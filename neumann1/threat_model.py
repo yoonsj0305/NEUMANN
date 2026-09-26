@@ -27,6 +27,8 @@ class Asset(str, Enum):
     MANIFEST_IDENTITY = "manifest_identity"
     AUTHORIZATION_HISTORY = "authorization_history"
     HOST_INTEGRITY = "host_integrity"
+    CORE_RUNTIME_STATE = "core_runtime_state"
+    HOST_CAPABILITIES = "host_capabilities"
     SOLVER_RESULT_INTEGRITY = "solver_result_integrity"
     CHECKPOINT_INTEGRITY = "checkpoint_integrity"
 
@@ -38,6 +40,7 @@ class TrustBoundary(str, Enum):
     LOCAL_LEDGER_FILE = "local_ledger_file"
     TRUSTED_HEAD = "trusted_external_head"
     PYTHON_PROCESS = "python_process"
+    CHILD_PROCESS = "child_process"
 
 
 @dataclass(frozen=True)
@@ -78,6 +81,7 @@ class ThreatScenario:
 
 
 THREAT_MODEL_VERSION = "neumann.threat-model.v1"
+THREAT_MODEL_VERSION_V2 = "neumann.threat-model.v2"
 
 
 def default_threat_model() -> tuple[ThreatScenario, ...]:
@@ -184,6 +188,144 @@ def default_threat_model() -> tuple[ThreatScenario, ...]:
     for scenario in scenarios:
         scenario.validate()
     return scenarios
+
+
+def threat_model_v2() -> tuple[ThreatScenario, ...]:
+    """Reassess plugin threats after the v0.0.19 process boundary.
+
+    v1 is preserved for historical reproducibility. v2 distinguishes direct
+    core-runtime coupling from same-user host capability abuse.
+    """
+    scenarios = (
+        ThreatScenario(
+            scenario_id="plugin.unapproved_activation",
+            actor=ThreatActor.MALICIOUS_PUBLISHER,
+            asset=Asset.EXECUTION_AUTHORITY,
+            boundary=TrustBoundary.ACTIVATION,
+            description="An installed plugin attempts execution without exact-manifest approval.",
+            prevent=Assurance.ENFORCED,
+            detect=Assurance.DETECTED,
+            contain=Assurance.ENFORCED,
+            recover=Assurance.ENFORCED,
+            controls=("digest_bound_approval", "authorization_before_child_dispatch"),
+            evidence=("test_unapproved_manifest_cannot_trigger_resolver_import", "fresh_venv_unapproved_adapter_blocked"),
+            residual_risk="A compromised NEUMANN process can bypass the managed authorization path.",
+        ),
+        ThreatScenario(
+            scenario_id="plugin.manifest_substitution",
+            actor=ThreatActor.PACKAGE_TAMPERER,
+            asset=Asset.MANIFEST_IDENTITY,
+            boundary=TrustBoundary.ACTIVATION,
+            description="Plugin metadata changes after approval while retaining a logical plugin identity.",
+            prevent=Assurance.ENFORCED,
+            detect=Assurance.DETECTED,
+            contain=Assurance.ENFORCED,
+            recover=Assurance.PARTIAL,
+            controls=("canonical_manifest_sha256", "digest_bound_approval"),
+            evidence=("test_approval_is_bound_to_exact_manifest_digest", "benchmark_v016_changed_manifest_digest_blocked"),
+            residual_risk="Publisher authenticity before first approval is still not established.",
+        ),
+        ThreatScenario(
+            scenario_id="ledger.record_mutation",
+            actor=ThreatActor.LEDGER_TAMPERER,
+            asset=Asset.AUTHORIZATION_HISTORY,
+            boundary=TrustBoundary.LOCAL_LEDGER_FILE,
+            description="A persisted authorization event is modified or reordered on disk.",
+            prevent=Assurance.OUT_OF_SCOPE,
+            detect=Assurance.DETECTED,
+            contain=Assurance.ENFORCED,
+            recover=Assurance.PARTIAL,
+            controls=("sha256_event_chain", "reload_full_chain_verification"),
+            evidence=("test_mutating_persisted_event_is_detected", "test_reordering_events_is_detected"),
+            residual_risk="Detection blocks trusted reload but does not restore the original ledger bytes.",
+        ),
+        ThreatScenario(
+            scenario_id="ledger.valid_prefix_rollback",
+            actor=ThreatActor.HOST_ROLLBACK_ADMIN,
+            asset=Asset.AUTHORIZATION_HISTORY,
+            boundary=TrustBoundary.TRUSTED_HEAD,
+            description="The ledger is replaced with a complete older valid prefix.",
+            prevent=Assurance.OUT_OF_SCOPE,
+            detect=Assurance.PARTIAL,
+            contain=Assurance.PARTIAL,
+            recover=Assurance.PARTIAL,
+            controls=("trusted_expected_head",),
+            evidence=("test_valid_prefix_truncation_requires_trusted_head_to_detect",),
+            residual_risk="Detection depends on an uncompromised expected head outside the ledger file.",
+        ),
+        ThreatScenario(
+            scenario_id="plugin.direct_core_runtime_mutation",
+            actor=ThreatActor.COMPROMISED_PLUGIN,
+            asset=Asset.CORE_RUNTIME_STATE,
+            boundary=TrustBoundary.CHILD_PROCESS,
+            description="Plugin code attempts to mutate NEUMANN core Python module/global state through direct in-process execution.",
+            prevent=Assurance.ENFORCED,
+            detect=Assurance.DETECTED,
+            contain=Assurance.ENFORCED,
+            recover=Assurance.PARTIAL,
+            controls=("out_of_process_execution", "json_rpc_boundary"),
+            evidence=("test_adapter_creation_does_not_import_plugin_in_core_process", "benchmark_v019_plugin_imported_in_parent_after_false", "benchmark_v019_worker_pids_outside_parent"),
+            residual_risk="Process separation blocks direct shared Python state, but same-user OS mechanisms are not sandboxed.",
+        ),
+        ThreatScenario(
+            scenario_id="plugin.host_capability_abuse",
+            actor=ThreatActor.COMPROMISED_PLUGIN,
+            asset=Asset.HOST_CAPABILITIES,
+            boundary=TrustBoundary.CHILD_PROCESS,
+            description="A plugin child process abuses filesystem, network, subprocess, signal, or other OS capabilities available to the same user.",
+            prevent=Assurance.OUT_OF_SCOPE,
+            detect=Assurance.OUT_OF_SCOPE,
+            contain=Assurance.OUT_OF_SCOPE,
+            recover=Assurance.PARTIAL,
+            controls=("dispatch_timeout", "use_time_revocation"),
+            evidence=("benchmark_v019_post_revocation_child_launches_zero",),
+            residual_risk="v0.0.19 provides process separation but no OS-level capability restriction or hostile-code sandbox.",
+        ),
+        ThreatScenario(
+            scenario_id="core.process_compromise",
+            actor=ThreatActor.COMPROMISED_NEUMANN_PROCESS,
+            asset=Asset.EXECUTION_AUTHORITY,
+            boundary=TrustBoundary.PYTHON_PROCESS,
+            description="The NEUMANN process itself is compromised and bypasses its own controls.",
+            prevent=Assurance.OUT_OF_SCOPE,
+            detect=Assurance.OUT_OF_SCOPE,
+            contain=Assurance.OUT_OF_SCOPE,
+            recover=Assurance.OUT_OF_SCOPE,
+            controls=(),
+            evidence=(),
+            residual_risk="The enforcing process cannot be assumed to defend against an attacker that controls it.",
+        ),
+        ThreatScenario(
+            scenario_id="checkpoint.authority_compromise",
+            actor=ThreatActor.COMPROMISED_CHECKPOINT_AUTHORITY,
+            asset=Asset.CHECKPOINT_INTEGRITY,
+            boundary=TrustBoundary.TRUSTED_HEAD,
+            description="The external expected-head authority is compromised together with a local ledger rollback.",
+            prevent=Assurance.OUT_OF_SCOPE,
+            detect=Assurance.OUT_OF_SCOPE,
+            contain=Assurance.OUT_OF_SCOPE,
+            recover=Assurance.OUT_OF_SCOPE,
+            controls=(),
+            evidence=(),
+            residual_risk="Compromise of both the ledger and its trust anchor defeats current rollback detection.",
+        ),
+    )
+    for scenario in scenarios:
+        scenario.validate()
+    return scenarios
+
+
+def next_security_control_priority_v2(
+    scenarios: Iterable[ThreatScenario] | None = None,
+) -> str:
+    scenarios = tuple(threat_model_v2() if scenarios is None else scenarios)
+    for scenario in scenarios:
+        if (
+            scenario.scenario_id == "plugin.host_capability_abuse"
+            and scenario.contain == Assurance.OUT_OF_SCOPE
+        ):
+            return "os_level_capability_sandbox"
+    return "publisher_authenticity"
 
 
 def assurance_counts(scenarios: Iterable[ThreatScenario] | None = None) -> dict[str, int]:
