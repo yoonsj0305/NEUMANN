@@ -60,3 +60,12 @@ __all__ += [
     "AuthorizationEvent", "AuthorizationState", "PluginAuthorizationLedger",
     "PluginRuntimeBinding", "ManagedPluginRegistry", "AuthorizedPluginActivator",
 ]
+
+from .persistent_authorization import (
+    PERSISTENT_LEDGER_VERSION, GENESIS_HASH, LedgerIntegrityError, LedgerCheckpoint,
+    HashChainedAuthorizationLedger,
+)
+__all__ += [
+    "PERSISTENT_LEDGER_VERSION", "GENESIS_HASH", "LedgerIntegrityError",
+    "LedgerCheckpoint", "HashChainedAuthorizationLedger",
+]
