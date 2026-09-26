@@ -69,3 +69,14 @@ __all__ += [
     "PERSISTENT_LEDGER_VERSION", "GENESIS_HASH", "LedgerIntegrityError",
     "LedgerCheckpoint", "HashChainedAuthorizationLedger",
 ]
+
+from .threat_model import (
+    THREAT_MODEL_VERSION, Assurance, ThreatActor, Asset, TrustBoundary,
+    ThreatScenario, default_threat_model, assurance_counts,
+    unresolved_host_integrity_scenarios, next_control_priority,
+)
+__all__ += [
+    "THREAT_MODEL_VERSION", "Assurance", "ThreatActor", "Asset", "TrustBoundary",
+    "ThreatScenario", "default_threat_model", "assurance_counts",
+    "unresolved_host_integrity_scenarios", "next_control_priority",
+]
