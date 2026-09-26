@@ -6,6 +6,7 @@ from neumann1 import (
     ATTESTATION_GENESIS_HASH,
     AttestationLedgerIntegrityError,
     AttestationStatus,
+    CostLedger,
     HashChainedAttestationLedger,
     LifecycleAttestation,
     ManagedPluginRegistry,
@@ -102,7 +103,11 @@ def test_use_time_attestation_revocation_stops_next_plugin_rpc(tmp_path):
 
     evidence_ledger.revoke_manifest(m, "evidence withdrawn")
     with pytest.raises(PermissionError, match="attestation revoked"):
-        engine.solve(Problem("probe: after-revoke"))
+        adapter.compiler.dispatcher.dispatch(
+            "compile",
+            {"problem": {"raw_text": "probe: after-revoke", "metadata": {}}},
+            CostLedger(),
+        )
 
     assert adapter.compiler.dispatcher.request_count == requests_before_revoke
     assert not adapter.compiler.dispatcher.is_running
