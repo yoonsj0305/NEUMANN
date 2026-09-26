@@ -4,92 +4,59 @@
 
 > Make the cheapest correct reasoning path easy to use.
 
-The core idea is simple:
+The core idea:
 
-```text
-Problem
-  → Representation / Structure Formation
-  → Choose the cheapest correct execution path
-  → Deterministic or neural solver
-  → Verification
-  → Answer + evidence + cost ledger
-```
+Problem → Representation / Structure Formation → Selective execution policy → Deterministic or neural solver → Verification → Answer + evidence + cost ledger
 
 NEUMANN is not trying to make an LLM perform every calculation itself. It aims to separate what learned models are good at from what traditional algorithms and formal solvers already do faster and more reliably.
 
 ## Current engineering baseline
 
-**v0.0.5**
+**v0.0.6**
 
 Implemented:
-
 - typed problem / representation / result objects
-- bipartite-matching solver
-- shortest-path solver
-- linear-system solver
+- bipartite-matching, shortest-path, and linear-system solvers
 - deterministic answer verification
 - benchmark-only semantic contract verification
 - learned structure-family classifier
 - two-stage open-set / UNKNOWN gate
+- prototype-distance rejection baseline
+- structurally-near OOD benchmark
+- selective-risk curves
 - cost ledger and execution trace
-- held-out / hard-negative tests
 
-Current test status:
+Local test status:
 
-```text
-14 PASS
-0 FAIL
-```
+**17 PASS / 0 FAIL**
+
+## v0.0.6 result
+
+On a tiny frozen synthetic fixture:
+- two-stage gate: 80% known auto-route coverage, 13.33% near-unknown false-route
+- prototype-distance gate: 33.33% known auto-route coverage, 0% near-unknown false-route
+
+This is not a production guarantee. It demonstrates the safety-versus-coverage trade-off that a NEUMANN router must explicitly manage.
+
+See `docs/experiments/v0.0.6.md`.
 
 ## Important boundary
 
-v0.0.5 does **not** yet understand arbitrary natural-language problems.
+v0.0.6 does **not** yet generate complete solver-ready IRs from arbitrary natural language.
 
-The learned model currently predicts only a coarse structure family:
-
+The learned path currently recognizes only coarse structure families:
 - `bipartite_matching`
 - `shortest_path`
 - `linear_system`
 - `unknown`
 
-Complete solver-ready IR generation, semantic equivalence from raw language, and general LLM-backed structure formation are future work.
-
-## Research ↔ Engineering loop
-
-NEUMANN is developed through a continuous loop:
-
-```text
-research hypothesis
-    ↓
-minimal implementation
-    ↓
-measured gain or failure
-    ↓
-interpretation
-    ↓
-KEEP / MODIFY / KILL
-    ↓
-next experiment
-```
-
-Research results are tracked separately in the project research log; this repository is the source of truth for executable code, tests, benchmarks, and versioned engineering evidence.
-
 ## Run
 
 Requires Python 3.10+.
 
-```bash
-pip install -e .
-pytest -q
-python benchmark_v005.py
-```
-
-## Current research questions
-
-1. When does representation-first hybrid execution actually beat direct solving after representation, routing, solving, verification, and recovery costs are all counted?
-2. Can the system recognize when a problem is outside its supported structural competence?
-3. Can a learned Structure Former eventually produce complete, semantically faithful IRs from natural language?
-4. How often do directly reusable reasoning structures occur in naturally occurring heterogeneous task streams?
+    pip install -e .
+    pytest -q
+    python benchmark_v006.py
 
 ## Design principles
 
@@ -98,9 +65,9 @@ python benchmark_v005.py
 - **Traditional algorithms are first-class execution backends**
 - **A faster solver is useless if representation and verification overhead erase the gain**
 - **Answer correctness and representation fidelity are separate checks**
+- **Routing coverage must be chosen against an explicit false-route risk budget**
 - **Do not claim capability that the benchmark has not demonstrated**
 
 ## Status
 
 Research prototype. Not production-ready.
-
