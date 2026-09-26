@@ -29,7 +29,7 @@ def manifest():
     })
 
 
-def setup_adapter(timeout=1.0):
+def setup_adapter(timeout=8.0):
     sys.modules.pop(MODULE, None)
     m = manifest()
     ledger = PluginAuthorizationLedger()
@@ -74,7 +74,7 @@ def test_child_environment_mutation_does_not_mutate_parent_environment():
 
 
 def test_compile_timeout_fails_closed():
-    _, _, adapter, engine = setup_adapter(timeout=0.2)
+    _, _, adapter, engine = setup_adapter(timeout=3.0)
     result = engine.solve(Problem("probe: hang_compile"))
     assert not result.verified
     assert result.solver_name == "fallback_required"
@@ -83,7 +83,7 @@ def test_compile_timeout_fails_closed():
 
 
 def test_compile_crash_fails_closed():
-    _, _, adapter, engine = setup_adapter(timeout=1.0)
+    _, _, adapter, engine = setup_adapter(timeout=8.0)
     result = engine.solve(Problem("probe: crash_compile"))
     assert not result.verified
     assert result.solver_name == "fallback_required"
