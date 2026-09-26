@@ -6,74 +6,78 @@
 
 ## Current engineering baseline
 
-**v0.0.22**
+**v0.0.23**
 
-v0.0.21 proved that a persistent isolated worker can remove most fresh-process lifecycle overhead for lightweight families.
+v0.0.22 made persistent-worker state resettable and auditable.
 
-v0.0.22 addresses the semantic cost of that optimization:
+v0.0.23 makes lifecycle selection **declaration-aware**.
 
-> **What state is allowed to survive between requests, and how do we prevent hidden worker memory from becoming semantic authority?**
+Plugins may optionally declare a digest-bound `state_class` in their manifest.
 
-## Worker generations
+## State classes
 
-Every persistent worker lifecycle now has an explicit `generation_id`.
+### `stateless_semantics`
+- semantic correctness may not depend on hidden worker state
+- persistent worker allowed
 
-All persistent RPC responses are checked against the active generation. A generation mismatch is a protocol failure and the worker is discarded.
+### `cache_only`
+- retained state is performance cache only
+- persistent worker allowed
+- a finite `max_requests_per_worker` is mandatory
+- missing recycle bound is rejected
 
-`WorkerStatePolicy` currently supports:
+### `explicit_stateful`
+- semantics intentionally depend on state across requests
+- **rejected in v0.0.23** because NEUMANN does not yet have a session-scoped explicit-state protocol
 
-    max_requests_per_worker
+### `non_persistent_only`
+- worker reuse explicitly forbidden
+- fresh process per operation
 
-When the operation limit is reached, the next compile/solve/verify request starts a fresh worker generation.
+### no declaration
+- declaration-aware runtime fails safe to fresh-process execution
+- legacy manifest canonical shape remains unchanged
 
-Manual recycling is also available:
+## Authority identity
 
-    dispatcher.recycle("reason")
+`state_class`, when present, is part of the manifest canonical representation and SHA-256 digest.
 
-and records the previous generation ID, PID, request count, and recycle reason.
+Therefore changing:
 
-## Semantic state rule
+    stateless_semantics → cache_only
 
-NEUMANN's runtime contract is now:
+or any other lifecycle declaration requires a **new approval**.
 
-> Retained worker state may accelerate computation, but request correctness must not depend on hidden state that is absent from the explicit RPC payload and approved plugin artifact.
+## Declaration-aware runtime
 
-A strong CI probe sets:
+`resolve_plugin_lifecycle()` maps the declaration to:
+- persistent
+- fresh_process
+- reject
 
-    max_requests_per_worker = 1
+`build_declared_lifecycle_adapter()` then enforces that decision.
 
-which forces one problem's compile, solve, and verify operations into **three different worker generations**. The family must still return the correct verified answer.
+The external scalar-sum interoperability plugin now declares:
 
-## Poisoned-state experiment
+    state_class = stateless_semantics
 
-The test plugin contains an intentional hidden global poison flag.
+and is automatically routed to the persistent-worker path.
 
-CI verifies:
-- poison is visible inside the same generation
-- manual recycle clears the poison
-- request-limit recycle clears the poison
-- generation ID changes after recycle
-- normal results remain semantically equivalent across recycle
-- parent process still does not import plugin code
+## Critical boundary
 
-## Boundary
+A state declaration is a plugin contract claim, **not proof**.
 
-Process recycling resets Python in-memory state for the worker process. It does **not** roll back external effects such as:
-- filesystem writes
-- network / remote service state
-- databases
-- escaped descendants
-- host-level resources
+A malicious or buggy implementation can falsely claim `stateless_semantics`. Lifecycle enforcement and declaration conformance testing are separate concerns.
 
-That remains outside state hygiene and belongs to the OS-level sandbox / side-effect-control track.
+State classes also do not provide filesystem/network isolation or side-effect rollback.
 
-See `docs/experiments/v0.0.22.md`.
+See `docs/experiments/v0.0.23.md`.
 
 ## Run
 
     pip install -e .
     pytest -q
-    python benchmark_v022.py
+    python benchmark_v023.py
 
 ## Status
 

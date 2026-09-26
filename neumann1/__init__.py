@@ -43,8 +43,8 @@ __all__ += ["FamilyAdapter", "FamilyRegistry", "FAMILY_CONTRACT_VERSION", "built
 from .types import KindLike, kind_id, is_unknown_kind, display_kind
 __all__ += ["KindLike", "kind_id", "is_unknown_kind", "display_kind"]
 
-from .plugin_manifest import PluginManifest, PluginCatalog, ActivationPolicy, PluginActivator, PLUGIN_MANIFEST_VERSION
-__all__ += ["PluginManifest", "PluginCatalog", "ActivationPolicy", "PluginActivator", "PLUGIN_MANIFEST_VERSION"]
+from .plugin_manifest import PluginManifest, PluginCatalog, ActivationPolicy, PluginActivator, PLUGIN_MANIFEST_VERSION, PluginStateClass
+__all__ += ["PluginManifest", "PluginCatalog", "ActivationPolicy", "PluginActivator", "PLUGIN_MANIFEST_VERSION", "PluginStateClass"]
 
 from .plugin_discovery import DiscoveredManifest, DiscoveryIssue, DiscoveryReport, discover_installed_manifests, catalog_from_discovery
 __all__ += ["DiscoveredManifest", "DiscoveryIssue", "DiscoveryReport", "discover_installed_manifests", "catalog_from_discovery"]
@@ -106,4 +106,13 @@ from .persistent_plugin_isolation import (
 __all__ += [
     "PERSISTENT_PLUGIN_RPC_VERSION", "WorkerStatePolicy", "WorkerRecycleEvent",
     "PersistentSubprocessPluginDispatcher", "build_persistent_out_of_process_adapter",
+]
+
+from .plugin_lifecycle import (
+    LifecycleMode, LifecyclePolicyError, LifecycleResolution,
+    resolve_plugin_lifecycle, build_declared_lifecycle_adapter,
+)
+__all__ += [
+    "LifecycleMode", "LifecyclePolicyError", "LifecycleResolution",
+    "resolve_plugin_lifecycle", "build_declared_lifecycle_adapter",
 ]
