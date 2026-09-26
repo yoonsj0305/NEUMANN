@@ -6,92 +6,77 @@
 
 ## Current engineering baseline
 
-**v0.0.20**
+**v0.0.21**
 
-Implemented through v0.0.20:
-- representation-first family routing
-- static plugin discovery + exact-manifest authorization
-- durable hash-chained authorization ledger
-- use-time revocation
-- out-of-process plugin compiler/solver/verifier execution
-- crash/timeout fail-closed behavior
-- fresh-venv external-wheel interoperability
-- Threat Model v1 and **Threat Model v2**
-- **dispatch-vs-child-service runtime cost instrumentation**
+v0.0.20 measured the fresh-process execution path and found ~99.98% of the trivial-family dispatch interval outside measured child plugin service.
 
-## v0.0.20 focus
+v0.0.21 tests the resulting performance hypothesis:
 
-v0.0.19 solved one trust problem by moving external plugin code out of the NEUMANN core Python process.
+> Keep the process boundary, but reuse the worker process.
 
-That created a new engineering question:
+## Persistent worker path
 
-    Is the fresh-process boundary too expensive for repeated reasoning?
+Fresh-process path:
 
-Every isolated dispatch now records:
-- parent-observed dispatch time
-- child-observed plugin service time
-- outside-service time = dispatch - service
+    compile child → exit → solve child → exit → verify child → exit
 
-`outside-service` is a lower-bound proxy for process startup, imports, scheduling, IPC, and response handling.
+Persistent path:
 
-### Prototype performance gate
+    start child once
+      → import / activate once
+      → compile
+      → solve
+      → verify
+      → reuse for later requests
 
-Frozen before the CI measurement:
+Protocol:
 
-    outside_service_fraction >= 0.50
+    neumann.plugin.persistent-rpc.v1
 
-means this trivial-family microbenchmark is classified:
+Properties:
+- line-delimited JSON RPC
+- monotonically increasing request IDs
+- one serialized request at a time per worker
+- authorization checked before worker start and every request
+- revoke terminates the worker without sending another plugin RPC
+- timeout/crash discards worker
+- next approved request may start a clean replacement worker
+- plugin module remains outside the core Python process
 
-    fresh_process_lifecycle_dominated
+## Pre-registered keep gate
 
-and the next performance experiment becomes:
+Keep this direction only if CI shows:
 
-    persistent_worker_lifecycle
+1. warm persistent pipeline median <= 25% of fresh-process median
+2. revoked execution is not verified
+3. post-revocation plugin requests = 0
+4. worker is terminated on revocation
 
-This is an engineering heuristic, not a universal threshold.
+## Important semantic boundary
 
-## Threat Model v2
+Persistent workers retain child-process state across requests.
 
-v2 separates two threats that v1 grouped together:
+That may include plugin globals, caches, allocator state, and accidental mutable state.
 
-### Direct core Python-runtime mutation
+This is useful for performance, but creates a new lifecycle question:
 
-The isolated path now has evidence for process separation:
-- plugin module absent from parent `sys.modules`
-- compiler/solver/verifier worker PIDs differ from parent
-- JSON RPC boundary between core and plugin
+    What plugin state is allowed to persist, and when must a worker be recycled?
 
-### Host capability abuse
+## Security boundary
 
-Still not contained:
-- filesystem access
-- network access
-- subprocess creation
-- same-user OS capabilities
+Persistent reuse is **not** a sandbox improvement.
 
-Therefore the next **security** control priority is:
+Threat Model v2 still sets the next security priority to:
 
     os_level_capability_sandbox
 
-Performance and security priorities are intentionally allowed to diverge.
-
-See:
-- `docs/THREAT_MODEL_V2.md`
-- `docs/experiments/v0.0.20.md`
+See `docs/experiments/v0.0.21.md`.
 
 ## Run
 
-Requires Python 3.10+.
-
     pip install -e .
     pytest -q
-    python benchmark_v020.py
-
-## Claim boundary
-
-NEUMANN currently has process separation, not hostile-code-safe sandboxing.
-
-A future persistent worker may improve latency but does not, by itself, strengthen the security boundary.
+    python benchmark_v021.py
 
 ## Status
 
