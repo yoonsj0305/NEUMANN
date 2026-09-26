@@ -17,6 +17,7 @@ from .plugin_isolation import (
     PluginProcessTimeout, PluginProtocolError, _merge_ledger,
 )
 from .plugin_manifest import ActivationPolicy, PluginManifest
+from .worker_lifecycle import require_persistent_compatible
 
 
 PERSISTENT_PLUGIN_RPC_VERSION = "neumann.plugin.persistent-rpc.v1"
@@ -331,6 +332,7 @@ def build_persistent_out_of_process_adapter(
     manifest.validate()
     (policy or ActivationPolicy()).check(manifest)
     authorization_ledger.require_manifest(manifest)
+    require_persistent_compatible(manifest)
     dispatcher = PersistentSubprocessPluginDispatcher(
         manifest=manifest,
         authorization_ledger=authorization_ledger,
