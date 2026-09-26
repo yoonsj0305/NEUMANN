@@ -12,7 +12,7 @@ NEUMANN separates what learned models are good at from what traditional algorith
 
 ## Current engineering baseline
 
-**v0.0.8**
+**v0.0.9**
 
 Implemented:
 - typed problem / representation / result objects
@@ -29,9 +29,9 @@ Implemented:
 - **edge-level IR precision / recall / F1 measurement**
 - cost ledger and execution trace
 
-## v0.0.8 focus
+## v0.0.9 focus
 
-v0.0.8 hardens semantic fidelity for the first complete IR family.
+v0.0.9 adds a second complete IR family and tests family-neutral routing.
 
 The matching compiler now fails closed when:
 - any nonempty statement is unparsed
@@ -51,7 +51,7 @@ Requires Python 3.10+.
 
     pip install -e .
     pytest -q
-    python benchmark_v008.py
+    python benchmark_v009.py
 
 ## Design principles
 
@@ -67,3 +67,12 @@ Requires Python 3.10+.
 ## Status
 
 Research prototype. Not production-ready.
+
+
+### v0.0.9 additions
+- controlled linear-system compiler → complete A, b, variable-order IR
+- composite Structure Former across matching + linear systems
+- fail closed if zero or multiple families recognize the same input
+- raw-text routing to matching or Gaussian elimination without oracle solver payload
+
+See `docs/experiments/v0.0.9.md`.
