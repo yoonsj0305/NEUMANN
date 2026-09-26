@@ -19,3 +19,7 @@ __all__ += ["LearnedKindStructureFormer", "KeywordKindBaseline", "KindTrainingEx
 from .open_set import TwoStageOpenSetStructureFormer, OpenSetMetrics
 from .open_set_dataset import final_test_examples
 __all__ += ["TwoStageOpenSetStructureFormer", "OpenSetMetrics", "final_test_examples"]
+
+from .prototype_open_set import PrototypeOpenSetStructureFormer, PrototypeMetrics
+from .open_set_v006_dataset import validation_v006, final_test_v006
+__all__ += ["PrototypeOpenSetStructureFormer", "PrototypeMetrics", "validation_v006", "final_test_v006"]
