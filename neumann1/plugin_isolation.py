@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+import time
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -72,6 +73,7 @@ class SubprocessPluginDispatcher:
     python_executable: str = sys.executable
     worker_pids: list[int] = field(default_factory=list)
     launch_count: int = 0
+    dispatch_timings: list[dict[str, float | str | int]] = field(default_factory=list)
 
     def __post_init__(self):
         self.manifest.validate()
@@ -103,6 +105,7 @@ class SubprocessPluginDispatcher:
             raise PluginProtocolError("request exceeds byte limit")
 
         self.launch_count += 1
+        dispatch_start = time.perf_counter()
         try:
             completed = subprocess.run(
                 [self.python_executable, "-m", "neumann1.plugin_worker"],
@@ -136,8 +139,17 @@ class SubprocessPluginDispatcher:
         if response.get("protocol_version") != PLUGIN_RPC_VERSION:
             raise PluginProtocolError("plugin response protocol version mismatch")
 
+        dispatch_seconds = time.perf_counter() - dispatch_start
+        service_seconds = float(response.get("service_seconds", 0.0))
         worker_pid = int(response["worker_pid"])
         self.worker_pids.append(worker_pid)
+        self.dispatch_timings.append({
+            "operation": operation,
+            "worker_pid": worker_pid,
+            "dispatch_seconds": dispatch_seconds,
+            "service_seconds": service_seconds,
+            "outside_service_seconds": max(0.0, dispatch_seconds - service_seconds),
+        })
         _merge_ledger(ledger, dict(response.get("ledger", {})))
         return dict(response["result"])
 

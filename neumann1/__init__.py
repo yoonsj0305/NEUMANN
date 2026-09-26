@@ -74,11 +74,13 @@ from .threat_model import (
     THREAT_MODEL_VERSION, Assurance, ThreatActor, Asset, TrustBoundary,
     ThreatScenario, default_threat_model, assurance_counts,
     unresolved_host_integrity_scenarios, next_control_priority,
+    THREAT_MODEL_VERSION_V2, threat_model_v2, next_security_control_priority_v2,
 )
 __all__ += [
     "THREAT_MODEL_VERSION", "Assurance", "ThreatActor", "Asset", "TrustBoundary",
     "ThreatScenario", "default_threat_model", "assurance_counts",
     "unresolved_host_integrity_scenarios", "next_control_priority",
+    "THREAT_MODEL_VERSION_V2", "threat_model_v2", "next_security_control_priority_v2",
 ]
 
 from .plugin_isolation import (
@@ -93,3 +95,6 @@ __all__ += [
     "SubprocessPluginDispatcher", "OutOfProcessCompiler", "OutOfProcessSolver",
     "OutOfProcessVerifier", "build_out_of_process_adapter",
 ]
+
+from .runtime_cost import RuntimeCostAssessment, assess_dispatch_timings
+__all__ += ["RuntimeCostAssessment", "assess_dispatch_timings"]

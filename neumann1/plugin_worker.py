@@ -4,6 +4,7 @@ import contextlib
 import json
 import os
 import sys
+import time
 from typing import Any
 
 from .plugin_loading import resolve_python_entry_point
@@ -115,13 +116,16 @@ def main() -> int:
             request = json.loads(raw.decode("utf-8"))
             if not isinstance(request, dict):
                 raise ValueError("RPC request must be a JSON object")
+            service_start = time.perf_counter()
             response = _run(request)
+            response["service_seconds"] = time.perf_counter() - service_start
         except BaseException as exc:
             response = {
                 "ok": False,
                 "protocol_version": PLUGIN_RPC_VERSION,
                 "worker_pid": os.getpid(),
                 "error": f"{type(exc).__name__}: {exc}",
+                "service_seconds": None,
             }
 
     sys.stdout.write(json.dumps(response, separators=(",", ":"), ensure_ascii=True))
