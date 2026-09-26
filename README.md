@@ -10,61 +10,47 @@ Problem → learned proposal → deterministic compiler → solver-ready IR → 
 
 ## Current engineering baseline
 
-**v0.0.13**
+**v0.0.14**
 
 Implemented:
 - learned proposal + deterministic compiler acceptance
 - open namespaced external family kinds
 - Family Adapter Contract v1 + conformance harness
-- **Plugin Manifest v1**
-- **static Plugin Catalog**
-- **explicit activation boundary**
-- pre-import metadata policy for declared capabilities
+- Plugin Manifest v1 + static Plugin Catalog
+- explicit activation boundary
+- **static installed-package manifest discovery**
 - fail-closed UNKNOWN path
 - CI-backed tests and benchmark smoke
 
-## v0.0.13 focus
+## v0.0.14 focus
 
-The central rule is:
+Installed Python distributions can now advertise NEUMANN manifests by shipping JSON files under a path segment named:
 
-**Discovery != Trust != Execution**
+    neumann_plugins/
 
-A plugin can now be described by a static manifest:
+Discovery uses importlib.metadata distribution file listings and reads those static JSON files directly.
 
-    neumann.plugin.manifest.v1
+It does **not** resolve or import the plugin entry point.
 
-The manifest declares:
-- plugin ID and version
-- family ID
-- namespaced representation kind
-- family contract version
-- entry point
-- capabilities
+Rules:
+- only JSON under a neumann_plugins path segment is considered
+- manifest size is capped at 64 KiB by default
+- malformed or oversized manifests become DiscoveryIssue records
+- one bad distribution does not abort every other discovery
+- duplicate plugin/family/kind conflicts are not silently resolved
+- distribution name/version/path and manifest digest are retained as provenance
 
-Catalog registration validates metadata and conflict rules **without resolving or importing plugin code**.
-
-Activation is a separate explicit operation:
-
-    manifest
-      → policy check
-      → resolve entry point
-      → factory
-      → FamilyAdapter identity check
-
-The default metadata policy blocks plugins declaring network, filesystem.write, or subprocess before resolver code is called.
-
-This is **not a sandbox**. Once imported, code is ordinary Python. Manifest SHA-256 is an audit identity, not a publisher signature.
+This is package discovery, not package trust. A malicious package that is already installed is still installed code.
 
 Still missing:
-- installed-package discovery
-- cryptographic signatures / publisher identity
-- dependency isolation and sandboxing
-- capability enforcement after import
-- revocation
-- public package/index workflow
-- multi-version compatibility negotiation
+- interoperability test with an independently published package
+- signatures / publisher identity
+- isolated installation and dependency resolution
+- post-import sandboxing
+- revocation / trust store
+- public registry/index
 
-See `docs/experiments/v0.0.13.md`.
+See `docs/experiments/v0.0.14.md`.
 
 ## Run
 
@@ -72,16 +58,16 @@ Requires Python 3.10+.
 
     pip install -e .
     pytest -q
-    python benchmark_v013.py
+    python benchmark_v014.py
 
 ## Design principles
 
 - **Correctness before compression**
 - **UNKNOWN is a valid answer**
 - **Learned prediction is proposal, not authority**
-- **Discovery must not imply code execution**
-- **Declared capability policy is not a sandbox**
-- **External families must be namespaced and conformant**
+- **Discovery must not imply import**
+- **Installation is not trust**
+- **Static metadata errors should be auditable, not silently ignored**
 - **Do not claim security properties that are not enforced**
 - **Do not claim capability that the benchmark has not demonstrated**
 
