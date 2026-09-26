@@ -7,7 +7,7 @@ import sys
 from neumann1 import (
     ManagedPluginRegistry, PluginAuthorizationLedger, Problem, RegistryEngine,
     WorkerStateClass, builtin_family_registry, catalog_from_discovery,
-    discover_installed_manifests, build_persistent_out_of_process_adapter,
+    discover_installed_manifests,
 )
 from neumann1.persistent_plugin_isolation import _build_unattested_persistent_adapter_for_conformance as build_persistent_out_of_process_adapter
 
