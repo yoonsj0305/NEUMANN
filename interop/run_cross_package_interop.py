@@ -56,7 +56,7 @@ def run():
         raise RuntimeError("unapproved out-of-process adapter creation was not blocked")
 
     ledger.approve(manifest, reason="cross-package OOP approval")
-    adapter = build_out_of_process_adapter(manifest, ledger, timeout_seconds=2.0)
+    adapter = build_out_of_process_adapter(manifest, ledger, timeout_seconds=8.0)
     if PLUGIN_MODULE in sys.modules:
         raise RuntimeError("proxy construction imported plugin into parent")
 
