@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .types import Problem, SolveResult, CostLedger, IRKind
+from .types import Problem, SolveResult, CostLedger, display_kind, is_unknown_kind
 from .family_registry import FamilyRegistry
 
 
@@ -22,9 +22,11 @@ class RegistryEngine:
         trace: list[str] = []
 
         rep = self.structure_former.form(problem, ledger)
-        trace.append(f"representation={rep.kind.value} confidence={rep.confidence:.3f}")
+        trace.append(
+            f"representation={display_kind(rep.kind)} confidence={rep.confidence:.3f}"
+        )
 
-        if rep.kind == IRKind.UNKNOWN or rep.confidence < self.min_confidence:
+        if is_unknown_kind(rep.kind) or rep.confidence < self.min_confidence:
             ledger.fallback_steps += 1
             return SolveResult(
                 answer=None,
@@ -36,7 +38,20 @@ class RegistryEngine:
                 trace=trace + ["fail_closed"],
             )
 
-        adapter = self.registry.get(rep.kind)
+        try:
+            adapter = self.registry.get(rep.kind)
+        except (TypeError, ValueError) as exc:
+            ledger.fallback_steps += 1
+            return SolveResult(
+                answer=None,
+                representation=rep,
+                solver_name="fallback_required",
+                verified=False,
+                verification_reason=f"Invalid representation kind: {exc}",
+                ledger=ledger,
+                trace=trace + ["invalid_kind_fail_closed"],
+            )
+
         if adapter is None:
             ledger.fallback_steps += 1
             return SolveResult(
@@ -44,7 +59,9 @@ class RegistryEngine:
                 representation=rep,
                 solver_name="fallback_required",
                 verified=False,
-                verification_reason=f"No registered family adapter for {rep.kind.value}",
+                verification_reason=(
+                    f"No registered family adapter for {display_kind(rep.kind)}"
+                ),
                 ledger=ledger,
                 trace=trace + ["unregistered_family_fail_closed"],
             )
@@ -62,6 +79,7 @@ class RegistryEngine:
             )
 
         trace.append(f"family={adapter.family_id}")
+        trace.append(f"kind_id={adapter.canonical_kind_id}")
         trace.append(f"solver={adapter.solver.name}")
         answer = adapter.solver.solve(rep, ledger)
         vr = adapter.answer_verifier.verify(problem, rep, answer, ledger)
