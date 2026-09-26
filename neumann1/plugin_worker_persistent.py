@@ -32,7 +32,7 @@ def _read_line() -> bytes | None:
     return raw
 
 
-def _handle(adapter, request: dict[str, Any]) -> dict[str, Any]:
+def _handle(adapter, request: dict[str, Any], generation_id: str) -> dict[str, Any]:
     if request.get("protocol_version") != PERSISTENT_PLUGIN_RPC_VERSION:
         raise ValueError("unsupported persistent plugin RPC version")
 
@@ -84,6 +84,7 @@ def _handle(adapter, request: dict[str, Any]) -> dict[str, Any]:
         "protocol_version": PERSISTENT_PLUGIN_RPC_VERSION,
         "request_id": request_id,
         "worker_pid": os.getpid(),
+        "generation_id": generation_id,
         "service_seconds": time.perf_counter() - service_start,
         "ledger": _ledger_to_dict(ledger),
         "result": result,
@@ -104,6 +105,9 @@ def main() -> int:
             raise ValueError("first persistent RPC operation must be initialize")
 
         manifest = PluginManifest.from_dict(dict(init["manifest"]))
+        generation_id = str(init["generation_id"])
+        if not generation_id:
+            raise ValueError("generation_id is required")
         with contextlib.redirect_stdout(sys.stderr):
             adapter = PluginActivator(resolve_python_entry_point).activate(manifest)
 
@@ -112,6 +116,7 @@ def main() -> int:
             "protocol_version": PERSISTENT_PLUGIN_RPC_VERSION,
             "request_id": int(init.get("request_id", 0)),
             "worker_pid": os.getpid(),
+            "generation_id": generation_id,
             "manifest_digest_sha256": manifest.digest_sha256,
             "result": {"initialized": True},
         })
@@ -124,7 +129,7 @@ def main() -> int:
                 request = json.loads(raw.decode("utf-8"))
                 if not isinstance(request, dict):
                     raise ValueError("RPC request must be an object")
-                response = _handle(adapter, request)
+                response = _handle(adapter, request, generation_id)
             except BaseException as exc:
                 response = {
                     "ok": False,
@@ -135,6 +140,7 @@ def main() -> int:
                         else None
                     ),
                     "worker_pid": os.getpid(),
+                    "generation_id": generation_id,
                     "error": f"{type(exc).__name__}: {exc}",
                 }
             _write(response)
