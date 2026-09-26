@@ -82,7 +82,8 @@ def run():
     revoked = engine.solve(Problem("sum: 2, 3, 4.5"))
     if revoked.verified:
         raise RuntimeError("revoked plugin still executed successfully")
-    if dispatcher.launch_count != launches_after_first:
+    launches_after_revoked_attempt = dispatcher.launch_count
+    if launches_after_revoked_attempt != launches_after_first:
         raise RuntimeError("revoked request launched a child process")
 
     ledger.approve(manifest, reason="cross-package OOP re-approval")
@@ -118,8 +119,8 @@ def run():
         "execution_answer": first.answer,
         "child_launches_after_first": launches_after_first,
         "revoked_execution_verified": revoked.verified,
-        "child_launches_after_revoked_attempt": dispatcher.launch_count if not restored.verified else launches_after_first,
-        "post_revocation_child_launches": 0,
+        "child_launches_after_revoked_attempt": launches_after_revoked_attempt,
+        "post_revocation_child_launches": launches_after_revoked_attempt - launches_after_first,
         "restored_execution_verified": restored.verified,
         "total_child_launches_after_conformance": dispatcher.launch_count,
         "conformance": {
