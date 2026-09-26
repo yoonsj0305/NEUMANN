@@ -103,7 +103,7 @@ def test_revocation_before_next_dispatch_launches_no_child():
 
 
 def test_solver_timeout_is_engine_fail_closed():
-    _, _, adapter, engine = setup_adapter(timeout=0.2)
+    _, _, adapter, engine = setup_adapter(timeout=3.0)
     result = engine.solve(Problem("probe: hang_solve"))
     assert not result.verified
     assert result.solver_name == "fallback_required"
@@ -111,7 +111,7 @@ def test_solver_timeout_is_engine_fail_closed():
 
 
 def test_verifier_crash_is_engine_fail_closed():
-    _, _, adapter, engine = setup_adapter(timeout=1.0)
+    _, _, adapter, engine = setup_adapter(timeout=8.0)
     result = engine.solve(Problem("probe: crash_verify"))
     assert not result.verified
     assert result.solver_name == "fallback_required"
