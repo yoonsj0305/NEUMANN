@@ -1,0 +1,11 @@
+{
+  "manifest_version": "neumann.plugin.manifest.v1",
+  "plugin_id": "example.scalar_sum_plugin",
+  "plugin_version": "0.1.0",
+  "family_id": "example.scalar_sum",
+  "kind": "example.scalar_sum",
+  "family_contract_version": "neumann.family.v1",
+  "entry_point": "example_scalar_sum.plugin:make_adapter",
+  "capabilities": ["compile", "solve", "verify", "cpu"],
+  "description": "External scalar-sum family for NEUMANN cross-package interoperability proof"
+}

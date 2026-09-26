@@ -48,3 +48,6 @@ __all__ += ["PluginManifest", "PluginCatalog", "ActivationPolicy", "PluginActiva
 
 from .plugin_discovery import DiscoveredManifest, DiscoveryIssue, DiscoveryReport, discover_installed_manifests, catalog_from_discovery
 __all__ += ["DiscoveredManifest", "DiscoveryIssue", "DiscoveryReport", "discover_installed_manifests", "catalog_from_discovery"]
+
+from .plugin_loading import resolve_python_entry_point, activate_python_plugin
+__all__ += ["resolve_python_entry_point", "activate_python_plugin"]

@@ -10,47 +10,56 @@ Problem → learned proposal → deterministic compiler → solver-ready IR → 
 
 ## Current engineering baseline
 
-**v0.0.14**
+**v0.0.15**
 
 Implemented:
 - learned proposal + deterministic compiler acceptance
 - open namespaced external family kinds
 - Family Adapter Contract v1 + conformance harness
 - Plugin Manifest v1 + static Plugin Catalog
-- explicit activation boundary
-- **static installed-package manifest discovery**
+- static installed-package manifest discovery
+- explicit Python plugin activation
+- **fresh-venv cross-distribution interoperability proof**
 - fail-closed UNKNOWN path
-- CI-backed tests and benchmark smoke
+- CI-backed tests and interoperability checks
 
-## v0.0.14 focus
+## v0.0.15 focus
 
-Installed Python distributions can now advertise NEUMANN manifests by shipping JSON files under a path segment named:
+v0.0.15 moves beyond fake distribution objects.
 
-    neumann_plugins/
+The repository contains a separate external Python distribution used only for interoperability testing:
 
-Discovery uses importlib.metadata distribution file listings and reads those static JSON files directly.
+    neumann-example-scalar-sum
 
-It does **not** resolve or import the plugin entry point.
+CI builds two independent wheels:
 
-Rules:
-- only JSON under a neumann_plugins path segment is considered
-- manifest size is capped at 64 KiB by default
-- malformed or oversized manifests become DiscoveryIssue records
-- one bad distribution does not abort every other discovery
-- duplicate plugin/family/kind conflicts are not silently resolved
-- distribution name/version/path and manifest digest are retained as provenance
+    neumann1-0.0.15-*.whl
+    neumann_example_scalar_sum-0.1.0-*.whl
 
-This is package discovery, not package trust. A malicious package that is already installed is still installed code.
+Then it creates a fresh virtual environment, installs both wheels, and starts a new Python process.
 
-Still missing:
-- interoperability test with an independently published package
-- signatures / publisher identity
-- isolated installation and dependency resolution
-- post-import sandboxing
-- revocation / trust store
-- public registry/index
+The interoperability proof verifies:
+- the external plugin module is not imported before discovery
+- its static manifest is discovered from installed distribution metadata
+- catalog creation does not import plugin code
+- explicit activation imports the plugin
+- the external FamilyAdapter registers without modifying core IRKind
+- raw input executes through RegistryEngine
+- result verification succeeds
+- the same family conformance contract passes
 
-See `docs/experiments/v0.0.14.md`.
+### Important boundary
+
+This is real cross-distribution interoperability, but the external package source still lives in the same Git repository because the current GitHub connector cannot create another repository.
+
+It is therefore not yet evidence of:
+- independently maintained repository interoperability
+- independently published PyPI compatibility
+- publisher authenticity
+- sandboxing
+- dependency isolation
+
+See docs/experiments/v0.0.15.md.
 
 ## Run
 
@@ -60,14 +69,17 @@ Requires Python 3.10+.
     pytest -q
     python benchmark_v014.py
 
+The fresh-venv cross-package proof is executed by GitHub Actions.
+
 ## Design principles
 
 - **Correctness before compression**
 - **UNKNOWN is a valid answer**
 - **Learned prediction is proposal, not authority**
 - **Discovery must not imply import**
+- **Activation must be explicit**
+- **Cross-package claims require clean-environment evidence**
 - **Installation is not trust**
-- **Static metadata errors should be auditable, not silently ignored**
 - **Do not claim security properties that are not enforced**
 - **Do not claim capability that the benchmark has not demonstrated**
 
