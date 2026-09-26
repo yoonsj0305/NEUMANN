@@ -1,15 +1,56 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List
+import re
+from typing import Any, Dict, List, TypeAlias
 
 
 class IRKind(str, Enum):
+    """Legacy/core representation kinds.
+
+    Core families keep this enum for backward compatibility. External families
+    should use a namespaced string such as "acme.min_cost_flow".
+    """
+
     BIPARTITE_MATCHING = "bipartite_matching"
     SHORTEST_PATH = "shortest_path"
     LINEAR_SYSTEM = "linear_system"
     ARITHMETIC = "arithmetic"
     UNKNOWN = "unknown"
+
+
+KindLike: TypeAlias = IRKind | str
+_CUSTOM_KIND_RE = re.compile(r"^[a-z0-9][a-z0-9_-]*(?:\.[a-z0-9][a-z0-9_-]*)+$")
+
+
+def kind_id(kind: KindLike) -> str:
+    """Return the stable runtime identifier for a representation kind."""
+    if isinstance(kind, IRKind):
+        return f"core.{kind.value}"
+    if not isinstance(kind, str) or not kind:
+        raise TypeError("representation kind must be IRKind or nonempty string")
+    if kind in {"unknown", "core.unknown"}:
+        return "core.unknown"
+    if not _CUSTOM_KIND_RE.fullmatch(kind):
+        raise ValueError(
+            "external representation kinds must be namespaced, e.g. 'vendor.family'"
+        )
+    if kind.startswith("core."):
+        raise ValueError("the 'core.' kind namespace is reserved for NEUMANN core")
+    return kind
+
+
+def is_unknown_kind(kind: KindLike) -> bool:
+    try:
+        return kind_id(kind) == "core.unknown"
+    except (TypeError, ValueError):
+        return False
+
+
+def display_kind(kind: KindLike) -> str:
+    if isinstance(kind, IRKind):
+        return kind.value
+    return str(kind)
 
 
 @dataclass(frozen=True)
@@ -20,7 +61,7 @@ class Problem:
 
 @dataclass(frozen=True)
 class Representation:
-    kind: IRKind
+    kind: KindLike
     payload: Dict[str, Any]
     confidence: float
     rationale: str = ""
