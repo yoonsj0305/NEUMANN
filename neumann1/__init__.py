@@ -51,3 +51,12 @@ __all__ += ["DiscoveredManifest", "DiscoveryIssue", "DiscoveryReport", "discover
 
 from .plugin_loading import resolve_python_entry_point, activate_python_plugin
 __all__ += ["resolve_python_entry_point", "activate_python_plugin"]
+
+from .plugin_authorization import (
+    AuthorizationEvent, AuthorizationState, PluginAuthorizationLedger,
+    PluginRuntimeBinding, ManagedPluginRegistry, AuthorizedPluginActivator,
+)
+__all__ += [
+    "AuthorizationEvent", "AuthorizationState", "PluginAuthorizationLedger",
+    "PluginRuntimeBinding", "ManagedPluginRegistry", "AuthorizedPluginActivator",
+]

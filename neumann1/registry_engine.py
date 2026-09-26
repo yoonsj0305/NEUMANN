@@ -40,6 +40,17 @@ class RegistryEngine:
 
         try:
             adapter = self.registry.get(rep.kind)
+        except PermissionError as exc:
+            ledger.fallback_steps += 1
+            return SolveResult(
+                answer=None,
+                representation=rep,
+                solver_name="fallback_required",
+                verified=False,
+                verification_reason=f"Plugin authorization denied: {exc}",
+                ledger=ledger,
+                trace=trace + ["authorization_fail_closed"],
+            )
         except (TypeError, ValueError) as exc:
             ledger.fallback_steps += 1
             return SolveResult(

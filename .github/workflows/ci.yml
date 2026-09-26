@@ -21,11 +21,13 @@ jobs:
         run: pytest -q
       - name: Discovery benchmark smoke
         run: python benchmark_v014.py
+      - name: Authorization benchmark smoke
+        run: python benchmark_v016.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .
           python -m build --wheel --outdir dist/plugin interop/example_scalar_sum_plugin
-      - name: Cross-package interoperability in fresh venv
+      - name: Cross-package authorization and revocation in fresh venv
         run: |
           python -m venv /tmp/neumann-interop
           /tmp/neumann-interop/bin/python -m pip install --upgrade pip
