@@ -38,8 +38,8 @@ class PluginManifest:
     family_contract_version: str
     entry_point: str
     capabilities: tuple[str, ...] = ()
-    worker_state_class: WorkerStateClass | None = None
     description: str = ""
+    worker_state_class: WorkerStateClass | None = None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "PluginManifest":
