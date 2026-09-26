@@ -42,3 +42,6 @@ __all__ += ["FamilyAdapter", "FamilyRegistry", "FAMILY_CONTRACT_VERSION", "built
 
 from .types import KindLike, kind_id, is_unknown_kind, display_kind
 __all__ += ["KindLike", "kind_id", "is_unknown_kind", "display_kind"]
+
+from .plugin_manifest import PluginManifest, PluginCatalog, ActivationPolicy, PluginActivator, PLUGIN_MANIFEST_VERSION
+__all__ += ["PluginManifest", "PluginCatalog", "ActivationPolicy", "PluginActivator", "PLUGIN_MANIFEST_VERSION"]
