@@ -13,7 +13,12 @@ from neumann1 import (
     catalog_from_discovery,
     run_family_conformance,
 )
-from neumann1.plugin_loading import activate_python_plugin
+from neumann1.plugin_authorization import (
+    AuthorizedPluginActivator,
+    ManagedPluginRegistry,
+    PluginAuthorizationLedger,
+)
+from neumann1.plugin_loading import resolve_python_entry_point
 
 
 PLUGIN_ID = "example.scalar_sum_plugin"
@@ -47,20 +52,58 @@ def run():
     if manifest is None:
         raise RuntimeError("discovered plugin missing from catalog")
 
-    adapter = activate_python_plugin(manifest)
+    ledger = PluginAuthorizationLedger()
+    resolver_calls = []
+
+    def resolver(entry_point):
+        resolver_calls.append(entry_point)
+        return resolve_python_entry_point(entry_point)
+
+    authorized_activator = AuthorizedPluginActivator(ledger, resolver)
+
+    unapproved_blocked_before_import = False
+    try:
+        authorized_activator.activate(manifest)
+    except PermissionError:
+        unapproved_blocked_before_import = (
+            PLUGIN_MODULE not in sys.modules and len(resolver_calls) == 0
+        )
+    if not unapproved_blocked_before_import:
+        raise RuntimeError("unapproved plugin reached import/resolver boundary")
+
+    ledger.approve(manifest, reason="cross-package CI approval")
+    adapter = authorized_activator.activate(manifest)
     imported_after_activation = PLUGIN_MODULE in sys.modules
     if not imported_after_activation:
-        raise RuntimeError("explicit activation did not import plugin module")
+        raise RuntimeError("approved explicit activation did not import plugin module")
 
-    registry = builtin_family_registry()
-    registry.register(adapter)
+    managed_registry = ManagedPluginRegistry(builtin_family_registry(), ledger)
+    managed_registry.register_plugin(manifest, adapter)
+    engine = RegistryEngine(adapter.compiler, managed_registry)
 
-    engine = RegistryEngine(adapter.compiler, registry)
-    result = engine.solve(Problem("sum: 2, 3, 4.5"))
-    if not result.verified:
-        raise RuntimeError(result.verification_reason)
-    if abs(float(result.answer["sum"]) - 9.5) > 1e-12:
-        raise RuntimeError("unexpected external plugin result")
+    import example_scalar_sum.plugin as plugin_module
+    calls_before_execution = plugin_module.SOLVE_CALLS
+
+    first = engine.solve(Problem("sum: 2, 3, 4.5"))
+    if not first.verified or abs(float(first.answer["sum"]) - 9.5) > 1e-12:
+        raise RuntimeError("authorized external execution failed")
+    calls_after_first = plugin_module.SOLVE_CALLS
+
+    ledger.revoke(manifest.plugin_id, reason="cross-package CI revocation")
+    revoked = engine.solve(Problem("sum: 2, 3, 4.5"))
+    calls_after_revoked_attempt = plugin_module.SOLVE_CALLS
+    if revoked.verified:
+        raise RuntimeError("revoked plugin still executed successfully")
+    if calls_after_revoked_attempt != calls_after_first:
+        raise RuntimeError("solver was called after revocation")
+
+    ledger.approve(manifest, reason="cross-package CI re-approval")
+    restored = engine.solve(Problem("sum: 2, 3, 4.5"))
+    calls_after_restore = plugin_module.SOLVE_CALLS
+    if not restored.verified:
+        raise RuntimeError("re-approved plugin did not resume execution")
+    if calls_after_restore != calls_after_first + 1:
+        raise RuntimeError("re-approved solver call count unexpected")
 
     conformance = run_family_conformance(
         adapter,
@@ -83,21 +126,32 @@ def run():
         "plugin_distribution_manifest_path": discovered.relative_path,
         "plugin_manifest_digest_sha256": discovered.manifest_digest_sha256,
         "plugin_imported_after_discovery": imported_after_discovery,
+        "unapproved_activation_blocked_before_import": unapproved_blocked_before_import,
         "plugin_imported_after_activation": imported_after_activation,
-        "registered_kind_ids": list(registry.kind_ids()),
-        "execution_verified": result.verified,
-        "execution_answer": result.answer,
-        "execution_trace": result.trace,
+        "resolver_calls_after_authorized_activation": len(resolver_calls),
+        "registered_kind_ids": list(managed_registry.kind_ids()),
+        "first_execution_verified": first.verified,
+        "execution_answer": first.answer,
+        "solver_calls_before_execution": calls_before_execution,
+        "solver_calls_after_first": calls_after_first,
+        "revoked_execution_verified": revoked.verified,
+        "revoked_verification_reason": revoked.verification_reason,
+        "post_revocation_solver_calls": calls_after_revoked_attempt - calls_after_first,
+        "restored_execution_verified": restored.verified,
+        "solver_calls_after_restore": calls_after_restore,
+        "authorization_events": [
+            {"sequence": e.sequence, "action": e.action, "reason": e.reason}
+            for e in ledger.events()
+        ],
         "conformance": {
             "valid_compile_rate": conformance.valid_compile_rate,
             "valid_verified_rate": conformance.valid_verified_rate,
             "reject_fail_closed_rate": conformance.reject_fail_closed_rate,
         },
         "boundary": (
-            "Core and plugin are separate Python wheel distributions installed into "
-            "a fresh venv, but their source currently lives in the same Git repository. "
-            "This is cross-distribution interoperability evidence, not yet a separate-"
-            "repository or independently published third-party proof."
+            "Authorization is an in-memory managed-runtime control. Core and plugin are "
+            "separate wheels in a fresh venv, but source still lives in one Git repository. "
+            "Revocation prevents managed NEUMANN execution; it does not unload imported code."
         ),
     }
 
