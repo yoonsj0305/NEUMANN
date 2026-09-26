@@ -6,60 +6,72 @@
 
 Core path:
 
-Problem → learned proposal → deterministic compiler → solver-ready IR → family registry → family-owned solver/verifier → answer + evidence
+Problem → learned proposal → deterministic compiler → solver-ready IR → family registry → authorized solver/verifier → answer + evidence
 
 ## Current engineering baseline
 
-**v0.0.15**
+**v0.0.16**
 
 Implemented:
 - learned proposal + deterministic compiler acceptance
 - open namespaced external family kinds
 - Family Adapter Contract v1 + conformance harness
-- Plugin Manifest v1 + static Plugin Catalog
-- static installed-package manifest discovery
-- explicit Python plugin activation
-- **fresh-venv cross-distribution interoperability proof**
-- fail-closed UNKNOWN path
+- Plugin Manifest v1 + static installed-package discovery
+- fresh-venv cross-distribution interoperability
+- **digest-bound plugin approval ledger**
+- **use-time authorization checks**
+- **runtime revocation and re-approval**
+- fail-closed UNKNOWN / authorization denial paths
 - CI-backed tests and interoperability checks
 
-## v0.0.15 focus
+## v0.0.16 focus
 
-v0.0.15 moves beyond fake distribution objects.
+Activation is no longer treated as permanent authority.
 
-The repository contains a separate external Python distribution used only for interoperability testing:
+Approval is bound to the exact canonical manifest SHA-256:
 
-    neumann-example-scalar-sum
+    plugin_id + manifest_digest_sha256
 
-CI builds two independent wheels:
+A changed manifest requires a new approval.
 
-    neumann1-0.0.15-*.whl
-    neumann_example_scalar_sum-0.1.0-*.whl
+The managed execution path is:
 
-Then it creates a fresh virtual environment, installs both wheels, and starts a new Python process.
+    static discovery
+      → explicit approval
+      → authorized activation
+      → managed plugin registration
+      → use-time authorization check
+      → solver
 
-The interoperability proof verifies:
-- the external plugin module is not imported before discovery
-- its static manifest is discovered from installed distribution metadata
-- catalog creation does not import plugin code
-- explicit activation imports the plugin
-- the external FamilyAdapter registers without modifying core IRKind
-- raw input executes through RegistryEngine
-- result verification succeeds
-- the same family conformance contract passes
+ManagedPluginRegistry checks authorization every time RegistryEngine requests an external family.
+
+This means revocation can stop the next solver action even when the Python module is already imported.
+
+CI verifies:
+- unapproved activation does not reach the resolver/import boundary
+- exact approved digest can activate
+- changed manifest digest is blocked
+- approved external plugin executes
+- revoke is recorded
+- next execution fails closed
+- solver call count increases by **0** after revocation
+- re-approval restores execution
 
 ### Important boundary
 
-This is real cross-distribution interoperability, but the external package source still lives in the same Git repository because the current GitHub connector cannot create another repository.
+The authorization ledger is currently in-memory and unauthenticated.
 
-It is therefore not yet evidence of:
-- independently maintained repository interoperability
-- independently published PyPI compatibility
-- publisher authenticity
-- sandboxing
-- dependency isolation
+Revocation means NEUMANN managed-runtime execution authority is withdrawn. It does not unload already imported Python code or provide OS/process sandboxing.
 
-See docs/experiments/v0.0.15.md.
+Still missing:
+- durable/tamper-evident ledger storage
+- cryptographic publisher identity
+- distributed policy consistency
+- OS/process isolation
+- dependency sandboxing
+- revocation distribution across multiple hosts
+
+See docs/experiments/v0.0.16.md.
 
 ## Run
 
@@ -67,9 +79,9 @@ Requires Python 3.10+.
 
     pip install -e .
     pytest -q
-    python benchmark_v014.py
+    python benchmark_v016.py
 
-The fresh-venv cross-package proof is executed by GitHub Actions.
+The fresh-venv external-plugin authorization proof is also executed by GitHub Actions.
 
 ## Design principles
 
@@ -77,11 +89,11 @@ The fresh-venv cross-package proof is executed by GitHub Actions.
 - **UNKNOWN is a valid answer**
 - **Learned prediction is proposal, not authority**
 - **Discovery must not imply import**
-- **Activation must be explicit**
-- **Cross-package claims require clean-environment evidence**
-- **Installation is not trust**
+- **Activation must not imply permanent authority**
+- **Authorization is bound to exact manifest identity**
+- **Revocation is checked at use time**
+- **Post-revocation solver actions should be zero in the managed path**
 - **Do not claim security properties that are not enforced**
-- **Do not claim capability that the benchmark has not demonstrated**
 
 ## Status
 
