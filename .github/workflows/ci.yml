@@ -29,6 +29,8 @@ jobs:
         run: python benchmark_v018.py
       - name: Out-of-process plugin benchmark smoke
         run: python benchmark_v019.py
+      - name: Runtime-cost and threat-v2 benchmark smoke
+        run: python benchmark_v020.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .
