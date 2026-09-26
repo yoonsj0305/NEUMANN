@@ -23,3 +23,6 @@ __all__ += ["TwoStageOpenSetStructureFormer", "OpenSetMetrics", "final_test_exam
 from .prototype_open_set import PrototypeOpenSetStructureFormer, PrototypeMetrics
 from .open_set_v006_dataset import validation_v006, final_test_v006
 __all__ += ["PrototypeOpenSetStructureFormer", "PrototypeMetrics", "validation_v006", "final_test_v006"]
+
+from .matching_ir import ControlledMatchingStructureFormer, MatchingSemanticVerifier, MatchingSemanticContract
+__all__ += ["ControlledMatchingStructureFormer", "MatchingSemanticVerifier", "MatchingSemanticContract"]
