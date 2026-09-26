@@ -9,7 +9,7 @@ from neumann1 import (
     PLUGIN_MANIFEST_VERSION, Problem, RegistryEngine, builtin_family_registry,
 )
 from neumann1.plugin_isolation import build_out_of_process_adapter
-from neumann1.persistent_plugin_isolation import build_persistent_out_of_process_adapter
+from neumann1.persistent_plugin_isolation import _build_unattested_persistent_adapter_for_conformance as build_persistent_out_of_process_adapter
 
 
 def make_manifest():
