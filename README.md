@@ -10,53 +10,51 @@ Problem → learned proposal / competence signal → deterministic family compil
 
 ## Current engineering baseline
 
-**v0.0.11**
+**v0.0.12**
 
 Implemented:
-- typed problem / representation / result objects
 - learned proposal + deterministic compiler acceptance
 - complete controlled IR compilers for matching and square linear systems
-- **Family Adapter Contract v1**
-- **Family Registry**
-- **family-owned solver + answer verifier execution**
-- **conformance harness for valid/reject fixtures**
+- Family Adapter Contract v1
+- Family Registry + conformance harness
+- **open namespaced representation kinds for external families**
+- backward compatibility for legacy core IRKind values
+- family-owned solver/verifier execution
 - fail-closed UNKNOWN path
 - CI-backed tests and benchmark smoke
 
-## v0.0.11 focus
+## v0.0.12 focus
 
-NEUMANN is moving from a monolithic prototype toward an extensible runtime.
+v0.0.11 had a real ecosystem blocker: IRKind was a closed Python Enum.
 
-A family adapter bundles:
+v0.0.12 keeps that enum for backward compatibility, but opens the runtime kind namespace.
 
-- `family_id`
-- IR kind
-- compiler
-- solver
-- answer verifier
-- contract version
+Core enum kinds are projected into reserved identifiers such as:
 
-Contract version:
+    core.bipartite_matching
+    core.linear_system
 
-`neumann.family.v1`
+External families may use namespaced string kinds such as:
 
-The registry enforces uniqueness and runtime shape checks, while the conformance harness measures:
+    example.scalar_sum
+    vendor.some_family
 
-- valid compile rate
-- valid solved+verified rate
-- reject fail-closed rate
+The core.* namespace is reserved.
 
-### Known blocker
+The v0.0.12 benchmark defines an external scalar-sum family with its own compiler, solver, and verifier. It registers and executes without adding an IRKind enum member.
 
-The current `IRKind` is still a closed Python Enum.
+This proves a runtime extension point, not yet a complete plugin distribution ecosystem.
 
-That means a truly external plugin cannot introduce a new representation kind without modifying NEUMANN core.
+Still missing:
+- package discovery
+- signed manifests
+- capability/permission declarations
+- dependency isolation and sandboxing
+- richer version negotiation
+- public plugin registry/index
+- supply-chain security
 
-So v0.0.11 is **not yet a fully open plugin system**.
-
-The next compatibility problem is to migrate toward an open namespaced kind identifier without breaking safety.
-
-See `docs/experiments/v0.0.11.md`.
+See `docs/experiments/v0.0.12.md`.
 
 ## Run
 
@@ -64,16 +62,17 @@ Requires Python 3.10+.
 
     pip install -e .
     pytest -q
-    python benchmark_v011.py
+    python benchmark_v012.py
 
 ## Design principles
 
 - **Correctness before compression**
 - **UNKNOWN is a valid answer**
 - **Learned prediction is proposal, not authority**
-- **Family execution should be adapter-owned and independently conformant**
-- **Traditional algorithms are first-class execution backends**
-- **Do not hide ecosystem blockers behind a plugin-shaped API**
+- **Core compatibility should not close the extension namespace**
+- **External kinds must be namespaced**
+- **Family execution should be adapter-owned and conformant**
+- **Do not call a runtime extension point a mature plugin ecosystem until discovery and supply-chain boundaries exist**
 - **Do not claim capability that the benchmark has not demonstrated**
 
 ## Status

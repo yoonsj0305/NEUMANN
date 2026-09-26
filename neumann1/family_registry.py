@@ -2,7 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Iterable, Mapping
 
-from .types import IRKind
+from .types import IRKind, KindLike, kind_id
 
 
 FAMILY_CONTRACT_VERSION = "neumann.family.v1"
@@ -12,22 +12,25 @@ FAMILY_CONTRACT_VERSION = "neumann.family.v1"
 class FamilyAdapter:
     """Runtime bundle for one representation family.
 
-    v1 intentionally keeps IRKind as a closed enum. This makes the contract stable
-    for the current prototype but is a known limitation for third-party families;
-    opening the kind namespace is a future compatibility task.
+    Built-in families may use legacy IRKind values. Third-party families use
+    open namespaced string kinds, for example "acme.min_cost_flow".
     """
 
     family_id: str
-    ir_kind: IRKind
+    ir_kind: KindLike
     compiler: object
     solver: object
     answer_verifier: object
     contract_version: str = FAMILY_CONTRACT_VERSION
 
+    @property
+    def canonical_kind_id(self) -> str:
+        return kind_id(self.ir_kind)
+
 
 class FamilyRegistry:
     def __init__(self, adapters: Iterable[FamilyAdapter] = ()):
-        self._by_kind: dict[IRKind, FamilyAdapter] = {}
+        self._by_kind_id: dict[str, FamilyAdapter] = {}
         self._by_id: dict[str, FamilyAdapter] = {}
         for adapter in adapters:
             self.register(adapter)
@@ -38,12 +41,14 @@ class FamilyRegistry:
                 f"unsupported family contract {adapter.contract_version!r}; "
                 f"expected {FAMILY_CONTRACT_VERSION!r}"
             )
-        if adapter.ir_kind == IRKind.UNKNOWN:
+
+        canonical = adapter.canonical_kind_id
+        if canonical == "core.unknown":
             raise ValueError("UNKNOWN cannot be registered as an executable family")
         if adapter.family_id in self._by_id:
             raise ValueError(f"duplicate family_id: {adapter.family_id}")
-        if adapter.ir_kind in self._by_kind:
-            raise ValueError(f"duplicate IR kind: {adapter.ir_kind.value}")
+        if canonical in self._by_kind_id:
+            raise ValueError(f"duplicate IR kind: {canonical}")
 
         if not callable(getattr(adapter.compiler, "form", None)):
             raise TypeError("family compiler must expose form(problem, ledger)")
@@ -55,22 +60,25 @@ class FamilyRegistry:
             raise TypeError("family answer verifier must expose verify()")
 
         self._by_id[adapter.family_id] = adapter
-        self._by_kind[adapter.ir_kind] = adapter
+        self._by_kind_id[canonical] = adapter
 
-    def get(self, kind: IRKind) -> FamilyAdapter | None:
-        return self._by_kind.get(kind)
+    def get(self, kind: KindLike) -> FamilyAdapter | None:
+        return self._by_kind_id.get(kind_id(kind))
 
     def get_by_id(self, family_id: str) -> FamilyAdapter | None:
         return self._by_id.get(family_id)
 
-    def kinds(self) -> tuple[IRKind, ...]:
-        return tuple(self._by_kind)
+    def kinds(self) -> tuple[KindLike, ...]:
+        return tuple(adapter.ir_kind for adapter in self._by_id.values())
+
+    def kind_ids(self) -> tuple[str, ...]:
+        return tuple(self._by_kind_id)
 
     def adapters(self) -> tuple[FamilyAdapter, ...]:
         return tuple(self._by_id.values())
 
-    def compilers_by_kind(self) -> Mapping[IRKind, object]:
-        return {kind: adapter.compiler for kind, adapter in self._by_kind.items()}
+    def compilers_by_kind(self) -> Mapping[KindLike, object]:
+        return {adapter.ir_kind: adapter.compiler for adapter in self._by_id.values()}
 
     def solvers(self) -> tuple[object, ...]:
         return tuple(adapter.solver for adapter in self._by_id.values())

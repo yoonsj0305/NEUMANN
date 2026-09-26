@@ -2,7 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Sequence
 
-from .types import Problem, CostLedger, IRKind
+from .types import Problem, CostLedger, is_unknown_kind, kind_id
 from .family_registry import FamilyAdapter
 
 
@@ -44,7 +44,11 @@ def run_family_conformance(
         problem = Problem(text)
         ledger = CostLedger()
         rep = adapter.compiler.form(problem, ledger)
-        if rep.kind != adapter.ir_kind:
+        try:
+            same_kind = kind_id(rep.kind) == adapter.canonical_kind_id
+        except (TypeError, ValueError):
+            same_kind = False
+        if not same_kind:
             continue
         valid_compiled += 1
 
@@ -58,7 +62,7 @@ def run_family_conformance(
     reject_fail_closed = 0
     for text in reject_texts:
         rep = adapter.compiler.form(Problem(text), CostLedger())
-        if rep.kind == IRKind.UNKNOWN:
+        if is_unknown_kind(rep.kind):
             reject_fail_closed += 1
 
     return ConformanceResult(
