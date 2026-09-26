@@ -6,77 +6,94 @@
 
 ## Current engineering baseline
 
-**v0.0.18**
+**v0.0.19**
 
-NEUMANN now has both an execution architecture and an explicit plugin trust model.
+NEUMANN now has an explicit plugin trust model and a first out-of-process execution boundary.
 
-Implemented through v0.0.18:
+Implemented through v0.0.19:
 - learned proposal + deterministic compiler acceptance
 - open namespaced external family kinds
 - Family Adapter Contract + conformance harness
-- static plugin manifests and installed-package discovery
-- fresh-venv cross-distribution interoperability
-- digest-bound approval and use-time revocation
+- static manifests and installed-package discovery
+- digest-bound approval + use-time revocation
 - durable hash-chained authorization ledger
-- trusted-head rollback detection boundary
-- **machine-readable Threat Model v1**
-- **assurance labels tied to evidence identifiers**
+- machine-readable Threat Model v1
+- **out-of-process plugin compiler/solver/verifier execution**
+- **JSON RPC request/response boundary**
+- **timeout/crash fail-closed behavior**
+- **fresh-venv external wheel isolation proof**
 
-## v0.0.18 focus
+## v0.0.19 focus
 
-v0.0.18 deliberately does not add another security mechanism.
+Threat Model v1 identified the largest uncontained runtime gap:
 
-It freezes the attacker and trust-boundary model first.
+    approved plugin code executed inside the NEUMANN core Python process
 
-Threat actors include:
-- malicious plugin publisher
-- installed-package tamperer
-- local ledger tamperer
-- host administrator capable of rollback
-- compromised plugin after activation
-- compromised NEUMANN process
-- compromised checkpoint authority
+v0.0.19 moves external family execution behind a child-process boundary.
 
-Each threat scenario declares:
-- protected asset
-- trust boundary
-- PREVENT assurance
-- DETECT assurance
-- CONTAIN assurance
-- RECOVER assurance
-- controls
-- evidence identifiers
-- residual risk
+Core process owns:
+- manifest discovery
+- authorization ledger
+- ManagedPluginRegistry
+- RegistryEngine
+- RPC proxy
 
-Strong assurance labels require explicit evidence.
+Child process owns:
+- plugin import
+- adapter factory
+- compiler operation
+- solver operation
+- verifier operation
 
-### Main result
+Each operation currently runs in a fresh child Python process.
 
-The existing system is strongest around:
-- static discovery
-- exact-manifest approval
-- managed runtime revocation
-- persisted-ledger integrity
+### Protocol
 
-The largest uncontained runtime gap is:
+    neumann.plugin.rpc.v1
 
-**approved plugin code executes inside the NEUMANN Python process.**
+Current bounds:
+- request: 64 KiB
+- response: 256 KiB
+- configurable operation timeout
+- JSON-serializable payloads only
 
-Therefore Threat Model v1 selects:
+Authorization is checked **immediately before every child launch**.
 
-    out_of_process_plugin_isolation
+CI tests prove:
+- adapter creation does not import the plugin in the core process
+- compiler / solver / verifier run in child PIDs
+- plugin module remains absent from parent `sys.modules`
+- child `os.environ` mutation does not mutate parent environment
+- compiler timeout fails closed
+- compiler crash fails closed
+- solver timeout fails closed
+- verifier crash fails closed
+- revoke before the next request causes **0 new child launches**
+- external plugin wheel in a fresh venv follows the same out-of-process path
 
-as the next implementation priority.
+### Critical boundary
 
-### Why not signatures first?
+**This is process separation, not an OS sandbox.**
 
-Signatures establish identity/authenticity. They do not contain what signed code can do after import.
+The child still runs as the same OS user and may retain normal filesystem, process, and network permissions.
 
-A perfectly signed malicious or compromised plugin would still run with ordinary Python process authority today.
+v0.0.19 therefore supports claims about:
+- Python runtime / address-space separation
+- killable timeout/crash boundary
+- no direct plugin import into core process
+- revocation before dispatch
+
+It does **not** support claims about:
+- hostile-code-safe sandboxing
+- filesystem isolation
+- network isolation
+- child-process descendant containment
+- publisher authenticity
+- defense against a compromised host or core process
 
 See:
-- `docs/THREAT_MODEL.md`
-- `docs/experiments/v0.0.18.md`
+- `docs/THREAT_MODEL.md` for the pre-v0.0.19 threat baseline
+- `docs/experiments/v0.0.19.md` for the isolation experiment
 
 ## Run
 
@@ -84,25 +101,17 @@ Requires Python 3.10+.
 
     pip install -e .
     pytest -q
-    python benchmark_v018.py
+    python benchmark_v019.py
 
-## Security claim discipline
+## Next trust-plane question
 
-NEUMANN currently must **not** claim:
-- publisher authenticity
-- safe execution of approved plugin code
-- sandboxing after import
-- defense against a compromised NEUMANN process
-- rollback-proof storage without an external trust anchor
-- tamper-proof storage
+If v0.0.19 evidence holds, the next threat-model revision should distinguish:
 
-## Next milestone
+    process separation
+        from
+    OS-level sandboxing
 
-v0.0.19 should test an **out-of-process plugin execution boundary** with:
-- bounded request/response schema
-- timeout/crash fail-closed behavior
-- revocation before dispatch
-- no direct mutation of core in-memory authorization state
+and decide whether the next control is host capability restriction, publisher identity, or both.
 
 ## Status
 
