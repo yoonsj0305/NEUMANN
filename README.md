@@ -4,15 +4,15 @@
 
 > Make the cheapest correct reasoning path easy to use.
 
-The core idea:
+Core path:
 
 Problem → Representation / Structure Formation → Selective execution policy → Deterministic or neural solver → Verification → Answer + evidence + cost ledger
 
-NEUMANN is not trying to make an LLM perform every calculation itself. It aims to separate what learned models are good at from what traditional algorithms and formal solvers already do faster and more reliably.
+NEUMANN separates what learned models are good at from what traditional algorithms and formal solvers already do faster and more reliably.
 
 ## Current engineering baseline
 
-**v0.0.6**
+**v0.0.7**
 
 Implemented:
 - typed problem / representation / result objects
@@ -22,33 +22,26 @@ Implemented:
 - learned structure-family classifier
 - two-stage open-set / UNKNOWN gate
 - prototype-distance rejection baseline
-- structurally-near OOD benchmark
-- selective-risk curves
+- structurally-near OOD benchmark and selective-risk curves
+- **controlled natural-language matching compiler → complete solver-ready IR**
+- independent matching semantic-contract check
 - cost ledger and execution trace
 
 Local test status:
 
-**17 PASS / 0 FAIL**
+**21 PASS / 0 FAIL**
 
-## v0.0.6 result
+## v0.0.7 result
 
-On a tiny frozen synthetic fixture:
-- two-stage gate: 80% known auto-route coverage, 13.33% near-unknown false-route
-- prototype-distance gate: 33.33% known auto-route coverage, 0% near-unknown false-route
+For one deliberately narrow family, controlled matching statements now run end-to-end:
 
-This is not a production guarantee. It demonstrates the safety-versus-coverage trade-off that a NEUMANN router must explicitly manage.
+raw text → matching IR → deterministic matching solver → answer verification
 
-See `docs/experiments/v0.0.6.md`.
+Three surface forms compiled to faithful solver-ready IRs in the frozen toy benchmark, and an unsupported minimum-spanning-tree prompt failed closed.
 
-## Important boundary
+Important: this is a **controlled grammar compiler**, not general natural-language understanding.
 
-v0.0.6 does **not** yet generate complete solver-ready IRs from arbitrary natural language.
-
-The learned path currently recognizes only coarse structure families:
-- `bipartite_matching`
-- `shortest_path`
-- `linear_system`
-- `unknown`
+See `docs/experiments/v0.0.7.md`.
 
 ## Run
 
@@ -56,16 +49,16 @@ Requires Python 3.10+.
 
     pip install -e .
     pytest -q
-    python benchmark_v006.py
+    python benchmark_v007.py
 
 ## Design principles
 
 - **Correctness before compression**
 - **UNKNOWN is a valid answer**
 - **Traditional algorithms are first-class execution backends**
-- **A faster solver is useless if representation and verification overhead erase the gain**
 - **Answer correctness and representation fidelity are separate checks**
 - **Routing coverage must be chosen against an explicit false-route risk budget**
+- **Expand capability one structural family at a time, with explicit semantic checks**
 - **Do not claim capability that the benchmark has not demonstrated**
 
 ## Status
