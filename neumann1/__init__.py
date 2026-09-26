@@ -1,4 +1,4 @@
-from .types import Problem, Representation, IRKind, SolveResult, CostLedger
+from .types import Problem, Representation, IRKind, SolveResult, CostLedger, VerificationResult
 from .engine import NeumannEngine
 from .representation import ExplicitStructureFormer
 from .solvers import BipartiteMatchingSolver, ShortestPathSolver, LinearSystemSolver
@@ -6,7 +6,7 @@ from .verifier import DeterministicVerifier
 from .reference_semantics import ReferenceSemanticVerifier, SemanticContract
 
 __all__ = [
-    "Problem", "Representation", "IRKind", "SolveResult", "CostLedger",
+    "Problem", "Representation", "IRKind", "SolveResult", "CostLedger", "VerificationResult",
     "NeumannEngine", "ExplicitStructureFormer", "BipartiteMatchingSolver",
     "ShortestPathSolver", "LinearSystemSolver", "DeterministicVerifier",
     "ReferenceSemanticVerifier", "SemanticContract",
