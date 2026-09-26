@@ -8,6 +8,7 @@ from typing import Any, Iterable
 
 from .family_registry import FAMILY_CONTRACT_VERSION, FamilyAdapter
 from .types import kind_id
+from .worker_lifecycle import WorkerStateClass, parse_worker_state_class
 
 
 PLUGIN_MANIFEST_VERSION = "neumann.plugin.manifest.v1"
@@ -37,6 +38,7 @@ class PluginManifest:
     family_contract_version: str
     entry_point: str
     capabilities: tuple[str, ...] = ()
+    worker_state_class: WorkerStateClass | None = None
     description: str = ""
 
     @classmethod
@@ -63,6 +65,7 @@ class PluginManifest:
             family_contract_version=str(data["family_contract_version"]),
             entry_point=str(data["entry_point"]),
             capabilities=tuple(str(x) for x in data.get("capabilities", ())),
+            worker_state_class=parse_worker_state_class(data.get("worker_state_class")),
             description=str(data.get("description", "")),
         )
         manifest.validate()
@@ -106,7 +109,7 @@ class PluginManifest:
             raise ValueError("family plugins must declare compile, solve, and verify capabilities")
 
     def canonical_dict(self) -> dict[str, Any]:
-        return {
+        data = {
             "manifest_version": self.manifest_version,
             "plugin_id": self.plugin_id,
             "plugin_version": self.plugin_version,
@@ -117,6 +120,9 @@ class PluginManifest:
             "capabilities": list(self.capabilities),
             "description": self.description,
         }
+        if self.worker_state_class is not None:
+            data["worker_state_class"] = self.worker_state_class.value
+        return data
 
     @property
     def digest_sha256(self) -> str:
