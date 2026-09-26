@@ -45,3 +45,6 @@ __all__ += ["KindLike", "kind_id", "is_unknown_kind", "display_kind"]
 
 from .plugin_manifest import PluginManifest, PluginCatalog, ActivationPolicy, PluginActivator, PLUGIN_MANIFEST_VERSION
 __all__ += ["PluginManifest", "PluginCatalog", "ActivationPolicy", "PluginActivator", "PLUGIN_MANIFEST_VERSION"]
+
+from .plugin_discovery import DiscoveredManifest, DiscoveryIssue, DiscoveryReport, discover_installed_manifests, catalog_from_discovery
+__all__ += ["DiscoveredManifest", "DiscoveryIssue", "DiscoveryReport", "discover_installed_manifests", "catalog_from_discovery"]
