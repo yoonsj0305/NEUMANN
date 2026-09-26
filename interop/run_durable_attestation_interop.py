@@ -7,6 +7,7 @@ import sys
 import tempfile
 
 from neumann1 import (
+    CostLedger,
     HashChainedAttestationLedger,
     LifecycleConformanceCase,
     ManagedPluginRegistry,
@@ -85,7 +86,11 @@ def run():
 
         revoked_blocked = False
         try:
-            engine.solve(Problem("sum: 1, 1"))
+            adapter.compiler.dispatcher.dispatch(
+                "compile",
+                {"problem": {"raw_text": "sum: 1, 1", "metadata": {}}},
+                CostLedger(),
+            )
         except PermissionError:
             revoked_blocked = True
         if not revoked_blocked:
