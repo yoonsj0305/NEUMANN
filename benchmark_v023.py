@@ -108,8 +108,11 @@ def run():
         legacy, ledger_for(legacy), timeout_seconds=8.0
     )
 
+    same_identity_cache_data = stateless.canonical_dict()
+    same_identity_cache_data["worker_state_class"] = "CACHE_ONLY"
+    same_identity_cache = PluginManifest.from_dict(same_identity_cache_data)
     digest_changes_with_class = (
-        stateless.digest_sha256 != cache_only.digest_sha256
+        stateless.digest_sha256 != same_identity_cache.digest_sha256
     )
 
     return {
