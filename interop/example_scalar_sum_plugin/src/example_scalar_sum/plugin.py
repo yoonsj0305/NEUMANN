@@ -11,6 +11,7 @@ from neumann1 import (
 
 
 KIND = "example.scalar_sum"
+SOLVE_CALLS = 0
 
 
 class ScalarSumCompiler:
@@ -58,6 +59,8 @@ class ScalarSumSolver:
         return representation.kind == KIND
 
     def solve(self, representation: Representation, ledger: CostLedger):
+        global SOLVE_CALLS
+        SOLVE_CALLS += 1
         values = list(map(float, representation.payload["values"]))
         ledger.solver_steps += len(values)
         return {"sum": sum(values)}
