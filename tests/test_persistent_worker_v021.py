@@ -4,7 +4,7 @@ from neumann1 import (
     ManagedPluginRegistry, PluginAuthorizationLedger, PluginManifest,
     PLUGIN_MANIFEST_VERSION, Problem, RegistryEngine, builtin_family_registry,
 )
-from neumann1.persistent_plugin_isolation import build_persistent_out_of_process_adapter
+from neumann1.persistent_plugin_isolation import _build_unattested_persistent_adapter_for_conformance as build_persistent_out_of_process_adapter
 
 
 MODULE = "neumann1.isolation_probe_plugin"
