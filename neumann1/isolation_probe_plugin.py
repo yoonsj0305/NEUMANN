@@ -8,6 +8,7 @@ from .types import CostLedger, IRKind, Problem, Representation, VerificationResu
 
 
 KIND = "test.isolation_probe"
+POISONED = False
 
 
 class ProbeCompiler:
@@ -30,6 +31,7 @@ class ProbeSolver:
         return rep.kind == KIND
 
     def solve(self, rep: Representation, ledger: CostLedger):
+        global POISONED
         ledger.solver_steps += 1
         mode = str(rep.payload["mode"])
         if mode == "hang_solve":
@@ -38,7 +40,14 @@ class ProbeSolver:
             os._exit(18)
         if mode == "mutate_env":
             os.environ["NEUMANN_CHILD_MUTATION"] = "child-only"
-        return {"mode": mode, "pid": os.getpid(), "value": 42}
+        if mode == "poison":
+            POISONED = True
+        return {
+            "mode": mode,
+            "pid": os.getpid(),
+            "value": 42,
+            "poisoned": POISONED,
+        }
 
 
 class ProbeVerifier:
