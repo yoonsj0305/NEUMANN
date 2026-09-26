@@ -23,6 +23,7 @@ def make_manifest():
         "family_contract_version": "neumann.family.v1",
         "entry_point": "neumann1.isolation_probe_plugin:make_adapter",
         "capabilities": ["compile", "solve", "verify", "cpu"],
+        "worker_state_class": "CACHE_ONLY",
     })
 
 

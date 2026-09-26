@@ -6,74 +6,93 @@
 
 ## Current engineering baseline
 
-**v0.0.22**
+**v0.0.23**
 
-v0.0.21 proved that a persistent isolated worker can remove most fresh-process lifecycle overhead for lightweight families.
+v0.0.22 made persistent-worker state visible through generation IDs and recycle evidence.
 
-v0.0.22 addresses the semantic cost of that optimization:
+v0.0.23 replaces one global reuse policy with an explicit plugin lifecycle declaration that the runtime enforces.
 
-> **What state is allowed to survive between requests, and how do we prevent hidden worker memory from becoming semantic authority?**
+## Worker state classes
 
-## Worker generations
+### `STATELESS`
+Semantic correctness requires no retained worker state.
 
-Every persistent worker lifecycle now has an explicit `generation_id`.
+Persistent reuse: **allowed**.
 
-All persistent RPC responses are checked against the active generation. A generation mismatch is a protocol failure and the worker is discarded.
+### `CACHE_ONLY`
+Retained state may accelerate computation, but clearing it must not change semantic results.
 
-`WorkerStatePolicy` currently supports:
+Persistent reuse: **allowed**.
 
-    max_requests_per_worker
+### `STATEFUL_EXPLICIT`
+State is part of semantics and therefore requires an explicit state-transfer/checkpoint protocol.
 
-When the operation limit is reached, the next compile/solve/verify request starts a fresh worker generation.
+v0.0.23 does not implement that protocol.
 
-Manual recycling is also available:
+Current execution: **fail closed**.
 
-    dispatcher.recycle("reason")
+### `NON_PERSISTENT`
+The family must not be reused through a persistent worker.
 
-and records the previous generation ID, PID, request count, and recycle reason.
+Fresh-process execution: **allowed**.
 
-## Semantic state rule
+Persistent reuse: **rejected before plugin launch**.
 
-NEUMANN's runtime contract is now:
+## Legacy manifests
 
-> Retained worker state may accelerate computation, but request correctness must not depend on hidden state that is absent from the explicit RPC payload and approved plugin artifact.
+Older manifests without `worker_state_class` remain valid on the fresh-process path.
 
-A strong CI probe sets:
+They cannot silently gain persistent-reuse privileges:
 
-    max_requests_per_worker = 1
+    undeclared + fresh       → allowed
+    undeclared + persistent  → rejected
 
-which forces one problem's compile, solve, and verify operations into **three different worker generations**. The family must still return the correct verified answer.
+## Manifest identity
 
-## Poisoned-state experiment
+When present, `worker_state_class` is part of the canonical manifest SHA-256.
 
-The test plugin contains an intentional hidden global poison flag.
+Changing lifecycle class therefore changes approval identity and requires a new exact-manifest authorization.
 
-CI verifies:
-- poison is visible inside the same generation
-- manual recycle clears the poison
-- request-limit recycle clears the poison
-- generation ID changes after recycle
-- normal results remain semantically equivalent across recycle
-- parent process still does not import plugin code
+## Runtime enforcement
 
-## Boundary
+Current compatibility matrix:
 
-Process recycling resets Python in-memory state for the worker process. It does **not** roll back external effects such as:
-- filesystem writes
-- network / remote service state
-- databases
-- escaped descendants
-- host-level resources
+| Declaration | Fresh process | Persistent worker |
+|---|---:|---:|
+| undeclared legacy | allow | reject |
+| STATELESS | allow | allow |
+| CACHE_ONLY | allow | allow |
+| NON_PERSISTENT | allow | reject |
+| STATEFUL_EXPLICIT | reject | reject |
 
-That remains outside state hygiene and belongs to the OS-level sandbox / side-effect-control track.
+`STATEFUL_EXPLICIT` remains blocked until NEUMANN has a real explicit-state protocol rather than hidden worker memory.
 
-See `docs/experiments/v0.0.22.md`.
+## Important boundary
+
+A declaration is a policy input, not behavioral proof.
+
+A malicious or buggy plugin may claim `CACHE_ONLY` while actually depending on hidden state.
+
+Therefore declaration enforcement must remain paired with behavioral evidence such as:
+- v0.0.22 cross-generation correctness
+- poison-state reset tests
+- conformance suites
+
+See `docs/experiments/v0.0.23.md`.
 
 ## Run
 
     pip install -e .
     pytest -q
-    python benchmark_v022.py
+    python benchmark_v023.py
+
+## Parallel security track
+
+Lifecycle classes do not sandbox host capabilities.
+
+Threat Model v2 still points to:
+
+    os_level_capability_sandbox
 
 ## Status
 

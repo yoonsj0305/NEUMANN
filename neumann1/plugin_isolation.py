@@ -9,6 +9,7 @@ from typing import Any
 
 from .family_registry import FamilyAdapter
 from .plugin_manifest import ActivationPolicy, PluginManifest
+from .worker_lifecycle import require_fresh_compatible
 from .types import (
     CostLedger, IRKind, Problem, Representation, VerificationResult, kind_id,
 )
@@ -226,6 +227,7 @@ def build_out_of_process_adapter(
     manifest.validate()
     (policy or ActivationPolicy()).check(manifest)
     authorization_ledger.require_manifest(manifest)
+    require_fresh_compatible(manifest)
 
     dispatcher = SubprocessPluginDispatcher(
         manifest=manifest,
