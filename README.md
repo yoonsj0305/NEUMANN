@@ -6,94 +6,78 @@
 
 ## Current engineering baseline
 
-**v0.0.19**
+**v0.0.20**
 
-NEUMANN now has an explicit plugin trust model and a first out-of-process execution boundary.
-
-Implemented through v0.0.19:
-- learned proposal + deterministic compiler acceptance
-- open namespaced external family kinds
-- Family Adapter Contract + conformance harness
-- static manifests and installed-package discovery
-- digest-bound approval + use-time revocation
+Implemented through v0.0.20:
+- representation-first family routing
+- static plugin discovery + exact-manifest authorization
 - durable hash-chained authorization ledger
-- machine-readable Threat Model v1
-- **out-of-process plugin compiler/solver/verifier execution**
-- **JSON RPC request/response boundary**
-- **timeout/crash fail-closed behavior**
-- **fresh-venv external wheel isolation proof**
+- use-time revocation
+- out-of-process plugin compiler/solver/verifier execution
+- crash/timeout fail-closed behavior
+- fresh-venv external-wheel interoperability
+- Threat Model v1 and **Threat Model v2**
+- **dispatch-vs-child-service runtime cost instrumentation**
 
-## v0.0.19 focus
+## v0.0.20 focus
 
-Threat Model v1 identified the largest uncontained runtime gap:
+v0.0.19 solved one trust problem by moving external plugin code out of the NEUMANN core Python process.
 
-    approved plugin code executed inside the NEUMANN core Python process
+That created a new engineering question:
 
-v0.0.19 moves external family execution behind a child-process boundary.
+    Is the fresh-process boundary too expensive for repeated reasoning?
 
-Core process owns:
-- manifest discovery
-- authorization ledger
-- ManagedPluginRegistry
-- RegistryEngine
-- RPC proxy
+Every isolated dispatch now records:
+- parent-observed dispatch time
+- child-observed plugin service time
+- outside-service time = dispatch - service
 
-Child process owns:
-- plugin import
-- adapter factory
-- compiler operation
-- solver operation
-- verifier operation
+`outside-service` is a lower-bound proxy for process startup, imports, scheduling, IPC, and response handling.
 
-Each operation currently runs in a fresh child Python process.
+### Prototype performance gate
 
-### Protocol
+Frozen before the CI measurement:
 
-    neumann.plugin.rpc.v1
+    outside_service_fraction >= 0.50
 
-Current bounds:
-- request: 64 KiB
-- response: 256 KiB
-- configurable operation timeout
-- JSON-serializable payloads only
+means this trivial-family microbenchmark is classified:
 
-Authorization is checked **immediately before every child launch**.
+    fresh_process_lifecycle_dominated
 
-CI tests prove:
-- adapter creation does not import the plugin in the core process
-- compiler / solver / verifier run in child PIDs
-- plugin module remains absent from parent `sys.modules`
-- child `os.environ` mutation does not mutate parent environment
-- compiler timeout fails closed
-- compiler crash fails closed
-- solver timeout fails closed
-- verifier crash fails closed
-- revoke before the next request causes **0 new child launches**
-- external plugin wheel in a fresh venv follows the same out-of-process path
+and the next performance experiment becomes:
 
-### Critical boundary
+    persistent_worker_lifecycle
 
-**This is process separation, not an OS sandbox.**
+This is an engineering heuristic, not a universal threshold.
 
-The child still runs as the same OS user and may retain normal filesystem, process, and network permissions.
+## Threat Model v2
 
-v0.0.19 therefore supports claims about:
-- Python runtime / address-space separation
-- killable timeout/crash boundary
-- no direct plugin import into core process
-- revocation before dispatch
+v2 separates two threats that v1 grouped together:
 
-It does **not** support claims about:
-- hostile-code-safe sandboxing
-- filesystem isolation
-- network isolation
-- child-process descendant containment
-- publisher authenticity
-- defense against a compromised host or core process
+### Direct core Python-runtime mutation
+
+The isolated path now has evidence for process separation:
+- plugin module absent from parent `sys.modules`
+- compiler/solver/verifier worker PIDs differ from parent
+- JSON RPC boundary between core and plugin
+
+### Host capability abuse
+
+Still not contained:
+- filesystem access
+- network access
+- subprocess creation
+- same-user OS capabilities
+
+Therefore the next **security** control priority is:
+
+    os_level_capability_sandbox
+
+Performance and security priorities are intentionally allowed to diverge.
 
 See:
-- `docs/THREAT_MODEL.md` for the pre-v0.0.19 threat baseline
-- `docs/experiments/v0.0.19.md` for the isolation experiment
+- `docs/THREAT_MODEL_V2.md`
+- `docs/experiments/v0.0.20.md`
 
 ## Run
 
@@ -101,17 +85,13 @@ Requires Python 3.10+.
 
     pip install -e .
     pytest -q
-    python benchmark_v019.py
+    python benchmark_v020.py
 
-## Next trust-plane question
+## Claim boundary
 
-If v0.0.19 evidence holds, the next threat-model revision should distinguish:
+NEUMANN currently has process separation, not hostile-code-safe sandboxing.
 
-    process separation
-        from
-    OS-level sandboxing
-
-and decide whether the next control is host capability restriction, publisher identity, or both.
+A future persistent worker may improve latency but does not, by itself, strengthen the security boundary.
 
 ## Status
 
