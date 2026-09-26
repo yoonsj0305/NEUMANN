@@ -16,8 +16,19 @@ jobs:
       - name: Install
         run: |
           python -m pip install --upgrade pip
-          pip install -e . pytest
+          pip install -e . pytest build
       - name: Test
         run: pytest -q
-      - name: Benchmark smoke
+      - name: Discovery benchmark smoke
         run: python benchmark_v014.py
+      - name: Build core and external plugin wheels
+        run: |
+          python -m build --wheel --outdir dist/core .
+          python -m build --wheel --outdir dist/plugin interop/example_scalar_sum_plugin
+      - name: Cross-package interoperability in fresh venv
+        run: |
+          python -m venv /tmp/neumann-interop
+          /tmp/neumann-interop/bin/python -m pip install --upgrade pip
+          /tmp/neumann-interop/bin/python -m pip install dist/core/*.whl dist/plugin/*.whl
+          cd /tmp
+          /tmp/neumann-interop/bin/python "$GITHUB_WORKSPACE/interop/run_cross_package_interop.py"
