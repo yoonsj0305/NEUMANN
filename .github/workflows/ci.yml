@@ -35,6 +35,8 @@ jobs:
         run: python benchmark_v021.py
       - name: Worker state-hygiene benchmark smoke
         run: python benchmark_v022.py
+      - name: Lifecycle-class policy benchmark smoke
+        run: python benchmark_v023.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .
@@ -54,3 +56,7 @@ jobs:
         run: |
           cd /tmp
           /tmp/neumann-interop/bin/python "$GITHUB_WORKSPACE/interop/run_state_hygiene_interop.py"
+      - name: Cross-package lifecycle-class enforcement in fresh venv
+        run: |
+          cd /tmp
+          /tmp/neumann-interop/bin/python "$GITHUB_WORKSPACE/interop/run_lifecycle_class_interop.py"
