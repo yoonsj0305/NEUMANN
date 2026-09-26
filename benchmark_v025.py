@@ -6,6 +6,7 @@ from pathlib import Path
 
 from neumann1 import (
     AttestationStatus,
+    CostLedger,
     HashChainedAttestationLedger,
     LifecycleAttestation,
     ManagedPluginRegistry,
@@ -92,7 +93,11 @@ def run():
         revoked_head = reloaded.head_sha256
         revoked_blocked = False
         try:
-            engine.solve(Problem("probe: after-revoke"))
+            adapter.compiler.dispatcher.dispatch(
+                "compile",
+                {"problem": {"raw_text": "probe: after-revoke", "metadata": {}}},
+                CostLedger(),
+            )
         except PermissionError:
             revoked_blocked = True
 
