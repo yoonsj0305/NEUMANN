@@ -23,6 +23,8 @@ jobs:
         run: python benchmark_v014.py
       - name: Authorization benchmark smoke
         run: python benchmark_v016.py
+      - name: Persistent authorization benchmark smoke
+        run: python benchmark_v017.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .

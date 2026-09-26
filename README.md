@@ -10,7 +10,7 @@ Problem → learned proposal → deterministic compiler → solver-ready IR → 
 
 ## Current engineering baseline
 
-**v0.0.16**
+**v0.0.17**
 
 Implemented:
 - learned proposal + deterministic compiler acceptance
@@ -18,60 +18,76 @@ Implemented:
 - Family Adapter Contract v1 + conformance harness
 - Plugin Manifest v1 + static installed-package discovery
 - fresh-venv cross-distribution interoperability
-- **digest-bound plugin approval ledger**
-- **use-time authorization checks**
-- **runtime revocation and re-approval**
-- fail-closed UNKNOWN / authorization denial paths
+- digest-bound plugin approval + use-time revocation
+- **durable JSONL authorization ledger**
+- **SHA-256 hash-chained authorization events**
+- **trusted-head rollback/truncation detection**
+- fail-closed UNKNOWN / authorization denial / ledger-integrity paths
 - CI-backed tests and interoperability checks
 
-## v0.0.16 focus
+## v0.0.17 focus
 
-Activation is no longer treated as permanent authority.
+Authorization state can now survive process restarts.
 
-Approval is bound to the exact canonical manifest SHA-256:
+Each persisted event contains:
+- ledger version
+- monotonic sequence
+- APPROVE / REVOKE action
+- plugin ID
+- exact manifest digest
+- reason
+- previous event hash
+- current event hash
 
-    plugin_id + manifest_digest_sha256
+On reload NEUMANN verifies the entire chain before reconstructing authority state.
 
-A changed manifest requires a new approval.
+Local hash-chain verification detects:
+- event mutation
+- record reordering
+- broken predecessor links
+- malformed or partial records
 
-The managed execution path is:
+### Rollback boundary
 
-    static discovery
-      → explicit approval
-      → authorized activation
-      → managed plugin registration
-      → use-time authorization check
-      → solver
+A complete rollback to an older valid ledger prefix is still internally self-consistent.
 
-ManagedPluginRegistry checks authorization every time RegistryEngine requests an external family.
+Therefore v0.0.17 supports a **trusted expected head SHA-256** supplied from outside the ledger file.
 
-This means revocation can stop the next solver action even when the Python module is already imported.
+With that checkpoint, an older/truncated valid prefix fails closed.
+
+This distinction is deliberate:
+
+    local hash chain
+        !=
+    rollback-proof storage
+
+Correct claim:
+**tamper-evident relative to the stated checkpoint trust boundary**.
 
 CI verifies:
-- unapproved activation does not reach the resolver/import boundary
-- exact approved digest can activate
-- changed manifest digest is blocked
-- approved external plugin executes
-- revoke is recorded
-- next execution fails closed
-- solver call count increases by **0** after revocation
-- re-approval restores execution
+- persisted authorization state survives reload
+- reloaded ledger drives ManagedPluginRegistry and RegistryEngine
+- event mutation is detected
+- event reordering is detected
+- whole-event truncation can look valid without a checkpoint
+- the same truncation is detected with a trusted expected head
+- append-after-reload extends the verified chain
+- existing fresh-venv plugin discovery/authorization/revocation remains green
 
 ### Important boundary
 
-The authorization ledger is currently in-memory and unauthenticated.
+The persistent ledger is currently single-writer and file-backed.
 
-Revocation means NEUMANN managed-runtime execution authority is withdrawn. It does not unload already imported Python code or provide OS/process sandboxing.
+It does not yet provide:
+- multi-process locking
+- authenticated operator identity
+- signatures
+- WORM/immutable storage
+- secure remote checkpoint service
+- distributed consensus
+- rollback resistance if attacker controls both ledger and checkpoint
 
-Still missing:
-- durable/tamper-evident ledger storage
-- cryptographic publisher identity
-- distributed policy consistency
-- OS/process isolation
-- dependency sandboxing
-- revocation distribution across multiple hosts
-
-See docs/experiments/v0.0.16.md.
+See docs/experiments/v0.0.17.md.
 
 ## Run
 
@@ -79,9 +95,7 @@ Requires Python 3.10+.
 
     pip install -e .
     pytest -q
-    python benchmark_v016.py
-
-The fresh-venv external-plugin authorization proof is also executed by GitHub Actions.
+    python benchmark_v017.py
 
 ## Design principles
 
@@ -90,10 +104,10 @@ The fresh-venv external-plugin authorization proof is also executed by GitHub Ac
 - **Learned prediction is proposal, not authority**
 - **Discovery must not imply import**
 - **Activation must not imply permanent authority**
-- **Authorization is bound to exact manifest identity**
 - **Revocation is checked at use time**
-- **Post-revocation solver actions should be zero in the managed path**
-- **Do not claim security properties that are not enforced**
+- **Persisted authority must be verified before use**
+- **Hash chains do not magically solve rollback without an external trust anchor**
+- **Do not claim tamper-proof when the evidence only supports tamper-evident**
 
 ## Status
 
