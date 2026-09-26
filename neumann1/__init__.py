@@ -39,3 +39,6 @@ from .family_registry import FamilyAdapter, FamilyRegistry, FAMILY_CONTRACT_VERS
 from .registry_engine import RegistryEngine
 from .family_conformance import ConformanceResult, run_family_conformance
 __all__ += ["FamilyAdapter", "FamilyRegistry", "FAMILY_CONTRACT_VERSION", "builtin_family_registry", "RegistryEngine", "ConformanceResult", "run_family_conformance"]
+
+from .types import KindLike, kind_id, is_unknown_kind, display_kind
+__all__ += ["KindLike", "kind_id", "is_unknown_kind", "display_kind"]
