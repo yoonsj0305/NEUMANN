@@ -100,10 +100,10 @@ from .runtime_cost import RuntimeCostAssessment, assess_dispatch_timings
 __all__ += ["RuntimeCostAssessment", "assess_dispatch_timings"]
 
 from .persistent_plugin_isolation import (
-    PERSISTENT_PLUGIN_RPC_VERSION, PersistentSubprocessPluginDispatcher,
-    build_persistent_out_of_process_adapter,
+    PERSISTENT_PLUGIN_RPC_VERSION, WorkerStatePolicy, WorkerRecycleEvent,
+    PersistentSubprocessPluginDispatcher, build_persistent_out_of_process_adapter,
 )
 __all__ += [
-    "PERSISTENT_PLUGIN_RPC_VERSION", "PersistentSubprocessPluginDispatcher",
-    "build_persistent_out_of_process_adapter",
+    "PERSISTENT_PLUGIN_RPC_VERSION", "WorkerStatePolicy", "WorkerRecycleEvent",
+    "PersistentSubprocessPluginDispatcher", "build_persistent_out_of_process_adapter",
 ]
