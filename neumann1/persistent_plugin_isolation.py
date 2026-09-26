@@ -320,7 +320,7 @@ class PersistentSubprocessPluginDispatcher:
         self.close()
 
 
-def build_persistent_out_of_process_adapter(
+def _build_unattested_persistent_adapter_for_conformance(
     manifest: PluginManifest,
     authorization_ledger: object,
     *,
@@ -329,6 +329,13 @@ def build_persistent_out_of_process_adapter(
     policy: ActivationPolicy | None = None,
     state_policy: WorkerStatePolicy | None = None,
 ) -> FamilyAdapter:
+    """Conformance-only low-level builder.
+
+    This function deliberately bypasses lifecycle attestation so the attestation
+    harness can evaluate a candidate before privilege is granted. It still
+    enforces manifest validation, activation policy, authorization, and lifecycle
+    class compatibility. It is intentionally not exported from neumann1.__init__.
+    """
     manifest.validate()
     (policy or ActivationPolicy()).check(manifest)
     authorization_ledger.require_manifest(manifest)
@@ -347,4 +354,40 @@ def build_persistent_out_of_process_adapter(
         solver=OutOfProcessSolver(dispatcher),
         answer_verifier=OutOfProcessVerifier(dispatcher),
         contract_version=manifest.family_contract_version,
+    )
+
+def build_persistent_out_of_process_adapter(
+    manifest: PluginManifest,
+    authorization_ledger: object,
+    *,
+    attestation_registry: object | None = None,
+    timeout_seconds: float = 2.0,
+    python_executable: str = sys.executable,
+    policy: ActivationPolicy | None = None,
+    state_policy: WorkerStatePolicy | None = None,
+) -> FamilyAdapter:
+    """Create an attestation-gated persistent plugin adapter.
+
+    Persistent reuse is privileged: an exact-manifest PASS attestation must be
+    present in the trusted attestation registry before any worker can be built.
+    """
+    manifest.validate()
+    (policy or ActivationPolicy()).check(manifest)
+    authorization_ledger.require_manifest(manifest)
+    require_persistent_compatible(manifest)
+    if attestation_registry is None:
+        raise PermissionError(
+            "passing lifecycle attestation required for persistent execution"
+        )
+    require = getattr(attestation_registry, "require_manifest", None)
+    if not callable(require):
+        raise TypeError("attestation_registry must provide require_manifest(manifest)")
+    require(manifest)
+    return _build_unattested_persistent_adapter_for_conformance(
+        manifest,
+        authorization_ledger,
+        timeout_seconds=timeout_seconds,
+        python_executable=python_executable,
+        policy=policy,
+        state_policy=state_policy,
     )
