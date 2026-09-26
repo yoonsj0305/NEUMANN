@@ -27,11 +27,13 @@ jobs:
         run: python benchmark_v017.py
       - name: Threat-model benchmark smoke
         run: python benchmark_v018.py
+      - name: Out-of-process plugin benchmark smoke
+        run: python benchmark_v019.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .
           python -m build --wheel --outdir dist/plugin interop/example_scalar_sum_plugin
-      - name: Cross-package authorization and revocation in fresh venv
+      - name: Cross-package out-of-process execution in fresh venv
         run: |
           python -m venv /tmp/neumann-interop
           /tmp/neumann-interop/bin/python -m pip install --upgrade pip
