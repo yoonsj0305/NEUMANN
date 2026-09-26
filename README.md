@@ -12,7 +12,7 @@ NEUMANN separates what learned models are good at from what traditional algorith
 
 ## Current engineering baseline
 
-**v0.0.7**
+**v0.0.8**
 
 Implemented:
 - typed problem / representation / result objects
@@ -23,25 +23,27 @@ Implemented:
 - two-stage open-set / UNKNOWN gate
 - prototype-distance rejection baseline
 - structurally-near OOD benchmark and selective-risk curves
-- **controlled natural-language matching compiler → complete solver-ready IR**
+- controlled natural-language matching compiler → complete solver-ready IR
 - independent matching semantic-contract check
+- **fail-closed matching parser diagnostics**
+- **edge-level IR precision / recall / F1 measurement**
 - cost ledger and execution trace
 
-Local test status:
+## v0.0.8 focus
 
-**21 PASS / 0 FAIL**
+v0.0.8 hardens semantic fidelity for the first complete IR family.
 
-## v0.0.7 result
+The matching compiler now fails closed when:
+- any nonempty statement is unparsed
+- the same left entity is repeated with conflicting rights
+- negation / exception / capacity / cost semantics appear
+- right-side tokens are outside the controlled identifier grammar
 
-For one deliberately narrow family, controlled matching statements now run end-to-end:
+Identical repeated statements are accepted but surfaced in diagnostics.
 
-raw text → matching IR → deterministic matching solver → answer verification
+The goal is intentionally **not** broader language coverage. It is to make silent semantic loss harder.
 
-Three surface forms compiled to faithful solver-ready IRs in the frozen toy benchmark, and an unsupported minimum-spanning-tree prompt failed closed.
-
-Important: this is a **controlled grammar compiler**, not general natural-language understanding.
-
-See `docs/experiments/v0.0.7.md`.
+See `docs/experiments/v0.0.8.md`.
 
 ## Run
 
@@ -49,7 +51,7 @@ Requires Python 3.10+.
 
     pip install -e .
     pytest -q
-    python benchmark_v007.py
+    python benchmark_v008.py
 
 ## Design principles
 
@@ -58,6 +60,7 @@ Requires Python 3.10+.
 - **Traditional algorithms are first-class execution backends**
 - **Answer correctness and representation fidelity are separate checks**
 - **Routing coverage must be chosen against an explicit false-route risk budget**
+- **Silent partial parsing is a correctness failure**
 - **Expand capability one structural family at a time, with explicit semantic checks**
 - **Do not claim capability that the benchmark has not demonstrated**
 
