@@ -6,48 +6,57 @@
 
 Core path:
 
-Problem → learned proposal / competence signal → deterministic family compiler → solver-ready IR → deterministic or neural solver → verification → answer + evidence + cost ledger
-
-NEUMANN separates what learned models are good at from what traditional algorithms and formal solvers already do faster and more reliably.
+Problem → learned proposal / competence signal → deterministic family compiler → solver-ready IR → family registry → family-owned solver/verifier → answer + evidence + cost ledger
 
 ## Current engineering baseline
 
-**v0.0.10**
+**v0.0.11**
 
 Implemented:
 - typed problem / representation / result objects
-- bipartite-matching, shortest-path, and linear-system solvers
-- deterministic answer verification
-- benchmark-side semantic contracts
-- learned open-set structure-family recognizer
-- structurally-near OOD evaluation and selective-risk curves
+- learned proposal + deterministic compiler acceptance
 - complete controlled IR compilers for matching and square linear systems
-- multi-family deterministic routing
-- **learned family proposal + deterministic compiler acceptance**
+- **Family Adapter Contract v1**
+- **Family Registry**
+- **family-owned solver + answer verifier execution**
+- **conformance harness for valid/reject fixtures**
 - fail-closed UNKNOWN path
-- cost ledger and execution trace
+- CI-backed tests and benchmark smoke
 
-## v0.0.10 focus
+## v0.0.11 focus
 
-The learned model is **not allowed to authorize solver execution by itself**.
+NEUMANN is moving from a monolithic prototype toward an extensible runtime.
 
-It may propose a family, but the corresponding deterministic compiler must independently accept the raw input and emit the same IR family. Otherwise NEUMANN returns UNKNOWN.
+A family adapter bundles:
 
-    raw problem
-        ↓
-    learned proposal
-        ↓
-    authorized family compiler
-        ↓
-    accept complete IR OR UNKNOWN
-        ↓
-    solver
+- `family_id`
+- IR kind
+- compiler
+- solver
+- answer verifier
+- contract version
 
-This tests a possible scalable pattern for NEUMANN:
+Contract version:
 
-**learned proposal + deterministic acceptance**
+`neumann.family.v1`
 
-See `docs/experiments/v0.0.10.md`.
+The registry enforces uniqueness and runtime shape checks, while the conformance harness measures:
+
+- valid compile rate
+- valid solved+verified rate
+- reject fail-closed rate
+
+### Known blocker
+
+The current `IRKind` is still a closed Python Enum.
+
+That means a truly external plugin cannot introduce a new representation kind without modifying NEUMANN core.
+
+So v0.0.11 is **not yet a fully open plugin system**.
+
+The next compatibility problem is to migrate toward an open namespaced kind identifier without breaking safety.
+
+See `docs/experiments/v0.0.11.md`.
 
 ## Run
 
@@ -55,17 +64,16 @@ Requires Python 3.10+.
 
     pip install -e .
     pytest -q
-    python benchmark_v010.py
+    python benchmark_v011.py
 
 ## Design principles
 
 - **Correctness before compression**
 - **UNKNOWN is a valid answer**
-- **Learned prediction is a proposal, not authority**
+- **Learned prediction is proposal, not authority**
+- **Family execution should be adapter-owned and independently conformant**
 - **Traditional algorithms are first-class execution backends**
-- **Answer correctness and representation fidelity are separate checks**
-- **Silent partial parsing is a correctness failure**
-- **Expand capability one structural family at a time**
+- **Do not hide ecosystem blockers behind a plugin-shaped API**
 - **Do not claim capability that the benchmark has not demonstrated**
 
 ## Status
