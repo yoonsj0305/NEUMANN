@@ -118,3 +118,16 @@ __all__ += [
     "parse_worker_state_class", "persistent_lifecycle_decision", "fresh_lifecycle_decision",
     "require_persistent_compatible", "require_fresh_compatible",
 ]
+
+from .lifecycle_attestation import (
+    LIFECYCLE_ATTESTATION_VERSION, MIN_ATTESTATION_CASES, MIN_WARM_REPETITIONS,
+    AttestationStatus, LifecycleConformanceCase, LifecycleAttestation,
+    LifecycleAttestationRegistry, conformance_corpus_digest,
+    run_lifecycle_conformance_attestation,
+)
+__all__ += [
+    "LIFECYCLE_ATTESTATION_VERSION", "MIN_ATTESTATION_CASES", "MIN_WARM_REPETITIONS",
+    "AttestationStatus", "LifecycleConformanceCase", "LifecycleAttestation",
+    "LifecycleAttestationRegistry", "conformance_corpus_digest",
+    "run_lifecycle_conformance_attestation",
+]
