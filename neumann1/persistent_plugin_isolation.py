@@ -49,6 +49,7 @@ class WorkerRecycleEvent:
 class PersistentSubprocessPluginDispatcher:
     manifest: PluginManifest
     authorization_ledger: object
+    attestation_registry: object | None = None
     timeout_seconds: float = 2.0
     python_executable: str = sys.executable
     state_policy: WorkerStatePolicy = field(default_factory=WorkerStatePolicy)
@@ -162,10 +163,20 @@ class PersistentSubprocessPluginDispatcher:
             self._kill_worker()
             raise PluginProcessError(error)
 
+    def _require_runtime_evidence(self) -> None:
+        self.authorization_ledger.require_manifest(self.manifest)
+        if self.attestation_registry is not None:
+            require = getattr(self.attestation_registry, "require_manifest", None)
+            if not callable(require):
+                raise TypeError(
+                    "attestation_registry must provide require_manifest(manifest)"
+                )
+            require(self.manifest)
+
     def _ensure_started(self) -> None:
         if self.is_running:
             return
-        self.authorization_ledger.require_manifest(self.manifest)
+        self._require_runtime_evidence()
         start = time.perf_counter()
         process = subprocess.Popen(
             [self.python_executable, "-m", "neumann1.plugin_worker_persistent"],
@@ -214,10 +225,10 @@ class PersistentSubprocessPluginDispatcher:
     ) -> dict[str, Any]:
         with self._lock:
             try:
-                self.authorization_ledger.require_manifest(self.manifest)
+                self._require_runtime_evidence()
             except PermissionError:
-                # Revocation is fail-closed: terminate without sending any further
-                # protocol message to plugin code.
+                # Authorization or evidence revocation is fail-closed: terminate
+                # without sending any further protocol message to plugin code.
                 self._kill_worker()
                 raise
 
@@ -328,6 +339,7 @@ def _build_unattested_persistent_adapter_for_conformance(
     python_executable: str = sys.executable,
     policy: ActivationPolicy | None = None,
     state_policy: WorkerStatePolicy | None = None,
+    runtime_attestation_registry: object | None = None,
 ) -> FamilyAdapter:
     """Conformance-only low-level builder.
 
@@ -343,6 +355,7 @@ def _build_unattested_persistent_adapter_for_conformance(
     dispatcher = PersistentSubprocessPluginDispatcher(
         manifest=manifest,
         authorization_ledger=authorization_ledger,
+        attestation_registry=runtime_attestation_registry,
         timeout_seconds=timeout_seconds,
         python_executable=python_executable,
         state_policy=state_policy or WorkerStatePolicy(),
@@ -390,4 +403,5 @@ def build_persistent_out_of_process_adapter(
         python_executable=python_executable,
         policy=policy,
         state_policy=state_policy,
+        runtime_attestation_registry=attestation_registry,
     )
