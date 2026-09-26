@@ -6,6 +6,7 @@ import subprocess
 import sys
 import threading
 import time
+import uuid
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -20,6 +21,28 @@ from .plugin_manifest import ActivationPolicy, PluginManifest
 
 PERSISTENT_PLUGIN_RPC_VERSION = "neumann.plugin.persistent-rpc.v1"
 
+@dataclass(frozen=True)
+class WorkerStatePolicy:
+    """Lifecycle policy for persistent plugin workers.
+
+    max_requests_per_worker counts plugin operations (compile/solve/verify), not
+    initialization or shutdown messages. None means no automatic count-based
+    recycle. Semantic correctness must not depend on retained hidden worker state.
+    """
+    max_requests_per_worker: int | None = None
+
+    def validate(self) -> None:
+        if self.max_requests_per_worker is not None and self.max_requests_per_worker <= 0:
+            raise ValueError("max_requests_per_worker must be positive or None")
+
+
+@dataclass(frozen=True)
+class WorkerRecycleEvent:
+    reason: str
+    generation_id: str | None
+    worker_pid: int | None
+    requests_in_generation: int
+
 
 @dataclass
 class PersistentSubprocessPluginDispatcher:
@@ -27,20 +50,26 @@ class PersistentSubprocessPluginDispatcher:
     authorization_ledger: object
     timeout_seconds: float = 2.0
     python_executable: str = sys.executable
+    state_policy: WorkerStatePolicy = field(default_factory=WorkerStatePolicy)
     start_count: int = 0
     request_count: int = 0
     worker_pids: list[int] = field(default_factory=list)
     dispatch_timings: list[dict[str, float | str | int]] = field(default_factory=list)
     startup_timings: list[float] = field(default_factory=list)
+    recycle_events: list[WorkerRecycleEvent] = field(default_factory=list)
 
     def __post_init__(self):
         self.manifest.validate()
         if self.timeout_seconds <= 0:
             raise ValueError("timeout_seconds must be positive")
+        self.state_policy.validate()
         self._process = None
         self._responses = None
         self._reader = None
         self._request_id = 0
+        self._generation_sequence = 0
+        self._generation_id = None
+        self._requests_in_generation = 0
         self._lock = threading.Lock()
 
     @property
@@ -50,6 +79,14 @@ class PersistentSubprocessPluginDispatcher:
     @property
     def worker_pid(self) -> int | None:
         return self._process.pid if self.is_running else None
+
+    @property
+    def generation_id(self) -> str | None:
+        return self._generation_id if self.is_running else None
+
+    @property
+    def requests_in_generation(self) -> int:
+        return self._requests_in_generation if self.is_running else 0
 
     def _reader_loop(self, process, responses):
         try:
@@ -114,6 +151,9 @@ class PersistentSubprocessPluginDispatcher:
         if int(response.get("request_id", -1)) != request_id:
             self._kill_worker()
             raise PluginProtocolError("persistent plugin request/response ID mismatch")
+        if response.get("generation_id") != self._generation_id:
+            self._kill_worker()
+            raise PluginProtocolError("persistent plugin generation ID mismatch")
         if not response.get("ok"):
             error = str(response.get("error", "persistent plugin operation failed"))
             # Worker-level plugin errors invalidate this worker because plugin state
@@ -142,6 +182,11 @@ class PersistentSubprocessPluginDispatcher:
         self._responses = responses
         self._reader = reader
         self.start_count += 1
+        self._generation_sequence += 1
+        self._generation_id = (
+            f"{self.manifest.plugin_id}:g{self._generation_sequence}:{uuid.uuid4().hex}"
+        )
+        self._requests_in_generation = 0
 
         init_id = 0
         try:
@@ -150,6 +195,7 @@ class PersistentSubprocessPluginDispatcher:
                 "request_id": init_id,
                 "operation": "initialize",
                 "manifest": self.manifest.canonical_dict(),
+                "generation_id": self._generation_id,
             })
             response = self._next_response(self.timeout_seconds)
             self._validate_response(response, init_id)
@@ -174,6 +220,14 @@ class PersistentSubprocessPluginDispatcher:
                 self._kill_worker()
                 raise
 
+            limit = self.state_policy.max_requests_per_worker
+            if (
+                self.is_running
+                and limit is not None
+                and self._requests_in_generation >= limit
+            ):
+                self.recycle("max_requests_per_worker")
+
             self._ensure_started()
             self._request_id += 1
             request_id = self._request_id
@@ -185,6 +239,7 @@ class PersistentSubprocessPluginDispatcher:
                 "payload": payload,
             })
             self.request_count += 1
+            self._requests_in_generation += 1
             response = self._next_response(self.timeout_seconds)
             self._validate_response(response, request_id)
 
@@ -194,6 +249,8 @@ class PersistentSubprocessPluginDispatcher:
             self.dispatch_timings.append({
                 "operation": operation,
                 "worker_pid": worker_pid,
+                "generation_id": str(self._generation_id),
+                "requests_in_generation": self._requests_in_generation,
                 "dispatch_seconds": dispatch_seconds,
                 "service_seconds": service_seconds,
                 "outside_service_seconds": max(0.0, dispatch_seconds - service_seconds),
@@ -205,6 +262,8 @@ class PersistentSubprocessPluginDispatcher:
         self._process = None
         self._responses = None
         self._reader = None
+        self._generation_id = None
+        self._requests_in_generation = 0
 
     def _kill_worker(self) -> None:
         process = self._process
@@ -215,6 +274,17 @@ class PersistentSubprocessPluginDispatcher:
             except subprocess.TimeoutExpired:
                 pass
         self._reset_handles()
+
+    def recycle(self, reason: str = "manual") -> None:
+        event = WorkerRecycleEvent(
+            reason=reason,
+            generation_id=self._generation_id,
+            worker_pid=self.worker_pid,
+            requests_in_generation=self._requests_in_generation,
+        )
+        if self.is_running:
+            self.recycle_events.append(event)
+            self._kill_worker()
 
     def close(self) -> None:
         process = self._process
@@ -256,6 +326,7 @@ def build_persistent_out_of_process_adapter(
     timeout_seconds: float = 2.0,
     python_executable: str = sys.executable,
     policy: ActivationPolicy | None = None,
+    state_policy: WorkerStatePolicy | None = None,
 ) -> FamilyAdapter:
     manifest.validate()
     (policy or ActivationPolicy()).check(manifest)
@@ -265,6 +336,7 @@ def build_persistent_out_of_process_adapter(
         authorization_ledger=authorization_ledger,
         timeout_seconds=timeout_seconds,
         python_executable=python_executable,
+        state_policy=state_policy or WorkerStatePolicy(),
     )
     return FamilyAdapter(
         family_id=manifest.family_id,
