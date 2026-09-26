@@ -169,7 +169,9 @@ class PersistentSubprocessPluginDispatcher:
             try:
                 self.authorization_ledger.require_manifest(self.manifest)
             except PermissionError:
-                self.close()
+                # Revocation is fail-closed: terminate without sending any further
+                # protocol message to plugin code.
+                self._kill_worker()
                 raise
 
             self._ensure_started()
