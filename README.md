@@ -6,55 +6,65 @@
 
 Core path:
 
-Problem → learned proposal / competence signal → deterministic family compiler → solver-ready IR → family registry → family-owned solver/verifier → answer + evidence + cost ledger
+Problem → learned proposal → deterministic compiler → solver-ready IR → family registry → family-owned solver/verifier → answer + evidence
 
 ## Current engineering baseline
 
-**v0.0.12**
+**v0.0.13**
 
 Implemented:
 - learned proposal + deterministic compiler acceptance
-- complete controlled IR compilers for matching and square linear systems
-- Family Adapter Contract v1
-- Family Registry + conformance harness
-- **open namespaced representation kinds for external families**
-- backward compatibility for legacy core IRKind values
-- family-owned solver/verifier execution
+- open namespaced external family kinds
+- Family Adapter Contract v1 + conformance harness
+- **Plugin Manifest v1**
+- **static Plugin Catalog**
+- **explicit activation boundary**
+- pre-import metadata policy for declared capabilities
 - fail-closed UNKNOWN path
 - CI-backed tests and benchmark smoke
 
-## v0.0.12 focus
+## v0.0.13 focus
 
-v0.0.11 had a real ecosystem blocker: IRKind was a closed Python Enum.
+The central rule is:
 
-v0.0.12 keeps that enum for backward compatibility, but opens the runtime kind namespace.
+**Discovery != Trust != Execution**
 
-Core enum kinds are projected into reserved identifiers such as:
+A plugin can now be described by a static manifest:
 
-    core.bipartite_matching
-    core.linear_system
+    neumann.plugin.manifest.v1
 
-External families may use namespaced string kinds such as:
+The manifest declares:
+- plugin ID and version
+- family ID
+- namespaced representation kind
+- family contract version
+- entry point
+- capabilities
 
-    example.scalar_sum
-    vendor.some_family
+Catalog registration validates metadata and conflict rules **without resolving or importing plugin code**.
 
-The core.* namespace is reserved.
+Activation is a separate explicit operation:
 
-The v0.0.12 benchmark defines an external scalar-sum family with its own compiler, solver, and verifier. It registers and executes without adding an IRKind enum member.
+    manifest
+      → policy check
+      → resolve entry point
+      → factory
+      → FamilyAdapter identity check
 
-This proves a runtime extension point, not yet a complete plugin distribution ecosystem.
+The default metadata policy blocks plugins declaring network, filesystem.write, or subprocess before resolver code is called.
+
+This is **not a sandbox**. Once imported, code is ordinary Python. Manifest SHA-256 is an audit identity, not a publisher signature.
 
 Still missing:
-- package discovery
-- signed manifests
-- capability/permission declarations
+- installed-package discovery
+- cryptographic signatures / publisher identity
 - dependency isolation and sandboxing
-- richer version negotiation
-- public plugin registry/index
-- supply-chain security
+- capability enforcement after import
+- revocation
+- public package/index workflow
+- multi-version compatibility negotiation
 
-See `docs/experiments/v0.0.12.md`.
+See `docs/experiments/v0.0.13.md`.
 
 ## Run
 
@@ -62,17 +72,17 @@ Requires Python 3.10+.
 
     pip install -e .
     pytest -q
-    python benchmark_v012.py
+    python benchmark_v013.py
 
 ## Design principles
 
 - **Correctness before compression**
 - **UNKNOWN is a valid answer**
 - **Learned prediction is proposal, not authority**
-- **Core compatibility should not close the extension namespace**
-- **External kinds must be namespaced**
-- **Family execution should be adapter-owned and conformant**
-- **Do not call a runtime extension point a mature plugin ecosystem until discovery and supply-chain boundaries exist**
+- **Discovery must not imply code execution**
+- **Declared capability policy is not a sandbox**
+- **External families must be namespaced and conformant**
+- **Do not claim security properties that are not enforced**
 - **Do not claim capability that the benchmark has not demonstrated**
 
 ## Status

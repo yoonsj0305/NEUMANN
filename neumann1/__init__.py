@@ -1,4 +1,4 @@
-from .types import Problem, Representation, IRKind, SolveResult, CostLedger
+from .types import Problem, Representation, IRKind, SolveResult, CostLedger, VerificationResult
 from .engine import NeumannEngine
 from .representation import ExplicitStructureFormer
 from .solvers import BipartiteMatchingSolver, ShortestPathSolver, LinearSystemSolver
@@ -6,7 +6,7 @@ from .verifier import DeterministicVerifier
 from .reference_semantics import ReferenceSemanticVerifier, SemanticContract
 
 __all__ = [
-    "Problem", "Representation", "IRKind", "SolveResult", "CostLedger",
+    "Problem", "Representation", "IRKind", "SolveResult", "CostLedger", "VerificationResult",
     "NeumannEngine", "ExplicitStructureFormer", "BipartiteMatchingSolver",
     "ShortestPathSolver", "LinearSystemSolver", "DeterministicVerifier",
     "ReferenceSemanticVerifier", "SemanticContract",
@@ -42,3 +42,6 @@ __all__ += ["FamilyAdapter", "FamilyRegistry", "FAMILY_CONTRACT_VERSION", "built
 
 from .types import KindLike, kind_id, is_unknown_kind, display_kind
 __all__ += ["KindLike", "kind_id", "is_unknown_kind", "display_kind"]
+
+from .plugin_manifest import PluginManifest, PluginCatalog, ActivationPolicy, PluginActivator, PLUGIN_MANIFEST_VERSION
+__all__ += ["PluginManifest", "PluginCatalog", "ActivationPolicy", "PluginActivator", "PLUGIN_MANIFEST_VERSION"]
