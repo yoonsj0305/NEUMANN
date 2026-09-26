@@ -47,6 +47,16 @@ def test_state_declaration_is_digest_bound():
     assert declared.digest_sha256 != legacy.digest_sha256
 
 
+
+def test_old_approval_does_not_cover_changed_state_declaration():
+    legacy = manifest()
+    declared = manifest("stateless_semantics")
+    ledger = PluginAuthorizationLedger()
+    ledger.approve(legacy)
+    ledger.require_manifest(legacy)
+    with pytest.raises(PermissionError):
+        ledger.require_manifest(declared)
+
 def test_stateless_semantics_resolves_to_persistent():
     resolution = resolve_plugin_lifecycle(manifest("stateless_semantics"))
     assert resolution.mode == LifecycleMode.PERSISTENT
