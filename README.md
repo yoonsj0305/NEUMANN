@@ -6,77 +6,74 @@
 
 ## Current engineering baseline
 
-**v0.0.21**
+**v0.0.22**
 
-v0.0.20 measured the fresh-process execution path and found ~99.98% of the trivial-family dispatch interval outside measured child plugin service.
+v0.0.21 proved that a persistent isolated worker can remove most fresh-process lifecycle overhead for lightweight families.
 
-v0.0.21 tests the resulting performance hypothesis:
+v0.0.22 addresses the semantic cost of that optimization:
 
-> Keep the process boundary, but reuse the worker process.
+> **What state is allowed to survive between requests, and how do we prevent hidden worker memory from becoming semantic authority?**
 
-## Persistent worker path
+## Worker generations
 
-Fresh-process path:
+Every persistent worker lifecycle now has an explicit `generation_id`.
 
-    compile child → exit → solve child → exit → verify child → exit
+All persistent RPC responses are checked against the active generation. A generation mismatch is a protocol failure and the worker is discarded.
 
-Persistent path:
+`WorkerStatePolicy` currently supports:
 
-    start child once
-      → import / activate once
-      → compile
-      → solve
-      → verify
-      → reuse for later requests
+    max_requests_per_worker
 
-Protocol:
+When the operation limit is reached, the next compile/solve/verify request starts a fresh worker generation.
 
-    neumann.plugin.persistent-rpc.v1
+Manual recycling is also available:
 
-Properties:
-- line-delimited JSON RPC
-- monotonically increasing request IDs
-- one serialized request at a time per worker
-- authorization checked before worker start and every request
-- revoke terminates the worker without sending another plugin RPC
-- timeout/crash discards worker
-- next approved request may start a clean replacement worker
-- plugin module remains outside the core Python process
+    dispatcher.recycle("reason")
 
-## Pre-registered keep gate
+and records the previous generation ID, PID, request count, and recycle reason.
 
-Keep this direction only if CI shows:
+## Semantic state rule
 
-1. warm persistent pipeline median <= 25% of fresh-process median
-2. revoked execution is not verified
-3. post-revocation plugin requests = 0
-4. worker is terminated on revocation
+NEUMANN's runtime contract is now:
 
-## Important semantic boundary
+> Retained worker state may accelerate computation, but request correctness must not depend on hidden state that is absent from the explicit RPC payload and approved plugin artifact.
 
-Persistent workers retain child-process state across requests.
+A strong CI probe sets:
 
-That may include plugin globals, caches, allocator state, and accidental mutable state.
+    max_requests_per_worker = 1
 
-This is useful for performance, but creates a new lifecycle question:
+which forces one problem's compile, solve, and verify operations into **three different worker generations**. The family must still return the correct verified answer.
 
-    What plugin state is allowed to persist, and when must a worker be recycled?
+## Poisoned-state experiment
 
-## Security boundary
+The test plugin contains an intentional hidden global poison flag.
 
-Persistent reuse is **not** a sandbox improvement.
+CI verifies:
+- poison is visible inside the same generation
+- manual recycle clears the poison
+- request-limit recycle clears the poison
+- generation ID changes after recycle
+- normal results remain semantically equivalent across recycle
+- parent process still does not import plugin code
 
-Threat Model v2 still sets the next security priority to:
+## Boundary
 
-    os_level_capability_sandbox
+Process recycling resets Python in-memory state for the worker process. It does **not** roll back external effects such as:
+- filesystem writes
+- network / remote service state
+- databases
+- escaped descendants
+- host-level resources
 
-See `docs/experiments/v0.0.21.md`.
+That remains outside state hygiene and belongs to the OS-level sandbox / side-effect-control track.
+
+See `docs/experiments/v0.0.22.md`.
 
 ## Run
 
     pip install -e .
     pytest -q
-    python benchmark_v021.py
+    python benchmark_v022.py
 
 ## Status
 
