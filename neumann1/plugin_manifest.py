@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import Enum
 import hashlib
 import json
 import re
@@ -11,6 +12,13 @@ from .types import kind_id
 
 
 PLUGIN_MANIFEST_VERSION = "neumann.plugin.manifest.v1"
+
+class PluginStateClass(str, Enum):
+    STATELESS_SEMANTICS = "stateless_semantics"
+    CACHE_ONLY = "cache_only"
+    EXPLICIT_STATEFUL = "explicit_stateful"
+    NON_PERSISTENT_ONLY = "non_persistent_only"
+
 _PLUGIN_ID_RE = re.compile(r"^[a-z0-9][a-z0-9_-]*(?:\.[a-z0-9][a-z0-9_-]*)+$")
 _ENTRY_POINT_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_.]*:[A-Za-z_][A-Za-z0-9_]*$")
 
@@ -38,6 +46,7 @@ class PluginManifest:
     entry_point: str
     capabilities: tuple[str, ...] = ()
     description: str = ""
+    state_class: PluginStateClass | None = None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "PluginManifest":
@@ -64,6 +73,11 @@ class PluginManifest:
             entry_point=str(data["entry_point"]),
             capabilities=tuple(str(x) for x in data.get("capabilities", ())),
             description=str(data.get("description", "")),
+            state_class=(
+                None
+                if data.get("state_class") is None
+                else PluginStateClass(str(data["state_class"]))
+            ),
         )
         manifest.validate()
         return manifest
@@ -104,9 +118,11 @@ class PluginManifest:
             raise ValueError(f"unknown declared capabilities: {unknown_caps}")
         if "compile" not in self.capabilities or "solve" not in self.capabilities or "verify" not in self.capabilities:
             raise ValueError("family plugins must declare compile, solve, and verify capabilities")
+        if self.state_class is not None and not isinstance(self.state_class, PluginStateClass):
+            raise ValueError("state_class must be a PluginStateClass or None")
 
     def canonical_dict(self) -> dict[str, Any]:
-        return {
+        data = {
             "manifest_version": self.manifest_version,
             "plugin_id": self.plugin_id,
             "plugin_version": self.plugin_version,
@@ -117,6 +133,11 @@ class PluginManifest:
             "capabilities": list(self.capabilities),
             "description": self.description,
         }
+        # Backward-compatible v1 extension: absence of state_class keeps the
+        # canonical representation (and therefore digest) of legacy manifests stable.
+        if self.state_class is not None:
+            data["state_class"] = self.state_class.value
+        return data
 
     @property
     def digest_sha256(self) -> str:
