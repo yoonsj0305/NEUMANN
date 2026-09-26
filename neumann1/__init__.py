@@ -34,3 +34,8 @@ __all__ += ["ControlledLinearSystemStructureFormer", "LinearSemanticVerifier", "
 from .learned_compiler_gate import LearnedProposalCompilerGate
 from .compiler_gate_dataset import compiler_gate_training_examples, compiler_gate_validation_examples, compiler_gate_final_examples
 __all__ += ["LearnedProposalCompilerGate", "compiler_gate_training_examples", "compiler_gate_validation_examples", "compiler_gate_final_examples"]
+
+from .family_registry import FamilyAdapter, FamilyRegistry, FAMILY_CONTRACT_VERSION, builtin_family_registry
+from .registry_engine import RegistryEngine
+from .family_conformance import ConformanceResult, run_family_conformance
+__all__ += ["FamilyAdapter", "FamilyRegistry", "FAMILY_CONTRACT_VERSION", "builtin_family_registry", "RegistryEngine", "ConformanceResult", "run_family_conformance"]
