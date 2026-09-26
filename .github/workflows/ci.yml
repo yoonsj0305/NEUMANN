@@ -25,6 +25,8 @@ jobs:
         run: python benchmark_v016.py
       - name: Persistent authorization benchmark smoke
         run: python benchmark_v017.py
+      - name: Threat-model benchmark smoke
+        run: python benchmark_v018.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .
