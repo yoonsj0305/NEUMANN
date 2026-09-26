@@ -9,7 +9,7 @@ from neumann1 import (
     builtin_family_registry, catalog_from_discovery, discover_installed_manifests,
 )
 from neumann1.persistent_plugin_isolation import (
-    WorkerStatePolicy, build_persistent_out_of_process_adapter,
+    WorkerStatePolicy, _build_unattested_persistent_adapter_for_conformance as build_persistent_out_of_process_adapter,
 )
 
 

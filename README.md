@@ -6,89 +6,114 @@
 
 ## Current engineering baseline
 
-**v0.0.23**
+**v0.0.24**
 
-v0.0.22 made persistent-worker state visible through generation IDs and recycle evidence.
+v0.0.23 made persistent reuse an explicit lifecycle privilege.
 
-v0.0.23 replaces one global reuse policy with an explicit plugin lifecycle declaration that the runtime enforces.
+v0.0.24 adds the missing evidence gate:
 
-## Worker state classes
+> **A plugin declaration is not enough. Persistent reuse now requires exact-artifact behavioral attestation.**
 
-### `STATELESS`
-Semantic correctness requires no retained worker state.
+## Persistent privilege
 
-Persistent reuse: **allowed**.
+Public persistent execution requires:
 
-### `CACHE_ONLY`
-Retained state may accelerate computation, but clearing it must not change semantic results.
+    exact manifest authorization
+      + lifecycle-compatible declaration
+      + exact-manifest PASS lifecycle attestation
 
-Persistent reuse: **allowed**.
+Only then can the public persistent builder create a reusable worker.
 
-### `STATEFUL_EXPLICIT`
-State is part of semantics and therefore requires an explicit state-transfer/checkpoint protocol.
+## Lifecycle conformance attestation
 
-v0.0.23 does not implement that protocol.
+Attestation currently supports persistent-compatible classes:
+- `STATELESS`
+- `CACHE_ONLY`
 
-Current execution: **fail closed**.
+Minimum prototype PASS gate:
+- at least 3 explicit conformance cases
+- at least 2 warm repetitions per case
+- warm persistent mode: 100% pass
+- recycled mode: 100% pass
+- compile/solve/verify cross-generation mode: 100% pass
+- expected semantic subset equivalence: 1.0
 
-### `NON_PERSISTENT`
-The family must not be reused through a persistent worker.
+Execution modes:
 
-Fresh-process execution: **allowed**.
+### Warm
+Repeated cases reuse the same worker.
 
-Persistent reuse: **rejected before plugin launch**.
+### Recycled
+Worker is recycled at case boundaries.
 
-## Legacy manifests
+### Cross-generation
+`max_requests_per_worker=1` forces compile, solve, and verify through separate worker generations.
 
-Older manifests without `worker_state_class` remain valid on the fresh-process path.
+## Exact-artifact binding
 
-They cannot silently gain persistent-reuse privileges:
+Attestation records are bound to:
+- plugin ID
+- exact manifest SHA-256
+- declared worker state class
+- explicit conformance corpus SHA-256
 
-    undeclared + fresh       → allowed
-    undeclared + persistent  → rejected
+The attestation itself also has a canonical SHA-256 digest.
 
-## Manifest identity
+Therefore:
 
-When present, `worker_state_class` is part of the canonical manifest SHA-256.
+    changed manifest + old attestation → reject
 
-Changing lifecycle class therefore changes approval identity and requires a new exact-manifest authorization.
+even when the logical plugin ID is unchanged.
 
 ## Runtime enforcement
 
-Current compatibility matrix:
+Public persistent builder behavior:
 
-| Declaration | Fresh process | Persistent worker |
-|---|---:|---:|
-| undeclared legacy | allow | reject |
-| STATELESS | allow | allow |
-| CACHE_ONLY | allow | allow |
-| NON_PERSISTENT | allow | reject |
-| STATEFUL_EXPLICIT | reject | reject |
+| Evidence | Result |
+|---|---:|
+| no attestation registry | reject |
+| no attestation for exact manifest | reject |
+| stale attestation for another digest | reject |
+| FAIL attestation | reject |
+| exact PASS attestation | allow |
 
-`STATEFUL_EXPLICIT` remains blocked until NEUMANN has a real explicit-state protocol rather than hidden worker memory.
+## Bootstrap boundary
+
+Attestation must test a candidate before persistent privilege exists.
+
+NEUMANN therefore has an internal conformance-only persistent builder that bypasses only the attestation requirement while still enforcing:
+- manifest validation
+- exact-manifest authorization
+- activation policy
+- lifecycle compatibility
+- out-of-process execution
+
+It is intentionally **not exported as a public NEUMANN API**.
 
 ## Important boundary
 
-A declaration is a policy input, not behavioral proof.
+A PASS attestation is deterministic evidence over a finite declared corpus.
 
-A malicious or buggy plugin may claim `CACHE_ONLY` while actually depending on hidden state.
+It is **not**:
+- formal verification
+- proof for all possible inputs
+- proof against adaptive malicious behavior
+- publisher identity
+- OS sandboxing
 
-Therefore declaration enforcement must remain paired with behavioral evidence such as:
-- v0.0.22 cross-generation correctness
-- poison-state reset tests
-- conformance suites
+The attestation registry is in-memory in v0.0.24.
 
-See `docs/experiments/v0.0.23.md`.
+See `docs/experiments/v0.0.24.md`.
 
 ## Run
 
     pip install -e .
     pytest -q
-    python benchmark_v023.py
+    python benchmark_v024.py
 
 ## Parallel security track
 
-Lifecycle classes do not sandbox host capabilities.
+Lifecycle attestation governs reuse semantics, not host capabilities.
 
 Threat Model v2 still points to:
 
