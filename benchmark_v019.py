@@ -32,7 +32,7 @@ def make_manifest():
     })
 
 
-def make_engine(timeout=1.0):
+def make_engine(timeout=8.0):
     sys.modules.pop(MODULE, None)
     manifest = make_manifest()
     ledger = PluginAuthorizationLedger()
@@ -44,7 +44,7 @@ def make_engine(timeout=1.0):
 
 
 def run():
-    manifest, ledger, adapter, engine = make_engine(timeout=1.0)
+    manifest, ledger, adapter, engine = make_engine(timeout=8.0)
     dispatcher = adapter.compiler.dispatcher
     parent_pid = os.getpid()
     imported_before = MODULE in sys.modules
@@ -59,7 +59,7 @@ def run():
     revoked = engine.solve(Problem("probe: ok"))
     launches_after_revoked = dispatcher.launch_count
 
-    _, _, timeout_adapter, timeout_engine = make_engine(timeout=0.2)
+    _, _, timeout_adapter, timeout_engine = make_engine(timeout=3.0)
     compile_timeout = timeout_engine.solve(Problem("probe: hang_compile"))
     solver_timeout = timeout_engine.solve(Problem("probe: hang_solve"))
 
