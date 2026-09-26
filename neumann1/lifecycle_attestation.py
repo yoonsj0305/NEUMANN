@@ -6,7 +6,8 @@ import hashlib
 import json
 from typing import Any, Iterable
 
-from .family_registry import ManagedPluginRegistry, builtin_family_registry
+from .family_registry import builtin_family_registry
+from .plugin_authorization import ManagedPluginRegistry
 from .persistent_plugin_isolation import (
     WorkerStatePolicy,
     _build_unattested_persistent_adapter_for_conformance,
