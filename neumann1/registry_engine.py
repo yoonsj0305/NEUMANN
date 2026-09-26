@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from .types import Problem, SolveResult, CostLedger, display_kind, is_unknown_kind
 from .family_registry import FamilyRegistry
+from .plugin_isolation import PluginProcessError
 
 
 class RegistryEngine:
@@ -92,8 +93,20 @@ class RegistryEngine:
         trace.append(f"family={adapter.family_id}")
         trace.append(f"kind_id={adapter.canonical_kind_id}")
         trace.append(f"solver={adapter.solver.name}")
-        answer = adapter.solver.solve(rep, ledger)
-        vr = adapter.answer_verifier.verify(problem, rep, answer, ledger)
+        try:
+            answer = adapter.solver.solve(rep, ledger)
+            vr = adapter.answer_verifier.verify(problem, rep, answer, ledger)
+        except PluginProcessError as exc:
+            ledger.fallback_steps += 1
+            return SolveResult(
+                answer=None,
+                representation=rep,
+                solver_name="fallback_required",
+                verified=False,
+                verification_reason=f"Plugin process fail-closed: {exc}",
+                ledger=ledger,
+                trace=trace + ["plugin_process_fail_closed"],
+            )
         trace.append(f"verified={vr.ok}")
 
         return SolveResult(
