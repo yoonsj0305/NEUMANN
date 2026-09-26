@@ -30,3 +30,7 @@ __all__ += ["ControlledMatchingStructureFormer", "MatchingSemanticVerifier", "Ma
 from .linear_ir import ControlledLinearSystemStructureFormer, LinearSemanticVerifier, LinearSemanticContract
 from .composite import CompositeStructureFormer
 __all__ += ["ControlledLinearSystemStructureFormer", "LinearSemanticVerifier", "LinearSemanticContract", "CompositeStructureFormer"]
+
+from .learned_compiler_gate import LearnedProposalCompilerGate
+from .compiler_gate_dataset import compiler_gate_training_examples, compiler_gate_validation_examples, compiler_gate_final_examples
+__all__ += ["LearnedProposalCompilerGate", "compiler_gate_training_examples", "compiler_gate_validation_examples", "compiler_gate_final_examples"]
