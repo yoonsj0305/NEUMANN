@@ -26,3 +26,7 @@ __all__ += ["PrototypeOpenSetStructureFormer", "PrototypeMetrics", "validation_v
 
 from .matching_ir import ControlledMatchingStructureFormer, MatchingSemanticVerifier, MatchingSemanticContract
 __all__ += ["ControlledMatchingStructureFormer", "MatchingSemanticVerifier", "MatchingSemanticContract"]
+
+from .linear_ir import ControlledLinearSystemStructureFormer, LinearSemanticVerifier, LinearSemanticContract
+from .composite import CompositeStructureFormer
+__all__ += ["ControlledLinearSystemStructureFormer", "LinearSemanticVerifier", "LinearSemanticContract", "CompositeStructureFormer"]
