@@ -80,3 +80,16 @@ __all__ += [
     "ThreatScenario", "default_threat_model", "assurance_counts",
     "unresolved_host_integrity_scenarios", "next_control_priority",
 ]
+
+from .plugin_isolation import (
+    PLUGIN_RPC_VERSION, MAX_REQUEST_BYTES, MAX_RESPONSE_BYTES,
+    PluginProcessError, PluginProcessTimeout, PluginProtocolError,
+    SubprocessPluginDispatcher, OutOfProcessCompiler, OutOfProcessSolver,
+    OutOfProcessVerifier, build_out_of_process_adapter,
+)
+__all__ += [
+    "PLUGIN_RPC_VERSION", "MAX_REQUEST_BYTES", "MAX_RESPONSE_BYTES",
+    "PluginProcessError", "PluginProcessTimeout", "PluginProtocolError",
+    "SubprocessPluginDispatcher", "OutOfProcessCompiler", "OutOfProcessSolver",
+    "OutOfProcessVerifier", "build_out_of_process_adapter",
+]
