@@ -107,3 +107,14 @@ __all__ += [
     "PERSISTENT_PLUGIN_RPC_VERSION", "WorkerStatePolicy", "WorkerRecycleEvent",
     "PersistentSubprocessPluginDispatcher", "build_persistent_out_of_process_adapter",
 ]
+
+from .worker_lifecycle import (
+    WorkerStateClass, LifecycleMode, LifecycleDecision,
+    parse_worker_state_class, persistent_lifecycle_decision, fresh_lifecycle_decision,
+    require_persistent_compatible, require_fresh_compatible,
+)
+__all__ += [
+    "WorkerStateClass", "LifecycleMode", "LifecycleDecision",
+    "parse_worker_state_class", "persistent_lifecycle_decision", "fresh_lifecycle_decision",
+    "require_persistent_compatible", "require_fresh_compatible",
+]
