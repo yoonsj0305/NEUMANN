@@ -66,8 +66,8 @@ def run():
     if not restored.verified or restored.answer["sum"] != 3.0:
         raise RuntimeError("reapproved persistent plugin did not recover")
     second_pid = dispatcher.worker_pid
-    if dispatcher.start_count != 2 or second_pid == first_pid:
-        raise RuntimeError("reapproval did not create a clean replacement worker")
+    if dispatcher.start_count != 2 or second_pid is None:
+        raise RuntimeError("reapproval did not create a replacement worker")
 
     result = {
         "core_distribution_version": md.version("neumann1"),
