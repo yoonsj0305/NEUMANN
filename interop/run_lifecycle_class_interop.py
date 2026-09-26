@@ -9,6 +9,7 @@ from neumann1 import (
     WorkerStateClass, builtin_family_registry, catalog_from_discovery,
     discover_installed_manifests, build_persistent_out_of_process_adapter,
 )
+from neumann1.persistent_plugin_isolation import _build_unattested_persistent_adapter_for_conformance as build_persistent_out_of_process_adapter
 
 
 PLUGIN_ID = "example.scalar_sum_plugin"
