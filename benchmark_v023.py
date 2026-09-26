@@ -5,8 +5,8 @@ import json
 from neumann1 import (
     PluginAuthorizationLedger, PluginManifest, PLUGIN_MANIFEST_VERSION,
     WorkerStateClass, build_out_of_process_adapter,
-    build_persistent_out_of_process_adapter,
 )
+from neumann1.persistent_plugin_isolation import _build_unattested_persistent_adapter_for_conformance as build_persistent_out_of_process_adapter
 
 
 def make_manifest(state_class=None, suffix="base"):
