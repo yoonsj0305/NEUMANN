@@ -10,7 +10,7 @@ from .types import IRKind
 class TwoStageModelFootprint:
     """Inspectable model-state footprint for the current two-stage proposer.
 
-    \`\`linear_parameter_count\`\` counts fitted logistic-regression coefficient and
+    ``linear_parameter_count`` counts fitted logistic-regression coefficient and
     intercept scalars only. TF-IDF vocabulary and IDF state are reported
     separately because they are learned preprocessing state, not trainable linear
     classifier parameters.
