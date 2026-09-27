@@ -34,6 +34,19 @@ It explicitly does **not** call the score proxy FLOPs, does not infer joules or 
 
 See `docs/experiments/v0.0.27.md`.
 
+First measured v0.0.27 result:
+- fitted logistic coefficient/intercept scalars: **1,962**
+- measurement/public prediction parity: **1.0**
+- known proposal coverage and end-to-end verified coverage: **1.0**
+- proposal-layer unsupported false-route rate: **0.10**
+- final unsupported false-route rate after compiler gate: **0.0**
+- one bad learned proposal was rejected by the deterministic compiler
+- mean sparse score-term proxy: **60.17**
+- 8 repeated exact uses: learned score-term proxy **8 → 1 equivalent inference payment**
+- KEEP decision: **true**
+
+The 10% proposal false-route is a useful result, not a hidden blemish: the learned router can be wrong while the deterministic compiler prevents that mistake from becoming solver authority.
+
 ### Previous structural-reuse result
 
 v0.0.26 measured:
