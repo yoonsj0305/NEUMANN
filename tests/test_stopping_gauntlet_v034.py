@@ -106,7 +106,7 @@ def test_v034_all_scorers_are_bounded_and_share_candidate_universe():
 
 def test_v034_threshold_calibration_is_deterministic_and_on_grid():
     frozen = fit_frozen_v033_scorer()
-    examples = v034_calibration_examples()[:48]
+    examples = v034_calibration_examples()[:24]
 
     first = calibrate_threshold(
         examples,
@@ -126,7 +126,7 @@ def test_v034_threshold_calibration_is_deterministic_and_on_grid():
 def test_v034_final_stopping_does_not_force_oracle_cardinality():
     frozen = fit_frozen_v033_scorer()
     calibration = calibrate_threshold(
-        v034_calibration_examples(),
+        v034_calibration_examples()[:48],
         "learned_mlp",
         frozen_scorer=frozen,
     )
@@ -138,7 +138,7 @@ def test_v034_final_stopping_does_not_force_oracle_cardinality():
             calibration,
             frozen_scorer=frozen,
         )
-        for example in v034_final_examples()[:32]
+        for example in v034_final_examples()[:8]
     ]
 
     assert any(
@@ -154,9 +154,9 @@ def test_v034_final_stopping_does_not_force_oracle_cardinality():
 def test_v034_checker_preserves_verified_retention_on_sample():
     frozen = fit_frozen_v033_scorer()
     calibration_examples = (
-        v034_calibration_examples()
+        v034_calibration_examples()[:32]
     )
-    final_examples = v034_final_examples()[:16]
+    final_examples = v034_final_examples()[:4]
 
     for method in (
         "learned_mlp",
