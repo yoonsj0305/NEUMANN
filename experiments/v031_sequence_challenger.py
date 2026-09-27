@@ -248,6 +248,7 @@ class TinySequenceTransformer(nn.Module):
         self.encoder = nn.TransformerEncoder(
             layer,
             num_layers=config.layers,
+            enable_nested_tensor=False,
         )
         self.head = nn.Linear(
             config.d_model,
