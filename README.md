@@ -6,7 +6,7 @@
 
 ## Current engineering baseline
 
-**v0.0.26 candidate**
+**v0.0.26**
 
 v0.0.25 closed durable/revocable persistent evidence authority.
 
@@ -27,6 +27,14 @@ It measures:
 It does **not** interpret NEUMANN step counts as FLOPs, byte counts as tokens, or this controlled benchmark as proof of LLM/energy efficiency.
 
 See `docs/experiments/v0.0.26.md`.
+
+First measured result:
+- verified answer equivalence: **1.0**
+- representation-step reduction for 8 repeated executions: **8 → 1**
+- mean representation/raw byte ratio: **3.86** (representation is larger)
+- mean observed CI wall-time ratio: **4.07×** in favor of reuse
+
+The wall-time ratio is a diagnostic from small Python fixtures, not a general speedup claim.
 
 ## Persistent privilege
 
