@@ -59,6 +59,30 @@ PyTorch remains an **experiment-only dependency**. It is installed in a separate
 
 See `docs/experiments/v0.0.31.md`.
 
+First measured v0.0.31 result:
+- core pytest: **155 passed, 1 skipped**
+- sequence contract tests: **4 passed**
+- CPU PyTorch: **2.14.0+cpu**
+- Direct / Structural parameters: **75,538 / 75,538**
+- parameter bytes: **302,152 / 302,152**
+- identical 82-way heads
+- identical learned arithmetic proxy on matched inputs
+- total training examples: **8,192 / 8,192**
+- Direct solved-positive examples: **8,192**
+- Structural positives / near-negatives: **4,096 / 4,096**
+- Direct validation verified: **29/243 = 11.93%**
+- Direct final verified: **31/243 = 12.76%**
+- matched Structural validation verified: **243/243 = 100%**
+- matched Structural final verified: **243/243 = 100%**
+- Structural near-negative proposal false routes: **0%**
+- Structural compiler-gated false routes: **0%**
+- frozen v0.0.29 MLP Structural on the new final split: **242/243 = 99.59%**
+- KEEP decision: **true**
+
+An early contract-only run caught text collisions with previous generated corpora before the full quality benchmark executed. The generator now enforces explicit forbidden-text exclusion; the successful v0.0.31 train/validation/final sets are mutually disjoint and disjoint from v0.0.29/v0.0.30.
+
+This weakens the simple explanation that the earlier Direct gap was only a shallow-MLP inductive-bias artifact. It remains a narrow task-specific quality result, not a total-compute or frontier-LLM efficiency claim.
+
 ### Previous measured results
 
 v0.0.30:
