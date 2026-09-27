@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
 from neumann1.learned_compression_dataset import (
     learned_compression_final_examples,
     learned_compression_training_examples,
@@ -123,33 +125,51 @@ def test_v034_threshold_calibration_is_deterministic_and_on_grid():
     assert first.threshold in THRESHOLD_GRID
 
 
-def test_v034_final_stopping_does_not_force_oracle_cardinality():
+def test_v034_final_stopping_does_not_use_core_dimension_metadata():
     frozen = fit_frozen_v033_scorer()
     calibration = calibrate_threshold(
         v034_calibration_examples()[:48],
         "learned_mlp",
         frozen_scorer=frozen,
     )
+    example = v034_final_examples()[0]
 
-    observations = [
-        observe_stopping_method(
-            example,
-            "learned_mlp",
-            calibration,
-            frozen_scorer=frozen,
-        )
-        for example in v034_final_examples()[:8]
-    ]
-
-    assert any(
-        row.proposed_count
-        != (
-            row.apparent_dimension
-            - row.core_dimension
-        )
-        for row in observations
+    shadow_core_dimension = (
+        example.core_dimension + 1
+        if example.core_dimension + 1
+        < example.apparent_dimension
+        else max(1, example.core_dimension - 1)
+    )
+    shadow = replace(
+        example,
+        core_dimension=shadow_core_dimension,
     )
 
+    original_scores = score_candidates(
+        example,
+        "learned_mlp",
+        frozen_scorer=frozen,
+    )
+    shadow_scores = score_candidates(
+        shadow,
+        "learned_mlp",
+        frozen_scorer=frozen,
+    )
+
+    assert original_scores == shadow_scores
+
+    original_proposals = sum(
+        1
+        for item in original_scores
+        if item.score >= calibration.threshold
+    )
+    shadow_proposals = sum(
+        1
+        for item in shadow_scores
+        if item.score >= calibration.threshold
+    )
+
+    assert original_proposals == shadow_proposals
 
 def test_v034_checker_preserves_verified_retention_on_sample():
     frozen = fit_frozen_v033_scorer()
