@@ -41,6 +41,8 @@ jobs:
         run: python benchmark_v024.py
       - name: Durable attestation ledger benchmark smoke
         run: python benchmark_v025.py
+      - name: Structural efficiency contract benchmark smoke
+        run: python benchmark_v026.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .
