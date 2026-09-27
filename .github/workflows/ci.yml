@@ -82,3 +82,20 @@ jobs:
         run: |
           cd /tmp
           /tmp/neumann-interop/bin/python "$GITHUB_WORKSPACE/interop/run_durable_attestation_interop.py"
+
+  sequence-experiment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install core and sequence experiment dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e . pytest
+          pip install torch==2.14.0+cpu --index-url https://download.pytorch.org/whl/cpu
+      - name: Sequence experiment contract tests
+        run: pytest -q tests/test_sequence_v031.py
+      - name: Matched tiny-Transformer benchmark
+        run: python benchmark_v031.py
