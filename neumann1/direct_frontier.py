@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import time
+import warnings
 
 import numpy as np
+from sklearn.exceptions import ConvergenceWarning
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 
 from .paired_linear_dataset import PairedLinearExample
@@ -31,6 +33,8 @@ class DirectFrontierModels:
     solution_scale: float
     regression_training_seconds: float
     classifier_training_seconds: float
+    regression_convergence_warning: bool
+    classifier_convergence_warning: bool
 
 
 @dataclass(frozen=True)
@@ -159,16 +163,28 @@ def fit_direct_frontier_models(
         random_state=random_state,
     )
     start = time.perf_counter()
-    regressor.fit(x, regression_targets)
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always", ConvergenceWarning)
+        regressor.fit(x, regression_targets)
     regression_training_seconds = time.perf_counter() - start
+    regression_convergence_warning = any(
+        isinstance(item.message, ConvergenceWarning)
+        for item in caught
+    )
 
     classifier = _new_classifier(
         config.hidden_units,
         random_state=random_state,
     )
     start = time.perf_counter()
-    classifier.fit(x, class_targets)
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always", ConvergenceWarning)
+        classifier.fit(x, class_targets)
     classifier_training_seconds = time.perf_counter() - start
+    classifier_convergence_warning = any(
+        isinstance(item.message, ConvergenceWarning)
+        for item in caught
+    )
 
     if len(classifier.classes_) != PAIR_CLASS_COUNT:
         raise RuntimeError(
@@ -183,6 +199,8 @@ def fit_direct_frontier_models(
         solution_scale=solution_scale,
         regression_training_seconds=regression_training_seconds,
         classifier_training_seconds=classifier_training_seconds,
+        regression_convergence_warning=regression_convergence_warning,
+        classifier_convergence_warning=classifier_convergence_warning,
     )
 
 
