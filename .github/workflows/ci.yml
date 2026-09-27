@@ -49,6 +49,8 @@ jobs:
         run: python benchmark_v028.py
       - name: Matched token direct-vs-structure benchmark smoke
         run: python benchmark_v029.py
+      - name: Direct capacity-data frontier benchmark smoke
+        run: python benchmark_v030.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .
