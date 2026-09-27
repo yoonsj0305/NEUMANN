@@ -98,9 +98,9 @@ First measured final result:
 - verified retention: **100%**
 - unsafe accepted reductions: **0**
 - fail-closed rejected proposals: **1,209**
-- mean elimination-count recovery: **70.11%**
-- mean exact oracle-rule recovery: **70.08%**
-- mean oracle solver-savings recovery: **83.65%**
+- mean elimination-count recovery: **72.02%**
+- mean exact oracle-rule recovery: **71.98%**
+- mean oracle solver-savings recovery: **84.93%**
 - KEEP: **true**
 
 At k=2,n=32:
@@ -128,7 +128,15 @@ It does **not** establish:
 - natural-language compression
 - total-compute superiority
 
-It also lacks a pre-registered random/simple-heuristic ranking control. A simple structural statistic may explain part of the measured recovery. That is the next falsification target.
+Two post-result diagnostic controls were added before merge:
+
+- deterministic random ranking: **24.40%** elimination recovery
+- simple sparsity + target-incidence heuristic: **61.55%**
+- learned MLP: **72.02%**
+
+The learned scorer therefore exceeds this particular simple heuristic by about **10.46 percentage points**, while the heuristic itself remains strong. Because these controls were added after the primary result was observed, they are diagnostic rather than pre-registered evidence.
+
+The final-head learned result reproduced exactly across two independent GitHub Actions executions. The next falsification target is a pre-registered stronger heuristic suite plus removal of the oracle-cardinality budget.
 
 See:
 - `docs/research/structural_compression_thesis.md`
