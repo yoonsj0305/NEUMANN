@@ -36,6 +36,21 @@ Cost superiority is **not** a KEEP condition. If the neural model is more expens
 
 See `docs/experiments/v0.0.28.md`.
 
+First measured v0.0.28 result:
+- neural fitted weight/bias scalars: **7,858**
+- logistic fitted coefficient/intercept scalars: **1,962**
+- neural/logistic parameter ratio: **4.005x**
+- neural mean weighted-sum proxy: **243.78**
+- logistic mean score-term proxy: **60.17**
+- neural/logistic arithmetic-proxy ratio: **4.052x**
+- neural known proposal and end-to-end verified coverage: **1.0**
+- unsupported proposal false-route: logistic **0.10**, neural **0.0**
+- unsupported final false-route after compiler gate: **0.0 for both**
+- 8 repeated exact neural uses: **8.0x** learned-work amortization
+- KEEP decision: **true**
+
+This is an important negative result: adding nonlinearity improved routing on this tiny corpus, but did **not** make the learned layer compute-efficient. The tiny MLP paid roughly four times the model-state and arithmetic proxy cost of the logistic baseline.
+
 ### Previous measured results
 
 v0.0.27:
