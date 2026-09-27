@@ -50,6 +50,25 @@ Inference capacity is matched, but supervision cardinality is not: the structura
 
 See `docs/experiments/v0.0.29.md`.
 
+First measured v0.0.29 result:
+- pytest: **149 passed**
+- learned architecture for both paths: **640 -> 8 -> 2**
+- parameter count: **5,146 vs 5,146**
+- dense weighted-sum proxy: **5,136 vs 5,136**
+- matched learned-capacity ratio: **1.0**
+- Structural final proposal coverage: **1.0**
+- Structural final verified coverage: **1.0**
+- Direct final verified coverage: **0.0**
+- Direct solution RMSE: **3.123**
+- Direct mean max equation residual: **12.765**
+- Structural near-negative proposal false-route: **0.0**
+- Structural near-negative compiler-gated false-route: **0.0**
+- KEEP decision: **true**
+
+This is a matched-capacity **quality** result, not yet a total-compute win. The learned inference cost is deliberately equal, while the Structural path also pays deterministic compiler/solver work. The narrow finding is that, for this controlled 2x2 corpus, using the tiny learned model to select structure preserved verified task completion where using the matched-capacity model for direct numeric regression did not.
+
+The next falsification step is to increase direct-model capacity and training data until it reaches the structural path, if it can, and measure that break-even frontier.
+
 ### Previous measured results
 
 v0.0.28:
