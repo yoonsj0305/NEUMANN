@@ -177,3 +177,23 @@ __all__ += [
     "RepeatedNeuralProposalReuseObservation", "inspect_tiny_neural_model",
     "measure_tiny_neural_proposal", "measure_repeated_neural_proposal_reuse",
 ]
+
+from .paired_linear_dataset import (
+    PairedLinearExample, generate_paired_linear_examples, make_near_negative,
+    paired_linear_training_examples, paired_linear_validation_examples,
+    paired_linear_final_examples,
+)
+from .paired_token_baseline import (
+    FixedPositionTokenEncoder, MatchedTokenModels, MatchedMLPFootprint,
+    TokenInferenceObservation, fit_matched_token_models,
+    inspect_matched_token_models, measure_token_model,
+    structural_accepts_linear, direct_solution,
+)
+__all__ += [
+    "PairedLinearExample", "generate_paired_linear_examples", "make_near_negative",
+    "paired_linear_training_examples", "paired_linear_validation_examples",
+    "paired_linear_final_examples", "FixedPositionTokenEncoder",
+    "MatchedTokenModels", "MatchedMLPFootprint", "TokenInferenceObservation",
+    "fit_matched_token_models", "inspect_matched_token_models",
+    "measure_token_model", "structural_accepts_linear", "direct_solution",
+]
