@@ -6,13 +6,13 @@
 
 ## Current engineering baseline
 
-**v0.0.24**
+**v0.0.25**
 
-v0.0.23 made persistent reuse an explicit lifecycle privilege.
+v0.0.24 made exact-artifact behavioral attestation mandatory for persistent reuse.
 
-v0.0.24 adds the missing evidence gate:
+v0.0.25 closes the next authority gap:
 
-> **A plugin declaration is not enough. Persistent reuse now requires exact-artifact behavioral attestation.**
+> **A historical PASS is not permanent authority. Lifecycle evidence is now durable, hash-chained, revocable, and rechecked at use time.**
 
 ## Persistent privilege
 
@@ -101,15 +101,23 @@ It is **not**:
 - publisher identity
 - OS sandboxing
 
-The attestation registry is in-memory in v0.0.24.
+v0.0.25 adds a durable append-only attestation ledger with:
+- exact manifest / corpus / attestation digest binding
+- ISSUE / REVOKE evidence history
+- hash-chain integrity verification on reload
+- optional trusted-head rollback detection
+- use-time evidence checks before every persistent dispatch
 
-See `docs/experiments/v0.0.24.md`.
+A local hash chain still cannot detect rollback to an older valid prefix without a trusted external head.
+
+See `docs/experiments/v0.0.25.md`.
 
 ## Run
 
     pip install -e .
     pytest -q
     python benchmark_v024.py
+    python benchmark_v025.py
 
 ## Parallel security track
 

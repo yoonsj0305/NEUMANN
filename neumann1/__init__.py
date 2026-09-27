@@ -131,3 +131,15 @@ __all__ += [
     "LifecycleAttestationRegistry", "conformance_corpus_digest",
     "run_lifecycle_conformance_attestation",
 ]
+
+
+from .persistent_attestation import (
+    PERSISTENT_ATTESTATION_LEDGER_VERSION, ATTESTATION_GENESIS_HASH,
+    AttestationLedgerIntegrityError, AttestationLedgerCheckpoint,
+    AttestationLedgerEvent, AttestationEvidenceState, HashChainedAttestationLedger,
+)
+__all__ += [
+    "PERSISTENT_ATTESTATION_LEDGER_VERSION", "ATTESTATION_GENESIS_HASH",
+    "AttestationLedgerIntegrityError", "AttestationLedgerCheckpoint",
+    "AttestationLedgerEvent", "AttestationEvidenceState", "HashChainedAttestationLedger",
+]
