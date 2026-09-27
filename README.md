@@ -1,10 +1,75 @@
 # NEUMANN 1
 
-**NEUMANN 1** is a research-engineering project for **representation-first, compute-efficient problem solving**.
+**NEUMANN 1** is a research-engineering project for **Structural Compression: reducing computational degrees of freedom before solving**.
 
-> Make the cheapest correct reasoning path easy to use.
+> Discover the minimal sufficient computational structure, execute only what remains, and verify the original problem.
+
+## Research thesis freeze
+
+After v0.0.31, NEUMANN is no longer positioned primarily as "LLM + symbolic solver", "structure-first reasoning", or "IR + solver + verifier".
+
+Those mechanisms are treated as enabling components with substantial prior art.
+
+The central research hypothesis is now:
+
+> **Can an AI reduce reasoning cost by discovering a minimal sufficient computational structure before solving?**
+
+The stronger scaling question is:
+
+> **Does Structural Compression change how verified reasoning compute grows with problem complexity?**
+
+Canonical target architecture:
+
+    Raw Problem
+        ↓
+    Semantic Parse
+        ↓
+    Structural Discovery
+        ↓
+    Structural Compression
+        ↓
+    Minimal Structural IR
+        ↓
+    Algorithm / Solver Router
+        ↓
+    Specialized Execution
+        ↓
+    Independent Verification
+        ↓
+    Result
+        ↓
+    Canonical Structure Memory
+
+The critical distinction is:
+
+    Structure discovery ≠ Structural Compression
+
+NEUMANN must not merely re-encode all variables and constraints into an IR. It should attempt to remove safely reconstructible variables, redundant constraints, equivalent states, symmetry-related distinctions, and other computational degrees of freedom before execution.
+
+Every learned reduction remains advisory. A compression certificate and independent checks retain execution authority.
+
+See:
+- `docs/research/structural_compression_thesis.md`
+- `docs/research/prior_art_positioning.md`
+- `docs/experiments/v0.0.32.md`
 
 ## Current engineering baseline
+
+**v0.0.31 FROZEN**
+
+The next pre-registered research milestone is **v0.0.32 — Structural Compression Contract + Oracle Lower Bound**.
+
+v0.0.32 deliberately does **not** start with a learned compressor. It first measures the achievable reduction on generated systems whose true dependency structure is known by construction, while requiring reconstruction and verification against the original full problem.
+
+This separates three questions that must not be conflated:
+
+1. does a valid compression opportunity exist?
+2. can it change deterministic solver-work scaling?
+3. can a learned system discover enough of that compression safely?
+
+Only the first two belong to v0.0.32. Learned Structural Compression is reserved for the next milestone if the oracle benchmark justifies it.
+
+### Frozen enabling result
 
 **v0.0.31**
 
