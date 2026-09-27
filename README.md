@@ -6,29 +6,50 @@
 
 ## Current engineering baseline
 
-**v0.0.26**
+**v0.0.27**
 
-v0.0.25 closed durable/revocable persistent evidence authority.
+v0.0.26 established a first structural-efficiency contract: an already-valid solver-ready representation can be reused so repeated execution does not repay representation formation on every run.
 
-v0.0.26 deliberately returns to the central NEUMANN research question:
+v0.0.27 moves one layer upstream:
 
-> **Can a solver-ready structural representation become reusable computation without changing verified answers?**
+> **How much learned inference work does the current structural proposer actually use, and can that work be measured without pretending a proxy is FLOPs or energy?**
 
-The first efficiency contract is intentionally narrow. It compares:
-- recompiling raw text on every repeated execution
-- compiling once and reusing the exact solver-ready representation
+The current proposer is deliberately small:
+- TF-IDF word + character features
+- logistic known-vs-unknown detector
+- logistic supported-family classifier
+- deterministic compiler acceptance before solver authority
 
-It measures:
-- verified-answer equivalence
-- representation / solver / verification steps
-- canonical raw-text and representation byte counts
-- wall-clock time as a diagnostic only
+The v0.0.27 contract measures:
+- fitted logistic coefficient/intercept scalar count
+- TF-IDF IDF state separately from classifier parameters
+- sparse active features per executed stage
+- sparse score dot-product term proxy
+- proposal coverage and abstention
+- proposal false routes versus compiler-gated false routes
+- end-to-end deterministic solver verification for supported tasks
+- exact repeated-proposal reuse over 8 uses
 
-It does **not** interpret NEUMANN step counts as FLOPs, byte counts as tokens, or this controlled benchmark as proof of LLM/energy efficiency.
+It explicitly does **not** call the score proxy FLOPs, does not infer joules or GPU-memory savings, and does not generalize this TF-IDF/logistic model to an LLM.
 
-See `docs/experiments/v0.0.26.md`.
+See `docs/experiments/v0.0.27.md`.
 
-First measured result:
+First measured v0.0.27 result:
+- fitted logistic coefficient/intercept scalars: **1,962**
+- measurement/public prediction parity: **1.0**
+- known proposal coverage and end-to-end verified coverage: **1.0**
+- proposal-layer unsupported false-route rate: **0.10**
+- final unsupported false-route rate after compiler gate: **0.0**
+- one bad learned proposal was rejected by the deterministic compiler
+- mean sparse score-term proxy: **60.17**
+- 8 repeated exact uses: learned score-term proxy **8 → 1 equivalent inference payment**
+- KEEP decision: **true**
+
+The 10% proposal false-route is a useful result, not a hidden blemish: the learned router can be wrong while the deterministic compiler prevents that mistake from becoming solver authority.
+
+### Previous structural-reuse result
+
+v0.0.26 measured:
 - verified answer equivalence: **1.0**
 - representation-step reduction for 8 repeated executions: **8 → 1**
 - mean representation/raw byte ratio: **3.86** (representation is larger)
@@ -141,6 +162,7 @@ See `docs/experiments/v0.0.25.md`.
     python benchmark_v024.py
     python benchmark_v025.py
     python benchmark_v026.py
+    python benchmark_v027.py
 
 ## Parallel security track
 

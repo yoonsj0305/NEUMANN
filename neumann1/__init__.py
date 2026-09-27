@@ -153,3 +153,14 @@ __all__ += [
     "ExecutionCostSnapshot", "StructuralEfficiencyObservation",
     "canonical_representation_bytes", "measure_repeated_structural_reuse",
 ]
+
+from .model_side_cost import (
+    TwoStageModelFootprint, ProposalCostObservation,
+    RepeatedProposalReuseObservation, inspect_two_stage_model,
+    measure_two_stage_proposal, measure_repeated_proposal_reuse,
+)
+__all__ += [
+    "TwoStageModelFootprint", "ProposalCostObservation",
+    "RepeatedProposalReuseObservation", "inspect_two_stage_model",
+    "measure_two_stage_proposal", "measure_repeated_proposal_reuse",
+]
