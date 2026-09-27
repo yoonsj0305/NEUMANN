@@ -57,6 +57,29 @@ The validation split is evaluated before the final split. Final-grid results are
 
 See `docs/experiments/v0.0.30.md`.
 
+First measured v0.0.30 result:
+- pytest: **155 passed**
+- Direct grid: **12 pre-registered cells**
+- Direct training sizes: **128 / 512 / 2048**
+- Direct hidden widths: **8 / 16 / 32 / 64**
+- Structural final verified coverage on new 243-system split: **1.0**
+- Structural final near-negative proposal false-route: **1/243**
+- Structural final compiler-gated false-route: **0**
+- best validation Direct: **2048 x 64 rounded regression**
+- best validation Direct verified coverage: **10.70%**
+- validation break-even: **not reached**
+- validation-selected Direct final coverage: **8.23%**
+- observed best pre-registered final Direct: **2048 x 16 rounded regression**
+- observed best final Direct verified coverage: **11.52%**
+- observed final break-even: **not reached**
+- best discrete 81-class final coverage: **9.88%**
+- raw regression strict verified coverage: **0% in all 12 cells**
+- KEEP decision: **true**
+
+The validation-selected Direct model used roughly **8x** the Structural learned parameter state and dense weighted-sum proxy while training on **16x** as many positive systems, but still did not reach the fixed Structural verified coverage.
+
+This is not an 8x total-compute claim. The Structural path additionally executes deterministic compilation and Gaussian elimination, and the two paths have different supervision. The supported statement is narrower: **no Direct break-even was observed inside the pre-registered v0.0.30 frontier.**
+
 ### Previous measured results
 
 v0.0.29:
