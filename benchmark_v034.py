@@ -15,6 +15,7 @@ from neumann1.stopping_gauntlet import (
     aggregate_stopping_observations,
     calibrate_threshold,
     fit_frozen_v033_scorer,
+    fit_frozen_v033_scorer_once,
     observe_stopping_method,
 )
 from neumann1.stopping_gauntlet_dataset import (
@@ -53,6 +54,11 @@ def run() -> dict[str, object]:
     calibration_examples = v034_calibration_examples()
     final_examples = v034_final_examples()
     frozen = fit_frozen_v033_scorer()
+    replay_frozen = fit_frozen_v033_scorer_once()
+    learned_scorer_replay_identical = (
+        frozen.fitted_state_sha256
+        == replay_frozen.fitted_state_sha256
+    )
 
     v033_signatures = _all_v033_signatures()
     calibration_signatures = _signatures(
@@ -164,6 +170,7 @@ def run() -> dict[str, object]:
         and no_oracle_cardinality_at_final
         and all_safe
         and thresholds_on_grid
+        and learned_scorer_replay_identical
     )
 
     return {
@@ -217,6 +224,15 @@ def run() -> dict[str, object]:
             "weighted_sum_terms_per_candidate": (
                 frozen.footprint
                 .weighted_sum_terms_per_candidate
+            ),
+            "fitted_state_sha256": (
+                frozen.fitted_state_sha256
+            ),
+            "replay_fitted_state_sha256": (
+                replay_frozen.fitted_state_sha256
+            ),
+            "replay_identical": (
+                learned_scorer_replay_identical
             ),
         },
         "threshold_grid": list(THRESHOLD_GRID),
@@ -302,6 +318,9 @@ def run() -> dict[str, object]:
                     == 0
                     for result in final_results.values()
                 )
+            ),
+            "learned_scorer_replay_identical": (
+                learned_scorer_replay_identical
             ),
         },
         "keep_v034_contract": keep,
