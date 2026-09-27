@@ -6,13 +6,35 @@
 
 ## Current engineering baseline
 
-**v0.0.25**
+**v0.0.26**
 
-v0.0.24 made exact-artifact behavioral attestation mandatory for persistent reuse.
+v0.0.25 closed durable/revocable persistent evidence authority.
 
-v0.0.25 closes the next authority gap:
+v0.0.26 deliberately returns to the central NEUMANN research question:
 
-> **A historical PASS is not permanent authority. Lifecycle evidence is now durable, hash-chained, revocable, and rechecked at use time.**
+> **Can a solver-ready structural representation become reusable computation without changing verified answers?**
+
+The first efficiency contract is intentionally narrow. It compares:
+- recompiling raw text on every repeated execution
+- compiling once and reusing the exact solver-ready representation
+
+It measures:
+- verified-answer equivalence
+- representation / solver / verification steps
+- canonical raw-text and representation byte counts
+- wall-clock time as a diagnostic only
+
+It does **not** interpret NEUMANN step counts as FLOPs, byte counts as tokens, or this controlled benchmark as proof of LLM/energy efficiency.
+
+See `docs/experiments/v0.0.26.md`.
+
+First measured result:
+- verified answer equivalence: **1.0**
+- representation-step reduction for 8 repeated executions: **8 → 1**
+- mean representation/raw byte ratio: **3.86** (representation is larger)
+- mean observed CI wall-time ratio: **4.07×** in favor of reuse
+
+The wall-time ratio is a diagnostic from small Python fixtures, not a general speedup claim.
 
 ## Persistent privilege
 
@@ -118,6 +140,7 @@ See `docs/experiments/v0.0.25.md`.
     pytest -q
     python benchmark_v024.py
     python benchmark_v025.py
+    python benchmark_v026.py
 
 ## Parallel security track
 

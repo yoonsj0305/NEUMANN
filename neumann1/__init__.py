@@ -143,3 +143,13 @@ __all__ += [
     "AttestationLedgerIntegrityError", "AttestationLedgerCheckpoint",
     "AttestationLedgerEvent", "AttestationEvidenceState", "HashChainedAttestationLedger",
 ]
+
+
+from .structural_efficiency import (
+    ExecutionCostSnapshot, StructuralEfficiencyObservation,
+    canonical_representation_bytes, measure_repeated_structural_reuse,
+)
+__all__ += [
+    "ExecutionCostSnapshot", "StructuralEfficiencyObservation",
+    "canonical_representation_bytes", "measure_repeated_structural_reuse",
+]
