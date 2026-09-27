@@ -218,3 +218,24 @@ __all__ += [
     "direct_frontier_training_pool", "direct_frontier_validation_examples",
     "direct_frontier_final_examples",
 ]
+
+from .structural_compression import (
+    CORE_DIMENSIONS, APPARENT_DIMENSIONS, EXAMPLES_PER_CELL,
+    ExactLinearSystem, ReconstructionRule, CompressionCertificate,
+    StructuralCompressionExample, GaussianOperationCounts,
+    ReconstructionOperationCounts, VerificationOperationCounts,
+    CompressionObservation, scale_grid, generate_cell,
+    generate_benchmark_corpus, check_compression_certificate,
+    solve_exact_gauss_jordan, reconstruct_full_answer,
+    verify_exact_full_system, observe_example, aggregate_observations,
+)
+__all__ += [
+    "CORE_DIMENSIONS", "APPARENT_DIMENSIONS", "EXAMPLES_PER_CELL",
+    "ExactLinearSystem", "ReconstructionRule", "CompressionCertificate",
+    "StructuralCompressionExample", "GaussianOperationCounts",
+    "ReconstructionOperationCounts", "VerificationOperationCounts",
+    "CompressionObservation", "scale_grid", "generate_cell",
+    "generate_benchmark_corpus", "check_compression_certificate",
+    "solve_exact_gauss_jordan", "reconstruct_full_answer",
+    "verify_exact_full_system", "observe_example", "aggregate_observations",
+]
