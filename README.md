@@ -6,70 +6,91 @@
 
 ## Current engineering baseline
 
-**v0.0.29**
+**v0.0.30**
 
-v0.0.28 showed that adding a nonlinear proposal head did not automatically create efficiency: the tiny MLP improved proposal routing on the controlled corpus, but used about 4x the fitted classifier state and arithmetic proxy of the logistic baseline.
+v0.0.29 established the first matched-learned-capacity task comparison:
 
-v0.0.29 moves from proposer-vs-proposer comparison to the first **paired direct-vs-structure task experiment**.
+- Structural learned path: 640 -> 8 -> 2
+- Direct learned path: 640 -> 8 -> 2
+- learned parameter ratio: 1.0
+- learned dense weighted-sum proxy ratio: 1.0
+- Structural strict verified coverage: 1.0
+- Direct raw-regression strict verified coverage: 0.0
 
-Two learned paths receive the same fixed-position token representation and the same one-hidden-layer, 8-unit, two-output MLP inference architecture.
+v0.0.30 now tries to **erase that gap** rather than repeat it.
 
-Direct path:
+The Direct side receives a pre-registered capacity/data sweep:
 
-    raw token sequence
-      -> matched-capacity MLP
-      -> two numeric solution values
-      -> evaluation verifier
+Training sizes:
 
-Structural path:
+    128, 512, 2048
 
-    raw token sequence
-      -> matched-capacity MLP
-      -> LINEAR / ABSTAIN
+Hidden widths:
+
+    8, 16, 32, 64
+
+For every cell, NEUMANN trains two Direct models:
+
+1. a two-output numeric regressor
+2. a stronger 81-class discrete solution classifier
+
+The regressor is evaluated both raw and after rounding/clipping to the benchmark's known integer support [-4, 4]. This prevents strict floating-point verification from being the only reason Direct loses.
+
+The resulting three Direct challengers are:
+
+    raw regression
+    rounded regression
+    81-class discrete classification
+
+The Structural reference is frozen at the v0.0.29 configuration:
+
+    640 -> 8 -> 2 structural proposer
       -> deterministic compiler
-      -> deterministic solver
+      -> Gaussian elimination
       -> deterministic verifier
 
-The paired benchmark is deliberately limited to deterministic generated **2x2 nonsingular integer linear systems** so the inference-capacity comparison stays interpretable.
+v0.0.30 measures the **break-even frontier**:
 
-The experiment records:
-- exact learned parameter-count parity
-- exact layer-shape parity
-- exact dense weighted-sum proxy parity
-- direct verified numeric-answer coverage
-- direct solution RMSE and equation residuals
-- structural proposal and verified coverage
-- near-negative proposal false routes
-- compiler-gated final false routes
-- learned model wall-clock as diagnostic only
-- deterministic solver and verifier steps separately
+> How much Direct learned capacity and training data is required to reach the fixed Structural verified coverage, if any pre-registered configuration reaches it?
 
-The direct model gets no compiler or solver output during inference. A deterministic compiler is used only on the evaluation side to construct a reference representation for answer verification.
+The validation split is evaluated before the final split. Final-grid results are descriptive only and cannot retune the sweep.
 
-Inference capacity is matched, but supervision cardinality is not: the structural model sees the same positive systems plus paired unsupported near-negatives so it can learn abstention. This boundary is explicit in the experiment contract.
+See `docs/experiments/v0.0.30.md`.
 
-See `docs/experiments/v0.0.29.md`.
+First measured v0.0.30 result:
+- pytest: **155 passed**
+- Direct grid: **12 pre-registered cells**
+- Direct training sizes: **128 / 512 / 2048**
+- Direct hidden widths: **8 / 16 / 32 / 64**
+- Structural final verified coverage on new 243-system split: **1.0**
+- Structural final near-negative proposal false-route: **1/243**
+- Structural final compiler-gated false-route: **0**
+- best validation Direct: **2048 x 64 rounded regression**
+- best validation Direct verified coverage: **10.70%**
+- validation break-even: **not reached**
+- validation-selected Direct final coverage: **8.23%**
+- observed best pre-registered final Direct: **2048 x 16 rounded regression**
+- observed best final Direct verified coverage: **11.52%**
+- observed final break-even: **not reached**
+- best discrete 81-class final coverage: **9.88%**
+- raw regression strict verified coverage: **0% in all 12 cells**
+- KEEP decision: **true**
 
-First measured v0.0.29 result:
+The validation-selected Direct model used roughly **8x** the Structural learned parameter state and dense weighted-sum proxy while training on **16x** as many positive systems, but still did not reach the fixed Structural verified coverage.
+
+This is not an 8x total-compute claim. The Structural path additionally executes deterministic compilation and Gaussian elimination, and the two paths have different supervision. The supported statement is narrower: **no Direct break-even was observed inside the pre-registered v0.0.30 frontier.**
+
+### Previous measured results
+
+v0.0.29:
 - pytest: **149 passed**
 - learned architecture for both paths: **640 -> 8 -> 2**
 - parameter count: **5,146 vs 5,146**
 - dense weighted-sum proxy: **5,136 vs 5,136**
-- matched learned-capacity ratio: **1.0**
-- Structural final proposal coverage: **1.0**
 - Structural final verified coverage: **1.0**
-- Direct final verified coverage: **0.0**
+- Direct raw-regression final verified coverage: **0.0**
 - Direct solution RMSE: **3.123**
-- Direct mean max equation residual: **12.765**
-- Structural near-negative proposal false-route: **0.0**
 - Structural near-negative compiler-gated false-route: **0.0**
-- KEEP decision: **true**
-
-This is a matched-capacity **quality** result, not yet a total-compute win. The learned inference cost is deliberately equal, while the Structural path also pays deterministic compiler/solver work. The narrow finding is that, for this controlled 2x2 corpus, using the tiny learned model to select structure preserved verified task completion where using the matched-capacity model for direct numeric regression did not.
-
-The next falsification step is to increase direct-model capacity and training data until it reaches the structural path, if it can, and measure that break-even frontier.
-
-### Previous measured results
 
 v0.0.28:
 - neural fitted weight/bias scalars: **7,858**
@@ -79,14 +100,11 @@ v0.0.28:
 - neural known proposal and end-to-end verified coverage: **1.0**
 - unsupported proposal false-route: logistic **0.10**, neural **0.0**
 - unsupported final false-route after compiler gate: **0.0 for both**
-- 8 repeated exact neural uses: **8.0x** learned-work amortization
 
 v0.0.27:
 - logistic coefficient/intercept scalars: **1,962**
 - known proposal and end-to-end verified coverage: **1.0**
-- unsupported proposal false-route rate: **0.10**
-- unsupported final false-route rate after compiler gate: **0.0**
-- mean sparse score-term proxy: **60.17**
+- unsupported final false-route after compiler gate: **0.0**
 
 v0.0.26:
 - verified answer equivalence: **1.0**
@@ -203,6 +221,7 @@ See `docs/experiments/v0.0.25.md`.
     python benchmark_v027.py
     python benchmark_v028.py
     python benchmark_v029.py
+    python benchmark_v030.py
 
 ## Parallel security track
 

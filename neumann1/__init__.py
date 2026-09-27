@@ -197,3 +197,24 @@ __all__ += [
     "fit_matched_token_models", "inspect_matched_token_models",
     "measure_token_model", "structural_accepts_linear", "direct_solution",
 ]
+
+from .direct_frontier import (
+    PAIR_CLASS_COUNT, DirectFrontierConfig, DirectFrontierModels,
+    DirectModelFootprint, DirectPrediction, frontier_configs,
+    solution_pair_to_class, class_to_solution_pair,
+    fit_direct_frontier_models, model_footprint, predict_direct,
+)
+from .paired_linear_dataset import (
+    generate_solution_covered_linear_examples,
+    direct_frontier_training_pool, direct_frontier_validation_examples,
+    direct_frontier_final_examples,
+)
+__all__ += [
+    "PAIR_CLASS_COUNT", "DirectFrontierConfig", "DirectFrontierModels",
+    "DirectModelFootprint", "DirectPrediction", "frontier_configs",
+    "solution_pair_to_class", "class_to_solution_pair",
+    "fit_direct_frontier_models", "model_footprint", "predict_direct",
+    "generate_solution_covered_linear_examples",
+    "direct_frontier_training_pool", "direct_frontier_validation_examples",
+    "direct_frontier_final_examples",
+]
