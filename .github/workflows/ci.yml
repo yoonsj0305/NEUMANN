@@ -45,6 +45,8 @@ jobs:
         run: python benchmark_v026.py
       - name: Model-side structural proposal cost benchmark smoke
         run: python benchmark_v027.py
+      - name: Tiny neural structural proposal benchmark smoke
+        run: python benchmark_v028.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .
