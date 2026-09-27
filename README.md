@@ -6,56 +6,68 @@
 
 ## Current engineering baseline
 
-**v0.0.27**
+**v0.0.28**
 
-v0.0.26 established a first structural-efficiency contract: an already-valid solver-ready representation can be reused so repeated execution does not repay representation formation on every run.
+v0.0.27 established an auditable learned-proposal cost contract for the TF-IDF + logistic router.
 
-v0.0.27 moves one layer upstream:
+v0.0.28 asks the next controlled question:
 
-> **How much learned inference work does the current structural proposer actually use, and can that work be measured without pretending a proxy is FLOPs or energy?**
+> **Does the same structural proposal contract survive a genuinely nonlinear neural proposer, and what does that nonlinearity actually cost?**
 
-The current proposer is deliberately small:
-- TF-IDF word + character features
-- logistic known-vs-unknown detector
-- logistic supported-family classifier
-- deterministic compiler acceptance before solver authority
+The new proposer keeps the same TF-IDF inputs but replaces each logistic head with a one-hidden-layer MLP:
 
-The v0.0.27 contract measures:
-- fitted logistic coefficient/intercept scalar count
-- TF-IDF IDF state separately from classifier parameters
-- sparse active features per executed stage
-- sparse score dot-product term proxy
-- proposal coverage and abstention
-- proposal false routes versus compiler-gated false routes
-- end-to-end deterministic solver verification for supported tasks
-- exact repeated-proposal reuse over 8 uses
+    TF-IDF
+      -> 4-unit ReLU hidden layer
+      -> open-set / family proposal
+      -> deterministic compiler gate
 
-It explicitly does **not** call the score proxy FLOPs, does not infer joules or GPU-memory savings, and does not generalize this TF-IDF/logistic model to an LLM.
+The neural model still has no solver authority. Solver-ready IR must come from the deterministic compiler.
 
-See `docs/experiments/v0.0.27.md`.
+The v0.0.28 benchmark compares the neural proposer and the v0.0.27 logistic baseline on the exact same corpus and records:
+- fitted model state
+- layer shapes
+- sparse active features
+- weighted-sum term proxy
+- known-task proposal and verified coverage
+- unsupported proposal and final false-route rates
+- exact repeated-proposal reuse
 
-First measured v0.0.27 result:
-- fitted logistic coefficient/intercept scalars: **1,962**
-- measurement/public prediction parity: **1.0**
-- known proposal coverage and end-to-end verified coverage: **1.0**
-- proposal-layer unsupported false-route rate: **0.10**
-- final unsupported false-route rate after compiler gate: **0.0**
-- one bad learned proposal was rejected by the deterministic compiler
-- mean sparse score-term proxy: **60.17**
-- 8 repeated exact uses: learned score-term proxy **8 → 1 equivalent inference payment**
+Cost superiority is **not** a KEEP condition. If the neural model is more expensive, that is retained as a negative result rather than optimized away.
+
+See `docs/experiments/v0.0.28.md`.
+
+First measured v0.0.28 result:
+- neural fitted weight/bias scalars: **7,858**
+- logistic fitted coefficient/intercept scalars: **1,962**
+- neural/logistic parameter ratio: **4.005x**
+- neural mean weighted-sum proxy: **243.78**
+- logistic mean score-term proxy: **60.17**
+- neural/logistic arithmetic-proxy ratio: **4.052x**
+- neural known proposal and end-to-end verified coverage: **1.0**
+- unsupported proposal false-route: logistic **0.10**, neural **0.0**
+- unsupported final false-route after compiler gate: **0.0 for both**
+- 8 repeated exact neural uses: **8.0x** learned-work amortization
 - KEEP decision: **true**
 
-The 10% proposal false-route is a useful result, not a hidden blemish: the learned router can be wrong while the deterministic compiler prevents that mistake from becoming solver authority.
+This is an important negative result: adding nonlinearity improved routing on this tiny corpus, but did **not** make the learned layer compute-efficient. The tiny MLP paid roughly four times the model-state and arithmetic proxy cost of the logistic baseline.
 
-### Previous structural-reuse result
+### Previous measured results
 
-v0.0.26 measured:
+v0.0.27:
+- logistic coefficient/intercept scalars: **1,962**
+- known proposal and end-to-end verified coverage: **1.0**
+- unsupported proposal false-route rate: **0.10**
+- unsupported final false-route rate after compiler gate: **0.0**
+- mean sparse score-term proxy: **60.17**
+- 8 repeated exact uses: **8.0x** learned-work amortization
+
+v0.0.26:
 - verified answer equivalence: **1.0**
-- representation-step reduction for 8 repeated executions: **8 → 1**
+- representation-step reduction for 8 repeated executions: **8 -> 1**
 - mean representation/raw byte ratio: **3.86** (representation is larger)
-- mean observed CI wall-time ratio: **4.07×** in favor of reuse
+- mean observed CI wall-time ratio: **4.07x** in favor of reuse
 
-The wall-time ratio is a diagnostic from small Python fixtures, not a general speedup claim.
+Wall-clock remains diagnostic only and is not a general speed claim.
 
 ## Persistent privilege
 
@@ -163,6 +175,7 @@ See `docs/experiments/v0.0.25.md`.
     python benchmark_v025.py
     python benchmark_v026.py
     python benchmark_v027.py
+    python benchmark_v028.py
 
 ## Parallel security track
 

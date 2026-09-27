@@ -164,3 +164,16 @@ __all__ += [
     "RepeatedProposalReuseObservation", "inspect_two_stage_model",
     "measure_two_stage_proposal", "measure_repeated_proposal_reuse",
 ]
+
+from .neural_open_set import TinyNeuralOpenSetStructureFormer, NeuralOpenSetMetrics
+from .neural_model_cost import (
+    TinyNeuralModelFootprint, NeuralProposalCostObservation,
+    RepeatedNeuralProposalReuseObservation, inspect_tiny_neural_model,
+    measure_tiny_neural_proposal, measure_repeated_neural_proposal_reuse,
+)
+__all__ += [
+    "TinyNeuralOpenSetStructureFormer", "NeuralOpenSetMetrics",
+    "TinyNeuralModelFootprint", "NeuralProposalCostObservation",
+    "RepeatedNeuralProposalReuseObservation", "inspect_tiny_neural_model",
+    "measure_tiny_neural_proposal", "measure_repeated_neural_proposal_reuse",
+]
