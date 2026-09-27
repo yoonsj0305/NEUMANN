@@ -84,17 +84,50 @@ class StoppingObservation:
 class FrozenV033Scorer:
     proposer: LearnedCompressionProposer
     footprint: LearnedCompressorFootprint
+    fitted_state_sha256: str
 
 
-@lru_cache(maxsize=1)
-def fit_frozen_v033_scorer() -> FrozenV033Scorer:
+def learned_compressor_fingerprint(
+    proposer: LearnedCompressionProposer,
+) -> str:
+    scaler = proposer.pipeline.named_steps["scale"]
+    mlp = proposer.pipeline.named_steps["mlp"]
+
+    digest = hashlib.sha256()
+    digest.update(b"NEUMANN-v034-frozen-v033-scorer\0")
+
+    arrays = [
+        scaler.mean_,
+        scaler.scale_,
+        *mlp.coefs_,
+        *mlp.intercepts_,
+    ]
+    for array in arrays:
+        normalized = array.astype("<f8", copy=False)
+        digest.update(repr(tuple(normalized.shape)).encode("ascii"))
+        digest.update(b"\0")
+        digest.update(normalized.tobytes(order="C"))
+        digest.update(b"\0")
+
+    return digest.hexdigest()
+
+
+def fit_frozen_v033_scorer_once() -> FrozenV033Scorer:
     proposer = LearnedCompressionProposer().fit(
         learned_compression_training_examples()
     )
     return FrozenV033Scorer(
         proposer=proposer,
         footprint=inspect_learned_compressor(proposer),
+        fitted_state_sha256=learned_compressor_fingerprint(
+            proposer
+        ),
     )
+
+
+@lru_cache(maxsize=1)
+def fit_frozen_v033_scorer() -> FrozenV033Scorer:
+    return fit_frozen_v033_scorer_once()
 
 
 def _sort_scored(
