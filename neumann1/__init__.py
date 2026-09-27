@@ -239,3 +239,40 @@ __all__ += [
     "solve_exact_gauss_jordan", "reconstruct_full_answer",
     "verify_exact_full_system", "observe_example", "aggregate_observations",
 ]
+
+from .learned_compression_dataset import (
+    LEARNED_COMPRESSION_GENERATOR_VERSION,
+    TRAIN_EXAMPLES_PER_CELL, VALIDATION_EXAMPLES_PER_CELL,
+    FINAL_EXAMPLES_PER_CELL, AffineDependency,
+    LearnedCompressionExample, learned_scale_grid,
+    learned_compression_training_examples,
+    learned_compression_validation_examples,
+    learned_compression_final_examples,
+)
+from .learned_compression import (
+    FEATURE_DIMENSION, HIDDEN_UNITS, MODEL_RANDOM_STATE,
+    AffineCandidate, ScoredCandidate, LearnedCompressorFootprint,
+    MaterializedReduction, CheckerResult, LearnedCompressionObservation,
+    enumerate_affine_candidates, candidate_features,
+    LearnedCompressionProposer, inspect_learned_compressor,
+    validate_candidate_against_system, materialize_reduction,
+    oracle_candidates, check_scored_proposals,
+    observe_learned_compression, aggregate_learned_observations,
+)
+__all__ += [
+    "LEARNED_COMPRESSION_GENERATOR_VERSION",
+    "TRAIN_EXAMPLES_PER_CELL", "VALIDATION_EXAMPLES_PER_CELL",
+    "FINAL_EXAMPLES_PER_CELL", "AffineDependency",
+    "LearnedCompressionExample", "learned_scale_grid",
+    "learned_compression_training_examples",
+    "learned_compression_validation_examples",
+    "learned_compression_final_examples",
+    "FEATURE_DIMENSION", "HIDDEN_UNITS", "MODEL_RANDOM_STATE",
+    "AffineCandidate", "ScoredCandidate", "LearnedCompressorFootprint",
+    "MaterializedReduction", "CheckerResult", "LearnedCompressionObservation",
+    "enumerate_affine_candidates", "candidate_features",
+    "LearnedCompressionProposer", "inspect_learned_compressor",
+    "validate_candidate_against_system", "materialize_reduction",
+    "oracle_candidates", "check_scored_proposals",
+    "observe_learned_compression", "aggregate_learned_observations",
+]
