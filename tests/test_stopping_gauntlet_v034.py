@@ -12,6 +12,7 @@ from neumann1.stopping_gauntlet import (
     THRESHOLD_GRID,
     calibrate_threshold,
     fit_frozen_v033_scorer,
+    fit_frozen_v033_scorer_once,
     observe_stopping_method,
     score_candidates,
 )
@@ -77,6 +78,22 @@ def test_v034_frozen_learned_scorer_matches_v033_capacity():
         frozen.footprint
         .weighted_sum_terms_per_candidate
         == 272
+    )
+
+
+def test_v034_frozen_learned_scorer_replays_exactly():
+    first = fit_frozen_v033_scorer_once()
+    second = fit_frozen_v033_scorer_once()
+
+    assert (
+        first.fitted_state_sha256
+        == second.fitted_state_sha256
+    )
+
+    example = v034_calibration_examples()[0]
+    assert (
+        first.proposer.score(example)
+        == second.proposer.score(example)
     )
 
 
