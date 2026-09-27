@@ -55,135 +55,108 @@ See:
 
 ## Current engineering baseline
 
-**v0.0.31 FROZEN**
+**v0.0.32 — Oracle Structural Compression baseline**
 
-The next pre-registered research milestone is **v0.0.32 — Structural Compression Contract + Oracle Lower Bound**.
+v0.0.32 is the first NEUMANN experiment that directly measures reduction of computational degrees of freedom.
 
-v0.0.32 deliberately does **not** start with a learned compressor. It first measures the achievable reduction on generated systems whose true dependency structure is known by construction, while requiring reconstruction and verification against the original full problem.
+Pre-registered controlled family:
 
-This separates three questions that must not be conflated:
+    core dimension k ∈ {2, 4}
+    apparent dimension n ∈ {4, 8, 16, 32}
+    32 systems per cell
+    256 systems total
 
-1. does a valid compression opportunity exist?
-2. can it change deterministic solver-work scaling?
-3. can a learned system discover enough of that compression safely?
+Baseline:
 
-Only the first two belong to v0.0.32. Learned Structural Compression is reserved for the next milestone if the oracle benchmark justifies it.
+    full n-variable system
+      -> exact rational Gauss-Jordan
+      -> verify original full problem
 
-### Frozen enabling result
+Oracle Structural Compression:
+
+    full system
+      -> oracle compression certificate
+      -> retained k-variable core
+      -> same exact solver
+      -> reconstruction
+      -> verify original full problem
+
+First measured result:
+
+- core pytest: **161 passed, 1 skipped**
+- full-solution equivalence: **1.0**
+- certificate validity: **1.0**
+- verification-work parity: **true**
+- KEEP: **true**
+
+For fixed (k=2):
+
+    n = 4   : baseline/compressed solver work = 4.47x
+    n = 8   : 18.50x
+    n = 16  : 75.27x
+    n = 32  : 302.27x
+
+Measured solver log-log slope:
+
+    baseline   ≈ 2.0266
+    compressed ≈ 0.0000
+
+For fixed (k=4):
+
+    n = 4   : 1.00x
+    n = 8   : 4.74x
+    n = 16  : 20.52x
+    n = 32  : 85.31x
+
+Measured solver log-log slope:
+
+    baseline   ≈ 2.1361
+    compressed ≈ 0.00018
+
+This is an **oracle** result. Generator-provided dependency information is unavailable to a real learned system.
+
+It does not establish that an AI can discover the compression or that total end-to-end compute is lower.
+
+Important retained negative/boundary results:
+
+- reconstruction work still grows with apparent problem size
+- full original-problem verification still grows with apparent problem size
+- compressed solver payload shrinks sharply
+- the explicit v0.0.32 certificate is larger than the raw solver payload, so end-to-end byte compression is **not** demonstrated
+
+At (k=2,n=32):
+
+    raw solver payload          ≈ 2416.5 bytes
+    compressed core payload     ≈ 56.4 bytes
+    explicit certificate        ≈ 7360.6 bytes
+
+The solver bottleneck was compressed; proof/reconstruction overhead remains.
+
+See:
+- `docs/research/structural_compression_thesis.md`
+- `docs/research/prior_art_positioning.md`
+- `docs/experiments/v0.0.32.md`
+
+### Frozen enabling results
 
 **v0.0.31**
 
-v0.0.30 gave the Direct shallow-MLP path up to 16x more positive training data and up to 8x the learned inference arithmetic proxy, plus integer rounding and an exact 81-class formulation. No Direct break-even was observed inside that pre-registered frontier.
-
-v0.0.31 attacks the strongest remaining simple explanation:
-
-> perhaps Direct failed because a fixed-position MLP is the wrong sequence/algorithmic inductive bias.
-
-The new experiment uses a small learned Transformer and matches Direct and Structural much more tightly.
-
-Both paths use the exact same:
-- categorical tokenization
-- numeric scalar channel
-- learned token embeddings
-- learned positional embeddings
-- 2 Transformer encoder layers
-- d_model = 64
-- 4 attention heads
-- feed-forward width = 128
-- identical 82-way output head
-- 12 fixed training epochs
-- total training cardinality = 8,192
-
-Direct receives **8,192 unique solved positive systems**.
-
-Structural receives:
-- 4,096 positive systems
-- 4,096 paired near-negatives
-
-So Direct is deliberately favored with twice as many positive solved examples while total training cardinality stays equal.
-
-Direct:
-
-    raw text
-      -> Tiny Transformer
-      -> one of 81 exact solution-pair classes
-      -> evaluation verifier
-
-Structural:
-
-    raw text
-      -> identical Tiny Transformer
-      -> LINEAR / abstain semantics
-      -> deterministic compiler
-      -> Gaussian elimination
-      -> deterministic verifier
-
-The compiler is unavailable to Direct inference. It is used there only as an evaluation oracle.
-
-PyTorch remains an **experiment-only dependency**. It is installed in a separate CI job and is not added to the NEUMANN core wheel dependencies.
-
-See `docs/experiments/v0.0.31.md`.
-
-First measured v0.0.31 result:
-- core pytest: **155 passed, 1 skipped**
-- sequence contract tests: **4 passed**
-- CPU PyTorch: **2.14.0+cpu**
-- Direct / Structural parameters: **75,538 / 75,538**
-- parameter bytes: **302,152 / 302,152**
-- identical 82-way heads
-- identical learned arithmetic proxy on matched inputs
-- total training examples: **8,192 / 8,192**
-- Direct solved-positive examples: **8,192**
-- Structural positives / near-negatives: **4,096 / 4,096**
-- Direct validation verified: **29/243 = 11.93%**
-- Direct final verified: **31/243 = 12.76%**
-- matched Structural validation verified: **243/243 = 100%**
-- matched Structural final verified: **243/243 = 100%**
-- Structural near-negative proposal false routes: **0%**
-- Structural compiler-gated false routes: **0%**
-- frozen v0.0.29 MLP Structural on the new final split: **242/243 = 99.59%**
-- KEEP decision: **true**
-
-An early contract-only run caught text collisions with previous generated corpora before the full quality benchmark executed. The generator now enforces explicit forbidden-text exclusion; the successful v0.0.31 train/validation/final sets are mutually disjoint and disjoint from v0.0.29/v0.0.30.
-
-This weakens the simple explanation that the earlier Direct gap was only a shallow-MLP inductive-bias artifact. It remains a narrow task-specific quality result, not a total-compute or frontier-LLM efficiency claim.
-
-### Previous measured results
-
-v0.0.30:
-- pytest: **155 passed**
-- pre-registered Direct cells: **12**
+- matched Direct / Structural Tiny Transformers: **75,538 parameters each**
+- identical learned arithmetic proxy
+- Direct final verified coverage: **31/243 = 12.76%**
 - Structural final verified coverage: **243/243 = 100%**
-- validation-best Direct: **2048 examples, width 64, rounded regression**
-- validation-best Direct verified coverage: **26/243 = 10.70%**
-- validation-selected Direct final coverage: **20/243 = 8.23%**
-- descriptive best pre-registered final Direct: **28/243 = 11.52%**
-- best 81-class Direct final coverage: **24/243 = 9.88%**
-- Direct break-even reached: **no**
+- near-negative false routes: **0%**
+- result remains task-specific and is not a total-compute claim
 
-v0.0.29:
-- learned architecture for both paths: **640 -> 8 -> 2**
-- parameter count: **5,146 vs 5,146**
-- dense weighted-sum proxy: **5,136 vs 5,136**
-- Structural final verified coverage: **1.0**
-- Direct raw-regression final verified coverage: **0.0**
+**v0.0.30**
 
-v0.0.28:
-- neural/logistic parameter ratio: **4.005x**
-- neural/logistic arithmetic-proxy ratio: **4.052x**
-- neural known proposal and end-to-end verified coverage: **1.0**
-- unsupported final false-route after compiler gate: **0.0 for both**
+- Direct capacity/data frontier did not reach Structural verified coverage
+- best descriptive final Direct: **28/243 = 11.52%**
+- fixed Structural final: **243/243 = 100%**
 
-v0.0.27:
-- logistic coefficient/intercept scalars: **1,962**
-- known proposal and end-to-end verified coverage: **1.0**
-- unsupported final false-route after compiler gate: **0.0**
+**v0.0.26–v0.0.29**
 
-v0.0.26:
-- verified answer equivalence: **1.0**
-- representation-step reduction for 8 repeated executions: **8 -> 1**
-
-Wall-clock remains diagnostic only and is not a general speed claim.
+Established reusable-structure amortization, learned-proposal cost accounting, authority separation, and the first matched-capacity direct-vs-structure comparisons.
 
 ## Persistent privilege
 
