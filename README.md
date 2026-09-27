@@ -6,52 +6,61 @@
 
 ## Current engineering baseline
 
-**v0.0.28**
+**v0.0.29**
 
-v0.0.27 established an auditable learned-proposal cost contract for the TF-IDF + logistic router.
+v0.0.28 showed that adding a nonlinear proposal head did not automatically create efficiency: the tiny MLP improved proposal routing on the controlled corpus, but used about 4x the fitted classifier state and arithmetic proxy of the logistic baseline.
 
-v0.0.28 asks the next controlled question:
+v0.0.29 moves from proposer-vs-proposer comparison to the first **paired direct-vs-structure task experiment**.
 
-> **Does the same structural proposal contract survive a genuinely nonlinear neural proposer, and what does that nonlinearity actually cost?**
+Two learned paths receive the same fixed-position token representation and the same one-hidden-layer, 8-unit, two-output MLP inference architecture.
 
-The new proposer keeps the same TF-IDF inputs but replaces each logistic head with a one-hidden-layer MLP:
+Direct path:
 
-    TF-IDF
-      -> 4-unit ReLU hidden layer
-      -> open-set / family proposal
-      -> deterministic compiler gate
+    raw token sequence
+      -> matched-capacity MLP
+      -> two numeric solution values
+      -> evaluation verifier
 
-The neural model still has no solver authority. Solver-ready IR must come from the deterministic compiler.
+Structural path:
 
-The v0.0.28 benchmark compares the neural proposer and the v0.0.27 logistic baseline on the exact same corpus and records:
-- fitted model state
-- layer shapes
-- sparse active features
-- weighted-sum term proxy
-- known-task proposal and verified coverage
-- unsupported proposal and final false-route rates
-- exact repeated-proposal reuse
+    raw token sequence
+      -> matched-capacity MLP
+      -> LINEAR / ABSTAIN
+      -> deterministic compiler
+      -> deterministic solver
+      -> deterministic verifier
 
-Cost superiority is **not** a KEEP condition. If the neural model is more expensive, that is retained as a negative result rather than optimized away.
+The paired benchmark is deliberately limited to deterministic generated **2x2 nonsingular integer linear systems** so the inference-capacity comparison stays interpretable.
 
-See `docs/experiments/v0.0.28.md`.
+The experiment records:
+- exact learned parameter-count parity
+- exact layer-shape parity
+- exact dense weighted-sum proxy parity
+- direct verified numeric-answer coverage
+- direct solution RMSE and equation residuals
+- structural proposal and verified coverage
+- near-negative proposal false routes
+- compiler-gated final false routes
+- learned model wall-clock as diagnostic only
+- deterministic solver and verifier steps separately
 
-First measured v0.0.28 result:
+The direct model gets no compiler or solver output during inference. A deterministic compiler is used only on the evaluation side to construct a reference representation for answer verification.
+
+Inference capacity is matched, but supervision cardinality is not: the structural model sees the same positive systems plus paired unsupported near-negatives so it can learn abstention. This boundary is explicit in the experiment contract.
+
+See `docs/experiments/v0.0.29.md`.
+
+### Previous measured results
+
+v0.0.28:
 - neural fitted weight/bias scalars: **7,858**
 - logistic fitted coefficient/intercept scalars: **1,962**
 - neural/logistic parameter ratio: **4.005x**
-- neural mean weighted-sum proxy: **243.78**
-- logistic mean score-term proxy: **60.17**
 - neural/logistic arithmetic-proxy ratio: **4.052x**
 - neural known proposal and end-to-end verified coverage: **1.0**
 - unsupported proposal false-route: logistic **0.10**, neural **0.0**
 - unsupported final false-route after compiler gate: **0.0 for both**
 - 8 repeated exact neural uses: **8.0x** learned-work amortization
-- KEEP decision: **true**
-
-This is an important negative result: adding nonlinearity improved routing on this tiny corpus, but did **not** make the learned layer compute-efficient. The tiny MLP paid roughly four times the model-state and arithmetic proxy cost of the logistic baseline.
-
-### Previous measured results
 
 v0.0.27:
 - logistic coefficient/intercept scalars: **1,962**
@@ -59,13 +68,11 @@ v0.0.27:
 - unsupported proposal false-route rate: **0.10**
 - unsupported final false-route rate after compiler gate: **0.0**
 - mean sparse score-term proxy: **60.17**
-- 8 repeated exact uses: **8.0x** learned-work amortization
 
 v0.0.26:
 - verified answer equivalence: **1.0**
 - representation-step reduction for 8 repeated executions: **8 -> 1**
 - mean representation/raw byte ratio: **3.86** (representation is larger)
-- mean observed CI wall-time ratio: **4.07x** in favor of reuse
 
 Wall-clock remains diagnostic only and is not a general speed claim.
 
@@ -176,6 +183,7 @@ See `docs/experiments/v0.0.25.md`.
     python benchmark_v026.py
     python benchmark_v027.py
     python benchmark_v028.py
+    python benchmark_v029.py
 
 ## Parallel security track
 
