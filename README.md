@@ -6,99 +6,107 @@
 
 ## Current engineering baseline
 
-**v0.0.30**
+**v0.0.31**
 
-v0.0.29 established the first matched-learned-capacity task comparison:
+v0.0.30 gave the Direct shallow-MLP path up to 16x more positive training data and up to 8x the learned inference arithmetic proxy, plus integer rounding and an exact 81-class formulation. No Direct break-even was observed inside that pre-registered frontier.
 
-- Structural learned path: 640 -> 8 -> 2
-- Direct learned path: 640 -> 8 -> 2
-- learned parameter ratio: 1.0
-- learned dense weighted-sum proxy ratio: 1.0
-- Structural strict verified coverage: 1.0
-- Direct raw-regression strict verified coverage: 0.0
+v0.0.31 attacks the strongest remaining simple explanation:
 
-v0.0.30 now tries to **erase that gap** rather than repeat it.
+> perhaps Direct failed because a fixed-position MLP is the wrong sequence/algorithmic inductive bias.
 
-The Direct side receives a pre-registered capacity/data sweep:
+The new experiment uses a small learned Transformer and matches Direct and Structural much more tightly.
 
-Training sizes:
+Both paths use the exact same:
+- categorical tokenization
+- numeric scalar channel
+- learned token embeddings
+- learned positional embeddings
+- 2 Transformer encoder layers
+- d_model = 64
+- 4 attention heads
+- feed-forward width = 128
+- identical 82-way output head
+- 12 fixed training epochs
+- total training cardinality = 8,192
 
-    128, 512, 2048
+Direct receives **8,192 unique solved positive systems**.
 
-Hidden widths:
+Structural receives:
+- 4,096 positive systems
+- 4,096 paired near-negatives
 
-    8, 16, 32, 64
+So Direct is deliberately favored with twice as many positive solved examples while total training cardinality stays equal.
 
-For every cell, NEUMANN trains two Direct models:
+Direct:
 
-1. a two-output numeric regressor
-2. a stronger 81-class discrete solution classifier
+    raw text
+      -> Tiny Transformer
+      -> one of 81 exact solution-pair classes
+      -> evaluation verifier
 
-The regressor is evaluated both raw and after rounding/clipping to the benchmark's known integer support [-4, 4]. This prevents strict floating-point verification from being the only reason Direct loses.
+Structural:
 
-The resulting three Direct challengers are:
-
-    raw regression
-    rounded regression
-    81-class discrete classification
-
-The Structural reference is frozen at the v0.0.29 configuration:
-
-    640 -> 8 -> 2 structural proposer
+    raw text
+      -> identical Tiny Transformer
+      -> LINEAR / abstain semantics
       -> deterministic compiler
       -> Gaussian elimination
       -> deterministic verifier
 
-v0.0.30 measures the **break-even frontier**:
+The compiler is unavailable to Direct inference. It is used there only as an evaluation oracle.
 
-> How much Direct learned capacity and training data is required to reach the fixed Structural verified coverage, if any pre-registered configuration reaches it?
+PyTorch remains an **experiment-only dependency**. It is installed in a separate CI job and is not added to the NEUMANN core wheel dependencies.
 
-The validation split is evaluated before the final split. Final-grid results are descriptive only and cannot retune the sweep.
+See `docs/experiments/v0.0.31.md`.
 
-See `docs/experiments/v0.0.30.md`.
-
-First measured v0.0.30 result:
-- pytest: **155 passed**
-- Direct grid: **12 pre-registered cells**
-- Direct training sizes: **128 / 512 / 2048**
-- Direct hidden widths: **8 / 16 / 32 / 64**
-- Structural final verified coverage on new 243-system split: **1.0**
-- Structural final near-negative proposal false-route: **1/243**
-- Structural final compiler-gated false-route: **0**
-- best validation Direct: **2048 x 64 rounded regression**
-- best validation Direct verified coverage: **10.70%**
-- validation break-even: **not reached**
-- validation-selected Direct final coverage: **8.23%**
-- observed best pre-registered final Direct: **2048 x 16 rounded regression**
-- observed best final Direct verified coverage: **11.52%**
-- observed final break-even: **not reached**
-- best discrete 81-class final coverage: **9.88%**
-- raw regression strict verified coverage: **0% in all 12 cells**
+First measured v0.0.31 result:
+- core pytest: **155 passed, 1 skipped**
+- sequence contract tests: **4 passed**
+- CPU PyTorch: **2.14.0+cpu**
+- Direct / Structural parameters: **75,538 / 75,538**
+- parameter bytes: **302,152 / 302,152**
+- identical 82-way heads
+- identical learned arithmetic proxy on matched inputs
+- total training examples: **8,192 / 8,192**
+- Direct solved-positive examples: **8,192**
+- Structural positives / near-negatives: **4,096 / 4,096**
+- Direct validation verified: **29/243 = 11.93%**
+- Direct final verified: **31/243 = 12.76%**
+- matched Structural validation verified: **243/243 = 100%**
+- matched Structural final verified: **243/243 = 100%**
+- Structural near-negative proposal false routes: **0%**
+- Structural compiler-gated false routes: **0%**
+- frozen v0.0.29 MLP Structural on the new final split: **242/243 = 99.59%**
 - KEEP decision: **true**
 
-The validation-selected Direct model used roughly **8x** the Structural learned parameter state and dense weighted-sum proxy while training on **16x** as many positive systems, but still did not reach the fixed Structural verified coverage.
+An early contract-only run caught text collisions with previous generated corpora before the full quality benchmark executed. The generator now enforces explicit forbidden-text exclusion; the successful v0.0.31 train/validation/final sets are mutually disjoint and disjoint from v0.0.29/v0.0.30.
 
-This is not an 8x total-compute claim. The Structural path additionally executes deterministic compilation and Gaussian elimination, and the two paths have different supervision. The supported statement is narrower: **no Direct break-even was observed inside the pre-registered v0.0.30 frontier.**
+This weakens the simple explanation that the earlier Direct gap was only a shallow-MLP inductive-bias artifact. It remains a narrow task-specific quality result, not a total-compute or frontier-LLM efficiency claim.
 
 ### Previous measured results
 
+v0.0.30:
+- pytest: **155 passed**
+- pre-registered Direct cells: **12**
+- Structural final verified coverage: **243/243 = 100%**
+- validation-best Direct: **2048 examples, width 64, rounded regression**
+- validation-best Direct verified coverage: **26/243 = 10.70%**
+- validation-selected Direct final coverage: **20/243 = 8.23%**
+- descriptive best pre-registered final Direct: **28/243 = 11.52%**
+- best 81-class Direct final coverage: **24/243 = 9.88%**
+- Direct break-even reached: **no**
+
 v0.0.29:
-- pytest: **149 passed**
 - learned architecture for both paths: **640 -> 8 -> 2**
 - parameter count: **5,146 vs 5,146**
 - dense weighted-sum proxy: **5,136 vs 5,136**
 - Structural final verified coverage: **1.0**
 - Direct raw-regression final verified coverage: **0.0**
-- Direct solution RMSE: **3.123**
-- Structural near-negative compiler-gated false-route: **0.0**
 
 v0.0.28:
-- neural fitted weight/bias scalars: **7,858**
-- logistic fitted coefficient/intercept scalars: **1,962**
 - neural/logistic parameter ratio: **4.005x**
 - neural/logistic arithmetic-proxy ratio: **4.052x**
 - neural known proposal and end-to-end verified coverage: **1.0**
-- unsupported proposal false-route: logistic **0.10**, neural **0.0**
 - unsupported final false-route after compiler gate: **0.0 for both**
 
 v0.0.27:
@@ -109,7 +117,6 @@ v0.0.27:
 v0.0.26:
 - verified answer equivalence: **1.0**
 - representation-step reduction for 8 repeated executions: **8 -> 1**
-- mean representation/raw byte ratio: **3.86** (representation is larger)
 
 Wall-clock remains diagnostic only and is not a general speed claim.
 
@@ -222,6 +229,8 @@ See `docs/experiments/v0.0.25.md`.
     python benchmark_v028.py
     python benchmark_v029.py
     python benchmark_v030.py
+    # v0.0.31 requires optional CPU PyTorch in its separate CI job
+    python benchmark_v031.py
 
 ## Parallel security track
 

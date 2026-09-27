@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import lru_cache
 import random
 
 
@@ -149,6 +150,7 @@ def generate_solution_covered_linear_examples(
     count: int,
     *,
     seed: int,
+    forbidden_texts: frozenset[str] | None = None,
 ) -> tuple[PairedLinearExample, ...]:
     """Generate a deterministic pool that covers all 81 integer solution pairs.
 
@@ -169,6 +171,7 @@ def generate_solution_covered_linear_examples(
         )
 
     rng = random.Random(seed)
+    forbidden = set(forbidden_texts or ())
     schedule: list[tuple[int, int]] = []
     while len(schedule) < count:
         cycle = list(all_solutions)
@@ -199,7 +202,7 @@ def generate_solution_covered_linear_examples(
                 f"{prefix}{_expression(a, v1, b, v2)} = {rhs1}; "
                 f"{_expression(c, v1, d, v2)} = {rhs2}"
             )
-            if text in seen:
+            if text in seen or text in forbidden:
                 continue
 
             seen.add(text)
@@ -237,4 +240,59 @@ def direct_frontier_final_examples() -> tuple[PairedLinearExample, ...]:
     return generate_solution_covered_linear_examples(
         243,
         seed=3003,
+    )
+
+
+
+def _sequence_previous_texts() -> frozenset[str]:
+    return frozenset(
+        example.text
+        for dataset in (
+            paired_linear_training_examples(),
+            paired_linear_validation_examples(),
+            paired_linear_final_examples(),
+            direct_frontier_training_pool(),
+            direct_frontier_validation_examples(),
+            direct_frontier_final_examples(),
+        )
+        for example in dataset
+    )
+
+
+@lru_cache(maxsize=1)
+def sequence_challenger_training_pool() -> tuple[PairedLinearExample, ...]:
+    """v0.0.31 positive pool, explicitly disjoint from prior corpora."""
+    return generate_solution_covered_linear_examples(
+        8192,
+        seed=3101,
+        forbidden_texts=_sequence_previous_texts(),
+    )
+
+
+@lru_cache(maxsize=1)
+def sequence_challenger_validation_examples() -> tuple[PairedLinearExample, ...]:
+    forbidden = _sequence_previous_texts().union(
+        example.text
+        for example in sequence_challenger_training_pool()
+    )
+    return generate_solution_covered_linear_examples(
+        243,
+        seed=3102,
+        forbidden_texts=frozenset(forbidden),
+    )
+
+
+@lru_cache(maxsize=1)
+def sequence_challenger_final_examples() -> tuple[PairedLinearExample, ...]:
+    forbidden = _sequence_previous_texts().union(
+        example.text
+        for example in sequence_challenger_training_pool()
+    ).union(
+        example.text
+        for example in sequence_challenger_validation_examples()
+    )
+    return generate_solution_covered_linear_examples(
+        243,
+        seed=3103,
+        forbidden_texts=frozenset(forbidden),
     )
