@@ -55,108 +55,105 @@ See:
 
 ## Current engineering baseline
 
-**v0.0.32 — Oracle Structural Compression baseline**
+**v0.0.33 — Learned Structural Compression Proposal**
 
-v0.0.32 is the first NEUMANN experiment that directly measures reduction of computational degrees of freedom.
+v0.0.32 established that an oracle dependency certificate could reduce the retained solver dimension from apparent n to independent core k and substantially alter the solver-work curve.
 
-Pre-registered controlled family:
+v0.0.33 asks whether a small learned proposer can recover part of that oracle compression without holding execution authority.
 
-    core dimension k ∈ {2, 4}
-    apparent dimension n ∈ {4, 8, 16, 32}
-    32 systems per cell
-    256 systems total
+The new corpus removes the obvious v0.0.32 role cues:
 
-Baseline:
+- generic observed variable names
+- randomized variable order
+- randomized equation order
+- affine dependencies with offsets
+- chained dependencies
+- no fixed core/derived row blocks
 
-    full n-variable system
-      -> exact rational Gauss-Jordan
-      -> verify original full problem
+Learned path:
 
-Oracle Structural Compression:
-
-    full system
-      -> oracle compression certificate
-      -> retained k-variable core
-      -> same exact solver
+    full permuted system
+      -> fixed candidate enumerator
+      -> tiny learned candidate scorer
+      -> top-B proposals
+      -> deterministic reduction checker
+      -> safe retained subsystem
+      -> exact solver
       -> reconstruction
-      -> verify original full problem
+      -> verify ORIGINAL full problem
 
-First measured result:
+Important scaffold:
 
-- core pytest: **161 passed, 1 skipped**
-- full-solution equivalence: **1.0**
-- certificate validity: **1.0**
-- verification-work parity: **true**
+    B = n - k
+
+The model is told the oracle elimination cardinality. It predicts **which** reductions to attempt, not **how far** compression should continue.
+
+First measured final result:
+
+- final examples: **256**
+- examples with compression opportunity: **224**
+- tiny MLP parameters: **289**
+- feature dimension: **16**
+- hidden width: **16**
+- verified retention: **100%**
+- unsafe accepted reductions: **0**
+- fail-closed rejected proposals: **1,209**
+- mean elimination-count recovery: **70.11%**
+- mean exact oracle-rule recovery: **70.08%**
+- mean oracle solver-savings recovery: **83.65%**
 - KEEP: **true**
 
-For fixed (k=2):
+At k=2,n=32:
 
-    n = 4   : baseline/compressed solver work = 4.47x
-    n = 8   : 18.50x
-    n = 16  : 75.27x
-    n = 32  : 302.27x
+    baseline solver ops ≈ 6121.4
+    oracle solver ops   = 15
+    learned solver ops  ≈ 1302.5
+    oracle savings recovered ≈ 78.89%
 
-Measured solver log-log slope:
+At k=4,n=32:
 
-    baseline   ≈ 2.0266
-    compressed ≈ 0.0000
+    baseline solver ops ≈ 6464.6
+    oracle solver ops   ≈ 95.8
+    learned solver ops  ≈ 1586.0
+    oracle savings recovered ≈ 76.20%
 
-For fixed (k=4):
+Learned elimination recovery declines with apparent dimension, reaching roughly **54%** at n=32. The learned discovery layer is therefore itself a scaling bottleneck.
 
-    n = 4   : 1.00x
-    n = 8   : 4.74x
-    n = 16  : 20.52x
-    n = 32  : 85.31x
+The result is deliberately narrow.
 
-Measured solver log-log slope:
+It does **not** establish:
+- learned discovery of k
+- globally minimal structure
+- domain-general compression
+- natural-language compression
+- total-compute superiority
 
-    baseline   ≈ 2.1361
-    compressed ≈ 0.00018
-
-This is an **oracle** result. Generator-provided dependency information is unavailable to a real learned system.
-
-It does not establish that an AI can discover the compression or that total end-to-end compute is lower.
-
-Important retained negative/boundary results:
-
-- reconstruction work still grows with apparent problem size
-- full original-problem verification still grows with apparent problem size
-- compressed solver payload shrinks sharply
-- the explicit v0.0.32 certificate is larger than the raw solver payload, so end-to-end byte compression is **not** demonstrated
-
-At (k=2,n=32):
-
-    raw solver payload          ≈ 2416.5 bytes
-    compressed core payload     ≈ 56.4 bytes
-    explicit certificate        ≈ 7360.6 bytes
-
-The solver bottleneck was compressed; proof/reconstruction overhead remains.
+It also lacks a pre-registered random/simple-heuristic ranking control. A simple structural statistic may explain part of the measured recovery. That is the next falsification target.
 
 See:
 - `docs/research/structural_compression_thesis.md`
-- `docs/research/prior_art_positioning.md`
 - `docs/experiments/v0.0.32.md`
+- `docs/experiments/v0.0.33.md`
 
 ### Frozen enabling results
+
+**v0.0.32**
+
+- oracle Structural Compression benchmark
+- full-solution equivalence: **1.0**
+- baseline solver finite-range slope: about **2.03–2.14**
+- fixed-k oracle-compressed solver slope: about **0**
+- explicit certificate byte overhead retained as a negative result
 
 **v0.0.31**
 
 - matched Direct / Structural Tiny Transformers: **75,538 parameters each**
-- identical learned arithmetic proxy
-- Direct final verified coverage: **31/243 = 12.76%**
-- Structural final verified coverage: **243/243 = 100%**
-- near-negative false routes: **0%**
-- result remains task-specific and is not a total-compute claim
+- Direct final verified coverage: **12.76%**
+- Structural final verified coverage: **100%**
 
-**v0.0.30**
+**v0.0.26–v0.0.30**
 
-- Direct capacity/data frontier did not reach Structural verified coverage
-- best descriptive final Direct: **28/243 = 11.52%**
-- fixed Structural final: **243/243 = 100%**
-
-**v0.0.26–v0.0.29**
-
-Established reusable-structure amortization, learned-proposal cost accounting, authority separation, and the first matched-capacity direct-vs-structure comparisons.
+Established representation reuse, learned-proposal accounting, authority separation, and direct-vs-structure controlled comparisons.
 
 ## Persistent privilege
 
