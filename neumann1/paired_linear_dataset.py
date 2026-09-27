@@ -238,3 +238,26 @@ def direct_frontier_final_examples() -> tuple[PairedLinearExample, ...]:
         243,
         seed=3003,
     )
+
+
+
+def sequence_challenger_training_pool() -> tuple[PairedLinearExample, ...]:
+    """v0.0.31 positive pool for the sequence-model challenger."""
+    return generate_solution_covered_linear_examples(
+        8192,
+        seed=3101,
+    )
+
+
+def sequence_challenger_validation_examples() -> tuple[PairedLinearExample, ...]:
+    return generate_solution_covered_linear_examples(
+        243,
+        seed=3102,
+    )
+
+
+def sequence_challenger_final_examples() -> tuple[PairedLinearExample, ...]:
+    return generate_solution_covered_linear_examples(
+        243,
+        seed=3103,
+    )
