@@ -286,7 +286,8 @@ from .stopping_gauntlet_dataset import (
 from .stopping_gauntlet import (
     METHODS, THRESHOLD_GRID, ThresholdCalibration,
     StoppingObservation, FrozenV033Scorer,
-    fit_frozen_v033_scorer, score_candidates,
+    fit_frozen_v033_scorer, fit_frozen_v033_scorer_once,
+    learned_compressor_fingerprint, score_candidates,
     calibrate_threshold, observe_stopping_method,
     aggregate_stopping_observations,
 )
@@ -296,7 +297,8 @@ __all__ += [
     "v034_calibration_examples", "v034_final_examples",
     "METHODS", "THRESHOLD_GRID", "ThresholdCalibration",
     "StoppingObservation", "FrozenV033Scorer",
-    "fit_frozen_v033_scorer", "score_candidates",
+    "fit_frozen_v033_scorer", "fit_frozen_v033_scorer_once",
+    "learned_compressor_fingerprint", "score_candidates",
     "calibrate_threshold", "observe_stopping_method",
     "aggregate_stopping_observations",
 ]
