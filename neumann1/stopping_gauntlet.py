@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import lru_cache
 import hashlib
 import math
 from statistics import mean
@@ -85,6 +86,7 @@ class FrozenV033Scorer:
     footprint: LearnedCompressorFootprint
 
 
+@lru_cache(maxsize=1)
 def fit_frozen_v033_scorer() -> FrozenV033Scorer:
     proposer = LearnedCompressionProposer().fit(
         learned_compression_training_examples()
@@ -323,6 +325,57 @@ def _micro_proposal_metrics(
     )
 
 
+def _micro_metrics_from_prescored(
+    prescored: tuple[
+        tuple[
+            frozenset[tuple[int, str]],
+            tuple[ScoredCandidate, ...],
+        ],
+        ...,
+    ],
+    threshold: float,
+) -> tuple[float, float, float, int, int, int]:
+    proposed_total = 0
+    reference_total = 0
+    true_positive_total = 0
+
+    for reference, scored in prescored:
+        proposed = {
+            item.candidate.key
+            for item in scored
+            if item.score >= threshold
+        }
+        proposed_total += len(proposed)
+        reference_total += len(reference)
+        true_positive_total += len(
+            proposed.intersection(reference)
+        )
+
+    precision = (
+        true_positive_total / proposed_total
+        if proposed_total
+        else 0.0
+    )
+    recall = (
+        true_positive_total / reference_total
+        if reference_total
+        else 0.0
+    )
+    f1 = (
+        2.0 * precision * recall / (precision + recall)
+        if precision + recall
+        else 0.0
+    )
+    return (
+        precision,
+        recall,
+        f1,
+        proposed_total,
+        reference_total,
+        true_positive_total,
+    )
+
+
 def calibrate_threshold(
     examples: Iterable[LearnedCompressionExample],
     method: str,
@@ -330,6 +383,17 @@ def calibrate_threshold(
     frozen_scorer: FrozenV033Scorer,
 ) -> ThresholdCalibration:
     examples = tuple(examples)
+    prescored = tuple(
+        (
+            _reference_keys(example),
+            score_candidates(
+                example,
+                method,
+                frozen_scorer=frozen_scorer,
+            ),
+        )
+        for example in examples
+    )
     candidates: list[ThresholdCalibration] = []
 
     for threshold in THRESHOLD_GRID:
@@ -340,11 +404,9 @@ def calibrate_threshold(
             proposed_total,
             reference_total,
             true_positive_total,
-        ) = _micro_proposal_metrics(
-            examples,
-            method,
+        ) = _micro_metrics_from_prescored(
+            prescored,
             threshold,
-            frozen_scorer=frozen_scorer,
         )
         candidates.append(
             ThresholdCalibration(
@@ -367,7 +429,6 @@ def calibrate_threshold(
             item.threshold,
         ),
     )
-
 
 def _baseline_solver_ops(
     example: LearnedCompressionExample,
