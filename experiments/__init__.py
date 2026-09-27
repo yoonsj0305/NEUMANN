@@ -1,1 +1,1 @@
-"""Optional research experiments not required by the core package."""\n
+"""Optional research experiments not required by the core package."""
