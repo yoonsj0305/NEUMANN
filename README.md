@@ -55,115 +55,110 @@ See:
 
 ## Current engineering baseline
 
-**v0.0.34 — Structural Baseline Gauntlet + Confidence Stopping**
+**v0.0.35 — Compression Utility / Value-of-Reduction Oracle**
 
-v0.0.34 removes the v0.0.33 oracle-cardinality scaffold.
+v0.0.35 replaces generator-reference imitation as the primary optimization target with measured downstream solver-work utility:
 
-Final inference receives neither (k) nor (n-k).
+    VoR(c | R)
+        = solver_ops(R) - solver_ops(R ∪ {c})
 
-Each method uses one global threshold calibrated on a disjoint 192-example calibration set, then runs unchanged on 256 final examples.
-
-The frozen learned scorer remains:
-
-- 16 features
-- 16 hidden units
-- 289 fitted weight+bias scalars
-- same v0.0.33 training corpus
-
-Pre-registered deterministic controls include:
-
-- random ranking
-- target-leaf
-- row-sparsity
-- sparsity + incidence
-- dependency contrast
-- Markowitz-style local fill
-- fixed structural combo
-
-All proposals remain advisory:
-
-    score
-      -> threshold stopping
-      -> deterministic checker
-      -> exact retained solve
-      -> reconstruction
-      -> verify ORIGINAL full problem
-
-### Reproducibility freeze
-
-Cross-run numerical drift from refitting the sklearn MLP was detected before release and was not accepted.
-
-The release benchmark therefore does **not** refit the learned scorer. It loads the exact immutable float64 checkpoint in `neumann1/frozen_v033_checkpoint.py` and evaluates it through a fixed scalar inference path. The CI also pins the numerical stack for the remaining experiment suite.
-
-Final learned scorer SHA-256:
-
-`f9c1dccd0bda28619cb74c6fd6e8a457cde96944cbe5bfa65c9665859da3cc69`
-
-Two independent final-head runners reproduced the same fingerprint, threshold, calibration metrics, and final aggregates.
-
-### First measured result
-
-- core pytest: **176 passed, 1 skipped**
-- sequence lane: **PASS**
-- final verified retention: **100% for every method**
-- unsafe accepted reductions: **0 for every method**
-- `KEEP = true`
-
-Learned MLP:
-
-- threshold: **0.40**
-- final proposal precision: **91.04%**
-- recall: **94.27%**
-- F1: **92.63%**
-- mean solver ops after certified compression: **442.23**
-- mean solver savings vs full baseline: **1529.42**
-
-Best deterministic proposal F1 among the pre-registered heuristics:
-
-**Markowitz**
-
-- proposal F1: **77.86%**
-- mean solver ops: **387.31**
-- retained-dimension MAE: **4.09**
-- exact reference-retained-dimension match: **35.94%**
-
-Highest downstream solver savings:
-
-**Target-leaf heuristic**
-
-- proposal F1: **74.00%**
-- mean solver ops: **325.13**
-- mean solver savings: **1646.52**
-
-The full-system baseline averaged **1971.66 solver arithmetic operations**.
-
-### Central negative result
-
-The learned scorer is best at reproducing the generator's dependency-reference labels.
-
-It is **not** best at the actual downstream objective of reducing verified solver work.
-
-Therefore:
-
-> **better oracle-rule classification does not imply better Structural Compression.**
-
-This shifts NEUMANN's next target from candidate-label imitation to **Compression Utility / Value-of-Reduction**.
-
-The next system should treat:
+It separates:
 
 - validity,
 - computational utility,
-- stopping / minimality
+- stopping,
 
-as separate primitives.
+while keeping every learned or heuristic proposal advisory under the deterministic checker.
 
-Simple deterministic structural heuristics are now first-class baselines/components rather than merely controls.
+The experiment used a new split disjoint from every v0.0.33/v0.0.34 signature:
+
+- calibration: **192 systems**
+- final: **256 systems**
+- verified retention: **100% for every method**
+- unsafe accepted reductions: **0**
+- `KEEP = true`
+
+### First measured result
+
+Full-system baseline:
+
+- mean solver ops: **1960.09**
+
+Dynamic greedy marginal-utility teacher:
+
+- mean solver ops: **161.50**
+- mean solver savings: **1798.60**
+- mean accepted eliminations: **11.07**
+- mean retained dimension: **3.93**
+- mean trial materializations: **277.21**
+
+Strongest cheap deterministic baseline, **target-leaf**:
+
+- mean solver ops: **210.37**
+- mean solver savings: **1749.73**
+- dynamic-vs-target solver-savings delta: **+48.87**
+- target-leaf recovered **97.28%** of dynamic greedy solver savings
+
+Other key results:
+
+- Markowitz: **244.03 mean solver ops**
+- utility-calibrated frozen learned-reference MLP: **384.51**
+- static isolated utility: **780.02**
+
+Dynamic state-aware utility beat static isolated utility by:
+
+- **+618.52 mean solver savings**
+
+The interaction gap grew strongly with apparent dimension. At `n=32` it reached:
+
+- `k=2`: **2094.75**
+- `k=4`: **1821.13**
+
+Therefore:
+
+> **Value-of-Reduction is strongly state-dependent on this benchmark family.**
+
+A candidate that looks useful in isolation is not an adequate substitute for evaluating its marginal value after earlier reductions.
+
+### Teacher-search cost boundary
+
+The dynamic oracle is intentionally **not** a deployable inference policy.
+
+Its successful trial materializations alone consumed on average:
+
+- **104,298.70 trial solver ops per example**
+
+That is about **53.2×** the original full-system solver-work baseline, before counting partial work from failed materializations.
+
+The full v0.0.35 benchmark took approximately **618.9 s** on the first GitHub Actions run.
+
+Therefore the result supports a teacher/distillation role only, not end-to-end efficiency.
+
+### Architecture consequence
+
+The cheapest mechanism already captures most of the downstream value:
+
+    target-leaf
+        -> deterministic checker
+        -> ~97.3% of dynamic teacher savings
+
+The next research step should therefore not replace target-leaf wholesale with a larger learned policy.
+
+The preferred sequence is:
+
+    cheap deterministic compression
+        ↓
+    residual state-aware utility only where value remains
+        ↓
+    deterministic checker
+        ↓
+    exact execution + original-problem verification
+
+This makes the next target **residual Value-of-Reduction**, with learned residual prediction considered only after the cheap-first residual contract is measured.
 
 See:
-- `docs/research/structural_compression_thesis.md`
-- `docs/experiments/v0.0.32.md`
-- `docs/experiments/v0.0.33.md`
 - `docs/experiments/v0.0.34.md`
+- `docs/experiments/v0.0.35.md`
 
 ### Frozen enabling results
 
