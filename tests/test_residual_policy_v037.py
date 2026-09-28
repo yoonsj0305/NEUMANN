@@ -3,6 +3,9 @@ from __future__ import annotations
 from dataclasses import replace
 import math
 
+from neumann1.learned_compression import (
+    enumerate_affine_candidates,
+)
 from neumann1.residual_policy import (
     RESIDUAL_FEATURE_DIMENSION,
     fit_residual_tree,
@@ -82,10 +85,7 @@ def test_v037_feature_contract_is_state_aware_and_core_metadata_free():
     }
     candidate = next(
         item
-        for item in __import__(
-            "neumann1.learned_compression",
-            fromlist=["enumerate_affine_candidates"],
-        ).enumerate_affine_candidates(
+        for item in enumerate_affine_candidates(
             example.full_system
         )
         if (
