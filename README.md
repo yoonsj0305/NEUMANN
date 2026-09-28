@@ -91,9 +91,9 @@ All proposals remain advisory:
 
 ### Reproducibility freeze
 
-Cross-run numerical drift was detected before release and was not accepted.
+Cross-run numerical drift from refitting the sklearn MLP was detected before release and was not accepted.
 
-The final CI pins the numerical stack, hash seed, BLAS thread count, and OpenBLAS CPU kernel.
+The release benchmark therefore does **not** refit the learned scorer. It loads the exact immutable float64 checkpoint in `neumann1/frozen_v033_checkpoint.py` and evaluates it through a fixed scalar inference path. The CI also pins the numerical stack for the remaining experiment suite.
 
 Final learned scorer SHA-256:
 
