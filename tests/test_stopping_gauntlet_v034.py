@@ -82,7 +82,7 @@ def test_v034_frozen_learned_scorer_matches_v033_capacity():
 
 
 def test_v034_frozen_learned_scorer_replays_exactly():
-    first = fit_frozen_v033_scorer_once()
+    first = fit_frozen_v033_scorer()
     second = fit_frozen_v033_scorer_once()
 
     assert first.fitted_state_sha256 == (
