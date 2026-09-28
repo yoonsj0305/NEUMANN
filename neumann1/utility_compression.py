@@ -136,11 +136,11 @@ def _reference_keys(
     )
 
 
-def one_step_utility(
+def _one_step_utility_with_baseline(
     example: LearnedCompressionExample,
     candidate: AffineCandidate,
+    baseline_ops: int,
 ) -> float:
-    baseline_ops = _baseline_solver_ops(example)
     reduced = materialize_reduction(
         example,
         (candidate,),
@@ -156,6 +156,17 @@ def one_step_utility(
     return float(savings / baseline_ops)
 
 
+def one_step_utility(
+    example: LearnedCompressionExample,
+    candidate: AffineCandidate,
+) -> float:
+    return _one_step_utility_with_baseline(
+        example,
+        candidate,
+        _baseline_solver_ops(example),
+    )
+
+
 def utility_training_rows(
     examples: Iterable[LearnedCompressionExample],
 ) -> tuple[
@@ -166,6 +177,7 @@ def utility_training_rows(
     y: list[float] = []
 
     for example in examples:
+        baseline_ops = _baseline_solver_ops(example)
         for candidate in enumerate_affine_candidates(
             example.full_system
         ):
@@ -176,9 +188,10 @@ def utility_training_rows(
                 )
             )
             y.append(
-                one_step_utility(
+                _one_step_utility_with_baseline(
                     example,
                     candidate,
+                    baseline_ops,
                 )
             )
 
@@ -323,12 +336,14 @@ def score_utility_method(
         return utility_tree.score(example)
 
     if method == "oracle_one_step_utility":
+        baseline_ops = _baseline_solver_ops(example)
         output = [
             ScoredCandidate(
                 candidate=candidate,
-                score=one_step_utility(
+                score=_one_step_utility_with_baseline(
                     example,
                     candidate,
+                    baseline_ops,
                 ),
             )
             for candidate in enumerate_affine_candidates(
@@ -834,6 +849,7 @@ def utility_prediction_metrics(
     predicted: list[float] = []
 
     for example in examples:
+        baseline_ops = _baseline_solver_ops(example)
         scored = {
             item.candidate.key: item.score
             for item in utility_tree.score(
@@ -844,9 +860,10 @@ def utility_prediction_metrics(
             example.full_system
         ):
             truth.append(
-                one_step_utility(
+                _one_step_utility_with_baseline(
                     example,
                     candidate,
+                    baseline_ops,
                 )
             )
             predicted.append(
