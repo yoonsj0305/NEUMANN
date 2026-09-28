@@ -55,6 +55,18 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.44 — Adversarial structural boundary audit**
+
+The frozen indexed method was challenged with two fresh generated families.
+All 224 final answers verified against the original systems. It missed a
+valid high-incidence block in every one of 96 cases; it also missed both
+independently valid exact Schur witnesses in all 96 dense alternative cases.
+The 32 controls remained uncompressed. The production materializer cannot
+currently substitute eliminated targets into retained equations, so the
+dense witnesses are references rather than available actions. See
+`docs/experiments/v0.0.44.md`; run `python benchmark_v044_smoke.py` or
+`python benchmark_v044.py`. No learned model was trained in this audit.
+
 **v0.0.43 — Incremental indexed peeling**
 
 This freezes v0.0.42 E2 and indexes residual low-incidence row pairs. On a

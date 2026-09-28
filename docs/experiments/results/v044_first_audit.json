@@ -1,0 +1,92 @@
+{
+  "arms": {
+    "alternatives": {
+      "count": 96,
+      "mean_baseline_ops": 388.4375,
+      "mean_checkers": 0,
+      "mean_derivations": 0,
+      "mean_eliminated": 0,
+      "mean_final_solver_ops": 388.4375,
+      "mean_pair_examinations": 0,
+      "mean_posting_edges": 16,
+      "mean_posting_updates": 0,
+      "mean_witness_construction_ops": [
+        47.958333333333336,
+        45.208333333333336
+      ],
+      "mean_witness_retained_solver_ops": [
+        160.77083333333334,
+        164.35416666666666
+      ],
+      "missed_both": 96,
+      "rejected_materializations": 0,
+      "two_valid_positive_witnesses": 96,
+      "verified": true
+    },
+    "control": {
+      "count": 32,
+      "mean_baseline_ops": 56.0625,
+      "mean_checkers": 0,
+      "mean_derivations": 0,
+      "mean_eliminated": 0,
+      "mean_final_solver_ops": 56.0625,
+      "mean_pair_examinations": 0,
+      "mean_posting_edges": 10,
+      "mean_posting_updates": 0,
+      "rejected_materializations": 0,
+      "verified": true
+    },
+    "high_degree": {
+      "cells": {
+        "2x16": {
+          "count": 24,
+          "mean_elimination_recovery": 0.8571428571428571,
+          "mean_solver_savings_recovery": 0.9604820450387674,
+          "missed_any_elimination": 24
+        },
+        "2x32": {
+          "count": 24,
+          "mean_elimination_recovery": 0.9333333333333333,
+          "mean_solver_savings_recovery": 0.9894926409330616,
+          "missed_any_elimination": 24
+        },
+        "4x16": {
+          "count": 24,
+          "mean_elimination_recovery": 0.8333333333333334,
+          "mean_solver_savings_recovery": 0.9326351920115727,
+          "missed_any_elimination": 24
+        },
+        "4x32": {
+          "count": 24,
+          "mean_elimination_recovery": 0.9285714285714286,
+          "mean_solver_savings_recovery": 0.9851209033976046,
+          "missed_any_elimination": 24
+        }
+      },
+      "count": 96,
+      "mean_baseline_ops": 4695.8125,
+      "mean_checkers": 48.5,
+      "mean_derivations": 48.5,
+      "mean_eliminated": 19,
+      "mean_elimination_recovery": 0.888095238095238,
+      "mean_final_solver_ops": 145.47916666666666,
+      "mean_oracle_solver_ops": 55.229166666666664,
+      "mean_pair_examinations": 48.5,
+      "mean_posting_edges": 34,
+      "mean_posting_updates": 17,
+      "mean_solver_savings_recovery": 0.9669326953452516,
+      "missed_any_elimination": 96,
+      "oracle_verified": true,
+      "positive_oracle_savings_each": true,
+      "rejected_materializations": 0,
+      "six_incidence_targets": 192,
+      "verified": true
+    }
+  },
+  "boundary": "Exact synthetic systems. Schur witnesses are independent reference alternatives, not F1 actions. Retained-solver operation savings exclude Schur construction, routing, checking, reconstruction and verification.",
+  "cells_complete": true,
+  "count": 224,
+  "decision": "BOUNDARY_CONFIRMED",
+  "experiment": "v0.0.44 frozen indexed-peeling adversarial boundary audit",
+  "fresh_signatures": true
+}
