@@ -55,117 +55,78 @@ See:
 
 ## Current engineering baseline
 
-**v0.0.34 — Structural Baseline Gauntlet + Confidence Stopping**
+**v0.0.35 — Compression Economics Audit**
 
-v0.0.34 removes the v0.0.33 oracle-cardinality scaffold.
+v0.0.35 keeps the frozen v0.0.34 proposal system unchanged and asks a stricter question:
 
-Final inference receives neither (k) nor (n-k).
+> Does certified Structural Compression still save arithmetic work once the current checker's repeated successful rematerializations are counted?
 
-Each method uses one global threshold calibrated on a disjoint 192-example calibration set, then runs unchanged on 256 final examples.
+The current fail-closed checker validates each tentatively accepted candidate by:
 
-The frozen learned scorer remains:
+1. constructing the retained system,
+2. solving it exactly,
+3. reconstructing eliminated variables,
+4. verifying the original full problem,
 
-- 16 features
-- 16 hidden units
-- 289 fitted weight+bias scalars
-- same v0.0.33 training corpus
+and then rematerializes the final accepted set again.
 
-Pre-registered deterministic controls include:
+v0.0.35 audits an intentionally optimistic lower bound containing only successful materializations. It still excludes scorer work, candidate enumeration, failed-materialization hidden work, runtime overhead, memory traffic, and serialization.
 
-- random ranking
-- target-leaf
-- row-sparsity
-- sparsity + incidence
-- dependency contrast
-- Markowitz-style local fill
-- fixed structural combo
+### Measured result
 
-All proposals remain advisory:
-
-    score
-      -> threshold stopping
-      -> deterministic checker
-      -> exact retained solve
-      -> reconstruction
-      -> verify ORIGINAL full problem
-
-### Reproducibility freeze
-
-Cross-run numerical drift from refitting the sklearn MLP was detected before release and was not accepted.
-
-The release benchmark therefore does **not** refit the learned scorer. It loads the exact immutable float64 checkpoint in `neumann1/frozen_v033_checkpoint.py` and evaluates it through a fixed scalar inference path. The CI also pins the numerical stack for the remaining experiment suite.
-
-Final learned scorer SHA-256:
-
-`f9c1dccd0bda28619cb74c6fd6e8a457cde96944cbe5bfa65c9665859da3cc69`
-
-Two independent final-head runners reproduced the same fingerprint, threshold, calibration metrics, and final aggregates.
-
-### First measured result
-
-- core pytest: **176 passed, 1 skipped**
-- sequence lane: **PASS**
-- final verified retention: **100% for every method**
-- unsafe accepted reductions: **0 for every method**
+- final examples: **256**
+- methods audited: **8**
+- checker parity with frozen v0.0.34: **100%**
+- verified retention: **100% for every method**
+- unsafe accepted reductions: **0**
+- no-compression solve + verify baseline: **2047.99 arithmetic events on average**
+- fraction of examples with successful-path lower-bound ratio >= 1: **100% for every method**
 - `KEEP = true`
 
-Learned MLP:
+Selected methods:
 
-- threshold: **0.40**
-- final proposal precision: **91.04%**
-- recall: **94.27%**
-- F1: **92.63%**
-- mean solver ops after certified compression: **442.23**
-- mean solver savings vs full baseline: **1529.42**
+| Method | Final solver ops | Final solver savings | Successful materializations | Mean lower-bound / baseline |
+|---|---:|---:|---:|---:|
+| learned MLP | 442.23 | 1529.42 | 8.49 | **4.62x** |
+| target-leaf | **325.13** | **1646.52** | 8.68 | **4.50x** |
+| Markowitz | 387.31 | 1584.34 | 8.96 | **4.68x** |
 
-Best deterministic proposal F1 among the pre-registered heuristics:
-
-**Markowitz**
-
-- proposal F1: **77.86%**
-- mean solver ops: **387.31**
-- retained-dimension MAE: **4.09**
-- exact reference-retained-dimension match: **35.94%**
-
-Highest downstream solver savings:
-
-**Target-leaf heuristic**
-
-- proposal F1: **74.00%**
-- mean solver ops: **325.13**
-- mean solver savings: **1646.52**
-
-The full-system baseline averaged **1971.66 solver arithmetic operations**.
+The final retained solve is cheap. The current path used to obtain and certify that retained problem is not.
 
 ### Central negative result
 
-The learned scorer is best at reproducing the generator's dependency-reference labels.
+> **Per-candidate exact rematerialization destroys the measured solver savings on this benchmark.**
 
-It is **not** best at the actual downstream objective of reducing verified solver work.
+This is a failure of the current certification runtime architecture, not evidence against Structural Compression itself.
 
-Therefore:
+The evidence now separates three layers:
 
-> **better oracle-rule classification does not imply better Structural Compression.**
+1. **Compression potential:** v0.0.32 showed large solver-work reductions when the correct reduced structure is available.
+2. **Proposal capability:** v0.0.33–v0.0.34 showed that learned and deterministic scorers can safely find useful reductions.
+3. **Certification economics:** v0.0.35 showed that re-solving after every tentative reduction overwhelms those gains.
 
-This shifts NEUMANN's next target from candidate-label imitation to **Compression Utility / Value-of-Reduction**.
+The next milestone therefore does **not** train a larger utility model yet.
 
-The next system should treat:
-
-- validity,
-- computational utility,
-- stopping / minimality
-
-as separate primitives.
-
-Simple deterministic structural heuristics are now first-class baselines/components rather than merely controls.
+It must first test a bounded certification architecture that preserves exact reconstruction and original-problem verification while deleting repeated full reduced-system solves from the proposal inner loop.
 
 See:
 - `docs/research/structural_compression_thesis.md`
 - `docs/experiments/v0.0.32.md`
 - `docs/experiments/v0.0.33.md`
 - `docs/experiments/v0.0.34.md`
+- `docs/experiments/v0.0.35.md`
 
 ### Frozen enabling results
+
+**v0.0.34**
+
+- removed the oracle `n-k` proposal budget from final inference
+- learned proposal F1: **92.63%**
+- target-leaf final solver ops: **325.13**
+- learned final solver ops: **442.23**
+- verified retention: **100%**
+- unsafe accepted reductions: **0**
+- central result: reference-rule accuracy did not predict downstream solver utility
 
 **v0.0.33**
 
