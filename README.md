@@ -55,25 +55,22 @@ See:
 
 ## Current engineering baseline
 
-**v0.0.38.1 — Mixed Local + Coupled Harder-Family Gate**
+**v0.0.40 — Coupled-Block Discovery / Routing Gauntlet**
 
-v0.0.38.1 repaired the failed bridge from v0.0.38 without changing the
-pre-registered H1-H5 hardness thresholds.
+v0.0.40 moved from family design to actual structure discovery on a fresh
+256-system audit set.
 
-The new family mixes:
+No learned block model was trained.
 
-1. easy one-row leaves the frozen local pipeline can safely remove, and
-2. exact coupled 2x2 blocks that remain after local compression saturates.
+The validated v0.0.38.1 mixed family was held fixed:
 
-For active systems with n-k >= 4:
+- easy local one-row leaves,
+- coupled exact 2x2 blocks,
+- generic variable names,
+- row/column permutation,
+- exact original-problem verification.
 
-    exactly 2 easy leaves
-        +
-    remaining derived variables in coupled 2x2 blocks
-
-The smallest active n-k=2 cell remains pure coupled.
-
-Frozen local pipeline:
+The frozen local pipeline remained:
 
     target-leaf @ 0.10
         ↓
@@ -83,11 +80,120 @@ Frozen local pipeline:
         ↓
     deterministic checker
 
-Exact reference:
+v0.0.40 then compared deterministic routing/discovery variants.
 
-    validated easy-leaf rules
+### Result
+
+The selected method under the pre-registered tie-break was:
+
+    D4 = incidence router + row/target component graph
+
+It achieved:
+
+- solver-savings recovery: **100%**
+- elimination recovery: **100%**
+- block precision: **100%**
+- block recall: **100%**
+- block F1: **100%**
+- verified retention: **100%**
+- unsafe reductions: **0**
+
+Decision:
+
+    KEEP_DETERMINISTIC_DISCOVERY
+
+Therefore a learned block scorer is **not justified** on this family.
+
+### Performance-equivalent deterministic winners
+
+D2, D3, and D4 all recovered the full measured verified compression value.
+
+D2:
+
+    incidence router
         +
-    validated exact 2x2 block rules
+    exact candidate-overlap block discovery
+
+D3:
+
+    incidence router
+        +
+    sparse shared-unit block discovery
+
+D4:
+
+    incidence router
+        +
+    2-row / 2-target component graph
+
+All three reached:
+
+    100% solver-savings recovery
+    100% elimination recovery
+    100% block recall
+    100% verified retention
+
+D4 is the formal winner only because the frozen tie-break counted fewer
+row-pair examinations.
+
+That does not prove D4 has lower total discovery cost, because D4 instead
+examines graph edges and unlike cost units are intentionally kept separate.
+
+### Most important finding: routing before discovery
+
+D1 used the old local-first pipeline before exact block discovery.
+
+It still achieved:
+
+- solver-savings recovery: **98.20%**
+- elimination recovery: **95.02%**
+
+but block recall dropped to:
+
+    86.46%
+
+because the local stage consumed coupled targets before block discovery.
+
+Average coupled targets consumed locally:
+
+    D1 = 0.7109
+    D2 = 0
+
+After adding a trivial incidence router:
+
+    target incidence == 1
+        -> local path
+
+    target incidence > 1
+        -> reserve for multi-row path
+
+block recall became:
+
+    100%
+
+with easy-leaf routing precision/recall also:
+
+    100% / 100%
+
+So the current structural lesson is not "use a better block scorer."
+
+It is:
+
+    route structural degrees of freedom correctly
+        before
+    consuming them with local reductions.
+
+### Current validated architecture on this family
+
+    raw exact system
+        ↓
+    incidence-aware structural router
+        ├── local one-row path
+        └── multi-row reserved path
+        ↓
+    deterministic block discovery
+        ↓
+    exact independent algebra checker
         ↓
     exact retained solve
         ↓
@@ -95,94 +201,28 @@ Exact reference:
         ↓
     original full-system verification
 
-Data:
+### Saturation boundary
 
-- **256 final systems**
-- **224 active systems**
-- **192 mixed active systems**
-- **32 controls**
-- candidate-count contract: **100%**
-- verified retention: **100%** on both paths
-- unsafe reductions: **0**
-- `KEEP = true`
+This mixed 2x2 family is now saturated by cheap deterministic structure.
 
-### Harder-family gate result
+Do not train a block-discovery neural model on it.
 
-Frozen one-row pipeline:
+The next research family must remove at least one shortcut:
 
-- easy-leaf recovery: **100%**
-- total elimination recovery: **25.43%**
-- solver-savings recovery: **33.53%**
-- active-example progress rate: **88.84%**
+- fixed +/-1 coupled coefficients,
+- clean two-row/two-target connected components,
+- absence of distractor overlaps,
+- absence of cross-block dependencies,
+- single block size,
+- incidence-perfect routing.
 
-Exact mixed reference:
-
-- retained-dimension error: **0**
-- broad retained-dimension gap: **7 / 7 active cells**
-
-Pre-registered H1-H5:
-
-    H1  PASS
-    H2  PASS
-    H3  PASS
-    H4  PASS
-    H5  PASS
-
-Therefore:
-
-    HARDER_FAMILY_VALIDATED
-
-### Why this matters
-
-The local pipeline is no longer failing because the benchmark hides local
-structure.
-
-It recovers every declared easy leaf.
-
-Yet after that verified local progress, most of the useful compression remains
-in multi-row coupled structure.
-
-This gives NEUMANN a clean two-stage testbed:
-
-    local structural compression works
-        ↓
-    local primitive saturates
-        ↓
-    nonlocal / multi-row headroom remains
-
-That is the condition required before testing structural discovery.
-
-### Next canonical experiment
-
-Do not redesign this family again and do not increase residual neural capacity.
-
-The next canonical experiment is:
-
-    v0.0.40
-        = Coupled-Block Discovery / Routing Gauntlet
-
-It must compare:
-
-1. deterministic exact 2x2 algebraic enumeration,
-2. sparse row-pair / target-pair heuristics,
-3. graph / connected-component pairing,
-4. a smallest-adequate learned block scorer only if cheaper discovery methods
-   leave pre-registered verified downstream headroom.
-
-The optimization target remains:
-
-    verified downstream solver work
-
-not generator block-label imitation.
-
-The separately open v0.0.39 pure-coupled replication may provide secondary
-parser-visibility evidence, but it does not replace the canonical mixed-family
-path.
+Only if deterministic methods leave pre-registered verified downstream
+headroom should learned structural discovery be reconsidered.
 
 See:
 
-- `docs/experiments/v0.0.38.md`
 - `docs/experiments/v0.0.38.1.md`
+- `docs/experiments/v0.0.40.md`
 
 ### Frozen enabling results
 
