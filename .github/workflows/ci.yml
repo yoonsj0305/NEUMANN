@@ -77,6 +77,8 @@ jobs:
         run: python benchmark_v037_smoke.py
       - name: Coupled-block harder-family contract smoke
         run: python benchmark_v038_smoke.py
+      - name: Coupled-block fresh hardness replication
+        run: python benchmark_v039.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .
