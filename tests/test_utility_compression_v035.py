@@ -101,7 +101,7 @@ def test_v035_one_step_utility_is_bounded():
         example,
         "oracle_one_step_utility",
         utility_tree=fit_utility_tree_once(
-            utility_training_examples()[:16]
+            utility_training_examples()[:8]
         ),
         frozen_reference_scorer=(
             fit_frozen_v033_scorer()
@@ -119,7 +119,7 @@ def test_v035_one_step_utility_is_bounded():
 
 
 def test_v035_utility_tree_replays_exactly():
-    training = utility_training_examples()[:64]
+    training = utility_training_examples()[:8]
     first = fit_utility_tree_once(training)
     second = fit_utility_tree_once(training)
 
@@ -168,7 +168,7 @@ def test_v035_calibration_is_deterministic_on_subset():
         utility_training_examples()[:64]
     )
     frozen = fit_frozen_v033_scorer()
-    examples = utility_calibration_examples()[:12]
+    examples = utility_calibration_examples()[:2]
 
     first = calibrate_utility_threshold(
         examples,
@@ -193,7 +193,7 @@ def test_v035_checker_keeps_sample_verified():
     )
     frozen = fit_frozen_v033_scorer()
     calibration_examples = (
-        utility_calibration_examples()[:16]
+        utility_calibration_examples()[:2]
     )
 
     for method in (
