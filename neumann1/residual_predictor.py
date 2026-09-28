@@ -82,6 +82,7 @@ class ResidualPolicyObservation:
     invalid_trials: int
     nonpositive_trials: int
     successful_trial_solver_ops: int
+    candidates_scored: int
     degraded_mode: bool
     final_verified: bool
     nonpositive_accepted_count: int
@@ -836,6 +837,7 @@ def run_bounded_residual_policy(
     invalid_trials = 0
     nonpositive_trials = 0
     successful_trial_solver_ops = 0
+    candidates_scored = 0
     nonpositive_accepted_count = 0
     degraded_mode = False
 
@@ -846,6 +848,8 @@ def run_bounded_residual_policy(
         )
         if not feasible:
             break
+
+        candidates_scored += len(feasible)
 
         try:
             ranked = _policy_scores(
@@ -932,6 +936,7 @@ def run_bounded_residual_policy(
         successful_trial_solver_ops=(
             successful_trial_solver_ops
         ),
+        candidates_scored=candidates_scored,
         degraded_mode=degraded_mode,
         final_verified=verified,
         nonpositive_accepted_count=(
@@ -1148,6 +1153,17 @@ def aggregate_policy_against_teacher(
         "mean_successful_trial_solver_ops": mean(
             row.successful_trial_solver_ops
             for row in policy
+        ),
+        "mean_candidates_scored": mean(
+            row.candidates_scored
+            for row in policy
+        ),
+        "mean_weighted_sum_proxy": (
+            mean(
+                row.candidates_scored
+                for row in policy
+            )
+            * weighted_sum_terms_per_candidate
         ),
         "verified_retention": (
             verified_retention
