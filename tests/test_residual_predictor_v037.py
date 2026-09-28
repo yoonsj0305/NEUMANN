@@ -143,8 +143,13 @@ def test_v037_features_do_not_use_core_dimension_metadata():
 
 def test_v037_teacher_targets_are_bounded_and_nontrivial():
     frozen = fit_frozen_v033_scorer()
+    representative = (
+        v037_train_examples()[
+            ::V037_TRAIN_EXAMPLES_PER_CELL
+        ]
+    )
     X, y = build_teacher_training_matrix(
-        v037_train_examples()[:4],
+        representative,
         frozen_scorer=frozen,
     )
 
