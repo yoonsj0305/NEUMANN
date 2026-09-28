@@ -55,6 +55,16 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.45 — Exact Schur cost audit (research only)**
+
+On 224 fresh exact systems, an experimental deterministic F2 repaired both
+v0.0.44 structural gaps: all 96 high-incidence systems matched the full
+oracle, and all 96 dense systems admitted an exact two-variable Schur
+elimination. Yet measured full-path execution was slower than frozen F1:
+paired median ratios 1.060 and 1.487. F2 is kept as a research baseline,
+not promoted as a performance upgrade. See `docs/experiments/v0.0.45.md`
+and run `python benchmark_v045_smoke.py` or `python benchmark_v045.py`.
+
 **v0.0.44 — Adversarial structural boundary audit**
 
 The frozen indexed method was challenged with two fresh generated families.
