@@ -29,9 +29,6 @@ from neumann1.residual_predictor_dataset import (
 from neumann1.stopping_gauntlet import (
     fit_frozen_v033_scorer,
 )
-from neumann1.structural_compression import (
-    solve_exact_gauss_jordan,
-)
 from neumann1.learned_compression import (
     enumerate_affine_candidates,
 )
@@ -124,13 +121,6 @@ def test_v037_features_do_not_use_core_dimension_metadata():
     )
     assert feasible
 
-    _, baseline_counts = solve_exact_gauss_jordan(
-        example.full_system
-    )
-    _, shadow_baseline_counts = solve_exact_gauss_jordan(
-        shadow.full_system
-    )
-
     candidate = feasible[0]
     original_features = residual_state_features(
         example,
@@ -138,9 +128,6 @@ def test_v037_features_do_not_use_core_dimension_metadata():
         initial.materialized,
         candidate,
         feasible,
-        baseline_solver_ops=(
-            baseline_counts.arithmetic_ops
-        ),
     )
     shadow_features = residual_state_features(
         shadow,
@@ -148,9 +135,6 @@ def test_v037_features_do_not_use_core_dimension_metadata():
         shadow_initial.materialized,
         candidate,
         feasible,
-        baseline_solver_ops=(
-            shadow_baseline_counts.arithmetic_ops
-        ),
     )
 
     assert len(original_features) == 28
