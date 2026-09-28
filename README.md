@@ -57,71 +57,99 @@ See:
 
 **v0.0.38 — Coupled-Block Harder Structural Family Gate**
 
-v0.0.38 introduced exact two-row / two-target coupled blocks while keeping the
-frozen v0.0.37 one-row pipeline unchanged.
+v0.0.38 introduced exact two-row / two-target coupled compression after the
+original affine family became saturated by local heuristics.
 
-Canonical full run **171**:
+New motif:
 
-- systems: **256**
+    y + z = f(core)
+    y - z = g(core)
+
+The frozen v0.0.37 local pipeline was carried forward unchanged:
+
+    target-leaf @ 0.10
+        ↓
+    deterministic checker
+        ↓
+    Markowitz residual @ 0.05
+        ↓
+    deterministic checker
+
+The new 2x2 block checker uses exact Fraction arithmetic, re-derives the
+reconstruction algebra from the original rows, and verifies the reconstructed
+answer against the original full system.
+
+Data:
+
+- **256 final systems**
+- **224 active systems**
+- **32 no-compression controls**
 - verified retention: **100%** on both paths
 - unsafe reductions: **0**
-- block-oracle retained-dimension error: **0**
-- one-row elimination recovery: **7.35%**
-- one-row solver-savings recovery: **11.52%**
-- one-row active progress rate: **56.25%**
-- broad hard cells: **7 / 7**
 - `KEEP = true`
 
-Pre-registered result:
+### Measured result
 
-    H1 PASS
-    H2 PASS
-    H3 PASS
-    H4 FAIL
-    H5 PASS
+Exact block oracle:
+
+- retained-dimension error: **0**
+- broad retained-dimension gap: **7 / 7 active cells**
+
+Frozen one-row pipeline:
+
+- elimination recovery: **7.35%**
+- solver-savings recovery: **11.52%**
+- active-example accepted-progress rate: **56.25%**
+
+Pre-registered gate result:
+
+    H1  PASS
+    H2  PASS
+    H3  PASS
+    H4  FAIL
+    H5  PASS
 
 Therefore:
 
     FAMILY_NOT_HARD_ENOUGH
 
-The exact 2x2 block primitive is retained, but the pure-coupled generator is
-not accepted as the next discovery benchmark.
+### What failed
 
-### Why H4 stays unchanged
+The old parser was **not blind**. Every active cell exposed the expected local
+one-row candidates.
 
-One-row candidates are visible in every active cell. The issue is deeper:
-independent one-row removal usually cannot remain globally sufficient because a
-coupled target also appears in its partner row.
+The issue is deeper: the frozen one-row materializer cannot substitute an
+eliminated target into its coupled partner row. Most locally valid one-row
+identities therefore cannot become globally sufficient reductions and are
+correctly rejected by original-problem verification.
 
-Rather than weaken H4 from "safe real progress" to mere candidate visibility,
-NEUMANN keeps the stronger requirement.
+This is a primitive-completeness boundary, not a parser failure.
+
+### What remains valid
+
+The exact 2x2 block primitive safely reached the declared core across all active
+cells with 100% original-problem verification and zero unsafe block reductions.
+
+So the multi-row primitive is retained.
+
+The pure-coupled generator is not.
 
 ### Next research move
 
-    v0.0.38.1 — Mixed Local + Coupled Harder-Family Gate
+Do **not** relax H4 after seeing the result.
 
-For `n-k >= 4`:
+Do **not** retune the frozen local thresholds or train a block scorer yet.
 
-    2 easy one-row leaves
-        +
-    remaining derived variables in coupled 2x2 blocks
+The next gate is:
 
-For `n-k = 2`:
+    v0.0.38.1
+        = Mixed Local + Coupled Harder-Family Gate
 
-    1 pure coupled block
+It will add easy one-row leaves alongside coupled blocks so the old pipeline
+makes genuine measurable progress before saturating, while multi-row headroom
+still remains.
 
-This should force the desired sequence:
-
-    old cheap pipeline makes real verified progress
-        ↓
-    old primitive saturates
-        ↓
-    multi-row block structure remains
-
-The same H1-H5 thresholds, frozen target-leaf @ 0.10, frozen Markowitz @ 0.05,
-and exact block checker are reused unchanged on a new audit set.
-
-No learned model is introduced until that gate passes.
+The original H1-H5 thresholds stay unchanged.
 
 See:
 
