@@ -55,26 +55,24 @@ See:
 
 ## Current engineering baseline
 
-**v0.0.35 — Compression Utility / Value-of-Reduction Oracle**
+**v0.0.36 — Cheap-First Residual Headroom**
 
-v0.0.35 replaces generator-reference imitation as the primary optimization target with measured downstream solver-work utility:
+v0.0.36 tests whether any learned residual policy is worth building **after** the strongest cheap structural component has already run.
 
-    VoR(c | R)
-        = solver_ops(R) - solver_ops(R ∪ {c})
+The frozen cheap component is:
 
-It separates:
+    target-leaf @ threshold 0.10
+        ↓
+    deterministic checker
 
-- validity,
-- computational utility,
-- stopping,
+The residual teacher begins only from the actually certified target-leaf state and may not undo those accepted reductions.
 
-while keeping every learned or heuristic proposal advisory under the deterministic checker.
+The untouched audit set contains:
 
-The experiment used a new split disjoint from every v0.0.33/v0.0.34 signature:
-
-- calibration: **192 systems**
-- final: **256 systems**
-- verified retention: **100% for every method**
+- **256 systems**
+- **8 scale cells × 32 systems**
+- signatures disjoint from all v0.0.33–v0.0.35 data
+- verified retention: **100%**
 - unsafe accepted reductions: **0**
 - `KEEP = true`
 
@@ -82,83 +80,95 @@ The experiment used a new split disjoint from every v0.0.33/v0.0.34 signature:
 
 Full-system baseline:
 
-- mean solver ops: **1960.09**
+- mean solver ops: **1928.96**
 
-Dynamic greedy marginal-utility teacher:
+Frozen target-leaf:
 
-- mean solver ops: **161.50**
-- mean solver savings: **1798.60**
-- mean accepted eliminations: **11.07**
-- mean retained dimension: **3.93**
-- mean trial materializations: **277.21**
+- mean solver ops: **202.32**
+- mean solver savings: **1726.64**
+- mean accepted reductions: **9.59**
 
-Strongest cheap deterministic baseline, **target-leaf**:
+Empty-start dynamic greedy utility:
 
-- mean solver ops: **210.37**
-- mean solver savings: **1749.73**
-- dynamic-vs-target solver-savings delta: **+48.87**
-- target-leaf recovered **97.28%** of dynamic greedy solver savings
+- mean solver ops: **144.63**
+- mean solver savings: **1784.34**
+- mean trial materializations: **282.79**
 
-Other key results:
+Cheap-first residual dynamic utility:
 
-- Markowitz: **244.03 mean solver ops**
-- utility-calibrated frozen learned-reference MLP: **384.51**
-- static isolated utility: **780.02**
+- mean solver ops: **47.24**
+- mean total solver savings: **1881.72**
+- mean residual additions: **2.60 reductions**
+- mean residual trial materializations: **29.45**
 
-Dynamic state-aware utility beat static isolated utility by:
+Thus the hybrid reduced the solver work remaining after target-leaf by approximately **76.65%**.
 
-- **+618.52 mean solver savings**
+It also reduced retained-system solver work by approximately **67.34%** relative to the empty-start dynamic greedy teacher.
 
-The interaction gap grew strongly with apparent dimension. At `n=32` it reached:
+### Pre-registered continuation gates
 
-- `k=2`: **2094.75**
-- `k=4`: **1821.13**
+All three gates passed:
 
-Therefore:
+| Gate | Measured | Required |
+|---|---:|---:|
+| residual headroom recovery | **268.78%** | ≥50% |
+| positive residual rate | **55.47%** | ≥25% |
+| teacher materialization reduction | **89.58%** | ≥50% |
 
-> **Value-of-Reduction is strongly state-dependent on this benchmark family.**
+Decision:
 
-A candidate that looks useful in isolation is not an adequate substitute for evaluating its marginal value after earlier reductions.
+    PROCEED_LEARNED_RESIDUAL
 
-### Teacher-search cost boundary
-
-The dynamic oracle is intentionally **not** a deployable inference policy.
-
-Its successful trial materializations alone consumed on average:
-
-- **104,298.70 trial solver ops per example**
-
-That is about **53.2×** the original full-system solver-work baseline, before counting partial work from failed materializations.
-
-The full v0.0.35 benchmark took approximately **618.9 s** on the first GitHub Actions run.
-
-Therefore the result supports a teacher/distillation role only, not end-to-end efficiency.
+The recovery ratio exceeds 100% because the cheap-first hybrid reaches a lower solver-work state than empty-start greedy utility. This is a **path-dependence result**, not evidence of global optimality.
 
 ### Architecture consequence
 
-The cheapest mechanism already captures most of the downstream value:
+The measured architecture is now:
 
-    target-leaf
-        -> deterministic checker
-        -> ~97.3% of dynamic teacher savings
-
-The next research step should therefore not replace target-leaf wholesale with a larger learned policy.
-
-The preferred sequence is:
-
-    cheap deterministic compression
+    cheap structural prior
         ↓
-    residual state-aware utility only where value remains
+    certified compression
+        ↓
+    state-aware residual policy
         ↓
     deterministic checker
         ↓
-    exact execution + original-problem verification
+    exact execution
+        ↓
+    original-problem verification
 
-This makes the next target **residual Value-of-Reduction**, with learned residual prediction considered only after the cheap-first residual contract is measured.
+This is materially different from either:
+
+- pure learned compression, or
+- expensive utility search from the raw problem.
+
+A cheap deterministic prior changes the search trajectory and sharply reduces the state space explored by the residual utility stage.
+
+Teacher-search work also fell sharply:
+
+- full dynamic successful-trial solver ops: **103,621.68**
+- residual successful-trial solver ops: **1,073.43**
+
+This is approximately a **98.96% reduction** in that measured teacher-work component.
+
+This still does **not** establish end-to-end total-compute superiority because invalid-materialization partial work and other deterministic overhead are not fully instrumented.
+
+### Scale structure
+
+Residual value is strongly heterogeneous.
+
+At apparent dimension `n=32`:
+
+- `k=2`: positive residual rate **96.875%**
+- `k=4`: positive residual rate **100%**
+
+At smaller cells residual value can be sparse.
+
+Therefore v0.0.37 should build the **smallest adequate state-aware residual predictor**, while keeping cheap residual heuristics and an activation/router possibility as mandatory baselines rather than assuming a universal neural policy.
 
 See:
-- `docs/experiments/v0.0.34.md`
 - `docs/experiments/v0.0.35.md`
+- `docs/experiments/v0.0.36.md`
 
 ### Frozen enabling results
 
