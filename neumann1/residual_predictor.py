@@ -590,6 +590,10 @@ def fit_residual_models(
         tuple(examples),
         frozen_scorer=frozen_scorer,
     )
+    if not np.any(y > 0.0):
+        raise ValueError(
+            "training corpus contains no positive residual utility"
+        )
 
     ridge = Pipeline(
         [
