@@ -28,11 +28,6 @@ from .residual_headroom import (
 from .stopping_gauntlet import (
     FrozenV033Scorer,
 )
-from .structural_compression import (
-    solve_exact_gauss_jordan,
-)
-
-
 STATIC_FEATURE_DIMENSION = 16
 STATE_FEATURE_DIMENSION = 12
 RESIDUAL_FEATURE_DIMENSION = (
