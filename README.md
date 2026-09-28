@@ -57,28 +57,21 @@ See:
 
 **v0.0.36 — Cheap-First Residual Headroom**
 
-v0.0.36 tests whether a strong cheap structural prior should run before any expensive or learned residual policy.
+v0.0.36 tests whether any learned residual policy is worth building **after** the strongest cheap structural component has already run.
 
-Frozen first stage:
+The frozen cheap component is:
 
     target-leaf @ threshold 0.10
-        -> deterministic checker
+        ↓
+    deterministic checker
 
-Residual stage:
+The residual teacher begins only from the actually certified target-leaf state and may not undo those accepted reductions.
 
-    certified cheap-first state
-        -> state-aware marginal-utility search
-        -> deterministic checker
-        -> exact retained solve
-        -> reconstruct
-        -> verify ORIGINAL full problem
+The untouched audit set contains:
 
-The experiment used a new untouched **256-system** audit set disjoint from every v0.0.33-v0.0.35 signature.
-
-Contract status:
-
-- core pytest: **189 passed, 1 skipped**
-- sequence lane: **PASS**
+- **256 systems**
+- **8 scale cells × 32 systems**
+- signatures disjoint from all v0.0.33–v0.0.35 data
 - verified retention: **100%**
 - unsafe accepted reductions: **0**
 - `KEEP = true`
@@ -93,6 +86,7 @@ Frozen target-leaf:
 
 - mean solver ops: **202.32**
 - mean solver savings: **1726.64**
+- mean accepted reductions: **9.59**
 
 Empty-start dynamic greedy utility:
 
@@ -104,51 +98,73 @@ Cheap-first residual dynamic utility:
 
 - mean solver ops: **47.24**
 - mean total solver savings: **1881.72**
-- mean residual additions: **2.60**
-- mean trial materializations: **29.45**
+- mean residual additions: **2.60 reductions**
+- mean residual trial materializations: **29.45**
 
-Thus the cheap-first residual path reduced remaining solver work by approximately:
+Thus the hybrid reduced the solver work remaining after target-leaf by approximately **76.65%**.
 
-- **76.65% vs target-leaf alone**
-- **67.34% vs empty-start dynamic greedy**
+It also reduced retained-system solver work by approximately **67.34%** relative to the empty-start dynamic greedy teacher.
 
-while reducing teacher trial materializations by approximately **89.58%**.
+### Pre-registered continuation gates
 
-### Continuation gate
+All three gates passed:
 
-All three pre-registered continuation criteria passed:
-
-- residual headroom recovery: **268.78%** >= 50%
-- examples with positive residual gain: **55.47%** >= 25%
-- teacher materialization reduction: **89.58%** >= 50%
+| Gate | Measured | Required |
+|---|---:|---:|
+| residual headroom recovery | **268.78%** | ≥50% |
+| positive residual rate | **55.47%** | ≥25% |
+| teacher materialization reduction | **89.58%** | ≥50% |
 
 Decision:
 
     PROCEED_LEARNED_RESIDUAL
 
-The headroom-recovery ratio exceeds 100% because the cheap-first residual path beat the empty-start greedy teacher. This is evidence of **path dependence**, not global optimality.
+The recovery ratio exceeds 100% because the cheap-first hybrid reaches a lower solver-work state than empty-start greedy utility. This is a **path-dependence result**, not evidence of global optimality.
 
 ### Architecture consequence
 
-The current strongest architecture on this benchmark family is:
+The measured architecture is now:
 
-    cheap deterministic structural prior
+    cheap structural prior
         ↓
     certified compression
         ↓
     state-aware residual policy
         ↓
-    deterministic authority
+    deterministic checker
         ↓
-    exact execution + original-problem verification
+    exact execution
+        ↓
+    original-problem verification
 
-This is stronger than starting expensive utility search from the raw system.
+This is materially different from either:
 
-Residual value is also highly scale-dependent. On the `n=32` cells, positive residual gain occurred in **96.875%** of `k=2` cases and **100%** of `k=4` cases, while several small cells had sparse residual value.
+- pure learned compression, or
+- expensive utility search from the raw problem.
 
-Therefore the next experiment may include a cheap residual activation/router, but any router must be evaluated on new data rather than fitted and confirmed on v0.0.36 final systems.
+A cheap deterministic prior changes the search trajectory and sharply reduces the state space explored by the residual utility stage.
 
-The next milestone is a **smallest-adequate state-aware residual predictor**, compared against cheap deterministic residual baselines and the exact residual teacher. Learned complexity is retained only if it recovers value the cheap residual heuristics do not.
+Teacher-search work also fell sharply:
+
+- full dynamic successful-trial solver ops: **103,621.68**
+- residual successful-trial solver ops: **1,073.43**
+
+This is approximately a **98.96% reduction** in that measured teacher-work component.
+
+This still does **not** establish end-to-end total-compute superiority because invalid-materialization partial work and other deterministic overhead are not fully instrumented.
+
+### Scale structure
+
+Residual value is strongly heterogeneous.
+
+At apparent dimension `n=32`:
+
+- `k=2`: positive residual rate **96.875%**
+- `k=4`: positive residual rate **100%**
+
+At smaller cells residual value can be sparse.
+
+Therefore v0.0.37 should build the **smallest adequate state-aware residual predictor**, while keeping cheap residual heuristics and an activation/router possibility as mandatory baselines rather than assuming a universal neural policy.
 
 See:
 - `docs/experiments/v0.0.35.md`
