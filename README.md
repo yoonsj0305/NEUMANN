@@ -55,6 +55,15 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.47 — Row-overlap boundary (contract only)**
+
+F3's exact two-row support-pair candidates cannot overlap one row in a
+nonsingular square residual: four target columns would occupy only three
+rows. The [contract and audit](docs/experiments/v0.0.47.md) checks singular
+overlap, full-rank repair, and disjoint controls on 384 fresh integer
+matrices. This is not a new learned model or a performance improvement.
+Run `python benchmark_v047_smoke.py` for a small contract check.
+
 **v0.0.46 — Cached exact candidates and dense abstention (research)**
 
 An incremental candidate cache preserves v0.0.45's exact high-incidence
