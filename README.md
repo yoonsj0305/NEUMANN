@@ -55,102 +55,131 @@ See:
 
 ## Current engineering baseline
 
-**v0.0.33 — Learned Structural Compression Proposal**
+**v0.0.34 — Structural Baseline Gauntlet + Confidence Stopping**
 
-v0.0.32 established that an oracle dependency certificate could reduce the retained solver dimension from apparent n to independent core k and substantially alter the solver-work curve.
+v0.0.34 removes the v0.0.33 oracle-cardinality scaffold.
 
-v0.0.33 asks whether a small learned proposer can recover part of that oracle compression without holding execution authority.
+Final inference receives neither (k) nor (n-k).
 
-The new corpus removes the obvious v0.0.32 role cues:
+Each method uses one global threshold calibrated on a disjoint 192-example calibration set, then runs unchanged on 256 final examples.
 
-- generic observed variable names
-- randomized variable order
-- randomized equation order
-- affine dependencies with offsets
-- chained dependencies
-- no fixed core/derived row blocks
+The frozen learned scorer remains:
 
-Learned path:
+- 16 features
+- 16 hidden units
+- 289 fitted weight+bias scalars
+- same v0.0.33 training corpus
 
-    full permuted system
-      -> fixed candidate enumerator
-      -> tiny learned candidate scorer
-      -> top-B proposals
-      -> deterministic reduction checker
-      -> safe retained subsystem
-      -> exact solver
+Pre-registered deterministic controls include:
+
+- random ranking
+- target-leaf
+- row-sparsity
+- sparsity + incidence
+- dependency contrast
+- Markowitz-style local fill
+- fixed structural combo
+
+All proposals remain advisory:
+
+    score
+      -> threshold stopping
+      -> deterministic checker
+      -> exact retained solve
       -> reconstruction
       -> verify ORIGINAL full problem
 
-Important scaffold:
+### Reproducibility freeze
 
-    B = n - k
+Cross-run numerical drift from refitting the sklearn MLP was detected before release and was not accepted.
 
-The model is told the oracle elimination cardinality. It predicts **which** reductions to attempt, not **how far** compression should continue.
+The release benchmark therefore does **not** refit the learned scorer. It loads the exact immutable float64 checkpoint in `neumann1/frozen_v033_checkpoint.py` and evaluates it through a fixed scalar inference path. The CI also pins the numerical stack for the remaining experiment suite.
 
-First measured final result:
+Final learned scorer SHA-256:
 
-- final examples: **256**
-- examples with compression opportunity: **224**
-- tiny MLP parameters: **289**
-- feature dimension: **16**
-- hidden width: **16**
-- verified retention: **100%**
-- unsafe accepted reductions: **0**
-- fail-closed rejected proposals: **1,209**
-- mean elimination-count recovery: **72.02%**
-- mean exact oracle-rule recovery: **71.98%**
-- mean oracle solver-savings recovery: **84.93%**
-- KEEP: **true**
+`f9c1dccd0bda28619cb74c6fd6e8a457cde96944cbe5bfa65c9665859da3cc69`
 
-At k=2,n=32:
+Two independent final-head runners reproduced the same fingerprint, threshold, calibration metrics, and final aggregates.
 
-    baseline solver ops ≈ 6121.4
-    oracle solver ops   = 15
-    learned solver ops  ≈ 1302.5
-    oracle savings recovered ≈ 78.89%
+### First measured result
 
-At k=4,n=32:
+- core pytest: **176 passed, 1 skipped**
+- sequence lane: **PASS**
+- final verified retention: **100% for every method**
+- unsafe accepted reductions: **0 for every method**
+- `KEEP = true`
 
-    baseline solver ops ≈ 6464.6
-    oracle solver ops   ≈ 95.8
-    learned solver ops  ≈ 1586.0
-    oracle savings recovered ≈ 76.20%
+Learned MLP:
 
-Learned elimination recovery declines with apparent dimension, reaching roughly **54%** at n=32. The learned discovery layer is therefore itself a scaling bottleneck.
+- threshold: **0.40**
+- final proposal precision: **91.04%**
+- recall: **94.27%**
+- F1: **92.63%**
+- mean solver ops after certified compression: **442.23**
+- mean solver savings vs full baseline: **1529.42**
 
-The result is deliberately narrow.
+Best deterministic proposal F1 among the pre-registered heuristics:
 
-It does **not** establish:
-- learned discovery of k
-- globally minimal structure
-- domain-general compression
-- natural-language compression
-- total-compute superiority
+**Markowitz**
 
-Two post-result diagnostic controls were added before merge:
+- proposal F1: **77.86%**
+- mean solver ops: **387.31**
+- retained-dimension MAE: **4.09**
+- exact reference-retained-dimension match: **35.94%**
 
-- deterministic random ranking: **24.40%** elimination recovery
-- simple sparsity + target-incidence heuristic: **61.55%**
-- learned MLP: **72.02%**
+Highest downstream solver savings:
 
-The learned scorer therefore exceeds this particular simple heuristic by about **10.46 percentage points**, while the heuristic itself remains strong. Because these controls were added after the primary result was observed, they are diagnostic rather than pre-registered evidence.
+**Target-leaf heuristic**
 
-The final-head learned result reproduced exactly across two independent GitHub Actions executions. The next falsification target is a pre-registered stronger heuristic suite plus removal of the oracle-cardinality budget.
+- proposal F1: **74.00%**
+- mean solver ops: **325.13**
+- mean solver savings: **1646.52**
+
+The full-system baseline averaged **1971.66 solver arithmetic operations**.
+
+### Central negative result
+
+The learned scorer is best at reproducing the generator's dependency-reference labels.
+
+It is **not** best at the actual downstream objective of reducing verified solver work.
+
+Therefore:
+
+> **better oracle-rule classification does not imply better Structural Compression.**
+
+This shifts NEUMANN's next target from candidate-label imitation to **Compression Utility / Value-of-Reduction**.
+
+The next system should treat:
+
+- validity,
+- computational utility,
+- stopping / minimality
+
+as separate primitives.
+
+Simple deterministic structural heuristics are now first-class baselines/components rather than merely controls.
 
 See:
 - `docs/research/structural_compression_thesis.md`
 - `docs/experiments/v0.0.32.md`
 - `docs/experiments/v0.0.33.md`
+- `docs/experiments/v0.0.34.md`
 
 ### Frozen enabling results
+
+**v0.0.33**
+
+- oracle-cardinality scaffold (B=n-k)
+- learned elimination recovery: **72.02%**
+- learned oracle solver-savings recovery: **84.93%**
+- verified retention: **100%**
+- unsafe accepted reductions: **0**
 
 **v0.0.32**
 
 - oracle Structural Compression benchmark
 - full-solution equivalence: **1.0**
-- baseline solver finite-range slope: about **2.03–2.14**
-- fixed-k oracle-compressed solver slope: about **0**
+- fixed-k oracle-compressed solver slope: approximately **0**
 - explicit certificate byte overhead retained as a negative result
 
 **v0.0.31**
@@ -158,10 +187,6 @@ See:
 - matched Direct / Structural Tiny Transformers: **75,538 parameters each**
 - Direct final verified coverage: **12.76%**
 - Structural final verified coverage: **100%**
-
-**v0.0.26–v0.0.30**
-
-Established representation reuse, learned-proposal accounting, authority separation, and direct-vs-structure controlled comparisons.
 
 ## Persistent privilege
 

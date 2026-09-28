@@ -276,3 +276,42 @@ __all__ += [
     "oracle_candidates", "check_scored_proposals",
     "observe_learned_compression", "aggregate_learned_observations",
 ]
+
+from .stopping_gauntlet_dataset import (
+    V034_CALIBRATION_EXAMPLES_PER_CELL,
+    V034_FINAL_EXAMPLES_PER_CELL,
+    v034_calibration_examples,
+    v034_final_examples,
+)
+from .stopping_gauntlet import (
+    METHODS, THRESHOLD_GRID, ThresholdCalibration,
+    StoppingObservation, FrozenV033Scorer,
+    fit_frozen_v033_scorer, fit_frozen_v033_scorer_once,
+    score_candidates,
+    calibrate_threshold, observe_stopping_method,
+    aggregate_stopping_observations,
+)
+__all__ += [
+    "V034_CALIBRATION_EXAMPLES_PER_CELL",
+    "V034_FINAL_EXAMPLES_PER_CELL",
+    "v034_calibration_examples", "v034_final_examples",
+    "METHODS", "THRESHOLD_GRID", "ThresholdCalibration",
+    "StoppingObservation", "FrozenV033Scorer",
+    "fit_frozen_v033_scorer", "fit_frozen_v033_scorer_once",
+    "score_candidates",
+    "calibrate_threshold", "observe_stopping_method",
+    "aggregate_stopping_observations",
+]
+
+from .frozen_v033_checkpoint import (
+    FROZEN_V033_CHECKPOINT_FORMAT,
+    FROZEN_V033_STATE_SHA256,
+    FrozenV033CheckpointProposer,
+    checkpoint_state_sha256,
+)
+__all__ += [
+    "FROZEN_V033_CHECKPOINT_FORMAT",
+    "FROZEN_V033_STATE_SHA256",
+    "FrozenV033CheckpointProposer",
+    "checkpoint_state_sha256",
+]
