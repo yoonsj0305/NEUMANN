@@ -55,120 +55,117 @@ See:
 
 ## Current engineering baseline
 
-**v0.0.36 — Cheap-First Residual Headroom**
+**v0.0.37 — Smallest Adequate State-Aware Residual Predictor**
 
-v0.0.36 tests whether any learned residual policy is worth building **after** the strongest cheap structural component has already run.
+v0.0.37 asked whether a learned residual policy is actually necessary after
+cheap certified structural compression.
 
-The frozen cheap component is:
+Frozen first stage:
 
-    target-leaf @ threshold 0.10
-        ↓
-    deterministic checker
+    target-leaf @ 0.10
+        -> deterministic checker
 
-The residual teacher begins only from the actually certified target-leaf state and may not undo those accepted reductions.
+Two learned residual models were tested:
 
-The untouched audit set contains:
+- Ridge: **23 fitted weight+bias scalars**
+- Tiny MLP: **193 fitted weight+bias scalars**, 8 hidden units
 
-- **256 systems**
-- **8 scale cells × 32 systems**
-- signatures disjoint from all v0.0.33–v0.0.35 data
-- verified retention: **100%**
+Training target:
+
+    exact marginal solver-work gain
+        / current solver work
+
+not generator dependency labels or teacher candidate identity.
+
+Data:
+
+- train: **96 systems**
+- validation: **64 systems**
+- final: **192 systems**
+- all splits disjoint from v0.0.33–v0.0.36 and from one another
+- final verified retention: **100% for every deployable method**
 - unsafe accepted reductions: **0**
 - `KEEP = true`
 
 ### First measured result
 
-Full-system baseline:
+Frozen target-leaf first stage on final:
 
-- mean solver ops: **1928.96**
+- mean solver ops: **209.41**
 
-Frozen target-leaf:
+Exact residual greedy teacher:
 
-- mean solver ops: **202.32**
-- mean solver savings: **1726.64**
-- mean accepted reductions: **9.59**
+- mean final solver ops: **53.21**
+- mean residual savings: **156.20**
+- mean trial materializations: **30.5**
 
-Empty-start dynamic greedy utility:
+Validation-selected Tiny MLP @ 0.10:
 
-- mean solver ops: **144.63**
-- mean solver savings: **1784.34**
-- mean trial materializations: **282.79**
+- final solver ops: **59.93**
+- residual savings: **149.48**
+- teacher-savings recovery: **95.70%**
+- mean attempted proposals: **2.49**
 
-Cheap-first residual dynamic utility:
+Validation-selected deterministic residual policy, **Markowitz @ 0.05**:
 
-- mean solver ops: **47.24**
-- mean total solver savings: **1881.72**
-- mean residual additions: **2.60 reductions**
-- mean residual trial materializations: **29.45**
+- final solver ops: **46.22**
+- residual savings: **163.18**
+- teacher-savings recovery: **104.47%**
+- mean attempted proposals: **8.56**
 
-Thus the hybrid reduced the solver work remaining after target-leaf by approximately **76.65%**.
+The learned model passed the absolute recovery gate but failed the pre-registered
+value-add gate:
 
-It also reduced retained-system solver work by approximately **67.34%** relative to the empty-start dynamic greedy teacher.
-
-### Pre-registered continuation gates
-
-All three gates passed:
-
-| Gate | Measured | Required |
-|---|---:|---:|
-| residual headroom recovery | **268.78%** | ≥50% |
-| positive residual rate | **55.47%** | ≥25% |
-| teacher materialization reduction | **89.58%** | ≥50% |
+    learned recovery                 = 95.70%   PASS
+    learned advantage vs Markowitz   = -8.77%   FAIL
 
 Decision:
 
-    PROCEED_LEARNED_RESIDUAL
-
-The recovery ratio exceeds 100% because the cheap-first hybrid reaches a lower solver-work state than empty-start greedy utility. This is a **path-dependence result**, not evidence of global optimality.
+    KEEP_DETERMINISTIC_RESIDUAL
 
 ### Architecture consequence
 
-The measured architecture is now:
+For this exact affine-linear family, the learned residual component is deleted.
 
-    cheap structural prior
-        ↓
-    certified compression
-        ↓
-    state-aware residual policy
+The current cheapest validated path is:
+
+    target-leaf @ 0.10
         ↓
     deterministic checker
         ↓
-    exact execution
+    residual Markowitz @ 0.05
+        ↓
+    deterministic checker
+        ↓
+    exact retained solve
+        ↓
+    reconstruction
         ↓
     original-problem verification
 
-This is materially different from either:
+The result also sharpens the teacher boundary.
 
-- pure learned compression, or
-- expensive utility search from the raw problem.
+Markowitz exceeded the one-step greedy teacher's residual savings on final data,
+so exact marginal-gain greedy search is **not** a global optimum. Structural
+search order is path-dependent.
 
-A cheap deterministic prior changes the search trajectory and sharply reduces the state space explored by the residual utility stage.
+Secondary final deterministic methods, reported descriptively only, reached
+slightly lower solver ops than Markowitz, but final data are not reused to
+reselect the primary policy.
 
-Teacher-search work also fell sharply:
+### Next research move
 
-- full dynamic successful-trial solver ops: **103,621.68**
-- residual successful-trial solver ops: **1,073.43**
+Do **not** increase neural capacity on this family.
 
-This is approximately a **98.96% reduction** in that measured teacher-work component.
-
-This still does **not** establish end-to-end total-compute superiority because invalid-materialization partial work and other deterministic overhead are not fully instrumented.
-
-### Scale structure
-
-Residual value is strongly heterogeneous.
-
-At apparent dimension `n=32`:
-
-- `k=2`: positive residual rate **96.875%**
-- `k=4`: positive residual rate **100%**
-
-At smaller cells residual value can be sparse.
-
-Therefore v0.0.37 should build the **smallest adequate state-aware residual predictor**, while keeping cheap residual heuristics and an activation/router possibility as mandatory baselines rather than assuming a universal neural policy.
+v0.0.38 should move to a harder structural family where cheap local sparsity and
+incidence heuristics are less aligned with downstream solver work, then test
+whether the frozen deterministic pair transfers.
 
 See:
+
 - `docs/experiments/v0.0.35.md`
 - `docs/experiments/v0.0.36.md`
+- `docs/experiments/v0.0.37.md`
 
 ### Frozen enabling results
 
