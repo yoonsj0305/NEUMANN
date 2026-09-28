@@ -57,91 +57,91 @@ See:
 
 **v0.0.37 — Smallest Adequate State-Aware Residual Predictor**
 
-v0.0.37 tested whether a learned residual policy is justified after the
-v0.0.36 cheap-first architecture.
+v0.0.37 asked whether a learned residual policy is still justified after the
+cheap-first Structural Compression path discovered in v0.0.36.
 
-The first stage remained frozen:
+Frozen first stage:
 
     target-leaf @ 0.10
         ↓
     deterministic checker
 
-The residual stage compared:
+The experiment then compared:
 
-- Ridge regression, 23 fitted weight+bias scalars
-- tiny MLP, 8 hidden units / 193 fitted weight+bias scalars
-- target-leaf residual
-- Markowitz residual
-- dependency-contrast residual
-- structural-combo residual
-- exact state-aware marginal-utility teacher
-
-The learned target was exact downstream marginal solver-work gain, not
-generator dependency identity.
+- Ridge residual regression,
+- an 8-hidden-unit state-aware MLP,
+- cheap residual structural heuristics,
+- an exact one-step greedy marginal-utility teacher.
 
 Data:
 
 - train: **96 systems**
 - validation: **64 systems**
-- untouched final: **192 systems**
-- all splits disjoint from v0.0.33-v0.0.36 and from one another
-- core pytest: **196 passed, 1 skipped**
-- verified retention: **100% for every deployable method**
+- final: **192 systems**
+- all splits disjoint from v0.0.33–v0.0.36 and from one another
+- final verified retention: **100% for every deployable method**
 - unsafe accepted reductions: **0**
 - `KEEP = true`
 
-### Validation-only selection
+### Learned result
 
-Selected learned residual:
+Validation selected the tiny MLP:
 
-    tiny MLP @ threshold 0.10
-    validation teacher-value recovery = 101.02%
+- state features: **22**
+- hidden units: **8**
+- fitted weight+bias scalars: **193**
+- threshold: **0.10**
 
-Selected deterministic residual:
+On untouched final data:
 
-    Markowitz @ threshold 0.05
-    validation teacher-value recovery = 103.91%
+- frozen target-leaf solver ops: **209.41**
+- exact one-step greedy teacher solver ops: **53.21**
+- tiny MLP solver ops: **59.93**
+- tiny MLP residual-value recovery: **95.70%**
 
-No final result participated in model or threshold selection.
+The learned model was therefore genuinely effective.
 
-### Untouched final result
+### But the learned component was deleted
 
-Frozen first-stage target-leaf:
+Validation selected a deterministic **Markowitz residual policy @ 0.05** under
+the pre-registered tie-break.
 
-- mean solver ops: **209.41**
+On untouched final data:
 
-Exact residual teacher:
+- Markowitz solver ops: **46.22**
+- Markowitz residual-value recovery vs greedy teacher: **104.47%**
+- mean attempted proposals: **8.56**
+- verified retention: **100%**
+- unsafe accepted reductions: **0**
 
-- mean final solver ops: **53.21**
-- mean residual additional savings: **156.20**
-
-Selected tiny MLP:
-
-- mean final solver ops: **59.93**
-- mean residual additional savings: **149.48**
-- teacher-value recovery: **95.70%**
-
-Selected Markowitz residual:
-
-- mean final solver ops: **46.22**
-- mean residual additional savings: **163.18**
-- teacher-value recovery: **104.47%**
-
-The learned policy passed the pre-registered 70% recovery gate, but failed the
-required value-add gate over the selected deterministic residual:
-
-    learned advantage fraction
-        = -8.77% of teacher residual value
-
-Decision:
+Pre-registered decision:
 
     KEEP_DETERMINISTIC_RESIDUAL
 
-The learned residual branch is therefore rejected for this family.
+The MLP passed the >=70% recovery gate but failed the requirement to beat the
+best deterministic residual policy by at least 10% of teacher residual value.
 
-### Architecture consequence
+Its measured learned advantage fraction was:
 
-The currently justified path is:
+    -8.77%
+
+Therefore the neural residual branch is not part of the current deployable
+architecture for this family.
+
+### Greedy teacher correction
+
+The exact marginal-utility teacher is now explicitly treated as a
+**one-step greedy teacher**, not an upper bound.
+
+Several deterministic orderings reached lower final solver work than the greedy
+trajectory. This is further evidence that Structural Compression is strongly
+path-dependent.
+
+Final data did **not** change the frozen primary choice. Markowitz remains the
+primary deterministic residual policy because it was selected on validation
+before the final set was opened.
+
+### Current affine-family architecture
 
     target-leaf @ 0.10
         ↓
@@ -155,38 +155,19 @@ The currently justified path is:
         ↓
     reconstruction
         ↓
-    verify ORIGINAL problem
+    original-problem verification
 
-This result is important because the tiny MLP did learn the residual objective
-well. It recovered about **95.7%** of the exact greedy teacher's final residual
-value.
+### Research consequence
 
-It is still unnecessary.
+Do not increase neural capacity on this affine-linear benchmark family.
 
-A cheaper deterministic structural rule performed better on the
-pre-registered primary comparison.
+The family is now too friendly to local sparse-elimination heuristics for more
+learned optimization to be justified.
 
-### Benchmark saturation warning
-
-On the untouched final set, dependency-contrast descriptively reached
-**44.81 mean solver ops**, slightly below the validation-selected Markowitz
-policy. It is not promoted to the primary winner because it was not selected by
-the validation protocol.
-
-Together with the repeated strength of target-leaf, Markowitz, and related
-heuristics, this indicates that the current affine-linear generator is becoming
-saturated by local structural rules.
-
-The next step is therefore **not** a larger neural residual model.
-
-The preferred v0.0.38 direction is a **Harder Structural Family Gate** with
-non-local compression motifs such as coupled multi-row dependencies,
-relation-level redundancy, equivalence/symmetry structure, and adversarial
-local-incidence decoys.
-
-A learned component may return only if it creates pre-registered downstream
-value beyond deterministic structural algorithms on an untouched harder
-family.
+The next Structural Compression experiment should move to a harder family with
+nonlocal interactions, symmetry/equivalent-state compression, long-range
+redundancy, or mixed-family routing, while preserving cheap structural methods
+as first-class baselines.
 
 See:
 - `docs/experiments/v0.0.35.md`
