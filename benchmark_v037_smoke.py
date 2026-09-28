@@ -8,6 +8,7 @@ from neumann1.residual_predictor import (
     fit_residual_models,
 )
 from neumann1.residual_predictor_dataset import (
+    V037_TRAIN_EXAMPLES_PER_CELL,
     v037_train_examples,
     v037_validation_examples,
 )
@@ -19,7 +20,7 @@ from neumann1.stopping_gauntlet import (
 def run():
     frozen = fit_frozen_v033_scorer()
     models = fit_residual_models(
-        v037_train_examples()[:4],
+        v037_train_examples()[::V037_TRAIN_EXAMPLES_PER_CELL],
         frozen_scorer=frozen,
     )
     examples = v037_validation_examples()[:2]
