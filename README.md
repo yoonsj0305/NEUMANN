@@ -57,7 +57,17 @@ See:
 
 **v0.0.38 — Coupled-Block Harder Structural Family Gate**
 
-The v0.0.37 affine family is frozen with the deterministic deployable path:
+v0.0.38 deliberately moved away from the saturated one-row affine family and
+introduced exact two-row / two-target coupled blocks.
+
+Each block has the form:
+
+    y + z = f(core)
+    y - z = g(core)
+
+after row/column permutation and generic renaming.
+
+The frozen v0.0.37 deployable baseline remained unchanged:
 
     target-leaf @ 0.10
         ↓
@@ -65,80 +75,98 @@ The v0.0.37 affine family is frozen with the deterministic deployable path:
         ↓
     Markowitz residual @ 0.05
         ↓
-    exact retained solve
-        ↓
-    reconstruction + original-problem verification
+    deterministic checker
 
-v0.0.38 tested whether a harder family should replace that saturated benchmark.
+A new exact 2x2 block checker independently re-derived the block algebra using
+Fraction arithmetic and verified the reconstructed answer against the original
+full system.
 
-New motif:
+Data:
 
-    y + z = f(core)
-    y - z = g(core)
-
-Independent one-row candidates remain visible, but exact two-row block
-compression can eliminate both coupled variables jointly.
-
-Canonical first full result, GitHub Actions run **171**:
-
-- final systems: **256**
-- active systems: **224**
-- verified retention: **100%** on one-row and block paths
-- unsafe accepted reductions: **0**
-- exact block retained-dimension error: **0**
-- mean one-row elimination recovery: **7.35%**
-- mean one-row solver-savings recovery: **11.52%**
-- broad hard cells: **7 / 7**
-- one-row active progress rate: **56.25%**
+- **256 systems**
+- **224 active coupled-block systems**
+- **32 no-compression controls**
+- **8 cells × 32 systems**
+- prior-signature disjointness: **PASS**
+- one-row verified retention: **100%**
+- block-oracle verified retention: **100%**
+- unsafe reductions: **0**
 - `KEEP = true`
 
-Pre-registered gates:
+### First measured result
+
+Exact 2x2 block reference:
+
+- mean retained-dimension error vs declared core: **0**
+
+Frozen one-row pipeline over active systems:
+
+- mean elimination recovery: **7.35%**
+- mean solver-savings recovery: **11.52%**
+- active-example progress rate: **56.25%**
+
+Broad structural gap:
+
+- active cells satisfying the retained-dimension-gap criterion: **7 / 7**
+
+Pre-registered harder-family gates:
 
 | Gate | Result |
 |---|---:|
-| H1 oracle reaches core | PASS |
-| H2 one-row elimination recovery <=75% | PASS |
-| H3 one-row solver recovery <=90% | PASS |
-| H4 one-row progress >=75% active examples | **FAIL** |
-| H5 broad hardness in >=5 cells | PASS |
+| H1 oracle reaches core exactly | PASS |
+| H2 one-row elimination recovery ≤75% | PASS |
+| H3 one-row solver-savings recovery ≤90% | PASS |
+| H4 one-row accepted progress on ≥75% active examples | **FAIL** |
+| H5 broad gap in ≥5 active cells | PASS |
 
-Decision:
+Therefore the frozen result is:
 
     FAMILY_NOT_HARD_ENOUGH
 
-This does not mean the family was easy. It was **too disconnected from the old
-primitive** to serve as the next discovery benchmark: most locally valid
-one-row candidates fail global sufficiency because each coupled target appears
-in both block rows.
+### Why H4 failed
 
-The exact 2x2 block primitive itself is retained. The pure-coupled generator is
-not.
+This is **not** parser blindness.
 
-### Next research move
+Every active cell exposed exactly the expected one-row candidates:
 
-Do not relax H4 and do not train a model yet.
+    candidate count = 4 × coupled-block count
 
-The next audit is:
+The old parser sees the local affine identities.
 
-    v0.0.38.1 — Mixed Local + Coupled Harder-Family Gate
+The failure occurs in the old one-row materialization primitive. It deletes the
+chosen target column and source row but does not algebraically substitute that
+target into other retained rows. In a coupled block, each target still appears
+in the partner row, so many individually valid affine identities cannot become
+standalone full reductions and are correctly rejected by original-problem
+verification.
 
-For active cells with `n-k >= 4`, exactly two derived variables will be easy
-one-row leaves and the remaining derived variables will form coupled 2x2
-blocks. The smallest `n-k=2` active cell remains pure-coupled.
+Thus v0.0.38 uncovered a measurement-definition mismatch:
 
-This creates the intended trajectory:
+    intended H4 question:
+        "can the old parser see real candidates?"
 
-    cheap local compression makes real progress
-        ↓
-    local primitive saturates
-        ↓
-    multi-row structure remains
+    implemented H4 question:
+        "can the entire old one-row reduction primitive
+         successfully materialize at least one reduction?"
 
-The original H1-H5 thresholds remain unchanged and a new untouched audit set is
-required.
+Those are not equivalent.
+
+The gate is **not** changed on the observed v0.0.38 data.
+
+### Research consequence
+
+Do not train a block-discovery model yet.
+
+The next experiment must use **fresh data** and pre-register a repaired
+anti-parser-blindness gate based directly on candidate visibility/algebraic
+validity while keeping H1, H2, H3 and H5 unchanged.
+
+Only after that independent replication passes should NEUMANN compare block
+discovery/routing methods.
 
 See:
 
+- `docs/experiments/v0.0.36.md`
 - `docs/experiments/v0.0.37.md`
 - `docs/experiments/v0.0.38.md`
 
