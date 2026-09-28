@@ -55,120 +55,143 @@ See:
 
 ## Current engineering baseline
 
-**v0.0.36 — Cheap-First Residual Headroom**
+**v0.0.37 — Smallest Adequate State-Aware Residual Predictor**
 
-v0.0.36 tests whether any learned residual policy is worth building **after** the strongest cheap structural component has already run.
+v0.0.37 tested whether a learned residual policy is justified after the
+v0.0.36 cheap-first architecture.
 
-The frozen cheap component is:
+The first stage remained frozen:
 
-    target-leaf @ threshold 0.10
+    target-leaf @ 0.10
         ↓
     deterministic checker
 
-The residual teacher begins only from the actually certified target-leaf state and may not undo those accepted reductions.
+The residual stage compared:
 
-The untouched audit set contains:
+- Ridge regression, 23 fitted weight+bias scalars
+- tiny MLP, 8 hidden units / 193 fitted weight+bias scalars
+- target-leaf residual
+- Markowitz residual
+- dependency-contrast residual
+- structural-combo residual
+- exact state-aware marginal-utility teacher
 
-- **256 systems**
-- **8 scale cells × 32 systems**
-- signatures disjoint from all v0.0.33–v0.0.35 data
-- verified retention: **100%**
+The learned target was exact downstream marginal solver-work gain, not
+generator dependency identity.
+
+Data:
+
+- train: **96 systems**
+- validation: **64 systems**
+- untouched final: **192 systems**
+- all splits disjoint from v0.0.33-v0.0.36 and from one another
+- core pytest: **196 passed, 1 skipped**
+- verified retention: **100% for every deployable method**
 - unsafe accepted reductions: **0**
 - `KEEP = true`
 
-### First measured result
+### Validation-only selection
 
-Full-system baseline:
+Selected learned residual:
 
-- mean solver ops: **1928.96**
+    tiny MLP @ threshold 0.10
+    validation teacher-value recovery = 101.02%
 
-Frozen target-leaf:
+Selected deterministic residual:
 
-- mean solver ops: **202.32**
-- mean solver savings: **1726.64**
-- mean accepted reductions: **9.59**
+    Markowitz @ threshold 0.05
+    validation teacher-value recovery = 103.91%
 
-Empty-start dynamic greedy utility:
+No final result participated in model or threshold selection.
 
-- mean solver ops: **144.63**
-- mean solver savings: **1784.34**
-- mean trial materializations: **282.79**
+### Untouched final result
 
-Cheap-first residual dynamic utility:
+Frozen first-stage target-leaf:
 
-- mean solver ops: **47.24**
-- mean total solver savings: **1881.72**
-- mean residual additions: **2.60 reductions**
-- mean residual trial materializations: **29.45**
+- mean solver ops: **209.41**
 
-Thus the hybrid reduced the solver work remaining after target-leaf by approximately **76.65%**.
+Exact residual teacher:
 
-It also reduced retained-system solver work by approximately **67.34%** relative to the empty-start dynamic greedy teacher.
+- mean final solver ops: **53.21**
+- mean residual additional savings: **156.20**
 
-### Pre-registered continuation gates
+Selected tiny MLP:
 
-All three gates passed:
+- mean final solver ops: **59.93**
+- mean residual additional savings: **149.48**
+- teacher-value recovery: **95.70%**
 
-| Gate | Measured | Required |
-|---|---:|---:|
-| residual headroom recovery | **268.78%** | ≥50% |
-| positive residual rate | **55.47%** | ≥25% |
-| teacher materialization reduction | **89.58%** | ≥50% |
+Selected Markowitz residual:
+
+- mean final solver ops: **46.22**
+- mean residual additional savings: **163.18**
+- teacher-value recovery: **104.47%**
+
+The learned policy passed the pre-registered 70% recovery gate, but failed the
+required value-add gate over the selected deterministic residual:
+
+    learned advantage fraction
+        = -8.77% of teacher residual value
 
 Decision:
 
-    PROCEED_LEARNED_RESIDUAL
+    KEEP_DETERMINISTIC_RESIDUAL
 
-The recovery ratio exceeds 100% because the cheap-first hybrid reaches a lower solver-work state than empty-start greedy utility. This is a **path-dependence result**, not evidence of global optimality.
+The learned residual branch is therefore rejected for this family.
 
 ### Architecture consequence
 
-The measured architecture is now:
+The currently justified path is:
 
-    cheap structural prior
-        ↓
-    certified compression
-        ↓
-    state-aware residual policy
+    target-leaf @ 0.10
         ↓
     deterministic checker
         ↓
-    exact execution
+    Markowitz residual @ 0.05
         ↓
-    original-problem verification
+    deterministic checker
+        ↓
+    exact retained solve
+        ↓
+    reconstruction
+        ↓
+    verify ORIGINAL problem
 
-This is materially different from either:
+This result is important because the tiny MLP did learn the residual objective
+well. It recovered about **95.7%** of the exact greedy teacher's final residual
+value.
 
-- pure learned compression, or
-- expensive utility search from the raw problem.
+It is still unnecessary.
 
-A cheap deterministic prior changes the search trajectory and sharply reduces the state space explored by the residual utility stage.
+A cheaper deterministic structural rule performed better on the
+pre-registered primary comparison.
 
-Teacher-search work also fell sharply:
+### Benchmark saturation warning
 
-- full dynamic successful-trial solver ops: **103,621.68**
-- residual successful-trial solver ops: **1,073.43**
+On the untouched final set, dependency-contrast descriptively reached
+**44.81 mean solver ops**, slightly below the validation-selected Markowitz
+policy. It is not promoted to the primary winner because it was not selected by
+the validation protocol.
 
-This is approximately a **98.96% reduction** in that measured teacher-work component.
+Together with the repeated strength of target-leaf, Markowitz, and related
+heuristics, this indicates that the current affine-linear generator is becoming
+saturated by local structural rules.
 
-This still does **not** establish end-to-end total-compute superiority because invalid-materialization partial work and other deterministic overhead are not fully instrumented.
+The next step is therefore **not** a larger neural residual model.
 
-### Scale structure
+The preferred v0.0.38 direction is a **Harder Structural Family Gate** with
+non-local compression motifs such as coupled multi-row dependencies,
+relation-level redundancy, equivalence/symmetry structure, and adversarial
+local-incidence decoys.
 
-Residual value is strongly heterogeneous.
-
-At apparent dimension `n=32`:
-
-- `k=2`: positive residual rate **96.875%**
-- `k=4`: positive residual rate **100%**
-
-At smaller cells residual value can be sparse.
-
-Therefore v0.0.37 should build the **smallest adequate state-aware residual predictor**, while keeping cheap residual heuristics and an activation/router possibility as mandatory baselines rather than assuming a universal neural policy.
+A learned component may return only if it creates pre-registered downstream
+value beyond deterministic structural algorithms on an untouched harder
+family.
 
 See:
 - `docs/experiments/v0.0.35.md`
 - `docs/experiments/v0.0.36.md`
+- `docs/experiments/v0.0.37.md`
 
 ### Frozen enabling results
 
