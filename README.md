@@ -55,95 +55,151 @@ See:
 
 ## Current engineering baseline
 
-**v0.0.33 — Learned Structural Compression Proposal**
+**v0.0.34 — Structural Baseline Gauntlet + Confidence Stopping**
 
-v0.0.32 established that an oracle dependency certificate could reduce the retained solver dimension from apparent n to independent core k and substantially alter the solver-work curve.
+v0.0.34 removes the v0.0.33 oracle-cardinality scaffold from final inference.
 
-v0.0.33 asks whether a small learned proposer can recover part of that oracle compression without holding execution authority.
+No final method receives:
 
-The new corpus removes the obvious v0.0.32 role cues:
+    k
+    n - k
+    a fixed proposal count
 
-- generic observed variable names
-- randomized variable order
-- randomized equation order
-- affine dependencies with offsets
-- chained dependencies
-- no fixed core/derived row blocks
+Instead, each scorer receives one global confidence threshold selected on a disjoint labeled calibration set and proposes every candidate above that threshold.
 
-Learned path:
+The deterministic checker retains authority over every reduction.
 
-    full permuted system
-      -> fixed candidate enumerator
-      -> tiny learned candidate scorer
-      -> top-B proposals
-      -> deterministic reduction checker
-      -> safe retained subsystem
-      -> exact solver
-      -> reconstruction
-      -> verify ORIGINAL full problem
+### Data / reproducibility
 
-Important scaffold:
-
-    B = n - k
-
-The model is told the oracle elimination cardinality. It predicts **which** reductions to attempt, not **how far** compression should continue.
-
-First measured final result:
-
+- calibration examples: **192**
 - final examples: **256**
-- examples with compression opportunity: **224**
-- tiny MLP parameters: **289**
-- feature dimension: **16**
-- hidden width: **16**
-- verified retention: **100%**
-- unsafe accepted reductions: **0**
-- fail-closed rejected proposals: **1,209**
-- mean elimination-count recovery: **72.02%**
-- mean exact oracle-rule recovery: **71.98%**
-- mean oracle solver-savings recovery: **84.93%**
+- all v0.0.34 signatures disjoint from v0.0.33
+- calibration/final mutually disjoint
+- frozen v0.0.33 checkpoint: **289 fitted MLP weight+bias scalars**
+- immutable checkpoint SHA-256:
+  `f9c1dccd0bda28619cb74c6fd6e8a457cde96944cbe5bfa65c9665859da3cc69`
+- two independent final CI executions reproduced the same learned threshold and aggregate exactly
+- core pytest: **176 passed, 1 skipped**
+- all benchmark, wheel, sequence, and fresh-venv checks: **PASS**
 - KEEP: **true**
 
-At k=2,n=32:
+### Learned no-cardinality stopping result
 
-    baseline solver ops ≈ 6121.4
-    oracle solver ops   = 15
-    learned solver ops  ≈ 1302.5
-    oracle savings recovered ≈ 78.89%
+Calibration selected:
 
-At k=4,n=32:
+    learned threshold = 0.40
 
-    baseline solver ops ≈ 6464.6
-    oracle solver ops   ≈ 95.8
-    learned solver ops  ≈ 1586.0
-    oracle savings recovered ≈ 76.20%
+Final:
 
-Learned elimination recovery declines with apparent dimension, reaching roughly **54%** at n=32. The learned discovery layer is therefore itself a scaling bottleneck.
+- raw proposal precision: **91.04%**
+- raw proposal recall: **94.27%**
+- raw proposal F1: **92.63%**
+- mean accepted eliminations: **7.492**
+- retained-dimension MAE vs generator k: **4.508**
+- exact generator-k match: **31.25%**
+- mean post-compression solver ops: **442.23**
+- mean solver savings vs baseline: **1,529.42**
+- mean generator-reference solver-savings recovery: **83.01%**
+- verified retention: **100%**
+- unsafe accepted reductions: **0**
 
-The result is deliberately narrow.
+This establishes that the frozen learned scorer can stop without receiving oracle cardinality at final inference in the controlled family.
 
-It does **not** establish:
-- learned discovery of k
-- globally minimal structure
-- domain-general compression
-- natural-language compression
-- total-compute superiority
+### Main falsification result
 
-Two post-result diagnostic controls were added before merge:
+The learned scorer is the best **reference-rule classifier**, but it is not the best **computational compression policy**.
 
-- deterministic random ranking: **24.40%** elimination recovery
-- simple sparsity + target-incidence heuristic: **61.55%**
-- learned MLP: **72.02%**
+| Method | Raw proposal F1 | Retained-dim MAE | Mean solver ops | Mean solver savings |
+|---|---:|---:|---:|---:|
+| Learned MLP | **92.63%** | 4.508 | 442.23 | 1,529.42 |
+| Markowitz-style | 77.86% | **4.086** | 387.31 | 1,584.34 |
+| Target-leaf | 74.00% | 4.324 | **325.13** | **1,646.52** |
+| Sparsity + incidence | 67.73% | 5.305 | 418.91 | 1,552.75 |
+| Deterministic random | 59.64% | 5.902 | 601.53 | 1,370.13 |
 
-The learned scorer therefore exceeds this particular simple heuristic by about **10.46 percentage points**, while the heuristic itself remains strong. Because these controls were added after the primary result was observed, they are diagnostic rather than pre-registered evidence.
+All listed methods retain **100% verified original-problem correctness** with **0 unsafe accepted reductions**.
 
-The final-head learned result reproduced exactly across two independent GitHub Actions executions. The next falsification target is a pre-registered stronger heuristic suite plus removal of the oracle-cardinality budget.
+Markowitz beats learned scoring on mean solver savings by **54.92 arithmetic ops** despite having much lower reference-rule F1.
+
+Target-leaf is an even stronger computational counterexample: it has only **74.00%** raw reference F1 but the lowest mean solver work and largest mean solver savings in the gauntlet.
+
+At n=32:
+
+    k=2
+      learned      1192.19 solver ops
+      Markowitz    1083.91
+      target-leaf   667.00
+
+    k=4
+      learned      1530.16 solver ops
+      Markowitz    1203.53
+      target-leaf   801.34
+
+### Research consequence
+
+v0.0.34 changes the optimization target.
+
+The project should no longer treat:
+
+    "match the generator dependency certificate"
+
+as the primary objective.
+
+The emerging objective is:
+
+    valid reduction
+        ↓
+    verified equivalence
+        ↓
+    marginal computational utility
+
+Reference-certificate recovery remains a diagnostic, not the final target.
+
+This also reinforces that the generator dependency DAG is a reference certificate rather than a unique global optimum: a small number of non-reference reductions were deterministically verified as valid.
+
+### Important boundaries
+
+v0.0.34 still does not establish:
+
+- globally minimal structure,
+- total end-to-end compute superiority,
+- domain-general Structural Compression,
+- natural-language compression,
+- asymptotic complexity improvement.
+
+Thresholds are still calibrated using labeled generator-reference data.
+
+Solver work, learned scoring work, checker work, reconstruction, and verification remain separate cost categories.
 
 See:
 - `docs/research/structural_compression_thesis.md`
 - `docs/experiments/v0.0.32.md`
 - `docs/experiments/v0.0.33.md`
+- `docs/experiments/v0.0.34.md`
+
+### Next research gate
+
+**v0.0.35 candidate: Utility-Directed Structural Compression**
+
+Rather than training primarily against reference-rule identity:
+
+- freeze Markowitz and target-leaf as first-class baselines,
+- measure marginal verified solver-work reduction per candidate,
+- compare deterministic, learned, and hybrid utility-directed policies,
+- include checker / reconstruction / verification costs explicitly,
+- preserve fail-closed deterministic reduction authority.
+
+NEUMANN should absorb the cheapest mechanism that works rather than defend a learned component for its own sake.
 
 ### Frozen enabling results
+
+**v0.0.33**
+
+- oracle-cardinality learned proposal experiment
+- final verified retention: **100%**
+- elimination recovery: **72.02%**
+- oracle solver-savings recovery: **84.93%**
+- later falsified as insufficient evidence that learned ranking is the best compression policy
 
 **v0.0.32**
 
