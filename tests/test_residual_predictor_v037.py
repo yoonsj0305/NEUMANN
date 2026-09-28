@@ -163,7 +163,7 @@ def test_v037_teacher_targets_are_bounded_and_nontrivial():
 def test_v037_model_footprints_are_frozen():
     frozen = fit_frozen_v033_scorer()
     models = fit_residual_models(
-        v037_train_examples()[:4],
+        v037_train_examples()[::V037_TRAIN_EXAMPLES_PER_CELL],
         frozen_scorer=frozen,
     )
 
@@ -190,7 +190,7 @@ def test_v037_model_footprints_are_frozen():
 def test_v037_bounded_policy_never_accepts_nonpositive_gain():
     frozen = fit_frozen_v033_scorer()
     models = fit_residual_models(
-        v037_train_examples()[:4],
+        v037_train_examples()[::V037_TRAIN_EXAMPLES_PER_CELL],
         frozen_scorer=frozen,
     )
     example = v037_validation_examples()[0]
