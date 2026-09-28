@@ -85,6 +85,10 @@ def test_v034_frozen_learned_scorer_replays_exactly():
     first = fit_frozen_v033_scorer_once()
     second = fit_frozen_v033_scorer_once()
 
+    assert first.fitted_state_sha256 == (
+        "f9c1dccd0bda28619cb74c6fd6e8a457"
+        "cde96944cbe5bfa65c9665859da3cc69"
+    )
     assert (
         first.fitted_state_sha256
         == second.fitted_state_sha256
