@@ -81,6 +81,8 @@ jobs:
         run: python benchmark_v0381_smoke.py
       - name: Block discovery routing contract smoke
         run: python benchmark_v040_smoke.py
+      - name: Anti-shortcut causal-family contract smoke
+        run: python benchmark_v041_smoke.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .
@@ -129,4 +131,3 @@ jobs:
         run: pytest -q tests/test_sequence_v031.py
       - name: Matched tiny-Transformer benchmark
         run: python benchmark_v031.py
-

@@ -129,7 +129,10 @@ def _make_example(
     split: str,
     generator_seed: int,
     example_index: int,
+    variant: str = "legacy",
 ) -> MixedCoupledExample:
+    if variant not in {"legacy", "coefficient", "overlap", "combined"}:
+        raise ValueError(f"unknown mixed-family variant: {variant}")
     if k < 1 or n < k:
         raise ValueError("require 1 <= k <= n")
 
@@ -195,6 +198,7 @@ def _make_example(
     ] = []
 
     next_variable = k
+    previous_block_targets: tuple[int, int] | None = None
 
     for _ in range(easy_leaf_count):
         target_index = next_variable
@@ -280,32 +284,33 @@ def _make_example(
                 ]
             )
 
-        first_row[y_index] = 1
-        first_row[z_index] = 1
-        second_row[y_index] = 1
-        second_row[z_index] = -1
+        if variant in {"coefficient", "combined"}:
+            while True:
+                a, b, c, d_coeff = (
+                    rng.choice(coefficient_values) for _ in range(4)
+                )
+                if a * d_coeff != b * c:
+                    break
+        else:
+            a, b, c, d_coeff = 1, 1, 1, -1
 
-        first_rhs = (
-            y_value
-            + z_value
-            - sum(
-                coefficient * value
-                for coefficient, value in zip(
-                    first_coefficients,
-                    core_solution,
-                )
-            )
+        first_row[y_index] = a
+        first_row[z_index] = b
+        second_row[y_index] = c
+        second_row[z_index] = d_coeff
+
+        if variant in {"overlap", "combined"} and previous_block_targets:
+            for prior_index in previous_block_targets:
+                first_row[prior_index] = 1
+                second_row[prior_index] = 1
+
+        first_rhs = sum(
+            coefficient * value
+            for coefficient, value in zip(first_row, logical_solution)
         )
-        second_rhs = (
-            y_value
-            - z_value
-            - sum(
-                coefficient * value
-                for coefficient, value in zip(
-                    second_coefficients,
-                    core_solution,
-                )
-            )
+        second_rhs = sum(
+            coefficient * value
+            for coefficient, value in zip(second_row, logical_solution)
         )
 
         first_row_index = len(
@@ -340,6 +345,7 @@ def _make_example(
                 ),
             )
         )
+        previous_block_targets = (y_index, z_index)
 
     if len(logical_rows) != n:
         raise AssertionError(
@@ -534,8 +540,12 @@ def generate_mixed_cell(
     forbidden_signatures: frozenset[
         tuple[object, ...]
     ] | None = None,
+    variant: str = "legacy",
 ) -> tuple[MixedCoupledExample, ...]:
-    if (k, n) not in mixed_scale_grid():
+    if (k, n) not in mixed_scale_grid() and not (
+        split == "v041_control" and (k, n) == (2, 2)
+        and variant == "legacy"
+    ):
         raise ValueError(
             f"(k={k}, n={n}) is outside the frozen grid"
         )
@@ -561,6 +571,7 @@ def generate_mixed_cell(
             split=split,
             generator_seed=seed,
             example_index=index,
+            variant=variant,
         )
         if (
             example.signature in forbidden

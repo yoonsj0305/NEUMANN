@@ -118,6 +118,7 @@ class DiscoveryObservation:
     coupled_target_consumed_locally: int
     final_verified: bool
     unsafe_accepted_reductions: int
+    rejected_materialization_count: int = 0
 
 
 def _target_index(
@@ -1291,7 +1292,7 @@ def observe_discovery_method(
         )
 
     (
-        _,
+        baseline_answer,
         baseline_counts,
     ) = solve_exact_gauss_jordan(
         example.full_system
@@ -1319,6 +1320,7 @@ def observe_discovery_method(
         - oracle_ops
     )
 
+    rejected_materialization_count = 0
     if method == "D0_frozen_local_only":
         trace = run_frozen_one_row_pipeline(
             example,
@@ -1391,19 +1393,25 @@ def observe_discovery_method(
         )
 
         if materialized is None:
+            rejected_materialization_count = 1
+            # A rejected proposal never becomes an accepted reduction.
+            # The exact full-system solve is the degraded path.
+            local_candidates = ()
+            accepted_blocks = ()
             final_ops = (
                 baseline_ops
             )
-            final_verified = False
-            unsafe = (
-                len(
-                    local_candidates
-                )
-                + 2
-                * len(
-                    accepted_blocks
+            baseline_verified, _ = verify_exact_full_system(
+                example.full_system, baseline_answer,
+            )
+            final_verified = baseline_verified and all(
+                baseline_answer[name] == Fraction(expected)
+                for name, expected in zip(
+                    example.full_system.variables,
+                    example.full_system.ground_truth,
                 )
             )
+            unsafe = 0
         else:
             final_ops = (
                 materialized.solver_counts.arithmetic_ops
@@ -1592,6 +1600,7 @@ def observe_discovery_method(
         unsafe_accepted_reductions=(
             unsafe
         ),
+        rejected_materialization_count=rejected_materialization_count,
     )
 
 

@@ -573,33 +573,29 @@ def materialize_mixed_reference(
     if not retained_variables:
         return None
 
-    available = set(
-        retained_variables
-    )
-
-    for candidate in leaves:
-        dependencies = {
-            name
-            for name, _
-            in candidate.coefficients
-        }
-        if not dependencies.issubset(
-            available
-        ):
+    available = set(retained_variables)
+    pending = [
+        ("local", candidate, {candidate.target},
+         {name for name, _ in candidate.coefficients})
+        for candidate in leaves
+    ] + [
+        ("block", candidate, set(candidate.targets),
+         {name for rule in candidate.rules
+          for name, _ in rule.coefficients})
+        for candidate in blocks
+    ]
+    reconstruction_order = []
+    while pending:
+        remaining = []
+        for kind, candidate, targets, dependencies in pending:
+            if dependencies.issubset(available):
+                reconstruction_order.append((kind, candidate))
+                available.update(targets)
+            else:
+                remaining.append((kind, candidate, targets, dependencies))
+        if len(remaining) == len(pending):
             return None
-
-    for candidate in blocks:
-        dependencies = {
-            name
-            for rule
-            in candidate.rules
-            for name, _
-            in rule.coefficients
-        }
-        if not dependencies.issubset(
-            available
-        ):
-            return None
+        pending = remaining
 
     retained_columns = tuple(
         system.variables.index(
@@ -670,28 +666,20 @@ def materialize_mixed_reference(
     )
 
     try:
-        for candidate in leaves:
-            _apply_affine_rule(
-                full_answer,
-                candidate,
-                reconstruction_counts,
-            )
-
-        for candidate in blocks:
-            for rule in candidate.rules:
-                _apply_fraction_rule(
-                    full_answer,
-                    target=rule.target,
-                    constant=(
-                        rule.constant
-                    ),
-                    coefficients=(
-                        rule.coefficients
-                    ),
-                    counts=(
-                        reconstruction_counts
-                    ),
+        for kind, candidate in reconstruction_order:
+            if kind == "local":
+                _apply_affine_rule(
+                    full_answer, candidate, reconstruction_counts,
                 )
+            else:
+                for rule in candidate.rules:
+                    _apply_fraction_rule(
+                        full_answer,
+                        target=rule.target,
+                        constant=rule.constant,
+                        coefficients=rule.coefficients,
+                        counts=reconstruction_counts,
+                    )
     except ValueError:
         return None
 
