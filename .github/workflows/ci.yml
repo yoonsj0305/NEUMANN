@@ -67,6 +67,14 @@ jobs:
         run: python benchmark_v032.py
       - name: Learned Structural Compression benchmark smoke
         run: python benchmark_v033.py
+      - name: Export canonical frozen scorer candidate
+        run: python export_v034_frozen_scorer.py artifacts/v034_frozen_scorer.json
+      - name: Upload canonical frozen scorer candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: v034-canonical-scorer-candidate
+          path: artifacts/v034_frozen_scorer.json
+          if-no-files-found: error
       - name: Structural baseline gauntlet and stopping benchmark smoke
         run: python benchmark_v034.py
       - name: Build core and external plugin wheels
