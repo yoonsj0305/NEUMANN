@@ -118,3 +118,26 @@ jobs:
       - name: Matched tiny-Transformer benchmark
         run: python benchmark_v031.py
 
+
+
+  v035-checkpoint-export:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      OPENBLAS_CORETYPE: "HASWELL"
+      MKL_NUM_THREADS: "1"
+      BLIS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned training stack
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy==2.4.6 scipy==1.17.1 scikit-learn==1.9.1 threadpoolctl==3.7.0
+          pip install -e .
+      - name: Export v0.0.35 training-only matched checkpoints
+        run: python export_v035_checkpoints.py
