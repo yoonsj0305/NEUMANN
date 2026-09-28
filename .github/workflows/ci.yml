@@ -71,8 +71,8 @@ jobs:
         run: python benchmark_v034.py
       - name: Compression Utility contract smoke
         run: python benchmark_v035_smoke.py
-      - name: Residual headroom full benchmark
-        run: python benchmark_v036.py
+      - name: Residual headroom contract smoke
+        run: python benchmark_v036_smoke.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .
