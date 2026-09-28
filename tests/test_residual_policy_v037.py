@@ -135,20 +135,21 @@ def test_v037_feature_contract_is_state_aware_and_core_metadata_free():
 
 def test_v037_teacher_rows_are_finite_and_tree_fit_is_deterministic():
     frozen = fit_frozen_v033_scorer()
-    states = tuple(
-        prepare_initial_state(
+    collected = []
+    for example in v037_train_examples()[:64]:
+        state = prepare_initial_state(
             example,
             frozen_scorer=frozen,
         )
-        for example in v037_train_examples()[:4]
-    )
-    rows = tuple(
-        row
-        for state in states
-        for row in teacher_rows_for_example(
-            state
+        collected.extend(
+            teacher_rows_for_example(
+                state
+            )
         )
-    )
+        if len(collected) >= 32:
+            break
+
+    rows = tuple(collected)
     assert rows
     assert all(
         math.isfinite(
