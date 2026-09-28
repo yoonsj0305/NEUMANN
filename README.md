@@ -55,6 +55,18 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.42 — Nonunit parser and residual-incidence peeling**
+
+This experiment tested two deterministic repairs to the v0.0.41 failure
+modes on fresh generated exact systems. E1 removes the unit-only 2x2 target
+restriction. E2 also peels validated low-incidence blocks from the remaining
+row set. Neither method trains a learned block model. The pre-registered
+protocol is `docs/experiments/v0.0.42.md`; the fresh 224-system audit passed
+and E2 recovered 100% of oracle solver savings on all three active arms.
+Run `python benchmark_v042.py` for the audit or `python benchmark_v042_smoke.py`
+for a bounded correctness check. E2 examined 1,305.5 row pairs per active
+system on average; solver arithmetic savings exclude discovery and checking.
+
 **v0.0.41 — Anti-shortcut causal audit**
 
 The v0.0.40 deterministic result was challenged on three separate
