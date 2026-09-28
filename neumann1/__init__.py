@@ -287,7 +287,7 @@ from .stopping_gauntlet import (
     METHODS, THRESHOLD_GRID, ThresholdCalibration,
     StoppingObservation, FrozenV033Scorer,
     fit_frozen_v033_scorer, fit_frozen_v033_scorer_once,
-    learned_compressor_fingerprint, score_candidates,
+    score_candidates,
     calibrate_threshold, observe_stopping_method,
     aggregate_stopping_observations,
 )
@@ -298,7 +298,20 @@ __all__ += [
     "METHODS", "THRESHOLD_GRID", "ThresholdCalibration",
     "StoppingObservation", "FrozenV033Scorer",
     "fit_frozen_v033_scorer", "fit_frozen_v033_scorer_once",
-    "learned_compressor_fingerprint", "score_candidates",
+    "score_candidates",
     "calibrate_threshold", "observe_stopping_method",
     "aggregate_stopping_observations",
+]
+
+from .frozen_v033_checkpoint import (
+    FROZEN_V033_CHECKPOINT_FORMAT,
+    FROZEN_V033_STATE_SHA256,
+    FrozenV033CheckpointProposer,
+    checkpoint_state_sha256,
+)
+__all__ += [
+    "FROZEN_V033_CHECKPOINT_FORMAT",
+    "FROZEN_V033_STATE_SHA256",
+    "FrozenV033CheckpointProposer",
+    "checkpoint_state_sha256",
 ]
