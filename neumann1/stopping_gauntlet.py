@@ -19,9 +19,11 @@ from .learned_compression import (
     materialize_reduction,
     oracle_candidates,
 )
-from .learned_compression_dataset import (
-    LearnedCompressionExample,
-    learned_compression_training_examples,
+from .learned_compression_dataset import LearnedCompressionExample
+from .frozen_v033_checkpoint import (
+    FROZEN_V033_STATE_SHA256,
+    FrozenV033CheckpointProposer,
+    checkpoint_state_sha256,
 )
 from .structural_compression import solve_exact_gauss_jordan
 
@@ -82,53 +84,33 @@ class StoppingObservation:
 
 @dataclass(frozen=True)
 class FrozenV033Scorer:
-    proposer: LearnedCompressionProposer
+    proposer: FrozenV033CheckpointProposer
     footprint: LearnedCompressorFootprint
     fitted_state_sha256: str
 
 
-def learned_compressor_fingerprint(
-    proposer: LearnedCompressionProposer,
-) -> str:
-    scaler = proposer.pipeline.named_steps["scale"]
-    mlp = proposer.pipeline.named_steps["mlp"]
-
-    digest = hashlib.sha256()
-    digest.update(b"NEUMANN-v034-frozen-v033-scorer\0")
-
-    arrays = [
-        scaler.mean_,
-        scaler.scale_,
-        *mlp.coefs_,
-        *mlp.intercepts_,
-    ]
-    for array in arrays:
-        normalized = array.astype("<f8", copy=False)
-        digest.update(repr(tuple(normalized.shape)).encode("ascii"))
-        digest.update(b"\0")
-        digest.update(normalized.tobytes(order="C"))
-        digest.update(b"\0")
-
-    return digest.hexdigest()
-
-
 def fit_frozen_v033_scorer_once() -> FrozenV033Scorer:
-    proposer = LearnedCompressionProposer().fit(
-        learned_compression_training_examples()
-    )
+    proposer = FrozenV033CheckpointProposer()
+    fingerprint = checkpoint_state_sha256()
+    if fingerprint != FROZEN_V033_STATE_SHA256:
+        raise AssertionError("frozen checkpoint fingerprint drift")
     return FrozenV033Scorer(
         proposer=proposer,
-        footprint=inspect_learned_compressor(proposer),
-        fitted_state_sha256=learned_compressor_fingerprint(
-            proposer
+        footprint=LearnedCompressorFootprint(
+            input_feature_dimension=16,
+            hidden_units=16,
+            fitted_weight_bias_scalars=289,
+            scaler_state_scalars=32,
+            layer_shapes=((16, 16), (16, 1)),
+            weighted_sum_terms_per_candidate=272,
         ),
+        fitted_state_sha256=fingerprint,
     )
 
 
 @lru_cache(maxsize=1)
 def fit_frozen_v033_scorer() -> FrozenV033Scorer:
     return fit_frozen_v033_scorer_once()
-
 
 def _sort_scored(
     items: Iterable[ScoredCandidate],
