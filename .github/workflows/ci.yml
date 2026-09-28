@@ -73,6 +73,8 @@ jobs:
         run: python benchmark_v035_smoke.py
       - name: Residual headroom contract smoke
         run: python benchmark_v036_smoke.py
+      - name: Learned residual full benchmark
+        run: python benchmark_v037.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .
