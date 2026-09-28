@@ -115,15 +115,6 @@ def _target_index(candidate: AffineCandidate) -> int:
     return int(candidate.target[1:])
 
 
-def _baseline_solver_ops(
-    example: LearnedCompressionExample,
-) -> int:
-    _, counts = solve_exact_gauss_jordan(
-        example.full_system
-    )
-    return counts.arithmetic_ops
-
-
 def _feasible_candidates(
     example: LearnedCompressionExample,
     accepted: tuple[AffineCandidate, ...],
@@ -314,8 +305,6 @@ def residual_state_features(
     current: MaterializedReduction,
     candidate: AffineCandidate,
     feasible: tuple[AffineCandidate, ...],
-    *,
-    baseline_solver_ops: int,
 ) -> tuple[float, ...]:
     static = candidate_features(
         example.full_system,
@@ -329,7 +318,10 @@ def residual_state_features(
     )
     current_ratio = (
         current.solver_counts.arithmetic_ops
-        / max(1.0, float(baseline_solver_ops))
+        / max(
+            1.0,
+            float(example.full_system.dimension ** 3),
+        )
     )
 
     features = static + (
@@ -352,7 +344,6 @@ def _teacher_step(
     accepted: tuple[AffineCandidate, ...],
     current: MaterializedReduction,
     *,
-    baseline_solver_ops: int,
     collect_samples: bool,
 ) -> tuple[
     AffineCandidate | None,
@@ -396,7 +387,6 @@ def _teacher_step(
             current,
             candidate,
             feasible,
-            baseline_solver_ops=baseline_solver_ops,
         )
 
         trials += 1
@@ -480,8 +470,6 @@ def run_exact_residual_teacher(
     target_leaf_ops = (
         current.solver_counts.arithmetic_ops
     )
-    baseline_ops = _baseline_solver_ops(example)
-
     residual_accepted = 0
     trials = 0
     successful = 0
@@ -502,7 +490,6 @@ def run_exact_residual_teacher(
             example,
             accepted,
             current,
-            baseline_solver_ops=baseline_ops,
             collect_samples=collect_samples,
         )
 
@@ -751,7 +738,6 @@ def _policy_scores(
     current: MaterializedReduction,
     feasible: tuple[AffineCandidate, ...],
     *,
-    baseline_solver_ops: int,
     method: str,
     models: FittedResidualModels | None,
 ) -> tuple[tuple[float, AffineCandidate], ...]:
@@ -773,9 +759,6 @@ def _policy_scores(
                     current,
                     candidate,
                     feasible,
-                    baseline_solver_ops=(
-                        baseline_solver_ops
-                    ),
                 )
                 for candidate in feasible
             ],
@@ -852,8 +835,6 @@ def run_bounded_residual_policy(
     target_leaf_ops = (
         current.solver_counts.arithmetic_ops
     )
-    baseline_ops = _baseline_solver_ops(example)
-
     accepted_residual = 0
     exact_trials = 0
     successful_trials = 0
@@ -877,7 +858,6 @@ def run_bounded_residual_policy(
                 accepted,
                 current,
                 feasible,
-                baseline_solver_ops=baseline_ops,
                 method=method,
                 models=models,
             )
