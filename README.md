@@ -55,26 +55,31 @@ See:
 
 ## Current engineering baseline
 
-**v0.0.35 — Compression Utility / Value-of-Reduction Oracle**
+**v0.0.36 — Cheap-First Residual Headroom**
 
-v0.0.35 replaces generator-reference imitation as the primary optimization target with measured downstream solver-work utility:
+v0.0.36 tests whether a strong cheap structural prior should run before any expensive or learned residual policy.
 
-    VoR(c | R)
-        = solver_ops(R) - solver_ops(R ∪ {c})
+Frozen first stage:
 
-It separates:
+    target-leaf @ threshold 0.10
+        -> deterministic checker
 
-- validity,
-- computational utility,
-- stopping,
+Residual stage:
 
-while keeping every learned or heuristic proposal advisory under the deterministic checker.
+    certified cheap-first state
+        -> state-aware marginal-utility search
+        -> deterministic checker
+        -> exact retained solve
+        -> reconstruct
+        -> verify ORIGINAL full problem
 
-The experiment used a new split disjoint from every v0.0.33/v0.0.34 signature:
+The experiment used a new untouched **256-system** audit set disjoint from every v0.0.33-v0.0.35 signature.
 
-- calibration: **192 systems**
-- final: **256 systems**
-- verified retention: **100% for every method**
+Contract status:
+
+- core pytest: **189 passed, 1 skipped**
+- sequence lane: **PASS**
+- verified retention: **100%**
 - unsafe accepted reductions: **0**
 - `KEEP = true`
 
@@ -82,83 +87,72 @@ The experiment used a new split disjoint from every v0.0.33/v0.0.34 signature:
 
 Full-system baseline:
 
-- mean solver ops: **1960.09**
+- mean solver ops: **1928.96**
 
-Dynamic greedy marginal-utility teacher:
+Frozen target-leaf:
 
-- mean solver ops: **161.50**
-- mean solver savings: **1798.60**
-- mean accepted eliminations: **11.07**
-- mean retained dimension: **3.93**
-- mean trial materializations: **277.21**
+- mean solver ops: **202.32**
+- mean solver savings: **1726.64**
 
-Strongest cheap deterministic baseline, **target-leaf**:
+Empty-start dynamic greedy utility:
 
-- mean solver ops: **210.37**
-- mean solver savings: **1749.73**
-- dynamic-vs-target solver-savings delta: **+48.87**
-- target-leaf recovered **97.28%** of dynamic greedy solver savings
+- mean solver ops: **144.63**
+- mean solver savings: **1784.34**
+- mean trial materializations: **282.79**
 
-Other key results:
+Cheap-first residual dynamic utility:
 
-- Markowitz: **244.03 mean solver ops**
-- utility-calibrated frozen learned-reference MLP: **384.51**
-- static isolated utility: **780.02**
+- mean solver ops: **47.24**
+- mean total solver savings: **1881.72**
+- mean residual additions: **2.60**
+- mean trial materializations: **29.45**
 
-Dynamic state-aware utility beat static isolated utility by:
+Thus the cheap-first residual path reduced remaining solver work by approximately:
 
-- **+618.52 mean solver savings**
+- **76.65% vs target-leaf alone**
+- **67.34% vs empty-start dynamic greedy**
 
-The interaction gap grew strongly with apparent dimension. At `n=32` it reached:
+while reducing teacher trial materializations by approximately **89.58%**.
 
-- `k=2`: **2094.75**
-- `k=4`: **1821.13**
+### Continuation gate
 
-Therefore:
+All three pre-registered continuation criteria passed:
 
-> **Value-of-Reduction is strongly state-dependent on this benchmark family.**
+- residual headroom recovery: **268.78%** >= 50%
+- examples with positive residual gain: **55.47%** >= 25%
+- teacher materialization reduction: **89.58%** >= 50%
 
-A candidate that looks useful in isolation is not an adequate substitute for evaluating its marginal value after earlier reductions.
+Decision:
 
-### Teacher-search cost boundary
+    PROCEED_LEARNED_RESIDUAL
 
-The dynamic oracle is intentionally **not** a deployable inference policy.
-
-Its successful trial materializations alone consumed on average:
-
-- **104,298.70 trial solver ops per example**
-
-That is about **53.2×** the original full-system solver-work baseline, before counting partial work from failed materializations.
-
-The full v0.0.35 benchmark took approximately **618.9 s** on the first GitHub Actions run.
-
-Therefore the result supports a teacher/distillation role only, not end-to-end efficiency.
+The headroom-recovery ratio exceeds 100% because the cheap-first residual path beat the empty-start greedy teacher. This is evidence of **path dependence**, not global optimality.
 
 ### Architecture consequence
 
-The cheapest mechanism already captures most of the downstream value:
+The current strongest architecture on this benchmark family is:
 
-    target-leaf
-        -> deterministic checker
-        -> ~97.3% of dynamic teacher savings
-
-The next research step should therefore not replace target-leaf wholesale with a larger learned policy.
-
-The preferred sequence is:
-
-    cheap deterministic compression
+    cheap deterministic structural prior
         ↓
-    residual state-aware utility only where value remains
+    certified compression
         ↓
-    deterministic checker
+    state-aware residual policy
+        ↓
+    deterministic authority
         ↓
     exact execution + original-problem verification
 
-This makes the next target **residual Value-of-Reduction**, with learned residual prediction considered only after the cheap-first residual contract is measured.
+This is stronger than starting expensive utility search from the raw system.
+
+Residual value is also highly scale-dependent. On the `n=32` cells, positive residual gain occurred in **96.875%** of `k=2` cases and **100%** of `k=4` cases, while several small cells had sparse residual value.
+
+Therefore the next experiment may include a cheap residual activation/router, but any router must be evaluated on new data rather than fitted and confirmed on v0.0.36 final systems.
+
+The next milestone is a **smallest-adequate state-aware residual predictor**, compared against cheap deterministic residual baselines and the exact residual teacher. Learned complexity is retained only if it recovers value the cheap residual heuristics do not.
 
 See:
-- `docs/experiments/v0.0.34.md`
 - `docs/experiments/v0.0.35.md`
+- `docs/experiments/v0.0.36.md`
 
 ### Frozen enabling results
 
