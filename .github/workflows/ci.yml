@@ -91,6 +91,8 @@ jobs:
         run: python benchmark_v044_smoke.py
       - name: Exact Schur cost contract smoke
         run: python benchmark_v045_smoke.py
+      - name: Cached candidate and dense abstention contract smoke
+        run: python benchmark_v046_smoke.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .

@@ -544,7 +544,7 @@ def generate_mixed_cell(
 ) -> tuple[MixedCoupledExample, ...]:
     if (k, n) not in mixed_scale_grid() and not (
         split in {"v041_control", "v042_control", "v043_control", "v044_control",
-                  "v045_control"}
+                  "v045_control", "v046_control"}
         and (k, n) == (2, 2)
         and variant == "legacy"
     ):

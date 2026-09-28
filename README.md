@@ -55,6 +55,18 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.46 — Cached exact candidates and dense abstention (research)**
+
+An incremental candidate cache preserves v0.0.45's exact high-incidence
+reductions on a fresh 96-case arm while cutting derivation/checker calls
+from 56 to 9.5 per system. Paired local full-path time was 0.764× frozen
+F1 on that arm. On 96 dense systems F3 abstained and exactly matched F1,
+but still ran 1.017× as long; controls were also slightly slower. Thus the
+result is conditional and synthetic, not a general performance claim or a
+trained model. The pre-registered 224-system audit is documented in
+`docs/experiments/v0.0.46.md`; run `python benchmark_v046_smoke.py` or
+`python benchmark_v046.py`.
+
 **v0.0.45 — Exact Schur cost audit (research only)**
 
 On 224 fresh exact systems, an experimental deterministic F2 repaired both
