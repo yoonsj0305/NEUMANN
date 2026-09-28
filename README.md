@@ -57,116 +57,74 @@ See:
 
 **v0.0.38 — Coupled-Block Harder Structural Family Gate**
 
-v0.0.38 deliberately moved away from the saturated one-row affine family and
-introduced exact two-row / two-target coupled blocks.
+v0.0.38 introduced exact two-row / two-target coupled blocks while keeping the
+frozen v0.0.37 one-row pipeline unchanged.
 
-Each block has the form:
+Canonical full run **171**:
 
-    y + z = f(core)
-    y - z = g(core)
-
-after row/column permutation and generic renaming.
-
-The frozen v0.0.37 deployable baseline remained unchanged:
-
-    target-leaf @ 0.10
-        ↓
-    deterministic checker
-        ↓
-    Markowitz residual @ 0.05
-        ↓
-    deterministic checker
-
-A new exact 2x2 block checker independently re-derived the block algebra using
-Fraction arithmetic and verified the reconstructed answer against the original
-full system.
-
-Data:
-
-- **256 systems**
-- **224 active coupled-block systems**
-- **32 no-compression controls**
-- **8 cells × 32 systems**
-- prior-signature disjointness: **PASS**
-- one-row verified retention: **100%**
-- block-oracle verified retention: **100%**
+- systems: **256**
+- verified retention: **100%** on both paths
 - unsafe reductions: **0**
+- block-oracle retained-dimension error: **0**
+- one-row elimination recovery: **7.35%**
+- one-row solver-savings recovery: **11.52%**
+- one-row active progress rate: **56.25%**
+- broad hard cells: **7 / 7**
 - `KEEP = true`
 
-### First measured result
+Pre-registered result:
 
-Exact 2x2 block reference:
+    H1 PASS
+    H2 PASS
+    H3 PASS
+    H4 FAIL
+    H5 PASS
 
-- mean retained-dimension error vs declared core: **0**
-
-Frozen one-row pipeline over active systems:
-
-- mean elimination recovery: **7.35%**
-- mean solver-savings recovery: **11.52%**
-- active-example progress rate: **56.25%**
-
-Broad structural gap:
-
-- active cells satisfying the retained-dimension-gap criterion: **7 / 7**
-
-Pre-registered harder-family gates:
-
-| Gate | Result |
-|---|---:|
-| H1 oracle reaches core exactly | PASS |
-| H2 one-row elimination recovery ≤75% | PASS |
-| H3 one-row solver-savings recovery ≤90% | PASS |
-| H4 one-row accepted progress on ≥75% active examples | **FAIL** |
-| H5 broad gap in ≥5 active cells | PASS |
-
-Therefore the frozen result is:
+Therefore:
 
     FAMILY_NOT_HARD_ENOUGH
 
-### Why H4 failed
+The exact 2x2 block primitive is retained, but the pure-coupled generator is
+not accepted as the next discovery benchmark.
 
-This is **not** parser blindness.
+### Why H4 stays unchanged
 
-Every active cell exposed exactly the expected one-row candidates:
+One-row candidates are visible in every active cell. The issue is deeper:
+independent one-row removal usually cannot remain globally sufficient because a
+coupled target also appears in its partner row.
 
-    candidate count = 4 × coupled-block count
+Rather than weaken H4 from "safe real progress" to mere candidate visibility,
+NEUMANN keeps the stronger requirement.
 
-The old parser sees the local affine identities.
+### Next research move
 
-The failure occurs in the old one-row materialization primitive. It deletes the
-chosen target column and source row but does not algebraically substitute that
-target into other retained rows. In a coupled block, each target still appears
-in the partner row, so many individually valid affine identities cannot become
-standalone full reductions and are correctly rejected by original-problem
-verification.
+    v0.0.38.1 — Mixed Local + Coupled Harder-Family Gate
 
-Thus v0.0.38 uncovered a measurement-definition mismatch:
+For `n-k >= 4`:
 
-    intended H4 question:
-        "can the old parser see real candidates?"
+    2 easy one-row leaves
+        +
+    remaining derived variables in coupled 2x2 blocks
 
-    implemented H4 question:
-        "can the entire old one-row reduction primitive
-         successfully materialize at least one reduction?"
+For `n-k = 2`:
 
-Those are not equivalent.
+    1 pure coupled block
 
-The gate is **not** changed on the observed v0.0.38 data.
+This should force the desired sequence:
 
-### Research consequence
+    old cheap pipeline makes real verified progress
+        ↓
+    old primitive saturates
+        ↓
+    multi-row block structure remains
 
-Do not train a block-discovery model yet.
+The same H1-H5 thresholds, frozen target-leaf @ 0.10, frozen Markowitz @ 0.05,
+and exact block checker are reused unchanged on a new audit set.
 
-The next experiment must use **fresh data** and pre-register a repaired
-anti-parser-blindness gate based directly on candidate visibility/algebraic
-validity while keeping H1, H2, H3 and H5 unchanged.
-
-Only after that independent replication passes should NEUMANN compare block
-discovery/routing methods.
+No learned model is introduced until that gate passes.
 
 See:
 
-- `docs/experiments/v0.0.36.md`
 - `docs/experiments/v0.0.37.md`
 - `docs/experiments/v0.0.38.md`
 
