@@ -55,117 +55,106 @@ See:
 
 ## Current engineering baseline
 
-**v0.0.37 — Smallest Adequate State-Aware Residual Predictor**
+**v0.0.38 — Coupled-Block Harder Structural Family Gate**
 
-v0.0.37 asked whether a learned residual policy is actually necessary after
-cheap certified structural compression.
+v0.0.38 introduced exact two-row / two-target coupled compression after the
+original affine family became saturated by local heuristics.
 
-Frozen first stage:
+New motif:
+
+    y + z = f(core)
+    y - z = g(core)
+
+The frozen v0.0.37 local pipeline was carried forward unchanged:
 
     target-leaf @ 0.10
-        -> deterministic checker
+        ↓
+    deterministic checker
+        ↓
+    Markowitz residual @ 0.05
+        ↓
+    deterministic checker
 
-Two learned residual models were tested:
-
-- Ridge: **23 fitted weight+bias scalars**
-- Tiny MLP: **193 fitted weight+bias scalars**, 8 hidden units
-
-Training target:
-
-    exact marginal solver-work gain
-        / current solver work
-
-not generator dependency labels or teacher candidate identity.
+The new 2x2 block checker uses exact Fraction arithmetic, re-derives the
+reconstruction algebra from the original rows, and verifies the reconstructed
+answer against the original full system.
 
 Data:
 
-- train: **96 systems**
-- validation: **64 systems**
-- final: **192 systems**
-- all splits disjoint from v0.0.33–v0.0.36 and from one another
-- final verified retention: **100% for every deployable method**
-- unsafe accepted reductions: **0**
+- **256 final systems**
+- **224 active systems**
+- **32 no-compression controls**
+- verified retention: **100%** on both paths
+- unsafe reductions: **0**
 - `KEEP = true`
 
-### First measured result
+### Measured result
 
-Frozen target-leaf first stage on final:
+Exact block oracle:
 
-- mean solver ops: **209.41**
+- retained-dimension error: **0**
+- broad retained-dimension gap: **7 / 7 active cells**
 
-Exact residual greedy teacher:
+Frozen one-row pipeline:
 
-- mean final solver ops: **53.21**
-- mean residual savings: **156.20**
-- mean trial materializations: **30.5**
+- elimination recovery: **7.35%**
+- solver-savings recovery: **11.52%**
+- active-example accepted-progress rate: **56.25%**
 
-Validation-selected Tiny MLP @ 0.10:
+Pre-registered gate result:
 
-- final solver ops: **59.93**
-- residual savings: **149.48**
-- teacher-savings recovery: **95.70%**
-- mean attempted proposals: **2.49**
+    H1  PASS
+    H2  PASS
+    H3  PASS
+    H4  FAIL
+    H5  PASS
 
-Validation-selected deterministic residual policy, **Markowitz @ 0.05**:
+Therefore:
 
-- final solver ops: **46.22**
-- residual savings: **163.18**
-- teacher-savings recovery: **104.47%**
-- mean attempted proposals: **8.56**
+    FAMILY_NOT_HARD_ENOUGH
 
-The learned model passed the absolute recovery gate but failed the pre-registered
-value-add gate:
+### What failed
 
-    learned recovery                 = 95.70%   PASS
-    learned advantage vs Markowitz   = -8.77%   FAIL
+The old parser was **not blind**. Every active cell exposed the expected local
+one-row candidates.
 
-Decision:
+The issue is deeper: the frozen one-row materializer cannot substitute an
+eliminated target into its coupled partner row. Most locally valid one-row
+identities therefore cannot become globally sufficient reductions and are
+correctly rejected by original-problem verification.
 
-    KEEP_DETERMINISTIC_RESIDUAL
+This is a primitive-completeness boundary, not a parser failure.
 
-### Architecture consequence
+### What remains valid
 
-For this exact affine-linear family, the learned residual component is deleted.
+The exact 2x2 block primitive safely reached the declared core across all active
+cells with 100% original-problem verification and zero unsafe block reductions.
 
-The current cheapest validated path is:
+So the multi-row primitive is retained.
 
-    target-leaf @ 0.10
-        ↓
-    deterministic checker
-        ↓
-    residual Markowitz @ 0.05
-        ↓
-    deterministic checker
-        ↓
-    exact retained solve
-        ↓
-    reconstruction
-        ↓
-    original-problem verification
-
-The result also sharpens the teacher boundary.
-
-Markowitz exceeded the one-step greedy teacher's residual savings on final data,
-so exact marginal-gain greedy search is **not** a global optimum. Structural
-search order is path-dependent.
-
-Secondary final deterministic methods, reported descriptively only, reached
-slightly lower solver ops than Markowitz, but final data are not reused to
-reselect the primary policy.
+The pure-coupled generator is not.
 
 ### Next research move
 
-Do **not** increase neural capacity on this family.
+Do **not** relax H4 after seeing the result.
 
-v0.0.38 should move to a harder structural family where cheap local sparsity and
-incidence heuristics are less aligned with downstream solver work, then test
-whether the frozen deterministic pair transfers.
+Do **not** retune the frozen local thresholds or train a block scorer yet.
+
+The next gate is:
+
+    v0.0.38.1
+        = Mixed Local + Coupled Harder-Family Gate
+
+It will add easy one-row leaves alongside coupled blocks so the old pipeline
+makes genuine measurable progress before saturating, while multi-row headroom
+still remains.
+
+The original H1-H5 thresholds stay unchanged.
 
 See:
 
-- `docs/experiments/v0.0.35.md`
-- `docs/experiments/v0.0.36.md`
 - `docs/experiments/v0.0.37.md`
+- `docs/experiments/v0.0.38.md`
 
 ### Frozen enabling results
 
