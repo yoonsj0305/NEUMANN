@@ -85,6 +85,8 @@ jobs:
         run: python benchmark_v041_smoke.py
       - name: Residual-peeling contract smoke
         run: python benchmark_v042_smoke.py
+      - name: Incremental indexed-peeling contract smoke
+        run: python benchmark_v043_smoke.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .

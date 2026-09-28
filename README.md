@@ -55,6 +55,17 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.43 — Incremental indexed peeling**
+
+This freezes v0.0.42 E2 and indexes residual low-incidence row pairs. On a
+fresh 224-system audit, the same verified reductions and solutions were
+selected on all 192 active cases; indexed pair examinations fell to 4.44%
+in the coefficient arm and 0.73% in each overlap arm. The 32 controls stayed
+uncompressed without rejected whole-system proposals. Paired local timing
+ratios ranged from 0.855 to 0.893, but this does not measure energy or
+general-purpose performance. See `docs/experiments/v0.0.43.md` and run
+`python benchmark_v043_smoke.py` or `python benchmark_v043.py`.
+
 **v0.0.42 — Nonunit parser and residual-incidence peeling**
 
 This experiment tested two deterministic repairs to the v0.0.41 failure
