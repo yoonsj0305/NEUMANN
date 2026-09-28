@@ -55,17 +55,25 @@ See:
 
 ## Current engineering baseline
 
-**v0.0.38 — Coupled-Block Harder Structural Family Gate**
+**v0.0.38.1 — Mixed Local + Coupled Harder-Family Gate**
 
-v0.0.38 introduced exact two-row / two-target coupled compression after the
-original affine family became saturated by local heuristics.
+v0.0.38.1 repaired the failed bridge from v0.0.38 without changing the
+pre-registered H1-H5 hardness thresholds.
 
-New motif:
+The new family mixes:
 
-    y + z = f(core)
-    y - z = g(core)
+1. easy one-row leaves the frozen local pipeline can safely remove, and
+2. exact coupled 2x2 blocks that remain after local compression saturates.
 
-The frozen v0.0.37 local pipeline was carried forward unchanged:
+For active systems with n-k >= 4:
+
+    exactly 2 easy leaves
+        +
+    remaining derived variables in coupled 2x2 blocks
+
+The smallest active n-k=2 cell remains pure coupled.
+
+Frozen local pipeline:
 
     target-leaf @ 0.10
         ↓
@@ -75,86 +83,106 @@ The frozen v0.0.37 local pipeline was carried forward unchanged:
         ↓
     deterministic checker
 
-The new 2x2 block checker uses exact Fraction arithmetic, re-derives the
-reconstruction algebra from the original rows, and verifies the reconstructed
-answer against the original full system.
+Exact reference:
+
+    validated easy-leaf rules
+        +
+    validated exact 2x2 block rules
+        ↓
+    exact retained solve
+        ↓
+    reconstruction
+        ↓
+    original full-system verification
 
 Data:
 
 - **256 final systems**
 - **224 active systems**
-- **32 no-compression controls**
+- **192 mixed active systems**
+- **32 controls**
+- candidate-count contract: **100%**
 - verified retention: **100%** on both paths
 - unsafe reductions: **0**
 - `KEEP = true`
 
-### Measured result
+### Harder-family gate result
 
-Exact block oracle:
+Frozen one-row pipeline:
+
+- easy-leaf recovery: **100%**
+- total elimination recovery: **25.43%**
+- solver-savings recovery: **33.53%**
+- active-example progress rate: **88.84%**
+
+Exact mixed reference:
 
 - retained-dimension error: **0**
 - broad retained-dimension gap: **7 / 7 active cells**
 
-Frozen one-row pipeline:
-
-- elimination recovery: **7.35%**
-- solver-savings recovery: **11.52%**
-- active-example accepted-progress rate: **56.25%**
-
-Pre-registered gate result:
+Pre-registered H1-H5:
 
     H1  PASS
     H2  PASS
     H3  PASS
-    H4  FAIL
+    H4  PASS
     H5  PASS
 
 Therefore:
 
-    FAMILY_NOT_HARD_ENOUGH
+    HARDER_FAMILY_VALIDATED
 
-### What failed
+### Why this matters
 
-The old parser was **not blind**. Every active cell exposed the expected local
-one-row candidates.
+The local pipeline is no longer failing because the benchmark hides local
+structure.
 
-The issue is deeper: the frozen one-row materializer cannot substitute an
-eliminated target into its coupled partner row. Most locally valid one-row
-identities therefore cannot become globally sufficient reductions and are
-correctly rejected by original-problem verification.
+It recovers every declared easy leaf.
 
-This is a primitive-completeness boundary, not a parser failure.
+Yet after that verified local progress, most of the useful compression remains
+in multi-row coupled structure.
 
-### What remains valid
+This gives NEUMANN a clean two-stage testbed:
 
-The exact 2x2 block primitive safely reached the declared core across all active
-cells with 100% original-problem verification and zero unsafe block reductions.
+    local structural compression works
+        ↓
+    local primitive saturates
+        ↓
+    nonlocal / multi-row headroom remains
 
-So the multi-row primitive is retained.
+That is the condition required before testing structural discovery.
 
-The pure-coupled generator is not.
+### Next canonical experiment
 
-### Next research move
+Do not redesign this family again and do not increase residual neural capacity.
 
-Do **not** relax H4 after seeing the result.
+The next canonical experiment is:
 
-Do **not** retune the frozen local thresholds or train a block scorer yet.
+    v0.0.40
+        = Coupled-Block Discovery / Routing Gauntlet
 
-The next gate is:
+It must compare:
 
-    v0.0.38.1
-        = Mixed Local + Coupled Harder-Family Gate
+1. deterministic exact 2x2 algebraic enumeration,
+2. sparse row-pair / target-pair heuristics,
+3. graph / connected-component pairing,
+4. a smallest-adequate learned block scorer only if cheaper discovery methods
+   leave pre-registered verified downstream headroom.
 
-It will add easy one-row leaves alongside coupled blocks so the old pipeline
-makes genuine measurable progress before saturating, while multi-row headroom
-still remains.
+The optimization target remains:
 
-The original H1-H5 thresholds stay unchanged.
+    verified downstream solver work
+
+not generator block-label imitation.
+
+The separately open v0.0.39 pure-coupled replication may provide secondary
+parser-visibility evidence, but it does not replace the canonical mixed-family
+path.
 
 See:
 
-- `docs/experiments/v0.0.37.md`
 - `docs/experiments/v0.0.38.md`
+- `docs/experiments/v0.0.38.1.md`
 
 ### Frozen enabling results
 
