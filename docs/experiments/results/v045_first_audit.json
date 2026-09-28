@@ -1,0 +1,138 @@
+{
+  "arms": {
+    "alternatives": {
+      "count": 96,
+      "mean_baseline_ops": 393.5416666666667,
+      "mean_new_checkers": 2,
+      "mean_new_derivations": 2.0416666666666665,
+      "mean_new_eliminated": 2,
+      "mean_new_ops": 168.4375,
+      "mean_new_pairs": 4.552083333333333,
+      "mean_new_posting_edges": 22,
+      "mean_new_posting_updates": 0,
+      "mean_old_checkers": 0,
+      "mean_old_derivations": 0,
+      "mean_old_eliminated": 0,
+      "mean_old_ops": 393.5416666666667,
+      "mean_old_pairs": 0,
+      "mean_old_posting_edges": 16,
+      "mean_old_posting_updates": 0,
+      "mean_schur_construction_ops": 44.958333333333336,
+      "median_paired_runtime_ratio": 1.487015542267928,
+      "modes": {
+        "full": 0,
+        "schur": 96,
+        "sparse": 0
+      },
+      "new_attempts": 96,
+      "new_median_ms": 0.9502225,
+      "new_rejections": 0,
+      "old_attempts": 0,
+      "old_median_ms": 0.641384,
+      "old_rejections": 0,
+      "two_valid_witnesses": 96,
+      "two_variable_recovery_count": 96,
+      "verified": true
+    },
+    "control": {
+      "count": 32,
+      "mean_baseline_ops": 55.75,
+      "mean_new_checkers": 0,
+      "mean_new_derivations": 0,
+      "mean_new_eliminated": 0,
+      "mean_new_ops": 55.75,
+      "mean_new_pairs": 0,
+      "mean_new_posting_edges": 10,
+      "mean_new_posting_updates": 0,
+      "mean_old_checkers": 0,
+      "mean_old_derivations": 0,
+      "mean_old_eliminated": 0,
+      "mean_old_ops": 55.75,
+      "mean_old_pairs": 0,
+      "mean_old_posting_edges": 10,
+      "mean_old_posting_updates": 0,
+      "mean_schur_construction_ops": 0,
+      "median_paired_runtime_ratio": 1.0044036904554803,
+      "modes": {
+        "full": 32,
+        "schur": 0,
+        "sparse": 0
+      },
+      "new_attempts": 0,
+      "new_median_ms": 0.1180805,
+      "new_rejections": 0,
+      "old_attempts": 0,
+      "old_median_ms": 0.113384,
+      "old_rejections": 0,
+      "verified": true
+    },
+    "high_degree": {
+      "cells": {
+        "2x16": {
+          "count": 24,
+          "full_recovery_count": 24,
+          "median_paired_runtime_ratio": 1.1169207074296286
+        },
+        "2x32": {
+          "count": 24,
+          "full_recovery_count": 24,
+          "median_paired_runtime_ratio": 1.0758675737961134
+        },
+        "4x16": {
+          "count": 24,
+          "full_recovery_count": 24,
+          "median_paired_runtime_ratio": 1.0539595806542692
+        },
+        "4x32": {
+          "count": 24,
+          "full_recovery_count": 24,
+          "median_paired_runtime_ratio": 1.0479017246295543
+        }
+      },
+      "count": 96,
+      "full_recovery_count": 96,
+      "mean_baseline_ops": 4989.291666666667,
+      "mean_new_checkers": 56,
+      "mean_new_derivations": 56,
+      "mean_new_eliminated": 21,
+      "mean_new_ops": 55.770833333333336,
+      "mean_new_pairs": 56,
+      "mean_new_posting_edges": 46,
+      "mean_new_posting_updates": 23,
+      "mean_old_checkers": 48.5,
+      "mean_old_derivations": 48.5,
+      "mean_old_eliminated": 19,
+      "mean_old_ops": 149.8125,
+      "mean_old_pairs": 48.5,
+      "mean_old_posting_edges": 34,
+      "mean_old_posting_updates": 17,
+      "mean_oracle_ops": 55.770833333333336,
+      "mean_schur_construction_ops": 0,
+      "median_paired_runtime_ratio": 1.0599788121668468,
+      "modes": {
+        "full": 0,
+        "schur": 0,
+        "sparse": 96
+      },
+      "new_attempts": 96,
+      "new_median_ms": 17.6525,
+      "new_rejections": 0,
+      "old_attempts": 96,
+      "old_median_ms": 15.746837500000002,
+      "old_rejections": 0,
+      "oracle_verified": true,
+      "positive_oracle_savings_each": true,
+      "verified": true
+    }
+  },
+  "boundary": "Paired full-path wall time includes routing, search, exact checking, Schur construction, retained solve, reconstruction and original verification. Retained solver arithmetic is not total cost. No energy or peak RAM measurement.",
+  "cells_complete": true,
+  "count": 224,
+  "decision": "STRUCTURAL_REPAIR_CONFIRMED",
+  "experiment": "v0.0.45 exact Schur and incidence-six cost audit",
+  "fresh_signatures": true,
+  "timing_environment": {
+    "omp_num_threads": "1",
+    "pythonhashseed": "0"
+  }
+}
