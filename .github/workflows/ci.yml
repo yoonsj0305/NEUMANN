@@ -77,6 +77,8 @@ jobs:
         run: python benchmark_v037_smoke.py
       - name: Coupled-block harder-family contract smoke
         run: python benchmark_v038_smoke.py
+      - name: Mixed local-plus-coupled full gate
+        run: python benchmark_v0381.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .
