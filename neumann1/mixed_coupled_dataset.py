@@ -543,7 +543,7 @@ def generate_mixed_cell(
     variant: str = "legacy",
 ) -> tuple[MixedCoupledExample, ...]:
     if (k, n) not in mixed_scale_grid() and not (
-        split == "v041_control" and (k, n) == (2, 2)
+        split in {"v041_control", "v042_control"} and (k, n) == (2, 2)
         and variant == "legacy"
     ):
         raise ValueError(

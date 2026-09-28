@@ -1,0 +1,534 @@
+{
+  "arms": {
+    "coefficient": {
+      "count": 64,
+      "decision": "DETERMINISTIC_SUFFICIENT",
+      "new_methods": {
+        "E1_static_nonunit": {
+          "block_label_recall": 1.0,
+          "cells": [
+            {
+              "count": 16,
+              "k": 2,
+              "mean_elimination_recovery": 1.0,
+              "mean_solver_savings_recovery": 1.0,
+              "n": 16,
+              "verified_retention": 1
+            },
+            {
+              "count": 16,
+              "k": 2,
+              "mean_elimination_recovery": 1.0,
+              "mean_solver_savings_recovery": 1.0,
+              "n": 32,
+              "verified_retention": 1
+            },
+            {
+              "count": 16,
+              "k": 4,
+              "mean_elimination_recovery": 1.0,
+              "mean_solver_savings_recovery": 1.0,
+              "n": 16,
+              "verified_retention": 1
+            },
+            {
+              "count": 16,
+              "k": 4,
+              "mean_elimination_recovery": 1.0,
+              "mean_solver_savings_recovery": 1.0,
+              "n": 32,
+              "verified_retention": 1
+            }
+          ],
+          "count": 64,
+          "final_materialization_attempts": 64,
+          "mean_checker_calls": 58,
+          "mean_derivation_calls": 58,
+          "mean_elimination_recovery": 1.0,
+          "mean_final_solver_ops": 56.09375,
+          "mean_row_pair_examinations": 1305.5,
+          "mean_solver_savings_recovery": 1.0,
+          "rejected_joint_materializations": 0,
+          "unsafe_accepted_reductions": 0,
+          "verified_retention": 1
+        },
+        "E2_residual_peeling": {
+          "block_label_recall": 1.0,
+          "cells": [
+            {
+              "count": 16,
+              "k": 2,
+              "mean_elimination_recovery": 1.0,
+              "mean_solver_savings_recovery": 1.0,
+              "n": 16,
+              "verified_retention": 1
+            },
+            {
+              "count": 16,
+              "k": 2,
+              "mean_elimination_recovery": 1.0,
+              "mean_solver_savings_recovery": 1.0,
+              "n": 32,
+              "verified_retention": 1
+            },
+            {
+              "count": 16,
+              "k": 4,
+              "mean_elimination_recovery": 1.0,
+              "mean_solver_savings_recovery": 1.0,
+              "n": 16,
+              "verified_retention": 1
+            },
+            {
+              "count": 16,
+              "k": 4,
+              "mean_elimination_recovery": 1.0,
+              "mean_solver_savings_recovery": 1.0,
+              "n": 32,
+              "verified_retention": 1
+            }
+          ],
+          "count": 64,
+          "final_materialization_attempts": 64,
+          "mean_checker_calls": 58,
+          "mean_derivation_calls": 58,
+          "mean_elimination_recovery": 1.0,
+          "mean_final_solver_ops": 56.09375,
+          "mean_row_pair_examinations": 1305.5,
+          "mean_solver_savings_recovery": 1.0,
+          "rejected_joint_materializations": 0,
+          "unsafe_accepted_reductions": 0,
+          "verified_retention": 1
+        }
+      },
+      "nonunit_candidate_visibility_e1": 1.0,
+      "nonunit_candidate_visibility_e2": 1.0,
+      "old_baselines": {
+        "D0_frozen_local_only": {
+          "mean_final_solver_ops": 3809,
+          "mean_solver_savings_recovery": 0.1536210709507094,
+          "rejected_joint_materializations": 0,
+          "verified_retention": 1
+        },
+        "D1_local_first_exact_overlap": {
+          "mean_final_solver_ops": 3809,
+          "mean_solver_savings_recovery": 0.1536210709507094,
+          "rejected_joint_materializations": 0,
+          "verified_retention": 1
+        },
+        "D2_incidence_exact_overlap": {
+          "mean_final_solver_ops": 3809,
+          "mean_solver_savings_recovery": 0.1536210709507094,
+          "rejected_joint_materializations": 0,
+          "verified_retention": 1
+        },
+        "D3_incidence_sparse_unit_pair": {
+          "mean_final_solver_ops": 3809,
+          "mean_solver_savings_recovery": 0.1536210709507094,
+          "rejected_joint_materializations": 0,
+          "verified_retention": 1
+        },
+        "D4_incidence_component_graph": {
+          "mean_final_solver_ops": 3809,
+          "mean_solver_savings_recovery": 0.1536210709507094,
+          "rejected_joint_materializations": 0,
+          "verified_retention": 1
+        }
+      },
+      "oracle_positive_savings_each_example": true,
+      "oracle_verified": true
+    },
+    "combined": {
+      "count": 64,
+      "decision": "DETERMINISTIC_SUFFICIENT",
+      "new_methods": {
+        "E1_static_nonunit": {
+          "block_label_recall": 0.10526315789473684,
+          "cells": [
+            {
+              "count": 16,
+              "k": 2,
+              "mean_elimination_recovery": 0.2857142857142857,
+              "mean_solver_savings_recovery": 0.40297280025623206,
+              "n": 16,
+              "verified_retention": 1
+            },
+            {
+              "count": 16,
+              "k": 2,
+              "mean_elimination_recovery": 0.13333333333333333,
+              "mean_solver_savings_recovery": 0.23002186215868103,
+              "n": 32,
+              "verified_retention": 1
+            },
+            {
+              "count": 16,
+              "k": 4,
+              "mean_elimination_recovery": 0.3333333333333333,
+              "mean_solver_savings_recovery": 0.4589095746390891,
+              "n": 16,
+              "verified_retention": 1
+            },
+            {
+              "count": 16,
+              "k": 4,
+              "mean_elimination_recovery": 0.14285714285714285,
+              "mean_solver_savings_recovery": 0.18389677260296253,
+              "n": 32,
+              "verified_retention": 1
+            }
+          ],
+          "count": 64,
+          "final_materialization_attempts": 64,
+          "mean_checker_calls": 1,
+          "mean_derivation_calls": 1,
+          "mean_elimination_recovery": 0.2238095238095238,
+          "mean_final_solver_ops": 4464.65625,
+          "mean_row_pair_examinations": 485,
+          "mean_solver_savings_recovery": 0.3189502524142412,
+          "rejected_joint_materializations": 0,
+          "unsafe_accepted_reductions": 0,
+          "verified_retention": 1
+        },
+        "E2_residual_peeling": {
+          "block_label_recall": 1.0,
+          "cells": [
+            {
+              "count": 16,
+              "k": 2,
+              "mean_elimination_recovery": 1.0,
+              "mean_solver_savings_recovery": 1.0,
+              "n": 16,
+              "verified_retention": 1
+            },
+            {
+              "count": 16,
+              "k": 2,
+              "mean_elimination_recovery": 1.0,
+              "mean_solver_savings_recovery": 1.0,
+              "n": 32,
+              "verified_retention": 1
+            },
+            {
+              "count": 16,
+              "k": 4,
+              "mean_elimination_recovery": 1.0,
+              "mean_solver_savings_recovery": 1.0,
+              "n": 16,
+              "verified_retention": 1
+            },
+            {
+              "count": 16,
+              "k": 4,
+              "mean_elimination_recovery": 1.0,
+              "mean_solver_savings_recovery": 1.0,
+              "n": 32,
+              "verified_retention": 1
+            }
+          ],
+          "count": 64,
+          "final_materialization_attempts": 64,
+          "mean_checker_calls": 9.5,
+          "mean_derivation_calls": 9.5,
+          "mean_elimination_recovery": 1.0,
+          "mean_final_solver_ops": 55.65625,
+          "mean_row_pair_examinations": 1305.5,
+          "mean_solver_savings_recovery": 1.0,
+          "rejected_joint_materializations": 0,
+          "unsafe_accepted_reductions": 0,
+          "verified_retention": 1
+        }
+      },
+      "nonunit_candidate_visibility_e1": 0.10526315789473684,
+      "nonunit_candidate_visibility_e2": 1.0,
+      "old_baselines": {
+        "D0_frozen_local_only": {
+          "mean_final_solver_ops": 5276.875,
+          "mean_solver_savings_recovery": 0.14092434393132386,
+          "rejected_joint_materializations": 0,
+          "verified_retention": 1
+        },
+        "D1_local_first_exact_overlap": {
+          "mean_final_solver_ops": 5276.875,
+          "mean_solver_savings_recovery": 0.14092434393132386,
+          "rejected_joint_materializations": 0,
+          "verified_retention": 1
+        },
+        "D2_incidence_exact_overlap": {
+          "mean_final_solver_ops": 5276.875,
+          "mean_solver_savings_recovery": 0.14092434393132386,
+          "rejected_joint_materializations": 0,
+          "verified_retention": 1
+        },
+        "D3_incidence_sparse_unit_pair": {
+          "mean_final_solver_ops": 5276.875,
+          "mean_solver_savings_recovery": 0.14092434393132386,
+          "rejected_joint_materializations": 0,
+          "verified_retention": 1
+        },
+        "D4_incidence_component_graph": {
+          "mean_final_solver_ops": 5276.875,
+          "mean_solver_savings_recovery": 0.14092434393132386,
+          "rejected_joint_materializations": 0,
+          "verified_retention": 1
+        }
+      },
+      "oracle_positive_savings_each_example": true,
+      "oracle_verified": true
+    },
+    "control": {
+      "count": 32,
+      "decision": "CONTROL",
+      "new_methods": {
+        "E1_static_nonunit": {
+          "block_label_recall": null,
+          "cells": [
+            {
+              "count": 16,
+              "k": 2,
+              "mean_elimination_recovery": null,
+              "mean_solver_savings_recovery": null,
+              "n": 2,
+              "verified_retention": 1
+            },
+            {
+              "count": 16,
+              "k": 4,
+              "mean_elimination_recovery": null,
+              "mean_solver_savings_recovery": null,
+              "n": 4,
+              "verified_retention": 1
+            }
+          ],
+          "count": 32,
+          "final_materialization_attempts": 32,
+          "mean_checker_calls": 0.5,
+          "mean_derivation_calls": 0.5,
+          "mean_elimination_recovery": null,
+          "mean_final_solver_ops": 56.3125,
+          "mean_row_pair_examinations": 3.5,
+          "mean_solver_savings_recovery": null,
+          "rejected_joint_materializations": 16,
+          "unsafe_accepted_reductions": 0,
+          "verified_retention": 1
+        },
+        "E2_residual_peeling": {
+          "block_label_recall": null,
+          "cells": [
+            {
+              "count": 16,
+              "k": 2,
+              "mean_elimination_recovery": null,
+              "mean_solver_savings_recovery": null,
+              "n": 2,
+              "verified_retention": 1
+            },
+            {
+              "count": 16,
+              "k": 4,
+              "mean_elimination_recovery": null,
+              "mean_solver_savings_recovery": null,
+              "n": 4,
+              "verified_retention": 1
+            }
+          ],
+          "count": 32,
+          "final_materialization_attempts": 32,
+          "mean_checker_calls": 0.5,
+          "mean_derivation_calls": 0.5,
+          "mean_elimination_recovery": null,
+          "mean_final_solver_ops": 56.3125,
+          "mean_row_pair_examinations": 3.5,
+          "mean_solver_savings_recovery": null,
+          "rejected_joint_materializations": 16,
+          "unsafe_accepted_reductions": 0,
+          "verified_retention": 1
+        }
+      },
+      "nonunit_candidate_visibility_e1": null,
+      "nonunit_candidate_visibility_e2": null,
+      "old_baselines": {
+        "D0_frozen_local_only": {
+          "mean_final_solver_ops": 56.3125,
+          "mean_solver_savings_recovery": null,
+          "rejected_joint_materializations": 0,
+          "verified_retention": 1
+        },
+        "D1_local_first_exact_overlap": {
+          "mean_final_solver_ops": 56.3125,
+          "mean_solver_savings_recovery": null,
+          "rejected_joint_materializations": 0,
+          "verified_retention": 1
+        },
+        "D2_incidence_exact_overlap": {
+          "mean_final_solver_ops": 56.3125,
+          "mean_solver_savings_recovery": null,
+          "rejected_joint_materializations": 0,
+          "verified_retention": 1
+        },
+        "D3_incidence_sparse_unit_pair": {
+          "mean_final_solver_ops": 56.3125,
+          "mean_solver_savings_recovery": null,
+          "rejected_joint_materializations": 0,
+          "verified_retention": 1
+        },
+        "D4_incidence_component_graph": {
+          "mean_final_solver_ops": 56.3125,
+          "mean_solver_savings_recovery": null,
+          "rejected_joint_materializations": 0,
+          "verified_retention": 1
+        }
+      },
+      "oracle_positive_savings_each_example": true,
+      "oracle_verified": true
+    },
+    "overlap": {
+      "count": 64,
+      "decision": "DETERMINISTIC_SUFFICIENT",
+      "new_methods": {
+        "E1_static_nonunit": {
+          "block_label_recall": 0.10526315789473684,
+          "cells": [
+            {
+              "count": 16,
+              "k": 2,
+              "mean_elimination_recovery": 0.2857142857142857,
+              "mean_solver_savings_recovery": 0.3693042572361385,
+              "n": 16,
+              "verified_retention": 1
+            },
+            {
+              "count": 16,
+              "k": 2,
+              "mean_elimination_recovery": 0.13333333333333333,
+              "mean_solver_savings_recovery": 0.1560100455244435,
+              "n": 32,
+              "verified_retention": 1
+            },
+            {
+              "count": 16,
+              "k": 4,
+              "mean_elimination_recovery": 0.3333333333333333,
+              "mean_solver_savings_recovery": 0.4651642129685277,
+              "n": 16,
+              "verified_retention": 1
+            },
+            {
+              "count": 16,
+              "k": 4,
+              "mean_elimination_recovery": 0.14285714285714285,
+              "mean_solver_savings_recovery": 0.1934695370564707,
+              "n": 32,
+              "verified_retention": 1
+            }
+          ],
+          "count": 64,
+          "final_materialization_attempts": 64,
+          "mean_checker_calls": 1,
+          "mean_derivation_calls": 1,
+          "mean_elimination_recovery": 0.2238095238095238,
+          "mean_final_solver_ops": 4309.03125,
+          "mean_row_pair_examinations": 485,
+          "mean_solver_savings_recovery": 0.2959870131963951,
+          "rejected_joint_materializations": 0,
+          "unsafe_accepted_reductions": 0,
+          "verified_retention": 1
+        },
+        "E2_residual_peeling": {
+          "block_label_recall": 1.0,
+          "cells": [
+            {
+              "count": 16,
+              "k": 2,
+              "mean_elimination_recovery": 1.0,
+              "mean_solver_savings_recovery": 1.0,
+              "n": 16,
+              "verified_retention": 1
+            },
+            {
+              "count": 16,
+              "k": 2,
+              "mean_elimination_recovery": 1.0,
+              "mean_solver_savings_recovery": 1.0,
+              "n": 32,
+              "verified_retention": 1
+            },
+            {
+              "count": 16,
+              "k": 4,
+              "mean_elimination_recovery": 1.0,
+              "mean_solver_savings_recovery": 1.0,
+              "n": 16,
+              "verified_retention": 1
+            },
+            {
+              "count": 16,
+              "k": 4,
+              "mean_elimination_recovery": 1.0,
+              "mean_solver_savings_recovery": 1.0,
+              "n": 32,
+              "verified_retention": 1
+            }
+          ],
+          "count": 64,
+          "final_materialization_attempts": 64,
+          "mean_checker_calls": 9.5,
+          "mean_derivation_calls": 9.5,
+          "mean_elimination_recovery": 1.0,
+          "mean_final_solver_ops": 55.78125,
+          "mean_row_pair_examinations": 1305.5,
+          "mean_solver_savings_recovery": 1.0,
+          "rejected_joint_materializations": 0,
+          "unsafe_accepted_reductions": 0,
+          "verified_retention": 1
+        }
+      },
+      "nonunit_candidate_visibility_e1": 0.10526315789473684,
+      "nonunit_candidate_visibility_e2": 1.0,
+      "old_baselines": {
+        "D0_frozen_local_only": {
+          "mean_final_solver_ops": 4277.125,
+          "mean_solver_savings_recovery": 0.24425156156974054,
+          "rejected_joint_materializations": 0,
+          "verified_retention": 1
+        },
+        "D1_local_first_exact_overlap": {
+          "mean_final_solver_ops": 5505.84375,
+          "mean_solver_savings_recovery": 0.0,
+          "rejected_joint_materializations": 64,
+          "verified_retention": 1
+        },
+        "D2_incidence_exact_overlap": {
+          "mean_final_solver_ops": 5505.84375,
+          "mean_solver_savings_recovery": 0.0,
+          "rejected_joint_materializations": 64,
+          "verified_retention": 1
+        },
+        "D3_incidence_sparse_unit_pair": {
+          "mean_final_solver_ops": 4309.03125,
+          "mean_solver_savings_recovery": 0.2959870131963951,
+          "rejected_joint_materializations": 0,
+          "verified_retention": 1
+        },
+        "D4_incidence_component_graph": {
+          "mean_final_solver_ops": 5110.65625,
+          "mean_solver_savings_recovery": 0.11531751750754828,
+          "rejected_joint_materializations": 0,
+          "verified_retention": 1
+        }
+      },
+      "oracle_positive_savings_each_example": true,
+      "oracle_verified": true
+    }
+  },
+  "boundary": "Generated exact linear systems; final solver ops exclude discovery, checker, and router work.",
+  "cells_complete": true,
+  "controls_unchanged": true,
+  "count": 224,
+  "experiment": "v0.0.42 deterministic nonunit visibility and residual peeling",
+  "fresh_signatures": true,
+  "keep_audit": true,
+  "methods_verified": true,
+  "oracle_verified": true,
+  "unsafe_accepted_reductions_zero": true
+}
