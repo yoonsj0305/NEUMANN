@@ -10,7 +10,6 @@ import numpy as np
 from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-from threadpoolctl import threadpool_limits
 
 from .learned_compression_dataset import (
     AffineDependency,
@@ -308,17 +307,10 @@ class LearnedCompressionProposer:
                 "training corpus must contain positive and negative candidates"
             )
 
-        # v0.0.34 reproducibility hardening:
-        # sklearn's L-BFGS delegates dense linear algebra to BLAS.
-        # Different runner thread scheduling produced different fitted
-        # weights despite a fixed sklearn random_state. Restrict the
-        # numerical backend to one thread so the frozen v0.0.33 scorer
-        # is reproducible across CI runners.
-        with threadpool_limits(limits=1):
-            self.pipeline.fit(
-                np.asarray(X, dtype=float),
-                np.asarray(y, dtype=int),
-            )
+        self.pipeline.fit(
+            np.asarray(X, dtype=float),
+            np.asarray(y, dtype=int),
+        )
         return self
 
     def score(
@@ -341,8 +333,7 @@ class LearnedCompressionProposer:
             ],
             dtype=float,
         )
-        with threadpool_limits(limits=1):
-            probabilities = self.pipeline.predict_proba(X)[:, 1]
+        probabilities = self.pipeline.predict_proba(X)[:, 1]
 
         scored = [
             ScoredCandidate(
