@@ -2,6 +2,12 @@ from __future__ import annotations
 
 import json
 import math
+import os
+
+import numpy
+import scipy
+import sklearn
+import threadpoolctl
 
 from neumann1.learned_compression_dataset import (
     learned_compression_final_examples,
@@ -178,6 +184,18 @@ def run() -> dict[str, object]:
             "v0.0.34 Structural Baseline Gauntlet "
             "+ Confidence Stopping"
         ),
+        "numerical_reproducibility": {
+            "numpy_version": numpy.__version__,
+            "scipy_version": scipy.__version__,
+            "scikit_learn_version": sklearn.__version__,
+            "threadpoolctl_version": threadpoolctl.__version__,
+            "pythonhashseed": os.environ.get("PYTHONHASHSEED"),
+            "openblas_num_threads": os.environ.get("OPENBLAS_NUM_THREADS"),
+            "openblas_coretype": os.environ.get("OPENBLAS_CORETYPE"),
+            "omp_num_threads": os.environ.get("OMP_NUM_THREADS"),
+            "mkl_num_threads": os.environ.get("MKL_NUM_THREADS"),
+            "threadpools": threadpoolctl.threadpool_info(),
+        },
         "data_contract": {
             "scale_grid": [
                 {
