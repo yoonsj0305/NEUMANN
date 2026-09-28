@@ -315,3 +315,46 @@ __all__ += [
     "FrozenV033CheckpointProposer",
     "checkpoint_state_sha256",
 ]
+
+from .utility_compression_dataset import (
+    V035_TRAIN_EXAMPLES_PER_CELL,
+    V035_CALIBRATION_EXAMPLES_PER_CELL,
+    V035_FINAL_EXAMPLES_PER_CELL,
+    v035_training_examples,
+    v035_calibration_examples,
+    v035_final_examples,
+)
+from .frozen_v035_checkpoints import (
+    V035_REFERENCE_STATE_SHA256,
+    V035_UTILITY_STATE_SHA256,
+    FrozenV035ReferenceClassifier,
+    FrozenV035UtilityRegressor,
+    checkpoint_fingerprints,
+)
+from .utility_gauntlet import (
+    V035_METHODS, V035_DEPLOYABLE_METHODS,
+    V035_THRESHOLD_GRID, UtilityScorerBundle,
+    UtilityThresholdCalibration, UtilityPolicyObservation,
+    make_v035_scorers, score_v035_candidates,
+    exact_one_step_utility_scores, build_prefix_trace,
+    calibrate_utility_threshold, observe_utility_policy,
+    utility_regressor_diagnostics,
+    aggregate_utility_observations,
+)
+__all__ += [
+    "V035_TRAIN_EXAMPLES_PER_CELL",
+    "V035_CALIBRATION_EXAMPLES_PER_CELL",
+    "V035_FINAL_EXAMPLES_PER_CELL",
+    "v035_training_examples", "v035_calibration_examples",
+    "v035_final_examples", "V035_REFERENCE_STATE_SHA256",
+    "V035_UTILITY_STATE_SHA256",
+    "FrozenV035ReferenceClassifier", "FrozenV035UtilityRegressor",
+    "checkpoint_fingerprints", "V035_METHODS",
+    "V035_DEPLOYABLE_METHODS", "V035_THRESHOLD_GRID",
+    "UtilityScorerBundle", "UtilityThresholdCalibration",
+    "UtilityPolicyObservation", "make_v035_scorers",
+    "score_v035_candidates", "exact_one_step_utility_scores",
+    "build_prefix_trace", "calibrate_utility_threshold",
+    "observe_utility_policy", "utility_regressor_diagnostics",
+    "aggregate_utility_observations",
+]
