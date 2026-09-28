@@ -237,7 +237,7 @@ def _make_example(
 
             rhs = sum(
                 row[column] * logical_values[column]
-                for column in range(n)
+                for column in range(len(logical_values))
             )
             old_rows.append(
                 len(logical_rows)
