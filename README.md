@@ -55,6 +55,19 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.41 — Anti-shortcut causal audit**
+
+The v0.0.40 deterministic result was challenged on three separate
+synthetic arms: generic nonunit invertible 2x2 coefficients, cross-block
+overlap, and both together. Candidate visibility is measured separately from
+verified downstream compression. The audit is pre-registered in
+`docs/experiments/v0.0.41.md`; no learned block scorer was trained. The
+224-system audit passed its integrity and verification gates. Nonunit block
+coefficients exposed a candidate-visibility limit; cross-block overlap
+exposed a conflict/selection bottleneck. Run
+`python benchmark_v041.py` for the frozen 224-system audit, or
+`python benchmark_v041_smoke.py` for a bounded correctness check.
+
 **v0.0.40 — Coupled-Block Discovery / Routing Gauntlet**
 
 v0.0.40 moved from family design to actual structure discovery on a fresh
