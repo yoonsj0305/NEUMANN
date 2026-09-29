@@ -55,6 +55,14 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.49 — Matched topology cost audit (no model trained)**
+
+96 exact counterfactual pairs matched dimension, nonzero count and original
+column-incidence histogram. Every pair changed F3's retained dimension
+by two, but none showed a robust F3-to-F1 cost reversal: caching remained
+beneficial on the retained-support side. This is a negative gate result,
+not learned structural intelligence. See `docs/experiments/v0.0.49.md`.
+
 **v0.0.48 — Cost-gate opportunity audit (no model trained)**
 
 On 128 fresh exact n=16 systems, a one-feature original-incidence gate
