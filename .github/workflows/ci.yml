@@ -95,6 +95,8 @@ jobs:
         run: python benchmark_v046_smoke.py
       - name: Row-overlap boundary contract smoke
         run: python benchmark_v047_smoke.py
+      - name: Cost-gate opportunity contract smoke
+        run: python benchmark_v048_smoke.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .
