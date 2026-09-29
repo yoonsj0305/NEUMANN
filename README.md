@@ -56,6 +56,18 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.70 — Constructed combinatorial compression (bounded positive mechanism)**
+
+Classical false-twin quotient reduced full verified MIS cost by 2.53×,
+13.83× and 57.50× in three constructed expanded cells versus HiGHS with
+native presolve and symmetry enabled. Every completed optimum was checked
+by separate exact integer DP and original-edge feasibility. Two m=1
+controls were near equal, but direct execution failed the 5s optimality
+budget in the fourth expanded cell; overall gate is **CAPABILITY_UNREACHED**,
+not PASS. A summary ratio for that censored cell was corrected to null,
+with original raw trials preserved. No learned or graph-SOTA advantage is
+claimed; see `docs/experiments/v0.0.70.md`.
+
 **v0.0.69 — Verified fast direct baseline (negative opportunity gate)**
 
 With a dense numerical proposal, exact integer-equation verification on
