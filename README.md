@@ -55,6 +55,13 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.56 — Corrective natural-matrix reuse audit (preregistered)**
+
+The v0.0.55 first audit aborted on a frozen forward-error threshold, while
+the original-equation backward error remained small. The corrective protocol
+retains every source and comparator and declares its updated numerical
+criterion before the next complete audit. See `docs/experiments/v0.0.56.md`.
+
 **v0.0.55 — Unmodified matrix reuse incidence (invalid numerical gate)**
 
 All 13 original NIST BCSSTRUC1 stiffness matrices test how often exact
