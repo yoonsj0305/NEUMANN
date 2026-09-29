@@ -55,6 +55,15 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.48 — Cost-gate opportunity audit (no model trained)**
+
+On 128 fresh exact n=16 systems, a one-feature original-incidence gate
+separated all high-degree cases from dense and control cases. Only five
+robust cost winners conflicted with it (pre-registered minimum: 16), so
+the audit did not justify training a learned gate. All exact answers
+verified; local timing is diagnostic, not a deployment claim. See
+`docs/experiments/v0.0.48.md` and `python benchmark_v048_smoke.py`.
+
 **v0.0.47 — Row-overlap boundary (contract only)**
 
 F3's exact two-row support-pair candidates cannot overlap one row in a
