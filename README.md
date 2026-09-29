@@ -55,6 +55,15 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.52 — Real numerical matrix ordering audit (negative gate)**
+
+Four pinned NIST BCSSTRUC1 sparse matrices test a cheap external RCM order
+against SuperLU's native ordering policies, charging full-path work and
+checking the original equations. The data are fetched separately. The
+predeclared >=20% threshold was met on 0/4 matrices; native NATURAL was
+fastest on all four. No learned orderer was trained. The complete first
+audit and limitations are in `docs/experiments/v0.0.52.md`.
+
 **v0.0.51 — PACE external ordering opportunity gate (no model trained)**
 
 On all 28 PACE 2017 public minimum-fill graphs with at most 128 vertices,
