@@ -55,12 +55,15 @@ See:
 
 ## Current engineering baseline
 
-**v0.0.56 — Corrective natural-matrix reuse audit (preregistered)**
+**v0.0.56 — Corrective natural-matrix reuse audit (negative gate)**
 
 The v0.0.55 first audit aborted on a frozen forward-error threshold, while
 the original-equation backward error remained small. The corrective protocol
 retains every source and comparator and declares its updated numerical
-criterion before the next complete audit. See `docs/experiments/v0.0.56.md`.
+criterion before the next complete audit. Across all 13 unmodified originals,
+three had repeated components but none delivered the required end-to-end
+advantage; seven of ten no-repeat cases had >10% scanning overhead. The
+generic component scan is stopped. See `docs/experiments/v0.0.56.md`.
 
 **v0.0.55 — Unmodified matrix reuse incidence (invalid numerical gate)**
 
