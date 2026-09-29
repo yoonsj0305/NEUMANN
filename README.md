@@ -55,6 +55,14 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.51 — PACE external ordering opportunity gate (no model trained)**
+
+On all 28 PACE 2017 public minimum-fill graphs with at most 128 vertices,
+16 bounded min-fill restarts left no >=10% arithmetic-proxy headroom over
+the stronger of min-degree/min-fill in the 11 sparse cases. This is an
+external graph-only negative gate, not an exact optimum or verified numeric
+solve. See `docs/experiments/v0.0.51.md`.
+
 **v0.0.50 — Sparse ordering opportunity gate (no model trained)**
 
 On 48 fresh 12-node SPD graph Laplacian systems, min-degree/min-fill left
