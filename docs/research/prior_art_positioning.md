@@ -29,10 +29,16 @@ Working watchlist supplied by the current literature review:
 - AlphaGeometry
 - IR2Solve
 - COVER
-- SymbolLKG
 - related symbolic-chain / verifier / solver-routing work
+- mature solver presolve/ordering and learned presolve (including L2P-MIP)
+- e-graphs and equality saturation for representation and reuse
 
 These names are maintained here as a review checklist.
+
+`SymbolLKG` was removed from the bibliography watchlist because its original
+source could not be independently verified. Do not restore without a primary
+source. IR2Solve/COVER details also require primary-source verification before
+quoting any number, submission date or precise mechanism.
 
 Performance numbers, dates, exact mechanisms, and novelty comparisons must be independently verified before publication.
 
@@ -78,6 +84,12 @@ Candidate research territory:
 4. Does verified reasoning work empirically scale with retained computational degrees of freedom rather than apparent problem size?
 
 5. Does Structural Compression change the observed compute-growth curve over increasing problem complexity?
+
+Novelty is not the gate for choosing an experiment. The primary decision is
+verified capability at **lower measured total compute** versus a strong,
+deployable baseline, including the solver's native presolve, discovery,
+repair and verification. Reuse a mature method whenever it wins that test.
+Separate diagnostic per-instance oracles from deployable policy costs.
 
 ## Novelty discipline
 
