@@ -28,6 +28,16 @@ and genuine difficulty, not because one particular method won preliminary
 timings. Require strongest cheap deterministic and optimized direct
 baselines. Pre-register the minimum capability and costs before final data.
 
+v0.0.70 gives **bounded positive combinatorial mechanism evidence**, not a
+full pass: classical false-twin quotient on constructed MIS graphs gave
+2.53×, 13.83× and 57.50× lower complete verified cost in three expanded
+cells against native-presolve/symmetry-enabled HiGHS. Two m=1 controls were
+near equal. The fourth expanded cell's direct MIP failed the 5s optimality
+budget, so frozen overall verdict remains `CAPABILITY_UNREACHED` and no
+speed factor exists there. Exact DP independently checked every completed
+optimum. A stronger specialized graph/DP comparator and natural incidence
+are required before promoting this known mechanism as a NEUMANN contribution.
+
 ## Q3 — Is learned discovery needed beyond cheap tests?
 
 **Open.** Construct a matched-observable case where cheap deterministic
@@ -61,8 +71,10 @@ complete time is a failed compute gate, not a partial speed win. Retain
 negative results and costs for all failed proposals. If a cheap deterministic
 component saturates a family, do not train a model merely to have one.
 
-Immediate next experiment: seek an identifiable input regime in which
-full-path savings remain possible **after** strong direct computation,
-reuse, batching, and exact verification. Freeze its capability criterion
-and comparators before a final holdout. The v0.0.68 score-only lower bound
-rules out a checker-only rescue for the existing n≤32 learned path.
+Immediate next experiment: strengthen the graph/DP executor comparison on
+the v0.0.70 mechanism, where the verifier itself may already do the useful
+optimization. Then seek natural instances where full-path savings remain
+possible **after** strong direct computation, reuse, batching, and exact
+verification. Freeze capability and comparators before a final holdout.
+The v0.0.68 score-only lower bound rules out a checker-only rescue for the
+existing n≤32 learned path.
