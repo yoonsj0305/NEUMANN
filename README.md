@@ -55,6 +55,15 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.58 — Existing-presolve workload triage (descriptive)**
+
+Across 240 official MIPLIB benchmark instances, trivial presolve already
+removes at least half the variables in 20. A stronger native HiGHS presolve
+on one hash-pinned aggregation-rich example removes 796/2,500 variables,
+where the raw trivial presolve removes only 29. This is an opportunity-screen
+correction, not a NEUMANN speedup or solve result. See
+`docs/experiments/v0.0.58.md`.
+
 **v0.0.57 — Verified-compute floor and leaf opportunity (descriptive)**
 
 On the 13 previously inspected original matrices, iterative degree-at-most-one
