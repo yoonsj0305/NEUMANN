@@ -55,6 +55,15 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.57 — Verified-compute floor and leaf opportunity (descriptive)**
+
+On the 13 previously inspected original matrices, iterative degree-at-most-one
+graph peeling reaches at most 3.39% of variables; none meets the 10% screening
+heuristic. This nonblind structural count is not a numeric compression or
+runtime result. Full original-equation verification and explicit output also
+impose a linear input/output floor on the total path. See
+`docs/experiments/v0.0.57.md`.
+
 **v0.0.56 — Corrective natural-matrix reuse audit (negative gate)**
 
 The v0.0.55 first audit aborted on a frozen forward-error threshold, while
