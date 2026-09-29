@@ -55,11 +55,13 @@ See:
 
 ## Current engineering baseline
 
-**v0.0.54 — Component splitting versus reuse (preregistered)**
+**v0.0.54 — Component splitting versus reuse (positive controlled ablation)**
 
 The mechanism ablation compares exact factor reuse against an equally
 decomposed baseline that independently factors each component. Both verify
-the original assembled equations. See `docs/experiments/v0.0.54.md`.
+the original assembled equations. Reuse lowered full-path time by >=20% on
+4/4 large cases, separating reuse from decomposition in this repeated-copy
+workload. See `docs/experiments/v0.0.54.md`.
 
 **v0.0.53 — Exact real-matrix component reuse (positive controlled gate)**
 
