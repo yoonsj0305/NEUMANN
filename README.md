@@ -55,6 +55,24 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.56 — Corrective natural-matrix reuse audit (negative gate)**
+
+The v0.0.55 first audit aborted on a frozen forward-error threshold, while
+the original-equation backward error remained small. The corrective protocol
+retains every source and comparator and declares its updated numerical
+criterion before the next complete audit. Across all 13 unmodified originals,
+three had repeated components but none delivered the required end-to-end
+advantage; seven of ten no-repeat cases had >10% scanning overhead. The
+generic component scan is stopped. See `docs/experiments/v0.0.56.md`.
+
+**v0.0.55 — Unmodified matrix reuse incidence (invalid numerical gate)**
+
+All 13 original NIST BCSSTRUC1 stiffness matrices test how often exact
+identical components actually occur, with a scan-and-abstain path charged
+against native full solves. The protocol is in `docs/experiments/v0.0.55.md`.
+The first audit aborted on the frozen forward-error tolerance for `bcsstk13`;
+no reuse-incidence conclusion follows from this run.
+
 **v0.0.54 — Component splitting versus reuse (positive controlled ablation)**
 
 The mechanism ablation compares exact factor reuse against an equally

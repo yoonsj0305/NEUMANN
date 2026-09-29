@@ -109,6 +109,10 @@ jobs:
         run: python benchmark_v053_smoke.py
       - name: Factorization reuse mechanism contract smoke
         run: python benchmark_v054_smoke.py
+      - name: Natural-matrix reuse abstention contract smoke
+        run: python benchmark_v055_smoke.py
+      - name: Corrective natural-matrix numerical contract smoke
+        run: python benchmark_v056_smoke.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .
