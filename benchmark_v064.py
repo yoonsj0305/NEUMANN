@@ -95,7 +95,21 @@ class Recourse:
         return objective, np.asarray(gradient).ravel(), np.asarray(solution.col_value)
 
 
-def exploratory(source, budget_s=20.0, max_iterations=10):
+def sparsify_valid_cut(row, rhs, lower, upper, threshold=1e-9):
+    """Relax RHS by the worst contribution of removed, bounded coefficients."""
+    row = np.asarray(row).copy()
+    drop = np.flatnonzero((abs(row) > 0) & (abs(row) <= threshold))
+    if len(drop):
+        lo = np.asarray(lower)[drop]
+        hi = np.asarray(upper)[drop]
+        if not np.isfinite(lo).all() or not np.isfinite(hi).all():
+            raise ValueError("cannot bound dropped cut coefficients")
+        rhs -= float(np.minimum(row[drop] * lo, row[drop] * hi).sum())
+        row[drop] = 0.0
+    return row, rhs
+
+
+def exploratory(source, budget_s=20.0, max_iterations=10, recourse_type=Recourse):
     start = perf_counter()
     core = source.core
     count = len(source.scenarios)
@@ -108,7 +122,7 @@ def exploratory(source, budget_s=20.0, max_iterations=10):
                    core.row_lower_[:FIRST_ROWS], core.row_upper_[:FIRST_ROWS],
                    list(core.integrality_[:FIRST_COLS]) + [highspy.HighsVarType.kContinuous] * count)
     master.setOptionValue("mip_rel_gap", 0.0)
-    recourse = Recourse(source)
+    recourse = recourse_type(source)
     history = []
     best = None
     for iteration in range(max_iterations):
@@ -145,26 +159,36 @@ def exploratory(source, budget_s=20.0, max_iterations=10):
                 all_feasible = False
                 gradient = f_gradient
                 rhs = float(gradient @ x - violation)
-                cut_indices = np.flatnonzero(abs(gradient) > 1e-12).astype(np.int32)
-                cut_values = gradient[cut_indices]
                 if gradient @ x - rhs < 1e-7:
                     raise ValueError("feasibility cut does not separate current point")
                 kind = "feasibility"
+                row = np.r_[gradient, np.zeros(count)]
             else:
                 objective, gradient, y = recourse.optimize(x, deltas)
                 y_values.append((s, y))
                 rhs = float(gradient @ x - objective)
                 row = np.r_[gradient, np.zeros(count)]
                 row[FIRST_COLS + s] = -1.0
-                cut_indices = np.flatnonzero(abs(row) > 1e-12).astype(np.int32)
-                cut_values = row[cut_indices]
                 if theta[s] + 1e-7 >= objective + gradient @ (x - x):
                     # No violated optimality cut at this point is necessary.
                     continue
                 kind = "optimality"
-            if master.addRow(-highspy.kHighsInf, rhs, len(cut_indices), cut_indices,
-                             cut_values) != highspy.HighsStatus.kOk:
-                raise ValueError("master rejected a cut")
+            # Dropping a coefficient d_j from a·z <= rhs keeps the inequality
+            # valid only if its RHS is relaxed by -min(d_j * bounded_x_j).
+            # SEMI's first-stage integers have finite [0,100] bounds.
+            row, rhs = sparsify_valid_cut(
+                row, rhs, list(core.col_lower_[:FIRST_COLS]) + [0.0] * count,
+                list(core.col_upper_[:FIRST_COLS]) + [highspy.kHighsInf] * count)
+            cut_indices = np.flatnonzero(abs(row) > 1e-9).astype(np.int32)
+            cut_values = row[cut_indices]
+            cut_status = master.addRow(-highspy.kHighsInf, rhs, len(cut_indices), cut_indices,
+                                       cut_values)
+            if cut_status != highspy.HighsStatus.kOk:
+                raise ValueError(f"master rejected cut: iteration={iteration}, scenario={s}, "
+                                 f"type={kind}, violation={violation}, nnz={len(cut_indices)}, "
+                                 f"rhs={rhs}, gradient_dot_x={float(gradient @ x)}, "
+                                 f"status={cut_status}, min_coeff={min(cut_values)}, "
+                                 f"max_coeff={max(cut_values)}")
             record["cuts"].append({"scenario": s, "type": kind,
                                     "violation": violation, "nonzeros": len(cut_indices)})
         if all_feasible:
@@ -186,6 +210,8 @@ def exploratory(source, budget_s=20.0, max_iterations=10):
     return {"protocol": "v0.0.64 exploratory decomposition, no frozen performance gate",
             "budget_s": budget_s, "elapsed_s": perf_counter() - start,
             "iterations": history, "best_original_feasible": best,
+            "recourse_lp_builds": getattr(recourse, "lp_builds", None),
+            "recourse_lp_runs": getattr(recourse, "lp_runs", None),
             "scope": "single nonblind instance; no iso-capability speedup claim"}
 
 
