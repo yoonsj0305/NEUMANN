@@ -55,6 +55,15 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.62 — Residual motif screen after native MIP presolve (descriptive)**
+
+Three previously inspected MIPLIB instances were screened for equality
+leaves, exact duplicate columns and disconnected components after native
+HiGHS presolve. The new fixed-cost flow example `beasleyC3` has none of
+these simple residual motifs; `n5-3` has five tiny separate components
+totaling 11 of 2,139 presolved variables. No new reducer or speed claim
+follows. See `docs/experiments/v0.0.62.md`.
+
 **v0.0.61 — Original-MIP affine reduction, corrective capability gate (negative)**
 
 The v0.0.60 frozen objective/gap conjunction was unattained by either arm;
