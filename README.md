@@ -55,6 +55,15 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.64 — SEMI2 recourse decomposition exploration (negative opportunity)**
+
+An exploratory classical dual-cut master removed the two 9,802-variable
+recourse blocks from its integer master but generated no complete feasible
+answer within 20 seconds. Native HiGHS returned an independently verified
+feasible MIP incumbent in 19.089 seconds (objective 1711.347, gap 0.204).
+No iso-capability timing ratio or learned discovery claim follows. The
+candidate stays out of runtime. See `docs/experiments/v0.0.64.md`.
+
 **v0.0.63 — SEMI two-stage input and original-model verifier (enabling)**
 
 Hash-pinned SIPLIB semiconductor tool-planning SMPS data are expanded into
