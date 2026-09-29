@@ -56,6 +56,17 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.69 — Verified fast direct baseline (negative opportunity gate)**
+
+With a dense numerical proposal, exact integer-equation verification on
+the original problem, and fail-closed exact fallback, direct inference on
+the new n=32 affine-linear cases took ~0.31–0.33 ms median. Learned
+compression took ~110–116 ms; all answers were exactly verified, with zero
+fallbacks in the 160 timed fast-direct calls. This studied family has no
+structural-compression opportunity at these dimensions against a stronger
+direct method. Look elsewhere rather than tuning the learned scorer here.
+See `docs/experiments/v0.0.69.md`.
+
 **v0.0.68 — Full-path learned compression gate (negative)**
 
 At identical exact verified capability on a frozen affine-linear family,

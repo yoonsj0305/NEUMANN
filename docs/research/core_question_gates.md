@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-09-29. Goal: a system with substantially less **total** compute
+Updated 2026-09-30. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -17,7 +17,11 @@ does not establish impossibility on other tasks or larger dimensions.
 
 ## Q2 — Where is compression actually profitable?
 
-**Open.** Define and measure a family where direct verified computation is
+**Open beyond the studied affine family.** v0.0.69 found no opportunity at
+n≤32 after adding a fast numerical direct proposal with exact original
+verification and exact fallback: n=32 direct took ~0.31–0.33 ms versus
+~110–116 ms learned compression (4 new cases/cell, 5 repeats/case, all
+verified). Define and measure a different family where direct verified computation is
 costly enough that discovery, validation, reconstruction, and verification
 can collectively fit beneath it. Select the family for principled structure
 and genuine difficulty, not because one particular method won preliminary
@@ -57,8 +61,8 @@ complete time is a failed compute gate, not a partial speed win. Retain
 negative results and costs for all failed proposals. If a cheap deterministic
 component saturates a family, do not train a model merely to have one.
 
-Immediate next experiment: freeze a capability criterion and direct baseline
-for Q2, and seek an identifiable input regime in which full-path savings
-are possible *before* introducing another learned component. The v0.0.68
-score-only lower bound rules out a checker-only rescue for the existing
-n<=32 learned path.
+Immediate next experiment: seek an identifiable input regime in which
+full-path savings remain possible **after** strong direct computation,
+reuse, batching, and exact verification. Freeze its capability criterion
+and comparators before a final holdout. The v0.0.68 score-only lower bound
+rules out a checker-only rescue for the existing n≤32 learned path.
