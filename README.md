@@ -55,6 +55,17 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.66 — Verified DC power-grid outage reuse (positive mechanism, limited)**
+
+For the externally sourced 118-bus test network, one factorization reused
+across 177 connected single-branch outages took 20.779 ms median versus
+94.409 ms for repeating generic sparse factorization, including topology
+screening and every original-outage residual check. Nine islanding outages
+are outside the defined connected-outage capability. This is a known
+rank-one/LODF-style method; a mature specialized baseline and untouched
+networks are still required before any NEUMANN architecture claim. See
+`docs/experiments/v0.0.66.md`.
+
 **v0.0.65 — Persistent recourse LP diagnostic on SEMI3 (negative)**
 
 Retaining the LP basis removed most recourse-model rebuilds: 103 LP runs used
