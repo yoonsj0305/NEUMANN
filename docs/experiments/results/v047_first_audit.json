@@ -1,0 +1,31 @@
+{
+  "arms": {
+    "disjoint": {
+      "count": 128,
+      "eligible_pairs": [[0, 1], [2, 3]],
+      "overlap": false,
+      "passed": 128,
+      "rank_counts": {"4": 128}
+    },
+    "overlap": {
+      "count": 128,
+      "eligible_pairs": [[0, 1], [1, 2]],
+      "overlap": true,
+      "passed": 128,
+      "rank_counts": {"3": 128}
+    },
+    "repair": {
+      "count": 128,
+      "eligible_pairs": [[0, 1]],
+      "overlap": false,
+      "passed": 128,
+      "rank_counts": {"4": 128}
+    }
+  },
+  "decision": "BOUNDARY_CONFIRMED",
+  "first_complete_audit": true,
+  "scope": "exact integer square 4x4 fixture",
+  "total": 384,
+  "unique_signatures": 384,
+  "version": "0.0.47"
+}
