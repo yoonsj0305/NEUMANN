@@ -55,6 +55,13 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.53 — Exact real-matrix component reuse (preregistered)**
+
+A controlled workload interleaves repeated copies of two pinned NIST matrices.
+It tests whether full-path exact factorization reuse, including component
+detection and original-equation verification, beats a fixed strong native
+SuperLU baseline. See `docs/experiments/v0.0.53.md`.
+
 **v0.0.52 — Real numerical matrix ordering audit (negative gate)**
 
 Four pinned NIST BCSSTRUC1 sparse matrices test a cheap external RCM order
