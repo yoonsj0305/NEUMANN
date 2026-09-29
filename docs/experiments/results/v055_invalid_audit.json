@@ -1,0 +1,17 @@
+{
+  "version": "v0.0.55",
+  "preregistration_commit": "5cd97d6",
+  "decision": "INVALID_NUMERICAL_VERIFICATION",
+  "first_run": {
+    "aborted_at": "bcsstk13/COLAMD discarded warmup",
+    "reason": "planted-solution relative infinity error exceeded frozen 1e-7 threshold",
+    "full_result_generated": false
+  },
+  "postmortem_diagnostic_same_original_matrix": {
+    "matrix": "bcsstk13",
+    "NATURAL": {"backward_error": 2.2727535600253997e-16, "solution_error": 7.548400324321809e-08, "valid_v055": true},
+    "COLAMD": {"backward_error": 3.4758108799486307e-16, "solution_error": 1.0526328239712942e-07, "valid_v055": false},
+    "GATED_REUSE": {"backward_error": 2.2727535600253997e-16, "solution_error": 7.548400324321809e-08, "valid_v055": true, "components": 1, "abstained": true}
+  },
+  "opportunity_conclusion": null
+}

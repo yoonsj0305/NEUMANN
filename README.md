@@ -55,11 +55,13 @@ See:
 
 ## Current engineering baseline
 
-**v0.0.55 — Unmodified matrix reuse incidence (preregistered)**
+**v0.0.55 — Unmodified matrix reuse incidence (invalid numerical gate)**
 
 All 13 original NIST BCSSTRUC1 stiffness matrices test how often exact
 identical components actually occur, with a scan-and-abstain path charged
 against native full solves. The protocol is in `docs/experiments/v0.0.55.md`.
+The first audit aborted on the frozen forward-error tolerance for `bcsstk13`;
+no reuse-incidence conclusion follows from this run.
 
 **v0.0.54 — Component splitting versus reuse (positive controlled ablation)**
 
