@@ -55,6 +55,18 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.61 — Original-MIP affine reduction, corrective capability gate (negative)**
+
+The v0.0.60 frozen objective/gap conjunction was unattained by either arm;
+its timing ratio was not an iso-capability result. In a separately frozen,
+explicitly post-result-calibrated v0.0.61 rerun, all six trials met the
+corrected objective/gap gate and passed original-MIP verification. The
+763-variable affine reduction was 1.313× slower than native HiGHS on median
+complete-path time (9.871 vs 7.520 s). It remains out of the runtime.
+This is a nonblind, single-instance negative gate, not an independent
+holdout or scaling result. See `docs/experiments/v0.0.60.md` and
+`docs/experiments/v0.0.61.md`.
+
 **v0.0.59 — Bounded affine elimination against native LP presolve (negative)**
 
 On one nonblind MIPLIB instance's continuous LP relaxation, a verified

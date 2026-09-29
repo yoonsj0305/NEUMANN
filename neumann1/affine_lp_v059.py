@@ -33,10 +33,10 @@ def sparse(lp) -> csc_matrix:
                        np.asarray(a.start_)), shape=(lp.num_row_, lp.num_col_))
 
 
-def reduce_lp(lp) -> Reduction:
+def reduce_lp(lp, *, retain_integrality: bool = False) -> Reduction:
     import highspy
 
-    if any(kind != highspy.HighsVarType.kContinuous for kind in lp.integrality_):
+    if not retain_integrality and any(kind != highspy.HighsVarType.kContinuous for kind in lp.integrality_):
         raise ValueError("this transformation requires a continuous LP")
     a = sparse(lp).tocsr()
     col_degree = np.diff(a.tocsc().indptr)
@@ -47,7 +47,9 @@ def reduce_lp(lp) -> Reduction:
             continue
         first, end = a.indptr[i:i+2]
         choices = [int(j) for j, coeff in zip(a.indices[first:end], a.data[first:end])
-                   if col_degree[j] == 1 and coeff != 0]
+                   if col_degree[j] == 1 and coeff != 0
+                   and (not retain_integrality or
+                        lp.integrality_[j] == highspy.HighsVarType.kContinuous)]
         if choices:
             selected[i] = min(choices)
     eliminated_columns = set(selected.values())
@@ -105,6 +107,8 @@ def reduce_lp(lp) -> Reduction:
     model.col_cost_ = costs.tolist()
     model.col_lower_ = [float(lp.col_lower_[j]) for j in retained]
     model.col_upper_ = [float(lp.col_upper_[j]) for j in retained]
+    if retain_integrality:
+        model.integrality_ = [lp.integrality_[j] for j in retained]
     model.row_lower_, model.row_upper_ = row_lower, row_upper
     model.offset_, model.sense_ = offset, lp.sense_
     model.a_matrix_.format_ = highspy.MatrixFormat.kColwise
@@ -143,3 +147,11 @@ def check_original(lp, matrix: csc_matrix, x: np.ndarray) -> tuple[float, float]
         if high < INF:
             max_error = max(max_error, max(0., value - high) / max(scale, abs(high)))
     return max_error, float(np.dot(lp.col_cost_, x) + lp.offset_)
+
+
+def check_integrality(lp, x: np.ndarray) -> float:
+    import highspy
+
+    return max((abs(float(x[j]) - round(float(x[j])))
+                for j, kind in enumerate(lp.integrality_)
+                if kind != highspy.HighsVarType.kContinuous), default=0.0)
