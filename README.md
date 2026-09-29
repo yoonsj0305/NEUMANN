@@ -55,6 +55,14 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.50 — Sparse ordering opportunity gate (no model trained)**
+
+On 48 fresh 12-node SPD graph Laplacian systems, min-degree/min-fill left
+no >=10% sparse scalar-operation headroom versus globally optimal
+symbolic order. The optimum search was far costlier than an exact solve.
+This family is saturated for learned ordering claims; see
+`docs/experiments/v0.0.50.md`.
+
 **v0.0.49 — Matched topology cost audit (no model trained)**
 
 96 exact counterfactual pairs matched dimension, nonzero count and original

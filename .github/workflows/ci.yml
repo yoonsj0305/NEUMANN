@@ -99,6 +99,8 @@ jobs:
         run: python benchmark_v048_smoke.py
       - name: Matched topology counterfactual contract smoke
         run: python benchmark_v049_smoke.py
+      - name: Sparse ordering opportunity contract smoke
+        run: python benchmark_v050_smoke.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .
