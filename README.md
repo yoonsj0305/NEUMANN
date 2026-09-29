@@ -55,6 +55,15 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.63 — SEMI two-stage input and original-model verifier (enabling)**
+
+Hash-pinned SIPLIB semiconductor tool-planning SMPS data are expanded into
+2/3/4-scenario MIPs with the published dimensions. An independent verifier
+checks original scenario rows, first-stage integrality and expected
+objective; a short sanity run and two rejection controls pass. No new
+reduction or iso-capability speed comparison has been run. See
+`docs/experiments/v0.0.63.md`.
+
 **v0.0.62 — Residual motif screen after native MIP presolve (descriptive)**
 
 Three previously inspected MIPLIB instances were screened for equality
