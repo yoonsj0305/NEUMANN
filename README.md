@@ -51,9 +51,22 @@ Every learned reduction remains advisory. A compression certificate and independ
 See:
 - `docs/research/structural_compression_thesis.md`
 - `docs/research/prior_art_positioning.md`
+- `docs/research/core_question_gates.md`
 - `docs/experiments/v0.0.32.md`
 
 ## Current engineering baseline
+
+**v0.0.68 — Full-path learned compression gate (negative)**
+
+At identical exact verified capability on a frozen affine-linear family,
+the 289-parameter learned candidate scorer plus its checker took about
+95–104 ms at apparent dimension 32 versus 3.2–3.4 ms for the full exact
+direct solve. Its score computation alone took ~9 ms. Earlier reduced-solver
+operation counts omitted repeated tentative solves and thus do not imply a
+complete-system efficiency advantage. Stop deploying learned compression
+on this family; seek a genuinely compute-limited regime and compare to
+strong direct baselines before claiming model-level efficiency. See
+`docs/experiments/v0.0.68.md`.
 
 **v0.0.67 — Strong batched grid comparator (negative routing gate)**
 
