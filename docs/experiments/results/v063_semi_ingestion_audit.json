@@ -1,0 +1,74 @@
+{
+  "archive_sha256": "f43f9cb87c2ce9f133d05c46c9dd631d401aa440e2848312ad8e61bd4f89bff3",
+  "cases": [
+    {
+      "integer_variables": 612,
+      "nonzeros": 80280,
+      "probabilities": [
+        0.75,
+        0.25
+      ],
+      "rhs_delta_counts": [
+        0,
+        13
+      ],
+      "rows": 11686,
+      "scenario_count": 2,
+      "variables": 20216
+    },
+    {
+      "integer_variables": 612,
+      "nonzeros": 120114,
+      "probabilities": [
+        0.5,
+        0.3,
+        0.2
+      ],
+      "rhs_delta_counts": [
+        0,
+        13,
+        13
+      ],
+      "rows": 17528,
+      "scenario_count": 3,
+      "variables": 30018
+    },
+    {
+      "integer_variables": 612,
+      "nonzeros": 159948,
+      "probabilities": [
+        0.4,
+        0.3,
+        0.2,
+        0.1
+      ],
+      "rhs_delta_counts": [
+        0,
+        13,
+        13,
+        13
+      ],
+      "rows": 23370,
+      "scenario_count": 4,
+      "variables": 39820
+    }
+  ],
+  "highs_version": "1.15.1",
+  "protocol": "v0.0.63 nonblind SEMI input and verifier audit",
+  "sanity": {
+    "dual_bound": 1313.7075385438663,
+    "full_path_elapsed_s": 3.346103220999794,
+    "negative_controls": "primal and integrality rejected",
+    "objective": 6276.363569110424,
+    "objective_agreement": 9.094947017729282e-13,
+    "original_integrality_violation": 0.0,
+    "original_primal_violation": 5.002220859751105e-12,
+    "relative_gap": 0.7906897004804863,
+    "run_status": "HighsStatus.kWarning",
+    "scenario_count": 2,
+    "solver_status": "HighsModelStatus.kTimeLimit",
+    "solver_time_limit_s": 3.0
+  },
+  "scope": "input and verifier sanity only; no candidate or iso-capability comparison",
+  "source": "SIPLIB SEMI source ZIP; no redistribution"
+}
