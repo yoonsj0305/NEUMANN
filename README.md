@@ -55,6 +55,14 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.59 — Bounded affine elimination against native LP presolve (negative)**
+
+On one nonblind MIPLIB instance's continuous LP relaxation, a verified
+substitution removed 763 variables but rewrote 763 bound rows. The full
+candidate path was 10.18× slower than the original LP with native HiGHS
+presolve (161.74 vs 15.89 ms median). This is a local negative gate, not
+a MIP or general impossibility result. See `docs/experiments/v0.0.59.md`.
+
 **v0.0.58 — Existing-presolve workload triage (descriptive)**
 
 Across 240 official MIPLIB benchmark instances, trivial presolve already
