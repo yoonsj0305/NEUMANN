@@ -55,6 +55,17 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.65 — Persistent recourse LP diagnostic on SEMI3 (negative)**
+
+Retaining the LP basis removed most recourse-model rebuilds: 103 LP runs used
+five constructions in a 19.722-second complete-path diagnostic. Yet no
+original-feasible candidate appeared in 24 master iterations. Native HiGHS
+returned an independently verified feasible solution within the same nominal
+20-second budget. The SEMI instances share a core, so this is not a new
+independent holdout or an iso-capability speed comparison. Stop tuning this
+core and seek a verifiable structural reduction on a new family. See
+`docs/experiments/v0.0.65.md`.
+
 **v0.0.64 — SEMI2 recourse decomposition exploration (negative opportunity)**
 
 An exploratory classical dual-cut master removed the two 9,802-variable
