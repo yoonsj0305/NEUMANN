@@ -55,6 +55,23 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.54 — Component splitting versus reuse (positive controlled ablation)**
+
+The mechanism ablation compares exact factor reuse against an equally
+decomposed baseline that independently factors each component. Both verify
+the original assembled equations. Reuse lowered full-path time by >=20% on
+4/4 large cases, separating reuse from decomposition in this repeated-copy
+workload. See `docs/experiments/v0.0.54.md`.
+
+**v0.0.53 — Exact real-matrix component reuse (positive controlled gate)**
+
+A controlled workload interleaves repeated copies of two pinned NIST matrices.
+It tests whether full-path exact factorization reuse, including component
+detection and original-equation verification, beats a fixed strong native
+SuperLU baseline. All 4/4 large cases beat fixed NATURAL by >=20%; the
+`bcsstk09` 16-copy case was 11.0× faster. This mixes decomposition and reuse;
+the next ablation must separate them. See `docs/experiments/v0.0.53.md`.
+
 **v0.0.52 — Real numerical matrix ordering audit (negative gate)**
 
 Four pinned NIST BCSSTRUC1 sparse matrices test a cheap external RCM order
