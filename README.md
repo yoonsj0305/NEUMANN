@@ -55,6 +55,18 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.67 — Strong batched grid comparator (negative routing gate)**
+
+The known PTDF-style multiple-RHS path was compared with per-outage
+rank-one reuse and a frozen query-size router under identical full-angle
+output and original-equation verification. On the separately selected
+300-bus standard network, the router's four-workload median sum was
+20.872 ms versus 20.369 ms for fixed batching; the predeclared 10%
+advantage failed. Use batching for this measured workload and delete the
+extra router. These are local DC approximation diagnostics, not a NEUMANN
+algorithm novelty or AC power-system safety result. See
+`docs/experiments/v0.0.67.md`.
+
 **v0.0.66 — Verified DC power-grid outage reuse (positive mechanism, limited)**
 
 For the externally sourced 118-bus test network, one factorization reused
