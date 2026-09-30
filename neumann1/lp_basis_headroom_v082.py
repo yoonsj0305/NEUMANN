@@ -198,7 +198,7 @@ def direct_once(case: dict, method: str) -> dict:
                     "presolve": True,
                     "time_limit": TIME_LIMIT_S,
                     "threads": 1,
-                    "parallel": False,
+                    "parallel": "off",
                 },
             )
         solve_ms = _elapsed_ms(solve_start)
