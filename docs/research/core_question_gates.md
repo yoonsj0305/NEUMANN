@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-09-30 through v0.0.76. Goal: a system with substantially less **total** compute
+Updated 2026-09-30 through v0.0.77. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -114,6 +114,13 @@ training or timing was run. The v0.0.31 structural route contains no variable
 compression and is downstream-equivalent to this bounded direct program
 interpretation. Its answer-only learning gap cannot establish a compression
 advantage. This is comparator repair, not a Q4 capability/cost result.
+
+v0.0.77 integrates PR #82's frozen task-admission evidence alongside the
+v0.0.76 program-parity witness. The zero-learned-parameter path retained
+243/243 verified hidden-solution-equivalent positives and 243/243 rejected
+near-negatives, so `REJECT_EXISTING_LINEAR_TASK_FOR_Q4` is preserved. The
+canonical first CI summary remains unchanged; no new timing gate is opened.
+This closes the old controlled grammar as a central Q4 candidate, not Q4.
 
 ## Q5 — Are scaling and cross-domain reuse real?
 

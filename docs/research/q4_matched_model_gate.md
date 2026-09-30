@@ -1,6 +1,6 @@
 # Q4 next milestone — matched model, not a solver-only demonstration
 
-Updated 2026-09-30 through the v0.0.76 comparator repair. This is a **design gate**,
+Updated 2026-09-30 through the v0.0.77 admission integration. This is a **design gate**,
 not a registered trained-model evaluation or a completed implementation.
 
 ## Exact question
@@ -118,3 +118,12 @@ downstream behavior. It is not new learned inference or a matched full-cost
 comparison. Raw contract evidence is `docs/experiments/results/v076_program_parity.json`.
 No further training on this cheap controlled grammar is justified; the next
 new task must admit real reduction and include this direct tool-access baseline.
+
+
+Current restart update: v0.0.77 preserves both formerly conflicting branches.
+The first PR #82 admission verdict is now integrated and the v0.0.76 atomic
+program comparator remains unchanged. Do not repeat a final audit to choose
+better timings or train another model on the saturated controlled grammar.
+The next substantive milestone is a new task admission with a residual
+structural decision, an executable Direct comparison, a no-compression
+ablation, shared verification authority, and full-path cost accounting.

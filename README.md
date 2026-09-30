@@ -56,6 +56,17 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.77 — Integrate the interrupted Q4 admission audit**
+
+The formerly conflicting PR #82 audit is integrated without replacing
+v0.0.76's atomic-program comparator. Its unchanged first CI result rejects
+the old controlled linear-text task for Q4: a zero-learned-parameter path
+verified all 243 positives against hidden solutions and rejected all 243
+paired unsupported forms. The first summary and its missing per-row timing
+archive limitation are preserved. Observation summaries now reject duplicate,
+missing and inconsistent evidence. No new timing gate or model training is
+claimed; Q3/Q4 stay open. See `docs/experiments/v0.0.77.md`.
+
 **v0.0.76 — Direct tool-program comparator parity (not a Q4 pass)**
 
 The v0.0.31 structural classifier can also be interpreted as a direct
