@@ -23,7 +23,7 @@ from typing import Any
 import numpy as np
 import scipy
 from scipy.linalg import LinAlgWarning, lu_factor, lu_solve
-from scipy.optimize import linprog
+from scipy.optimize import OptimizeWarning, linprog
 import threadpoolctl
 from threadpoolctl import threadpool_limits
 
@@ -182,14 +182,25 @@ def direct_once(case: dict, method: str) -> dict:
     start = perf_counter_ns()
     solve_start = perf_counter_ns()
     try:
-        result = linprog(
-            case["c"],
-            A_eq=case["A"],
-            b_eq=case["b"],
-            bounds=(0, None),
-            method=method,
-            options={"presolve": True, "time_limit": TIME_LIMIT_S},
-        )
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message=r"Unrecognized options detected:.*",
+                category=OptimizeWarning,
+            )
+            result = linprog(
+                case["c"],
+                A_eq=case["A"],
+                b_eq=case["b"],
+                bounds=(0, None),
+                method=method,
+                options={
+                    "presolve": True,
+                    "time_limit": TIME_LIMIT_S,
+                    "threads": 1,
+                    "parallel": False,
+                },
+            )
         solve_ms = _elapsed_ms(solve_start)
         verify_start = perf_counter_ns()
         certificate = None
@@ -488,6 +499,8 @@ def protocol() -> dict:
         "direct_methods": list(DIRECT_METHODS),
         "repeats": REPEATS,
         "time_limit_s": TIME_LIMIT_S,
+        "highs_threads": 1,
+        "highs_parallel": False,
         "order_seed": ORDER_SEED,
         "seed_base": SEED_BASE,
         "runtime": {
