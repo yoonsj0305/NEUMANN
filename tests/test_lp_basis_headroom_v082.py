@@ -1,5 +1,6 @@
 """v0.0.82 contracts: zero-discovery basis headroom screen."""
 from copy import deepcopy
+import json
 import unittest
 
 from neumann1.lp_basis_headroom_v082 import (
@@ -11,6 +12,7 @@ from neumann1.lp_basis_headroom_v082 import (
     WIDTH_FACTORS,
     generate_case,
     oracle_basis_once,
+    protocol,
     specifications,
     summarize,
 )
@@ -45,6 +47,10 @@ class LPBasisHeadroomV082Tests(unittest.TestCase):
         self.assertEqual(control["latent_pair_sha256"], expanded["latent_pair_sha256"])
         self.assertNotEqual(control["raw_observable_sha256"],
                             expanded["raw_observable_sha256"])
+
+    def test_protocol_is_json_roundtrip_stable(self):
+        frozen = protocol()
+        self.assertEqual(json.loads(json.dumps(frozen)), frozen)
 
     def test_oracle_basis_reconstructs_verified_original_certificate(self):
         spec = next(s for s in specifications()
