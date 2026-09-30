@@ -1,6 +1,6 @@
 # Q4 next milestone — matched model, not a solver-only demonstration
 
-Updated 2026-09-30 through v0.0.81 certificate contract. This is a **design gate**,
+Updated 2026-09-30 through v0.0.82 first retained headroom audit. This is a **design gate**,
 not a registered trained-model evaluation or a completed implementation.
 
 ## Exact question
@@ -176,3 +176,21 @@ If that zero-model oracle cannot clear the predeclared complete-cost gate, do
 not train a basis/active-set model. A positive screen would still leave Q3/Q4
 open until cheap deterministic basis tests, a matched runnable Direct learner,
 a no-compression ablation, training budgets and final holdouts are frozen.
+
+v0.0.82 restart: the matched-control exact-basis oracle passes the frozen
+**mechanism headroom** gate, not Q3 or Q4. All cases verify under the same
+v0.0.81 original-LP certificate. Expanded-case oracle/best-Direct geometric
+mean ratio is 0.0087784284, 12/12 expanded cases clear the >=20% condition,
+and 12/12 matched control/expanded pairs clear >=2x scaling amplification.
+The exact basis is free oracle metadata, so the result is non-deployable and
+cannot be called a model speedup.
+
+Next action is deliberately **not neural training**. First freeze and run a
+deterministic/classical basis-discovery shortcut screen using only admissible
+A,b,c-derived observables and equal-authority solver-native information. If
+cheap discovery consumes the residual headroom, Q3 learning is unnecessary.
+Only if meaningful verified headroom remains should a learned basis/active-set
+route be compared with published learned-basis baselines, a same-budget
+executable Direct learner, and the NEUMANN no-compression ablation. Q4 stays
+OPEN.
+
