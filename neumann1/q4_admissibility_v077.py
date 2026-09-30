@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from math import isfinite
 from statistics import mean, median
 from time import perf_counter_ns
 
@@ -52,9 +53,9 @@ def q4_admissibility_audit_examples() -> tuple[PairedLinearExample, ...]:
     )
     texts = {example.text for example in examples}
     if len(texts) != AUDIT_COUNT:
-        raise RuntimeError("v0.0.76 audit corpus contains duplicate text")
+        raise RuntimeError("v0.0.77 audit corpus contains duplicate text")
     if texts.intersection(prior_linear_texts()):
-        raise RuntimeError("v0.0.76 audit corpus overlaps an earlier linear corpus")
+        raise RuntimeError("v0.0.77 audit corpus overlaps an earlier linear corpus")
     return examples
 
 
@@ -144,10 +145,34 @@ def observe_negative(
 
 
 def summarize(rows: list[dict]) -> dict:
+    expected = {(index, polarity) for index in range(AUDIT_COUNT)
+                for polarity in ("positive", "negative")}
+    observed = set()
+    for row in rows:
+        index, polarity = row.get("index"), row.get("polarity")
+        if type(index) is not int or polarity not in ("positive", "negative"):
+            raise ValueError("invalid observation identity")
+        identity = (index, polarity)
+        if identity not in expected or identity in observed:
+            raise ValueError("duplicated or out-of-range observation")
+        observed.add(identity)
+        elapsed = row.get("total_ms")
+        if type(elapsed) not in (int, float) or not isfinite(elapsed) or elapsed < 0:
+            raise ValueError("invalid observation timing")
+        flags = (("compiled", "solved", "verified", "semantic_equivalent", "accepted_exact")
+                 if polarity == "positive" else ("fail_closed",))
+        if any(type(row.get(flag)) is not bool for flag in flags):
+            raise ValueError("invalid observation capability flags")
+        if polarity == "positive" and row["accepted_exact"] != all(
+            row[flag] for flag in flags[:-1]
+        ):
+            raise ValueError("inconsistent positive acceptance")
+    if observed != expected:
+        raise ValueError("v0.0.77 requires every unique positive/negative pair")
     positives = [row for row in rows if row["polarity"] == "positive"]
     negatives = [row for row in rows if row["polarity"] == "negative"]
     if len(positives) != AUDIT_COUNT or len(negatives) != AUDIT_COUNT:
-        raise ValueError("v0.0.76 requires all 243 positive and negative rows")
+        raise ValueError("v0.0.77 requires all 243 positive and negative rows")
 
     positive_compile_rate = mean(float(row["compiled"]) for row in positives)
     positive_verifier_rate = mean(float(row["verified"]) for row in positives)
@@ -246,7 +271,7 @@ def run_audit(
 
     summary = summarize(rows)
     return {
-        "experiment": "v0.0.76 Q4 task-admissibility gate",
+        "experiment": "v0.0.77 Q4 task-admissibility gate",
         "audit_count": AUDIT_COUNT,
         "audit_seed": AUDIT_SEED,
         "prior_text_count": len(prior_linear_texts()),

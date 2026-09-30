@@ -1,6 +1,6 @@
 # Q4 next milestone — matched model, not a solver-only demonstration
 
-Updated 2026-09-30 through the v0.0.76 task-admissibility audit. This is a **design gate**,
+Updated 2026-09-30 through the v0.0.77 admission integration. This is a **design gate**,
 not a registered trained-model evaluation or a completed implementation.
 
 ## Exact question
@@ -102,22 +102,28 @@ gate rather than shrinking the comparator until a win appears.
 
 ## Restart checkpoint
 
-Current code version: v0.0.76.
+Historical v0.0.74 checkpoint. Frozen negative evidence:
+`docs/experiments/results/v074_sequential_audit.json`; initial contaminated
+measurements are separately retained. Do not rerun to select better timings.
+First next action: admit a task and actual model configuration against the
+matrix above, or reject it with a measured cheap-baseline reason. **Do not**
+train on the rejected n=16–32 best-eight order policy or report Q4 as passed.
 
-v0.0.76 has now executed the first task-admission rule rather than merely
-stating it. The existing controlled 2x2 linear-text family is rejected:
-243/243 fresh positives were exactly verified and hidden-solution-equivalent
-under a zero-learned-parameter deterministic compiler/solver path, and
-243/243 paired unsupported forms failed closed.
+Restart update: latest code v0.0.76, based on exact upstream v0.0.75 tree
+`2cf1c01bb292f1f05f733c59594617de2d10f2a3` (`ddfffc55...`). v0.0.75 retained
+only a lifetime hygiene fix and preserved its first negative timing gate.
+v0.0.76 now supplies a direct atomic tool-program interpretation of the
+v0.0.31 structural route: 39,852 possible-head/text pairs have identical
+downstream behavior. It is not new learned inference or a matched full-cost
+comparison. Raw contract evidence is `docs/experiments/results/v076_program_parity.json`.
+No further training on this cheap controlled grammar is justified; the next
+new task must admit real reduction and include this direct tool-access baseline.
 
-This result closes the old v0.0.29-v0.0.31 family as the central Q4
-benchmark. It does not answer Q4 itself.
 
-Next action: identify and preregister a **new admissible task** before
-training. The task must leave a genuine residual decision after strongest
-cheap deterministic processing, expose identical observable input to Direct
-and Structural paths, and support a same-budget executable Direct program/IR
-learner with identical executor and original-task verifier authority.
-
-Do not return to the rejected linear task, the v0.0.74 ordering policy, or
-answer-only Direct classification merely to obtain a favorable comparison.
+Current restart update: v0.0.77 preserves both formerly conflicting branches.
+The first PR #82 admission verdict is now integrated and the v0.0.76 atomic
+program comparator remains unchanged. Do not repeat a final audit to choose
+better timings or train another model on the saturated controlled grammar.
+The next substantive milestone is a new task admission with a residual
+structural decision, an executable Direct comparison, a no-compression
+ablation, shared verification authority, and full-path cost accounting.

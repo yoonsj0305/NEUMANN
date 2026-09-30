@@ -56,18 +56,27 @@ See:
 
 ## Current engineering baseline
 
-**v0.0.76 — Q4 task-admissibility gate (existing linear task rejected)**
+**v0.0.77 — Integrate the interrupted Q4 admission audit**
 
-A fresh 243-positive / 243-paired-negative audit showed that the existing
-v0.0.29-v0.0.31 controlled 2x2 linear-text task is saturated by a
-zero-learned-parameter path: positive exact-verified hidden-solution
-equivalence was 243/243 and paired unsupported inputs failed closed 243/243.
-The preregistered decision is `REJECT_EXISTING_LINEAR_TASK_FOR_Q4`.
-Do not train another matched model on this task and do not reinterpret the
-earlier capability demonstrations as total-compute evidence. The next Q4
-candidate must first survive a cheap-deterministic task-admission gate and
-must include a same-budget executable Direct learner with identical
-executor/verifier authority. See `docs/experiments/v0.0.76.md`.
+The formerly conflicting PR #82 audit is integrated without replacing
+v0.0.76's atomic-program comparator. Its unchanged first CI result rejects
+the old controlled linear-text task for Q4: a zero-learned-parameter path
+verified all 243 positives against hidden solutions and rejected all 243
+paired unsupported forms. The first summary and its missing per-row timing
+archive limitation are preserved. Observation summaries now reject duplicate,
+missing and inconsistent evidence. No new timing gate or model training is
+claimed; Q3/Q4 stay open. See `docs/experiments/v0.0.77.md`.
+
+**v0.0.76 — Direct tool-program comparator parity (not a Q4 pass)**
+
+The v0.0.31 structural classifier can also be interpreted as a direct
+atomic tool-program predictor using the same checkpoint and labels.
+On 486 already-opened positive/near-negative texts and all 82 possible
+head outputs, 39,852 paired downstream checks had zero mismatches in
+status, answer and individual bookkeeping counters. This is a post-head
+contract witness, **not** 39,852 model inferences, new training, or a latency
+advantage. The old answer-only comparison cannot isolate compression from
+tool access. Q3/Q4 remain open. See `docs/experiments/v0.0.76.md`.
 
 **v0.0.75 — DP lifetime hygiene (correctness fix; first timing gate failed)**
 

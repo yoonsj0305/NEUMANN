@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-09-30 through v0.0.76. Goal: a system with substantially less **total** compute
+Updated 2026-09-30 through v0.0.77. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -104,15 +104,23 @@ verification contract. Report model inference, deterministic tooling, retries,
 memory, and training amortization separately. At matched verified quality,
 compare capability-versus-total-compute frontiers, not parameter counts.
 
-v0.0.76 rejects the old controlled 2x2 linear-text task as a Q4 benchmark.
-On 243 fresh text-disjoint positives, a zero-learned-parameter deterministic
-compiler + exact solver + original-input verifier matched the hidden generator
-solution on 243/243. All 243 paired near-negatives failed closed. The frozen
-decision is `REJECT_EXISTING_LINEAR_TASK_FOR_Q4`. This does not make Q4
-negative; it removes a confounded task before training. Q4 remains open until
-a new task survives deterministic admission and a matched executable Direct
-learner is compared with NEUMANN at identical independently verified
-capability and complete cost.
+v0.0.76 implements the missing direct **atomic tool-program** comparator
+for the v0.0.31 route. Its output labels can be renamed to a trusted solver
+call or abstention with the same checkpoint/training. All 39,852 paired
+post-head checks (486 already-opened texts x 82 possible head outputs) match
+in status, answer and separate counters; 243 positive head-0 calls match
+generated known solutions, and 243 near-negatives reject. No model inference,
+training or timing was run. The v0.0.31 structural route contains no variable
+compression and is downstream-equivalent to this bounded direct program
+interpretation. Its answer-only learning gap cannot establish a compression
+advantage. This is comparator repair, not a Q4 capability/cost result.
+
+v0.0.77 integrates PR #82's frozen task-admission evidence alongside the
+v0.0.76 program-parity witness. The zero-learned-parameter path retained
+243/243 verified hidden-solution-equivalent positives and 243/243 rejected
+near-negatives, so `REJECT_EXISTING_LINEAR_TASK_FOR_Q4` is preserved. The
+canonical first CI summary remains unchanged; no new timing gate is opened.
+This closes the old controlled grammar as a central Q4 candidate, not Q4.
 
 ## Q5 — Are scaling and cross-domain reuse real?
 
