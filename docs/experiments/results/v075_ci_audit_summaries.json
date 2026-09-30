@@ -1,0 +1,62 @@
+{
+  "experiment": "v0.0.75 proof-DP lifetime hygiene audit",
+  "source_tree_sha": "a4aec3292adc8a670966518640065573898b5a99",
+  "canonical_first_audit": {
+    "workflow_run_id": 36668589533,
+    "job_id": 109738512524,
+    "decision": "LIFETIME_FIX_CORRECT_BUT_PERF_REGRESSION",
+    "groups": {
+      "independent_direct": {
+        "cases": 25,
+        "geometric_mean_ratio": 1.001872926917187,
+        "max_cell_ratio": 1.2093935539105818
+      },
+      "independent_quotient": {
+        "cases": 25,
+        "geometric_mean_ratio": 1.0014231564649287,
+        "max_cell_ratio": 1.1363508682743353
+      },
+      "proof_direct": {
+        "cases": 25,
+        "geometric_mean_ratio": 1.0032670750234718,
+        "max_cell_ratio": 1.1146335789979316
+      },
+      "proof_quotient": {
+        "cases": 25,
+        "geometric_mean_ratio": 0.9747170565123016,
+        "max_cell_ratio": 1.1331442844707804
+      }
+    }
+  },
+  "identical_tree_replication": {
+    "workflow_run_id": 36668960996,
+    "job_id": 109739639628,
+    "observed_decision": "LIFETIME_FIX_VALIDATED",
+    "replaces_first_audit": false,
+    "groups": {
+      "independent_direct": {
+        "cases": 25,
+        "geometric_mean_ratio": 0.9953617122156736,
+        "max_cell_ratio": 1.0673157375424418
+      },
+      "independent_quotient": {
+        "cases": 25,
+        "geometric_mean_ratio": 0.993119884811784,
+        "max_cell_ratio": 1.0424183497396273
+      },
+      "proof_direct": {
+        "cases": 25,
+        "geometric_mean_ratio": 1.0002717495243285,
+        "max_cell_ratio": 1.0355050225799816
+      },
+      "proof_quotient": {
+        "cases": 25,
+        "geometric_mean_ratio": 0.9957611651000633,
+        "max_cell_ratio": 1.0558642701971153
+      }
+    },
+    "pytest": "302 passed, 3 skipped"
+  },
+  "raw_rows_persisted": false,
+  "note": "CI printed summaries without --output. Preserve first frozen verdict; replication is timing-variance evidence only."
+}
