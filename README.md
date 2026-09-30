@@ -56,6 +56,20 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.83 — Classical norm shortcut consumes raw-family headroom**
+
+The first retained observable-only audit verified all 576 timed and 192 warmup
+records. On 12 expanded raw cases, discovery plus checking and any fallback
+had geometric mean complete-cost ratio `0.0182276863` versus best native;
+11/12 cleared the 20% reduction threshold and avoided fallback. On matched
+column-normalized cases the ratio was `1.1156167303`, with 0/12 wins and
+0/12 avoiding fallback. Decision: `CHEAP_DISCOVERY_CONSUMES_RAW_FAMILY_HEADROOM`.
+This is a classical, generator-aware shortcut on a constructed family, not a
+learned NEUMANN speedup. Q3/Q4 remain OPEN; normalization failure does not
+authorize model training. Next: stronger norm-invariant classical comparisons
+before a new residual-headroom gate. See `docs/experiments/v0.0.83.md` for the
+preserved first archive, timing scope and cross-BLAS reproducibility limit.
+
 **v0.0.82 — Oracle-basis headroom admitted for discovery screening**
 
 The first retained matched-control audit reached verified capability on every
