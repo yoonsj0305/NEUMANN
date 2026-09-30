@@ -57,6 +57,13 @@ representative sample. Stop promoting exact-twin discovery as a broad
 NEUMANN advantage on this evidence. The huge synthetic wins remain a
 conditional classical mechanism, not product-level efficiency.
 
+Literature boundary: LearnAndReduce (Großmann, Langedal and Schulz,
+ACDA 2025) already combines GNN screening with exact MIS reductions.
+Before allocating any graph-specific learned-discovery budget, compare
+against this line of work and native exact KaMIS reductions; a simple
+"learn the reduction location" claim is already occupied. See
+`prior_art_positioning.md` for primary sources and license boundary.
+
 ## Q3 — Is learned discovery needed beyond cheap tests?
 
 **Open.** Construct a matched-observable case where cheap deterministic
