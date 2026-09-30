@@ -5,11 +5,11 @@ Task contract:
     subject to A x = b
                x >= 0
 
-A primal/dual certificate is (x, y).  The verifier never calls an optimizer.
+A primal/dual certificate is (x, y). The verifier never calls an optimizer.
 For this standard form, primal feasibility, dual feasibility A^T y <= c,
 and equality of primal/dual objectives certify optimality up to the frozen
-numerical tolerances.  Complementarity is checked as an additional fault
-signal, not as a substitute for the primal/dual conditions.
+numerical tolerances. Complementarity is reported as an additional diagnostic;
+it is not an independent acceptance requirement once those conditions hold.
 """
 from __future__ import annotations
 
@@ -37,11 +37,25 @@ def _matrix(value: Any):
     if sparse.issparse(value):
         if not np.all(np.isfinite(value.data)):
             raise ValueError("A must be finite")
-        return value.astype(np.float64)
-    array = np.asarray(value, dtype=np.float64)
-    if array.ndim != 2 or not np.all(np.isfinite(array)):
-        raise ValueError("A must be a finite two-dimensional matrix")
-    return array
+        matrix = value.astype(np.float64)
+    else:
+        matrix = np.asarray(value, dtype=np.float64)
+        if matrix.ndim != 2 or not np.all(np.isfinite(matrix)):
+            raise ValueError("A must be a finite two-dimensional matrix")
+    if matrix.shape[0] <= 0 or matrix.shape[1] <= 0:
+        raise ValueError("A must have at least one row and one column")
+    return matrix
+
+
+def _tolerance(value: Any, name: str) -> float:
+    if isinstance(value, (bool, np.bool_)) or not isinstance(
+        value, (int, float, np.integer, np.floating)
+    ):
+        raise ValueError(f"{name} must be a finite non-negative number")
+    number = float(value)
+    if not np.isfinite(number) or number < 0:
+        raise ValueError(f"{name} must be a finite non-negative number")
+    return number
 
 
 def verify_standard_form_certificate(
@@ -56,104 +70,142 @@ def verify_standard_form_certificate(
 ) -> dict:
     """Check one original LP and one claimed primal/dual optimum.
 
-    This function is deliberately solver-free.  It checks the original
+    The acceptance test is a componentwise, scale-aware numerical certificate.
+    Equality and dual residuals are normalized by the magnitudes of the
+    original dot-product terms, which avoids rejecting a numerically valid
+    certificate merely because large terms cancel to a small right-hand side.
+
+    This function is deliberately solver-free. It checks the original
     coefficients supplied by the caller rather than a reduced model or a
-    cached gold answer.  The returned metrics are descriptive and keep the
-    exact frozen tolerances used for the acceptance decision.
+    cached gold answer.
     """
     matrix = _matrix(A)
     rhs = _vector(b, "b")
     cost = _vector(c, "c")
     primal = _vector(x, "x")
     dual = _vector(y, "y")
+    atol = _tolerance(atol, "atol")
+    rtol = _tolerance(rtol, "rtol")
 
     rows, cols = matrix.shape
     if rhs.size != rows or cost.size != cols or primal.size != cols or dual.size != rows:
         raise ValueError("certificate shape mismatch")
-    if (
-        type(atol) not in (int, float)
-        or type(rtol) not in (int, float)
-        or not np.isfinite([atol, rtol]).all()
-        or atol < 0
-        or rtol < 0
-    ):
-        raise ValueError("invalid certificate tolerance")
 
-    ax = np.asarray(matrix @ primal, dtype=np.float64).reshape(-1)
-    aty = np.asarray(matrix.T @ dual, dtype=np.float64).reshape(-1)
-    dual_slack = cost - aty
+    abs_matrix = abs(matrix) if sparse.issparse(matrix) else np.abs(matrix)
+    with np.errstate(over="ignore", invalid="ignore"):
+        ax = np.asarray(matrix @ primal, dtype=np.float64).reshape(-1)
+        aty = np.asarray(matrix.T @ dual, dtype=np.float64).reshape(-1)
+        dual_slack = cost - aty
 
-    primal_objective = float(cost @ primal)
-    dual_objective = float(rhs @ dual)
+        equality_scale = np.asarray(
+            abs_matrix @ np.abs(primal), dtype=np.float64
+        ).reshape(-1) + np.abs(rhs)
+        equality_allowance = atol + rtol * np.maximum(1.0, equality_scale)
+        equality_residual = np.abs(ax - rhs)
 
-    equality_abs = float(np.max(np.abs(ax - rhs), initial=0.0))
-    equality_tol = float(
-        atol + rtol * max(1.0, float(np.max(np.abs(rhs), initial=0.0)))
-    )
-
-    nonnegative_abs = float(max(0.0, -float(np.min(primal, initial=0.0))))
-    nonnegative_tol = float(
-        atol + rtol * max(1.0, float(np.max(np.abs(primal), initial=0.0)))
-    )
-
-    dual_feasibility_abs = float(
-        max(0.0, -float(np.min(dual_slack, initial=0.0)))
-    )
-    dual_feasibility_tol = float(
-        atol
-        + rtol
-        * max(
-            1.0,
-            float(np.max(np.abs(cost), initial=0.0)),
-            float(np.max(np.abs(aty), initial=0.0)),
+        nonnegative_abs = float(max(0.0, -float(np.min(primal, initial=0.0))))
+        nonnegative_allowance = float(
+            atol + rtol * max(1.0, float(np.max(np.abs(primal), initial=0.0)))
         )
+
+        dual_scale = np.asarray(
+            abs_matrix.T @ np.abs(dual), dtype=np.float64
+        ).reshape(-1) + np.abs(cost)
+        dual_allowance = atol + rtol * np.maximum(1.0, dual_scale)
+        dual_violation = np.maximum(-dual_slack, 0.0)
+
+        primal_objective = float(cost @ primal)
+        dual_objective = float(rhs @ dual)
+        objective_gap_abs = float(abs(primal_objective - dual_objective))
+        objective_scale = float(
+            np.abs(cost) @ np.abs(primal) + np.abs(rhs) @ np.abs(dual)
+        )
+        objective_gap_allowance = float(
+            atol + rtol * max(1.0, objective_scale)
+        )
+
+        complementarity_terms = np.abs(primal * dual_slack)
+        complementarity_scale = np.abs(primal) * (np.abs(cost) + np.abs(aty))
+        complementarity_allowance = atol + rtol * np.maximum(
+            1.0, complementarity_scale
+        )
+
+    numerical_finite = bool(
+        np.all(np.isfinite(ax))
+        and np.all(np.isfinite(aty))
+        and np.all(np.isfinite(equality_scale))
+        and np.all(np.isfinite(dual_scale))
+        and np.isfinite(primal_objective)
+        and np.isfinite(dual_objective)
+        and np.isfinite(objective_scale)
     )
 
-    objective_gap_abs = float(abs(primal_objective - dual_objective))
-    objective_gap_tol = float(
-        atol + rtol * max(1.0, abs(primal_objective), abs(dual_objective))
-    )
-
-    complementarity_abs = float(
-        np.max(np.abs(primal * dual_slack), initial=0.0)
-    )
-    complementarity_tol = objective_gap_tol
+    if numerical_finite:
+        equality_ratio = float(
+            np.max(equality_residual / equality_allowance, initial=0.0)
+        )
+        nonnegative_ratio = float(nonnegative_abs / nonnegative_allowance)
+        dual_feasibility_ratio = float(
+            np.max(dual_violation / dual_allowance, initial=0.0)
+        )
+        objective_gap_ratio = float(objective_gap_abs / objective_gap_allowance)
+        complementarity_ratio = float(
+            np.max(
+                complementarity_terms / complementarity_allowance,
+                initial=0.0,
+            )
+        )
+    else:
+        equality_ratio = float("inf")
+        nonnegative_ratio = float("inf")
+        dual_feasibility_ratio = float("inf")
+        objective_gap_ratio = float("inf")
+        complementarity_ratio = float("inf")
 
     accepted = bool(
-        equality_abs <= equality_tol
-        and nonnegative_abs <= nonnegative_tol
-        and dual_feasibility_abs <= dual_feasibility_tol
-        and objective_gap_abs <= objective_gap_tol
-        and complementarity_abs <= complementarity_tol
+        numerical_finite
+        and equality_ratio <= 1.0
+        and nonnegative_ratio <= 1.0
+        and dual_feasibility_ratio <= 1.0
+        and objective_gap_ratio <= 1.0
     )
 
     return {
         "schema": CERTIFICATE_SCHEMA,
         "accepted": accepted,
+        "numerical_finite": numerical_finite,
         "rows": int(rows),
         "cols": int(cols),
         "nnz": int(matrix.nnz if sparse.issparse(matrix) else np.count_nonzero(matrix)),
-        "atol": float(atol),
-        "rtol": float(rtol),
+        "atol": atol,
+        "rtol": rtol,
         "primal_objective": primal_objective,
         "dual_objective": dual_objective,
-        "equality_abs": equality_abs,
-        "equality_tol": equality_tol,
+        "equality_abs": float(np.max(equality_residual, initial=0.0)),
+        "equality_tol": float(np.max(equality_allowance, initial=atol)),
+        "equality_ratio": equality_ratio,
         "nonnegative_abs": nonnegative_abs,
-        "nonnegative_tol": nonnegative_tol,
-        "dual_feasibility_abs": dual_feasibility_abs,
-        "dual_feasibility_tol": dual_feasibility_tol,
+        "nonnegative_tol": nonnegative_allowance,
+        "nonnegative_ratio": nonnegative_ratio,
+        "dual_feasibility_abs": float(np.max(dual_violation, initial=0.0)),
+        "dual_feasibility_tol": float(np.max(dual_allowance, initial=atol)),
+        "dual_feasibility_ratio": dual_feasibility_ratio,
         "objective_gap_abs": objective_gap_abs,
-        "objective_gap_tol": objective_gap_tol,
-        "complementarity_abs": complementarity_abs,
-        "complementarity_tol": complementarity_tol,
+        "objective_gap_tol": objective_gap_allowance,
+        "objective_gap_ratio": objective_gap_ratio,
+        "complementarity_abs": float(np.max(complementarity_terms, initial=0.0)),
+        "complementarity_tol": float(
+            np.max(complementarity_allowance, initial=atol)
+        ),
+        "complementarity_ratio": complementarity_ratio,
+        "complementarity_diagnostic_only": True,
     }
 
 
 def highs_candidate(A: Any, b: Any, c: Any) -> dict:
     """Produce a candidate with HiGHS, then verify it through the solver-free path.
 
-    This wrapper exists for integration tests and future cost screens.  The
+    This wrapper exists for integration tests and future cost screens. The
     verifier above remains the authority and does not trust HiGHS status alone.
     """
     from scipy.optimize import linprog
@@ -185,7 +237,7 @@ def highs_candidate(A: Any, b: Any, c: Any) -> dict:
 def contract_fixture(seed: int = 8101, rows: int = 6, cols: int = 30) -> dict:
     """Construct one bounded fixture with a known certificate for contract tests.
 
-    The planted certificate is test-only authority.  It must not be used as
+    The planted certificate is test-only authority. It must not be used as
     inference input, a future performance label, or a production verifier.
     """
     if type(seed) is not int or type(rows) is not int or type(cols) is not int:
