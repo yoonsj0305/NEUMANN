@@ -472,9 +472,9 @@ def summarize(records: list[dict], warmups: list[dict] | None = None) -> dict:
 
 
 
-def validate_archive(report: dict) -> None:
-    """Validate a preserved audit without rerunning any timed solve."""
-    expected_protocol = {
+def protocol() -> dict:
+    """Return the JSON-stable frozen v0.0.82 measurement contract."""
+    return {
         "rows": list(ROWS),
         "condition_numbers": list(CONDITION_NUMBERS),
         "width_factors": list(WIDTH_FACTORS),
@@ -490,6 +490,11 @@ def validate_archive(report: dict) -> None:
         "min_scaling_amplification": MIN_SCALING_AMPLIFICATION,
         "min_scaling_pairs": MIN_SCALING_PAIRS,
     }
+
+
+def validate_archive(report: dict) -> None:
+    """Validate a preserved audit without rerunning any timed solve."""
+    expected_protocol = protocol()
     if report.get("protocol") != expected_protocol:
         raise ValueError("protocol drift")
     if not report.get("environment", {}).get("declared_single_thread"):
@@ -617,22 +622,7 @@ def run_audit(*, require_single_thread: bool = True) -> dict:
     return {
         "experiment": "v0.0.82 constructed LP oracle-basis headroom",
         "status": "opened-development mechanism screen; no learned model",
-        "protocol": {
-            "rows": list(ROWS),
-            "condition_numbers": list(CONDITION_NUMBERS),
-            "width_factors": list(WIDTH_FACTORS),
-            "pair_replicates": PAIR_REPLICATES,
-            "direct_methods": list(DIRECT_METHODS),
-            "repeats": REPEATS,
-            "time_limit_s": TIME_LIMIT_S,
-            "order_seed": ORDER_SEED,
-            "seed_base": SEED_BASE,
-            "expanded_oracle_geomean_max": EXPANDED_ORACLE_GEOMEAN_MAX,
-            "twenty_percent_ratio": TWENTY_PERCENT_RATIO,
-            "min_expanded_twenty_percent_wins": MIN_EXPANDED_TWENTY_PERCENT_WINS,
-            "min_scaling_amplification": MIN_SCALING_AMPLIFICATION,
-            "min_scaling_pairs": MIN_SCALING_PAIRS,
-        },
+        "protocol": protocol(),
         "environment": {
             **env,
             "python": platform.python_version(),
