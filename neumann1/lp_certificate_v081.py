@@ -103,10 +103,8 @@ def verify_standard_form_certificate(
         equality_allowance = atol + rtol * np.maximum(1.0, equality_scale)
         equality_residual = np.abs(ax - rhs)
 
-        nonnegative_abs = float(max(0.0, -float(np.min(primal, initial=0.0))))
-        nonnegative_allowance = float(
-            atol + rtol * max(1.0, float(np.max(np.abs(primal), initial=0.0)))
-        )
+        nonnegative_violation = np.maximum(-primal, 0.0)
+        nonnegative_allowance = atol + rtol * np.maximum(1.0, np.abs(primal))
 
         dual_scale = np.asarray(
             abs_matrix.T @ np.abs(dual), dtype=np.float64
@@ -144,7 +142,9 @@ def verify_standard_form_certificate(
         equality_ratio = float(
             np.max(equality_residual / equality_allowance, initial=0.0)
         )
-        nonnegative_ratio = float(nonnegative_abs / nonnegative_allowance)
+        nonnegative_ratio = float(
+            np.max(nonnegative_violation / nonnegative_allowance, initial=0.0)
+        )
         dual_feasibility_ratio = float(
             np.max(dual_violation / dual_allowance, initial=0.0)
         )
@@ -184,8 +184,8 @@ def verify_standard_form_certificate(
         "equality_abs": float(np.max(equality_residual, initial=0.0)),
         "equality_tol": float(np.max(equality_allowance, initial=atol)),
         "equality_ratio": equality_ratio,
-        "nonnegative_abs": nonnegative_abs,
-        "nonnegative_tol": nonnegative_allowance,
+        "nonnegative_abs": float(np.max(nonnegative_violation, initial=0.0)),
+        "nonnegative_tol": float(np.max(nonnegative_allowance, initial=atol)),
         "nonnegative_ratio": nonnegative_ratio,
         "dual_feasibility_abs": float(np.max(dual_violation, initial=0.0)),
         "dual_feasibility_tol": float(np.max(dual_allowance, initial=atol)),
