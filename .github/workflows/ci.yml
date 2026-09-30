@@ -113,6 +113,8 @@ jobs:
         run: python benchmark_v055_smoke.py
       - name: Corrective natural-matrix numerical contract smoke
         run: python benchmark_v056_smoke.py
+      - name: DP lifetime hygiene full audit
+        run: python benchmark_v075.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .
