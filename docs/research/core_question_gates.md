@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-09-30 through v0.0.83. Goal: a system with substantially less **total** compute
+Updated 2026-10-01 through v0.0.84. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -15,6 +15,14 @@ This is a generator-aware classical shortcut, not learned-model evidence.
 Q3/Q4 remain OPEN. Require stronger norm-invariant classical comparators and
 residual headroom before proposing a learned gate. See `../experiments/v0.0.83.md`
 for the first retained archive and cross-BLAS source-reproduction limitation.
+
+v084's scale-invariant least-squares/residual/primal/QR portfolio verified all
+720 timed and 240 warmup paths, but every expanded case fell back to native.
+Raw and normalized complete-cost geomean ratios are 1.3553861823 and
+1.3559506383, with zero 20% wins. Decision:
+`RESIDUAL_HEADROOM_UNRESOLVED_NOT_LEARNING_ADMISSION`. Keep native default;
+failed heuristics do not prove learning has value. Exact retained inputs and
+primal/dual witnesses enable solver-free offline replay. Q3/Q4 remain OPEN.
 
 ## Q1 — Does learned structural discovery pay for itself?
 
