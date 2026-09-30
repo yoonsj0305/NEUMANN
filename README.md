@@ -56,6 +56,20 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.82 — Oracle-basis headroom admitted for discovery screening**
+
+The first retained matched-control audit reached verified capability on every
+frozen route and case. Across the 12 expanded `n=16m` cases, the geometric
+mean oracle/best-Direct complete-cost ratio was `0.0087784284`; all 12/12
+expanded cases cleared the >=20% reduction condition, and all 12/12 matched
+`n=m` -> `16m` pairs cleared the >=2x scaling-amplification condition.
+The decision is `ADMIT_BASIS_DISCOVERY_SEARCH_NOT_MODEL_TRAINING`.
+This is a constructed, non-deployable exact-basis oracle diagnostic, not a
+NEUMANN model speedup: basis discovery cost is zero by design. Q3/Q4 remain
+OPEN. Next step is deterministic/classical observable-only basis discovery
+screening before any learned predictor. See `docs/experiments/v0.0.82.md` and
+the preserved `v082_first_audit.json`.
+
 **v0.0.81 — Certificate-first LP verifier contract**
 
 Standard-form LP candidates can now carry a primal/dual witness checked against
