@@ -500,7 +500,7 @@ def protocol() -> dict:
         "repeats": REPEATS,
         "time_limit_s": TIME_LIMIT_S,
         "highs_threads": 1,
-        "highs_parallel": False,
+        "highs_parallel": "off",
         "order_seed": ORDER_SEED,
         "seed_base": SEED_BASE,
         "runtime": {
