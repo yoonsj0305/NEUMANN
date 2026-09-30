@@ -24,6 +24,7 @@ import numpy as np
 import scipy
 from scipy.linalg import LinAlgWarning, lu_factor, lu_solve
 from scipy.optimize import linprog
+import threadpoolctl
 from threadpoolctl import threadpool_limits
 
 from neumann1.lp_certificate_v081 import verify_standard_form_certificate
@@ -38,6 +39,11 @@ REPEATS = 3
 TIME_LIMIT_S = 5.0
 ORDER_SEED = 82991
 SEED_BASE = 82100
+
+FROZEN_PYTHON_MAJOR_MINOR = (3, 11)
+FROZEN_NUMPY_VERSION = "2.4.6"
+FROZEN_SCIPY_VERSION = "1.17.1"
+FROZEN_THREADPOOLCTL_VERSION = "3.7.0"
 
 EXPANDED_ORACLE_GEOMEAN_MAX = 0.50
 TWENTY_PERCENT_RATIO = 0.80
@@ -484,6 +490,12 @@ def protocol() -> dict:
         "time_limit_s": TIME_LIMIT_S,
         "order_seed": ORDER_SEED,
         "seed_base": SEED_BASE,
+        "runtime": {
+            "python_major_minor": list(FROZEN_PYTHON_MAJOR_MINOR),
+            "numpy": FROZEN_NUMPY_VERSION,
+            "scipy": FROZEN_SCIPY_VERSION,
+            "threadpoolctl": FROZEN_THREADPOOLCTL_VERSION,
+        },
         "expanded_oracle_geomean_max": EXPANDED_ORACLE_GEOMEAN_MAX,
         "twenty_percent_ratio": TWENTY_PERCENT_RATIO,
         "min_expanded_twenty_percent_wins": MIN_EXPANDED_TWENTY_PERCENT_WINS,
@@ -497,8 +509,16 @@ def validate_archive(report: dict) -> None:
     expected_protocol = protocol()
     if report.get("protocol") != expected_protocol:
         raise ValueError("protocol drift")
-    if not report.get("environment", {}).get("declared_single_thread"):
+    environment = report.get("environment", {})
+    if not environment.get("declared_single_thread"):
         raise ValueError("audit did not preserve the frozen single-thread boundary")
+    if (
+        environment.get("python_major_minor") != list(FROZEN_PYTHON_MAJOR_MINOR)
+        or environment.get("numpy") != FROZEN_NUMPY_VERSION
+        or environment.get("scipy") != FROZEN_SCIPY_VERSION
+        or environment.get("threadpoolctl") != FROZEN_THREADPOOLCTL_VERSION
+    ):
+        raise ValueError("frozen runtime version drift")
 
     specs = {s["id"]: s for s in specifications()}
     sources = report.get("sources", [])
@@ -568,10 +588,25 @@ def single_thread_environment() -> dict:
     return values
 
 
-def run_audit(*, require_single_thread: bool = True) -> dict:
+def run_audit(
+    *,
+    require_single_thread: bool = True,
+    require_frozen_versions: bool = True,
+) -> dict:
     env = single_thread_environment()
     if require_single_thread and not env["declared_single_thread"]:
         raise RuntimeError("frozen audit requires OMP/OPENBLAS/MKL thread counts = 1")
+    actual_versions = {
+        "python_major_minor": [int(x) for x in platform.python_version_tuple()[:2]],
+        "numpy": np.__version__,
+        "scipy": scipy.__version__,
+        "threadpoolctl": threadpoolctl.__version__,
+    }
+    expected_versions = protocol()["runtime"]
+    if require_frozen_versions and actual_versions != expected_versions:
+        raise RuntimeError(
+            f"frozen runtime version drift: expected {expected_versions}, got {actual_versions}"
+        )
 
     records = []
     warmups = []
@@ -626,9 +661,12 @@ def run_audit(*, require_single_thread: bool = True) -> dict:
         "environment": {
             **env,
             "python": platform.python_version(),
+            "python_major_minor": actual_versions["python_major_minor"],
             "platform": platform.platform(),
-            "numpy": np.__version__,
-            "scipy": scipy.__version__,
+            "machine": platform.machine(),
+            "numpy": actual_versions["numpy"],
+            "scipy": actual_versions["scipy"],
+            "threadpoolctl": actual_versions["threadpoolctl"],
         },
         "sources": sources,
         "warmups": warmups,
