@@ -162,8 +162,10 @@ controls before timing. No broader rejection of SQL learning follows.
 v0.0.81 restart: standard-form LP is admitted only as a **verification
 interface candidate**, not yet as a model task. A primal/dual witness can be
 checked against the original coefficients without re-running the optimizer.
-The verifier is solver-free and fail-closed under fixed float64 residual
-tolerances; malformed, primal, dual and objective faults are negative controls.
+The verifier is solver-free and fail-closed under fixed float64 componentwise
+backward-error tolerances; malformed, primal, dual and objective faults are
+negative controls. Complementarity remains diagnostic rather than a duplicate
+acceptance condition.
 No timing threshold or learned active-set/basis predictor is present.
 
 Next action is v0.0.82: freeze fresh LP instances and a strong HiGHS Direct
