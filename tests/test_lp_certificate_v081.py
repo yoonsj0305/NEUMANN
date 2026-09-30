@@ -101,6 +101,18 @@ class LPCertificateV081Tests(unittest.TestCase):
         self.assertTrue(report["accepted"], report)
         self.assertLessEqual(report["equality_ratio"], 1.0)
 
+    def test_nonnegativity_scale_is_componentwise(self):
+        # A huge positive coordinate must not make an unrelated negative
+        # coordinate numerically acceptable.
+        A = np.eye(2)
+        x = np.array([1e8, -1e-4])
+        b = x.copy()
+        c = np.zeros(2)
+        y = np.zeros(2)
+        report = verify_standard_form_certificate(A, b, c, x, y)
+        self.assertFalse(report["accepted"])
+        self.assertGreater(report["nonnegative_ratio"], 1.0)
+
     def test_shape_nonfinite_and_tolerance_errors_are_rejected(self):
         with self.assertRaises(ValueError):
             verify_standard_form_certificate(
