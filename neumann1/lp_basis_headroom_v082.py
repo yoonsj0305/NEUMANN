@@ -22,6 +22,7 @@ from typing import Any
 import numpy as np
 import scipy
 from scipy.optimize import linprog
+from scipy.optimize._highspy import _core as _highs_core
 from threadpoolctl import threadpool_limits
 
 from neumann1.lp_certificate_v081 import verify_standard_form_certificate
@@ -358,6 +359,11 @@ def run_audit(*, implementation_commit: str) -> dict:
             "python": platform.python_version(),
             "numpy": np.__version__,
             "scipy": scipy.__version__,
+            "highs": (
+                f"{_highs_core.HIGHS_VERSION_MAJOR}."
+                f"{_highs_core.HIGHS_VERSION_MINOR}."
+                f"{_highs_core.HIGHS_VERSION_PATCH}"
+            ),
         },
         "platform": platform.platform(),
         "protocol": {
