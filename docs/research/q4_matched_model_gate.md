@@ -1,6 +1,6 @@
 # Q4 next milestone — matched model, not a solver-only demonstration
 
-Updated 2026-09-30 through v0.0.79 instrumentation. This is a **design gate**,
+Updated 2026-09-30 through v0.0.80 relational screen. This is a **design gate**,
 not a registered trained-model evaluation or a completed implementation.
 
 ## Exact question
@@ -145,3 +145,15 @@ callback bodies and their declarations. No new task, actual model roster,
 sealed dataset or performance claim is supplied by this instrumentation.
 Freeze and audit these before using it; fixture ratios do not close Q3/Q4.
 See `../experiments/v0.0.79.md`.
+
+v0.0.80 restart: the bounded three-relation constructed planner workload is
+rejected before training. The finite six-policy zero-model oracle improved
+verified total cost by only 3.3575% over the strongest fixed Direct policy.
+Independent SQLite replay dominated measured costs. Preserve the first
+216-call archive and do not fit a learner or loosen the gate to rescue it.
+The next candidate must pair a costly residual decision with a cheaper
+independently checkable certificate, identical authority for Direct, and
+actual runnable models frozen before fitting. Original-query recomputation
+is one verification implementation, not the definition of verification;
+any replacement needs its own original-semantics contract and falsification
+controls before timing. No broader rejection of SQL learning follows.
