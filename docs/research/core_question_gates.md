@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-09-30 through v0.0.73. Goal: a system with substantially less **total** compute
+Updated 2026-09-30 through v0.0.74. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -72,6 +72,18 @@ structure from admissible input; no hidden oracle labels at inference.
 Compare to a strong deterministic search and equal-budget direct learner.
 If learned discovery costs more than it saves, disable it.
 
+v0.0.74 screens an exact counting planner before spending training budget:
+27 fresh synthetic graphs, 243 timed calls, all independently certified and
+agreeing. Best-of-eight stochastic min-fill costs 1.7568× the per-graph
+faster measured min-fill/min-degree reference in geometric mean, with zero
+20% cost wins. Its non-deployable zero-planning diagnostic is 0.8824×, only
+2/27 graphs with 20% wins, versus the frozen <=0.8× and >=9/27 thresholds.
+Do **not** train to reproduce these selected orders on this n=16–32 input
+distribution. This rules out neither better orders outside these eight
+candidates nor larger/other tasks. It is an unlearned headroom rejection,
+not a negative test of every possible learned planner. Learned tree
+decomposition/ordering already has direct prior art; see the positioning map.
+
 ## Q4 — Does NEUMANN itself beat a matched direct model?
 
 **Open.** v0.0.31's 2×2 neural demonstration is a capability feasibility
@@ -97,12 +109,16 @@ complete time is a failed compute gate, not a partial speed win. Retain
 negative results and costs for all failed proposals. If a cheap deterministic
 component saturates a family, do not train a model merely to have one.
 
-Immediate next experiment: measure larger representative graphs against
-mature specialized graph reductions, then look for a task where structure
-cannot be discovered
-more cheaply by deterministic tests. Seek learned benefit only where its
-complete cost is lower than strong direct computation, reuse, batching,
-and exact verification. Freeze capability and comparators before a final
-holdout.
+Immediate priority: Q4's matched **model-level** comparison, not more MIS
+subroutine wins. Direct answer-only classification is insufficient: include
+a same-budget executable-program/IR predictor with identical access to the
+executor and original-task verifier, as well as strongest cheap deterministic
+input processing. Freeze training data, architecture/size budget, generated
+surface holdouts, verified quality target, failure costs, inference and
+training-amortization accounting before training. Reject a task up front if
+a cheap deterministic parser/executor already saturates it. Graph-family
+scaling and mature KaMIS integration remain optional mechanism follow-ups,
+not the project's central next milestone. Do not call a trained component
+or an oracle cost proxy a Q4 pass.
 The v0.0.68 score-only lower bound rules out a checker-only rescue for the
 existing n≤32 learned path.

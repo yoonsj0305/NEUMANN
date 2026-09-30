@@ -79,6 +79,23 @@ multi-domain, reusable minimum-compute question.
 
 ## NEUMANN positioning rule
 
+### Elimination-order boundary (v0.0.74)
+
+Kask, Gelfand, Otten and Dechter, *Pushing the Power of Stochastic Greedy
+Ordering Schemes for Inference in Graphical Models* (AAAI 2011), studies
+iterative randomized greedy elimination orders minimizing induced width
+and state-space size: https://ojs.aaai.org/index.php/AAAI/article/view/7828 .
+Khakhulin, Schutski and Oseledets, *Graph Convolutional Policy for Solving
+Tree Decomposition via Reinforcement Learning Heuristics* (2019), is a
+direct learned-decomposition predecessor: https://arxiv.org/abs/1910.08371 .
+Song et al., *Learning Variable Ordering Heuristics for Solving Constraint
+Satisfaction Problems* (2019), learns ordering for backtracking CSP search:
+https://arxiv.org/abs/1912.10762 . CSP branching is not sum-product elimination.
+Do not call learned elimination or learned ordering a NEUMANN invention.
+Current reuse: ideas/baseline specification only; no external code/data/weights.
+v0.0.74 is a bounded **unlearned** complete-cost screening experiment, not a
+comparison to these full learned systems or a new structure discovery method.
+
 Do not claim novelty from:
 
     Problem -> structure -> reasoning
