@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-09-30 through v0.0.75. Goal: a system with substantially less **total** compute
+Updated 2026-09-30 through v0.0.76. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -103,6 +103,16 @@ training data budget, quality target, hardware, warm-up convention, and
 verification contract. Report model inference, deterministic tooling, retries,
 memory, and training amortization separately. At matched verified quality,
 compare capability-versus-total-compute frontiers, not parameter counts.
+
+v0.0.76 rejects the old controlled 2x2 linear-text task as a Q4 benchmark.
+On 243 fresh text-disjoint positives, a zero-learned-parameter deterministic
+compiler + exact solver + original-input verifier matched the hidden generator
+solution on 243/243. All 243 paired near-negatives failed closed. The frozen
+decision is `REJECT_EXISTING_LINEAR_TASK_FOR_Q4`. This does not make Q4
+negative; it removes a confounded task before training. Q4 remains open until
+a new task survives deterministic admission and a matched executable Direct
+learner is compared with NEUMANN at identical independently verified
+capability and complete cost.
 
 ## Q5 — Are scaling and cross-domain reuse real?
 
