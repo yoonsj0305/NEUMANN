@@ -56,6 +56,21 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.75 — DP lifetime hygiene (correctness fix; first timing gate failed)**
+
+Both exact graph-DP paths now avoid per-call self-referential recursive
+closures, so memo state is released without waiting for cyclic GC on normal
+and budget-exceeded exits. Exact answers, memoized state counts and full
+proof records match the embedded legacy implementations. The first frozen
+25-case audit retained the preregistered negative verdict
+`LIFETIME_FIX_CORRECT_BUT_PERF_REGRESSION`: all aggregate geometric means
+were near 1.0, but one independent/direct cell measured 1.2094× versus the
+1.20 no-regression cap. An identical-tree clean replication later passed all
+caps; it is recorded as timing-variance evidence and does not replace the
+first result. Keep the lifetime fix as runtime hygiene, with **no speedup or
+NEUMANN-efficiency claim**. See `docs/experiments/v0.0.75.md`.
+
+
 **v0.0.74 — Elimination-order learning headroom screen (negative)**
 
 All 243 timed calls on 27 frozen synthetic exact-counting graphs verified

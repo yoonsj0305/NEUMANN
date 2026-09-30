@@ -35,34 +35,49 @@ def _transition(mask: int, neighbors: tuple[int, ...],
     return weights[pivot], without, without & ~neighbors[pivot]
 
 
+class _ProofMemo(dict):
+    """Weak-referenceable per-call Bellman table; intentionally cycle-free."""
+    pass
+
+
+def _proof_visit(mask: int, neighbors: tuple[int, ...], weights: tuple[int, ...],
+                 memo: _ProofMemo, state_limit: int, deadline: int) -> int:
+    """Module-level recursion avoids a per-call self-referential closure."""
+    if mask in memo:
+        return memo[mask]
+    if len(memo) >= state_limit:
+        raise RuntimeError("proof DP state cap reached")
+    if len(memo) % 1024 == 0 and perf_counter_ns() >= deadline:
+        raise RuntimeError("proof DP execution time cap reached")
+    if not mask:
+        value = 0
+    else:
+        weight, without, with_pivot = _transition(mask, neighbors, weights)
+        if with_pivot == -1:
+            value = weight + _proof_visit(
+                without, neighbors, weights, memo, state_limit, deadline
+            )
+        else:
+            value = max(
+                _proof_visit(without, neighbors, weights, memo, state_limit, deadline),
+                weight + _proof_visit(
+                    with_pivot, neighbors, weights, memo, state_limit, deadline
+                ),
+            )
+    memo[mask] = value
+    return value
+
+
 def solve_with_proof(graph: Graph, weights: tuple[int, ...],
                      *, state_limit: int = 2_000_000,
                      time_limit_s: float = 5.) -> DPProof:
     if len(graph) != len(weights) or any(type(w) is not int or w <= 0 for w in weights):
         raise ValueError("positive integer weight per vertex required")
     neighbors = _neighbors(graph)
-    memo: dict[int, int] = {}
+    memo = _ProofMemo()
     deadline = perf_counter_ns() + int(time_limit_s * 1e9)
-
-    def visit(mask: int) -> int:
-        if mask in memo:
-            return memo[mask]
-        if len(memo) >= state_limit:
-            raise RuntimeError("proof DP state cap reached")
-        if len(memo) % 1024 == 0 and perf_counter_ns() >= deadline:
-            raise RuntimeError("proof DP execution time cap reached")
-        if not mask:
-            value = 0
-        else:
-            weight, without, with_pivot = _transition(mask, neighbors, weights)
-            if with_pivot == -1:
-                value = weight + visit(without)
-            else:
-                value = max(visit(without), weight + visit(with_pivot))
-        memo[mask] = value
-        return value
-
-    visit((1 << len(graph)) - 1)
+    _proof_visit((1 << len(graph)) - 1, neighbors, weights,
+                 memo, state_limit, deadline)
     return DPProof(tuple(sorted(memo.items())))
 
 
