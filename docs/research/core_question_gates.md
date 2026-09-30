@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-09-30 through v0.0.77. Goal: a system with substantially less **total** compute
+Updated 2026-09-30 through v0.0.78. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -121,6 +121,17 @@ v0.0.76 program-parity witness. The zero-learned-parameter path retained
 near-negatives, so `REJECT_EXISTING_LINEAR_TASK_FOR_Q4` is preserved. The
 canonical first CI summary remains unchanged; no new timing gate is opened.
 This closes the old controlled grammar as a central Q4 candidate, not Q4.
+
+v0.0.78 tests a new natural-language-source candidate's **reference-program
+execution**, not learned semantic discovery: all 1,000 opened SVAMP expressions
+had at most two arithmetic operations, with zero >=20% common-subexpression
+sharing wins and local median complete expression work 0.040462 ms. One
+equation/answer disagreement was retained (999/1,000 exact matches). This
+rejects that bounded numeric-execution-compression target before training.
+It does not settle model-side planning/compression or natural-language semantic
+verification. The entire corpus is opened development data, not a final set.
+Neither a supplied reference equation nor a gold answer may become inference
+authority. Direct must have the same optimized program runtime.
 
 ## Q5 — Are scaling and cross-domain reuse real?
 

@@ -117,6 +117,8 @@ jobs:
         run: pytest -q tests/test_dp_lifetime_v075.py
       - name: Program parity and Q4 admission integration contract
         run: pytest -q tests/test_program_parity_v076.py tests/test_q4_admissibility_v077.py
+      - name: Natural arithmetic opportunity contracts (no final audit rerun)
+        run: pytest -q tests/test_natural_arithmetic_v078.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .

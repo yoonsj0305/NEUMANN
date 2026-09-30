@@ -56,6 +56,18 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.78 — Natural arithmetic execution target rejected before training**
+
+An opened-development audit of all 1,000 official SVAMP reference equations
+found only 0–2 arithmetic operations per program and zero >=20% wins from
+shared common-subexpression execution. Median complete expression parse,
+exact execution and independent expression check was 0.040462 ms locally.
+999 equation results matched source answers exactly; one equation/answer
+disagreement remains archived rather than silently fixed or dropped.
+No raw word problem was solved and no model was trained. This rejects only
+this numeric-execution-compression target; semantic model/planning costs
+were not measured. Q3/Q4 remain open. See `docs/experiments/v0.0.78.md`.
+
 **v0.0.77 — Integrate the interrupted Q4 admission audit**
 
 The formerly conflicting PR #82 audit is integrated without replacing
