@@ -119,6 +119,8 @@ jobs:
         run: pytest -q tests/test_program_parity_v076.py tests/test_q4_admissibility_v077.py
       - name: Natural arithmetic opportunity contracts (no final audit rerun)
         run: pytest -q tests/test_natural_arithmetic_v078.py
+      - name: Matched full-path cost fault-injection contracts
+        run: pytest -q tests/test_matched_cost_v079.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .

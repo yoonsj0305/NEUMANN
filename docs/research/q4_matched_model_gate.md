@@ -1,6 +1,6 @@
 # Q4 next milestone — matched model, not a solver-only demonstration
 
-Updated 2026-09-30 through the v0.0.78 natural-program screen. This is a **design gate**,
+Updated 2026-09-30 through v0.0.79 instrumentation. This is a **design gate**,
 not a registered trained-model evaluation or a completed implementation.
 
 ## Exact question
@@ -137,3 +137,11 @@ Next admission must identify a costly residual *learned discovery/planning*
 decision and an actual runnable matched Direct learner. Shared compiler CSE
 cannot be reserved for NEUMANN. Gold-answer checking is offline dataset-label
 agreement, never production semantic verification of a raw NL problem.
+
+v0.0.79 adds `matched_cost_v079.measure/summarize` for the next admitted
+model experiment. It retains attempted/fallback work and distinguishes
+original-task verification from labels and expression checks, but trusts
+callback bodies and their declarations. No new task, actual model roster,
+sealed dataset or performance claim is supplied by this instrumentation.
+Freeze and audit these before using it; fixture ratios do not close Q3/Q4.
+See `../experiments/v0.0.79.md`.
