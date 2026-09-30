@@ -31,6 +31,7 @@ Working watchlist supplied by the current literature review:
 - COVER
 - related symbolic-chain / verifier / solver-routing work
 - mature solver presolve/ordering and learned presolve (including L2P-MIP)
+- exact and learned MIS reductions: KaMIS and LearnAndReduce
 - e-graphs and equality saturation for representation and reuse
 
 These names are maintained here as a review checklist.
@@ -41,6 +42,40 @@ source. IR2Solve/COVER details also require primary-source verification before
 quoting any number, submission date or precise mechanism.
 
 Performance numbers, dates, exact mechanisms, and novelty comparisons must be independently verified before publication.
+
+## Graph-specific boundary confirmed after v0.0.73
+
+The primary paper by Großmann, Langedal and Schulz,
+*Accelerating Reductions Using Graph Neural Networks for the Maximum Weight
+Independent Set Problem* (ACDA 2025; extended arXiv:2412.14198), and its
+official `KarlsruheMIS/LearnAndReduce` repository already use a GNN as a
+screening mechanism for expensive reduction rules. They retain exact
+reduction semantics and lift the reduced result to the original graph.
+Their graph-specific combination is substantially closer than a generic
+"neural proposal + solver" citation. Sources:
+https://arxiv.org/abs/2412.14198 and
+https://github.com/KarlsruheMIS/LearnAndReduce . Reuse type: ideas and
+baseline specification only; **no code, data or weights copied**. The
+repository advertises MIT licensing, but check exact components and
+submodules before any future code import.
+
+KaMIS itself provides exact `weighted_branch_reduce` and `struction`
+executors as well as heuristic programs such as `redumis`. Do not
+mistake a heuristic solution for certified optimum in an iso-capability
+comparison. Its default kernelization may itself remove twins and much
+more; compare a native/default exact configuration before claiming a
+benefit from our own simple quotient. See
+https://github.com/KarlsruheMIS/KaMIS . The repository documents MIT
+with some BSD-3-Clause components; license and commit checks are required
+at integration. No KaMIS binary is in the current v0.0.73 experiment.
+
+Consequence: "a GNN predicts profitable graph reduction locations" and
+"a learned screen plus exact graph reductions" are **not** NEUMANN novelty
+claims. A new graph-learning experiment needs a precisely identified
+residual bottleneck not solved by LearnAndReduce and a full-cost comparison
+against its applicable configuration. The v0.0.73 four-network negative
+gate provides no such headroom. This does not settle NEUMANN's broader
+multi-domain, reusable minimum-compute question.
 
 ## NEUMANN positioning rule
 
