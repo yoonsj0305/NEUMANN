@@ -77,6 +77,35 @@ against its applicable configuration. The v0.0.73 four-network negative
 gate provides no such headroom. This does not settle NEUMANN's broader
 multi-domain, reusable minimum-compute question.
 
+## LP basis-learning boundary confirmed before v0.0.82
+
+Learning an LP basis or warm start is already an established research line.
+Fan et al., *Smart Initial Basis Selection for Linear Programs* (ICML 2023)
+uses a GNN to predict an initial LP basis and evaluates with HiGHS and OptVerse:
+https://proceedings.mlr.press/v202/fan23d.html .
+
+Lu and Yan, *Learning Initial Basis Selection for Linear Programming via
+Duality-Inspired Tripartite Graph Representation and Comprehensive
+Supervision* (ICML 2025), develops a duality-inspired tripartite GNN and
+explicit supervision for basis quality/feasibility:
+https://proceedings.mlr.press/v267/lu25q.html .
+
+Consequence: "predict an LP basis with a neural network", "use a GNN to warm
+start simplex", and "repair a predicted basis before handing it to a solver"
+are **not** NEUMANN novelty claims. v0.0.82 therefore does not train a model.
+It first asks whether free exact basis knowledge has enough *complete verified*
+value after original-problem certificate checking and after separating generic
+solver overhead with matched n=m controls.
+
+If that headroom exists, the next comparison must first include strong
+deterministic/classical basis or active-set discovery and these learned
+basis-selection lines as applicable baselines. Any later NEUMANN claim must be
+about the broader certificate-first structural-compression system and
+iso-capability total-compute behavior, not basis prediction itself.
+
+Reuse type: literature positioning and baseline specification only; no external
+code, datasets or weights copied.
+
 ## NEUMANN positioning rule
 
 ### Elimination-order boundary (v0.0.74)
