@@ -129,12 +129,24 @@ def recover_set(graph: Graph, weights: tuple[int, ...], proof: DPProof) -> tuple
     return tuple(sorted(chosen))
 
 
-def observe_dp(graph: Graph, *, compressed: bool) -> dict:
+def observe_dp(graph: Graph, *, compressed: bool, routed: bool = False) -> dict:
+    if compressed and routed:
+        raise ValueError("select compressed or routed, not both")
     start = perf_counter_ns()
     validate_graph(graph)
-    cert = discover_twins(graph) if compressed else None
-    if cert is not None:
-        check_certificate(graph, cert)
+    cert = None
+    fallback = False
+    if compressed or routed:
+        candidate = discover_twins(graph)
+        if compressed or len(candidate.groups) < len(graph):
+            try:
+                check_certificate(graph, candidate)
+            except ValueError:
+                if not routed:
+                    raise
+                fallback = True
+            else:
+                cert = candidate
     planned = perf_counter_ns()
     target = cert.quotient if cert is not None else graph
     weights = cert.weights if cert is not None else (1,) * len(graph)
@@ -158,6 +170,8 @@ def observe_dp(graph: Graph, *, compressed: bool) -> dict:
     finished = perf_counter_ns()
     return {"vertices": len(graph), "edges": sum(map(len, graph)) // 2,
             "retained": len(target), "optimum": optimum, "verified": True,
+            "routed_to": ("quotient" if cert is not None else "direct"),
+            "fallback": fallback,
             "proof_states": len(proof.states), "proof_bytes": proof_bytes,
             "plan_ms": (planned - start) / 1e6,
             "execute_ms": (solved - planned) / 1e6,

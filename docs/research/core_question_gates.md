@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-09-30 through v0.0.72. Goal: a system with substantially less **total** compute
+Updated 2026-09-30 through v0.0.73. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -48,6 +48,15 @@ subroutine opportunity, **not** superiority over modern graph reductions
 or a NEUMANN learned/system-level advantage. The direct proof checker is
 independent code but not an optimized production-grade graph solver.
 
+v0.0.73's first four non-planted classic network checks all certified exact
+optima across 60 timed calls, but the frozen small-graph routing gate
+**failed**: 7.1%, 8.4%, and 12.3% routed cost reductions on the three
+graphs with some false twins, versus a 10.3% cost increase on the no-twin
+graph. No graph reached the 20% gain condition. These examples are not a
+representative sample. Stop promoting exact-twin discovery as a broad
+NEUMANN advantage on this evidence. The huge synthetic wins remain a
+conditional classical mechanism, not product-level efficiency.
+
 ## Q3 — Is learned discovery needed beyond cheap tests?
 
 **Open.** Construct a matched-observable case where cheap deterministic
@@ -81,9 +90,9 @@ complete time is a failed compute gate, not a partial speed win. Retain
 negative results and costs for all failed proposals. If a cheap deterministic
 component saturates a family, do not train a model merely to have one.
 
-Immediate next experiment: test twin incidence and full-path effect on
-natural or diverse non-planted graphs against mature specialized graph
-reductions, then look for a task where structure cannot be discovered
+Immediate next experiment: measure larger representative graphs against
+mature specialized graph reductions, then look for a task where structure
+cannot be discovered
 more cheaply by deterministic tests. Seek learned benefit only where its
 complete cost is lower than strong direct computation, reuse, batching,
 and exact verification. Freeze capability and comparators before a final

@@ -56,6 +56,15 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.73 — Small non-planted graph routing gate (negative)**
+
+Four provenance-backed classic networks and 60 timed exact-proof calls
+showed no 20% complete-cost win for exact twin routing: reductions were
+7–12% on three graphs with some twins, while one no-twin graph incurred
+~10% overhead. The preregistered gate failed. This prevents extrapolating
+v0.0.72's planted large wins to general networks. See
+`docs/experiments/v0.0.73.md` and archived raw measurements.
+
 **v0.0.72 — Proof-carrying DP and exact quotient (constructed mechanism)**
 
 After removing the redundant MIP executor and using a separate Bellman
