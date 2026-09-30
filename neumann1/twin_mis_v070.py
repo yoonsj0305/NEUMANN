@@ -4,7 +4,6 @@ Constructed research audit only; highspy is optional, never a core dependency.
 """
 
 from dataclasses import dataclass
-from functools import lru_cache
 import random
 from time import perf_counter_ns
 
@@ -66,32 +65,61 @@ def check_certificate(graph: Graph, cert: TwinCertificate) -> None:
                 raise ValueError("wrong quotient edge set")
 
 
-def independent_optimum(graph: Graph, weights: tuple[int, ...],
-                        *, call_limit: int = 2_000_000) -> int:
-    """Exact integer DP; separate algorithm from MIP branch-and-cut."""
-    if len(weights) != len(graph) or any(w <= 0 for w in weights):
-        raise ValueError("positive weights required")
-    masks = tuple(sum(1 << u for u in row) for row in graph)
-    calls = 0
+class _IndependentMemo(dict):
+    """Weak-referenceable per-call memo; intentionally cycle-free."""
+    pass
 
-    @lru_cache(maxsize=None)
-    def visit(mask):
-        nonlocal calls
-        calls += 1
-        if calls > call_limit:
-            raise RuntimeError("independent optimum call cap reached")
-        if mask == 0:
-            return 0
-        vertices = [v for v in range(len(graph)) if mask & (1 << v)]
+
+def _independent_visit(mask: int, masks: tuple[int, ...],
+                       weights: tuple[int, ...], memo: _IndependentMemo,
+                       calls: list[int], call_limit: int) -> int:
+    """Module-level recursion avoids a per-call self-referential closure."""
+    if mask in memo:
+        return memo[mask]
+    calls[0] += 1
+    if calls[0] > call_limit:
+        raise RuntimeError("independent optimum call cap reached")
+    if mask == 0:
+        value = 0
+    else:
+        vertices = [v for v in range(len(weights)) if mask & (1 << v)]
         isolated = [v for v in vertices if masks[v] & mask == 0]
         if isolated:
             removed = sum(1 << v for v in isolated)
-            return sum(weights[v] for v in isolated) + visit(mask ^ removed)
-        pivot = max(vertices, key=lambda v: (masks[v] & mask).bit_count())
-        without = mask & ~(1 << pivot)
-        return max(visit(without), weights[pivot] + visit(without & ~masks[pivot]))
+            value = (sum(weights[v] for v in isolated)
+                     + _independent_visit(mask ^ removed, masks, weights,
+                                          memo, calls, call_limit))
+        else:
+            pivot = max(vertices, key=lambda v: (masks[v] & mask).bit_count())
+            without = mask & ~(1 << pivot)
+            value = max(
+                _independent_visit(without, masks, weights, memo, calls, call_limit),
+                weights[pivot] + _independent_visit(
+                    without & ~masks[pivot], masks, weights, memo, calls, call_limit),
+            )
+    memo[mask] = value
+    return value
 
-    return visit((1 << len(graph)) - 1)
+
+def _independent_optimum_with_stats(graph: Graph, weights: tuple[int, ...],
+                                    *, call_limit: int = 2_000_000) -> tuple[int, int]:
+    """Exact optimum plus memoized state count for equivalence audits."""
+    if len(weights) != len(graph) or any(w <= 0 for w in weights):
+        raise ValueError("positive weights required")
+    masks = tuple(sum(1 << u for u in row) for row in graph)
+    memo = _IndependentMemo()
+    calls = [0]
+    value = _independent_visit((1 << len(graph)) - 1, masks, weights,
+                               memo, calls, call_limit)
+    return value, len(memo)
+
+
+def independent_optimum(graph: Graph, weights: tuple[int, ...],
+                        *, call_limit: int = 2_000_000) -> int:
+    """Exact integer DP; separate algorithm from MIP branch-and-cut."""
+    return _independent_optimum_with_stats(
+        graph, weights, call_limit=call_limit
+    )[0]
 
 
 def _mip(graph: Graph, weights: tuple[int, ...]):
