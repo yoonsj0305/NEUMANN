@@ -1,6 +1,6 @@
 # Q4 next milestone — matched model, not a solver-only demonstration
 
-Updated 2026-09-30 through the v0.0.77 admission integration. This is a **design gate**,
+Updated 2026-09-30 through the v0.0.78 natural-program screen. This is a **design gate**,
 not a registered trained-model evaluation or a completed implementation.
 
 ## Exact question
@@ -127,3 +127,13 @@ better timings or train another model on the saturated controlled grammar.
 The next substantive milestone is a new task admission with a residual
 structural decision, an executable Direct comparison, a no-compression
 ablation, shared verification authority, and full-path cost accounting.
+
+v0.0.78 restart: the SVAMP **numeric execution compression** candidate is
+rejected, not the natural-language problem-solving task as a whole. Supplied
+reference equations take 0–2 arithmetic operations and have no measured CSE
+redundancy. The source has one retained equation/answer disagreement. No model
+is trained on this rejected target; model inference/planning remains unmeasured.
+Next admission must identify a costly residual *learned discovery/planning*
+decision and an actual runnable matched Direct learner. Shared compiler CSE
+cannot be reserved for NEUMANN. Gold-answer checking is offline dataset-label
+agreement, never production semantic verification of a raw NL problem.
