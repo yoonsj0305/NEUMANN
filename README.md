@@ -56,6 +56,19 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.76 — Q4 task-admissibility gate (existing linear task rejected)**
+
+A fresh 243-positive / 243-paired-negative audit showed that the existing
+v0.0.29-v0.0.31 controlled 2x2 linear-text task is saturated by a
+zero-learned-parameter path: positive exact-verified hidden-solution
+equivalence was 243/243 and paired unsupported inputs failed closed 243/243.
+The preregistered decision is `REJECT_EXISTING_LINEAR_TASK_FOR_Q4`.
+Do not train another matched model on this task and do not reinterpret the
+earlier capability demonstrations as total-compute evidence. The next Q4
+candidate must first survive a cheap-deterministic task-admission gate and
+must include a same-budget executable Direct learner with identical
+executor/verifier authority. See `docs/experiments/v0.0.76.md`.
+
 **v0.0.75 — DP lifetime hygiene (correctness fix; first timing gate failed)**
 
 Both exact graph-DP paths now avoid per-call self-referential recursive
