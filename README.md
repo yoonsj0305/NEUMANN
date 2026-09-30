@@ -56,6 +56,17 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.76 — Direct tool-program comparator parity (not a Q4 pass)**
+
+The v0.0.31 structural classifier can also be interpreted as a direct
+atomic tool-program predictor using the same checkpoint and labels.
+On 486 already-opened positive/near-negative texts and all 82 possible
+head outputs, 39,852 paired downstream checks had zero mismatches in
+status, answer and individual bookkeeping counters. This is a post-head
+contract witness, **not** 39,852 model inferences, new training, or a latency
+advantage. The old answer-only comparison cannot isolate compression from
+tool access. Q3/Q4 remain open. See `docs/experiments/v0.0.76.md`.
+
 **v0.0.75 — DP lifetime hygiene (correctness fix; first timing gate failed)**
 
 Both exact graph-DP paths now avoid per-call self-referential recursive
