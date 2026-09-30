@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-09-30 through v0.0.79. Goal: a system with substantially less **total** compute
+Updated 2026-09-30 through v0.0.80. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -139,6 +139,16 @@ verification scopes and investment accounting. Fault-injection fixtures
 test these contracts; no new learner or independent final data is evaluated.
 Caller-declared scopes/refs require separate audit and summaries remain
 descriptive. This is measurement infrastructure, not a Q3/Q4 pass.
+
+v0.0.80 screens a constructed integer relational planning task using native
+DuckDB, a deterministic bag-multiplicity rewrite, four forced connected join
+orders, and SQLite original-query verification. All 216 timed calls verified,
+but the zero-model-cost post-hoc plan choice was only 3.3575% cheaper than
+the strongest fixed Direct path; only 3/12 cases reached 20% savings. Do not
+train on this bounded rejected target. The observed dominant cost was the
+independent original-query replay, not a learned planning step. A next task
+needs a cheaper independently checkable witness and the same verification
+access for all comparators; waive neither capability nor original semantics.
 
 ## Q5 — Are scaling and cross-domain reuse real?
 

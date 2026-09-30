@@ -56,6 +56,17 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.80 — Constructed relational planner target rejected before training**
+
+All 216 timed calls and 72 warmups matched a separate SQLite original-query
+execution exactly. Even a non-deployable zero-model choice among six measured
+policies reduced complete cost by only 3.3575% against the strongest fixed
+Direct policy; >=20% savings occurred in 3/12 cases, below the frozen gate.
+The exact deterministic multiplicity rewrite was also available to Direct.
+Original-query recomputation dominated observed verification cost. No model
+is trained on this bounded constructed target and Q3/Q4 remain open.
+See `docs/experiments/v0.0.80.md`; the preserved final audit is not rerun by CI.
+
 **v0.0.79 — Shared-authority full-path measurement interface**
 
 The next model experiment can measure all five required comparator routes
