@@ -2,7 +2,10 @@
 from __future__ import annotations
 
 import base64
+import gzip
 import hashlib
+import io
+import json
 import math
 import os
 import platform
@@ -10,6 +13,7 @@ import random
 import warnings
 from statistics import geometric_mean, median
 from time import perf_counter_ns
+from pathlib import Path
 
 import numpy as np
 import scipy
@@ -366,3 +370,29 @@ def validate_archive(report):
         _check_record(row, inputs[row['case_id']])
     if summary != report['summary']:
         raise ValueError('summary drift')
+
+
+def load_retained_archive(manifest_path):
+    """Reassemble immutable storage parts, never regenerate or re-time inputs."""
+    path = Path(manifest_path)
+    manifest = json.loads(path.read_text())
+    if manifest['format'] != 'neumann.lp.first-audit.parts.v1':
+        raise ValueError('unsupported archive manifest')
+    parts, names = [], set()
+    for entry in manifest['parts']:
+        name = entry['name']
+        if not isinstance(name, str) or Path(name).name != name or name in names:
+            raise ValueError('invalid or duplicate archive part path')
+        names.add(name)
+        data = (path.parent / name).read_bytes()
+        if len(data) != entry['bytes'] or hashlib.sha256(data).hexdigest() != entry['sha256']:
+            raise ValueError('archive part integrity drift')
+        parts.append(data)
+    compressed = b''.join(parts)
+    if len(compressed) != manifest['compressed_bytes'] or hashlib.sha256(compressed).hexdigest() != manifest['compressed_sha256']:
+        raise ValueError('reassembled first archive drift')
+    with gzip.GzipFile(fileobj=io.BytesIO(compressed)) as archive:
+        raw = archive.read(256 * 1024 * 1024 + 1)
+    if len(raw) > 256 * 1024 * 1024 or hashlib.sha256(raw).hexdigest() != manifest['json_sha256']:
+        raise ValueError('first JSON integrity drift')
+    return json.loads(raw)

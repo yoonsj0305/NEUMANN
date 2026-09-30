@@ -56,15 +56,21 @@ See:
 
 ## Current engineering baseline
 
-**v0.0.84 — Next classical portfolio protocol frozen; performance untested**
+**v0.0.84 — Scale-invariant classical portfolio fails the cost gate**
 
 An observable-only portfolio now normalizes received columns, then proposes
 bases using least-squares dual residual trimming, minimum-norm primal scores
 and pivoted QR. Its complete cost includes all proposal work, failed attempts,
 original-LP checking and native fallback. The explicit first-audit runner
 retains exact inputs and primal/dual witnesses for solver-free offline replay.
-Fixtures are not performance evidence. No v084 audit or learned training has
-run; Q3/Q4 remain OPEN. See `docs/experiments/v0.0.84.md` for the frozen gate.
+The first audit verified all 720 timed and 240 warmup observations, and offline
+witness replay passed without solving or regenerating inputs. Expanded
+portfolio/native geomean complete-cost ratios are 1.3553861823 raw and
+1.3559506383 normalized, with 0/12 >=20% wins and 0/12 no-fallback cases in
+both forms. Decision: `RESIDUAL_HEADROOM_UNRESOLVED_NOT_LEARNING_ADMISSION`.
+Keep native as default on the normalized family. No learned training or Q3/Q4
+pass follows from failed heuristics. See `docs/experiments/v0.0.84.md` for
+the frozen gate, first split archive and portability limits.
 
 **v0.0.83 — Classical norm shortcut consumes raw-family headroom**
 

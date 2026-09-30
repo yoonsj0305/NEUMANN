@@ -15,6 +15,21 @@ from neumann1.lp_certificate_v081 import verify_standard_form_certificate
 
 
 class PortfolioTests(unittest.TestCase):
+    def test_retained_first_archive_reassembles_and_replays_without_solving(self):
+        path = Path(__file__).resolve().parents[1] / 'docs/experiments/results/v084_first_audit.manifest.json'
+        manifest = json.loads(path.read_text())
+        self.assertEqual(manifest['json_sha256'],
+                         '10ad3cad8ad5c7f2543c333ce72f484f6747767828dc76e842795940603177c9')
+        report = p.load_retained_archive(path)
+        with patch.object(p, 'linprog', side_effect=AssertionError('optimizer forbidden')), \
+             patch.object(p.previous, 'generate_case', side_effect=AssertionError('generation forbidden')), \
+             patch.object(p, 'propose', side_effect=AssertionError('new discovery forbidden')):
+            p.validate_archive(report)
+        self.assertEqual(sum(r['accepted'] for r in report['records']), 720)
+        self.assertEqual(sum(r['accepted'] for r in report['warmups']), 240)
+        self.assertEqual(report['summary']['decision'], 'RESIDUAL_HEADROOM_UNRESOLVED_NOT_LEARNING_ADMISSION')
+        self.assertTrue(all(not x['gate_pass'] for x in report['summary']['forms'].values()))
+
     def fixture(self):
         return {'A': np.array([[1., 0., 2.], [0., 1., 2.]]),
                 'b': np.ones(2), 'c': np.array([0., 0., 1.])}
