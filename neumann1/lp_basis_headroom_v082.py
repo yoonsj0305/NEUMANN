@@ -471,6 +471,91 @@ def summarize(records: list[dict], warmups: list[dict] | None = None) -> dict:
     }
 
 
+
+def validate_archive(report: dict) -> None:
+    """Validate a preserved audit without rerunning any timed solve."""
+    expected_protocol = {
+        "rows": ROWS,
+        "condition_numbers": CONDITION_NUMBERS,
+        "width_factors": WIDTH_FACTORS,
+        "pair_replicates": PAIR_REPLICATES,
+        "direct_methods": DIRECT_METHODS,
+        "repeats": REPEATS,
+        "time_limit_s": TIME_LIMIT_S,
+        "order_seed": ORDER_SEED,
+        "seed_base": SEED_BASE,
+        "expanded_oracle_geomean_max": EXPANDED_ORACLE_GEOMEAN_MAX,
+        "twenty_percent_ratio": TWENTY_PERCENT_RATIO,
+        "min_expanded_twenty_percent_wins": MIN_EXPANDED_TWENTY_PERCENT_WINS,
+        "min_scaling_amplification": MIN_SCALING_AMPLIFICATION,
+        "min_scaling_pairs": MIN_SCALING_PAIRS,
+    }
+    if report.get("protocol") != expected_protocol:
+        raise ValueError("protocol drift")
+    if not report.get("environment", {}).get("declared_single_thread"):
+        raise ValueError("audit did not preserve the frozen single-thread boundary")
+
+    specs = {s["id"]: s for s in specifications()}
+    sources = report.get("sources", [])
+    if len(sources) != len(specs) or {s.get("id") for s in sources} != set(specs):
+        raise ValueError("source coverage drift")
+    for source in sources:
+        spec = specs[source["id"]]
+        if any(source.get(k) != v for k, v in spec.items()):
+            raise ValueError("source specification drift")
+        regenerated = generate_case(spec)
+        for key in (
+            "raw_observable_sha256",
+            "oracle_basis_sha256",
+            "latent_pair_sha256",
+        ):
+            if source.get(key) != regenerated[key]:
+                raise ValueError(f"{key} drift")
+        if not math.isclose(
+            float(source.get("actual_basis_condition")),
+            regenerated["actual_basis_condition"],
+            rel_tol=1e-12,
+            abs_tol=1e-12,
+        ):
+            raise ValueError("basis condition drift")
+
+    records = report.get("records", [])
+    warmups = report.get("warmups", [])
+    for row in [*records, *warmups]:
+        if type(row.get("accepted")) is not bool:
+            raise ValueError("invalid capability flag")
+        for key, value in row.items():
+            if key.endswith("_ms") and (
+                type(value) not in (int, float)
+                or not np.isfinite(value)
+                or value < 0
+            ):
+                raise ValueError("invalid charged timing")
+
+        if row.get("accepted"):
+            certificate = row.get("certificate")
+            if not isinstance(certificate, dict) or not certificate.get("accepted"):
+                raise ValueError("accepted route lacks accepted original certificate")
+
+        if row.get("path") == "direct":
+            if row["total_ms"] + 1e-12 < row["solve_ms"] + row["verify_ms"]:
+                raise ValueError("Direct total omits charged stages")
+        elif row.get("path") == "oracle_basis":
+            components = (
+                row["extract_ms"]
+                + row["factor_solve_ms"]
+                + row["reconstruct_ms"]
+                + row["verify_ms"]
+            )
+            if row["total_ms"] + 1e-12 < components:
+                raise ValueError("oracle total omits charged stages")
+        else:
+            raise ValueError("unknown route path")
+
+    expected_summary = summarize(records, warmups)
+    if report.get("summary") != expected_summary:
+        raise ValueError("summary drift")
+
 def single_thread_environment() -> dict:
     keys = ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS")
     values = {key: os.environ.get(key) for key in keys}
