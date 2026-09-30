@@ -127,6 +127,16 @@ jobs:
         run: pytest -q tests/test_lp_certificate_v081.py
       - name: LP certificate integration smoke (no timing claim)
         run: python benchmark_v081_smoke.py
+      - name: LP basis headroom pre-audit contracts
+        run: pytest -q tests/test_lp_basis_headroom_v082.py
+      - name: v0.0.82 frozen first audit
+        run: python benchmark_v082.py --output /tmp/v082_first_audit.json
+      - name: Upload v0.0.82 first-audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: v082-first-audit-${{ github.sha }}
+          path: /tmp/v082_first_audit.json
+          if-no-files-found: error
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .
