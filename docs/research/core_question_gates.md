@@ -153,9 +153,10 @@ access for all comparators; waive neither capability nor original semantics.
 v0.0.81 implements that missing verification boundary for one candidate
 class: standard-form LPs with primal/dual certificates. The original LP can
 be checked through primal feasibility, dual feasibility and objective equality
-without calling an optimizer; complementary slackness is retained as an
-additional fault signal. Fixed float64 tolerances and negative controls are
-tested. This is an enabling interface, not evidence that certificate checking
+without calling an optimizer; complementary slackness is retained as a
+diagnostic rather than a duplicate gate. Fixed float64 componentwise
+backward-error tolerances and negative controls are tested. This is an enabling
+interface, not evidence that certificate checking
 is cheap enough in practice, that a basis predictor has headroom, or that
 learning is needed. v0.0.82 must screen non-deployable basis/support oracle
 headroom against a strong HiGHS Direct path while both pay the same verifier.
