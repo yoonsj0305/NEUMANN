@@ -161,6 +161,22 @@ is cheap enough in practice, that a basis predictor has headroom, or that
 learning is needed. v0.0.82 must screen non-deployable basis/support oracle
 headroom against a strong HiGHS Direct path while both pay the same verifier.
 
+v0.0.82 first retained matched-control audit **passes only the mechanism
+headroom admission screen**. All frozen routes/cases verified. On the 12
+expanded cases, the geometric mean exact-basis-oracle / per-case fastest
+verified Direct ratio is 0.0087784284; 12/12 expanded cases clear the 20%
+reduction condition, and 12/12 matched n=m -> 16m pairs clear the >=2x
+scaling-amplification condition. Decision:
+`ADMIT_BASIS_DISCOVERY_SEARCH_NOT_MODEL_TRAINING`.
+
+This does not close Q3. The oracle is given the exact optimal basis for free on
+an author-generated constructed family. Before any learning, cheap
+observable-only deterministic/classical discovery and solver-native warm-start
+information must be tested under equal authority. It also does not close Q4:
+no learned NEUMANN route, matched executable Direct learner, no-compression
+ablation, training amortization, or fresh natural/held-out workload has been
+evaluated.
+
 ## Q5 — Are scaling and cross-domain reuse real?
 
 **Open.** Only after Q2–Q4 pass: test larger apparent sizes and independent
