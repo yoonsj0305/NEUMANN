@@ -21,6 +21,7 @@ from time import perf_counter_ns
 from typing import Any
 
 import numpy as np
+import scipy
 from scipy.linalg import LinAlgWarning, lu_factor, lu_solve
 from scipy.optimize import linprog
 from threadpoolctl import threadpool_limits
@@ -147,6 +148,14 @@ def generate_case(spec: dict) -> dict:
         (_array_digest(matrix) + _array_digest(rhs) + _array_digest(cost)).encode()
     ).hexdigest()
     basis_digest = _array_digest(basis)
+    latent_pair_digest = hashlib.sha256(
+        (
+            _array_digest(basis_matrix)
+            + _array_digest(x_basic)
+            + _array_digest(rhs)
+            + _array_digest(dual)
+        ).encode()
+    ).hexdigest()
 
     return {
         "spec": dict(spec),
@@ -156,6 +165,7 @@ def generate_case(spec: dict) -> dict:
         "oracle_basis": basis,
         "raw_observable_sha256": raw_digest,
         "oracle_basis_sha256": basis_digest,
+        "latent_pair_sha256": latent_pair_digest,
         "actual_basis_condition": float(np.linalg.cond(matrix[:, basis])),
     }
 
@@ -300,7 +310,7 @@ def _median_total(records: list[dict]) -> float:
     return float(median(r["total_ms"] for r in records))
 
 
-def summarize(records: list[dict]) -> dict:
+def summarize(records: list[dict], warmups: list[dict] | None = None) -> dict:
     expected = {
         (s["id"], path, repeat)
         for s in specifications()
@@ -323,6 +333,26 @@ def summarize(records: list[dict]) -> dict:
     if seen != expected:
         raise ValueError("all frozen timed observations required")
 
+    warmup_map = None
+    if warmups is not None:
+        warm_expected = {
+            (s["id"], path)
+            for s in specifications()
+            for path in (*DIRECT_METHODS, "oracle_basis")
+        }
+        warm_ids = [(w["case_id"], w["route_id"]) for w in warmups]
+        if (
+            len(warm_ids) != len(warm_expected)
+            or set(warm_ids) != warm_expected
+            or len(set(warm_ids)) != len(warm_ids)
+        ):
+            raise ValueError("warmup observation identity/coverage error")
+        if any(type(w["accepted"]) is not bool for w in warmups):
+            raise ValueError("invalid warmup capability flag")
+        warmup_map = {
+            (w["case_id"], w["route_id"]): w["accepted"] for w in warmups
+        }
+
     cells = []
     for spec in specifications():
         by_method = {}
@@ -331,7 +361,14 @@ def summarize(records: list[dict]) -> dict:
                 r for r in records
                 if r["case_id"] == spec["id"] and r["route_id"] == method
             ]
-            eligible = len(group) == REPEATS and all(r["accepted"] for r in group)
+            eligible = (
+                len(group) == REPEATS
+                and all(r["accepted"] for r in group)
+                and (
+                    warmup_map is None
+                    or warmup_map[(spec["id"], method)]
+                )
+            )
             by_method[method] = {
                 "eligible": eligible,
                 "median_total_ms": _median_total(group) if eligible else None,
@@ -347,6 +384,10 @@ def summarize(records: list[dict]) -> dict:
         oracle_eligible = (
             len(oracle_group) == REPEATS
             and all(r["accepted"] for r in oracle_group)
+            and (
+                warmup_map is None
+                or warmup_map[(spec["id"], "oracle_basis")]
+            )
         )
         if not eligible_direct or not oracle_eligible:
             cells.append({
@@ -452,6 +493,7 @@ def run_audit(*, require_single_thread: bool = True) -> dict:
                 **spec,
                 "raw_observable_sha256": case["raw_observable_sha256"],
                 "oracle_basis_sha256": case["oracle_basis_sha256"],
+                "latent_pair_sha256": case["latent_pair_sha256"],
                 "actual_basis_condition": case["actual_basis_condition"],
             })
 
@@ -485,15 +527,7 @@ def run_audit(*, require_single_thread: bool = True) -> dict:
                     **observation,
                 })
 
-    summary = summarize(records)
-    if not all(w["accepted"] for w in warmups):
-        summary = {
-            "decision": DECISION_CAPABILITY,
-            "warmup_failure": True,
-            "q3": "OPEN",
-            "q4": "OPEN",
-            "underlying_summary": summary,
-        }
+    summary = summarize(records, warmups)
 
     return {
         "experiment": "v0.0.82 constructed LP oracle-basis headroom",
@@ -519,6 +553,7 @@ def run_audit(*, require_single_thread: bool = True) -> dict:
             "python": platform.python_version(),
             "platform": platform.platform(),
             "numpy": np.__version__,
+            "scipy": scipy.__version__,
         },
         "sources": sources,
         "warmups": warmups,
