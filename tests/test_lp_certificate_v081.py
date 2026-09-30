@@ -87,15 +87,16 @@ class LPCertificateV081Tests(unittest.TestCase):
 
     def test_backward_error_scaling_handles_large_cancelling_terms(self):
         # The first equality has O(1e8) terms whose exact result is O(1).
-        # A one-ulp-scale perturbation should be judged relative to the original
-        # dot-product magnitude rather than only to the small right-hand side.
+        # A 1e-14 relative perturbation produces an O(1e-6) absolute row
+        # residual. It should be judged relative to the original dot-product
+        # magnitude rather than only to the small right-hand side.
         A = np.array([[1e8, -1e8], [1.0, 0.0]], dtype=float)
         x = np.array([1.0, 1.0 - 1e-8], dtype=float)
         b = A @ x
         y = np.zeros(2)
         c = np.zeros(2)
         perturbed = x.copy()
-        perturbed[1] = np.nextafter(perturbed[1], np.inf)
+        perturbed[1] += 1e-14
         report = verify_standard_form_certificate(A, b, c, perturbed, y)
         self.assertTrue(report["accepted"], report)
         self.assertLessEqual(report["equality_ratio"], 1.0)
