@@ -475,11 +475,11 @@ def summarize(records: list[dict], warmups: list[dict] | None = None) -> dict:
 def validate_archive(report: dict) -> None:
     """Validate a preserved audit without rerunning any timed solve."""
     expected_protocol = {
-        "rows": ROWS,
-        "condition_numbers": CONDITION_NUMBERS,
-        "width_factors": WIDTH_FACTORS,
+        "rows": list(ROWS),
+        "condition_numbers": list(CONDITION_NUMBERS),
+        "width_factors": list(WIDTH_FACTORS),
         "pair_replicates": PAIR_REPLICATES,
-        "direct_methods": DIRECT_METHODS,
+        "direct_methods": list(DIRECT_METHODS),
         "repeats": REPEATS,
         "time_limit_s": TIME_LIMIT_S,
         "order_seed": ORDER_SEED,
@@ -618,11 +618,11 @@ def run_audit(*, require_single_thread: bool = True) -> dict:
         "experiment": "v0.0.82 constructed LP oracle-basis headroom",
         "status": "opened-development mechanism screen; no learned model",
         "protocol": {
-            "rows": ROWS,
-            "condition_numbers": CONDITION_NUMBERS,
-            "width_factors": WIDTH_FACTORS,
+            "rows": list(ROWS),
+            "condition_numbers": list(CONDITION_NUMBERS),
+            "width_factors": list(WIDTH_FACTORS),
             "pair_replicates": PAIR_REPLICATES,
-            "direct_methods": DIRECT_METHODS,
+            "direct_methods": list(DIRECT_METHODS),
             "repeats": REPEATS,
             "time_limit_s": TIME_LIMIT_S,
             "order_seed": ORDER_SEED,
