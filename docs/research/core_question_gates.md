@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-09-30 through v0.0.75. Goal: a system with substantially less **total** compute
+Updated 2026-09-30 through v0.0.76. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -103,6 +103,17 @@ training data budget, quality target, hardware, warm-up convention, and
 verification contract. Report model inference, deterministic tooling, retries,
 memory, and training amortization separately. At matched verified quality,
 compare capability-versus-total-compute frontiers, not parameter counts.
+
+v0.0.76 implements the missing direct **atomic tool-program** comparator
+for the v0.0.31 route. Its output labels can be renamed to a trusted solver
+call or abstention with the same checkpoint/training. All 39,852 paired
+post-head checks (486 already-opened texts x 82 possible head outputs) match
+in status, answer and separate counters; 243 positive head-0 calls match
+generated known solutions, and 243 near-negatives reject. No model inference,
+training or timing was run. The v0.0.31 structural route contains no variable
+compression and is downstream-equivalent to this bounded direct program
+interpretation. Its answer-only learning gap cannot establish a compression
+advantage. This is comparator repair, not a Q4 capability/cost result.
 
 ## Q5 — Are scaling and cross-domain reuse real?
 
