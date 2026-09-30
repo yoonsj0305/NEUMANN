@@ -1,0 +1,48 @@
+{
+  "experiment": "v0.0.76 Q4 task-admissibility gate",
+  "status": "frozen_first_ci_summary",
+  "canonical_first_run": {
+    "pull_request": 82,
+    "preregistered_head_sha": "ac9f85d2e6412eddebcedf45b15fda23d2507290",
+    "workflow_run_id": 36671289602,
+    "test_job_id": 109746626654,
+    "full_suite": {
+      "passed": 305,
+      "skipped": 3
+    },
+    "workflow_conclusion": "success"
+  },
+  "protocol": {
+    "audit_count": 243,
+    "audit_seed": 7602,
+    "positive_rows": 243,
+    "negative_rows": 243,
+    "threshold": 0.99,
+    "learned_parameter_count": 0,
+    "timing_role": "diagnostic_only"
+  },
+  "summary": {
+    "decision": "REJECT_EXISTING_LINEAR_TASK_FOR_Q4",
+    "learned_parameter_count": 0,
+    "positive_rows": 243,
+    "negative_rows": 243,
+    "positive_compile_rate": 1,
+    "positive_verifier_rate": 1,
+    "positive_hidden_solution_equivalence_rate": 1,
+    "positive_exact_verified_rate": 1,
+    "negative_fail_closed_rate": 1,
+    "median_positive_total_ms": 0.070342,
+    "median_negative_rejection_ms": 0.028774,
+    "mean_positive_representation_steps": 1,
+    "mean_positive_solver_steps": 9,
+    "mean_positive_verification_steps": 5,
+    "mean_negative_representation_steps": 1,
+    "threshold": 0.99
+  },
+  "archive_limit": {
+    "raw_per_row_rows_persisted": false,
+    "reason": "canonical first CI invoked benchmark_v076.py without --output; only stdout summary was retained",
+    "decision_affected": false,
+    "note": "per-row timing was diagnostic and had no decision threshold; later timing reruns must not replace the canonical first-run summary"
+  }
+}
