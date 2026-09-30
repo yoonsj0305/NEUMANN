@@ -60,9 +60,10 @@ See:
 
 Standard-form LP candidates can now carry a primal/dual witness checked against
 the original coefficients without calling an optimizer or replaying the solve.
-The verifier checks primal feasibility, non-negativity, dual feasibility,
-primal/dual objective agreement and complementary slackness under fixed float64
-tolerances, with fault-injection tests and a bounded HiGHS integration smoke.
+The verifier checks primal feasibility, non-negativity, dual feasibility and
+primal/dual objective agreement under fixed float64 componentwise backward-error
+tolerances; complementary slackness is retained as a diagnostic. Fault-injection
+tests and a bounded HiGHS integration smoke exercise the contract.
 This is enabling infrastructure only: no timing gate, learned basis predictor,
 or Q3/Q4 result is claimed. The next gate is a zero-model basis/support
 headroom screen in which every path pays this same original-LP verification.
