@@ -131,6 +131,8 @@ jobs:
         run: pytest -q tests/test_lp_basis_headroom_v082.py
       - name: Oracle-basis comparator integration smoke (no timing claim)
         run: python benchmark_v082_smoke.py
+      - name: Observable basis discovery contracts and retained archive (no timing audit)
+        run: pytest -q tests/test_lp_discovery_v083.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .

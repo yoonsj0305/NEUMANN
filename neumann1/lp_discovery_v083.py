@@ -212,7 +212,8 @@ def run_audit():
             "summary": summarize(records, warmups)}
 
 
-def validate_archive(report):
+def validate_archive(report, *, regenerate_sources=True):
+    """Integrity only when regeneration is disabled; byte hashes are BLAS-specific."""
     if report["protocol"] != protocol() or not report["environment"]["declared_single_thread"]:
         raise ValueError("protocol/thread drift")
     if any(report["environment"][k] != v for k, v in protocol()["runtime"].items()):
@@ -222,20 +223,40 @@ def validate_archive(report):
     for source, spec in zip(report["sources"], specifications()):
         if any(source[k] != v for k, v in spec.items()):
             raise ValueError("source specification drift")
-        if generate_case(spec)[1] != source["raw_sha256"]:
+        if not isinstance(source['raw_sha256'], str) or len(source['raw_sha256']) != 64 or any(c not in '0123456789abcdef' for c in source['raw_sha256']):
+            raise ValueError('invalid source digest')
+        if regenerate_sources and generate_case(spec)[1] != source["raw_sha256"]:
             raise ValueError("source hash drift")
     for row in [*report["warmups"], *report["records"]]:
         if row["accepted"] and not (isinstance(row["certificate"], dict) and row["certificate"].get("accepted") is True):
             raise ValueError("unverified acceptance")
         if row["route_id"] == "norm_discovery":
+            if type(row['fallback_used']) is not bool or not 1 <= len(row['attempts']) <= 2:
+                raise ValueError('invalid candidate/fallback record')
+            if any(a['accepted'] for a in row['attempts'][:-1]):
+                raise ValueError('continued after verified candidate')
             stages = row["discovery_ms"] + sum(a["total_ms"] for a in row["attempts"])
             if row["fallback_used"]:
                 stages += row["fallback"]["total_ms"]
             elif row["fallback"] is not None:
                 raise ValueError("fallback drift")
+            winner = row['fallback'] if row['fallback_used'] else row['attempts'][-1]
+            if row['accepted'] != winner['accepted'] or row['certificate'] != winner['certificate']:
+                raise ValueError('route acceptance inconsistent with executed path')
+            if row['fallback_used'] and row['attempts'][-1]['accepted']:
+                raise ValueError('fallback after accepted candidate')
             if row["total_ms"] < stages:
                 raise ValueError("omitted attempt/fallback cost")
         elif row["error"] is None and row["total_ms"] < row["solve_ms"] + row["verify_ms"]:
             raise ValueError("omitted Direct cost")
+        nested = row.get('attempts', []) + ([row['fallback']] if row.get('fallback_used') else [])
+        for item in [row, *nested]:
+            if type(item['accepted']) is not bool:
+                raise ValueError('invalid acceptance type')
+            if item['accepted'] and not (isinstance(item['certificate'], dict) and item['certificate'].get('accepted') is True):
+                raise ValueError('unverified nested acceptance')
+            for k, v in item.items():
+                if k.endswith('_ms') and v is not None and (type(v) not in (float, int) or not math.isfinite(v) or v < 0):
+                    raise ValueError('invalid charged stage')
     if summarize(report["records"], report["warmups"]) != report["summary"]:
         raise ValueError("summary drift")

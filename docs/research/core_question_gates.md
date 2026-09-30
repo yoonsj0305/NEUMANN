@@ -1,10 +1,20 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-09-30 through v0.0.81. Goal: a system with substantially less **total** compute
+Updated 2026-09-30 through v0.0.83. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
 family to general reasoning capability is permitted.
+
+Latest LP checkpoint: v082 admitted classical basis-discovery screening, not
+training. In v083, observable column-norm rules passed the raw planted-family
+gate (complete-cost/native geomean 0.0182276863; 11/12 expanded wins and
+no-fallback cases), but failed after matched column normalization (1.1156167303;
+0/12 wins and no-fallback cases). All 768 timed/warmup observations verified.
+This is a generator-aware classical shortcut, not learned-model evidence.
+Q3/Q4 remain OPEN. Require stronger norm-invariant classical comparators and
+residual headroom before proposing a learned gate. See `../experiments/v0.0.83.md`
+for the first retained archive and cross-BLAS source-reproduction limitation.
 
 ## Q1 — Does learned structural discovery pay for itself?
 

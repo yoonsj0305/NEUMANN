@@ -1,5 +1,11 @@
 import copy
 import inspect
+import gzip
+import hashlib
+import json
+import subprocess
+import sys
+from pathlib import Path
 import unittest
 from unittest.mock import patch
 import numpy as np
@@ -8,6 +14,33 @@ from neumann1.lp_certificate_v081 import verify_standard_form_certificate
 
 
 class DiscoveryTests(unittest.TestCase):
+    def retained(self):
+        path = Path(__file__).resolve().parents[1] / 'docs/experiments/results/v083_first_audit.json.gz'
+        raw = gzip.decompress(path.read_bytes())
+        self.assertEqual(hashlib.sha256(raw).hexdigest(),
+                         'a9693593bf1869b6148edf1f06e1ec5e7c5d641da439b592735b90980d42b09f')
+        return json.loads(raw)
+
+    def test_retained_first_archive_integrity_without_cross_blas_regeneration(self):
+        report = self.retained()
+        discovery.validate_archive(report, regenerate_sources=False)
+        self.assertEqual(len(report['records']), 576)
+        self.assertEqual(sum(x['accepted'] for x in report['records']), 576)
+        self.assertTrue(report['summary']['normalization_sensitive'])
+
+    def test_retained_archive_rejects_cost_coverage_and_acceptance_tampering(self):
+        original = self.retained()
+        route_index = next(i for i,r in enumerate(original['records']) if r['route_id']=='norm_discovery')
+        for mutation in ('missing', 'cost', 'acceptance', 'summary', 'source'):
+            report = copy.deepcopy(original)
+            if mutation == 'missing': report['records'].pop()
+            elif mutation == 'cost': report['records'][route_index]['total_ms'] = 0.
+            elif mutation == 'acceptance': report['records'][route_index]['accepted'] = False
+            elif mutation == 'summary': report['summary']['decision'] = 'Q4_PASS'
+            else: report['sources'][0]['seed'] += 1
+            with self.assertRaises(ValueError):
+                discovery.validate_archive(report, regenerate_sources=False)
+
     def test_observable_only_signature_and_candidate_sets(self):
         self.assertEqual(list(inspect.signature(discovery.propose).parameters), ['A', 'b', 'c'])
         A = np.array([[1., 0., 2.], [0., 1., 2.]])
@@ -25,8 +58,18 @@ class DiscoveryTests(unittest.TestCase):
         self.assertGreaterEqual(row['total_ms'], row['discovery_ms'] + sum(a['total_ms'] for a in row['attempts']))
 
     def test_singular_proposal_retains_cost_then_verified_native_fallback(self):
-        row = discovery.discovery_once(np.array([[1., 1., 0.], [0., 0., 1.]]),
-                                       np.ones(2), np.array([2., 1., 0.]))
+        # HiGHS owns a process-global thread scheduler. Earlier unrelated tests
+        # can initialize it with different settings; the audit runs fresh.
+        script = """
+import json
+import numpy as np
+from neumann1.lp_discovery_v083 import discovery_once
+print(json.dumps(discovery_once(np.array([[1.,1.,0.],[0.,0.,1.]]),
+                               np.ones(2), np.array([2.,1.,0.]))))
+"""
+        completed = subprocess.run([sys.executable, '-c', script], check=True,
+                                   capture_output=True, text=True, timeout=30)
+        row = json.loads(completed.stdout)
         self.assertTrue(row['accepted'])
         self.assertTrue(row['fallback_used'])
         self.assertFalse(row['attempts'][0]['accepted'])
