@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-09-30 through v0.0.78. Goal: a system with substantially less **total** compute
+Updated 2026-09-30 through v0.0.79. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -132,6 +132,13 @@ It does not settle model-side planning/compression or natural-language semantic
 verification. The entire corpus is opened development data, not a final set.
 Neither a supplied reference equation nor a gold answer may become inference
 authority. Direct must have the same optimized program runtime.
+
+v0.0.79 implements the shared-authority full-path measurement interface,
+including complete five-route coverage, failed attempt/fallback costs,
+verification scopes and investment accounting. Fault-injection fixtures
+test these contracts; no new learner or independent final data is evaluated.
+Caller-declared scopes/refs require separate audit and summaries remain
+descriptive. This is measurement infrastructure, not a Q3/Q4 pass.
 
 ## Q5 — Are scaling and cross-domain reuse real?
 

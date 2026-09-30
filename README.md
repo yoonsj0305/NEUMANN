@@ -56,6 +56,16 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.79 — Shared-authority full-path measurement interface**
+
+The next model experiment can measure all five required comparator routes
+with shared execution/verification callbacks, observable-only proposer
+arguments, retained failed attempts and deterministic fallback costs.
+Label matches and expression checks do not count as original-task verification.
+Complete paired records are required for descriptive ratios. This is
+instrumentation with fault-injection fixtures, not new training, task admission
+or a model efficiency win. Q3/Q4 remain open. See `docs/experiments/v0.0.79.md`.
+
 **v0.0.78 — Natural arithmetic execution target rejected before training**
 
 An opened-development audit of all 1,000 official SVAMP reference equations
