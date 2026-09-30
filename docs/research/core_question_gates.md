@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-09-30 through v0.0.74. Goal: a system with substantially less **total** compute
+Updated 2026-09-30 through v0.0.75. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -83,6 +83,17 @@ distribution. This rules out neither better orders outside these eight
 candidates nor larger/other tasks. It is an unlearned headroom rejection,
 not a negative test of every possible learned planner. Learned tree
 decomposition/ordering already has direct prior art; see the positioning map.
+
+
+v0.0.75 is a maintenance gate, not progress on learned discovery. It removes
+per-call recursive-closure cycles from both exact graph-DP paths while
+preserving exact answers, memoized state counts and proof records. The first
+frozen timing audit failed its strict every-cell <=1.20 no-regression rule
+because one independent/direct cell measured 1.2094×; a later identical-tree
+replication passed all caps. Preserve the first decision and the replication.
+Keep the code change only as deterministic lifetime hygiene; make no efficiency
+claim from it. The result does not change Q3 or Q4 status.
+
 
 ## Q4 — Does NEUMANN itself beat a matched direct model?
 
