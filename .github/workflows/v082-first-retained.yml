@@ -1,0 +1,90 @@
+name: v0.0.82 first retained audit
+
+on:
+  push:
+    branches:
+      - audit/v082-first-retained
+    paths:
+      - .github/workflows/v082-first-retained.yml
+
+permissions:
+  contents: write
+
+jobs:
+  first-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OMP_DYNAMIC: "FALSE"
+      OPENBLAS_NUM_THREADS: "1"
+      OPENBLAS_CORETYPE: "HASWELL"
+      MKL_NUM_THREADS: "1"
+      MKL_CBWR: "COMPATIBLE"
+      BLIS_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+      VECLIB_MAXIMUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install frozen audit dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy==2.4.6 scipy==1.17.1 scikit-learn==1.9.1 threadpoolctl==3.7.0
+          pip install -e .
+
+      - name: Run first retained v0.0.82 audit exactly once
+        run: |
+          mkdir -p docs/experiments/results
+          test ! -e docs/experiments/results/v082_first_audit.json
+          python benchmark_v082.py --output docs/experiments/results/v082_first_audit.json
+
+      - name: Preserve audit identity
+        run: |
+          python - <<'PY'
+          import hashlib, json, pathlib, platform, subprocess
+          result = pathlib.Path("docs/experiments/results/v082_first_audit.json")
+          raw = result.read_bytes()
+          meta = {
+              "audit_result_sha256": hashlib.sha256(raw).hexdigest(),
+              "audited_git_sha": subprocess.check_output(
+                  ["git", "rev-parse", "HEAD"], text=True
+              ).strip(),
+              "python": platform.python_version(),
+              "runner": "github-actions/ubuntu-24.04",
+              "note": (
+                  "First retained audit for canonical v0.0.82 matched-control protocol. "
+                  "Result commit does not retrigger this workflow because the push trigger "
+                  "is path-scoped to the workflow file only."
+              ),
+          }
+          pathlib.Path("docs/experiments/results/v082_first_audit_meta.json").write_text(
+              json.dumps(meta, indent=2) + "\n"
+          )
+          print(json.dumps(meta, indent=2))
+          PY
+
+      - name: Upload immutable audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: v082-first-retained-audit
+          path: |
+            docs/experiments/results/v082_first_audit.json
+            docs/experiments/results/v082_first_audit_meta.json
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Commit retained audit records to audit branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/experiments/results/v082_first_audit.json docs/experiments/results/v082_first_audit_meta.json
+          git commit -m "v0.0.82 preserve first retained matched-control audit [audit-result]"
+          git push origin HEAD:audit/v082-first-retained
