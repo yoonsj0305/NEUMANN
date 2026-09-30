@@ -56,6 +56,18 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.74 — Elimination-order learning headroom screen (negative)**
+
+All 243 timed calls on 27 frozen synthetic exact-counting graphs verified
+and agreed. Best-of-eight stochastic min-fill cost 1.76× the faster measured
+min-fill/min-degree baseline (geometric mean). Even a **non-deployable**
+zero-planning diagnostic ratio of 0.882 failed the predeclared 20% aggregate
+gain and 9/27 gain-incidence conditions. Do not train on this bounded
+candidate-order/distribution screen; no learned or model-level advantage
+was measured. Raw concurrent-test-contaminated timings were preserved and
+replaced by a sequential audit with unchanged inputs and thresholds.
+See `docs/experiments/v0.0.74.md`.
+
 **v0.0.73 — Small non-planted graph routing gate (negative)**
 
 Four provenance-backed classic networks and 60 timed exact-proof calls
