@@ -1,6 +1,6 @@
 # Q4 next milestone — matched model, not a solver-only demonstration
 
-Updated 2026-09-30 through v0.0.80 relational screen. This is a **design gate**,
+Updated 2026-09-30 through v0.0.81 certificate contract. This is a **design gate**,
 not a registered trained-model evaluation or a completed implementation.
 
 ## Exact question
@@ -157,3 +157,22 @@ actual runnable models frozen before fitting. Original-query recomputation
 is one verification implementation, not the definition of verification;
 any replacement needs its own original-semantics contract and falsification
 controls before timing. No broader rejection of SQL learning follows.
+
+
+v0.0.81 restart: standard-form LP is admitted only as a **verification
+interface candidate**, not yet as a model task. A primal/dual witness can be
+checked against the original coefficients without re-running the optimizer.
+The verifier is solver-free and fail-closed under fixed float64 componentwise
+backward-error tolerances; malformed, primal, dual and objective faults are
+negative controls. Complementarity remains diagnostic rather than a duplicate
+acceptance condition.
+No timing threshold or learned active-set/basis predictor is present.
+
+Next action is v0.0.82: freeze fresh LP instances and a strong HiGHS Direct
+path, then give a non-deployable diagnostic oracle the optimal basis/support
+for free. Both Direct and oracle-compressed paths must reconstruct a full
+primal/dual witness and pay the identical original-LP certificate check.
+If that zero-model oracle cannot clear the predeclared complete-cost gate, do
+not train a basis/active-set model. A positive screen would still leave Q3/Q4
+open until cheap deterministic basis tests, a matched runnable Direct learner,
+a no-compression ablation, training budgets and final holdouts are frozen.

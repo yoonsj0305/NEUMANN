@@ -123,6 +123,10 @@ jobs:
         run: pytest -q tests/test_matched_cost_v079.py
       - name: Relational semantics and first-archive contracts (no audit rerun)
         run: pytest -q tests/test_relational_v080.py
+      - name: LP primal-dual certificate authority contracts
+        run: pytest -q tests/test_lp_certificate_v081.py
+      - name: LP certificate integration smoke (no timing claim)
+        run: python benchmark_v081_smoke.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .
