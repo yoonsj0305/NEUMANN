@@ -56,6 +56,17 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.72 — Proof-carrying DP and exact quotient (constructed mechanism)**
+
+After removing the redundant MIP executor and using a separate Bellman
+proof checker, all 162 timed paths on a fresh constructed MIS holdout
+certified the same optima. At base k=32 and twin multiplicities 4/8,
+quotient DP cost 7.52/11.35 ms end-to-end versus direct proof-DP
+180.85/1085.50 ms; quotient MIP cost 46.54/40.90 ms. Frozen complete-cost
+gates passed on this artificial family. This is a known classical reduction
+and specialized DP, **not** a learned or state-of-the-art graph advantage.
+See `docs/experiments/v0.0.72.md` and its archived raw audit.
+
 **v0.0.70 — Constructed combinatorial compression (bounded positive mechanism)**
 
 Classical false-twin quotient reduced full verified MIS cost by 2.53×,

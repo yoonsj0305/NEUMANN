@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-09-30. Goal: a system with substantially less **total** compute
+Updated 2026-09-30 through v0.0.72. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -38,6 +38,16 @@ speed factor exists there. Exact DP independently checked every completed
 optimum. A stronger specialized graph/DP comparator and natural incidence
 are required before promoting this known mechanism as a NEUMANN contribution.
 
+v0.0.71–72 delete the redundant MIP in this artificial false-twin family.
+Fresh v0.0.72 seeds with a separately implemented Bellman proof checker
+certified all 162 timed paths. In the k=32,m=4 and m=8 cells, complete
+quotient-DP cost was 7.52/11.35 ms versus direct proof-DP 180.85/1085.50 ms
+and quotient MIP 46.54/40.90 ms. This clears the frozen constructed cost
+gates, including the m=1 controls. It establishes a classical exact
+subroutine opportunity, **not** superiority over modern graph reductions
+or a NEUMANN learned/system-level advantage. The direct proof checker is
+independent code but not an optimized production-grade graph solver.
+
 ## Q3 — Is learned discovery needed beyond cheap tests?
 
 **Open.** Construct a matched-observable case where cheap deterministic
@@ -71,10 +81,12 @@ complete time is a failed compute gate, not a partial speed win. Retain
 negative results and costs for all failed proposals. If a cheap deterministic
 component saturates a family, do not train a model merely to have one.
 
-Immediate next experiment: strengthen the graph/DP executor comparison on
-the v0.0.70 mechanism, where the verifier itself may already do the useful
-optimization. Then seek natural instances where full-path savings remain
-possible **after** strong direct computation, reuse, batching, and exact
-verification. Freeze capability and comparators before a final holdout.
+Immediate next experiment: test twin incidence and full-path effect on
+natural or diverse non-planted graphs against mature specialized graph
+reductions, then look for a task where structure cannot be discovered
+more cheaply by deterministic tests. Seek learned benefit only where its
+complete cost is lower than strong direct computation, reuse, batching,
+and exact verification. Freeze capability and comparators before a final
+holdout.
 The v0.0.68 score-only lower bound rules out a checker-only rescue for the
 existing n≤32 learned path.

@@ -180,8 +180,9 @@ def observe(graph: Graph, *, compressed: bool) -> dict:
             "total_ms": (finished - start) / 1e6}
 
 
-def constructed_graph(k: int, multiplicity: int, index: int) -> Graph:
-    seed = 700_000 + 1000 * k + index
+def constructed_graph(k: int, multiplicity: int, index: int,
+                      *, seed_base: int = 700_000) -> Graph:
+    seed = seed_base + 1000 * k + index
     rng = random.Random(seed)
     base_edges = [(v, u) for v in range(k) for u in range(v + 1, k)
                   if rng.random() < .35]
