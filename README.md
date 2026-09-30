@@ -56,6 +56,18 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.81 — Certificate-first LP verifier contract**
+
+Standard-form LP candidates can now carry a primal/dual witness checked against
+the original coefficients without calling an optimizer or replaying the solve.
+The verifier checks primal feasibility, non-negativity, dual feasibility,
+primal/dual objective agreement and complementary slackness under fixed float64
+tolerances, with fault-injection tests and a bounded HiGHS integration smoke.
+This is enabling infrastructure only: no timing gate, learned basis predictor,
+or Q3/Q4 result is claimed. The next gate is a zero-model basis/support
+headroom screen in which every path pays this same original-LP verification.
+See `docs/experiments/v0.0.81.md`.
+
 **v0.0.80 — Constructed relational planner target rejected before training**
 
 All 216 timed calls and 72 warmups matched a separate SQLite original-query
