@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-09-30 through v0.0.80. Goal: a system with substantially less **total** compute
+Updated 2026-09-30 through v0.0.81. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -149,6 +149,16 @@ train on this bounded rejected target. The observed dominant cost was the
 independent original-query replay, not a learned planning step. A next task
 needs a cheaper independently checkable witness and the same verification
 access for all comparators; waive neither capability nor original semantics.
+
+v0.0.81 implements that missing verification boundary for one candidate
+class: standard-form LPs with primal/dual certificates. The original LP can
+be checked through primal feasibility, dual feasibility and objective equality
+without calling an optimizer; complementary slackness is retained as an
+additional fault signal. Fixed float64 tolerances and negative controls are
+tested. This is an enabling interface, not evidence that certificate checking
+is cheap enough in practice, that a basis predictor has headroom, or that
+learning is needed. v0.0.82 must screen non-deployable basis/support oracle
+headroom against a strong HiGHS Direct path while both pay the same verifier.
 
 ## Q5 — Are scaling and cross-domain reuse real?
 
