@@ -56,6 +56,16 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.84 — Next classical portfolio protocol frozen; performance untested**
+
+An observable-only portfolio now normalizes received columns, then proposes
+bases using least-squares dual residual trimming, minimum-norm primal scores
+and pivoted QR. Its complete cost includes all proposal work, failed attempts,
+original-LP checking and native fallback. The explicit first-audit runner
+retains exact inputs and primal/dual witnesses for solver-free offline replay.
+Fixtures are not performance evidence. No v084 audit or learned training has
+run; Q3/Q4 remain OPEN. See `docs/experiments/v0.0.84.md` for the frozen gate.
+
 **v0.0.83 — Classical norm shortcut consumes raw-family headroom**
 
 The first retained observable-only audit verified all 576 timed and 192 warmup

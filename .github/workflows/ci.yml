@@ -133,6 +133,8 @@ jobs:
         run: python benchmark_v082_smoke.py
       - name: Observable basis discovery contracts and retained archive (no timing audit)
         run: pytest -q tests/test_lp_discovery_v083.py
+      - name: Scale-invariant portfolio and portable witness replay contracts (fixtures only)
+        run: pytest -q tests/test_lp_portfolio_v084.py
       - name: Build core and external plugin wheels
         run: |
           python -m build --wheel --outdir dist/core .
