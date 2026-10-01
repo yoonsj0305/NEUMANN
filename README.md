@@ -56,6 +56,15 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.95 — Same-support graph refinement is not a new compression authority**
+
+The v0.0.94 compact route first selects exactly 2m columns with the point head,
+then lets the graph re-rank only those same 2m columns. Therefore its restricted
+LP support is identical to point-only up to permutation; the graph can change
+only the exact-m basis proposal/order. Contract tests freeze this program
+boundary. Do not spend another fit/holdout on this same-support graph contract;
+native default and Q3/Q4 remain OPEN. See `docs/experiments/v0.0.95.md`.
+
 **v0.0.94 — Input compaction preserves coverage, but does not clear the cost gate**
 
 Frozen CG5-point selectors preserve46/48 shortlists on both seeds while all
