@@ -181,5 +181,7 @@ jobs:
           pip install torch==2.14.0+cpu --index-url https://download.pytorch.org/whl/cpu
       - name: Sequence experiment contract tests
         run: pytest -q tests/test_sequence_v031.py
+      - name: LP model-side state compression architecture fixtures (no fitting)
+        run: pytest -q tests/test_lp_state_models_v087.py
       - name: Matched tiny-Transformer benchmark
         run: python benchmark_v031.py
