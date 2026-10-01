@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-10-01 through v0.0.90. Goal: a system with substantially less **total** compute
+Updated 2026-10-01 through v0.0.91. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -85,6 +85,17 @@ the frozen conjunctions. Decision `STOP_ONE_PASS_CANDIDATE`: no fresh final
 budget is admitted, no global closure, no inference state-pruning claim against
 the same early full Direct computation. Native default and Q3/Q4 OPEN remain.
 See `../experiments/v0.0.90.md` for the first archive and paired-vs-pooled caveat.
+
+v091 removes both least-squares feature fits and retrains all eight candidates
+once with the original48 opened training inputs and equal budgets. The first
+16 training inputs screen22 routes,1408/1408 certified answers. Both compact
+seeds require full rescue on16/16 cases; compact/best learned Direct ratios
+3.5577/3.6873 and all frozen conjunctions fail. Full16 with the same cheap
+observables avoids rescue on11/10 cases, so the result does not establish that
+cheap features are unlearnable. Stop this specific early-pruning/fit candidate,
+admit no holdout, preserve all first weights and costs. This in-sample screen
+does not establish generalization, Q3 or Q4. Native remains default. See
+`../experiments/v0.0.91.md`.
 
 ## Q1 — Does learned structural discovery pay for itself?
 

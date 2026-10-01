@@ -56,6 +56,17 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.91 — Cheap features learn in full models, but early pruning fails**
+
+Retrain all eight compact/full/pointwise candidates once with observable
+features that omit both least-squares input fits. The preregistered in-sample
+screen certifies all 1408 original-LP answers, but both compact seeds require
+full rescue on all 16 cases and cost 3.5577/3.6873 times best learned Direct.
+Full16 avoids rescue on 11/10 cases with the same inputs. Stop this specific
+candidate without a new holdout; Q3/Q4 remain OPEN and native remains default.
+The first data, weights, fit costs and negative verdict are preserved in
+`docs/experiments/v0.0.91.md` and its byte-exact archive.
+
 **v0.0.90 — Delete late graph work, but stop the one-pass candidate**
 
 A preregistered opened-training screen gave all Direct models the same early

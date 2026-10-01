@@ -189,5 +189,7 @@ jobs:
         run: pytest -q tests/test_lp_shortlist_study_v089.py
       - name: One-pass opened-training screen fixtures and retained replay (no timing rerun)
         run: pytest -q tests/test_lp_one_pass_v090.py tests/test_lp_one_pass_screen_v090.py
+      - name: Cheap-feature first fit and screen replay (no fitting or timing rerun)
+        run: pytest -q tests/test_lp_cheap_features_v091.py tests/test_lp_cheap_screen_v091.py
       - name: Matched tiny-Transformer benchmark
         run: python benchmark_v031.py
