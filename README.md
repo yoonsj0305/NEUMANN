@@ -56,6 +56,18 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.95 — Frozen graph refinement adds no stable incremental basis value**
+
+A preregistered replay of the retained v0.0.94 probe compares compact-graph
+basis proposals directly with point-only proposals on the exact same 2m
+retained sets. Those sets match on 48/48 cases for both seeds. Seed87001
+loses certificate count 1→0 and mean label recall falls 0.892904→0.887695;
+seed87002 gains only 0→1 certificate and +0.023438 mean recall, below the
+frozen +4-certificate/+0.05 gate, with 10 paired losses. Decision
+`STOP_GRAPH_REFINEMENT_INFORMATION_CANDIDATE`. No new fitting, inference,
+solver call or timing was run. Native remains default; Q3/Q4 OPEN. See
+`docs/experiments/v0.0.95.md`.
+
 **v0.0.94 — Input compaction preserves coverage, but does not clear the cost gate**
 
 Frozen CG5-point selectors preserve46/48 shortlists on both seeds while all
