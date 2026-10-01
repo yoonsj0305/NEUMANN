@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-10-01 through v0.0.86. Goal: a system with substantially less **total** compute
+Updated 2026-10-01 through v0.0.87. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -40,6 +40,18 @@ nonoptimal and singular heads; negative controls deny acceptance on verifier
 failure or deadline expiry. No timing audit, task admission or training was
 performed. A future LP experiment must actually measure this comparator and
 applicable learned-basis baselines; its mere existence does not admit learning.
+
+v087 implements actual internal graph-state/edge removal in a runnable small
+GNN. The sole declared corrective opened-development screen verified 864/864
+calls and admitted bounded fitting: perfect-output complete-cost/classical
+geomean 0.3118916013, 12/12 expanded >=20% wins, compact/full forward geomean
+0.7374609639. Predictions were discarded and a certified oracle basis injected.
+This is not learned discovery, a matched trained-model result or Q3/Q4 closure.
+The first timing-confounded archive was lost in workspace replacement before
+publication; the missing-evidence notice preserves that limitation. Only the
+retained correction supports this candidate-specific gate. A separate fitting
+and sealed final-evaluation preregistration is required; no paper reproduction
+or general learned-LP superiority is established.
 
 ## Q1 — Does learned structural discovery pay for itself?
 

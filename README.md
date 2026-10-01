@@ -56,6 +56,20 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.87 — Real model-state compaction clears bounded fitting admission**
+
+Runnable compact/full GNNs differ in actual retained states and edges, not
+the name of a shared basis head. The sole declared corrective opened-data
+screen verified 864/864 paths. Paying real untrained forward/features while
+injecting a perfect basis gave complete-cost/classical geomean 0.3118916013,
+12/12 expanded >=20% wins, and compact/full forward geomean 0.7374609639.
+This is a nondeployable perfect-output diagnostic: it admits bounded fitting,
+NOT learned accuracy or Q3/Q4 closure. The first run was timing-confounded;
+its uncommitted archive was lost during workspace replacement. That retention
+failure is explicitly disclosed, not replaced with reconstructed evidence.
+The correction and missing-evidence notice are retained in the v087 manifest.
+See `docs/experiments/v0.0.87.md`. Native remains the deployed default.
+
 **v0.0.86 — Native warm-start comparator interface (performance untested)**
 
 Direct can now supply the same advisory basis to native HiGHS simplex and

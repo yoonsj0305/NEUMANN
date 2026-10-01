@@ -363,6 +363,8 @@ def load_admission(manifest_path, attempt='corrected'):
             or manifest['corrected']['timing_admissible'] is not True):
         raise ValueError('admission manifest drift')
     entry = manifest[attempt]
+    if entry.get('available') is not True:
+        raise ValueError('first archive unavailable; notice is not measurement evidence')
     if type(entry['name']) is not str or Path(entry['name']).name != entry['name']:
         raise ValueError('invalid archive path')
     data = (path.parent / entry['name']).read_bytes()

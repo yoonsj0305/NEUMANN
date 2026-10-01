@@ -116,3 +116,41 @@ def test_runner_preserves_partial_failed_observations(tmp_path):
         with pytest.raises(p.AuditInterrupted): runner.main()
     with gzip.open(target, 'rt') as stream: saved = json.load(stream)
     assert saved['partial'] == partial and saved['do_not_overwrite']
+
+
+def retained_report():
+    from pathlib import Path
+    root = Path(__file__).resolve().parents[1] / 'docs/experiments/results'
+    return p.load_admission(root / 'v087_admission.manifest.json'), p.load_source(
+        root / 'v084_first_audit.manifest.json')
+
+
+def test_retained_correction_replays_without_solver_or_model():
+    report, original = retained_report()
+    with patch.object(p, 'prepare', side_effect=AssertionError('oracle setup forbidden')), \
+         patch.object(p.storage, 'candidate_once', side_effect=AssertionError('solve forbidden')), \
+         patch.object(p, 'solve_native_checked', side_effect=AssertionError('native forbidden')):
+        p.validate_archive(report, original)
+    assert report['summary']['decision'] == 'ADMIT_BOUNDED_MODEL_FITTING_NOT_Q3_Q4_PASS'
+    assert len(report['records']) == 864
+
+
+@pytest.mark.parametrize('fault', ['witness', 'source', 'cost', 'runtime', 'state', 'summary'])
+def test_retained_archive_rejects_evidence_faults(fault):
+    report, original = retained_report()
+    if fault == 'witness': report['records'][0]['witness']['x'][0] += 100.
+    if fault == 'source': report['sources'][0]['expanded'] = not report['sources'][0]['expanded']
+    if fault == 'cost':
+        r = next(r for r in report['records'] if 'execution' in r)
+        r['total_ms'] = 0.
+    if fault == 'runtime': report['environment']['numpy'] = 'wrong'
+    if fault == 'state':
+        next(r for r in report['records'] if r['route'].startswith('perfect_'))['state_columns'] += 1
+    if fault == 'summary': report['summary']['perfect_complete_best_direct_geomean'] = 0.
+    with pytest.raises(ValueError): p.validate_archive(report, original)
+
+
+def test_missing_first_archive_cannot_be_used_as_measurement():
+    from pathlib import Path
+    manifest = Path(__file__).resolve().parents[1] / 'docs/experiments/results/v087_admission.manifest.json'
+    with pytest.raises(ValueError, match='unavailable'): p.load_admission(manifest, 'first')
