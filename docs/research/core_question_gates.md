@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-10-01 through v0.0.92. Goal: a system with substantially less **total** compute
+Updated 2026-10-01 through v0.0.94. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -307,3 +307,18 @@ not the project's central next milestone. Do not call a trained component
 or an oracle cost proxy a Q4 pass.
 The v0.0.68 score-only lower bound rules out a checker-only rescue for the
 existing n≤32 learned path.
+
+
+## v093–94 selector and input-compaction boundary
+
+v093 rejects CG3 point parity and more fitting: strongest cheap classical
+shortlist32/48, point coverage46→44/45. v094 preregisters fixedCG5 and a
+point selector before all graph messages. Both seeds preserve46/48 required
+columns and graph terms fall to1/8 of full16; this admits only a paid screen.
+The first31-route cost screen certifies1984/1984 answers but fails both
+frozen conjunctions. A focused pytest process overlapped timing; all first
+bytes and a no-positive-cost-claim notice are retained. No clean quantitative
+performance estimate or speed claim follows. No new fit/holdout is admitted.
+Point-only chooses exactly the same2m retained set as the routed graph, so
+additional graph work must earn its cost through useful finer proposals;
+state-work reduction alone does not establish Q4. Native default, Q3/Q4 OPEN.

@@ -117,6 +117,9 @@ def validate(report):
             m,n=raw['A'].shape;name=r['route'].removeprefix('cg5_').split('_s')[0]
             for ix,size in ((r['basis'],m),(r['indices'],2*m)):
                 if len(ix)!=size or len(set(ix))!=size or any(type(i) is not int or not 0<=i<n for i in ix):raise ValueError('proposal drift')
+            columns=0 if name in ('point','residual') else 2*m if name=='compact' else n
+            terms=0 if columns==0 else m*columns*16*6
+            if r['state_columns']!=columns or r['edge_multiply_terms']!=terms:raise ValueError('state ledger drift')
             c=r['candidate'];cert=c['certificate']
             if c['indices']!=r['basis']:raise ValueError('basis drift')
             if cert and (c['witness'] is None or verify_standard_form_certificate(**raw,**c['witness'])['accepted']!=cert['accepted'] or c['accepted']!=cert['accepted']):raise ValueError('rejected basis drift')

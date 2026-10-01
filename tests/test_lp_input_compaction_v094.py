@@ -45,3 +45,17 @@ def test_frozen_gate_requires_both_seeds_and_rejects_duplicates():
     assert summarize(records,reference)['decision']=='STOP_FROZEN_INPUT_COMPACTION_NO_NEW_FIT'
     with pytest.raises(ValueError,match='coverage'):
         summarize(records+[copy.deepcopy(records[0])],reference)
+
+
+def test_cost_gate_protects_point_only_direct():
+    from experiments.lp_input_cost_v094 import ROUTES,summarize
+    sources=[{'id':f'train{i}'} for i in range(16)]
+    records=[{'case_id':s['id'],'route':r,'repeat':i,'accepted':True,
+        'total_ms':1. if 'point' in r else 2. if 'compact' in r else 4.,
+        'candidate':{'accepted':True},'execution':None}
+        for s in sources for r in ROUTES for i in (-1,0,1,2)]
+    result=summarize(records,sources,0.)
+    assert all(t['ratios'][3]==2. for t in result['tests'])
+    assert not any(t['passed'] for t in result['tests'])
+    assert result['decision']=='STOP_FROZEN_INPUT_COMPACTION_COST_CANDIDATE'
+    assert result['global_q3']==result['global_q4']=='OPEN'
