@@ -157,7 +157,8 @@ def validate(report):
     models=restore_models(report['training'])
     for key, model in models.items():
         t=report['training'][key]
-        if (not t['completed'] or t['parameters']!=sum(p.numel() for p in model.parameters())
+        if (not t['completed'] or key!=f"{t['name']}_s{t['seed']}"
+            or t['parameters']!=sum(p.numel() for p in model.parameters())
             or t['parameters']>400000 or not 0<t['fit_ms']<=240000.
             or [e['epoch'] for e in t['epochs']]!=list(range(1,13))
             or any(not math.isfinite(e['mean_loss']) for e in t['epochs'])):
@@ -171,6 +172,16 @@ def validate(report):
             not verify_standard_form_certificate(**raw,**row['witness'])['accepted']):
             raise ValueError('accepted witness drift')
         execution=row.get('execution')
+        if row['route'] in old.LEARNERS:
+            m,n=raw['A'].shape; compact=row['route'].startswith('compact16')
+            columns=min(n,2*m) if compact else n
+            width=128 if row['route'].startswith('full128') else 16
+            terms=0 if row['route'].startswith('point16') else m*n*width*2+m*columns*width*4
+            if (row['state_columns']!=columns or row['edge_multiply_terms']!=terms
+                or len(row['indices'])!=min(n,2*m) or len(set(row['indices']))!=len(row['indices'])
+                or any(type(i) is not int or not 0<=i<n for i in row['indices'])
+                or (execution and row['indices']!=execution['indices'])):
+                raise ValueError('state or shortlist drift')
         if execution and row['total_ms']+1e-6<row['proposal_ms']+execution['total_ms']:
             raise ValueError('complete ledger drift')
         if execution and 'subset_accepted' in execution:
