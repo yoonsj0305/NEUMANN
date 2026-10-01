@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-10-01 through v0.0.95. Goal: a system with substantially less **total** compute
+Updated 2026-10-01 through v0.0.96. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -294,19 +294,22 @@ complete time is a failed compute gate, not a partial speed win. Retain
 negative results and costs for all failed proposals. If a cheap deterministic
 component saturates a family, do not train a model merely to have one.
 
-Immediate priority: Q4's matched **model-level** comparison, not more MIS
-subroutine wins. Direct answer-only classification is insufficient: include
-a same-budget executable-program/IR predictor with identical access to the
-executor and original-task verifier, as well as strongest cheap deterministic
-input processing. Freeze training data, architecture/size budget, generated
-surface holdouts, verified quality target, failure costs, inference and
-training-amortization accounting before training. Reject a task up front if
-a cheap deterministic parser/executor already saturates it. Graph-family
-scaling and mature KaMIS integration remain optional mechanism follow-ups,
-not the project's central next milestone. Do not call a trained component
-or an oracle cost proxy a Q4 pass.
-The v0.0.68 score-only lower bound rules out a checker-only rescue for the
-existing n≤32 learned path.
+Immediate priority is now the **Q34 joint architecture gate**, not serial Q3
+then Q4 tuning. Q3 and Q4 remain analytical labels, but a system advances only
+when it recovers enough available structural utility and discovery costs fit
+inside the saved compute under equal original-task verification. The internal
+engineering floor is utility recovery >=0.80 and discovery cost <=20% of
+pre-discovery savings, with complete cost below Direct. See
+`q34_joint_gate.md`.
+
+Before any new training, screen the representation ceiling. Then compare
+materially different deterministic-first, minimal learned, full-information,
+and adaptive support architectures under one evaluator. Delete Pareto-dominated
+families immediately. Three materially different adequate-ceiling families
+failing the same Q34 gate ends local tuning and triggers representation /
+objective / task redesign. One fresh Q34 pass advances directly to Q5 with
+fallback. The v0.0.68 score-only lower bound still rules out a checker-only
+rescue for the existing n<=32 learned path.
 
 
 ## v093–94 selector and input-compaction boundary
@@ -332,3 +335,17 @@ only alter the exact-m basis proposal/order under this contract. Decision:
 with this same support authority. This is candidate-specific, not a global Q3
 or Q4 closure; a successor must change verified structural authority or target
 a different task/family.
+
+v096 performs the first representation-ceiling screen before any new training.
+The frozen point-selected2m support contains the complete hidden reference basis
+on46/48 cases for both seeds (95.83%) and mean basis recall is0.999349. Early
+compression OFF exposes all columns, but the frozen full graph still produces
+0/48 original-LP-certified exact-m proposals on both seeds; compact produces
+0/48 and1/48. Full-information certificate gains are0 and-1, far below the
+frozen +4 rescue threshold. Decision:
+`DISCOVERER_BOTTLENECK_DOMINATES_EARLY_SUPPORT_LOSS`.
+
+This does not pass Q34 or close Q3/Q4. It stops further pruning-point tuning on
+this candidate and changes the next target from exact-m basis generation to
+verified support discovery plus restricted execution and charged fallback.
+The next tournament is specified in `q34_architecture_tournament.md`.

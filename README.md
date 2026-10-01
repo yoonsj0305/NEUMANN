@@ -56,6 +56,18 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.96 — Q34 reset: support ceiling is high; exact-basis target is the bottleneck**
+
+Development decisions now use one coupled Q34 gate rather than serial Q3/Q4
+tuning. A replay-only ceiling check finds the early 2m support already contains
+the full reference basis on 46/48 cases for both seeds with 99.935% mean basis
+recall. Turning early compression OFF does not rescue the frozen exact-m
+discoverer: full-information graph certificates are 0/48 on both seeds.
+Decision `DISCOVERER_BOTTLENECK_DOMINATES_EARLY_SUPPORT_LOSS`. Stop shifting
+the pruning point. The next tournament compares complete support-proposal ->
+restricted-solve -> verifier -> fallback systems. Q3/Q4 remain analytically
+OPEN; Q34 has not passed. See `docs/experiments/v0.0.96.md`.
+
 **v0.0.95 — Same-support graph refinement is not a new compression authority**
 
 The v0.0.94 compact route first selects exactly 2m columns with the point head,
