@@ -1,6 +1,6 @@
 # Q4 next milestone — matched model, not a solver-only demonstration
 
-Updated 2026-10-01 through v0.0.85 executable-Direct parity. This is a **design gate**,
+Updated 2026-10-01 through v0.0.86 native warm-start interface. This is a **design gate**,
 not a registered trained-model evaluation or a completed implementation.
 
 ## Exact question
@@ -112,6 +112,15 @@ No 10x multiplier is assumed for these options. Stop after a frozen negative
 gate rather than shrinking the comparator until a win appears.
 
 ## Restart checkpoint
+
+Current v0.0.86 adds `lp_native_warm_start_v086.solve_native_checked` with
+original-certificate authority and paid native basis repair/cold fallback.
+Focused fixtures pass 11 tests; this is not a residual-headroom or learning
+result. No new timing audit or model training. Next: select and preregister a
+substantive actual-model task with a residual learned decision, or reject it
+on full-cost evidence before fitting. If LP is selected, measure native warm
+starts and relevant published learned-basis baselines; the available interface
+alone is not learning admission. Keep all prior archives unchanged.
 
 Current v0.0.85 checkpoint: `v085_diagnostic.manifest.json` retains a failed
 runtime preflight (zero paired executions) and the first completed untimed
