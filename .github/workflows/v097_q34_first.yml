@@ -40,7 +40,7 @@ jobs:
           mkdir -p docs/experiments/results
           test ! -e docs/experiments/results/v097_first_tournament.json.gz
           test ! -e docs/experiments/results/v097_first_tournament.manifest.json
-          python experiments/lp_q34_tournament_v097.py \
+          python -m experiments.lp_q34_tournament_v097 \
             --output-gzip docs/experiments/results/v097_first_tournament.json.gz \
             --manifest docs/experiments/results/v097_first_tournament.manifest.json \
             --frozen-head "$GITHUB_SHA"
