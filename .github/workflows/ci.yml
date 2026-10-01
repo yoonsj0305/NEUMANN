@@ -197,5 +197,7 @@ jobs:
         run: pytest -q tests/test_lp_selector_v093.py tests/test_lp_selector_probe_v093.py
       - name: Frozen input compaction contracts and first retained replay (no diagnosis or timing rerun)
         run: pytest -q tests/test_lp_input_compaction_v094.py tests/test_lp_input_replay_v094.py
+      - name: Same-support graph authority boundary contracts (no model run)
+        run: pytest -q tests/test_lp_graph_equivalence_v095.py
       - name: Matched tiny-Transformer benchmark
         run: python benchmark_v031.py
