@@ -164,8 +164,20 @@ def run_study(checkpoint):
 
 
 def validate_report(report):
+    import base64, hashlib
     if report['protocol']!=protocol() or report['stage']!='completed': raise ValueError('protocol drift')
+    original=load_study('docs/experiments/results/v088_completed.manifest.json')
+    if report['training']!=original['training'] or report['training_setup_ms']!=original['training_setup_ms']:
+        raise ValueError('frozen training evidence drift')
+    for fit in report['training'].values():
+        digest=hashlib.sha256()
+        for key,value in fit['weights'].items():
+            digest.update(key.encode()); digest.update(base64.b64decode(value['base64'],validate=True))
+        if digest.hexdigest()!=fit['weights_sha256']: raise ValueError('checkpoint digest drift')
     raws={s['id']:raw_source(s) for s in report['sources']}
+    for source in report['sources']:
+        if not verify_standard_form_certificate(**raws[source['id']],**source['label']['witness'])['accepted']:
+            raise ValueError('source label certificate drift')
     if [{k:s[k] for k in spec} for s,spec in zip(report['sources'],specs())]!=specs():
         raise ValueError('new split drift')
     for row in report['records']:
@@ -173,7 +185,30 @@ def validate_report(report):
         if row['accepted'] and (row['witness'] is None or not verify_standard_form_certificate(**raw,**row['witness'])['accepted']):
             raise ValueError('accepted witness drift')
         execution=row.get('execution')
-        if execution and execution['subset_accepted']:
+        # The retained legacy basis controls have a different execution schema.
+        shortlist_execution=execution if execution and 'subset_accepted' in execution else None
+        answer=row.get('answer')
+        if answer and verify_standard_form_certificate(**raw,**answer['witness'])['accepted']!=answer['certificate']['accepted']:
+            raise ValueError('answer rejection evidence drift')
+        if shortlist_execution:
+            for native,is_restricted in ((execution['restricted'],True),(execution['fallback'],False)):
+                if not native: continue
+                target=raw
+                if is_restricted:
+                    ix=execution['indices'];target={'A':raw['A'][:,ix],'b':raw['b'],'c':raw['c'][ix]}
+                if native['total_ms']+1e-6 < sum(s['ms'] for a in native['attempts'] for s in a['stages']):
+                    raise ValueError('native cost ledger drift')
+                for attempt in native['attempts']:
+                    witness=attempt['witness']; cert=attempt['certificate']
+                    if cert and (witness is None or verify_standard_form_certificate(**target,**witness)['accepted']!=cert['accepted']):
+                        raise ValueError('native witness drift')
+            if execution['original_certificate']:
+                small=execution['restricted']['attempts'][-1]['witness'];x=np.zeros(raw['A'].shape[1])
+                x[execution['indices']]=small['x']
+                verdict=verify_standard_form_certificate(**raw,x=x,y=small['y'])['accepted']
+                if verdict!=execution['original_certificate']['accepted'] or verdict!=execution['subset_accepted']:
+                    raise ValueError('omitted-variable rejection evidence drift')
+        if shortlist_execution and execution['subset_accepted']:
             small=execution['restricted']['attempts'][-1]['witness']; x=np.zeros(raw['A'].shape[1])
             x[execution['indices']]=small['x']
             if not verify_standard_form_certificate(**raw,x=x,y=small['y'])['accepted']:

@@ -56,6 +56,16 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.89 — Shared shortlist fails with frozen learned checkpoints**
+
+All eight frozen v088 models received the same restricted native executor and
+paid full original-LP checking/rescue on twelve new constructed inputs. All
+960 observations certified original answers, but every seed/group failed the
+unchanged complete-cost gate. Compact/best learned Direct ratios were
+2.1758/0.9674 and 1.3747/1.3092; Q3/Q4 remain OPEN. The first byte-exact archive,
+failed replay-schema notice and solver/model-free replay are retained. No new
+fitting or timing rerun. Keep native default. See `docs/experiments/v0.0.89.md`.
+
 **v0.0.88 — First actual learned model comparison fails the frozen gate**
 
 Four runnable models x two seeds trained on 48 fresh cases. All 768 final

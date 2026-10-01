@@ -49,3 +49,36 @@ def test_first_runner_refuses_overwrite(tmp_path):
     with patch('sys.argv',['benchmark_v089.py',str(tmp_path)]), \
          patch.object(p,'run_study',side_effect=AssertionError('final forbidden')):
         with pytest.raises(SystemExit): runner.main()
+
+
+def test_retained_first_shortlist_replay_never_executes_model_or_solver():
+    from neumann1.lp_shortlist_archive_v089 import load_study
+    report=load_study('docs/experiments/results/v089_completed.manifest.json')
+    with patch.object(p.old,'generate',side_effect=AssertionError('final generation forbidden')), \
+         patch.object(p,'restore_models',side_effect=AssertionError('model execution forbidden')), \
+         patch.object(p,'solve_shortlist_checked',side_effect=AssertionError('solver forbidden')):
+        p.validate_report(report)
+        assert len(report['records'])==960
+        assert report['summary']['global_q3']==report['summary']['global_q4']=='OPEN'
+        row=next(r for r in report['records'] if r['accepted'])
+        old=row['witness']['x'][0]; row['witness']['x'][0]=old+100.
+        with pytest.raises(ValueError,match='witness'): p.validate_report(report)
+        row['witness']['x'][0]=old
+        old=report['training_setup_ms'];report['training_setup_ms']+=1.
+        with pytest.raises(ValueError,match='training'): p.validate_report(report)
+        report['training_setup_ms']=old
+        old=report['summary']['decision'];report['summary']['decision']='FAKE_PASS'
+        with pytest.raises(ValueError,match='summary'): p.validate_report(report)
+        report['summary']['decision']=old
+
+
+def test_shortlist_archive_duplicate_parts_rejected(tmp_path):
+    import hashlib,json
+    from neumann1.lp_shortlist_archive_v089 import load_study
+    data=b'fixture';(tmp_path/'part').write_bytes(data)
+    part={'name':'part','bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}
+    manifest={'format':'neumann.lp-shortlist-study.archive.v1',
+              'preregistration_head':'b2e73ef6410adb07bebef484e2ba5299163cdaa1',
+              'rerun':False,'parts':[part,part]}
+    path=tmp_path/'manifest.json';path.write_text(json.dumps(manifest))
+    with pytest.raises(ValueError,match='duplicate'):load_study(path)
