@@ -56,6 +56,22 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.85 — LP basis-only attribution rejected under executable-Direct parity**
+
+A closed Direct program can execute the same supplied basis head with the
+same LU/reconstruction, original-LP certificate and charged native fallback.
+On 210 unique case/basis pairs from v084's already-opened retained inputs,
+both adapters agreed exactly in stable outcomes, full primal/dual witnesses
+and call ledgers: 36 accepted and 174 rejected on each side. The diagnostic
+disabled native fallback; fresh-process fixtures separately cover paid
+fallback, singular bases, invalid heads and abstention. No learner, new
+holdout or speed ratio was tested. Decision:
+`LP_BASIS_ONLY_Q4_ATTRIBUTION_REJECTED`. Stop treating a basis-only head versus
+a cold full solver as a central Q4 comparison; this does not reject all LP
+learning or different architectures. Q3/Q4 remain OPEN. The first runtime
+preflight failure is retained alongside the first completed untimed comparison.
+See `docs/experiments/v0.0.85.md` and the results manifest.
+
 **v0.0.84 — Scale-invariant classical portfolio fails the cost gate**
 
 An observable-only portfolio now normalizes received columns, then proposes

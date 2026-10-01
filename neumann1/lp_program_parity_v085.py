@@ -6,6 +6,8 @@ the actual witnesses and call ledger but deliberately exclude elapsed times.
 from __future__ import annotations
 
 import hashlib
+import gzip
+import io
 import json
 import os
 import platform
@@ -38,6 +40,26 @@ def load_source(path):
     if json.loads(path.read_text())['json_sha256'] != SOURCE_JSON_SHA256:
         raise ValueError('not the preregistered v084 first archive')
     return source.load_retained_archive(path)
+
+
+def load_diagnostic(manifest_path):
+    path = Path(manifest_path)
+    manifest = json.loads(path.read_text())
+    if (manifest['format'] != 'neumann.lp-program-parity.archive.v1' or
+            manifest['source_json_sha256'] != SOURCE_JSON_SHA256):
+        raise ValueError('diagnostic manifest drift')
+    entry = manifest['completed']
+    if type(entry['name']) is not str or Path(entry['name']).name != entry['name']:
+        raise ValueError('invalid diagnostic archive path')
+    data = (path.parent / entry['name']).read_bytes()
+    if len(data) != entry['bytes'] or hashlib.sha256(data).hexdigest() != entry['sha256']:
+        raise ValueError('completed diagnostic integrity drift')
+    with gzip.GzipFile(fileobj=io.BytesIO(data)) as archive:
+        decoded = archive.read(16 * 1024 * 1024 + 1)
+    if (len(decoded) > 16 * 1024 * 1024 or len(decoded) != entry['json_bytes'] or
+            hashlib.sha256(decoded).hexdigest() != entry['json_sha256']):
+        raise ValueError('completed JSON integrity drift')
+    return json.loads(decoded)
 
 
 def _basis(raw, indices):
@@ -206,12 +228,18 @@ def summarize(records):
             'q3': 'OPEN', 'q4': 'OPEN'}
 
 
+def _environment():
+    return {'python': platform.python_version(),
+            'python_major_minor': list(map(int, platform.python_version_tuple()[:2])),
+            'numpy': np.__version__, 'scipy': scipy.__version__,
+            'threadpoolctl': threadpoolctl.__version__,
+            'openblas_coretype': os.environ.get('OPENBLAS_CORETYPE')}
+
+
 def run_diagnostic(original):
     source.validate_archive(original)
     inputs, pairs = prepare_pairs(original)
-    environment = {'python': platform.python_version(), 'numpy': np.__version__,
-                   'scipy': scipy.__version__, 'threadpoolctl': threadpoolctl.__version__,
-                   'openblas_coretype': os.environ.get('OPENBLAS_CORETYPE')}
+    environment = _environment()
     if (any(environment[k] != v for k, v in source.protocol()['runtime'].items()) or
             environment['openblas_coretype'] != 'HASWELL'):
         raise RuntimeError('use frozen Python/package runtime and HASWELL dispatch')

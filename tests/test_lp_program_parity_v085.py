@@ -1,6 +1,7 @@
 """Non-time fixtures and solver-free archive replay; no diagnostic in CI."""
 import copy
 import gzip
+import hashlib
 import inspect
 import json
 from pathlib import Path
@@ -16,6 +17,27 @@ from neumann1 import lp_program_parity_v085 as p
 
 
 class ProgramParityTests(unittest.TestCase):
+    def test_retained_diagnostic_replays_without_any_solving(self):
+        directory = Path(__file__).resolve().parents[1] / 'docs/experiments/results'
+        manifest = json.loads((directory / 'v085_diagnostic.manifest.json').read_text())
+        self.assertEqual(manifest['completed']['json_sha256'],
+                         'ba29b88cb62dae39b6282d06636fc7ac3903d50c8120915a61c5080a3675e86e')
+        original = p.load_source(directory / 'v084_first_audit.manifest.json')
+        report = p.load_diagnostic(directory / 'v085_diagnostic.manifest.json')
+        with patch.object(p.source, 'lu_factor', side_effect=AssertionError('LU forbidden')), \
+             patch.object(p.source, 'linprog', side_effect=AssertionError('optimizer forbidden')), \
+             patch.object(p.source.previous, 'generate_case', side_effect=AssertionError('generation forbidden')):
+            p.validate_archive(report, original)
+        self.assertEqual(report['summary'], {'pairs': 210, 'agreement': 210,
+                                             'neumann_accepted': 36, 'direct_accepted': 36,
+                                             'decision': p.DECISION, 'q3': 'OPEN', 'q4': 'OPEN'})
+        failed = directory / manifest['failed_preflight']['name']
+        self.assertEqual(hashlib.sha256(failed.read_bytes()).hexdigest(),
+                         manifest['failed_preflight']['sha256'])
+        with gzip.open(failed, 'rt') as stream:
+            self.assertEqual(json.load(stream), {'execution_failed': "KeyError: 'python_major_minor'",
+                                                 'do_not_overwrite': True})
+
     def raw(self):
         return {'A': np.array([[1., 0., 2.], [0., 1., 2.]]),
                 'b': np.ones(2), 'c': np.array([0., 0., 1.])}
@@ -129,6 +151,21 @@ print(json.dumps(rows))
         original['records'].pop(0)
         with self.assertRaises(ValueError): p.prepare_pairs(original)
 
+    def test_runtime_schema_and_diagnostic_on_fixture(self):
+        self.assertIn('python_major_minor', p._environment())
+        environment = {**p.source.protocol()['runtime'], 'python': '3.11.fixture',
+                       'openblas_coretype': 'HASWELL'}
+        with patch.object(p.source, 'validate_archive'), \
+             patch.object(p, '_environment', return_value=environment):
+            report = p.run_diagnostic(self.original())
+        p.validate_archive(report, self.original())
+        self.assertEqual(report['summary']['agreement'], 2)
+        environment['python_major_minor'] = [3, 12]
+        with patch.object(p.source, 'validate_archive'), \
+             patch.object(p, '_environment', return_value=environment), \
+             patch.object(p.source, 'lu_factor', side_effect=AssertionError('solve forbidden')):
+            with self.assertRaises(RuntimeError): p.run_diagnostic(self.original())
+
     def test_solver_free_archive_replays_rejected_and_accepted_witnesses(self):
         original, report = self.report()
         with patch.object(p.source, 'lu_factor', side_effect=AssertionError('LU forbidden')), \
@@ -170,6 +207,16 @@ print(json.dumps(rows))
                  patch.object(benchmark_v085, 'load_source', side_effect=AssertionError('load forbidden')):
                 with self.assertRaises(SystemExit): benchmark_v085.main()
             self.assertEqual(path.read_bytes(), b'')
+
+    def test_manifest_and_source_identity_fail_closed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'manifest.json'
+            path.write_text(json.dumps({'json_sha256': '0' * 64}))
+            with self.assertRaises(ValueError): p.load_source(path)
+            path.write_text(json.dumps({'format': 'neumann.lp-program-parity.archive.v1',
+                                       'source_json_sha256': p.SOURCE_JSON_SHA256,
+                                       'completed': {'name': '../outside'}}))
+            with self.assertRaises(ValueError): p.load_diagnostic(path)
 
     def test_failed_first_attempt_is_not_erased(self):
         import benchmark_v085
