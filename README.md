@@ -56,6 +56,20 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.97 — Q34 development tournament admits frozen point-support to fresh holdout**
+
+A preregistered complete-system tournament compares deterministic, frozen
+pointwise, full-information graph, and adaptive support routes against Direct
+and a free-oracle support reference. The first valid run retains576 observations
+and charges proposal, solver, original verification, fallback and learned-fit
+amortization. B_POINT is the only Pareto survivor: both seeds finish16/16
+without full fallback, recover at least90.9% of oracle structural savings,
+keep discovery burden below4.6%, and reach amortized complete/Direct ratios
+about0.21. C/D pass the development conjunction but are Pareto-dominated; A
+fails the0.80 utility floor. Decision `ADMIT_FRESH_Q34_HOLDOUT`. This is a
+constructed-family development result, not global Q34 or Q3/Q4 closure.
+See `docs/experiments/v0.0.97.md`.
+
 **v0.0.96 — Q34 reset: support ceiling is high; exact-basis target is the bottleneck**
 
 Development decisions now use one coupled Q34 gate rather than serial Q3/Q4
