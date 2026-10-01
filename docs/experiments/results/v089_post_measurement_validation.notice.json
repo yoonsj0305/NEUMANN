@@ -1,0 +1,11 @@
+{
+  "schema": "neumann.lp-shortlist-validation-notice.v1",
+  "phase": "after completed report and all 960 observations were written",
+  "failure": "KeyError: subset_accepted in retained-report validation",
+  "cause": "Legacy exact-basis controls have a different execution schema from new shortlist controls",
+  "measurement_completed": true,
+  "measurement_rerun": false,
+  "response": "Distinguish the two execution schemas and replay the same first retained bytes only",
+  "changed_inference_or_solver": false,
+  "changed_gate_or_thresholds": false
+}
