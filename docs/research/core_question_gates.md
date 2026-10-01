@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-10-01 through v0.0.89. Goal: a system with substantially less **total** compute
+Updated 2026-10-01 through v0.0.90. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -73,6 +73,18 @@ no-full-rescue counts 3/6,6/6,5/6,5/6. Decision:
 `FROZEN_CHECKPOINT_SHORTLIST_GATE_FAILED`. Preserve first bytes and the initial
 post-measurement replay-schema failure; no solver/model/timing rerun or weakened
 gate. Native stays default; Q3/Q4 OPEN. See `../experiments/v0.0.89.md`.
+
+v090 deletes the compact model's late graph updates after the internal 2m
+retained-set decision and permits the same coarse-head path to full Direct.
+Only 16 already-opened v088 training inputs are screened; no new fitting or
+final generation. All 1792 calls certify original LP answers and all 32 retained
+sets agree. Ordered solver input differs on all 16/16 cases for both seeds;
+the screen is an executor alternative, not an isolated FLOP attribution.
+Complete-cost / best learned Direct ratios 1.8274 and 1.3203 both fail, as do
+the frozen conjunctions. Decision `STOP_ONE_PASS_CANDIDATE`: no fresh final
+budget is admitted, no global closure, no inference state-pruning claim against
+the same early full Direct computation. Native default and Q3/Q4 OPEN remain.
+See `../experiments/v0.0.90.md` for the first archive and paired-vs-pooled caveat.
 
 ## Q1 — Does learned structural discovery pay for itself?
 
