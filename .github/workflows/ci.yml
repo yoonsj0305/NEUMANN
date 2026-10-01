@@ -183,5 +183,7 @@ jobs:
         run: pytest -q tests/test_sequence_v031.py
       - name: LP model-side state compression architecture fixtures (no fitting)
         run: pytest -q tests/test_lp_state_models_v087.py
+      - name: First learned-model study contracts (no fitting or final generation)
+        run: pytest -q tests/test_lp_model_study_v088.py
       - name: Matched tiny-Transformer benchmark
         run: python benchmark_v031.py
