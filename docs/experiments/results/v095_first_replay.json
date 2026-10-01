@@ -1,0 +1,45 @@
+{
+  "format": "neumann.lp-graph-incremental-v095.first-replay.v1",
+  "frozen_head": "2e5000096e7fd1c836ae3a1f37057469555cbce6",
+  "ci_run_id": 36860294154,
+  "sequence_job_id": 110362561208,
+  "source_manifest": "docs/experiments/results/v094_first_probe.manifest.json",
+  "new_fitting": false,
+  "new_inference": false,
+  "new_solver_calls": false,
+  "timing": false,
+  "final_evaluation": false,
+  "decision": "STOP_GRAPH_REFINEMENT_INFORMATION_CANDIDATE",
+  "global_q3": "OPEN",
+  "global_q4": "OPEN",
+  "tests": [
+    {
+      "seed": 87001,
+      "point_certificates": 1,
+      "compact_certificates": 0,
+      "certificate_gain": -1,
+      "point_mean_label_recall": 0.8929036458333334,
+      "compact_mean_label_recall": 0.8876953125,
+      "mean_label_recall_gain": -0.00520833333333337,
+      "hit_wins": 15,
+      "hit_losses": 23,
+      "hit_ties": 10,
+      "identical_retained_sets": 48,
+      "passed": false
+    },
+    {
+      "seed": 87002,
+      "point_certificates": 0,
+      "compact_certificates": 1,
+      "certificate_gain": 1,
+      "point_mean_label_recall": 0.89453125,
+      "compact_mean_label_recall": 0.91796875,
+      "mean_label_recall_gain": 0.0234375,
+      "hit_wins": 24,
+      "hit_losses": 10,
+      "hit_ties": 14,
+      "identical_retained_sets": 48,
+      "passed": false
+    }
+  ]
+}
