@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-10-02 through v0.0.97. Goal: a system with substantially less **total** compute
+Updated 2026-10-02 through v0.0.98 preregistration. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -367,3 +367,12 @@ This remains constructed-family development evidence, not global Q34/Q3/Q4
 closure. Freeze B_POINT and both seeds with no further tuning, test them on a
 separately preregistered fresh holdout, and if confirmed advance this mechanism
 to Q5 scaling/cross-domain evaluation instead of more local Q3/Q4 polishing.
+
+v098 preregisters that fresh confirmation without opening it. Only the frozen
+B_POINT point16 checkpoints at seeds87001/87002 survive. The new source set is
+24 cases at seeds98200-98223, split evenly between m64 IID and m128
+size+surface shift. Source generation is a model-free registration phase;
+timed evaluation is a separate phase that reads only the committed source
+archive. The unchanged Q34 thresholds must pass independently for both seeds,
+both groups and all24 combined. Until source-registration is explicitly armed,
+the holdout remains unopened.
