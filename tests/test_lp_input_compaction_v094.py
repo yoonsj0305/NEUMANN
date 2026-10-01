@@ -1,5 +1,5 @@
-import torch
 import pytest
+torch=pytest.importorskip('torch')
 from experiments.lp_state_models_v087 import GraphStateModel,PointwiseModel
 from experiments.lp_input_compaction_v094 import propose
 
