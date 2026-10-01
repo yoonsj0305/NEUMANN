@@ -56,6 +56,18 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.88 — First actual learned model comparison fails the frozen gate**
+
+Four runnable models x two seeds trained on 48 fresh cases. All 768 final
+calls certified original LP answers, with equal answer/basis/native-repair
+authority and paid failures. Compact seed87002 reduced some costs, but
+seed87001 lacked classical/learned-Direct superiority, and native repair was
+needed on 12/12 and 11/12 cases. No stable matched-model pass: decision
+`FIRST_LEARNED_CANDIDATE_GATE_FAILED`; Q3/Q4 remain OPEN. All exact train/final
+inputs, eight weights, losses and failed/accepted witnesses are retained in
+the first archive with solver/model-free replay. Keep native default. See
+`docs/experiments/v0.0.88.md` for all four comparison rows and amortization.
+
 **v0.0.87 — Real model-state compaction clears bounded fitting admission**
 
 Runnable compact/full GNNs differ in actual retained states and edges, not

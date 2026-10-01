@@ -69,3 +69,38 @@ def test_first_runner_refuses_existing_directory(tmp_path):
     with patch('sys.argv',['benchmark_v088.py',str(tmp_path)]), \
          patch.object(p,'run_study',side_effect=AssertionError('first fitting forbidden')):
         with pytest.raises(SystemExit): runner.main()
+
+
+def test_retained_first_study_replays_and_rejects_evidence_corruption():
+    from pathlib import Path
+    from neumann1.lp_model_study_archive_v088 import load_study
+    report=load_study(Path(__file__).resolve().parents[1]/'docs/experiments/results/v088_completed.manifest.json')
+    with patch.object(p,'generate',side_effect=AssertionError('no input regeneration')), \
+         patch.object(p,'roster',side_effect=AssertionError('no model execution')), \
+         patch.object(p.storage,'candidate_once',side_effect=AssertionError('no solve')):
+        p.validate_report(report)
+        assert len(report['records'])==768 and all(r['accepted'] for r in report['records'])
+        assert report['summary']['decision']=='FIRST_LEARNED_CANDIDATE_GATE_FAILED'
+        r=report['records'][0]; old=r['witness']['x'][0]; r['witness']['x'][0]=old+100.
+        with pytest.raises(ValueError,match='witness'): p.validate_report(report)
+        r['witness']['x'][0]=old
+        fit=report['training']['compact16_s87001']; old=fit['weights_sha256'];fit['weights_sha256']='wrong'
+        with pytest.raises(ValueError,match='checkpoint'): p.validate_report(report)
+        fit['weights_sha256']=old
+        old=report['summary']['tests'][0]['classical_ratio'];report['summary']['tests'][0]['classical_ratio']=0.
+        with pytest.raises(ValueError,match='gate'): p.validate_report(report)
+        report['summary']['tests'][0]['classical_ratio']=old
+
+
+def test_archive_loader_rejects_duplicate_and_modified_parts(tmp_path):
+    import hashlib,json
+    from neumann1.lp_model_study_archive_v088 import load_study
+    data=b'fixture';(tmp_path/'part').write_bytes(data)
+    part={'name':'part','bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}
+    manifest={'format':'neumann.lp-first-model-study.archive.v1',
+              'preregistration_head':'e3d7042d57b872ab61756c3b4103607c2f3e43cf','rerun':False,
+              'parts':[part,part]}
+    path=tmp_path/'manifest.json';path.write_text(json.dumps(manifest))
+    with pytest.raises(ValueError,match='duplicate'): load_study(path)
+    manifest['parts']=[part];path.write_text(json.dumps(manifest));(tmp_path/'part').write_bytes(b'broken')
+    with pytest.raises(ValueError,match='part integrity'): load_study(path)
