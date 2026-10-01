@@ -201,5 +201,9 @@ jobs:
         run: pytest -q tests/test_lp_graph_equivalence_v095.py
       - name: Q34 representation ceiling first replay (no fitting, inference, solver, or timing)
         run: pytest -q -s tests/test_lp_q34_ceiling_v096.py
+      - name: Q34 support tournament contracts (no timing audit)
+        run: pytest -q tests/test_lp_q34_tournament_v097.py
+      - name: Q34 first tournament retained replay (no model, solver, fitting, or timing)
+        run: pytest -q tests/test_lp_q34_replay_v097.py
       - name: Matched tiny-Transformer benchmark
         run: python benchmark_v031.py

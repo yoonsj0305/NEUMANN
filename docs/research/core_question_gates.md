@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-10-01 through v0.0.96. Goal: a system with substantially less **total** compute
+Updated 2026-10-02 through v0.0.97. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -349,3 +349,21 @@ This does not pass Q34 or close Q3/Q4. It stops further pruning-point tuning on
 this candidate and changes the next target from exact-m basis generation to
 verified support discovery plus restricted execution and charged fallback.
 The next tournament is specified in `q34_architecture_tournament.md`.
+
+v097 executes that first joint support-system tournament on16 already-opened
+development cases with frozen v088 weights. The first workflow attempt is
+retained as invalid pre-measurement invocation: import failed before warmup,
+solver, or timing. The first valid audit freezes576 observations. Direct median
+total sums to541.979956ms and the free-oracle post path to49.706681ms.
+
+B_POINT is the only Pareto survivor. Both seeds pass the frozen Q34 development
+conjunction with no full fallback in16/16 cases: worst-seed utility recovery
+0.909057, discovery burden0.045977, and amortized complete/Direct0.212278.
+C_FULL and D_ADAPTIVE also pass but are Pareto-dominated by B_POINT.
+A_DETERMINISTIC has complete/Direct0.735660 but utility recovery0.320260 and
+fails the0.80 utility floor. Decision: `ADMIT_FRESH_Q34_HOLDOUT`.
+
+This remains constructed-family development evidence, not global Q34/Q3/Q4
+closure. Freeze B_POINT and both seeds with no further tuning, test them on a
+separately preregistered fresh holdout, and if confirmed advance this mechanism
+to Q5 scaling/cross-domain evaluation instead of more local Q3/Q4 polishing.

@@ -1,0 +1,197 @@
+{
+  "decision": "ADMIT_FRESH_Q34_HOLDOUT",
+  "file": "v097_first_tournament.json.gz",
+  "format": "neumann.q34-support-tournament-v097.archive.v1",
+  "frozen_head": "d7ae02ca0418a4b93020e0e8fbf2ecbcd5b1e975",
+  "gzip_bytes": 1314315,
+  "gzip_sha256": "7ed4e58ff78150ae7e98ee38de035dd830497deb8bbef3f47210b37bd7595b10",
+  "json_bytes": 11158908,
+  "json_sha256": "79eb4273ffe9b4344c58c42e7128ebba551d13d6a35ee5c5ce4c7678f8225ef5",
+  "rerun": false,
+  "summary": {
+    "decision": "ADMIT_FRESH_Q34_HOLDOUT",
+    "development_only": true,
+    "direct_total_ms": 541.979956,
+    "families": {
+      "A_DETERMINISTIC": {
+        "amortized_complete_ratio": 0.7356601431216028,
+        "capability": true,
+        "discovery_burden": 0.09126572364054518,
+        "dominated_by": [
+          "B_POINT",
+          "D_ADAPTIVE"
+        ],
+        "fallback_free_cases": 10,
+        "pareto_survivor": false,
+        "passed": false,
+        "routes": [
+          "A_DETERMINISTIC"
+        ],
+        "utility_recovery": 0.3202600059895594
+      },
+      "B_POINT": {
+        "amortized_complete_ratio": 0.21227808742653945,
+        "capability": true,
+        "discovery_burden": 0.04597737054891446,
+        "dominated_by": [],
+        "fallback_free_cases": 16,
+        "pareto_survivor": true,
+        "passed": true,
+        "routes": [
+          "B_POINT_s87001",
+          "B_POINT_s87002"
+        ],
+        "utility_recovery": 0.9090572121754934
+      },
+      "C_FULL": {
+        "amortized_complete_ratio": 0.254731728173357,
+        "capability": true,
+        "discovery_burden": 0.09788653660255166,
+        "dominated_by": [
+          "B_POINT"
+        ],
+        "fallback_free_cases": 16,
+        "pareto_survivor": false,
+        "passed": true,
+        "routes": [
+          "C_FULL_s87001",
+          "C_FULL_s87002"
+        ],
+        "utility_recovery": 0.9086924229230198
+      },
+      "D_ADAPTIVE": {
+        "amortized_complete_ratio": 0.2874517364682763,
+        "capability": true,
+        "discovery_burden": 0.05057294444866194,
+        "dominated_by": [
+          "B_POINT"
+        ],
+        "fallback_free_cases": 16,
+        "pareto_survivor": false,
+        "passed": true,
+        "routes": [
+          "D_ADAPTIVE_s87001",
+          "D_ADAPTIVE_s87002"
+        ],
+        "utility_recovery": 0.8262845814654471
+      }
+    },
+    "global_q3": "OPEN",
+    "global_q4": "OPEN",
+    "oracle_post_ratio": 0.0917131352363149,
+    "oracle_post_total_ms": 49.706681,
+    "oracle_savings_ms": 492.273275,
+    "pareto_q34_survivors": [
+      "B_POINT"
+    ],
+    "q34_global_pass": false,
+    "reference_capability": true,
+    "routes": {
+      "A_DETERMINISTIC": {
+        "amortized_complete_ratio": 0.7356601431216028,
+        "amortized_investment_total_ms": 0.0,
+        "candidate_pre_discovery_savings_ms": 157.65544200000002,
+        "capability": true,
+        "discovery_burden": 0.09126572364054518,
+        "effective_discovery_total_ms": 14.388538,
+        "fallback_free_cases": 10,
+        "online_complete_ratio": 0.7356601431216028,
+        "passed": false,
+        "post_total_ms": 384.324514,
+        "proposal_total_ms": 14.388538,
+        "subset_accepted_cases": 10,
+        "utility_recovery": 0.3202600059895594
+      },
+      "B_POINT_s87001": {
+        "amortized_complete_ratio": 0.21227808742653945,
+        "amortized_investment_total_ms": 1.4343134832,
+        "candidate_pre_discovery_savings_ms": 447.504571,
+        "capability": true,
+        "discovery_burden": 0.04597737054891446,
+        "effective_discovery_total_ms": 20.5750834832,
+        "fallback_free_cases": 16,
+        "online_complete_ratio": 0.20963165471750397,
+        "passed": true,
+        "post_total_ms": 94.475385,
+        "proposal_total_ms": 19.14077,
+        "subset_accepted_cases": 16,
+        "utility_recovery": 0.9090572121754934
+      },
+      "B_POINT_s87002": {
+        "amortized_complete_ratio": 0.21020555013735598,
+        "amortized_investment_total_ms": 1.4328088144,
+        "candidate_pre_discovery_savings_ms": 448.352933,
+        "capability": true,
+        "discovery_burden": 0.04527721426637796,
+        "effective_discovery_total_ms": 20.300171814400002,
+        "fallback_free_cases": 16,
+        "online_complete_ratio": 0.20756189367268776,
+        "passed": true,
+        "post_total_ms": 93.627023,
+        "proposal_total_ms": 18.867363,
+        "subset_accepted_cases": 16,
+        "utility_recovery": 0.9107805679680661
+      },
+      "C_FULL_s87001": {
+        "amortized_complete_ratio": 0.254731728173357,
+        "amortized_investment_total_ms": 3.7766338272,
+        "candidate_pre_discovery_savings_ms": 447.749071,
+        "capability": true,
+        "discovery_burden": 0.09788653660255166,
+        "effective_discovery_total_ms": 43.8286058272,
+        "fallback_free_cases": 16,
+        "online_complete_ratio": 0.2477635113871259,
+        "passed": true,
+        "post_total_ms": 94.230885,
+        "proposal_total_ms": 40.051972,
+        "subset_accepted_cases": 16,
+        "utility_recovery": 0.9095538875231446
+      },
+      "C_FULL_s87002": {
+        "amortized_complete_ratio": 0.2543178687176394,
+        "amortized_investment_total_ms": 3.9555252976000004,
+        "candidate_pre_discovery_savings_ms": 447.324995,
+        "capability": true,
+        "discovery_burden": 0.09652987599675712,
+        "effective_discovery_total_ms": 43.1802262976,
+        "fallback_free_cases": 16,
+        "online_complete_ratio": 0.24701958166142954,
+        "passed": true,
+        "post_total_ms": 94.654961,
+        "proposal_total_ms": 39.224701,
+        "subset_accepted_cases": 16,
+        "utility_recovery": 0.9086924229230198
+      },
+      "D_ADAPTIVE_s87001": {
+        "amortized_complete_ratio": 0.2874517364682763,
+        "amortized_investment_total_ms": 1.4343134832,
+        "candidate_pre_discovery_savings_ms": 406.757817,
+        "capability": true,
+        "discovery_burden": 0.05057294444866194,
+        "effective_discovery_total_ms": 20.5709404832,
+        "fallback_free_cases": 16,
+        "online_complete_ratio": 0.28480530375924085,
+        "passed": true,
+        "post_total_ms": 135.222139,
+        "proposal_total_ms": 19.136627,
+        "subset_accepted_cases": 16,
+        "utility_recovery": 0.8262845814654471
+      },
+      "D_ADAPTIVE_s87002": {
+        "amortized_complete_ratio": 0.28644666116471657,
+        "amortized_investment_total_ms": 1.4328088144,
+        "candidate_pre_discovery_savings_ms": 407.175221,
+        "capability": true,
+        "discovery_burden": 0.0502083937332719,
+        "effective_discovery_total_ms": 20.443613814400003,
+        "fallback_free_cases": 16,
+        "online_complete_ratio": 0.2838030047000483,
+        "passed": true,
+        "post_total_ms": 134.804735,
+        "proposal_total_ms": 19.010805,
+        "subset_accepted_cases": 16,
+        "utility_recovery": 0.8271324926180484
+      }
+    }
+  }
+}

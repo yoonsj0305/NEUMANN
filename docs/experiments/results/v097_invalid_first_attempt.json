@@ -1,0 +1,14 @@
+{
+  "schema": "neumann.q34-support-tournament-v097.invalid-attempt.v1",
+  "workflow_run_id": 36939319271,
+  "workflow_run_number": 1,
+  "frozen_head": "51b4c9329da76ee6d08ab9a271420b9ba605ee20",
+  "status": "INVALID_PRE_MEASUREMENT_INVOCATION",
+  "timing_observations": 0,
+  "warmups_completed": 0,
+  "solver_calls": 0,
+  "result_archive_created": false,
+  "reason": "The workflow invoked the runner as 'python experiments/lp_q34_tournament_v097.py'. Python placed the experiments directory, not the repository root, on sys.path; importing experiments.lp_input_compaction_v094 therefore raised ModuleNotFoundError before run_study or any timing observation began.",
+  "correction_boundary": "Do not change experiment code, thresholds, routes, data, checkpoints, runtime, or cost accounting. Change only the workflow invocation to 'python -m experiments.lp_q34_tournament_v097'. Preserve this invalid attempt permanently.",
+  "favorable_rerun": false
+}
