@@ -56,6 +56,16 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.92 — One more full update before pruning is still insufficient**
+
+Move the paid compact shortlist decision after the second graph update;
+retrain once, retain all eight v091 checkpoints as concurrent controls, and
+charge the entire new eight-model fit phase. All 1920 original-LP answers
+certify, yet compact avoids full rescue on only2/16 and0/16 cases. Complete
+cost/best learned Direct ratios3.3394/4.0392 fail the frozen gate. No new holdout
+is admitted; Q3/Q4 remain OPEN and native remains default. See the first weights,
+failed witness/cost ledger and result in `docs/experiments/v0.0.92.md`.
+
 **v0.0.91 — Cheap features learn in full models, but early pruning fails**
 
 Retrain all eight compact/full/pointwise candidates once with observable

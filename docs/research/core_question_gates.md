@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-10-01 through v0.0.91. Goal: a system with substantially less **total** compute
+Updated 2026-10-01 through v0.0.92. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -96,6 +96,16 @@ cheap features are unlearnable. Stop this specific early-pruning/fit candidate,
 admit no holdout, preserve all first weights and costs. This in-sample screen
 does not establish generalization, Q3 or Q4. Native remains default. See
 `../experiments/v0.0.91.md`.
+
+v092 moves coarse selection after two full graph updates and retrains once,
+protecting all eight previous cheap-feature checkpoints as concurrent controls.
+All1920 original-LP answers certify, but compact avoids full rescue on only2/16
+and0/16 cases. Complete-cost / best learned Direct ratios3.3394/4.0392 fail;
+the full56.025541-second eight-model fit phase is charged at10000 queries and
+does not rescue the decision. Stop this fixed late-pruning candidate without
+admitting a holdout. This is not an isolated causal timing ablation or a claim
+that all delayed selection methods fail. Q3/Q4 OPEN, native default unchanged.
+See `../experiments/v0.0.92.md`.
 
 ## Q1 — Does learned structural discovery pay for itself?
 
