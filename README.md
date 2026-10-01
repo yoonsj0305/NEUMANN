@@ -56,6 +56,18 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.98 — fresh Q34 holdout preregistered, still UNOPENED**
+
+The sole v0.0.97 Pareto survivor, frozen B_POINT at seeds 87001/87002, is
+registered for a two-phase fresh test. Twenty-four new planted-family cases are
+specified prospectively at seeds 98200-98223: twelve m=64 IID cases and twelve
+m=128 size+surface-shift cases. Source registration is isolated from model
+access and timing; evaluation restores only the two point16 survivors. The
+unchanged Q34 0.80 utility / 0.20 discovery-burden conjunction must pass for
+both seeds, both groups and the combined set. No source-generation trigger is
+armed yet, so these cases remain unopened. See
+`docs/experiments/v0.0.98-preregistration.md`.
+
 **v0.0.97 — Q34 development tournament admits frozen point-support to fresh holdout**
 
 A preregistered complete-system tournament compares deterministic, frozen
