@@ -56,17 +56,16 @@ See:
 
 ## Current engineering baseline
 
-**v0.0.98 — fresh Q34 holdout preregistered, still UNOPENED**
+**v0.0.98 — fresh Q34 holdout FAILS on size/surface shift; no Q5 yet**
 
-The sole v0.0.97 Pareto survivor, frozen B_POINT at seeds 87001/87002, is
-registered for a two-phase fresh test. Twenty-four new planted-family cases are
-specified prospectively at seeds 98200-98223: twelve m=64 IID cases and twelve
-m=128 size+surface-shift cases. Source registration is isolated from model
-access and timing; evaluation restores only the two point16 survivors. The
-unchanged Q34 0.80 utility / 0.20 discovery-burden conjunction must pass for
-both seeds, both groups and the combined set. No source-generation trigger is
-armed yet, so these cases remain unopened. See
-`docs/experiments/v0.0.98-preregistration.md`.
+The frozen v0.0.97 B_POINT survivor was evaluated once on 24 separately
+registered fresh cases. Both seeds pass the iid64 cell, but both fail the
+preregistered 0.80 utility-recovery floor on m=128 size+surface shift
+(0.7563 / 0.6614) even though discovery burden stays near 2% and complete cost
+remains far below Direct. Decision `Q34_FRESH_HOLDOUT_FAIL_NO_Q5`; no holdout
+tuning and no Q5 advance. The next step is a higher-level equivalence-invariant
+representation redesign using opened development/metamorphic data only. See
+`docs/experiments/v0.0.98.md`.
 
 **v0.0.97 — Q34 development tournament admits frozen point-support to fresh holdout**
 
