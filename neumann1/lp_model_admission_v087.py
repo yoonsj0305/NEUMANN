@@ -1,11 +1,16 @@
 """A first, opened-development admission screen; not a learned Q3/Q4 result."""
 from __future__ import annotations
 
+import gzip
+import hashlib
+import io
+import json
 import math
 import platform
 import random
 from statistics import geometric_mean, median
 from time import perf_counter_ns
+from pathlib import Path
 
 import numpy as np
 import scipy
@@ -345,3 +350,27 @@ def validate_archive(report, original):
                 raise ValueError('model state/computation trace drift')
     if report['summary'] != summarize(report['records'], report['sources']):
         raise ValueError('summary drift')
+
+
+def load_admission(manifest_path, attempt='corrected'):
+    """Check immutable retained bytes. Only the declared correction is admissible."""
+    path = Path(manifest_path)
+    manifest = json.loads(path.read_text())
+    if (manifest['format'] != 'neumann.lp-model-admission.archive.v1'
+            or manifest['source_sha256'] != SOURCE_SHA
+            or manifest['preregistration_head'] != '2debccde83087bb900269f0932cd571f3997f349'
+            or manifest['first']['timing_admissible'] is not False
+            or manifest['corrected']['timing_admissible'] is not True):
+        raise ValueError('admission manifest drift')
+    entry = manifest[attempt]
+    if type(entry['name']) is not str or Path(entry['name']).name != entry['name']:
+        raise ValueError('invalid archive path')
+    data = (path.parent / entry['name']).read_bytes()
+    if len(data) != entry['bytes'] or hashlib.sha256(data).hexdigest() != entry['sha256']:
+        raise ValueError('archive integrity drift')
+    with gzip.GzipFile(fileobj=io.BytesIO(data)) as stream:
+        decoded = stream.read(32*1024*1024+1)
+    if (len(decoded) > 32*1024*1024 or len(decoded) != entry['json_bytes']
+            or hashlib.sha256(decoded).hexdigest() != entry['json_sha256']):
+        raise ValueError('JSON integrity drift')
+    return json.loads(decoded)
