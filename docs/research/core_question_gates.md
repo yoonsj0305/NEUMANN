@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-10-01 through v0.0.94. Goal: a system with substantially less **total** compute
+Updated 2026-10-01 through v0.0.95. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -322,3 +322,13 @@ performance estimate or speed claim follows. No new fit/holdout is admitted.
 Point-only chooses exactly the same2m retained set as the routed graph, so
 additional graph work must earn its cost through useful finer proposals;
 state-work reduction alone does not establish Q4. Native default, Q3/Q4 OPEN.
+
+v095 closes that attribution loophole by construction. The compact route sets
+`keep=top2m(point)` and then asks the graph to rank exactly those2m columns;
+its2m shortlist must therefore be the same support as point-only, up to a
+permutation. The restricted LP has identical variable support. The graph can
+only alter the exact-m basis proposal/order under this contract. Decision:
+`STOP_SAME_SUPPORT_GRAPH_REFINEMENT_NO_NEW_FIT`. Do not fit another variant
+with this same support authority. This is candidate-specific, not a global Q3
+or Q4 closure; a successor must change verified structural authority or target
+a different task/family.
