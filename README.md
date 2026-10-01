@@ -56,6 +56,16 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.94 — Input compaction preserves coverage, but does not clear the cost gate**
+
+Frozen CG5-point selectors preserve46/48 shortlists on both seeds while all
+three graph updates use only2m columns (one eighth of full graph terms).
+The admitted first paid screen certifies all1984 answers, but both cost gates
+fail against point-only/strong Direct and amortization. A concurrent focused
+test contaminated first timings; original bytes and this limitation are
+retained, with no clean speed claim or favorable rerun. Stop this candidate;
+native default and Q3/Q4 OPEN. See `docs/experiments/v0.0.94.md`.
+
 **v0.0.93 — Frozen selector diagnosis does not admit another fit**
 
 One untimed pass over 48 opened training inputs retains 1,824 records from
