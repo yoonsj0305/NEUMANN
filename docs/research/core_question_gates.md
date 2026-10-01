@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-10-01 through v0.0.85. Goal: a system with substantially less **total** compute
+Updated 2026-10-01 through v0.0.86. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -32,6 +32,14 @@ program produced identical stable outcomes, full witnesses and call ledgers
 Decision: `LP_BASIS_ONLY_Q4_ATTRIBUTION_REJECTED`. Basis-only output relabeling
 cannot establish Q4 against equal tool authority. This stops that attribution
 route, not different learned architectures or the broader LP line. Q3/Q4 OPEN.
+
+v086 implements the previously missing native HiGHS warm-start interface:
+Direct can supply an advisory basis and pay native repair, original numerical
+verification and any cold fallback. Correctness fixtures verify optimal,
+nonoptimal and singular heads; negative controls deny acceptance on verifier
+failure or deadline expiry. No timing audit, task admission or training was
+performed. A future LP experiment must actually measure this comparator and
+applicable learned-basis baselines; its mere existence does not admit learning.
 
 ## Q1 — Does learned structural discovery pay for itself?
 

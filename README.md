@@ -56,6 +56,17 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.86 — Native warm-start comparator interface (performance untested)**
+
+Direct can now supply the same advisory basis to native HiGHS simplex and
+let it repair nonoptimal/singular proposals. Full original-LP certificates
+retain authority; invalid proposals, failed verification and shared-deadline
+exhaustion fail closed with charged cold fallback. Setup, failed attempts,
+verification and native call counts are retained. Eleven focused tests cover
+real native repair and negative controls. This completes a comparator
+interface, not a learned experiment or speed gate. Native stays the default
+on the normalized family; Q3/Q4 remain OPEN. See `docs/experiments/v0.0.86.md`.
+
 **v0.0.85 — LP basis-only attribution rejected under executable-Direct parity**
 
 A closed Direct program can execute the same supplied basis head with the
