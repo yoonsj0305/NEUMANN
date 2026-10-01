@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-10-02 through v0.0.98 preregistration. Goal: a system with substantially less **total** compute
+Updated 2026-10-02 through v0.0.98 fresh holdout. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -368,11 +368,19 @@ closure. Freeze B_POINT and both seeds with no further tuning, test them on a
 separately preregistered fresh holdout, and if confirmed advance this mechanism
 to Q5 scaling/cross-domain evaluation instead of more local Q3/Q4 polishing.
 
-v098 preregisters that fresh confirmation without opening it. Only the frozen
-B_POINT point16 checkpoints at seeds87001/87002 survive. The new source set is
-24 cases at seeds98200-98223, split evenly between m64 IID and m128
-size+surface shift. Source generation is a model-free registration phase;
-timed evaluation is a separate phase that reads only the committed source
-archive. The unchanged Q34 thresholds must pass independently for both seeds,
-both groups and all24 combined. Until source-registration is explicitly armed,
-the holdout remains unopened.
+v098 executes that fresh confirmation under the frozen two-phase protocol.
+Source registration run36942551197 freezes24 cases with model_access=false,
+timing=false and route_evaluation=false. First evaluation run36942660947 then
+tests only Direct, free Oracle and the two frozen B_POINT seeds.
+
+Both seeds pass iid64, but both fail the size+surface-shift utility floor:
+0.756263 and0.661419 versus the frozen0.80 minimum. Discovery burden remains
+0.018912/0.021408 and complete/Direct remains0.292875/0.383130, so economics
+are not the blocking gate. Overall utility is0.772144/0.678884.
+Decision: `Q34_FRESH_HOLDOUT_FAIL_NO_Q5`. No holdout tuning and no Q5
+advance. The next development step must move up one level to representation /
+objective / task-family design. A code-level invariance audit makes the current
+CG5 signed `D.mean(0)` feature and row-count scaling a principled target for an
+equivalence-quotient redesign, but this is a mechanistic hypothesis, not a
+causal claim from holdout labels. Any successor must use opened development or
+analytic metamorphic data and a new future holdout.
