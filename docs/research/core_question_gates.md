@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-10-01 through v0.0.87. Goal: a system with substantially less **total** compute
+Updated 2026-10-01 through v0.0.88. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -52,6 +52,17 @@ publication; the missing-evidence notice preserves that limitation. Only the
 retained correction supports this candidate-specific gate. A separate fitting
 and sealed final-evaluation preregistration is required; no paper reproduction
 or general learned-LP superiority is established.
+
+v088 completes the first actual compact/full/pointwise/wider-GNN learned study,
+48 fresh training examples and two fixed seeds. All 768 final calls verified,
+but compact seed87001 fails classical/learned-Direct savings and seed87002 is
+not consistently <=.8 of strong learned Direct across IID and size/surface
+groups. Only 0/6,0/6,1/6,0/6 cells solve its entire predicted basis without
+native repair, below the >=4/6 requirement. First decision:
+`FIRST_LEARNED_CANDIDATE_GATE_FAILED`. Native stays default; all eight weights,
+train/final arrays, failures and full costs are retained. No favorable seed,
+fit/timing rerun or holdout tuning. Q3/Q4 remain OPEN; this rejects the bounded
+candidate, not every learned architecture or the broader research thesis.
 
 ## Q1 — Does learned structural discovery pay for itself?
 
