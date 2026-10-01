@@ -6,7 +6,6 @@ from unittest.mock import patch
 import pytest
 
 pytest.importorskip("torch")
-pytest.importorskip("highspy")
 
 from experiments import lp_q34_tournament_v097 as runner
 from neumann1.lp_q34_archive_v097 import load_first_tournament
