@@ -42,6 +42,46 @@ def restricted_original_checked(A, b, c, indices, *, budget_s):
     }
 
 
+def support_with_fallback_checked(A, b, c, indices, *, budget_s=5.0):
+    """Try one restricted support, then charge a cold full Direct fallback."""
+    started = perf_counter_ns()
+    A, b, c = _raw(A, b, c)
+    if type(budget_s) not in (int, float) or not math.isfinite(budget_s) or budget_s <= 0:
+        raise ValueError("positive finite budget required")
+
+    def remaining():
+        return budget_s - (perf_counter_ns() - started) / 1e9
+
+    restricted = None
+    fallback = None
+    witness = None
+    accepted = False
+    left = remaining()
+    if left > 0:
+        restricted = restricted_original_checked(A, b, c, list(indices), budget_s=left)
+        if restricted["accepted"]:
+            accepted = True
+            witness = restricted["witness"]
+
+    if not accepted and remaining() > 0:
+        fallback = solve_native_checked(A, b, c, cold_fallback=False, budget_s=remaining())
+        if fallback["accepted"]:
+            accepted = True
+            witness = fallback["attempts"][-1]["witness"]
+
+    total_ms = (perf_counter_ns() - started) / 1e6
+    return {
+        "accepted": bool(accepted and total_ms <= budget_s * 1000.0),
+        "restricted": restricted,
+        "fallback": fallback,
+        "fallback_used": fallback is not None,
+        "subset_accepted": bool(restricted and restricted["accepted"]),
+        "witness": witness,
+        "total_ms": total_ms,
+        "budget_s": budget_s,
+    }
+
+
 def adaptive_support_checked(A, b, c, ranking, *, budget_s=5.0, factors=(1, 2, 4)):
     """Try progressively larger supports, then a charged cold full Direct fallback."""
     started = perf_counter_ns()
