@@ -193,5 +193,7 @@ jobs:
         run: pytest -q tests/test_lp_cheap_features_v091.py tests/test_lp_cheap_screen_v091.py
       - name: Late-pruning first fit and retained screen replay (no fitting or timing rerun)
         run: pytest -q tests/test_lp_late_v092.py tests/test_lp_late_screen_v092.py
+      - name: Untimed selector diagnosis contracts and retained replay (no inference rerun)
+        run: pytest -q tests/test_lp_selector_v093.py tests/test_lp_selector_probe_v093.py
       - name: Matched tiny-Transformer benchmark
         run: python benchmark_v031.py

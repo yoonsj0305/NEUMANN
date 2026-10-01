@@ -56,6 +56,16 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.93 — Frozen selector diagnosis does not admit another fit**
+
+One untimed pass over 48 opened training inputs retains 1,824 records from
+32 frozen learned conditions and six classical controls. Only 82 exact-m
+bases certify; strongest classical shortlist coverage is32/48. CG3 pointwise
+coverage drops46→44/45, so both-seed parity fails. No training, optimizer,
+new holdout or timing rerun: decision `SELECTOR_GAP_UNRESOLVED_NO_NEW_FIT`.
+Native remains default and Q3/Q4 OPEN. See `docs/experiments/v0.0.93.md` and
+the byte-exact first archive with inference-free replay.
+
 **v0.0.92 — One more full update before pruning is still insufficient**
 
 Move the paid compact shortlist decision after the second graph update;
