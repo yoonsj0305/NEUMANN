@@ -17,6 +17,19 @@ def test_frozen_v095_incremental_value_first_replay():
     assert all(t['identical_retained_sets']==48 for t in result['tests'])
     assert all(t['hit_wins']+t['hit_losses']+t['hit_ties']==48 for t in result['tests'])
     assert result['global_q3']==result['global_q4']=='OPEN'
+    expected={
+        87001:(1,0,-1,0.8929036458333334,0.8876953125,-0.00520833333333337,15,23,10),
+        87002:(0,1,1,0.89453125,0.91796875,0.0234375,24,10,14),
+    }
+    for t in result['tests']:
+        pc,cc,cg,pr,cr,rg,w,l,ties=expected[t['seed']]
+        assert (t['point_certificates'],t['compact_certificates'],t['certificate_gain'])==(pc,cc,cg)
+        assert t['point_mean_label_recall']==pytest.approx(pr,abs=1e-15)
+        assert t['compact_mean_label_recall']==pytest.approx(cr,abs=1e-15)
+        assert t['mean_label_recall_gain']==pytest.approx(rg,abs=1e-15)
+        assert (t['hit_wins'],t['hit_losses'],t['hit_ties'])==(w,l,ties)
+        assert t['passed'] is False
+    assert result['decision']=='STOP_GRAPH_REFINEMENT_INFORMATION_CANDIDATE'
     print('V095_FIRST_REPLAY='+json.dumps(result,separators=(',',':')))
 
 
