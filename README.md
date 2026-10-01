@@ -56,6 +56,17 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.90 — Delete late graph work, but stop the one-pass candidate**
+
+A preregistered opened-training screen gave all Direct models the same early
+coarse-head access. All 1792 original-LP checks and 32 retained-set parity checks
+passed, yet compact/best learned Direct complete-cost ratios were 1.8274 and
+1.3203. Both seeds fail the frozen gate. No new fit or final evaluation; Q3/Q4
+remain OPEN. Retained sets agree, but solver column orders differ. The same
+one-pass graph computation is available to full Direct, so it is not an
+inference-compaction attribution result. Keep native default; see
+`docs/experiments/v0.0.90.md` and the preserved first archive.
+
 **v0.0.89 — Shared shortlist fails with frozen learned checkpoints**
 
 All eight frozen v088 models received the same restricted native executor and

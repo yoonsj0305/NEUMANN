@@ -60,3 +60,36 @@ def test_first_runner_refuses_overwriting(tmp_path):
     with patch('sys.argv',['benchmark_v090.py',str(tmp_path)]), \
          patch.object(p,'run',side_effect=AssertionError('timing forbidden')):
         with pytest.raises(SystemExit):benchmark_v090.main()
+
+
+def test_retained_screen_replay_does_not_time_fit_solve_or_generate():
+    from neumann1.lp_one_pass_archive_v090 import load_screen
+    report=load_screen('docs/experiments/results/v090_first_screen.manifest.json')
+    with patch.object(p,'restore_models',side_effect=AssertionError('inference forbidden')), \
+         patch.object(p,'observe',side_effect=AssertionError('timing forbidden')), \
+         patch.object(p.previous.old,'generate',side_effect=AssertionError('generation forbidden')):
+        p.validate(report)
+        assert len(report['records'])==1792
+        assert report['summary']['decision']=='STOP_ONE_PASS_CANDIDATE'
+        row=report['records'][0];old=row['witness']['x'][0];row['witness']['x'][0]+=100.
+        with pytest.raises(ValueError,match='witness'):p.validate(report)
+        row['witness']['x'][0]=old
+        old=report['training_fit_ms']['compact16_s87001'];report['training_fit_ms']['compact16_s87001']+=1.
+        with pytest.raises(ValueError,match='fit'):p.validate(report)
+        report['training_fit_ms']['compact16_s87001']=old
+        old=report['summary']['decision'];report['summary']['decision']='FAKE_PASS'
+        with pytest.raises(ValueError,match='summary'):p.validate(report)
+        report['summary']['decision']=old
+
+
+def test_archive_part_identity_rejected(tmp_path):
+    import hashlib,json
+    from neumann1.lp_one_pass_archive_v090 import load_screen
+    data=b'fixture';(tmp_path/'part').write_bytes(data)
+    part={'name':'part','bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}
+    m={'format':'neumann.lp-one-pass-screen.archive.v1',
+       'preregistration_head':'905deacd02fefc9bd06dc4bf94216d81b6da2510','rerun':False,'parts':[part,part]}
+    path=tmp_path/'manifest.json';path.write_text(json.dumps(m))
+    with pytest.raises(ValueError,match='duplicate'):load_screen(path)
+    m['parts']=[{**part,'sha256':'0'*64}];path.write_text(json.dumps(m))
+    with pytest.raises(ValueError,match='integrity'):load_screen(path)
