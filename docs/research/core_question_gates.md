@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-10-01 through v0.0.84. Goal: a system with substantially less **total** compute
+Updated 2026-10-01 through v0.0.85. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -23,6 +23,15 @@ Raw and normalized complete-cost geomean ratios are 1.3553861823 and
 `RESIDUAL_HEADROOM_UNRESOLVED_NOT_LEARNING_ADMISSION`. Keep native default;
 failed heuristics do not prove learning has value. Exact retained inputs and
 primal/dual witnesses enable solver-free offline replay. Q3/Q4 remain OPEN.
+
+v085 repairs LP's executable-Direct attribution boundary. For all 210 unique
+case/basis pairs actually attempted in v084's first timed repeats, the same
+supplied head interpreted as a NEUMANN basis or a closed Direct checked-basis
+program produced identical stable outcomes, full witnesses and call ledgers
+(36 accepted, 174 rejected per adapter). No training or timing was evaluated.
+Decision: `LP_BASIS_ONLY_Q4_ATTRIBUTION_REJECTED`. Basis-only output relabeling
+cannot establish Q4 against equal tool authority. This stops that attribution
+route, not different learned architectures or the broader LP line. Q3/Q4 OPEN.
 
 ## Q1 — Does learned structural discovery pay for itself?
 

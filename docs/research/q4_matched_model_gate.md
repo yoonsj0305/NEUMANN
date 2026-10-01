@@ -1,6 +1,6 @@
 # Q4 next milestone — matched model, not a solver-only demonstration
 
-Updated 2026-09-30 through v0.0.82 first retained headroom audit. This is a **design gate**,
+Updated 2026-10-01 through v0.0.85 executable-Direct parity. This is a **design gate**,
 not a registered trained-model evaluation or a completed implementation.
 
 ## Exact question
@@ -45,6 +45,17 @@ change the matched comparison. The frozen protocol must name actual runnable
 models, not generic labels from this matrix.
 
 ## Matching and accounting
+
+LP-specific boundary (v085): a Direct executable predictor may emit
+`solve_basis_checked` with the same basis, reconstruction, original certificate
+and fallback as NEUMANN. All 210 retained supplied-head checks agreed exactly;
+this is not learned accuracy or cost evidence. Comparing a basis predictor
+only against a cold full solver withholds execution authority. A new learned
+experiment must compare actual architectures/training or paid discovery
+behavior, not just rename one checkpoint's output. Same backend authority
+does not make different trained architectures equally efficient. Do not infer
+a universal impossibility result from this bounded adapter equivalence.
+
 
 Fix text/graph-level disjoint training, development and sealed final sets;
 hold out structural classes as well as surface forms if claiming generality.
@@ -102,12 +113,15 @@ gate rather than shrinking the comparator until a win appears.
 
 ## Restart checkpoint
 
-Historical v0.0.74 checkpoint. Frozen negative evidence:
-`docs/experiments/results/v074_sequential_audit.json`; initial contaminated
-measurements are separately retained. Do not rerun to select better timings.
-First next action: admit a task and actual model configuration against the
-matrix above, or reject it with a measured cheap-baseline reason. **Do not**
-train on the rejected n=16–32 best-eight order policy or report Q4 as passed.
+Current v0.0.85 checkpoint: `v085_diagnostic.manifest.json` retains a failed
+runtime preflight (zero paired executions) and the first completed untimed
+comparison. Q3/Q4 remain OPEN. v084's classical portfolio also failed the cost
+gate; this is not learning admission. Do not train solely to repackage the same
+basis head. First next action: choose an actual matched model experiment with
+distinct learned computation/inductive bias and frozen equal-authority
+comparators, or reject its full-cost headroom before fitting. If revisiting LP,
+include native warm starts and published learned-basis baselines. Preserve
+the v074 rejected order target and all first timing evidence unchanged.
 
 Restart update: latest code v0.0.76, based on exact upstream v0.0.75 tree
 `2cf1c01bb292f1f05f733c59594617de2d10f2a3` (`ddfffc55...`). v0.0.75 retained
@@ -193,4 +207,3 @@ Only if meaningful verified headroom remains should a learned basis/active-set
 route be compared with published learned-basis baselines, a same-budget
 executable Direct learner, and the NEUMANN no-compression ablation. Q4 stays
 OPEN.
-
