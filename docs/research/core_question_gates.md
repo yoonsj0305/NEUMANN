@@ -309,7 +309,7 @@ The v0.0.68 score-only lower bound rules out a checker-only rescue for the
 existing n≤32 learned path.
 
 
-## v093–94 selector and input-compaction boundary
+## v093–95 selector, input-compaction and graph-value boundary
 
 v093 rejects CG3 point parity and more fitting: strongest cheap classical
 shortlist32/48, point coverage46→44/45. v094 preregisters fixedCG5 and a
@@ -322,3 +322,15 @@ performance estimate or speed claim follows. No new fit/holdout is admitted.
 Point-only chooses exactly the same2m retained set as the routed graph, so
 additional graph work must earn its cost through useful finer proposals;
 state-work reduction alone does not establish Q4. Native default, Q3/Q4 OPEN.
+
+v095 preregisters a no-new-compute replay to isolate that finer-proposal value.
+On the same 48 opened inputs, point and compact retain identical2m sets on
+48/48 cases for both seeds. Seed87001 certificate count changes1→0 and mean
+hidden-label basis recall changes0.892904→0.887695; paired hit wins/losses/ties
+are15/23/10. Seed87002 changes0→1 certificate and0.894531→0.917969 mean
+recall, with24/10/14 wins/losses/ties. The frozen gate required certificate
+gain≥4, mean recall gain≥0.05, wins≥12 and losses≤6 for both seeds. Neither
+passes. Decision `STOP_GRAPH_REFINEMENT_INFORMATION_CANDIDATE`: stop adding
+graph refinement on this fixed CG5 shortlist; do not authorize another graph
+fit, holdout or paid timing screen. This is not a general impossibility result
+for graph models and does not close Q3/Q4. Native remains default.
