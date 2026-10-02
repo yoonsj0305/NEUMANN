@@ -197,7 +197,7 @@ def _base_problem(spec):
         "replicate":0,"seed":spec["seed"],
     })
     A,b,c=storage.normalized(case["A"],case["b"],case["c"])
-    return {"A":A,"b":b,"c":c},list(case["oracle_basis"])
+    return {"A":A,"b":b,"c":c},[int(i) for i in case["oracle_basis"]]
 
 
 def _surface(raw,seed):
