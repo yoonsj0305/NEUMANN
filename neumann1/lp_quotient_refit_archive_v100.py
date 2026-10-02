@@ -4,6 +4,7 @@ from __future__ import annotations
 import gzip
 import hashlib
 import json
+import math
 from pathlib import Path
 
 from experiments.lp_quotient_refit_v100 import protocol, summarize
@@ -12,6 +13,19 @@ EXPECTED_FORMAT="neumann.quotient-point-refit-v100.archive.v1"
 EXPECTED_HEAD="8e14341a614d8810380def5e2c302352c6ca47e3"
 EXPECTED_DECISION="STOP_QUOTIENT_REFIT_NO_FRESH_HOLDOUT"
 MAX_JSON_BYTES=64*1024*1024
+
+
+def _numeric_equal(a,b):
+    """Exact structure/discrete values; tolerate only cross-runtime float ulps."""
+    if type(a) is not type(b):
+        return False
+    if isinstance(a,float):
+        return math.isclose(a,b,rel_tol=1e-12,abs_tol=1e-12)
+    if isinstance(a,dict):
+        return set(a)==set(b) and all(_numeric_equal(a[k],b[k]) for k in a)
+    if isinstance(a,list):
+        return len(a)==len(b) and all(_numeric_equal(x,y) for x,y in zip(a,b))
+    return a==b
 
 
 def load_first_refit(manifest_path):
@@ -50,8 +64,11 @@ def load_first_refit(manifest_path):
     if report["frozen_head"]!=EXPECTED_HEAD or report["stage"]!="completed":
         raise ValueError("v100 report identity drift")
     replay=summarize(report["records"],report["development_sources"])
-    if replay!=manifest["summary"] or report["summary"]!=manifest["summary"]:
-        raise ValueError("v100 summary replay drift")
-    if replay["decision"]!=EXPECTED_DECISION:
+    if not _numeric_equal(replay,report["summary"]):
+        raise ValueError("v100 summary drift beyond cross-runtime float tolerance")
+    if not _numeric_equal(report["summary"],manifest["summary"]):
+        raise ValueError("v100 manifest summary drift")
+    if (replay["decision"]!=EXPECTED_DECISION
+            or report["summary"]["decision"]!=manifest["decision"]):
         raise ValueError("v100 replay decision drift")
     return report
