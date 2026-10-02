@@ -6,6 +6,7 @@ on:
       - neumann1/general_*v1061.py
       - experiments/general_*v106.py
       - experiments/general_*v1061.py
+      - experiments/general_repair_evidence_v1061.py
       - experiments/bp_frozen_transfer_m106.py
       - experiments/first_evidence_v106.py
       - tests/test_first_evidence_v106.py
@@ -13,6 +14,7 @@ on:
       - tests/test_general_boot2_first_archive.py
       - docs/experiments/boot2_first_v106.pins.json
       - docs/experiments/results/v106_general_boot2*
+      - docs/experiments/results/v1061_general_repair_first/replay.json
       - .github/workflows/general_runtime_boot2.yml
       - tests/test_general_runtime_v106.py
       - tests/test_general_runtime_repair_v1061.py
@@ -74,3 +76,5 @@ jobs:
           if test -d docs/experiments/results/v106_general_boot2; then
             python -m experiments.general_evidence_v106 --directory docs/experiments/results/v106_general_boot2
           fi
+      - name: Runtime-0.1 retained evidence replay; no weights or neural rerun
+        run: python -m experiments.general_repair_evidence_v1061 --directory docs/experiments/results/v1061_general_repair_first --expect docs/experiments/results/v1061_general_repair_first/replay.json
