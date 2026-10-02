@@ -1,0 +1,31 @@
+name: Architecture Multiplier AM1 contracts
+on:
+  pull_request:
+    paths:
+      - experiments/architecture_multiplier_am1.py
+      - experiments/general_hf_core_cuda_am1.py
+      - experiments/run_architecture_multiplier_am1.py
+      - tests/test_architecture_multiplier_am1.py
+      - docs/research/architecture_multiplier_am1.md
+      - docs/research/critical_path_v1062.md
+      - README.md
+      - pyproject.toml
+      - .github/workflows/architecture_multiplier_am1*.yml
+
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install fixture dependencies only
+        run: |
+          pip install -e . pytest
+      - name: AM1 scientific gate contracts
+        run: |
+          python -m pytest -q tests/test_architecture_multiplier_am1.py
+      - name: Compile accelerator executor without loading model weights
+        run: |
+          python -m py_compile             experiments/architecture_multiplier_am1.py             experiments/general_hf_core_cuda_am1.py             experiments/run_architecture_multiplier_am1.py
