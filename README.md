@@ -56,6 +56,17 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.98 — fresh Q34 holdout FAILS on size/surface shift; no Q5 yet**
+
+The frozen v0.0.97 B_POINT survivor was evaluated once on 24 separately
+registered fresh cases. Both seeds pass the iid64 cell, but both fail the
+preregistered 0.80 utility-recovery floor on m=128 size+surface shift
+(0.7563 / 0.6614) even though discovery burden stays near 2% and complete cost
+remains far below Direct. Decision `Q34_FRESH_HOLDOUT_FAIL_NO_Q5`; no holdout
+tuning and no Q5 advance. The next step is a higher-level equivalence-invariant
+representation redesign using opened development/metamorphic data only. See
+`docs/experiments/v0.0.98.md`.
+
 **v0.0.97 — Q34 development tournament admits frozen point-support to fresh holdout**
 
 A preregistered complete-system tournament compares deterministic, frozen
