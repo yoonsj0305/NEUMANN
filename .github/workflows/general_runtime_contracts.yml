@@ -8,6 +8,9 @@ on:
       - experiments/first_evidence_v106.py
       - tests/test_first_evidence_v106.py
       - tests/test_general_evidence_v106.py
+      - tests/test_general_boot2_first_archive.py
+      - docs/experiments/boot2_first_v106.pins.json
+      - docs/experiments/results/v106_general_boot2*
       - .github/workflows/general_runtime_boot2.yml
       - tests/test_general_runtime_v106.py
       - tests/test_bp_frozen_transfer_m106.py
@@ -23,7 +26,7 @@ jobs:
           python-version: '3.12'
       - run: pip install -e . pytest
       - name: Fixtures only; no model download, fitting or registered corpus
-        run: python -m pytest -q tests/test_general_runtime_v106.py tests/test_bp_frozen_transfer_m106.py tests/test_first_evidence_v106.py tests/test_general_evidence_v106.py
+        run: python -m pytest -q tests/test_general_runtime_v106.py tests/test_bp_frozen_transfer_m106.py tests/test_first_evidence_v106.py tests/test_general_evidence_v106.py tests/test_general_boot2_first_archive.py
   processor-readiness:
     runs-on: ubuntu-24.04
     steps:

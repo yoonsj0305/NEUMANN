@@ -30,3 +30,23 @@ Boot2 uses three distinct, fully opened arithmetic/coding/planning controls and 
 Boot2 is armed only after this repair and both first archives pass CI and merge. Processor-only CI performs no neural inference; retained BP CI replays original witnesses and costs without refitting or fresh solves. New archive pins protect every original raw file, including gzip inputs, events, reports, terminals and setup failures.
 
 No paid API or frontier call is made. Development must next demonstrate useful capability and resource gains against the strongest matched B0/B1/B2/B3 baseline before v0.0.107 fresh holdout. v0.0.108 is the later frontier gap pilot; v0.0.109 is the actual edge gate. Toy interface controls cannot close those gates.
+
+## Boot2 first actual model outcome: readiness FAILED
+
+Run36998148198 completed all15 opened controls and the frozen-core audit, with no training or frontier calls. Workflow SUCCESS means execution and retention completed; **every arm was0/3 and no tool invocation occurred in any query**. The NEUMANN structural loop was therefore not exercised. General capability gate remains NOT_EVALUATED; Q1–Q7 remain OPEN.
+
+| Arm | Accepted | Actual output tokens, all3 queries | Median runtime-query latency (seconds) |
+|---|---:|---:|---:|
+| B0 Direct | 0/3 | 290 | 39.315 |
+| B1 reasoning | 0/3 | 576 | 91.167 |
+| B2 one tool | 0/3 | 751 | 120.240 |
+| B3 iterative tools | 0/3 | 725 | 120.320 |
+| N required representation | 0/3 | 706 | 120.413 |
+
+The9 B2/B3/N queries retained unfinished thought output, rejected it as an action, restarted and reached the120-second complete query limit without a tool call. All3 B1 queries ended at the192-token per-call cutoff inside thought output, although the shared query token cap was512. B0 coding emitted an answer-only object, missing the strict action field; B0 planning emitted a truncated tool-call string despite the direct restriction; B0 math emitted final answer11, rejected by the original exact checker (26). These are protocol/budget and one actual arithmetic failure, not evidence that a functioning NEUMANN architecture lost a hard capability contest. No failed receipt is converted into success.
+
+Core: public Gemma E2B revision3e22461f65e89153144f8adb70e3b8c2cc9845a7, CPU BF16, actual5104297504 parameters. Weights/files/tensor-version audit unchanged; artifact digestbf6d4f9d506f536db6255143e5f21e05b9ccadfea54af281ac278bd49c178d66. Startup69236.473193ms; prior failed startup41258.945662ms is charged in the reported cold-query scenarios. Whole study1573892.639070ms. Peak parent-process RSS7057285120bytes is cumulative, not whole-device or per-arm peak memory. FLOPs, energy, money, thermal and VRAM remain unavailable. Latency above is the retained runtime-query interval; archival/controller overhead is reflected in whole-study time, not a closed Q5 per-query cost claim.
+
+Frozen executor79ff7e5721b61c35929a4d88a4362f711936568c; first archivec57fd111b249d442e63113ae223801b2987e7b82. Every raw query, actual token ID, failed action, manifest, core audit, terminal and setup record is protected by first-byte pins. Independent replay checks original accepted-answer obligations and receipt/accounting consistency without neural generation, fitting or fresh CSP solving; zero original successes remain zero.
+
+Next development must correct action framing and bounded reasoning before another model study or hard capability evaluation. Preserve all first outcomes, keep the old runtime/checker authoritative for their replay, and preregister any revised opened diagnostic separately. Do not open v107 holdout or spend on frontier references on this evidence.
