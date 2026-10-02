@@ -1,0 +1,38 @@
+name: Frozen North Star and Frontier Gap contracts
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/frontier-gap-contracts.yml'
+      - 'neumann1/frontier_gap_contract.py'
+      - 'tests/test_frontier_gap_contract.py'
+      - 'tests/test_north_star_freeze.py'
+      - 'docs/research/**'
+      - 'README.md'
+      - 'pyproject.toml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/frontier-gap-contracts.yml'
+      - 'neumann1/frontier_gap_contract.py'
+      - 'tests/test_frontier_gap_contract.py'
+      - 'tests/test_north_star_freeze.py'
+      - 'docs/research/**'
+      - 'README.md'
+      - 'pyproject.toml'
+permissions:
+  contents: read
+jobs:
+  receipt-contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Synthetic receipt faults only; no models, fitting, solvers or API calls
+        run: python -m unittest discover -s tests -p 'test_frontier_gap_contract.py' -v
+      - name: Frozen user objective and exact legacy namespace
+        run: python -m unittest discover -s tests -p 'test_north_star_freeze.py' -v
+      - name: Original v103/v104 first-byte authority remains unchanged
+        run: python -m unittest discover -s tests -p 'test_q5*archive.py' -v

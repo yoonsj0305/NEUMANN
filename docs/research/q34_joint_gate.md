@@ -1,3 +1,11 @@
+> Historical joint mechanism gate, retained unchanged through v104. Current
+> authority is the [Frozen North Star](frozen_north_star.md). This document's
+> legacy Q3/Q4 and “advance Q5” refer to the old question namespace: the latter
+> involved scaling/transfer, now Q6, alongside current Q5 complete cost.
+> Its 80%/20% preregistration is preserved; a bounded pass does not close current
+> Q3/Q4/Q5/Q7 or automatically arm another LP sweep. See
+> [current fixed gates](core_question_gates.md).
+
 # NEUMANN 1 — Q34 Joint Gate
 
 Updated 2026-10-01. This gate replaces serial Q3-then-Q4 development decisions.
