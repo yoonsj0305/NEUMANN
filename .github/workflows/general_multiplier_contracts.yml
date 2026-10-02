@@ -4,8 +4,12 @@ on:
   pull_request:
     paths:
       - neumann1/general_multiplier_contract.py
+      - neumann1/general_multiplier_runtime.py
       - experiments/general_multiplier_tasks.py
+      - experiments/general_multiplier_accelerator_core.py
+      - experiments/general_multiplier_first.py
       - tests/test_general_multiplier_contract.py
+      - tests/test_general_multiplier_runtime.py
       - docs/research/architecture_multiplier_gate.md
       - docs/experiments/general_multiplier_v1.preregister.json
       - .github/workflows/general_multiplier_contracts.yml
@@ -20,8 +24,10 @@ jobs:
           python-version: '3.12'
       - name: Install contract dependencies only
         run: pip install -e . pytest
-      - name: Pure contracts; no model weights, inference, fitting, tools or sealed data
-        run: python -m pytest -q tests/test_general_multiplier_contract.py
+      - name: Pure contracts and runtime authority; no model weights or accelerator inference
+        run: |
+          python -m pytest -q tests/test_general_multiplier_contract.py tests/test_general_multiplier_runtime.py
+          python -m py_compile             neumann1/general_multiplier_runtime.py             experiments/general_multiplier_accelerator_core.py             experiments/general_multiplier_first.py
       - name: Freeze opened task and budget identities
         run: |
           python - <<'PY'
