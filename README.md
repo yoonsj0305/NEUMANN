@@ -56,6 +56,19 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.99 — equivalence-quotient representation clears the pre-fit gate**
+
+Without fitting, labels, solver calls, timing or v0.0.98 holdout access, 48
+opened development LPs are tested under144 solution-preserving surface views.
+The old CG5 signed-mean channel moves by up to0.172335 and frozen top2m support
+is exactly unchanged in only48/144 views per seed. The preregistered quotient
+features reduce maximum drift to1.78e-15, keep all first-six channels
+non-degenerate, and make the dimension-normalized m32/m64 statistic ratio
+1.00576. Decision `ADMIT_QUOTIENT_POINT_REFIT_ON_OPENED_DEV`. This authorizes
+only a separately preregistered opened-development refit; Q34/Q3/Q4 remain
+open and the sealed v0.0.98 holdout cannot be reused. See
+`docs/experiments/v0.0.99.md`.
+
 **v0.0.98 — fresh Q34 holdout FAILS on size/surface shift; no Q5 yet**
 
 The frozen v0.0.97 B_POINT survivor was evaluated once on 24 separately

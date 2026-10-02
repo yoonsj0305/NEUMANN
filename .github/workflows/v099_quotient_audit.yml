@@ -1,0 +1,35 @@
+name: v099 Quotient Representation Audit
+
+on:
+  push:
+    branches:
+      - research/v099-equivalence-quotient
+    paths:
+      - .github/workflows/v099_quotient_audit.yml
+
+jobs:
+  quotient-audit:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OMP_DYNAMIC: "FALSE"
+      OPENBLAS_NUM_THREADS: "1"
+      OPENBLAS_CORETYPE: "HASWELL"
+      MKL_NUM_THREADS: "1"
+      MKL_CBWR: "COMPATIBLE"
+      BLIS_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+      VECLIB_MAXIMUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install quotient-audit dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e . pytest
+          pip install torch==2.14.0+cpu --index-url https://download.pytorch.org/whl/cpu
+      - name: Run frozen label-free quotient audit
+        run: pytest -q -s tests/test_lp_equivalence_quotient_v099.py
