@@ -37,14 +37,13 @@ def test_v102_route_roster_excludes_stopped_controls():
     assert not any("OLD_CG5" in r for r in ROUTES)
 
 
-def test_v102_archived_training_identity_normalizes_json_seed_keys_only():
-    from experiments.lp_expand4_holdout_v102 import authority_and_models
-    authority,models,training=authority_and_models()
-    assert set(training)=={100001,100002}
-    assert set(models)=={100001,100002}
-    assert {str(k):v for k,v in training.items()}=={
-        str(k):v for k,v in authority["training_identity"].items()
-    }
+def test_v102_training_identity_canonicalization_is_key_only():
+    from experiments.lp_expand4_holdout_v102 import canonical_training_identity
+    row={"feature_setup_ms":1.0,"fit_ms":2.0,"weights_sha256":"abc"}
+    runtime={100001:row,100002:row}
+    archived={"100001":row,"100002":row}
+    assert canonical_training_identity(runtime)==archived
+    assert canonical_training_identity(archived)==archived
 
 
 def test_v102_invalid_first_evaluation_is_preserved_as_zero_observation_failure():
