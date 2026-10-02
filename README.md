@@ -56,6 +56,20 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.100 — quotient refit fixes surface invariance, but m128 size recovery still misses Q34**
+
+The one preregistered matched refit compares identical 433-parameter point
+support MLPs on OLD_CG5 versus the v0.0.99 quotient representation. Quotient
+support becomes exactly invariant on all 16/16 base/surface pairs for both
+seeds, versus 0/16 for OLD_CG5. Both quotient seeds pass m64 and the aggregate
+32-view Q34 arithmetic, with discovery burden below 3.8% and complete/Direct
+near 0.19–0.27. However each m128 cell has one 2m-support miss out of eight and
+utility recovery remains 0.7876–0.7998, below the frozen 0.80 per-cell floor.
+Decision `STOP_QUOTIENT_REFIT_NO_FRESH_HOLDOUT`: no second fit, threshold
+rescue, new holdout, v0.0.98 reuse, or Q5 advance. Surface nuisance is fixed;
+the remaining target is size-generalization/support-width diagnosis without new
+training. See `docs/experiments/v0.0.100.md`.
+
 **v0.0.100 — quotient refit fixes equivalence stability but misses m128 cell gate**
 
 Matched433-parameter OLD_CG5 and QUOTIENT support-only MLPs are trained once
