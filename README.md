@@ -56,6 +56,21 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.104 — first new-class headroom: assignment stopped, basis-pursuit admits frozen transfer only**
+
+The first frozen audit retains32 new construction-class sources and448/448
+original-LP-certified observations. Against native/IPM and applicable optimized
+assignment Direct, free exact-support-and-optimal-dual Oracle fails all four
+assignment cost cells. Stop that family under this executor. Basis-pursuit
+passes all four cells (Oracle/Direct0.633142,0.377829,0.217160,0.137875;16/16
+source wins), admitting only a separately frozen test with both existing
+checkpoints on new sources. No model inference, new fitting or actual transfer
+is established. Both classes share the LP backend; globalQ5 and cross-domain
+reuse remain OPEN. v103's first scaling/capability failure is preserved, not
+rescued by this different optimistic diagnostic. See `docs/experiments/v0.0.104.md`.
+
+### Prior mechanism confirmation — v0.0.102
+
 **v0.0.102 — frozen EXPAND4 passes the fresh Q34 holdout; Q5 is authorized**
 
 A two-phase fresh confirmation freezes 24 new base seeds as 48 m64/m128 ×

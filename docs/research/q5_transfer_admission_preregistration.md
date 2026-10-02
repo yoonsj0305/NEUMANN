@@ -1,7 +1,10 @@
 # Q5 independent-construction admission — v104 first protocol
 
-Status: implementation contract, UNARMED until final-head CI and merge. No new
-registered source, measurement, model forward or fit has occurred at publication.
+Status: first attempt completed and retained. At implementation publication,
+the contract was UNARMED with no registered source or measurement; PR116 was
+merged only after final-head CI. First run36974426284 now retains32 sources and
+448 observations: assignment STOP, basis-pursuit admits frozen transfer only.
+See `../experiments/v0.0.104.md`. No model forward or fitting has occurred.
 The v103 first Q5 result remains `Q5_SCALING_CAPABILITY_OR_ACCOUNTING_UNREACHED`.
 This protocol does not replace that result and cannot close global Q5.
 
@@ -186,7 +189,7 @@ a genuinely different task/representation through a new future preregistration.
 If a family passes, the next iteration must specify frozen-checkpoint transfer,
 fresh unobserved inputs, strong matched Direct and all failures BEFORE opening.
 
-At implementation publication: source/measurement trigger absent, registered
+At original implementation publication: source/measurement trigger absent, registered
 inputs unopened, v103 first archives unchanged, repository release remains103.
 The scientific v104 result document is created only after retained first evidence
 exists. Keep canonical research-journal checkpoints linked to the exact head.

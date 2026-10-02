@@ -5,6 +5,7 @@ on:
     paths:
       - experiments/q5_transfer_*.py
       - tests/test_q5_transfer_contract.py
+      - tests/test_q5_transfer_archive.py
       - tests/test_transfer_runtime_v104.py
       - docs/research/q5_transfer_admission_preregistration.md
       - .github/workflows/q5_transfer_contracts.yml
@@ -19,6 +20,8 @@ jobs:
         with:
           python-version: '3.11'
       - run: python -m unittest discover -s tests -p 'test_q5_transfer_contract.py' -v
+      - name: First v104 receipt and replacement guards; no new inputs
+        run: python -m unittest discover -s tests -p 'test_q5_transfer_archive.py' -v
   runtime-fixtures:
     runs-on: ubuntu-24.04
     env:
@@ -56,3 +59,6 @@ jobs:
           result_pin('docs/experiments/results/q5_first_evaluation')
           print('V103_FIRST_BYTE_PINS_PASS_NO_REPLACEMENT')
           PY
+      - name: Independently replay all first v104 witnesses and complete costs; no solvers or forwards
+        run: |
+          python -m experiments.q5_transfer_first_archive --directory docs/experiments/results/v104_transfer_admission_first

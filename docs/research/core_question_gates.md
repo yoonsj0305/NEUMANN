@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-10-02 through v0.0.103 first Q5 and unarmed v104 admission. Goal: a system with substantially less **total** compute
+Updated 2026-10-02 through v0.0.104 first independent-class headroom. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -286,11 +286,16 @@ mechanism to Q5. v103's first Q5 evaluation retains 1,536 observations and
 `Q5_SCALING_CAPABILITY_OR_ACCOUNTING_UNREACHED`; no favorable rerun, slope or
 pooled result can close it. See `../experiments/v0.0.103.md`.
 
-The unarmed v104 protocol screens two new construction classes for optimistic
-free exact-support-and-original-dual Oracle headroom against native/IPM and
-applicable optimized assignment Direct. It contains zero model evaluation or
-fitting and shares the LP backend; even a pass is neither cross-domain transfer
-nor global Q5 closure. See `q5_transfer_admission_preregistration.md`.
+v104's first zero-model Oracle headroom audit retains32 new assignment/L1
+basis-pursuit sources and448/448 certified observations. Against native/IPM
+and applicable optimized assignment Direct, assignment fails every cost cell
+(ratios1.575965/1.216452/1.047592/0.993206) and is stopped. Basis-pursuit passes
+all cells (0.633142/0.377829/0.217160/0.137875;16/16 source wins), admitting only
+a separately frozen first checkpoint-transfer test, NOT training. Free support
+AND optimal dual is an optimistic ceiling, not deployable model evidence.
+Both classes share the LP backend; no cross-computational-domain or globalQ5
+closure follows. See `../experiments/v0.0.104.md` and
+`q5_transfer_admission_preregistration.md`. Original v103 failure is unchanged.
 
 The broad closure requirements remain: test larger apparent sizes and independent
 domains, randomized surface forms with held-out structural classes, cache
