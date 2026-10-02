@@ -39,32 +39,7 @@ jobs:
       - name: Verify preregistration marker when present
         run: |
           if test -f docs/experiments/general_multiplier_v1.preregister.json; then
-            python - <<'PY'
-            import json
-            from dataclasses import asdict
-            from pathlib import Path
-            from experiments.general_multiplier_tasks import manifest
-            from neumann1.general_multiplier_contract import MultiplierBudget
-            from neumann1.general_runtime_v106 import sha
-
-            marker=json.loads(Path("docs/experiments/general_multiplier_v1.preregister.json").read_text())
-            m=manifest()
-            assert marker["schema"] == "neumann.architecture-multiplier-preregister.v1"
-            assert marker["task_sha256"] == m["task_sha256"]
-            assert marker["model_view_sha256"] == m["model_view_sha256"]
-            assert marker["budget_sha256"] == sha(asdict(MultiplierBudget()))
-            assert marker["task_count"] == 12
-            assert marker["arms"] == ["DIRECT","TOOL","NEUMANN"]
-            assert marker["accelerator_execution_armed"] is False
-            assert marker["new_training"] is False
-            assert marker["frontier_calls"] == 0
-            assert marker["holdout_opened"] is False
-            PY
-            head=$(python - <<'PY'
-            import json
-            from pathlib import Path
-            print(json.loads(Path("docs/experiments/general_multiplier_v1.preregister.json").read_text())["contract_head"])
-            PY
-            )
+            python -c 'import json; from dataclasses import asdict; from pathlib import Path; from experiments.general_multiplier_tasks import manifest; from neumann1.general_multiplier_contract import MultiplierBudget; from neumann1.general_runtime_v106 import sha; marker=json.loads(Path("docs/experiments/general_multiplier_v1.preregister.json").read_text()); m=manifest(); assert marker["schema"]=="neumann.architecture-multiplier-preregister.v1"; assert marker["task_sha256"]==m["task_sha256"]; assert marker["model_view_sha256"]==m["model_view_sha256"]; assert marker["budget_sha256"]==sha(asdict(MultiplierBudget())); assert marker["task_count"]==12; assert marker["arms"]==["DIRECT","TOOL","NEUMANN"]; assert marker["accelerator_execution_armed"] is False; assert marker["new_training"] is False; assert marker["frontier_calls"]==0; assert marker["holdout_opened"] is False'
+            head=$(python -c 'import json; from pathlib import Path; print(json.loads(Path("docs/experiments/general_multiplier_v1.preregister.json").read_text())["contract_head"])')
             git merge-base --is-ancestor "$head" HEAD
           fi
