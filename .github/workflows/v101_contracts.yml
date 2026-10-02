@@ -1,0 +1,28 @@
+name: v101 Final Adaptive Gate Contracts
+
+on:
+  push:
+    branches:
+      - research/v101-final-adaptive-q34-gate
+    paths:
+      - .github/workflows/v101_contracts.yml
+      - docs/research/q3_q4_closure_rule.md
+      - docs/experiments/v0.0.101-preregistration.md
+      - experiments/lp_final_adaptive_v101.py
+      - tests/test_lp_final_adaptive_v101.py
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install contract dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e . pytest
+          pip install torch==2.14.0+cpu --index-url https://download.pytorch.org/whl/cpu
+      - name: Validate frozen v101 contract only
+        run: pytest -q tests/test_lp_final_adaptive_v101.py
