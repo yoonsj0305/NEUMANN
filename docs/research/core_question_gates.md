@@ -399,3 +399,24 @@ This is a representation admission result, not a Q34 pass. It authorizes a
 separately preregistered small point-support refit on opened development and
 metamorphic data only. The v098 holdout remains sealed; any later confirmation
 must use a newly registered holdout.
+
+v100 performs the one authorized matched refit: OLD_CG5 and QUOTIENT use the
+same433-parameter support-only MLP, same48 opened training sources, same two
+initialization seeds and same12-epoch schedule. Evaluation is a new
+development-only 2x2 factorial: m64/m128 × base/equivalent-surface, eight
+cases per cell.
+
+The representation fix survives training exactly: QUOTIENT support is identical
+on16/16 base/surface pairs for both seeds, while matched OLD_CG5 is0/16.
+m64 cells pass comfortably. However each quotient seed has one restricted
+support miss among eight m128 cases. m128 utility remains0.787617/0.799773
+(seed100001 base/surface) and0.796467/0.794749 (seed100002), below the frozen
+0.80 every-cell requirement despite discovery burden around1.5–1.7% and
+complete/Direct around0.25. Aggregate32-view Q34 passes, but the preregistered
+cell conjunction forbids aggregate rescue. Decision:
+`STOP_QUOTIENT_REFIT_NO_FRESH_HOLDOUT`.
+
+No threshold change, second fit, fresh holdout or Q5 advance is authorized.
+The next question must be training-free: determine whether a modest
+verifier-triggered support expansion can recover the rare m128 miss before
+spending on any further learned discoverer.
