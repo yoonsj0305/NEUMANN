@@ -93,8 +93,12 @@ def worker(directory, route):
     with threadpool_limits(1):
         env = preflight(); models = {}; training = {}
         if route.startswith("EXPAND4"):
+            import torch
+            torch.set_num_threads(1)
+            torch.set_num_interop_threads(1)
             from experiments.lp_frozen_support_expansion_v101 import restore_frozen_quotient
             models, training = restore_frozen_quotient()
+            env = preflight()
         manifest = json.loads((Path(directory)/"sources.json").read_text())
         if manifest["protocol"] != protocol(): raise ValueError("worker source contract drift")
         entries = {e["metadata"]["id"]:e for e in manifest["cases"]}
