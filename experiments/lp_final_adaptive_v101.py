@@ -18,6 +18,7 @@ import torch
 from threadpoolctl import threadpool_info, threadpool_limits
 
 from experiments.lp_quotient_refit_v100 import SupportMLP, _base_problem, _surface, point_features
+from experiments.lp_model_study_v088 import pack_weights
 from neumann1 import lp_model_admission_v087 as admission
 from neumann1.lp_certificate_v081 import verify_standard_form_certificate
 from neumann1.lp_q34_support_v097 import adaptive_support_checked, restricted_original_checked, support_with_fallback_checked
@@ -85,6 +86,8 @@ def restore_models(report):
             arr=np.frombuffer(raw,dtype="<f4").reshape(value["shape"]).copy()
             state[name]=torch.tensor(arr)
         model.load_state_dict(state,strict=True)
+        if pack_weights(model)[1] != row["weights_sha256"]:
+            raise ValueError("v101 restored quotient checkpoint identity drift")
         model.eval()
         models[seed]=model
         training[seed]=row
