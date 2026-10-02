@@ -2,6 +2,8 @@
 import copy
 import importlib.util
 import json
+import importlib.metadata
+import os
 import tempfile
 from pathlib import Path
 import unittest
@@ -16,6 +18,15 @@ from neumann1 import lp_portfolio_v084 as storage
 
 def fixture():
     return {"A":audit.assignment_matrix(2),"b":np.ones(3),"c":np.array([4.,1.,2.,3.])}
+
+
+def exact_worker_runtime():
+    from experiments.q5_register import runtime
+    try:
+        return (runtime()==audit.evidence_module().RUNTIME
+                and os.environ.get("OPENBLAS_CORETYPE")=="HASWELL")
+    except importlib.metadata.PackageNotFoundError:
+        return False
 
 
 class TransferRuntimeTests(unittest.TestCase):
@@ -60,7 +71,7 @@ class TransferRuntimeTests(unittest.TestCase):
         native_checked(small,result["native"])
         check_cost(result["total_ms"],result["solve_ms"]+result["verify_ms"])
 
-    @unittest.skipUnless(importlib.util.find_spec("highspy"),"exact runtime required in dedicated CI")
+    @unittest.skipUnless(exact_worker_runtime(),"fresh worker READY requires pinned runtime; exercised in dedicated CI")
     def test_all_four_fresh_workers_ready_without_any_source(self):
         with tempfile.TemporaryDirectory() as directory:
             (Path(directory)/"sources.json").write_text(json.dumps({"cases":[]}))

@@ -40,7 +40,14 @@ jobs:
           pip install -e . --no-deps
           pip install torch==2.14.0+cpu --index-url https://download.pytorch.org/whl/cpu
       - name: Tiny explicit fixtures; no registered corpus or timing claim
-        run: python -m unittest discover -s tests -p 'test_transfer_runtime_v104.py' -v
+        run: |
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'tests')
+          from test_transfer_runtime_v104 import exact_worker_runtime
+          assert exact_worker_runtime(), 'dedicated native-worker fixture must not be skipped'
+          PY
+          python -m unittest discover -s tests -p 'test_transfer_runtime_v104.py' -v
       - name: Original Q5 first source/result authority only
         run: |
           python - <<'PY'
