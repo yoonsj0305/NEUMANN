@@ -114,3 +114,5 @@ jobs:
           fi
       - name: Runtime-0.1 retained evidence replay; no weights or neural rerun
         run: python -m experiments.general_repair_evidence_v1061 --directory docs/experiments/results/v1061_general_repair_first --expect docs/experiments/results/v1061_general_repair_first/replay.json
+      - name: Runtime-0.2 retained Decision-1 evidence replay; no weights or neural rerun
+        run: python -m experiments.general_compact_evidence_v1062 --directory docs/experiments/results/v1062_general_compact_first --expect docs/experiments/results/v1062_general_compact_first/replay.json
