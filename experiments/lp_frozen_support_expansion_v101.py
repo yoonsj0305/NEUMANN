@@ -378,6 +378,41 @@ def cell_metrics(records,sources,route):
     }
 
 
+def expansion_rescue_evidence(overall,cells):
+    """Pre-measurement authority gate: EXPAND4 must earn its extra support work."""
+    result={}
+    for seed in SEEDS:
+        fixed=f"FIXED2_s{seed}"
+        expand=f"EXPAND4_s{seed}"
+        m128=("m128_base","m128_surface")
+        fixed_fallback=sum(
+            cells[fixed][g]["cases"]-cells[fixed][g]["fallback_free_cases"]
+            for g in m128)
+        expand_fallback=sum(
+            cells[expand][g]["cases"]-cells[expand][g]["fallback_free_cases"]
+            for g in m128)
+        fixed_worst_utility=min(cells[fixed][g]["utility_recovery"] for g in m128)
+        expand_worst_utility=min(cells[expand][g]["utility_recovery"] for g in m128)
+        fixed_worst_complete=max(
+            cells[fixed][g]["amortized_complete_ratio"] for g in m128)
+        expand_worst_complete=max(
+            cells[expand][g]["amortized_complete_ratio"] for g in m128)
+        result[str(seed)]={
+            "fixed_m128_full_fallback_views":fixed_fallback,
+            "expand4_m128_full_fallback_views":expand_fallback,
+            "fixed_m128_worst_utility":fixed_worst_utility,
+            "expand4_m128_worst_utility":expand_worst_utility,
+            "fixed_m128_worst_complete_ratio":fixed_worst_complete,
+            "expand4_m128_worst_complete_ratio":expand_worst_complete,
+            "earned":bool(
+                expand_fallback<fixed_fallback
+                and expand_worst_utility>fixed_worst_utility
+                and expand_worst_complete<fixed_worst_complete
+            ),
+        }
+    return result
+
+
 def summarize(records,sources):
     expected={
         (s["id"],route,repeat)
@@ -460,14 +495,21 @@ def summarize(records,sources):
     survivors=[
         f for f,row in family_summary.items() if row["pareto_survivor"]
     ]
+    rescue=expansion_rescue_evidence(overall,cells)
+    expansion_promoted=bool(
+        family_summary["EXPAND4"]["pareto_survivor"]
+        and all(row["earned"] for row in rescue.values())
+    )
     decision=(
         "ADMIT_NEW_FRESH_Q34_HOLDOUT_FOR_FROZEN_SUPPORT_SYSTEM"
-        if survivors else
+        if expansion_promoted else
         "STOP_FIXED_POINT_SUPPORT_FAMILY"
     )
     return {
         "decision":decision,
         "pareto_survivors":survivors,
+        "fresh_holdout_candidate":["EXPAND4"] if expansion_promoted else [],
+        "expansion_rescue_evidence":rescue,
         "families":family_summary,
         "overall":overall,
         "groups":cells,
