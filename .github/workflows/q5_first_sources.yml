@@ -1,0 +1,80 @@
+name: Q5 First sources (unarmed without marker)
+
+on:
+  push:
+    branches: [research/q5-first-scaling]
+    paths: [docs/experiments/q5_first_sources.trigger.json]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: q5-first-sources
+  cancel-in-progress: false
+
+jobs:
+  first-sources:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OMP_DYNAMIC: "FALSE"
+      OPENBLAS_NUM_THREADS: "1"
+      OPENBLAS_CORETYPE: "HASWELL"
+      MKL_NUM_THREADS: "1"
+      MKL_CBWR: "COMPATIBLE"
+      BLIS_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+      VECLIB_MAXIMUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: First attempt and published executor gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test "$GITHUB_RUN_ATTEMPT" = "1"
+          test ! -e docs/experiments/results/q5_first_sources
+          python - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          marker = json.loads(Path("docs/experiments/q5_first_sources.trigger.json").read_text())
+          assert marker["schema"] == "neumann.q5-first-sources-trigger.v1"
+          assert marker["rerun"] is False
+          subprocess.run(["git", "merge-base", "--is-ancestor", marker["published_executor_head"], "HEAD"], check=True)
+          current = subprocess.check_output(["gh", "api", "repos/" + os.environ["GITHUB_REPOSITORY"] + "/branches/main", "--jq", ".commit.sha"], text=True).strip()
+          assert current == marker["latest_main_sha"], "main advanced: stop before evidence"
+          assert marker["fresh_seed_range"] == [103500, 103547]
+          PY
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install frozen runtime
+        run: |
+          pip install numpy==2.3.5 scipy==1.17.0 scikit-learn==1.9.1 threadpoolctl==3.7.0 highspy==1.15.1
+          pip install -e . --no-deps
+          pip install torch==2.14.0+cpu --index-url https://download.pytorch.org/whl/cpu
+      - name: First sources only; no overlapping tests or source work
+        run: |
+          python -m experiments.q5_register --output docs/experiments/results/q5_first_sources --frozen-head "$GITHUB_SHA" --seed-collision-audit-head "$GITHUB_SHA"
+      - name: Commit first receipts including partial failure
+        if: always()
+        run: |
+          if test -d docs/experiments/results/q5_first_sources; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -- docs/experiments/results/q5_first_sources
+            if ! git diff --cached --quiet; then
+              git commit -m "Q5 retain first sources bytes and receipts; no replacement"
+              git push origin "HEAD:${GITHUB_REF_NAME}"
+            fi
+          fi
+      - name: Upload first receipts including partial failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q5-first-sources
+          path: docs/experiments/results/q5_first_sources
+

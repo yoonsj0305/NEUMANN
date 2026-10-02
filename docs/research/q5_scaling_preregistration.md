@@ -85,7 +85,8 @@ possible equal-budget Direct learner or all classical support heuristics.
 ## Measurement and accounting requirements
 
 The CLI implementation is now available; source generation and measurement are
-**not armed in any workflow**. Publish this executor head and pass its fixtures
+**not armed in any workflow**: the two one-shot workflows require separate
+unpublished trigger markers on `research/q5-first-scaling`. Publish this executor head and pass its fixtures
 and exact-runtime preflight before adding a one-shot registration workflow.
 The following frozen rules still apply:
 
@@ -225,3 +226,11 @@ the resulting manifest, then publish a single isolated evaluation trigger.
 Upload AND retain receipts on failure; never rerun a favorable replacement.
 Only a retained real result may use the scientific decision labels. Global Q5
 remains OPEN, and cross-domain testing still needs a separate task contract.
+
+The unarmed source/evaluation workflows reject Actions rerun attempts and
+require a published executor ancestor and an exact latest-main pin. They
+commit and upload first receipts even when the Python stage fails. A new
+directory name does not authorize a replacement attempt. Workflow logs remain
+the notice if installation/runner failure occurs before a reservation or if
+a catastrophic runner termination prevents uploading partial files. Missing
+first bytes block a scientific verdict, never authorize favorable resampling.
