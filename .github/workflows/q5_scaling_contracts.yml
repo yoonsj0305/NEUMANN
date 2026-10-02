@@ -1,0 +1,20 @@
+name: Q5 scaling contracts only
+
+on:
+  pull_request:
+    paths:
+      - neumann1/q5_scaling_contract.py
+      - tests/test_q5_scaling_contract.py
+      - .github/workflows/q5_scaling_contracts.yml
+      - docs/research/q5_scaling_preregistration.md
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pure contract fixtures; no new sources, model or timing
+        run: python -m unittest discover -s tests -p test_q5_scaling_contract.py -v
