@@ -1,8 +1,9 @@
 """Synthetic retained-receipt fault fixtures, not model evidence."""
 from dataclasses import asdict
 import pytest
+import math
 from experiments.general_development_v106 import boot2_tasks
-from experiments.general_evidence_v106 import check_record
+from experiments.general_evidence_v106 import check_record, check_latency_sum
 from neumann1.general_runtime_v106 import Limits, sha
 
 
@@ -66,3 +67,11 @@ def test_successful_repair_preserves_prior_checker_error():
     args[0]["trace_sha256"] = sha(args[0]["events"])
     check_record(*args)
     assert args[0]["verification_errors"] == ["retained prior error"]
+
+
+def test_latency_sum_is_portable_without_allowing_material_cost_change():
+    values = [120452.2817,120413.361069,120181.548313]
+    expected = math.fsum(values)
+    check_latency_sum(math.nextafter(expected,math.inf),values)
+    with pytest.raises(AssertionError):
+        check_latency_sum(expected+0.000001,values)

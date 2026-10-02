@@ -8,8 +8,16 @@ import argparse
 from dataclasses import asdict
 import hashlib
 import json
+import math
 from pathlib import Path
 from neumann1.general_runtime_v106 import ARMS, Limits, MODEL_ID, MODEL_REVISION, sha, verify_original
+
+
+def check_latency_sum(actual, values):
+    # Python 3.12 improved float sum(); 3.11 may differ by one rounding ULP.
+    # Raw first-byte pins stay exact. Permit only two ULPs of arithmetic replay.
+    expected = math.fsum(values)
+    assert math.isfinite(actual) and math.isclose(actual,expected,rel_tol=0.,abs_tol=2*math.ulp(expected))
 
 
 def check_record(record, task, private, core, limits):
@@ -85,7 +93,7 @@ def replay(directory):
         arm_report = report["by_arm"][arm]
         assert arm_report["observations"] == len(subset)
         assert arm_report["accepted"] == sum(r["accepted"] for r in subset)
-        assert arm_report["query_ms"] == sum(r["complete_ms"] for r in subset)
+        check_latency_sum(arm_report["query_ms"],[r["complete_ms"] for r in subset])
         expected_tokens = sum(r["output_tokens"] for r in subset) if len(subset)==3 and all(r["token_accounting_complete"] for r in subset) else None
         assert arm_report["output_tokens"] == expected_tokens
         prior = report.get("prior_failed_setup_ms",0.)
