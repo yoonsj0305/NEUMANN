@@ -1,0 +1,37 @@
+name: General Architecture Multiplier contracts
+
+on:
+  pull_request:
+    paths:
+      - neumann1/general_multiplier_contract.py
+      - experiments/general_multiplier_tasks.py
+      - tests/test_general_multiplier_contract.py
+      - docs/research/architecture_multiplier_gate.md
+      - .github/workflows/general_multiplier_contracts.yml
+
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install contract dependencies only
+        run: pip install -e . pytest
+      - name: Pure contracts; no model weights, inference, fitting, tools or sealed data
+        run: python -m pytest -q tests/test_general_multiplier_contract.py
+      - name: Freeze opened task and budget identities
+        run: |
+          python - <<'PY'
+          from dataclasses import asdict
+          from experiments.general_multiplier_tasks import manifest
+          from neumann1.general_multiplier_contract import MultiplierBudget
+          from neumann1.general_runtime_v106 import sha
+          m=manifest()
+          print("OPENED_MULTIPLIER_TASK_SHA256",m["task_sha256"])
+          print("OPENED_MULTIPLIER_MODEL_VIEW_SHA256",m["model_view_sha256"])
+          print("OPENED_MULTIPLIER_BUDGET_SHA256",sha(asdict(MultiplierBudget())))
+          assert m["count"] == 12
+          assert m["families"] == {"math_logic":4,"coding":4,"constraint_planning":4}
+          PY
