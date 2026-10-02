@@ -87,7 +87,7 @@ engineering diagnosis: all 15 prompts fit under 240 tokens, but the harness stil
 fails readiness because tool-control adherence and retry latency prevent 15/15
 checker completion.
 
-The active next gate is therefore **Accelerated Opened Architecture Multiplier**,
+The active next gate is therefore the [Accelerated Opened Architecture Multiplier](architecture_multiplier_gate.md),
 not Runtime-0.3 and not v107.
 
 Requirements before execution:

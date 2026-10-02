@@ -1,0 +1,53 @@
+name: General Architecture Multiplier contracts
+
+on:
+  pull_request:
+    paths:
+      - neumann1/general_multiplier_contract.py
+      - neumann1/general_multiplier_runtime.py
+      - experiments/general_multiplier_tasks.py
+      - experiments/general_multiplier_accelerator_core.py
+      - experiments/general_multiplier_first.py
+      - tests/test_general_multiplier_contract.py
+      - tests/test_general_multiplier_runtime.py
+      - docs/research/architecture_multiplier_gate.md
+      - docs/experiments/general_multiplier_v1.preregister.json
+      - .github/workflows/general_multiplier_contracts.yml
+
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install contract dependencies only
+        run: pip install -e . pytest
+      - name: Pure contracts and runtime authority; no model weights or accelerator inference
+        run: |
+          python -m pytest -q tests/test_general_multiplier_contract.py tests/test_general_multiplier_runtime.py
+          python -m py_compile             neumann1/general_multiplier_runtime.py             experiments/general_multiplier_accelerator_core.py             experiments/general_multiplier_first.py
+      - name: Freeze opened task and budget identities
+        run: |
+          python - <<'PY'
+          from dataclasses import asdict
+          from experiments.general_multiplier_tasks import manifest
+          from neumann1.general_multiplier_contract import MultiplierBudget
+          from neumann1.general_runtime_v106 import sha
+          m=manifest()
+          print("OPENED_MULTIPLIER_TASK_SHA256",m["task_sha256"])
+          print("OPENED_MULTIPLIER_MODEL_VIEW_SHA256",m["model_view_sha256"])
+          print("OPENED_MULTIPLIER_BUDGET_SHA256",sha(asdict(MultiplierBudget())))
+          assert m["count"] == 12
+          assert m["families"] == {"math_logic":4,"coding":4,"constraint_planning":4}
+          PY
+      - name: Verify preregistration marker when present
+        run: |
+          if test -f docs/experiments/general_multiplier_v1.preregister.json; then
+            python -c 'import json; from dataclasses import asdict; from pathlib import Path; from experiments.general_multiplier_tasks import manifest; from neumann1.general_multiplier_contract import MultiplierBudget; from neumann1.general_runtime_v106 import sha; marker=json.loads(Path("docs/experiments/general_multiplier_v1.preregister.json").read_text()); m=manifest(); assert marker["schema"]=="neumann.architecture-multiplier-preregister.v1"; assert marker["task_sha256"]==m["task_sha256"]; assert marker["model_view_sha256"]==m["model_view_sha256"]; assert marker["budget_sha256"]==sha(asdict(MultiplierBudget())); assert marker["task_count"]==12; assert marker["arms"]==["DIRECT","TOOL","NEUMANN"]; assert marker["accelerator_execution_armed"] is False; assert marker["new_training"] is False; assert marker["frontier_calls"]==0; assert marker["holdout_opened"] is False'
+            head=$(python -c 'import json; from pathlib import Path; print(json.loads(Path("docs/experiments/general_multiplier_v1.preregister.json").read_text())["contract_head"])')
+            git merge-base --is-ancestor "$head" HEAD
+          fi
