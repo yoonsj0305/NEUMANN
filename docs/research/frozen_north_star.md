@@ -130,4 +130,6 @@ and unseen conditions. Only then is the central hypothesis supported at that sco
 
 Current boundary: none of the retained LP/graph/toy-model experiments establishes
 this final test. They remain useful bounded mechanism evidence. The next primary
-line is actual Frontier Gap admission/evaluation, not another automatic LP sweep.
+line builds toward actual Frontier Gap admission/evaluation. The user's subsequent
+execution decision is Runtime-0 → Fresh General Holdout → Frontier Gap → Edge
+Reality; see [the v106 roadmap](general_runtime_v106.md).
