@@ -14,12 +14,17 @@ from neumann1.lp_final_q34_archive_v102 import load_final_evaluation
 MANIFEST="docs/experiments/results/v102_final_evaluation.manifest.json"
 
 
-def test_final_q34_closure_replays_without_model_solver_fit_or_timing():
+@pytest.fixture(scope="module")
+def retained_report():
+    return load_final_evaluation(MANIFEST)
+
+
+def test_final_q34_closure_replays_without_model_solver_fit_or_timing(retained_report):
     with (
         patch.object(runner,"run_study",side_effect=AssertionError("no final rerun")),
         patch.object(runner,"observe_candidate",side_effect=AssertionError("no candidate inference")),
     ):
-        report=load_final_evaluation(MANIFEST)
+        report=retained_report
     summary=report["summary"]
     assert summary["decision"]=="CLOSE_Q3_PASS_Q4_PASS_ADVANCE_Q5"
     assert summary["q3_status"]=="PASS_LP_MECHANISM"
@@ -33,8 +38,8 @@ def test_final_q34_closure_replays_without_model_solver_fit_or_timing():
     assert len(report["records"])==768
 
 
-def test_final_q34_all_four_cells_pass_both_seeds():
-    report=load_final_evaluation(MANIFEST)
+def test_final_q34_all_four_cells_pass_both_seeds(retained_report):
+    report=retained_report
     for route,cells in report["summary"]["groups"].items():
         assert set(cells)=={"m64_base","m64_surface","m128_base","m128_surface"}
         assert all(row["passed"] is True for row in cells.values())
