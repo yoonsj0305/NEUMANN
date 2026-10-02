@@ -35,3 +35,27 @@ def test_v102_route_roster_excludes_stopped_controls():
     )
     assert not any("FIXED2" in r for r in ROUTES)
     assert not any("OLD_CG5" in r for r in ROUTES)
+
+
+def test_v102_archived_training_identity_normalizes_json_seed_keys_only():
+    from experiments.lp_expand4_holdout_v102 import authority_and_models
+    authority,models,training=authority_and_models()
+    assert set(training)=={100001,100002}
+    assert set(models)=={100001,100002}
+    assert {str(k):v for k,v in training.items()}=={
+        str(k):v for k,v in authority["training_identity"].items()
+    }
+
+
+def test_v102_invalid_first_evaluation_is_preserved_as_zero_observation_failure():
+    import json
+    from pathlib import Path
+    notice=json.loads(Path(
+        "docs/experiments/results/v102_invalid_first_evaluation_attempt.json"
+    ).read_text())
+    assert notice["status"]=="INVALID_PRE_MEASUREMENT_AUTHORITY_KEY_NORMALIZATION"
+    assert notice["route_observations"]==0
+    assert notice["timing_observations"]==0
+    assert notice["warmups_completed"]==0
+    assert notice["result_archive_created"] is False
+    assert notice["favorable_rerun"] is False
