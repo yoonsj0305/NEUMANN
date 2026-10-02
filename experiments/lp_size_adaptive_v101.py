@@ -419,9 +419,9 @@ def run_study(frozen_head):
         raise RuntimeError(f"v101 runtime drift: {env!r}")
 
     v100=load_first_refit(V100_MANIFEST)
-    models=restore_models(v100)
     model_loading_started=perf_counter_ns()
-    # restore_models above is intentionally setup, not per-query discovery.
+    models=restore_models(v100)
+    # Checkpoint restoration is reported as setup, not per-query discovery.
     model_loading_ms=(perf_counter_ns()-model_loading_started)/1e6
 
     sources=[generate_source(s) for s in development_specs()]
