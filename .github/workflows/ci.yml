@@ -213,5 +213,7 @@ jobs:
         run: pytest -q -s tests/test_lp_equivalence_quotient_v099.py
       - name: Matched quotient-point refit contracts (no fitting or development generation)
         run: pytest -q tests/test_lp_quotient_refit_v100.py
+      - name: Matched quotient-point first-result replay (no fit/inference/solver/timing)
+        run: pytest -q tests/test_lp_quotient_refit_replay_v100.py
       - name: Matched tiny-Transformer benchmark
         run: python benchmark_v031.py
