@@ -156,7 +156,7 @@ def parse_final(content):
 
 def _tool_call(parsed):
     calls = parsed.get("tool_calls") if type(parsed) is dict else None
-    if calls is None:
+    if calls is None or calls == []:
         return None
     if type(calls) is not list or len(calls) != 1:
         raise ValueError("exactly one native tool call per model turn")
