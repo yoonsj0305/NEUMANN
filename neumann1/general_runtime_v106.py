@@ -282,6 +282,7 @@ def parse_action(raw):
     if text.startswith("```json") and text.endswith("```"):
         text = text[7:-3].strip()
     value = json.loads(text)
+    canonical(value)  # Reject NaN/Infinity before any parsed value enters a receipt.
     if type(value) is not dict or value.get("action") not in ("final", "call", "represent"):
         raise ValueError("invalid action envelope")
     return value
@@ -295,7 +296,7 @@ def run(task, private, arm, core, limits=Limits()):
     """
     if arm not in ARMS or task["family"] not in FAMILIES:
         raise ValueError("registered strategy/family required")
-    identity = dict(core.identity)
+    identity = json.loads(canonical(core.identity))
     if not identity.get("weights_frozen") or not identity.get("revision") or not identity.get("artifact_sha256"):
         raise ValueError("explicit frozen core identity required")
     start = perf_counter_ns()

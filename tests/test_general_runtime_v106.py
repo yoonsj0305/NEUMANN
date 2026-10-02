@@ -106,6 +106,27 @@ def test_missing_model_receipt_is_explicit_incomplete_accounting():
     assert r["model_calls"] == 1 and r["complete_ms"] > 0
 
 
+def test_nonfinite_json_rejected_with_full_raw_receipt_and_token_cost():
+    task, private = development_tasks()[0]
+    core = ScriptedCore([])
+    core.generate = lambda *args: {"raw":'{"action":"final","answer":NaN}',"input_tokens":100,"output_tokens":10}
+    r = run(task,private,"B0",core)
+    assert not r["accepted"] and r["token_accounting_complete"]
+    assert r["output_tokens"] == 10 and "NaN" in r["events"][1]["receipt"]["raw"]
+
+
+def test_nested_artifact_identity_drift_is_failure():
+    task, private = development_tasks()[0]
+    core = ScriptedCore([{"action":"final","answer":"18"}])
+    core.identity["files"] = {"weights":"original"}
+    original = core.generate
+    def drift(*args):
+        r = original(*args); core.identity["files"]["weights"] = "changed"; return r
+    core.generate = drift
+    r = run(task,private,"B0",core)
+    assert not r["accepted"] and "drift" in r["error"] and r["output_tokens"] == 10
+
+
 def test_official_processor_content_used_without_discarding_raw():
     task, private = development_tasks()[0]
     core = ScriptedCore([])
