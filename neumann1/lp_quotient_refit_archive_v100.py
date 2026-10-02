@@ -16,6 +16,18 @@ MAX_JSON_BYTES=64*1024*1024
 
 
 def _numeric_equal(a,b):
+    if type(a) is not type(b):
+        return False
+    if isinstance(a,float):
+        return math.isclose(a,b,rel_tol=1e-12,abs_tol=1e-12)
+    if isinstance(a,dict):
+        return set(a)==set(b) and all(_numeric_equal(a[k],b[k]) for k in a)
+    if isinstance(a,list):
+        return len(a)==len(b) and all(_numeric_equal(x,y) for x,y in zip(a,b))
+    return a==b
+
+
+def _numeric_equal(a,b):
     """Exact structure/discrete values; tolerate only cross-runtime float ulps."""
     if type(a) is not type(b):
         return False
