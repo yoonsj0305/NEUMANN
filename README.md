@@ -56,6 +56,21 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.101 — verifier-triggered 2m→4m expansion clears the development Q34 gate**
+
+No new fitting is performed. The two frozen v0.0.100 quotient point-support
+models are tested on new development seeds under FIXED2 versus EXPAND4.
+FIXED2 again misses the frozen utility floor (worst cell about0.783) and remains
+stopped. EXPAND4 computes the same ranking once, retries at4m only after a
+failed2m original-problem verification, and clears every m64/m128 ×
+base/surface cell for both seeds. Conservative EXPAND4 metrics are minimum
+utility0.866994, maximum discovery burden0.030060, maximum amortized
+complete/Direct0.221243, with32/32 fallback-free views per seed. Each seed
+expands on exactly4/32 views and all four4m attempts certify. Decision
+`ADMIT_NEW_FRESH_Q34_HOLDOUT_FOR_FROZEN_SUPPORT_SYSTEM`. Freeze EXPAND4 only;
+no refit, support-factor tuning, v0.0.98 reuse or Q5 advance. See
+`docs/experiments/v0.0.101.md`.
+
 **v0.0.100 — quotient refit fixes surface invariance, but m128 size recovery still misses Q34**
 
 The one preregistered matched refit compares identical 433-parameter point

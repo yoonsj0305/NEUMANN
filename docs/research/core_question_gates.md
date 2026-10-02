@@ -437,3 +437,23 @@ No threshold change, second fit, fresh holdout or Q5 advance is authorized.
 The next question must be training-free: determine whether a modest
 verifier-triggered support expansion can recover the rare m128 miss before
 spending on any further learned discoverer.
+
+v101 answers that question with no new training. The frozen quotient ranking is
+evaluated on new seeds101200..101215 under FIXED2 and one verifier-triggered
+EXPAND4 retry. FIXED2 again fails the strict cell gate, with worst utility
+0.783242 and only28/32 fallback-free views per seed.
+
+EXPAND4 passes every m64/m128 x base/equivalent-surface cell and the combined
+gate for both seeds. Conservative family coordinates are minimum utility
+0.866994, maximum discovery burden0.030060 and maximum amortized
+complete/Direct0.221243. Both seeds are32/32 fallback-free; exactly4/32 views
+per seed trigger the4m stage and all four expanded attempts certify. The
+preregistered rescue test also passes for each seed: m128 full fallbacks fall
+2->0, worst-cell utility rises above0.8709, and worst-cell complete ratio falls
+below0.1792. Exact top2m base/surface invariance remains16/16.
+
+Decision: `ADMIT_NEW_FRESH_Q34_HOLDOUT_FOR_FROZEN_SUPPORT_SYSTEM`.
+Freeze EXPAND4 only. FIXED2 remains stopped and cannot be revived by favorable
+resampling. The next allowed step is a newly registered fresh Q34 holdout with
+new seeds and the exact frozen EXPAND4 authority. This development result does
+not itself pass global Q34, close Q3/Q4 or authorize Q5.

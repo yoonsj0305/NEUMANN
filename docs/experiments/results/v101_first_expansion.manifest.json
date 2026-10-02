@@ -1,0 +1,384 @@
+{
+  "decision": "ADMIT_NEW_FRESH_Q34_HOLDOUT_FOR_FROZEN_SUPPORT_SYSTEM",
+  "file": "v101_first_expansion.json.gz",
+  "format": "neumann.frozen-support-expansion-v101.archive.v1",
+  "frozen_head": "e6fb888c1ef216085832ea723bbac4ad8953ca22",
+  "gzip_bytes": 3218651,
+  "gzip_sha256": "e468b676e72dc3b8922fdc0fc044a4400fdbba3728362c8ead8af02e4018971f",
+  "json_bytes": 11453071,
+  "json_sha256": "b9d2d830bdd89244f944adbf5c5c4b44c14f106cab8b26042b69b3c4954383b1",
+  "rerun": false,
+  "summary": {
+    "advance_q5": false,
+    "decision": "ADMIT_NEW_FRESH_Q34_HOLDOUT_FOR_FROZEN_SUPPORT_SYSTEM",
+    "expansion_rescue_evidence": {
+      "100001": {
+        "earned": true,
+        "expand4_m128_full_fallback_views": 0,
+        "expand4_m128_worst_complete_ratio": 0.17919367940859848,
+        "expand4_m128_worst_utility": 0.8709752806822597,
+        "fixed_m128_full_fallback_views": 2,
+        "fixed_m128_worst_complete_ratio": 0.26191029945176725,
+        "fixed_m128_worst_utility": 0.7835856279018512
+      },
+      "100002": {
+        "earned": true,
+        "expand4_m128_full_fallback_views": 0,
+        "expand4_m128_worst_complete_ratio": 0.1788800010974962,
+        "expand4_m128_worst_utility": 0.8724803110401294,
+        "fixed_m128_full_fallback_views": 2,
+        "fixed_m128_worst_complete_ratio": 0.2622490886993815,
+        "fixed_m128_worst_utility": 0.7832418616805652
+      }
+    },
+    "families": {
+      "EXPAND4": {
+        "dominated_by": [],
+        "maximum_amortized_complete_ratio": 0.2212432511707686,
+        "maximum_discovery_burden": 0.030060390089731503,
+        "minimum_fallback_free_cases": 8,
+        "minimum_utility_recovery": 0.8669935649657865,
+        "pareto_survivor": true,
+        "passed": true,
+        "routes": [
+          "EXPAND4_s100001",
+          "EXPAND4_s100002"
+        ]
+      },
+      "FIXED2": {
+        "dominated_by": [],
+        "maximum_amortized_complete_ratio": 0.29831811179740503,
+        "maximum_discovery_burden": 0.03281990559311659,
+        "minimum_fallback_free_cases": 7,
+        "minimum_utility_recovery": 0.7832418616805652,
+        "pareto_survivor": false,
+        "passed": false,
+        "routes": [
+          "FIXED2_s100001",
+          "FIXED2_s100002"
+        ]
+      }
+    },
+    "fresh_holdout": false,
+    "fresh_holdout_candidate": [
+      "EXPAND4"
+    ],
+    "global_q3": "OPEN",
+    "global_q4": "OPEN",
+    "groups": {
+      "EXPAND4_s100001": {
+        "m128_base": {
+          "amortized_complete_ratio": 0.17919367940859848,
+          "capability": true,
+          "cases": 8,
+          "discovery_burden": 0.009191965988945417,
+          "expanded_accepted_cases": 1,
+          "expanded_cases": 1,
+          "fallback_free_cases": 8,
+          "passed": true,
+          "reference_capability": true,
+          "route": "EXPAND4_s100001",
+          "subset_accepted_cases": 8,
+          "utility_recovery": 0.8722235492473133
+        },
+        "m128_surface": {
+          "amortized_complete_ratio": 0.1782659072786452,
+          "capability": true,
+          "cases": 8,
+          "discovery_burden": 0.01023765143339425,
+          "expanded_accepted_cases": 1,
+          "expanded_cases": 1,
+          "fallback_free_cases": 8,
+          "passed": true,
+          "reference_capability": true,
+          "route": "EXPAND4_s100001",
+          "subset_accepted_cases": 8,
+          "utility_recovery": 0.8709752806822597
+        },
+        "m64_base": {
+          "amortized_complete_ratio": 0.21754733394108997,
+          "capability": true,
+          "cases": 8,
+          "discovery_burden": 0.02799478581799151,
+          "expanded_accepted_cases": 1,
+          "expanded_cases": 1,
+          "fallback_free_cases": 8,
+          "passed": true,
+          "reference_capability": true,
+          "route": "EXPAND4_s100001",
+          "subset_accepted_cases": 8,
+          "utility_recovery": 0.8733762831383368
+        },
+        "m64_surface": {
+          "amortized_complete_ratio": 0.21802845934925522,
+          "capability": true,
+          "cases": 8,
+          "discovery_burden": 0.029287277149563994,
+          "expanded_accepted_cases": 1,
+          "expanded_cases": 1,
+          "fallback_free_cases": 8,
+          "passed": true,
+          "reference_capability": true,
+          "route": "EXPAND4_s100001",
+          "subset_accepted_cases": 8,
+          "utility_recovery": 0.8698792503758166
+        }
+      },
+      "EXPAND4_s100002": {
+        "m128_base": {
+          "amortized_complete_ratio": 0.1788800010974962,
+          "capability": true,
+          "cases": 8,
+          "discovery_burden": 0.009105015867408216,
+          "expanded_accepted_cases": 1,
+          "expanded_cases": 1,
+          "fallback_free_cases": 8,
+          "passed": true,
+          "reference_capability": true,
+          "route": "EXPAND4_s100002",
+          "subset_accepted_cases": 8,
+          "utility_recovery": 0.8724803110401294
+        },
+        "m128_surface": {
+          "amortized_complete_ratio": 0.17510854959930583,
+          "capability": true,
+          "cases": 8,
+          "discovery_burden": 0.009879697421884832,
+          "expanded_accepted_cases": 1,
+          "expanded_cases": 1,
+          "fallback_free_cases": 8,
+          "passed": true,
+          "reference_capability": true,
+          "route": "EXPAND4_s100002",
+          "subset_accepted_cases": 8,
+          "utility_recovery": 0.8740057484221615
+        },
+        "m64_base": {
+          "amortized_complete_ratio": 0.21681754529955108,
+          "capability": true,
+          "cases": 8,
+          "discovery_burden": 0.028135074381453094,
+          "expanded_accepted_cases": 1,
+          "expanded_cases": 1,
+          "fallback_free_cases": 8,
+          "passed": true,
+          "reference_capability": true,
+          "route": "EXPAND4_s100002",
+          "subset_accepted_cases": 8,
+          "utility_recovery": 0.874317064989421
+        },
+        "m64_surface": {
+          "amortized_complete_ratio": 0.2212432511707686,
+          "capability": true,
+          "cases": 8,
+          "discovery_burden": 0.030060390089731503,
+          "expanded_accepted_cases": 1,
+          "expanded_cases": 1,
+          "fallback_free_cases": 8,
+          "passed": true,
+          "reference_capability": true,
+          "route": "EXPAND4_s100002",
+          "subset_accepted_cases": 8,
+          "utility_recovery": 0.8669935649657865
+        }
+      },
+      "FIXED2_s100001": {
+        "m128_base": {
+          "amortized_complete_ratio": 0.2548131915682687,
+          "capability": true,
+          "cases": 8,
+          "discovery_burden": 0.010023875850092047,
+          "expanded_accepted_cases": 0,
+          "expanded_cases": 0,
+          "fallback_free_cases": 7,
+          "passed": false,
+          "reference_capability": true,
+          "route": "FIXED2_s100001",
+          "subset_accepted_cases": 7,
+          "utility_recovery": 0.7925324861127654
+        },
+        "m128_surface": {
+          "amortized_complete_ratio": 0.26191029945176725,
+          "capability": true,
+          "cases": 8,
+          "discovery_burden": 0.01183802980326411,
+          "expanded_accepted_cases": 0,
+          "expanded_cases": 0,
+          "fallback_free_cases": 7,
+          "passed": false,
+          "reference_capability": true,
+          "route": "FIXED2_s100001",
+          "subset_accepted_cases": 7,
+          "utility_recovery": 0.7835856279018512
+        },
+        "m64_base": {
+          "amortized_complete_ratio": 0.2953101657057196,
+          "capability": true,
+          "cases": 8,
+          "discovery_burden": 0.02959142236596173,
+          "expanded_accepted_cases": 0,
+          "expanded_cases": 0,
+          "fallback_free_cases": 7,
+          "passed": false,
+          "reference_capability": true,
+          "route": "FIXED2_s100001",
+          "subset_accepted_cases": 7,
+          "utility_recovery": 0.7878713244917142
+        },
+        "m64_surface": {
+          "amortized_complete_ratio": 0.29317466377253054,
+          "capability": true,
+          "cases": 8,
+          "discovery_burden": 0.031917443654506265,
+          "expanded_accepted_cases": 0,
+          "expanded_cases": 0,
+          "fallback_free_cases": 7,
+          "passed": false,
+          "reference_capability": true,
+          "route": "FIXED2_s100001",
+          "subset_accepted_cases": 7,
+          "utility_recovery": 0.78842150137862
+        }
+      },
+      "FIXED2_s100002": {
+        "m128_base": {
+          "amortized_complete_ratio": 0.2550388509737155,
+          "capability": true,
+          "cases": 8,
+          "discovery_burden": 0.010269883983243085,
+          "expanded_accepted_cases": 0,
+          "expanded_cases": 0,
+          "fallback_free_cases": 7,
+          "passed": false,
+          "reference_capability": true,
+          "route": "FIXED2_s100002",
+          "subset_accepted_cases": 7,
+          "utility_recovery": 0.7924894222401783
+        },
+        "m128_surface": {
+          "amortized_complete_ratio": 0.2622490886993815,
+          "capability": true,
+          "cases": 8,
+          "discovery_burden": 0.01185809734069512,
+          "expanded_accepted_cases": 0,
+          "expanded_cases": 0,
+          "fallback_free_cases": 7,
+          "passed": false,
+          "reference_capability": true,
+          "route": "FIXED2_s100002",
+          "subset_accepted_cases": 7,
+          "utility_recovery": 0.7832418616805652
+        },
+        "m64_base": {
+          "amortized_complete_ratio": 0.2966315958812372,
+          "capability": true,
+          "cases": 8,
+          "discovery_burden": 0.030099764961608995,
+          "expanded_accepted_cases": 0,
+          "expanded_cases": 0,
+          "fallback_free_cases": 7,
+          "passed": false,
+          "reference_capability": true,
+          "route": "FIXED2_s100002",
+          "subset_accepted_cases": 7,
+          "utility_recovery": 0.7868060764305733
+        },
+        "m64_surface": {
+          "amortized_complete_ratio": 0.29831811179740503,
+          "capability": true,
+          "cases": 8,
+          "discovery_burden": 0.03281990559311659,
+          "expanded_accepted_cases": 0,
+          "expanded_cases": 0,
+          "fallback_free_cases": 7,
+          "passed": false,
+          "reference_capability": true,
+          "route": "FIXED2_s100002",
+          "subset_accepted_cases": 7,
+          "utility_recovery": 0.7834146034458102
+        }
+      }
+    },
+    "new_fitting": false,
+    "overall": {
+      "EXPAND4_s100001": {
+        "amortized_complete_ratio": 0.18344899009979196,
+        "capability": true,
+        "cases": 32,
+        "discovery_burden": 0.011973055031247456,
+        "expanded_accepted_cases": 4,
+        "expanded_cases": 4,
+        "fallback_free_cases": 32,
+        "passed": true,
+        "reference_capability": true,
+        "route": "EXPAND4_s100001",
+        "subset_accepted_cases": 32,
+        "utility_recovery": 0.8715733801637001
+      },
+      "EXPAND4_s100002": {
+        "amortized_complete_ratio": 0.18202526611278563,
+        "capability": true,
+        "cases": 32,
+        "discovery_burden": 0.011820226779124175,
+        "expanded_accepted_cases": 4,
+        "expanded_cases": 4,
+        "fallback_free_cases": 32,
+        "passed": true,
+        "reference_capability": true,
+        "route": "EXPAND4_s100002",
+        "subset_accepted_cases": 32,
+        "utility_recovery": 0.8729580108273384
+      },
+      "FIXED2_s100001": {
+        "amortized_complete_ratio": 0.2628450572281935,
+        "capability": true,
+        "cases": 32,
+        "discovery_burden": 0.013308570029758146,
+        "expanded_accepted_cases": 0,
+        "expanded_cases": 0,
+        "fallback_free_cases": 28,
+        "passed": false,
+        "reference_capability": true,
+        "route": "FIXED2_s100001",
+        "subset_accepted_cases": 28,
+        "utility_recovery": 0.7878922916566079
+      },
+      "FIXED2_s100002": {
+        "amortized_complete_ratio": 0.26349176701133503,
+        "capability": true,
+        "cases": 32,
+        "discovery_burden": 0.01349754849575779,
+        "expanded_accepted_cases": 0,
+        "expanded_cases": 0,
+        "fallback_free_cases": 28,
+        "passed": false,
+        "reference_capability": true,
+        "route": "FIXED2_s100002",
+        "subset_accepted_cases": 28,
+        "utility_recovery": 0.7873518692128587
+      }
+    },
+    "paired_top2_invariance": {
+      "EXPAND4_s100001": {
+        "exact_pairs": 16,
+        "pairs": 16
+      },
+      "EXPAND4_s100002": {
+        "exact_pairs": 16,
+        "pairs": 16
+      },
+      "FIXED2_s100001": {
+        "exact_pairs": 16,
+        "pairs": 16
+      },
+      "FIXED2_s100002": {
+        "exact_pairs": 16,
+        "pairs": 16
+      }
+    },
+    "pareto_survivors": [
+      "EXPAND4"
+    ],
+    "v098_holdout_access": false
+  }
+}
