@@ -21,6 +21,8 @@ The immediate question is:
 
 ## Decision 1 — Compact Runtime readiness
 
+**RESOLVED: FAIL on first actual v0.0.106.2 single-thread CPU run.**
+
 Candidate: v0.0.106.2 Runtime-0.2 Compact Pointer Actions.
 
 This gate evaluates interface/runtime readiness only. It is not a capability
@@ -35,18 +37,25 @@ PASS requires all three primary conditions:
 The retained implementation also requires complete token accounting, no prompt
 admission block, and no actual model deadline.
 
-If the first actual v1062 attempt fails this readiness gate, STOP CPU runtime
-micro-optimization on the mainline. Do not create Runtime-0.3 merely to tune
-prompts, token caps, parser behavior, or single-thread CPU latency. Move the same
-frozen core and matched runtime contract to an accelerator-class execution
-environment for the capability study.
+The first actual v1062 attempt failed this readiness gate: 5/15 actual timeouts,
+only 1/9 tool-enabled observations with a tool call, and only 7/15 observations
+reaching the original checker, despite all 15 prompts passing the 240-token
+admission gate. Therefore CPU runtime micro-optimization is STOPPED on the
+mainline. Do not create Runtime-0.3 merely to tune prompts, token caps, parser
+behavior, compact grammar, or single-thread CPU latency. Move the same frozen
+core and matched runtime contract to an accelerator-class execution environment
+for the capability study.
 
 Edge efficiency is a later Reality Gate. Single-thread CPU inference is not the
 scientific target of the General Capability study.
 
 ## Decision 2 — Architecture Multiplier
 
-Only after Decision 1 is physically runnable, compare the same frozen small core
+**ACTIVE NEXT DECISION.** The capability comparison moves to accelerator-class
+execution because Decision 1 failed on the CPU harness, not because a capability
+comparison failed.
+
+Compare the same frozen small core
 under the strongest matched baseline and NEUMANN orchestration on opened
 development tasks.
 
@@ -129,12 +138,13 @@ evidence. It is no longer the active optimization surface.
 v1062 Compact Runtime
         |
         v
-Decision 1: interface ready?
-   NO -> leave CPU harness; accelerator runtime
-   YES
+Decision 1: interface ready? = NO
         |
         v
-Opened Architecture Multiplier
+LEAVE CPU HARNESS
+        |
+        v
+Accelerated Opened Architecture Multiplier
         |
         v
 Decision 2: matched advantage?
