@@ -1,0 +1,78 @@
+{
+  "schema": "neumann.general-compact-evidence.v1062.v1",
+  "source_run_id": 37013632396,
+  "source_trigger_head": "7a47dba21934675e7f6a1c44c67ee9326bd30db3",
+  "source_evidence_commit": "0185661132822e7b62c37dc8a24d64ca45af1d75",
+  "source_schema": "neumann.general-compact-development.v1062.v1",
+  "source_status": "COMPLETE_COMPACT_REPAIR_DIAGNOSTIC",
+  "query_count": 15,
+  "actual_timeout_count": 5,
+  "prompt_admitted_count": 15,
+  "token_accounting_complete_count": 15,
+  "answer_present_count": 7,
+  "checker_reached_count": 7,
+  "tool_start_count": 1,
+  "tool_enabled_observation_count": 9,
+  "tool_enabled_observations_with_tool_calls": 1,
+  "accepted_count": 2,
+  "by_arm": {
+    "B2": {
+      "observations": 3,
+      "actual_timeouts": 0,
+      "tool_starts": 0,
+      "checker_reached": 0,
+      "answers_present": 0,
+      "accepted": 0,
+      "max_prompt_tokens": 218
+    },
+    "B0": {
+      "observations": 3,
+      "actual_timeouts": 0,
+      "tool_starts": 0,
+      "checker_reached": 3,
+      "answers_present": 3,
+      "accepted": 1,
+      "max_prompt_tokens": 212
+    },
+    "B3": {
+      "observations": 3,
+      "actual_timeouts": 2,
+      "tool_starts": 1,
+      "checker_reached": 1,
+      "answers_present": 1,
+      "accepted": 1,
+      "max_prompt_tokens": 228
+    },
+    "N": {
+      "observations": 3,
+      "actual_timeouts": 3,
+      "tool_starts": 0,
+      "checker_reached": 0,
+      "answers_present": 0,
+      "accepted": 0,
+      "max_prompt_tokens": 229
+    },
+    "B1": {
+      "observations": 3,
+      "actual_timeouts": 0,
+      "tool_starts": 0,
+      "checker_reached": 3,
+      "answers_present": 3,
+      "accepted": 0,
+      "max_prompt_tokens": 215
+    }
+  },
+  "decision_1_primary": {
+    "fifteen_queries_complete_without_timeout": false,
+    "all_tool_enabled_observations_call_tools": false,
+    "all_observations_reach_original_checker": false
+  },
+  "decision_1": "FAIL",
+  "general_capability_gate": "NOT_EVALUATED",
+  "global_questions_closed": [],
+  "new_training": false,
+  "frontier_calls": 0,
+  "holdout_opened": false,
+  "cpu_runtime_mainline": "STOP_MICROTUNING_MOVE_ACCELERATOR",
+  "interpretation": "Runtime-0.2 removed native-schema inflation and all fifteen prompts passed the 240-token admission gate, but five observations still timed out, only one of nine tool-enabled observations executed a tool, and only seven of fifteen reached the original checker. Under the frozen critical-path contract this ends single-thread CPU runtime micro-tuning; it is not a General Capability verdict."
+}
