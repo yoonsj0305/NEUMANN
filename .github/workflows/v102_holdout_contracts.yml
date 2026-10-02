@@ -1,0 +1,31 @@
+name: v102 Fresh EXPAND4 Holdout Contracts
+
+on:
+  push:
+    branches:
+      - research/v102-expand4-fresh-holdout
+    paths:
+      - .github/workflows/v102_holdout_contracts.yml
+      - docs/experiments/v0.0.102-preregistration.md
+      - experiments/lp_expand4_holdout_register_v102.py
+      - experiments/lp_expand4_holdout_v102.py
+      - tests/test_lp_expand4_holdout_register_v102.py
+      - tests/test_lp_expand4_holdout_v102.py
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install contract dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e . pytest highspy==1.15.1
+          pip install torch==2.14.0+cpu --index-url https://download.pytorch.org/whl/cpu
+      - name: Validate v102 preregistration contracts only
+        run: |
+          pytest -q tests/test_lp_expand4_holdout_register_v102.py \
+                    tests/test_lp_expand4_holdout_v102.py

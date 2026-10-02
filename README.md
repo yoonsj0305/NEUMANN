@@ -56,6 +56,24 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.102 — frozen EXPAND4 passes the fresh Q34 holdout; Q5 is authorized**
+
+A two-phase fresh confirmation freezes 24 new base seeds as 48 m64/m128 ×
+base/equivalent-surface views before any route evaluation. The first valid
+evaluation runs only Direct, free Oracle and the two frozen EXPAND4 seeds.
+Both seeds pass every preregistered cell and the combined set. Conservative
+coordinates are minimum utility recovery **0.805591**, maximum discovery
+burden **0.034522**, maximum amortized complete/Direct **0.252877**, with
+48/48 fallback-free views per seed and exact paired top2m invariance 24/24.
+m128 failures at 2m are recovered by the already-frozen verifier-triggered 4m
+stage; all expansions certify. Decision
+`Q34_EXPAND4_FRESH_HOLDOUT_PASS_ADVANCE_Q5`.
+
+This is a fresh Q34 pass for the constructed LP mechanism, not a global Q3/Q4
+closure. Stop local Q3/Q4 tuning on this family and advance the frozen mechanism
+to Q5 scaling/cross-domain/end-to-end tests. See
+`docs/experiments/v0.0.102.md`.
+
 **v0.0.101 — verifier-triggered 2m→4m expansion clears the development Q34 gate**
 
 No new fitting is performed. The two frozen v0.0.100 quotient point-support

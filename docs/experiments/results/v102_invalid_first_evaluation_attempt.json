@@ -1,0 +1,17 @@
+{
+  "schema": "neumann.q34-expand4-fresh-eval-v102.invalid-attempt.v1",
+  "workflow_run_id": 36949396361,
+  "workflow_run_number": 1,
+  "frozen_head": "bcc47c3a256c52617d3078fac16881a1394bbadf",
+  "status": "INVALID_PRE_MEASUREMENT_AUTHORITY_KEY_NORMALIZATION",
+  "source_archive_loaded": true,
+  "model_restore_started": true,
+  "route_observations": 0,
+  "timing_observations": 0,
+  "warmups_completed": 0,
+  "result_archive_created": false,
+  "v098_holdout_access": false,
+  "reason": "v101 training_identity was created with integer seed keys, but JSON archive decoding canonicalized object keys to strings. v102 compared the decoded string-key mapping directly with restore_frozen_quotient()'s int-key runtime mapping and raised before any route observation.",
+  "correction_boundary": "Keep source bytes, checkpoints, weights, routes, thresholds, support factors, evaluation order, timing, and cost accounting unchanged. Canonicalize only the training-identity mapping keys to strings for archive-vs-runtime equality checking. Preserve runtime int keys for investment accounting.",
+  "favorable_rerun": false
+}

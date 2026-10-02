@@ -1,0 +1,60 @@
+name: v102 Register Fresh EXPAND4 Holdout Sources
+
+on:
+  push:
+    branches:
+      - research/v102-expand4-fresh-holdout
+    paths:
+      - .github/workflows/v102_register_sources.yml
+
+permissions:
+  contents: write
+
+jobs:
+  register-sources:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OMP_DYNAMIC: "FALSE"
+      OPENBLAS_NUM_THREADS: "1"
+      OPENBLAS_CORETYPE: "HASWELL"
+      MKL_NUM_THREADS: "1"
+      MKL_CBWR: "COMPATIBLE"
+      BLIS_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+      VECLIB_MAXIMUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install source-registration runtime only
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy==2.3.5 scipy==1.17.0 scikit-learn==1.9.1 threadpoolctl==3.7.0 highspy==1.15.1
+          pip install -e . --no-deps
+      - name: Register fresh source bytes only
+        run: |
+          mkdir -p docs/experiments/results
+          test ! -e docs/experiments/results/v102_fresh_sources.json.gz
+          test ! -e docs/experiments/results/v102_fresh_sources.manifest.json
+          python -m experiments.lp_expand4_holdout_register_v102 \
+            --output-gzip docs/experiments/results/v102_fresh_sources.json.gz \
+            --manifest docs/experiments/results/v102_fresh_sources.manifest.json \
+            --frozen-head "$GITHUB_SHA"
+      - name: Retain immutable registered sources
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/experiments/results/v102_fresh_sources.json.gz \
+                  docs/experiments/results/v102_fresh_sources.manifest.json
+          git commit -m "v102 retain registered fresh holdout sources"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+      - name: Upload registered source evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: v102-fresh-holdout-sources
+          path: |
+            docs/experiments/results/v102_fresh_sources.json.gz
+            docs/experiments/results/v102_fresh_sources.manifest.json
