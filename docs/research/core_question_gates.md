@@ -384,3 +384,18 @@ CG5 signed `D.mean(0)` feature and row-count scaling a principled target for an
 equivalence-quotient redesign, but this is a mechanistic hypothesis, not a
 causal claim from holdout labels. Any successor must use opened development or
 analytic metamorphic data and a new future holdout.
+
+v099 performs that representation-level audit without fitting, labels, solver
+calls, timing or v098 holdout access. Across48 opened v088 training inputs and
+three deterministic equivalence views each, the old CG5 signed-mean channel
+moves by as much as0.172335 and each frozen point selector keeps exactly the
+same top2m support on only48/144 views. The preregistered quotient replacement
+reduces maximum feature drift to1.78e-15, all first-six channels remain
+non-degenerate, and the dimension-normalized slot median ratio m32/m64 is
+1.00576 versus the frozen<=1.20 gate. Decision:
+`ADMIT_QUOTIENT_POINT_REFIT_ON_OPENED_DEV`.
+
+This is a representation admission result, not a Q34 pass. It authorizes a
+separately preregistered small point-support refit on opened development and
+metamorphic data only. The v098 holdout remains sealed; any later confirmation
+must use a newly registered holdout.
