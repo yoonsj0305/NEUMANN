@@ -62,6 +62,23 @@ Neither relabeling the Q numbers nor changing the objective creates new evidence
 No v104 admission automatically authorizes fitting, another architecture or a
 claim about frontier-level reasoning.
 
+## Execution policy after Runtime-0.1
+
+Q1-Q7 remain the fixed scientific question namespace, but they are not seven
+parallel development programs. The active execution policy is frozen in
+[Critical Path Contract after Runtime-0.1](critical_path_v1062.md).
+
+Mainline work is restricted to three decision points:
+
+1. Runtime-0.2 physical/interface readiness.
+2. Opened matched Architecture Multiplier.
+3. One sealed general evaluation that jointly produces the admitted Q5/Q6/Q7
+   evidence.
+
+Until those gates admit expansion, further LP polishing, new solver families,
+4B/7B scaling, frontier API work, Edge optimization, model training and large
+benchmark construction are STOPPED on the mainline.
+
 ## Next primary gate
 
 The user adopted [General Runtime-0](general_runtime_v106.md) as the next primary
