@@ -1,0 +1,16 @@
+{
+  "schema": "neumann.final-q34-holdout-v102.invalid-evaluation-attempt.v1",
+  "workflow_run_id": 36947265864,
+  "workflow_run_number": 1,
+  "frozen_head": "21162ad1d4d59220c39e82f89ee6a97a105999e7",
+  "status": "INVALID_PRE_EVALUATION_ARCHIVE_VALIDATION",
+  "candidate_inference": false,
+  "model_restoration": false,
+  "timing_observations": 0,
+  "solver_calls": 0,
+  "result_archive_created": false,
+  "source_archive_modified": false,
+  "reason": "The byte-exact source loader successfully opened and certificate-validated registered sources, then incorrectly expected oracle_registration_certificate to contain a 'basis' field. The registration certificate schema stores the witness/certificate but not a redundant basis field. A KeyError occurred before load_first_refit, model restoration, candidate inference, solver execution, warmup, or retained timing.",
+  "correction_boundary": "Preserve the source archive, models, routes, thresholds, seeds, order, runtime and cost accounting. Remove only the invalid redundant cert['basis'] equality assertion; instead validate the separately registered source['basis'] shape/range/uniqueness. No experiment parameter changes are authorized.",
+  "favorable_rerun": false
+}
