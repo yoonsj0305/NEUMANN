@@ -1,0 +1,15 @@
+{
+  "schema": "neumann.q34-expand4-fresh-source-v102.invalid-attempt.v1",
+  "workflow_run_id": 36949171261,
+  "workflow_run_number": 4,
+  "frozen_head": "8040f75fd48c37816fa7bee8f7870f8af592c75e",
+  "status": "INVALID_PRE_SOURCE_GENERATION_DEPENDENCY",
+  "source_views_generated": 0,
+  "model_access": false,
+  "route_observations": 0,
+  "timing_observations": 0,
+  "result_archive_created": false,
+  "reason": "Importing the neumann1 package executed neumann1.__init__, which imports learned_representation and therefore requires scikit-learn. The registration runtime omitted scikit-learn, causing ModuleNotFoundError before build(), source generation, model access, route evaluation, or timing.",
+  "correction_boundary": "Keep seeds, source protocol, generation code, checkpoints, routes, thresholds, and evaluation code unchanged. Add only scikit-learn==1.9.1 to the source-registration runtime dependency set.",
+  "favorable_rerun": false
+}
