@@ -437,3 +437,39 @@ No threshold change, second fit, fresh holdout or Q5 advance is authorized.
 The next question must be training-free: determine whether a modest
 verifier-triggered support expansion can recover the rare m128 miss before
 spending on any further learned discoverer.
+
+
+## v0.0.101–102 final Q3/Q4 closure
+
+v101 freezes the quotient checkpoints and removes training entirely. STATIC
+top2m again misses the strict m128 utility gate, but verifier-triggered
+ADAPTIVE top2m->top4m passes all four opened-development cells for both seeds.
+Each seed recovers two m128 fallback-free views relative to STATIC. Decision:
+`ADMIT_FINAL_FRESH_Q34_HOLDOUT_ADAPTIVE`. No model or gate change is then
+allowed.
+
+v102 registers one final fresh holdout before any model access:24 new base LPs
+(seeds100500..100523), one equivalent surface view each,48 views total, four
+cells of12. The valid source registration records model_access=false,
+candidate_inference=false, timing=false and route_evaluation=false. The frozen
+ADAPTIVE contract is then evaluated once with equal original-LP verification
+and all discovery/restricted/fallback/training-amortization costs charged.
+
+Both seeds pass every required cell and the combined set. Across all
+seed-by-cell gates, minimum utility recovery is0.8693019707922695, maximum
+discovery burden0.037030755908723165, and maximum amortized complete/Direct
+0.19252710474293702. Every cell is12/12 fallback-free for both seeds and every
+retained answer verifies.
+
+Final decision:
+`CLOSE_Q3_PASS_Q4_PASS_ADVANCE_Q5`.
+
+Scoped statuses:
+- Q3 = `PASS_LP_MECHANISM`
+- Q4 = `PASS_LP_MECHANISM`
+- Q5 = ADMITTED
+
+This closes Q3/Q4 only for the current constructed-LP mechanism under the
+frozen operational definitions. It does not claim domain-general structural
+discovery/economics. Local LP Q3/Q4 tuning is now frozen; continue with Q5
+scaling, harder/open-set shift, and cross-domain validation.
