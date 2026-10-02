@@ -1,0 +1,61 @@
+name: v101 First Final Adaptive Q34 Gate
+
+on:
+  push:
+    branches:
+      - research/v101-final-adaptive-q34-gate
+    paths:
+      - .github/workflows/v101_first.yml
+
+permissions:
+  contents: write
+
+jobs:
+  first-final-adaptive:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OMP_DYNAMIC: "FALSE"
+      OPENBLAS_NUM_THREADS: "1"
+      OPENBLAS_CORETYPE: "HASWELL"
+      MKL_NUM_THREADS: "1"
+      MKL_CBWR: "COMPATIBLE"
+      BLIS_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+      VECLIB_MAXIMUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install exact retained v101 runtime
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy==2.3.5 scipy==1.17.0 scikit-learn==1.9.1 threadpoolctl==3.7.0 highspy==1.15.1
+          pip install -e . --no-deps
+          pip install torch==2.14.0+cpu --index-url https://download.pytorch.org/whl/cpu
+      - name: First final adaptive development gate only
+        run: |
+          mkdir -p docs/experiments/results
+          test ! -e docs/experiments/results/v101_first_adaptive.json.gz
+          test ! -e docs/experiments/results/v101_first_adaptive.manifest.json
+          python -m experiments.lp_final_adaptive_v101 \
+            --output-gzip docs/experiments/results/v101_first_adaptive.json.gz \
+            --manifest docs/experiments/results/v101_first_adaptive.manifest.json \
+            --frozen-head "$GITHUB_SHA"
+      - name: Retain immutable first result
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/experiments/results/v101_first_adaptive.json.gz \
+                  docs/experiments/results/v101_first_adaptive.manifest.json
+          git commit -m "v101 retain first final adaptive Q34 gate"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+      - name: Upload first-result evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: v101-first-final-adaptive-q34
+          path: |
+            docs/experiments/results/v101_first_adaptive.json.gz
+            docs/experiments/results/v101_first_adaptive.manifest.json
