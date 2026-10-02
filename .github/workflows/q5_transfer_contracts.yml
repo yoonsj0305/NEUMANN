@@ -1,0 +1,58 @@
+name: Q5 independent-family admission contracts
+
+on:
+  pull_request:
+    paths:
+      - experiments/q5_transfer_*.py
+      - tests/test_q5_transfer_contract.py
+      - tests/test_transfer_runtime_v104.py
+      - docs/research/q5_transfer_admission_preregistration.md
+      - .github/workflows/q5_transfer_contracts.yml
+      - .github/workflows/q5_transfer_first.yml
+
+jobs:
+  pure-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -p 'test_q5_transfer_contract.py' -v
+  runtime-fixtures:
+    runs-on: ubuntu-24.04
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OMP_DYNAMIC: "FALSE"
+      OPENBLAS_NUM_THREADS: "1"
+      OPENBLAS_CORETYPE: "HASWELL"
+      MKL_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Exact numerical runtime
+        run: |
+          pip install numpy==2.3.5 scipy==1.17.0 scikit-learn==1.9.1 threadpoolctl==3.7.0 highspy==1.15.1
+          pip install -e . --no-deps
+          pip install torch==2.14.0+cpu --index-url https://download.pytorch.org/whl/cpu
+      - name: Tiny explicit fixtures; no registered corpus or timing claim
+        run: |
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'tests')
+          from test_transfer_runtime_v104 import exact_worker_runtime
+          assert exact_worker_runtime(), 'dedicated native-worker fixture must not be skipped'
+          PY
+          python -m unittest discover -s tests -p 'test_transfer_runtime_v104.py' -v
+      - name: Original Q5 first source/result authority only
+        run: |
+          python - <<'PY'
+          from experiments.q5_first_archive import source_pin, result_pin
+          source_pin('docs/experiments/results/q5_first_sources')
+          result_pin('docs/experiments/results/q5_first_evaluation')
+          print('V103_FIRST_BYTE_PINS_PASS_NO_REPLACEMENT')
+          PY

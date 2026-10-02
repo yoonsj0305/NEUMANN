@@ -1,6 +1,6 @@
 # NEUMANN 1: high-efficiency system research gates
 
-Updated 2026-10-02 through v0.0.98 fresh holdout. Goal: a system with substantially less **total** compute
+Updated 2026-10-02 through v0.0.103 first Q5 and unarmed v104 admission. Goal: a system with substantially less **total** compute
 at fixed independently verified capability, not victory in one solver subroutine.
 "Model" means the complete inference system; a small learned component alone
 does not constitute the desired model. No extrapolation from a synthetic
@@ -280,7 +280,19 @@ evaluated.
 
 ## Q5 — Are scaling and cross-domain reuse real?
 
-**Open.** Only after Q2–Q4 pass: test larger apparent sizes and independent
+**Open.** The constructed Q34 fresh gate passed in v102, advancing its frozen
+mechanism to Q5. v103's first Q5 evaluation retains 1,536 observations and
+32 native Direct capability failures at m256/width32. The decision remains
+`Q5_SCALING_CAPABILITY_OR_ACCOUNTING_UNREACHED`; no favorable rerun, slope or
+pooled result can close it. See `../experiments/v0.0.103.md`.
+
+The unarmed v104 protocol screens two new construction classes for optimistic
+free exact-support-and-original-dual Oracle headroom against native/IPM and
+applicable optimized assignment Direct. It contains zero model evaluation or
+fitting and shares the LP backend; even a pass is neither cross-domain transfer
+nor global Q5 closure. See `q5_transfer_admission_preregistration.md`.
+
+The broad closure requirements remain: test larger apparent sizes and independent
 domains, randomized surface forms with held-out structural classes, cache
 misses and invalidation, and separately report cold and warm traffic.
 Estimate uncertainty in the log-compute slope; do not infer improved slope
