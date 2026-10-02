@@ -7,6 +7,7 @@ on:
       - experiments/bp_frozen_transfer_m106.py
       - experiments/first_evidence_v106.py
       - tests/test_first_evidence_v106.py
+      - tests/test_general_evidence_v106.py
       - .github/workflows/general_runtime_boot2.yml
       - tests/test_general_runtime_v106.py
       - tests/test_bp_frozen_transfer_m106.py
@@ -22,7 +23,7 @@ jobs:
           python-version: '3.12'
       - run: pip install -e . pytest
       - name: Fixtures only; no model download, fitting or registered corpus
-        run: python -m pytest -q tests/test_general_runtime_v106.py tests/test_bp_frozen_transfer_m106.py tests/test_first_evidence_v106.py
+        run: python -m pytest -q tests/test_general_runtime_v106.py tests/test_bp_frozen_transfer_m106.py tests/test_first_evidence_v106.py tests/test_general_evidence_v106.py
   processor-readiness:
     runs-on: ubuntu-24.04
     steps:
@@ -51,3 +52,9 @@ jobs:
           OMP_NUM_THREADS: '1'
           OPENBLAS_NUM_THREADS: '1'
         run: python -m experiments.bp_frozen_transfer_m106 --replay --directory docs/experiments/results/m106_bp_transfer_first
+      - name: Retained General first failure and available original answers; no neural replay
+        run: |
+          python -m experiments.general_evidence_v106 --directory docs/experiments/results/v106_general_development_first
+          if test -d docs/experiments/results/v106_general_boot2; then
+            python -m experiments.general_evidence_v106 --directory docs/experiments/results/v106_general_boot2
+          fi
