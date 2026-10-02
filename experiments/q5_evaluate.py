@@ -126,9 +126,11 @@ class Worker:
             self.close()
             raise RuntimeError("Q5 worker readiness drift")
         self.ready = ready
+        charged_authority = shared_authority_ms if route.startswith("EXPAND4") else 0.0
         self.cold = {"external_launch_ready_ms": external,
                      "shared_authority_preflight_ms": shared_authority_ms,
-                     "cold_start_ms": external + shared_authority_ms,
+                     "authority_preflight_charged_ms": charged_authority,
+                     "cold_start_ms": external + charged_authority,
                      "first_observation": True, "ready": ready}
 
     def receive(self, timeout_s):

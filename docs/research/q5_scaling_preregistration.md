@@ -178,8 +178,10 @@ The registrar and executor are implemented, with these concrete boundaries:
 - `experiments.q5_evaluate`: requires the committed manifest's SHA256, restores
   only the two frozen models, serializes one warmup + three retained repeats in
   the frozen 1536-observation schedule. Each route's first process launch through
-  READY is measured externally. Full parent authority replay is also charged
-  to every deployable cold startup (not hidden in research overhead). Workers
+  READY is measured externally. Full parent learned-authority replay is also
+  charged to each candidate cold startup (not hidden in research overhead).
+  Direct/Oracle do not pay this learned-admission fee: their baseline cannot
+  be inflated with checkpoint checks they do not need. Workers
   remain idle except the current query. Startup is one-time service loading;
   it includes model restoration but cannot be claimed as zero by preloading.
 - Every query charges source read/decompression/digest/array decoding. Candidate

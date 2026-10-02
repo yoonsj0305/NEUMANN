@@ -278,7 +278,8 @@ class Q5ExecutionTests(unittest.TestCase):
                               "training_identity": training if route.startswith("EXPAND4") else None}
                 self.cold = {"external_launch_ready_ms": 1000.0,
                              "shared_authority_preflight_ms": shared_authority_ms,
-                             "cold_start_ms": 1000.0 + shared_authority_ms,
+                             "authority_preflight_charged_ms": shared_authority_ms if route.startswith("EXPAND4") else 0.0,
+                             "cold_start_ms": 1000.0 + (shared_authority_ms if route.startswith("EXPAND4") else 0.0),
                              "first_observation": True, "ready": self.ready}
             def observe(self, case_id):
                 row = next(cursor)
@@ -309,6 +310,9 @@ class Q5ExecutionTests(unittest.TestCase):
             self.assertEqual(terminal["observations"], 1536)
             self.assertEqual(len(list(output.glob("observation_*.json.gz"))), 1536)
             self.assertFalse(report["global_q5_closed"])
+            self.assertEqual(report["cold"]["DIRECT"]["authority_preflight_charged_ms"], 0.0)
+            self.assertEqual(report["cold"]["EXPAND4_s100001"]["authority_preflight_charged_ms"],
+                             report["cold"]["EXPAND4_s100001"]["shared_authority_preflight_ms"])
             self.assertEqual(sum(r["kind"] == "query_start" for r in ledger), 1536)
             with patch.object(replay, "parent_authority", return_value=({}, training)), \
                  patch.object(replay, "validate_records", side_effect=lambda directory, records: records):

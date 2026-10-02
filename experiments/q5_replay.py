@@ -252,12 +252,15 @@ def replay(source_directory, result_directory):
                 or row["ready"]["environment"]["hardware"] != report["environment"]["hardware"]
                 or row["ready"]["environment"]["runtime"] != ev.RUNTIME):
             raise ValueError("Q5 cold first/runtime/hardware drift")
-        for key in ("cold_start_ms", "external_launch_ready_ms", "shared_authority_preflight_ms"):
+        for key in ("cold_start_ms", "external_launch_ready_ms", "shared_authority_preflight_ms", "authority_preflight_charged_ms"):
             ev.finite_ms(row[key])
         if (not row["ready"]["environment"]["threadpools"]
                 or any(p["num_threads"] != 1 for p in row["ready"]["environment"]["threadpools"])):
             raise ValueError("Q5 cold thread drift")
-        if not math.isclose(row["cold_start_ms"], row["external_launch_ready_ms"] + row["shared_authority_preflight_ms"], rel_tol=1e-12):
+        expected_charge = row["shared_authority_preflight_ms"] if route.startswith("EXPAND4") else 0.0
+        if row["authority_preflight_charged_ms"] != expected_charge:
+            raise ValueError("Q5 learned authority fee assigned to Direct/Oracle or hidden")
+        if not math.isclose(row["cold_start_ms"], row["external_launch_ready_ms"] + expected_charge, rel_tol=1e-12):
             raise ValueError("Q5 cold authority cost omitted")
     kinds = [r["kind"] for r in rows]
     if kinds.count("timing_window_start") != 1 or kinds.count("timing_window_end") != 1:
