@@ -173,16 +173,22 @@ def _representation(task, args):
     public = task["public"]
     family = task["family"]
     if family == "math_logic":
-        ir = {"family": family, "expression": args.get("expression", public["expression"])}
-        # reduce_original independently reconstructs required bindings from original task.
+        if args.get("expression") != public["expression"] or type(args.get("bindings")) is not dict:
+            raise ValueError("math representation must carry exact original expression and bindings")
+        ir = {"family": family, "expression": args["expression"]}
+        certified = reduce_original(task, ir)
+        required = certified["ir"]["bindings"]
+        if any(args["bindings"].get(k) != v for k, v in required.items()):
+            raise ValueError("math representation binding mismatch")
+        return certified
     elif family == "constraint_planning":
-        ir = {
-            "family": family,
-            "domains": args.get("domains", public["domains"]),
-            "constraints": args.get("constraints", public["constraints"]),
-        }
+        if args.get("domains") != public["domains"] or args.get("constraints") != public["constraints"]:
+            raise ValueError("planning representation must carry exact original domains/constraints")
+        ir = {"family": family, "domains": args["domains"], "constraints": args["constraints"]}
     else:
-        ir = {"family": family, "requirement": args.get("requirement", public["requirement"])}
+        if args.get("requirement") != public["requirement"]:
+            raise ValueError("coding representation must carry exact original requirement")
+        ir = {"family": family, "requirement": args["requirement"]}
     certified = reduce_original(task, ir)
     return certified
 
