@@ -57,3 +57,12 @@ def test_neumann_requires_retained_certified_representation():
     args[0]["arm"] = "N"
     with pytest.raises(AssertionError):
         check_record(*args)
+
+
+def test_successful_repair_preserves_prior_checker_error():
+    args = fixture()
+    args[0]["events"].insert(2,{"kind":"verification","accepted":False,"error":"retained prior error"})
+    args[0]["verification_errors"] = ["retained prior error"]
+    args[0]["trace_sha256"] = sha(args[0]["events"])
+    check_record(*args)
+    assert args[0]["verification_errors"] == ["retained prior error"]

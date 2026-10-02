@@ -38,8 +38,8 @@ def check_record(record, task, private, core, limits):
     assert record["complete_ms"] >= 0
     if record["accepted"]:
         assert record["complete_ms"] <= limits["wall_ms"]
-        assert not record["verification_errors"]
-        assert any(e["kind"] == "verification" and e["accepted"] for e in events)
+        checks = [e for e in events if e["kind"] == "verification"]
+        assert checks and checks[-1]["accepted"] and checks[-1].get("error") is None
         assert verify_original(task,record["answer"],private,limits["tool_ms"])
         if record["arm"] == "N":
             assert any(e["kind"] == "tool_result" and e.get("tool") == "reduce"
