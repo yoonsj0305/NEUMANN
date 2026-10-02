@@ -81,24 +81,39 @@ benchmark construction are STOPPED on the mainline.
 
 ## Next primary gate
 
-The user adopted [General Runtime-0](general_runtime_v106.md) as the next primary
-surface: v106 opened development, v107 sealed fresh general holdout, v108 Frontier
-Gap Pilot-1, v109 actual Edge Reality. Same frozen small weights and strongest
-matched tool/verification baselines come first, with no new training.
+Runtime-0.2 first actual evidence is now retained and Decision 1 is FAIL on the
+single-thread CPU surface. The compact prompt admission problem is closed as an
+engineering diagnosis: all 15 prompts fit under 240 tokens, but the harness still
+fails readiness because tool-control adherence and retry latency prevent 15/15
+checker completion.
 
-The subsequent surface is [Frontier Gap admission](frontier_gap_evaluation.md):
-original tasks on which an actually executed frozen small baseline fails and an
-actually executed frontier reference succeeds. Register verifier, model revisions,
-eligible tools, source/license, budgets and resource/accounting conventions before
-opening responses. Freeze NEUMANN before frontier solutions/gap membership can
-influence it.
+The active next gate is therefore **Accelerated Opened Architecture Multiplier**,
+not Runtime-0.3 and not v107.
 
-v105 supplies a receipt-only audit interface and synthetic fault tests, NOT a real
-frontier comparison. All seven global questions remain OPEN even if synthetic
-fixtures or one future case-set diagnostic pass. First real execution is UNARMED
-until model/provider access and a bounded spending/execution authority are supplied.
-Do not extract credentials or launch unbudgeted paid calls.
+Requirements before execution:
 
-The user also authorized basis-pursuit frozen transfer on new registered inputs
-with both existing checkpoints, no refit. This subordinate M106_BP experiment
-does not replace the general capability track or close any global question.
+- same frozen Gemma 4 E2B revision,
+- accelerator-class execution environment,
+- strongest matched E2B baseline and NEUMANN use identical core weights,
+- equal eligible external tools and original-task checker authority,
+- pre-registered model/tool-call and complete resource accounting,
+- opened development tasks only,
+- no frontier reference and no sealed holdout.
+
+Primary decision:
+
+```
+Does E2B + NEUMANN materially improve capability per complete resource over
+the strongest matched E2B baseline?
+```
+
+A negative result pivots architecture. A positive result admits exactly one
+sealed general evaluation. Q5/Q6/Q7 remain distinct scientific questions but
+must not branch into independent development programs.
+
+The subsequent sealed surface is [Frontier Gap admission](frontier_gap_evaluation.md)
+only if the opened Architecture Multiplier passes. v107/v108 identifiers remain
+reserved historical roadmap labels; their execution is not authorized by the
+Runtime-0.2 run.
+
+All seven global questions remain OPEN.
