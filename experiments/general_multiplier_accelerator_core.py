@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from pathlib import Path
 import resource
 import subprocess
@@ -67,10 +68,11 @@ class FrozenAcceleratorCore:
         torch.manual_seed(12601)
         torch.cuda.manual_seed_all(12601)
 
+        access_token = os.environ.get("HF_TOKEN")
         self.path = Path(snapshot_download(
             FROZEN_MODEL_ID,
             revision=FROZEN_MODEL_REVISION,
-            token=False,
+            token=access_token if access_token else False,
         ))
         self.files = {
             str(path.relative_to(self.path)): _file_hash(path)
