@@ -2,15 +2,16 @@
 
 ## Current state
 
-`EXECUTOR_IMPLEMENTED_NO_NEW_EVIDENCE` — the per-case registrar, serial
-whole-path executor, retained replay and exact-runtime authority preflight are
-implemented. No new Q5 LP has been generated, no model forward has run, and no
-Q5 experimental timing has been performed. The thirty unit tests are synthetic
-analysis/fault-injection fixtures, not Q5 evidence. The metadata protocol's
-original contract-only status remains frozen as provenance. This change
-does not revise v102 or increment its experimental version.
+`FIRST_Q5_SLICE_COMPLETE_CAPABILITY_UNREACHED` — the first registered 48 bases/
+96 views and all 1536 observations are retained. The frozen decision is
+`Q5_SCALING_CAPABILITY_OR_ACCOUNTING_UNREACHED`: 32 Direct observations on
+m256/width32 miss capability; 18 other cell gates fail on cost. No replacement
+run, refit or gate change is authorized. See [v0.0.103](../experiments/v0.0.103.md)
+for first-byte pins, exact failures and eligible slope evidence. The metadata
+protocol's original contract-only status remains frozen as provenance; it is
+not the current execution status. Global Q5 remains OPEN.
 
-The latest result is v0.0.102, not the interrupted v0.0.94 candidate. Its
+The parent result is v0.0.102, not the interrupted v0.0.94 candidate. Its
 fresh constructed-LP Q34 result authorizes a Q5 test. End local Q3/Q4 polishing,
 refitting, support-width search and threshold rescue on that family.
 
@@ -84,10 +85,11 @@ possible equal-budget Direct learner or all classical support heuristics.
 
 ## Measurement and accounting requirements
 
-The CLI implementation is now available; source generation and measurement are
-**not armed in any workflow**: the two one-shot workflows require separate
-unpublished trigger markers on `research/q5-first-scaling`. Publish this executor head and pass its fixtures
-and exact-runtime preflight before adding a one-shot registration workflow.
+The executor passed final-head CI and was merged in PR114 before the separate
+first-source and first-evaluation trigger markers were published on
+`research/q5-first-scaling`. Both first workflows completed once. Their markers
+are retained as provenance, not invitations to run again. The original
+preregistered requirements below remain unchanged.
 The following frozen rules still apply:
 
 1. Freeze the exact dependency/BLAS/thread/hardware envelope before sources.
@@ -213,8 +215,9 @@ Ubuntu24.04 runners, HASWELL BLAS dispatch, one numerical/Torch thread.
 Actual CPU/kernel/affinity/BLAS metadata are retained and must match across
 routes on the single measurement runner. This envelope does not assert that
 separately scheduled source-registration and timing runners have identical CPUs.
-CI's authority job only replays old bytes and restores old weights. It never
-generates Q5 inputs, executes inference or provides a cold/timing sample.
+CI's authority job replays parent bytes/restores old weights and independently
+replays the hard-pinned first Q5 bytes, witnesses and cost ledger. It never
+generates Q5 inputs, executes inference or provides a new cold/timing sample.
 
 Fixture-discovered correction before any Q5 evidence: equal analytic exponents
 produced a tiny negative OLS difference from floating-point roundoff. Differences
@@ -222,14 +225,13 @@ within 1e-12 are now exactly zero before the frozen bootstrap decision; such
 noise cannot count as a strictly improved slope. Size/width/seed selection,
 cost/utility/burden thresholds and bootstrap design are unchanged.
 
-Next: after final-head CI/preflight passes, audit latest seed use, publish a
-single registration trigger, commit all first registered bytes/receipts, pin
-the resulting manifest, then publish a single isolated evaluation trigger.
-Upload AND retain receipts on failure; never rerun a favorable replacement.
-Only a retained real result may use the scientific decision labels. Global Q5
-remains OPEN, and cross-domain testing still needs a separate task contract.
+Next: independently replay the retained first evidence, publish its negative
+boundary, pass final-head CI and merge. Do not rescue this opened slice by
+dropping small sizes, failed Direct cases, square controls or a surface view.
+Global Q5 remains OPEN; any subsequent task/cross-domain source and capability
+contract must be separately frozen before opening new evidence.
 
-The unarmed source/evaluation workflows reject Actions rerun attempts and
+The one-shot source/evaluation workflows reject Actions rerun attempts and
 require a published executor ancestor and an exact latest-main pin. They
 commit and upload first receipts even when the Python stage fails. A new
 directory name does not authorize a replacement attempt. Workflow logs remain

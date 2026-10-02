@@ -9,8 +9,11 @@ on:
       - experiments/q5_*.py
       - tests/test_q5_scaling_contract.py
       - tests/test_q5_execution.py
+      - tests/test_q5_first_archive.py
       - .github/workflows/q5_scaling_contracts.yml
       - docs/research/q5_scaling_preregistration.md
+      - docs/experiments/results/q5_first_sources/**
+      - docs/experiments/results/q5_first_evaluation/**
 
 jobs:
   contracts:
@@ -49,6 +52,9 @@ jobs:
       - name: Replay parent bytes and restore weights only (zero new inputs/forwards/solves)
         run: |
           python -m experiments.q5_preflight --output /tmp/q5-authority-preflight --frozen-head "$GITHUB_SHA"
+      - name: Replay immutable first Q5 witnesses and costs (forwards and solves forbidden)
+        run: |
+          python -m experiments.q5_first_archive --sources docs/experiments/results/q5_first_sources --results docs/experiments/results/q5_first_evaluation
       - name: Preserve preflight receipts including failure
         if: always()
         uses: actions/upload-artifact@v4
