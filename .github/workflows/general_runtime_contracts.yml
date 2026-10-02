@@ -50,7 +50,17 @@ jobs:
           from neumann1.general_runtime_v106 import MODEL_ID, MODEL_REVISION
           processor=AutoProcessor.from_pretrained(MODEL_ID,revision=MODEL_REVISION,token=False,trust_remote_code=False)
           assert isinstance(processor,Gemma4Processor)
-          print('PINNED_PROCESSOR_READY_NO_WEIGHTS_NO_FORWARD')
+          from neumann1.general_runtime_repair_v1061 import _schemas
+          messages=[
+              {'role':'system','content':'Bounded native action controller.'},
+              {'role':'user','content':'Return one bounded action.'},
+          ]
+          rendered=processor.apply_chat_template(
+              messages, tools=_schemas('N'), tokenize=True, return_dict=True,
+              return_tensors='pt', add_generation_prompt=True, enable_thinking=False)
+          assert int(rendered['input_ids'].shape[-1]) > 0
+          assert int(rendered['input_ids'].shape[-1]) < 4096
+          print('PINNED_PROCESSOR_READY_NATIVE_REPAIR_TOOLS_NO_WEIGHTS_NO_FORWARD')
           PY
       - name: Original retained BP witnesses and full costs; no fit/forward/solve
         env:
