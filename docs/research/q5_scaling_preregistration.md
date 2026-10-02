@@ -144,6 +144,20 @@ These labels are reserved for a separately retained first evaluation, not this
 contract. Four sizes and four bases per cell provide limited empirical slope
 evidence, not an asymptotic law. Q5 stays globally OPEN in every outcome here.
 
+## Contract CI correction history
+
+The first dedicated contract workflow, run36952164612, failed before fixtures:
+the test imported the package's legacy eager `__init__`, which requires
+scientific/model dependencies even though this new module uses only the
+standard library. Local checking used a partial source snapshot and therefore
+did not expose that package initialization dependency. Preserve this failure.
+
+Only the fixture import was corrected to load the exact standalone module by
+file path. No package exports or scientific runtime were changed. This keeps
+the dedicated contract job genuinely model/solver/dependency-free. The Q5
+metadata, costs, gates, bootstrap and absence of experimental evidence are
+unchanged. The corrected fixtures must actually execute before merge.
+
 ## Safe next execution point
 
 Implement and test a model-free multipart/per-case source registration archive,

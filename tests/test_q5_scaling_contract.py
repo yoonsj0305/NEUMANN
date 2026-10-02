@@ -1,9 +1,17 @@
 """Synthetic contract fixtures only: no model, LP generation, or timing."""
 import copy
+import importlib.util
 import math
 import unittest
+from pathlib import Path
 
-from neumann1 import q5_scaling_contract as q5
+# The package's legacy __init__ eagerly imports scientific/model dependencies.
+# Load this standalone pure-stdlib analysis module without executing that init.
+_spec = importlib.util.spec_from_file_location(
+    "q5_scaling_contract", Path(__file__).resolve().parents[1] / "neumann1" / "q5_scaling_contract.py"
+)
+q5 = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(q5)
 
 
 class Q5ScalingContractTests(unittest.TestCase):
