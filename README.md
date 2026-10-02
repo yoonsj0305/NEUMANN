@@ -30,7 +30,7 @@ G={T: an actually executed frozen small baseline fails AND a frontier reference
 succeeds}, independently verified on original tasks. The v0.0.105
 [receipt-only contract](docs/research/frontier_gap_evaluation.md) retains complete
 paired outcomes, original/answer/trace hashes and six measured/estimated/unknown
-resource axes. Its 21 synthetic fault tests are NOT model or frontier evidence.
+resource axes. Its 23 synthetic fault tests are NOT model or frontier evidence.
 No real model calls, new fitting or new frontier corpus is armed by this release.
 
 A real first run requires frozen model/provider access, source/license-approved

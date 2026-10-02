@@ -218,5 +218,20 @@ class FrontierGapTests(unittest.TestCase):
         p=subprocess.run([sys.executable,'-c',code],cwd=ROOT,capture_output=True,text=True)
         self.assertEqual(p.returncode,0,p.stderr)
 
+    def test_duplicate_original_cannot_inflate_case_or_family_coverage(self):
+        data=fixture()
+        data[0]['tasks'][1]['problem_sha256']=data[0]['tasks'][0]['problem_sha256']
+        with self.assertRaisesRegex(ValueError,'duplicate original'):run(data)
+
+    def test_undefined_family_ratio_is_partial_evidence_not_a_measured_failure(self):
+        data=fixture()
+        for row in data[1]:
+            if row['task_id']=='0':
+                row['resources']['vram_bytes']['value']=0.;rebind_trace(row,data[2])
+        result=run(data)
+        self.assertAlmostEqual(result['resource_ratios']['vram_bytes'],.4)
+        self.assertIsNone(result['family_cells'][0]['resource_ratios']['vram_bytes'])
+        self.assertEqual(result['decision'],'PARTIAL_RESOURCE_EVIDENCE_NO_FULL_NORTH_STAR_CLAIM')
+
 
 if __name__=='__main__':unittest.main()

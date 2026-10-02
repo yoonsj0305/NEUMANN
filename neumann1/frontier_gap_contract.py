@@ -68,6 +68,8 @@ def validate_manifest(m):
         raise ValueError("frozen repeat count required")
     if (not m["tasks"] or len({t["id"] for t in m["tasks"]})!=len(m["tasks"])):
         raise ValueError("unique nonempty frozen original corpus required")
+    if len({t["problem_sha256"] for t in m["tasks"]})!=len(m["tasks"]):
+        raise ValueError("duplicate original task is not independent coverage")
     for t in m["tasks"]:
         _text(t["id"]);_text(t["family"]);_hash(t["problem_sha256"])
         _text(t["source"]);_text(t["license"])
@@ -204,9 +206,11 @@ def audit(manifest, records, blobs, *, verify_original, validate_trace):
     if not gap:decision="NO_VERIFIED_FRONTIER_GAP"
     elif not coverage:decision="INSUFFICIENT_GAP_COVERAGE"
     elif not iso:decision="CAPABILITY_UNREACHED_NO_ISO_CAPABILITY_CLAIM"
-    elif any(ratios[k] is None for k in METRICS):decision="PARTIAL_RESOURCE_EVIDENCE_NO_FULL_NORTH_STAR_CLAIM"
+    elif (any(ratios[k] is None for k in METRICS)
+          or any(c["resource_ratios"][k] is None for c in cells for k in METRICS)):
+        decision="PARTIAL_RESOURCE_EVIDENCE_NO_FULL_NORTH_STAR_CLAIM"
     elif (any(ratios[k]>p["resource_ratio_max"][k] for k in METRICS)
-          or any(c["resource_ratios"][k] is None or c["resource_ratios"][k]>p["resource_ratio_max"][k]
+          or any(c["resource_ratios"][k]>p["resource_ratio_max"][k]
                  for c in cells for k in METRICS)):decision="MEASURED_RESOURCE_GATE_FAILED"
     else:decision="CASE_SET_GATE_PASSED_NOT_GLOBAL_CLOSURE"
     return {"question_namespace":NAMESPACE,"decision":decision,"gap_task_ids":gap,
