@@ -96,7 +96,9 @@ def authority_and_models():
     if summary["fresh_holdout_candidate"]!=["EXPAND4"]:
         raise ValueError("v102 authority candidate drift")
     models,training=restore_frozen_quotient()
-    if authority["training_identity"]!=training:
+    archived_training={str(k):v for k,v in authority["training_identity"].items()}
+    runtime_training={str(k):v for k,v in training.items()}
+    if archived_training!=runtime_training:
         raise ValueError("v102 frozen checkpoint/training identity drift")
     return authority,models,training
 
