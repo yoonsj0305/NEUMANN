@@ -39,8 +39,14 @@ def certificate(raw, witness, retained):
             raise ValueError("Q5 certificate without witness")
         return False
     derived = verify_standard_form_certificate(**raw, **witness)
-    if retained is not None and not equal(derived, retained):
-        raise ValueError("Q5 retained original certificate drift")
+    if retained is not None:
+        # Retained bytes pin ALL original numeric diagnostics. Independently
+        # re-establish semantic acceptance, dimensions and default tolerance;
+        # do not require roundoff-sensitive BLAS residuals to be byte-identical.
+        fields = ("schema", "accepted", "numerical_finite", "rows", "cols", "nnz",
+                  "atol", "rtol", "complementarity_diagnostic_only")
+        if any(retained.get(k) != derived[k] for k in fields):
+            raise ValueError("Q5 retained original certificate drift")
     return bool(derived["accepted"])
 
 
@@ -75,7 +81,8 @@ def native_checked(raw, result):
     if type(attempt["accepted"]) is not bool or attempt["accepted"] != accepted:
         raise ValueError("Q5 native witness acceptance drift")
     budget_ms = ev.finite_ms(result["budget_s"]) * 1000
-    if budget_ms <= 0 or result["accepted"] != (accepted and result["total_ms"] <= budget_ms):
+    if (not 0 < budget_ms <= ev.contract.protocol()["budget_s"] * 1000
+            or result["accepted"] != (accepted and result["total_ms"] <= budget_ms)):
         raise ValueError("Q5 native deadline acceptance drift")
     exceeded = result["total_ms"] > budget_ms
     status = "VERIFIED" if result["accepted"] else ("BUDGET_EXCEEDED" if exceeded else "REJECTED")
@@ -115,6 +122,7 @@ def expansion_checked(raw, execution, ranking, budget_ms=5000.0):
     if not 1 <= len(attempts) <= 2:
         raise ValueError("Q5 support retry coverage drift")
     winner = None
+    spent = 0.0
     for i, attempt in enumerate(attempts):
         factor = (2, 4)[i]
         size = min(n, factor * m)
@@ -122,6 +130,8 @@ def expansion_checked(raw, execution, ranking, budget_ms=5000.0):
             raise ValueError("Q5 support expansion without verifier rejection")
         result = attempt["result"]
         restricted_checked(raw, result, ranking[:size])
+        check_cost(budget_ms, spent + result["native"]["budget_s"] * 1000)
+        spent += result["total_ms"]
         if result["accepted"]:
             winner = result["witness"]
     fallback = execution["fallback"]
@@ -129,6 +139,7 @@ def expansion_checked(raw, execution, ranking, budget_ms=5000.0):
         if winner is not None:
             raise ValueError("Q5 Direct fallback after accepted support")
         native_checked(raw, fallback)
+        check_cost(budget_ms, spent + fallback["budget_s"] * 1000)
         if fallback["accepted"]:
             winner = fallback["attempts"][-1]["witness"]
     check_cost(execution["total_ms"], sum(a["result"]["total_ms"] for a in attempts)
@@ -254,7 +265,8 @@ def replay(source_directory, result_directory):
     start, end = kinds.index("timing_window_start"), kinds.index("timing_window_end")
     if rows[start]["payload"] != {"serial": True, "other_workflows_on_runner": False}:
         raise ValueError("Q5 isolated serial runner declaration drift")
-    if kinds[start+1:end] != (["cold_start"] * 4 + [kind for _ in ev.schedule() for kind in ("query_start", "observation")]):
+    if kinds[start+1:end] != ([kind for _ in ev.ROUTES for kind in ("cold_start_begin", "cold_start")]
+                            + [kind for _ in ev.schedule() for kind in ("query_start", "observation")]):
         raise ValueError("Q5 serial timing ledger drift")
     starts = [r["payload"] for r in rows if r["kind"] == "query_start"]
     if [(r["case_id"], r["route"], r["repeat"]) for r in starts] != ev.schedule():

@@ -219,7 +219,8 @@ class Q5ExecutionTests(unittest.TestCase):
             shape = (2, 6)
         raw = {"A": Matrix()}
         attempts = [{"support_factor": f, "support_size": min(6, f * 2),
-                     "result": {"accepted": True, "witness": {}, "total_ms": 1.0}} for f in (2, 4)]
+                     "result": {"accepted": True, "witness": {}, "total_ms": 1.0,
+                                "native": {"budget_s": 1.0}}} for f in (2, 4)]
         with patch.object(replay, "restricted_checked"):
             with self.assertRaises(ValueError):
                 replay.expansion_checked(raw, {"attempts": attempts}, list(range(6)))
@@ -228,8 +229,9 @@ class Q5ExecutionTests(unittest.TestCase):
         class Matrix:
             shape = (2, 6)
         attempts = [{"support_factor": f, "support_size": min(6, f * 2),
-                     "result": {"accepted": False, "witness": None, "total_ms": 1.0}} for f in (2, 4)]
-        execution = {"attempts": attempts, "fallback": {"accepted": False, "total_ms": 2.0}, "total_ms": 3.0}
+                     "result": {"accepted": False, "witness": None, "total_ms": 1.0,
+                                "native": {"budget_s": 1.0}}} for f in (2, 4)]
+        execution = {"attempts": attempts, "fallback": {"accepted": False, "total_ms": 2.0, "budget_s": 1.0}, "total_ms": 3.0}
         with patch.object(replay, "restricted_checked"), patch.object(replay, "native_checked"):
             with self.assertRaises(ValueError):
                 replay.expansion_checked({"A": Matrix()}, execution, list(range(6)))

@@ -195,7 +195,14 @@ def evaluate(source_directory, output, frozen_head, expected_source_manifest_sha
         timing_start = perf_counter_ns()
         attempt.append("timing_window_start", {"serial": True, "other_workflows_on_runner": False})
         for route in ev.ROUTES:
-            instance = Worker(source_directory, route, output, authority_ms)
+            attempt.append("cold_start_begin", {"route": route})
+            cold_began = perf_counter_ns()
+            try:
+                instance = Worker(source_directory, route, output, authority_ms)
+            except BaseException as exc:
+                attempt.append("cold_start_failed", {"route": route, "elapsed_ms": elapsed_ms(cold_began),
+                                                       "error": f"{type(exc).__name__}: {exc}"})
+                raise
             workers[route] = instance
             if instance.ready["environment"]["hardware"] != env["hardware"]:
                 raise RuntimeError("Q5 cross-route hardware drift")
