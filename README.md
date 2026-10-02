@@ -1,24 +1,52 @@
 # NEUMANN 1
 
-**NEUMANN 1** is a research-engineering project for **Structural Compression: reducing computational degrees of freedom before solving**.
+**Frontier-level problem solving with minimum necessary computation.**
 
-> Discover the minimal sufficient computational structure, execute only what remains, and verify the original problem.
+The goal is not a small model, LP optimizer, solver router or tool-use wrapper.
+Solve difficult original problems that frontier systems actually solve, at the
+same useful capability with much less complete compute, memory, energy, latency
+and monetary cost. Learned intelligence discovers meaning/structure and chooses
+computation; cheaper derivable work belongs outside neural inference.
 
-## Research thesis freeze
+## Frozen North Star — highest authority
 
-After v0.0.31, NEUMANN is no longer positioned primarily as "LLM + symbolic solver", "structure-first reasoning", or "IR + solver + verifier".
+The user's 2026-10-02 [Frozen North Star](docs/research/frozen_north_star.md)
+fixes Q1–Q7, NOT architectures:
 
-Those mechanisms are treated as enabling components with substantial prior art.
+- Q1 computation reduction; Q2 correctness/capability preservation.
+- Q3 oracle-free useful hidden structure; Q4 sufficiently cheap discovery.
+- Q5 complete end-to-end cost versus strong Direct.
+- Q6 unseen/new-family/open-set/scaling generalization.
+- Q7 actual frontier capability-gap recovery.
 
-The central research hypothesis is now:
+Do not compute what can be eliminated. Do not learn what can be derived more
+cheaply. Never spend compute unless it buys capability. No component earns
+permanence. Edge and cloud are one heterogeneous pool; charge all local/remote
+work and failed routes under an explicit iso-capability Pareto objective.
 
-> **Can an AI reduce reasoning cost by discovering a minimal sufficient computational structure before solving?**
+## Current primary surface — Frontier Gap (UNARMED)
 
-The stronger scaling question is:
+G={T: an actually executed frozen small baseline fails AND a frontier reference
+succeeds}, independently verified on original tasks. The v0.0.105
+[receipt-only contract](docs/research/frontier_gap_evaluation.md) retains complete
+paired outcomes, original/answer/trace hashes and six measured/estimated/unknown
+resource axes. Its 23 synthetic fault tests are NOT model or frontier evidence.
+No real model calls, new fitting or new frontier corpus is armed by this release.
 
-> **Does Structural Compression change how verified reasoning compute grows with problem complexity?**
+A real first run requires frozen model/provider access, source/license-approved
+tasks, an independent checker and explicit execution/spending caps before data
+is opened. Tokens cannot stand in for closed FLOPs/VRAM/energy; unavailable
+telemetry remains UNKNOWN. All global Q1–Q7 remain OPEN. See
+[current gates and historical mapping](docs/research/core_question_gates.md).
 
-Canonical target architecture:
+## Historical structural-compression mechanism thesis
+
+The following retained mechanism is subordinate to the Frozen North Star.
+Its old Q numbering is namespaced through v104, not retrospectively rewritten.
+The target is a minimal sufficient representation; this pipeline is an example,
+not a canonical mandatory architecture.
+
+Historical prototype architecture:
 
     Raw Problem
         ↓
@@ -54,7 +82,7 @@ See:
 - `docs/research/core_question_gates.md`
 - `docs/experiments/v0.0.32.md`
 
-## Current engineering baseline
+## Latest retained mechanism evidence — not frontier proof
 
 **v0.0.104 — first new-class headroom: assignment stopped, basis-pursuit admits frozen transfer only**
 
@@ -66,7 +94,7 @@ passes all four cells (Oracle/Direct0.633142,0.377829,0.217160,0.137875;16/16
 source wins), admitting only a separately frozen test with both existing
 checkpoints on new sources. No model inference, new fitting or actual transfer
 is established. Both classes share the LP backend; globalQ5 and cross-domain
-reuse remain OPEN. v103's first scaling/capability failure is preserved, not
+reuse remain OPEN in the legacy namespace (current Q6). v103's first scaling/capability failure is preserved, not
 rescued by this different optimistic diagnostic. See `docs/experiments/v0.0.104.md`.
 
 ### Prior mechanism confirmation — v0.0.102

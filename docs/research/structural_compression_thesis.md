@@ -1,3 +1,10 @@
+> Historical mechanism thesis, retained through v104. The user-frozen
+> [Frozen North Star](frozen_north_star.md), dated 2026-10-02, is now the highest
+> authority. Structural compression is a hypothesis/mechanism, not a permanently
+> required architecture or an LP-only objective. Q1–Q7 are fixed under the new
+> namespace; see [current gates](core_question_gates.md). The historical text and
+> original decisions below are retained, not promoted to frontier proof.
+
 # NEUMANN 1 Research Thesis — Structural Compression
 
 Status: research direction freeze after v0.0.31
