@@ -43,7 +43,7 @@ ROUTES=(
 def protocol():
     return {
         "schema":"neumann.quotient-point-refit-v100.v1",
-        "runtime":admission.RUNTIME,
+        "runtime":{**admission.RUNTIME,"scikit_learn":"1.9.1"},
         "train_sources":48,
         "model_seeds":list(MODEL_SEEDS),
         "kinds":list(KINDS),
