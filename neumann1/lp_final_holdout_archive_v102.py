@@ -69,7 +69,9 @@ def load_final_sources(manifest_path):
         if not cert["accepted"] or not verify_standard_form_certificate(
                 **problem,**cert["witness"])["accepted"]:
             raise ValueError("v102 source oracle registration drift")
-        if list(source["basis"])!=list(cert["basis"]):
+        basis=list(source["basis"])
+        if (len(basis)!=m or len(set(basis))!=m
+                or any(type(i) is not int or not 0<=i<n for i in basis)):
             raise ValueError("v102 source basis registration drift")
     return report
 
