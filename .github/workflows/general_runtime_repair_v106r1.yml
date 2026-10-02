@@ -3,12 +3,20 @@ on:
   push:
     branches: [research/general-runtime-repair-v106r1]
     paths: [docs/experiments/general_runtime_repair_v106r1.trigger.json]
+  pull_request:
+    paths:
+      - docs/experiments/general_runtime_repair_v106r1.trigger.json
+      - .github/workflows/general_runtime_repair_v106r1.yml
+      - neumann1/general_runtime_repair_v106.py
+      - experiments/general_hf_core_repair_v106.py
+      - experiments/general_runtime_repair_v106.py
+      - tests/test_general_runtime_repair_v106.py
 
 permissions:
   contents: write
 
 concurrency:
-  group: general-runtime-repair-v106r1
+  group: general-runtime-repair-v106r1-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -25,13 +33,23 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Detect retained one-shot evidence
+        id: retained
+        run: |
+          if test -e docs/experiments/results/v106_general_repair1/report.json; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Parent evidence and one-shot marker
+        if: steps.retained.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           test "$GITHUB_RUN_ATTEMPT" = "1"
-          test ! -e docs/experiments/results/v106_general_repair1
           python -m experiments.first_evidence_v106
           python - <<'PY'
           import json, os, subprocess
@@ -45,6 +63,7 @@ jobs:
           assert marker['holdout_opened'] is False
           assert marker['parent_boot2_archive'] == 'c57fd111b249d442e63113ae223801b2987e7b82'
           subprocess.run(['git','merge-base','--is-ancestor', marker['parent_main_merge'], 'HEAD'], check=True)
+          subprocess.run(['git','merge-base','--is-ancestor', marker['published_candidate_head'], 'HEAD'], check=True)
           current = subprocess.check_output(
               ['gh','api','repos/'+os.environ['GITHUB_REPOSITORY']+'/branches/main','--jq','.commit.sha'],
               text=True,
@@ -53,16 +72,19 @@ jobs:
           PY
 
       - uses: actions/setup-python@v5
+        if: steps.retained.outputs.skip != 'true'
         with:
           python-version: '3.12'
 
       - name: Contract fixtures before model download
+        if: steps.retained.outputs.skip != 'true'
         run: |
           pip install pytest
           pip install -e . --no-deps
           python -m pytest -q tests/test_general_runtime_v106.py tests/test_general_runtime_repair_v106.py
 
       - name: Frozen CPU model dependencies
+        if: steps.retained.outputs.skip != 'true'
         timeout-minutes: 10
         run: |
           pip install numpy==2.3.5 scipy==1.17.0 scikit-learn==1.9.1
@@ -70,21 +92,23 @@ jobs:
           pip install transformers==5.10.1 pillow
 
       - name: Runtime-0.1 fifteen opened repair observations
+        if: steps.retained.outputs.skip != 'true'
         timeout-minutes: 40
         run: |
           python -u -m experiments.general_runtime_repair_v106 \
             --directory docs/experiments/results/v106_general_repair1 \
-            --frozen-head "$GITHUB_SHA"
+            --frozen-head "$(git rev-parse HEAD)"
 
       - name: Retain first repair bytes even on a negative result
-        if: always()
+        if: always() && steps.retained.outputs.skip != 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -- docs/experiments/results/v106_general_repair1 || true
           if ! git diff --cached --quiet; then
             git commit -m "Retain first Runtime-0.1 opened repair evidence"
-            git push origin "HEAD:${GITHUB_REF_NAME}"
+            TARGET_BRANCH="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
+            git push origin "HEAD:${TARGET_BRANCH}"
           fi
 
       - uses: actions/upload-artifact@v4
