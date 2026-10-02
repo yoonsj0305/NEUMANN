@@ -8,6 +8,7 @@ from experiments.lp_frozen_support_expansion_v101 import (
     ROUTES,
     SEEDS,
     base_specs,
+    expansion_rescue_evidence,
     protocol,
 )
 
@@ -47,3 +48,52 @@ def test_v101_route_roster_has_only_frozen_execution_contracts():
         "FIXED2_s100001","FIXED2_s100002",
         "EXPAND4_s100001","EXPAND4_s100002",
     )
+
+
+def _metric(cases, fallback_free, utility, complete):
+    return {
+        "cases":cases,
+        "fallback_free_cases":fallback_free,
+        "utility_recovery":utility,
+        "amortized_complete_ratio":complete,
+    }
+
+
+def test_v101_expand4_must_earn_authority_over_fixed2():
+    overall={}
+    cells={}
+    for seed in SEEDS:
+        fixed=f"FIXED2_s{seed}"
+        expand=f"EXPAND4_s{seed}"
+        overall[fixed]={}
+        overall[expand]={}
+        cells[fixed]={
+            "m128_base":_metric(8,7,0.79,0.27),
+            "m128_surface":_metric(8,7,0.79,0.26),
+        }
+        cells[expand]={
+            "m128_base":_metric(8,8,0.90,0.22),
+            "m128_surface":_metric(8,8,0.90,0.21),
+        }
+    evidence=expansion_rescue_evidence(overall,cells)
+    assert all(row["earned"] for row in evidence.values())
+
+
+def test_v101_fixed2_resampling_cannot_count_as_expansion_rescue():
+    overall={}
+    cells={}
+    for seed in SEEDS:
+        fixed=f"FIXED2_s{seed}"
+        expand=f"EXPAND4_s{seed}"
+        overall[fixed]={}
+        overall[expand]={}
+        cells[fixed]={
+            "m128_base":_metric(8,8,0.90,0.20),
+            "m128_surface":_metric(8,8,0.90,0.20),
+        }
+        cells[expand]={
+            "m128_base":_metric(8,8,0.90,0.21),
+            "m128_surface":_metric(8,8,0.90,0.21),
+        }
+    evidence=expansion_rescue_evidence(overall,cells)
+    assert not any(row["earned"] for row in evidence.values())
