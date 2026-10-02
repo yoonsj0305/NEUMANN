@@ -303,7 +303,7 @@ def run_compact(task, private, arm, core, limits=CompactLimits()):
                 continue
 
             if action["a"] == "f":
-                if arm in ("B2", "N"):
+                if arm in ("B2", "B3", "N"):
                     raise ValueError("tool/representation action required by repair arm")
                 answer = action["v"]
                 verified = check(answer)
@@ -332,7 +332,7 @@ def run_compact(task, private, arm, core, limits=CompactLimits()):
                 except Exception as exc:
                     outcome = {"error": type(exc).__name__ + ": " + str(exc)}
                     events.append({"kind": "tool_result", "tool": "reduce_pointer", "result": outcome, "ms": milliseconds(began)})
-                    if arm == "N":
+                    if arm in ("B3", "N"):
                         state = {"e": "representation_rejected"}
                         continue
                     raise
