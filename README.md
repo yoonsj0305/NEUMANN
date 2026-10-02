@@ -33,7 +33,11 @@ edge-class small core as Direct, reasoning, same-tools, iterative verification,
 and NEUMANN. No new training; no frontier calls before small/N traces are frozen.
 Original math, coding and planning checkers retain authority. B3 receives the
 same certified plan execution as N. Interface controls are not capability proof.
-The admitted basis-pursuit frozen-checkpoint mechanism study continues separately.
+The first frozen basis-pursuit transfer preserved capability but failed the full
+cost gate; both checkpoints are STOP_FROZEN_TRANSFER_NO_REFIT. The first General
+startup is INCOMPLETE (0/15 observations, missing torchvision). Both first archives
+are immutable. [Actual outcomes and Boot2 readiness](docs/experiments/v106_first_outcomes.md)
+record the dependency repair and a separately registered opened diagnostic.
 
 ## Frontier Gap contract — subsequent, still UNARMED
 
