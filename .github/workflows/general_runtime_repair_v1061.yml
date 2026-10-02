@@ -1,0 +1,86 @@
+name: General Runtime-0.1 opened repair first attempt
+on:
+  push:
+    branches: [research/general-runtime-repair-v1061]
+    paths: [docs/experiments/general_runtime_repair_v1061.trigger.json]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: general-runtime-repair-v1061
+  cancel-in-progress: false
+
+jobs:
+  repair-first:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prove original negative evidence remains present
+        run: |
+          test "$GITHUB_RUN_ATTEMPT" = "1"
+          test -d docs/experiments/results/v106_general_boot2
+          test -f docs/experiments/boot2_first_v106.pins.json
+          test ! -e docs/experiments/results/v1061_general_repair_first
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          marker=json.loads(Path('docs/experiments/general_runtime_repair_v1061.trigger.json').read_text())
+          assert marker['schema']=='neumann.general-runtime-repair-trigger.v1061.v1'
+          assert marker['rerun'] is False
+          assert marker['new_training'] is False
+          assert marker['frontier_calls']==0
+          assert marker['paid_api_calls']==0
+          assert marker['holdout_opened'] is False
+          assert marker['original_boot2_preserved'] is True
+          PY
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Contract tests before model execution
+        run: |
+          pip install -e . pytest
+          python -m pytest -q tests/test_general_runtime_repair_v1061.py
+
+      - name: Frozen CPU model dependencies
+        timeout-minutes: 10
+        run: |
+          pip install numpy==2.3.5 scipy==1.17.0 scikit-learn==1.9.1
+          pip install torch==2.14.0+cpu torchvision==0.29.0+cpu --index-url https://download.pytorch.org/whl/cpu
+          pip install transformers==5.10.1 pillow
+
+      - name: Execute fifteen opened repair observations
+        timeout-minutes: 40
+        run: |
+          python -u -m experiments.general_repair_v1061 \
+            --directory docs/experiments/results/v1061_general_repair_first \
+            --frozen-head "$GITHUB_SHA"
+
+      - name: Retain first repair bytes including partial failure
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- docs/experiments/results/v1061_general_repair_first* || true
+          if ! git diff --cached --quiet; then
+            git commit -m "Retain first Runtime-0.1 opened repair evidence"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: general-runtime-repair-v1061-first
+          path: docs/experiments/results/v1061_general_repair_first*
