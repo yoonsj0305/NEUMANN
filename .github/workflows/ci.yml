@@ -215,5 +215,7 @@ jobs:
         run: pytest -q tests/test_lp_quotient_refit_v100.py
       - name: Matched quotient-point first-result replay (no fit/inference/solver/timing)
         run: pytest -q tests/test_lp_quotient_refit_replay_v100.py
+      - name: Frozen quotient support-expansion contracts (no fitting/development generation)
+        run: pytest -q tests/test_lp_frozen_support_expansion_v101.py
       - name: Matched tiny-Transformer benchmark
         run: python benchmark_v031.py
