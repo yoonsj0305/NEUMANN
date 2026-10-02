@@ -2,9 +2,12 @@
 
 ## Current state
 
-`CONTRACT_ONLY_NO_NEW_EVIDENCE` — no new LP has been generated, no model has
-run, and no experimental timing has been performed for this contract. The
-eight unit tests are synthetic analysis fixtures, not Q5 evidence. This change
+`EXECUTOR_IMPLEMENTED_NO_NEW_EVIDENCE` — the per-case registrar, serial
+whole-path executor, retained replay and exact-runtime authority preflight are
+implemented. No new Q5 LP has been generated, no model forward has run, and no
+Q5 experimental timing has been performed. The thirty unit tests are synthetic
+analysis/fault-injection fixtures, not Q5 evidence. The metadata protocol's
+original contract-only status remains frozen as provenance. This change
 does not revise v102 or increment its experimental version.
 
 The latest result is v0.0.102, not the interrupted v0.0.94 candidate. Its
@@ -81,8 +84,11 @@ possible equal-budget Direct learner or all classical support heuristics.
 
 ## Measurement and accounting requirements
 
-Measurement implementation is deliberately **not enabled** by this commit.
-It must first be published and pass contract-only CI, with the following rules:
+The CLI implementation is now available; source generation and measurement are
+**not armed in any workflow**: the two one-shot workflows require separate
+unpublished trigger markers on `research/q5-first-scaling`. Publish this executor head and pass its fixtures
+and exact-runtime preflight before adding a one-shot registration workflow.
+The following frozen rules still apply:
 
 1. Freeze the exact dependency/BLAS/thread/hardware envelope before sources.
    Use the successful v102 runtime, one numerical/Torch thread and HASWELL BLAS
@@ -160,9 +166,73 @@ unchanged. The corrected fixtures must actually execute before merge.
 
 ## Safe next execution point
 
-Implement and test a model-free multipart/per-case source registration archive,
-then a separate complete-cost evaluator, failed-attempt retention, externally
-measured cold startup and byte-exact no-execution replay. Publish the exact
-runtime/executor contract and commit head before generating any source. Run
-source registration once, commit its bytes, then admit one isolated evaluation.
-Ordinary CI must run fixtures/replay only, never the Q5 benchmark.
+The registrar and executor are implemented, with these concrete boundaries:
+
+- `experiments.q5_register`: atomically reserves an attempt directory before
+  scientific imports or sources. Pins the operator's latest seed-collision
+  audit to the execution head. The new generator entry point shares v082's
+  exact formula but accepts only the Q5 grid; v082's old grid is unchanged.
+  Retains one bounded gzip per view, including rejected labels before stopping.
+  Hashes, canonical metadata, original oracle certificates and the exact
+  paired surface transform are replayed. No model restore/forward in registration.
+- `experiments.q5_evaluate`: requires the committed manifest's SHA256, restores
+  only the two frozen models, serializes one warmup + three retained repeats in
+  the frozen 1536-observation schedule. Each route's first process launch through
+  READY is measured externally. Full parent learned-authority replay is also
+  charged to each candidate cold startup (not hidden in research overhead).
+  Direct/Oracle do not pay this learned-admission fee: their baseline cannot
+  be inflated with checkpoint checks they do not need. Workers
+  remain idle except the current query. Startup is one-time service loading;
+  it includes model restoration but cannot be claimed as zero by preloading.
+- Every query charges source read/decompression/digest/array decoding. Candidate
+  discovery charges those operations plus features, tensor conversion, forward,
+  permutation validation and ranking. All native/restricted attempts, lifted
+  certificates, failure witnesses and fallback ledgers survive. External
+  request/response and retained-ledger serialization are charged conservatively
+  in post cost, with separate descriptive transport cost. The unchanged 5s
+  capability deadline also applies to that external receipt.
+- Files are exclusive-create only. Hash-chained fsynced events bracket the
+  isolated timing window, every query start, every completed compressed
+  observation and terminal completion/failure. A partial attempt cannot be
+  resumed or replaced. One gzip per observation avoids a >100MiB monolithic Git
+  blob. Post-window replay verifies sources, native execution ledgers, support
+  authority, primal reconstruction, original witnesses and complete budgets;
+  it performs no forwards, new solves or timing. Report identity is pinned by
+  the terminal receipt. Published first-run manifest/receipt hashes must be
+  recorded as the external authority before ordinary CI admits retained replay.
+- Analysis uses each case's median **complete** charge, not a favorable sum of
+  independently selected stage medians. Warmup failures remain capability
+  failures. Q=1 includes full original training/setup plus cold startup; Q=10000
+  amortizes both. Native-stage costs must be contained by full attempt/path
+  clocks. Missing observations or accounting invalidate evidence, never reduce
+  the sample. RSS is descriptive Linux KiB; no energy claim.
+
+Exact envelope: CPython3.12, NumPy2.3.5, SciPy1.17.0, scikit-learn1.9.1,
+PyTorch2.14.0+cpu, highspy1.15.1, threadpoolctl3.7.0; Linux x86_64
+Ubuntu24.04 runners, HASWELL BLAS dispatch, one numerical/Torch thread.
+Actual CPU/kernel/affinity/BLAS metadata are retained and must match across
+routes on the single measurement runner. This envelope does not assert that
+separately scheduled source-registration and timing runners have identical CPUs.
+CI's authority job only replays old bytes and restores old weights. It never
+generates Q5 inputs, executes inference or provides a cold/timing sample.
+
+Fixture-discovered correction before any Q5 evidence: equal analytic exponents
+produced a tiny negative OLS difference from floating-point roundoff. Differences
+within 1e-12 are now exactly zero before the frozen bootstrap decision; such
+noise cannot count as a strictly improved slope. Size/width/seed selection,
+cost/utility/burden thresholds and bootstrap design are unchanged.
+
+Next: after final-head CI/preflight passes, audit latest seed use, publish a
+single registration trigger, commit all first registered bytes/receipts, pin
+the resulting manifest, then publish a single isolated evaluation trigger.
+Upload AND retain receipts on failure; never rerun a favorable replacement.
+Only a retained real result may use the scientific decision labels. Global Q5
+remains OPEN, and cross-domain testing still needs a separate task contract.
+
+The unarmed source/evaluation workflows reject Actions rerun attempts and
+require a published executor ancestor and an exact latest-main pin. They
+commit and upload first receipts even when the Python stage fails. A new
+directory name does not authorize a replacement attempt. Workflow logs remain
+the notice if installation/runner failure occurs before a reservation or if
+a catastrophic runner termination prevents uploading partial files. Missing
+first bytes block a scientific verdict, never authorize favorable resampling.

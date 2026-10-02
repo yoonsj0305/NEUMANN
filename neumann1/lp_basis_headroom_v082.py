@@ -98,6 +98,18 @@ def _orthogonal(rng: np.random.Generator, n: int) -> np.ndarray:
 
 
 def generate_case(spec: dict) -> dict:
+    return _generate_case(spec, ROWS, WIDTH_FACTORS)
+
+
+def generate_q5_case(spec: dict) -> dict:
+    """Same constructed family, on the separately frozen Q5 size/width grid.
+
+    Do not mutate v082 globals or broaden the authority of generate_case.
+    """
+    return _generate_case(spec, (32, 64, 128, 256), (1, 16, 32))
+
+
+def _generate_case(spec: dict, rows_grid, width_grid) -> dict:
     """Generate one constructed nondegenerate standard-form LP.
 
     Control and expanded cases sharing pair_id use the same basis matrix,
@@ -115,7 +127,7 @@ def generate_case(spec: dict) -> dict:
     factor = spec["width_factor"]
     n = spec["cols"]
     condition = spec["condition_number"]
-    if m not in ROWS or factor not in WIDTH_FACTORS or n != m * factor:
+    if m not in rows_grid or factor not in width_grid or n != m * factor:
         raise ValueError("outside frozen size grid")
     if condition not in CONDITION_NUMBERS:
         raise ValueError("outside frozen conditioning grid")

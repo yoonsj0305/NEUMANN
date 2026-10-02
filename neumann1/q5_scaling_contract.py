@@ -197,18 +197,23 @@ def slope_evidence(paired_costs):
         return log_slope(direct), log_slope(candidate)
 
     direct, candidate = slopes({m: range(REPLICATES) for m in ROWS})
+    def difference(c, d):
+        # Identical exponents can differ by a few floating-point ulps after
+        # log/OLS. Numerical noise cannot establish a strictly lower slope.
+        delta = c - d
+        return 0.0 if abs(delta) <= 1e-12 else delta
     rng = random.Random(protocol()["bootstrap_seed"])
     differences = []
     for _ in range(protocol()["bootstrap_repeats"]):
         indices = {m: [rng.choice((0, 2)), rng.choice((0, 2)),
                        rng.choice((1, 3)), rng.choice((1, 3))] for m in ROWS}
         d, c = slopes(indices)
-        differences.append(c - d)
+        differences.append(difference(c, d))
     differences.sort()
     tail = protocol()["slope_familywise_alpha"] / protocol()["slope_comparisons"]
     upper = differences[min(len(differences)-1, math.ceil((1-tail)*len(differences))-1)]
     return {"direct_slope": direct, "candidate_slope": candidate,
-            "slope_difference": candidate-direct, "difference_upper": upper,
+            "slope_difference": difference(candidate, direct), "difference_upper": upper,
             "lower_empirical_slope": upper < 0,
             "cross_domain_pass": False, "global_q5_closed": False}
 

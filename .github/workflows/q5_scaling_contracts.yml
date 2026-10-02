@@ -4,7 +4,11 @@ on:
   pull_request:
     paths:
       - neumann1/q5_scaling_contract.py
+      - neumann1/q5_evidence.py
+      - neumann1/lp_basis_headroom_v082.py
+      - experiments/q5_*.py
       - tests/test_q5_scaling_contract.py
+      - tests/test_q5_execution.py
       - .github/workflows/q5_scaling_contracts.yml
       - docs/research/q5_scaling_preregistration.md
 
@@ -17,4 +21,37 @@ jobs:
         with:
           python-version: '3.11'
       - name: Pure contract fixtures; no new sources, model or timing
-        run: python -m unittest discover -s tests -p test_q5_scaling_contract.py -v
+        run: python -m unittest discover -s tests -p 'test_q5*.py' -v
+
+  authority-preflight:
+    runs-on: ubuntu-24.04
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OMP_DYNAMIC: "FALSE"
+      OPENBLAS_NUM_THREADS: "1"
+      OPENBLAS_CORETYPE: "HASWELL"
+      MKL_NUM_THREADS: "1"
+      MKL_CBWR: "COMPATIBLE"
+      BLIS_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+      VECLIB_MAXIMUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install exact authority runtime
+        run: |
+          pip install numpy==2.3.5 scipy==1.17.0 scikit-learn==1.9.1 threadpoolctl==3.7.0 highspy==1.15.1
+          pip install -e . --no-deps
+          pip install torch==2.14.0+cpu --index-url https://download.pytorch.org/whl/cpu
+      - name: Replay parent bytes and restore weights only (zero new inputs/forwards/solves)
+        run: |
+          python -m experiments.q5_preflight --output /tmp/q5-authority-preflight --frozen-head "$GITHUB_SHA"
+      - name: Preserve preflight receipts including failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q5-authority-preflight
+          path: /tmp/q5-authority-preflight
