@@ -221,5 +221,7 @@ jobs:
         run: pytest -q tests/test_lp_frozen_support_expansion_replay_v101.py
       - name: Fresh EXPAND4 holdout contracts only (no source generation/model/timing)
         run: pytest -q tests/test_lp_expand4_holdout_register_v102.py tests/test_lp_expand4_holdout_v102.py
+      - name: Fresh EXPAND4 first evaluation retained replay (no model, solver, fitting, or timing)
+        run: pytest -q tests/test_lp_expand4_holdout_replay_v102.py
       - name: Matched tiny-Transformer benchmark
         run: python benchmark_v031.py
