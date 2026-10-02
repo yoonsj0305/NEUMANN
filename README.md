@@ -56,6 +56,20 @@ See:
 
 ## Current engineering baseline
 
+**v0.0.102 — Q3/Q4 CLOSED for the constructed-LP mechanism; Q5 admitted**
+
+One final two-phase fresh holdout freezes48 unseen views before model access and
+tests only the frozen quotient-point adaptive contract
+`top2m -> verify -> top4m -> verify -> Direct fallback`. Both frozen seeds
+pass all four required cells. Across the eight seed-by-cell gates, minimum
+utility recovery is0.869302, maximum discovery burden0.037031, and maximum
+amortized complete/Direct0.192527; every cell is12/12 fallback-free and every
+retained answer verifies on the original LP. Decision
+`CLOSE_Q3_PASS_Q4_PASS_ADVANCE_Q5`: Q3=`PASS_LP_MECHANISM`,
+Q4=`PASS_LP_MECHANISM`. This closure is scoped to the constructed-LP
+mechanism, not all-domain structural intelligence. Stop local Q3/Q4 tuning and
+advance to Q5. See `docs/experiments/v0.0.102.md`.
+
 **v0.0.100 — quotient refit fixes surface invariance, but m128 size recovery still misses Q34**
 
 The one preregistered matched refit compares identical 433-parameter point
