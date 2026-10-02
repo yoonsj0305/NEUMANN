@@ -1,0 +1,68 @@
+name: General Runtime-0 first opened development (marker only)
+on:
+  push:
+    branches: [research/general-runtime-first-v106]
+    paths: [docs/experiments/general_runtime_v106.trigger.json]
+permissions:
+  contents: write
+concurrency:
+  group: general-runtime-first-v106
+  cancel-in-progress: false
+jobs:
+  first-development:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: First attempt and published executor
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test "$GITHUB_RUN_ATTEMPT" = "1"
+          test ! -e docs/experiments/results/v106_general_development_first
+          python - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          marker=json.loads(Path('docs/experiments/general_runtime_v106.trigger.json').read_text())
+          assert marker['schema']=='neumann.general-runtime-first-trigger.v106.v1'
+          assert marker['rerun'] is False and marker['frontier_calls']==0 and marker['new_training'] is False
+          subprocess.run(['git','merge-base','--is-ancestor',marker['published_executor_head'],'HEAD'],check=True)
+          current=subprocess.check_output(['gh','api','repos/'+os.environ['GITHUB_REPOSITORY']+'/branches/main','--jq','.commit.sha'],text=True).strip()
+          assert current==marker['latest_main_sha']
+          Path('docs/experiments/results/v106_general_development_first.setup.json').write_text(json.dumps({'marker':marker,'status':'setup_started','head':os.environ['GITHUB_SHA']}))
+          PY
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Frozen CPU model dependencies (no paid API)
+        timeout-minutes: 10
+        run: |
+          pip install -e . --no-deps
+          pip install torch==2.14.0+cpu --index-url https://download.pytorch.org/whl/cpu
+          pip install transformers==5.10.1 pillow
+      - name: First model load and fifteen opened interface observations
+        timeout-minutes: 40
+        run: python -u -m experiments.general_development_v106 --directory docs/experiments/results/v106_general_development_first --frozen-head "$GITHUB_SHA"
+      - name: Retain first bytes including model-load failure or partial trace
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- docs/experiments/results/v106_general_development_first* || true
+          if ! git diff --cached --quiet; then
+            git commit -m "Retain first General Runtime-0 development attempt; no replacement"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: general-runtime-v106-first
+          path: docs/experiments/results/v106_general_development_first*

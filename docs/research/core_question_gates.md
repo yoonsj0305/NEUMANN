@@ -64,7 +64,12 @@ claim about frontier-level reasoning.
 
 ## Next primary gate
 
-The next primary surface is [Frontier Gap admission](frontier_gap_evaluation.md):
+The user adopted [General Runtime-0](general_runtime_v106.md) as the next primary
+surface: v106 opened development, v107 sealed fresh general holdout, v108 Frontier
+Gap Pilot-1, v109 actual Edge Reality. Same frozen small weights and strongest
+matched tool/verification baselines come first, with no new training.
+
+The subsequent surface is [Frontier Gap admission](frontier_gap_evaluation.md):
 original tasks on which an actually executed frozen small baseline fails and an
 actually executed frontier reference succeeds. Register verifier, model revisions,
 eligible tools, source/license, budgets and resource/accounting conventions before
@@ -77,5 +82,6 @@ fixtures or one future case-set diagnostic pass. First real execution is UNARMED
 until model/provider access and a bounded spending/execution authority are supplied.
 Do not extract credentials or launch unbudgeted paid calls.
 
-LP transfer remains an optional subordinate mechanism experiment. It does not
-replace the Frozen North Star, and no automatic follow-up is armed by this change.
+The user also authorized basis-pursuit frozen transfer on new registered inputs
+with both existing checkpoints, no refit. This subordinate M106_BP experiment
+does not replace the general capability track or close any global question.

@@ -1,0 +1,74 @@
+name: Basis-pursuit frozen transfer M106 first attempt
+on:
+  push:
+    branches: [research/bp-frozen-transfer-m106]
+    paths: [docs/experiments/bp_frozen_transfer_m106.trigger.json]
+permissions:
+  contents: write
+concurrency:
+  group: bp-frozen-transfer-m106-first
+  cancel-in-progress: false
+jobs:
+  first-transfer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OMP_DYNAMIC: "FALSE"
+      OPENBLAS_NUM_THREADS: "1"
+      OPENBLAS_CORETYPE: "HASWELL"
+      MKL_NUM_THREADS: "1"
+      MKL_CBWR: "COMPATIBLE"
+      BLIS_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+      VECLIB_MAXIMUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: First attempt, admitted family and published executor
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test "$GITHUB_RUN_ATTEMPT" = "1"
+          test ! -e docs/experiments/results/m106_bp_transfer_first
+          python - <<'PY'
+          import json,os,subprocess
+          from pathlib import Path
+          m=json.loads(Path('docs/experiments/bp_frozen_transfer_m106.trigger.json').read_text())
+          assert m['schema']=='neumann.bp-frozen-first-trigger.m106.v1'
+          assert m['rerun'] is False and m['new_fitting'] is False and m['oracle_access'] is False
+          assert m['fresh_seed_range']==[106300,106315] and m['model_seeds']==[100001,100002]
+          subprocess.run(['git','merge-base','--is-ancestor',m['published_executor_head'],'HEAD'],check=True)
+          current=subprocess.check_output(['gh','api','repos/'+os.environ['GITHUB_REPOSITORY']+'/branches/main','--jq','.commit.sha'],text=True).strip()
+          assert current==m['latest_main_sha']
+          Path('docs/experiments/results/m106_bp_transfer_first.setup.json').write_text(json.dumps({'marker':m,'status':'setup_started','head':os.environ['GITHUB_SHA']}))
+          PY
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Exact frozen numerical runtime
+        run: |
+          pip install numpy==2.3.5 scipy==1.17.0 scikit-learn==1.9.1 threadpoolctl==3.7.0 highspy==1.15.1
+          pip install -e . --no-deps
+          pip install torch==2.14.0+cpu --index-url https://download.pytorch.org/whl/cpu
+      - name: First sources then isolated serial transfer; no refit or oracle
+        run: python -u -m experiments.bp_frozen_transfer_m106 --directory docs/experiments/results/m106_bp_transfer_first --frozen-head "$GITHUB_SHA"
+      - name: Independent retained witness/cost replay, no inference or solve
+        run: python -m experiments.bp_frozen_transfer_m106 --replay --directory docs/experiments/results/m106_bp_transfer_first
+      - name: Retain first bytes including failure or partial receipts
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- docs/experiments/results/m106_bp_transfer_first* || true
+          if ! git diff --cached --quiet; then
+            git commit -m "Retain first frozen basis-pursuit transfer; no replacement"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m106-bp-frozen-first
+          path: docs/experiments/results/m106_bp_transfer_first*

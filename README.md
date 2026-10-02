@@ -24,7 +24,18 @@ cheaply. Never spend compute unless it buys capability. No component earns
 permanence. Edge and cloud are one heterogeneous pool; charge all local/remote
 work and failed routes under an explicit iso-capability Pareto objective.
 
-## Current primary surface — Frontier Gap (UNARMED)
+## Current primary surface — General NEUMANN Runtime-0
+
+The user's next sequence is v0.0.106 opened runtime development, v0.0.107
+Fresh General Holdout, v0.0.108 Frontier Gap Pilot-1, then v0.0.109 Edge Reality
+Gate. [Runtime-0](docs/research/general_runtime_v106.md) compares the same frozen
+edge-class small core as Direct, reasoning, same-tools, iterative verification,
+and NEUMANN. No new training; no frontier calls before small/N traces are frozen.
+Original math, coding and planning checkers retain authority. B3 receives the
+same certified plan execution as N. Interface controls are not capability proof.
+The admitted basis-pursuit frozen-checkpoint mechanism study continues separately.
+
+## Frontier Gap contract — subsequent, still UNARMED
 
 G={T: an actually executed frozen small baseline fails AND a frontier reference
 succeeds}, independently verified on original tasks. The v0.0.105

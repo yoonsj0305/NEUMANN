@@ -1,0 +1,22 @@
+name: General Runtime-0 and frozen transfer contracts
+on:
+  pull_request:
+    paths:
+      - neumann1/general_*v106.py
+      - experiments/general_*v106.py
+      - experiments/bp_frozen_transfer_m106.py
+      - tests/test_general_runtime_v106.py
+      - tests/test_bp_frozen_transfer_m106.py
+      - .github/workflows/general_runtime*.yml
+      - .github/workflows/bp_frozen_transfer_first.yml
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pytest
+      - name: Fixtures only; no model download, fitting or registered corpus
+        run: python -m pytest -q tests/test_general_runtime_v106.py tests/test_bp_frozen_transfer_m106.py
