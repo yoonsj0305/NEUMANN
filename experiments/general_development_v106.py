@@ -65,7 +65,9 @@ def execute(directory, frozen_head):
                                  "observations": sum(r["arm"] == a for r in records),
                                  "query_ms": sum(r["complete_ms"] for r in records if r["arm"] == a),
                                  "cold_single_query_ms": [startup + r["complete_ms"] for r in records if r["arm"] == a],
-                                 "output_tokens": sum(r["output_tokens"] for r in records if r["arm"] == a)} for a in ARMS}}
+                                 "output_tokens": (sum(r["output_tokens"] for r in records if r["arm"] == a)
+                                     if all(r["token_accounting_complete"] for r in records if r["arm"] == a)
+                                     and sum(r["arm"] == a for r in records)==3 else None)} for a in ARMS}}
         write(directory / "report.json", report)
         files = {p.name: __import__("hashlib").sha256(p.read_bytes()).hexdigest() for p in sorted(directory.iterdir()) if p.is_file()}
         write(directory / "terminal.json", {"files": files, "complete": bool(complete), "no_replacement": True})

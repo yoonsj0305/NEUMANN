@@ -203,6 +203,8 @@ def verify_original(task, candidate, private, deadline_ms):
     if family == "coding":
         if type(candidate) is not str:
             return False
+        if not private.get("tests"):
+            raise ValueError("original-spec test vectors required")
         outputs = _python(candidate, [case["input"] for case in private["tests"]], deadline_ms)
         return len(outputs) == len(private["tests"]) and all(
             canonical(a) == canonical(b["output"]) for a, b in zip(outputs, private["tests"]))
@@ -212,6 +214,8 @@ def verify_original(task, candidate, private, deadline_ms):
         return False
     # Separate complete-rule check, not the solver's partial consistency helper.
     for op, name, other in task["public"]["constraints"]:
+        if op not in ("lt", "le", "eq", "ne"):
+            raise ValueError("unknown original constraint; checker cannot attest")
         a = candidate[name]
         b = candidate[other] if type(other) is str else other
         if op == "lt" and not a < b: return False

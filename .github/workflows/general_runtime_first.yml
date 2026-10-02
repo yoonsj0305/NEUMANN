@@ -45,6 +45,7 @@ jobs:
       - name: Frozen CPU model dependencies (no paid API)
         timeout-minutes: 10
         run: |
+          pip install numpy==2.3.5 scipy==1.17.0 scikit-learn==1.9.1
           pip install -e . --no-deps
           pip install torch==2.14.0+cpu --index-url https://download.pytorch.org/whl/cpu
           pip install transformers==5.10.1 pillow

@@ -41,6 +41,14 @@ def test_original_constraints_cannot_be_removed():
     assert not verify_original(task, {"A":0,"B":0,"C":0}, private, 1000)
 
 
+def test_unknown_rule_or_empty_program_tests_cannot_attest_correctness():
+    task, private = development_tasks()[2]
+    task["public"]["constraints"] = [["unknown","A","B"]]
+    with pytest.raises(ValueError): verify_original(task,{"A":0,"B":1,"C":2},private,1000)
+    task, _ = development_tasks()[1]
+    with pytest.raises(ValueError): verify_original(task,"def solve(items): return 0",{"tests":[]},1000)
+
+
 def test_ir_rewrite_cannot_change_answer():
     task, _ = development_tasks()[0]
     with pytest.raises(ValueError): reduce_original(task, {"family":"math_logic", "expression":"1"})
