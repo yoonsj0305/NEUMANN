@@ -79,8 +79,7 @@ jobs:
       - name: Contract fixtures before model download
         if: steps.retained.outputs.skip != 'true'
         run: |
-          pip install pytest
-          pip install -e . --no-deps
+          pip install -e . pytest
           python -m pytest -q tests/test_general_runtime_v106.py tests/test_general_runtime_repair_v106.py
 
       - name: Frozen CPU model dependencies
