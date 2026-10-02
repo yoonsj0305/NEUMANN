@@ -88,6 +88,10 @@ def raw_source(source):
         ("A",(m,n)),("b",(m,)),("c",(n,)))}
 
 
+def canonical_training_identity(mapping):
+    return {str(k):v for k,v in mapping.items()}
+
+
 def authority_and_models():
     authority=load_first_expansion(AUTHORITY_MANIFEST)
     summary=authority["summary"]
@@ -96,8 +100,8 @@ def authority_and_models():
     if summary["fresh_holdout_candidate"]!=["EXPAND4"]:
         raise ValueError("v102 authority candidate drift")
     models,training=restore_frozen_quotient()
-    archived_training={str(k):v for k,v in authority["training_identity"].items()}
-    runtime_training={str(k):v for k,v in training.items()}
+    archived_training=canonical_training_identity(authority["training_identity"])
+    runtime_training=canonical_training_identity(training)
     if archived_training!=runtime_training:
         raise ValueError("v102 frozen checkpoint/training identity drift")
     return authority,models,training
