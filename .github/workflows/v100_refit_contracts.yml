@@ -1,0 +1,27 @@
+name: v100 Quotient Refit Contracts
+
+on:
+  push:
+    branches:
+      - research/v100-quotient-point-refit
+    paths:
+      - .github/workflows/v100_refit_contracts.yml
+      - docs/experiments/v0.0.100-preregistration.md
+      - experiments/lp_quotient_refit_v100.py
+      - tests/test_lp_quotient_refit_v100.py
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install contract dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e . pytest
+          pip install torch==2.14.0+cpu --index-url https://download.pytorch.org/whl/cpu
+      - name: Validate frozen v100 pre-fit contract only
+        run: pytest -q tests/test_lp_quotient_refit_v100.py

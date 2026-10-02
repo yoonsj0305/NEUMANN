@@ -399,3 +399,41 @@ This is a representation admission result, not a Q34 pass. It authorizes a
 separately preregistered small point-support refit on opened development and
 metamorphic data only. The v098 holdout remains sealed; any later confirmation
 must use a newly registered holdout.
+
+v100 performs exactly that one matched refit with the same 433-parameter
+support-only MLP, training labels, seeds, optimizer and 12-epoch budget for
+OLD_CG5 versus QUOTIENT. The quotient representation survives training with
+exact base/surface top2m support invariance on16/16 pairs for both seeds, while
+OLD_CG5 is0/16. Both quotient seeds pass m64 and the combined32-view Q34
+arithmetic. Yet every quotient m128 cell fails the frozen utility>=0.80
+per-cell requirement: utilities range0.787617–0.799773, with7/8 fallback-free
+cases, while discovery burden remains only0.0154–0.0171 and complete/Direct
+0.249–0.266. Decision: `STOP_QUOTIENT_REFIT_NO_FRESH_HOLDOUT`.
+
+Thus the known surface-coordinate defect is repaired but does not explain the
+remaining m128 failure. Do not fit again, relax the gate, reuse v098, or open a
+new holdout. The next admissible step is a no-fit size-generalization/support
+authority diagnosis on the now-opened v100 development archive, such as whether
+the frozen quotient ranking recovers the missing structure under modest
+support expansion. Q34/Q3/Q4 remain open; Q5 remains blocked.
+
+v100 performs the one authorized matched refit: OLD_CG5 and QUOTIENT use the
+same433-parameter support-only MLP, same48 opened training sources, same two
+initialization seeds and same12-epoch schedule. Evaluation is a new
+development-only 2x2 factorial: m64/m128 × base/equivalent-surface, eight
+cases per cell.
+
+The representation fix survives training exactly: QUOTIENT support is identical
+on16/16 base/surface pairs for both seeds, while matched OLD_CG5 is0/16.
+m64 cells pass comfortably. However each quotient seed has one restricted
+support miss among eight m128 cases. m128 utility remains0.787617/0.799773
+(seed100001 base/surface) and0.796467/0.794749 (seed100002), below the frozen
+0.80 every-cell requirement despite discovery burden around1.5–1.7% and
+complete/Direct around0.25. Aggregate32-view Q34 passes, but the preregistered
+cell conjunction forbids aggregate rescue. Decision:
+`STOP_QUOTIENT_REFIT_NO_FRESH_HOLDOUT`.
+
+No threshold change, second fit, fresh holdout or Q5 advance is authorized.
+The next question must be training-free: determine whether a modest
+verifier-triggered support expansion can recover the rare m128 miss before
+spending on any further learned discoverer.
