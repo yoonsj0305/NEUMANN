@@ -50,20 +50,19 @@ class CompactLimits:
 
 
 SYSTEM = (
-    'JSON only; no prose/thought. '
-    'Final {"a":"f","v":answer}. '
-    'Compute {"a":"c","t":"m|c|p","s":"code only for p"}. '
-    'Represent {"a":"r","k":["public field names"],"x":"m|c|p","s":"code only for p"}. '
-    'm=exact math,c=finite CSP,p=Python solve(items). '
-    'For code use the shortest valid source; no comments/docstrings.'
+    'One JSON only; no prose. '
+    'f={"a":"f","v":answer}; '
+    'c={"a":"c","t":"m|c|p","s":"Python source if p"}; '
+    'r={"a":"r","k":["public fields"],"x":"m|c|p","s":"Python source if p"}. '
+    'm=math,c=CSP,p=Python solve(items). Code shortest; no comments.'
 )
 
 ARM = {
-    "B0": 'Use f only.',
-    "B1": 'Solve carefully; use f only.',
-    "B2": 'Use exactly one c. Runtime executes it and submits its candidate to the original checker.',
-    "B3": 'Use one c or r. Runtime executes it and submits its candidate to the original checker.',
-    "N": 'Use r first. Select only necessary original public fields and the cheapest executor.',
+    "B0": 'f only.',
+    "B1": 'Solve carefully; f only.',
+    "B2": 'Exactly one c; runtime executes/checks.',
+    "B3": 'Use c or r; runtime executes/checks.',
+    "N": 'r first; select necessary public fields and cheapest x.',
 }
 
 
