@@ -180,9 +180,18 @@ def query(directory, entry, route):
 
 
 def worker(directory, route):
-    from threadpoolctl import threadpool_limits
     if route not in {"NATIVE", "IPM", "ASSIGNMENT", "ORACLE"}:
         raise ValueError("unknown worker route")
+    # Fresh workers have no numerical imports. Load BOTH BLAS libraries and
+    # the applicable backend before READY, charging imports to cold startup
+    # rather than hiding a lazy optimizer import in an excluded warmup.
+    import numpy
+    import scipy.linalg
+    if route in {"NATIVE","ORACLE"}:
+        from neumann1 import lp_native_warm_start_v086
+    else:
+        import scipy.optimize
+    from threadpoolctl import threadpool_limits
     with threadpool_limits(1):
         env = preflight()
         manifest = json.loads((Path(directory)/"sources.json").read_text())

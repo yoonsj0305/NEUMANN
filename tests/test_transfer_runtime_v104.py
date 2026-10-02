@@ -1,6 +1,9 @@
 """Tiny explicit mathematical fixtures; never generate the registered corpus."""
 import copy
 import importlib.util
+import json
+import tempfile
+from pathlib import Path
 import unittest
 from unittest.mock import patch
 
@@ -56,6 +59,20 @@ class TransferRuntimeTests(unittest.TestCase):
         small={"A":raw["A"][:,[1,2]],"b":raw["b"],"c":raw["c"][[1,2]]}
         native_checked(small,result["native"])
         check_cost(result["total_ms"],result["solve_ms"]+result["verify_ms"])
+
+    @unittest.skipUnless(importlib.util.find_spec("highspy"),"exact runtime required in dedicated CI")
+    def test_all_four_fresh_workers_ready_without_any_source(self):
+        with tempfile.TemporaryDirectory() as directory:
+            (Path(directory)/"sources.json").write_text(json.dumps({"cases":[]}))
+            for route in ("NATIVE","IPM","ASSIGNMENT","ORACLE"):
+                w=audit.Worker(directory,route)
+                try:
+                    self.assertTrue(w.ready["ready"])
+                    self.assertGreater(w.cold_ms,0)
+                    pools=w.ready["environment"]["threadpools"]
+                    self.assertTrue(pools)
+                    self.assertTrue(all(p["num_threads"]==1 for p in pools))
+                finally:w.close()
 
     def test_retained_native_record_and_late_receipt(self):
         raw=fixture();answer=audit.assignment_checked(raw)
