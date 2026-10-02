@@ -5,7 +5,6 @@ from unittest.mock import patch
 import pytest
 
 pytest.importorskip("torch")
-pytest.importorskip("highspy")
 
 from experiments import lp_expand4_holdout_v102 as runner
 from neumann1.lp_expand4_holdout_archive_v102 import load_first_evaluation
