@@ -184,8 +184,8 @@ def main():
     result = analyze(args.directory)
     text = json.dumps(result, sort_keys=True, separators=(",", ":"), allow_nan=False)
     if args.expect:
-        expected = Path(args.expect).read_text().strip()
-        if text != expected:
+        expected = json.loads(Path(args.expect).read_text())
+        if json.loads(text) != expected:
             raise SystemExit("replay drift")
     print(text)
 
