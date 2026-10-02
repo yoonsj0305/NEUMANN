@@ -187,6 +187,7 @@ def worker(directory, route):
     # rather than hiding a lazy optimizer import in an excluded warmup.
     import numpy
     import scipy.linalg
+    from neumann1 import lp_portfolio_v084, lp_certificate_v081
     if route in {"NATIVE","ORACLE"}:
         from neumann1 import lp_native_warm_start_v086
     else:
