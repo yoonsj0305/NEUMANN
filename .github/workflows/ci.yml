@@ -211,5 +211,7 @@ jobs:
         run: pytest -q tests/test_lp_q34_replay_v098.py
       - name: Equivalence quotient representation audit (opened development only, no fit/solver/holdout)
         run: pytest -q -s tests/test_lp_equivalence_quotient_v099.py
+      - name: Matched quotient-point refit contracts (no fitting or development generation)
+        run: pytest -q tests/test_lp_quotient_refit_v100.py
       - name: Matched tiny-Transformer benchmark
         run: python benchmark_v031.py
