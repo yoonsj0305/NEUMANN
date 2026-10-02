@@ -23,7 +23,7 @@ class FrozenHFCore:
         import torch
         import transformers
         from huggingface_hub import snapshot_download
-        from transformers import AutoProcessor, AutoModelForMultimodalLM
+        from transformers import AutoProcessor, AutoModelForMultimodalLM, Gemma4Processor
         self.torch, self.transformers = torch, transformers
         torch.set_num_threads(1)
         torch.set_num_interop_threads(1)
@@ -46,6 +46,8 @@ class FrozenHFCore:
                          "weights_frozen": True, "precision": "bfloat16", "device": "cpu",
                          "parameters": sum(p.numel() for p in self.model.parameters()),
                          "torch": torch.__version__, "transformers": transformers.__version__,
+                         "torchvision": __import__("torchvision").__version__,
+                         "effective_tokenizer_vocab_sha256": sha(self.processor.tokenizer.get_vocab()),
                          "evidence_kind": "actual_frozen_model"}
         self.startup_ms = milliseconds(started)
 
