@@ -143,6 +143,79 @@ Interface readiness requires:
 Accuracy is retained but is not an interface-readiness threshold. General Gate
 remains NOT_EVALUATED regardless of the result.
 
+## First actual result
+
+Source run: `37013632396`.
+
+Source trigger head: `7a47dba21934675e7f6a1c44c67ee9326bd30db3`.
+
+Retained evidence commit: `0185661132822e7b62c37dc8a24d64ca45af1d75`.
+
+The one-shot first actual Runtime-0.2 run completed all 15 retained observations
+and preserved the frozen-core audit, but **Decision 1 FAILED**.
+
+Measured replay:
+
+- 15/15 prompts passed the 240-token admission gate,
+- observed prompt range: 159-229 tokens,
+- 15/15 model-token accounting complete,
+- 5/15 actual query timeouts,
+- only 1/9 B2/B3/N observations executed any deterministic tool,
+- only 7/15 observations reached the original checker,
+- 7/15 observations produced a retained candidate answer,
+- 2/15 observations were accepted by the checker.
+
+By arm:
+
+- B0: 0 timeouts, 3/3 checker reached, 1/3 accepted,
+- B1: 0 timeouts, 3/3 checker reached, 0/3 accepted,
+- B2: 0 timeouts, 0/3 tool calls, 0/3 checker reached,
+- B3: 2/3 timeouts, 1/3 tool path, 1/3 checker reached, 1/3 accepted,
+- N: 3/3 timeouts, 0/3 tool calls, 0/3 checker reached.
+
+The compact prompt successfully removed native-schema inflation. That means this
+failure must not be reclassified as another prompt-length problem. Instead, the
+frozen E2B core frequently failed to obey the compact control grammar on the
+first attempt, while a second model call was physically too expensive inside the
+120 s single-thread CPU query budget. First calls already consumed roughly
+70-109 s on the opened controls.
+
+This is still **NOT** a General Capability verdict. The run does not establish
+that NEUMANN helps or hurts the same core on a matched capability task. It shows
+that the current single-thread CPU harness is no longer an efficient scientific
+surface for obtaining that answer.
+
+## Decision after first actual v1062
+
+Per the frozen critical-path contract:
+
+```
+Decision 1 = FAIL
+CPU runtime mainline = STOP_MICROTUNING_MOVE_ACCELERATOR
+General Capability Gate = NOT_EVALUATED
+Q1-Q7 = OPEN
+```
+
+Do **not** create Runtime-0.3 to tune prompt wording, compact grammar, parser
+heuristics, token caps or single-thread CPU latency.
+
+The next execution environment must preserve:
+
+- the same frozen Gemma 4 E2B revision,
+- matched baseline vs NEUMANN rights,
+- original-checker authority,
+- complete resource accounting,
+- bounded tool and model calls,
+
+while moving the capability experiment to accelerator-class execution. Edge
+efficiency remains a later Reality Gate and must not be inferred from that
+accelerated capability run.
+
+The byte-identical first-run files are retained under
+`docs/experiments/results/v1062_general_compact_first/`. The independent
+`replay.json` is recomputed in CI without loading model weights or re-running
+tools.
+
 ## Immutable boundaries
 
 - frozen Gemma 4 E2B revision unchanged,
