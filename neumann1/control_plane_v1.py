@@ -212,6 +212,7 @@ def run_control(view, arm, scorer, execute, verify_original, costs, cost_weight=
             raise ValueError("forward admission")
         event = {"kind": "score", "request_sha256": digest([prompts, labels]),
                  "plan_sha256": digest([vars(r) for r in plan.rows]), "status": "STARTED",
+                 "plan_rows": [vars(r) for r in plan.rows], "labels": list(labels),
                  "evaluated_tokens": plan.evaluated_tokens, "scored_tokens": plan.scored_tokens,
                  "score_rows": len(plan.rows), "generated_tokens": 0}
         events.append(event)
@@ -306,6 +307,8 @@ def run_control(view, arm, scorer, execute, verify_original, costs, cost_weight=
     complete_ms = (perf_counter_ns() - started) / 1e6
     return {"schema": SCHEMA, "arm": arm, "accepted": accepted, "answer": answer, "error": error,
             "counts": counts, "complete_ms": complete_ms, "events": events,
+            "budget": vars(budget), "cost_estimates": {route: vars(costs[route]) for route in ROUTES},
+            "cost_weight_nats_per_ms": cost_weight if arm == "NEUMANN" else 0.0,
             "original_sha256": digest(original), "core_sha256": digest(identity),
             "trace_sha256": digest(events), "accounting_complete": all(e.get("status") != "STARTED" for e in events),
             "general_capability_gate": "NOT_EVALUATED", "global_questions_closed": [],

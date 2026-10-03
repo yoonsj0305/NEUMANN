@@ -68,6 +68,8 @@ class ControllerTests(unittest.TestCase):
         self.assertEqual(calls[-1], ("ARITHMETIC", {"b": 7, "a": 3}))
         self.assertTrue(all("noise" not in evidence for _, evidence in calls))
         self.assertEqual(result["counts"]["generated_tokens"], 0)
+        self.assertEqual(result["cost_estimates"]["DIRECT"]["provenance"], "synthetic estimate, not measured")
+        self.assertEqual(result["events"][0]["plan_rows"][0]["label_ids"], (3,))
         self.assertEqual(result["counts"]["forward_calls"], 3)
         self.assertTrue(result["accounting_complete"])
         self.assertEqual(result["general_capability_gate"], "NOT_EVALUATED")
