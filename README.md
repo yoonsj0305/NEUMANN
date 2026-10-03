@@ -48,6 +48,14 @@ performed yet.** v107 sealed evaluation, frontier calls, 4B/7B scaling, Edge
 optimization, new training, and large benchmark expansion remain blocked until
 Decision 2 resolves.
 
+Decision 3 has been **prepared but not armed**. The
+[sealed gate](docs/research/decision3_sealed_gate.md), metadata-only
+[source census](docs/research/decision3_source_census_2026-10-03.md), frontier
+receipt schema and zero-content readiness checker are frozen in advance. No
+gated task row has been opened. The current task-specific AM1 interface is also
+recorded as a blocker for genuine new-family evaluation, so a Decision-2 PASS
+cannot silently grow a benchmark-specific executor before the sealed test.
+
 ## Frontier Gap contract — subsequent, still UNARMED
 
 G={T: an actually executed frozen small baseline fails AND a frontier reference
