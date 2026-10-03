@@ -100,6 +100,14 @@ The same sealed experiment should measure, where applicable:
 Q5, Q6 and Q7 remain distinct questions in the scientific record. They are not
 three separate engineering projects.
 
+Decision-3 contracts, metadata-only source census and a no-unseal readiness
+checker are preregistered in advance. They do NOT authorize execution before
+Decision 2 passes. The current AM1 representation/executor grammar is
+task-specific; the Decision-3 readiness marker therefore records
+`BLOCKED_CURRENT_TASK_SPECIFIC_INTERFACE`. A genuinely new family may not be
+made runnable by adding answer-capable semantics after seeing sealed data. Any
+such interface change must return to opened matched validation first.
+
 Only a positive sealed result admits Edge/Cloud engineering.
 
 ## Explicit STOP list until admitted
