@@ -36,7 +36,8 @@ SCHEMA = "neumann.architecture-multiplier-first.v1"
 def _peak_process_rss_bytes():
     try:
         import resource
-        return int(_peak_process_rss_bytes())
+        value = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        return int(value * 1024)
     except Exception:
         return None
 
@@ -188,7 +189,7 @@ def execute(directory, frozen_head):
         "arm_results": arm_results,
         "decision_2": verdict,
         "whole_study_ms": milliseconds(started),
-        "peak_process_rss_bytes": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024,
+        "peak_process_rss_bytes": _peak_process_rss_bytes(),
         "new_training": False,
         "frontier_calls": 0,
         "holdout_opened": False,
