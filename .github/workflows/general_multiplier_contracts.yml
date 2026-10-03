@@ -8,9 +8,19 @@ on:
       - experiments/general_multiplier_tasks.py
       - experiments/general_multiplier_accelerator_core.py
       - experiments/general_multiplier_first.py
+      - experiments/general_multiplier_local_preflight.py
+      - experiments/general_multiplier_evidence_replay.py
+      - neumann1/general_python_worker_v106.py
+      - scripts/am1_local_setup.ps1
+      - scripts/am1_local_run.ps1
+      - AM1_LOCAL_SETUP.cmd
+      - AM1_LOCAL_RUN.cmd
       - tests/test_general_multiplier_contract.py
       - tests/test_general_multiplier_runtime.py
+      - tests/test_general_multiplier_local_prep.py
       - docs/research/architecture_multiplier_gate.md
+      - docs/research/am1_local_execution.md
+      - docs/experiments/general_multiplier_local_execution_v1.json
       - docs/experiments/general_multiplier_v1.preregister.json
       - .github/workflows/general_multiplier_contracts.yml
 
@@ -28,8 +38,8 @@ jobs:
         run: pip install -e . pytest
       - name: Pure contracts and runtime authority; no model weights or accelerator inference
         run: |
-          python -m pytest -q tests/test_general_multiplier_contract.py tests/test_general_multiplier_runtime.py
-          python -m py_compile             neumann1/general_multiplier_runtime.py             experiments/general_multiplier_accelerator_core.py             experiments/general_multiplier_first.py
+          python -m pytest -q tests/test_general_multiplier_contract.py tests/test_general_multiplier_runtime.py tests/test_general_multiplier_local_prep.py
+          python -m py_compile neumann1/general_multiplier_runtime.py neumann1/general_python_worker_v106.py experiments/general_multiplier_accelerator_core.py experiments/general_multiplier_first.py experiments/general_multiplier_local_preflight.py experiments/general_multiplier_evidence_replay.py
       - name: Freeze opened task and budget identities
         run: |
           python - <<'PY'
@@ -48,6 +58,9 @@ jobs:
         run: |
           if test -f docs/experiments/general_multiplier_v1.preregister.json; then
             python -c 'import json; from dataclasses import asdict; from pathlib import Path; from experiments.general_multiplier_tasks import manifest; from neumann1.general_multiplier_contract import MultiplierBudget; from neumann1.general_runtime_v106 import sha; marker=json.loads(Path("docs/experiments/general_multiplier_v1.preregister.json").read_text()); m=manifest(); assert marker["schema"]=="neumann.architecture-multiplier-preregister.v1"; assert marker["task_sha256"]==m["task_sha256"]; assert marker["model_view_sha256"]==m["model_view_sha256"]; assert marker["budget_sha256"]==sha(asdict(MultiplierBudget())); assert marker["task_count"]==12; assert marker["arms"]==["DIRECT","TOOL","NEUMANN"]; assert marker["accelerator_execution_armed"] is False; assert marker["new_training"] is False; assert marker["frontier_calls"]==0; assert marker["holdout_opened"] is False'
-            head=$(python -c 'import json; from pathlib import Path; print(json.loads(Path("docs/experiments/general_multiplier_v1.preregister.json").read_text())["contract_head"])')
-            git merge-base --is-ancestor "$head" HEAD
+            # contract_head is the original PR branch commit. PR #126 was
+            # squash-merged, so that branch commit is intentionally not a main
+            # ancestor. Content identities above preserve the preregistration;
+            # this ancestry check pins the authoritative squash merge instead.
+            git merge-base --is-ancestor 28ff412ee73370f63e632c006fbe8301d5e7c2be HEAD
           fi

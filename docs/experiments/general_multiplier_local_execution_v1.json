@@ -1,0 +1,16 @@
+{
+  "schema": "neumann.am1-local-execution-implementation.v1",
+  "scientific_contract_merge": "28ff412ee73370f63e632c006fbe8301d5e7c2be",
+  "scientific_pr": 126,
+  "actual_run_performed": false,
+  "paid_compute_required": false,
+  "cpu_fallback_allowed": false,
+  "quantization_allowed": false,
+  "minimum_vram_mib": 14336,
+  "precision": "bfloat16",
+  "setup_entrypoint": "AM1_LOCAL_SETUP.cmd",
+  "run_entrypoint": "AM1_LOCAL_RUN.cmd",
+  "preflight": "experiments/general_multiplier_local_preflight.py",
+  "evidence_replay": "experiments/general_multiplier_evidence_replay.py",
+  "next_scientific_action": "FIRST_VALID_AM1_EXECUTION"
+}

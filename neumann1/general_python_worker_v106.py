@@ -1,7 +1,10 @@
 """Resource-capped pure Python subset worker. Not a general Python sandbox."""
 import ast
 import json
-import resource
+try:
+    import resource
+except ImportError:  # Windows
+    resource = None
 import sys
 
 BUILTINS = {"sum": sum, "len": len, "min": min, "max": max, "abs": abs,
@@ -50,10 +53,14 @@ def execute(data):
 
 
 def main():
-    resource.setrlimit(resource.RLIMIT_CPU, (1, 2))
-    resource.setrlimit(resource.RLIMIT_AS, (256*1024*1024, 256*1024*1024))
-    resource.setrlimit(resource.RLIMIT_FSIZE, (0, 0))
-    resource.setrlimit(resource.RLIMIT_NOFILE, (16, 16))
+    # Unix gets kernel-enforced caps. Windows has no stdlib resource module;
+    # the parent still enforces a hard subprocess timeout and this worker keeps
+    # the same AST/builtin/input/output restrictions.
+    if resource is not None:
+        resource.setrlimit(resource.RLIMIT_CPU, (1, 2))
+        resource.setrlimit(resource.RLIMIT_AS, (256*1024*1024, 256*1024*1024))
+        resource.setrlimit(resource.RLIMIT_FSIZE, (0, 0))
+        resource.setrlimit(resource.RLIMIT_NOFILE, (16, 16))
     try:
         raw = sys.stdin.read(100001)
         if len(raw) > 100000: raise ValueError("input byte cap")

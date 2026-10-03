@@ -5,7 +5,6 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import resource
 import subprocess
 from time import perf_counter_ns
 
@@ -19,6 +18,17 @@ from neumann1.general_multiplier_contract import (
 from neumann1.general_runtime_v106 import milliseconds, sha
 
 MIN_ACCELERATOR_MEMORY_BYTES = 14 * 1024**3
+
+def _peak_process_rss_bytes():
+    try:
+        import resource
+        value = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        # Linux reports KiB; macOS reports bytes. AM1 local target is Windows/Linux,
+        # and Windows intentionally reports UNKNOWN instead of inventing a value.
+        return int(value * 1024)
+    except Exception:
+        return None
+
 
 
 def _file_hash(path):
@@ -192,7 +202,7 @@ class FrozenAcceleratorCore:
             "deadline_reached": milliseconds(started) >= deadline_ms,
             "peak_accelerator_memory_bytes": int(torch.cuda.max_memory_allocated(self.device)),
             "peak_accelerator_reserved_bytes": int(torch.cuda.max_memory_reserved(self.device)),
-            "peak_process_rss_bytes": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024,
+            "peak_process_rss_bytes": _peak_process_rss_bytes(),
             "core_sha256": sha(self.identity),
         }
 
@@ -209,5 +219,5 @@ class FrozenAcceleratorCore:
             "current_accelerator_allocated_bytes": int(self.torch.cuda.memory_allocated(self.device)),
             "max_accelerator_allocated_bytes": int(self.torch.cuda.max_memory_allocated(self.device)),
             "max_accelerator_reserved_bytes": int(self.torch.cuda.max_memory_reserved(self.device)),
-            "peak_process_rss_bytes": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024,
+            "peak_process_rss_bytes": _peak_process_rss_bytes(),
         }

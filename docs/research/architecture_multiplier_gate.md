@@ -1,6 +1,6 @@
 # NEUMANN 1 — Accelerated Opened Architecture Multiplier Gate
 
-Status: CONTRACT-ONLY / UNARMED.
+Status: EXECUTION-READY / ACTUAL RUN NOT YET PERFORMED.
 
 This is Decision 2 in the three-decision critical path. Runtime-0.2 already
 resolved Decision 1 as a single-thread CPU harness failure, not a capability
@@ -176,10 +176,11 @@ Until this gate passes:
 
 ## Execution authority
 
-This branch does not provision or purchase accelerator compute and does not start
-model inference. Actual execution remains UNARMED until a concrete non-CPU
-runner is available and its environment receipt satisfies the frozen contract.
+The accelerator runner is implemented, but no actual Decision-2 capability run
+has been performed. Local execution is the preferred zero-cost path and is
+documented in [AM1 Local Zero-Cost Execution](am1_local_execution.md).
 
-When such a runner exists, the next implementation step is the smallest possible
-runner adapter plus one first opened execution. No additional architecture
-search is admitted beforehand.
+A valid first run must still satisfy the frozen environment receipt and retain
+all 36 observations. Hardware or environment failure is NOT_EVALUATED, not a
+negative capability result. No paid compute is required by the contract, and no
+additional architecture search is admitted before the first valid execution.
