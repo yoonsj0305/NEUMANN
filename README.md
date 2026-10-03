@@ -24,20 +24,29 @@ cheaply. Never spend compute unless it buys capability. No component earns
 permanence. Edge and cloud are one heterogeneous pool; charge all local/remote
 work and failed routes under an explicit iso-capability Pareto objective.
 
-## Current primary surface — General NEUMANN Runtime-0
+## Current primary surface — Decision 2 Architecture Multiplier
 
-The user's next sequence is v0.0.106 opened runtime development, v0.0.107
-Fresh General Holdout, v0.0.108 Frontier Gap Pilot-1, then v0.0.109 Edge Reality
-Gate. [Runtime-0](docs/research/general_runtime_v106.md) compares the same frozen
-edge-class small core as Direct, reasoning, same-tools, iterative verification,
-and NEUMANN. No new training; no frontier calls before small/N traces are frozen.
-Original math, coding and planning checkers retain authority. B3 receives the
-same certified plan execution as N. Interface controls are not capability proof.
-The first frozen basis-pursuit transfer preserved capability but failed the full
-cost gate; both checkpoints are STOP_FROZEN_TRANSFER_NO_REFIT. The first General
-startup is INCOMPLETE (0/15 observations, missing torchvision). Both first archives
-are immutable. [Actual outcomes and Boot2 readiness](docs/experiments/v106_first_outcomes.md)
-record the dependency repair and a separately registered opened diagnostic.
+Decision 1 is closed. The first actual Runtime-0.2 compact CPU attempt fit every
+prompt under the frozen admission cap, but failed readiness because single-thread
+CPU latency and control adherence prevented complete tool/checker execution.
+That result is retained as a harness failure, not a capability verdict. CPU
+micro-tuning is stopped.
+
+The active mainline is now the
+[Accelerated Opened Architecture Multiplier](docs/research/architecture_multiplier_gate.md).
+It compares the same frozen Gemma 4 E2B core under exactly three arms:
+DIRECT, matched TOOL, and NEUMANN. The opened set is only 12 tasks
+(4 math, 4 coding, 4 finite planning), with the original checker retaining
+authority. The frozen PASS rule admits exactly one sealed general evaluation;
+a valid FAIL requires an architecture pivot.
+
+PR #126 merged the scientific contract and accelerator runner. A
+[zero-cost local execution path](docs/research/am1_local_execution.md) now
+provides CUDA/BF16 preflight, native-Windows compatibility, one-shot evidence
+retention, and model-free replay. **No valid AM1 capability run has been
+performed yet.** v107 sealed evaluation, frontier calls, 4B/7B scaling, Edge
+optimization, new training, and large benchmark expansion remain blocked until
+Decision 2 resolves.
 
 ## Frontier Gap contract — subsequent, still UNARMED
 
