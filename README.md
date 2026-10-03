@@ -26,6 +26,8 @@ work and failed routes under an explicit iso-capability Pareto objective.
 
 ## Current primary surface — architecture pivot after Decision 2 FAIL
 
+The active implementation step is [Non-Generative Control Plane P0](docs/research/control_plane_pivot_v1.md): fixed-candidate likelihood scoring, evidence expansion and original-verifier authority. P1 route-only GPU scoring and P2 matched capability comparison remain unarmed; the original Decision-2 FAIL is preserved.
+
 Decision 1 is closed. The first actual Runtime-0.2 compact CPU attempt failed
 interface readiness, so CPU micro-tuning was stopped and the same frozen small
 core moved to an accelerator-class matched comparison.

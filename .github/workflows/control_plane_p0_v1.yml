@@ -1,0 +1,29 @@
+name: Non-generative control plane P0 contracts
+
+on:
+  pull_request:
+    paths:
+      - 'neumann1/control_plane*_v1.py'
+      - 'experiments/control_plane_p0_v1.py'
+      - 'tests/test_control_plane*_v1.py'
+      - 'docs/research/control_plane_pivot_v1.md'
+      - 'docs/experiments/results/am1_decision2_first_original/**'
+      - '.github/workflows/control_plane_p0_v1.yml'
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install package and CPU tensor test dependencies, no weights
+        run: |
+          pip install -e .
+          pip install torch==2.14.0+cpu --index-url https://download.pytorch.org/whl/cpu
+      - name: P0 pure and synthetic tensor contracts, no model weights
+        run: python -m unittest discover -s tests -p 'test_control_plane*_v1.py' -v
+      - name: Preserve and independently replay original Decision-2 failure
+        run: python -m experiments.control_plane_p0_v1
