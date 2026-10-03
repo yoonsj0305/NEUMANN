@@ -8,9 +8,19 @@ on:
       - experiments/general_multiplier_tasks.py
       - experiments/general_multiplier_accelerator_core.py
       - experiments/general_multiplier_first.py
+      - experiments/general_multiplier_local_preflight.py
+      - experiments/general_multiplier_evidence_replay.py
+      - neumann1/general_python_worker_v106.py
+      - scripts/am1_local_setup.ps1
+      - scripts/am1_local_run.ps1
+      - AM1_LOCAL_SETUP.cmd
+      - AM1_LOCAL_RUN.cmd
       - tests/test_general_multiplier_contract.py
       - tests/test_general_multiplier_runtime.py
+      - tests/test_general_multiplier_local_prep.py
       - docs/research/architecture_multiplier_gate.md
+      - docs/research/am1_local_execution.md
+      - docs/experiments/general_multiplier_local_execution_v1.json
       - docs/experiments/general_multiplier_v1.preregister.json
       - .github/workflows/general_multiplier_contracts.yml
 
@@ -28,8 +38,8 @@ jobs:
         run: pip install -e . pytest
       - name: Pure contracts and runtime authority; no model weights or accelerator inference
         run: |
-          python -m pytest -q tests/test_general_multiplier_contract.py tests/test_general_multiplier_runtime.py
-          python -m py_compile             neumann1/general_multiplier_runtime.py             experiments/general_multiplier_accelerator_core.py             experiments/general_multiplier_first.py
+          python -m pytest -q tests/test_general_multiplier_contract.py tests/test_general_multiplier_runtime.py tests/test_general_multiplier_local_prep.py
+          python -m py_compile neumann1/general_multiplier_runtime.py neumann1/general_python_worker_v106.py experiments/general_multiplier_accelerator_core.py experiments/general_multiplier_first.py experiments/general_multiplier_local_preflight.py experiments/general_multiplier_evidence_replay.py
       - name: Freeze opened task and budget identities
         run: |
           python - <<'PY'
