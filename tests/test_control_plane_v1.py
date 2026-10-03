@@ -168,6 +168,20 @@ class ControllerTests(unittest.TestCase):
         self.assertFalse(result["accounting_complete"])
         self.assertIn("budget mismatch", result["error"])
 
+    def test_exhausted_generation_does_not_block_remaining_deterministic_compute(self):
+        seen = []
+        def execute(route, view, ms, caps):
+            seen.append(caps)
+            if len(seen) == 1:
+                return ExecutionResult(0, 1, 1, 1)
+            return ExecutionResult(10, 0, 0, 1)
+        result = run_control(VIEW, "TOOL", fixture(), execute, lambda a, ms: a == 10, COSTS,
+                             budget=replace(ControlBudget(), generated_tokens=1, model_calls=1))
+        self.assertTrue(result["accepted"])
+        self.assertEqual(seen[1]["generated_tokens"], 0)
+        self.assertEqual(seen[1]["model_calls"], 0)
+        self.assertEqual(result["counts"]["generated_tokens"], 1)
+
     def test_identity_drift_blocks_acceptance(self):
         scorer = fixture()
         def execute(*args):

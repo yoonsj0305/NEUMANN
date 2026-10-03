@@ -263,10 +263,6 @@ def run_control(view, arm, scorer, execute, verify_original, costs, cost_weight=
                 check_deadline()
                 if counts["attempts"] >= budget.attempts:
                     raise ValueError("attempt cap")
-                if counts["model_calls"] >= budget.model_calls or counts["tool_calls"] >= budget.tool_calls:
-                    raise ValueError("execution resource cap")
-                if counts["generated_tokens"] >= budget.generated_tokens:
-                    raise ValueError("answer generation cap")
                 counts["attempts"] += 1
                 event = {"kind": "execution", "route": route, "keys": list(evidence), "status": "STARTED"}
                 events.append(event)
