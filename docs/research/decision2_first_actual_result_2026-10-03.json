@@ -1,0 +1,76 @@
+{
+  "schema": "neumann.decision2-first-actual-result.v1",
+  "date": "2026-10-03",
+  "frozen_head": "716e71834fe5b585e7369e7c1394919c61b3d9e9",
+  "source_archive": {
+    "name": "NEUMANN_D2_OFFICIAL_EVIDENCE.zip",
+    "bytes": 89766,
+    "sha256": "468893d7be2ac5587edee3b7f87ad4310919f8c883800df8e1f8d41150556355",
+    "retention": "user-retained complete archive"
+  },
+  "execution": {
+    "model_id": "google/gemma-4-E2B-it",
+    "model_revision": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+    "precision": "bfloat16",
+    "accelerator": "Tesla T4",
+    "observations": 36,
+    "replay_valid": true,
+    "terminal_hash_mismatches": 0,
+    "core_unchanged": true
+  },
+  "arms": {
+    "DIRECT": {
+      "successes": 0,
+      "observations": 12,
+      "model_calls": 24,
+      "tool_calls": 0,
+      "input_tokens": 4950,
+      "output_tokens": 6144,
+      "complete_ms": 438365.942284
+    },
+    "TOOL": {
+      "successes": 0,
+      "observations": 12,
+      "model_calls": 24,
+      "tool_calls": 0,
+      "input_tokens": 4974,
+      "output_tokens": 6144,
+      "complete_ms": 435523.924754
+    },
+    "NEUMANN": {
+      "successes": 0,
+      "observations": 12,
+      "model_calls": 24,
+      "tool_calls": 0,
+      "input_tokens": 5262,
+      "output_tokens": 6144,
+      "complete_ms": 437706.01175299997
+    }
+  },
+  "failure_fingerprint": {
+    "model_calls": 72,
+    "calls_at_256_output_token_cap": 72,
+    "calls_beginning_thought_channel": 72,
+    "calls_reaching_final_channel": 0,
+    "json_decode_action_rejections": 72,
+    "deadline_reached_receipts": 0,
+    "total_tool_calls": 0
+  },
+  "decision_2": {
+    "verdict": "FAIL",
+    "strongest_baseline": "TOOL",
+    "baseline_successes": 0,
+    "neumann_successes": 0,
+    "architecture_multiplier": null,
+    "latency_ratio": 1.00501025747376,
+    "next": "ARCHITECTURE_PIVOT",
+    "sealed_general_evaluation_admitted": false
+  },
+  "interpretation": {
+    "proximal_failure": "generative control never produced a consumable final action before the per-call output cap",
+    "tested_architecture_falsified": true,
+    "structural_intelligence_global_claim_closed": false,
+    "decision3_blocked": true,
+    "favorable_rerun_forbidden": true
+  }
+}
