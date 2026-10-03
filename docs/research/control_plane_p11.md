@@ -18,10 +18,11 @@ Actual original tokenizer vocabulary SHA256 is checked, and each string must
 encode to one distinct non-special token with exact decode. CI performs this
 tokenizer-only readiness check without downloading any model weights or reading
 tasks. Runtime repeats it against the original core tokenizer before scoring.
-Readiness uses the same Gemma4Processor as the original core, since it adds
-registered multimodal special tokens; generic AutoTokenizer alone does not
-reproduce the frozen vocabulary. Processor assets are downloaded, model weights
-are not. CI's CPU vision dependency is only for that processor import.
+Readiness uses the same Gemma4Processor as the original core and its exact
+vocabulary hash function (JSON with ASCII Unicode escaping). Public-view/trace
+hashes use a different Unicode serialization; those digests must not be reused
+for the frozen vocabulary. Processor assets are downloaded, model weights are
+not. CI's CPU vision dependency is only for that processor import.
 Numeric IDs are determined by the frozen vocabulary and encoding rule; no
 response-dependent code search, fallback code selection or fitted task prior.
 

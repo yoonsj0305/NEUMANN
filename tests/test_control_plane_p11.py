@@ -10,6 +10,7 @@ from types import SimpleNamespace
 
 from neumann1.control_plane_v1 import ROUTES, digest
 from neumann1.control_plane_p1_contract import MODEL, TASK_IDS
+from neumann1.general_runtime_v106 import sha as original_core_sha
 from neumann1.control_plane_p11 import (Budget,CODES,SCHEDULES,CodePlan,CodedFailure,NextCodeBackend,
     aggregate,audit_codes,contract,evaluate_development,plan_cost,prompt_for,score_development,validate_schedules)
 from experiments.control_plane_p11_dev import PUBLIC,registration,run
@@ -113,10 +114,11 @@ class CodedContracts(unittest.TestCase):
         with self.assertRaises(ValueError):aggregate(matrix)
 
     def test_code_audit_requires_exact_vocabulary_single_non_special_unique_tokens(self):
-        vocab={'A':1,'B':2,'C':3,'D':4};tokens={c:[i] for c,i in vocab.items()}
+        vocab={'A':1,'B':2,'C':3,'D':4,'가':5};tokens={c:[i] for c,i in vocab.items()}
         tokenizer=SimpleNamespace(get_vocab=lambda:vocab,encode=lambda c,**kw:tokens[c],
                                   decode=lambda ids,**kw:next(c for c,i in vocab.items() if ids==[i]),all_special_ids=[])
-        with patch('neumann1.control_plane_p11.MODEL',{**MODEL,'tokenizer_sha256':digest(vocab)}):
+        self.assertNotEqual(original_core_sha(vocab),digest(vocab))
+        with patch('neumann1.control_plane_p11.MODEL',{**MODEL,'tokenizer_sha256':original_core_sha(vocab)}):
             self.assertEqual(audit_codes(tokenizer)['token_ids'],[1,2,3,4])
             tokens['A']=[1,2]
             with self.assertRaises(ValueError):audit_codes(tokenizer)

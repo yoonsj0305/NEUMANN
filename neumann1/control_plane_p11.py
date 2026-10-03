@@ -11,6 +11,7 @@ from time import perf_counter_ns
 
 from neumann1.control_plane_v1 import ROUTES, canonical, digest, finite, public_view, snapshot
 from neumann1.control_plane_p1_contract import MODEL, PUBLIC_SHA256, TASK_IDS
+from neumann1.general_runtime_v106 import sha as original_core_sha
 
 SCHEMA = "neumann.control-plane-p1.1.v1"
 CODES = ("A", "B", "C", "D")
@@ -70,7 +71,7 @@ def validate_schedules(schedules=SCHEDULES):
 
 def audit_codes(tokenizer):
     # Only a frozen tokenizer is needed; no model, fitting or task rows.
-    if digest(tokenizer.get_vocab()) != MODEL["tokenizer_sha256"]:
+    if original_core_sha(tokenizer.get_vocab()) != MODEL["tokenizer_sha256"]:
         raise ValueError("exact frozen tokenizer vocabulary required")
     ids=[]
     for code in CODES:
