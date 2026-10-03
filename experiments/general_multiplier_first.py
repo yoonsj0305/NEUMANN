@@ -11,7 +11,6 @@ import hashlib
 import json
 from pathlib import Path
 import random
-import resource
 import traceback
 from time import perf_counter_ns
 
@@ -33,6 +32,14 @@ from neumann1.general_multiplier_runtime import run_observation
 from neumann1.general_runtime_v106 import canonical, milliseconds, sha
 
 SCHEMA = "neumann.architecture-multiplier-first.v1"
+
+def _peak_process_rss_bytes():
+    try:
+        import resource
+        return int(_peak_process_rss_bytes())
+    except Exception:
+        return None
+
 
 
 def _write(path, value):
