@@ -1,9 +1,12 @@
 """Zero-cost local AM1 preparation contracts. No GPU or model weights required."""
 from pathlib import Path
+import sys
+from types import SimpleNamespace
 
 import pytest
 
 from experiments.general_multiplier_evidence_replay import verify_terminal_hashes
+from experiments.general_multiplier_first import _peak_process_rss_bytes
 from experiments.general_multiplier_local_preflight import classify, parse_nvidia_smi
 from neumann1.general_python_worker_v106 import execute
 
@@ -59,3 +62,11 @@ def test_terminal_hash_replay_detects_byte_change(tmp_path):
     evidence.write_text('{"ok":false}\n', encoding="utf-8")
     mismatch = verify_terminal_hashes(tmp_path, {"files":{"report.json":good}})
     assert "report.json" in mismatch
+
+def test_first_runner_peak_rss_helper_reads_resource_without_recursion(monkeypatch):
+    fake_resource = SimpleNamespace(
+        RUSAGE_SELF=7,
+        getrusage=lambda who: SimpleNamespace(ru_maxrss=123),
+    )
+    monkeypatch.setitem(sys.modules, "resource", fake_resource)
+    assert _peak_process_rss_bytes() == 123 * 1024
