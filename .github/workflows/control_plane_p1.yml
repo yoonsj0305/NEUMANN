@@ -1,0 +1,32 @@
+name: P1 route-only controller contracts
+
+on:
+  pull_request:
+    paths:
+      - 'neumann1/control_plane*.py'
+      - 'experiments/control_plane_p1*.py'
+      - 'scripts/control_plane_p1_kaggle.py'
+      - 'tests/test_control_plane_p1.py'
+      - 'docs/experiments/control_plane_p1*.json'
+      - 'docs/research/control_plane_p1.md'
+      - '.github/workflows/control_plane_p1.yml'
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install package and CPU tensor fixture dependencies
+        run: |
+          pip install -e .
+          pip install torch==2.14.0+cpu --index-url https://download.pytorch.org/whl/cpu
+      - name: P1 runner and original P0 contracts, no Gemma weights/inference
+        run: |
+          python -m unittest discover -s tests -p 'test_control_plane_p1.py' -v
+          python -m unittest discover -s tests -p 'test_control_plane*_v1.py' -v
+      - name: Frozen registration validation only
+        run: python -m experiments.control_plane_p1_first --check-registration
