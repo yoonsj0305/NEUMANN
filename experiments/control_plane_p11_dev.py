@@ -36,11 +36,14 @@ def registration():
 
 def tokenizer_readiness():
     """CI: original vocabulary only, no model weights or task rows loaded."""
-    from transformers import AutoTokenizer
+    from transformers import AutoProcessor, Gemma4Processor
     from neumann1.control_plane_p1_contract import MODEL
-    tokenizer=AutoTokenizer.from_pretrained(MODEL['model_id'],revision=MODEL['model_revision'],
-                                           token=False,trust_remote_code=False)
-    return audit_codes(tokenizer)
+    # The original processor adds its registered multimodal special tokens.
+    # Generic AutoTokenizer alone does not reproduce the core's vocabulary.
+    processor=AutoProcessor.from_pretrained(MODEL['model_id'],revision=MODEL['model_revision'],
+                                            token=False,trust_remote_code=False)
+    if not isinstance(processor,Gemma4Processor):raise ValueError('original Gemma4Processor required')
+    return audit_codes(processor.tokenizer)
 
 
 def run(directory,frozen_head):

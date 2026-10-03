@@ -23,7 +23,7 @@ jobs:
       - name: Package and CPU tensor fixtures; no Gemma weights
         run: |
           pip install -e .
-          pip install torch==2.14.0+cpu --index-url https://download.pytorch.org/whl/cpu
+          pip install torch==2.14.0+cpu torchvision==0.29.0+cpu --index-url https://download.pytorch.org/whl/cpu
           pip install transformers==5.16.1 huggingface_hub
       - name: Balanced algebra, causal next-code, partial costs and original failure replay
         run: |
