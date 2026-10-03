@@ -51,38 +51,36 @@ scientific target of the General Capability study.
 
 ## Decision 2 — Architecture Multiplier
 
-**ACTIVE NEXT DECISION.** The capability comparison moves to accelerator-class
-execution because Decision 1 failed on the CPU harness, not because a capability
-comparison failed.
+**RESOLVED: FAIL on the first valid accelerator execution.**
 
-Compare the same frozen small core
-under the strongest matched baseline and NEUMANN orchestration on opened
-development tasks.
+The frozen Gemma 4 E2B / BF16 Architecture Multiplier completed 36/36 terminal
+observations on a Tesla T4. The model-free replay is valid and the frozen-core
+audit is unchanged. DIRECT, TOOL and NEUMANN each scored 0/12, so the
+architecture multiplier is undefined and the preregistered evaluator returned
+FAIL with next action ARCHITECTURE_PIVOT.
 
-Primary quantities:
+The retained receipts show a shared control-plane failure before any structural
+executor comparison occurred:
+
+- 72/72 model calls used the full 256-token per-call output allowance;
+- 72/72 began in the thought channel;
+- 0/72 reached the final channel;
+- all 72 action parses failed with JSONDecodeError;
+- TOOL and NEUMANN executed zero tool calls;
+- no model receipt hit the wall-clock generation deadline.
+
+The frozen verdict remains FAIL. Do not relabel it NOT_EVALUATED and do not
+rerun the same contract with favorable prompt/parser/token-budget changes.
+
+The tested architecture
 
 ```
-M_A = Capability(E2B + NEUMANN) / Capability(best matched E2B baseline)
+free-form reasoning -> final JSON control action -> executor
 ```
 
-and, where a complete resource scalar is pre-registered and all required axes are
-measured:
-
-```
-M_E = (Q_N / R_N) / (Q_B / R_B)
-```
-
-Do not collapse UNKNOWN compute, memory, energy, latency, or money into zero.
-The exact capability and resource aggregation must be frozen before execution.
-
-Admission rule:
-
-- meaningful positive matched signal -> admit one sealed general evaluation;
-- no meaningful advantage -> architecture pivot;
-- accounting incomplete -> repair measurement, not the model architecture.
-
-This opened Architecture Multiplier is the next capability experiment. It
-replaces separate Q5/Q6/Q7 development programs.
+is stopped. The active mainline is now an architecture pivot that separates
+low-entropy control selection from free-form generation. Any replacement must
+return to opened matched validation before Decision 3.
 
 ## Decision 3 — One sealed general evaluation
 
@@ -135,10 +133,11 @@ evidence. It is no longer the active optimization surface.
   line.
 - v1062 first actual bytes are one-shot evidence. Preserve failures; do not
   replace them with a favorable rerun.
-- General Gate remains NOT_EVALUATED until an actual matched capability contest
-  is runnable.
-- v107 sealed holdout and v108 frontier work remain blocked until Decision 2
-  explicitly admits them.
+- Decision 2 first actual accelerator evidence is authoritative and immutable.
+  Its frozen verdict is FAIL.
+- No favorable rerun of the failed AM1 contract is allowed.
+- Decision 3, v107 sealed work and frontier work remain blocked until a new
+  architecture passes a separately frozen opened matched validation gate.
 
 ## Mainline
 
@@ -155,8 +154,14 @@ LEAVE CPU HARNESS
 Accelerated Opened Architecture Multiplier
         |
         v
-Decision 2: matched advantage?
-   NO -> architecture pivot
+Decision 2: matched advantage? = NO
+        |
+        v
+ARCHITECTURE PIVOT
+        |
+        v
+opened matched validation of new control architecture
+   NO -> pivot again / stop candidate
    YES
         |
         v
