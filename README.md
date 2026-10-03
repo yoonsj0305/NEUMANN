@@ -26,7 +26,7 @@ work and failed routes under an explicit iso-capability Pareto objective.
 
 ## Current primary surface — architecture pivot after Decision 2 FAIL
 
-The implementation step after [Non-Generative Control Plane P0](docs/research/control_plane_pivot_v1.md) is the preregistered [P1 real controller diagnostic](docs/research/control_plane_p1.md): frozen Gemma teacher-forced route scores on the original twelve opened public views, with no generation, answers or tools. The P1 runner, model-free receipt replay and Kaggle first-run bootstrap are prepared for CI; actual GPU results remain NOT_EVALUATED. P2 matched capability comparison and Decision 3 remain blocked; the original Decision-2 FAIL is preserved.
+The [first real P1 controller diagnostic](docs/research/control_plane_p1_first_result_2026-10-03.md) completed 12/12 with unchanged frozen weights and complete costs but selected ARITHMETIC on all twelve: retained FAIL. The next architecture is [P1.1 permutation-marginalized coded routing](docs/research/control_plane_p11.md), with explicit executor contracts, audited single-token codes and balanced route/code assignment. The old twelve tasks are development only; actual P1.1 has not run. Fresh opened validation must follow architecture freeze before P2 can be registered. Decision 3 remains blocked; original P1 and Decision-2 failures are preserved.
 
 Decision 1 is closed. The first actual Runtime-0.2 compact CPU attempt failed
 interface readiness, so CPU micro-tuning was stopped and the same frozen small
