@@ -1,0 +1,95 @@
+{
+  "schema": "neumann.decision3-source-registry.v1",
+  "prepared_at": "2026-10-03",
+  "task_rows_opened_during_preparation": 0,
+  "small_model": {
+    "repo_id": "google/gemma-4-E2B-it",
+    "revision": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+    "hub_updated_date": "2026-07-20",
+    "parameters": 5123200000,
+    "note": "Hub update date is not asserted to be a training-data cutoff."
+  },
+  "sources": [
+    {
+      "id": "hle_rolling",
+      "repo_id": "cais/hle-rolling",
+      "kind": "gated_hf_dataset",
+      "license": "MIT",
+      "observed_updated_date": "2026-09-17",
+      "content_accessed": false,
+      "redistribute_raw_rows": false,
+      "role": "PRIMARY_UNSEEN_CANDIDATE",
+      "eligibility_if_admitted": [
+        "row id absent from the frozen base-HLE id set",
+        "text-only question",
+        "automatically verifiable answer type",
+        "selection uses ids/metadata only before inference"
+      ],
+      "strength": "Dynamic HLE fork reports harder replacements from a held-out set.",
+      "limitation": "A new public id is a contamination defense, not proof that no private training exposure ever occurred.",
+      "interface_status": "BLOCKED_CURRENT_RUNTIME_REQUIRES_TASK_AGNOSTIC_QA_PATH"
+    },
+    {
+      "id": "hle_diamond",
+      "repo_id": "cais/hle-diamond",
+      "kind": "gated_hf_dataset",
+      "license": "MIT",
+      "release_date": "2026-09-22",
+      "observed_updated_date": "2026-09-24",
+      "size": 1000,
+      "partitions": {"reasoning": 500, "knowledge": 500},
+      "content_accessed": false,
+      "redistribute_raw_rows": false,
+      "role": "SECONDARY_CONTAMINATION_CONTROL",
+      "strength": "Gated, canary-protected, refined 2026 release with reasoning/knowledge partitions.",
+      "limitation": "It is refined from the broader HLE question collection; release date alone does not prove the underlying questions are unseen to the frozen model.",
+      "interface_status": "BLOCKED_CURRENT_RUNTIME_REQUIRES_TASK_AGNOSTIC_QA_PATH"
+    },
+    {
+      "id": "gpqa",
+      "repo_id": "Idavidrein/gpqa",
+      "kind": "gated_hf_dataset",
+      "license": "CC-BY-4.0",
+      "first_publication_year": 2023,
+      "content_accessed": false,
+      "redistribute_raw_rows": false,
+      "role": "VERIFIER_SANITY_ONLY_NOT_PRIMARY_UNSEEN",
+      "strength": "Expert-written science questions with an official gated distribution and explicit non-redistribution request.",
+      "limitation": "Too old/public to establish post-model unseen generalization for Gemma 4 E2B.",
+      "interface_status": "BLOCKED_CURRENT_RUNTIME_REQUIRES_TASK_AGNOSTIC_QA_PATH"
+    },
+    {
+      "id": "arc_agi_2",
+      "repo_id": "arcprize/ARC-AGI-2",
+      "kind": "public_plus_private_remote_sets",
+      "public_training_tasks": 1000,
+      "public_evaluation_tasks": 120,
+      "private_sets": ["semi-private remote-commercial", "fully-private competition"],
+      "content_accessed": false,
+      "role": "STRONG_PRIVATE_CANDIDATE_DEFERRED",
+      "strength": "Official private tiers are designed for low/near-zero leakage evaluation.",
+      "limitation": "Requires a grid/ARC execution interface and remote competition/evaluation path not present in the frozen Decision-2 runtime.",
+      "interface_status": "DEFER_INTERFACE_MISMATCH"
+    },
+    {
+      "id": "livecodebench",
+      "repo_id": "livecodebench/code_generation_lite",
+      "kind": "date_tagged_public_coding",
+      "license_label": "cc",
+      "content_accessed": false,
+      "role": "FUTURE_TEMPORAL_CODING_CANDIDATE",
+      "strength": "Problems have contest release dates and hidden tests, enabling date-based contamination control.",
+      "limitation": "The official published version metadata inspected during preparation only documented releases through January 2025, earlier than the frozen Gemma-4 E2B artifact update.",
+      "interface_status": "WAIT_FOR_OFFICIAL_POST_2026_07_20_TASKS_AND_GENERIC_CODE_IO"
+    }
+  ],
+  "selection_seed_commitment": "NEUMANN-D3-SEALED-V1-2026-10-03",
+  "selection_policy": {
+    "no_content_preview_before_decision2_pass": true,
+    "no_answer_or_rationale_use_in_selection": true,
+    "no_model_output_use_in_membership": true,
+    "stable_id_hash_selection": "sha256(seed_commitment || source_id || stable_task_id)",
+    "diversity_rule": "metadata-only caps must prevent any single raw_subject/family from dominating",
+    "raw_selected_rows": "local-private evidence only; never commit or publicly redistribute when source terms discourage redistribution"
+  }
+}

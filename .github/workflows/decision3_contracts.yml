@@ -1,0 +1,47 @@
+name: Decision 3 sealed preregistration contracts
+
+on:
+  pull_request:
+    paths:
+      - neumann1/decision3_contract.py
+      - neumann1/decision3_frontier_receipt.py
+      - experiments/decision3_selection.py
+      - experiments/decision3_readiness.py
+      - tests/test_decision3_contract.py
+      - tests/test_decision3_readiness.py
+      - docs/research/decision3_sealed_gate.md
+      - docs/research/decision3_source_census_2026-10-03.md
+      - docs/experiments/decision3_source_registry_v1.json
+      - docs/experiments/decision3_interface_readiness_v1.json
+      - scripts/d3_readiness_check.ps1
+      - D3_READINESS_CHECK.cmd
+      - .github/workflows/decision3_contracts.yml
+
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install contract dependencies only
+        run: pip install -e . pytest
+      - name: Decision-3 pure contract and fault tests
+        run: |
+          python -m pytest -q tests/test_decision3_contract.py tests/test_decision3_readiness.py
+          python -m py_compile             neumann1/decision3_contract.py             neumann1/decision3_frontier_receipt.py             experiments/decision3_selection.py             experiments/decision3_readiness.py
+      - name: Prove preparation did not open sealed rows
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          registry=json.loads(Path("docs/experiments/decision3_source_registry_v1.json").read_text())
+          interface=json.loads(Path("docs/experiments/decision3_interface_readiness_v1.json").read_text())
+          assert registry["task_rows_opened_during_preparation"] == 0
+          assert all(source["content_accessed"] is False for source in registry["sources"])
+          assert interface["sealed_data_opened"] is False
+          assert interface["task_agnostic_interface"] is False
+          print("DECISION3_SEALED_ROWS_OPENED", 0)
+          print("DECISION3_CURRENT_INTERFACE", interface["status"])
+          PY
