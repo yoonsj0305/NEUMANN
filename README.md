@@ -24,37 +24,39 @@ cheaply. Never spend compute unless it buys capability. No component earns
 permanence. Edge and cloud are one heterogeneous pool; charge all local/remote
 work and failed routes under an explicit iso-capability Pareto objective.
 
-## Current primary surface — Decision 2 Architecture Multiplier
+## Current primary surface — architecture pivot after Decision 2 FAIL
 
-Decision 1 is closed. The first actual Runtime-0.2 compact CPU attempt fit every
-prompt under the frozen admission cap, but failed readiness because single-thread
-CPU latency and control adherence prevented complete tool/checker execution.
-That result is retained as a harness failure, not a capability verdict. CPU
-micro-tuning is stopped.
+Decision 1 is closed. The first actual Runtime-0.2 compact CPU attempt failed
+interface readiness, so CPU micro-tuning was stopped and the same frozen small
+core moved to an accelerator-class matched comparison.
 
-The active mainline is now the
-[Accelerated Opened Architecture Multiplier](docs/research/architecture_multiplier_gate.md).
-It compares the same frozen Gemma 4 E2B core under exactly three arms:
-DIRECT, matched TOOL, and NEUMANN. The opened set is only 12 tasks
-(4 math, 4 coding, 4 finite planning), with the original checker retaining
-authority. The frozen PASS rule admits exactly one sealed general evaluation;
-a valid FAIL requires an architecture pivot.
+Decision 2 has now also been executed once under its frozen contract and is
+**RESOLVED: FAIL**. The first actual Tesla T4 / BF16 run completed all 36
+terminal observations and the model-free evidence replay is valid with zero
+terminal hash mismatches. DIRECT, TOOL and NEUMANN each scored 0/12; TOOL and
+NEUMANN executed zero tool calls. Across all 72 model calls, every generation
+used the full 256-token per-call allowance in the thought channel, none reached
+the final channel, and all 72 action parses failed before an executor path was
+entered.
 
-PR #126 merged the scientific contract and accelerator runner. A
-[zero-cost local execution path](docs/research/am1_local_execution.md) now
-provides CUDA/BF16 preflight, native-Windows compatibility, one-shot evidence
-retention, and model-free replay. **No valid AM1 capability run has been
-performed yet.** v107 sealed evaluation, frontier calls, 4B/7B scaling, Edge
-optimization, new training, and large benchmark expansion remain blocked until
-Decision 2 resolves.
+The authoritative retained analysis is
+[Decision 2 first actual result](docs/research/decision2_first_actual_result_2026-10-03.md),
+with machine-readable receipt and core report/replay/environment artifacts in
+`docs/research/decision2_first_actual_evidence/`.
 
-Decision 3 has been **prepared but not armed**. The
+Per the preregistered rule, this remains a real Decision-2 FAIL, not a
+NOT_EVALUATED relabel. It blocks Decision 3 and requires an architecture pivot.
+The tested free-form-generative-control design is stopped. The next opened
+candidate must separate low-entropy control decisions from free-form reasoning,
+with controller cost explicitly charged and no favorable rerun of the failed
+AM1 contract.
+
+Decision 3 remains **prepared but not armed**. The
 [sealed gate](docs/research/decision3_sealed_gate.md), metadata-only
 [source census](docs/research/decision3_source_census_2026-10-03.md), frontier
-receipt schema and zero-content readiness checker are frozen in advance. No
-gated task row has been opened. The current task-specific AM1 interface is also
-recorded as a blocker for genuine new-family evaluation, so a Decision-2 PASS
-cannot silently grow a benchmark-specific executor before the sealed test.
+receipt schema and zero-content readiness checker remain frozen. No gated task
+row has been opened. A new architecture must return to opened matched validation
+before any sealed evaluation.
 
 ## Frontier Gap contract — subsequent, still UNARMED
 
