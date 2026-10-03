@@ -1,0 +1,131 @@
+{
+  "contract": {
+    "all_24_permutations": false,
+    "budget": {
+      "context_tokens": 4096,
+      "controller_wall_ms": 180000.0,
+      "evaluated_tokens": 196608,
+      "forward_calls": 144,
+      "input_rows": 288,
+      "padded_tokens": 196608,
+      "score_rows": 1152,
+      "scored_tokens": 1152,
+      "study_wall_ms": 1800000.0,
+      "task_wall_ms": 120000.0
+    },
+    "calibration_from_tasks": false,
+    "code_audit": "exact frozen vocabulary SHA256, single token, distinct, non-special, exact decode",
+    "codes": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "criteria": {
+      "centered_schedule_tolerance_nats": 0.5,
+      "centered_task_range_min_nats": 0.001,
+      "distinct_winners": 2,
+      "dominant_winner_max": 10,
+      "numeric_tolerance_nats": 0.05,
+      "stable_winner_margin_nats": 0.5
+    },
+    "decision3_admitted": false,
+    "development_only": true,
+    "development_public_sha256": "c883a44136817bf2501549a42c268b29577b8f153b3ca95b807e7ab245fdd2f0",
+    "fresh_validation": "UNREGISTERED_UNOPENED_PENDING_DEVELOPMENT_AND_ARCHITECTURE_FREEZE",
+    "frontier_calls": 0,
+    "generated_calls": 0,
+    "model": {
+      "artifact_sha256": "bf6d4f9d506f536db6255143e5f21e05b9ccadfea54af281ac278bd49c178d66",
+      "model_id": "google/gemma-4-E2B-it",
+      "model_revision": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+      "precision": "bfloat16",
+      "tokenizer_sha256": "8552955a1513c80096c4155aa2de30079a20d4c3f255b9d1acf9162c859b4207",
+      "weights_frozen": true
+    },
+    "modes": [
+      "batch4",
+      "unbatched1",
+      "reverse_batch4"
+    ],
+    "new_training": false,
+    "p2_admitted": false,
+    "schedules": [
+      [
+        [
+          0,
+          1,
+          2,
+          3
+        ],
+        [
+          1,
+          2,
+          3,
+          0
+        ],
+        [
+          2,
+          3,
+          0,
+          1
+        ],
+        [
+          3,
+          0,
+          1,
+          2
+        ]
+      ],
+      [
+        [
+          0,
+          2,
+          1,
+          3
+        ],
+        [
+          1,
+          3,
+          2,
+          0
+        ],
+        [
+          2,
+          0,
+          3,
+          1
+        ],
+        [
+          3,
+          1,
+          0,
+          2
+        ]
+      ]
+    ],
+    "schema": "neumann.control-plane-p1.1.v1",
+    "sealed_data_opened": false,
+    "semantics": {
+      "ARITHMETIC": "Exact scalar arithmetic evaluation using explicitly supplied expressions and values.",
+      "CSP": "Finite constraint search using explicitly supplied domains and constraints.",
+      "DIRECT": "Normal neural answer reasoning when the other executors are insufficient.",
+      "PYTHON": "Bounded general Python algorithm implementation and execution when algorithmic work is required."
+    },
+    "statistic": "mean_logprob_after_balanced_route_to_code_assignment",
+    "token_boundary": "frozen chat prefix followed by one separately encoded non-special code token",
+    "tool_calls": 0
+  },
+  "source_sha256": {
+    "docs/experiments/control_plane_p1_opened_public.json": "2c9b064763592ab6c21723c7cdd1e34b2447b68eed7de082489953f55e8d4ec0",
+    "experiments/control_plane_p11_dev.py": "1f5ba5d310e160f3c3759c477bbf67765535a5f3dae8b0686fd7cb3593963d33",
+    "experiments/control_plane_p11_replay.py": "f3b7259d7bca6b686b11ec3949bb14daf14e466ab24c805aabbe8765a98cc493",
+    "experiments/control_plane_p1_first.py": "88b999eee2d66ec99ad9f0ceb9d890139b06cf992d913554e56ec3150b4d56d4",
+    "experiments/general_multiplier_accelerator_core.py": "8c90b2ff6671aacb168f7c6c5eb713522584a238746b7383ce1c0cc3d35ea33e",
+    "neumann1/control_plane_p11.py": "7b687f59882201843d2c952000c5efa77bb87c3d4cdad17c3f642193cebf0e5b",
+    "neumann1/control_plane_p1_contract.py": "9c46b5fc0a2dfacbe0b06600d30dbcf82d60c86f1bbd6d50bc6151db21e62ce0",
+    "neumann1/control_plane_scoring_v1.py": "b3caaf61219a112c91101c8fe0a88e92c651ee4412d3a6289daedea79bc13b58",
+    "neumann1/control_plane_v1.py": "2c87d27b0c543a01620f97059206edd169ab177ca852737dfe853f1cbd10a7ca",
+    "neumann1/general_multiplier_contract.py": "d2c9695a402b4b6e6a6e5761d73c484ef396571a6e5edfd8e411253acbb23863"
+  }
+}

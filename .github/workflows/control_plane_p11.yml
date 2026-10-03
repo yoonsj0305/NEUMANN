@@ -1,0 +1,33 @@
+name: P1.1 balanced coded controller contracts
+
+on:
+  pull_request:
+    paths:
+      - 'neumann1/control_plane*.py'
+      - 'experiments/control_plane_p11*.py'
+      - 'tests/test_control_plane_p11.py'
+      - 'docs/experiments/control_plane_p11*.json'
+      - 'docs/experiments/results/control_plane_p1_first/**'
+      - 'docs/research/control_plane_p11.md'
+      - '.github/workflows/control_plane_p11.yml'
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Package and CPU tensor fixtures; no Gemma weights
+        run: |
+          pip install -e .
+          pip install torch==2.14.0+cpu --index-url https://download.pytorch.org/whl/cpu
+          pip install transformers==5.16.1 huggingface_hub
+      - name: Balanced algebra, causal next-code, partial costs and original failure replay
+        run: |
+          python -m unittest discover -s tests -p 'test_control_plane_p11.py' -v
+          python -m experiments.control_plane_p11_dev --check-registration
+      - name: Actual frozen tokenizer single-code readiness only; no task inputs or inference
+        run: python -m experiments.control_plane_p11_dev --tokenizer-readiness
