@@ -106,7 +106,11 @@ def test_no_sufficient_frontier_gap_is_not_negative_recovery_evidence():
     rows=good_rows()
     for row in rows:
         row["roles"]["BASELINE"]["verified_success"]=True
+        row["roles"]["NEUMANN"]["verified_success"]=True
+        row["roles"]["NEUMANN"]["complete_ms"]=40
     result=common(rows)
+    assert result["sealed_multiplier"]["persists"]
+    assert result["frontier_gap"]["task_count"]==0
     assert result["verdict"]=="NOT_EVALUATED_NO_SUFFICIENT_VERIFIED_FRONTIER_GAP"
 
 
