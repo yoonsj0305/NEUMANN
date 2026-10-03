@@ -1,0 +1,64 @@
+{
+  "schema": "neumann.control-plane-p1-first-result-summary.v1",
+  "date": "2026-10-03",
+  "frozen_head": "81d004cf91251ef523e734756548c6cd694ac54e",
+  "source_archive": {
+    "name": "NEUMANN_P1_FIRST_EVIDENCE.zip",
+    "bytes": 22762,
+    "sha256": "38d489dde092e86eea6a9f2276bc15fcfa574c463e18ececf161037dfd95cb38"
+  },
+  "execution": {
+    "observations": 12,
+    "accounting_complete": true,
+    "generated_calls": 0,
+    "generated_tokens": 0,
+    "tool_calls": 0,
+    "evaluated_tokens": 13464,
+    "padded_tokens": 13680,
+    "scored_tokens": 252,
+    "forward_calls": 72,
+    "whole_study_ms": 197380.417596,
+    "startup_ms": 141126.102264,
+    "core_unchanged": true,
+    "replay_integrity_valid": true
+  },
+  "decision": {
+    "verdict": "FAIL",
+    "reason": "DEGENERATE_ROUTE_SELECTION",
+    "p2_admitted": false,
+    "decision3_admitted": false,
+    "winner_counts": {
+      "DIRECT": 0,
+      "ARITHMETIC": 12,
+      "CSP": 0,
+      "PYTHON": 0
+    },
+    "centered_score_range_nats": 5.696547150611877
+  },
+  "verbalizer_token_ids": {
+    "DIRECT": [
+      35357
+    ],
+    "ARITHMETIC": [
+      1425,
+      13655,
+      54849,
+      2011
+    ],
+    "CSP": [
+      210396
+    ],
+    "PYTHON": [
+      185267
+    ]
+  },
+  "posthoc_only": {
+    "p1_rescue": false,
+    "mean_centered_winner_counts": {
+      "DIRECT": 2,
+      "ARITHMETIC": 2,
+      "CSP": 4,
+      "PYTHON": 4
+    }
+  }
+}
