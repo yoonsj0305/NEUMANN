@@ -1,0 +1,399 @@
+{
+  "public_sha256": "c883a44136817bf2501549a42c268b29577b8f153b3ca95b807e7ab245fdd2f0",
+  "rows": [
+    {
+      "task_id": "am_math_01",
+      "view": {
+        "instruction": "Return the exact rational value.",
+        "public": {
+          "background": "A blue notebook is on the desk.",
+          "bindings": {
+            "a": 17,
+            "b": 13,
+            "c": 5,
+            "d": 4,
+            "e": 8,
+            "unused": 999
+          },
+          "expression": "(a*b-c)/(d+e)"
+        }
+      }
+    },
+    {
+      "task_id": "am_math_02",
+      "view": {
+        "instruction": "Return the exact rational value.",
+        "public": {
+          "background": "The receipt is printed on green paper.",
+          "bindings": {
+            "p": 29,
+            "q": 11,
+            "r": 7,
+            "s": 3,
+            "t": 9,
+            "unused": 123
+          },
+          "expression": "(p*q-r)/(s+t)"
+        }
+      }
+    },
+    {
+      "task_id": "am_math_03",
+      "view": {
+        "instruction": "Return the exact rational value.",
+        "public": {
+          "background": "A train leaves at noon.",
+          "bindings": {
+            "spare": 404,
+            "u": 19,
+            "v": 7,
+            "x": 14,
+            "y": 3,
+            "z": 8
+          },
+          "expression": "(x+y*z)/(u-v)"
+        }
+      }
+    },
+    {
+      "task_id": "am_math_04",
+      "view": {
+        "instruction": "Return the exact rational value.",
+        "public": {
+          "background": "The folder label says ORBIT.",
+          "bindings": {
+            "m": 12,
+            "n": 7,
+            "p": 5,
+            "q": 15,
+            "r": 4,
+            "unused": -77
+          },
+          "expression": "(m*n+p)/(q-r)"
+        }
+      }
+    },
+    {
+      "task_id": "am_code_01",
+      "view": {
+        "instruction": "Return Python source defining solve(items).",
+        "public": {
+          "background": "The caller likes music.",
+          "examples": [
+            {
+              "input": [
+                -2,
+                -2,
+                0,
+                3,
+                -5
+              ],
+              "output": 2
+            }
+          ],
+          "requirement": "Return the number of distinct negative integers in items, a list of integers."
+        }
+      }
+    },
+    {
+      "task_id": "am_code_02",
+      "view": {
+        "instruction": "Return Python source defining solve(items).",
+        "public": {
+          "background": "The caller likes astronomy.",
+          "examples": [
+            {
+              "input": [
+                2,
+                2,
+                3,
+                4,
+                -2
+              ],
+              "output": 4
+            }
+          ],
+          "requirement": "Return the sum of distinct even integers in items, a list of integers."
+        }
+      }
+    },
+    {
+      "task_id": "am_code_03",
+      "view": {
+        "instruction": "Return Python source defining solve(items).",
+        "public": {
+          "background": "A poster on the wall is orange.",
+          "examples": [
+            {
+              "input": [
+                1,
+                1,
+                2,
+                3,
+                5,
+                -1
+              ],
+              "output": 3
+            }
+          ],
+          "requirement": "Return the number of distinct positive odd integers in items, a list of integers."
+        }
+      }
+    },
+    {
+      "task_id": "am_code_04",
+      "view": {
+        "instruction": "Return Python source defining solve(items).",
+        "public": {
+          "background": "The request arrived on Tuesday.",
+          "examples": [
+            {
+              "input": [
+                -2,
+                -2,
+                3,
+                0
+              ],
+              "output": 5
+            }
+          ],
+          "requirement": "Return the sum of absolute values of distinct nonzero integers in items, a list of integers."
+        }
+      }
+    },
+    {
+      "task_id": "am_plan_01",
+      "view": {
+        "instruction": "Return a complete assignment meeting every original constraint.",
+        "public": {
+          "background": "A train has six carriages.",
+          "constraints": [
+            [
+              "lt",
+              "A",
+              "B"
+            ],
+            [
+              "lt",
+              "B",
+              "C"
+            ],
+            [
+              "eq",
+              "C",
+              "D"
+            ]
+          ],
+          "domains": {
+            "A": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "B": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "C": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "D": [
+              0,
+              1,
+              2,
+              3
+            ]
+          }
+        }
+      }
+    },
+    {
+      "task_id": "am_plan_02",
+      "view": {
+        "instruction": "Return a complete assignment meeting every original constraint.",
+        "public": {
+          "background": "Four empty boxes are stacked nearby.",
+          "constraints": [
+            [
+              "lt",
+              "W",
+              "X"
+            ],
+            [
+              "le",
+              "X",
+              "Y"
+            ],
+            [
+              "lt",
+              "Y",
+              "Z"
+            ]
+          ],
+          "domains": {
+            "W": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "X": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "Y": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "Z": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        }
+      }
+    },
+    {
+      "task_id": "am_plan_03",
+      "view": {
+        "instruction": "Return a complete assignment meeting every original constraint.",
+        "public": {
+          "background": "The room has a round clock.",
+          "constraints": [
+            [
+              "ne",
+              "P",
+              "Q"
+            ],
+            [
+              "lt",
+              "Q",
+              "R"
+            ],
+            [
+              "lt",
+              "P",
+              "R"
+            ],
+            [
+              "eq",
+              "R",
+              "S"
+            ]
+          ],
+          "domains": {
+            "P": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "Q": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "R": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "S": [
+              0,
+              1,
+              2,
+              3
+            ]
+          }
+        }
+      }
+    },
+    {
+      "task_id": "am_plan_04",
+      "view": {
+        "instruction": "Return a complete assignment meeting every original constraint.",
+        "public": {
+          "background": "A spare cable lies under the table.",
+          "constraints": [
+            [
+              "eq",
+              "A",
+              "B"
+            ],
+            [
+              "lt",
+              "B",
+              "C"
+            ],
+            [
+              "lt",
+              "C",
+              "D"
+            ],
+            [
+              "eq",
+              "D",
+              "E"
+            ]
+          ],
+          "domains": {
+            "A": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "B": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "C": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "D": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "E": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "schema": "neumann.control-plane-p1-opened-public.v1"
+}
