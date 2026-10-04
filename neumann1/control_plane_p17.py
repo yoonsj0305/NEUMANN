@@ -30,6 +30,7 @@ INSTRUCTIONS = (
     "Return exact.", "Return a complete assignment.",
     "Return the exact rational value required by the original query.",
     "Return a complete assignment satisfying the original query.",
+    "Resolve the single bounded pronoun by choosing the candidate interpretation that makes all stated constraints jointly satisfiable, then return a complete assignment.",
 )
 TAILS = ("Return the exact rational value.", "Return a complete assignment.")
 MAX_CANDIDATES = 4
