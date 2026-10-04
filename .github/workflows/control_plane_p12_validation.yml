@@ -1,0 +1,36 @@
+name: Frozen P1.2 fresh opened validation contracts
+
+on:
+  pull_request:
+    paths:
+      - 'neumann1/control_plane*.py'
+      - 'experiments/control_plane_p12_validation*.py'
+      - 'scripts/control_plane_p12_validation_kaggle.py'
+      - 'tests/test_control_plane_p12_validation*.py'
+      - 'docs/experiments/control_plane_p12_validation*.json'
+      - 'docs/experiments/control_plane_p12_architecture.freeze.json'
+      - 'docs/experiments/results/control_plane_p12_first.zip.b64'
+      - 'docs/research/control_plane_p12_validation.md'
+      - '.github/workflows/control_plane_p12_validation.yml'
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Package and CPU tensor fixtures only
+        run: |
+          pip install -e .
+          pip install torch==2.14.0+cpu torchvision==0.29.0+cpu --index-url https://download.pytorch.org/whl/cpu
+          pip install transformers==5.16.1 huggingface_hub
+      - name: Fresh source, original checkers, dedup, admission, first-only replay/bootstrap
+        run: |
+          python -m unittest discover -s tests -p 'test_control_plane_p12_validation*.py' -v
+          python -m unittest discover -s tests -p 'test_control_plane_p12.py' -v
+          python -m experiments.control_plane_p12_validation_first --check-registration
+      - name: Frozen tokenizer and exact planned token budgets only; zero weights or scores
+        run: python -m experiments.control_plane_p12_validation_first --token-budget-readiness
