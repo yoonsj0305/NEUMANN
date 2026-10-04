@@ -4,7 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from neumann1.control_plane_p14 import _routing_from_proposal, run_mixed_and_execute
+from neumann1.control_plane_p14 import _routing_from_proposal, parse_proposal, run_mixed_and_execute
 from experiments.control_plane_p14_dev import _executor, _hidden_verifier, evaluate
 from experiments.control_plane_p14_registration import registration
 
@@ -46,35 +46,53 @@ def replay(directory):
                 raise ValueError("raw semantic item must charge exactly one model call")
             proposal = record.get("proposal")
             if proposal is None:
-                raise ValueError("raw semantic proposal receipt required")
-            if proposal.get("route") == "ABSTAIN":
-                expected_status = "ABSTAINED"
-                expected_accepted = False
-                expected_executed = False
+                receipt = record.get("semantic_receipt")
+                if record.get("status") != "FAILED" or not record.get("error"):
+                    raise ValueError("missing proposal requires retained semantic failure")
+                if type(receipt) is dict and type(receipt.get("raw")) is str:
+                    try:
+                        parse_proposal(receipt["raw"])
+                    except Exception:
+                        pass
+                    else:
+                        # A syntactically valid raw proposal can still fail a
+                        # post-generation identity/deadline/VRAM gate.
+                        if not any(x in record["error"] for x in (
+                            "deadline", "VRAM", "identity", "receipt", "budget"
+                        )):
+                            raise ValueError("unexplained semantic failure with valid proposal")
+                if record.get("accepted") is not False or record.get("executed") is not False:
+                    raise ValueError("failed semantic compilation cannot execute")
+            elif proposal.get("route") == "ABSTAIN":
+                if record.get("status") != "ABSTAINED" or record.get("accepted") is not False or record.get("executed") is not False:
+                    raise ValueError("semantic abstention replay drift")
             else:
                 typed, routed = _routing_from_proposal(row["view"], proposal)
                 answer = _executor(routed["selected_route"], routed["project"])
                 accepted = _hidden_verifier(ref)(row["view"], answer)
                 expected_status = "ACCEPTED" if accepted else "REJECTED_BY_ORIGINAL_VERIFIER"
-                expected_accepted = accepted
-                expected_executed = True
                 if record.get("selected_route") != routed["selected_route"]:
                     raise ValueError("raw semantic selected-route drift")
-            if record.get("status") != expected_status or record.get("accepted") is not expected_accepted or record.get("executed") is not expected_executed:
-                raise ValueError("raw semantic execution/verifier replay drift")
+                if record.get("status") != expected_status or record.get("accepted") is not accepted or record.get("executed") is not True:
+                    raise ValueError("raw semantic execution/verifier replay drift")
         else:
             routing = record.get("routing")
-            if type(routing) is not dict or type(routing.get("fallback_receipt")) is not dict:
-                raise ValueError("mixed fallback raw receipt required")
-            expected = run_mixed_and_execute(
-                row["view"],
-                lambda receipt=routing["fallback_receipt"]: RecordedFallback(receipt),
-                _executor,
-                _hidden_verifier(ref),
-            )
-            for key in ("status", "accepted", "executed", "selected_route"):
-                if record.get(key) != expected.get(key):
-                    raise ValueError("mixed fallback replay drift: " + key)
+            receipt = routing.get("fallback_receipt") if type(routing) is dict else None
+            if type(receipt) is dict:
+                expected = run_mixed_and_execute(
+                    row["view"],
+                    lambda receipt=receipt: RecordedFallback(receipt),
+                    _executor,
+                    _hidden_verifier(ref),
+                )
+                for key in ("status", "accepted", "executed", "selected_route"):
+                    if record.get(key) != expected.get(key):
+                        raise ValueError("mixed fallback replay drift: " + key)
+            else:
+                if record.get("status") != "FAILED" or not record.get("error"):
+                    raise ValueError("missing mixed fallback receipt requires retained failure")
+                if record.get("accepted") is not False:
+                    raise ValueError("failed mixed fallback cannot be accepted")
         records.append(record)
 
     decision = evaluate(records, refs if complete else [], report["core_audit"].get("unchanged"), complete, report["whole_study_ms"])
