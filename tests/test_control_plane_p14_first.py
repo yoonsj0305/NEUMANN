@@ -2,7 +2,7 @@
 import unittest
 
 from neumann1.control_plane_p1_contract import MODEL
-from neumann1.control_plane_p14 import FrozenSemanticCompiler
+from neumann1.control_plane_p14 import FrozenSemanticCompiler, SemanticProposalFailure
 from experiments.control_plane_p14_dev import evaluate
 from experiments.control_plane_p14_registration import registration, check_construction
 
@@ -77,12 +77,14 @@ class FirstRunContracts(unittest.TestCase):
         self.assertEqual(core.calls, 1)
         self.assertEqual(receipt["output_tokens"], 20)
 
-    def test_semantic_deadline_or_missing_vram_fails_closed(self):
+    def test_semantic_deadline_or_missing_vram_fails_closed_with_receipt(self):
         view = {"instruction":"Return exact.","public":{"query":"Add 2 and 3."}}
-        with self.assertRaises(TimeoutError):
-            FrozenSemanticCompiler(FakeCore(deadline=True)).propose(view, 1000.0)
-        with self.assertRaises(ValueError):
-            FrozenSemanticCompiler(FakeCore(peak=None)).propose(view, 1000.0)
+        for core in (FakeCore(deadline=True), FakeCore(peak=None)):
+            with self.subTest(deadline=core.deadline, peak=core.peak):
+                with self.assertRaises(SemanticProposalFailure) as caught:
+                    FrozenSemanticCompiler(core).propose(view, 1000.0)
+                self.assertEqual(caught.exception.receipt["output_tokens"], 20)
+                self.assertIsInstance(caught.exception.receipt["raw"], str)
 
     def test_opened_gate_pass_never_admits_p2(self):
         _, _, refs = registration()
