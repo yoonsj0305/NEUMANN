@@ -5,6 +5,7 @@ from neumann1.control_plane_p1_contract import MODEL
 from neumann1.control_plane_p14 import FrozenSemanticCompiler, SemanticProposalFailure
 from experiments.control_plane_p14_dev import evaluate
 from experiments.control_plane_p14_registration import registration, check_construction
+from experiments.control_plane_p14_replay import replay_raw_record
 
 
 class FakeCore:
@@ -85,6 +86,33 @@ class FirstRunContracts(unittest.TestCase):
                     FrozenSemanticCompiler(core).propose(view, 1000.0)
                 self.assertEqual(caught.exception.receipt["output_tokens"], 20)
                 self.assertIsInstance(caught.exception.receipt["raw"], str)
+
+    def test_replay_accepts_retained_invalid_typed_proposal_without_rescue(self):
+        _, rows, refs = registration()
+        # p14d_03-like failure: JSON parsed, but exact arithmetic admission
+        # rejects the float literal before any executor work.
+        row = rows[2]
+        ref = refs[2]
+        record = {
+            "task_id": row["task_id"],
+            "kind": ref["kind"],
+            "model_calls": 1,
+            "proposal": {
+                "route": "ARITHMETIC",
+                "public": {"expression": "(11 - 2) / 3 + 0.5", "bindings": {"name": 1}},
+            },
+            "status": "FAILED",
+            "accepted": False,
+            "executed": False,
+            "selected_route": None,
+            "error": "ValueError: integer literal required",
+        }
+        # Replay verifies the retained failure state; it does not repair the IR.
+        replay_raw_record(row, ref, record)
+        corrupted = dict(record)
+        corrupted["accepted"] = True
+        with self.assertRaises(ValueError):
+            replay_raw_record(row, ref, corrupted)
 
     def test_opened_gate_pass_never_admits_p2(self):
         _, _, refs = registration()
