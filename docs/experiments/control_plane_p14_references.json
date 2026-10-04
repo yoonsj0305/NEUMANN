@@ -1,0 +1,320 @@
+{
+  "schema": "neumann.p14-development-references.v1",
+  "rows": [
+    {
+      "task_id": "p14d_01",
+      "kind": "RAW_SEMANTIC",
+      "family": "math_logic",
+      "private": {
+        "exact": "3"
+      },
+      "witness": "3",
+      "expected_route": "ARITHMETIC"
+    },
+    {
+      "task_id": "p14d_02",
+      "kind": "RAW_SEMANTIC",
+      "family": "math_logic",
+      "private": {
+        "exact": "32"
+      },
+      "witness": "32",
+      "expected_route": "ARITHMETIC"
+    },
+    {
+      "task_id": "p14d_03",
+      "kind": "RAW_SEMANTIC",
+      "family": "math_logic",
+      "private": {
+        "exact": "7/2"
+      },
+      "witness": "7/2",
+      "expected_route": "ARITHMETIC"
+    },
+    {
+      "task_id": "p14d_04",
+      "kind": "RAW_SEMANTIC",
+      "family": "math_logic",
+      "private": {
+        "exact": "2"
+      },
+      "witness": "2",
+      "expected_route": "ARITHMETIC"
+    },
+    {
+      "task_id": "p14d_05",
+      "kind": "RAW_SEMANTIC",
+      "family": "constraint_planning",
+      "private": {
+        "domains": {
+          "A": [
+            0,
+            1,
+            2
+          ],
+          "B": [
+            0,
+            1,
+            2
+          ],
+          "C": [
+            0,
+            1,
+            2
+          ]
+        },
+        "constraints": [
+          [
+            "lt",
+            "A",
+            "B"
+          ],
+          [
+            "lt",
+            "B",
+            "C"
+          ]
+        ]
+      },
+      "witness": {
+        "A": 0,
+        "B": 1,
+        "C": 2
+      },
+      "expected_route": "CSP"
+    },
+    {
+      "task_id": "p14d_06",
+      "kind": "RAW_SEMANTIC",
+      "family": "constraint_planning",
+      "private": {
+        "domains": {
+          "X": [
+            1,
+            2,
+            3
+          ],
+          "Y": [
+            1,
+            2,
+            3
+          ]
+        },
+        "constraints": [
+          [
+            "eq",
+            "X",
+            1
+          ],
+          [
+            "ne",
+            "X",
+            "Y"
+          ]
+        ]
+      },
+      "witness": {
+        "X": 1,
+        "Y": 2
+      },
+      "expected_route": "CSP"
+    },
+    {
+      "task_id": "p14d_07",
+      "kind": "RAW_SEMANTIC",
+      "family": "constraint_planning",
+      "private": {
+        "domains": {
+          "P": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "Q": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "R": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        "constraints": [
+          [
+            "eq",
+            "P",
+            0
+          ],
+          [
+            "lt",
+            "P",
+            "Q"
+          ],
+          [
+            "lt",
+            "Q",
+            "R"
+          ]
+        ]
+      },
+      "witness": {
+        "P": 0,
+        "Q": 1,
+        "R": 2
+      },
+      "expected_route": "CSP"
+    },
+    {
+      "task_id": "p14d_08",
+      "kind": "RAW_SEMANTIC",
+      "family": "constraint_planning",
+      "private": {
+        "domains": {
+          "A": [
+            0,
+            1
+          ],
+          "B": [
+            0,
+            1
+          ],
+          "C": [
+            0,
+            1
+          ],
+          "D": [
+            0,
+            1
+          ]
+        },
+        "constraints": [
+          [
+            "ne",
+            "A",
+            "B"
+          ],
+          [
+            "eq",
+            "B",
+            "C"
+          ],
+          [
+            "ne",
+            "C",
+            "D"
+          ]
+        ]
+      },
+      "witness": {
+        "A": 0,
+        "B": 1,
+        "C": 1,
+        "D": 0
+      },
+      "expected_route": "CSP"
+    },
+    {
+      "task_id": "p14d_09",
+      "kind": "MIXED_FALLBACK",
+      "family": "math_logic",
+      "private": {
+        "exact": "6"
+      },
+      "witness": "6",
+      "expected_route": "ARITHMETIC"
+    },
+    {
+      "task_id": "p14d_10",
+      "kind": "MIXED_FALLBACK",
+      "family": "math_logic",
+      "private": {
+        "exact": "3"
+      },
+      "witness": "3",
+      "expected_route": "ARITHMETIC"
+    },
+    {
+      "task_id": "p14d_11",
+      "kind": "MIXED_FALLBACK",
+      "family": "constraint_planning",
+      "private": {
+        "domains": {
+          "P": [
+            0,
+            1,
+            2
+          ],
+          "Q": [
+            0,
+            1,
+            2
+          ],
+          "R": [
+            0,
+            1,
+            2
+          ]
+        },
+        "constraints": [
+          [
+            "lt",
+            "P",
+            "Q"
+          ],
+          [
+            "lt",
+            "Q",
+            "R"
+          ]
+        ]
+      },
+      "witness": {
+        "P": 0,
+        "Q": 1,
+        "R": 2
+      },
+      "expected_route": "CSP"
+    },
+    {
+      "task_id": "p14d_12",
+      "kind": "MIXED_FALLBACK",
+      "family": "constraint_planning",
+      "private": {
+        "domains": {
+          "U": [
+            1,
+            2,
+            3
+          ],
+          "V": [
+            1,
+            2,
+            3
+          ]
+        },
+        "constraints": [
+          [
+            "eq",
+            "U",
+            1
+          ],
+          [
+            "ne",
+            "U",
+            "V"
+          ]
+        ]
+      },
+      "witness": {
+        "U": 1,
+        "V": 2
+      },
+      "expected_route": "CSP"
+    }
+  ]
+}
