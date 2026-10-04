@@ -120,6 +120,14 @@ def semantic_prompt(view):
     )
 
 
+class SemanticProposalFailure(RuntimeError):
+    """Completed semantic-model work failed post-generation; retain its receipt."""
+
+    def __init__(self, message, receipt):
+        super().__init__(message)
+        self.receipt = snapshot(receipt)
+
+
 class FrozenSemanticCompiler:
     """One bounded generation call; no model loading occurs in this wrapper."""
 
@@ -145,32 +153,38 @@ class FrozenSemanticCompiler:
             False,
             min(remaining_ms, Budget().semantic_wall_ms),
         )
-        if self.core.identity != self.identity or self.core.audit().get("unchanged") is not True:
-            raise ValueError("semantic compiler model identity drift")
-        for key in ("input_tokens", "output_tokens"):
-            if type(result.get(key)) is not int or result[key] < 0:
-                raise ValueError("complete semantic token receipt required")
-        if result["output_tokens"] > Budget().semantic_output_tokens:
-            raise ValueError("semantic output budget drift")
-        if result.get("deadline_reached") is not False:
-            raise TimeoutError("semantic generation deadline reached")
-        peak = result.get("peak_accelerator_memory_bytes")
-        if type(peak) is not int or peak <= 0:
-            raise ValueError("positive semantic peak VRAM receipt required")
-        if type(result.get("core_sha256")) is not str or not result["core_sha256"]:
-            raise ValueError("semantic core identity receipt required")
-        proposal = parse_proposal(result["raw"])
-        return {
-            "proposal": proposal,
-            "raw_sha256": digest(result["raw"]),
-            "input_tokens": result["input_tokens"],
-            "output_tokens": result["output_tokens"],
-            "generation_ms": finite(result.get("generation_ms"), True),
-            "deadline_reached": bool(result.get("deadline_reached")),
+        receipt = {
+            "raw": result.get("raw"),
+            "raw_sha256": digest(result["raw"]) if type(result.get("raw")) is str else None,
+            "input_tokens": result.get("input_tokens"),
+            "output_tokens": result.get("output_tokens"),
+            "generation_ms": result.get("generation_ms"),
+            "deadline_reached": result.get("deadline_reached"),
             "peak_accelerator_memory_bytes": result.get("peak_accelerator_memory_bytes"),
             "core_sha256": result.get("core_sha256"),
             "complete_ms": (perf_counter_ns() - began) / 1e6,
         }
+        try:
+            if self.core.identity != self.identity or self.core.audit().get("unchanged") is not True:
+                raise ValueError("semantic compiler model identity drift")
+            for key in ("input_tokens", "output_tokens"):
+                if type(result.get(key)) is not int or result[key] < 0:
+                    raise ValueError("complete semantic token receipt required")
+            if result["output_tokens"] > Budget().semantic_output_tokens:
+                raise ValueError("semantic output budget drift")
+            if result.get("deadline_reached") is not False:
+                raise TimeoutError("semantic generation deadline reached")
+            peak = result.get("peak_accelerator_memory_bytes")
+            if type(peak) is not int or peak <= 0:
+                raise ValueError("positive semantic peak VRAM receipt required")
+            if type(result.get("core_sha256")) is not str or not result["core_sha256"]:
+                raise ValueError("semantic core identity receipt required")
+            receipt["generation_ms"] = finite(result.get("generation_ms"), True)
+            proposal = parse_proposal(result["raw"])
+        except Exception as exc:
+            raise SemanticProposalFailure(type(exc).__name__ + ": " + str(exc), receipt) from exc
+        receipt["proposal"] = proposal
+        return receipt
 
 
 def _routing_from_proposal(original, proposal):
@@ -249,6 +263,13 @@ def interpret_and_execute(view, compiler, executor, original_verifier):
             result["accounting_complete"] = True
         if remaining() <= 0:
             raise TimeoutError("semantic item complete wall exceeded")
+    except SemanticProposalFailure as exc:
+        result["semantic_receipt"] = snapshot(exc.receipt)
+        result["input_tokens"] = exc.receipt.get("input_tokens") if type(exc.receipt.get("input_tokens")) is int else 0
+        result["output_tokens"] = exc.receipt.get("output_tokens") if type(exc.receipt.get("output_tokens")) is int else 0
+        result["error"] = type(exc).__name__ + ": " + str(exc)
+        result["status"] = "FAILED"
+        result["accounting_complete"] = True
     except Exception as exc:
         result["error"] = type(exc).__name__ + ": " + str(exc)
         if result["status"] == "INCOMPLETE":
