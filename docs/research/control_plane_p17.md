@@ -55,6 +55,9 @@ The implemented frozen-core adapter reuses the exact Gemma identity/tokenizer,
 BF16 and no-training audit. It teacher-forces original audited A/B/C/D code IDs.
 All24 code-slot permutations and batch4/unbatched1/reverse_batch4 are recorded;
 unused slots are explicitly unavailable and masked out of selection.
+Prompt-facing references use compact e0/e1 occurrence aliases; long integrity
+hashes remain in receipts,not neural semantic context. Aliases retain the same
+raw source spans and typed values and cannot introduce a new literal/entity.
 Candidate choice is recomputed from raw matrices; no generated JSON,atoms,
 numbers,answers or command are accepted. Core/model generation hard tripwires
 are installed. Prompt hashes,prefixes,mapping order,memory,cost ledgers and core

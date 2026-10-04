@@ -153,6 +153,14 @@ class EvidenceContracts(unittest.TestCase):
             for chosen in range(len(b["candidates"])):
                 self.assertEqual(validate_selection(v,b,scoring(v,b,chosen)),chosen)
 
+    def test_prompt_uses_compact_references_not_integrity_hash_noise(self):
+        v=ambiguous(); b=build_candidates(v); prompt=selector_prompt(v,b,PERMUTATIONS[0])
+        self.assertIn('"ref":"e0"',prompt)
+        self.assertIn('"query"',prompt)
+        for token in b["evidence"]["tokens"]: self.assertNotIn(token["id"],prompt)
+        self.assertNotIn(b["evidence"]["source_view_sha256"],prompt)
+        self.assertLess(len(prompt),3000)
+
     def test_bundle_atoms_refs_route_coverage_tamper_reject(self):
         v=view("Start with 4, add 2"); b=build_candidates(v)
         for field,value in (("route","CSP"),("atoms",[["START","invented"]]),("covered_span",[0,1])):

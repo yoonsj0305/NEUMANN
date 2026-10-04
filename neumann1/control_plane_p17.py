@@ -216,13 +216,22 @@ def compile_references(view, bundle, index):
 
 def selector_prompt(view, bundle, permutation):
     if tuple(permutation) not in PERMUTATIONS or bundle != build_candidates(view): raise ValueError("fixed candidate legend required")
+    # Integrity hashes are machine responsibility, not semantic evidence.
+    # Compact aliases refer to exactly the same source-bound occurrences.
+    aliases = {token["id"]:"e%d"%i for i,token in enumerate(bundle["evidence"]["tokens"])}
+    evidence = [{"ref":aliases[t["id"]],"kind":t["kind"],"span":t["span"],
+                 "surface":t["surface"],"value":t["value"]} for t in bundle["evidence"]["tokens"]]
     legend = []
     for i in range(4):
-        candidate = bundle["candidates"][i] if i < len(bundle["candidates"]) else {"unavailable":True}
+        if i < len(bundle["candidates"]):
+            original = bundle["candidates"][i]
+            candidate = {"route":original["route"],
+                         "atoms":[[a[0],*[aliases[ref] for ref in a[1:]]] for a in original["atoms"]]}
+        else: candidate = {"unavailable":True}
         legend.append({"code":CODES[permutation[i]],"interpretation":candidate})
     return ("Select the interpretation faithful to the original obligation. Return one code only. "
             "Unavailable slots cannot be chosen. References copy source evidence; never generate numbers.\n"
-            +canonical({"original":view,"evidence":bundle["evidence"],"legend":legend}))
+            +canonical({"original":view,"evidence":evidence,"legend":legend}))
 
 
 def _choice(matrices, n):
