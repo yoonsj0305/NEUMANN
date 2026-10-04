@@ -160,6 +160,17 @@ The distinction matters:
 2. **p15d_05** goes further and narrows the CSP to one satisfying candidate assignment rather than preserving the full original solution set. That is not natural-language equivalence, but it may still be a useful compressed hypothesis if the original verifier later accepts the produced answer.
 3. None of these observations can rescue P1.5. The registered contract required the exact P1.5 wire and all four records are immutable FAILs.
 
+## Post-hoc semantic reading of the rejected CSP text
+
+For diagnosis only, not admission, the four rejected CSP strings were read under the ordinary mathematical meanings of their alternate notation. A brute-force comparison against the private original obligations shows:
+
+- `p15d_06`: equivalent original solution set after reading bare value lists as domains and infix `NE/EQ/LT` normally.
+- `p15d_07`: equivalent original solution set after reading brace notation and symbolic `<=/!=`.
+- `p15d_08`: equivalent original solution set after reading brace notation and equality propagation (`R=2` permits `P!=R -> P!=2`, `Q<=R -> Q<=2`).
+- `p15d_05`: **not equivalent** to the full original CSP. It narrows the original two-solution set `{(3,1,1),(3,2,2)}` to the valid singleton candidate `(3,1,1)`.
+
+Thus three rejected strings are surface variants of an equivalent CSP and the fourth is a valid solution-subset hypothesis. All four carry enough semantic content to support at least one original-valid answer under an appropriate prospectively frozen interpretation. This is useful architecture diagnosis only: P1.5's registered exact wire rejected all four, so the official result remains 0/4 CSP and FAIL.
+
 ## Scientific diagnosis
 
 P1.5 split the previous P1.4 failure into two sharply different regimes.
