@@ -1,0 +1,89 @@
+{
+  "schema": "neumann.control-plane-p12-fresh-validation-first-result-summary.v1",
+  "date": "2026-10-04",
+  "source_archive": {
+    "name": "NEUMANN_P12_VALIDATION_FIRST_EVIDENCE.zip",
+    "bytes": 93637,
+    "sha256": "362b13d7d7006ea1c55ad33788acd11d1712e94c081d59d52b28581d3abe3444",
+    "members": 36,
+    "archive_manifest_valid": true,
+    "terminal_pins_valid": true,
+    "replay_integrity_valid": true,
+    "no_replacement": true
+  },
+  "frozen_runtime": {
+    "source_head": "7c9117f3ce4bf9082c9fe104dcc46734beb29ddc",
+    "tree": "33c1b68c135d86deb519e83f5c800f5af8fdd51c",
+    "bootstrap_sha256": "77d3e7a57459a89322ff94145a11de73452cc9ce92583e7045fa5bd755028a99",
+    "model_id": "google/gemma-4-E2B-it",
+    "model_revision": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+    "precision": "bfloat16",
+    "device": "Tesla T4"
+  },
+  "execution": {
+    "observations": 12,
+    "accounting_complete": true,
+    "input_rows": 864,
+    "score_rows": 3456,
+    "scored_tokens": 3456,
+    "evaluated_tokens": 202968,
+    "padded_tokens": 202968,
+    "forward_calls": 432,
+    "startup_ms": 135602.303771,
+    "controller_wall_ms": 426236.293225,
+    "whole_study_ms": 561838.601404,
+    "max_task_ms": 42159.989063,
+    "generated_calls": 0,
+    "tool_calls": 0,
+    "frontier_calls": 0,
+    "historical_score_reuse": false,
+    "core_unchanged": true
+  },
+  "independently_recomputed_geometry": {
+    "max_numeric_delta_nats": 1.1920928955078125e-7,
+    "max_centered_loo_delta_nats": 0.19702962325051532,
+    "min_full_margin_nats": 0.6145833857978382,
+    "loo_winners_stable": "72/72",
+    "distinct_winners": 3,
+    "dominant_winner_count": 6,
+    "centered_task_range_nats": 8.355021161274028,
+    "all_geometry_gates_pass": true
+  },
+  "compatibility": {
+    "overall": "10/12",
+    "math_logic": "4/4",
+    "coding": "4/4",
+    "constraint_planning": "2/4",
+    "failures": [
+      {
+        "task_id": "p12v_09",
+        "expected": "CSP",
+        "winner": "ARITHMETIC",
+        "margin_nats": 0.6145833857978382,
+        "loo_delta_nats": 0.17467448343522873
+      },
+      {
+        "task_id": "p12v_12",
+        "expected": "CSP",
+        "winner": "ARITHMETIC",
+        "margin_nats": 1.2460937479020986,
+        "loo_delta_nats": 0.10123695961216761
+      }
+    ]
+  },
+  "decision": {
+    "verdict": "FAIL",
+    "reason": "TYPED_ROUTE_COMPATIBILITY_FAILURE",
+    "p2_registration_admitted": false,
+    "p2_admitted": false,
+    "decision3_admitted": false,
+    "global_questions_closed": []
+  },
+  "next_candidate": {
+    "name": "contract-first hierarchical routing",
+    "status": "post-failure architecture diagnosis only",
+    "rule": "deterministic public executor-admissibility first; semantic router only for ambiguous/untyped inputs",
+    "old_validation_rescued": false,
+    "new_fresh_validation_required": true
+  }
+}
