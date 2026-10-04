@@ -1,0 +1,32 @@
+name: P1.4 semantic interpretation contracts
+
+on:
+  pull_request:
+    paths:
+      - 'neumann1/control_plane_p14.py'
+      - 'experiments/control_plane_p14*.py'
+      - 'tests/test_control_plane_p14*.py'
+      - 'docs/experiments/control_plane_p14*.json'
+      - 'docs/research/control_plane_p14*.md'
+      - 'scripts/control_plane_p14*.py'
+      - '.github/workflows/control_plane_p14.yml'
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install existing CPU package dependencies only
+        run: python -m pip install numpy==2.4.6 scipy==1.17.1 scikit-learn==1.9.1 threadpoolctl==3.7.0
+      - name: P1.4 source compile preflight
+        run: python -m py_compile neumann1/control_plane_p14.py experiments/control_plane_p14_catalog.py experiments/control_plane_p14_registration.py experiments/control_plane_p14_dev.py experiments/control_plane_p14_replay.py scripts/control_plane_p14_kaggle.py
+      - name: P1.4 synthetic semantic and fallback contracts
+        run: python -m unittest discover -s tests -p 'test_control_plane_p14*.py' -v
+      - name: P1.4 frozen registration and original checker controls
+        run: python -m experiments.control_plane_p14_registration
