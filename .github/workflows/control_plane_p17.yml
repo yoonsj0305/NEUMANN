@@ -1,0 +1,30 @@
+name: P1.7 source evidence P0 contracts
+
+on:
+  pull_request:
+    paths:
+      - 'neumann1/control_plane_p17.py'
+      - 'tests/test_control_plane_p17*.py'
+      - 'docs/experiments/control_plane_p17*.json'
+      - 'docs/research/control_plane_p17*.md'
+      - '.github/workflows/control_plane_p17.yml'
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install CPU package dependencies only
+        run: python -m pip install numpy==2.4.6 scipy==1.17.1 scikit-learn==1.9.1 threadpoolctl==3.7.0
+      - name: Compile P1.7 source without loading model
+        run: python -m py_compile neumann1/control_plane_p17.py tests/test_control_plane_p17.py
+      - name: Synthetic source reference and scoring contracts
+        run: python -m unittest discover -s tests -p 'test_control_plane_p17*.py' -v
+      - name: P0 machine contract matches implementation
+        run: python -c 'import json; from pathlib import Path; from neumann1.control_plane_p17 import contract; assert json.loads(Path("docs/experiments/control_plane_p17_p0.contract.json").read_text()) == contract()'
