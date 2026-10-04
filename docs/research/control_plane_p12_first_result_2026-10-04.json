@@ -1,0 +1,76 @@
+{
+  "schema": "neumann.control-plane-p12-first-result-summary.v1",
+  "date": "2026-10-04",
+  "source_archive": {
+    "name": "NEUMANN_P12_FIRST_EVIDENCE.zip",
+    "bytes": 83071,
+    "sha256": "b27748d76b8abdba24ab11ad85f25eb4012c8c9593a12a83590bfbf8666c98ba",
+    "members": 36,
+    "archive_manifest_valid": true,
+    "terminal_pins_valid": true,
+    "replay_integrity_valid": true
+  },
+  "frozen_runtime": {
+    "experiment_head": "75d9843e0d893e1a34394258b14c984d461cec1c",
+    "tree": "bb4deba6ec23bb5923b2d1ab2dfd4dc5b2e874c5",
+    "merged_main_tree_same": true,
+    "bootstrap_sha256": "c8f66d3f05a672377376cb92f8d4e39f7669cd8e55a88d58a08bfaa430c5bdfe",
+    "model_id": "google/gemma-4-E2B-it",
+    "model_revision": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+    "precision": "bfloat16",
+    "device": "Tesla T4",
+    "code_token_ids": {
+      "A": 236776,
+      "B": 236799,
+      "C": 236780,
+      "D": 236796
+    }
+  },
+  "execution": {
+    "observations": 12,
+    "accounting_complete": true,
+    "input_rows": 864,
+    "score_rows": 3456,
+    "scored_tokens": 3456,
+    "evaluated_tokens": 195912,
+    "padded_tokens": 195912,
+    "forward_calls": 432,
+    "startup_ms": 73160.168761,
+    "controller_wall_ms": 391239.38074,
+    "whole_study_ms": 464399.553967,
+    "max_task_ms": 35821.75055,
+    "generated_calls": 0,
+    "tool_calls": 0,
+    "frontier_calls": 0,
+    "historical_score_reuse": false,
+    "core_unchanged": true
+  },
+  "independently_recomputed_gate": {
+    "max_numeric_delta_nats": 9.5367431640625e-7,
+    "max_centered_loo_delta_nats": 0.16280517373744807,
+    "min_full_margin_nats": 1.4335937847693758,
+    "loo_winners_stable": "72/72",
+    "distinct_winners": 3,
+    "dominant_winner_count": 4,
+    "centered_task_range_nats": 8.84653722627355,
+    "winner_counts": {
+      "DIRECT": 0,
+      "ARITHMETIC": 4,
+      "CSP": 4,
+      "PYTHON": 4
+    }
+  },
+  "residual_diagnostic_only": {
+    "max_centered_orbit_pair_delta_nats": 1.3395995695300371,
+    "max_centered_per_mapping_range_nats": 13.450195014499968
+  },
+  "decision": {
+    "verdict": "PASS",
+    "reason": "DEVELOPMENT_DIAGNOSTIC_ONLY",
+    "p2_admitted": false,
+    "decision3_admitted": false,
+    "fresh_validation_registered": false,
+    "global_questions_closed": []
+  },
+  "next": "FREEZE_P12_UNCHANGED_THEN_REGISTER_FRESH_OPENED_VALIDATION"
+}
