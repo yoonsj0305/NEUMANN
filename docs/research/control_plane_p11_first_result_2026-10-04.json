@@ -1,0 +1,75 @@
+{
+  "schema": "neumann.control-plane-p11-first-result-summary.v1",
+  "date": "2026-10-04",
+  "source_archive": {
+    "name": "NEUMANN_P11_FIRST_EVIDENCE.zip",
+    "bytes": 52833,
+    "sha256": "6bdc2cc9435cefd8a3e99d1d0bc3589bd3b6ad84e50be83db877b1dde769e3ec",
+    "members": 36,
+    "archive_manifest_valid": true,
+    "terminal_pins_valid": true,
+    "replay_integrity_valid": true
+  },
+  "frozen_runtime": {
+    "head": "4e6db9926a27c94f63c8d539d0c6e57c34b49336",
+    "bootstrap_sha256": "a2372bb34ba76a50e92eca3d3e6cecaa60d10606d05a332329a0b17c347d610c",
+    "model_id": "google/gemma-4-E2B-it",
+    "model_revision": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+    "precision": "bfloat16",
+    "device": "Tesla T4",
+    "code_token_ids": {
+      "A": 236776,
+      "B": 236799,
+      "C": 236780,
+      "D": 236796
+    }
+  },
+  "execution": {
+    "observations": 12,
+    "accounting_complete": true,
+    "input_rows": 288,
+    "score_rows": 1152,
+    "scored_tokens": 1152,
+    "evaluated_tokens": 65304,
+    "padded_tokens": 65304,
+    "forward_calls": 144,
+    "startup_ms": 136019.051389,
+    "controller_wall_ms": 147784.539878,
+    "whole_study_ms": 283803.594684,
+    "max_numeric_delta_nats": 5.960464477539063e-8,
+    "generated_calls": 0,
+    "tool_calls": 0,
+    "frontier_calls": 0,
+    "core_unchanged": true
+  },
+  "decision": {
+    "verdict": "FAIL",
+    "reason": "NUMERIC_OR_PERMUTATION_INSTABILITY",
+    "p2_admitted": false,
+    "decision3_admitted": false,
+    "fresh_validation_registered": false
+  },
+  "diagnostic_only": {
+    "pooled_winner_counts": {
+      "DIRECT": 0,
+      "ARITHMETIC": 4,
+      "CSP": 4,
+      "PYTHON": 4
+    },
+    "both_schedule_winner_agreement": "12/12",
+    "schedule_delta_tolerance_nats": 0.5,
+    "schedule_delta_failures": 7,
+    "max_centered_schedule_delta_nats": 0.9896240348252832,
+    "min_pooled_margin_nats": 1.6445313356816769,
+    "centered_task_range_nats": 8.717773343466206,
+    "expected_family_pattern_after_the_fact": "math 4/4 ARITHMETIC; code 4/4 PYTHON; planning 4/4 CSP",
+    "confirmatory_evidence": false
+  },
+  "next_candidate": {
+    "name": "full-S4 permutation-marginalized coded router",
+    "mappings": 24,
+    "development_only": true,
+    "p2_blocked": true,
+    "decision3_blocked": true
+  }
+}
