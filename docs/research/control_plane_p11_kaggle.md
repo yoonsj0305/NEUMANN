@@ -27,7 +27,7 @@ Transformers remains `5.16.1`. No credentials are requested or printed by the
 bootstrap. The retained core uses its original access path and identity audit.
 
 The published notebook cell downloads and checks the bootstrap, loads its
-definitions with `runpy.run_path`, calls `run()` exactly once, then calls
+definitions with `runpy.run_path`, calls `run(launcher_wall_ms=...)` exactly once, then calls
 `display_archive(Path('/kaggle/working'))` in the notebook process. Importing
 the script does not execute an experiment; do not use `run_name='__main__'`
 inside a notebook because kernel arguments are not bootstrap CLI arguments.
@@ -45,7 +45,9 @@ Operational timeout caps in seconds: preflight60, clone180, checkout60,
 dependency installation600, second preflight60, package inventory60,
 registration60, runner2700, replay60. These are abort limits, not runtime
 estimates. Runner's registered study/controller/token limits are unchanged.
-Bootstrap setup+runner wall time and per-stage wall times are reported
+The launch cell measures bootstrap download/hash/loading wall time in ms and
+passes it as accounting metadata (not a model or budget setting). Bootstrap
+setup+runner wall time, the launcher+setup+runner sum and per-stage wall times are reported
 separately from the original study cost; archive packaging time is in the
 hash receipt. Do not count the wrapper as free or mistake timeout limits for
 measured latency. Energy, FLOPs and monetary cost stay UNKNOWN.

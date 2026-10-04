@@ -62,8 +62,10 @@ class BootstrapTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root:
             working = Path(root)
             execute, calls = self.fake(working)
-            data, _ = bootstrap.run(working, execute)
+            data, _ = bootstrap.run(working, execute, launcher_wall_ms=15.5)
             self.assertEqual(data["status"], "FINISHED")
+            self.assertEqual(data["launcher_wall_ms"], 15.5)
+            self.assertEqual(data["launcher_setup_and_runner_wall_ms"], data["setup_and_runner_wall_ms"] + 15.5)
             self.assertEqual(data["runtime_head"], "4e6db9926a27c94f63c8d539d0c6e57c34b49336")
             self.assertEqual(data["bootstrap_sha256"], hashlib.sha256(SCRIPT.read_bytes()).hexdigest())
             self.assertTrue(all(s["wall_ms"] >= 0 for s in data["stages"]))

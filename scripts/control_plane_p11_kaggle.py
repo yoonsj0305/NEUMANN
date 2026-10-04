@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import signal
@@ -132,16 +133,19 @@ def package_existing(working):
     return package(working)
 
 
-def run(working=Path("/kaggle/working"), execute=command):
+def run(working=Path("/kaggle/working"), execute=command, *, launcher_wall_ms=None):
     working = Path(working)
     if not working.is_dir():
         raise RuntimeError("registered Kaggle working directory required")
     names = (SETUP, OUTPUT, CHECKOUT, ARCHIVE, HASH_RECEIPT, LOG, REPLAY, CONSTRAINTS)
     if any((working / name).exists() for name in names):
         raise RuntimeError("first attempt already started; retain evidence, do not rerun")
+    if launcher_wall_ms is not None and (not math.isfinite(launcher_wall_ms) or launcher_wall_ms < 0):
+        raise ValueError("finite nonnegative launcher timing required")
     started = time.perf_counter()
     data = {"schema": "neumann.control-plane-p11-setup.v1", "runtime_head": RUNTIME_HEAD,
             "bootstrap_sha256": digest_file(__file__), "status": "STARTED", "stages": [],
+            "launcher_wall_ms": launcher_wall_ms,
             "development_only": True, "favorable_rerun": False,
             "p2_admitted": False, "decision3_admitted": False, "active_child_pid": None}
     # Atomic reservation precedes any dependency change, download or model load.
@@ -213,6 +217,8 @@ def run(working=Path("/kaggle/working"), execute=command):
         print(data["error"], flush=True)
     finally:
         data["setup_and_runner_wall_ms"] = (time.perf_counter() - started) * 1000
+        data["launcher_setup_and_runner_wall_ms"] = (
+            None if launcher_wall_ms is None else launcher_wall_ms + data["setup_and_runner_wall_ms"])
         write_json(working / SETUP, data)
         result = package(working)
         print("Download from the Kaggle Output panel:", ARCHIVE, flush=True)
