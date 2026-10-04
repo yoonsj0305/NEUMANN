@@ -1,0 +1,90 @@
+{
+  "schema": "neumann.p14-first-result-summary.v1",
+  "date": "2026-10-04",
+  "archive": {
+    "name": "NEUMANN_P14_FIRST_EVIDENCE.zip",
+    "bytes": 61736,
+    "sha256": "7f819cd1dd26dc94ca690b4be3e2e365b7f65882900caff78e30e3e1c647af52",
+    "members": 35,
+    "manifest_valid": true,
+    "crc_valid": true,
+    "unsafe_paths": 0,
+    "duplicates": 0,
+    "symlinks": 0,
+    "no_replacement": true
+  },
+  "frozen_identity": {
+    "source_head": "bba2e6a6420581edddeafdba94fbd8b60f540e56",
+    "tree": "94b88cb154a102764bea6fc5d5d0a6da133b6ad6",
+    "bootstrap_sha256": "602c2164a05bf3b2fca6f886bcb2217478c063f1ee46d327109588416b27c30a",
+    "model_id": "google/gemma-4-E2B-it",
+    "model_revision": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+    "precision": "bfloat16",
+    "accelerator": "Tesla T4",
+    "core_unchanged": true
+  },
+  "frozen_result": {
+    "study_status": "COMPLETE",
+    "observations": 12,
+    "verdict": "FAIL",
+    "reason": "RAW_ACCOUNTING_INCOMPLETE",
+    "p2_registration_admitted": false,
+    "p2_admitted": false,
+    "decision3_admitted": false,
+    "bootstrap_status": "FAILED_OR_INTERRUPTED",
+    "bootstrap_failure": "model-free receipt replay failed"
+  },
+  "independent_capability_recompute": {
+    "raw_semantic_accepted": "5/8",
+    "raw_arithmetic_accepted": "2/4",
+    "raw_csp_accepted": "3/4",
+    "mixed_fallback_accepted": "4/4",
+    "raw_model_calls": 8,
+    "mixed_fallback_calls": 4,
+    "capability_gate_would_pass_after_accounting_fix": false,
+    "no_rescue": true
+  },
+  "work": {
+    "raw_input_tokens": 1547,
+    "raw_output_tokens": 515,
+    "raw_generation_ms": 42830.960607,
+    "mixed_neural_forward_calls": 144,
+    "mixed_evaluated_tokens": 67104,
+    "mixed_score_rows": 1152,
+    "startup_ms": 117888.579499,
+    "whole_study_ms": 723101.583479,
+    "max_task_ms": 61689.537604,
+    "energy_j": null,
+    "flops": null,
+    "cost_money": null
+  },
+  "raw_failures": [
+    {
+      "task_id": "p14d_02",
+      "kind": "semantic_wrong_answer",
+      "detail": "sequential arithmetic scope/precedence changed; original verifier rejected"
+    },
+    {
+      "task_id": "p14d_03",
+      "kind": "typed_ir_invalid",
+      "detail": "float literal 0.5 rejected by exact integer/rational arithmetic contract"
+    },
+    {
+      "task_id": "p14d_06",
+      "kind": "typed_ir_invalid",
+      "detail": "malformed CSP constraint tuples rejected by P1.3"
+    }
+  ],
+  "replay": {
+    "archived_replay_valid": false,
+    "failure_task": "p14d_03",
+    "failure": "ValueError: integer literal required",
+    "interpretation": "secondary model-free replay infrastructure bug; no inference rerun permitted"
+  },
+  "next_candidate": {
+    "name": "semantic sketch plus deterministic canonical compiler",
+    "status": "post-result candidate only; not preregistered",
+    "p14_rerun": false,
+    "new_opened_development_required": true
+  }
+}
