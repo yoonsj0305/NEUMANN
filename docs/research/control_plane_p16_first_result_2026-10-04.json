@@ -1,0 +1,139 @@
+{
+  "schema": "neumann.p16-first-result-summary.v1",
+  "date": "2026-10-04",
+  "evidence": {
+    "name": "NEUMANN_P16_FIRST_EVIDENCE.zip",
+    "bytes": 39521,
+    "sha256": "7a217717513ddac16aa54a00e28aec62397ff2d356dbd689fe42d4952b1862d4",
+    "members": 27,
+    "crc_valid": true,
+    "manifest_valid": true,
+    "terminal_hashes_valid": true,
+    "unsafe_paths": 0,
+    "duplicate_members": 0,
+    "symlinks": 0,
+    "no_replacement": true
+  },
+  "identity": {
+    "source_head": "82581ca94fdf8f5fd0b85fe7d654c4fc8fe460c2",
+    "merged_main_before_result": "1e7acde57bdb6bf256e9e77dc3959f836eaba265",
+    "bootstrap_sha256": "00de9c30c5a35716a0563d7ca79f5a4a601be4f5ce25d9f8b3173fb675849688",
+    "model_id": "google/gemma-4-E2B-it",
+    "model_revision": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+    "precision": "bfloat16",
+    "accelerator": "Tesla T4",
+    "core_unchanged": true,
+    "replay_exit_code": 0
+  },
+  "frozen_result": {
+    "study_status": "COMPLETE",
+    "observations": 8,
+    "verdict": "FAIL",
+    "reason": "SEMANTIC_PATH_CAPABILITY_FAILURE",
+    "raw_semantic_accepted": "1/8",
+    "raw_math_accepted": "0/4",
+    "raw_csp_accepted": "1/4",
+    "p2_registration_admitted": false,
+    "p2_admitted": false,
+    "decision3_admitted": false
+  },
+  "task_results": [
+    {
+      "task_id": "p16d_01",
+      "domain": "ARITHMETIC",
+      "status": "FAILED",
+      "accepted": false,
+      "error": "ValueError: exact hypothesis header and END required"
+    },
+    {
+      "task_id": "p16d_02",
+      "domain": "ARITHMETIC",
+      "status": "FAILED",
+      "accepted": false,
+      "error": "ValueError: exact hypothesis header and END required"
+    },
+    {
+      "task_id": "p16d_03",
+      "domain": "ARITHMETIC",
+      "status": "FAILED",
+      "accepted": false,
+      "error": "ValueError: exact hypothesis header and END required"
+    },
+    {
+      "task_id": "p16d_04",
+      "domain": "ARITHMETIC",
+      "status": "FAILED",
+      "accepted": false,
+      "error": "ValueError: exact hypothesis header and END required"
+    },
+    {
+      "task_id": "p16d_05",
+      "domain": "CSP",
+      "status": "FAILED",
+      "accepted": false,
+      "error": "ValueError: exact hypothesis header and END required"
+    },
+    {
+      "task_id": "p16d_06",
+      "domain": "CSP",
+      "status": "FAILED",
+      "accepted": false,
+      "error": "ValueError: exact hypothesis header and END required"
+    },
+    {
+      "task_id": "p16d_07",
+      "domain": "CSP",
+      "status": "FAILED",
+      "accepted": false,
+      "error": "ValueError: exact hypothesis header and END required"
+    },
+    {
+      "task_id": "p16d_08",
+      "domain": "CSP",
+      "status": "ACCEPTED",
+      "accepted": true
+    }
+  ],
+  "diagnosis": {
+    "immediate_failure": "7/8 generated comma-delimited inline record sequences not accepted by line-oriented normalizer",
+    "conservative_opened_semantic_read": {
+      "arithmetic_clear_correct": "2/4",
+      "csp_contains_original_valid_candidate": "4/4"
+    },
+    "genuine_semantic_errors": [
+      "p16d_02 replaces requested divisor 6 with generated operand 18",
+      "p16d_04 emits DIVIDE 36/9; literal operand semantics do not preserve the requested divide-by-9 operation"
+    ],
+    "next_principle": "extract literals/entities deterministically and let learned control choose among typed references instead of freely regenerating operands",
+    "p16_rerun": false
+  },
+  "work": {
+    "model_calls": 8,
+    "input_tokens": 2375,
+    "output_tokens": 314,
+    "generation_ms_sum": 27533.481861,
+    "tool_calls": 1,
+    "verifier_calls": 1,
+    "startup_ms": 94641.52735,
+    "whole_study_ms": 399712.331629,
+    "max_item_ms": 33442.41981,
+    "max_accelerator_allocated_bytes": 10290313728,
+    "launcher_setup_and_runner_wall_ms": 450195.022687,
+    "energy_j": null,
+    "flops": null,
+    "money": null
+  },
+  "metadata_note": "frozen decision.next contains stale P15 label; verdict and admission unaffected",
+  "next_candidate": {
+    "name": "deterministic evidence extraction plus bounded typed semantic selection",
+    "preregistered": false,
+    "fresh_evidence_required": true,
+    "goals": [
+      "remove punctuation/record-separator responsibility from the model",
+      "copy/reference original literals and entity spans instead of regenerating operands",
+      "zero-neural fast path for uniquely typed semantics",
+      "bounded coded selector for ambiguous semantics",
+      "original verifier remains authority"
+    ]
+  }
+}
