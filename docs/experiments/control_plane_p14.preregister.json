@@ -1,0 +1,62 @@
+{
+  "schema": "neumann.p14-semantic-development-registration.v1",
+  "architecture_schema": "neumann.control-plane-p1.4.v1",
+  "parent_main": "6dbdfb0a2e5271dadb3cebee01c8eb7a204df260",
+  "first_only": true,
+  "opened_development": true,
+  "scores_seen_at_registration": false,
+  "scope": "8 raw arithmetic/CSP semantic-compilation tasks plus 4 mixed typed masked-full-S4 tasks; opened development only",
+  "public_sha256": "fd468a1cba535f8e49aee5b02dd60dac8cc9d83c5df05e69d8bcab908167207a",
+  "references_sha256": "6edb716ebd6f4f5585bc7bd4e9ed2433cb57e855576bf452579a76880546aa42",
+  "task_ids": [
+    "p14d_01",
+    "p14d_02",
+    "p14d_03",
+    "p14d_04",
+    "p14d_05",
+    "p14d_06",
+    "p14d_07",
+    "p14d_08",
+    "p14d_09",
+    "p14d_10",
+    "p14d_11",
+    "p14d_12"
+  ],
+  "composition": {
+    "raw_math": 4,
+    "raw_csp": 4,
+    "mixed_typed": 4
+  },
+  "model": {
+    "model_id": "google/gemma-4-E2B-it",
+    "model_revision": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+    "artifact_sha256": "bf6d4f9d506f536db6255143e5f21e05b9ccadfea54af281ac278bd49c178d66",
+    "tokenizer_sha256": "8552955a1513c80096c4155aa2de30079a20d4c3f255b9d1acf9162c859b4207",
+    "precision": "bfloat16",
+    "weights_frozen": true
+  },
+  "gate": {
+    "raw_semantic_accepted_min": 6,
+    "raw_math_accepted_min": 3,
+    "raw_csp_accepted_min": 3,
+    "mixed_fallback_accepted_min": 3,
+    "raw_model_calls_exact": 8,
+    "mixed_fallback_calls_exact": 4,
+    "semantic_retries": 0,
+    "original_verifier_required": true,
+    "whole_study_wall_ms": 1800000,
+    "per_item_wall_ms": 180000,
+    "interpretation": "opened semantic-development diagnostic only; no P2 admission"
+  },
+  "boundaries": {
+    "coding_semantic_synthesis": "OUT_OF_SCOPE",
+    "training": false,
+    "frontier_calls": 0,
+    "sealed_data": false,
+    "p12_validation_rescued": false,
+    "p2_registration_admitted": false,
+    "p2_admitted": false,
+    "decision3_admitted": false,
+    "global_questions_closed": []
+  }
+}
