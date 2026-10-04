@@ -1,0 +1,336 @@
+{
+  "authority": "unchanged verify_original and literal independent construction records; finite coding tests",
+  "rows": [
+    {
+      "compatible_route": "ARITHMETIC",
+      "family": "math_logic",
+      "private": {
+        "exact": "6"
+      },
+      "semantic_kind": "nested_divide_then_multiply",
+      "task_id": "p12v_01",
+      "witness": "6"
+    },
+    {
+      "compatible_route": "ARITHMETIC",
+      "family": "math_logic",
+      "private": {
+        "exact": "-37/18"
+      },
+      "semantic_kind": "unary_rational_sum",
+      "task_id": "p12v_02",
+      "witness": "-37/18"
+    },
+    {
+      "compatible_route": "ARITHMETIC",
+      "family": "math_logic",
+      "private": {
+        "exact": "117/35"
+      },
+      "semantic_kind": "product_of_two_sums",
+      "task_id": "p12v_03",
+      "witness": "117/35"
+    },
+    {
+      "compatible_route": "ARITHMETIC",
+      "family": "math_logic",
+      "private": {
+        "exact": "5/63"
+      },
+      "semantic_kind": "nested_rational_difference",
+      "task_id": "p12v_04",
+      "witness": "5/63"
+    },
+    {
+      "compatible_route": "PYTHON",
+      "family": "coding",
+      "private": {
+        "tests": [
+          {
+            "input": [],
+            "output": []
+          },
+          {
+            "input": [
+              3,
+              -5,
+              2
+            ],
+            "output": [
+              3,
+              -2,
+              0
+            ]
+          },
+          {
+            "input": [
+              0,
+              0
+            ],
+            "output": [
+              0,
+              0
+            ]
+          },
+          {
+            "input": [
+              -1
+            ],
+            "output": [
+              -1
+            ]
+          },
+          {
+            "input": [
+              2,
+              2,
+              2
+            ],
+            "output": [
+              2,
+              4,
+              6
+            ]
+          }
+        ]
+      },
+      "semantic_kind": "prefix_sums",
+      "task_id": "p12v_05",
+      "witness": "def solve(items):\n    result = []\n    total = 0\n    for value in items:\n        total += value\n        result = result + [total]\n    return result\n"
+    },
+    {
+      "compatible_route": "PYTHON",
+      "family": "coding",
+      "private": {
+        "tests": [
+          {
+            "input": [],
+            "output": []
+          },
+          {
+            "input": [
+              2,
+              2,
+              -1,
+              -1,
+              -1,
+              2
+            ],
+            "output": [
+              [
+                2,
+                2
+              ],
+              [
+                -1,
+                3
+              ],
+              [
+                2,
+                1
+              ]
+            ]
+          },
+          {
+            "input": [
+              0
+            ],
+            "output": [
+              [
+                0,
+                1
+              ]
+            ]
+          },
+          {
+            "input": [
+              1,
+              2,
+              1
+            ],
+            "output": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                1
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          },
+          {
+            "input": [
+              -3,
+              -3
+            ],
+            "output": [
+              [
+                -3,
+                2
+              ]
+            ]
+          }
+        ]
+      },
+      "semantic_kind": "consecutive_run_encoding",
+      "task_id": "p12v_06",
+      "witness": "def solve(items):\n    result = []\n    for value in items:\n        if len(result) == 0 or result[-1][0] != value:\n            result = result + [[value, 1]]\n        else:\n            result[-1][1] += 1\n    return result\n"
+    },
+    {
+      "compatible_route": "PYTHON",
+      "family": "coding",
+      "private": {
+        "tests": [
+          {
+            "input": [],
+            "output": 0
+          },
+          {
+            "input": [
+              1,
+              2,
+              2,
+              3,
+              4
+            ],
+            "output": 3
+          },
+          {
+            "input": [
+              5,
+              4,
+              3
+            ],
+            "output": 1
+          },
+          {
+            "input": [
+              -3,
+              -2,
+              -1,
+              0
+            ],
+            "output": 4
+          },
+          {
+            "input": [
+              7
+            ],
+            "output": 1
+          }
+        ]
+      },
+      "semantic_kind": "longest_increasing_contiguous_run",
+      "task_id": "p12v_07",
+      "witness": "def solve(items):\n    best = 0\n    current = 0\n    for i in range(len(items)):\n        if i > 0 and items[i] > items[i-1]:\n            current += 1\n        else:\n            current = 1\n        best = max(best, current)\n    return best\n"
+    },
+    {
+      "compatible_route": "PYTHON",
+      "family": "coding",
+      "private": {
+        "tests": [
+          {
+            "input": [],
+            "output": 0
+          },
+          {
+            "input": [
+              1,
+              -1,
+              1,
+              -1,
+              0,
+              0
+            ],
+            "output": 5
+          },
+          {
+            "input": [
+              0,
+              0,
+              0
+            ],
+            "output": 3
+          },
+          {
+            "input": [
+              2,
+              -2,
+              -2
+            ],
+            "output": 2
+          },
+          {
+            "input": [
+              1,
+              2,
+              3
+            ],
+            "output": 0
+          }
+        ]
+      },
+      "semantic_kind": "zero_sum_index_pairs",
+      "task_id": "p12v_08",
+      "witness": "def solve(items):\n    count = 0\n    for i in range(len(items)):\n        for j in range(i+1, len(items)):\n            if items[i] + items[j] == 0:\n                count += 1\n    return count\n"
+    },
+    {
+      "compatible_route": "CSP",
+      "family": "constraint_planning",
+      "private": {},
+      "semantic_kind": "triangle_coloring_with_alias",
+      "task_id": "p12v_09",
+      "witness": {
+        "A": 0,
+        "B": 1,
+        "C": 2,
+        "D": 0
+      }
+    },
+    {
+      "compatible_route": "CSP",
+      "family": "constraint_planning",
+      "private": {},
+      "semantic_kind": "finite_derangement",
+      "task_id": "p12v_10",
+      "witness": {
+        "A": 2,
+        "B": 1,
+        "C": 4,
+        "D": 3
+      }
+    },
+    {
+      "compatible_route": "CSP",
+      "family": "constraint_planning",
+      "private": {},
+      "semantic_kind": "nonuniform_domains_with_constants",
+      "task_id": "p12v_11",
+      "witness": {
+        "P": 0,
+        "Q": 4,
+        "R": 5,
+        "S": 2
+      }
+    },
+    {
+      "compatible_route": "CSP",
+      "family": "constraint_planning",
+      "private": {},
+      "semantic_kind": "anchored_even_cycle",
+      "task_id": "p12v_12",
+      "witness": {
+        "A": 0,
+        "B": 1,
+        "C": 0,
+        "D": 1
+      }
+    }
+  ],
+  "schema": "neumann.p12-validation-references.v1"
+}
