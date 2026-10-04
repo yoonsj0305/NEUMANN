@@ -17,6 +17,68 @@ class RecordedFallback:
         return self.receipt
 
 
+def replay_raw_record(row, ref, record):
+    """Replay one retained raw item, including strict-contract rejection.
+
+    A proposal object can be syntactically valid JSON yet still be rejected by
+    P1.3 admissibility. That is a legitimate retained FAIL state, not replay
+    corruption. This helper never repairs or reinterprets the proposal.
+    """
+    if record.get("model_calls") != 1:
+        raise ValueError("raw semantic item must charge exactly one model call")
+    proposal = record.get("proposal")
+    if proposal is None:
+        receipt = record.get("semantic_receipt")
+        if record.get("status") != "FAILED" or not record.get("error"):
+            raise ValueError("missing proposal requires retained semantic failure")
+        if type(receipt) is dict and type(receipt.get("raw")) is str:
+            try:
+                parse_proposal(receipt["raw"])
+            except Exception:
+                pass
+            else:
+                if not any(x in record["error"] for x in (
+                    "deadline", "VRAM", "identity", "receipt", "budget"
+                )):
+                    raise ValueError("unexplained semantic failure with valid proposal")
+        if record.get("accepted") is not False or record.get("executed") is not False:
+            raise ValueError("failed semantic compilation cannot execute")
+        return
+
+    if proposal.get("route") == "ABSTAIN":
+        if (record.get("status") != "ABSTAINED"
+                or record.get("accepted") is not False
+                or record.get("executed") is not False):
+            raise ValueError("semantic abstention replay drift")
+        return
+
+    try:
+        typed, routed = _routing_from_proposal(row["view"], proposal)
+    except Exception as exc:
+        # The original run can retain a parsed proposal that is not a valid
+        # executable P1.3 contract, e.g. a float literal or malformed CSP
+        # tuple. It must have failed before execution and remain rejected.
+        if (record.get("status") != "FAILED"
+                or record.get("accepted") is not False
+                or record.get("executed") is not False
+                or not record.get("error")):
+            raise ValueError("invalid typed proposal replay state drift") from exc
+        expected_name = type(exc).__name__
+        if expected_name not in record["error"] and str(exc) not in record["error"]:
+            raise ValueError("invalid typed proposal failure mismatch") from exc
+        return
+
+    answer = _executor(routed["selected_route"], routed["project"])
+    accepted = _hidden_verifier(ref)(row["view"], answer)
+    expected_status = "ACCEPTED" if accepted else "REJECTED_BY_ORIGINAL_VERIFIER"
+    if record.get("selected_route") != routed["selected_route"]:
+        raise ValueError("raw semantic selected-route drift")
+    if (record.get("status") != expected_status
+            or record.get("accepted") is not accepted
+            or record.get("executed") is not True):
+        raise ValueError("raw semantic execution/verifier replay drift")
+
+
 def replay(directory):
     directory = Path(directory)
     terminal = json.loads((directory / "terminal.json").read_bytes())
@@ -42,39 +104,7 @@ def replay(directory):
             raise ValueError("P1.4 task identity drift")
 
         if ref["kind"] == "RAW_SEMANTIC":
-            if record.get("model_calls") != 1:
-                raise ValueError("raw semantic item must charge exactly one model call")
-            proposal = record.get("proposal")
-            if proposal is None:
-                receipt = record.get("semantic_receipt")
-                if record.get("status") != "FAILED" or not record.get("error"):
-                    raise ValueError("missing proposal requires retained semantic failure")
-                if type(receipt) is dict and type(receipt.get("raw")) is str:
-                    try:
-                        parse_proposal(receipt["raw"])
-                    except Exception:
-                        pass
-                    else:
-                        # A syntactically valid raw proposal can still fail a
-                        # post-generation identity/deadline/VRAM gate.
-                        if not any(x in record["error"] for x in (
-                            "deadline", "VRAM", "identity", "receipt", "budget"
-                        )):
-                            raise ValueError("unexplained semantic failure with valid proposal")
-                if record.get("accepted") is not False or record.get("executed") is not False:
-                    raise ValueError("failed semantic compilation cannot execute")
-            elif proposal.get("route") == "ABSTAIN":
-                if record.get("status") != "ABSTAINED" or record.get("accepted") is not False or record.get("executed") is not False:
-                    raise ValueError("semantic abstention replay drift")
-            else:
-                typed, routed = _routing_from_proposal(row["view"], proposal)
-                answer = _executor(routed["selected_route"], routed["project"])
-                accepted = _hidden_verifier(ref)(row["view"], answer)
-                expected_status = "ACCEPTED" if accepted else "REJECTED_BY_ORIGINAL_VERIFIER"
-                if record.get("selected_route") != routed["selected_route"]:
-                    raise ValueError("raw semantic selected-route drift")
-                if record.get("status") != expected_status or record.get("accepted") is not accepted or record.get("executed") is not True:
-                    raise ValueError("raw semantic execution/verifier replay drift")
+            replay_raw_record(row, ref, record)
         else:
             routing = record.get("routing")
             receipt = routing.get("fallback_receipt") if type(routing) is dict else None
