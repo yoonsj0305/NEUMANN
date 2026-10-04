@@ -1,0 +1,128 @@
+{
+  "schema": "neumann.p15-first-result-summary.v1",
+  "date": "2026-10-04",
+  "evidence": {
+    "name": "NEUMANN_P15_FIRST_EVIDENCE.zip",
+    "bytes": 39438,
+    "sha256": "4e252ab6a67c0988d31fb148647ef7124b2543b5f52abfd84987b3a164ffea5d",
+    "members": 27,
+    "crc_valid": true,
+    "manifest_valid": true,
+    "unsafe_paths": 0,
+    "duplicate_members": 0,
+    "symlinks": 0,
+    "no_replacement": true
+  },
+  "identity": {
+    "source_head": "26e40447c23e9820197d03edeee52415fe00bee7",
+    "merged_main_before_result": "3886911214971f78ae134045abb9591640bc8c5a",
+    "bootstrap_sha256": "441b8bc28a6f5522dcf79e143569cb1f15c79fc2c341051a3b977fc55e8820df",
+    "model_id": "google/gemma-4-E2B-it",
+    "model_revision": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+    "precision": "bfloat16",
+    "accelerator": "Tesla T4",
+    "core_unchanged": true,
+    "replay_exit_code": 0
+  },
+  "frozen_result": {
+    "study_status": "COMPLETE",
+    "observations": 8,
+    "verdict": "FAIL",
+    "reason": "SEMANTIC_PATH_CAPABILITY_FAILURE",
+    "raw_semantic_accepted": "4/8",
+    "raw_math_accepted": "4/4",
+    "raw_csp_accepted": "0/4",
+    "p2_registration_admitted": false,
+    "p2_admitted": false,
+    "decision3_admitted": false
+  },
+  "task_results": [
+    {
+      "task_id": "p15d_01",
+      "domain": "ARITHMETIC",
+      "status": "ACCEPTED",
+      "accepted": true
+    },
+    {
+      "task_id": "p15d_02",
+      "domain": "ARITHMETIC",
+      "status": "ACCEPTED",
+      "accepted": true
+    },
+    {
+      "task_id": "p15d_03",
+      "domain": "ARITHMETIC",
+      "status": "ACCEPTED",
+      "accepted": true
+    },
+    {
+      "task_id": "p15d_04",
+      "domain": "ARITHMETIC",
+      "status": "ACCEPTED",
+      "accepted": true
+    },
+    {
+      "task_id": "p15d_05",
+      "domain": "CSP",
+      "status": "FAILED",
+      "accepted": false,
+      "error": "ValueError: unsupported CSP atom"
+    },
+    {
+      "task_id": "p15d_06",
+      "domain": "CSP",
+      "status": "FAILED",
+      "accepted": false,
+      "error": "ValueError: unsupported CSP atom"
+    },
+    {
+      "task_id": "p15d_07",
+      "domain": "CSP",
+      "status": "FAILED",
+      "accepted": false,
+      "error": "ValueError: unsupported CSP atom"
+    },
+    {
+      "task_id": "p15d_08",
+      "domain": "CSP",
+      "status": "FAILED",
+      "accepted": false,
+      "error": "ValueError: unsupported CSP atom"
+    }
+  ],
+  "diagnosis": {
+    "arithmetic": "typed ordered atoms plus deterministic exact compiler passed 4/4 on the new opened arithmetic set",
+    "csp_failure_locus": "strict sketch surface parser before canonical compilation, execution or original verification",
+    "csp_proposals_compiled": 0,
+    "csp_tool_calls": 0,
+    "csp_verifier_calls": 0,
+    "key_split": "semantic content versus serialization",
+    "p15_rerun": false
+  },
+  "work": {
+    "model_calls": 8,
+    "input_tokens": 1979,
+    "output_tokens": 261,
+    "generation_ms_sum": 23638.40749,
+    "tool_calls": 4,
+    "verifier_calls": 4,
+    "startup_ms": 97824.439998,
+    "whole_study_ms": 419011.277529,
+    "max_item_ms": 33921.563035,
+    "max_accelerator_allocated_bytes": 10281742336,
+    "energy_j": null,
+    "flops": null,
+    "money": null
+  },
+  "next_candidate": {
+    "name": "semantic hypothesis plus deterministic ambiguity-rejecting surface normalization",
+    "preregistered": false,
+    "fresh_evidence_required": true,
+    "constraints": [
+      "no post-hoc repair",
+      "no model retry",
+      "no facts inferred from original query by the normalizer",
+      "original verifier remains acceptance authority"
+    ]
+  }
+}
