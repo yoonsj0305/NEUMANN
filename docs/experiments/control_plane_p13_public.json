@@ -1,0 +1,646 @@
+{
+  "rows": [
+    {
+      "task_id": "p13v_01",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "background": "Irrelevant planning and coding words.",
+          "bindings": {
+            "a": 31,
+            "b": 4,
+            "c": 6,
+            "d": 3,
+            "e": 2,
+            "f": 5
+          },
+          "expression": "(a-b*c)/(d+e*f)"
+        }
+      }
+    },
+    {
+      "task_id": "p13v_02",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "background": "Irrelevant planning and coding words.",
+          "bindings": {
+            "a": 12,
+            "b": 5,
+            "c": 1,
+            "d": 2,
+            "e": 3,
+            "f": 4
+          },
+          "expression": "(a/(b-c)+d)*(e+f)"
+        }
+      }
+    },
+    {
+      "task_id": "p13v_03",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "background": "Irrelevant planning and coding words.",
+          "bindings": {
+            "a": 8,
+            "b": 3,
+            "c": 2,
+            "d": 6,
+            "e": 3
+          },
+          "expression": "-(a-b)/(c+d/e)"
+        }
+      }
+    },
+    {
+      "task_id": "p13v_04",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "background": "Irrelevant planning and coding words.",
+          "bindings": {
+            "a": 7,
+            "b": 2,
+            "c": 5,
+            "d": 4,
+            "e": 1,
+            "f": 3
+          },
+          "expression": "(a+b)/(c-d/(e+f))"
+        }
+      }
+    },
+    {
+      "task_id": "p13v_05",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "background": "Irrelevant arithmetic words.",
+          "examples": [
+            {
+              "input": [
+                3,
+                1,
+                4,
+                2
+              ],
+              "output": [
+                3,
+                3,
+                4,
+                4
+              ]
+            }
+          ],
+          "requirement": "Return the inclusive running maxima of items, a list of integers. Empty input returns []."
+        }
+      }
+    },
+    {
+      "task_id": "p13v_06",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "background": "Irrelevant arithmetic words.",
+          "examples": [
+            {
+              "input": [
+                1
+              ],
+              "output": [
+                1
+              ]
+            }
+          ],
+          "requirement": "Rotate the integer list items one place to the left. Empty input returns []."
+        }
+      }
+    },
+    {
+      "task_id": "p13v_07",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "background": "Irrelevant arithmetic words.",
+          "examples": [
+            {
+              "input": [
+                0,
+                1,
+                3
+              ],
+              "output": 2
+            }
+          ],
+          "requirement": "Return the smallest nonnegative integer absent from items, a list of integers."
+        }
+      }
+    },
+    {
+      "task_id": "p13v_08",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "background": "Irrelevant arithmetic words.",
+          "examples": [
+            {
+              "input": [
+                4
+              ],
+              "output": []
+            }
+          ],
+          "requirement": "Return the absolute difference of each consecutive pair in items, in order. Length below two returns []."
+        }
+      }
+    },
+    {
+      "task_id": "p13v_09",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "background": "ARITHMETIC is just irrelevant text.",
+          "constraints": [
+            [
+              "lt",
+              "a",
+              "b"
+            ],
+            [
+              "lt",
+              "b",
+              "c"
+            ],
+            [
+              "lt",
+              "c",
+              "d"
+            ],
+            [
+              "lt",
+              "d",
+              "e"
+            ],
+            [
+              "ne",
+              "a",
+              "d"
+            ]
+          ],
+          "domains": {
+            "a": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "b": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "c": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "d": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "e": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        }
+      }
+    },
+    {
+      "task_id": "p13v_10",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "background": "ARITHMETIC is just irrelevant text.",
+          "constraints": [
+            [
+              "ne",
+              "v0",
+              "v1"
+            ],
+            [
+              "ne",
+              "v1",
+              "v2"
+            ],
+            [
+              "ne",
+              "v2",
+              "v3"
+            ],
+            [
+              "ne",
+              "v3",
+              "v4"
+            ],
+            [
+              "ne",
+              "v4",
+              "v5"
+            ],
+            [
+              "ne",
+              "v5",
+              "v0"
+            ],
+            [
+              "ne",
+              "v0",
+              "v2"
+            ]
+          ],
+          "domains": {
+            "v0": [
+              0,
+              1,
+              2
+            ],
+            "v1": [
+              0,
+              1,
+              2
+            ],
+            "v2": [
+              0,
+              1,
+              2
+            ],
+            "v3": [
+              0,
+              1,
+              2
+            ],
+            "v4": [
+              0,
+              1,
+              2
+            ],
+            "v5": [
+              0,
+              1,
+              2
+            ]
+          }
+        }
+      }
+    },
+    {
+      "task_id": "p13v_11",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "background": "ARITHMETIC is just irrelevant text.",
+          "constraints": [
+            [
+              "eq",
+              "h",
+              2
+            ],
+            [
+              "lt",
+              "a",
+              "h"
+            ],
+            [
+              "lt",
+              "b",
+              "h"
+            ],
+            [
+              "lt",
+              "c",
+              "h"
+            ],
+            [
+              "lt",
+              "d",
+              "h"
+            ]
+          ],
+          "domains": {
+            "a": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "b": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "c": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "d": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "h": [
+              0,
+              1,
+              2,
+              3
+            ]
+          }
+        }
+      }
+    },
+    {
+      "task_id": "p13v_12",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "background": "ARITHMETIC is just irrelevant text.",
+          "constraints": [
+            [
+              "ne",
+              "a",
+              "c"
+            ],
+            [
+              "ne",
+              "a",
+              "d"
+            ],
+            [
+              "ne",
+              "a",
+              "e"
+            ],
+            [
+              "ne",
+              "b",
+              "c"
+            ],
+            [
+              "ne",
+              "b",
+              "d"
+            ],
+            [
+              "ne",
+              "b",
+              "e"
+            ]
+          ],
+          "domains": {
+            "a": [
+              0,
+              1
+            ],
+            "b": [
+              0,
+              1
+            ],
+            "c": [
+              0,
+              1
+            ],
+            "d": [
+              0,
+              1
+            ],
+            "e": [
+              0,
+              1
+            ]
+          }
+        }
+      }
+    },
+    {
+      "task_id": "p13v_13",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "expression": "x+1"
+        }
+      }
+    },
+    {
+      "task_id": "p13v_14",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "bindings": {
+            "x": 3
+          },
+          "expression": "x**2"
+        }
+      }
+    },
+    {
+      "task_id": "p13v_15",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "bindings": {
+            "x": true
+          },
+          "expression": "x+1"
+        }
+      }
+    },
+    {
+      "task_id": "p13v_16",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "constraints": [
+            [
+              "ne",
+              "a",
+              "missing"
+            ]
+          ],
+          "domains": {
+            "a": [
+              0,
+              1
+            ]
+          }
+        }
+      }
+    },
+    {
+      "task_id": "p13v_17",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "constraints": [
+            [
+              "unknown",
+              "a",
+              0
+            ]
+          ],
+          "domains": {
+            "a": [
+              0,
+              1
+            ]
+          }
+        }
+      }
+    },
+    {
+      "task_id": "p13v_18",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "constraints": [],
+          "domains": {
+            "a": [
+              0,
+              1,
+              1
+            ]
+          }
+        }
+      }
+    },
+    {
+      "task_id": "p13v_19",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "examples": [
+            {
+              "hidden_answer": [],
+              "input": [],
+              "output": []
+            }
+          ],
+          "requirement": "Return a list."
+        }
+      }
+    },
+    {
+      "task_id": "p13v_20",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "examples": [
+            {
+              "input": [],
+              "output": []
+            }
+          ],
+          "requirement": " "
+        }
+      }
+    },
+    {
+      "task_id": "p13v_21",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "bindings": {
+            "a": 8,
+            "b": 2
+          },
+          "constraints": [
+            [
+              "ne",
+              "p",
+              "q"
+            ]
+          ],
+          "domains": {
+            "p": [
+              0,
+              1
+            ],
+            "q": [
+              0,
+              1
+            ]
+          },
+          "expression": "a/b"
+        }
+      }
+    },
+    {
+      "task_id": "p13v_22",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "constraints": [
+            [
+              "le",
+              "u",
+              "v"
+            ]
+          ],
+          "domains": {
+            "u": [
+              1,
+              2
+            ],
+            "v": [
+              1,
+              2
+            ]
+          },
+          "examples": [
+            {
+              "input": [
+                1,
+                2
+              ],
+              "output": 2
+            }
+          ],
+          "requirement": "Return the number of list elements."
+        }
+      }
+    },
+    {
+      "task_id": "p13v_23",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "query": "How many distinct integer triples satisfy the conditions described in prose?"
+        }
+      }
+    },
+    {
+      "task_id": "p13v_24",
+      "view": {
+        "instruction": "Satisfy the original public problem obligations.",
+        "public": {
+          "query": "Write a program satisfying an incomplete natural-language specification."
+        }
+      }
+    }
+  ]
+}

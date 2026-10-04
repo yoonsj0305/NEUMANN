@@ -1,0 +1,182 @@
+{
+  "architecture": {
+    "budget": {
+      "fallback_calls": 1,
+      "public_bytes": 32768,
+      "wall_ms": 120000.0
+    },
+    "cost_estimates": "optional nonnegative milliseconds with provenance; no measured-cheapest claim",
+    "decision3_admitted": false,
+    "fallback_budget": {
+      "context_tokens": 4096,
+      "controller_wall_ms": 540000.0,
+      "evaluated_tokens": 589824,
+      "forward_calls": 432,
+      "input_rows": 864,
+      "padded_tokens": 589824,
+      "score_rows": 3456,
+      "scored_tokens": 3456,
+      "study_wall_ms": 1800000.0,
+      "task_wall_ms": 120000.0
+    },
+    "fallback_codes": [
+      236776,
+      236799,
+      236780,
+      236796
+    ],
+    "fallback_geometry": {
+      "all_loo_winners_stable": true,
+      "centered_task_range_min_nats": 0.001,
+      "distinct_winners": 2,
+      "dominant_winner_max": 10,
+      "loo_centered_tolerance_nats": 0.5,
+      "minimum_full_margin_nats": 0.5,
+      "numeric_tolerance_nats": 0.05
+    },
+    "fallback_model": {
+      "artifact_sha256": "bf6d4f9d506f536db6255143e5f21e05b9ccadfea54af281ac278bd49c178d66",
+      "model_id": "google/gemma-4-E2B-it",
+      "model_revision": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+      "precision": "bfloat16",
+      "tokenizer_sha256": "8552955a1513c80096c4155aa2de30079a20d4c3f255b9d1acf9162c859b4207",
+      "weights_frozen": true
+    },
+    "generation_in_controller": false,
+    "global_questions_closed": [],
+    "malformed_typed_input": "REJECT_ENTIRE_INPUT",
+    "mixed_typed_input": "LAZY_FULL_S4_MASKED_SELECTION_OR_ABSTAIN",
+    "p12_validation_rescued": false,
+    "p2_admitted": false,
+    "p2_registration_admitted": false,
+    "public_fields": [
+      "background",
+      "bindings",
+      "constraints",
+      "domains",
+      "examples",
+      "expression",
+      "query",
+      "requirement"
+    ],
+    "raw_query": "NEEDS_SEMANTIC_INTERPRETATION_NO_AUTOMATIC_EXECUTION",
+    "references_visible_to_controller": false,
+    "schema": "neumann.control-plane-p1.3.v1",
+    "selected_route_in_admissible_routes": true,
+    "single_typed_neural_forwards": 0,
+    "typed_groups": {
+      "ARITHMETIC": [
+        "expression",
+        "bindings"
+      ],
+      "CSP": [
+        "domains",
+        "constraints"
+      ],
+      "PYTHON": [
+        "requirement",
+        "examples"
+      ]
+    },
+    "unknown_fields": "REJECT"
+  },
+  "cpu_diagnostic_only": true,
+  "decision3_admitted": false,
+  "first_only": true,
+  "gate": {
+    "all_diagnostic_neural_forwards": 0,
+    "exact_contract_matches": 24,
+    "per_item_wall_ms": 500.0,
+    "scope": "authored typed contract and stopped-state diagnostic only; semantic fallback not run",
+    "single_typed_neural_forwards": 0,
+    "whole_study_wall_ms": 30000.0
+  },
+  "p2_admitted": false,
+  "p2_registration_admitted": false,
+  "provenance": {
+    "authored_opened": true,
+    "composition": {
+      "invalid_contract": 8,
+      "mixed_contract": 2,
+      "positive_typed": 12,
+      "raw_query": 2
+    },
+    "dedup_scope": "positive typed arithmetic alpha-AST, normalized coding requirement, CSP graph/cardinality isomorphism; no universal semantic novelty proof",
+    "external_benchmark": false,
+    "first_diagnostic_seen_at_registration": false,
+    "neural_scores_seen": false,
+    "prior_opened_views": 27
+  },
+  "public_sha256": "f727b27bb38955aed88be5aec6c7867b233815ff15e3f53c47c8ebf4edfa23f2",
+  "references_sha256": "69b21e43d0df6982c703b40ddc560020ace03028682d8e1947fdae5a40e314c4",
+  "retained_parent_result": {
+    "archive_bytes": 93637,
+    "archive_sha256": "362b13d7d7006ea1c55ad33788acd11d1712e94c081d59d52b28581d3abe3444",
+    "p2_registration_admitted": false,
+    "pr": 140,
+    "verdict": "FAIL"
+  },
+  "schema": "neumann.p13-contract-first-registration.v1",
+  "semantic_fallback_run": false,
+  "source_sha256": {
+    ".github/workflows/control_plane_p13.yml": "215649cf547046242acd1a8809b493f6c43756be21ed6c9aa8171a1b34af97d5",
+    "docs/experiments/control_plane_p12_architecture.freeze.json": "f89fc8cb119252a41436fc44188eba1f8344ea3e3e177bead07cccf54e8d96c3",
+    "docs/experiments/control_plane_p12_validation_public.json": "1cedefa4e0fea65a7deac1bd604fd4be77fc0803aa0b300a444251040cd43983",
+    "docs/experiments/control_plane_p12_validation_references.json": "8be8fb2cf4d1697d44adf4abee0d8061aa31fc6c501b3d70cc50950f5e849546",
+    "docs/experiments/control_plane_p13_public.json": "ad5528da1376f23917907245a632186eb45a5567d9fb63e21da540a2ba7ed339",
+    "docs/experiments/control_plane_p13_references.json": "293d6de2403f912b85f679eef490ecbacd597d01bd4904a55bf95237322d7da0",
+    "docs/experiments/control_plane_p1_opened_public.json": "2c9b064763592ab6c21723c7cdd1e34b2447b68eed7de082489953f55e8d4ec0",
+    "docs/research/control_plane_p13.md": "36cbfffdc215865c801e89d89ffe9fe2056a101ad475770b9225f3a89c9fcdb7",
+    "experiments/control_plane_p11_dev.py": "8986facd8f06f38c5bb6bd8d2ab98525b3d5f6e1a6445f7f2bce570100f3a782",
+    "experiments/control_plane_p11_replay.py": "f3b7259d7bca6b686b11ec3949bb14daf14e466ab24c805aabbe8765a98cc493",
+    "experiments/control_plane_p12_dev.py": "9666fd289d47be20a1559d496df0ede39c51305f558df3db8b3469526cac96db",
+    "experiments/control_plane_p12_replay.py": "b16dc95d63acd0206275ac4c1ad1772517f40d9362e3cabd9f06b06e0f5a1951",
+    "experiments/control_plane_p12_validation_catalog.py": "d70f3e21b3505dbff3f198668308a6f65a6cd6d19a98e3dc07d74b135dc5348f",
+    "experiments/control_plane_p12_validation_first.py": "e277906c003a8f98e50aaf0862d8515227213d166e32721ce8b965e22875d14d",
+    "experiments/control_plane_p12_validation_replay.py": "8fc4bc714dea1683ed0b71aaaee781620c35d658bdfb38e7724bf2fb6baa21e9",
+    "experiments/control_plane_p13_catalog.py": "4949c606e7a050f2230c9e22fda698bd838f68e6cdf73121daca409b47fd862c",
+    "experiments/control_plane_p13_first.py": "c50a6ec55ee0124ab02ab9e289a5ddf7361380609ec67494fa2b48fd570dc376",
+    "experiments/control_plane_p1_first.py": "88b999eee2d66ec99ad9f0ceb9d890139b06cf992d913554e56ec3150b4d56d4",
+    "experiments/general_multiplier_accelerator_core.py": "8c90b2ff6671aacb168f7c6c5eb713522584a238746b7383ce1c0cc3d35ea33e",
+    "neumann1/control_plane_p11.py": "03462d09005c9a514556b8f14f467412122e10f4d7db710bfbe9759885248989",
+    "neumann1/control_plane_p12.py": "2670fa76f207964bc7e7fbdc2538ba673988d4dd08d677b9e9fba2b107b7ba2b",
+    "neumann1/control_plane_p12_validation.py": "955b69b0f2df7c95310a1d3a1ca5eb03dbc127056ef1e482e15e8adfc98932c2",
+    "neumann1/control_plane_p13.py": "7374d5ccb606fb0624f2cdf9836e4d72f6eb92cd141851d8eb12a8924bdef988",
+    "neumann1/control_plane_p1_contract.py": "9c46b5fc0a2dfacbe0b06600d30dbcf82d60c86f1bbd6d50bc6151db21e62ce0",
+    "neumann1/control_plane_scoring_v1.py": "b3caaf61219a112c91101c8fe0a88e92c651ee4412d3a6289daedea79bc13b58",
+    "neumann1/control_plane_v1.py": "2c87d27b0c543a01620f97059206edd169ab177ca852737dfe853f1cbd10a7ca",
+    "neumann1/general_multiplier_contract.py": "d2c9695a402b4b6e6a6e5761d73c484ef396571a6e5edfd8e411253acbb23863",
+    "neumann1/general_python_worker_v106.py": "c85f93ffc22a4637022a88b4fe8735f2c2c256ea08187b4efa8b242fa035040e",
+    "neumann1/general_runtime_v106.py": "eed968d58a8b5bf739b0f4ed3ada37734002b3e73339584059053f719c29ebb5",
+    "scripts/control_plane_p12_kaggle.py": "c8f66d3f05a672377376cb92f8d4e39f7669cd8e55a88d58a08bfaa430c5bdfe",
+    "scripts/control_plane_p12_validation_kaggle.py": "77d3e7a57459a89322ff94145a11de73452cc9ce92583e7045fa5bd755028a99",
+    "tests/test_control_plane_p13.py": "744fce6eddec9ccb5e52c226a3606ad8bd1df711f0945b472bbe937f0e0a67c5",
+    "tests/test_control_plane_p13_first.py": "ad8a52eb8c8e6c2851f41497a9e562ae6c4b209d6eda31c8bedb96dfa6b6a084"
+  },
+  "task_ids": [
+    "p13v_01",
+    "p13v_02",
+    "p13v_03",
+    "p13v_04",
+    "p13v_05",
+    "p13v_06",
+    "p13v_07",
+    "p13v_08",
+    "p13v_09",
+    "p13v_10",
+    "p13v_11",
+    "p13v_12",
+    "p13v_13",
+    "p13v_14",
+    "p13v_15",
+    "p13v_16",
+    "p13v_17",
+    "p13v_18",
+    "p13v_19",
+    "p13v_20",
+    "p13v_21",
+    "p13v_22",
+    "p13v_23",
+    "p13v_24"
+  ]
+}

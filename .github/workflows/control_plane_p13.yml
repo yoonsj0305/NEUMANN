@@ -1,0 +1,39 @@
+name: P1.3 contract-first routing and first CPU diagnostic
+
+on:
+  pull_request:
+    paths:
+      - 'neumann1/control_plane_p13.py'
+      - 'experiments/control_plane_p13*.py'
+      - 'tests/test_control_plane_p13*.py'
+      - 'docs/experiments/control_plane_p13*.json'
+      - '.github/workflows/control_plane_p13.yml'
+
+jobs:
+  contract-and-first-cpu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install existing CPU package dependencies (no model runtime)
+        run: python -m pip install numpy==2.4.6 scipy==1.17.1 scikit-learn==1.9.1 threadpoolctl==3.7.0
+      - name: Synthetic control contracts and retained-first faults only
+        run: python -m unittest discover -s tests -p 'test_control_plane_p13*.py' -v
+      - name: Frozen registration and original construction checker controls
+        run: python -m experiments.control_plane_p13_first --check-registration
+      - name: First frozen CPU public-contract diagnostic (no weights or GPU)
+        run: python -m experiments.control_plane_p13_first --directory "$RUNNER_TEMP/neumann_p13_first_contract" --frozen-head "$(git rev-parse HEAD)" --archive-stdout
+      - name: Retain first PASS FAIL or INCOMPLETE evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN_P13_FIRST_CONTRACT_EVIDENCE
+          path: |
+            ${{ runner.temp }}/NEUMANN_P13_FIRST_CONTRACT_EVIDENCE.zip
+            ${{ runner.temp }}/neumann_p13_first_contract
+          if-no-files-found: warn
