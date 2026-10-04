@@ -152,6 +152,13 @@ class FrozenSemanticCompiler:
                 raise ValueError("complete semantic token receipt required")
         if result["output_tokens"] > Budget().semantic_output_tokens:
             raise ValueError("semantic output budget drift")
+        if result.get("deadline_reached") is not False:
+            raise TimeoutError("semantic generation deadline reached")
+        peak = result.get("peak_accelerator_memory_bytes")
+        if type(peak) is not int or peak <= 0:
+            raise ValueError("positive semantic peak VRAM receipt required")
+        if type(result.get("core_sha256")) is not str or not result["core_sha256"]:
+            raise ValueError("semantic core identity receipt required")
         proposal = parse_proposal(result["raw"])
         return {
             "proposal": proposal,
