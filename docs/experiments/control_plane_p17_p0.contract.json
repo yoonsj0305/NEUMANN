@@ -1,0 +1,38 @@
+{
+  "schema": "neumann.control-plane-p1.7.p0.v1",
+  "stage": "P0_SYNTHETIC_CONTRACT_ONLY",
+  "model": {
+    "model_id": "google/gemma-4-E2B-it",
+    "model_revision": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+    "artifact_sha256": "bf6d4f9d506f536db6255143e5f21e05b9ccadfea54af281ac278bd49c178d66",
+    "tokenizer_sha256": "8552955a1513c80096c4155aa2de30079a20d4c3f255b9d1acf9162c859b4207",
+    "precision": "bfloat16",
+    "weights_frozen": true
+  },
+  "evidence": "query UTF-8 hash; Python Unicode codepoint half-open span; stable source-bound ID",
+  "grammar": "bounded English sequential accumulator / shared-domain CSP; complete query consumption",
+  "word_number_lexicon": {
+    "one quarter": "1/4",
+    "two thirds": "2/3",
+    "one half": "1/2"
+  },
+  "maximum_candidates": 4,
+  "ambiguity": "one It equals literal CSP clause; all declared-entity bindings enumerated or stop",
+  "selection": "unique grammar candidate = zero neural; otherwise full-S4 fixed-code scoring with masks",
+  "numeric_regeneration": false,
+  "generated_calls": 0,
+  "retry": false,
+  "cost_estimate_weight": 0.0,
+  "original_verifier_required": true,
+  "compiler": "UNCHANGED_P1.5",
+  "admissibility": "UNCHANGED_P1.3",
+  "semantic_equivalence_proved": false,
+  "p16_result_rescued": false,
+  "actual_gemma_run": "NOT_RUN",
+  "development_registration": "NOT_REGISTERED",
+  "fresh_validation_registered": false,
+  "p2_registration_admitted": false,
+  "p2_admitted": false,
+  "decision3_admitted": false,
+  "global_questions_closed": []
+}
