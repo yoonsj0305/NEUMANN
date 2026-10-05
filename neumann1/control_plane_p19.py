@@ -55,6 +55,8 @@ def contract():
         "hidden_reference_access": False,
         "numeric_regeneration": False,
         "p18_result_rescued": False,
+        "p18_opened_tasks_model_score_reuse": False,
+        "future_actual_requires_new_registered_tasks": True,
         "actual_gemma_run": "NOT_RUN",
         "development_registration": "NOT_REGISTERED",
         "fresh_validation_registered": False,
