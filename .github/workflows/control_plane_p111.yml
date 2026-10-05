@@ -1,0 +1,30 @@
+name: P1.11 semantic micro-executor contracts
+
+on:
+  pull_request:
+    paths:
+      - 'neumann1/control_plane_p111.py'
+      - 'tests/test_control_plane_p111.py'
+      - 'docs/experiments/control_plane_p111_p0.contract.json'
+      - 'docs/research/control_plane_p111*.md'
+      - '.github/workflows/control_plane_p111.yml'
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install CPU test dependencies only
+        run: python -m pip install pytest numpy==2.4.6 scipy==1.17.1 scikit-learn==1.9.1 threadpoolctl==3.7.0
+      - name: Compile P1.11 without loading model
+        run: python -m py_compile neumann1/control_plane_p111.py tests/test_control_plane_p111.py
+      - name: P1.11 synthetic contracts
+        run: python -m pytest -q tests/test_control_plane_p111.py
+      - name: Machine contract matches implementation
+        run: python -c 'import json; from pathlib import Path; from neumann1.control_plane_p111 import contract; assert json.loads(Path("docs/experiments/control_plane_p111_p0.contract.json").read_text()) == contract()'

@@ -1,0 +1,45 @@
+{
+  "schema": "neumann.control-plane-p1.11.semantic-microexecutor.p0.v1",
+  "stage": "P0_SYNTHETIC_CONTRACT_ONLY",
+  "model": {
+    "model_id": "sentence-transformers/all-MiniLM-L6-v2",
+    "model_revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+    "parameters": 22713728,
+    "architecture": "BertModel",
+    "embedding_dim": 384,
+    "pooling": "attention-mask mean pooling then L2 normalization",
+    "training": false
+  },
+  "semantic_ir": "TARGET_ROLE_PLUS_SOURCE_BOUND_CANDIDATE_ROLE_DESCRIPTIONS",
+  "large_generative_model_on_primary_path": false,
+  "forward_calls_per_ambiguous_item": 1,
+  "all_candidates_batched_together": true,
+  "score": "cosine(target_embedding,candidate_role_embedding)",
+  "winner_rule": "UNIQUE_TOP_ABOVE_ABSOLUTE_AND_MARGIN_GATES",
+  "criteria": {
+    "minimum_top_cosine": 0,
+    "minimum_margin_cosine": 0.05
+  },
+  "removed_before_neural_compute": [
+    "numeric_literals",
+    "domains",
+    "csp_constraints",
+    "candidate_assignment_atoms",
+    "solver_witnesses",
+    "full_query"
+  ],
+  "generation": false,
+  "retry": false,
+  "hidden_reference_access": false,
+  "new_training": false,
+  "p110_result_rescued": false,
+  "p110_task_score_reuse": false,
+  "future_actual_requires_new_registered_tasks": true,
+  "actual_model_run": "NOT_RUN",
+  "development_registration": "NOT_REGISTERED",
+  "fresh_validation_registered": false,
+  "p2_registration_admitted": false,
+  "p2_admitted": false,
+  "decision3_admitted": false,
+  "global_questions_closed": []
+}
