@@ -29,5 +29,5 @@ def negative_controls():
       {"instruction":"Unregistered P1.9 cue.","public":{"query":"Choose X, Y from {0,1}. X differs from Y, It equals 1. Return a complete assignment."}},
       {"instruction":SEMANTIC_INSTRUCTIONS[0],"public":{"query":"Choose X, Y from {0,1}. It equals 1, It equals 0. Return a complete assignment."}},
       {"instruction":SEMANTIC_INSTRUCTIONS[1],"public":{"query":"Choose A, B, C, D, E from {0,1,2,3,4}. It equals 2. Return a complete assignment."}},
-      {"instruction":SEMANTIC_INSTRUCTIONS[2],"public":{"query":"Choose P, Q, R from {0,1,2}. P differs from Q. Return a complete assignment."}},
+      {"instruction":SEMANTIC_INSTRUCTIONS[2],"public":{"query":"Choose P, Q, R from {0,1,2}. It differs from P. Return a complete assignment."}},
     )
