@@ -135,7 +135,8 @@ def test_batch_order_drift_abstains():
     row = _b_row()
     parsed, bundle, eligible, receipt = _receipt(row, preferred=1)
     receipt = copy.deepcopy(receipt)
-    # Change candidate 1 A score only in the reverse mode.
-    receipt["passes"][2]["matrix"][1][0] += 0.2
+    # Change candidate 1 B score only in the reverse mode while keeping
+    # every log probability nonpositive.
+    receipt["passes"][2]["matrix"][1][1] += 0.2
     with pytest.raises(ValueError, match="numerical drift"):
         validate_selection(row["view"], parsed, bundle, eligible, receipt)
