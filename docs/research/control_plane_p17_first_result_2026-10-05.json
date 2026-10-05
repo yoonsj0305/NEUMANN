@@ -1,0 +1,90 @@
+{
+  "schema": "neumann.p17-first-result-summary.v1",
+  "date": "2026-10-05",
+  "evidence": {
+    "name": "NEUMANN_P17_FIRST_EVIDENCE.zip",
+    "bytes": 86633,
+    "sha256": "97f84b6e5f0980fdc815dbb3678502e0e23b1459af1b68e1630361379a254bad",
+    "members_reported": 35,
+    "crc_reported": "PASS",
+    "independent_archive_ingestion": false,
+    "no_replacement": true
+  },
+  "frozen_result": {
+    "study_status": "COMPLETE",
+    "observations": 12,
+    "verdict": "FAIL",
+    "reason": "TASK_WALL_CAP",
+    "p2_registration_admitted": false,
+    "p2_admitted": false,
+    "decision3_admitted": false,
+    "report_error": null,
+    "core_unchanged": true
+  },
+  "unique_path": {
+    "accepted": "8/8",
+    "arithmetic": "4/4",
+    "csp": "4/4",
+    "model_calls": 0,
+    "neural_forward_calls": 0,
+    "generated_calls": 0,
+    "tool_calls": 8,
+    "verifier_calls": 8
+  },
+  "ambiguous_path": {
+    "accepted": "0/4",
+    "model_calls": 4,
+    "neural_forward_calls": 110,
+    "expected_if_complete": 144,
+    "generated_calls": 0,
+    "tool_calls": 0,
+    "verifier_calls": 0,
+    "tasks": [
+      {
+        "task_id": "p17d_09",
+        "forwards": 7,
+        "error": "ValueError: partial or wrong candidate receipt"
+      },
+      {
+        "task_id": "p17d_10",
+        "forwards": 36,
+        "error": "ValueError: selector wall cap"
+      },
+      {
+        "task_id": "p17d_11",
+        "forwards": 31,
+        "error": "ValueError: partial or wrong candidate receipt"
+      },
+      {
+        "task_id": "p17d_12",
+        "forwards": 36,
+        "error": "ValueError: selector wall cap"
+      }
+    ]
+  },
+  "work": {
+    "evaluated_tokens": 183042,
+    "padded_tokens": 183042,
+    "startup_ms": 104631.266283,
+    "whole_study_ms": 666819.196618,
+    "max_accelerator_allocated_bytes": 10830349312,
+    "max_accelerator_reserved_bytes": 12060721152,
+    "peak_process_rss_bytes": 12195471360,
+    "energy_j": null,
+    "flops": null,
+    "money": null
+  },
+  "replay": {
+    "archived_exit_code": 1,
+    "archived_failure": "ValueError: P1.7 semantic replay drift: execution",
+    "root_cause": "execution complete_ms was compared as semantic identity",
+    "fix": "compare accepted/executed/answer/error only; validate timing separately",
+    "result_rescued": false
+  },
+  "next_candidate": {
+    "principle": "deterministic feasibility pruning before neural ambiguity selection",
+    "preregistered": false,
+    "fresh_evidence_required": true,
+    "p17_rerun": false
+  }
+}
