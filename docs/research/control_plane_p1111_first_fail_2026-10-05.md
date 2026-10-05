@@ -41,3 +41,114 @@ No favorable rerun or replacement is permitted.
 Fresh validation remains unregistered. P2 registration=false. P2=false.
 Decision3=false. Q1-Q7 globally OPEN. The North Star claim of overwhelming
 iso-capability advantage plus category change is not established by this result.
+
+
+## Exact retained diagnosis
+
+Read-only inspection of the immutable P1.11.1 receipts establishes that this was
+a complete, replayable **semantic-capability failure**, not a cost, timing,
+accounting, control-path, reference, or core-identity failure.
+
+Frozen report:
+
+- status: `COMPLETE`
+- observations: `12`
+- accounting_complete: `true`
+- whole study: `9,137.403 ms`
+- selector startup: `5,461.325 ms`
+- model calls: `12`
+- neural forwards: `12`
+- generated calls: `0`
+- feasibility calls: `35`
+- selector complete: `12/12`
+- lexical unique selections: `0`
+- accepted: `3/12`
+- selected: `8/12`
+- verifier rejected: `5`
+- semantic abstained: `4`
+- raw top correct: `6/12`
+- exact frozen reason: `P111_SEMANTIC_CAPABILITY_FAILURE`
+
+The model/artifact audit was unchanged, and peak accelerator allocated memory was
+about 101 MB.
+
+### Why threshold tuning is rejected
+
+The six correct raw tops and six incorrect raw tops are already fixed before the
+0.05 cosine-margin gate.
+
+If the margin threshold were reduced all the way to zero, all 12 tasks would be
+selected, but only the same 6/12 raw winners would be correct. Therefore no
+global threshold change can reach the preregistered 9/12 capability floor.
+
+The observed margin is also badly calibrated:
+
+- b01: wrong raw winner, margin about 0.2174
+- b02: correct, margin about 0.1140
+- b03: wrong, margin about 0.0860
+- b04: correct, margin about 0.0781
+- b05: correct raw winner, margin about 0.0357 -> abstained
+- b06: wrong, margin about 0.0613
+- b07: correct raw winner, margin about 0.0144 -> abstained
+- b08: correct, margin about 0.0504
+- b09: correct raw winner, margin about 0.0083 -> abstained
+- b10: wrong, margin about 0.1018
+- b11: wrong, margin about 0.1119
+- b12: wrong raw winner, margin about 0.0181 -> abstained
+
+Higher confidence is therefore not monotonically associated with correctness on
+this opened development set.
+
+### Candidate-count diagnostic
+
+Raw-top correctness by candidate count:
+
+- 2 candidates: 2/4
+- 3 candidates: 4/5
+- 4 candidates: 0/3
+
+This is diagnostic only and is confounded by task semantics, but the complete
+failure on all three four-candidate tasks is consistent with the larger point:
+independent sentence embeddings plus cosine similarity are not reliably
+resolving the functional/relational distinctions that remain after deterministic
+CSP pruning.
+
+### Cost-side signal
+
+P1.11.1 did achieve the intended cheap control regime:
+
+- 12 learned calls / 12 forwards total
+- 266 input tokens
+- zero generation
+- one batched encoder forward per ambiguous task
+- after initial warmup, most forward times are approximately 5-6 ms
+- peak accelerator allocated memory about 101 MB
+
+This is strong local cost evidence but **not** an iso-capability efficiency win,
+because capability failed badly.
+
+## Prospective consequence
+
+Do not continue tuning:
+
+- the cosine margin,
+- absolute cosine floors,
+- pooling,
+- batch order,
+- the same independent-embedding formulation,
+- or the same opened tasks.
+
+The next architecture should preserve the one-batch micro-executor regime while
+changing the semantic primitive from **independent bi-encoder similarity** to
+**joint target-candidate interaction**.
+
+A clean P1.12 hypothesis is a frozen, small **cross-encoder semantic judge**:
+construct one pair for each candidate, batch all pairs into one forward, score
+candidate relevance jointly with the target role, choose top-1, execute, and let
+the independent original verifier accept/reject. Confidence calibration should
+be separated from ranking capability instead of being used to mask raw ranking
+errors.
+
+P1.12 must use newly authored preregistered tasks. P1.11/P1.11.1 task scores may
+be used only for retrospective diagnosis and must never become P1.12 evaluation
+evidence.
