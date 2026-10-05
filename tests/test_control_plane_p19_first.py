@@ -98,3 +98,78 @@ def test_wall_and_core_identity_fail_closed():
     assert evaluate(synthetic_rows(),refs,False,True,1000.0)["verdict"]=="NOT_EVALUATED"
     rows=synthetic_rows(); rows[0]["complete_ms"]=GATE["per_item_wall_ms"]+1
     assert evaluate(rows,refs,True,True,1000.0)["reason"]=="TASK_WALL_CAP"
+
+
+def _selector_receipt(row, preferred, strength=2.0):
+    from neumann1.control_plane_p19_semantic import build_bundle
+    from neumann1.control_plane_p19 import proposition_prompt
+    from neumann1.control_plane_p11 import CodePlan, plan_cost
+    from neumann1.control_plane_p12 import CODE_TOKEN_IDS
+    from neumann1.control_plane_p1_contract import MODEL
+    from neumann1.control_plane_v1 import digest
+
+    parsed,bundle=build_bundle(row["view"])
+    eligible=list(range(len(bundle["candidates"])))
+    prompts=[proposition_prompt(row["view"],parsed,bundle,i) for i in eligible]
+    prefixes=[tuple(range(1,5+i)) for i in range(len(eligible))]
+    matrix=[]
+    for i in range(len(eligible)):
+        if i==preferred: matrix.append([-0.1,-0.1-strength,-5.0,-5.0])
+        else: matrix.append([-0.1-strength,-0.1,-5.0,-5.0])
+    passes=[]
+    k=len(eligible)
+    for mode,size,order in (
+        ("batch_all",k,list(range(k))),
+        ("unbatched1",1,list(range(k))),
+        ("reverse_batch_all",k,list(reversed(range(k)))),
+    ):
+        ordered=[prefixes[i] for i in order]
+        plan=CodePlan(tuple(ordered),CODE_TOKEN_IDS); cost=plan_cost(plan,size)
+        passes.append({
+          "mode":mode,"batch_size":size,"order":order,"prefixes":ordered,
+          "code_ids":list(CODE_TOKEN_IDS),"planned":cost,"actual":cost,"status":"COMPLETE",
+          "matrix":[list(x) for x in matrix],"peak_accelerator_memory_bytes":1,
+        })
+    ledger={k:0 for k in passes[0]["actual"]}
+    for p in passes:
+        for key,value in p["actual"].items(): ledger[key]+=value
+    return {
+      "status":"COMPLETE","bundle_sha256":bundle["bundle_sha256"],
+      "original_view_sha256":digest(row["view"]),"parser_view_sha256":digest(parsed),
+      "eligible_indexes":eligible,"prompt_sha256":[digest(p) for p in prompts],
+      "identity":{**MODEL,"device_type":"cuda","device_name":"Tesla T4","evidence_kind":"actual_frozen_model",
+                  "framework":"torch-2.11.0+cu128/transformers-5.16.1","torchvision":"0.26.0+cu128"},
+      "unchanged":True,"generated_calls":0,"passes":passes,"ledger":ledger,
+    }
+
+class _RecordedSelector:
+    def __init__(self,receipt): self.receipt=receipt
+    def score(self,*_args):
+        from neumann1.control_plane_v1 import snapshot
+        return snapshot(self.receipt)
+
+def test_run_item_complete_selector_reaches_original_verifier():
+    from experiments.control_plane_p19_runtime import run_item
+    _,rows,refs=registration()
+    row,ref=rows[0],refs[0]
+    receipt=_selector_receipt(row,ref["expected_candidate"],strength=2.0)
+    got=run_item(row,ref,_RecordedSelector(receipt))
+    assert got["status"]=="ACCEPTED"
+    assert got["accepted"] is True and got["executed"] is True
+    assert got["selected_candidate"]==ref["expected_candidate"]
+    assert got["model_calls"]==1 and got["neural_forward_calls"]==4
+    assert got["tool_calls"]==got["verifier_calls"]==1
+    assert got["accounting_complete"] is True and got["selector_complete"] is True
+
+def test_run_item_low_margin_is_complete_semantic_abstention():
+    from experiments.control_plane_p19_runtime import run_item
+    _,rows,refs=registration()
+    row,ref=rows[0],refs[0]
+    receipt=_selector_receipt(row,ref["expected_candidate"],strength=0.2)
+    got=run_item(row,ref,_RecordedSelector(receipt))
+    assert got["status"]=="SEMANTIC_ABSTAINED"
+    assert got["accepted"] is False and got["executed"] is False
+    assert got["selected_candidate"] is None
+    assert got["tool_calls"]==got["verifier_calls"]==0
+    assert got["accounting_complete"] is True and got["selector_complete"] is True
+    assert "candidate margin failure" in got["selection_error"]
