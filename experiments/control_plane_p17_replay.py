@@ -47,11 +47,25 @@ def replay_record(row, ref, record):
         "selected_candidate", "selected_route", "model_calls",
         "neural_forward_calls", "generated_calls", "evaluated_tokens",
         "padded_tokens", "tool_calls", "verifier_calls", "accounting_complete",
-        "bundle", "selection", "selector_receipt", "proposal", "execution",
+        "bundle", "selection", "selector_receipt", "proposal",
     )
     for key in keys:
         if record.get(key) != expected.get(key):
             raise ValueError("P1.7 semantic replay drift: " + key)
+
+    # execute_selected() records a fresh local complete_ms on every replay.
+    # Timing is raw accounting evidence, not a semantic identity field.
+    # Compare only the execution semantics and validate retained timing separately.
+    observed_execution = record.get("execution")
+    replayed_execution = expected.get("execution")
+    if (observed_execution is None) != (replayed_execution is None):
+        raise ValueError("P1.7 execution receipt coverage drift")
+    if observed_execution is not None:
+        for key in ("accepted", "executed", "answer", "error"):
+            if observed_execution.get(key) != replayed_execution.get(key):
+                raise ValueError("P1.7 execution semantic replay drift: " + key)
+        finite(observed_execution.get("complete_ms"), True)
+        finite(replayed_execution.get("complete_ms"), True)
     if bool(record.get("error")) != bool(expected.get("error")):
         raise ValueError("P1.7 failure explanation coverage drift")
     for key in (
