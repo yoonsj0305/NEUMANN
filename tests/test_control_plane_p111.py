@@ -15,7 +15,10 @@ def test_contract_is_microexecutor_not_generative_controller():
     c = contract()
     assert c["model"]["model_id"] == "sentence-transformers/all-MiniLM-L6-v2"
     assert c["model"]["model_revision"] == "1110a243fdf4706b3f48f1d95db1a4f5529b4d41"
-    assert c["model"]["parameters"] == 22713728
+    assert c["model"]["parameters"] == 22713216
+    assert c["model"]["state_elements_total"] == 22713728
+    assert c["model"]["non_parameter_state_elements"] == 512
+    assert c["model"]["state_elements_total"] - c["model"]["parameters"] == 512
     assert c["large_generative_model_on_primary_path"] is False
     assert c["forward_calls_per_ambiguous_item"] == 1
     assert c["generation"] is False
