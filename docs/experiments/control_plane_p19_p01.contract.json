@@ -1,0 +1,51 @@
+{
+  "schema": "neumann.control-plane-p1.9.p0.1.balanced-proposition.v1",
+  "stage": "P0_1_SYNTHETIC_CONTRACT_ONLY",
+  "model": {
+    "model_id": "google/gemma-4-E2B-it",
+    "model_revision": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+    "artifact_sha256": "bf6d4f9d506f536db6255143e5f21e05b9ccadfea54af281ac278bd49c178d66",
+    "tokenizer_sha256": "8552955a1513c80096c4155aa2de30079a20d4c3f255b9d1acf9162c859b4207",
+    "precision": "bfloat16",
+    "weights_frozen": true
+  },
+  "response_semantics": {
+    "A": "YES",
+    "B": "NO"
+  },
+  "claims": [
+    "FAITHFUL",
+    "NOT_FAITHFUL"
+  ],
+  "balanced_score": "0.5*((A-B)_FAITHFUL-(A-B)_NOT_FAITHFUL)",
+  "fixed_additive_ab_prior_cancels": true,
+  "candidate_identity_in_output_code": false,
+  "candidate_code_permutations": 0,
+  "modes": [
+    "batch4",
+    "unbatched1",
+    "reverse_batch4"
+  ],
+  "max_batch": 4,
+  "forward_calls_per_item": "2*k + 2*ceil((2*k)/4)",
+  "p18_shape_planned_forward_calls": 38,
+  "criteria": {
+    "max_mode_balanced_score_delta_nats": 0.05,
+    "minimum_balanced_score_nats": 0,
+    "minimum_candidate_margin_nats": 0.5
+  },
+  "generation": false,
+  "retry": false,
+  "hidden_reference_access": false,
+  "numeric_regeneration": false,
+  "p18_result_rescued": false,
+  "p18_opened_tasks_model_score_reuse": false,
+  "future_actual_requires_new_registered_tasks": true,
+  "actual_gemma_run": "NOT_RUN",
+  "development_registration": "NOT_REGISTERED",
+  "fresh_validation_registered": false,
+  "p2_registration_admitted": false,
+  "p2_admitted": false,
+  "decision3_admitted": false,
+  "global_questions_closed": []
+}
