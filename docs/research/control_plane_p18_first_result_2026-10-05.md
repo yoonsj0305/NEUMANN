@@ -141,3 +141,23 @@ The important architecture lesson is therefore not to relax the wall again. P1.7
 The next development mechanism should instead reduce the residual semantic decision itself: fewer forward passes, fewer coded permutations, or a different bounded representation that removes arbitrary code-label effects without paying full-S4 cost. Any new mechanism must preserve source-bound evidence, feasibility pruning, no free numeric/entity regeneration, no hidden reference access, no generation retry, independent original verification, complete partial-work accounting, and first-result discipline.
 
 P1.8 is not rerun or rescued. Fresh validation remains unregistered. P2 registration=false. P2 actual=false. Decision3=false. Q1-Q7 globally OPEN.
+
+
+## Read-only post-hoc latent-selector diagnosis
+
+After the immutable first result, the already-retained complete selector matrices were read without model inference, evidence mutation, execution or verification. These diagnostics are **POST_HOC_NON_ADMISSIBLE** and cannot change the historical P1.8 verdict.
+
+- **B01**: expected candidate 1; frozen full-S4 latent choice 0. Eligible margin = 1.013020835 nats. All three execution modes were numerically identical and leave-one-orbit-out winners were stable. This is a clean, stable semantic miss.
+- **B02**: expected candidate 1; raw eligible winner was candidate 1, but margin = 0.228515626 nats, below the frozen 0.5-nat admissibility floor. Therefore the historical selector would still abstain/fail even absent the 180 s wall. This is weak correct-direction evidence, not an admissible success.
+- **B03**: only 30/36 forwards completed. No latent choice is reconstructed.
+- **B04**: expected candidate 1; frozen full-S4 latent choice 0. Eligible margin = 5.178629555 nats with stable leave-one-orbit-out winners. This is a second clean, stable semantic miss.
+
+The post-hoc evidence therefore rejects the narrow hypothesis that P1.8 B failed only because the selector wall was too small. Of the three B items with complete matrices, two strongly and stably prefer the wrong semantic candidate; the third points to the correct candidate but fails the prospectively frozen confidence margin.
+
+### Architecture consequence
+
+Do **not** extend the full-S4 wall again and do not treat the 36-forward mechanism as a production candidate. P1.9 should replace arbitrary multi-class A/B/C/D candidate-slot coding with a candidate-local semantic proposition test using shared fixed response semantics. A prospective design target is to score each remaining candidate as a proposition such as `FAITHFUL` vs `NOT_FAITHFUL`, so candidate identity lives in the prompt while output-token semantics remain constant across candidates.
+
+For B candidate counts 2/3/4/3, a design using one primary batched pass plus one independently ordered confirmation pass would require approximately 4/6/8/6 scored candidate rows and about 8 total forward calls if batched by item, rather than the frozen P1.8 study's 144 forwards. Exact P1.9 budgets and stability criteria must be frozen before any new Gemma score.
+
+This is an architecture proposal only. No P1.9 model score has been run.
