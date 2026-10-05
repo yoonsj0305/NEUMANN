@@ -114,7 +114,8 @@ def test_minimal_contrast_deletes_resolved_csp_structure():
     raw = str(contrast)
     assert "DOMAIN" not in raw
     assert "NE" not in raw
-    assert "7" not in raw and "9" not in raw
+    assert set(contrast["bindings"][0]["entity"]) == {"surface", "span"}
+    assert "value" not in contrast["bindings"][0]["entity"]
 
 
 def test_pair_prompt_uses_fixed_left_right_semantics_only():
