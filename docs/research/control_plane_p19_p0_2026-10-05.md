@@ -68,3 +68,10 @@ P0 default guards:
 This P0 is synthetic-contract work only. No actual P1.9 Gemma score has run. No new development set is registered. P1.8 is not rerun or rescued. Strong future baselines must share the deterministic source extraction, feasibility pruning, compiler, specialist and original verifier.
 
 P2 registration=false. P2 actual=false. Decision3=false. Q1-Q7 globally OPEN.
+
+
+## Data boundary for the first actual P1.9 score
+
+P1.8 B01-B04 directly informed this architecture change and are therefore opened development history. They may be used only as model-free/synthetic regression fixtures. They must not be rescored with Gemma and presented as P1.9 evidence.
+
+Before any actual P1.9 model score, a new semantic-development set must be authored, independently checked, hashed and registered. The new set must preserve public grounding, multi-feasible candidates after deterministic pruning, no hidden expected label in model input, and independent original-task verification.
