@@ -4,6 +4,10 @@ on:
   pull_request:
     paths:
       - 'neumann1/control_plane_p18.py'
+      - 'neumann1/control_plane_p18_semantic.py'
+      - 'experiments/control_plane_p18*.py'
+      - 'scripts/control_plane_p18*.py'
+      - 'tests/test_control_plane_p18*.py'
       - 'tests/test_control_plane_p18.py'
       - 'docs/experiments/control_plane_p18*.json'
       - 'docs/research/control_plane_p18*.md'
@@ -23,10 +27,14 @@ jobs:
       - name: Install CPU package dependencies only
         run: python -m pip install numpy==2.4.6 scipy==1.17.1 scikit-learn==1.9.1 threadpoolctl==3.7.0
       - name: Compile P1.8 without loading model
-        run: python -m py_compile neumann1/control_plane_p18.py tests/test_control_plane_p18.py
+        run: python -m py_compile neumann1/control_plane_p18.py neumann1/control_plane_p18_semantic.py experiments/control_plane_p18_catalog.py experiments/control_plane_p18_registration.py experiments/control_plane_p18_runtime.py experiments/control_plane_p18_dev.py experiments/control_plane_p18_replay.py scripts/control_plane_p18_kaggle.py tests/test_control_plane_p18.py tests/test_control_plane_p18_first.py tests/test_control_plane_p18_kaggle.py
       - name: Synthetic feasibility, residual selection and accounting contracts
         run: python -m unittest tests.test_control_plane_p18 -v
       - name: Unchanged frozen P1.7 regression
         run: python -m unittest discover -s tests -p 'test_control_plane_p17*.py' -v
       - name: P0 machine contract matches implementation
         run: python -c 'import json; from pathlib import Path; from neumann1.control_plane_p18 import contract; assert json.loads(Path("docs/experiments/control_plane_p18_p0.contract.json").read_text()) == contract()'
+      - name: Frozen P1.8 development registration and checker controls
+        run: python -m experiments.control_plane_p18_registration
+      - name: P1.8 opened-development registration and gate tests
+        run: python -m unittest tests.test_control_plane_p18_first tests.test_control_plane_p18_kaggle -v
