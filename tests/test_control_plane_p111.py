@@ -267,3 +267,38 @@ def test_encoder_malformed_ir_stops_before_tokenization():
     ir = example_ir(); ir["private_reference"] = {"X": 1}
     with patch.dict(sys.modules, modules), pytest.raises(ValueError): encoder.score(ir)
     assert encoder.tokenizer.call_count == encoder.model.call_count == 0
+
+
+def test_local_artifact_loader_is_network_closed_and_uses_no_revision_lookup():
+    modules = fake_torch_modules()
+    parameter = SimpleNamespace(numel=lambda: MODEL["parameters"], requires_grad_=Mock())
+    model = Mock(); model.to.return_value = model; model.parameters = lambda: iter([parameter])
+    transformers = ModuleType("transformers")
+    transformers.AutoModel = SimpleNamespace(from_pretrained=Mock(return_value=model))
+    transformers.AutoTokenizer = SimpleNamespace(from_pretrained=Mock(return_value=Mock()))
+    modules["transformers"] = transformers
+    with patch.dict(sys.modules, modules):
+        FrozenMiniLMSemanticEncoder(
+            model_source="/tmp/p111-frozen",
+            local_files_only=True,
+        )
+        with pytest.raises(ValueError, match="local-only"):
+            FrozenMiniLMSemanticEncoder(
+                model_source="/tmp/p111-frozen",
+                local_files_only=False,
+            )
+    for loader in (transformers.AutoModel, transformers.AutoTokenizer):
+        loader.from_pretrained.assert_called_once_with(
+            "/tmp/p111-frozen",
+            local_files_only=True,
+        )
+
+
+def test_failed_forward_retains_partial_token_and_attempt_costs():
+    encoder, modules = synthetic_encoder(fail=True)
+    with patch.dict(sys.modules, modules), pytest.raises(RuntimeError):
+        encoder.score(example_ir())
+    assert encoder.last_attempt["forward_calls"] == 1
+    assert encoder.last_attempt["input_rows"] == 3
+    assert encoder.last_attempt["input_tokens"] == 6
+    assert encoder.last_attempt["padded_tokens"] == 9
