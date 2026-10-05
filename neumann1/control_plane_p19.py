@@ -22,7 +22,7 @@ from neumann1.control_plane_p11 import (
 )
 from neumann1.control_plane_p12 import CODE_TOKEN_IDS, Budget as ScoreBudget
 from neumann1.control_plane_p17 import LEDGER_KEYS
-from neumann1.control_plane_p18_semantic import build_semantic_bundle, parser_view
+from neumann1.control_plane_p17 import build_candidates as p17_build_candidates
 
 SCHEMA = "neumann.control-plane-p1.9.proposition-selector.p0.v1"
 A_INDEX = 0
@@ -57,6 +57,7 @@ def contract():
         "p18_result_rescued": False,
         "p18_opened_tasks_model_score_reuse": False,
         "future_actual_requires_new_registered_tasks": True,
+        "fresh_semantic_instruction_registry": "EXTERNAL_REGISTRATION_REQUIRED",
         "actual_gemma_run": "NOT_RUN",
         "development_registration": "NOT_REGISTERED",
         "fresh_validation_registered": False,
@@ -67,9 +68,32 @@ def contract():
     }
 
 
-def proposition_prompt(view, parsed, bundle, candidate_index):
-    if parsed != parser_view(view) or bundle != build_semantic_bundle(view)[1]:
+def _validate_parsed_bundle(view, parsed, bundle):
+    """Validate a registry-normalized semantic view without accepting free parsing.
+
+    The caller/experiment registration owns the finite list of allowed original
+    semantic instructions. P1.9 core only accepts the exact normalized parser
+    view with unchanged query bytes, then reconstructs the P1.7 bundle.
+    """
+    if type(view) is not dict or set(view) != {"instruction", "public"}:
+        raise ValueError("exact P1.9 semantic view required")
+    if type(view.get("instruction")) is not str or not view["instruction"]:
+        raise ValueError("nonempty original semantic instruction required")
+    if type(view.get("public")) is not dict or set(view["public"]) != {"query"}:
+        raise ValueError("exact query-only public payload required")
+    query = view["public"].get("query")
+    if type(query) is not str or not query:
+        raise ValueError("nonempty query required")
+    expected = {"instruction": "Return a complete assignment.", "public": {"query": query}}
+    if parsed != expected:
+        raise ValueError("registered instruction-normalized parser view required")
+    if bundle != p17_build_candidates(parsed):
         raise ValueError("P1.9 semantic candidate/source drift")
+    return True
+
+
+def proposition_prompt(view, parsed, bundle, candidate_index):
+    _validate_parsed_bundle(view, parsed, bundle)
     if type(candidate_index) is not int or not 0 <= candidate_index < len(bundle["candidates"]):
         raise ValueError("valid candidate index required")
 
@@ -228,8 +252,7 @@ def _log_odds(row):
 
 
 def validate_selection(view, parsed, bundle, eligible, receipt, criteria=Criteria()):
-    if parsed != parser_view(view) or bundle != build_semantic_bundle(view)[1]:
-        raise ValueError("P1.9 semantic candidate/source drift")
+    _validate_parsed_bundle(view, parsed, bundle)
     if (
         type(eligible) is not list
         or not 2 <= len(eligible) <= 4
