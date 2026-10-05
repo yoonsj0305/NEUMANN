@@ -41,7 +41,7 @@ def _receipt(row, preferred=1, strength=2.0, other=-2.0):
         # Receipt matrices are canonical candidate order after backend reorder.
         canonical_matrix = [None] * 2
         for i, scores in zip(order, ordered_matrix):
-            canonical_matrix[i] = scores
+            canonical_matrix[i] = list(scores)
         from neumann1.control_plane_p11 import CodePlan, plan_cost
         plan = CodePlan(tuple(ordered_prefixes), CODE_TOKEN_IDS)
         cost = plan_cost(plan, size)
