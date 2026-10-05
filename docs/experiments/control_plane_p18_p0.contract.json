@@ -1,0 +1,41 @@
+{
+  "actual_gemma_run": "NOT_RUN",
+  "admissibility": "UNCHANGED_P1.3",
+  "budget": {
+    "feasibility_constraint_checks": 100000,
+    "feasibility_nodes": 20000,
+    "feasibility_wall_ms": 2000,
+    "whole_item_wall_ms": 180000
+  },
+  "cost_estimate_weight": 0.0,
+  "decision3_admitted": false,
+  "development_registration": "NOT_REGISTERED",
+  "feasibility_is_semantic_equivalence": false,
+  "feasibility_statuses": [
+    "SAT",
+    "UNSAT",
+    "UNKNOWN"
+  ],
+  "fresh_validation_registered": false,
+  "generation": false,
+  "global_questions_closed": [],
+  "grammar_compiler": "UNCHANGED_FROZEN_P1.7_SOURCE_REFERENCES",
+  "mask": "original candidate indexes; no compaction or reindexing",
+  "model": {
+    "artifact_sha256": "bf6d4f9d506f536db6255143e5f21e05b9ccadfea54af281ac278bd49c178d66",
+    "model_id": "google/gemma-4-E2B-it",
+    "model_revision": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+    "precision": "bfloat16",
+    "tokenizer_sha256": "8552955a1513c80096c4155aa2de30079a20d4c3f255b9d1acf9162c859b4207",
+    "weights_frozen": true
+  },
+  "p17_result_rescued": false,
+  "p2_admitted": false,
+  "p2_registration_admitted": false,
+  "retry": false,
+  "schema": "neumann.control-plane-p1.8.p0.v1",
+  "selection": "0 SAT reject; 1 SAT zero neural; 2+ SAT masked full-S4 fallback",
+  "stage": "P0_SYNTHETIC_CONTRACT_ONLY",
+  "unknown_policy": "STOP_NO_SELECTION_OR_EXECUTION",
+  "witness_reuse": "same source-bound IR only; original verifier always required"
+}
