@@ -4,7 +4,7 @@ Date: 2026-10-05
 
 P1.10 remains immutable INCOMPLETE / KeyboardInterrupt. No P1.10 score is reused.
 
-P1.11 moves the residual semantic ambiguity from a 5.1B generative next-token controller to a frozen 22,713,728-parameter sentence-semantic micro-executor. This document freezes the first actual development protocol before any P1.11 pretrained-model score is observed.
+P1.11 moves the residual semantic ambiguity from a 5.1B generative next-token controller to a frozen 22,713,216-parameter sentence-semantic micro-executor. This document freezes the first actual development protocol before any P1.11 pretrained-model score is observed.
 
 ## Fresh development set
 

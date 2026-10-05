@@ -63,6 +63,22 @@ def test_fresh_registration_and_nonlexical_construction():
     assert reg["scores_seen_at_registration"] is False
     assert reg["first_only"] is True
     assert reg["p110_task_score_reuse"] is False
+    assert reg["architecture"]["model_parameters"] == 22713216
+    assert reg["architecture"]["model_state_elements_total"] == 22713728
+    assert reg["architecture"]["non_parameter_state_elements"] == 512
+    assert reg["identity_repair"] == {
+        "revision": "P1.11.1",
+        "historical_archive_sha256": "d75aeeccbd54e5c96041a41f4c40c1df17a5504d44c026336c53fab2b247e5e0",
+        "historical_verdict": "NOT_EVALUATED",
+        "historical_reason": "INCOMPLETE_OR_COVERAGE_DRIFT",
+        "historical_error": "P1.11 frozen model parameter-count drift",
+        "historical_observations": 0,
+        "historical_model_calls": 0,
+        "historical_neural_forward_calls": 0,
+        "task_scores_seen": False,
+        "task_or_gate_changed": False,
+        "repair_scope": "MODEL_PARAMETER_IDENTITY_ONLY",
+    }
     assert len(rows) == len(refs) == 12
     result = check_construction()
     assert result["candidate_counts"] == COUNTS

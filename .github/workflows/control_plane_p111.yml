@@ -25,7 +25,7 @@ jobs:
       - name: Install CPU test dependencies only
         run: python -m pip install pytest numpy==2.4.6 scipy==1.17.1 scikit-learn==1.9.1 threadpoolctl==3.7.0
       - name: Compile P1.11 without loading model
-        run: python -m py_compile neumann1/control_plane_p111.py neumann1/control_plane_p111_semantic.py experiments/control_plane_p111_catalog.py experiments/control_plane_p111_registration.py experiments/control_plane_p111_runtime.py experiments/control_plane_p111_dev.py experiments/control_plane_p111_replay.py scripts/control_plane_p111_kaggle.py tests/test_control_plane_p111.py tests/test_control_plane_p111_first.py tests/test_control_plane_p111_kaggle.py
+        run: python -m py_compile neumann1/control_plane_p111.py neumann1/control_plane_p111_semantic.py experiments/control_plane_p111_catalog.py experiments/control_plane_p111_registration.py experiments/control_plane_p111_runtime.py experiments/control_plane_p111_dev.py experiments/control_plane_p111_replay.py scripts/control_plane_p111_kaggle.py scripts/control_plane_p1111_kaggle.py tests/test_control_plane_p111.py tests/test_control_plane_p111_first.py tests/test_control_plane_p111_kaggle.py tests/test_control_plane_p1111_kaggle.py tests/test_control_plane_p1111_kaggle.py
       - name: P1.11 synthetic and opened-development contracts
         run: python -m pytest -q tests/test_control_plane_p111.py tests/test_control_plane_p111_first.py tests/test_control_plane_p111_kaggle.py
       - name: Frozen fresh P1.11 registration and construction controls
@@ -34,5 +34,7 @@ jobs:
         run: python -m pytest -q tests/test_control_plane_p110.py tests/test_control_plane_p110_first.py
       - name: Publish frozen P1.11 bootstrap SHA-256
         run: python -c 'import hashlib; from pathlib import Path; print("P111_BOOTSTRAP_SHA256="+hashlib.sha256(Path("scripts/control_plane_p111_kaggle.py").read_bytes()).hexdigest())'
+      - name: Publish frozen P1.11.1 repair bootstrap SHA-256
+        run: python -c 'import hashlib; from pathlib import Path; print("P1111_BOOTSTRAP_SHA256="+hashlib.sha256(Path("scripts/control_plane_p1111_kaggle.py").read_bytes()).hexdigest())'
       - name: Machine contract matches implementation
         run: python -c 'import json; from pathlib import Path; from neumann1.control_plane_p111 import contract; assert json.loads(Path("docs/experiments/control_plane_p111_p0.contract.json").read_text()) == contract()'

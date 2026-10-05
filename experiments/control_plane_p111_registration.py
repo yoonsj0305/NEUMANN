@@ -66,7 +66,9 @@ def development_architecture():
         "semantic_ir": "TARGET_ROLE_PLUS_SOURCE_BOUND_CANDIDATE_ROLE_DESCRIPTIONS",
         "model_id": "sentence-transformers/all-MiniLM-L6-v2",
         "model_revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
-        "model_parameters": 22713728,
+        "model_parameters": 22713216,
+        "model_state_elements_total": 22713728,
+        "non_parameter_state_elements": 512,
         "device": "Tesla T4 / cuda",
         "precision": "float32",
         "pooling": "attention-mask mean pooling then L2 normalization",
@@ -165,6 +167,21 @@ def registration():
         raise ValueError("P1.11 architecture/gate drift")
     if reg["scores_seen_at_registration"] is not False or reg["first_only"] is not True:
         raise ValueError("P1.11 pre-score first-only registration required")
+    repair = reg.get("identity_repair")
+    if repair != {
+        "revision": "P1.11.1",
+        "historical_archive_sha256": "d75aeeccbd54e5c96041a41f4c40c1df17a5504d44c026336c53fab2b247e5e0",
+        "historical_verdict": "NOT_EVALUATED",
+        "historical_reason": "INCOMPLETE_OR_COVERAGE_DRIFT",
+        "historical_error": "P1.11 frozen model parameter-count drift",
+        "historical_observations": 0,
+        "historical_model_calls": 0,
+        "historical_neural_forward_calls": 0,
+        "task_scores_seen": False,
+        "task_or_gate_changed": False,
+        "repair_scope": "MODEL_PARAMETER_IDENTITY_ONLY",
+    }:
+        raise ValueError("P1.11.1 identity-repair provenance drift")
     if reg.get("p110_task_score_reuse") is not False:
         raise ValueError("P1.10 task-score reuse forbidden")
     ids = [row["task_id"] for row in rows]

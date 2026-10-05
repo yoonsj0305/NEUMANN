@@ -37,10 +37,15 @@ The first P0 specialist is frozen
 `sentence-transformers/all-MiniLM-L6-v2` at revision
 `1110a243fdf4706b3f48f1d95db1a4f5529b4d41`.
 
-Frozen parameter count: 22,713,728.
+Frozen AutoModel parameter count: 22,713,216.
+
+The model artifact/state metadata also contains 512 non-parameter I64 state
+elements, giving 22,713,728 total state elements. P1.11.1 explicitly separates
+these quantities so `sum(p.numel() for p in model.parameters())` is compared
+against 22,713,216 rather than the artifact-state total.
 
 The previously frozen Gemma control core has 5,104,297,504 parameters, so the
-parameter-count ratio is about 224.7x. This ratio is design context only.
+parameter-count ratio is about 224.73x. This ratio is design context only.
 It is **not** a compute, energy, latency or economic advantage claim.
 
 ## Minimal neural input
