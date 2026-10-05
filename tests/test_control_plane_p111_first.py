@@ -82,7 +82,7 @@ def test_nine_of_twelve_passes_development_gate_only():
     decision = evaluate(rows, refs, True, True, 1000.0)
     assert decision["verdict"] == "PASS"
     assert decision["accepted"] == 9
-    assert decision["neural_forward_calls"] if False else True
+    assert decision["path_cost"]["neural_forward_calls"] == 12
     assert decision["p2_registration_admitted"] is False
     assert decision["decision3_admitted"] is False
 
