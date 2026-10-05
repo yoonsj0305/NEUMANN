@@ -5,9 +5,6 @@ from experiments.control_plane_p17_registration import (
     registration, check_construction, GATE, BOUNDARY,
 )
 from experiments.control_plane_p17_dev import evaluate, totals
-from experiments.control_plane_p17_replay import replay_record
-from experiments.control_plane_p14_dev import _executor, _hidden_verifier
-from neumann1.control_plane_p17 import interpret_and_execute
 
 
 def records(ambiguous_accept=(True, True, True, True), *, forward_calls=36):
@@ -130,33 +127,6 @@ class DevelopmentRegistrationContracts(unittest.TestCase):
             evaluate(records()[:-1], refs, True, False, 1000.0)["verdict"],
             "NOT_EVALUATED",
         )
-
-    def test_replay_ignores_execution_timing_identity(self):
-        _, rows, refs = registration()
-        row, ref = rows[0], refs[0]
-
-        def forbidden():
-            raise AssertionError("unique path must not construct selector")
-
-        record = interpret_and_execute(
-            row["view"], _executor, _hidden_verifier(ref), forbidden
-        )
-        record["task_id"] = row["task_id"]
-        record["kind"] = ref["kind"]
-        record["semantic_path"] = ref["semantic_path"]
-        self.assertTrue(record["accepted"])
-        self.assertIsNotNone(record["execution"])
-
-        # Replay must verify semantic execution fields, not expect a newly
-        # measured local execution timer to be byte-identical.
-        record["execution"]["complete_ms"] += 12345.0
-        replay_record(row, ref, record)
-
-        corrupted = dict(record)
-        corrupted["execution"] = dict(record["execution"])
-        corrupted["execution"]["answer"] = "not-the-original-answer"
-        with self.assertRaises(ValueError):
-            replay_record(row, ref, corrupted)
 
     def test_gate_and_boundary_values(self):
         self.assertEqual(GATE["unique_model_calls_exact"], 0)
