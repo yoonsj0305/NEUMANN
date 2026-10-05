@@ -1,0 +1,43 @@
+{
+  "schema": "neumann.control-plane-p1.12.cross-encoder.p0.v1",
+  "stage": "P0_SYNTHETIC_CONTRACT_ONLY",
+  "model": {
+    "model_id": "cross-encoder/ms-marco-MiniLM-L6-v2",
+    "model_revision": "ce0834f22110de6d9222af7a7a03628121708969",
+    "architecture": "BertForSequenceClassification",
+    "expected_parameters": 22713601,
+    "parameter_count_semantics": "sum(p.numel() for p in AutoModelForSequenceClassification.parameters())",
+    "hidden_size": 384,
+    "layers": 6,
+    "labels": 1,
+    "training": false
+  },
+  "semantic_ir": "JOINT_TARGET_CANDIDATE_ROLE_PAIRS",
+  "large_generative_model_on_primary_path": false,
+  "bi_encoder_cosine_on_primary_path": false,
+  "cross_encoder_joint_interaction": true,
+  "all_candidate_pairs_batched_together": true,
+  "forward_calls_per_ambiguous_item": 1,
+  "score": "single scalar relevance logit per target-candidate pair",
+  "ranking_rule": "UNIQUE_TOP_LOGIT",
+  "confidence_threshold": null,
+  "confidence_calibration_deferred": true,
+  "pair_template": {
+    "query_prefix": "Target function: ",
+    "candidate_prefix": "Candidate role: "
+  },
+  "generation": false,
+  "retry": false,
+  "hidden_reference_access": false,
+  "new_training": false,
+  "p111_task_score_reuse": false,
+  "p111_tasks_as_p112_evidence": false,
+  "future_actual_requires_new_registered_tasks": true,
+  "actual_model_run": "NOT_RUN",
+  "development_registration": "NOT_REGISTERED",
+  "fresh_validation_registered": false,
+  "p2_registration_admitted": false,
+  "p2_admitted": false,
+  "decision3_admitted": false,
+  "global_questions_closed": []
+}
