@@ -40,3 +40,28 @@ Fresh validation remains unregistered. P2 registration=false. P2=false.
 Decision3=false. Q1-Q7 globally OPEN. The North Star claim of overwhelming
 iso-capability advantage/category change is not affected or established by this
 result.
+
+
+## Exact diagnosis from retained report
+
+Read-only inspection of the retained first result established:
+
+- report status: `INCOMPLETE`
+- observations: `0`
+- model calls: `0`
+- neural forward calls: `0`
+- core receipt: absent
+- no task start marker exists
+- evaluator reason: `INCOMPLETE_OR_COVERAGE_DRIFT`
+- runner error: `ValueError: P1.11 frozen model parameter-count drift`
+
+The failure occurred during `FrozenMiniLMSemanticEncoder` construction, before
+any semantic task or forward pass. The contract had conflated the model's
+22,713,216 parameters with 22,713,728 total artifact/state elements, the latter
+including 512 non-parameter I64 state elements.
+
+Historical P1.11 therefore remains **NOT_EVALUATED**, not semantic FAIL.
+
+A separately named P1.11.1 identity-only repair is allowed because no task score
+or task-dependent model signal was observed. It does not replace or mutate this
+archive.
