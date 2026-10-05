@@ -1,0 +1,83 @@
+{
+  "schema": "neumann.p110-opened-development-registration.v1",
+  "architecture": {
+    "stage": "OPENED_DEVELOPMENT_REGISTERED",
+    "p0": "P1.10 minimal semantic contrast symmetric pairwise selector",
+    "task_mix": "8 fresh multi-feasible semantic binding tasks",
+    "semantic_ir": "SOURCE_BOUND_MINIMAL_PRONOUN_BINDING_CONTRAST",
+    "response_semantics": {
+      "A": "LEFT_BINDING_MORE_FAITHFUL",
+      "B": "RIGHT_BINDING_MORE_FAITHFUL"
+    },
+    "pair_orientations": "BOTH",
+    "winner_rule": "UNIQUE_CONDORCET_ABOVE_MARGIN",
+    "modes": [
+      "batch_all",
+      "reverse_batch_all"
+    ],
+    "forward_calls_per_item": 2,
+    "first_only": true,
+    "actual_gemma_run": "NOT_RUN",
+    "complete_cost_accounting_required": true,
+    "baseline_rule": "future baselines share extraction, feasibility pruning, compiler, specialist and original verifier access"
+  },
+  "first_only": true,
+  "opened_development": true,
+  "scores_seen_at_registration": false,
+  "p19_opened_task_score_reuse": false,
+  "scope": "8 newly authored raw CSP obligations; all remain multi-feasible after deterministic pruning; opened development only",
+  "task_ids": [
+    "p110d_b01",
+    "p110d_b02",
+    "p110d_b03",
+    "p110d_b04",
+    "p110d_b05",
+    "p110d_b06",
+    "p110d_b07",
+    "p110d_b08"
+  ],
+  "candidate_counts": [
+    2,
+    3,
+    4,
+    2,
+    3,
+    4,
+    3,
+    2
+  ],
+  "expected_candidate_positions": [
+    1,
+    2,
+    2,
+    1,
+    0,
+    3,
+    0,
+    1
+  ],
+  "public_sha256": "1b532dfb36ddd2cb629f2dfd5c3748b5138216d516e31c73c636dfd183b7b28a",
+  "references_sha256": "1bde1831857fffd1efe471eb7f42d9e3f5dda19e4c9f011626cb835fc42e4fd5",
+  "source_freeze": "exact clean git HEAD supplied to first-only runner and pinned by launcher before any model score",
+  "gate": {
+    "observations_exact": 8,
+    "accepted_min": 6,
+    "model_calls_exact": 8,
+    "neural_forward_calls_exact": 16,
+    "generated_calls_exact": 0,
+    "feasibility_calls_exact": 23,
+    "selector_complete_exact": 8,
+    "selector_wall_ms": 60000,
+    "per_item_wall_ms": 90000,
+    "whole_study_wall_ms": 900000,
+    "out_of_grammar_controls_exact": 4
+  },
+  "boundaries": {
+    "development_only": true,
+    "fresh_validation_registered": false,
+    "p2_registration_admitted": false,
+    "p2_admitted": false,
+    "decision3_admitted": false,
+    "global_questions_closed": []
+  }
+}
