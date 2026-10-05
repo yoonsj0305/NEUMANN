@@ -1,0 +1,417 @@
+{
+  "rows": [
+    {
+      "task_id": "p18d_a01",
+      "family": "constraint_planning",
+      "expected_candidate": 1,
+      "private": {
+        "domains": {
+          "X": [
+            0,
+            1,
+            2
+          ],
+          "Y": [
+            0,
+            1,
+            2
+          ]
+        },
+        "constraints": [
+          [
+            "eq",
+            "X",
+            2
+          ],
+          [
+            "eq",
+            "Y",
+            0
+          ]
+        ]
+      },
+      "witness": {
+        "X": 2,
+        "Y": 0
+      }
+    },
+    {
+      "task_id": "p18d_a02",
+      "family": "constraint_planning",
+      "expected_candidate": 1,
+      "private": {
+        "domains": {
+          "A": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "B": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "C": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        "constraints": [
+          [
+            "eq",
+            "A",
+            1
+          ],
+          [
+            "eq",
+            "C",
+            3
+          ],
+          [
+            "eq",
+            "B",
+            2
+          ]
+        ]
+      },
+      "witness": {
+        "A": 1,
+        "B": 2,
+        "C": 3
+      }
+    },
+    {
+      "task_id": "p18d_a03",
+      "family": "constraint_planning",
+      "expected_candidate": 2,
+      "private": {
+        "domains": {
+          "P": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "Q": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "R": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "S": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "constraints": [
+          [
+            "eq",
+            "P",
+            0
+          ],
+          [
+            "eq",
+            "Q",
+            1
+          ],
+          [
+            "eq",
+            "S",
+            4
+          ],
+          [
+            "eq",
+            "R",
+            2
+          ]
+        ]
+      },
+      "witness": {
+        "P": 0,
+        "Q": 1,
+        "R": 2,
+        "S": 4
+      }
+    },
+    {
+      "task_id": "p18d_a04",
+      "family": "constraint_planning",
+      "expected_candidate": 2,
+      "private": {
+        "domains": {
+          "M": [
+            -3,
+            -2,
+            -1,
+            0
+          ],
+          "N": [
+            -3,
+            -2,
+            -1,
+            0
+          ],
+          "O": [
+            -3,
+            -2,
+            -1,
+            0
+          ]
+        },
+        "constraints": [
+          [
+            "eq",
+            "M",
+            -3
+          ],
+          [
+            "eq",
+            "N",
+            -2
+          ],
+          [
+            "eq",
+            "O",
+            -1
+          ]
+        ]
+      },
+      "witness": {
+        "M": -3,
+        "N": -2,
+        "O": -1
+      }
+    },
+    {
+      "task_id": "p18d_b01",
+      "family": "constraint_planning",
+      "expected_candidate": 1,
+      "semantic_grounding": "spare channel is the backup channel, so It denotes Y",
+      "private": {
+        "domains": {
+          "X": [
+            0,
+            1
+          ],
+          "Y": [
+            0,
+            1
+          ]
+        },
+        "constraints": [
+          [
+            "ne",
+            "X",
+            "Y"
+          ],
+          [
+            "eq",
+            "Y",
+            1
+          ]
+        ]
+      },
+      "witness": {
+        "X": 0,
+        "Y": 1
+      }
+    },
+    {
+      "task_id": "p18d_b02",
+      "family": "constraint_planning",
+      "expected_candidate": 1,
+      "semantic_grounding": "buffer stage is intermediate storage, so It denotes B",
+      "private": {
+        "domains": {
+          "A": [
+            0,
+            1,
+            2
+          ],
+          "B": [
+            0,
+            1,
+            2
+          ],
+          "C": [
+            0,
+            1,
+            2
+          ]
+        },
+        "constraints": [
+          [
+            "ne",
+            "A",
+            "B"
+          ],
+          [
+            "ne",
+            "A",
+            "C"
+          ],
+          [
+            "ne",
+            "B",
+            "C"
+          ],
+          [
+            "eq",
+            "B",
+            2
+          ]
+        ]
+      },
+      "witness": {
+        "A": 0,
+        "B": 2,
+        "C": 1
+      }
+    },
+    {
+      "task_id": "p18d_b03",
+      "family": "constraint_planning",
+      "expected_candidate": 2,
+      "semantic_grounding": "holding is the temporary-storage role, so It denotes R",
+      "private": {
+        "domains": {
+          "P": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "Q": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "R": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "S": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        "constraints": [
+          [
+            "ne",
+            "P",
+            "Q"
+          ],
+          [
+            "ne",
+            "P",
+            "R"
+          ],
+          [
+            "ne",
+            "P",
+            "S"
+          ],
+          [
+            "ne",
+            "Q",
+            "R"
+          ],
+          [
+            "ne",
+            "Q",
+            "S"
+          ],
+          [
+            "ne",
+            "R",
+            "S"
+          ],
+          [
+            "eq",
+            "R",
+            3
+          ]
+        ]
+      },
+      "witness": {
+        "P": 0,
+        "Q": 1,
+        "R": 3,
+        "S": 2
+      }
+    },
+    {
+      "task_id": "p18d_b04",
+      "family": "constraint_planning",
+      "expected_candidate": 1,
+      "semantic_grounding": "deputy means second-in-command, so It denotes N",
+      "private": {
+        "domains": {
+          "M": [
+            -2,
+            -1,
+            0
+          ],
+          "N": [
+            -2,
+            -1,
+            0
+          ],
+          "O": [
+            -2,
+            -1,
+            0
+          ]
+        },
+        "constraints": [
+          [
+            "ne",
+            "M",
+            "N"
+          ],
+          [
+            "ne",
+            "M",
+            "O"
+          ],
+          [
+            "ne",
+            "N",
+            "O"
+          ],
+          [
+            "eq",
+            "N",
+            -1
+          ]
+        ]
+      },
+      "witness": {
+        "M": -2,
+        "N": -1,
+        "O": 0
+      }
+    }
+  ]
+}
