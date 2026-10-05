@@ -13,6 +13,38 @@ actually solves, while minimizing necessary compute, memory, energy, latency
 and monetary cost. A cheaper system that cannot solve the original problem
 does not meet the objective.
 
+## 1.1 Overwhelming Advantage and Category Change
+
+The project does **not** define success as a small benchmark win, a modest cost
+reduction, or a slightly smaller model. Local gains are mechanism evidence only.
+
+The final ambition has two coupled requirements:
+
+1. **Overwhelming advantage.** At the same useful capability, NEUMANN must
+   repeatedly produce a clear Pareto gap in complete compute, memory, energy,
+   latency and/or monetary cost across unseen problem families and real Frontier
+   Gap tasks. Numeric multipliers and thresholds must be preregistered before
+   each evaluation; they are never chosen after observing results.
+2. **Category change.** NEUMANN is intended to establish a different operating
+   regime for intelligence-per-compute: change the representation, eliminate
+   work that need not be done, and buy learned intelligence only for the
+   irreducible uncertainty that remains. The target is not merely a better small
+   LLM, router, solver wrapper or tool-use system.
+
+A desirable scaling signature is that structural elimination, reuse and
+specialization preserve or increase NEUMANN's relative advantage as task
+complexity grows. Gains confined to toy or narrowly constructed regimes do not
+satisfy the final project objective.
+
+**One-line criterion:** Do not stop at a small win. Create an overwhelming
+resource gap at iso-capability and change the computational category in which
+useful intelligence is produced.
+
+P1.x PASS/FAIL results remain local research evidence under this North Star.
+They do not by themselves constitute NEUMANN success. Q1-Q7, complete
+iso-capability accounting, independent verification and fresh/open-set evidence
+remain mandatory.
+
 ## 2. Core hypothesis
 
 An important part of intelligence may come from changing a problem into a
