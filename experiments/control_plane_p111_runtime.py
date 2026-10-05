@@ -47,9 +47,9 @@ def totals(rows):
 def _raw_top_candidate(ir, similarities, entity_to_candidate):
     if type(similarities) is not list or len(similarities) != len(ir["candidates"]):
         raise ValueError("complete P1.11 similarity vector required")
-    position = max(
+    position = min(
         range(len(similarities)),
-        key=lambda i: (float(similarities[i]), ir["candidates"][i]["entity"]),
+        key=lambda i: (-float(similarities[i]), ir["candidates"][i]["entity"]),
     )
     return entity_to_candidate[ir["candidates"][position]["entity"]]
 
