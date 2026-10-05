@@ -1,0 +1,53 @@
+{
+  "schema": "neumann.control-plane-p1.10.minimal-pairwise.p0.v1",
+  "stage": "P0_SYNTHETIC_CONTRACT_ONLY",
+  "model": {
+    "model_id": "google/gemma-4-E2B-it",
+    "model_revision": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+    "artifact_sha256": "bf6d4f9d506f536db6255143e5f21e05b9ccadfea54af281ac278bd49c178d66",
+    "tokenizer_sha256": "8552955a1513c80096c4155aa2de30079a20d4c3f255b9d1acf9162c859b4207",
+    "precision": "bfloat16",
+    "weights_frozen": true
+  },
+  "semantic_ir": "SOURCE_BOUND_MINIMAL_PRONOUN_BINDING_CONTRAST",
+  "removed_from_neural_prompt": [
+    "domains",
+    "literal_values",
+    "already_resolved_csp_relations",
+    "candidate_atoms",
+    "evidence_alias_ledger"
+  ],
+  "response_semantics": {
+    "A": "LEFT_BINDING_MORE_FAITHFUL",
+    "B": "RIGHT_BINDING_MORE_FAITHFUL"
+  },
+  "candidate_identity_in_output_code": false,
+  "candidate_code_permutations": 0,
+  "pair_orientations": "BOTH",
+  "pairwise_preference": "D(i,j)=(L(i,j)-L(j,i))/2",
+  "winner_rule": "UNIQUE_CONDORCET_ABOVE_MARGIN",
+  "modes": [
+    "batch_all",
+    "reverse_batch_all"
+  ],
+  "forward_calls_per_item": 2,
+  "criteria": {
+    "max_mode_log_odds_delta_nats": 0.05,
+    "minimum_pairwise_preference_nats": 0.5
+  },
+  "generation": false,
+  "retry": false,
+  "hidden_reference_access": false,
+  "numeric_regeneration": false,
+  "p19_result_rescued": false,
+  "p19_opened_tasks_model_score_reuse": false,
+  "p19_batch_order_development_observation": "8/8 EXACT THREE_MODE SCORE EQUALITY",
+  "future_actual_requires_new_registered_tasks": true,
+  "actual_gemma_run": "NOT_RUN",
+  "development_registration": "NOT_REGISTERED",
+  "fresh_validation_registered": false,
+  "p2_registration_admitted": false,
+  "p2_admitted": false,
+  "decision3_admitted": false,
+  "global_questions_closed": []
+}
