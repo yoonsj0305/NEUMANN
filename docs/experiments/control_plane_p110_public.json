@@ -1,0 +1,84 @@
+{
+  "rows": [
+    {
+      "task_id": "p110d_b01",
+      "stratum": "B_MULTI_FEASIBLE_MINIMAL_PAIRWISE",
+      "view": {
+        "instruction": "X is the primary route and Y is the reserve route. Resolve 'It' to the emergency path, then return a complete assignment.",
+        "public": {
+          "query": "Choose X, Y from {14,17}. X differs from Y, It equals 17. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p110d_b02",
+      "stratum": "B_MULTI_FEASIBLE_MINIMAL_PAIRWISE",
+      "view": {
+        "instruction": "A is the intake node, B is the transform node, and C is the output node. Resolve 'It' to the terminal node, then return a complete assignment.",
+        "public": {
+          "query": "Choose A, B, C from {3,8,13}. A differs from B, A differs from C, B differs from C, It equals 13. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p110d_b03",
+      "stratum": "B_MULTI_FEASIBLE_MINIMAL_PAIRWISE",
+      "view": {
+        "instruction": "P is the sensor, Q is the controller, R is the actuator, and S is the recorder. Resolve 'It' to the component that physically changes the system, then return a complete assignment.",
+        "public": {
+          "query": "Choose P, Q, R, S from {21,34,55,89}. P differs from Q, P differs from R, P differs from S, Q differs from R, Q differs from S, R differs from S, It equals 55. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p110d_b04",
+      "stratum": "B_MULTI_FEASIBLE_MINIMAL_PAIRWISE",
+      "view": {
+        "instruction": "M is the leader and N is the deputy. Resolve 'It' to the succession role, then return a complete assignment.",
+        "public": {
+          "query": "Choose M, N from {-9,-7}. M differs from N, It equals -7. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p110d_b05",
+      "stratum": "B_MULTI_FEASIBLE_MINIMAL_PAIRWISE",
+      "view": {
+        "instruction": "A is the volatile cache, B is the persistent store, and C is the archive. Resolve 'It' to the fastest temporary tier, then return a complete assignment.",
+        "public": {
+          "query": "Choose A, B, C from {16,32,64}. A differs from B, A differs from C, B differs from C, It equals 16. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p110d_b06",
+      "stratum": "B_MULTI_FEASIBLE_MINIMAL_PAIRWISE",
+      "view": {
+        "instruction": "P is launch, Q is cruise, R is braking, and S is docking. Resolve 'It' to the rendezvous completion phase, then return a complete assignment.",
+        "public": {
+          "query": "Choose P, Q, R, S from {-12,-9,-6,-3}. P differs from Q, P differs from R, P differs from S, Q differs from R, Q differs from S, R differs from S, It equals -3. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p110d_b07",
+      "stratum": "B_MULTI_FEASIBLE_MINIMAL_PAIRWISE",
+      "view": {
+        "instruction": "M is the estimator, N is the controller, and O is telemetry. Resolve 'It' to the state-inference component, then return a complete assignment.",
+        "public": {
+          "query": "Choose M, N, O from {25,50,75}. M differs from N, M differs from O, N differs from O, It equals 25. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p110d_b08",
+      "stratum": "B_MULTI_FEASIBLE_MINIMAL_PAIRWISE",
+      "view": {
+        "instruction": "X is the transmit path and Y is the receive path. Resolve 'It' to the inbound link, then return a complete assignment.",
+        "public": {
+          "query": "Choose X, Y from {101,202}. X differs from Y, It equals 202. Return a complete assignment."
+        }
+      }
+    }
+  ]
+}
