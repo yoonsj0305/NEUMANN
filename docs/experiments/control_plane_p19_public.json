@@ -1,12 +1,84 @@
 {
   "rows": [
-    {"task_id":"p19d_b01","stratum":"B_MULTI_FEASIBLE_PROPOSITION","view":{"instruction":"X is the nominal path and Y is the contingency path. Resolve 'It' to the fallback path, then return a complete assignment.","public":{"query":"Choose X, Y from {0,1}. X differs from Y, It equals 1. Return a complete assignment."}}},
-    {"task_id":"p19d_b02","stratum":"B_MULTI_FEASIBLE_PROPOSITION","view":{"instruction":"A is the receiving queue, B is the processing queue, and C is the delivery queue. Resolve 'It' to the entry queue, then return a complete assignment.","public":{"query":"Choose A, B, C from {0,1,2}. A differs from B, A differs from C, B differs from C, It equals 2. Return a complete assignment."}}},
-    {"task_id":"p19d_b03","stratum":"B_MULTI_FEASIBLE_PROPOSITION","view":{"instruction":"P is thermal control, Q is propulsion, R is radio, and S is navigation. Resolve 'It' to the communications subsystem, then return a complete assignment.","public":{"query":"Choose P, Q, R, S from {0,1,2,3}. P differs from Q, P differs from R, P differs from S, Q differs from R, Q differs from S, R differs from S, It equals 3. Return a complete assignment."}}},
-    {"task_id":"p19d_b04","stratum":"B_MULTI_FEASIBLE_PROPOSITION","view":{"instruction":"M is the coordinator and N is the operator. Resolve 'It' to the managerial role, then return a complete assignment.","public":{"query":"Choose M, N from {-1,0}. M differs from N, It equals -1. Return a complete assignment."}}},
-    {"task_id":"p19d_b05","stratum":"B_MULTI_FEASIBLE_PROPOSITION","view":{"instruction":"A is the hot tier, B is the warm tier, and C is the archive tier. Resolve 'It' to the long-term storage tier, then return a complete assignment.","public":{"query":"Choose A, B, C from {10,20,30}. A differs from B, A differs from C, B differs from C, It equals 30. Return a complete assignment."}}},
-    {"task_id":"p19d_b06","stratum":"B_MULTI_FEASIBLE_PROPOSITION","view":{"instruction":"P is ascent, Q is coast, R is descent, and S is touchdown. Resolve 'It' to the landing phase, then return a complete assignment.","public":{"query":"Choose P, Q, R, S from {-3,-2,-1,0}. P differs from Q, P differs from R, P differs from S, Q differs from R, Q differs from S, R differs from S, It equals -1. Return a complete assignment."}}},
-    {"task_id":"p19d_b07","stratum":"B_MULTI_FEASIBLE_PROPOSITION","view":{"instruction":"M is the detector, N is the predictor, and O is the logger. Resolve 'It' to the forecasting component, then return a complete assignment.","public":{"query":"Choose M, N, O from {1,2,3}. M differs from N, M differs from O, N differs from O, It equals 2. Return a complete assignment."}}},
-    {"task_id":"p19d_b08","stratum":"B_MULTI_FEASIBLE_PROPOSITION","view":{"instruction":"X is the uplink and Y is the downlink. Resolve 'It' to the ground-to-space link, then return a complete assignment.","public":{"query":"Choose X, Y from {5,6}. X differs from Y, It equals 6. Return a complete assignment."}}}
+    {
+      "task_id": "p19d_b01",
+      "stratum": "B_MULTI_FEASIBLE_PROPOSITION",
+      "view": {
+        "instruction": "X is the nominal path and Y is the contingency path. Resolve 'It' to the fallback path, then return a complete assignment.",
+        "public": {
+          "query": "Choose X, Y from {7,9}. X differs from Y, It equals 9. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p19d_b02",
+      "stratum": "B_MULTI_FEASIBLE_PROPOSITION",
+      "view": {
+        "instruction": "A is the receiving queue, B is the processing queue, and C is the delivery queue. Resolve 'It' to the entry queue, then return a complete assignment.",
+        "public": {
+          "query": "Choose A, B, C from {2,4,6}. A differs from B, A differs from C, B differs from C, It equals 6. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p19d_b03",
+      "stratum": "B_MULTI_FEASIBLE_PROPOSITION",
+      "view": {
+        "instruction": "P is thermal control, Q is propulsion, R is radio, and S is navigation. Resolve 'It' to the communications subsystem, then return a complete assignment.",
+        "public": {
+          "query": "Choose P, Q, R, S from {10,20,30,40}. P differs from Q, P differs from R, P differs from S, Q differs from R, Q differs from S, R differs from S, It equals 40. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p19d_b04",
+      "stratum": "B_MULTI_FEASIBLE_PROPOSITION",
+      "view": {
+        "instruction": "M is the coordinator and N is the operator. Resolve 'It' to the managerial role, then return a complete assignment.",
+        "public": {
+          "query": "Choose M, N from {-5,-4}. M differs from N, It equals -5. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p19d_b05",
+      "stratum": "B_MULTI_FEASIBLE_PROPOSITION",
+      "view": {
+        "instruction": "A is the hot tier, B is the warm tier, and C is the archive tier. Resolve 'It' to the long-term storage tier, then return a complete assignment.",
+        "public": {
+          "query": "Choose A, B, C from {11,22,33}. A differs from B, A differs from C, B differs from C, It equals 33. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p19d_b06",
+      "stratum": "B_MULTI_FEASIBLE_PROPOSITION",
+      "view": {
+        "instruction": "P is ascent, Q is coast, R is descent, and S is touchdown. Resolve 'It' to the landing phase, then return a complete assignment.",
+        "public": {
+          "query": "Choose P, Q, R, S from {-8,-6,-4,-2}. P differs from Q, P differs from R, P differs from S, Q differs from R, Q differs from S, R differs from S, It equals -4. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p19d_b07",
+      "stratum": "B_MULTI_FEASIBLE_PROPOSITION",
+      "view": {
+        "instruction": "M is the detector, N is the predictor, and O is the logger. Resolve 'It' to the forecasting component, then return a complete assignment.",
+        "public": {
+          "query": "Choose M, N, O from {4,5,6}. M differs from N, M differs from O, N differs from O, It equals 5. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p19d_b08",
+      "stratum": "B_MULTI_FEASIBLE_PROPOSITION",
+      "view": {
+        "instruction": "X is the uplink and Y is the downlink. Resolve 'It' to the ground-to-space link, then return a complete assignment.",
+        "public": {
+          "query": "Choose X, Y from {12,13}. X differs from Y, It equals 13. Return a complete assignment."
+        }
+      }
+    }
   ]
 }
