@@ -7,7 +7,7 @@
     "semantic_ir": "TARGET_ROLE_PLUS_SOURCE_BOUND_CANDIDATE_ROLE_DESCRIPTIONS",
     "model_id": "sentence-transformers/all-MiniLM-L6-v2",
     "model_revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
-    "model_parameters": 22713728,
+    "model_parameters": 22713216,
     "device": "Tesla T4 / cuda",
     "precision": "float32",
     "pooling": "attention-mask mean pooling then L2 normalization",
@@ -18,7 +18,9 @@
     "actual_model_run": "NOT_RUN",
     "complete_cost_accounting_required": true,
     "artifact_acquisition": "exact revision before study; file SHA-256 manifest retained",
-    "baseline_rule": "model-free exact-token lexical-overlap anti-triviality control shares the same Semantic Role IR; future capability claims still require stronger shared baselines"
+    "baseline_rule": "model-free exact-token lexical-overlap anti-triviality control shares the same Semantic Role IR; future capability claims still require stronger shared baselines",
+    "model_state_elements_total": 22713728,
+    "non_parameter_state_elements": 512
   },
   "first_only": true,
   "opened_development": true,
@@ -91,5 +93,18 @@
     "p2_admitted": false,
     "decision3_admitted": false,
     "global_questions_closed": []
+  },
+  "identity_repair": {
+    "revision": "P1.11.1",
+    "historical_archive_sha256": "d75aeeccbd54e5c96041a41f4c40c1df17a5504d44c026336c53fab2b247e5e0",
+    "historical_verdict": "NOT_EVALUATED",
+    "historical_reason": "INCOMPLETE_OR_COVERAGE_DRIFT",
+    "historical_error": "P1.11 frozen model parameter-count drift",
+    "historical_observations": 0,
+    "historical_model_calls": 0,
+    "historical_neural_forward_calls": 0,
+    "task_scores_seen": false,
+    "task_or_gate_changed": false,
+    "repair_scope": "MODEL_PARAMETER_IDENTITY_ONLY"
   }
 }
