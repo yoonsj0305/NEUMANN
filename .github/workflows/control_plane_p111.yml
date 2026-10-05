@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install CPU test dependencies only
-        run: python -m pip install pytest
+        run: python -m pip install pytest numpy==2.4.6 scipy==1.17.1 scikit-learn==1.9.1 threadpoolctl==3.7.0
       - name: Compile P1.11 without loading model
         run: python -m py_compile neumann1/control_plane_p111.py tests/test_control_plane_p111.py
       - name: P1.11 synthetic contracts
