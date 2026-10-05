@@ -1,0 +1,84 @@
+{
+  "rows": [
+    {
+      "task_id": "p19d_a01",
+      "stratum": "A_FEASIBILITY_REDUCIBLE",
+      "view": {
+        "instruction": "Resolve the single bounded pronoun by choosing the candidate interpretation that makes all stated constraints jointly satisfiable, then return a complete assignment.",
+        "public": {
+          "query": "Choose X, Y from {2,5}. X equals 2, It equals 5. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p19d_a02",
+      "stratum": "A_FEASIBILITY_REDUCIBLE",
+      "view": {
+        "instruction": "Resolve the single bounded pronoun by choosing the candidate interpretation that makes all stated constraints jointly satisfiable, then return a complete assignment.",
+        "public": {
+          "query": "Choose A, B, C from {1,4,7}. A equals 1, C equals 7, It equals 4. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p19d_a03",
+      "stratum": "A_FEASIBILITY_REDUCIBLE",
+      "view": {
+        "instruction": "Resolve the single bounded pronoun by choosing the candidate interpretation that makes all stated constraints jointly satisfiable, then return a complete assignment.",
+        "public": {
+          "query": "Choose P, Q, R, S from {2,4,6,8}. P equals 2, Q equals 4, S equals 8, It equals 6. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p19d_a04",
+      "stratum": "A_FEASIBILITY_REDUCIBLE",
+      "view": {
+        "instruction": "Resolve the single bounded pronoun by choosing the candidate interpretation that makes all stated constraints jointly satisfiable, then return a complete assignment.",
+        "public": {
+          "query": "Choose M, N, O from {-6,-3,0}. M equals -6, N equals -3, It equals 0. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p19d_b01",
+      "stratum": "B_MULTI_FEASIBLE_SEMANTIC",
+      "view": {
+        "instruction": "X is the inbound channel and Y is the outbound channel. Resolve 'It' to the channel carrying traffic away from the system, then return a complete assignment.",
+        "public": {
+          "query": "Choose X, Y from {11,14}. X differs from Y, It equals 14. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p19d_b02",
+      "stratum": "B_MULTI_FEASIBLE_SEMANTIC",
+      "view": {
+        "instruction": "A is the left port, B is the center port, and C is the right port. Resolve 'It' to the middle port, then return a complete assignment.",
+        "public": {
+          "query": "Choose A, B, C from {3,6,9}. A differs from B, A differs from C, B differs from C, It equals 6. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p19d_b03",
+      "stratum": "B_MULTI_FEASIBLE_SEMANTIC",
+      "view": {
+        "instruction": "P is the first stage, Q is the second stage, R is the third stage, and S is the fourth stage. Resolve 'It' to the stage immediately after Q, then return a complete assignment.",
+        "public": {
+          "query": "Choose P, Q, R, S from {10,20,30,40}. P differs from Q, P differs from R, P differs from S, Q differs from R, Q differs from S, R differs from S, It equals 30. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p19d_b04",
+      "stratum": "B_MULTI_FEASIBLE_SEMANTIC",
+      "view": {
+        "instruction": "M is the active unit, N is the standby unit, and O is the retired unit. Resolve 'It' to the unit that would take over if the active unit failed, then return a complete assignment.",
+        "public": {
+          "query": "Choose M, N, O from {-5,0,5}. M differs from N, M differs from O, N differs from O, It equals 0. Return a complete assignment."
+        }
+      }
+    }
+  ]
+}
