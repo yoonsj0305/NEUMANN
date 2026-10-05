@@ -24,7 +24,10 @@ SCHEMA = "neumann.control-plane-p1.11.semantic-microexecutor.p0.v1"
 MODEL = {
     "model_id": "sentence-transformers/all-MiniLM-L6-v2",
     "model_revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
-    "parameters": 22713728,
+    "parameters": 22713216,
+    "state_elements_total": 22713728,
+    "non_parameter_state_elements": 512,
+    "parameter_count_semantics": "sum(p.numel() for p in AutoModel.parameters())",
     "architecture": "BertModel",
     "embedding_dim": 384,
     "pooling": "attention-mask mean pooling then L2 normalization",
