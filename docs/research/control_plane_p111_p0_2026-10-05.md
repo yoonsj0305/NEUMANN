@@ -66,6 +66,14 @@ candidate role description 2
 Candidate entity identity stays outside the embedding text and is reattached
 deterministically after scoring.
 
+The bounded role-declaration parser consumes the entire public instruction.
+An `and` inside a role stays part of the role; `and Y is the ...` starts a new
+declaration. Duplicate/missing declarations, extra sentences and unsupported
+syntax reject rather than silently lose obligations. When feasibility leaves
+holes, callers provide the complete source entity set separately: all source
+roles are checked, but only eligible original entity/role pairs enter the IR.
+This is a bounded grammar mechanism, not a general natural-language parser.
+
 ## Frozen embedding semantics
 
 Use the model-card Transformers formulation:
@@ -82,6 +90,12 @@ Use the model-card Transformers formulation:
 Otherwise abstain.
 
 No generation, retry, hidden label, private reference or new training is allowed.
+
+The backend calls `eval()`, disables gradients on every parameter and loads both
+tokenizer and model from the exact revision. Context overflow rejects before the
+forward; tokenization never silently truncates a role. An attempted forward is
+charged even if the backend raises. Future actual-run accounting must retain
+startup/tokenization/partial-work timing and counters, not just completed scores.
 
 ## Why this is not merely another model
 
@@ -110,3 +124,21 @@ P1.11 P0 is synthetic-contract work only.
 
 The project North Star remains **overwhelming iso-capability resource advantage
 plus category change**, not a local benchmark win.
+
+## P0 validation and execution readiness
+
+Synthetic tests exercise full-prefix consumption, declaration separators, pruned
+source identity, malformed IR/nonfinite scores, confidence/abstention, exact
+revision load arguments, gradient freezing and parameter-count rejection.
+A NumPy-backed synthetic Torch surface checks the actual adapter orchestration:
+target and all candidates share one batch, attention-mask pooling excludes pad
+states, normalization/cosine selects only via the frozen gates, overflow makes
+zero forwards, and a failed forward remains charged. No pretrained weights or
+real P1.11 model scores are used by these tests.
+
+This PR is **P0 only**. Development tasks/registration, complete runtime/archive
+replay and a first-only Kaggle launcher are **NOT READY**. Do not rerun the
+historical P1.10 cell. An actual P1.11 experiment needs a separately preregistered
+fresh set, strong shared baselines, exact runtime/artifact identity and complete
+cost/verification gates before scores. Passing these synthetic tests is not a
+capability or resource advantage result.
