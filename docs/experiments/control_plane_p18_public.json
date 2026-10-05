@@ -1,0 +1,84 @@
+{
+  "rows": [
+    {
+      "task_id": "p18d_a01",
+      "stratum": "A_FEASIBILITY_REDUCIBLE",
+      "view": {
+        "instruction": "Resolve the single bounded pronoun by choosing the candidate interpretation that makes all stated constraints jointly satisfiable, then return a complete assignment.",
+        "public": {
+          "query": "Choose X, Y from {0,1,2}. X equals 2, It equals 0. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p18d_a02",
+      "stratum": "A_FEASIBILITY_REDUCIBLE",
+      "view": {
+        "instruction": "Resolve the single bounded pronoun by choosing the candidate interpretation that makes all stated constraints jointly satisfiable, then return a complete assignment.",
+        "public": {
+          "query": "Choose A, B, C from {0,1,2,3}. A equals 1, C equals 3, It equals 2. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p18d_a03",
+      "stratum": "A_FEASIBILITY_REDUCIBLE",
+      "view": {
+        "instruction": "Resolve the single bounded pronoun by choosing the candidate interpretation that makes all stated constraints jointly satisfiable, then return a complete assignment.",
+        "public": {
+          "query": "Choose P, Q, R, S from {0,1,2,3,4}. P equals 0, Q equals 1, S equals 4, It equals 2. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p18d_a04",
+      "stratum": "A_FEASIBILITY_REDUCIBLE",
+      "view": {
+        "instruction": "Resolve the single bounded pronoun by choosing the candidate interpretation that makes all stated constraints jointly satisfiable, then return a complete assignment.",
+        "public": {
+          "query": "Choose M, N, O from {-3,-2,-1,0}. M equals -3, N equals -2, It equals -1. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p18d_b01",
+      "stratum": "B_MULTI_FEASIBLE_SEMANTIC",
+      "view": {
+        "instruction": "X is the primary channel and Y is the spare channel. Resolve 'It' to the backup channel, then return a complete assignment.",
+        "public": {
+          "query": "Choose X, Y from {0,1}. X differs from Y, It equals 1. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p18d_b02",
+      "stratum": "B_MULTI_FEASIBLE_SEMANTIC",
+      "view": {
+        "instruction": "A is the input stage, B is the buffer stage, and C is the output stage. Resolve 'It' to the intermediate storage stage, then return a complete assignment.",
+        "public": {
+          "query": "Choose A, B, C from {0,1,2}. A differs from B, A differs from C, B differs from C, It equals 2. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p18d_b03",
+      "stratum": "B_MULTI_FEASIBLE_SEMANTIC",
+      "view": {
+        "instruction": "P is intake, Q is processing, R is holding, and S is output. Resolve 'It' to the temporary storage role, then return a complete assignment.",
+        "public": {
+          "query": "Choose P, Q, R, S from {0,1,2,3}. P differs from Q, P differs from R, P differs from S, Q differs from R, Q differs from S, R differs from S, It equals 3. Return a complete assignment."
+        }
+      }
+    },
+    {
+      "task_id": "p18d_b04",
+      "stratum": "B_MULTI_FEASIBLE_SEMANTIC",
+      "view": {
+        "instruction": "M is the leader, N is the deputy, and O is the observer. Resolve 'It' to the second-in-command, then return a complete assignment.",
+        "public": {
+          "query": "Choose M, N, O from {-2,-1,0}. M differs from N, M differs from O, N differs from O, It equals -1. Return a complete assignment."
+        }
+      }
+    }
+  ]
+}
