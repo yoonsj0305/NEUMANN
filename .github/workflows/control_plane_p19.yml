@@ -25,9 +25,9 @@ jobs:
       - name: Install CPU test dependencies only
         run: python -m pip install pytest numpy==2.4.6 scipy==1.17.1 scikit-learn==1.9.1 threadpoolctl==3.7.0
       - name: Compile P1.9 without loading model
-        run: python -m py_compile neumann1/control_plane_p19.py neumann1/control_plane_p19_semantic.py experiments/control_plane_p19_catalog.py experiments/control_plane_p19_registration.py experiments/control_plane_p19_runtime.py experiments/control_plane_p19_dev.py experiments/control_plane_p19_replay.py tests/test_control_plane_p19.py tests/test_control_plane_p19_first.py
+        run: python -m py_compile neumann1/control_plane_p19.py neumann1/control_plane_p19_semantic.py experiments/control_plane_p19_catalog.py experiments/control_plane_p19_registration.py experiments/control_plane_p19_runtime.py experiments/control_plane_p19_dev.py experiments/control_plane_p19_replay.py scripts/control_plane_p19_kaggle.py tests/test_control_plane_p19.py tests/test_control_plane_p19_first.py tests/test_control_plane_p19_kaggle.py
       - name: P1.9 synthetic proposition contracts
-        run: python -m pytest -q tests/test_control_plane_p19.py tests/test_control_plane_p19_first.py
+        run: python -m pytest -q tests/test_control_plane_p19.py tests/test_control_plane_p19_first.py tests/test_control_plane_p19_kaggle.py
       - name: Frozen fresh P1.9 registration and construction controls
         run: python -m experiments.control_plane_p19_registration
       - name: P1.8 front-half regressions
