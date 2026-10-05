@@ -16,6 +16,8 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 import math
 import re
+from pathlib import Path
+from time import perf_counter_ns
 
 SCHEMA = "neumann.control-plane-p1.11.semantic-microexecutor.p0.v1"
 
@@ -223,20 +225,24 @@ class FrozenMiniLMSemanticEncoder:
     forward over target + all candidate descriptions.
     """
 
-    def __init__(self, device="cpu"):
+    def __init__(self, device="cpu", model_source=None, local_files_only=False):
         import torch
         from transformers import AutoModel, AutoTokenizer
 
         self.torch = torch
         self.device = torch.device(device)
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            MODEL["model_id"],
-            revision=MODEL["model_revision"],
-        )
-        self.model = AutoModel.from_pretrained(
-            MODEL["model_id"],
-            revision=MODEL["model_revision"],
-        ).to(self.device)
+        if model_source is None:
+            source = MODEL["model_id"]
+            loader_kwargs = {"revision": MODEL["model_revision"]}
+            self.model_source = MODEL["model_id"] + "@" + MODEL["model_revision"]
+        else:
+            source = str(Path(model_source))
+            if not local_files_only:
+                raise ValueError("explicit P1.11 model source must be local-only")
+            loader_kwargs = {"local_files_only": True}
+            self.model_source = source
+        self.tokenizer = AutoTokenizer.from_pretrained(source, **loader_kwargs)
+        self.model = AutoModel.from_pretrained(source, **loader_kwargs).to(self.device)
         self.model.eval()
         for parameter in self.model.parameters():
             parameter.requires_grad_(False)
@@ -255,31 +261,55 @@ class FrozenMiniLMSemanticEncoder:
         _validate_ir(ir)
 
         texts = [ir["target_role"]] + [row["role"] for row in ir["candidates"]]
+        tokenize_started = perf_counter_ns()
         encoded = self.tokenizer(
             texts,
             padding=True,
             truncation=False,
             return_tensors="pt",
         )
+        tokenize_ms = (perf_counter_ns() - tokenize_started) / 1e6
         if encoded["input_ids"].shape[1] > 256:
             raise ValueError("P1.11 context cap; no silent truncation")
+        input_rows = len(texts)
+        input_tokens = int(encoded["attention_mask"].sum().item())
+        padded_tokens = int(encoded["input_ids"].numel())
         encoded = {k: v.to(self.device) for k, v in encoded.items()}
-        # Charge an attempted forward even if the backend raises. A future
-        # actual runner must retain this counter and tokenization costs too.
+        self.last_attempt = {
+            "input_rows": input_rows,
+            "input_tokens": input_tokens,
+            "padded_tokens": padded_tokens,
+            "tokenize_ms": tokenize_ms,
+            "forward_calls": 0,
+        }
+        # Charge an attempted forward even if the backend raises.
         self.forward_calls += 1
+        self.last_attempt["forward_calls"] = 1
+        forward_started = perf_counter_ns()
         with self.torch.no_grad():
             output = self.model(**encoded)
+        forward_ms = (perf_counter_ns() - forward_started) / 1e6
+
+        post_started = perf_counter_ns()
         embeddings = self._mean_pool(output[0], encoded["attention_mask"])
         embeddings = F.normalize(embeddings, p=2, dim=1)
         target = embeddings[0]
         candidate = embeddings[1:]
         similarities = (candidate @ target).detach().cpu().tolist()
+        pooling_similarity_ms = (perf_counter_ns() - post_started) / 1e6
+        self.last_attempt.update({
+            "forward_ms": forward_ms,
+            "pooling_similarity_ms": pooling_similarity_ms,
+        })
 
         return {
             "similarities": similarities,
             "forward_calls": 1,
-            "input_rows": len(texts),
-            "input_tokens": int(encoded["attention_mask"].sum().item()),
-            "padded_tokens": int(encoded["input_ids"].numel()),
+            "input_rows": input_rows,
+            "input_tokens": input_tokens,
+            "padded_tokens": padded_tokens,
+            "tokenize_ms": tokenize_ms,
+            "forward_ms": forward_ms,
+            "pooling_similarity_ms": pooling_similarity_ms,
             "device": str(self.device),
         }
