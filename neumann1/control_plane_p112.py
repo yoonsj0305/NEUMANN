@@ -10,6 +10,7 @@ cross-encoder. No model is loaded and no model score is produced at import time.
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+from time import perf_counter_ns
 
 from neumann1.control_plane_p111 import semantic_role_ir
 
@@ -190,6 +191,7 @@ class FrozenMiniLMCrossEncoder:
         queries = [row["query"] for row in pairs]
         candidates = [row["candidate_text"] for row in pairs]
 
+        began = perf_counter_ns()
         encoded = self.tokenizer(
             queries,
             candidates,
@@ -198,26 +200,41 @@ class FrozenMiniLMCrossEncoder:
             max_length=256,
             return_tensors="pt",
         )
+        tokenize_ms = (perf_counter_ns() - began) / 1e6
         encoded = {k: v.to(self.device) for k, v in encoded.items()}
         attempt = {
             "input_rows": len(pairs),
             "input_tokens": int(encoded["attention_mask"].sum().item()),
             "padded_tokens": int(encoded["input_ids"].numel()),
         }
-        self.last_attempt = dict(attempt)
+        self.last_attempt = {**attempt, "tokenize_ms": tokenize_ms}
 
-        self.forward_calls += 1  # charged before execution, including failed attempts
+        if self.device.type == "cuda":
+            self.torch.cuda.synchronize(self.device)
+        forward_start = perf_counter_ns()
+        self.forward_calls += 1  # attempted work charged, even on model failure
         self.last_attempt["forward_calls"] = 1
         with self.torch.no_grad():
             output = self.model(**encoded)
+        if self.device.type == "cuda":
+            self.torch.cuda.synchronize(self.device)
+        forward_ms = (perf_counter_ns() - forward_start) / 1e6
+        self.last_attempt["forward_ms"] = forward_ms
 
+        logit_start = perf_counter_ns()
         logits = output.logits
         if logits.ndim != 2 or logits.shape != (len(pairs), 1):
             raise ValueError("P1.12 one scalar logit per pair required")
 
+        scores = logits[:, 0].detach().float().cpu().tolist()
+        logit_extract_ms = (perf_counter_ns() - logit_start) / 1e6
         return {
-            "logits": logits[:, 0].detach().float().cpu().tolist(),
+            "logits": scores,
             "forward_calls": 1,
             **attempt,
+            "tokenize_ms": tokenize_ms,
+            "forward_ms": forward_ms,
+            "logit_extract_ms": logit_extract_ms,
+            "complete_ms": (perf_counter_ns() - began) / 1e6,
             "device": str(self.device),
         }
