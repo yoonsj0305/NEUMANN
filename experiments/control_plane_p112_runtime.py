@@ -46,12 +46,12 @@ def totals(rows):
 
 def _raw_top_candidate(ir, logits, entity_to_candidate):
     if type(logits) is not list or len(logits) != len(ir["pairs"]):
-        raise ValueError("complete P1.12 similarity vector required")
+        raise ValueError("complete P1.12 joint-logit vector required")
     position = min(
         range(len(logits)),
-        key=lambda i: (-float(logits[i]), ir["candidates"][i]["entity"]),
+        key=lambda i: (-float(logits[i]), ir["pairs"][i]["entity"]),
     )
-    return entity_to_candidate[ir["candidates"][position]["entity"]]
+    return entity_to_candidate[ir["pairs"][position]["entity"]]
 
 
 def evaluate(rows, refs, core_unchanged, complete, whole_ms):
@@ -293,7 +293,7 @@ def run_item(row, ref, encoder):
             "padded_tokens": model_output["padded_tokens"],
             "tokenize_ms": model_output.get("tokenize_ms"),
             "forward_ms": model_output.get("forward_ms"),
-            "pooling_similarity_ms": model_output.get("pooling_similarity_ms"),
+            "logit_extract_ms": model_output.get("logit_extract_ms"),
             "device": model_output.get("device"),
             "complete_ms": selector_ms,
         }
