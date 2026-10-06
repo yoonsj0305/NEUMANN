@@ -25,9 +25,9 @@ jobs:
       - name: Install CPU test dependencies only
         run: python -m pip install pytest numpy==2.4.6 scipy==1.17.1 scikit-learn==1.9.1 threadpoolctl==3.7.0
       - name: Compile P1.12 without loading model
-        run: python -m py_compile neumann1/control_plane_p112.py neumann1/control_plane_p112_semantic.py experiments/control_plane_p112_catalog.py experiments/control_plane_p112_registration.py tests/test_control_plane_p112.py tests/test_control_plane_p112_first.py
+        run: python -m py_compile neumann1/control_plane_p112.py neumann1/control_plane_p112_semantic.py experiments/control_plane_p112_catalog.py experiments/control_plane_p112_registration.py experiments/control_plane_p112_runtime.py tests/test_control_plane_p112.py tests/test_control_plane_p112_first.py tests/test_control_plane_p112_runtime.py
       - name: P1.12 synthetic contracts
-        run: python -m pytest -q tests/test_control_plane_p112.py tests/test_control_plane_p112_first.py
+        run: python -m pytest -q tests/test_control_plane_p112.py tests/test_control_plane_p112_first.py tests/test_control_plane_p112_runtime.py
       - name: Frozen fresh P1.12 registration and construction controls
         run: python -m experiments.control_plane_p112_registration
       - name: P1.11 and P1.10 regression boundary
