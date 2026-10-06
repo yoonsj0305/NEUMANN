@@ -5,7 +5,23 @@ import pytest
 from experiments.control_plane_p112_catalog import catalog
 from experiments.control_plane_p112_replay import replay_record
 from experiments.control_plane_p112_runtime import run_item
-from tests.test_control_plane_p112_runtime import FixtureCrossEncoder
+class FixtureCrossEncoder:
+    """Synthetic ranking stub; no pretrained weights are loaded."""
+    def __init__(self, winner):
+        self.winner=winner
+        self.forward_calls=0
+        self.last_attempt=None
+
+    def score(self, ir):
+        n=len(ir["pairs"])
+        self.forward_calls+=1
+        self.last_attempt={"forward_calls":1,"input_rows":n,"input_tokens":5*n,"padded_tokens":8*n}
+        scores=[0.0]*n
+        scores[self.winner]=5.0
+        return {"logits":scores,"forward_calls":1,"input_rows":n,
+                "input_tokens":5*n,"padded_tokens":8*n,"device":"cpu-fixture",
+                "tokenize_ms":0.1,"forward_ms":0.1,"logit_extract_ms":0.1}
+
 
 
 def test_exact_original_verifier_replay_with_no_model():
