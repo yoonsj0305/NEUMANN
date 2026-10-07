@@ -1,0 +1,65 @@
+{
+  "identity": "INDUCTIVE_PERSPECTIVE_ENGINEERING_V1",
+  "kind": "OPENED_ENGINEERING_NOT_G0_G1",
+  "fixture_powers": [
+    2,
+    3
+  ],
+  "fixture_goals": [
+    "position",
+    "invariant"
+  ],
+  "parameter_rows": [
+    [
+      2,
+      7,
+      3,
+      1
+    ],
+    [
+      -4,
+      11,
+      -2,
+      -3
+    ],
+    [
+      10000000000000000000000000000000000000000,
+      -1000000000000000000000000000000000000000000000000000000000000,
+      9,
+      0
+    ]
+  ],
+  "original_horizons": [
+    0,
+    1,
+    7,
+    31
+  ],
+  "proof_only_large_horizon": 1000000000000000000000000000000,
+  "native_degree": 3,
+  "source_role": "F",
+  "manual_proposal_role": "O",
+  "performance_gate": null,
+  "timings_scope": "diagnostic verification/discovery calls only, not complete comparative cost",
+  "sources": {
+    "neumann1/inductive_perspective.py": "bbaa71bdeae3727a0b7c07e45b23ea513a8d2e44ce279a366189351e4d5a7309",
+    "neumann1/inductive_symbolic_baseline.py": "0e394f3b5ec518cce807df7c83c4ef299ab2becb905350e4013553e04ddcb9f7",
+    "experiments/inductive_fixture_cases.py": "9432d075702512f247073ae9aba7db22b3c878096aa6a06940dee10d23e97b50",
+    "neumann1/representation_program.py": "2b1bff0563c9e0b216fcbb840f3220499d2d0f59d494f73762560f447a42159a",
+    "experiments/inductive_perspective_integration.py": "1ecf7646d8154747ea7e9411e6d67f92745302b4db5549d637ec76d2dfd8bd96",
+    "experiments/representation_headroom.py": "ce82c6a8341888896d12725389cfcd7202c5538910526e91bf9e419924f585eb"
+  },
+  "packages": {
+    "sympy": {
+      "version": "1.14.0",
+      "record_sha256": "2888c3440019a7be40f88aa39e19fed5beb50912a9fe6d5cc98b6bed53ebf014"
+    },
+    "mpmath": {
+      "version": "1.3.0",
+      "record_sha256": "6e0dc4362026a41beb2ad7081ec8f6fc9be0c48d9ce65784733aedc223c60100"
+    }
+  },
+  "fresh_eligible": 0,
+  "learned_model": false,
+  "G1_admitted": false
+}

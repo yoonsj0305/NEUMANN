@@ -1,0 +1,284 @@
+{
+  "schema": "neumann.g0-headroom.v1",
+  "frozen_at_utc": "2026-10-06T11:59:46.772380+00:00",
+  "status": "PREREGISTERED_BEFORE_FULL_GRID_EXECUTION",
+  "specs": [
+    {
+      "id": "graph_m12_t4_r0",
+      "family": "graph",
+      "m": 12,
+      "copies": 4,
+      "seed": 1061800,
+      "density": 0.25,
+      "large": false
+    },
+    {
+      "id": "graph_m12_t4_r1",
+      "family": "graph",
+      "m": 12,
+      "copies": 4,
+      "seed": 1061801,
+      "density": 0.55,
+      "large": false
+    },
+    {
+      "id": "graph_m12_t8_r0",
+      "family": "graph",
+      "m": 12,
+      "copies": 8,
+      "seed": 1061800,
+      "density": 0.25,
+      "large": false
+    },
+    {
+      "id": "graph_m12_t8_r1",
+      "family": "graph",
+      "m": 12,
+      "copies": 8,
+      "seed": 1061801,
+      "density": 0.55,
+      "large": false
+    },
+    {
+      "id": "graph_m12_t16_r0",
+      "family": "graph",
+      "m": 12,
+      "copies": 16,
+      "seed": 1061800,
+      "density": 0.25,
+      "large": true
+    },
+    {
+      "id": "graph_m12_t16_r1",
+      "family": "graph",
+      "m": 12,
+      "copies": 16,
+      "seed": 1061801,
+      "density": 0.55,
+      "large": true
+    },
+    {
+      "id": "graph_m16_t4_r0",
+      "family": "graph",
+      "m": 16,
+      "copies": 4,
+      "seed": 1062200,
+      "density": 0.25,
+      "large": false
+    },
+    {
+      "id": "graph_m16_t4_r1",
+      "family": "graph",
+      "m": 16,
+      "copies": 4,
+      "seed": 1062201,
+      "density": 0.55,
+      "large": false
+    },
+    {
+      "id": "graph_m16_t8_r0",
+      "family": "graph",
+      "m": 16,
+      "copies": 8,
+      "seed": 1062200,
+      "density": 0.25,
+      "large": false
+    },
+    {
+      "id": "graph_m16_t8_r1",
+      "family": "graph",
+      "m": 16,
+      "copies": 8,
+      "seed": 1062201,
+      "density": 0.55,
+      "large": false
+    },
+    {
+      "id": "graph_m16_t16_r0",
+      "family": "graph",
+      "m": 16,
+      "copies": 16,
+      "seed": 1062200,
+      "density": 0.25,
+      "large": true
+    },
+    {
+      "id": "graph_m16_t16_r1",
+      "family": "graph",
+      "m": 16,
+      "copies": 16,
+      "seed": 1062201,
+      "density": 0.55,
+      "large": true
+    },
+    {
+      "id": "matrix_n512_k4_r0",
+      "family": "matrix",
+      "n": 512,
+      "rank": 4,
+      "seed": 1062640,
+      "large": false
+    },
+    {
+      "id": "matrix_n512_k4_r1",
+      "family": "matrix",
+      "n": 512,
+      "rank": 4,
+      "seed": 1062641,
+      "large": false
+    },
+    {
+      "id": "matrix_n512_k16_r0",
+      "family": "matrix",
+      "n": 512,
+      "rank": 16,
+      "seed": 1062760,
+      "large": false
+    },
+    {
+      "id": "matrix_n512_k16_r1",
+      "family": "matrix",
+      "n": 512,
+      "rank": 16,
+      "seed": 1062761,
+      "large": false
+    },
+    {
+      "id": "matrix_n1024_k4_r0",
+      "family": "matrix",
+      "n": 1024,
+      "rank": 4,
+      "seed": 1062640,
+      "large": false
+    },
+    {
+      "id": "matrix_n1024_k4_r1",
+      "family": "matrix",
+      "n": 1024,
+      "rank": 4,
+      "seed": 1062641,
+      "large": false
+    },
+    {
+      "id": "matrix_n1024_k16_r0",
+      "family": "matrix",
+      "n": 1024,
+      "rank": 16,
+      "seed": 1062760,
+      "large": false
+    },
+    {
+      "id": "matrix_n1024_k16_r1",
+      "family": "matrix",
+      "n": 1024,
+      "rank": 16,
+      "seed": 1062761,
+      "large": false
+    },
+    {
+      "id": "matrix_n2048_k4_r0",
+      "family": "matrix",
+      "n": 2048,
+      "rank": 4,
+      "seed": 1062640,
+      "large": true
+    },
+    {
+      "id": "matrix_n2048_k4_r1",
+      "family": "matrix",
+      "n": 2048,
+      "rank": 4,
+      "seed": 1062641,
+      "large": true
+    },
+    {
+      "id": "matrix_n2048_k16_r0",
+      "family": "matrix",
+      "n": 2048,
+      "rank": 16,
+      "seed": 1062760,
+      "large": true
+    },
+    {
+      "id": "matrix_n2048_k16_r1",
+      "family": "matrix",
+      "n": 2048,
+      "rank": 16,
+      "seed": 1062761,
+      "large": true
+    }
+  ],
+  "routes": {
+    "graph": [
+      "NX_DIRECT",
+      "MILP_DIRECT",
+      "TWIN_QUOTIENT",
+      "FREE_TWIN"
+    ],
+    "matrix": [
+      "CHOLESKY_DIRECT",
+      "CG_DIRECT",
+      "PIVOTED_CHOLESKY",
+      "FREE_FACTOR"
+    ]
+  },
+  "measured_repeats": 3,
+  "warmup_repeats": 1,
+  "families": 2,
+  "criterion": {
+    "speedup": 10.0,
+    "per_family_geomean": ">=10",
+    "largest_scale_cases": ">=3/4 at >=10x",
+    "all_cases_evaluable": true,
+    "scope": "optimistic first-query matched warm latency only"
+  },
+  "baseline_envelope": "Per-case fastest correct median among native and known structural algorithms; no global strongest claim",
+  "complete_query_cost": "input array scan/hash + transform/discovery + execution/reconstruction + original-task verification + failed attempts",
+  "excluded_but_reported_investment": "imports, worker launch, input generation/storage, offline independent reference and correct free-oracle preparation",
+  "free_oracle": "Provided correct structure, not a proof of best possible representation; discovery cost excluded for optimistic screen only",
+  "cache_rights": "All first-query caches empty; warm repeated-query exact-cache floor separately reported, native discovery investment retained",
+  "thread_budget": 1,
+  "milp_time_limit_seconds": 5.0,
+  "query_eligibility_seconds": 15,
+  "worker_event_timeout_seconds": 30,
+  "whole_run_limit_seconds": 1800,
+  "matrix_check": "SPD A=I+UU' family; residual L2 <=1e-7*max(1,||b||), implies solution L2 error bound",
+  "graph_check": "Original graph clique feasibility/integer weight equals independently certified original-graph MILP optimum",
+  "new_producer_exposure": "OPENED_DEVELOPMENT; no claim of fresh learned-model evaluation",
+  "missing_historical_assets": "excluded, never required or reconstructed",
+  "sealed_payload_access": false,
+  "training": false,
+  "gpu": false,
+  "g2_authorized": false,
+  "source_sha256": "de0d16d61f869cc2784b5456ec27938b427237433ea58991c067eb2d233c28f7",
+  "runtime_identity": {
+    "numpy": {
+      "version": "2.4.6",
+      "record_sha256": "20829a3bc98e8befec83ab1dfa5b453f4cc7243a27a5667830f8d411221c485c"
+    },
+    "scipy": {
+      "version": "1.17.1",
+      "record_sha256": "2e5177df6eb6449a8c7cc078a5df90e3207a5c753e88a678583f916b525f7690"
+    },
+    "networkx": {
+      "version": "3.6.1",
+      "record_sha256": "f98277551f79e9cffce4fdcfdf875dd6f3d8f3e9e1a8146a83b3b803d719a6b2"
+    },
+    "threadpoolctl": {
+      "version": "3.7.0",
+      "record_sha256": "1c1dc08bca4b1a3786c4bf1cdfbd5717786bffa286c1d1cc0b8238e5441b9337"
+    },
+    "networkx_clique_source_sha256": "480bce4406d9ad9f88a5356e11c6ab11342284d7acfa0969362aa867b8448273",
+    "python": "3.12.14"
+  },
+  "d0_manifests": {
+    "Continuation/D0_CORE_LP_COST_VIEW/manifest.json": "676906849327930b461370372b2a701a191615a42add04386a43326c0a64018b",
+    "Continuation/D0_CONTROL_FIRST/manifest.json": "ebb9b0dccfb4b696810f54ec5c23db4d703ccf7f07474c0c26da98de195e1763"
+  },
+  "primary_sources": [
+    "https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.clique.max_weight_clique.html",
+    "https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.milp.html",
+    "https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.lapack.dpstrf.html",
+    "https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.cg.html"
+  ]
+}

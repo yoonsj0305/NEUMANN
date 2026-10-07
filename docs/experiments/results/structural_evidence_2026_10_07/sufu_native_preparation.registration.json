@@ -1,0 +1,1189 @@
+{
+  "study": "SUFU_NATIVE_OPENED_ENGINEERING_V1",
+  "purpose": "Strong existing structural synthesis baseline engineering intake; not economic headroom.",
+  "commit": "c2b3ff0637460c568b0533f992007278f88d0f55",
+  "runner_sha256": "96c014f9e31e9cbce71055414f0d010897c99c645ac5c59de1c00195090ccc3b",
+  "executable_sha256": "6a3b97eab682f69bc502c9d03411b80863c848c2ab4c1863637db0ecb7b688c4",
+  "timeout_seconds_per_case": 30,
+  "repeats": 1,
+  "selection": "all 290 pinned benchmark/**/*.f except the author-excluded grammar module",
+  "excluded_before_execution": [
+    {
+      "path": "benchmark/autolifter/autolifter-base.f",
+      "reason": "Shared grammar definitions; not a runnable benchmark; author collector excludes this."
+    }
+  ],
+  "seed": "Upstream default Env RNG(0); all randomness not established fixed.",
+  "modified_algorithm_sources": 0,
+  "use_gurobi": false,
+  "exposure": "Entire public source and upstream cached results opened; sum preflight run.",
+  "published_score_is_not_our_score": true,
+  "bounded_checks_are_not_universal_proofs": true,
+  "fresh_eligible": 0,
+  "G0_passed": false,
+  "G1_admitted": false,
+  "G2_admitted": false,
+  "no_followup_retuning_or_selective_replacement": true,
+  "benchmarks": [
+    {
+      "path": "benchmark/autolifter/dac/0after1.f",
+      "sha256": "c2ff23acf9df08393e4618a078482ede807ac53ce8bfff1fb3eb5b80f5661dd2"
+    },
+    {
+      "path": "benchmark/autolifter/dac/0s1s.f",
+      "sha256": "85e254c0f07413a71a835cf8711a1319a12453ff0929c34419fa6b1157f3c3d0"
+    },
+    {
+      "path": "benchmark/autolifter/dac/2nd-min.f",
+      "sha256": "32da50e2d2d6611a258115cd48ff48335b82258bdd113722aa7f9cec72067ed4"
+    },
+    {
+      "path": "benchmark/autolifter/dac/3rd-min.f",
+      "sha256": "56f35ef2ed456624949e04e31a35b39fcb90398bb7eb79bd47fef6840d82e44c"
+    },
+    {
+      "path": "benchmark/autolifter/dac/atoi.f",
+      "sha256": "5e91f4c94604981109d8faafd2ac861396a4c12b2e9a08d2e5c8a4d91165208f"
+    },
+    {
+      "path": "benchmark/autolifter/dac/average.f",
+      "sha256": "36cb41bdd9385c810ce76862b0fca8d535407d3c68646dc792618e9be3b1687c"
+    },
+    {
+      "path": "benchmark/autolifter/dac/balanced.f",
+      "sha256": "2d758d8c9c211a90f809642f79f1bb6be2b6900a01bfa588a5fed3f599a8e50b"
+    },
+    {
+      "path": "benchmark/autolifter/dac/cnt1s.f",
+      "sha256": "2d3eaf284bde3be1ff8675649613c0952693e7c06a9f483e573e6103bdd427c5"
+    },
+    {
+      "path": "benchmark/autolifter/dac/count10p.f",
+      "sha256": "992c0e49ffee24ad1565ca5a3cd3546ec05bcb9b4c9214927927cc35d2ecc2bc"
+    },
+    {
+      "path": "benchmark/autolifter/dac/count10s2.f",
+      "sha256": "93f22026eee3bde971ba68a4d1fb385e722d571be06fee4ad023686a9a7fa7dc"
+    },
+    {
+      "path": "benchmark/autolifter/dac/count1s2s3s.f",
+      "sha256": "0720cda894901bae66da6c26bd98a20ae8a91bb4419af98f8f2efd657d300d3c"
+    },
+    {
+      "path": "benchmark/autolifter/dac/dropwhile.f",
+      "sha256": "40ce91a3f81a91e28f8e3dc92267da1ec4eb719e2058dc4ae53e1d8772ad583c"
+    },
+    {
+      "path": "benchmark/autolifter/dac/is_sorted.f",
+      "sha256": "79312a8df70cb6b688b3b49b19ec3c5a85cc654341690e3b1ecba0cb1af158b4"
+    },
+    {
+      "path": "benchmark/autolifter/dac/largest_peak.f",
+      "sha256": "69e84ff5b4e56f174e27d0282a886fbf05a43d5ddd3b8d13973fcc724e61b900"
+    },
+    {
+      "path": "benchmark/autolifter/dac/length.f",
+      "sha256": "31e54dfad75421d88d4ca64689179c72294e8a26d4a9d38e43330dfaec120a16"
+    },
+    {
+      "path": "benchmark/autolifter/dac/line_sight.f",
+      "sha256": "dd62e85c0b053ea428c42622f28f3910abf09add47e68a1166a824c1ebfc5c15"
+    },
+    {
+      "path": "benchmark/autolifter/dac/lis.f",
+      "sha256": "f5b7401aebe844a1c691fc4482670a62eda84894717920c807c274a42d92284d"
+    },
+    {
+      "path": "benchmark/autolifter/dac/longest00s.f",
+      "sha256": "b2983461ca5b7affc32775df2b7ef2fe7f016c150b993f3bc53182eb974fad46"
+    },
+    {
+      "path": "benchmark/autolifter/dac/longest10s2.f",
+      "sha256": "36d03a1921607084a1ec7c0c00a240a29365ecdd66d6680da2302cea5a9b1d4f"
+    },
+    {
+      "path": "benchmark/autolifter/dac/longest1s.f",
+      "sha256": "a5757c3da54baf641c0cb730d87ca47fcf44eefbc3ce73a2a52206254037145a"
+    },
+    {
+      "path": "benchmark/autolifter/dac/longest_odd10s.f",
+      "sha256": "65f66f0ca5fc5f21b2c3475acc9e7cf04f3ec1780b568403ef0401d6b0e8ebe7"
+    },
+    {
+      "path": "benchmark/autolifter/dac/max.f",
+      "sha256": "37dbc68d15a3939a8a3e08997ea58292dddb273dd13cc84915141aa8afb3643f"
+    },
+    {
+      "path": "benchmark/autolifter/dac/max_1s_p.f",
+      "sha256": "e4d8e1ec3b5191fffc0623bea011f931a694cf75bcaf21945de4fddb39fa55eb"
+    },
+    {
+      "path": "benchmark/autolifter/dac/max_dist_between_zeros.f",
+      "sha256": "09470905c6e9d16a84d4181a824f64c056a9c2de1b53238dabb147991e271d3c"
+    },
+    {
+      "path": "benchmark/autolifter/dac/max_len_1s.f",
+      "sha256": "7c6cd4e35a95f5d63d461f7c679261db063d01feac60ee10b9270c8733c57c9c"
+    },
+    {
+      "path": "benchmark/autolifter/dac/max_sum_between_ones.f",
+      "sha256": "5341ac2563b2fe49d56b7fc4ae6cf7f8c6628c46426ad165d8fb32c96f0e3d77"
+    },
+    {
+      "path": "benchmark/autolifter/dac/min.f",
+      "sha256": "10351fc50bc6f8252b0fe6b8cd7df332afccf4260c31686c9964492662a04f76"
+    },
+    {
+      "path": "benchmark/autolifter/dac/mpp.f",
+      "sha256": "755904d95dec187405a60d53892eb2fac717096162678ab994a09da0fd187b19"
+    },
+    {
+      "path": "benchmark/autolifter/dac/mps.f",
+      "sha256": "927afa46ebf63cc24eb8012faeac7935b00254ed8392997bb713481c18e36d0d"
+    },
+    {
+      "path": "benchmark/autolifter/dac/mps_p.f",
+      "sha256": "91df3da17078f8b05bda6562921bea812da6e98c60cae3a0a2379d3280423a47"
+    },
+    {
+      "path": "benchmark/autolifter/dac/msp.f",
+      "sha256": "5d37e48686fa5e4147bed94ee826187cfcec0b023e03353fb9a869d1baaa9c90"
+    },
+    {
+      "path": "benchmark/autolifter/dac/mss.f",
+      "sha256": "4f92b2e6e0b6413ccf59c3eab6673591ce25bc615eb29c75c70b728d339ca360"
+    },
+    {
+      "path": "benchmark/autolifter/dac/mtp.f",
+      "sha256": "57a5b02eb8b806ee06923497bc7fe0f2a6837fc25e9cf23dd9efc5bd123b9ac8"
+    },
+    {
+      "path": "benchmark/autolifter/dac/mts.f",
+      "sha256": "4713ef067294783844db68f80d906bcdefa066bb4126d82a8807cf35eaeaa247"
+    },
+    {
+      "path": "benchmark/autolifter/dac/mts_p.f",
+      "sha256": "19ae7b584fbe4b3c7089c2ead1ade865ef72e56ce4e006f4bc86b153d6a5d1aa"
+    },
+    {
+      "path": "benchmark/autolifter/dac/sum.f",
+      "sha256": "348e62c187273b95fe8131d8730525cae78f0270003331538eac25d40b6eb944"
+    },
+    {
+      "path": "benchmark/autolifter/lsp/page10.f",
+      "sha256": "b06213aebb846015ab492823f8404ab620b5c180de16f576d55f5cbdf30d3c04"
+    },
+    {
+      "path": "benchmark/autolifter/lsp/page12.f",
+      "sha256": "20391456b7863ee2cef274f3f157fbb9d03f7ab71bb62f43f7edef6e7162db53"
+    },
+    {
+      "path": "benchmark/autolifter/lsp/page20.f",
+      "sha256": "2221b085d1b451c16b6d9f000b6cd76daba9e1b4afdb42976ad7dccd22301499"
+    },
+    {
+      "path": "benchmark/autolifter/lsp/page21.f",
+      "sha256": "4f19e7480c11e7faa4d48e25e12222e8a7265bb132de0de1fb289da473422694"
+    },
+    {
+      "path": "benchmark/autolifter/lsp/page22-1.f",
+      "sha256": "8eeb69596df587ee3719e56e61b6561298b7500dab4a1710f32c644f4622d62f"
+    },
+    {
+      "path": "benchmark/autolifter/lsp/page22-2.f",
+      "sha256": "3a360595dc29e31139a645491f981a01a9eecb19e9643eedd595f58d55f65f37"
+    },
+    {
+      "path": "benchmark/autolifter/lsp/page9-1.f",
+      "sha256": "3193aac1a3c177c9ce33d102188319c6603aacdffa8eec5f729777cd2c52fc1c"
+    },
+    {
+      "path": "benchmark/autolifter/lsp/page9-2.f",
+      "sha256": "784f49bb3050ab21b24825844e70ff8e6f4f4326f16de88088b3671de867e844"
+    },
+    {
+      "path": "benchmark/autolifter/segment-tree/2nd-min-neg.f",
+      "sha256": "d0df8d2e83d9d88ff61e06426d4ba70bf59080b90df14c239c91d60ad9c39a65"
+    },
+    {
+      "path": "benchmark/autolifter/segment-tree/3rd-min-neg.f",
+      "sha256": "6d31ebba55b7f73e79ed8383727a4fb5a41772f1c0206aa6f9d13d6da1555923"
+    },
+    {
+      "path": "benchmark/autolifter/segment-tree/max-1s-cover.f",
+      "sha256": "0ce61270eb7b05b5d637fa12617ef473fa18af1330418e0f4b2e13c90f3fa9a9"
+    },
+    {
+      "path": "benchmark/autolifter/segment-tree/max-1s-p-cover.f",
+      "sha256": "58f96bac4237ef1573599ebe32bb7c54188cbebf8aa160ebaa8f34126ac71603"
+    },
+    {
+      "path": "benchmark/autolifter/segment-tree/min-neg.f",
+      "sha256": "e88578e5748970de5a6a9ebcdafa3468aedc0b4b0a7b8c1818013734e97bbb5f"
+    },
+    {
+      "path": "benchmark/autolifter/segment-tree/mss-cover.f",
+      "sha256": "dffb9c00381d841e45b9d56e293a765586f4c7db3a14667e9dd49e89e82d8976"
+    },
+    {
+      "path": "benchmark/autolifter/segment-tree/mss-neg.f",
+      "sha256": "f5e22f2dd2b1bb2d71afaffa5ecc3ca9f16c3d9fbf5bcacfb04243a4d2078bcd"
+    },
+    {
+      "path": "benchmark/autolifter/segment-tree/mts-cover.f",
+      "sha256": "e0228b3808ee55bf45d008e7b3051e5e2110a0386b7df7b4d9ff02b36cdcdde0"
+    },
+    {
+      "path": "benchmark/autolifter/segment-tree/mts-neg.f",
+      "sha256": "751f7532e89fb9f39edc317c8a26cb54bbbce3ff4422315cc8d11ca2ebbc3e8c"
+    },
+    {
+      "path": "benchmark/autolifter/segment-tree/sqrsum-cover.f",
+      "sha256": "ee103506f9892cda74445de43419d957e6d640f10919ad9b06f1a72f5a8a3f72"
+    },
+    {
+      "path": "benchmark/autolifter/segment-tree/sqrsum-plus.f",
+      "sha256": "da691ec24e8975ca52342393ade025b48612ca01fcf3264cdbcaddf05f772185"
+    },
+    {
+      "path": "benchmark/autolifter/segment-tree/sum-cover.f",
+      "sha256": "343f974fc7785dab4f62148a56a50477cdcac7859bcfa659e89c71e390e3d726"
+    },
+    {
+      "path": "benchmark/autolifter/segment-tree/sum-plus.f",
+      "sha256": "1d1986aed96093a724be6261c5e2580df83b33709485e4184e873f7b41681cc5"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/0after1.f",
+      "sha256": "a4ec75d7f8178136bda86c48128245a04625949008199aee5a970159986766c4"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/0s1s.f",
+      "sha256": "607271757b8c7096ec5708a606f45b233ffc72615e11df3167ef2e1cee177fec"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/2nd-min.f",
+      "sha256": "aa8b97e945189efdbe5ba313ee86532980ae9bc0ef9ca7cdf94bc490ba5c2dc1"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/3rd-min.f",
+      "sha256": "1a2455d6f19e2f6f11020333f7d347276fa36cf22c5305400d87a7a62e18d647"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/atoi.f",
+      "sha256": "e95062f92367dcd2ad12eaacd890adb39f8392c2f5dcf2228a7af94e143f21fc"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/average.f",
+      "sha256": "e81887241783b67978ab92acf026e2a662127c36492d9ebb9aab400e5260c5a3"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/balanced.f",
+      "sha256": "96b6525c8a7d90a1e3891c29aac682632bb1ccbfc56e969f1df4b2abbb7364a2"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/cnt1s.f",
+      "sha256": "210c2b94abc574d38af6691dd276c907a9c863835536829448a89ce2f6a932cf"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/count10p.f",
+      "sha256": "0dba82e19aa6e844f13a8dd961592e27371e1f5dd5bcafb00812372a86d8957a"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/count10s2.f",
+      "sha256": "dbe2d405f576f4d365f80eefcd813acdd5c65f65d065a7ad9b7234e846db3e87"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/count1s2s3s.f",
+      "sha256": "a78d3c304af083c907ab05366d9c59f9d11311c1dc3ed85fe854599f47a95fcb"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/dropwhile.f",
+      "sha256": "3735c92a2439175df9b3a7901f2f9033b31adc25eea57e5aec2399876417ad23"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/is_sorted.f",
+      "sha256": "85d4de4a9ecf5280f709e3b71fc63ffbedf67088da0b034a28a72aab8a871166"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/largest_peak.f",
+      "sha256": "829c8d895547512f717557883873ce03dab0d0ba3bb6b90fc212974f8325c845"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/length.f",
+      "sha256": "80b2183e0bea7b57bb8c722f56fa22ed3ddeb58174dc61536410d4475229c07a"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/line_sight.f",
+      "sha256": "9ad307f9c102e18738981f8302346a1d705221c88484e3d51efa8520be6f83e5"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/lis.f",
+      "sha256": "0610fc32d2b81d319f2912abab2b1c0b3afb8970b3df4acd0316414fa63d9133"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/longest00s.f",
+      "sha256": "107f4b1c75cd681abe8d1a6d8125e5ca892f2395ebd78afb9d518c0d43a1d35a"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/longest10s2.f",
+      "sha256": "3750b15dc59477dc6d40199312f3102b29fecb3816a15f490272289d1c1079ed"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/longest1s.f",
+      "sha256": "aba36b7f6c45befee0ab53ee9df1f1db1c42c780760b09e700b1bd8fcf3a3dea"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/longest_odd10s.f",
+      "sha256": "7563f8536fd0e0f3e45bbda33a480dbb35b97a0c07a42ceeb5949c3cd97a07b1"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/mas.f",
+      "sha256": "c82bb9291706c3e27dab9279cae9a48d44b27d1b9afb9e6942b92a9950617610"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/max.f",
+      "sha256": "15d55ef44b0d30ed83319df0dc83a38d34c7c5b11381cf9767ebb78d3c5c3f8d"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/max_1s_p.f",
+      "sha256": "f09e36c36c63c46d2a2c94a63d06a6138832631b051f23d1d2562ea6a7d76ed2"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/max_dist_between_zeros.f",
+      "sha256": "a3011b658311186ea70d644a2cd400d5a155ab058a882269d8dfc5386dea533f"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/max_len_1s.f",
+      "sha256": "5d702294984facbece04156bc72aae01155f3b0808dca0a6a2a68235d67a2c65"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/max_sum_between_ones.f",
+      "sha256": "4683279dc2f7a5efe0846f9171c418b19888a93651e6e5dde0453c26f715f22b"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/min.f",
+      "sha256": "43ccf211a4d8da29f97b41cadef013841039869553bba3df59174c686290c059"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/mis.f",
+      "sha256": "be6eb88f757f4b5ed4373a26471604435018f291c7b588160894f90ad273ba04"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/mmm.f",
+      "sha256": "14af8f87bee581bc982192e0e74fed1307cd71b37477b502681ffedde4d447a7"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/mpp.f",
+      "sha256": "1dc16230fa7cf20ef02f2ed79e4a7785ddcbaa3ec6b87efef60e6991c0e4899d"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/mps.f",
+      "sha256": "d4f4216dd5f0513862ba363e5b6cf72b4ed633a36ecc9f41a56f9c0c5919bced"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/mps_p.f",
+      "sha256": "20c63530a82e6f741aff643e0d3f2fc76f048f99f24b5c065691fbdeecece46a"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/msp.f",
+      "sha256": "a5a6ed8a1d7e4951b398ab4be475e88f6892dd9dfa22603bd71a66dc0fe5890f"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/mss.f",
+      "sha256": "01507fd65198219ea791691ba13f734066b8492f6ce8f84492c6519a81365f48"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/mtp.f",
+      "sha256": "b91ed91167312a8f427be1006e1f0b290b9682341521065f75f12116512acb94"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/mts.f",
+      "sha256": "563b488dbda308cc8b1bc25710dec0de081268b910f4a80a16623030f4b2c6ec"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/mts_p.f",
+      "sha256": "57ec9e2619810cd2b2139e6a2091ed29634fafdfb938859776e9471757aff263"
+    },
+    {
+      "path": "benchmark/autolifter/single-pass/sum.f",
+      "sha256": "3613f3d0c6de428c77556633e0b94b57e502a70a6897c72da54b37a91df8d7d1"
+    },
+    {
+      "path": "benchmark/fusion/algprog/ex3.13.f",
+      "sha256": "2adb96694fbfdecde7bdbc658c22ef54a3908d012f1b49e604258334e5d51c6d"
+    },
+    {
+      "path": "benchmark/fusion/algprog/ex3.14.f",
+      "sha256": "52a7c68b3467bc933862ff90494391585dfd714d737e8928273c2e5af8f600a6"
+    },
+    {
+      "path": "benchmark/fusion/algprog/page58.f",
+      "sha256": "41d2d0a92323d48da0e29e504b349245e49ad23bf8a4af371eced5f98867494d"
+    },
+    {
+      "path": "benchmark/fusion/algprog/page60.f",
+      "sha256": "cfb674e9fb821d34d7a7a1c7255affc8195e06a2629d14457cfb18020af12103"
+    },
+    {
+      "path": "benchmark/fusion/algprog/page62.f",
+      "sha256": "3c6372a0472f09512139963ded30f63c82f16b0ac97a87aec557eed61c0e8afa"
+    },
+    {
+      "path": "benchmark/fusion/deforestation/page7-1.f",
+      "sha256": "bf54ab6496635183d58d916638bb35e272be2e81febbee1f5af6f80a904f1832"
+    },
+    {
+      "path": "benchmark/fusion/deforestation/page7-2.f",
+      "sha256": "8fae77f9ffd3a31585babc9e7a7ec544fe22458ce160849f364a93686e46ff73"
+    },
+    {
+      "path": "benchmark/fusion/identities/page3.f",
+      "sha256": "f7e50c5b1a8db44c1fb603e639fc3d354ac53129c9e85935aaac6a26a9b34cef"
+    },
+    {
+      "path": "benchmark/fusion/identities/page5.f",
+      "sha256": "2db48bc83dc740644bfeab0b09892c56622004c3cf91b4be7a74bacd98217999"
+    },
+    {
+      "path": "benchmark/fusion/identities/page6.f",
+      "sha256": "b55f8b3a37c6b7559b543886aa78912094c94409b6c2fee73dca079909501782"
+    },
+    {
+      "path": "benchmark/fusion/shortcut/page1.f",
+      "sha256": "aa26990932636fd3f1bd658c760eabca3a49493820e9781436971f706ab125e2"
+    },
+    {
+      "path": "benchmark/fusion/shortcut/page3.f",
+      "sha256": "b956e3b1efeed26199516dbc5007e9fbe2061d62e8e4dd8823865cefd3086504"
+    },
+    {
+      "path": "benchmark/fusion/shortcut/page7.f",
+      "sha256": "ae915c35e995f57c82385e0009f74638f85baaa501f663de5f31606b1157b0ea"
+    },
+    {
+      "path": "benchmark/fusion/shortcut/page8.f",
+      "sha256": "38b2f3119e57c26dca47342a4dc042c79488a6769204970fc052f95ddd746763"
+    },
+    {
+      "path": "benchmark/fusion/tupling/page1.f",
+      "sha256": "5119edba967c1af4e92903642918f323dcb7a551b9d7f4e5a95956d3b40fc22e"
+    },
+    {
+      "path": "benchmark/fusion/tupling/page8.f",
+      "sha256": "771ec070da024cff69f2c10af1dc375842ccd56739de97ad6be7552888e0d134"
+    },
+    {
+      "path": "benchmark/synduce/combine/mss_with_sum.f",
+      "sha256": "0d5a5cd3bec2adb020267d6fa4c764faf5019d4b0c6300069c72b976b8bc4d99"
+    },
+    {
+      "path": "benchmark/synduce/combine/mts.f",
+      "sha256": "bdb0ad48145aa14da8e375ed147ed23d14685c8ac43905a66f023c01dbbcfff0"
+    },
+    {
+      "path": "benchmark/synduce/combine/mts_and_mps.f",
+      "sha256": "d096a75721ce6d3155e70dc36e3c2dd71a78dd93524c1a0d25f9a21c2202f548"
+    },
+    {
+      "path": "benchmark/synduce/compressed_list/sum.f",
+      "sha256": "3793836508dde84950ebb41cd54261be961b12ee874b3edeb0ee7be4940443f4"
+    },
+    {
+      "path": "benchmark/synduce/constraints/alist/count_eq.f",
+      "sha256": "593423e14422e6b433734ba0a176a00f70e53abb700661763fab20c5fd1fbebb"
+    },
+    {
+      "path": "benchmark/synduce/constraints/alist/count_eq2.f",
+      "sha256": "262b80e95a4f4545b54265ac777f2ff3130c64ae913cc321b7ac3d1d03b8ef7e"
+    },
+    {
+      "path": "benchmark/synduce/constraints/alist/most_frequent.f",
+      "sha256": "a9bddc8536ddab3b793a5e87f53dec5e15f757876d23b0a9c93d45c6767b52d6"
+    },
+    {
+      "path": "benchmark/synduce/constraints/alist/most_frequent_v2.f",
+      "sha256": "a9bddc8536ddab3b793a5e87f53dec5e15f757876d23b0a9c93d45c6767b52d6"
+    },
+    {
+      "path": "benchmark/synduce/constraints/alist/sums.f",
+      "sha256": "870168d5685d2ce5a48242b931dcb40ec15980bb07720464448f3cf308e00f3e"
+    },
+    {
+      "path": "benchmark/synduce/constraints/all_positive/list_mps.f",
+      "sha256": "fc1390a5921b5b1bc045d2da242830ba9715e009410982d2bffedaae5c168ff8"
+    },
+    {
+      "path": "benchmark/synduce/constraints/all_positive/sndmax.f",
+      "sha256": "7d9273ea19c48cfb19b3552544dff97245cee66c150467c214aac331529dd7ba"
+    },
+    {
+      "path": "benchmark/synduce/constraints/all_positive/sndmin.f",
+      "sha256": "b9a2067e516c05401abf073d6190078096a9cb30e9ef6ef20b5b4e699b98e5d8"
+    },
+    {
+      "path": "benchmark/synduce/constraints/balanced_tree/height.f",
+      "sha256": "b3c536fa0f3e0692722a5bafaeb2cca714bec2fe2497f34916eba6f2143ff77e"
+    },
+    {
+      "path": "benchmark/synduce/constraints/balanced_tree/height_v2.f",
+      "sha256": "aeaa82fa602920cf1969b26b9e2e98b2aab00e32ed7ebaa5697228521a20aecf"
+    },
+    {
+      "path": "benchmark/synduce/constraints/balanced_tree/node_count.f",
+      "sha256": "f13c51639b5910045522fdab27b71a55bcdae2cfca4f7916e6f1e46c76b0cfd0"
+    },
+    {
+      "path": "benchmark/synduce/constraints/bst/check_included_comb.f",
+      "sha256": "2a3d8b23c7770f282f4d2f691a8fe22d5f6d85d761f56fb52092b1ba4fe84882"
+    },
+    {
+      "path": "benchmark/synduce/constraints/bst/check_mem_included.f",
+      "sha256": "ffdfe2a41d9b8ab6d06571c14a37e132cd38cf2e15b14d5e4892e9b1d4667f22"
+    },
+    {
+      "path": "benchmark/synduce/constraints/bst/check_no_subtree_sum_gt2.f",
+      "sha256": "92502e2bfb41a91514ebd267a49af6ba8a74b4b3ab698980a3f5259d2e7ecf65"
+    },
+    {
+      "path": "benchmark/synduce/constraints/bst/contains.f",
+      "sha256": "96ab62c6b364cb6224fceafc8cc88c60afe8696440f3a139967f9f28890b59e2"
+    },
+    {
+      "path": "benchmark/synduce/constraints/bst/contains_bool_2.f",
+      "sha256": "4eb51b94ab5fbb0f6bbd9b93f10ab496ff92fa43f3ee9f0976588f2a78d4db71"
+    },
+    {
+      "path": "benchmark/synduce/constraints/bst/contains_no_ensure.f",
+      "sha256": "96ab62c6b364cb6224fceafc8cc88c60afe8696440f3a139967f9f28890b59e2"
+    },
+    {
+      "path": "benchmark/synduce/constraints/bst/contains_v2.f",
+      "sha256": "8d2efbc4333c1bbe90eaa1b6b01b48af3a99df21c4ec53c38c4650736cd1c53c"
+    },
+    {
+      "path": "benchmark/synduce/constraints/bst/contains_v3.f",
+      "sha256": "ef405b6f852f3595ff3a68dc553abcba777da82b64c129cc12559d7b0f7aa545"
+    },
+    {
+      "path": "benchmark/synduce/constraints/bst/count_between.f",
+      "sha256": "20db5cd1a5f15f24ce2336d27ecf8bd09d4550c4d3a0818a8ca7c78bc2728522"
+    },
+    {
+      "path": "benchmark/synduce/constraints/bst/count_lt.f",
+      "sha256": "864625951bd2020de7678e3a5fb4da14cd9f37ca641c321e2983eafe38b4982b"
+    },
+    {
+      "path": "benchmark/synduce/constraints/bst/from_list_contains.f",
+      "sha256": "c79bb489307310289a94e727c7d9694bdfbe4bb5ce30a5f40bf614d049028421"
+    },
+    {
+      "path": "benchmark/synduce/constraints/bst/from_list_max.f",
+      "sha256": "138862caeb9c938ac43ed7b23deb80cfdc1972326d7f89b7f5ad2744da6c27f9"
+    },
+    {
+      "path": "benchmark/synduce/constraints/bst/minimax_separate.f",
+      "sha256": "ef62c9855084fedbdc4376d458361b0181b5849513a26c8a97bc966c999eb955"
+    },
+    {
+      "path": "benchmark/synduce/constraints/bst/minimax_sim.f",
+      "sha256": "3e14f4ad5e84eba83a2b26768bc410dcca688e868f185bb3ec618d8097e2f96d"
+    },
+    {
+      "path": "benchmark/synduce/constraints/bst/most_frequent_v1.f",
+      "sha256": "3d279965cdf40b6165b5d1be81de3cfea0df3c06361bc5560136054ce7eebc07"
+    },
+    {
+      "path": "benchmark/synduce/constraints/bst/sum_between.f",
+      "sha256": "f9a2c2d9d8f4131786671745eff9a40b183245ae3cb76cac74eb6a706a8426f6"
+    },
+    {
+      "path": "benchmark/synduce/constraints/bst/sum_gt_by_key.f",
+      "sha256": "66eebd6c1ab10b477bb2ef1bd42d40fd2750f628a9f6974047172a7116de87c9"
+    },
+    {
+      "path": "benchmark/synduce/constraints/constantlist/contains.f",
+      "sha256": "6ece822dfbb2e20abd979e00723396c08449cfce5e6531b1a420bd32cc44e78e"
+    },
+    {
+      "path": "benchmark/synduce/constraints/constantlist/index_of.f",
+      "sha256": "59f41a26609dcb2efd9fa3381606a6168493c19d965f9dfa758cf979d8b38d38"
+    },
+    {
+      "path": "benchmark/synduce/constraints/empty_right_subtree/contains.f",
+      "sha256": "8594a5dcb2d75a9d59195c2399b82942bab7486467342bdbb46f073df61f0684"
+    },
+    {
+      "path": "benchmark/synduce/constraints/empty_right_subtree/sum.f",
+      "sha256": "e1c5ed69e12d9ca993b7b8f29878cbbec05dd003e78b2781310a832a5455975a"
+    },
+    {
+      "path": "benchmark/synduce/constraints/ensures/bal_2.f",
+      "sha256": "7c9f29fcf4054b8e13235d2e470192e717630eb266f703783b20326ebdc75de5"
+    },
+    {
+      "path": "benchmark/synduce/constraints/ensures/maxsegstrip_full_noe.f",
+      "sha256": "58699a84eddc131131c66e870b0858360ac116126570238f9fae186e38e21b9b"
+    },
+    {
+      "path": "benchmark/synduce/constraints/ensures/maxsegstrip_noe.f",
+      "sha256": "02822c7d80d321aea1a698535747ca16ed6d1f9eefea516fc8dfec2e95c5620f"
+    },
+    {
+      "path": "benchmark/synduce/constraints/ensures/mps_no_ensures.f",
+      "sha256": "9c2c12a393754a44fb6ef40c82648dc098d02182c54a3435c8cdee242b98fb6d"
+    },
+    {
+      "path": "benchmark/synduce/constraints/ensures/mpss_full_noe.f",
+      "sha256": "aeb2d05c40d3f7d5e9f3996a0ae1f2277203e6312b4efb0d1349373c48353a31"
+    },
+    {
+      "path": "benchmark/synduce/constraints/ensures/mpss_noe.f",
+      "sha256": "6e1ae241a1ab37de307d7cff7d4fdaa01be72a95c50c57072260370001a2599c"
+    },
+    {
+      "path": "benchmark/synduce/constraints/ensures/mss_no_ensures.f",
+      "sha256": "ef1c2f3cbdc42f9a6a446f44399fb714e75d51c6886d7f169a2935b2cc28ebe1"
+    },
+    {
+      "path": "benchmark/synduce/constraints/ensures/mts_no_ensures.f",
+      "sha256": "8fb9de6a70798a60db05180c7cf5d8ad23d18acad27807afe83beeaa309212ac"
+    },
+    {
+      "path": "benchmark/synduce/constraints/ensures/mtss_full_noe.f",
+      "sha256": "ada11254bfbac19f3a61377425eb7c037401a8c5f3ce80cdaa56621c37246380"
+    },
+    {
+      "path": "benchmark/synduce/constraints/ensures/mtss_noe.f",
+      "sha256": "7c145b11a75347bfbacf77d8ce87f094e1a02eb59adc998ec486125a939f17d4"
+    },
+    {
+      "path": "benchmark/synduce/constraints/ensures/nested_minmax_noe.f",
+      "sha256": "5aa77a77444c4621e92af85b8b92d62951bf2cde86159f452ca97fa0ce4cd88e"
+    },
+    {
+      "path": "benchmark/synduce/constraints/even_tree/parity_of_max.f",
+      "sha256": "ab65a448641230410b5e5a467ad6667803bf28cf699f8787aca929100603b89b"
+    },
+    {
+      "path": "benchmark/synduce/constraints/even_tree/sum_of_parities.f",
+      "sha256": "10f50ea73d88c32da31d498ee92b9308257f9288efd814e7f800873fabebe029"
+    },
+    {
+      "path": "benchmark/synduce/constraints/evenlist/first_odd.f",
+      "sha256": "b48ce6a95c4ce37f51819bdfdfa3ec37231db4ee4a0c52256b0ffad252a792d0"
+    },
+    {
+      "path": "benchmark/synduce/constraints/evenlist/parity_of_first.f",
+      "sha256": "3941c7299b324bca8266fb0d1a0e259200e435f9ec35143ce25c494d928d8551"
+    },
+    {
+      "path": "benchmark/synduce/constraints/evenlist/parity_of_last.f",
+      "sha256": "cade770044a904400cf183323f4df1ed97e5e855cc56d32f4eab2848be50dd49"
+    },
+    {
+      "path": "benchmark/synduce/constraints/evenlist/parity_of_sum.f",
+      "sha256": "6d2ba6e96ead0e17972ff1ddd4aa7912080120eedcc934dc51893cf3e707dbac"
+    },
+    {
+      "path": "benchmark/synduce/constraints/memo/constant.f",
+      "sha256": "918205ede20029df531f0b7fcbc0b9410c4b872f37f8c1cb67d5de1c06451c9d"
+    },
+    {
+      "path": "benchmark/synduce/constraints/memo/count_lt.f",
+      "sha256": "487fc821bac2b6cf96483f7800deea228b8498efde15bf86765631fcfffa38b9"
+    },
+    {
+      "path": "benchmark/synduce/constraints/memo/max_contains.f",
+      "sha256": "2265fa527085bb320c50b2fc1336841f73abc144e70ccfae9eb54b0ee5be7b3b"
+    },
+    {
+      "path": "benchmark/synduce/constraints/memo/max_sum_gt.f",
+      "sha256": "31af5cac0ebc3c5aff39eacc034c865f176b493b6b7b13e6f1492ce1b4e50bc4"
+    },
+    {
+      "path": "benchmark/synduce/constraints/memo/minmax.f",
+      "sha256": "864bb147c2926b8f3855ed74dc8e6e70b455b9cdaa160e64544c6b59cf21dc71"
+    },
+    {
+      "path": "benchmark/synduce/constraints/memo/mts_memo_sum.f",
+      "sha256": "ee514854c50c033cdd72eee5bdda41f2f287a91412de9c82dd67ef7516fcedc5"
+    },
+    {
+      "path": "benchmark/synduce/constraints/memo/proper_indexation_sum_lt_pos.f",
+      "sha256": "0a951162827192098906197ad03928556c121a3166a6f4ddac277cae0d4ee292"
+    },
+    {
+      "path": "benchmark/synduce/constraints/memo/proper_indexation_sum_lt_pos_v2.f",
+      "sha256": "51d20d050a23a529801718aa9a2ea939283f2cb52dac6421722f75af5d6ebfaf"
+    },
+    {
+      "path": "benchmark/synduce/constraints/memo/tree_size.f",
+      "sha256": "1f9248ed47c736d538f23b8bdc78e3c44e4f16c99a7bb1d1dfa037ef7bc332b6"
+    },
+    {
+      "path": "benchmark/synduce/constraints/program/memo_psum.f",
+      "sha256": "68c21a4525875d7cdf73ee3bc787f9a618338b512fce1db3a11bfc84992e32c1"
+    },
+    {
+      "path": "benchmark/synduce/constraints/size/obfuscated_length.f",
+      "sha256": "79fcd6eb085031c34446f74408ff6b7f3d1a4b618b4405ded19e913cdbd95189"
+    },
+    {
+      "path": "benchmark/synduce/constraints/size/obfuscated_length_3.f",
+      "sha256": "9c739c7ffd46e37d8b585b88bd78943f1e5c5d2c163a74778f841b08165bdead"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sorted_and_indexed/count_lt.f",
+      "sha256": "d5e09c590a189bf08a44a775b7099df11dff8964838a20ab7f444638b416ae26"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sorted_and_indexed/count_lt0.f",
+      "sha256": "e91106d62f714e6046873b6499eeb9bc6fd840de034664e483824e7576e37348"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/count_lt.f",
+      "sha256": "daec34086ccfdb8c01e156fcc13f8d0ecbcdddbe6e0b49182d7059d41d9bbf54"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/exists_equal_elements.f",
+      "sha256": "2d50d62f61ec7d2d38858ab3b547bccc2f13b36a71d370b4e25e808178a67ffb"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/exists_equal_elements_v2.f",
+      "sha256": "64884479c1f52f5ad3a76f9e32dde1988884bf5993f367405162b504172fc1f8"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/failing_slspplus.f",
+      "sha256": "ae1e95e4f00d6806158d3a8953a3473e9317bed836b78fc5d41dba88f927f37d"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/index_of.f",
+      "sha256": "4616658fd1ae6deb69b5dfcb5c5bcd46638a0d38475b02dcf06275607749f684"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/interval_intersection.f",
+      "sha256": "0a3b54145b3cf4bfb045c69bf26e203d814e4026901e2ddfbec5b6e5854f2205"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/is_intersection_empty.f",
+      "sha256": "385e675ea9e1cee5f0f98c9397efd4ee6ea0627f4f0961db37f45e6c144b6ea4"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/largest_diff.f",
+      "sha256": "3bbfe8b9a84f9e4a8402572e2888d93a266b4a123cdd85b062285b0a190a5fed"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/largest_diff_poslist.f",
+      "sha256": "bea358c6134c829c40136be1e73ed26fbdc6ce84d8ebb879cb52d769583d9d8c"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/largest_even.f",
+      "sha256": "801a54ae805bc9c108d970b77df55cdcfafd229c91a7d96a8a15fb76af6facfd"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/largest_even_pos.f",
+      "sha256": "3f1c8dfbc0fec11f4f05f9a074df87bd6525fa31757c2866feaefa352e90e2f6"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/largest_even_pos_v2.f",
+      "sha256": "971ddad5bb43a10e72c4f45014fa6194a93545ffa63fff6e7c77fb2cf3c81315"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/max.f",
+      "sha256": "7ec44519fdc442ceeb017d42ecb37213f2af332163e95cdadbbefc1124887bb3"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/max_point_sum.f",
+      "sha256": "914dccb13cf9918d6c543759e9821995ee1df7cf9f5ee05bef649bd6f87f1c9a"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/min.f",
+      "sha256": "1dbac907352fc2cd680d060d0324aa894a113ab3079aa68560f0cbb0811ec719"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/mss.f",
+      "sha256": "9ed63d766a879e2b4e3f11c1739d398c381d0975a7162290d09192d3dc244ca9"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/nestedl_pyramid.f",
+      "sha256": "57c2987a865110da4bbc1cc8039f0be95c5bb29cf667606f76b37ab945db0199"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/parallel_max.f",
+      "sha256": "ab11b98c28ef70b81d3d0185f0b3eab46976f9bd661887f246dbf2be51718456"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/parallel_max2.f",
+      "sha256": "e8226a21bd2c25219d2cb58bc9ae29d4090440fc1521f70482f1fd71dcdef5e3"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/parallel_min.f",
+      "sha256": "29624d9c4bf2dc43deed78d5195cafdd39e9e1815eadf7543240ab64e715ed46"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/slsp.f",
+      "sha256": "a934ef125ac685373affad5f3e1cc9dc40471255699a3dc91cf9002ef00fa272"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/smallest_diff.f",
+      "sha256": "1f55f08f65d7f3f668896f2ab4b636625be2b1c1397fe088628ecadabd044691"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/sndmax_empty_base_case.f",
+      "sha256": "7bfad9bb0ec83345756e07681487300dc6c72843a98d6b8fbfaacabd5c614609"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/sndmax_len2_base_case.f",
+      "sha256": "6f5357f59a60f91b73689bef6872cf9adf0456cd13e08e0895eb9b2f506aab94"
+    },
+    {
+      "path": "benchmark/synduce/constraints/sortedlist/sndmind.f",
+      "sha256": "8ec78171e7d174cd9aa392adbe8f24d1593b5359a5ba562da14abd37703722a7"
+    },
+    {
+      "path": "benchmark/synduce/constraints/symmetric_tree/height.f",
+      "sha256": "187761ceb19c100569da9fe821b04d03d13a93c0a5390de294bd970902b5168d"
+    },
+    {
+      "path": "benchmark/synduce/constraints/symmetric_tree/min.f",
+      "sha256": "3709e415f858690b3189f607c069d626db4d8bc32b852717391c8180b85317e0"
+    },
+    {
+      "path": "benchmark/synduce/constraints/symmetric_tree/sum.f",
+      "sha256": "9835bde0bb9178f31b621dec2f663b2a135fd35bfaa72e61db629c3657a98f21"
+    },
+    {
+      "path": "benchmark/synduce/constraints/unimodal_lists/max_in_um_pos.f",
+      "sha256": "df2fa75245b2511fd620bf71321c78421d85d93ab88dcc2e692421a3fbdefba4"
+    },
+    {
+      "path": "benchmark/synduce/constraints/unimodal_lists/max_logn.f",
+      "sha256": "772fb8ff1fce17e2e621b7b681f86928ddbac0c2f3d2ccf01a62718626a4e9ff"
+    },
+    {
+      "path": "benchmark/synduce/constraints/unimodal_lists/max_logn_v2.f",
+      "sha256": "b2d19e9108f9f59d8d18e2ccf1f6ca00207398e9f29a5c2a3324851e615e2d26"
+    },
+    {
+      "path": "benchmark/synduce/expressions/max_subexpr_sum.f",
+      "sha256": "c915079edf5576b0e3ecdeaf6ecc134a823ec013740157433ca51e315b2fad8a"
+    },
+    {
+      "path": "benchmark/synduce/expressions/norm_arith.f",
+      "sha256": "c01acc46930273a0bc5bdaaa0203eed696c80b6727d41c89eecc906d992f9493"
+    },
+    {
+      "path": "benchmark/synduce/indexed_list/position_polynomial.f",
+      "sha256": "7c0805ed70403570a8cccbb76f9acca024dc946c843bb6c4a4f6dbef657578fc"
+    },
+    {
+      "path": "benchmark/synduce/indexed_list/search.f",
+      "sha256": "a585437583eb521ce8aaac998a2356e84b6cd92c109ea451ac905e83017065e8"
+    },
+    {
+      "path": "benchmark/synduce/indexed_list/sum_elts_lt_pos.f",
+      "sha256": "343f4ccbfd03e94902ffaa579f56ba9e43e26284014b246f7d0cdbbd06905472"
+    },
+    {
+      "path": "benchmark/synduce/list/alist_sum.f",
+      "sha256": "6c9f987547ff9283e58d7a03235a380a9962ed55ed40244b05be4fad60e29f75"
+    },
+    {
+      "path": "benchmark/synduce/list/atoi.f",
+      "sha256": "6347440be864d470967faa60c5c4bb5f823112839e83400038296354a18c54e2"
+    },
+    {
+      "path": "benchmark/synduce/list/bal.f",
+      "sha256": "a0678be040ca00f4a7eba99a904071c09d3234b8ed74f658c1ca8390708b5073"
+    },
+    {
+      "path": "benchmark/synduce/list/hamming.f",
+      "sha256": "7dc5ddeb78ac24534722384391653c9352f40f3dfaccedca2c0400d5029da059"
+    },
+    {
+      "path": "benchmark/synduce/list/issorted.f",
+      "sha256": "d4831e9a4d0a68f50bd566f44e635bc4c432a1fe700e1215d0bb85b6a310de91"
+    },
+    {
+      "path": "benchmark/synduce/list/last.f",
+      "sha256": "8ea068abc6f79e4f2acb5a6dfc2b7871b913298be10f3562e60c59f88fe53125"
+    },
+    {
+      "path": "benchmark/synduce/list/lenhom.f",
+      "sha256": "13cb3c4682568777811f6ed6f3b25f75d57aada8f71bfbbc7da25dee7399e3ea"
+    },
+    {
+      "path": "benchmark/synduce/list/line_of_sight.f",
+      "sha256": "1a653fb99d398521a697379aa6ab2e923eb60ba09a31da457874301f9de2765d"
+    },
+    {
+      "path": "benchmark/synduce/list/maxcount.f",
+      "sha256": "45c9dcfaf598196ce2006e1b77c6f839ff7b328f4e74374855f657cedfa2b088"
+    },
+    {
+      "path": "benchmark/synduce/list/maxhom.f",
+      "sha256": "3c01a7f2d971917cc14b464eef9d2d07e4eecc818707b765d7d8c4d41ee0fa81"
+    },
+    {
+      "path": "benchmark/synduce/list/mincount.f",
+      "sha256": "88ef91f2e9a4d1f831b6b7110502b60acf1accdcb6c771c70fac1f74b2542ef0"
+    },
+    {
+      "path": "benchmark/synduce/list/minhom.f",
+      "sha256": "ebd264dee43374543f1c0ef30e501508e13a59a8aefa2d9fe50e9676bf882d86"
+    },
+    {
+      "path": "benchmark/synduce/list/mpshom.f",
+      "sha256": "c26ad8493b1a5dc2336acb1538c698994e318cc8d4af7efe0688ad74e0a79ca7"
+    },
+    {
+      "path": "benchmark/synduce/list/msshom.f",
+      "sha256": "f87276baa9e5ac142a9336491081d54c4a6b78720700d30b006e1fade75f8731"
+    },
+    {
+      "path": "benchmark/synduce/list/mts_and_mps_hom.f",
+      "sha256": "35e2b6b1b867b245f1f1ee67fb7bc7d3430cdd95473ae24929cf748e642f0a6f"
+    },
+    {
+      "path": "benchmark/synduce/list/mtshom.f",
+      "sha256": "8fb9de6a70798a60db05180c7cf5d8ad23d18acad27807afe83beeaa309212ac"
+    },
+    {
+      "path": "benchmark/synduce/list/polyhom.f",
+      "sha256": "b8fd0c8751c09189609ddf7ae448ea5aae905e841691c7583be4ced251c16b12"
+    },
+    {
+      "path": "benchmark/synduce/list/prodhom.f",
+      "sha256": "73ecd00695de68db8b9729ad19d4f265ad4b3f3f9da379a12d5ce39df13f2945"
+    },
+    {
+      "path": "benchmark/synduce/list/search.f",
+      "sha256": "a18b92c0df37b16f9262b562255bf6127bb74c9c73f647a9b46158f9770586a6"
+    },
+    {
+      "path": "benchmark/synduce/list/slsp.f",
+      "sha256": "e17c4e9d43efb7deffd27c96b074d91a4e2d4133e989a405a5880b2f1f903a4a"
+    },
+    {
+      "path": "benchmark/synduce/list/sndmax.f",
+      "sha256": "332f1a55c184c89d46e3cf8be016a18b4b82ccfae1980d9c951a09b0e0bb59eb"
+    },
+    {
+      "path": "benchmark/synduce/list/sndmin.f",
+      "sha256": "3e7ff98a1cb1cf6f85211067e8df875e2909b58049b8b6ce8918db581561ccc5"
+    },
+    {
+      "path": "benchmark/synduce/list/sumevens.f",
+      "sha256": "8d43547549efdebcda9dd335a2f6a784f0413258e64b0c9a8ab6f1a9c71d1117"
+    },
+    {
+      "path": "benchmark/synduce/list/sumgt.f",
+      "sha256": "b37a05bb2d9648a18871e99ad8b1e65cb560e127fc92ff0ccc57d4e7e0c2bc9d"
+    },
+    {
+      "path": "benchmark/synduce/list/sumhom.f",
+      "sha256": "599311f1737a6790034ea0331f2abe3146384da536f8a50b42f5e1b7126ae149"
+    },
+    {
+      "path": "benchmark/synduce/list/sumodds.f",
+      "sha256": "91feb8f78cde3062a7ea912578787f7dab8b7ba292e5ae33ae9e206dc4e23a71"
+    },
+    {
+      "path": "benchmark/synduce/list/zero_after_one.f",
+      "sha256": "05ef62bc139b2651e819c0b5d85a83127abde94f06d6191a2ef2ef28d461d2cb"
+    },
+    {
+      "path": "benchmark/synduce/list/zeros_ones.f",
+      "sha256": "3ab6945717625eb44ddde3faf44a833935951fb97afd62eeb4a38b3e26903faf"
+    },
+    {
+      "path": "benchmark/synduce/list_to_tree/mls.f",
+      "sha256": "a01a3492d19e0770041388daebd723737436ff5fd7794c738b4ecb8bec25fa13"
+    },
+    {
+      "path": "benchmark/synduce/list_to_tree/search.f",
+      "sha256": "6f924940c6e2e233d72b7144c1ebadce03774dd5c92626900251af6d34d1c88d"
+    },
+    {
+      "path": "benchmark/synduce/list_to_tree/search_v2.f",
+      "sha256": "92c81447068ae9c187c000ec6798a8d66fdbd20c94b695b5a9c9750dc09fbe22"
+    },
+    {
+      "path": "benchmark/synduce/list_to_tree/search_v3.f",
+      "sha256": "478c487ae8a754f50bb97d83dedd15b1776f8895d9db39dfee80f67bd9d2fde8"
+    },
+    {
+      "path": "benchmark/synduce/misc/composed_unkwns.f",
+      "sha256": "a83bce9d0e5751a86ec608e2aa05f21fbc45e76fc56276547728943ab6dc6d5c"
+    },
+    {
+      "path": "benchmark/synduce/misc/count_between.f",
+      "sha256": "d8b540a3a6706c2045ba953eb338531e8f9cac976779d361df086fc72e5bd10c"
+    },
+    {
+      "path": "benchmark/synduce/misc/simple_nnf.f",
+      "sha256": "ca43f242882621b42c96d214ebfa0d502c3aa99623f819073a4169e110c8bff0"
+    },
+    {
+      "path": "benchmark/synduce/misc/unknowns_are_ids.f",
+      "sha256": "7a948f6d4dc89935397ee9746b33e488648542f0399c4170b1275beb0e932758"
+    },
+    {
+      "path": "benchmark/synduce/nested_list/mtss.f",
+      "sha256": "7c145b11a75347bfbacf77d8ce87f094e1a02eb59adc998ec486125a939f17d4"
+    },
+    {
+      "path": "benchmark/synduce/nested_list/pyramid_intervals.f",
+      "sha256": "0bccaf29d1b50eb1f94aeccc8291e4db72229d03e7607bc5e6a0b1a0eb450d22"
+    },
+    {
+      "path": "benchmark/synduce/numbers/int_nat_toint.f",
+      "sha256": "4daf1187835b87734064b2b253dc7deb01ce96237ca0d2222442e5917a39063d"
+    },
+    {
+      "path": "benchmark/synduce/numbers/int_nat_twosum.f",
+      "sha256": "a762bb959b4e6f85ae3435371d301e875ba70d7a6103be5af58f4613f7d00a16"
+    },
+    {
+      "path": "benchmark/synduce/ptree/maxheads.f",
+      "sha256": "23c9754fb51240f7a5f06427487c81967e3300fd410c2eadcbc1a51aca265109"
+    },
+    {
+      "path": "benchmark/synduce/ptree/maxlast.f",
+      "sha256": "adc1fca7436f82b36235024ce66b1add78a69fa3f3d8d05584c3bd69fc08bed1"
+    },
+    {
+      "path": "benchmark/synduce/ptree/maxsum.f",
+      "sha256": "054c31e806bba105fc2521284aa6196d2b7c4a795553ad77d4125e794ad44f47"
+    },
+    {
+      "path": "benchmark/synduce/ptree/mul.f",
+      "sha256": "d5b16ebbb72d01f8cf31f0e3378c30d8e80d8b225069887488d5c9cbbdff0a68"
+    },
+    {
+      "path": "benchmark/synduce/ptree/sum.f",
+      "sha256": "275e2a22170d6baf2a56ee8a6f561f40a07071a5109d7e5ff66f7f59c225e4df"
+    },
+    {
+      "path": "benchmark/synduce/sorted_list/max.f",
+      "sha256": "85d02d527491c15f5812017be7ddce4a53a7bb5f864252794560472356bd522a"
+    },
+    {
+      "path": "benchmark/synduce/sorted_list/min.f",
+      "sha256": "6221e288de57cfac88171d22f1370c925f4814d15d3dc3c7f361681ff7e2602a"
+    },
+    {
+      "path": "benchmark/synduce/sorted_list/sumgtz.f",
+      "sha256": "e88e3c695b88888bf411c4c870c79d17924ee6f51119ca5eb31112560d94747f"
+    },
+    {
+      "path": "benchmark/synduce/tailopt/mps.f",
+      "sha256": "25d1764e17e3e086a605fb067dd7f353bc612b6909f6d9cc01da119afac0c370"
+    },
+    {
+      "path": "benchmark/synduce/tailopt/mts.f",
+      "sha256": "8732075879c6f5c8582015ab17da5824b026bb0be7692cf8df26e00543ffc2be"
+    },
+    {
+      "path": "benchmark/synduce/tailopt/sum.f",
+      "sha256": "9354b5f8aaaa49f48ed7cea31065ab0ee16c8ab38d25bdaca8bfab522f4c0464"
+    },
+    {
+      "path": "benchmark/synduce/terms/height.f",
+      "sha256": "f8dc9312c77ecada0e8286a0caed33be0d64a9c6c7482709e3731a4593dd29f6"
+    },
+    {
+      "path": "benchmark/synduce/tree/maxPathWeight.f",
+      "sha256": "5e7b781a6ea8aec8326e4dde05c02026eb6b57b993be8bb9efd8fd5ec04a2963"
+    },
+    {
+      "path": "benchmark/synduce/tree/maxtree.f",
+      "sha256": "7f205063eed2efffeb1fa4cd99ee0d98a660ece0a5698cccd6ec9456d1d45e47"
+    },
+    {
+      "path": "benchmark/synduce/tree/maxtree2.f",
+      "sha256": "f4aa29484cea9f716c12d1d3facde58217f36ed62ade6839615bf33945e4ca2a"
+    },
+    {
+      "path": "benchmark/synduce/tree/min.f",
+      "sha256": "7f205063eed2efffeb1fa4cd99ee0d98a660ece0a5698cccd6ec9456d1d45e47"
+    },
+    {
+      "path": "benchmark/synduce/tree/minmax.f",
+      "sha256": "f7224a68d7dec1ec81e8e7e84a0ad2fa6f5377cf3e455e978e53984778c02333"
+    },
+    {
+      "path": "benchmark/synduce/tree/mips.f",
+      "sha256": "2e1fb8ecd27c72fcdd90d232db3e231431259ffd693693ad8c0c9c5df97a43fd"
+    },
+    {
+      "path": "benchmark/synduce/tree/mits.f",
+      "sha256": "53f14ae53fbb7ecf3dae56658025544cc1095c973030ac3f7f4210db638512f8"
+    },
+    {
+      "path": "benchmark/synduce/tree/mpps.f",
+      "sha256": "6ffe7371f30acd74d1efa7622129ddfdeefd516712e074fb46c749966a456571"
+    },
+    {
+      "path": "benchmark/synduce/tree/poly.f",
+      "sha256": "340870d51f8d62bd51d4e7e88094a4a1407a282bbab29a45f6338a470f2bda94"
+    },
+    {
+      "path": "benchmark/synduce/tree/poly2.f",
+      "sha256": "84e932d615fbc70e8ea7bf1046da13159e79db215866a8df51a63086ca656405"
+    },
+    {
+      "path": "benchmark/synduce/tree/sorted.f",
+      "sha256": "6512b1e8f2c2122c062e794fe0c8e882526e2466a5f406c4a3c624cf19e1a20f"
+    },
+    {
+      "path": "benchmark/synduce/tree/sorted_2.f",
+      "sha256": "f4bea39641154b5fb7056cedc45e41638cb93f7ffcf50e3763a1032cba03eede"
+    },
+    {
+      "path": "benchmark/synduce/tree/sumtree.f",
+      "sha256": "bb6c3ce559014a4a71f533c26d6214c9d41ed2993d63b651986b038a52efd52c"
+    },
+    {
+      "path": "benchmark/synduce/treepaths/height.f",
+      "sha256": "7ec077587c0ba4884438c75452b59a28e77c9cd54da522d0c3788edab4d22130"
+    },
+    {
+      "path": "benchmark/synduce/treepaths/leftmostodd.f",
+      "sha256": "1d5aa1298ae95ab58edfb6e4a6125b2a62674d4272e088396bd7244c48a97f78"
+    },
+    {
+      "path": "benchmark/synduce/treepaths/maxPathWeight.f",
+      "sha256": "c5b4d68a09085f8a50b1588161b03e2983c610e92cb500c0561ae99e0dff3424"
+    },
+    {
+      "path": "benchmark/synduce/treepaths/maxPathWeight2.f",
+      "sha256": "8a194528121397e0f9d8dfa1e1932cd5190116964d3e7093b01ea9838ca41070"
+    },
+    {
+      "path": "benchmark/synduce/treepaths/mips.f",
+      "sha256": "6cb89a11ba9a6bf3c6c66b7deae5b61355d084162c9aea1be75d2909649f1374"
+    },
+    {
+      "path": "benchmark/synduce/treepaths/sum.f",
+      "sha256": "9a97b109b9ecb3b7ff1d478e3c066b4642f51928a15702bd7e6db5c2bcc12d95"
+    },
+    {
+      "path": "benchmark/synduce/unimodal_lists/search_no_optim.f",
+      "sha256": "f27bb7b1fef8cefa52668d92c51e4cd01c5b4b8043c7888daaf16e3ffd06b468"
+    },
+    {
+      "path": "benchmark/synduce/unimodal_lists/sum.f",
+      "sha256": "2bf36983f1faf32d5859d7d129eb29ab21ab3b8b5a02d1ca54b589c1e24b7a02"
+    },
+    {
+      "path": "benchmark/synduce/zipper/list_sum.f",
+      "sha256": "3ae8e5dc71d70f3ac836b2ab0679a8a8c05f8a9d0ff12f1528048510b42560b9"
+    },
+    {
+      "path": "benchmark/synduce/zipper/list_sum_basic.f",
+      "sha256": "b10635b87bb1642e30fe8e1cc005567ca19fc6dfd25bd420e19c7aa51232e11f"
+    }
+  ]
+}

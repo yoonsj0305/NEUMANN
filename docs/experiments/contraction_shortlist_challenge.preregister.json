@@ -1,0 +1,53 @@
+{
+  "experiment_id": "CONTRACTION_SHORTLIST_CHALLENGE_V1",
+  "source_first_report_sha256": "6101d85e271446350d7186259c3289065e9c1965e0c9d65d10f046d8acde996b",
+  "selection": "all >=10x/peak-compatible candidates from frozen first shape screen",
+  "selected": [
+    "tensor_lm_batch_likelihood_brackets_4_4d"
+  ],
+  "seeds": [
+    19,
+    23,
+    47
+  ],
+  "variants": [
+    "GREEDY128",
+    "RECONF32"
+  ],
+  "worker_deadline_seconds": 45,
+  "same_public_equation_shapes_only": true,
+  "separate_from_original_shape_screen": true,
+  "rule": "Take lowest modeled arithmetic work over all old and new eligible native plans; retain >=10x AND peak-compatible shortlist",
+  "case_pins": {
+    "tensor_lm_batch_likelihood_brackets_4_4d": "697e03a2d389b6ba6214068c0a5d805438e1f876e6b0229878d9c4c09e1393c2"
+  },
+  "sources": {
+    "experiments/contraction_shortlist_challenge.py": "44b64095e40fba000a7a46a5b9f35ca3c791940313c1120d43e6514e1a639fcd",
+    "neumann1/cotengra_baseline.py": "2f4f83c6d9edf121f3d46b025e9c7418f89f6ca08f5bfe69ed8758335fc6b236",
+    "neumann1/contraction_structure.py": "9c0fe6db87df9577a3f26160235fc0116640a23a4dc7a5590f2dce1cbcc58a39"
+  },
+  "packages": {
+    "cotengra": {
+      "version": "0.8.2",
+      "record_sha256": "b2871dc813edcbbca92eed6beafa9c12e040a7ce942f980b7ce7239fb6a2c7d0"
+    },
+    "autoray": {
+      "version": "0.11.0",
+      "record_sha256": "a8108ec2783d2a8b1f768b55fb4114e0bed1256aef0d163d17c3a4f2765ddfe7"
+    },
+    "opt_einsum": {
+      "version": "3.4.0",
+      "record_sha256": "a5eebcdd3dd677cfe45529ba48eb9c272c21edecdb80da91e6797b251a8ad1ec"
+    },
+    "numpy": {
+      "version": "2.4.6",
+      "record_sha256": "20829a3bc98e8befec83ab1dfa5b453f4cc7243a27a5667830f8d411221c485c"
+    }
+  },
+  "PYTHONHASHSEED": "0",
+  "shape_only": true,
+  "actual_dataset_answers_checked": false,
+  "G1_admitted": false,
+  "global_optimum_claimed": false,
+  "GPU_or_training": false
+}

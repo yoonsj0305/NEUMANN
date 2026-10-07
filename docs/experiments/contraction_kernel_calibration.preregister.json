@@ -1,0 +1,76 @@
+{
+  "experiment_id": "OPENED_CONTRACTION_CPU_CALIBRATION_V1",
+  "case_id": "tensor_lm_batch_likelihood_brackets_4_4d",
+  "case_path": "C:\\Users\\Seojun\\Desktop\\NEUMANN 1\\Continuation\\STRUCTURAL_SCREEN_FIRST\\cases\\tensor_lm_batch_likelihood_brackets_4_4d.json",
+  "case_sha256": "697e03a2d389b6ba6214068c0a5d805438e1f876e6b0229878d9c4c09e1393c2",
+  "native_path": "C:\\Users\\Seojun\\Desktop\\NEUMANN 1\\Continuation\\CONTRACTION_CHALLENGE_FIRST\\tensor_lm_batch_likelihood_brackets_4_4d_RECONF32_47.json",
+  "native_sha256": "4af8b914733596b259c624420b76630a8acc301bdb20fddd1f19c52f606f2c50",
+  "supplied_label": "opt_size",
+  "routes": [
+    "CACHED_NATIVE_BEST",
+    "PUBLIC_GREEDY",
+    "PUBLIC_AUTO_HQ",
+    "PUBLIC_RECONF32",
+    "FREE_PUBLISHED"
+  ],
+  "repetitions": 3,
+  "query_seeds": [
+    6100801,
+    6100802,
+    6100803
+  ],
+  "dtype": "float64",
+  "synthetic_values": "independent uniform [0.5,1.5]; published shapes, original arrays unavailable",
+  "BLAS_threads": 1,
+  "relative_tolerance": 1e-10,
+  "absolute_tolerance": 0,
+  "reference": "full-output agreement of two supplied independently certified paths; no independent original dataset answers",
+  "cache_rights": "all routes reuse their compiled path across three actual different-value queries",
+  "cached_native_investment": "prior full six-plan challenge remains recorded separately; not silently free",
+  "first_cost": "discovery or cached artifact read+hash, index certificate, expression compilation, input scan, kernel, full-output check",
+  "three_query_cost": "one setup plus all three actual input scans, kernels and checks",
+  "budgets": {
+    "input_bytes": 67108864,
+    "largest_intermediate_bytes": 268435456,
+    "modeled_work": 20000000000
+  },
+  "excluded_investments_separate": [
+    "imports/cold start",
+    "input generation",
+    "reference execution",
+    "prior native search",
+    "published path research"
+  ],
+  "energy_or_actual_RSS_measured": false,
+  "fresh_eligible": false,
+  "G1_admitted": false,
+  "learning_or_GPU": false,
+  "sources": {
+    "experiments/contraction_kernel_calibration.py": "257ffb786f2995d4aef6f1d15cce2a8f10e410c2c35ec2f1e02685edbe22c166",
+    "neumann1/contraction_structure.py": "9c0fe6db87df9577a3f26160235fc0116640a23a4dc7a5590f2dce1cbcc58a39",
+    "neumann1/cotengra_baseline.py": "2f4f83c6d9edf121f3d46b025e9c7418f89f6ca08f5bfe69ed8758335fc6b236",
+    "experiments/representation_headroom.py": "ce82c6a8341888896d12725389cfcd7202c5538910526e91bf9e419924f585eb"
+  },
+  "packages": {
+    "numpy": {
+      "version": "2.4.6",
+      "record_sha256": "20829a3bc98e8befec83ab1dfa5b453f4cc7243a27a5667830f8d411221c485c"
+    },
+    "opt_einsum": {
+      "version": "3.4.0",
+      "record_sha256": "a5eebcdd3dd677cfe45529ba48eb9c272c21edecdb80da91e6797b251a8ad1ec"
+    },
+    "cotengra": {
+      "version": "0.8.2",
+      "record_sha256": "b2871dc813edcbbca92eed6beafa9c12e040a7ce942f980b7ce7239fb6a2c7d0"
+    },
+    "autoray": {
+      "version": "0.11.0",
+      "record_sha256": "a8108ec2783d2a8b1f768b55fb4114e0bed1256aef0d163d17c3a4f2765ddfe7"
+    },
+    "threadpoolctl": {
+      "version": "3.7.0",
+      "record_sha256": "1c1dc08bca4b1a3786c4bf1cdfbd5717786bffa286c1d1cc0b8238e5441b9337"
+    }
+  }
+}

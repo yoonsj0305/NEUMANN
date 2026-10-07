@@ -1,0 +1,140 @@
+{
+  "status": "PASS_ALL_NATIVE_REPLAY_ARTIFACTS_AND_NONERROR_VALUES",
+  "archive_members": 4625,
+  "phases": [
+    {
+      "folder": "sufu-witness-replay",
+      "case_counts": {
+        "NATIVE_REPLAY_INCOMPLETE_PRESERVED": 183
+      },
+      "manifest_files": 920,
+      "registration_sha256": "5f869890163af0603d9f2e0f9cbb23e7a37ca9bc1ec00de22e16b8682c48c8b9"
+    },
+    {
+      "folder": "sufu-witness-initialized-replay",
+      "case_counts": {
+        "NATIVE_REPLAY_INCOMPLETE_PRESERVED": 183
+      },
+      "manifest_files": 1280,
+      "registration_sha256": "69ac48dabc5abf69a9cdb12589be3916a6c6ad8fe2692f0bde11d6a426bd17ee"
+    },
+    {
+      "folder": "sufu-witness-owned-replay",
+      "case_counts": {
+        "NATIVE_REPLAY_COMPLETE": 179,
+        "NATIVE_REPLAY_INCOMPLETE_PRESERVED": 4
+      },
+      "manifest_files": 1280,
+      "registration_sha256": "20f011431569d5052cdfbac94b3c8cff791795000bbd42388b3c08a62541eb76"
+    }
+  ],
+  "native_rows": 12312,
+  "native_semantic_error_rows": 48,
+  "original_counts": {
+    "match": 12278,
+    "error": 34
+  },
+  "optimized_counts": {
+    "match": 12265,
+    "error": 47
+  },
+  "native_confirmed_pair_differences": 373,
+  "programs_with_differences": 24,
+  "failed_program_pairs": [
+    {
+      "index": 255,
+      "original_path": "benchmark/synduce/ptree/maxheads.f",
+      "rows": 66,
+      "workers": {
+        "original": {
+          "status": "NATIVE_VALUES_RETURNED",
+          "exit_code": 0,
+          "seconds": 0.03217371899881982,
+          "stdout_sha256": "476977d919f90b38271253eaddb422b7602f9d0cd1a236b31b53226c193126c0",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "outputs_sha256": "6af1d47463707ff78d7b60993adc0593db4c03135fdc3177ff28abeea96cf44e"
+        },
+        "optimized": {
+          "status": "PROCESS_ERROR",
+          "exit_code": -6,
+          "seconds": 0.01639657999839983,
+          "stdout_sha256": "836bbf1c9958f108bde2861e5cfb938fbcb46328252d9ce7b89f5c7a8561483b",
+          "stderr_sha256": "320d81f012056a798f0a46f51d5ef232973103554296e64e815cdfbe1cde55f9"
+        }
+      }
+    },
+    {
+      "index": 256,
+      "original_path": "benchmark/synduce/ptree/maxlast.f",
+      "rows": 66,
+      "workers": {
+        "original": {
+          "status": "NATIVE_VALUES_RETURNED",
+          "exit_code": 0,
+          "seconds": 0.0320887899997615,
+          "stdout_sha256": "3bb7e28b091482d4bd90a36b74a10f9ca56a8d520c76d75b79d9c1e9790b5247",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "outputs_sha256": "fdfe4c5ed14c6fed6c344b6389321fa221491ae5509b2224fc06ce1b02411b36"
+        },
+        "optimized": {
+          "status": "PROCESS_ERROR",
+          "exit_code": -6,
+          "seconds": 0.016005389999918407,
+          "stdout_sha256": "430043a0d5c2de548393122cb25c2872a3015461633c7ccfee601863170501d6",
+          "stderr_sha256": "320d81f012056a798f0a46f51d5ef232973103554296e64e815cdfbe1cde55f9"
+        }
+      }
+    },
+    {
+      "index": 258,
+      "original_path": "benchmark/synduce/ptree/mul.f",
+      "rows": 72,
+      "workers": {
+        "original": {
+          "status": "NATIVE_VALUES_RETURNED",
+          "exit_code": 0,
+          "seconds": 0.0322195600001578,
+          "stdout_sha256": "cdb0f82c859f642ba3126bd311295790160ba591f3c5640dee7c0f8ebd8e3d57",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "outputs_sha256": "65a21b71c991371bc1620b4084cbd858016ba3a7a35cea34de00cb57d4dec45c"
+        },
+        "optimized": {
+          "status": "PROCESS_ERROR",
+          "exit_code": -6,
+          "seconds": 0.016029059999709716,
+          "stdout_sha256": "a91c8031886cbc7ff108ce287e16741615b88af196329fa2d1d4d1a4e0758cd2",
+          "stderr_sha256": "320d81f012056a798f0a46f51d5ef232973103554296e64e815cdfbe1cde55f9"
+        }
+      }
+    },
+    {
+      "index": 259,
+      "original_path": "benchmark/synduce/ptree/sum.f",
+      "rows": 72,
+      "workers": {
+        "original": {
+          "status": "NATIVE_VALUES_RETURNED",
+          "exit_code": 0,
+          "seconds": 0.03231329899972479,
+          "stdout_sha256": "cdb0f82c859f642ba3126bd311295790160ba591f3c5640dee7c0f8ebd8e3d57",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "outputs_sha256": "724a47fca8b23088d866bdbb5e55f3d23cff2bb597f1b5d519ed106697d8d6ac"
+        },
+        "optimized": {
+          "status": "PROCESS_ERROR",
+          "exit_code": -6,
+          "seconds": 0.016023610000047483,
+          "stdout_sha256": "19c8bf2094f73f23225b5fa57289e9a18b039efee3d1e8cf11986bfd9ef55f88",
+          "stderr_sha256": "320d81f012056a798f0a46f51d5ef232973103554296e64e815cdfbe1cde55f9"
+        }
+      }
+    }
+  ],
+  "official_score_changed": false,
+  "universal_equivalence_proven": false,
+  "cost_advantage_established": false,
+  "fresh_eligible": 0,
+  "G0_passed": false,
+  "G1_admitted": false,
+  "G2_admitted": false
+}

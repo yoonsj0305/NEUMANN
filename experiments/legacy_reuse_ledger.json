@@ -1,0 +1,46 @@
+{
+  "schema": "neumann.d0-workspace-evidence-index.v1",
+  "status": "D0_G0_REQUIRED_AVAILABLE_SCOPE_COMPLETE_WITH_EXCLUSIONS",
+  "coverage": "v0.0.100..104 opened core LP only",
+  "artifact_root": "../../Continuation/D0_CORE_LP_COST_VIEW",
+  "manifest_sha256": "676906849327930b461370372b2a701a191615a42add04386a43326c0a64018b",
+  "files": {
+    "cost_records.jsonl": "d634c565f9b0e89be63067e518cd25d8f94fd24d72a1644d12b424796be977ff",
+    "derivation.json": "9fbec422aa028749db042ab6d36ac2de17a71a60a15eb5eda95a1ffb21f22238",
+    "leakage_guard_report.json": "bc48f59cb484d1eb19745c6c88b499ca5f6bb13d8137dc8548110e62add48af8",
+    "legacy_reuse_ledger.json": "f0d8f3f559b4ea89a02e6615a61df3cc1d3b364e225d6d6aebbe0c16c91e5d90",
+    "structural_experiences.jsonl": "3d240fbde8eb86e5f881d16dd730cf63a32e9c751d30385c269863776b7d9bf5",
+    "verifier_registry.json": "007d07f9cb11d5084634eade9da4e64366039f9ad25706acfa925529e702da1f"
+  },
+  "counts": {
+    "source_metadata_only": 64,
+    "NOT_RECHECKED_ORIGINAL_ARRAYS_ABSENT_FROM_ARCHIVE": 1536,
+    "observations": 4288,
+    "original_accepted": 4256,
+    "warmups_retained": 1072,
+    "source_coefficients_available": 176,
+    "D0_ORIGINAL_CERTIFICATE_PASS": 2720,
+    "original_rejected": 32
+  },
+  "sealed_payloads_opened": 0,
+  "g0_executed": true,
+  "g1_training_executed": false,
+  "control_asset_index": {
+    "path": "../../Continuation/D0_CONTROL_FIRST",
+    "manifest_sha256": "ebb9b0dccfb4b696810f54ec5c23db4d703ccf7f07474c0c26da98de195e1763",
+    "verified_zip_archives": 7,
+    "verified_raw_bundles": 3,
+    "metadata_only_excluded_studies": 11,
+    "original_files_checked": 168
+  },
+  "overall_missing_archive_recovery": "PENDING_OPTIONAL; excluded from G0 dependencies and data reuse",
+  "g0_first_result": {
+    "path": "../../Continuation/G0_FIRST",
+    "manifest_sha256": "fd961d5554b99a5335839aa061e580d11be95aeee945043f02d4cf6ba010e710",
+    "decision": "G0_NO_G1_TRAINING_ADMISSION",
+    "observations": 384,
+    "accepted": 384,
+    "new_model_calls": 0,
+    "training": false
+  }
+}

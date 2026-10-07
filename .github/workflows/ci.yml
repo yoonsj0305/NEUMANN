@@ -28,7 +28,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install numpy==2.4.6 scipy==1.17.1 scikit-learn==1.9.1 threadpoolctl==3.7.0
-          pip install -e '.[relational,native_lp]' pytest build
+          pip install -e '.[relational,native_lp,recursive,tensor]' pytest build
       - name: Test
         run: pytest -q
       - name: Discovery benchmark smoke

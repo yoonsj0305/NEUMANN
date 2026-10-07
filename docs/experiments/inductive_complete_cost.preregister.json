@@ -1,0 +1,68 @@
+{
+  "experiment_id": "INDUCTIVE_COMPLETE_COST_V1",
+  "degrees": [
+    2,
+    4,
+    6
+  ],
+  "shears": [
+    -2,
+    3
+  ],
+  "seed_base": 8127000,
+  "cases": 6,
+  "repetitions": 3,
+  "reuse_counts": [
+    1,
+    16
+  ],
+  "routes": [
+    "COMPILED_DIRECT",
+    "PUBLIC_INTEGER_NATIVE",
+    "PUBLIC_CAS_FACTOR",
+    "FREE_COORDINATES"
+  ],
+  "worker_deadline_seconds": 15,
+  "primary": "parent subprocess launch through exit, all request outputs loaded and compared with registered exact answers",
+  "original_checker": "exact full integer output comparison, candidate universal induction proof additionally mandatory",
+  "native_rights": "public spec only; known integer cancellation/antidifference, same induction checker/compiler/procedure reuse; optional CAS factor/CSE",
+  "direct_rights": "goal dependency closure removes irrelevant state; compiler DCE/CSE; initial/transition/goal compilation once per process; validated integer inputs",
+  "free_rights": "provided proposal read inside request; original-task certificate recomputed inside process; only offline discovery omitted",
+  "reuse": "same public program,16 actual distinct parameters/horizons; both native and free compile once",
+  "baseline_qualification": "all3 repetitions complete all actual requests in the reuse regime; all answers correct; fastest qualified native median",
+  "rule": {
+    "geometric_mean_at_least": 10,
+    "individual_at_least_10x": 5,
+    "case_count": 6,
+    "both_regimes_required": true,
+    "all_cases_evaluable": true
+  },
+  "positive": "ONE_DOMAIN_OPERATIONAL_HEADROOM_ONLY_NOT_G1_ADMISSION",
+  "negative": "NO_10X_OPERATIONAL_HEADROOM_IN_REGISTERED_SCOPE",
+  "incomplete": "INCOMPLETE_NO_ADMISSION",
+  "offline_cost": "case/answer/proposal construction excluded and separately timed; research and any future learning investments UNKNOWN,never zero",
+  "resource_axis": "CPU process wall seconds,not FLOPs,energy,money or actual peak memory",
+  "fresh_eligible": 0,
+  "independent_domains": 1,
+  "G1_admitted": false,
+  "GPU_or_learning": false,
+  "sources": {
+    "experiments/inductive_complete_cost.py": "e6d43350a72655b7d3edec8a834dfe28898e50219dabba55946f8522dcfa25e8",
+    "experiments/inductive_cost_cases.py": "be80c8738edef40cdfe6ad49b53c943dcdedd0507c44508e9343b6666ffb99d9",
+    "neumann1/polynomial_translation_native.py": "4e5a5689a141e05679e0d84ac9fa963771453a7e1dd7719b7dd9274400c4298e",
+    "neumann1/inductive_perspective.py": "bbaa71bdeae3727a0b7c07e45b23ea513a8d2e44ce279a366189351e4d5a7309",
+    "neumann1/inductive_symbolic_baseline.py": "0e394f3b5ec518cce807df7c83c4ef299ab2becb905350e4013553e04ddcb9f7",
+    "neumann1/representation_program.py": "2b1bff0563c9e0b216fcbb840f3220499d2d0f59d494f73762560f447a42159a",
+    "experiments/representation_headroom.py": "ce82c6a8341888896d12725389cfcd7202c5538910526e91bf9e419924f585eb"
+  },
+  "packages": {
+    "sympy": {
+      "version": "1.14.0",
+      "record_sha256": "2888c3440019a7be40f88aa39e19fed5beb50912a9fe6d5cc98b6bed53ebf014"
+    },
+    "mpmath": {
+      "version": "1.3.0",
+      "record_sha256": "6e0dc4362026a41beb2ad7081ec8f6fc9be0c48d9ce65784733aedc223c60100"
+    }
+  }
+}

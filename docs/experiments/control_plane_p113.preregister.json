@@ -1,0 +1,115 @@
+{
+  "schema": "neumann.control-plane-p1.13.preregister.v1",
+  "scores_seen_at_registration": false,
+  "first_only": true,
+  "base_head": "a0119180e743f5115b21847fdb6ac6741f97bbe2",
+  "base_tree": "9f415e46b2979dba4eae3469f9f6998bec5a8d9d",
+  "source_sha256": {
+    "neumann1/control_plane_p113.py": "1547c7263f97431e7ca6488b05d53e700b1a331a2e33dda5e43a9aecd9946c30",
+    "experiments/control_plane_p113_catalog.py": "e88b96b3ed098196183fbff078cce5985f4a187e3b6ebdbc40a86b234ef838b2",
+    "experiments/control_plane_p113.py": "74ad5779513ba71cb9ef7e0a89fcf3553874f4e7f3c30c13cbd2e43dbe5a8445",
+    "tests/test_control_plane_p113.py": "4c5410cb57f79e37318c99c70c1c8484e30cf9cc9e1d3a244457ab61690e2c88"
+  },
+  "public_sha256": "797b3c32c05394c223aeac6d013db6e59dc231c6d76187d45afb1675907db749",
+  "references_sha256": "b9233561918ce7d1056061b8b8cccdc3d38f1396a5bc0dedf5b327628ef4ab97",
+  "models": {
+    "baseline": {
+      "model_id": "cross-encoder/ms-marco-MiniLM-L6-v2",
+      "revision": "ce0834f22110de6d9222af7a7a03628121708969",
+      "files": {
+        "config.json": {
+          "sha256": "380e02c93f431831be65d99a4e7e5f67c133985bf2e77d9d4eba46847190bacc",
+          "size": 794
+        },
+        "model.safetensors": {
+          "sha256": "821d1aa69520101d6e0737f78a042ae25b19e5cb9160701909d10434f4aeb0ae",
+          "size": 90870598
+        },
+        "special_tokens_map.json": {
+          "sha256": "3c3507f36dff57bce437223db3b3081d1e2b52ec3e56ee55438193ecb2c94dd6",
+          "size": 132
+        },
+        "tokenizer.json": {
+          "sha256": "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66",
+          "size": 711396
+        },
+        "tokenizer_config.json": {
+          "sha256": "a5c2e5a7b1a29a0702cd28c08a399b5ecc110c263009d17f7e3b415f25905fd8",
+          "size": 1330
+        },
+        "vocab.txt": {
+          "sha256": "07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3",
+          "size": 231508
+        }
+      },
+      "expected_parameters": 22713601
+    },
+    "nli": {
+      "model_id": "cross-encoder/nli-deberta-v3-base",
+      "revision": "6c749ce3425cd33b46d187e45b92bbf96ee12ec7",
+      "files": {
+        "added_tokens.json": {
+          "sha256": "a4b6bfe668f2b3cf6f0cd535e98a0663d2d0d4a4a15f13075ad3597d33985a23",
+          "size": 26
+        },
+        "config.json": {
+          "sha256": "897e756eb59d3183adb505952e7910e7cbc7750a43f3b3747a96b688d2b02a47",
+          "size": 1052
+        },
+        "model.safetensors": {
+          "sha256": "d8148c6d49e0a7925134294c56326c71fe0ab1dc390e37355e00c7efbb488afa",
+          "size": 737726552
+        },
+        "special_tokens_map.json": {
+          "sha256": "ed7c099c988dbb414b18a6980d20cb57b91b7cd119f6f6941eb364b0e892e712",
+          "size": 301
+        },
+        "spm.model": {
+          "sha256": "c679fbf93643d19aab7ee10c0b99e460bdbc02fedf34b92b05af343b4af586fd",
+          "size": 2464616
+        },
+        "tokenizer.json": {
+          "sha256": "5124ef2ead1a10a717703bc436de7f353da76d6340e4587719b42b1693707964",
+          "size": 8656624
+        },
+        "tokenizer_config.json": {
+          "sha256": "f3eecd07c370ef0bf7dd3780d3cd68cf9c8b00c267e21a208ddcd8f82bfec1a6",
+          "size": 1346
+        }
+      },
+      "expected_parameters": 184424451
+    }
+  },
+  "gate": {
+    "accepted_min": 9,
+    "strictly_more_accepted_than_baseline": true,
+    "per_item_wall_ms": 15000,
+    "selector_wall_ms": 10000,
+    "per_arm_wall_ms": 240000
+  },
+  "runtime": {
+    "torch": "2.11.0+cu128",
+    "torchvision": "0.26.0+cu128",
+    "transformers": "5.16.1",
+    "device": "Tesla T4",
+    "dtype": "float32",
+    "arms_in_order": [
+      "baseline",
+      "nli"
+    ]
+  },
+  "decision": "unique highest raw entailment-minus-contradiction logit; ties abstain; no calibrated confidence",
+  "hypothesis": "task-aligned NLI plus increased capacity improves functional role selection on new controlled tasks",
+  "confounding": "size, pretraining and objective change together; no causal attribution to NLI alone",
+  "boundaries": {
+    "development_only": true,
+    "fresh_validation_registered": false,
+    "unseen_computational_families": false,
+    "strong_direct_baseline_included": false,
+    "economic_advantage_established": false,
+    "p2_admitted": false,
+    "decision3_admitted": false,
+    "global_questions_closed": [],
+    "pretraining_investment": "UNKNOWN"
+  }
+}

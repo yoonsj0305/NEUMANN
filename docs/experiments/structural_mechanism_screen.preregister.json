@@ -1,0 +1,82 @@
+{
+  "experiment_id": "STRUCTURAL_MECHANISM_SCREEN_V1",
+  "status": "PREREGISTERED_BEFORE_PERFORMANCE",
+  "source_archive_sha256": "a79615cf56f16df1a06ecc3913e9fa96c73b884e429462a830f2bfff952fdbb2",
+  "metadata_origin": "tensor4all/strided-rs-benchmark-suite",
+  "metadata_commit": "05506112eb40f7cff7ac102689614c180a7d6120",
+  "metadata_scope": "all JSON instances in pinned archive; derived metadata, not original tensors",
+  "proof_assay": {
+    "degrees": [
+      4,
+      8,
+      12
+    ],
+    "motifs": [
+      "ONE_STEP",
+      "COMPOSED",
+      "FALSE_SHARED"
+    ],
+    "replicas": 2,
+    "repetitions": 3,
+    "rows": 64,
+    "seed_base": 6100700,
+    "routes": [
+      "DIRECT",
+      "PUBLIC_SYMBOLIC_CERT",
+      "FREE_CERT",
+      "FREE_FULL_POLYNOMIAL"
+    ],
+    "paired_verifier_gain_target": 10,
+    "all_controls_must_reject": true,
+    "score_scope": "component ratio on ONE_STEP/COMPOSED only; complete pipeline costs also reported",
+    "not_g0_admission": true
+  },
+  "contraction_screen": {
+    "strategies": [
+      "greedy",
+      "auto",
+      "auto-hq",
+      "random-greedy-128",
+      "dynamic-programming"
+    ],
+    "repetitions": 1,
+    "DP_eligibility": "public operand count<=16 OR connected matrix chain",
+    "published_paths": "Oracle-only opt_size/opt_flops; never native planner input",
+    "shape_shortlist_rule": "best native modeled work / best supplied modeled work >=10 AND supplied peak<=best-work native peak",
+    "rule_scope": "candidate shortlist only; no actual tensor execution or accuracy/latency conclusion",
+    "global_optimum_proven": false,
+    "G1_admission": false
+  },
+  "worker_seconds_per_case": 45,
+  "failed_time_and_partial_output_retained": true,
+  "sealed_access": false,
+  "GPU_or_training": false,
+  "fresh_eligible": 0,
+  "source_pins": {
+    "experiments/structural_mechanism_screen.py": "7e86114ed80590529ce06bfa0ac2b1ac36d6af5e215406d36b0e01661ee55700",
+    "neumann1/public_rewrite_search.py": "417fc9146c8701dc3c8051dda81e37ae1110d733f56c2ad58cf3c158eafd5a07",
+    "neumann1/contraction_structure.py": "9c0fe6db87df9577a3f26160235fc0116640a23a4dc7a5590f2dce1cbcc58a39",
+    "neumann1/representation_program.py": "2b1bff0563c9e0b216fcbb840f3220499d2d0f59d494f73762560f447a42159a",
+    "neumann1/representation_rewrite_certificate.py": "5e6cfa13542c8a571f7013b576063dc54b07588fac78697f9815b5944fee19f9",
+    "experiments/representation_headroom_replay.py": "b598954b34ab77e41666dd09500eb161f05f2c0b9e3f56ebacf181aeee1de083",
+    "experiments/representation_headroom.py": "ce82c6a8341888896d12725389cfcd7202c5538910526e91bf9e419924f585eb"
+  },
+  "packages": {
+    "numpy": {
+      "version": "2.4.6",
+      "record_sha256": "20829a3bc98e8befec83ab1dfa5b453f4cc7243a27a5667830f8d411221c485c"
+    },
+    "sympy": {
+      "version": "1.14.0",
+      "record_sha256": "2888c3440019a7be40f88aa39e19fed5beb50912a9fe6d5cc98b6bed53ebf014"
+    },
+    "mpmath": {
+      "version": "1.3.0",
+      "record_sha256": "6e0dc4362026a41beb2ad7081ec8f6fc9be0c48d9ce65784733aedc223c60100"
+    },
+    "opt_einsum": {
+      "version": "3.4.0",
+      "record_sha256": "a5eebcdd3dd677cfe45529ba48eb9c272c21edecdb80da91e6797b251a8ad1ec"
+    }
+  }
+}

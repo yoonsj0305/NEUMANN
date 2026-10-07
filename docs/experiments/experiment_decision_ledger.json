@@ -1,0 +1,441 @@
+{
+  "schema": "neumann.experiment-decision-ledger.v1",
+  "north_star_changed": false,
+  "global_questions_closed": [],
+  "d0": {
+    "status": "G0_REQUIRED_AVAILABLE_SCOPE_COMPLETE_WITH_EXCLUSIONS",
+    "missing_original_studies": 11,
+    "future_training_views": "NOT_ACTIVATED"
+  },
+  "g0": {
+    "contract": "docs/experiments/g0_headroom.preregister.json",
+    "result": "../../Continuation/G0_FIRST/report.json",
+    "decision": "G0_NO_G1_TRAINING_ADMISSION",
+    "families": {
+      "graph": {
+        "evaluable_cases": 12,
+        "cases": 12,
+        "geomean_speedup": 1.0771915924305098,
+        "large_10x_cases": 0,
+        "large_cases": 4,
+        "headroom_admitted": false
+      },
+      "matrix": {
+        "evaluable_cases": 12,
+        "cases": 12,
+        "geomean_speedup": 1.1287233895006978,
+        "large_10x_cases": 0,
+        "large_cases": 4,
+        "headroom_admitted": false
+      }
+    },
+    "first_evidence_no_replacement": true,
+    "independent_original_witness_replay": 384,
+    "independent_graph_optimum_proofs": 12
+  },
+  "g1": {
+    "status": "NOT_ADMITTED_FOR_SCREENED_CANDIDATES",
+    "single_known_structure_selector_training": "STOP",
+    "core_hypothesis": "cost-aware generation of composed representation programs with semantic preservation",
+    "new_headroom_required": true,
+    "symbolic_baseline": "neumann1/perspective_symbolic_baseline.py",
+    "learned_model_implemented": false,
+    "certificate_interface": {
+      "source": "neumann1/representation_rewrite_certificate.py",
+      "sha256": "5e6cfa13542c8a571f7013b576063dc54b07588fac78697f9815b5944fee19f9",
+      "status": "SEMANTIC_TESTS_ONLY_NO_TIMED_HEADROOM_OR_LEARNED_DISCOVERY_RESULT"
+    },
+    "additional_native_reuse_comparator": {
+      "source": "neumann1/native_perspective_catalog.py",
+      "learned": false,
+      "scope": "label rename and dimension rebinding at fixed operand-order incidence; no unknown-topology discovery",
+      "actual_new_cost_advantage_measured": false,
+      "same_reuse_rights_required_for_all_arms": true
+    }
+  },
+  "g2": {
+    "status": "NOT_AUTHORIZED",
+    "decision3_unsealed": false
+  },
+  "gpu_started": false,
+  "historical_verdicts_changed": false,
+  "g0_composition": {
+    "contract": "docs/experiments/g0_composition.preregister.json",
+    "first_result": "../../Continuation/G0_COMPOSITION_FIRST/report.json",
+    "decision": "NO_HEADROOM_ADMISSION_FOR_THIS_REGISTERED_SCOPE",
+    "domain_count": 1,
+    "cases": 18,
+    "accepted_observations": 648,
+    "regimes": {
+      "first_query": {
+        "geometric_mean_ratio": 1.7964270592180638,
+        "largest_10x_count": 0,
+        "passed": false
+      },
+      "reuse64": {
+        "geometric_mean_ratio": 5.803725366890221,
+        "largest_10x_count": 2,
+        "passed": false
+      }
+    },
+    "first_evidence_no_replacement": true,
+    "original_task_replay": 648,
+    "G1_admitted": false
+  },
+  "structural_mechanism_screen": {
+    "contract": "docs/experiments/structural_mechanism_screen.preregister.json",
+    "first_result": "../../Continuation/STRUCTURAL_SCREEN_FIRST/report.json",
+    "proof_assay": {
+      "accepted": 216,
+      "paired_verifier_cases": 12,
+      "verifier_ratio_geomean": 8.40372048094914,
+      "component_10x_pass": false,
+      "false_controls_rejected": 72,
+      "complete_query_native_over_free_geomean": 0.3956958551976437
+    },
+    "derived_tensor_cases": 14,
+    "certified_modeled_paths": 89,
+    "initial_modeled_shortlist": [
+      "tensor_lm_batch_likelihood_brackets_4_4d"
+    ],
+    "G1_admitted": false,
+    "original_tensor_answers_available": false,
+    "first_evidence_no_replacement": true
+  },
+  "contraction_shortlist_challenge": {
+    "contract": "docs/experiments/contraction_shortlist_challenge.preregister.json",
+    "cases": [
+      {
+        "id": "tensor_lm_batch_likelihood_brackets_4_4d",
+        "challenge_complete": true,
+        "original_shape_ratio": 16.837587226238938,
+        "stronger_native_work_model": 308822812,
+        "supplied_work_model": 236675916,
+        "new_ratio": 1.3048341260037628,
+        "best_new_variant": "RECONF32",
+        "best_new_seed": 47,
+        "remaining_shortlist": false
+      }
+    ],
+    "observations": 6,
+    "modeled_work_only": true,
+    "G1_admitted": false,
+    "first_evidence_no_replacement": true
+  },
+  "contraction_cpu_calibration": {
+    "contract": "docs/experiments/contraction_kernel_calibration.preregister.json",
+    "scope": "CPU calibration on synthetic positive float64 inputs with opened public shapes; original dataset arrays/answers unavailable",
+    "original_report_complete": false,
+    "actual_queries": 36,
+    "predeclared_resource_exclusions": 3,
+    "descriptive_eligible_envelope": {
+      "first_query_seconds": {
+        "best_eligible_native_route": "CACHED_NATIVE_BEST",
+        "native_over_free": 1.6882290833886116
+      },
+      "three_query_seconds": {
+        "best_eligible_native_route": "CACHED_NATIVE_BEST",
+        "native_over_free": 1.6986019570011381
+      },
+      "median_kernel_seconds": {
+        "best_eligible_native_route": "PUBLIC_RECONF32",
+        "native_over_free": 1.6630159579731338
+      }
+    },
+    "original_dataset_ground_truth": false,
+    "fresh_eligible": 0,
+    "G1_admitted": false,
+    "first_evidence_no_replacement": true
+  },
+  "d0_structural_experience": {
+    "status": "AVAILABLE_OPENED_DIAGNOSTIC_VIEWS_NOT_TRAINING",
+    "raw_observations": 335,
+    "experience_groups": 181,
+    "public_problems": 32,
+    "native_unique_programs": 31,
+    "topology_groups": 13,
+    "rebind_development_checks": 42,
+    "fresh_eligible": 0,
+    "training_activated": false,
+    "G1_admitted": false,
+    "result": "../../Continuation/STRUCTURAL_EXPERIENCE_V2_2026-10-07/report.json",
+    "replay": "../../Continuation/STRUCTURAL_EXPERIENCE_AUDIT_2026-10-07/replay.json"
+  },
+  "perspective_transfer_headroom": {
+    "contract": "docs\\experiments\\perspective_transfer_headroom.preregister.json",
+    "decision": "INCOMPLETE_NO_ADMISSION",
+    "cases": 8,
+    "evaluable_cases": 6,
+    "first_result": "../../Continuation/TRANSFER_HEADROOM_FIRST/report.json",
+    "replay": "../../Continuation/TRANSFER_HEADROOM_AUDIT_2026-10-07/replay.json",
+    "query_observations": 126,
+    "accepted_observations": 117,
+    "abstained_observations": 9,
+    "actual_numeric_queries": 234,
+    "cases_without_reference": 2,
+    "offline_failure_trace_available": false,
+    "regimes": {
+      "first_query_seconds": {
+        "splice_geomean": null,
+        "splice_10x_cases": 0,
+        "passed": false
+      },
+      "two_query_seconds": {
+        "splice_geomean": null,
+        "splice_10x_cases": 0,
+        "passed": false
+      }
+    },
+    "completed_case_ratios": {
+      "tensor_lm_batch_likelihood_brackets_4_4d_rebound": {
+        "first_query_seconds": {
+          "best_native": "PRIOR_FIRST",
+          "native_over_free": 1.011719589829733
+        },
+        "two_query_seconds": {
+          "best_native": "PRIOR_FIRST",
+          "native_over_free": 1.0134521391149556
+        }
+      },
+      "tensor_lm_batch_likelihood_brackets_4_4d_splice": {
+        "first_query_seconds": {
+          "best_native": "PRIOR_FIRST",
+          "native_over_free": 1.1528557801705104
+        },
+        "two_query_seconds": {
+          "best_native": "PRIOR_FIRST",
+          "native_over_free": 1.1578771025997558
+        }
+      },
+      "tensor_lm_batch_likelihood_sentence_3_12d_rebound": {
+        "first_query_seconds": {
+          "best_native": "PRIOR_FIRST",
+          "native_over_free": 1.0653056940411718
+        },
+        "two_query_seconds": {
+          "best_native": "PRIOR_FIRST",
+          "native_over_free": 1.0577067902893187
+        }
+      },
+      "tensor_lm_batch_likelihood_sentence_3_12d_splice": {
+        "first_query_seconds": {
+          "best_native": "PRIOR_FIRST",
+          "native_over_free": 1.1876556693501674
+        },
+        "two_query_seconds": {
+          "best_native": "PRIOR_FIRST",
+          "native_over_free": 1.1410110696961908
+        }
+      },
+      "tensor_str_nw_mera_closed_120_rebound": {
+        "first_query_seconds": {
+          "best_native": "PRIOR_FIRST",
+          "native_over_free": 1.086897539749608
+        },
+        "two_query_seconds": {
+          "best_native": "PRIOR_FIRST",
+          "native_over_free": 1.0698078270196627
+        }
+      },
+      "tensor_str_nw_mera_closed_120_splice": {
+        "first_query_seconds": {
+          "best_native": "PRIOR_FIRST",
+          "native_over_free": 1.0870939470085488
+        },
+        "two_query_seconds": {
+          "best_native": "PRIOR_FIRST",
+          "native_over_free": 1.0843091810113747
+        }
+      }
+    },
+    "scope": "one-domain warm-service constructed development screening, not original benchmark or learned discovery evidence",
+    "first_evidence_no_replacement": true,
+    "fresh_eligible": 0,
+    "G1_admitted": false
+  },
+  "inductive_generation_engineering": {
+    "kind": "OPENED_ENGINEERING_NOT_G0_G1",
+    "status": "PASS_ENGINEERING_ONLY",
+    "result": "../../Continuation/INDUCTIVE_PERSPECTIVE_FIRST/report.json",
+    "audit": "../../Continuation/INDUCTIVE_PERSPECTIVE_AUDIT/replay.json",
+    "certified_proposals": 8,
+    "universal_identities": 40,
+    "paired_numeric_comparisons": 96,
+    "large_horizon_formula_checks": 24,
+    "false_proposals_rejected": 3,
+    "native_also_solves_all_fixtures": true,
+    "learned_policy_implemented": false,
+    "headroom_measured": false,
+    "G0_passed": false,
+    "G1_admitted": false,
+    "fresh_eligible": 0
+  },
+  "inductive_complete_cost": {
+    "contract": "docs/experiments/inductive_complete_cost.preregister.json",
+    "decision": "NO_10X_OPERATIONAL_HEADROOM_IN_REGISTERED_SCOPE",
+    "scope": "one-domain constructed-development operational free-coordinate ceiling,not learned NEUMANN or complete R&D investment",
+    "cases": 6,
+    "independent_domains": 1,
+    "worker_observations": 144,
+    "accepted_workers": 132,
+    "actual_query_outputs": 1122,
+    "distinct_development_requests": 96,
+    "failed_workers": 12,
+    "failure_kind": "CAS verification budget UNKNOWN,not proven mathematically false",
+    "regimes": {
+      "1": {
+        "all_evaluable": true,
+        "geomean_native_over_free": 0.9961369278671681,
+        "individual_10x_count": 0,
+        "passed": false
+      },
+      "16": {
+        "all_evaluable": true,
+        "geomean_native_over_free": 0.9973958195425805,
+        "individual_10x_count": 0,
+        "passed": false
+      }
+    },
+    "result": "../../Continuation/INDUCTIVE_COMPLETE_COST_FIRST/report.json",
+    "audit": "../../Continuation/INDUCTIVE_COMPLETE_COST_AUDIT/replay.json",
+    "first_evidence_no_replacement": true,
+    "learning_performed": false,
+    "G1_admitted": false,
+    "fresh_eligible": 0,
+    "research_investment": "UNKNOWN",
+    "resource_axis": "CPU process wall seconds,not FLOPs,energy,money or actual peak memory"
+  },
+  "recursive_summary_engineering": {
+    "kind": "OPENED_ADAPTED_REFERENCES_NOT_G0_G1",
+    "status": "PASS_ENGINEERING_ADAPTED_REFERENCE_CHECKS_ONLY",
+    "public_adapted_references": 4,
+    "manual_fixture": 1,
+    "native_public_synthesis_accepted": 3,
+    "native_mss_status": "UNKNOWN",
+    "paired_numeric_queries": 8736,
+    "accepted_summary_proposals": 8,
+    "universal_obligations": 72,
+    "independent_Z3_AST_and_saved_SMT_checks": 144,
+    "false_proposals_rejected": 3,
+    "source_commit": "b5c1d1611d3fbf5d8cdf9a23fde52c2cbba95a89",
+    "full_Synduce_installed_or_run": false,
+    "result": "../../Continuation/RECURSIVE_SUMMARY_FIRST/report.json",
+    "audit": "../../Continuation/RECURSIVE_SUMMARY_AUDIT/replay.json",
+    "fresh_eligible": 0,
+    "learned_policy_implemented": false,
+    "performance_measured": false,
+    "G0_passed": false,
+    "G1_admitted": false,
+    "first_evidence_no_replacement": true
+  },
+  "compressed_recursive_complete_cost_2026_10_07": {
+    "decision": "NO_10X_IN_REGISTERED_COMPRESSED_REFERENCES",
+    "workers": 240,
+    "accepted_workers": 240,
+    "actual_queries": 2040,
+    "distinct_requests": 320,
+    "geomean_native_over_free": {
+      "cold1": 1.0047774454444425,
+      "cold16": 1.0023682024041156
+    },
+    "wins10x": {
+      "cold1": 0,
+      "cold16": 0
+    },
+    "report_sha256": "e4487e30d748bbee4be32050af2b942c316b6d98d77ad0ffaf04e1d0efeaf0b9",
+    "G1_admitted": false,
+    "fresh_eligible": 0,
+    "learning_performed": false,
+    "scope": "registered opened compressed implementation cost;not intrinsic intelligence lower bound"
+  },
+  "native_decoder_source_binding_2026_10_07": {
+    "new_native_first_certified": 25,
+    "new_native_first_abstained": 2,
+    "prior_finite_successes_reused": 2,
+    "native_union_opened_ASTs": 27,
+    "source_protocol_bound": 26,
+    "source_distinct_ASTs": 11,
+    "original_holes_implementable": 13,
+    "added_or_changed_state_required": 13,
+    "independent_Z3_summary_conditions": 243,
+    "saved_CVC5_conditions_replayed_in_Z3": 243,
+    "numeric_control_rows": 88533,
+    "G0_passed": false,
+    "G1_admitted": false,
+    "learning_performed": false,
+    "fresh_eligible": 0,
+    "independent_proof_audit": "Continuation/SYMBOLIC_DECODER_AUDIT/audit.json",
+    "remote_first_26_view_artifact": "LOST_BEFORE_LOCAL_TRANSFER_NOT_INDEPENDENTLY_AUDITED",
+    "prior_15_view_remote_archive": "LOCAL_AND_INDEPENDENTLY_AUDITED",
+    "first_evidence_no_replacement": true
+  },
+  "sufu_and_original_tensors_2026_10_07": {
+    "sufu_native_first": {
+      "bounded_success": 183,
+      "timeout": 105,
+      "error": 2,
+      "source_cases": 290,
+      "seconds": 5093.723732553,
+      "official_paper_reproduction": false
+    },
+    "functional_stress": {
+      "registered_rows": 13176,
+      "concrete_match": 12215,
+      "counterexample_rows": 373,
+      "not_evaluated": 588,
+      "counterexample_program_views": 24,
+      "broad_witness_domain": true,
+      "original_score_changed": false
+    },
+    "native_replay_first": {
+      "complete_pairs": 179,
+      "incomplete_pairs": 4,
+      "nonerror_native_outputs_agree_with_python": true,
+      "native_confirmed_counterexample_rows": 373,
+      "semantic_error_rows": 48,
+      "arithmetic_bound": 50000
+    },
+    "separate_LF_frontend_recovery": {
+      "complete_pairs": 4,
+      "original_optimized_expected_rows": 276,
+      "prior_failed_runs_preserved": true
+    },
+    "separate_OCaml414_recovery": {
+      "source_views": 26,
+      "rows": 7818,
+      "source_byte_groups": 20,
+      "public_ASTs": 11,
+      "old_OCaml5_archive_loss_unchanged": true
+    },
+    "original_tensors": {
+      "original_members": 168,
+      "first_metadata_decoded": 163,
+      "first_refused": 5,
+      "separate_budget_recovered": 4,
+      "still_refused": 1,
+      "shape_selected_cases": 30,
+      "complete_model_cases": 29,
+      "model_finished_workers": 238,
+      "model_timeout_workers": 3,
+      "remaining_10x_model_shortlist": 0,
+      "original_array_calibration_cases": 4,
+      "verified_observations": 45,
+      "retained_full_output_checks": 135,
+      "maximum_component_ratio": 3.4477731552,
+      "complete_investment_measured": false
+    },
+    "D0_identity": {
+      "case_IDs": 290,
+      "exact_source_byte_groups": 285,
+      "original_duplicate_ID_failure_preserved": true,
+      "role_purpose_denials": 3219
+    },
+    "cost_advantage_established": false,
+    "learned_perspective_engine_implemented": false,
+    "G0_passed": false,
+    "G1_admitted": false,
+    "G2_admitted": false,
+    "fresh_eligible": 0,
+    "historical_verdicts_changed": false
+  }
+}

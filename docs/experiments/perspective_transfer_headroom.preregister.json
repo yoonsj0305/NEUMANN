@@ -1,0 +1,99 @@
+{
+  "experiment_id": "PERSPECTIVE_TRANSFER_HEADROOM_V1",
+  "source_ids": [
+    "tensor_gm_queen5_5_3.wcsp",
+    "tensor_lm_batch_likelihood_brackets_4_4d",
+    "tensor_lm_batch_likelihood_sentence_3_12d",
+    "tensor_str_nw_mera_closed_120"
+  ],
+  "source_root": "C:\\Users\\Seojun\\Desktop\\NEUMANN 1\\Continuation\\STRUCTURAL_SCREEN_FIRST\\cases",
+  "source_pins": {
+    "tensor_gm_queen5_5_3.wcsp": "fc2f9c7577f66af92e7b4b73c4b578d53ee33a357d9f883434b62012c2452336",
+    "tensor_lm_batch_likelihood_brackets_4_4d": "697e03a2d389b6ba6214068c0a5d805438e1f876e6b0229878d9c4c09e1393c2",
+    "tensor_lm_batch_likelihood_sentence_3_12d": "dcfded4994a586ba0349cab39811b62f8a6e26a9cbdb922876a1e29c10a8287f",
+    "tensor_str_nw_mera_closed_120": "3acb2827796f7795a3550b4591b5fc14c6f7f7a71b798975646539ef999c3172"
+  },
+  "catalog": "C:\\Users\\Seojun\\Desktop\\NEUMANN 1\\Continuation\\STRUCTURAL_EXPERIENCE_V2_2026-10-07\\native-catalog.json",
+  "catalog_sha256": "1518db0f06a194a1c6cf3be3d63833fbb64458605d2efb67c6f65ff899cc6039",
+  "modes": [
+    "REBOUND",
+    "SPLICE"
+  ],
+  "seed_base": 6101000,
+  "repetitions": 3,
+  "actual_queries_per_procedure": 2,
+  "routes": [
+    "GREEDY",
+    "AUTO_HQ",
+    "RECONF32",
+    "PRIOR_FIRST",
+    "PRIOR_BEST_MODEL",
+    "GEOMETRY_CATALOG",
+    "FREE_STRUCTURE"
+  ],
+  "values": "deterministic independent float64 uniform [.98,1.02] on registered modified shapes",
+  "BLAS_threads": 1,
+  "rtol": 1e-10,
+  "atol": 0,
+  "budget": {
+    "modeled_work": 1000000000,
+    "peak_elements": 16777216,
+    "input_bytes": 8388608
+  },
+  "worker_deadline_seconds": 120,
+  "offline_free_selection": "minimum modeled work/peak among eligible original supplied paths, same-arity public priors, fresh greedy/auto-hq/GREEDY128/RECONF32 paths; selected before request timings",
+  "reference": "two distinct structurally certified eligible paths must agree on full positive finite outputs",
+  "primary": "warm persistent-engine first new-structure request: discovery, index certificate, compile, scan, kernel, full-output comparison",
+  "verification_reuse": "native certificates computed inside the request may be reused without double checking; FREE offline certificate must be checked again inside the request",
+  "historical_priority_sorting": "once at engine setup for all prior-using arms, separately charged investment",
+  "secondary": "same setup plus two actual different-value queries; common reuse rights",
+  "baseline_envelope": "per-case fastest eligible native median; at least one native route must complete all repetitions and queries",
+  "rule": {
+    "splice_geomean_at_least": 10,
+    "splice_cases_at_least_10x": 3,
+    "splice_cases": 4,
+    "all_eight_cases_evaluable": true,
+    "both_first_and_two_query_required": true
+  },
+  "positive_decision": "ONE_DOMAIN_WARM_SERVICE_HEADROOM_ONLY_NOT_G1_ADMISSION",
+  "negative_decision": "NO_HEADROOM_FOR_THIS_REGISTERED_TRANSFER_SCOPE",
+  "incomplete_decision": "INCOMPLETE_NO_ADMISSION",
+  "investment_accounting": "imports/engine setup, input generation, references and offline path discovery measured separately; prior source search/research not silently zero; no complete deployment or cold single-query gain claim",
+  "fresh_eligible": 0,
+  "independent_domains": 1,
+  "constructed_development_only": true,
+  "model_training_or_GPU": false,
+  "G1_admitted": false,
+  "Decision3_unsealed": false,
+  "sources": {
+    "experiments/perspective_transfer_headroom.py": "52231eb646d42933d813681cd4d8fa7a6d200ff8911867bcfa813aa7c4576614",
+    "neumann1/public_path_reuse.py": "bdbd3bd114aebeb0d263ee62b822104cb66a69ad541f7b40a299650c0da18a8a",
+    "neumann1/native_perspective_catalog.py": "31431b325ddcfb32855146e57f7325dc984e44918a9faf5d15776ff86217cee2",
+    "neumann1/contraction_structure.py": "9c0fe6db87df9577a3f26160235fc0116640a23a4dc7a5590f2dce1cbcc58a39",
+    "neumann1/cotengra_baseline.py": "2f4f83c6d9edf121f3d46b025e9c7418f89f6ca08f5bfe69ed8758335fc6b236",
+    "experiments/contraction_kernel_calibration.py": "257ffb786f2995d4aef6f1d15cce2a8f10e410c2c35ec2f1e02685edbe22c166",
+    "experiments/representation_headroom.py": "ce82c6a8341888896d12725389cfcd7202c5538910526e91bf9e419924f585eb"
+  },
+  "packages": {
+    "numpy": {
+      "version": "2.4.6",
+      "record_sha256": "20829a3bc98e8befec83ab1dfa5b453f4cc7243a27a5667830f8d411221c485c"
+    },
+    "opt_einsum": {
+      "version": "3.4.0",
+      "record_sha256": "a5eebcdd3dd677cfe45529ba48eb9c272c21edecdb80da91e6797b251a8ad1ec"
+    },
+    "cotengra": {
+      "version": "0.8.2",
+      "record_sha256": "b2871dc813edcbbca92eed6beafa9c12e040a7ce942f980b7ce7239fb6a2c7d0"
+    },
+    "autoray": {
+      "version": "0.11.0",
+      "record_sha256": "a8108ec2783d2a8b1f768b55fb4114e0bed1256aef0d163d17c3a4f2765ddfe7"
+    },
+    "threadpoolctl": {
+      "version": "3.7.0",
+      "record_sha256": "1c1dc08bca4b1a3786c4bf1cdfbd5717786bffa286c1d1cc0b8238e5441b9337"
+    }
+  }
+}
