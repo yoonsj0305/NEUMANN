@@ -112,3 +112,12 @@ AddressHolder 소유권 문제로 183개 모두 실패했다. 두 첫 실행은 
 Python 3.12 이상을 요구하므로 core CI를 3.12로 맞추고 structural extra에
 egglog 14.0.0/networkx 3.6.1을 추가했다. 과거 sequence CI의 Python 3.11은 유지한다.
 이 수정은 배포 환경 재현 작업이며 동결한 실험 알고리즘·실행 결과의 변경이 아니다.
+
+
+수정 의존성 환경의 첫 전체 검사에서는 1,443개 통과·1개 실패·35개 skip과
+229개 subtest 통과를 기록했다. 남은 실패는 다른 MILP 호출 뒤 공유 native 상태에서
+그래프 solver가 status4로 거절되는 경우이며 로컬에서도 재현했다.
+해당 correctness fixture의 모든 원래 경로를 실제 실험과 같은 fresh worker에서
+실행하고, 10개 노드의 1,024개 부분집합을 별도로 전수 탐색한 최적값과 대조하도록
+검사를 강화했다. 5초 solver 예산, 실패 거절, 실험 소스와 기존 결과는 그대로다.
+단일 수정 fixture 파일의 6개 검사를 통과했으며 전체 GitHub 검사를 다시 확인한다.

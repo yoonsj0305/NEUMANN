@@ -1,0 +1,31 @@
+{
+  "status": "GITHUB_CI_FIRST_GRAPH_FIXTURE_FAILURE_PRESERVED",
+  "commit": "fcd94f917a2bdc0cf3e9ab319eda7c25cb3cd0ca",
+  "run_id": 37632015786,
+  "job_id": 112828432115,
+  "failed": 1,
+  "passed": 1443,
+  "skipped": 35,
+  "subtests_passed": 229,
+  "test": "tests/test_structural_headroom.py::test_true_twin_quotient_preserves_original_optimum",
+  "local_diagnosis": {
+    "initial_default_milp_success": true,
+    "frozen_graph_result": [
+      {
+        "success": false,
+        "status": 4,
+        "message": "(HiGHS Status 0: Not Set)"
+      }
+    ],
+    "observation": {
+      "fixture_scheduler_interference_reproduced": true,
+      "refusal": "Original-graph MILP did not certify optimum within frozen budget"
+    },
+    "purpose": "fixture global native scheduler diagnosis; not performance study",
+    "frozen_source_modified": false
+  },
+  "test_repair": "Keep all registered original graph routes and their exact five-second MILP budget; execute fixture routes in a fresh process, validate against independent exhaustive enumeration of 1024 subsets. No skip, fallback or optimum tolerance relaxation.",
+  "frozen_algorithm_changed": false,
+  "historical_G0_result_changed": false,
+  "targeted_fixture_tests_passed": 6
+}

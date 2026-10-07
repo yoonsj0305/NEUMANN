@@ -2,6 +2,9 @@
 import io
 import json
 import zipfile
+import itertools
+import subprocess
+import sys
 
 import numpy as np
 import pytest
@@ -16,9 +19,29 @@ def test_true_twin_quotient_preserves_original_optimum():
     case = g0.generate(spec)
     public = g0.public_view(case, "graph")
     assert set(public) == {"adjacency", "weights"}
-    expected = int(public["weights"][g0.graph_milp(public)].sum())
-    for route in g0.ROUTES["graph"]:
-        witness = g0.solve(public, route, case["oracle_labels"] if route.startswith("FREE_") else None)
+    # An independent exhaustive reference is feasible for this ten-node fixture.
+    expected = max(sum(int(public["weights"][i]) for i in subset)
+                   for bits in range(1 << len(public["weights"]))
+                   for subset in [[i for i in range(len(public["weights"])) if bits & (1 << i)]]
+                   if all(public["adjacency"][i, j] for i, j in itertools.combinations(subset, 2)))
+    # Actual registered routes use fresh workers. Other suite tests initialize
+    # the native HiGHS scheduler; do not let that state alter this fixture.
+    script = '''
+import json,sys,numpy as np
+from experiments import structural_headroom as g0
+x=json.load(sys.stdin)
+public={"adjacency":np.asarray(x["adjacency"],dtype=bool),"weights":np.asarray(x["weights"])}
+labels=np.asarray(x["oracle_labels"])
+print(json.dumps({route:g0.solve(public,route,labels if route.startswith("FREE_") else None)
+                  for route in g0.ROUTES["graph"]}))
+'''
+    worker = subprocess.run([sys.executable, "-X", "utf8", "-c", script],
+                            input=json.dumps({k: case[k].tolist() for k in ["adjacency", "weights", "oracle_labels"]}),
+                            capture_output=True, text=True, timeout=30)
+    assert worker.returncode == 0, worker.stderr
+    witnesses = json.loads(worker.stdout)
+    assert set(witnesses) == set(g0.ROUTES["graph"])
+    for route, witness in witnesses.items():
         assert g0.graph_check(public, witness, expected)
 
 
