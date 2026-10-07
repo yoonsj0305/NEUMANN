@@ -103,3 +103,12 @@ AddressHolder 소유권 문제로 183개 모두 실패했다. 두 첫 실행은 
 전체 pytest 수집 시 기존 Linux `resource` 모듈에 의존한 4파일은 Windows에서 실패했다.
 이를 통과했다고 기록하지 않았다. Linux CI에는 recursive/tensor optional dependencies를
 추가했다. GitHub CI 완료 여부는 별도 확인해야 한다.
+
+
+### GitHub 공개 후 CI 환경 수정
+
+최초 GitHub core CI는 egglog/networkx가 설치되지 않아 테스트 수집 2파일에서 실패했다.
+그 기록을 ci_first_collection_failure.json에 남겼다. 로컬 고정 버전 egglog 14.0.0은
+Python 3.12 이상을 요구하므로 core CI를 3.12로 맞추고 structural extra에
+egglog 14.0.0/networkx 3.6.1을 추가했다. 과거 sequence CI의 Python 3.11은 유지한다.
+이 수정은 배포 환경 재현 작업이며 동결한 실험 알고리즘·실행 결과의 변경이 아니다.
