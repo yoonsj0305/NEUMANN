@@ -18,6 +18,8 @@ from neumann1.structural_data_rights import DataUseError, authorize
 SCOPES = {
     "exact_integer_recurrence":
         "all integer parameters and nonnegative horizons; ordered original outputs",
+    "exact_integer_recurrence_guarded":
+        "original ordered goal from the bound initial state; all integer parameters and nonnegative integer horizons",
     "integer_list_right_fold":
         "all finite mathematical integer lists; ordered original fold outputs",
 }
@@ -60,7 +62,7 @@ class ProblemView:
         authorize(asset, "development_problem")
         if not isinstance(lineage, str) or not lineage.strip() or domain not in SCOPES:
             raise DataUseError("opened lineage and supported domain required")
-        if domain == "exact_integer_recurrence":
+        if domain in {"exact_integer_recurrence", "exact_integer_recurrence_guarded"}:
             from neumann1.inductive_perspective import validate_problem
             validate_problem(original)
             state = StructuralState(tuple(original["parameters"] + original["state"]),
@@ -176,6 +178,11 @@ class PreparedPerspective:
             if view.domain == "exact_integer_recurrence":
                 from neumann1.inductive_perspective import compile_acceleration
                 engine = compile_acceleration(original, program)
+            elif view.domain == "exact_integer_recurrence_guarded":
+                from neumann1.guarded_perspective import compile_guarded_acceleration
+                if not isinstance(program, dict) or set(program) != {"proposal", "witness"}:
+                    raise ValueError("separate guarded proposal/witness envelope required")
+                engine = compile_guarded_acceleration(original, program["proposal"], program["witness"])
             else:
                 from neumann1.recursive_summary import CertifiedSummary
                 engine = CertifiedSummary(original, program)
@@ -202,7 +209,7 @@ class PreparedPerspective:
         if self._engine is None:
             raise ValueError("unverified proposal cannot execute")
         start = perf_counter()
-        if self._view.domain == "exact_integer_recurrence":
+        if self._view.domain in {"exact_integer_recurrence", "exact_integer_recurrence_guarded"}:
             if not isinstance(request, dict) or set(request) != {"parameters", "steps"}:
                 raise ValueError("original parameters/horizon request required")
             output = self._engine.run(request["parameters"], request["steps"])

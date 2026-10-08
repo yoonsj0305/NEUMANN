@@ -1,5 +1,14 @@
 # NEUMANN 1 현재 상태 — 2026-10-08
 
+사용자 Directive v1.1 후속 작업: 초기 도달 상태의 **Guarded 인증 ENGINEERING
+PASS**, 기존 불변량 발견→초기 조건 결합→목표 충분성 연결 구현. 관련 152개
+로컬 테스트와 126개 독립 항등식 검사가 통과했다. 기존 Universal/과거 source
+pin은 보존했다. 동일하게 특수화한 Native와 무료 표현의 cold1/cold64/warm
+비율은 0.967/1.022/0.988배로 **이 fixture에서 NO MEANINGFUL HEADROOM**이다.
+이 계열의 학습은 HOLD. 새 G0 PASS·학습·프런티어 성능 성공은 아니다.
+
+- [v1.1 구현·증명·반례·비용·다음 결정](research/guarded_perspective_2026-10-08.md)
+
 목표는 **프런티어급 능력 + 압도적인 총계산 우위 + 새로운 학습 가능한 계산 원리**다.
 현재 이 목표를 달성했다고 주장할 증거는 없다. Q1~Q7은 열려 있으며 G1/G2와
 Decision 3 봉인 평가는 실행하지 않았다.

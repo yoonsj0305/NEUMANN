@@ -1,5 +1,12 @@
 # NEUMANN 1 연구 상태 감사
 
+v1.1 후속 업데이트: [Guarded 구현과 결과](docs/research/guarded_perspective_2026-10-08.md).
+감사 시작 main `55178a2`, #175 `c404f66`, 미병합; c404의 CI 7개 SUCCESS 확인.
+기존 source pin을 보존한 별도 Guarded 확장과 기존 불변량 연결을 구현했다.
+ENGINEERING PASS지만 기존 fixture의 같은 최적화 권한을 갖춘 Native 대비
+operational 비용 약 1배다. 그 계열의 학습 HOLD, 기존 G0 A/B 유지,
+G1/G2 미진입. 아래 v1.0 감사 결과와 최초 기록은 기존 시점의 관찰로 보존한다.
+
 2026-10-08. 사용자 Research & Development Directive v1.0을 적용한 D0.
 **현재 결정: PIVOT(후보 선정), HOLD(G1/G2). 압도적인 비용 우위와 학습된 LPS는 미입증이다.**
 North Star/Q1~Q7, 과거 판정과 Decision 3 봉인은 변경하지 않았다.
