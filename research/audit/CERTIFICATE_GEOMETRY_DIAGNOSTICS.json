@@ -1,0 +1,116 @@
+{
+  "kind": "RETAINED_OPENED_CERTIFICATE_GEOMETRY_ANALYSIS",
+  "sources": {
+    "docs\\experiments\\results\\v088_completed.manifest.json": "75d7a94026786dd6931a01f4b7332960f11b47cf34e73475cd4b0f5c6a3df19e",
+    "docs\\experiments\\results\\m106_bp_transfer_first\\sources.json": "61b3b5cea713c7265379c039f97cb5eb1c656031f14aba0ee70176da776fc7e8",
+    "docs\\experiments\\results\\m106_bp_transfer_first\\report.json": "fd0f069bb43c8f4f471578de35a6f70af2c418b46b701260f12cd1d27bebd6b8",
+    "neumann1\\lp_basis_headroom_v082.py": "6c1d3fffc9755dea5d40bb53257967257ca839c2a10bf97ae83a0718e26a38ca",
+    "experiments\\lp_quotient_refit_v100.py": "dd00b64a639e23bf96d2dd97c5d5c8d8518a687302eba56052cf28e3c114f3bb"
+  },
+  "groups": {
+    "v088_opened_training": {
+      "originals": 48,
+      "support_sizes": [
+        32,
+        64
+      ],
+      "dual_nullities": [
+        0
+      ],
+      "positive_support_fractions": [
+        0.0625
+      ],
+      "dual_tight_column_counts": [
+        32,
+        64
+      ],
+      "zero_primal_dual_tight_counts": [
+        0
+      ],
+      "dual_tight_ranks": [
+        32,
+        64
+      ],
+      "all_active_support_full_rank": true,
+      "active_stationarity_max_error": 9.797718192317006e-15,
+      "inactive_min_reduced_slack": 0.1919343904161275,
+      "median_positive_primal": 0.32083907902298964
+    },
+    "M106_opened_transfer": {
+      "originals": 16,
+      "support_sizes": [
+        2,
+        4,
+        8,
+        16
+      ],
+      "dual_nullities": [
+        14,
+        28,
+        56,
+        112
+      ],
+      "positive_support_fractions": [
+        0.0078125
+      ],
+      "dual_tight_column_counts": [
+        8,
+        9,
+        10,
+        14,
+        15,
+        23,
+        47,
+        53,
+        55,
+        56,
+        95,
+        112,
+        115,
+        119
+      ],
+      "zero_primal_dual_tight_counts": [
+        6,
+        7,
+        8,
+        11,
+        12,
+        19,
+        39,
+        45,
+        47,
+        48,
+        79,
+        96,
+        99,
+        103
+      ],
+      "dual_tight_ranks": [
+        8,
+        9,
+        10,
+        14,
+        15,
+        23,
+        47,
+        53,
+        55,
+        56,
+        95,
+        112,
+        115,
+        119
+      ],
+      "all_active_support_full_rank": true,
+      "active_stationarity_max_error": 1.9049561927886316e-10,
+      "inactive_min_reduced_slack": -2.792861497624699e-10,
+      "median_positive_primal": 0.18198500876102183
+    }
+  },
+  "new_solver_calls": 0,
+  "new_model_forwards": 0,
+  "new_problems": 0,
+  "rank_scope": "Numerical SVD default epsilon-scaled threshold; no exact rank or uniqueness claim for arbitrary floating input.",
+  "causal_boundary": "Full-rank positive basis fixes the dual through stationarity in the ideal original generator. Sparse BP active equalities leave dual freedom. This explains loss of an automatic certificate property, but not every ranking or cost failure.",
+  "decision": "HOLD_LEARNING"
+}

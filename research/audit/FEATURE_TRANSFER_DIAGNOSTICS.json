@@ -1,0 +1,91 @@
+{
+  "kind": "OPENED_POSTHOC_FEATURE_ANALYSIS",
+  "original_function_sha256": "784b48bf0c5456e1a0ddb2314b221f75bb3beda849e18bc4be5762537f7e5399",
+  "training_manifest_sha256": "75d7a94026786dd6931a01f4b7332960f11b47cf34e73475cd4b0f5c6a3df19e",
+  "M106_source_manifest_sha256": "61b3b5cea713c7265379c039f97cb5eb1c656031f14aba0ee70176da776fc7e8",
+  "groups": {
+    "v088_opened_training": {
+      "originals": 48,
+      "channel_std_median": [
+        0.7269297547501676,
+        0.36114629900278306,
+        0.008371314020910816,
+        0.15024366213953097,
+        0.055258295119748536,
+        0.03091783018536276,
+        0.0,
+        0.0
+      ],
+      "channel_std_max": [
+        0.8336205580934894,
+        0.3923795201231736,
+        0.012163303966103661,
+        0.212992734996516,
+        0.07887348688740509,
+        0.038841981308472044,
+        0.0,
+        0.0
+      ],
+      "channel_under_1e_8_originals": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        48,
+        48
+      ],
+      "channels_under_1e_8_per_original": [
+        2
+      ]
+    },
+    "M106_opened_transfer": {
+      "originals": 16,
+      "channel_std_median": [
+        1.763536349827882e-16,
+        1.6269798218397279e-16,
+        0.007863450353203355,
+        0.13505225454043904,
+        0.05059977179711548,
+        0.030086248206937526,
+        0.0,
+        0.0
+      ],
+      "channel_std_max": [
+        2.471843997619693e-16,
+        2.362696200209494e-16,
+        0.01596510000269541,
+        0.27118853651791874,
+        0.09968400531150129,
+        0.051266258416594476,
+        0.0,
+        0.0
+      ],
+      "channel_under_1e_8_originals": [
+        16,
+        16,
+        0,
+        0,
+        0,
+        0,
+        16,
+        16
+      ],
+      "channels_under_1e_8_per_original": [
+        4
+      ]
+    }
+  },
+  "M106_max_pair_errors": {
+    "signed_pair_matrix_max_error": 0.0,
+    "signed_pair_even_channels_max_error": 0.0,
+    "signed_pair_odd_channels_max_error": 0.0
+  },
+  "new_model_forwards": 0,
+  "new_solver_calls": 0,
+  "new_training": 0,
+  "new_problems": 0,
+  "boundary": "Feature degeneration is observed, but does not prove missing-information impossibility, causality of ranking failure, or sufficiency of retraining. Scalar channels2/3 retain original correlations; original verifier and paid-certificate economics remain separate.",
+  "decision": "HOLD_LEARNING"
+}

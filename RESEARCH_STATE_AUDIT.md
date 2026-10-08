@@ -1,5 +1,21 @@
 # NEUMANN 1 연구 상태 감사
 
+v2.0 Phase2 후속 판별: [BP 인증 경제성 실측](docs/research/bp_certificate_diagnostic_2026-10-08.md).
+원본16개/576관측과 독립 original-goal replay가 통과했다. D무료support+유료dual
+Native/D0.484×,E무료support+dual4.091×,각후보10배0/16. 해당어댑터의full dual
+획득비용이병목으로 확인됐다. HOLD_LEARNING; Phase3/G1/G2를시작하지않는다.
+기존IR/verifier/native/첫증거를보존했고 GitHub반영없이로컬에저장했다.
+아래Phase1과이전감사는각작성시점의결과다.
+
+v2.0 누적 연구 복구: [전체 감사와 원인 분석](research/audit/EVIDENCE_TO_DECISION_MASTER_REVIEW.md),
+[데이터 계보](research/audit/EVIDENCE_LINEAGE.json),
+[아키텍처 공백](research/audit/NEUMANN_ARCHITECTURE_GAP.md),
+[결정](research/audit/RESEARCH_DECISION.md). 현재 HOLD_LEARNING.
+main55178a2/#175fb23dca/#174a011918을 읽기 전용으로 재확인했고14openPR,
+17동일#174 blobs, exacthead CI를 과학 판정과 구별했다. 새 변경은 로컬이다.
+M106의 최적 primal/실패 dual 분리를 기존 수치 witness로 확인했다.
+과거 최초 결과, North Star/Q1–Q7과 봉인은 유지했다. 아래 감사는 당시 상태다.
+
 v1.1 후속 업데이트: [Guarded 구현과 결과](docs/research/guarded_perspective_2026-10-08.md).
 감사 시작 main `55178a2`, #175 `c404f66`, 미병합; c404의 CI 7개 SUCCESS 확인.
 기존 source pin을 보존한 별도 Guarded 확장과 기존 불변량 연결을 구현했다.

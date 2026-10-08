@@ -1,0 +1,967 @@
+{
+  "scope": "Source selection only, before native scientific measurements",
+  "selection_rule": "All 10 registered DTMC families; minimum metadata state count per fixed size bin, nontrivial exact reachability then expected reward/steps; deterministic tie breaks",
+  "size_bins": [
+    [
+      "small",
+      100,
+      5000
+    ],
+    [
+      "large",
+      5001,
+      100000
+    ]
+  ],
+  "cases": [
+    {
+      "family": "brp",
+      "file": "brp.jani",
+      "goal": "p1",
+      "goal_type": "prob-reach",
+      "expected_exact": "1503982516387544510687823213516750681753609533738014093985492327446021823341670745201522478360759626261166470522913554557570937367804047825330483938531949304640395637223627199/3552713678800500929355621337890625000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "parameters": [
+        {
+          "name": "N",
+          "value": 16
+        },
+        {
+          "name": "MAX",
+          "value": 2
+        }
+      ],
+      "file_parameters": [],
+      "metadata_states": 677,
+      "metadata_source_sha256": "612c268c3713edd084d87b260657eebdd4f69395926d393f83af7153d45530c0",
+      "source_commit": "c7324a311475ba1a3f40e36a324e32f91e766540",
+      "complexity_bin": "small",
+      "problem_lineage_id": "brp/brp.jani/[{\"name\": \"N\", \"value\": 16}, {\"name\": \"MAX\", \"value\": 2}]",
+      "case_id": "brp-small-p1",
+      "source_url": "https://raw.githubusercontent.com/ahartmanns/qcomp/c7324a311475ba1a3f40e36a324e32f91e766540/benchmarks/dtmc/brp/brp.jani",
+      "file_sha256": "6aa736a36f68a9c1334e8ede0e0542a1cbbe3066f6fdcedb767c20ab0df01771",
+      "file_bytes": 53156,
+      "goal_expression": {
+        "fun": "values",
+        "op": "filter",
+        "states": {
+          "op": "initial"
+        },
+        "values": {
+          "exp": {
+            "left": true,
+            "op": "U",
+            "right": {
+              "left": "s",
+              "op": "=",
+              "right": 5
+            }
+          },
+          "op": "Pmin"
+        }
+      }
+    },
+    {
+      "family": "brp",
+      "file": "brp.jani",
+      "goal": "p1",
+      "goal_type": "prob-reach",
+      "expected_exact": "1137520452297956464830882968813042681709338303013192208244681893463470011511153113938612392643898648290063235804978679424683535788294952453260292024258852201876167824935089882553027690636929806265877156505139362856816143085852103940492295866761097174270743450658300887837697796011211267176674556318751484102760047860421107514097128569224042812322022008808956108483043582732391996124748826369905049124915258992533742594335920287325988728847529706256172479182782765398426411190463875262378818222986321343356994978876538916180775339888041070059971660796008052811441840535532566730178927628948091473789977081230338957026918167799996154216059054712768051127907721968916630412052335603772542317790729062559786728511134585096265340085361502618258325452008421468295116800422652552895219027430594392011412952080086102162001541741774792495590617811697620485443682315451363673619294485281146082832876711533828347013655215381533377892741013282122519177543969430263377952915516289185389722375038939689160222927290737459298500927465521330615478988400261316004386924474583236946182408104377309922615127079780992881932370271225630021897749292287579026599897110175267825743807061961290237605780672104279642438354578117447083528802346862306657227597171558275116625886276202772433522320993571611222453378576792773856409043535024689958263868731346044291862271972856439743589666666504781815668874441359511133787727060935683893841497599/25379418373156492232740245558305435468236188497010955816060603212394766978892994739324074290557842862296645910577508958466020713424436267027807063576761797784387164997356950668826588206682438068409528271807807110513827972137477530234495048944154405035078525543212890625000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "parameters": [
+        {
+          "name": "N",
+          "value": 64
+        },
+        {
+          "name": "MAX",
+          "value": 5
+        }
+      ],
+      "file_parameters": [],
+      "metadata_states": 5192,
+      "metadata_source_sha256": "612c268c3713edd084d87b260657eebdd4f69395926d393f83af7153d45530c0",
+      "source_commit": "c7324a311475ba1a3f40e36a324e32f91e766540",
+      "complexity_bin": "large",
+      "problem_lineage_id": "brp/brp.jani/[{\"name\": \"N\", \"value\": 64}, {\"name\": \"MAX\", \"value\": 5}]",
+      "case_id": "brp-large-p1",
+      "source_url": "https://raw.githubusercontent.com/ahartmanns/qcomp/c7324a311475ba1a3f40e36a324e32f91e766540/benchmarks/dtmc/brp/brp.jani",
+      "file_sha256": "6aa736a36f68a9c1334e8ede0e0542a1cbbe3066f6fdcedb767c20ab0df01771",
+      "file_bytes": 53156,
+      "goal_expression": {
+        "fun": "values",
+        "op": "filter",
+        "states": {
+          "op": "initial"
+        },
+        "values": {
+          "exp": {
+            "left": true,
+            "op": "U",
+            "right": {
+              "left": "s",
+              "op": "=",
+              "right": 5
+            }
+          },
+          "op": "Pmin"
+        }
+      }
+    },
+    {
+      "family": "coupon",
+      "file": "coupon.5-2.jani",
+      "goal": "exp_draws",
+      "goal_type": "exp-reward",
+      "expected_exact": "751/126",
+      "parameters": [
+        {
+          "name": "B",
+          "value": 5
+        }
+      ],
+      "file_parameters": [
+        {
+          "name": "N",
+          "value": 5
+        },
+        {
+          "name": "DRAWS",
+          "value": 2
+        }
+      ],
+      "metadata_states": 5397,
+      "metadata_source_sha256": "18f7c5f6c05da3e3e86a62fcca32655c40cabe065a69622b77e6d6c7d3e3b015",
+      "source_commit": "c7324a311475ba1a3f40e36a324e32f91e766540",
+      "complexity_bin": "large",
+      "problem_lineage_id": "coupon/coupon.5-2.jani/[{\"name\": \"B\", \"value\": 5}]",
+      "case_id": "coupon-large-exp_draws",
+      "source_url": "https://raw.githubusercontent.com/ahartmanns/qcomp/c7324a311475ba1a3f40e36a324e32f91e766540/benchmarks/dtmc/coupon/coupon.5-2.jani",
+      "file_sha256": "2c90ebfa00d3c964f8ba6f540c6221f188f40b9166d78f4500158e767df0ab39",
+      "file_bytes": 29044,
+      "goal_expression": {
+        "fun": "values",
+        "op": "filter",
+        "states": {
+          "op": "initial"
+        },
+        "values": {
+          "accumulate": [
+            "steps"
+          ],
+          "exp": "numberDraws",
+          "op": "Emin",
+          "reach": "_ret0_"
+        }
+      }
+    },
+    {
+      "family": "crowds",
+      "file": "crowds.jani",
+      "goal": "positive",
+      "goal_type": "prob-reach",
+      "expected_exact": "16406726260175797/309779851562500000",
+      "parameters": [
+        {
+          "name": "TotalRuns",
+          "value": 3
+        },
+        {
+          "name": "CrowdSize",
+          "value": 5
+        }
+      ],
+      "file_parameters": [],
+      "metadata_states": 1145,
+      "metadata_source_sha256": "479c27458549939846f46f2ee917f700311cd19f21936a2ef692bdc81b079120",
+      "source_commit": "c7324a311475ba1a3f40e36a324e32f91e766540",
+      "complexity_bin": "small",
+      "problem_lineage_id": "crowds/crowds.jani/[{\"name\": \"TotalRuns\", \"value\": 3}, {\"name\": \"CrowdSize\", \"value\": 5}]",
+      "case_id": "crowds-small-positive",
+      "source_url": "https://raw.githubusercontent.com/ahartmanns/qcomp/c7324a311475ba1a3f40e36a324e32f91e766540/benchmarks/dtmc/crowds/crowds.jani",
+      "file_sha256": "20d8af250128d80348e17a0b36c7e72bd7430bdac0c75d2e417b99f7ce73595e",
+      "file_bytes": 140791,
+      "goal_expression": {
+        "fun": "values",
+        "op": "filter",
+        "states": {
+          "op": "initial"
+        },
+        "values": {
+          "exp": {
+            "left": true,
+            "op": "U",
+            "right": {
+              "left": "observe0",
+              "op": ">",
+              "right": 1
+            }
+          },
+          "op": "Pmin"
+        }
+      }
+    },
+    {
+      "family": "crowds",
+      "file": "crowds.jani",
+      "goal": "positive",
+      "goal_type": "prob-reach",
+      "expected_exact": "729411335557151611/19825910500000000000",
+      "parameters": [
+        {
+          "name": "TotalRuns",
+          "value": 3
+        },
+        {
+          "name": "CrowdSize",
+          "value": 10
+        }
+      ],
+      "file_parameters": [],
+      "metadata_states": 6460,
+      "metadata_source_sha256": "479c27458549939846f46f2ee917f700311cd19f21936a2ef692bdc81b079120",
+      "source_commit": "c7324a311475ba1a3f40e36a324e32f91e766540",
+      "complexity_bin": "large",
+      "problem_lineage_id": "crowds/crowds.jani/[{\"name\": \"TotalRuns\", \"value\": 3}, {\"name\": \"CrowdSize\", \"value\": 10}]",
+      "case_id": "crowds-large-positive",
+      "source_url": "https://raw.githubusercontent.com/ahartmanns/qcomp/c7324a311475ba1a3f40e36a324e32f91e766540/benchmarks/dtmc/crowds/crowds.jani",
+      "file_sha256": "20d8af250128d80348e17a0b36c7e72bd7430bdac0c75d2e417b99f7ce73595e",
+      "file_bytes": 140791,
+      "goal_expression": {
+        "fun": "values",
+        "op": "filter",
+        "states": {
+          "op": "initial"
+        },
+        "values": {
+          "exp": {
+            "left": true,
+            "op": "U",
+            "right": {
+              "left": "observe0",
+              "op": ">",
+              "right": 1
+            }
+          },
+          "op": "Pmin"
+        }
+      }
+    },
+    {
+      "family": "egl",
+      "file": "egl.jani",
+      "goal": "unfairA",
+      "goal_type": "prob-reach",
+      "expected_exact": "33/64",
+      "parameters": [
+        {
+          "name": "N",
+          "value": 5
+        },
+        {
+          "name": "L",
+          "value": 2
+        }
+      ],
+      "file_parameters": [],
+      "metadata_states": 33790,
+      "metadata_source_sha256": "a99d4c9d8dd3924a87351a71571f387826dab7af06427d6a1deb1387bc86e91c",
+      "source_commit": "c7324a311475ba1a3f40e36a324e32f91e766540",
+      "complexity_bin": "large",
+      "problem_lineage_id": "egl/egl.jani/[{\"name\": \"N\", \"value\": 5}, {\"name\": \"L\", \"value\": 2}]",
+      "case_id": "egl-large-unfairA",
+      "source_url": "https://raw.githubusercontent.com/ahartmanns/qcomp/c7324a311475ba1a3f40e36a324e32f91e766540/benchmarks/dtmc/egl/egl.jani",
+      "file_sha256": "c0d704f79e9cf6c8e4a2354af876a48a094a2166d10f92638e3158d8a3a61846",
+      "file_bytes": 353051,
+      "goal_expression": {
+        "fun": "values",
+        "op": "filter",
+        "states": {
+          "op": "initial"
+        },
+        "values": {
+          "exp": {
+            "left": true,
+            "op": "U",
+            "right": {
+              "left": {
+                "exp": "knowA",
+                "op": "\u00ac"
+              },
+              "op": "\u2227",
+              "right": "knowB"
+            }
+          },
+          "op": "Pmin"
+        }
+      }
+    },
+    {
+      "family": "haddad-monmege",
+      "file": "haddad-monmege.jani",
+      "goal": "exp_steps",
+      "goal_type": "exp-steps",
+      "expected_exact": "1901475900342344102245054808062",
+      "parameters": [
+        {
+          "name": "N",
+          "value": 100
+        },
+        {
+          "name": "p",
+          "value": 0.7
+        }
+      ],
+      "file_parameters": [],
+      "metadata_states": 201,
+      "metadata_source_sha256": "fb0b20fc0b9e170b346518ec70af3032d0ffe0ca7bc11a2e8699e57bd6f0f49f",
+      "source_commit": "c7324a311475ba1a3f40e36a324e32f91e766540",
+      "complexity_bin": "small",
+      "problem_lineage_id": "haddad-monmege/haddad-monmege.jani/[{\"name\": \"N\", \"value\": 100}, {\"name\": \"p\", \"value\": 0.7}]",
+      "case_id": "haddad-monmege-small-exp_steps",
+      "source_url": "https://raw.githubusercontent.com/ahartmanns/qcomp/c7324a311475ba1a3f40e36a324e32f91e766540/benchmarks/dtmc/haddad-monmege/haddad-monmege.jani",
+      "file_sha256": "1fa80d5ad37a313a4ead523d856c020ea3c5a5e01bee5d45e45b8bfe576f48ac",
+      "file_bytes": 11393,
+      "goal_expression": {
+        "fun": "values",
+        "op": "filter",
+        "states": {
+          "op": "initial"
+        },
+        "values": {
+          "accumulate": [
+            "steps"
+          ],
+          "exp": 1,
+          "op": "Emin",
+          "reach": "Done"
+        }
+      }
+    },
+    {
+      "family": "herman",
+      "file": "herman.7.jani",
+      "goal": "steps",
+      "goal_type": "exp-reward",
+      "expected_exact": "48/7",
+      "parameters": [],
+      "file_parameters": [
+        {
+          "name": "N",
+          "value": 7
+        }
+      ],
+      "metadata_states": 128,
+      "metadata_source_sha256": "3f657f21ca9c7a0783b87c306645bdaa387a19397aedff21a662088263900328",
+      "source_commit": "c7324a311475ba1a3f40e36a324e32f91e766540",
+      "complexity_bin": "small",
+      "problem_lineage_id": "herman/herman.7.jani/[]",
+      "case_id": "herman-small-steps",
+      "source_url": "https://raw.githubusercontent.com/ahartmanns/qcomp/c7324a311475ba1a3f40e36a324e32f91e766540/benchmarks/dtmc/herman/herman.7.jani",
+      "file_sha256": "7a9701c302b9efaf9a3b3570ee00cf4e64bf68e0c8a5bba5ba230894d9604b6a",
+      "file_bytes": 29279,
+      "goal_expression": {
+        "fun": "max",
+        "op": "filter",
+        "states": {
+          "op": "initial"
+        },
+        "values": {
+          "accumulate": [
+            "exit"
+          ],
+          "exp": "steps",
+          "op": "Emin",
+          "reach": "stable"
+        }
+      }
+    },
+    {
+      "family": "herman",
+      "file": "herman.15.jani",
+      "goal": "steps",
+      "goal_type": "exp-reward",
+      "expected_exact": "100/3",
+      "parameters": [],
+      "file_parameters": [
+        {
+          "name": "N",
+          "value": 15
+        }
+      ],
+      "metadata_states": 32768,
+      "metadata_source_sha256": "3f657f21ca9c7a0783b87c306645bdaa387a19397aedff21a662088263900328",
+      "source_commit": "c7324a311475ba1a3f40e36a324e32f91e766540",
+      "complexity_bin": "large",
+      "problem_lineage_id": "herman/herman.15.jani/[]",
+      "case_id": "herman-large-steps",
+      "source_url": "https://raw.githubusercontent.com/ahartmanns/qcomp/c7324a311475ba1a3f40e36a324e32f91e766540/benchmarks/dtmc/herman/herman.15.jani",
+      "file_sha256": "17196fade3ab8ef13a74636962bf88853aa9875621de2ddfad3a7d4d83f69eb7",
+      "file_bytes": 60964,
+      "goal_expression": {
+        "fun": "max",
+        "op": "filter",
+        "states": {
+          "op": "initial"
+        },
+        "values": {
+          "accumulate": [
+            "exit"
+          ],
+          "exp": "steps",
+          "op": "Emin",
+          "reach": "stable"
+        }
+      }
+    },
+    {
+      "family": "leader_sync",
+      "file": "leader_sync.5-2.jani",
+      "goal": "time",
+      "goal_type": "exp-reward",
+      "expected_exact": "16/5",
+      "parameters": [],
+      "file_parameters": [
+        {
+          "name": "N",
+          "value": 5
+        },
+        {
+          "name": "K",
+          "value": 2
+        }
+      ],
+      "metadata_states": 141,
+      "metadata_source_sha256": "dcc9723599eadefc4f26a18fe651e0a906799427b0d1e8669c80a9eb683d1e5b",
+      "source_commit": "c7324a311475ba1a3f40e36a324e32f91e766540",
+      "complexity_bin": "small",
+      "problem_lineage_id": "leader_sync/leader_sync.5-2.jani/[]",
+      "case_id": "leader_sync-small-time",
+      "source_url": "https://raw.githubusercontent.com/ahartmanns/qcomp/c7324a311475ba1a3f40e36a324e32f91e766540/benchmarks/dtmc/leader_sync/leader_sync.5-2.jani",
+      "file_sha256": "bd5ca659b5c452214dca85d77df77d9a55bdfe2ca898dbf22d124611de30bc4c",
+      "file_bytes": 94311,
+      "goal_expression": {
+        "fun": "values",
+        "op": "filter",
+        "states": {
+          "op": "initial"
+        },
+        "values": {
+          "accumulate": [
+            "steps"
+          ],
+          "exp": "num_rounds",
+          "op": "Emin",
+          "reach": "elected"
+        }
+      }
+    },
+    {
+      "family": "nand",
+      "file": "nand.jani",
+      "goal": "reliable",
+      "goal_type": "prob-reach",
+      "expected_exact": "454145248959466263206300672080823961584243126656236807230574990948755414929234065950885444364672074670801081404922816501/1585597238352817012091618498084205900866241992472115126058557904586976405880704987794160842895507812500000000000000000000",
+      "parameters": [
+        {
+          "name": "N",
+          "value": 20
+        },
+        {
+          "name": "K",
+          "value": 1
+        }
+      ],
+      "file_parameters": [],
+      "metadata_states": 78332,
+      "metadata_source_sha256": "07a4e73dc5617ae1f5ebb29b453be5b34acdd16375df8e4cd79d7e59db278a7b",
+      "source_commit": "c7324a311475ba1a3f40e36a324e32f91e766540",
+      "complexity_bin": "large",
+      "problem_lineage_id": "nand/nand.jani/[{\"name\": \"N\", \"value\": 20}, {\"name\": \"K\", \"value\": 1}]",
+      "case_id": "nand-large-reliable",
+      "source_url": "https://raw.githubusercontent.com/ahartmanns/qcomp/c7324a311475ba1a3f40e36a324e32f91e766540/benchmarks/dtmc/nand/nand.jani",
+      "file_sha256": "06d766610e8693ac7efe6da521051e1b7b4581739a01c539e556c3f7c057442e",
+      "file_bytes": 74222,
+      "goal_expression": {
+        "fun": "values",
+        "op": "filter",
+        "states": {
+          "op": "initial"
+        },
+        "values": {
+          "exp": {
+            "left": true,
+            "op": "U",
+            "right": {
+              "left": {
+                "left": "s",
+                "op": "=",
+                "right": 4
+              },
+              "op": "\u2227",
+              "right": {
+                "left": {
+                  "left": "z",
+                  "op": "/",
+                  "right": "N"
+                },
+                "op": "<",
+                "right": 0.1
+              }
+            }
+          },
+          "op": "Pmin"
+        }
+      }
+    },
+    {
+      "family": "oscillators",
+      "file": "oscillators.6-6-0.1-1.jani",
+      "goal": "power_consumption",
+      "goal_type": "exp-reward",
+      "expected_exact": "71586791842874885623626671584519797159911727435149078940482856720934745142987241813527098412145752103459710399145970056807375924997474511596572872403/44220678497741019423185264811907840292426804361978627330554551841647132049480499079807925581039166472553873570779529103809976303578299531164640000000000",
+      "parameters": [
+        {
+          "name": "mu",
+          "value": 0.1
+        },
+        {
+          "name": "lambda",
+          "value": 1.0
+        }
+      ],
+      "file_parameters": [
+        {
+          "name": "N",
+          "value": 6
+        },
+        {
+          "name": "T",
+          "value": 6
+        },
+        {
+          "name": "epsilon",
+          "value": 0.1
+        },
+        {
+          "name": "R",
+          "value": 1
+        }
+      ],
+      "metadata_states": 463,
+      "metadata_source_sha256": "bdc0c5238ee26469d911107546ea0fc22af9a246d9f6f320c5cb67506d0b8272",
+      "source_commit": "c7324a311475ba1a3f40e36a324e32f91e766540",
+      "complexity_bin": "small",
+      "problem_lineage_id": "oscillators/oscillators.6-6-0.1-1.jani/[{\"name\": \"mu\", \"value\": 0.1}, {\"name\": \"lambda\", \"value\": 1.0}]",
+      "case_id": "oscillators-small-power_consumption",
+      "source_url": "https://raw.githubusercontent.com/ahartmanns/qcomp/c7324a311475ba1a3f40e36a324e32f91e766540/benchmarks/dtmc/oscillators/oscillators.6-6-0.1-1.jani",
+      "file_sha256": "7bebdad152337c3820685515af507581ad67319caa66e7dc457d2719ed631eeb",
+      "file_bytes": 517671,
+      "goal_expression": {
+        "fun": "values",
+        "op": "filter",
+        "states": {
+          "op": "initial"
+        },
+        "values": {
+          "accumulate": [
+            "exit"
+          ],
+          "exp": "power_consumption",
+          "op": "Emin",
+          "reach": {
+            "left": {
+              "left": {
+                "left": {
+                  "left": {
+                    "left": {
+                      "left": {
+                        "left": {
+                          "left": {
+                            "left": 0.5,
+                            "op": "*",
+                            "right": "k_6"
+                          },
+                          "op": "+",
+                          "right": {
+                            "left": 0.5,
+                            "op": "*",
+                            "right": "k_2"
+                          }
+                        },
+                        "op": "+",
+                        "right": {
+                          "left": {
+                            "left": -1,
+                            "op": "*",
+                            "right": "k_4"
+                          },
+                          "op": "+",
+                          "right": {
+                            "left": -0.5,
+                            "op": "*",
+                            "right": "k_3"
+                          }
+                        }
+                      },
+                      "op": "+",
+                      "right": {
+                        "left": {
+                          "left": -0.5,
+                          "op": "*",
+                          "right": "k_5"
+                        },
+                        "op": "+",
+                        "right": {
+                          "left": 1,
+                          "op": "*",
+                          "right": "k_1"
+                        }
+                      }
+                    },
+                    "op": "/",
+                    "right": 6
+                  },
+                  "op": "pow",
+                  "right": 2
+                },
+                "op": "+",
+                "right": {
+                  "left": {
+                    "left": {
+                      "left": {
+                        "left": {
+                          "left": {
+                            "left": -0.866025403784,
+                            "op": "*",
+                            "right": "k_6"
+                          },
+                          "op": "+",
+                          "right": {
+                            "left": 0.866025403784,
+                            "op": "*",
+                            "right": "k_2"
+                          }
+                        },
+                        "op": "+",
+                        "right": {
+                          "left": {
+                            "left": 0.0,
+                            "op": "*",
+                            "right": "k_4"
+                          },
+                          "op": "+",
+                          "right": {
+                            "left": 0.866025403784,
+                            "op": "*",
+                            "right": "k_3"
+                          }
+                        }
+                      },
+                      "op": "+",
+                      "right": {
+                        "left": {
+                          "left": -0.866025403784,
+                          "op": "*",
+                          "right": "k_5"
+                        },
+                        "op": "+",
+                        "right": {
+                          "left": 0.0,
+                          "op": "*",
+                          "right": "k_1"
+                        }
+                      }
+                    },
+                    "op": "/",
+                    "right": 6
+                  },
+                  "op": "pow",
+                  "right": 2
+                }
+              },
+              "op": "pow",
+              "right": 0.5
+            },
+            "op": "\u2265",
+            "right": "lambda"
+          }
+        }
+      }
+    },
+    {
+      "family": "oscillators",
+      "file": "oscillators.6-10-0.1-1.jani",
+      "goal": "power_consumption",
+      "goal_type": "exp-reward",
+      "expected_exact": "289182085177600110051885553860214311310128371762688530515198199043097084527973587022652120524422049346303903661586826015723895054067692995196099317924093988869247162320349350897396149902642756352348105672853038834379846818589045387992606341740509725311243258371420317525060450568404665468094137261392055523840739573196979150054090273547544432979334516832917246264463902581427136812483508676188051722063205283757745716099410737313219092440629134683577672074739040042712597685677270360153770005086291263739001256536953719330062742860624923332240607992583921338325558695655413521683978856782340367905568614445112999210107104775114746526265097954806201689622193956011555906035651958776800566212812924378820964935493424354659963178855038948026934867734674289243745594769460144227542688053805970170856483830210751495347534295158986773278955503775718392533896452171337842686773645682678655988042811132134537878486429467154204671778912320577472661968778290616590011852208769535601781597818741533483549840615609241498165377541492218042668883240921779376945175768252644290680131274748676699935182653050100431343509138921225535931341457830350246731803475387560909190882742147899828197847566810841945939471980388972802006948336259999542730948411699091824743108608472204431631602665022864059409115766252477665066203533249142148604317799108717019742406867508282393537052490205522376275358303114973298082500778633088741954226153024109542462880769194011013918895882140671408548123249027468241368582283054847064159637661859383199588682391549713543592192901867804993552684483658492764183256566077837614139089213383658538303088990522016034991374842729222935202476692747614294123004539471319833476232331922564053738240084452652414855965162388402811791645144684703143307259487836633437701449531816970867983037513855826364420378370990520350027863371282823351542618049090234896107898391778209761393678018152431579880389963481333215169823948215414483495464584523171022564548793947275600670779174624611233021786217462530193074848674635977544962817876912427348501476290859702732711888869846389147427096772506511490150302830225444942551259369702422458877339866937676994042186253951/31956913191406200814956562571303927859628862526255955735470636976318540400303565422146711086154038460181526211929190265067061654013925759129721878466947804980798854198467126235090275717978351682020195436203457994872399470633698255201611148958230390464437149251513906764236685253882105174685258342439042436307187501547061390058448523226268610343409989439232139367220828730951636741472777394469482371241476030188600369214427154152884816311783765904275257024556883978310752771399299432205005950751915727286096959669030480500908889139408793980649438184137094406888364897366309149462213003627398941418292687277427607067643476725232957823147625496195554542304109078225843591648368325801955782727937216425996796478942394595952067785799927569541853078387921465508003803459956105754776735116597618717946170745296500897087117575972335758015371894596491235257897133150521153782461526418343413566796689149707624773784855953645557284908662088685538253062045150587285770075760247981756437773621454388582702431827831206317197395428174517429508220223724771569346416072710884478995553667943210666476770643274892939022484585070943189171438585256738113317181203121056480422248682971988449431730864387413279681325881763431694498347936928263786233072345385651202507449910604907742914186185760457232386785160005962728717057703437807505958075142031181883706890483126242241419247055068274515232155723878548780563422842580467075779311191307443167559173923897312052451484771148974158381192705870851976219307097217532001064933140062951341066063294334833721645361775801938549656630721270957649670811970072497252995145186965608962593631153757709369311960991441118284750833205716868465770625592341532023501591044725234210668902533437955014345877648815116250705996610849804124620699096432629843907998115854085525794328329027474543801944652890700133177880449823307016359085670227289232136866090896429732942948639200705639176248234443237928138332752040183125593035140246636656037970607103801237609354339068134111410946647356342616599375233653146211026452878636516356630035521653000415127819373037988837723102137471003504386898479607239041861920366844736167238699772605836760000000000000000",
+      "parameters": [
+        {
+          "name": "mu",
+          "value": 0.1
+        },
+        {
+          "name": "lambda",
+          "value": 1.0
+        }
+      ],
+      "file_parameters": [
+        {
+          "name": "N",
+          "value": 6
+        },
+        {
+          "name": "T",
+          "value": 10
+        },
+        {
+          "name": "epsilon",
+          "value": 0.1
+        },
+        {
+          "name": "R",
+          "value": 1
+        }
+      ],
+      "metadata_states": 5006,
+      "metadata_source_sha256": "bdc0c5238ee26469d911107546ea0fc22af9a246d9f6f320c5cb67506d0b8272",
+      "source_commit": "c7324a311475ba1a3f40e36a324e32f91e766540",
+      "complexity_bin": "large",
+      "problem_lineage_id": "oscillators/oscillators.6-10-0.1-1.jani/[{\"name\": \"mu\", \"value\": 0.1}, {\"name\": \"lambda\", \"value\": 1.0}]",
+      "case_id": "oscillators-large-power_consumption",
+      "source_url": "https://raw.githubusercontent.com/ahartmanns/qcomp/c7324a311475ba1a3f40e36a324e32f91e766540/benchmarks/dtmc/oscillators/oscillators.6-10-0.1-1.jani",
+      "file_sha256": "17b13fbb21158c68db617f5c5977a88471d2b019ddfea518dec4d0f9c5735ae4",
+      "file_bytes": 6102683,
+      "goal_expression": {
+        "fun": "values",
+        "op": "filter",
+        "states": {
+          "op": "initial"
+        },
+        "values": {
+          "accumulate": [
+            "exit"
+          ],
+          "exp": "power_consumption",
+          "op": "Emin",
+          "reach": {
+            "left": {
+              "left": {
+                "left": {
+                  "left": {
+                    "left": {
+                      "left": {
+                        "left": {
+                          "left": {
+                            "left": {
+                              "left": 0.809016994375,
+                              "op": "*",
+                              "right": "k_10"
+                            },
+                            "op": "+",
+                            "right": {
+                              "left": 0.809016994375,
+                              "op": "*",
+                              "right": "k_2"
+                            }
+                          },
+                          "op": "+",
+                          "right": {
+                            "left": {
+                              "left": -1,
+                              "op": "*",
+                              "right": "k_6"
+                            },
+                            "op": "+",
+                            "right": {
+                              "left": -0.809016994375,
+                              "op": "*",
+                              "right": "k_5"
+                            }
+                          }
+                        },
+                        "op": "+",
+                        "right": {
+                          "left": {
+                            "left": -0.309016994375,
+                            "op": "*",
+                            "right": "k_8"
+                          },
+                          "op": "+",
+                          "right": {
+                            "left": 0.309016994375,
+                            "op": "*",
+                            "right": "k_3"
+                          }
+                        }
+                      },
+                      "op": "+",
+                      "right": {
+                        "left": {
+                          "left": {
+                            "left": 0.309016994375,
+                            "op": "*",
+                            "right": "k_9"
+                          },
+                          "op": "+",
+                          "right": {
+                            "left": 1,
+                            "op": "*",
+                            "right": "k_1"
+                          }
+                        },
+                        "op": "+",
+                        "right": {
+                          "left": {
+                            "left": -0.809016994375,
+                            "op": "*",
+                            "right": "k_7"
+                          },
+                          "op": "+",
+                          "right": {
+                            "left": -0.309016994375,
+                            "op": "*",
+                            "right": "k_4"
+                          }
+                        }
+                      }
+                    },
+                    "op": "/",
+                    "right": 6
+                  },
+                  "op": "pow",
+                  "right": 2
+                },
+                "op": "+",
+                "right": {
+                  "left": {
+                    "left": {
+                      "left": {
+                        "left": {
+                          "left": {
+                            "left": {
+                              "left": -0.587785252292,
+                              "op": "*",
+                              "right": "k_10"
+                            },
+                            "op": "+",
+                            "right": {
+                              "left": 0.587785252292,
+                              "op": "*",
+                              "right": "k_2"
+                            }
+                          },
+                          "op": "+",
+                          "right": {
+                            "left": {
+                              "left": 0.0,
+                              "op": "*",
+                              "right": "k_6"
+                            },
+                            "op": "+",
+                            "right": {
+                              "left": 0.587785252292,
+                              "op": "*",
+                              "right": "k_5"
+                            }
+                          }
+                        },
+                        "op": "+",
+                        "right": {
+                          "left": {
+                            "left": -0.951056516295,
+                            "op": "*",
+                            "right": "k_8"
+                          },
+                          "op": "+",
+                          "right": {
+                            "left": 0.951056516295,
+                            "op": "*",
+                            "right": "k_3"
+                          }
+                        }
+                      },
+                      "op": "+",
+                      "right": {
+                        "left": {
+                          "left": {
+                            "left": -0.951056516295,
+                            "op": "*",
+                            "right": "k_9"
+                          },
+                          "op": "+",
+                          "right": {
+                            "left": 0.0,
+                            "op": "*",
+                            "right": "k_1"
+                          }
+                        },
+                        "op": "+",
+                        "right": {
+                          "left": {
+                            "left": -0.587785252292,
+                            "op": "*",
+                            "right": "k_7"
+                          },
+                          "op": "+",
+                          "right": {
+                            "left": 0.951056516295,
+                            "op": "*",
+                            "right": "k_4"
+                          }
+                        }
+                      }
+                    },
+                    "op": "/",
+                    "right": 6
+                  },
+                  "op": "pow",
+                  "right": 2
+                }
+              },
+              "op": "pow",
+              "right": 0.5
+            },
+            "op": "\u2265",
+            "right": "lambda"
+          }
+        }
+      }
+    }
+  ],
+  "exclusions": [
+    {
+      "family": "bluetooth",
+      "bin": "small",
+      "reason": "No public exact nontrivial supported goal in predeclared size range"
+    },
+    {
+      "family": "bluetooth",
+      "bin": "large",
+      "reason": "No public exact nontrivial supported goal in predeclared size range"
+    },
+    {
+      "family": "coupon",
+      "bin": "small",
+      "reason": "No public exact nontrivial supported goal in predeclared size range"
+    },
+    {
+      "family": "egl",
+      "bin": "small",
+      "reason": "No public exact nontrivial supported goal in predeclared size range"
+    },
+    {
+      "family": "haddad-monmege",
+      "bin": "large",
+      "reason": "No public exact nontrivial supported goal in predeclared size range"
+    },
+    {
+      "family": "leader_sync",
+      "bin": "large",
+      "reason": "No public exact nontrivial supported goal in predeclared size range"
+    },
+    {
+      "family": "nand",
+      "bin": "small",
+      "reason": "No public exact nontrivial supported goal in predeclared size range"
+    }
+  ]
+}

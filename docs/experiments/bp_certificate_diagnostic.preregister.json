@@ -1,0 +1,108 @@
+{
+  "schema": "neumann.opened-bp-certificate-diagnostic.v1",
+  "frozen": true,
+  "historical_verdicts_changed": false,
+  "head": "fb23dca002bbd50c96e0c766369269a0b7fcc7a6",
+  "source_report_sha256": "fd0f069bb43c8f4f471578de35a6f70af2c418b46b701260f12cd1d27bebd6b8",
+  "independent_opened_originals": 16,
+  "fresh_originals": 0,
+  "routes": [
+    "A_NATIVE",
+    "A_IPM",
+    "A_DUAL",
+    "A_SPGL1",
+    "B_RETAINED_s100001",
+    "B_RETAINED_s100002",
+    "C_ORACLE_PADDED",
+    "D_ORACLE_SPARSE",
+    "E_ORACLE_SPARSE_DUAL"
+  ],
+  "scheduled_observations": 576,
+  "warmups": 1,
+  "timed_repeats": 3,
+  "order_seed": 106208,
+  "request_budget_s": 5.0,
+  "whole_execution_budget_s": 300,
+  "one_numerical_thread": true,
+  "free_structures": "C/D/E Oracle only; B retained frozen ranking with free discovery LOWER BOUND",
+  "new_model_forwards": 0,
+  "new_data_generated": 0,
+  "dual_D": "minimum-norm KKT; full original HiGHS dual-feasibility repair; original checker unchanged",
+  "strong_comparators": [
+    "Highs original primal simplex",
+    "SciPy original IPM",
+    "classical explicit original dual LP",
+    "SPGL1 BP with SAME sparse primal/dual refit"
+  ],
+  "spgl1_options": {
+    "bp_tol": 1e-09,
+    "opt_tol": 1e-09,
+    "iter_lim": 2000,
+    "max_matvec": 8000,
+    "support_threshold": "1e-6*max(1,maxabs(beta))"
+  },
+  "headroom_screen": {
+    "geomean": 10,
+    "required_tenfold_originals": 13,
+    "originals": 16,
+    "all_verified_every_repeat": true,
+    "censored_handling": "INCOMPLETE; no subset PASS"
+  },
+  "measured_dependency_setup_ms": 1792.0299999968847,
+  "unknown_cost_axes": [
+    "energy",
+    "FLOPs",
+    "peak_memory",
+    "historical fit on same CPU",
+    "complete lifecycle investment",
+    "operational money"
+  ],
+  "startup_scope": "shared diagnostic imports and retained-label authority checks; not independently optimized deployment startup",
+  "request_scope": "source read/hash/decode, candidate/all failed attempts/dual acquisition/fallback, original check, minimal common response serialization. Scientific archival fsync excluded; full research wall disclosed.",
+  "amortization_Q": [
+    1,
+    10000
+  ],
+  "runner_sha256": "e6a7084f617b184264359128d3a42931756ae62e65ddfc1cff8ae635b0d194cf",
+  "source_pins": {
+    "neumann1/lp_certificate_v081.py": "d60f8b0ad045f1b82df01e70d963f52ead5bf3814701e8d6b37bc603b417a209",
+    "neumann1/lp_native_warm_start_v086.py": "623f4ccd85233d6d96cbf8d3faf20272c04e327a9c7e64b4893403c2671cfcd4",
+    "neumann1/lp_q34_support_v097.py": "ee498ee731a5c35e1cc1f61057938a5fab76cd0196cdf314e7f095659041651a",
+    "neumann1/q5_evidence.py": "4f107d6db6a35f1ca6c241f914d487d5bbd3224eb38bee117b103296e08175bc",
+    "experiments/q5_register.py": "369abb86fd7504d8c56931f88aa083f81fb5181310f634d854b5bebd062600d8",
+    "docs/experiments/results/m106_bp_transfer_first/report.json": "fd0f069bb43c8f4f471578de35a6f70af2c418b46b701260f12cd1d27bebd6b8",
+    "docs/experiments/results/m106_bp_transfer_first/sources.json": "61b3b5cea713c7265379c039f97cb5eb1c656031f14aba0ee70176da776fc7e8",
+    "docs/experiments/results/m106_bp_transfer_first/m106_bp_k8_r0.json.gz": "34673a2acdde52780299e16ff665e572b3fe7e3130b805b4fdd62aafa641c331",
+    "docs/experiments/results/m106_bp_transfer_first/m106_bp_k8_r1.json.gz": "0e55112b38c2c7b03850ccde706f597d4ac840e4c2ecafba17b818502e59f303",
+    "docs/experiments/results/m106_bp_transfer_first/m106_bp_k8_r2.json.gz": "b90a87ff204dcf7bcc5f549999dfa43052cc0a148bce2ae48b03c8fb29178397",
+    "docs/experiments/results/m106_bp_transfer_first/m106_bp_k8_r3.json.gz": "9ed9290c4b028f1e853a4594a52e0f266004ae53ab698472c097fd50503d84f5",
+    "docs/experiments/results/m106_bp_transfer_first/m106_bp_k16_r0.json.gz": "f26c75b9f169248323da3cec654cffb73c6162566e66e5aaa63075783a8e5a94",
+    "docs/experiments/results/m106_bp_transfer_first/m106_bp_k16_r1.json.gz": "6974c4cf06a232db68f450a975030287652d3140403c99a5a1fc59eb9ad368a7",
+    "docs/experiments/results/m106_bp_transfer_first/m106_bp_k16_r2.json.gz": "606ed53c07b517fbd372069c10fdcd1f137164b0c761179f7be9e235db6ffb5e",
+    "docs/experiments/results/m106_bp_transfer_first/m106_bp_k16_r3.json.gz": "d783eae375cb90acd87905585b09088479d8d311b0a90661725485b978e15aaf",
+    "docs/experiments/results/m106_bp_transfer_first/m106_bp_k32_r0.json.gz": "3861d0848002d2934ad2abc1f2903fb00dfbbc78fcd802bc3a688c0ee5327fa9",
+    "docs/experiments/results/m106_bp_transfer_first/m106_bp_k32_r1.json.gz": "6fb23418378189892b41871924341c12695e2db51f17734912e33a2e1137cbae",
+    "docs/experiments/results/m106_bp_transfer_first/m106_bp_k32_r2.json.gz": "b7cd2a3b1a223f53b766042eb8c49dad6b9751ae2f4c0644cf9ebd10eb99da9f",
+    "docs/experiments/results/m106_bp_transfer_first/m106_bp_k32_r3.json.gz": "8afc941f074dc76b37201c8b8b3c755447ac58fe1dabb2fb63811c9e3df1cd37",
+    "docs/experiments/results/m106_bp_transfer_first/m106_bp_k64_r0.json.gz": "e76076931af43d825070a0553863c811a300efa0e6d8ee80e1ab865bcb17dc32",
+    "docs/experiments/results/m106_bp_transfer_first/m106_bp_k64_r1.json.gz": "38a508cf0d2fc4f334e7ccc7ee69ee4e16681528911e4b833af65d8159290bd1",
+    "docs/experiments/results/m106_bp_transfer_first/m106_bp_k64_r2.json.gz": "a2c3e37e90ac68cd05667952c2007d8742484936cb0e4b21f223bb7d14a90195",
+    "docs/experiments/results/m106_bp_transfer_first/m106_bp_k64_r3.json.gz": "25481d9f9c8728c0988724498370062106121c3aa6ce5a79bdd5df84b9a8759b"
+  },
+  "contract_sha256_in_receipt_required": true,
+  "learning_admitted": false,
+  "registered_utc": "2026-10-08T07:17:14.249782+00:00",
+  "dependency_pins": {
+    "highspy/_core.cp312-win_amd64.pyd": "f733d7369f647f8afe481bbaf569164f7cd7c127e41ca53cd7c205c2fb9038e2",
+    "spgl1/spgl1.py": "2c7a0347233582a8ed89228a7e3d40beeeff8b9e3db35320050fd91165a136d0",
+    "spgl1/lsqr.py": "4dbc3d30732bd2dd5e92cf3e0cd6c33bb08d92e7ae97f1b97737457766e43372"
+  },
+  "runtime_expected": {
+    "python": "3.12.14",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "highspy": "1.15.1",
+    "spgl1": "0.0.3",
+    "platform": "Windows11, same resident process and one numerical thread"
+  }
+}

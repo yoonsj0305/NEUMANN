@@ -1,0 +1,199 @@
+===== BEGIN P1.11 NOT_EVALUATED DIAGNOSTIC =====
+{
+  "P111_FIRST_NONEVALUATED_DIAGNOSTIC": true,
+  "historical_result_changed": false,
+  "model_inference": false,
+  "evidence_mutation": false,
+  "archive": {
+    "bytes": 23620,
+    "sha256": "d75aeeccbd54e5c96041a41f4c40c1df17a5504d44c026336c53fab2b247e5e0"
+  },
+  "setup": {
+    "active_child_pid": null,
+    "bootstrap_sha256": "07d3f606ba9fe5beb9c79f4181e1525731a2699e9b77b361042158794ca120de",
+    "decision3_admitted": false,
+    "development_only": true,
+    "development_verdict": "NOT_EVALUATED",
+    "favorable_rerun": false,
+    "launcher_setup_and_runner_wall_ms": 62872.423547000035,
+    "launcher_wall_ms": 205.55751300003067,
+    "model_artifact_manifest_sha256": "f961e60f6f7352d756e7addf8d7887be199c81facd2ae93950bc03d1e52d7292",
+    "p110_task_score_reuse": false,
+    "p2_admitted": false,
+    "p2_registration_admitted": false,
+    "replay_exit_code": 0,
+    "runner_exit_code": 2,
+    "runtime_head": "8094b4ea90fc48f4d3c0d8142ff378dbe73afc59",
+    "schema": "neumann.control-plane-p111-setup.v1",
+    "setup_and_runner_wall_ms": 62666.866034000006,
+    "stages": [
+      {
+        "exit_code": 0,
+        "name": "CUDA runtime preflight",
+        "status": "COMPLETE",
+        "wall_ms": 8083.7951359999915
+      },
+      {
+        "exit_code": 0,
+        "name": "clone",
+        "status": "COMPLETE",
+        "wall_ms": 20461.48367500001
+      },
+      {
+        "exit_code": 0,
+        "name": "frozen checkout",
+        "status": "COMPLETE",
+        "wall_ms": 1218.4485829999971
+      },
+      {
+        "exit_code": 0,
+        "name": "dependencies",
+        "status": "COMPLETE",
+        "wall_ms": 4074.9469840000074
+      },
+      {
+        "exit_code": 0,
+        "name": "post-install CUDA preflight",
+        "status": "COMPLETE",
+        "wall_ms": 2321.301398000003
+      },
+      {
+        "exit_code": 0,
+        "name": "frozen model artifact acquisition",
+        "status": "COMPLETE",
+        "wall_ms": 1919.0423150000129
+      },
+      {
+        "exit_code": 0,
+        "name": "package inventory",
+        "status": "COMPLETE",
+        "wall_ms": 1819.807733999994
+      },
+      {
+        "exit_code": 0,
+        "name": "frozen registration",
+        "status": "COMPLETE",
+        "wall_ms": 1970.50107299998
+      },
+      {
+        "exit_code": 2,
+        "name": "first semantic-microexecutor development run",
+        "status": "NONZERO",
+        "wall_ms": 19013.703873999988
+      },
+      {
+        "exit_code": 0,
+        "name": "model-free receipt replay",
+        "status": "COMPLETE",
+        "wall_ms": 1519.1126610000083
+      }
+    ],
+    "status": "FINISHED_NONPASS"
+  },
+  "report": {
+    "status": "INCOMPLETE",
+    "observations": 0,
+    "decision": {
+      "decision3_admitted": false,
+      "development_only": true,
+      "fresh_validation_registered": false,
+      "global_questions_closed": [],
+      "p2_admitted": false,
+      "p2_registration_admitted": false,
+      "reason": "INCOMPLETE_OR_COVERAGE_DRIFT",
+      "verdict": "NOT_EVALUATED"
+    },
+    "whole_study_ms": 16588.252375,
+    "selector_startup_ms": null,
+    "accounting_complete": false,
+    "cost_totals": {
+      "feasibility_calls": 0,
+      "feasibility_constraint_checks": 0,
+      "feasibility_nodes": 0,
+      "generated_calls": 0,
+      "input_rows": 0,
+      "input_tokens": 0,
+      "model_calls": 0,
+      "neural_forward_calls": 0,
+      "padded_tokens": 0,
+      "tool_calls": 0,
+      "verifier_calls": 0,
+      "witness_cache_hits": 0
+    },
+    "core_audit": {},
+    "error": {
+      "message": "P1.11 frozen model parameter-count drift",
+      "traceback": "Traceback (most recent call last):\n  File \"/kaggle/working/NEUMANN_P111_FROZEN/experiments/control_plane_p111_dev.py\", line 172, in run\n    encoder = FrozenMiniLMSemanticEncoder(\n        device=\"cuda\",\n        model_source=model_dir,\n        local_files_only=True,\n    )\n  File \"/kaggle/working/NEUMANN_P111_FROZEN/neumann1/control_plane_p111.py\", line 250, in __init__\n    raise ValueError(\"P1.11 frozen model parameter-count drift\")\nValueError: P1.11 frozen model parameter-count drift\n",
+      "type": "ValueError"
+    }
+  },
+  "core": null,
+  "terminal": {
+    "complete": false,
+    "decision": "NOT_EVALUATED",
+    "no_replacement": true
+  },
+  "tasks": [
+    {
+      "index": 0,
+      "started": false,
+      "completed": false
+    },
+    {
+      "index": 1,
+      "started": false,
+      "completed": false
+    },
+    {
+      "index": 2,
+      "started": false,
+      "completed": false
+    },
+    {
+      "index": 3,
+      "started": false,
+      "completed": false
+    },
+    {
+      "index": 4,
+      "started": false,
+      "completed": false
+    },
+    {
+      "index": 5,
+      "started": false,
+      "completed": false
+    },
+    {
+      "index": 6,
+      "started": false,
+      "completed": false
+    },
+    {
+      "index": 7,
+      "started": false,
+      "completed": false
+    },
+    {
+      "index": 8,
+      "started": false,
+      "completed": false
+    },
+    {
+      "index": 9,
+      "started": false,
+      "completed": false
+    },
+    {
+      "index": 10,
+      "started": false,
+      "completed": false
+    },
+    {
+      "index": 11,
+      "started": false,
+      "completed": false
+    }
+  ]
+}
+===== END P1.11 NOT_EVALUATED DIAGNOSTIC =====

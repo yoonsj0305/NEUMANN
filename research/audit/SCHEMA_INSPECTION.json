@@ -1,0 +1,1957 @@
+{
+  "docs/experiments/results/v102_first_evaluation.json.gz": {
+    "authority_archive_identity": {
+      "decision": "ADMIT_NEW_FRESH_Q34_HOLDOUT_FOR_FROZEN_SUPPORT_SYSTEM",
+      "frozen_head": "e6fb888c1ef216085832ea723bbac4ad8953ca22",
+      "gzip_sha256": "e468b676e72dc3b8922fdc0fc044a4400fdbba3728362c8ead8af02e4018971f",
+      "json_sha256": "b9d2d830bdd89244f944adbf5c5c4b44c14f106cab8b26042b69b3c4954383b1"
+    },
+    "environment": {
+      "highspy": "1.15.1",
+      "numpy": "2.3.5",
+      "python": {
+        "list_length": 2,
+        "first": null
+      },
+      "scikit_learn": "1.9.1",
+      "scipy": "1.17.0",
+      "torch": "2.14.0+cpu"
+    },
+    "frozen_head": "46af13c3d7d9b1a87f0a0db8511f5972511beb16",
+    "protocol": {
+      "amortization_queries": 10000,
+      "authority_manifest": "docs/experiments/results/v101_first_expansion.manifest.json",
+      "budget_s": 5.0,
+      "checkpoint_selection": false,
+      "discovery_burden_max": 0.2,
+      "expanded_support_factor": 4,
+      "final_q34_holdout": true,
+      "fixed_support_factor": 2,
+      "global_q3": "OPEN",
+      "global_q4": "OPEN",
+      "groups": {
+        "list_length": 4,
+        "first": null
+      },
+      "model_seeds": {
+        "list_length": 2,
+        "first": null
+      },
+      "new_fitting": false,
+      "order_seed": 102991,
+      "repeats": 3,
+      "routes": {
+        "list_length": 4,
+        "first": null
+      },
+      "runtime": {
+        "highspy": {
+          "type": "str",
+          "len": 6
+        },
+        "numpy": {
+          "type": "str",
+          "len": 5
+        },
+        "python": {
+          "type": "list",
+          "len": 2
+        },
+        "scikit_learn": {
+          "type": "str",
+          "len": 5
+        },
+        "scipy": {
+          "type": "str",
+          "len": 6
+        },
+        "torch": {
+          "type": "str",
+          "len": 10
+        }
+      },
+      "schema": "neumann.q34-expand4-fresh-eval-v102.v1",
+      "source_manifest": "docs/experiments/results/v102_fresh_sources.manifest.json",
+      "source_views": 48,
+      "support_factor_tuning": false,
+      "utility_floor": 0.8,
+      "v098_holdout_access": false,
+      "warmups": 1
+    },
+    "records": {
+      "list_length": 768,
+      "first": {
+        "accepted": {
+          "type": "bool",
+          "len": null
+        },
+        "amortized_investment_ms": {
+          "type": "float",
+          "len": null
+        },
+        "case_id": {
+          "type": "str",
+          "len": 19
+        },
+        "expanded": {
+          "type": "bool",
+          "len": null
+        },
+        "expanded_accepted": {
+          "type": "bool",
+          "len": null
+        },
+        "fallback_used": {
+          "type": "bool",
+          "len": null
+        },
+        "group": {
+          "type": "str",
+          "len": 11
+        },
+        "pair_id": {
+          "type": "str",
+          "len": 11
+        },
+        "post_ms": {
+          "type": "float",
+          "len": null
+        },
+        "proposal_ms": {
+          "type": "float",
+          "len": null
+        },
+        "ranking": {
+          "type": "list",
+          "len": 1024
+        },
+        "repeat": {
+          "type": "int",
+          "len": null
+        },
+        "route": {
+          "type": "str",
+          "len": 15
+        },
+        "subset_accepted": {
+          "type": "bool",
+          "len": null
+        },
+        "surface": {
+          "type": "bool",
+          "len": null
+        },
+        "top2": {
+          "type": "list",
+          "len": 128
+        },
+        "total_ms": {
+          "type": "float",
+          "len": null
+        },
+        "witness": {
+          "type": "dict",
+          "len": 2
+        }
+      }
+    },
+    "source_archive_identity": {
+      "frozen_head": "35b6d7ee40f61a578afc89e3955226061de8f89e",
+      "gzip_sha256": "9420b10a44ca3101374a79d638cc209f1301d2b867cec8de3ebecb0f270c4202",
+      "json_sha256": "00dcdcb4b3ebaed4607685951a61b36d5fb5f3fc046720b39c2c8babcef4c0a5"
+    },
+    "stage": "completed",
+    "summary": {
+      "advance_q5": true,
+      "decision": "Q34_EXPAND4_FRESH_HOLDOUT_PASS_ADVANCE_Q5",
+      "development_tuning_on_holdout": false,
+      "fresh_views": 48,
+      "global_q3": "OPEN",
+      "global_q4": "OPEN",
+      "groups": {
+        "EXPAND4_s100001": {
+          "type": "dict",
+          "len": 4
+        },
+        "EXPAND4_s100002": {
+          "type": "dict",
+          "len": 4
+        }
+      },
+      "lp_q34_mechanism_pass": true,
+      "overall": {
+        "EXPAND4_s100001": {
+          "type": "dict",
+          "len": 20
+        },
+        "EXPAND4_s100002": {
+          "type": "dict",
+          "len": 20
+        }
+      },
+      "paired_top2_invariance": {
+        "EXPAND4_s100001": {
+          "type": "dict",
+          "len": 2
+        },
+        "EXPAND4_s100002": {
+          "type": "dict",
+          "len": 2
+        }
+      },
+      "seed_pass": {
+        "EXPAND4_s100001": {
+          "type": "bool",
+          "len": null
+        },
+        "EXPAND4_s100002": {
+          "type": "bool",
+          "len": null
+        }
+      },
+      "v098_holdout_access": false
+    },
+    "threadpools": {
+      "list_length": 4,
+      "first": {
+        "architecture": {
+          "type": "str",
+          "len": 7
+        },
+        "filepath": {
+          "type": "str",
+          "len": 109
+        },
+        "internal_api": {
+          "type": "str",
+          "len": 8
+        },
+        "num_threads": {
+          "type": "int",
+          "len": null
+        },
+        "prefix": {
+          "type": "str",
+          "len": 17
+        },
+        "threading_layer": {
+          "type": "str",
+          "len": 8
+        },
+        "user_api": {
+          "type": "str",
+          "len": 4
+        },
+        "version": {
+          "type": "str",
+          "len": 6
+        }
+      }
+    },
+    "torch_threads": {
+      "interop": 1,
+      "intraop": 1
+    },
+    "training_identity": {
+      "100001": {
+        "feature_setup_ms": {
+          "type": "float",
+          "len": null
+        },
+        "fit_ms": {
+          "type": "float",
+          "len": null
+        },
+        "weights_sha256": {
+          "type": "str",
+          "len": 64
+        }
+      },
+      "100002": {
+        "feature_setup_ms": {
+          "type": "float",
+          "len": null
+        },
+        "fit_ms": {
+          "type": "float",
+          "len": null
+        },
+        "weights_sha256": {
+          "type": "str",
+          "len": 64
+        }
+      }
+    }
+  },
+  "docs/experiments/results/v101_first_expansion.json.gz": {
+    "development_sources": {
+      "list_length": 32,
+      "first": {
+        "basis": {
+          "type": "list",
+          "len": 64
+        },
+        "condition": {
+          "type": "int",
+          "len": null
+        },
+        "group": {
+          "type": "str",
+          "len": 8
+        },
+        "id": {
+          "type": "str",
+          "len": 14
+        },
+        "pair_id": {
+          "type": "str",
+          "len": 9
+        },
+        "rows": {
+          "type": "int",
+          "len": null
+        },
+        "seed": {
+          "type": "int",
+          "len": null
+        },
+        "sha256": {
+          "type": "str",
+          "len": 64
+        },
+        "surface": {
+          "type": "bool",
+          "len": null
+        }
+      }
+    },
+    "development_specs": {
+      "list_length": 16,
+      "first": {
+        "condition": {
+          "type": "int",
+          "len": null
+        },
+        "pair_id": {
+          "type": "str",
+          "len": 9
+        },
+        "rows": {
+          "type": "int",
+          "len": null
+        },
+        "seed": {
+          "type": "int",
+          "len": null
+        }
+      }
+    },
+    "environment": {
+      "highspy": "1.15.1",
+      "numpy": "2.3.5",
+      "python": {
+        "list_length": 2,
+        "first": null
+      },
+      "scikit_learn": "1.9.1",
+      "scipy": "1.17.0",
+      "torch": "2.14.0+cpu"
+    },
+    "frozen_head": "e6fb888c1ef216085832ea723bbac4ad8953ca22",
+    "protocol": {
+      "advance_q5": false,
+      "amortization_queries": 10000,
+      "budget_s": 5.0,
+      "checkpoint_selection": false,
+      "development_base_cases": 16,
+      "development_seed_base": 101200,
+      "development_views": 32,
+      "discovery_burden_max": 0.2,
+      "expanded_support_factor": 4,
+      "families": {
+        "list_length": 2,
+        "first": null
+      },
+      "fixed_support_factor": 2,
+      "fresh_holdout": false,
+      "global_q3": "OPEN",
+      "global_q4": "OPEN",
+      "groups": {
+        "list_length": 4,
+        "first": null
+      },
+      "model_seeds": {
+        "list_length": 2,
+        "first": null
+      },
+      "new_fitting": false,
+      "order_seed": 101991,
+      "repeats": 3,
+      "routes": {
+        "list_length": 6,
+        "first": null
+      },
+      "runtime": {
+        "highspy": {
+          "type": "str",
+          "len": 6
+        },
+        "numpy": {
+          "type": "str",
+          "len": 5
+        },
+        "python": {
+          "type": "list",
+          "len": 2
+        },
+        "scikit_learn": {
+          "type": "str",
+          "len": 5
+        },
+        "scipy": {
+          "type": "str",
+          "len": 6
+        },
+        "torch": {
+          "type": "str",
+          "len": 10
+        }
+      },
+      "schema": "neumann.frozen-support-expansion-v101.v1",
+      "source_checkpoint": "v100_first_refit",
+      "surface_seed_offset": 200000,
+      "utility_floor": 0.8,
+      "v098_holdout_access": false,
+      "warmups": 1
+    },
+    "records": {
+      "list_length": 768,
+      "first": {
+        "accepted": {
+          "type": "bool",
+          "len": null
+        },
+        "amortized_investment_ms": {
+          "type": "float",
+          "len": null
+        },
+        "case_id": {
+          "type": "str",
+          "len": 14
+        },
+        "expanded": {
+          "type": "bool",
+          "len": null
+        },
+        "expanded_accepted": {
+          "type": "bool",
+          "len": null
+        },
+        "fallback_used": {
+          "type": "bool",
+          "len": null
+        },
+        "group": {
+          "type": "str",
+          "len": 8
+        },
+        "pair_id": {
+          "type": "str",
+          "len": 9
+        },
+        "post_ms": {
+          "type": "float",
+          "len": null
+        },
+        "proposal_ms": {
+          "type": "float",
+          "len": null
+        },
+        "ranking": {
+          "type": "list",
+          "len": 1024
+        },
+        "repeat": {
+          "type": "int",
+          "len": null
+        },
+        "route": {
+          "type": "str",
+          "len": 15
+        },
+        "source_sha256": {
+          "type": "str",
+          "len": 64
+        },
+        "subset_accepted": {
+          "type": "bool",
+          "len": null
+        },
+        "surface": {
+          "type": "bool",
+          "len": null
+        },
+        "top2": {
+          "type": "list",
+          "len": 128
+        },
+        "total_ms": {
+          "type": "float",
+          "len": null
+        },
+        "witness": {
+          "type": "dict",
+          "len": 2
+        }
+      }
+    },
+    "stage": "completed",
+    "summary": {
+      "advance_q5": false,
+      "decision": "ADMIT_NEW_FRESH_Q34_HOLDOUT_FOR_FROZEN_SUPPORT_SYSTEM",
+      "expansion_rescue_evidence": {
+        "100001": {
+          "type": "dict",
+          "len": 7
+        },
+        "100002": {
+          "type": "dict",
+          "len": 7
+        }
+      },
+      "families": {
+        "EXPAND4": {
+          "type": "dict",
+          "len": 8
+        },
+        "FIXED2": {
+          "type": "dict",
+          "len": 8
+        }
+      },
+      "fresh_holdout": false,
+      "fresh_holdout_candidate": {
+        "list_length": 1,
+        "first": null
+      },
+      "global_q3": "OPEN",
+      "global_q4": "OPEN",
+      "groups": {
+        "EXPAND4_s100001": {
+          "type": "dict",
+          "len": 4
+        },
+        "EXPAND4_s100002": {
+          "type": "dict",
+          "len": 4
+        },
+        "FIXED2_s100001": {
+          "type": "dict",
+          "len": 4
+        },
+        "FIXED2_s100002": {
+          "type": "dict",
+          "len": 4
+        }
+      },
+      "new_fitting": false,
+      "overall": {
+        "EXPAND4_s100001": {
+          "type": "dict",
+          "len": 12
+        },
+        "EXPAND4_s100002": {
+          "type": "dict",
+          "len": 12
+        },
+        "FIXED2_s100001": {
+          "type": "dict",
+          "len": 12
+        },
+        "FIXED2_s100002": {
+          "type": "dict",
+          "len": 12
+        }
+      },
+      "paired_top2_invariance": {
+        "EXPAND4_s100001": {
+          "type": "dict",
+          "len": 2
+        },
+        "EXPAND4_s100002": {
+          "type": "dict",
+          "len": 2
+        },
+        "FIXED2_s100001": {
+          "type": "dict",
+          "len": 2
+        },
+        "FIXED2_s100002": {
+          "type": "dict",
+          "len": 2
+        }
+      },
+      "pareto_survivors": {
+        "list_length": 1,
+        "first": null
+      },
+      "v098_holdout_access": false
+    },
+    "training_identity": {
+      "100001": {
+        "feature_setup_ms": {
+          "type": "float",
+          "len": null
+        },
+        "fit_ms": {
+          "type": "float",
+          "len": null
+        },
+        "weights_sha256": {
+          "type": "str",
+          "len": 64
+        }
+      },
+      "100002": {
+        "feature_setup_ms": {
+          "type": "float",
+          "len": null
+        },
+        "fit_ms": {
+          "type": "float",
+          "len": null
+        },
+        "weights_sha256": {
+          "type": "str",
+          "len": 64
+        }
+      }
+    }
+  },
+  "docs/experiments/results/v100_first_refit.json.gz": {
+    "development_sources": {
+      "list_length": 32,
+      "first": {
+        "basis": {
+          "type": "list",
+          "len": 64
+        },
+        "condition": {
+          "type": "int",
+          "len": null
+        },
+        "group": {
+          "type": "str",
+          "len": 8
+        },
+        "id": {
+          "type": "str",
+          "len": 10
+        },
+        "pair_id": {
+          "type": "str",
+          "len": 5
+        },
+        "rows": {
+          "type": "int",
+          "len": null
+        },
+        "seed": {
+          "type": "int",
+          "len": null
+        },
+        "sha256": {
+          "type": "str",
+          "len": 64
+        },
+        "surface": {
+          "type": "bool",
+          "len": null
+        }
+      }
+    },
+    "development_specs": {
+      "list_length": 16,
+      "first": {
+        "condition": {
+          "type": "int",
+          "len": null
+        },
+        "pair_id": {
+          "type": "str",
+          "len": 5
+        },
+        "rows": {
+          "type": "int",
+          "len": null
+        },
+        "seed": {
+          "type": "int",
+          "len": null
+        }
+      }
+    },
+    "environment": {
+      "highspy": "1.15.1",
+      "numpy": "2.3.5",
+      "python": {
+        "list_length": 2,
+        "first": null
+      },
+      "scikit_learn": "1.9.1",
+      "scipy": "1.17.0",
+      "torch": "2.14.0+cpu"
+    },
+    "frozen_head": "8e14341a614d8810380def5e2c302352c6ca47e3",
+    "protocol": {
+      "advance_q5": false,
+      "amortization_queries": 10000,
+      "budget_s": 5.0,
+      "checkpoint": "last_epoch_only",
+      "development_base_cases": 16,
+      "development_seed_base": 100200,
+      "development_views": 32,
+      "discovery_burden_max": 0.2,
+      "epochs": 12,
+      "fresh_holdout": false,
+      "global_q3": "OPEN",
+      "global_q4": "OPEN",
+      "groups": {
+        "list_length": 4,
+        "first": null
+      },
+      "kinds": {
+        "list_length": 2,
+        "first": null
+      },
+      "lr": 0.001,
+      "model_seeds": {
+        "list_length": 2,
+        "first": null
+      },
+      "optimizer": "Adam",
+      "order_seed": 100991,
+      "parameters": 433,
+      "positive_weight": 15.0,
+      "repeats": 3,
+      "routes": {
+        "list_length": 6,
+        "first": null
+      },
+      "runtime": {
+        "highspy": {
+          "type": "str",
+          "len": 6
+        },
+        "numpy": {
+          "type": "str",
+          "len": 5
+        },
+        "python": {
+          "type": "list",
+          "len": 2
+        },
+        "scikit_learn": {
+          "type": "str",
+          "len": 5
+        },
+        "scipy": {
+          "type": "str",
+          "len": 6
+        },
+        "torch": {
+          "type": "str",
+          "len": 10
+        }
+      },
+      "schema": "neumann.quotient-point-refit-v100.v1",
+      "support_factor": 2,
+      "surface_seed_offset": 200000,
+      "train_order_seed_base": 100091,
+      "train_sources": 48,
+      "utility_floor": 0.8,
+      "v088_final_access": false,
+      "v098_holdout_access": false,
+      "warmups": 1,
+      "weight_decay": 0.0,
+      "width": 16
+    },
+    "records": {
+      "list_length": 768,
+      "first": {
+        "accepted": {
+          "type": "bool",
+          "len": null
+        },
+        "amortized_investment_ms": {
+          "type": "float",
+          "len": null
+        },
+        "case_id": {
+          "type": "str",
+          "len": 10
+        },
+        "execution": {
+          "type": "dict",
+          "len": 8
+        },
+        "fallback_used": {
+          "type": "bool",
+          "len": null
+        },
+        "group": {
+          "type": "str",
+          "len": 8
+        },
+        "indices": {
+          "type": "list",
+          "len": 128
+        },
+        "pair_id": {
+          "type": "str",
+          "len": 5
+        },
+        "post_ms": {
+          "type": "float",
+          "len": null
+        },
+        "proposal_ms": {
+          "type": "float",
+          "len": null
+        },
+        "repeat": {
+          "type": "int",
+          "len": null
+        },
+        "route": {
+          "type": "str",
+          "len": 15
+        },
+        "source_sha256": {
+          "type": "str",
+          "len": 64
+        },
+        "subset_accepted": {
+          "type": "bool",
+          "len": null
+        },
+        "surface": {
+          "type": "bool",
+          "len": null
+        },
+        "total_ms": {
+          "type": "float",
+          "len": null
+        },
+        "witness": {
+          "type": "dict",
+          "len": 2
+        }
+      }
+    },
+    "stage": "completed",
+    "summary": {
+      "advance_q5": false,
+      "decision": "STOP_QUOTIENT_REFIT_NO_FRESH_HOLDOUT",
+      "development_views": 32,
+      "global_q3": "OPEN",
+      "global_q4": "OPEN",
+      "groups": {
+        "OLD_CG5_s100001": {
+          "type": "dict",
+          "len": 4
+        },
+        "OLD_CG5_s100002": {
+          "type": "dict",
+          "len": 4
+        },
+        "QUOTIENT_s100001": {
+          "type": "dict",
+          "len": 4
+        },
+        "QUOTIENT_s100002": {
+          "type": "dict",
+          "len": 4
+        }
+      },
+      "overall": {
+        "OLD_CG5_s100001": {
+          "type": "dict",
+          "len": 18
+        },
+        "OLD_CG5_s100002": {
+          "type": "dict",
+          "len": 18
+        },
+        "QUOTIENT_s100001": {
+          "type": "dict",
+          "len": 18
+        },
+        "QUOTIENT_s100002": {
+          "type": "dict",
+          "len": 18
+        }
+      },
+      "paired_support_invariance": {
+        "OLD_CG5_s100001": {
+          "type": "dict",
+          "len": 2
+        },
+        "OLD_CG5_s100002": {
+          "type": "dict",
+          "len": 2
+        },
+        "QUOTIENT_s100001": {
+          "type": "dict",
+          "len": 2
+        },
+        "QUOTIENT_s100002": {
+          "type": "dict",
+          "len": 2
+        }
+      },
+      "quotient_development_pass": false,
+      "v098_holdout_access": false
+    },
+    "threadpools": {
+      "list_length": 4,
+      "first": {
+        "architecture": {
+          "type": "str",
+          "len": 7
+        },
+        "filepath": {
+          "type": "str",
+          "len": 109
+        },
+        "internal_api": {
+          "type": "str",
+          "len": 8
+        },
+        "num_threads": {
+          "type": "int",
+          "len": null
+        },
+        "prefix": {
+          "type": "str",
+          "len": 17
+        },
+        "threading_layer": {
+          "type": "str",
+          "len": 8
+        },
+        "user_api": {
+          "type": "str",
+          "len": 4
+        },
+        "version": {
+          "type": "str",
+          "len": 6
+        }
+      }
+    },
+    "torch_threads": {
+      "interop": 1,
+      "intraop": 1
+    },
+    "training": {
+      "OLD_CG5_s100001": {
+        "epochs": {
+          "type": "list",
+          "len": 12
+        },
+        "feature_setup_ms": {
+          "type": "float",
+          "len": null
+        },
+        "fit_ms": {
+          "type": "float",
+          "len": null
+        },
+        "kind": {
+          "type": "str",
+          "len": 7
+        },
+        "parameters": {
+          "type": "int",
+          "len": null
+        },
+        "seed": {
+          "type": "int",
+          "len": null
+        },
+        "weights": {
+          "type": "dict",
+          "len": 6
+        },
+        "weights_sha256": {
+          "type": "str",
+          "len": 64
+        }
+      },
+      "OLD_CG5_s100002": {
+        "epochs": {
+          "type": "list",
+          "len": 12
+        },
+        "feature_setup_ms": {
+          "type": "float",
+          "len": null
+        },
+        "fit_ms": {
+          "type": "float",
+          "len": null
+        },
+        "kind": {
+          "type": "str",
+          "len": 7
+        },
+        "parameters": {
+          "type": "int",
+          "len": null
+        },
+        "seed": {
+          "type": "int",
+          "len": null
+        },
+        "weights": {
+          "type": "dict",
+          "len": 6
+        },
+        "weights_sha256": {
+          "type": "str",
+          "len": 64
+        }
+      },
+      "QUOTIENT_s100001": {
+        "epochs": {
+          "type": "list",
+          "len": 12
+        },
+        "feature_setup_ms": {
+          "type": "float",
+          "len": null
+        },
+        "fit_ms": {
+          "type": "float",
+          "len": null
+        },
+        "kind": {
+          "type": "str",
+          "len": 8
+        },
+        "parameters": {
+          "type": "int",
+          "len": null
+        },
+        "seed": {
+          "type": "int",
+          "len": null
+        },
+        "weights": {
+          "type": "dict",
+          "len": 6
+        },
+        "weights_sha256": {
+          "type": "str",
+          "len": 64
+        }
+      },
+      "QUOTIENT_s100002": {
+        "epochs": {
+          "type": "list",
+          "len": 12
+        },
+        "feature_setup_ms": {
+          "type": "float",
+          "len": null
+        },
+        "fit_ms": {
+          "type": "float",
+          "len": null
+        },
+        "kind": {
+          "type": "str",
+          "len": 8
+        },
+        "parameters": {
+          "type": "int",
+          "len": null
+        },
+        "seed": {
+          "type": "int",
+          "len": null
+        },
+        "weights": {
+          "type": "dict",
+          "len": 6
+        },
+        "weights_sha256": {
+          "type": "str",
+          "len": 64
+        }
+      }
+    }
+  },
+  "docs/experiments/results/q5_first_evaluation/report.json": {
+    "cold": {
+      "DIRECT": {
+        "authority_preflight_charged_ms": {
+          "type": "float",
+          "len": null
+        },
+        "cold_start_ms": {
+          "type": "float",
+          "len": null
+        },
+        "external_launch_ready_ms": {
+          "type": "float",
+          "len": null
+        },
+        "first_observation": {
+          "type": "bool",
+          "len": null
+        },
+        "ready": {
+          "type": "dict",
+          "len": 5
+        },
+        "shared_authority_preflight_ms": {
+          "type": "float",
+          "len": null
+        }
+      },
+      "EXPAND4_s100001": {
+        "authority_preflight_charged_ms": {
+          "type": "float",
+          "len": null
+        },
+        "cold_start_ms": {
+          "type": "float",
+          "len": null
+        },
+        "external_launch_ready_ms": {
+          "type": "float",
+          "len": null
+        },
+        "first_observation": {
+          "type": "bool",
+          "len": null
+        },
+        "ready": {
+          "type": "dict",
+          "len": 5
+        },
+        "shared_authority_preflight_ms": {
+          "type": "float",
+          "len": null
+        }
+      },
+      "EXPAND4_s100002": {
+        "authority_preflight_charged_ms": {
+          "type": "float",
+          "len": null
+        },
+        "cold_start_ms": {
+          "type": "float",
+          "len": null
+        },
+        "external_launch_ready_ms": {
+          "type": "float",
+          "len": null
+        },
+        "first_observation": {
+          "type": "bool",
+          "len": null
+        },
+        "ready": {
+          "type": "dict",
+          "len": 5
+        },
+        "shared_authority_preflight_ms": {
+          "type": "float",
+          "len": null
+        }
+      },
+      "ORACLE": {
+        "authority_preflight_charged_ms": {
+          "type": "float",
+          "len": null
+        },
+        "cold_start_ms": {
+          "type": "float",
+          "len": null
+        },
+        "external_launch_ready_ms": {
+          "type": "float",
+          "len": null
+        },
+        "first_observation": {
+          "type": "bool",
+          "len": null
+        },
+        "ready": {
+          "type": "dict",
+          "len": 5
+        },
+        "shared_authority_preflight_ms": {
+          "type": "float",
+          "len": null
+        }
+      }
+    },
+    "contract": {
+      "amortization_queries": 10000,
+      "base_cases": 48,
+      "bootstrap_repeats": 2000,
+      "bootstrap_seed": 103992,
+      "budget_s": 5.0,
+      "cache": "disabled",
+      "checkpoint_selection": false,
+      "conditions": {
+        "list_length": 2,
+        "first": null
+      },
+      "cross_domain_pass": false,
+      "discovery_burden_max": 0.2,
+      "expansion_authority": "original_verifier_rejection_only",
+      "global_q5_closed": false,
+      "holdout_tuning": false,
+      "largest_wide_ratio_max": 0.8,
+      "model_seeds": {
+        "list_length": 2,
+        "first": null
+      },
+      "new_fitting": false,
+      "null_control_ratio_max": 1.2,
+      "order_seed": 103991,
+      "replicates": 4,
+      "rows": {
+        "list_length": 4,
+        "first": null
+      },
+      "schema": "neumann.q5-scaling-contract.v1",
+      "seed_base": 103500,
+      "slope_comparisons": 8,
+      "slope_familywise_alpha": 0.05,
+      "status": "CONTRACT_ONLY_NO_NEW_EVIDENCE",
+      "support_factors": {
+        "list_length": 2,
+        "first": null
+      },
+      "surface_seed_offset": 400000,
+      "timed_repeats": 3,
+      "utility_floor": 0.8,
+      "views": 96,
+      "warmups": 1,
+      "width_factors": {
+        "list_length": 3,
+        "first": null
+      }
+    },
+    "controller_wall_ms_including_research_replay": 575332.992725,
+    "cross_domain_pass": false,
+    "environment": {
+      "hardware": {
+        "affinity": {
+          "type": "list",
+          "len": 4
+        },
+        "cpu_model": {
+          "type": "str",
+          "len": 31
+        },
+        "logical_cpus": {
+          "type": "int",
+          "len": null
+        },
+        "machine": {
+          "type": "str",
+          "len": 6
+        },
+        "release": {
+          "type": "str",
+          "len": 17
+        },
+        "system": {
+          "type": "str",
+          "len": 5
+        }
+      },
+      "openblas_coretype": "HASWELL",
+      "runtime": {
+        "highspy": {
+          "type": "str",
+          "len": 6
+        },
+        "numpy": {
+          "type": "str",
+          "len": 5
+        },
+        "python": {
+          "type": "list",
+          "len": 2
+        },
+        "scikit_learn": {
+          "type": "str",
+          "len": 5
+        },
+        "scipy": {
+          "type": "str",
+          "len": 6
+        },
+        "threadpoolctl": {
+          "type": "str",
+          "len": 5
+        },
+        "torch": {
+          "type": "str",
+          "len": 10
+        }
+      },
+      "threadpools": {
+        "list_length": 4,
+        "first": null
+      }
+    },
+    "frozen_head": "99e59fe9ceec4102d023ce0f9eb2e510017062c4",
+    "global_q5_closed": false,
+    "rerun": false,
+    "research_costs": "source labels retained in source cases; replay/retention wall disclosed separately",
+    "schema": "neumann.q5-evaluation.v1",
+    "source_manifest_sha256": "684a1e54656a0e491f67438a730799af91cca9f0e401ad9da94068fd1deaed64",
+    "summary": {
+      "case_costs": {
+        "list_length": 384,
+        "first": null
+      },
+      "cells": {
+        "list_length": 48,
+        "first": null
+      },
+      "cross_domain_pass": false,
+      "decision": "Q5_SCALING_CAPABILITY_OR_ACCOUNTING_UNREACHED",
+      "evidence_scope": "constructed_LP_only",
+      "failures_including_warmup": 32,
+      "global_q5_closed": false,
+      "observations": 1536,
+      "slopes": {
+        "list_length": 4,
+        "first": null
+      }
+    },
+    "training_identity": {
+      "100001": {
+        "feature_setup_ms": {
+          "type": "float",
+          "len": null
+        },
+        "fit_ms": {
+          "type": "float",
+          "len": null
+        },
+        "weights_sha256": {
+          "type": "str",
+          "len": 64
+        }
+      },
+      "100002": {
+        "feature_setup_ms": {
+          "type": "float",
+          "len": null
+        },
+        "fit_ms": {
+          "type": "float",
+          "len": null
+        },
+        "weights_sha256": {
+          "type": "str",
+          "len": 64
+        }
+      }
+    },
+    "transport_receipts_charged": true
+  },
+  "docs/experiments/results/q5_first_evaluation/observation_0000.json.gz": {
+    "accepted": true,
+    "case_id": "q5_m128_w1_r3_surface",
+    "error": null,
+    "execution": {
+      "accepted": true,
+      "attempts": {
+        "list_length": 1,
+        "first": null
+      },
+      "budget_s": 4.996175292,
+      "fallback_used": false,
+      "head_kind": "COLD",
+      "ledger": {
+        "certificate_calls": {
+          "type": "int",
+          "len": null
+        },
+        "native_run_calls": {
+          "type": "int",
+          "len": null
+        },
+        "set_basis_calls": {
+          "type": "int",
+          "len": null
+        }
+      },
+      "status": "VERIFIED",
+      "total_ms": 33.221677
+    },
+    "peak_rss_kib": 714700,
+    "post_ms": 38.028869,
+    "proposal_ms": 0.0,
+    "ranking": null,
+    "repeat": -1,
+    "route": "DIRECT",
+    "total_ms": 38.028869,
+    "transport_and_receipt_ms": 0.965288000000001,
+    "witness": {
+      "x": {
+        "list_length": 128,
+        "first": null
+      },
+      "y": {
+        "list_length": 128,
+        "first": null
+      }
+    },
+    "worker_total_ms": 37.063581
+  },
+  "docs/experiments/results/q5_first_sources/q5_m64_w16_r0_base.json.gz": {
+    "arrays": {
+      "A": {
+        "data": {
+          "type": "str",
+          "len": 699052
+        },
+        "dtype": {
+          "type": "str",
+          "len": 3
+        },
+        "shape": {
+          "type": "list",
+          "len": 2
+        }
+      },
+      "b": {
+        "data": {
+          "type": "str",
+          "len": 684
+        },
+        "dtype": {
+          "type": "str",
+          "len": 3
+        },
+        "shape": {
+          "type": "list",
+          "len": 1
+        }
+      },
+      "c": {
+        "data": {
+          "type": "str",
+          "len": 10924
+        },
+        "dtype": {
+          "type": "str",
+          "len": 3
+        },
+        "shape": {
+          "type": "list",
+          "len": 1
+        }
+      }
+    },
+    "cols": 1024,
+    "condition": 1,
+    "id": "q5_m64_w16_r0_base",
+    "label": {
+      "accepted": true,
+      "certificate": {
+        "accepted": {
+          "type": "bool",
+          "len": null
+        },
+        "atol": {
+          "type": "float",
+          "len": null
+        },
+        "cols": {
+          "type": "int",
+          "len": null
+        },
+        "complementarity_abs": {
+          "type": "float",
+          "len": null
+        },
+        "complementarity_diagnostic_only": {
+          "type": "bool",
+          "len": null
+        },
+        "complementarity_ratio": {
+          "type": "float",
+          "len": null
+        },
+        "complementarity_tol": {
+          "type": "float",
+          "len": null
+        },
+        "dual_feasibility_abs": {
+          "type": "float",
+          "len": null
+        },
+        "dual_feasibility_ratio": {
+          "type": "float",
+          "len": null
+        },
+        "dual_feasibility_tol": {
+          "type": "float",
+          "len": null
+        },
+        "dual_objective": {
+          "type": "float",
+          "len": null
+        },
+        "equality_abs": {
+          "type": "float",
+          "len": null
+        },
+        "equality_ratio": {
+          "type": "float",
+          "len": null
+        },
+        "equality_tol": {
+          "type": "float",
+          "len": null
+        },
+        "nnz": {
+          "type": "int",
+          "len": null
+        },
+        "nonnegative_abs": {
+          "type": "float",
+          "len": null
+        },
+        "nonnegative_ratio": {
+          "type": "float",
+          "len": null
+        },
+        "nonnegative_tol": {
+          "type": "float",
+          "len": null
+        },
+        "numerical_finite": {
+          "type": "bool",
+          "len": null
+        },
+        "objective_gap_abs": {
+          "type": "float",
+          "len": null
+        },
+        "objective_gap_ratio": {
+          "type": "float",
+          "len": null
+        },
+        "objective_gap_tol": {
+          "type": "float",
+          "len": null
+        },
+        "primal_objective": {
+          "type": "float",
+          "len": null
+        },
+        "rows": {
+          "type": "int",
+          "len": null
+        },
+        "rtol": {
+          "type": "float",
+          "len": null
+        },
+        "schema": {
+          "type": "str",
+          "len": 39
+        }
+      },
+      "error": null,
+      "indices": {
+        "list_length": 64,
+        "first": null
+      },
+      "method": "q5_registration_oracle_only",
+      "solve_ms": 0.165909,
+      "total_ms": 0.500872,
+      "verify_ms": 0.308073,
+      "witness": {
+        "x": {
+          "type": "list",
+          "len": 1024
+        },
+        "y": {
+          "type": "list",
+          "len": 64
+        }
+      }
+    },
+    "pair_id": "q5_m64_w16_r0",
+    "replicate": 0,
+    "rows": 64,
+    "seed": 103516,
+    "sha256": "d476b6659bcd4d0698846707a0fece9ab853e5d24c59f3c00a9f3351f032df1a",
+    "surface": false,
+    "width_factor": 16
+  },
+  "docs/experiments/results/m106_bp_transfer_first/report.json": {
+    "cold_ms": {
+      "EXPAND4_s100001": 6494.654993,
+      "EXPAND4_s100002": 6476.603846,
+      "IPM": 1080.311554,
+      "NATIVE": 1090.123202
+    },
+    "frozen_head": "5db505265f10e204526221f1cd7d318acdb47973",
+    "new_fitting": false,
+    "oracle_access": false,
+    "protocol": {
+      "amortization_queries": 10000,
+      "budget_s": 5.0,
+      "global_questions_closed": {
+        "list_length": 0,
+        "first": null
+      },
+      "model_seeds": {
+        "list_length": 2,
+        "first": null
+      },
+      "new_fitting": false,
+      "observations": 256,
+      "oracle_access": false,
+      "routes": {
+        "list_length": 4,
+        "first": null
+      },
+      "same_lp_backend": true,
+      "schema": "neumann.bp-frozen-transfer.m106.v1",
+      "specs": {
+        "list_length": 16,
+        "first": null
+      },
+      "timed_repeats": 3,
+      "warmups": 1
+    },
+    "records": {
+      "list_length": 256,
+      "first": {
+        "accepted": {
+          "type": "bool",
+          "len": null
+        },
+        "case_id": {
+          "type": "str",
+          "len": 13
+        },
+        "error": {
+          "type": "NoneType",
+          "len": null
+        },
+        "execution": {
+          "type": "dict",
+          "len": 11
+        },
+        "peak_rss_kib": {
+          "type": "int",
+          "len": null
+        },
+        "phase": {
+          "type": "str",
+          "len": 6
+        },
+        "post_ms": {
+          "type": "float",
+          "len": null
+        },
+        "proposal_ms": {
+          "type": "float",
+          "len": null
+        },
+        "ranking": {
+          "type": "NoneType",
+          "len": null
+        },
+        "repeat": {
+          "type": "int",
+          "len": null
+        },
+        "route": {
+          "type": "str",
+          "len": 3
+        },
+        "total_ms": {
+          "type": "float",
+          "len": null
+        },
+        "transport_and_receipt_ms": {
+          "type": "float",
+          "len": null
+        },
+        "witness": {
+          "type": "dict",
+          "len": 2
+        },
+        "worker_total_ms": {
+          "type": "float",
+          "len": null
+        }
+      }
+    },
+    "sources_sha256": "2acba8380817005ae9334539ecf964b21fd75201cb51a946776605e3380f6cda",
+    "summary": {
+      "cells": {
+        "list_length": 16,
+        "first": null
+      },
+      "computational_cross_domain": false,
+      "decisions": {
+        "EXPAND4_s100001": {
+          "type": "str",
+          "len": 29
+        },
+        "EXPAND4_s100002": {
+          "type": "str",
+          "len": 29
+        }
+      },
+      "direct_envelope": "best per-source NATIVE/IPM; optimistic diagnostic, not deployed router",
+      "global_questions_closed": {
+        "list_length": 0,
+        "first": null
+      },
+      "joint_pass": false,
+      "natural_problem_transfer": false
+    },
+    "training_identity": {
+      "100001": {
+        "feature_setup_ms": {
+          "type": "float",
+          "len": null
+        },
+        "fit_ms": {
+          "type": "float",
+          "len": null
+        },
+        "weights_sha256": {
+          "type": "str",
+          "len": 64
+        }
+      },
+      "100002": {
+        "feature_setup_ms": {
+          "type": "float",
+          "len": null
+        },
+        "fit_ms": {
+          "type": "float",
+          "len": null
+        },
+        "weights_sha256": {
+          "type": "str",
+          "len": 64
+        }
+      }
+    }
+  },
+  "docs/experiments/results/m106_bp_transfer_first/observation_0000.json.gz": {
+    "missing": true
+  },
+  "docs/experiments/results/m106_bp_transfer_first/m106_bp_k8_r0.json.gz": {
+    "arrays": {
+      "A": {
+        "data": {
+          "type": "str",
+          "len": 43692
+        },
+        "dtype": {
+          "type": "str",
+          "len": 3
+        },
+        "shape": {
+          "type": "list",
+          "len": 2
+        }
+      },
+      "b": {
+        "data": {
+          "type": "str",
+          "len": 172
+        },
+        "dtype": {
+          "type": "str",
+          "len": 3
+        },
+        "shape": {
+          "type": "list",
+          "len": 1
+        }
+      },
+      "c": {
+        "data": {
+          "type": "str",
+          "len": 2732
+        },
+        "dtype": {
+          "type": "str",
+          "len": 3
+        },
+        "shape": {
+          "type": "list",
+          "len": 1
+        }
+      }
+    },
+    "input_sha256": "b449d9d9fdd4abd8f07bdf2d176ca20e948f56f3eaba4131baed53a4c8c298f0",
+    "metadata": {
+      "cols": 256,
+      "family": "basis_pursuit",
+      "id": "m106_bp_k8_r0",
+      "level": 8,
+      "rows": 16,
+      "seed": 106300
+    }
+  },
+  "docs/experiments/results/v104_transfer_admission_first/report.json": {
+    "cold_ms": {
+      "ASSIGNMENT": 1145.089596,
+      "IPM": 1124.987526,
+      "NATIVE": 1143.813861,
+      "ORACLE": 1140.754573
+    },
+    "contract": {
+      "amortization_queries": 10000,
+      "base_cases": 32,
+      "budget_s": 5.0,
+      "cross_domain_pass": false,
+      "families": {
+        "list_length": 2,
+        "first": null
+      },
+      "global_q5_closed": false,
+      "large_cell_min_20pct_wins": 3,
+      "large_cell_ratio_max": 0.8,
+      "levels": {
+        "list_length": 4,
+        "first": null
+      },
+      "models": 0,
+      "new_fitting": false,
+      "oracle_authority": "free_exact_primal_support_and_original_optimal_dual",
+      "order": "all_shuffled_warmups_before_shuffled_timed_repeats",
+      "order_seed": 104991,
+      "replicates": 4,
+      "schema": "neumann.q5-transfer-admission.v104.v1",
+      "scope": "two_construction_classes_shared_LP_backend",
+      "seed_base": 104000,
+      "small_control_ratio_max": 1.2,
+      "timed_repeats": 3,
+      "warmups": 1
+    },
+    "controller_wall_ms_including_research": 32366.846709,
+    "environment": {
+      "hardware": {
+        "affinity": {
+          "type": "list",
+          "len": 4
+        },
+        "cpu_model": {
+          "type": "str",
+          "len": 31
+        },
+        "logical_cpus": {
+          "type": "int",
+          "len": null
+        },
+        "machine": {
+          "type": "str",
+          "len": 6
+        },
+        "release": {
+          "type": "str",
+          "len": 17
+        },
+        "system": {
+          "type": "str",
+          "len": 5
+        }
+      },
+      "openblas_coretype": "HASWELL",
+      "runtime": {
+        "highspy": {
+          "type": "str",
+          "len": 6
+        },
+        "numpy": {
+          "type": "str",
+          "len": 5
+        },
+        "python": {
+          "type": "list",
+          "len": 2
+        },
+        "scikit_learn": {
+          "type": "str",
+          "len": 5
+        },
+        "scipy": {
+          "type": "str",
+          "len": 6
+        },
+        "threadpoolctl": {
+          "type": "str",
+          "len": 5
+        },
+        "torch": {
+          "type": "str",
+          "len": 10
+        }
+      },
+      "threadpools": {
+        "list_length": 4,
+        "first": null
+      }
+    },
+    "frozen_head": "17d83a4dd22faf8a5799b68a82c8ef2456d414fa",
+    "rerun": false,
+    "schema": "neumann.v104-admission-result.v1",
+    "sources_sha256": "e53a3538d39a1b7d3156b1b1cb988582fb903fd69cf92cb4bd96c006c73a477f",
+    "summary": {
+      "cases": {
+        "list_length": 32,
+        "first": null
+      },
+      "cells": {
+        "list_length": 8,
+        "first": null
+      },
+      "cross_domain_pass": false,
+      "decisions": {
+        "assignment": {
+          "type": "str",
+          "len": 30
+        },
+        "basis_pursuit": {
+          "type": "str",
+          "len": 45
+        }
+      },
+      "evidence_scope": "two_construction_classes_shared_LP_backend",
+      "failed_observations": 0,
+      "global_q5_closed": false,
+      "model_forwards": 0,
+      "new_fitting": false,
+      "observations": 448
+    }
+  }
+}
