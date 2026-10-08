@@ -1,0 +1,20 @@
+{
+  "kind": "PREPARATION_METADATA_ONLY_NOT_PERFORMANCE",
+  "checked_date": "2026-10-08",
+  "sources": {
+    "CPOG": {"repository": "https://github.com/rebryant/cpog", "head": "a97ed8543d8368a234f715cf8b1a7aa38bc96c3d"},
+    "D4": {"repository": "https://github.com/crillab/d4", "head": "333370cc1e843dd0749c1efe88516e72b5239174"},
+    "Storm": {"repository": "https://github.com/stormchecker/storm", "head": "8186ef8a08b89bb4d65cfd4bbde7b20d1c39627d"}
+  },
+  "CPOG_documented_requirements": ["C/C++", "Python", "D4", "CaDiCal", "drat-trim", "Elan/Lean for verified checker"],
+  "local_preflight": {
+    "C_CXX_cmake_ninja_discovered_on_PATH": false,
+    "WSL": "command requests installation; not initialized on this machine",
+    "native_compiler_verifier_runs": "NOT_PERFORMED",
+    "compiler_absence_outside_PATH_proven": false,
+    "environment_changes": "NONE"
+  },
+  "decision": "HOLD_PERFORMANCE_MEASUREMENT_UNTIL_STRONG_BASELINE_AND_VALID_FREE_CERTIFICATE_ARE_CONNECTED",
+  "G0_pass": false,
+  "GPU_or_training": false
+}
