@@ -1,0 +1,36 @@
+{
+  "schema": "neumann.symbolic-baseline-reuse.v1",
+  "status": "CPU_BASELINE_INFRASTRUCTURE_ONLY_NOT_G0_OR_G1_RESULT",
+  "package": "egglog",
+  "version": "14.0.0",
+  "upstream": "https://github.com/egraphs-good/egglog-python",
+  "license": "MIT",
+  "wheel_file": "egglog-14.0.0-cp312-cp312-win_amd64.whl",
+  "wheel_sha256": "c6350ef19ab6d5385c984e218af7a46c97f7fd96e2bc46af11cd0da3c0940804",
+  "record_sha256": "6108e2f024d74e5f6afb4ad66b3e39de8bd4931dc163bedbaef887bd52bcc7ce",
+  "native_binary_sha256": {
+    "egglog/bindings.cp312-win_amd64.pyd": "d72d6062663ee5f725f026e64a25237cd0d3615eba96594ce69533102577f2e1"
+  },
+  "license_sha256": {
+    "egglog-14.0.0.dist-info/licenses/LICENSE": "4df69ba0c559f3543a39468a8d4ef3eae5634a570629c94b61c3a98036e6f7fb"
+  },
+  "adapter_source_sha256": "e71f2db1ad4963bb2b18a18f1bf68e5799276ad9ddb5a802fc65b9d32c4c060a",
+  "adapter_source": "neumann1/perspective_symbolic_baseline.py",
+  "runtime_versions": {
+    "egglog": "14.0.0",
+    "networkx": "3.6.1",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "threadpoolctl": "3.7.0"
+  },
+  "semantics": "unbounded exact-integer expressions; i64 literals; no float rewrites",
+  "known_axioms": "commutativity, associativity, distributivity, zero, one",
+  "learned": false,
+  "new_training": false,
+  "fresh_evaluation": false,
+  "new_model_calls": 0,
+  "upstream_induction_investment": "UNKNOWN",
+  "extracted_tree_size_is_execution_cost": false,
+  "future_g1_admitted": false,
+  "tests": "3 correctness/negative-control tests passed; earlier metric mismatch between AST and e-graph costs corrected before reuse freeze"
+}
