@@ -1,0 +1,212 @@
+{
+  "firstPreexperimentAttempt": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Action completed."
+      }
+    ],
+    "structuredContent": {
+      "jobs": [
+        {
+          "id": 111382158368,
+          "name": "contract-and-first-cpu",
+          "status": "completed",
+          "conclusion": "failure",
+          "run_id": 37184038237,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Synthetic control contracts and retained-first faults only",
+              "status": "completed",
+              "conclusion": "failure",
+              "number": 4
+            },
+            {
+              "name": "Frozen registration and original construction checker controls",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 5
+            },
+            {
+              "name": "First frozen CPU public-contract diagnostic (no weights or GPU)",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 6
+            },
+            {
+              "name": "Retain first PASS FAIL or INCOMPLETE evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 13
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15
+            }
+          ]
+        }
+      ]
+    },
+    "isError": false
+  },
+  "firstPerformedDiagnostic": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Action completed."
+      }
+    ],
+    "structuredContent": {
+      "jobs": [
+        {
+          "id": 111382340094,
+          "name": "contract-and-first-cpu",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 37184100179,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Install existing CPU package dependencies (no model runtime)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Synthetic control contracts and retained-first faults only",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Frozen registration and original construction checker controls",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "First frozen CPU public-contract diagnostic (no weights or GPU)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7
+            },
+            {
+              "name": "Retain first PASS FAIL or INCOMPLETE evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 17
+            }
+          ]
+        }
+      ]
+    },
+    "isError": false
+  },
+  "artifact": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Action completed."
+      }
+    ],
+    "structuredContent": {
+      "artifacts": [
+        {
+          "id": 11296102302,
+          "name": "NEUMANN_P13_FIRST_CONTRACT_EVIDENCE",
+          "size_in_bytes": 146540,
+          "url": "https://api.github.com/repos/yoonsj0305/NEUMANN/actions/artifacts/11296102302",
+          "archive_download_url": "https://api.github.com/repos/yoonsj0305/NEUMANN/actions/artifacts/11296102302/zip",
+          "expired": false,
+          "created_at": "2026-10-04T06:53:20Z",
+          "expires_at": "2027-01-02T06:52:50Z",
+          "updated_at": "2026-10-04T06:53:20Z",
+          "digest": "sha256:6206276527e22750bb1fe3f7854c7d6d1795e8dd517ef3fa564b681e63358e92",
+          "workflow_run": {
+            "id": 37184100179,
+            "repository_id": 1387714752,
+            "head_repository_id": 1387714752,
+            "head_branch": "research/p13-contract-first-v1",
+            "head_sha": "708df674c98232f3a38ffa7e59748747648a4773"
+          }
+        }
+      ]
+    },
+    "isError": false
+  },
+  "readOnly": true,
+  "noNewGitHubRun": true,
+  "originalInnerArchiveHash": "5a578c9dcc4f4b4182a3dd3a7a4cde1974c98deea22d2ea123869b3fe394facd",
+  "innerArchiveBytes": 130662,
+  "recoverySource": "Retained original workflow job 111382340094 P13_ARCHIVE_BASE64 output",
+  "innerArchiveAndOuterGitHubArtifactHashesHaveDifferentScopes": true
+}

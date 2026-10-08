@@ -1,0 +1,403 @@
+===== BEGIN P1.10 INTERRUPTED PARTIAL DIAGNOSTIC =====
+{
+  "P110_INTERRUPTED_DIAGNOSTIC_ONLY": true,
+  "historical_result_changed": false,
+  "model_inference": false,
+  "evidence_mutation": false,
+  "archive": {
+    "bytes": 49983,
+    "sha256": "26639aaa19074efc564bbd01d7ac106e586491a8e43fc7524fde0d9cc95535b9"
+  },
+  "summary": {
+    "completed_tasks": 6,
+    "raw_condorcet_correct": 2,
+    "raw_condorcet_evaluable": 5,
+    "accepted": 2,
+    "neural_forwards_completed": 12,
+    "evaluated_tokens_completed": 10536
+  },
+  "tasks": [
+    {
+      "index": 0,
+      "started": true,
+      "completed": true,
+      "task_id": "p110d_b01",
+      "expected_candidate": 1,
+      "status": "REJECTED_BY_ORIGINAL_VERIFIER",
+      "accepted": false,
+      "executed": true,
+      "selected_candidate": 0,
+      "raw_condorcet_candidate": 0,
+      "raw_condorcet_correct": false,
+      "selection": "MINIMAL_PAIRWISE_CONDORCET",
+      "selection_error": null,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "model_calls": 1,
+      "neural_forward_calls": 2,
+      "evaluated_tokens": 488,
+      "complete_ms": 33943.054399,
+      "selector_decision": {
+        "evaluated_tokens": 488,
+        "forward_calls": 2,
+        "max_mode_log_odds_delta_nats": 0.0,
+        "minimum_pairwise_preference_nats": 2.874999988824129,
+        "pairwise_preference_nats": {
+          "0>1": 2.874999988824129
+        },
+        "selected_candidate": 0
+      },
+      "pairwise_diagnostic": {
+        "pairwise_preference_nats": {
+          "0>1": 2.874999988824129,
+          "1>0": -2.874999988824129
+        },
+        "raw_condorcet_winners": [
+          {
+            "candidate": 0,
+            "minimum_margin_nats": 2.874999988824129
+          }
+        ],
+        "confident_condorcet_winners": [
+          {
+            "candidate": 0,
+            "minimum_margin_nats": 2.874999988824129
+          }
+        ],
+        "max_batch_order_delta_nats": 0.0,
+        "forward_calls": 2,
+        "evaluated_tokens": 488,
+        "selector_complete_ms": 33930.673076
+      },
+      "execution": {
+        "accepted": false,
+        "answer": {
+          "X": 17,
+          "Y": 14
+        },
+        "complete_ms": 0.14257,
+        "error": null,
+        "executed": true
+      },
+      "error": null
+    },
+    {
+      "index": 1,
+      "started": true,
+      "completed": true,
+      "task_id": "p110d_b02",
+      "expected_candidate": 2,
+      "status": "SEMANTIC_ABSTAINED",
+      "accepted": false,
+      "executed": false,
+      "selected_candidate": null,
+      "raw_condorcet_candidate": null,
+      "raw_condorcet_correct": null,
+      "selection": "MINIMAL_PAIRWISE_ABSTAIN",
+      "selection_error": "ValueError: P1.10 no unique confident Condorcet winner",
+      "accounting_complete": true,
+      "selector_complete": true,
+      "model_calls": 1,
+      "neural_forward_calls": 2,
+      "evaluated_tokens": 1556,
+      "complete_ms": 35037.499345,
+      "selector_decision": null,
+      "pairwise_diagnostic": {
+        "pairwise_preference_nats": {
+          "0>1": 0.5781249403953552,
+          "1>0": -0.5781249403953552,
+          "0>2": -0.640624925494194,
+          "2>0": 0.640624925494194,
+          "1>2": 0.09374994598329067,
+          "2>1": -0.09374994598329067
+        },
+        "raw_condorcet_winners": [],
+        "confident_condorcet_winners": [],
+        "max_batch_order_delta_nats": 0.0,
+        "forward_calls": 2,
+        "evaluated_tokens": 1556,
+        "selector_complete_ms": 35024.503845
+      },
+      "execution": null,
+      "error": null
+    },
+    {
+      "index": 2,
+      "started": true,
+      "completed": true,
+      "task_id": "p110d_b03",
+      "expected_candidate": 2,
+      "status": "ACCEPTED",
+      "accepted": true,
+      "executed": true,
+      "selected_candidate": 2,
+      "raw_condorcet_candidate": 2,
+      "raw_condorcet_correct": true,
+      "selection": "MINIMAL_PAIRWISE_CONDORCET",
+      "selection_error": null,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "model_calls": 1,
+      "neural_forward_calls": 2,
+      "evaluated_tokens": 3312,
+      "complete_ms": 37718.465523,
+      "selector_decision": {
+        "evaluated_tokens": 3312,
+        "forward_calls": 2,
+        "max_mode_log_odds_delta_nats": 0.0,
+        "minimum_pairwise_preference_nats": 0.937499962747097,
+        "pairwise_preference_nats": {
+          "0>1": 0.7187500149011612,
+          "0>2": -2.3281249187421054,
+          "0>3": 0.4687500521540642,
+          "1>2": -1.687499933410436,
+          "1>3": 0.29687505029141903,
+          "2>3": 0.937499962747097
+        },
+        "selected_candidate": 2
+      },
+      "pairwise_diagnostic": {
+        "pairwise_preference_nats": {
+          "0>1": 0.7187500149011612,
+          "1>0": -0.7187500149011612,
+          "0>2": -2.3281249187421054,
+          "2>0": 2.3281249187421054,
+          "0>3": 0.4687500521540642,
+          "3>0": -0.4687500521540642,
+          "1>2": -1.687499933410436,
+          "2>1": 1.687499933410436,
+          "1>3": 0.29687505029141903,
+          "3>1": -0.29687505029141903,
+          "2>3": 0.937499962747097,
+          "3>2": -0.937499962747097
+        },
+        "raw_condorcet_winners": [
+          {
+            "candidate": 2,
+            "minimum_margin_nats": 0.937499962747097
+          }
+        ],
+        "confident_condorcet_winners": [
+          {
+            "candidate": 2,
+            "minimum_margin_nats": 0.937499962747097
+          }
+        ],
+        "max_batch_order_delta_nats": 0.0,
+        "forward_calls": 2,
+        "evaluated_tokens": 3312,
+        "selector_complete_ms": 37690.673517
+      },
+      "execution": {
+        "accepted": true,
+        "answer": {
+          "P": 21,
+          "Q": 34,
+          "R": 55,
+          "S": 89
+        },
+        "complete_ms": 0.334408,
+        "error": null,
+        "executed": true
+      },
+      "error": null
+    },
+    {
+      "index": 3,
+      "started": true,
+      "completed": true,
+      "task_id": "p110d_b04",
+      "expected_candidate": 1,
+      "status": "REJECTED_BY_ORIGINAL_VERIFIER",
+      "accepted": false,
+      "executed": true,
+      "selected_candidate": 0,
+      "raw_condorcet_candidate": 0,
+      "raw_condorcet_correct": false,
+      "selection": "MINIMAL_PAIRWISE_CONDORCET",
+      "selection_error": null,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "model_calls": 1,
+      "neural_forward_calls": 2,
+      "evaluated_tokens": 480,
+      "complete_ms": 33256.568119,
+      "selector_decision": {
+        "evaluated_tokens": 480,
+        "forward_calls": 2,
+        "max_mode_log_odds_delta_nats": 0.0,
+        "minimum_pairwise_preference_nats": 1.1250000828877091,
+        "pairwise_preference_nats": {
+          "0>1": 1.1250000828877091
+        },
+        "selected_candidate": 0
+      },
+      "pairwise_diagnostic": {
+        "pairwise_preference_nats": {
+          "0>1": 1.1250000828877091,
+          "1>0": -1.1250000828877091
+        },
+        "raw_condorcet_winners": [
+          {
+            "candidate": 0,
+            "minimum_margin_nats": 1.1250000828877091
+          }
+        ],
+        "confident_condorcet_winners": [
+          {
+            "candidate": 0,
+            "minimum_margin_nats": 1.1250000828877091
+          }
+        ],
+        "max_batch_order_delta_nats": 0.0,
+        "forward_calls": 2,
+        "evaluated_tokens": 480,
+        "selector_complete_ms": 33248.307227
+      },
+      "execution": {
+        "accepted": false,
+        "answer": {
+          "M": -7,
+          "N": -9
+        },
+        "complete_ms": 0.124317,
+        "error": null,
+        "executed": true
+      },
+      "error": null
+    },
+    {
+      "index": 4,
+      "started": true,
+      "completed": true,
+      "task_id": "p110d_b05",
+      "expected_candidate": 0,
+      "status": "ACCEPTED",
+      "accepted": true,
+      "executed": true,
+      "selected_candidate": 0,
+      "raw_condorcet_candidate": 0,
+      "raw_condorcet_correct": true,
+      "selection": "MINIMAL_PAIRWISE_CONDORCET",
+      "selection_error": null,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "model_calls": 1,
+      "neural_forward_calls": 2,
+      "evaluated_tokens": 1556,
+      "complete_ms": 35006.653033,
+      "selector_decision": {
+        "evaluated_tokens": 1556,
+        "forward_calls": 2,
+        "max_mode_log_odds_delta_nats": 0.0,
+        "minimum_pairwise_preference_nats": 3.585937488824129,
+        "pairwise_preference_nats": {
+          "0>1": 4.1484375153668225,
+          "0>2": 3.585937488824129,
+          "1>2": 1.8125000521540642
+        },
+        "selected_candidate": 0
+      },
+      "pairwise_diagnostic": {
+        "pairwise_preference_nats": {
+          "0>1": 4.1484375153668225,
+          "1>0": -4.1484375153668225,
+          "0>2": 3.585937488824129,
+          "2>0": -3.585937488824129,
+          "1>2": 1.8125000521540642,
+          "2>1": -1.8125000521540642
+        },
+        "raw_condorcet_winners": [
+          {
+            "candidate": 0,
+            "minimum_margin_nats": 3.585937488824129
+          }
+        ],
+        "confident_condorcet_winners": [
+          {
+            "candidate": 0,
+            "minimum_margin_nats": 3.585937488824129
+          }
+        ],
+        "max_batch_order_delta_nats": 0.0,
+        "forward_calls": 2,
+        "evaluated_tokens": 1556,
+        "selector_complete_ms": 34991.753983
+      },
+      "execution": {
+        "accepted": true,
+        "answer": {
+          "A": 16,
+          "B": 32,
+          "C": 64
+        },
+        "complete_ms": 0.162089,
+        "error": null,
+        "executed": true
+      },
+      "error": null
+    },
+    {
+      "index": 5,
+      "started": true,
+      "completed": true,
+      "task_id": "p110d_b06",
+      "expected_candidate": 3,
+      "status": "SEMANTIC_ABSTAINED",
+      "accepted": false,
+      "executed": false,
+      "selected_candidate": null,
+      "raw_condorcet_candidate": 0,
+      "raw_condorcet_correct": false,
+      "selection": "MINIMAL_PAIRWISE_ABSTAIN",
+      "selection_error": "ValueError: P1.10 no unique confident Condorcet winner",
+      "accounting_complete": true,
+      "selector_complete": true,
+      "model_calls": 1,
+      "neural_forward_calls": 2,
+      "evaluated_tokens": 3144,
+      "complete_ms": 37554.759163,
+      "selector_decision": null,
+      "pairwise_diagnostic": {
+        "pairwise_preference_nats": {
+          "0>1": 1.1562500512227416,
+          "1>0": -1.1562500512227416,
+          "0>2": 0.4062499722931534,
+          "2>0": -0.4062499722931534,
+          "0>3": 0.4218749329447746,
+          "3>0": -0.4218749329447746,
+          "1>2": -0.1562499417923391,
+          "2>1": 0.1562499417923391,
+          "1>3": -0.2500000838190317,
+          "3>1": 0.2500000838190317,
+          "2>3": 0.2656248779967427,
+          "3>2": -0.2656248779967427
+        },
+        "raw_condorcet_winners": [
+          {
+            "candidate": 0,
+            "minimum_margin_nats": 0.4062499722931534
+          }
+        ],
+        "confident_condorcet_winners": [],
+        "max_batch_order_delta_nats": 0.0,
+        "forward_calls": 2,
+        "evaluated_tokens": 3144,
+        "selector_complete_ms": 37530.090433
+      },
+      "execution": null,
+      "error": null
+    },
+    {
+      "index": 6,
+      "started": true,
+      "completed": false
+    },
+    {
+      "index": 7,
+      "started": false,
+      "completed": false
+    }
+  ]
+}
+===== END P1.10 INTERRUPTED PARTIAL DIAGNOSTIC =====

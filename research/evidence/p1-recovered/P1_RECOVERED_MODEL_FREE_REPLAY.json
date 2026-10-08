@@ -1,0 +1,353 @@
+{
+  "schema": "neumann.p1-recovered-model-free-replay.v1",
+  "results": {
+    "P1.1": {
+      "exit_code": 0,
+      "result": {
+        "complete": true,
+        "decision": {
+          "decision3_admitted": false,
+          "development_only": true,
+          "fresh_validation_registered": false,
+          "general_capability_gate": "NOT_EVALUATED",
+          "global_questions_closed": [],
+          "p2_admitted": false,
+          "reason": "NUMERIC_OR_PERMUTATION_INSTABILITY",
+          "verdict": "FAIL"
+        },
+        "decision3_admitted": false,
+        "development_only": true,
+        "integrity_valid": true,
+        "ledger": {
+          "evaluated_tokens": 65304,
+          "forward_calls": 144,
+          "input_rows": 288,
+          "padded_tokens": 65304,
+          "score_rows": 1152,
+          "scored_tokens": 1152
+        },
+        "model_inference": false,
+        "p2_admitted": false
+      },
+      "original_replay_exit_code": 0,
+      "original_frozen_verdict": {
+        "decision3_admitted": false,
+        "development_only": true,
+        "fresh_validation_registered": false,
+        "general_capability_gate": "NOT_EVALUATED",
+        "global_questions_closed": [],
+        "p2_admitted": false,
+        "reason": "NUMERIC_OR_PERMUTATION_INSTABILITY",
+        "verdict": "FAIL"
+      },
+      "existing_replay_module": "experiments.control_plane_p11_replay",
+      "existing_replay_source_sha256": "f3b7259d7bca6b686b11ec3949bb14daf14e466ab24c805aabbe8765a98cc493",
+      "copied_archive_sha256": "6bdc2cc9435cefd8a3e99d1d0bc3589bd3b6ad84e50be83db877b1dde769e3ec",
+      "original_archive_still_matches": true,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "P1.2-dev": {
+      "exit_code": 0,
+      "result": {
+        "complete": true,
+        "decision": {
+          "centered_task_range_nats": 8.84653722627355,
+          "decision3_admitted": false,
+          "development_only": true,
+          "fresh_validation_registered": false,
+          "general_capability_gate": "NOT_EVALUATED",
+          "global_questions_closed": [],
+          "next": "FREEZE_ARCHITECTURE_THEN_REGISTER_FRESH_OPENED_VALIDATION",
+          "p2_admitted": false,
+          "reason": "DEVELOPMENT_DIAGNOSTIC_ONLY",
+          "verdict": "PASS",
+          "winner_counts": {
+            "ARITHMETIC": 4,
+            "CSP": 4,
+            "DIRECT": 0,
+            "PYTHON": 4
+          }
+        },
+        "decision3_admitted": false,
+        "development_only": true,
+        "integrity_valid": true,
+        "ledger": {
+          "evaluated_tokens": 195912,
+          "forward_calls": 432,
+          "input_rows": 864,
+          "padded_tokens": 195912,
+          "score_rows": 3456,
+          "scored_tokens": 3456
+        },
+        "model_inference": false,
+        "p2_admitted": false
+      },
+      "original_replay_exit_code": 0,
+      "original_frozen_verdict": {
+        "centered_task_range_nats": 8.84653722627355,
+        "decision3_admitted": false,
+        "development_only": true,
+        "fresh_validation_registered": false,
+        "general_capability_gate": "NOT_EVALUATED",
+        "global_questions_closed": [],
+        "next": "FREEZE_ARCHITECTURE_THEN_REGISTER_FRESH_OPENED_VALIDATION",
+        "p2_admitted": false,
+        "reason": "DEVELOPMENT_DIAGNOSTIC_ONLY",
+        "verdict": "PASS",
+        "winner_counts": {
+          "ARITHMETIC": 4,
+          "CSP": 4,
+          "DIRECT": 0,
+          "PYTHON": 4
+        }
+      },
+      "existing_replay_module": "experiments.control_plane_p12_replay",
+      "existing_replay_source_sha256": "b16dc95d63acd0206275ac4c1ad1772517f40d9362e3cabd9f06b06e0f5a1951",
+      "copied_archive_sha256": "b27748d76b8abdba24ab11ad85f25eb4012c8c9593a12a83590bfbf8666c98ba",
+      "original_archive_still_matches": true,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "P1.2-validation": {
+      "exit_code": 0,
+      "result": {
+        "complete": true,
+        "decision": {
+          "centered_task_range_nats": 8.355021161274028,
+          "compatible_by_domain": {
+            "coding": 4,
+            "constraint_planning": 2,
+            "math_logic": 4
+          },
+          "compatible_routes": 10,
+          "decision3_admitted": false,
+          "development_only": false,
+          "fresh_validation_registered": true,
+          "general_capability_gate": "NOT_EVALUATED",
+          "global_questions_closed": [],
+          "next": "PRESERVE_FIRST_VALIDATION_FAILURE",
+          "p2_admitted": false,
+          "p2_registration_admitted": false,
+          "reason": "TYPED_ROUTE_COMPATIBILITY_FAILURE",
+          "verdict": "FAIL",
+          "winner_counts": {
+            "ARITHMETIC": 6,
+            "CSP": 2,
+            "DIRECT": 0,
+            "PYTHON": 4
+          }
+        },
+        "decision3_admitted": false,
+        "development_only": false,
+        "integrity_valid": true,
+        "ledger": {
+          "evaluated_tokens": 202968,
+          "forward_calls": 432,
+          "input_rows": 864,
+          "padded_tokens": 202968,
+          "score_rows": 3456,
+          "scored_tokens": 3456
+        },
+        "model_inference": false,
+        "p2_admitted": false,
+        "p2_registration_admitted": false
+      },
+      "original_replay_exit_code": 0,
+      "original_frozen_verdict": {
+        "centered_task_range_nats": 8.355021161274028,
+        "compatible_by_domain": {
+          "coding": 4,
+          "constraint_planning": 2,
+          "math_logic": 4
+        },
+        "compatible_routes": 10,
+        "decision3_admitted": false,
+        "development_only": false,
+        "fresh_validation_registered": true,
+        "general_capability_gate": "NOT_EVALUATED",
+        "global_questions_closed": [],
+        "next": "PRESERVE_FIRST_VALIDATION_FAILURE",
+        "p2_admitted": false,
+        "p2_registration_admitted": false,
+        "reason": "TYPED_ROUTE_COMPATIBILITY_FAILURE",
+        "verdict": "FAIL",
+        "winner_counts": {
+          "ARITHMETIC": 6,
+          "CSP": 2,
+          "DIRECT": 0,
+          "PYTHON": 4
+        }
+      },
+      "existing_replay_module": "experiments.control_plane_p12_validation_replay",
+      "existing_replay_source_sha256": "8fc4bc714dea1683ed0b71aaaee781620c35d658bdfb38e7724bf2fb6baa21e9",
+      "copied_archive_sha256": "362b13d7d7006ea1c55ad33788acd11d1712e94c081d59d52b28581d3abe3444",
+      "original_archive_still_matches": true,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "P1.4": {
+      "exit_code": 0,
+      "result": {
+        "complete": true,
+        "decision": {
+          "decision3_admitted": false,
+          "development_only": true,
+          "fresh_validation_registered": false,
+          "global_questions_closed": [],
+          "p2_admitted": false,
+          "p2_registration_admitted": false,
+          "reason": "RAW_ACCOUNTING_INCOMPLETE",
+          "verdict": "FAIL"
+        },
+        "decision3_admitted": false,
+        "integrity_valid": true,
+        "model_inference": false,
+        "p2_registration_admitted": false
+      },
+      "original_replay_exit_code": 1,
+      "original_frozen_verdict": {
+        "decision3_admitted": false,
+        "development_only": true,
+        "fresh_validation_registered": false,
+        "global_questions_closed": [],
+        "p2_admitted": false,
+        "p2_registration_admitted": false,
+        "reason": "RAW_ACCOUNTING_INCOMPLETE",
+        "verdict": "FAIL"
+      },
+      "existing_replay_module": "experiments.control_plane_p14_replay",
+      "existing_replay_source_sha256": "5d76b5de2c6cf5ee05efc05130ff39700f542f0f97a84784bdc0fac8eafd5f2d",
+      "copied_archive_sha256": "7f819cd1dd26dc94ca690b4be3e2e365b7f65882900caff78e30e3e1c647af52",
+      "original_archive_still_matches": true,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "P1.5": {
+      "exit_code": 0,
+      "result": {
+        "complete": true,
+        "decision": {
+          "cost_totals": {
+            "input_tokens": 1979,
+            "model_calls": 8,
+            "output_tokens": 261,
+            "tool_calls": 4,
+            "verifier_calls": 4
+          },
+          "decision3_admitted": false,
+          "development_only": true,
+          "fresh_validation_registered": false,
+          "global_questions_closed": [],
+          "next": "RETAIN_FIRST_P15_FAILURE_AND_DIAGNOSE",
+          "p2_admitted": false,
+          "p2_registration_admitted": false,
+          "raw_csp_accepted": 0,
+          "raw_math_accepted": 4,
+          "raw_semantic_accepted": 4,
+          "reason": "SEMANTIC_PATH_CAPABILITY_FAILURE",
+          "verdict": "FAIL"
+        },
+        "decision3_admitted": false,
+        "development_only": true,
+        "fresh_validation_registered": false,
+        "global_questions_closed": [],
+        "integrity_valid": true,
+        "model_inference": false,
+        "p2_admitted": false,
+        "p2_registration_admitted": false
+      },
+      "original_replay_exit_code": 0,
+      "original_frozen_verdict": {
+        "cost_totals": {
+          "input_tokens": 1979,
+          "model_calls": 8,
+          "output_tokens": 261,
+          "tool_calls": 4,
+          "verifier_calls": 4
+        },
+        "decision3_admitted": false,
+        "development_only": true,
+        "fresh_validation_registered": false,
+        "global_questions_closed": [],
+        "next": "RETAIN_FIRST_P15_FAILURE_AND_DIAGNOSE",
+        "p2_admitted": false,
+        "p2_registration_admitted": false,
+        "raw_csp_accepted": 0,
+        "raw_math_accepted": 4,
+        "raw_semantic_accepted": 4,
+        "reason": "SEMANTIC_PATH_CAPABILITY_FAILURE",
+        "verdict": "FAIL"
+      },
+      "existing_replay_module": "experiments.control_plane_p15_replay",
+      "existing_replay_source_sha256": "4aa9e139a6275481a86e51fd929caf91dd92fa9c1d0fe26e8c4f82d62dfadfa2",
+      "copied_archive_sha256": "4e252ab6a67c0988d31fb148647ef7124b2543b5f52abfd84987b3a164ffea5d",
+      "original_archive_still_matches": true,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "P1.6": {
+      "exit_code": 0,
+      "result": {
+        "complete": true,
+        "decision": {
+          "cost_totals": {
+            "input_tokens": 2375,
+            "model_calls": 8,
+            "output_tokens": 314,
+            "tool_calls": 1,
+            "verifier_calls": 1
+          },
+          "decision3_admitted": false,
+          "development_only": true,
+          "fresh_validation_registered": false,
+          "global_questions_closed": [],
+          "next": "RETAIN_FIRST_P15_FAILURE_AND_DIAGNOSE",
+          "p2_admitted": false,
+          "p2_registration_admitted": false,
+          "raw_csp_accepted": 1,
+          "raw_math_accepted": 0,
+          "raw_semantic_accepted": 1,
+          "reason": "SEMANTIC_PATH_CAPABILITY_FAILURE",
+          "verdict": "FAIL"
+        },
+        "decision3_admitted": false,
+        "development_only": true,
+        "fresh_validation_registered": false,
+        "global_questions_closed": [],
+        "integrity_valid": true,
+        "model_inference": false,
+        "p2_admitted": false,
+        "p2_registration_admitted": false
+      },
+      "original_replay_exit_code": 0,
+      "original_frozen_verdict": {
+        "cost_totals": {
+          "input_tokens": 2375,
+          "model_calls": 8,
+          "output_tokens": 314,
+          "tool_calls": 1,
+          "verifier_calls": 1
+        },
+        "decision3_admitted": false,
+        "development_only": true,
+        "fresh_validation_registered": false,
+        "global_questions_closed": [],
+        "next": "RETAIN_FIRST_P15_FAILURE_AND_DIAGNOSE",
+        "p2_admitted": false,
+        "p2_registration_admitted": false,
+        "raw_csp_accepted": 1,
+        "raw_math_accepted": 0,
+        "raw_semantic_accepted": 1,
+        "reason": "SEMANTIC_PATH_CAPABILITY_FAILURE",
+        "verdict": "FAIL"
+      },
+      "existing_replay_module": "experiments.control_plane_p16_replay",
+      "existing_replay_source_sha256": "6de5f682bd194a72d002913673538450288ad9288faafa6445b589a1eb59afbe",
+      "copied_archive_sha256": "7a217717513ddac16aa54a00e28aec62397ff2d356dbd689fe42d4952b1862d4",
+      "original_archive_still_matches": true,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "model_calls": 0,
+  "neural_forwards": 0,
+  "optimization_calls": 0,
+  "deterministic_original_goal_checks_executed": true,
+  "historical_verdicts_changed": false,
+  "fresh_evaluation": false
+}

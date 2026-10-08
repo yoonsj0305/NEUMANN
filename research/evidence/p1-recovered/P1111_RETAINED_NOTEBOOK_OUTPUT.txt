@@ -1,0 +1,1600 @@
+===== BEGIN P1.11.1 FIRST FAIL DIAGNOSTIC =====
+{
+  "P1111_FIRST_FAIL_DIAGNOSTIC_ONLY": true,
+  "historical_result_changed": false,
+  "model_inference": false,
+  "evidence_mutation": false,
+  "archive_identity": {
+    "archive": "NEUMANN_P1111_FIRST_EVIDENCE.zip",
+    "archive_sha256": "ba2538830d60403294b7bc8230c7d8769bfb4ea66f59c2c7c26f5079beefcb81",
+    "archive_bytes": 54180
+  },
+  "historical_p111": {
+    "archive_sha256": "d75aeeccbd54e5c96041a41f4c40c1df17a5504d44c026336c53fab2b247e5e0",
+    "verdict": "NOT_EVALUATED",
+    "observations": 0,
+    "model_calls": 0,
+    "neural_forward_calls": 0
+  },
+  "setup": {
+    "active_child_pid": null,
+    "bootstrap_sha256": "fb81110e363662a47fe6489599a945d2adb3441a89d8d40fdee4ce5c62acfd7d",
+    "decision3_admitted": false,
+    "development_only": true,
+    "development_verdict": "FAIL",
+    "favorable_rerun": false,
+    "historical_first_archive_sha256": "d75aeeccbd54e5c96041a41f4c40c1df17a5504d44c026336c53fab2b247e5e0",
+    "historical_first_model_calls": 0,
+    "historical_first_neural_forward_calls": 0,
+    "historical_first_observations": 0,
+    "historical_first_verdict": "NOT_EVALUATED",
+    "identity_repair_revision": "P1.11.1",
+    "launcher_setup_and_runner_wall_ms": 47381.25407299981,
+    "launcher_wall_ms": 153.49794400003702,
+    "model_artifact_manifest_sha256": "f961e60f6f7352d756e7addf8d7887be199c81facd2ae93950bc03d1e52d7292",
+    "p110_task_score_reuse": false,
+    "p2_admitted": false,
+    "p2_registration_admitted": false,
+    "repair_scope": "MODEL_PARAMETER_IDENTITY_ONLY",
+    "replacement_of_historical_first": false,
+    "replay_exit_code": 0,
+    "runner_exit_code": 2,
+    "runtime_head": "9dcb96a2c1e303c2178776ba9ab8b66eee53913b",
+    "schema": "neumann.control-plane-p1111-setup.v1",
+    "setup_and_runner_wall_ms": 47227.75612899977,
+    "stages": [
+      {
+        "exit_code": 0,
+        "name": "CUDA runtime preflight",
+        "status": "COMPLETE",
+        "wall_ms": 2422.8335799998604
+      },
+      {
+        "exit_code": 0,
+        "name": "clone",
+        "status": "COMPLETE",
+        "wall_ms": 19708.951718999968
+      },
+      {
+        "exit_code": 0,
+        "name": "frozen checkout",
+        "status": "COMPLETE",
+        "wall_ms": 1168.3525050000299
+      },
+      {
+        "exit_code": 0,
+        "name": "dependencies",
+        "status": "COMPLETE",
+        "wall_ms": 3423.172884999758
+      },
+      {
+        "exit_code": 0,
+        "name": "post-install CUDA preflight",
+        "status": "COMPLETE",
+        "wall_ms": 2320.710636000058
+      },
+      {
+        "exit_code": 0,
+        "name": "frozen model artifact acquisition",
+        "status": "COMPLETE",
+        "wall_ms": 1418.1334810000408
+      },
+      {
+        "exit_code": 0,
+        "name": "package inventory",
+        "status": "COMPLETE",
+        "wall_ms": 1669.4969330001186
+      },
+      {
+        "exit_code": 0,
+        "name": "frozen registration",
+        "status": "COMPLETE",
+        "wall_ms": 1770.344252999621
+      },
+      {
+        "exit_code": 2,
+        "name": "first evaluable semantic-microexecutor run after identity repair",
+        "status": "NONZERO",
+        "wall_ms": 11543.897733999984
+      },
+      {
+        "exit_code": 0,
+        "name": "model-free receipt replay",
+        "status": "COMPLETE",
+        "wall_ms": 1519.6114929999567
+      }
+    ],
+    "status": "FINISHED_NONPASS",
+    "task_scores_seen_before_repair": false
+  },
+  "report_summary": {
+    "status": "COMPLETE",
+    "observations": 12,
+    "decision": {
+      "accepted": 3,
+      "cost_totals": {
+        "feasibility_calls": 35,
+        "feasibility_constraint_checks": 727,
+        "feasibility_nodes": 283,
+        "generated_calls": 0,
+        "input_rows": 47,
+        "input_tokens": 266,
+        "model_calls": 12,
+        "neural_forward_calls": 12,
+        "padded_tokens": 456,
+        "tool_calls": 8,
+        "verifier_calls": 8,
+        "witness_cache_hits": 8
+      },
+      "decision3_admitted": false,
+      "development_only": true,
+      "fresh_validation_registered": false,
+      "global_questions_closed": [],
+      "next": "RETAIN_FIRST_P111_FAILURE_AND_DIAGNOSE",
+      "p2_admitted": false,
+      "p2_registration_admitted": false,
+      "path_cost": {
+        "feasibility_calls": 35,
+        "generated_calls": 0,
+        "lexical_unique_selections": 0,
+        "model_calls": 12,
+        "neural_forward_calls": 12,
+        "selector_complete": 12
+      },
+      "raw_top_correct": 6,
+      "reason": "P111_SEMANTIC_CAPABILITY_FAILURE",
+      "selected": 8,
+      "semantic_abstained": 4,
+      "verdict": "FAIL",
+      "verifier_rejected": 5
+    },
+    "whole_study_ms": 9137.402945,
+    "selector_startup_ms": 5461.325434,
+    "accounting_complete": true,
+    "cost_totals": {
+      "feasibility_calls": 35,
+      "feasibility_constraint_checks": 727,
+      "feasibility_nodes": 283,
+      "generated_calls": 0,
+      "input_rows": 47,
+      "input_tokens": 266,
+      "model_calls": 12,
+      "neural_forward_calls": 12,
+      "padded_tokens": 456,
+      "tool_calls": 8,
+      "verifier_calls": 8,
+      "witness_cache_hits": 8
+    },
+    "core_audit": {
+      "after_identity": {
+        "artifact_files": {
+          "config.json": {
+            "bytes": 612,
+            "sha256": "953f9c0d463486b10a6871cc2fd59f223b2c70184f49815e7efbcab5d8908b41"
+          },
+          "model.safetensors": {
+            "bytes": 90868376,
+            "sha256": "53aa51172d142c89d9012cce15ae4d6cc0ca6895895114379cacb4fab128d9db"
+          },
+          "special_tokens_map.json": {
+            "bytes": 112,
+            "sha256": "303df45a03609e4ead04bc3dc1536d0ab19b5358db685b6f3da123d05ec200e3"
+          },
+          "tokenizer.json": {
+            "bytes": 466247,
+            "sha256": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037"
+          },
+          "tokenizer_config.json": {
+            "bytes": 350,
+            "sha256": "acb92769e8195aabd29b7b2137a9e6d6e25c476a4f15aa4355c233426c61576b"
+          },
+          "vocab.txt": {
+            "bytes": 231508,
+            "sha256": "07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3"
+          }
+        },
+        "artifact_manifest_sha256": "f961e60f6f7352d756e7addf8d7887be199c81facd2ae93950bc03d1e52d7292",
+        "device_name": "Tesla T4",
+        "device_type": "cuda",
+        "evidence_kind": "actual_frozen_semantic_microexecutor",
+        "model": {
+          "architecture": "BertModel",
+          "embedding_dim": 384,
+          "model_id": "sentence-transformers/all-MiniLM-L6-v2",
+          "model_revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+          "non_parameter_state_elements": 512,
+          "parameter_count_semantics": "sum(p.numel() for p in AutoModel.parameters())",
+          "parameters": 22713216,
+          "pooling": "attention-mask mean pooling then L2 normalization",
+          "state_elements_total": 22713728,
+          "training": false
+        },
+        "model_training": false,
+        "parameters": 22713216,
+        "precision": [
+          "torch.float32"
+        ],
+        "schema": "neumann.control-plane-p111-core.v1",
+        "torch": "2.11.0+cu128",
+        "transformers": "5.16.1",
+        "weights_frozen": true
+      },
+      "artifact_unchanged": true,
+      "current_accelerator_allocated_bytes": 100429312,
+      "current_accelerator_reserved_bytes": 111149056,
+      "forward_calls": 12,
+      "max_accelerator_allocated_bytes": 101445632,
+      "max_accelerator_reserved_bytes": 111149056,
+      "peak_process_rss_bytes": 1414942720,
+      "unchanged": true
+    },
+    "error": null
+  },
+  "derived_summary": {
+    "completed_tasks": 12,
+    "accepted": 3,
+    "selected_tasks": 8,
+    "selected_correct": 3,
+    "raw_top_evaluable": 12,
+    "raw_top_correct": 6,
+    "semantic_abstained": 4,
+    "verifier_rejected": 5,
+    "model_calls": 12,
+    "neural_forward_calls": 12,
+    "generated_calls": 0,
+    "input_tokens": 266
+  },
+  "tasks": [
+    {
+      "index": 0,
+      "started": true,
+      "completed": true,
+      "task_id": "p111d_b01",
+      "expected_candidate": 1,
+      "semantic_grounding": "warm standby is the failover copy, so It denotes Y",
+      "status": "REJECTED_BY_ORIGINAL_VERIFIER",
+      "accepted": false,
+      "executed": true,
+      "selected_candidate": 0,
+      "selected_correct": false,
+      "raw_top_candidate": 0,
+      "raw_top_correct": false,
+      "eligible_indexes": [
+        0,
+        1
+      ],
+      "semantic_ir": {
+        "candidates": [
+          {
+            "entity": "X",
+            "role": "active replica"
+          },
+          {
+            "entity": "Y",
+            "role": "warm standby"
+          }
+        ],
+        "target_role": "failover copy"
+      },
+      "candidate_entities": {
+        "0": "X",
+        "1": "Y"
+      },
+      "similarities": [
+        0.31389880180358887,
+        0.09648076444864273
+      ],
+      "selector_decision": {
+        "candidate_cosines": {
+          "X": 0.31389880180358887,
+          "Y": 0.09648076444864273
+        },
+        "margin_cosine": 0.21741803735494614,
+        "selected_candidate_position": 0,
+        "selected_entity": "X",
+        "top_cosine": 0.31389880180358887
+      },
+      "selection": "SEMANTIC_MICROEXECUTOR_COSINE",
+      "selection_error": null,
+      "lexical_baseline": {
+        "candidates": [
+          {
+            "entity": "X",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "Y",
+            "overlap_tokens": [],
+            "score": 0
+          }
+        ],
+        "max_overlap": 0,
+        "target_tokens": [
+          "copy",
+          "failover"
+        ],
+        "unique_selection": null
+      },
+      "model_calls": 1,
+      "neural_forward_calls": 1,
+      "generated_calls": 0,
+      "input_rows": 3,
+      "input_tokens": 14,
+      "padded_tokens": 15,
+      "feasibility_calls": 2,
+      "tool_calls": 1,
+      "verifier_calls": 1,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "selector_forward_ms": 449.24695,
+      "selector_complete_ms": 588.342364,
+      "complete_ms": 597.860281,
+      "execution": {
+        "accepted": false,
+        "answer": {
+          "X": 47,
+          "Y": 31
+        },
+        "complete_ms": 0.136118,
+        "error": null,
+        "executed": true
+      },
+      "error": null
+    },
+    {
+      "index": 1,
+      "started": true,
+      "completed": true,
+      "task_id": "p111d_b02",
+      "expected_candidate": 1,
+      "semantic_grounding": "syntax analyzer builds the parse tree, so It denotes B",
+      "status": "ACCEPTED",
+      "accepted": true,
+      "executed": true,
+      "selected_candidate": 1,
+      "selected_correct": true,
+      "raw_top_candidate": 1,
+      "raw_top_correct": true,
+      "eligible_indexes": [
+        0,
+        1,
+        2
+      ],
+      "semantic_ir": {
+        "candidates": [
+          {
+            "entity": "A",
+            "role": "tokenizer"
+          },
+          {
+            "entity": "B",
+            "role": "syntax analyzer"
+          },
+          {
+            "entity": "C",
+            "role": "optimizer"
+          }
+        ],
+        "target_role": "stage that builds the parse tree"
+      },
+      "candidate_entities": {
+        "0": "A",
+        "1": "B",
+        "2": "C"
+      },
+      "similarities": [
+        0.21695587038993835,
+        0.33091211318969727,
+        0.15343071520328522
+      ],
+      "selector_decision": {
+        "candidate_cosines": {
+          "A": 0.21695587038993835,
+          "B": 0.33091211318969727,
+          "C": 0.15343071520328522
+        },
+        "margin_cosine": 0.11395624279975891,
+        "selected_candidate_position": 1,
+        "selected_entity": "B",
+        "top_cosine": 0.33091211318969727
+      },
+      "selection": "SEMANTIC_MICROEXECUTOR_COSINE",
+      "selection_error": null,
+      "lexical_baseline": {
+        "candidates": [
+          {
+            "entity": "A",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "B",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "C",
+            "overlap_tokens": [],
+            "score": 0
+          }
+        ],
+        "max_overlap": 0,
+        "target_tokens": [
+          "builds",
+          "parse",
+          "tree"
+        ],
+        "unique_selection": null
+      },
+      "model_calls": 1,
+      "neural_forward_calls": 1,
+      "generated_calls": 0,
+      "input_rows": 4,
+      "input_tokens": 23,
+      "padded_tokens": 36,
+      "feasibility_calls": 3,
+      "tool_calls": 1,
+      "verifier_calls": 1,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "selector_forward_ms": 32.637831,
+      "selector_complete_ms": 33.865065,
+      "complete_ms": 46.539915,
+      "execution": {
+        "accepted": true,
+        "answer": {
+          "A": 6,
+          "B": 10,
+          "C": 15
+        },
+        "complete_ms": 0.146802,
+        "error": null,
+        "executed": true
+      },
+      "error": null
+    },
+    {
+      "index": 2,
+      "started": true,
+      "completed": true,
+      "task_id": "p111d_b03",
+      "expected_candidate": 1,
+      "semantic_grounding": "condenser rejects heat to the surroundings, so It denotes Q",
+      "status": "REJECTED_BY_ORIGINAL_VERIFIER",
+      "accepted": false,
+      "executed": true,
+      "selected_candidate": 3,
+      "selected_correct": false,
+      "raw_top_candidate": 3,
+      "raw_top_correct": false,
+      "eligible_indexes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "semantic_ir": {
+        "candidates": [
+          {
+            "entity": "P",
+            "role": "compressor"
+          },
+          {
+            "entity": "Q",
+            "role": "condenser"
+          },
+          {
+            "entity": "R",
+            "role": "expansion valve"
+          },
+          {
+            "entity": "S",
+            "role": "evaporator"
+          }
+        ],
+        "target_role": "component that rejects heat to the surroundings"
+      },
+      "candidate_entities": {
+        "0": "P",
+        "1": "Q",
+        "2": "R",
+        "3": "S"
+      },
+      "similarities": [
+        0.1777825951576233,
+        0.2873877286911011,
+        0.06625382602214813,
+        0.3733625113964081
+      ],
+      "selector_decision": {
+        "candidate_cosines": {
+          "P": 0.1777825951576233,
+          "Q": 0.2873877286911011,
+          "R": 0.06625382602214813,
+          "S": 0.3733625113964081
+        },
+        "margin_cosine": 0.085974782705307,
+        "selected_candidate_position": 3,
+        "selected_entity": "S",
+        "top_cosine": 0.3733625113964081
+      },
+      "selection": "SEMANTIC_MICROEXECUTOR_COSINE",
+      "selection_error": null,
+      "lexical_baseline": {
+        "candidates": [
+          {
+            "entity": "P",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "Q",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "R",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "S",
+            "overlap_tokens": [],
+            "score": 0
+          }
+        ],
+        "max_overlap": 0,
+        "target_tokens": [
+          "heat",
+          "rejects",
+          "surroundings"
+        ],
+        "unique_selection": null
+      },
+      "model_calls": 1,
+      "neural_forward_calls": 1,
+      "generated_calls": 0,
+      "input_rows": 5,
+      "input_tokens": 26,
+      "padded_tokens": 45,
+      "feasibility_calls": 4,
+      "tool_calls": 1,
+      "verifier_calls": 1,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "selector_forward_ms": 5.31009,
+      "selector_complete_ms": 6.448016,
+      "complete_ms": 28.652892,
+      "execution": {
+        "accepted": false,
+        "answer": {
+          "P": 22,
+          "Q": 66,
+          "R": 88,
+          "S": 44
+        },
+        "complete_ms": 0.180242,
+        "error": null,
+        "executed": true
+      },
+      "error": null
+    },
+    {
+      "index": 3,
+      "started": true,
+      "completed": true,
+      "task_id": "p111d_b04",
+      "expected_candidate": 0,
+      "semantic_grounding": "public verification key checks whether a signature is valid, so It denotes M",
+      "status": "ACCEPTED",
+      "accepted": true,
+      "executed": true,
+      "selected_candidate": 0,
+      "selected_correct": true,
+      "raw_top_candidate": 0,
+      "raw_top_correct": true,
+      "eligible_indexes": [
+        0,
+        1
+      ],
+      "semantic_ir": {
+        "candidates": [
+          {
+            "entity": "M",
+            "role": "public verification key"
+          },
+          {
+            "entity": "N",
+            "role": "private signing key"
+          }
+        ],
+        "target_role": "credential used to check whether a signature is valid"
+      },
+      "candidate_entities": {
+        "0": "M",
+        "1": "N"
+      },
+      "similarities": [
+        0.5034162998199463,
+        0.4253571927547455
+      ],
+      "selector_decision": {
+        "candidate_cosines": {
+          "M": 0.5034162998199463,
+          "N": 0.4253571927547455
+        },
+        "margin_cosine": 0.0780591070652008,
+        "selected_candidate_position": 0,
+        "selected_entity": "M",
+        "top_cosine": 0.5034162998199463
+      },
+      "selection": "SEMANTIC_MICROEXECUTOR_COSINE",
+      "selection_error": null,
+      "lexical_baseline": {
+        "candidates": [
+          {
+            "entity": "M",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "N",
+            "overlap_tokens": [],
+            "score": 0
+          }
+        ],
+        "max_overlap": 0,
+        "target_tokens": [
+          "check",
+          "credential",
+          "signature",
+          "valid"
+        ],
+        "unique_selection": null
+      },
+      "model_calls": 1,
+      "neural_forward_calls": 1,
+      "generated_calls": 0,
+      "input_rows": 3,
+      "input_tokens": 23,
+      "padded_tokens": 39,
+      "feasibility_calls": 2,
+      "tool_calls": 1,
+      "verifier_calls": 1,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "selector_forward_ms": 5.357256,
+      "selector_complete_ms": 6.240728,
+      "complete_ms": 12.300792,
+      "execution": {
+        "accepted": true,
+        "answer": {
+          "M": -14,
+          "N": -11
+        },
+        "complete_ms": 0.117214,
+        "error": null,
+        "executed": true
+      },
+      "error": null
+    },
+    {
+      "index": 4,
+      "started": true,
+      "completed": true,
+      "task_id": "p111d_b05",
+      "expected_candidate": 0,
+      "semantic_grounding": "scheduler assigns jobs to executors, so It denotes A",
+      "status": "SEMANTIC_ABSTAINED",
+      "accepted": false,
+      "executed": false,
+      "selected_candidate": null,
+      "selected_correct": null,
+      "raw_top_candidate": 0,
+      "raw_top_correct": true,
+      "eligible_indexes": [
+        0,
+        1,
+        2
+      ],
+      "semantic_ir": {
+        "candidates": [
+          {
+            "entity": "A",
+            "role": "scheduler"
+          },
+          {
+            "entity": "B",
+            "role": "worker"
+          },
+          {
+            "entity": "C",
+            "role": "audit logger"
+          }
+        ],
+        "target_role": "component that assigns jobs to executors"
+      },
+      "candidate_entities": {
+        "0": "A",
+        "1": "B",
+        "2": "C"
+      },
+      "similarities": [
+        0.35037800669670105,
+        0.31464722752571106,
+        0.06778277456760406
+      ],
+      "selector_decision": null,
+      "selection": "SEMANTIC_MICROEXECUTOR_ABSTAIN",
+      "selection_error": "ValueError: P1.11 semantic similarity margin failure",
+      "lexical_baseline": {
+        "candidates": [
+          {
+            "entity": "A",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "B",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "C",
+            "overlap_tokens": [],
+            "score": 0
+          }
+        ],
+        "max_overlap": 0,
+        "target_tokens": [
+          "assigns",
+          "executors",
+          "jobs"
+        ],
+        "unique_selection": null
+      },
+      "model_calls": 1,
+      "neural_forward_calls": 1,
+      "generated_calls": 0,
+      "input_rows": 4,
+      "input_tokens": 23,
+      "padded_tokens": 44,
+      "feasibility_calls": 3,
+      "tool_calls": 0,
+      "verifier_calls": 0,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "selector_forward_ms": 5.739342,
+      "selector_complete_ms": 6.80216,
+      "complete_ms": 17.268352,
+      "execution": null,
+      "error": null
+    },
+    {
+      "index": 5,
+      "started": true,
+      "completed": true,
+      "task_id": "p111d_b06",
+      "expected_candidate": 3,
+      "semantic_grounding": "fusion engine combines multiple measurements into one state estimate, so It denotes S",
+      "status": "REJECTED_BY_ORIGINAL_VERIFIER",
+      "accepted": false,
+      "executed": true,
+      "selected_candidate": 1,
+      "selected_correct": false,
+      "raw_top_candidate": 1,
+      "raw_top_correct": false,
+      "eligible_indexes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "semantic_ir": {
+        "candidates": [
+          {
+            "entity": "P",
+            "role": "image sensor"
+          },
+          {
+            "entity": "Q",
+            "role": "inertial sensor"
+          },
+          {
+            "entity": "R",
+            "role": "satellite navigation receiver"
+          },
+          {
+            "entity": "S",
+            "role": "fusion engine"
+          }
+        ],
+        "target_role": "module that combines multiple measurements into one state estimate"
+      },
+      "candidate_entities": {
+        "0": "P",
+        "1": "Q",
+        "2": "R",
+        "3": "S"
+      },
+      "similarities": [
+        0.18447019159793854,
+        0.26941585540771484,
+        0.20812340080738068,
+        0.15509523451328278
+      ],
+      "selector_decision": {
+        "candidate_cosines": {
+          "P": 0.18447019159793854,
+          "Q": 0.26941585540771484,
+          "R": 0.20812340080738068,
+          "S": 0.15509523451328278
+        },
+        "margin_cosine": 0.06129245460033417,
+        "selected_candidate_position": 1,
+        "selected_entity": "Q",
+        "top_cosine": 0.26941585540771484
+      },
+      "selection": "SEMANTIC_MICROEXECUTOR_COSINE",
+      "selection_error": null,
+      "lexical_baseline": {
+        "candidates": [
+          {
+            "entity": "P",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "Q",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "R",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "S",
+            "overlap_tokens": [],
+            "score": 0
+          }
+        ],
+        "max_overlap": 0,
+        "target_tokens": [
+          "combines",
+          "estimate",
+          "measurements",
+          "multiple",
+          "state"
+        ],
+        "unique_selection": null
+      },
+      "model_calls": 1,
+      "neural_forward_calls": 1,
+      "generated_calls": 0,
+      "input_rows": 5,
+      "input_tokens": 30,
+      "padded_tokens": 55,
+      "feasibility_calls": 4,
+      "tool_calls": 1,
+      "verifier_calls": 1,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "selector_forward_ms": 5.409768,
+      "selector_complete_ms": 6.593606,
+      "complete_ms": 30.083204,
+      "execution": {
+        "accepted": false,
+        "answer": {
+          "P": 5,
+          "Q": 26,
+          "R": 12,
+          "S": 19
+        },
+        "complete_ms": 0.167832,
+        "error": null,
+        "executed": true
+      },
+      "error": null
+    },
+    {
+      "index": 6,
+      "started": true,
+      "completed": true,
+      "task_id": "p111d_b07",
+      "expected_candidate": 2,
+      "semantic_grounding": "battery stores electrical energy, so It denotes O",
+      "status": "SEMANTIC_ABSTAINED",
+      "accepted": false,
+      "executed": false,
+      "selected_candidate": null,
+      "selected_correct": null,
+      "raw_top_candidate": 2,
+      "raw_top_correct": true,
+      "eligible_indexes": [
+        0,
+        1,
+        2
+      ],
+      "semantic_ir": {
+        "candidates": [
+          {
+            "entity": "M",
+            "role": "circuit breaker"
+          },
+          {
+            "entity": "N",
+            "role": "transformer"
+          },
+          {
+            "entity": "O",
+            "role": "battery"
+          }
+        ],
+        "target_role": "device that stores electrical energy"
+      },
+      "candidate_entities": {
+        "0": "M",
+        "1": "N",
+        "2": "O"
+      },
+      "similarities": [
+        0.2382977455854416,
+        0.3735315203666687,
+        0.38788872957229614
+      ],
+      "selector_decision": null,
+      "selection": "SEMANTIC_MICROEXECUTOR_ABSTAIN",
+      "selection_error": "ValueError: P1.11 semantic similarity margin failure",
+      "lexical_baseline": {
+        "candidates": [
+          {
+            "entity": "M",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "N",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "O",
+            "overlap_tokens": [],
+            "score": 0
+          }
+        ],
+        "max_overlap": 0,
+        "target_tokens": [
+          "electrical",
+          "energy",
+          "stores"
+        ],
+        "unique_selection": null
+      },
+      "model_calls": 1,
+      "neural_forward_calls": 1,
+      "generated_calls": 0,
+      "input_rows": 4,
+      "input_tokens": 18,
+      "padded_tokens": 28,
+      "feasibility_calls": 3,
+      "tool_calls": 0,
+      "verifier_calls": 0,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "selector_forward_ms": 5.200471,
+      "selector_complete_ms": 6.192161,
+      "complete_ms": 16.336693,
+      "execution": null,
+      "error": null
+    },
+    {
+      "index": 7,
+      "started": true,
+      "completed": true,
+      "task_id": "p111d_b08",
+      "expected_candidate": 0,
+      "semantic_grounding": "upstream channel carries requests from the client toward the service, so It denotes X",
+      "status": "ACCEPTED",
+      "accepted": true,
+      "executed": true,
+      "selected_candidate": 0,
+      "selected_correct": true,
+      "raw_top_candidate": 0,
+      "raw_top_correct": true,
+      "eligible_indexes": [
+        0,
+        1
+      ],
+      "semantic_ir": {
+        "candidates": [
+          {
+            "entity": "X",
+            "role": "upstream channel"
+          },
+          {
+            "entity": "Y",
+            "role": "downstream channel"
+          }
+        ],
+        "target_role": "path carrying requests from the client toward the service"
+      },
+      "candidate_entities": {
+        "0": "X",
+        "1": "Y"
+      },
+      "similarities": [
+        0.19021232426166534,
+        0.139798104763031
+      ],
+      "selector_decision": {
+        "candidate_cosines": {
+          "X": 0.19021232426166534,
+          "Y": 0.139798104763031
+        },
+        "margin_cosine": 0.05041421949863434,
+        "selected_candidate_position": 0,
+        "selected_entity": "X",
+        "top_cosine": 0.19021232426166534
+      },
+      "selection": "SEMANTIC_MICROEXECUTOR_COSINE",
+      "selection_error": null,
+      "lexical_baseline": {
+        "candidates": [
+          {
+            "entity": "X",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "Y",
+            "overlap_tokens": [],
+            "score": 0
+          }
+        ],
+        "max_overlap": 0,
+        "target_tokens": [
+          "carrying",
+          "client",
+          "requests",
+          "service"
+        ],
+        "unique_selection": null
+      },
+      "model_calls": 1,
+      "neural_forward_calls": 1,
+      "generated_calls": 0,
+      "input_rows": 3,
+      "input_tokens": 19,
+      "padded_tokens": 33,
+      "feasibility_calls": 2,
+      "tool_calls": 1,
+      "verifier_calls": 1,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "selector_forward_ms": 5.567512,
+      "selector_complete_ms": 6.414417,
+      "complete_ms": 12.894376,
+      "execution": {
+        "accepted": true,
+        "answer": {
+          "X": 303,
+          "Y": 606
+        },
+        "complete_ms": 0.125562,
+        "error": null,
+        "executed": true
+      },
+      "error": null
+    },
+    {
+      "index": 8,
+      "started": true,
+      "completed": true,
+      "task_id": "p111d_b09",
+      "expected_candidate": 1,
+      "semantic_grounding": "control valve meters fluid flow, so It denotes B",
+      "status": "SEMANTIC_ABSTAINED",
+      "accepted": false,
+      "executed": false,
+      "selected_candidate": null,
+      "selected_correct": null,
+      "raw_top_candidate": 1,
+      "raw_top_correct": true,
+      "eligible_indexes": [
+        0,
+        1,
+        2
+      ],
+      "semantic_ir": {
+        "candidates": [
+          {
+            "entity": "A",
+            "role": "pump"
+          },
+          {
+            "entity": "B",
+            "role": "control valve"
+          },
+          {
+            "entity": "C",
+            "role": "reservoir"
+          }
+        ],
+        "target_role": "element that meters fluid flow"
+      },
+      "candidate_entities": {
+        "0": "A",
+        "1": "B",
+        "2": "C"
+      },
+      "similarities": [
+        0.272611528635025,
+        0.28088000416755676,
+        0.20937198400497437
+      ],
+      "selector_decision": null,
+      "selection": "SEMANTIC_MICROEXECUTOR_ABSTAIN",
+      "selection_error": "ValueError: P1.11 semantic similarity margin failure",
+      "lexical_baseline": {
+        "candidates": [
+          {
+            "entity": "A",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "B",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "C",
+            "overlap_tokens": [],
+            "score": 0
+          }
+        ],
+        "max_overlap": 0,
+        "target_tokens": [
+          "flow",
+          "fluid",
+          "meters"
+        ],
+        "unique_selection": null
+      },
+      "model_calls": 1,
+      "neural_forward_calls": 1,
+      "generated_calls": 0,
+      "input_rows": 4,
+      "input_tokens": 17,
+      "padded_tokens": 28,
+      "feasibility_calls": 3,
+      "tool_calls": 0,
+      "verifier_calls": 0,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "selector_forward_ms": 5.303219,
+      "selector_complete_ms": 6.284555,
+      "complete_ms": 17.073203,
+      "execution": null,
+      "error": null
+    },
+    {
+      "index": 9,
+      "started": true,
+      "completed": true,
+      "task_id": "p111d_b10",
+      "expected_candidate": 2,
+      "semantic_grounding": "object code is relocatable machine instructions emitted before final linking, so It denotes R",
+      "status": "REJECTED_BY_ORIGINAL_VERIFIER",
+      "accepted": false,
+      "executed": true,
+      "selected_candidate": 3,
+      "selected_correct": false,
+      "raw_top_candidate": 3,
+      "raw_top_correct": false,
+      "eligible_indexes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "semantic_ir": {
+        "candidates": [
+          {
+            "entity": "P",
+            "role": "source text"
+          },
+          {
+            "entity": "Q",
+            "role": "intermediate representation"
+          },
+          {
+            "entity": "R",
+            "role": "object code"
+          },
+          {
+            "entity": "S",
+            "role": "executable image"
+          }
+        ],
+        "target_role": "relocatable machine instructions emitted before final linking"
+      },
+      "candidate_entities": {
+        "0": "P",
+        "1": "Q",
+        "2": "R",
+        "3": "S"
+      },
+      "similarities": [
+        0.11229235678911209,
+        0.06458953768014908,
+        0.09507866948843002,
+        0.21406835317611694
+      ],
+      "selector_decision": {
+        "candidate_cosines": {
+          "P": 0.11229235678911209,
+          "Q": 0.06458953768014908,
+          "R": 0.09507866948843002,
+          "S": 0.21406835317611694
+        },
+        "margin_cosine": 0.10177599638700485,
+        "selected_candidate_position": 3,
+        "selected_entity": "S",
+        "top_cosine": 0.21406835317611694
+      },
+      "selection": "SEMANTIC_MICROEXECUTOR_COSINE",
+      "selection_error": null,
+      "lexical_baseline": {
+        "candidates": [
+          {
+            "entity": "P",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "Q",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "R",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "S",
+            "overlap_tokens": [],
+            "score": 0
+          }
+        ],
+        "max_overlap": 0,
+        "target_tokens": [
+          "emitted",
+          "instructions",
+          "linking",
+          "machine",
+          "relocatable"
+        ],
+        "unique_selection": null
+      },
+      "model_calls": 1,
+      "neural_forward_calls": 1,
+      "generated_calls": 0,
+      "input_rows": 5,
+      "input_tokens": 30,
+      "padded_tokens": 60,
+      "feasibility_calls": 4,
+      "tool_calls": 1,
+      "verifier_calls": 1,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "selector_forward_ms": 5.342753,
+      "selector_complete_ms": 6.696507,
+      "complete_ms": 31.698665,
+      "execution": {
+        "accepted": false,
+        "answer": {
+          "P": 7,
+          "Q": 14,
+          "R": 28,
+          "S": 21
+        },
+        "complete_ms": 0.164318,
+        "error": null,
+        "executed": true
+      },
+      "error": null
+    },
+    {
+      "index": 10,
+      "started": true,
+      "completed": true,
+      "task_id": "p111d_b11",
+      "expected_candidate": 2,
+      "semantic_grounding": "localization filter estimates robot pose from sensor evidence, so It denotes O",
+      "status": "REJECTED_BY_ORIGINAL_VERIFIER",
+      "accepted": false,
+      "executed": true,
+      "selected_candidate": 0,
+      "selected_correct": false,
+      "raw_top_candidate": 0,
+      "raw_top_correct": false,
+      "eligible_indexes": [
+        0,
+        1,
+        2
+      ],
+      "semantic_ir": {
+        "candidates": [
+          {
+            "entity": "M",
+            "role": "camera"
+          },
+          {
+            "entity": "N",
+            "role": "wheel encoder"
+          },
+          {
+            "entity": "O",
+            "role": "localization filter"
+          }
+        ],
+        "target_role": "module that estimates robot pose from sensor evidence"
+      },
+      "candidate_entities": {
+        "0": "M",
+        "1": "N",
+        "2": "O"
+      },
+      "similarities": [
+        0.34848952293395996,
+        0.18973127007484436,
+        0.23658613860607147
+      ],
+      "selector_decision": {
+        "candidate_cosines": {
+          "M": 0.34848952293395996,
+          "N": 0.18973127007484436,
+          "O": 0.23658613860607147
+        },
+        "margin_cosine": 0.11190338432788849,
+        "selected_candidate_position": 0,
+        "selected_entity": "M",
+        "top_cosine": 0.34848952293395996
+      },
+      "selection": "SEMANTIC_MICROEXECUTOR_COSINE",
+      "selection_error": null,
+      "lexical_baseline": {
+        "candidates": [
+          {
+            "entity": "M",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "N",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "O",
+            "overlap_tokens": [],
+            "score": 0
+          }
+        ],
+        "max_overlap": 0,
+        "target_tokens": [
+          "estimates",
+          "evidence",
+          "pose",
+          "robot",
+          "sensor"
+        ],
+        "unique_selection": null
+      },
+      "model_calls": 1,
+      "neural_forward_calls": 1,
+      "generated_calls": 0,
+      "input_rows": 4,
+      "input_tokens": 24,
+      "padded_tokens": 40,
+      "feasibility_calls": 3,
+      "tool_calls": 1,
+      "verifier_calls": 1,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "selector_forward_ms": 5.446845,
+      "selector_complete_ms": 6.387674,
+      "complete_ms": 18.73655,
+      "execution": {
+        "accepted": false,
+        "answer": {
+          "M": 37,
+          "N": 11,
+          "O": 23
+        },
+        "complete_ms": 0.128259,
+        "error": null,
+        "executed": true
+      },
+      "error": null
+    },
+    {
+      "index": 11,
+      "started": true,
+      "completed": true,
+      "task_id": "p111d_b12",
+      "expected_candidate": 1,
+      "semantic_grounding": "friction brake removes kinetic energy to stop the machine, so It denotes Y",
+      "status": "SEMANTIC_ABSTAINED",
+      "accepted": false,
+      "executed": false,
+      "selected_candidate": null,
+      "selected_correct": null,
+      "raw_top_candidate": 0,
+      "raw_top_correct": false,
+      "eligible_indexes": [
+        0,
+        1
+      ],
+      "semantic_ir": {
+        "candidates": [
+          {
+            "entity": "X",
+            "role": "traction motor"
+          },
+          {
+            "entity": "Y",
+            "role": "friction brake"
+          }
+        ],
+        "target_role": "component that removes kinetic energy to stop the machine"
+      },
+      "candidate_entities": {
+        "0": "X",
+        "1": "Y"
+      },
+      "similarities": [
+        0.34133562445640564,
+        0.32324182987213135
+      ],
+      "selector_decision": null,
+      "selection": "SEMANTIC_MICROEXECUTOR_ABSTAIN",
+      "selection_error": "ValueError: P1.11 semantic similarity margin failure",
+      "lexical_baseline": {
+        "candidates": [
+          {
+            "entity": "X",
+            "overlap_tokens": [],
+            "score": 0
+          },
+          {
+            "entity": "Y",
+            "overlap_tokens": [],
+            "score": 0
+          }
+        ],
+        "max_overlap": 0,
+        "target_tokens": [
+          "energy",
+          "kinetic",
+          "machine",
+          "removes",
+          "stop"
+        ],
+        "unique_selection": null
+      },
+      "model_calls": 1,
+      "neural_forward_calls": 1,
+      "generated_calls": 0,
+      "input_rows": 3,
+      "input_tokens": 19,
+      "padded_tokens": 33,
+      "feasibility_calls": 2,
+      "tool_calls": 0,
+      "verifier_calls": 0,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "selector_forward_ms": 5.612986,
+      "selector_complete_ms": 6.630414,
+      "complete_ms": 11.526023,
+      "execution": null,
+      "error": null
+    }
+  ],
+  "core": {
+    "artifact_files": {
+      "config.json": {
+        "bytes": 612,
+        "sha256": "953f9c0d463486b10a6871cc2fd59f223b2c70184f49815e7efbcab5d8908b41"
+      },
+      "model.safetensors": {
+        "bytes": 90868376,
+        "sha256": "53aa51172d142c89d9012cce15ae4d6cc0ca6895895114379cacb4fab128d9db"
+      },
+      "special_tokens_map.json": {
+        "bytes": 112,
+        "sha256": "303df45a03609e4ead04bc3dc1536d0ab19b5358db685b6f3da123d05ec200e3"
+      },
+      "tokenizer.json": {
+        "bytes": 466247,
+        "sha256": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037"
+      },
+      "tokenizer_config.json": {
+        "bytes": 350,
+        "sha256": "acb92769e8195aabd29b7b2137a9e6d6e25c476a4f15aa4355c233426c61576b"
+      },
+      "vocab.txt": {
+        "bytes": 231508,
+        "sha256": "07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3"
+      }
+    },
+    "artifact_manifest_sha256": "f961e60f6f7352d756e7addf8d7887be199c81facd2ae93950bc03d1e52d7292",
+    "device_name": "Tesla T4",
+    "device_type": "cuda",
+    "evidence_kind": "actual_frozen_semantic_microexecutor",
+    "model": {
+      "architecture": "BertModel",
+      "embedding_dim": 384,
+      "model_id": "sentence-transformers/all-MiniLM-L6-v2",
+      "model_revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+      "non_parameter_state_elements": 512,
+      "parameter_count_semantics": "sum(p.numel() for p in AutoModel.parameters())",
+      "parameters": 22713216,
+      "pooling": "attention-mask mean pooling then L2 normalization",
+      "state_elements_total": 22713728,
+      "training": false
+    },
+    "model_training": false,
+    "parameters": 22713216,
+    "precision": [
+      "torch.float32"
+    ],
+    "schema": "neumann.control-plane-p111-core.v1",
+    "torch": "2.11.0+cu128",
+    "transformers": "5.16.1",
+    "weights_frozen": true
+  },
+  "model_artifacts": {
+    "files": {
+      "config.json": {
+        "bytes": 612,
+        "sha256": "953f9c0d463486b10a6871cc2fd59f223b2c70184f49815e7efbcab5d8908b41"
+      },
+      "model.safetensors": {
+        "bytes": 90868376,
+        "sha256": "53aa51172d142c89d9012cce15ae4d6cc0ca6895895114379cacb4fab128d9db"
+      },
+      "special_tokens_map.json": {
+        "bytes": 112,
+        "sha256": "303df45a03609e4ead04bc3dc1536d0ab19b5358db685b6f3da123d05ec200e3"
+      },
+      "tokenizer.json": {
+        "bytes": 466247,
+        "sha256": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037"
+      },
+      "tokenizer_config.json": {
+        "bytes": 350,
+        "sha256": "acb92769e8195aabd29b7b2137a9e6d6e25c476a4f15aa4355c233426c61576b"
+      },
+      "vocab.txt": {
+        "bytes": 231508,
+        "sha256": "07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3"
+      }
+    },
+    "model_id": "sentence-transformers/all-MiniLM-L6-v2",
+    "model_revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+    "schema": "neumann.control-plane-p111-model-artifacts.v1"
+  },
+  "terminal": {
+    "complete": true,
+    "decision": "FAIL",
+    "no_replacement": true
+  }
+}
+===== END P1.11.1 FIRST FAIL DIAGNOSTIC =====

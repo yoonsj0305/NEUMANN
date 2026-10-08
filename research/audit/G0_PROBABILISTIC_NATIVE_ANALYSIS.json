@@ -1,0 +1,757 @@
+{
+  "kind": "INDEPENDENT_FIRST_RECEIPT_REPLAY_AND_POSTHOC_COST_ANALYSIS",
+  "archive": {
+    "archive_sha256": "63e04646c8070b8df8fbe51ef7793a37f8dc873aae23e02488525e63be25bbc1",
+    "bytes": 1215837,
+    "entries": 1022,
+    "manifest_verified_files": 1021
+  },
+  "contract_sha256": "9694bd5031d6a08e265d112922eeb67c3e3bd72ea51bf4c4beaf2082bea05a1c",
+  "native_manifest_binding": {
+    "status": "EXECUTED_ROWS_EQUAL_REGISTERED_CONTAINER_ROWS; NOT_BYTE_IDENTICAL",
+    "registered_container_sha256": "2f22f947737757931903ce23d6bf2b7b8c658b5f1ca7e5a3f226e86111a2d6f0",
+    "executed_rows_sha256": "9d493a94fdc15b43055c6f864a779488bc4bad34bd80b46039a9a1b4079d50d4",
+    "frozen_contract_changed": false,
+    "limitation": "Runtime did not assert the full-container hash; independent replay verifies exact row projection and all input file hashes."
+  },
+  "scheduled_jobs": 125,
+  "executed_jobs": 125,
+  "job_statuses": {
+    "FINISHED": 101,
+    "PROCESS_FAILED": 9,
+    "TIMEOUT": 15
+  },
+  "goal_verdicts": {
+    "PASS": 361,
+    "NOT_VERIFIED": 14
+  },
+  "fully_verified_jobs": 87,
+  "independent_case_requests": 13,
+  "model_families": 9,
+  "unique_JANI_files": 11,
+  "total_parent_wall_seconds": 1809.1690805979997,
+  "parent_reference_audit_seconds": 0.08925799399457901,
+  "cohort_status": "INCOMPLETE",
+  "errors": [
+    {
+      "error_type": "RuntimeError",
+      "message": "InvalidPropertyException: The property refers to unknown label '(s = 5)'.",
+      "count": 4
+    },
+    {
+      "error_type": "RuntimeError",
+      "message": "InvalidPropertyException: The property refers to unknown label '(observe0 > 1)'.",
+      "count": 4
+    },
+    {
+      "error_type": "RuntimeError",
+      "message": "InvalidPropertyException: The property refers to unknown label '((s = 4) & ((z / 20) < 1/10))'.",
+      "count": 2
+    },
+    {
+      "error_type": "RuntimeError",
+      "message": "InvalidPropertyException: The property refers to unknown label '(((((((((1/2 * k_6) + (1/2 * k_2)) + ((-1 * k_4) + (-1/2 * k_3))) + ((-1/2 * k_5) + (1 * k_1))) / 6) ^ 2) + ((((((-108253175473/125000000000 * k_6) + (108253175473/125000000000 * k_2)) + ((0 * k_4) + (108253175473/125000000000 * k_3))) + ((-108253175473/125000000000 * k_5) + (0 * k_1))) / 6) ^ 2)) ^ 1/2) >= 1)'.",
+      "count": 1
+    },
+    {
+      "error_type": "RuntimeError",
+      "message": "InvalidPropertyException: The property refers to unknown label '(((((((((((1 * k_1) + (1/2 * k_2)) + (-(1/2) * k_3)) + (-(1) * k_4)) + (-(1/2) * k_5)) + (1/2 * k_6)) / 6) ^ 2) + ((((((((0 * k_1) + (108253175473/125000000000 * k_2)) + (108253175473/125000000000 * k_3)) + (0 * k_4)) + (-(108253175473/125000000000) * k_5)) + (-(108253175473/125000000000) * k_6)) / 6) ^ 2)) ^ 1/2) >= 1)'.",
+      "count": 1
+    },
+    {
+      "error_type": "RuntimeError",
+      "message": "InvalidPropertyException: The property refers to unknown label '((((((((((1294427191/1600000000 * k_10) + (1294427191/1600000000 * k_2)) + ((-1 * k_6) + (-1294427191/1600000000 * k_5))) + ((-494427191/1600000000 * k_8) + (494427191/1600000000 * k_3))) + (((494427191/1600000000 * k_9) + (1 * k_1)) + ((-1294427191/1600000000 * k_7) + (-494427191/1600000000 * k_4)))) / 6) ^ 2) + (((((((-146946313073/250000000000 * k_10) + (146946313073/250000000000 * k_2)) + ((0 * k_6) + (146946313073/250000000000 * k_5))) + ((-190211303259/200000000000 * k_8) + (190211303259/200000000000 * k_3))) + (((-190211303259/200000000000 * k_9) + (0 * k_1)) + ((-146946313073/250000000000 * k_7) + (190211303259/200000000000 * k_4)))) / 6) ^ 2)) ^ 1/2) >= 1)'.",
+      "count": 1
+    },
+    {
+      "error_type": "RuntimeError",
+      "message": "InvalidPropertyException: The property refers to unknown label '(((((((((((((((1 * k_1) + (1294427191/1600000000 * k_2)) + (494427191/1600000000 * k_3)) + (-(494427191/1600000000) * k_4)) + (-(1294427191/1600000000) * k_5)) + (-(1) * k_6)) + (-(1294427191/1600000000) * k_7)) + (-(494427191/1600000000) * k_8)) + (494427191/1600000000 * k_9)) + (1294427191/1600000000 * k_10)) / 6) ^ 2) + ((((((((((((0 * k_1) + (146946313073/250000000000 * k_2)) + (190211303259/200000000000 * k_3)) + (190211303259/200000000000 * k_4)) + (146946313073/250000000000 * k_5)) + (0 * k_6)) + (-(146946313073/250000000000) * k_7)) + (-(190211303259/200000000000) * k_8)) + (-(190211303259/200000000000) * k_9)) + (-(146946313073/250000000000) * k_10)) / 6) ^ 2)) ^ 1/2) >= 1)'.",
+      "count": 1
+    }
+  ],
+  "process_failures": [
+    {
+      "job_no": 4,
+      "case_id": "brp-small-p1",
+      "format": "jani",
+      "route": "dd_parametric_bisim_sparse",
+      "returncode": -11,
+      "stderr": ""
+    },
+    {
+      "job_no": 26,
+      "case_id": "crowds-small-positive",
+      "format": "jani",
+      "route": "dd_parametric_bisim_sparse",
+      "returncode": -11,
+      "stderr": ""
+    },
+    {
+      "job_no": 31,
+      "case_id": "crowds-small-positive",
+      "format": "prism",
+      "route": "dd_parametric_bisim_sparse",
+      "returncode": -11,
+      "stderr": ""
+    },
+    {
+      "job_no": 72,
+      "case_id": "herman-small-steps",
+      "format": "prism",
+      "route": "dd_parametric_bisim_sparse",
+      "returncode": -11,
+      "stderr": ""
+    },
+    {
+      "job_no": 76,
+      "case_id": "herman-large-steps",
+      "format": "jani",
+      "route": "dd_parametric_bisim_sparse",
+      "returncode": -11,
+      "stderr": ""
+    },
+    {
+      "job_no": 85,
+      "case_id": "leader_sync-small-time",
+      "format": "jani",
+      "route": "dd_parametric_bisim_sparse",
+      "returncode": -11,
+      "stderr": ""
+    },
+    {
+      "job_no": 90,
+      "case_id": "leader_sync-small-time",
+      "format": "prism",
+      "route": "dd_parametric_bisim_sparse",
+      "returncode": -11,
+      "stderr": ""
+    },
+    {
+      "job_no": 104,
+      "case_id": "nand-large-reliable",
+      "format": "prism",
+      "route": "dd_parametric_bisim_sparse",
+      "returncode": -11,
+      "stderr": ""
+    },
+    {
+      "job_no": 108,
+      "case_id": "oscillators-small-power_consumption",
+      "format": "jani",
+      "route": "dd_parametric_bisim_sparse",
+      "returncode": -11,
+      "stderr": ""
+    }
+  ],
+  "families": {
+    "brp": {
+      "requests": 2,
+      "available_comparable_requests": 2,
+      "resident_optimistic_geomean": 4.363635872910329,
+      "two_registered_bins_with_verified_paths": true,
+      "screening": "NO_TENFOLD_OPTIMISTIC_HEADROOM_IN_TESTED_PATHS"
+    },
+    "coupon": {
+      "requests": 1,
+      "available_comparable_requests": 1,
+      "resident_optimistic_geomean": 22.550479868431303,
+      "two_registered_bins_with_verified_paths": false,
+      "screening": "NO_REGISTERED_FAMILY_PASS"
+    },
+    "crowds": {
+      "requests": 2,
+      "available_comparable_requests": 2,
+      "resident_optimistic_geomean": 9.678493654564294,
+      "two_registered_bins_with_verified_paths": true,
+      "screening": "NO_TENFOLD_OPTIMISTIC_HEADROOM_IN_TESTED_PATHS"
+    },
+    "egl": {
+      "requests": 1,
+      "available_comparable_requests": 1,
+      "resident_optimistic_geomean": 53.088533141598035,
+      "two_registered_bins_with_verified_paths": false,
+      "screening": "NO_REGISTERED_FAMILY_PASS"
+    },
+    "haddad-monmege": {
+      "requests": 1,
+      "available_comparable_requests": 1,
+      "resident_optimistic_geomean": 9.973312274754353,
+      "two_registered_bins_with_verified_paths": false,
+      "screening": "NO_REGISTERED_FAMILY_PASS"
+    },
+    "herman": {
+      "requests": 2,
+      "available_comparable_requests": 1,
+      "resident_optimistic_geomean": 8.25963305807139,
+      "two_registered_bins_with_verified_paths": false,
+      "screening": "NO_REGISTERED_FAMILY_PASS"
+    },
+    "leader_sync": {
+      "requests": 1,
+      "available_comparable_requests": 1,
+      "resident_optimistic_geomean": 5.826299109591662,
+      "two_registered_bins_with_verified_paths": false,
+      "screening": "NO_REGISTERED_FAMILY_PASS"
+    },
+    "nand": {
+      "requests": 1,
+      "available_comparable_requests": 1,
+      "resident_optimistic_geomean": 5.388785603563172,
+      "two_registered_bins_with_verified_paths": false,
+      "screening": "NO_REGISTERED_FAMILY_PASS"
+    },
+    "oscillators": {
+      "requests": 2,
+      "available_comparable_requests": 1,
+      "resident_optimistic_geomean": 3.70157066296406,
+      "two_registered_bins_with_verified_paths": false,
+      "screening": "NO_REGISTERED_FAMILY_PASS"
+    }
+  },
+  "cells": [
+    {
+      "case_id": "brp-small-p1",
+      "family": "brp",
+      "observed_exact_outputs": 28,
+      "fully_verified_native_paths": 7,
+      "status": "COMPLETE_PATH_AVAILABLE",
+      "native_cold_seconds": 0.240974934,
+      "native_resident_fresh_seconds": 0.027870374,
+      "free_optimistic_cold_seconds": 0.201360703,
+      "free_optimistic_resident_seconds": 0.003819248,
+      "native_over_free_cold": 1.196732681252111,
+      "native_over_free_resident": 7.2973459696778,
+      "native_over_free_compiled_reuse": 1.0333314028235898,
+      "max_state_reduction": 1.8919753086419753,
+      "max_transition_reduction": 1.7765486725663717,
+      "native_cold_path": "prism/sparse_exact_topological",
+      "native_resident_path": "jani/sparse_exact_topological",
+      "free_cold_path": "jani/sparse_parametric_bisim",
+      "free_resident_path": "jani/sparse_parametric_bisim"
+    },
+    {
+      "case_id": "brp-large-p1",
+      "family": "brp",
+      "observed_exact_outputs": 32,
+      "fully_verified_native_paths": 8,
+      "status": "COMPLETE_PATH_AVAILABLE",
+      "native_cold_seconds": 0.332204309,
+      "native_resident_fresh_seconds": 0.127391935,
+      "free_optimistic_cold_seconds": 0.24604814099999997,
+      "free_optimistic_resident_seconds": 0.048821359,
+      "native_over_free_cold": 1.3501598006383637,
+      "native_over_free_resident": 2.609348400154121,
+      "native_over_free_compiled_reuse": 0.9981294913270649,
+      "max_state_reduction": 1.8760927404028886,
+      "max_transition_reduction": 1.790535090077978,
+      "native_cold_path": "prism/sparse_exact",
+      "native_resident_path": "prism/sparse_exact",
+      "free_cold_path": "jani/sparse_parametric_bisim",
+      "free_resident_path": "jani/dd_parametric_bisim_sparse"
+    },
+    {
+      "case_id": "coupon-large-exp_draws",
+      "family": "coupon",
+      "observed_exact_outputs": 20,
+      "fully_verified_native_paths": 5,
+      "status": "COMPLETE_PATH_AVAILABLE",
+      "native_cold_seconds": 0.260888183,
+      "native_resident_fresh_seconds": 0.049225217,
+      "free_optimistic_cold_seconds": 0.19546717200000002,
+      "free_optimistic_resident_seconds": 0.00218289,
+      "native_over_free_cold": 1.3346905279828778,
+      "native_over_free_resident": 22.550479868431303,
+      "native_over_free_compiled_reuse": 1.0667899776804242,
+      "max_state_reduction": 89.95,
+      "max_transition_reduction": 108.06944444444444,
+      "native_cold_path": "jani/sparse_parametric_bisim",
+      "native_resident_path": "jani/sparse_parametric_bisim",
+      "free_cold_path": "jani/sparse_parametric_bisim",
+      "free_resident_path": "jani/sparse_parametric_bisim"
+    },
+    {
+      "case_id": "crowds-small-positive",
+      "family": "crowds",
+      "observed_exact_outputs": 29,
+      "fully_verified_native_paths": 6,
+      "status": "COMPLETE_PATH_AVAILABLE",
+      "native_cold_seconds": 0.258634854,
+      "native_resident_fresh_seconds": 0.039668496,
+      "free_optimistic_cold_seconds": 0.21083567399999997,
+      "free_optimistic_resident_seconds": 0.006864401,
+      "native_over_free_cold": 1.22671296129895,
+      "native_over_free_resident": 5.778872184186209,
+      "native_over_free_compiled_reuse": 1.05020821392509,
+      "max_state_reduction": 28.625,
+      "max_transition_reduction": 32.583333333333336,
+      "native_cold_path": "jani/sparse_parametric_bisim",
+      "native_resident_path": "jani/sparse_parametric_bisim",
+      "free_cold_path": "jani/sparse_parametric_bisim",
+      "free_resident_path": "jani/sparse_parametric_bisim"
+    },
+    {
+      "case_id": "crowds-large-positive",
+      "family": "crowds",
+      "observed_exact_outputs": 32,
+      "fully_verified_native_paths": 8,
+      "status": "COMPLETE_PATH_AVAILABLE",
+      "native_cold_seconds": 0.313422494,
+      "native_resident_fresh_seconds": 0.098400541,
+      "free_optimistic_cold_seconds": 0.200134519,
+      "free_optimistic_resident_seconds": 0.006070508,
+      "native_over_free_cold": 1.5660591464483944,
+      "native_over_free_resident": 16.209605687036404,
+      "native_over_free_compiled_reuse": 1.079465967077179,
+      "max_state_reduction": 161.5,
+      "max_transition_reduction": 248.83333333333334,
+      "native_cold_path": "jani/sparse_parametric_bisim",
+      "native_resident_path": "jani/sparse_parametric_bisim",
+      "free_cold_path": "jani/dd_parametric_bisim_sparse",
+      "free_resident_path": "jani/sparse_parametric_bisim"
+    },
+    {
+      "case_id": "egl-large-unfairA",
+      "family": "egl",
+      "observed_exact_outputs": 40,
+      "fully_verified_native_paths": 10,
+      "status": "COMPLETE_PATH_AVAILABLE",
+      "native_cold_seconds": 0.96471594,
+      "native_resident_fresh_seconds": 0.758146671,
+      "free_optimistic_cold_seconds": 0.203479224,
+      "free_optimistic_resident_seconds": 0.014280798999999999,
+      "native_over_free_cold": 4.74110290493343,
+      "native_over_free_resident": 53.088533141598035,
+      "native_over_free_compiled_reuse": 1.094295061264245,
+      "max_state_reduction": 2815.8333333333335,
+      "max_transition_reduction": 1934.0555555555557,
+      "native_cold_path": "jani/sparse_parametric_bisim",
+      "native_resident_path": "jani/sparse_parametric_bisim",
+      "free_cold_path": "jani/sparse_parametric_bisim",
+      "free_resident_path": "jani/sparse_parametric_bisim"
+    },
+    {
+      "case_id": "haddad-monmege-small-exp_steps",
+      "family": "haddad-monmege",
+      "observed_exact_outputs": 40,
+      "fully_verified_native_paths": 10,
+      "status": "COMPLETE_PATH_AVAILABLE",
+      "native_cold_seconds": 0.229285799,
+      "native_resident_fresh_seconds": 0.019581721,
+      "free_optimistic_cold_seconds": 0.195344524,
+      "free_optimistic_resident_seconds": 0.0019634120000000003,
+      "native_over_free_cold": 1.1737508393119842,
+      "native_over_free_resident": 9.973312274754354,
+      "native_over_free_compiled_reuse": 1.0457334282188722,
+      "max_state_reduction": 1.99009900990099,
+      "max_transition_reduction": 2.0,
+      "native_cold_path": "prism/sparse_exact",
+      "native_resident_path": "prism/sparse_parametric_bisim",
+      "free_cold_path": "jani/dd_parametric_bisim_sparse",
+      "free_resident_path": "jani/sparse_parametric_bisim"
+    },
+    {
+      "case_id": "herman-small-steps",
+      "family": "herman",
+      "observed_exact_outputs": 37,
+      "fully_verified_native_paths": 9,
+      "status": "COMPLETE_PATH_AVAILABLE",
+      "native_cold_seconds": 0.231704945,
+      "native_resident_fresh_seconds": 0.017363731,
+      "free_optimistic_cold_seconds": 0.194837227,
+      "free_optimistic_resident_seconds": 0.00210224,
+      "native_over_free_cold": 1.1892231714014283,
+      "native_over_free_resident": 8.25963305807139,
+      "native_over_free_compiled_reuse": 1.0909935610466566,
+      "max_state_reduction": 14.222222222222221,
+      "max_transition_reduction": 44.36734693877551,
+      "native_cold_path": "prism/sparse_parametric_bisim",
+      "native_resident_path": "prism/sparse_parametric_bisim",
+      "free_cold_path": "jani/dd_parametric_bisim_sparse",
+      "free_resident_path": "jani/sparse_parametric_bisim"
+    },
+    {
+      "case_id": "herman-large-steps",
+      "family": "herman",
+      "observed_exact_outputs": 0,
+      "fully_verified_native_paths": 0,
+      "status": "INCOMPLETE",
+      "native_cold_seconds": null,
+      "native_resident_fresh_seconds": null,
+      "free_optimistic_cold_seconds": null,
+      "free_optimistic_resident_seconds": null,
+      "native_over_free_cold": null,
+      "native_over_free_resident": null,
+      "native_over_free_compiled_reuse": null,
+      "max_state_reduction": null,
+      "max_transition_reduction": null
+    },
+    {
+      "case_id": "leader_sync-small-time",
+      "family": "leader_sync",
+      "observed_exact_outputs": 32,
+      "fully_verified_native_paths": 8,
+      "status": "COMPLETE_PATH_AVAILABLE",
+      "native_cold_seconds": 0.23813554,
+      "native_resident_fresh_seconds": 0.027265699,
+      "free_optimistic_cold_seconds": 0.20037757399999997,
+      "free_optimistic_resident_seconds": 0.004679763,
+      "native_over_free_cold": 1.1884340909327509,
+      "native_over_free_resident": 5.826299109591661,
+      "native_over_free_compiled_reuse": 1.2511764503124836,
+      "max_state_reduction": 11.75,
+      "max_transition_reduction": 13.23076923076923,
+      "native_cold_path": "jani/sparse_parametric_bisim",
+      "native_resident_path": "jani/sparse_exact",
+      "free_cold_path": "jani/sparse_parametric_bisim",
+      "free_resident_path": "jani/sparse_parametric_bisim"
+    },
+    {
+      "case_id": "nand-large-reliable",
+      "family": "nand",
+      "observed_exact_outputs": 29,
+      "fully_verified_native_paths": 7,
+      "status": "COMPLETE_PATH_AVAILABLE",
+      "native_cold_seconds": 0.954915797,
+      "native_resident_fresh_seconds": 0.744754587,
+      "free_optimistic_cold_seconds": 0.33131037500000005,
+      "free_optimistic_resident_seconds": 0.138204531,
+      "native_over_free_cold": 2.8822393412823244,
+      "native_over_free_resident": 5.388785603563171,
+      "native_over_free_compiled_reuse": 0.9913357327757126,
+      "max_state_reduction": 1.9594266703354428,
+      "max_transition_reduction": 1.9970088911532204,
+      "native_cold_path": "prism/sparse_exact",
+      "native_resident_path": "prism/sparse_exact_topological",
+      "free_cold_path": "prism/sparse_parametric_bisim",
+      "free_resident_path": "jani/dd_parametric_bisim_sparse"
+    },
+    {
+      "case_id": "oscillators-small-power_consumption",
+      "family": "oscillators",
+      "observed_exact_outputs": 28,
+      "fully_verified_native_paths": 7,
+      "status": "COMPLETE_PATH_AVAILABLE",
+      "native_cold_seconds": 0.580967854,
+      "native_resident_fresh_seconds": 0.447629356,
+      "free_optimistic_cold_seconds": 0.302551752,
+      "free_optimistic_resident_seconds": 0.120929572,
+      "native_over_free_cold": 1.9202263750236024,
+      "native_over_free_resident": 3.7015706629640595,
+      "native_over_free_compiled_reuse": 0.996181042742221,
+      "max_state_reduction": 1.0021645021645023,
+      "max_transition_reduction": 1.0015686274509803,
+      "native_cold_path": "prism/sparse_parametric_bisim",
+      "native_resident_path": "prism/sparse_parametric_bisim",
+      "free_cold_path": "jani/sparse_parametric_bisim",
+      "free_resident_path": "jani/sparse_parametric_bisim"
+    },
+    {
+      "case_id": "oscillators-large-power_consumption",
+      "family": "oscillators",
+      "observed_exact_outputs": 14,
+      "fully_verified_native_paths": 2,
+      "status": "COMPLETE_PATH_AVAILABLE",
+      "native_cold_seconds": 11.294680731,
+      "native_resident_fresh_seconds": 12.588701532,
+      "free_optimistic_cold_seconds": null,
+      "free_optimistic_resident_seconds": null,
+      "native_over_free_cold": null,
+      "native_over_free_resident": null,
+      "native_over_free_compiled_reuse": null,
+      "max_state_reduction": null,
+      "max_transition_reduction": null,
+      "native_cold_path": "prism/sparse_exact",
+      "native_resident_path": "prism/sparse_exact"
+    }
+  ],
+  "compiled_reuse_controls": [
+    {
+      "case_id": "brp-small-p1",
+      "format": "jani",
+      "route": "sparse_parametric_bisim",
+      "native_seconds": 0.0008650475,
+      "free_seconds": 0.0008380465,
+      "ratio": 1.0322189759160143
+    },
+    {
+      "case_id": "brp-small-p1",
+      "format": "prism",
+      "route": "sparse_parametric_bisim",
+      "native_seconds": 0.0008766939999999999,
+      "free_seconds": 0.000840021,
+      "ratio": 1.0436572419022856
+    },
+    {
+      "case_id": "brp-small-p1",
+      "format": "prism",
+      "route": "dd_parametric_bisim_sparse",
+      "native_seconds": 0.0009260704999999999,
+      "free_seconds": 0.00090418,
+      "ratio": 1.024210334225486
+    },
+    {
+      "case_id": "brp-large-p1",
+      "format": "jani",
+      "route": "sparse_parametric_bisim",
+      "native_seconds": 0.046571465,
+      "free_seconds": 0.046627052,
+      "ratio": 0.9988078379907012
+    },
+    {
+      "case_id": "brp-large-p1",
+      "format": "jani",
+      "route": "dd_parametric_bisim_sparse",
+      "native_seconds": 0.045091070999999996,
+      "free_seconds": 0.045384164000000005,
+      "ratio": 0.9935419544138786
+    },
+    {
+      "case_id": "brp-large-p1",
+      "format": "prism",
+      "route": "sparse_parametric_bisim",
+      "native_seconds": 0.0462645505,
+      "free_seconds": 0.046275300000000005,
+      "ratio": 0.9997677054497754
+    },
+    {
+      "case_id": "brp-large-p1",
+      "format": "prism",
+      "route": "dd_parametric_bisim_sparse",
+      "native_seconds": 0.0449649605,
+      "free_seconds": 0.0449462975,
+      "ratio": 1.0004152288628445
+    },
+    {
+      "case_id": "coupon-large-exp_draws",
+      "format": "jani",
+      "route": "sparse_parametric_bisim",
+      "native_seconds": 0.0003252235,
+      "free_seconds": 0.00031882899999999997,
+      "ratio": 1.0200562056776517
+    },
+    {
+      "case_id": "coupon-large-exp_draws",
+      "format": "jani",
+      "route": "dd_parametric_bisim_sparse",
+      "native_seconds": 0.00033633000000000003,
+      "free_seconds": 0.0003014615,
+      "ratio": 1.1156648527258042
+    },
+    {
+      "case_id": "crowds-small-positive",
+      "format": "jani",
+      "route": "sparse_parametric_bisim",
+      "native_seconds": 0.00030510300000000004,
+      "free_seconds": 0.0002848775,
+      "ratio": 1.0709971829997105
+    },
+    {
+      "case_id": "crowds-small-positive",
+      "format": "prism",
+      "route": "sparse_parametric_bisim",
+      "native_seconds": 0.000275319,
+      "free_seconds": 0.000267346,
+      "ratio": 1.029822776476925
+    },
+    {
+      "case_id": "crowds-large-positive",
+      "format": "jani",
+      "route": "dd_parametric_bisim_sparse",
+      "native_seconds": 0.00032135,
+      "free_seconds": 0.0002885245,
+      "ratio": 1.1137702344168345
+    },
+    {
+      "case_id": "crowds-large-positive",
+      "format": "jani",
+      "route": "sparse_parametric_bisim",
+      "native_seconds": 0.000301546,
+      "free_seconds": 0.00028154549999999997,
+      "ratio": 1.0710382513661203
+    },
+    {
+      "case_id": "crowds-large-positive",
+      "format": "prism",
+      "route": "dd_parametric_bisim_sparse",
+      "native_seconds": 0.0003013855,
+      "free_seconds": 0.00028408700000000003,
+      "ratio": 1.0608915578678362
+    },
+    {
+      "case_id": "crowds-large-positive",
+      "format": "prism",
+      "route": "sparse_parametric_bisim",
+      "native_seconds": 0.000298952,
+      "free_seconds": 0.00027863599999999997,
+      "ratio": 1.0729123300650312
+    },
+    {
+      "case_id": "egl-large-unfairA",
+      "format": "jani",
+      "route": "sparse_parametric_bisim",
+      "native_seconds": 6.6657e-05,
+      "free_seconds": 5.51505e-05,
+      "ratio": 1.2086381809775069
+    },
+    {
+      "case_id": "egl-large-unfairA",
+      "format": "jani",
+      "route": "dd_parametric_bisim_sparse",
+      "native_seconds": 0.000102404,
+      "free_seconds": 9.6342e-05,
+      "ratio": 1.062921674866621
+    },
+    {
+      "case_id": "egl-large-unfairA",
+      "format": "prism",
+      "route": "sparse_parametric_bisim",
+      "native_seconds": 6.6082e-05,
+      "free_seconds": 5.6442e-05,
+      "ratio": 1.170794798199922
+    },
+    {
+      "case_id": "egl-large-unfairA",
+      "format": "prism",
+      "route": "dd_parametric_bisim_sparse",
+      "native_seconds": 0.000197922,
+      "free_seconds": 0.0002076035,
+      "ratio": 0.9533654297735829
+    },
+    {
+      "case_id": "haddad-monmege-small-exp_steps",
+      "format": "jani",
+      "route": "sparse_parametric_bisim",
+      "native_seconds": 0.0006897625,
+      "free_seconds": 0.0006483179999999999,
+      "ratio": 1.0639261905422956
+    },
+    {
+      "case_id": "haddad-monmege-small-exp_steps",
+      "format": "jani",
+      "route": "dd_parametric_bisim_sparse",
+      "native_seconds": 0.0007319564999999999,
+      "free_seconds": 0.000720913,
+      "ratio": 1.0153187693938102
+    },
+    {
+      "case_id": "haddad-monmege-small-exp_steps",
+      "format": "prism",
+      "route": "sparse_parametric_bisim",
+      "native_seconds": 0.0006912295,
+      "free_seconds": 0.0006493905000000001,
+      "ratio": 1.0644281060471317
+    },
+    {
+      "case_id": "haddad-monmege-small-exp_steps",
+      "format": "prism",
+      "route": "dd_parametric_bisim_sparse",
+      "native_seconds": 0.0007208365,
+      "free_seconds": 0.0006930795,
+      "ratio": 1.0400487967109113
+    },
+    {
+      "case_id": "herman-small-steps",
+      "format": "jani",
+      "route": "sparse_parametric_bisim",
+      "native_seconds": 0.000225236,
+      "free_seconds": 0.0002144525,
+      "ratio": 1.0502838623937703
+    },
+    {
+      "case_id": "herman-small-steps",
+      "format": "jani",
+      "route": "dd_parametric_bisim_sparse",
+      "native_seconds": 0.000253889,
+      "free_seconds": 0.00021565,
+      "ratio": 1.1773197310456758
+    },
+    {
+      "case_id": "herman-small-steps",
+      "format": "prism",
+      "route": "sparse_parametric_bisim",
+      "native_seconds": 0.0002204515,
+      "free_seconds": 0.000209917,
+      "ratio": 1.05018412039044
+    },
+    {
+      "case_id": "leader_sync-small-time",
+      "format": "jani",
+      "route": "sparse_parametric_bisim",
+      "native_seconds": 0.0001231695,
+      "free_seconds": 9.5251e-05,
+      "ratio": 1.2931045343355974
+    },
+    {
+      "case_id": "leader_sync-small-time",
+      "format": "prism",
+      "route": "sparse_parametric_bisim",
+      "native_seconds": 0.000119944,
+      "free_seconds": 9.90775e-05,
+      "ratio": 1.210607857485302
+    },
+    {
+      "case_id": "nand-large-reliable",
+      "format": "jani",
+      "route": "sparse_parametric_bisim",
+      "native_seconds": 0.14307193,
+      "free_seconds": 0.143535154,
+      "ratio": 0.9967727487859874
+    },
+    {
+      "case_id": "nand-large-reliable",
+      "format": "jani",
+      "route": "dd_parametric_bisim_sparse",
+      "native_seconds": 0.1336738005,
+      "free_seconds": 0.134390554,
+      "ratio": 0.9946666378055112
+    },
+    {
+      "case_id": "nand-large-reliable",
+      "format": "prism",
+      "route": "sparse_parametric_bisim",
+      "native_seconds": 0.13771444900000002,
+      "free_seconds": 0.1401493005,
+      "ratio": 0.982626730983934
+    },
+    {
+      "case_id": "oscillators-small-power_consumption",
+      "format": "jani",
+      "route": "sparse_parametric_bisim",
+      "native_seconds": 0.008431735999999999,
+      "free_seconds": 0.0083567525,
+      "ratio": 1.0089728037296783
+    },
+    {
+      "case_id": "oscillators-small-power_consumption",
+      "format": "prism",
+      "route": "sparse_parametric_bisim",
+      "native_seconds": 0.0083907575,
+      "free_seconds": 0.008389834,
+      "ratio": 1.0001100736915653
+    },
+    {
+      "case_id": "oscillators-small-power_consumption",
+      "format": "prism",
+      "route": "dd_parametric_bisim_sparse",
+      "native_seconds": 0.008537824999999999,
+      "free_seconds": 0.008714845499999999,
+      "ratio": 0.9796874769610087
+    }
+  ],
+  "new_solver_calls_in_analysis": 0,
+  "new_model_forwards": 0,
+  "decision": "HOLD_LEARNING",
+  "cost_scope": "Optimistic free quotient floors retain original parse/bind/hash and exact solve/restore; reference judgement is diagnostic audit cost, not a deployable per-request verifier; omit quotient construction, delivery and independent certificate costs. Cold floor charges measured process startup. Native receives the same compilation/reuse rights.",
+  "harness_limit": "Parent subprocess.wait polling quantizes job wall; use worker perf_counter_ns for internal latency. Timed-out jobs have no receipt for unfinished repeat, so missing stage costs are UNKNOWN.",
+  "strong_comparator_gap": "Herman15 has a published exact analytic formula; Storm portfolio is not strongest native there. Some native routes failed or were not verified, so all strongest-comparator claims are qualified.",
+  "unknown_axes": [
+    "Oracle delivery",
+    "independent quotient proof acquisition",
+    "energy",
+    "FLOPs",
+    "money",
+    "training",
+    "full lifecycle investment"
+  ],
+  "statistical_scope": "Three repeats and opened requests are diagnostic, not independent broad generalization."
+}

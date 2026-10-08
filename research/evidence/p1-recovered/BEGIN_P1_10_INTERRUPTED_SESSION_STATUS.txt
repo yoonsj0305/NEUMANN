@@ -1,0 +1,105 @@
+===== BEGIN P1.10 INTERRUPTED-SESSION STATUS =====
+{
+  "setup_exists": true,
+  "setup": {
+    "active_child_pid": null,
+    "bootstrap_sha256": "8dffa777f716604365ac0c8d95da5d0bc437addda8edd46203f56a502c46c572",
+    "decision3_admitted": false,
+    "development_only": true,
+    "error": "KeyboardInterrupt: ",
+    "favorable_rerun": false,
+    "launcher_setup_and_runner_wall_ms": 389934.5357500001,
+    "launcher_wall_ms": 146.3133930001277,
+    "p19_opened_task_score_reuse": false,
+    "p2_admitted": false,
+    "p2_registration_admitted": false,
+    "runtime_head": "0c9b04954ffffe83051fcc2fcb675101717021ad",
+    "schema": "neumann.control-plane-p110-setup.v1",
+    "setup_and_runner_wall_ms": 389788.222357,
+    "stages": [
+      {
+        "exit_code": 0,
+        "name": "CUDA runtime preflight",
+        "status": "COMPLETE",
+        "wall_ms": 3426.0628930001076
+      },
+      {
+        "exit_code": 0,
+        "name": "clone",
+        "status": "COMPLETE",
+        "wall_ms": 19522.1505479999
+      },
+      {
+        "exit_code": 0,
+        "name": "frozen checkout",
+        "status": "COMPLETE",
+        "wall_ms": 1419.4964700000128
+      },
+      {
+        "exit_code": 0,
+        "name": "dependencies",
+        "status": "COMPLETE",
+        "wall_ms": 3928.4177510003246
+      },
+      {
+        "exit_code": 0,
+        "name": "post-install CUDA preflight",
+        "status": "COMPLETE",
+        "wall_ms": 2874.842060999981
+      },
+      {
+        "exit_code": 0,
+        "name": "package inventory",
+        "status": "COMPLETE",
+        "wall_ms": 1920.4928809999728
+      },
+      {
+        "exit_code": 0,
+        "name": "frozen registration",
+        "status": "COMPLETE",
+        "wall_ms": 2022.1826990000409
+      },
+      {
+        "error": "KeyboardInterrupt",
+        "name": "first minimal-pairwise semantic development run",
+        "status": "FAILED_OR_INTERRUPTED",
+        "wall_ms": 354660.4123950001
+      }
+    ],
+    "status": "FAILED_OR_INTERRUPTED"
+  },
+  "active_child_pid": null,
+  "active_child_alive": false,
+  "archive_exists": true,
+  "archive_bytes": 49983,
+  "hash_receipt": {
+    "archive": "NEUMANN_P110_FIRST_EVIDENCE.zip",
+    "archive_bytes": 49983,
+    "archive_sha256": "26639aaa19074efc564bbd01d7ac106e586491a8e43fc7524fde0d9cc95535b9",
+    "development_only": true,
+    "no_replacement": true,
+    "packaging_ms": 10.33504700035337
+  },
+  "result_dir_exists": true,
+  "result_files": [
+    "core.json",
+    "manifest.json",
+    "study_started.json",
+    "task_00.json",
+    "task_00_started.json",
+    "task_01.json",
+    "task_01_started.json",
+    "task_02.json",
+    "task_02_started.json",
+    "task_03.json",
+    "task_03_started.json",
+    "task_04.json",
+    "task_04_started.json",
+    "task_05.json",
+    "task_05_started.json",
+    "task_06_started.json"
+  ],
+  "report": null,
+  "terminal": null
+}
+===== END P1.10 INTERRUPTED-SESSION STATUS =====

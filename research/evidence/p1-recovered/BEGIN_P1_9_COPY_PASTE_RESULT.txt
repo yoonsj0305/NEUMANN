@@ -1,0 +1,1297 @@
+===== BEGIN P1.9 COPY-PASTE RESULT =====
+{
+  "P19_COPY_PASTE_BUNDLE": true,
+  "archive_identity": {
+    "archive": "NEUMANN_P19_FIRST_EVIDENCE.zip",
+    "archive_sha256": "3493421fca63f1a2155a0ed21265a4f1b2c799f91cb20bcc0d1a57269ea9a759",
+    "archive_bytes": 66795
+  },
+  "setup": {
+    "active_child_pid": null,
+    "bootstrap_sha256": "a37e29f91a98d183e3f6906fd53643096eab2baae4a7bb5af034c3f1c8ee36a6",
+    "decision3_admitted": false,
+    "development_only": true,
+    "development_verdict": "FAIL",
+    "favorable_rerun": false,
+    "launcher_setup_and_runner_wall_ms": 650904.1526,
+    "launcher_wall_ms": 225.9573069999874,
+    "p18_opened_task_score_reuse": false,
+    "p2_admitted": false,
+    "p2_registration_admitted": false,
+    "replay_exit_code": 0,
+    "runner_exit_code": 2,
+    "runtime_head": "d5811f44a018e86660769ba9bebb542168ee97fd",
+    "schema": "neumann.control-plane-p19-setup.v1",
+    "setup_and_runner_wall_ms": 650678.1952930001,
+    "stages": [
+      {
+        "exit_code": 0,
+        "name": "CUDA runtime preflight",
+        "status": "COMPLETE",
+        "wall_ms": 21527.713957000004
+      },
+      {
+        "exit_code": 0,
+        "name": "clone",
+        "status": "COMPLETE",
+        "wall_ms": 24442.922806000013
+      },
+      {
+        "exit_code": 0,
+        "name": "frozen checkout",
+        "status": "COMPLETE",
+        "wall_ms": 1419.8945699999967
+      },
+      {
+        "exit_code": 0,
+        "name": "dependencies",
+        "status": "COMPLETE",
+        "wall_ms": 6082.741831999954
+      },
+      {
+        "exit_code": 0,
+        "name": "post-install CUDA preflight",
+        "status": "COMPLETE",
+        "wall_ms": 2824.7317860000294
+      },
+      {
+        "exit_code": 0,
+        "name": "package inventory",
+        "status": "COMPLETE",
+        "wall_ms": 2121.947712000008
+      },
+      {
+        "exit_code": 0,
+        "name": "frozen registration",
+        "status": "COMPLETE",
+        "wall_ms": 5884.361232999992
+      },
+      {
+        "exit_code": 2,
+        "name": "first proposition-semantic development run",
+        "status": "NONZERO",
+        "wall_ms": 584236.2951290001
+      },
+      {
+        "exit_code": 0,
+        "name": "model-free receipt replay",
+        "status": "COMPLETE",
+        "wall_ms": 2122.3731579998457
+      }
+    ],
+    "status": "FINISHED_NONPASS"
+  },
+  "report": {
+    "accounting_complete": true,
+    "core_audit": {
+      "after_artifact_sha256": "bf6d4f9d506f536db6255143e5f21e05b9ccadfea54af281ac278bd49c178d66",
+      "current_accelerator_allocated_bytes": 10233627136,
+      "max_accelerator_allocated_bytes": 10407165440,
+      "max_accelerator_reserved_bytes": 11966349312,
+      "peak_process_rss_bytes": 11985166336,
+      "unchanged": true
+    },
+    "cost_money": null,
+    "cost_totals": {
+      "evaluated_tokens": 58101,
+      "feasibility_calls": 23,
+      "feasibility_constraint_checks": 401,
+      "feasibility_nodes": 161,
+      "generated_calls": 0,
+      "model_calls": 8,
+      "neural_forward_calls": 39,
+      "padded_tokens": 58101,
+      "tool_calls": 1,
+      "verifier_calls": 1,
+      "witness_cache_hits": 1
+    },
+    "decision": {
+      "accepted": 1,
+      "cost_totals": {
+        "evaluated_tokens": 58101,
+        "feasibility_calls": 23,
+        "feasibility_constraint_checks": 401,
+        "feasibility_nodes": 161,
+        "generated_calls": 0,
+        "model_calls": 8,
+        "neural_forward_calls": 39,
+        "padded_tokens": 58101,
+        "tool_calls": 1,
+        "verifier_calls": 1,
+        "witness_cache_hits": 1
+      },
+      "decision3_admitted": false,
+      "development_only": true,
+      "fresh_validation_registered": false,
+      "global_questions_closed": [],
+      "next": "RETAIN_FIRST_P19_FAILURE_AND_DIAGNOSE",
+      "p2_admitted": false,
+      "p2_registration_admitted": false,
+      "path_cost": {
+        "feasibility_calls": 23,
+        "generated_calls": 0,
+        "model_calls": 8,
+        "neural_forward_calls": 39,
+        "selector_complete": 8
+      },
+      "reason": "P19_SEMANTIC_CAPABILITY_FAILURE",
+      "selected": 1,
+      "semantic_abstained": 7,
+      "verdict": "FAIL",
+      "verifier_rejected": 0
+    },
+    "decision3_admitted": false,
+    "development_only": true,
+    "energy_j": null,
+    "error": null,
+    "fallback_calls": 0,
+    "flops": null,
+    "fresh_validation_registered": false,
+    "frontier_calls": 0,
+    "global_questions_closed": [],
+    "historical_score_reuse": false,
+    "new_training": false,
+    "observations": 8,
+    "p18_opened_task_score_reuse": false,
+    "p2_admitted": false,
+    "p2_registration_admitted": false,
+    "schema": "neumann.control-plane-p1.9-development.v1",
+    "sealed_data_opened": false,
+    "selector_startup_ms": 185390.141922,
+    "source_head": "d5811f44a018e86660769ba9bebb542168ee97fd",
+    "status": "COMPLETE",
+    "timing_scope": "whole study includes registration/source/runtime checks, one frozen-core startup, feasibility, P1.9 proposition scoring, admitted execution, original verification and final audit; excludes bootstrap/setup/final serialization/packaging/replay",
+    "whole_study_ms": 580714.165182
+  },
+  "tasks": [
+    {
+      "index": 0,
+      "task_id": "p19d_b01",
+      "status": "SEMANTIC_ABSTAINED",
+      "accepted": false,
+      "executed": false,
+      "selected_candidate": null,
+      "eligible_indexes": [
+        0,
+        1
+      ],
+      "selection": "CANDIDATE_LOCAL_PROPOSITION_ABSTAIN",
+      "selection_error": "ValueError: P1.9 candidate margin failure",
+      "model_calls": 1,
+      "neural_forward_calls": 4,
+      "generated_calls": 0,
+      "evaluated_tokens": 2856,
+      "padded_tokens": 2856,
+      "feasibility_calls": 2,
+      "feasibility_nodes": 6,
+      "feasibility_constraint_checks": 7,
+      "tool_calls": 0,
+      "verifier_calls": 0,
+      "witness_cache_hits": 0,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "selector_decision": null,
+      "extraction_ms": 4.04613,
+      "feasibility_ms": 3.469565,
+      "selection_ms": 38654.712816,
+      "compile_ms": 0.0,
+      "routing_ms": 0.0,
+      "execution_ms": 0.0,
+      "verification_ms": 0.0,
+      "complete_ms": 38662.45465,
+      "error": null,
+      "execution": null,
+      "selector_receipt_summary": {
+        "status": "COMPLETE",
+        "complete_ms": 38650.462918,
+        "generated_calls": 0,
+        "ledger": {
+          "evaluated_tokens": 2856,
+          "forward_calls": 4,
+          "input_rows": 6,
+          "padded_tokens": 2856,
+          "score_rows": 24,
+          "scored_tokens": 24
+        },
+        "error": null,
+        "eligible_indexes": [
+          0,
+          1
+        ]
+      },
+      "selector_passes": [
+        {
+          "mode": "batch_all",
+          "status": "COMPLETE",
+          "batch_size": 2,
+          "order": [
+            0,
+            1
+          ],
+          "actual": {
+            "evaluated_tokens": 952,
+            "forward_calls": 1,
+            "input_rows": 2,
+            "padded_tokens": 952,
+            "score_rows": 8,
+            "scored_tokens": 8
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            0.4374999701976776,
+            0.5625
+          ],
+          "peak_accelerator_memory_bytes": 10400891904
+        },
+        {
+          "mode": "unbatched1",
+          "status": "COMPLETE",
+          "batch_size": 1,
+          "order": [
+            0,
+            1
+          ],
+          "actual": {
+            "evaluated_tokens": 952,
+            "forward_calls": 2,
+            "input_rows": 2,
+            "padded_tokens": 952,
+            "score_rows": 8,
+            "scored_tokens": 8
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            0.4374999701976776,
+            0.5625
+          ],
+          "peak_accelerator_memory_bytes": 10322136064
+        },
+        {
+          "mode": "reverse_batch_all",
+          "status": "COMPLETE",
+          "batch_size": 2,
+          "order": [
+            1,
+            0
+          ],
+          "actual": {
+            "evaluated_tokens": 952,
+            "forward_calls": 1,
+            "input_rows": 2,
+            "padded_tokens": 952,
+            "score_rows": 8,
+            "scored_tokens": 8
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            0.4374999701976776,
+            0.5625
+          ],
+          "peak_accelerator_memory_bytes": 10401588224
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "task_id": "p19d_b02",
+      "status": "ACCEPTED",
+      "accepted": true,
+      "executed": true,
+      "selected_candidate": 0,
+      "eligible_indexes": [
+        0,
+        1,
+        2
+      ],
+      "selection": "CANDIDATE_LOCAL_PROPOSITION",
+      "selection_error": null,
+      "model_calls": 1,
+      "neural_forward_calls": 5,
+      "generated_calls": 0,
+      "evaluated_tokens": 6903,
+      "padded_tokens": 6903,
+      "feasibility_calls": 3,
+      "feasibility_nodes": 18,
+      "feasibility_constraint_checks": 34,
+      "tool_calls": 1,
+      "verifier_calls": 1,
+      "witness_cache_hits": 1,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "selector_decision": {
+        "candidate_log_odds_nats": {
+          "0": 8.609375374857336,
+          "1": 6.187500087544322,
+          "2": 6.140624937135726
+        },
+        "evaluated_tokens": 6903,
+        "forward_calls": 5,
+        "margin_nats": 2.4218752873130143,
+        "max_mode_log_odds_delta_nats": 0.0,
+        "selected_candidate": 0
+      },
+      "extraction_ms": 1.623036,
+      "feasibility_ms": 7.777311,
+      "selection_ms": 43569.666119,
+      "compile_ms": 1.955816,
+      "routing_ms": 0.137173,
+      "execution_ms": 0.020348,
+      "verification_ms": 0.032294,
+      "complete_ms": 43581.708544,
+      "error": null,
+      "execution": {
+        "accepted": true,
+        "answer": {
+          "A": 6,
+          "B": 2,
+          "C": 4
+        },
+        "complete_ms": 0.159689,
+        "error": null,
+        "executed": true
+      },
+      "selector_receipt_summary": {
+        "status": "COMPLETE",
+        "complete_ms": 43560.461867,
+        "generated_calls": 0,
+        "ledger": {
+          "evaluated_tokens": 6903,
+          "forward_calls": 5,
+          "input_rows": 9,
+          "padded_tokens": 6903,
+          "score_rows": 36,
+          "scored_tokens": 36
+        },
+        "error": null,
+        "eligible_indexes": [
+          0,
+          1,
+          2
+        ]
+      },
+      "selector_passes": [
+        {
+          "mode": "batch_all",
+          "status": "COMPLETE",
+          "batch_size": 3,
+          "order": [
+            0,
+            1,
+            2
+          ],
+          "actual": {
+            "evaluated_tokens": 2301,
+            "forward_calls": 1,
+            "input_rows": 3,
+            "padded_tokens": 2301,
+            "score_rows": 12,
+            "scored_tokens": 12
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            8.609375374857336,
+            6.187500087544322,
+            6.140624937135726
+          ],
+          "peak_accelerator_memory_bytes": 10670937600
+        },
+        {
+          "mode": "unbatched1",
+          "status": "COMPLETE",
+          "batch_size": 1,
+          "order": [
+            0,
+            1,
+            2
+          ],
+          "actual": {
+            "evaluated_tokens": 2301,
+            "forward_calls": 3,
+            "input_rows": 3,
+            "padded_tokens": 2301,
+            "score_rows": 12,
+            "scored_tokens": 12
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            8.609375374857336,
+            6.187500087544322,
+            6.140624937135726
+          ],
+          "peak_accelerator_memory_bytes": 10385746432
+        },
+        {
+          "mode": "reverse_batch_all",
+          "status": "COMPLETE",
+          "batch_size": 3,
+          "order": [
+            2,
+            1,
+            0
+          ],
+          "actual": {
+            "evaluated_tokens": 2301,
+            "forward_calls": 1,
+            "input_rows": 3,
+            "padded_tokens": 2301,
+            "score_rows": 12,
+            "scored_tokens": 12
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            8.609375374857336,
+            6.187500087544322,
+            6.140624937135726
+          ],
+          "peak_accelerator_memory_bytes": 10670790656
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "task_id": "p19d_b03",
+      "status": "SEMANTIC_ABSTAINED",
+      "accepted": false,
+      "executed": false,
+      "selected_candidate": null,
+      "eligible_indexes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "selection": "CANDIDATE_LOCAL_PROPOSITION_ABSTAIN",
+      "selection_error": "ValueError: P1.9 no positively faithful candidate",
+      "model_calls": 1,
+      "neural_forward_calls": 6,
+      "generated_calls": 0,
+      "evaluated_tokens": 14352,
+      "padded_tokens": 14352,
+      "feasibility_calls": 4,
+      "feasibility_nodes": 40,
+      "feasibility_constraint_checks": 121,
+      "tool_calls": 0,
+      "verifier_calls": 0,
+      "witness_cache_hits": 0,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "selector_decision": null,
+      "extraction_ms": 3.053206,
+      "feasibility_ms": 18.494062,
+      "selection_ms": 56950.940456,
+      "compile_ms": 0.0,
+      "routing_ms": 0.0,
+      "execution_ms": 0.0,
+      "verification_ms": 0.0,
+      "complete_ms": 56973.190246,
+      "error": null,
+      "execution": null,
+      "selector_receipt_summary": {
+        "status": "COMPLETE",
+        "complete_ms": 56931.806441,
+        "generated_calls": 0,
+        "ledger": {
+          "evaluated_tokens": 14352,
+          "forward_calls": 6,
+          "input_rows": 12,
+          "padded_tokens": 14352,
+          "score_rows": 48,
+          "scored_tokens": 48
+        },
+        "error": null,
+        "eligible_indexes": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "selector_passes": [
+        {
+          "mode": "batch_all",
+          "status": "COMPLETE",
+          "batch_size": 4,
+          "order": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "actual": {
+            "evaluated_tokens": 4784,
+            "forward_calls": 1,
+            "input_rows": 4,
+            "padded_tokens": 4784,
+            "score_rows": 16,
+            "scored_tokens": 16
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            -8.45312466629548,
+            -7.796875086030923,
+            -8.640625373984221,
+            -8.976562627605745
+          ],
+          "peak_accelerator_memory_bytes": 11260016128
+        },
+        {
+          "mode": "unbatched1",
+          "status": "COMPLETE",
+          "batch_size": 1,
+          "order": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "actual": {
+            "evaluated_tokens": 4784,
+            "forward_calls": 4,
+            "input_rows": 4,
+            "padded_tokens": 4784,
+            "score_rows": 16,
+            "scored_tokens": 16
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            -8.45312466629548,
+            -7.796875086030923,
+            -8.640625373984221,
+            -8.976562627605745
+          ],
+          "peak_accelerator_memory_bytes": 10499971072
+        },
+        {
+          "mode": "reverse_batch_all",
+          "status": "COMPLETE",
+          "batch_size": 4,
+          "order": [
+            3,
+            2,
+            1,
+            0
+          ],
+          "actual": {
+            "evaluated_tokens": 4784,
+            "forward_calls": 1,
+            "input_rows": 4,
+            "padded_tokens": 4784,
+            "score_rows": 16,
+            "scored_tokens": 16
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            -8.45312466629548,
+            -7.796875086030923,
+            -8.640625373984221,
+            -8.976562627605745
+          ],
+          "peak_accelerator_memory_bytes": 11260016128
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "task_id": "p19d_b04",
+      "status": "SEMANTIC_ABSTAINED",
+      "accepted": false,
+      "executed": false,
+      "selected_candidate": null,
+      "eligible_indexes": [
+        0,
+        1
+      ],
+      "selection": "CANDIDATE_LOCAL_PROPOSITION_ABSTAIN",
+      "selection_error": "ValueError: P1.9 candidate margin failure",
+      "model_calls": 1,
+      "neural_forward_calls": 4,
+      "generated_calls": 0,
+      "evaluated_tokens": 2880,
+      "padded_tokens": 2880,
+      "feasibility_calls": 2,
+      "feasibility_nodes": 8,
+      "feasibility_constraint_checks": 9,
+      "tool_calls": 0,
+      "verifier_calls": 0,
+      "witness_cache_hits": 0,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "selector_decision": null,
+      "extraction_ms": 0.91447,
+      "feasibility_ms": 3.436744,
+      "selection_ms": 37242.442702,
+      "compile_ms": 0.0,
+      "routing_ms": 0.0,
+      "execution_ms": 0.0,
+      "verification_ms": 0.0,
+      "complete_ms": 37246.996297,
+      "error": null,
+      "execution": null,
+      "selector_receipt_summary": {
+        "status": "COMPLETE",
+        "complete_ms": 37238.173007,
+        "generated_calls": 0,
+        "ledger": {
+          "evaluated_tokens": 2880,
+          "forward_calls": 4,
+          "input_rows": 6,
+          "padded_tokens": 2880,
+          "score_rows": 24,
+          "scored_tokens": 24
+        },
+        "error": null,
+        "eligible_indexes": [
+          0,
+          1
+        ]
+      },
+      "selector_passes": [
+        {
+          "mode": "batch_all",
+          "status": "COMPLETE",
+          "batch_size": 2,
+          "order": [
+            0,
+            1
+          ],
+          "actual": {
+            "evaluated_tokens": 960,
+            "forward_calls": 1,
+            "input_rows": 2,
+            "padded_tokens": 960,
+            "score_rows": 8,
+            "scored_tokens": 8
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            0.7499999403953552,
+            0.6250000298023224
+          ],
+          "peak_accelerator_memory_bytes": 10404384256
+        },
+        {
+          "mode": "unbatched1",
+          "status": "COMPLETE",
+          "batch_size": 1,
+          "order": [
+            0,
+            1
+          ],
+          "actual": {
+            "evaluated_tokens": 960,
+            "forward_calls": 2,
+            "input_rows": 2,
+            "padded_tokens": 960,
+            "score_rows": 8,
+            "scored_tokens": 8
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            0.7499999403953552,
+            0.6250000298023224
+          ],
+          "peak_accelerator_memory_bytes": 10323648000
+        },
+        {
+          "mode": "reverse_batch_all",
+          "status": "COMPLETE",
+          "batch_size": 2,
+          "order": [
+            1,
+            0
+          ],
+          "actual": {
+            "evaluated_tokens": 960,
+            "forward_calls": 1,
+            "input_rows": 2,
+            "padded_tokens": 960,
+            "score_rows": 8,
+            "scored_tokens": 8
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            0.7499999403953552,
+            0.6250000298023224
+          ],
+          "peak_accelerator_memory_bytes": 10404384256
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "task_id": "p19d_b05",
+      "status": "SEMANTIC_ABSTAINED",
+      "accepted": false,
+      "executed": false,
+      "selected_candidate": null,
+      "eligible_indexes": [
+        0,
+        1,
+        2
+      ],
+      "selection": "CANDIDATE_LOCAL_PROPOSITION_ABSTAIN",
+      "selection_error": "ValueError: P1.9 candidate margin failure",
+      "model_calls": 1,
+      "neural_forward_calls": 5,
+      "generated_calls": 0,
+      "evaluated_tokens": 7074,
+      "padded_tokens": 7074,
+      "feasibility_calls": 3,
+      "feasibility_nodes": 18,
+      "feasibility_constraint_checks": 34,
+      "tool_calls": 0,
+      "verifier_calls": 0,
+      "witness_cache_hits": 0,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "selector_decision": null,
+      "extraction_ms": 1.844314,
+      "feasibility_ms": 8.909171,
+      "selection_ms": 44568.017422,
+      "compile_ms": 0.0,
+      "routing_ms": 0.0,
+      "execution_ms": 0.0,
+      "verification_ms": 0.0,
+      "complete_ms": 44579.096549,
+      "error": null,
+      "execution": null,
+      "selector_receipt_summary": {
+        "status": "COMPLETE",
+        "complete_ms": 44558.695149,
+        "generated_calls": 0,
+        "ledger": {
+          "evaluated_tokens": 7074,
+          "forward_calls": 5,
+          "input_rows": 9,
+          "padded_tokens": 7074,
+          "score_rows": 36,
+          "scored_tokens": 36
+        },
+        "error": null,
+        "eligible_indexes": [
+          0,
+          1,
+          2
+        ]
+      },
+      "selector_passes": [
+        {
+          "mode": "batch_all",
+          "status": "COMPLETE",
+          "batch_size": 3,
+          "order": [
+            0,
+            1,
+            2
+          ],
+          "actual": {
+            "evaluated_tokens": 2358,
+            "forward_calls": 1,
+            "input_rows": 3,
+            "padded_tokens": 2358,
+            "score_rows": 12,
+            "scored_tokens": 12
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            0.125,
+            0.125,
+            0.5
+          ],
+          "peak_accelerator_memory_bytes": 10683033600
+        },
+        {
+          "mode": "unbatched1",
+          "status": "COMPLETE",
+          "batch_size": 1,
+          "order": [
+            0,
+            1,
+            2
+          ],
+          "actual": {
+            "evaluated_tokens": 2358,
+            "forward_calls": 3,
+            "input_rows": 3,
+            "padded_tokens": 2358,
+            "score_rows": 12,
+            "scored_tokens": 12
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            0.125,
+            0.125,
+            0.5
+          ],
+          "peak_accelerator_memory_bytes": 10388773376
+        },
+        {
+          "mode": "reverse_batch_all",
+          "status": "COMPLETE",
+          "batch_size": 3,
+          "order": [
+            2,
+            1,
+            0
+          ],
+          "actual": {
+            "evaluated_tokens": 2358,
+            "forward_calls": 1,
+            "input_rows": 3,
+            "padded_tokens": 2358,
+            "score_rows": 12,
+            "scored_tokens": 12
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            0.125,
+            0.125,
+            0.5
+          ],
+          "peak_accelerator_memory_bytes": 10683033600
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "task_id": "p19d_b06",
+      "status": "SEMANTIC_ABSTAINED",
+      "accepted": false,
+      "executed": false,
+      "selected_candidate": null,
+      "eligible_indexes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "selection": "CANDIDATE_LOCAL_PROPOSITION_ABSTAIN",
+      "selection_error": "ValueError: P1.9 no positively faithful candidate",
+      "model_calls": 1,
+      "neural_forward_calls": 6,
+      "generated_calls": 0,
+      "evaluated_tokens": 14220,
+      "padded_tokens": 14220,
+      "feasibility_calls": 4,
+      "feasibility_nodes": 44,
+      "feasibility_constraint_checks": 146,
+      "tool_calls": 0,
+      "verifier_calls": 0,
+      "witness_cache_hits": 0,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "selector_decision": null,
+      "extraction_ms": 3.033474,
+      "feasibility_ms": 19.279017,
+      "selection_ms": 57974.090185,
+      "compile_ms": 0.0,
+      "routing_ms": 0.0,
+      "execution_ms": 0.0,
+      "verification_ms": 0.0,
+      "complete_ms": 57996.894609,
+      "error": null,
+      "execution": null,
+      "selector_receipt_summary": {
+        "status": "COMPLETE",
+        "complete_ms": 57954.97219,
+        "generated_calls": 0,
+        "ledger": {
+          "evaluated_tokens": 14220,
+          "forward_calls": 6,
+          "input_rows": 12,
+          "padded_tokens": 14220,
+          "score_rows": 48,
+          "scored_tokens": 48
+        },
+        "error": null,
+        "eligible_indexes": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "selector_passes": [
+        {
+          "mode": "batch_all",
+          "status": "COMPLETE",
+          "batch_size": 4,
+          "order": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "actual": {
+            "evaluated_tokens": 4740,
+            "forward_calls": 1,
+            "input_rows": 4,
+            "padded_tokens": 4740,
+            "score_rows": 16,
+            "scored_tokens": 16
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            -10.109374524025043,
+            -9.234375124207872,
+            -9.921874882074917,
+            -9.312499885083525
+          ],
+          "peak_accelerator_memory_bytes": 11248541184
+        },
+        {
+          "mode": "unbatched1",
+          "status": "COMPLETE",
+          "batch_size": 1,
+          "order": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "actual": {
+            "evaluated_tokens": 4740,
+            "forward_calls": 4,
+            "input_rows": 4,
+            "padded_tokens": 4740,
+            "score_rows": 16,
+            "scored_tokens": 16
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            -10.109374524025043,
+            -9.234375124207872,
+            -9.921874882074917,
+            -9.312499885083525
+          ],
+          "peak_accelerator_memory_bytes": 10497504768
+        },
+        {
+          "mode": "reverse_batch_all",
+          "status": "COMPLETE",
+          "batch_size": 4,
+          "order": [
+            3,
+            2,
+            1,
+            0
+          ],
+          "actual": {
+            "evaluated_tokens": 4740,
+            "forward_calls": 1,
+            "input_rows": 4,
+            "padded_tokens": 4740,
+            "score_rows": 16,
+            "scored_tokens": 16
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            -10.109374524025043,
+            -9.234375124207872,
+            -9.921874882074917,
+            -9.312499885083525
+          ],
+          "peak_accelerator_memory_bytes": 11248541184
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "task_id": "p19d_b07",
+      "status": "SEMANTIC_ABSTAINED",
+      "accepted": false,
+      "executed": false,
+      "selected_candidate": null,
+      "eligible_indexes": [
+        0,
+        1,
+        2
+      ],
+      "selection": "CANDIDATE_LOCAL_PROPOSITION_ABSTAIN",
+      "selection_error": "ValueError: P1.9 candidate margin failure",
+      "model_calls": 1,
+      "neural_forward_calls": 5,
+      "generated_calls": 0,
+      "evaluated_tokens": 6876,
+      "padded_tokens": 6876,
+      "feasibility_calls": 3,
+      "feasibility_nodes": 21,
+      "feasibility_constraint_checks": 43,
+      "tool_calls": 0,
+      "verifier_calls": 0,
+      "witness_cache_hits": 0,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "selector_decision": null,
+      "extraction_ms": 1.84435,
+      "feasibility_ms": 9.022517,
+      "selection_ms": 44787.30117,
+      "compile_ms": 0.0,
+      "routing_ms": 0.0,
+      "execution_ms": 0.0,
+      "verification_ms": 0.0,
+      "complete_ms": 44798.519863,
+      "error": null,
+      "execution": null,
+      "selector_receipt_summary": {
+        "status": "COMPLETE",
+        "complete_ms": 44778.059152,
+        "generated_calls": 0,
+        "ledger": {
+          "evaluated_tokens": 6876,
+          "forward_calls": 5,
+          "input_rows": 9,
+          "padded_tokens": 6876,
+          "score_rows": 36,
+          "scored_tokens": 36
+        },
+        "error": null,
+        "eligible_indexes": [
+          0,
+          1,
+          2
+        ]
+      },
+      "selector_passes": [
+        {
+          "mode": "batch_all",
+          "status": "COMPLETE",
+          "batch_size": 3,
+          "order": [
+            0,
+            1,
+            2
+          ],
+          "actual": {
+            "evaluated_tokens": 2292,
+            "forward_calls": 1,
+            "input_rows": 3,
+            "padded_tokens": 2292,
+            "score_rows": 12,
+            "scored_tokens": 12
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            9.749999882660632,
+            8.874999890773324,
+            9.874999763072992
+          ],
+          "peak_accelerator_memory_bytes": 10669114880
+        },
+        {
+          "mode": "unbatched1",
+          "status": "COMPLETE",
+          "batch_size": 1,
+          "order": [
+            0,
+            1,
+            2
+          ],
+          "actual": {
+            "evaluated_tokens": 2292,
+            "forward_calls": 3,
+            "input_rows": 3,
+            "padded_tokens": 2292,
+            "score_rows": 12,
+            "scored_tokens": 12
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            9.749999882660632,
+            8.874999890773324,
+            9.874999763072992
+          ],
+          "peak_accelerator_memory_bytes": 10385290240
+        },
+        {
+          "mode": "reverse_batch_all",
+          "status": "COMPLETE",
+          "batch_size": 3,
+          "order": [
+            2,
+            1,
+            0
+          ],
+          "actual": {
+            "evaluated_tokens": 2292,
+            "forward_calls": 1,
+            "input_rows": 3,
+            "padded_tokens": 2292,
+            "score_rows": 12,
+            "scored_tokens": 12
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            9.749999882660632,
+            8.874999890773324,
+            9.874999763072992
+          ],
+          "peak_accelerator_memory_bytes": 10669114880
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "task_id": "p19d_b08",
+      "status": "SEMANTIC_ABSTAINED",
+      "accepted": false,
+      "executed": false,
+      "selected_candidate": null,
+      "eligible_indexes": [
+        0,
+        1
+      ],
+      "selection": "CANDIDATE_LOCAL_PROPOSITION_ABSTAIN",
+      "selection_error": "ValueError: P1.9 no positively faithful candidate",
+      "model_calls": 1,
+      "neural_forward_calls": 4,
+      "generated_calls": 0,
+      "evaluated_tokens": 2940,
+      "padded_tokens": 2940,
+      "feasibility_calls": 2,
+      "feasibility_nodes": 6,
+      "feasibility_constraint_checks": 7,
+      "tool_calls": 0,
+      "verifier_calls": 0,
+      "witness_cache_hits": 0,
+      "accounting_complete": true,
+      "selector_complete": true,
+      "selector_decision": null,
+      "extraction_ms": 1.059766,
+      "feasibility_ms": 3.992798,
+      "selection_ms": 37950.052029,
+      "compile_ms": 0.0,
+      "routing_ms": 0.0,
+      "execution_ms": 0.0,
+      "verification_ms": 0.0,
+      "complete_ms": 37955.348713,
+      "error": null,
+      "execution": null,
+      "selector_receipt_summary": {
+        "status": "COMPLETE",
+        "complete_ms": 37945.666134,
+        "generated_calls": 0,
+        "ledger": {
+          "evaluated_tokens": 2940,
+          "forward_calls": 4,
+          "input_rows": 6,
+          "padded_tokens": 2940,
+          "score_rows": 24,
+          "scored_tokens": 24
+        },
+        "error": null,
+        "eligible_indexes": [
+          0,
+          1
+        ]
+      },
+      "selector_passes": [
+        {
+          "mode": "batch_all",
+          "status": "COMPLETE",
+          "batch_size": 2,
+          "order": [
+            0,
+            1
+          ],
+          "actual": {
+            "evaluated_tokens": 980,
+            "forward_calls": 1,
+            "input_rows": 2,
+            "padded_tokens": 980,
+            "score_rows": 8,
+            "scored_tokens": 8
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            -2.1875000968575478,
+            -1.8125
+          ],
+          "peak_accelerator_memory_bytes": 10407165440
+        },
+        {
+          "mode": "unbatched1",
+          "status": "COMPLETE",
+          "batch_size": 1,
+          "order": [
+            0,
+            1
+          ],
+          "actual": {
+            "evaluated_tokens": 980,
+            "forward_calls": 2,
+            "input_rows": 2,
+            "padded_tokens": 980,
+            "score_rows": 8,
+            "scored_tokens": 8
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            -2.1875000968575478,
+            -1.8125
+          ],
+          "peak_accelerator_memory_bytes": 10324637696
+        },
+        {
+          "mode": "reverse_batch_all",
+          "status": "COMPLETE",
+          "batch_size": 2,
+          "order": [
+            1,
+            0
+          ],
+          "actual": {
+            "evaluated_tokens": 980,
+            "forward_calls": 1,
+            "input_rows": 2,
+            "padded_tokens": 980,
+            "score_rows": 8,
+            "scored_tokens": 8
+          },
+          "known_partial_cost": null,
+          "log_odds_A_minus_B": [
+            -2.1875000968575478,
+            -1.8125
+          ],
+          "peak_accelerator_memory_bytes": 10407165440
+        }
+      ]
+    }
+  ],
+  "core": {
+    "accelerator_class": true,
+    "accelerator_memory_bytes": 15636037632,
+    "artifact_sha256": "bf6d4f9d506f536db6255143e5f21e05b9ccadfea54af281ac278bd49c178d66",
+    "deterministic": true,
+    "device_name": "Tesla T4",
+    "device_type": "cuda",
+    "do_sample": false,
+    "driver": "580.178.04",
+    "evidence_kind": "actual_frozen_model",
+    "files": {
+      "chat_template.jinja": "0a2c8073c878ab1da004bee933a998606537bbb62016310352c7285c3f01c5b5",
+      "config.json": "1b28f3d2c3100f6c594754b81107428bd7b822a7f48272ca681dae9d2ec38330",
+      "generation_config.json": "d4226bbe3117d2d253ba4609720ba82c6c4ce4627a9a6ae05387c78983ac03de",
+      "model.safetensors": "2db5482b20d746879bb3ef79b5203e9075a2e2b98f54ec7c2f281c1477ddc550",
+      "processor_config.json": "32bdf45d2ad4cc29a0822ddd157a182de76644f0419a6228d151495256e9813c",
+      "tokenizer.json": "cc8d3a0ce36466ccc1278bf987df5f71db1719b9ca6b4118264f45cb627bfe0f",
+      "tokenizer_config.json": "9f4fec4b1dc6ecddf8f4a92e9caea5971c0e67d81309f3f9066a2bee8c362633"
+    },
+    "framework": "torch-2.11.0+cu128/transformers-5.16.1",
+    "interface": "am1_compact_json_no_native_schema",
+    "model_id": "google/gemma-4-E2B-it",
+    "model_revision": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+    "parameters": 5104297504,
+    "precision": "bfloat16",
+    "tokenizer_sha256": "8552955a1513c80096c4155aa2de30079a20d4c3f255b9d1acf9162c859b4207",
+    "torchvision": "0.26.0+cu128",
+    "weights_frozen": true
+  },
+  "terminal_summary": {
+    "complete": true,
+    "decision": "FAIL",
+    "no_replacement": true,
+    "terminal_file_count": 20
+  }
+}
+===== END P1.9 COPY-PASTE RESULT =====

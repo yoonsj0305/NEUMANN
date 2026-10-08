@@ -1,0 +1,275 @@
+{
+  "schema": "neumann.master-recovery-local-verification.v2",
+  "checked_utc": "2026-10-08T06:52:45.440668+00:00",
+  "authority": "MASTER RESEARCH RECOVERY & DEVELOPMENT DIRECTIVE v2.0",
+  "decision": "HOLD_LEARNING",
+  "scope": "existing opened CPU evidence audit and optimizer-free witness checks only",
+  "branch": "research/neumann1-structural-evidence-2026-10-07",
+  "head": "fb23dca002bbd50c96e0c766369269a0b7fcc7a6",
+  "main": "55178a211962caf5ce677deb37edd30bfb4fdccc",
+  "github_writes": 0,
+  "commits_created": 0,
+  "new_model_forwards": 0,
+  "new_solver_calls": 0,
+  "new_data_generated": 0,
+  "gpu_training": false,
+  "sealed_payload_access": false,
+  "historical_verdicts_changed": false,
+  "global_questions_closed": [],
+  "ci_scope": "Existing fb23 head CI only. No remote CI on new local edits.",
+  "inventory": {
+    "registry_rows": 251,
+    "documentary_nodes": 158,
+    "missing_or_intentionally_excluded_entries": 27,
+    "rows_are_independent_experiments": false
+  },
+  "analysis_replay": {
+    "argv": [
+      "C:\\Users\\Seojun\\Desktop\\NEUMANN 1\\.venv\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "research/audit/analyze_retained_lp.py"
+    ],
+    "returncode": 0,
+    "wall_seconds": 4.980795399998897,
+    "stderr": ""
+  },
+  "analysis_stdout": "ANALYSIS_EXECUTION.txt",
+  "original_numerical_verifier": "neumann1/lp_certificate_v081.py; frozen atol/rtol1e-8; no new exact formal proof",
+  "m106": {
+    "source_hash": "fd0f069bb43c8f4f471578de35a6f70af2c418b46b701260f12cd1d27bebd6b8",
+    "independent_problems": 16,
+    "observations": 256,
+    "checks": {
+      "final_checked": 256,
+      "final_accepted": 256,
+      "restricted_original_checked": 232,
+      "restricted_original_accepted": 8,
+      "objective_matches_native": 84,
+      "objective_matches_native_but_original_rejected": 76,
+      "offline_existing_native_dual_pair_checks": 19,
+      "offline_existing_native_dual_pair_accepted": 19
+    },
+    "rejection_axes_all_repeats": {
+      "dual_feasibility": 224,
+      "no_restricted_witness": 24,
+      "accepted": 8
+    },
+    "first_timed_optimal_primal_rejected_attempts": 19,
+    "first_timed_optimal_primal_rejected_paths": 13,
+    "first_timed_optimal_primal_rejected_originals": 7
+  },
+  "q5": {
+    "report_sha256": "1f7a3ad5a1038e42234b734b0b00f185c0be4a5a1d11a3d3d6e96ace92d546e3",
+    "source_manifest_sha256": "684a1e54656a0e491f67438a730799af91cca9f0e401ad9da94068fd1deaed64",
+    "independent_problems": 48,
+    "equivalent_views": 96,
+    "observations": 1536,
+    "derived_candidate_view_rows": 192,
+    "comparable_rows": 176,
+    "registered_cost_advantage_rows": 114,
+    "finite_stationary_break_even_rows": 114,
+    "original_decision": "Q5_SCALING_CAPABILITY_OR_ACCOUNTING_UNREACHED"
+  },
+  "local_tests": {
+    "argv": [
+      "C:\\Users\\Seojun\\Desktop\\NEUMANN 1\\.venv\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/test_historical_causal_audit.py",
+      "tests/test_counting_native_headroom.py"
+    ],
+    "returncode": 0,
+    "wall_seconds": 3.4914004000020213,
+    "stdout": "...............                                                          [100%]\n15 passed in 2.97s\n",
+    "stderr": ""
+  },
+  "whitespace_check": {
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "returncode": 0,
+    "wall_seconds": 0.04491140000754967,
+    "stdout": "",
+    "stderr": ""
+  },
+  "frozen_core_and_result_diff_check": {
+    "argv": [
+      "git",
+      "diff",
+      "--exit-code",
+      "HEAD",
+      "--",
+      "neumann1",
+      "experiments/bp_frozen_transfer_m106.py",
+      "experiments/q5_first_archive.py",
+      "experiments/q5_transfer_admission.py",
+      "docs/experiments/results",
+      "docs/experiments/experiment_decision_ledger.json"
+    ],
+    "returncode": 0,
+    "wall_seconds": 0.039657299988903105,
+    "stdout": "",
+    "stderr": ""
+  },
+  "local_native_archives": [
+    {
+      "path": "C:\\Users\\Seojun\\Desktop\\NEUMANN 1\\Continuation\\G0_NATIVE_READINESS_2026-10-08\\NEUMANN_G0_READINESS_FIRST.zip",
+      "bytes": 145426,
+      "sha256": "4359b0e585b5b07d7c3b55524b075aac7cab546f4c96b5983529a768a8c52f3e",
+      "verified_again": true
+    },
+    {
+      "path": "C:\\Users\\Seojun\\Desktop\\NEUMANN 1\\Continuation\\G0_NATIVE_READINESS_2026-10-08\\COUNTING_NATIVE_FIRST.zip",
+      "bytes": 165751643,
+      "sha256": "004d8ed4e7ced5b62af6e629686c859e398fd2a3e2962b9d5b0c33b4b0148e61",
+      "verified_again": true
+    }
+  ],
+  "kaggle_cpu": "Draft saved; session OFF; screenshot in native readiness continuation directory",
+  "limitations": [
+    "Missing historical raw originals are explicit, not inferred from successors.",
+    "Existing Native dual pairing is an offline Oracle diagnosis; cost of acquiring dual UNKNOWN.",
+    "Break-even is conditional same-case historical-runtime estimate, excludes unmeasured investment.",
+    "No frontier-level capability or overwhelming complete-cost advantage demonstrated.",
+    "Counting first result INCOMPLETE; prototype-only and debug I/O/polling timing limitations apply.",
+    "No Phase2/G1/G2 activation or conditional NEXT_DECISIVE_EXPERIMENT execution contract."
+  ],
+  "artifact_hashes": [
+    {
+      "path": "research\\audit\\ANALYSIS_EXECUTION.txt",
+      "bytes": 3087,
+      "sha256": "1194cf8a7a7ab527485a3380afd67ee8e191f2cbfd13cf409f84d2c654abf371"
+    },
+    {
+      "path": "research\\audit\\analyze_retained_lp.py",
+      "bytes": 12197,
+      "sha256": "53fae482ff27d3e4dcf1100f87cce0d84ec2bbae85a556a8fce4610a3df0ec8a"
+    },
+    {
+      "path": "research\\audit\\BOTTLENECK_CAUSAL_MATRIX.md",
+      "bytes": 5035,
+      "sha256": "6dda6df680fb0e90f10cc0454eb2de628b8dacec869496f8e97ed95344d0717a"
+    },
+    {
+      "path": "research\\audit\\build_registry.py",
+      "bytes": 31830,
+      "sha256": "88d9fde18b6dd8e09a55aac5c2723bd7686be3d1970494c049aac397e01ab02a"
+    },
+    {
+      "path": "research\\audit\\EVIDENCE_LINEAGE.json",
+      "bytes": 272353,
+      "sha256": "71e4743d5d8a2561e048ec70b610f6f63e5c8f36837abc234f16dc2075550f61"
+    },
+    {
+      "path": "research\\audit\\EVIDENCE_TO_DECISION_MASTER_REVIEW.md",
+      "bytes": 20753,
+      "sha256": "f1ac726e46a848464d0da56e134673d473ee93e444a93af962cee18479795a39"
+    },
+    {
+      "path": "research\\audit\\EXPERIMENT_REGISTRY.csv",
+      "bytes": 757532,
+      "sha256": "cac93feed566784629a1733d97f89156f754d85bc5b013169eaac0856d9c9336"
+    },
+    {
+      "path": "research\\audit\\HISTORICAL_SOURCE_REVIEW.md",
+      "bytes": 396545,
+      "sha256": "b314a62a15cb6173ddfca14039262cde32f87b5ba1e7bab2e1830c9c4b69d00c"
+    },
+    {
+      "path": "research\\audit\\inspect_existing_evidence.py",
+      "bytes": 2464,
+      "sha256": "9bfdc036e1733f38163ff4f6ee5302bf1a5cf053c104520c4120f4ce572b322e"
+    },
+    {
+      "path": "research\\audit\\LOCAL_GIT_STATUS.txt",
+      "bytes": 427,
+      "sha256": "99f0a199c8258c653e550583ed015de0856060662cd3614dc157caae5d5de74f"
+    },
+    {
+      "path": "research\\audit\\LP_SUCCESS_ENVELOPE.csv",
+      "bytes": 45442,
+      "sha256": "06025797f36f8a3f6e58aa2f494a1624cf7b557c5566531970a33dfddb6d4b4d"
+    },
+    {
+      "path": "research\\audit\\LP_SUCCESS_ENVELOPE.json",
+      "bytes": 13534,
+      "sha256": "6806ebfd3765ae56255717511cfee0535b306a228a8c700b80a8da636ecb490a"
+    },
+    {
+      "path": "research\\audit\\LP_SUCCESS_ENVELOPE.md",
+      "bytes": 3375,
+      "sha256": "cdcd6bb91187d7c69c0de41c8a0969f861553eb67dcd8bc4f9082e8ea1ce30ee"
+    },
+    {
+      "path": "research\\audit\\M106_RETAINED_DIAGNOSTICS.csv",
+      "bytes": 10792,
+      "sha256": "7aab5dedacedf3dd08213d8988b8a3b53500a5961012886fa8c3b989aae9c8e9"
+    },
+    {
+      "path": "research\\audit\\M106_RETAINED_DIAGNOSTICS.json",
+      "bytes": 2184,
+      "sha256": "2452dbce45af1cef724804253fbc36367db286ad2c8022724a724f4b1ee444d0"
+    },
+    {
+      "path": "research\\audit\\MISSING_EVIDENCE.md",
+      "bytes": 3222,
+      "sha256": "26216ef26e8e27834ca9f85318ec254755cc87c6eaf80de452e5eb45913e93a7"
+    },
+    {
+      "path": "research\\audit\\NEUMANN_ARCHITECTURE_GAP.md",
+      "bytes": 4085,
+      "sha256": "7b59b11a2a9e909a69f888a86820805ecc16bcd76fa71039b1c4a63e41993550"
+    },
+    {
+      "path": "research\\audit\\OPEN_PR_CI_FIRST.json",
+      "bytes": 15240,
+      "sha256": "f933829399e4ba7130e50b9d7f1f2c373c57d76671fee80015d2a8f8cb3b955d"
+    },
+    {
+      "path": "research\\audit\\PR174_OVERLAP.json",
+      "bytes": 1921,
+      "sha256": "749b3c66286c1a58983277ae69437da48fdd23c859ee1494264f3e8651626188"
+    },
+    {
+      "path": "research\\audit\\probe_retained_lp.py",
+      "bytes": 1399,
+      "sha256": "7ba9f9ceca2e419186d20f630cc106f6ab7e7f98809eb5bd6747db2fe153c720"
+    },
+    {
+      "path": "research\\audit\\REPOSITORY_STATE_FIRST.json",
+      "bytes": 7725,
+      "sha256": "97fbc08e5bcc60e4b1a41cd108620a936e24a39c6a77a32c62bff82ce9b2b6f8"
+    },
+    {
+      "path": "research\\audit\\RESEARCH_DECISION.md",
+      "bytes": 3841,
+      "sha256": "cbf5544afd18cd799575244c728555dbdb8bbade068f6511f69144f66be466f3"
+    },
+    {
+      "path": "research\\audit\\SCHEMA_INSPECTION.json",
+      "bytes": 44872,
+      "sha256": "c44048b8bc299496da9a290cf3b37fbd1d9d742250c15eb65b6b559cb61f0268"
+    },
+    {
+      "path": "research\\audit\\tail_digest.py",
+      "bytes": 457,
+      "sha256": "8ba4eb5ea151ba725a338c530582937fba8834b453f7ee1b7867427ead2058f1"
+    },
+    {
+      "path": "research\\audit\\TEST_RESULTS.txt",
+      "bytes": 101,
+      "sha256": "c094c694e5ba4de3dd18ca42ca6ad416c6f59677570748b6cebf23709c9116e5"
+    },
+    {
+      "path": "research\\audit\\version_digest.py",
+      "bytes": 708,
+      "sha256": "9e188e09c4d11b0160ccd6c2bd1fc7b0929f6dc8f00066d1104b3ac86fcb09fb"
+    }
+  ]
+}

@@ -1,0 +1,254 @@
+{
+  "kind": "OPENED_POSTHOC_CAUSAL_ANALYSIS_NOT_FIRST_VERDICT_REPLACEMENT",
+  "original_report_sha256": "2b99aff89dbe4f64a7fa6a72d6e85767dcba07190be87b298ddc9dd7440118bc",
+  "contract_sha256": "5fbce4a2bedd22833f4c9b47cf502c44642cc5b8477cfab32ba7fdc23aa3db13",
+  "replay": {
+    "status": "PASS",
+    "observations": 576,
+    "original_witnesses_checked": 576,
+    "final_original_valid_in_budget": 576,
+    "new_solver_calls": 0,
+    "new_model_forwards": 0,
+    "first_result_not_replaced": true
+  },
+  "independent_originals": 16,
+  "observations": 576,
+  "per_route": {
+    "A_NATIVE": {
+      "requests": 64,
+      "independent_originals": 16,
+      "final_verified": 64,
+      "fallback_requests": 0,
+      "fallback_originals": [],
+      "timed_query_ms_median": 30.684649999999998,
+      "timed_decode_ms_median": 5.3251,
+      "candidate_errors": {}
+    },
+    "A_IPM": {
+      "requests": 64,
+      "independent_originals": 16,
+      "final_verified": 64,
+      "fallback_requests": 0,
+      "fallback_originals": [],
+      "timed_query_ms_median": 59.91655,
+      "timed_decode_ms_median": 5.19005,
+      "candidate_errors": {}
+    },
+    "A_DUAL": {
+      "requests": 64,
+      "independent_originals": 16,
+      "final_verified": 64,
+      "fallback_requests": 0,
+      "fallback_originals": [],
+      "timed_query_ms_median": 42.8331,
+      "timed_decode_ms_median": 5.3075,
+      "candidate_errors": {}
+    },
+    "A_SPGL1": {
+      "requests": 64,
+      "independent_originals": 16,
+      "final_verified": 64,
+      "fallback_requests": 8,
+      "fallback_originals": [
+        "m106_bp_k64_r2",
+        "m106_bp_k8_r3"
+      ],
+      "timed_query_ms_median": 181.1741,
+      "timed_decode_ms_median": 5.6921,
+      "candidate_errors": {}
+    },
+    "B_RETAINED_s100001": {
+      "requests": 64,
+      "independent_originals": 16,
+      "final_verified": 64,
+      "fallback_requests": 60,
+      "fallback_originals": [
+        "m106_bp_k16_r0",
+        "m106_bp_k16_r1",
+        "m106_bp_k16_r2",
+        "m106_bp_k16_r3",
+        "m106_bp_k32_r0",
+        "m106_bp_k32_r1",
+        "m106_bp_k32_r2",
+        "m106_bp_k32_r3",
+        "m106_bp_k64_r0",
+        "m106_bp_k64_r1",
+        "m106_bp_k64_r2",
+        "m106_bp_k64_r3",
+        "m106_bp_k8_r0",
+        "m106_bp_k8_r2",
+        "m106_bp_k8_r3"
+      ],
+      "timed_query_ms_median": 42.8977,
+      "timed_decode_ms_median": 5.3689,
+      "candidate_errors": {}
+    },
+    "B_RETAINED_s100002": {
+      "requests": 64,
+      "independent_originals": 16,
+      "final_verified": 64,
+      "fallback_requests": 60,
+      "fallback_originals": [
+        "m106_bp_k16_r0",
+        "m106_bp_k16_r1",
+        "m106_bp_k16_r2",
+        "m106_bp_k16_r3",
+        "m106_bp_k32_r0",
+        "m106_bp_k32_r1",
+        "m106_bp_k32_r2",
+        "m106_bp_k32_r3",
+        "m106_bp_k64_r0",
+        "m106_bp_k64_r1",
+        "m106_bp_k64_r2",
+        "m106_bp_k64_r3",
+        "m106_bp_k8_r0",
+        "m106_bp_k8_r1",
+        "m106_bp_k8_r3"
+      ],
+      "timed_query_ms_median": 47.9585,
+      "timed_decode_ms_median": 7.0588,
+      "candidate_errors": {}
+    },
+    "C_ORACLE_PADDED": {
+      "requests": 64,
+      "independent_originals": 16,
+      "final_verified": 64,
+      "fallback_requests": 64,
+      "fallback_originals": [
+        "m106_bp_k16_r0",
+        "m106_bp_k16_r1",
+        "m106_bp_k16_r2",
+        "m106_bp_k16_r3",
+        "m106_bp_k32_r0",
+        "m106_bp_k32_r1",
+        "m106_bp_k32_r2",
+        "m106_bp_k32_r3",
+        "m106_bp_k64_r0",
+        "m106_bp_k64_r1",
+        "m106_bp_k64_r2",
+        "m106_bp_k64_r3",
+        "m106_bp_k8_r0",
+        "m106_bp_k8_r1",
+        "m106_bp_k8_r2",
+        "m106_bp_k8_r3"
+      ],
+      "timed_query_ms_median": 40.87895,
+      "timed_decode_ms_median": 5.21725,
+      "candidate_errors": {}
+    },
+    "D_ORACLE_SPARSE": {
+      "requests": 64,
+      "independent_originals": 16,
+      "final_verified": 64,
+      "fallback_requests": 0,
+      "fallback_originals": [],
+      "timed_query_ms_median": 111.93015,
+      "timed_decode_ms_median": 5.51335,
+      "candidate_errors": {},
+      "first_dual_accepted_requests": 20,
+      "first_dual_accepted_originals": [
+        "m106_bp_k16_r0",
+        "m106_bp_k16_r1",
+        "m106_bp_k8_r0",
+        "m106_bp_k8_r1",
+        "m106_bp_k8_r2"
+      ],
+      "dual_method_counts": {
+        "minimum_norm_KKT": 64,
+        "full_dual_feasibility_LP": 44
+      },
+      "stage_medians_ms_not_additive": {
+        "full_dual_feasibility_LP": 104.75705,
+        "minimum_norm_dual": 0.08695,
+        "original_verification": 0.6996,
+        "primal_refit": 0.13645000000000002
+      }
+    },
+    "E_ORACLE_SPARSE_DUAL": {
+      "requests": 64,
+      "independent_originals": 16,
+      "final_verified": 64,
+      "fallback_requests": 0,
+      "fallback_originals": [],
+      "timed_query_ms_median": 6.09835,
+      "timed_decode_ms_median": 5.1967,
+      "candidate_errors": {},
+      "first_dual_accepted_requests": 64,
+      "first_dual_accepted_originals": [
+        "m106_bp_k16_r0",
+        "m106_bp_k16_r1",
+        "m106_bp_k16_r2",
+        "m106_bp_k16_r3",
+        "m106_bp_k32_r0",
+        "m106_bp_k32_r1",
+        "m106_bp_k32_r2",
+        "m106_bp_k32_r3",
+        "m106_bp_k64_r0",
+        "m106_bp_k64_r1",
+        "m106_bp_k64_r2",
+        "m106_bp_k64_r3",
+        "m106_bp_k8_r0",
+        "m106_bp_k8_r1",
+        "m106_bp_k8_r2",
+        "m106_bp_k8_r3"
+      ],
+      "dual_method_counts": {
+        "FREE_RETAINED_OPTIMAL_DUAL_ORACLE": 64
+      },
+      "stage_medians_ms_not_additive": {
+        "original_verification": 0.31495,
+        "primal_refit": 0.13829999999999998
+      }
+    }
+  },
+  "first_screening": {
+    "B_RETAINED_s100001": {
+      "all_sixteen_comparable": true,
+      "comparable_originals": 16,
+      "geomean_over_completed": 0.6943281366599783,
+      "originals": 16,
+      "screen": "NO_REGISTERED_TENFOLD_HEADROOM",
+      "tenfold_originals": 0
+    },
+    "B_RETAINED_s100002": {
+      "all_sixteen_comparable": true,
+      "comparable_originals": 16,
+      "geomean_over_completed": 0.6978407570099845,
+      "originals": 16,
+      "screen": "NO_REGISTERED_TENFOLD_HEADROOM",
+      "tenfold_originals": 0
+    },
+    "C_ORACLE_PADDED": {
+      "all_sixteen_comparable": true,
+      "comparable_originals": 16,
+      "geomean_over_completed": 0.725449070858969,
+      "originals": 16,
+      "screen": "NO_REGISTERED_TENFOLD_HEADROOM",
+      "tenfold_originals": 0
+    },
+    "D_ORACLE_SPARSE": {
+      "all_sixteen_comparable": true,
+      "comparable_originals": 16,
+      "geomean_over_completed": 0.48373610935097194,
+      "originals": 16,
+      "screen": "NO_REGISTERED_TENFOLD_HEADROOM",
+      "tenfold_originals": 0
+    },
+    "E_ORACLE_SPARSE_DUAL": {
+      "all_sixteen_comparable": true,
+      "comparable_originals": 16,
+      "geomean_over_completed": 4.091272386287689,
+      "originals": 16,
+      "screen": "NO_REGISTERED_TENFOLD_HEADROOM",
+      "tenfold_originals": 0
+    }
+  },
+  "strongest_native_counts": {
+    "A_NATIVE": 16
+  },
+  "new_model_forwards": 0,
+  "new_solver_calls_in_analysis": 0,
+  "decision": "HOLD_LEARNING",
+  "causal_boundary": "Certificate acquisition is expensive for this minimum-norm/HiGHS feasibility adapter; not an intrinsic impossibility of cheap certification. Oracle E is not a learned engine.",
+  "cost_boundary": "Windows matched operational Q10000, includes source read/decode/check/response plus common diagnostic startup and dependency setup. Full investment/energy/FLOPs/peak memory UNKNOWN."
+}

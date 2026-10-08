@@ -1,0 +1,98 @@
+{
+  "schema": "neumann.bp-certificate-diagnostic-local-verification.v1",
+  "checked_utc": "2026-10-08T07:38:45.700679+00:00",
+  "conclusion": "ENGINEERING_PASS / NO_REGISTERED_TENFOLD_HEADROOM",
+  "next_decision": "HOLD_LEARNING",
+  "phase3_started": false,
+  "independent_originals": 16,
+  "observations": 576,
+  "fresh_originals": 0,
+  "final_verified": 576,
+  "independent_replay": {
+    "status": "PASS",
+    "observations": 576,
+    "original_witnesses_checked": 576,
+    "final_original_valid_in_budget": 576,
+    "new_solver_calls": 0,
+    "new_model_forwards": 0,
+    "first_result_not_replaced": true,
+    "replay_wall_seconds": 11.45484760000545,
+    "report_sha256": "2b99aff89dbe4f64a7fa6a72d6e85767dcba07190be87b298ddc9dd7440118bc",
+    "runner_sha256_unchanged": true
+  },
+  "tests": {
+    "passed": 35,
+    "pytest_seconds": 4.04
+  },
+  "first_runner_sha256": "e6a7084f617b184264359128d3a42931756ae62e65ddfc1cff8ae635b0d194cf",
+  "contract_sha256": "5fbce4a2bedd22833f4c9b47cf502c44642cc5b8477cfab32ba7fdc23aa3db13",
+  "first_report_sha256": "2b99aff89dbe4f64a7fa6a72d6e85767dcba07190be87b298ddc9dd7440118bc",
+  "archive": {
+    "path": "C:\\Users\\Seojun\\Desktop\\NEUMANN 1\\Continuation\\BP_CERTIFICATE_DIAGNOSTIC_2026-10-08\\BP_CERTIFICATE_DIAGNOSTIC_FIRST.zip",
+    "bytes": 14820188,
+    "sha256": "088f4bb94f807fbdc102c60426db966d4320aecbdf32f3923f8d338499dbb756",
+    "entries": 631,
+    "all_bytes_rechecked": true
+  },
+  "screening": {
+    "B_RETAINED_s100001": {
+      "all_sixteen_comparable": true,
+      "comparable_originals": 16,
+      "geomean_over_completed": 0.6943281366599783,
+      "originals": 16,
+      "screen": "NO_REGISTERED_TENFOLD_HEADROOM",
+      "tenfold_originals": 0
+    },
+    "B_RETAINED_s100002": {
+      "all_sixteen_comparable": true,
+      "comparable_originals": 16,
+      "geomean_over_completed": 0.6978407570099845,
+      "originals": 16,
+      "screen": "NO_REGISTERED_TENFOLD_HEADROOM",
+      "tenfold_originals": 0
+    },
+    "C_ORACLE_PADDED": {
+      "all_sixteen_comparable": true,
+      "comparable_originals": 16,
+      "geomean_over_completed": 0.725449070858969,
+      "originals": 16,
+      "screen": "NO_REGISTERED_TENFOLD_HEADROOM",
+      "tenfold_originals": 0
+    },
+    "D_ORACLE_SPARSE": {
+      "all_sixteen_comparable": true,
+      "comparable_originals": 16,
+      "geomean_over_completed": 0.48373610935097194,
+      "originals": 16,
+      "screen": "NO_REGISTERED_TENFOLD_HEADROOM",
+      "tenfold_originals": 0
+    },
+    "E_ORACLE_SPARSE_DUAL": {
+      "all_sixteen_comparable": true,
+      "comparable_originals": 16,
+      "geomean_over_completed": 4.091272386287689,
+      "originals": 16,
+      "screen": "NO_REGISTERED_TENFOLD_HEADROOM",
+      "tenfold_originals": 0
+    }
+  },
+  "registry_rows": 252,
+  "older_251_verdicts_unchanged": true,
+  "all_original_source_pins_unchanged": true,
+  "new_model_forwards": 0,
+  "new_tasks_generated": 0,
+  "gpu_training": false,
+  "sealed_access": false,
+  "github_writes": 0,
+  "commits_created": 0,
+  "remote_ci_on_new_edits": false,
+  "full_lifecycle_investment": "UNKNOWN",
+  "limitations": [
+    "Opened same16 M106 sources; no independent fresh/generalization claim.",
+    "B is free retained-ranking lower bound, not deployed learned model cost.",
+    "C/D/E Oracle structures are diagnostic only.",
+    "Shared diagnostic cold start is not optimized per-route deployment.",
+    "A_NATIVE is fastest declared comparator16/16; four routes do not exhaust all L1 algorithms.",
+    "Paid dual feasibility expensive in tested adapter, not proof all cheap certificates impossible."
+  ]
+}
