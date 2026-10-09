@@ -35,7 +35,8 @@ def fixture():
             if role == "small":
                 candidate = {"solution": {"x0": {"numerator": 0, "denominator": 1}}}
             cost = {"frontier": 100.0, "small": 50.0,
-                    "neumann": 20.0, "strong_native": 10.0}[role]
+                    "neumann": 20.0, "strong_native": 10.0,
+                    "classical_hybrid": 12.0}[role]
             receipts.append({
                 "task_id": case["id"], "role": role, "repeat": 0,
                 "original_problem_sha256": case["original_problem_sha256"],
@@ -56,12 +57,16 @@ class F0OpenedTests(unittest.TestCase):
         self.assertEqual(result["decision"], "BOUNDED_PILOT_CAPABILITY_MATCH")
         self.assertEqual(result["gap_source_groups"], 2)
         self.assertEqual(result["gap_recovery_rate"], 1.)
-        self.assertEqual(result["observations"], 8)
+        self.assertEqual(result["observations"], 10)
         self.assertAlmostEqual(result["neumann_to_frontier_reported_resource_ratio"]["latency_ms"], .2)
         self.assertIsNone(result["neumann_to_frontier_reported_resource_ratio"]["cost_usd"])
         self.assertFalse(result["scientific_success"])
         self.assertEqual(result["capture_attestation"], "UNVERIFIED_EXCEPT_FOR_ORIGINAL_MATH")
         self.assertEqual(result["strong_native_gap_verified_rate"], 1.)
+        self.assertEqual(result["classical_hybrid_gap_verified_rate"], 1.)
+        self.assertEqual(result["conservative_source_group_recovery_rate"], 1.)
+        self.assertAlmostEqual(result["neumann_to_classical_hybrid_reported_resource_ratio"]["latency_ms"], 20/12)
+        self.assertAlmostEqual(result["neumann_to_best_classical_reported_resource_ratio"]["latency_ms"], 2.)
         self.assertAlmostEqual(result["neumann_to_strong_native_reported_resource_ratio"]["latency_ms"], 2.)
 
     def test_wrong_neumann_answer_never_counts_as_recovery(self):
@@ -117,6 +122,22 @@ class F0OpenedTests(unittest.TestCase):
         self.assertTrue(verify_original_answer(task, {"primal": [1, 1], "dual": [0, 0]}))
         self.assertFalse(verify_original_answer(task, {"primal": [1, 1], "dual": [1, 0]}))
 
+
+
+    def test_classical_hybrid_missing_raises_instead_of_disappearing(self):
+        m, receipts = fixture()
+        receipts = [r for r in receipts if not (r["role"] == "classical_hybrid" and r["task_id"] == "opened_1")]
+        with self.assertRaisesRegex(ValueError, "missing comparison"):
+            audit_opened(m, receipts)
+
+    def test_classical_hybrid_wrong_answer_disables_its_iso_ratio(self):
+        m, receipts = fixture()
+        row = next(r for r in receipts if r["role"] == "classical_hybrid" and r["task_id"] == "opened_0")
+        row["answer"] = {"solution": {"x0": {"numerator": 0, "denominator": 1}}}
+        report = audit_opened(m, receipts)
+        self.assertLess(report["classical_hybrid_gap_verified_rate"], 1.)
+        self.assertIsNone(report["neumann_to_classical_hybrid_reported_resource_ratio"]["latency_ms"])
+        self.assertIsNone(report["neumann_to_best_classical_reported_resource_ratio"]["latency_ms"])
 
 if __name__ == "__main__":
     unittest.main()
