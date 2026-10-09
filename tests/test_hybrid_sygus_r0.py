@@ -95,3 +95,20 @@ def test_original_checker_accepts_proven_alpha_renamed_formals():
         "(define-fun inv-f ((z Int)) Bool (>= z 0))", timeout_ms=1200)
     assert proof["accepted"], proof
     assert all(x["smt_result"] == "unsat" for x in proof["obligations"])
+
+
+def test_independent_original_verifier_accepts_standard_cvc5_solution_wrapper():
+    pytest.importorskip("z3")
+    _, args, defs = prepare(SOURCE)
+    wrapped = "(\n(define-fun inv-f ((x Int)) Bool (>= x 0))\n)\n"
+    proof = independent_check(args, defs, wrapped, timeout_ms=1200)
+    assert proof["accepted"], proof
+    assert all(x["smt_result"] == "unsat" for x in proof["obligations"])
+
+
+def test_multi_solution_spoof_fails_closed():
+    pytest.importorskip("z3")
+    _, args, defs = prepare(SOURCE)
+    malicious = "((define-fun inv-f ((x Int)) Bool true) (define-fun inv-f ((x Int)) Bool (>= x 0)))"
+    proof = independent_check(args, defs, malicious, timeout_ms=1200)
+    assert not proof["accepted"]
