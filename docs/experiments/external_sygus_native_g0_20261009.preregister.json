@@ -1,0 +1,30 @@
+{
+  "schema": "neumann.external-sygus-native-screen.premeasure.v1",
+  "date": "2026-10-09",
+  "scope": "opened-development; independent external-source families; native baseline only; no NEUMANN candidate",
+  "upstream": {
+    "repository": "SyGuS-Org/benchmarks",
+    "sha": "13c8deb68a873635879c9a69bc78caebd340f646",
+    "year": 2019,
+    "track": "Inv_Track"
+  },
+  "selected_sources": [
+    "comp/2019/Inv_Track/From2018/brett.sl",
+    "comp/2019/Inv_Track/From2018/cggmp2005_true-unreach-call_true-termination.sl",
+    "comp/2019/Inv_Track/From2018/fib_01.sl",
+    "comp/2019/Inv_Track/From2018/ex1.sl",
+    "comp/2019/Inv_Track/From2018/bkley.sl",
+    "comp/2019/Inv_Track/XC/1.c.sl",
+    "comp/2019/Inv_Track/XC/10.c.sl",
+    "comp/2019/Inv_Track/XC/100_conf1.sl"
+  ],
+  "selection": "Prespecified 5 distinct From2018 + 3 XC task files; deliberate difficulty diversity, NOT random unbiased benchmark sampling",
+  "baseline": "Installed cvc5 CLI unmodified SyGuS invariant synthesis, pinned source bytes, timeout 15 s each, cold process, no trained/neural candidate",
+  "certificate": "if solution returned, extract define-fun inv-f and independently check pre=>inv, inv&trans=>inv', inv=>post via z3-solver separate process/library; SAT/UNKNOWN/TIMEOUT never accepted",
+  "start_policy": "original list/source rev and budget fixed before native solver execution",
+  "resource": "1 CPU per process; OMP and BLAS 1 thread; observed wall seconds; full startup installation/energy/money unknown",
+  "no_cherry_pick": true,
+  "policy": "Any install, parsing or verifier failures retained. Native unsolved or NOT_VERIFIED stays unresolved, not 'headroom'. No Q/Q34/P1/v102 verdict changes.",
+  "learning_admission": false,
+  "sealed_access": false
+}
