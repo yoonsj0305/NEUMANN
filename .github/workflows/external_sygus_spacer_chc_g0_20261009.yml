@@ -1,0 +1,49 @@
+name: External SyGuS Z3 Spacer Native (Opened Only)
+# Scoped separate-method native control on same pinned upstream SyGuS inputs.
+# Neither a SyGuS invariant certificate replay nor a NEUMANN performance claim.
+on:
+  push:
+    branches:
+      - research/external-sygus-spacer-native-g0-20261009
+    paths:
+      - .github/workflows/external_sygus_spacer_chc_g0_20261009.yml
+permissions:
+  contents: read
+jobs:
+  spacer-chc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    env:
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install independent native CHC solver
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.4.0
+          python -c "import z3; print(z3.get_version_string())"
+      - name: Restore exact external SyGuS 2019 source
+        run: |
+          set -euo pipefail
+          mkdir -p third_party/sygus_benchmarks
+          git -C third_party/sygus_benchmarks init
+          git -C third_party/sygus_benchmarks remote add origin https://github.com/SyGuS-Org/benchmarks.git
+          git -C third_party/sygus_benchmarks fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
+          git -C third_party/sygus_benchmarks checkout --detach FETCH_HEAD
+          test "$(git -C third_party/sygus_benchmarks rev-parse HEAD)" = "13c8deb68a873635879c9a69bc78caebd340f646"
+      - name: Run frozen native-only CHC control
+        run: |
+          python -m experiments.external_sygus_spacer_chc_g0_20261009
+      - name: Always retain complete receipts including worker failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: external-sygus-spacer-chc-g0-first
+          if-no-files-found: warn
+          path: research/development/external_sygus_spacer_chc_g0_20261009/
