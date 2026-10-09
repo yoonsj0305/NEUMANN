@@ -29,8 +29,12 @@ def main():
             raise RuntimeError("noncertified path in optional frozen mode")
         if x["receipt"]["answer"]["certificate"] != "neumann.lp-standard-form-certificate.v1":
             raise RuntimeError("original LP dual proof absent")
-        if x["receipt"]["original_task_sha256"] != entries[0]["receipt"]["original_task_sha256"]:
-            raise RuntimeError("different original task entered")
+        # A policy/seed changes the wrapped request hash even for identical A,b,c.
+        # The original v102 source identity and case ID, not whole task digests,
+        # are the right matched-original authority across routes.
+        if (x["original_source_sha256"] != entries[0]["original_source_sha256"]
+                or x["original_case"] != entries[0]["original_case"]):
+            raise RuntimeError("different original source entered")
     cold, warm = entries[2]["receipt"], entries[3]["receipt"]
     fc = [e for e in cold["events"] if e["kind"] == "frozen_q34_learned_proposal"]
     fw = [e for e in warm["events"] if e["kind"] == "frozen_q34_learned_proposal"]
