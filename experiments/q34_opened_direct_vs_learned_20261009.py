@@ -87,7 +87,7 @@ def evaluate():
     torch.set_num_interop_threads(1)
     runtime = {
         "python": list(sys.version_info[:2]), "numpy": np.__version__,
-        "scipy": scipy.__version__, "sklearn": sklearn.__version__,
+        "scipy": scipy.__version__, "scikit_learn": sklearn.__version__,
         "torch": torch.__version__, "highspy": highspy.Highs().version(),
         "threadpoolctl": threadpoolctl.__version__,
     }
