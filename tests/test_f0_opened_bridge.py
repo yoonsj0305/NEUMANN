@@ -137,7 +137,7 @@ class F0OpenedTests(unittest.TestCase):
         report = audit_opened(m, receipts)
         self.assertLess(report["classical_hybrid_gap_verified_rate"], 1.)
         self.assertIsNone(report["neumann_to_classical_hybrid_reported_resource_ratio"]["latency_ms"])
-        self.assertIsNone(report["neumann_to_best_classical_reported_resource_ratio"]["latency_ms"])
+        self.assertAlmostEqual(report["neumann_to_best_classical_reported_resource_ratio"]["latency_ms"], 2.)
 
 if __name__ == "__main__":
     unittest.main()
