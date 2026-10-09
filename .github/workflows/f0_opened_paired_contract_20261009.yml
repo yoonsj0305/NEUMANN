@@ -4,7 +4,9 @@ on:
     branches: [research/f0-opened-original-comparison-20261009]
     paths:
       - neumann1/f0_opened_bridge.py
+      - neumann1/f0_capture_local.py
       - tests/test_f0_opened_bridge.py
+      - tests/test_f0_capture_local.py
       - .github/workflows/f0_opened_paired_contract_20261009.yml
   workflow_dispatch:
 permissions:
@@ -27,7 +29,7 @@ jobs:
           python -m pip install --disable-pip-version-check -e . pytest
       - name: Verify mathematical original and corruption rejection
         run: |
-          python -m pytest -q tests/test_f0_opened_bridge.py
+          python -m pytest -q tests/test_f0_opened_bridge.py tests/test_f0_capture_local.py
       - name: Guard scientific claim boundary
         run: |
           python - <<'PY'
