@@ -1,0 +1,45 @@
+{
+  "schema": "neumann.external-sygus-cvc5-142-paired.v1",
+  "date_kst": "2026-10-09",
+  "classification": "OPENED_DEVELOPMENT_NATIVE_ONLY",
+  "base_archive": "research/external-sygus-native-g0-20261009@0be10d66a8dd0521ddbc1f6004afc8465ccbb248",
+  "historical_first_actual": "37892991415",
+  "historical_first_technical": "37892764426",
+  "source_commit": "13c8deb68a873635879c9a69bc78caebd340f646",
+  "source_manifest": "docs/experiments/external_sygus_native_g0_20261009.preregister.json",
+  "solvers": [
+    {
+      "id": "APT_OLD",
+      "version": "1.1.2",
+      "source": "Ubuntu apt-get cvc5"
+    },
+    {
+      "id": "RELEASE_142",
+      "version": "1.4.2",
+      "source": "official cvc5 GitHub release cvc5-1.4.2",
+      "archive_url": "https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip",
+      "archive_sha256": "7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8"
+    }
+  ],
+  "execution": {
+    "repeats": 3,
+    "task_timeout_seconds": 15,
+    "shuffle_seed": 20261009,
+    "subprocess_each_case": true,
+    "threads_per_case": 1,
+    "preprocessing": "identical original-to-SyGuS-2.1 translated inputs; exact original bytes and translated SHA retained",
+    "independent_verifier": "Z3 4.13.4 original pre/consecution/post triple; each timeout 3000ms; accepting only UNSAT x3",
+    "native_cost": "per-case wall including solver subprocess startup",
+    "validation_cost": "separately measured paid Z3 proof-checking",
+    "excluded": "binary download/setup and common original retrieval excluded from per-case wall, tracked separately if available"
+  },
+  "analysis": {
+    "outcome_first": "Do not infer discovered NEUMANN headroom from native timeout",
+    "paired_comparison": "count verified by each per task and repeat; report median solver-time for tasks certified 3/3 by both",
+    "failures": "all retained",
+    "fresh": false,
+    "neumann_policy_training": false,
+    "admission": false,
+    "no_hidden_changes": true
+  }
+}
