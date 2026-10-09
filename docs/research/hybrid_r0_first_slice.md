@@ -4,6 +4,21 @@
 **Research base:** PR #176 `c182fd3f8d8b5c711415a214e899bfefe7511a0a`. Existing first archives and global Q1–Q7 unchanged.  
 **Related design:** [NEUMANN Hybrid Architecture Freeze in Notion](https://app.notion.com/p/3f47830ff3348151abc0e91df83fed1f) · [Minimal experiments plan](https://app.notion.com/p/3f47830ff334812f9759c929af41d47c).
 
+## 2026-10-09 extension: actual third domain and external original program pass
+
+**Verified scope:** `THREE_DOMAIN_ENGINEERING_PASS / FULL_R0_STILL_NOT_ADMITTED / R1_NOT_ADMITTED / HOLD_NEW_TRAINING`. Original frozen historic research verdicts and global Q1–Q7 are unchanged.
+
+The same `python -m neumann1.hybrid_runtime_r0` accepts three typed tasks: `lp.standard_form`, `exact.linear`, and **`sygus.invariant`**. The third is classical-only: source-bound legacy declaration translation, cold-process cvc5 invariant synthesis, independent Z3 obligations for initial condition, inductive preservation and original safety property. Only three UNSAT checks can admit a result. Unsupported source syntax, multiple candidates, false invariants and parse failures fail closed.
+
+- [Final extended CI and raw CLI artifacts](https://github.com/yoonsj0305/NEUMANN/actions/runs/37899428468): **32/32 pytest PASS**, original-verified LP and rational exact CLI smoke, plus independent full-goal verification of a genuine [SyGuS 2019 From2018/ex1.sl](https://github.com/SyGuS-Org/benchmarks/blob/13c8deb68a873635879c9a69bc78caebd340f646/comp/2019/Inv_Track/From2018/ex1.sl) (the original 2019 source, no formula edits).
+- Original external source in the last CLI receipt has NEUMANN task digest `4ceb2e40dc446c7fac93802f3375a1feb3d54ff766f9d4807aaad962d69c6f8c`; source-typed digest is for the full wrapper task, not just the original file.
+- First third-domain CI `37898642007` failed at a syntax error; second `37898760947` at legitimate SMT-LIB alpha-renaming rejection; `37898920383` diagnosed the native answer parsing; `37899079244` exposed cvc5's standard outer solution-list wrapper. Each first error is retained in distinct Actions runs. Repair changed ONLY adapter interface semantics, never weakened the independent original-goal Z3 checker. [First corrected three-domain PASS](https://github.com/yoonsj0305/NEUMANN/actions/runs/37899239108): 32 PASS.
+- The SyGuS third domain has **zero learned model calls**, so it demonstrates heterogeneous verified computation, not learned semantic superiority. The 32 tests are independent engineering checks, **not 32 scientifically independent tasks**.
+- Per-invocation solver and original certification time are measured; process RSS is sampled. Off-process installer/startup, energy/thermal, all deployment costs and cross-domain learned routing are UNKNOWN or currently absent. Frozen Q34 cold-start and warm-cache overhead remain important limitations.
+- The earlier “only two domains” note below was true before this addendum and is superseded **only as to the third adapter and added verification tests**. All other R0/R1 limitations remain binding.
+
+**Next and only R0 release blockers:** clean install and dependency/options test in a single release workflow; explicit edge-limited CPU mode with measured peak resident RAM and cold/warm lifecycle; single-machine matched failure/fallback stress across all three domains and a one-run complete engineering cost manifest; honest README/capability matrix. New trained architecture and new G0 scientific tests remain **HOLD** until an R0 engineering release.
+
 ## What is *now executable*
 
 A minimal typed JSON/JSONL CLI: `python -m neumann1.hybrid_runtime_r0`. The same task/goal hash and original-task verifier are used across:
