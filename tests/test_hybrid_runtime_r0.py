@@ -145,7 +145,7 @@ def test_persistent_jsonl_runs_two_independent_original_tasks():
     line1 = {"domain": "exact.linear", "A": [[2]], "b": [4]}
     line2 = {"domain": "exact.linear", "A": [[3]], "b": [6]}
     proc = subprocess.run([sys.executable, "-m", "neumann1.hybrid_runtime_r0", "--jsonl"],
-                          input=json.dumps(line1) + "\\n" + json.dumps(line2) + "\\n",
+                          input=json.dumps(line1) + "\n" + json.dumps(line2) + "\n",
                           text=True, capture_output=True, timeout=15)
     assert proc.returncode == 0, proc.stderr
     outputs = [json.loads(x) for x in proc.stdout.splitlines()]
