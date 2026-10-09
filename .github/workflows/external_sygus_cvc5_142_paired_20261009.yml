@@ -1,10 +1,13 @@
 name: External SyGuS cvc5 1.1.2 vs 1.4.2 Paired CPU (Opened)
+# First run 37893823942 failed pre-measurement on changed 1.4.2 version format.
+# Frozen cohort and paired protocol unchanged; retain first technical failure.
 on:
   push:
     branches:
       - research/external-sygus-native-cvc5-142-20261009
     paths:
       - .github/workflows/external_sygus_cvc5_142_paired_20261009.yml
+      - experiments/external_sygus_cvc5_142_paired_20261009.py
 permissions:
   contents: read
 jobs:
