@@ -17,7 +17,7 @@ from .hybrid_runtime_r0 import (canonical, digest, source_problem_payload,
                                 validate_task)
 
 SCHEMA = "neumann.f0-opened-paired.v1"
-ROLES = ("small", "frontier", "neumann", "strong_native")
+ROLES = ("small", "frontier", "neumann", "strong_native", "classical_hybrid")
 RESOURCE_KEYS = ("latency_ms", "cost_usd")
 
 
@@ -171,17 +171,22 @@ def audit_opened(manifest: dict, receipts: list[dict]) -> dict:
            if q["small"] == 0 and q["frontier"] == 1]
     recovered = [task_id for task_id in gap if per_case[task_id]["neumann"] == 1]
     independent_gap_groups = {tasks[t]["source_group_id"] for t in gap}
+    recovered_groups = {g for g in independent_gap_groups
+                        if all(t in recovered for t in gap
+                               if tasks[t]["source_group_id"] == g)}
     frontier_matching = bool(gap and len(recovered) == len(gap))
     # Do not claim an economic frontier gain while the best native already wins.
     # Compare matched-capability totals against BOTH frontier and specialist.
-    ratio, native_ratio = {}, {}
+    ratio, native_ratio, classical_ratio = {}, {}, {}
     native_matching = bool(gap and all(per_case[t]["strong_native"] == 1 for t in gap))
+    classical_matching = bool(gap and all(per_case[t]["classical_hybrid"] == 1 for t in gap))
     for metric in RESOURCE_KEYS:
         n = [x["resources"][metric] for x in observations
              if x["task_id"] in gap and x["role"] == "neumann"]
         for comparator, eligible, sink in (
             ("frontier", frontier_matching, ratio),
             ("strong_native", frontier_matching and native_matching, native_ratio),
+            ("classical_hybrid", frontier_matching and classical_matching, classical_ratio),
         ):
             ref = [x["resources"][metric] for x in observations
                    if x["task_id"] in gap and x["role"] == comparator]
@@ -201,13 +206,24 @@ def audit_opened(manifest: dict, receipts: list[dict]) -> dict:
         "cases": len(tasks), "observations": len(observations),
         "gap_case_ids": gap,
         "gap_source_groups": len(independent_gap_groups),
+        "recovered_source_groups": len(recovered_groups),
+        "conservative_source_group_recovery_rate":
+            len(recovered_groups) / len(independent_gap_groups) if gap else None,
         "recovered_case_ids": recovered,
         "gap_recovery_rate": len(recovered) / len(gap) if gap else None,
         "per_case_verified_rate": per_case,
         "neumann_to_frontier_reported_resource_ratio": ratio,
         "neumann_to_strong_native_reported_resource_ratio": native_ratio,
+        "neumann_to_classical_hybrid_reported_resource_ratio": classical_ratio,
+        "neumann_to_best_classical_reported_resource_ratio": {
+            k: max(native_ratio[k], classical_ratio[k])
+            if native_ratio[k] is not None and classical_ratio[k] is not None
+            else None for k in RESOURCE_KEYS
+        },
         "strong_native_gap_verified_rate":
             sum(per_case[t]["strong_native"] for t in gap) / len(gap) if gap else None,
+        "classical_hybrid_gap_verified_rate":
+            sum(per_case[t]["classical_hybrid"] for t in gap) / len(gap) if gap else None,
         "scientific_success": False,
         "global_questions_closed": [],
         "limitations": [
@@ -215,7 +231,8 @@ def audit_opened(manifest: dict, receipts: list[dict]) -> dict:
             "Equal declared tool eligibility does not prove equal actual access.",
             "Only original mathematical answers are independently verified.",
             "No complete compute/energy/RAM/VRAM/investment or provider invoices audited.",
-            "Strongest classical hybrid, holdout, generalization and F1 require separate gates."
+            "Reported resources must charge all tool attempts, proof and retries; intake does not attest this.",
+            "Holdout, generalization and F1 require separate gates."
         ],
     }
 
