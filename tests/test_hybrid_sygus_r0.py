@@ -1,5 +1,6 @@
 """R0 third-domain original invariant certificates, negative and live controls."""
 import shutil
+import json
 
 import pytest
 
@@ -77,7 +78,7 @@ def test_live_native_synthesis_three_original_proofs():
     if not shutil.which("cvc5"):
         pytest.skip("cvc5 native solver unavailable")
     r = run(task())
-    assert r["status"] == "VERIFIED", r
+    assert r["status"] == "VERIFIED", json.dumps(r, indent=2, ensure_ascii=False)
     assert r["answer"]["certificate"] == "original-sygus-init-consecution-safety-v1"
     assert r["cost"]["model_calls"] == 0
     proofs = [e for e in r["events"] if e.get("kind") ==
