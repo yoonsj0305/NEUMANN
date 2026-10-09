@@ -304,7 +304,16 @@ def main() -> None:
     # Single request by default. --jsonl keeps the frozen archive in one process.
     # Every line is an independent task with independent ORIGINAL certificate.
     if sys.argv[1:] == ["--jsonl"]:
-        for line in sys.stdin.buffer:
+        while True:
+            line = sys.stdin.buffer.readline(MAX_INPUT_BYTES + 1)
+            if not line:
+                break
+            if len(line) > MAX_INPUT_BYTES and not line.endswith(b"\n"):
+                # Bound memory; drain an overlong record without decoding it.
+                while True:
+                    extra = sys.stdin.buffer.readline(MAX_INPUT_BYTES + 1)
+                    if not extra or extra.endswith(b"\n"):
+                        break
             print(canonical(_decode_and_run(line)), flush=True)
     elif not sys.argv[1:]:
         raw = sys.stdin.buffer.read(MAX_INPUT_BYTES + 1)
