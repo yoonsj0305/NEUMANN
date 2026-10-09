@@ -10,6 +10,7 @@ on:
       - tests/test_hybrid_runtime_r0.py
       - tests/test_hybrid_sygus_r0.py
       - experiments/hybrid_r0_frozen_smoke_20261009.py
+      - experiments/hybrid_r0_bp_negative_smoke_20261009.py
 permissions:
   contents: read
 
@@ -81,6 +82,9 @@ jobs:
       - name: Historic opened Q34 frozen-model integration smoke
         run: |
           python -m experiments.hybrid_r0_frozen_smoke_20261009
+      - name: Opened M106 negative-transfer capability and original-check regression
+        run: |
+          python -m experiments.hybrid_r0_bp_negative_smoke_20261009
       - name: Preserve paid proposal and original LP certification records
         if: always()
         uses: actions/upload-artifact@v4
