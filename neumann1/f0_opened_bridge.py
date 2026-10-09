@@ -64,7 +64,10 @@ def verify_original_answer(task: dict, answer: object) -> bool:
             _, arguments, original_defs = prepare(spec["source"])
             proof = independent_check(arguments, original_defs, invariant, timeout_ms=2500)
             return proof["accepted"] is True
-    except (ValueError, TypeError, KeyError, ImportError, OverflowError):
+    except ImportError as exc:
+        # Infrastructure failure cannot be silently counted as a small-model FAIL.
+        raise RuntimeError("independent verifier dependency unavailable") from exc
+    except (ValueError, TypeError, KeyError, OverflowError):
         return False
     return False
 
