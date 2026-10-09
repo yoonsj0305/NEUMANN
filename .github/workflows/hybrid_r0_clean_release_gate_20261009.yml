@@ -1,0 +1,67 @@
+name: Hybrid R0 clean-install, failure and edge CPU release gate
+# Engineering opened-source only; frozen North Star Q1-Q7 remain OPEN.
+on:
+  push:
+    branches:
+      - research/hybrid-r0-first-slice-20261009
+    paths:
+      - .github/workflows/hybrid_r0_clean_release_gate_20261009.yml
+      - experiments/hybrid_r0_release_gate_20261009.py
+permissions:
+  contents: read
+jobs:
+  clean-hybrid-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    env:
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install classical native cvc5 outside Python venv
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y cvc5
+          cvc5 --version
+      - name: Create independent clean environment and pinned CPU tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m venv /tmp/neumann_r0_clean
+          /tmp/neumann_r0_clean/bin/python -m pip install --disable-pip-version-check \
+            numpy==2.3.5 scipy==1.17.0 scikit-learn==1.9.1 threadpoolctl==3.7.0 \
+            highspy==1.15.1 z3-solver==4.13.4.0 psutil==7.0.0 'pytest>=8,<10'
+          /tmp/neumann_r0_clean/bin/python -m pip install -e . --no-deps
+          /tmp/neumann_r0_clean/bin/python -c \
+            'import neumann1.hybrid_runtime_r0, highspy, z3, psutil; print("CLEAN_INSTALL_IMPORT_PASS")'
+      - name: Existing bounded engineering regression
+        run: |
+          /tmp/neumann_r0_clean/bin/python -m pytest -q \
+            tests/test_hybrid_runtime_r0.py tests/test_hybrid_sygus_r0.py
+      - name: Restore source-pinned actual SyGuS 2019 opened original
+        run: |
+          set -euo pipefail
+          curl -fLsS --retry 3 \
+            -o /tmp/neumann_r0_ex1_2019.sl \
+            https://raw.githubusercontent.com/SyGuS-Org/benchmarks/13c8deb68a873635879c9a69bc78caebd340f646/comp/2019/Inv_Track/From2018/ex1.sl
+          test -s /tmp/neumann_r0_ex1_2019.sl
+          sha256sum /tmp/neumann_r0_ex1_2019.sl
+      - name: First clean 3-domain CPU RSS and failover paired gate
+        run: |
+          /tmp/neumann_r0_clean/bin/python -m experiments.hybrid_r0_release_gate_20261009 \
+            /tmp/neumann_r0_ex1_2019.sl
+      - name: Always retain first run, including a technical failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hybrid-r0-clean-release-first-receipts
+          if-no-files-found: warn
+          path: |
+            research/development/hybrid_r0_release_gate_20261009/
+            /tmp/neumann_r0_ex1_2019.sl
