@@ -1,0 +1,87 @@
+name: Hybrid R0 distributable wheel and independent install smoke
+# Engineering RC only: no frozen Q34 model archives are bundled in this wheel.
+on:
+  push:
+    branches:
+      - research/hybrid-r0-first-slice-20261009
+    paths:
+      - .github/workflows/hybrid_r0_wheel_install_gate_20261009.yml
+permissions:
+  contents: read
+jobs:
+  packaged-r0:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    env:
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build wheel using standard packaging in clean builder
+        run: |
+          python -m pip install --disable-pip-version-check build
+          python -m build --wheel --outdir /tmp/neumann_r0_wheels
+          test "$(find /tmp/neumann_r0_wheels -name '*.whl' | wc -l)" = "1"
+          sha256sum /tmp/neumann_r0_wheels/*.whl
+      - name: Install isolated wheel, not editable source
+        run: |
+          python -m venv /tmp/neumann_r0_wheel_env
+          /tmp/neumann_r0_wheel_env/bin/pip install --disable-pip-version-check \
+            numpy==2.3.5 scipy==1.17.0 scikit-learn==1.9.1 \
+            highspy==1.15.1 threadpoolctl==3.7.0 z3-solver==4.13.4.0
+          /tmp/neumann_r0_wheel_env/bin/pip install --no-deps /tmp/neumann_r0_wheels/*.whl
+          sudo apt-get update -qq
+          sudo apt-get install -y cvc5
+          curl -fsSL --retry 3 -o /tmp/r0_wheel_ex1.sl \
+            https://raw.githubusercontent.com/SyGuS-Org/benchmarks/13c8deb68a873635879c9a69bc78caebd340f646/comp/2019/Inv_Track/From2018/ex1.sl
+      - name: Run wheel from outside Git checkout, three original certificates and blocked model
+        working-directory: /tmp
+        run: |
+          /tmp/neumann_r0_wheel_env/bin/python - <<'PY'
+          import inspect, json, pathlib, subprocess, sys
+          from neumann1 import hybrid_runtime_r0 as runtime
+          module_path = inspect.getfile(runtime)
+          assert "site-packages" in module_path and "/NEUMANN/" not in module_path, module_path
+          original = pathlib.Path("/tmp/r0_wheel_ex1.sl").read_text()
+          tasks = [
+            {"domain":"lp.standard_form","A":[[1,0,1,0],[0,1,0,1]],"b":[1,1],"c":[0,0,2,2]},
+            {"domain":"exact.linear","A":[[2,0],[0,3]],"b":[1,1]},
+            {"domain":"sygus.invariant","source":original,"budget_s":15.0},
+            {"domain":"lp.standard_form","A":[[1,0,1,0],[0,1,0,1]],"b":[1,1],
+             "c":[0,0,2,2],"policy":"frozen_q34","seed":100001}
+          ]
+          p = subprocess.run([sys.executable,"-m","neumann1.hybrid_runtime_r0","--jsonl"],
+                             input="\n".join(json.dumps(t) for t in tasks)+"\n",
+                             capture_output=True,text=True,timeout=35,check=True)
+          responses=[json.loads(x) for x in p.stdout.splitlines()]
+          assert len(responses)==4, responses
+          assert all(x["status"]=="VERIFIED" for x in responses[:3]), responses
+          assert responses[3]["status"] in ("UNKNOWN","ERROR"), responses[3]
+          assert responses[3]["answer"] is None, responses[3]
+          assert all(x["cost"]["frontier_calls"]==0 for x in responses)
+          assert responses[0]["answer"]["certificate"]=="neumann.lp-standard-form-certificate.v1"
+          assert responses[2]["answer"]["certificate"]=="original-sygus-init-consecution-safety-v1"
+          proof=[e for e in responses[2]["events"] if e.get("kind")=="independent_original_sygus_certificate"]
+          assert len(proof)==1 and proof[0]["passed"]
+          assert len(proof[0]["obligations"])==3
+          pathlib.Path("/tmp/hybrid_r0_wheel_smoke_receipts.json").write_text(
+            json.dumps({"classification":"WHEEL_ENGINEERING_FIXTURE_ONLY",
+                        "installed_module":module_path,
+                        "results":responses},indent=2))
+          print("WHEEL_EXTERNAL_INSTALL_THREE_DOMAIN_PASS")
+          print("WHEEL_FROZEN_NOT_BUNDLED_FAIL_CLOSED")
+          PY
+      - name: Preserve distributable wheel and complete receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann1-hybrid-r0-wheel-engineering-first
+          if-no-files-found: warn
+          path: |
+            /tmp/neumann_r0_wheels/
+            /tmp/hybrid_r0_wheel_smoke_receipts.json

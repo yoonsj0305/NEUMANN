@@ -1,0 +1,80 @@
+name: Hybrid R0 First Slice Engineering CI
+on:
+  push:
+    branches:
+      - research/hybrid-r0-first-slice-20261009
+    paths:
+      - .github/workflows/hybrid_r0_first_slice.yml
+      - neumann1/hybrid_runtime_r0.py
+      - neumann1/hybrid_sygus_r0.py
+      - tests/test_hybrid_runtime_r0.py
+      - tests/test_hybrid_sygus_r0.py
+      - docs/research/hybrid_r0_first_slice.md
+permissions:
+  contents: read
+jobs:
+  first-slice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install native LP and test runtime
+        run: |
+          python -m pip install --disable-pip-version-check "numpy==2.3.5" "scipy==1.17.0" "scikit-learn==1.9.1" "threadpoolctl==3.7.0" "highspy==1.15.1" "pytest>=8,<10"
+          python -m pip install --no-deps -e .
+          python -m pip install --disable-pip-version-check z3-solver==4.13.4.0
+          sudo apt-get update -qq && sudo apt-get install -y cvc5
+      - name: Execute engineering-original certificate gates
+        run: |
+          python -m pytest -q tests/test_hybrid_runtime_r0.py tests/test_hybrid_sygus_r0.py
+      - name: CLI exact-integer smoke
+        run: |
+          printf '{"domain":"exact.linear","A":[[2,0],[0,3]],"b":[1,1]}' | python -m neumann1.hybrid_runtime_r0 > /tmp/r0_exact.json
+          python -c "import json; r=json.load(open('/tmp/r0_exact.json')); assert r['status']=='VERIFIED'; assert r['answer']['solution']['x0']=={'numerator':1,'denominator':2}"
+      - name: CLI LP with independent original certificate smoke
+        run: |
+          printf '{"domain":"lp.standard_form","A":[[1,0,1,0],[0,1,0,1]],"b":[1,1],"c":[0,0,2,2]}' | python -m neumann1.hybrid_runtime_r0 > /tmp/r0_lp.json
+          python -c "import json; r=json.load(open('/tmp/r0_lp.json')); assert r['status']=='VERIFIED'; assert r['answer']['certificate']=='neumann.lp-standard-form-certificate.v1'"
+      - name: Source-pinned official SyGuS 2019 program original goal proof
+        run: |
+          curl -fsSL --retry 3 -o /tmp/r0_official_ex1.sl \
+            https://raw.githubusercontent.com/SyGuS-Org/benchmarks/13c8deb68a873635879c9a69bc78caebd340f646/comp/2019/Inv_Track/From2018/ex1.sl
+          python - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+          source = Path('/tmp/r0_official_ex1.sl').read_text()
+          assert '(inv-constraint inv-f pre-f trans-f post-f)' in source
+          payload = {"domain":"sygus.invariant","source":source,"budget_s":15.0}
+          result = subprocess.run(
+              ["python","-m","neumann1.hybrid_runtime_r0"],
+              input=json.dumps(payload),text=True,capture_output=True,timeout=30,check=True)
+          receipt = json.loads(result.stdout)
+          Path('/tmp/r0_sygus_original.json').write_text(json.dumps(receipt, indent=2))
+          assert receipt["status"] == "VERIFIED", receipt
+          assert receipt["answer"]["certificate"] == "original-sygus-init-consecution-safety-v1"
+          proofs = [e for e in receipt["events"] if e["kind"] == "independent_original_sygus_certificate"]
+          assert len(proofs) == 1 and proofs[0]["passed"], receipt
+          assert all(x["smt_result"] == "unsat" for x in proofs[0]["obligations"])
+          print("OFFICIAL_SYGUS_ORIGINAL_VERIFIED",receipt["original_task_sha256"])
+          PY
+      - name: Preserve both CLI actual receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hybrid-r0-first-slice-engineering-receipts
+          if-no-files-found: warn
+          path: |
+            /tmp/r0_exact.json
+            /tmp/r0_lp.json
+            /tmp/r0_sygus_original.json
+            /tmp/r0_official_ex1.sl
