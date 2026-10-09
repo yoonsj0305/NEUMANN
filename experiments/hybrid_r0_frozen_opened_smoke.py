@@ -17,7 +17,8 @@ base = {"domain": "lp.standard_form",
 records = []
 for name, opts in (("native", {"policy": "native"}),
                    ("classical_fixed4m", {"policy": "residual_fixed4m"}),
-                   ("frozen_q34_seed100001", {"policy": "frozen_q34", "seed": 100001})):
+                   ("frozen_q34_seed100001_cold", {"policy": "frozen_q34", "seed": 100001}),
+                   ("frozen_q34_seed100001_warm", {"policy": "frozen_q34", "seed": 100001})):
     r = run({**base, **opts})
     records.append({"route": name, "original_case": source["id"],
                     "original_source_sha256": source["sha256"],
@@ -30,9 +31,13 @@ for name, opts in (("native", {"policy": "native"}),
 data = {"classification": "ENGINEERING_OPENED_SMOKE_ONLY",
         "cases": 1, "route_count": len(records), "records": records,
         "original_v102_unchanged": True, "no_new_training": True,
-        "note": "cold restore is charged for frozen Q34, so speed comparisons with historical warm averages are INVALID"}
+        "note": "Cold and warm are separately charged: never compare cold/historical warm or infer training generalization"}
 (out / "opened_q34_three_route_smoke.json").write_text(json.dumps(data, sort_keys=True, indent=2)+"\n")
-if len(records) != 3 or not all(x["receipt"]["status"] == "VERIFIED" for x in records):
+if len(records) != 4 or not all(x["receipt"]["status"] == "VERIFIED" for x in records):
     raise RuntimeError("Hybrid R0 frozen adapter not admitted; all first receipts retained")
+if records[-2]["receipt"]["events"][0]["checkpoint_cache_hit"] is not False:
+    raise RuntimeError("First frozen restore incorrectly marked as cache hit")
+if records[-1]["receipt"]["events"][0]["checkpoint_cache_hit"] is not True:
+    raise RuntimeError("Persistent frozen checkpoint not reused")
 if records[-1]["receipt"]["cost"]["model_calls"] != 1:
     raise RuntimeError("Frozen model inference accounting missing")
