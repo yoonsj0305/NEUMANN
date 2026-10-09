@@ -8,7 +8,10 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-import resource
+try:
+    import resource  # Linux/macOS; no built-in resource module on Windows.
+except ImportError:
+    resource = None
 import sys
 from fractions import Fraction
 from time import perf_counter_ns
@@ -268,7 +271,9 @@ def run(task: Any) -> dict:
         "cost": {
             "observed_wall_ms": total_ms,
             "stages_ms": stages,
-            "process_peak_rss_kb": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
+            "process_peak_rss_kb": (resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+                                    if resource is not None and sys.platform.startswith("linux")
+                                    else "UNKNOWN"),
             "model_calls": sum(e.get("kind") == "frozen_q34_learned_proposal"
                                for e in events), "frontier_calls": 0,
             "cold_process_startup_ms": "UNKNOWN",
