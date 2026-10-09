@@ -95,6 +95,13 @@ def prepare(source):
 def independent_check(original_args, base_defs, output, timeout_ms):
     import z3
     candidate = parse(output)
+    # cvc5 emits SyGuS solutions as a parenthesized list of define-fun forms,
+    # e.g. ((define-fun inv-f ((x Int)) Bool (>= x 0))).
+    # Unwrap exactly one standard solution-list layer; multiple definitions or
+    # unrelated output still fail closed. Proof obligations are NOT weakened.
+    if (len(candidate) == 1 and isinstance(candidate[0], list)
+            and candidate[0] and isinstance(candidate[0][0], list)):
+        candidate = candidate[0]
     candidates = [x for x in candidate if isinstance(x, list) and x and x[0] == "define-fun"]
     if len(candidates) != 1:
         return {"accepted": False, "reason": "NO_SINGLE_INVARIANT", "obligations": []}
