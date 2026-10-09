@@ -137,3 +137,18 @@ def test_frozen_q34_rejects_user_supplied_ranking():
     task["ranking"] = list(range(12))
     r = run(task)
     assert r["status"] == "ERROR" and r["answer"] is None
+
+
+def test_persistent_jsonl_runs_two_independent_original_tasks():
+    import subprocess
+    import sys
+    line1 = {"domain": "exact.linear", "A": [[2]], "b": [4]}
+    line2 = {"domain": "exact.linear", "A": [[3]], "b": [6]}
+    proc = subprocess.run([sys.executable, "-m", "neumann1.hybrid_runtime_r0", "--jsonl"],
+                          input=json.dumps(line1) + "\\n" + json.dumps(line2) + "\\n",
+                          text=True, capture_output=True, timeout=15)
+    assert proc.returncode == 0, proc.stderr
+    outputs = [json.loads(x) for x in proc.stdout.splitlines()]
+    assert len(outputs) == 2
+    assert all(x["status"] == "VERIFIED" for x in outputs)
+    assert outputs[0]["original_task_sha256"] != outputs[1]["original_task_sha256"]
