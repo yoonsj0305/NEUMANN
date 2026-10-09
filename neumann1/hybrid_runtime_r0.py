@@ -32,6 +32,22 @@ def digest(x: Any) -> str:
     return hashlib.sha256(canonical(x).encode("utf-8")).hexdigest()
 
 
+def source_problem_payload(task: dict, spec: dict) -> dict:
+    """Source-level original problem, excluding execution policy and budgets.
+
+    No solution, oracle, model seed, candidate ranking or fallback decision may
+    enter this identity. This is a byte-normalized JSON source fingerprint,
+    not a claim that two algebraically equivalent encodings are identical.
+    """
+    kind = spec["domain"]
+    if kind == "lp.standard_form":
+        return {"domain": kind, "A": task["A"], "b": task["b"], "c": task["c"]}
+    if kind == "sygus.invariant":
+        return {"domain": kind, "source": task["source"]}
+    return {"domain": kind, "A": task["A"], "b": task["b"],
+            "variables": spec["variables"]}
+
+
 def elapsed_ms(t: int) -> float:
     return (perf_counter_ns() - t) / 1e6
 
@@ -245,11 +261,13 @@ def run(task: Any) -> dict:
     status, answer, reason = "ERROR", None, None
     kind = task.get("domain") if isinstance(task, dict) else None
     task_hash = None
+    original_problem_hash = None
     budget_s = None
     try:
         task_hash = digest(task)
         validation_start = perf_counter_ns()
         spec = validate_task(task)
+        original_problem_hash = digest(source_problem_payload(task, spec))
         stage_cost("input_validation_ms", validation_start, stages)
         budget_s = spec["budget_s"]
         deadline = started + int(budget_s * 1e9)
@@ -284,7 +302,9 @@ def run(task: Any) -> dict:
     stages["unassigned_python_wrapper_ms"] = max(0., total_ms - sum(stages.values()))
     result = {
         "schema": SCHEMA,
-        "original_task_sha256": task_hash,
+        "original_task_sha256": task_hash,  # Legacy request-scoped field; do not reinterpret.
+        "execution_request_sha256": task_hash,
+        "original_problem_sha256": original_problem_hash,
         "domain": kind, "status": status, "answer": answer,
         "reason": reason, "events": events,
         "cost": {
