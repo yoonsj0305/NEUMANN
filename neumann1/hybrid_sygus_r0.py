@@ -115,7 +115,7 @@ def independent_check(original_args, base_defs, output, timeout_ms):
     next_args = " ".join(next_names)
     declarations = "".join(
         f"(declare-const {name} {sort})\n"
-        for name, sort in list(original_args) + [[n + "!", sort] for n, sort in original_args])
+        for name, sort in list(original_args) + [[n + "!", sort] for n, sort in original_args]
     )
     definitions = "\n".join(smt(x) for x in base_defs + [inv]) + "\n"
     queries = [
