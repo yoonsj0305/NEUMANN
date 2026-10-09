@@ -62,6 +62,7 @@ class F0OpenedTests(unittest.TestCase):
         self.assertFalse(result["scientific_success"])
         self.assertEqual(result["capture_attestation"], "UNVERIFIED_EXCEPT_FOR_ORIGINAL_MATH")
         self.assertEqual(result["strong_native_gap_verified_rate"], 1.)
+        self.assertAlmostEqual(result["neumann_to_strong_native_reported_resource_ratio"]["latency_ms"], 2.)
 
     def test_wrong_neumann_answer_never_counts_as_recovery(self):
         m, r = fixture()
