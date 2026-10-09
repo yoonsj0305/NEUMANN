@@ -18,7 +18,7 @@ from time import perf_counter_ns
 from typing import Any
 
 SCHEMA = "neumann.hybrid-r0-engineering.v0"
-DOMAINS = ("lp.standard_form", "exact.linear")
+DOMAINS = ("lp.standard_form", "exact.linear", "sygus.invariant")
 LP_MODES = ("native", "residual_fixed4m", "external_ranking", "frozen_q34")
 MAX_INPUT_BYTES = 2_000_000
 _FROZEN_Q34_CACHE = None  # Immutable checkpoint reuse within one local process.
@@ -82,6 +82,18 @@ def validate_task(task: Any) -> dict:
         return {"domain": kind, "A": a, "b": b, "c": c,
                 "policy": policy, "seed": task.get("seed"),
                 "ranking": task.get("ranking"), "budget_s": float(budget)}
+    if kind == "sygus.invariant":
+        require_fields(task, {"domain", "source"}, {"domain", "source", "budget_s"})
+        source = task["source"]
+        if not isinstance(source, str) or not source or len(source.encode("utf-8")) > 40000:
+            raise ValueError("SyGuS source must be nonempty and <= 40000 bytes")
+        from .hybrid_sygus_r0 import prepare
+        # Fail closed before launching any external process.
+        prepare(source)
+        budget = task.get("budget_s", 15.0)
+        if type(budget) not in (int, float) or not math.isfinite(budget) or not 0 < budget <= 30:
+            raise ValueError("invalid SyGuS budget")
+        return {"domain": kind, "source": source, "budget_s": float(budget)}
     require_fields(task, {"domain", "A", "b"},
                    {"domain", "A", "b", "variables", "budget_s"})
     A, b = task["A"], task["b"]
@@ -243,6 +255,13 @@ def run(task: Any) -> dict:
         deadline = started + int(budget_s * 1e9)
         if kind == "lp.standard_form":
             answer, status = lp_route(spec, stages, events, deadline)
+        elif kind == "sygus.invariant":
+            from .hybrid_sygus_r0 import solve_and_verify
+            left = (deadline - perf_counter_ns()) / 1e9
+            if left <= 0:
+                answer, status = None, "TIMEOUT"
+            else:
+                answer, status = solve_and_verify(spec["source"], left, stages, events)
         else:
             answer, status = exact_linear_route(spec, stages, events, deadline)
     except (TypeError, ValueError, KeyError) as exc:
