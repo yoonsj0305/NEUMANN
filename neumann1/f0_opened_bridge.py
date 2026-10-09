@@ -169,18 +169,25 @@ def audit_opened(manifest: dict, receipts: list[dict]) -> dict:
     recovered = [task_id for task_id in gap if per_case[task_id]["neumann"] == 1]
     independent_gap_groups = {tasks[t]["source_group_id"] for t in gap}
     frontier_matching = bool(gap and len(recovered) == len(gap))
-    ratio = {}
+    # Do not claim an economic frontier gain while the best native already wins.
+    # Compare matched-capability totals against BOTH frontier and specialist.
+    ratio, native_ratio = {}, {}
+    native_matching = bool(gap and all(per_case[t]["strong_native"] == 1 for t in gap))
     for metric in RESOURCE_KEYS:
-        f = [x["resources"][metric] for x in observations
-             if x["task_id"] in gap and x["role"] == "frontier"]
         n = [x["resources"][metric] for x in observations
              if x["task_id"] in gap and x["role"] == "neumann"]
-        if (frontier_matching and f and n
-                and all(x["status"] == "measured" for x in f + n)
-                and sum(x["value"] for x in f) > 0):
-            ratio[metric] = sum(x["value"] for x in n) / sum(x["value"] for x in f)
-        else:
-            ratio[metric] = None
+        for comparator, eligible, sink in (
+            ("frontier", frontier_matching, ratio),
+            ("strong_native", frontier_matching and native_matching, native_ratio),
+        ):
+            ref = [x["resources"][metric] for x in observations
+                   if x["task_id"] in gap and x["role"] == comparator]
+            if (eligible and ref and n
+                    and all(x["status"] == "measured" for x in ref + n)
+                    and sum(x["value"] for x in ref) > 0):
+                sink[metric] = sum(x["value"] for x in n) / sum(x["value"] for x in ref)
+            else:
+                sink[metric] = None
     return {
         "schema": SCHEMA,
         "scope": "OPENED_DEVELOPMENT_DIAGNOSTIC_NOT_FRESH_OR_SEALED",
@@ -195,6 +202,7 @@ def audit_opened(manifest: dict, receipts: list[dict]) -> dict:
         "gap_recovery_rate": len(recovered) / len(gap) if gap else None,
         "per_case_verified_rate": per_case,
         "neumann_to_frontier_reported_resource_ratio": ratio,
+        "neumann_to_strong_native_reported_resource_ratio": native_ratio,
         "strong_native_gap_verified_rate":
             sum(per_case[t]["strong_native"] for t in gap) / len(gap) if gap else None,
         "scientific_success": False,
