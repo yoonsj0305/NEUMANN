@@ -1,0 +1,51 @@
+name: External SyGuS G0 Native Baseline (Opened Only)
+on:
+  push:
+    branches:
+      - research/external-sygus-native-g0-20261009
+    paths:
+      - .github/workflows/external_sygus_native_g0_20261009.yml
+
+permissions:
+  contents: read
+
+jobs:
+  native-screen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install unmodified cvc5 native CLI and independent z3-solver
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y cvc5
+          python -m pip install --disable-pip-version-check z3-solver==4.13.4.0
+          cvc5 --version
+          python -c "import z3; print(z3.get_version_string())"
+      - name: Fetch exact historical third-party external cohort
+        run: |
+          mkdir -p third_party/sygus_benchmarks
+          git -C third_party/sygus_benchmarks init
+          git -C third_party/sygus_benchmarks remote add origin https://github.com/SyGuS-Org/benchmarks.git
+          git -C third_party/sygus_benchmarks fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
+          git -C third_party/sygus_benchmarks checkout --detach FETCH_HEAD
+          test "$(git -C third_party/sygus_benchmarks rev-parse HEAD)" = "13c8deb68a873635879c9a69bc78caebd340f646"
+      - name: First opened native-only cohort
+        run: |
+          python -m experiments.external_sygus_native_g0_20261009
+      - name: Preserve all receipts including any failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: external-sygus-native-g0-first
+          if-no-files-found: warn
+          path: research/development/external_sygus_native_g0_20261009/
