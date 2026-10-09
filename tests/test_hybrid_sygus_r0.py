@@ -86,3 +86,12 @@ def test_live_native_synthesis_three_original_proofs():
     assert len(proofs) == 1 and proofs[0]["passed"]
     assert all(e["smt_result"] == "unsat" for e in proofs[0]["obligations"])
     assert r["research_scope"] == "ENGINEERING_FIXTURE_ONLY_NOT_FRESH_EVIDENCE"
+
+
+def test_original_checker_accepts_proven_alpha_renamed_formals():
+    pytest.importorskip("z3")
+    _, args, defs = prepare(SOURCE)
+    proof = independent_check(args, defs,
+        "(define-fun inv-f ((z Int)) Bool (>= z 0))", timeout_ms=1200)
+    assert proof["accepted"], proof
+    assert all(x["smt_result"] == "unsat" for x in proof["obligations"])
