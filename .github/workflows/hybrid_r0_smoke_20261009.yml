@@ -1,0 +1,57 @@
+name: Hybrid R0 - Original-Certificate CPU Acceptance
+on:
+  push:
+    branches:
+      - research/hybrid-r0-first-slice-20261009
+    paths:
+      - .github/workflows/hybrid_r0_smoke_20261009.yml
+      - neumann1/hybrid_runtime_r0.py
+      - neumann1/hybrid_sygus_r0.py
+      - tests/test_hybrid_runtime_r0.py
+      - tests/test_hybrid_sygus_r0.py
+      - experiments/hybrid_r0_frozen_smoke_20261009.py
+permissions:
+  contents: read
+
+jobs:
+  cpu-classical-r0:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install original code and two independent domain solvers
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y cvc5
+          python -m pip install -e '.[native_lp]' pytest z3-solver==4.13.4.0 threadpoolctl==3.7.0
+          cvc5 --version
+      - name: Three-domain original-certificate negative and positive tests
+        run: |
+          python -m pytest -q tests/test_hybrid_runtime_r0.py tests/test_hybrid_sygus_r0.py
+      - name: CLI single request smoke
+        run: |
+          printf '%s\n' '{"domain":"exact.linear","A":[[2,0],[0,3]],"b":[1,1]}' |
+            python -m neumann1.hybrid_runtime_r0 > hybrid_r0_stdout.json
+          python - <<'PY'
+          import json
+          x=json.load(open("hybrid_r0_stdout.json"))
+          assert x["status"] == "VERIFIED",x
+          assert x["answer"]["solution"]["x0"] == {"numerator":1,"denominator":2}
+          assert x["north_star_global_questions_closed"] == []
+          print("R0_CPU_CLI_VERIFIED",x["original_task_sha256"])
+          PY
+      - name: Preserve CPU proof and cost receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hybrid-r0-classical-first-cpu
+          if-no-files-found: warn
+          path: hybrid_r0_stdout.json
