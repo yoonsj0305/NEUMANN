@@ -104,11 +104,9 @@ def independent_check(original_args, base_defs, output, timeout_ms):
             or len(inv[2]) != len(original_args)
             or [a[1] for a in inv[2]] != [a[1] for a in original_args]):
         return {"accepted": False, "reason": "INVALID_INVARIANT_SIGNATURE", "obligations": []}
-    # The synthesized invariant's parameter names may differ from the original
-    # (the published examples match, but requiring equality avoids free variables
-    # or silent captures in this deliberately narrow v0 adapter).
-    if [a[0] for a in inv[2]] != [a[0] for a in original_args]:
-        return {"accepted": False, "reason": "VARIABLE_BINDING_UNSUPPORTED", "obligations": []}
+    # Function formal parameter names may differ by alpha-renaming.
+    # SMT-LIB define-fun binds those names locally. The independently parsed
+    # original three proof queries still determine original-task authority.
     names = [p[0] for p in original_args]
     next_names = [n + "!" for n in names]
     curr = " ".join(names)
@@ -172,7 +170,9 @@ def solve_and_verify(source: str, budget_s: float, stages: dict, events: list):
     proof = independent_check(args, defs, process.stdout, timeout_ms=2500)
     stages["independent_original_verification_ms"] = _ms(stamp)
     events.append({"kind": "independent_original_sygus_certificate",
-                   "passed": proof["accepted"], "obligations": proof["obligations"]})
+                   "passed": proof["accepted"], "obligations": proof["obligations"],
+                   "reason": proof.get("reason"),
+                   "candidate_excerpt_on_rejection": process.stdout[:600] if not proof["accepted"] else None})
     if not proof["accepted"]:
         return None, "REJECTED"
     return {"invariant": proof["candidate"],
