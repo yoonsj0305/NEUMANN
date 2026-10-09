@@ -128,6 +128,32 @@ jobs:
           assert all(x["capture"]["runner_receipt"]["cost"]["frontier_calls"]==0 for x in rows)
           assert all(x["capture"]["complete_cost_status"]=="PARTIAL_NO_ENERGY_MONEY_OR_INVESTMENT" for x in rows)
           print("HISTORICAL_V102_TWO_ORIGINALS_FOUR_ACTUAL_LOCAL_SOLVES; NO_FRONTIER_CALLS")
+          import hashlib
+          from statistics import geometric_mean
+          obs = {}
+          for row in rows:
+              obs.setdefault(row["task_id"], {})[row["role"]] = row["resources"]["latency_ms"]["value"]
+          ratios = {source: pair["strong_native"] / pair["classical_hybrid"]
+                    for source, pair in obs.items()}
+          summary = {
+              "schema": "neumann.f0-opened-local-headroom.v1",
+              "classification": "HISTORICAL_OPENED_ENGINEERING_DIAGNOSTIC_NOT_FRESH",
+              "independent_originals": len(obs),
+              "frontier_executions": 0,
+              "small_baseline_executions": 0,
+              "learned_model_executions": 0,
+              "strong_native_over_classical_hybrid_cold_wall_ratio_by_original": ratios,
+              "geomean_strong_native_over_classical_hybrid_cold_wall_ratio": geometric_mean(ratios.values()),
+              "actual_capture_sha256": hashlib.sha256(
+                  Path("/tmp/f0_opened/historical_v102_local_controls.jsonl").read_bytes()
+              ).hexdigest(),
+              "money_energy_memory_training_total": "UNKNOWN",
+              "new_scientific_admission": False,
+              "global_questions_closed": [],
+          }
+          Path("/tmp/f0_opened/historical_v102_local_summary.json").write_text(
+              json.dumps(summary, sort_keys=True, indent=2) + "\n")
+          print("OPENED_LOCAL_RATIO_ONLY", json.dumps(summary, sort_keys=True))
           PY
       - name: Preserve opened v102 original source local solver receipts
         if: always()
@@ -138,3 +164,4 @@ jobs:
           path: |
             /tmp/f0_opened/historical_v102_manifest.json
             /tmp/f0_opened/historical_v102_local_controls.jsonl
+            /tmp/f0_opened/historical_v102_local_summary.json
