@@ -1,10 +1,14 @@
 name: External SyGuS G0 Native Baseline (Opened Only)
+# Technical run 37892764426: 8/8 parser failures on legacy declare-primed-var.
+# Subsequent run uses semantics-preserving SyGuS-IF 2015 -> 2.1 syntax migration.
+# The original first technical archive and immutable preregistration are retained.
 on:
   push:
     branches:
       - research/external-sygus-native-g0-20261009
     paths:
       - .github/workflows/external_sygus_native_g0_20261009.yml
+      - experiments/external_sygus_native_g0_20261009.py
 
 permissions:
   contents: read
