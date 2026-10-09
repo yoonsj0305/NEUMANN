@@ -60,3 +60,23 @@ Remaining R0 completion requirements from [Notion Fast Finish Plan](https://app.
 5. Unseen family-disjoint new G0 headroom only after separate locked preregistration. New learned structural *generation* E3 remains blocked until positive G0.
 
 **Decision:** KEEP working hybrid first slice; HOLD training; proceed only with necessary R0 engineering regressions, then ONE prospective high-value classical headroom G0. Old global Q1–Q7 remain OPEN; Decision3 remains sealed.
+
+
+## Follow-up same-branch E1: opened BP/M106 negative-transfer regression (2026-10-09)
+
+**Actual follow-up GitHub CI:** [Actions 37934816709](https://github.com/yoonsj0305/NEUMANN/actions/runs/37934816709), both CPU and frozen/BP jobs succeeded.
+
+- The same three-domain test group again: 32 PASS, 0 FAIL. Two Q34 original historical LPs × (Native, deterministic residual 4m, frozen seed100001): **6/6 original-certified**. This is a repeat engineering check, *not* new fresh scientific evidence.
+- Additional two **historically OPENED BP/M106 independent originals** (k8/r0, k16/r0), each with Native, residual fixed4m, and frozen Q34 ranker. Original files were unpacked only after validating original archived gzip/json SHA-256 and source input identity. No generator labels were used as runtime features.
+- **Six BP route observations, six original LP primal+dual certifications passed**. Native always returned verified answers; no unverified proposal was admitted; frozen model was actually called.
+
+| Opened BP original | Native observed ms | Deterministic4m observed ms | Frozen observed ms |
+| --- | ---: | ---: | ---: |
+| M106 k8/r0 | 10.116 | 5.658 | 798.477 (cold restore) |
+| M106 k16/r0 | 11.763 | 14.393 | 15.463 (cached) |
+
+**Interpretation:** The frozen policy can retain original LP correctness through the verifier and fallback, but its marginal economy across BP transfers is NOT established. The BP k16 example costs more than Native even warm. Do not drop the older 16-original negative transfer verdict due to these **two** small ad hoc engineering fixtures; measurements have no timed repeats and changing hardware/setup matters.
+
+Raw new BP artifact \`hybrid-r0-frozen-q34-first-reuse\` GitHub artifact ID **11617374261** (historical + BP records); BP first archive SHA256 \`bf917191b200849512fe836ca6e8256357074cd9254fca519418f4541e976bdb\`. Six Q34 first run from the new workflow SHA256 \`865645c2fbfb74d1b49860c0c6afaae716ea392059826baf01284e937f395f39\`. Previous CI 37934146693 original first success and its original artifact remain intact.
+
+**Updated engineering assessment:** \`HYBRID_R0_FIRST_SLICE_ENGINEERING_PASS_WITH_NEGATIVE_TRANSFER_FIXTURE\` and **still NOT full HYBRID_R0_COMPLETE**. Next priority is explicit cost-aware decline/abstain and finished release manifest, not learning to imitate a failed BP transfer.
