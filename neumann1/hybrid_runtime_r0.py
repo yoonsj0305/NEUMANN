@@ -18,6 +18,7 @@ SCHEMA = "neumann.hybrid-r0-engineering.v0"
 DOMAINS = ("lp.standard_form", "exact.linear")
 LP_MODES = ("native", "residual_fixed4m", "external_ranking", "frozen_q34")
 MAX_INPUT_BYTES = 2_000_000
+_FROZEN_Q34_CACHE = None  # Immutable checkpoint reuse within one local process.
 
 
 def canonical(x: Any) -> str:
@@ -129,14 +130,21 @@ def lp_route(spec: dict, stages: dict, events: list, deadline: int) -> tuple[Any
         from experiments.lp_frozen_support_expansion_v101 import (
             frozen_ranking, investment_per_query,
         )
+        global _FROZEN_Q34_CACHE
         load_started = perf_counter_ns()
-        _authority, models, training = authority_and_models()
-        stage_cost("frozen_checkpoint_restore_ms", load_started, stages)
+        was_cached = _FROZEN_Q34_CACHE is not None
+        if _FROZEN_Q34_CACHE is None:
+            _authority, models, training = authority_and_models()
+            _FROZEN_Q34_CACHE = (models, training)
+        else:
+            models, training = _FROZEN_Q34_CACHE
+        stage_cost("frozen_checkpoint_restore_or_cache_lookup_ms", load_started, stages)
         seed = spec["seed"]
         proposal_started = perf_counter_ns()
         ranking, _reported_ms = frozen_ranking({"A": A, "b": b, "c": c}, models[seed])
         stage_cost("frozen_model_proposal_ms", proposal_started, stages)
         events.append({"kind": "frozen_q34_learned_proposal", "seed": seed,
+                       "checkpoint_cache_hit": was_cached,
                        "checkpoint_sha256": training[seed]["weights_sha256"],
                        "amortized_training_ms_per_10000_query": investment_per_query(training, seed),
                        "provenance": "v100/v101/v102 historical first archive"})
@@ -281,19 +289,29 @@ def run(task: Any) -> dict:
     return result
 
 
-def main() -> None:
-    # Minimal stdin/stdout JSON contract, no eval or executable user code.
-    raw = sys.stdin.buffer.read(MAX_INPUT_BYTES + 1)
+def _decode_and_run(raw: bytes) -> dict:
     if len(raw) > MAX_INPUT_BYTES:
-        result = {"schema": SCHEMA, "status": "ERROR",
-                  "reason": "INPUT_LIMIT", "answer": None}
+        return {"schema": SCHEMA, "status": "ERROR",
+                "reason": "INPUT_LIMIT", "answer": None}
+    try:
+        return run(json.loads(raw.decode("utf-8")))
+    except (ValueError, UnicodeError) as exc:
+        return {"schema": SCHEMA, "status": "ERROR",
+                "reason": f"INVALID_JSON: {type(exc).__name__}", "answer": None}
+
+
+def main() -> None:
+    # Single request by default. --jsonl keeps the frozen archive in one process.
+    # Every line is an independent task with independent ORIGINAL certificate.
+    if sys.argv[1:] == ["--jsonl"]:
+        for line in sys.stdin.buffer:
+            print(canonical(_decode_and_run(line)), flush=True)
+    elif not sys.argv[1:]:
+        raw = sys.stdin.buffer.read(MAX_INPUT_BYTES + 1)
+        print(canonical(_decode_and_run(raw)))
     else:
-        try:
-            result = run(json.loads(raw.decode("utf-8")))
-        except (ValueError, UnicodeError) as exc:
-            result = {"schema": SCHEMA, "status": "ERROR",
-                      "reason": f"INVALID_JSON: {type(exc).__name__}", "answer": None}
-    print(canonical(result))
+        print(canonical({"schema": SCHEMA, "status": "ERROR",
+                         "reason": "UNSUPPORTED_CLI_ARGUMENT", "answer": None}))
 
 
 if __name__ == "__main__":
