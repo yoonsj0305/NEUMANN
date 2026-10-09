@@ -1,0 +1,27 @@
+{
+  "schema": "neumann.external-sygus-spacer-chc-native-screen.v1",
+  "date_kst": "2026-10-09",
+  "scope": "Opened preselected native-only CHC PDR baseline, not NEUMANN training/evaluation",
+  "sygus_source_commit": "13c8deb68a873635879c9a69bc78caebd340f646",
+  "selected_sources": [
+    "comp/2019/Inv_Track/XC/100_conf1.sl",
+    "comp/2019/Inv_Track/XC/1.c.sl",
+    "comp/2019/Inv_Track/From2018/brett.sl"
+  ],
+  "selection_explanation": "The previously timed-out XC/100_conf1, previously variable-result XC/1.c, and fast solved control brett; frozen before Z3 Spacer attempts",
+  "z3_version": "4.13.4",
+  "engine": "spacer",
+  "query": "reachable bad state with direct pre/trans/post Horn encoding",
+  "direction": "UNSAT means source program safety proved within modeled transition; SAT means bad reachable; UNKNOWN or TIMEOUT not proof",
+  "deadline_ms": 15000,
+  "outer_deadline_s": 18,
+  "repeats": 3,
+  "worker": "one fresh Python process per task",
+  "threads": 1,
+  "shuffle_seed": 20261009,
+  "conversion_rule": "Original SyGuS invariant declarations and pre-f/trans-f/post-f definitions to CHC relations, no manipulation of transition or postcondition bodies",
+  "independent_check_note": "Z3 fixedpoint response is single solver authority; get_answer evidence is retained but not independently proof-replayed; this cannot count as independently certified synthesized invariant unless separate checker validates",
+  "costs": "wall time includes per-task Python process+solver, excludes dependency installation; engine query cost separately if available",
+  "no_laundering": "Do not call one native's timeout NEUMANN headroom; no replacement of previous first native or matched 48-observation result",
+  "global_questions": "Q1-Q7 remain OPEN; HOLD_LEARNING; no fresh admissions; sealed sets untouched"
+}
