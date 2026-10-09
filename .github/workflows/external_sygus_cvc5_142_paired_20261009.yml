@@ -1,0 +1,64 @@
+name: External SyGuS cvc5 1.1.2 vs 1.4.2 Paired CPU (Opened)
+on:
+  push:
+    branches:
+      - research/external-sygus-native-cvc5-142-20261009
+    paths:
+      - .github/workflows/external_sygus_cvc5_142_paired_20261009.yml
+permissions:
+  contents: read
+jobs:
+  paired-native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    env:
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned prior solver and independent proof checker
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y cvc5 unzip curl
+          python -m pip install --disable-pip-version-check z3-solver==4.13.4.0
+          /usr/bin/cvc5 --version | head -1
+      - name: Restore official fixed cvc5 1.4.2 static binary and SHA256
+        run: |
+          set -euo pipefail
+          curl -fLsS --retry 3 --retry-delay 2 \
+            -o /tmp/cvc5_142.zip \
+            https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5_142.zip' | sha256sum --check
+          mkdir -p /tmp/cvc5_142_extract
+          unzip -q /tmp/cvc5_142.zip -d /tmp/cvc5_142_extract
+          find /tmp/cvc5_142_extract -type f -name cvc5 -print
+          executable="$(find /tmp/cvc5_142_extract -type f -name cvc5 | head -1)"
+          test -n "$executable"
+          cp "$executable" /tmp/cvc5_142
+          chmod 755 /tmp/cvc5_142
+          /tmp/cvc5_142 --version | head -1
+      - name: Clone exact frozen official 2019 SyGuS inputs
+        run: |
+          set -euo pipefail
+          mkdir -p third_party/sygus_benchmarks
+          git -C third_party/sygus_benchmarks init
+          git -C third_party/sygus_benchmarks remote add origin https://github.com/SyGuS-Org/benchmarks.git
+          git -C third_party/sygus_benchmarks fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
+          git -C third_party/sygus_benchmarks checkout --detach FETCH_HEAD
+          test "$(git -C third_party/sygus_benchmarks rev-parse HEAD)" = "13c8deb68a873635879c9a69bc78caebd340f646"
+      - name: Execute preregistered three-repeat paired comparison
+        run: |
+          python -m experiments.external_sygus_cvc5_142_paired_20261009
+      - name: Upload all receipts and any failed-state evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: external-sygus-cvc5-142-paired-first
+          if-no-files-found: warn
+          path: research/development/external_sygus_cvc5_142_paired_20261009/
