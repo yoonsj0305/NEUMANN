@@ -1,10 +1,14 @@
 name: Hybrid R0 optional frozen model Edge RSS gate (opened)
+# First technical run 37903301328 failed after all four original certificates
+# passed: compared policy-scoped wrapper digests rather than the original LP SHA.
+# Original first technical artifact retained, no model/data changes.
 on:
   push:
     branches:
       - research/hybrid-r0-first-slice-20261009
     paths:
       - .github/workflows/hybrid_r0_frozen_edge_memory_gate_20261009.yml
+      - experiments/hybrid_r0_frozen_memory_gate_20261009.py
 permissions:
   contents: read
 jobs:
