@@ -19,7 +19,7 @@ Previously the repository had an excellent receipt-only Frontier Gap audit but n
 
 ## Integrity constraints
 - Only `split=opened_development`; the bridge actively rejects sealed/fresh labels.
-- Frozen role revisions: `small`, `frontier`, `neumann`, `strong_native`. Complete task × role × repeat coverage required.
+- Frozen role revisions: `small`, `frontier`, `neumann`, `strong_native`, `classical_hybrid`. Complete task × role × repeat coverage required. `classical_hybrid` must be an actual strong non-neural algorithmic baseline, not a relabeled weaker native call.
 - Each receipt must bind actual original_problem_sha256, exact role revision and stated capture source. A self-reported 'correct' flag is ignored.
 - Cost may be `measured` only if capture provides a real measurement; unavailable has `value:null`. Mixed cold/warm/provider billing cannot establish a complete end-to-end saving.
 - All output has `scientific_success:false` regardless of favorable toy math or self-reported provider identity. No claim of frontier parity or 10x is possible from this module.
