@@ -30,7 +30,7 @@ def version(binary):
     p = subprocess.run([binary, "--version"], text=True, capture_output=True, timeout=6)
     if p.returncode:
         raise RuntimeError("version command failed: " + str(binary))
-    m = re.search(r"This is cvc5 version ([0-9]+\.[0-9]+\.[0-9]+)", p.stdout)
+    m = re.search(r"(?:This is cvc5 version|^cvc5)\s+([0-9]+\.[0-9]+\.[0-9]+)", p.stdout, re.MULTILINE)
     if m is None:
         raise RuntimeError("unparseable cvc5 version: " + p.stdout[:200])
     return m.group(1)
