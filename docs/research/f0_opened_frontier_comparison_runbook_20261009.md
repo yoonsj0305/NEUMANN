@@ -30,6 +30,19 @@ Previously the repository had an excellent receipt-only Frontier Gap audit but n
 - For category-change follow-up: measure NEUMANN total resources against BOTH frontier and stronger of Native/classical-hybrid at matched verified capability, including model + tools + retry + verification + cold + investment, and attempt >=10x on a prepublished measured resource axis. This threshold is aspirational, not a post-hoc interpretation.
 - Stop the proposed learned structural family if strongest native or classical hybrid dominates even a free valid representation ceiling; do not repeat near-isomorphic tasks to manufacture an advantage.
 
+## Existing R0 local controls: executable without reimplementing solvers
+
+The additional **neumann1.f0_capture_local** adapter invokes the unchanged R0 CLI in a NEW local Python process per original and arm. Native uses policy=native; deterministic classical-hybrid uses the existing residual_fixed4m. Optional learned NEUMANN uses frozen_q34 only if --roles neumann --frozen-seed 100001 (or 100002) is explicitly requested AND the historical source/archive and frozen weights exist. It rejects model-use claims if no frozen proposal event appears. Missing archive is infrastructure, not a model capability failure.
+
+Given a pre-registered F0 opened manifest, run:
+
+    python -m neumann1.f0_capture_local --manifest opened_manifest.json --output local_controls.jsonl
+
+Default output contains only two partial arms: strong_native and classical_hybrid. It cannot invent small, frontier or learned NEUMANN observations. The F0 auditor MUST reject the missing three arms. The local latency measurement includes fresh Python process startup, solver, the built-in original certificate, and an additional independently run parent verifier. Money, energy, full research/training investment, RAM/VRAM, remote costs are UNKNOWN. Output uses exclusive creation and refuses to overwrite first captures.
+
+The focused GitHub CI reuses two already-opened engineering fixture controls AND two independent existing registered v102 m64 base source originals. The archived v102 compressed source bytes are identity-checked by the EXISTING load_registered function and original arrays are decoded using the EXISTING lp_portfolio_v084. No new task generation, gold labels, teacher traces, solvers or checkpoint fitting. On the two historical originals it retains actual four cold R0 local executions, original SHA provenance, raw receipts, simple Native/classical cold ratio and a receipt SHA; these are classified as HISTORICAL_OPENED_ENGINEERING_DIAGNOSTIC_NOT_FRESH.
+
+The original v102 first-run designation 'fresh' is a historical label, not permission to relabel those source tasks as fresh F1 now. Likewise actual local Native vs fixed4m timing, regardless of outcome, cannot establish new learned structural advantage or G0/F1 success.
 ## Immediately remaining blocker
 The authenticated frozen frontier model responses and the small baseline responses have not been executed or supplied in this session. There is no legitimate real F0 result until those calls and separately audited complete traces exist. The ChatGPT conversational model itself cannot stand in for a controlled model-provider evaluation receipt.
 
