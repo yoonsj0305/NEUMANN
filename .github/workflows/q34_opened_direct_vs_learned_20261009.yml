@@ -1,5 +1,7 @@
 name: Q34 Opened Historical Head-to-Head (Development Only)
 # No historical evidence rewrite. Opened, contaminated, retrospective comparison only.
+# First run 37885771474 failed before any measurements: Python KeyError scikit_learn.
+# Corrected-development run is distinct; original failed logs are retained.
 # Pinned to base research HEAD c182fd3, prior first archives remain immutable.
 on:
   push:
@@ -7,6 +9,7 @@ on:
       - research/q34-opened-direct-vs-learned-20261009
     paths:
       - .github/workflows/q34_opened_direct_vs_learned_20261009.yml
+      - experiments/q34_opened_direct_vs_learned_20261009.py
 
 permissions:
   contents: read
