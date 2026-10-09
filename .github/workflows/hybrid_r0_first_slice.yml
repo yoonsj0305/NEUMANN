@@ -6,7 +6,9 @@ on:
     paths:
       - .github/workflows/hybrid_r0_first_slice.yml
       - neumann1/hybrid_runtime_r0.py
+      - neumann1/hybrid_sygus_r0.py
       - tests/test_hybrid_runtime_r0.py
+      - tests/test_hybrid_sygus_r0.py
       - docs/research/hybrid_r0_first_slice.md
 permissions:
   contents: read
@@ -29,9 +31,11 @@ jobs:
         run: |
           python -m pip install --disable-pip-version-check "numpy==2.3.5" "scipy==1.17.0" "scikit-learn==1.9.1" "threadpoolctl==3.7.0" "highspy==1.15.1" "pytest>=8,<10"
           python -m pip install --no-deps -e .
+          python -m pip install --disable-pip-version-check z3-solver==4.13.4.0
+          sudo apt-get update -qq && sudo apt-get install -y cvc5
       - name: Execute engineering-original certificate gates
         run: |
-          python -m pytest -q tests/test_hybrid_runtime_r0.py
+          python -m pytest -q tests/test_hybrid_runtime_r0.py tests/test_hybrid_sygus_r0.py
       - name: CLI exact-integer smoke
         run: |
           printf '{"domain":"exact.linear","A":[[2,0],[0,3]],"b":[1,1]}' | python -m neumann1.hybrid_runtime_r0 > /tmp/r0_exact.json
