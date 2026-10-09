@@ -1,0 +1,51 @@
+name: Hybrid R0 First Slice Engineering CI
+on:
+  push:
+    branches:
+      - research/hybrid-r0-first-slice-20261009
+    paths:
+      - .github/workflows/hybrid_r0_first_slice.yml
+      - neumann1/hybrid_runtime_r0.py
+      - tests/test_hybrid_runtime_r0.py
+      - docs/research/hybrid_r0_first_slice.md
+permissions:
+  contents: read
+jobs:
+  first-slice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install native LP and test runtime
+        run: |
+          python -m pip install --disable-pip-version-check "numpy==2.3.5" "scipy==1.17.0" "scikit-learn==1.9.1" "threadpoolctl==3.7.0" "highspy==1.15.1" "pytest>=8,<10"
+          python -m pip install --no-deps -e .
+      - name: Execute engineering-original certificate gates
+        run: |
+          python -m pytest -q tests/test_hybrid_runtime_r0.py
+      - name: CLI exact-integer smoke
+        run: |
+          printf '{"domain":"exact.linear","A":[[2,0],[0,3]],"b":[1,1]}' | python -m neumann1.hybrid_runtime_r0 > /tmp/r0_exact.json
+          python -c "import json; r=json.load(open('/tmp/r0_exact.json')); assert r['status']=='VERIFIED'; assert r['answer']['solution']['x0']=={'numerator':1,'denominator':2}"
+      - name: CLI LP with independent original certificate smoke
+        run: |
+          printf '{"domain":"lp.standard_form","A":[[1,0,1,0],[0,1,0,1]],"b":[1,1],"c":[0,0,2,2]}' | python -m neumann1.hybrid_runtime_r0 > /tmp/r0_lp.json
+          python -c "import json; r=json.load(open('/tmp/r0_lp.json')); assert r['status']=='VERIFIED'; assert r['answer']['certificate']=='neumann.lp-standard-form-certificate.v1'"
+      - name: Preserve both CLI actual receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hybrid-r0-first-slice-engineering-receipts
+          if-no-files-found: warn
+          path: |
+            /tmp/r0_exact.json
+            /tmp/r0_lp.json
