@@ -1,0 +1,109 @@
+{
+  "schema": "neumann.hybrid-r0-p0-asset-manifest.v1",
+  "date_kst": "2026-10-09",
+  "source_snapshot": {
+    "parent_sha": "c182fd3f8d8b5c711415a214e899bfefe7511a0a",
+    "repo": "yoonsj0305/NEUMANN",
+    "parent_pr": 176,
+    "main_head_at_start": "55178a211962caf5ce677deb37edd30bfb4fdccc",
+    "branch": "research/hybrid-r0-first-slice-20261009"
+  },
+  "history_rights": {
+    "Q34": "OPENED_EVIDENCE_AND_FROZEN_COMPONENT",
+    "basis_pursuit": "OPENED_NEGATIVE_TRANSFER",
+    "p1_runtime0": "ENGINEERING_FAIL_FIXTURE",
+    "sygus2019": "OPENED_EXTERNAL_NATIVE_BASELINE",
+    "decision3": "SEALED_DO_NOT_ACCESS",
+    "new_test": "ENGINEERING_FIXTURE_ONLY"
+  },
+  "reusable": [
+    {
+      "module": "neumann1/lp_native_warm_start_v086.py",
+      "role": "LP native execution; original certificate",
+      "verified_by": "Hybrid R0 CLI native LP smoke",
+      "policy": "REUSE"
+    },
+    {
+      "module": "neumann1/lp_certificate_v081.py",
+      "role": "independent full original LP primal-dual certificate",
+      "verified_by": "Hybrid R0 LP smoke",
+      "policy": "REUSE"
+    },
+    {
+      "module": "neumann1/lp_q34_support_v097.py",
+      "role": "restricted solve, 4m and full native fallback",
+      "verified_by": "Hybrid R0 classical residual gate",
+      "policy": "REUSE"
+    },
+    {
+      "module": "neumann1/lp_model_admission_v087.py",
+      "role": "existing deterministic residual features, generator-aware; only opened local comparison",
+      "verified_by": "Hybrid R0 residual gate",
+      "policy": "REUSE_WITH_LIMITATIONS"
+    },
+    {
+      "module": "neumann1/structural_compression.py",
+      "role": "exact-integer linear system and original-equation verification",
+      "verified_by": "Hybrid R0 exact.linear gate",
+      "policy": "REUSE"
+    },
+    {
+      "module": "neumann1/verified_direct.py",
+      "role": "numeric hint with exact rational fallback",
+      "verified_by": "Hybrid R0 original exact.linear gate",
+      "policy": "REUSE"
+    },
+    {
+      "module": "experiments/lp_expand4_holdout_v102.py",
+      "role": "restore authority and frozen v100/v101 checkpoint lineage",
+      "verified_by": "additional actual cold-engineering smoke pending",
+      "policy": "REUSE_NO_TRAINING"
+    },
+    {
+      "module": "experiments/lp_frozen_support_expansion_v101.py",
+      "role": "actual frozen proposal and 2m to 4m expansion",
+      "verified_by": "additional actual cold-engineering smoke pending",
+      "policy": "REUSE_NO_TRAINING"
+    },
+    {
+      "module": "neumann1/general_runtime_v106.py",
+      "role": "legacy multipurpose experimental controller/verification",
+      "verified_by": "historical Decision2 FAIL and controls only",
+      "policy": "REVIEW_NOT_MERGE"
+    },
+    {
+      "module": "research/audit/RESEARCH_DECISION.md",
+      "role": "prior FAIL/PASS and limitations",
+      "verified_by": "PR176",
+      "policy": "IMMUTABLE_HISTORICAL"
+    },
+    {
+      "module": "docs/research/frozen_north_star.md",
+      "role": "user frozen binding goals Q1-Q7",
+      "verified_by": "read only",
+      "policy": "AUTHORITATIVE"
+    }
+  ],
+  "not_yet_implemented": [
+    "new sufficient-representation generator",
+    "learned generalization to unseen families",
+    "real Frontier Gap R1/R2",
+    "costed cloud offload",
+    "measured energy",
+    "full Windows or edge portability",
+    "certified SyGuS/SMT R0 adapter"
+  ],
+  "engineering_start": {
+    "r0_first_slice": "implemented",
+    "domains": [
+      "lp.standard_form",
+      "exact.linear"
+    ],
+    "cli": "python -m neumann1.hybrid_runtime_r0",
+    "initial_ci": "https://github.com/yoonsj0305/NEUMANN/actions/runs/37896972981",
+    "tests": "16 in follow-up CI",
+    "model_training": "none"
+  },
+  "claim_boundary": "First runnable engineering vertical slice, not Hybrid R0 final acceptance or NEUMANN scientific improvement. Frozen v102 and all historical results remain separate unchanged.",
+  "next_gate": "Complete actual frozen checkpoint cold-run, validate same-original baseline and security/cost controls, then publish R0 interface contract."
+}
