@@ -70,3 +70,71 @@ jobs:
           name: neumann-f0-opened-local-controls-first
           if-no-files-found: warn
           path: /tmp/f0_opened/
+      - name: Reuse original historical v102 LP sources without new generation
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from experiments.lp_expand4_holdout_register_v102 import load_registered
+          from neumann1 import lp_portfolio_v084 as storage
+          from neumann1.hybrid_runtime_r0 import digest, source_problem_payload, validate_task, canonical, MAX_INPUT_BYTES
+          from neumann1.f0_opened_bridge import SCHEMA, ROLES, validate_manifest
+
+          registry = "docs/experiments/results/v102_fresh_sources.manifest.json"
+          archive_meta, archive = load_registered(registry)  # verifies retained compressed original.
+          original_bases = sorted(
+              (s for s in archive["sources"]
+               if s["rows"] == 64 and s["id"].endswith("_base")),
+              key=lambda s: s["id"])
+          selected = original_bases[:2]  # fixed selection; NEVER rank by observed performance.
+          assert len(selected) == 2 and len({s["id"].rsplit("_",1)[0] for s in selected}) == 2
+          cases = []
+          for source in selected:
+              m, n = source["rows"], source["cols"]
+              raw = {k: storage.decode_array(source["arrays"][k], shape).tolist()
+                     for k, shape in (("A",(m,n)),("b",(m,)),("c",(n,)))}
+              task = {"domain":"lp.standard_form", **raw, "budget_s":15.0}
+              assert len(canonical({**task, "policy":"native"}).encode()) <= MAX_INPUT_BYTES
+              cases.append({
+                  "id": source["id"],
+                  "family": "historical_v102_q34_m64_constructed_lp",
+                  "source_group_id": source["id"].rsplit("_",1)[0],
+                  "source": f"{registry}#{source['id']}@{source['sha256']}",
+                  "license": "repository_internal_opened_research_only;redistribution_rights_unassessed",
+                  "task": task,
+                  "original_problem_sha256": digest(source_problem_payload(task,validate_task(task))),
+              })
+          systems={role:{"id":role+"_opened_v102_control",
+                         "revision":"R0_existing_original_engineering_only",
+                         "tools":["equally_eligible_lp_original_solver"]}
+                   for role in ROLES}
+          manifest={"schema":SCHEMA, "split":"opened_development",
+                    "repeats":1, "cases":cases, "systems":systems}
+          validate_manifest(manifest)
+          Path("/tmp/f0_opened/historical_v102_manifest.json").write_text(
+              json.dumps(manifest,sort_keys=True,indent=2),encoding="utf-8")
+          print("OPENED_V102_EXISTING_ORIGINALS", [s["id"] for s in selected])
+          PY
+          python -m neumann1.f0_capture_local \
+            --manifest /tmp/f0_opened/historical_v102_manifest.json \
+            --output /tmp/f0_opened/historical_v102_local_controls.jsonl
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          rows=[json.loads(x) for x in Path("/tmp/f0_opened/historical_v102_local_controls.jsonl").read_text().splitlines()]
+          assert len(rows)==4
+          assert len({x["task_id"] for x in rows})==2
+          assert all(x["capture"]["runner_status"]=="VERIFIED" for x in rows), rows
+          assert all(x["capture"]["runner_receipt"]["cost"]["frontier_calls"]==0 for x in rows)
+          assert all(x["capture"]["complete_cost_status"]=="PARTIAL_NO_ENERGY_MONEY_OR_INVESTMENT" for x in rows)
+          print("HISTORICAL_V102_TWO_ORIGINALS_FOUR_ACTUAL_LOCAL_SOLVES; NO_FRONTIER_CALLS")
+          PY
+      - name: Preserve opened v102 original source local solver receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-f0-opened-v102-existing-originals
+          if-no-files-found: warn
+          path: |
+            /tmp/f0_opened/historical_v102_manifest.json
+            /tmp/f0_opened/historical_v102_local_controls.jsonl
