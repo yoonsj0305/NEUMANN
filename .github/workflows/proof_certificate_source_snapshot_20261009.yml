@@ -1,0 +1,27 @@
+name: NEUMANN Proof Contract Source Snapshot
+on:
+  push:
+    branches:
+      - research/proof-certificate-economics-20261009
+    paths:
+      - .github/workflows/proof_certificate_source_snapshot_20261009.yml
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pin original representation-program source identity
+        shell: bash
+        run: |
+          sha256sum neumann1/representation_program.py > source.sha256
+          git rev-parse HEAD > research_head.txt
+          cp neumann1/representation_program.py representation_program.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: proof-contract-source-snapshot-20261009
+          path: |
+            representation_program.py
+            source.sha256
+            research_head.txt
