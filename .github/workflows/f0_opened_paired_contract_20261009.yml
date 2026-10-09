@@ -33,6 +33,6 @@ jobs:
           python - <<'PY'
           from neumann1.f0_opened_bridge import SCHEMA, ROLES
           assert SCHEMA == 'neumann.f0-opened-paired.v1'
-          assert ROLES == ('small','frontier','neumann','strong_native')
+          assert ROLES == ('small','frontier','neumann','strong_native','classical_hybrid')
           print('F0_OPENED_CONTRACT_ONLY_NO_MODEL_CALLS_NO_SCIENTIFIC_ADMISSION')
           PY
