@@ -121,3 +121,19 @@ def test_automatic_receipt_has_deterministic_identity():
     a, b = run(t), run(t)
     assert a["original_task_sha256"] == b["original_task_sha256"]
     assert a["status"] == b["status"] == "VERIFIED"
+
+
+def test_frozen_q34_seed_whitelist_before_model_import():
+    task = lp_task("frozen_q34")
+    task["seed"] = 100003
+    r = run(task)
+    assert r["status"] == "ERROR" and r["answer"] is None
+    assert r["events"] == []
+
+
+def test_frozen_q34_rejects_user_supplied_ranking():
+    task = lp_task("frozen_q34")
+    task["seed"] = 100001
+    task["ranking"] = list(range(12))
+    r = run(task)
+    assert r["status"] == "ERROR" and r["answer"] is None
