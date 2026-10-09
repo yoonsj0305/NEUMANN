@@ -216,9 +216,10 @@ def audit_opened(manifest: dict, receipts: list[dict]) -> dict:
         "neumann_to_strong_native_reported_resource_ratio": native_ratio,
         "neumann_to_classical_hybrid_reported_resource_ratio": classical_ratio,
         "neumann_to_best_classical_reported_resource_ratio": {
-            k: max(native_ratio[k], classical_ratio[k])
-            if native_ratio[k] is not None and classical_ratio[k] is not None
-            else None for k in RESOURCE_KEYS
+            k: (max(eligible) if eligible else None)
+            for k in RESOURCE_KEYS
+            for eligible in [[r for r in (native_ratio[k], classical_ratio[k])
+                              if r is not None]]
         },
         "strong_native_gap_verified_rate":
             sum(per_case[t]["strong_native"] for t in gap) / len(gap) if gap else None,
