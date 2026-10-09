@@ -122,6 +122,26 @@ def independent_check(source, solution, expected_name="inv-f"):
             "candidate_chars": len(to_smt(inv))}
 
 
+def convert_legacy_sygus(source):
+    """SyGuS-IF 2015 declare-primed-var is two declare-var in SyGuS-IF 2.1.
+    Parser-only migration. Do not alter any define-fun, invariant or constraint.
+    """
+    forms = sexp_parse(source)
+    converted = []
+    decls = 0
+    for form in forms:
+        if isinstance(form, list) and len(form) == 3 and form[0] == "declare-primed-var":
+            _, symbol, sort = form
+            converted.extend([["declare-var", symbol, sort],
+                              ["declare-var", symbol + "!", sort]])
+            decls += 1
+        else:
+            converted.append(form)
+    if decls == 0:
+        raise RuntimeError("Expected historic primed declaration absent")
+    return "\n".join(to_smt(f) for f in converted) + "\n", decls
+
+
 def run_screen():
     c = json.loads(CONTRACT.read_text())
     if c["schema"] != "neumann.external-sygus-native-screen.premeasure.v1":
@@ -137,13 +157,18 @@ def run_screen():
     for path in c["selected_sources"]:
         p = upstream / path
         data = p.read_bytes()
+        converted, declaration_count = convert_legacy_sygus(data.decode())
+        sandbox = DEST / "converted"
+        sandbox.mkdir(parents=True, exist_ok=True)
+        effective = sandbox / (str(len(records)) + ".sygus")
+        effective.write_text(converted)
         started = time.perf_counter_ns()
         output = ""
         stderr = ""
         exitcode = None
         timeout = False
         try:
-            proc = subprocess.run(["cvc5", "--lang=sygus2", str(p)],
+            proc = subprocess.run(["cvc5", "--sygus", "--lang=sygus2", str(effective)],
                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                   timeout=CVC5_SECONDS, text=True)
             output, stderr, exitcode = proc.stdout, proc.stderr, proc.returncode
@@ -157,7 +182,9 @@ def run_screen():
             {"status": "SOLVER_ERROR"})
         records.append({
             "source": path, "source_sha256": sha_bytes(data),
-            "source_bytes": len(data), "solver_wall_seconds": wall_seconds,
+            "source_bytes": len(data), "converted_source_sha256": sha_bytes(converted.encode()),
+            "legacy_primed_declarations": declaration_count,
+            "solver_wall_seconds": wall_seconds,
             "solver_exit_code": exitcode, "solver_timeout": timeout,
             "candidate_result": result, "stdout": output[:50000],
             "stderr": stderr[:5000], "stdout_sha256": sha_bytes(output.encode())})
@@ -169,7 +196,8 @@ def run_screen():
         key = row["candidate_result"]["status"]
         counts[key] = counts.get(key, 0) + 1
     summary = {
-        "status": "COMPLETED_OPENED_NATIVE_SCREEN",
+        "status": "COMPLETED_OPENED_NATIVE_SCREEN_AFTER_SYNTAX_FIX",
+        "technical_attempt_1": "37892764426: 8/8 parser failures, no solver evaluation",
         "originals": len(records), "source_commit": head,
         "contract_sha256": sha_bytes(CONTRACT.read_bytes()),
         "cvc5_version": solver_version, "z3_version": z3.get_version_string(),
