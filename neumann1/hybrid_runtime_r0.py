@@ -16,7 +16,7 @@ from typing import Any
 
 SCHEMA = "neumann.hybrid-r0-engineering.v0"
 DOMAINS = ("lp.standard_form", "exact.linear")
-LP_MODES = ("native", "residual_fixed4m", "external_ranking")
+LP_MODES = ("native", "residual_fixed4m", "external_ranking", "frozen_q34")
 MAX_INPUT_BYTES = 2_000_000
 
 
@@ -45,7 +45,7 @@ def validate_task(task: Any) -> dict:
         raise ValueError("domain must be an admitted exact-linear or LP domain")
     if kind == "lp.standard_form":
         require_fields(task, {"domain", "A", "b", "c"},
-                       {"domain", "A", "b", "c", "policy", "ranking", "budget_s"})
+                       {"domain", "A", "b", "c", "policy", "ranking", "seed", "budget_s"})
         import numpy as np
         a = np.asarray(task["A"], dtype=np.float64)
         b = np.asarray(task["b"], dtype=np.float64)
@@ -60,6 +60,11 @@ def validate_task(task: Any) -> dict:
             raise ValueError("unsupported LP policy")
         if "ranking" in task and policy != "external_ranking":
             raise ValueError("ranking only legal with external_ranking mode")
+        if policy == "frozen_q34":
+            if type(task.get("seed")) is not int or task["seed"] not in (100001, 100002):
+                raise ValueError("frozen_q34 requires one admitted original frozen seed")
+        elif "seed" in task:
+            raise ValueError("seed only legal for frozen_q34")
         if policy == "external_ranking":
             r = task.get("ranking")
             if (not isinstance(r, list) or len(r) != a.shape[1]
@@ -71,7 +76,8 @@ def validate_task(task: Any) -> dict:
                 or not 0 < budget <= 30):
             raise ValueError("finite budget_s in (0,30] required")
         return {"domain": kind, "A": a, "b": b, "c": c,
-                "policy": policy, "ranking": task.get("ranking"), "budget_s": float(budget)}
+                "policy": policy, "seed": task.get("seed"),
+                "ranking": task.get("ranking"), "budget_s": float(budget)}
     require_fields(task, {"domain", "A", "b"},
                    {"domain", "A", "b", "variables", "budget_s"})
     A, b = task["A"], task["b"]
@@ -118,6 +124,23 @@ def lp_route(spec: dict, stages: dict, events: list, deadline: int) -> tuple[Any
         ranking = list(spec["ranking"])
         events.append({"kind": "untrusted_external_ranking", "learned": False,
                        "cost_scope": "external ranking generation UNKNOWN"})
+    elif policy == "frozen_q34":
+        from experiments.lp_expand4_holdout_v102 import authority_and_models
+        from experiments.lp_frozen_support_expansion_v101 import (
+            frozen_ranking, investment_per_query,
+        )
+        load_started = perf_counter_ns()
+        _authority, models, training = authority_and_models()
+        stage_cost("frozen_checkpoint_restore_ms", load_started, stages)
+        seed = spec["seed"]
+        proposal_started = perf_counter_ns()
+        ranking, _reported_ms = frozen_ranking({"A": A, "b": b, "c": c}, models[seed])
+        stage_cost("frozen_model_proposal_ms", proposal_started, stages)
+        events.append({"kind": "frozen_q34_learned_proposal", "seed": seed,
+                       "checkpoint_sha256": training[seed]["weights_sha256"],
+                       "amortized_training_ms_per_10000_query": investment_per_query(training, seed),
+                       "provenance": "v100/v101/v102 historical first archive"})
+
     remaining = (deadline - perf_counter_ns()) / 1e9
     if remaining <= 0:
         return None, "TIMEOUT"
@@ -130,7 +153,8 @@ def lp_route(spec: dict, stages: dict, events: list, deadline: int) -> tuple[Any
         via = "native"
     else:
         outcome = adaptive_support_checked(A, b, c, ranking,
-                                           budget_s=remaining, factors=(4,))
+                                           budget_s=remaining,
+                                           factors=(2, 4) if policy == "frozen_q34" else (4,))
         candidate = outcome["witness"] if outcome["accepted"] else None
         events.append({"kind": "certified_restricted_then_native",
                        "subsets_attempted": [x["support_size"] for x in outcome["attempts"]],
@@ -237,15 +261,20 @@ def run(task: Any) -> dict:
             "observed_wall_ms": total_ms,
             "stages_ms": stages,
             "process_peak_rss_kb": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
-            "model_calls": 0, "frontier_calls": 0,
+            "model_calls": sum(e.get("kind") == "frozen_q34_learned_proposal"
+                               for e in events), "frontier_calls": 0,
             "cold_process_startup_ms": "UNKNOWN",
-            "offline_training_investment_ms": "UNKNOWN",
+            "offline_training_investment_ms": (
+                next((e["amortized_training_ms_per_10000_query"] for e in events
+                      if e.get("kind") == "frozen_q34_learned_proposal"), "UNKNOWN")
+            ),
             "external_structure_proposal_ms": "UNKNOWN" if kind == "lp.standard_form" and
                  isinstance(task, dict) and task.get("policy") == "external_ranking" else "NOT_APPLICABLE",
             "measured_energy_j": "UNKNOWN", "cloud_transport_ms": "NOT_APPLICABLE",
         },
         "research_scope": "ENGINEERING_FIXTURE_ONLY_NOT_FRESH_EVIDENCE",
-        "learned_model_inference": False,
+        "learned_model_inference": any(e.get("kind") == "frozen_q34_learned_proposal"
+                                       for e in events),
         "north_star_global_questions_closed": [],
     }
     canonical(result)
