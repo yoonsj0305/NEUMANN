@@ -1,0 +1,47 @@
+name: Hybrid R0 Archived Frozen Q34 Adapter Cold Smoke
+on:
+  push:
+    branches:
+      - research/hybrid-r0-first-slice-20261009
+    paths:
+      - .github/workflows/hybrid_r0_frozen_q34_smoke.yml
+permissions:
+  contents: read
+jobs:
+  frozen-q34-r0:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      OPENBLAS_CORETYPE: "HASWELL"
+      MKL_NUM_THREADS: "1"
+      MKL_CBWR: "COMPATIBLE"
+      NUMEXPR_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install exact historical LP and Torch CPU environment
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install numpy==2.3.5 scipy==1.17.0 scikit-learn==1.9.1 threadpoolctl==3.7.0 highspy==1.15.1
+          python -m pip install --no-deps -e .
+          python -m pip install torch==2.14.0+cpu --index-url https://download.pytorch.org/whl/cpu
+      - name: Verify frozen archived assets exist
+        run: |
+          test -s docs/experiments/results/v100_first_refit.json.gz
+          test -s docs/experiments/results/v101_first_expansion.json.gz
+          test -s docs/experiments/results/v102_fresh_sources.json.gz
+      - name: Test actual archived frozen checkpoint in the new R0 runtime
+        run: |
+          python -m experiments.hybrid_r0_frozen_opened_smoke
+      - name: Preserve first cold engineering receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hybrid-r0-frozen-q34-cold-original-receipts
+          if-no-files-found: warn
+          path: research/development/hybrid_r0_first_slice/
