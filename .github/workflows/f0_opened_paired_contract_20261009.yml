@@ -1,0 +1,38 @@
+name: F0 opened paired verifier model-free contract
+on:
+  push:
+    branches: [research/f0-opened-original-comparison-20261009]
+    paths:
+      - neumann1/f0_opened_bridge.py
+      - tests/test_f0_opened_bridge.py
+      - .github/workflows/f0_opened_paired_contract_20261009.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-proofs-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install independent verifier prerequisites
+        run: |
+          python -m pip install --disable-pip-version-check -e . pytest
+      - name: Verify mathematical original and corruption rejection
+        run: |
+          python -m pytest -q tests/test_f0_opened_bridge.py
+      - name: Guard scientific claim boundary
+        run: |
+          python - <<'PY'
+          from neumann1.f0_opened_bridge import SCHEMA, ROLES
+          assert SCHEMA == 'neumann.f0-opened-paired.v1'
+          assert ROLES == ('small','frontier','neumann','strong_native')
+          print('F0_OPENED_CONTRACT_ONLY_NO_MODEL_CALLS_NO_SCIENTIFIC_ADMISSION')
+          PY
