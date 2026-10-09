@@ -152,3 +152,44 @@ def test_persistent_jsonl_runs_two_independent_original_tasks():
     assert len(outputs) == 2
     assert all(x["status"] == "VERIFIED" for x in outputs)
     assert outputs[0]["original_task_sha256"] != outputs[1]["original_task_sha256"]
+
+
+def test_original_problem_identity_is_policy_and_budget_independent():
+    # Same mathematical LP, three execution choices. Independent original
+    # verifier/capability comparisons must pair by original_problem_sha256.
+    native = lp_task("native")
+    classical = lp_task("residual_fixed4m")
+    classical["budget_s"] = 9.0
+    external = lp_task("external_ranking", list(range(12)))
+    results = [run(t) for t in (native, classical, external)]
+    assert all(r["status"] == "VERIFIED" for r in results), results
+    assert len({r["original_problem_sha256"] for r in results}) == 1
+    assert len({r["execution_request_sha256"] for r in results}) == 3
+    assert all(r["original_task_sha256"] == r["execution_request_sha256"]
+               for r in results)
+    assert all(r["original_problem_sha256"] is not None for r in results)
+
+
+def test_original_problem_identity_changes_when_goal_changes():
+    x = lp_task()
+    y = lp_task()
+    y["c"][0] = 0.5
+    a, b = run(x), run(y)
+    assert a["status"] == b["status"] == "VERIFIED"
+    assert a["original_problem_sha256"] != b["original_problem_sha256"]
+
+
+def test_exact_linear_implicit_and_explicit_default_variables_have_same_identity():
+    a = {"domain": "exact.linear", "A": [[2]], "b": [4]}
+    b = {**a, "variables": ["x0"], "budget_s": 6.0}
+    ra, rb = run(a), run(b)
+    assert ra["status"] == rb["status"] == "VERIFIED"
+    assert ra["original_problem_sha256"] == rb["original_problem_sha256"]
+    assert ra["execution_request_sha256"] != rb["execution_request_sha256"]
+
+
+def test_invalid_source_never_receives_validated_problem_identity():
+    r = run({"domain": "exact.linear", "A": [[True]], "b": [1]})
+    assert r["status"] == "ERROR" and r["answer"] is None
+    assert r["original_problem_sha256"] is None
+    assert r["execution_request_sha256"] == r["original_task_sha256"]
