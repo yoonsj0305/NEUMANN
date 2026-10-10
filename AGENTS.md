@@ -12,6 +12,16 @@ upload to GitHub. Additional learned discovery needs demonstrated value over
 the strongest available Classical-Hybrid, not only a restricted source skeleton.
 Older GPU exploration authorities below are historical.
 
+Follow-up from 2add388: the stored poly_no_fac Native affine representation is
+ORIGINAL_CERTIFIED only after first-component decode under mathematical integer,
+fixed-parameter, finite ordered-tree semantics. Existing polynomial identities
+and source repr order/termination proof supply the certificate; no new synthesis
+or execution framework. Full compiled OCaml packaging and complete-cost ratios
+are UNKNOWN. Classical affine-summary discovery learning remains HOLD. Preserve
+the prior mps_no_sum collision and (prefix,sum) resolution. See
+docs/research/POLY_NO_FAC_ORIGINAL_CERTIFICATION_2026-10-10.md and its separate
+opened development receipt. No GPU/model/paid/sealed calls or GitHub upload.
+
 # LATEST ZEROGPU INSPECTION AUTHORITY | 2026-10-10 KST
 
 Current work is read-only free eligibility/quota inspection and static unchanged
