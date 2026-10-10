@@ -1,3 +1,19 @@
+# LATEST RETAINED EXTERNAL ADMISSION AUTHORITY | 2026-10-10 KST
+
+Continuation from 4e0e4bd: inspected retained external invariant, nonlinear
+constraint and goal-coupled synthesis evidence. Decision is
+NO_ADMISSIBLE_EVIDENCED_CANDIDATE; no new candidate or performance experiment.
+Single-solver timeouts, bounded SuFu outputs and posthoc CHC free-model check
+ratios do not establish strongest Classical-Hybrid residual headroom. CHC model
+witness/source binding and matched affine/phase/Spacer controls remain missing.
+Preserve the existing 29/174 gate (0 PASS / 8 HOLD / 21 UNKNOWN) and all first
+results. Do not turn this retrospective analysis into fresh learning evidence.
+At most recover one historical half_true_modif_m_000 model/source/checker trace
+before considering a registered experiment; absence stays UNKNOWN. Learning
+HOLD, Gemma BLOCKED_SMALL_MODEL_RUNTIME, zero paid/GPU/sealed execution and no
+GitHub upload continue. See
+docs/research/RETAINED_EXTERNAL_STRUCTURE_ADMISSION_2026-10-10.md.
+
 # LATEST NATIVE STRUCTURE GATE AUTHORITY | 2026-10-10 KST
 
 At c39bbdf continuation, all existing 29 public source entries / 174 saved
