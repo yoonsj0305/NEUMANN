@@ -1,3 +1,56 @@
+# LATEST HUMAN EXECUTION AUTHORITY | 2026-10-10 KST
+
+New paid F0 budget is **0 KRW**. No paid API, GPU instance, service, credit
+purchase or automatic paid fallback without a later explicit human approval.
+Use a free route only after its actual authentication, remaining free allowance
+and zero incremental charge are verified. A ChatGPT/Codex subscription is NOT
+external API authority. No new training or sealed Decision3 access.
+Reuse `google/gemma-4-E2B-it` at historical revision
+`3e22461f65e89153144f8adb70e3b8c2cc9845a7`; never silently use latest.
+The human has now explicitly requested uploading this completed batch to
+GitHub. Publish the pending F0 verifier/readiness work through existing Draft
+PR #179, without merging or releasing. Later development remains local until
+another upload request. No paid execution or Notion publication is authorized.
+These newer human constraints supersede conflicting publication/budget notes
+below and in the handoff. See docs/research/F0_ZERO_BUDGET_READINESS_2026-10-10.md
+and research/development/f0-zero-budget-2026-10-10/execution-policy.json.
+
+# ACTIVE HUMAN PIVOT DIRECTIVE | 2026-10-10 KST
+
+**Read docs/research/CODEX_HANDOFF_PIVOT_2026-10-10.md completely before modifying NEUMANN 1.**
+This newest human instruction supersedes conflicting historical local-only/5-hour
+timebox/GitHub-or-Notion-write restrictions and outdated old G0 next-step suggestions
+below, but does NOT supersede the frozen North Star, first evidence, source hashes,
+historical outcomes, required authorization for paid calls, or sealed Decision 3.
+
+Current development direction: HYBRID STRUCTURAL INTELLIGENCE ENGINE, classical
+solvers first; only learn goal-sufficient, source-bound new structure if it adds
+verified iso-capability economic value over the strongest classical hybrid.
+Frontier-level performance and >=10x complete cost advantage are aspirational
+and UNPROVEN. Q1-Q7 globally OPEN; Decision3 SEALED; HOLD_NEW_LEARNING.
+
+Repo working stack: #174 -> #175 -> #176 -> #177 -> #178 -> Draft #179.
+Do not assume main has this code; do not merge the stack blindly.
+NEVER rerun sealed evaluations, re-label opened v102/Q34/BP/SyGuS as fresh,
+replace original first artifacts, repeat failed P1/G0-A/G0-B experiments,
+or launch unapproved paid provider/GPU/model calls.
+
+Evidence first: official v102 cold source-aligned run 38012360839, 2 original
+LPs x Native/classical/frozen = 6 verified outcomes, learned frozen about
+3.27-3.33x SLOWER than Native on these cold cases. First raw archive
+11653732636 is immutable. Corrected counts are 6 total/2 frozen, with
+the original summary accounting defect documented, NOT overwritten.
+
+Immediate next critical path: verify latest PR head and dependencies; use
+existing hybrid_runtime_r0, f0_opened_bridge, f0_capture_local, original
+verifiers and frontier_gap_contract; identify real authenticated small-vs-
+frontier original-task gap (P1/F0), with finite spending permission and
+equal tools; only then one registered classical-headroom gate. Provider
+evidence currently missing; report BLOCKED_PROVIDER_EVIDENCE rather than
+fabricating failures or launching another benchmark. Append dated decisions
+to Notion Fast Finish if connector authorization allows it.
+
+---
 # NEUMANN 1 research instructions
 
 Latest human steering (2026-10-09 KST): finish the current audit and upload all

@@ -1,5 +1,11 @@
 # NEUMANN 1
 
+> **Active Codex development handoff (2026-10-10):**
+> [Hybrid Structural Intelligence Pivot, evidence, stop rules, next F0 frontier gates](docs/research/CODEX_HANDOFF_PIVOT_2026-10-10.md).
+> Read this and the latest top section of [AGENTS.md](AGENTS.md) BEFORE following
+> older v106/P1.1 README passages. Historical accounts below are preserved as
+> a timeline, not a restart instruction. Active PR stack #174 through #179 is
+> unmerged; global Q1-Q7 remain OPEN.
 **Frontier-level problem solving with minimum necessary computation.**
 
 The goal is not a small model, LP optimizer, solver router or tool-use wrapper.

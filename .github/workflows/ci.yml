@@ -225,3 +225,43 @@ jobs:
         run: pytest -q tests/test_lp_expand4_holdout_replay_v102.py
       - name: Matched tiny-Transformer benchmark
         run: python benchmark_v031.py
+
+  f0-original-controls:
+    # Ensure the archive smoke actually runs on the active PR. A workflow
+    # introduced only on a new branch might not have an observable Actions run.
+    if: github.event_name == 'pull_request' && github.head_ref == 'research/f0-opened-original-comparison-20261009'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      OPENBLAS_CORETYPE: "HASWELL"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install existing R0 Python and HiGHS dependencies
+        run: |
+          python -m pip install --disable-pip-version-check -e '.[native_lp]' pytest
+      - name: Existing F0 original-verifier and two-arm real-capture tests
+        run: python -m pytest -q tests/test_f0_opened_bridge.py tests/test_f0_capture_local.py
+      - name: Check retained v102 source integrity without repeating the cost study
+        run: |
+          python - <<'PY'
+          from experiments.f0_run_opened_v102_existing import registered_manifest
+          manifest = registered_manifest()
+          assert len(manifest["cases"]) == 2
+          print("RETAINED_OPENED_SOURCE_INTEGRITY_ONLY_NO_MODEL_OR_SOLVER_CALLS",
+                [case["id"] for case in manifest["cases"]])
+          PY
+      # The original frozen-checkpoint cold experiment was completed ONCE:
+      # Actions 38012360839, artifact 11653732636. Do not automatically
+      # rerun or overwrite the first experimental evidence on every PR edit.
+      # To reproduce in a separately preregistered environment, invoke:
+      # python -m experiments.f0_run_opened_v102_existing \
+      #   --outdir /tmp/a_new_run --frozen-seed 100001
