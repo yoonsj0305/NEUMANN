@@ -94,3 +94,35 @@ def test_local_input_provenance_required():
     broken["cases"][0]["original_problem_sha256"] = "0" * 64
     with pytest.raises(ValueError, match="original problem"):
         capture_opened_locals(broken)
+
+
+def test_first_frozen_counter_accounting_without_rerunning_checkpoint(monkeypatch, tmp_path):
+    """Pure metadata regression; historical frozen original bytes stay immutable."""
+    from experiments import f0_run_opened_v102_existing as study
+    manifest = opened_lp_manifest()
+    second = copy.deepcopy(manifest["cases"][0])
+    second["id"] = "opened_second"
+    second["source_group_id"] = "opened_second"
+    second["task"]["c"][2] = 5.0
+    second["original_problem_sha256"] = digest(
+        source_problem_payload(second["task"], validate_task(second["task"])))
+    manifest["cases"].append(second)
+
+    monkeypatch.setattr(study, "registered_manifest", lambda: manifest)
+
+    def synthetic_receipts(m, roles=("strong_native", "classical_hybrid"), frozen_seed=None):
+        assert frozen_seed is None or frozen_seed == 100001
+        return [
+            {"task_id": case["id"], "role": role,
+             "capture": {"runner_status": "VERIFIED"},
+             "resources": {"latency_ms": {"value": 4.0 if role == "neumann" else 2.0}}}
+            for case in m["cases"] for role in roles
+        ]
+
+    monkeypatch.setattr(study, "capture_opened_locals", synthetic_receipts)
+    report = study.run_existing(tmp_path / "mock_only", frozen_seed=100001)
+    assert report["learned_model_executions"] == 2
+    assert report["actual_existing_learned_model_executions"] == 2
+    assert report["actual_local_executions"] == 6
+    assert report["new_scientific_admission"] is False
+    assert report["classification"] == "HISTORICAL_OPENED_ENGINEERING_DIAGNOSTIC_NOT_FRESH"
