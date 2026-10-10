@@ -16,6 +16,9 @@ from pathlib import Path
 MODEL_ID = "google/gemma-4-E2B-it"
 MODEL_REVISION = "3e22461f65e89153144f8adb70e3b8c2cc9845a7"
 MIN_VRAM = 14 * 1024**3
+# Current user authority is CPU preparation + GPU checks only. This is an
+# execution gate, not a retroactive amendment of the frozen model contract.
+INFERENCE_AUTHORIZED = False
 
 
 def write_json(path, value):
@@ -37,20 +40,17 @@ def preflight(torch_module=None):
     started = time.perf_counter()
     result = {"status": "BLOCKED_ENVIRONMENT", "stage": "LIBRARIES",
               "model_calls": 0, "checkpoint_download_attempted": False,
-              "versions": {}, "bf16_native": None, "bf16_operations": None}
+              "versions": {}, "bf16_native": None, "bf16_with_emulation": None,
+              "bf16_operations": None, "inference_authorized": False,
+              "model_libraries_checked": False,
+              "emulation_authority": "NOT_EXPLICITLY_AUTHORIZED",
+              "bf16_operation_scope": "SMALL_MATMUL_AND_SDPA_NOT_MODEL_COMPATIBILITY"}
     try:
+        inspect_libraries = torch_module is None
         if torch_module is None:
-            for name in ("torch", "torchvision", "transformers", "huggingface_hub",
-                         "numpy", "scipy", "sklearn", "z3"):
-                result["dependency"] = name
-                module = importlib.import_module(name)
-                result["versions"][name] = getattr(module, "__version__", None)
-            import transformers
-            for name in ("AutoModelForMultimodalLM", "AutoProcessor", "Gemma4Processor"):
-                result["dependency"] = "transformers." + name
-                getattr(transformers, name)  # Actually import lazy classes.
-            result["versions"]["z3"] = importlib.import_module("z3").get_version_string()
+            result["dependency"] = "torch"
             torch_module = importlib.import_module("torch")
+            result["versions"]["torch"] = torch_module.__version__
         t = torch_module
         result["stage"] = "CUDA"
         if not t.cuda.is_available() or t.cuda.device_count() < 1:
@@ -64,13 +64,20 @@ def preflight(torch_module=None):
         result["stage"] = "SINGLE_DEVICE_VRAM"
         if int(p.total_memory) < MIN_VRAM:
             raise RuntimeError("SINGLE_GPU_BELOW_14_GIB")
+        t.cuda.set_device(0)  # The API tests the current device, not all GPUs.
         result["stage"] = "BF16_OPERATIONS"
         try:
             result["bf16_native"] = bool(t.cuda.is_bf16_supported(including_emulation=False))
         except TypeError:
             result["bf16_native"] = None  # Old API cannot attest native support.
-        # Do not reject emulated BF16 solely by compute capability; actually test
-        # BF16 tensors/matmul/attention. No cast, quantization or loader override.
+        try:
+            result["bf16_with_emulation"] = bool(
+                t.cuda.is_bf16_supported(including_emulation=True))
+        except TypeError:
+            result["bf16_with_emulation"] = None
+        # Operation success is separate evidence; it never authorizes emulation.
+        # No cast, quantization, checkpoint download or loader override.
+        result["bf16_operations"] = False
         with t.inference_mode():
             a = t.ones((32, 32), device="cuda:0", dtype=t.bfloat16)
             b = a @ a
@@ -84,7 +91,29 @@ def preflight(torch_module=None):
         result["bf16_operations"] = True
         del a, b, q, attention
         t.cuda.empty_cache()
-        result["status"] = "READY_FOR_ONE_FROZEN_ATTEMPT"
+        result["stage"] = "BF16_ADMISSION"
+        if result["bf16_native"] is False:
+            result.update(status="BLOCKED_BF16_CONTRACT",
+                          reason="NATIVE_BF16_UNAVAILABLE_EMULATION_NOT_AUTHORIZED")
+        elif result["bf16_native"] is None:
+            result.update(status="NOT_VERIFIED_NATIVE_BF16",
+                          reason="NATIVE_BF16_API_CANNOT_ATTEST_SUPPORT")
+        else:
+            if inspect_libraries:
+                result["stage"] = "LIBRARIES"
+                for name in ("torchvision", "transformers", "huggingface_hub",
+                             "numpy", "scipy", "sklearn", "z3"):
+                    result["dependency"] = name
+                    module = importlib.import_module(name)
+                    result["versions"][name] = getattr(module, "__version__", None)
+                transformers = importlib.import_module("transformers")
+                for name in ("AutoModelForMultimodalLM", "AutoProcessor", "Gemma4Processor"):
+                    result["dependency"] = "transformers." + name
+                    getattr(transformers, name)  # Actually import lazy classes.
+                result["versions"]["z3"] = importlib.import_module("z3").get_version_string()
+                result["model_libraries_checked"] = True
+            result["stage"] = "ENVIRONMENT_CHECK_COMPLETE"
+            result["status"] = "ENVIRONMENT_CHECK_PASS_INFERENCE_HOLD"
     except Exception as exc:
         result["error_type"] = type(exc).__name__
         # No token, account data, authentication errors or local paths exported.
@@ -124,9 +153,14 @@ def smoke(root, out):
         result["stage"] = "PREFLIGHT"
         p = preflight()
         write_json(out / "runtime-preflight.json", p)
-        if p["status"] != "READY_FOR_ONE_FROZEN_ATTEMPT":
-            result["status"] = "BLOCKED_ENVIRONMENT"
+        if p["status"] != "ENVIRONMENT_CHECK_PASS_INFERENCE_HOLD":
+            result["status"] = p["status"]
+            result["reason"] = p.get("reason")
             return result
+        if not INFERENCE_AUTHORIZED:
+            result.update(status="INFERENCE_HELD_BY_CURRENT_DIRECTIVE",
+                          stage="EXECUTION_AUTHORITY")
+            return result  # Even an admissible GPU cannot start the frozen core.
         from neumann1.f0_opened_bridge import verify_original_answer, OriginalVerificationUnavailable
         from neumann1.hybrid_runtime_r0 import digest, source_problem_payload, validate_task
         from experiments.general_multiplier_accelerator_core import FrozenAcceleratorCore

@@ -1,4 +1,4 @@
-"""Model-free denial tests for a ONE-call Kaggle adapter, not F0 outcomes."""
+"""Model-free BF16 admission and inference-HOLD tests, not F0 outcomes."""
 import hashlib
 import json
 from contextlib import nullcontext
@@ -21,8 +21,11 @@ def fake_torch(vram=MIN_VRAM, *, cuda=True, native=False, matmul_error=False):
     module = SimpleNamespace(
         cuda=SimpleNamespace(is_available=lambda: cuda, device_count=lambda: 2,
              get_device_properties=lambda _: SimpleNamespace(total_memory=vram),
-             get_device_name=lambda _: "synthetic T4", get_device_capability=lambda _: (7, 5),
-             is_bf16_supported=lambda **kwargs: native, synchronize=lambda _: None,
+             get_device_name=lambda _: "synthetic test GPU",
+             get_device_capability=lambda _: (8, 0) if native else (7, 5),
+             is_bf16_supported=MagicMock(side_effect=lambda **kw:
+                 True if kw["including_emulation"] else native),
+             set_device=MagicMock(), synchronize=lambda _: None,
              empty_cache=lambda: None),
         version=SimpleNamespace(cuda="synthetic"), bfloat16="bfloat16",
         inference_mode=nullcontext, ones=lambda *a, **k: tensor,
@@ -50,15 +53,38 @@ def test_two_gpu_aggregate_is_not_single_device_capacity(vram):
 
 
 def test_native_bf16_absence_is_distinct_from_operation_failure():
-    r = preflight(fake_torch(native=False))
-    assert r["status"] == "READY_FOR_ONE_FROZEN_ATTEMPT"
+    t = fake_torch(native=False)
+    r = preflight(t)
+    assert r["status"] == "BLOCKED_BF16_CONTRACT"
     assert r["bf16_native"] is False and r["bf16_operations"] is True
-    assert r["model_calls"] == 0
+    assert r["bf16_with_emulation"] is True
+    assert r["reason"] == "NATIVE_BF16_UNAVAILABLE_EMULATION_NOT_AUTHORIZED"
+    assert r["model_calls"] == 0 and r["inference_authorized"] is False
+    t.cuda.is_bf16_supported.assert_any_call(including_emulation=False)
+    t.cuda.is_bf16_supported.assert_any_call(including_emulation=True)
+    t.cuda.set_device.assert_called_once_with(0)
+
+
+def test_native_supported_gpu_still_holds_inference():
+    r = preflight(fake_torch(native=True))
+    assert r["status"] == "ENVIRONMENT_CHECK_PASS_INFERENCE_HOLD"
+    assert r["bf16_native"] is True and r["bf16_operations"] is True
+    assert r["inference_authorized"] is False and r["model_calls"] == 0
+
+
+def test_old_bf16_api_does_not_supply_native_evidence():
+    t = fake_torch(native=True)
+    t.cuda.is_bf16_supported = MagicMock(side_effect=TypeError("old API"))
+    r = preflight(t)
+    assert r["status"] == "NOT_VERIFIED_NATIVE_BF16"
+    assert r["bf16_native"] is None and r["bf16_operations"] is True
+    assert r["bf16_with_emulation"] is None and r["model_calls"] == 0
 
 
 def test_unsupported_bf16_kernel_stops_before_download():
     r = preflight(fake_torch(matmul_error=True))
     assert r["status"] == "BLOCKED_ENVIRONMENT" and r["stage"] == "BF16_OPERATIONS"
+    assert r["bf16_operations"] is False
     assert r["checkpoint_download_attempted"] is False
     assert "unsupported kernel" not in str(r)
 
@@ -115,6 +141,24 @@ def test_mutated_bundle_never_enters_preflight(tmp_path, monkeypatch):
     assert r["verified"] is None and r["model_calls"] == 0
     assert called == []
     assert r["error_type"] == "ValueError"
+
+
+def test_native_pass_never_constructs_core_or_downloads_weights(tmp_path, monkeypatch):
+    root = bundle(tmp_path)
+    out = tmp_path / "held"
+    out.mkdir()
+    monkeypatch.setattr("experiments.f0_kaggle_frozen_smoke.preflight", lambda: {
+        "status": "ENVIRONMENT_CHECK_PASS_INFERENCE_HOLD", "model_calls": 0})
+    # Guarded code returns before importing or initializing the frozen loader.
+    import experiments.general_multiplier_accelerator_core as core
+    constructor = MagicMock(side_effect=AssertionError("NO MODEL AUTHORITY"))
+    monkeypatch.setattr(core, "FrozenAcceleratorCore", constructor)
+    r = smoke(root, out)
+    assert r["status"] == "INFERENCE_HELD_BY_CURRENT_DIRECTIVE"
+    assert r["verified"] is None and r["model_calls"] == 0
+    constructor.assert_not_called()
+    assert not (out / "startup-started.json").exists()
+    assert not (out / "input.json").exists()
 
 
 def test_receipts_are_exclusive(tmp_path):

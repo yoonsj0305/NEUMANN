@@ -1,3 +1,15 @@
+# CURRENT HUMAN GPU ADMISSION AUTHORITY | 2026-10-10 KST
+
+Preserve the previous Kaggle notebook and local commits. Current work is CPU
+preparation and GPU environment checks ONLY: no checkpoint download/inference.
+Native BF16 must be attested with including_emulation=False separately from
+actual BF16 operations. Frozen contract does not explicitly authorize emulation;
+do not assume it is allowed. Keep FrozenAcceleratorCore/revision/hashes unchanged.
+Use the environment-only notebook described in
+docs/research/F0_NATIVE_BF16_ADMISSION_2026-10-10.md; the earlier one-call notebook
+is retained historical preparation, not current execution authority. Zero new
+paid budget; no GitHub upload until the owner explicitly asks again.
+
 # LATEST HUMAN EXECUTION AUTHORITY | 2026-10-10 KST
 
 New paid F0 budget is **0 KRW**. No paid API, GPU instance, service, credit
