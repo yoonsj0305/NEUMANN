@@ -1,3 +1,17 @@
+# LATEST ZEROGPU INSPECTION AUTHORITY | 2026-10-10 KST
+
+Current work is read-only free eligibility/quota inspection and static unchanged
+core analysis only. Free personal Space creation is NOT_ELIGIBLE under the
+documented age condition; backend grant, private occupancy and remaining quota
+are UNKNOWN. Connected OAuth lacks billing-read scope; isolated SDK 2.2.0 quota
+attempt stops with LocalTokenNotFoundError. Do not export OAuth credentials,
+create a Space, download weights, run GPUs or change the frozen core. ZeroGPU
+compatibility and cold occupancy remain NOT_VERIFIED/UNKNOWN. Stop allocation
+hunting; continue existing original-proof F0 preparation. No paid run or upload.
+See docs/research/F0_ZEROGPU_SUITABILITY_2026-10-10.md. Private account metadata
+and SDK tools stay outside Git. Older active sections are historical where they
+conflict with this latest read-only instruction.
+
 # LATEST HUMAN COLAB RESULT | 2026-10-10 KST
 
 The owner actually checked Colab: Tesla T4, single-device VRAM 15637086208

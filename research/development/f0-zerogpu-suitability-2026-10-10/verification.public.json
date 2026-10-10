@@ -1,0 +1,133 @@
+{
+  "status": "LOCAL_STATIC_AND_EXISTING_ORIGINAL_PROOF_CHECK_PASS",
+  "base_commit": "1acc1d93b447c5a9741d6b888ea14682c06a05e5",
+  "static_core_calls": {
+    "__init__": [
+      {
+        "line": 66,
+        "call": "torch.cuda.is_available"
+      },
+      {
+        "line": 66,
+        "call": "torch.cuda.device_count"
+      },
+      {
+        "line": 71,
+        "call": "torch.cuda.get_device_properties"
+      },
+      {
+        "line": 79,
+        "call": "torch.cuda.manual_seed_all"
+      },
+      {
+        "line": 82,
+        "call": "snapshot_download"
+      },
+      {
+        "line": 88,
+        "call": "_file_hash"
+      },
+      {
+        "line": 96,
+        "call": "AutoProcessor.from_pretrained"
+      },
+      {
+        "line": 107,
+        "call": "AutoModelForMultimodalLM.from_pretrained"
+      },
+      {
+        "line": 118,
+        "call": "torch.cuda.synchronize"
+      },
+      {
+        "line": 120,
+        "call": "validate_environment"
+      },
+      {
+        "line": 122,
+        "call": "torch.cuda.get_device_name"
+      }
+    ],
+    "generate": [
+      {
+        "line": 177,
+        "call": "torch.cuda.synchronize"
+      },
+      {
+        "line": 178,
+        "call": "torch.cuda.reset_peak_memory_stats"
+      },
+      {
+        "line": 181,
+        "call": "self.model.generate"
+      },
+      {
+        "line": 187,
+        "call": "torch.cuda.synchronize"
+      },
+      {
+        "line": 190,
+        "call": "generated[0, n:].detach().cpu().tolist"
+      },
+      {
+        "line": 190,
+        "call": "generated[0, n:].detach().cpu"
+      },
+      {
+        "line": 190,
+        "call": "generated[0, n:].detach"
+      },
+      {
+        "line": 203,
+        "call": "torch.cuda.max_memory_allocated"
+      },
+      {
+        "line": 204,
+        "call": "torch.cuda.max_memory_reserved"
+      }
+    ],
+    "audit": [
+      {
+        "line": 210,
+        "call": "_file_hash"
+      },
+      {
+        "line": 219,
+        "call": "self.torch.cuda.memory_allocated"
+      },
+      {
+        "line": 220,
+        "call": "self.torch.cuda.max_memory_allocated"
+      },
+      {
+        "line": 221,
+        "call": "self.torch.cuda.max_memory_reserved"
+      }
+    ]
+  },
+  "protected_files_sha256": {
+    "experiments/general_multiplier_accelerator_core.py": "8c90b2ff6671aacb168f7c6c5eb713522584a238746b7383ce1c0cc3d35ea33e",
+    "neumann1/general_multiplier_contract.py": "d2c9695a402b4b6e6a6e5761d73c484ef396571a6e5edfd8e411253acbb23863",
+    "experiments/f0_kaggle_frozen_smoke.py": "334c06b6b1b43900e62a1e10bdb9adf4bc2de3627137729b16cf9b37a6b69bcc",
+    "docs/experiments/general_multiplier_v1.preregister.json": "ce857e00f3047844b25cedfdd3b4d3535c31b12e0fb43e2524dd1daee024b1c8",
+    "docs/experiments/general_multiplier_local_execution_v1.json": "414f084c1886d1c21a29d1decd4d765029141f5c74626205e49d6624ddc6e983",
+    "neumann1/f0_opened_bridge.py": "94757ddca94270dea78b908cb8725572631c9ffbccf965e8931db4a69c66644e",
+    "neumann1/hybrid_sygus_r0.py": "71fda8ed928cee51e00f32e47d5ef73994b5031c80df129a90cc258620eed376"
+  },
+  "opened_original_source_sha256": "930b37d15f14baf615c7e7741ef5d607db717390bb8465ad8255a0d12764125c",
+  "opened_original_cpu_preparation": "PASS",
+  "native_binary_sha256": "868a0d7a5e3acba7d7e71b95c7a7f89fdc7b82d1ab8d2ea4a84ff067274bdf5a",
+  "native_solver_performance_runs": 0,
+  "tests_passed": 6,
+  "tests_failed": 0,
+  "tests_skipped": 0,
+  "tests_scope": "Existing fixtures and fault injection; not fresh sources/model/provider evidence",
+  "public_test_report_sha256": "dc4fb023f32cb6f461ccc5562948c36296296aec09412ca8d1cba98c367561d9",
+  "actual_gpu_calls": 0,
+  "model_downloads": 0,
+  "model_inferences": 0,
+  "paired_f0_originals": 0,
+  "historical_colab_result_preserved": true,
+  "remote_ci": "NOT_RUN_LOCAL_ONLY",
+  "github_upload": false
+}
