@@ -1,3 +1,17 @@
+# LATEST CORE RESEARCH AUTHORITY | 2026-10-10 KST
+
+Stop free GPU/environment hunting. Preserve bb10651 and all original evidence.
+Frozen Gemma F0 remains BLOCKED_SMALL_MODEL_RUNTIME with unchanged native BF16,
+revision, checkpoint and execution contract. Reuse stored public program and
+constraint sources, R0, cvc5/Z3/SyGuS and existing original-goal verifiers.
+First separate representation insufficiency from Native search failure using
+stored results. Any new causal development diagnostic is opened, source-bound
+and separate from original cohorts; it is not fresh F0/G0/G1 evidence. Do not
+rerun completed experiments, train, access sealed data, use paid services or
+upload to GitHub. Additional learned discovery needs demonstrated value over
+the strongest available Classical-Hybrid, not only a restricted source skeleton.
+Older GPU exploration authorities below are historical.
+
 # LATEST ZEROGPU INSPECTION AUTHORITY | 2026-10-10 KST
 
 Current work is read-only free eligibility/quota inspection and static unchanged
