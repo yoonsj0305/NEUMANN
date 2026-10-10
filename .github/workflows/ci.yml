@@ -260,3 +260,19 @@ jobs:
           name: neumann-f0-v102-existing-originals-ci-first
           if-no-files-found: warn
           path: /tmp/f0_v102_opened_first/
+      - name: Restore existing original frozen v102 checkpoint on CPU (no training)
+        run: |
+          python -m pip install --disable-pip-version-check \
+            torch==2.14.0+cpu --index-url https://download.pytorch.org/whl/cpu
+      - name: Existing frozen structural head versus strong local controls, cold
+        run: |
+          python -m experiments.f0_run_opened_v102_existing \
+            --outdir /tmp/f0_v102_opened_frozen_first \
+            --frozen-seed 100001
+      - name: Preserve same-job first frozen model and classical receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-f0-opened-v102-frozen-cold-first
+          if-no-files-found: warn
+          path: /tmp/f0_v102_opened_frozen_first/
