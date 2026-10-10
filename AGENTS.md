@@ -1,3 +1,18 @@
+# LATEST HUMAN COLAB RESULT | 2026-10-10 KST
+
+The owner actually checked Colab: Tesla T4, single-device VRAM 15637086208
+bytes, native BF16 false, BF16 operations true, ready false. Preserve this as
+HUMAN_REPORTED hardware evidence, not an agent-captured raw runtime receipt.
+Record COLAB_T4_NATIVE_BF16_UNSUPPORTED. Gemma calls and paired F0 originals
+remain zero; BLOCKED_SMALL_MODEL_RUNTIME continues. Do not retry Colab/T4
+allocation, change dtype, quantize, or run an emulation experiment automatically.
+Keep the exact frozen core/revision/checkpoint identities and existing notebooks.
+Next admission question is actual free ZeroGPU hosting entitlement and remaining
+free allowance; authenticated read access is not GPU entitlement. No paid
+fallback, Space publication or GitHub upload. See
+docs/research/F0_COLAB_T4_RESULT_2026-10-10.md for the append-only result.
+Older sections below are historical instructions where they conflict here.
+
 # LATEST COLAB CONTINUATION AUTHORITY | 2026-10-10 KST
 
 Check actual zero-charge Colab GPU first; do not assume its type or allowance.
