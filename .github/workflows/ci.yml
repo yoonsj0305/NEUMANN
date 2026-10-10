@@ -250,16 +250,15 @@ jobs:
           python -m pip install --disable-pip-version-check -e '.[native_lp]' pytest
       - name: Existing F0 original-verifier and two-arm real-capture tests
         run: python -m pytest -q tests/test_f0_opened_bridge.py tests/test_f0_capture_local.py
-      - name: Actual v102 registered-original local routes (NO new training)
+      - name: Check retained v102 source integrity without repeating the cost study
         run: |
-          python -m experiments.f0_run_opened_v102_existing --outdir /tmp/f0_v102_opened_first
-      - name: Archive both original receipts and first controls even on failure
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: neumann-f0-v102-existing-originals-ci-first
-          if-no-files-found: warn
-          path: /tmp/f0_v102_opened_first/
+          python - <<'PY'
+          from experiments.f0_run_opened_v102_existing import registered_manifest
+          manifest = registered_manifest()
+          assert len(manifest["cases"]) == 2
+          print("RETAINED_OPENED_SOURCE_INTEGRITY_ONLY_NO_MODEL_OR_SOLVER_CALLS",
+                [case["id"] for case in manifest["cases"]])
+          PY
       # The original frozen-checkpoint cold experiment was completed ONCE:
       # Actions 38012360839, artifact 11653732636. Do not automatically
       # rerun or overwrite the first experimental evidence on every PR edit.

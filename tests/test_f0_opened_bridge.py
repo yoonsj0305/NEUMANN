@@ -1,10 +1,32 @@
 """Model-free F0 opened intake checks: never scientific frontier observations."""
 import copy
 import unittest
+from unittest.mock import patch
 
 from neumann1.f0_opened_bridge import (SCHEMA, ROLES, audit_opened,
+                                       OriginalVerificationUnavailable,
                                        validate_manifest, verify_original_answer)
 from neumann1.hybrid_runtime_r0 import digest, source_problem_payload, validate_task
+
+# Same invariant engineering fixture used by test_hybrid_sygus_r0, not an
+# external source or model result. Faults below are injected verifier outcomes.
+SYGUS_SOURCE = """(set-logic LIA)
+(synth-inv inv-f ((x Int)))
+(declare-primed-var x Int)
+(define-fun pre-f ((x Int)) Bool (= x 0))
+(define-fun trans-f ((x Int) (x! Int)) Bool (= x! (+ x 1)))
+(define-fun post-f ((x Int)) Bool (>= x 0))
+(inv-constraint inv-f pre-f trans-f post-f)
+(check-synth)
+"""
+INVARIANT = "(define-fun inv-f ((x Int)) Bool (>= x 0))"
+
+
+def proof_fixture(statuses, *, accepted=False):
+    return {"accepted": accepted, "obligations": [
+        {"obligation": name, "smt_result": status, "proved": status == "unsat"}
+        for name, status in zip(("init", "inductive", "safe"), statuses)
+    ]}
 
 
 def fixture():
@@ -51,6 +73,101 @@ def fixture():
 
 
 class F0OpenedTests(unittest.TestCase):
+    def test_smt_unknown_and_checker_error_are_not_wrong_model_answers(self):
+        task = {"domain": "sygus.invariant", "source": SYGUS_SOURCE}
+        for statuses in (("unknown", "unsat", "unsat"),
+                         ("unsat", "unknown", "unsat"),
+                         ("unsat", "unsat", "unknown"),
+                         ("unknown", "unknown", "unknown"),
+                         ("unsat", "parser_error:Z3Exception", "unsat")):
+            with self.subTest(statuses=statuses), patch(
+                    "neumann1.hybrid_sygus_r0.independent_check",
+                    return_value=proof_fixture(statuses)):
+                with self.assertRaisesRegex(RuntimeError, "not verified"):
+                    verify_original_answer(task, {"invariant": INVARIANT})
+
+    def test_unproved_or_incomplete_accepted_flag_has_no_authority(self):
+        task = {"domain": "sygus.invariant", "source": SYGUS_SOURCE}
+        for statuses in (("unsat", "unknown", "unsat"), ("unsat", "unsat")):
+            with self.subTest(statuses=statuses), patch(
+                    "neumann1.hybrid_sygus_r0.independent_check",
+                    return_value=proof_fixture(statuses, accepted=True)):
+                with self.assertRaisesRegex(RuntimeError, "not verified"):
+                    verify_original_answer(task, {"invariant": INVARIANT})
+
+    def test_sat_counterexample_remains_a_real_rejection(self):
+        task = {"domain": "sygus.invariant", "source": SYGUS_SOURCE}
+        with patch("neumann1.hybrid_sygus_r0.independent_check",
+                   return_value=proof_fixture(("unsat", "sat", "unknown"))):
+            self.assertFalse(verify_original_answer(task, {"invariant": INVARIANT}))
+
+    def test_smt_unknown_cannot_manufacture_frontier_gap_and_is_retained(self):
+        m, receipts = fixture()
+        case = m["cases"][0]
+        case["task"] = {"domain": "sygus.invariant", "source": SYGUS_SOURCE}
+        case["original_problem_sha256"] = digest(source_problem_payload(
+            case["task"], validate_task(case["task"])))
+        for row in receipts:
+            if row["task_id"] == case["id"]:
+                row["original_problem_sha256"] = case["original_problem_sha256"]
+                row["answer"] = {"invariant": INVARIANT}
+        unknown = proof_fixture(("unsat", "unknown", "unsat"))
+        valid = proof_fixture(("unsat", "unsat", "unsat"), accepted=True)
+        with patch("neumann1.hybrid_sygus_r0.independent_check",
+                   side_effect=[unknown, valid, valid, valid, valid]):
+            out = audit_opened(m, receipts)
+        self.assertEqual(out["gap_case_ids"], ["opened_1"])
+        self.assertIsNone(out["per_case_verified_rate"]["opened_0"]["small"])
+        self.assertEqual(out["incomplete_case_ids"], ["opened_0"])
+        self.assertEqual(out["decision"], "INCOMPLETE_ORIGINAL_VERIFICATION")
+        self.assertEqual(out["observations"], 10)
+        self.assertEqual(len(out["verification_errors"]), 1)
+        failure = out["verification_errors"][0]
+        self.assertEqual((failure["task_id"], failure["role"]), ("opened_0", "small"))
+        self.assertEqual(failure["proof"]["obligations"][1]["smt_result"], "unknown")
+        self.assertFalse(out["scientific_success"])
+        self.assertEqual(out["global_questions_closed"], [])
+        for name, values in out.items():
+            if name.endswith("reported_resource_ratio"):
+                self.assertEqual(values, {"latency_ms": None, "cost_usd": None})
+
+    def test_unavailable_verification_in_any_arm_or_repeat_is_retained(self):
+        for role in ROLES:
+            for repeat in (0, 1):
+                with self.subTest(role=role, repeat=repeat):
+                    m, first = fixture()
+                    m["repeats"] = 2
+                    receipts = [dict(copy.deepcopy(row), repeat=i)
+                                for row in first for i in (0, 1)]
+                    target = next(i for i, row in enumerate(receipts)
+                                  if row["task_id"] == "opened_0"
+                                  and row["role"] == role and row["repeat"] == repeat)
+                    calls = iter(range(len(receipts)))
+
+                    def checker(task, answer):
+                        if next(calls) == target:
+                            raise OriginalVerificationUnavailable(
+                                "injected verifier unavailability",
+                                {"reason": "DEPENDENCY_UNAVAILABLE"})
+                        return verify_original_answer(task, answer)
+
+                    with patch("neumann1.f0_opened_bridge.verify_original_answer",
+                               side_effect=checker):
+                        out = audit_opened(m, receipts)
+                    self.assertEqual(out["observations"], 20)
+                    self.assertEqual(out["incomplete_case_ids"], ["opened_0"])
+                    self.assertIsNone(out["per_case_verified_rate"]["opened_0"][role])
+                    self.assertEqual(out["decision"], "INCOMPLETE_ORIGINAL_VERIFICATION")
+                    failure = out["verification_errors"][0]
+                    self.assertEqual((failure["role"], failure["repeat"]), (role, repeat))
+                    self.assertEqual(failure["resources"], receipts[target]["resources"])
+                    self.assertIn("opened_1", out["gap_case_ids"])
+                    for name, values in out.items():
+                        if name.endswith("reported_resource_ratio"):
+                            self.assertEqual(values, {"latency_ms": None, "cost_usd": None})
+                    if role in ("strong_native", "classical_hybrid"):
+                        self.assertIsNone(out[role + "_gap_verified_rate"])
+
     def test_real_exact_original_equations_not_declared_acceptance(self):
         m, r = fixture()
         result = audit_opened(m, r)

@@ -1,3 +1,20 @@
+# LATEST HUMAN EXECUTION AUTHORITY | 2026-10-10 KST
+
+New paid F0 budget is **0 KRW**. No paid API, GPU instance, service, credit
+purchase or automatic paid fallback without a later explicit human approval.
+Use a free route only after its actual authentication, remaining free allowance
+and zero incremental charge are verified. A ChatGPT/Codex subscription is NOT
+external API authority. No new training or sealed Decision3 access.
+Reuse `google/gemma-4-E2B-it` at historical revision
+`3e22461f65e89153144f8adb70e3b8c2cc9845a7`; never silently use latest.
+The human has now explicitly requested uploading this completed batch to
+GitHub. Publish the pending F0 verifier/readiness work through existing Draft
+PR #179, without merging or releasing. Later development remains local until
+another upload request. No paid execution or Notion publication is authorized.
+These newer human constraints supersede conflicting publication/budget notes
+below and in the handoff. See docs/research/F0_ZERO_BUDGET_READINESS_2026-10-10.md
+and research/development/f0-zero-budget-2026-10-10/execution-policy.json.
+
 # ACTIVE HUMAN PIVOT DIRECTIVE | 2026-10-10 KST
 
 **Read docs/research/CODEX_HANDOFF_PIVOT_2026-10-10.md completely before modifying NEUMANN 1.**

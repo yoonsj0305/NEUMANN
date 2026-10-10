@@ -21,12 +21,24 @@ ROLES = ("small", "frontier", "neumann", "strong_native", "classical_hybrid")
 RESOURCE_KEYS = ("latency_ms", "cost_usd")
 
 
+class OriginalVerificationUnavailable(RuntimeError):
+    """The original checker did not establish validity or a counterexample."""
+
+    def __init__(self, message: str, proof: dict):
+        super().__init__(message)
+        self.proof = proof
+
+
 def _nonnegative(value: object) -> bool:
     return type(value) in (int, float) and math.isfinite(value) and value >= 0
 
 
+def _verified_rate(values: list) -> float | None:
+    return None if not values or None in values else sum(values) / len(values)
+
+
 def verify_original_answer(task: dict, answer: object) -> bool:
-    """Source-level verification; never trust submitted 'correct' claims."""
+    """Return a checked Boolean or raise on unavailable original verification."""
     try:
         spec = validate_task(task)
         if not isinstance(answer, dict):
@@ -63,10 +75,30 @@ def verify_original_answer(task: dict, answer: object) -> bool:
                 return False
             _, arguments, original_defs = prepare(spec["source"])
             proof = independent_check(arguments, original_defs, invariant, timeout_ms=2500)
-            return proof["accepted"] is True
+            obligations = proof.get("obligations", [])
+            if (isinstance(obligations, list) and len(obligations) == 3
+                    and all(isinstance(x, dict) for x in obligations)
+                    and [x.get("obligation") for x in obligations]
+                    == ["init", "inductive", "safe"]):
+                statuses = [x.get("smt_result") for x in obligations]
+                if "sat" in statuses:
+                    return False  # A checked original counterexample is decisive.
+                if statuses == ["unsat"] * 3 and proof.get("accepted") is True:
+                    return True
+            if (proof.get("accepted") is False and not obligations
+                    and proof.get("reason") in
+                    ("NO_SINGLE_INVARIANT", "INVALID_INVARIANT_SIGNATURE")):
+                return False  # Deterministic output-contract rejection.
+            raise OriginalVerificationUnavailable(
+                "original SyGuS answer not verified; no complete proof or counterexample",
+                proof,
+            )
     except ImportError as exc:
         # Infrastructure failure cannot be silently counted as a small-model FAIL.
-        raise RuntimeError("independent verifier dependency unavailable") from exc
+        raise OriginalVerificationUnavailable(
+            "independent verifier dependency unavailable; answer not verified",
+            {"reason": "DEPENDENCY_UNAVAILABLE", "error_type": type(exc).__name__},
+        ) from exc
     except (ValueError, TypeError, KeyError, OverflowError):
         return False
     return False
@@ -151,20 +183,28 @@ def audit_opened(manifest: dict, receipts: list[dict]) -> dict:
                 raise ValueError("missing resource is not zero")
             if item["status"] == "measured" and not _nonnegative(item.get("value")):
                 raise ValueError("invalid measured resource")
-        accepted = verify_original_answer(task["task"], receipt.get("answer"))
+        verification_error, proof = None, None
+        try:
+            accepted = verify_original_answer(task["task"], receipt.get("answer"))
+        except OriginalVerificationUnavailable as exc:
+            accepted = None  # UNKNOWN must never become a small-model FAIL.
+            verification_error, proof = str(exc), exc.proof
         observations.append({"task_id": k[0], "role": k[1], "repeat": k[2],
                              "source_group_id": task["source_group_id"],
                              "family": task["family"], "verified": accepted,
+                             "verification_error": verification_error, "proof": proof,
                              "resources": costs})
     if seen != expected:
         raise ValueError("missing comparison arm; absence is not a model failure")
     per_case = {}
     for task_id in tasks:
-        per_case[task_id] = {
-            r: sum(x["verified"] for x in observations
-                   if x["task_id"] == task_id and x["role"] == r)
-            / manifest["repeats"] for r in ROLES
-        }
+        per_case[task_id] = {}
+        for role in ROLES:
+            values = [x["verified"] for x in observations
+                      if x["task_id"] == task_id and x["role"] == role]
+            per_case[task_id][role] = _verified_rate(values)
+    verification_errors = [x for x in observations if x["verification_error"]]
+    incomplete = [t for t in tasks if any(v is None for v in per_case[t].values())]
     # Gap membership depends ONLY on the small and frontier results.
     # For this first strict pilot, require all repetitions to agree.
     gap = [task_id for task_id, q in per_case.items()
@@ -174,7 +214,8 @@ def audit_opened(manifest: dict, receipts: list[dict]) -> dict:
     recovered_groups = {g for g in independent_gap_groups
                         if all(t in recovered for t in gap
                                if tasks[t]["source_group_id"] == g)}
-    frontier_matching = bool(gap and len(recovered) == len(gap))
+    frontier_matching = bool(gap and len(recovered) == len(gap)
+                             and not verification_errors)
     # Do not claim an economic frontier gain while the best native already wins.
     # Compare matched-capability totals against BOTH frontier and specialist.
     ratio, native_ratio, classical_ratio = {}, {}, {}
@@ -200,10 +241,13 @@ def audit_opened(manifest: dict, receipts: list[dict]) -> dict:
         "schema": SCHEMA,
         "scope": "OPENED_DEVELOPMENT_DIAGNOSTIC_NOT_FRESH_OR_SEALED",
         "capture_attestation": "UNVERIFIED_EXCEPT_FOR_ORIGINAL_MATH",
-        "decision": ("NO_OBSERVED_GAP" if not gap else
+        "decision": ("INCOMPLETE_ORIGINAL_VERIFICATION" if incomplete else
+                     "NO_OBSERVED_GAP" if not gap else
                      "BOUNDED_PILOT_CAPABILITY_MATCH" if frontier_matching else
                      "BOUNDED_PILOT_CAPABILITY_UNREACHED"),
         "cases": len(tasks), "observations": len(observations),
+        "incomplete_case_ids": incomplete,
+        "verification_errors": verification_errors,
         "gap_case_ids": gap,
         "gap_source_groups": len(independent_gap_groups),
         "recovered_source_groups": len(recovered_groups),
@@ -222,9 +266,9 @@ def audit_opened(manifest: dict, receipts: list[dict]) -> dict:
                               if r is not None]]
         },
         "strong_native_gap_verified_rate":
-            sum(per_case[t]["strong_native"] for t in gap) / len(gap) if gap else None,
+            _verified_rate([per_case[t]["strong_native"] for t in gap]),
         "classical_hybrid_gap_verified_rate":
-            sum(per_case[t]["classical_hybrid"] for t in gap) / len(gap) if gap else None,
+            _verified_rate([per_case[t]["classical_hybrid"] for t in gap]),
         "scientific_success": False,
         "global_questions_closed": [],
         "limitations": [

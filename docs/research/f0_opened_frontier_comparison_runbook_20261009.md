@@ -52,3 +52,9 @@ The authenticated frozen frontier model responses and the small baseline respons
 - The existing v105 `frontier_gap_contract.audit` remains authoritative for a future **genuinely preregistered fresh F1**, not this opened helper.
 
 Status: F0_INGESTION_BRIDGE_IMPLEMENTED / REAL_PROVIDER_RESPONSES_PENDING / R0_STACK_UNMERGED / Q1_Q7_OPEN / HOLD_NEW_LEARNING.
+
+## Local verification correction (2026-10-10)
+
+An original SyGuS checker timeout, UNKNOWN or parser failure is unavailable verification, not proof that the model answered incorrectly. The intake now retains the checker proof and resource receipt, emits `verified:null`, and propagates any unavailable repetition to `per_case_verified_rate:null`. A checked original counterexample remains a rejection. Only the complete original init/consecution/safety proof authorizes acceptance.
+
+Any incomplete arm makes the cohort decision `INCOMPLETE_ORIGINAL_VERIFICATION`; it disables all reported resource ratios. Known paired gaps remain explicitly partial diagnostics. See [the local engineering result](F0_VERIFIER_UNKNOWN_FIX_2026-10-10.md). Provider responses, model revisions and authorized call budget are still required before actual F0 capture; these regression tests supply none of them.
