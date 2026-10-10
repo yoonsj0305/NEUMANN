@@ -58,7 +58,7 @@ def registered_manifest() -> dict:
     return mfest
 
 
-def run_existing(outdir: Path) -> dict:
+def run_existing(outdir: Path, *, frozen_seed: int | None = None) -> dict:
     if outdir.exists() and any(outdir.iterdir()):
         raise FileExistsError("refuse to replace an existing or first-run capture")
     outdir.mkdir(parents=True, exist_ok=True)
@@ -91,6 +91,46 @@ def run_existing(outdir: Path) -> dict:
         "new_scientific_admission": False,
         "global_questions_closed": [],
     }
+    if frozen_seed is not None:
+        if frozen_seed not in (100001, 100002):
+            raise ValueError("only original v102 checkpoint seeds permitted")
+        # Same two previously opened original LP sources, same job/hardware.
+        # Every child is newly spawned; checkpoint restoration is paid each time.
+        learned_rows = capture_opened_locals(
+            manifest, roles=("neumann",), frozen_seed=frozen_seed)
+        (outdir / "frozen_existing_cold.jsonl").write_text(
+            "".join(canonical(row) + "\n" for row in learned_rows))
+        frozen = {r["task_id"]: r for r in learned_rows}
+        paired = {}
+        for original in by_source:
+            obs = frozen[original]
+            if obs["capture"]["runner_status"] != "VERIFIED":
+                paired[original] = {
+                    "frozen_status": obs["capture"]["runner_status"],
+                    "frozen_over_native_cold_wall_ratio": None,
+                    "frozen_over_classical_cold_wall_ratio": None,
+                }
+            else:
+                ms = obs["resources"]["latency_ms"]["value"]
+                paired[original] = {
+                    "frozen_status": "VERIFIED",
+                    "frozen_cold_wall_ms": ms,
+                    "frozen_over_native_cold_wall_ratio":
+                        ms / by_source[original]["strong_native"],
+                    "frozen_over_classical_cold_wall_ratio":
+                        ms / by_source[original]["classical_hybrid"],
+                }
+        summary["historical_frozen_q34_checkpoint_seed"] = frozen_seed
+        summary["actual_existing_learned_model_executions"] = len(learned_rows)
+        summary["frozen_cold_paired_comparison_by_original"] = paired
+        summary["frozen_result_scope"] = (
+            "PAID_CHECKPOINT_RESTORE_EACH_ORIGINAL_OPENED_ENGINEERING_ONLY"
+        )
+        summary["all_frozen_originals_verified"] = all(
+            r["frozen_status"] == "VERIFIED" for r in paired.values()
+        )
+        summary["capture_sha256_frozen"] = hashlib.sha256(
+            (outdir / "frozen_existing_cold.jsonl").read_bytes()).hexdigest()
     (outdir / "summary.json").write_text(json.dumps(summary, sort_keys=True, indent=2) + "\n")
     return summary
 
@@ -98,8 +138,9 @@ def run_existing(outdir: Path) -> dict:
 def main() -> None:
     p = argparse.ArgumentParser(description="Previously registered, already OPENED v102 local controls")
     p.add_argument("--outdir", type=Path, required=True)
+    p.add_argument("--frozen-seed", type=int)
     args = p.parse_args()
-    result = run_existing(args.outdir)
+    result = run_existing(args.outdir, frozen_seed=args.frozen_seed)
     print("F0_ACTUAL_OPENED_LOCAL_CONTROLS_NO_FRONTIER", json.dumps(result, sort_keys=True))
 
 
