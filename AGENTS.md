@@ -1,3 +1,20 @@
+# LATEST FINAL RECOVERY AND CPU R0 AUTHORITY | 2026-10-10 KST
+
+Continuation from 8067d10: the single limited half_true_modif_m_000 recovery
+attempt is CLOSED. Verdict PARTIAL: original/hash and published run metadata
+exist, actual historical model/proof is unrecoverable in inspected local assets.
+Original certification, execution binding, license and economics remain UNKNOWN.
+Do not retry the recovery, run a new solver to fill missing evidence, substitute
+a manual relation, explore more candidate families or admit learning. Candidate
+search is CLOSED; current work is CPU R0 product completion ONLY, reusing the
+existing CLI/JSONL, verifiers, native tools and wheel gate. Inspect/close existing
+CPU dependency/native cvc5 executable, source-bound wheel manifest and controlled
+integration requirements; do not add research hypotheses. Historical engineering
+PASS is not current full release or Frontier Gap evidence. Preserve prior 29/174
+gate, first results, learning HOLD, frozen Gemma BLOCKED_SMALL_MODEL_RUNTIME,
+zero paid/GPU/sealed execution and no GitHub upload. See
+docs/research/CHC_HALF_FINAL_RECOVERY_AND_R0_CLOSURE_2026-10-10.md.
+
 # LATEST RETAINED EXTERNAL ADMISSION AUTHORITY | 2026-10-10 KST
 
 Continuation from 4e0e4bd: inspected retained external invariant, nonlinear
