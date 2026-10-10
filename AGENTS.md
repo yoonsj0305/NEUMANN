@@ -1,3 +1,15 @@
+# LATEST COLAB CONTINUATION AUTHORITY | 2026-10-10 KST
+
+Check actual zero-charge Colab GPU first; do not assume its type or allowance.
+Only after native BF16, one GPU >=14 GiB and runtime libraries are verified may
+the owner's conditional one-opened-source frozen Gemma attempt proceed. Reuse
+the exact core/revision/hash/BF16 contract. The prior environment-only hold is
+historical authority; current inference gate stays closed until facts are known.
+Colab browser access timed out; do not spend this continuation on more browser
+retries or build another executor. Preserve 8ffcd32 and prepared notebooks.
+Use the minimal Colab hardware-check artifact; no package/weight/model work in
+that cell. Continue existing F0 preparation; new paid budget zero, no GitHub push.
+
 # CURRENT HUMAN GPU ADMISSION AUTHORITY | 2026-10-10 KST
 
 Preserve the previous Kaggle notebook and local commits. Current work is CPU
