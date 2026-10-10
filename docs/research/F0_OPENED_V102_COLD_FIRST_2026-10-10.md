@@ -35,6 +35,15 @@ The **raw frozen-first artifact summary has contradictory execution counts**: th
 
 **Correct interpretation:** four local Native/classical routes plus two genuinely executed frozen learned routes = **six original-verifier-complete paths, including two learned model inference executions**. The stored original ZIP and original receipts are preserved unchanged. In later code commit `2f0e3955b0ed3bc8b24ad4c6fc118bc1fedf69fc`, the summary counters are fixed and a model-free regression test asserts six total/two learned. CI no longer automatically replays a costly frozen checkpoint run on each commit; one-time first archive #11653732636 remains authoritative.
 
+## Prior G0 first experiments already constrain the next direction
+
+The Oct 8 master decision ledger, already preserved in PR #176 ancestry, reports more than just the LP result:
+
+- **G0-B certified Boolean counting:** first 17 OPENED public CNF originals, 12 completed and 5 certificate-generation timeouts, hence **INCOMPLETE**, not PASS. In the completed subset, the reported Native/free ratio geomean was **0.4393×**, best **4.0204×**, with **zero 10× positives out of 12**. That is not a measured general negative for every Boolean circuit but does block naive rerun/training of that same cold pipeline.
+- **G0-A probabilistic goal structure:** 125 first native jobs, 361 exact PASS / 14 NOT_VERIFIED, 9 process errors / 15 timeouts, all-family conclusion **INCOMPLETE**. Registered 2-bin optimistic mean BRP 4.364× and Crowds 9.67849×, neither reaches 10× family gate; higher positive singleton free-floor values are not viable learned or strong-analytic-matched conclusions.
+- **Previous Guarded Perspective:** same optimized strong Native operational cold1 0.96735×, cold64 1.02222×, warm 0.98839× free representation diagnostic, no meaningful 10× headroom.
+
+**Updated decision:** Do NOT route from failed Q34 cold to repeating the same incomplete G0-A or G0-B first setup. The defensible next move is first identifying a genuinely open natural-language-to-goal-sufficient-representation capability gap with real small/frontier/system inputs and a stronger classical comparator, then only conducting one narrow pre-registered economic diagnostic if strong-native paid-proof headroom exists. Until actual hosted reference responses and auditable spending authority exist, provider/model outcomes remain UNKNOWN. This requirement cannot be replaced by model-free contracts or additional engineering wrappers.
 ## Research implication and STOP/PIVOT
 
 - R0 classical wheel remains a sound engineering asset in previously certified scopes.
