@@ -1,3 +1,16 @@
+# LATEST NATIVE STRUCTURE GATE AUTHORITY | 2026-10-10 KST
+
+At c39bbdf continuation, all existing 29 public source entries / 174 saved
+Native observations were screened: NATIVE_UNRESOLVED_STRUCTURE_GATE yields
+0 PASS, 8 HOLD, 21 UNKNOWN. Stop active learning-candidate search in this
+cohort; retain all proofs, code and first runs. Missing certification/cost is
+UNKNOWN, not evidence of opportunity. po_sorted --no-lifting failure is not
+strongest Classical-Hybrid failure with equal state-extension rights. Next
+inspect distinct real external source evidence only; no new cohort/model is
+admitted yet. Preserve mps_no_sum and poly_no_fac learning HOLD, frozen Gemma
+BLOCKED_SMALL_MODEL_RUNTIME, zero paid execution, sealed protection and no
+GitHub upload. See docs/research/NATIVE_UNRESOLVED_STRUCTURE_GATE_2026-10-10.md.
+
 # LATEST CORE RESEARCH AUTHORITY | 2026-10-10 KST
 
 Stop free GPU/environment hunting. Preserve bb10651 and all original evidence.
