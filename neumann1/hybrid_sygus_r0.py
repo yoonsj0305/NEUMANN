@@ -23,12 +23,16 @@ def _ms(stamp):
     return (perf_counter_ns() - stamp) / 1e6
 
 
+class SyGuSParseError(ValueError):
+    """A deterministic source/candidate syntax or size-contract violation."""
+
+
 def parse(source: str):
     if not isinstance(source, str) or not source or len(source.encode()) > 40000:
-        raise ValueError("missing or oversized SyGuS source")
+        raise SyGuSParseError("missing or oversized SyGuS source")
     tokens = [s for s in TOKENS.findall(source) if not s.startswith(";")]
     if len(tokens) > 10000:
-        raise ValueError("SyGuS source token cap")
+        raise SyGuSParseError("SyGuS source token cap")
     stack = [[]]
     for token in tokens:
         if token == "(":
@@ -36,15 +40,15 @@ def parse(source: str):
             stack[-1].append(child)
             stack.append(child)
             if len(stack) > 128:
-                raise ValueError("SyGuS recursion cap")
+                raise SyGuSParseError("SyGuS recursion cap")
         elif token == ")":
             if len(stack) <= 1:
-                raise ValueError("extra close parenthesis")
+                raise SyGuSParseError("extra close parenthesis")
             stack.pop()
         else:
             stack[-1].append(token)
     if len(stack) != 1:
-        raise ValueError("unclosed SyGuS source")
+        raise SyGuSParseError("unclosed SyGuS source")
     return stack[0]
 
 

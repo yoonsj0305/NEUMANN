@@ -73,6 +73,99 @@ def fixture():
 
 
 class F0OpenedTests(unittest.TestCase):
+    def test_original_checker_exceptions_never_become_model_failures(self):
+        checks = (
+            ({"domain": "exact.linear", "A": [[2]], "b": [1]},
+             {"solution": {"x0": {"numerator": 1, "denominator": 2}}},
+             "neumann1.f0_opened_bridge.Fraction"),
+            ({"domain": "lp.standard_form", "A": [[1]], "b": [1], "c": [0]},
+             {"primal": [1], "dual": [0]},
+             "neumann1.lp_certificate_v081.verify_standard_form_certificate"),
+            ({"domain": "sygus.invariant", "source": SYGUS_SOURCE},
+             {"invariant": INVARIANT},
+             "neumann1.hybrid_sygus_r0.independent_check"),
+        )
+        for task, answer, target in checks:
+            for error in (ValueError, TypeError, KeyError, OverflowError,
+                          RuntimeError, AttributeError, OSError, ZeroDivisionError):
+                with self.subTest(domain=task["domain"], error=error.__name__), patch(
+                        target, side_effect=error("private verifier diagnostic")):
+                    with self.assertRaises(OriginalVerificationUnavailable) as caught:
+                        verify_original_answer(task, answer)
+                    self.assertEqual(caught.exception.proof["reason"], "VERIFIER_ERROR")
+                    self.assertEqual(caught.exception.proof["error_type"], error.__name__)
+                    self.assertNotIn("private verifier diagnostic", str(caught.exception))
+
+    def test_lp_checker_fault_is_retained_without_false_frontier_gap(self):
+        from neumann1.lp_certificate_v081 import verify_standard_form_certificate
+        m, receipts = fixture()
+        case = m["cases"][0]
+        case["task"] = {"domain": "lp.standard_form", "A": [[1]], "b": [1], "c": [0]}
+        case["original_problem_sha256"] = digest(source_problem_payload(
+            case["task"], validate_task(case["task"])))
+        for row in receipts:
+            if row["task_id"] == case["id"]:
+                row["original_problem_sha256"] = case["original_problem_sha256"]
+                row["answer"] = {"primal": [1], "dual": [0]}
+        calls = 0
+
+        def checker(*args, **kwargs):
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                raise ValueError("private checker diagnostic")
+            return verify_standard_form_certificate(*args, **kwargs)
+
+        with patch("neumann1.lp_certificate_v081.verify_standard_form_certificate",
+                   side_effect=checker):
+            out = audit_opened(m, receipts)
+        self.assertEqual(out["gap_case_ids"], ["opened_1"])
+        self.assertIsNone(out["per_case_verified_rate"]["opened_0"]["small"])
+        self.assertEqual(out["decision"], "INCOMPLETE_ORIGINAL_VERIFICATION")
+        failure = out["verification_errors"][0]
+        self.assertEqual(failure["proof"]["stage"], "LP_ORIGINAL_CHECK")
+        self.assertEqual(failure["resources"], receipts[0]["resources"])
+        self.assertNotIn("private checker diagnostic", str(out))
+        for name, values in out.items():
+            if name.endswith("reported_resource_ratio"):
+                self.assertTrue(all(v is None for v in values.values()))
+
+    def test_lp_candidate_contract_rejection_does_not_call_checker(self):
+        task = {"domain": "lp.standard_form", "A": [[1]], "b": [1], "c": [0]}
+        invalid = (None, {}, [], [True], ["1"], [[1]], [1, 2],
+                   [float("nan")], [float("inf")], [10 ** 1000])
+        for value in invalid:
+            with self.subTest(value_type=type(value).__name__), patch(
+                    "neumann1.lp_certificate_v081.verify_standard_form_certificate") as checker:
+                self.assertFalse(verify_original_answer(task, {"primal": value, "dual": [0]}))
+                checker.assert_not_called()
+
+    def test_lp_incomplete_or_nonfinite_proof_is_unknown(self):
+        task = {"domain": "lp.standard_form", "A": [[1]], "b": [1], "c": [0]}
+        for proof in (None, {}, {"accepted": 1, "numerical_finite": True},
+                      {"accepted": False, "numerical_finite": False}):
+            with self.subTest(proof=proof), patch(
+                    "neumann1.lp_certificate_v081.verify_standard_form_certificate",
+                    return_value=proof):
+                with self.assertRaises(OriginalVerificationUnavailable):
+                    verify_original_answer(task, {"primal": [1], "dual": [0]})
+
+    def test_original_task_error_is_not_bad_model_answer(self):
+        task = {"domain": "exact.linear", "A": [[2]], "b": [1]}
+        with patch("neumann1.f0_opened_bridge.validate_task", side_effect=ValueError("fault")):
+            with self.assertRaises(OriginalVerificationUnavailable) as caught:
+                verify_original_answer(task, {})
+        self.assertEqual(caught.exception.proof["stage"], "ORIGINAL_TASK_VALIDATION")
+
+    def test_candidate_sygus_syntax_rejection_keeps_typed_boundary(self):
+        task = {"domain": "sygus.invariant", "source": SYGUS_SOURCE}
+        for invariant in ("(", ")", "(define-fun inv-f ((x Int)) Bool (>= x 0))("):
+            with self.subTest(invariant=invariant):
+                self.assertFalse(verify_original_answer(task, {"invariant": invariant}))
+        with patch("neumann1.hybrid_sygus_r0.independent_check", return_value=None):
+            with self.assertRaises(OriginalVerificationUnavailable):
+                verify_original_answer(task, {"invariant": INVARIANT})
+
     def test_smt_unknown_and_checker_error_are_not_wrong_model_answers(self):
         task = {"domain": "sygus.invariant", "source": SYGUS_SOURCE}
         for statuses in (("unknown", "unsat", "unsat"),

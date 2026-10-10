@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import sys
 from fractions import Fraction
 from pathlib import Path
 
@@ -38,7 +39,13 @@ def _verified_rate(values: list) -> float | None:
 
 
 def verify_original_answer(task: dict, answer: object) -> bool:
-    """Return a checked Boolean or raise on unavailable original verification."""
+    """Reject invalid candidates; checker faults are unavailable verification.
+
+    Only explicit candidate-contract checks and independently established
+    counterexamples may return False. Exceptions from trusted source handling
+    or the original checker must not manufacture a model failure.
+    """
+    stage = "ORIGINAL_TASK_VALIDATION"
     try:
         spec = validate_task(task)
         if not isinstance(answer, dict):
@@ -47,6 +54,7 @@ def verify_original_answer(task: dict, answer: object) -> bool:
             values = answer.get("solution")
             if not isinstance(values, dict) or set(values) != set(spec["variables"]):
                 return False
+            stage = "EXACT_CANDIDATE_DECODING"
             xs = []
             for name in spec["variables"]:
                 cell = values[name]
@@ -58,23 +66,53 @@ def verify_original_answer(task: dict, answer: object) -> bool:
                         or max(abs(cell["numerator"]), cell["denominator"]) > 10 ** 60):
                     return False
                 xs.append(Fraction(cell["numerator"], cell["denominator"]))
+            stage = "EXACT_ORIGINAL_CHECK"
             return all(sum(Fraction(a) * x for a, x in zip(row, xs)) == rhs
                        for row, rhs in zip(spec["A"], spec["b"]))
         if spec["domain"] == "lp.standard_form":
             from .lp_certificate_v081 import verify_standard_form_certificate
             if "primal" not in answer or "dual" not in answer:
                 return False
+            # Candidate JSON is checked before entering the original numerical
+            # verifier. Its own ValueError/TypeError is an infrastructure fault.
+            for key, size in (("primal", len(spec["c"])), ("dual", len(spec["b"]))):
+                values = answer[key]
+                if (not isinstance(values, list) or len(values) != size
+                        or any(type(v) not in (int, float)
+                               or not -sys.float_info.max <= v <= sys.float_info.max
+                               for v in values)):
+                    return False
+            stage = "LP_ORIGINAL_CHECK"
             proof = verify_standard_form_certificate(
                 spec["A"], spec["b"], spec["c"],
                 answer["primal"], answer["dual"])
-            return proof["accepted"] is True
+            if (not isinstance(proof, dict)
+                    or type(proof.get("accepted")) is not bool
+                    or type(proof.get("numerical_finite")) is not bool):
+                raise OriginalVerificationUnavailable(
+                    "original LP verifier returned an invalid proof",
+                    {"reason": "INVALID_VERIFIER_RESULT", "stage": stage})
+            if not proof["numerical_finite"]:
+                raise OriginalVerificationUnavailable(
+                    "original LP arithmetic not finite; answer not verified",
+                    {"reason": "NUMERICAL_VERIFICATION_UNAVAILABLE", "stage": stage})
+            return proof["accepted"]
         if spec["domain"] == "sygus.invariant":
-            from .hybrid_sygus_r0 import prepare, independent_check
+            from .hybrid_sygus_r0 import prepare, independent_check, SyGuSParseError
             invariant = answer.get("invariant")
             if not isinstance(invariant, str) or not 0 < len(invariant) <= 40000:
                 return False
+            stage = "SYGUS_ORIGINAL_PREPARATION"
             _, arguments, original_defs = prepare(spec["source"])
-            proof = independent_check(arguments, original_defs, invariant, timeout_ms=2500)
+            stage = "SYGUS_ORIGINAL_CHECK"
+            try:
+                proof = independent_check(arguments, original_defs, invariant, timeout_ms=2500)
+            except SyGuSParseError:
+                return False  # Typed candidate grammar/size rejection only.
+            if not isinstance(proof, dict):
+                raise OriginalVerificationUnavailable(
+                    "original SyGuS verifier returned an invalid proof",
+                    {"reason": "INVALID_VERIFIER_RESULT", "stage": stage})
             obligations = proof.get("obligations", [])
             if (isinstance(obligations, list) and len(obligations) == 3
                     and all(isinstance(x, dict) for x in obligations)
@@ -93,15 +131,25 @@ def verify_original_answer(task: dict, answer: object) -> bool:
                 "original SyGuS answer not verified; no complete proof or counterexample",
                 proof,
             )
+    except OriginalVerificationUnavailable:
+        raise
     except ImportError as exc:
         # Infrastructure failure cannot be silently counted as a small-model FAIL.
         raise OriginalVerificationUnavailable(
             "independent verifier dependency unavailable; answer not verified",
-            {"reason": "DEPENDENCY_UNAVAILABLE", "error_type": type(exc).__name__},
+            {"reason": "DEPENDENCY_UNAVAILABLE", "stage": stage,
+             "error_type": type(exc).__name__},
         ) from exc
-    except (ValueError, TypeError, KeyError, OverflowError):
-        return False
-    return False
+    except Exception as exc:
+        # No exception text/path/credentials are copied into public receipts.
+        raise OriginalVerificationUnavailable(
+            "independent verifier error; answer not verified",
+            {"reason": "VERIFIER_ERROR", "stage": stage,
+             "error_type": type(exc).__name__},
+        ) from exc
+    raise OriginalVerificationUnavailable(
+        "original task has no admitted verifier",
+        {"reason": "UNSUPPORTED_ORIGINAL_VERIFIER", "stage": stage})
 
 
 def validate_manifest(m: dict) -> dict:

@@ -1,0 +1,75 @@
+{
+  "schema": "neumann.codex-readonly-preflight.v1",
+  "recorded_at_utc": "2026-10-10T06:33:56.191573+00:00",
+  "cli_version": "codex-cli 0.160.1",
+  "auth_mode": "chatgpt",
+  "included_plan_confirmed": true,
+  "ordinary_included_usage_allowed": true,
+  "paid_credit_fallback_unavailable_at_probe": true,
+  "api_key_environment_present": false,
+  "catalog_models": [
+    {
+      "id": "gpt-6.1-sol",
+      "model": "gpt-6.1-sol",
+      "is_default": true,
+      "default_reasoning_effort": "low"
+    },
+    {
+      "id": "gpt-6-astra",
+      "model": "gpt-6-astra",
+      "is_default": false,
+      "default_reasoning_effort": "low"
+    },
+    {
+      "id": "gpt-6-sol",
+      "model": "gpt-6-sol",
+      "is_default": false,
+      "default_reasoning_effort": "medium"
+    },
+    {
+      "id": "gpt-6-luna",
+      "model": "gpt-6-luna",
+      "is_default": false,
+      "default_reasoning_effort": "medium"
+    },
+    {
+      "id": "gpt-5.6-sol",
+      "model": "gpt-5.6-sol",
+      "is_default": false,
+      "default_reasoning_effort": "low"
+    },
+    {
+      "id": "gpt-5.6-terra",
+      "model": "gpt-5.6-terra",
+      "is_default": false,
+      "default_reasoning_effort": "medium"
+    },
+    {
+      "id": "gpt-5.6-luna",
+      "model": "gpt-5.6-luna",
+      "is_default": false,
+      "default_reasoning_effort": "medium"
+    }
+  ],
+  "provider_capabilities": {
+    "namespaceTools": true,
+    "webSearch": true,
+    "imageGeneration": true
+  },
+  "response_identity_snapshot": "NOT_RETURNED_BY_METADATA_METHODS",
+  "methods": [
+    "initialize",
+    "initialized",
+    "account/read(refreshToken=false)",
+    "model/list",
+    "account/rateLimits/read",
+    "modelProvider/capabilities/read"
+  ],
+  "thread_start_calls": 0,
+  "turn_start_calls": 0,
+  "generation_calls": 0,
+  "new_paid_spend_krw": 0,
+  "privacy": "Account payloads, plan names, quota percentages, balances, account IDs and email were not retained.",
+  "one_included_authentication_probe_eligible": true,
+  "scientific_status": "BLOCKED_PROVIDER_EVIDENCE_NO_MODEL_RESPONSES"
+}

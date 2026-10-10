@@ -10,12 +10,12 @@ provider-side invoice cap. No model inference or GPU session was started.
 |---|---|---|---|
 | Google Gemma via HF download and local/Kaggle inference | `google/gemma-4-E2B-it`, `3e22461f65e89153144f8adb70e3b8c2cc9845a7` | Historical constants/manifest agree; public exact-revision endpoint returned matching SHA and ungated/public/enabled status. Standard local cache and torch/transformers/HF runtime absent. | Reuse exact pin; not run. |
 | Existing Kaggle | T4 x2 option; original 2026-10-03 environment | Browser authenticated; accelerator None and session off. Numerical remaining free quota not obtained; browser lookup timed out. | Hold execution until free quota is verified. No old cells run/changed. |
-| Hugging Face Inference Providers | No frontier model selected | Authenticated non-Pro OAuth has jobs/profile/read scopes, no inference scope; no inference callable exposed. Current official default Free allowance is none. Account-specific balance is unknown. | No verified free inference route. |
-| OpenAI Codex subscription | CLI 0.160.1; catalog includes `gpt-6-astra`, `gpt-6.1-sol`, `gpt-6-sol`, `gpt-6-luna`, `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna` | Actual account/read reports ChatGPT Plus; actual model/list returns seven IDs. Point-in-time ordinary quota allowed, 33% five-hour and 92% weekly used, purchased balance 0. Immutable backend revision not returned. | Real subscription route candidate; no F0 capture, frontier selection or inference probe yet. |
+| Hugging Face Inference Providers | No frontier model selected | Authenticated OAuth has no inference scope or inference callable. No verified free inference authority. Account-specific balance is unknown. | No verified free inference route. |
+| OpenAI Codex subscription | CLI 0.160.1; seven catalog model IDs | Managed ChatGPT authentication and included-usage permission confirmed; immutable backend revision not returned. Account plan names and numerical quota snapshots are omitted from this public summary. | Initial metadata-only observation; see the separately registered authentication probe below for subsequent execution. |
 | External OpenAI/Anthropic/Google API | No model selected; immutable revision unknown | No corresponding API key in the process environment and no verified free grant. Subscription login is not API authority. | `BLOCKED_PROVIDER_EVIDENCE`; do not call. |
 | Existing Native / Classical R0 | HiGHS/SciPy, independent Z3, official cvc5 1.4.2 | Local CPU, no external service charge. cvc5 CLI installed from official release with archive digest checked. | Existing SyGuS synthesis → original Z3 certificate path now executable. Engineering only. |
 
-The [sanitized observations](../../research/development/f0-zero-budget-2026-10-10/provider-observations.json)
+The [historical observations](../../research/development/f0-zero-budget-2026-10-10/provider-observations.json)
 retain actual metadata. A model catalog is not an inference response; public
 Gemma weights are not a verified runnable GPU environment. No small FAIL or
 frontier PASS was inferred from missing calls. No independent F0 paired original
@@ -90,3 +90,17 @@ GitHub: no push/PR/Notion publication. Existing local verifier patch remains
 `49fe3bbd6103c620f58cc72c262b45a40ba237c0`, based on PR #179's
 `a5c4097c418231b416c8ece482df5eac4ae6d9bc`; the remote CI applies only to the
 remote head. No old result or model pin changed. Q1–Q7 open; HOLD_NEW_LEARNING.
+
+## Subsequent local check: checker faults and subscription response
+
+The original metadata-only and test receipts above describe their own time.
+See [the fault-boundary and authentication follow-up](F0_FAULT_BOUNDARY_AND_SUBSCRIPTION_PROBE_2026-10-10.md)
+for a separate, preregistered one-call included-usage authentication probe and
+new verifier fault-injection results. It is not a paired F0 problem evaluation.
+
+This current public summary omits account-specific plan names and quota values.
+The already published historical provider JSON and its original receipt are
+unchanged; their original bytes remain available in Git history and on GitHub.
+New public preflight evidence uses allowlisted execution-eligibility facts,
+without account identifiers, emails, plan names or numerical quota snapshots.
+No remote redaction or history rewrite is authorized or performed in this batch.
