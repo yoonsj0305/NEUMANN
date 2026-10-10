@@ -122,6 +122,8 @@ def run_existing(outdir: Path, *, frozen_seed: int | None = None) -> dict:
                 }
         summary["historical_frozen_q34_checkpoint_seed"] = frozen_seed
         summary["actual_existing_learned_model_executions"] = len(learned_rows)
+        summary["learned_model_executions"] = len(learned_rows)
+        summary["actual_local_executions"] = len(rows) + len(learned_rows)
         summary["frozen_cold_paired_comparison_by_original"] = paired
         summary["frozen_result_scope"] = (
             "PAID_CHECKPOINT_RESTORE_EACH_ORIGINAL_OPENED_ENGINEERING_ONLY"
