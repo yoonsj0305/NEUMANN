@@ -247,7 +247,7 @@ jobs:
           python-version: '3.12'
       - name: Install existing R0 Python and HiGHS dependencies
         run: |
-          python -m pip install --disable-pip-version-check -e '.[native_lp]' pytest
+          python -m pip install --disable-pip-version-check -e '.[cpu-r0]' pytest
       - name: Existing F0 original-verifier and two-arm real-capture tests
         run: python -m pytest -q tests/test_f0_opened_bridge.py tests/test_f0_capture_local.py
       - name: Check retained v102 source integrity without repeating the cost study
