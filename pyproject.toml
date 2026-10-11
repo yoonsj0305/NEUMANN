@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools==80.9.0", "wheel==0.45.1"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "neumann1"
 version = "0.0.106"
@@ -6,6 +10,7 @@ requires-python = ">=3.10"
 dependencies = ["numpy>=1.26", "scipy>=1.11", "scikit-learn>=1.4"]
 
 [project.optional-dependencies]
+cpu-r0 = ["highspy==1.15.1", "z3-solver==4.15.4.0"]
 relational = ["duckdb==1.5.6"]
 native_lp = ["highspy==1.15.1"]
 recursive = ["cvc5==1.4.1", "z3-solver==4.15.4.0"]

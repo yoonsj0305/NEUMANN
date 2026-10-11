@@ -1,0 +1,35 @@
+{
+  "baseline_commit": "c39bbdfecea75232e9307c548baf3bea991973af",
+  "command": "python -X utf8 -m pytest -q tests/test_native_unresolved_structure_gate.py tests/test_recursive_state_evidence_triage.py",
+  "exit_code": 0,
+  "passed": 31,
+  "failed": 0,
+  "skipped": 0,
+  "pytest_reported_seconds": 2.0,
+  "stdout": "............................... [100%]\n31 passed in 2.00s\n",
+  "scope": "engineering admission/integrity checks and existing mps collision regression; not task-performance evidence",
+  "analysis_attempts": [
+    {
+      "attempt": 1,
+      "exit_code": 1,
+      "reason": "Fail-closed source-path alias guard; no result files written"
+    },
+    {
+      "attempt": 2,
+      "exit_code": 0,
+      "reason": "Exact path plus source SHA selected; byte-identical incomplete-path alias explicitly excluded"
+    }
+  ],
+  "checks": [
+    "29 CSV rows match JSON and original indices",
+    "prior local evidence directories byte-identical to c39bbdf",
+    "frozen accelerator/core contract byte-identical to c39bbdf"
+  ],
+  "new_task_performance_runs": 0,
+  "new_source_proof_runs": 0,
+  "model_calls": 0,
+  "gpu_calls": 0,
+  "paid_calls": 0,
+  "GitHub_upload": false,
+  "new_CI": "NOT_RUN"
+}

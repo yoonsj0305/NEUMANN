@@ -1,0 +1,34 @@
+{
+  "schema": "neumann.f0.execution-authority.v1",
+  "authority": "human instruction 2026-10-10: new paid F0 budget is 0 KRW",
+  "new_paid_budget_krw": 0,
+  "paid_api_calls_allowed": false,
+  "paid_gpu_instances_allowed": false,
+  "paid_service_or_credit_purchase_allowed": false,
+  "automatic_paid_fallback_allowed": false,
+  "confirmed_zero_incremental_charge_routes_only": true,
+  "remaining_free_allowance_must_be_verified_before_execution": true,
+  "unknown_billing_blocks_execution": true,
+  "small_model": {
+    "id": "google/gemma-4-E2B-it",
+    "revision": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+    "identity_source": "neumann1/general_runtime_v106.py",
+    "replace_with_latest_allowed": false
+  },
+  "frontier_model": {
+    "selected_id": null,
+    "selected_revision": null,
+    "status": "BLOCKED_PROVIDER_EVIDENCE",
+    "reason": "subscription model catalog is available, but no controlled F0 provider response or immutable backend revision has been captured"
+  },
+  "training_allowed": false,
+  "sealed_decision3_access_allowed": false,
+  "github_upload_allowed": false,
+  "notes": [
+    "Current execution authority; not a replacement for historical frozen experiment contracts.",
+    "This policy records the human authority. It is not a provider-side billing limit.",
+    "No hosted inference adapter exists here that can enforce an external provider invoice cap.",
+    "Subscription allowance is not external OpenAI API authorization.",
+    "Zero incremental provider charge does not mean zero energy, total resource cost, or prepaid subscription investment."
+  ]
+}

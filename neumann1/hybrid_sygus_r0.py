@@ -23,12 +23,16 @@ def _ms(stamp):
     return (perf_counter_ns() - stamp) / 1e6
 
 
+class SyGuSParseError(ValueError):
+    """A deterministic source/candidate syntax or size-contract violation."""
+
+
 def parse(source: str):
     if not isinstance(source, str) or not source or len(source.encode()) > 40000:
-        raise ValueError("missing or oversized SyGuS source")
+        raise SyGuSParseError("missing or oversized SyGuS source")
     tokens = [s for s in TOKENS.findall(source) if not s.startswith(";")]
     if len(tokens) > 10000:
-        raise ValueError("SyGuS source token cap")
+        raise SyGuSParseError("SyGuS source token cap")
     stack = [[]]
     for token in tokens:
         if token == "(":
@@ -36,15 +40,15 @@ def parse(source: str):
             stack[-1].append(child)
             stack.append(child)
             if len(stack) > 128:
-                raise ValueError("SyGuS recursion cap")
+                raise SyGuSParseError("SyGuS recursion cap")
         elif token == ")":
             if len(stack) <= 1:
-                raise ValueError("extra close parenthesis")
+                raise SyGuSParseError("extra close parenthesis")
             stack.pop()
         else:
             stack[-1].append(token)
     if len(stack) != 1:
-        raise ValueError("unclosed SyGuS source")
+        raise SyGuSParseError("unclosed SyGuS source")
     return stack[0]
 
 
@@ -104,13 +108,13 @@ def independent_check(original_args, base_defs, output, timeout_ms):
         candidate = candidate[0]
     candidates = [x for x in candidate if isinstance(x, list) and x and x[0] == "define-fun"]
     if len(candidates) != 1:
-        return {"accepted": False, "reason": "NO_SINGLE_INVARIANT", "obligations": []}
+        return {"accepted": False, "verdict": "REJECTED", "reason": "NO_SINGLE_INVARIANT", "obligations": []}
     inv = candidates[0]
     if (len(inv) != 5 or inv[1] != "inv-f" or inv[3] != "Bool"
             or not isinstance(inv[2], list)
             or len(inv[2]) != len(original_args)
             or [a[1] for a in inv[2]] != [a[1] for a in original_args]):
-        return {"accepted": False, "reason": "INVALID_INVARIANT_SIGNATURE", "obligations": []}
+        return {"accepted": False, "verdict": "REJECTED", "reason": "INVALID_INVARIANT_SIGNATURE", "obligations": []}
     # Function formal parameter names may differ by alpha-renaming.
     # SMT-LIB define-fun binds those names locally. The independently parsed
     # original three proof queries still determine original-task authority.
@@ -130,16 +134,21 @@ def independent_check(original_args, base_defs, output, timeout_ms):
     ]
     checks = []
     for name, query in zip(("init", "inductive", "safe"), queries):
-        s = z3.Solver()
-        s.set(timeout=timeout_ms)
         try:
+            s = z3.Solver()
+            s.set(timeout=timeout_ms)
             s.from_string(definitions + declarations + "(assert " + query + ")\n")
             status = str(s.check())
         except Exception as exc:
-            status = "parser_error:" + type(exc).__name__
+            status = "checker_error:" + type(exc).__name__
         checks.append({"obligation": name, "smt_result": status,
                        "proved": status == "unsat"})
-    return {"accepted": all(v["proved"] for v in checks),
+    # SAT is an actual original-obligation counterexample. Missing proof,
+    # timeout or checker failure is not evidence that the answer is wrong.
+    accepted = all(v["proved"] for v in checks)
+    verdict = ("VERIFIED" if accepted else "REJECTED"
+               if any(v["smt_result"] == "sat" for v in checks) else "UNKNOWN")
+    return {"accepted": accepted, "verdict": verdict,
             "obligations": checks,
             "candidate_sha256": hashlib.sha256(smt(inv).encode()).hexdigest(),
             "candidate": smt(inv)}
@@ -164,6 +173,11 @@ def solve_and_verify(source: str, budget_s: float, stages: dict, events: list):
             stages["sygus_native_ms"] = _ms(stamp)
             events.append({"kind": "sygus_native", "status": "TIMEOUT"})
             return None, "TIMEOUT"
+        except FileNotFoundError:
+            stages["sygus_native_ms"] = _ms(stamp)
+            events.append({"kind": "sygus_native", "status": "DEPENDENCY_MISSING",
+                           "required_executable": "cvc5"})
+            return None, "UNKNOWN"
         stages["sygus_native_ms"] = _ms(stamp)
     if process.returncode != 0:
         events.append({"kind": "sygus_native", "status": "ERROR",
@@ -179,9 +193,10 @@ def solve_and_verify(source: str, budget_s: float, stages: dict, events: list):
     events.append({"kind": "independent_original_sygus_certificate",
                    "passed": proof["accepted"], "obligations": proof["obligations"],
                    "reason": proof.get("reason"),
+                   "verdict": proof["verdict"],
                    "candidate_excerpt_on_rejection": process.stdout[:600] if not proof["accepted"] else None})
     if not proof["accepted"]:
-        return None, "REJECTED"
+        return None, proof["verdict"]
     return {"invariant": proof["candidate"],
             "proof_sha256": proof["candidate_sha256"],
             "certificate": "original-sygus-init-consecution-safety-v1"}, "VERIFIED"

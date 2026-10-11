@@ -1,0 +1,9 @@
+{
+  "command": [
+    "<PRIVATE_RUN_ROOT>\\wheel-env\\Scripts\\python.exe",
+    "-c",
+    "import inspect,json,sys; from neumann1 import hybrid_runtime_r0 as r; print(json.dumps({'module':inspect.getfile(r),'python':sys.version,'prefix':sys.prefix,'base_prefix':sys.base_prefix}))"
+  ],
+  "exit_code": 0,
+  "wall_s": 22.569703399960417
+}

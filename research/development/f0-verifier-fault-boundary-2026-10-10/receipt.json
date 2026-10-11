@@ -1,0 +1,442 @@
+{
+  "schema": "neumann.f0-fault-boundary-followup.v1",
+  "recorded_at_utc": "2026-10-10T06:44:47.895271+00:00",
+  "base_commit": "a8ad955db4c0f07b797420a245893b1c4a9c5876",
+  "publication": "LOCAL_ONLY_NO_PUSH_NO_PR_UPDATE",
+  "hypothesis": "Trusted checker faults cannot manufacture small failures or Frontier Gap",
+  "verdict": "ENGINEERING_PASS_FRONTIER_GAP_UNMEASURED",
+  "tests": {
+    "passed": 86,
+    "subtests_passed": 58,
+    "failed": 0,
+    "skipped": 0,
+    "wall_seconds": 6.89
+  },
+  "paid_spend_krw": 0,
+  "model_inference_calls": 1,
+  "model_inference_scope": "PREREGISTERED_AUTHENTICATION_MARKER_ONLY",
+  "model": "gpt-6.1-sol",
+  "immutable_backend_revision": null,
+  "small_model_calls": 0,
+  "paired_f0_originals": 0,
+  "gpu_starts": 0,
+  "protected_opened_file_count": 64,
+  "protected_opened_files": [
+    {
+      "path": "docs/experiments/bp_certificate_diagnostic.preregister.json",
+      "git_blob": "15a2d16ddfcd1105b0db7049aaaa20768e0b2ad1",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/contraction_kernel_calibration.preregister.json",
+      "git_blob": "a95a9c131a9a7b9b10276ed837a95f29ce4071cc",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/contraction_shortlist_challenge.preregister.json",
+      "git_blob": "6e5e485368fcec9bc05dd77d973fdc20e2f13cff",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/control_plane_p110.preregister.json",
+      "git_blob": "f384c7e8d319604404a5c955ebb626deb83c6db4",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/control_plane_p111.preregister.json",
+      "git_blob": "52ce94c60d5077a6b6d8565b45a14c4dac4df9ef",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/control_plane_p112.preregister.json",
+      "git_blob": "8f8501d5482c0388bed6542a6d904a3584ecf3e5",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/control_plane_p113.preregister.json",
+      "git_blob": "e75feb21a398b5f106d4ad81eee61c28caa8e53d",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/control_plane_p11_dev.preregister.json",
+      "git_blob": "4336517b89f9f69c9c1f249724557d981558e2d1",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/control_plane_p12_dev.preregister.json",
+      "git_blob": "06d38d27973fb4d52a9a9dd2a409882eb5b5b1bb",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/control_plane_p12_validation.preregister.json",
+      "git_blob": "deab7789901d9867f961270b5549ec26cf91e693",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/control_plane_p13.preregister.json",
+      "git_blob": "ed60fafaca614d108936335a485607188ad02a30",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/control_plane_p14.preregister.json",
+      "git_blob": "936bb3d61e3488a0ffa32945c451eb5bb128064a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/control_plane_p15.preregister.json",
+      "git_blob": "6d9887b7ad8a543e7fa6246adf134e283b7df363",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/control_plane_p16.preregister.json",
+      "git_blob": "2b61089899692ffd4362d47b26f59ace2994c165",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/control_plane_p17.preregister.json",
+      "git_blob": "91fdb626f34e58f45d8d01f49411ff3171a0faca",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/control_plane_p18.preregister.json",
+      "git_blob": "3e9fcb2a229f608aa8799c9fd00be98f24b7e1df",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/control_plane_p19.preregister.json",
+      "git_blob": "cf02294efeb6ce2b17df0c3b774376b0e3f8268f",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/control_plane_p1_v1.preregister.json",
+      "git_blob": "9580c5e288cec5d7184b2d5d338f5f12b0d2768d",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/counting_native_headroom.active.preregister.json",
+      "git_blob": "b548e3e5e3beda97a1e4fb0ac2c85d95448a4127",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/counting_native_headroom.canonical.preregister.json",
+      "git_blob": "41c31bc5f7384abc95c0df68c08db19ecd1d6689",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/counting_native_headroom.preregister.json",
+      "git_blob": "3b2a352cb537138bece447c6111ca9e2a501228b",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/g0_composition.preregister.json",
+      "git_blob": "2f64f21931862d7185e7d0b23876669cc1ed4954",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/g0_headroom.preregister.json",
+      "git_blob": "8fed90e8c8b28e3947fabc51fa55cf782853e017",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/general_multiplier_v1.preregister.json",
+      "git_blob": "d9b1f0de15e622d6420a934f95b91eb567bd7793",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/guarded_fixture_probe.preregister.json",
+      "git_blob": "5f87df2591dc2862143e90316a996f319960e956",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/inductive_complete_cost.preregister.json",
+      "git_blob": "c3dc14de7a7bd1e4074e1d95e418415b139cf7de",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/perspective_transfer_headroom.preregister.json",
+      "git_blob": "07522175f35da6a25eec93c551983ffdb48bc5b2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/experiments/structural_mechanism_screen.preregister.json",
+      "git_blob": "ddb530f64026dbb72f167ac7aa9e730e7da2f9ef",
+      "unchanged": true
+    },
+    {
+      "path": "docs/research/frozen_north_star.md",
+      "git_blob": "ec713474bec995acfe9199bf719a9eef983b11e5",
+      "unchanged": true
+    },
+    {
+      "path": "neumann1/candidate_budget.py",
+      "git_blob": "7419792cc8732f34e71daf4e0ae332d46856258a",
+      "unchanged": true
+    },
+    {
+      "path": "neumann1/functional_experience_store.py",
+      "git_blob": "544c11e9a2f401517f0e11fe97861589e4f9e0c3",
+      "unchanged": true
+    },
+    {
+      "path": "neumann1/general_runtime_compact_v1062.py",
+      "git_blob": "97b02ba91116ff59a920888f2b890454fe778ea2",
+      "unchanged": true
+    },
+    {
+      "path": "neumann1/general_runtime_repair_v1061.py",
+      "git_blob": "fa31ee21364ca430706cd697baa7c7f179f2ddc6",
+      "unchanged": true
+    },
+    {
+      "path": "neumann1/general_runtime_v106.py",
+      "git_blob": "c244cfe9eace0e301a54dd8c7fc5fce4f5a9a834",
+      "unchanged": true
+    },
+    {
+      "path": "neumann1/guarded_perspective.py",
+      "git_blob": "f5ec2412d06ee150541ba64ce22557a6c3a7006f",
+      "unchanged": true
+    },
+    {
+      "path": "neumann1/guarded_symbolic_baseline.py",
+      "git_blob": "ca8619a3e3c21e000c61601162e85de7f371611a",
+      "unchanged": true
+    },
+    {
+      "path": "neumann1/inductive_perspective.py",
+      "git_blob": "dbd28ef7939e0fc774dcf47eb8b4ac1d502c622b",
+      "unchanged": true
+    },
+    {
+      "path": "neumann1/inductive_symbolic_baseline.py",
+      "git_blob": "3e7b44c8ffaf5fdb4cad9b133dd5751107cf37fe",
+      "unchanged": true
+    },
+    {
+      "path": "neumann1/lp_certificate_v081.py",
+      "git_blob": "68f0ad0aa388f1a42c79ea3c8150ef7b63847d24",
+      "unchanged": true
+    },
+    {
+      "path": "neumann1/lp_native_warm_start_v086.py",
+      "git_blob": "8a441721987cc6f5c9a1d0e29955b44da3e9bb8f",
+      "unchanged": true
+    },
+    {
+      "path": "neumann1/lp_q34_support_v097.py",
+      "git_blob": "51e161a204c44c57079b8d9404a9df9ca38d9572",
+      "unchanged": true
+    },
+    {
+      "path": "neumann1/native_perspective_catalog.py",
+      "git_blob": "9083c083cd6d943fb9337146497e8aa91775d9df",
+      "unchanged": true
+    },
+    {
+      "path": "neumann1/perspective.py",
+      "git_blob": "5bc6af4e735fabcad914ca56166473b1f6032242",
+      "unchanged": true
+    },
+    {
+      "path": "neumann1/perspective_symbolic_baseline.py",
+      "git_blob": "abe9259b23a4d43e1388bcd268207ac6c0d556df",
+      "unchanged": true
+    },
+    {
+      "path": "neumann1/recursive_summary.py",
+      "git_blob": "5c55b0eb5b41d0b20e22a76fb9e27b43f1797ddd",
+      "unchanged": true
+    },
+    {
+      "path": "neumann1/recursive_symbolic_baseline.py",
+      "git_blob": "a7230df86aa40ce53833a39713fa1628b813cafe",
+      "unchanged": true
+    },
+    {
+      "path": "neumann1/representation_program.py",
+      "git_blob": "68b0bff10c65c5b49c4fb1a093103e9306a1b971",
+      "unchanged": true
+    },
+    {
+      "path": "neumann1/representation_rewrite_certificate.py",
+      "git_blob": "0d74638389750ed7fbc9eb1afa629b853ec16735",
+      "unchanged": true
+    },
+    {
+      "path": "neumann1/runtime_cost.py",
+      "git_blob": "176fbfff7c2335f96e2d7a604e69649edb7a92ff",
+      "unchanged": true
+    },
+    {
+      "path": "neumann1/structural_data_rights.py",
+      "git_blob": "556ebd65c2705e1f168289ed421d2ccc5c6c9515",
+      "unchanged": true
+    },
+    {
+      "path": "neumann1/structural_experience.py",
+      "git_blob": "ca74dc76d38505c9147eda1b1b714d204b954bb0",
+      "unchanged": true
+    },
+    {
+      "path": "research/audit/BOTTLENECK_CAUSAL_MATRIX.md",
+      "git_blob": "b6b31f9f92408d88bed5a709a6f139a2cba5877a",
+      "unchanged": true
+    },
+    {
+      "path": "research/audit/CERTIFICATE_GEOMETRY_CAUSAL_REVIEW.md",
+      "git_blob": "d4714fe4ec949410b96ed99ee5efc169bb48b44b",
+      "unchanged": true
+    },
+    {
+      "path": "research/audit/EVIDENCE_LINEAGE.json",
+      "git_blob": "e4a8ec05bb3bd313d1ed5e772d9a3eece5d5c580",
+      "unchanged": true
+    },
+    {
+      "path": "research/audit/EVIDENCE_TO_DECISION_MASTER_REVIEW.md",
+      "git_blob": "ff6f17b7aa97c2645c6812742f09dadc8de3d064",
+      "unchanged": true
+    },
+    {
+      "path": "research/audit/EXPERIMENT_REGISTRY.csv",
+      "git_blob": "534cece6ac18b0e487ca38720d2e63531694a1cc",
+      "unchanged": true
+    },
+    {
+      "path": "research/audit/FEATURE_TRANSFER_CAUSAL_REVIEW.md",
+      "git_blob": "cbc7be02edbcdc87302711b4aa76589cd4c87f76",
+      "unchanged": true
+    },
+    {
+      "path": "research/audit/NEUMANN_ARCHITECTURE_GAP.md",
+      "git_blob": "5754ad819fa9ae8262c0eb2bedfe1b8cc7d3e7bd",
+      "unchanged": true
+    },
+    {
+      "path": "research/audit/Q34_MECHANISM_ATTRIBUTION.md",
+      "git_blob": "4297ae6574d4ac1e936255b88451db95e79b0768",
+      "unchanged": true
+    },
+    {
+      "path": "research/audit/RESEARCH_DECISION.md",
+      "git_blob": "eb98171bd3b8b85bec982477ae36a88c6bab4f70",
+      "unchanged": true
+    },
+    {
+      "path": "research/evidence/bp-certificate-2026-10-08/first.zip",
+      "git_blob": "cb06453205cb6e8df34550539dc136d397e64382",
+      "unchanged": true
+    },
+    {
+      "path": "research/evidence/counting-2026-10-08/transport-manifest.json",
+      "git_blob": "8c84d3003f00f2e5c78021ca8a09a7556caf8f60",
+      "unchanged": true
+    },
+    {
+      "path": "research/evidence/native-readiness-2026-10-08/first.zip",
+      "git_blob": "f3d69e232c9ad82d9b3d5af32ff3f09503ba99b3",
+      "unchanged": true
+    },
+    {
+      "path": "research/evidence/probabilistic-native-2026-10-08/first.zip",
+      "git_blob": "bdc03660a90426b6595b8be9aadf9ab4565d2546",
+      "unchanged": true
+    }
+  ],
+  "historical_readiness_receipts": [
+    {
+      "path": "research/development/f0-verification-unknown-2026-10-10/protected-integrity.json",
+      "sha256": "e41b06cf0448ce92ee1850223bf929544a91f979698e63e0d60d7411cdc43e05",
+      "unchanged": true
+    },
+    {
+      "path": "research/development/f0-verification-unknown-2026-10-10/pytest-final.log",
+      "sha256": "345e432c4d37dbaf8854c1d4f4ce425b52478c76397954477e91ddc3a5d59b06",
+      "unchanged": true
+    },
+    {
+      "path": "research/development/f0-verification-unknown-2026-10-10/pytest-final.xml",
+      "sha256": "8c2c6668e83f24bf9b101396218c2b6988e4c3561e2a8e00d765b99054f0c2d7",
+      "unchanged": true
+    },
+    {
+      "path": "research/development/f0-verification-unknown-2026-10-10/receipt.json",
+      "sha256": "67dcbd70f38caa9bec5223e3633f5964127704593926a90847418b03db7ff465",
+      "unchanged": true
+    },
+    {
+      "path": "research/development/f0-zero-budget-2026-10-10/execution-policy.json",
+      "sha256": "0b193d15d46b71dbfc66bc1223e0070f5839220e76a1d5da44277f9725544642",
+      "unchanged": true
+    },
+    {
+      "path": "research/development/f0-zero-budget-2026-10-10/provider-observations.json",
+      "sha256": "3aec2eb75afc64eaa36ef5251aa9060ee8f7d3353aa10aaf83e0ae16ced5a45f",
+      "unchanged": true
+    },
+    {
+      "path": "research/development/f0-zero-budget-2026-10-10/pytest.log",
+      "sha256": "c5ed723f2bedc2c58e2758a5898fdb087cda9e19105c46926cfd667e964707d8",
+      "unchanged": true
+    },
+    {
+      "path": "research/development/f0-zero-budget-2026-10-10/pytest.xml",
+      "sha256": "e13ecd0cfff22519e1bb0967366ffe6bb2674ab9441466f97d9a59de1d3a8f78",
+      "unchanged": true
+    },
+    {
+      "path": "research/development/f0-zero-budget-2026-10-10/receipt.json",
+      "sha256": "d858796f95f26f26cb4e18c16f4b6195506fad5cb9f64810d3d2f5d4d8aae9dc",
+      "unchanged": true
+    }
+  ],
+  "source_files": [
+    {
+      "path": "neumann1/f0_opened_bridge.py",
+      "sha256": "94757ddca94270dea78b908cb8725572631c9ffbccf965e8931db4a69c66644e"
+    },
+    {
+      "path": "neumann1/hybrid_sygus_r0.py",
+      "sha256": "71fda8ed928cee51e00f32e47d5ef73994b5031c80df129a90cc258620eed376"
+    },
+    {
+      "path": "tests/test_f0_opened_bridge.py",
+      "sha256": "0f470f393028fa2641b1de4fe62306d6a23af72e6cd419798febed7cd6e7349e"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "research/development/f0-verifier-fault-boundary-2026-10-10/authentication-probe.registration.json",
+      "sha256": "df864151199c09c7358e82ad6836dabf94d7820b1e5ccc9670ea2a02e3117d47"
+    },
+    {
+      "path": "research/development/f0-verifier-fault-boundary-2026-10-10/authentication-probe.result.public.json",
+      "sha256": "3176d90a0b51d25919aad05391fe9ea0fb0a6ce53e784704ac8d4c1a1620cdaa"
+    },
+    {
+      "path": "research/development/f0-verifier-fault-boundary-2026-10-10/probe-source.txt",
+      "sha256": "abac924229d0c5bfe4115337dab3f58a5691fccfd878d78038dd9e7330b086c4"
+    },
+    {
+      "path": "research/development/f0-verifier-fault-boundary-2026-10-10/pytest.log",
+      "sha256": "b0a3964911b177b8ce190a994af30d6faec115b09f6029d0dc39f3605cd38069"
+    },
+    {
+      "path": "research/development/f0-verifier-fault-boundary-2026-10-10/pytest.xml",
+      "sha256": "64347f62484962f91ae64b08119e72dac64374f77707f84ab1c3921b17723333"
+    },
+    {
+      "path": "research/development/f0-verifier-fault-boundary-2026-10-10/readonly-preflight.public.json",
+      "sha256": "1d21e431de6784e3d0f03d7e790d5464bebde248e592a5e2f598ce76db9dbd5a"
+    }
+  ],
+  "privacy": "Allowlisted new provider artifacts have no account identifiers, email, plan, quota percentages, balances or credentials. Historical public JSON is unchanged.",
+  "kaggle": {
+    "remaining_free_gpu_quota": null,
+    "status": "BROWSER_DISCOVERY_TIMEOUT_NO_SESSION_STARTED"
+  },
+  "scientific_status": "BLOCKED_PROVIDER_EVIDENCE_NO_PAIRED_ORIGINALS",
+  "global_questions_closed": [],
+  "learning": "HOLD_NEW_LEARNING",
+  "next_action": "Verify a free compatible runtime for the pinned Gemma arm before registering actual paired original requests"
+}

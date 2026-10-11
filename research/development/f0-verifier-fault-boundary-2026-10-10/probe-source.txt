@@ -1,0 +1,208 @@
+"""Read-only Codex protocol facts. Account payloads stay in process memory.
+
+This does not start a thread/turn or access tokens/auth files.
+Only allowlisted, non-personal evidence is written outside the repository.
+"""
+import datetime
+import decimal
+import json
+import os
+from pathlib import Path
+import queue
+import shutil
+import subprocess
+import sys
+import hashlib
+import threading
+import time
+
+ROOT = Path(__file__).resolve().parent
+messages = queue.Queue()
+cli = shutil.which("codex")
+proc = subprocess.Popen([cli, "app-server", "--listen", "stdio://"],
+                        stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                        stderr=subprocess.DEVNULL, text=True, encoding="utf-8",
+                        creationflags=subprocess.CREATE_NO_WINDOW)
+
+
+def read():
+    for line in proc.stdout:
+        try:
+            messages.put(json.loads(line))
+        except (ValueError, TypeError):
+            pass
+
+
+threading.Thread(target=read, daemon=True).start()
+request_id = 0
+
+
+def send(method, params=None, notify=False):
+    global request_id
+    msg = {"method": method}
+    if params is not None:
+        msg["params"] = params
+    if not notify:
+        request_id += 1
+        msg["id"] = request_id
+    proc.stdin.write(json.dumps(msg) + "\n")
+    proc.stdin.flush()
+    if notify:
+        return {}
+    deadline = time.monotonic() + 15
+    while time.monotonic() < deadline:
+        response = messages.get(timeout=max(.01, deadline - time.monotonic()))
+        if response.get("id") == request_id:
+            if "error" in response:
+                raise RuntimeError("Protocol request unavailable: " + method)
+            return response["result"]
+    raise TimeoutError(method)
+
+
+try:
+    send("initialize", {"clientInfo": {"name": "neumann-readiness",
+         "title": "NEUMANN metadata preflight", "version": "0.1"},
+         "capabilities": {"experimentalApi": True}})
+    send("initialized", notify=True)
+    account = send("account/read", {"refreshToken": False}).get("account") or {}
+    catalog = send("model/list", {"limit": 20, "includeHidden": False})
+    limits = send("account/rateLimits/read")
+    capabilities = send("modelProvider/capabilities/read", {})
+    buckets = limits.get("rateLimitsByLimitId") or {"codex": limits.get("rateLimits")}
+    buckets = [v for v in buckets.values() if isinstance(v, dict)]
+    credit_states = [v.get("credits") for v in buckets]
+    no_paid_credit = bool(credit_states) and all(
+        isinstance(c, dict) and c.get("hasCredits") is False
+        and c.get("unlimited") is False
+        and decimal.Decimal(str(c.get("balance"))) == 0
+        for c in credit_states)
+    included_plan = account.get("type") == "chatgpt" and account.get("planType") in (
+        "plus", "pro", "pro_100", "pro_200", "pro_500")
+    ordinary = limits.get("ordinaryUsageAllowed") is True
+    credentials_present = any(bool(os.environ.get(key)) for key in (
+        "OPENAI_API_KEY", "CODEX_API_KEY", "AZURE_OPENAI_API_KEY"))
+    result = {
+        "schema": "neumann.codex-readonly-preflight.v1",
+        "recorded_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "cli_version": subprocess.check_output([cli, "--version"], text=True).strip(),
+        "auth_mode": account.get("type"),
+        "included_plan_confirmed": included_plan,
+        "ordinary_included_usage_allowed": ordinary,
+        "paid_credit_fallback_unavailable_at_probe": no_paid_credit,
+        "api_key_environment_present": credentials_present,
+        "catalog_models": [{"id": m.get("id"), "model": m.get("model"),
+                           "is_default": m.get("isDefault"),
+                           "default_reasoning_effort": m.get("defaultReasoningEffort")}
+                          for m in catalog.get("data", [])],
+        "provider_capabilities": {key: capabilities.get(key) for key in (
+            "namespaceTools", "webSearch", "imageGeneration")},
+        "response_identity_snapshot": "NOT_RETURNED_BY_METADATA_METHODS",
+        "methods": ["initialize", "initialized", "account/read(refreshToken=false)",
+                    "model/list", "account/rateLimits/read", "modelProvider/capabilities/read"],
+        "thread_start_calls": 0, "turn_start_calls": 0,
+        "generation_calls": 0, "new_paid_spend_krw": 0,
+        "privacy": "Account payloads, plan names, quota percentages, balances, account IDs and email were not retained.",
+        "one_included_authentication_probe_eligible": (
+            included_plan and ordinary and no_paid_credit and not credentials_present),
+        "scientific_status": "BLOCKED_PROVIDER_EVIDENCE_NO_MODEL_RESPONSES",
+    }
+    (ROOT / "readonly-preflight.public.json").write_text(
+        json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps(result))
+    if sys.argv[1:] == ["--auth-echo"]:
+        registration_path = ROOT / "authentication-probe.registration.json"
+        if registration_path.exists():
+            raise RuntimeError("Authentication probe already registered; no automatic repeat")
+        if not result["one_included_authentication_probe_eligible"]:
+            raise RuntimeError("No verified zero-incremental-charge probe authority")
+        default = next(m for m in result["catalog_models"] if m["is_default"])
+        model = default["model"]
+        registration = {
+            "schema": "neumann.codex-authentication-probe.registration.v1",
+            "registered_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            "purpose": "One included-usage authentication/response probe, not F0 or frontier selection",
+            "provider": "OpenAI Codex managed ChatGPT authentication",
+            "requested_model": model, "model_selection": "actual catalog default",
+            "max_generation_calls": 1, "max_retries": 0, "max_wall_seconds": 30,
+            "paid_budget_krw": 0, "paid_credit_fallback": "UNAVAILABLE_BY_PREFLIGHT",
+            "prompt": "Reply with exactly NEUMANN_AUTH_PROBE_OK. Do not use any tools.",
+            "tools": "No tool invocation permitted; observed calls invalidate probe",
+            "original_problems": 0, "small_model_calls": 0,
+            "immutable_model_revision": None,
+            "token_cap": "No exact request token ceiling exposed; low effort and bounded wall time",
+            "success": "completed turn, exact response, zero tools and no model reroute",
+            "future_frontier_reference_selected": False,
+        }
+        with registration_path.open("x", encoding="utf-8") as f:
+            f.write(json.dumps(registration, indent=2) + "\n")
+        empty_cwd = ROOT / "empty-authentication-probe"
+        empty_cwd.mkdir(exist_ok=True)
+        started = time.perf_counter()
+        thread = send("thread/start", {
+            "model": model, "modelProvider": "openai", "ephemeral": True,
+            "cwd": str(empty_cwd), "sandbox": "read-only", "approvalPolicy": "never",
+            "serviceTier": "default",
+            "baseInstructions": "You are an authentication probe. Return the requested marker only. Do not invoke tools or inspect files.",
+            "config": {"web_search": "disabled", "mcp_servers": {},
+                       "features.multi_agent": False, "features.shell_tool": False},
+        })
+        thread_id = thread["thread"]["id"]
+        turn = send("turn/start", {
+            "threadId": thread_id,
+            "input": [{"type": "text", "text": registration["prompt"], "text_elements": []}],
+            "model": model, "effort": "low", "serviceTierForTurn": "default",
+        })
+        kinds, response, usage, status, rerouted = [], [], None, "incomplete", False
+        tool_calls = 0
+        turn_id = turn["turn"]["id"]
+        deadline = started + registration["max_wall_seconds"]
+        while time.perf_counter() < deadline:
+            event = messages.get(timeout=max(.01, deadline - time.perf_counter()))
+            method, params = event.get("method"), event.get("params") or {}
+            if method:
+                kinds.append(method)
+            if method == "model/rerouted":
+                rerouted = True
+            if method == "thread/tokenUsage/updated":
+                usage = params.get("tokenUsage")
+            if method == "item/completed":
+                item = params.get("item") or {}
+                if item.get("type") == "agentMessage":
+                    response.append(item.get("text", ""))
+                elif item.get("type") not in ("userMessage", "reasoning"):
+                    tool_calls += 1
+            if method == "turn/completed":
+                status = (params.get("turn") or {}).get("status", "missing_status")
+                break
+        raw_response = "\n".join(response)
+        output = {
+            "schema": "neumann.codex-authentication-probe.result.v1",
+            "recorded_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            "registration_sha256": hashlib.sha256(registration_path.read_bytes()).hexdigest(),
+            "requested_model": model, "thread_returned_model": thread.get("model"),
+            "thread_returned_provider": thread.get("modelProvider"),
+            "immutable_model_revision": None,
+            "thread_id_sha256": hashlib.sha256(thread_id.encode()).hexdigest(),
+            "turn_id_sha256": hashlib.sha256(turn_id.encode()).hexdigest(),
+            "status": status, "response": raw_response if raw_response == "NEUMANN_AUTH_PROBE_OK" else None,
+            "response_sha256": hashlib.sha256(raw_response.encode()).hexdigest(),
+            "token_usage": usage, "latency_ms": (time.perf_counter() - started) * 1000,
+            "event_methods": sorted(set(kinds)), "tool_calls": tool_calls,
+            "model_rerouted": rerouted, "generation_calls": 1,
+            "new_paid_spend_krw": 0, "subscription_investment": "UNKNOWN",
+            "api_invoice": "NOT_APPLICABLE_TO_INCLUDED_SUBSCRIPTION_USAGE",
+            "provider_response_attestation": "LOCAL_CODEX_PROTOCOL_ONLY_NO_BACKEND_SNAPSHOT_OR_SIGNED_TRACE",
+            "probe_pass": status == "completed" and raw_response == "NEUMANN_AUTH_PROBE_OK" and tool_calls == 0 and not rerouted,
+            "original_problems": 0, "small_model_calls": 0, "paired_f0_originals": 0,
+            "frontier_gap_measured": False, "frontier_reference_selected": False,
+        }
+        with (ROOT / "authentication-probe.result.public.json").open("x", encoding="utf-8") as f:
+            f.write(json.dumps(output, indent=2) + "\n")
+        print(json.dumps(output))
+finally:
+    proc.terminate()
+    try:
+        proc.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        proc.wait(timeout=5)

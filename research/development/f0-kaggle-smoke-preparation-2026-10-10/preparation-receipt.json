@@ -1,0 +1,72 @@
+{
+  "scope": "LOCAL_ENGINEERING_PREPARATION_NOT_GPU_RESULT",
+  "baseline_commit": "1201d45a87a07504c060e4e2243b293371b8cd91",
+  "actual_gpu_sessions_started": 0,
+  "actual_model_calls": 0,
+  "actual_frontier_calls": 0,
+  "actual_paired_F0_originals": 0,
+  "prepared_opened_originals": 1,
+  "notebook_sha256": "5ef55d0d86020d74f15efb137c583683dcc5510e1110c49dc6b29626e53fccf1",
+  "static_compiled_code_cells": 3,
+  "bundled_python_sources": 60,
+  "reused_core_unchanged": true,
+  "local_original_checker_positive": {
+    "accepted": true,
+    "obligations": [
+      {
+        "obligation": "init",
+        "smt_result": "unsat",
+        "proved": true
+      },
+      {
+        "obligation": "inductive",
+        "smt_result": "unsat",
+        "proved": true
+      },
+      {
+        "obligation": "safe",
+        "smt_result": "unsat",
+        "proved": true
+      }
+    ],
+    "candidate_sha256": "ab57295eacbd7af2b98dfb0819e6708f149efeea0fa3bef20554a31d3b23e617",
+    "candidate": "(define-fun inv-f ((x Int) (y Int) (xa Int) (ya Int)) Bool (>= (+ xa (* 2 ya)) 0))"
+  },
+  "local_original_checker_negative": {
+    "accepted": false,
+    "obligations": [
+      {
+        "obligation": "init",
+        "smt_result": "unsat",
+        "proved": true
+      },
+      {
+        "obligation": "inductive",
+        "smt_result": "unsat",
+        "proved": true
+      },
+      {
+        "obligation": "safe",
+        "smt_result": "sat",
+        "proved": false
+      }
+    ],
+    "candidate_sha256": "79bd09e5089fa25357d105ad935722a253ada1692e12c385b91f98c975676558",
+    "candidate": "(define-fun inv-f ((x Int) (y Int) (xa Int) (ya Int)) Bool true)"
+  },
+  "tests": {
+    "passed": 42,
+    "subtests_passed": 58,
+    "failed": 0,
+    "skipped": 0,
+    "elapsed_s": 6.52
+  },
+  "artifact_checks": [
+    "SHA-bound source",
+    "all reused bundle files match 1201d45",
+    "private/evidence/sealed payload excluded"
+  ],
+  "preparation_error": "First static exclusion check falsely matched public *_authorization.py source filenames; corrected exclusion to target authentication artifacts, no archive contents changed",
+  "gpu_runtime_status": "NOT_EXECUTED",
+  "scientific_success": false
+}

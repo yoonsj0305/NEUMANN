@@ -1,0 +1,43 @@
+{
+  "outer_process_wall_ms": 1630.3792,
+  "receipts": [
+    {
+      "answer": null,
+      "cost": {
+        "cloud_transport_ms": "NOT_APPLICABLE",
+        "cold_process_startup_ms": "UNKNOWN",
+        "external_structure_proposal_ms": "NOT_APPLICABLE",
+        "frontier_calls": 0,
+        "measured_energy_j": "UNKNOWN",
+        "model_calls": 0,
+        "observed_wall_ms": 1.4848,
+        "offline_training_investment_ms": "UNKNOWN",
+        "process_peak_rss_kb": "UNKNOWN",
+        "stages_ms": {
+          "exact_or_numeric_execution_ms": 0.1406,
+          "input_validation_ms": 0.0402,
+          "unassigned_python_wrapper_ms": 1.3039999999999998
+        }
+      },
+      "domain": "exact.linear",
+      "events": [
+        {
+          "kind": "exact_linear_solver",
+          "status": "no_unique_solution"
+        }
+      ],
+      "execution_request_sha256": "487b596509887c7423e81c0803c13a60eff7e3f09a4b18c9ad45f495b4c274e9",
+      "learned_model_inference": false,
+      "north_star_global_questions_closed": [],
+      "original_problem_sha256": "18b81ba87cdb1c311f7f69f889e07f7e779cea1abdfa675557798142388c5446",
+      "original_task_sha256": "487b596509887c7423e81c0803c13a60eff7e3f09a4b18c9ad45f495b4c274e9",
+      "reason": null,
+      "research_scope": "ENGINEERING_FIXTURE_ONLY_NOT_FRESH_EVIDENCE",
+      "schema": "neumann.hybrid-r0-engineering.v0",
+      "status": "UNKNOWN"
+    }
+  ],
+  "rss_sampling_note": "4 ms sampled maximum, lower bound, not exact all-time peak",
+  "sample_count": 187,
+  "sampled_process_tree_peak_rss_bytes": 123355136
+}

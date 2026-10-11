@@ -1,0 +1,31 @@
+{
+  "scope": "READ_ONLY_FREE_RUNTIME_ELIGIBILITY_CHECK_NOT_GPU_EXECUTION",
+  "candidate": "HUGGING_FACE_ZEROGPU",
+  "official_documentation": "https://huggingface.co/docs/hub/spaces-zerogpu",
+  "documentation_checked_date_kst": "2026-10-10",
+  "documented_default_hardware": "Half NVIDIA RTX Pro 6000 Blackwell",
+  "documented_default_vram_gb": 48,
+  "actual_allocated_device": null,
+  "actual_native_bf16": null,
+  "authenticated_read_context": true,
+  "space_write_authority_verified": false,
+  "free_hosting_entitlement": "UNKNOWN",
+  "remaining_free_allowance": "UNKNOWN",
+  "zero_charge_fallback_guarantee": "UNKNOWN",
+  "frozen_core_zerogpu_compatibility": "NOT_TESTED",
+  "missing_evidence": [
+    "Free hosting entitlement and eligibility conditions",
+    "Current remaining included GPU allowance; no paid credit fallback",
+    "Authorized Space access suitable for the unchanged frozen core",
+    "Native BF16 and single-device VRAM measured inside a real GPU allocation",
+    "Model libraries and initialization within the finite free execution budget"
+  ],
+  "doc_connector_result": "UNAVAILABLE; official web page used instead",
+  "gpu_allocation_attempts": 0,
+  "spaces_created": 0,
+  "jobs_created": 0,
+  "model_calls": 0,
+  "private_account_metadata_exported": false,
+  "decision": "BLOCKED_SMALL_MODEL_RUNTIME",
+  "stop_rule": "No further allocation hunting or new adapter until eligibility and zero-charge allowance are established"
+}

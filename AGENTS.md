@@ -1,3 +1,200 @@
+# LATEST LOCAL CPU R0 RELEASE CANDIDATE | 2026-10-11 KST
+
+Final integrity review: R0 LOCAL RC VERIFIED, NOT RELEASED. Wheel build remains
+1e0524d; e7bb00f and the final CI/docs follow-up change no package/dependency bytes.
+18 retained requests classify as 12 original certified, 2 expected UNKNOWN,
+4 expected ERROR. Scoped exact-HEAD wheel CI is prepared but NOT RUN; upload and
+dispatch require explicit human authorization. Preserve PR #174–#179 ancestry;
+existing #179 branch is the fast-forward publication target, not a main merge.
+
+Source 1e0524d: pinned CPU wheel install contract and SyGuS UNKNOWN boundary.
+Independent Windows installation, 18 retained-fixture cold/persistent receipts,
+12 original certificates and missing-dependency/model fail-closed checks passed.
+92 selected source tests and 59 repeated installed-wheel tests passed, zero skips.
+See docs/research/R0_CPU_RELEASE_CANDIDATE_2026-10-11.md for exact scope and hashes.
+Status LOCAL_CPU_R0_RC_PASS_PENDING_REMOTE_CI, release ledger 6/7 locally evidenced.
+Do not imply remote CI, public release, Frontier Gap or learned intelligence PASS.
+No GitHub upload until explicitly authorized; no further candidate recovery or
+R0 feature expansion. Preserve historical results, learning HOLD, frozen Gemma
+BLOCKED_SMALL_MODEL_RUNTIME, zero paid/GPU/model/sealed execution. Previous
+recovery authorities below are closed historical context.
+
+# LATEST FINAL RECOVERY AND CPU R0 AUTHORITY | 2026-10-10 KST
+
+Continuation from 8067d10: the single limited half_true_modif_m_000 recovery
+attempt is CLOSED. Verdict PARTIAL: original/hash and published run metadata
+exist, actual historical model/proof is unrecoverable in inspected local assets.
+Original certification, execution binding, license and economics remain UNKNOWN.
+Do not retry the recovery, run a new solver to fill missing evidence, substitute
+a manual relation, explore more candidate families or admit learning. Candidate
+search is CLOSED; current work is CPU R0 product completion ONLY, reusing the
+existing CLI/JSONL, verifiers, native tools and wheel gate. Inspect/close existing
+CPU dependency/native cvc5 executable, source-bound wheel manifest and controlled
+integration requirements; do not add research hypotheses. Historical engineering
+PASS is not current full release or Frontier Gap evidence. Preserve prior 29/174
+gate, first results, learning HOLD, frozen Gemma BLOCKED_SMALL_MODEL_RUNTIME,
+zero paid/GPU/sealed execution and no GitHub upload. See
+docs/research/CHC_HALF_FINAL_RECOVERY_AND_R0_CLOSURE_2026-10-10.md.
+
+# LATEST RETAINED EXTERNAL ADMISSION AUTHORITY | 2026-10-10 KST
+
+Continuation from 4e0e4bd: inspected retained external invariant, nonlinear
+constraint and goal-coupled synthesis evidence. Decision is
+NO_ADMISSIBLE_EVIDENCED_CANDIDATE; no new candidate or performance experiment.
+Single-solver timeouts, bounded SuFu outputs and posthoc CHC free-model check
+ratios do not establish strongest Classical-Hybrid residual headroom. CHC model
+witness/source binding and matched affine/phase/Spacer controls remain missing.
+Preserve the existing 29/174 gate (0 PASS / 8 HOLD / 21 UNKNOWN) and all first
+results. Do not turn this retrospective analysis into fresh learning evidence.
+At most recover one historical half_true_modif_m_000 model/source/checker trace
+before considering a registered experiment; absence stays UNKNOWN. Learning
+HOLD, Gemma BLOCKED_SMALL_MODEL_RUNTIME, zero paid/GPU/sealed execution and no
+GitHub upload continue. See
+docs/research/RETAINED_EXTERNAL_STRUCTURE_ADMISSION_2026-10-10.md.
+
+# LATEST NATIVE STRUCTURE GATE AUTHORITY | 2026-10-10 KST
+
+At c39bbdf continuation, all existing 29 public source entries / 174 saved
+Native observations were screened: NATIVE_UNRESOLVED_STRUCTURE_GATE yields
+0 PASS, 8 HOLD, 21 UNKNOWN. Stop active learning-candidate search in this
+cohort; retain all proofs, code and first runs. Missing certification/cost is
+UNKNOWN, not evidence of opportunity. po_sorted --no-lifting failure is not
+strongest Classical-Hybrid failure with equal state-extension rights. Next
+inspect distinct real external source evidence only; no new cohort/model is
+admitted yet. Preserve mps_no_sum and poly_no_fac learning HOLD, frozen Gemma
+BLOCKED_SMALL_MODEL_RUNTIME, zero paid execution, sealed protection and no
+GitHub upload. See docs/research/NATIVE_UNRESOLVED_STRUCTURE_GATE_2026-10-10.md.
+
+# LATEST CORE RESEARCH AUTHORITY | 2026-10-10 KST
+
+Stop free GPU/environment hunting. Preserve bb10651 and all original evidence.
+Frozen Gemma F0 remains BLOCKED_SMALL_MODEL_RUNTIME with unchanged native BF16,
+revision, checkpoint and execution contract. Reuse stored public program and
+constraint sources, R0, cvc5/Z3/SyGuS and existing original-goal verifiers.
+First separate representation insufficiency from Native search failure using
+stored results. Any new causal development diagnostic is opened, source-bound
+and separate from original cohorts; it is not fresh F0/G0/G1 evidence. Do not
+rerun completed experiments, train, access sealed data, use paid services or
+upload to GitHub. Additional learned discovery needs demonstrated value over
+the strongest available Classical-Hybrid, not only a restricted source skeleton.
+Older GPU exploration authorities below are historical.
+
+Follow-up from 2add388: the stored poly_no_fac Native affine representation is
+ORIGINAL_CERTIFIED only after first-component decode under mathematical integer,
+fixed-parameter, finite ordered-tree semantics. Existing polynomial identities
+and source repr order/termination proof supply the certificate; no new synthesis
+or execution framework. Full compiled OCaml packaging and complete-cost ratios
+are UNKNOWN. Classical affine-summary discovery learning remains HOLD. Preserve
+the prior mps_no_sum collision and (prefix,sum) resolution. See
+docs/research/POLY_NO_FAC_ORIGINAL_CERTIFICATION_2026-10-10.md and its separate
+opened development receipt. No GPU/model/paid/sealed calls or GitHub upload.
+
+# LATEST ZEROGPU INSPECTION AUTHORITY | 2026-10-10 KST
+
+Current work is read-only free eligibility/quota inspection and static unchanged
+core analysis only. Free personal Space creation is NOT_ELIGIBLE under the
+documented age condition; backend grant, private occupancy and remaining quota
+are UNKNOWN. Connected OAuth lacks billing-read scope; isolated SDK 2.2.0 quota
+attempt stops with LocalTokenNotFoundError. Do not export OAuth credentials,
+create a Space, download weights, run GPUs or change the frozen core. ZeroGPU
+compatibility and cold occupancy remain NOT_VERIFIED/UNKNOWN. Stop allocation
+hunting; continue existing original-proof F0 preparation. No paid run or upload.
+See docs/research/F0_ZEROGPU_SUITABILITY_2026-10-10.md. Private account metadata
+and SDK tools stay outside Git. Older active sections are historical where they
+conflict with this latest read-only instruction.
+
+# LATEST HUMAN COLAB RESULT | 2026-10-10 KST
+
+The owner actually checked Colab: Tesla T4, single-device VRAM 15637086208
+bytes, native BF16 false, BF16 operations true, ready false. Preserve this as
+HUMAN_REPORTED hardware evidence, not an agent-captured raw runtime receipt.
+Record COLAB_T4_NATIVE_BF16_UNSUPPORTED. Gemma calls and paired F0 originals
+remain zero; BLOCKED_SMALL_MODEL_RUNTIME continues. Do not retry Colab/T4
+allocation, change dtype, quantize, or run an emulation experiment automatically.
+Keep the exact frozen core/revision/checkpoint identities and existing notebooks.
+Next admission question is actual free ZeroGPU hosting entitlement and remaining
+free allowance; authenticated read access is not GPU entitlement. No paid
+fallback, Space publication or GitHub upload. See
+docs/research/F0_COLAB_T4_RESULT_2026-10-10.md for the append-only result.
+Older sections below are historical instructions where they conflict here.
+
+# LATEST COLAB CONTINUATION AUTHORITY | 2026-10-10 KST
+
+Check actual zero-charge Colab GPU first; do not assume its type or allowance.
+Only after native BF16, one GPU >=14 GiB and runtime libraries are verified may
+the owner's conditional one-opened-source frozen Gemma attempt proceed. Reuse
+the exact core/revision/hash/BF16 contract. The prior environment-only hold is
+historical authority; current inference gate stays closed until facts are known.
+Colab browser access timed out; do not spend this continuation on more browser
+retries or build another executor. Preserve 8ffcd32 and prepared notebooks.
+Use the minimal Colab hardware-check artifact; no package/weight/model work in
+that cell. Continue existing F0 preparation; new paid budget zero, no GitHub push.
+
+# CURRENT HUMAN GPU ADMISSION AUTHORITY | 2026-10-10 KST
+
+Preserve the previous Kaggle notebook and local commits. Current work is CPU
+preparation and GPU environment checks ONLY: no checkpoint download/inference.
+Native BF16 must be attested with including_emulation=False separately from
+actual BF16 operations. Frozen contract does not explicitly authorize emulation;
+do not assume it is allowed. Keep FrozenAcceleratorCore/revision/hashes unchanged.
+Use the environment-only notebook described in
+docs/research/F0_NATIVE_BF16_ADMISSION_2026-10-10.md; the earlier one-call notebook
+is retained historical preparation, not current execution authority. Zero new
+paid budget; no GitHub upload until the owner explicitly asks again.
+
+# LATEST HUMAN EXECUTION AUTHORITY | 2026-10-10 KST
+
+New paid F0 budget is **0 KRW**. No paid API, GPU instance, service, credit
+purchase or automatic paid fallback without a later explicit human approval.
+Use a free route only after its actual authentication, remaining free allowance
+and zero incremental charge are verified. A ChatGPT/Codex subscription is NOT
+external API authority. No new training or sealed Decision3 access.
+Reuse `google/gemma-4-E2B-it` at historical revision
+`3e22461f65e89153144f8adb70e3b8c2cc9845a7`; never silently use latest.
+The human has now explicitly requested uploading this completed batch to
+GitHub. Publish the pending F0 verifier/readiness work through existing Draft
+PR #179, without merging or releasing. Later development remains local until
+another upload request. No paid execution or Notion publication is authorized.
+These newer human constraints supersede conflicting publication/budget notes
+below and in the handoff. See docs/research/F0_ZERO_BUDGET_READINESS_2026-10-10.md
+and research/development/f0-zero-budget-2026-10-10/execution-policy.json.
+
+# ACTIVE HUMAN PIVOT DIRECTIVE | 2026-10-10 KST
+
+**Read docs/research/CODEX_HANDOFF_PIVOT_2026-10-10.md completely before modifying NEUMANN 1.**
+This newest human instruction supersedes conflicting historical local-only/5-hour
+timebox/GitHub-or-Notion-write restrictions and outdated old G0 next-step suggestions
+below, but does NOT supersede the frozen North Star, first evidence, source hashes,
+historical outcomes, required authorization for paid calls, or sealed Decision 3.
+
+Current development direction: HYBRID STRUCTURAL INTELLIGENCE ENGINE, classical
+solvers first; only learn goal-sufficient, source-bound new structure if it adds
+verified iso-capability economic value over the strongest classical hybrid.
+Frontier-level performance and >=10x complete cost advantage are aspirational
+and UNPROVEN. Q1-Q7 globally OPEN; Decision3 SEALED; HOLD_NEW_LEARNING.
+
+Repo working stack: #174 -> #175 -> #176 -> #177 -> #178 -> Draft #179.
+Do not assume main has this code; do not merge the stack blindly.
+NEVER rerun sealed evaluations, re-label opened v102/Q34/BP/SyGuS as fresh,
+replace original first artifacts, repeat failed P1/G0-A/G0-B experiments,
+or launch unapproved paid provider/GPU/model calls.
+
+Evidence first: official v102 cold source-aligned run 38012360839, 2 original
+LPs x Native/classical/frozen = 6 verified outcomes, learned frozen about
+3.27-3.33x SLOWER than Native on these cold cases. First raw archive
+11653732636 is immutable. Corrected counts are 6 total/2 frozen, with
+the original summary accounting defect documented, NOT overwritten.
+
+Immediate next critical path: verify latest PR head and dependencies; use
+existing hybrid_runtime_r0, f0_opened_bridge, f0_capture_local, original
+verifiers and frontier_gap_contract; identify real authenticated small-vs-
+frontier original-task gap (P1/F0), with finite spending permission and
+equal tools; only then one registered classical-headroom gate. Provider
+evidence currently missing; report BLOCKED_PROVIDER_EVIDENCE rather than
+fabricating failures or launching another benchmark. Append dated decisions
+to Notion Fast Finish if connector authorization allows it.
+
+---
 # NEUMANN 1 research instructions
 
 Latest human steering (2026-10-09 KST): finish the current audit and upload all

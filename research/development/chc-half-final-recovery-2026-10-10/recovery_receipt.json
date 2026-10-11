@@ -1,0 +1,480 @@
+{
+  "task": "CHC_HALF_SINGLE_FINAL_RECOVERY_2026_10_10",
+  "baseline": "8067d105e73c44cd4f872197e9d4fcf7f9a05098",
+  "attempt_limit": 1,
+  "attempts_performed": 1,
+  "attempt_closed": true,
+  "final_recovery_verdict": "PARTIAL",
+  "witness_recovery": "EVIDENCE_UNRECOVERABLE_IN_INSPECTED_LOCAL_ASSETS",
+  "execution_lineage": "INCOMPLETE",
+  "original_certification": "UNKNOWN",
+  "economics": "UNKNOWN",
+  "source": {
+    "repository": "chc-comp/chc-comp25-benchmarks",
+    "commit": "ddd279cab0717db6effe69baad451a8eb04ffd86",
+    "path": "extra-small-lia/half_true_modif_m_000.smt2",
+    "bytes": 1078,
+    "sha256": "cbcccf60b5d88da85c8c03f41c5f06dda85398503aaf74a9e5bcfea69071616c",
+    "git_blob_sha1": "96eea8c4fc77f4c6c9147b6ac68108793f73e4d4",
+    "url": "https://github.com/chc-comp/chc-comp25-benchmarks/blob/ddd279cab0717db6effe69baad451a8eb04ffd86/extra-small-lia/half_true_modif_m_000.smt2"
+  },
+  "source_group": "extra-small-lia",
+  "group_meaning": "REPOSITORY_PATH_LABEL_NOT_PROOF_OF_INDEPENDENT_PROBLEM_LINEAGE",
+  "published_category": "LIA-Lin",
+  "source_assertions": 5,
+  "source_predicates": [
+    "inv",
+    "inv1"
+  ],
+  "source_license": "UNKNOWN_NO_LOCAL_LICENSE_OR_PROVENANCE_CHAIN_FOUND",
+  "redistribution_authorized": false,
+  "historical_source_hash_matches_this_copy": "UNKNOWN",
+  "published_runs": [
+    {
+      "task_id": "extra-small-lia/half_true_modif_m_000.yml",
+      "task_descriptor_link": "../../chc-comp25-benchmarks/extra-small-lia/half_true_modif_m_000.yml",
+      "tool_table": "results-golem-LIA-Lin.table.html",
+      "exact_executable_command": "UNKNOWN_LOG_NOT_HELD",
+      "task_descriptor_contents": "MISSING",
+      "source_hash_in_historical_execution": "UNKNOWN",
+      "runs": [
+        {
+          "tool": "golem",
+          "version": "0.8.1",
+          "declared_options": "--print-witness",
+          "declared_timeout": "1800 s",
+          "declared_memory_limit": "15000 MB",
+          "declared_cpu_cores": "2",
+          "generator": "BenchExec 3.31-dev",
+          "published_status": "true",
+          "published_cpu_seconds": 64.611694956,
+          "published_wall_seconds": 32.30946583599962,
+          "log_link": "../golem.logfiles/CHC-COMP2025_check-sat.half_true_modif_m_000.yml.log",
+          "actual_log_held": false,
+          "actual_model_or_proof_body_held": false
+        },
+        {
+          "tool": "princess-validate-golem-models",
+          "version": "UNKNOWN",
+          "declared_options": "models/golem-models/${rundefinition_name}.${taskdef_name}.log",
+          "declared_timeout": "90 s",
+          "declared_memory_limit": "7000 MB",
+          "declared_cpu_cores": "2",
+          "generator": "BenchExec 3.31-dev",
+          "published_status": "true",
+          "published_cpu_seconds": 4.671150657,
+          "published_wall_seconds": 2.6159996629867237,
+          "log_link": "../princess-validate-golem-models.2025-07-19_19-35-15.logfiles/CHC-COMP2025_check-sat.half_true_modif_m_000.yml.log",
+          "actual_log_held": false,
+          "actual_model_or_proof_body_held": false
+        },
+        {
+          "tool": "z3-validate-golem-models",
+          "version": "UNKNOWN",
+          "declared_options": "models/golem-models/${rundefinition_name}.${taskdef_name}.log",
+          "declared_timeout": "90 s",
+          "declared_memory_limit": "7000 MB",
+          "declared_cpu_cores": "2",
+          "generator": "BenchExec 3.31-dev",
+          "published_status": "true",
+          "published_cpu_seconds": 0.212909324,
+          "published_wall_seconds": 0.21913450800639112,
+          "log_link": "../z3-validate-golem-models.2025-07-19_19-35-14.logfiles/CHC-COMP2025_check-sat.half_true_modif_m_000.yml.log",
+          "actual_log_held": false,
+          "actual_model_or_proof_body_held": false
+        },
+        {
+          "tool": "cvc5-validate-golem-models",
+          "version": "UNKNOWN",
+          "declared_options": "models/golem-models/${rundefinition_name}.${taskdef_name}.log",
+          "declared_timeout": "90 s",
+          "declared_memory_limit": "7000 MB",
+          "declared_cpu_cores": "2",
+          "generator": "BenchExec 3.31-dev",
+          "published_status": "true",
+          "published_cpu_seconds": 0.281644278,
+          "published_wall_seconds": 0.28112380499078427,
+          "log_link": "../cvc5-validate-golem-models.2025-07-19_19-35-15.logfiles/CHC-COMP2025_check-sat.half_true_modif_m_000.yml.log",
+          "actual_log_held": false,
+          "actual_model_or_proof_body_held": false
+        }
+      ]
+    },
+    {
+      "task_id": "extra-small-lia/half_true_modif_m_000.yml",
+      "task_descriptor_link": "../../chc-comp25-benchmarks/extra-small-lia/half_true_modif_m_000.yml",
+      "tool_table": "results-eldarica-LIA-Lin.table.html",
+      "exact_executable_command": "UNKNOWN_LOG_NOT_HELD",
+      "task_descriptor_contents": "MISSING",
+      "source_hash_in_historical_execution": "UNKNOWN",
+      "runs": [
+        {
+          "tool": "eldarica",
+          "version": "v2.2",
+          "declared_options": "-portfolio -ssol",
+          "declared_timeout": "1800 s",
+          "declared_memory_limit": "15000 MB",
+          "declared_cpu_cores": "2",
+          "generator": "BenchExec 3.31-dev",
+          "published_status": "true",
+          "published_cpu_seconds": 173.240505497,
+          "published_wall_seconds": 87.22997882201162,
+          "log_link": "../eldarica.logfiles/CHC-COMP2025_check-sat.half_true_modif_m_000.yml.log",
+          "actual_log_held": false,
+          "actual_model_or_proof_body_held": false
+        },
+        {
+          "tool": "princess-validate-eldarica-models",
+          "version": "UNKNOWN",
+          "declared_options": "models/eldarica-models/${rundefinition_name}.${taskdef_name}.log",
+          "declared_timeout": "90 s",
+          "declared_memory_limit": "7000 MB",
+          "declared_cpu_cores": "2",
+          "generator": "BenchExec 3.31-dev",
+          "published_status": "true",
+          "published_cpu_seconds": 2.416720664,
+          "published_wall_seconds": 1.540778294991469,
+          "log_link": "../princess-validate-eldarica-models.2025-07-19_19-35-14.logfiles/CHC-COMP2025_check-sat.half_true_modif_m_000.yml.log",
+          "actual_log_held": false,
+          "actual_model_or_proof_body_held": false
+        },
+        {
+          "tool": "z3-validate-eldarica-models",
+          "version": "UNKNOWN",
+          "declared_options": "models/eldarica-models/${rundefinition_name}.${taskdef_name}.log",
+          "declared_timeout": "90 s",
+          "declared_memory_limit": "7000 MB",
+          "declared_cpu_cores": "2",
+          "generator": "BenchExec 3.31-dev",
+          "published_status": "true",
+          "published_cpu_seconds": 0.126894516,
+          "published_wall_seconds": 0.12994764700124506,
+          "log_link": "../z3-validate-eldarica-models.2025-07-19_19-35-14.logfiles/CHC-COMP2025_check-sat.half_true_modif_m_000.yml.log",
+          "actual_log_held": false,
+          "actual_model_or_proof_body_held": false
+        },
+        {
+          "tool": "cvc5-validate-eldarica-models",
+          "version": "UNKNOWN",
+          "declared_options": "models/eldarica-models/${rundefinition_name}.${taskdef_name}.log",
+          "declared_timeout": "90 s",
+          "declared_memory_limit": "7000 MB",
+          "declared_cpu_cores": "2",
+          "generator": "BenchExec 3.31-dev",
+          "published_status": "true",
+          "published_cpu_seconds": 0.149919866,
+          "published_wall_seconds": 0.1539004819933325,
+          "log_link": "../cvc5-validate-eldarica-models.2025-07-19_19-35-14.logfiles/CHC-COMP2025_check-sat.half_true_modif_m_000.yml.log",
+          "actual_log_held": false,
+          "actual_model_or_proof_body_held": false
+        }
+      ]
+    },
+    {
+      "task_id": "extra-small-lia/half_true_modif_m_000.yml",
+      "task_descriptor_link": "../../chc-comp25-benchmarks/extra-small-lia/half_true_modif_m_000.yml",
+      "tool_table": "results-theta-LIA-Lin.table.html",
+      "exact_executable_command": "UNKNOWN_LOG_NOT_HELD",
+      "task_descriptor_contents": "MISSING",
+      "source_hash_in_historical_execution": "UNKNOWN",
+      "runs": [
+        {
+          "tool": "theta",
+          "version": "6.17.4",
+          "declared_options": "--print-model",
+          "declared_timeout": "1800 s",
+          "declared_memory_limit": "15000 MB",
+          "declared_cpu_cores": "2",
+          "generator": "BenchExec 3.31-dev",
+          "published_status": "TIMEOUT",
+          "published_cpu_seconds": 1802.082874939,
+          "published_wall_seconds": 1615.7765294189958,
+          "log_link": "../theta.logfiles/CHC-COMP2025_check-sat.half_true_modif_m_000.yml.log",
+          "actual_log_held": false,
+          "actual_model_or_proof_body_held": false
+        },
+        {
+          "tool": "princess-validate-theta-models",
+          "version": "UNKNOWN",
+          "declared_options": "models/theta-models/${rundefinition_name}.${taskdef_name}.log",
+          "declared_timeout": "90 s",
+          "declared_memory_limit": "7000 MB",
+          "declared_cpu_cores": "2",
+          "generator": "BenchExec 3.31-dev",
+          "published_status": "unknown",
+          "published_cpu_seconds": 0.333763571,
+          "published_wall_seconds": 0.33371750700462144,
+          "log_link": "../princess-validate-theta-models.2025-07-19_19-35-14.logfiles/CHC-COMP2025_check-sat.half_true_modif_m_000.yml.log",
+          "actual_log_held": false,
+          "actual_model_or_proof_body_held": false
+        },
+        {
+          "tool": "z3-validate-theta-models",
+          "version": "UNKNOWN",
+          "declared_options": "models/theta-models/${rundefinition_name}.${taskdef_name}.log",
+          "declared_timeout": "90 s",
+          "declared_memory_limit": "7000 MB",
+          "declared_cpu_cores": "2",
+          "generator": "BenchExec 3.31-dev",
+          "published_status": "unknown",
+          "published_cpu_seconds": 0.262365632,
+          "published_wall_seconds": 0.2630716990097426,
+          "log_link": "../z3-validate-theta-models.2025-07-19_19-35-14.logfiles/CHC-COMP2025_check-sat.half_true_modif_m_000.yml.log",
+          "actual_log_held": false,
+          "actual_model_or_proof_body_held": false
+        },
+        {
+          "tool": "cvc5-validate-theta-models",
+          "version": "UNKNOWN",
+          "declared_options": "models/theta-models/${rundefinition_name}.${taskdef_name}.log",
+          "declared_timeout": "90 s",
+          "declared_memory_limit": "7000 MB",
+          "declared_cpu_cores": "2",
+          "generator": "BenchExec 3.31-dev",
+          "published_status": "unknown",
+          "published_cpu_seconds": 0.238287202,
+          "published_wall_seconds": 0.2520260080054868,
+          "log_link": "../cvc5-validate-theta-models.2025-07-19_19-35-15.logfiles/CHC-COMP2025_check-sat.half_true_modif_m_000.yml.log",
+          "actual_log_held": false,
+          "actual_model_or_proof_body_held": false
+        }
+      ]
+    }
+  ],
+  "existing_link_checks": [
+    {
+      "task": "extra-small-lia/half_true_modif_m_000.yml",
+      "kind": "native_model_log",
+      "url": "https://home.mit.bme.hu/~bajczi/chc-comp25-models/final/golem.logfiles/CHC-COMP2025_check-sat.half_true_modif_m_000.yml.log",
+      "checked_utc": "2026-10-09T05:11:52.977179+00:00",
+      "http_status": 404,
+      "retrieved_model_certificate": false
+    },
+    {
+      "task": "extra-small-lia/half_true_modif_m_000.yml",
+      "kind": "z3_validation_log",
+      "url": "https://home.mit.bme.hu/~bajczi/chc-comp25-models/final/z3-validate-golem-models.2025-07-19_19-35-14.logfiles/CHC-COMP2025_check-sat.half_true_modif_m_000.yml.log",
+      "checked_utc": "2026-10-09T05:11:52.977179+00:00",
+      "http_status": 404,
+      "retrieved_model_certificate": false
+    }
+  ],
+  "new_network_calls": 0,
+  "new_link_retries": 0,
+  "search_scope": {
+    "roots": [
+      "Continuation",
+      "GitHub"
+    ],
+    "excluded_dependency_inventories": [
+      ".venv",
+      "site-packages",
+      "node_modules",
+      ".git"
+    ],
+    "zip_directories_inspected": 87,
+    "zip_members_inspected": 22030,
+    "matching_archive_members": 0,
+    "archive_errors": 0,
+    "other_tar_tgz_7z_containers_found": 0,
+    "zip_contents_extracted": false,
+    "loose_content_and_filename_target_search": true,
+    "guarantees_exhaustive_absence_outside_scope": false
+  },
+  "independent_verifier_run": false,
+  "why_not_verified": "No complete SAT predicate interpretation or UNSAT proof from the exact historical original exists in the inspected held evidence. Do not substitute a manual affine relation, different source or fresh solver output.",
+  "native_comparability": {
+    "same_published_task_label_and_declared_resource_class": true,
+    "same_original_bytes_bound": false,
+    "complete_commands_and_builds_bound": false,
+    "checker_versions_bound": false,
+    "cost_acquisition_failed_search_reuse": "UNKNOWN",
+    "strongest_equal_rights_baseline": "UNKNOWN",
+    "neumann_speedup_claimed": false
+  },
+  "research_decision": "CLOSE_CANDIDATE_SEARCH_ENTER_CPU_R0_COMPLETION_ONLY",
+  "new_candidate": null,
+  "new_experiment": null,
+  "new_solver_calls": 0,
+  "new_model_calls": 0,
+  "gpu_calls": 0,
+  "paid_calls": 0,
+  "sealed_access": false,
+  "github_upload": false,
+  "learning": "HOLD",
+  "gemma_f0": "BLOCKED_SMALL_MODEL_RUNTIME",
+  "prior_29_gate": {
+    "PASS": 0,
+    "HOLD": 8,
+    "UNKNOWN": 21
+  },
+  "r0_inspection": {
+    "scope": "STATIC_EXISTING_CPU_PRODUCT_CLOSURE_ONLY",
+    "current_python_version": "3.12.14",
+    "installed_package_metadata": {
+      "numpy": "2.4.6",
+      "scipy": "1.17.1",
+      "scikit-learn": "1.9.1",
+      "highspy": "1.15.1",
+      "z3-solver": "4.15.4.0",
+      "cvc5": "1.4.1",
+      "psutil": "7.2.2",
+      "build": "NOT_INSTALLED_IN_INSPECTED_PYTHON",
+      "setuptools": "NOT_INSTALLED_IN_INSPECTED_PYTHON"
+    },
+    "cvc5_executable_on_current_path": false,
+    "new_runtime_verification": false,
+    "new_wheel_build": false,
+    "new_tests": false,
+    "local_neumann_wheel_found": false,
+    "historical_gate_claims": "RETAINED_ENGINEERING_REPORTS_NOT_CURRENT_RELEASE_OR_SCIENTIFIC_SUCCESS",
+    "closure_items": [
+      {
+        "item": "CPU dependency and native executable installation contract",
+        "status": "INCOMPLETE",
+        "facts": "Default pyproject dependencies omit Z3 and native cvc5 executable. Historical wheel workflow manually installs Z3/HiGHS and apt cvc5. Current Python has cvc5 bindings but no cvc5 executable on PATH; package versions differ from the historical release gate."
+      },
+      {
+        "item": "Source-bound distributable and independent install receipt",
+        "status": "INCOMPLETE",
+        "facts": "No local NEUMANN wheel recovered. Historical wheel report is not a current-baseline wheel/source/dependency hash manifest. Reuse the existing wheel gate; do not create a new harness."
+      },
+      {
+        "item": "Controlled integration and release scope",
+        "status": "INCOMPLETE",
+        "facts": "No merge/upload or new CI. Retain classical-only default, no bundled Q34 assets or auto-download. Source/third-party distribution permissions still need an explicit release inventory."
+      }
+    ],
+    "not_required_for_cpu_release": [
+      "new_structural_discovery",
+      "new_learning",
+      "Gemma_GPU_runtime",
+      "Frontier_Gap_recovery",
+      "Edge_energy_or_10x_claims"
+    ],
+    "next_single_product_action": "Finalize the existing classical-only CPU install/dependency contract and source-bound wheel manifest using the existing gate. No automatic remote CI or solver rerun is authorized by this static review."
+  },
+  "artifact_identities": [
+    {
+      "path": "Continuation/PUBLIC_PRIOR_ARTIFACTS_2026-10-09/chc_comp_2025/extra-small-lia__half_true_modif_m_000.smt2",
+      "bytes": 1078,
+      "sha256": "cbcccf60b5d88da85c8c03f41c5f06dda85398503aaf74a9e5bcfea69071616c",
+      "stored_hash_matched": true
+    },
+    {
+      "path": "Continuation/PUBLIC_PRIOR_ARTIFACTS_2026-10-09/chc_comp_2025/source_receipts.json",
+      "bytes": 1606,
+      "sha256": "97bedec2cf236214550c2dbee20aa10734edb5dd0236f788feaba28b9904fe18",
+      "stored_hash_matched": false
+    },
+    {
+      "path": "Continuation/PUBLIC_PRIOR_ARTIFACTS_2026-10-09/chc_comp_2025/results-golem-LIA-Lin.table.html",
+      "bytes": 2511787,
+      "sha256": "a94d5ba5356a448d8b2ded377fb898d3935e46f7076c070b3bc1214f4572c400",
+      "stored_hash_matched": true
+    },
+    {
+      "path": "Continuation/PUBLIC_PRIOR_ARTIFACTS_2026-10-09/chc_comp_2025/results-eldarica-LIA-Lin.table.html",
+      "bytes": 2499058,
+      "sha256": "ce5224e6d6c38d2483e71bb6c5b60c3ac796af5eb8d892d74ee2eab1e6b3a068",
+      "stored_hash_matched": true
+    },
+    {
+      "path": "Continuation/PUBLIC_PRIOR_ARTIFACTS_2026-10-09/chc_comp_2025/results-theta-LIA-Lin.table.html",
+      "bytes": 2502811,
+      "sha256": "43091e83b786942e21fb9dd269750b4cec39f06eb71d1032f9e5669ac522bda9",
+      "stored_hash_matched": true
+    },
+    {
+      "path": "Continuation/CHC_HALF_RECOVERY_2026-10-10/archive_directory_search.json",
+      "bytes": 16482,
+      "sha256": "bf880595b5461ead1edf940ebee283058079efd94d7b6c771124dde7145bb349",
+      "stored_hash_matched": false
+    },
+    {
+      "path": "Continuation/PUBLIC_PRIOR_ARTIFACTS_2026-10-09/chc_comp_2025/published_witness_link_availability_2026-10-09.json",
+      "bytes": 1545,
+      "sha256": "864e8a9a7960e07831bfd5dcf32ff72041449ba522cbfe40a9eb23a2821080d6",
+      "stored_hash_matched": false
+    },
+    {
+      "path": "GitHub/NEUMANN-F0-LOCAL/pyproject.toml",
+      "bytes": 658,
+      "sha256": "bdc2ca1a3a561c0307b650e17418bfa8a6598c2e25cf3a2f5d4ab6fb5b8617f3",
+      "stored_hash_matched": false
+    },
+    {
+      "path": "GitHub/NEUMANN-F0-LOCAL/neumann1/hybrid_runtime_r0.py",
+      "bytes": 17624,
+      "sha256": "6e1905c6b6c4bd502f1703a77f100ff402820e191ba9248e2d733e2211ed834c",
+      "stored_hash_matched": false
+    },
+    {
+      "path": "GitHub/NEUMANN-F0-LOCAL/neumann1/hybrid_sygus_r0.py",
+      "bytes": 8739,
+      "sha256": "71fda8ed928cee51e00f32e47d5ef73994b5031c80df129a90cc258620eed376",
+      "stored_hash_matched": false
+    },
+    {
+      "path": "GitHub/NEUMANN-F0-LOCAL/neumann1/__init__.py",
+      "bytes": 14790,
+      "sha256": "e75122eb0abf13e0427d17d2bd12554bda8c2d979425000b0d099b964c1fa9c7",
+      "stored_hash_matched": false
+    },
+    {
+      "path": "GitHub/NEUMANN-F0-LOCAL/tests/test_hybrid_runtime_r0.py",
+      "bytes": 7509,
+      "sha256": "65547aa464c0e11567d66c800d1d02774a468e2a99c77d2f86cdf265881f21d2",
+      "stored_hash_matched": false
+    },
+    {
+      "path": "GitHub/NEUMANN-F0-LOCAL/tests/test_hybrid_sygus_r0.py",
+      "bytes": 4484,
+      "sha256": "2b5ba193d6f5d08272cc0e88d26990d7e169610c549c8e01ad4959cb44fa4869",
+      "stored_hash_matched": false
+    },
+    {
+      "path": "GitHub/NEUMANN-F0-LOCAL/.github/workflows/hybrid_r0_wheel_install_gate_20261009.yml",
+      "bytes": 4440,
+      "sha256": "cfda123bda93e16e21236ac08a3067e9a8b12fdedee3e92fe7c70c15c5d1efd4",
+      "stored_hash_matched": false
+    },
+    {
+      "path": "GitHub/NEUMANN-F0-LOCAL/.github/workflows/hybrid_r0_clean_release_gate_20261009.yml",
+      "bytes": 2773,
+      "sha256": "8bd0bcf5fb152ccc3e0796952351c7a3f2c891971e532ddad8dd3a04cef31e18",
+      "stored_hash_matched": false
+    },
+    {
+      "path": "GitHub/NEUMANN-F0-LOCAL/experiments/hybrid_r0_release_gate_20261009.py",
+      "bytes": 11691,
+      "sha256": "5b9271d7eaa482ba316ae485ef697568e674cc4752d96940d29a972e028599ac",
+      "stored_hash_matched": false
+    },
+    {
+      "path": "GitHub/NEUMANN-F0-LOCAL/docs/research/hybrid_r0_distribution_decision_20261009.md",
+      "bytes": 3128,
+      "sha256": "ec6550545c8e624ac170b746bb4b4a8bc3ba40c24f0add44e27c0b1888c25d9c",
+      "stored_hash_matched": false
+    },
+    {
+      "path": "GitHub/NEUMANN-F0-LOCAL/docs/research/hybrid_r0_executable_rc_20261009.md",
+      "bytes": 6679,
+      "sha256": "ddc08c474529edf849efd83e160e7982d39e146db4bfa6d88ddd667970368263",
+      "stored_hash_matched": false
+    },
+    {
+      "path": "GitHub/NEUMANN-F0-LOCAL/docs/research/hybrid_r0_clean_release_gate_20261009.md",
+      "bytes": 5857,
+      "sha256": "9a3e0e6dd9a47abc27df26b7ca22533e81e30c7a6be8f3ce846d6aedbb596d39",
+      "stored_hash_matched": false
+    },
+    {
+      "path": "GitHub/NEUMANN-F0-LOCAL/docs/research/hybrid_r0_source_identity_contract_20261009.md",
+      "bytes": 3169,
+      "sha256": "7fe894752849724b3d2320717e5d0670fe0066416695e841a432de878481537c",
+      "stored_hash_matched": false
+    }
+  ],
+  "claim_boundary": "PARTIAL recovery means a source copy and table metadata exist; it is not independent CHC certification. Candidate search is closed, not an impossibility theorem. CPU R0 scope does not satisfy the frozen North Star."
+}

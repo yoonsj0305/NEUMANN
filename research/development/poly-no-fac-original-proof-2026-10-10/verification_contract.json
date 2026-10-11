@@ -1,0 +1,23 @@
+{
+  "analysis_id": "POLY_NO_FAC_STORED_NATIVE_ORIGINAL_PROOF_20261010",
+  "baseline_commit": "2add388b78af9ce23031203e669dee1638a94551",
+  "kind": "opened source-specific independent verification, not new synthesis or performance cohort",
+  "original_path": "benchmarks/list/poly_no_fac.ml",
+  "original_sha256": "e9a3436fe113e714f09baa701304f6eca9b8b2ae760812d319b8a128ef002810",
+  "stored_population": "case 22, all 3 CVC4 and all 3 CVC5 first observations, selected from previous 29-source/174-observation triage",
+  "printed_native_solution_sha256": "5e4ec657938e9b98e637f709902170dda17b341f4254566e061de30ffc265487",
+  "original_goal": "spec x (repr tree)",
+  "decoded_native_goal": "first component of the stored lifted h tree, with the same immutable x at every leaf",
+  "scope": "all integer x and leaf values, all finite ordered acyclic constructor trees, mathematical unbounded integers",
+  "proof": "existing exact polynomial identity verifier for affine suffix responses plus structural induction and existing source repr order/termination proof",
+  "binding": "explicit transcription of this one hash-pinned source and printed solution, not a general OCaml parser or executable",
+  "acceptance": "all seven universal polynomial identities and source repr proof accepted; mismatched sources, unsupported bindings or exhausted proof budgets remain UNKNOWN",
+  "not_certified": ["full compiled OCaml wrapper", "machine overflow semantics", "cyclic/infinite structures", "changed parameter per subtree", "arbitrary source programs", "natural-language intent", "complete-cost advantage", "Frontier Gap"],
+  "repeats_are_independent_problems": false,
+  "fresh_independent_problems": 0,
+  "new_model_calls": 0,
+  "new_gpu_calls": 0,
+  "new_native_synthesis_runs": 0,
+  "paid_calls": 0,
+  "sealed_access": false
+}

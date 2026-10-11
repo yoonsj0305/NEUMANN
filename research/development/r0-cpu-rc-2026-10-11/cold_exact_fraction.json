@@ -1,0 +1,62 @@
+{
+  "outer_process_wall_ms": 1604.8899,
+  "receipts": [
+    {
+      "answer": {
+        "method": "numeric_verified_or_exact_gauss_jordan",
+        "solution": {
+          "x0": {
+            "denominator": 2,
+            "numerator": 1
+          },
+          "x1": {
+            "denominator": 3,
+            "numerator": 1
+          }
+        }
+      },
+      "cost": {
+        "cloud_transport_ms": "NOT_APPLICABLE",
+        "cold_process_startup_ms": "UNKNOWN",
+        "external_structure_proposal_ms": "NOT_APPLICABLE",
+        "frontier_calls": 0,
+        "measured_energy_j": "UNKNOWN",
+        "model_calls": 0,
+        "observed_wall_ms": 1.5817,
+        "offline_training_investment_ms": "UNKNOWN",
+        "process_peak_rss_kb": "UNKNOWN",
+        "stages_ms": {
+          "exact_or_numeric_execution_ms": 0.2527,
+          "independent_original_verification_ms": 0.0111,
+          "input_validation_ms": 0.039,
+          "unassigned_python_wrapper_ms": 1.2789000000000001
+        }
+      },
+      "domain": "exact.linear",
+      "events": [
+        {
+          "kind": "exact_linear_solver",
+          "numeric_then_exact_fallback": true,
+          "proposal_status": "nonintegral_proposal"
+        },
+        {
+          "equations": 2,
+          "kind": "independent_exact_original_certificate",
+          "passed": true
+        }
+      ],
+      "execution_request_sha256": "bcfd041c53b7c657cab3416f0422f209277ef7627581c9d4cc3ffb494703f6d1",
+      "learned_model_inference": false,
+      "north_star_global_questions_closed": [],
+      "original_problem_sha256": "d49fa912416243016103424f6970450da057167ee563c5a762b0ed4f0d426f74",
+      "original_task_sha256": "bcfd041c53b7c657cab3416f0422f209277ef7627581c9d4cc3ffb494703f6d1",
+      "reason": null,
+      "research_scope": "ENGINEERING_FIXTURE_ONLY_NOT_FRESH_EVIDENCE",
+      "schema": "neumann.hybrid-r0-engineering.v0",
+      "status": "VERIFIED"
+    }
+  ],
+  "rss_sampling_note": "4 ms sampled maximum, lower bound, not exact all-time peak",
+  "sample_count": 185,
+  "sampled_process_tree_peak_rss_bytes": 123502592
+}

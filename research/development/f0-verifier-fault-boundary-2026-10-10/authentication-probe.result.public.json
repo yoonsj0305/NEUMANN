@@ -1,0 +1,58 @@
+{
+  "schema": "neumann.codex-authentication-probe.result.v1",
+  "recorded_at_utc": "2026-10-10T06:34:01.213546+00:00",
+  "registration_sha256": "df864151199c09c7358e82ad6836dabf94d7820b1e5ccc9670ea2a02e3117d47",
+  "requested_model": "gpt-6.1-sol",
+  "thread_returned_model": "gpt-6.1-sol",
+  "thread_returned_provider": "openai",
+  "immutable_model_revision": null,
+  "thread_id_sha256": "b27b32506593364f04960dee12b814053efa8f40ac86fc1cf26c04a6a38a314a",
+  "turn_id_sha256": "c9b5e54dd604532da9f56e1393708a5ff09d93d1dae15a57111d8082b7b962db",
+  "status": "completed",
+  "response": "NEUMANN_AUTH_PROBE_OK",
+  "response_sha256": "c0a834806243dd4cc1ee2b62b0c5f8b4316be7d1b0952d7f3269a2eba5468693",
+  "token_usage": {
+    "total": {
+      "totalTokens": 10625,
+      "inputTokens": 10614,
+      "cachedInputTokens": 4992,
+      "cacheWriteInputTokens": 0,
+      "outputTokens": 11,
+      "reasoningOutputTokens": 0
+    },
+    "last": {
+      "totalTokens": 10625,
+      "inputTokens": 10614,
+      "cachedInputTokens": 4992,
+      "cacheWriteInputTokens": 0,
+      "outputTokens": 11,
+      "reasoningOutputTokens": 0
+    },
+    "modelContextWindow": 258400
+  },
+  "latency_ms": 4992.240799998399,
+  "event_methods": [
+    "account/rateLimits/updated",
+    "item/agentMessage/delta",
+    "item/completed",
+    "item/started",
+    "mcpServer/startupStatus/updated",
+    "thread/status/changed",
+    "thread/tokenUsage/updated",
+    "turn/completed",
+    "turn/started"
+  ],
+  "tool_calls": 0,
+  "model_rerouted": false,
+  "generation_calls": 1,
+  "new_paid_spend_krw": 0,
+  "subscription_investment": "UNKNOWN",
+  "api_invoice": "NOT_APPLICABLE_TO_INCLUDED_SUBSCRIPTION_USAGE",
+  "provider_response_attestation": "LOCAL_CODEX_PROTOCOL_ONLY_NO_BACKEND_SNAPSHOT_OR_SIGNED_TRACE",
+  "probe_pass": true,
+  "original_problems": 0,
+  "small_model_calls": 0,
+  "paired_f0_originals": 0,
+  "frontier_gap_measured": false,
+  "frontier_reference_selected": false
+}

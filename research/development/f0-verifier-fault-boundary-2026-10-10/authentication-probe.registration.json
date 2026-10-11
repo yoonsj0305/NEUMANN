@@ -1,0 +1,21 @@
+{
+  "schema": "neumann.codex-authentication-probe.registration.v1",
+  "registered_at_utc": "2026-10-10T06:33:56.222940+00:00",
+  "purpose": "One included-usage authentication/response probe, not F0 or frontier selection",
+  "provider": "OpenAI Codex managed ChatGPT authentication",
+  "requested_model": "gpt-6.1-sol",
+  "model_selection": "actual catalog default",
+  "max_generation_calls": 1,
+  "max_retries": 0,
+  "max_wall_seconds": 30,
+  "paid_budget_krw": 0,
+  "paid_credit_fallback": "UNAVAILABLE_BY_PREFLIGHT",
+  "prompt": "Reply with exactly NEUMANN_AUTH_PROBE_OK. Do not use any tools.",
+  "tools": "No tool invocation permitted; observed calls invalidate probe",
+  "original_problems": 0,
+  "small_model_calls": 0,
+  "immutable_model_revision": null,
+  "token_cap": "No exact request token ceiling exposed; low effort and bounded wall time",
+  "success": "completed turn, exact response, zero tools and no model reroute",
+  "future_frontier_reference_selected": false
+}

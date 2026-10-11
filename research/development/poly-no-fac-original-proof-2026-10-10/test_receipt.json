@@ -1,0 +1,17 @@
+{
+  "kind": "local proof-recipe and verifier regression, not performance cohort",
+  "date_kst": "2026-10-10",
+  "command": "python -X utf8 -m pytest -q tests/test_poly_no_fac_original_proof.py tests/test_representation_program.py tests/test_source_bound_recursive.py tests/test_recursive_state_evidence_triage.py",
+  "exit_code": 0,
+  "passed": 53,
+  "failed": 0,
+  "elapsed_seconds_reported_by_pytest": 3.16,
+  "output": "..................................................... [100%]\n53 passed in 3.16s",
+  "native_original_counterexample": false,
+  "test_mutation_counterexample": {"x": 2, "left": [1], "right": [1], "original_goal": 3, "wrong_merge_goal": 2},
+  "new_native_synthesis_runs": 0,
+  "new_model_calls": 0,
+  "new_gpu_calls": 0,
+  "small_model_runtime_status": "BLOCKED_SMALL_MODEL_RUNTIME",
+  "frontier_gap_measured": false
+}

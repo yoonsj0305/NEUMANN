@@ -1,0 +1,237 @@
+{
+  "schema": "neumann.f0-verification-unknown.engineering.v1",
+  "recorded_at_utc": "2026-10-10T02:00:04Z",
+  "scope": "ENGINEERING_REGRESSION_ONLY_NO_AUTHENTICATED_PROVIDER_OR_SCIENTIFIC_EVALUATION",
+  "checked_prs": [
+    {
+      "number": 174,
+      "state": "open",
+      "draft": false,
+      "head": "a0119180e743f5115b21847fdb6ac6741f97bbe2",
+      "head_ref": "research/p112-opened-development-v1",
+      "base": "55178a211962caf5ce677deb37edd30bfb4fdccc",
+      "base_ref": "main",
+      "merged": false,
+      "html_url": "https://github.com/yoonsj0305/NEUMANN/pull/174"
+    },
+    {
+      "number": 175,
+      "state": "open",
+      "draft": true,
+      "head": "fb23dca002bbd50c96e0c766369269a0b7fcc7a6",
+      "head_ref": "research/neumann1-structural-evidence-2026-10-07",
+      "base": "55178a211962caf5ce677deb37edd30bfb4fdccc",
+      "base_ref": "main",
+      "merged": false,
+      "html_url": "https://github.com/yoonsj0305/NEUMANN/pull/175"
+    },
+    {
+      "number": 176,
+      "state": "open",
+      "draft": true,
+      "head": "c182fd3f8d8b5c711415a214e899bfefe7511a0a",
+      "head_ref": "research/neumann1-master-audit-2026-10-09",
+      "base": "fb23dca002bbd50c96e0c766369269a0b7fcc7a6",
+      "base_ref": "research/neumann1-structural-evidence-2026-10-07",
+      "merged": false,
+      "html_url": "https://github.com/yoonsj0305/NEUMANN/pull/176"
+    },
+    {
+      "number": 177,
+      "state": "open",
+      "draft": true,
+      "head": "5cbda9d363d877438da9d3f227307f6ddc17d8a9",
+      "head_ref": "research/hybrid-r0-first-slice-20261009",
+      "base": "c182fd3f8d8b5c711415a214e899bfefe7511a0a",
+      "base_ref": "research/neumann1-master-audit-2026-10-09",
+      "merged": false,
+      "html_url": "https://github.com/yoonsj0305/NEUMANN/pull/177"
+    },
+    {
+      "number": 178,
+      "state": "open",
+      "draft": true,
+      "head": "986d77498fc9be9b72631231dbbada450295f18a",
+      "head_ref": "research/hybrid-r0-identity-contract-20261009",
+      "base": "5cbda9d363d877438da9d3f227307f6ddc17d8a9",
+      "base_ref": "research/hybrid-r0-first-slice-20261009",
+      "merged": false,
+      "html_url": "https://github.com/yoonsj0305/NEUMANN/pull/178"
+    },
+    {
+      "number": 179,
+      "state": "open",
+      "draft": true,
+      "head": "a5c4097c418231b416c8ece482df5eac4ae6d9bc",
+      "head_ref": "research/f0-opened-original-comparison-20261009",
+      "base": "986d77498fc9be9b72631231dbbada450295f18a",
+      "base_ref": "research/hybrid-r0-identity-contract-20261009",
+      "merged": false,
+      "html_url": "https://github.com/yoonsj0305/NEUMANN/pull/179"
+    }
+  ],
+  "latest_remote_ci": [
+    {
+      "id": 38014206664,
+      "name": "Frozen North Star and Frontier Gap contracts",
+      "head_sha": "a5c4097c418231b416c8ece482df5eac4ae6d9bc",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/yoonsj0305/NEUMANN/actions/runs/38014206664",
+      "updated_at": "2026-10-10T01:42:43Z"
+    },
+    {
+      "id": 38014206653,
+      "name": "CI",
+      "head_sha": "a5c4097c418231b416c8ece482df5eac4ae6d9bc",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/yoonsj0305/NEUMANN/actions/runs/38014206653",
+      "updated_at": "2026-10-10T01:50:20Z"
+    }
+  ],
+  "git_write_policy": "LOCAL_ONLY_NO_PUSH_NO_GITHUB_MUTATION",
+  "working_base": "a5c4097c418231b416c8ece482df5eac4ae6d9bc",
+  "stages": [
+    {
+      "stage": "pre_fix_fault_reproduction",
+      "tool_chunk": "cd659a",
+      "exit_code": 1,
+      "pytest_summary": "8 failed, 3 passed, 10 deselected in 7.27s",
+      "failed_subtests": 7,
+      "failed_integration_tests": 1,
+      "raw_local_output": null,
+      "reason": "First output retained in tool transcript only; no retrospective pre-fix rerun."
+    },
+    {
+      "stage": "first_fix_related_regression",
+      "tool_chunk": "dd0b3c",
+      "exit_code": 0,
+      "pytest_summary": "78 passed, 1 skipped, 7 subtests passed in 8.57s",
+      "raw_local_output": null
+    },
+    {
+      "stage": "final_all_arms_repeats_regression",
+      "tool_chunk": "df9399",
+      "exit_code": 0,
+      "pytest_summary": "79 passed, 1 skipped, 17 subtests passed in 6.82s",
+      "raw_local_output": "pytest-final.log",
+      "junit": "pytest-final.xml"
+    }
+  ],
+  "test_command": "python -X utf8 -m pytest -q tests/test_f0_opened_bridge.py tests/test_f0_capture_local.py tests/test_hybrid_runtime_r0.py tests/test_hybrid_sygus_r0.py tests/test_frontier_gap_contract.py --tb=short --junitxml=research/development/f0-verification-unknown-2026-10-10/pytest-final.xml",
+  "unavailable_test": {
+    "test": "test_live_native_synthesis_three_original_proofs",
+    "reason": "cvc5 native solver unavailable"
+  },
+  "runtime": {
+    "python": "3.12.14",
+    "platform": "Windows-11-10.0.26300-SP0",
+    "packages": {
+      "pytest": "9.1.1",
+      "numpy": "2.4.6",
+      "scipy": "1.17.1",
+      "highspy": "1.15.1",
+      "z3-solver": "4.15.4.0",
+      "torch": null
+    },
+    "cvc5_cli": null
+  },
+  "boundary": {
+    "authenticated_provider_calls": 0,
+    "new_model_forwards": 0,
+    "gpu_training": 0,
+    "scientific_originals_evaluated": 0,
+    "sealed_originals_accessed": 0,
+    "github_mutations": 0,
+    "notion_writes": 0
+  },
+  "provider_readiness": {
+    "decision": "BLOCKED_PROVIDER_EVIDENCE",
+    "small_id": null,
+    "small_revision": null,
+    "frontier_id": null,
+    "frontier_revision": null,
+    "authenticated_capture": null,
+    "finite_authorized_budget": null,
+    "registered_scientific_cohort": null,
+    "owner_inputs_needed": [
+      "Exact frozen small/frontier provider IDs and revisions",
+      "Authenticated capture route with first-call usage and cost receipts",
+      "Finite authorized call budget, tool authority and deadlines"
+    ],
+    "local_native_sygus_blocker": "cvc5 CLI absent; installed Z3 independent checking available"
+  },
+  "science": {
+    "decision": "HOLD_NEW_LEARNING",
+    "frontier_capability": "NOT_ESTABLISHED",
+    "complete_cost_10x": "NOT_ESTABLISHED",
+    "compute_flops": "UNKNOWN",
+    "energy": "UNKNOWN",
+    "memory": "UNKNOWN",
+    "monetary_cost": "UNKNOWN",
+    "test_duration_is_inference_cost": false,
+    "historical_verdicts_unchanged": true
+  },
+  "integrity": {
+    "protected_opened_files": 64,
+    "all_match_base": true,
+    "detail": "protected-integrity.json",
+    "local_diff_check": "PASS"
+  },
+  "file_hashes": [
+    {
+      "path": "neumann1/f0_opened_bridge.py",
+      "sha256": "796c98ba78656f022137eff9061cd75277ad4fc2f6673ae22803763a0d91b770"
+    },
+    {
+      "path": "tests/test_f0_opened_bridge.py",
+      "sha256": "46633b6377a7524ae936217a6bb25ce94418479cd417f48e95de5f29e9ba6ee7"
+    },
+    {
+      "path": "docs/research/f0_opened_frontier_comparison_runbook_20261009.md",
+      "sha256": "3ca0f893e247ffaca58fcfed170636db6f2dfa78b130728c7d28b2d3c69e2c5b"
+    },
+    {
+      "path": "docs/research/F0_VERIFIER_UNKNOWN_FIX_2026-10-10.md",
+      "sha256": "90a17f9ec57a9a201be0d29c0b343c57d4fffd0154bbd64a340bdc6aeaee9640"
+    },
+    {
+      "path": "research/development/f0-verification-unknown-2026-10-10/pytest-final.log",
+      "sha256": "345e432c4d37dbaf8854c1d4f4ce425b52478c76397954477e91ddc3a5d59b06"
+    },
+    {
+      "path": "research/development/f0-verification-unknown-2026-10-10/pytest-final.xml",
+      "sha256": "8c2c6668e83f24bf9b101396218c2b6988e4c3561e2a8e00d765b99054f0c2d7"
+    },
+    {
+      "path": "research/development/f0-verification-unknown-2026-10-10/protected-integrity.json",
+      "sha256": "e41b06cf0448ce92ee1850223bf929544a91f979698e63e0d60d7411cdc43e05"
+    }
+  ],
+  "junit_counts_including_subtests": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "1",
+    "tests": "97",
+    "time": "6.811",
+    "timestamp": "2026-10-10T10:58:32.660551+09:00",
+    "hostname": "Yoon"
+  },
+  "skipped_cases": [
+    {
+      "test": "test_live_native_synthesis_three_original_proofs",
+      "reason": "cvc5 native solver unavailable"
+    }
+  ],
+  "latest_user_steering": {
+    "focus": "Verified program/constraint structural discovery",
+    "admission": "F0 -> G0 -> R1 -> independent F1",
+    "moving_baseline": "Hypothetical monetary 2x/5x/10x reductions on price-sensitive components only; no measured results",
+    "prior_work_checked": [
+      "https://arxiv.org/abs/2608.13077",
+      "https://aclanthology.org/2026.acl-demo.66/"
+    ]
+  }
+}

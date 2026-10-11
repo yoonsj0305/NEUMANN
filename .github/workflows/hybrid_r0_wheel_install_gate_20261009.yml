@@ -1,6 +1,16 @@
 name: Hybrid R0 distributable wheel and independent install smoke
 # Engineering RC only: no frozen Q34 model archives are bundled in this wheel.
 on:
+  pull_request:
+    paths:
+      - .github/workflows/hybrid_r0_wheel_install_gate_20261009.yml
+      - pyproject.toml
+      - neumann1/**
+      - tests/test_hybrid_runtime_r0.py
+      - tests/test_hybrid_sygus_r0.py
+      - tests/test_f0_opened_bridge.py
+      - docs/research/r0_cpu_windows_constraints.txt
+  workflow_dispatch:
   push:
     branches:
       - research/hybrid-r0-first-slice-20261009
@@ -19,26 +29,38 @@ jobs:
       PYTHONHASHSEED: "0"
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Build wheel using standard packaging in clean builder
         run: |
-          python -m pip install --disable-pip-version-check build
-          python -m build --wheel --outdir /tmp/neumann_r0_wheels
+          git rev-parse HEAD | tee /tmp/r0_source_commit.txt
+          python -m pip install --disable-pip-version-check build==1.3.0 setuptools==80.9.0 wheel==0.45.1
+          python -m build --wheel --no-isolation --outdir /tmp/neumann_r0_wheels
           test "$(find /tmp/neumann_r0_wheels -name '*.whl' | wc -l)" = "1"
-          sha256sum /tmp/neumann_r0_wheels/*.whl
+          sha256sum /tmp/neumann_r0_wheels/*.whl | tee /tmp/r0_wheel_sha256.txt
       - name: Install isolated wheel, not editable source
         run: |
           python -m venv /tmp/neumann_r0_wheel_env
           /tmp/neumann_r0_wheel_env/bin/pip install --disable-pip-version-check \
-            numpy==2.3.5 scipy==1.17.0 scikit-learn==1.9.1 \
-            highspy==1.15.1 threadpoolctl==3.7.0 z3-solver==4.13.4.0
+            -r docs/research/r0_cpu_windows_constraints.txt
           /tmp/neumann_r0_wheel_env/bin/pip install --no-deps /tmp/neumann_r0_wheels/*.whl
-          sudo apt-get update -qq
-          sudo apt-get install -y cvc5
+          /tmp/neumann_r0_wheel_env/bin/pip check | tee /tmp/r0_pip_check.txt
+          /tmp/neumann_r0_wheel_env/bin/pip freeze --all > /tmp/r0_installed_lock.txt
+          curl -fsSL --retry 3 -o /tmp/cvc5-1.4.1.zip \
+            https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.1/cvc5-Linux-x86_64-static.zip
+          echo '2f8efe58fe27ba7bccbb504533f690b9312d69da14192712460e4a19231f02a1  /tmp/cvc5-1.4.1.zip' | sha256sum --check
+          unzip -q /tmp/cvc5-1.4.1.zip -d /tmp/r0_native
+          chmod +x /tmp/r0_native/cvc5-Linux-x86_64-static/bin/cvc5
+          echo '/tmp/r0_native/cvc5-Linux-x86_64-static/bin' >> "$GITHUB_PATH"
+          /tmp/r0_native/cvc5-Linux-x86_64-static/bin/cvc5 --version > /tmp/r0_cvc5_version.txt
+          grep -q '^cvc5 1.4.1 ' /tmp/r0_cvc5_version.txt
+          sha256sum /tmp/r0_native/cvc5-Linux-x86_64-static/bin/cvc5 > /tmp/r0_cvc5_binary_sha256.txt
           curl -fsSL --retry 3 -o /tmp/r0_wheel_ex1.sl \
             https://raw.githubusercontent.com/SyGuS-Org/benchmarks/13c8deb68a873635879c9a69bc78caebd340f646/comp/2019/Inv_Track/From2018/ex1.sl
+          echo '930b37d15f14baf615c7e7741ef5d607db717390bb8465ad8255a0d12764125c  /tmp/r0_wheel_ex1.sl' | sha256sum --check
       - name: Run wheel from outside Git checkout, three original certificates and blocked model
         working-directory: /tmp
         run: |
@@ -76,6 +98,46 @@ jobs:
           print("WHEEL_EXTERNAL_INSTALL_THREE_DOMAIN_PASS")
           print("WHEEL_FROZEN_NOT_BUNDLED_FAIL_CLOSED")
           PY
+      - name: Reuse retained 18-request release gate against installed wheel
+        working-directory: /tmp
+        env:
+          SOURCE_CHECKOUT: ${{ github.workspace }}
+        run: |
+          python -m pip install --disable-pip-version-check psutil==7.2.2
+          python - <<'PY'
+          import importlib.util, os, pathlib, traceback
+          source=pathlib.Path(os.environ["SOURCE_CHECKOUT"])
+          spec=importlib.util.spec_from_file_location("retained_r0_gate", source/"experiments/hybrid_r0_release_gate_20261009.py")
+          gate=importlib.util.module_from_spec(spec); spec.loader.exec_module(gate)
+          gate.CLI=["/tmp/neumann_r0_wheel_env/bin/python", "-m", "neumann1.hybrid_runtime_r0"]
+          gate.ROOT=pathlib.Path("/tmp")
+          gate.OUT=pathlib.Path("/tmp/r0_wheel_gate")
+          gate.OUT.mkdir()
+          try:
+              gate.run("/tmp/r0_wheel_ex1.sl")
+          except Exception:
+              (gate.OUT/"failure.txt").write_text(traceback.format_exc())
+              raise
+          PY
+      - name: Installed-wheel regression, including actual native and UNKNOWN controls
+        working-directory: /tmp
+        env:
+          SOURCE_CHECKOUT: ${{ github.workspace }}
+          PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
+        run: |
+          /tmp/neumann_r0_wheel_env/bin/pip install --disable-pip-version-check pytest==9.0.2
+          mkdir /tmp/r0_wheel_tests
+          cp "$SOURCE_CHECKOUT"/tests/test_hybrid_runtime_r0.py "$SOURCE_CHECKOUT"/tests/test_hybrid_sygus_r0.py "$SOURCE_CHECKOUT"/tests/test_f0_opened_bridge.py /tmp/r0_wheel_tests/
+          cd /tmp/r0_wheel_tests
+          unset PYTHONPATH
+          /tmp/neumann_r0_wheel_env/bin/python - <<'PY' | tee /tmp/r0_installed_tests.txt
+          import inspect, pytest
+          from neumann1 import hybrid_runtime_r0 as runtime
+          module=inspect.getfile(runtime)
+          assert "/tmp/neumann_r0_wheel_env/" in module and "site-packages" in module, module
+          print("INSTALLED_MODULE="+module, flush=True)
+          raise SystemExit(pytest.main([".", "--import-mode=importlib", "-q", "-ra"]))
+          PY
       - name: Preserve distributable wheel and complete receipts
         if: always()
         uses: actions/upload-artifact@v4
@@ -85,3 +147,11 @@ jobs:
           path: |
             /tmp/neumann_r0_wheels/
             /tmp/hybrid_r0_wheel_smoke_receipts.json
+            /tmp/r0_wheel_gate/
+            /tmp/r0_source_commit.txt
+            /tmp/r0_wheel_sha256.txt
+            /tmp/r0_pip_check.txt
+            /tmp/r0_installed_lock.txt
+            /tmp/r0_cvc5_version.txt
+            /tmp/r0_cvc5_binary_sha256.txt
+            /tmp/r0_installed_tests.txt

@@ -1,0 +1,17 @@
+{
+  "analysis_id": "OPENED_RECURSIVE_CONTEXT_SUFFICIENCY_TRIAGE_20261010",
+  "source_baseline": "bb10651f7168b0ab1c58e517e3ac8f7fe69a6780",
+  "kind": "retrospective evidence join plus fixed exact counterexample, not performance experiment",
+  "family": "goal-sufficient ordered recursive summaries",
+  "selected_original": "benchmarks/list/mps_no_sum.ml",
+  "selected_source_sha256": "37ff22ac5b3436dcd4d4a316b6783c383096f15da5c98d1368649f2587fec891",
+  "population": "all 29 registered Synduce source entries, both stored 3-repeat Native cohorts; selected original is opened development",
+  "hypothesis": "the unchanged target-only recursive interface loses context needed by its own goal; existing Classical-Hybrid already supplies sufficient auxiliary state",
+  "fixed_witness": {"left_a": [-1], "left_b": [0], "right": [1]},
+  "acceptance": "equal child goal inputs and unequal concatenated original goals establish impossibility of this goal-only join; hash-bound existing prefix_lift certificate must preserve the selected original",
+  "decision_rule": "if existing classical prefix_lift resolves the witness and has a stored original-goal certificate, HOLD learned discovery for this already-covered mechanism; no prospective benchmark unless residual headroom over that control is justified",
+  "budgets": {"new_model_calls": 0, "new_gpu_calls": 0, "new_native_cohort_runs": 0, "paid_cost": 0, "sealed_access": false},
+  "cost_scope": "reuse historical tool-only elapsed costs with their original scopes; new analysis timing is bookkeeping, not inference or speedup",
+  "fresh_independent_problems": 0,
+  "not_claimed": ["universal impossibility of richer summaries", "new representation discovery", "complete-cost advantage", "Native success on every full OCaml program", "Frontier Gap", "G0 PASS", "learning admission"]
+}
