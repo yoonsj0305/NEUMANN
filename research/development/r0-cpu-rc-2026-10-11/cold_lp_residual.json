@@ -1,0 +1,79 @@
+{
+  "outer_process_wall_ms": 1647.4429,
+  "receipts": [
+    {
+      "answer": {
+        "certificate": "neumann.lp-standard-form-certificate.v1",
+        "dual": [
+          -0.0,
+          -0.0
+        ],
+        "method": "residual_fixed4m",
+        "objective": 0.0,
+        "primal": [
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "cost": {
+        "cloud_transport_ms": "NOT_APPLICABLE",
+        "cold_process_startup_ms": "UNKNOWN",
+        "external_structure_proposal_ms": "NOT_APPLICABLE",
+        "frontier_calls": 0,
+        "measured_energy_j": "UNKNOWN",
+        "model_calls": 0,
+        "observed_wall_ms": 18.4728,
+        "offline_training_investment_ms": "UNKNOWN",
+        "process_peak_rss_kb": "UNKNOWN",
+        "stages_ms": {
+          "independent_original_verification_ms": 0.1494,
+          "input_validation_ms": 0.0981,
+          "native_and_restricted_execution_ms": 11.8244,
+          "paid_feature_and_structure_ms": 0.7861,
+          "unassigned_python_wrapper_ms": 5.614799999999999
+        }
+      },
+      "domain": "lp.standard_form",
+      "events": [
+        {
+          "columns": 12,
+          "kind": "classical_ranking",
+          "rows": 2
+        },
+        {
+          "fallback": false,
+          "kind": "certified_restricted_then_native",
+          "subsets_attempted": [
+            8
+          ]
+        },
+        {
+          "kind": "independent_original_lp_certificate",
+          "passed": true
+        }
+      ],
+      "execution_request_sha256": "aa2343ac91c4a97554a79cf7f9ddb6b1c7f55f551fb6a248cce3c0ae31242d66",
+      "learned_model_inference": false,
+      "north_star_global_questions_closed": [],
+      "original_problem_sha256": "e3520fbcafc39ce30a80c073515746870d58c1195a6e8bf1da8e3abb4efeab35",
+      "original_task_sha256": "aa2343ac91c4a97554a79cf7f9ddb6b1c7f55f551fb6a248cce3c0ae31242d66",
+      "reason": null,
+      "research_scope": "ENGINEERING_FIXTURE_ONLY_NOT_FRESH_EVIDENCE",
+      "schema": "neumann.hybrid-r0-engineering.v0",
+      "status": "VERIFIED"
+    }
+  ],
+  "rss_sampling_note": "4 ms sampled maximum, lower bound, not exact all-time peak",
+  "sample_count": 189,
+  "sampled_process_tree_peak_rss_bytes": 128229376
+}

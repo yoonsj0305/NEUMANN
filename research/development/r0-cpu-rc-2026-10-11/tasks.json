@@ -1,0 +1,240 @@
+{
+  "exact_fraction": {
+    "A": [
+      [
+        2,
+        0
+      ],
+      [
+        0,
+        3
+      ]
+    ],
+    "b": [
+      1,
+      1
+    ],
+    "domain": "exact.linear"
+  },
+  "exact_integer": {
+    "A": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        -1
+      ]
+    ],
+    "b": [
+      3,
+      1
+    ],
+    "domain": "exact.linear"
+  },
+  "exact_singular": {
+    "A": [
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        2
+      ]
+    ],
+    "b": [
+      3,
+      6
+    ],
+    "domain": "exact.linear"
+  },
+  "invalid_domain": {
+    "domain": "unsupported.neural",
+    "input": "test"
+  },
+  "lp_external_reject_fallback": {
+    "A": [
+      [
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1
+      ]
+    ],
+    "b": [
+      1,
+      1
+    ],
+    "budget_s": 10,
+    "c": [
+      0,
+      0,
+      2.2,
+      2.3,
+      2.4,
+      2.5,
+      2.6,
+      2.7,
+      2.8,
+      2.9,
+      3.0,
+      3.1
+    ],
+    "domain": "lp.standard_form",
+    "policy": "external_ranking",
+    "ranking": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      0,
+      1,
+      10,
+      11
+    ]
+  },
+  "lp_native": {
+    "A": [
+      [
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1
+      ]
+    ],
+    "b": [
+      1,
+      1
+    ],
+    "budget_s": 10,
+    "c": [
+      0,
+      0,
+      2.2,
+      2.3,
+      2.4,
+      2.5,
+      2.6,
+      2.7,
+      2.8,
+      2.9,
+      3.0,
+      3.1
+    ],
+    "domain": "lp.standard_form",
+    "policy": "native"
+  },
+  "lp_residual": {
+    "A": [
+      [
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1
+      ]
+    ],
+    "b": [
+      1,
+      1
+    ],
+    "budget_s": 10,
+    "c": [
+      0,
+      0,
+      2.2,
+      2.3,
+      2.4,
+      2.5,
+      2.6,
+      2.7,
+      2.8,
+      2.9,
+      3.0,
+      3.1
+    ],
+    "domain": "lp.standard_form",
+    "policy": "residual_fixed4m"
+  },
+  "sygus_bad_source": {
+    "budget_s": 15,
+    "domain": "sygus.invariant",
+    "source": "(set-option :produce-models true)\n(set-logic LIA)\n\n(synth-inv inv-f ((x Int) (y Int) (xa Int) (ya Int)))\n\n(declare-primed-var x Int)\n(declare-primed-var y Int)\n(declare-primed-var xa Int)\n(declare-primed-var ya Int)\n(define-fun pre-f ((x Int) (y Int) (xa Int) (ya Int)) Bool\n    (and (= xa 0) (= ya 0)))\n(define-fun trans-f ((x Int) (y Int) (xa Int) (ya Int) (x! Int) (y! Int) (xa! Int) (ya! Int)) Bool\n    (and (and (and (= x! (+ 1 (+ xa (* 2 ya)))) (or (= y! (+ (- ya (* 2 xa)) x!)) (= y! (- (- ya (* 2 xa)) x!)))) (= xa! (- x! (* 2 y!)))) (= ya! (+ (* 2 x!) y!))))\n(define-fun post-f ((x Int) (y Int) (xa Int) (ya Int)) Bool\n    (>= (+ xa (* 2 ya)) 0))\n\n(inv-constraint inv-f pre-f trans-f post-f)\n\n(check-synth)\n\n"
+  },
+  "sygus_original": {
+    "budget_s": 15,
+    "domain": "sygus.invariant",
+    "source": "(set-logic LIA)\n\n(synth-inv inv-f ((x Int) (y Int) (xa Int) (ya Int)))\n\n(declare-primed-var x Int)\n(declare-primed-var y Int)\n(declare-primed-var xa Int)\n(declare-primed-var ya Int)\n(define-fun pre-f ((x Int) (y Int) (xa Int) (ya Int)) Bool\n    (and (= xa 0) (= ya 0)))\n(define-fun trans-f ((x Int) (y Int) (xa Int) (ya Int) (x! Int) (y! Int) (xa! Int) (ya! Int)) Bool\n    (and (and (and (= x! (+ 1 (+ xa (* 2 ya)))) (or (= y! (+ (- ya (* 2 xa)) x!)) (= y! (- (- ya (* 2 xa)) x!)))) (= xa! (- x! (* 2 y!)))) (= ya! (+ (* 2 x!) y!))))\n(define-fun post-f ((x Int) (y Int) (xa Int) (ya Int)) Bool\n    (>= (+ xa (* 2 ya)) 0))\n\n(inv-constraint inv-f pre-f trans-f post-f)\n\n(check-synth)\n\n"
+  }
+}

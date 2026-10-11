@@ -1,3 +1,17 @@
+# LATEST LOCAL CPU R0 RELEASE CANDIDATE | 2026-10-11 KST
+
+Source 1e0524d: pinned CPU wheel install contract and SyGuS UNKNOWN boundary.
+Independent Windows installation, 18 retained-fixture cold/persistent receipts,
+12 original certificates and missing-dependency/model fail-closed checks passed.
+92 selected source tests and 59 repeated installed-wheel tests passed, zero skips.
+See docs/research/R0_CPU_RELEASE_CANDIDATE_2026-10-11.md for exact scope and hashes.
+Status LOCAL_CPU_R0_RC_PASS_PENDING_REMOTE_CI, release ledger 6/7 locally evidenced.
+Do not imply remote CI, public release, Frontier Gap or learned intelligence PASS.
+No GitHub upload until explicitly authorized; no further candidate recovery or
+R0 feature expansion. Preserve historical results, learning HOLD, frozen Gemma
+BLOCKED_SMALL_MODEL_RUNTIME, zero paid/GPU/model/sealed execution. Previous
+recovery authorities below are closed historical context.
+
 # LATEST FINAL RECOVERY AND CPU R0 AUTHORITY | 2026-10-10 KST
 
 Continuation from 8067d10: the single limited half_true_modif_m_000 recovery

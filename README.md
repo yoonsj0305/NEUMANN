@@ -1,5 +1,12 @@
 # NEUMANN 1
 
+> **CPU R0 local release candidate (2026-10-11):**
+> [Install contract](docs/research/R0_CPU_INSTALL.md) and
+> [fixed-source wheel / independent installation results](docs/research/R0_CPU_RELEASE_CANDIDATE_2026-10-11.md).
+> LP, exact linear and restricted SyGuS CPU integration passed locally.
+> Remote CI and public release are pending; learned structural intelligence and
+> Frontier Gap remain unproven. Older research sections below are historical.
+
 > **Active Codex development handoff (2026-10-10):**
 > [Hybrid Structural Intelligence Pivot, evidence, stop rules, next F0 frontier gates](docs/research/CODEX_HANDOFF_PIVOT_2026-10-10.md).
 > Read this and the latest top section of [AGENTS.md](AGENTS.md) BEFORE following

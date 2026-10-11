@@ -1,0 +1,46 @@
+{
+  "exit_code": 0,
+  "receipt": {
+    "answer": null,
+    "cost": {
+      "cloud_transport_ms": "NOT_APPLICABLE",
+      "cold_process_startup_ms": "UNKNOWN",
+      "external_structure_proposal_ms": "NOT_APPLICABLE",
+      "frontier_calls": 0,
+      "measured_energy_j": "UNKNOWN",
+      "model_calls": 0,
+      "observed_wall_ms": 5.8933,
+      "offline_training_investment_ms": "UNKNOWN",
+      "process_peak_rss_kb": "UNKNOWN",
+      "stages_ms": {
+        "input_validation_ms": 0.9281,
+        "source_prepare_ms": 0.0,
+        "sygus_native_ms": 2.3758,
+        "unassigned_python_wrapper_ms": 2.5894
+      }
+    },
+    "domain": "sygus.invariant",
+    "events": [
+      {
+        "converted_sha256": "e3903adb182faa089cae1bb5b6cc0c8ec5e30a9b838de9ee8e127177579ce542",
+        "kind": "sygus_original_source",
+        "sha256": "930b37d15f14baf615c7e7741ef5d607db717390bb8465ad8255a0d12764125c"
+      },
+      {
+        "kind": "sygus_native",
+        "required_executable": "cvc5",
+        "status": "DEPENDENCY_MISSING"
+      }
+    ],
+    "execution_request_sha256": "e787db160748ab6ab09b575ff7f2344f80d367b2e9fb28b8d32911af025e2da4",
+    "learned_model_inference": false,
+    "north_star_global_questions_closed": [],
+    "original_problem_sha256": "1e7656c82a6c000b869b8d0a2f0e067eb94971838b4bd3986e7e0b9d66bbd663",
+    "original_task_sha256": "e787db160748ab6ab09b575ff7f2344f80d367b2e9fb28b8d32911af025e2da4",
+    "reason": null,
+    "research_scope": "ENGINEERING_FIXTURE_ONLY_NOT_FRESH_EVIDENCE",
+    "schema": "neumann.hybrid-r0-engineering.v0",
+    "status": "UNKNOWN"
+  },
+  "stderr": ""
+}
