@@ -1,0 +1,12 @@
+{
+  "scope": "private integrity-audit plumbing only; no R0 solver, model or performance rerun",
+  "attempts": [
+    {"attempt": 1, "result": "FileNotFoundError", "cause": "audit assumed ZIP in native subdirectory", "correction": "use existing retained ZIP at private run root"},
+    {"attempt": 2, "result": "KeyError", "cause": "audit used exe_sha256 instead of existing executable_sha256 receipt field", "correction": "read actual retained receipt schema"},
+    {"attempt": 3, "result": "ModuleNotFoundError", "cause": "PyYAML unavailable for static workflow parse", "correction": "install pinned PyYAML 6.0.3 to private audit-tools only"},
+    {"attempt": 4, "result": "PASS", "cause": null, "correction": null}
+  ],
+  "first_runtime_receipts_modified": false,
+  "scientific_verdict_changes": false,
+  "runtime_dependencies_modified": false
+}

@@ -132,3 +132,94 @@ this exact implementation and installation contract before public release. Until
 then retain local RC status. Candidate recovery stays PARTIAL/closed, learning
 HOLD, frozen Gemma BLOCKED_SMALL_MODEL_RUNTIME and Frontier Gap NOT_MEASURED.
 Further R0 feature/solver expansion is not justified by this result.
+
+## Final integrity and integration review (2026-10-11)
+
+Current decision: **R0 LOCAL RC VERIFIED**, **NOT RELEASED**. The final remote CI
+gate remains pending explicit upload authorization.
+
+`1e0524d → e7bb00f` changes only documentation, agent/README guidance,
+byte-preservation attributes and stored engineering evidence. Package Python,
+pyproject/build dependencies, dependency constraints and tests are unchanged.
+This follow-up adds CI wiring and derived audit records only. Keep the existing
+wheel and its exact **build SHA 1e0524d**, not e7bb00f or the later report HEAD.
+All 195 wheel Python files equal the current files; all 198 hashed RECORD entries
+verify. The 43 retained public-copy hashes, matching private originals and private
+archive hash verify. Previous test logs remain 92 selected source tests and 59
+repeated installed-wheel tests, with no skips; no solver/model study was rerun.
+
+### All eighteen requests
+
+The [18-row classification CSV](../../research/development/r0-cpu-rc-2026-10-11/final-integration/request_classification.csv)
+records mode, original/request hashes, expected and actual status, certificate
+scope and unchanged timing. This table displays both modes separately by column.
+
+| Retained task | Expected in each mode | Cold actual | Persistent actual | Verification |
+|---|---|---|---|---|
+| lp_native | VERIFIED | VERIFIED | VERIFIED | Original primal/dual certified |
+| lp_residual | VERIFIED | VERIFIED | VERIFIED | Original primal/dual certified |
+| lp_external_reject_fallback | VERIFIED | VERIFIED | VERIFIED | Rejected restricted path, actual fallback, original primal/dual certified |
+| exact_fraction | VERIFIED | VERIFIED | VERIFIED | Exact original equations certified |
+| exact_integer | VERIFIED | VERIFIED | VERIFIED | Exact original equations certified |
+| sygus_original | VERIFIED | VERIFIED | VERIFIED | Original init/inductive/safe all UNSAT |
+| exact_singular | UNKNOWN | UNKNOWN | UNKNOWN | no_unique_solution; no output/certificate, not an UNSAT claim |
+| invalid_domain | ERROR | ERROR | ERROR | Unsupported input rejected before solver; no original proof |
+| sygus_bad_source | ERROR | ERROR | ERROR | Unsupported source command rejected before solver; no original proof |
+
+Thus **12 original-certified observations + 2 expected UNKNOWN + 4 expected ERROR**.
+The six non-certified cases have no answer; they are expected safe outcomes rather
+than six certified answers or six incorrectly labelled model failures. Repeated
+modes and LP policies are not additional independent mathematical problems.
+
+### External cvc5 identity
+
+The actual local executable is
+`<PRIVATE_RUN_ROOT>/native/cvc5-Win64-x86_64-static/bin/cvc5.exe`;
+PRIVATE_RUN_ROOT is the private `Continuation/R0_CPU_RC_2026-10-10` folder, not
+site-packages or the wheel. Actual version:
+`cvc5 1.4.1 [git 2b2e844 on branch HEAD]`.
+Executable SHA-256 remains
+`04ee0af071fc18796ce9bf809fceac36e23893f8c2e42c829c4461bc9f0bec91`;
+download ZIP SHA-256 remains
+`1aaafe93484b5ed2cc8a74c2079242e85f160044afea647fadd3e794f7f7e50d`.
+Both were rehashed and version output matched the retained log. Install the
+external CLI on process PATH as described in R0_CPU_INSTALL.md; Python bindings
+are not its replacement. No executable is bundled in the wheel.
+
+### Verified PR ancestry and prepared CI
+
+Read-only GitHub metadata, exact-head pull-request CI records and git ls-remote
+agree with local Git objects. Main is still `55178a2`; all six PRs are OPEN and
+unmerged. #174 is non-Draft; #175–#179 are Draft.
+
+| PR | Current HEAD | Actual base | Queried HEAD CI |
+|---|---|---|---|
+| #174 | a011918 | main | SUCCESS |
+| #175 | fb23dca | main; contains #174 ancestry | SUCCESS |
+| #176 | c182fd3 | #175 branch | SUCCESS |
+| #177 | 5cbda9d | #176 branch | SUCCESS |
+| #178 | 986d774 | #177 branch | SUCCESS |
+| #179 | a8ad955 | #178 branch | SUCCESS |
+
+Each preceding HEAD is an ancestor of the next and of e7bb00f. At that reviewed
+local HEAD, #179 is 13 commits behind and has zero commits absent locally. After
+authorization and another remote check, publish the existing local history by
+fast-forward to `research/f0-opened-original-comparison-20261009` (#179). Do not
+squash, rebase, force-push, merge into main or merge storage-only evidence branches.
+The earlier successful CI runs do not validate the unpublished local HEAD.
+
+The existing wheel workflow previously matched only a historical push branch and
+workflow-file path. Its minimal integration update enables scoped PR/manual
+triggers, explicitly checks out the PR HEAD, uses the already tested dependency
+lock, pins official Linux cvc5 CLI 1.4.1 with archive SHA-256, preserves build/source
+and native identities, and reuses the unchanged 18-request gate plus installed
+regression tests. It is **prepared, not executed**. YAML and all three embedded
+Python blocks parse locally; Linux download/install and remote job success remain
+unverified until approved upload. No package runtime or dependency change requires
+a replacement local wheel.
+
+[Final integrity receipt](../../research/development/r0-cpu-rc-2026-10-11/final-integration/integrity_summary.json)
+and [read-only PR/CI snapshot](../../research/development/r0-cpu-rc-2026-10-11/final-integration/remote_pr_snapshot.json)
+bind this review. Scope stays Classical-Hybrid CPU LP, exact linear and restricted
+SyGuS only. No new learning, Gemma contract change, GPU, paid call, sealed access
+or Frontier Gap evidence is admitted.

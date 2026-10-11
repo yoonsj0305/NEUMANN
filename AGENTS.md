@@ -1,5 +1,12 @@
 # LATEST LOCAL CPU R0 RELEASE CANDIDATE | 2026-10-11 KST
 
+Final integrity review: R0 LOCAL RC VERIFIED, NOT RELEASED. Wheel build remains
+1e0524d; e7bb00f and the final CI/docs follow-up change no package/dependency bytes.
+18 retained requests classify as 12 original certified, 2 expected UNKNOWN,
+4 expected ERROR. Scoped exact-HEAD wheel CI is prepared but NOT RUN; upload and
+dispatch require explicit human authorization. Preserve PR #174–#179 ancestry;
+existing #179 branch is the fast-forward publication target, not a main merge.
+
 Source 1e0524d: pinned CPU wheel install contract and SyGuS UNKNOWN boundary.
 Independent Windows installation, 18 retained-fixture cold/persistent receipts,
 12 original certificates and missing-dependency/model fail-closed checks passed.
