@@ -57,6 +57,7 @@ def test_independent_three_obligation_verifier(candidate, expected):
     _, args, defs = prepare(SOURCE)
     proof = independent_check(args, defs, candidate, timeout_ms=1200)
     assert proof["accepted"] == expected, proof
+    assert proof["verdict"] == ("VERIFIED" if expected else "REJECTED")
     assert len(proof["obligations"]) == 3
     if expected:
         assert [p["smt_result"] for p in proof["obligations"]] == ["unsat"]*3
@@ -69,7 +70,8 @@ def test_no_fake_cvc5_success_on_optional_dependency_absence(monkeypatch):
     monkeypatch.setattr(adapter.subprocess, "run", missing)
     r = run(task())
     assert r["answer"] is None
-    assert r["status"] in ("ERROR", "UNKNOWN")
+    assert r["status"] == "UNKNOWN"
+    assert any(e.get("status") == "DEPENDENCY_MISSING" for e in r["events"])
     assert r["learned_model_inference"] is False
 
 
@@ -112,3 +114,32 @@ def test_multi_solution_spoof_fails_closed():
     malicious = "((define-fun inv-f ((x Int)) Bool true) (define-fun inv-f ((x Int)) Bool (>= x 0)))"
     proof = independent_check(args, defs, malicious, timeout_ms=1200)
     assert not proof["accepted"]
+
+
+@pytest.mark.parametrize("checker_fault", [False, True])
+def test_inconclusive_original_proof_is_unknown_not_counterexample(monkeypatch, checker_fault):
+    import z3
+    import subprocess
+    import neumann1.hybrid_sygus_r0 as adapter
+
+    class InconclusiveSolver:
+        def set(self, **kwargs):
+            pass
+
+        def from_string(self, text):
+            if checker_fault:
+                raise RuntimeError("injected checker failure")
+
+        def check(self):
+            return z3.unknown
+
+    monkeypatch.setattr(z3, "Solver", InconclusiveSolver)
+    candidate = "(define-fun inv-f ((x Int)) Bool (>= x 0))"
+    _, args, defs = prepare(SOURCE)
+    proof = independent_check(args, defs, candidate, timeout_ms=1)
+    assert proof["verdict"] == "UNKNOWN" and not proof["accepted"]
+    monkeypatch.setattr(adapter.subprocess, "run", lambda *a, **k:
+                        subprocess.CompletedProcess(a, 0, candidate, ""))
+    receipt = run(task())
+    assert receipt["status"] == "UNKNOWN" and receipt["answer"] is None
+    assert receipt["events"][-1]["verdict"] == "UNKNOWN"
