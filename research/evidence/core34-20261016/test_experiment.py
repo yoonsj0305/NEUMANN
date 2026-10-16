@@ -1,4 +1,9 @@
 import random
+import pytest
+
+# Specialized research proof dependency is not required by the base NEUMANN runtime.
+# The focused CORE-34 workflow explicitly installs SymPy and executes these tests.
+pytest.importorskip("sympy", reason="optional CORE-34 symbolic research dependency")
 from experiment import fold, observes, proof, direct_solve, proof_explicit, generate, PROBES, candidate_rhs
 
 
