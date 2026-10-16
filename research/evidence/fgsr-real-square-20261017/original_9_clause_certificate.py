@@ -89,7 +89,7 @@ def main():
         if len(clauses)!=9:raise ValueError("WRONG_ORIGINAL_ASSERT_COUNT")
         decls=[f for f in all_forms if f.startswith("(declare-fun")]
         names=re.findall(r"\(declare-fun\s+\|([^|]+)\|",original.decode())
-        if sorted(names)!=sorted([*WITNESS.keys(),"CHC_COMP_FALSE"]):
+        if sorted(names)!=sorted(WITNESS.keys()):
             raise ValueError("DECLARATION_SIGNATURE_NAME_MISMATCH")
         record["actual_source_sha_verified"]=True
         record["source_relation_names"]=names
