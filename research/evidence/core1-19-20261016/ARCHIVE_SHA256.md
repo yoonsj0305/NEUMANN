@@ -1,6 +1,6 @@
 # SHA256 archive register | 2026-10-16
 
-31 locally verified ZIP archives (including CORE22 independent source-AST audit). The entries below are checksums, NOT uploaded ZIP files.
+32 locally verified ZIP archives (including CORE22 independent source-AST audit). The entries below are checksums, NOT uploaded ZIP files.
 
 | Stage | Original archive filename | SHA-256 |
 |---|---|---|
@@ -45,5 +45,7 @@
 
 | CORE26 | NEUMANN_CORE26_GOAL_LEAKAGE_CLASSICAL_20261016.zip | fd9da9cad74ac8d730cfcdc5573389272e43de1b5d1472e6635eb5b4994b36df |
 
-All 31 archives passed ZIP CRC check in local workspace.
+| CORE27 | NEUMANN_CORE27_NON_GOAL_INTERMEDIATE_LEARNED_20261016.zip | ce5f164d0e75bffb563ccc5b8f6671528b0376fad537244e8d38b67b19dca57b |
+
+All 32 archives passed ZIP CRC check in local workspace.
 Raw archive bytes and checkpoints remain outside GitHub pending a transfer channel that supports local binary files.
