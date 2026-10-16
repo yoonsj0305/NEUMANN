@@ -1,0 +1,49 @@
+name: FGSR source-bound nonlinear proof-DAG correction validation
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/fgsr-source-bound-dag-verify-once.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  one-full-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      PYTHONPATH: research/evidence/fgsr-q3-single-independent-family
+      FGSR_RESULT: research/evidence/fgsr-q3-single-independent-family/nonlinear_dag_source_bound_receipt.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Frozen independent SMT backend
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/fgsr-q3-single-independent-family/full_nonlinear_dag_one.py
+      - name: First actual 9 certificate and falsification regression tests
+        run: |
+          python -m unittest -v test_nonlinear_dag_certificate
+      - name: Unchanged authentic 48-rule original source-goal-bound DAG evaluation
+        run: |
+          python research/evidence/fgsr-q3-single-independent-family/full_nonlinear_dag_one.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('research/evidence/fgsr-q3-single-independent-family/nonlinear_dag_source_bound_receipt.json').read_text())
+          print('ACTUAL_SOURCE_GOAL_BOUND_VERDICT',d["status"])
+          print('PREMISE_ARITIES',d.get('premise_arities'))
+          print('DEPTHS',[(x['nodes'],x['verdict']) for x in d['attempts']])
+          print('Q_GATES',d['q1_q7'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-source-bound-dag-verifier-regression-and-original
+          path: research/evidence/fgsr-q3-single-independent-family/nonlinear_dag_source_bound_receipt.json
+          if-no-files-found: warn
+          retention-days: 45
