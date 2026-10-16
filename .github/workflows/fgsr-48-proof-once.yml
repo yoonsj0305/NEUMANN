@@ -1,0 +1,45 @@
+name: FGSR authentic 48-clause manual-control proof
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/fgsr-48-proof-once.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  one-original-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      FGSR_RESULT: research/evidence/fgsr-q3-single-independent-family/manual_control_first_receipt.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned independent SMT verifier
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/fgsr-q3-single-independent-family/manual_control_proof_once.py
+      - name: One original 48-clause manual candidate proof
+        run: |
+          python research/evidence/fgsr-q3-single-independent-family/manual_control_proof_once.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('research/evidence/fgsr-q3-single-independent-family/manual_control_first_receipt.json')
+          x=json.loads(p.read_text())
+          print("SCIENTIFIC_RESULT",x["status"])
+          print("VERIFIED",x.get("verified_original_unsat_count"),"/",x.get("original_clause_count"))
+          print("NEURAL_CALLS",x["neural_calls"])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-48-horn-manual-invariant-first-proof
+          path: research/evidence/fgsr-q3-single-independent-family/manual_control_first_receipt.json
+          if-no-files-found: warn
+          retention-days: 45
