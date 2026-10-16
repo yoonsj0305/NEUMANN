@@ -39,7 +39,7 @@ def source_assertions(text):
             else:atoms.append(x)
         flatten(premise)
         calls=[a for a in atoms if z3.is_app(a) and a.decl().name()=="Inv"]
-        guard=[a for a in atoms if a not in calls]
+        guard=[z3.BoolVal(False) if z3.is_app(a) and a.decl().name()=="CHC_COMP_FALSE" else a for a in atoms if not(z3.is_app(a) and a.decl().name()=="Inv")]
         if head.decl().name()=="Inv":kind="relation"
         elif head.decl().name()=="CHC_COMP_FALSE":kind="false_pred"
         elif z3.is_false(head):kind="false"
@@ -144,11 +144,14 @@ def main():
         receipt["original_rules"]=len(rules)
         receipt["original_assertion_sha256_verified"]=True
         for step in range(MAX_ROUNDS):
+            if (time.perf_counter_ns()-start)/1e9 > 210:
+                raise RuntimeError("TOTAL_CPU_WALL_CAP_210_SECONDS")
             removed=set(); counterexamples=[]
             # Every rule is analyzed with one shared active set per round.
             for rule in rules:
                 if rule["kind"]!="relation":continue
                 if receipt["smt_checks"]>=MAX_TOTAL_SMT_CHECKS:raise RuntimeError("GLOBAL_SMT_CALL_CAP")
+                if (time.perf_counter_ns()-start)/1e9 > 210:raise RuntimeError("TOTAL_CPU_WALL_CAP_210_SECONDS")
                 verdict,false_at_head,ms=query(rule,templates,active)
                 receipt["smt_checks"]+=1
                 if verdict=="unknown":raise RuntimeError("SMT_UNKNOWN_OR_TIMEOUT_RULE_"+str(rule["index"]))
