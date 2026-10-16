@@ -1,6 +1,6 @@
 # SHA256 archive register | 2026-10-16
 
-22 locally verified ZIP archives. The entries below are checksums, NOT uploaded ZIP files.
+23 locally verified ZIP archives (CORE20 appended). The entries below are checksums, NOT uploaded ZIP files.
 
 | Stage | Original archive filename | SHA-256 |
 |---|---|---|
@@ -27,5 +27,7 @@
 | CORE18 CERT | NEUMANN_CORE18_COMPOSITION_CERTIFIED_20261016.zip | 58b46fcc433c9f34cb20d82fcf290d43f8d0073a0fa07cefa7a78c17bd353b00 |
 | CORE19 | NEUMANN_CORE19_SEMANTIC_GATE_20261016.zip | aa12c9a794083ddd66f871c105270a755bfa9ae9c52ca6fe67630d8c7c03be42 |
 
-All 22 archives passed ZIP CRC check in local workspace.
+| CORE20 | NEUMANN_CORE20_INFORMATION_OBSTRUCTION_20261016.zip | 7ce7d46a46ffa9d45e92e82c9b2d4a8716dfdba6dc8b31fed27e14a793a7fdcf |
+
+All 23 archives passed ZIP CRC check in local workspace.
 Raw archive bytes and checkpoints remain outside GitHub pending a transfer channel that supports local binary files.
