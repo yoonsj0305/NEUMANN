@@ -1,6 +1,6 @@
 # SHA256 archive register | 2026-10-16
 
-23 locally verified ZIP archives (CORE20 appended). The entries below are checksums, NOT uploaded ZIP files.
+24 locally verified ZIP archives (CORE20–21 appended). The entries below are checksums, NOT uploaded ZIP files.
 
 | Stage | Original archive filename | SHA-256 |
 |---|---|---|
@@ -29,5 +29,7 @@
 
 | CORE20 | NEUMANN_CORE20_INFORMATION_OBSTRUCTION_20261016.zip | 7ce7d46a46ffa9d45e92e82c9b2d4a8716dfdba6dc8b31fed27e14a793a7fdcf |
 
-All 23 archives passed ZIP CRC check in local workspace.
+| CORE21 | NEUMANN_CORE21_WHOLE_SOURCE_GATE_20261016.zip | 9802a810cb5ef370ceb44e1862432b664f964e85b5056803b5d55f94b88423bd |
+
+All 24 archives passed ZIP CRC check in local workspace.
 Raw archive bytes and checkpoints remain outside GitHub pending a transfer channel that supports local binary files.
