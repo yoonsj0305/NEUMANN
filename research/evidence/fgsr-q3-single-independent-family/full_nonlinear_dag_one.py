@@ -110,8 +110,7 @@ def attempt(rules,nodes,cap_ms):
         alternatives=[]
         def symbolic_state(ref):
             # For every variable index j, pick a topologically earlier fact.
-            return [z3.If(ref==0,states[0][j],
-                *[]) for j in range(8)] if i==1 else [
+            return [states[0][j] for j in range(8)] if i==1 else [
                 __import__("functools").reduce(
                     lambda expr, ix:z3.If(ref==ix,states[ix][j],expr),
                     range(1,i),states[0][j])
