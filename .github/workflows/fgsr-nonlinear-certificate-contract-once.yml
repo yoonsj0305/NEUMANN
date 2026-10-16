@@ -1,0 +1,29 @@
+name: FGSR nonlinear Horn proof-DAG verifier contracts
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/fgsr-nonlinear-certificate-contract-once.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  independently-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      PYTHONPATH: research/evidence/fgsr-q3-single-independent-family
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin Python theorem replay dependencies
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/fgsr-q3-single-independent-family/full_nonlinear_dag_one.py
+      - name: Positive exact nonlinear original-rule replay and negative controls
+        run: |
+          python -m unittest -v test_nonlinear_dag_certificate
