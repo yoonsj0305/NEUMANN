@@ -1,6 +1,6 @@
 # SHA256 archive register | 2026-10-16
 
-32 locally verified ZIP archives (including CORE22 independent source-AST audit). The entries below are checksums, NOT uploaded ZIP files.
+33 locally verified ZIP archives (including CORE22 independent source-AST audit). The entries below are checksums, NOT uploaded ZIP files.
 
 | Stage | Original archive filename | SHA-256 |
 |---|---|---|
@@ -47,5 +47,7 @@
 
 | CORE27 | NEUMANN_CORE27_NON_GOAL_INTERMEDIATE_LEARNED_20261016.zip | ce5f164d0e75bffb563ccc5b8f6671528b0376fad537244e8d38b67b19dca57b |
 
-All 32 archives passed ZIP CRC check in local workspace.
+| CORE28 | NEUMANN_CORE28_GOAL_HIDDEN_THEORY_GENERATOR_20261016.zip | f8f7166ff296e8a62df09d6bae70047829dd7a76878c48006617e020bb9df2d6 |
+
+All 33 archives passed ZIP CRC check in local workspace.
 Raw archive bytes and checkpoints remain outside GitHub pending a transfer channel that supports local binary files.
