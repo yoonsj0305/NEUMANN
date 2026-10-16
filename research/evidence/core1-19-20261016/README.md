@@ -1,4 +1,4 @@
-# NEUMANN 1: CORE-1 through CORE-19 evidence ledger (2026-10-16)
+# NEUMANN 1: CORE-1 through CORE-20 evidence ledger (2026-10-16)
 
 Scientific North Star: Frontier-level problem solving with minimum necessary computation.
 GLOBAL Q1-Q7 OPEN. All CORE results below are development-only. Frozen earlier evidence and Decision 3 unchanged.
@@ -24,6 +24,7 @@ GLOBAL Q1-Q7 OPEN. All CORE results below are development-only. Frozen earlier e
 - **CORE-17**: Neural full linear recursive AST 2/3 top-1, 3/3 top-5; algebra about 82x faster.
 - **CORE-18**: Neural proposal for take-map commutation, goal41 14/14, false positive on no-information input.
 - **CORE-19**: Base-case semantic gate blocks 8/8 mutations and preserves 2/2 valid cases; neural invention unproven.
+- **CORE-20**: Actual frozen 11D feature collision between valid/invalid source; equal-input pair provably forces >=50% balanced error for any deterministic model with these features; typed source-AST input repair tested 5/5, not learned invention.
 
 ## Scientific claim boundary
 - Certified symbolic proof does NOT establish that a learned model invented an abstraction.
