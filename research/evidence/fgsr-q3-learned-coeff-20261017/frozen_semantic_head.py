@@ -25,10 +25,11 @@ def numeric_invariant(u: tuple[int,int,int], v: tuple[int,int,int]):
     if not d:raise ValueError("Trained model returned no nontrivial semantic relation")
     generated=tuple(int(a)//d for a in generated)
     # No exact symbolic cross-product recovery, coefficient replacement or repair.
+    signed=lambda n: str(n) if n>=0 else f"(- {-n})"
     return {
         "learned_coefficients":generated,
         "typed_semantic_relation":
-            "(= (+ " + " ".join(f"(* {a} {name})" for a,name in zip(
+            "(= (+ " + " ".join(f"(* {signed(a)} {name})" for a,name in zip(
                 generated,("x","y","z"))) + ") 0)",
         "not_independently_proven_here":True,
         "global_q1_q7":"OPEN"
