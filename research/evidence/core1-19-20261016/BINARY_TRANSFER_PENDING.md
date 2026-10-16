@@ -1,22 +1,18 @@
-# Binary evidence transfer | 24-archive current ledger
+# Binary evidence transfer: 25-archive current ledger
 
-GitHub PR #180 currently contains **scientific records and 24 SHA256 archive identities, but NOT the original ZIP byte streams or checkpoints**. Do not mark this archive remote complete until all byte streams are uploaded and verified.
+GitHub PR #180 contains the complete **scientific text records and 25 original ZIP SHA-256 identities**, but **not the binary ZIP bytes or model checkpoints**.
 
-## Local complete bundle, independently verified
+## Complete local vault, validated 2026-10-16
 
-- `NEUMANN_CORE1_21_COMPLETE_LOCAL_VAULT_20261016.zip`
-- Complete bundle SHA256: `09dcfbb5443dd8dfdfa71a573294cba5c1dcaf9bee33a95545fa2a21a6ff9254`.
-- Contains **24** original individually SHA256-checked, CRC-valid ZIPs, an exact JSON manifest and the upload utility.
-- Import utility: `NEUMANN_CORE1_21_ARCHIVE_UPLOADER_20261016.py`.
-- Tested after separate ZIP extraction: `LOCAL_PREFLIGHT_PASS 24 archives 2315875 bytes` and dry run performed **NO GitHub mutation**.
+- `NEUMANN_CORE1_22_COMPLETE_LOCAL_VAULT_20261016.zip`
+- SHA-256 `e021c4a9495dbc74aee4df70bafb73b3f86f689537a27fa144c33ed1ed8f4ad5`
+- Size: **2,417,287 bytes**.
+- 25 original individual ZIPs: every file verified against its SHA-256 and ZIP CRC, both prior to creating this vault and after reading it back.
+- Corrected archival manifest: `NEUMANN_CORE1_22_ARCHIVE_MANIFEST_20261016.json`, declares **25** records. An older local vault for CORE1–21 mistakenly declared 23 when it contained 24; the older original has been preserved instead of rewritten.
+- Included upload helper: `NEUMANN_CORE1_22_ARCHIVE_UPLOADER_20261016.py`. Dry-run result: **LOCAL_PREFLIGHT_PASS 25 archives 2436578 bytes** and **DRY_RUN**, no GitHub mutation.
 
-## Complete remote import procedure (must run in locally GitHub-authenticated session)
+## Binary upload instruction and secure boundary
 
-1. Obtain the bundle download from the producing ChatGPT conversation and verify the SHA256.
-2. Unzip it into one local directory.
-3. Use `gh auth login` or provide `GITHUB_TOKEN` with repository write permission on your own machine. Never share your token.
-4. Execute `python NEUMANN_CORE1_21_ARCHIVE_UPLOADER_20261016.py`; expect `LOCAL_PREFLIGHT_PASS 24 archives`.
-5. Execute `python NEUMANN_CORE1_21_ARCHIVE_UPLOADER_20261016.py --push` to create 24 Git binary blobs, one fast-forward commit in the research branch, and perform byte-for-byte remote readback.
-6. Only treat upload as complete after **`ALL_24_ARCHIVES_UPLOADED_AND_REMOTE_VERIFIED`** appears and each recorded SHA256 matches the GitHub file bytes.
+On the owner's locally GitHub-authenticated computer, download and SHA-256-check the full vault, then extract it. Run `python NEUMANN_CORE1_22_ARCHIVE_UPLOADER_20261016.py` to recheck all 25 local blobs. If ready, run the same command with `--push`. This uses only the isolated branch `research/core1-19-evidence-audit-20261016`, refuses clobbering existing source files, rejects a moved branch head, and checks remote Git blob contents byte-for-byte. Do not put GitHub tokens into chats; use local `gh auth login` or an environment variable.
 
-Additional caveat: the uploader intentionally refuses overwriting existing evidence archive paths and rejects branch-head changes rather than force pushing. All results and past Q1–Q7 verdicts are frozen and unaffected.
+**Remote archive upload is NOT complete until `ALL_25_ARCHIVES_UPLOADED_AND_REMOTE_VERIFIED` and remote SHA readback are observed.** Scientific Q1–Q7 remain OPEN; no reported frontier or neural superiority.
