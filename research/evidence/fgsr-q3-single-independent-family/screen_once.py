@@ -22,7 +22,7 @@ CAP_SECONDS = 10
 OUT = Path(os.environ.get("FGSR_RESULT", "receipt.json"))
 
 def git_blob(data):
-    return hashlib.sha1(b"blob " + str(len(data)).encode() + b"\\0" + data).hexdigest()
+    return hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
 
 def summary(source):
     return {
@@ -117,7 +117,7 @@ def run():
         result["error"]=str(exc)[:650]
     result["total_wall_ms"]=round((time.perf_counter_ns()-t0)/1e6,3)
     OUT.parent.mkdir(parents=True,exist_ok=True)
-    OUT.write_text(json.dumps(result,indent=2,sort_keys=True)+"\\n")
+    OUT.write_text(json.dumps(result,indent=2,sort_keys=True)+"\n")
     print("FGSR_VERDICT", result["outcome"])
     for solver in result.get("solvers",[]):
         print("SOLVER",solver["solver"],solver["status"],solver["wall_ms"])
