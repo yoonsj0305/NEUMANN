@@ -1,0 +1,45 @@
+name: FGSR real llreve 9 original clause full classical certificate
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/fgsr-real-square-complete-original-once.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  independent-original-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      FGSR_RESULT: research/evidence/fgsr-real-square-20261017/first_real_square_full_original_receipt.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin trusted standalone SMT verifier
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/fgsr-real-square-20261017/original_9_clause_certificate.py
+      - name: Original 9-clause FULL proof with explicit special-purpose classical relation interpretation
+        run: |
+          python research/evidence/fgsr-real-square-20261017/original_9_clause_certificate.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('research/evidence/fgsr-real-square-20261017/first_real_square_full_original_receipt.json').read_text())
+          print('GROUNDED_ORIGINAL_PROOF',r['status'])
+          print('ORIGINAL_CLAUSES_CERTIFIED',r.get('independently_certified_original'))
+          print('NEGATIVE_CONTROL',r.get('negative_control_forced_true_final_relation',{}).get('result'))
+          print('NO_Q_PROMOTION',r['global_q1_q7'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-real-square-full-independent-original-certificate
+          path: research/evidence/fgsr-real-square-20261017/first_real_square_full_original_receipt.json
+          if-no-files-found: warn
+          retention-days: 45
