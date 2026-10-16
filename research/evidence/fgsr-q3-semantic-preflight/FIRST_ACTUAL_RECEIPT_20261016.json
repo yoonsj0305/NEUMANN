@@ -1,0 +1,44 @@
+{
+  "experiment": "FGSR_Q3_PRETRAINED_SOURCE_GOAL_ONE_SHOT_OPENED_DEV",
+  "status": "REJECTED_INCOMPLETE_TYPED_DEFINITIONS",
+  "global_q1_q7": "OPEN",
+  "candidate_type": "full_new_typed_helper_and_original_relation_interpretations",
+  "neumann_model": false,
+  "open_dev_not_blind": true,
+  "pretraining_contamination_unknown": true,
+  "one_frozen_attempt": true,
+  "seed": 20261016,
+  "model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "model_revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+  "source_commit": "e5a86a1ad252fe1df75e06814769ec1d14540032",
+  "source_sha256": "713e61bb9abe535491e93a36581d1d16f2ba617e454366a1b589d692b0453456",
+  "max_new_tokens": 640,
+  "resources": {
+    "wall_ms": 25068.876,
+    "money_usd": null,
+    "energy_j": null,
+    "training_amortization": "UNKNOWN"
+  },
+  "model_response": "```smtlib2\n(%inc (%Tree-0 0))\n(%inc (%Tree-0.1 Int))\n(%inc (%Tree-0.2 %Tree))\n```\n\nThis solution introduces a new set of logical operations and relations while maintaining the same structure and constraints from the original problem. The goal is to create a completely typed mathematical interpretation of all declared Boolean relations that satisfy all original assertions, ensuring the final safety condition is met.",
+  "measured_inference": {
+    "prompt_tokens": 1471,
+    "output_tokens": 91,
+    "generate_wall_ms": 17956.437,
+    "cpu_threads": 2
+  },
+  "candidate_structure": {
+    "defined_original_relations": [],
+    "missing_relations": [
+      "%inc",
+      "%inc.0",
+      "%main",
+      "%main.5",
+      "%size",
+      "%size.0",
+      "%sum",
+      "%sum.0"
+    ],
+    "new_helper_names": [],
+    "total_definitions": 0
+  }
+}
