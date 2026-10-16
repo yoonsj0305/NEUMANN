@@ -1,22 +1,20 @@
-# Binary evidence transfer | CORE-1–26 · 31 original ZIP archives
+# Binary research archive transfer | CORE-1–27
 
-**The GitHub PR presently contains scientific reports and 31 locally verified archive SHA256 identities, NOT the original ZIP binary payloads or checkpoint weights.** No remote archive completion is claimed.
+GitHub draft PR #180 currently contains scientific reports, frozen verdicts and **32 original ZIP artifact SHA-256 identities**, NOT the ZIP binaries or neural weights.
 
-## Verified latest local vault
+## Locally verified latest complete vault
+- Filename: `NEUMANN_CORE1_27_COMPLETE_LOCAL_VAULT_20261016.zip`.
+- SHA-256: `d64a1213d216691353a99ec8d51e95dd4be2c9f720b9d943b5084eda90b43828`.
+- Total size: **2,992,388 bytes**.
+- Nested original ZIPs: **32**, aggregate 3,016,081 original compressed bytes, each CRC- and SHA-256-verified.
+- Local uploader: `NEUMANN_CORE1_27_ARCHIVE_UPLOADER_20261016.py`.
+- Independent extraction + dry run: `LOCAL_PREFLIGHT_PASS 32 archives 3016081 bytes`; `DRY_RUN: no GitHub mutation`.
 
-- Bundle: `NEUMANN_CORE1_26_COMPLETE_LOCAL_VAULT_20261016.zip`
-- Exact SHA256: `07e73a62c30103a47739afe76cee7482252ffcb741c8b7ae565d1321f5ad300e`
-- Bundle size: **2,957,951 bytes**
-- Original experiment ZIPs: **31**, combined original nested ZIP bytes 2,980,867, each SHA256-verified, each CRC-tested.
-- Uploader: `NEUMANN_CORE1_26_ARCHIVE_UPLOADER_20261016.py`
-- Freshly extracted local readback: `LOCAL_PREFLIGHT_PASS 31 archives 2980867 bytes`, followed by `DRY_RUN: no GitHub mutation`.
+## Required verified binary handoff
+1. Download the above archive from the producing ChatGPT response. Independently check its SHA-256.
+2. Extract on your own GitHub-authenticated computer. Verify the uploader source first. Use `gh auth login` or a minimally scoped GitHub token in your terminal; do not paste credentials into ChatGPT.
+3. Run `python NEUMANN_CORE1_27_ARCHIVE_UPLOADER_20261016.py` first. It only validates local SHA-256/CRC.
+4. Run `python NEUMANN_CORE1_27_ARCHIVE_UPLOADER_20261016.py --push` on the research branch. It is intended to fail closed on overwrites/concurrent changes, create one fast-forward commit, then reread remote bytes.
+5. **Declare remote binary archival complete only after** `ALL_32_ARCHIVES_UPLOADED_AND_REMOTE_VERIFIED` and matching remote ZIP checksums.
 
-## One safe remote import path
-
-1. Download the exact local vault from the producing ChatGPT response. Verify whole-vault SHA256.
-2. Extract. Run `python NEUMANN_CORE1_26_ARCHIVE_UPLOADER_20261016.py` from inside the extracted folder. It verifies each of 31 ZIP archive byte identities *without contacting GitHub*.
-3. Authenticate using `gh auth login` or set repo-scoped `GITHUB_TOKEN` locally. Do not disclose credentials in chat.
-4. Run `python NEUMANN_CORE1_26_ARCHIVE_UPLOADER_20261016.py --push`. The helper is restricted to the specific research branch, rejects overwriting archive paths, does not force-push or rewrite historic evidence, and checks uploaded Git blobs after the commit.
-5. Only declare remote ZIP upload complete when the tool prints `ALL_31_ARCHIVES_UPLOADED_AND_REMOTE_VERIFIED` and the remote binary SHA values match the manifest.
-
-This document records a tested dry-run only. CORE-26 confirms the source proof (tree mirror/height) but the required equality form was visible from paired `ff` safety guards. **New learned abstraction invention is not proven; Q1–Q7 OPEN**.
+No authenticated binary transfer has been performed from this conversation. Q1–Q7 are unchanged (all OPEN); CORE-27 exhibits a human-framed off-goal intermediate with learned operator token, NOT independent neural abstraction-language invention.
