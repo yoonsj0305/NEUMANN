@@ -1,23 +1,22 @@
-# Binary evidence transfer | CORE-1 through CORE-24 · 29 archives
+# Binary evidence transfer | CORE-1–25 · 30 original ZIP archives
 
-**GitHub PR #180 currently contains research reports and SHA-256 identities, NOT original ZIP byte streams/checkpoints.** A complete locally CRC/SHA256 verified vault with the uploader is available in the producing ChatGPT conversation.
+Scientific report text and SHA256 catalog are committed in research draft PR #180. **The original binary ZIPs, source bundles and model checkpoints are NOT remotely uploaded.** Do not claim the remote archive is complete.
 
-## Verified local bundle
+## Independently verified local vault
 
-- Name: `NEUMANN_CORE1_24_COMPLETE_LOCAL_VAULT_20261016.zip`.
-- Exact SHA-256: `f5c1953cb623857e407a31f9ad9a23a9eba7e6fadbb576c9cdfaa7913d9127d5`.
-- Outer vault: 2,876,651 bytes, 29 *original* individually verified experiment ZIPs (2,899,135 combined uncompressed archive bytes), plus JSON manifest and upload helper.
-- Uploader: `NEUMANN_CORE1_24_ARCHIVE_UPLOADER_20261016.py`.
-- On independent extracted local preflight: `LOCAL_PREFLIGHT_PASS 29 archives 2899135 bytes`, `DRY_RUN: no GitHub mutation`.
-- Original ZIP CRC checks all passed. The included uploader independently validates SHA-256 and file byte size for every archive before network access.
+- Filename: `NEUMANN_CORE1_25_COMPLETE_LOCAL_VAULT_20261016.zip`
+- Exact SHA-256: `e5df3488e8dd7aa6dae1ceb03eaeffd99e88653461168a1fe21063c31903ad27`
+- Size: **2,946,446 bytes**
+- Includes **30** individually SHA-256 and CRC-verified original experiment ZIP archives (combined inner ZIP bytes: **2,969,158**), local JSON manifest and source-checking binary uploader.
+- Importer file: `NEUMANN_CORE1_25_ARCHIVE_UPLOADER_20261016.py`
+- Independent extraction dry-run: **`LOCAL_PREFLIGHT_PASS 30 archives 2969158 bytes`** followed by **`DRY_RUN: no GitHub mutation`**.
 
-## Authenticated one-shot binary upload
+## Verified-upload procedure (user-side GitHub-authenticated environment required)
 
-1. Obtain the ZIP using its ChatGPT conversation download link. Confirm SHA-256 equals the value above.
-2. Extract the bundle locally.
-3. Authenticate `gh auth login` OR provide a repo-scoped `GITHUB_TOKEN` in your terminal. Do not paste tokens into ChatGPT or commit them.
-4. Run `python NEUMANN_CORE1_24_ARCHIVE_UPLOADER_20261016.py` first to verify all 29 ZIP identities **without writing**.
-5. Run `python NEUMANN_CORE1_24_ARCHIVE_UPLOADER_20261016.py --push` to stage 29 Git blobs under the dedicated research branch. It rejects overwrites and concurrent branch changes, creates one fast-forward commit, and rereads remote Git blobs to verify all SHA-256s.
-6. Only say binary upload is DONE if it prints `ALL_29_ARCHIVES_UPLOADED_AND_REMOTE_VERIFIED` and the remote archive path is actually present.
+1. Download the latest vault from the ChatGPT conversation and verify its exact SHA-256.
+2. Unzip. Authenticate GitHub in a local terminal using `gh auth login`, or use a scoped `GITHUB_TOKEN` with repo write access. Never share tokens in the chat.
+3. Run `python NEUMANN_CORE1_25_ARCHIVE_UPLOADER_20261016.py` and verify all 30 original ZIP byte identities in dry-run mode.
+4. Run `python NEUMANN_CORE1_25_ARCHIVE_UPLOADER_20261016.py --push` ONLY from a trusted, authenticated environment. It does not force-push or overwrite and verifies remote Git blobs after a fast-forward commit on the research branch.
+5. **Only after** output `ALL_30_ARCHIVES_UPLOADED_AND_REMOTE_VERIFIED` and matching remote SHA values is GitHub byte-level archival complete.
 
-**No GitHub binary upload was executed by this ChatGPT session** because the active GitHub connector does not ingest the local binary byte stream. The present draft PR should remain draft until verified import. Historic results remain development-only and Q1–Q7 OPEN.
+Q1–Q7 remain OPEN. CORE25 passed a new kind of narrowly prewritten nil-shape auxiliary on development source but failed 0/4 incompatible heldout family type preflights; strong exact baseline wins. Neither research truth nor archive state may be upgraded because these instructions were written.
