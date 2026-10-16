@@ -1,0 +1,51 @@
+name: FGSR first learned semantic content on difficult original (one frozen shot)
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/fgsr-first-learned-hard-original-once.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  first-pretrained-semantic-original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      HF_HUB_DISABLE_XET: "1"
+      TOKENIZERS_PARALLELISM: "false"
+      OMP_NUM_THREADS: "2"
+      FGSR_RESULT: "research/evidence/fgsr-q3-single-independent-family/first_learned_semantic_hard_original_receipt.json"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin pretrained checkpoint, syntax and original-only verifier dependencies
+        run: |
+          python -m py_compile research/evidence/fgsr-q3-single-independent-family/first_learned_semantic_on_hard_original.py
+          python -m pip install --disable-pip-version-check 'torch==2.5.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --disable-pip-version-check 'transformers==4.46.3' 'huggingface_hub==0.35.3' 'z3-solver==4.13.3.0'
+      - name: One pretrained SMALL model proposed semantic content and all original 48 clauses audited
+        run: |
+          python research/evidence/fgsr-q3-single-independent-family/first_learned_semantic_on_hard_original.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('research/evidence/fgsr-q3-single-independent-family/first_learned_semantic_hard_original_receipt.json').read_text())
+          print('SCIENTIFIC_STATUS',x['status'])
+          print('SOURCE_ORIGINAL_CERTIFIED',x.get('model_candidate_check',{}).get('certified_unsat'))
+          print('OUTPUT_SHA',x.get('model_output_sha256'))
+          print('NEURAL_CALLS',x['neural_generation_calls'])
+          print('GLOBAL_Q',x['global_q1_q7'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-first-actual-pretrained-semantic-content-hard-original
+          path: research/evidence/fgsr-q3-single-independent-family/first_learned_semantic_hard_original_receipt.json
+          if-no-files-found: warn
+          retention-days: 45
