@@ -43,7 +43,7 @@ def close_pairs(s):
     ds=[x for x in all_ if x.startswith("(declare-fun |Inv|")]
     if len(ds)!=1 or len(re.findall(r"\bInt\b",ds[0]))!=8:
         raise ValueError("unsupported_relation_sort")
-    assertions=[x for x in all_ if x.startswith("(assert ")]
+    assertions=[x for x in all_ if re.match(r"\\(assert\\s",x)]
     expected=[]
     pat=re.compile(r"\(=>\s+\(and\s+\(Inv\s+([A-Za-z0-9_\s]+)\)\s+true\s*\)\s+\(Inv\s+([A-Za-z0-9_\s]+)\)\s*\)")
     for assertion in assertions:
