@@ -47,3 +47,13 @@ Input = original problem bytes + goal + permissions + budget. Output = original 
 - WBS4: independent audit, cost accounting and stop/go; retain buffer for reproduction/UNKNOWN.
 
 **2026-10-16 disposition:** No new evaluation was executed by this decision; provider evidence and full learned cross-family capability remain absent. The scientifically correct next state is **PIVOT_TO_FGSR_1 / BLOCKED_PROVIDER_EVIDENCE / HOLD_ADDITIONAL_LEARNING / Q1_Q7_OPEN**.
+
+
+## Quantitative hard barrier: actual cold LP evidence (measured historical, not new runs)
+Two *opened* F0 LP problems previously measured matched Strong Native at 940.399164ms and 913.728656ms; the frozen learned path required 3077.804039ms and 3044.446328ms. At a 10x faster-than-Native wall goal under each same original, NEUMANN needs <=94.0399164ms and <=91.3728656ms respectively. That would require current frozen learned wall to decrease by **32.7287x and 33.3189x**, or delete approximately **96.94% and 96.999%** of its current complete wall. These are calculated *necessary conditions* for those two historical measured paths, **not achieved savings or a generic lower bound**. A design retaining an unchanged >=0.9s Native solve as a mandatory step cannot attain a <0.1s 10x wall target in that environment. Focus future research on **eliminating computation**, not minor dispatch optimization. Cold and warm, correct full cost, and task equivalence must stay separate.
+
+## Execution permission and provider audit (16 Oct, follow-up)
+Connected Hugging Face profile inspected: non-Pro, historical Jobs inventory 0, no existing authenticated model executions to reuse. As of the cited vendor docs Jobs require positive pre-paid balance and are metered; Free monthly inference credits are specific to Inference Providers, not an authorized Jobs GPU grant. Do not launch paid Jobs, paid API calls or infer model successes from ChatGPT chat. The existing F0 intake code and independent validators are present; do NOT implement another receipt harness in their place. Provider-attested SMALL and FRONTIER **actual original matched outputs remain absent**.
+
+## Engineering integrity correction
+The prior inherited GitHub CI run 38866078543 failed because the optional CORE-34 symbolic research test imported `sympy` unconditionally during full-suite collection; base runtime does not require `sympy`. CORE-34 and CORE-35 stacked branches were fixed with `pytest.importorskip("sympy")` for the optional test, while the focused research workflow installs and runs SymPy checks explicitly. Focused replay was observed SUCCESS for new downstream commit; latest downstream full-suite status must be checked separately. This is **CI hygiene** and earns **no scientific Q status**.
