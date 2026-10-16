@@ -129,7 +129,18 @@ def attempt(rules,nodes,cap_ms):
                 parts.extend(atom.arg(j)==derefs[k][j] for j in range(8))
             alternatives.append(z3.And(*parts))
         solver.add(z3.Or(*alternatives))
-    solver.add(z3.Or(states[-1][3]==0,states[-1][3]==1))
+    error_rules=[r for r in rules if r["kind"]=="CHC_COMP_FALSE"]
+    actual_error_disjuncts=[]
+    for err in error_rules:
+        ee=inst(err,f"goal_{nodes}_original_rule_{err['id']}")
+        if len(ee["body"])!=1:raise ValueError("UNSUPPORTED_ERROR_RULE_PREMISES")
+        atom=ee["body"][0]
+        actual_error_disjuncts.append(z3.And(
+            *ee["guards"],
+            *[atom.arg(j)==states[-1][j] for j in range(8)]
+        ))
+    if not actual_error_disjuncts:raise ValueError("NO_ORIGINAL_UNSAFETY_GOAL")
+    solver.add(z3.Or(*actual_error_disjuncts))
     start=time.monotonic()
     result=solver.check()
     if result!=z3.sat:
