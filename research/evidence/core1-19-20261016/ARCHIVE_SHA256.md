@@ -1,6 +1,6 @@
 # SHA256 archive register | 2026-10-16
 
-34 locally verified ZIP archives (including CORE22 independent source-AST audit). The entries below are checksums, NOT uploaded ZIP files.
+35 locally verified ZIP archives (including CORE22 independent source-AST audit). The entries below are checksums, NOT uploaded ZIP files.
 
 | Stage | Original archive filename | SHA-256 |
 |---|---|---|
@@ -51,5 +51,7 @@
 
 | CORE29 | NEUMANN_CORE29_SOURCE_FIRST_HORN_20261016.zip | 355835e1f28b9a3596cdb9e9d5e376a6dd48b2e6d8b8608aba0d1d52c45e7f70 |
 
-All 34 archives passed ZIP CRC check in local workspace.
+| CORE30 | NEUMANN_CORE30_SOURCE_RECURSION_CERTIFIED_20261016.zip | 7edea8ea3d786f1e263a2017844efad1ccd3256009e7ab55a21277a1f8149c27 |
+
+All 35 archives passed ZIP CRC check in local workspace.
 Raw archive bytes and checkpoints remain outside GitHub pending a transfer channel that supports local binary files.
