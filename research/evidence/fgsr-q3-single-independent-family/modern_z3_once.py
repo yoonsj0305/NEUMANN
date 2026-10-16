@@ -66,6 +66,8 @@ def main():
         if actual!=DIGEST or blob!=BLOB:raise ValueError("SOURCE_HASH_MISMATCH")
         p=Path("/tmp/fgsr_external_modern_original.smt2")
         p.write_bytes(raw)
+        import z3
+        receipt["model_version"] = z3.get_version_string()
         child=subprocess.run([sys.executable,__file__,"--native",str(p)],
                             stdout=subprocess.PIPE,stderr=subprocess.PIPE,
                             text=True,timeout=20,check=False)
