@@ -1,0 +1,48 @@
+name: FGSR independent-family one-shot classical gate
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/fgsr-independent-family-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-gap-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    env:
+      FGSR_RESULT: research/evidence/fgsr-q3-single-independent-family/first_actual_receipt.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check frozen code syntax
+        run: python -m py_compile research/evidence/fgsr-q3-single-independent-family/screen_once.py
+      - name: Install public independent exact solvers
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq z3
+          sudo apt-get install -y -qq cvc5 || echo "cvc5 unavailable; classified MISSING"
+          command -v z3
+      - name: One preregistered untouched-source solver run each
+        run: |
+          python research/evidence/fgsr-q3-single-independent-family/screen_once.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('research/evidence/fgsr-q3-single-independent-family/first_actual_receipt.json').read_text())
+          print('FIRST_ACTUAL_VERDICT',d['outcome'])
+          print('SOURCE_BLOB_CHECKED',d.get('git_blob_verified'))
+          print('SCIENTIFIC_Q',d['global_questions'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-single-independent-family-first-baseline-receipt
+          path: research/evidence/fgsr-q3-single-independent-family/first_actual_receipt.json
+          if-no-files-found: warn
+          retention-days: 45
