@@ -3,7 +3,7 @@
 This tests a specialist capable of interpolant/CEGAR predicate discovery.
 Do NOT treat solver timeout as neural proof. Do NOT modify external source.
 """
-import hashlib,io,json,os,platform,re,subprocess,sys,tarfile,time,urllib.request,zipfile
+import gzip,hashlib,io,json,os,platform,re,subprocess,sys,tarfile,time,urllib.request,zipfile
 from pathlib import Path
 
 REV="b4fa7a708e5863bbcdb5de50d692ead3a67cbedc"
@@ -40,11 +40,15 @@ def unpack_payload(name,archive):
             for m in t.getmembers():
                 if Path(m.name).is_absolute() or ".." in Path(m.name).parts:raise ValueError("UNSAFE_RELEASE_ARCHIVE_PATH")
             t.extractall(base,filter="data")
+    elif name.endswith(".gz"):
+        p=base/Path(name).stem
+        p.write_bytes(gzip.decompress(archive))
+        p.chmod(p.stat().st_mode | 0o111)
     elif name.endswith(".jar"):
         p=base/name;p.write_bytes(archive)
     else:raise ValueError("UNSUPPORTED_ASSET_FORMAT")
     jars=sorted(base.rglob("*assembly*.jar"))
-    elds=[p for p in base.rglob("eld") if p.is_file()]
+    elds=[p for p in base.rglob("*") if p.is_file() and (p.name=="eld" or p.name=="eldarica-x86-linux-static")]
     if elds:
         exe=elds[0]
         exe.chmod(exe.stat().st_mode | 0o111)
