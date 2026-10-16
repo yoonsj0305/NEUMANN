@@ -1,0 +1,49 @@
+# NEUMANN 1 — CORE-ONLY decision and stop/go gate (2026-10-16)
+
+**Decision: STOP additional CORE-named theorem/solver micro-experiments. DO NOT interpret accumulation of successful proofs as learned intelligence progress.** Frozen North Star remains *Frontier-level problem solving with minimum necessary computation*. Historical studies, failures, receipts, seals and Q1–Q7 are unchanged (ALL OPEN).
+
+## Evidence that justifies the stop
+- CORE-33: learned 817-param constrained synthetic helper emission, 40/40, but exact classical emitter 0.414ms vs neural 38.942ms for 40 generated programs (~94x **classical** advantage). No new learned helper language invention.
+- CORE-34: matched 3,645 candidate AST proof search can prune to 1 proof, but **strong exact linear classical solve** 0.306ms vs selective 1.999ms (single-run, synthetic). No neural necessity.
+- CORE-35: genuine RustHorn safe original 13/13 independently UNSAT with **human-written post-inspection witness**. The preregistered direct safe verdict was TIMEOUT/ERROR at 10,014.317ms, not a successful matched baseline. Summing the safe per-clause certificate execution gives **9,625.252ms**, exclusive of human invention, certificate construction and other costs. This does NOT establish a 10x advantage (nor an apples-to-apples iso-capability speed comparison).
+- CORE-35 genuine unsafe original: strong direct UNSAT at **737.156ms** while witness-verification sum **9,107.851ms**, ~**12.355x slower** than direct; unsafe witness necessarily has SAT counterexample, so this comparison is NOT iso-capability as a proof-producing system, only a diagnostic of wasted verification work. Do not cite as a general speedup/slowdown theorem.
+- Multiple older studies: R0 cold frozen learned 3.27–3.33x slower than native on 2 opened LPs; M106 no 10x among 16 opened originals; P1 meaning/control failures; classical structure/fold selection repeatedly dominates trivial learned heads.
+- New neural work cannot be justified by a stronger proof certificate alone. Verifying a human-provided abstraction is not autonomous reframing.
+
+## RESEARCH REQUIREMENT DELETION
+Stop: more arithmetic AST candidates, CHC proof-encoding variations, synthetic arity shifts, read/rewritten RustHorn holdout, Z3 timeout hunts, proof-only papers, new PR stacks, G0 repeats, LP policy tuning. All retain their useful historical artifacts. Permit a new experiment only if it directly exercises the *entire* missing causal chain.
+
+## One decisive experiment (registered DESIGN, NOT EXECUTED)
+**Name:** Real Frontier-Gap Structural Recovery (FGSR-1).
+**Question:** On a source-group-disjoint original task that a fixed small reference ACTUALLY fails and a fixed frontier reference ACTUALLY solves, can a frozen NEUMANN source+goal-conditioned learned proposer find a previously UNPROVIDED, sufficient representation, get the original result independently certified, and beat the strongest equal-information specialized classical/direct route in complete resources?
+
+Required synchronized arms:
+1. **SMALL** fixed exact checkpoint and real captured answer;
+2. **FRONTIER** fixed exact provider revision and real captured answer;
+3. **STRONG CLASSICAL** best applicable specialized direct+hybrid solver, same source and eligible input/hints;
+4. **NEUMANN minus learning** all identical parsing, tools, retrieval, proof and fallback minus learned proposer;
+5. **NEUMANN full** frozen weights, goals, schema, output AST/relation and independent verifier.
+
+**Preconditions before opening a new original:** certified benchmark identity/licensing and originality; provider model revisions and true execution receipts; allowed tool budget; explicit spend approval where needed; frozen learned weights and decoder before test; baseline improvements permitted equally; trusted independent verifier; immutable manifest including source group, no training/held-out contamination; hard per-case runtime and monetary ceilings.
+
+**Execution order:**
+A. Confirm one actual frontier-gap membership G using independently validated small-fail/frontier-pass. If either missing -> **BLOCKED_PROVIDER_EVIDENCE**, not small-model FAIL.
+B. Strong classical/native headroom screen on same original, using only legal input. If a matching classical route already solves materially cheaper -> **CLASSICAL_DOMINATES**, stop learned spend.
+C. Freeze a learned semantic/structure proposer trained only on separate opened data; test on a NEW, disjoint holdout with no supplied lemma/mode/gold. If checkpoint inaccessible -> **BLOCKED_MODEL_RUNTIME**. Never promote candidate selection or scripted grammar completion to NEW abstraction invention.
+D. Independent original-goal proof of EVERY accepted output, negative mutation, goal/input masking and ablation. UNSAT/SAT/UNKNOWN semantics preserved. A proposal lacking certificate -> reject and safe fallback/ABSTAIN.
+E. Compare complete end-to-end cost with cold+warm, proposer, verification, fallback, unsuccessful attempts, training amortization and provider charges; one axis must exceed a *preregistered* threshold only at matched verified capability. Energy/VRAM/flops UNKNOWN when unavailable.
+F. Once a scope-specific win is valid, repeat on independently frozen distinct source groups; do not call one successful task frontier-level generality.
+
+**Go/no-go condition:** No model training or additional theorem-family research while (A) has no actual real model-pair. If a suitable authorized zero-extra-cost provider path is unavailable, stop at BLOCKED_PROVIDER_EVIDENCE and preserve this design. Next useful user-independent work is verifying existing F0 intake/receipts, NOT rewriting the F0 harness or calling ChatGPT conversational output an authenticated frontier receipt.
+
+## Interface / degraded mode
+Input = original problem bytes + goal + permissions + budget. Output = original task answer + original verifier certificate + resource receipt or explicit ABSTAIN. Learned stage advisory. Strong native/classical route is default when the cheap structural test already suffices; on parse/semantic mismatch, timeout, UNKNOWN, budget violation or certificate failure, return classical verified answer if available, otherwise ABSTAIN. No fabricated success.
+
+## Work breakdown (Estimate planning, not results)
+- WBS0: audit provider and exact model availability; exit only with attestable identity or BLOCKED.
+- WBS1: bind one opened eligible original and independent verifier to existing F0 adapter; no new bridge.
+- WBS2: paired original five-arm run with immutable first receipt.
+- WBS3: conditional one candidate learned proposer with source-disjoint frozen holdout, if WBS2 shows a real gap.
+- WBS4: independent audit, cost accounting and stop/go; retain buffer for reproduction/UNKNOWN.
+
+**2026-10-16 disposition:** No new evaluation was executed by this decision; provider evidence and full learned cross-family capability remain absent. The scientifically correct next state is **PIVOT_TO_FGSR_1 / BLOCKED_PROVIDER_EVIDENCE / HOLD_ADDITIONAL_LEARNING / Q1_Q7_OPEN**.
