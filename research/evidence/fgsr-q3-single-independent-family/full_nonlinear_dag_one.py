@@ -20,9 +20,9 @@ OUT=Path(os.environ.get("FGSR_RESULT","nonlinear_dag_receipt.json"))
 BUDGET=[(6,12000),(10,16000),(14,25000),(18,35000)]
 WALL_CAP_SECONDS=112
 
-def read_rules(data):
+def read_rules(data,expected_count=48):
     formulas=z3.parse_smt2_string(data)
-    if len(formulas)!=48:raise ValueError("ORIGINAL_CLAUSE_COUNT_MISMATCH")
+    if len(formulas)!=expected_count:raise ValueError("ORIGINAL_CLAUSE_COUNT_MISMATCH")
     rules=[]
     for i,f in enumerate(formulas,1):
         if not (z3.is_quantifier(f) and f.is_forall()):raise ValueError("NOT_FORALL_"+str(i))
@@ -43,9 +43,10 @@ def read_rules(data):
             if not z3.is_false(head):raise ValueError("UNKNOWN_HEAD_"+str(i))
             kind="false"
         rules.append({"id":i,"vars":fresh,"body":calls,"guards":guards,"head":head,"kind":kind})
-    if sum(x["kind"]=="Inv" for x in rules)!=45:raise ValueError("INV_HEAD_COUNT_UNEXPECTED")
-    if sum(x["kind"]=="CHC_COMP_FALSE" for x in rules)!=2:raise ValueError("GOAL_COUNT_UNEXPECTED")
-    if sum(x["kind"]=="false" for x in rules)!=1:raise ValueError("TERMINAL_COUNT_UNEXPECTED")
+    if expected_count==48:
+        if sum(x["kind"]=="Inv" for x in rules)!=45:raise ValueError("INV_HEAD_COUNT_UNEXPECTED")
+        if sum(x["kind"]=="CHC_COMP_FALSE" for x in rules)!=2:raise ValueError("GOAL_COUNT_UNEXPECTED")
+        if sum(x["kind"]=="false" for x in rules)!=1:raise ValueError("TERMINAL_COUNT_UNEXPECTED")
     return rules
 
 def inst(rule,prefix):
