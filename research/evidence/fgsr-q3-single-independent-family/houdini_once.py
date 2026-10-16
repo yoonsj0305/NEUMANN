@@ -45,7 +45,7 @@ def replace_rule(assertion,candidates,one_head=None):
         last=occurrences[-1]
         # Original Horn normal form: last Inv is the conclusion exactly when
         # only closing parentheses follow that atom.
-        if re.fullmatch(r"\)+",form[last.end():].strip()):head_index=len(occurrences)-1
+        if form[last.end():].strip(" \n\t\r)")=="":head_index=len(occurrences)-1
     chunks=[];pos=0
     for j,atom in enumerate(occurrences):
         chunks.append(form[pos:atom.start()])
