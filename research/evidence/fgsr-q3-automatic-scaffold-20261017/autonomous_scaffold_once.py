@@ -191,7 +191,8 @@ def solve_source(rules,relations,loops,mode,t0):
         vars_,forms,_=cands[name]
         param=[z3.Int(f"p{i}") for i in range(len(vars_))]
         subs=list(zip(vars_,param))
-        full=z3.And(*[z3.substitute(forms[j],*subs) for j in sorted(active[name])])
+        full=(z3.And(*[z3.substitute(forms[j],*subs) for j in sorted(active[name])])
+              if active[name] else z3.BoolVal(True))
         definition="(define-fun |"+name+"| ("+" ".join(
             f"(p{i} Int)" for i in range(len(param)))+") Bool "+full.sexpr()+")"
         definitions.append(definition)
