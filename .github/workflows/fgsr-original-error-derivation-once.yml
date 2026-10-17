@@ -1,0 +1,41 @@
+name: FGSR original 48-Horn concrete error derivation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  one-original-counterexample:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      FGSR_RESULT: research/evidence/fgsr-q3-single-independent-family/original_error_derivation_receipt.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Independent original Z3 backend
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/fgsr-q3-single-independent-family/original_error_derivation_bmc.py
+      - name: Search for genuine original Horn error derivation and independently replay
+        run: |
+          python research/evidence/fgsr-q3-single-independent-family/original_error_derivation_bmc.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('research/evidence/fgsr-q3-single-independent-family/original_error_derivation_receipt.json').read_text())
+          print('SOURCE_GENUINE_TRACE',r['status'])
+          print('CERTIFICATE_REPLAYED',r.get('independent_each_original_rule_replay',{}).get('verified',False))
+          print('LEARNED_Q',r['global_Q'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-original-error-derivation-first-actual
+          path: research/evidence/fgsr-q3-single-independent-family/original_error_derivation_receipt.json
+          if-no-files-found: warn
+          retention-days: 45

@@ -1,0 +1,17 @@
+# FGSR original semantic sanity gate: finite error-derivation test
+**2026-10-16 · Actual executed. NOT a proof that the original is SAFE or UNSAFE.**
+
+The previous opened CHC-COMP `ultimate/LIA-NonLin/33_double_lock_p1_vs_simplified_000.smt2`, SHA256 `2dfd3f531151113401aca614ad3e4176dae77ebcb326abbbcc456551a9a8f645`, contains 48 Horn rules, 8 integer state arguments, 1 universal initial rule, 27 one-`Inv`-premise original derivation rules and **17 multi-premise original Horn clauses excluded by this finite-trace search**.
+
+## Single original-only exact witness test
+Actual [GitHub Actions run #38920018845](https://github.com/yoonsj0305/NEUMANN/actions/runs/38920018845), Z3 4.13.3, one pinned original with exact hash and original one-premise rule ASTs, initial witness data arguments 0 (which original initial rule permits), 34 step maximum, 85,000ms total cap, model calls **0**. At each depth a SAT check asks whether error control value D is 0 or 1. A positive result would have to store all concrete states/rule identities and replay every step from the original AST, plus original initial and error/false rules, before a proven original UNSAT (unsafe) verdict.
+
+**Actual result** `INCOMPLETE_SOLVER_UNKNOWN`: depths **0 through 8** each `unsat`, depth **9** `unknown`; elapsed wall **85,004.002ms**. Therefore **NO** concrete erroneous original derivation was obtained and **NO** original safety certificate was obtained. The 17 nonlinear Horn rules were deliberately excluded, so the checked space is an underapproximation. Initial 0-data concretization further narrows the checked space. The finite-depth negative findings have no logical implication for the original complete 48-rule Horn satisfiability.
+
+Authoritative immutable actual result [JSON receipt](https://github.com/yoonsj0305/NEUMANN/blob/research/core35-rusthorn-real-source-gate-20261016/research/evidence/fgsr-q3-single-independent-family/FIRST_ACTUAL_BOUNDED_DERIVATION_20261016.json), executable [source](https://github.com/yoonsj0305/NEUMANN/blob/research/core35-rusthorn-real-source-gate-20261016/research/evidence/fgsr-q3-single-independent-family/original_error_derivation_bmc.py). Archive `NEUMANN_FGSR_ORIGINAL_ERROR_DERIVATION_20261016.zip`, 1,233B JSON, ZIP hash `ff0eec2f09b9662902e35976d44bc8c00a42d41946a77d1059aa9982b9ec247e`, internal JSON SHA256 `2692b545aba3b744c60ea2ec59a9fa6f72b0f22f49b172a6c40c6ee84236ac64`, CRC PASS. Original source external bytes not redistributed in archive.
+
+## The single real research conclusion
+The source is **nonlinear Horn**, with 17 premises whose sound use requires combined facts or a representation of an entire derivation DAG. It is invalid to conclude either safety or unsafety by continuing to enumerate a single linear state trace. Pure PC-restriction Houdini, symmetry quotient and fixed 1105 conjuncts already failed; more posthoc classical microtemplates or solver timeout tuning on this opened instance is not scientifically efficient.
+
+**STOP further opened-case classical micro-experiments.** Q1–Q7 all OPEN. The next admissible positive Q3 test requires a *trained, frozen source-conditioned proposer* that independently invents a dependency-complete auxiliary relation/derivation representation and validates ALL original clauses against the best equally informed classical and no-learning baselines **on a separate unseen source-family**. The user-facing logical contract is no fabricated certificate, complete attempt cost, and ABSTAIN on UNKNOWN. Q7 frontier comparisons remain `BLOCKED_PROVIDER_EVIDENCE`.
+

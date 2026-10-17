@@ -1,0 +1,70 @@
+{
+  "provenance": "AUTHENTIC_TRAINED_FROZEN_15_WEIGHT_LOOP_POLYNOMIAL_HEAD",
+  "checkpoint_file_sha256": "cc2b34773dd095b7980fa6365518714d896e69a64dd38a37e34cf522a64cc3e6",
+  "features": "k,m,n source recurrence s_next=s+k*a+m*t+n; t_next=t-1",
+  "coefficient_meaning": "A a^2 + B a t + C t^2 + D a + E t; s0=0 t0=a",
+  "train_samples": 1024,
+  "validation_samples": 256,
+  "adam_updates": 226,
+  "validation_max_abs_error": 0.00006799848882366177,
+  "learned_15_weights": [
+    [
+      1.0000049469135488,
+      0.4999992569855871,
+      -0.0000020057653445301194
+    ],
+    [
+      -1.000002119635724,
+      -6.423412509021618e-7,
+      -5.45191648158471e-7
+    ],
+    [
+      0.000002011956074289804,
+      -0.49999712700133986,
+      5.553681471410288e-7
+    ],
+    [
+      0.0000014567394845014275,
+      0.5000001780616748,
+      0.9999947721961792
+    ],
+    [
+      1.3924630612775726e-7,
+      -0.5000030165377514,
+      -1.0000031105465235
+    ]
+  ],
+  "external_original_result": {
+    "benchmark": "CHC-COMP 2026 eldarica-misc/LIA/llreve/square_twice_safe.c-1_000.smt2",
+    "original_sha256": "f62d0fb72140e6bd7e953dcebd131a4e9498cc9c0c150588ca79944962e9e748",
+    "model_proposed_loop_coefficients": {
+      "inv_main8": [
+        1,
+        -1,
+        0,
+        0,
+        0
+      ],
+      "inv_main13": [
+        1,
+        -1,
+        0,
+        0,
+        0
+      ],
+      "inv_main22": [
+        1,
+        -1,
+        0,
+        0,
+        0
+      ]
+    },
+    "original_clause_proofs_with_PREEXISTING_HUMAN_SCAFFOLD": "9/9 UNSAT",
+    "exact_classical_same_scaffold": "9/9 UNSAT",
+    "zero_head_ablation": "1/9 UNSAT, clause2 SAT",
+    "learned_operator_family_invented": false,
+    "all_global_questions": "Q1-Q7 OPEN"
+  },
+  "archive": "NEUMANN1_REAL_LEARNED_COMPONENT_GATE_20261017.zip SHA256 fde973a62a0f6b909419287244a089402987592d7fa0b9de7816fb4741a633b7"
+}

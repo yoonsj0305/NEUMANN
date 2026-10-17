@@ -1,0 +1,40 @@
+name: Q3 frozen source 17-probe original six-Horn impossibility theorem
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-six-horn:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    env:
+      FGSR_RESULT: research/evidence/fgsr-q3-active-information-20261017/first_github_independent_original_theorem.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Exact independent solver
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/fgsr-q3-active-information-20261017/original_six_horn_theorem.py
+      - name: Check joint original six Horn clauses and record negative scientific boundary
+        run: |
+          python research/evidence/fgsr-q3-active-information-20261017/original_six_horn_theorem.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path("research/evidence/fgsr-q3-active-information-20261017/first_github_independent_original_theorem.json").read_text())
+          assert r["shared_relation_joint_result"]=="unsat"
+          assert r["original_quantified_horn_assertions"]==6
+          assert r["deltas_at_index_17"]==[1,2]
+          assert r["global_q1_q7"]=="OPEN"
+          print("INFORMATION_THEOREM_PASS",r["status"])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-17-probe-independent-original-theorem-first-evidence
+          path: research/evidence/fgsr-q3-active-information-20261017/first_github_independent_original_theorem.json
+          if-no-files-found: warn
+          retention-days: 45

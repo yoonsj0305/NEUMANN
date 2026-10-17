@@ -1,0 +1,46 @@
+name: FGSR semantic learned preflight (opened source)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  opened-one-shot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      HF_HUB_DISABLE_XET: "1"
+      TOKENIZERS_PARALLELISM: "false"
+      OMP_NUM_THREADS: "2"
+      FGSR_RESULT: "research/evidence/fgsr-q3-semantic-preflight/receipt.json"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin code syntax, install public CPU-only dependencies
+        run: |
+          python -m py_compile research/evidence/fgsr-q3-semantic-preflight/run_once.py
+          python -m pip install --disable-pip-version-check 'torch==2.5.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --disable-pip-version-check 'transformers==4.46.3' 'huggingface_hub==0.35.3' 'z3-solver==4.13.3.0'
+      - name: Exactly one frozen-pretrained public model inference, opened source only
+        run: |
+          python research/evidence/fgsr-q3-semantic-preflight/run_once.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result=json.loads(Path("research/evidence/fgsr-q3-semantic-preflight/receipt.json").read_text())
+          print("FGSR_STATUS",result["status"])
+          print("ORIGINAL_CLAUSES_UNSAT",sum(x=="unsat" for x in result.get("independent_original_proof",[])))
+          print("SCIENTIFIC_Q1_Q7",result["global_q1_q7"])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-q3-one-shot-original-receipt
+          path: research/evidence/fgsr-q3-semantic-preflight/receipt.json
+          if-no-files-found: warn
+          retention-days: 30

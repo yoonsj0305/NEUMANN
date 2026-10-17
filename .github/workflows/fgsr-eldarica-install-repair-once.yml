@@ -1,0 +1,38 @@
+name: FGSR Eldarica 2.3 exact-source install repair
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  specialist-original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      FGSR_RESULT: research/evidence/fgsr-q3-single-independent-family/eldarica_first_actual_solver_receipt.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate binary archive handler and unchanged source checks
+        run: python -m py_compile research/evidence/fgsr-q3-single-independent-family/eldarica_once.py
+      - name: One restored specialist solver cold attempt
+        run: |
+          python research/evidence/fgsr-q3-single-independent-family/eldarica_once.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('research/evidence/fgsr-q3-single-independent-family/eldarica_first_actual_solver_receipt.json').read_text())
+          print("ELDARICA_ACTUAL",d["status"],d.get("solver_wall_ms"))
+          print("EXTERNAL_UNMODIFIED",not d["external_source_modified"])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-eldarica-actual-post-install-repair
+          path: research/evidence/fgsr-q3-single-independent-family/eldarica_first_actual_solver_receipt.json
+          if-no-files-found: warn
+          retention-days: 45

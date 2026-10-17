@@ -1,0 +1,26 @@
+name: Q3 internal research pinned original 48-rule source mirror
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-verification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Fetch exact pinned public research benchmark
+        run: |
+          python - <<'PY'
+          import hashlib,urllib.request,pathlib
+          u='https://raw.githubusercontent.com/chc-comp/chc-comp26-benchmarks/b4fa7a708e5863bbcdb5de50d692ead3a67cbedc/ultimate/LIA-NonLin/33_double_lock_p1_vs_simplified_000.smt2'
+          b=urllib.request.urlopen(u,timeout=25).read()
+          assert hashlib.sha256(b).hexdigest()=='2dfd3f531151113401aca614ad3e4176dae77ebcb326abbbcc456551a9a8f645'
+          assert b.count(b'(assert')==48
+          pathlib.Path('private_research_source_48.smt2').write_bytes(b)
+          print('PINNED_ORIGINAL_SHA256',hashlib.sha256(b).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fgsr-pinned-public-research-source-private-analysis-only
+          path: private_research_source_48.smt2
+          retention-days: 1

@@ -1,0 +1,40 @@
+name: FGSR full auto structure independent original proof and learned-minus ablation
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  second-independent-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    env:
+      FGSR_RESULT: research/evidence/fgsr-q3-automatic-scaffold-20261017/second_independent_replay_receipt.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin independent solver and compile
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/fgsr-q3-automatic-scaffold-20261017/autonomous_scaffold_once.py
+      - name: Re-derive five relations, export SMT, independent all-source replay, full candidate-minus control
+        run: |
+          python research/evidence/fgsr-q3-automatic-scaffold-20261017/autonomous_scaffold_once.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('research/evidence/fgsr-q3-automatic-scaffold-20261017/second_independent_replay_receipt.json').read_text())
+          print('FULL_ORIGINAL_PROOF',r['status'])
+          print('SMT_REPLAY_VERIFIED',r.get('SECOND_INDEPENDENT_ORIGINAL_REPLAY',{}).get('verified'))
+          print('LEARNED_ORIGINAL',r.get('LEARNED',{}).get('original_unsat_count'))
+          print('LEARNED_MINUS_ORIGINAL',r.get('NONE',{}).get('original_unsat_count'))
+          print('ALL_GLOBAL_Q',r['global_q1_q7'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-auto-five-predicate-second-independent-proof-and-ablation
+          path: research/evidence/fgsr-q3-automatic-scaffold-20261017/second_independent_replay_receipt.json
+          if-no-files-found: warn
+          retention-days: 45

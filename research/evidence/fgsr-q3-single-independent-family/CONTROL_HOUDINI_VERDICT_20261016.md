@@ -1,0 +1,24 @@
+# FGSR hard 48-clause original: finite-control and Houdini induction gates
+
+Date: 2026-10-16. Authentic opened CHC-COMP external original `ultimate/LIA-NonLin/33_double_lock_p1_vs_simplified_000.smt2`, pinned upstream `b4fa7a708e5863bbcdb5de50d692ead3a67cbedc`, original SHA-256 `2dfd3f531151113401aca614ad3e4176dae77ebcb326abbbcc456551a9a8f645`, original clause count exactly **48**.
+
+## Actual outcome (not a scientific Q pass)
+
+1. [Original-first manually designed finite-control relation](https://github.com/yoonsj0305/NEUMANN/blob/research/core35-rusthorn-real-source-gate-20261016/research/evidence/fgsr-q3-single-independent-family/manual_control_proof_once.py) independently validates **the first 25/48 original Horn rules UNSAT**, but **original rule 26 is SAT**. First actual [GitHub Actions run #38912825821](https://github.com/yoonsj0305/NEUMANN/actions/runs/38912825821), frozen raw evidence artifact ID `12050209854`. There is NO overall sound proof, despite the first 25 rules being consistent. The researcher's initial hypothesis that pc5 and pc6 always equal -1 was falsified because original rule 26 can activate one worker when main is at control state 4. The statement is a source-derived hypothesis chosen AFTER inspecting the case, not a neural-generated lemma.
+
+2. Tested [classical finite-basis Houdini](https://github.com/yoonsj0305/NEUMANN/blob/research/core35-rusthorn-real-source-gate-20261016/research/evidence/fgsr-q3-single-independent-family/houdini_once.py) as a strict learned-minus baseline. Hypothesis basis supplied by a researcher: 7 predefined (possibly conditional) Boolean facts about the eight real source variables, not a discovered abstraction language. It tested **813 induction obligations**, 5 elimination iterations, and retained exactly **2 inductive predicates**:
+   - main pc H is in {0,1,2,3,4};
+   - if main pc H differs from 4, both worker pcs D and E are -1.
+   It removed pc5=-1 at original rule 26, pc6=-1 at rule 2 (once pc5 was relaxed), a conditional A=0 at rule 14, worker0 safe-state set at rule 5 and worker1 safe-state set at rule 1. The final interpretation passed **46/48** untouched original clauses; original clause 46 is SAT (unsafe goal), and no full original SAT/UNSAT verdict is certified. Wall **870.527 ms**, GitHub Actions [actual run #38913697625](https://github.com/yoonsj0305/NEUMANN/actions/runs/38913697625), raw evidence artifact ID `12051761031`. No neural calls and no original modifications.
+
+3. The FIRST Houdini setup [run #38913495219](https://github.com/yoonsj0305/NEUMANN/actions/runs/38913495219) was **BLOCKED before SMT induction**, because head detection did not allow SMT blank space between trailing closure parentheses. The parser was repaired without changing the source, templates, test conditions, or max cap. This failure is retained in raw archived receipt artifact ID `12050828473`. Workflow SUCCESS means receipt collection, NOT scientific success. The original manual proof run likewise yielded a correctly rejected scientific verdict.
+
+## Research claim, precisely limited
+
+`FINITE_BASIS_HOUDINI_LIMIT_REACHED / ORIGINAL_48_PROOF_OPEN / LEARNED_Q3_UNPROVEN / GLOBAL_Q1_Q7_OPEN`.
+
+The exact logical content proved is only that the **strongest inductive conjunction *within the seven predetermined predicate candidates*** is insufficient to establish the original program's error-free safety. It does NOT prove a stronger inductive invariant does not exist, or that specialist classical solvers are generally incapable. The earlier original Z3/cvc5/Eldarica timeouts also remain finite-budget observations, not verified problem solutions. Do not call an SMT counterexample to our *candidate* a true program execution attack/reachability trace. A model of the negated lemma indicates a defective overapproximation, NOT necessarily a reachable bad state. No 10× wall/cost improvement, no learned abstraction invention, no frontier comparison or Q gate promoted.
+
+**Necessary next high-value mechanism:** any positive result must conjecture a genuinely NEW, source-and-goal-dependent **numeric/control *relational* invariant** (not just PC bounds and a syntax-fixed lemma), certify every unchanged original 48 Horn clause, use a source-group-disjoint frozen learned head, and beat equally informed specialist classical and learned-minus baselines in full computational budget. If the conjecture is manually specified and only verified by SMT, credit the human/classical method, not NEUMANN. No more finite-control template tuning or repeated solver timeouts on this opened case.
+
+Exact self-contained CI first-proof script and Houdini implementation are tracked in GitHub at the links above. Raw GitHub Actions zip artifacts contain *receipts*, not the third-party original SMT source. CI workflows have been disabled for automatic PR reruns after evidence capture.

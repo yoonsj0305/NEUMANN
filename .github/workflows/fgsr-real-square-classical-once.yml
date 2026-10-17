@@ -1,0 +1,38 @@
+name: FGSR unseen real llreve square classical-first one-shot
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      FGSR_RESULT: research/evidence/fgsr-real-square-20261017/first_real_square_receipt.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin exact classical baseline
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/fgsr-real-square-20261017/classical_first_once.py
+      - name: One untouched genuine CHC original solver run
+        run: |
+          python research/evidence/fgsr-real-square-20261017/classical_first_once.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('research/evidence/fgsr-real-square-20261017/first_real_square_receipt.json').read_text())
+          print('REAL_EXTERNAL_VERDICT',r['status'])
+          print('SOURCE_SHA256',r.get('original_sha256'))
+          print('MODEL_CALLS',r['model_calls'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-real-square-original-classical-first-evidence
+          path: research/evidence/fgsr-real-square-20261017/first_real_square_receipt.json
+          if-no-files-found: warn
+          retention-days: 45

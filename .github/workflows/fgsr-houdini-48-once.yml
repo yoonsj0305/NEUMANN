@@ -1,0 +1,43 @@
+name: FGSR 48-Horn Houdini classical basis one attempt
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  finite-abstract-interpretation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      FGSR_RESULT: research/evidence/fgsr-q3-single-independent-family/houdini_first_receipt.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pinned Z3 and syntax
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/fgsr-q3-single-independent-family/houdini_once.py
+          python -m py_compile research/evidence/fgsr-q3-single-independent-family/manual_control_proof_once.py
+      - name: One model-free candidate elimination and original source verification
+        run: |
+          python research/evidence/fgsr-q3-single-independent-family/houdini_once.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('research/evidence/fgsr-q3-single-independent-family/houdini_first_receipt.json')
+          r=json.loads(p.read_text())
+          print("HOUDINI",r["status"])
+          print("SURVIVING",r.get("accepted_inductive_conjuncts"))
+          print("ORIGINAL_UNSAT",r.get("full_original_unsat_count"))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-48-original-houdini-first-evidence
+          path: research/evidence/fgsr-q3-single-independent-family/houdini_first_receipt.json
+          if-no-files-found: warn
+          retention-days: 45

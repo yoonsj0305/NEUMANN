@@ -1,0 +1,22 @@
+name: Original Horn proof audit
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install z3-solver==4.13.3.0
+      - run: python research/evidence/fgsr-double-lock-full48-20261017/independent_exact_original_verifier.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: full48-original-certificate
+          path: research/evidence/fgsr-double-lock-full48-20261017/INDEPENDENT_GITHUB_48_OF_48_RECEIPT.json
+          retention-days: 45

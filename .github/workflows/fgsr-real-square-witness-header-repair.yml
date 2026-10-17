@@ -1,0 +1,41 @@
+name: FGSR real square witness source-header-only correction
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  corrected-original-certificate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      FGSR_RESULT: research/evidence/fgsr-real-square-20261017/corrected_real_square_original_proof.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin original proof verifier
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/fgsr-real-square-20261017/original_9_clause_certificate.py
+      - name: Same mathematical witness on same 9 unchanged original clauses
+        run: |
+          python research/evidence/fgsr-real-square-20261017/original_9_clause_certificate.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('research/evidence/fgsr-real-square-20261017/corrected_real_square_original_proof.json').read_text())
+          print('ORIGINAL_FULL_CERTIFICATE',x["status"])
+          print('CLAUSES',x.get('independently_certified_original'),"/9")
+          print('NEGATIVE_CONTROL',x.get('negative_control_forced_true_final_relation',{}).get('result'))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-real-square-corrected-actual-independent-nine-clause-proof
+          path: research/evidence/fgsr-real-square-20261017/corrected_real_square_original_proof.json
+          if-no-files-found: warn
+          retention-days: 45

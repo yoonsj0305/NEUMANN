@@ -1,0 +1,43 @@
+name: FGSR 48 original relational fixedpoint completion attempt
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  efficient-fixedpoint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    env:
+      FGSR_RESULT: research/evidence/fgsr-q3-single-independent-family/relational_fixpoint_receipt.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Freeze same original and candidate language
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/fgsr-q3-single-independent-family/relational_houdini_single_gate.py
+          python -m py_compile research/evidence/fgsr-q3-single-independent-family/relational_houdini_fixpoint.py
+      - name: One 1105-predicate efficient relational fixed-point and original proof
+        run: |
+          python research/evidence/fgsr-q3-single-independent-family/relational_houdini_fixpoint.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result=json.loads(Path('research/evidence/fgsr-q3-single-independent-family/relational_fixpoint_receipt.json').read_text())
+          print("SCIENTIFIC",result["status"])
+          print("ALL_ORIGINAL_UNSAT",result.get("verified_original_unsat"))
+          print("EXPENSE_MS",result["total_wall_ms"])
+          print("GLOBAL_Q",result["global_Q1_Q7"])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-relational-fixedpoint-single-attempt
+          path: research/evidence/fgsr-q3-single-independent-family/relational_fixpoint_receipt.json
+          if-no-files-found: warn
+          retention-days: 45

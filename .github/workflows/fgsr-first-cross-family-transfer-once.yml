@@ -1,0 +1,39 @@
+name: FGSR two source-family frozen pretrained-transfer test (first evidence)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first-frozen-holdout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      FGSR_RESULT: research/evidence/fgsr-q3-transfer-20261017/first_heldout_transfer_receipt.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pinned independent backend
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/fgsr-q3-transfer-20261017/frozen_transfer_gate.py
+      - name: Exactly two original external sources selected before source inspection
+        run: |
+          python -u research/evidence/fgsr-q3-transfer-20261017/frozen_transfer_gate.py
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          a=json.loads(Path("research/evidence/fgsr-q3-transfer-20261017/first_heldout_transfer_receipt.json").read_text())
+          assert len(a["targets"])==2, "Must include failures and unsupported tasks in denominator"
+          print("TRANSFER",a["full_source_certificates"],"/",a["source_coverage_denominator"])
+          print("ALL_CASE_RESULTS",[(x["target_id"],x["status"]) for x in a["targets"]])
+          print("Q1_Q7",a["global_q1_q7"])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-first-two-real-source-family-transfer-original-receipt
+          path: research/evidence/fgsr-q3-transfer-20261017/first_heldout_transfer_receipt.json
+          if-no-files-found: warn
+          retention-days: 45

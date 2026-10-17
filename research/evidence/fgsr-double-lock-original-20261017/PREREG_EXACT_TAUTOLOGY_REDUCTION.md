@@ -1,0 +1,12 @@
+# NEUMANN 1 FGSR 48-Horn source-equivalent clause-elimination gate | 2026-10-17
+
+**Opened external development original**, no heldout neural claim. Upstream `chc-comp/chc-comp26-benchmarks` `b4fa7a708e5863bbcdb5de50d692ead3a67cbedc`, `ultimate/LIA-NonLin/33_double_lock_p1_vs_simplified_000.smt2`, fixed sha256 `2dfd3f531151113401aca614ad3e4176dae77ebcb326abbbcc456551a9a8f645`, 48 source original universal Horn clauses.
+
+Previous direct native Z3 and Horn solver timed out, previous opened-source hypothesis basis had 46/48 UNSAT but two failed, NOT a complete original proof. Four new original solver arms also failed to decide (first parser had implementation error, second fixedpoint Spacer canceled at 16s, original 12s timed out, BMC unknown, Horn 12s unknown). Do **NOT** relabel these errors as structural impossibility or neural success.
+
+## Frozen one-shot decisive method
+Compute for **every one of all 48 original quantified clauses**, using a fresh unconstrained uninterpreted `Inv` and `CHC_COMP_FALSE`, whether the **negation of that very clause** has *any* satisfying assignment. Explicitly instantiate its universally quantified variables with fresh constants, retaining arithmetic constraints unchanged. Only when the negation is `UNSAT` can the clause be deleted as a logical tautology. `SAT`, `UNKNOWN`, solver failure, empty proof receipt all mean KEEP. No handcrafted removals. Every removed clause gets a Z3 4.13.3 independent UNSAT receipt. Source original SHA unchanged and predicate definitions unchanged. Output trimmed original .smt2, SHA, index mapping, and all 48 statuses. **The original and trimmed conjunctions are equivalent** by individually proved tautology deletion; no approximation.
+
+If at least one deletion, use two exact reduced-problem unbounded solver arms with strict no-retune caps: (1) original Horn solver 20s, (2) native Z3 solver 16s. If one returns sat or unsat, check the *original full 48* with a fresh solver or a proof/model replayer before proclaiming Q3. No solver outcome/unknown fabricated. No neural head consulted. If no decision, retain real original as UNSOLVED and STOP classical one-off tuning.
+
+**Admission:** new independently justified source program simplification is an authentic progress in minimal necessary computation; original 48-way SAT/UNSAT proved only with full certifying evidence; trained autonomous operator invention and global Q1–Q7 remain OPEN.

@@ -1,0 +1,22 @@
+{
+  "study": "FGSR-Q3 restricted synthetic quadratic source-to-invariant coefficient learning; Q1-Q7 OPEN",
+  "frozen_file_sha256": "7d7893a0cadd385a799770fb910fd11811fb650458c07bac97bf6bcd48aea67f",
+  "parameters": 18,
+  "architecture": "source AST -> 6 affine update coefficients -> learned torch.Linear(6,3,bias=False,float64) -> human-specified quadratic basis",
+  "train_n": 1024,
+  "val_n": 256,
+  "train_seed": 2026101705,
+  "validation_seed": 2026101706,
+  "holdout_seed": 2026101707,
+  "optimizer": "Adam lr=.08, 247 steps",
+  "val_max_error": 9.230569611329287e-06,
+  "training_optimizer_wall_ms_excluding_parsing": 73.149,
+  "weight_matrix": [
+    [0.48085136176296556, 0.007963645745469055, 0.03829576449416793, -0.007963906836195606, -0.0018778431098287014, 0.0037535737779662097],
+    [0.10140666515523276, 0.4234256240421596, -0.2028127215632347, 0.5765745146372966, -0.14626990180251892, 0.29254121256386517],
+    [0.18536779151789368, -0.10698452818142198, -0.3707362238909354, 0.10698539485964254, 0.24292679844499837, 0.5141448019320339]
+  ],
+  "source_dataset_scope": "authored synthetic; NOT an external heldout independent family",
+  "strong_classical_match": true,
+  "global_questions": "Q1-Q7 OPEN"
+}
