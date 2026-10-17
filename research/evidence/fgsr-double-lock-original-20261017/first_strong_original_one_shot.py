@@ -43,11 +43,26 @@ def fixedpoint(source,engine,limit_ms):
     context=z3.Fixedpoint()
     context.set(engine=engine,timeout=limit_ms)
     # Full unchanged original declarations and exact assertions are added by the parser.
-    parsed=context.parse_string(source)
-    rule_count=len(context.get_rules())
-    if rule_count!=48:
-        raise ValueError(f"not 48 original clauses ({rule_count})")
+    parsed=z3.parse_smt2_string(source)
+    if len(parsed)!=48:
+        raise ValueError(f"not 48 source assertions ({len(parsed)})")
+    if any(not z3.is_quantifier(x) for x in parsed):
+        raise ValueError("original unsupported quantified rule")
     named_false=z3.Bool("CHC_COMP_FALSE")
+    # Original clause 48 is exactly (CHC_COMP_FALSE => false), equivalent
+    # to querying CHC_COMP_FALSE for reachability. Independently prove this
+    # normalization and register each of the preceding 47 rules unchanged.
+    qc=z3.Solver()
+    qc.add(z3.Xor(parsed[-1],z3.Not(named_false)))
+    if qc.check()!=z3.unsat:
+        raise ValueError("original last rule not equivalent to query false")
+    inv_decl=z3.Function("Inv",*([z3.IntSort()]*8),z3.BoolSort())
+    context.register_relation(inv_decl,named_false.decl())
+    for original in parsed[:-1]:
+        context.add_rule(original)
+    rule_count=len(context.get_rules())
+    if rule_count!=47:
+        raise ValueError(f"expected 47 original rules plus exact final false query, got {rule_count}")
     result=str(context.query(named_false))
     extra={"original_rule_count":rule_count,"fixedpoint_query":result}
     try:
