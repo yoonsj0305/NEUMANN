@@ -1,0 +1,50 @@
+name: FGSR standard-SMT certificate complete original replay
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/fgsr-portable-true-certificate-once.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-verified-portable-certificate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      FGSR_RESULT: research/evidence/fgsr-q3-automatic-scaffold-20261017/portable_certificate_final_receipt.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin verifier and compile
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/fgsr-q3-automatic-scaffold-20261017/autonomous_scaffold_once.py
+      - name: Generate portable SMT-LIB five-predicate certificate and prove all original clauses
+        run: |
+          python research/evidence/fgsr-q3-automatic-scaffold-20261017/autonomous_scaffold_once.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('research/evidence/fgsr-q3-automatic-scaffold-20261017/portable_certificate_final_receipt.json').read_text())
+          defs=r.get('LEARNED',{}).get('explicit_original_relation_definitions_smt2','')
+          assert '(define-fun |inv_main3| ((p0 Int)) Bool true)' in defs, "empty conjunction must be canonical SMT true"
+          assert 'Bool and)' not in defs, "nonstandard nullary and rejected"
+          assert r.get('SECOND_INDEPENDENT_ORIGINAL_REPLAY',{}).get('verified') is True
+          assert r.get('LEARNED',{}).get('original_unsat_count') == 9
+          assert r.get('NONE',{}).get('original_unsat_count') == 8
+          print('PORTABLE_ORIGINAL_PROOF_AND_ABLATION','PASS')
+          print('SOURCE_SHA',r['source_sha256'])
+          print('AUTOMATIC_WALL_MS',r['full_wall_ms'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-standard-portable-auto-five-predicate-original-proof
+          path: research/evidence/fgsr-q3-automatic-scaffold-20261017/portable_certificate_final_receipt.json
+          if-no-files-found: warn
+          retention-days: 45
