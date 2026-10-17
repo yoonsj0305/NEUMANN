@@ -1,0 +1,53 @@
+name: CORE36 same-goal fixed-probe information theorem
+
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/core36-20261017/**'
+      - '.github/workflows/core36-fixed-probe-theorem.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-theorem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install independent native Z3
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libz3-4
+      - name: Recheck complete original clauses, common-goal theorem, mutations
+        working-directory: research/evidence/core36-20261017
+        run: |
+          python -m py_compile core36_proof.py
+          python core36_proof.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('core36_receipt.json').read_text())
+          assert r['status']=='SYNTHETIC_MATHEMATICAL_NO_GO_PASS'
+          assert r['same_goal'] is True
+          assert r['z3_original_negations_unsat']==30
+          assert r['joint_system_ground_instance_unsat']==5
+          assert r['invalid_candidate_checks_sat']==20
+          assert r['Q1_Q7']=='OPEN'
+          for case in r['cases']:
+              assert all(v=='unsat' for v in case['original_clause_checks'].values())
+              assert all(v=='sat' for v in case['mutations'].values())
+              assert case['no_shared_relation']=='unsat'
+          print('CORE36_ORIGINAL_THEOREM_CERTIFIED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: core36-independent-native-z3-receipt
+          path: research/evidence/core36-20261017/core36_receipt.json
+          if-no-files-found: warn
+          retention-days: 45
