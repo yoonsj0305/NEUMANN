@@ -55,7 +55,7 @@ def run():
             raw=request.read()
         if hashlib.sha256(raw).hexdigest()!=sha:
             raise ValueError("PINNED_SOURCE_SHA256_MISMATCH")
-        _,declarations,assertions=q.read_original(raw)
+        _,declarations,assertions=q.read_source(raw)
         names=list(declarations)
         choices=[[k for k in TEMPLATES if matches(k,declarations[name][0])]
                  for name in names]
@@ -65,7 +65,7 @@ def run():
         start=time.perf_counter_ns()
         for assignment in itertools.product(*choices):
             program={"relations":{name:ast(kind) for name,kind in zip(names,assignment)}}
-            witness=q.verify(raw,program,per_clause_ms=2500)
+            witness=q.verify_original(raw,program)
             observed=witness["verdicts"]
             if witness["accepted"]:
                 verdict="ACCEPTED_CERTIFICATE_FOUND"
