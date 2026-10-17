@@ -29,6 +29,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install numpy==2.4.6 scipy==1.17.1 scikit-learn==1.9.1 threadpoolctl==3.7.0
           pip install -e '.[relational,native_lp]' pytest build
+          # Real independent proof-DAG tests require Z3 at pytest collection.
+          pip install z3-solver==4.13.3.0
       - name: Test
         run: pytest -q
       - name: Discovery benchmark smoke
