@@ -39,7 +39,11 @@ WITNESS=r"""
 (define-fun %main.5
  ((l %List) (originalSum Int) (m1 ~Mut<Int>) (r1 ~Mut<%List>)
   (m2 ~Mut<Int>) (newSum Int) (bad Bool) (ret Bool)) Bool
- (= bad ret))
+ (and
+   (= (~ret<Int> m1) (~cur<Int> m1))
+   (= (~ret<%List> r1) (~cur<%List> r1))
+   (= (~ret<Int> m2) (~cur<Int> m2))
+   (= bad ret)))
 (define-fun %main ((ret Bool)) Bool (not ret))
 """
 
@@ -92,6 +96,17 @@ def run(source,timeout_s):
     if changed==rules[-1]:raise ValueError("GOAL_MUTATION_FAILED")
     altered=original.one(negated_source(dtype,changed),timeout_s)
     result["negative_controls"]["changed_goal"]=altered["verdict"]
+    # Preserve first-failure explanation: dropping caller's equality guards is
+    # overbroad and must re-create SAT at the untouched original main clause.
+    weakened=WITNESS.replace(
+        "(and\n   (= (~ret<Int> m1) (~cur<Int> m1))\n"
+        "   (= (~ret<%List> r1) (~cur<%List> r1))\n"
+        "   (= (~ret<Int> m2) (~cur<Int> m2))\n"
+        "   (= bad ret)))",
+        "(= bad ret))")
+    if weakened==WITNESS:raise ValueError("MISSING_FIRST_FAILURE_REGRESSION")
+    weak_result=original.one(negated_source(dtype,rules[0],weakened),timeout_s)
+    result["negative_controls"]["weakened_main_guard_original_clause1"]=weak_result["verdict"]
     complete=all(x=="unsat" for x in result["original_verdicts"])
     negative=all(x=="sat" for x in result["negative_controls"].values())
     result["status"]=("OPENED_ORIGINAL_FORMAL_CERTIFICATE_PASS"
