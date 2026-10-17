@@ -25,7 +25,7 @@ def assess(x):
     req(type(n) is int and n>0,"NO_ACTUAL_TRAINED_SEMANTIC_MODEL")
     req(l.get("frozen_before_target_access") is True,"MODEL_NOT_FROZEN")
     req(l.get("full_source_and_goal_input") is True,"NO_GOAL_CONDITIONING")
-    req(l.get("unprovided_new_operator_kind") is True,"NO_NEW_OPERATOR_KIND")
+    req(l.get("unprovided_relation_semantics") is True,"NO_NEW_SEMANTIC_RELATION")
     req(l.get("complete_typed_relational_output") is True,"NO_TYPED_COMPLETE_RELATION")
     req(l.get("model_emitted_semantics_not_compiler_inserted") is True,"NOT_MODEL_SEMANTICS")
     req(l.get("holdout_absent_from_training") is True,"TRAIN_TARGET_LEAKAGE")
