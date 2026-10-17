@@ -39,6 +39,11 @@ class FirstEvidence(unittest.TestCase):
         self.assertEqual(r["q1_q7"],"OPEN")
         x["arms"]["neumann"]["original_sha256"]="f"*64
         self.assertIn("MISMATCH_NEUMANN",g.assess(x)["reasons"])
+    def test_malformed_nested_receipts_fail_closed(self):
+        r=g.assess({"contract":"NEUMANN_FGSR_CAUSAL_V1",
+                    "original":[],"learned_semantics":"nonsense","arms":[42]})
+        self.assertEqual(r["status"],"BLOCKED_CAUSAL_ADMISSION")
+        self.assertEqual(r["q1_q7"],"OPEN")
     def test_no_real_neural_trained_model_blocks(self):
         case=json.loads((HERE/"historical_three.json").read_text())["cases"][0]
         self.assertIn("NO_ACTUAL_TRAINED_SEMANTIC_MODEL",g.assess(case)["reasons"])
