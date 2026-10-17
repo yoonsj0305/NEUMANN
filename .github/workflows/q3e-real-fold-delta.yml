@@ -1,0 +1,44 @@
+name: Q3E real RustHorn list fold delta exact 27-candidate synthesis
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3e-recursive-sum-auto-20261018/**'
+      - '.github/workflows/q3e-real-fold-delta.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-independent:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin exact verifier
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/q3e-recursive-sum-auto-20261018/first_independent_original.py
+      - name: Source-pinned 27-candidate full Horn original proof
+        run: |
+          python research/evidence/q3e-recursive-sum-auto-20261018/first_independent_original.py --output /tmp/q3e-original-first.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3e-original-first.json'))
+          assert r['status']=='ONE_POSTHOC_CLASSICAL_AUTOSYNTH_ORIGINAL_12_PROOF'
+          assert r['source_sha256']=='caca97e89ef8cd7a089d107d7b74971a50b5135deab68d268dc7f01b0a87786d'
+          assert r['original_rule_count']==12
+          assert r['candidate_count']==27 and r['rejected_candidates']==26
+          assert r['complete_certificates']==[[1,1,1]]
+          assert r['negative_goal_mutation']=='sat'
+          assert r['zero_coefficients']['all_originals_proved'] is False
+          assert r['global_q1_q7']=='OPEN' and r['model_calls']==0
+          print('Q3E_ONE_REAL_ORIGINAL_FULL_SAFETY_PROOF_AND_FROZEN_CLASSICAL_SIGN_DISCOVERY')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3e-one-authentic-rusthorn-original-27-classical-sign-candidates
+          path: /tmp/q3e-original-first.json
+          retention-days: 60
