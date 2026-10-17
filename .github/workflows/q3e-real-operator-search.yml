@@ -1,0 +1,45 @@
+name: Q3E 81 candidate recursive fold original Horn proof search
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3e-recursive-sum-auto-20261018/**'
+      - '.github/workflows/q3e-real-operator-search.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  independent-original-search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin exact independent Z3 verifier
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/q3e-recursive-sum-auto-20261018/operator_search_81.py
+      - name: Full exact original 81-candidate proof enumeration
+        run: |
+          python research/evidence/q3e-recursive-sum-auto-20261018/operator_search_81.py --output /tmp/q3e-81-fold-first.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3e-81-fold-first.json'))
+          assert r['status']=='ONE_OF_81_POSTHOC_CLASSICAL_RELATIONAL_PROGRAMS_PROVEN'
+          assert r['candidate_count']==81 and r['rejected_candidates']==80
+          assert r['number_full_certificates']==1
+          assert r['winning_program']['fold']=='recursive_sum'
+          assert r['winning_program']['coefficients']==[1,1,1]
+          assert r['final_all_rule_verdicts']==['unsat']*12
+          assert r['all_other_candidates_have_sat_counterexample'] is True
+          assert r['goal_mutation']=='sat'
+          assert r['q1_q7']=='OPEN' and r['model_calls']==0
+          print('Q3E_ALL_81_REAL_ORIGINAL_OPERATOR_PROGRAMS_EXHAUSTED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3e-81-recursive-fold-signed-delta-original-proof-receipt
+          path: /tmp/q3e-81-fold-first.json
+          retention-days: 60
