@@ -1,0 +1,38 @@
+name: NEUMANN FGSR causal scientific admission preflight
+on:
+  pull_request:
+    paths:
+      - "research/evidence/fgsr-causal-admission-20261017/**"
+      - ".github/workflows/fgsr-causal-admission.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Five/negative causal audits without external inference
+        run: |
+          set -euo pipefail
+          cd research/evidence/fgsr-causal-admission-20261017
+          python -m unittest -v test_causal_gate.py
+          python causal_gate.py --input historical_three.json --output /tmp/fgsr-history-verdict.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/fgsr-history-verdict.json'))
+          assert r['q1_q7']=='OPEN' and r['neural_calls']==0
+          assert len(r['results'])==3
+          assert all(x['status']=='BLOCKED_CAUSAL_ADMISSION' and x['reasons'] for x in r['results'])
+          print('HISTORICAL_NONADMISSION_REPLAY_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-causal-historical-nonadmission-first
+          path: /tmp/fgsr-history-verdict.json
+          retention-days: 45
