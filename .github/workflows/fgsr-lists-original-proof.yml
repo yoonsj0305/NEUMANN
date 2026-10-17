@@ -1,0 +1,55 @@
+name: FGSR Lists-4 posthoc original full formal proof gate
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/fgsr-lists-two-step-20261017/**'
+      - '.github/workflows/fgsr-lists-original-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  independent-original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin proof verifier
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/fgsr-lists-two-step-20261017/original_lists_formal_proof.py
+      - name: Pinned genuine unchanged RustHorn source
+        run: |
+          python - <<'PY'
+          from urllib.request import urlopen
+          from pathlib import Path
+          from hashlib import sha256,sha1
+          rev='e5a86a1ad252fe1df75e06814769ec1d14540032'
+          p='lists-4-inc-some2-safe.smt2'
+          b=urlopen('https://raw.githubusercontent.com/chc-comp/rust-horn/'+rev+'/'+p,timeout=30).read()
+          assert sha256(b).hexdigest()=='a73dd31be612a9d01efee2c9d1aad59ae7c3ec9a84ba51d5d450ca4100a5b6db'
+          assert sha1(b'blob '+str(len(b)).encode()+bytes([0])+b).hexdigest()=='5386fa67ac0248f9e8a3c4eb15465e1cac61d0b9'
+          Path('/tmp/fgsr_lists_original.smt2').write_bytes(b)
+          print('EXACT_PINNED_SOURCE',len(b))
+          PY
+      - name: All 12 original assertion negations and two falsifications
+        run: |
+          python research/evidence/fgsr-lists-two-step-20261017/original_lists_formal_proof.py --source /tmp/fgsr_lists_original.smt2 --output /tmp/fgsr_lists_first_receipt.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/fgsr_lists_first_receipt.json'))
+          assert r['original_clause_count']==12
+          assert r['original_verdicts']==['unsat']*12
+          assert all(x=='sat' for x in r['negative_controls'].values())
+          assert r['status']=='OPENED_ORIGINAL_FORMAL_CERTIFICATE_PASS'
+          assert r['q1_q7']=='OPEN'
+          print('SCOPED_FORMAL_PROOF_PASS',r['status'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-lists-posthoc-first-original-horn-proof-receipt
+          path: /tmp/fgsr_lists_first_receipt.json
+          retention-days: 45
