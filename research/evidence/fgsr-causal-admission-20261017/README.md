@@ -22,3 +22,6 @@ A **bounded Q3 mechanism study** does *not* need frontier API access, but does n
 **Build/freeze the missing source+goal relational-operator decoder first**, rather than collect another posthoc RustHorn proof. It must propose semantic structure not deterministically inserted by an AST compiler; code-generated syntax is allowed, code-generated mathematical lemma is not. Stop early if same-info specialized classical generates the same output cheaper.
 
 Degraded mode: `BLOCKED_CAUSAL_ADMISSION`, `ABSTAIN`, Q1–Q7 OPEN. No GPU, provider access or paid API used.
+
+## First-principles correction (frozen study contract)
+New useful semantic relations may be compositions of existing mathematical primitives. Do NOT require the neural model to invent a new *primitive operator kind*. Require it to emit a non-preseeded relation's semantic content from original source+goal. A Turing-complete classical computation can simulate neural inference, so an absolute theorem that classical algorithms cannot solve an instance is not a legitimate premise. The meaningful benchmark is matched-cost capability under predeclared finite budgets with the strongest available classical solver. The target is sufficient learned relation semantics, not novel operator spelling.
