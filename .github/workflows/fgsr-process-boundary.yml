@@ -1,0 +1,43 @@
+name: FGSR original-certificate one-process boundary deletion
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/fgsr-process-boundary-20261017/**'
+      - '.github/workflows/fgsr-process-boundary.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin and compile original verification code
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/fgsr-process-boundary-20261017/fgsr_resident_original.py
+          python -m py_compile research/evidence/core35-20261016/core35.py
+      - name: Actual paired 27-rule original certificate and negative control
+        run: |
+          python research/evidence/fgsr-process-boundary-20261017/fgsr_resident_original.py --fetch-upstream --output /tmp/fgsr-receipt.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/fgsr-receipt.json'))
+          assert r['status']=='CERTIFIED_REPLAY_EQUAL'
+          assert r['all_rules_checked'] and r['equal_original_verdicts']
+          assert len(r['verification_verdicts']['safe'])==13
+          assert len(r['verification_verdicts']['unsafe'])==13
+          assert r['verification_verdicts']['poison']==['sat']
+          assert r['global_Q1_Q7']=='OPEN'
+          print('ORIGINAL_CERTIFICATE_REPLAY_PASS',r['scoped_process_wall_ratio_old_over_resident'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-paired-original-process-cost-first-receipt
+          path: /tmp/fgsr-receipt.json
+          retention-days: 45

@@ -1,0 +1,40 @@
+name: FGSR Eldarica second-stage genuine CHC baseline
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/fgsr-real-source-triage-20261017/**'
+      - '.github/workflows/fgsr-eldarica-second-stage.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  specialist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Syntax audit
+        run: |
+          python -m py_compile research/evidence/fgsr-real-source-triage-20261017/eldarica_second_stage_once.py
+      - name: Exactly one fixed-budget specialist run per original
+        run: |
+          python research/evidence/fgsr-real-source-triage-20261017/eldarica_second_stage_once.py --output /tmp/fgsr-eldarica-second-stage.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/fgsr-eldarica-second-stage.json'))
+          assert r['preregistered_commit']=='a2ec0ba4e4506da5b2e67dc675ce1130cf3578bb'
+          assert r['Q1_Q7']=='OPEN' and r['model_calls']==0
+          assert len(r['records'])==2
+          assert all(x['original_unchanged'] and x['status'] in ('DECIDED','TIMEOUT','UNKNOWN') for x in r['records'])
+          print('CLASSICAL_SPECIALIST_VERDICT',r['outcome'])
+          print('ORIGINALS', [(x['source'],x['status'],x['solver_verdict']) for x in r['records']])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-eldarica-second-stage-raw-receipt
+          path: /tmp/fgsr-eldarica-second-stage.json
+          retention-days: 45
