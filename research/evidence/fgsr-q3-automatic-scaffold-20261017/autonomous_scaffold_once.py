@@ -227,8 +227,15 @@ def independently_replay_original(source,definitions):
         standalone.set(timeout=7000)
         start=time.perf_counter_ns()
         try:
-            standalone.from_string("(set-logic ALL)\n"+definitions+
-                "\n(assert (not "+inside+"))")
+            parsed=z3.parse_smt2_string(
+                "(set-logic ALL)\n"+definitions+"\n(assert "+inside+")")
+            if len(parsed)!=1 or not z3.is_quantifier(parsed[0]) or not parsed[0].is_forall():
+                err("NOT_AN_ORIGINAL_QUANTIFIED_CLAUSE")
+            q=parsed[0]
+            fresh=[z3.Const(f"independent_clause_{i}_v{j}",q.var_sort(j))
+                   for j in range(q.num_vars())]
+            universally_instantiated=z3.substitute_vars(q.body(),*fresh)
+            standalone.add(z3.Not(universally_instantiated))
             answer=str(standalone.check())
         except Exception as exc:
             answer="ERROR_"+type(exc).__name__+":"+str(exc)[:130]
