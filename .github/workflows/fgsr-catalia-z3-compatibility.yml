@@ -1,0 +1,60 @@
+name: FGSR Catalia compatible Z3 single repair check
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/fgsr-lists-two-step-20261017/CATALIA_COMPATIBILITY_REPAIR.md'
+      - '.github/workflows/fgsr-catalia-z3-compatibility.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compatible-z3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install exactly Z3 4.12.5 official historical release
+        run: |
+          set -euo pipefail
+          URL="https://github.com/Z3Prover/z3/releases/download/z3-4.12.5/z3-4.12.5-x64-glibc-2.35.zip"
+          curl --fail --location --silent --show-error --retry 3 "$URL" -o /tmp/z3-4.12.5.zip
+          sha256sum /tmp/z3-4.12.5.zip | tee /tmp/fgsr-z3-archive-sha256.txt
+          unzip -q /tmp/z3-4.12.5.zip -d /tmp/fgsr-z3-compatible
+          BIN="/tmp/fgsr-z3-compatible/z3-4.12.5-x64-glibc-2.35/bin"
+          test -x "$BIN/z3"
+          "$BIN/z3" --version | tee /tmp/fgsr-z3-version.txt
+          grep 'Z3 version 4.12.5' /tmp/fgsr-z3-version.txt
+          echo "$BIN" >> "$GITHUB_PATH"
+      - name: Rebuild same Catalia commit and rerun identical original once
+        run: |
+          python research/evidence/fgsr-lists-two-step-20261017/adt_specialist_first.py --output /tmp/fgsr-catalia-compat/result.json
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          p=Path('/tmp/fgsr-catalia-compat/result.json')
+          r=json.loads(p.read_text())
+          r['study_stage']='COMPATIBILITY_RETRY_NOT_FIRST_BLIND'
+          r['original_first_artifact_id']=12102103384
+          r['repair_protocol_commit']='169b84900da2fa069f8b2f4eae2e7d498bdce2a6'
+          r['z3_compatible_release_url']='https://github.com/Z3Prover/z3/releases/download/z3-4.12.5/z3-4.12.5-x64-glibc-2.35.zip'
+          data=Path('/tmp/z3-4.12.5.zip').read_bytes()
+          r['z3_compatible_release_sha256']=hashlib.sha256(data).hexdigest()
+          r['z3_compatible_release_bytes']=len(data)
+          r['z3_compatible_observed_version']=Path('/tmp/fgsr-z3-version.txt').read_text().strip()
+          p.write_text(json.dumps(r,indent=2)+'\n')
+          assert r['original_source_unmodified'] is True
+          assert r['global_q1_q7']=='OPEN' and r['model_calls']==0
+          assert r['z3_binary_version']['stdout_tail'].strip()==r['z3_compatible_observed_version']
+          print('COMPATIBILITY_RETRY',r['science_status'])
+          print('Z3_VERSION',r['z3_compatible_observed_version'])
+          print('SOLVER_ANSWER',r.get('solver_answer'))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-catalia-z3-4125-compatibility-retry-receipt
+          path: /tmp/fgsr-catalia-compat/result.json
+          retention-days: 45
