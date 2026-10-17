@@ -10,9 +10,12 @@ def assess(x):
     def req(ok,why):
         if not ok:b.append(why)
     if not isinstance(x,dict):return {"status":"BLOCKED_SCHEMA","reasons":["NOT_OBJECT"],"q1_q7":"OPEN"}
-    o=x.get("original",{}) or {}
-    l=x.get("learned_semantics",{}) or {}
-    arms=x.get("arms",{}) or {}
+    o=x.get("original",{})
+    l=x.get("learned_semantics",{})
+    arms=x.get("arms",{})
+    if not isinstance(o,dict):o={}
+    if not isinstance(l,dict):l={}
+    if not isinstance(arms,dict):arms={}
     source=o.get("sha256","")
     goal=o.get("goal_hash","")
     hashok=lambda s: type(s) is str and len(s)==64 and all(c in "0123456789abcdef" for c in s)
