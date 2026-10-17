@@ -1,0 +1,41 @@
+name: FGSR untouched real-source classical-first admission screen
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/fgsr-real-source-triage-20261017/**'
+      - '.github/workflows/fgsr-real-source-triage.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-intake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin original executable and verifier
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/fgsr-real-source-triage-20261017/first_original_classical_screen.py
+      - name: First original no-model Z3 fixed-budget screen
+        run: |
+          python research/evidence/fgsr-real-source-triage-20261017/first_original_classical_screen.py --output /tmp/fgsr-classical-original-first.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/fgsr-classical-original-first.json'))
+          assert r['frozen_preregistration_commit']=='02c0b6e289cf7b27c446a665c50dfcabb20e1e73'
+          assert r['status']=='CLASSICAL_FIRST_REAL_SOURCE_TRIAGE_COMPLETE'
+          assert len(r['results'])==2 and r['training_count']==r['neural_calls']==r['frontier_calls']==0
+          assert all('source_sha256' in x and 'git_blob_sha1' in x for x in r['results'])
+          assert r['Q1_Q7']=='OPEN'
+          print('SCIENTIFIC_FIRST_CLASSICAL',[(x['path'],x['verdict']) for x in r['results']])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-first-classical-untouched-source-screen
+          path: /tmp/fgsr-classical-original-first.json
+          retention-days: 45
