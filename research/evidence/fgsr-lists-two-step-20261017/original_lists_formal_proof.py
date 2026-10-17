@@ -50,7 +50,7 @@ def original_engine():
     return mod
 
 def source_identity(data):
-    g=hashlib.sha1(b"blob "+str(len(data)).encode()+b"\\0"+data).hexdigest()
+    g=hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
     return {"sha256":hashlib.sha256(data).hexdigest(),"blob":g}
 
 def split(source,original):
@@ -62,8 +62,8 @@ def split(source,original):
     return dtype,rules
 
 def negated_source(dtype,assertion,witness=WITNESS):
-    prefix="(set-logic ALL)\\n"+"\\n".join(dtype)+"\\n"+witness+"\\n"
-    return prefix+"(assert (not "+assertion[len("(assert "):-1]+"))\\n(check-sat)\\n"
+    prefix="(set-logic ALL)\n"+"\n".join(dtype)+"\n"+witness+"\n"
+    return prefix+"(assert (not "+assertion[len("(assert "):-1]+"))\n(check-sat)\n"
 
 def run(source,timeout_s):
     original=original_engine()
@@ -111,7 +111,7 @@ def main():
     args=p.parse_args()
     result=run(args.source,args.per_rule_cap)
     args.output.parent.mkdir(parents=True,exist_ok=True)
-    args.output.write_text(json.dumps(result,indent=2)+"\\n")
+    args.output.write_text(json.dumps(result,indent=2)+"\n")
     print("REAL_ORIGINAL",result["status"])
     print("SOURCE_CLAUSES",result["original_verdicts"])
     print("NEGATIVES",result["negative_controls"])
