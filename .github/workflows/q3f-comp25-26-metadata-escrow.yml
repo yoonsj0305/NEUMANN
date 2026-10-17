@@ -1,0 +1,47 @@
+name: Q3F official CHC-COMP25+26 unresolved source-group SHA escrow
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3f-competition-candidates-20261018/**'
+      - 'docs/research/Q3F_CHCCOMP25_26_UNSOLVED_BLIND_CANDIDATES_20261018.md'
+      - '.github/workflows/q3f-comp25-26-metadata-escrow.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  competition-headroom-escrow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: No source read required for negative metadata guards
+        run: |
+          python -m unittest discover -s research/evidence/q3f-competition-candidates-20261018 -p 'test_metadata_only.py' -v
+      - name: Pin two distinct source-group targets from CHC-COMP official metadata
+        run: |
+          python research/evidence/q3f-competition-candidates-20261018/first_metadata_only_escrow.py --output /tmp/q3f-official-competition-escrow.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3f-official-competition-escrow.json'))
+          assert r['status']=='TWO_COMPETITION_HEADROOM_CANDIDATES_SEALED_NOT_EVALUATED'
+          assert r['selection_preregistered_commit']=='ea2c5290ff8649cbbd86cf96a887ceca595dafa4'
+          assert r['global_q1_q7']=='OPEN'
+          assert r['source_body_inspection'] is False
+          assert r['learned_model_calls']==r['solver_invocations']==r['frontier_model_calls']==0
+          assert len(r['records'])==2
+          assert len({x['family_group'] for x in r['records']})==2
+          assert all(x['training_exclusion'] is True and x['source_text_exposed_to_model'] is False for x in r['records'])
+          assert all(len(x['raw_source_byte_identity_ONLY']['sha256'])==64 for x in r['records'])
+          assert all(x['metadata']['2025']['documented_competition_outcome']=='NO_TOOL_VERDICT_RECORDED' for x in r['records'])
+          assert all(x['metadata']['2026']['documented_competition_outcome']=='NO_TOOL_VERDICT_RECORDED' for x in r['records'])
+          print('Q3F_TWO_PRE_REGISTERED_COMPETITION_HEADROOM_CANDIDATES_IDENTIFIED_AND_SOURCE_HASHED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3f-comp25-26-two-source-groups-metadata-first-sealed-identities
+          path: /tmp/q3f-official-competition-escrow.json
+          retention-days: 90
