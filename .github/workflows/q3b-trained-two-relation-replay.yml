@@ -1,0 +1,43 @@
+name: Q3B frozen trained two-relation synthetic original proof replay
+on:
+  pull_request:
+    paths:
+      - "research/evidence/q3b-trained-two-relations-20261017/**"
+      - ".github/workflows/q3b-trained-two-relation-replay.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-original-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin one Z3 backend, no retraining
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/q3b-trained-two-relations-20261017/frozen_original_replay.py
+      - name: Frozen trained model vs full original + classical/ablation
+        run: |
+          python research/evidence/q3b-trained-two-relations-20261017/frozen_original_replay.py --out /tmp/neumann-q3b-synthetic-original-replay.json
+          python - <<'PY'
+          import json
+          obj=json.load(open("/tmp/neumann-q3b-synthetic-original-replay.json"))
+          assert obj["status"]=="FROZEN_Q3B_SYNTHETIC_PROOF_REPLAY_PASS"
+          assert obj["learned_certified_original_rules"]==120
+          assert obj["classical_certified_original_rules"]==120
+          assert obj["zero_head_safety_rejections"]==24
+          assert obj["source_group"]=="RESEARCHER_AUTHORED_SYNTHETIC_ONLY"
+          assert obj["trained_model_classical_advantage"] is False
+          assert obj["global_q1_q7"]=="OPEN"
+          print("Q3B_SCIENCE",obj["status"])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3b-trained-synthetic-first-independent-github-replay
+          path: /tmp/neumann-q3b-synthetic-original-replay.json
+          retention-days: 45
