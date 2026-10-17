@@ -108,9 +108,15 @@ def reconstruct_all(raw):
         rows.append({
           "original_clause_index":i,
           "universal_variables":len(vars_),
+          "typed_bound_variables":[{"name":v.decl().name(),"sort":str(v.sort())} for v in vars_],
           "body_relation_calls":[c.decl().name() for c in calls],
+          "body_call_terms":[{"relation":c.decl().name(),
+                              "arguments":[arg.sexpr() for arg in c.children()]} for c in calls],
           "guard_atoms":len(guards),
+          "guard_semantic_terms":[g.sexpr() for g in guards],
           "head_relation":head_label,
+          "head_semantic_term":head.sexpr(),
+          "complete_original_rule_sexpr":assertion.sexpr(),
           "kind":classification,
           "body_horn_sha256":hashlib.sha256(body.sexpr().encode()).hexdigest(),
           "lossless_quantifier_free_xor":"unsat"
