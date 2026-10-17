@@ -33,6 +33,16 @@ jobs:
           assert all(x['status']=='TYPED_GRAPH_ORIGINAL_RULES_LOSSLESS' for x in r['results'])
           assert all(x['negative_control']['xor_result']=='sat' for x in r['results'])
           assert all(x['original_xor_unsat']==x['original_clause_count'] for x in r['results'])
+          for src in r['results']:
+            assert len(src['typed_rules'])==src['original_clause_count']
+            assert all('complete_original_rule_sexpr' in rule
+                       and 'typed_bound_variables' in rule
+                       and 'guard_semantic_terms' in rule
+                       and 'body_call_terms' in rule
+                       and 'head_semantic_term' in rule
+                       for rule in src['typed_rules'])
+            assert all(rule['guard_atoms']==len(rule['guard_semantic_terms'])
+                       for rule in src['typed_rules'])
           print('TYPED_GRAPH_ACTUAL_23_ORIGINAL_MEANINGS_CERTIFIED')
           PY
       - uses: actions/upload-artifact@v4
