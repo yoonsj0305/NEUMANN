@@ -1,0 +1,51 @@
+name: FGSR real ADT classical specialist first-only gate
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/fgsr-lists-two-step-20261017/adt_specialist_first.py'
+      - 'research/evidence/fgsr-lists-two-step-20261017/PREREG_ADT_SPECIALIST.md'
+      - '.github/workflows/fgsr-adt-specialist-once.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  catalia-original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prepare official Rust compiler and one Z3 version
+        run: |
+          rustup show active-toolchain
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq z3
+          z3 --version
+          python -m py_compile research/evidence/fgsr-lists-two-step-20261017/adt_specialist_first.py
+      - name: Run one fixed source-pinned Catalia ADT-specialist screen
+        run: |
+          python research/evidence/fgsr-lists-two-step-20261017/adt_specialist_first.py --output /tmp/fgsr_catalia/result.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/fgsr_catalia/result.json')
+          r=json.loads(p.read_text())
+          assert r['original_source_unmodified'] is True
+          assert r['protocol_commit']=='4b888d9911b5306d4d25b4bf094a1790356462cc'
+          assert r['global_q1_q7']=='OPEN' and r['model_calls']==0
+          assert r['science_status'] in (
+            'SPECIALIST_SOLVER_REPORTED_DECISION',
+            'SPECIALIST_UNKNOWN', 'SPECIALIST_TIMEOUT_NOT_GAP',
+            'SPECIALIST_ERROR_OR_UNSUPPORTED', 'SPECIALIST_UNCLASSIFIED_OUTPUT',
+            'BLOCKED_CATALIA_BUILD', 'BLOCKED_MISSING_BUILT_BINARY',
+            'BLOCKED_EXCEPTION')
+          print('STRICT_EVIDENCE',r['science_status'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-catalia-original-specialist-first-receipt
+          path: /tmp/fgsr_catalia/result.json
+          retention-days: 45
