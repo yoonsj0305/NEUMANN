@@ -195,12 +195,13 @@ def solve_source(rules,relations,loops,mode,t0):
         definition="(define-fun |"+name+"| ("+" ".join(
             f"(p{i} Int)" for i in range(len(param)))+") Bool "+full.sexpr()+")"
         definitions.append(definition)
-    certificate="\\n".join(definitions)+"\\n"
+    certificate="\n".join(definitions)+"\n"
     return dict(status=("CERTIFIED_ALL_ORIGINAL" if len(verdict)==9 and
                         all(x["status"]=="unsat" for x in verdict)
                       else "INCOMPLETE_ORIGINAL_GOAL"),
                 candidate_inventory={n:len(cands[n][1]) for n in cands},
-                selected_conjuncts=selected,original_verdicts=verdict,\n                explicit_original_relation_definitions_smt2=certificate,
+                selected_conjuncts=selected,original_verdicts=verdict,
+                explicit_original_relation_definitions_smt2=certificate,
                 original_unsat_count=sum(x["status"]=="unsat" for x in verdict),
                 houdini_rounds=rounds,houdini_queries=calls,
                 removals_total=sum(x["removed"] for x in removals),
