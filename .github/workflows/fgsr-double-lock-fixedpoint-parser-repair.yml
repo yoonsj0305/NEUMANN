@@ -1,0 +1,42 @@
+name: FGSR double-lock strict fixedpoint-parser repair same budgets first retry
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/fgsr-double-lock-fixedpoint-parser-repair.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  fixed-original-retry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      FGSR_RESULT: research/evidence/fgsr-double-lock-original-20261017/fixed_parser_second_original_receipt.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin Z3 and compile
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/fgsr-double-lock-original-20261017/first_strong_original_one_shot.py
+      - name: Re-run exactly four classical original arms with corrected parser and same budgets
+        run: |
+          python -u research/evidence/fgsr-double-lock-original-20261017/first_strong_original_one_shot.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('research/evidence/fgsr-double-lock-original-20261017/fixed_parser_second_original_receipt.json').read_text())
+          assert r.get('pinned_original_verified')
+          assert len(r['arms'])==4
+          print('ORIGINAL_STRICT',r['strong_original_classical_status'])
+          print('FOUR_ARMS',[(x['solver_arm'],x['status']) for x in r['arms']])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-double-lock-real-48-fixedpoint-parser-repair
+          path: research/evidence/fgsr-double-lock-original-20261017/fixed_parser_second_original_receipt.json
+          if-no-files-found: warn
+          retention-days: 45
