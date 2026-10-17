@@ -27,7 +27,7 @@ class FirstEvidence(unittest.TestCase):
            "original":{"sha256":src,"goal_hash":goal,"source_group_disjoint":True,
                        "opened_during_model_design":False,"provenance_audited":True},
            "learned_semantics":{"actual_train_updates":1,"frozen_before_target_access":True,
-                "full_source_and_goal_input":True,"unprovided_new_operator_kind":True,
+                "full_source_and_goal_input":True,"unprovided_relation_semantics":True,
                 "complete_typed_relational_output":True,
                 "model_emitted_semantics_not_compiler_inserted":True,
                 "holdout_absent_from_training":True,
@@ -53,7 +53,7 @@ class FirstEvidence(unittest.TestCase):
         x={"contract":"NEUMANN_FGSR_CAUSAL_V1","original":{"sha256":src,"goal_hash":goal,
            "source_group_disjoint":True,"opened_during_model_design":False,"provenance_audited":True},
            "learned_semantics":{"actual_train_updates":1,"frozen_before_target_access":True,
-            "full_source_and_goal_input":True,"unprovided_new_operator_kind":True,
+            "full_source_and_goal_input":True,"unprovided_relation_semantics":True,
             "complete_typed_relational_output":True,"model_emitted_semantics_not_compiler_inserted":True,
             "holdout_absent_from_training":True,"checkpoint_sha256":"d"*64,"decoder_sha256":"e"*64},
             "arms":roles}
