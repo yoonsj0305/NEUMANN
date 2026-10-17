@@ -1,0 +1,50 @@
+name: FGSR Lists-4 second verifier original safety certificate
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/fgsr-lists-two-step-20261017/**'
+      - '.github/workflows/fgsr-lists-second-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  second-source-reparse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin Z3Py verifier
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/fgsr-lists-two-step-20261017/independent_second_z3py.py
+      - name: Download identical pinned original source and independently prove it
+        run: |
+          python - <<'PY'
+          from urllib.request import urlopen
+          from pathlib import Path
+          from hashlib import sha256,sha1
+          rev='e5a86a1ad252fe1df75e06814769ec1d14540032'
+          b=urlopen('https://raw.githubusercontent.com/chc-comp/rust-horn/'+rev+'/lists-4-inc-some2-safe.smt2',timeout=30).read()
+          assert sha256(b).hexdigest()=='a73dd31be612a9d01efee2c9d1aad59ae7c3ec9a84ba51d5d450ca4100a5b6db'
+          assert sha1(b'blob '+str(len(b)).encode()+bytes([0])+b).hexdigest()=='5386fa67ac0248f9e8a3c4eb15465e1cac61d0b9'
+          Path('/tmp/fgsr_original_lists_2.smt2').write_bytes(b)
+          PY
+          python research/evidence/fgsr-lists-two-step-20261017/independent_second_z3py.py --source /tmp/fgsr_original_lists_2.smt2 --output /tmp/fgsr_independent_lists_2.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/fgsr_independent_lists_2.json'))
+          assert r['status']=='SECOND_Z3PY_REPARSE_ORIGINAL_12_OF_12_CERTIFIED'
+          assert len(r['checks'])==12 and all(x['status']=='unsat' for x in r['checks'])
+          assert all(x=='sat' for x in r['negative_controls'].values())
+          assert r['q1_q7']=='OPEN'
+          print('SECOND_INDEPENDENT_REPARSE_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fgsr-lists-second-smt-original-clause-replay
+          path: /tmp/fgsr_independent_lists_2.json
+          retention-days: 45
