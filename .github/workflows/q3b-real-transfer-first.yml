@@ -1,0 +1,45 @@
+name: Q3B frozen model genuine RustHorn transfer first
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3b-real-transfer-20261017/**'
+      - '.github/workflows/q3b-real-transfer-first.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first-source-transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Exactly one pinned Z3 and parser; frozen model only
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/q3b-real-transfer-20261017/frozen_first_external.py
+      - name: Explicit positive and negative adapter contracts
+        run: |
+          python -m unittest -v research/evidence/q3b-real-transfer-20261017/test_external_adapter.py
+      - name: First actual untouched out-of-generator external sources
+        run: |
+          python research/evidence/q3b-real-transfer-20261017/frozen_first_external.py --output /tmp/q3b_real_first.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3b_real_first.json'))
+          assert r['preregistered_before_source_commit']=='47e1677bb9206bbd62395673b526795d52037247'
+          assert r['model_retrained'] is False and r['global_q1_q7']=='OPEN'
+          assert [v['name'] for v in r['results']]==['inc-max-2-base3-safe.smt2','lists-3-inc-some-safe.smt2']
+          assert all('sha256' in v.get('original',{}) for v in r['results'])
+          assert all(v['science_verdict']!='BLOCKED_OR_ENGINEERING_ERROR' for v in r['results'])
+          print('FIRST_ACTUAL_REAL_ORIGINALS',[(v['name'],v['science_verdict']) for v in r['results']])
+          print('AUTHENTIC_MODEL_CALLS',r['model_calls_total'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3b-two-authentic-external-originals-first-frozen-receipt
+          path: /tmp/q3b_real_first.json
+          retention-days: 60
