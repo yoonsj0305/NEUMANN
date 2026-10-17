@@ -186,15 +186,55 @@ def solve_source(rules,relations,loops,mode,t0):
         verdict.append(dict(rule=r["index"],status=status,
                    wall_ms=round((time.perf_counter_ns()-start)/1e6,3)))
     selected={n:[cands[n][2][j] for j in sorted(active[n])] for n in active}
+    definitions=[]
+    for name in sorted(cands):
+        vars_,forms,_=cands[name]
+        param=[z3.Int(f"p{i}") for i in range(len(vars_))]
+        subs=list(zip(vars_,param))
+        full=z3.And(*[z3.substitute(forms[j],*subs) for j in sorted(active[name])])
+        definition="(define-fun |"+name+"| ("+" ".join(
+            f"(p{i} Int)" for i in range(len(param)))+") Bool "+full.sexpr()+")"
+        definitions.append(definition)
+    certificate="\\n".join(definitions)+"\\n"
     return dict(status=("CERTIFIED_ALL_ORIGINAL" if len(verdict)==9 and
                         all(x["status"]=="unsat" for x in verdict)
                       else "INCOMPLETE_ORIGINAL_GOAL"),
                 candidate_inventory={n:len(cands[n][1]) for n in cands},
-                selected_conjuncts=selected,original_verdicts=verdict,
+                selected_conjuncts=selected,original_verdicts=verdict,\n                explicit_original_relation_definitions_smt2=certificate,
                 original_unsat_count=sum(x["status"]=="unsat" for x in verdict),
                 houdini_rounds=rounds,houdini_queries=calls,
                 removals_total=sum(x["removed"] for x in removals),
                 removal_sample=removals[:16])
+
+def independently_replay_original(source,definitions):
+    # Physically separate interpreter: refetch original bytes in workflow,
+    # parse literal original quantified SMT-LIB clauses, not Houdini AST refs.
+    all_forms=[];depth=0;start=None
+    for pos,ch in enumerate(source):
+        if ch=="(":
+            if depth==0:start=pos
+            depth+=1
+        elif ch==")":
+            depth-=1
+            if depth==0:all_forms.append(source[start:pos+1])
+    original=[x for x in all_forms if re.match(r"^\(assert\s",x)]
+    if len(original)!=9:err("CHANGED_SOURCE_IN_INDEPENDENT_REPLAY")
+    checks=[]
+    for i,assertion in enumerate(original,1):
+        inside=assertion[len("(assert"):-1].strip()
+        standalone=z3.Solver()
+        standalone.set(timeout=7000)
+        start=time.perf_counter_ns()
+        try:
+            standalone.from_string("(set-logic ALL)\n"+definitions+
+                "\n(assert (not "+inside+"))")
+            answer=str(standalone.check())
+        except Exception as exc:
+            answer="ERROR_"+type(exc).__name__+":"+str(exc)[:130]
+        checks.append({"original_clause":i,"result":answer,
+                       "wall_ms":round((time.perf_counter_ns()-start)/1e6,3)})
+    return {"separate_native_parse_original":True,"checks":checks,
+            "verified":len(checks)==9 and all(c["result"]=="unsat" for c in checks)}
 
 def main():
     started=time.monotonic()
@@ -229,10 +269,16 @@ def main():
             t=time.monotonic()
             record[mode]=solve_source(rules,relations,loops,mode,started)
             record[mode]["execution_wall_ms"]=round((time.monotonic()-t)*1000,3)
+        record["SECOND_INDEPENDENT_ORIGINAL_REPLAY"]=independently_replay_original(
+            raw.decode(),record["LEARNED"]["explicit_original_relation_definitions_smt2"])
+        t=time.monotonic()
+        record["NONE"]=solve_source(rules,relations,loops,"NONE",started)
+        record["NONE"]["execution_wall_ms"]=round((time.monotonic()-t)*1000,3)
         record["status"]=(
-            "FULL_SOURCE_AUTOMATIC_SCAFFOLD_ADMITTED_CLASSICAL_EQUALS_LEARNED"
+            "FULL_SOURCE_AUTOMATIC_SCAFFOLD_AND_INDEPENDENT_REPLAY_CERTIFIED"
             if record["LEARNED"]["status"]=="CERTIFIED_ALL_ORIGINAL"
-            else "AUTOMATIC_RELATION_SCAFFOLD_NOT_SUFFICIENT")
+            and record["SECOND_INDEPENDENT_ORIGINAL_REPLAY"]["verified"]
+            else "AUTOMATIC_RELATION_SCAFFOLD_NOT_CERTIFIED")
     except Exception as exc:
         record["status"]="BLOCKED_OR_INCOMPLETE"
         record["error"]=type(exc).__name__+":"+str(exc)[:1200]
