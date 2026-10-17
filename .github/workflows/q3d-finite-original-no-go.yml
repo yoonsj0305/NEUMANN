@@ -1,0 +1,42 @@
+name: Q3D exhaustive frozen-template real CHC no-go independent replay
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3d-exhaustive-20261017/**'
+      - '.github/workflows/q3d-finite-original-no-go.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-source-every-candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin Z3 and check source
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/q3d-exhaustive-20261017/exhaustive_two_originals.py
+      - name: Refute EVERY typable Q3D program on exact two authentic originals
+        run: |
+          python research/evidence/q3d-exhaustive-20261017/exhaustive_two_originals.py --out /tmp/q3d-exhaustive-frozen-originals.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3d-exhaustive-frozen-originals.json'))
+          assert r['status']=='FINITE_DECODER_NO_GO_PROVEN'
+          assert r['grammar_sha256']=='6dbf2c209ca31b31d9ce8aeeae4f75c8d900c002d1d4dc38c70d1e096b4d4ddf'
+          assert r['Q1_Q7']=='OPEN' and r['model_forward_calls']==0
+          assert [c['type_correct_candidate_count'] for c in r['cases']]==[144,3]
+          assert sum(c['sat_counterexamples'] for c in r['cases'])==147
+          assert all(c['unknown_or_error']==c['complete_certificates']==0 for c in r['cases'])
+          print('SCOPE_ONLY_FINITE_TYPED_GRAMMAR_EXHAUSTED_147_OF_147')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3d-frozen-six-template-all-147-real-counterexamples
+          path: /tmp/q3d-exhaustive-frozen-originals.json
+          retention-days: 60
