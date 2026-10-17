@@ -1,0 +1,47 @@
+name: Q3C genuine original variable-typed AST admission gate
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3c-variable-typed-program-20261017/**'
+      - '.github/workflows/q3c-typed-program-gate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  typed-ast-original-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin Z3 independent Horn proof verifier
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/q3c-variable-typed-program-20261017/typed_program_gate.py
+      - name: Model-output type/arity guard negative contracts
+        run: |
+          python -m unittest -v research/evidence/q3c-variable-typed-program-20261017/test_typed_program_gate.py
+      - name: Full original source fraud gates for 6- and 7-relation CHCs
+        run: |
+          python research/evidence/q3c-variable-typed-program-20261017/typed_program_gate.py --out /tmp/fgsr-q3c-first.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/fgsr-q3c-first.json'))
+          assert r['global_q1_q7']=='OPEN'
+          assert r['trained_model_used'] is False
+          assert r['status']=='GATE_READY_NO_TRAINED_MODEL'
+          assert r['original_rules_seen']==23
+          assert [x['relations'] for x in r['records']]==[6,7]
+          assert all(x['ill_typed_rejected'] and x['missing_relation_rejected'] for x in r['records'])
+          assert all(x['all_true']['accepted'] is False and x['all_false']['accepted'] is False for x in r['records'])
+          assert all(x['all_true']['first_nonproof'] is not None and x['all_false']['first_nonproof'] is not None for x in r['records'])
+          print('SCOPED_Q3C_TYPED_SOURCE_GATE_PASS_23_ORIGINALS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3c-typed-ast-all-original-proofs-first-negative-receipt
+          path: /tmp/fgsr-q3c-first.json
+          retention-days: 60
