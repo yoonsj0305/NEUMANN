@@ -33,7 +33,7 @@ def flatten(f):
 def quantifier_body(expr,index):
     if z3.is_quantifier(expr):
         if not expr.is_forall():raise ValueError("NON_UNIVERSAL_QUANTIFIER")
-        xs=[z3.Const(f"ir_var_{index}_{j}",expr.var_sort(j)) for j in range(expr.num_vars())]
+        xs=[z3.Const(f"ir_var_{index}_{j}",expr.var_sort(expr.num_vars()-1-j)) for j in range(expr.num_vars())]
         return z3.substitute_vars(expr.body(),*xs),xs
     return expr,[]
 
