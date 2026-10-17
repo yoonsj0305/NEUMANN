@@ -1,0 +1,43 @@
+name: Q3B opened originals generic typed Horn graph losslessness
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3b-real-transfer-20261017/**'
+      - '.github/workflows/q3b-real-typed-ir.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  typed-graph:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install exact semantic SMT verifier
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/q3b-real-transfer-20261017/postopen_generic_typed_graph_ir.py
+      - name: Independent source graph meaning preservation on already opened originals
+        run: |
+          python research/evidence/q3b-real-transfer-20261017/postopen_generic_typed_graph_ir.py --output /tmp/q3b-postopened-typed-graph.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3b-postopened-typed-graph.json'))
+          assert r['prior_first_frozen_run']=='39040534264'
+          assert r['global_q1_q7']=='OPEN' and r['model_calls']==0
+          assert [x['original_clause_count'] for x in r['results']]==[11,12]
+          assert r['total_verified_original_rules']==23
+          assert all(x['status']=='TYPED_GRAPH_ORIGINAL_RULES_LOSSLESS' for x in r['results'])
+          assert all(x['negative_control']['xor_result']=='sat' for x in r['results'])
+          assert all(x['original_xor_unsat']==x['original_clause_count'] for x in r['results'])
+          print('TYPED_GRAPH_ACTUAL_23_ORIGINAL_MEANINGS_CERTIFIED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3b-postopened-source-neutral-23-original-clause-graph-receipt
+          path: /tmp/q3b-postopened-typed-graph.json
+          retention-days: 60
