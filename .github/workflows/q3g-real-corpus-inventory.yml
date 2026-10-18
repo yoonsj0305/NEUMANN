@@ -59,6 +59,24 @@ jobs:
           path: /tmp/q3g-real-inventory.json
           retention-days: 60
 
+      - name: Verify ancestor license texts and count legitimately reusable training pairs
+        run: |
+          python research/evidence/q3g-real-corpus-20261018/license_body_audit.py --workbook third_party_loopy/GeneratedInvariants.xlsx --dataset third_party_loopy/dataset.zip --output /tmp/q3g-licensed-subset.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3g-licensed-subset.json'))
+          assert r['all_398_source_links_preserved'] is True
+          assert r['unresolved_license_sources_excluded'] is True
+          assert r['original_chc_comp_heldouts_read'] is False
+          assert r['training_still_not_executed'] is True and r['q1_q7']=='OPEN'
+          print('REAL_PERMISSIVE_TRAINING_SUBSET',r['permissively_licensed_pair_count'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3g-real-license-body-review-hash-only
+          path: /tmp/q3g-licensed-subset.json
+          retention-days: 60
       - uses: actions/upload-artifact@v4
         if: always()
         with:
