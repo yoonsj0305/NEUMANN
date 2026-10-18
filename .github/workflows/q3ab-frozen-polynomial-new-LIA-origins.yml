@@ -1,0 +1,50 @@
+name: Q3AB one-shot frozen Q3Z polynomial proposal on two unused LIA source origins
+on:
+  push:
+    branches:
+      - research/q3ab-frozen-polynomial-two-LIA-origins-20261018
+    paths:
+      - research/evidence/q3ab-first-two-LIA-origins-20261018/**
+      - .github/workflows/q3ab-frozen-polynomial-new-LIA-origins.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first-source-original-3vc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Identical frozen Q3Z source generator deps
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.13.3
+          python -m py_compile research/evidence/q3ab-first-two-LIA-origins-20261018/first_six_original_polynomial_generator.py
+      - name: Run 6 first original sources and retain all abstains and first-exec failures
+        run: |
+          python research/evidence/q3ab-first-two-LIA-origins-20261018/first_six_original_polynomial_generator.py --root external_loopinvgen --out /tmp/q3ab_first_two_lia_origins.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3ab_first_two_lia_origins.json'))
+          assert r['status']=='Q3AB_FIRST_SIX_AUTHENTIC_ORIGINAL_EXACT_PROOF_STUDY_COMPLETE'
+          assert len(r['manifest'])==len(r['cases'])==6
+          assert len(set(x['original_sha256'] for x in r['manifest']))==6
+          assert r['GLOBAL_Q3']=='OPEN' and r['GLOBAL_Q1_Q7']=='OPEN'
+          assert r['no_neural_forwards']
+          print('Q3AB_TWO_NEW_SOURCE_ORIGINS_FINAL',r['summary']['two_group_registered_structure_generation'])
+          PY
+      - name: Preserve first full original source 3VC certificate/fail receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3ab-first-two-lia-original-origin-exact-polynomial-first
+          path: /tmp/q3ab_first_two_lia_origins.json
+          retention-days: 90
