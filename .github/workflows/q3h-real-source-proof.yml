@@ -71,6 +71,25 @@ jobs:
               assert proof['checks']['weak_constant_true_invariant_postcondition']=='sat'
           print('ALL_LICENSED_ORIGINAL_PROOF_ELIGIBILITY_RECORDED_NOT_AI_PASS')
           PY
+      - name: Search genuine C source and original goal for inductive structures WITHOUT published labels
+        run: |
+          python research/evidence/q3h-real-source-proof-20261018/source_only_houdini.py --dataset third_party_loopy/dataset.zip --output /tmp/q3h-source-only-first.json
+          python - <<'PY'
+          import json
+          obj=json.load(open('/tmp/q3h-source-only-first.json'))
+          assert obj['public_published_labels_read'] is False
+          assert obj['q3f_holdout_read'] is False
+          assert obj['neural_learning_calls']==0
+          assert obj['global_q1_q7']=='OPEN'
+          assert len(obj['records'])==3
+          print('Q3H_FIRST_SOURCE_ONLY_SCIENCE_RECORD',obj['classically_proven'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3h2-original-sources-without-invariant-labels-first-classical-search
+          path: /tmp/q3h-source-only-first.json
+          retention-days: 60
       - uses: actions/upload-artifact@v4
         if: always()
         with:
