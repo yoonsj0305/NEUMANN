@@ -1,0 +1,104 @@
+name: Q3H independently reprove 3 authentic licensed C loop invariants
+on:
+  pull_request:
+    paths:
+      - "research/evidence/q3h-real-source-proof-20261018/**"
+      - ".github/workflows/q3h-real-source-proof.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-proof-eligibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: microsoft/loop-invariant-gen-experiments
+          ref: 91fe89245a0894ec8ad3741d85ae91ce3b552b2e
+          path: third_party_loopy
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin C AST frontend and exact Z3 backend
+        run: |
+          python -m pip install --disable-pip-version-check pycparser==2.22 z3-solver==4.13.3.0
+          python -m py_compile research/evidence/q3h-real-source-proof-20261018/replay_real_c_loop_invariants.py
+      - name: Independently verify unchanged licensed C loop source, invariant and postcondition
+        run: |
+          python research/evidence/q3h-real-source-proof-20261018/replay_real_c_loop_invariants.py --workbook third_party_loopy/GeneratedInvariants.xlsx --dataset third_party_loopy/dataset.zip --out /tmp/q3h-first-original-c-proof.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path('/tmp/q3h-first-original-c-proof.json').read_text())
+          assert report['global_q1_q7']=='OPEN'
+          assert report['learned_model_inference_calls']==0
+          assert report['q3f_holdout_source_read'] is False
+          assert report['opened_only_previously_development_real_sources'] is True
+          assert len(report['results'])==3
+          assert report['fully_proven_count']==3
+          for r in report['results']:
+              assert r['source_altered'] is False
+              assert r['license'] in ('APACHE_2_0','BSD_3_CLAUSE','MIT')
+              p=r['proof']
+              assert p['status']=='ALL_ORIGINAL_LOOP_OBLIGATIONS_UNSAT'
+              assert all(p['checks'][k]=='unsat' for k in
+                     ('init','inductive','postcondition','body_signed_overflow','prelude_signed_overflow'))
+              assert p['checks']['mutated_false_postcondition']=='sat'
+              assert p['checks']['weak_constant_true_invariant_postcondition']=='sat'
+          print('Q3H_THREE_AUTHENTIC_ORIGINAL_C_LOOP_INVARIANTS_FORMALLY_REPROVEN')
+          PY
+      - name: Bounded full survey of all real licensed original source/invariant pairs
+        run: |
+          python research/evidence/q3h-real-source-proof-20261018/audit_all_licensed_originals.py --workbook third_party_loopy/GeneratedInvariants.xlsx --dataset third_party_loopy/dataset.zip --out /tmp/q3h-all-licensed-originals.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3h-all-licensed-originals.json'))
+          assert r['status']=='COMPLETE_BOUNDARY_AUDIT_NO_Q3_PROMOTION'
+          assert r['permissive_programs_checked']==150
+          assert r['actual_original_full_proofs']>=3
+          assert r['proofs_from_distinct_source_groups']>=3
+          assert r['q3f_sealed_benchmarks_read'] is False
+          assert r['actual_learned_model_proof_calls']==0
+          assert r['third_party_C_and_invariant_text_retained'] is False
+          assert r['global_q1_q7']=='OPEN'
+          for proof in [x['proof'] for x in r['records'] if x['supported_original_C_proof']]:
+              assert all(proof['checks'][k]=='unsat' for k in
+                ('init','inductive','postcondition','body_signed_overflow','prelude_signed_overflow'))
+              assert proof['checks']['mutated_false_postcondition']=='sat'
+              assert proof['checks']['weak_constant_true_invariant_postcondition']=='sat'
+          print('ALL_LICENSED_ORIGINAL_PROOF_ELIGIBILITY_RECORDED_NOT_AI_PASS')
+          PY
+      - name: Search genuine C source and original goal for inductive structures WITHOUT published labels
+        run: |
+          python research/evidence/q3h-real-source-proof-20261018/source_only_houdini.py --dataset third_party_loopy/dataset.zip --output /tmp/q3h-source-only-first.json
+          python - <<'PY'
+          import json
+          obj=json.load(open('/tmp/q3h-source-only-first.json'))
+          assert obj['public_published_labels_read'] is False
+          assert obj['q3f_holdout_read'] is False
+          assert obj['neural_learning_calls']==0
+          assert obj['global_q1_q7']=='OPEN'
+          assert len(obj['records'])==3
+          print('Q3H_FIRST_SOURCE_ONLY_SCIENCE_RECORD',obj['classically_proven'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3h2-original-sources-without-invariant-labels-first-classical-search
+          path: /tmp/q3h-source-only-first.json
+          retention-days: 60
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3h-all-150-original-licensed-c-invariant-proof-eligibility
+          path: /tmp/q3h-all-licensed-originals.json
+          retention-days: 60
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3h-first-real-source-three-independent-c-induction-receipts
+          path: /tmp/q3h-first-original-c-proof.json
+          retention-days: 60
