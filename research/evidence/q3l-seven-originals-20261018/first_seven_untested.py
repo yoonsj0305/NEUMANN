@@ -13,7 +13,7 @@ HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE.parent/"q3h-real-source-proof-20261018"))
 sys.path.insert(0,str(HERE.parent/"q3k-chc-spacer-20261018"))
 from source_only_houdini import candidate_proof
-from replay_real_c_loop_invariants import signed_domain,MIN_INT,MAX_INT
+from replay_real_c_loop_invariants import signed_domain,MIN_INT,MAX_INT,model_original
 from first_source_only_direct_chc import (
     model_semantics,source_fixedpoint,controls,substitute,signed_bad,
     bounded_reachability
@@ -81,7 +81,7 @@ def evaluate_source(source):
         }
         # CHC all targets are independently queried. First returns are
         # preserved as-is, including canceled solver UNKNOWN/errors.
-        chcs=source_fixedpoint(model,names,base,arith)
+        chcs=source_fixedpoint(model,names,base,arith,timeout_ms=QUERY_TIMEOUT_MS)
         bad_exit=chcs["exit_safety"]["bad_state_query"]
         bad_overflow=chcs["signed_step_overflow"]["bad_state_query"]
         info["direct_original_chc"]={
@@ -89,6 +89,8 @@ def evaluate_source(source):
             "bad_overflow":chcs["signed_step_overflow"],
             "original_relation_arity":chcs["quantified_original_relation_arity"],
         }
+        independently_parsed=model_original(source,"1")
+        same_signature=tuple(names)==tuple(sorted(independently_parsed["loop_state"]))
         checks=prior["full_original_check"]
         houdini_overflow=(
             checks["initial"]=="unsat" and
@@ -100,8 +102,7 @@ def evaluate_source(source):
           "original_reachable_bad_exit_absent":bad_exit=="unsat",
           "source_only_houdini_legal_step_certificate":houdini_overflow,
           "direct_chc_bad_overflow_absent":bad_overflow=="unsat",
-          "same_original_state_variables":set(prior["program_features_used"])>=set() and
-                 tuple(names)==tuple(sorted(names)),
+          "same_original_state_variables":same_signature,
         }
         # The classical Houdini invariant and the SPACER transition both
         # use the same Q3H model_original original source parser.
