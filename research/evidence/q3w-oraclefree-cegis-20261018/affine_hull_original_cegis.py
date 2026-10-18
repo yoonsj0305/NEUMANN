@@ -61,7 +61,7 @@ def formula(rows,vars):
     if any([len(a)!=d for a in R]):raise AssertionError("BAD_ROW")
     # Every witness is inside the exact certified affine row span.
     for a in R:
-        assert (sp.Matrix([a]).T*K)==sp.zeros(1,K.cols)
+        assert (sp.Matrix([a])*K)==sp.zeros(1,K.cols)
     return inv,R,K.rank()
 
 def model_column(s,vars):
