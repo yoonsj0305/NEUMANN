@@ -148,11 +148,17 @@ def run(root,firstfile):
            ("FORWARD",custom["now"]),
            ("REVERSED",list(reversed(custom["now"]))),
         ]:
-            candidate=z3.substitute_vars(cover,*bindings)
-            result=check_cover(candidate,mixed_native)
-            result["binding"]=name
-            if result.get("status")=="ORIGINAL_FULL_3VC_CERTIFIED":
-                covers.append(result)
+            try:
+                candidate=z3.substitute_vars(cover,*bindings)
+                result=check_cover(candidate,mixed_native)
+                result["binding"]=name
+                if result.get("status")=="ORIGINAL_FULL_3VC_CERTIFIED":
+                    covers.append(result)
+            except z3.Z3Exception:
+                # Original mixed Int/Bool relation binders cannot be reversed
+                # when that violates their sorts. Explicitly reject this
+                # counterfactual order; never downgrade genuine forward proof.
+                continue
     except Exception as exc:
         raise ValueError("FAILED_TO_NATIVE_RECERTIFY_SOURCE_ORIGINAL_INVARIANT:"+type(exc).__name__) from exc
     if not covers:raise ValueError("NATIVE_PARSER_ORIGINAL_3VC_INVARIANT_NOT_PROVEN")
