@@ -1,0 +1,41 @@
+name: G0 one-shot original MathProblems 18 AST lineage audit
+on:
+  push:
+    branches:
+      - research/g0-sq2026-per-task-union-20261018
+    paths:
+      - research/evidence/g0-fast-close-smtcomp26/first_original_18_lineage.py
+      - .github/workflows/g0-original-18-lineage.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-18-lineage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install existing official data parser and original source AST parser, no solver runs
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.15.4.0 ijson==3.4.0
+      - name: Auditable first exact 18 structural shape receipts
+        run: |
+          python research/evidence/g0-fast-close-smtcomp26/first_original_18_lineage.py
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/g0_mathproblems18_source_lineage_first.json'))
+          assert r['status']=='FIRST_18_FIXED_SOURCE_FINGERPRINT_AUDIT_COMPLETE'
+          assert r['originals']==18
+          assert sum(k['count'] for k in r['template_clusters'])==18
+          assert r['no_neural_call_or_learning'] and r['no_original_solver_run'] and r['no_oracle_cost_measured']
+          assert r['G1']=='HOLD_LEARNING'
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g0-mathproblems18-original-first-structural-lineage
+          path: /tmp/g0_mathproblems18_source_lineage_first.json
+          retention-days: 90
