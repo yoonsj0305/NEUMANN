@@ -1,0 +1,43 @@
+name: R4 all 36 originals full-cost same-host Z3 vs old vs R3 gated hybrid
+on:
+  push:
+    branches:
+      - research/r4-matched-endtoend-36-20261018
+    paths:
+      - research/evidence/r4-matched36/**
+      - .github/workflows/r4-matched36-three-full-arms.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-full-hybrid-matched:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Original Z3 4.15.4 and exact polynomial SymPy 1.14 CPU only
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.15.4.0 sympy==1.14.0
+          python -m py_compile research/evidence/r4-matched36/one_shot_all36_old_vs_r3_full_hybrid.py
+      - name: One matched full-workflow experiment all original 36 no gold-conditioned branches
+        run: |
+          python research/evidence/r4-matched36/one_shot_all36_old_vs_r3_full_hybrid.py
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/r4_all36_samehost_first_full_system.json'))
+          assert r['status']=='R4_FIRST_36_MATCHED_FULL_HYBRID_COMPLETE'
+          assert len(r['originals'])==36
+          assert r['metrics']['judgement']['preserved_exact_math_original_certificates']
+          assert r['neural_forwards']==0 and r['global_Q1_Q7']=='OPEN'
+          print('R4_SCOPED_FINAL',r['metrics']['judgement']['r4_pre_registered_full_dev_cost_gate'])
+          PY
+      - name: Preserve complete first receipt even on error or negative result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-r4-all36-matched-full-system-first
+          path: /tmp/r4_all36_samehost_first_full_system.json
+          retention-days: 90
