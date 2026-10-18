@@ -49,8 +49,10 @@ def run(modelpath:Path,trainreceipt:Path,priorclassical:Path,dataset:Path):
                  for h in held)
     if basewins!=EXPECTED_Q3I_CLASSICAL:
         raise ValueError("FIRST_REPORTED_CLASSICAL_6_OF_32_NOT_REPRODUCED")
-    if sha(dataset.read_bytes())!=sha(dataset.read_bytes()):
-        raise ValueError("UNREACHABLE")
+    original_corpus=dataset.read_bytes()
+    blob_header=b"blob "+str(len(original_corpus)).encode()+bytes([0])
+    if hashlib.sha1(blob_header+original_corpus).hexdigest()!="17cac0f6734a39f0fe73558199cc2ad8d5c1a810":
+        raise ValueError("PINNED_LOOPY_PROGRAM_CORPUS_CHANGED")
     target_sources={}
     with zipfile.ZipFile(dataset) as z:
         for item in z.infolist():
