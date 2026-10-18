@@ -169,9 +169,9 @@ def audit(original,source_sha):
 
 def controls():
     cases={
-       "reachable_wrong_exit":("int main(void){int i=0;while(i<2){i++;}//@ assert (i==1);\nreturn 0;}", "sat", "unsat"),
-       "safe_correct_exit":("int main(void){int i=0;while(i<2){i++;}//@ assert (i==2);\nreturn 0;}", "unsat", "unsat"),
-       "genuine_signed_overflow":("int main(void){int i=2147483647;while(i>=0){i++;}//@ assert (i<0);\nreturn 0;}", "unsat", "sat"),
+       "reachable_wrong_exit":("int main(void){int i=0;while(i<2){i++;}\n//@ assert (i==1);\nreturn 0;}", "sat", "unsat"),
+       "safe_correct_exit":("int main(void){int i=0;while(i<2){i++;}\n//@ assert (i==2);\nreturn 0;}", "unsat", "unsat"),
+       "genuine_signed_overflow":("int main(void){int i=2147483647;while(i>=0){i++;}\n//@ assert (i<0);\nreturn 0;}", "unsat", "sat"),
     }
     output={}
     for name,(source,expected_exit,expected_overflow) in cases.items():
