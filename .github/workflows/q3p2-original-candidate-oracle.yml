@@ -1,0 +1,66 @@
+name: Q3P2 fixed all 11 trained typed AST source-repertoire original proof sufficiency audit
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3p2-frozen-repertoire-20261018/**'
+      - 'docs/research/Q3P2_FIXED_TEMPLATE_ORACLE_PREREG_20261018.md'
+      - '.github/workflows/q3p2-original-candidate-oracle.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original-typed-repertoire-oracle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Load exact frozen initial neural Q3P 0/40 original proof first record
+        uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39092503854
+          name: q3p-first-real-trained-typed-ast-neural-vs-ablations-original-three-vc-receipt
+          github-token: ${{ github.token }}
+          path: /tmp/q3p2-first-neural
+      - name: Exact original Z3 and PyTorch runtime
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m pip install --disable-pip-version-check --index-url https://download.pytorch.org/whl/cpu torch==2.5.1
+      - name: Exhaust ONLY frozen source-based training AST templates in every fixed actual original
+        run: |
+          python research/evidence/q3p2-frozen-repertoire-20261018/exhaust_exact_training_templates.py --root external_loopinvgen --first-q3p /tmp/q3p2-first-neural/q3p-first-actual-learned-proposer.json --output /tmp/q3p2-all-11-candidate-fixed-repertoire.json
+          python - <<'PY'
+          import json
+          a=json.load(open('/tmp/q3p2-all-11-candidate-fixed-repertoire.json'))
+          assert a['status']=='COMPLETE_ONLY_ORIGINAL_SOURCE_FINITE_REPERTOIRE_VERDICT'
+          assert a['first_original_source_count']==56
+          assert a['first_original_candidate_count']==11
+          assert a['posthoc_hard_no_training_update'] is True
+          assert a['unseen_group_labels_used_for_training'] is False
+          assert a['q3f_challenge_targets_unopened'] is True
+          assert a['new_math_operator_created'] is False
+          assert a['global_q1_q7']=='OPEN'
+          assert len(a['all_original_proof_receipts'])==40
+          for k,n in [('HELDOUT',24),('DIAGNOSTIC',16)]:
+              grp=a['per_split_outcomes'][k]
+              assert grp['originals']==n
+              assert grp['first_trained_neural_TOP3_original_proofs']==0
+              assert grp['originals_with_some_training_template_original_proof']<=n
+          print('Q3P2_FROZEN_TEST_ONLY_ALL_TEMPLATE_ORIGINAL_PROOF_ORACLE_AUDIT_RECORDED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3p2-first-frozen-all-source-typed-template-original-3vc-repertoire-evidence
+          path: /tmp/q3p2-all-11-candidate-fixed-repertoire.json
+          retention-days: 90
