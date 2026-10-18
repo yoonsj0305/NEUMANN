@@ -1,0 +1,59 @@
+name: Q3X preregistered nonlinear NIA original oracle-free CEGIS domain-transfer gate
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3x-nia-20261018/**'
+      - 'docs/research/Q3X_FIRST_NEW_NIA_TWO_GROUPS_PREREG_20261018.md'
+      - '.github/workflows/q3x-first-nia-domain-transfer.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first-two-nia:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Exact classical runtime
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.13.3
+          python -m py_compile research/evidence/q3x-nia-20261018/first_nia_domain_one_shot.py
+      - name: First NIA frozen two-group experiment with honest negative results
+        run: |
+          python research/evidence/q3x-nia-20261018/first_nia_domain_one_shot.py --root external_loopinvgen --out /tmp/q3x-first-nia-original-results.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/q3x-first-nia-original-results.json'))
+          assert d['status']=='COMPLETE_FROZEN_NIA_PROSPECTIVE_RESULT'
+          assert d['preregistered_before_source_read_commit']=='c0c99a9a9fd5675518a10e414d250e1c6158d36b'
+          assert d['same_q3w_frozen_oracle_free_discovery_implementation'] is True
+          assert d['synthetic_controls']['pass'] is True
+          assert len(d['nia_frozen_new_origin_groups'])==2
+          assert d['nia_first_original_count']>=4
+          assert d['historical_original_count']==12
+          assert len(d['nia_original_per_case_receipts'])==d['nia_first_original_count']
+          assert d['neural_forwards']==0
+          assert d['gold_or_oracle_source_invariants_used'] is False
+          assert d['q3f_two_sealed_chc_originals_opened'] is False
+          assert d['global_Q1_Q7']=='OPEN'
+          for x in d['nia_original_per_case_receipts']+d['historical_per_case_receipts']:
+              if x.get('original_full_three_vc_status')=='ORIGINAL_FULL_3VC_CERTIFIED':
+                  assert all(y=='unsat' for y in x['original_full_three_vc_components'].values())
+                  assert all(y=='unsat' for y in x['original_native_semantic_xor'].values())
+          print('Q3X_COMPLETE_PRESERVE_FALSE_IF_NO_NIA_TWO_FAMILY_GATE',d['nia_two_distinct_origin_group_gate'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3x-first-nia-cross-domain-original-evidence-all-failures
+          path: /tmp/q3x-first-nia-original-results.json
+          retention-days: 90
