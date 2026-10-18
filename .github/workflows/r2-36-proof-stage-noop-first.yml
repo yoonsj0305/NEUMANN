@@ -1,0 +1,43 @@
+name: R2 proof-stage no-op gate all 36 opened SMT source originals
+on:
+  push:
+    branches:
+      - research/r2-cheap-proof-noop-gate-36-20261018
+    paths:
+      - research/evidence/r2-proof-noop-gate/**
+      - .github/workflows/r2-36-proof-stage-noop-first.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sound-noop-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Frozen prior proof engine dependencies, no AI inference
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.15.4.0 sympy==1.14.0
+          python -m py_compile research/evidence/r2-proof-noop-gate/first_36_originals_sound_gate.py
+      - name: Same-runner full old proof versus cheap-rejection proof, original 27 and 9
+        run: |
+          python research/evidence/r2-proof-noop-gate/first_36_originals_sound_gate.py
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/r2_frozen36_proof_stage_receipt.json'))
+          assert r['status']=='FIRST_36_SOURCE_SOUND_NOOP_GATE_AUDIT_COMPLETE'
+          assert len(r['cases'])==36
+          assert r['summary']['old_cert_count']==r['summary']['gate_cert_count']==4
+          assert r['neural_forwards']==0 and r['global_Q1_Q7']=='OPEN'
+          print('R2_HONEST_36_GATE',r['summary']['engineering_gate'])
+          PY
+      - name: Save immutable FIRST full original-source receipt even if failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-r2-first-36-proof-stage-cheap-noop-gate
+          path: /tmp/r2_frozen36_proof_stage_receipt.json
+          retention-days: 90
