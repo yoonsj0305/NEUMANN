@@ -1,0 +1,47 @@
+name: Q3AC source-opened proof of original relational transition nonfunctionality
+on:
+  push:
+    branches:
+      - research/q3ab-frozen-polynomial-two-LIA-origins-20261018
+    paths:
+      - research/evidence/q3ac-original-transition-two-successors-20261018/**
+      - .github/workflows/q3ac-source-transition-two-successors.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-trans-two-successors:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Original native 3-formula exact parity, two-independent-next relational witness
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.13.3
+          python -m py_compile research/evidence/q3ac-original-transition-two-successors-20261018/first_opened_source_nonfunctional.py
+          python research/evidence/q3ac-original-transition-two-successors-20261018/first_opened_source_nonfunctional.py --root external_loopinvgen --out /tmp/q3ac_opened_original_nondeterminism.json
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3ac_opened_original_nondeterminism.json'))
+          assert x['status']=='Q3AC_OPENED_SOURCE_TRANSITION_FUNCTIONALITY_AUDIT_COMPLETE'
+          assert len(x['originals'])==2
+          assert x['Q3_GLOBAL']=='OPEN' and x['Q1_Q7_GLOBAL']=='OPEN'
+          assert all(set(v['original_source_parity'].values())=={'unsat'} for v in x['originals'])
+          print('Q3AC_TWO_SUCCESSOR_STATUS',[(v['original_path'],v['two_successor_query_status']) for v in x['originals']])
+          PY
+      - name: Preserve first actual original SMT parity and two-successor witness receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3ac-opened-original-transition-two-successors-first
+          path: /tmp/q3ac_opened_original_nondeterminism.json
+          retention-days: 90
