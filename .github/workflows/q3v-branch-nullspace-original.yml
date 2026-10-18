@@ -1,0 +1,61 @@
+name: Q3V all-branch exact nullspace and original SyGuS 3VC certification
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3v-branch-common-nullspace-20261019/**'
+      - 'docs/research/Q3V_BRANCH_COMMON_NULLSPACE_PREREG_20261019.md'
+      - '.github/workflows/q3v-branch-nullspace-original.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-branch-kernel-original-proofs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Fixed native SMT solver and exact rational linear algebra
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.13.3
+          python -m py_compile research/evidence/q3v-branch-common-nullspace-20261019/first_original_branch_nullspace.py
+      - name: Freeze and evaluate ALL source branches, adversarial proof tests and actual original source cases
+        run: |
+          python research/evidence/q3v-branch-common-nullspace-20261019/first_original_branch_nullspace.py --root external_loopinvgen --out /tmp/q3v-first-source-branch-common-kernel.json
+          python - <<'PY'
+          import json
+          a=json.load(open('/tmp/q3v-first-source-branch-common-kernel.json'))
+          assert a['status']=='FIRST_FROZEN_ORIGINAL_BRANCH_NULLSPACE_STUDY_RECORDED'
+          assert a['first_synthetic_branch_adversarial_controls']['pass']
+          assert a['first_fixed_authentic_original_summary']['original_files']==10
+          assert len(a['first_all_original_records'])==10
+          assert len({x['source_git_blob'] for x in a['first_all_original_records']})==10
+          assert a['deterministic_classical_source_transition_coefficients_only']
+          assert a['neural_training_calls']==0
+          assert not a['new_mathematical_primitive_learned']
+          assert not a['q3f_sealed_chc_original_bodies_opened']
+          assert a['global_q1_q7']=='OPEN'
+          for x in a['first_all_original_records']:
+              if x.get('full_original_safe_by_branch_nullspace'):
+                  assert x['original_pre_sat']=='sat' and x['original_not_post_sat']=='sat'
+                  assert all(v=='unsat' for v in x['actual_original_pre_trans_post_native_parser_parity'].values())
+                  assert all(v=='unsat' for v in x['full_source_original_3vc_checks'].values())
+              for r in x['mathematical_relations']:
+                  if r['source_certified']:
+                      assert r['original_pre_implies_relation']==r['original_inductive_relation']=='unsat'
+          print('Q3V_FIRST_ALL_REAL_BRANCH_SOURCE_ORIGINAL_3VC_AND_NEGATIVE_CONTROLS_RECORDED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3v-original-common-branch-nullspace-inductive-and-safety-proof-receipt
+          path: /tmp/q3v-first-source-branch-common-kernel.json
+          retention-days: 90
