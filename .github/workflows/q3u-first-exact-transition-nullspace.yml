@@ -1,0 +1,68 @@
+name: Q3U exact source transition nullspace coefficients and original 3VC safety proof
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3u-exact-transition-nullspace-20261018/**'
+      - 'docs/research/Q3U_EXACT_TRANSITION_NULLSPACE_PREREG_20261018.md'
+      - '.github/workflows/q3u-first-exact-transition-nullspace.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-derived-relational-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install exact classical algebra and original proof engines
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.13.3
+          python -m py_compile research/evidence/q3u-exact-transition-nullspace-20261018/first_real_affine_nullspace.py
+      - name: Real source-driven exact nullspace and native original 3VC certificates, including adversarial controls
+        run: |
+          python research/evidence/q3u-exact-transition-nullspace-20261018/first_real_affine_nullspace.py --root external_loopinvgen --out /tmp/q3u-first-original-math-nullspace.json
+          python - <<'PY'
+          import json
+          report=json.load(open('/tmp/q3u-first-original-math-nullspace.json'))
+          assert report['status']=='FIRST_FROZEN_ORIGINAL_TRANSITION_NULLSPACE_AND_THREE_VC_STUDY_COMPLETE'
+          assert report['first_controls']['pass']
+          assert report['first_controls']['reset_relation_coefficient_computed']==[1,-1]
+          assert report['first_controls']['control_post_alone_3vc']!='ORIGINAL_FULL_3VC_CERTIFIED'
+          assert report['first_controls']['control_post_plus_derived_relation_3vc']=='ORIGINAL_FULL_3VC_CERTIFIED'
+          assert report['first_controls']['control_invalid_relation_3vc']!='ORIGINAL_FULL_3VC_CERTIFIED'
+          assert report['first_controls']['control_mutated_original_step_3vc']!='ORIGINAL_FULL_3VC_CERTIFIED'
+          assert report['first_actual_source_summary']['actual_original_source_count']==10
+          assert len(report['all_first_original_source_records'])==10
+          assert len(set(r['git_blob'] for r in report['all_first_original_source_records']))==10
+          assert report['coefficients_hardcoded_per_target'] is False
+          assert report['new_neural_model_training_or_inference']==0
+          assert report['global_q1_q7']=='OPEN'
+          assert report['q3f_two_original_escrow_bodies_opened'] is False
+          for r in report['all_first_original_source_records']:
+              if r['original_full_relation_safety']:
+                  assert r['full_original_3vc_statuses']=={
+                      'initial':'unsat','consecution':'unsat','post':'unsat'}
+                  assert r['independent_source_parsing_parity']=={
+                      'pre':'unsat','trans':'unsat','post':'unsat'}
+                  assert r['original_pre_sat']=='sat' and r['original_not_post_sat']=='sat'
+              for relation in r['all_source_certified_relations']:
+                  if relation['source_certified']:
+                      assert relation['original_pre_implies_relation']=='unsat'
+                      assert relation['original_inductive_relation']=='unsat'
+          print('Q3U_ORIGINAL_EXACT_LINEAR_RELATION_COEFFICIENT_PROOF_FIRST_RECEIPT_VERIFIED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3u-real-source-transition-nullspace-and-native-original-3vc-first
+          path: /tmp/q3u-first-original-math-nullspace.json
+          retention-days: 90
