@@ -1,0 +1,63 @@
+name: Q3P first real trained typed AST source-only original proof vs neural and classical ablations
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3p-trained-typed-20261018/**'
+      - 'docs/research/Q3P_FIRST_LEARNED_TYPED_AST_PREREG_20261018.md'
+      - '.github/workflows/q3p-first-trained-typed-original-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first-genuine-neural-proposer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install exact Z3 and CPU neural runtime
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m pip install --disable-pip-version-check --index-url https://download.pytorch.org/whl/cpu torch==2.5.1
+          python -m py_compile research/evidence/q3p-trained-typed-20261018/first_trained_typed_proposer.py
+      - name: First frozen train/evaluation group typed invariant proposal and original formal proof
+        run: |
+          python research/evidence/q3p-trained-typed-20261018/first_trained_typed_proposer.py --root external_loopinvgen --out /tmp/q3p-first-actual-learned-proposer.json
+          python - <<'PY'
+          import json
+          a=json.load(open('/tmp/q3p-first-actual-learned-proposer.json'))
+          assert a['status']=='FIRST_FROZEN_LEARNED_TYPED_SOURCE_ONLY_PROOF_AUDIT_COMPLETE'
+          assert a['source_file_count']==56
+          assert a['trained_on_eval_origin_group'] is False
+          assert a['model_trained_using_test_source_solutions'] is False
+          assert a['model_new_math_primitive_created'] is False
+          assert a['unopened_Q3F_original_source_access'] is False
+          assert a['no_paid_provider'] is True
+          assert a['global_q1_q7']=='OPEN'
+          assert a['strict_original_proven_distinct_training_AST_templates']>=1
+          assert a['training_pair_labels']['positive']>=1
+          assert a['training_pair_labels']['total']>=a['training_pair_labels']['positive']
+          assert a['training_neural_parameters']>0
+          for k in ('HELDOUT','DIAGNOSTIC'):
+              g=a['all_model_eval_cases'][k]
+              assert g['trained_TOP1_certified']<=g['trained_TOP3_certified']
+              assert g['trained_TOP3_certified']<=g['evaluated_original_count']
+              assert g['untrained_TOP3_certified']<=g['evaluated_original_count']
+              assert g['popularity_TOP3_certified']<=g['evaluated_original_count']
+          assert len(a['evaluation_original_records'])==a['group_census']['HELDOUT']+a['group_census']['DIAGNOSTIC']
+          print('Q3P_TRUE_TYPED_LEARNED_SOURCE_PROOF_AND_ABLATIONS_RECORDED_NO_Q3_PROMOTION')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3p-first-real-trained-typed-ast-neural-vs-ablations-original-three-vc-receipt
+          path: /tmp/q3p-first-actual-learned-proposer.json
+          retention-days: 90
