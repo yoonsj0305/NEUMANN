@@ -53,7 +53,7 @@ def model_semantics(original):
     base=z3.And(assumptions,z3.Not(pre_bad),init_signed)
     return m,names,base,prelude_status,step
 
-def source_fixedpoint(m,names,base,arith,requested=("exit_safety","signed_step_overflow")):
+def source_fixedpoint(m,names,base,arith,requested=("exit_safety","signed_step_overflow"),timeout_ms=QUERY_MS):
     h=m["loop_state"]
     init=m["after_prelude"]
     vals=[h[n] for n in names]
@@ -62,7 +62,7 @@ def source_fixedpoint(m,names,base,arith,requested=("exit_safety","signed_step_o
     exitbad=z3.Function("Q3K_BadExit",z3.BoolSort())
     overbad=z3.Function("Q3K_BadOverflow",z3.BoolSort())
     fp=z3.Fixedpoint()
-    fp.set(engine="spacer",timeout=QUERY_MS)
+    fp.set(engine="spacer",timeout=timeout_ms)
     fp.register_relation(reach,exitbad,overbad)
     free={v.decl().name():v for t in (
         base,m["loop_test"],m["post_assert"],*nextvals,*arith
