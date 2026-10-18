@@ -72,7 +72,7 @@ def synth_features(source,templ,arith_vars,vars_after):
     c=candidate_features(templ["canonical"])
     candidates=source["variables"]
     c2=[
-      min(len(candidates),12)/12,
+      min(candidates,12)/12,
       min(source["syntactic_size"],600)/600,
       min(templ["nodes"],250)/250,
       min(len(z3.z3util.get_vars(templ["canonical"])),12)/12
