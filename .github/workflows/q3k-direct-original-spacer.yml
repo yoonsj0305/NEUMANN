@@ -1,0 +1,54 @@
+name: Q3K original unchanged C direct CHC SPACER full reachable-safety check
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3k-chc-spacer-20261018/**'
+      - 'docs/research/Q3K_ORIGINAL_CHC_SPACER_PREREG_20261018.md'
+      - '.github/workflows/q3k-direct-original-spacer.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-c-spacer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: microsoft/loop-invariant-gen-experiments
+          ref: 91fe89245a0894ec8ad3741d85ae91ce3b552b2e
+          path: third_party_loopy
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin C frontend and original CHC solver; no training
+        run: |
+          python -m pip install --disable-pip-version-check pycparser==2.22 z3-solver==4.13.3.0
+          python -m py_compile research/evidence/q3k-chc-spacer-20261018/first_source_only_direct_chc.py
+      - name: Verify fixed safe, unsafe, overflow controls and query real original
+        run: |
+          python research/evidence/q3k-chc-spacer-20261018/first_source_only_direct_chc.py --dataset third_party_loopy/dataset.zip --output /tmp/q3k-first-source-spacer.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3k-first-source-spacer.json'))
+          assert r['original_sha256']=='7b1ed83d1a2e80a1e5aa97e27a23c7ac1a53bd734cc95808ecce4aa868c41a23'
+          assert r['source_mathematical_target_invariants_never_read'] is True
+          assert r['q3f_chc_comp_escrow_targets_remain_unopened'] is True
+          assert r['model_training_or_inference']==0 and r['all_global_q1_q7']=='OPEN'
+          assert set(r['control_results'])=={'reachable_wrong_exit','safe_correct_exit','genuine_signed_overflow'}
+          # A failing engineering control is a documented science block, not a valid theorem.
+          assert all(x['pass'] is True for x in r['control_results'].values())
+          if r['main']['status']=='CLASSICAL_SPECIALIST_FULL_ORIGINAL_PROVEN':
+              assert r['main']['prelude_bad_query']=='unsat'
+              assert r['main']['direct_chc']['exit_safety']['bad_state_query']=='unsat'
+              assert r['main']['direct_chc']['signed_step_overflow']['bad_state_query']=='unsat'
+          print('Q3K_SOURCE_FIRST_REACHABILITY_RECORD_PRESERVED',r['main']['status'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3k-unchanged-original-c-spacer-first-reachability-evidence
+          path: /tmp/q3k-first-source-spacer.json
+          retention-days: 90
