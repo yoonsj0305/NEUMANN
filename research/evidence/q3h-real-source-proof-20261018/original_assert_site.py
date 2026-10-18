@@ -49,9 +49,17 @@ def require_original_after_loop_assertion(code: str)->dict:
         following+=1
     if following>=len(items):raise OriginalAssertionSiteError("ASSERTION_NOT_AFTER_MAIN_LOOP")
     stmt=items[following]
-    if not (isinstance(stmt,c_ast.FuncCall) and
-            isinstance(stmt.name,c_ast.ID) and stmt.name.name==MARKER and
-            stmt.args is None):
+    def inert_exit_marker(node):
+        # An otherwise empty nested C compound is executed unconditionally
+        # at this program point; it has the SAME observable point as the
+        # immediate post-loop statement. Reject if/while/calls/assignments.
+        if isinstance(node,c_ast.Compound):
+            active=[c for c in (node.block_items or []) if not isinstance(c,c_ast.EmptyStatement)]
+            return len(active)==1 and inert_exit_marker(active[0])
+        return (isinstance(node,c_ast.FuncCall) and
+                isinstance(node.name,c_ast.ID) and node.name.name==MARKER and
+                node.args is None)
+    if not inert_exit_marker(stmt):
         def is_marker(node):
             return (isinstance(node,c_ast.FuncCall) and
                     isinstance(node.name,c_ast.ID) and node.name.name==MARKER)
@@ -85,7 +93,7 @@ def require_original_after_loop_assertion(code: str)->dict:
     # All normal original-source execution rules continue to be imposed by
     # model_original; this check is a strictly *additional* rejection gate.
     return {
-        "marker_location":"IMMEDIATE_MAIN_LOOP_EXIT",
+        "marker_location":"IMMEDIATE_MAIN_LOOP_EXIT_OR_INERT_COMPOUND",
         "original_line_1based":index+1,
         "original_annotation_expression_length":len(label),
         "main_loop_kind":type(items[idx]).__name__,
