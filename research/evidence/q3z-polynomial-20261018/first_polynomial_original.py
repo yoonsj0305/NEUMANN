@@ -352,6 +352,7 @@ def synthetic():
     b2=sp.Matrix([0,0,1])
     gauss=explore(pre2,trans2,goal2,
             [fixed,total,idx],[fixedp,totalp,idxp],a2,b2)
+    print('Q3Z_SYNTH_GAUSS_FIRST_FAILURE_DIAGNOSTIC',json.dumps(gauss,sort_keys=True),flush=True)
     assert gauss["individually_original_inductive_conserved_polynomials"]>=1
     assert gauss["candidate_mode_results"]["CONSERVATION"]["status"]==GOAL_SUCCESS
     assert full_three_vc(goal2,pre2,trans2,goal2,
