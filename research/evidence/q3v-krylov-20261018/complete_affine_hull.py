@@ -126,7 +126,7 @@ def centered_rotation_control():
     assert R.rows==2 and K.rank()==1
     # Independent exact trajectory: fixed center is the only reachable point.
     assert M*y0==y0
-    return {"new_joint_equations":R.tolist(),"post_only":post_alone,
+    return {"new_joint_equations":[[int(v) for v in row] for row in R.tolist()],"post_only":post_alone,
             "each_individual_equality":each,"full_joint_original_3vc":joint["status"],
             "mutated_old_certificate_rejected":stale!=PROVEN,
             "old_reset_nullspace_dim":0,"old_conservation_nullspace_dim":0}
@@ -181,7 +181,7 @@ def original_case(root):
             "original_total_transition_exact":True,
             "original_pre_singleton_exact":list(map(int,x0)),
             "complete_hull_rank":K.rank(),
-            "complete_hull_integer_equalities":R.tolist(),
+            "complete_hull_integer_equalities":[[int(v) for v in row] for row in R.tolist()],
             "source_3vc":{k:full.get(k) for k in ("initial","consecution","post")},
             "post_only":alone["status"],"strong_spacer":strong["status"],
             "strong_spacer_ms":strong.get("native_solver_wall_ms")}
