@@ -52,7 +52,25 @@ def require_original_after_loop_assertion(code: str)->dict:
     if not (isinstance(stmt,c_ast.FuncCall) and
             isinstance(stmt.name,c_ast.ID) and stmt.name.name==MARKER and
             stmt.args is None):
-        raise OriginalAssertionSiteError("ORIGINAL_ASSERTION_NOT_IMMEDIATELY_AFTER_LOOP")
+        def is_marker(node):
+            return (isinstance(node,c_ast.FuncCall) and
+                    isinstance(node.name,c_ast.ID) and node.name.name==MARKER)
+        top=[j for j,node in enumerate(items) if is_marker(node)]
+        if len(top)==1 and top[0]<idx:
+            detail="ASSERTION_BEFORE_MAIN_LOOP"
+        elif len(top)==1 and top[0]>idx:
+            detail="ASSERTION_AFTER_LOOP_BUT_NOT_IMMEDIATE"
+        elif len(top)>1:
+            detail="MULTIPLE_ASSERTION_ANCHORS"
+        else:
+            class Locator(c_ast.NodeVisitor):
+                found=False
+                def visit_FuncCall(self,node):
+                    if is_marker(node):self.found=True
+                    self.generic_visit(node)
+            loc=Locator();loc.visit(items[idx])
+            detail="ASSERTION_NESTED_IN_MAIN_LOOP" if loc.found else "ASSERTION_NOT_TOP_LEVEL_MAIN"
+        raise OriginalAssertionSiteError(detail)
     # All normal original-source execution rules continue to be imposed by
     # model_original; this check is a strictly *additional* rejection gate.
     return {
