@@ -1,0 +1,44 @@
+name: R10 matched 52-original heterogeneous classical expert-routing full four-arm cost
+on:
+  push:
+    branches:
+      - research/r10-heterogeneous-classical-52-20261018
+    paths:
+      - research/evidence/r10-classical-52/**
+      - .github/workflows/r10-frozen-heterogeneous-52.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  matched-four-arms:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin free original Z3 and exact integer polynomial verifier
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.15.4.0 sympy==1.14.0
+          python -m py_compile research/evidence/r10-classical-52/first52_four_arm_full_portfolio.py
+      - name: First frozen four-arm original 52 source proofs with all independent fallback CPU costs
+        run: |
+          python research/evidence/r10-classical-52/first52_four_arm_full_portfolio.py
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/neumann_r10_original_52_first.json'))
+          assert x['status']=='R10_FIRST_52_ORIGINAL_FOUR_FULL_ARMS_COMPLETE'
+          assert len(x['originals'])==52 and len(x['evaluations'])==52
+          assert len(set(r['source_sha256'] for r in x['originals']))==52
+          assert x['summary']['joint']['independent_mathematically_original_source_certificates']==20
+          assert x['Q1_Q7_GLOBAL']=='OPEN' and x['no_neural_model_or_training']
+          print('R10_FULL_CLASSICAL_PORTFOLIO_RESULT',x['summary']['adjudication'])
+          PY
+      - name: Preserve FIRST full 52 original four-arm receipt even on invalid input
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-r10-first-heterogeneous-52-four-arm-original-receipt
+          path: /tmp/neumann_r10_original_52_first.json
+          retention-days: 90
