@@ -1,0 +1,59 @@
+name: Q3K2 actual full original C safety by classical proof composition
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3k-chc-spacer-20261018/**'
+      - 'docs/research/Q3K2_COMPOSITION_PREREG_20261018.md'
+      - '.github/workflows/q3k2-composed-original-c-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  complete-original-classical-composition:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: microsoft/loop-invariant-gen-experiments
+          ref: 91fe89245a0894ec8ad3741d85ae91ce3b552b2e
+          path: third_party_loopy
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pinned exact arithmetic, symbolic C AST and SPACER
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 pycparser==2.22 sympy==1.13.3
+          python -m py_compile research/evidence/q3k-chc-spacer-20261018/composed_original_c_certificate.py
+      - name: Independently REEXECUTE original C polynomial and CHC lemmas and soundly compose
+        run: |
+          python research/evidence/q3k-chc-spacer-20261018/composed_original_c_certificate.py --dataset third_party_loopy/dataset.zip --output /tmp/q3k2-original-C-composed-certificate.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3k2-original-C-composed-certificate.json'))
+          assert r['original_C_unchanged'] is True
+          assert r['exact_original_sha256']=='7b1ed83d1a2e80a1e5aa97e27a23c7ac1a53bd734cc95808ecce4aa868c41a23'
+          assert r['original_published_invariant_read'] is False
+          assert r['q3f_escrow_chc_target_source_read'] is False
+          assert r['learned_model_calls']==0
+          assert r['first_original_q3j_stays_whole_source']=='NOT_PROVEN'
+          assert r['first_original_q3k_stays_whole_source']=='UNKNOWN'
+          assert r['global_q1_q7']=='OPEN'
+          assert r['three_controls_pass'] is True
+          if r['status']=='ONE_AUTHENTIC_ORIGINAL_C_SAFETY_PROVEN_BY_CLASSICAL_COMPOSITION':
+              assert r['all_components_passing'] is True
+              assert all(r['composition_lemma_contract'].values())
+              assert r['source_only_direct_reachability']['reachable_original_bad_exit']=='unsat'
+              assert r['source_only_polynomial_induction']['original_checks']['signed_overflow']=='unsat'
+              print('ONE_GENUINE_ORIGINAL_C_SAFETY_PROVEN_WITH_TWO_CLASSICAL_LEMMAS')
+          else:
+              print('NO_GENUINE_ORIGINAL_COMPOSITE_PROOF_ADMITTED',r['status'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3k2-one-authentic-original-C-composed-safety-certificate
+          path: /tmp/q3k2-original-C-composed-certificate.json
+          retention-days: 90
