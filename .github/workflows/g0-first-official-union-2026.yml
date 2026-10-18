@@ -34,10 +34,25 @@ jobs:
           # This job is an audit, not an admission to neural training.
           print('G0_FIRST_OFFICIAL_PER_TASK_EVIDENCE_STATUS',d['status'])
           PY
+      - name: Historical MathProblems 18 original reference labels only, preregistered separately
+        run: |
+          python research/evidence/g0-fast-close-smtcomp26/mathproblems_18_metadata_only.py
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/g0_mathproblems_18_reference_screen.json'))
+          assert d['status']=='MATHPROBLEMS_18_OFFICIAL_METADATA_COMPLETE'
+          assert d['family_in_2026_benchmarks']==134
+          assert d['no_competitor_sat_or_unsat_count']==18
+          assert d['no_original_smt2_task_source_bodies_read']
+          assert d['per_case_new_qfn2l_same_tasks']=='NOT_CHECKED'
+          assert d['g1']=='HOLD_LEARNING'
+          PY
       - name: Archive complete evidence including any first failure
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: g0-first-smtcomp2026-per-task-all-classical-union
-          path: /tmp/g0_2026_per_task_union_first_receipt.json
+          path: |
+            /tmp/g0_2026_per_task_union_first_receipt.json
+            /tmp/g0_mathproblems_18_reference_screen.json
           retention-days: 90
