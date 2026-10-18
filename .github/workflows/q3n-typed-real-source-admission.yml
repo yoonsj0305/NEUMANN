@@ -1,0 +1,58 @@
+name: Q3N independent original-C proof-carrying typed AST data feasibility
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3n-typed-ast-20261018/**'
+      - 'docs/research/Q3N_TYPED_AST_TRAINING_DATA_ADMISSION_PREREG_20261018.md'
+      - '.github/workflows/q3n-typed-real-source-admission.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit-real-typed-original-proofs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: microsoft/loop-invariant-gen-experiments
+          ref: 91fe89245a0894ec8ad3741d85ae91ce3b552b2e
+          path: third_party_loopy
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install original C AST and Z3 full proof backends
+        run: |
+          python -m pip install --disable-pip-version-check pycparser==2.22 z3-solver==4.13.3.0
+          python -m py_compile research/evidence/q3n-typed-ast-20261018/first_real_original_typed_admission.py
+      - name: Reject unbound and ill-typed AST; source-replay all published originals
+        run: |
+          python research/evidence/q3n-typed-ast-20261018/first_real_original_typed_admission.py --workbook third_party_loopy/GeneratedInvariants.xlsx --dataset third_party_loopy/dataset.zip --output /tmp/q3n-real-proof-typed-data.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3n-real-proof-typed-data.json'))
+          assert r['actual_source_identity_count']==150
+          assert r['original_verified_label_and_license_pool']==150
+          assert r['trained_model_calls']==r['frontier_model_calls']==0
+          assert r['q3f_escrow_source_text_opened'] is False
+          assert r['global_q1_q7']=='OPEN'
+          assert r['group_split']=='Q3G_20261018_FROZEN_SOURCE_GROUP_SPLIT'
+          split=r['split_census']
+          assert split['TRAIN']['total_license_accepted_source_files']+split['HELDOUT']['total_license_accepted_source_files']==150
+          assert set(x['split'] for x in r['source_identity_and_status_only'])=={'TRAIN','HELDOUT'}
+          assert all(x['typed_variable_binding_valid'] and x['typed_sort_valid'] and x['original_C_assertion_site_checked'] for x in r['source_identity_and_status_only'] if x['status']=='INDEPENDENT_ORIGINAL_C_PROOF_AND_TYPED_AST')
+          if r['status']=='GO_REAL_TYPED_OPERATOR_TRAINING':
+              assert split['TRAIN']['groups_with_at_least_two_independent_proofs']>=20
+          else:
+              assert r['status']=='STOP_INSUFFICIENT_GROUP_DISJOINT_ORIGINAL_PROVEN_TRAINING_DATA'
+              assert r['training_admitted'] is False
+          print('Q3N_FIRST_REAL_TYPED_ORIGINAL_PROOF_DATA_ADMISSION_RECORDED',r['status'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3n-real-source-150-typed-ast-independently-original-proven-data-census
+          path: /tmp/q3n-real-proof-typed-data.json
+          retention-days: 90
