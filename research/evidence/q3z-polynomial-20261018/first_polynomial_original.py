@@ -101,7 +101,8 @@ def polynomial_to_z3(expr,symbols,now):
         if coeff.q!=1:raise Abstain("NON_INTEGRAL_POLY_CERTIFICATE")
         product=z3.IntVal(int(coeff))
         for i,power in enumerate(exps):
-            if power: product=product*now[i]**int(power)
+            for _ in range(int(power)):
+                product=product*now[i]
         terms.append(product)
     return z3.Sum(*terms) if terms else z3.IntVal(0)
 
