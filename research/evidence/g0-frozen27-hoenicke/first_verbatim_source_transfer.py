@@ -4,7 +4,7 @@ Preregd: GitHub Issue 221 before opening any original Hoenicke SMT body.
 Imported proof code is pinned verbatim to ORIGINAL Ultimate evidence Git blob.
 No prompt/model/inferred labels; all 27 original files are examined unchanged.
 """
-import collections, gzip, hashlib, importlib.util, json, os, subprocess, sys, time
+import collections, gzip, hashlib, importlib.util, json, os, re, subprocess, sys, time
 import urllib.request
 from pathlib import Path
 import ijson
@@ -69,9 +69,48 @@ def load_verbatim_frozen_checker():
     sp.loader.exec_module(mod)
     return mod,hashlib.sha256(source).hexdigest()
 
+def multiline_asserts_as_singleline(text):
+    """Lossless whitespace-only input adaptation for frozen old line parser.
+    No math transformations. Original file is never modified.
+    """
+    pattern=re.compile(r"(?m)^[ \t]*\(assert[ \t]")
+    matches=list(pattern.finditer(text))
+    if not matches:
+        raise ValueError("ORIGINAL_SOURCE_CONTAINS_NO_ASSERTIONS")
+    extracted=[]
+    for match in matches:
+        start=text.index("(",match.start())
+        depth=0
+        end=None
+        for i in range(start,len(text)):
+            ch=text[i]
+            if ch=="(":depth+=1
+            elif ch==")":
+                depth-=1
+                if depth==0:
+                    end=i+1
+                    break
+        if end is None or depth!=0:raise ValueError("UNBALANCED_ORIGINAL_ASSERT")
+        raw=text[start:end]
+        one=" ".join(raw.split())
+        # Token sequences (incl. original quoted variable names) unchanged.
+        toks=lambda x: re.findall(r"\|[^|]*\||\(|\)|[^\s()]+",x)
+        if toks(raw)!=toks(one):
+            raise RuntimeError("ORIGINAL_ASSERT_TOKENS_CHANGED_BY_WHITESPACE_ONLY_ADAPTER")
+        extracted.append(one)
+    # Exact same parse on untouched original via standard SMTLIB Z3 frontend:
+    solver=z3.Solver()
+    solver.from_string(text)
+    if len(solver.assertions())!=len(extracted):
+        raise RuntimeError("ORIGINAL_ASSERTION_COVERAGE_MISMATCH")
+    return "\n".join(extracted),len(extracted)
+
 def checker_case(alg, source_file, text):
-    # Exact unchanged function list. Never add a pattern, bound, or new lemma.
-    clauses=alg.source_asserts(text)
+    # Exact unchanged FROZEN proof criterion. Repair only old input lexer.
+    canonical, original_assert_count=multiline_asserts_as_singleline(text)
+    clauses=alg.source_asserts(canonical)
+    if len(clauses)!=original_assert_count:
+        raise RuntimeError("CANONICAL_SOURCE_ASSERTION_COUNT_MISMATCH")
     eligible=[]
     unsupported=0
     for clause in clauses:
