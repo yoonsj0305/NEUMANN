@@ -202,6 +202,8 @@ def get_main(code):
     return fn,assertion
 
 def model_original(code,label):
+    from original_assert_site import require_original_after_loop_assertion
+    require_original_after_loop_assertion(code)
     fn,assertion=get_main(code)
     ast=fn.body.block_items or []
     initial={}
