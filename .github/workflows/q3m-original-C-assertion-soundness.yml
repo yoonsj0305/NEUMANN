@@ -1,0 +1,81 @@
+name: Q3M fail-closed original C assertion site and exact historical 13 reproof
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3h-real-source-proof-20261018/replay_real_c_loop_invariants.py'
+      - 'research/evidence/q3h-real-source-proof-20261018/original_assert_site.py'
+      - 'research/evidence/q3m-assert-site-20261018/**'
+      - 'docs/research/Q3M_ASSERTION_SITE_SOUNDNESS_PREREG_20261018.md'
+      - '.github/workflows/q3m-original-C-assertion-soundness.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independent-source-site-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: microsoft/loop-invariant-gen-experiments
+          ref: 91fe89245a0894ec8ad3741d85ae91ce3b552b2e
+          path: third_party_loopy
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Download untouched first 150-C classical original evidence
+        uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39084573345
+          name: q3i-first-150-real-source-no-label-classical-houdini-receipt
+          github-token: ${{ github.token }}
+          path: /tmp/q3m-history/q3i
+      - name: Download untouched first original Q3K-2 composition
+        uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39087265530
+          name: q3k2-one-authentic-original-C-composed-safety-certificate
+          github-token: ${{ github.token }}
+          path: /tmp/q3m-history/q3k2
+      - name: Download untouched Q3L seven-case first original study
+        uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39088069803
+          name: q3l-first-seven-authentic-original-C-classical-composition
+          github-token: ${{ github.token }}
+          path: /tmp/q3m-history/q3l
+      - name: Install original proof engines
+        run: |
+          python -m pip install --disable-pip-version-check pycparser==2.22 z3-solver==4.13.3.0 sympy==1.13.3
+          python -m py_compile research/evidence/q3m-assert-site-20261018/audit_13_originals.py
+      - name: Strict post-loop original assertion site, adversarial mutation, reprove all historical 13
+        run: |
+          python research/evidence/q3m-assert-site-20261018/audit_13_originals.py --dataset third_party_loopy/dataset.zip --q3i /tmp/q3m-history/q3i/q3i-source-only-first-150.json --q3k2 /tmp/q3m-history/q3k2/q3k2-original-C-composed-certificate.json --q3l /tmp/q3m-history/q3l/q3l-first-seven.json --out /tmp/q3m-assert-sites-13-originals.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3m-assert-sites-13-originals.json'))
+          assert r['status']=='ANNOTATION_SITE_AND_ORIGINAL_PROOF_AUDIT_COMPLETE'
+          assert r['historical_13_exact_originals']==13
+          assert len(r['records'])==13
+          assert r['no_published_target_invariants_used'] is True
+          assert r['no_q3f_holdout_source_read'] is True
+          assert r['neural_model_calls']==0 and r['global_q1_q7']=='OPEN'
+          assert all(x['correct_rejection_or_admission'] for x in r['adversarial_controls'].values())
+          assert r['adversarial_controls']['false_before_loop']['site_accepted'] is False
+          assert r['adversarial_controls']['inside_loop']['site_accepted'] is False
+          assert r['adversarial_controls']['after_return']['site_accepted'] is False
+          assert r['adversarial_controls']['correct_after_loop']['site_accepted'] is True
+          print('Q3M_FIRST_FROZEN_ASSERTION_SITE_REPROOF_COUNT',r['historical_full_original_certificates_reverified_with_site_gate'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3m-original-C-exact-13-assertion-site-soundness-recertification
+          path: /tmp/q3m-assert-sites-13-originals.json
+          retention-days: 90
