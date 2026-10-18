@@ -1,0 +1,44 @@
+name: G0 Newton exact original 27 integer polynomial proof
+on:
+  push:
+    branches:
+      - research/g0-hoenicke-newton-exact-integer-20261018
+    paths:
+      - research/evidence/g0-newton-hoenicke27/**
+      - .github/workflows/g0-newton-hoenicke27-once.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-newton-original-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Z3 original parser and exact symbolic integer ring only
+        run: python -m pip install --disable-pip-version-check z3-solver==4.15.4.0 sympy==1.14.0
+      - name: Run exactly registered 27 source originals once with no neural or paid API
+        run: |
+          python -m py_compile research/evidence/g0-newton-hoenicke27/one_shot_integer_polynomial_proof.py
+          python research/evidence/g0-newton-hoenicke27/one_shot_integer_polynomial_proof.py
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/g0_hoenicke27_newton_integer_first.json'))
+          assert r['status']=='EXACT_INTEGER_NEWTON_OPENED_DEV_27_COMPLETED'
+          assert len(r['files'])==27
+          assert r['source_opened_development_only']
+          assert all(f['status']!='ORIGINAL_UNSAT_CERTIFIED' or f['independent_original_plus_proven_lemma']=='unsat' for f in r['files'])
+          assert r['no_neural_training_or_inference'] and r['G1']=='HOLD_LEARNING'
+          assert r['Q1_to_Q7_global']=='OPEN'
+          print('G0_FIRST_EXACT_NEWTON_FINAL',r['source_verified_unsat_count'])
+          PY
+      - name: Save first immutable source certificates or failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g0-newton-27-exact-source-proof-first
+          path: /tmp/g0_hoenicke27_newton_integer_first.json
+          retention-days: 90
