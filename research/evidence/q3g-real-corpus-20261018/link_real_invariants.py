@@ -41,7 +41,8 @@ def identify(rows, archive):
         # Best effort license discovery: this is advisory, not a legal permission decision.
         ancestors=matched.split("/")[:-1]
         license_candidates=[lic for lic in licenses
-            if lic.startswith("/".join(ancestors[:2])+"/")]
+            if posixpath.dirname(lic) in ("/".join(ancestors[:i])
+                for i in range(1,len(ancestors)+1))]
         best_license=max(license_candidates,key=len,default=None)
         path_parts=matched.split("/")
         group="/".join(path_parts[:4]) if len(path_parts)>4 else "/".join(path_parts[:-1])
