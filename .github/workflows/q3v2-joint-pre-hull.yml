@@ -1,0 +1,53 @@
+name: Q3V2 exact Pre hull + joint nullspace original VCs (development)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3v2-joint-pre-hull.yml'
+      - 'docs/research/Q3V2_JOINT_PRE_AFFINE_HULL_PREREG_20261019.md'
+      - 'research/evidence/q3v2-joint-pre-hull-20261019/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-exact-joint-subspace-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned exact math / SMT proof backend
+        run: python -m pip install --disable-pip-version-check sympy==1.13.3 z3-solver==4.13.3.0
+      - name: Constructed algebra, original synthetic VCs and immutable opened-corpus regression
+        run: |
+          python -m py_compile research/evidence/q3v2-joint-pre-hull-20261019/joint_pre_hull.py
+          python research/evidence/q3v2-joint-pre-hull-20261019/joint_pre_hull.py --root external_loopinvgen --out /tmp/q3v2_joint_first_receipt.json
+          python - <<'PY'
+          import json
+          a=json.load(open('/tmp/q3v2_joint_first_receipt.json'))
+          assert a['algebra']['status']=='EXACT_ALGEBRA_PASS'
+          assert a['proof']['status']=='Z3_SYNTHETIC_ORIGINAL_VCS_PASS'
+          assert a['proof']['single_branch']['old_count']==0
+          assert a['proof']['single_branch']['safety']=='ORIGINAL_FULL_3VC_CERTIFIED'
+          assert a['proof']['guarded_two_branch']['safety']=='ORIGINAL_FULL_3VC_CERTIFIED'
+          assert a['proof']['mutation_rejection']
+          assert len(a['proof']['opened_source_regression'])==10
+          assert len({x['blob'] for x in a['proof']['opened_source_regression']})==10
+          assert a['global_Q1_Q7']=='OPEN' and a['neural_training_calls']==0
+          print('Q3V2_ALL_CONSTRUCTED_EXACT_PROOF_CONTROLS_PASS')
+          PY
+          sha256sum /tmp/q3v2_joint_first_receipt.json
+      - name: Archive first result, INCLUDING failures/ABSTAIN
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3v2-joint-first-source-result
+          path: /tmp/q3v2_joint_first_receipt.json
+          if-no-files-found: warn
