@@ -1,0 +1,66 @@
+name: Q3Z first source-polynomial structural discovery original NIA and prospective transfer
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3z-polynomial-20261018/**'
+      - 'docs/research/Q3Z_FIRST_POLYNOMIAL_CLOSURE_PREREG_20261018.md'
+      - '.github/workflows/q3z-first-polynomial-original-nia.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first-source-derived-polynomial-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Exact algebra and original solver backend
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.13.3
+          python -m py_compile research/evidence/q3z-polynomial-20261018/first_polynomial_original.py
+      - name: First fixed polynomial discovery from genuine original source, all positive and negative outcomes
+        run: |
+          python research/evidence/q3z-polynomial-20261018/first_polynomial_original.py --root external_loopinvgen --out /tmp/q3z-first-polynomial-original-nia.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3z-first-polynomial-original-nia.json'))
+          assert r['status']=='FIRST_FROZEN_NIA_POLYNOMIAL_STUDY_EXECUTED'
+          assert r['pre_registration_commit']=='267d8dd0d98e2d52193730ad65d4528269f27d2e'
+          assert r['synthetic_controls']['strict_controls_pass']
+          assert r['development_original_count']==6
+          assert len(r['first_other_origin_groups'])==2
+          assert r['first_other_origin_count']>=4
+          assert len(r['prospective_original_receipts'])==r['first_other_origin_count']
+          assert len(set(x['source_git_blob'] for x in
+                 r['prospective_original_receipts']+
+                 r['development_original_receipts']))==r['first_other_origin_count']+6
+          for q in r['prospective_original_receipts']+r['development_original_receipts']:
+              if q.get('any_full_original_three_vc'):
+                  assert any(x.get('original_vcs')==['unsat']*3 for x in
+                      q['candidate_mode_results'].values())
+                  assert all(z=='unsat' for z in q['independent_original_source_native_xor'].values())
+                  assert q['original_pre_sat']==q['original_not_post_sat']=='sat'
+                  assert q['original_transition_affine_graph_implied_by_source']
+          assert r['trained_neural_forwards']==0
+          assert r['original_gold_invariant_or_classical_cover_supplied'] is False
+          assert r['q3f_sealed_chc_targets_opened'] is False
+          assert r['global_Q1_Q7']=='OPEN'
+          # If first prospective Q3 source transfer fails, that is a valid
+          # scientific negative result, not a CI infrastructure failure.
+          print('Q3Z_FIRST_PROSPECTIVE_TRANSFER_ADMITTED',r['prospective_two_origin_gate'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3z-first-polynomial-nia-source-3vc-all-negative-results
+          path: /tmp/q3z-first-polynomial-original-nia.json
+          retention-days: 90
