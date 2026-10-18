@@ -1,0 +1,42 @@
+name: G0 exact opened original 3 nonlinear modulo UNSAT proof
+on:
+  push:
+    branches:
+      - research/g0-ultimate-2023-nia-real-20261018
+    paths:
+      - research/evidence/g0-ultimate2023-20261018/exact_original_modular_unsat.py
+      - .github/workflows/g0-ultimate-three-source-modular-proof.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-modular-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Existing Z3 original parser and verification backend
+        run: python -m pip install --disable-pip-version-check z3-solver==4.15.4.0
+      - name: Exact source-derived modular certificates, all 3 unknown originals
+        run: |
+          python research/evidence/g0-ultimate2023-20261018/exact_original_modular_unsat.py
+          python - <<'PY'
+          import json
+          s=json.load(open('/tmp/g0_ultimate3_exact_polynomial_unsat_proof.json'))
+          assert s['status']=='ALL_3_OPENED_ORIGINAL_QF_NIA_UNSAT_CERTIFIED'
+          assert s['registered_cases']==['ps5-ll.c_2.smt2','ps6.c_0.smt2','ps6.c_12.smt2']
+          assert len(s['cases'])==3
+          assert all(x['all_residue_values_zero'] and x['independent_original_source_z3_lemma_checker']['original_plus_proved_congruence_unsat'] for x in s['cases'])
+          assert s['g0_free_oracle_full_cost_admitted'] is False
+          assert s['global_q1_q7']=='OPEN' and s['g1']=='HOLD_LEARNING'
+          PY
+      - name: Archive original proof or first failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g0-three-ultimate-original-exact-unsat-certs
+          path: /tmp/g0_ultimate3_exact_polynomial_unsat_proof.json
+          retention-days: 90
