@@ -1,0 +1,52 @@
+name: Q3G first real licensed program-to-invariant CPU learning
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3g-real-corpus-20261018/**'
+      - '.github/workflows/q3g-real-cpu-train.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  group-disjoint-real-training:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: microsoft/loop-invariant-gen-experiments
+          ref: 91fe89245a0894ec8ad3741d85ae91ce3b552b2e
+          path: third_party_loopy
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: CPU-only reproducible dependency pins
+        run: |
+          python -m pip install --disable-pip-version-check numpy==1.26.4
+          python -m pip install --disable-pip-version-check --index-url https://download.pytorch.org/whl/cpu torch==2.5.1
+          python -m py_compile research/evidence/q3g-real-corpus-20261018/train_real_program_invariant.py
+      - name: CPU-train variable-length neural invariant emitter against published real source groups
+        run: |
+          python research/evidence/q3g-real-corpus-20261018/train_real_program_invariant.py --workbook third_party_loopy/GeneratedInvariants.xlsx --dataset third_party_loopy/dataset.zip --checkpoint /tmp/q3g-real-trained/first-frozen-real-source.pt --output /tmp/q3g-real-trained/first_train_receipt.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/q3g-real-trained/first_train_receipt.json').read_text())
+          assert r['status']=='REAL_LICENSED_GROUP_DISJOINT_CPU_TRAINING_COMPLETE'
+          assert r['training_examples']>0 and r['heldout_examples']>0
+          assert r['train_cross_holdout_exact_source_hash_overlap']==0
+          assert r['has_original_independent_proof'] is False
+          assert r['is_q3_full_autonomous_relational_AST'] is False
+          assert r['is_real_competition_holdout_test'] is False
+          assert r['all_q1_q7']=='OPEN'
+          assert len(r['checkpoint_sha256'])==64
+          print('REAL_LICENSED_NEURAL_TRAINING_ACTUALLY_COMPLETED_NOT_GLOBAL_Q3')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3g-real-cpu-trained-invariant-model-first-raw-receipts
+          path: /tmp/q3g-real-trained/
+          retention-days: 60
