@@ -1,0 +1,67 @@
+name: Q3Q learned constructive typed AST with original SyGuS 3VC and strong classical baselines
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3q-learned-atom-assembly-20261018/**'
+      - 'docs/research/Q3Q_CONSTRUCTIVE_TYPED_AST_FIRST_PREREG_20261018.md'
+      - '.github/workflows/q3q-first-constructor-original-vc.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-neural-constructive-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install fixed Z3 and CPU neural runtime
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m pip install --disable-pip-version-check --index-url https://download.pytorch.org/whl/cpu torch==2.5.1
+          python -m py_compile research/evidence/q3q-learned-atom-assembly-20261018/first_constructive_learner.py
+      - name: First source-conditioned AST construction + real neural weights vs all classical controls
+        run: |
+          python research/evidence/q3q-learned-atom-assembly-20261018/first_constructive_learner.py --root external_loopinvgen --out /tmp/q3q-first-real-neural-construction-original-proof.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3q-first-real-neural-construction-original-proof.json'))
+          assert r['status']=='FIRST_CONSTRUCTIVE_NEURAL_TYPED_AST_ORIGINAL_PROOFS_RECORDED'
+          assert r['frozen_original_corpus_count']==56
+          assert r['original_group_test_count']==40
+          assert r['zero_test_knowledge_in_training'] is True
+          assert r['learning_epochs']==50
+          assert r['training_atom_labels']['positive']>=1
+          assert r['training_atom_labels']['negative']>=1
+          assert r['learned_weights']>0
+          assert r['source_text_or_invariant_text_redistributed'] is False
+          assert r['q3f_sealed_holdout_sources_accessed'] is False
+          assert r['global_q1_q7']=='OPEN'
+          assert len(r['first_original_eval_sha_only'])==40
+          for split,n in [('HELDOUT',24),('DIAGNOSTIC',16)]:
+              val=r['per_split_actual_original_proof_summary'][split]
+              assert val['originals']==n
+              for k,m in val['proofed'].items():
+                  assert 0<=m<=n
+          for case in r['first_original_eval_sha_only']:
+              if case.get('model_full_orig_proof'):
+                  proof=case['methods']['TRAINED_TOP12']
+                  assert proof['strict_original_3vc_status']=='ALL_THREE_ORIGINAL_VCS_UNSAT'
+                  assert proof['nonvacuous_source_postcondition'] is True
+                  assert proof['final_conjunction_atom_count']>0
+          print('Q3Q_FIRST_EXACT_ORIGINAL_TYPED_AST_LEARNED_AND_CLASSICAL_VERDICTS_PRESERVED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3q-first-learned-source-ast-constructor-original-3vc-full-baselines
+          path: /tmp/q3q-first-real-neural-construction-original-proof.json
+          retention-days: 90
