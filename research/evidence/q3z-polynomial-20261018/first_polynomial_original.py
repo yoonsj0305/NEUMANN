@@ -181,20 +181,25 @@ def classify(goal,now,nxt,pre,trans,post,symbols):
 
 def conservation_checked(pre,trans,now,nxt,symbols,basis):
     kept=[];denied=0
-    for poly in basis:
+    for index,poly in enumerate(basis):
         try:
             expr=polynomial_to_z3(poly,symbols,now)
             solver=z3.Solver();solver.set(timeout=SMT_MS);solver.add(pre)
             if str(solver.check())!="sat":denied+=1;continue
             val=solver.model().eval(expr,model_completion=True)
-            if not z3.is_int_value(val):denied+=1;continue
+            if not z3.is_int_value(val):
+                print("Q3Z_CONSERVATION_REJECT_NON_INTEGER_MODEL",index,flush=True)
+                denied+=1;continue
             candidate=expr==int(val.as_long())
             base,_=checked(pre,z3.Not(candidate))
             next_candidate=z3.substitute(candidate,*list(zip(now,nxt)))
             step,_=checked(candidate,trans,z3.Not(next_candidate))
             if base==step=="unsat":kept.append((candidate,poly))
-            else:denied+=1
-        except (Abstain,z3.Z3Exception):
+            else:
+                print("Q3Z_CONSERVATION_VC_REFUTATION",index,base,step,flush=True)
+                denied+=1
+        except (Abstain,z3.Z3Exception) as exc:
+            print("Q3Z_CONSERVATION_TYPE_REJECTION",index,type(exc).__name__,str(exc)[:80],flush=True)
             denied+=1
     return kept,denied
 
