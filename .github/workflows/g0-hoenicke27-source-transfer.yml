@@ -1,0 +1,43 @@
+name: G0 prospective frozen 27 original cross-origin transfer
+on:
+  push:
+    branches:
+      - research/g0-hoenicke-frozen-27-transfer-20261018
+    paths:
+      - research/evidence/g0-frozen27-hoenicke/**
+      - .github/workflows/g0-hoenicke27-source-transfer.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  prospective-source-transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin original check runtime, no learning, no GPU
+        run: python -m pip install --disable-pip-version-check z3-solver==4.15.4.0 ijson==3.4.0
+      - name: One frozen algorithm over every one of the 27 previously unread original programs
+        run: |
+          python research/evidence/g0-frozen27-hoenicke/first_verbatim_source_transfer.py
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/g0_hoenicke_frozen27_first_cross_family_receipt.json'))
+          assert r['status']=='FIRST_FROZEN_CROSS_FAMILY_SOURCE_AUDIT_COMPLETE'
+          assert len(r['originals'])==27 and r['upstream_original_dir_nfiles']==27
+          assert r['algorithm_frozen_git_blob_sha1']=='ae50844955aec9e636a0a3f2986f6cc52b4ec1fd'
+          assert r['no_task_specific_algorithm_tuning']
+          assert r['no_neural_train_or_infer']
+          assert r['G1']=='HOLD_LEARNING' and r['Q1_Q7_GLOBAL']=='OPEN'
+          print('G0_PROSPECTIVE_FROZEN_TRANSFER',r['transfer'],r['proofs_before_official_results'])
+          PY
+      - name: Preserve one immutable first success or failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g0-hoenicke-frozen27-one-shot-transfer-full
+          path: /tmp/g0_hoenicke_frozen27_first_cross_family_receipt.json
+          retention-days: 90
