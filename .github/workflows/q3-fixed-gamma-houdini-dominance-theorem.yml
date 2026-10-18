@@ -1,0 +1,42 @@
+name: Q3 fixed Gamma selector vs complete classical Houdini theorem audit
+on:
+  push:
+    branches:
+      - research/q3-fixed-grammar-dominance-theorem-20261018
+    paths:
+      - research/evidence/q3-fixed-grammar-theorem-20261018/**
+      - .github/workflows/q3-fixed-gamma-houdini-dominance-theorem.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-classical-coverage-theorem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pure Python fully exhaustive 2-state semantics and extra 3/4-state witnesses
+        run: |
+          python -m py_compile research/evidence/q3-fixed-grammar-theorem-20261018/fixed_gamma_houdini_exhaustive.py
+          python research/evidence/q3-fixed-grammar-theorem-20261018/fixed_gamma_houdini_exhaustive.py
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3_fixed_grammar_dominance_first_receipt.json'))
+          assert r['status']=='Q3_FIXED_GRAMMAR_COMPLETE_HOUDINI_COVERAGE_THEOREM_AUDIT_PASS'
+          assert r['complete_semantic_source_models']==256
+          assert r['all_possible_original_gamma_sets']==16
+          assert r['counterexample_with_equal_grammar'] is False
+          assert r['illegally_weak_classical_grammar_negative_control_detected']
+          assert r['Q3_GLOBAL']=='OPEN' and r['GLOBAL_Q1_Q7']=='OPEN'
+          print('Q3_FIXED_GRAMMAR_PRECISE_STATUS',r['conclusion'])
+          PY
+      - name: Preserve first complete proof enumeration and error receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-first-fixed-grammar-complete-houdini-formal-enumeration
+          path: /tmp/q3_fixed_grammar_dominance_first_receipt.json
+          retention-days: 90
