@@ -1,0 +1,77 @@
+name: Q3R true first previously untouched source-origin learned Typed AST original proof test
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3r-fresh-origin-20261018/**'
+      - 'docs/research/Q3R_FRESH_ORIGIN_LEARNED_CONSTRUCTOR_PREREG_20261018.md'
+      - '.github/workflows/q3r-fresh-source-origin-original-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  exact-first-fresh-group-study:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39094837562
+          name: q3q-first-learned-source-ast-constructor-original-3vc-full-baselines
+          github-token: ${{ github.token }}
+          path: /tmp/q3r-frozen-q3q-first
+      - name: Install original pinned formal solver and CPU learning runtime
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m pip install --disable-pip-version-check --index-url https://download.pytorch.org/whl/cpu torch==2.5.1
+          python -m py_compile research/evidence/q3r-fresh-origin-20261018/first_unseen_source_family_neural_proof.py
+      - name: First truly new family source SyGuS original safety, same pretrained Q3Q weights replay, all classical and post-only controls
+        run: |
+          python research/evidence/q3r-fresh-origin-20261018/first_unseen_source_family_neural_proof.py --root external_loopinvgen --first-q3q /tmp/q3r-frozen-q3q-first/q3q-first-real-neural-construction-original-proof.json --out /tmp/q3r-first-new-family-original-3vc.json
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3r-first-new-family-original-3vc.json'))
+          assert x['status']=='FIRST_FIXED_NEW_ORIGIN_RESULT_RECORDED'
+          assert x['source_repo']=='SaswatPadhi/LoopInvGen'
+          assert x['old_source_count']==56
+          assert x['new_orig_source_file_count']>0
+          assert x['actual_new_source_group_count']>0
+          assert x['historical_first_model_training_exact_replay']['original_first_training_replayed_exactly'] is True
+          assert x['historical_first_model_training_exact_replay']['train_atom_examples']==1247
+          assert x['historical_first_model_training_exact_replay']['train_true_labels']==56
+          assert x['historical_first_model_training_exact_replay']['learned_parameters']==1633
+          assert x['no_test_invariant_answers_leaked_to_training'] is True
+          assert x['no_original_benchmark_text_or_formula_exported'] is True
+          assert x['q3f_escrow_original_source_bodies_opened'] is False
+          assert x['no_new_primitive_math_operators'] is True
+          assert x['global_q1_q7']=='OPEN'
+          assert len(set(x['new_uninspected_origin_groups_selected']))==x['actual_new_source_group_count']
+          assert len(set(t['source_sha'] for t in x['new_test_original_3VC_results']))==x['new_orig_source_file_count']
+          for r in x['new_test_original_3VC_results']:
+              assert r['source_family_fresh'] is True
+              assert r['source_origin'] in x['new_uninspected_origin_groups_selected']
+              if r.get('learned_verified_full_original_3VC'):
+                  a=r['original_methods']['LEARNED_TOP12']
+                  assert a['status']=='ALL_THREE_ORIGINAL_VCS_UNSAT_NONTRIVIAL'
+                  assert a['strict_original_3vc_status']=='ALL_THREE_ORIGINAL_VCS_UNSAT'
+                  assert a['nonvacuous_source_postcondition'] is True
+                  assert a['final_conjunction_atom_count']>0
+          print('Q3R_TRUE_PREDECLARED_FRESH_ORIGIN_EXACT_MODEL_AND_ORIGINAL_PROOF_AUDIT_RECORDED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3r-first-truly-new-origin-trained-constructor-postonly-fullclassical-originals
+          path: /tmp/q3r-first-new-family-original-3vc.json
+          retention-days: 90
