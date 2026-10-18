@@ -1,0 +1,85 @@
+name: Q3G real verified Loopy program-invariant data asset audit
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3g-real-corpus-20261018/**'
+      - '.github/workflows/q3g-real-corpus-inventory.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  authenticate-real-dataset:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: microsoft/loop-invariant-gen-experiments
+          ref: 91fe89245a0894ec8ad3741d85ae91ce3b552b2e
+          path: third_party_loopy
+          persist-credentials: false
+      - name: Parse pinned original program corpus plus successful invariant records
+        run: |
+          python research/evidence/q3g-real-corpus-20261018/inventory_real_corpus.py \
+            --workbook third_party_loopy/GeneratedInvariants.xlsx \
+            --dataset third_party_loopy/dataset.zip \
+            --output /tmp/q3g-real-inventory.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3g-real-inventory.json'))
+          assert r['status']=='REAL_DATA_ASSET_INVENTORY_COMPLETE_NOT_TRAINING'
+          assert r['loopy_commit']=='91fe89245a0894ec8ad3741d85ae91ce3b552b2e'
+          assert r['program_archive_file_count']>0
+          assert r['xlsx_sheets'] and sum(x['populated_rows'] for x in r['xlsx_sheets'])>0
+          assert r['holdout_original_source_bodies_accessed'] is False
+          assert r['learned_model_calls']==r['independent_original_proof_replays']==0
+          assert r['global_q1_q7']=='OPEN'
+          print('Q3G_DATA_ASSET_AUTHENTIC_AND_NONBLIND_INVENTORY')
+          for t in r['xlsx_sheets']:print('SHEET_HEADERS',t['name'],t['first_two_row_metadata'])
+          PY
+      - name: Match real program bytes and labeled invariant identities, screen duplicate/source group/license
+        run: |
+          python research/evidence/q3g-real-corpus-20261018/link_real_invariants.py --workbook third_party_loopy/GeneratedInvariants.xlsx --dataset third_party_loopy/dataset.zip --output /tmp/q3g-real-joined.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3g-real-joined.json'))
+          assert r['status']=='SOURCE_INVARIANT_IDENTITY_LINKED_NOT_TRAINED'
+          assert r['q3f_competition_targets_read'] is False
+          assert r['licensed_training_admitted'] is False
+          assert r['source_invariant_independently_reproven'] is False
+          assert r['model_trained'] is False and r['global_q1_q7']=='OPEN'
+          assert r['metrics']['matched_rows']>0
+          print('Q3G_ACTUAL_MATCHED_SOURCE_PAIRS',r['metrics']['matched_rows'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3g-real-loopy-original-program-verified-invariant-asset-first-inventory
+          path: /tmp/q3g-real-inventory.json
+          retention-days: 60
+
+      - name: Verify ancestor license texts and count legitimately reusable training pairs
+        run: |
+          python research/evidence/q3g-real-corpus-20261018/license_body_audit.py --workbook third_party_loopy/GeneratedInvariants.xlsx --dataset third_party_loopy/dataset.zip --output /tmp/q3g-licensed-subset.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3g-licensed-subset.json'))
+          assert r['all_398_source_links_preserved'] is True
+          assert r['unresolved_license_sources_excluded'] is True
+          assert r['original_chc_comp_heldouts_read'] is False
+          assert r['training_still_not_executed'] is True and r['q1_q7']=='OPEN'
+          print('REAL_PERMISSIVE_TRAINING_SUBSET',r['permissively_licensed_pair_count'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3g-real-license-body-review-hash-only
+          path: /tmp/q3g-licensed-subset.json
+          retention-days: 60
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3g-authentic-loopy-program-invariant-matched-sha-only-first
+          path: /tmp/q3g-real-joined.json
+          retention-days: 60
