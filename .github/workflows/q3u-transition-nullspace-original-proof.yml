@@ -1,0 +1,63 @@
+name: Q3U first source-transition nullspace constructive affine relationship original proof
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3u-nullspace-20261018/**'
+      - 'docs/research/Q3U_TRANSITION_NULLSPACE_FIRST_PREREG_20261018.md'
+      - '.github/workflows/q3u-transition-nullspace-original-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-affine-nullspace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin exact symbolic math and original formal verification runtime
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.13.3
+          python -m py_compile research/evidence/q3u-nullspace-20261018/transition_nullspace_original_proof.py
+      - name: First 3 actual original SyGuS, source-derived coeff proofs and false-transition negative controls
+        run: |
+          python research/evidence/q3u-nullspace-20261018/transition_nullspace_original_proof.py --root external_loopinvgen --out /tmp/q3u-first-transition-nullspace-real-originals.json
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3u-first-transition-nullspace-real-originals.json'))
+          assert x['status']=='FIRST_REAL_SOURCE_AND_ADVERSARIAL_AFFINE_PROOF_COMPLETE'
+          assert x['all_adversarial_controls_passed'] is True
+          assert all(x['specific_adversarial_controls'].values())
+          assert x['real_original_sources_count']==3
+          assert len(x['real_original_studies'])==3
+          assert x['fixed_model_samples_per_relation']==28
+          assert x['neural_learning_inference_calls']==0
+          assert x['source_coefficients_learned_by_nn'] is False
+          assert x['classical_algorithm_found_coefficients_from_original_source'] is True
+          assert x['q3f_two_chc_competition_holdout_originals_opened'] is False
+          assert x['source_or_formula_text_redistributed'] is False
+          assert x['global_q1_q7']=='OPEN'
+          assert len({r['original_source_git_blob'] for r in x['real_original_studies']})==3
+          for t in [x['synthetic_hidden_coefficient_study']]+x['real_original_studies']:
+              for eq in t.get('sound_original_relational_coefficients',[]):
+                  assert eq['n_nonzero_original_state_coefficients']>=1
+              if t.get('full_original_program_proven'):
+                  assert t['full_original_three_vc_negated_queries']==['unsat']*3
+                  assert t['original_pre_sat']=='sat'
+                  assert t['original_not_post_sat']=='sat'
+          print('Q3U_PREREGISTERED_TRUE_ORIGINAL_AFFINE_MECHANISM_PROOF_RECORDED_NO_NEURAL_PROMOTION')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3u-first-affine-nullspace-original-three-sygus-and-corrupt-source-proof
+          path: /tmp/q3u-first-transition-nullspace-real-originals.json
+          retention-days: 90
