@@ -66,7 +66,7 @@ def scan(xlsx,archive):
     if git_blob(xl)!=LOOPY_WORKBOOK_GIT_BLOB or git_blob(raw)!=LOOPY_DATASET_GIT_BLOB:
         raise ValueError("MISMATCH_PUBLIC_PINNED_DATASET")
     tables=workbook_tables(xl)
-    with zipfile.ZipFile(raw) as z:
+    with zipfile.ZipFile(io.BytesIO(raw)) as z:
         files=[i for i in z.infolist() if not i.is_dir()]
         names=[i.filename for i in files]
         paths=collections.Counter(n.split("/")[1] if len(n.split("/"))>1 else "root" for n in names)
