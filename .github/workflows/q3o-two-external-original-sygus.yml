@@ -1,0 +1,59 @@
+name: Q3O exact two external LIA and NIA original SyGuS proof/typed AST
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3o-real-sygus-20261018/**'
+      - 'docs/research/Q3O_EXTERNAL_SYGUS_FIRST_TWO_PREREG_20261018.md'
+      - '.github/workflows/q3o-two-external-original-sygus.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first-external-sygus:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Only pinned Z3, no neural/paid model inference
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/q3o-real-sygus-20261018/first_two_originals.py
+      - name: First true original SyGuS pre/transition/post full CHC and 3-VC typed cover extraction
+        run: |
+          python research/evidence/q3o-real-sygus-20261018/first_two_originals.py --root external_loopinvgen --output /tmp/q3o-two-real-external-originals.json
+          python - <<'PY'
+          import json
+          a=json.load(open('/tmp/q3o-two-real-external-originals.json'))
+          assert a['source_count']==2 and len(a['records'])==2
+          assert a['source_groups']==2
+          assert a['published_benchmark_answer_labels_used'] is False
+          assert a['source_contents_redistributed'] is False
+          assert a['q3f_sealed_benchmark_sources_read'] is False
+          assert a['model_training_calls']==a['paid_frontier_calls']==0
+          assert a['all_q1_q7']=='OPEN'
+          assert set(r['source_git_blob'] for r in a['records'])=={
+              'b1c26aaddfcbab90f2dd47b6e84faaae973be200',
+              'f066be50786c6a41bdaf0b0e2df399c579469f3f'}
+          for item in a['records']:
+              if item.get('at_least_one_independently_proven_AST_cover'):
+                  assert item['spacer_original_bad_exit_verdict']=='unsat'
+                  assert any(c['status']=='ALL_ORIGINAL_SYGUS_VCS_UNSAT'
+                      and all(c[k]=='unsat' for k in ('init','inductive','postcondition'))
+                      for c in item['independently_original_VC_reproved_covers'])
+          print('Q3O_FIRST_REAL_TWO_EXTERNAL_ORIGINALS_PRESERVED',a['spacer_original_full_safety_proven'],a['full_original_VC_backchecked_inductive_AST_seeds'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3o-first-mit-sygus-lia-nia-external-originals-typed-cover-evidence
+          path: /tmp/q3o-two-real-external-originals.json
+          retention-days: 90
