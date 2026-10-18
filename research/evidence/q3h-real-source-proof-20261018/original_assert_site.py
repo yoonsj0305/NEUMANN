@@ -68,8 +68,19 @@ def require_original_after_loop_assertion(code: str)->dict:
                 def visit_FuncCall(self,node):
                     if is_marker(node):self.found=True
                     self.generic_visit(node)
-            loc=Locator();loc.visit(items[idx])
-            detail="ASSERTION_NESTED_IN_MAIN_LOOP" if loc.found else "ASSERTION_NOT_TOP_LEVEL_MAIN"
+            def inside(node):
+                found=Locator();found.visit(node)
+                return found.found
+            if inside(items[idx]):
+                detail="ASSERTION_NESTED_IN_MAIN_LOOP"
+            elif any(inside(items[j]) for j in range(idx)):
+                detail="ASSERTION_NESTED_BEFORE_MAIN_LOOP"
+            elif any(inside(items[j]) for j in range(idx+1,len(items))):
+                detail="ASSERTION_NESTED_AFTER_MAIN_LOOP"
+            elif any(inside(e) for e in tree.ext if e is not mains[0]):
+                detail="ASSERTION_IN_OTHER_FUNCTION_OR_GLOBAL_CONTEXT"
+            else:
+                detail="ASSERTION_SITE_UNRECOGNIZED_NOT_TOP_LEVEL_MAIN"
         raise OriginalAssertionSiteError(detail)
     # All normal original-source execution rules continue to be imposed by
     # model_original; this check is a strictly *additional* rejection gate.
