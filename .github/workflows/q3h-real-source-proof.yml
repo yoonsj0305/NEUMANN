@@ -50,6 +50,33 @@ jobs:
               assert p['checks']['weak_constant_true_invariant_postcondition']=='sat'
           print('Q3H_THREE_AUTHENTIC_ORIGINAL_C_LOOP_INVARIANTS_FORMALLY_REPROVEN')
           PY
+      - name: Bounded full survey of all real licensed original source/invariant pairs
+        run: |
+          python research/evidence/q3h-real-source-proof-20261018/audit_all_licensed_originals.py --workbook third_party_loopy/GeneratedInvariants.xlsx --dataset third_party_loopy/dataset.zip --out /tmp/q3h-all-licensed-originals.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3h-all-licensed-originals.json'))
+          assert r['status']=='COMPLETE_BOUNDARY_AUDIT_NO_Q3_PROMOTION'
+          assert r['permissive_programs_checked']==150
+          assert r['actual_original_full_proofs']>=3
+          assert r['proofs_from_distinct_source_groups']>=3
+          assert r['q3f_sealed_benchmarks_read'] is False
+          assert r['actual_learned_model_proof_calls']==0
+          assert r['third_party_C_and_invariant_text_retained'] is False
+          assert r['global_q1_q7']=='OPEN'
+          for proof in [x['proof'] for x in r['records'] if x['supported_original_C_proof']]:
+              assert all(proof['checks'][k]=='unsat' for k in
+                ('init','inductive','postcondition','body_signed_overflow','prelude_signed_overflow'))
+              assert proof['checks']['mutated_false_postcondition']=='sat'
+              assert proof['checks']['weak_constant_true_invariant_postcondition']=='sat'
+          print('ALL_LICENSED_ORIGINAL_PROOF_ELIGIBILITY_RECORDED_NOT_AI_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3h-all-150-original-licensed-c-invariant-proof-eligibility
+          path: /tmp/q3h-all-licensed-originals.json
+          retention-days: 60
       - uses: actions/upload-artifact@v4
         if: always()
         with:
