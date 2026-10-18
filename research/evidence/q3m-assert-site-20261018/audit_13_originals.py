@@ -48,20 +48,24 @@ def controls_test():
       "correct_after_loop":code("  while(x>0){x--;}\n  //@ assert (x==0);\n  return 0;\n}\n"),
       "inside_loop":code("  while(x>0){\n    //@ assert (x==0);\n    x--;\n  }\n  return 0;\n}\n"),
       "after_return":code("  while(x>0){x--;}\n  return 0;\n  //@ assert (x==0);\n}\n"),
+      "correct_inert_compound_after_loop":code("  while(x>0){x--;}\n  {\n    ;\n    //@ assert (x==0);\n  }\n  return 0;\n}\n"),
+      "wrong_effectful_compound_after_loop":code("  while(x>0){x--;}\n  {\n    x++;\n    //@ assert (x==0);\n  }\n  return 0;\n}\n"),
+      "wrong_conditional_compound_after_loop":code("  while(x>0){x--;}\n  if(x != 0){\n    //@ assert (x==0);\n  }\n  return 0;\n}\n"),
     }
     result={}
     for key,src in cases.items():
         site=classify(src)
         accepted=site["status"]=="SOURCE_ASSERTION_SITE_ADMITTED"
-        expected=key=="correct_after_loop"
+        expected=key in ("correct_after_loop","correct_inert_compound_after_loop")
         result[key]={"site_accepted":accepted,"expected":expected,
                      "correct_rejection_or_admission":accepted==expected,
                      "status":site}
     # The valid postloop control must still actually prove its original
     # annotated assertion with the existing unchanged C induction logic.
-    correct=verify(cases["correct_after_loop"],"x>=0")
-    result["correct_after_loop"]["original_C_full_proof_replayed"]=correct["status"]=="ALL_ORIGINAL_LOOP_OBLIGATIONS_UNSAT"
-    result["correct_after_loop"]["correct_rejection_or_admission"] &=result["correct_after_loop"]["original_C_full_proof_replayed"]
+    for key in ("correct_after_loop","correct_inert_compound_after_loop"):
+        correct=verify(cases[key],"x>=0")
+        result[key]["original_C_full_proof_replayed"]=correct["status"]=="ALL_ORIGINAL_LOOP_OBLIGATIONS_UNSAT"
+        result[key]["correct_rejection_or_admission"] &=result[key]["original_C_full_proof_replayed"]
     return result
 
 def run(dataset,historical):
