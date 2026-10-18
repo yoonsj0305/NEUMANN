@@ -18,22 +18,34 @@ def source_banner(s):
     return m.group(1).strip()[:120] if m else "SOURCE_HEADER_NOT_IDENTIFIED"
 
 def canonical_formula(s):
-    solver=z3.Solver()
-    solver.from_string(s)
-    terms=solver.assertions()
-    if not terms:raise RuntimeError("NO_SOURCE_ASSERTIONS")
-    from z3.z3util import get_vars
-    vars=get_vars(z3.And(*terms))
-    names=sorted(set(v.decl().name() for v in vars))
-    joined="\n".join(t.sexpr() for t in terms)
-    for i,n in enumerate(names):
-        joined=re.sub(r"(?<![A-Za-z0-9_])"+re.escape(n)+r"(?![A-Za-z0-9_])",
-                      "AUDIT_SYMBOL_"+str(i),joined)
-    # Normalization erases only numeric constants >= 2 (and negative
-    # numeral magnitudes), NOT expression operations or exponent count.
-    joined=re.sub(r"(?<![A-Za-z0-9_])\d+(?![A-Za-z0-9_])",
-                  lambda m:m.group(0) if m.group(0) in ("0","1") else "AUDIT_NUM",joined)
-    return hashlib.sha256(joined.encode()).hexdigest(),len(vars),len(terms)
+    """Lossless lexical structure of unmodified original ASSERT expressions.
+    Avoid quadratic Z3 get_vars on large 350KB hard original AST trees.
+    Exact original Z3 parse happens in pinned source retrieval function.
+    """
+    decls=re.findall(r"\(declare-fun\s+([^\s()]+)\s+\(\)\s+Int\s*\)",s)
+    symbols={name:"AUDIT_SYMBOL_"+str(i) for i,name in enumerate(sorted(set(decls)))}
+    forms=[]
+    for m in re.finditer(r"\(assert\b",s):
+        start=m.start()
+        depth=0
+        stop=None
+        for offset in range(start,len(s)):
+            if s[offset]=="(":depth+=1
+            elif s[offset]==")":
+                depth-=1
+                if depth==0:
+                    stop=offset+1
+                    break
+        if stop is None:raise RuntimeError("UNBALANCED_ORIGINAL_ASSERT_FORM")
+        forms.append(s[start:stop])
+    if not forms:raise RuntimeError("NO_ASSERTIONS_IN_ORIGINAL_SOURCE")
+    words=re.findall(r"\(|\)|[^\s()]+","\n".join(forms))
+    canon=[]
+    for t in words:
+        if t in symbols:canon.append(symbols[t])
+        elif re.fullmatch(r"[0-9]+",t) and t not in ("0","1"):canon.append("AUDIT_NUM")
+        else:canon.append(t)
+    return hashlib.sha256(" ".join(canon).encode()).hexdigest(),len(decls),len(forms)
 
 def main():
     receipts=[]
