@@ -1,0 +1,61 @@
+name: Q3Y original nonlinear NIA safety-region-relative CEGIS first test
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3y-post-relative-20261018/**'
+      - 'docs/research/Q3Y_POST_RELATIVE_CEGIS_FIRST_PREREG_20261018.md'
+      - '.github/workflows/q3y-relative-safety-original.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  q3y-first-frozen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin exact real SMT and algebra CPU dependencies
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.13.3
+          python -m py_compile research/evidence/q3y-post-relative-20261018/safety_region_cegis.py
+      - name: Record all first actual source outcomes, including negative Q3 transfer
+        run: |
+          python research/evidence/q3y-post-relative-20261018/safety_region_cegis.py --root external_loopinvgen --out /tmp/q3y-first-source-original-region-proof.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/q3y-first-source-original-region-proof.json'))
+          assert d['status']=='FIRST_Q3Y_FROZEN_ORIGINAL_NONLINEAR_DOMAIN_STUDY_COMPLETE'
+          assert d['pre_registered_before_original_source_read_commit']=='ab67b9037be4d6da18526079b1761e05779417ee'
+          assert d['controls']['pass'] is True
+          assert d['original_safety_not_inferred_from_equality_only'] is True
+          assert len(d['new_nia_source_path_only_groups'])==2
+          assert d['fresh_original_count']>=4
+          assert d['previously_opened_original_count']==12
+          assert len(d['fresh_original_per_case_results'])==d['fresh_original_count']
+          assert d['trained_neural_forwards']==0
+          assert d['gold_oracle_covers_used'] is False
+          assert d['sealed_Q3F_CHC_originals_opened'] is False
+          assert d['global_Q1_Q7']=='OPEN'
+          for x in d['fresh_original_per_case_results']+d['historical_original_per_case_results']:
+              if x.get('original_goal_three_vc_status')=='ORIGINAL_FULL_3VC_CERTIFIED':
+                  assert x['original_goal_three_vc_queries']==['unsat']*3
+                  assert all(y=='unsat' for y in x['original_source_native_parity'].values())
+                  assert x['original_pre_sat']==x['original_not_post_sat']=='sat'
+          print('Q3Y_FROZEN_FIRST_TWO_NIA_FAMILY_SCIENTIFIC_RESULT',
+                d['fresh_two_origin_useful_Q3_candidate_gate'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3y-first-post-relative-exact-affine-nia-original-source-certificates
+          path: /tmp/q3y-first-source-original-region-proof.json
+          retention-days: 90
