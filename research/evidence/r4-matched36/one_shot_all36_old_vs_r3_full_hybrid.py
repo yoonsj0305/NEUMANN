@@ -172,8 +172,7 @@ def main():
        old["including_frozen_prover_fetch_wall_s"],4),
    "r3_at_least_z3_correct_answer_count":basematched,
    "r3_faster_than_z3_standalone":not_worse_z,
-   "r4_pre_registered_full_dev_cost_gate":"PASS" if cost_better and source_preserved and (
-       not basematched or not_worse_z) else "FAIL",
+   "r4_pre_registered_full_dev_cost_gate":"PASS" if cost_better and source_preserved and basematched and not_worse_z else "FAIL",
    "underlying_new_source_independent_generalization":"NOT_TESTED",
    "best_classical_specialist_or_neural_frontier_claim":"NOT_TESTED"}
   result["metrics"]=stats
