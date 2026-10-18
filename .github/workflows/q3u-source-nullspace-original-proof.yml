@@ -1,0 +1,62 @@
+name: Q3U original transition exact nullspace structure and source safety
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3u-exact-transition-nullspace-20261018/**'
+      - 'docs/research/Q3U_EXACT_TRANSITION_NULLSPACE_PREREG_20261018.md'
+      - '.github/workflows/q3u-source-nullspace-original-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-original-source-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned original Z3 and exact symbolic mathematics
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.13.3
+          python -m py_compile research/evidence/q3u-exact-transition-nullspace-20261018/first_real_affine_nullspace.py
+      - name: First pinned real-source exact nullspace relations with original native parser and original 3VC
+        run: |
+          python research/evidence/q3u-exact-transition-nullspace-20261018/first_real_affine_nullspace.py --root external_loopinvgen --out /tmp/q3u-first-real-exact-nullspace-source-proof.json
+          python - <<'PY'
+          import json
+          a=json.load(open('/tmp/q3u-first-real-exact-nullspace-source-proof.json'))
+          assert a['status']=='FIRST_FROZEN_ORIGINAL_TRANSITION_NULLSPACE_AND_THREE_VC_STUDY_COMPLETE'
+          assert a['first_controls']['pass'] is True
+          assert a['first_actual_source_summary']['actual_original_source_count']==10
+          assert len(a['all_first_original_source_records'])==10
+          assert len({x['git_blob'] for x in a['all_first_original_source_records']})==10
+          assert a['new_neural_model_training_or_inference']==0
+          assert not a['q3f_two_original_escrow_bodies_opened']
+          assert not a['externally_copied_source_or_smt_formula_text']
+          assert a['global_q1_q7']=='OPEN'
+          for record in a['all_first_original_source_records']:
+            if record['original_full_relation_safety']:
+              assert record['original_pre_sat']=='sat'
+              assert record['original_not_post_sat']=='sat'
+              assert all(x=='unsat' for x in record['independent_source_parsing_parity'].values())
+              assert all(record['full_original_3vc_statuses'][k]=='unsat'
+                  for k in ('initial','consecution','post'))
+            for r in record.get('all_source_certified_relations',[]):
+              if r['source_certified']:
+                assert r['original_pre_implies_relation']==r['original_inductive_relation']=='unsat'
+          print('Q3U_REAL_ORIGINAL_NULLSPACE_VALIDATION_RECORDED_NOT_GLOBAL_Q3')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3u-first-exact-transition-kernel-real-original-sygus-3vc-proof
+          path: /tmp/q3u-first-real-exact-nullspace-source-proof.json
+          retention-days: 90
