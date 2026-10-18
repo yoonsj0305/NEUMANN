@@ -1,0 +1,43 @@
+name: G0 one-shot 2026 SMT-COMP official per-task union audit
+on:
+  push:
+    branches:
+      - 'research/g0-sq2026-per-task-union-20261018'
+    paths:
+      - 'research/evidence/g0-fast-close-smtcomp26/**'
+      - '.github/workflows/g0-first-official-union-2026.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  official-per-task-union:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install streaming official JSON reader, NOT a solver or neural runtime
+        run: python -m pip install --disable-pip-version-check ijson==3.4.0
+      - name: Analyze first pinned 2026 original per-task results without task-content reads
+        run: |
+          python -m py_compile research/evidence/g0-fast-close-smtcomp26/first_official_per_task_union.py
+          python research/evidence/g0-fast-close-smtcomp26/first_official_per_task_union.py
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/g0_2026_per_task_union_first_receipt.json'))
+          assert d['source_identity']['commit']=='cd15cbedd4ef312d615448100797a80e922cf575'
+          assert d['no_source_program_bodies_opened'] and d['no_neural_training_or_forwards'] and d['no_paid_calls']
+          assert d['global_q1_q7']=='OPEN'
+          assert d['decision']['g1']=='HOLD_LEARNING' and d['decision']['g2']=='BLOCKED'
+          # This job is an audit, not an admission to neural training.
+          print('G0_FIRST_OFFICIAL_PER_TASK_EVIDENCE_STATUS',d['status'])
+          PY
+      - name: Archive complete evidence including any first failure
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g0-first-smtcomp2026-per-task-all-classical-union
+          path: /tmp/g0_2026_per_task_union_first_receipt.json
+          retention-days: 90
