@@ -1,0 +1,48 @@
+name: R1 FINAL prospective 2025 Elster ALL9 frozen original structural hybrid
+on:
+  push:
+    branches:
+      - research/r1-final-g0-elster9-frozen-transfer-20261018
+    paths:
+      - research/evidence/r1-fastclose-final-elster9/**
+      - .github/workflows/r1-final-elster9-g0-once.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  independent-origin-final-stop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Original source Z3 4.15.4 plus native cvc5 and exact ZZ polynomial proof
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.15.4.0 sympy==1.14.0
+          sudo apt-get update -qq
+          sudo apt-get install -y cvc5
+          cvc5 --version
+      - name: One frozen 9-source check with independent mathematical proof or faithful fallback
+        run: |
+          python -m py_compile research/evidence/r1-fastclose-final-elster9/one_shot_all9_source_isolated_cost.py
+          python research/evidence/r1-fastclose-final-elster9/one_shot_all9_source_isolated_cost.py
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/r1_g0_elster9_final_receipt.json'))
+          assert r['status']=='R1_G0_FINAL_SOURCE_ISOLATED_COHORT_COMPLETE'
+          assert len(r['tasks'])==9
+          assert r['learning_or_neural_forwards']==0
+          assert r['global_q1_q7']=='OPEN' and r['g1']=='HOLD_LEARNING'
+          assert all(t['source_qf_nia_present'] for t in r['tasks'])
+          assert len({t['original_sha256'] for t in r['tasks']})==9
+          print('R1_FINAL_SCIENCE_DECISION',r['metrics']['same_runner_g0_research_decision'])
+          PY
+      - name: Preserve complete actual data or FIRST failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-r1-final-first-source-isolated-2025-elster9
+          path: /tmp/r1_g0_elster9_final_receipt.json
+          retention-days: 90
