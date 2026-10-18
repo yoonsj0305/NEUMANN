@@ -1,0 +1,27 @@
+name: Q3H licensed real C original proof-eligibility syntax inspection
+on:
+  pull_request:
+    paths:
+      - "research/evidence/q3h-real-source-proof-20261018/**"
+      - ".github/workflows/q3h-real-source-proof.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-proof-eligibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: microsoft/loop-invariant-gen-experiments
+          ref: 91fe89245a0894ec8ad3741d85ae91ce3b552b2e
+          path: third_party_loopy
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Inspect small source-group representative real development examples only
+        run: |
+          python research/evidence/q3h-real-source-proof-20261018/inspect_development_examples.py --workbook third_party_loopy/GeneratedInvariants.xlsx --dataset third_party_loopy/dataset.zip
