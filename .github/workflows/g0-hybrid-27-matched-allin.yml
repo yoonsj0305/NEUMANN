@@ -1,0 +1,45 @@
+name: G0 27 frozen-source matched all-in Z3 vs classic-structural hybrid
+on:
+  push:
+    branches:
+      - research/g0-hybrid27-matched-allin-20261018
+    paths:
+      - research/evidence/g0-hybrid-matched27/**
+      - .github/workflows/g0-hybrid-27-matched-allin.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  same-runner-matched-hybrid:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Only old original Z3 and exact SymPy integer polynomial libraries
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.15.4.0 sympy==1.14.0
+          git --version
+      - name: Exact 27 original 3s Z3-only versus structurally certified fall-through Z3, same runner
+        run: |
+          python -m py_compile research/evidence/g0-hybrid-matched27/frozen_hybrid_same_cpu_first.py
+          python research/evidence/g0-hybrid-matched27/frozen_hybrid_same_cpu_first.py
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/g0_hybrid27_first_matched_allin_receipt.json'))
+          assert d['status']=='MATCHED_27_ORIGINAL_HYBRID_FIRST_DONE'
+          assert len(d['files'])==27
+          assert d['no_model_inference_or_training'] and d['no_gpu_or_paid_api']
+          assert d['Q1_Q7_GLOBAL']=='OPEN' and d['G1']=='HOLD_LEARNING'
+          assert all(row['source_sha256']==d['source_raw_sha256'][row['filename']] for row in d['files'])
+          print('G0_HYBRID_27_GATE',d['summary']['bounded_development_hybrid_gate'])
+          PY
+      - name: Preserve immutable complete receipt even on first failure
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g0-hybrid27-frozen-all-in-same-runner-first
+          path: /tmp/g0_hybrid27_first_matched_allin_receipt.json
+          retention-days: 90
