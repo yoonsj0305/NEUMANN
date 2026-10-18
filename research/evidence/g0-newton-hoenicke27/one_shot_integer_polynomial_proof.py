@@ -75,7 +75,10 @@ def canonical_poly(expr):
     x=sp.expand(expr)
     symbols=sorted(x.free_symbols,key=lambda v:v.name)
     if len(symbols)>MAX_SYMBOLS:raise ValueError("SYMBOL_LIMIT")
-    p=sp.Poly(x,*symbols,domain=sp.ZZ) if symbols else sp.Poly(x,domain=sp.ZZ)
+    if not symbols:
+        if not isinstance(x,sp.Integer):raise ValueError("NON_INTEGER_CONSTANT")
+        return x
+    p=sp.Poly(x,*symbols,domain=sp.ZZ)
     if len(p.terms())>MAX_POLY_TERMS:raise ValueError("POLYNOMIAL_TERMS_LIMIT")
     return x
 
