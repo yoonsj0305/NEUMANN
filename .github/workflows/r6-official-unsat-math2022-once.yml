@@ -1,0 +1,48 @@
+name: R6 official 2026 two-solver-confirmed 2022 MathProblems UNSAT eight
+on:
+  push:
+    branches:
+      - research/r6-official-unsat-math2022-first8-20261018
+    paths:
+      - research/evidence/r6-2022-mathproblems-official/**
+      - .github/workflows/r6-official-unsat-math2022-once.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  prospective-original-consensus:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pinned original SMT parser, official JSON stream and native cvc5
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.15.4.0 sympy==1.14.0 ijson==3.4.0
+          sudo apt-get update -qq
+          sudo apt-get install -y cvc5
+          cvc5 --version
+      - name: Exact original 2022 MathProblems eligibility from complete 2026 official archive, then selected original solver proof
+        run: |
+          python -m py_compile research/evidence/r6-2022-mathproblems-official/one_shot_official2026_consensus_unsat8.py
+          python research/evidence/r6-2022-mathproblems-official/one_shot_official2026_consensus_unsat8.py
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/neumann_r6_math2022_first_evidence.json'))
+          assert d['status'] in ('R6_OFFICIAL_ELIGIBILITY_STOP','R6_FIRST_8_FROZEN_TRUE_UNSAT_ORIGINALS_COMPLETE')
+          assert d['Q1_Q7_GLOBAL']=='OPEN' and d['G1']=='HOLD_LEARNING'
+          assert d['no_neural_calls'] and d['no_gpu'] and d['no_paid_calls']
+          if d['status']=='R6_FIRST_8_FROZEN_TRUE_UNSAT_ORIGINALS_COMPLETE':
+              assert len(d['cases'])==8
+              assert len({c['original_sha256'] for c in d['cases']})==8
+          print('R6_SCIENTIFIC_DECISION',d.get('metrics',{}).get('verdict',d['status']))
+          PY
+      - name: Preserve immutable first eligibility and full original-result receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-r6-official2026-grounded-2022-math-unsat-original-first
+          path: /tmp/neumann_r6_math2022_first_evidence.json
+          retention-days: 90
