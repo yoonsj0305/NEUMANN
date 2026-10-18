@@ -32,7 +32,7 @@ This proof is about accepted-certificate-language preservation in that old progr
 | valid independently original-certified UNSAT | 4/27 | 0/9 | **4/36, same across all** |
 | R3 prefilter bypasses | 23/27 | **9/9** | **32/36** |
 
-R3 compared with token-only R2: **1.828366s** less total 36-source stage work, **33.8095%** reduction on one CPU runner; compared with unconditional original, **6.460062s less = 64.3456%** reduction. Note on already R2-screened Hoenicke R3 was ~1.8ms SLOWER, because it had no additional cases to exclude there; all R3 speedup came from rejecting 9/9 Elster before the full heavy SymPy-based certifier. Elster group: 4.062536→2.232401s (**45.05% less stage wall**).
+R3 compared with token-only R2: **1.828366s** less total 36-source stage work, **33.8095%** reduction on one CPU runner; compared with unconditional original, **6.460062s less = 64.3462%** reduction. Note on already R2-screened Hoenicke R3 was ~1.8ms SLOWER, because it had no additional cases to exclude there; all R3 speedup came from rejecting 9/9 Elster before the full heavy SymPy-based certifier. Elster group: 4.062536→2.232401s (**45.05% less stage wall**).
 
 All original four certificates from Hoenicke retained exactly: `modInvStep.smt2`, `modInvStepSimplified.smt2`, `modInvVar1.smt2`, `modSimpleTest.smt2`. No extra counterfeit certificate. This is a **correct-by-construction negative gate for this frozen certifier with directly tested preservation on 36 originals**.
 
