@@ -157,7 +157,6 @@ def verify_source_unsat_from_proven_identity(original_path,candidate):
     if orig_assert_count<1:raise RuntimeError("EMPTY_ORIGINAL_CONSTRAINTS")
     name=candidate["source_var"]
     x=z3.Int(name)
-    p=sum(z3.IntVal(c)*x**d for d,c in candidate["coefficient_by_degree"].items())
     # Implement integer powers with multiplication, never Real power coercion.
     terms=[]
     for d,c in candidate["coefficient_by_degree"].items():
