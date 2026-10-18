@@ -1,4 +1,4 @@
-name: Q3H licensed real C original proof-eligibility syntax inspection
+name: Q3H independently reprove 3 authentic licensed C loop invariants
 on:
   pull_request:
     paths:
@@ -10,7 +10,7 @@ permissions:
 jobs:
   real-proof-eligibility:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
@@ -22,6 +22,37 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Inspect small source-group representative real development examples only
+      - name: Pin C AST frontend and exact Z3 backend
         run: |
-          python research/evidence/q3h-real-source-proof-20261018/inspect_development_examples.py --workbook third_party_loopy/GeneratedInvariants.xlsx --dataset third_party_loopy/dataset.zip
+          python -m pip install --disable-pip-version-check pycparser==2.22 z3-solver==4.13.3.0
+          python -m py_compile research/evidence/q3h-real-source-proof-20261018/replay_real_c_loop_invariants.py
+      - name: Independently verify unchanged licensed C loop source, invariant and postcondition
+        run: |
+          python research/evidence/q3h-real-source-proof-20261018/replay_real_c_loop_invariants.py --workbook third_party_loopy/GeneratedInvariants.xlsx --dataset third_party_loopy/dataset.zip --out /tmp/q3h-first-original-c-proof.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path('/tmp/q3h-first-original-c-proof.json').read_text())
+          assert report['global_q1_q7']=='OPEN'
+          assert report['learned_model_inference_calls']==0
+          assert report['q3f_holdout_source_read'] is False
+          assert report['opened_only_previously_development_real_sources'] is True
+          assert len(report['results'])==3
+          assert report['fully_proven_count']==3
+          for r in report['results']:
+              assert r['source_altered'] is False
+              assert r['license'] in ('APACHE_2_0','BSD_3_CLAUSE','MIT')
+              p=r['proof']
+              assert p['status']=='ALL_ORIGINAL_LOOP_OBLIGATIONS_UNSAT'
+              assert all(p['checks'][k]=='unsat' for k in
+                     ('init','inductive','postcondition','body_signed_overflow','prelude_signed_overflow'))
+              assert p['checks']['mutated_false_postcondition']=='sat'
+              assert p['checks']['weak_constant_true_invariant_postcondition']=='sat'
+          print('Q3H_THREE_AUTHENTIC_ORIGINAL_C_LOOP_INVARIANTS_FORMALLY_REPROVEN')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3h-first-real-source-three-independent-c-induction-receipts
+          path: /tmp/q3h-first-original-c-proof.json
+          retention-days: 60
