@@ -1,0 +1,45 @@
+name: R9 relevant classical cube mod9 specialist vs frozen R8 exact modular 16 x 3
+on:
+  push:
+    branches:
+      - research/r9-specialist-cube-mod9-control-20261018
+    paths:
+      - research/evidence/r9-specialist-cube9/**
+      - .github/workflows/r9-specialist-vs-generic-16x3.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-specialist-strong-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Original generic math dependencies; native classical specialist uses Python standard library only
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.15.4.0 sympy==1.14.0
+          python -m py_compile research/evidence/r9-specialist-cube9/specialist_original_smt_cube9.py
+          python -m py_compile research/evidence/r9-specialist-cube9/one_shot_16_original_3repeat_headroom.py
+      - name: Real original SMT 16 x 3 same-host cold proof specialist versus exact R8 general proof
+        run: |
+          python research/evidence/r9-specialist-cube9/one_shot_16_original_3repeat_headroom.py
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/neumann_r9_specialist_first_repeated.json'))
+          assert d['status']=='R9_FIRST_16_ORIGINALS_THREE_ROUNDS_COMPLETE'
+          assert len(d['measurements'])==48
+          assert len(d['original_sources'])==16
+          assert d['summary']['all_original_certificates_reproduced_in_both_algorithms']
+          assert d['Q1_Q7_GLOBAL']=='OPEN' and d['no_learned_model']
+          print('R9_BOUNDARY',d['summary']['judgement'])
+          PY
+      - name: Retain first 96 original solver proof receipts, all errors and 3-round costs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-r9-first-specialist-versus-r8-generic-16x3
+          path: /tmp/neumann_r9_specialist_first_repeated.json
+          retention-days: 90
