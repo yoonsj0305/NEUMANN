@@ -1,0 +1,45 @@
+name: G0 ORIGINAL 2023 Ultimate NIA 2026 nonanswer frozen three
+on:
+  push:
+    branches:
+      - research/g0-ultimate-2023-nia-real-20261018
+    paths:
+      - research/evidence/g0-ultimate2023-20261018/**
+      - .github/workflows/g0-ultimate-three-original-2026.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  three-source-original-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Existing CPU specialist binaries, NO GPU and NO new training
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.15.4.0 ijson==3.4.0
+          sudo apt-get update -qq
+          sudo apt-get install -y cvc5
+          cvc5 --version
+      - name: Exactly frozen original three on two CPU solvers, original model check
+        run: |
+          python research/evidence/g0-ultimate2023-20261018/first_frozen_three_original_solver.py
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/g0_ultimate_first_original_classical.json'))
+          assert d['status']=='COMPLETE_FROZEN_THREE_ORIGINAL_SPECIALIST_REPLAY'
+          assert len(d['cases'])==3
+          assert all(set(row['arms'])=={'z3','cvc5'} for row in d['cases'])
+          assert d['zero_training'] and d['g1']=='HOLD_LEARNING' and d['global_q1_q7']=='OPEN'
+          print('G0_ULTIMATE_SOURCE_CHECK',d['summary'])
+          PY
+      - name: Preserve ALL first receipts including blocked execution
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g0-ultimate-2023-2026-first-three-original-cpu-control
+          path: /tmp/g0_ultimate_first_original_classical.json
+          retention-days: 90
