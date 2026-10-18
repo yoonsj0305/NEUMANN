@@ -175,7 +175,7 @@ def synthetic_strict_controls():
 
     b_pre=z3.Or(z3.And(x==1,y==1),z3.And(x==2,y==2))
     b_trans=z3.Or(z3.And(x>0,xp==x+y,yp==x+y),
-                  z3.And(x<=0,xp==x,yp==y))
+                  z3.And(x<=0,xp==x,yp==y-5))
     ib,b=test_case("BRANCHING_NON_SINGLETON_INIT",b_pre,b_trans,y>=1,[x,y],[xp,yp])
     assert b["additional_hidden_structure_necessary"]
     assert b["init_counterexamples"]>=1
