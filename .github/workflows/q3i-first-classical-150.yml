@@ -1,0 +1,58 @@
+name: Q3I first all 150 licensed genuine C sources, classical without labels
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3i-150-classical-20261018/**'
+      - 'docs/research/Q3I_SOURCE_ONLY_CLASSICAL_150_PREREG_20261018.md'
+      - '.github/workflows/q3i-first-classical-150.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  freeze-and-execute:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: microsoft/loop-invariant-gen-experiments
+          ref: 91fe89245a0894ec8ad3741d85ae91ce3b552b2e
+          path: third_party_loopy
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Exact pinned C source parser and SMT backend
+        run: |
+          python -m pip install --disable-pip-version-check pycparser==2.22 z3-solver==4.13.3.0
+          python -m py_compile research/evidence/q3i-150-classical-20261018/first_source_only_150.py
+      - name: First full source-only baseline on exactly 150 pinned licensed real sources
+        run: |
+          python research/evidence/q3i-150-classical-20261018/first_source_only_150.py --workbook third_party_loopy/GeneratedInvariants.xlsx --dataset third_party_loopy/dataset.zip --output /tmp/q3i-source-only-first-150.json
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3i-source-only-first-150.json'))
+          assert x['status']=='SOURCE_ONLY_LICENSED_DEVELOPMENT_CORPUS_CLASSICAL_AUDIT_COMPLETE'
+          assert x['source_programs_seen']==150
+          assert x['exact_original_source_hashes_distinct']==150
+          assert len(x['first_originals'])==150
+          assert x['invariant_strings_passed_to_solver'] is False
+          assert x['published_invariant_strings_used_for_generation'] is False
+          assert x['model_training_or_inference_calls']==0
+          assert x['q3f_original_bodies_read'] is False
+          assert x['source_originals_modified'] is False
+          assert x['all_q1_q7']=='OPEN'
+          for rec in x['first_originals']:
+              if rec['proof']['status']=='SOURCE_ONLY_AUTO_INVARIANT_CERTIFIED':
+                  p=rec['proof']['full_original_check']
+                  assert all(p[key]=='unsat' for key in ('initial','inductive','postcondition','signed_overflow'))
+                  assert p['deliberately_false_goal']==p['empty_invariant_goal']=='sat'
+          print('FIRST_FROZEN_Q3I_REAL_SOURCE_ONLY_BOUNDARY_AUDIT_PASSED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3i-first-150-real-source-no-label-classical-houdini-receipt
+          path: /tmp/q3i-source-only-first-150.json
+          retention-days: 60
