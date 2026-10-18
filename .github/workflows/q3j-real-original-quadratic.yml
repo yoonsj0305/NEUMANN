@@ -1,0 +1,53 @@
+name: Q3J first frozen real C quadratic invariant original proof
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3j-polynomial-20261018/**'
+      - 'docs/research/Q3J_QUADRATIC_ORIGINAL_SOURCE_PREREG_20261018.md'
+      - '.github/workflows/q3j-real-original-quadratic.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first-source-only-quadratic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: microsoft/loop-invariant-gen-experiments
+          ref: 91fe89245a0894ec8ad3741d85ae91ce3b552b2e
+          path: third_party_loopy
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned authentic C frontend, exact symbolic verifier and rational algebra
+        run: |
+          python -m pip install --disable-pip-version-check pycparser==2.22 z3-solver==4.13.3.0 sympy==1.13.3
+          python -m py_compile research/evidence/q3j-polynomial-20261018/source_only_quadratic.py
+      - name: First original source SHA-bound semantic polynomial study, preserve negative results
+        run: |
+          python research/evidence/q3j-polynomial-20261018/source_only_quadratic.py --dataset third_party_loopy/dataset.zip --output /tmp/q3j-first-fixed-real-polynomial.json
+          python - <<'PY'
+          import json
+          receipt=json.load(open('/tmp/q3j-first-fixed-real-polynomial.json'))
+          assert receipt['source_sha256']=='7b1ed83d1a2e80a1e5aa97e27a23c7ac1a53bd734cc95808ecce4aa868c41a23'
+          assert receipt['source_byte_modified'] is False
+          assert receipt['external_answer_label_loaded'] is False
+          assert receipt['chc_comp_holdouts_read'] is False
+          assert receipt['all_q1_q7']=='OPEN'
+          if receipt['proof']['status']=='QUADRATIC_CLASSICAL_REAL_ORIGINAL_FULLY_PROVEN':
+              r=receipt['proof']['full_original']
+              assert all(r[k]=='unsat' for k in ('init','inductive','exit_safety','signed_overflow'))
+              assert r['false_goal']==r['empty_invariant']=='sat'
+              assert receipt['proof']['final_quadratic_candidates']>0
+          print('FIXED_REAL_Q3J_OUTCOME_RECORDED_NO_GLOBAL_Q3_PROMOTION')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3j-one-predeclared-original-source-only-quadratic-first-evidence
+          path: /tmp/q3j-first-fixed-real-polynomial.json
+          retention-days: 60
