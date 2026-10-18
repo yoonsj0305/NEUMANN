@@ -1,0 +1,47 @@
+name: R7 MathProblems source-unseen metadata-adapted UNSAT8 original classical transfer
+on:
+  push:
+    branches:
+      - research/r7-math2022-sourcehidden-first8-20261018
+    paths:
+      - research/evidence/r7-math2022-one-official-unsat/**
+      - .github/workflows/r7-math2022-first8-one-official-unsat.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  frozen-original-eight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin free source parser, official metadata streaming and cvc5 native
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.15.4.0 sympy==1.14.0 ijson==3.4.0
+          sudo apt-get update -qq
+          sudo apt-get install -y cvc5
+          cvc5 --version
+      - name: First8 independently chosen 2022 originals, unchanged structural proof versus both native controls
+        run: |
+          python -m py_compile research/evidence/r7-math2022-one-official-unsat/first_eight_2022_originals_bounded.py
+          python research/evidence/r7-math2022-one-official-unsat/first_eight_2022_originals_bounded.py
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/neumann_r7_math2022_first_evidence.json'))
+          assert d['status']=='R7_FIRST_8_FROZEN_TRUE_UNSAT_ORIGINALS_COMPLETE'
+          assert d['total_eligible_origins']==27 and len(d['cases'])==8
+          assert len({x['original_sha256'] for x in d['cases']})==8
+          assert d['Q1_Q7_GLOBAL']=='OPEN'
+          assert d['no_neural_calls'] and d['no_gpu'] and d['no_paid_calls']
+          print('R7_FROZEN_SOURCE_FINAL',d['metrics']['verdict'])
+          PY
+      - name: Preserve first actual original receipt even on technical failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-r7-math2022-first-8-source-hidden-one-official-unsat
+          path: /tmp/neumann_r7_math2022_first_evidence.json
+          retention-days: 90
