@@ -1,0 +1,71 @@
+name: Q3W one-shot oracle-free CEGIS original sources and prospective Q3 transfer gate
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3w-oraclefree-cegis-20261018/**'
+      - 'docs/research/Q3W_ORACLE_FREE_AFFINE_CEGIS_ONE_SHOT_PREREG_20261018.md'
+      - '.github/workflows/q3w-original-cegis-one-shot.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  one-shot-q3-original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39097412364
+          name: q3s-first-affine-last-unopened-two-source-groups-original-3vc
+          github-token: ${{ github.token }}
+          path: /tmp/q3w-prior-q3s-first
+      - name: Install fixed original formal solver and exact mathematics
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.13.3
+          python -m py_compile research/evidence/q3w-oraclefree-cegis-20261018/affine_hull_original_cegis.py
+      - name: Execute FIRST full frozen original CEGIS discovery with all controls and honest failure preservation
+        run: |
+          python research/evidence/q3w-oraclefree-cegis-20261018/affine_hull_original_cegis.py --root external_loopinvgen --q3s-first /tmp/q3w-prior-q3s-first/q3s-first-new-affine-learned-original.json --out /tmp/q3w-first-original-and-fresh-discovery.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/q3w-first-original-and-fresh-discovery.json'))
+          assert d['status']=='ONE_SHOT_Q3W_ORIGINAL_STUDY_COMPLETE'
+          assert d['preregistration_commit']=='93ca73e3a3b5d5abd52285eae59624464115b699'
+          assert d['synthetic_controls']['pass'] is True
+          assert d['previously_opened_case_count']==12
+          assert len(d['newly_selected_frozen_source_groups'])==2
+          assert d['newly_selected_frozen_source_count']>=4
+          assert len(d['all_original_case_receipts'])==d['original_source_count']
+          assert len(set(x['source_blob'] for x in d['all_original_case_receipts']))==d['original_source_count']
+          assert d['trained_neural_forward_calls']==0
+          assert d['gold_labels_or_precomputed_original_solutions_used'] is False
+          assert d['classical_specialist_invariant_leakage'] is False
+          assert d['q3f_two_sealed_chc_originals_opened'] is False
+          assert d['global_Q1_Q7']=='OPEN'
+          for x in d['all_original_case_receipts']:
+              if x.get('original_full_three_vc_status')=='ORIGINAL_FULL_3VC_CERTIFIED':
+                  assert all(v=='unsat' for v in x['original_full_three_vc_components'].values())
+                  assert all(v=='unsat' for v in x['original_native_semantic_xor'].values())
+                  assert x['original_pre_sat']=='sat'
+                  assert x['original_not_post_sat']=='sat'
+          # A real prospective FAIL is a genuine scientific outcome, not a broken CI.
+          print('Q3W_ONE_SHOT_RETAINED_FIRST_TRUE_OUTCOME',d['fresh_transfer_strict_Q3_candidate_pass'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3w-first-oracle-free-cegis-authentic-original-proofs-and-negative-outcomes
+          path: /tmp/q3w-first-original-and-fresh-discovery.json
+          retention-days: 90
