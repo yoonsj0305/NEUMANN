@@ -1,0 +1,69 @@
+name: Q3T original mixed Bool Int source proof validity and previously unsupported ten
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3t-mixed-original-20261018/**'
+      - 'docs/research/Q3T_MIXED_SORT_ORIGINAL_SYGUS_PREREG_20261018.md'
+      - '.github/workflows/q3t-mixed-original-semantics.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  mixed-original-source-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39097412364
+          name: q3s-first-affine-last-unopened-two-source-groups-original-3vc
+          github-token: ${{ github.token }}
+          path: /tmp/q3t-first-q3s
+      - name: Install original exact SMT backend
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/q3t-mixed-original-20261018/mixed_sygus_original.py
+      - name: Fixed ten genuine ORIGINAL SyGuS mixed Int/Bool formal proof, negative controls
+        run: |
+          python research/evidence/q3t-mixed-original-20261018/mixed_sygus_original.py --root external_loopinvgen --q3s-first /tmp/q3t-first-q3s/q3s-first-new-affine-learned-original.json --out /tmp/q3t-first-original-mixed-ten.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3t-first-original-mixed-ten.json'))
+          assert r['study']=='Q3T_MIXED_BOOL_INT_ORIGINAL_SYGUS_SEMANTIC_CORRECTNESS_HARDENING'
+          assert r['original_source_count']==10
+          assert r['adversarial_mixed_original_controls']['controls_all_pass']
+          assert r['trained_neural_inference_calls']==0
+          assert not r['learned_new_math_operator']
+          assert not r['chc_comp_Q3F_sealed_originals_opened']
+          assert not r['source_or_formula_text_redistributed']
+          assert r['global_Q1_Q7']=='OPEN'
+          assert len(set(x['original_source_git_blob'] for x in r['first_original_file_receipts']))==10
+          for case in r['first_original_file_receipts']:
+              if case.get('original_direct_safety_proven'):
+                  assert case['original_pre_sat']=='sat'
+                  assert case['original_not_post_sat']=='sat'
+                  assert case['direct_original_bad_exit']=='unsat'
+              if case.get('original_proof_carried_typed_ast'):
+                  assert case.get('original_direct_safety_proven')
+                  assert all(all(y[k]=='unsat' for k in ('initial','consecution','post'))
+                      for y in case['original_inductive_cover_three_vc'])
+          print('Q3T_FIRST_FIXED_ORIGINAL_MIXED_SORT_SOURCE_HARDENING_PROOF_ADMITTED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3t-first-original-bool-int-ten-typed-source-proof-and-negative-controls
+          path: /tmp/q3t-first-original-mixed-ten.json
+          retention-days: 90
