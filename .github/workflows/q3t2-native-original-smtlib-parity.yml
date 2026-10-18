@@ -1,0 +1,66 @@
+name: Q3T2 native SMTLIB parser parity and independently original CHC/3VC Fig3 certification
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3t2-native-original-20261018/**'
+      - 'docs/research/Q3T2_NATIVE_ORIGINAL_SOURCE_PARSER_PARITY_PREREG_20261018.md'
+      - '.github/workflows/q3t2-native-original-smtlib-parity.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  native-and-custom-original-soundness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39098626092
+          name: q3t-first-original-bool-int-ten-typed-source-proof-and-negative-controls
+          github-token: ${{ github.token }}
+          path: /tmp/q3t2-first-receipt
+      - name: Install original Z3 4.13.3.0 and check independent parser script syntax
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/evidence/q3t2-native-original-20261018/native_smtlib_source_parity.py
+      - name: Independent native SMTLIB source + original 3VC and direct CHC proof
+        run: |
+          python research/evidence/q3t2-native-original-20261018/native_smtlib_source_parity.py --root external_loopinvgen --q3t-first /tmp/q3t2-first-receipt/q3t-first-original-mixed-ten.json --out /tmp/q3t2-native-source-full-original-proof.json
+          python - <<'PY'
+          import json
+          o=json.load(open('/tmp/q3t2-native-source-full-original-proof.json'))
+          assert o['status']=='ONE_AUTHENTIC_MIXED_INT_BOOL_SOURCE_NATIVE_SEMANTIC_PARITY_AND_3VC_PROVEN'
+          assert o['original_int_state_vars']==2 and o['original_bool_state_vars']==1
+          assert all(x=='unsat' for x in o['independently_native_parsed_pre_trans_post_xor'].values())
+          assert o['intentionally_negated_pre_semantic_control']=='sat'
+          assert o['native_original_pre_sat']=='sat'
+          assert o['native_original_not_post_sat']=='sat'
+          assert o['native_direct_spacer_original_proof']['status']=='unsat'
+          assert o['native_source_original_3vc_proven_cover_count']>=1
+          for q in o['native_source_original_3vc_proven_cover_certificates']:
+              assert q['initial']==q['consecution']==q['post']=='unsat'
+          assert o['native_parser_is_different_implementation_from_custom_compiler'] is True
+          assert o['solver_backend_is_same_Z3_not_independent_theorem_provers'] is True
+          assert o['new_neural_model_training_or_inference']==0
+          assert o['q3f_two_sealed_chc_benchmarks_opened'] is False
+          assert o['global_q1_q7']=='OPEN'
+          print('Q3T2_REAL_ORIGINAL_NATIVE_SOURCE_SEMANTICS_AND_ORIGINAL_INVARIANT_PROVEN')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3t2-first-native-original-mixed-bool-int-3vc-certificate
+          path: /tmp/q3t2-native-source-full-original-proof.json
+          retention-days: 90
