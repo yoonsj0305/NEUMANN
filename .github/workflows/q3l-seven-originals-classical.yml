@@ -1,0 +1,63 @@
+name: Q3L first exact seven authentic original C classical composition
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3l-seven-originals-20261018/**'
+      - 'research/evidence/q3k-chc-spacer-20261018/first_source_only_direct_chc.py'
+      - 'docs/research/Q3L_SEVEN_ADDITIONAL_ORIGINALS_FREEZE_20261018.md'
+      - '.github/workflows/q3l-seven-originals-classical.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first-seven:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: microsoft/loop-invariant-gen-experiments
+          ref: 91fe89245a0894ec8ad3741d85ae91ce3b552b2e
+          path: third_party_loopy
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin exact C frontend and Z3 specialist solver
+        run: |
+          python -m pip install --disable-pip-version-check pycparser==2.22 z3-solver==4.13.3.0
+          python -m py_compile research/evidence/q3l-seven-originals-20261018/first_seven_untested.py
+      - name: First all-seven unchanged C source-only specialist composition audit
+        run: |
+          python research/evidence/q3l-seven-originals-20261018/first_seven_untested.py --dataset third_party_loopy/dataset.zip --output /tmp/q3l-first-seven.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3l-first-seven.json'))
+          assert r['registered_source_count']==7
+          assert r['actual_evaluated_source_count']==7
+          assert len(r['cases'])==7
+          assert len({x['source_sha256'] for x in r['cases']})==7
+          assert r['controls_all_pass'] is True
+          assert r['original_publication_answer_labels_used'] is False
+          assert r['neural_model_training_or_inference_calls']==0
+          assert r['q3f_sealed_chc_originals_opened'] is False
+          assert r['global_q1_q7']=='OPEN'
+          for x in r['cases']:
+              assert x['source_unmodified'] is True
+              if x['status']=='CLASSICAL_SPECIALISTS_COMPOSED_ORIGINAL_C_PROVEN':
+                  g=x['composition_gate']
+                  assert g['original_prelude_no_signed_overflow'] is True
+                  assert g['original_reachable_bad_exit_absent'] is True
+                  assert (g['source_only_houdini_legal_step_certificate'] or
+                          g['direct_chc_bad_overflow_absent'])
+                  assert g['same_original_state_variables'] is True
+                  assert x['bounded_actual_bad_exit_check']['classification']!='ACTUAL_REACHABLE_BAD_EXIT_WITHIN_BOUND'
+          print('Q3L_FIRST_EXACT_SEVEN_RECORDED_WITH_NO_CHERRY_PICKING')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3l-first-seven-authentic-original-C-classical-composition
+          path: /tmp/q3l-first-seven.json
+          retention-days: 90
