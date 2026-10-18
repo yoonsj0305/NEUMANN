@@ -41,7 +41,8 @@ def main():
                 if key is not None:
                     assert key not in statuses
                     statuses[key]=rec["status"].lower()
-        assert len(reported)==len(statuses)==134
+        assert len(reported)==134, 'FROZEN_COMPETITION_SELECTED_134_DRIFT'
+        assert set(reported).issubset(set(statuses)), 'SELECTED_SOURCE_NOT_IN_FULL_INDEX'
         noanswers={key for key,solver in reported.items()
                    if not any(x in ("sat","unsat") for x in solver.values())}
         assert len(noanswers)==18
