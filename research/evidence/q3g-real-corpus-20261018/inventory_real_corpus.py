@@ -5,7 +5,7 @@ No third-party program text or model-target content is committed or distributed.
 No claim of independent original verification until per-instance recheck.
 """
 from __future__ import annotations
-import argparse,collections,hashlib,json,re,zipfile
+import argparse,collections,hashlib,io,json,re,zipfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -28,7 +28,7 @@ def git_blob(raw):
 
 def workbook_tables(raw):
     tables={}
-    with zipfile.ZipFile(raw) as z:
+    with zipfile.ZipFile(io.BytesIO(raw)) as z:
         shared=[]
         if "xl/sharedStrings.xml" in z.namelist():
             shared_xml=ET.fromstring(z.read("xl/sharedStrings.xml"))
