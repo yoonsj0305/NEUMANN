@@ -33,7 +33,7 @@ def run(root,first_receipt_file):
     train=[x for x in sources if x["split"]=="TRAIN" and
            x["parse_status"]=="OK" and x["input_precondition_sat"]=="sat"]
     test=[x for x in sources if x["split"]!="TRAIN"]
-    indexed={(x["path"],x["source_sha"]) for x in prior["evaluation_original_records"]}
+    indexed={(x["original_path"],x["original_sha"]) for x in prior["evaluation_original_records"]}
     if {(x["path"],x["source_sha"]) for x in test}!=indexed:
         raise ValueError("POSTHOC_TEST_ORIGINALS_DIFFER_FROM_FIRST_MODEL")
     oracle_specs=[]
@@ -52,7 +52,7 @@ def run(root,first_receipt_file):
     statuses=collections.Counter()
     for testsource in test:
         old=next(x for x in prior["evaluation_original_records"]
-                 if x["source_sha"]==testsource["source_sha"])
+                 if x["original_sha"]==testsource["source_sha"])
         case={
             "source_path":testsource["path"],"source_sha":testsource["source_sha"],
             "split":testsource["split"],"origin_group":testsource["group"],
