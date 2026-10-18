@@ -1,0 +1,48 @@
+name: R8 first exact modular arithmetic theorem and source-hidden next-eight original trial
+on:
+  push:
+    branches:
+      - research/r8-modular-obstruction-2022-16-20261018
+    paths:
+      - research/evidence/r8-modular-obstruction/**
+      - .github/workflows/r8-modular-unsat-dev-holdout-once.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-modular-certificate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Exact original Z3 AST, independent SymPy verifier, official dataset and native cvc5
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.15.4.0 sympy==1.14.0 ijson==3.4.0
+          sudo apt-get update -qq
+          sudo apt-get install -y cvc5
+          cvc5 --version
+          python -m py_compile research/evidence/r8-modular-obstruction/exact_polynomial_remainder_certificate.py
+          python -m py_compile research/evidence/r8-modular-obstruction/first16_math2022_dev_plus_holdout.py
+      - name: One original arithmetic proof pilot, first eight development and NEXT eight unviewed source texts
+        run: |
+          python research/evidence/r8-modular-obstruction/first16_math2022_dev_plus_holdout.py
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/neumann_r8_math2022_first_evidence.json'))
+          assert r['status']=='R8_FIRST_16_EXACT_ORIGINAL_MODULAR_VERIFIED'
+          assert len(r['cases'])==16
+          assert len(set(c['original_sha256'] for c in r['cases']))==16
+          assert len([c for c in r['cases'] if c['cohort'].startswith('unopened')])==8
+          assert r['Q1_Q7_GLOBAL']=='OPEN' and r['no_neural_model']
+          print('R8_MATHEMATICAL_CONCLUSION',r['metrics']['interpretation'])
+          PY
+      - name: Preserve first exact original-source proof certificates and every failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-r8-first-modular-proof-dev8-sourcehidden8
+          path: /tmp/neumann_r8_math2022_first_evidence.json
+          retention-days: 90
