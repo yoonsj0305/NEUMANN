@@ -40,10 +40,7 @@ jobs:
           PY
       - name: Match real program bytes and labeled invariant identities, screen duplicate/source group/license
         run: |
-          python research/evidence/q3g-real-corpus-20261018/link_real_invariants.py \\
-            --workbook third_party_loopy/GeneratedInvariants.xlsx \\
-            --dataset third_party_loopy/dataset.zip \\
-            --output /tmp/q3g-real-joined.json
+          python research/evidence/q3g-real-corpus-20261018/link_real_invariants.py --workbook third_party_loopy/GeneratedInvariants.xlsx --dataset third_party_loopy/dataset.zip --output /tmp/q3g-real-joined.json
           python - <<'PY'
           import json
           r=json.load(open('/tmp/q3g-real-joined.json'))
