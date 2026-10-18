@@ -38,9 +38,33 @@ jobs:
           print('Q3G_DATA_ASSET_AUTHENTIC_AND_NONBLIND_INVENTORY')
           for t in r['xlsx_sheets']:print('SHEET_HEADERS',t['name'],t['first_two_row_metadata'])
           PY
+      - name: Match real program bytes and labeled invariant identities, screen duplicate/source group/license
+        run: |
+          python research/evidence/q3g-real-corpus-20261018/link_real_invariants.py \\
+            --workbook third_party_loopy/GeneratedInvariants.xlsx \\
+            --dataset third_party_loopy/dataset.zip \\
+            --output /tmp/q3g-real-joined.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3g-real-joined.json'))
+          assert r['status']=='SOURCE_INVARIANT_IDENTITY_LINKED_NOT_TRAINED'
+          assert r['q3f_competition_targets_read'] is False
+          assert r['licensed_training_admitted'] is False
+          assert r['source_invariant_independently_reproven'] is False
+          assert r['model_trained'] is False and r['global_q1_q7']=='OPEN'
+          assert r['metrics']['matched_rows']>0
+          print('Q3G_ACTUAL_MATCHED_SOURCE_PAIRS',r['metrics']['matched_rows'])
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: q3g-real-loopy-original-program-verified-invariant-asset-first-inventory
           path: /tmp/q3g-real-inventory.json
+          retention-days: 60
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3g-authentic-loopy-program-invariant-matched-sha-only-first
+          path: /tmp/q3g-real-joined.json
           retention-days: 60
