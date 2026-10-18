@@ -1,0 +1,45 @@
+name: G0 27 original strict CPU counterfactual Z3 cvc5
+on:
+  push:
+    branches:
+      - research/g0-hoenicke-newton-exact-integer-20261018
+    paths:
+      - research/evidence/g0-newton-hoenicke27/first_whole_27_z3_cvc5_comparator.py
+      - .github/workflows/g0-newton-27-classical-control.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-classical-comparator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pinned Z3 original parser and repository cvc5
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.15.4.0 sympy==1.14.0
+          sudo apt-get update -qq
+          sudo apt-get install -y cvc5
+          cvc5 --version
+      - name: Run original all 27 for both ordinary SMT solvers, 3s wall each
+        run: |
+          python research/evidence/g0-newton-hoenicke27/first_whole_27_z3_cvc5_comparator.py
+          python - <<'PY'
+          import json
+          p='/tmp/g0_newton27_classical_three_sec_first.json'
+          r=json.load(open(p))
+          assert r['status']=='COMPLETE_ALL_27_TWOSOLVER_DEVELOPMENT_CONTROL'
+          assert len(r['cases'])==27
+          assert sum(int(c['previously_proved_by_source_algorithm']) for c in r['cases'])==4
+          assert r['G1']=='HOLD_LEARNING' and r['Q1_Q7_global']=='OPEN'
+          PY
+      - name: Preserve full original-source comparator or first failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g0-newton27-z3-cvc5-3second-entire-first
+          path: /tmp/g0_newton27_classical_three_sec_first.json
+          retention-days: 90
