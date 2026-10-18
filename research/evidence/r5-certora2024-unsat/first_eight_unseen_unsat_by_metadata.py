@@ -196,8 +196,8 @@ def main():
   z3wall=sum(r["z3"]["wall_s"] for r in rows)
   cvc5wall=sum(r["cvc5"]["wall_s"] for r in rows)
   hybridwall=sum(r["hybrid"]["full_case_wall_s"] for r in rows)+receipt["hybrid_engine_fetch_init_wall_s"]
-  if sourceproofs and extra and hybridcorrect>max(z3correct,cvc5correct) and
-      hybridwall<=min(z3wall,cvc5wall):
+  if (sourceproofs and extra and hybridcorrect>max(z3correct,cvc5correct) and
+      hybridwall<=min(z3wall,cvc5wall)):
    outcome="RESTRICTED_NEW_SOURCE_MATH_PROOF_AND_TWO_BASELINE_COST_GO"
   elif not sourceproofs:outcome="FAIL_NO_NEW_SOURCE_EXACT_CERTIFICATE_STOP"
   elif not extra:outcome="NO_GO_NO_UNIQUE_EXTRA_VS_TWO_BASELINES"
