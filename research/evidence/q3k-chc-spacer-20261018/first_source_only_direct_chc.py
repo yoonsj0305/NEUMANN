@@ -53,7 +53,7 @@ def model_semantics(original):
     base=z3.And(assumptions,z3.Not(pre_bad),init_signed)
     return m,names,base,prelude_status,step
 
-def source_fixedpoint(m,names,base,arith):
+def source_fixedpoint(m,names,base,arith,requested=("exit_safety","signed_step_overflow")):
     h=m["loop_state"]
     init=m["after_prelude"]
     vals=[h[n] for n in names]
@@ -78,6 +78,7 @@ def source_fixedpoint(m,names,base,arith):
                               z3.Not(m["post_assert"])))
     result={}
     for title,goal in (("exit_safety",exitbad()),("signed_step_overflow",overbad())):
+        if title not in requested:continue
         started=time.perf_counter_ns()
         try:
             q=fp.query(goal)
