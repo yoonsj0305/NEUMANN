@@ -1,0 +1,57 @@
+name: G0 first 18 frozen original source modern classical comparison
+on:
+  push:
+    branches:
+      - 'research/g0-sq2026-per-task-union-20261018'
+    paths:
+      - 'research/evidence/g0-fast-close-smtcomp26/first_original_18_modern_classical_replay.py'
+      - '.github/workflows/g0-first-mathproblems18-modern-classical.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-mathproblems-18-two-arm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: MarekDanco/qfn2l
+          ref: ca83ce1a7b81aa78520c06360aaf4724f7f8c963
+          path: external_qfn2l
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Exact original code and official metadata reader, NO neural model
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.15.4.0 ijson==3.4.0
+          python -m py_compile research/evidence/g0-fast-close-smtcomp26/first_original_18_modern_classical_replay.py
+      - name: All 18 original tasks, same wall and original source, independent original SAT model check
+        run: |
+          python research/evidence/g0-fast-close-smtcomp26/first_original_18_modern_classical_replay.py
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/g0_mathproblems18_first_modern_classical_replay.json'))
+          assert r['status']=='FIRST_18_MODERN_CLASSICAL_SOURCE_CASES_ATTEMPTED'
+          assert len(r['cases'])==18
+          assert r['exact_original_metadata_counts']=={'sat':13,'unknown':5}
+          assert r['paper_qfn2l_cpp_replication'] is False
+          assert r['zero_neural_forwards']
+          assert r['g1']=='HOLD_LEARNING'
+          assert r['global_Q1_Q7']=='OPEN'
+          for row in r['cases']:
+              assert set(row['arms'])=={'z3','qfn2l'}
+              for v in row['arms'].values():
+                  assert v['model_values_not_exported']
+                  if v['source_model_validation']['status']=='SOURCE_ORIGINAL_MODEL_VERIFIED':
+                      assert v['solver_reported_answer']=='sat'
+          PY
+      - name: Preserve first outcome even when a source or solver fails
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g0-first-mathproblems18-strong-classical-source-proofs
+          path: /tmp/g0_mathproblems18_first_modern_classical_replay.json
+          retention-days: 90
