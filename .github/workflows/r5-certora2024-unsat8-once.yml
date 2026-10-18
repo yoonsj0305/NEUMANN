@@ -1,0 +1,53 @@
+name: R5 FROZEN unseen 2024 Certora UNSAT eight from 41
+on:
+  push:
+    branches:
+      - research/r5-certora2024-unsat8-frozen-20261018
+    paths:
+      - research/evidence/r5-certora2024-unsat/**
+      - .github/workflows/r5-certora2024-unsat8-once.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-fresh-unsat-family:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin Z3 4.15.4 and native cvc5 and source-lemma dependencies
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.15.4.0 sympy==1.14.0
+          sudo apt-get update -qq
+          sudo apt-get install -y cvc5
+          cvc5 --version
+      - name: Frozen selection from all 41 original status headers then exact 8 original 3-arm tests
+        run: |
+          python -m py_compile research/evidence/r5-certora2024-unsat/first_eight_unseen_unsat_by_metadata.py
+          python research/evidence/r5-certora2024-unsat/first_eight_unseen_unsat_by_metadata.py
+          python - <<'PY'
+          import json
+          p='/tmp/r5_certora2024_frozen_unsat8_first.json'
+          j=json.load(open(p))
+          assert j['status'] in (
+              'R5_FIRST_EIGHT_2024_UNSAT_ALL_ARMS_COMPLETE',
+              'R5_ELIGIBILITY_FAIL_INSUFFICIENT_SOURCE_UNSAT_STOP')
+          assert len(j['directory_manifest'])==41
+          if j['status']=='R5_FIRST_EIGHT_2024_UNSAT_ALL_ARMS_COMPLETE':
+              assert len(j['tasks'])==8
+              assert len({x['source_sha256'] for x in j['tasks']})==8
+              assert all(x['source_status_for_selection_ONLY']=='unsat' for x in j['directory_manifest']
+                  if any(x['name']==s['source_name'] for s in j['tasks']))
+          assert j['Q1_Q7_GLOBAL']=='OPEN' and j['neural_forwards']==0
+          print('NEUMANN_R5_FROZEN_DECISION',j.get('metrics',{}).get('preregistered_single_family_decision',j['status']))
+          PY
+      - name: Immutable FIRST full original 41 manifest and selected result archive
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5-first-new-2024-certora-original-unsat8-audit
+          path: /tmp/r5_certora2024_frozen_unsat8_first.json
+          retention-days: 90
