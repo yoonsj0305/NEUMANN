@@ -8,10 +8,11 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
 jobs:
   freeze-and-execute:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
@@ -50,6 +51,49 @@ jobs:
                   assert p['deliberately_false_goal']==p['empty_invariant_goal']=='sat'
           print('FIRST_FROZEN_Q3I_REAL_SOURCE_ONLY_BOUNDARY_AUDIT_PASSED')
           PY
+      - name: Load immutable frozen Q3G actual real-source neural checkpoint + first receipt
+        uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39082129492
+          name: q3g-real-cpu-trained-invariant-model-first-raw-receipts
+          github-token: ${{ github.token }}
+          path: /tmp/q3i-neural-frozen
+      - name: Load immutable Q3I first 150-source classical evidence (not recomputed)
+        uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39084573345
+          name: q3i-first-150-real-source-no-label-classical-houdini-receipt
+          github-token: ${{ github.token }}
+          path: /tmp/q3i-classical-frozen
+      - name: Install same PyTorch/NumPy inference interface for previously trained model
+        run: |
+          python -m pip install --disable-pip-version-check numpy==1.26.4
+          python -m pip install --disable-pip-version-check --index-url https://download.pytorch.org/whl/cpu torch==2.5.1
+      - name: Exact original-C proof of 32 frozen neural outputs vs source-only classical 6
+        run: |
+          python research/evidence/q3i-150-classical-20261018/frozen_neural_same32_original_proof.py --checkpoint /tmp/q3i-neural-frozen/first-frozen-real-source.pt --trained-receipt /tmp/q3i-neural-frozen/first_train_receipt.json --classical-receipt /tmp/q3i-classical-frozen/q3i-source-only-first-150.json --dataset third_party_loopy/dataset.zip --out /tmp/q3i-neural-paired-originals.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3i-neural-paired-originals.json'))
+          assert r['actual_original_c_sources_evaluated']==32
+          assert r['unmodified_original_source_count']==32
+          assert r['classical_whole_original_safety_proofs']==6
+          assert r['train_test_source_sha_overlap']==0
+          assert r['model_was_retrained'] is False
+          assert r['reference_input_originals_only'] is True
+          assert r['q3f_competition_escrow_bodies_accessed'] is False
+          assert r['global_q1_q7']=='OPEN'
+          assert len(r['per_original'])==32
+          print('FROZEN_SAME_SOURCE_32_ORIGINAL_PROOF_PAIR_REPLAY_COMPLETE',r['neural_whole_original_safety_proofs'],r['classical_whole_original_safety_proofs'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3i2-frozen-original-32-neural-vs-classical-true-proof
+          path: /tmp/q3i-neural-paired-originals.json
+          retention-days: 60
       - uses: actions/upload-artifact@v4
         if: always()
         with:
