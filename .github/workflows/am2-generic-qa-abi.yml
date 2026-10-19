@@ -1,0 +1,34 @@
+name: AM2 generic public QA ABI boundary (engineering only)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/am2-generic-qa-abi.yml'
+      - 'neumann1/am2_generic_qa_abi.py'
+      - 'tests/test_am2_generic_qa_abi.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  public-only-boundary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Static compile generic ABI without loading Gemma/GPU
+        run: |
+          python -m py_compile neumann1/am2_generic_qa_abi.py tests/test_am2_generic_qa_abi.py
+      - name: Public/private boundary tests (engineering, no model)
+        run: |
+          set -o pipefail
+          python -m unittest discover -s tests -p test_am2_generic_qa_abi.py -v 2>&1 | tee /tmp/am2_qa_abi_first.txt
+          sha256sum /tmp/am2_qa_abi_first.txt
+      - name: Preserve first engineering verification log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: am2-generic-public-qa-boundary-first
+          path: /tmp/am2_qa_abi_first.txt
+          if-no-files-found: warn
