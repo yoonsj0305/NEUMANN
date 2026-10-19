@@ -68,7 +68,8 @@ def expr_for(coeff,base,driver,target):
               sp.factorial(k) for k,c in enumerate(coeff)))
  num,den=sp.fraction(sp.together(symbolic))
  poly=sp.Poly(num,n)
- rhs=z3.Sum(*[int(c)*_power(driver,p[0]) for p,c in poly.terms()])
+ parts=[int(c)*_power(driver,p[0]) for p,c in poly.terms()]
+ rhs=parts[0] if len(parts)==1 else z3.Sum(*parts) if parts else z3.IntVal(0)
  return target*int(den)==rhs,str(symbolic)
 
 def _power(var,degree):
