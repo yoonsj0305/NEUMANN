@@ -1,0 +1,32 @@
+name: G0 qfn2l C++ pinned specialist build qualification
+on:
+  push:
+    branches:
+      - research/g0-qfn2l-cpp-build-qual-20261019
+    paths:
+      - '.github/workflows/g0-qfn2l-cpp-build-qualification.yml'
+      - 'research/evidence/g0-qfn2l-cpp-qualification-20261019/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build-qualification-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Confirm preregistered build script identity
+        run: |
+          echo 'a564b6f8fe88be4affe0fa0ed8da1ed3db9df3dcc730963eccd07ca86d76771a  research/evidence/g0-qfn2l-cpp-qualification-20261019/first_build_gate.sh' | sha256sum -c -
+      - name: One frozen upstream C++ build qualification (NO original benchmark)
+        run: bash research/evidence/g0-qfn2l-cpp-qualification-20261019/first_build_gate.sh
+      - name: Record actual phase / scientific authority
+        if: always()
+        run: |
+          if [ -f build_audit/summary.json ]; then cat build_audit/summary.json; else echo '{"status":"CI_PREBUILD_BLOCKED","scientific_original_tasks_run":0,"g0_full":"OPEN"}'; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g0-cpp-specialist-first-build-qualification
+          path: build_audit/**
+          if-no-files-found: warn
