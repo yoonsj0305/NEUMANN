@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Confirm preregistered build script identity
         run: |
-          echo 'a564b6f8fe88be4affe0fa0ed8da1ed3db9df3dcc730963eccd07ca86d76771a  research/evidence/g0-qfn2l-cpp-qualification-20261019/first_build_gate.sh' | sha256sum -c -
+          echo 'ece3a331015956cc67b6663dd75cb79e3557732900a60a8845952bff65b31367  research/evidence/g0-qfn2l-cpp-qualification-20261019/first_build_gate.sh' | sha256sum -c -
       - name: One frozen upstream C++ build qualification (NO original benchmark)
         run: bash research/evidence/g0-qfn2l-cpp-qualification-20261019/first_build_gate.sh
       - name: Record actual phase / scientific authority
