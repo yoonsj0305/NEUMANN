@@ -34,3 +34,19 @@ jobs:
           name: g0-cpp-specialist-first-build-qualification
           path: build_audit/**
           if-no-files-found: warn
+      - name: Enforce recorded qualification verdict AFTER artifact capture
+        run: |
+          python - <<'PY'
+          import json,sys
+          from pathlib import Path
+          f=Path('build_audit/summary.json')
+          if not f.exists():
+            print('BUILD_QUALIFICATION_BLOCKED_NO_SUMMARY')
+            sys.exit(1)
+          r=json.loads(f.read_text())
+          print('SCIENTIFIC_BUILD_VERDICT:',r['status'],'phase:',r['phase'])
+          assert r['scientific_original_tasks_run']==0
+          assert r['g0_full']=='OPEN'
+          if r['status']!='BUILD_QUALIFICATION_PASS':
+            sys.exit(1)
+          PY
