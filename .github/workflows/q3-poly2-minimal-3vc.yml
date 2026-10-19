@@ -1,0 +1,67 @@
+name: Q3 PolyRank minimal two-atom original cross-check
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-poly2-minimal-3vc.yml'
+      - 'research/evidence/q3_polyrank_full_signed_first_20261019/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-bound-original-3vc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: source_official_loopinv
+          persist-credentials: false
+          sparse-checkout: |
+            benchmarks/LIA/2005.ICALP_PolyRank
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin official upstream and immutable original verifier
+        run: |
+          test "$(git -C source_official_loopinv rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+          test "$(git hash-object experiments/q3_source_prove.py)" = a74b62cc97958e06f70116f3c8cec2f6db3d3b75
+          test "$(git hash-object experiments/am2_sygus_native_three_vc_checker.py)" = aca2b543057c968acd8a175e7b1ef8e391ba79b2
+          python -m py_compile research/evidence/q3_polyrank_full_signed_first_20261019/poly2_auto_minimal_exact.py
+          python -m py_compile research/evidence/q3_polyrank_full_signed_first_20261019/poly2_exact_minimum_original_3vc.py
+      - name: Install pinned local CPU and independent external SMT
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cvc5
+          python -m pip install --disable-pip-version-check . sympy==1.13.3 z3-solver==4.13.3.0
+          cvc5 --version
+      - name: Replay min-cardinality and 3 original VCs, unmodified external checker
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_polyrank_full_signed_first_20261019/poly2_exact_minimum_original_3vc.py --source-root source_official_loopinv --out /tmp/q3_poly2_minimal_original_3vc.json | tee /tmp/q3_poly2_minimal_original_3vc.log
+          sha256sum /tmp/q3_poly2_minimal_original_3vc.json
+      - name: Retain first complete scientific result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: poly2-minimal-original-z3-cvc5-first
+          path: |
+            /tmp/q3_poly2_minimal_original_3vc.json
+            /tmp/q3_poly2_minimal_original_3vc.log
+          if-no-files-found: warn
+      - name: Enforce strictly scoped science gate
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,sys
+          d=json.load(open('/tmp/q3_poly2_minimal_original_3vc.json'))
+          assert d['posthoc_already_opened'] and d['first_three_origin_blind_gate']=='FAIL_IMMUTABLE'
+          assert d['global_q1_q7']=='OPEN' and d['new_unseen_origin_count']==0
+          assert d['model_calls']==d['gpu_calls']==d['neural_learning_calls']==0
+          assert all(d['gates'].values()), d['gates']
+          print('POLYRANK_TWO_ATOM_INDEPENDENT_ORIGINAL_3VC_POSTHOC_PASS')
+          PY
