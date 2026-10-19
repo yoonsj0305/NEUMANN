@@ -1,0 +1,7 @@
+# Q3 Mannadiv external solver-version falsification (posthoc)
+
+Frozen source, candidate, three native Pre/Trans/Post, scientific gates EXACTLY unchanged from initial [PR #295](https://github.com/yoonsj0305/NEUMANN/pull/295). First pinned Ubuntu apt cvc5 (~1.1.x) under 3s and three 15s modes gave **Post UNKNOWN** despite original Z3 UNSAT 3/3. This remains a complete negative result and is not replaced.
+
+Experiment ONLY changes independent solver binary to upstream stable **cvc5 1.4.2 (released 2026-10-08)**. Official GitHub asset `https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip`, SHA256 `7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8` via the official GitHub Releases API. Verify byte identity before installation. Same original source SHA/Git blob, same minimal invariant, unchanged native Z3 proof, independent original cvc5 3VC checker with 3-second budget and one extra 15s suite. No neural training, no new grammar, no hidden gold.
+
+If cvc5 1.4.2 returns 3/3 UNSAT, record an independent solver version-dependent **posthoc original source proof**. If Post stays UNKNOWN, preserve it. Under no condition promote global Q3, neural-exclusive novelty, Q4 10x or fresh blind transfer.
