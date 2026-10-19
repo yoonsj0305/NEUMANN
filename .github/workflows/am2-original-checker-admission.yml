@@ -22,6 +22,8 @@ jobs:
       - name: Compile source metadata gate without inference dependencies
         run: |
           python -m py_compile neumann1/am2_original_checker_admission.py tests/test_am2_original_checker_admission.py
+      - name: Install declared NEUMANN runtime dependencies for live gate CLI
+        run: python -m pip install --disable-pip-version-check .
       - name: Original cohort negative controls and actual no-admitted-data receipt
         run: |
           set -o pipefail
