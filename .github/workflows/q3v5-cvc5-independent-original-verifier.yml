@@ -1,0 +1,61 @@
+name: Q3V5 independent cvc5 original source VC audit (verification-only)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3v5-cvc5-independent-original-verifier.yml'
+      - 'research/evidence/q3v5-cvc5-second-solver-20261019/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-independent-cvc5-vcs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Freeze known Q3V4 and Q3V3 and Q3V classical program blobs
+        run: |
+          test "$(git hash-object research/evidence/q3v4-proof-portfolio-20261019/first_integrated_original_portfolio.py)" = c29bea4f93e37911908d32ec443714b907c40806
+          test "$(git hash-object research/evidence/q3v3-octagon-houdini-20261019/first_octagon_original.py)" = b93a19747e642941468dde0fe704bde9034ef550
+          test "$(git hash-object research/evidence/q3v-branch-common-nullspace-20261019/first_original_branch_nullspace.py)" = ce9bd5d1a502d3807e75161e476aedab0ed1ca02
+          test "$(git -C external_loopinvgen rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+      - name: Install native independent cvc5 binary on free CPU runner
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq cvc5
+          cvc5 --version
+      - name: Exact original Z3 invariant --> native external CVC5 second independent proof
+        run: |
+          python -m pip install --disable-pip-version-check sympy==1.13.3 z3-solver==4.13.3.0
+          python -m py_compile research/evidence/q3v5-cvc5-second-solver-20261019/second_backend_first_audit.py
+          python research/evidence/q3v5-cvc5-second-solver-20261019/second_backend_first_audit.py --root external_loopinvgen --out /tmp/q3v5_cvc5_second_solver_first.json
+          sha256sum /tmp/q3v5_cvc5_second_solver_first.json
+      - name: Preserve first independent solver verdict before gate
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3v5-first-independent-cvc5-original-vcs
+          path: /tmp/q3v5_cvc5_second_solver_first.json
+          if-no-files-found: warn
+      - name: Enforce cvc5 actual 18/18 original VCs and 2 SAT mutation controls
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,sys
+          x=json.load(open('/tmp/q3v5_cvc5_second_solver_first.json'))
+          print("SECOND_SOLVER_ACTUAL",x["status"],x.get("original_safety_vcs_independently_unsat"),x.get("negative_controls_sat"))
+          assert x["prior_two_origin_prospective_gate"]=="FIRST_FROZEN_TRANSFER_FAIL_UNCHANGED"
+          if not x.get("gate_pass"):sys.exit(2)
+          assert x["original_safety_vcs_independently_unsat"]==18
+          assert x["negative_controls_sat"]==2
+          print("SIX_OPENED_ORIGINALS_CVC5_SECOND_SOLVER_CERTIFICATES_PASS")
+          PY
