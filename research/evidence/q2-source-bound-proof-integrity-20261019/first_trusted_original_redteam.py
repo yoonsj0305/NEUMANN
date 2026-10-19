@@ -39,6 +39,23 @@ def run(root):
         raise AssertionError("SECOND_ACCELERATION_MUST_BE_POST_ONLY")
     good=[replay_original_source_bound(p,x) for p,x in zip(paths,r)]
     if good!=[True,True]:
+        for src,receipt,is_good in zip(paths,r,good):
+            if is_good:
+                continue
+            second=prove_source(src)
+            keys=("status","source_sha256","source_bytes","selected_route",
+                "verifier_authority","certificate_scope","invariant_sexpr",
+                "invariant_sha256","original_three_vc",
+                "independent_native_custom_parser_xor")
+            print("DIAGNOSTIC_REAL_SOURCE",src.name,
+                "legacy_replay",replay_exported_queries(receipt),
+                "second_status",second.get("status"),
+                "mismatched_fields",[key for key in keys if
+                    receipt.get(key)!=second.get(key)],
+                "smt_script_sha_pairs",{
+                    k:(receipt["original_bad_condition_smt2"][k]["sha256"],
+                       second.get("original_bad_condition_smt2",{}).get(k,{}).get("sha256"))
+                    for k in CHECKS},flush=True)
         raise AssertionError("GENUINE_SOURCE_BOUND_REPLAY_FAILED")
 
     poisoned=copy.deepcopy(r[0])
