@@ -224,17 +224,30 @@ def main():
     p.add_argument("--source",required=True,type=Path)
     p.add_argument("--out",required=True,type=Path)
     args=p.parse_args()
+    overall_start=time.perf_counter_ns()
     result=prove_source(args.source)
+    audit_start=time.perf_counter_ns()
+    original_bound=(
+        result["status"]=="ORIGINAL_SOURCE_THREE_VC_CERTIFIED"
+        and replay_original_source_bound(args.source,result)
+    )
+    result["original_source_bound_replay"]=bool(original_bound)
+    result["source_bound_replay_wall_ms"]=round(
+        (time.perf_counter_ns()-audit_start)/1e6,3)
+    result["complete_wall_ms"]=round(
+        (time.perf_counter_ns()-overall_start)/1e6,3)
+    result["source_only_spacer_not_inductive_3vc"]=(
+        result["status"]=="ORIGINAL_SOURCE_ONLY_SPACER_UNSAT")
     args.out.parent.mkdir(parents=True,exist_ok=True)
     args.out.write_text(json.dumps(result,indent=2,sort_keys=True)+"\n")
     print(json.dumps({"status":result["status"],
           "selected":result.get("selected_route"),
-          "replay_3vc":replay_exported_queries(result),
+          "original_source_bound_replay":bool(original_bound),
+          "source_only_spacer_not_inductive_3vc":
+            result["source_only_spacer_not_inductive_3vc"],
           "original_source_sha256":result.get("source_sha256")}))
     raise SystemExit(0 if (
-        (result["status"]=="ORIGINAL_SOURCE_THREE_VC_CERTIFIED"
-         and replay_exported_queries(result))
-        or result["status"]=="ORIGINAL_SOURCE_ONLY_SPACER_UNSAT"
+        original_bound or result["source_only_spacer_not_inductive_3vc"]
     ) else 2)
 if __name__=="__main__":
     main()
