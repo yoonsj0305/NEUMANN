@@ -1,0 +1,79 @@
+name: AM2 exact live source bound SyGuS checker wired to three arm typed model boundary
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/am2-sygus-typed-three-arm-integration.yml'
+      - 'neumann1/am2_generic_qa_abi.py'
+      - 'neumann1/am2_opened_three_arm_runtime.py'
+      - 'experiments/am2_first_typed_sygus_three_arm_original.py'
+      - 'tests/test_am2_smt_typed_envelope.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  one-live-source-verified-three-arm-boundary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: official_sources
+          persist-credentials: false
+          sparse-checkout: |
+            comp/2018/Inv_Track
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check real source theorem and runner immutable baseline
+        run: |
+          test "$(git -C official_sources rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          test "$(git hash-object experiments/q3_source_prove.py)" = a74b62cc97958e06f70116f3c8cec2f6db3d3b75
+          test "$(git hash-object experiments/am2_sygus_native_three_vc_checker.py)" = aca2b543057c968acd8a175e7b1ef8e391ba79b2
+          test "$(git hash-object neumann1/am2_opened_three_arm_runtime.py)" = d041e8c2ac2a3e1f3b2984a2ee002d923172bcc9
+          python -m py_compile experiments/am2_first_typed_sygus_three_arm_original.py neumann1/am2_generic_qa_abi.py tests/test_am2_smt_typed_envelope.py
+      - name: Install real independent proof validators and original project runtime
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cvc5
+          python -m pip install --disable-pip-version-check . sympy==1.13.3 z3-solver==4.13.3.0
+          cvc5 --version
+      - name: Frozen SMT envelope controls
+        run: |
+          set -o pipefail
+          python -m unittest discover -s tests -p test_am2_smt_typed_envelope.py -v 2>&1 | tee /tmp/am2_smt_typed_envelope_tests.log
+      - name: First actual original checker three-arm execution with visibly synthetic outputs
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python -m experiments.am2_first_typed_sygus_three_arm_original --source-root official_sources --out /tmp/am2_sygus_typed_three_arm_first.json | tee /tmp/am2_sygus_typed_three_arm_first_stdout.log
+          sha256sum /tmp/am2_sygus_typed_three_arm_first.json
+      - name: Always archive the first result and every failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: am2-sygus-typed-three-arm-original-first
+          path: |
+            /tmp/am2_smt_typed_envelope_tests.log
+            /tmp/am2_sygus_typed_three_arm_first.json
+            /tmp/am2_sygus_typed_three_arm_first_stdout.log
+          if-no-files-found: warn
+      - name: Freeze scoped original-checker wiring, no model scientific admission
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,sys
+          r=json.load(open('/tmp/am2_sygus_typed_three_arm_first.json'))
+          assert len(r['cases'])==2
+          assert r['actual_model_calls']==0 and r['gpu_calls']==0
+          assert not r['admitted_opened_cohort_24']
+          assert not r['learned_new_operator_proven']
+          assert r['historical_first_AM1']=='FAIL_UNCHANGED'
+          assert r['sealed_D3']=='BLOCKED' and r['global_Q1_Q7']=='OPEN'
+          print('AM2_FIRST_ORIGINAL_CHECKER_3ARM_INTEGRATION',r['first_engineering_gate_pass'])
+          if not r['first_engineering_gate_pass']:sys.exit(2)
+          print('SCOPED_REAL_CHECKER_WIRING_ONLY_NOT_MODEL_PROOF')
+          PY
