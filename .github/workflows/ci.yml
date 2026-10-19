@@ -498,3 +498,68 @@ jobs:
           if not d["frozen_first_gate_pass"]:sys.exit(2)
           print("BOUNDED_EXTERNAL_3ORIGIN_CLASSICAL_ORIGINAL_PROOF_TRANSFER_SCOPED_PASS_ONLY")
           PY
+
+
+  q3-posthoc-polyrank-full-five-variable-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: source_official_loopinv
+          persist-credentials: false
+          sparse-checkout: |
+            benchmarks/LIA/2005.ICALP_PolyRank
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate frozen original source git and unchanged independent checker
+        run: |
+          test "$(git -C source_official_loopinv rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+          test "$(git hash-object experiments/q3_source_prove.py)" = a74b62cc97958e06f70116f3c8cec2f6db3d3b75
+          test "$(git hash-object experiments/am2_sygus_native_three_vc_checker.py)" = aca2b543057c968acd8a175e7b1ef8e391ba79b2
+          test "$(git hash-object research/evidence/q3_cegar_pre_tight_facets_20261019/first_original_tight_facet.py)" = 6e5c5b1566b0000556e9ab4c231efba0a6293ea7
+          python -m py_compile research/evidence/q3_polyrank_full_signed_first_20261019/first_source_polyrank_linear_potentials.py
+      - name: Install exact native Z3, separately executed cvc5 and source full classical
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cvc5
+          python -m pip install --disable-pip-version-check . sympy==1.13.3 z3-solver==4.13.3.0
+          cvc5 --version
+      - name: FIRST preregistered polyRank exact source FULL signed linear invariant recovery
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3_polyrank_full_signed_first_20261019/first_source_polyrank_linear_potentials.py --source-root source_official_loopinv --out /tmp/q3_polyrank_full_linear_first.json | tee /tmp/q3_polyrank_full_linear_first_stdout.log
+          sha256sum /tmp/q3_polyrank_full_linear_first.json
+      - name: Archive FIRST source output and any failures BEFORE scientific criterion
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-polyrank-full-five-var-first-signed-source-3vc
+          path: |
+            /tmp/q3_polyrank_full_linear_first.json
+            /tmp/q3_polyrank_full_linear_first_stdout.log
+          if-no-files-found: warn
+      - name: Enforce honest posthoc first gate and all global question OPEN markers
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,sys
+          r=json.load(open('/tmp/q3_polyrank_full_linear_first.json'))
+          assert r["preregistered_issue"]==289
+          assert r["historical_first_issue287_three_origin_first"]=="FAIL_IMMUTABLE"
+          assert r["one_already_opened_original_posthoc_only"]
+          assert r["global_Q1_Q7"]=="OPEN"
+          assert not r["unique_neural_learned_operator"]
+          assert r["historical_first_AM1"]=="FAIL_UNCHANGED"
+          assert r["gpu_calls"]==r["model_calls"]==r["paid_api_calls"]==0
+          print("FIRST_POSTHOC_POLYRANK_FULL_SIGNED_SOURCE_GATE",r["first_scoped_dev_pass"])
+          print("ORIGINAL_PREDECLARED_CRITERIA",r["fixed_first_development_gate"])
+          if not r["first_scoped_dev_pass"]:sys.exit(2)
+          print("REAL_ORIGINAL_POLYRANK_FULL_FIVE_VAR_Z3_CVC5_BOUNDED_DEV_PROOF_NOT_Q3_GLOBAL")
+          PY
