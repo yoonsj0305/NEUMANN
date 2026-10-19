@@ -200,7 +200,19 @@ def replay_original_source_bound(path, receipt):
         if set(expected)!=set(("initial","consecution","post")) or set(received)!=set(expected):
             return False
         for key in ("initial","consecution","post"):
-            if expected[key]!=received[key]:
+            if expected[key].get("expected")!="unsat" or received[key].get("expected")!="unsat":
+                return False
+            # Z3 serializer may reorder let-bindings/named assertions between
+            # two executions. Parse each exact query and compare its RAW
+            # assertion AST structure. Never use equivalence/XOR here: two
+            # UNSAT conditions would all be equivalent to arbitrary false!
+            recorded=z3.Solver()
+            recorded.from_string(received[key]["query"])
+            reconstructed=z3.Solver()
+            reconstructed.from_string(expected[key]["query"])
+            actual_assertions=[term.sexpr() for term in recorded.assertions()]
+            source_assertions=[term.sexpr() for term in reconstructed.assertions()]
+            if actual_assertions!=source_assertions or not actual_assertions:
                 return False
         return True
     except Exception:
