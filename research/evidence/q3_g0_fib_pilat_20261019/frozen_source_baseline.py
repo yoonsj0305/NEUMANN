@@ -13,7 +13,7 @@ from experiments.q3_source_prove import (
     all_exact_branch_updates,common_kernels,actual_relation,
     prove_candidate_relation
 )
-from experiments.q3_source_prove import independent_native_bad_query
+from first_proof_gated_lazy_fallback import independent_native_bad_query
 from experiments.am2_sygus_native_three_vc_checker import check_original_candidate
 
 REV="6ac90265b11431c9477dfbd33e3e3380234c0499"
