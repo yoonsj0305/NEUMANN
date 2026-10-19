@@ -1,0 +1,53 @@
+name: Q3V3 fixed 10 originals octagonal Houdini first study
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3v3-octagon-original.yml'
+      - 'research/evidence/q3v3-octagon-houdini-20261019/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  q3v3-one-frozen-original-study:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install exact pinned SMT environment
+        run: python -m pip install --disable-pip-version-check sympy==1.13.3 z3-solver==4.13.3.0
+      - name: Run single pre-registered source study before archive
+        run: |
+          python -m py_compile research/evidence/q3v3-octagon-houdini-20261019/first_octagon_original.py
+          python research/evidence/q3v3-octagon-houdini-20261019/first_octagon_original.py --root external_loopinvgen --out /tmp/q3v3_first_original_receipt.json
+          sha256sum /tmp/q3v3_first_original_receipt.json
+      - name: Preserve first PASS or FAIL receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3v3-first-original-study
+          path: /tmp/q3v3_first_original_receipt.json
+          if-no-files-found: warn
+      - name: Enforce frozen mathematical admission after archiving
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,sys
+          x=json.load(open("/tmp/q3v3_first_original_receipt.json"))
+          assert len(x["first_existing_opened_source_results"]) == 10
+          assert x["training_calls"] == 0 and x["global_Q1_Q7"]=="OPEN"
+          s=x["summary"]
+          print("FROZEN_Q3V3_SCIENCE",s,"JOINT_ADMISSION",x["predeclared_joint_admission"])
+          if not x["predeclared_joint_admission"]:
+              print("FIRST_ADMISSION_FAIL: preserve all ten and no tuning")
+              sys.exit(2)
+          print("FIRST_ADMISSION_PASS: both additional opened originals proof certified, global open")
+          PY
