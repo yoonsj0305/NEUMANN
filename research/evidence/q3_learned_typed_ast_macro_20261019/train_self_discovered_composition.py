@@ -162,7 +162,7 @@ def original_transfer(root,model_ast,classic_ast):
  nat=native_original_relations(forms,original)
  nat.update({"now":original["now"],"next":original["next"]})
  parity=check_parity(original,nat)
- if set(parity)!=set(EXPECTED) or any(v!="unsat" for v in parity.values()):
+ if set(parity)!={"pre","trans","post"} or any(v!="unsat" for v in parity.values()):
   raise ValueError("EXTERNAL_REAL_ORIGINAL_PRE_TRANS_POST_PARITY_MISMATCH")
  if len(original["now"])!=5 or original["num_bool"]!=0:
   raise ValueError("REAL_ORIGINAL_STATE_ARITY_MISMATCH")
