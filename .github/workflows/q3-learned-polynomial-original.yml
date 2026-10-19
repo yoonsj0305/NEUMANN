@@ -1,0 +1,73 @@
+name: Q3 CPU learned polynomial source-original proof (posthoc)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-learned-polynomial-original.yml'
+      - 'research/evidence/q3_learned_polynomial_generator_20261019/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  frozen-cpu-trained-quadratic-original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: official_loopinv
+          sparse-checkout: |
+            benchmarks/NIA/2018.CHI_InvGame
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify original source and unchanged independent proof checker
+        run: |
+          test "$(git -C official_loopinv rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+          test "$(git hash-object experiments/q3_source_prove.py)" = a74b62cc97958e06f70116f3c8cec2f6db3d3b75
+          test "$(git hash-object experiments/am2_sygus_native_three_vc_checker.py)" = aca2b543057c968acd8a175e7b1ef8e391ba79b2
+          python -m py_compile research/evidence/q3_learned_polynomial_generator_20261019/neural_generator.py
+          python -m py_compile research/evidence/q3_learned_polynomial_generator_20261019/original_three_vc.py
+      - name: Install CPU neural and original independent prover
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.17.0 scikit-learn==1.8.0 sympy==1.14.0 z3-solver==4.13.3.0
+          cvc5 --version
+      - name: ONE frozen CPU learn + complete official original Z3 cvc5 source-bound study
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_learned_polynomial_generator_20261019/original_three_vc.py --source-root official_loopinv --out /tmp/q3_learned_poly_first.json | tee /tmp/q3_learned_poly_first.log
+          sha256sum /tmp/q3_learned_poly_first.json
+      - name: Preserve first results including scientific FAIL
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-learned-polynomial-first-authentic-original
+          path: |
+            /tmp/q3_learned_poly_first.json
+            /tmp/q3_learned_poly_first.log
+          if-no-files-found: warn
+      - name: Enforce bounded science gate and global OPEN
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open("/tmp/q3_learned_poly_first.json"))
+          l=x["learning"];o=x["external_original"]
+          assert l["train_examples"]==588 and l["holdout_examples"]==132
+          assert l["holdout_exact_coefficient_vector"]>=100
+          assert l["all_a1_b0_roles_excluded_from_training"]
+          assert all(l["omitted_a1_b0_source_permutation_results"].values())
+          assert all(o["checks"].values()),o["checks"]
+          assert x["novel_mathematical_primitive_absent_training_grammar"] is False
+          assert x["neural_unique_over_strong_exact_classical"] is False
+          assert x["global_Q1_Q7"]==x["global_Q3"]=="OPEN"
+          assert x["first_true_blind_3origin_gate"]=="FAIL_IMMUTABLE"
+          print("CPU_LEARNED_QUADRATIC_GENERATION_REAL_ORIGINAL_POSTHOC_SCOPED_PASS")
+          PY
