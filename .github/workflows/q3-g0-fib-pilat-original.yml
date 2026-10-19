@@ -1,0 +1,69 @@
+name: Q3 G0 first two-source-family exact classical audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-g0-fib-pilat-original.yml'
+      - 'research/evidence/q3_g0_fib_pilat_20261019/**'
+      - 'docs/research/Q3_G0_FIB_PILAT_ORIGINAL_PRE_SOURCE_FREEZE_20261019.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  frozen-classical-headroom-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: official_loopinv
+          sparse-checkout: |
+            benchmarks/NIA/2016.ATVA_PILAT
+            benchmarks/LIA/2017.ASE_FiB
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Original source and frozen G0 harness shape
+        run: |
+          test "$(git -C official_loopinv rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+          python -m py_compile research/evidence/q3_g0_fib_pilat_20261019/frozen_source_baseline.py
+      - name: Strong exact solvers (CPU)
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cvc5
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.14.0 numpy==2.3.5 scipy==1.17.0
+          cvc5 --version
+      - name: First source-unopened frozen 3-case G0 classical-first study
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_g0_fib_pilat_20261019/frozen_source_baseline.py --root official_loopinv --out /tmp/q3_g0_fib_pilat_first.json | tee /tmp/q3_g0_fib_pilat_first.log
+          sha256sum /tmp/q3_g0_fib_pilat_first.json
+      - name: Preserve FIRST actual G0 outcomes, including unknown and failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-g0-two-independent-original-source-groups-first
+          path: |
+            /tmp/q3_g0_fib_pilat_first.json
+            /tmp/q3_g0_fib_pilat_first.log
+          if-no-files-found: warn
+      - name: Anti-cherry-pick identity and honesty gates (does NOT require success)
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_g0_fib_pilat_first.json'))
+          assert len(x['cases'])==3 and x['all_cohort_rows_included']
+          assert x['source_identity_all_verified']
+          assert len({v['source'] for v in x['cases']})==3
+          assert {v['origin_group'] for v in x['cases']}=={'2016.ATVA_PILAT','2017.ASE_FiB'}
+          assert x['neural_training_on_frozen_sources'] is False
+          assert x['global_Q3']==x['global_Q1_Q7']=='OPEN'
+          print('G0_FROZEN_ORIGINAL_IDENTITY_AUDIT_PASS')
+          print('G0_SCIENCE_VERDICT', x['g0_decision'])
+          PY
