@@ -1,0 +1,71 @@
+name: AM2 FIRST real original SyGuS invariant checker with independent cvc5
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/am2-sygus-first-original-checker.yml'
+      - 'experiments/am2_sygus_native_three_vc_checker.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first-two-real-original-proofs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: external_official_sygus
+          persist-credentials: false
+          sparse-checkout: |
+            comp/2018/Inv_Track
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Source identity, immutability and checker compilation
+        run: |
+          test "$(git -C external_official_sygus rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          test "$(git hash-object experiments/q3_source_prove.py)" = a74b62cc97958e06f70116f3c8cec2f6db3d3b75
+          test "$(git hash-object research/evidence/q3v6-lazy-specialist-20261019/first_proof_gated_lazy_fallback.py)" = 7e61c7a3a0ed9d15b354b7b3d67b5adf40517059
+          python -m py_compile experiments/am2_sygus_native_three_vc_checker.py
+      - name: Install fixed real original SMT backends and declared dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cvc5
+          python -m pip install --disable-pip-version-check . sympy==1.13.3 z3-solver==4.13.3.0
+          cvc5 --version
+      - name: First actual original source-bound candidate checker test
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python -m experiments.am2_sygus_native_three_vc_checker --source-root external_official_sygus --out /tmp/am2_real_original_checker_first.json | tee /tmp/am2_real_original_checker_first_stdout.log
+          sha256sum /tmp/am2_real_original_checker_first.json
+      - name: Always preserve first real checker result, including failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: am2-first-real-sygus-original-checker
+          path: |
+            /tmp/am2_real_original_checker_first.json
+            /tmp/am2_real_original_checker_first_stdout.log
+          if-no-files-found: warn
+      - name: Enforce strict first source-bound checker gate with no neural promotion
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,sys
+          x=json.load(open('/tmp/am2_real_original_checker_first.json'))
+          assert x['frozen_original_count']==2
+          assert x['global_Q1_Q7']=='OPEN'
+          assert not x['am2_24_original_cohort_admitted']
+          assert not x['learned_new_operator_proven']
+          assert x['model_calls']==x['gpu_calls']==x['paid_api_calls']==0
+          assert not x['sealed_sources_opened']
+          print('FIRST_REAL_SOURCE_CHECKER',x['first_scoped_checker_pass'])
+          print('ORIGINAL_CHECKS',x['checks'])
+          if not x['first_scoped_checker_pass']:sys.exit(2)
+          print('ONE_REAL_ORIGINAL_CHECKER_MODALITY_SCOPED_PASS')
+          PY
