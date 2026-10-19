@@ -1,0 +1,69 @@
+name: Q3 Mannadiv pinned cvc5 1.4.2 original Post verifier
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-mannadiv-cvc5-142.yml'
+      - 'docs/research/Q3_MANNADIV_CVC5_142_FROZEN_VERSION_CHECK_20261019.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  stable_1_4_2_same_original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: official_loopinv
+          sparse-checkout: |
+            benchmarks/NIA/2016.ATVA_PILAT
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Download only exact signed release binary SHA
+        run: |
+          test "$(git -C official_loopinv rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+          curl -fL --retry 3 -o /tmp/cvc5-142.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5-142.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5142
+          unzip -q /tmp/cvc5-142.zip -d /tmp/cvc5142
+          find /tmp/cvc5142 -type f -name 'cvc5' -print
+          test "$(find /tmp/cvc5142 -type f -name 'cvc5' | wc -l)" -eq 1
+          chmod +x "$(find /tmp/cvc5142 -type f -name 'cvc5' | head -1)"
+          sudo install -m 755 "$(find /tmp/cvc5142 -type f -name 'cvc5' | head -1)" /usr/local/bin/cvc5
+          cvc5 --version
+          cvc5 --version | grep -F '1.4.2'
+      - name: Install original python Z3 checker unchanged
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.14.0 numpy==2.3.5 scipy==1.17.0
+      - name: FIRST pinned latest official cvc5 original 3VC source experiment
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_mannadiv_division_certificate_20261019/verify_minimal_original.py --root official_loopinv --out /tmp/q3_mannadiv_cvc5142_first.json | tee /tmp/q3_mannadiv_cvc5142_first.log
+          sha256sum /tmp/q3_mannadiv_cvc5142_first.json
+      - name: Retain unknown/first result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-mannadiv-cvc5-142-same-original-first
+          path: |
+            /tmp/q3_mannadiv_cvc5142_first.json
+            /tmp/q3_mannadiv_cvc5142_first.log
+          if-no-files-found: warn
+      - name: Do not promote scientific claims
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_mannadiv_cvc5142_first.json'))
+          assert all(x['gates'].values())
+          assert x['global_Q1_Q7']==x['global_Q3']=='OPEN'
+          assert x['learning_unique_over_strong_classical'] is False
+          print("TRUE_INDEPENDENT_ORIGINAL_CVC5_142_RESULT",x['science_verdict'])
+          PY
