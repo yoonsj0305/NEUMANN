@@ -135,7 +135,7 @@ def prove_source(path):
 def replay_exported_queries(receipt):
     """Read-only model-free recheck of shipped solver obligations, NEVER trust a flag."""
     if receipt.get("status")!="ORIGINAL_SOURCE_THREE_VC_CERTIFIED":
-        return receipt.get("status")=="ORIGINAL_SOURCE_ONLY_SPACER_UNSAT"
+        return False
     obligations=receipt.get("original_bad_condition_smt2")
     if type(obligations)!=dict or set(obligations)!=set(EXPECTED):
         return False
@@ -165,8 +165,10 @@ def main():
           "selected":result.get("selected_route"),
           "replay_3vc":replay_exported_queries(result),
           "original_source_sha256":result.get("source_sha256")}))
-    raise SystemExit(0 if result["status"] in (
-        "ORIGINAL_SOURCE_THREE_VC_CERTIFIED",
-        "ORIGINAL_SOURCE_ONLY_SPACER_UNSAT") and replay_exported_queries(result) else 2)
+    raise SystemExit(0 if (
+        (result["status"]=="ORIGINAL_SOURCE_THREE_VC_CERTIFIED"
+         and replay_exported_queries(result))
+        or result["status"]=="ORIGINAL_SOURCE_ONLY_SPACER_UNSAT"
+    ) else 2)
 if __name__=="__main__":
     main()
