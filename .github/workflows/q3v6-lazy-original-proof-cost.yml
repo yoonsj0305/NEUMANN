@@ -1,0 +1,60 @@
+name: Q3V6 first original proof-gated lazy specialist cost study (dev only)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3v6-lazy-original-proof-cost.yml'
+      - 'research/evidence/q3v6-lazy-specialist-20261019/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first-fixed-eight-lazy-versus-specialist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify immutable existing mathematical engine Git blobs
+        run: |
+          test "$(git hash-object research/evidence/q3v4-proof-portfolio-20261019/first_integrated_original_portfolio.py)" = c29bea4f93e37911908d32ec443714b907c40806
+          test "$(git hash-object research/evidence/q3v3-octagon-houdini-20261019/first_octagon_original.py)" = b93a19747e642941468dde0fe704bde9034ef550
+          test "$(git hash-object research/evidence/q3v-branch-common-nullspace-20261019/first_original_branch_nullspace.py)" = ce9bd5d1a502d3807e75161e476aedab0ed1ca02
+          test "$(git -C external_loopinvgen rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+      - name: Install pinned CPU arithmetic and SMT environment
+        run: python -m pip install --disable-pip-version-check sympy==1.13.3 z3-solver==4.13.3.0
+      - name: Execute exact opened eight original source proofs and all-spacer control
+        run: |
+          python -m py_compile research/evidence/q3v6-lazy-specialist-20261019/first_proof_gated_lazy_fallback.py
+          python research/evidence/q3v6-lazy-specialist-20261019/first_proof_gated_lazy_fallback.py --root external_loopinvgen --out /tmp/q3v6_first_lazy_original.json
+          sha256sum /tmp/q3v6_first_lazy_original.json
+      - name: Preserve all eight outcomes, including original failure and timeouts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3v6-first-proof-gated-specialist-original-cpu-evidence
+          path: /tmp/q3v6_first_lazy_original.json
+          if-no-files-found: warn
+      - name: Enforce frozen pre-registered scoped criterion only after archive
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,sys
+          r=json.load(open("/tmp/q3v6_first_lazy_original.json"))
+          s=r["first_summary"]
+          print("FIRST_Q3V6_SCIENTIFIC_SUMMARY",s)
+          assert r["global_Q1_Q7"]=="OPEN"
+          assert r["iso_capability_tenfold_claim"] is False
+          assert r["neural_learning_or_inference_calls"]==0
+          if not s["first_gate_pass"]:
+              print("FIRST_Q3V6_SCIENCE_GATE=FAIL")
+              sys.exit(2)
+          print("FIRST_Q3V6_BOUNDED_LAZY_ORIGINAL_PROOF_GATE=PASS")
+          PY
