@@ -38,9 +38,11 @@ def study(path):
     native = native_original_relations(parsed, original)
     native.update({"now":original["now"],"next":original["next"]})
     now=original["now"]
-    actual_names=[v.decl().name() for v in now]
-    if actual_names!=["c","x","y","x0","y0"]:
-        raise RuntimeError("SOURCE_VARIABLE_ORDER_DRIFT")
+    # The frozen parser alpha-renames source-bound SMT symbols; their names
+    # are not the names in the original synth-inv parameter list. The exact
+    # pinned 695-byte source plus full original semantic XOR check is authority.
+    if len(now)!=5 or original["num_int"]!=5 or original["num_bool"]!=0:
+        raise RuntimeError("SOURCE_INTEGER_STATE_SHAPE_DRIFT")
     parity=check_parity(original,native)
     if set(parity)!={"pre","trans","post"} or any(v!="unsat" for v in parity.values()):
         raise RuntimeError("NATIVE_VS_CUSTOM_ORIGINAL_PARITY_FAIL")
