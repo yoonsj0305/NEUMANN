@@ -1,0 +1,53 @@
+name: Q3V4 integrated original proof portfolio first one-run audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3v4-original-portfolio.yml'
+      - 'research/evidence/q3v4-proof-portfolio-20261019/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  q3v4-ten-original-proofs-and-spacer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install the same exact SMT library dependencies as prior Q3V2/Q3V3
+        run: python -m pip install --disable-pip-version-check sympy==1.13.3 z3-solver==4.13.3.0
+      - name: Run one portfolio vs native source-only SPACER on all original ten
+        run: |
+          python -m py_compile research/evidence/q3v4-proof-portfolio-20261019/first_integrated_original_portfolio.py
+          python research/evidence/q3v4-proof-portfolio-20261019/first_integrated_original_portfolio.py --root external_loopinvgen --out /tmp/q3v4_original_ten_first.json
+          sha256sum /tmp/q3v4_original_ten_first.json
+      - name: Preserve complete first result BEFORE PASS/FAIL gate
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3v4-ten-original-first-portfolio-receipt
+          path: /tmp/q3v4_original_ten_first.json
+          if-no-files-found: warn
+      - name: Enforce frozen all-ten actual original 3VC admission
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,sys
+          x=json.load(open('/tmp/q3v4_original_ten_first.json'))
+          assert len(x['cases'])==10
+          assert x['global_Q1_Q7']=='OPEN'
+          assert not x['source_family_blind'] and x['training_calls']==0
+          print('FROZEN_FIRST_RESULT:',x['summary'],'gate:',x['first_science_gate_pass'])
+          if not x['first_science_gate_pass']:
+              sys.exit(2)
+          assert x['summary']['all_original_three_vc_certified']==10
+          print('FIRST_Q3V4_ORIGINAL_10_3VC_CERTIFICATES_PASS')
+          PY
