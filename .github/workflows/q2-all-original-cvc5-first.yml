@@ -1,0 +1,69 @@
+name: Q2-E1 one independent cvc5 backend verification of 16 original source proofs
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q2-all-original-cvc5-first.yml'
+      - 'research/evidence/q2-all-original-cvc5-20261019/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  strict-second-solver-all-originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Assert unmodified original proof mechanisms and external immutable sources
+        run: |
+          test "$(git -C external_loopinvgen rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+          test "$(git hash-object research/evidence/q3v6-lazy-specialist-20261019/first_proof_gated_lazy_fallback.py)" = 7e61c7a3a0ed9d15b354b7b3d67b5adf40517059
+          test "$(git hash-object research/evidence/q3v4-proof-portfolio-20261019/first_integrated_original_portfolio.py)" = c29bea4f93e37911908d32ec443714b907c40806
+          test "$(git hash-object research/evidence/q3v3-octagon-houdini-20261019/first_octagon_original.py)" = b93a19747e642941468dde0fe704bde9034ef550
+          python -m py_compile research/evidence/q2-all-original-cvc5-20261019/first_all_original_independent_backend.py
+      - name: Install genuine second SMT backend and frozen source proof dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq cvc5
+          cvc5 --version
+          python -m pip install --disable-pip-version-check sympy==1.13.3 z3-solver==4.13.3.0
+      - name: ONE first 18 real original source proof and 48 cvc5 obligations
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q2-all-original-cvc5-20261019/first_all_original_independent_backend.py --root external_loopinvgen --out /tmp/q2_all_original_independent_first.json | tee /tmp/q2_all_original_independent_first.log
+          sha256sum /tmp/q2_all_original_independent_first.json
+      - name: Preserve FIRST SCIENCE receipt before decision, including failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q2-first-all-16-original-independent-cvc5
+          path: |
+            /tmp/q2_all_original_independent_first.json
+            /tmp/q2_all_original_independent_first.log
+          if-no-files-found: warn
+      - name: Enforce no forged independence or global Q2 claims
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,sys
+          x=json.load(open("/tmp/q2_all_original_independent_first.json"))
+          print("Q2_FIRST_INDEPENDENT_SOLVER_RESULT",x["status"])
+          assert x["Q2_global"]=="OPEN" and x["Q1_Q7_global"]=="OPEN"
+          assert x["model_calls"]==0 and x["gpu_calls"]==0
+          assert x["certification_not_independent_frontend"] is True
+          if not x["gate_pass"]:
+              sys.exit(2)
+          assert x["original_three_vc_cases"]==16
+          assert x["independent_external_unsat_original_bad_conditions"]==48
+          assert x["spacer_source_only_without_invariant"]==2
+          assert x["unique_original_source_sha"]==18
+          print("Q2_ALL_16_ORIGINAL_INVARIANTS_SECOND_SOLVER_SCOPED_PASS")
+          PY
