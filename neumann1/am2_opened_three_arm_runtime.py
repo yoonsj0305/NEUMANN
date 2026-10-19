@@ -76,6 +76,8 @@ def _structure(proposer:Callable,certifier:Callable,view:dict,budget:OpenedBudge
     if (type(certificate) is not dict
         or type(certificate.get("valid")) is not bool
         or certificate["valid"] is not True
+        or certificate.get("source_sha256")!=sha(view)
+        or certificate.get("proposal_sha256")!=sha(proposal)
         or type(certificate.get("proof_sha256")) is not str
         or len(certificate["proof_sha256"])!=64
         or any(c not in "0123456789abcdef" for c in certificate["proof_sha256"])):
@@ -95,6 +97,11 @@ def _frozen_core_identity(core:Any,production:bool)->dict:
         and raw.get("accelerator_class") is True
         and raw.get("model_id")=="google/gemma-4-E2B-it"
         and raw.get("model_revision")=="3e22461f65e89153144f8adb70e3b8c2cc9845a7"
+        and raw.get("artifact_sha256")=="bf6d4f9d506f536db6255143e5f21e05b9ccadfea54af281ac278bd49c178d66"
+        and raw.get("tokenizer_sha256")=="8552955a1513c80096c4155aa2de30079a20d4c3f255b9d1acf9162c859b4207"
+        and raw.get("precision")=="bfloat16"
+        and raw.get("deterministic") is True
+        and raw.get("do_sample") is False
     ):
         raise InterfaceBlocked("UNQUALIFIED_ACTUAL_CORE_IDENTITY")
     return raw
@@ -169,7 +176,7 @@ def run_one_opened(
             rec["structure_method_id"]=proposal["method_id"]
             rec["structure_proposal_sha256"]=sha(proposal)
             rec["structure_certificate_sha256"]=certificate["proof_sha256"]
-            messages[1]["content"]+="\nINDEPENDENTLY_SOURCE_CERTIFIED_STRUCTURE:\n"+proposal["representation"]
+            messages[1]["content"]+="\nPUBLIC_SOURCE_STRUCTURE_VERIFIED_BY_CALLER_CERTIFIER:\n"+proposal["representation"]
         rec["model_input_sha256"]=sha(messages)
 
         remaining=budget.wall_ms-_elapsed_ms(started)
