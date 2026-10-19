@@ -28,3 +28,19 @@ For original Post, if `x>=y`, `p<=0` implies `c<=x0-y0-(x-y)<=x0-y0`. If `x0>=y0
 - `LEARNED_Q3_UNIQUE_NEW_MATH=NOT_PROVEN`, `Q6_BLIND_TRANSFER=OPEN`, `Q4_ALL_IN_COST=OPEN`, `GLOBAL_Q1_Q7=OPEN`. Preserve the first three-origin blind FAIL at Issue #287 and previous AM1 FAIL. Keep historical receipts immutable.
 
 The source-pinned algebraic checker is maintained as a separate development diagnostic; do not confuse proof minimization on an already-opened original with a prospective new capability.
+
+
+## 2026-10-19 follow-up: original minimal-certificate SMT verification COMPLETE
+
+**First independent SMT rerun:** [GitHub Actions #39243964305](https://github.com/yoonsj0305/NEUMANN/actions/runs/39243964305), completed **SUCCESS**. Frozen upstream source hash, native/custom semantic parity and nonvacuity were checked again. The two-atom certificate above was independently rechecked against the genuine original Pre / full nondeterministic three-branch Trans / published Post:
+
+- Original Z3: **initial UNSAT, consecution UNSAT, post UNSAT** (3/3).
+- Unchanged SHA-bound independent cvc5: **initial UNSAT, consecution UNSAT, post UNSAT** (3/3).
+- 37 exact fixed-grammar subset checks repeated; exhaustive cardinality minimum **2** among the frozen 8 individually inductive signed predicates, with exactly 2 minimum pairs.
+- All **7/7** bad candidate/injected SMT/wrong-source-hash controls rejected. Deliberately corrupted transition yields a satisfiable original induction failure.
+- Registered source/model status: **previously opened single PolyRank source; posthoc classical development, 0 trained model calls, no blind-origin transfer**. The earlier prospective three-origin Issue #287 **FAIL remains unchanged**. Global Q1–Q7 **OPEN**.
+- First technical attempt [Actions #39243764168](https://github.com/yoonsj0305/NEUMANN/actions/runs/39243764168) failed at a parser alpha-renaming *preflight assumption*, before proof checks. Preserved failure log and repaired only name-assumption handling; the exact pinned original, invariant, scientific thresholds and source-bound verifier remained unchanged.
+- Raw successful JSON SHA-256: `e49fc3d779e1385089a38ed37503c99948b183010f97e3dd1060cdf9c1a8cafa`; [first successful result artifact #12181624620](https://github.com/yoonsj0305/NEUMANN/actions/runs/39243964305/artifacts/12181624620). In CI, the separate original native/cvc5 verification and registered gate both returned **PASS**.
+- Exact code: [min-cardinality enumeration](https://github.com/yoonsj0305/NEUMANN/blob/research/q3-polyrank-full-linear-pre-facets-20261019/research/evidence/q3_polyrank_full_signed_first_20261019/poly2_auto_minimal_exact.py) and [original-independent-SMT replay](https://github.com/yoonsj0305/NEUMANN/blob/research/q3-polyrank-full-linear-pre-facets-20261019/research/evidence/q3_polyrank_full_signed_first_20261019/poly2_exact_minimum_original_3vc.py).
+
+**Precise newly closed statement:** `Q3_POLY2_FIXED_EIGHT_MINIMAL_TWO_ATOM_ORIGINAL_Z3_CVC5_CERTIFICATE=POSTHOC_SCOPED_PASS`. This is original-specific classical proof compression, **not** evidence for novel neural mathematics, learned necessity, Q6 blind source transfer, or lower end-to-end computing cost.
