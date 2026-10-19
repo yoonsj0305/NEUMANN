@@ -419,3 +419,82 @@ jobs:
           if not r["first_dev_scoped_pass"]:sys.exit(2)
           print("SOURCE_DEAD_STATE_SYGUS_ORIGINAL_Z3_CVC5_SCOPED_DEV_PASS_ONLY")
           PY
+
+
+  q3-first-blind-three-benchmark-origins:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: blind_originals/loopinv
+          persist-credentials: false
+          sparse-checkout: |
+            benchmarks/LIA/2005.ICALP_PolyRank
+            benchmarks/LIA/2018.NeurIPS_Code2Inv
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: blind_originals/sygus
+          persist-credentials: false
+          sparse-checkout: |
+            comp/2018/Inv_Track
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify pinned upstream original collection revisions and unchanged original 3VC
+        run: |
+          test "$(git -C blind_originals/loopinv rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+          test "$(git -C blind_originals/sygus rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          test "$(git hash-object experiments/q3_source_prove.py)" = a74b62cc97958e06f70116f3c8cec2f6db3d3b75
+          test "$(git hash-object experiments/am2_sygus_native_three_vc_checker.py)" = aca2b543057c968acd8a175e7b1ef8e391ba79b2
+          test "$(git hash-object research/evidence/q3_sum4vars_liveness_first_20261019/first_original_liveness.py)" = ed482a06a3b307544c8858a8ff44c00d805414ff
+          test "$(git hash-object research/evidence/q3_cegar_pre_tight_facets_20261019/first_original_tight_facet.py)" = 6e5c5b1566b0000556e9ab4c231efba0a6293ea7
+          python -m py_compile research/evidence/q3_blind_three_origin_first_20261019/first_strict_original_transfer.py
+          echo 'First prospective original names, SHA, gates frozen in Issue #287 BEFORE any source body access.'
+      - name: Install real original exact Z3 and independent cvc5 backend
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cvc5
+          python -m pip install --disable-pip-version-check . sympy==1.13.3 z3-solver==4.13.3.0
+          cvc5 --version
+      - name: FIRST science experiment on exactly THREE pinned original collection origins
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3_blind_three_origin_first_20261019/first_strict_original_transfer.py --source-root blind_originals --out /tmp/q3_first_three_origins.json | tee /tmp/q3_first_three_origins_stdout.log
+          sha256sum /tmp/q3_first_three_origins.json
+      - name: Archive FIRST complete raw original results BEFORE research verdict
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-frozen-untouched-three-origin-originals-first
+          path: |
+            /tmp/q3_first_three_origins.json
+            /tmp/q3_first_three_origins_stdout.log
+          if-no-files-found: warn
+      - name: Enforce all first registered science gates, including historical FAIL status
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,sys
+          d=json.load(open('/tmp/q3_first_three_origins.json'))
+          assert d["preregistered_issue"]==287
+          assert d["collection_names"]==["POLYRANK_2005","CODE2INV_2018","SYGUS_2018"]
+          assert d["chosen_before_source_bodies_read"]
+          assert not d["independent_original_human_authors_verified"]
+          assert not d["structure_discovery_is_trained_neural"]
+          assert len(d["original_file_receipts"])==3
+          assert d["frontier_model_calls"]==d["native_GPU_model_forwards"]==d["paid_API_calls"]==0
+          assert d["frozen_history_am1"]==d["frozen_history_issue279"]==d["frozen_history_issue283"]=="FAIL_UNCHANGED"
+          assert d["global_Q1_Q7"]=="OPEN" and d["sealed_D3"]=="BLOCKED"
+          print("FIRST_UNTOUCHED_THREE_ORIGINAL_ORIGINS",d["frozen_first_gate_pass"])
+          print("FROZEN_SCIENCE_CHECKS",d["frozen_first_gate_conditions"])
+          if not d["frozen_first_gate_pass"]:sys.exit(2)
+          print("BOUNDED_EXTERNAL_3ORIGIN_CLASSICAL_ORIGINAL_PROOF_TRANSFER_SCOPED_PASS_ONLY")
+          PY
