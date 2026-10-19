@@ -184,6 +184,36 @@ class ThreeArmExecutableBoundary(unittest.TestCase):
                 production=True)
         self.assertEqual(c.calls,0)
 
+
+    def test_real_mode_rejects_missing_strict_cuda_hardware_even_with_pinned_ids(self):
+        c=FakeCore()
+        c.identity.update({"evidence_kind":"actual_frozen_model",
+            "accelerator_class":True,"model_id":"google/gemma-4-E2B-it",
+            "model_revision":"3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+            "artifact_sha256":"bf6d4f9d506f536db6255143e5f21e05b9ccadfea54af281ac278bd49c178d66",
+            "tokenizer_sha256":"8552955a1513c80096c4155aa2de30079a20d4c3f255b9d1acf9162c859b4207",
+            "precision":"bfloat16","deterministic":True,"do_sample":False})
+        with self.assertRaisesRegex(abi.InterfaceBlocked,"ATTESTATION_REQUIRED"):
+            runtime.run_one_opened(PUBLIC,"DIRECT",c,lambda x:True,production=True)
+        self.assertEqual(c.calls,0)
+
+    def test_emulated_bf16_t4_rejected_before_production_generation(self):
+        c=FakeCore()
+        c.identity.update({"evidence_kind":"actual_frozen_model",
+            "accelerator_class":True,"model_id":"google/gemma-4-E2B-it",
+            "model_revision":"3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+            "artifact_sha256":"bf6d4f9d506f536db6255143e5f21e05b9ccadfea54af281ac278bd49c178d66",
+            "tokenizer_sha256":"8552955a1513c80096c4155aa2de30079a20d4c3f255b9d1acf9162c859b4207",
+            "precision":"bfloat16","deterministic":True,"do_sample":False})
+        props=types.SimpleNamespace(major=7,minor=5,total_memory=15*1024**3)
+        cuda=types.SimpleNamespace(is_available=lambda:True,device_count=lambda:1,
+            get_device_properties=lambda idx:props,
+            is_bf16_supported=lambda **kwargs:True)
+        c.torch=types.SimpleNamespace(cuda=cuda)
+        with self.assertRaisesRegex(abi.InterfaceBlocked,"MINIMUM_NOT_MET"):
+            runtime.run_one_opened(PUBLIC,"DIRECT",c,lambda x:True,production=True)
+        self.assertEqual(c.calls,0)
+
     def test_frozen_budgets_validate(self):
         with self.assertRaises(ValueError):
             runtime.OpenedBudget(max_new_tokens=0)
