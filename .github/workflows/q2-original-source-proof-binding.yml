@@ -31,7 +31,7 @@ jobs:
       - name: ONE prospective real-original proof-binder security test
         run: |
           set -o pipefail
-          python research/evidence/q2-source-bound-proof-integrity-20261019/first_trusted_original_redteam.py --root external_loopinvgen --out /tmp/q2_real_source_proof_redteam_first.json | tee /tmp/q2_real_source_proof_redteam_first_stdout.txt
+          PYTHONPATH=. python research/evidence/q2-source-bound-proof-integrity-20261019/first_trusted_original_redteam.py --root external_loopinvgen --out /tmp/q2_real_source_proof_redteam_first.json | tee /tmp/q2_real_source_proof_redteam_first_stdout.txt
           sha256sum /tmp/q2_real_source_proof_redteam_first.json
       - name: Always archive first observations including failure
         if: always()
