@@ -1,0 +1,70 @@
+name: Q3 prod-bin source-trained bilinear original Z3 cvc5
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-prod-bin-learned-source.yml'
+      - 'research/evidence/q3_prod_bin_learning_20261019/**'
+      - 'docs/research/Q3_PRODBIN_POST_G0_LEARNED_CONSERVATION_FIRST_CI_FREEZE_20261019.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  frozen_first_posthoc_prod_bin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: official_loopinv
+          sparse-checkout: |
+            benchmarks/NIA/2018.CHI_InvGame
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate exact source revision and study file syntax
+        run: |
+          test "$(git -C official_loopinv rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+          python -m py_compile research/evidence/q3_prod_bin_learning_20261019/train_goal_seed_original.py
+      - name: Install source and verifier pinned pure CPU
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5b
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5b
+          sudo install -m 755 "$(find /tmp/cvc5b -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 scipy==1.17.0 sympy==1.14.0 numpy==2.3.5
+      - name: FIRST original-source train-and-Z3-cvc5 native three-VC experiment
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_prod_bin_learning_20261019/train_goal_seed_original.py --source-root official_loopinv --out /tmp/q3_prod_bin_first.json | tee /tmp/q3_prod_bin_first.log
+          sha256sum /tmp/q3_prod_bin_first.json
+      - name: Archive FIRST experiment receipt even if global gate fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-prod-bin-source-neural-bilinear-first-original
+          path: |
+            /tmp/q3_prod_bin_first.json
+            /tmp/q3_prod_bin_first.log
+          if-no-files-found: warn
+      - name: Block inflated novel-learning attribution
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_prod_bin_first.json'))
+          assert x['train_episodes']==88 and x['heldout_episodes']==12
+          assert x['source_only_full_degree_two_grammar_predeclared'] is True
+          assert x['learned_unique_vs_classical_same_features'] is False
+          assert x['trained_neural_invents_new_primitive_outside_given_monomial_vocabulary'] is False
+          assert x['global_Q1_Q7']==x['global_Q3']=='OPEN'
+          print('FIRST_SCIENCE_SCOPED_RESULT',x['scoped_posthoc_pass'])
+          print('VERIFIER_Z3',x['learned_native_original_Z3_bad_conditions'])
+          PY
