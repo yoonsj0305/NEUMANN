@@ -1,0 +1,74 @@
+name: Q3 source-only neural polynomial depth growth original 3VC
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-source-trace-neural-growth.yml'
+      - 'research/evidence/q3_learned_growth_original_20261019/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first-original-coupled-neural-growth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: official_loopinv
+          sparse-checkout: |
+            benchmarks/NIA/2018.CHI_InvGame
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pinned original evidence and source compile
+        run: |
+          test "$(git -C official_loopinv rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+          python -m py_compile research/evidence/q3_learned_growth_original_20261019/learn_growth_from_original_traces.py
+      - name: Install CPU gradient optimizer and independent exact solvers
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.17.0 sympy==1.14.0 z3-solver==4.13.3.0
+          cvc5 --version
+      - name: FIRST frozen original trace source-only gradient study
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_learned_growth_original_20261019/learn_growth_from_original_traces.py --root official_loopinv --out /tmp/q3_growth_original_first.json | tee /tmp/q3_growth_original_first.log
+          sha256sum /tmp/q3_growth_original_first.json
+      - name: Archive FIRST true outcome, whether PASS or FAIL
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-first-original-source-trace-growing-neural
+          path: |
+            /tmp/q3_growth_original_first.json
+            /tmp/q3_growth_original_first.log
+          if-no-files-found: warn
+      - name: Enforce scoped criteria only
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_growth_original_first.json'))
+          assert set(x['originals'])=={'cube2','gauss'}
+          for key,src in x['originals'].items():
+            assert src['bounded_posthoc_pass'] is True,(key,src['gates'])
+            assert all(src['gates'].values())
+            assert src['train_samples']==8 and src['heldout_trace_samples']==5
+            assert all(t['training_performed'] for t in src['neural_learned_atoms'])
+          cube=x['originals']['cube2']['neural_learned_atoms']
+          assert sorted(a['depth'] for a in cube)==[1,2,3]
+          assert any(a['single_relation_step_vc']=='sat' for a in cube)
+          gauss=x['originals']['gauss']['neural_learned_atoms']
+          assert len(gauss)==1 and gauss[0]['depth']==2
+          assert x['degree_controller_is_classical'] is True
+          assert x['trained_neural_invents_primitive_outside_arithmetic_vocabulary'] is False
+          assert x['global_Q3']==x['global_Q1_Q7']=='OPEN'
+          print('FIRST_SELF_SUPERVISED_SOURCE_ONLY_NEURAL_GROWTH_COUPLED_Z3_CVC5_POSTHOC_SCOPED_PASS')
+          PY
