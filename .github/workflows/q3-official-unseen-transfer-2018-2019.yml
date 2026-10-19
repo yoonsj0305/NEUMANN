@@ -27,6 +27,9 @@ jobs:
           python-version: '3.11'
       - name: Freeze old prover and external git commit BEFORE FIRST source read
         run: |
+          echo "Q3_SOURCE_CLI_GIT_BLOB $(git hash-object experiments/q3_source_prove.py)"
+          echo "Q3V6_GIT_BLOB $(git hash-object research/evidence/q3v6-lazy-specialist-20261019/first_proof_gated_lazy_fallback.py)"
+          echo "Q3V4_GIT_BLOB $(git hash-object research/evidence/q3v4-proof-portfolio-20261019/first_integrated_original_portfolio.py)"
           test "$(git hash-object experiments/q3_source_prove.py)" = 11392c9f4c2d7cf4f3b358ae61407c20df78fed1
           test "$(git hash-object research/evidence/q3v6-lazy-specialist-20261019/first_proof_gated_lazy_fallback.py)" = 7e61c7a3a0ed9d15b354b7b3d67b5adf40517059
           test "$(git hash-object research/evidence/q3v4-proof-portfolio-20261019/first_integrated_original_portfolio.py)" = c29bea4f93e37911908d32ec443714b907c40806
