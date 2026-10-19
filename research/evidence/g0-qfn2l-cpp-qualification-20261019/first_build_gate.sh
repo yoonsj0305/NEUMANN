@@ -32,7 +32,7 @@ if [ "$RC" -ne 0 ]; then record_status "$RC" smt_clone; exit 0; fi
 (cd smt-switch && git checkout -q "$SW") >>build_audit/smt_clone.log 2>&1
 RC=$?
 if [ "$RC" -ne 0 ]; then record_status "$RC" smt_checkout; exit 0; fi
-(cd smt-switch && timeout 120 ./configure.sh --z3 --no-auto-deps > "$GITHUB_WORKSPACE/build_audit/switch_config.log" 2>&1)
+(cd smt-switch && timeout 120 ./configure.sh --z3 --z3-dir=/usr --no-auto-deps > "$GITHUB_WORKSPACE/build_audit/switch_config.log" 2>&1)
 RC=$?
 if [ "$RC" -ne 0 ]; then record_status "$RC" smt_config; exit 0; fi
 timeout 220 cmake --build smt-switch/build -j 2 >build_audit/switch_make.log 2>&1
