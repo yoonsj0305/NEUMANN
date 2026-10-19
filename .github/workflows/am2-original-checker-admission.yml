@@ -53,6 +53,14 @@ jobs:
           assert d["model_calls"]==d["gpu_calls"]==d["paid_api_calls"]==0
           assert not d["sealed_task_content_accessed"]
           assert d["global_Q1_Q7"]=="OPEN"
-          assert not any(d["gates"].values())
+          g=d["gates"]
+          # Unique IDs and valid metadata are vacuously true for zero rows;
+          # the scientific gates MUST still refuse admission.
+          assert not g["at_least_24_actual_original_source_records"]
+          assert not g["at_least_3_registered_origins_8_each"]
+          assert not g["real_source_bound_checker_executed"]
+          assert not g["type_specific_original_answer_adapter_connected"]
+          assert not g["license_original_provenance_audited"]
+          assert not g["strong_tool_plus_headroom_independently_measured"]
           print("ACTUAL_ADMISSION_BLOCKED_CORRECTLY_NOT_FAKE_MODEL_PASS")
           PY
