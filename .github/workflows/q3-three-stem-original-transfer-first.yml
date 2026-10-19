@@ -1,0 +1,75 @@
+name: Q3 three preregistered official original source-stem transfer gate
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-three-stem-original-transfer-first.yml'
+      - 'research/evidence/q3_three_stem_original_transfer_20261019/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-unopened-three-stem-transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: official_sygus
+          persist-credentials: false
+          sparse-checkout: |
+            comp/2017/Inv_Track
+            comp/2018/Inv_Track
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify exact old frozen proposer, new source mechanism, external git tree and compile
+        run: |
+          test "$(git -C official_sygus rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          test "$(git hash-object experiments/q3_source_prove.py)" = a74b62cc97958e06f70116f3c8cec2f6db3d3b75
+          test "$(git hash-object experiments/am2_sygus_native_three_vc_checker.py)" = aca2b543057c968acd8a175e7b1ef8e391ba79b2
+          python -m py_compile research/evidence/q3_three_stem_original_transfer_20261019/first_unseen_source_transfer.py
+          echo "Frozen FIRST experiment registered before viewing source content at Issue #279"
+      - name: Install source-independent original Z3 and cvc5 verifier
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cvc5
+          python -m pip install --disable-pip-version-check . sympy==1.13.3 z3-solver==4.13.3.0
+          cvc5 --version
+      - name: First original source transfer exactly three fixed names, both exact classical methods
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3_three_stem_original_transfer_20261019/first_unseen_source_transfer.py --upstream-root official_sygus --out /tmp/q3_three_stem_first.json | tee /tmp/q3_three_stem_first_stdout.log
+          sha256sum /tmp/q3_three_stem_first.json
+      - name: Archive FIRST raw original source statuses before evaluating gate, including FAIL
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-three-stem-official-original-first
+          path: |
+            /tmp/q3_three_stem_first.json
+            /tmp/q3_three_stem_first_stdout.log
+          if-no-files-found: warn
+      - name: Strict prereg first gate and immutable broad question status
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,sys
+          d=json.load(open("/tmp/q3_three_stem_first.json"))
+          assert d["preregistered_issue"]==279
+          assert d["selection_frozen_before_source_body_read"]
+          assert d["metadata_selected_stems"]==["cegar","const","fib"]
+          assert not d["independent_source_authors_proven"]
+          assert not d["neural_learned_new_structure_proven"]
+          assert d["model_calls"]==d["GPU_calls"]==d["paid_API_calls"]==0
+          assert d["historical_AM1_first"]=="FAIL_UNCHANGED"
+          assert d["Q1_to_Q7_global"]=="OPEN"
+          print("Q3_FIRST_THREE_STEM_REGISTERED_SCOPE",d["scoped_first_gate_pass"])
+          print("Q3_FIRST_THREE_STEM_CRITERIA",d["predeclared_conditions"])
+          if not d["scoped_first_gate_pass"]:sys.exit(2)
+          print("REAL_ORIGINAL_TRANSFER_SCOPED_NOT_NEURAL_OR_GLOBAL")
+          PY
