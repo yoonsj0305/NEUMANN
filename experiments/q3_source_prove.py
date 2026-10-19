@@ -153,6 +153,60 @@ def replay_exported_queries(receipt):
             return False
     return True
 
+
+def replay_original_source_bound(path, receipt):
+    """Replay a prior 3VC receipt against the ACTUAL original source bytes.
+
+    The legacy replay_exported_queries() checks only that three arbitrary
+    queries are UNSAT. This strict method recomputes actual Pre, Trans, Post,
+    source-conditioned invariant and all three real obligations from the
+    trusted original input and requires exact bytes. It cannot independently
+    prove *other* syntactically different but valid invariants; deliberately
+    fail-closed for archival reproducibility.
+
+    This is independent of the UNTRUSTED receipt, but it uses the SAME
+    frozen generator and native verifier; not a disjoint proof assistant.
+    """
+    if type(receipt) is not dict:
+        return False
+    try:
+        path=Path(path)
+        if path.is_symlink() or not path.is_file() or path.suffix!=".sl":
+            return False
+        data=path.read_bytes()
+        if len(data)>MAX_INPUT_BYTES:
+            return False
+        if receipt.get("source_sha256")!=_sha(data):
+            return False
+        if receipt.get("status")!="ORIGINAL_SOURCE_THREE_VC_CERTIFIED":
+            return False
+        if not replay_exported_queries(receipt):
+            return False
+        reconstructed=prove_source(path)
+        if reconstructed.get("status")!="ORIGINAL_SOURCE_THREE_VC_CERTIFIED":
+            return False
+        for key in (
+            "source_sha256","source_bytes","selected_route",
+            "verifier_authority","certificate_scope",
+            "invariant_sexpr","invariant_sha256",
+            "original_three_vc","independent_native_custom_parser_xor"
+        ):
+            if reconstructed.get(key)!=receipt.get(key):
+                return False
+        expected=reconstructed.get("original_bad_condition_smt2")
+        received=receipt.get("original_bad_condition_smt2")
+        if type(expected) is not dict or type(received) is not dict:
+            return False
+        if set(expected)!=set(("initial","consecution","post")) or set(received)!=set(expected):
+            return False
+        for key in ("initial","consecution","post"):
+            if expected[key]!=received[key]:
+                return False
+        return True
+    except Exception:
+        return False
+
+
 def main():
     p=argparse.ArgumentParser(description="Safe source-to-invariant proof; never asserts global Q3.")
     p.add_argument("--source",required=True,type=Path)
