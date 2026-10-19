@@ -1,0 +1,71 @@
+name: Q3 first real old-ABSTAIN SyGuS source-derived relational Houdini recovery
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-anfp-relational-original-first.yml'
+      - 'research/evidence/q3_anfp_relational_source_houdini_20261019/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  recover-two-real-published-old-original-abstentions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: official_sygus
+          persist-credentials: false
+          sparse-checkout: |
+            comp/2017/Inv_Track
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Enforce source original semantics and frozen verifier before evidence
+        run: |
+          test "$(git -C official_sygus rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          test "$(git hash-object experiments/q3_source_prove.py)" = a74b62cc97958e06f70116f3c8cec2f6db3d3b75
+          test "$(git hash-object experiments/am2_sygus_native_three_vc_checker.py)" = aca2b543057c968acd8a175e7b1ef8e391ba79b2
+          python -m py_compile research/evidence/q3_anfp_relational_source_houdini_20261019/first_anfp_source_original.py
+      - name: Install fixed original SMT verifiers only, no trained model
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cvc5
+          python -m pip install --disable-pip-version-check . sympy==1.13.3 z3-solver==4.13.3.0
+          cvc5 --version
+      - name: FIRST source-derived original proof recovery, no original answer or file-name route
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3_anfp_relational_source_houdini_20261019/first_anfp_source_original.py --official-root official_sygus --out /tmp/q3_anfp_first_original.json | tee /tmp/q3_anfp_first_stdout.log
+          sha256sum /tmp/q3_anfp_first_original.json
+      - name: Preserve all first proof results including failures before gate
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-anfp-original-relational-houdini-first
+          path: |
+            /tmp/q3_anfp_first_original.json
+            /tmp/q3_anfp_first_stdout.log
+          if-no-files-found: warn
+      - name: Strict frozen predeclared gate, do not close global Q3
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,sys
+          d=json.load(open("/tmp/q3_anfp_first_original.json"))
+          assert d["preregistered_issue"]==277 and len(d["cases"])==2
+          assert d["original_source_family_count_verified"]==1
+          assert d["original_source_prior_statuses_unchanged"]=="TWO_ABSTAIN"
+          assert d["learned_neural_structure_contribution"] is False
+          assert d["actual_models_called"]==d["gpu_calls"]==d["paid_api_calls"]==0
+          assert d["global_Q1_Q7"]=="OPEN" and d["sealed_D3"]=="BLOCKED"
+          print("FIRST_ANFP_REAL_ORIGINAL_Q3_RECOVERY_GATE",d["first_frozen_recovery_scoped_pass"])
+          print("PREDECLARED_CRITERIA",d["predeclared_conditions"])
+          if not d["first_frozen_recovery_scoped_pass"]:sys.exit(2)
+          print("CLASSICAL_SOURCE_DERIVED_ORIGINAL_PROOF_SCOPE_PASS_NOT_GLOBAL_Q3")
+          PY
