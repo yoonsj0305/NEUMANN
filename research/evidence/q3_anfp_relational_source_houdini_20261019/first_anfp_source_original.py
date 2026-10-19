@@ -164,9 +164,21 @@ def one_file(source):
         raise RuntimeError("ORIGINAL_SOURCE_VACUOUS")
     post_only=source_proof(native["post"],native)
     learnt=original_houdini(src,native)
-    full_formula=learnt["invariant"].sexpr()
-    # This external adapter is independent of Houdini's success flag and
-    # re-parses source and formula; uses native Z3 original VCs and cvc5 backend.
+    # INFRA-ONLY cross-SMT-LIB serialization repair after FIRST run FAIL.
+    # Z3 lets z3.Sum(singleton) print a one-argument SMT-LIB (+ ...), while
+    # strict cvc5 rejects it before any proof. Do NOT change the discovered
+    # invariant's semantics or grammar. Canonicalize and PROVE equivalence
+    # against the first native-source invariant BEFORE external rechecking.
+    first_native_invariant=learnt["invariant"]
+    canonical_invariant=z3.simplify(first_native_invariant)
+    equivalence=z3.Solver()
+    equivalence.set(timeout=2500)
+    equivalence.add(z3.Xor(first_native_invariant,canonical_invariant))
+    if equivalence.check()!=z3.unsat:
+        raise RuntimeError("CANONICAL_SMT_INVARIANT_NOT_PROVABLY_EQUIVALENT")
+    full_formula=canonical_invariant.sexpr()
+    # External adapter re-parses original SyGuS and candidate, runs native Z3
+    # 3VC and then separate strict cvc5 on the full original bad conditions.
     verified=check_original_candidate(source,full_formula,
           expected_source_sha256=digest)
     wrong={}
@@ -192,6 +204,10 @@ def one_file(source):
         "original_post_only_vcs":post_only["vcs"],
         "source_only_relational_houdini":{
             k:v for k,v in learnt.items() if k!="invariant"},
+        "native_first_discovered_invariant_sexpr":first_native_invariant.sexpr(),
+        "semantic_preserving_smt_canonicalization":"Z3_SIMPLIFY_WITH_EXACT_XOR_UNSAT",
+        "native_vs_cross_backend_candidate_xor":"unsat",
+        "first_original_cross_backend_failure_preserved":True,
         "discovered_source_only_invariant_sexpr":full_formula,
         "discovered_source_only_invariant_sha256":sha(full_formula.encode()),
         "external_original_checker_result":verified,
