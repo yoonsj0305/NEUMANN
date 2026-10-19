@@ -1,6 +1,9 @@
 # AM1 Local Zero-Cost Execution
 
-Status: **IMPLEMENTATION READY / ACTUAL RUN NOT YET PERFORMED.**
+Status: **HISTORICAL LOCAL RUN INSTRUCTIONS, NOT CURRENT SCIENCE ACTION.**
+
+> **2026-10-19 correction:** The first real frozen AM1 BF16/Tesla T4 study has **already run and FAILED** (36/36 terminal results, DIRECT/TOOL/NEUMANN 0/12, 72/72 non-final thought-channel generations). That immutable first AM1 cannot be reexecuted with altered prompts/parser and called a scientific first PASS. This document documents an archived launcher only. Follow [critical path](critical_path_v1062.md) and [new AM2 CP0 report](AM2_CP0_FIRST_TYPED_CONTROL_VERDICT_20261019.md) instead.
+
 
 This path exists so Decision 2 can be executed on a suitable local NVIDIA GPU
 without paid cloud compute. It does not change the frozen Architecture
@@ -21,7 +24,7 @@ Supporting scripts:
 - `experiments/general_multiplier_local_preflight.py`
 - `experiments/general_multiplier_evidence_replay.py`
 
-The first run still uses the authoritative
+The historical first-run launcher uses the authoritative
 `experiments/general_multiplier_first.py` and the same frozen Decision-2
 contract merged in PR #126.
 
@@ -84,7 +87,7 @@ The launcher:
 6. performs a model-free evidence replay,
 7. writes a ZIP under `_am1_local`.
 
-The ZIP is the file to preserve and upload for independent review.
+An archive ZIP from a historical/diagnostic rerun must never replace the original first frozen AM1 scientific evidence.
 
 ## Windows portability boundary
 
@@ -96,7 +99,7 @@ recorded as UNKNOWN rather than fabricated.
 
 ## What remains blocked
 
-Until the actual AM1 verdict exists, do not start:
+The actual AM1 verdict is FAIL. Until a NEW separately frozen matched architecture PASS exists, do not start:
 
 - sealed v107 evaluation,
 - frontier reference execution,

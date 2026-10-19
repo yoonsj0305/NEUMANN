@@ -1,0 +1,56 @@
+name: AM2 CP0 new typed control plane first CPU functional gate
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/am2-cp0-typed-control.yml'
+      - 'experiments/am2_cp0_first_control.py'
+      - 'neumann1/am2_typed_control_pivot.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  am2-cp0-first-opened-typed-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Require original AM1 opened source identity and no model runtime dependency
+        run: |
+          test "$(git hash-object experiments/general_multiplier_tasks.py)" = 357f4bb4827543b0a2c9f8d809c8911b51040820
+          python -m py_compile neumann1/am2_typed_control_pivot.py experiments/am2_cp0_first_control.py
+      - name: Install unchanged declared minimal project runtime dependencies
+        run: python -m pip install .
+      - name: First 12 original opened tasks twice and four adversarial controls
+        run: |
+          python -m experiments.am2_cp0_first_control --out /tmp/am2_cp0_first_original.json | tee /tmp/am2_cp0_first_stdout.txt
+          sha256sum /tmp/am2_cp0_first_original.json
+      - name: Preserve first receipt and failure log BEFORE authority gate
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: am2-cp0-first-typed-control-opened-originals
+          path: |
+            /tmp/am2_cp0_first_original.json
+            /tmp/am2_cp0_first_stdout.txt
+          if-no-files-found: warn
+      - name: Enforce no false learned or accelerator conclusion
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/am2_cp0_first_original.json'))
+          assert d['status']=='SCOPED_CONTROL_PLANE_PASS'
+          assert d['model_calls_total']==0 and d['gpu_model_calls']==0
+          assert d['am2_architecture_multiplier']=='NOT_EVALUATED'
+          assert d['am1_frozen_first_accelerator_verdict']=='FAIL_UNCHANGED'
+          assert d['original_development_tasks']==12 and len(d['cases'])==24
+          assert d['no_10x_or_frontier_claim'] and d['full_Q1_Q7']=='OPEN'
+          for arm in ('TOOL','NEUMANN'):
+              row=d['per_arm_outcomes'][arm]
+              assert row['ORIGINAL_CHECKER_PASS']==8
+              assert row['NEEDS_ACTUAL_FROZEN_MODEL']==4
+          print('FIRST_AM2_CP0_FUNCTIONAL_GATE_PASS__NO_NEURAL_CAPABILITY_CLAIM')
+          PY
