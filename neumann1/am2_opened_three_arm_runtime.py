@@ -104,6 +104,22 @@ def _frozen_core_identity(core:Any,production:bool)->dict:
         and raw.get("do_sample") is False
     ):
         raise InterfaceBlocked("UNQUALIFIED_ACTUAL_CORE_IDENTITY")
+    if production:
+        # The old AM1 core only checked the tensor dtype; a Tesla T4 can emulate
+        # BF16 but has no native BF16 math. Reject before any new generation.
+        t=getattr(core,"torch",None)
+        if t is None:
+            raise InterfaceBlocked("REAL_PYTORCH_NATIVE_BF16_ATTESTATION_REQUIRED")
+        try:
+            if not t.cuda.is_available() or t.cuda.device_count()<1:
+                raise InterfaceBlocked("ACTUAL_CUDA_REQUIRED")
+            props=t.cuda.get_device_properties(0)
+            if int(props.major)<8 or int(props.total_memory)<14*1024**3:
+                raise InterfaceBlocked("ACTUAL_NATIVE_BF16_GPU_MINIMUM_NOT_MET")
+            if t.cuda.is_bf16_supported(including_emulation=False) is not True:
+                raise InterfaceBlocked("ACTUAL_NONEMULATED_BF16_NOT_SUPPORTED")
+        except (AttributeError,TypeError) as exc:
+            raise InterfaceBlocked("CANNOT_INDEPENDENTLY_ATTEST_NATIVE_BF16") from exc
     return raw
 
 
