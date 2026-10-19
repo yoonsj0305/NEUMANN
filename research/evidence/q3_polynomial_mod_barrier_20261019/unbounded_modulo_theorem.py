@@ -41,8 +41,10 @@ def impossibility():
   formula=sp.Integer(k)**(d*(d+1)//2)*sp.prod(sp.factorial(j) for j in range(1,d+1))
   if det!=formula or rank!=d+1:raise AssertionError("RATIONAL_VANDERMONDE_THEOREM_FAIL")
   c=[z3.Real(f"coefficient_{k}_{d}_{j}") for j in range(d+1)]
-  zeros=[z3.Sum(*[c[j]*(i*k)**j for j in range(d+1)])==0 for i in range(d+1)]
-  one=z3.Sum(*c)==1
+  def no_unary_sum(v):
+   return v[0] if len(v)==1 else z3.Sum(*v)
+  zeros=[no_unary_sum([c[j]*(i*k)**j for j in range(d+1)])==0 for i in range(d+1)]
+  one=no_unary_sum(c)==1
   solver=z3.Solver();solver.set(timeout=3000)
   solver.add(*zeros,one)
   native=str(solver.check())
