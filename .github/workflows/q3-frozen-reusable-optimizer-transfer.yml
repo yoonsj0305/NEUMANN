@@ -1,0 +1,73 @@
+name: Q3 one-shot frozen learned optimizer transfer to official real SyGuS originals
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-frozen-reusable-optimizer-transfer.yml'
+      - 'research/evidence/q3_transferable_optimizer_first_20261019/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first-learned-no-test-training-transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: upstream_official
+          persist-credentials: false
+          sparse-checkout: |
+            comp/2018/Inv_Track
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pre-train source reproducibility and frozen existing original checker
+        run: |
+          test "$(git -C upstream_official rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          test "$(git hash-object experiments/q3_source_prove.py)" = a74b62cc97958e06f70116f3c8cec2f6db3d3b75
+          test "$(git hash-object experiments/am2_sygus_native_three_vc_checker.py)" = aca2b543057c968acd8a175e7b1ef8e391ba79b2
+          python -m py_compile research/evidence/q3_transferable_optimizer_first_20261019/first_frozen_optimizer_transfer.py
+      - name: Fixed CPU-only actual original prover dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cvc5
+          python -m pip install --disable-pip-version-check . numpy==1.26.4 scipy==1.14.1 sympy==1.13.3 z3-solver==4.13.3.0
+          cvc5 --version
+      - name: FIRST experiment only - synthetic no-label shared pretraining then two originals with no per-source training
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_transferable_optimizer_first_20261019/first_frozen_optimizer_transfer.py --source-root upstream_official --out /tmp/q3_transfer_first.json | tee /tmp/q3_transfer_first.log
+          sha256sum /tmp/q3_transfer_first.json
+      - name: Save immutable FIRST full results, success and failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-frozen-recurrent-optimizer-transfer-first
+          path: |
+            /tmp/q3_transfer_first.json
+            /tmp/q3_transfer_first.log
+          if-no-files-found: warn
+      - name: Explicit preregistered scoped gate and all global open flags
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,sys
+          d=json.load(open("/tmp/q3_transfer_first.json"))
+          assert d["preregistered_issue"]==275
+          assert len(d["original_public_cases"])==2
+          assert d["globally_pretrained_recurrent_operator"]["learned_parameters"]==4
+          assert all(x["per_source_training_calls"]==0 and x["per_source_weight_gradient_updates"]==0 for x in d["original_public_cases"])
+          assert not d["actual_pretrained_language_model"]
+          assert not d["new_grammar_learned"]
+          assert d["global_Q1_Q7"]=="OPEN" and d["sealed_D3"]=="BLOCKED"
+          assert d["actual_gemma_E2B_calls"]==d["gpu_calls"]==d["frontier_calls"]==0
+          print("FIRST_PRETRAINED_CROSS_SOURCE_GATE",d["first_transfer_gate_pass"])
+          print("REGISTERED_FIRST_GATES",d["predeclared_conditions"])
+          if not d["first_transfer_gate_pass"]:sys.exit(2)
+          print("SCOPED_SHARED_LEARNED_OPTIMIZER_TRANSFER_ONLY_NOT_CLASSICAL_SUPERIORITY")
+          PY
