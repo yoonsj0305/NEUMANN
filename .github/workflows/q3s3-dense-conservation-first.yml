@@ -1,0 +1,53 @@
+name: Q3-S3 FIRST constructed dense-three-variable expressivity separation
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3s3-dense-conservation-first.yml'
+      - 'research/evidence/q3s3-dense-conservation-20261019/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  prereg-dense-3var-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin exact math and original SMT validator dependencies
+        run: python -m pip install --disable-pip-version-check sympy==1.13.3 z3-solver==4.13.3.0
+      - name: Execute FIRST generated source proofs and domain-impossibility witnesses
+        run: |
+          set -o pipefail
+          python -m py_compile research/evidence/q3s3-dense-conservation-20261019/first_dense_3var_octagon_separation.py
+          python research/evidence/q3s3-dense-conservation-20261019/first_dense_3var_octagon_separation.py --out /tmp/q3s3_first_result.json | tee /tmp/q3s3_first_stdout.txt
+          sha256sum /tmp/q3s3_first_result.json
+      - name: Always preserve the FIRST raw pass or fail receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3s3-first-dense-3var-math-and-octagon-separation
+          path: |
+            /tmp/q3s3_first_result.json
+            /tmp/q3s3_first_stdout.txt
+          if-no-files-found: warn
+      - name: Enforce the frozen mathematics-only first gate after archival
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,sys
+          v=json.load(open('/tmp/q3s3_first_result.json'))
+          print('Q3_S3_VERDICT',v['summary'])
+          assert v['scientific_scope']=='CONSTRUCTED_SOURCE_ONLY_CLASSICAL'
+          assert not v['learned_new_operator'] and not v['source_originals_are_independent_unseen']
+          assert v['global_Q3']=='OPEN' and v['global_Q1_Q7']=='OPEN'
+          assert v['strong_specialist_comparison']=='NOT_EVALUATED'
+          if not v['summary']['frozen_first_gate_pass']:
+              sys.exit(2)
+          assert v['summary']['exact_original_3vc_pass']==12
+          assert v['summary']['conjunctive_signed_octagon_expressivity_separation']==12
+          assert v['summary']['all_three_negative_classes_rejected_per_case']==12
+          print('Q3S3_SCOPE_ONLY_PROOF_PASS_NOT_LEARNED_Q3_OR_FRONTIER')
+          PY
