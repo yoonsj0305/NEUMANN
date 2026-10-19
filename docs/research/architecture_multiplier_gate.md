@@ -1,6 +1,9 @@
 # NEUMANN 1 — Accelerated Opened Architecture Multiplier Gate
 
-Status: EXECUTION-READY / ACTUAL RUN NOT YET PERFORMED.
+Status: **HISTORICAL FROZEN AM1 FIRST ACCELERATOR EXECUTION FAILED / SUPERSEDED.**
+
+> **2026-10-19 evidence synchronization (status only, thresholds unchanged):** The first real Gemma 4 E2B BF16 AM1 accelerator study HAS been performed: 36/36 observations on Tesla T4, DIRECT/TOOL/NEUMANN 0/12 each; all 72 model calls remained in the thought channel and produced no valid final control action. Its frozen scientific decision is **FAIL / ARCHITECTURE_PIVOT**, NOT environment NOT_EVALUATED. The contract below is the retained first-study rules, not a license to rerun the failed experiment. For live authority, use [Critical Path after Runtime-0.1](critical_path_v1062.md). AM2-CP0 is a new separate control-plane study [report](AM2_CP0_FIRST_TYPED_CONTROL_VERDICT_20261019.md), NOT a model capability pass.
+
 
 This is Decision 2 in the three-decision critical path. Runtime-0.2 already
 resolved Decision 1 as a single-thread CPU harness failure, not a capability
@@ -176,11 +179,11 @@ Until this gate passes:
 
 ## Execution authority
 
-The accelerator runner is implemented, but no actual Decision-2 capability run
-has been performed. Local execution is the preferred zero-cost path and is
-documented in [AM1 Local Zero-Cost Execution](am1_local_execution.md).
+The original accelerator runner remains archived but its first Decision-2
+capability execution has already FAILED. Do not rerun the old frozen contract.
+Historical local launcher details remain in [AM1 Local Zero-Cost Execution](am1_local_execution.md).
 
-A valid first run must still satisfy the frozen environment receipt and retain
-all 36 observations. Hardware or environment failure is NOT_EVALUATED, not a
-negative capability result. No paid compute is required by the contract, and no
-additional architecture search is admitted before the first valid execution.
+The actual first run retained 36 original observations and produced the frozen
+FAIL verdict. Historical hardware or environment qualification rules are recorded
+above, but they no longer authorize favorable reruns. New architectures require
+separately preregistered opened matched evaluation before any sealed test.
