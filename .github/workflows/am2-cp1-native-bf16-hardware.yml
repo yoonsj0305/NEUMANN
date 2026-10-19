@@ -1,0 +1,47 @@
+name: AM2 CP1 native BF16 physical readiness, offline logical selftest only
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/am2-cp1-native-bf16-hardware.yml'
+      - 'experiments/am2_cp1_native_bf16_*.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  no-paid-gpu-native-bf16-readiness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run native-BF16 control logic WITHOUT downloading model or torch
+        run: |
+          python -m py_compile experiments/am2_cp1_native_bf16_preflight.py experiments/am2_cp1_native_bf16_first_audit.py
+          python -m experiments.am2_cp1_native_bf16_first_audit --out /tmp/am2_native_bf16_first.json | tee /tmp/am2_native_bf16_first_stdout.txt
+          sha256sum /tmp/am2_native_bf16_first.json
+      - name: Preserve original readiness status and negative tests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: am2-cp1-first-native-bf16-readiness-log
+          path: |
+            /tmp/am2_native_bf16_first.json
+            /tmp/am2_native_bf16_first_stdout.txt
+          if-no-files-found: warn
+      - name: Enforce zero-model no-claim gate AFTER archiving
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/am2_native_bf16_first.json'))
+          assert r['first_gate_pass']
+          assert r['synthetic_logic_controls_pass']==5
+          assert r['real_free_CPU_runner_status']=='BLOCKED_HARDWARE'
+          assert r['actual_model_calls']==0 and r['actual_gpu_compute_calls']==0
+          assert r['am2_model_capability']=='NOT_EVALUATED'
+          assert r['global_Q1_Q7']=='OPEN'
+          assert r['synthetic_positive_is_not_real_hardware']
+          print('AM2_CP1_PHYSICAL_READINESS_GUARD_FIRST_PASS_NOT_MODEL_PASS')
+          PY
