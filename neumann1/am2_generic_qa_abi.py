@@ -11,10 +11,12 @@ import re
 from typing import Any, Callable
 
 SCHEMA="neumann.am2.generic-qa-public.v1"
-SUPPORTED={"short_text","integer","choice"}
+SUPPORTED={"short_text","integer","choice","smt_invariant"}
 BAD_KEYS={"answer","gold","solution","rationale","checker","private","private_tests","reference_answer","ground_truth","model_response"}
 MAX_QUESTION=16000
 MAX_ANSWER=1500
+MAX_SMT_INVARIANT=4096
+SMT_FINAL_RE=re.compile(r"^<answer>(.{1,4096})</answer>$",flags=re.DOTALL)
 FINAL_RE=re.compile(r"^<answer>([^<>\n]{1,1500})</answer>$",flags=re.DOTALL)
 INTEGER_RE=re.compile(r"^-?(?:0|[1-9][0-9]*)$")
 
@@ -64,7 +66,11 @@ def validate_public(view:dict)->dict:
 def format_public_messages(view:dict)->list[dict]:
     """Identical baseline public content until costed extra machinery is added."""
     clean=validate_public(view)
-    instruction=("Answer the public problem. Return exactly one final line as "
+    instruction=("Answer the public problem. Return ONLY <answer>VALUE</answer>. "
+       "For smt_invariant, VALUE is exactly one standalone SMT-LIB Boolean term "
+       "and may contain whitespace, parentheses or comparison operators. "
+       "No extra SMT commands, no explanations, and no private checker data." if clean["answer_kind"]=="smt_invariant" else
+       "Answer the public problem. Return exactly one final line as "
        "<answer>VALUE</answer>, with no other text. Do not include reasoning. "
        "Use only the supplied public fields.")
     return [{"role":"system","content":instruction},
@@ -80,6 +86,15 @@ def extract_answer(raw:str,view:dict)->str:
         raw=raw.rsplit("<|channel>final",1)[-1]
     for suffix in ("<|end|>","<|eot_id|>","<eos>"):
         raw=raw.replace(suffix,"")
+    if clean["answer_kind"]=="smt_invariant":
+        match=SMT_FINAL_RE.fullmatch(raw.strip())
+        if match is None:
+            raise InterfaceBlocked("FINAL_SINGLE_SMT_INVARIANT_NOT_FOUND")
+        answer=match.group(1).strip()
+        if (not answer or len(answer)>MAX_SMT_INVARIANT or
+            "<answer>" in answer or "</answer>" in answer):
+            raise InterfaceBlocked("INVALID_SMT_INVARIANT_ENVELOPE")
+        return answer
     match=FINAL_RE.fullmatch(raw.strip())
     if match is None:
         raise InterfaceBlocked("FINAL_SINGLE_ANSWER_NOT_FOUND")
