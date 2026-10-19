@@ -38,7 +38,7 @@ def first_run():
     }
     for name,(fake,expected) in configurations.items():
         result=probe_native_bf16(fake,require_nvidia_smi=False)
-        assert result["status"]==expected, (name, result)
+        assert (result["status"]=="LOGIC_READY_SIMULATION_ONLY" if expected=="LOGIC_READY_SIMULATION_ONLY" else result["status"]=="BLOCKED_HARDWARE" and result.get("reason")==expected), (name, result)
         assert result["model_loaded"] is False
         assert result["model_calls"]==0 and result["gpu_kernel_calls"]==0
         assert result["paid_compute_used"] is False
