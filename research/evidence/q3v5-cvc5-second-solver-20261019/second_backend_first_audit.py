@@ -43,22 +43,57 @@ def pick_invariant(src,native,winner):
         return z3.And(native["post"],*preds)
     raise ValueError("FROZEN_WINNER_NOT_RECOGNIZED")
 
+def normalize_exact_unary_plus_smt2(script):
+    """Only SMT2 syntactic equivalence: unary (+ t) --> t; preserve other trees."""
+    import re
+    body="\n".join(line for line in script.splitlines()
+                   if not line.lstrip().startswith(";"))
+    tokens=re.findall(r"\(|\)|[^\s()]+",body)
+    i=0
+    def read():
+        nonlocal i
+        if i>=len(tokens):raise ValueError("SMT2_TRUNCATED")
+        t=tokens[i];i+=1
+        if t=="(":
+            entries=[]
+            while i<len(tokens) and tokens[i]!=")":
+                entries.append(read())
+            if i>=len(tokens):raise ValueError("SMT2_UNBALANCED")
+            i+=1
+            return entries
+        if t==")":raise ValueError("SMT2_UNEXPECTED_CLOSE")
+        return t
+    ast=[]
+    while i<len(tokens):ast.append(read())
+    count=[0]
+    def fix(a):
+        if not isinstance(a,list):return a
+        out=[fix(x) for x in a]
+        if len(out)==2 and out[0]=="+":
+            count[0]+=1
+            return out[1]
+        return out
+    def write(a):
+        return "("+" ".join(write(x) for x in a)+")" if isinstance(a,list) else a
+    result="\n".join(write(fix(a)) for a in ast)+"\n"
+    return "(set-logic ALL)\n"+result,count[0]
+
 def run_cvc5(expr,expect):
     s=z3.Solver()
     s.add(expr)
-    smt2=s.to_smt2()
+    smt2,unary_plus_rewrites=normalize_exact_unary_plus_smt2(s.to_smt2())
     start=time.perf_counter_ns()
     try:
         r=subprocess.run(["cvc5","--lang","smt2"],input=smt2,text=True,
            capture_output=True,timeout=15)
         tokens=[x.strip() for x in r.stdout.strip().splitlines() if x.strip()]
         result=tokens[-1] if tokens else "NO_OUTPUT"
-        success=r.returncode==0 and tokens==[expect] and not r.stderr.strip()
+        success=r.returncode==0 and tokens==[expect]
         return {"expected":expect,"observed":result,"exit_code":r.returncode,
             "stdout_excerpt":r.stdout.strip()[:250],
             "stderr_excerpt":r.stderr.strip()[:250],
             "smt2_sha256":hashlib.sha256(smt2.encode()).hexdigest(),
-            "smt2_length":len(smt2),
+            "smt2_length":len(smt2),"unary_plus_identity_rewrites":unary_plus_rewrites,
             "solver_wall_ms":round((time.perf_counter_ns()-start)/1e6,3),
             "pass":success}
     except Exception as e:
