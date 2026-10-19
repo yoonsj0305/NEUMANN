@@ -1,0 +1,80 @@
+name: Q3 official first 8 real originals - source-bound proof forgery audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-official-source-bound-audit.yml'
+      - 'research/evidence/q3source-bound-authenticity-20261019/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original-source-bound-certificate-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          ref: 7b111a5ef8d2bc71d7bc8c03a8056c771da8848b
+          path: q3_strict_prover
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: external_official_sygus
+          persist-credentials: false
+          sparse-checkout: |
+            comp/2017/Inv_Track
+            comp/2018/Inv_Track
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-official-2017-2018-first-12-source-evidence
+          run-id: 39210016907
+          github-token: ${{ github.token }}
+          path: /tmp/q3_first_original
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pinned first research evidence and strengthened source-bound verifier
+        run: |
+          test "$(git -C q3_strict_prover rev-parse HEAD)" = 7b111a5ef8d2bc71d7bc8c03a8056c771da8848b
+          test "$(git -C external_official_sygus rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          test "$(git -C q3_strict_prover hash-object experiments/q3_source_prove.py)" = a74b62cc97958e06f70116f3c8cec2f6db3d3b75
+          echo "090e63f7839df2cd43e7db4132928dc00c098987b71904f052b3366b84cc3fbd  /tmp/q3_first_original/q3official17_18_first12.json" | sha256sum -c -
+          python -m py_compile research/evidence/q3source-bound-authenticity-20261019/audit_first_official_proofs.py
+      - name: Install fixed original solver and structural dependencies (no model)
+        run: python -m pip install --disable-pip-version-check . sympy==1.13.3 z3-solver==4.13.3.0
+      - name: Read-only original-source-bound replay plus three negative spoofing controls per valid proof
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3source-bound-authenticity-20261019/audit_first_official_proofs.py --original-first-receipt /tmp/q3_first_original/q3official17_18_first12.json --external-official-root external_official_sygus --strict-prover-checkout q3_strict_prover --out /tmp/q3_source_bound_audit_first.json | tee /tmp/q3_source_bound_audit_first_stdout.log
+          sha256sum /tmp/q3_source_bound_audit_first.json
+      - name: Preserve audit including every failure before final gate
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-official-original-source-bound-authenticity-first
+          path: |
+            /tmp/q3_source_bound_audit_first.json
+            /tmp/q3_source_bound_audit_first_stdout.log
+          if-no-files-found: warn
+      - name: Honor fixed issue 263 audit controls, not scientific Q3 promotion
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,sys
+          d=json.load(open('/tmp/q3_source_bound_audit_first.json'))
+          assert d['first_github_actions_run']==39210016907
+          assert d['no_new_task_originals'] and not d['source_proposer_retrained']
+          assert d['model_calls']==d['gpu_calls']==0
+          assert d['global_Q1_Q7']=='OPEN'
+          print('Q3_SOURCE_BOUND_FIRST_AUDIT',d['scoped_audit_pass'])
+          print('AUDIT_CHECKS',d['checks'])
+          if not d['scoped_audit_pass']:sys.exit(2)
+          print('Q3_ORIGINAL_PROOF_AUTHENTICITY_SCOPED_PASS_NOT_LEARNED_GLOBAL_Q3')
+          PY
