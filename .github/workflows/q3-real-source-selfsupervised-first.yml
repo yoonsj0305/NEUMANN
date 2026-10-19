@@ -1,0 +1,73 @@
+name: Q3 first source-only self-supervised neural conserved relation, REAL official originals
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-real-source-selfsupervised-first.yml'
+      - 'research/evidence/q3_real_selfsupervised_source_gradient_20261019/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first-frozen-real-sygus-gradient-invariant:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: upstream_official
+          persist-credentials: false
+          sparse-checkout: |
+            comp/2018/Inv_Track
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Lock ORIGINAL public source and existing original-proof checker before learning
+        run: |
+          test "$(git -C upstream_official rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          test "$(git hash-object experiments/q3_source_prove.py)" = a74b62cc97958e06f70116f3c8cec2f6db3d3b75
+          test "$(git hash-object experiments/am2_sygus_native_three_vc_checker.py)" = aca2b543057c968acd8a175e7b1ef8e391ba79b2
+          python -m py_compile research/evidence/q3_real_selfsupervised_source_gradient_20261019/first_official_source_gradient.py
+          echo "Pre-registered before FIRST source-local training at Issue #273"
+      - name: Install exact real symbolic checker and numerical CPU dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cvc5
+          python -m pip install --disable-pip-version-check . numpy==1.26.4 sympy==1.13.3 z3-solver==4.13.3.0
+          cvc5 --version
+      - name: ONE first source-only unsupervised gradient training and original induction proof
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_real_selfsupervised_source_gradient_20261019/first_official_source_gradient.py --source-root upstream_official --out /tmp/q3_real_selfsupervised_first.json | tee /tmp/q3_real_selfsupervised_first.log
+          sha256sum /tmp/q3_real_selfsupervised_first.json
+      - name: Preserve immutable FIRST outcomes before admission verdict, including errors
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-real-original-selfsupervised-source-gradient-first
+          path: |
+            /tmp/q3_real_selfsupervised_first.json
+            /tmp/q3_real_selfsupervised_first.log
+          if-no-files-found: warn
+      - name: Enforce original research gate, never global Q3 or frontier proof
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,sys
+          d=json.load(open("/tmp/q3_real_selfsupervised_first.json"))
+          assert d["preregistered_issue"]==273
+          assert d["sources_already_opened"] and d["new_unseen_authored_families"]==0
+          assert not d["source_post_used_by_learned_gradient"]
+          assert d["train_labels_supplied"]==0
+          assert not d["full_classical_unique_neural_capability"]
+          assert d["gemma_model_calls"]==d["gpu_calls"]==d["frontier_model_calls"]==0
+          assert d["global_Q1_Q7"]==d["Q3_global"]=="OPEN"
+          print("FIRST_REAL_SOURCE_SELF_SUPERVISED_Q3",d["first_real_original_learned_gate_pass"])
+          print("ORIGINAL_CANDIDATE_CHECKS",d["frozen_gate_checks"])
+          if not d["first_real_original_learned_gate_pass"]:sys.exit(2)
+          print("BOUNDED_REAL_ORIGINAL_SOURCE_LEARNED_PROOF_PASS_NOT_UNIQUE_OR_GENERAL")
+          PY
