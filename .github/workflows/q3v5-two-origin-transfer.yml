@@ -1,0 +1,57 @@
+name: Q3V5 frozen two-origin source-blind transfer (first only)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3v5-two-origin-transfer.yml'
+      - 'research/evidence/q3v5-two-origin-transfer-20261019/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  independent-origins-first-transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Enforce byte-identical classical implementation before any new source inspection
+        run: |
+          test "$(git hash-object research/evidence/q3v4-proof-portfolio-20261019/first_integrated_original_portfolio.py)" = c29bea4f93e37911908d32ec443714b907c40806
+          test "$(git hash-object research/evidence/q3v3-octagon-houdini-20261019/first_octagon_original.py)" = b93a19747e642941468dde0fe704bde9034ef550
+          test "$(git hash-object research/evidence/q3v-branch-common-nullspace-20261019/first_original_branch_nullspace.py)" = ce9bd5d1a502d3807e75161e476aedab0ed1ca02
+          test "$(git -C external_loopinvgen rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+      - name: Install pinned CPU math and proof dependencies
+        run: python -m pip install --disable-pip-version-check sympy==1.13.3 z3-solver==4.13.3.0
+      - name: First selected unopened two original origin families, no ad-hoc retries
+        run: |
+          python -m py_compile research/evidence/q3v5-two-origin-transfer-20261019/first_two_families.py
+          python research/evidence/q3v5-two-origin-transfer-20261019/first_two_families.py --root external_loopinvgen --out /tmp/q3v5_frozen_first.json
+          sha256sum /tmp/q3v5_frozen_first.json
+      - name: Archive ALL positive, unsupported, wrong and negative first observations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3v5-first-two-origin-raw-science-evidence
+          path: /tmp/q3v5_frozen_first.json
+          if-no-files-found: warn
+      - name: Enforce prospectively frozen transfer gate only AFTER archiving
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,sys
+          r=json.load(open('/tmp/q3v5_frozen_first.json'))
+          print("FIRST_Q3V5_ACTUAL_SCIENTIFIC_VERDICT:",r['status'])
+          print("FIRST_Q3V5_ORIGIN_COUNTS:",r["by_origin_group"])
+          assert r["global_Q1_Q7"]=="OPEN" and r["neural_model_calls"]==0
+          if r['status']!='FIRST_FROZEN_TRANSFER_PASS' or not r['frozen_science_gate_pass']:
+              sys.exit(3)
+          print("Q3V5_FROZEN_PROSPECTIVE_ORIGIN_TRANSFER_GATE_PASS")
+          PY
