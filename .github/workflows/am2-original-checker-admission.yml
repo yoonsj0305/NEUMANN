@@ -1,0 +1,66 @@
+name: AM2 original source verifier admission - authentic metadata, fail-closed
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/am2-original-checker-admission.yml'
+      - 'neumann1/am2_original_checker_admission.py'
+      - 'tests/test_am2_original_checker_admission.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  reject-fake-scientific-cohorts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile source metadata gate without inference dependencies
+        run: |
+          python -m py_compile neumann1/am2_original_checker_admission.py tests/test_am2_original_checker_admission.py
+      - name: Install declared NEUMANN runtime dependencies for live gate CLI
+        run: python -m pip install --disable-pip-version-check .
+      - name: Original cohort negative controls and actual no-admitted-data receipt
+        run: |
+          set -o pipefail
+          python -m unittest discover -s tests -p test_am2_original_checker_admission.py -v 2>&1 | tee /tmp/am2_original_checker_first_tests.log
+          PYTHONPATH=. python -m neumann1.am2_original_checker_admission --out /tmp/am2_original_checker_actual_readiness.json | tee /tmp/am2_original_checker_first_stdout.log
+          sha256sum /tmp/am2_original_checker_actual_readiness.json
+      - name: Always preserve FIRST software negative tests, no fake original eligibility
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: am2-original-checker-admission-first-readiness
+          path: |
+            /tmp/am2_original_checker_first_tests.log
+            /tmp/am2_original_checker_first_stdout.log
+            /tmp/am2_original_checker_actual_readiness.json
+          if-no-files-found: warn
+      - name: Admit no Q1-Q7 science claim from metadata and unit tests
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open("/tmp/am2_original_checker_actual_readiness.json"))
+          assert d["registered_public_repo_candidates"]==3
+          assert d["actual_original_task_records"]==0
+          assert d["status"]=="BLOCKED_NOT_AN_ADMITTED_OPENED_24_COHORT"
+          assert d["scientific_admitted"] is False
+          assert d["model_calls"]==d["gpu_calls"]==d["paid_api_calls"]==0
+          assert not d["sealed_task_content_accessed"]
+          assert d["global_Q1_Q7"]=="OPEN"
+          g=d["gates"]
+          # Unique IDs and valid metadata are vacuously true for zero rows;
+          # the scientific gates MUST still refuse admission.
+          assert not g["at_least_24_actual_original_source_records"]
+          assert not g["at_least_3_registered_origins_8_each"]
+          assert not g["real_source_bound_checker_executed"]
+          assert not g["type_specific_original_answer_adapter_connected"]
+          assert not g["license_original_provenance_audited"]
+          assert not g["strong_tool_plus_headroom_independently_measured"]
+          print("ACTUAL_ADMISSION_BLOCKED_CORRECTLY_NOT_FAKE_MODEL_PASS")
+          PY
