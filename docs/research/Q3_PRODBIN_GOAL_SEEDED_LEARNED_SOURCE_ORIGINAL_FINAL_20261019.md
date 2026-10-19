@@ -1,0 +1,32 @@
+# NEUMANN 1 | FIRST prod-bin authentic original source-trained conservation certification
+
+**2026-10-19 KST** | `Q3_GOAL_SEEDED_LEARNED_NONAFFINE_RELATION_SOURCE_ORIGINAL=POSTHOC_SCOPED_PASS`; `Q3_NEW_MATHEMATICAL_PRIMITIVE=NOT_PROVEN`; `GLOBAL_Q3=OPEN`; `GLOBAL_Q1_Q7=OPEN`.
+
+## Unmodified original and earlier G0
+
+- Upstream `SaswatPadhi/LoopInvGen@6ac90265b11431c9477dfbd33e3e3380234c0499`, source `benchmarks/NIA/2018.CHI_InvGame/prod-bin.desugared.sl`, frozen Git blob SHA1 `b720f5e7556e1486d77ef65ae8f35b7bace20485`, original bytes SHA256 `b19442f2f8fc9fc3a0e95a7d524f59b1120b908ac9ba1fa03346a3dda4dc558c`.
+- [PR #296](https://github.com/yoonsj0305/NEUMANN/pull/296) selected all three actual sources across two groups via filenames + Git blobs in commit `3c59a4ae` **before** original bodies were opened in that G0 study. [First G0 run #39258891342](https://github.com/yoonsj0305/NEUMANN/actions/runs/39258891342) SUCCESS (hash/parity/nonvacuity): other two sources solved by Z3 SPACER; `prod-bin` original Pre/Trans/Post nonvacuous but not proved by frozen source-only Q3V6 portfolio (Post-alone step SAT, octagon Houdini fails Post, exact branch nullspace abstraction unsupported nonlinear step; native SPACER error at ~3s). Pinned independent cvc5 1.4.2 original SyGuS synthesis 15s did not complete (20s external process limit), **not proof of all-classical impossibility**.
+- Raw first G0 JSON SHA256 `024f43e084ea38e566ed5b5a5a351f5a13c596adfae11b99b3d6aebaaa1a1b39`; [artifact #12189701346](https://github.com/yoonsj0305/NEUMANN/actions/runs/39258891342/artifacts/12189701346), ZIP SHA256 `cb0986c3cdb33427b9e0e7d327ac198564462e136492b1813e6448c0cba4d491`, CRC PASS.
+
+## Actual trained source-conditional coefficient generator
+
+- After G0, **opened source**. A local numerical development prototype had already succeeded before the first production CI experiment was frozen. Therefore [PR #297](https://github.com/yoonsj0305/NEUMANN/pull/297) is **POSTHOC DEVELOPMENT**, not blind transfer/G1. [First original Z3+cvc5 CI #39260380112](https://github.com/yoonsj0305/NEUMANN/actions/runs/39260380112) completed **SUCCESS** with every frozen bounded gate true.
+- First 88 source initial conditions `a=0..7,b=0..10` generated **376 real original states** and **288 state transitions**, each successor **explicitly Z3-proved to be unique under the actual published original Trans**, never manually reimplemented loop. Separate heldout 12 conditions `a=8..10,b=11..14`: **81 states** and **69 true original transitions**. No parameter learning on holdout.
+- Model uses the **published Post `z=ab` as a goal anchor** `z-ab`. This is allowed original task information, **not a privileged published invariant label**, but it is not Post-blind. The learner sees non-gold source trajectories and fits 18 freely trainable coefficients of all remaining predefined original 5-variable real polynomial monomials of degree up to 2 using actual CPU gradient L-BFGS-B (`314` iterations); coefficient rounding yields exactly one new active monomial `x*y` with coefficient `+1`. The actual learned source-to-goal relation is
+
+```
+I = (z - a*b + x*y == 0)      equivalent to      a*b = x*y + z
+```
+
+- All source-trained matrix constraints exact, and **all 81 independently heldout source states** plus their transition conservation equations exact.
+- **Unmodified ORIGINAL** source native Z3 initiation/consecution/Post bad conditions: `unsat` / `unsat` / `unsat`; identical original source native/custom XOR parity 3/3 `UNSAT`. Unmodified independent [AM2 source-SHA-bound checker](https://github.com/yoonsj0305/NEUMANN/blob/research/q3-prod-bin-learned-conservation-original-20261019/experiments/am2_sygus_native_three_vc_checker.py) with pinned actual cvc5 **1.4.2** also found **original bad VCs UNSAT 3/3**, return code 0 each, at its existing 3-second per-query cap. Post-alone does not induct (step SAT); remove the cross-term and the safety proof is lost. No original source/goal weakened, no unknown accepted.
+- First immutable raw successful JSON SHA256 `380610840022d1d7841c28b3de5c28345c819f8e17a6217f10718f0806c9ce98`; original [GitHub artifact #12191745147](https://github.com/yoonsj0305/NEUMANN/actions/runs/39260380112/artifacts/12191745147), ZIP SHA256 `b839a2b34c86a93e1ed58f72219b743deb6ceb2e059975e407f151fa018c7d62`, CRC PASS.
+
+## Most important strong classical control and limitation
+
+- **Matched original-source input, identical predeclared 18 monomial columns and same 376 original state trajectories:** numerical exact linear-system least-squares recovered **the identical 18 coefficients**, and independently passed the published original Z3 3VC and all heldout rows. Hence **the current neural method did not discover a proof unavailable to the same-feature classical method**.
+- Measured on *the same* pinned Actions CPU: gradient model's fitting-component wall **22.413 ms** versus classical least-squares fitting-component **0.346 ms**, about **64.8 times** higher fitting cost for the gradient method. These are **only the coefficient fitting components**, not complete system cold-start / original SMT / energy comparison, so no system-cost ratio is asserted.
+- The learned equality is absent from old **affine-only Γ**, but `x*y` was included in the expanded **degree≤2 monomial grammar in advance**. Accordingly, NOT invented mathematical multiplication operator, not proof of trainable AST-grammar invention, and not a unique model-vs-best specialist capability. Original published LoopInvGen and DreamCoder-style grammar-growing program synthesis remain relevant prior art.
+- Explicit outcome: `Q3_PRODBIN_SOURCE_GOAL_CONDITIONED_BILINEAR_COEFFICIENT_GENERATION=POSTHOC_SCOPED_PASS`, `Q3_EXACT_ORIGINAL_Z3_CVC5_3VC=POSTHOC_SCOPED_PASS`, `Q3_NEURAL_OPERATOR_OUTSIDE_PREDECLARED_VOCAB=OPEN`, `Q3_UNIQUE_OVER_EQUAL_INFORMATION_CLASSICAL=NO`, `Q4/Q5_ALL_IN_10X=OPEN`, `Q6_FRESH_BLIND_SOURCE_TRANSFER=OPEN`, `Q7_FRONTIER_PROVIDER=BLOCKED`, global `Q1–Q7=OPEN`.
+
+**STOP spending neural training on polynomial-degree≤2 source-conditioned exact-recovery examples.** Under NEUMANN's fixed computation-minimal North Star, use the strong exact classical route for this domain and redeploy learning only where a genuinely new candidate AST vocabulary and matched classical deficit are demonstrated first.
