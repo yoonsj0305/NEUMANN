@@ -1,0 +1,75 @@
+name: Q3 OFFICIAL previously-uninspected SyGuS 2018/19 one-shot source transfer
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-official-unseen-transfer-2018-2019.yml'
+      - 'research/evidence/q3official-blind-transfer-20261019/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first-prospective-official-original-transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: external_official_sygus
+          persist-credentials: false
+          sparse-checkout: |
+            comp/2018/Inv_Track
+            comp/2019/Inv_Track
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Freeze old prover and external git commit BEFORE FIRST source read
+        run: |
+          echo "Q3_SOURCE_CLI_GIT_BLOB $(git hash-object experiments/q3_source_prove.py)"
+          echo "Q3V6_GIT_BLOB $(git hash-object research/evidence/q3v6-lazy-specialist-20261019/first_proof_gated_lazy_fallback.py)"
+          echo "Q3V4_GIT_BLOB $(git hash-object research/evidence/q3v4-proof-portfolio-20261019/first_integrated_original_portfolio.py)"
+          test "$(git hash-object experiments/q3_source_prove.py)" = 11392c9f4c2d7cf4f3b358ae61407c20df78fed1
+          test "$(git hash-object research/evidence/q3v6-lazy-specialist-20261019/first_proof_gated_lazy_fallback.py)" = 7e61c7a3a0ed9d15b354b7b3d67b5adf40517059
+          test "$(git hash-object research/evidence/q3v4-proof-portfolio-20261019/first_integrated_original_portfolio.py)" = c29bea4f93e37911908d32ec443714b907c40806
+          test "$(git -C external_official_sygus rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3official-blind-transfer-20261019/first_official_2018_2019.py
+      - name: Install only open-source pinned validators
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cvc5
+          python -m pip install --disable-pip-version-check . sympy==1.13.3 z3-solver==4.13.3.0
+          cvc5 --version
+      - name: ONE frozen official-source experiment (always preserve all results)
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3official-blind-transfer-20261019/first_official_2018_2019.py --source-root external_official_sygus --out /tmp/q3official_first12.json | tee /tmp/q3official_first12_stdout.log
+          sha256sum /tmp/q3official_first12.json
+      - name: Preserve ALL first source failures and proof receipts before science gate
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-official-2018-2019-first-12-source-evidence
+          path: |
+            /tmp/q3official_first12.json
+            /tmp/q3official_first12_stdout.log
+          if-no-files-found: warn
+      - name: Enforce preregistered science gate with no posthoc substitution
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,sys
+          v=json.load(open("/tmp/q3official_first12.json"))
+          assert v["total_sources"]==12 and len(v["cases"])==12
+          assert v["external_git_commit"]=="13c8deb68a873635879c9a69bc78caebd340f646"
+          assert v["selection"]=="FIRST_SIX_LEXICOGRAPHIC_SL_PER_YEAR_NO_SUBSTITUTION"
+          assert v["global_Q1_Q7"]=="OPEN" and v["global_Q6"]=="OPEN"
+          assert v["model_calls"]==v["GPU_calls"]==v["frontier_calls"]==0
+          assert not v["independent_original_origin_proved"] and not v["learned_new_operators"]
+          print("FIRST_Q3_OFFICIAL_TRANSFER_SCIENCE_GATE",v["scientific_transfer_gate_pass"])
+          if not v["scientific_transfer_gate_pass"]:sys.exit(2)
+          print("SCOPED_OFFICIAL_SOURCE_TRANSFER_PASS_DOES_NOT_CLOSE_GLOBAL_Q3")
+          PY
