@@ -51,7 +51,9 @@ def public_structure(view):
             "method_id":"TEST_ONLY_NOT_LEARNED_OR_NOVEL"}
 
 def public_certifier(view,proposal):
-    return {"valid":True,"proof_sha256":"f"*64}
+    return {"valid":True,"proof_sha256":"f"*64,
+            "source_sha256":runtime.sha(view),
+            "proposal_sha256":runtime.sha(proposal)}
 
 class ThreeArmExecutableBoundary(unittest.TestCase):
     def test_same_core_three_arms_and_original_boolean_checker(self):
@@ -153,6 +155,34 @@ class ThreeArmExecutableBoundary(unittest.TestCase):
         self.assertFalse(row["accepted"])
         self.assertEqual(row["original_checker_calls"],1)
         self.assertEqual(row["status"],"ORIGINAL_CHECKER_REJECT")
+
+
+    def test_certifier_cannot_reuse_proof_on_another_public_source(self):
+        stale_hash=runtime.sha(PUBLIC)
+        changed={**PUBLIC,"question":"Another original."}
+        def stale_cert(view,proposal):
+            return {"valid":True,"proof_sha256":"f"*64,
+                    "source_sha256":stale_hash,
+                    "proposal_sha256":runtime.sha(proposal)}
+        core=FakeCore()
+        row=runtime.run_one_opened(changed,"NEUMANN",core,lambda x:True,
+            shared_tool=public_tool,proposer=public_structure,
+            certifier=stale_cert,production=False)
+        self.assertFalse(row["accepted"])
+        self.assertEqual(core.calls,0)
+        self.assertIn("CERTIFICATION_FAILED",row["reason"])
+
+    def test_frozen_artifact_and_tokenizer_required_for_actual_model(self):
+        c=FakeCore()
+        c.identity.update({"evidence_kind":"actual_frozen_model",
+            "accelerator_class":True,"model_id":"google/gemma-4-E2B-it",
+            "model_revision":"3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+            "artifact_sha256":"0"*64,"tokenizer_sha256":"1"*64,
+            "precision":"bfloat16","deterministic":True,"do_sample":False})
+        with self.assertRaises(abi.InterfaceBlocked):
+            runtime.run_one_opened(PUBLIC,"DIRECT",c,lambda x:True,
+                production=True)
+        self.assertEqual(c.calls,0)
 
     def test_frozen_budgets_validate(self):
         with self.assertRaises(ValueError):
