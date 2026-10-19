@@ -1,0 +1,35 @@
+name: AM2 opened matched three-arm runtime - software execution boundary only
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/am2-opened-three-arm-boundary.yml'
+      - 'neumann1/am2_opened_three_arm_runtime.py'
+      - 'tests/test_am2_opened_three_arm_runtime.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  executable-three-arm-software-boundary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Ensure exact new ABI was staged and never retrieve models or gated source rows
+        run: |
+          test -f neumann1/am2_generic_qa_abi.py
+          python -m py_compile neumann1/am2_opened_three_arm_runtime.py tests/test_am2_opened_three_arm_runtime.py
+      - name: Run only software contract unit tests using a visibly synthetic non-model core
+        run: |
+          set -o pipefail
+          python -m unittest discover -s tests -p test_am2_opened_three_arm_runtime.py -v 2>&1 | tee /tmp/am2_three_arm_contract_tests.txt
+          sha256sum /tmp/am2_three_arm_contract_tests.txt
+      - name: Save first software boundary result even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: am2-three-arm-opened-runtime-first-boundary
+          path: /tmp/am2_three_arm_contract_tests.txt
+          if-no-files-found: warn
