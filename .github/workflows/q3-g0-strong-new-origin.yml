@@ -1,0 +1,76 @@
+name: Q3 G0 original new-author stronger SyGuS baseline
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-g0-strong-new-origin.yml'
+      - 'research/evidence/q3_g0_20261019/**'
+      - 'docs/research/Q3_G0_NEW_ORIGIN_STRONG_SYGUS_PREREG_20261019.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first_g0_two_origins_cpu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: official_loopinv
+          sparse-checkout: |
+            benchmarks/NIA/2018.CHI_InvGame
+            benchmarks/LIA/others
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check source revision and G0 syntax
+        run: |
+          test "$(git -C official_loopinv rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+          python -m py_compile research/evidence/q3_g0_20261019/strong_original_baseline.py
+      - name: Official pinned cvc5 1.4.2, authentic source-only SyGuS
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          test "$(find /tmp/cvc5bin -type f -name cvc5 | wc -l)" -eq 1
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.14.0 numpy==2.3.5 scipy==1.17.0
+      - name: FIRST frozen three authentic original G0 classical plus cvc5 SyGuS
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_g0_20261019/strong_original_baseline.py --root official_loopinv --out /tmp/q3_g0_strong_new_first.json | tee /tmp/q3_g0_strong_new_first.log
+          sha256sum /tmp/q3_g0_strong_new_first.json
+      - name: Freeze FIRST actual scientific outcomes including unsupported/UNKNOWN
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-g0-new-origin-three-original-strong-classical-first
+          path: |
+            /tmp/q3_g0_strong_new_first.json
+            /tmp/q3_g0_strong_new_first.log
+          if-no-files-found: warn
+      - name: Authentic source identity and nonfabrication gates
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_g0_strong_new_first.json'))
+          assert x['source_identity_all_verified'] is True
+          assert x['all_cohort_rows_included']
+          assert {r['origin_group'] for r in x['cases']}=={'2018.CHI_InvGame','LIA.others'}
+          assert len(x['cases'])==3
+          assert x['global_Q3']==x['global_Q1_Q7']=='OPEN'
+          assert x['neural_training_on_frozen_sources'] is False
+          for row in x['cases']:
+            if row.get('original_validity')=='NONVACUOUS_PARSED_PARITY_PASS':
+              p=row['classical']['cvc5_original_sygus_15s']
+              assert p['original_inductive_certificate'] is False
+          print('G0_FIRST_EXACT_THREE_SOURCE_IDENTITIES_PASS',x['g0_decision'])
+          PY
