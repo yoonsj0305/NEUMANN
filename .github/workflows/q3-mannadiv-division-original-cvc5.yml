@@ -1,0 +1,66 @@
+name: Q3 mannadiv minimal Euclid proof cvc5 first scientific receipt
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-mannadiv-division-original-cvc5.yml'
+      - 'research/evidence/q3_mannadiv_division_certificate_20261019/**'
+      - 'docs/research/Q3_MANNADIV_INDEPENDENT_POST_GAP_PREREG_20261019.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first-original-cvc5-minimal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: official_loopinv
+          sparse-checkout: |
+            benchmarks/NIA/2016.ATVA_PILAT
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin original source
+        run: |
+          test "$(git -C official_loopinv rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+          python -m py_compile research/evidence/q3_mannadiv_division_certificate_20261019/verify_minimal_original.py
+      - name: Install cvc5 and original Z3
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cvc5
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.14.0 numpy==2.3.5 scipy==1.17.0
+          cvc5 --version
+      - name: FIRST registered source-original independent cvc5 gap attempt
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_mannadiv_division_certificate_20261019/verify_minimal_original.py --root official_loopinv --out /tmp/q3_mannadiv_euclid_cvc5_first.json | tee /tmp/q3_mannadiv_euclid_cvc5_first.log
+          sha256sum /tmp/q3_mannadiv_euclid_cvc5_first.json
+      - name: Archive first outcome even if unknown
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-mannadiv-minimal-euclid-first-independent-cvc5
+          path: |
+            /tmp/q3_mannadiv_euclid_cvc5_first.json
+            /tmp/q3_mannadiv_euclid_cvc5_first.log
+          if-no-files-found: warn
+      - name: Enforce original scope, never fake cvc5
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_mannadiv_euclid_cvc5_first.json'))
+          assert all(x['gates'].values()),x['gates']
+          assert x['source_only_minimal_original_Z3_bad_VCs']==dict.fromkeys(['initial','consecution','post'],'unsat')
+          assert x['neural_math_primitive_invention'] is False
+          assert x['global_Q3']==x['global_Q1_Q7']=='OPEN'
+          print('SCIENCE_CVC5_ORIGINAL_ALL_THREE',x['EXTERNAL_ORIGINAL_CVC5_ALL_THREE_UNSAT'])
+          print('SCIENCE_VERDICT',x['science_verdict'])
+          PY
