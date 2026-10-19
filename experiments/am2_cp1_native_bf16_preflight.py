@@ -45,6 +45,7 @@ def probe_native_bf16(torch_module=None, *, require_nvidia_smi=True):
         except Exception as e:
             return blocked("PYTORCH_ACCELERATOR_PACKAGE_NOT_AVAILABLE",
                 {"error_class":type(e).__name__})
+    simulation_only=bool(torch_module is not None and not require_nvidia_smi)
     t=torch_module
     try:
         if not t.cuda.is_available() or t.cuda.device_count()<1:
@@ -72,7 +73,8 @@ def probe_native_bf16(torch_module=None, *, require_nvidia_smi=True):
         details["native_bfloat16_reported"]=True
         return {
             "schema":"neumann.am2-cp1.native-bf16-hardware.v1",
-            "status":"READY_NATIVE_BF16_PHYSICAL_GATE_ONLY",
+            "status":("LOGIC_READY_SIMULATION_ONLY" if simulation_only
+            else "READY_NATIVE_BF16_PHYSICAL_GATE_ONLY"),
             "hardware_only":True,"model_loaded":False,
             "model_calls":0,"gpu_kernel_calls":0,
             "paid_compute_used":False,
