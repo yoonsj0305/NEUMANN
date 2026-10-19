@@ -13,6 +13,8 @@ jobs:
     timeout-minutes: 16
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/checkout@v4
         with:
           repository: SyGuS-Org/benchmarks
