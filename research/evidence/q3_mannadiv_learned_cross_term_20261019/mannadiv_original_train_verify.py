@@ -165,7 +165,15 @@ def main():
    ablated[i]=0
  without_product=source_proof(z3.And(now[goal]==polynomial(ablated,now,mons),helper),native)
  strong_expert_only=classical_helper_only
- ext=check_original_candidate(path,z3.And(learning_relation,helper).sexpr(),
+ # The unchanged external original prover rejects SMT-LIB unary (+ arg).
+ # Z3 pretty-printer can emit this from generic source-only Houdini atoms.
+ # Canonicalize only the candidate syntax, then prove exact Boolean parity
+ # against the unmodified already Z3-certified candidate BEFORE cvc5.
+ raw_candidate=z3.And(learning_relation,helper)
+ normalized_candidate=z3.simplify(raw_candidate)
+ serialized_parity=check_formula(z3.Xor(raw_candidate,normalized_candidate))
+ if serialized_parity!="unsat":raise ValueError("CANDIDATE_SERIALIZATION_NOT_PROVABLY_EQUIVALENT")
+ ext=check_original_candidate(path,normalized_candidate.sexpr(),
              expected_source_sha256=sha)
  cv=ext.get("cvc5_original_three_vc") or {}
  gates={
