@@ -107,7 +107,7 @@ def adversarial_controls():
     altered="Return the sum of distinct odd integers in items, a list of integers."
     o=compile_public_requirement(original)
     a=compile_public_requirement(altered)
-    if o["generated_source_sha256"] if "generated_source_sha256" in o else o["source"] == a["source"]:
+    if o["source"] == a["source"]:
         raise AssertionError("PUBLIC_SPEC_CHANGE_DID_NOT_AFFECT_COMPILER")
     rejected["altered_requirement_different_program"]="PASS"
     items=[2,2,3,4,-2]
