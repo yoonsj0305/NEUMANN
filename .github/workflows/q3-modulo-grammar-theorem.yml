@@ -1,0 +1,66 @@
+name: Q3 nonpolynomial grammar theorem and synthetic modular transfer
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-modulo-grammar-theorem.yml'
+      - 'research/evidence/q3_polynomial_mod_barrier_20261019/**'
+      - 'docs/research/Q3_POLYNOMIAL_GRAMMAR_MODULO_BARRIER_PREREG_20261019.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first_original_synthetic_scope_verification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Get independent cvc5 exact pinned binary
+        run: |
+          python -m py_compile research/evidence/q3_polynomial_mod_barrier_20261019/unbounded_modulo_theorem.py
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          test "$(find /tmp/cvc5bin -type f -name cvc5 | wc -l)" -eq 1
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F '1.4.2'
+      - name: Install exact symbolic math and CPU neural optimizer
+        run: |
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.14.0 numpy==2.3.5 scipy==1.17.0
+      - name: FIRST full proof of polynomial grammar exclusion and source synthetic generalization
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_polynomial_mod_barrier_20261019/unbounded_modulo_theorem.py --out /tmp/q3_mod_barrier_first.json | tee /tmp/q3_mod_barrier_first.log
+          sha256sum /tmp/q3_mod_barrier_first.json
+      - name: Preserve first actual outcome pass or fail
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-modulo-polynomial-barrier-first
+          path: |
+            /tmp/q3_mod_barrier_first.json
+            /tmp/q3_mod_barrier_first.log
+          if-no-files-found: warn
+      - name: Enforce mathematically narrow science claims
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_mod_barrier_first.json'))
+          assert x['theorem_original_solver_dual_certified'] is True
+          assert len(x['verified_finite_witness_cases'])==24
+          assert x['finite_interpolation_failure_positive_control']['finite_interpolation_wrong_on_next_n']
+          assert x['synthetic_bounded_pass'] is True
+          assert {t['synthetic_modulus_k'] for t in x['test']}=={7,8,9,11}
+          assert x['decoder_has_mod_primitive_predefined'] is True
+          assert x['same_source_matched_exact_classical_also_solves'] is True
+          assert x['unique_learned_mathematical_primitive_over_classical'] is False
+          assert x['new_external_origin_cross_family_blind'] is False
+          assert x['global_Q3']==x['global_Q1_Q7']=='OPEN'
+          print('FIRST_REAL_POLYNOMIAL_OPERATOR_BARRIER_AND_SYNTHETIC_SCOPED_PASS')
+          PY
