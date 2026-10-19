@@ -1,0 +1,60 @@
+name: Q3 first genuinely CPU-trained source-only operator proposer and exact original Z3 proofs
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-cpu-trained-source-operator-first.yml'
+      - 'research/evidence/q3_cpu_learned_operator_20261019/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  frozen-first-actual-cpu-neural-training:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Source compile and immutable scientific issue marker
+        run: |
+          python -m py_compile research/evidence/q3_cpu_learned_operator_20261019/first_trained_source_operator.py
+          echo "First CPU-trained model study preregistered at https://github.com/yoonsj0305/NEUMANN/issues/271 BEFORE first execution"
+      - name: Install fixed CPU neural and original Z3 checker only
+        run: |
+          python -m pip install --disable-pip-version-check numpy==1.26.4 scikit-learn==1.5.2 z3-solver==4.13.3.0
+      - name: ONE first frozen supervised CPU train and unseen-parameter original proof gate
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_cpu_learned_operator_20261019/first_trained_source_operator.py --out /tmp/q3_cpu_learned_first.json | tee /tmp/q3_cpu_learned_first_stdout.txt
+          sha256sum /tmp/q3_cpu_learned_first.json
+      - name: Archive FIRST science output before verdict, even if failed
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-cpu-trained-source-operator-first-train-proofs
+          path: |
+            /tmp/q3_cpu_learned_first.json
+            /tmp/q3_cpu_learned_first_stdout.txt
+          if-no-files-found: warn
+      - name: Enforce preregistered bounded learned proof gate (not global Q3)
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,sys
+          d=json.load(open("/tmp/q3_cpu_learned_first.json"))
+          assert d["preregister_issue"]==271
+          assert d["training_examples"]==360 and d["heldout_originals"]==90
+          assert not d["model_uses_inference_post_or_gold"]
+          assert not d["learned_open_ended_new_math_invented"]
+          assert not d["trained_original_frozen_gemma_E2B"]
+          assert d["native_GPU_model_forwards"]==d["paid_API_calls"]==d["frontier_model_calls"]==0
+          assert d["global_Q1_Q7"]=="OPEN"
+          print("FIRST_SCIENCE_ACTUAL_CPU_NEURAL_OPERATOR_VERDICT",d["first_scoped_gate_pass"])
+          print("STRONG_FULL_CLASSICAL",d["original_3vc_correctly_certified"]["STRONG_FULL_CLASSICAL"])
+          print("ALL_PREDECLARED_CHECKS",d["preregistered_gate_conditions"])
+          if not d["first_scoped_gate_pass"]:sys.exit(2)
+          print("SCOPED_LEARNED_SOURCE_OPERATOR_PROPOSAL_PASS_NOT_FULL_Q3_OR_FRONTIER")
+          PY
