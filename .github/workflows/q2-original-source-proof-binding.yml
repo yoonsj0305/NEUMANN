@@ -1,0 +1,59 @@
+name: Q2 real-original proof binding red-team (no model/GPU)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q2-original-source-proof-binding.yml'
+      - 'experiments/q3_source_prove.py'
+      - 'research/evidence/q2-source-bound-proof-integrity-20261019/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-source-boundary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin trusted original, solver dependencies and syntax
+        run: |
+          test "$(git -C external_loopinvgen rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+          python -m pip install --disable-pip-version-check sympy==1.13.3 z3-solver==4.13.3.0
+          python -m py_compile experiments/q3_source_prove.py research/evidence/q2-source-bound-proof-integrity-20261019/first_trusted_original_redteam.py
+      - name: ONE prospective real-original proof-binder security test
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q2-source-bound-proof-integrity-20261019/first_trusted_original_redteam.py --root external_loopinvgen --out /tmp/q2_real_source_proof_redteam_first.json | tee /tmp/q2_real_source_proof_redteam_first_stdout.txt
+          sha256sum /tmp/q2_real_source_proof_redteam_first.json
+      - name: Always archive first observations including failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q2-original-proof-source-binding-first-redteam
+          path: |
+            /tmp/q2_real_source_proof_redteam_first.json
+            /tmp/q2_real_source_proof_redteam_first_stdout.txt
+          if-no-files-found: warn
+      - name: Enforce trusted-original source binding scope and fail-closed decisions
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open("/tmp/q2_real_source_proof_redteam_first.json"))
+          assert x["first_gate_pass"]
+          assert x["legacy_unbound_vulnerability_reproduced"] is True
+          assert x["strict_replay_good_sources_passed"]==2
+          assert all(x["hardened_boundary_negative_controls"].values())
+          assert x["new_model_inferences"]==0
+          assert x["global_Q1_Q7"]=="OPEN"
+          assert x["historical_prove_source_success_preserved"] is True
+          print("Q2_SOURCE_BOUND_PROOF_INTEGRITY_GATE_SCOPED_PASS")
+          PY

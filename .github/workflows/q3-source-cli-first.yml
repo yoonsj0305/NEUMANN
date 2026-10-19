@@ -1,0 +1,63 @@
+name: Q3 source proof CLI first 18 original safety deployment regression
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-source-cli-first.yml'
+      - 'experiments/q3_source_prove.py'
+      - 'research/evidence/q3-source-proof-cli-20261019/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-only-cli-first-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Assert previously frozen original proposer and proof engine blobs unchanged
+        run: |
+          test "$(git hash-object research/evidence/q3v6-lazy-specialist-20261019/first_proof_gated_lazy_fallback.py)" = 7e61c7a3a0ed9d15b354b7b3d67b5adf40517059
+          test "$(git hash-object research/evidence/q3v4-proof-portfolio-20261019/first_integrated_original_portfolio.py)" = c29bea4f93e37911908d32ec443714b907c40806
+          test "$(git hash-object research/evidence/q3v3-octagon-houdini-20261019/first_octagon_original.py)" = b93a19747e642941468dde0fe704bde9034ef550
+          test "$(git -C external_loopinvgen rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+      - name: Pin original solver versions and required repository dependencies
+        run: |
+          python -m pip install --disable-pip-version-check . sympy==1.13.3 z3-solver==4.13.3.0
+      - name: First same opened original 18 proof CLI regression and exported-SMT replays
+        run: |
+          python -m py_compile experiments/q3_source_prove.py research/evidence/q3-source-proof-cli-20261019/first_original_18_cli_gate.py
+          PYTHONPATH=. python research/evidence/q3-source-proof-cli-20261019/first_original_18_cli_gate.py --root external_loopinvgen --out /tmp/q3_cli_first18.json | tee /tmp/q3_cli_first18_stdout.log
+          sha256sum /tmp/q3_cli_first18.json
+      - name: Preserve all first original cases before any final gate
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-cli-first-18-original-replay-receipt
+          path: |
+            /tmp/q3_cli_first18.json
+            /tmp/q3_cli_first18_stdout.log
+          if-no-files-found: warn
+      - name: Fail closed on any originally unproved source
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,sys
+          a=json.load(open("/tmp/q3_cli_first18.json"))
+          print("FROZEN_Q3_DEPLOYMENT_GATE",a["first_gate_pass"])
+          print("FROZEN_Q3_SCIENCE_NOT_PROMOTED",a["global_Q3"],a["global_Q1_Q7"])
+          assert a["global_Q3"]=="OPEN" and a["global_Q1_Q7"]=="OPEN"
+          assert a["source_originals"]==18 and a["model_calls"]==0
+          if not a["first_gate_pass"]:sys.exit(2)
+          assert a["explicit_replayable_inductive_three_vc"]==16
+          assert a["source_only_spacer_without_inductive_certificate"]==2
+          print("Q3_SINGLE_FILE_DEPLOYABLE_CLI_SCOPED_PASS")
+          PY
