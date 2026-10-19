@@ -1,5 +1,9 @@
 name: G0 qfn2l C++ pinned specialist build qualification
 on:
+  pull_request:
+    paths:
+      - '.github/workflows/g0-qfn2l-cpp-build-qualification.yml'
+      - 'research/evidence/g0-qfn2l-cpp-qualification-20261019/**'
   push:
     branches:
       - research/g0-qfn2l-cpp-build-qual-20261019
