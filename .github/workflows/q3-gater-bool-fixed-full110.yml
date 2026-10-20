@@ -69,7 +69,9 @@ jobs:
           r=json.load(open('/tmp/q3_Bool_full110_original_second.json'))
           assert r['immutable_first_model_real_source_pass']=='0/18'
           assert r['same_source_samples_proposals_first18_identical']
-          assert r['frozen_268_neural_weights_SHA256']=='d00ebe239e23fe86e6ace2fe2d7a69ea380f0fb6fc4dbc096cc3bb3d2baf07d0'
+          assert r['first_original_268_neural_weights_SHA256']=='d00ebe239e23fe86e6ace2fe2d7a69ea380f0fb6fc4dbc096cc3bb3d2baf07d0'
+          assert r['numerical_first18_AST_and_scores_identical']
+          assert 'regenerated_268_neural_weights_SHA256' in r
           assert r['one_source_posthoc_full_verifier_budget_expansion_only']
           assert r['fixed_boolean_grammar_exact_classical_stronger']=='YES'
           assert r['gate_R_full']==r['gate_V']==r['global_Q3']=='OPEN'
