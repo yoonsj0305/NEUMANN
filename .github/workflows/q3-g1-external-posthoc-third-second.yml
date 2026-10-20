@@ -1,0 +1,74 @@
+name: Q3 G1 immutable 2-valid-first plus third-posthoc SHA audit
+on:
+  push:
+    branches:
+      - research/q3-g1-independent-author-original-audit-20261020
+    paths:
+      - '.github/workflows/q3-g1-external-posthoc-third-second.yml'
+      - 'research/evidence/q3_g1_independent_author_origins_20261020/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preserved_first_blind_two_plus_posthoc_third:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: independent_upstream
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+            lib/Inv_Track/andrew_lustre
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check pinned external upstream version and Python syntax
+        run: |
+          test "$(git -C independent_upstream rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_g1_independent_author_origins_20261020/first_frozen42_three_syguS_origins.py
+      - name: SHA-pinned independent cvc5 1.4.2, Z3, NumPy, SymPy, SciPy
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          test "$(find /tmp/cvc5bin -type f -name cvc5 | wc -l)" -eq 1
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.17.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: POSTHOC third SHA-corrected independent actual originals, unchanged learned weights
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_g1_independent_author_origins_20261020/first_frozen42_three_syguS_origins.py --root independent_upstream --out /tmp/q3_g1_origin_second_posthoc.json | tee /tmp/q3_g1_origin_second_posthoc.log
+          sha256sum /tmp/q3_g1_origin_second_posthoc.json
+      - name: Preserve actual second evidence even when model is unsupported
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-g1-independent-origin-second-third-posthoc
+          path: |
+            /tmp/q3_g1_origin_second_posthoc.json
+            /tmp/q3_g1_origin_second_posthoc.log
+          if-no-files-found: warn
+      - name: Never silently relabel third repaired source as blind
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3_g1_origin_second_posthoc.json'))
+          assert r['all_three_original_git_blobs_verified']
+          assert r['third_target_POSTHOC_NOT_FRESH_BLIND']
+          assert r['genuine_first_presource_sha_verified']==2
+          assert r['frozen_first_ci_raw_sha256']=='825afcbe5bb374dea536fa66ad85d5b19ed2458f6ac2596a69156468ceb65c14'
+          assert r['frozen_weights_and_synthetic_training']['frozen_trained_weights_sha256']=='563c6be70fade6db755425a5756b6fdd89503ada5727bf31f49ad195ec041a78'
+          assert r['global_Q3']=='OPEN'
+          print('FROZEN_EXTERNAL_VALID_BLIND_SOURCES',2)
+          print('POSTHOC_IDENTITY_FIXED_SOURCE',r['originals'][2]['status'])
+          print('LEARNED_REAL_EXTERNAL_ORIGINALS',r['learned_certified_new_originals'])
+          PY
