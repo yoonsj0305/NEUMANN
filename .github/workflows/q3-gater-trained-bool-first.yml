@@ -1,0 +1,73 @@
+name: Q3 Gate R first actual CPU-learned Boolean relational source proposal
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-gater-trained-bool-first.yml'
+      - 'research/evidence/q3_gateR_learned_bool_20261021/**'
+      - 'docs/research/Q3_TRAINED_BOOLEAN_RELATION_REAL_ORIGINAL_FIRST_FROZEN_20261021.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real_first_neural_bool_source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: external_originals
+          sparse-checkout: |
+            lib/Inv_Track/andrew_lustre
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Exact source revision and Python compiled grammar
+        run: |
+          test "$(git -C external_originals rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_gateR_learned_bool_20261021/first_cpu_trained_bool_implication_source_only.py
+      - name: Exact Z3 and SHA-pinned independent cvc5 plus CPU NumPy
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          test "$(find /tmp/cvc5bin -type f -name cvc5 | wc -l)" -eq 1
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: FIRST actual original train from synthetic and frozen Boolean relational proposal
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_gateR_learned_bool_20261021/first_cpu_trained_bool_implication_source_only.py --root external_originals --out /tmp/q3_gateR_bool_neural_first.json | tee /tmp/q3_gateR_bool_neural_first.log
+          sha256sum /tmp/q3_gateR_bool_neural_first.json
+      - name: Immutable first original evidence even when model fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-gater-trained-Boolean-first-original
+          path: |
+            /tmp/q3_gateR_bool_neural_first.json
+            /tmp/q3_gateR_bool_neural_first.log
+          if-no-files-found: warn
+      - name: Honest independent evidence scope
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3_gateR_bool_neural_first.json'))
+          assert r['synthetic_neural_learning']['synthetic_train']==2400
+          assert r['synthetic_neural_learning']['synthetic_test']==480
+          assert r['synthetic_model_frozen_before_source_read']
+          assert r['source_already_opened_NOT_BLIND']
+          assert r['gate_R_full']==r['gate_V']==r['global_Q3']=='OPEN'
+          assert r['genuine_G1_first_unseen_transfer']=='NOT_TESTED'
+          assert r['novel_math_operator_beyond_source_and_classical']=='NOT_PROVEN'
+          print('SYNTHETIC_HELDOUT',r['synthetic_neural_learning']['learned_heldout_correct'],'/480')
+          print('LEARNED_REAL_BOOL_RELATION_INDUCTIVE',r['learned_real_source_inductive_relational_clauses'])
+          PY
