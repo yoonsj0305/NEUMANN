@@ -1,0 +1,72 @@
+name: Q3 prod4br pinned original UNSAFE counterexample dual SMT
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-prod4br-original-unsafe-first.yml'
+      - 'research/evidence/q3_prod4br_original_unsafe_20261020/**'
+      - 'docs/research/Q3_PROD4BR_ACTUAL_ORIGINAL_ONE_STEP_UNSAFE_FIRST_CI_FREEZE_20261020.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first_certified_original_one_step_bad_path:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: original_loopinvgen
+          sparse-checkout: |
+            benchmarks/NIA/other
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Source pin and Python syntax before witness verification
+        run: |
+          test "$(git -C original_loopinvgen rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+          python -m py_compile research/evidence/q3_prod4br_original_unsafe_20261020/one_step_real_bad_execution.py
+      - name: Official pinned cvc5 1.4.2 and Z3 for independent original reachability
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          test "$(find /tmp/cvc5bin -type f -name cvc5 | wc -l)" -eq 1
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.17.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: FIRST nine independently Z3 and cvc5 authenticated original unsafety checks
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_prod4br_original_unsafe_20261020/one_step_real_bad_execution.py --root original_loopinvgen --out /tmp/q3_prod4br_original_unsafe_first.json | tee /tmp/q3_prod4br_original_unsafe_first.log
+          sha256sum /tmp/q3_prod4br_original_unsafe_first.json
+      - name: Retain FIRST real source counterexample even if not provable
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-prod4br-real-original-first-unsafe
+          path: |
+            /tmp/q3_prod4br_original_unsafe_first.json
+            /tmp/q3_prod4br_original_unsafe_first.log
+          if-no-files-found: warn
+      - name: Scientifically honest unsafe verdict and unchanged source
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_prod4br_original_unsafe_first.json'))
+          assert x['git_blob']=='81b9f72de2b2ee569a2f395fac2fd67164f0a10f'
+          assert x['original_unmodified_program_UNSAFE'] is True
+          assert x['independently_dual_verified_obligations']==9
+          assert x['source_current_state_from_original_Pre']==[1,1,1,1,1,0]
+          assert x['source_next_state_from_original_Trans']==[1,1,0,0,1,-1]
+          assert x['witness_source_is_unmodified_published_original']
+          assert x['global_Q3']==x['global_Q1_Q7']=='OPEN'
+          print('FIRST_ORIGINAL_PROD4BR_ONE_STEP_REAL_BUG_Z3_CVC5_CERTIFIED')
+          PY
