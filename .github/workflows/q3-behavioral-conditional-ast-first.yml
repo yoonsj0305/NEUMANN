@@ -1,0 +1,67 @@
+name: Q3 teacher-free behavioral-gradient conditional AST true original synthetic proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-behavioral-conditional-ast-first.yml'
+      - 'research/evidence/q3_behavioral_conditional_ast_20261020/**'
+      - 'docs/research/Q3_BEHAVIORAL_CONDITIONAL_AST_FIRST_CI_FREEZE_20261020.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first_behavioral_gradient_compositional_ast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile study and pin the exact external verifier
+        run: |
+          python -m py_compile research/evidence/q3_behavioral_conditional_ast_20261020/first_cpu_original.py
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          test "$(find /tmp/cvc5bin -type f -name cvc5 | wc -l)" -eq 1
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F '1.4.2'
+      - name: Install CPU optimizer and source-exact SMT tools
+        run: |
+          python -m pip install --disable-pip-version-check torch==2.5.1 numpy==1.26.4 z3-solver==4.13.3.0 sympy==1.14.0 scipy==1.14.1
+      - name: FIRST behavioral-only conditional AST original synthetic 3VC
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_behavioral_conditional_ast_20261020/first_cpu_original.py --out /tmp/q3_behavioral_ast_first.json | tee /tmp/q3_behavioral_ast_first.log
+          sha256sum /tmp/q3_behavioral_ast_first.json
+      - name: Retain FIRST success, fail, or incomplete receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-behavioral-conditional-ast-first
+          path: |
+            /tmp/q3_behavioral_ast_first.json
+            /tmp/q3_behavioral_ast_first.log
+          if-no-files-found: warn
+      - name: Enforce narrow scoped science and ablation
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_behavioral_ast_first.json'))
+          assert x['scoped_behavioral_gradient_AST_learning_pass'],x
+          assert x['no_gold_ast_or_search_discovered_ast_as_gradient_pseudolabel']
+          assert x['gradient_uses_full_enumerated_AST_behavior_scores']
+          assert x['complete_classical_heldout_all_k']
+          assert x['independent_29_parameter_negative_control']['heldout_all_k_pass'] is False
+          assert x['shuffled_output_negative_control']['heldout_all_k_pass'] is False
+          assert x['conditional_125_parameter_learning']['heldout_all_k_pass']
+          assert {r['k'] for r in x['heldout_synthetic_programs']}=={7,8,9,11}
+          assert x['conclusion_attribution']['Q3_global']=='OPEN'
+          assert x['conclusion_attribution']['new_mathematical_primitive_outside_grammar'] is False
+          assert x['conclusion_attribution']['learned_exclusive_superiority_over_strong_classical'] is False
+          print('Q3_TEACHER_FREE_GRADIENT_BEHAVIORAL_AST_FIRST_SCOPED_PASS')
+          PY
