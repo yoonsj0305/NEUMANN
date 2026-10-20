@@ -1,0 +1,76 @@
+name: Q3 SyGuS original sum1 posthoc source-guard proof and neural ablation
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-sygus-sum1-guard-first.yml'
+      - 'research/evidence/q3_sygus_sum1_guard_20261020/**'
+      - 'docs/research/Q3_SUM1_POSTHOC_SOURCE_GUARD_DISJUNCTION_FROZEN_20261020.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first_posthoc_guarded_original_sum1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: frozen_sygus_original
+          sparse-checkout: |
+            comp/2017/Inv_Track
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Source pin and proof script syntax
+        run: |
+          test "$(git -C frozen_sygus_original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_sygus_sum1_guard_20261020/first_source_guard_without_neural_gold.py
+      - name: Frozen cvc5 and source-linked native Z3 and NumPy SymPy
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          test "$(find /tmp/cvc5bin -type f -name cvc5 | wc -l)" -eq 1
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.14.0 numpy==2.3.5 scipy==1.17.0
+      - name: FIRST source-only guarded inductive mine, full dual original and neural ablation
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_sygus_sum1_guard_20261020/first_source_guard_without_neural_gold.py --root frozen_sygus_original --out /tmp/q3_sum1_guard_first.json | tee /tmp/q3_sum1_guard_first.log
+          sha256sum /tmp/q3_sum1_guard_first.json
+      - name: Preserve first correct or failed source guard receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-sygus-sum1-first-posthoc-classical-source-guard
+          path: |
+            /tmp/q3_sum1_guard_first.json
+            /tmp/q3_sum1_guard_first.log
+          if-no-files-found: warn
+      - name: Strict scientific scope not learned original G1
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3_sum1_guard_first.json'))
+          assert r['original_git_blob']=='5fd2e4f7841aea6ebab96d30d394819b0d2b17d6'
+          assert r['science_scope'].startswith('POSTHOC')
+          assert r['trained_weights_unchanged_sha256']=='563c6be70fade6db755425a5756b6fdd89503ada5727bf31f49ad195ec041a78'
+          assert r['original_source_parser_semantic_xor']=={'pre':'unsat','trans':'unsat','post':'unsat'}
+          assert r['source_pre_trans_bound_miner']['source_without_Post']
+          assert r['source_pre_trans_bound_miner']['admitted_disjunction_count']>0
+          assert r['learned_posthoc_original_full_dual_3VC_PASS']
+          assert r['classical_posthoc_original_full_dual_3VC_PASS']
+          assert not r['neural_unique_causal_effect_proven']
+          assert r['global_Q3']==r['global_Q1_Q7']=='OPEN'
+          print('POSTHOC_SUM1_CLASSICAL_AND_LEARNED_GUARDED_SOURCE_PROOF_PASS')
+          print('NEURAL_ABLATED_SAME_PROOF',r['without_learned_polynomial_original_full_dual_3VC_PASS'])
+          PY
