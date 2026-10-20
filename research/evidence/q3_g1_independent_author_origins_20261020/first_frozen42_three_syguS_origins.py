@@ -27,7 +27,7 @@ FROZEN=(
  ("andrew_lustre","lib/Inv_Track/andrew_lustre/DRAGON_1.lus.sl",
   "8490b3e25ff7d462a7405e68e742be1abb35b8f8"),
  ("from_2018_mixed","lib/Inv_Track/from_2018/ex1.sl",
-  "1c58bcd6793f95c57c2684a277c99ab28528172"),
+  "1c58bcd6793f95c57c2684a277c99ab28528172d"),
 )
 def sha(data):return hashlib.sha256(data).hexdigest()
 def gitblob(data):return hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
@@ -172,6 +172,10 @@ def main():
   "frozen_weights_and_synthetic_training":train,
   "total_original_source_count":len(rows),
   "all_three_original_git_blobs_verified":all("actual_original_sha256" in r for r in rows),
+  "genuine_first_presource_sha_verified":2,
+  "third_target_sha_corrected_after_first_source_opened":True,
+  "frozen_first_ci_raw_sha256":"825afcbe5bb374dea536fa66ad85d5b19ed2458f6ac2596a69156468ceb65c14",
+  "third_target_POSTHOC_NOT_FRESH_BLIND":True,
   "source_origin_groups":["xujie_code2inv","andrew_lustre","from_2018_mixed"],
   "third_group_authorship_independence_from_previous_benchmark":"UNKNOWN",
   "learned_certified_new_originals":sum(r["original_source_three_vc_learned_dual_pass"] for r in rows),
