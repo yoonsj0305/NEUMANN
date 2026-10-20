@@ -115,7 +115,7 @@ def exact_nullspace_candidate(states,now):
   possible.append((nonzero,magnitude,display,candidate,ci))
  possible.sort(key=lambda x:(x[0],x[1],x[2]))
  _,_,chosen,formula,coeff=possible[0]
- return {"candidate":formula,
+ return {"candidate_smt":formula.sexpr(),
     "expression":chosen,"degree2_monomials":len(tuples),
     "exact_trace_row_rank":int(M.rank()),
     "exact_nullspace_dimension":len(basis),
