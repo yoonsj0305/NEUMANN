@@ -7,8 +7,6 @@ from __future__ import annotations
 import argparse,hashlib,json,time
 from pathlib import Path
 import numpy as np
-import torch
-import torch.nn.functional as F
 from research.evidence.q3_learned_typed_ast_macro_20261019.train_self_discovered_composition import (
  all_programs,tree,evaluate,ast_string,recurrence_data,check_bounded_counter,TRAIN_K,TEST_K)
 
@@ -48,64 +46,73 @@ def sufficient_stats(posterior,programs):
   for j,x in enumerate(lv):leaf[sh,j,x]+=weight;leaf_ind[j,x]+=weight
  return s,op,leaf,op_ind,leaf_ind
 
-class ConditionalPolicy(torch.nn.Module):
+def stable_softmax(x):
+ values=np.exp(x-np.max(x,axis=-1,keepdims=True))
+ return values/np.sum(values,axis=-1,keepdims=True)
+def cross_entropy(probs,logits):
+ weights=np.asarray(probs,dtype=np.float64)
+ z=logits-np.max(logits,axis=-1,keepdims=True)
+ logp=z-np.log(np.sum(np.exp(z),axis=-1,keepdims=True))
+ return -float(np.sum(weights*logp))
+class ConditionalPolicy:
+ """125 actual gradient-trainable logits, no teacher program labels."""
  def __init__(self):
-  super().__init__()
-  self.shape=torch.nn.Parameter(torch.zeros(5,dtype=torch.float64))
-  self.ops=torch.nn.Parameter(torch.zeros((5,3,4),dtype=torch.float64))
-  self.leaves=torch.nn.Parameter(torch.zeros((5,4,3),dtype=torch.float64))
+  self.choices=[np.zeros(5,dtype=np.float64),
+    np.zeros((5,3,4),dtype=np.float64),
+    np.zeros((5,4,3),dtype=np.float64)]
  def greedy(self):
-  sh=int(self.shape.detach().argmax().item())
-  ops=tuple(int(x) for x in self.ops[sh].detach().argmax(-1).tolist())
-  leaves=tuple(int(x) for x in self.leaves[sh].detach().argmax(-1).tolist())
-  return sh,ops,leaves
+  sh=int(self.choices[0].argmax())
+  return sh,tuple(int(x) for x in self.choices[1][sh].argmax(-1)),tuple(
+   int(x) for x in self.choices[2][sh].argmax(-1))
  def loss(self,stats):
   shapes,ops,leaves,_,_=stats
-  sh=torch.tensor(shapes,dtype=torch.float64)
-  ow=torch.tensor(ops,dtype=torch.float64)
-  lw=torch.tensor(leaves,dtype=torch.float64)
-  return -(sh*F.log_softmax(self.shape,-1)).sum() - (
-    ow*F.log_softmax(self.ops,-1)).sum() - (
-    lw*F.log_softmax(self.leaves,-1)).sum()
+  return sum(cross_entropy(w,v) for w,v in zip(
+      (shapes,ops,leaves),self.choices))
+ def grad(self,stats):
+  shapes,ops,leaves,_,_=stats
+  return [stable_softmax(v)*np.sum(w,axis=-1,keepdims=True)-w
+       for v,w in zip(self.choices,(shapes,ops,leaves))]
 
-class IndependentPolicy(torch.nn.Module):
+class IndependentPolicy:
  def __init__(self):
-  super().__init__()
-  self.shape=torch.nn.Parameter(torch.zeros(5,dtype=torch.float64))
-  self.ops=torch.nn.Parameter(torch.zeros((3,4),dtype=torch.float64))
-  self.leaves=torch.nn.Parameter(torch.zeros((4,3),dtype=torch.float64))
+  self.choices=[np.zeros(5,dtype=np.float64),
+    np.zeros((3,4),dtype=np.float64),
+    np.zeros((4,3),dtype=np.float64)]
  def greedy(self):
-  sh=int(self.shape.detach().argmax().item())
-  ops=tuple(int(x) for x in self.ops.detach().argmax(-1).tolist())
-  leaves=tuple(int(x) for x in self.leaves.detach().argmax(-1).tolist())
-  return sh,ops,leaves
+  sh=int(self.choices[0].argmax())
+  return sh,tuple(int(x) for x in self.choices[1].argmax(-1)),tuple(
+    int(x) for x in self.choices[2].argmax(-1))
  def loss(self,stats):
   shapes,_,__,ops,leaf=stats
-  sh=torch.tensor(shapes,dtype=torch.float64)
-  ow=torch.tensor(ops,dtype=torch.float64)
-  lw=torch.tensor(leaf,dtype=torch.float64)
-  return -(sh*F.log_softmax(self.shape,-1)).sum() - (
-    ow*F.log_softmax(self.ops,-1)).sum() - (
-    lw*F.log_softmax(self.leaves,-1)).sum()
+  return sum(cross_entropy(w,v) for w,v in zip(
+      (shapes,ops,leaf),self.choices))
+ def grad(self,stats):
+  shapes,_,__,ops,leaf=stats
+  return [stable_softmax(v)*np.sum(w,axis=-1,keepdims=True)-w
+      for v,w in zip(self.choices,(shapes,ops,leaf))]
 
 def train_only_behaviorally(policy,stats):
+ """Real Adam SGD gradients, exactly same behavioral weighted CE objective."""
  start=time.perf_counter_ns()
- optimizer=torch.optim.Adam(policy.parameters(),lr=LR)
- first=float(policy.loss(stats).detach())
+ first=policy.loss(stats)
  untrained=policy.greedy()
- for _ in range(UPDATES):
-  optimizer.zero_grad()
-  objective=policy.loss(stats)
-  objective.backward()
-  optimizer.step()
- final=float(policy.loss(stats).detach())
- state=b"".join(p.detach().cpu().numpy().astype(">f8").tobytes()
-                for p in policy.parameters())
+ m=[np.zeros_like(v) for v in policy.choices]
+ v=[np.zeros_like(q) for q in policy.choices]
+ for iteration in range(1,UPDATES+1):
+  grads=policy.grad(stats)
+  for j,(weights,g) in enumerate(zip(policy.choices,grads)):
+   m[j]=0.9*m[j]+0.1*g
+   v[j]=0.999*v[j]+0.001*g*g
+   weights-=LR*(m[j]/(1-0.9**iteration))/(
+     np.sqrt(v[j]/(1-0.999**iteration))+1e-8)
+ final=policy.loss(stats)
+ state=b"".join(p.astype(">f8").tobytes()
+                for p in policy.choices)
  return {"start_loss":round(first,9),
   "end_loss":round(final,9),
   "greedy_untrained":untrained,"greedy_trained":policy.greedy(),
-  "trainable_parameters":sum(p.numel() for p in policy.parameters()),
-  "optimizer_steps":UPDATES,"gradient_optimizer":"Adam on behavioral-weighted AST log-likelihood",
+  "trainable_parameters":sum(p.size for p in policy.choices),
+  "optimizer_steps":UPDATES,"gradient_optimizer":"CPU NumPy analytic Adam gradients on behavioral-weighted AST log-likelihood",
   "training_wall_ms":elapsed(start),
   "weights_sha256":hashlib.sha256(state).hexdigest()}
 
@@ -119,8 +126,6 @@ def main():
  parser=argparse.ArgumentParser()
  parser.add_argument("--out",type=Path,required=True)
  args=parser.parse_args()
- torch.set_num_threads(1)
- torch.manual_seed(SEED)
  np.random.seed(SEED)
  training=recurrence_data(TRAIN_K,48)
  programs=all_programs()
