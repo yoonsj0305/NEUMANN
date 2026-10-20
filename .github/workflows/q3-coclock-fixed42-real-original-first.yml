@@ -1,0 +1,75 @@
+name: Q3 frozen 42-weight co-clock original source recovery
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-coclock-fixed42-real-original-first.yml'
+      - 'research/evidence/q3_coclock_fixed42_20261020/**'
+      - 'docs/research/Q3_COCLOCK_POSTHOC_CONTINUATION_CONTRACT_20261020.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first_coclock_posthoc_real_3_originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: frozen_upstream
+          sparse-checkout: |
+            benchmarks/NIA/other
+            benchmarks/NIA/2018.CHI_InvGame
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check original upstream exact git revision and script syntax
+        run: |
+          test "$(git -C frozen_upstream rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+          python -m py_compile research/evidence/q3_coclock_fixed42_20261020/posthoc_genuine_source_affine_controller.py
+      - name: SHA pinned cvc5 1.4.2 and exact Z3 SymPy NumPy
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          test "$(find /tmp/cvc5bin -type f -name cvc5 | wc -l)" -eq 1
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.14.0 numpy==2.3.5 scipy==1.17.0
+      - name: First independent actual source co-clock plus unchanged trained model original 3VC
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_coclock_fixed42_20261020/posthoc_genuine_source_affine_controller.py --root frozen_upstream --out /tmp/q3_coclock_fixed42_first.json | tee /tmp/q3_coclock_fixed42_first.log
+          sha256sum /tmp/q3_coclock_fixed42_first.json
+      - name: Preserve original FIRST evidence including all UNKNOWN or FAIL
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-coclock-fixed42-original-posthoc-first
+          path: |
+            /tmp/q3_coclock_fixed42_first.json
+            /tmp/q3_coclock_fixed42_first.log
+          if-no-files-found: warn
+      - name: Strict truthful scoped scientific gate
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_coclock_fixed42_first.json'))
+          assert x['scientific_scope'].startswith('POSTHOC')
+          assert x['source_case_count']==3 and len(x['cases'])==3
+          assert x['frozen_original_weights_and_synthetic_data_unmodified']['frozen_trained_weights_sha256']=='563c6be70fade6db755425a5756b6fdd89503ada5727bf31f49ad195ec041a78'
+          assert x['fixed_original_first_blind_learned_pass_count']==2
+          assert x['fixed_original_first_blind_classical_pass_count']==2
+          assert not x['learned_superiority_over_strong_classical']
+          assert not x['new_author_family_out_of_domain']
+          assert x['global_Q3']==x['global_Q1_Q7']=='OPEN'
+          print('FROZEN_LEARNED_POSTHOC_REAL_SOURCE',x['learned_posthoc_dual_original_3VC_count'],'/3')
+          print('STRONG_CLASSICAL_POSTHOC_REAL_SOURCE',x['strong_classical_posthoc_dual_original_3VC_count'],'/3')
+          PY
