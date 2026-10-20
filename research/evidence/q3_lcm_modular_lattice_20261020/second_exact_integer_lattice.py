@@ -100,13 +100,19 @@ def fixed_source_only_lattice(source,native):
     vv=tuple(int(x) for x in (sp.Matrix([vec])*A).row(0))
     good,coeff=integer_lattice_membership(base,vv)
     if not good:raise RuntimeError("FINAL_INTEGER_MODULE_CERTIFICATE_MISMATCH")
-    recomputed=tuple(sum(int(coeff[j])*int(base[j][i])
-       for j in range(len(base))) for i in range(n))
-    assert recomputed==vv
+    # Coefficients returned by HNF membership are in the canonical HNF
+    # basis, NOT the original redundant candidate basis. Audit them against
+    # the actual canonical integer matrix, not mismatched coordinates.
+    canonical=hermite_normal_form(sp.Matrix.hstack(*[
+       sp.Matrix(v) for v in base]))
+    recomputed=tuple(int(x) for x in canonical*sp.Matrix(coeff))
+    assert recomputed==vv,(label,idx,vv,recomputed)
     exact_certificate.append({"candidate":label,"modulus_idx":m,
       "source_branch":idx,"updated_vector":vv,
       "modulus_plus_surviving_vectors":base,
-      "exact_integer_coefficients":coeff,
+      "canonical_HNF_basis_columns":[[int(v) for v in canonical.col(j)]
+         for j in range(canonical.cols)],
+      "canonical_HNF_integer_coefficients":coeff,
       "replay_identity_verified":True})
  final_mod=[(label,c,p) for m,group in groups for label,c,p in group]
  final_formula=z3.And(*[p for label,c,p in final_mod],
