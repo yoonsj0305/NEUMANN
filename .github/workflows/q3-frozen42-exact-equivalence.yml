@@ -1,0 +1,53 @@
+name: Q3 frozen 42-weight universal symbolic equivalence no-go
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-frozen42-exact-equivalence.yml'
+      - 'research/evidence/q3_fixed42_exact_no_go_20261020/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact_all_polynomials_degree5:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install exact rational symbolic audit only, no neural/GPU
+        run: python -m pip install --disable-pip-version-check sympy==1.14.0 numpy==2.3.5
+      - name: EXACT universal matrix theorem, all 6 symbolic bases and negative control
+        run: |
+          set -o pipefail
+          python research/evidence/q3_fixed42_exact_no_go_20261020/full_polynomial_universal_equivalence.py --out /tmp/q3_fixed42_exact_universal_proof.json | tee /tmp/q3_fixed42_exact_universal_proof.log
+          sha256sum /tmp/q3_fixed42_exact_universal_proof.json
+      - name: Preserve exact mathematical proof receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-frozen42-exact-polynomial-universal-no-go
+          path: |
+            /tmp/q3_fixed42_exact_universal_proof.json
+            /tmp/q3_fixed42_exact_universal_proof.log
+          if-no-files-found: warn
+      - name: Fail closed if original weight or fixed-grammar theorem changes
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_fixed42_exact_universal_proof.json'))
+          assert x['original_frozen_weights_SHA256']=='563c6be70fade6db755425a5756b6fdd89503ada5727bf31f49ad195ec041a78'
+          assert x['original_first_trained_JSON_SHA256']=='993e7ce6ce116bedce68efa66ada4a42ea1913629730ec1b914bdfc60316f513'
+          assert x['exact_rational_matrix_identity_B_times_L_is_I6']
+          assert x['unique_polynomial_antidifference_given_zero_initial']
+          assert len(x['six_basis_exact_classical_source_replays'])==6
+          assert x['matrix_one_entry_mutation_counterexample_detected']
+          assert x['strict_learned_function_class_advantage_over_exact_classical_possible'] is False
+          assert not x['absolute_runtime_inferiority_or_superiority_proved']
+          assert x['global_Q3']==x['global_Q1_Q7']=='OPEN'
+          print('UNIVERSAL_FROZEN_42_LEARNED_EQUALS_EXACT_CLASSICAL_THEOREM_PASS')
+          PY
