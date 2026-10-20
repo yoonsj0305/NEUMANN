@@ -56,10 +56,13 @@ jobs:
               label=entry["status"]
               if label not in ("sat","unsat","unknown"): raise ValueError("Nonstandard benchmark label: "+str(label))
               registry[f]=label
-          solved=collections.defaultdict(set)
-          present=collections.defaultdict(set)
+          # Replay the official scoring semantics for unknown expected statuses:
+          # a solver is sound when it never contradicts an already-known original,
+          # and sound solvers establish the competition's inferred sound_status.
+          rows_by_file=collections.defaultdict(dict)
           seen=set()
-          bad=[]
+          all_solvers=set()
+          present=set()
           for row in results["results"]:
               if row.get("track")!="SingleQuery": continue
               f=file_path(row["file"])
@@ -70,29 +73,54 @@ jobs:
               key=(f,solver)
               if key in seen: raise ValueError("Duplicate original run: "+str(key))
               seen.add(key)
-              present[f].add(solver)
+              rows_by_file[f][solver]=row["result"]
+              present.add(f)
+              all_solvers.add(solver)
+          selected=present
+          metadata_counts=collections.Counter(registry[f] for f in selected)
+          if len(selected)!=2857 or metadata_counts!=collections.Counter({"sat":1643,"unsat":614,"unknown":600}):
+              raise ValueError(f"Official original metadata mismatch: selected={len(selected)} status={dict(metadata_counts)}")
+          unsound=set()
+          for f,entries in rows_by_file.items():
               label=registry[f]
-              answer=row["result"]
-              if label in ("sat","unsat") and answer in ("sat","unsat") and label!=answer:
-                  bad.append((f,solver,label,answer))
-              if label in ("sat","unsat") and answer==label: solved[solver].add(f)
-          if bad: raise ValueError("Contradictory solver answers: "+str(bad[:4]))
-          selected=set(present)
-          count=collections.Counter(registry[f] for f in selected)
+              if label not in ("sat","unsat"): continue
+              for solver,answer in entries.items():
+                  if answer in ("sat","unsat") and answer!=label: unsound.add(solver)
+          sound=all_solvers-unsound
+          derived={}
+          disagreements=[]
+          for f in selected:
+              candidate={answer for solver,answer in rows_by_file[f].items()
+                         if solver in sound and answer in ("sat","unsat")}
+              if len(candidate)==2:
+                  disagreements.append(f)
+              elif len(candidate)==1:
+                  derived[f]=next(iter(candidate))
+              else:
+                  derived[f]=registry[f]
+          if disagreements:
+              raise ValueError("Official sound-solver disagreements require exclusion from scoring: "+str(disagreements[:10]))
+          count=collections.Counter(derived.values())
           expect={"sat":1664,"unsat":887,"unknown":306}
-          if len(selected)!=2857 or dict(count)!=expect:
-              raise ValueError(f"Published selected task mismatch: selected={len(selected)} statuses={dict(count)} expected={expect}")
+          if count!=collections.Counter(expect):
+              raise ValueError(f"Official derived scoring categories mismatch: {dict(count)} expected={expect}; unsound={sorted(unsound)}")
+          solved=collections.defaultdict(set)
+          for f,entries in rows_by_file.items():
+              for solver,answer in entries.items():
+                  if derived[f] in ("sat","unsat") and answer==derived[f]:
+                      solved[solver].add(f)
           score={"Z3-alpha2":(1577,831),"Z3-Z3++":(1630,778)}
           for solver,(sat,unsat) in score.items():
-              ss=collections.Counter(registry[f] for f in solved[solver])
+              ss=collections.Counter(derived[f] for f in solved[solver])
               if (ss["sat"],ss["unsat"])!=(sat,unsat):
-                  raise ValueError(f"Official score mismatch solver={solver}: {dict(ss)}")
-          classified={f for f in selected if registry[f] in ("sat","unsat")}
+                  raise ValueError(f"Official leaderboard score mismatch solver={solver}: {dict(ss)} vs {(sat,unsat)}")
+          classified={f for f in selected if derived[f] in ("sat","unsat")}
           pair=sorted(classified-solved["Z3-alpha2"]-solved["Z3-Z3++"])
           union=set()
           for found in solved.values(): union.update(found)
           gap=sorted(classified-union)
-          if len(pair)>90 or not set(gap).issubset(set(pair)): raise ValueError("Mathematical upper bound invariant failed")
+          if len(pair)>90 or not set(gap).issubset(set(pair)):
+              raise ValueError("Mathematical upper bound invariant failed")
           families=collections.Counter("/".join(f.split("/")[2:-1]) for f in gap)
           by_solver={name:len(tasks) for name,tasks in sorted(solved.items())}
           report={
@@ -101,15 +129,21 @@ jobs:
               "official_source_git_blob_shas":{k:v[0] for k,v in blobs.items()},
               "total_original_tasks":len(selected),
               "official_status_counts":dict(count),
+              "original_metadata_status_counts":dict(metadata_counts),
+              "sound_solver_count":len(sound),
+              "excluded_unsound_solver_names":sorted(unsound),
+              "competition_status_derived_from_sound_solvers":True,
               "participating_solver_count":len(by_solver),
               "published_winner_counts_verified":True,
               "pair_joint_unresolved_classified_count":len(pair),
               "all_solver_joint_unresolved_classified_count":len(gap),
-              "all_solver_joint_unresolved_known_status_counts":dict(collections.Counter(registry[f] for f in gap)),
+              "all_solver_joint_unresolved_known_status_counts":dict(collections.Counter(derived[f] for f in gap)),
+              "all_solver_joint_unresolved_original_metadata_counts":dict(collections.Counter(registry[f] for f in gap)),
               "all_solver_joint_unresolved_family_counts":dict(sorted(families.items())),
               "all_solver_joint_unresolved_paths":gap,
               "all_solver_solved_counts":by_solver,
               "known_status_results_only":True,
+              "original_status_independently_confirmed":False,
               "original_proof_independently_verified":False,
               "matched_cpu_cost_measured":False,
               "free_oracle_upper_bound_measured":False,
