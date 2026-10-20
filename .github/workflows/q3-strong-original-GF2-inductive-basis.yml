@@ -1,0 +1,78 @@
+name: Q3 source VERIFIED low-arity GF2 implies all-arity original invariant closure
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-strong-original-GF2-inductive-basis.yml'
+      - 'research/evidence/q3_exact_GF2_all_arity_20261021/source_verified_pairwise_complete_kernel.py'
+      - 'docs/research/Q3_SOURCE_CERTIFIED_PAIRWISE_ALL_ARITY_STRONG_NO_GO_CONTRACT_20261021.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  two_real_original_inductive_GF2_baselines:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: source_originals
+          sparse-checkout: |
+            lib/Inv_Track/andrew_lustre
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Actual unchanged source Git revision and checker syntax
+        run: |
+          test "$(git -C source_originals rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_exact_GF2_all_arity_20261021/source_verified_pairwise_complete_kernel.py
+      - name: Z3, numpy for source parser, independent SHA-pinned cvc5
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Recover immutable original 64-source-sample all-arity kernel proof
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39515983812
+          name: q3-original-64-states-exact-all-arity-gf2
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/prior
+      - name: Native original Z3 and cvc5 all true source singleton/pairwise 2VC, exact rank closure
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_exact_GF2_all_arity_20261021/source_verified_pairwise_complete_kernel.py --root source_originals --previous /tmp/prior/q3_exact_GF2_all_arity_final.json --out /tmp/q3_strong_GF2_actual_inductive_original.json | tee /tmp/q3_strong_GF2_actual_inductive_original.log
+          sha256sum /tmp/q3_strong_GF2_actual_inductive_original.json
+      - name: Archive true first external original posthoc source-certified basis evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-two-authentic-originals-true-inductive-gf2-basis
+          path: |
+            /tmp/q3_strong_GF2_actual_inductive_original.json
+            /tmp/q3_strong_GF2_actual_inductive_original.log
+          if-no-files-found: warn
+      - name: No source false proof or new-operator G1 promotion
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open('/tmp/q3_strong_GF2_actual_inductive_original.json'))
+          assert p['pinned_previous_raw_JSON_SHA256']=='e5764b1815947b0c4092be96e2ef0eebca7b81dfc3c65ff9da8e581175127fab'
+          assert p['two_real_original_source_git_blobs_authenticated']
+          assert p['original_first_learned_2VC']=='0/2_PRESERVED'
+          assert len(p['actual_original_sources'])==2
+          assert p['gate_R_full']==p['gate_V']==p['global_Q3']=='OPEN'
+          print('ALL_SOURCE_TRUE_GF2_PARITIES_GENERATED_BY_INDUCTIVE_ATOMS',
+                p['full_actual_program_inductive_all_arity_GF2_basis_coverage_count'],'/2')
+          PY
