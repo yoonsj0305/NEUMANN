@@ -159,7 +159,8 @@ def source_decision(root, original_spec, historical):
         if pair_receipt["GF2_pairwise_span_rank"] != historical["source_sample_pairwise_upper_bound_on_inductive_span"]["GF2_pairwise_span_rank"]:
             raise RuntimeError("HISTORICAL_PAIRWISE_GF2_RANK_REGRESSION")
         out["all_observed_pairwise_relations_actually_in_nullspace"] = all(
-            reduce_basis(row_basis, vector) == 0 for vector in pair_basis.values()
+            ((vector & ((1 << n) | sum(int(bit) << j for j, bit in enumerate(observed)))).bit_count() % 2) == 0
+            for vector in pair_basis.values() for observed in rows
         )
         if not out["all_observed_pairwise_relations_actually_in_nullspace"]:
             raise RuntimeError("GF2_PAIRWISE_SOURCE_NOT_IN_COMPLETE_NULLSPACE")
