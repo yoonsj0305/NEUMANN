@@ -1,0 +1,39 @@
+# NEUMANN 1 Q3 | Frozen 42-weight learned operator + source-certified co-clock controller: authentic 3/3 original proofs
+
+**2026-10-20 KST | BOUNDED POSTHOC SCOPED PASS, NOT FIRST-BLIND 3/3 AND NOT GLOBAL Q3.**
+
+## Strict chronology: no retrospective score inflation
+
+Original first untouched SHA-frozen run [PR #310](https://github.com/yoonsj0305/NEUMANN/pull/310), [official Actions #39424234515](https://github.com/yoonsj0305/NEUMANN/actions/runs/39424234515): **learned 2/3, strong classical 2/3**. Exact frozen first JSON SHA256 `993e7ce6ce116bedce68efa66ada4a42ea1913629730ec1b914bdfc60316f513`, official artifact #12264693070 (ZIP SHA256 `5c35295502b50ec55a740454e276fd78361add3fb19b201f1151c2c05ecd5e76`). Synthetic-trained 6→7 polynomial coefficient integrator weights (42 integerized weights, CPU linear regression from 384 synthetic source prefix traces), SHA256 `563c6be70fade6db755425a5756b6fdd89503ada5727bf31f49ad195ec041a78`. 64/64 synthetic heldout exact. The third original `non-lin-ineq-4.desugared.sl` remained unproven because input extractor could not eliminate a noncanonical simultaneously +1-incrementing clock; original Post VC SAT for the proposed insufficient invariant.
+
+Subsequently actual third original contents were opened. This follow-up [PR #312](https://github.com/yoonsj0305/NEUMANN/pull/312) is **POSTHOC REPAIR** and has NO independent blind-G1 standing. The goal was narrowly to repair source semantics normalization without changing **any of the 42 trained weights, synthetic labels, training seed, model architecture, generator grammar or original physical Pre/Trans/Post**. The GitHub receipts of the initial 2/3 remain immutable.
+
+Initial new implementation [Actions #39425613378](https://github.com/yoonsj0305/NEUMANN/actions/runs/39425613378) completed technically but scientific **0/3 fail-closed**, from comparing original parser keys `pre/trans/post` against erroneously written `initial/consecution/post`; original JSON SHA256 `6eef98d794d7ac97a6f39b1f566777e295073e13813dccf4e080793cc2c1f7a0`. Repaired the key-only code error, preserving failure. Second [Actions #39425802821](https://github.com/yoonsj0305/NEUMANN/actions/runs/39425802821) proved third original with learned + classical dual Z3/cvc5 3VC, but **regressed** first two to Post SAT because the generic controller kept only the primary clock's published source guard, dropping another co-clock's necessary bound. Honest scientific status **1/3**, original JSON SHA256 `6d555c89cc04d5835ec82f596239291bd4cc61d8` (see raw artifact checksum for full original hash). Repaired ONLY original Pre-entailed guard retention for *every* source-incrementing co-clock, preserving that result too.
+
+Finally **[official Actions #39426091930](https://github.com/yoonsj0305/NEUMANN/actions/runs/39426091930) SUCCESS**. Both unchanged frozen learned operator and same-information exact SymPy classical solver independently proved the full native unmodified **original Pre⇒I, I∧Trans⇒I', I⇒Post** in Z3 UNSAT 3/3 and SHA-pinned independent official **cvc5 v1.4.2 UNSAT 3/3** on **each of all three originals**. Total 9/9 actual ORIGINAL proof VCs per independent solver backend for learned and another 9/9 for classical.
+
+First completed final raw original CI JSON SHA256 `3b2ffc963ec5ea4e269ee1beb3279e23a7cdb4a4ce3678c16869688328295a35`, GitHub artifact #12265353681, original ZIP SHA256 `cdc34a210f2db23a5fd9fc4ff7ff10047916ff398732f2a2e1dcc4ca60c7aeeb`, CRC PASS. No posthoc source or prior receipt mutation.
+
+## Actual algorithm and independently checked source properties
+
+1. Verify frozen upstream public `SaswatPadhi/LoopInvGen@6ac90265b11431c9477dfbd33e3e3380234c0499` exact source Git blobs: `pottsumm2.sl` 81eda39a343064ade00393afc3b7ac85f296dddf; `pottsumm4.sl` 58e7abf2b607dafefaacd8f3007a1cc6e2cbe399; `non-lin-ineq-4.desugared.sl` 7981b1ebef61779043278aabc250d17eab3d3a1b. Original native/custom Pre/Trans/Post semantic XOR parity 3/3 UNSAT, Pre SAT and NOT Post SAT without invariant (source nonvacuity).
+2. Extract original physical next-state recurrences (all exact source Trans entail the extracted updates Z3 UNSAT), enumerate all +1 clocks, choose lexicographically first canonical clock, and obtain other co-clock's exact offset from original Pre model. For all three cases independently verify `Pre⇒u−t=c` and `(u−t=c)∧Trans⇒u'−t'=c` using **Z3 and independent cvc5 UNSAT**; wrong offset c+1 inconsistent with original Pre UNSAT as negative control.
+3. For two `pottsumm` originals, offset `c=0`: physical two clocks equal, and the original Trans bound is on the SECOND clock. Retain its Pre-proven guard `u<=bound`, fixing the source safety Post. The learned operator produces exact:
+   - `pottsumm2`: (2s=t^2+t).
+   - `pottsumm4`: (4s=t^4+2t^3+t^2).
+4. For `non-lin-ineq-4`, source variables (i,j,k): original Pre establishes `j-i=1`; original source Trans increments both i,j by +1, preserving difference, both independently proved. Original k update `k'=k+(i+1)(j+1)`, substitute **only inside the generated delta** using the proved source relation `j=i+1` to get `(i+1)(i+2)`. The PRETRAINED 42-weight mapping generates (k=i(i+1)(i+2)/3). The math identity F(i+1)−F(i)=delta is independently checked by exact SymPy. At exit i>=1000 original bound i<=1000 forces i=1000, so k meets its original `1000j<=k` Post.
+5. The same source-certified offset normalization feeds strong exact classical SymPy antidifference. For all THREE originals, **learned AST candidate text equals exact classical AST text**; no unique learned operator invention. Complete actual original Z3 3/3 and cvc5 3/3 for BOTH methods and all 3 programs (18 proof obligations per backend across both methods).
+
+## Measured bounded cost
+
+Actual complete GitHub-run CPU `entire_wall_including_repeated_training_ms` **4123.761ms**, including replayed synthetic prefix learning, all original source verification and control. `whole_synthetic_training_and_audits_ms` **3484.116ms**. Three source case wall: **258.032 / 174.980 / 206.368ms**, total ~639.38ms. Learned per-case proposal generation **16.654 / 18.223 / 17.690ms**; matched exact classical SymPy generation **147.288 / 31.981 / 52.959ms**. These are ONE runner measurements with different code execution conditions, not statistically robust 10× advantage; training cost utterly dominates this three-source cohort and all-in superiority is unproven. Explicit `GPU_calls=0`, `paid_API_calls=0`.
+
+## Truthful scientific disposition
+
+**PASS:** A CPU-trained fixed 42-weight polynomial coefficient operator can be reused, without re-training, together with **source-proved affine co-clock normalization**, to propose authentic mathematical polynomial invariant on `non-lin-ineq-4`. Z3 + independent cvc5 certify the actual original Pre/Trans/Post safety. It also preserves operation on two earlier original sources, all **3/3** in this **posthoc repaired** study.
+
+**NOT PASS:** initial unseen first-source score is STILL 2/3. Same-information strong classical exact solver is **3/3** too, with exactly the SAME invariants, and the 42-weight learner does NOT invent new algebraic primitive beyond the predeclared polynomial degree≤6 grammar. Different author families not tested, no learning-specific causal advantage, no 10× full compute superiority. Thus **GLOBAL Q3=OPEN, all Q1–Q7=OPEN** and the original first failures are preserved.
+
+Research decision: Archive this as a **reusable source-affine semantic interface** in NEUMANN hybrid backend. Do NOT keep tuning this opened benchmark to manufacture G1. To prove true neural unique Q3 requires genuinely new author-origin family, frozen source/algorithm/weights and an independent strong exact classical baseline BEFORE opening any target original source.
+
+Code: `research/evidence/q3_coclock_fixed42_20261020/posthoc_genuine_source_affine_controller.py`; proof workflow `.github/workflows/q3-coclock-fixed42-real-original-first.yml`.
