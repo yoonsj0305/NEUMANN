@@ -42,7 +42,7 @@ jobs:
           sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
           cvc5 --version | grep -F 1.4.2
           python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
-      - name: FIRST frozen three-uninspected + three controls: bounded source Pre/Trans/Post
+      - name: "FIRST frozen three-uninspected + three controls: bounded source Pre/Trans/Post"
         run: |
           set -o pipefail
           PYTHONPATH=. python research/evidence/q3_generic_source_original_bmc_20261020/first_six_real_sources.py --root upstream_original --out /tmp/q3_generic_unsafe_bmc_first.json | tee /tmp/q3_generic_unsafe_bmc_first.log
