@@ -1,0 +1,138 @@
+name: G0 SMT-COMP 2026 original per-task union one-shot
+on:
+  push:
+    branches:
+      - research/g0-smtcomp2026-official-union-20261020
+    paths:
+      - .github/workflows/g0_smtcomp_2026_union.yml
+permissions:
+  contents: read
+concurrency:
+  group: g0-smtcomp2026-original-union-single
+  cancel-in-progress: false
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 9
+    steps:
+      - name: Verify official binary identities and compute real per-original classical union
+        shell: bash
+        run: |
+          python - <<'PY'
+          import collections, gzip, hashlib, json, os, pathlib, urllib.request
+          base = "https://raw.githubusercontent.com/SMT-COMP/smt-comp.github.io/master/data/"
+          blobs = {
+              "results-sq-2026.json.gz": ("958998e703aa5f5b32b45c253f80e618440824b1", 12728309),
+              "benchmarks-2026.json.gz": ("83afb4e0a83f651e8677caa99872acce843011cb", 3239841),
+          }
+          data = {}
+          for filename, (sha, size) in blobs.items():
+              req = urllib.request.Request(base + filename, headers={"User-Agent":"NEUMANN1-public-original-data-audit/1"})
+              with urllib.request.urlopen(req, timeout=90) as response:
+                  raw = response.read(size + 1)
+              calc = hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\x00" + raw).hexdigest()
+              if len(raw) != size or calc != sha:
+                  raise ValueError(f"Official binary identity failure for {filename}: size={len(raw)}, sha={calc}")
+              data[filename] = json.loads(gzip.decompress(raw))
+              print(f"OFFICIAL_BLOB_VERIFIED filename={filename} sha={sha} size={size}",flush=True)
+          bench, results = data["benchmarks-2026.json.gz"], data["results-sq-2026.json.gz"]
+          print("SCHEMA_KEYS", sorted(bench), sorted(results),flush=True)
+          def file_path(o):
+              if not isinstance(o,dict) or o.get("incremental") is not False:
+                  raise ValueError(f"Bad SMT2 identity/incrementality: {str(o)[:250]}")
+              logic, fam, name = o.get("logic"), o.get("family"), o.get("name")
+              if logic not in {"QF_NIA","QF_NIRA"}: return None
+              if not isinstance(fam,list) or not isinstance(name,str) or not name.endswith(".smt2"):
+                  raise ValueError("Invalid original filename")
+              segments=[logic,*fam,name]
+              if any(not isinstance(s,str) or not s or s in (".","..") or "/" in s or "\\" in s for s in segments):
+                  raise ValueError("Invalid original path component")
+              return "non-incremental/"+"/".join(segments)
+          registry={}
+          for entry in bench["non_incremental"]:
+              f=file_path(entry["file"])
+              if f is None: continue
+              if f in registry: raise ValueError("Duplicate original benchmark: "+f)
+              label=entry["status"]
+              if label not in ("sat","unsat","unknown"): raise ValueError("Nonstandard benchmark label: "+str(label))
+              registry[f]=label
+          solved=collections.defaultdict(set)
+          present=collections.defaultdict(set)
+          seen=set()
+          bad=[]
+          for row in results["results"]:
+              if row.get("track")!="SingleQuery": continue
+              f=file_path(row["file"])
+              if f is None: continue
+              if f not in registry: raise ValueError("Missing source registry: "+f)
+              solver=row["solver"]
+              if not isinstance(solver,str): raise ValueError("Bad solver")
+              key=(f,solver)
+              if key in seen: raise ValueError("Duplicate original run: "+str(key))
+              seen.add(key)
+              present[f].add(solver)
+              label=registry[f]
+              answer=row["result"]
+              if label in ("sat","unsat") and answer in ("sat","unsat") and label!=answer:
+                  bad.append((f,solver,label,answer))
+              if label in ("sat","unsat") and answer==label: solved[solver].add(f)
+          if bad: raise ValueError("Contradictory solver answers: "+str(bad[:4]))
+          selected=set(present)
+          count=collections.Counter(registry[f] for f in selected)
+          expect={"sat":1664,"unsat":887,"unknown":306}
+          if len(selected)!=2857 or dict(count)!=expect:
+              raise ValueError(f"Published selected task mismatch: selected={len(selected)} statuses={dict(count)} expected={expect}")
+          score={"Z3-alpha2":(1577,831),"Z3-Z3++":(1630,778)}
+          for solver,(sat,unsat) in score.items():
+              ss=collections.Counter(registry[f] for f in solved[solver])
+              if (ss["sat"],ss["unsat"])!=(sat,unsat):
+                  raise ValueError(f"Official score mismatch solver={solver}: {dict(ss)}")
+          classified={f for f in selected if registry[f] in ("sat","unsat")}
+          pair=sorted(classified-solved["Z3-alpha2"]-solved["Z3-Z3++"])
+          union=set()
+          for found in solved.values(): union.update(found)
+          gap=sorted(classified-union)
+          if len(pair)>90 or not set(gap).issubset(set(pair)): raise ValueError("Mathematical upper bound invariant failed")
+          families=collections.Counter("/".join(f.split("/")[2:-1]) for f in gap)
+          by_solver={name:len(tasks) for name,tasks in sorted(solved.items())}
+          report={
+              "schema":"neumann.g0-smtcomp2026-original-union.v1",
+              "official_binary_verified":True,
+              "official_source_git_blob_shas":{k:v[0] for k,v in blobs.items()},
+              "total_original_tasks":len(selected),
+              "official_status_counts":dict(count),
+              "participating_solver_count":len(by_solver),
+              "published_winner_counts_verified":True,
+              "pair_joint_unresolved_classified_count":len(pair),
+              "all_solver_joint_unresolved_classified_count":len(gap),
+              "all_solver_joint_unresolved_known_status_counts":dict(collections.Counter(registry[f] for f in gap)),
+              "all_solver_joint_unresolved_family_counts":dict(sorted(families.items())),
+              "all_solver_joint_unresolved_paths":gap,
+              "all_solver_solved_counts":by_solver,
+              "known_status_results_only":True,
+              "original_proof_independently_verified":False,
+              "matched_cpu_cost_measured":False,
+              "free_oracle_upper_bound_measured":False,
+              "g0_admission":False,
+              "q1_q7_global":"OPEN",
+              "status":"OFFICIAL_UNION_MEASURED_SCREEN_ONLY_NOT_NEUMANN_PERFORMANCE"
+          }
+          path=pathlib.Path("g0_smtcomp2026_official_union.json")
+          path.write_text(json.dumps(report,indent=2,sort_keys=True)+"\n")
+          print("NEUMANN_G0_OFFICIAL_UNION",json.dumps({k:v for k,v in report.items() if k not in ("all_solver_joint_unresolved_paths","all_solver_solved_counts","all_solver_joint_unresolved_family_counts")},sort_keys=True),flush=True)
+          print("NEUMANN_G0_FAMILY_COUNTS",json.dumps(report["all_solver_joint_unresolved_family_counts"],sort_keys=True),flush=True)
+          print("NEUMANN_G0_GAP_PATHS",json.dumps(gap),flush=True)
+          with open(os.environ["GITHUB_STEP_SUMMARY"],"a") as s:
+              s.write("# NEUMANN 1 G0 official 2026 union audit\n")
+              s.write("Official Git binary data verified: **yes**. Independent proofs / matched costs: **not run**.\n\n")
+              s.write("Joint unresolved by top 2: **"+str(len(pair))+"**; by all solvers: **"+str(len(gap))+"**.\n")
+              s.write("G0 admissible: **NO**; Q1–Q7: OPEN.\n")
+          PY
+      - name: Retain exact compact screen-only evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g0-smtcomp2026-official-original-union
+          path: g0_smtcomp2026_official_union.json
+          if-no-files-found: ignore
+          retention-days: 5
