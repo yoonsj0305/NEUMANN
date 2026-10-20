@@ -5,7 +5,7 @@
 Source of heldout originals is **not** the previously used `SaswatPadhi/LoopInvGen` repository. New external independent **SyGuS-Org/benchmarks** at exact upstream commit `13c8deb68a873635879c9a69bc78caebd340f646`, authored/aggregated via multiple contributor collections. Names and git blob SHA1 frozen using ONLY GitHub repository metadata before opening content:
 1. **Andrew Lustre source collection:** `lib/Inv_Track/andrew_lustre/DRAGON_1.lus.sl`, git blob `8490b3e25ff7d462a7405e68e742be1abb35b8f8`.
 2. **Xujie Code2Inv source collection:** `lib/Inv_Track/xujie_code2inv/1.c.sl`, git blob `859bae24a9f26044a40a3c97f1d2e5fc08504f06`.
-3. **SyGuS 2017 competition source collection:** `comp/2017/Inv_Track/sum1.sl`, git blob `5fd2e4f7841a` (TRUNCATED metadata). **Do NOT inspect/open until complete blob identity discovered and this entry patched and frozen.** (Update full blob via GitHub file metadata directory list only before read).
+3. **SyGuS 2017 competition source collection:** `comp/2017/Inv_Track/sum1.sl`, git blob `5fd2e4f7841aea6ebab96d30d394819b0d2b17d6` (complete GitHub metadata blob; frozen BEFORE opening target content).
 
 These are three distinct benchmark **collections** in the independently maintained SyGuS-Org repository. Collection names suggest separate origins; original authorship / independence is not itself established by names. Do NOT claim three verified distinct author teams without provenance. Note possible duplicate problems across benchmark collections and older experiments: check all candidate raw SHA and canonical AST after source content opened; duplication => leakage flag and NOT FRESH.
 
