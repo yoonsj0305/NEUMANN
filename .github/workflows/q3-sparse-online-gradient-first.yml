@@ -1,0 +1,63 @@
+name: Q3 sparse online gradient no-full-grammar first source proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-sparse-online-gradient-first.yml'
+      - 'research/evidence/q3_sparse_online_policy_20261020/**'
+      - 'docs/research/Q3_SPARSE_ONLINE_POLICY_NEGATIVE_FIRST_CI_FREEZE_20261020.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first_no_full_candidate_enumeration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Static freeze and independent cvc5 v1.4.2
+        run: |
+          python -m py_compile research/evidence/q3_sparse_online_policy_20261020/first_no_full_grammar.py
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          test "$(find /tmp/cvc5bin -type f -name cvc5 | wc -l)" -eq 1
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F '1.4.2'
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0 sympy==1.14.0 scipy==1.17.0
+      - name: First 32-seed online gradient policy versus paired fixed-budget uniform
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_sparse_online_policy_20261020/first_no_full_grammar.py --out /tmp/q3_sparse_online_first.json | tee /tmp/q3_sparse_online_first.log
+          sha256sum /tmp/q3_sparse_online_first.json
+      - name: Retain every first outcome even if model fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-sparse-online-gradient-first
+          path: |
+            /tmp/q3_sparse_online_first.json
+            /tmp/q3_sparse_online_first.log
+          if-no-files-found: warn
+      - name: Honest science gate accepts failure data, not invented PASS
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_sparse_online_first.json'))
+          assert len(x['cases'])==32
+          assert x['equal_evaluation_budget_per_arm']==3000
+          assert all(r['actual_evaluations']==3000 for r in x['cases'])
+          assert x['full_25920_candidate_pre_evaluation'] is False
+          assert x['program_target_AST_given'] is False
+          assert x['real_external_original_fresh_blind'] is False
+          assert not x['unique_new_mathematical_primitive_not_in_DSL']
+          assert x['global_Q3']==x['global_Q1_Q7']=='OPEN'
+          assert x['first_positive_synthetic_Z3_cvc5_certificates']['all_cvc5_Z3_3VC_verified']
+          print('Q3_FIRST_SPARSE_ONLINE_SCIENCE_VERDICT',x['science_verdict'])
+          PY
