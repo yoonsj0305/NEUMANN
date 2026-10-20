@@ -6,7 +6,7 @@ immutable comparison to true PR321 first-negative original experiments.
 import argparse,hashlib,itertools,json,time
 from pathlib import Path
 import z3
-from research.evidence.q3_gater_learned_xor4_20261021.first_two_frozen_source_four_way_parity import (
+from research.evidence.q3_gateR_learned_xor4_20261021.first_two_frozen_source_four_way_parity import (
  ORIGINS,UPSTREAM,sha,blob,sexprs,compile_typed_original,
  compile_independent_native,dual,elapsed,samples,sample_pairwise_basis,
  gf2_in_span)
