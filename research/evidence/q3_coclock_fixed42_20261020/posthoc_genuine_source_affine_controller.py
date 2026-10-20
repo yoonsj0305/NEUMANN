@@ -19,7 +19,7 @@ from experiments.q3_source_prove import (
 FROZEN_WEIGHTS_SHA="563c6be70fade6db755425a5756b6fdd89503ada5727bf31f49ad195ec041a78"
 FIRST_CI="https://github.com/yoonsj0305/NEUMANN/actions/runs/39424234515"
 FIRST_RAW_JSON_SHA="993e7ce6ce116bedce68efa66ada4a42ea1913629730ec1b914bdfc60316f513"
-EXPECTED={"initial","consecution","post"}
+EXPECTED={"pre","trans","post"}
 
 def independent(name,claim):
     z,elapsed=zcheck(claim,secs=8)
