@@ -1,0 +1,12 @@
+# Q3 G0 | New frozen three public ORIGINAL source controls, 2026-10-20
+
+PRE-SOURCE FREEZE: upstream SaswatPadhi/LoopInvGen@6ac90265b11431c9477dfbd33e3e3380234c0499; metadata only (filename and git blob) inspected before this document. Contents have NOT been opened in this study at time of freeze.
+1. NIA.other / benchmarks/NIA/other/mul.sl git blob f6291a03edee61b5624bd5b394913988d4c5af9a
+2. NIA.other / benchmarks/NIA/other/prod4br.sl git blob 81b9f72de2b2ee569a2f395fac2fd67164f0a10f
+3. CHI.InvGame / benchmarks/NIA/2018.CHI_InvGame/sorin04.desugared.sl git blob 565795c4792ead110b65aad27fa5657bbbee074e
+
+ONE GOAL: establish authentic SOURCE-ONLY strong classical G0 headroom (or reject it) before training any model; do not manufacture a learned Q3 PASS.
+Protocol stays byte-for-byte the existing untouched Q3 G0 classical evaluator of PR #296: original Pre/Trans/Post source custom/native semantic XOR parity, Pre SAT/Not Post SAT, source-only Post-only / exact octagon Houdini / common affine nullspace / independent native Z3 SPACER, pinned 15s cvc5 1.4.2 active original SyGuS. A proposed candidate counts proof only after exact original three VCs and independent certified cvc5.
+All three rows MUST remain in receipt, even if parser unsupported or no strong solver completes. No source-specific template, goal expression, hand-picked invariant, or neural updates. Freeze Git blobs and 15s original synthesis, existing source-only solver budgets. Original `lcm` proof in PR #304 is already POSTHOC and cannot be reused to reclassify these previously uninspected sources as solved without an explicit independent truthful run.
+Only if all measured strong classical baselines fail to certify a nonvacuous supported original may it be marked as `UNRESOLVED_G0_HEADROOM_CANDIDATE`, which is NOT a theorem of classical impossibility. True Q3 learned first-discovery would require frozen model proposal without training/test leakage, strong same-info classical control, and real original Z3+cvc5 certification, preferably author-family disjoint. G1/Q3 remain OPEN until that separate experiment.
+This is CPU-only and free. Do NOT tune the same three frozen sources and then claim them blind later. If no genuine headroom, explicitly STOP spending neural calls.

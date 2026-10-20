@@ -1,0 +1,75 @@
+name: Q3 new real 3-source G0 exact classic-first blind
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-new3-original-g0-first.yml'
+      - 'research/evidence/q3_new3_original_g0_20261020/**'
+      - 'docs/research/Q3_NEW_3_ORIGINAL_SOURCE_G0_PRE_CONTENT_FREEZE_20261020.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first_sha_frozen_three_source_g0:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: original_loopinvgen
+          sparse-checkout: |
+            benchmarks/NIA/other
+            benchmarks/NIA/2018.CHI_InvGame
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Source revision, stable exact model code
+        run: |
+          test "$(git -C original_loopinvgen rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+          python -m py_compile research/evidence/q3_new3_original_g0_20261020/unaltered_strong_original_baseline.py
+      - name: Independent real cvc5 native original SyGuS with SHA
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          test "$(find /tmp/cvc5bin -type f -name cvc5 | wc -l)" -eq 1
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.17.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: FIRST new original source strong classic G0 baseline (no training)
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=.:research/evidence/q3v6-lazy-specialist-20261019 python research/evidence/q3_new3_original_g0_20261020/unaltered_strong_original_baseline.py --root original_loopinvgen --out /tmp/q3_three_strong_first.json | tee /tmp/q3_three_strong_first.log
+          sha256sum /tmp/q3_three_strong_first.json
+      - name: Preserve FIRST all results even when unsupported
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-three-new-authentic-original-g0-first
+          path: |
+            /tmp/q3_three_strong_first.json
+            /tmp/q3_three_strong_first.log
+          if-no-files-found: warn
+      - name: Real source identity hard gates, no cherry picking
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3_three_strong_first.json'))
+          assert r['source_identity_all_verified']
+          assert r['all_cohort_rows_included'] and len(r['cases'])==3
+          assert r['neural_training_on_frozen_sources'] is False
+          assert {q['source'] for q in r['cases']}=={
+            'benchmarks/NIA/other/mul.sl',
+            'benchmarks/NIA/other/prod4br.sl',
+            'benchmarks/NIA/2018.CHI_InvGame/sorin04.desugared.sl'}
+          assert r['global_Q3']==r['global_Q1_Q7']=='OPEN'
+          print('NEW_3_SOURCE_G0_FIRST_FINAL',r['g0_decision'])
+          print('NEW_3_SOURCE_G0_CASES',[(q['source'],q['g0'],q.get('original_validity')) for q in r['cases']])
+          PY
