@@ -81,7 +81,7 @@ def proof_certificate():
    "fixed_input_polynomial_max_degree":5,
    "fixed_output_antidifference_max_degree":6,
    "frozen_integer_weight_denominator":SCALE,
-   "difference_operator_integer_matrix":B.tolist(),
+   "difference_operator_integer_matrix":[[int(x) for x in B.row(r)] for r in range(6)],
    "learned_rational_operator_matrix":[
      [str(x) for x in learned_operator.row(r)] for r in range(6)],
    "exact_rational_matrix_identity_B_times_L_is_I6":product==sp.eye(6),
