@@ -1,0 +1,81 @@
+name: Q3 G1 first independent author-origin original frozen 42-weight audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-g1-independent-author-three-first.yml'
+      - 'research/evidence/q3_g1_independent_author_origins_20261020/**'
+      - 'docs/research/Q3_G1_INDEPENDENT_AUTHOR_3_ORIGINALS_PRESOURCE_FREEZE_20261020.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first_external_author_origin_audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: independent_upstream
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+            lib/Inv_Track/andrew_lustre
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Exact non-LoopInvGen original source revision and syntax
+        run: |
+          test "$(git -C independent_upstream rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_g1_independent_author_origins_20261020/first_frozen42_three_syguS_origins.py
+      - name: Install independently SHA-pinned official cvc5 1.4.2
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          test "$(find /tmp/cvc5bin -type f -name cvc5 | wc -l)" -eq 1
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.14.0 numpy==2.3.5 scipy==1.17.0
+      - name: FIRST 3 pinned new author origins unmodified real originals, model SHA before source
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_g1_independent_author_origins_20261020/first_frozen42_three_syguS_origins.py --root independent_upstream --out /tmp/q3_g1_independent_author_first.json | tee /tmp/q3_g1_independent_author_first.log
+          sha256sum /tmp/q3_g1_independent_author_first.json
+      - name: Preserve ALL first G1 scientific outcomes including unsupported and failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-g1-independent-author-origins-first-frozen42
+          path: |
+            /tmp/q3_g1_independent_author_first.json
+            /tmp/q3_g1_independent_author_first.log
+          if-no-files-found: warn
+      - name: Enforce model identity, actual source identity, and honest scoped status
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3_g1_independent_author_first.json'))
+          assert r['frozen_weights_recomputed_before_original_bytes']
+          assert r['frozen_weights_and_synthetic_training']['frozen_trained_weights_sha256']=='563c6be70fade6db755425a5756b6fdd89503ada5727bf31f49ad195ec041a78'
+          assert r['frozen_weights_and_synthetic_training']['heldout_64_full_integer_coefficient_predictions_exact']==64
+          assert r['all_three_original_git_blobs_verified']
+          assert r['genuine_first_presource_sha_verified']==2
+          assert r['third_target_POSTHOC_NOT_FRESH_BLIND']
+          assert r['frozen_first_ci_raw_sha256']=='825afcbe5bb374dea536fa66ad85d5b19ed2458f6ac2596a69156468ceb65c14'
+          assert len(r['originals'])==r['total_original_source_count']==3
+          assert r['upstream_original_revision']=='13c8deb68a873635879c9a69bc78caebd340f646'
+          assert r['novel_G1_unique_learned_structure']=='NOT_DEMONSTRATED'
+          assert not r['neural_new_math_operator_outside_predeclared_degree6_grammar']
+          assert r['global_Q3']==r['global_Q1_Q7']=='OPEN'
+          print('INDEPENDENT_ORIGIN_FIRST_LEARNED',r['learned_certified_new_originals'],'/3')
+          print('INDEPENDENT_ORIGIN_MATCHED_CLASSICAL',r['matched_classical_certified_new_originals'],'/3')
+          print('PER_ORIGINAL',[(x['origin_family'],x['status']) for x in r['originals']])
+          PY
