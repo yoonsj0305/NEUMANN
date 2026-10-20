@@ -1,0 +1,79 @@
+name: Q3 G0 cheap exact source GF2 parity headroom before any neural training
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-g0-zero-train-xor4-first.yml'
+      - 'research/evidence/q3_g0_xor4_fast_preflight_20261021/**'
+      - 'docs/research/Q3_G0_XOR4_NO_HEADROOM_PRE_TRAIN_FREEZE_20261021.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  exact_preflight_no_neural:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original_public_source
+          sparse-checkout: |
+            lib/Inv_Track/andrew_lustre
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Exact original revision and source syntax
+        run: |
+          test "$(git -C original_public_source rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_g0_xor4_fast_preflight_20261021/independent_source_gf2_zero_train.py
+      - name: Pinned independent original source solvers and numerical import dependencies
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Download immutable first unopened source learned+classical negative
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39514997383
+          name: q3-learned-xor4-two-real-first-originals
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/frozen_original_first
+      - name: EXACT zero-neural headroom, verified real original sample source and positive-control synthetic
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_g0_xor4_fast_preflight_20261021/independent_source_gf2_zero_train.py --root original_public_source --first /tmp/frozen_original_first/q3_xor4_first_two.json --out /tmp/q3_g0_original_preflight.json | tee /tmp/q3_g0_original_preflight.log
+          sha256sum /tmp/q3_g0_original_preflight.json
+      - name: Preserve true first G0 success and all error states
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-g0-two-real-source-zero-neural-preflight
+          path: |
+            /tmp/q3_g0_original_preflight.json
+            /tmp/q3_g0_original_preflight.log
+          if-no-files-found: warn
+      - name: Strict bounded science
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/q3_g0_original_preflight.json'))
+          assert q['G0_original_replay_certified']
+          assert q['zero_neural_forward_calls'] and q['zero_neural_train_updates']
+          assert q['all_first_original_two_git_ids_preserved']
+          assert q['exact_classical_full_independent_G4_headroom']==0
+          assert q['independent_positive_negative_synthetic_preflight_controls']['nonpairwise_even4_positive']=='PASS_GO_1_OF_1'
+          assert q['independent_positive_negative_synthetic_preflight_controls']['unconstrained_all16_negative']=='PASS_NO_GO_0_OF_1'
+          assert q['NOT_full_program_absence_of_new_operator_theorem']
+          assert q['global_Q3']==q['gate_R_full']==q['gate_V']=='OPEN'
+          print('Q3 G0 original scoped NO_GO on XOR4 after full GF2 sample scan; skip neural training.')
+          PY
