@@ -148,13 +148,15 @@ def make_clause(src,original_positions,a,b,relation):
  if relation==3:return A==B
  raise ValueError("NOT_RELATION")
 def model_candidates(src,index,states,params):
+ goal_atoms=set(str(v) for v in z3.z3util.get_vars(src["post"]))
+ goal_indices={i for i,v in enumerate(src["now"]) if str(v) in goal_atoms}
  if len(states)<8:raise ValueError("INSUFFICIENT_REAL_SOURCE_DATA")
  out=[]
  for a in range(len(index)):
   for b in range(a+1,len(index)):
-   # Skip the original sole Post goal boolean, not via checking actual
-   # target Post formula. Pre-frozen source signature calls out OK at 13.
-   if index[a]==13 or index[b]==13:continue
+   # Exclude goal-support state coordinates via source Post free-variable
+   # MASK ONLY: do not use goal values as candidate features or labels.
+   if index[a] in goal_indices or index[b] in goal_indices:continue
    f=features([(row[a],row[b]) for row in states])
    probs,_=run_net(np.asarray([f]),params)
    relation=int(np.argmax(probs[0]))
@@ -168,6 +170,8 @@ def model_candidates(src,index,states,params):
  return out
 def certified_first(original,source,states,params):
  index,rows,model_receipts=original_samples(source)
+ goal_atoms=set(str(v) for v in z3.z3util.get_vars(source["post"]))
+ goal_indices={i for i,v in enumerate(source["now"]) if str(v) in goal_atoms}
  preds=model_candidates(source,index,rows,params)
  checked_preds=[]
  accepted=[]
@@ -189,7 +193,7 @@ def certified_first(original,source,states,params):
  all_possible=0;initial_sufficient=0;inductive_count=0
  for a in range(len(index)):
   for b in range(a+1,len(index)):
-   if index[a]==13 or index[b]==13:continue
+   if index[a] in goal_indices or index[b] in goal_indices:continue
    for relation in (1,2,3):
     atom=make_clause(source,index,a,b,relation)
     all_possible+=1
@@ -211,8 +215,9 @@ def certified_first(original,source,states,params):
     "original_pre_entailed_candidates":initial_sufficient,
     "inductive_candidates_Z3_found":inductive_count,
     "classical_is_complete_for_this_fixed_grammar":True},
-   "no_original_post_used_in_proposer":True,
-   "post_index13_excluded_from_all_candidates":True}
+   "source_Post_used_only_for_goal_coordinate_exclusion":True,
+   "post_support_coordinates_excluded_from_all_candidates":sorted(goal_indices),
+   "source_Post_not_used_as_training_label_or_feature":True}
 
 def main():
  a=argparse.ArgumentParser()
