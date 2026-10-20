@@ -1,0 +1,77 @@
+name: Q3 posthoc frozen 268-weight Boolean full original candidate audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-gater-bool-fixed-full110.yml'
+      - 'research/evidence/q3_gateR_learned_bool_20261021/posthoc_immutable_first18_all110_source_2vc.py'
+      - 'docs/research/Q3_BOOLEAN_FIRST_0_18_FIXED_AND_POSTHOC_110_AUDIT_20261021.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source_only_inductiveness_full_budget:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: pinned_original
+          sparse-checkout: |
+            lib/Inv_Track/andrew_lustre
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Source and code pinned
+        run: |
+          test "$(git -C pinned_original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_gateR_learned_bool_20261021/posthoc_immutable_first18_all110_source_2vc.py
+      - name: Z3 and independent SHA-pinned official cvc5 and NumPy
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Fetch exact historical first 0 of 18 proof receipt
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39512051313
+          name: q3-gater-trained-Boolean-first-original
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/historical_first
+      - name: First candidate model SHA frozen, compare first 18 and verify all emitted original AST candidates
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_gateR_learned_bool_20261021/posthoc_immutable_first18_all110_source_2vc.py --root pinned_original --first /tmp/historical_first/q3_gateR_bool_neural_first.json --out /tmp/q3_Bool_full110_original_second.json | tee /tmp/q3_Bool_full110_original_second.log
+          sha256sum /tmp/q3_Bool_full110_original_second.json
+      - name: Immutable second scientific receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-gater-trained-Boolean-full110-posthoc-second
+          path: |
+            /tmp/q3_Bool_full110_original_second.json
+            /tmp/q3_Bool_full110_original_second.log
+          if-no-files-found: warn
+      - name: No false breakthrough or first source result rewrite
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3_Bool_full110_original_second.json'))
+          assert r['immutable_first_model_real_source_pass']=='0/18'
+          assert r['same_source_samples_proposals_first18_identical']
+          assert r['frozen_268_neural_weights_SHA256']=='d00ebe239e23fe86e6ace2fe2d7a69ea380f0fb6fc4dbc096cc3bb3d2baf07d0'
+          assert r['one_source_posthoc_full_verifier_budget_expansion_only']
+          assert r['fixed_boolean_grammar_exact_classical_stronger']=='YES'
+          assert r['gate_R_full']==r['gate_V']==r['global_Q3']=='OPEN'
+          print('Posthoc original source learned Boolean certificates',r['neural_boolean_actual_original_inductive_2VC_dual_proved'],'/',r['neural_boolean_source_proposal_count'])
+          PY
