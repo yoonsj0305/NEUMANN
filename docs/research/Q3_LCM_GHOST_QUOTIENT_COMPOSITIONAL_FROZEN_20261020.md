@@ -1,0 +1,15 @@
+Q3 | LCM original source compositional ghost-quotient certificate (2026-10-20)
+
+Scope: POSTHOC / CLASSICAL ONLY / source already opened. Previous PR303 exact integer HNF identifies four source-only congruences and produces eight integer matrix identities but full direct QF_NIA original verification was UNKNOWN. This is an entirely separate verifier decomposition, not retcon of previous unknown and NOT learned neural invention.
+
+Frozen methodology before first Actions run:
+- Trusted real source SaswatPadhi/LoopInvGen@6ac90265b11431c9477dfbd33e3e3380234c0499 benchmarks/NIA/other/lcm.sl; blob 6c0cbaafc0c8b960d6047014dc5670554aacbc85, raw SHA256 c488e8b87d96e48916ffd95c656c3ef712f3d8f327128a461814f3d424936667.
+- Regenerate candidate four signed pair expressions from the source-only exact integer HNF miner, DO NOT program them as gold input or read original post to mine the equalities.
+- Introduce one integer *ghost quotient witness* per congruence E%m=0: source variable m>0 and equation E=m*q. The ghost is proof-only, not a new physical program variable; its update after each original branch is DERIVED via exact integer column-module coordinates of the corresponding original source transition matrix (no manual quotient updates hardcoded).
+- Show initial witness constants exist from actual source Pre using exact Z3. Show each original Trans branch implies exact published source affine update (source-only), and the two original branches jointly exhaust Trans. For every branch, verify resulting ghost relation, and strict-positivity preservation, in Z3 and official separate SHA-pinned cvc5 1.4.2, with original Pre/Trans source formulas and no privileged gold proof.
+- Show final exit original x=y forces u+v simultaneously equals a times one integer linear combination of ghost witnesses and b times another, with exact symbolic equalities. Separately prove the universal mod lemma for arbitrary positive divisor d and quotient q: ((d*q) mod d)==0 in Z3 and cvc5. Compose these facts into a sound induction argument that the ORIGINAL published Post follows at exit. This is a modular proof certificate for original behavior; do not present it as successful monolithic original 3VC when still UNKNOWN.
+- Original-source FROZEN no modifications, typed parser/custom xor pre/trans/post parity, Pre SAT and negated post SAT, mutation/negative controls.
+- Original direct SMT 3VC UNKNOWN from PR303 remains unchanged. Goal is *compositional independent subtheorem* double-SMT proof of the mathematical source invariant and safety, not total solver completeness.
+- If any proof subobligation Unknown or timed out, overall compositional certification remains OPEN. Even full sound success is POSTHOC_CLASSICAL_SCOPED_PASS, not global Q3 neural invention, not G1 real blind and not frontier or 10x.
+
+First CI log and all results (including FAIL) immutable. CPU only, no paid LLM/GPU.
