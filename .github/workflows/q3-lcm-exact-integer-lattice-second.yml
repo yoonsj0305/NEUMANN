@@ -1,0 +1,73 @@
+name: Q3 real lcm exact integer-lattice source proof second
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-lcm-exact-integer-lattice-second.yml'
+      - 'research/evidence/q3_lcm_modular_lattice_20261020/second_exact_integer_lattice.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact_lattice_second_after_preserved_first_UNKNOWN:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: original_loopinvgen
+          sparse-checkout: |
+            benchmarks/NIA/other
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Frozen source revision and corrected algebraic solver syntax
+        run: |
+          test "$(git -C original_loopinvgen rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+          python -m py_compile research/evidence/q3_lcm_modular_lattice_20261020/second_exact_integer_lattice.py
+      - name: Pinned independent cvc5, exact sympy integer HNF, original Z3
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          test "$(find /tmp/cvc5bin -type f -name cvc5 | wc -l)" -eq 1
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.17.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: SECOND run exact algebraic source-only lattice without precomputed answer
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_lcm_modular_lattice_20261020/second_exact_integer_lattice.py --source-root original_loopinvgen --out /tmp/q3_lcm_exact_second.json | tee /tmp/q3_lcm_exact_second.log
+          sha256sum /tmp/q3_lcm_exact_second.json
+      - name: Preserve second raw proof separately from first UNKNOWN
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-real-lcm-second-exact-integer-HNF
+          path: |
+            /tmp/q3_lcm_exact_second.json
+            /tmp/q3_lcm_exact_second.log
+          if-no-files-found: warn
+      - name: Truthful exact algebraic proof gates, never fake SMT success
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_lcm_exact_second.json'))
+          assert x['original_source_no_Post_used_in_generation']
+          assert x['git_blob']=='6c0cbaafc0c8b960d6047014dc5670554aacbc85'
+          assert x['source_only_grammar_mining']['initial_mod_candidates']==32
+          assert x['source_only_grammar_mining']['all_hnf_certificates_exact']
+          assert not x['genuinely_new_blind_origin']
+          assert x['no_neural_training_and_no_neural_new_operator']
+          assert x['global_Q3']==x['global_Q1_Q7']=='OPEN'
+          print('SECOND_SOURCE_EXACT_ALGEBRA_SCOPED',x['full_real_original_3VC_dual_solver'])
+          print('SECOND_FULL_ORIGINAL_Z3',x['original_Z3_native_3VC'])
+          print('SECOND_FINAL_EXACT_CONGRUENCES',x['source_only_grammar_mining']['final_modular_candidates'])
+          PY
