@@ -1,0 +1,68 @@
+name: Q3 Gate R posthoc independently certify mixed Bool Int actual original
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-gater-original-classical-invariant.yml'
+      - 'research/evidence/q3_gater_relational_mixed_20261020/posthoc_independent_source_cvc5_invariant_3vc.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_sygus_full_independent_cert:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original_source
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+            lib/Inv_Track/andrew_lustre
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Original source pin and compiled syntax
+        run: |
+          test "$(git -C original_source rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_gater_relational_mixed_20261020/posthoc_independent_source_cvc5_invariant_3vc.py
+      - name: Pinned official cvc5 and independent Z3
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+      - name: ORIGINAL candidate recompiled and truly independently checked 3VC
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3_gater_relational_mixed_20261020/posthoc_independent_source_cvc5_invariant_3vc.py --root original_source --out /tmp/q3_GateR_classical_original_first.json | tee /tmp/q3_GateR_classical_original_first.log
+          sha256sum /tmp/q3_GateR_classical_original_first.json
+      - name: Always retain actual first candidate proof results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-gater-mixed-bool-original-independent-solver-first
+          path: |
+            /tmp/q3_GateR_classical_original_first.json
+            /tmp/q3_GateR_classical_original_first.log
+          if-no-files-found: warn
+      - name: No false original safety proof and no global Q3 closure
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3_GateR_classical_original_first.json'))
+          assert r['two_already_opened_originals_posthoc']
+          assert r['both_source_sha_verified']
+          assert len(r['rows'])==2
+          assert r['global_Q3']==r['gate_R_complete']==r['gate_V']=='OPEN'
+          assert r['learned_causal_new_structure']=='NOT_DEMONSTRATED'
+          print('ACTUAL ORIGINAL INDEPENDENT 3VC',r['original_independent_classical_3VC_dual_count'],'/2')
+          PY
