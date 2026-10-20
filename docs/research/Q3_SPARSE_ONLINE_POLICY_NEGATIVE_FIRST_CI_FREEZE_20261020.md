@@ -1,0 +1,19 @@
+# Q3 | Sparse online AST gradient policy decisive development audit (2026-10-20)
+
+**FROZEN AFTER LOCAL DEV:** This study was already executed locally before this GitHub-first test. The locally observed candidate-only structural learner obtained correct source-reconstructing AST in **1/32** deterministic seed runs with 3000 candidate feedbacks each, while matched uniform stochastic classical search got **4/32**. In its only successful seed #24, the learner first found a correct AST at proposal #1999 *before* freezing its weights and proposed the same equivalence again at post-freeze #4. Thus it did **not** initially find a novel correct expression using frozen trained weights without earlier correct sample. This is **negative causal evidence** about this exact policy, NOT a global impossibility theorem or statistically established superiority of classical methods.
+
+## Contract
+
+- Same already-opened author-created counter recurrence as PR #299/#300. Train k=2..6, 48 samples per source, 240 data points. Formula is not provided; errors compare candidate actual arithmetic against observed `r`. No external author-family-blind test.
+- Program family exactly 25,920 ASTs: five binary tree shapes, three operators per AST from +,-,*,Euclidean int div, four leaves from a,b,1. **No full 25,920 candidate evaluation is allowed to the sparse learner.** Each sampled AST is evaluated once against the 240 source states; 2500 online feedback proposals followed by 500 proposals after policy freeze; 3000 total per seeded trial.
+- Categorical **125-parameter shape-conditional stochastic program policy**, updated from source behavior by **analytic Adam gradient of reward-weighted log likelihood** on batches of 125 sampled ASTs. Rewards `log1p(MAE)+0.1×(1−fraction_exact)`, soft elite temperature 0.3, 7 actual Adam updates after each batch, lr 0.22, 30% probability mix with uniform grammar to preserve diversity. This is classical estimation-of-distribution / neural-like learnable policy, not gradient neural language model and not novel mathematical primitive.
+- Uniform baseline **3000 candidate evaluations** from exactly same full grammar, with a deterministic independent RNG seed; 32 fixed paired seeds 1..32. Compare absolute success and discovery attempt, and any novel post-freeze successful candidate *without* a pre-freeze success. Record entire 32-row registry without selection. No tuning from test on this source if this policy fails.
+- Zero paid API, zero GPU, zero exhaustively precomputed reward posterior, no supervised gold AST IDs. All original mathematical operators are PREDEFINED in finite DSL.
+- Where a correct proposal exists, verify 4 heldout synthetic counter programs k=7,8,9,11 with unchanged Z3 and *independent pinned cvc5 v1.4.2* 3VC initial/consecution/post. These are same synthetic family and proof doesn't establish fresh source-family generalization.
+- First official GitHub CI raw JSON receipt archived whether PASS/FAIL (build green means honesty gates passed, NOT experiment success).
+
+## Decision already indicated by local dev
+
+For this online policy, choose `Q3_SPARSE_ONLINE_CONDITIONAL_GRADIENT_DISCOVERY = FAIL_NO_ADVANTAGE`; a single correct proposal rediscovered after freeze is not a new learned first-discovery event. No extra learning budget goes to this exact CEM/Adam setup. The strong classical full finite grammar search or principled symbolic decomposition dominates as the trusted minimum-compute fallback for this synthetic family, but ***32 trials cannot establish general superiority over all possible gradient policies.***
+
+Global Q3, strong original fresh author-blind learning, and Q4 10× all-in remain OPEN. Next high-value objective is learning reusable structure from **multiple training task families** before testing new frozen original sources, not repeatedly trying the same synthetic modulo task with different sampling temperatures.
