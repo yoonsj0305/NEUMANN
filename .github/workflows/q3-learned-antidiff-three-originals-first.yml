@@ -1,0 +1,76 @@
+name: Q3 FIRST synthetic-trained polynomial operator -> three unseen authentic original sources
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-learned-antidiff-three-originals-first.yml'
+      - 'research/evidence/q3_frozen_learned_antidiff_20261020/**'
+      - 'docs/research/Q3_LEARNED_OPERATOR_3_ORIGINALS_PRE_SOURCE_FREEZE_20261020.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  train_then_reveal_three_originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: upstream_original
+          sparse-checkout: |
+            benchmarks/NIA/other
+            benchmarks/NIA/2018.CHI_InvGame
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Audit frozen upstream and compile
+        run: |
+          test "$(git -C upstream_original rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+          python -m py_compile research/evidence/q3_frozen_learned_antidiff_20261020/first_synthetic_trained_three_originals.py
+      - name: Exact independent source proof tools; no GPU
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          test "$(find /tmp/cvc5bin -type f -name cvc5 | wc -l)" -eq 1
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F '1.4.2'
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.14.0 numpy==2.3.5 scipy==1.17.0
+      - name: FIRST fixed-seed synthetic supervised 42-parameter operator and unseen originals
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_frozen_learned_antidiff_20261020/first_synthetic_trained_three_originals.py --root upstream_original --out /tmp/q3_learned_three_first.json | tee /tmp/q3_learned_three_first.log
+          sha256sum /tmp/q3_learned_three_first.json
+      - name: Preserve first all results even if learned transfer fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-first-trained-polynomial-three-originals
+          path: |
+            /tmp/q3_learned_three_first.json
+            /tmp/q3_learned_three_first.log
+          if-no-files-found: warn
+      - name: Enforce limited hypothesis not global Q3
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_learned_three_first.json'))
+          assert x['three_source_rows_retained'] and len(x['cases'])==3
+          assert x['model_training_before_any_target_source_body_parsed']
+          assert x['three_target_originals_pinned_before_content_read']
+          assert x['trained_operator']['learned_trainable_linear_weights']==42
+          assert x['trained_operator']['heldout_64_full_integer_coefficient_predictions_exact']==64
+          assert x['distinct_upstream_author_origin_groups']==1
+          assert not x['learned_new_mathematical_primitive_outside_predeclared_polynomial_grammar']
+          assert not x['learned_superior_to_complete_exact_classical']
+          assert x['global_Q3']==x['global_Q1_Q7']=='OPEN'
+          print('FIRST_SYNTHETIC_TRAINED_FROZEN_UNSEEN_DUAL_ORIGINAL',x['learned_first_proposals_dual_original_3VC'],'/3')
+          print('SAME_INPUT_EXACT_CLASSICAL',x['same_information_strong_classical_dual_original_3VC'],'/3')
+          PY
