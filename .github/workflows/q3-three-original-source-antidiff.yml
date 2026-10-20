@@ -1,0 +1,74 @@
+name: Q3 real three-source exact symbolic antidifference first
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-three-original-source-antidiff.yml'
+      - 'research/evidence/q3_source_only_discrete_antidifference_20261020/**'
+      - 'docs/research/Q3_SOURCE_ONLY_ANTIDIFFERENCE_THREE_ORIGINALS_FROZEN_20261020.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first_classical_real_source_antidiff:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: upstream_original
+          sparse-checkout: |
+            benchmarks/NIA/other
+            benchmarks/NIA/2018.CHI_InvGame
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Confirm source revision and syntax
+        run: |
+          test "$(git -C upstream_original rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+          python -m py_compile research/evidence/q3_source_only_discrete_antidifference_20261020/first_three_source_exact_recurrence.py
+      - name: Independent pinned cvc5 and exact polynomial source tools
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          test "$(find /tmp/cvc5bin -type f -name cvc5 | wc -l)" -eq 1
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F '1.4.2'
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.14.0 numpy==2.3.5 scipy==1.17.0
+      - name: FIRST original source-only polynomial-antidifference, full double three-VC
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_source_only_discrete_antidifference_20261020/first_three_source_exact_recurrence.py --root upstream_original --out /tmp/q3_three_original_antidiff_first.json | tee /tmp/q3_three_original_antidiff_first.log
+          sha256sum /tmp/q3_three_original_antidiff_first.json
+      - name: Preserve FIRST complete outcome including scientific failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-three-original-source-antidiff-first
+          path: |
+            /tmp/q3_three_original_antidiff_first.json
+            /tmp/q3_three_original_antidiff_first.log
+          if-no-files-found: warn
+      - name: Scope gate accepts science failures but rejects fabricated claims
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3_three_original_antidiff_first.json'))
+          assert r['three_source_rows_preserved'] and len(r['sources'])==3
+          assert r['classical_only_no_neural_calls']
+          assert r['this_source_already_opened_after_BMC']
+          assert r['global_Q3']==r['global_Q1_Q7']=='OPEN'
+          assert {x['source'] for x in r['sources']}=={
+            'benchmarks/NIA/other/pottsumm3.sl',
+            'benchmarks/NIA/2018.CHI_InvGame/s9.desugared.sl',
+            'benchmarks/NIA/2018.CHI_InvGame/non-lin-ineq-3.desugared.sl'}
+          print('SOURCE_ONLY_CLASSICAL_FIRST_DUAL_ORIGINAL_3VC',r['independent_original_full_3VC_pass_count'],'/3')
+          PY
