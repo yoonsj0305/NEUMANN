@@ -1,0 +1,13 @@
+# NEUMANN 1 Q3 G0: fail-fast before neural XOR4 training
+
+2026-10-21 KST. The previous PR #321 FIRST unopened files have ALREADY been opened and yielded learned=0 and classical=0 original source 2VC, synthetics neural=590/600 and exact classical=600/600. Immutable first Actions #39514997383 raw JSON SHA256 5e9c7f5d1e4039d5a7e3b7edd90857684d8d7ac14b3ab10589b76c2102c2e47b.
+
+**This work develops a necessary headroom G0 filter, no fresh blind neural evidence.** Same actual pinned originals: FIREFLY_1 Git blob e23218d41372a350467aba1386897cb0311247ff, DRAGON_2 Git blob 17f0cea250008e9e3575d38181f7e40804501dde, SyGuS-Org/benchmarks@13c8deb68a873635879c9a69bc78caebd340f646.
+
+Before any neural weights/model forwards/training: exact source typed/native semantic XOR 3 predicates via Z3 and independent cvc5; 32 source Pre and 32 actual Pre/Trans successor distinct Bool observations; remove direct published Post support variables only as exclusion mask. Enumerate ALL 4-way candidate tuple parity constraints within the source eligible typed Bool state vars. Compute GF2 linear span of every singleton/pairwise source-sample-consistent affine constraint as conservative *sample* baseline. Any 4-body parity that is consistent with ALL truly reachable sample states and NOT in that span is 'G0_HEADROOM' and may warrant learning. If none -> `NO_GO_CURRENT_XOR4_INDEPENDENT_CANDIDATE_CLASS` and DO NOT train. Does not certify all global source higher-order invariants impossible: some valid formula outside this grammar or in approximate pairwise sample span could still exist.
+
+Strong synthetic controls WITHOUT SMT source: 8 even-parity 4bit rows include ALL 8 even assignments and give 1 genuinely independent XOR4 (G0 GO), while all 16 4bit assignments give ZERO parity headroom (G0 NO_GO). A copied/stale returned 0/2 verdict which also incorrectly returns NO_GO on positive control is invalid.
+
+Automated fail-closed replay of actual prior immutable original JSON source Git IDs, exact source eligible Bool counts (15 and 20), sample count (64/64) and G0 sample-pairwise rank (3 and 6), classical 4parity no-headroom 0/0, without fake model improvement. Full real G0 CPU time excludes prior first-run 1.965s synthetic training; no exact speedup factor without matched repeated timing. No GPU or paid API, all global questions OPEN.
+
+Scientific STOP/GO: source preflight dispatch logic saves repeated training in known-no-headroom source programs, not proof of trained novel mathematical operator, not fresh authors, not full NEUMANN Q3 nor Q4.
