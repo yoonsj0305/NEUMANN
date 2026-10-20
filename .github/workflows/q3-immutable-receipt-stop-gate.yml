@@ -1,0 +1,85 @@
+name: Q3 final current-architecture stop gate with immutable original Actions proofs
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-immutable-receipt-stop-gate.yml'
+      - 'research/evidence/q3_exit_gate_20261020/**'
+      - 'docs/research/Q3_STOP_CURRENT_42W_TWO_REMAINING_GATES_20261020.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  scientific_stop_gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Download immutable original exact theorem Actions receipt
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39430292389
+          name: q3-frozen42-exact-polynomial-universal-no-go
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/theorem
+      - name: Download first SHA-frozen five external-source Actions receipt
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39436675738
+          name: q3-independent-families-exact-theorem-first
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/five
+      - name: Download unchanged first external valid-two source failure receipt
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39436903481
+          name: q3-g1-independent-author-origins-first-frozen42
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/external_first
+      - name: Download external classical Z3 plus independent cvc5 original source certificate
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39437965135
+          name: q3-g1-external-classical-source-native-proof
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/external_classical
+      - name: Independently audit raw proof SHA, exact learned operator algebra, and original scientific failures
+        run: |
+          set -o pipefail
+          python research/evidence/q3_exit_gate_20261020/immutable_q3_decision.py \
+            --theorem /tmp/theorem/q3_fixed42_exact_universal_proof.json \
+            --five /tmp/five/q3_first_cross_origin_five.json \
+            --external-first /tmp/external_first/q3_g1_independent_author_first.json \
+            --external-classical /tmp/external_classical/q3_external_solver_original_proof.json \
+            --out /tmp/q3_decisive_stop_gate.json | tee /tmp/q3_decisive_stop_gate.log
+          sha256sum /tmp/q3_decisive_stop_gate.json
+      - name: Archive auditable current-architecture stop verdict
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-current-frozen42-stop-and-remaining-two-gates
+          path: |
+            /tmp/q3_decisive_stop_gate.json
+            /tmp/q3_decisive_stop_gate.log
+          if-no-files-found: warn
+      - name: Never promote global Q3 or invent unsupported learned pass
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/q3_decisive_stop_gate.json'))
+          assert q['result']=='DECISION_CLOSED_CURRENT_42W_ARCHITECTURE_NO_GO'
+          assert q['current_polynomial_operator_exact_negative_theorem']['matrix_exact_difference_identity']=='PASS_36_ENTRIES'
+          assert q['Q3_global_deployable_cross_origin']=='OPEN'
+          assert q['Q3_current_fixed_42w_learned_exclusive_math']=='NO_GO_CLOSED'
+          assert q['Q3_matched_strong_classical_advantage']=='NOT_DEMONSTRATED'
+          assert len(q['remaining_Q3_decisive_gates'])==2
+          assert q['global_Q3']==q['global_Q1_Q7']=='OPEN'
+          assert q['do_not_run_more_fixed42_training_for_operator_novelty']
+          print('Q3 DECISION: current frozen model NO_GO, 2 decisive OPEN gates, global Q3 OPEN.')
+          PY
