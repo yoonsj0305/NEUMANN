@@ -1,0 +1,80 @@
+name: Q3 exact any-arity GF2 source-only no-go or residual certificate
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-all-arity-exact-gf2-original.yml'
+      - 'research/evidence/q3_exact_GF2_all_arity_20261021/**'
+      - 'docs/research/Q3_TWO_ORIGINALS_EXACT_GF2_ALL_ARITY_CLOSURE_CONTRACT_20261021.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independent_actual_original_GF2_closure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: source_originals
+          sparse-checkout: |
+            lib/Inv_Track/andrew_lustre
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify official original sources and compiled exact GF2 checker
+        run: |
+          test "$(git -C source_originals rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_exact_GF2_all_arity_20261021/first_source_64_observation_exact_nullspace.py
+      - name: Install independent SHA pinned original cvc5, Z3 and NumPy for source parser
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          test "$(find /tmp/cvc5bin -type f -name cvc5 | wc -l)" -eq 1
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Download immutable genuine first learned XOR4 0/2 original receipt
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39514997383
+          name: q3-learned-xor4-two-real-first-originals
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/first
+      - name: Audit SHA and complete affine XOR space on exact real Pre/Trans samples
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_exact_GF2_all_arity_20261021/first_source_64_observation_exact_nullspace.py --root source_originals --first /tmp/first/q3_xor4_first_two.json --out /tmp/q3_exact_GF2_all_arity_final.json | tee /tmp/q3_exact_GF2_all_arity_final.log
+          sha256sum /tmp/q3_exact_GF2_all_arity_final.json
+      - name: Preserve raw first all-arity algebra and any proof failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-original-64-states-exact-all-arity-gf2
+          path: |
+            /tmp/q3_exact_GF2_all_arity_final.json
+            /tmp/q3_exact_GF2_all_arity_final.log
+          if-no-files-found: warn
+      - name: Science accounting and no false learned-original-3VC
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          a=json.load(open('/tmp/q3_exact_GF2_all_arity_final.json'))
+          assert a['original_first_source_run']==39514997383
+          assert a['immutable_original_first_JSON_sha256']=='5e9c7f5d1e4039d5a7e3b7edd90857684d8d7ac14b3ab10589b76c2102c2e47b'
+          assert a['all_original_byte_git_blobs_authenticated']
+          assert a['original_source_semantics_dual_3VC_count']==2
+          assert a['first_source_model_XOR4_2VC']=='0/2_PRESERVED'
+          assert a['no_new_learned_model_training']
+          assert a['gate_R_learned_novel_representation']==a['gate_V_first_new_author_origin']==a['global_Q3']=='OPEN'
+          print('EXACT_COMPLETE_GF2_ORIGINALS',a['source_specific_GF2_complete_closure_count'],'of 2')
+          PY
