@@ -41,7 +41,7 @@ jobs:
           test "$(find /tmp/cvc5bin -type f -name cvc5 | wc -l)" -eq 1
           sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
           cvc5 --version | grep -F 1.4.2
-          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.14.0 numpy==2.3.5 scipy==1.17.0
       - name: "FIRST frozen three-uninspected + three controls: bounded source Pre/Trans/Post"
         run: |
           set -o pipefail
