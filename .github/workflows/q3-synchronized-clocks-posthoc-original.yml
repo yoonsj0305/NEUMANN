@@ -1,0 +1,76 @@
+name: Q3 posthoc synchronized clocks unchanged learned 42w original recheck
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-synchronized-clocks-posthoc-original.yml'
+      - 'research/evidence/q3_posthoc_sync_clock_repair_20261020/**'
+      - 'docs/research/Q3_POSTHOC_SYNCHRONIZED_CLOCK_REPAIR_FROZEN_20261020.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact_original_42weight_syncclock:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: upstream_original
+          sparse-checkout: |
+            benchmarks/NIA/other
+            benchmarks/NIA/2018.CHI_InvGame
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Assert unchanged upstream source and Python
+        run: |
+          test "$(git -C upstream_original rev-parse HEAD)" = 6ac90265b11431c9477dfbd33e3e3380234c0499
+          python -m py_compile research/evidence/q3_posthoc_sync_clock_repair_20261020/first_unchanged_42_weight_three_originals.py
+      - name: Pinned independent cvc5 and exact algebra, CPU only
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          test "$(find /tmp/cvc5bin -type f -name cvc5 | wc -l)" -eq 1
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F '1.4.2'
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.14.0 numpy==2.3.5 scipy==1.17.0
+      - name: FIRST posthoc three original dual SMT with unchanged frozen weights
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_posthoc_sync_clock_repair_20261020/first_unchanged_42_weight_three_originals.py --root upstream_original --out /tmp/q3_syncclock_original_first.json | tee /tmp/q3_syncclock_original_first.log
+          sha256sum /tmp/q3_syncclock_original_first.json
+      - name: Preserve FIRST science receipt including incomplete
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-synchronized-clocks-42weight-posthoc-original
+          path: |
+            /tmp/q3_syncclock_original_first.json
+            /tmp/q3_syncclock_original_first.log
+          if-no-files-found: warn
+      - name: Honesty flags and verified source attribution
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_syncclock_original_first.json'))
+          assert x['original_immutable_first_learned_real_3VC_was_2_of_3']
+          assert x['frozen_trained_operator']['frozen_trained_weights_sha256']=='563c6be70fade6db755425a5756b6fdd89503ada5727bf31f49ad195ec041a78'
+          assert not x['new_source_adapter_retrained_any_weights']
+          assert x['all_original_Git_blobs_unchanged']
+          assert len(x['cases'])==3
+          assert not x['first_blind_new_third_source_success']
+          assert not x['outside_fixed_degree6_polynomial_grammar']
+          assert not x['learned_unique_superiority_over_classical']
+          assert x['global_Q3']==x['global_Q1_Q7']=='OPEN'
+          print('POSTHOC_SYNC_CLOCK_FROZEN42_DUAL',x['original_lifted_full_dual_3VC_count'],'/3')
+          print('SAMEINFO_CLASSICAL',x['original_equal_info_classical_full_dual_3VC_count'],'/3')
+          PY
