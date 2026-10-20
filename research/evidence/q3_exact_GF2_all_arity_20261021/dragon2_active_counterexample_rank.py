@@ -142,6 +142,7 @@ def main():
         raise RuntimeError("ACTUAL_SOURCE_OBSERVATION_CONTRADICTS_PROVEN_2VC")
     events=[]
     seen={tuple(v) for v in rows}
+    initial_distinct_count=len(seen)
     initial_nullity=len(nullspace_matrix(rows,n)[1])
     status="ABSTAIN_NOT_CONVERGED"
     for it in range(MAX_WITNESSES+1):
@@ -194,7 +195,7 @@ def main():
          "final_source_counterexample_enriched_nullity":final_nullity,
          "all_arity_affine_original_closed":status.startswith("PASS_"),
          "source_authentic_observations":len(rows),
-         "new_independent_counterexample_witnesses":len(seen)-64,
+         "new_independent_counterexample_witnesses":len(seen)-initial_distinct_count,
          "iterations":events,"fresh_proven_low_arity_certificates":certificates,
          "native_typed_original_semantics_z3_cvc5":checks,
          "sampling_receipts":source_sample_receipts,
