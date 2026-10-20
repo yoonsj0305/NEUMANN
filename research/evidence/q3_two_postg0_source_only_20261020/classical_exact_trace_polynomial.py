@@ -76,7 +76,7 @@ def original_source_episodes(src,native,domain=range(-3,8),max_init=100):
 def expr_integer_from_fraction_polynomial(raw,now):
  """Build exact integer equation using the LCM denominators, no truncation."""
  polynomial=sp.Poly(raw, *now,domain=sp.QQ) if False else sp.Poly(raw,domain=sp.QQ)
- denom=sp.ilcm(*[int(x.q) for x in polynomial.coeffs()]) if polynomial.coeffs() else 1
+ denom=math.lcm(*[int(x.q) for x in polynomial.coeffs()]) if polynomial.coeffs() else 1
  eq=sp.expand(denom*raw)
  def convert(term):
   if term.is_Integer:return z3.IntVal(int(term))
@@ -102,7 +102,7 @@ def exact_nullspace_candidate(states,now):
  possible=[]
  symbols=sp.symbols(' '.join(str(v) for v in now))
  for v in basis:
-  mulden=sp.ilcm(*[int(c.q) for c in v])
+  mulden=math.lcm(*[int(c.q) for c in v])
   ci=[int(mulden*c) for c in v]
   gcd=math.gcd(*ci)
   ci=[x//max(gcd,1) for x in ci]
