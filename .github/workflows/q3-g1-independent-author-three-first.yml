@@ -67,6 +67,9 @@ jobs:
           assert r['frozen_weights_and_synthetic_training']['frozen_trained_weights_sha256']=='563c6be70fade6db755425a5756b6fdd89503ada5727bf31f49ad195ec041a78'
           assert r['frozen_weights_and_synthetic_training']['heldout_64_full_integer_coefficient_predictions_exact']==64
           assert r['all_three_original_git_blobs_verified']
+          assert r['genuine_first_presource_sha_verified']==2
+          assert r['third_target_POSTHOC_NOT_FRESH_BLIND']
+          assert r['frozen_first_ci_raw_sha256']=='825afcbe5bb374dea536fa66ad85d5b19ed2458f6ac2596a69156468ceb65c14'
           assert len(r['originals'])==r['total_original_source_count']==3
           assert r['upstream_original_revision']=='13c8deb68a873635879c9a69bc78caebd340f646'
           assert r['novel_G1_unique_learned_structure']=='NOT_DEMONSTRATED'
