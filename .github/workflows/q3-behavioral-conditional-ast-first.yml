@@ -29,9 +29,9 @@ jobs:
           test "$(find /tmp/cvc5bin -type f -name cvc5 | wc -l)" -eq 1
           sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
           cvc5 --version | grep -F '1.4.2'
-      - name: Install CPU optimizer and source-exact SMT tools
+      - name: Install source-exact SMT tools; NumPy gradient needs no torch
         run: |
-          python -m pip install --disable-pip-version-check torch==2.5.1 numpy==1.26.4 z3-solver==4.13.3.0 sympy==1.14.0 scipy==1.14.1
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0 sympy==1.14.0 scipy==1.17.0
       - name: FIRST behavioral-only conditional AST original synthetic 3VC
         run: |
           set -o pipefail
