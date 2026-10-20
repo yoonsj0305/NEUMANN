@@ -124,7 +124,7 @@ def generator_from_controller(src,native,weights,exact_classical,controller):
     for e in atoms(native["trans"]):
         if e.decl().kind()!=z3.Z3_OP_LT:continue
         lo,hi=e.children()
-        if str(lo)!=meta["canonical_clock"]:continue
+        if str(lo) not in clock_names:continue
         if not(z3.is_int_value(hi) or str(hi) in meta["source_static_parameters"]):continue
         bound=lo<=hi
         res,_=zcheck(z3.And(native["pre"],z3.Not(bound)),secs=5)
