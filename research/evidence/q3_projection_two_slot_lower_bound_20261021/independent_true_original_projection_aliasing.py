@@ -59,6 +59,13 @@ def per(root,item):
         row["actual_same_original_state_Pre_and_NotPost"]=check(same)
         row["one_step_reachable_projection_aliases_negative"]=check(reach1_projection_collision)
         row["actual_one_step_reachable_unsafe"]=check(reach1_actual_unsafe)
+        # Minimal necessary prefix-width of program-state information for
+        # separating EVERY genuine one-step source successor from a Bad state.
+        row["one_step_feature_prefix_aliasing_audit"]={}
+        for width in range(1,min(5,len(src["now"])+1)):
+            test=z3.And(native["pre"],native["trans"],bad,
+              *(a==b for a,b in zip(src["next"][:width],cloned[:width])))
+            row["one_step_feature_prefix_aliasing_audit"][str(width)]=check(test)
         if not all(r["independent_dual"] for r in (
             row["Pre_satisfiable"],row["NotPost_satisfiable"],
             row["two_slot_positive_vs_negative_indistinguishable"],
@@ -73,6 +80,9 @@ def per(root,item):
         row["genuine_original_unsafe_at_initial_state"]=unsafe
         row["one_step_two_slot_inductive_separator_impossible"]=(
             row["one_step_reachable_projection_aliases_negative"]["status"]=="SAT")
+        row["minimal_prefix_variables_to_eliminate_one_step_projection_alias"]=next(
+            (int(k) for k,v in row["one_step_feature_prefix_aliasing_audit"].items()
+             if v["independent_dual"] and v["status"]=="UNSAT"),None)
         row["one_step_projection_alias_without_actual_unsafe"]=(
             row["one_step_two_slot_inductive_separator_impossible"] and
             row["actual_one_step_reachable_unsafe"]["status"]=="UNSAT")
@@ -111,6 +121,9 @@ def main():
             sum(r["genuine_original_unsafe_at_initial_state"] for r in accepted),
         "pure_information_alias_without_initial_unsafety_count":
             sum(r["projection_alias_without_actual_initial_unsafety"] for r in accepted),
+        "original_67_minimum_prefix_to_remove_one_step_collision":
+            next((r["minimal_prefix_variables_to_eliminate_one_step_projection_alias"]
+                  for r in accepted if r["source"].endswith("/67.c.sl")),None),
         "all_source_variables_cannot_separate_count":
             sum(r["all_state_slots_positive_vs_negative_indistinguishable"]["status"]=="SAT" for r in accepted),
         "not_claim_of_neural_or_boolean_model_unique_success":True,
@@ -127,6 +140,7 @@ def main():
                 "one_step_alias_without_actual_unsafe_count",
                 "true_initial_unsafe_original_count",
                 "pure_information_alias_without_initial_unsafety_count",
+                "original_67_minimum_prefix_to_remove_one_step_collision",
                 "all_source_variables_cannot_separate_count"):
         print("Q3_EXACT_INFORMATION_LOWER_BOUND",key,result[key])
     print("Q3_GLOBAL_OPEN")
