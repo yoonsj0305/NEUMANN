@@ -1,0 +1,84 @@
+name: G0 first four original SMT2 unbounded UNSAT finite mod9 math certificates
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/g0-first-four-original-unbounded-unsat.yml'
+      - 'research/evidence/g0_fresh_four_unsat_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  authentic_four_originals_complete_math_unsat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/QF_NIA/20220315-MathProblems
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify prior source-body-blind SHA precommit and original compiler syntax
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/g0_fresh_four_unsat_20261021/first_original_four_complete_integer_unsat_mod9.py
+          python - <<'PY'
+          import json
+          c=json.load(open('research/evidence/g0_fresh_four_unsat_20261021/BEFORE_ANY_SOURCE_BODY_OPEN_AUTHENTIC_FOUR.json'))
+          assert c['pre_source_body_read'] and len(c['targets'])==4 and len(c['positive_source_controls'])==2
+          assert c['registered_method'].startswith('Parse true original Z3 AST')
+          print('FOUR_SOURCE_GIT_BLOBS_PREOPEN_FROZEN')
+          PY
+      - name: Fixed authentic exact original Z3 and independent cvc5
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+          lscpu | grep 'Model name' | head -1
+      - name: Authenticated six genuine original SMT-LIB source bounded Direct vs full modular unbounded proof
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/g0_fresh_four_unsat_20261021/first_original_four_complete_integer_unsat_mod9.py --root original --freeze research/evidence/g0_fresh_four_unsat_20261021/BEFORE_ANY_SOURCE_BODY_OPEN_AUTHENTIC_FOUR.json --out /tmp/g0_first_four_actual_unbounded_unsat.json | tee /tmp/g0_first_four_actual_unbounded_unsat.log
+          sha256sum /tmp/g0_first_four_actual_unbounded_unsat.json
+      - name: Preserve all first-source outcomes, raw Direct timeouts and math certificate
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g0-original-unbounded-four-mod9-threecube-math-dual
+          path: |
+            /tmp/g0_first_four_actual_unbounded_unsat.json
+            /tmp/g0_first_four_actual_unbounded_unsat.log
+          if-no-files-found: warn
+      - name: Fail closed on source AST and independently sound unbounded math
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/g0_first_four_actual_unbounded_unsat.json'))
+          assert x['four_original_git_sha_frozen_before_source_open_commit']=='b169a7fd88abb1818dc7327e413ad8b7ac59ea10'
+          assert len(x['four_true_original_unbounded_cases'])==4 and x['all_four_new_originals_retained']
+          assert len(x['two_non_unsat_mod9_controls'])==2
+          assert x['control_mod9_does_NOT_falsely_claim_unsat_count']==2
+          assert x['original_source_absolute_unbounded_UNSAT_mathematically_proven']==4
+          assert x['full_original_checkers_run_but_abstract_theorem_is_separate_from_raw_source_solver']
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          for row in x['four_true_original_unbounded_cases']:
+              assert row['original_true_target']%9 in (4,5)
+              assert row['n_mod9_is_mathematically_forbidden']
+              assert row['independent_source_theorem_abstract_smt_z3_cvc5']['independent_dual_abstract_agrees_with_finite_math']
+              assert row['status']=='TRUE_ORIGINAL_ALL_INTEGER_UNSAT_BY_COMPLETE_MOD9_THEOREM'
+          print('ORIGINAL_UNBOUNDED_FOUR_UNSAT_PROVED',x['original_source_absolute_unbounded_UNSAT_mathematically_proven'])
+          print('UNCHANGED_DIRECT_4SEC_INDEPENDENT_UNSAT',x['original_full_source_dual_direct_UNSAT_within_each_4sec'])
+          PY
