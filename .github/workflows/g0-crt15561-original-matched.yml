@@ -1,0 +1,91 @@
+name: G0 full original SMT2 CRT15561 vs strong CRT63 matched exact 50k and 250 brute cases
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/g0-crt15561-original-matched.yml'
+      - 'research/evidence/g0_crt15561_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  four_factor_original_g0_strongest_previous_crt63:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/QF_NIA/20220315-MathProblems
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate unchanged official original source and preregistration
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/g0_crt15561_20261021/exact_four_factor_originals_specialist_comparison.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/g0_crt15561_20261021/POSTHOC_FOUR_FACTOR_CRT_EXACT_CONTRACT.json'))
+          assert x['schema']=='neumann.g0.posthoc_CRT15561_fixed_r50000_exact_specialist_matched.v1'
+          assert x['modulus']==15561 and x['prime_power_factors']==[9,7,13,19]
+          assert x['scientific_split'].startswith('POSTHOC')
+          assert len(x['five_originals_from_PR344'])==5
+          print('TRUE_ORIGINAL_FOUR_FACTOR_CRT_PRE_EXECUTION_CONTRACT_LOCKED')
+          PY
+      - name: Install fixed independent original SAT SMT-LIB proof solvers
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+          lscpu | grep -E 'Model name' | head -1
+      - name: Certified 250 independent brute controls and five original source matched full cost
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/g0_crt15561_20261021/exact_four_factor_originals_specialist_comparison.py --root original --freeze research/evidence/g0_cubic_mod9_20261021/NEW_SEVEN_PRE_SOURCE_TRANSFER_FREEZE.json --contract research/evidence/g0_crt15561_20261021/POSTHOC_FOUR_FACTOR_CRT_EXACT_CONTRACT.json --out /tmp/g0_crt15561_five_actual_source_matched.json | tee /tmp/g0_crt15561_five_actual_source_matched.log
+          sha256sum /tmp/g0_crt15561_five_actual_source_matched.json
+      - name: Archive all actual original proofs and bounded misses including errors
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g0-crt15561-five-original-iso-strong-crt63-full-proof-cost
+          path: |
+            /tmp/g0_crt15561_five_actual_source_matched.json
+            /tmp/g0_crt15561_five_actual_source_matched.log
+          if-no-files-found: warn
+      - name: Strict iso-capability full original evidence and no invented novelty
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/g0_crt15561_five_actual_source_matched.json'))
+          assert x['pre_run_four_factor_contract_commit']=='82e659ba5535cb2d4092d4f2fef69ee8b92f313d'
+          assert x['study_is_POSTHOC_not_first_source_blind']
+          assert x['five_previous_source_originals_retained']
+          assert x['original_source_3_prior_controls_SAT']==3
+          assert x['independent_250_small_solvable_and_no_solution_oracle']['reference_cases']==250
+          assert x['same_exact_original_source_bounded_capability']
+          assert x['all_source_original_sat_models_independent_Z3_cvc5']
+          assert x['NO_TRUE_UNBOUNDED_UNSAT_ASSERTIONS_FROM_BOUND_MISS']
+          assert x['not_strongest_classical_direct_because_same_modulus_available_to_direct']
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          for t in x['five_opened_originals']:
+              for arm in ('strong_CRT63','CRT15561'):
+                  z=t[arm]
+                  assert z['status'] in ('ORIGINAL_RAW_SMT2_Z3_CVC5_SAT','BOUNDED_50K_NO_WITNESS_UNBOUNDED_UNKNOWN')
+                  if z['status']=='ORIGINAL_RAW_SMT2_Z3_CVC5_SAT':
+                      assert z['original_full_SMT2_independent_dual']
+                      assert z['source_certification']['independent_dual_result']
+          print('TRUE_ORIGINAL_CRT15561_ISO_CAPABILITY_5_OF_5')
+          print('FULL_SOURCE_WALL_RATIO_CRT63_OVER_CRT15561',x['old_CRT63_over_new_CRT15561_total_wall_ratio'])
+          PY
