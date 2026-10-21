@@ -1,0 +1,19 @@
+{
+  "schema": "neumann.q3.posthoc_real_original_fib32_parity_invariant_dual_v1",
+  "source_full_original": "SyGuS-Org/benchmarks@13c8deb68a873635879c9a69bc78caebd340f646:lib/Inv_Track/from_2018/fib_32.sl",
+  "original_git_blob": "4fb129488bee3e1e0cdae899b318d6503ae23c12",
+  "source_bytes": 824,
+  "source_original_PREVIOUSLY_OPENED": true,
+  "first_original_24_metadata_git_freeze": "6a5792e196b2234358dca31ec9dd733f3ffed42d",
+  "last_unknown_first_original_CI": "https://github.com/yoonsj0305/NEUMANN/actions/runs/39556649958",
+  "status_before_this_new_manual_hypothesis": "UNKNOWN with generic Z3 SPACER 20s and cvc5 SyGuS 20s, original BMC 0..5 no independent unsafe trace",
+  "exact_parity_invariant_candidate": "k>0, 0<=n<=2*k, b∈{0,1}, [(n mod2=0 AND i=j) OR (n mod2=1 AND b=0 AND i=j+1) OR (n mod2=1 AND b=1 AND j=i+1)]. This source-native invariant expresses two counters alternate, parity of n, b phase. Candidate from MANUAL mathematical inspection of already-opened source, not from a trained model.",
+  "proof": "Original source exact git blob/bytes; independent typed original native Pre Trans Post parity double compilation and nonvacuity; actual 3VC initiation Pre∧¬I, inductiveness I∧Trans∧¬I_next and goal I∧¬Post, ALL UNSAT independently by Z3 and pinned cvc5. Original goal n>=2k=> i=j. Strong Direct with parity insight can propose identical invariant.",
+  "ablation": "Synthesize candidate with even/odd phase relation removed and require at least one 3VC not proved, but not proof that all other sophisticated classical invariants fail. Optional no-bound or b-phase controls only recorded, not forced new global status.",
+  "no_model_weights_trained": true,
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q5": "OPEN",
+  "global_Q6": "OPEN",
+  "global_Q7": "OPEN"
+}
