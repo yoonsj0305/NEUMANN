@@ -1,0 +1,89 @@
+name: Q3 second first-unopened original12 PCA learned full safety replication
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_second12_full_learned_replication_20261021.yml'
+      - 'research/evidence/q3_v32_second12_replication_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  second_true_original_cohort_exact_frozen_learned_Q3_3VC:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify second source-body-blind registration and SAME previously executed model
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_v32_second12_replication_20261021/second_unopened12_unchanged_training_full3vc.py
+          python - <<'PY'
+          import json
+          x=json.load(open("research/evidence/q3_v32_second12_replication_20261021/BEFORE_SECOND12_ORIGINAL_SOURCE_BODIES_GITSHA.json"))
+          assert x["schema"]=="neumann.q3.v32_second12_first_body_unopened_replication_of_same_frozen_learner.v1"
+          assert x["new_source_original_BODIES_NOT_OPENED_BEFORE_SHA_commit"]
+          assert len(x["cases"])==12 and len({q["git_blob"] for q in x["cases"]})==12
+          assert x["global_Q3"]==x["global_Q4"]==x["global_Q6"]=="OPEN"
+          print("SECOND_ORIGINAL_SOURCE_SHA_PREOPEN_FROZEN_AT_37e26ee")
+          PY
+      - name: Pin native cvc5 Z3 plus actual CPU PCA and strong exact nullspace comparator
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: Run unchanged trained PCA and original Post full 3VC with equal rights controls
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_v32_second12_replication_20261021/second_unopened12_unchanged_training_full3vc.py \
+            --root original \
+            --freeze research/evidence/q3_v32_second12_replication_20261021/BEFORE_SECOND12_ORIGINAL_SOURCE_BODIES_GITSHA.json \
+            --out /tmp/q3_second12_real_source_learning_replication.json | tee /tmp/q3_second12_real_source_learning_replication.log
+          sha256sum /tmp/q3_second12_real_source_learning_replication.json
+      - name: Archive actual original task receipts including all failed experiments
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-second-first-source12-real-trained-original-full-safety-replication
+          path: |
+            /tmp/q3_second12_real_source_learning_replication.json
+            /tmp/q3_second12_real_source_learning_replication.log
+          if-no-files-found: warn
+      - name: Independently require original dual 3VC proof whenever counted successful
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open("/tmp/q3_second12_real_source_learning_replication.json"))
+          assert q["schema"]=="neumann.q3.v32_second_source_unopened12_original_actual_learned_safety_replication.v1"
+          assert q["source_body_unopened_registration_commit"]=="37e26ee320717c9e903f7e2b9fa512ff378c4c9c"
+          assert q["source_first_original_SHA_verified_count"]==12
+          assert len(q["new_originals"])==12
+          assert len({r["true_original_git_blob"] for r in q["new_originals"]})==12
+          assert q["equal_data_equal_math_authority_classical"]
+          assert q["no_cross_program_learned_weight_transfer"]
+          assert q["global_Q3"]==q["global_Q4"]==q["global_Q6"]=="OPEN"
+          for row in q["new_originals"]:
+            for key in ("POST_only_already_exact_original_dual","simple_NOLEARN_plus_original_POST",
+                        "TRAINED_PCA_plus_original_POST","EXACT_CLASSICAL_plus_original_POST"):
+              proof=row.get(key)
+              if proof and proof["fully_verified_complete_original_3VC"]:
+                assert all(x["dual_pass"] for x in proof["independent_original_pre_trans_post_dual_proofs"].values())
+          print("SECOND_FRESH_SOURCE_ORIGINAL_LEARNED_3VC_REPLICATION_AUDITED")
+          PY
