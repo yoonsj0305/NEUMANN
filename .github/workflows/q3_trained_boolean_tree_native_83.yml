@@ -1,0 +1,76 @@
+name: Q3 genuine original actual trained Boolean DNF source-native induction
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_trained_boolean_tree_native_83.yml'
+      - 'research/evidence/q3_guarded_tree_83_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  train_symbolic_ice_boolean_from_true_original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check unchanged original source revision and learned DNF syntax
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_guarded_tree_83_20261021/actual_trained_tree_SMT_disjunction.py
+      - name: Independently pin cvc5 and true Z3 source plus fitted decision tree
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 z3-solver==4.13.3.0
+      - name: Actual native source Pre one-step and NotPost supervised model then original Z3 cvc5 3VC
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_guarded_tree_83_20261021/actual_trained_tree_SMT_disjunction.py \
+            --root original \
+            --freeze research/evidence/q3_ood_xujie12_20261021/PREBODY_GITSHA_UNSEEN_CROSS_FAMILY_XUJIE12.json \
+            --out /tmp/q3_real_learned_boolean_native_original83.json | tee /tmp/q3_real_learned_boolean_native_original83.log
+          sha256sum /tmp/q3_real_learned_boolean_native_original83.json
+      - name: Preserve actual model fitted structure, complete proof and strong Boolean control
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-original83-trained-tree-genuine-disjunctive-verified-vs-classical
+          path: |
+            /tmp/q3_real_learned_boolean_native_original83.json
+            /tmp/q3_real_learned_boolean_native_original83.log
+          if-no-files-found: warn
+      - name: Do not report nonproved original or unique ML discovery as PASS
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/q3_real_learned_boolean_native_original83.json'))
+          assert q['schema']=='neumann.q3.posthoc_native_supervised_tree_DNF_induction.v1'
+          assert q['original_SHA']=='364ed512df08efcdd3877c56f7743766d325ef49'
+          assert q['originals_first_opened_in_PRIOR_PR408']
+          assert q['actual_native_positive_count']>0 and q['actual_native_negative_count']>0
+          assert q['learned_topology_calibrated_by_symbolic_verifier_not_solely_model']
+          assert q['global_Q3']==q['global_Q4']==q['global_Q6']=='OPEN'
+          for proof in ('trained_model_complete_original_dual_proof','strong_same_source_no_fit_OR_dual_proof'):
+              p=q[proof]
+              if p['proven']:
+                  assert all(r['dual_pass'] for r in p['dual_Z3_cvc5_original_3VC'].values())
+          print('ACTUAL_TRAINED_BOOLEAN_SOURCE_MODEL_HONEST_BOUNDARY_RETAINED')
+          PY
