@@ -1,0 +1,75 @@
+name: Q3 full genuine original12 source generic affine Houdini complete inductive
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_genuine_original12_generic_houdini.yml'
+      - 'research/evidence/q3_original12_sourcegeneric_houdini_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original12_exact_inductive_conjunctive_Houdini:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate genuine original source revision and generic known classical learner
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_original12_sourcegeneric_houdini_20261021/auto_affine_houdini_actual_original12.py
+      - name: Install independent pinned actual original verification Z3 cvc5
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: Auto generate bounded original source affine atoms and counterexample-eliminate then dual 3VC certify
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_original12_sourcegeneric_houdini_20261021/auto_affine_houdini_actual_original12.py \
+            --root original \
+            --freeze research/evidence/q3_dnf_first12_20261021/NEW_UNSEEN_ORIGINALS_BEFORE_SOURCE_BODY_LOCK.json \
+            --out /tmp/q3_original12_generic_Houdini_full_3VC.json | tee /tmp/q3_original12_generic_Houdini_full_3VC.log
+          sha256sum /tmp/q3_original12_generic_Houdini_full_3VC.json
+      - name: Preserve full original inductive theorem proof certificates and abstentions
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-original12-generic-affine-Houdini-independent-full-3VC
+          path: |
+            /tmp/q3_original12_generic_Houdini_full_3VC.json
+            /tmp/q3_original12_generic_Houdini_full_3VC.log
+          if-no-files-found: warn
+      - name: Fail closed unless original independent two solvers prove every claimed full task
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3_original12_generic_Houdini_full_3VC.json'))
+          assert r['schema']=='neumann.q3.real_original12_source_generic_classical_Houdini_linear_conjunction.v1'
+          assert r['originals']==12 and len(r['all_original_proof_receipts'])==12
+          assert len({q['original_sha'] for q in r['all_original_proof_receipts']})==12
+          assert r['neural_forward_count']==r['model_fit_count']==0
+          assert r['known_classical_Houdini_not_novel_machine_learning_discovery']
+          assert r['global_Q3']==r['global_Q4']==r['global_Q6']=='OPEN'
+          for case in r['all_original_proof_receipts']:
+              if case.get('certified_full_original_SAFE'):
+                  assert all(x['dual_pass'] for x in case['actual_genuine_original_Z3_cvc5_induction_3VC'].values())
+                  assert case['source_generic_affine_Houdini']['goal_can_be_proved_by_full_template']
+          print('GENUINE_ORIGINAL_ALL_PASSED_SOURCE_GENERIC_HOUDINI_DUAL_CERTIFIED')
+          PY
