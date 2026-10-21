@@ -1,0 +1,84 @@
+name: Q3 actual full original QF_NIA 3x3 exact-equivalent reduced source deploy
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-original-3x3-reduced-full-qfnia.yml'
+      - 'research/evidence/q3_original_3x3_deploy_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  deploy_and_prove_original_full_source_equivalence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/QF_NIA/20220315-MathProblems
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Fixed source exact original and compiler syntax
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/q3_original_3x3_deploy_20261021/compile_full_authentic_smt2_exact_rowspace_and_probe.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/q3_original_3x3_deploy_20261021/PRE_EXECUTION_REAL_SOURCE_REDUCED_QFNIA_CONTRACT.json'))
+          assert x['posthoc_opened_sources_only']
+          assert len(x['sources'])==5
+          assert x['global_Q3']==x['global_Q4']=='OPEN'
+          print('POSTHOC_NO_SEALED_SOURCE_FULL_QFNIA')
+          PY
+      - name: Install exact source certified solvers, row rank independent maths
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0 sympy==1.14.0
+          lscpu | grep 'Model name' | head -1
+      - name: Original source Z3 cvc5 certified row subset to runnable full reduced QFNIA and exact OS-capped timed control
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3_original_3x3_deploy_20261021/compile_full_authentic_smt2_exact_rowspace_and_probe.py --root original --freeze research/evidence/q3_power_feature_20261021/PRE_SOURCE_FIRST_TEN_POSITIVE_MONOTONE_MAGIC_CONTRACT.json --contract research/evidence/q3_original_3x3_deploy_20261021/PRE_EXECUTION_REAL_SOURCE_REDUCED_QFNIA_CONTRACT.json --out /tmp/q3_actual_original_reduced_full.json | tee /tmp/q3_actual_original_reduced_full.log
+          sha256sum /tmp/q3_actual_original_reduced_full.json
+      - name: Preserve real original source reducer including unsolved status and exact timing
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-three-original-source-full-executable-reduced-qfnia
+          path: |
+            /tmp/q3_actual_original_reduced_full.json
+            /tmp/q3_actual_original_reduced_full.log
+          if-no-files-found: warn
+      - name: Require full source exact mathematical equivalence, forbid fake SAT
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_actual_original_reduced_full.json'))
+          assert x['all_five_original_rows_preserved']
+          assert x['original_source_equivalent_full_native_compilation_dual_certificates']==5
+          assert x['no_false_solver_answer_conflicts']
+          assert x['no_asymptotic_10x_based_on_UNRESOLVED_both_unsolved']
+          assert x['same_compiler_available_to_strong_direct']
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          for c in x['originals']:
+              assert c['all_unchanged_true_original_nonlinear_positive_distinct_AST_sha_verified']
+              assert c['actually_redundant_original_power_sum_assertions_removed']>=1
+              assert c['actual_original_full_formula_equivalence_certified']
+              assert c['status']=='CERTIFIED_EQUIVALENT_FULL_QFNIA_SOURCE_REWRITE'
+          print('Q3_TRUE_ORIGINAL_FULL_EXECUTABLE_QFNIA_SOURCES_CERTIFIED',x['original_source_equivalent_full_native_compilation_dual_certificates'],'/5')
+          print('Q3_TRUE_ORIGINAL_FULL_PROBLEM_SOLVED_ORIGINAL_VS_REDUCED',x['raw_generic_full_QFNIA_positive_solver_success_count'],x['reduced_generic_full_QFNIA_positive_solver_success_count'])
+          PY
