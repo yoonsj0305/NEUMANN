@@ -1,0 +1,80 @@
+name: Q3 ACTUAL trained structural hypotheses from genuine native trajectories
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_actual_trained_native_relations_20261021.yml'
+      - 'research/evidence/q3_trained_affine_from_native_samples_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real_original_source_cpu_trained_relation_discovery_vs_no_fit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Source identity and actual train algorithm lint
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_trained_affine_from_native_samples_20261021/actual_selfsupervised_candidate_miner.py
+      - name: Install pinned original Z3 cvc5 and real sklearn CPU learning
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 z3-solver==4.13.3.0
+      - name: CPU model FIT on original SAT trajectories, derive actual novel candidate relations and independently authenticate
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_trained_affine_from_native_samples_20261021/actual_selfsupervised_candidate_miner.py \
+            --root original \
+            --source-freeze research/evidence/q4q6_fresh12_cpu_router_20261021/FIRST_FRESH_12_SOURCE_SHA_FREEZE_BEFORE_BODY.json \
+            --out /tmp/q3_actual_trained_original_structural_proposal.json | tee /tmp/q3_actual_trained_original_structural_proposal.log
+          sha256sum /tmp/q3_actual_trained_original_structural_proposal.json
+      - name: Preserve successes, failures, trained coefficients, Z3 and cvc5 receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-real-trained-native-source-structural-hypothesis-versus-no-fit
+          path: |
+            /tmp/q3_actual_trained_original_structural_proposal.json
+            /tmp/q3_actual_trained_original_structural_proposal.log
+          if-no-files-found: warn
+      - name: Reject unsupported success and no model fit while preserving all Q3 global uncertainty
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/q3_actual_trained_original_structural_proposal.json'))
+          assert q['schema']=='neumann.q3.development_actual_trained_affine_proposal_from_original_transitions.v1'
+          assert q['genuine_original_source_count']==2 and len(q['originals'])==2
+          assert q['already_opened_original_source_after_previous_Q4_test']
+          assert q['real_trained_model_executed_count']>=1
+          assert q['global_Q3']==q['global_Q4']==q['global_Q6']=='OPEN'
+          assert q['strong_classical_Houdini_is_allowed_equal_authority']
+          for r in q['originals']:
+              if r['status']=='EXECUTED_TRAINED_VS_NO_FIT_NATIVE_SOURCE_3VC':
+                  assert r['actually_trained_learned_numeric_relation_model']
+                  for k in ('TRAINED_model_source_invariant','ZERO_TRAIN_equal_data_shallow_linear_Houdini'):
+                      p=r[k]
+                      if p['fully_verified_complete_original_3VC']:
+                          assert all(v['dual_pass'] for v in p['independent_original_pre_trans_post_dual_proofs'].values())
+          print('ACTUAL_CPU_TRAINED_NONVERBAL_NATIVE_SOURCE_RELATION_MODELS_RUN')
+          print('Q3_GLOBAL_NOVEL_LEARNED_DISCOVERY_STILL_OPEN')
+          PY
