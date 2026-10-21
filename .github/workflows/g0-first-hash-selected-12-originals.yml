@@ -74,6 +74,11 @@ jobs:
           assert x['all_12_original_true_source_rows_kept'] and len(x['cases'])==12
           assert x['source_verified_exact_AST_parity_count']==12
           assert x['no_trained_neural_model_calls']
+          assert x['immutable_first_run_actions_id']==39537541152
+          assert x['aggregation_correction_after_first_run_only']
+          assert sum(x['hybrid_true_original_disposition_counts'].values())==12
+          assert x['hybrid_true_original_disposition_counts']['UNKNOWN']==sum(
+              y['true_original_automated_hybrid_status']=='UNKNOWN' for y in x['cases'])
           assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
           assert x['no_new_mathematical_invention_or_strongest_equal_auth_direct_gap']
           for y in x['cases']:
