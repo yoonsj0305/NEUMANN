@@ -1,0 +1,79 @@
+name: Q3 actual learned full12 with certified adaptive minimum inputs
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_real12_adaptive_min_semantic_learning.yml'
+      - 'research/evidence/q3_semantic_adaptive12_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual_original12_exact_state_routed_training:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate unchanged original source and automatic feature learner code
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_semantic_adaptive12_20261021/run_source_native_minimal_inputs_on_12_models.py
+      - name: Install source independent proof solvers and genuine CPU trained decision tree
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: Run all 12 authentic originals with fixed versus exact minimum semantic adaptive fit plus no-fit
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_semantic_adaptive12_20261021/run_source_native_minimal_inputs_on_12_models.py \
+            --root original \
+            --freeze research/evidence/q3_dnf_first12_20261021/NEW_UNSEEN_ORIGINALS_BEFORE_SOURCE_BODY_LOCK.json \
+            --out /tmp/q3_original12_adaptive_semantic_learned_vs_exact.json | tee /tmp/q3_original12_adaptive_semantic_learned_vs_exact.log
+          sha256sum /tmp/q3_original12_adaptive_semantic_learned_vs_exact.json
+      - name: Preserve all genuine original learned failures and full dual proof receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-real-original12-adaptive-semantic-learned-and-exact-native-3vc
+          path: |
+            /tmp/q3_original12_adaptive_semantic_learned_vs_exact.json
+            /tmp/q3_original12_adaptive_semantic_learned_vs_exact.log
+          if-no-files-found: warn
+      - name: Fail closed any claimed model full original 3VC without Z3 cvc5 certificates
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          a=json.load(open('/tmp/q3_original12_adaptive_semantic_learned_vs_exact.json'))
+          assert a["schema"]=="neumann.q3.12_originals_exact_minimum_semantic_feature_then_actual_trained_DNF.v1"
+          assert a["genuine_originals"]==12
+          assert a["exact_source_state_minimum_proved_before_model_count"]==12
+          assert a["do_not_confuse_0_1_step_input_minimum_with_complete_proof"]
+          assert a["same_source_matched_full_original_dual_solver_rights"]
+          assert a["global_Q3"]==a["global_Q4"]==a["global_Q6"]=="OPEN"
+          for row in a['cases']:
+              if row.get('trivial_zero_model_original_3VC_certified'):
+                  assert all(x['dual_pass'] for x in row['trivial_original_all_dual_3VC'].values())
+              for label in ('previous_frozen_two_slot_interface','automatically_selected_semantic_interface'):
+                  m=row.get(label,{})
+                  for name in ('learned_disjunction','no_fit_disjunction'):
+                      if m.get(name+'_full_original_inductive'):
+                          assert all(v['dual_pass'] for v in m[name+'_original_dual_3VC'].values())
+          print("SOURCE12_ADAPTIVE_ACTUAL_LEARNED_AND_CLASSICAL_OR_PROOF_AUDITED")
+          PY
