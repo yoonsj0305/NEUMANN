@@ -1,0 +1,23 @@
+{
+  "schema": "neumann.g0.posthoc_5_original_iso_capability_mod9_vs_crt63_radius50k.v1",
+  "date": "2026-10-21",
+  "scientific_scope": "POSTHOC opened originals after CRT63 50k results already known; NOT blinded headroom or fresh validation",
+  "same_source_revision": "SMT-LIB/benchmark-submission-2022@81a39628827f61fbd74c6f3e67feb5c1b740d2f0",
+  "same_five_originals_from_previous_contract": [
+    "STC_0291.smt2",
+    "STC_0588.smt2",
+    "STC_0609.smt2",
+    "STC_0786.smt2",
+    "STC_0880.smt2"
+  ],
+  "numeric_radius": 50000,
+  "execution": "Same GitHub Actions ubuntu-latest CPU and Python 3.11 process; original source bytes/sha checked identically per arm; random_order forbidden; alternate first-arm as function of source index fixed before measuring. Reparse original SMT2 AST and independently Z3+cvc5 SAT-certify every found genuine source witness. Both exact bounded-search algorithms evaluate same numeric integer problem over [-50000,50000].",
+  "arm_direct_specialist": "Original PR344 mod9 sorted-two-sum exact numeric search, radius50k and 96 batch as published and unchanged.",
+  "arm_new": "Exact CRT mod9+mod7 nine cubic signature buckets and sorted-two-sum from PR345, radius50k, chunk128 frozen.",
+  "independent_reference": "Both algorithms must agree on SAT vs NO_WITNESS_WITHIN_BOUND; for SAT both independently Z3+cvc5 certify actual original SMT-LIB raw source. For bounded miss mathematical complete per-pair enumeration; do not claim unbounded integer UNSAT.",
+  "metric": "Complete per-arm original SMT2 parsing, numeric solve and independent source verification wall on same CPU. Checkout/install shared excluded for both. Original source authenticity checked before every arm, but outside timed cost. Full 5 task geometric and aggregate ratios reported only if all five equal capability.",
+  "statistical_limit": "One matched per-order run, sequential-run noise, small same author-family corpus, posthoc. Not SOTA specialist baseline: best classic can use both congruences and same code; no NEUMANN novelty.",
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q5": "OPEN"
+}
