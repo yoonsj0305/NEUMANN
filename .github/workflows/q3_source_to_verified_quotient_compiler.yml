@@ -1,0 +1,73 @@
+name: Q3 actual learned AST verified source-to-one-state executable quotient
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_source_to_verified_quotient_compiler.yml'
+      - 'research/evidence/q3_verifiable_original_to_quotient_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independently_compile_actual_trained_original_programs_to_proof_carrying_quotients:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate exact compiler source and install minimal symbolic dependency
+        run: |
+          python -m py_compile research/evidence/q3_verifiable_original_to_quotient_20261021/compile_source_to_proof_carrying_abstract_program.py
+          python -m pip install --disable-pip-version-check numpy==2.3.5 sympy==1.14.0
+      - name: Fetch official immutable actual trained original source polynomial receipts
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39611027543
+          github-token: ${{ github.token }}
+          name: q3-raw-transitions-trained-nonlinear-source-exact-classical-full-receipts
+          path: /tmp/source-rewrite
+      - name: Independently compile original learned source math to smaller verified executable system
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3_verifiable_original_to_quotient_20261021/compile_source_to_proof_carrying_abstract_program.py \
+            --official /tmp/source-rewrite/neumann_actual_raw_transition_nonlinear_AST.json \
+            --out /tmp/source-rewrite/compiled_exact_all24_learned_source_quotients.json | tee /tmp/source-rewrite/compiled_quotient.log
+          sha256sum /tmp/source-rewrite/compiled_exact_all24_learned_source_quotients.json
+      - name: Preserve original and classical exact source-quotient proof ledger
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-actual-learned-vs-exact-classical-verified-source-program-rewrite
+          path: |
+            /tmp/source-rewrite/compiled_exact_all24_learned_source_quotients.json
+            /tmp/source-rewrite/compiled_quotient.log
+          if-no-files-found: warn
+      - name: Ensure semantics and source history verified and no classical superiority falsely claimed
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/source-rewrite/compiled_exact_all24_learned_source_quotients.json'))
+          assert q['schema']=='neumann.q3.official_trained24_source_AST_to_verified_one_state_program_rewrite.v1'
+          assert q['official_original_learning_raw_SHA256']=='07a914d0f391119d0089b25fa59afdea0fce87b2aaad1e30e9ee34b3adc14d97'
+          assert q['actual_trained_source_rewrites_independently_certified']==24
+          assert q['matched_exact_classical_source_rewrites_independently_certified']==24
+          for row in q['exact_source_proof_ledger']:
+              for key in ('independent_original_learned_proof','matched_independent_exact_classical_proof'):
+                  a=row[key]
+                  assert a['FULL_VALID_SOURCE_REWRITE']
+                  assert a['exact_transition_commutation']
+                  assert a['original_Pre_maps_to_abstract_q0']
+                  assert a['abstract_q0_entails_original_Post']
+                  assert a['each_abstract_q_has_an_original_witness']
+                  assert a['abstract_source_transition']=='q_next = q'
+          assert q['independent_source_mutant_rejection']['real_state_x3_falsification']==6
+          assert q['strong_classical_transformation_equal']
+          assert not q['no_measured_computation_advantage_over_strong_exact_classical']==False
+          assert q['global_Q3']==q['global_Q4']==q['global_Q6']=='OPEN'
+          print('ACTUAL_LEARNED_COMPILATION_TO_ONE_STATE_VERIFIED_SOURCE_TRANSITION_24_OF_24_BUT_CLASSICAL_EQUAL')
+          PY
