@@ -1,0 +1,56 @@
+{
+  "schema": "neumann.q3.two_posthoc_original_unresolved_inductive_witness_preregister_v1",
+  "original_source_head": "SyGuS-Org/benchmarks@13c8deb68a873635879c9a69bc78caebd340f646",
+  "previous_original_12_first_opened_Action_run": 39579514369,
+  "source_bodies_ALREADY_OPENED_in_previous_first_Q4Q6_run": true,
+  "source_SHA_manifest_committed_before_original_first_open": "research/evidence/q4q6_fresh12_cpu_router_20261021/FIRST_FRESH_12_SOURCE_SHA_FREEZE_BEFORE_BODY.json",
+  "previous_original_full_result_sha256": "63270250aa9f422bb06d55569ece27e3200bc8355994d8ffe294a9b53b3ff06a",
+  "not_a_neural_learned_source_predictor": true,
+  "not_original_fresh_holdout": true,
+  "case_contracts": [
+    {
+      "path": "lib/Inv_Track/from_2018/fib_21.sl",
+      "original_git_blob": "836f4cbecd25fbd37fddd3a2c3c936a8ac230293",
+      "expected_states": [
+        "i",
+        "j",
+        "k",
+        "c1",
+        "c2",
+        "n",
+        "v"
+      ],
+      "candidate_terms": [
+        "n > 0",
+        "i >= 0",
+        "c1 >= 2000",
+        "c2 >= 2000",
+        "k >= 2000*i"
+      ],
+      "synthetic_ablation": "drop k>=2000*i and prove SAT of candidate_and_NotPost with BOTH Z3+cvc5"
+    },
+    {
+      "path": "lib/Inv_Track/from_2018/jmbl_hola.41.sl",
+      "original_git_blob": "19e13372aa064e62b539bb6c8fbf13e1d45ccc3c",
+      "expected_states": [
+        "i",
+        "j",
+        "k",
+        "n"
+      ],
+      "candidate_terms": [
+        "k >= 0",
+        "n >= 0",
+        "i >= 0",
+        "j >= 0",
+        "j >= i-1",
+        "i <= n+1"
+      ],
+      "synthetic_ablation": "drop j>=i-1 and prove SAT of candidate_and_NotPost with BOTH Z3+cvc5"
+    }
+  ],
+  "original_proof_admission": "Full untouched genuine source Pre -> I, I and Trans -> I', and I -> Post must independently Z3+cvc5 each return UNSAT. Synthetic weaker invariant must be refuted with Z3+cvc5 SAT and is NEVER interpreted as original UNSAFE. Do not backfill previous timeout to historical success.",
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q6": "OPEN"
+}

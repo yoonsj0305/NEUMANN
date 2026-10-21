@@ -1,0 +1,98 @@
+name: Q3 two original safety gaps human-derived full native Z3 cvc5 proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_two_unknown_true_source12_inductive.yml'
+      - 'research/evidence/q3_two_remaining_source12_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  true_first_source12_two_previous_original_unknowns_posthoc_dual_inductive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify posthoc candidate frozen before original solver execution
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_two_remaining_source12_20261021/source_exact_dual_inductive_two_posthoc.py
+          python - <<'PY'
+          import json
+          x=json.load(open("research/evidence/q3_two_remaining_source12_20261021/POSTHOC_TWO_TRUE_ORIGINAL_SOURCE_INDUCTIVE_CANDIDATES.json"))
+          assert x["schema"]=="neumann.q3.two_posthoc_original_unresolved_inductive_witness_preregister_v1"
+          assert x["source_bodies_ALREADY_OPENED_in_previous_first_Q4Q6_run"]
+          assert len(x["case_contracts"])==2
+          assert x["global_Q3"]==x["global_Q4"]==x["global_Q6"]=="OPEN"
+          print("PREREG_POSTHOC_TRUE_ORIGINAL_TWO_PROGRAM_INDUCTIVE_GUARDS")
+          PY
+      - name: Download exact immutable first fresh twelve SOURCE dual proof results
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39579514369
+          github-token: ${{ github.token }}
+          name: neumann-first12-original-trained-classical-prover-router-all-receipts
+          path: /tmp/q3_remaining
+      - name: Install independently pinned original Z3 plus cvc5
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: TRUE original fib21 and hola41 exact source complete inductive proofs and source-ablation countermodels
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python research/evidence/q3_two_remaining_source12_20261021/source_exact_dual_inductive_two_posthoc.py \
+            --root original \
+            --freeze research/evidence/q4q6_fresh12_cpu_router_20261021/FIRST_FRESH_12_SOURCE_SHA_FREEZE_BEFORE_BODY.json \
+            --contract research/evidence/q3_two_remaining_source12_20261021/POSTHOC_TWO_TRUE_ORIGINAL_SOURCE_INDUCTIVE_CANDIDATES.json \
+            --prior /tmp/q3_remaining/q4q6_first12_real_CPU_proof_router.json \
+            --out /tmp/q3_first12_two_posthoc_new_inductive_certificates.json | tee /tmp/q3_first12_two_posthoc_new_inductive_certificates.log
+          sha256sum /tmp/q3_first12_two_posthoc_new_inductive_certificates.json
+      - name: Preserve all actual original dual proof and negative control receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-two-previous-original-timeouts-exact-human-inductive-Z3-cvc5
+          path: |
+            /tmp/q3_first12_two_posthoc_new_inductive_certificates.json
+            /tmp/q3_first12_two_posthoc_new_inductive_certificates.log
+          if-no-files-found: warn
+      - name: Never count posthoc synthetic ablations as actual UNSAFE or learned source discovery
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/q3_first12_two_posthoc_new_inductive_certificates.json'))
+          assert q["previous_first_CPU_router_native_inductively_certified_original_count"]==10
+          assert q["previous_original_unresolved_count"]==2
+          assert q["new_posthoc_original_independently_Z3_cvc5_inductive_safe_proven"]==2
+          assert q["total_distinct_true_original_full_inductive_safe_proven"]==12
+          assert q["no_model_unique_structure_claim"] and q["manually_source_inspected_after_first_original_test"]
+          assert q["global_Q3"]==q["global_Q4"]==q["global_Q6"]=="OPEN"
+          for r in q["newly_confirmed_authentic_source_proof_cases"]:
+              assert r["status"]=="EXACT_ORIGINAL_TRUE_SAFE_FULL_INDUCTIVE_DUAL_PROOF"
+              assert r["source_original_independent_dual_3VC_certified"]
+              assert r["negative_synthetic_ablation_shows_missing_constraint"]
+              assert r["negative_not_an_original_program_unsafe_claim"]
+              assert all(t["dual_pass"] for t in r["original_full_pre_trans_post_inductive_three_VCs_both_Z3_cvc5"].values())
+          print("TRUE_REAL_ORIGINAL_FIRST12_FULL_INDUCTIVE_PROOFS_TWELVE_OUT_OF_TWELVE")
+          print("ZERO_LEARNED_UNIQUE_DISCOVERY_CLAIM")
+          PY
