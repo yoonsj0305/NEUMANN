@@ -24,3 +24,9 @@
 The iteration asks the SMT source solver for the *exact counterexample to a remaining candidate*, not more random source models. Every authentic new witness strictly decreases nullity, with a finite upper bound of 24; if closure succeeds, this eliminates the remaining DRAGON_2 affine XOR question without any training. It is NOT Q3 learned unique structure, not new primitive, not 3VC original full safety, not separate-author first generalization, and not Q4 whole-system 10x.
 
 After this exact scope closes or ABSTAINS, do not continue neural XOR studies. The next genuinely high-value axis is conditional Boolean/Integer relational discovery under fresh author-family original 3VC and matched classical CEGIS/SyGuS.
+
+## Historical first result and explicitly posthoc bounded-depth expansion
+
+The initial PR324 real CI #39518537487 completed with technical SUCCESS but **scientific ABSTAIN**: 64-source sampled nullity 5 versus native dual-proved rank 3; **zero** newly refuting native initial/one-step source states. Immutable raw JSON SHA256 `08f4775b2ebf1cc686ef8f8b657b5d2af21fe7601ac99b2ecd40fea33a794df2`, artifact #12310365045. This failure is permanent evidence, not deleted or relabeled.
+
+Follow-up is **posthoc** bounded model checking at genuine original depths 0,1,2,3,4. Reuse native original transition verbatim with fresh linked state symbols per step; retain source auxiliary/nondeterministic symbols as shared across steps, which may underapproximate the true fresh-input trace set. An actual SAT counterexample is still valid, but UNSAT/UNKNOWN is never an invariant proof. Stop at authenticated GF(2) nullity =3 (PASS) or report ABSTAIN. No deepening beyond 4 steps without new prior registration. No new neural training or paid API.
