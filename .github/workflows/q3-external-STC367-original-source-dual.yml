@@ -1,0 +1,85 @@
+name: Q3 original STC367 externally published witness genuine Z3 cvc5 SAT only
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-external-STC367-original-source-dual.yml'
+      - 'research/evidence/q3_prior_art_367_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  externally_published_not_generated_real_source_certificate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/QF_NIA/20220315-MathProblems
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check immutable source and posthoc published answer contract
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/q3_prior_art_367_20261021/independent_actual_original_STC367_public_witness.py
+          python - <<'PY'
+          import json
+          q=json.load(open('research/evidence/q3_prior_art_367_20261021/BEFORE_DUAL_VALIDATION_EXTERNAL_PUBLISHED_WITNESS_CONTRACT.json'))
+          assert q['posthoc_original_source_already_opened']
+          assert q['external_prior_art_human_found_from_public_web']
+          assert q['external_source_witness_minus_plus']==[-117360,-857002,857735]
+          assert q['global_Q3']==q['global_Q4']==q['global_Q5']=='OPEN'
+          print('EXTERNAL_KNOWN_PRIOR_ANSWER_NOT_NEW_MODEL_DISCOVERY')
+          PY
+      - name: Install two independently grounded ORIGINAL native SMT2 solvers
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Reproduce actual published known answer in unchanged true original complete SMT-LIB
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3_prior_art_367_20261021/independent_actual_original_STC367_public_witness.py --root original --contract research/evidence/q3_prior_art_367_20261021/BEFORE_DUAL_VALIDATION_EXTERNAL_PUBLISHED_WITNESS_CONTRACT.json --out /tmp/q3_true_original_367_public_external_smt2.json | tee /tmp/q3_true_original_367_public_external_smt2.log
+          sha256sum /tmp/q3_true_original_367_public_external_smt2.json
+      - name: Preserve original raw independently dual source SAT and external answer provenance
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-source367-real-original-public-prior-answer-dual
+          path: |
+            /tmp/q3_true_original_367_public_external_smt2.json
+            /tmp/q3_true_original_367_public_external_smt2.log
+          if-no-files-found: warn
+      - name: Fail closed on stale original hash and fabricated own discovery
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_true_original_367_public_external_smt2.json'))
+          assert x['registered_prior_to_dual_original_verification_commit']=='26eb550ea5afc51e7c700bbada63d1146fb5533b'
+          assert x['externally_retrieved_existing_public_witness_NOT_NEUMANN_created']
+          assert x['original_first_source_previously_opened']
+          assert x['not_authenticated_as_learner_hidden_structure_discovery']
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          y=x['source_genuine_original_checked']
+          assert y['genuine_source_SHA_authenticated']
+          assert y['true_original_integer_rhs']==367
+          assert y['arbitrary_precision_integer_cubic_sum']==367
+          assert y['original_full_SMT2_independent_Z3_cvc5_SAT']
+          assert y['complete_real_original_source_independent_Z3_cvc5_ground_proof']['independent_dual_result']
+          assert y['status']=='KNOWN_PUBLISHED_PRIOR_WITNESS_TRUE_ORIGINAL_SAT_DUAL'
+          print('EXTERNAL_PRIOR_KNOWN_ORIGINAL_STC367_SAT_DUAL_Z3_CVC5_CERTIFIED')
+          print('NOT_NEUMANN_NEW_SOLUTION_FALSE_POSITIVE_GUARD_PASS')
+          PY
