@@ -1,0 +1,75 @@
+name: Q3 exact two-slot invariant information lower bound original source
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_original12_projection_information_bound.yml'
+      - 'research/evidence/q3_projection_two_slot_lower_bound_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original12_projection_aliasing_independent_math:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Original frozen Git SHA and mathematical alias checker syntax
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_projection_two_slot_lower_bound_20261021/independent_true_original_projection_aliasing.py
+      - name: Source-native exact Z3 and independently pinned cvc5
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+      - name: Actual mathematically impossible first-two-features original Init vs Bad Q3 proof
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3_projection_two_slot_lower_bound_20261021/independent_true_original_projection_aliasing.py \
+            --root original \
+            --freeze research/evidence/q3_dnf_first12_20261021/NEW_UNSEEN_ORIGINALS_BEFORE_SOURCE_BODY_LOCK.json \
+            --out /tmp/original12_proved_projected_indistinguishability.json | tee /tmp/original12_proved_projected_indistinguishability.log
+          sha256sum /tmp/original12_proved_projected_indistinguishability.json
+      - name: Preserve exact original independent Z3 cvc5 source witnesses
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-exact-native-two-slot-structural-information-impossibility-real12
+          path: |
+            /tmp/original12_proved_projected_indistinguishability.json
+            /tmp/original12_proved_projected_indistinguishability.log
+          if-no-files-found: warn
+      - name: Never confuse projected nonseparability with genuine original UNSAFE
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/original12_proved_projected_indistinguishability.json'))
+          assert r["schema"]=="neumann.q3.original12_first_two_feature_information_lower_bound_dual.v1"
+          assert r["original_SHA_prebody_frozen_source_count"]==12
+          assert r["not_claim_of_neural_or_boolean_model_unique_success"]
+          assert r["global_Q3"]==r["global_Q4"]==r["global_Q6"]=="OPEN"
+          for x in r["source_rows"]:
+              if x["status"]=="ACTUAL_ORIGINAL_SOURCE_EXACT_PROJECTION_BAR_INTERVAL_VERIFIED":
+                  assert x["two_slot_positive_vs_negative_indistinguishable"]["independent_dual"]
+                  assert x["all_state_slots_positive_vs_negative_indistinguishable"]["independent_dual"]
+                  if x["projection_alias_without_actual_initial_unsafety"]:
+                      assert not x["genuine_original_unsafe_at_initial_state"]
+          print("EXACT_ORIGINAL_INFORMATION_BARRIER_SAT_CERTIFICATES_VERIFIED")
+          PY
