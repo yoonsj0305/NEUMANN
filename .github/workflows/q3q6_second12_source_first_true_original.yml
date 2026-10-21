@@ -1,0 +1,89 @@
+name: Q3Q6 first unseen genuine second12 fixed classical hybrid transfer
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3q6_second12_source_first_true_original.yml'
+      - 'research/evidence/q3q6_second12_firstsource_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  second_twelve_pre_body_frozen_actual_source_unmodified_core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify genuinely FIRST pre-body SHA lock and unchanged core interface
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3q6_second12_firstsource_20261021/run_unchanged_houdini_hybrid_on_first_new_originals.py
+          python - <<'PY'
+          import json
+          x=json.load(open("research/evidence/q3q6_second12_firstsource_20261021/FREEZE_BEFORE_SECOND_NEW12_ORIGINAL_SOURCE_BODY.json"))
+          assert x["schema"]=="neumann.q3q6_second12_genuinely_unopened_original_source_hybrid_transfer_v1"
+          assert x["source_bodies_NOT_READ_BEFORE_THIS_SHA_LOCK"]
+          assert x["algorithm_already_FIXED_AND_PROVEN_in_PR392"]
+          assert len(x["new_originals"])==12
+          assert x["global_Q3"]==x["global_Q4"]==x["global_Q6"]=="OPEN"
+          print("SECOND_12_NEW_ORIGINAL_PRE_BODY_GIT_BLOB_FROZEN")
+          PY
+      - name: Independently pinned true original Z3/cvc5 CPU proof backends
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: FIRST OPEN authentic new twelve programs into EXACT formerly proven fixed hybrid and reference methods
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python research/evidence/q3q6_second12_firstsource_20261021/run_unchanged_houdini_hybrid_on_first_new_originals.py \
+            --root original \
+            --freeze research/evidence/q3q6_second12_firstsource_20261021/FREEZE_BEFORE_SECOND_NEW12_ORIGINAL_SOURCE_BODY.json \
+            --out /tmp/q3q6_source_second12_first_unopened_actual_hybrid.json | tee /tmp/q3q6_source_second12_first_unopened_actual_hybrid.log
+          sha256sum /tmp/q3q6_source_second12_first_unopened_actual_hybrid.json
+      - name: Preserve ALL complete fresh original rows and failed/unknown/native verifier receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3q6-original-second12-first-unopened-fixed-houdini-classical-portfolio
+          path: |
+            /tmp/q3q6_source_second12_first_unopened_actual_hybrid.json
+            /tmp/q3q6_source_second12_first_unopened_actual_hybrid.log
+          if-no-files-found: warn
+      - name: Reject source-target leakage and learned or unsupported safety inflation
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open("/tmp/q3q6_source_second12_first_unopened_actual_hybrid.json"))
+          assert x["schema"]=="neumann.q3q6.second12_first_unopened_true_original_fixed_classical_hybrid_proof_v1"
+          assert len(x["fresh_programs"])==12
+          assert x["new_original_cohort_git_SHA_authenticated"]==12
+          assert len({r["original_git_blob"] for r in x["fresh_programs"]})==12
+          assert x["first_source_body_new_12_originals"] and x["previously_FIXED_Houdini_SyGuS_SPACER_core_reused_without_code_changes"]
+          assert x["global_Q3"]==x["global_Q4"]==x["global_Q6"]=="OPEN"
+          for r in x["fresh_programs"]:
+              if r["status"]=="COMPLETE_ALL_THREE_TRUE_ORIGINAL_SOURCE_PROGRAMS":
+                  assert r["all_matched_originals_full_inductive_success"]["hybrid"] is True or r["all_matched_originals_full_inductive_success"]["hybrid"] is False
+          print("SECOND12_ACTUAL_GENUINE_FIRST_SOURCE_PROGRAM_SUCCESS",
+                x["actual_source_full_dual_3VC_Hybrid_success"])
+          print("SECOND12_UNCERTIFIED_NATIVE_PROBLEMS",
+                x["genuine_new_originals_uncertified_as_SAFE_in_hybrid"])
+          print("NO_GLOBAL_Q3_Q4_Q6_FAKE_PASS")
+          PY
