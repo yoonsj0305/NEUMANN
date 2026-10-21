@@ -1,0 +1,66 @@
+name: Q4 source frozen fib07 source-native reachable safety counterexample independently dual
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q4-fib07-original-unsafety-dual.yml'
+      - 'research/evidence/q4_prospective_six_20261021/fib07_original_one_step_dual_unsafety.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  true_original_bad_one_step:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Exact unchanged upstream original
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q4_prospective_six_20261021/fib07_original_one_step_dual_unsafety.py
+      - name: Pinned independent source semantics solvers
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Exact real original one-step bad reachable witness Z3 and cvc5
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q4_prospective_six_20261021/fib07_original_one_step_dual_unsafety.py --root original --out /tmp/dual_unsafe_fib07.json | tee /tmp/dual_unsafe_fib07.log
+          sha256sum /tmp/dual_unsafe_fib07.json
+      - name: Preserve genuine original source counterexample and any failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q4-six-fib07-original-true-unsafe-dual
+          path: |
+            /tmp/dual_unsafe_fib07.json
+            /tmp/dual_unsafe_fib07.log
+          if-no-files-found: warn
+      - name: Only dual original evidence can refute source Post
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/dual_unsafe_fib07.json'))['full_original']
+          assert x['frozen_original_git_blob']=='d078734e83a870d7b95a68bc7a947cf85ff944d8'
+          assert x['source_original_published_safety_one_step_dual_refuted']
+          assert all(q['dual_pass'] for q in x['actual_original_ground_witness_independent_Z3_and_cvc5'].values())
+          assert x['global_Q3']==x['global_Q4']=='OPEN'
+          print('TRUE_ORIGINAL_FIB07_UNSAFE_Z3_AND_CVC5_PROVED')
+          PY
