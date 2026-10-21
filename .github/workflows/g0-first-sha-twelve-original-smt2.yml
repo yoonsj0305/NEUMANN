@@ -1,0 +1,93 @@
+name: G0 first 12 SHA-ranked real QFNIA original structural capability vs raw Direct
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/g0-first-sha-twelve-original-smt2.yml'
+      - 'research/evidence/g0_first_random_hash_12_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  genuine_first_SHA_twelve_originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/QF_NIA/20220315-MathProblems
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Preserve exact twelve source SHA freeze and syntax
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/g0_first_random_hash_12_20261021/first_original_twelve_same_cpu_unbounded_math_and_sat_vs_direct.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/g0_first_random_hash_12_20261021/ORIGINAL_TWELVE_PRE_BODY_GIT_SHA_FREEZE.json'))
+          assert x['frozen_before_first_source_body_read'] and len(x['targets'])==12
+          assert len({a['sha1_git_blob'] for a in x['targets']})==12
+          assert [x['targets'][i]['sha1_git_blob'] for i in range(12)]==sorted(v['sha1_git_blob'] for v in x['targets'])
+          assert x['selection_universe_eligible_original_count']==897
+          print('FROZEN_BEFORE_FIRST_BODY_12_UNBIASED_SHA_BLOB_ORDER')
+          PY
+      - name: Install independent real original Z3 and pinned cvc5 full SMT2 solvers
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+          lscpu | grep 'Model name' | head -1
+      - name: FIRST unmodified genuine 12 originals source-derived maths SAT UNSAT and raw Direct matched
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/g0_first_random_hash_12_20261021/first_original_twelve_same_cpu_unbounded_math_and_sat_vs_direct.py --root original --freeze research/evidence/g0_first_random_hash_12_20261021/ORIGINAL_TWELVE_PRE_BODY_GIT_SHA_FREEZE.json --out /tmp/g0_first_sha_original_twelve.json | tee /tmp/g0_first_sha_original_twelve.log
+          sha256sum /tmp/g0_first_sha_original_twelve.json
+      - name: Preserve first real source outcomes including actual negative and unknown cases
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g0-first-sha-ranked-12-original-source-proof-vs-raw-direct
+          path: |
+            /tmp/g0_first_sha_original_twelve.json
+            /tmp/g0_first_sha_original_twelve.log
+          if-no-files-found: warn
+      - name: Fail closed on false original claims and no invented global wins
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/g0_first_sha_original_twelve.json'))
+          assert x['immutable_git_blob_cohort_before_first_content_read_commit']=='4eda52b70950dce790fba2b7ac44bc4553feb555'
+          assert x['all_12_original_cases_retained'] and len(x['first_source_SHA_selection_original_cases'])==12
+          assert x['original_source_verified_Git_blobs']==12
+          assert x['independent_original_classification_conflicts']==0
+          assert x['equal_authority_strong_direct_can_use_same_mod9_and_CRT15561']
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          for row in x['first_source_SHA_selection_original_cases']:
+              assert row['original_authenticity_valid']
+              h=row['NEUMANN_no_neural_classical_source_dispatch']
+              if h['class']=='SAT':
+                  assert h['original_independent_Z3_cvc5_source_sat']
+                  assert h['unchanged_original_full_SMT2_dual_source_ground_check']['independent_dual_result']
+              elif h['class']=='UNSAT':
+                  assert h['mod9_theorem_pass']
+                  assert h['finite_unbounded_mod9_independent_Z3_cvc5']['independent_dual_abstract_agrees_with_finite_math']
+              else:
+                  assert h['class']=='UNKNOWN'
+          print('TRUE_FIRST_SOURCE12_MATH_SAFE_SAT',x['source_structural_SAT_original_Z3_cvc5_ground_verified'])
+          print('TRUE_FIRST_SOURCE12_MATH_UNBOUNDED_UNSAT',x['source_structural_UNSAT_original_exact_ast_mod9_independent_finite_proof'])
+          print('TRUE_FIRST_SOURCE12_RAW_DIRECT_SOLVED',x['raw_source_direct_union_total'])
+          print('TRUE_FIRST_SOURCE12_EXTRA_ORIGINAL_CASES',x['source_resolved_by_classical_structural_but_raw_direct_unknown'])
+          PY
