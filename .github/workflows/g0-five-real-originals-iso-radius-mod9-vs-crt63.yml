@@ -1,0 +1,88 @@
+name: G0 matched specialist mod9 versus CRT63 five authentic original SAT tasks
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/g0-five-real-originals-iso-radius-mod9-vs-crt63.yml'
+      - 'research/evidence/g0_crt63_matched_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  same_cpu_strong_specialist_originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/QF_NIA/20220315-MathProblems
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Original source repository and mathematical algorithm matching
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/g0_crt63_matched_20261021/five_original_source_specialist_iso_bound_runtime.py
+          python - <<'PY'
+          import json
+          r=json.load(open('research/evidence/g0_crt63_matched_20261021/POSTHOC_TRUE_ORIGINAL_MATCHED_COST_CONTRACT.json'))
+          assert r['numeric_radius']==50000
+          assert len(r['same_five_originals_from_previous_contract'])==5
+          assert r['scientific_scope'].startswith('POSTHOC')
+          print('HISTORIC_FIVE_SOURCE_MATCHED_COST_CONTRACT_FROZEN')
+          PY
+      - name: Original unchanged SMT2 independent Z3 and checksum pinned cvc5
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+          lscpu | grep 'Model name' | head -1
+      - name: Strong specialist mod9 vs CRT63 on same original SMT2 and CPU full checker cost
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/g0_crt63_matched_20261021/five_original_source_specialist_iso_bound_runtime.py --root original --freeze research/evidence/g0_cubic_mod9_20261021/NEW_SEVEN_PRE_SOURCE_TRANSFER_FREEZE.json --contract research/evidence/g0_crt63_matched_20261021/POSTHOC_TRUE_ORIGINAL_MATCHED_COST_CONTRACT.json --out /tmp/g0_same_originals_specialist_matched.json | tee /tmp/g0_same_originals_specialist_matched.log
+          sha256sum /tmp/g0_same_originals_specialist_matched.json
+      - name: Preserve authentic original model proof and all bounded solver misses
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g0-five-original-source-mod9-crt63-matched-CPU
+          path: |
+            /tmp/g0_same_originals_specialist_matched.json
+            /tmp/g0_same_originals_specialist_matched.log
+          if-no-files-found: warn
+      - name: Strict equal capability original-source dual cert and no SOTA false claim
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/g0_same_originals_specialist_matched.json'))
+          assert x['freeze_commit_before_matched_cost']=='a5c00594d6e13a9072e9663deaad6aad17d9f2aa'
+          assert x['all_five_real_original_rows_retained'] and len(x['posthoc_source_rows'])==5
+          assert x['new_source_authentication_count']==5
+          assert x['both_methods_identical_bounded_witness_or_miss_all_five']
+          assert x['strongest_classical_specialist_allowed_CRT63_exactly']
+          assert x['source_new_SAT_not_counted_again']
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          for row in x['posthoc_source_rows']:
+              for key in ('mod9','CRT63'):
+                  arm=row[key]
+                  if arm['status']=='ORIGINAL_SOURCE_SAT_DUAL':
+                      assert arm['original_source_independent_SAT_certificate']
+                      assert arm['source_original_SMT2_independent_Z3_cvc5']['independent_dual_result']
+                  else:
+                      assert arm['status']=='EXACT_BOUNDED_SEARCH_MISS_UNBOUNDED_UNKNOWN'
+          print('SAME_ORIGINAL_ISO_BOUNDED',x['both_methods_identical_bounded_witness_or_miss_all_five'])
+          print('PAIRED_FULL_SOURCE_COST_RATIO',x['at_equal_complete_bounded_work_scope_mod9_over_CRT63_aggregate'])
+          PY
