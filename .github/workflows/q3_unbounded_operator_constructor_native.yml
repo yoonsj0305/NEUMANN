@@ -1,0 +1,73 @@
+name: Q3 source-trained operator constructor escapes proven finite vocabulary
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_unbounded_operator_constructor_native.yml'
+      - 'research/evidence/q3_frozen_mod_list_escape_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_conditioned_learned_AST_constructor_dual_original_safety:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate actual meta-trained source operator program
+        run: |
+          python -m py_compile research/evidence/q3_frozen_mod_list_escape_20261022/train_source_conditioned_unbounded_modulus.py
+      - name: Install SHA pinned cvc5 and independent Z3 plus NumPy learner
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: Train on known source family and FIRST apply frozen weights to four larger heldout operator parameters
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_frozen_mod_list_escape_20261022/train_source_conditioned_unbounded_modulus.py \
+            --out /tmp/q3_learned_unbounded_modulus_native_original16.json | tee /tmp/q3_learned_unbounded_modulus_native_original16.log
+          sha256sum /tmp/q3_learned_unbounded_modulus_native_original16.json
+      - name: Archive all source training, native proofs, OOD and ablation counterexamples
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-source-trained-modulus-constructor-outside-proven-finite-list
+          path: |
+            /tmp/q3_learned_unbounded_modulus_native_original16.json
+            /tmp/q3_learned_unbounded_modulus_native_original16.log
+          if-no-files-found: warn
+      - name: Audit actual trained out of vocabulary original 3VC without claiming new primitive
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_learned_unbounded_modulus_native_original16.json'))
+          assert x['schema']=='neumann.q3.synthetic_source_meta_learned_modulus_constructor_frozen_list_ESCAPE.v1'
+          assert x['heldout_test_count']==16
+          assert x['new_out_of_dictionary_learned_native_complete_SAFE_count']==16
+          assert x['untrained_model_native_complete_SAFE_count']==0
+          assert x['equivalent_strong_classical_exact_GCD_COMPLETE_SAFE_count']==16
+          assert x['mutated_original_source_Z3_cvc5_counterexamples']==16
+          assert x['all_new_candidates_outside_the_19_preexisting_modulus_options']
+          assert x['modulo_primitive_supplied_from_start']
+          assert x['train_objective_hardcoded_PERIODICITY_and_max_period_bias']
+          assert not x['learned_OPERATOR_PRIMITIVE_CREATED']
+          assert x['global_Q3']==x['global_Q4']==x['global_Q6']=='OPEN'
+          assert len(x['all_original_source_trials'])==16
+          for case in x['all_original_source_trials']:
+              assert case['source_original_integer_step']>20
+              assert case['learned_candidate_parameter']>20
+              assert len(case['independent_learned_full_original_Z3_cvc5_3VC'])==3
+              assert all(z['independent_dual_unsat'] for z in case['independent_learned_full_original_Z3_cvc5_3VC'])
+              assert all(z['independent_dual_unsat'] for z in case['original_exact_classical_dual_3VC'])
+              assert case['mutant_source_transition_k_plus_one_dual_SAT'][1]['independent_dual_sat']
+          print('SCOPED_REPRESENTATION_RANGE_ESCAPE_WITH_FULL_NATIVE_3VC_AND_STRONG_CLASSICAL_EQUAL')
+          PY
