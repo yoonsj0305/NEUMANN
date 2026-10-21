@@ -1,0 +1,63 @@
+name: Q3 audit immutable real 8 proof and full method cost honesty
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_external8_immutable_verdict_and_cost.yml'
+      - 'research/evidence/q3_external8_official_cross_method_audit_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independently_audit_real_original8_while_removing_all_unearned_claims:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate immutable evidence parser
+        run: |
+          python -m py_compile research/evidence/q3_external8_official_cross_method_audit_20261021/immutable_strong_baseline_matched_receipts.py
+      - name: Fetch actual original 8 experimental double-prover receipts
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39616621609
+          github-token: ${{ github.token }}
+          name: q3-posthoc-source-conditioned-Pre-Trans-gradient-ablation-versus-exact-classical
+          path: /tmp/q3audit8
+      - name: Source-native full Z3 cvc5 certificate audit with strong classical knockout and true cost accounting
+        run: |
+          set -o pipefail
+          python research/evidence/q3_external8_official_cross_method_audit_20261021/immutable_strong_baseline_matched_receipts.py \
+            --source /tmp/q3audit8/q3_posthoc_real8_preconditioned_and_ablation.json \
+            --out /tmp/q3audit8/REAL_EXTERNAL_EIGHT_HONEST_CROSS_METHOD_EVIDENCE_LEDGER.json | tee /tmp/q3audit8/REAL_EXTERNAL_EIGHT_HONEST_CROSS_METHOD_EVIDENCE_LEDGER.log
+          sha256sum /tmp/q3audit8/REAL_EXTERNAL_EIGHT_HONEST_CROSS_METHOD_EVIDENCE_LEDGER.json
+      - name: Preserve audit ledger
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-real-external-eight-posthoc-all-method-source-audit
+          path: |
+            /tmp/q3audit8/REAL_EXTERNAL_EIGHT_HONEST_CROSS_METHOD_EVIDENCE_LEDGER.json
+            /tmp/q3audit8/REAL_EXTERNAL_EIGHT_HONEST_CROSS_METHOD_EVIDENCE_LEDGER.log
+          if-no-files-found: warn
+      - name: Fail closed if learning falsely counted above exact classical or 8 total source originals
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3audit8/REAL_EXTERNAL_EIGHT_HONEST_CROSS_METHOD_EVIDENCE_LEDGER.json'))
+          assert r['schema']=='neumann.q3.real_external8_official_immutable_full_original_proof_cost_audit.v1'
+          assert r['official_raw_JSON_SHA256']=='24695f8d8fec77d90eada2475011ba40332bf36696d65c03bd3043e2f07b67cc'
+          assert r['external_genuine_originals']==8
+          assert r['retrospective_learned_plus_SPACER_coverage']==8
+          assert r['retrospective_EXACT_plus_SPACER_coverage']==8
+          assert r['source_native_learned_unique_over_exact_and_SPACER']==0
+          assert r['retrospective_oracle_portfolio_is_NOT_actual_online_routed_runtime']
+          assert r['global_Q3']==r['global_Q4']==r['global_Q6']=='OPEN'
+          print('HONEST_8_REAL_SOURCE_DUAL_PROOF_PORTFOLIO_LEARNED_NOT_UNIQUELY_NEEDED')
+          PY
