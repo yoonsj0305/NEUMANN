@@ -1,0 +1,72 @@
+name: Q3 controlled hidden-coefficient ACTUAL CPU learning full native dual proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_hidden_coeff_actual_train_control_20261021.yml'
+      - 'research/evidence/q3_hidden_coeff_learner_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  train_hidden_coeff_from_true_source_trajectories_and_original_dual_proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check fixed hidden coefficient experiment protocol before any execution
+        run: |
+          python -m py_compile research/evidence/q3_hidden_coeff_learner_20261021/fixed_model_hidden_coefficient_real_training.py
+          python - <<'PY'
+          import json
+          c=json.load(open('research/evidence/q3_hidden_coeff_learner_20261021/FROZEN_GENERATOR_LEARNING_MECHANISM_CONTRACT.json'))
+          assert c['schema']=='neumann.q3.prospective_selfsupervised_hidden_coefficients_control_proof_v1'
+          assert c['testcases']==16
+          assert c['synthetic_only_not_public_original_sources']
+          assert c['global_Q3']==c['global_Q4']==c['global_Q6']=='OPEN'
+          print('SYNTHETIC_ONLY_ACTUAL_LEARNING_ABLATION_CONTRACT_LOCKED')
+          PY
+      - name: Install native independent Z3 pinned cvc5 and real CPU fitted model
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 z3-solver==4.13.3.0
+      - name: Actual hidden true source transition examples model fitting candidate hypotheses dual proofs
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_hidden_coeff_learner_20261021/fixed_model_hidden_coefficient_real_training.py \
+            --contract research/evidence/q3_hidden_coeff_learner_20261021/FROZEN_GENERATOR_LEARNING_MECHANISM_CONTRACT.json \
+            --out /tmp/q3_hidden_coefficient_16_full_original_training.json | tee /tmp/q3_hidden_coefficient_16_full_original_training.log
+          sha256sum /tmp/q3_hidden_coefficient_16_full_original_training.json
+      - name: Preserve actual successful and unsuccessful certificates model fits and ablations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-actual-trained-hidden-coefficient-16-control-not-public-original
+          path: |
+            /tmp/q3_hidden_coefficient_16_full_original_training.json
+            /tmp/q3_hidden_coefficient_16_full_original_training.log
+          if-no-files-found: warn
+      - name: Prohibit false original-benchmark claims regardless of positive generated tests
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/q3_hidden_coefficient_16_full_original_training.json'))
+          assert q['synthetic_generated_control_not_public_benchmark']
+          assert q['originals_with_hidden_unknown_random_coefficients']==16
+          assert q['global_Q3']==q['global_Q4']==q['global_Q6']=='OPEN'
+          assert q['strong_equal_authority_classical_synthesis_can_find_same_math']
+          for case in q['cases']:
+              if case.get('final_trained_original_native_inductive_certificate',{}).get('fully_verified_complete_original_3VC'):
+                  assert all(v['dual_pass'] for v in case['final_trained_original_native_inductive_certificate']['independent_original_pre_trans_post_dual_proofs'].values())
+          print('CONTROLLED_SYNTHETIC_NOT_PUBLIC_Q3_ORIGINAL_DECLARED')
+          PY
