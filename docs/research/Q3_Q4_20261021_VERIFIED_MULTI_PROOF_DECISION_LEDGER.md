@@ -2,7 +2,7 @@
 
 ## Immutable conclusion and limitations
 
-**Strongest authentic result:** four previously unopened same-author-family SyGuS original programs were identity-frozen in commit `8e6efc5b` BEFORE source bodies opened; source-exact pre/trans inductive affine space 4/4 was independently verified, and each full original *published Post* safety property was ultimately certified by unchanged original dual Z3 and SHA-pinned cvc5, **4/4**.
+**Strongest authentic result:** SIX real original programs have proven native Pre/Trans/Post safety with independently checked Z3+cvc5 certificates. Four previously unopened same-author-family SyGuS original programs were identity-frozen in commit `8e6efc5b` BEFORE source bodies opened; source-exact pre/trans inductive affine space 4/4 was independently verified, and each full original *published Post* safety property was ultimately certified by unchanged original dual Z3 and SHA-pinned cvc5, **4/4**.
 
 **Crucial negative boundary:** none of these proofs establishes learned, causally unique novel NEUMANN structure. They were obtained entirely via classical Gaussian elimination / Z3 / cvc5 / SPACER and have **zero neural training or forwards**. Do not promote Q3, Q4, Q7, overall frontier or an actual performance speedup.
 
@@ -19,6 +19,8 @@
 | Remaining DRAGON_4 k induction | [PR328](https://github.com/yoonsj0305/NEUMANN/pull/328), [CI #39521549010](https://github.com/yoonsj0305/NEUMANN/actions/runs/39521549010) | k=1..8 dual attempts UNKNOWN/NOT PROVED; no false pass |
 | DRAGON_4 alternative source safety | [PR330](https://github.com/yoonsj0305/NEUMANN/pull/330), [CI #39522085051](https://github.com/yoonsj0305/NEUMANN/actions/runs/39522085051) | Native full unchanged original PDR/SPACER reachability **UNSAT**, one-engine verified |
 | DRAGON_4 final **dual original 3VC** | [PR331](https://github.com/yoonsj0305/NEUMANN/pull/331), [CI #39522516608](https://github.com/yoonsj0305/NEUMANN/actions/runs/39522516608) | SPACER-recovered exact candidate formula. Native unchanged original **Pre→I**, **I∧Trans→I'**, **I→Post**, all independent Z3 **UNSAT** and cvc5 **UNSAT**. DRAGON_4 **PASS**, hence all four original published goals 4/4 |
+
+| First earlier frozen FIREFLY_1 and DRAGON_2, original published full safety | [PR332](https://github.com/yoonsj0305/NEUMANN/pull/332), [CI #39523136173](https://github.com/yoonsj0305/NEUMANN/actions/runs/39523136173) | Both exact original published Pre/Trans/Post properties independently Z3+cvc5 dual 3VC **2/2**, combined with new original four **6/6** actual native original safety certifications. Historical first learned XOR4 0/2 retained. This is posthoc classical, same author family |
 | Larger independent finite reference / computation accounting | [PR329](https://github.com/yoonsj0305/NEUMANN/pull/329), [CI #39521809087](https://github.com/yoonsj0305/NEUMANN/actions/runs/39521809087) | All 307 affine subsets on 4 bits, 40/40 independent explicit-state finite transition systems. Real original structural equation universe: 4,194,302 / 2,097,150 / 131,070 / 65,534, with exact independent source witness ranks 18 / 18 / 13 / 13. **NOT measured runtime Q4 10×** |
 
 ## The actually useful discovered representational gap
@@ -51,3 +53,16 @@ The actual proof certificate is the immutable raw CI artifact in PR331, NOT an i
 - **Measured first:** mathematical original 4/4 certified; total Q3 neural novelty and frontier economics remain OPEN.
 
 **Final evidence interpretation:** Many valuable *scoped formal verification questions were closed*, but **GLOBAL Q3 learning-novelty and GLOBAL Q4 cost advantage remain explicitly OPEN**. This is a material mathematical/software verification success, not a neural frontier breakthrough yet.
+
+## FINAL completed original-source matrix at this frozen research point
+
+| Source | All-arity affine scope | Full original published Post verified independently |
+|---|---|---|
+| FIREFLY_1 | source program true affine 2VC closure PASS | PDR extracted, original dual Z3+cvc5 3VC PASS PR332 |
+| DRAGON_2 | source program true affine 2VC closure PASS | PDR extracted, original dual Z3+cvc5 3VC PASS PR332 |
+| DRAGON_3 | exact least affine inductive 2VC PASS | sound 2-induction full published Post dual PASS PR327 |
+| DRAGON_4 | exact least affine inductive 2VC PASS | SPACER recovered invariant original dual 3VC PASS PR331 |
+| FIREFLY_2 | exact least affine inductive 2VC PASS | sound 2-induction full published Post dual PASS PR327 |
+| FIREFLY_3 | exact least affine inductive 2VC PASS | sound 2-induction full published Post dual PASS PR327 |
+
+**Exact summary: 6/6 scoped affine source-certified, 6/6 full real published safety independently source-certified, all same original author family, zero learned neural novelty (GLOBAL Q3 still OPEN), no global Q4 10×.**
