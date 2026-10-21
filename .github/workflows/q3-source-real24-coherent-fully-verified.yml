@@ -1,0 +1,93 @@
+name: Q3 official original 24 program proof safety closure 19 SAFE 5 UNSAFE
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-source-real24-coherent-fully-verified.yml'
+      - 'research/evidence/q3_code2inv_24_final_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  complete_source24_original_independent_certificates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Freeze authentic first source SHA and provenance hierarchy
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_code2inv_24_final_20261021/actual_complete_24_original_program_SAFE_UNSAFE_dual_proof_replay.py
+          python - <<'PY'
+          import json
+          p=json.load(open('research/evidence/q3_code2inv_24_final_20261021/BEFORE_COHERENT_REPLAY_POSTHOC_24_SAFE_UNSAFE.json'))
+          assert p['source_already_opened_in_all_replays'] and p['global_Q3']=='OPEN'
+          q=json.load(open('research/evidence/q3_code2inv_presource24_20261021/BEFORE_ANY_ORIGINAL_SOURCE_BODY_OPEN_24_GIT_BLOBS.json'))
+          assert len(q['cases'])==24
+          print('TRUE_SOURCE_POSTHOC_PRE_REGISTERED_BEFORE_COMPOSED_ONE_RUN')
+          PY
+      - name: Actual independent original SMT SyGuS and PDR theorem engines
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+          lscpu | grep 'Model name' | head -1
+      - name: One authentic first-source24 SHA-frozen full original safety proof execution
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_code2inv_24_final_20261021/actual_complete_24_original_program_SAFE_UNSAFE_dual_proof_replay.py --root original --freeze research/evidence/q3_code2inv_presource24_20261021/BEFORE_ANY_ORIGINAL_SOURCE_BODY_OPEN_24_GIT_BLOBS.json --protocol research/evidence/q3_code2inv_24_final_20261021/BEFORE_COHERENT_REPLAY_POSTHOC_24_SAFE_UNSAFE.json --out /tmp/NEUMANN_Q3_REAL24_COMPLETE_ORIGINAL_SAFE_UNSAFE.json | tee /tmp/NEUMANN_Q3_REAL24_COMPLETE_ORIGINAL_SAFE_UNSAFE.log
+          sha256sum /tmp/NEUMANN_Q3_REAL24_COMPLETE_ORIGINAL_SAFE_UNSAFE.json
+      - name: Preserve one coherent source proof ledger with every unknown/failed case
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-24-authentic-source-original-complete-proofs
+          path: |
+            /tmp/NEUMANN_Q3_REAL24_COMPLETE_ORIGINAL_SAFE_UNSAFE.json
+            /tmp/NEUMANN_Q3_REAL24_COMPLETE_ORIGINAL_SAFE_UNSAFE.log
+          if-no-files-found: warn
+      - name: Posthoc 24 original complete independent true SAFE/UNSAFE, never learned unique
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/NEUMANN_Q3_REAL24_COMPLETE_ORIGINAL_SAFE_UNSAFE.json'))
+          assert x['source_original_git_blob_pre_open_sha_manifest_commit']=='6a5792e196b2234358dca31ec9dd733f3ffed42d'
+          assert x['posthoc_protocol_before_final_composed_CI_commit']=='0af15ba44e9a2ba5a7592e019090a32fe0eb3d64'
+          assert x['all_original24_source_rows_retained'] and len(x['all_original_sources'])==24
+          assert x['exact_original_git_blob_verified_count']==24
+          assert x['source_original_24_certified_safe_plus_unsafe']==24
+          assert x['complete_source_full_original_independent_results']=={'SAFE':19,'UNSAFE':5,'UNKNOWN':0}
+          assert x['source_specific_manual_parity_NOT_an_automatically_learned_invariant']
+          assert x['matched_equal_authority_expert_can_use_all_same_source_mathematics']
+          assert x['neural_forwards']==x['model_weights_updated']==0
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          for q in x['all_original_sources']:
+              if q['independent_original_proof_status']=='SAFE':
+                  if q['route']=='POSTHOC_MANUAL_FIB32_PARITY_DUAL_3VC':
+                      assert q['posthoc_MANUAL_source_parity_specialist']['actual_true_original_parity_3VC_Z3_cvc5']
+                  else:
+                      assert q['original_strong_classical_competing_source_certificate']['strong_classical_verified_SAFE']
+              elif q['independent_original_proof_status']=='UNSAFE':
+                  r=q['original_unsafe_bounded_grounded_two_solver_trace']
+                  assert r['true_bounded_original_safety_refuted']
+                  assert r['checked_depth_receipts'][-1]['actual_original_fully_grounded_trace_sat_Z3_cvc5']['dual_pass']
+          print('TRUE_ORIGINAL_24_SAFE_UNSAFE_COMPLETE_19_5_ZERO_UNKNOWN')
+          PY
