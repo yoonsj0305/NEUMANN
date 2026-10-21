@@ -1,0 +1,92 @@
+name: Q6 first truly unseen seven original source files fixed CPU learned invariant transfer
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q6-first-seven-unopened-fib-original-CPU-transfer.yml'
+      - 'research/evidence/q6_cpu_transfer7_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_virgin_test_fixed_CPU_model_no_fit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify seven first source files frozen SHA before opening any content
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q6_cpu_transfer7_20261021/first_unopened_seven_original_fib_source_fixed_model_transfer.py
+          python - <<'PY'
+          import json
+          a=json.load(open('research/evidence/q6_cpu_transfer7_20261021/BEFORE_OPEN_SEVEN_NEW_ORIGINAL_FIB_CPU_MODEL_LOCK.json'))
+          assert a['schema']=='neumann.q6.seven_presource_hypothesis_fib32_fixed_CPU_model_no_target_fit.v1'
+          assert a['metadata_only_before_selected_7_test_source_bodies']
+          assert len(a['test_case_git_blobs'])==7
+          assert len({q['git_blob'] for q in a['test_case_git_blobs']})==7
+          assert a['global_Q3']==a['global_Q4']==a['global_Q5']==a['global_Q6']=='OPEN'
+          print('FROZEN_SEVEN_ORIGINAL_NEW_PROGRAM_CONTENTS_UNOPENED_IN_THIS_STUDY')
+          PY
+      - name: Pinned original native full proof solvers and actually trained CPU model
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 z3-solver==4.13.3.0
+      - name: ONE SOURCE-BODY VIRGIN look per new program, no training on any target file, original verified 3VC only
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q6_cpu_transfer7_20261021/first_unopened_seven_original_fib_source_fixed_model_transfer.py --root original --freeze research/evidence/q6_cpu_transfer7_20261021/BEFORE_OPEN_SEVEN_NEW_ORIGINAL_FIB_CPU_MODEL_LOCK.json --source24 research/evidence/q3_code2inv_presource24_20261021/BEFORE_ANY_ORIGINAL_SOURCE_BODY_OPEN_24_GIT_BLOBS.json --out /tmp/q6_frozen_learned_cpu_model_seven_true_originals.json | tee /tmp/q6_frozen_learned_cpu_model_seven_true_originals.log
+          sha256sum /tmp/q6_frozen_learned_cpu_model_seven_true_originals.json
+      - name: Preserve new true original source statuses and all unsupported types and failed proposals
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q6-new-seven-native-original-source-true-trained-model-no-retune
+          path: |
+            /tmp/q6_frozen_learned_cpu_model_seven_true_originals.json
+            /tmp/q6_frozen_learned_cpu_model_seven_true_originals.log
+          if-no-files-found: warn
+      - name: Strict future Q6 evidence scope: only native original dual proof, type-abstention not failed classification
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/q6_frozen_learned_cpu_model_seven_true_originals.json'))
+          assert q['source_body_unopened_at_seven_git_blob_freeze_commit']=='aed388ba7e00a31049d2f0612dfc4d7af22e7d71'
+          assert q['all_7_source_file_rows_preserved']
+          assert q['actual_new_original_source_sha_authenticated_count']==7
+          assert q['training_source_is_ALREADY_OPENED_fib32']
+          assert q['target_original_model_training_updates']==0
+          assert q['frozen_trained_model_equals_0train_trace_lookup']
+          assert q['global_Q3']==q['global_Q4']==q['global_Q5']==q['global_Q6']=='OPEN'
+          for row in q['new_originals']:
+              assert row['original_source_SHA_authenticated']
+              assert row['no_retraining_on_target']
+              if row['actual_original_learned_3VC']:
+                  assert row['native_model_frozen_interface_compatible']
+                  assert row['learned_fixed_other_source_actual_native_3VC']['actual_original_3VC_dual_success']
+                  assert row['same_authority_zero_train_lookup_actual_native_3VC']['actual_original_3VC_dual_success']
+              if row['status']=='ABSTAIN_FIXED_HUMAN_CHOSEN_SOURCE_INTERFACE_MISMATCH':
+                  assert row['native_model_frozen_interface_compatible']==False
+          print('Q6_NEW_PROGRAM_FIRST_SOURCE_SEVEN_AUTHENTIC',q['actual_new_original_source_sha_authenticated_count'])
+          print('Q6_NEW_PROGRAM_FIXED_MODEL_TYPED_COMPATIBLE',q['original_new_source_programs_with_fixed_supported_interface'])
+          print('Q6_NEW_PROGRAM_TRUE_INDEPENDENT_DUAL_3VC_SUCCESSES',q['q6_true_sealed_source_body_program_transfer_dual_count'])
+          print('Q6_NEW_PROGRAM_TOTAL_STRONG_CLASSICAL_SOURCE_SAFE',q['new_original_source_matched_classical_original_safety_proofs'])
+          PY
