@@ -1,0 +1,68 @@
+name: Q3 four real original full published Post classical independent 3VC
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-four-original-full-post-3vc.yml'
+      - 'research/evidence/q3_affine_unopened_transfer_20261021/four_original_posthoc_full_published_post_3vc.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  four_original_source_post_dual_3vc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: untouched_original
+          sparse-checkout: |
+            lib/Inv_Track/andrew_lustre
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authentic upstream version and frozen script
+        run: |
+          test "$(git -C untouched_original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_affine_unopened_transfer_20261021/four_original_posthoc_full_published_post_3vc.py
+      - name: Exact independent pinned solvers
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Posthoc first full original published property original 3VC
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_affine_unopened_transfer_20261021/four_original_posthoc_full_published_post_3vc.py --root untouched_original --freeze research/evidence/q3_affine_unopened_transfer_20261021/ORIGINAL_FOUR_PRESOURCE_FREEZE.json --out /tmp/q3_four_full_post_3vc.json | tee /tmp/q3_four_full_post_3vc.log
+          sha256sum /tmp/q3_four_full_post_3vc.json
+      - name: Preserve source published goal proofs and errors
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-four-original-published-post-independent-3vc
+          path: |
+            /tmp/q3_four_full_post_3vc.json
+            /tmp/q3_four_full_post_3vc.log
+          if-no-files-found: warn
+      - name: Explicit cannot claim learned original proof
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3_four_full_post_3vc.json'))
+          assert r['all_four_rows_retained'] and len(r['rows'])==4
+          assert r['global_Q3']=='OPEN'
+          assert r['no_learned_operator_new']
+          print('AUTHENTIC_ORIGINAL_PUBLISHED_POST_CLASSICAL_3VC',
+                r['actual_original_source_3VC_Z3_cvc5_dual_success'],'/4')
+          PY
