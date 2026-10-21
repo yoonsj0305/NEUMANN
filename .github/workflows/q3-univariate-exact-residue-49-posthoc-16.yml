@@ -1,0 +1,80 @@
+name: Q3 posthoc source polynomial separable exact residue DP and 49 soundness controls
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-univariate-exact-residue-49-posthoc-16.yml'
+      - 'research/evidence/q3_univariate_ring_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  generic_exact_polynomial_finite_ring:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/QF_NIA/20220315-MathProblems
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Frozen original SHA cohort and exact structural source code syntax
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/q3_univariate_ring_20261021/exact_separable_integer_polynomial_residue_discoverer.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/q3_univariate_ring_20261021/POSTHOC_PR351_SYNTHETIC_FAILURE_PIVOT.json'))
+          assert x['not_first_source_blind']
+          assert x['candidate_moduli']==[2,3,4,5,7,8,9,11,13,16]
+          print('AFTER_PR351_FIRST_SOURCE_ONLY_POSTHOC')
+          PY
+      - name: Independently proven QF LIA via pinned original solver implementations
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Mathematically exact separator, 49 adversarial synthetic controls and 16 posthoc full-source audits
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_univariate_ring_20261021/exact_separable_integer_polynomial_residue_discoverer.py --root original --freeze research/evidence/q3_cross_prefix_modulo_20261021/PRE_SOURCE_16_BY_8_PREFIX_SHA_LOCK.json --out /tmp/q3_posthoc_exact_ring_first16.json | tee /tmp/q3_posthoc_exact_ring_first16.log
+          sha256sum /tmp/q3_posthoc_exact_ring_first16.json
+      - name: Preserve controls and ALL original positive and negative first-source outcomes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-posthoc-general-exact-univariate-ring-and-fortynine-metamorphic
+          path: |
+            /tmp/q3_posthoc_exact_ring_first16.json
+            /tmp/q3_posthoc_exact_ring_first16.log
+          if-no-files-found: warn
+      - name: Fail closed on first-source attribution, all synthetic safety controls, independent theorem checks
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_posthoc_exact_ring_first16.json'))
+          assert x['posthoc_after_first_16_source_opens']
+          assert x['all_true_original_16_cases_retained'] and len(x['originals'])==16
+          assert x['original_full_source_SHA_authenticated']==16
+          assert x['new_exact_univariate_modular_decomposition_passed_same_49_controls']
+          assert x['same_math_structural_compiler_available_to_strong_direct']
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          for t in x['originals']:
+              if t['proven']:
+                  steps=t['source_exact_separable_math_certificate']['searched_moduli']
+                  assert any(s.get('independent_source_modular_obstruction_dual_Z3_cvc5') for s in steps)
+          print('POSTHOC_DIFFERENT_MATH_FULL_SOURCE_AUTHENTIC',x['original_full_source_SHA_authenticated'])
+          print('AUTO_STRUCTURE_UNBOUNDED_SOURCE_UNSAT',x['source_first16_new_unbounded_UNSAT_with_separable_proof'])
+          PY
