@@ -1,0 +1,86 @@
+name: Q3 source-agnostic classical linear Houdini automatic original12 native proofs
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_houdini_all12_actual_original_source.yml'
+      - 'research/evidence/q3_auto_linear_houdini_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bounded_actual_original_source12_automatic_linear_invariant_discovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Frozen original12 posthoc source generic candidate grammar
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_auto_linear_houdini_20261021/source_agnostic_linear_Houdini_source12.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/q3_auto_linear_houdini_20261021/PREREG_POSTHOC_GENERIC_HOUDINI_SOURCE12.json'))
+          assert x['schema']=='neumann.q3.posthoc_generic_linear_Houdini_original12_20261021.v1'
+          assert x['source_body_opened_before_hypothesis_design']
+          assert x['global_Q3']==x['global_Q4']==x['global_Q6']=='OPEN'
+          print('GENERIC_HOUDINI_POSTHOC_GRAMMAR_NO_TARGET_SOURCE_MANUAL_CASES')
+          PY
+      - name: Install actual independent Z3 and cvc5 full native original source verifier
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Execute source-agnostic Pre-entailed Houdini actual Trans and full original native 3VC across all twelve
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python research/evidence/q3_auto_linear_houdini_20261021/source_agnostic_linear_Houdini_source12.py \
+            --root original \
+            --freeze research/evidence/q4q6_fresh12_cpu_router_20261021/FIRST_FRESH_12_SOURCE_SHA_FREEZE_BEFORE_BODY.json \
+            --contract research/evidence/q3_auto_linear_houdini_20261021/PREREG_POSTHOC_GENERIC_HOUDINI_SOURCE12.json \
+            --out /tmp/q3_houdini_real_source12.json | tee /tmp/q3_houdini_real_source12.log
+          sha256sum /tmp/q3_houdini_real_source12.json
+      - name: Preserve all proven, unsupported, unknown, budgets and actual original source solver receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-source-original12-generic-Houdini-bounded-no-learn-native-proof
+          path: |
+            /tmp/q3_houdini_real_source12.json
+            /tmp/q3_houdini_real_source12.log
+          if-no-files-found: warn
+      - name: Prevent fabricated learned Q3 and require actual independent original full source solver receipts
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          a=json.load(open('/tmp/q3_houdini_real_source12.json'))
+          assert a['schema']=='neumann.q3.houdini_generic_linear_program12_auto_classical_20261021.v1'
+          assert len(a['original_source_programs'])==12
+          assert a['source_agnostic_candidate_generation_no_original_specific_cases']
+          assert a['original_source_bodies_were_previously_opened']
+          assert a['global_Q3']==a['global_Q4']==a['global_Q6']=='OPEN'
+          assert a['neural_training_updates']==a['model_inference_calls']==0
+          for q in a['original_source_programs']:
+              if q['automatic_source_agnostic_finite_linear_Houdini_verified']:
+                  assert q['Houdini_fixed_point_verdict']=='PROVED_INDUCTIVE_FIXED_POINT'
+                  assert all(t['dual_pass'] for t in q['source_actual_original_full_Z3_cvc5_3VC_receipts'].values())
+          print('AUTOMATIC_CLASSICAL_DISCOVERY_COUNT',a['actual_source_auto_inductive_dual_Z3_cvc5_proof_count'])
+          print('PROVES_ONLY_SPECIFIED_ORIGINAL_INDUCTIVE_NO_LEARNED_NEUMANN_UNIQUE')
+          PY
