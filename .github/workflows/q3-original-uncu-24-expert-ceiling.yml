@@ -1,0 +1,85 @@
+name: Q3 first 24 authentic Uncu math inequalities three forms expert headroom
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-original-uncu-24-expert-ceiling.yml'
+      - 'research/evidence/q3_l1_uncu_24_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  true_original_first_unseen_QF_NRA_family:
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/QF_NRA/20220314-Uncu
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Frozen original SHA cohort predates any source-body inspection
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/q3_l1_uncu_24_20261021/first_24_authentic_original_z3_cvc5_specialist_expert_screen.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/q3_l1_uncu_24_20261021/BEFORE_FIRST_SOURCE_BODY_AUTHENTIC_UNCU_24.json'))
+          assert x['presource_unopened_original_bodies_when_frozen']
+          assert len(x['all_original_sha_and_byte_targets'])==24
+          assert len({q['git_blob'] for q in x['all_original_sha_and_byte_targets']})==24
+          print('FIRST_FROZEN_SOURCE_UNCU_24_AUTHENTIC')
+          PY
+      - name: Pin real original independent nonlinear solvers
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          lscpu | grep 'Model name' | head -1
+      - name: First 24 real original source Z3 general Z3 specialist and cvc5 same CPU
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_l1_uncu_24_20261021/first_24_authentic_original_z3_cvc5_specialist_expert_screen.py --root original --manifest research/evidence/q3_l1_uncu_24_20261021/BEFORE_FIRST_SOURCE_BODY_AUTHENTIC_UNCU_24.json --out /tmp/q3_true_original_uncu_24_expert.json | tee /tmp/q3_true_original_uncu_24_expert.log
+          sha256sum /tmp/q3_true_original_uncu_24_expert.json
+      - name: Archive all real positives negative and unknown original labels and full costs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-first-unseen-24-original-uncu-polynomial-rational-experts
+          path: |
+            /tmp/q3_true_original_uncu_24_expert.json
+            /tmp/q3_true_original_uncu_24_expert.log
+          if-no-files-found: warn
+      - name: Strict original data integrity and forbidden claim prevention
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3_true_original_uncu_24_expert.json'))
+          assert r['strict_original_source_preinspection_SHA_freeze_commit']=='7a0d8d8d414d35e7b7f77c24897fd9120c3f9f14'
+          assert r['all_24_originals_retained']
+          assert r['original_file_cases_authentic_SHA_verified']==24
+          assert r['source_original_label_cvc5_Z3_conflicts']==0
+          assert r['first_screen_only_NOT_learning']
+          assert r['fresh_original_source_bodies_no_longer_blind_for_future_training']
+          assert r['global_Q3']==r['global_Q4']==r['global_Q5']=='OPEN'
+          for row in r['originals']:
+              assert row['status'] in ('TRUE_ORIGINAL_STRONG_DIRECT_SOLVED','TRUE_ORIGINAL_STRONG_DIRECT_TIMEOUT_UNKNOWN')
+              assert row['source_sha_verified']
+              assert len(row['same_cpu_real_full_original_solver_receipts'])==3
+          print('UNCU_GENUINE_24_SOURCE_FIRST_AUTHENTIC',r['original_file_cases_authentic_SHA_verified'])
+          print('UNCU_STRONG_CLASSICAL_ACTUAL_SOURCE_SOLVED',r['strong_original_three_solver_portfolio_solved_total'])
+          print('UNCU_GENUINE_UNSOLVED_RESIDUAL',r['candidate_unresolved_original_source_count'])
+          PY
