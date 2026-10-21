@@ -1,0 +1,85 @@
+name: Q3 source verifier guided repair and indistinguishability original truth
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_source_counterexample_ambiguity_repair.yml'
+      - 'research/evidence/q3_source_cegar_observational_alias_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_source_full_semantics_active_cegar_and_hidden_unsafe_witness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate source independent repair controller
+        run: |
+          python -m py_compile research/evidence/q3_source_cegar_observational_alias_20261022/source_counterexample_driven_modulus_repair.py
+      - name: Install exact pinned dual SMT tools and original numeric AST dependencies
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: Fetch and pin real official PR442 fitted proposal archive
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39687539419
+          github-token: ${{ github.token }}
+          name: q3-source-trained-modulus-constructor-outside-proven-finite-list
+          path: /tmp/q3cegar
+      - name: Verifier-as-feedback source-state repair, strong no-learning counterfactual, reachable unsafe original witness
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_source_cegar_observational_alias_20261022/source_counterexample_driven_modulus_repair.py \
+            --official /tmp/q3cegar/q3_learned_unbounded_modulus_native_original16.json \
+            --out /tmp/q3cegar/q3_real_counterexample_active_repair_and_indistinguishability.json | tee /tmp/q3cegar/q3_real_counterexample_active_repair_and_indistinguishability.log
+          sha256sum /tmp/q3cegar/q3_real_counterexample_active_repair_and_indistinguishability.json
+      - name: Archive complete double-solver counterexamples and source original certified successes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-proof-guided-structure-repair-indistinguishable-safe-unsafe-originals
+          path: |
+            /tmp/q3cegar/q3_real_counterexample_active_repair_and_indistinguishability.json
+            /tmp/q3cegar/q3_real_counterexample_active_repair_and_indistinguishability.log
+          if-no-files-found: warn
+      - name: Refuse global Q3 success; audit learned and classical and original unsafe proofs
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/q3cegar/q3_real_counterexample_active_repair_and_indistinguishability.json'))
+          assert q['schema']=='neumann.q3.official_trained_operator_source_cex_active_repair_observation_aliasing.v1'
+          assert q['hidden_safe_originals']==32 and q['hidden_unsafe_originals']==16
+          for key in ('independently_proved_hidden_safe_learned_repair',
+                      'independently_proved_hidden_safe_same_architecture_no_training_repair',
+                      'independently_proved_hidden_safe_NO_MODEL_scale_repair',
+                      'independently_proved_hidden_safe_source_GCD'):
+              assert q[key]==32
+          assert q['independently_proved_reachable_original_unsafe']==16
+          assert q['false_certified_safe_on_reachable_unsafe']==0
+          assert q['observationally_indistinguishable_safe_vs_unsafe_source_pairs']==16
+          assert q['all_these_methods_reuse_existing_modulo_primitive']
+          assert q['feedback_update_is_CLASSICAL_not_learned']
+          assert q['trained_model_not_causally_needed_under_identical_no_fit_counterfactual']
+          for case in q['safe_original_full_certificate_ledger']:
+              assert case['source_truth_independent_Z3_cvc5']['source_one_step_original_Z3_cvc5']['Z3']=='unsat'
+              for attempt in case['candidate_prior_methods_and_independent_counterexample_proofs']['original_trained_model_prior']['attempts']:
+                  cert=attempt['all_native_original_3VC']
+                  assert len(cert)==3 and all(z['dual_verified'] for z in cert)
+          for case in q['unsafe_original_full_rejection_ledger']:
+              assert case['source_truth_independent_Z3_cvc5']['source_one_step_original_Z3_cvc5']['Z3']=='sat'
+              assert case['source_truth_independent_Z3_cvc5']['genuine_reachable_original_unsafe_witness']
+          assert q['global_Q3']==q['global_Q4']==q['global_Q6']=='OPEN'
+          print('HIDDEN_BRANCH_COUNTEREXAMPLE_SOURCE_REPAIR_CERTIFIED_BUT_NO_LEARNED_NOVELTY')
+          PY
