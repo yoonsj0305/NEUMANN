@@ -1,0 +1,91 @@
+name: Q4 twelve genuine original full-cost post first vs SyGuS Spacer
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q4_12_original_cpu_20261021.yml'
+      - 'research/evidence/q4_source12_budget_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  true_original_first12_three_proof_matched_cost_routes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate frozen actual 12 source identities and fixed run protocol
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q4_source12_budget_20261021/real_12_native_full_cost_portfolio.py
+          python - <<'PY'
+          import json
+          a=json.load(open("research/evidence/q4_source12_budget_20261021/PREREG_POSTHOC_TRUE_SOURCE12_THREE_ROUTE_COST.json"))
+          assert a["schema"]=="neumann.q4.preregistered_posthoc_source12_same_answer_cost_three_routes.v1"
+          assert a["global_Q3"]==a["global_Q4"]==a["global_Q6"]=="OPEN"
+          assert a["training_updates"]==0
+          print("REAL_ORIGINAL_12_SOURCE_POSTHOC_COST_CONTRACT_ACCEPTED")
+          PY
+      - name: Install pinned independent native proof backends
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Full 12 actual source CPU proof-matched three-route observation
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q4_source12_budget_20261021/real_12_native_full_cost_portfolio.py \
+            --root original \
+            --freeze research/evidence/q6_first12_unopened_alpha_20261021/ORIGINAL_SOURCE_SHA_LOCK_BEFORE_FIRST_BODY.json \
+            --contract research/evidence/q4_source12_budget_20261021/PREREG_POSTHOC_TRUE_SOURCE12_THREE_ROUTE_COST.json \
+            --out /tmp/q4_source12_full_cost_native.json | tee /tmp/q4_source12_full_cost_native.log
+          sha256sum /tmp/q4_source12_full_cost_native.json
+      - name: Preserve evidence including all failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q4-original12-three-native-prover-full-cost-comparison
+          path: |
+            /tmp/q4_source12_full_cost_native.json
+            /tmp/q4_source12_full_cost_native.log
+          if-no-files-found: warn
+      - name: Fail closed on fabricated source successes or excluded shared cost
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open("/tmp/q4_source12_full_cost_native.json"))
+          assert q["schema"]=="neumann.q4.genuine_prior_opened_original12_CPU_proof_matched_cost_v1"
+          assert q["true_original_genuine_git_SHA_count"]==12 and len(q["originals"])==12
+          assert len({r["git_blob"] for r in q["originals"]})==12
+          assert all(r["source_valid"] and r["source_SHA_authenticated"] and r["common_source_prep_wall_ms"]>0 for r in q["originals"])
+          assert q["synthetic_false_Post_safety_refuted"]
+          assert not q["source_invariant_learner_used"] and q["neural_forwards"]==0
+          assert q["equal_authority_classical_direct_can_use_same_strategy"]
+          assert q["global_Q3"]==q["global_Q4"]==q["global_Q6"]=="OPEN"
+          for r in q["originals"]:
+              if r["status"]=="COMPLETE_THREE_ACTUAL_ORIGINAL_ROUTES":
+                  if r["comparable_same_certified_original_task"]:
+                      assert r["fixed_post_first_cheapest_safe"]["certified"]
+                      assert r["standalone_cvc5_SyGuS"]["certified"] or r["standalone_Z3_SPACER"]["certified"]
+                  assert r["fixed_post_first_cheapest_safe"]["actual_wall_ms"]>0
+          print("ALL_12_ACTUAL_ORIGINALS_AUTHENTIC_PRESERVED")
+          print("MATCHED_ONLY_THREE_ROUTE_COST",q["matched_original_both_certified_count"])
+          print("CLASSICAL_COMPUTE_EFFICIENCY_NOT_GLOBAL_Q4")
+          PY
