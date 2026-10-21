@@ -1,0 +1,86 @@
+name: Q3 real CPU trained phase invariant on authentic fib32 original native 3VC
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-real-CPU-trained-fib32-original.yml'
+      - 'research/evidence/q3_cpu_phase_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  true_original_source_cpu_trained_structure_versus_no_learn:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate actual original source revision and prereg learned proposal
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_cpu_phase_20261021/real_original_fib32_cpu_trained_phase_source_3vc.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/q3_cpu_phase_20261021/PREREG_POSTHOC_CPU_LEARNED_SOURCE_FIB32_NO_GOLD.json'))
+          assert x['schema']=='neumann.q3.20261021.posthoc_original_fib32_actually_trained_phase_proposer.v1'
+          assert x['source_was_opened_and_human_exact_invariant_already_published_PR373']
+          assert x['original_source_git_blob']=='4fb129488bee3e1e0cdae899b318d6503ae23c12'
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          print('REGISTERED_POSTHOC_CPU_LEARNER_NO_PRIOR_GOLD_LABELS_GIVEN_TO_TRAIN')
+          PY
+      - name: Independently pinned complete original dual Z3 cvc5 proof backends and real sklearn learning
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 z3-solver==4.13.3.0
+      - name: Train on actual original source transitions k1to5, verify full native 3VC and heldout original k6to12
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_cpu_phase_20261021/real_original_fib32_cpu_trained_phase_source_3vc.py --root original --freeze research/evidence/q3_code2inv_presource24_20261021/BEFORE_ANY_ORIGINAL_SOURCE_BODY_OPEN_24_GIT_BLOBS.json --contract research/evidence/q3_cpu_phase_20261021/PREREG_POSTHOC_CPU_LEARNED_SOURCE_FIB32_NO_GOLD.json --out /tmp/q3_real_original_cpu_trained_fib32.json | tee /tmp/q3_real_original_cpu_trained_fib32.log
+          sha256sum /tmp/q3_real_original_cpu_trained_fib32.json
+      - name: Preserve actually trained model tree features and 3VC independent proofs, and all failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-real-original-fib32-CPU-trained-typed-phase-learning-versus-classical
+          path: |
+            /tmp/q3_real_original_cpu_trained_fib32.json
+            /tmp/q3_real_original_cpu_trained_fib32.log
+          if-no-files-found: warn
+      - name: Do not admit learned Q3 uniqueness if same-source nolearned table can reproduce original proof
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/q3_real_original_cpu_trained_fib32.json'))
+          assert q['preregistered_before_training_SHA']=='d818e153b46a513c2f5a599425e8b8c8ed2ce6b8'
+          assert q['source_full_original_previously_opened_not_new_first_blind'] if 'source_full_original_previously_opened_not_new_first_blind' in q else q['posthoc_source_and_human_feature_grammar_leaked']
+          assert q['authenticated_original_native_source']['pinned_source_git_blob']=='4fb129488bee3e1e0cdae899b318d6503ae23c12'
+          assert q['actual_model_training_updates']==1
+          assert q['actual_original_full_native_3VC_learned_proposer_pass']
+          assert q['heldout_original_transition_state_predictions_correct']==q['heldout_original_transition_state_predictions_total']
+          assert q['heldout_original_transition_state_predictions_total']>100
+          assert q['nonlearner_same_source_trace_lookup']['actual_original_3VC_dual_success']
+          assert not q['no_train_hypothesis_constant_zero']['actual_original_3VC_dual_success']
+          assert not q['ablated_parity_only_full_original_verification']['actual_original_3VC_dual_success']
+          assert not q['ablated_permuted_label_original_3VC']['actual_original_3VC_dual_success']
+          assert q['not_a_unique_learned_Q3_result'] and q['global_Q3']==q['global_Q4']==q['global_Q5']=='OPEN'
+          print('ACTUAL_CPU_LEARNED_TYPED_SOURCE_INVARIANT_TRUE_ORIGINAL_Z3_CVC5_3VC_PASS')
+          print('ACTUAL_CPU_LEARNED_HELDOUT_K_PREDICTIONS',q['heldout_original_transition_state_predictions_total'])
+          print('ACTUAL_NO_LEARN_SAME_TRACE_TABLE_CAN_MATCH_SUCCESS_UNIQUE_GAP_ZERO')
+          PY
