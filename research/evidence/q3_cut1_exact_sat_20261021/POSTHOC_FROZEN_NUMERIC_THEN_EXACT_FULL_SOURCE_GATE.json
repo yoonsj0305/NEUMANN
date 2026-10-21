@@ -1,0 +1,16 @@
+{
+  "schema": "neumann.q3.cut1_posthoc_exact_source_SAT_search_no_learning.v1",
+  "date": "2026-10-21",
+  "original_source": "SMT-LIB/benchmark-submission-2022@81a39628827f61fbd74c6f3e67feb5c1b740d2f0",
+  "original_file": "non-incremental/NRA/20220222-cut-three-circles/cut-out-1.smt2",
+  "original_git_blob_sha": "0c0cd2fa878deac4791b790a8a13cb2747df5b14",
+  "original_bytes": 2970,
+  "source_already_opened_in_prior_expert_screen": true,
+  "claim": "Prior original strong Z3/cvc5 5sec not solved. New numerical optimizer is ordinary classical SciPy, NOT neural/learned unique Q3. Only ORIGINAL full SMT2 SAT verified by independent Z3 and cvc5 is admitted. Candidate approximate optimization not SAT.",
+  "decision": "Use frozen 20261021 random seed 101, true original parsed exact SMT2 exists+and 12 Real, <= < nary conditions. Solve continuous min nonlinear violation via scipy SLSQP from fixed 120 deterministic restarts, or fixed 600-generation scipy differential_evolution bounded all 12 Real. Do NOT manually hardcode witness/gold. Round floats to 1/10000, 1/100000, 1/1000000 rational, select first with all native ORIGINAL 39 asserts exact and strictly satisfied. If no original full exact rational witness, report UNKNOWN. Z3 4.13.3 & cvc5 1.4.2 on ORIGINAL whole existential body grounded with rational constants and all actual original constraints; BOTH SAT required.",
+  "budget": "Max 180 seconds original numerical optimizer+exact rational validation, process CPU within GitHub CI 8 minute job, avoid huge parameter sweeps after inspecting outcomes. Persist exact each failure.",
+  "scientific_status": "Not model training. Strong Direct with same SciPy has identical solution power. No neural uniqueness, no Q4 10x. Full 18/18 possible only if correct exact source SAT and Winograd externally conditional counted separately.",
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q5": "OPEN"
+}
