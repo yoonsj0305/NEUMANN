@@ -1,0 +1,23 @@
+{
+  "schema": "neumann.q3.original_three_by_three_exact_linear_skeleton_from_source.v1",
+  "scope": "POSTHOC already first-body-opened source programs MF03/MQ03/SC03/SQ03/MC03. No new original first-blind cases. Exact true ORIGINAL source linear power feature skeleton only; not full original nonlinear SAT solution.",
+  "math": "Map each unique source-native univariate monomial x^k (1<=k<=8) to formal feature Y_x. Every native asserted row/column/diagonal SUM x^k = t becomes integer linear equality sum Y_x -t =0. Drop every non-matching native source assertion (positive/distinct) ONLY for linear skeleton. Compute exact rational rank and rowspace basis. Independently require Z3 and cvc5 UNSAT of basis∧not(original_linear_all), proving full linear subsystem equivalence for all rationals/integers. Because every basis row is actual source assertion, original_linear_all⇒basis by construction. DO NOT claim equivalence to full original QF_NIA positive/distinct/nonlinear constraints.",
+  "expected_prior_math": "Full 3x3 row/column/diagonal magic square constraints have rank 7 among 10 Y-feature/target variables -> 3 rational degrees. 3x3 semi-magic rows and columns rank 5 -> 5 rational degrees. These are hypotheses subject to source verification and real AST, no signoff without independent solvers.",
+  "cases": [
+    "MF_03.smt2",
+    "MQ_03.smt2",
+    "SC_03.smt2",
+    "SQ_03.smt2",
+    "MC_03.smt2"
+  ],
+  "exact_source_SHA_manifest": "research/evidence/q3_power_feature_20261021/PRE_SOURCE_FIRST_TEN_POSITIVE_MONOTONE_MAGIC_CONTRACT.json",
+  "positive_controls": [
+    "MC_02.smt2",
+    "MS_02.smt2"
+  ],
+  "ablations": "Strong Direct afforded same sparse integer matrix, sympy.rref and linear projection; same algorithm so no unique structural discovery superiority claim. No hidden oracle original SAT. Report feature dimension reductions in linear skeleton; no 10x full end-to-end task assertion.",
+  "timing": "same CPU actual parser/linear elimination/independent theorem cost, show absolute but no mismatched Direct speedup claims.",
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q5": "OPEN"
+}

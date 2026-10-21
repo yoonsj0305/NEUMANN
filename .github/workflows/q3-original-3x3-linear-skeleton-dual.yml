@@ -1,0 +1,75 @@
+name: Q3 3x3 true original source exact rank skeleton Z3+cvc5 independent
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-original-3x3-linear-skeleton-dual.yml'
+      - 'research/evidence/q3_original_3x3_rank_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  independent_original_source_linear_rank:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/QF_NIA/20220315-MathProblems
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Original source and mathematical rowspace evidence syntax
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/q3_original_3x3_rank_20261021/exact_true_original_magic_power_rowspace_dual.py
+      - name: Pinned independent source Z3 cvc5, exact SymPy rational rank
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0 sympy==1.14.0
+      - name: Original five 3x3 source linear structural rank and exact dual rowspace equivalence
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3_original_3x3_rank_20261021/exact_true_original_magic_power_rowspace_dual.py --root original --freeze research/evidence/q3_power_feature_20261021/PRE_SOURCE_FIRST_TEN_POSITIVE_MONOTONE_MAGIC_CONTRACT.json --out /tmp/q3_original_3x3_rowspace.json | tee /tmp/q3_original_3x3_rowspace.log
+          sha256sum /tmp/q3_original_3x3_rowspace.json
+      - name: Preserve original full source proof and all failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-five-real-magic3-original-linear-skeleton-dual
+          path: |
+            /tmp/q3_original_3x3_rowspace.json
+            /tmp/q3_original_3x3_rowspace.log
+          if-no-files-found: warn
+      - name: Require original SHA and independent original linear basis equivalence
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_original_3x3_rowspace.json'))
+          assert x['source_corpus_first_sha_lock_from_previous_original_STUDY']=='941ec4d16357cb9120490506e7c45cc60c76e74a'
+          assert x['all_real_originals_previously_opened_NOT_new_unseen']
+          assert x['five_3x3_source_cases_kept']
+          assert x['five_3x3_original_SHA_verified']==5
+          assert x['five_3x3_original_exact_linear_skeleton_dual_certified']==5
+          assert x['no_original_3x3_non_linear_SAT_or_UNSAT_status_claim']
+          assert x['classical_rref_can_be_direct_strongest_algorithm']
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          for case in x['five_real_3x3_source_proofs']:
+              assert case['dual_Z3_cvc5_exact_linear_equivalence']['both_actual_independent_skeleton_equivalence']
+              assert all(t['independent_Z3_countermodel_SAT'] for t in case['positive_negative_geometry_controls'])
+              assert case['rank_basis_eq_count']<case['feature_variable_count_including_magic_target']
+          print('TRUE_ORIGINAL_3X3_EXACT_SKELETON',x['five_3x3_original_exact_linear_skeleton_dual_certified'],'/5')
+          PY
