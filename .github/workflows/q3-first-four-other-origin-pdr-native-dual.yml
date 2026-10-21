@@ -1,0 +1,72 @@
+name: Q3 other two source directory families frozen 4 native original 3VC
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-first-four-other-origin-pdr-native-dual.yml'
+      - 'research/evidence/q3_other_origin_four_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  other_origins_four_first_full_originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: source
+          sparse-checkout: |
+            lib/Inv_Track/from_2018
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Require immutable upstream commit and test syntax
+        run: |
+          test "$(git -C source rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_other_origin_four_20261021/frozen_four_mixed_source_pdr_dual.py
+      - name: Native Z3 and independent pinned cvc5
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Four first unopened originals source native PDR to dual independent 3VC
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_other_origin_four_20261021/frozen_four_mixed_source_pdr_dual.py --root source --freeze research/evidence/q3_other_origin_four_20261021/FROZEN_BEFORE_FIRST_OPEN.json --out /tmp/q3_other_four_first.json | tee /tmp/q3_other_four_first.log
+          sha256sum /tmp/q3_other_four_first.json
+      - name: Archive original first evidence, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-other-directory-four-first-originals-native-dual
+          path: |
+            /tmp/q3_other_four_first.json
+            /tmp/q3_other_four_first.log
+          if-no-files-found: warn
+      - name: Strict first-real-source accounting and no fabricated global Q3
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3_other_four_first.json'))
+          assert r['immutable_presource_metadata_commit']=='c3878668196e92b2c16ed359716d88b3d4e8f7fe'
+          assert r['four_rows_preserved'] and len(r['results'])==4
+          assert r['global_Q3']==r['global_Q4']=='OPEN'
+          for case in r['results']:
+              if case['source_independent_original_3VC']:
+                  assert case['original_published_Post_PDR']=='unsat'
+                  assert any(x['complete_original_3VC_independently_dual_proven'] for x in case['original_PDR_extracted_candidate_dual_receipts'])
+          print('UNOPENED_DIRECTORY_DISJOINT_REAL_SOURCE_DUAL_3VC',
+                r['number_of_real_source_full_published_safety_dual_3VC'],'/4')
+          PY
