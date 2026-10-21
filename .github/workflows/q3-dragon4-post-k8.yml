@@ -1,0 +1,68 @@
+name: Q3 DRAGON4 original published Post k8 dual attempts
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-dragon4-post-k8.yml'
+      - 'research/evidence/q3_affine_unopened_transfer_20261021/dragon4_original_post_k8.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact_original_dragon4_k8:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/andrew_lustre
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Native unchanged original hash, source syntax
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_affine_unopened_transfer_20261021/dragon4_original_post_k8.py
+      - name: Install independent pin cvc5 and Z3
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Source-faithful DRAGON4 k4..k8 original safety or abstain
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_affine_unopened_transfer_20261021/dragon4_original_post_k8.py --root original --freeze research/evidence/q3_affine_unopened_transfer_20261021/ORIGINAL_FOUR_PRESOURCE_FREEZE.json --out /tmp/q3_dragon4_k8.json | tee /tmp/q3_dragon4_k8.log
+          sha256sum /tmp/q3_dragon4_k8.json
+      - name: Always record all scientific failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-dragon4-original-k8-remaining-proof
+          path: |
+            /tmp/q3_dragon4_k8.json
+            /tmp/q3_dragon4_k8.log
+          if-no-files-found: warn
+      - name: No false promotion
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3_dragon4_k8.json'))
+          assert r['global_Q3']=='OPEN'
+          assert r['original']['source'].endswith('/DRAGON_4.lus.sl')
+          if r['real_published_Post_safety_proved']:
+              assert r['original']['first_full_success_k'] in range(1,9)
+              assert any(t['status']=='ORIGINAL_PUBLISHED_POST_K_INDUCTIVE_DUAL_PROVED' for t in r['original']['proof_trials'])
+          print('DRAGON4_FULL_ORIGINAL_VERDICT',r['real_published_Post_safety_proved'])
+          PY
