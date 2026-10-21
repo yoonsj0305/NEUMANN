@@ -1,0 +1,89 @@
+name: Q3 true original12 automatic Houdini plus cvc5 SPACER complete hybrid
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_true_original12_houdini_hybrid.yml'
+      - 'research/evidence/q3_complete_houdini_portfolio_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  classical_source_agnostic_automatic_true12_safe_inductive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify actual original source and prereg no case-specific 12 program names
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_complete_houdini_portfolio_20261021/full_original12_same_source_hybrid_vs_strong_classical.py
+          python - <<'PY'
+          import json
+          a=json.load(open("research/evidence/q3_complete_houdini_portfolio_20261021/PRE_HYBRID_POSTHOC_NO_SOURCE_CUSTOM_BRANCH.json"))
+          assert a["schema"]=="neumann.q3.posthoc_original12_generic_Houdini_syguS_spacer_complete_hybrid_v1"
+          assert a["source_body_already_opened_and_prior_success_locations_known"]
+          assert a["source_specific_invariants_forbidden"] and a["trained_model_forbidden"]
+          assert a["global_Q3"]==a["global_Q4"]==a["global_Q6"]=="OPEN"
+          PY
+      - name: Install independently original-source Z3 and checksum-pinned cvc5
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Full untouched 12 original sources generic Houdini then SyGuS SPACER, compared with two static original strong reference strategies
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python research/evidence/q3_complete_houdini_portfolio_20261021/full_original12_same_source_hybrid_vs_strong_classical.py \
+            --root original \
+            --freeze research/evidence/q4q6_fresh12_cpu_router_20261021/FIRST_FRESH_12_SOURCE_SHA_FREEZE_BEFORE_BODY.json \
+            --contract research/evidence/q3_complete_houdini_portfolio_20261021/PRE_HYBRID_POSTHOC_NO_SOURCE_CUSTOM_BRANCH.json \
+            --out /tmp/q3_houdini_hybrid_original12.json | tee /tmp/q3_houdini_hybrid_original12.log
+          sha256sum /tmp/q3_houdini_hybrid_original12.json
+      - name: Preserve original solver failure and original native 3VC receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-authentic-original12-classical-houdini-sygus-spacer-hybrid-complete
+          path: |
+            /tmp/q3_houdini_hybrid_original12.json
+            /tmp/q3_houdini_hybrid_original12.log
+          if-no-files-found: warn
+      - name: Require whole original native source independently proved not heuristic success
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_houdini_hybrid_original12.json'))
+          assert x["schema"]=="neumann.q3.classical_houdini_first_true_original12_dual_inductive_hybrid_v1"
+          assert x["original_source_auth_native_parity_count"]==12
+          assert len(x["originals"])==12
+          assert len({v["original_git_blob"] for v in x["originals"]})==12
+          assert x["source_agnostic_no_per_file_manual_invariant"]
+          assert x["full_original_source_verifier_authority_same_for_all"]
+          assert x["global_Q3"]==x["global_Q4"]==x["global_Q6"]=="OPEN"
+          assert x["neural_training_updates"]==x["neural_model_calls"]==0
+          for q in x["originals"]:
+              if q["all_matched_originals_full_inductive_success"]["hybrid"]:
+                  assert any(a["verifiable_result"]["certified"] for a in
+                    q["generic_Houdini_first_full_hybrid"]["all_original_source_solver_calls_including_failures"])
+          print("TRUE_AUTOMATIC_UNCHANGED_SOURCE12_DUAL_3VC_VERIFIED_COUNT",
+                x["full_original_native_independently_Z3_cvc5_hybrid_certified_count"])
+          print("NO_NEURAL_UNIQUE_Q3_OR_FULL_SYSTEM_Q4_CLAIM")
+          PY
