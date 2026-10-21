@@ -1,0 +1,53 @@
+{
+  "schema": "neumann.q6.seven_presource_hypothesis_fib32_fixed_CPU_model_no_target_fit.v1",
+  "source_upstream": "SyGuS-Org/benchmarks@13c8deb68a873635879c9a69bc78caebd340f646",
+  "metadata_only_before_selected_7_test_source_bodies": true,
+  "selection": "Seven original from_2018 fib_28, fib_30_x, fib_35, fib_37, fib_41, fib_43, fib_44; chosen from directory listing by file name to be near fib32 but not already studied originals fib25,32,33, earlier 01–21. No selected test source BODY used before this registration. Same from2018 benchmark family and likely same source origin, not independent research authors.",
+  "test_case_git_blobs": [
+    {
+      "path": "lib/Inv_Track/from_2018/fib_28.sl",
+      "git_blob": "1959b265175cf50e98adf61ecca327e721762642",
+      "bytes": 517
+    },
+    {
+      "path": "lib/Inv_Track/from_2018/fib_30_x.sl",
+      "git_blob": "a0e8f5fd163da4d731851ced830437f78667f300",
+      "bytes": 498
+    },
+    {
+      "path": "lib/Inv_Track/from_2018/fib_35.sl",
+      "git_blob": "87cab02955a921cd5181c711c1b7a353afe2710e",
+      "bytes": 406
+    },
+    {
+      "path": "lib/Inv_Track/from_2018/fib_37.sl",
+      "git_blob": "e8ff3c7aedac180e9947beae15932d44525b7b4c",
+      "bytes": 584
+    },
+    {
+      "path": "lib/Inv_Track/from_2018/fib_41.sl",
+      "git_blob": "bbd46c6c4fb8024846030d62dfc0402ffc0846d2",
+      "bytes": 614
+    },
+    {
+      "path": "lib/Inv_Track/from_2018/fib_43.sl",
+      "git_blob": "39334fe8143da18cf5232cca0e5474c707facc74",
+      "bytes": 555
+    },
+    {
+      "path": "lib/Inv_Track/from_2018/fib_44.sl",
+      "git_blob": "b7d50710a133cc0205c896bb4af6ee551a134320",
+      "bytes": 599
+    }
+  ],
+  "frozen_training_original": "lib/Inv_Track/from_2018/fib_32.sl@4fb129488bee3e1e0cdae899b318d6503ae23c12",
+  "training_model": "Exactly PR376 sklearn DecisionTreeRegressor max_depth=3 random_state=20261021 trained once only on pre/trans real Z3 reachable trace k1..5 and both initial b, from original fib32, with features parity n%2 and b, target offset i-j; fixed original source envelope; NEVER fit on any of seven new source bodies and never copy gold labels.",
+  "generalization_interface": "The typed invariant grammar and learned case lookup currently assume EXACT formal source variable schema (k,b,i,j,n) five Ints. After reading each new source only determine whether native original parser supports it AND its state names match the FROZEN interface. If mismatch, ABSTAIN_TYPING; NOT a learned prediction error or original program status. Do NOT adapt per-test role mapping or retune feature grammar after reading.",
+  "verified_when_compatible": "Apply exact frozen four-case learned numeric rule and developer supplied conservative envelope to actual UNCHANGED new original pre/trans/post, verified inductive 3VC independently Z3+cvc5; only true original source dual-certified 3VC counts. Compare same original with zero-trained deterministic four-case lookup formula and generic cvc5 SyGuS/PDR.",
+  "scientific_scope": "A prospective SOURCE-BODY blind fixed already trained model transfer attempt, not a new learned-model training and not unknown source author. Failure 0/7 or ABSTAIN is scientifically useful. No Q6 generalization unless actual new source pretranspost 3VC passes on at least one different original; Q3 learned uniqueness still requires beating same-rights expert, unlikely since same 4-case lookup can copy.",
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q5": "OPEN",
+  "global_Q6": "OPEN",
+  "global_Q7": "OPEN"
+}

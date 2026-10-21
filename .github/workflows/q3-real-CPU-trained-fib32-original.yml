@@ -91,3 +91,42 @@ jobs:
           print('ACTUAL_NO_LEARN_SAME_TRACE_TABLE_CAN_MATCH_SUCCESS_UNIQUE_GAP_ZERO')
           print('EXACT_ORIGINAL_SAME_TYPED_INVARIANT_SHA_LEARNED_VS_CLASSICAL',q['learned_vs_zero_train_actual_typed_invariant_identical_SHA256'])
           PY
+      - name: Frozen 7 new original source transfer protocol and first source bodies exact SHA
+        run: |
+          set -o pipefail
+          python -m py_compile research/evidence/q6_cpu_transfer7_20261021/first_unopened_seven_original_fib_source_fixed_model_transfer.py
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q6_cpu_transfer7_20261021/first_unopened_seven_original_fib_source_fixed_model_transfer.py --root original --freeze research/evidence/q6_cpu_transfer7_20261021/BEFORE_OPEN_SEVEN_NEW_ORIGINAL_FIB_CPU_MODEL_LOCK.json --source24 research/evidence/q3_code2inv_presource24_20261021/BEFORE_ANY_ORIGINAL_SOURCE_BODY_OPEN_24_GIT_BLOBS.json --out /tmp/q6_frozen_learned_cpu_model_seven_true_originals.json | tee /tmp/q6_frozen_learned_cpu_model_seven_true_originals.log
+          sha256sum /tmp/q6_frozen_learned_cpu_model_seven_true_originals.json
+      - name: Preserve all seven source-first transfer attempts including type mismatch and strong Direct
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q6-seven-new-original-source-first-transfer-on-known-good-CPU-workflow
+          path: |
+            /tmp/q6_frozen_learned_cpu_model_seven_true_originals.json
+            /tmp/q6_frozen_learned_cpu_model_seven_true_originals.log
+          if-no-files-found: warn
+      - name: Exact Q6 first source blinded seven original receipts no neural retuning
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/q6_frozen_learned_cpu_model_seven_true_originals.json'))
+          assert q['source_body_unopened_at_seven_git_blob_freeze_commit']=='aed388ba7e00a31049d2f0612dfc4d7af22e7d71'
+          assert q['all_7_source_file_rows_preserved']
+          assert q['actual_new_original_source_sha_authenticated_count']==7
+          assert q['target_original_model_training_updates']==0
+          assert q['frozen_trained_model_equals_0train_trace_lookup']
+          assert q['global_Q3']==q['global_Q4']==q['global_Q6']=='OPEN'
+          for r in q['new_originals']:
+              assert r['original_source_SHA_authenticated']
+              assert r['no_retraining_on_target']
+              if r['actual_original_learned_3VC']:
+                  assert r['native_model_frozen_interface_compatible']
+                  assert r['learned_fixed_other_source_actual_native_3VC']['actual_original_3VC_dual_success']
+                  assert r['same_authority_zero_train_lookup_actual_native_3VC']['actual_original_3VC_dual_success']
+          print('Q6_SEVEN_AUTHENTIC',q['actual_new_original_source_sha_authenticated_count'])
+          print('Q6_FIXED_MODEL_INTERFACE_MATCHES',q['original_new_source_programs_with_fixed_supported_interface'])
+          print('Q6_FIXED_LEARNED_CPU_NATIVE_PROOF_NEW_ORIGINALS',q['q6_true_sealed_source_body_program_transfer_dual_count'])
+          print('Q6_STRONG_CLASSICAL_SAME_ORIGINAL_PROGRAM_SAFE',q['new_original_source_matched_classical_original_safety_proofs'])
+          PY
