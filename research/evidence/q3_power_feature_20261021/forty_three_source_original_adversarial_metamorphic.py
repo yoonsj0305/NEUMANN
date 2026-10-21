@@ -19,9 +19,12 @@ from research.evidence.q3_power_feature_20261021.first_ten_unchanged_power_magic
 
 def powterm(x,k):
     if k==1:return x
-    result=x
-    for i in range(1,k):result=result*x
-    return result
+    # Match authentic SMT-LIB n-ary (* x x ... x) nodes. The first
+    # synthetic test failed at k=3 because chained Python multiplication
+    # produced a nested AST (* (* x x) x), which is mathematically equal
+    # but a different representation from the frozen REAL source syntax.
+    # Do not alter first original benchmark evidence or retune equations.
+    return z3.Product(*([x]*k))
 
 def run_case(label,assertions,expected_unsat,assignment=None):
     a=z3.Solver()
