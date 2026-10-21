@@ -1,0 +1,88 @@
+name: Q3 OOD first body blind new Code2Inv family 12 original full learned PCA 3VC
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_cross_family_xujie12_firstblind_20261021.yml'
+      - 'research/evidence/q3_ood_xujie12_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  unchanged_learned_source_structure_externally_new_original_family:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Assert source metadata-only prereg and unchanged fit method before new original body
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_ood_xujie12_20261021/frozen_PCA_learned_full_proof_cross_family.py
+          python - <<'PY'
+          import json
+          x=json.load(open("research/evidence/q3_ood_xujie12_20261021/PREBODY_GITSHA_UNSEEN_CROSS_FAMILY_XUJIE12.json"))
+          assert x["schema"]=="neumann.q3.20261021.unseen_cross_family_xujie_code2inv_12_original_SHA_metadata_only.v1"
+          assert x["source_bodies_opened_BEFORE_this_SHA_commit"] is False
+          assert len(x["cases"])==12 and len({v["git_blob"] for v in x["cases"]})==12
+          assert x["global_Q3"]==x["global_Q4"]==x["global_Q6"]=="OPEN"
+          print("CROSS_FAMILY_XUJIE12_FIRST_SOURCE_BODY_SHA_REGISTERED")
+          PY
+      - name: Install independent source proof verifiers and existing actual sklearn PCA fit
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: FIRST xujie original 12 bodies execute UNCHANGED prior trained full proof and exact control
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_ood_xujie12_20261021/frozen_PCA_learned_full_proof_cross_family.py \
+            --root original \
+            --freeze research/evidence/q3_ood_xujie12_20261021/PREBODY_GITSHA_UNSEEN_CROSS_FAMILY_XUJIE12.json \
+            --out /tmp/q3_first_xujie12_cross_family_trained_original.json | tee /tmp/q3_first_xujie12_cross_family_trained_original.log
+          sha256sum /tmp/q3_first_xujie12_cross_family_trained_original.json
+      - name: Preserve ALL originally unseen source cases including unsupported
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-xujie12-first-untouched-family-actual-trained-native-full3vc
+          path: |
+            /tmp/q3_first_xujie12_cross_family_trained_original.json
+            /tmp/q3_first_xujie12_cross_family_trained_original.log
+          if-no-files-found: warn
+      - name: No solver success without full independently verified original three VCs
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open("/tmp/q3_first_xujie12_cross_family_trained_original.json"))
+          assert q["schema"]=="neumann.q3.xujie_12_never_opened_OOD_full_original_trained_PCA_3VC.v1"
+          assert q["sha_lock_before_first_body_git_commit"]=="fffa79f076f8862beb14cbff5bbb7a15619222ce"
+          assert len(q["per_original_case_with_failures"])==12
+          assert q["new_distinct_source_originals"]==12
+          assert len({r["true_original_git_blob"] for r in q["per_original_case_with_failures"]})==12
+          assert q["existing_frozen_model_unmodified_on_new_family"]
+          assert q["global_Q3"]==q["global_Q4"]==q["global_Q6"]=="OPEN"
+          for row in q["per_original_case_with_failures"]:
+              for field in ("TRAINED_PCA_plus_original_POST","simple_NOLEARN_plus_original_POST",
+                            "EXACT_CLASSICAL_plus_original_POST","POST_only_already_exact_original_dual"):
+                  p=row.get(field)
+                  if p and p["fully_verified_complete_original_3VC"]:
+                      assert all(x["dual_pass"] for x in p["independent_original_pre_trans_post_dual_proofs"].values())
+          print("CROSS_FAMILY_FIRST_UNSEEN_AUTHENTIC_SOURCE_RESULT_FROZEN")
+          PY
