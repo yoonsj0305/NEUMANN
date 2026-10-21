@@ -8,6 +8,7 @@ No source-specific manual invariant, original bodies already opened PR412.
 from __future__ import annotations
 import argparse,json,time
 from pathlib import Path
+import numpy as np
 import z3
 import numpy as np
 from research.evidence.q3_original12_state_information_profile_20261021.dual_verified_minimum_feature_distribution import once as select
