@@ -51,7 +51,19 @@ def evaluate_source(root,entry):
             return rec
         reach=z3.Function("fresh_source_reach",*[v.sort() for v in source_orig["now"]],z3.BoolSort())
         bad=z3.Function("fresh_source_bad",z3.BoolSort())
-        all_vars=z3.z3util.get_vars(z3.And(source_orig["pre"],source_orig["trans"],source_orig["post"]))
+        # Declare EVERY relation-head state variable, including genuinely unconstrained
+        # next-state variables absent from the body. Missing these is a CHC
+        # front-end error, not a failure of original program safety.
+        used=z3.z3util.get_vars(z3.And(source_orig["pre"],source_orig["trans"],source_orig["post"]))
+        names={str(x) for x in used}
+        all_vars=list(used)
+        for x in source_orig["now"]+source_orig["next"]:
+            if str(x) not in names:
+                all_vars.append(x)
+                names.add(str(x))
+        rec["all_original_CHC_rule_head_variables_declared"]=all(
+            str(v) in names for v in source_orig["now"]+source_orig["next"])
+        rec["unconstrained_head_variables_registered"]=len(all_vars)-len(used)
         fp=z3.Fixedpoint()
         fp.set(engine="spacer",timeout=PDR_TIMEOUT_MS)
         fp.register_relation(reach,bad)
