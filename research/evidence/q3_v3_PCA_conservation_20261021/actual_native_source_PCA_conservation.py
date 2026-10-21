@@ -22,7 +22,7 @@ from research.evidence.q3_trained_affine_from_native_samples_20261021.actual_sel
 from research.evidence.q4_prospective_six_20261021.first_six_classical_cheapest_safe_portfolio import prepare
 PATHS=[
  ("lib/Inv_Track/from_2018/fib_21.sl","836f4cbecd25fbd37fddd3a2c3c936a8ac230293"),
- ("lib/Inv_Track/from_2018/jmbl_hola.41.sl","19e13372aa064e62b539bb6c8fbf13e1d45ccc3")
+ ("lib/Inv_Track/from_2018/jmbl_hola.41.sl","19e13372aa064e62b539bb6c8fbf13e1d45ccc3c")
 ]
 MAX_ARITY=4
 MAX_DATA_MAGNITUDE=100000000
