@@ -1,0 +1,92 @@
+name: Q3 first unseen twelve ORIGINAL PCA trained conservation 2VC
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_v31_first12_true_original_pca_20261021.yml'
+      - 'research/evidence/q3_v31_fresh12_original_conservation_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first_blind_12_actual_learned_source_conservation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Preregister first-source blinded 12 original metadata and unchanged real trained model
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_v31_fresh12_original_conservation_20261021/first12_original_trained_conservation_2vc.py
+          python - <<'PY'
+          import json
+          q=json.load(open('research/evidence/q3_v31_fresh12_original_conservation_20261021/BEFORE_NEW12_ACTUAL_ORIGINAL_SOURCE_GITSHA.json'))
+          assert q['schema']=='neumann.q3.v31_twelve_new_source_body_unopened_actual_PCA_inductive_conservation.v1'
+          assert q['source_body_NOT_OPENED_before_original_Git_SHA_registration']
+          assert len(q['cases'])==12
+          assert len({x['git_blob'] for x in q['cases']})==12
+          assert q['global_Q3']==q['global_Q4']==q['global_Q6']=='OPEN'
+          print('REAL_FIRST_UNOPENED_SOURCE12_SHA_FROZEN_BEFORE_ANY_SOURCE_CONTENT')
+          PY
+      - name: Install actually fitted CPU PCA, exact rational classical comparator, independent pinned Z3+cvc5
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: FIRST untouched original source bodies train and prove invariant laws unchanged fixed architecture
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_v31_fresh12_original_conservation_20261021/first12_original_trained_conservation_2vc.py \
+            --root original \
+            --freeze research/evidence/q3_v31_fresh12_original_conservation_20261021/BEFORE_NEW12_ACTUAL_ORIGINAL_SOURCE_GITSHA.json \
+            --out /tmp/neumann_PCA_first12_source_original_2VC.json | tee /tmp/neumann_PCA_first12_source_original_2VC.log
+          sha256sum /tmp/neumann_PCA_first12_source_original_2VC.json
+      - name: Publish actual first source post-open SHA and all attempted independent proofs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-first12-genuine-original-source-trained-PCA-conservation-2VC
+          path: |
+            /tmp/neumann_PCA_first12_source_original_2VC.json
+            /tmp/neumann_PCA_first12_source_original_2VC.log
+          if-no-files-found: warn
+      - name: Fail closed all made up first source trained source original valid proofs
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/neumann_PCA_first12_source_original_2VC.json'))
+          assert q['schema']=='neumann.q3.first_unopened12_true_originals_actually_fitted_PCA_inductive_2VC.v1'
+          assert q['new_source_originals_SHA_verified']==12 and len(q['originals'])==12
+          assert len({r['true_source_git_blob'] for r in q['originals']})==12
+          assert q['true_original_Git_SHA_before_source_body_commit']=='9133aa8909d051c9a1b33964d674877b049c4662'
+          assert q['SOURCE_FIRST_true_originals_and_bounded_generalization_only']
+          assert q['same_data_exact_classical_comparator_has_equal_authority']
+          assert q['no_full_original_postcondition_3VC_claim']
+          assert q['global_Q3']==q['global_Q4']==q['global_Q6']=='OPEN'
+          for r in q['originals']:
+              for candidate in r.get('learned_PCA_original_conservation_candidates_and_proofs',[]):
+                  p=candidate['original_source_independent_math']
+                  if p['universally_valid_original_inductive_nontrivial_2VC']:
+                      assert all(p[k]['dual_pass'] for k in (
+                          'native_Pre_implies_invariant_Z3_cvc5',
+                          'native_inductive_Trans_Z3_cvc5',
+                          'native_nontriviality_Z3_cvc5'))
+          print('FIRST_TRUE_ORIGINAL_SOURCE_BLIND_ACTUAL_TRAINED_RELATIONS_PROVEN')
+          PY
