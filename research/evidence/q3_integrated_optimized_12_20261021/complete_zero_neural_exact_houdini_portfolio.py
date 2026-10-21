@@ -6,9 +6,9 @@ independently certified complete source safety while charging all relevant
 model-free work? Fail closed for unsupported, unsafe and solver unknown.
 
 Priority: (0) Post tautology -> I=True dual Z3+cvc5 3VC;
-(1) exactly certified minimal source-state projection then bounded no-fit OR;
-(2) source-generic classical affine Houdini conjunction; (3) native original
-cvc5 SyGuS; (4) native Z3 SPACER/PDR.
+(1) source-generic affine Houdini conjunction before costly classical solvers;
+(2) exactly certified minimal source-state projection then bounded no-fit OR;
+(3) native original cvc5 SyGuS; (4) native Z3 SPACER/PDR.
 NO FITTED MODEL CALLS; this is strongest honest classical comparator, not Q3 ML.
 The minimum feature calculation establishes 0/1-step information necessity,
 not inductive global-safety sufficiency.
@@ -58,6 +58,27 @@ def case(root,item):
             out["winner"]="tautology_delete"
             out["certified_SAFE"]=True
             return out
+        # Known source-generic CLASSICAL Houdini affine conjunction route.
+        # Authentically inductive original candidate is NOT trusted without
+        # a separate full native source Z3+cvc5 Init/Trans/Goal verification.
+        t=time.perf_counter_ns()
+        try:
+            invariant,hinfo=houdini(src,native)
+            out["source_generic_affine_Houdini_search"]=hinfo
+            if invariant is not None:
+                complete,checks=verified_3vc(src,native,invariant)
+                out["original_dual_3VC_Houdini_conjunction"]=checks
+                out["Houdini_final_typed_original_AST"]=invariant.sexpr()
+                if complete:
+                    out["status"]="PASS_ORIGINAL_FULL_3VC_GENERIC_HOUDINI"
+                    out["certified_SAFE"]=True
+                    out["winner"]="generic_affine_Houdini"
+        except Exception as e:
+            out["source_generic_Houdini_error"]=type(e).__name__+":"+str(e)[:320]
+        finally:
+            out["routes"].append({"route":"source_generic_affine_Houdini",
+                                  "wall_ms":ms(t),"certified":out["certified_SAFE"]})
+        if out["certified_SAFE"]:return out
         t=time.perf_counter_ns()
         information=min_information(root,item)
         out["minimum_source_information_original_dual_evidence"]=information
@@ -102,27 +123,6 @@ def case(root,item):
                                           "wall_ms":ms(t),
                                           "certified":out["certified_SAFE"]})
                 if out["certified_SAFE"]:return out
-        # Known source-generic CLASSICAL Houdini affine conjunction route.
-        # Authentically inductive original candidate is NOT trusted without
-        # a separate full native source Z3+cvc5 Init/Trans/Goal verification.
-        t=time.perf_counter_ns()
-        try:
-            invariant,hinfo=houdini(src,native)
-            out["source_generic_affine_Houdini_search"]=hinfo
-            if invariant is not None:
-                complete,checks=verified_3vc(src,native,invariant)
-                out["original_dual_3VC_Houdini_conjunction"]=checks
-                out["Houdini_final_typed_original_AST"]=invariant.sexpr()
-                if complete:
-                    out["status"]="PASS_ORIGINAL_FULL_3VC_GENERIC_HOUDINI"
-                    out["certified_SAFE"]=True
-                    out["winner"]="generic_affine_Houdini"
-        except Exception as e:
-            out["source_generic_Houdini_error"]=type(e).__name__+":"+str(e)[:320]
-        finally:
-            out["routes"].append({"route":"source_generic_affine_Houdini",
-                                  "wall_ms":ms(t),"certified":out["certified_SAFE"]})
-        if out["certified_SAFE"]:return out
         # Separate independently verified complete unchanged original source route.
         t=time.perf_counter_ns()
         sygus=original_syguS(raw,src,native,2.0)
