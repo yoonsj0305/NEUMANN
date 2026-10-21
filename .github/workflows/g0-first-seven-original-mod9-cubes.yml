@@ -1,0 +1,88 @@
+name: G0 independent original SMT2 SAT via modular cubes first 7 frozen contest hard tasks
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/g0-first-seven-original-mod9-cubes.yml'
+      - 'research/evidence/g0_cubic_mod9_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  seven_original_future_blind_transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/QF_NIA/20220315-MathProblems
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Original Git pin source-frozen future cohort and script syntax
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/g0_cubic_mod9_20261021/first_seven_frozen_originals_exact_mod9_cubes.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/g0_cubic_mod9_20261021/NEW_SEVEN_PRE_SOURCE_TRANSFER_FREEZE.json'))
+          assert len(x['first_transfer_cohort'])==7 and x['new_seven_source_content_unopened_before_this_freeze']
+          assert x['registered_algorithm']['integer_domain'].startswith('fixed symmetric [-10000,10000]')
+          assert x['development_original_STC_0228']['status'].startswith('OPENED_DEVELOPMENT_ONLY')
+          print('SEVEN_NEW_ORIGINALS_FROZEN_BEFORE_ANY_CONTENT_READ')
+          PY
+      - name: Install exact source SMT2 dual original solvers and NumPy
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+          lscpu | grep 'Model name' | head -1
+      - name: FIRST 7 real original exact SAT witnesses with raw SMT2 Z3+cvc5
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/g0_cubic_mod9_20261021/first_seven_frozen_originals_exact_mod9_cubes.py --root original --freeze research/evidence/g0_cubic_mod9_20261021/NEW_SEVEN_PRE_SOURCE_TRANSFER_FREEZE.json --out /tmp/g0_cubes_seven_first.json | tee /tmp/g0_cubes_seven_first.log
+          sha256sum /tmp/g0_cubes_seven_first.json
+      - name: Archive immutable ORIGINAL witnesses and unknown first transfer results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g0-contest-original-mod9-seven-first-verified-sat
+          path: |
+            /tmp/g0_cubes_seven_first.json
+            /tmp/g0_cubes_seven_first.log
+          if-no-files-found: warn
+      - name: Strict genuine original model dual proof and negative check
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/g0_cubes_seven_first.json'))
+          assert x['seven_before_source_read_frozen_commit']=='8ee9fbf8588ae0dd3cea67c121d4fde02699426c'
+          assert x['all_seven_FIRST_outcome_rows_kept'] and len(x['first_transfer_rows'])==7
+          assert x['first_seven_source_SHA_authenticated']==7
+          assert x['first_seven_source_source_form_compiles']==7
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          assert x['opened_posthoc_development_original_STC_0228']['dual_valid_original_source']
+          assert x['opened_posthoc_development_original_STC_0228']['negative_control_PASS']
+          for r in x['first_transfer_rows']:
+              if r['certified_original_SAT']:
+                  assert r['independent_original_verifier_dual']
+                  assert r['authentic_original_dual_Z3_cvc5_model_certificate']['independent_dual_result']
+                  assert r['reframed_exact_bounded_numeric_search']['numeric_witness_exact_equality']
+          print('ORIGINAL_DEVELOPMENT_STC0228_SOURCE_DUAL_AND_NEGATIVE_PASS')
+          print('FROZEN_FIRST_FUTURE_REAL_ORIGINAL_SAT_CERTIFIED',
+                x['first_seven_new_originals_SAT_with_Z3_cvc5_true_source'],'/7')
+          print('NOT_FOUND_IS_UNKNOWN_NOT_UNSAT',
+                x['first_seven_not_found_or_unverified'])
+          PY
