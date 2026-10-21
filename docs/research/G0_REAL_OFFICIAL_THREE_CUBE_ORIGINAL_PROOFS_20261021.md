@@ -40,3 +40,18 @@ The numeric algorithm searches the **bounded range −10,000..10,000** via sorte
 - Two SAT proofs are prospective transfer of one unchanged source-schema and fixed algorithm to first unseen source bytes. Five other genuine first targets remain UNKNOWN.
 - No learned weights, neural forwards, model-generated structures, oracle witness labels, or external literature SAT triples at inference. Published outside specialist methods can overlap; no claim of new algorithm, unique NEUMANN superiority, or frontier-level problem solving.
 - A next legitimate gate is matched current strong generic Z3/cvc5 **and specialized modular-cube search** with full cost against fresh unseen original families. The current result establishes a bounded classical source-specific Q3-B mechanism and genuine source-certified SAT answers, but **GLOBAL Q3, Q4, Q5, Q6, Q7 remain OPEN**.
+
+## After-first matched CPU direct bounded evidence across ALL seven
+
+A separate posthoc test was run on **all seven first-frozen transfer originals**, not only on the two solved successes: [Actions #39532298808](https://github.com/yoonsj0305/NEUMANN/actions/runs/39532298808); raw artifact SHA256 `b3440563fd7ada611c2f200596d0c2f81414652251351eeb63f935ff0bf7696d`.
+
+- Source Git SHA/bytes verified: **7/7**.
+- Current Z3 4.13.3.0 direct on raw unchanged original SMT2: **UNKNOWN for 7/7** after its per-source 15-second bound.
+- Independently pinned cvc5 1.4.2 direct on raw unchanged original SMT2: **UNKNOWN for 7/7** after its per-source 15-second bound.
+- Zero original task proof certificates from these two generic bounded Direct methods: **0/7**. This is strictly 15-second current-GitHub-runner evidence, not UNSAT, nor an exhaustive union of all best solver/number-theory methods.
+- The preregistered fixed mod-9 + numeric sorted two-sum proposer produced **two independently verified original SAT proofs out of seven new original sources**, retaining FIVE original UNKNOWN at fixed radius 10,000.
+- Thus the bounded algorithm has an authentic **2/7 versus 0/7 capability improvement over these two generic direct executors**, though both systems have unmatched capability and no same-capability 10× runtime quotient exists. Stronger specialized *sum-of-three-cubes* algorithms can use the same representation, so unique NEUMANN superiority over the strongest specialist Direct is **NOT ESTABLISHED**.
+- On opened development `STC_0228`, independently verified source SAT proof required roughly 0.53 seconds of full recorded proof-path wall on the same runner; both generic direct methods returned UNKNOWN at 15 seconds each in [Actions #39530350142](https://github.com/yoonsj0305/NEUMANN/actions/runs/39530350142). Again this is a censored bounded capability comparison, not a measured pure 28× or 57× execution time ratio.
+- No neural model was fitted or called. This provides a bounded **non-oracle, non-neural structural original-task discovery and verification mechanism** relevant to current Q3-B, but NOT a proof of learned-unique Q3-A, general Q3/Q4, matching frontier capability or full architecture economics.
+
+**Research decision:** HOLD additional brute-force radius increases and additional same-family three-cubes sweeps unless a new structural representation, a credible stronger specialist baseline or a genuinely different hard original family is available. Changing K after seeing first unknown results would be posthoc development, NOT a second unseen transfer. The next high-value experiment must beat same-authority specialist Direct or show learned structural discovery on true residual hard tasks.
