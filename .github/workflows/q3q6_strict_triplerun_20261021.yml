@@ -1,0 +1,62 @@
+name: Q3Q6 strict triple-original source authority audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3q6_strict_triplerun_20261021.yml'
+      - 'research/evidence/q3q6_joint_cross_ci_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit_three_immutable_official_proof_runs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run falsification controls, not fake research evidence
+        run: python -m unittest -v research.evidence.q3q6_joint_cross_ci_20261021.test_verify_joint_gate
+      - name: Historical Q3 original proof auditor output
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39569042369
+          github-token: ${{ github.token }}
+          name: q3-true-18-original-source-cross-four-run-audit
+          path: /tmp/joint/q3
+      - name: Q6 eight genuine original posthoc proofs
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39573707830
+          github-token: ${{ github.token }}
+          name: q6-eight-real-source-semantic-alpha-native-72-double-proofs
+          path: /tmp/joint/eight
+      - name: Q6 twelve first source-body-unopened transfer proofs
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39574325055
+          github-token: ${{ github.token }}
+          name: q6-first12-real-original-source-general-alpha-transfer
+          path: /tmp/joint/twelve
+      - name: Verify exact three immutable JSON SHA256 and nested independent results
+        run: |
+          set -o pipefail
+          python research/evidence/q3q6_joint_cross_ci_20261021/verify_joint_gate.py \
+            --q3 /tmp/joint/q3/q3_official_18_source_evidence_audit.json \
+            --eight /tmp/joint/eight/q6_source_eight_original_alpha_semantics.json \
+            --twelve /tmp/joint/twelve/q6_first12_original_dynamic_alpha.json \
+            --out /tmp/joint/q3q6_reaudited.json | tee /tmp/joint/audit.log
+          sha256sum /tmp/joint/q3q6_reaudited.json
+      - name: Publish exact per-source trust-boundary counts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3q6-three-official-runs-strict-nested-evidence-audit
+          path: |
+            /tmp/joint/q3q6_reaudited.json
+            /tmp/joint/audit.log
+          if-no-files-found: warn
