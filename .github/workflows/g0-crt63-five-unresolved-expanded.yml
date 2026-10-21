@@ -1,0 +1,88 @@
+name: G0 posthoc original SMT-COMP residual five CRT63 exact radius 50k
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/g0-crt63-five-unresolved-expanded.yml'
+      - 'research/evidence/g0_cubic_crt63_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mathematical_crt63_true_original_qfnia:
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/QF_NIA/20220315-MathProblems
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate source revision, historical original files, fixed posthoc radius
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/g0_cubic_crt63_20261021/real_official_five_unknown_crt63_r50000.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/g0_cubic_crt63_20261021/POSTHOC_CRT63_R50000_PRE_EXECUTION_CONTRACT.json'))
+          assert x['preregistered_new_radius']==50000
+          assert len(x['candidates_exactly_five_previous_mod9_radius10000_UNKNOWN'])==5
+          assert len(x['positive_controls'])==3
+          assert x['scientific_split'].startswith('POSTHOC')
+          print('FROZEN_POSTHOC_RADIUS_50000_AND_MATH_CRT63')
+          PY
+      - name: Install exact source dual original SMT-LIB solvers and NumPy
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+          lscpu | grep 'Model name' | head -1
+      - name: Original source five unknowns exact modular CRT63 full numeric search and independently true SAT
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/g0_cubic_crt63_20261021/real_official_five_unknown_crt63_r50000.py --root original --freeze research/evidence/g0_cubic_mod9_20261021/NEW_SEVEN_PRE_SOURCE_TRANSFER_FREEZE.json --contract research/evidence/g0_cubic_crt63_20261021/POSTHOC_CRT63_R50000_PRE_EXECUTION_CONTRACT.json --out /tmp/g0_crt63_real_original_r50k.json | tee /tmp/g0_crt63_real_original_r50k.log
+          sha256sum /tmp/g0_crt63_real_original_r50k.json
+      - name: Preserve all first expanded-radius posthoc SAT or UNKNOWN outcomes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g0-official-original-crt63-50k-five-posthoc
+          path: |
+            /tmp/g0_crt63_real_original_r50k.json
+            /tmp/g0_crt63_real_original_r50k.log
+          if-no-files-found: warn
+      - name: Protect genuine first-blind distinction and original source proof
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/g0_crt63_real_original_r50k.json'))
+          assert x['pre_run_protocol_git_commit']=='bfb94b7733fb1ee4b9166d1db04ac975f9e42979'
+          assert len(x['previous_true_SAT_positive_controls'])==3
+          assert x['three_source_SAT_positive_controls_dual']==3
+          assert len(x['previously_unknown_five_originals'])==5
+          assert x['five_previous_unknown_rows_retained']
+          assert x['mod63_filter_lossless_over_all_integer_residue_classes']
+          assert x['full_original_integer_UNSAT_from_numeric_miss_never_claimed']
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          for row in x['previously_unknown_five_originals']:
+              if row['original_source_sat_verified_Z3_cvc5']:
+                  assert row['genuine_original_smt2_Z3_cvc5_independent_SAT']['independent_dual_result']
+                  assert row['CRT63_bounded_numeric_search']['exact_witness_arithmetic_confirmed']
+              else:
+                  assert row['unbounded_original_sat_if_numeric_miss']=='UNKNOWN'
+          print('THREE_PREVIOUS_ORIGINAL_SOURCE_SAT_POSITIVES',x['three_source_SAT_positive_controls_dual'])
+          print('FIVE_POSTHOC_HARD_ORIGINAL_SAT_ADDITIONS',x['newly_source_SAT_proven_previous_unknown'])
+          PY
