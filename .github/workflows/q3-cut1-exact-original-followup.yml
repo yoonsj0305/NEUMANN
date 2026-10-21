@@ -1,0 +1,85 @@
+name: Q3 exact original circle1 corrected provenance first numeric certificate
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-cut1-exact-original-followup.yml'
+      - 'research/evidence/q3_cut1_exact_sat_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_circle1_full_exact_rational_check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/NRA/20220222-cut-three-circles
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Independently pin 39 unchanged source-native original constraints
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/q3_cut1_exact_sat_20261021/authentic_original_circle1_scipy_nonlinear_exact_source_witness.py
+          python - <<'PY'
+          import hashlib,json,pathlib
+          q=json.load(open('research/evidence/q3_cut1_exact_sat_20261021/POSTHOC_FROZEN_NUMERIC_THEN_EXACT_FULL_SOURCE_GATE.json'))
+          assert q['source_already_opened_in_prior_expert_screen']
+          assert q['original_file']=='non-incremental/NRA/20220222-cut-three-circles/cut-out-1.smt2'
+          b=pathlib.Path('original',q['original_file']).read_bytes()
+          git=hashlib.sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()
+          assert git==q['original_git_blob_sha'] and len(b)==q['original_bytes']
+          assert q['global_Q3']==q['global_Q4']==q['global_Q5']=='OPEN'
+          print('TRUE_FROZEN_ORIGINAL_CIRCLE1_HASH_BYTES_AND_POSTHOC_SCOPE_PASS')
+          PY
+      - name: Install two genuine independent original SMT theorem engines and SciPy
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 z3-solver==4.13.3.0
+          lscpu | grep 'Model name' | head -1
+      - name: First full actually started original bounded numerical witness and independent exact rational solver
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_cut1_exact_sat_20261021/authentic_original_circle1_scipy_nonlinear_exact_source_witness.py --root original --contract research/evidence/q3_cut1_exact_sat_20261021/POSTHOC_FROZEN_NUMERIC_THEN_EXACT_FULL_SOURCE_GATE.json --out /tmp/q3_true_circle1_original_full_source.json | tee /tmp/q3_true_circle1_original_full_source.log
+          sha256sum /tmp/q3_true_circle1_original_full_source.json
+      - name: Preserve all actual negative and positive original source receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-circle1-full-original-exact-two-solver-sat-or-honest-unknown
+          path: |
+            /tmp/q3_true_circle1_original_full_source.json
+            /tmp/q3_true_circle1_original_full_source.log
+          if-no-files-found: warn
+      - name: Admit ONLY actual full original unchanged SAT if independent Z3 and cvc5
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_true_circle1_original_full_source.json'))
+          assert x['posthoc_same_original_source_already_opened'] and not x['learned_model_training']
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          y=x.get('real_original_numeric_and_exact_evidence',{})
+          if y.get('actual_original_SAT_dual_verified'):
+              proof=y['true_original_full_source_exact_rational_witness']
+              assert proof['all_original_source_native_constraints_satisfied_with_Fraction']
+              assert proof['independent_original_full_SMT2_SAT_Z3_cvc5']['independent_real_original_full_Z3_cvc5_SAT']
+              assert y['all_39_original_true_source_assertions_preserved']
+              print('CERTIFIED_ORIGINAL_SAT_CUT1_CLASSICAL_NUMERIC_EXACT')
+          else:
+              print('TRUE_ORIGINAL_CUT1_UNRESOLVED_OR_ABSTAIN_NO_FAKE_PROOF')
+          PY
