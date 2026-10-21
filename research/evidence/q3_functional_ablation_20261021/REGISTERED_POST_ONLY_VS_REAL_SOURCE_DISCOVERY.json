@@ -1,0 +1,28 @@
+{
+  "schema": "neumann.Q3.no_oracle.structural_discovery_vs_post_only.20_real_originals.preregistered.v1",
+  "frozen_date": "2026-10-21",
+  "study_scope": "historical 20 already opened official SyGuS originals, strictly POSTHOC not unseen holdout",
+  "historical_cohorts": [
+    "research/evidence/q3_affine_unopened_transfer_20261021/ORIGINAL_FOUR_PRESOURCE_FREEZE.json",
+    "research/evidence/q3_other_origin_four_20261021/FROZEN_BEFORE_FIRST_OPEN.json",
+    "research/evidence/q4_prospective_six_20261021/FROZEN_BEFORE_FIRST_SOURCE_OPEN.json",
+    "research/evidence/q34_safety_triage_six_20261021/PRE_SOURCE_FROZEN_ORIGINALS.json"
+  ],
+  "preserve_all_20": true,
+  "question": "Can a gold-free source-conditioned general classical structural discoverer recover useful inductive invariants not obtainable by blindly using original published Post as the invariant?",
+  "admission": {
+    "identity": "Source original Git blob+byte SHA pinned; original native/typed Pre,Trans,Post semantically equivalent in both Z3 and independent cvc5; original Pre SAT and not Post SAT",
+    "naive_no_discovery": "Candidate equals EXACT native original published Post. Independently dual prove original 3VC (original Pre=>Post; Post and original Trans=>Post next; Post=>Post), using same 8sec budgets as SPACER candidate.",
+    "discovery": "Call unmodified Z3 SPACER 15 sec on original source, extract its genuine inductive safety invariant AST and independently dual prove FULL actual original Pre,Trans,Post 3VC in Z3+cvc5. No supplied invariant, hidden gold, source ID rules, model, oracle label.",
+    "unsafety": "For authentic unsafe, generic 0..3-depth source BMC with full time-indexed state grounded and Z3+cvc5 SAT proof. UNKNOWN if no certificate; no labeling based on previous study result.",
+    "no_false_new_tech": "SPACER is an EXISTING strong classical solver; a matched Direct user can invoke it as-is. Never attribute its discovery to a trained learner or unique NEUMANN algorithm. This may give a bounded Q3 nonoracle capability signal, not proof of efficiency against strongest Direct or frontier capability.",
+    "positive": "Count candidates where dual 3VC of SPACER original truly passes while naive Post-alone candidate fails; certify stronger structure was needed for this restricted naive candidate.",
+    "negative": "Original positive safe post candidate may itself be inductive; retain it and do not mark structural discovery essential there. Unsafe source must NOT be promoted SAFE.",
+    "global": "Q3/Q4/Q5/Q6/Q7 remain OPEN; no assertion of learned unique discovery, no 10x."
+  },
+  "limits": {
+    "dual_vc_timeout_seconds": 8,
+    "PDR_timeout_milliseconds": 15000,
+    "BMC_depth_max": 3
+  }
+}
