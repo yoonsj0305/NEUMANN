@@ -118,13 +118,29 @@ def main():
         raise RuntimeError("ORIGINAL_UPSTREAM_SOURCE_COMMIT_CHANGED")
     cases=[one_original(args.root,t) for t in m["targets"]]
     classes=("SAT","UNSAT","UNKNOWN")
-    hy={k:sum(r["true_original_automated_hybrid_status"]==k and r["hybrid_correctly_verified"] for r in cases) for k in classes}
+    # FIRST IMMUTABLE execution #39537541152 exposed a reporting-only bug:
+    # UNKNOWN was counted only when hybrid_correctly_verified==True, which is
+    # correctly False for UNKNOWN, so first report printed UNKNOWN:0 although
+    # all 12 individual source rows retained the true one UNKNOWN status.
+    # Preserve the first run and correct ONLY aggregate accounting.
+    hy={
+       "SAT":sum(r["hybrid_correctly_verified"] and
+                 r["true_original_automated_hybrid_status"]=="SAT" for r in cases),
+       "UNSAT":sum(r["hybrid_correctly_verified"] and
+                   r["true_original_automated_hybrid_status"]=="UNSAT" for r in cases),
+    }
+    hy["UNKNOWN"]=len(cases)-hy["SAT"]-hy["UNSAT"]
+    assert sum(hy.values())==12
     direct={k:sum(r.get("direct_union_original_result","UNKNOWN")==k for r in cases) for k in classes}
     gain=sum(r.get("source_original_hybrid_vs_direct_capability")=="HYBRID_ONLY" for r in cases)
     extra=sum(r.get("source_original_hybrid_vs_direct_capability")=="DIRECT_ONLY" for r in cases)
     report={
       "schema":"neumann.g0.first_source_sha_selected_12_true_originals_structural_vs_generic_direct.v1",
       "frozen_selected_prior_to_first_source_body_commit":FIRST_FREEZE,
+      "immutable_first_run_actions_id":39537541152,
+      "immutable_first_run_head_sha":"d83c609888af80a5a5515430264730458fa84a38",
+      "aggregation_correction_after_first_run_only":True,
+      "source_level_historical_first_results_retained":True,
       "all_12_original_true_source_rows_kept":len(cases)==12,
       "source_file_names_leak_numeric_rhs_selection_did_NOT_use_rhs":True,
       "same_original_STC_math_family_not_cross_family":True,
