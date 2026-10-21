@@ -1,0 +1,98 @@
+name: Q3 real second12 four unknown original grounded unsafe and inductive safe
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_second12_four_original_safe_unsafe.yml'
+      - 'research/evidence/q3_second12_four_posthoc_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  four_previous_true_original_unknowns_exact_dual_proofs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Read only previously frozen actual source four posthoc hypotheses
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_second12_four_posthoc_20261021/verify_two_original_grounded_unsafe_and_two_native_safe.py
+          python - <<'PY'
+          import json
+          h=json.load(open("research/evidence/q3_second12_four_posthoc_20261021/REGISTERED_ORIGINAL_FOUR_GROUNDED_SAFE_UNSAFE_HYPOTHESES.json"))
+          assert h["schema"]=="neumann.q3.second_firstsource12_four_POSTHOC_original_unknown_source_native_triage_v1"
+          assert len(h["four_unchanged_source_posthoc_hypotheses"])==4
+          assert h["all_four_original_source_bodies_PREVIOUSLY_OPENED_in_PR394"]
+          assert h["global_Q3"]==h["global_Q4"]==h["global_Q6"]=="OPEN"
+          print("FOUR_POSTHOC_PRIOR_UNRESOLVED_SOURCE_HYPOTHESES_REGISTERED")
+          PY
+      - name: Download immutable FIRST untouched source second 12 baseline prior receipts
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39582778316
+          github-token: ${{ github.token }}
+          name: q3q6-original-second12-first-unopened-fixed-houdini-classical-portfolio
+          path: /tmp/q3_second12_previous
+      - name: Install exact independent source proof authorities
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Independently original Pre Trans NOT Post SAT grounding vs complete native original SAFE 3VC
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python research/evidence/q3_second12_four_posthoc_20261021/verify_two_original_grounded_unsafe_and_two_native_safe.py \
+            --root original \
+            --freeze research/evidence/q3q6_second12_firstsource_20261021/FREEZE_BEFORE_SECOND_NEW12_ORIGINAL_SOURCE_BODY.json \
+            --hypotheses research/evidence/q3_second12_four_posthoc_20261021/REGISTERED_ORIGINAL_FOUR_GROUNDED_SAFE_UNSAFE_HYPOTHESES.json \
+            --prior /tmp/q3_second12_previous/q3q6_source_second12_first_unopened_actual_hybrid.json \
+            --out /tmp/q3_second12_four_posthoc_true_safe_unsafe_native.json | tee /tmp/q3_second12_four_posthoc_true_safe_unsafe_native.log
+          sha256sum /tmp/q3_second12_four_posthoc_true_safe_unsafe_native.json
+      - name: Preserve every true original SAFE and original full trace UNSAFE source certificate
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-second12-original-four-previous-unknown-exact-safe-unsafe
+          path: |
+            /tmp/q3_second12_four_posthoc_true_safe_unsafe_native.json
+            /tmp/q3_second12_four_posthoc_true_safe_unsafe_native.log
+          if-no-files-found: warn
+      - name: Strict fail closed original all 12 before calling fully mathematically classified
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open("/tmp/q3_second12_four_posthoc_true_safe_unsafe_native.json"))
+          assert q["schema"]=="neumann.q3.second_12_first_source_original_complete_true_SAFE_UNSAFE_partition_v1"
+          assert q["unchanged_historical_first_run_eight_certified_safe"]==8
+          assert q["four_genuine_original_previous_UNKNOWN"]==4
+          assert q["global_Q3"]==q["global_Q4"]==q["global_Q6"]=="OPEN"
+          assert q["no_neural_trained_structure_or_unique_math"]
+          assert len(q["four_posthoc_original_source_proof_records"])==4
+          for r in q["four_posthoc_original_source_proof_records"]:
+              if r["status"]=="TRUE_ORIGINAL_INDEPENDENTLY_DUAL_GROUNDED_UNSAFE":
+                  assert r["complete_actual_original_1transition_path"]["verified_concrete_full_original_BMC_witness"]
+              if r["status"]=="TRUE_ORIGINAL_INDEPENDENTLY_DUAL_INDUCTIVE_SAFE":
+                  assert all(s["dual_pass"] for s in r["true_original_posthoc_full_inductive_proof"]["independent_original_full_native_source_Z3_cvc5_three_VCs"].values())
+          print("SECOND12_TRUE_FIRST_SOURCE_ORIGINALS_CLASSIFIED",
+                q["all_original_twelve_truly_certified_SAFE_or_UNSAFE"])
+          print("NEVER_FAKE_LEARNED_HIDDEN_Q3_PASS")
+          PY
