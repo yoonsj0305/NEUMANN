@@ -1,0 +1,74 @@
+name: G0 prior literature magic-cube published answer original SC08 SMT2 checker only
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/g0-external-sc08-oracle-reference-only.yml'
+      - 'research/evidence/g0_external_prior_sc08_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  external_literature_original_smt2_reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/QF_NIA/20220315-MathProblems
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check exact source SHA and no original discovery claim
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/g0_external_prior_sc08_20261021/published_2008_8x8_true_original_smt2.py
+          grep -q 'NOT NEUMANN discovery' research/evidence/g0_external_prior_sc08_20261021/PROVENANCE_PRIOR_ART_REFERENCE.md
+      - name: Install exact SMT original independent Z3 and pinned cvc5
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Independently verify EXTERNAL published 2008 original SC08 model SAT
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/g0_external_prior_sc08_20261021/published_2008_8x8_true_original_smt2.py --root original --out /tmp/g0_external_published_sc08.json | tee /tmp/g0_external_published_sc08.log
+          sha256sum /tmp/g0_external_published_sc08.json
+      - name: Archive published prior-art witness independent original SMT2 validation only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g0-sc08-external-2008-reference-dual-smt-original
+          path: |
+            /tmp/g0_external_published_sc08.json
+            /tmp/g0_external_published_sc08.log
+          if-no-files-found: warn
+      - name: Strict exclude oracle from real discovered-source successes
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/g0_external_published_sc08.json'))
+          w=x['original_prior_art_example']
+          assert x['external_web_literature_is_an_oracle_not_NEUMANN_research_answer']
+          assert x['do_not_count_this_as_genuine_unknown_first_2026_G0_solution']
+          assert x['global_Q3']==x['global_Q4']==x['global_Q7']=='OPEN'
+          assert w['original_SMT2_SAT_independent_dual']
+          assert w['source_git_blob']=='2641f701a4d085737d12c7924a7511c9e25a381a'
+          assert len(w['external_prior_math_check']['all_8_row_exact_cube_sums'])==8
+          assert len(w['external_prior_math_check']['all_8_column_exact_cube_sums'])==8
+          assert w['external_math_negative_control_modified_one_entry']['source_row_constraint_false']
+          print('EXTERNAL_PRIOR_ART_ORIGINAL_SC08_INDEPENDENT_SAT_PROVED')
+          print('NOT_AN_AUTONOMOUS_NEUMANN_DISCOVERY_TRUE')
+          PY
