@@ -65,12 +65,17 @@ def exact_bounded_universe(target,values,cubes):
     mod63=sum(mx*my for (a,u),mx in map63.items()
               for (b,v),my in map63.items()
               if ((target-a-b)%9,(target-u-v)%7) in map63)
-    assert 0<mod63<=mod9<=rawpairs
+    # The exact small-domain reference legitimately contains target values
+    # for which NO x,y pair can lead to any cube-residue z signature.
+    # A zero eligible-pair universe is a bounded NO-WITNESS certificate,
+    # not an internal assertion failure. First 50k source originals were
+    # unaffected because their eligible-pair universes were all positive.
+    assert 0<=mod63<=mod9<=rawpairs
     return {"original_full_bounded_x_y_pair_universe":rawpairs,
             "mod9_admissible_x_y_pair_universe":mod9,
             "CRT63_admissible_x_y_pair_universe":mod63,
-            "full_x_y_pair_universe_over_CRT63":rawpairs/mod63,
-            "mod9_pair_universe_over_CRT63":mod9/mod63,
+            "full_x_y_pair_universe_over_CRT63":rawpairs/mod63 if mod63 else None,
+            "mod9_pair_universe_over_CRT63":mod9/mod63 if mod63 else None,
             "candidate_pair_count_compression_not_wall_speed":True}
 
 def crt63_numeric_exact_search(target,radius):
