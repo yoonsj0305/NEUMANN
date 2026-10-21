@@ -34,7 +34,7 @@ jobs:
           import json
           x=json.load(open('research/evidence/q3_nonlinear_quotient_20261021/BEFORE_EXECUTING_EXACT_SOURCE_QUOTIENT_CONTRACT.json'))
           assert x['pre_execution_frozen'] and x['sources'].startswith('same 5 authentic previously OPENED')
-          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          assert 'Global Q1–Q7 OPEN' in x['acceptance']
           print('IMMUTABLE_PREREG_3X3_REAL_ORIGINAL_QUOTIENT')
           PY
       - name: Fix math and source checker versions, install independent Z3 and cvc5
