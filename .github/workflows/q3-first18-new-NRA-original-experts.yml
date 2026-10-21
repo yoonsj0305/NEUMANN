@@ -1,0 +1,88 @@
+name: Q3 first unseen 18 authentic QF NRA geometry matrix circles strong Direct ceiling
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-first18-new-NRA-original-experts.yml'
+      - 'research/evidence/q3_fresh_real_nra_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  authentic_original_NRA_unseen_three_problem_families:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/QF_NRA/20211101-Geogebra
+            non-incremental/NRA/20220222-strassen-matrix-multiplication
+            non-incremental/NRA/20220222-cut-three-circles
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate prospective frozen original cohort and strict source eligibility
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/q3_fresh_real_nra_20261021/first_18_new_originals_same_cpu_strong_classical_expert_screen.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/q3_fresh_real_nra_20261021/BEFORE_ANY_NEW_SOURCE_BODY_18_ORIGINALS.json'))
+          assert x['all_18_source_bodies_UNOPENED_when_manifest_committed']
+          assert x['schema']=='neumann.q3.new_author_nra_original_18_before_source_body.v1'
+          assert len(x['cases'])==18 and len({p['git_blob'] for p in x['cases']})==18
+          assert len({p['family'] for p in x['cases']})==3
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          print('TRUE_FRESH_ORIGINAL_SHA_ONLY_FROZEN_18_BEFORE_SOURCE_CONTENT')
+          PY
+      - name: Pinned independent nonlinear original solver versions
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          lscpu | grep 'Model name' | head -1
+      - name: FIRST actual authentic 18 original QF_NRA and NRA nonlinear SMT2 expert portfolio
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_fresh_real_nra_20261021/first_18_new_originals_same_cpu_strong_classical_expert_screen.py --root original --freeze research/evidence/q3_fresh_real_nra_20261021/BEFORE_ANY_NEW_SOURCE_BODY_18_ORIGINALS.json --out /tmp/q3_true_fresh_18_nra_strong_direct.json | tee /tmp/q3_true_fresh_18_nra_strong_direct.log
+          sha256sum /tmp/q3_true_fresh_18_nra_strong_direct.json
+      - name: Archive every original source result with all unresolved/positive/negative receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-authentic-first-new-18-other-family-nra-strong-expert-ceiling
+          path: |
+            /tmp/q3_true_fresh_18_nra_strong_direct.json
+            /tmp/q3_true_fresh_18_nra_strong_direct.log
+          if-no-files-found: warn
+      - name: Strict frozen metadata, no wrong learned claims and all source rows retained
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          a=json.load(open('/tmp/q3_true_fresh_18_nra_strong_direct.json'))
+          assert a['first_source_body_opened_only_after_original_git_metadata_freeze_commit']=='5412a4fb16c96694ab2bf629c34f6e41737f7a7f'
+          assert a['all_eighteen_original_ids_retained']
+          assert a['authenticated_native_original_source_sha_count']==18
+          assert a['actual_original_classification_conflicts']==0
+          assert a['no_hidden_original_label_used_for_routing']
+          assert a['no_CPU_or_GPU_learned_model_ever_trained_in_this_expert_screen']
+          assert a['global_Q3']==a['global_Q4']==a['global_Q5']=='OPEN'
+          for r in a['all_exact_original_sources']:
+              assert r['original_Git_blob_authenticated']
+              assert r['status'] in ('STRONG_CLASSICAL_SOLVED_ORIGINAL','EXPERT_PORTFOLIO_ORIGINAL_UNKNOWN')
+              assert len(r['source_solver_execution_receipts'])==3
+          print('TRUE_OTHER_FAMILY_ORIGINAL_NRA_EXPERT_SOLVED',a['strongest_three_original_solver_arms_resolved_total'])
+          print('TRUE_OTHER_FAMILY_ORIGINAL_NRA_NEW_RESIDUAL',a['original_source_remaining_candidate_hard_unsolved_total'])
+          PY
