@@ -1,0 +1,31 @@
+{
+  "schema": "neumann.q4q6.first_fresh_12_CPU_trained_verifier_dispatch_complete_system.v1",
+  "locked_heldout_metadata_commit": "4cd7ab0016e891af94deb702fdc4f7eb363cbf9b",
+  "heldout_original_upstream": "13c8deb68a873635879c9a69bc78caebd340f646",
+  "training_source": "Previous POSTHOC Q4 trial 12 source-authentic original full source task cost records from GitHub Actions run 39578591707 artifact q4-original12-three-native-prover-full-cost-comparison",
+  "training_raw_JSON_SHA256": "fa0fc6f7218761082aef77d02efdbe91da541477800eea8d32c956dd0e9e6839",
+  "training_no_retargeting_to_heldout": true,
+  "fixed_model": "sklearn DecisionTreeClassifier(max_depth=2,min_samples_leaf=2,random_state=20261021); categorical labels P=Post original 3VC,S=original cvc5 SyGuS,D=original Z3 SPACER; labels chosen from cheapest actually certified original training action route. Fit once from training programs only, no unseen labels.",
+  "features": "source-name-free [state_arity, bytes, counts from native AST per Pre/Trans/Post and operator occurrence histograms] with no problem file path or gold status",
+  "fixed_ordered_routes": {
+    "P": "Post independent native 3VC then cvc5 SyGuS 0.55s then SPACER 5s",
+    "S": "original cvc5 SyGuS 3s then SPACER 5s",
+    "D": "original SPACER 5s then cvc5 SyGuS 3s"
+  },
+  "fixed_competitors": [
+    "static P on all",
+    "static S on all",
+    "static D on all",
+    "hindsight per-source fastest independently certified original complete-task expert (unimplementable oracle)"
+  ],
+  "reference_scoring": "Source parsed and native full Pre/Trans/Post identity verified both Z3+cvc5. Count only original fully dual 3VC certified SAFE; PDR SAT-unreplayed/UNKNOWN not falsely UNSAFE. Strong baseline may copy feature extraction, model and method. All methods charged preflight, solver, verification, retries; trained strategy additionally charged feature creation and amortized training over entire heldout cohort.",
+  "ablation": "Training-majority class and permuted labels classification accuracy against posthoc valid task fastest oracle (never accepted as online task oracle); no inference from source filename.",
+  "stop_rule": "If matched success differs, do NOT calculate equal-capability 10x victory; otherwise compare total actual wall for equal verified original result counts. If ratio under 10 report FAIL, and Q4 global OPEN regardless.",
+  "source_generalization_scope": "New true source-body-unopened original program transfer of learned route selection, NOT learned invariant, structural theorem discovery, independent-author model transfer or NEUMANN unique advantage.",
+  "safety_controls": "Negative deliberately Post=False must fail original initial VC on one heldout authentic source; all failed runs preserved",
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q5": "OPEN",
+  "global_Q6": "OPEN",
+  "no_fabricated_training_models": true
+}
