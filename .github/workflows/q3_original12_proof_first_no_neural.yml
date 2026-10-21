@@ -1,0 +1,87 @@
+name: Q3 proof-first original12 classical no-neural audited portfolio
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_original12_proof_first_no_neural.yml'
+      - 'research/evidence/q3_proof_first_baseline_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native_original12_safe_deletion_exact_proof_portfolio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate genuine original repo revision and route schema
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_proof_first_baseline_20261021/cheap_safe_verified_original12_no_neural.py
+      - name: Install pinned independent original native Z3 cvc5 and parser dependencies
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: Run zero ML native original cheap proof deletion exact OR SyGuS and SPACER fallbacks
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_proof_first_baseline_20261021/cheap_safe_verified_original12_no_neural.py \
+            --root original \
+            --freeze research/evidence/q3_dnf_first12_20261021/NEW_UNSEEN_ORIGINALS_BEFORE_SOURCE_BODY_LOCK.json \
+            --out /tmp/q3_original12_zero_neural_true_proof_portfolio.json | tee /tmp/q3_original12_zero_neural_true_proof_portfolio.log
+          sha256sum /tmp/q3_original12_zero_neural_true_proof_portfolio.json
+      - name: Archive original native source cost and independent all three VC proof receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-original12-proof-first-no-neural-full-native-solvers
+          path: |
+            /tmp/q3_original12_zero_neural_true_proof_portfolio.json
+            /tmp/q3_original12_zero_neural_true_proof_portfolio.log
+          if-no-files-found: warn
+      - name: Do not count original safety if no independent full 3VC proof exists
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3_original12_zero_neural_true_proof_portfolio.json'))
+          assert r['schema']=='neumann.q3.proof_first_original12_classical_no_neural_fallback_portfolio.v1'
+          assert r['source_original_count']==12 and len(r['per_original'])==12
+          assert len({x['original_git_blob'] for x in r['per_original']})==12
+          assert r['neural_forwards']==r['fitted_ML_models']==0
+          assert r['only_original_independent_Z3_cvc5_FULL_3VC_counted']
+          assert sum(r['winner_breakdown'].values())==r['fully_certified_original_safe_independent_Z3_cvc5']
+          assert r['global_Q3']==r['global_Q4']==r['global_Q6']=='OPEN'
+          for case in r['per_original']:
+              if not case['certified_SAFE']:continue
+              winner=case['winner']
+              if winner=='tautology_delete':
+                  assert all(x['dual_pass'] for x in case['certified_trivial_True_original_3VC'].values())
+              if winner=='exact_no_fit_OR_with_min_info':
+                  assert all(x['dual_pass'] for x in case['original_dual_3VC_nofit_OR'].values())
+              if winner=='original_cvc5_SyGuS':
+                  assert case['strong_original_cvc5_SyGuS_native_source']['certified']
+                  assert all(x['dual_pass'] for x in case['strong_original_cvc5_SyGuS_native_source']['original_native_Z3_cvc5_3VC'].values())
+              if winner=='original_Z3_SPACER':
+                  p=case['strong_original_Z3_SPACER_native_source']
+                  assert p['certified']
+                  assert any(z['certified'] and all(q['dual_pass'] for q in z['original_full_dual_3VC'].values()) for z in p['original_independently_certified_candidates'])
+          print('ZERO_NEURAL_ORIGINAL_SOURCE_ORIGINAL_DUAL_PROOFS_AUDITED')
+          PY
