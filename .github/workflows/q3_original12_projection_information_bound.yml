@@ -37,7 +37,7 @@ jobs:
           mkdir -p /tmp/cvc5bin
           unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
           sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
-          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 sympy==1.14.0 z3-solver==4.13.3.0
       - name: Actual mathematically impossible first-two-features original Init vs Bad Q3 proof
         run: |
           set -o pipefail
