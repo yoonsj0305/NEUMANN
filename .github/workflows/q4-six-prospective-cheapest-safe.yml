@@ -1,0 +1,83 @@
+name: Q4 prospective source-frozen 6 classical safe-cheapest strategy vs full solvers
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q4-six-prospective-cheapest-safe.yml'
+      - 'research/evidence/q4_prospective_six_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first_six_original_cheapest_safe_prospective:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: source
+          sparse-checkout: |
+            lib/Inv_Track/andrew_lustre
+            lib/Inv_Track/from_2018
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check original Git SHA and freeze metadata before experiment
+        run: |
+          test "$(git -C source rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q4_prospective_six_20261021/first_six_classical_cheapest_safe_portfolio.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/q4_prospective_six_20261021/FROZEN_BEFORE_FIRST_SOURCE_OPEN.json'))
+          assert len(x['sources'])==6 and x['original_files_not_opened_pre_freeze']
+          print('PRE_REGISTERED SIX SOURCE BLOBS BEFORE ACTUAL SOURCE CONTENT')
+          PY
+      - name: Install pinned original Z3 and cvc5 on same CPU runner
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+          lscpu | grep 'Model name' | head -1
+      - name: FIRST six no tuning three routes original safety with negative controls
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q4_prospective_six_20261021/first_six_classical_cheapest_safe_portfolio.py --root source --freeze research/evidence/q4_prospective_six_20261021/FROZEN_BEFORE_FIRST_SOURCE_OPEN.json --out /tmp/q4_six_first.json | tee /tmp/q4_six_first.log
+          sha256sum /tmp/q4_six_first.json
+      - name: Preserve original six FIRST outcome including timeouts and errors
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q4-six-preregistered-source-cheapest-safe-first
+          path: |
+            /tmp/q4_six_first.json
+            /tmp/q4_six_first.log
+          if-no-files-found: warn
+      - name: Require authentic data, positive proof and all negative controls
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q4_six_first.json'))
+          assert x['source_freeze_commit']=='63f8ca99b8f9f00aa2bd562226d78641e7e9889c'
+          assert x['total_original_program_cases_preserved']==6
+          assert x['global_Q3']==x['global_Q4']=='OPEN'
+          print('PROSPECTIVE_COVERAGE_SYGUS_PDR_FAST_FIRST',
+                x['full_SyGuS_native_dual3VC'],
+                x['full_PDR_native_dual3VC'],
+                x['cheap_first_native_dual3VC'])
+          print('AGGREGATE_OBSERVED_WALL_RATIO',x['observed_aggregate_PDR_over_portfolio_ratio'])
+          print('POSITIVE_DUAL_SOURCE_AUTHENTICATIONS',x['all_six_authenticated'])
+          print('NEGATIVE_FALSE_POST_CONTROLS',x['all_controls_pass'])
+          if x['all_six_authenticated']!=6 or not x['all_controls_pass']:
+              raise SystemExit('First study recorded, but ORIGINAL proof admission BLOCKED: missing source authentication or negative control')
+          PY
