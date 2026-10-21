@@ -1,0 +1,84 @@
+name: Q34 six preregistered original SAFE or UNSAFE dual-certificate triage
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q34-six-first-safe-unsafe-triage.yml'
+      - 'research/evidence/q34_safety_triage_six_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact_first_original_six_dispositions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/andrew_lustre
+            lib/Inv_Track/from_2018
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate frozen original revision and test syntax
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q34_safety_triage_six_20261021/first_six_general_reachable_unsafety_and_full_safe_3vc.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/q34_safety_triage_six_20261021/PRE_SOURCE_FROZEN_ORIGINALS.json'))
+          assert len(x['targets'])==6 and x['freeze_is_pre_source_read']
+          print('SOURCE_FREEZE_AUTHENTICATED',len(x['targets']))
+          PY
+      - name: Pin independent Z3 and cvc5 safety solvers
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: First untouched source TRUE unsafe counterexample or certified safe 3VC
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q34_safety_triage_six_20261021/first_six_general_reachable_unsafety_and_full_safe_3vc.py --root original --freeze research/evidence/q34_safety_triage_six_20261021/PRE_SOURCE_FROZEN_ORIGINALS.json --out /tmp/q34_six_first_triage.json | tee /tmp/q34_six_first_triage.log
+          sha256sum /tmp/q34_six_first_triage.json
+      - name: Archive first source identities, proofs, counterexamples, UNKNOWNs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q34-six-original-first-safe-unsafe-grounded
+          path: |
+            /tmp/q34_six_first_triage.json
+            /tmp/q34_six_first_triage.log
+          if-no-files-found: warn
+      - name: Scientific admission requires original dual source evidence
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q34_six_first_triage.json'))
+          assert x['first_presource_git_freeze_commit']=='8d31c884c45cac8b5955b1ff548f8c4305f3ae8e'
+          assert x['first_true_original_six_outcomes_all_retained'] and len(x['first_cases'])==6
+          assert x['global_Q3']==x['global_Q4']=='OPEN'
+          assert x['positive_AND_negative_historic_control']['historic_original_fib07_UNSAFE']['status'].startswith('PASS')
+          assert x['positive_AND_negative_historic_control']['historic_original_fib05_SAFE']['status'].startswith('PASS')
+          for case in x['first_cases']:
+              if case.get('source_scientific_classification')=='UNSAFE':
+                  assert any(q.get('original_source_first_bad_trace_independently_proved') for q in case['original_safety_BMC']['checked_depth_receipts'])
+              if case.get('source_scientific_classification')=='SAFE':
+                  assert case.get('first_fast_original_SyGuS',{}).get('certified',False) or case.get('full_original_PDR_fallback',{}).get('certified',False)
+          print('FIRST_SIX_TRUE_CLASSIFICATIONS',
+                x['original_SAFE_independent_Z3_cvc5_3VC'],
+                x['original_UNSAFE_independent_grounded_Z3_cvc5'],
+                x['original_UNKNOWN_count'])
+          PY
