@@ -1,0 +1,29 @@
+{
+  "schema": "neumann.q3.20261021.posthoc_original_fib32_actually_trained_phase_proposer.v1",
+  "date": "2026-10-21",
+  "source_upstream": "SyGuS-Org/benchmarks@13c8deb68a873635879c9a69bc78caebd340f646",
+  "original_source_path": "lib/Inv_Track/from_2018/fib_32.sl",
+  "original_source_git_blob": "4fb129488bee3e1e0cdae899b318d6503ae23c12",
+  "original_source_bytes": 824,
+  "source_was_opened_and_human_exact_invariant_already_published_PR373": true,
+  "experimental_boundary": "DO NOT count as new first-blind source; do not train on manually authored invariant AST, success truth labels, historical source receipts or postcondition satisfying model. Training examples only come from source native pre/trans transition SAT traces with bound k=1..5 and both initial b states. Heldout traces k=6..12 generated only after fitting. The source-feature grammar (parity n%2 and b, envelope k>0, b∈{0,1}, 0≤n≤2k) is HUMAN HAND-SELECTED based on prior source inspection; only numerical offsets i-j learned, not new grammar. This matters; no original unguided NN structural discovery claim.",
+  "feature_model": "CPU sklearn DecisionTreeRegressor(max_depth=3,random_state=20261021) maps [n%2,b] to offset (i-j), using only Z3-grounded transitions. At inference compile four feature pairs (0,0),(0,1),(1,0),(1,1) into original typed symbolic Z3 invariant and submit to independent original native Z3+cvc5 full 3VC.",
+  "model_training_truth": "Supervised reachable (i-j) OFFSET from exact original source trajectories only, k=1..5, b0=0,1. Not target full oracle invariant, not original proof labels. Trace original each step Z3 SAT native Trans and exact current state; no manually seeded next-state equations.",
+  "holdout": "Held out k=6..12 both b0, with exact original source Z3 transitions and predictions, no test access during fitting. Heldout is a parameter split of SAME ORIGINAL source program, not an unseen original source program or independent author.",
+  "controls": [
+    "Model actually fit and predicts four typed integer offsets. Four symbolic conditions compiled without reading any manually authored solution or published previous AST.",
+    "Non-learned constant offset 0 plus same human envelope; independent original 3VC expected FAIL.",
+    "Deterministic trained-label permutation with fixed RNG, model grammar same and independent 3VC expected FAIL or inability to compile exact integer offsets.",
+    "Parity-only learned tree trained on identical original traces, no b feature; 3VC expected FAIL or unable integer output.",
+    "No-trained direct table constructed deterministically from SAME original source transition traces; may reproduce exact trained predictions and original 3VC, demonstrating no unique learned advantage.",
+    "Same cvc5 SyGuS with 3s and Z3 Spacer 6s strong classical baseline (actual original solver), all costs charged. Strongest equal-authority expert MAY use exact deterministic table and same manual source-feature grammar so Q3 UNIQUE remains OPEN even if model works."
+  ],
+  "costs": "Full source SHA authentication and independent native parity overhead, all native Z3 SAT trace generation/verification, actual scikit-learn fit/predict timing and memory, original independent Z3/cvc5 3VC, baseline failed proof attempts, comparator costs including trained and nontrained.",
+  "admission": "Verify exact original learned AST three VC independently, heldout original trace classification 100%, no false positive on negative controls, do not pretend that learned proposal is novel, source-blind, or beats strongest equal-authority direct. Report a bounded trained capability success if accurate; global Q3 Q4 Q5 Q6 Q7 OPEN.",
+  "no_model_weights_in_git": true,
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q5": "OPEN",
+  "global_Q6": "OPEN",
+  "global_Q7": "OPEN"
+}
