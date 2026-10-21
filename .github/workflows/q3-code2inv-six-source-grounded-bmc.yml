@@ -1,0 +1,85 @@
+name: Q3 true original Code2Inv five PDR-SAT BMC unsafety and fib32 residual
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-code2inv-six-source-grounded-bmc.yml'
+      - 'research/evidence/q3_code2inv_six_triage_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  independently_grounded_six_true_originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate first 24 original source hash and six selected nonclosure controls
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_code2inv_six_triage_20261021/actual_original_six_grounded_bad_path_and_fib32_extended_experts.py
+          python - <<'PY'
+          import json
+          c=json.load(open('research/evidence/q3_code2inv_six_triage_20261021/POST_FIRST_REAL_24_SIX_RISK_AND_UNKNOWN_SCOPE.json'))
+          assert c['new_study_is_POSTHOC_not_blind'] and len(c['strict_frozen_six'])==6
+          assert c['global_Q3']==c['global_Q4']=='OPEN'
+          print('TRUE_SOURCE_SIX_ALREADY_OPENED_FROZEN_BEFORE_NEW_BMC')
+          PY
+      - name: Install audited independent original Z3 and cvc5 solvers
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: True original 0..5 BMC and independently grounded full state trace, longer fib32 safety
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_code2inv_six_triage_20261021/actual_original_six_grounded_bad_path_and_fib32_extended_experts.py --root original --freeze research/evidence/q3_code2inv_presource24_20261021/BEFORE_ANY_ORIGINAL_SOURCE_BODY_OPEN_24_GIT_BLOBS.json --protocol research/evidence/q3_code2inv_six_triage_20261021/POST_FIRST_REAL_24_SIX_RISK_AND_UNKNOWN_SCOPE.json --out /tmp/q3_true_six_source_unsafe_and_fib32.json | tee /tmp/q3_true_six_source_unsafe_and_fib32.log
+          sha256sum /tmp/q3_true_six_source_unsafe_and_fib32.json
+      - name: Preserve full original paths or genuine unknown abstentions
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-code2inv-six-original-grounded-dual-bmc-traces-and-fib32
+          path: |
+            /tmp/q3_true_six_source_unsafe_and_fib32.json
+            /tmp/q3_true_six_source_unsafe_and_fib32.log
+          if-no-files-found: warn
+      - name: No false SAFE from absence of bounded trace, require fully grounded trace
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3_true_six_source_unsafe_and_fib32.json'))
+          assert r['original_first_24_true_source_hash_frozen_before_read']=='6a5792e196b2234358dca31ec9dd733f3ffed42d'
+          assert r['six_suspected_source_tasks_posthoc_frozen_commit']=='bfe2c4457aa281a038dfeb422ffe940b27ccf694'
+          assert r['original_six_full_source_identifiers_kept'] and len(r['original_six'])==6
+          assert r['all_six_true_original_source_authenticated']==6
+          assert r['unproved_and_timeout_are_not_actual_SAFE_or_UNSAFE']
+          assert r['global_Q3']==r['global_Q4']==r['global_Q5']=='OPEN'
+          for x in r['original_six']:
+              if x['independently_grounded_UNSAFE']:
+                  p=x['full_original_0_to_5_BMC_dual_Z3_cvc5']
+                  assert p['true_bounded_original_safety_refuted']
+                  assert p['checked_depth_receipts'][-1]['actual_original_fully_grounded_trace_sat_Z3_cvc5']['dual_pass']
+              if x['independently_inductive_SAFE']:
+                  assert x['longer_original_native_cvc5_SyGuS_20sec']['certified'] or x['longer_original_native_Z3_SPACER_20sec']['certified']
+          print('ORIGINAL_FIVE_RISK_VERIFIED_UNSAFE',r['five_PDR_sat_replayed_as_independently_certified_UNSAFE'])
+          print('ORIGINAL_LAST_FIB32_SAFE_UNSAFE',r['fib32_original_proved_SAFE'],r['fib32_original_proved_UNSAFE'])
+          PY
