@@ -1,0 +1,97 @@
+name: Q3 source body first blind twelve originals fixed proof-first no neural
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_firstunopened12_integrated_proof_first.yml'
+      - 'research/evidence/q3_proof_first_unopened12_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first_body_unopened_new12_native_z3_cvc5_original_proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Confirm SHA prereg BEFORE original source opened and unchanged exact learner
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_proof_first_unopened12_20261021/real_prebody_frozen_proof_first12.py
+          python - <<'PY'
+          import json
+          d=json.load(open('research/evidence/q3_proof_first_unopened12_20261021/PRE_BODY_SHA_LOCK_12_SOURCE_ORIGINALS.json'))
+          assert d["schema"]=="neumann.q3.source_body_first_unopened12_fixed_proof_first_zero_neural_original_v1"
+          assert d["original_source_BODIES_NOT_VIEWED_before_metadata_commit"]
+          assert len(d["cases"])==12 and len({a["git_blob"] for a in d["cases"]})==12
+          assert d["global_Q3"]==d["global_Q4"]==d["global_Q6"]=="OPEN"
+          print('SOURCE_FIRST_BLIND_NEW12_GIT_SHA_PRECOMMITTED_916c2c3')
+          PY
+      - name: Install independently pinned Z3 cvc5 and source parser dependencies
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: Open first new original source bodies and execute UNCHANGED PR424 controller no retuning
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_proof_first_unopened12_20261021/real_prebody_frozen_proof_first12.py \
+            --root original \
+            --freeze research/evidence/q3_proof_first_unopened12_20261021/PRE_BODY_SHA_LOCK_12_SOURCE_ORIGINALS.json \
+            --out /tmp/q3_first12_unopened_true_original_full3vc.json | tee /tmp/q3_first12_unopened_true_original_full3vc.log
+          sha256sum /tmp/q3_first12_unopened_true_original_full3vc.json
+      - name: Retain every first unseen program original proof solver error and genuine UNKNOWN
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-first-real-unopened12-fixed-classical-original-dual-proofs
+          path: |
+            /tmp/q3_first12_unopened_true_original_full3vc.json
+            /tmp/q3_first12_unopened_true_original_full3vc.log
+          if-no-files-found: warn
+      - name: Fail closed fake source-first proof claims or identity mismatch
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/q3_first12_unopened_true_original_full3vc.json'))
+          assert q['schema']=='neumann.q3.first_body_blind12_unchanged_classical_PROOF_FIRST_full_native_3VC.v1'
+          assert q['before_any_original_body_Git_metadata_commit']=='916c2c3e3c1f08c5ef804ca3179231f60d46dcff'
+          assert q['authentic_distinct_source_SHA_verified']==12
+          assert len(q['all_first_source_originals_and_native_3VC_receipts'])==12
+          assert len({v['original_git_blob'] for v in q['all_first_source_originals_and_native_3VC_receipts']})==12
+          assert q['neural_forward_count']==q['model_fit_count']==0
+          assert q['global_Q3']==q['global_Q4']==q['global_Q6']=='OPEN'
+          assert q['first_blind_true_original_full_dual_3VC_safe']+q['first_blind_true_original_unsafety_proven']+q['first_blind_original_UNKNOWN_or_ABSTAIN']==12
+          for row in q['all_first_source_originals_and_native_3VC_receipts']:
+              if not row['certified_SAFE']:continue
+              k=row['winner']
+              if k=='tautology_delete':p=row['certified_trivial_True_original_3VC']
+              elif k=='exact_no_fit_OR_with_min_info':p=row['original_dual_3VC_nofit_OR']
+              elif k=='generic_affine_Houdini':p=row['original_dual_3VC_Houdini_conjunction']
+              elif k=='original_cvc5_SyGuS':p=row['strong_original_cvc5_SyGuS_native_source']['original_native_Z3_cvc5_3VC']
+              elif k=='original_Z3_SPACER':
+                  f=row['strong_original_Z3_SPACER_native_source']
+                  assert f['certified']
+                  p=next(z['original_full_dual_3VC'] for z in f['original_independently_certified_candidates'] if z['certified'])
+              else:raise AssertionError('NEVER_ACCEPT_UNPROVEN_ROUTE')
+              assert set(p)=={'init','consecution','goal'}
+              assert all(z['dual_pass'] for z in p.values())
+          print('FIRST_SOURCE_BODY_BLIND_NEW_ORIGINAL12_ALL_TRUE_SOURCE_DUAL_CLAIMS_CERTIFIED')
+          PY
