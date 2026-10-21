@@ -4,6 +4,7 @@ on:
     paths:
       - '.github/workflows/q3-dragon2-exact-affine-inductive-fixpoint.yml'
       - 'research/evidence/q3_exact_GF2_all_arity_20261021/dragon2_exact_affine_inductive_fixpoint.py'
+      - 'research/evidence/q3_exact_GF2_all_arity_20261021/finite_exhaustive_inductive_oracle_test.py'
       - 'docs/research/Q3_DRAGON2_EXACT_ORIGINAL_AFFINE_INDUCTIVE_CLOSURE_CONTRACT_20261021.md'
   workflow_dispatch:
 permissions:
@@ -49,6 +50,9 @@ jobs:
           name: q3-learned-xor4-two-real-first-originals
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: /tmp/first
+      - name: Independent exhaustive finite 3bit oracle 20 cases
+        run: |
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_exact_GF2_all_arity_20261021/finite_exhaustive_inductive_oracle_test.py
       - name: Exact full original affine fixed point and two solver proof
         run: |
           set -o pipefail
