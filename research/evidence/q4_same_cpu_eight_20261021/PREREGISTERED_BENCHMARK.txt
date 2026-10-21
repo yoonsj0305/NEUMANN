@@ -1,0 +1,11 @@
+Q4 PRE-REGISTRATION, 2026-10-21: already opened eight original programs; not a blind trial.
+Source identities fixed by earlier frozen commits 8e6efc5b (andrew_lustre four) and c3878668 (other two directories four).
+NO exclusions, source changes, source-specific tuning, fresh neural training, paid API or GPU.
+Same CPU runner, same upstream source, same solver versions and same actual published Post for both paths.
+A: cvc5 original SyGuS with 15 second per task limit, candidate only PASS if actual Z3+cvc5 native source 3VC independently UNSAT.
+B: Z3 SPACER 30 second per task limit then actual inferred invariant only PASS if full original native source 3VC independently Z3+cvc5 UNSAT.
+Account all wall milliseconds per end-to-end solver route; shared checkout, install and parsing excluded from both equally. All 8 cases retained even unknown/timeout.
+Common solved tasks: baseline_ms/portfolio_ms ratio. Never treat baseline timeout as an observed speed ratio.
+Only claim >10x scoped common-solved improvement if each paired case ratio >=10; no claim of global Q4, neural exclusivity, or SOTA superiority.
+Include in-memory Post=False negative control for one first source of each group: PDR must report reachable failure, never UNSAT.
+Historical first program 4/4 and separate four-directory 4/4 source proofs unchanged. Q3/Q4 global OPEN.
