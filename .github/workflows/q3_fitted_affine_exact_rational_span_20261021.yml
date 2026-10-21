@@ -1,0 +1,73 @@
+name: Q3 real original24 fitted PCA affine candidate exact classical span proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_fitted_affine_exact_rational_span_20261021.yml'
+      - 'research/evidence/q3_affine_identifiability_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mathematical_affine_span_of_every_original_trained_candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile actual learned-vs-exact program and authenticate original revision
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_affine_identifiability_20261021/prove_actual_learned_affine_in_exact_Q_kernel.py
+      - name: Install pinned original Z3, PCA actual training and exact rational algebra
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: Machine check actual trained affine relation lies in exact Q-nullspace of original observed integer states
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_affine_identifiability_20261021/prove_actual_learned_affine_in_exact_Q_kernel.py \
+            --root original \
+            --freeze1 research/evidence/q3_v32_new12_full_source_20261021/PREOPEN_GENUINE_TWELVE_ORIGINAL_GITSHA_SOURCE_LOCK.json \
+            --freeze2 research/evidence/q3_v32_second12_replication_20261021/BEFORE_SECOND12_ORIGINAL_SOURCE_BODIES_GITSHA.json \
+            --out /tmp/q3_original24_actual_PCA_rational_affine_kernel.json | tee /tmp/q3_original24_actual_PCA_rational_affine_kernel.log
+          sha256sum /tmp/q3_original24_actual_PCA_rational_affine_kernel.json
+      - name: Preserve every native original source case and all actual PCA fitted basis coefficients
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-actual-original24-fitted-PCA-is-exact-classical-Q-nullspace-evidence
+          path: |
+            /tmp/q3_original24_actual_PCA_rational_affine_kernel.json
+            /tmp/q3_original24_actual_PCA_rational_affine_kernel.log
+          if-no-files-found: warn
+      - name: Treat model representation as nonunique, and reject false global claim
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          a=json.load(open('/tmp/q3_original24_actual_PCA_rational_affine_kernel.json'))
+          assert a["schema"]=="neumann.q3.actual_original24_exact_Q_kernel_contains_learned_PCA_affine_candidates.v1"
+          assert a["original_programs"]==24
+          assert a["counterexamples_to_exact_affine_subspace_theorem"]==0
+          assert a["strong_exact_classical_has_all_same_source_data_and_candidate_space"]
+          assert a["theorem_affine_representation_only_NOT_identical_bounded_Houdini_runtime"]
+          assert a["global_Q3"]==a["global_Q4"]==a["global_Q6"]=="OPEN"
+          print("NO_ML_EXCLUSIVE_AFFINE_EXPRESSIVITY_FALSE_CLAIM_ADMITTED")
+          PY
