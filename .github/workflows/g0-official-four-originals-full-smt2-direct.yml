@@ -1,0 +1,83 @@
+name: G0 SMT-COMP 2026 four frozen joint-unresolved official QF NIA originals
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/g0-official-four-originals-full-smt2-direct.yml'
+      - 'research/evidence/g0_official_original_four_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  four_official_original_unresolved_cpu_direct_headroom:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: upstream
+          sparse-checkout: |
+            non-incremental/QF_NIA/20220315-MathProblems
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Exact upstream original revision and fixed program
+        run: |
+          test "$(git -C upstream rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/g0_official_original_four_20261021/original_four_2026_union_smt_direct_recheck.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/g0_official_original_four_20261021/BLIND_FOUR_ORIGINALS_PRE_SOURCE_FREEZE.json'))
+          assert len(x['targets'])==4 and x['source_body_not_read_before_freeze']
+          assert all(q['path'].endswith('.smt2') for q in x['targets'])
+          print('ORIGINAL_FOUR_FROZEN_GIT_BLOBS_CONFIRMED_PRE_SOURCE_ACCESS')
+          PY
+      - name: Install pinned independent source-original SMT engines
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          lscpu | grep 'Model name' | head -1
+      - name: Real contest original four bounded fully authentic Z3 and cvc5
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/g0_official_original_four_20261021/original_four_2026_union_smt_direct_recheck.py --root upstream --freeze research/evidence/g0_official_original_four_20261021/BLIND_FOUR_ORIGINALS_PRE_SOURCE_FREEZE.json --out /tmp/g0_first4.json | tee /tmp/g0_first4.log
+          sha256sum /tmp/g0_first4.json
+      - name: Preserve all first source results and real original artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g0-first-2026-original-four-direct-solver-grounded
+          path: |
+            /tmp/g0_first4.json
+            /tmp/g0_first4.log
+          if-no-files-found: warn
+      - name: Source integrity and honest scientific claim gate
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/g0_first4.json'))
+          assert x['presource_freeze_commit']=='39ed7c703a922daa4d99e72dfee2e18ea3b77069'
+          assert x['source_SHA_and_full_original_verified_count']==4
+          assert x['all_frozen_four_rows_preserved'] and len(x['first_source_cases'])==4
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          assert x['new_independent_structure_discovery']=='NOT_DEMONSTRATED'
+          for p in x['first_source_cases']:
+              if p['original_UNSAT_dual_confirmed']:
+                  assert p['z3_direct']['status']==p['cvc5_direct']['status']=='UNSAT'
+              if p['original_SAT_grounded_independent_confirmed']:
+                  assert p['independent_complete_source_model_proof']['status']=='INDEPENDENT_FULL_ORIGINAL_GROUNDED_SAT'
+          print('AUTHENTIC_G0_FOUR',x['source_SHA_and_full_original_verified_count'])
+          print('STRONG_DIRECT_DUAL_SAT_UNSAT',x['original_full_sat_or_unsat_independently_dual_certified'])
+          print('UNKNOWN_IN_15SEC_CPU_BOUNDS',x['newly_bounded_CPU_dual_direct_unresolved_count'])
+          PY
