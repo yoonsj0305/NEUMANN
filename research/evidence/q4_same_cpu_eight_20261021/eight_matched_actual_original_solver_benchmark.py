@@ -96,7 +96,9 @@ def main():
         raise RuntimeError("COHORT_NOT_FROZEN_EIGHT")
     if old["upstream_commit"]!="13c8deb68a873635879c9a69bc78caebd340f646" or other["upstream_commit"]!="13c8deb68a873635879c9a69bc78caebd340f646":
         raise RuntimeError("UPSTREAM_REVISION_DIFFERS")
-    targets=old["source_targets"]+other["targets"]
+    # The earlier four-source freeze predates the optional directory label.
+    # Normalize metadata only; never change source bytes or original Git IDs.
+    targets=[dict(t,group=t.get("group","andrew_lustre")) for t in old["source_targets"]]+other["targets"]
     groups=[]
     for t in targets:
         baseline=original_baseline(a.root,t)
