@@ -1,0 +1,20 @@
+{
+  "schema": "neumann.q3.posthoc_original12_generic_Houdini_syguS_spacer_complete_hybrid_v1",
+  "source_metadata_freeze_commit": "4cd7ab0016e891af94deb702fdc4f7eb363cbf9b",
+  "source_body_already_opened_and_prior_success_locations_known": true,
+  "source_specific_invariants_forbidden": true,
+  "trained_model_forbidden": true,
+  "fixed_hybrid": "Generic source-independent Pre-entailment+Trans counterexample-elimination linear Houdini from PR391, full original native Z3+cvc5 3VC, if uncertified then original cvc5 SyGuS 3sec plus native Z3 SPACER 5sec, require independently original Z3+cvc5 3VC for all SAFE; all ABSTAIN and cost retained.",
+  "strong_static_baselines": [
+    "original cvc5 SyGuS 3sec followed by native Z3 SPACER 5sec",
+    "native Z3 SPACER 5sec followed by original cvc5 SyGuS 3sec"
+  ],
+  "comparison": "Compute true original program verified safe count on identical 12 sources; cost only for identical successes, all shared source preprocessing charged and failed attempts retained; no human-guided per-source branch or answer lookup",
+  "historic_first_12_first_run": 39579514369,
+  "historic_generic_Houdini_run": 39581483829,
+  "no_global_Q3_claim": true,
+  "no_10x_claim_without_observation": true,
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q6": "OPEN"
+}
