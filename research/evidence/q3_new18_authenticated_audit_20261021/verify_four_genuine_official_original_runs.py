@@ -85,7 +85,7 @@ def audit(freeze,config,artifact_root):
     assert bridge["actual_original_all_four_outputs_six_active_rank_one_products"]
     assert bridge["actual_original_seventh_weight_exactly_literal_zero"]
     assert bridge["this_source_bridge_NOT_a_formal_proof_of_Winograd_theorem"]
-    assert "Winograd" in bridge["known_1971_Winograd_minimum_tensor_rank_seven_EXTERNAL_THEOREM"]
+    assert bridge["known_1971_Winograd_minimum_tensor_rank_seven_EXTERNAL_THEOREM"]=="https://doi.org/10.1016/0024-3795(71)90009-7"
 
     c2=D["circles2"]
     assert c2["source_git_sha_before_first_original_content_commit"]==config["first_source_body_git_sha_freeze"]
