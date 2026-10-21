@@ -1,0 +1,49 @@
+{
+  "schema": "neumann.q34.second_truly_unopened_six_safety_triage.v1",
+  "date": "2026-10-21",
+  "immutable_upstream": "SyGuS-Org/benchmarks@13c8deb68a873635879c9a69bc78caebd340f646",
+  "freeze_is_pre_source_read": true,
+  "targets": [
+    {
+      "path": "lib/Inv_Track/andrew_lustre/DRAGON_6.lus.sl",
+      "git_blob": "32716afc4dc49116c8e6d734fb5d67a35df4e3d5",
+      "bytes": 37729
+    },
+    {
+      "path": "lib/Inv_Track/andrew_lustre/FIREFLY_5.lus.sl",
+      "git_blob": "d154c47ddd778ca64ad2812257fa20184e888cf3",
+      "bytes": 24375
+    },
+    {
+      "path": "lib/Inv_Track/from_2018/fib_08.sl",
+      "git_blob": "057c749f2a256c63c8845ebf8403880d5d48e327",
+      "bytes": 460
+    },
+    {
+      "path": "lib/Inv_Track/from_2018/fib_09s.sl",
+      "git_blob": "050b374b194fd8ffb627eadefd3c3ed72f698dfe",
+      "bytes": 1814
+    },
+    {
+      "path": "lib/Inv_Track/xujie_code2inv/16.c.sl",
+      "git_blob": "cb0f905c19fd16652c2bd403886775b1beafefa8",
+      "bytes": 1280
+    },
+    {
+      "path": "lib/Inv_Track/xujie_code2inv/17.c.sl",
+      "git_blob": "dc16cb2fa8357a1a6c97a93493ff02484a1fff21",
+      "bytes": 1281
+    }
+  ],
+  "protocol": {
+    "cheap_unsafe": "Exact original 0 and 1-step BMC SAT check, independently native Z3+cvc5 SAT for frozen concrete source witness including every state coordinate. No target gold invariant.",
+    "cheap_safe": "Same fixed 0.75 sec genuine cvc5 SyGuS source call then original Z3+cvc5 3VC.",
+    "complex_safe": "If no UNSAFE proof and cheap original SyGuS fails, original SPACER full native reachability plus AST-extracted original invariant Z3+cvc5 3VC.",
+    "declared_limits": "BMC dual each<=8sec, fast SyGuS<=0.75sec, SPACER<=15s, report all 6 outcomes and wall.",
+    "negative_controls": "Previously proved fib_07 one-step unsafe should be discovered automatically by generic BMC; one original genuine safe control where BMC does not falsely say UNSAFE; three mutation controls false Post must SAT.",
+    "admission": "Classification SAFE iff full native original 3VC UNSAT both independent; UNSAFE iff full original Pre/(one-step)Trans/!Post concrete source state trace SAT both independent. Otherwise UNKNOWN, not presumed safe.",
+    "neutrality": "No training/neural contribution or math invention; same family folders not author-independent; no 10x or full Q3/Q4 claims."
+  },
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN"
+}
