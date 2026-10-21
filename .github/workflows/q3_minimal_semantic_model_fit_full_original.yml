@@ -1,0 +1,74 @@
+name: Q3 actual trained DNF with independently minimal semantic state
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_minimal_semantic_model_fit_full_original.yml'
+      - 'research/evidence/q3_dynamic_minimal_learned67_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual_train_semantically_minimal_source_67:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify unchanged original source and learning method
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_dynamic_minimal_learned67_20261021/real_original_certified_minimum_interface_trained_tree.py
+      - name: Install genuine Z3 cvc5 pinned proof and CPU learned model
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: Real source automated semantic features and actual trained Boolean DNF native original full proof
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_dynamic_minimal_learned67_20261021/real_original_certified_minimum_interface_trained_tree.py \
+            --root original \
+            --freeze research/evidence/q3_dnf_first12_20261021/NEW_UNSEEN_ORIGINALS_BEFORE_SOURCE_BODY_LOCK.json \
+            --out /tmp/q3_original67_actual_trained_minimum_input.json | tee /tmp/q3_original67_actual_trained_minimum_input.log
+          sha256sum /tmp/q3_original67_actual_trained_minimum_input.json
+      - name: Archive original proof and honest matched classical evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-original67-trained-minimum-input-adaptive-proofs
+          path: |
+            /tmp/q3_original67_actual_trained_minimum_input.json
+            /tmp/q3_original67_actual_trained_minimum_input.log
+          if-no-files-found: warn
+      - name: Require native dual proof for all counted learned safety conclusions
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/q3_original67_actual_trained_minimum_input.json'))
+          assert q['schema']=='neumann.q3.posthoc_semantic_minimum_interface_to_actual_trained_DNF_original.v1'
+          assert q['exact_Z3_cvc5_all_smaller_subsets_minimum_feature_proof']['status']=='PROVED_FINITE_FEATURE_MINIMUM_ORIGINAL_NATIVE_Z3_CVC5'
+          assert q['already_opened_program_this_is_POSTHOC']
+          for label in ('prior_original_first_two_state_interface','algorithmically_selected_two_feature_interface'):
+              p=q[label]
+              for k in ('learned_disjunction','no_fit_disjunction'):
+                  if p.get(k+'_full_original_inductive'):
+                      assert all(z['dual_pass'] for z in p[k+'_original_dual_3VC'].values())
+          assert q['global_Q3']==q['global_Q4']==q['global_Q6']=='OPEN'
+          print('ACTUAL_SEMANTIC_FEATURE_MINIMUM_NATIVE_SOURCE_AND_LEARNED_ORIGINAL_CERTIFICATES_AUDITED')
+          PY
