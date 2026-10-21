@@ -80,7 +80,7 @@ def candidate_ast(vars,anchor,basis,coeffs,constant):
                   +[vars[anchor],z3.IntVal(-int(constant))])
 def same_math_classical(A,b):
     start=time.perf_counter_ns()
-    mat=sp.Matrix(A.tolist());vec=sp.Matrix(b.tolist())
+    mat=sp.Matrix(np.rint(A).astype(int).tolist());vec=sp.Matrix(np.rint(b).astype(int).tolist())
     sol=sp.linsolve(list(mat*sp.Matrix(sp.symbols("w:"+str(A.shape[1])))-vec),
                     sp.symbols("w:"+str(A.shape[1])))
     if not sol:return None,ms(start)
@@ -243,7 +243,7 @@ def main():
         "global_Q3":"OPEN","global_Q4":"OPEN","global_Q6":"OPEN",
         "all_cases":rows}
     path=Path(a.out);path.parent.mkdir(parents=True,exist_ok=True)
-    path.write_text(json.dumps(audit,indent=2,sort_keys=True)+"\n")
+    path.write_text(json.dumps(audit,indent=2,sort_keys=True,default=lambda q:bool(q) if isinstance(q,np.bool_) else int(q) if isinstance(q,np.integer) else float(q) if isinstance(q,np.floating) else str(q))+"\n")
     for k in ("actual_numeric_gradient_model_invoked_sources","actual_numeric_gradient_full_original_dual_3VC_SAFE",
               "same_basis_exact_rational_full_original_dual_3VC_SAFE",
               "native_full_source_cvc5_SyGuS_SAFE","native_full_source_Z3_SPACER_SAFE",
