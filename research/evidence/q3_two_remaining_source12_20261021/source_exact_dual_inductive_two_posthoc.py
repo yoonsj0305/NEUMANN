@@ -85,7 +85,7 @@ def audit(prior,manifest,contract,root):
     independent_first_certified=[z for z in prev if z["status"]=="COMPLETE_SAME_NATIVE_ORIGINAL_CPU_ROUTE_COMPARISON" and z["matched_trained_success"]]
     unresolved=[z for z in prev if not z.get("matched_trained_success",False)]
     targets=contract["case_contracts"]
-    if len(unresolved)!=len(targets)!=2:raise RuntimeError("EXPECTED_EXACTLY_2_PREVIOUS_UNRESOLVED")
+    if len(unresolved)!=2 or len(targets)!=2:raise RuntimeError("EXPECTED_EXACTLY_2_PREVIOUS_UNRESOLVED")
     frozen={x["path"]:x for x in cases}
     if {x["source"] for x in unresolved}!={x["path"] for x in targets}:
         raise RuntimeError("POSTHOC_CANDIDATES_NOT_HISTORICAL_UNKNOWN")
