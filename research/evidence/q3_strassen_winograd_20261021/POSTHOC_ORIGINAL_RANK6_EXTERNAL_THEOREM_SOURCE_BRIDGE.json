@@ -1,0 +1,17 @@
+{
+  "schema": "neumann.q3.posthoc_strassen_impossible_original_source_bilinear_rank6_winograd_external.v1",
+  "date": "2026-10-21",
+  "unmodified_original": "SMT-LIB/benchmark-submission-2022@81a39628827f61fbd74c6f3e67feb5c1b740d2f0:non-incremental/NRA/20220222-strassen-matrix-multiplication/strassen-impossible.smt2",
+  "original_frozen_blob": "9ffe078fd31c26792cde17c3d7c78e55691b0450",
+  "source_previously_opened": true,
+  "mathematical_authority": "Shmuel Winograd, On multiplication of 2 × 2 matrices, Linear Algebra and Its Applications 4(4), 381-388, October 1971. Original DOI 10.1016/0024-3795(71)90009-7. Independently confirm IBM research publication abstract that minimum exact bilinear multiplications is 7.",
+  "citation": "https://research.ibm.com/publications/on-multiplication-of-2-2-matrices",
+  "acceptance": "Read unchanged source full SMT2 after authentic SHA. Extract exactly exists(80 reals) forall(8 source input reals) conjunction of 4 output identities. Prove full original left-hand matrices form exact 2×2 matrix multiplication tensor by 4×16 bilinear monomial coefficients with independent Z3 and cvc5 UNSAT for non-equivalence to source LHS. Prove exact source RHS has exactly six shared rank-one bilinear A-only and B-only product terms P1..P6 with arbitrary existential linear input coefficients and each four output weights; 7th literal SMT 0 coefficient in all four. Rigorous native source AST checks plus separate independent QF_NRA Z3+cvc5 checking seventh-term zero as polynomial on arbitrary parameters/source reals. Then independently known Winograd 1971 theorem makes original full existential-real universal-real SMT2 UNSAT. Never claim solver formally proved the Winograd theorem or independently established full original UNSAT absent external theorem.",
+  "negative_guards": "Do NOT accept seven active rank-one products; nonreal source, different targets, per-output product forms not shared, mixed A/B input dependencies, or missing 0 seventh multiplier. Checks must fail closed. Exact coeff numbers 4×16; no source :status read.",
+  "ablation": "If external Winograd theorem disallowed, original result UNKNOWN even if premise source proof is established. Strong Direct with same theorem and compiler gets same UNSAT. This is not learned/novel unique Q3. All source already OPENED, posthoc.",
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q5": "OPEN",
+  "global_Q6": "OPEN",
+  "global_Q7": "OPEN"
+}
