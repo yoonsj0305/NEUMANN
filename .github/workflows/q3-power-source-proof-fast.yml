@@ -1,0 +1,73 @@
+name: Q3 independent fast authentic source ten magic power proof replay
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-power-source-proof-fast.yml'
+      - 'research/evidence/q3_power_feature_20261021/original_10_geometry_independent_dual_fast_replay.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  only_true_original_source_dual_theorem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/QF_NIA/20220315-MathProblems
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate original mathematical benchmark revision
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/q3_power_feature_20261021/original_10_geometry_independent_dual_fast_replay.py
+      - name: Install original independent source theorem provers
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Original exact source AST and independent verified necessary condition (no generic Direct)
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3_power_feature_20261021/original_10_geometry_independent_dual_fast_replay.py --root original --freeze research/evidence/q3_power_feature_20261021/PRE_SOURCE_FIRST_TEN_POSITIVE_MONOTONE_MAGIC_CONTRACT.json --out /tmp/q3_original10_fast_dual.json | tee /tmp/q3_original10_fast_dual.log
+          sha256sum /tmp/q3_original10_fast_dual.json
+      - name: Preserve all original proof or no proof outcomes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-true-original-ten-independent-dual-fast-geometric-proof
+          path: |
+            /tmp/q3_original10_fast_dual.json
+            /tmp/q3_original10_fast_dual.log
+          if-no-files-found: warn
+      - name: No inflation and strict original mathematical soundness
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_original10_fast_dual.json'))
+          assert x['original_git_sha_source_locked_prior_first_content']=='941ec4d16357cb9120490506e7c45cc60c76e74a'
+          assert x['this_run_is_after_original_first_source_look_not_first_trial']
+          assert x['original_source_authenticated_count']==10
+          assert len(x['cases'])==12
+          assert x['no_original_raw_direct_claim_or_measured_speed_ratio']
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          for q in x['cases']:
+              if q['source_injective_UNSAT_dual_pass']:
+                  assert q['independent_dual_original_necessary_QFLIA']['both_independent_unbounded_necessary_condition_UNSAT']
+                  assert q['source_geometry']['source_ast_verified_true_two_equal_sums']
+          print('Q3_2X2_NEW_ORIGINAL_DUAL_PROOF',x['five_true_original_power2x2_unbounded_unsat'])
+          print('Q3_3X3_NEW_ORIGINAL_DUAL_PROOF',x['five_source3x3_proved_unsat'])
+          PY
