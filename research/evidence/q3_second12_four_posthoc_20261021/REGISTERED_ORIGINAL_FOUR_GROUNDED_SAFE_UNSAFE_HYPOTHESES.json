@@ -1,0 +1,46 @@
+{
+  "schema": "neumann.q3.second_firstsource12_four_POSTHOC_original_unknown_source_native_triage_v1",
+  "upstream": "SyGuS-Org/benchmarks@13c8deb68a873635879c9a69bc78caebd340f646",
+  "all_four_original_source_bodies_PREVIOUSLY_OPENED_in_PR394": true,
+  "historical_first_source_run_id": 39582778316,
+  "historical_first_run_verdicts_IMMUTABLE": "8 FULL original SAFE 3VC; one prepare gate refused trivial Post or Pre nontrivial; three original safe UNKNOWN. Do not retroactively change first-run data.",
+  "source_frozen_metadata_manifest": "research/evidence/q3q6_second12_firstsource_20261021/FREEZE_BEFORE_SECOND_NEW12_ORIGINAL_SOURCE_BODY.json",
+  "four_unchanged_source_posthoc_hypotheses": [
+    {
+      "path": "lib/Inv_Track/from_2018/fib_07.sl",
+      "git_blob": "d078734e83a870d7b95a68bc7a947cf85ff944d8",
+      "hypothesis": "ACTUAL_UNSAFE_DEPTH_1",
+      "proof": "Full original Pre state0, Trans state0-state1, not original Post state1; independently Z3 and cvc5 SAT of untouched and exact grounded state witness; n! unconstrained in original source."
+    },
+    {
+      "path": "lib/Inv_Track/from_2018/jmbl_matrix2_simp.sl",
+      "git_blob": "4887478540a1cf665894582fafaaf3aabb080946",
+      "hypothesis": "ACTUAL_UNSAFE_DEPTH_1",
+      "proof": "Original native one transition can choose new a and unconstrained m! such that post false after k reaches c, independently ground and Z3/cvc5 full original SAT."
+    },
+    {
+      "path": "lib/Inv_Track/from_2018/jm2006_variant_true-unreach-call_true-termination.sl",
+      "git_blob": "5fe927c2afd006cae78158f089330f584edf027b",
+      "hypothesis": "SAFE_WITH_HUMAN_AFFINE_RELATIONS",
+      "candidate": [
+        "x+z=i",
+        "y+2*z=j"
+      ],
+      "proof": "Inductive full native original 3VC Z3+cvc5; source invariant derived manually AFTER source was opened."
+    },
+    {
+      "path": "lib/Inv_Track/from_2018/terminator_03_true-unreach-call_true-termination.sl",
+      "git_blob": "4601c17a86b2bc9bf98fd05dd8affe8692ac2c84",
+      "hypothesis": "SAFE_TRIVIAL_POST_TAUTOLOGY",
+      "candidate": [
+        "True"
+      ],
+      "proof": "Independent full source not(Post) UNSAT Z3 and cvc5 and original 3VC of True. Previous preflight required NOT Post SAT and must not treat tautologies as unsupported/unsafe."
+    }
+  ],
+  "no_learned_invariant_discovery_claim": true,
+  "admission": "Never classify unsafe without actual full original grounded path dual SAT; never classify safe without full original dual 3VC. If hypothesis fails keep source UNKNOWN, report failures. All original source Git SHA immutable.",
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q6": "OPEN"
+}
