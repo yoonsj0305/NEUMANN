@@ -76,6 +76,12 @@ jobs:
           assert q['heldout_original_transition_state_predictions_correct']==q['heldout_original_transition_state_predictions_total']
           assert q['heldout_original_transition_state_predictions_total']>100
           assert q['nonlearner_same_source_trace_lookup']['actual_original_3VC_dual_success']
+          assert q['finite_feature_domain_count']==4
+          assert q['finite_source_feature_table_complete_and_unique']
+          assert q['learned_vs_zero_train_actual_typed_invariant_identical_SHA256']
+          assert q['bounded_original_learned_unique_advantage_absent_on_this_domain']
+          assert q['CPU_decision_tree_training_wall_ms']>0
+          assert q['nonlearner_exact_finite_trace_lookup_build_ms']>=0
           assert not q['no_train_hypothesis_constant_zero']['actual_original_3VC_dual_success']
           assert not q['ablated_parity_only_full_original_verification']['actual_original_3VC_dual_success']
           assert not q['ablated_permuted_label_original_3VC']['actual_original_3VC_dual_success']
@@ -83,4 +89,5 @@ jobs:
           print('ACTUAL_CPU_LEARNED_TYPED_SOURCE_INVARIANT_TRUE_ORIGINAL_Z3_CVC5_3VC_PASS')
           print('ACTUAL_CPU_LEARNED_HELDOUT_K_PREDICTIONS',q['heldout_original_transition_state_predictions_total'])
           print('ACTUAL_NO_LEARN_SAME_TRACE_TABLE_CAN_MATCH_SUCCESS_UNIQUE_GAP_ZERO')
+          print('EXACT_ORIGINAL_SAME_TYPED_INVARIANT_SHA_LEARNED_VS_CLASSICAL',q['learned_vs_zero_train_actual_typed_invariant_identical_SHA256'])
           PY
