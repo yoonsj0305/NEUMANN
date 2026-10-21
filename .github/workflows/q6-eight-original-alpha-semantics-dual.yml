@@ -1,0 +1,83 @@
+name: Q6 source-original 8-program dynamic alpha normalizer native semantics 72 dual checks
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q6-eight-original-alpha-semantics-dual.yml'
+      - 'research/evidence/q6_alpha_arity_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact_original_8_program_dynamic_alpha_native_semantics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authentic original source and prereg exact source alpha semantics
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q6_alpha_arity_20261021/posthoc_eight_original_source_dynamic_arity_alpha_semantic_normalizer.py
+          python - <<'PY'
+          import json
+          c=json.load(open('research/evidence/q6_alpha_arity_20261021/PRE_EXECUTION_EIGHT_TRUE_ORIGINAL_DYNAMIC_ALPHA_CANONICAL_CONTRACT.json'))
+          assert c['schema']=='neumann.q6.posthoc_alpha_invariant_dynamic_original_program_semantic_skeleton_eight.v1'
+          assert c['original_count']==8 and c['source_already_opened_for_all_eight']
+          assert c['global_Q3']==c['global_Q4']==c['global_Q6']=='OPEN'
+          print('Q6_EXISTING_PR380_METHOD_POSTHOC_NO_LEARNED_TRANSFER_CLAIM')
+          PY
+      - name: Independently executable original source Z3 and SHA pinned cvc5
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Actual 8 original programs and three synthetic alpha variants per original, native dual semantic proofs
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python research/evidence/q6_alpha_arity_20261021/posthoc_eight_original_source_dynamic_arity_alpha_semantic_normalizer.py --root original --source24 research/evidence/q3_code2inv_presource24_20261021/BEFORE_ANY_ORIGINAL_SOURCE_BODY_OPEN_24_GIT_BLOBS.json --seven research/evidence/q6_cpu_transfer7_20261021/BEFORE_OPEN_SEVEN_NEW_ORIGINAL_FIB_CPU_MODEL_LOCK.json --contract research/evidence/q6_alpha_arity_20261021/PRE_EXECUTION_EIGHT_TRUE_ORIGINAL_DYNAMIC_ALPHA_CANONICAL_CONTRACT.json --out /tmp/q6_source_eight_original_alpha_semantics.json | tee /tmp/q6_source_eight_original_alpha_semantics.log
+          sha256sum /tmp/q6_source_eight_original_alpha_semantics.json
+      - name: Preserve source exact originals, negative controls and complete dual receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q6-eight-real-source-semantic-alpha-native-72-double-proofs
+          path: |
+            /tmp/q6_source_eight_original_alpha_semantics.json
+            /tmp/q6_source_eight_original_alpha_semantics.log
+          if-no-files-found: warn
+      - name: Require all eight original source 72 semantic and mutation controls
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q6_source_eight_original_alpha_semantics.json'))
+          assert x['preregistered_posthoc_original_source_structure_commit']=='f535c21787201c18e13d911f6208717d3e91ce48'
+          assert x['all_original_source_bodies_previously_opened_by_PR376_and_PR378']
+          assert x['same_8_original_git_source_files_retained']
+          assert x['true_original_sha_identity_authenticated']==8
+          assert x['dynamic_state_arity_independent_source_normalizer_pass']==8
+          assert x['true_native_3xdifferent_names_per_original_semantics_dual_pass']==72
+          assert x['synthetic_alpha_source_test_count']==24
+          assert x['all_actual_source_negative_post_mutations_detected']==8
+          assert x['global_Q3']==x['global_Q4']==x['global_Q6']=='OPEN'
+          print('Q6_AUTHENTIC_ORIGINAL_EIGHT_CANONICAL_ALPHA_8_OF_8')
+          print('Q6_REAL_ORIGINAL_PRE_TRANS_POST_INDEPENDENT_EQUIVALENCE_72_OF_72')
+          print('Q6_TRUE_ORIGINAL_SEMANTIC_NEGATIVE_8_OF_8')
+          print('Q6_LEARNED_GENERALIZATION_GLOBAL_OPEN')
+          PY
