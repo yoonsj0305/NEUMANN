@@ -1,0 +1,97 @@
+name: Q3 26 authentic original gold-free classical theorem broker with raw Direct and ablation
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-26-math-broker-original-source-ablation.yml'
+      - 'research/evidence/q3_integrated_math_broker_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  genuine_original_source_26_solver_and_deep_math_broker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/QF_NIA/20220315-MathProblems
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Freeze full original source identities and admitted math routes before execution
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/q3_integrated_math_broker_20261021/authentic_26_one_goldfree_source_math_broker.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/q3_integrated_math_broker_20261021/PRE_POSTHOC_UNIFIED_26_TRUE_SOURCE_NO_ORACLE_CONTRACT.json'))
+          assert x['schema']=='neumann.q3.posthoc_integrated_no_oracle_math_theorem_broker_26.v1'
+          assert x['source_count']==26 and len(x['three_immutable_source_manifests'])==3
+          assert x['scientific_split'].startswith('POSTHOC')
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          print('REAL_SOURCE_26_THREE_AUTHENTIC_FROZEN_MANIFESTS_POSTHOC_NO_UNIQUE_LEARNING')
+          PY
+      - name: Pin independently audited full original source theorem solvers
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0 sympy==1.14.0
+          lscpu | grep 'Model name' | head -1
+      - name: Authentic 26 originals classical inference not filenames versus same CPU raw direct with exact theorem ablation
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_integrated_math_broker_20261021/authentic_26_one_goldfree_source_math_broker.py --root original --manifest-four research/evidence/g0_fresh_four_unsat_20261021/BEFORE_ANY_SOURCE_BODY_OPEN_AUTHENTIC_FOUR.json --manifest-twelve research/evidence/g0_first_random_hash_12_20261021/ORIGINAL_TWELVE_PRE_BODY_GIT_SHA_FREEZE.json --manifest-ten research/evidence/q3_power_feature_20261021/PRE_SOURCE_FIRST_TEN_POSITIVE_MONOTONE_MAGIC_CONTRACT.json --contract research/evidence/q3_integrated_math_broker_20261021/PRE_POSTHOC_UNIFIED_26_TRUE_SOURCE_NO_ORACLE_CONTRACT.json --out /tmp/q3_integrated_26_raw_original_broker.json | tee /tmp/q3_integrated_26_raw_original_broker.log
+          sha256sum /tmp/q3_integrated_26_raw_original_broker.json
+      - name: Archive EVERY original successful failed or unverifiable branch
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-26-authentic-full-original-classical-broker-theorem-ablation
+          path: |
+            /tmp/q3_integrated_26_raw_original_broker.json
+            /tmp/q3_integrated_26_raw_original_broker.log
+          if-no-files-found: warn
+      - name: Strict faithful true original classification and unmatched full compute
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_integrated_26_raw_original_broker.json'))
+          assert x['preregistered_integration_contract_commit']=='2da789feb5ea301b1b2ea9953e694639b0eea295'
+          assert x['posthoc_ALL_previous_source_bodies_opened']
+          assert x['true_original_26_source_count']==26
+          assert x['actual_original_source_git_sha_authenticated_count']==26
+          assert x['any_known_true_source_misclassification_or_authentication_failure']==0
+          assert x['external_published_number_theory_theorem_NOT_independently_formally_proved']
+          assert x['accepted_comparator_equal_authority_specialist_can_copy_exact_same_algorithm']
+          assert x['learned_unique_structure_bonus_vs_equal_authority_classical']==0
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          for row in x['same_source_originals']:
+              assert row['status']=='VALID_TRUE_ORIGINAL_SOURCE_CHECK'
+              p=row['source_chosen_gold_free_math_dispatch']
+              assert not p['source_filename_routing'] and not p['source_gold_labels_input']
+              if p['status']=='SAT':
+                  q=p['three_cube_exact_original_independent_evidence']
+                  assert q['original_independent_Z3_cvc5_source_sat']
+              if p['status']=='UNSAT_CONDITIONAL_EXTERNAL_PUBLISHED_THEOREM':
+                  assert p['external_theorem_premise_used']
+                  assert p['native_true_original_source_to_AP_Z3_cvc5']['full_original_sums_entail_three_power_AP_DUAL']
+              assert row['source_Git_blob_authenticated']
+          print('TRUE_ORIGINAL_26_AUTHENTIC',x['actual_original_source_git_sha_authenticated_count'])
+          print('TRUE_ORIGINAL_26_SELF_CONTAINED_MACHINE_PROOFS',x['genuine_original_internal_machine_proved_sat_or_unsat'])
+          print('TRUE_ORIGINAL_26_PUBLISHED_THEOREM_CONDITIONAL',x['genuine_original_EXTERNAL_PUBLISHED_THEOREM_conditional_unsat'])
+          print('TRUE_ORIGINAL_26_RAW_DIRECT_SAT_UNSAT',x['matched_raw_original_strong_generic_Z3_OR_cvc5_solved_count'])
+          print('TRUE_ORIGINAL_26_CLASSICAL_BROKER_EXTRAS_OVER_RAW_GENERIC',x['extra_true_original_classification_vs_RAW_GENERIC_without_same_math_library'])
+          PY
