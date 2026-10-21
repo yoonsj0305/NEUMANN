@@ -1,0 +1,85 @@
+name: Q3 first virgin 24 true original Code2Inv/from2018 classical safety headroom
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-code2inv-new24-native-source-experts.yml'
+      - 'research/evidence/q3_code2inv_presource24_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  authentic_new24_original_source_SyGuS_PDR:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: True untouched original SyGuS source identity metadata freeze
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_code2inv_presource24_20261021/first_original24_native_cvc5_sygus_z3_spacer_expert_gate.py
+          python - <<'PY'
+          import json
+          c=json.load(open('research/evidence/q3_code2inv_presource24_20261021/BEFORE_ANY_ORIGINAL_SOURCE_BODY_OPEN_24_GIT_BLOBS.json'))
+          assert c['source_bodies_UNOPENED_at_Git_blob_SHA_freeze'] and len(c['cases'])==24
+          assert len({q['git_blob'] for q in c['cases']})==24
+          assert c['global_Q3']==c['global_Q4']=='OPEN'
+          print('SOURCE_BEFORE_FIRST_INSPECTION_SHA_FROZEN_24_GENUINE_PROGRAMS')
+          PY
+      - name: Pinned first original domain classical nonlinear theorem engines
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+          lscpu | grep 'Model name' | head -1
+      - name: First real exact original 24 Code2Inv source safety three strong expert routes and independently verified 3VC
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_code2inv_presource24_20261021/first_original24_native_cvc5_sygus_z3_spacer_expert_gate.py --root original --freeze research/evidence/q3_code2inv_presource24_20261021/BEFORE_ANY_ORIGINAL_SOURCE_BODY_OPEN_24_GIT_BLOBS.json --out /tmp/q3_new_true_24_original_safety_expert.json | tee /tmp/q3_new_true_24_original_safety_expert.log
+          sha256sum /tmp/q3_new_true_24_original_safety_expert.json
+      - name: Retain all first-open verified SAFE, unsafe-candidate, unsupported and unknown source outcomes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-first-source-new24-code2inv-classical-original-expert
+          path: |
+            /tmp/q3_new_true_24_original_safety_expert.json
+            /tmp/q3_new_true_24_original_safety_expert.log
+          if-no-files-found: warn
+      - name: Historical first original source must not become bogus model success
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3_new_true_24_original_safety_expert.json'))
+          assert r['first_original_git_sha_frozen_before_first_source_inspection_commit']=='6a5792e196b2234358dca31ec9dd733f3ffed42d'
+          assert r['all_24_authentic_original_source_rows_preserved'] and len(r['full_originals'])==24
+          assert not r['training_weights_updated'] and not r['neural_proposed_invariants']
+          assert r['all_24_source_labels_unused']
+          assert r['no_valid_closed_Q3_just_from_original_unsafe_or_unsolved']
+          assert r['global_Q3']==r['global_Q4']==r['global_Q5']=='OPEN'
+          for x in r['full_originals']:
+              if x['strong_classical_verified_SAFE']:
+                  assert x['full_native_cvc5_SyGuS_3s']['certified'] or x['full_native_Z3_SPACER_6s']['certified']
+                  assert x['typed_native_Pre_Trans_Post_Z3_cvc5_dual_parity']
+          print('FIRST_ORIGINAL_SAFETY_SHA_AUTHENTIC',r['all_original_24_true_source_valid_and_parity_verified'])
+          print('FIRST_ORIGINAL_SAFETY_CLASSICAL_SAFE',r['strong_classical_SAFE_inductively_proved_originals'])
+          print('FIRST_ORIGINAL_SAFETY_ACTUAL_UNPROVEN',r['source_safety_unproven_not_unsafe_or_learned_headroom'])
+          PY
