@@ -1,0 +1,80 @@
+name: Q3 v31 actual trained original conserved invariants native two VC
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_v31_native_trained_conservation_2vc.yml'
+      - 'research/evidence/q3_v31_proof_learned_conservation_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  prove_true_native_original_learned_conservation_not_always_full_safety:
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate unchanged true source and model script syntax
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_v31_proof_learned_conservation_20261021/verify_individual_PCA_learned_original_source_2VC.py
+          echo 'ORIGINAL_TEST_SOURCES_PREVIOUSLY_OPENED_BOUNDED_RESEARCH_ONLY'
+      - name: Independently pin real original proof checkers, actual learned PCA and rational algebra comparator
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: Independently certify original Pre=>C and C&Trans=>Cprime and nontriviality for every fitted conservation law
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_v31_proof_learned_conservation_20261021/verify_individual_PCA_learned_original_source_2VC.py \
+            --root original \
+            --freshfreeze research/evidence/q3_firstblind_eight_trained_20261021/BEFORE_EIGHT_NEW_ORIGINAL_SOURCE_BODIES_SHA_LOCK.json \
+            --oldfreeze research/evidence/q4q6_fresh12_cpu_router_20261021/FIRST_FRESH_12_SOURCE_SHA_FREEZE_BEFORE_BODY.json \
+            --out /tmp/learned_original_conservation_independent_2vc.json | tee /tmp/learned_original_conservation_independent_2vc.log
+          sha256sum /tmp/learned_original_conservation_independent_2vc.json
+      - name: Preserve every actual and negative source result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-v31-real-source-actual-trained-conservation-all-native-dual-receipts
+          path: |
+            /tmp/learned_original_conservation_independent_2vc.json
+            /tmp/learned_original_conservation_independent_2vc.log
+          if-no-files-found: warn
+      - name: Prove source-preserving two VCs but never claim complete safety or unique model mathematics
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/learned_original_conservation_independent_2vc.json'))
+          assert x['schema']=='neumann.q3.v31_actual_trained_PCA_real_original_conservation_two_induction_VCs.v1'
+          assert x['source_count']==10 and len(x['rows'])==10
+          assert x['all_test_source_bodies_previously_opened']
+          assert x['same_exact_classical_mathematical_rights']
+          assert x['not_mathematical_task_full_Post_proof']
+          assert x['global_Q3']==x['global_Q4']==x['global_Q6']=='OPEN'
+          for row in x['rows']:
+              for item in row.get('learned_PCA_original_conservation_candidates_and_proofs',[]):
+                  p=item['original_source_independent_math']
+                  if p['universally_valid_original_inductive_nontrivial_2VC']:
+                      for key in ('native_Pre_implies_invariant_Z3_cvc5','native_inductive_Trans_Z3_cvc5','native_nontriviality_Z3_cvc5'):
+                          assert p[key]['dual_pass']
+          print('GENUINE_ORIGINAL_SOURCE_TRAINED_CONSERVATION_CERTIFICATION_COMPLETE')
+          PY
