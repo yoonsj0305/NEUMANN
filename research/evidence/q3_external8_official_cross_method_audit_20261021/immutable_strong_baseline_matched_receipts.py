@@ -91,7 +91,7 @@ def main():
       "all_methods_original_parse_and_proof_wall_ms_sum":sum(q["all_source_path_wall_ms_including_all_methods"] for q in result),
       "retrospective_oracle_portfolio_is_NOT_actual_online_routed_runtime":True,
       "total_training_cost_and_amortization_NOT_MEASURED":True,
-      "no_proof_of_classical_superiority_or_10x":False,
+      "no_proof_of_learned_superiority_or_10x":True,
       "learned_unique_primitive_created":False,
       "global_Q3":"OPEN","global_Q4":"OPEN","global_Q6":"OPEN",
       "per_genuine_original":result}
