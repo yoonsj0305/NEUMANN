@@ -1,0 +1,76 @@
+name: Q3 immutable cross run audit 24 original verified safe or unsafe
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_24_original_crossrun_dual_proof_audit.yml'
+      - 'research/evidence/q3_exact_source24_certification_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  pinned_source_original_twentyfour_dual_certification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate original immutable actual dual-solver receipt auditor
+        run: |
+          python -m py_compile research/evidence/q3_exact_source24_certification_20261021/official_original24_crossrun_immutable_native_proof_audit.py
+          echo 'ORIGINAL_HISTORICAL_RECEIPTS_READ_ONLY_SHA_PINNED_NO_NEW_PROOF_CLAIMS'
+      - name: Download immutable posthoc original12 integrated successful original double proofs
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39601391011
+          github-token: ${{ github.token }}
+          name: q3-12-originals-zero-neural-integrated-proof-first-full-dual-3VC
+          path: /tmp/audit24/development
+      - name: Download immutable first source body blind additional12 source proofs and UNSAFE witness
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39602090265
+          github-token: ${{ github.token }}
+          name: q3-first-real-unopened12-fixed-classical-original-dual-proofs
+          path: /tmp/audit24/firstblind
+      - name: Independently audit original 24 source SHA identity full dual certified 3VC and original UNSAFE SAT
+        run: |
+          set -o pipefail
+          python research/evidence/q3_exact_source24_certification_20261021/official_original24_crossrun_immutable_native_proof_audit.py \
+            --development /tmp/audit24/development/q3_integrated_original12_all_full_native_3VC.json \
+            --blind /tmp/audit24/firstblind/q3_first12_unopened_true_original_full3vc.json \
+            --freeze_dev research/evidence/q3_dnf_first12_20261021/NEW_UNSEEN_ORIGINALS_BEFORE_SOURCE_BODY_LOCK.json \
+            --freeze_blind research/evidence/q3_proof_first_unopened12_20261021/PRE_BODY_SHA_LOCK_12_SOURCE_ORIGINALS.json \
+            --out /tmp/audit24/Q3_ALL24_IMMUTABLE_SOURCE_TRUTH_NATIVE_PROOFS.json | tee /tmp/audit24/CROSS_RUN_NATIVE_SOURCE_CERTIFICATES.log
+          sha256sum /tmp/audit24/Q3_ALL24_IMMUTABLE_SOURCE_TRUTH_NATIVE_PROOFS.json
+      - name: Preserve audit ledger of actual original safety certificates
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-source24-official-immutable-correct-original-proofs-cross-run-audit
+          path: |
+            /tmp/audit24/Q3_ALL24_IMMUTABLE_SOURCE_TRUTH_NATIVE_PROOFS.json
+            /tmp/audit24/CROSS_RUN_NATIVE_SOURCE_CERTIFICATES.log
+          if-no-files-found: warn
+      - name: Reject false original source first-blind or proof completeness claims
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          a=json.load(open('/tmp/audit24/Q3_ALL24_IMMUTABLE_SOURCE_TRUTH_NATIVE_PROOFS.json'))
+          assert a['schema']=='neumann.q3.official_two_original_cohorts_24_source_native_dual_receipt_audit.v1'
+          assert a['original_programs_24_all_git_sha_disjoint']==24
+          assert a['both_cohorts_total_true_Z3_cvc5_SAFE']==23
+          assert a['both_cohorts_total_true_Z3_cvc5_UNSAFE']==1
+          assert a['both_cohorts_total_UNKNOWN']==0
+          assert len(a['source_audit_ledger'])==24
+          assert a['all_programs_double_solver_original_3VC_or_unsafe_sat']
+          assert a['zero_neural_forwards_and_zero_fitted_models']
+          assert a['pre_source_body_metadata_frozen_for_second_cohort']
+          assert a['global_Q3']==a['global_Q4']==a['global_Q6']=='OPEN'
+          print('IMMUTABLE_REAL_SOURCE24_23SAFE_1UNSAFE_ORIGINAL_NATIVE_DUAL_CERTIFIED')
+          PY
