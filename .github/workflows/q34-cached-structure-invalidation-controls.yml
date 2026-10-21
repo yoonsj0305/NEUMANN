@@ -1,0 +1,68 @@
+name: Q34 real original source structural certificate synthetic negative mutation guards
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q34-cached-structure-invalidation-controls.yml'
+      - 'research/evidence/q34_real_source_mutant_reuse_20261021/source_invariant_negative_mutation_controls.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  reject_false_source_invariant_reuse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/andrew_lustre
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Source pin and negative mutation syntax
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q34_real_source_mutant_reuse_20261021/source_invariant_negative_mutation_controls.py
+      - name: Pinned independent original source Z3 and cvc5
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Original three positive invariant proofs and six independently dual synthetic invalidation controls
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q34_real_source_mutant_reuse_20261021/source_invariant_negative_mutation_controls.py --root original --freeze research/evidence/q34_real_source_mutant_reuse_20261021/FROZEN_MUTANTS_PRE_CONTENT.json --out /tmp/q34_invalidation.json | tee /tmp/q34_invalidation.log
+          sha256sum /tmp/q34_invalidation.json
+      - name: Preserve exact negative control results including errors
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q34-original-base-source-certificate-true-negative-invalidation
+          path: |
+            /tmp/q34_invalidation.json
+            /tmp/q34_invalidation.log
+          if-no-files-found: warn
+      - name: Strict original base positives and synthetic controls dual certification
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q34_invalidation.json'))
+          assert len(x['rows'])==3
+          assert x['positive_full_original_source_dual_pass']==3
+          assert x['negative_goal_false_z3_cvc5_rejections']==3
+          assert x['negative_trans_any_z3_cvc5_rejections']==3
+          assert x['new_real_source_verification_success_claims']==0
+          assert x['global_Q3']==x['global_Q4']=='OPEN'
+          print('STRUCTURE_REUSE_NEGATIVE_CONTROLS_6_OF_6_PASS')
+          PY

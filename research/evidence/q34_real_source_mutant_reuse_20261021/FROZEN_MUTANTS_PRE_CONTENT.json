@@ -1,0 +1,79 @@
+{
+  "schema": "neumann.q34.freeze_pre_source_variant_reuse_real_v1",
+  "upstream": "SyGuS-Org/benchmarks",
+  "upstream_commit": "13c8deb68a873635879c9a69bc78caebd340f646",
+  "before_mutant_content_read": true,
+  "scope": "TRUE untouched original SyGuS authored program mutants. Preserve ALL first mutants, including unsafe, signature mismatch and unknown. Not new author-family generalization.",
+  "baseline_origins": [
+    {
+      "path": "lib/Inv_Track/andrew_lustre/DRAGON_3.lus.sl",
+      "git_blob": "b71e97de26f972d60907486848b6fe8b043bb209",
+      "bytes": 39629,
+      "group": "DRAGON_3"
+    },
+    {
+      "path": "lib/Inv_Track/andrew_lustre/DRAGON_4.lus.sl",
+      "git_blob": "455422332af42a42d5f9c61562e1912f13bc2946",
+      "bytes": 37729,
+      "group": "DRAGON_4"
+    },
+    {
+      "path": "lib/Inv_Track/andrew_lustre/FIREFLY_3.lus.sl",
+      "git_blob": "8c92999373d0c29b1ccc4645dd423fd76b0ac647",
+      "bytes": 24375,
+      "group": "FIREFLY_3"
+    }
+  ],
+  "mutants": [
+    {
+      "path": "lib/Inv_Track/andrew_lustre/DRAGON_3_e1_4783.lus.sl",
+      "git_blob": "c82c2eeeca341eabe03bfe629418384a47547558",
+      "bytes": 39641,
+      "group": "DRAGON_3"
+    },
+    {
+      "path": "lib/Inv_Track/andrew_lustre/DRAGON_3_e1_4783_e1_3755.lus.sl",
+      "git_blob": "6e6d783c72de614286e507b687d4bff25eaf719a",
+      "bytes": 39653,
+      "group": "DRAGON_3"
+    },
+    {
+      "path": "lib/Inv_Track/andrew_lustre/DRAGON_3_e3_3846.lus.sl",
+      "git_blob": "e6d57b780c097dd838f5f2ade851e3ad65f48a14",
+      "bytes": 39629,
+      "group": "DRAGON_3"
+    },
+    {
+      "path": "lib/Inv_Track/andrew_lustre/DRAGON_4_e1_4312.lus.sl",
+      "git_blob": "704d688af2a317ec569a318f8d3a472004c184ec",
+      "bytes": 37741,
+      "group": "DRAGON_4"
+    },
+    {
+      "path": "lib/Inv_Track/andrew_lustre/DRAGON_4_e2_2799.lus.sl",
+      "git_blob": "242de2ff6ce60aa05f00ab19a35484ffbeb581f0",
+      "bytes": 37741,
+      "group": "DRAGON_4"
+    },
+    {
+      "path": "lib/Inv_Track/andrew_lustre/DRAGON_4_e3_4133.lus.sl",
+      "git_blob": "e95d65f32a44fb11e26c28baa1029186daa2bbb1",
+      "bytes": 37729,
+      "group": "DRAGON_4"
+    },
+    {
+      "path": "lib/Inv_Track/andrew_lustre/FIREFLY_3_e2_2236.lus.sl",
+      "git_blob": "22efc812b8fa8e037364b9e0f0302d13453f4987",
+      "bytes": 24381,
+      "group": "FIREFLY_3"
+    },
+    {
+      "path": "lib/Inv_Track/andrew_lustre/FIREFLY_3_e2_2236_e1_2305.lus.sl",
+      "git_blob": "c13427e87273331d89c9e4fae21a7a5b3e68daef",
+      "bytes": 24387,
+      "group": "FIREFLY_3"
+    }
+  ],
+  "design": "On each base source, run actual unchanged native original Z3 SPACER and extract actual full original inductive safety formula AST; independently authenticate source original Pre/Trans/Post Z3+cvc5 and full invariant 3VC dual. On each previously unopened mutant, check exact SHA/size, same typed source signature and nonvacuity, then compare cold same-CPU original source SPACER+independent 3VC vs verified reuse of base-cached invariant on new source (native Z3+cvc5 full original 3VC) with PDR fallback and all failures charged. Source no oracle/gold. No mutation-specific tuning. Verify unsafe original source with grounded dual witness before any unsafe claims. Baseline base invariant discovery cost included as cold-investment; amortization threshold must include it. Strong Direct granted SAME certificate and proof cache rights; this is a bounded structural reuse mechanism, not NEUMANN-only algorithm advantage.",
+  "scope_limit": "Global Q3 Q4 Q5 Q6 Q7 OPEN; no GPU/neural calls, no 10x unless observed iso capability; failed cases preserved; checkout time shared and excluded equally."
+}
