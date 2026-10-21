@@ -1,0 +1,19 @@
+{
+  "schema": "neumann.q3.posthoc.deploy_source_native_full_QFNIA_equivalent_magic_3x3.v1",
+  "source_revision": "SMT-LIB/benchmark-submission-2022@81a39628827f61fbd74c6f3e67feb5c1b740d2f0",
+  "posthoc_opened_sources_only": true,
+  "sources": [
+    "MF_03.smt2",
+    "MQ_03.smt2",
+    "SC_03.smt2",
+    "SQ_03.smt2",
+    "MC_03.smt2"
+  ],
+  "true_source_hash_manifest": "research/evidence/q3_power_feature_20261021/PRE_SOURCE_FIRST_TEN_POSITIVE_MONOTONE_MAGIC_CONTRACT.json",
+  "method": "Reparse every authentic original full QF_NIA source AST. Extract the true source-native equal-sum power monomial linear skeleton. Select exact rational independent subset (matrix rref), with independent Fraction Gaussian and independent Z3+cvc5 QF_LIA rowspace equivalence. Compile an executable reduced FULL QF_NIA source from the retained power sum rows and ALL other untouched source assertions. Remove ONLY 1 or 2 proved redundant sum rows; do not remove power, domain, positivity, distinct or any other original source assertion. Verify every other AST byte canonical SHA preserved and selected source row AST from actual original. Generated reduced formula is mathematically equivalent to full original as a logical conjunction, proof is from rowspace equivalence and identical remaining original assertions. Check original and reduced independently both Z3 and cvc5 raw with OS subprocess hard 3.5s each. No mistaking both UNKNOWN for iso-capability success. Output original plus reduced SAT/UNSAT/UNKNOWN status, actual parse+compile+dual overhead, source SHA artifact, backend wall.",
+  "next_gate": "If no actual positive original solves, global Q3,Q4 continue OPEN; do not pretend compression alone establishes useful frontier capability. Best Direct allowed same row reduction.",
+  "scope_limit": "Existing classical linear algebra, no neural learning and no cross-author novelty; no first source challenge.",
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q5": "OPEN"
+}
