@@ -25,9 +25,48 @@ from research.evidence.q3_original_3x3_rank_20261021.exact_true_original_magic_p
 from research.evidence.q3_published_3power_AP_20261021.five_original_source_to_Darmon_Merel_AP_theorem import (
     independent_entailment,EXTERNAL_LEMMA,EXTERNAL_CITATION
 )
-from research.evidence.q3_original_3x3_deploy_20261021.compile_full_authentic_smt2_exact_rowspace_and_probe import (
-    original_semantics_smt2,status_run
-)
+import subprocess,sys
+def original_semantics_smt2(assertions):
+    symbols={}
+    stack=list(assertions)
+    while stack:
+        term=stack.pop()
+        if term.num_args()==0 and term.decl().kind()==z3.Z3_OP_UNINTERPRETED:
+            if term.sort().kind()!=z3.Z3_INT_SORT:
+                raise RuntimeError("ORIGINAL_SOURCE_NONINTEGER_SYMBOL_UNEXPECTED")
+            symbols[str(term)]=True
+        else:
+            stack.extend(term.children())
+    lines=["(set-logic QF_NIA)"]
+    lines.extend("(declare-fun "+name+" () Int)" for name in sorted(symbols))
+    lines.extend("(assert "+a.sexpr()+")" for a in assertions)
+    lines.extend(["(check-sat)","(exit)"])
+    return "\n".join(lines)+"\n"
+
+def status_run(engine,payload):
+    start=time.perf_counter_ns()
+    if engine=="z3":
+        src="import z3,sys; p=z3.Solver();p.set(timeout=3000);p.from_string(sys.stdin.read());print(p.check())"
+        cmd=[sys.executable,"-c",src]
+    elif engine=="cvc5":
+        cmd=["cvc5","--lang=smt2","--tlimit-per=3000","-"]
+    else:raise ValueError("UNSUPPORTED_RAW_DIRECT_BACKEND")
+    label="UNKNOWN";error=None
+    try:
+        proc=subprocess.run(cmd,input=payload,capture_output=True,text=True,timeout=4.5)
+        vals=[q.strip().upper() for q in proc.stdout.splitlines()
+              if q.strip().lower() in ("sat","unsat","unknown")]
+        if proc.returncode==0 and vals:label=vals[0]
+        elif proc.returncode!=0:error="NONZERO_EXIT_"+str(proc.returncode)+":"+proc.stderr[:180]
+    except subprocess.TimeoutExpired:
+        label="UNKNOWN_HARD_OS_CAP"
+    except Exception as e:
+        label="UNKNOWN_BACKEND_ERROR"
+        error=type(e).__name__+":"+str(e)[:180]
+    return {"engine":engine,"source_status":label,
+            "whole_raw_source_backend_wall_ms":(time.perf_counter_ns()-start)/1e6,
+            "hard_OS_cap_sec":4.5,"error":error}
+
 from research.evidence.g0_official_original_four_20261021.original_four_2026_union_smt_direct_recheck import git_blob_sha1,sha256
 from research.evidence.g0_cubic_mod9_20261021.first_seven_frozen_originals_exact_mod9_cubes import structural_source
 
