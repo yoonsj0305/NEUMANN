@@ -1,0 +1,68 @@
+name: Q3 prove whole frozen learned operator grammar mathematically impossible OOD
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_all_mod_candidates_original_impossibility.yml'
+      - 'research/evidence/q3_exhaustive_operator_impossibility_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exhaustive_entire_operator_dictionary_native_original_dual_SAT:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate mathematically exact operator dictionary proof source
+        run: |
+          python -m py_compile research/evidence/q3_exhaustive_operator_impossibility_20261022/exhaustive_all_candidate_original_dual_counterexamples.py
+      - name: Install pinned Z3 cvc5 for independent 76 source failures plus 6 positive controls
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: Original source exhaustively Z3 and cvc5 certify all frozen candidates fail OOD inductive VC
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_exhaustive_operator_impossibility_20261022/exhaustive_all_candidate_original_dual_counterexamples.py \
+            --out /tmp/q3_76_original_dual_operator_impossibility_certificates.json | tee /tmp/q3_76_original_dual_operator_impossibility_certificates.log
+          sha256sum /tmp/q3_76_original_dual_operator_impossibility_certificates.json
+      - name: Archive every whole dictionary exact mathematical lower bound and positive controls
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-exhaustive-frozen-operator-dictionary-76-original-impossibility-certificates
+          path: |
+            /tmp/q3_76_original_dual_operator_impossibility_certificates.json
+            /tmp/q3_76_original_dual_operator_impossibility_certificates.log
+          if-no-files-found: warn
+      - name: Fail closed unless all 19 times 4 operators have independent real original SAT witnesses
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/q3_76_original_dual_operator_impossibility_certificates.json'))
+          assert q['schema']=='neumann.q3.exact_entire_fixed_mod_operator_grammar_impossibility.v1'
+          assert q['total_candidate_times_original_source_checks']==76
+          assert q['ALL_76_independently_certified_original_consecution_SAT']
+          assert q['admissible_model_candidates_within_vocabulary']==0
+          assert q['every_model_of_ANY_weights_fail_original_vc']
+          assert len(q['all_fixed_operator_source_counterexamples'])==76
+          assert q['positive_source_complete_dual_proof_controls']==6
+          for r in q['all_fixed_operator_source_counterexamples']:
+              assert r['source_inductive_invariant_mathematically_impossible']
+              assert r['original_source_real_independent_Z3_cvc5'][1]['independent_dual_sat']
+          for r in q['positive_in_vocab_actual_original_source_proofs']:
+              assert all(p['independent_dual_unsat'] for p in r['independent_original_full_Z3_cvc5_3VC'])
+          assert q['globally_all_program_invariant_impossibility_not_claimed']
+          assert q['global_Q3']==q['global_Q4']==q['global_Q6']=='OPEN'
+          print('Q3_ALL_FROZEN_OPERATOR_HYPOTHESES_MATHEMATICALLY_REFUTED_NOT_A_TRAINING_DEFECT')
+          PY
