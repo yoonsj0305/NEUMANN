@@ -41,7 +41,7 @@ jobs:
         run: |
           set -o pipefail
           PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_source_cegar_observational_alias_20261022/source_counterexample_driven_modulus_repair.py \
-            --official /tmp/q3cegar/q3_source_trained_unbounded_modulus_original.json \
+            --official /tmp/q3cegar/q3_learned_unbounded_modulus_native_original16.json \
             --out /tmp/q3cegar/q3_real_counterexample_active_repair_and_indistinguishability.json | tee /tmp/q3cegar/q3_real_counterexample_active_repair_and_indistinguishability.log
           sha256sum /tmp/q3cegar/q3_real_counterexample_active_repair_and_indistinguishability.json
       - name: Archive complete double-solver counterexamples and source original certified successes
