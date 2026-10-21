@@ -1,0 +1,83 @@
+name: Q3 DRAGON2 exact original affine inductive CEGIS closure
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-dragon2-exact-affine-inductive-fixpoint.yml'
+      - 'research/evidence/q3_exact_GF2_all_arity_20261021/dragon2_exact_affine_inductive_fixpoint.py'
+      - 'docs/research/Q3_DRAGON2_EXACT_ORIGINAL_AFFINE_INDUCTIVE_CLOSURE_CONTRACT_20261021.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  dragon2_original_all_boolean_affine_fixpoint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original_sources
+          sparse-checkout: |
+            lib/Inv_Track/andrew_lustre
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Exact original source and script identity
+        run: |
+          test "$(git -C original_sources rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_exact_GF2_all_arity_20261021/dragon2_exact_affine_inductive_fixpoint.py
+      - name: Pinned independent cvc5 plus Z3 and source parser dependency
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          test "$(find /tmp/cvc5bin -type f -name cvc5 | wc -l)" -eq 1
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Load immutable genuine first-unopened-source learned XOR4 0 of 2
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39514997383
+          name: q3-learned-xor4-two-real-first-originals
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/first
+      - name: Exact full original affine fixed point and two solver proof
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_exact_GF2_all_arity_20261021/dragon2_exact_affine_inductive_fixpoint.py --root original_sources --first /tmp/first/q3_xor4_first_two.json --out /tmp/q3_dragon2_affine_fixedpoint.json --max-wall-ms 600000 | tee /tmp/q3_dragon2_affine_fixedpoint.log
+          sha256sum /tmp/q3_dragon2_affine_fixedpoint.json
+      - name: Preserve all original source proof evidence or failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-dragon2-original-exact-affine-fixedpoint-first
+          path: |
+            /tmp/q3_dragon2_affine_fixedpoint.json
+            /tmp/q3_dragon2_affine_fixedpoint.log
+          if-no-files-found: warn
+      - name: Explicit scientifically conservative outcome gate
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          a=json.load(open('/tmp/q3_dragon2_affine_fixedpoint.json'))
+          assert a['historic_first_real_learned_XOR4']=='0/2_PRESERVED'
+          assert a['global_Q3']==a['full_Q3_GateR_and_GateV']=='OPEN'
+          assert a['controls']['four_way_parity_positive'].startswith('PASS')
+          assert a['controls']['unconstrained_transition_negative'].startswith('PASS')
+          assert a['original']['actual_source_sha256']
+          print('SCIENTIFIC_VERDICT',a['original']['scientific_status'])
+          if a['original']['scientific_status'].startswith('ABSTAIN'):
+              raise SystemExit('No original affine theorem admitted: ABSTAIN/UNKNOWN')
+          assert a['original']['every_affine_2VC_true_invariant_covered'] is True
+          assert all(v['dual_pass'] for v in a['original']['final_original_global_affine_2VC_Z3_and_cvc5'].values())
+          print('ORIGINAL_AFFINE_INDUCTIVE_SPACE_PROVEN_IN_DECLARED_SCOPE')
+          PY
