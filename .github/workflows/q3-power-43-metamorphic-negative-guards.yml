@@ -1,0 +1,41 @@
+name: Q3 positive power injection 43 adversarial SAT false-proof guards
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-power-43-metamorphic-negative-guards.yml'
+      - 'research/evidence/q3_power_feature_20261021/forty_three_source_original_adversarial_metamorphic.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  adversarial_true_original_source_semantics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pinned Z3 and independently executable cvc5 mathematical QFLIA proof
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+          python -m py_compile research/evidence/q3_power_feature_20261021/forty_three_source_original_adversarial_metamorphic.py
+      - name: Independent 43 source original assumptions mutation controls; no forced proof
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3_power_feature_20261021/forty_three_source_original_adversarial_metamorphic.py | tee /tmp/q3_true_geometry_43.log
+          grep -F 'Q3_POWER_MAGIC_ADVERSARIAL_TRUE_SOURCE_CONTROLS 43 /43 SOUND_FULL_UNBOUNDED_UNSAT 8 SOUND_SAT_NON_PROOFS 35' /tmp/q3_true_geometry_43.log
+      - name: Preserve all synthetic controls, failures and no-original-count distinction
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-power-source-43-synthetic-adversarial-controls
+          path: /tmp/q3_true_geometry_43.log
+          if-no-files-found: warn
