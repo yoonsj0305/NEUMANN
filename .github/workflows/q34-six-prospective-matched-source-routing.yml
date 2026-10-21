@@ -1,0 +1,85 @@
+name: Q34 first six new originals matched strong Direct complete cost
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q34-six-prospective-matched-source-routing.yml'
+      - 'research/evidence/q34_fresh_cost_routing_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_original_matched_source_discovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: source
+          sparse-checkout: |
+            lib/Inv_Track/andrew_lustre
+            lib/Inv_Track/from_2018
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Require fixed original identities and syntax
+        run: |
+          test "$(git -C source rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q34_fresh_cost_routing_20261021/six_first_source_complete_cost_matched_direct.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/q34_fresh_cost_routing_20261021/SIX_BLIND_SOURCE_FROZEN_BEFORE_FIRST_READ.json'))
+          assert len(x['sources'])==6 and x['first_source_access'].startswith('No source body')
+          assert x['protocol']['selector'].startswith('If original bytes > 8192')
+          print('GIT_BLOB_FROZEN_FIRST_NEW_SIX',len(x['sources']))
+          PY
+      - name: Original source Z3 and independently checksum-pinned cvc5
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+          lscpu | grep -E 'Model name' | head -1
+      - name: FIRST six genuine source complete costs under three equally authorized arms
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q34_fresh_cost_routing_20261021/six_first_source_complete_cost_matched_direct.py --root source --freeze research/evidence/q34_fresh_cost_routing_20261021/SIX_BLIND_SOURCE_FROZEN_BEFORE_FIRST_READ.json --out /tmp/q34_first_six_matched_cost.json | tee /tmp/q34_first_six_matched_cost.log
+          sha256sum /tmp/q34_first_six_matched_cost.json
+      - name: Preserve all first original experiment results, including negative conclusions
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q34-prospective-six-authentic-matched-complete-cost
+          path: |
+            /tmp/q34_first_six_matched_cost.json
+            /tmp/q34_first_six_matched_cost.log
+          if-no-files-found: warn
+      - name: Fail closed on source identity, trace disagreement and false claims
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q34_first_six_matched_cost.json'))
+          assert x['pre_content_source_freeze_commit']=='a4bf2cbf40040636480fb800d5824d8353bac834'
+          assert x['source_all_six_preserved'] and x['source_all_six_programs_nonduplicate']
+          assert x['source_case_all_certificates_agree']
+          assert all(x['arms'][a]['full_source_semantic_authentications']==6 for a in ('direct_PDR_first','uniform_post_first','size_route'))
+          assert x['positive_and_negative_source_controls']['original_fib07_independent_UNSAFE']['status'].startswith('PASS')
+          assert x['positive_and_negative_source_controls']['original_fib05_independent_SAFE']['status'].startswith('PASS')
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          assert x['strong_direct_can_execute_identical_source_size_dispatch']
+          print('FROZEN_SIX_CORRECT_CERTIFIED_COUNTS',
+                {a:{k:x['arms'][a][k] for k in ('certified','safe','unsafe','unknown','total_paid_full_path_wall_ms')} for a in x['arms']})
+          print('SAME_CAPABILITY',x['same_capability_full_certificate_new_vs_direct'])
+          print('BETTER_FULL_COST',x['candidate_full_cost_below_direct_at_iso_capability'])
+          print('TEN_X',x['candidate_10x_faster_at_iso_capability'])
+          PY
