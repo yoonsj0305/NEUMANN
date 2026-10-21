@@ -1,0 +1,93 @@
+name: Q3 integrated exact original12 fully certified zero neural optimized portfolio
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_integrated_original12_full_native_3VC.yml'
+      - 'research/evidence/q3_integrated_optimized_12_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  reproduce_12_genuine_originals_one_integrated_zero_neural_run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate exact original revision and compile actual unified proof controller
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_integrated_optimized_12_20261021/complete_zero_neural_exact_houdini_portfolio.py
+      - name: Install independent SHA pinned cvc5 and genuine Z3 plus source parser
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: ACTUAL single whole original 12 rerun native exact OR Houdini SyGuS Spacer all costs
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_integrated_optimized_12_20261021/complete_zero_neural_exact_houdini_portfolio.py \
+            --root original \
+            --freeze research/evidence/q3_dnf_first12_20261021/NEW_UNSEEN_ORIGINALS_BEFORE_SOURCE_BODY_LOCK.json \
+            --out /tmp/q3_integrated_original12_all_full_native_3VC.json | tee /tmp/q3_integrated_original12_all_full_native_3VC.log
+          sha256sum /tmp/q3_integrated_original12_all_full_native_3VC.json
+      - name: Preserve all source SHA original full proof costs and failed routes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-12-originals-zero-neural-integrated-proof-first-full-dual-3VC
+          path: |
+            /tmp/q3_integrated_original12_all_full_native_3VC.json
+            /tmp/q3_integrated_original12_all_full_native_3VC.log
+          if-no-files-found: warn
+      - name: All 12 genuine originals must be independently completely verified, never count a weak proof
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3_integrated_original12_all_full_native_3VC.json'))
+          assert r['schema']=='neumann.q3.proof_first_integrated_original12_zero_neural_exact_OR_Houdini_SyGuS_PDR.v2'
+          assert r['source_original_count']==12 and len(r['per_original'])==12
+          assert len({x['original_git_blob'] for x in r['per_original']})==12
+          assert r['neural_forwards']==r['fitted_ML_models']==0
+          assert r['fully_certified_original_safe_independent_Z3_cvc5']==12
+          assert r['genuine_unknown_or_abstained_count']==0
+          assert r['only_original_independent_Z3_cvc5_FULL_3VC_counted']
+          assert r['global_Q3']==r['global_Q4']==r['global_Q6']=='OPEN'
+          assert sum(r['winner_breakdown'].values())==12
+          for case in r['per_original']:
+              assert case['certified_SAFE']
+              winner=case['winner']
+              if winner=='tautology_delete':
+                  checks=case['certified_trivial_True_original_3VC']
+              elif winner=='exact_no_fit_OR_with_min_info':
+                  checks=case['original_dual_3VC_nofit_OR']
+              elif winner=='generic_affine_Houdini':
+                  checks=case['original_dual_3VC_Houdini_conjunction']
+              elif winner=='original_cvc5_SyGuS':
+                  checks=case['strong_original_cvc5_SyGuS_native_source']['original_native_Z3_cvc5_3VC']
+              elif winner=='original_Z3_SPACER':
+                  p=case['strong_original_Z3_SPACER_native_source']
+                  assert p['certified']
+                  checks=next(q['original_full_dual_3VC'] for q in p['original_independently_certified_candidates'] if q['certified'])
+              else:raise AssertionError('UNSUPPORTED_CERTIFIED_WINNER')
+              assert set(checks)=={'init','consecution','goal'}
+              assert all(z['dual_pass'] for z in checks.values())
+          print('TWELVE_OF_TWELVE_TRUE_NATIVE_ORIGINAL_DUAL_Z3_CVC5_CERTIFIED_ZERO_NEURAL')
+          PY
