@@ -84,7 +84,8 @@ def certificate(root):
             "unchanged_other_row_cube_sum":t,
             "source_row_constraint_false":negrow!=t,
             "source_distinct_constraint_also_false":bad[0][0] in {
-                v for row in bad for v in row if v!=bad[0][0]
+                bad[i][j] for i in range(8) for j in range(8)
+                if (i,j)!=(0,0)
             },
             "no_claim_of_second_solver_UNSAT_without_actual_check":True
         }
