@@ -1,0 +1,76 @@
+name: Q3 exact minimum original-state information profile all 12
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_original12_exact_min_feature_profile.yml'
+      - 'research/evidence/q3_original12_state_information_profile_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original12_exact_minimum_state_information:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check source identity and exact original theorem script
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_original12_state_information_profile_20261021/dual_verified_minimum_feature_distribution.py
+      - name: Install genuine independent exact Z3 and SHA-pinned cvc5
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: Minimum original zero one step state projection across entire previous blind twelve
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3_original12_state_information_profile_20261021/dual_verified_minimum_feature_distribution.py \
+            --root original \
+            --freeze research/evidence/q3_dnf_first12_20261021/NEW_UNSEEN_ORIGINALS_BEFORE_SOURCE_BODY_LOCK.json \
+            --out /tmp/q3_real_original12_exact_minimal_semantic_info.json | tee /tmp/q3_real_original12_exact_minimal_semantic_info.log
+          sha256sum /tmp/q3_real_original12_exact_minimal_semantic_info.json
+      - name: Preserve ALL independent per original mathematical receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-original12-minimal-information-distribution-all-native-dual-proofs
+          path: |
+            /tmp/q3_real_original12_exact_minimal_semantic_info.json
+            /tmp/q3_real_original12_exact_minimal_semantic_info.log
+          if-no-files-found: warn
+      - name: Fail closed if source minimum claims omit any smaller original projection
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,math
+          x=json.load(open('/tmp/q3_real_original12_exact_minimal_semantic_info.json'))
+          assert x['schema']=='neumann.q3.12_real_original_exact_minimal_0_1_step_information_profile.v1'
+          assert x['original_source_count']==12 and len(x['all_originals'])==12
+          assert x['bounded_necessary_information_NOT_inductive_sufficiency']
+          assert x['global_Q3']==x['global_Q4']==x['global_Q6']=='OPEN'
+          for r in x['all_originals']:
+              if r['status']=='MINIMUM_ORIGINAL_SOURCE_INFO_PROVED_BY_BOTH_SOLVERS':
+                  m=r['minimal_cardinality_for_0_1_step_versus_NotPost']
+                  assert r['all_smaller_feature_combinations_dual_SAT']==sum(
+                      math.comb(r['original_state_variable_count'],k) for k in range(m))
+                  assert all(p['dual_original_sat']['dual_pass'] for p in r['smaller_original_alias_proofs'])
+                  assert r['selected_projection_true_source_dual_UNSAT']['dual_pass']
+          print('ORIGINAL_TWELVE_SEMANTIC_INTERFACE_CERTIFICATES_ALL_CHECKED')
+          PY
