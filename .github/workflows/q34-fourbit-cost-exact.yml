@@ -1,0 +1,57 @@
+name: Q34 exact structural cost theorem and independent 4bit oracle
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q34-fourbit-cost-exact.yml'
+      - 'research/evidence/q3_affine_unopened_transfer_20261021/independent_fourbit_and_structural_cost_bound.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  exact_structural_cost:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: CPU only Z3 no GPU no paid API
+        run: python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Recover immutable first four original source affine receipt
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39520385265
+          name: q3-frozen-unopened-four-source-first-classical-affine
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/first4
+      - name: Independent exhaustive 4bit finite-state reference and real structural accounting
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_affine_unopened_transfer_20261021/independent_fourbit_and_structural_cost_bound.py --first /tmp/first4/q3_four_original_transfer.json --out /tmp/q34_cost_exact.json | tee /tmp/q34_cost_exact.log
+          sha256sum /tmp/q34_cost_exact.json
+      - name: Archive positive and negative controls, costs and caps
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q34-exact-real-structure-count-and-independent-four-bit
+          path: |
+            /tmp/q34_cost_exact.json
+            /tmp/q34_cost_exact.log
+          if-no-files-found: warn
+      - name: Distinguish structural search-space elimination from whole-runtime Q4 10x
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q34_cost_exact.json'))
+          assert x['independent_4bit_true_oracle']['pass_count']==40
+          assert len(x['actual_four_frozen_originals'])==4
+          assert x['structural_enumeration_avoidance_proved']
+          assert x['NOT_runtime_10x'] and x['NOT_state_of_the_art_classical_10x']
+          assert x['global_Q3']==x['global_Q4']=='OPEN'
+          print('SCOPED_PURE_ALGEBRAIC_ENUMERATION_AVOIDANCE_PASSED_FOUR_ORIGINALS')
+          PY
