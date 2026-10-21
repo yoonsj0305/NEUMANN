@@ -1,0 +1,83 @@
+name: Q3 native independent immutable source-operator causal admission audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_native_operator_boundary_replay.yml'
+      - 'research/evidence/q3_unbounded_ast_admission_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  exact_source_old_impossible_vs_real_learned_generated_new_ast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile independently written native source audit
+        run: |
+          python -m py_compile research/evidence/q3_unbounded_ast_admission_20261022/audit_archived_old_wall_and_learned_escape_native.py
+      - name: Install SHA pinned independent Z3 and cvc5
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: Download exact historical 76 frozen operator failures
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39625778248
+          github-token: ${{ github.token }}
+          name: q3-exhaustive-frozen-operator-dictionary-76-original-impossibility-certificates
+          path: /tmp/operator-audit/old
+      - name: Download official new learned operator constructor source proofs
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39687539419
+          github-token: ${{ github.token }}
+          name: q3-source-trained-modulus-constructor-outside-proven-finite-list
+          path: /tmp/operator-audit/new
+      - name: Re-run native Z3 and independent cvc5 on 76 old and 16 learned and 16 ablation original VCs
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3_unbounded_ast_admission_20261022/audit_archived_old_wall_and_learned_escape_native.py \
+            --old /tmp/operator-audit/old/q3_76_original_dual_operator_impossibility_certificates.json \
+            --new /tmp/operator-audit/new/q3_learned_unbounded_modulus_native_original16.json \
+            --out /tmp/operator-audit/NEUMANN_Q3_REPLAYED_CAUSAL_OPERATOR_BOUNDARY.json | tee /tmp/operator-audit/NEUMANN_Q3_REPLAYED_CAUSAL_OPERATOR_BOUNDARY.log
+          sha256sum /tmp/operator-audit/NEUMANN_Q3_REPLAYED_CAUSAL_OPERATOR_BOUNDARY.json
+      - name: Archive all independent replayed source SAT and UNSAT evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-native-old-grammar-impossibility-to-learned-grammar-escape-96proofs
+          path: |
+            /tmp/operator-audit/NEUMANN_Q3_REPLAYED_CAUSAL_OPERATOR_BOUNDARY.json
+            /tmp/operator-audit/NEUMANN_Q3_REPLAYED_CAUSAL_OPERATOR_BOUNDARY.log
+          if-no-files-found: warn
+      - name: Fail closed unless old impossibility new learned full goal and strong classical equality all hold
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/operator-audit/NEUMANN_Q3_REPLAYED_CAUSAL_OPERATOR_BOUNDARY.json'))
+          assert r['schema']=='neumann.q3.independent_native_causal_operator_dictionary_escape_audit.v1'
+          assert r['old_fixed_operator_candidate_count']==19
+          assert r['original_entire_19x4_vocabulary_all_fresh_dual_SAT']==76
+          assert r['new_learned_out_of_fixed_list_original_full_fresh_Z3_cvc5_3VC']==16
+          assert r['untrained_same_architecture_original_consecution_fresh_dual_SAT']==16
+          assert r['OOD_source_mutant_counterexamples_replayed']==16
+          assert r['matched_strong_classical_exact_GCD_same_original_proofs']==16
+          assert r['model_created_NEW_PARAMETER_INSTANCES']
+          assert not r['model_created_NEW_MOD_PRIMITIVE']
+          assert r['learned_MODULE_NECESSARY_vs_UNTRAINED_INITIALIZATION']
+          assert not r['learned_MODULE_NOT_NECESSARY_vs_STRONG_EXACT_CLASSICAL']==False
+          assert r['global_Q3']==r['global_Q4']==r['global_Q6']=='OPEN'
+          print('Q3_SCOPED_REPRESENTATION_RANGE_OVERCOME_FRESH_Z3_CVC5_CONFIRMED_CLASSICAL_EQUAL')
+          PY
