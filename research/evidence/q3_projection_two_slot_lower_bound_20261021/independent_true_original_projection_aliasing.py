@@ -45,22 +45,37 @@ def per(root,item):
         two=z3.And(native["pre"],bad,*(a==b for a,b in zip(first,cloned[:2])))
         all_vars=z3.And(native["pre"],bad,*(a==b for a,b in zip(src["now"],cloned)))
         same=z3.And(native["pre"],z3.Not(native["post"]))
+        # A reachable one-step successor must also be accepted by ANY inductive I.
+        # Shadow bad state can share pi(successor) while differing in omitted slots.
+        reach1_projection_collision=z3.And(native["pre"],native["trans"],bad,
+             *(a==b for a,b in zip(src["next"][:2],cloned[:2])))
+        reach1_actual_unsafe=z3.And(native["pre"],native["trans"],
+             z3.substitute(z3.Not(native["post"]),*list(zip(src["now"],src["next"]))))
         row["exact_dual_original_source_parity"]=parity
         row["Pre_satisfiable"]=check(native["pre"])
         row["NotPost_satisfiable"]=check(z3.Not(native["post"]))
         row["two_slot_positive_vs_negative_indistinguishable"]=check(two)
         row["all_state_slots_positive_vs_negative_indistinguishable"]=check(all_vars)
         row["actual_same_original_state_Pre_and_NotPost"]=check(same)
+        row["one_step_reachable_projection_aliases_negative"]=check(reach1_projection_collision)
+        row["actual_one_step_reachable_unsafe"]=check(reach1_actual_unsafe)
         if not all(r["independent_dual"] for r in (
             row["Pre_satisfiable"],row["NotPost_satisfiable"],
             row["two_slot_positive_vs_negative_indistinguishable"],
             row["all_state_slots_positive_vs_negative_indistinguishable"],
-            row["actual_same_original_state_Pre_and_NotPost"])):
+            row["actual_same_original_state_Pre_and_NotPost"],
+            row["one_step_reachable_projection_aliases_negative"],
+            row["actual_one_step_reachable_unsafe"])):
             raise RuntimeError("INDEPENDENT_NATIVE_SMT_DISAGREEMENT")
         aliased=row["two_slot_positive_vs_negative_indistinguishable"]["status"]=="SAT"
         unsafe=row["actual_same_original_state_Pre_and_NotPost"]["status"]=="SAT"
         row["two_input_classifier_mathematically_impossible_IA_AND_GOAL"]=aliased
         row["genuine_original_unsafe_at_initial_state"]=unsafe
+        row["one_step_two_slot_inductive_separator_impossible"]=(
+            row["one_step_reachable_projection_aliases_negative"]["status"]=="SAT")
+        row["one_step_projection_alias_without_actual_unsafe"]=(
+            row["one_step_two_slot_inductive_separator_impossible"] and
+            row["actual_one_step_reachable_unsafe"]["status"]=="UNSAT")
         row["projection_alias_without_actual_initial_unsafety"]=aliased and not unsafe
         row["status"]="ACTUAL_ORIGINAL_SOURCE_EXACT_PROJECTION_BAR_INTERVAL_VERIFIED"
     except Exception as e:
@@ -70,7 +85,7 @@ def per(root,item):
     print("Q3_PROJECTION_INFO_THEOREM",row["source"].rsplit("/",1)[-1],row["status"],
           "TWO_SLOT_IMPOSSIBLE",row.get("two_input_classifier_mathematically_impossible_IA_AND_GOAL"),
           "SAME_STATE_UNSAFE",row.get("genuine_original_unsafe_at_initial_state"),
-          "ALIAS_ONLY",row.get("projection_alias_without_actual_initial_unsafety"),
+          "ALIAS_ONLY",row.get("projection_alias_without_actual_initial_unsafety"),"ONE_STEP_ALIAS",row.get("one_step_two_slot_inductive_separator_impossible"),
           flush=True)
     return row
 def main():
@@ -88,6 +103,10 @@ def main():
         "originals_completely_dual_audited":len(accepted),
         "two_slot_representation_mathematically_insufficient_count":
             sum(r["two_input_classifier_mathematically_impossible_IA_AND_GOAL"] for r in accepted),
+        "one_step_projection_inductive_impossible_count":
+            sum(r["one_step_two_slot_inductive_separator_impossible"] for r in accepted),
+        "one_step_alias_without_actual_unsafe_count":
+            sum(r["one_step_projection_alias_without_actual_unsafe"] for r in accepted),
         "true_initial_unsafe_original_count":
             sum(r["genuine_original_unsafe_at_initial_state"] for r in accepted),
         "pure_information_alias_without_initial_unsafety_count":
@@ -104,6 +123,8 @@ def main():
     output.write_text(json.dumps(result,indent=2,sort_keys=True)+"\n")
     for key in ("originals_completely_dual_audited",
                 "two_slot_representation_mathematically_insufficient_count",
+                "one_step_projection_inductive_impossible_count",
+                "one_step_alias_without_actual_unsafe_count",
                 "true_initial_unsafe_original_count",
                 "pure_information_alias_without_initial_unsafety_count",
                 "all_source_variables_cannot_separate_count"):
