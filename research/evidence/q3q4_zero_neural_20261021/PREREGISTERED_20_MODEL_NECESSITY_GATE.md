@@ -1,0 +1,9 @@
+# Preregistered Q3/Q4 zero-neural necessity gate | 2026-10-21
+
+Original cohort: exactly the 20 previously opened genuine SyGuS program source Git blobs from the FOUR original metadata freeze files specified in PR #339. Not a new-source generalization claim. All cases retained without exception.
+
+Fixed source-first method, using no answer labels: (1) verify original Pre/Trans/Post typed/native parity and source SHA, Pre SAT and NotPost SAT; (2) original published Post as inductive invariant, Z3+cvc5 full 3VC; (3) exact genuine 0..3 step BMC, ground all states and verify original SAT counterexample with both independent solvers; (4) 0.75 second cvc5 SyGuS, only original Z3+cvc5 3VC-certified invariant accepted; (5) 15 second original Z3 SPACER fallback with extracted invariant independently 3VC-certified in original Z3+cvc5; otherwise UNKNOWN.
+
+All wall costs charged including failed probes and verification; zero neural forwards, training, GPU and API. Source-specific code and source-specific model routing forbidden. Also run same original Z3 SPACER as strongest single classical comparator on same CPU for all 20. This is NOT comparison to strongest classical portfolio, which is allowed the same tools and can perform the same routing. Avoid any unique NEUMANN learned structural invention or full Q3/Q4/Q5 claims.
+
+Predeclared scientific result: bounded zero-neural classification count SAFE/UNSAFE/UNKNOWN. On independently resolved sources, invoking another positively-costed neural step cannot improve binary correct classification for that *source*, though it may have lower runtime on other distributions. Model necessity globally remains UNKNOWN. Abort claiming positive capability if original checker not independently certified. Distinguish actual first policy result from all previous evidence.
