@@ -113,7 +113,7 @@ def main():
         "global_Q3":"OPEN","global_Q4":"OPEN","global_Q6":"OPEN",
         "cases":rows}
     path=Path(a.out);path.parent.mkdir(parents=True,exist_ok=True)
-    path.write_text(json.dumps(report,indent=2,sort_keys=True)+"\n")
+    path.write_text(json.dumps(report,indent=2,sort_keys=True,default=lambda z:int(z) if isinstance(z,np.integer) else float(z) if isinstance(z,np.floating) else str(z))+"\n")
     for k in ("exact_source_state_minimum_proved_before_model_count",
               "no_model_needed_original_Post_tautology_full_dual_proof",
               "original_fixed_two_input_model_fitted","semantic_adaptive_two_input_model_fitted",
