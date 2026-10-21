@@ -1,0 +1,93 @@
+name: Q3 official single coherent replay all 18 genuine nonlinear original evidence authorities
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-replay-full-18-authentic-source-proofs.yml'
+      - 'research/evidence/q3_other_family_18_final_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  one_official_same_original_18_provenance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/QF_NRA/20211101-Geogebra
+            non-incremental/NRA/20220222-strassen-matrix-multiplication
+            non-incremental/NRA/20220222-cut-three-circles
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Preserve official unmodified upstream original revision and frozen 18 experiment protocol
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/q3_other_family_18_final_20261021/independently_replay_and_adjudicate_18_authentic_original_sources.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/q3_other_family_18_final_20261021/PRE_INTEGRATION_TRUE_ORIGINAL_18_AUTHORITY_GATE.json'))
+          assert x['schema']=='neumann.q3.after_original_18_first_open_complete_provenance_union.v1'
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          assert 'POSTHOC' in x['strict_scientific_provenance']
+          print('TRUE_ORIGINAL_18_INITIAL_BLOB_FREEZE_AND_CLASSICAL_VS_EXTERNAL_AUTHORITY_SEPARATE')
+          PY
+      - name: Pinned independent original source Z3 cvc5 and exact SymPy rational arithmetic
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.14.0
+          lscpu | grep 'Model name' | head -1
+      - name: Reproduce four independent programs all eighteen exact original SMT2 source classifications
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_other_family_18_final_20261021/independently_replay_and_adjudicate_18_authentic_original_sources.py --root original --freeze research/evidence/q3_fresh_real_nra_20261021/BEFORE_ANY_NEW_SOURCE_BODY_18_ORIGINALS.json --contract research/evidence/q3_other_family_18_final_20261021/PRE_INTEGRATION_TRUE_ORIGINAL_18_AUTHORITY_GATE.json --out /tmp/NEUMANN_TRUE_ORIGINAL_18_SOURCE_TOTAL_CERTIFICATES.json | tee /tmp/NEUMANN_TRUE_ORIGINAL_18_SOURCE_TOTAL_CERTIFICATES.log
+          sha256sum /tmp/NEUMANN_TRUE_ORIGINAL_18_SOURCE_TOTAL_CERTIFICATES.json
+      - name: Archive every actual original and all external conditions, including four subrunner receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-final18-original-complete-classical-expert-source-dual-mathematics
+          path: |
+            /tmp/NEUMANN_TRUE_ORIGINAL_18_SOURCE_TOTAL_CERTIFICATES.json
+            /tmp/NEUMANN_TRUE_ORIGINAL_18_SOURCE_TOTAL_CERTIFICATES.log
+            /tmp/NEUMANN_true_original18_integrated_replay/
+          if-no-files-found: warn
+      - name: Strict one-run original-authority SAT vs literature conditional and no learned Q3
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/NEUMANN_TRUE_ORIGINAL_18_SOURCE_TOTAL_CERTIFICATES.json'))
+          assert r['source_18_git_blobs_locked_pre_source_content_commit']=='5412a4fb16c96694ab2bf629c34f6e41737f7a7f'
+          assert r['integration_protocol_frozen_before_replay_commit']=='9764a50fddb2ddf75fdfe98afa1205f952db6233'
+          assert r['original_first_source_run_historically_SHA_frozen_before_body_read_but_this_is_POSTHOC']
+          assert r['all_18_real_original_sources_authenticated']==18
+          assert r['full_original_truth_evidence_18_of_18']==18
+          assert r['real_originals_internal_independent_math_or_solver_classified']==17
+          assert r['real_originals_published_external_mathematical_lower_bound_CONDITIONAL']==1
+          assert r['every_original_classified_internal_or_external']==18
+          assert r['all_external_theorem_cases_NOT_machine_proved_from_first_principles']
+          assert r['NOT_a_model_trained_or_learned_Q3_unique_result']
+          assert r['full_external_literature_search_and_human_numerical_tuning_cost_not_instrumented']
+          assert r['Q3_Q4_Q5_GLOBAL']=='OPEN'
+          for row in r['all_source_originals']:
+              assert row['source_SHA_authenticated']
+              assert row['admitted_true_original_disposition'] in ('SAT','UNSAT','UNSAT_CONDITIONAL_WINOGRAD_1971_RANK7')
+          print('TRUE_AUTHENTIC_SMTLIB_NRA_ORIGINALS_18_ADJUDICATED_SOURCE_PROVENANCE')
+          print('TRUE_17_INTERNAL_ORIGINAL_MATH_SOLVER_CLASSIFICATIONS')
+          print('TRUE_1_PUBLISHED_WINOGRAD_THEOREM_CONDITIONAL_UNSAT')
+          print('GLOBAL_Q3_LEARNED_UNIQUE_OPEN')
+          PY
