@@ -32,7 +32,7 @@ jobs:
       - name: Actually train unsupported source operator, reject SAT counterexample then prove classical original fallback
         run: |
           set -o pipefail
-          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_OOD_operator_failclosed_20261022/frozen_operator_vocabulary_negative_admission.py \
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_OOD_operator_failclosed_20261022/frozen_operator_vocabulary_negative_admission.py \
             --out /tmp/q3_mod_OOD_original_negative_proofs.json | tee /tmp/q3_mod_OOD_original_negative_proofs.log
           sha256sum /tmp/q3_mod_OOD_original_negative_proofs.json
       - name: Preserve failed neural source candidates and successful classical receipts
