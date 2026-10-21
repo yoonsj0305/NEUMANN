@@ -1,0 +1,130 @@
+{
+  "schema": "neumann.q3.cross_eight_original_formula_prefixes_pre_content_16_general_modulo.v1",
+  "original_revision": "SMT-LIB/benchmark-submission-2022@81a39628827f61fbd74c6f3e67feb5c1b740d2f0",
+  "frozen_before_any_selected_source_body_read": true,
+  "selection": "Eight non-STC filename prefixes MC MF MQ MS RTA SC SF SQ; within each prefix exclude already opened MC07, SC08, SC09; from initial directory metadata sort source Git SHA ascending, select first TWO. 16 total, not 16 authors: same original generator research dataset, some source families distinct mathematical puzzles.",
+  "original_corpus_directory_index_first1000_only": true,
+  "source_hash_targets": [
+    {
+      "group": "MC",
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/MC_02.smt2",
+      "sha1_git_blob": "0e4e5da6af269e53ee865fe4001d920056f2f131",
+      "bytes": 1299
+    },
+    {
+      "group": "MC",
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/MC_05.smt2",
+      "sha1_git_blob": "1f7676a97a6be37970467be5975469dbcff84ccc",
+      "bytes": 12893
+    },
+    {
+      "group": "MF",
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/MF_04.smt2",
+      "sha1_git_blob": "20325ccb5f6620dc9ab0d0a0b265ef6f607ed137",
+      "bytes": 6707
+    },
+    {
+      "group": "MF",
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/MF_05.smt2",
+      "sha1_git_blob": "248a561c45704f0bb59eeee4028e9bf2ab0409f3",
+      "bytes": 13619
+    },
+    {
+      "group": "MQ",
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/MQ_07.smt2",
+      "sha1_git_blob": "15e937014e714b253659bee67222a749b81d3105",
+      "bytes": 43980
+    },
+    {
+      "group": "MQ",
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/MQ_04.smt2",
+      "sha1_git_blob": "316e756c9b3e877eaf7c2e4c8edb6289d08e0dd4",
+      "bytes": 6468
+    },
+    {
+      "group": "MS",
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/MS_02.smt2",
+      "sha1_git_blob": "09675e2be189efa4c12c17920d7088070e378b73",
+      "bytes": 1229
+    },
+    {
+      "group": "MS",
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/MS_05.smt2",
+      "sha1_git_blob": "2791e775d3c7acfc1034784e141597b4e767ef0d",
+      "bytes": 12531
+    },
+    {
+      "group": "RTA",
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/RTA_091.smt2",
+      "sha1_git_blob": "0829d243fdf4b11f664422d6e523ecef37fe9015",
+      "bytes": 464681
+    },
+    {
+      "group": "RTA",
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/RTA_097.smt2",
+      "sha1_git_blob": "0ba2753a30252dfa7189803828bdc290028a4d3c",
+      "bytes": 527879
+    },
+    {
+      "group": "SC",
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/SC_05.smt2",
+      "sha1_git_blob": "06cd9a8cf63f1b1cb7cfb1c4e0e25133affe6fd0",
+      "bytes": 12634
+    },
+    {
+      "group": "SC",
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/SC_04.smt2",
+      "sha1_git_blob": "13ed310158c38d3a7b42f8ba325d868a5be4ba30",
+      "bytes": 6006
+    },
+    {
+      "group": "SF",
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/SF_04.smt2",
+      "sha1_git_blob": "150741ed14874c23e0173464e8f417d6603a5953",
+      "bytes": 6400
+    },
+    {
+      "group": "SF",
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/SF_03.smt2",
+      "sha1_git_blob": "4bd46d211c42fd884e936e4f189a83b954d66bc0",
+      "bytes": 2860
+    },
+    {
+      "group": "SQ",
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/SQ_11.smt2",
+      "sha1_git_blob": "02c25212898aabeb182c3c057dacb982d6ec3eba",
+      "bytes": 248749
+    },
+    {
+      "group": "SQ",
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/SQ_07.smt2",
+      "sha1_git_blob": "07b7f472b2621a61589539ceaaaf33ecffab21b6",
+      "bytes": 43553
+    }
+  ],
+  "registered_general_abstract_discoverer": {
+    "math_modulus_candidates": [
+      2,
+      3,
+      4,
+      5,
+      7,
+      8,
+      9,
+      11,
+      13,
+      16
+    ],
+    "unsat_theorem": "From true original AST: preserve only conjunction-of-equalities, each integer ring polynomial formula over addition/subtraction/multiplication and integer constants. Reduce *both sides* modulo m with fresh residue variables 0..m-1. Drop ALL other unsupported original constraints/inequalities/negations/disjunctions, never strengthen originals. Thus any original integer solution maps to a model of modular abstraction. If Z3 UNSAT and independently cvc5 UNSAT on abstraction, ORIGINAL unbounded UNSAT. If SAT/UNKNOWN, no original conclusion.",
+    "max_free_integer_symbols": 90,
+    "per_modulus_z3_timeout_ms": 175,
+    "per_modulus_cvc5_timeout_ms": 2000,
+    "source_shape_diagnose": "Authenticate full raw original source SHA/bytes; parse native source original assertions Z3. Record count of original asserted conjuncts, actually sound polynomial equalities, unsupported dropped original constraints. No selective case omission. If no sound equality, abstain.",
+    "source_modular_no_oracle": "Fixed candidate moduli and no source name/target labels in inference; first discovered modular obstruction only, if any. Candidate moduli searched ascending in supplied order. No gradient/neural/LLM.",
+    "direct": "Original full unchanged SMT2 Z3 4sec and cvc5 4sec, same CPU; preserve numeric statuses/timeouts. Generic solver baseline only, not best modular classical because Direct can also run identical method.",
+    "no_falsely_claimed_SAT": "Modular abstract SAT cannot infer original SAT, and no bounded miss is full UNSAT. Any source positive SAT from raw Z3 is direct evidence only.",
+    "case_fail_closed": "If math AST unsupported, no proof; if CVC5 disagreement or timeout, no original UNSAT. Preserve all first source classifications.",
+    "bias": "Metadata filename/prefix is known, but actual original SMT2 contents not read; selection not based on outcome or source truth. Distinct prefixes not distinct mathematician authors."
+  },
+  "outcome_rules": "Q3 cross-formula unsat count and raw Direct headroom, no strong claimed NEUMANN unique invention. ZERO is a valuable negative stop signal. Global Q1-Q7 OPEN."
+}
