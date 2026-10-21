@@ -1,0 +1,85 @@
+{
+  "schema": "neumann.G0.first_hash_selected_twelve_math_capability_headroom.v1",
+  "upstream": "SMT-LIB/benchmark-submission-2022@81a39628827f61fbd74c6f3e67feb5c1b740d2f0",
+  "frozen_before_first_source_body_read": true,
+  "directory_api_first_1000_items_not_complete_corpus": true,
+  "selection_universe_eligible_original_count": 897,
+  "selection_rule": "Among visible first 1000 GitHub original source directory contents, filter STC_XXXX.smt2 4-digit source names; EXCLUDE previously opened STC_0003/0004/0005/0006/0013/0014/0228/0268/0291/0588/0609/0786/0813/0880/0087/0795; sort the remaining source Git blob SHA1 ASCII ascending; take first 12. No target-content/status/solvability selection, though filename RHS is public metadata.",
+  "source_split": "first_body_unopened_12_git_sha_blobs; NOT blind filename RHS; same already studied STC published author-family, no new cross-family author transfer",
+  "targets": [
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0001.smt2",
+      "sha1_git_blob": "00057272d850494517892736d3df34d071a35277",
+      "bytes": 621
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0380.smt2",
+      "sha1_git_blob": "000c4de04484c4ee87cfa0600b081a682c89aac2",
+      "bytes": 623
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0899.smt2",
+      "sha1_git_blob": "00787e37d4e071eb4895f3c9dea98ef4e76542ca",
+      "bytes": 623
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0482.smt2",
+      "sha1_git_blob": "011a55945b4515cb96ae327e42f329ad34749dfa",
+      "bytes": 625
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0608.smt2",
+      "sha1_git_blob": "016969ad444e00526b86af77d9ae334c6807bcc4",
+      "bytes": 625
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0367.smt2",
+      "sha1_git_blob": "01a8e86521634d522ee0a6b62024dc26e7ee5ac7",
+      "bytes": 623
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0448.smt2",
+      "sha1_git_blob": "01b171f8db93a3fdec63888a5d08b101a881791c",
+      "bytes": 623
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0585.smt2",
+      "sha1_git_blob": "02068402f757590b9c55cf1421763eab904d23b3",
+      "bytes": 623
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0673.smt2",
+      "sha1_git_blob": "0210397dcfd3eb8693ae6b56f0a55e433b21947b",
+      "bytes": 623
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0298.smt2",
+      "sha1_git_blob": "0234624687d67c94e9ec43ff01ebbe25dbdf581d",
+      "bytes": 623
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0896.smt2",
+      "sha1_git_blob": "02e710f29df44fcd0d633742baae6d5996a9fd60",
+      "bytes": 625
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0369.smt2",
+      "sha1_git_blob": "0305e0195af996b0b27df10743b37dd0d27cbd61",
+      "bytes": 623
+    }
+  ],
+  "preregistered_policy": {
+    "parser": "Exact native original source single assertion x^3+y^3+z^3=N over three distinct Int symbols, no other original constraints. Reject malformed source; retain all.",
+    "first_stage": "Finite unbounded integer UNSAT mod9 if target residue 4 or5, certificate independent Z3+cvc5 QF_LIA abstract plus verified exact source AST. If YES stop.",
+    "second_stage": "If not mod9 impossible, use fixed exact CRT15561 radius10000 with 9×7×13×19 cube residues, sorted pair binary search; source-derived N, no answer labels, SAT ONLY with raw original grounded unchanged SMT-LIB Z3+cvc5 independent. If no witness, report unbounded UNKNOWN.",
+    "direct_baselines": "Same CPU and unchanged authentic original SMT2 source Z3 4-second and cvc5 4-second, independent; strongest of either accepted SAT/UNSAT ONLY if actual full original status certified. Raw solver UNKNOWN retained as timeout, not comparable unbounded UNSAT.",
+    "metrics": "Number original source SAT and UNSAT from hybrid, direct union solved, hybrid-only statuses, new unknowns, whole source parse and independent proof cost (do not include raw Direct time in hybrid arm). 12 original preserved.",
+    "fairness": "Mathematical mod9 obstruction and CRT15561 specialist methods are available to equally authorized Direct; do not claim novel NEUMANN architecture/learned model, only a source-conditioned classical mechanism vs **raw** generic Z3/cvc5. This is NOT comparison to strongest specialist.",
+    "unseen_claim": "Source bytes unseen at registration, but source names leak numerical RHS, family STC math known, author-family generalization absent."
+  },
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q5": "OPEN",
+  "global_Q6": "OPEN",
+  "global_Q7": "OPEN"
+}
