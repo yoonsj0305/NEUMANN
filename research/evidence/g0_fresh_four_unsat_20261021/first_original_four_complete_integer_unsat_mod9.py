@@ -33,7 +33,7 @@ def abstract_QFLIA(n,timeout=5):
     s=z3.Solver();s.set(timeout=4000)
     for v in (a,b,c):
         s.add(z3.Or(*(v==i for i in CUBE_RESIDUES)))
-    s.add(z3.Mod(a+b+c,9)==n%9)
+    s.add((a+b+c)%9==n%9)
     r=s.check()
     z3answer=str(r).upper()
     def abstract_source():
