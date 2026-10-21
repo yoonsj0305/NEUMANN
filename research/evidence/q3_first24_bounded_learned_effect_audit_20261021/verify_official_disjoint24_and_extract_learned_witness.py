@@ -33,7 +33,7 @@ def status(row,k):
     need(type(b) is bool,"BOOLEAN_VERDICT_NOT_PRESENT_"+k)
     receipts=obj.get("independent_original_pre_trans_post_dual_proofs")
     if b:
-        need(isinstance(receipts,dict) and set(receipts)=={"pre","trans","post"},
+        need(isinstance(receipts,dict) and set(receipts)=={"init","consecution","goal"},
              "NOT_ORIGINAL_THREE_COMPLETE_VCS")
         for formula,d in receipts.items():
             need(d.get("dual_pass") is True,
