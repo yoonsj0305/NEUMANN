@@ -1,0 +1,54 @@
+{
+  "schema": "neumann.q3.external_real_8_PREBODY_SHA_V1",
+  "upstream": "SyGuS-Org/benchmarks@13c8deb68a873635879c9a69bc78caebd340f646",
+  "selection": "GitHub git-tree metadata ONLY; comp/2017/Inv_Track and comp/2019/Inv_Track/From2018; suffix .sl, sizes 450..1100 bytes, exclude -new/vars/simp, sorted by Git SHA; first four 2017 and first three plus fifth 2019 (omit jmbl_sum1 to avoid sum1 near-duplicate). Neither contents nor labels read.",
+  "original_source_bodies_opened_before_commit": false,
+  "frozen_training_algorithm": "numeric polynomial-invariant learner uses raw Z3-sampled original Trans and Init, anchors individual original state dimensions, source-generic monomials degree1..3, coefficients learned by numeric gradient, integer compiler, original independent dual Z3+cvc5 3VC if full goal; baseline exact rational nullspace with identical basis/samples; cvc5 SyGuS + Z3 SPACER full safety strong controls.",
+  "no_source_specific_edits_admitted_after_first_body_open": true,
+  "all_unknown_and_parser_errors_counted": true,
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q6": "OPEN",
+  "cases": [
+    {
+      "path": "comp/2017/Inv_Track/formula22.sl",
+      "git_blob": "0c798b938140fb05e8d840b7e54ff47f07a1793b",
+      "bytes": 547
+    },
+    {
+      "path": "comp/2017/Inv_Track/array.sl",
+      "git_blob": "56ed0ae1745b1603b116a490bf773ba29dcbf34b",
+      "bytes": 552
+    },
+    {
+      "path": "comp/2017/Inv_Track/hola_countud.sl",
+      "git_blob": "5d7f07c0b5a35d119ebe2d59bd5f56e447c547bf",
+      "bytes": 514
+    },
+    {
+      "path": "comp/2017/Inv_Track/sum1.sl",
+      "git_blob": "5fd2e4f7841aea6ebab96d30d394819b0d2b17d6",
+      "bytes": 521
+    },
+    {
+      "path": "comp/2019/Inv_Track/From2018/fib_41.sl",
+      "git_blob": "01d6662a6ce825939043683d96d33f07c3c32b04",
+      "bytes": 722
+    },
+    {
+      "path": "comp/2019/Inv_Track/From2018/fib_18.sl",
+      "git_blob": "03f37e87068ec2616c1747cf45860d7811c3ba99",
+      "bytes": 858
+    },
+    {
+      "path": "comp/2019/Inv_Track/From2018/jmbl_tacas.sl",
+      "git_blob": "07da5f3887401f7f778cf6cea87cea12a6fe1f83",
+      "bytes": 610
+    },
+    {
+      "path": "comp/2019/Inv_Track/From2018/fib_15.sl",
+      "git_blob": "125d1f9a277e262df77bcbda1a77851841d563d3",
+      "bytes": 584
+    }
+  ]
+}
