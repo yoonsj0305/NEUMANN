@@ -1,0 +1,84 @@
+name: Q3 full original 3x3 nonlinear quotient and matched strongest source solver
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-3x3-exact-nonlinear-quotient.yml'
+      - 'research/evidence/q3_nonlinear_quotient_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  certify_true_original_equivalent_nonlinear_quotient:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/QF_NIA/20220315-MathProblems
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authoritative true original revision and frozen source quotient contract
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/q3_nonlinear_quotient_20261021/original_true_power_magic_rref_quotient_solver.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/q3_nonlinear_quotient_20261021/BEFORE_EXECUTING_EXACT_SOURCE_QUOTIENT_CONTRACT.json'))
+          assert x['pre_execution_frozen'] and x['sources'].startswith('same 5 authentic previously OPENED')
+          assert 'Global Q1–Q7 OPEN' in x['acceptance']
+          print('IMMUTABLE_PREREG_3X3_REAL_ORIGINAL_QUOTIENT')
+          PY
+      - name: Fix math and source checker versions, install independent Z3 and cvc5
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0 sympy==1.14.0
+          lscpu | grep 'Model name' | head -1
+      - name: Actual original three-arm full QF_NIA source nonlinear quotient independent dual and full checker
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3_nonlinear_quotient_20261021/original_true_power_magic_rref_quotient_solver.py --root original --freeze research/evidence/q3_power_feature_20261021/PRE_SOURCE_FIRST_TEN_POSITIVE_MONOTONE_MAGIC_CONTRACT.json --contract research/evidence/q3_nonlinear_quotient_20261021/BEFORE_EXECUTING_EXACT_SOURCE_QUOTIENT_CONTRACT.json --out /tmp/q3_original_nonlinear_quotient.json | tee /tmp/q3_original_nonlinear_quotient.log
+          sha256sum /tmp/q3_original_nonlinear_quotient.json
+      - name: Archive all 5 real source math certificates and positive/negative results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-true-original-five-nonlinear-quotient-matched-strong-direct
+          path: |
+            /tmp/q3_original_nonlinear_quotient.json
+            /tmp/q3_original_nonlinear_quotient.log
+          if-no-files-found: warn
+      - name: Strict source-authentic original SAT task vs logical feature equivalence
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_original_nonlinear_quotient.json'))
+          assert x['preregistered_first_contract_commit']=='179183548af0e21c74b17de41172b78927751460'
+          assert x['all_five_genuine_sources_retained'] and len(x['cases'])==5
+          assert x['full_original_sha_authenticated']==5
+          assert x['original_full_nonlinear_quotient_independent_Z3_cvc5_equivalence']==5
+          assert x['all_new_or_old_backend_original_certified_results_consistent']
+          assert x['strong_direct_with_same_rank_rewriter_could_do_identical']
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          for row in x['cases']:
+              assert row['source_full_equivalence_original_quotient_dual']
+              assert row['exact_full_nonlinear_original_power_term_relation_preserved']
+              assert row['original_non_sum_assertions_identical_in_all_three']
+              assert all(q['both_independent_UNSAT'] for q in row['original_source_linear_to_quotient_necessary_and_sufficient'].values())
+          print('Q3_FIVE_TRUE_ORIGINAL_FULL_NONLINEAR_QUOTIENT_EQUIVALENT')
+          print('Q3_FIVE_TRUE_ORIGINAL_CAPABILITY_ADDITIONS',x['new_original_task_capability_over_raw'])
+          PY
