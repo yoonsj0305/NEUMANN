@@ -102,7 +102,7 @@ def main():
       learned_MODULE_NOT_NECESSARY_vs_STRONG_EXACT_CLASSICAL=True,
       estimated_training_and_candidate_cost_from_official_source_receipt_only=True,
       learner_synthetic_posthoc_and_designer_supplied_period_prior=True,
-      not_real_external_firstblind=False,
+      real_external_firstblind_NOT_TESTED=True,
       global_Q3="OPEN",global_Q4="OPEN",global_Q6="OPEN",
       all_fresh_old_witnesses=old_rows,
       all_fresh_new_certificates=new_rows)
