@@ -1,0 +1,80 @@
+name: Q3 integrated authentic 12 of 12 classical original full dual proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_integrated_source12_no_neural_full.yml'
+      - 'research/evidence/q3_integrated_12of12_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source12_full_native_proof_first_integrated:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate original source revision and standalone proof-first integrated program
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_integrated_12of12_20261021/one_route_complete_original_classical12.py
+      - name: Install actual source Z3 and independent pinned cvc5 and classical helper dependencies
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: Execute actual no ML original12 complete proof-first safe portfolio with source-generic Houdini fallback
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_integrated_12of12_20261021/one_route_complete_original_classical12.py \
+            --root original \
+            --freeze research/evidence/q3_dnf_first12_20261021/NEW_UNSEEN_ORIGINALS_BEFORE_SOURCE_BODY_LOCK.json \
+            --out /tmp/q3_actual_integrated_original12_independent_safe.json | tee /tmp/q3_actual_integrated_original12_independent_safe.log
+          sha256sum /tmp/q3_actual_integrated_original12_independent_safe.json
+      - name: Preserve actual original full routed end-to-end timing and independent certificates
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-neumann-original12-integrated-proof-first-no-neural-full-safe
+          path: |
+            /tmp/q3_actual_integrated_original12_independent_safe.json
+            /tmp/q3_actual_integrated_original12_independent_safe.log
+          if-no-files-found: warn
+      - name: Reject incomplete or nondual-certified full original program safety
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          a=json.load(open('/tmp/q3_actual_integrated_original12_independent_safe.json'))
+          assert a['schema']=='neumann.q3.12_originals_full_source_proof_first_integrated_no_neural.v1'
+          assert a['same_prebody_sha_frozen_real_originals']==12
+          assert a['fully_independent_source_Z3_cvc5_native_three_VC_safe']==12
+          assert a['global_unsafe_or_unproven_count']==0
+          assert len(a['all_originals_and_all_attempted_fallbacks'])==12
+          assert len({q['original_git_blob'] for q in a['all_originals_and_all_attempted_fallbacks']})==12
+          assert a['trained_model_fit_count']==a['neural_forward_count']==0
+          assert a['not_frontier_or_end_to_end_10x_or_original_ML_discovery']
+          assert a['global_Q3']==a['global_Q4']==a['global_Q6']=='OPEN'
+          for row in a['all_originals_and_all_attempted_fallbacks']:
+              assert row['final_original_complete_safe']
+              if row.get('winner')=='generic_conjunctive_affine_Houdini':
+                  cert=row['source_generic_affine_Houdini_fallback']['actual_genuine_original_Z3_cvc5_induction_3VC']
+                  assert set(cert)=={'init','consecution','goal'}
+                  assert all(v['dual_pass'] for v in cert.values())
+          print('Q3_ALL_TWELVE_TRUE_ORIGINAL_FULL_DUAL_SAFE_CERTIFICATES_IN_ONE_EXECUTION')
+          PY
