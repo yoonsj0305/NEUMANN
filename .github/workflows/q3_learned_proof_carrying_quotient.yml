@@ -1,0 +1,63 @@
+name: Q3 learned quotient actual training exhaustive original FSM control
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_learned_proof_carrying_quotient.yml'
+      - 'research/evidence/q3_learned_proof_carrying_quotient_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  learned_representation_and_independent_complete_original_verification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate learned structural source code
+        run: |
+          python -m py_compile research/evidence/q3_learned_proof_carrying_quotient_20261021/learned_quotient_benchmark.py
+          python -m pip install --disable-pip-version-check numpy==2.3.5
+      - name: Actually learn first-eight latent, reuse on unseen n, exhaustively certify every original FSM state
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_learned_proof_carrying_quotient_20261021/learned_quotient_benchmark.py \
+            --out /tmp/q3_learned_quotient_actual_evidence.json | tee /tmp/q3_learned_quotient_actual_evidence.log
+          sha256sum /tmp/q3_learned_quotient_actual_evidence.json
+      - name: Archive exact learned weights every source-state proof and strong classical counterfactual
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-prototype-learned-proof-carrying-quotient-full-state-audit
+          path: |
+            /tmp/q3_learned_quotient_actual_evidence.json
+            /tmp/q3_learned_quotient_actual_evidence.log
+          if-no-files-found: warn
+      - name: Enforce no external original or strongest classical superiority overclaim
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3_learned_quotient_actual_evidence.json'))
+          assert r['schema']=='neumann.q3.synthetic_fsm_learned_proof_carrying_quotient.v2'
+          assert len(r['training_replicates'])==12
+          assert all(c['converged'] for c in r['training_replicates'])
+          assert r['untrained_random_ablation_rejected']
+          assert r['symmetry_broken_source_counterexample']
+          assert [x['n'] for x in r['source_tasks']]==[8,12,16,18]
+          assert r['independently_exhaustively_verified_unseen_n']==[12,16,18]
+          for x in r['source_tasks']:
+              assert x['independent_complete_original_transition_audit']['certified']
+              assert x['independent_complete_original_transition_audit']['actual_original_states_exhaustively_verified']==2**x['n']
+              assert x['learned_proof_carrying_quotient']['states']==x['strong_classical_orbit']['states']
+              assert not x['advantage_over_strong_classical_in_state_count']
+          assert r['class_of_evidence']=='CONTROLLED_SYNTHETIC_MECHANISM_ONLY_NOT_EXTERNAL_ORIGINAL'
+          assert r['global_Q3']==r['global_Q4']==r['global_Q6']=='OPEN'
+          assert not r['learned_advantage_over_strong_classical']
+          assert not r['claim_10x_end_to_end_vs_strongest_classical']
+          print('LEARNED_STRUCTURE_MECHANISM_CERTIFIED_BUT_NO_STRONG_CLASSICAL_SUPERIORITY')
+          PY
