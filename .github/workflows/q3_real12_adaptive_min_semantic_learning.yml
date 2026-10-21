@@ -38,7 +38,7 @@ jobs:
           unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
           sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
           python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 sympy==1.14.0 z3-solver==4.13.3.0
-      - name: Run all 12 authentic originals: old 2-slot versus exact minimum semantic adaptive fit plus no-fit
+      - name: Run all 12 authentic originals with fixed versus exact minimum semantic adaptive fit plus no-fit
         run: |
           set -o pipefail
           PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_semantic_adaptive12_20261021/run_source_native_minimal_inputs_on_12_models.py \
