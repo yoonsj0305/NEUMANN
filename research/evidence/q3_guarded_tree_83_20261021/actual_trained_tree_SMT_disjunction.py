@@ -130,7 +130,7 @@ def main():
             "originals_first_opened_in_PRIOR_PR408":True,
             "claim_global_10x_or_unique_discovery":False,
             "global_Q3":"OPEN","global_Q4":"OPEN","global_Q6":"OPEN"}
-    Path(a.out).write_text(json.dumps(result,sort_keys=True,indent=2)+"\n")
+    Path(a.out).write_text(json.dumps(result,sort_keys=True,indent=2,default=lambda x: int(x) if isinstance(x,np.integer) else float(x) if isinstance(x,np.floating) else str(x))+"\n")
     print("TRAINED_ORIGINAL_BOOLEAN_DNF",t["proven"],"EXACT_NOFIT_OR",b["proven"],flush=True)
     print("LEARNED_TOPOLOGY",result["fitted_tree_original_DNF_before_calibration"],flush=True)
     print("SOURCE_SAMPLE_COUNTS",len(pos),len(neg),flush=True)
