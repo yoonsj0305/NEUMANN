@@ -1,0 +1,73 @@
+name: Q3 minimal real original semantic state interface dual exact source proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_min_original67_semantic_projection.yml'
+      - 'research/evidence/q3_min_semantic_projection_67_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  genuine_original67_minimum_full_source_projection:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Source SHA original and minimality algorithm Python compile
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_min_semantic_projection_67_20261021/derive_minimum_original_safe_bad_projection.py
+      - name: Original native source compiler and TWO independent arithmetic solvers
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Find minimum original state projection separating all safe first-step from bad states
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3_min_semantic_projection_67_20261021/derive_minimum_original_safe_bad_projection.py \
+            --root original \
+            --freeze research/evidence/q3_dnf_first12_20261021/NEW_UNSEEN_ORIGINALS_BEFORE_SOURCE_BODY_LOCK.json \
+            --out /tmp/q3_original67_minimum_source_interface.json | tee /tmp/q3_original67_minimum_source_interface.log
+          sha256sum /tmp/q3_original67_minimum_source_interface.json
+      - name: Preserve every smaller original source projection independently rejected
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-original67-exact-minimal-semantic-state-interface-two-solvers
+          path: |
+            /tmp/q3_original67_minimum_source_interface.json
+            /tmp/q3_original67_minimum_source_interface.log
+          if-no-files-found: warn
+      - name: Verify minimum cardinality original Z3 and cvc5 certificates
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open("/tmp/q3_original67_minimum_source_interface.json"))
+          assert x["schema"]=="neumann.q3.genuine_original67_minimum_projection_extension_two_solver.v1"
+          assert x["real_original_SHA"]=="5e1807ee5cbfa43c828fc3f67c3c31d4cb133a88"
+          assert x["minimum_proven_projection"]["original_full_safestate_badstate_projection_alias_UNSAT_both_solvers"]["dual_pass"]
+          assert len(x["all_smaller_projections_rejected"])==x["strictly_smaller_slot_projections_ALL_independently_SAT"]
+          assert all(r["two_original_independent_solver_SAT"]["dual_pass"] for r in x["all_smaller_projections_rejected"])
+          assert x["minimum_extra_slots_after_first_two"]>=1
+          assert x["full_original_state_program_SAFE_NOT_implied_by_this_classification_test"]
+          assert x["global_Q3"]==x["global_Q4"]==x["global_Q6"]=="OPEN"
+          print("MINIMUM_ORIGINAL_PROJECTED_INFORMATION_BARRIER_EXACT_BOTH_SOLVERS_CERTIFIED")
+          PY
