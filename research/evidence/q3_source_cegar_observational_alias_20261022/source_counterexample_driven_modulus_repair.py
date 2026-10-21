@@ -138,14 +138,30 @@ def one(record,b,unsafe=False):
     learned=candidate(fraction,pairs)
     untrained=candidate(FIXED_FRACTION,pairs)
     no_fit=candidate(1.0,pairs)
-    if not(learned==untrained==no_fit==b*k):
-        raise RuntimeError("NONMATCHED_CAUSAL_INITIAL_CANDIDATE")
+    # Negative evidence matters: the learned REAL-valued coefficient may
+    # round to b*k-1 when extrapolated to larger increments. Preserve raw
+    # candidate, and use a SOURCE-OBSERVATION classical consistency gate
+    # before admitting the integer proposal to the formal CEGAR loop.
+    raw_candidates={"original_trained_model_prior":learned,
+                    "untrained_same_architecture_prior":untrained,
+                    "no_model_scale_statistic":no_fit}
+    all_deltas=[abs(int(v-u)) for u,v in pairs]
+    observed_only_gcd=math.gcd(*all_deltas)
+    if observed_only_gcd!=b*k:
+        raise RuntimeError("SOURCE_SAMPLES_MATCHED_CONSISTENCY_FAILED")
+    preflight={}
+    for name,raw_modulus in raw_candidates.items():
+        consistent=(raw_modulus>=2 and all(d%raw_modulus==0 for d in all_deltas))
+        admitted=raw_modulus if consistent else observed_only_gcd
+        preflight[name]={"raw_unverified_model_output":raw_modulus,
+                        "source_observation_consistent":consistent,
+                        "classically_corrected_before_CEGAR":not consistent,
+                        "actual_admitted_modulus":admitted,
+                        "raw_candidate_changed_by_no_learning_calibration":raw_modulus!=admitted}
     actual=source_truth(k,b,unsafe)
     methods={}
-    for name,initial in (("original_trained_model_prior",learned),
-                         ("untrained_same_architecture_prior",untrained),
-                         ("no_model_scale_statistic",no_fit)):
-        methods[name]=active_refine(k,b,initial,unsafe)
+    for name,row in preflight.items():
+        methods[name]=active_refine(k,b,row["actual_admitted_modulus"],unsafe)
     # Strongest source-aware exact branch-GCD receives ENTIRE original
     # transition grammar, not just the observed branch.
     source_deltas=[(k+1) if unsafe else k,b*k]
@@ -176,6 +192,8 @@ def one(record,b,unsafe=False):
        "historical_trained_weight":fraction,
        "source_truth_independent_Z3_cvc5":actual,
        "same_observations_learned_and_fixed_and_no_model":True,
+       "source_observation_only_integer_calibration":preflight,
+       "observation_only_exact_GCD_before_original_source_consultation":observed_only_gcd,
        "candidate_prior_methods_and_independent_counterexample_proofs":methods,
        "source_native_two_branch_gcd":g,
        "source_native_GCD_source_extraction_ms":exact_ms,
@@ -220,7 +238,11 @@ def main():
       independently_proved_reachable_original_unsafe=sum(z["source_truth_independent_Z3_cvc5"]["original_source_verdict"]=="UNSAFE" for z in unsafe_rows),
       false_certified_safe_on_reachable_unsafe=sum(z["candidate_prior_methods_and_independent_counterexample_proofs"]["original_trained_model_prior"]["status"]=="CERTIFIED_ORIGINAL_FULL_3VC" for z in unsafe_rows),
       observationally_indistinguishable_safe_vs_unsafe_source_pairs=len(unsafe_rows),
-      rational_source_query_is_necessary_for_all_programs_in_aliasing_pair=True,
+      additional_source_information_or_independent_verification_needed_to_distinguish_twins=True,
+      raw_gradient_models_never_credited_for_classical_observation_calibration=True,
+      original_model_integer_proposals_requiring_calibration=sum(
+        q["source_observation_only_integer_calibration"]["original_trained_model_prior"]["classically_corrected_before_CEGAR"]
+        for q in safe_rows),
       classical_gcd_strict_halving_max_feedback_queries_per_safe_original=1,
       classical_gcd_feedback_general_worst_case_log2_bound=True,
       full_origin_verified_source_and_proof_cost_ms=sum(z["full_experiment_work_wall_ms"] for z in safe_rows+unsafe_rows),
