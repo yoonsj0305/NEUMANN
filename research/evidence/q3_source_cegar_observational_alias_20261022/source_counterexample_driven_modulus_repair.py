@@ -188,6 +188,8 @@ def one(record,b,unsafe=False):
        "original_Trans_AST":f"x_next = x + {(k+1) if unsafe else k} OR x_next = x + {b*k}",
        "original_Post_AST":f"(x-1) mod {k} == 0",
        "identical_transition_observation_count":len(pairs),
+       "observed_source_transition_pairs_SHA256":hashlib.sha256(
+             pairs.astype("<i8",copy=False).tobytes()).hexdigest(),
        "all_observations_contain_ONLY_large_step":True,
        "historical_trained_weight":fraction,
        "source_truth_independent_Z3_cvc5":actual,
@@ -222,6 +224,7 @@ def main():
                    p["visible_step_multiple"]==case["visible_step_multiple"] and
                    p["historical_trained_weight"]==case["historical_trained_weight"])
         if (match["identical_transition_observation_count"]!=case["identical_transition_observation_count"]
+            or match["observed_source_transition_pairs_SHA256"]!=case["observed_source_transition_pairs_SHA256"]
             or match["source_truth_independent_Z3_cvc5"]["original_source_verdict"]==
                  case["source_truth_independent_Z3_cvc5"]["original_source_verdict"]):
             raise RuntimeError("OBSERVATION_ALIASING_IMPOSSIBILITY_NOT_GENUINE")
@@ -246,6 +249,21 @@ def main():
       classical_gcd_strict_halving_max_feedback_queries_per_safe_original=1,
       classical_gcd_feedback_general_worst_case_log2_bound=True,
       full_origin_verified_source_and_proof_cost_ms=sum(z["full_experiment_work_wall_ms"] for z in safe_rows+unsafe_rows),
+      real_model_candidate_integer_rounding_corrections_before_proof=sum(
+          z["source_observation_only_integer_calibration"]["original_trained_model_prior"]["classically_corrected_before_CEGAR"]
+          for z in safe_rows),
+      source_only_modulus_candidate_corrections_before_proof=sum(
+          z["source_observation_only_integer_calibration"]["no_model_scale_statistic"]["classically_corrected_before_CEGAR"]
+          for z in safe_rows),
+      aggregate_trained_prior_CEGAR_proof_wall_ms=sum(
+          z["candidate_prior_methods_and_independent_counterexample_proofs"]["original_trained_model_prior"]["wall_ms"]
+          for z in safe_rows),
+      aggregate_NO_MODEL_prior_CEGAR_proof_wall_ms=sum(
+          z["candidate_prior_methods_and_independent_counterexample_proofs"]["no_model_scale_statistic"]["wall_ms"]
+          for z in safe_rows),
+      aggregate_direct_source_GCD_full_proof_wall_ms=sum(
+          z["source_native_exact_GCD_baseline_original_proof"]["wall_ms"]+
+          z["source_native_GCD_source_extraction_ms"] for z in safe_rows),
       all_these_methods_reuse_existing_modulo_primitive=True,
       feedback_update_is_CLASSICAL_not_learned=True,
       trained_model_not_causally_needed_under_identical_no_fit_counterfactual=True,
@@ -260,7 +278,11 @@ def main():
                 "independently_proved_hidden_safe_source_GCD",
                 "independently_proved_reachable_original_unsafe",
                 "observationally_indistinguishable_safe_vs_unsafe_source_pairs",
-                "false_certified_safe_on_reachable_unsafe"):
+                "false_certified_safe_on_reachable_unsafe",
+                "real_model_candidate_integer_rounding_corrections_before_proof",
+                "aggregate_trained_prior_CEGAR_proof_wall_ms",
+                "aggregate_NO_MODEL_prior_CEGAR_proof_wall_ms",
+                "aggregate_direct_source_GCD_full_proof_wall_ms"):
         print("Q3_VERIFIER_GUIDED_REPAIR_AND_OBSERVABILITY_LIMIT",key,r[key],flush=True)
     print("RESULTS_SHA256",hashlib.sha256(out.read_bytes()).hexdigest(),flush=True)
     print("GLOBAL_Q3_Q4_Q6_OPEN")
