@@ -1,0 +1,82 @@
+name: Q34 exact source certificate reuse on 8 fresh genuine original mutations
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q34-eight-original-mutant-certificate-reuse.yml'
+      - 'research/evidence/q34_real_source_mutant_reuse_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bounded_mutant_real_original_3vc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: source
+          sparse-checkout: |
+            lib/Inv_Track/andrew_lustre
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Assert true source SHA freeze before mutation content
+        run: |
+          test "$(git -C source rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q34_real_source_mutant_reuse_20261021/verified_source_mutants_original_certificate_transfer.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/q34_real_source_mutant_reuse_20261021/FROZEN_MUTANTS_PRE_CONTENT.json'))
+          assert x['before_mutant_content_read'] and len(x['mutants'])==8 and len(x['baseline_origins'])==3
+          assert len(set(a['git_blob'] for a in x['mutants']))==8
+          print('SOURCE_MUTANT_FIRST_PRE_CONTENT_FROZEN',len(x['mutants']))
+          PY
+      - name: Exact authentic independent Z3 and cvc5
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+          lscpu | grep -E 'Model name' | head -1
+      - name: True original source mutation certificate transfer vs fully authenticated cold Direct
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q34_real_source_mutant_reuse_20261021/verified_source_mutants_original_certificate_transfer.py --root source --freeze research/evidence/q34_real_source_mutant_reuse_20261021/FROZEN_MUTANTS_PRE_CONTENT.json --out /tmp/q34_eight_real_mutants.json | tee /tmp/q34_eight_real_mutants.log
+          sha256sum /tmp/q34_eight_real_mutants.json
+      - name: Preserve first real-source observations, original failure and cost
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q34-eight-original-authentic-source-mutant-proof-reuse
+          path: |
+            /tmp/q34_eight_real_mutants.json
+            /tmp/q34_eight_real_mutants.log
+          if-no-files-found: warn
+      - name: Cannot promote nonoriginal or uncertified candidate
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q34_eight_real_mutants.json'))
+          assert x['all_eight_first_mutant_source_rows_preserved'] and len(x['first_mutant_cases'])==8
+          assert x['first_mutant_freeze_commit']=='11ecb5691116bd3953b0dd5e69afe9b58839aaf0'
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          assert x['strongest_direct_can_equally_reuse_identical_source_certificates']
+          for case in x['first_mutant_cases']:
+              if case.get('verified_reused_source_candidate_then_direct_fallback',{}).get('proof_reused_and_dual_reverified',False):
+                  q=case['verified_reused_source_candidate_then_direct_fallback']['attempts'][0]
+                  assert q['proves_actual_mutant_source']
+                  assert all(v['dual_pass'] for v in q['original_source_dual_3VC'].values())
+          print('REAL_ORIGINAL_CERTIFICATE_REUSE',x['exact_previous_source_original_dual_proven_invariant_reuses'],'/8')
+          print('FULL_AUTHENTIC_MUTANT_VERDICTS_MATCH',x['paired_both_resolved_equal_verdict_count'],'/8')
+          print('WARM_WITH_DISCOVERY_INVESTMENT',x['warm_including_initial_certificate_investment_full_wall_ms'])
+          PY
