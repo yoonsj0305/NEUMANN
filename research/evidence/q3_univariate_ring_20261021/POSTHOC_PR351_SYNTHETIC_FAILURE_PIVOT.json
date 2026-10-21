@@ -1,0 +1,25 @@
+{
+  "schema": "neumann.q3.posthoc_univariate_separable_modular_exact_structure_v1",
+  "motivation": "Generic source-level Z3 non-linear residue SMT modulo9 timed out in first synthetic cubes=4 test at 175ms. The structure should be found without issuing nonlinear SMT at all; represent each independent univariate polynomial by its complete finite residue image and combine through modular addition DP, then independently prove refutation on QF_LIA in Z3+cvc5.",
+  "not_first_source_blind": true,
+  "source_scope": "49 synthetic original-program positive/negative controls and previously opened 16 cross-formula public original tasks from PR351. No new virgin source success counts.",
+  "source_math": "For a true native Int equality exprL=exprR in conjunction of original assertions, normalize lhs-rhs to additive top-level terms; accept only integer polynomials with +,-,*,nonnegative exponent <=12 and constants with ≤1 distinct free integer symbol PER additive term. For each symbol assign *all* values r in {0,...,m-1}, evaluate exact unlimited-precision polynomial term mod m. This is a mathematically exhaustive finite abstraction, with no learned gold. Aggregate independent unary terms by their symbol. Take exact modular sum reachable values. If zero unreachable, source equality impossible for every integer valuation, hence original full formula UNSAT. Use Z3+cvc5 on a generated QF_LIA residue-image check to certify. Unsupported eq/OR/NOT/other constraints entirely dropped; no invented original SAT or full original unbounded UNSAT without independent finite verification.",
+  "candidate_moduli": [
+    2,
+    3,
+    4,
+    5,
+    7,
+    8,
+    9,
+    11,
+    13,
+    16
+  ],
+  "expansion_cap": "At most 24 additive terms, 18 source variables per equality, 250 original equality clauses inspected per source. Hard cap is a fail-closed skipped eq, not permission to strengthen original.",
+  "required_controls": "4 known mathematically unbounded UNSAT across squares/cubes and 45 positive/abstain including 40 true satisfiable randomly constructed original polynomials. 49/49 exact acceptance. No original source contingent retuning.",
+  "baseline": "Current generic nonlinear Z3 source abstraction 175ms; known observed UNKNOWN for x³+y³+z³=4. Strong classical Direct is fully allowed same polynomial decomposition and CRT, so any scoped change NOT NEUMANN-specific invention. No extra model calls.",
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q5": "OPEN"
+}
