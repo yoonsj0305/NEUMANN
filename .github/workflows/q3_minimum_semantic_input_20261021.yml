@@ -1,0 +1,72 @@
+name: Q3 native exact minimum semantic input feature cardinality 67
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_minimum_semantic_input_20261021.yml'
+      - 'research/evidence/q3_minimum_exact_state_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  certify_smallest_source_projection_input:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate true original SHA and bounded theorem source code
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_minimum_exact_state_20261021/minimal_native_semantic_feature_subset.py
+      - name: Install pinned exact original independent Z3 cvc5 plus parser dependencies
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: Explore every smaller original state subset and certify exact optimum with Z3 and cvc5
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3_minimum_exact_state_20261021/minimal_native_semantic_feature_subset.py \
+            --root original \
+            --freeze research/evidence/q3_dnf_first12_20261021/NEW_UNSEEN_ORIGINALS_BEFORE_SOURCE_BODY_LOCK.json \
+            --out /tmp/q3_real_67_exact_min_semantic_variables.json | tee /tmp/q3_real_67_exact_min_semantic_variables.log
+          sha256sum /tmp/q3_real_67_exact_min_semantic_variables.json
+      - name: Preserve exact originals and all counterexample proof receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-original67-exact-minimum-necessary-state-features-full-dual-certificates
+          path: |
+            /tmp/q3_real_67_exact_min_semantic_variables.json
+            /tmp/q3_real_67_exact_min_semantic_variables.log
+          if-no-files-found: warn
+      - name: Fail closed on any uncertified minimum-state conclusion
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,math
+          q=json.load(open('/tmp/q3_real_67_exact_min_semantic_variables.json'))
+          assert q['status']=='PROVED_FINITE_FEATURE_MINIMUM_ORIGINAL_NATIVE_Z3_CVC5'
+          assert q['all_strictly_smaller_combinations_have_real_SAT_witness']
+          assert q['minimum_sufficient_zero_one_projection_independent_original_UNSAT']['dual_pass']
+          assert q['strictly_smaller_subset_counterexamples_independently_certified']==sum(
+              math.comb(q['original_variable_count'],i) for i in range(q['minimum_required_feature_count']))
+          assert q['NOT_sufficient_for_global_inductive_safety']
+          assert q['global_Q3']==q['global_Q4']==q['global_Q6']=='OPEN'
+          print('SOURCE_INPUT_THEOREM_DUAL_EXHAUSTIVE_ALL_SMALLER_SUBSETS_VERIFIED')
+          PY
