@@ -1,0 +1,104 @@
+name: Q4Q6 first-blind 12 real originals CPU-trained verifier router
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q4q6_fresh12_cpu_prover_router_20261021.yml'
+      - 'research/evidence/q4q6_fresh12_cpu_router_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  first_twelve_original_source_body_holdout_trained_proof_router:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify pre-source metadata-only commit and syntactic frozen CPU model
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q4q6_fresh12_cpu_router_20261021/actual_source_disjoint_CPU_trained_dispatch.py
+          python - <<'PY'
+          import json
+          a=json.load(open("research/evidence/q4q6_fresh12_cpu_router_20261021/FIRST_FRESH_12_SOURCE_SHA_FREEZE_BEFORE_BODY.json"))
+          c=json.load(open("research/evidence/q4q6_fresh12_cpu_router_20261021/PREREG_BEFORE_SOURCE_CPU_ROUTER_PROTOCOL.json"))
+          assert a["source_bodies_UNOPENED_at_this_metadata_SHA_commit"]
+          assert len(a["new_originals"])==12
+          assert c["locked_heldout_metadata_commit"]=="4cd7ab0016e891af94deb702fdc4f7eb363cbf9b"
+          assert c["global_Q3"]==c["global_Q4"]==c["global_Q6"]=="OPEN"
+          print("PREOPENED_SOURCE12_SHA_METADATA_AND_TRAINING_ARCHITECTURE_FROZEN")
+          PY
+      - name: Download immutable actual 12 training source cost receipts from prior OFFICIAL run
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39578591707
+          github-token: ${{ github.token }}
+          name: q4-original12-three-native-prover-full-cost-comparison
+          path: /tmp/q4q6_train
+      - name: Install original Z3 and independently pinned cvc5 and actual sklearn fit
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 z3-solver==4.13.3.0
+      - name: Train ONLY previous sources then FIRST execute twelve original heldouts without fitting
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q4q6_fresh12_cpu_router_20261021/actual_source_disjoint_CPU_trained_dispatch.py \
+            --root original \
+            --freeze research/evidence/q4q6_fresh12_cpu_router_20261021/FIRST_FRESH_12_SOURCE_SHA_FREEZE_BEFORE_BODY.json \
+            --oldfreeze research/evidence/q6_first12_unopened_alpha_20261021/ORIGINAL_SOURCE_SHA_LOCK_BEFORE_FIRST_BODY.json \
+            --contract research/evidence/q4q6_fresh12_cpu_router_20261021/PREREG_BEFORE_SOURCE_CPU_ROUTER_PROTOCOL.json \
+            --prior-result /tmp/q4q6_train/q4_source12_full_cost_native.json \
+            --out /tmp/q4q6_first12_real_CPU_proof_router.json | tee /tmp/q4q6_first12_real_CPU_proof_router.log
+          sha256sum /tmp/q4q6_first12_real_CPU_proof_router.json
+      - name: Preserve all unseen source evidence including failures and ablation costs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-first12-original-trained-classical-prover-router-all-receipts
+          path: |
+            /tmp/q4q6_first12_real_CPU_proof_router.json
+            /tmp/q4q6_first12_real_CPU_proof_router.log
+          if-no-files-found: warn
+      - name: Reject false learning or global claims and verify all original source SHA
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          a=json.load(open("/tmp/q4q6_first12_real_CPU_proof_router.json"))
+          assert a["schema"]=="neumann.q4q6.source_disjoint_real_CPU_router_first_new_originals_v1"
+          assert a["training_original_count"]==12 and a["new_original_count"]==12
+          assert a["new_original_SHA_authenticated"]==12
+          assert len({r["git_blob"] for r in a["original_new_programs"]})==12
+          assert a["model_training_update_once"]==1
+          assert a["all_classical_verifiers_have_equal_authority"]
+          assert a["no_new_inductive_invariant_learning_or_Q3_discovery"]
+          assert a["global_Q3"]==a["global_Q4"]==a["global_Q6"]=="OPEN"
+          assert a["training"]["training_data_excludes_every_new_original"]
+          for q in a["original_new_programs"]:
+              assert q["original_file_exact_SHA_authenticated"]
+              if q["status"]=="COMPLETE_SAME_NATIVE_ORIGINAL_CPU_ROUTE_COMPARISON":
+                  assert q["model_prediction_without_heldout_solver_gold"] in ("P","S","D")
+                  assert q["matched_trained_success"] is True or q["matched_trained_success"] is False
+          if a["original_new_programs"][0]["status"]=="COMPLETE_SAME_NATIVE_ORIGINAL_CPU_ROUTE_COMPARISON":
+              assert a["original_new_programs"][0]["source_negative_mutant_Post_false_rejected"]
+          print("FRESH_TRUE_ORIGINAL12_SHA_PRETRAIN_ONLY_MODEL_EVIDENCE_LOCKED")
+          print("NO_GLOBAL_Q3_Q4_Q6_PRETEND_PASS")
+          PY
