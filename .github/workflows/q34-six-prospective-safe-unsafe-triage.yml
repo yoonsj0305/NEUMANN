@@ -1,0 +1,81 @@
+name: Q34 prospective second six sources independent genuine SAFE or UNSAFE automated triage
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q34-six-prospective-safe-unsafe-triage.yml'
+      - 'research/evidence/q34_safety_triage_six_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  second_unseen_real_six_source_proof_classification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/andrew_lustre
+            lib/Inv_Track/from_2018
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Source SHA origin and exact safety triage syntax
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q34_safety_triage_six_20261021/first_six_general_reachable_unsafety_and_full_safe_3vc.py
+      - name: Independently SHA-pinned Z3/cvc5 original source verifier
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Frozen first original source content read and eight original dual-check controls
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q34_safety_triage_six_20261021/first_six_general_reachable_unsafety_and_full_safe_3vc.py --root original --freeze research/evidence/q34_safety_triage_six_20261021/PRE_SOURCE_FROZEN_ORIGINALS.json --out /tmp/q34_second_six.json | tee /tmp/q34_second_six.log
+          sha256sum /tmp/q34_second_six.json
+      - name: Upload first real actual true source proof and unknown receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q34-first-second-six-original-safe-unsafe-independent
+          path: |
+            /tmp/q34_second_six.json
+            /tmp/q34_second_six.log
+          if-no-files-found: warn
+      - name: No source result reclassification without original independent dual proof
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q34_second_six.json'))
+          assert x['first_presource_git_freeze_commit']=='8d31c884c45cac8b5955b1ff548f8c4305f3ae8e'
+          assert x['first_true_original_six_outcomes_all_retained']
+          assert x['positive_AND_negative_historic_control']['historic_original_fib07_UNSAFE']['status'].startswith('PASS')
+          assert x['positive_AND_negative_historic_control']['historic_original_fib05_SAFE']['status'].startswith('PASS')
+          assert x['global_Q3']==x['global_Q4']=='OPEN'
+          for row in x['first_cases']:
+              if row.get('source_scientific_classification')=='UNSAFE':
+                  assert any(c['actual_original_fully_grounded_trace_sat_Z3_cvc5']['dual_pass']
+                    for c in row['original_safety_BMC']['checked_depth_receipts']
+                    if 'actual_original_fully_grounded_trace_sat_Z3_cvc5' in c)
+              if row.get('source_scientific_classification')=='SAFE':
+                  c=row.get('first_fast_original_SyGuS',{})
+                  p=row.get('full_original_PDR_fallback',{})
+                  assert c.get('certified',False) or p.get('certified',False)
+          print('ORIGINAL_SOURCE_TRUE_SAFE',x['original_SAFE_independent_Z3_cvc5_3VC'])
+          print('ORIGINAL_SOURCE_TRUE_UNSAFE',x['original_UNSAFE_independent_grounded_Z3_cvc5'])
+          print('ORIGINAL_SOURCE_UNKNOWN',x['original_UNKNOWN_count'])
+          PY
