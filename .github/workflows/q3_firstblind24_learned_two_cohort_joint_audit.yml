@@ -1,0 +1,70 @@
+name: Q3 strict authentic two source blind24 actually trained structural full proof audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_firstblind24_learned_two_cohort_joint_audit.yml'
+      - 'research/evidence/q3_two_blind24_actual_learned_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_two_real_cohorts_24_identity_and_individual_independent_dual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Strict offline 24 original source scientific claim audit script syntax
+        run: python -m py_compile research/evidence/q3_two_blind24_actual_learned_20261021/independent_sha_pinned_source24_audit.py
+      - name: Retrieve first original 12 learning claim untouched official GitHub Actions JSON
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39587212632
+          github-token: ${{ github.token }}
+          name: q3-v32-first12-original-PCA-learned-full3VC-vs-no-fit-and-exact
+          path: /tmp/two24/first
+      - name: Retrieve second original 12 true independent source cohort evidence
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39587707176
+          github-token: ${{ github.token }}
+          name: q3-v32-second12-original-PCA-learned-full3VC-replication-vs-classical
+          path: /tmp/two24/second
+      - name: Pin original JSON byte SHA and verify every source+model truth receipt independently
+        run: |
+          set -o pipefail
+          python research/evidence/q3_two_blind24_actual_learned_20261021/independent_sha_pinned_source24_audit.py \
+            --first /tmp/two24/first/q3_v32_first_new12_original_actual_learned_complete_3VC.json \
+            --second /tmp/two24/second/q3_v32_second_new12_original_actual_learned_complete_3VC.json \
+            --out /tmp/two24/q3_two_cohort24_strict_original_source_evidence.json | tee /tmp/two24/official_evidence_audit.log
+          sha256sum /tmp/two24/q3_two_cohort24_strict_original_source_evidence.json
+      - name: Preserve exact first-blind 24 original task scientific truth classification
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-two-real-firstblind24-actual-learned-full-native3vc-audit
+          path: |
+            /tmp/two24/q3_two_cohort24_strict_original_source_evidence.json
+            /tmp/two24/official_evidence_audit.log
+          if-no-files-found: warn
+      - name: Fail closed any inflated learned unique and missing dual original proof
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/two24/q3_two_cohort24_strict_original_source_evidence.json'))
+          assert q["schema"]=="neumann.q3.24_two_source_blind_original_actual_trained_full_induction_cross_audited.v1"
+          assert q["source_Git_sha_prebody_frozen_distinct_originals"]==24
+          assert q["source_authentic_original_3VC_certified"]=={"post":7,"basic":17,"trained":19,"exact":20}
+          assert q["learned_extra_proven_vs_fixed_no_fit"]==2
+          assert q["learned_extra_proven_vs_equal_mathematics_exact_classical"]==0
+          assert q["global_Q3"]==q["global_Q4"]==q["global_Q6"]=="OPEN"
+          assert q["per_original_source_specific_CPU_fit_NOT_pretrained_weight_transfer"]
+          assert q["not_measured_end_to_end_frontier_10x"]
+          print("TWENTY_FOUR_TRUE_ORIGINAL_ACTUALLY_TRAINED_STRUCTURAL_SOURCE_COMPLETE_PROOFS_NINETEEN")
+          PY
