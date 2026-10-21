@@ -37,45 +37,49 @@ def proof_vector(cert, eligible):
 def vector_parts(vector, n):
     return vector & ((1 << n) - 1), (vector >> n) & 1
 
-def witness(original, eligible, vec, phase):
+def witness(original, eligible, vec, depth):
+    """Find an actual length-depth native-original path refuting a parity.
+
+    A single set of source auxiliary/nondet inputs is SHARED across all steps:
+    this intentionally under-approximates potentially fresher per-step inputs.
+    Thus a SAT path is authentic, while UNSAT is never taken as full unbounded
+    reachability proof. Only SAT witnesses can shrink the GF2 upper bound.
+    """
     mask, off = vector_parts(vec, len(eligible))
     candidate = candidate_original_native(original, eligible, mask, off)
-    if phase == "pre":
-        observed_states = original["now"]
-        violation = z3.Not(candidate)
-        formula = original["pre"]
-    elif phase == "pretrans_successor":
-        observed_states = original["next"]
-        violation = z3.Not(z3.substitute(candidate, *list(zip(original["now"], original["next"]))))
-        formula = z3.And(original["pre"], original["trans"])
-    else:
-        raise ValueError("UNKNOWN_AUTHENTIC_PHASE")
+    states = [original["now"], original["next"]]
+    for d in range(2, depth + 1):
+        states.append([z3.Const("_neumann_q3_depth_%d_state_%d" % (d, i), v.sort())
+                       for i, v in enumerate(original["now"])])
+    constraints = [original["native_pre"]]
+    for d in range(depth):
+        sub = list(zip(original["now"], states[d]))
+        sub += list(zip(original["next"], states[d + 1]))
+        constraints.append(z3.substitute(original["native_trans"], *sub))
+    target = z3.substitute(candidate, *list(zip(original["now"], states[depth])))
+    formula = z3.And(*(constraints + [z3.Not(target)]))
     s = z3.Solver()
-    s.set(timeout=8000)
-    s.add(formula, violation)
+    s.set(timeout=10000)
+    s.add(formula)
     verdict = s.check()
     if verdict == z3.unknown:
-        return {"status": "UNKNOWN", "reason":s.reason_unknown(), "phase":phase}
+        return {"status": "UNKNOWN", "reason":s.reason_unknown(), "depth":depth}
     if verdict == z3.unsat:
-        return {"status": "UNSAT", "phase":phase}
+        return {"status": "UNSAT", "depth":depth}
     model = s.model()
+    observed_states = states[depth]
     bits = [int(z3.is_true(model.eval(observed_states[i], model_completion=True))) for i in eligible]
     if ((mask & sum(int(b) << j for j,b in enumerate(bits))).bit_count() % 2) == off:
         raise RuntimeError("RETURNED_MODEL_DOES_NOT_REFUTE_FORMULA")
-    # Independently check with the untouched compiled native source predicate.
-    if phase == "pre":
-        ground = original["native_pre"]
-    else:
-        ground = z3.And(original["native_pre"], original["native_trans"])
-    native = z3.Solver()
-    native.set(timeout=8000)
-    native.add(ground)
+    replay = z3.Solver()
+    replay.set(timeout=10000)
+    replay.add(*constraints)
     for i,b in zip(eligible,bits):
-        native.add(observed_states[i] == z3.BoolVal(bool(b)))
-    nv = native.check()
-    if nv != z3.sat:
-        raise RuntimeError("ORIGINAL_NATIVE_SOURCE_WITNESS_NOT_REPLAYABLE_" + str(nv))
-    return {"status":"SAT_AUTHENTIC", "phase":phase, "bits":bits,
+        replay.add(observed_states[i] == z3.BoolVal(bool(b)))
+    rv = replay.check()
+    if rv != z3.sat:
+        raise RuntimeError("ORIGINAL_NATIVE_MULTISTEP_WITNESS_NOT_REPLAYABLE_" + str(rv))
+    return {"status":"SAT_AUTHENTIC", "depth":depth, "bits":bits,
             "observed_sha256":sha(bytes(bits))}
 
 def main():
@@ -162,14 +166,14 @@ def main():
             raise RuntimeError("UNEXPLAINED_NULLITY_WITH_NO_RESIDUAL")
         results=[]
         hit=None
-        for phase in ("pre","pretrans_successor"):
-            result=witness(original,eligible,residual,phase)
+        for depth in range(5):
+            result=witness(original,eligible,residual,depth)
             results.append({k:v for k,v in result.items() if k!="bits"})
             if result["status"]=="SAT_AUTHENTIC":
                 hit=result
                 break
         if hit is None:
-            status="ABSTAIN_UNREFUTED_RESIDUAL_AT_DEPTH0_OR_1"
+            status="ABSTAIN_NO_AUTHENTIC_COUNTEREXAMPLE_UP_TO_DEPTH4"
             events.append({"iteration":it,"kernel_nullity":len(kernel),
                            "residual_vector_hex":hex(residual),"solver_results":results})
             break
@@ -182,7 +186,7 @@ def main():
             raise RuntimeError("NEW_SOURCE_WITNESS_DID_NOT_REDUCE_GF2_NULLITY")
         events.append({"iteration":it,"nullity_before":len(kernel),
                        "nullity_after":new_nullity,"refuted_residual_hex":hex(residual),
-                       "witness_phase":hit["phase"],"witness_sha256":hit["observed_sha256"],
+                       "witness_depth":hit["depth"],"witness_sha256":hit["observed_sha256"],
                        "solver_results":results})
     final_nullity=len(nullspace_matrix(rows,n)[1])
     out={"schema":"neumann.q3.original.DRAGON2.active_GF2_counterexample_rank.v1",
@@ -195,7 +199,7 @@ def main():
          "final_source_counterexample_enriched_nullity":final_nullity,
          "all_arity_affine_original_closed":status.startswith("PASS_"),
          "source_authentic_observations":len(rows),
-         "new_independent_counterexample_witnesses":len(seen)-initial_distinct_count,
+         "new_independent_counterexample_witnesses":len(seen)-initial_distinct_count,\n         "native_bounded_reachability_depth_cap":4,
          "iterations":events,"fresh_proven_low_arity_certificates":certificates,
          "native_typed_original_semantics_z3_cvc5":checks,
          "sampling_receipts":source_sample_receipts,
