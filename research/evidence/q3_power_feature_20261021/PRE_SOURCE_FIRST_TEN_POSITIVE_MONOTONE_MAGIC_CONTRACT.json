@@ -1,0 +1,84 @@
+{
+  "schema": "neumann.q3.first_original_10_power_features_magic_semimagic_geometric_injective.v1",
+  "source": "SMT-LIB/benchmark-submission-2022@81a39628827f61fbd74c6f3e67feb5c1b740d2f0",
+  "source_body_unopened_for_ten_new_cases_at_freeze": true,
+  "scientific_scope": "Five new original subscript 02 cases plus five new 03 cases, source file names reveal size and power-family, all share 2022 mathematical generator authors. No true authorship-independent or fully blind transfer. Full original source Git SHA frozen precontent.",
+  "five_original_2x2_targets": [
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/MF_02.smt2",
+      "sha1_git_blob": "924c7236e3f044c9e0e21d809e550c6bc0a6f19b",
+      "bytes": 1449
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/MQ_02.smt2",
+      "sha1_git_blob": "cc9da7a04aeeb2c888b2908e0dd0469bf31ccdce",
+      "bytes": 1378
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/SC_02.smt2",
+      "sha1_git_blob": "48b970960c4025b34d2cb19ff0b8b3ba319f154a",
+      "bytes": 1176
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/SF_02.smt2",
+      "sha1_git_blob": "d0aee7520c746db2ea60f9eb688abee324a10d37",
+      "bytes": 1278
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/SQ_02.smt2",
+      "sha1_git_blob": "9c959ccb2cc526fbba72eb202421fed20a970272",
+      "bytes": 1231
+    }
+  ],
+  "five_original_3x3_controls": [
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/MF_03.smt2",
+      "sha1_git_blob": "4d2160bab398a2a000eec465abefa357c1b81ad9",
+      "bytes": 3097
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/MQ_03.smt2",
+      "sha1_git_blob": "7f0370e97cf8a09d11c758eb8879901fad3802ec",
+      "bytes": 2954
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/SC_03.smt2",
+      "sha1_git_blob": "628101ef7b760a049fa9c5aa1845782ffaac8076",
+      "bytes": 2638
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/SQ_03.smt2",
+      "sha1_git_blob": "0fd8fb86de1b30ec41f4db083f95ef52f6ecd440",
+      "bytes": 2753
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/MC_03.smt2",
+      "sha1_git_blob": "456d93d880bf329efb45686738ccadc6a837a78d",
+      "bytes": 2803
+    }
+  ],
+  "two_previously_opened_development_controls": [
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/MC_02.smt2",
+      "sha1_git_blob": "0e4e5da6af269e53ee865fe4001d920056f2f131",
+      "bytes": 1299
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/MS_02.smt2",
+      "sha1_git_blob": "09675e2be189efa4c12c17920d7088070e378b73",
+      "bytes": 1229
+    }
+  ],
+  "one_fixed_source_geometry_method": "Parse full original raw SMT2 with Z3. From ONLY its actually asserted source equalities, detect two equal-sum 2-term equations sharing one power monomial of same positive exponent k, hence derive b^k=c^k. Check literal original distinct(b,c) and source-positive(>b 0),(>c 0). For any k>=1, positive integer function x↦x^k is strictly increasing (factorization x^k−y^k=(x−y)∑ x^(k−1−i)y^i), so source entails b^k != c^k, contradiction. Do not use source :status metadata, answer labels, file name, or target/row specific paths during inference.",
+  "exponent_bound": "Only repeated multiplication of the SAME native Int cell symbol with 1 <= repeated count <= 8 is allowed; exact exponent inferred from original AST. No unsafe approximate power equivalence.",
+  "strong_original_evidence": "Source full native AST status/source SHA preverified, two exact source equality AST SHA references and original distinct/positive assertion AST SHA references retained. Recreate symbolic feature equalities F_a+F_b=T,F_a+F_c=T,F_b != F_c as a necessary abstraction, independently verify QF_LIA UNSAT in Z3 and cvc5. Mathematical source bridge is monotonic power injectivity, independently provide exact symbolic factorization and finite test controls. This is full ORIGINAL unbounded UNSAT proof, despite finite arithmetic theorem solver verifying abstraction rather than actual raw nonlinear SMT2.",
+  "matched_direct": "Run raw unchanged original source Z3 4 sec and cvc5 4 sec each same CPU, record direct SAT/UNSAT/UNKNOWN; no invented 10x capability/efficiency vs stronger algorithm with same power feature transformation.",
+  "hard_cases": "3x3 sources left UNKNOWN when 2-term magic contradiction absent. They are controls, not assumed SAT. Every first-source result retained.",
+  "false_inference_controls": "Known authentic original 2x2 MC02/MS02 already opened, first new 5 02 positive, 5 03 controls; separately mutate equal-sum line or remove original distinct to require safe abstention in synthetic controls. Original SAT proof never inferred from an abstract SAT result.",
+  "prior_art": "Elementary injectivity and sums; generic classical algebra, not newly discovered theorem, not trained model learning, no global Q3/Q4/Q5/Fronter claim.",
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q5": "OPEN",
+  "global_Q6": "OPEN",
+  "global_Q7": "OPEN"
+}
