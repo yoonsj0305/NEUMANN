@@ -1,0 +1,19 @@
+{
+  "schema": "neumann.q6.posthoc_alpha_invariant_dynamic_original_program_semantic_skeleton_eight.v1",
+  "motivation": "Previous Q6 PR378 fixed 5-var manually named phase frontend refuses 7 genuine source programs with 2–4 vars. The next architectural step must at least remove lexical-name and fixed-arithmetic-variable-count assumptions before higher-value trained grammar search.",
+  "true_original_provenance": "SyGuS-Org/benchmarks@13c8deb68a873635879c9a69bc78caebd340f646, one opened genuine fib_32 original and seven previously pre-body frozen now opened source programs from PR378 metadata at aed388ba.",
+  "source_already_opened_for_all_eight": true,
+  "original_manifests": [
+    "research/evidence/q3_code2inv_presource24_20261021/BEFORE_ANY_ORIGINAL_SOURCE_BODY_OPEN_24_GIT_BLOBS.json",
+    "research/evidence/q6_cpu_transfer7_20261021/BEFORE_OPEN_SEVEN_NEW_ORIGINAL_FIB_CPU_MODEL_LOCK.json"
+  ],
+  "original_count": 8,
+  "method": "Use exactly the complete original native independently validated Pre Trans Post z3 AST, current and primed state variables from source parser. For each original with 2..6 state vars, enumerate ALL index permutations, alpha rename original native now/next variables to uniformly typed placeholders s0..sn-1 and s0next.. preserving source original conjunct syntax. Canonical identity is lexicographic minimum concatenated pre/trans/post native sexprs after renaming. For each source generate 3 deterministic alpha-renamed and state-declaration-reordered equivalent programs with previously unseen variable NAMES, require EXACT same canonical identity; reverse alpha rename and require independent Z3+cvc5 UNSAT XOR of ORIGINAL and back-transformed Pre,Trans,Post for EACH condition. 8x3x3 native independent proof pairs. Different source programs need not have same canonical identity, only preserve semantics under renaming and variable count, no new invariant generation claimed.",
+  "limits": "max 6 integer source vars (factorial permutation), original source parser must support exact native formulas. Record fail-closed unsupported rather than silently dropping native constraints. Do not claim canonical identity invariant under arbitrary equivalent expression algebra rewrites or across different state counts. Canonicalization alone is NOT a learned role encoder nor Q6 program-generalization PASS.",
+  "negative_controls": "Change (toggle) original postcondition or delete true source positive condition in one synthetic mutated copy; canonical identities should differ from original and independent Z3+cvc5 XOR should be SAT, proving no false equivalence beyond alpha renaming.",
+  "admission": "8/8 genuine SHA originals authenticated, 8/8 supported dynamic arity, 24/24 alpha-normalized identity matches and 72/72 independent double-solver native-equivalence checks, mutation distinguishes source semantics. Existing classical same canonicalization (not novel learned algorithm). Q3/Q6 global still OPEN.",
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q5": "OPEN",
+  "global_Q6": "OPEN"
+}
