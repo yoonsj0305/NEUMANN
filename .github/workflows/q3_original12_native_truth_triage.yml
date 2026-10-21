@@ -1,0 +1,82 @@
+name: Q3 true original12 exact tautology UNSAFE and projected information triage
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_original12_native_truth_triage.yml'
+      - 'research/evidence/q3_dnf12_native_truth_triage_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact_source_native_deletion_before_learning:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Frozen source identity before reading original bodies and parser lint
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_dnf12_native_truth_triage_20261021/exact_original_post_tautology_unsafe_projected_alias.py
+      - name: Pin authentic original independent Z3 and cvc5
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+      - name: Exact source Pre Trans Post original dual proof without model or source weakening
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3_dnf12_native_truth_triage_20261021/exact_original_post_tautology_unsafe_projected_alias.py \
+            --root original \
+            --freeze research/evidence/q3_dnf_first12_20261021/NEW_UNSEEN_ORIGINALS_BEFORE_SOURCE_BODY_LOCK.json \
+            --out /tmp/q3_native_original12_exact_post_unsafe_alias.json | tee /tmp/q3_native_original12_exact_post_unsafe_alias.log
+          sha256sum /tmp/q3_native_original12_exact_post_unsafe_alias.json
+      - name: Preserve all unchanged original native certificates and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-first12-truth-triage-original-tautology-unsafe-projection-dual
+          path: |
+            /tmp/q3_native_original12_exact_post_unsafe_alias.json
+            /tmp/q3_native_original12_exact_post_unsafe_alias.log
+          if-no-files-found: warn
+      - name: Reject false original source SAFE or false claimed information loss
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/q3_native_original12_exact_post_unsafe_alias.json'))
+          assert q["schema"]=="neumann.q3.12_true_originals_posthoc_exact_native_learning_necessity_and_projection.v1"
+          assert q["original_sha_locked_count"]==12
+          assert q["all_source_bodies_were_opened_before_this_posthoc_diagnostic"]
+          assert q["no_bounded_UNSAT_claimed_complete_safe"]
+          assert q["not_close_global_Q3_Q4_Q6"]
+          assert len({x["original_git_blob"] for x in q["all_authentic_original_cases"]})==12
+          for row in q["all_authentic_original_cases"]:
+              if row["status"]=="SOURCE_POST_TAUTOLOGY_NO_MACHINE_LEARNING_NEEDED":
+                  assert row["genuine_original_full_safe_certificate"]
+                  assert all(t["dual_pass"] for t in row["True_invariant_full_original_3VC"].values())
+              if row["status"]=="CERTIFIED_TWO_SLOT_PROJECTED_LABEL_ALIAS":
+                  assert row["full_original_safe_one_step_vs_bad_projection_alias_dual"]["dual_pass"]
+              if row["status"] in ("GENUINE_SOURCE_INIT_UNSAFE","GENUINE_SOURCE_ONE_STEP_UNSAFE"):
+                  key=("genuine_initial_UNSAFE_dual_witness" if row["status"]=="GENUINE_SOURCE_INIT_UNSAFE"
+                       else "genuine_first_transition_UNSAFE_dual_witness")
+                  assert row[key]["dual_pass"]
+          print("REAL_ORIGINAL_TAUTOLOGY_UNSAFE_PROJECTION_NATIVE_DOUBLE_CERTIFIED")
+          PY
