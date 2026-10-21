@@ -1,0 +1,53 @@
+{
+  "schema": "neumann.q4.first_six_originals_fixed_cheapest_safe_solver_portfolio.v1",
+  "freeze_date": "2026-10-21",
+  "upstream": "SyGuS-Org/benchmarks",
+  "upstream_sha": "13c8deb68a873635879c9a69bc78caebd340f646",
+  "source_metadata_only": true,
+  "original_files_not_opened_pre_freeze": true,
+  "directories_not_independent_authors": true,
+  "sources": [
+    {
+      "path": "lib/Inv_Track/andrew_lustre/DRAGON_5.lus.sl",
+      "git_blob": "9aec137978b7b4b4df54b6fe82244f8720586d18",
+      "bytes": 37898
+    },
+    {
+      "path": "lib/Inv_Track/andrew_lustre/FIREFLY_4.lus.sl",
+      "git_blob": "7b8ff9bb4f175418813aa10a82025144b64cacdd",
+      "bytes": 26180
+    },
+    {
+      "path": "lib/Inv_Track/from_2018/fib_05_x.sl",
+      "git_blob": "c722739a4917aa1a358bc1b9fc3d9f2c171fe856",
+      "bytes": 522
+    },
+    {
+      "path": "lib/Inv_Track/from_2018/fib_07.sl",
+      "git_blob": "d078734e83a870d7b95a68bc7a947cf85ff944d8",
+      "bytes": 658
+    },
+    {
+      "path": "lib/Inv_Track/xujie_code2inv/13.c.sl",
+      "git_blob": "e2ea9cbfa7db975740f23b8a756d4546383b2a88",
+      "bytes": 963
+    },
+    {
+      "path": "lib/Inv_Track/xujie_code2inv/15.c.sl",
+      "git_blob": "08799de010dde03e696f2542396555ec4755be82",
+      "bytes": 1281
+    }
+  ],
+  "admission": {
+    "screen": "original Git blob/byte length, full typed-native original semantic parity for original Pre, Trans, Post (Z3+cvc5), original Pre SAT (both), NotPost SAT (both)",
+    "sygus_fast": "cvc5 original SyGuS with total subprocess budget 0.75s; accept only independently certified original Pre/Trans/Post 3VC in Z3 and cvc5",
+    "fallback": "original source SPACER full reachability with bounded wall 15 sec, extract actual returned fixedpoint invariant and independently prove full original 3VC in Z3 and cvc5",
+    "controls": "same new original PDR-only and original SyGuS-only 15sec routes, all on same CPU instance; record every unknown; no timed-out speedup quotient; three per-group genuine source Post False mutations must SAT",
+    "baseline_comparison": "Compare portfolio to always PDR in per-task paired observed full end-to-end times WHEN BOTH DUAL PASS. Compare coverage and total observed wall times separately; fixed equal CPU but no claim of SOTA or 10x",
+    "hypothesis": "Portfolio admits all same fully certified original successes as PDR-only with lower observed total wall, while avoiding 20-second cutoff SyGuS on hard sources.",
+    "stop": "No adaptation to failed frozen sources inside same first experiment. Record exact first result even if 0/6. NEVER label classical portfolio as learned Q3."
+  },
+  "no_gpu_no_paid_api_no_new_neural": true,
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN"
+}
