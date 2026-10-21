@@ -1,0 +1,62 @@
+name: Q3 44 authenticated original source corpus authority audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_44_original_source_authority_20261021.yml'
+      - 'research/evidence/q3_44_original_proof_partition_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original44_strict_source_provenance_and_mathematical_authority:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check strict source ledger compile and syntax
+        run: python -m py_compile research/evidence/q3_44_original_proof_partition_20261021/verify_44_authentic_originals.py
+      - name: Download 26 source-authentic mathematical broker results
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39546097948
+          github-token: ${{ github.token }}
+          name: q3-26-authentic-full-original-classical-broker-theorem-ablation
+          path: /tmp/q344/q26
+      - name: Download source-authenticated external public STC367 result
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39546751137
+          github-token: ${{ github.token }}
+          name: q3-source367-real-original-public-prior-answer-dual
+          path: /tmp/q344/prior
+      - name: Download 18 authentic original audit evidence
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39569042369
+          github-token: ${{ github.token }}
+          name: q3-true-18-original-source-cross-four-run-audit
+          path: /tmp/q344/q18
+      - name: Re-audit original SHA and source status, external prior knowledge, theorem trust boundaries
+        run: |
+          set -o pipefail
+          python research/evidence/q3_44_original_proof_partition_20261021/verify_44_authentic_originals.py \
+            --q26 /tmp/q344/q26/q3_integrated_26_raw_original_broker.json \
+            --prior /tmp/q344/prior/q3_true_original_367_public_external_smt2.json \
+            --q18 /tmp/q344/q18/q3_official_18_source_evidence_audit.json \
+            --out /tmp/q344/original44_immutable_joint_ledger.json | tee /tmp/q344/original44.log
+          sha256sum /tmp/q344/original44_immutable_joint_ledger.json
+      - name: Preserve all 44 distinct original source truth partitions without model relabel
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-44-authentic-original-math-and-authority-partition
+          path: |
+            /tmp/q344/original44_immutable_joint_ledger.json
+            /tmp/q344/original44.log
+          if-no-files-found: warn
