@@ -140,7 +140,24 @@ def independent_finite_QFLIA_certificate(info):
     z=s.check()
     cvc=None
     if z==z3.unsat:
-        payload="(set-logic QF_LIA)\n"+s.to_smt2()
+        # Emit a TINY standalone QF_LIA proof independently of Z3's
+        # to_smt2(), which is not guaranteed cvc5-compatible (it may
+        # embed Z3-specific global declarations/status or parser options).
+        # Original generated finite images are exact, and no source label
+        # or negative result is passed as a premise.
+        lines=["(set-logic QF_LIA)"]
+        image_groups=list(info["true_source_individual_univariate_images"].values())
+        for i,im in enumerate(image_groups):
+            name="fin_r_"+str(i)
+            lines.append("(declare-fun "+name+" () Int)")
+            allowed=" ".join("(= "+name+" "+str(int(v))+")" for v in im)
+            lines.append("(assert (or "+allowed+"))")
+        items=["fin_r_"+str(i) for i in range(len(image_groups))]
+        items.append(str(int(info["true_source_literal_constant_modulus"])))
+        plus="(+ "+" ".join(items)+")" if len(items)>1 else items[0]
+        lines.append("(assert (= (mod "+plus+" "+str(m)+") 0))")
+        lines+=["(check-sat)","(exit)"]
+        payload="\n".join(lines)+"\n"
         start=time.perf_counter_ns()
         cvc={"abstract_source_smt2_sha256":sha256(payload.encode()),
              "cvc5_original_math_status":"UNKNOWN","cvc5_exit":None}
@@ -154,6 +171,7 @@ def independent_finite_QFLIA_certificate(info):
                 cvc["cvc5_original_math_status"]=statuses[0]
             else:
                 cvc["cvc5_stderr_excerpt"]=r.stderr[:280]
+                cvc["cvc5_stdout_excerpt"]=r.stdout[:280]
         except Exception as e:
             cvc["error"]=type(e).__name__+":"+str(e)[:250]
         cvc["cvc5_math_abstract_wall_ms"]=(time.perf_counter_ns()-start)/1e6
