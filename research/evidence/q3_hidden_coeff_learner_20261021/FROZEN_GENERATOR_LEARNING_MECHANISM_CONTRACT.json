@@ -1,0 +1,19 @@
+{
+  "schema": "neumann.q3.prospective_selfsupervised_hidden_coefficients_control_proof_v1",
+  "testcases": 16,
+  "source_generator_seed": 20261021,
+  "variable_names_and_permutations_deterministically_randomized": true,
+  "hidden_per_test_transition_coefficient_range_inclusive": [
+    3,
+    23
+  ],
+  "candidate_learner": "EXACT prior PR393 native source model: sample real Pre/Trans z3 true witnesses, sklearn fitted pairwise QuantileRegressor linear envelopes, candidate Houdini, independently Z3+cvc5 source full 3VC",
+  "learner_not_provided_generator_coefficient": true,
+  "control": "same original sampled traces no sklearn fit; unary bounds + ±1 pairwise constraints and same Houdini",
+  "negative_mutation": "change exact source Post y >= coefficient * n to y >= (coefficient+1)*n; learned I MUST fail source original goal VC; NOT a true original unsafe classification",
+  "synthetic_only_not_public_original_sources": true,
+  "source_first_generalization_not_proven": true,
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q6": "OPEN"
+}
