@@ -1,0 +1,43 @@
+{
+  "schema": "neumann.q3.posthoc_first24_source_5_PDR_SAT_plus_one_HARD_BMC_replay.v1",
+  "based_on_successful_original_first_CI": "https://github.com/yoonsj0305/NEUMANN/actions/runs/39556104670",
+  "historical_original_source_blob_first_frozen_commit": "6a5792e196b2234358dca31ec9dd733f3ffed42d",
+  "new_study_is_POSTHOC_not_blind": true,
+  "strict_frozen_six": [
+    {
+      "family": "CODE2INV_NATIVE",
+      "name": "27.c.sl",
+      "expected_previous_status": "PDR_SAT_UNREPLAYED_ORIGINAL_SAFETY_UNRESOLVED"
+    },
+    {
+      "family": "CODE2INV_CONF5",
+      "name": "72_conf5.sl",
+      "expected_previous_status": "PDR_SAT_UNREPLAYED_ORIGINAL_SAFETY_UNRESOLVED"
+    },
+    {
+      "family": "OTHER_2018",
+      "name": "jmbl_trex3_vars.sl",
+      "expected_previous_status": "PDR_SAT_UNREPLAYED_ORIGINAL_SAFETY_UNRESOLVED"
+    },
+    {
+      "family": "OTHER_2018",
+      "name": "fib_33ns.sl",
+      "expected_previous_status": "PDR_SAT_UNREPLAYED_ORIGINAL_SAFETY_UNRESOLVED"
+    },
+    {
+      "family": "OTHER_2018",
+      "name": "jmbl_trex3.sl",
+      "expected_previous_status": "PDR_SAT_UNREPLAYED_ORIGINAL_SAFETY_UNRESOLVED"
+    },
+    {
+      "family": "OTHER_2018",
+      "name": "fib_32.sl",
+      "expected_previous_status": "GOLD_FREE_HARD_SAFE_UNPROVEN_CLASSICAL_OR_MISSING_INVARIANT"
+    }
+  ],
+  "method": "For each source original native Pre Trans Post same exact source Pre-SAT/Post-nontrivial double parity, BMC original depth 0..5 and full grounded all state each timestamp original SAT independently Z3 cvc5. If no true trace, keep UNKNOWN, never infer SAFE from bounded no-bad. For fib32 specifically also run original native cvc5 SyGuS 15sec and Z3 SPACER 20sec; only independent original full dual 3VC inductive SAFE accepted.",
+  "controls": "Historical known real fib07 unsafe at depth1 and fib05x original safe, both original source SHA identity preknown; rule false positive reject.",
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q5": "OPEN"
+}
