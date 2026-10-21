@@ -1,0 +1,92 @@
+name: Q3 real untouched two-corpus originals frozen learned vs strongest exact proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_external_real8_original_nonlin_blind.yml'
+      - 'research/evidence/q3_external_8_source_transition_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real_prebody_external_original_first_execution:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            comp/2017/Inv_Track
+            comp/2019/Inv_Track/From2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check source-body SHA registration and immutable numeric learner contract
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_external_8_source_transition_20261021/actual_fit_cross_corpus_real_original.py
+          python - <<'PY'
+          import json
+          q=json.load(open('research/evidence/q3_external_8_source_transition_20261021/PREBODY_GIT_SHA_FROZEN_8.json'))
+          assert q['schema']=='neumann.q3.external_real_8_PREBODY_SHA_V1'
+          assert len(q['cases'])==8 and len({x['git_blob'] for x in q['cases']})==8
+          assert not q['original_source_bodies_opened_before_commit']
+          print('EXTERNAL_REAL_TWO_CORPUS_FIRST_BODY_SHA_PREREGISTERED')
+          PY
+      - name: Install pinned source verifiers and genuine gradient numeric learner
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: FIRST original bodies actual numeric learned polynomial and equal classical exact independent dual source proofs
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_external_8_source_transition_20261021/actual_fit_cross_corpus_real_original.py \
+            --root original \
+            --freeze research/evidence/q3_external_8_source_transition_20261021/PREBODY_GIT_SHA_FROZEN_8.json \
+            --out /tmp/q3_REAL_EXTERNAL_EIGHT_source_blind_learning.json | tee /tmp/q3_REAL_EXTERNAL_EIGHT_source_blind_learning.log
+          sha256sum /tmp/q3_REAL_EXTERNAL_EIGHT_source_blind_learning.json
+      - name: Keep all real source failures and proof receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-source-blind-two-external-original-corpora-eight-strong-classical
+          path: |
+            /tmp/q3_REAL_EXTERNAL_EIGHT_source_blind_learning.json
+            /tmp/q3_REAL_EXTERNAL_EIGHT_source_blind_learning.log
+          if-no-files-found: warn
+      - name: Enforce genuine model fits and no forged full native source proof
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/q3_REAL_EXTERNAL_EIGHT_source_blind_learning.json'))
+          assert q['schema']=='neumann.q3.first_source_body_blind_external_real_8_fixed_polynomial_fit_v1'
+          assert q['prebody_meta_SHA_lock_commit']=='e00e96733735e9d2ff5198359e3d76801b1eed1b'
+          assert q['exact_original_sources_sha_verified']==8
+          assert len(q['all_cases'])==8
+          assert q['same_math_classical_has_equal_grammar_and_source_samples']
+          assert q['new_operator_primitive_not_autonomously_invented']
+          assert q['learned_weight_retraining_each_source_not_meta_transfer']
+          for case in q['all_cases']:
+              for row in case.get('source_generic_gradient_and_exact_classical_candidates',[]):
+                  for name in ('learned_candidate_original_proof','classical_exact_original_proof'):
+                      cert=row.get(name)
+                      if cert and cert['exactly_full_source_3VC_proved']:
+                          assert all(z['dual_pass'] for z in cert['full_original_independent_Z3_cvc5_3VC'].values())
+              for name in ('original_cvc5_SyGuS_2s','original_Z3_SPACER'):
+                  cert=case.get(name)
+                  if cert and cert['certified']:
+                      assert name in case
+          assert q['global_Q3']==q['global_Q4']==q['global_Q6']=='OPEN'
+          print('Genuine two-corpus external real source proof receipts audited without Q3 overclaim')
+          PY
