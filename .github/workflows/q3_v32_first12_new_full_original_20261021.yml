@@ -1,0 +1,89 @@
+name: Q3 FIRST new original12 trained PCA plus original Post COMPLETE 3VC
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_v32_first12_new_full_original_20261021.yml'
+      - 'research/evidence/q3_v32_new12_full_source_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  genuine_unseen_original_source_full_learned_safety_vs_equal_classical:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate PRE-body untouched original commit and already validated fixed trained method
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_v32_new12_full_source_20261021/first_12_unopened_learned_full_native_3VC.py
+          python - <<'PY'
+          import json
+          x=json.load(open("research/evidence/q3_v32_new12_full_source_20261021/PREOPEN_GENUINE_TWELVE_ORIGINAL_GITSHA_SOURCE_LOCK.json"))
+          assert x['schema']=='neumann.q3.v32_twelve_first_unopened_genuine_original_learned_full_post_probe.v1'
+          assert x['source_bodies_UNOPENED_at_this_registration']
+          assert len(x['cases'])==12 and len({q['git_blob'] for q in x['cases']})==12
+          assert x['global_Q3']==x['global_Q4']==x['global_Q6']=='OPEN'
+          print("SOURCE12_GENUINELY_UNOPENED_SOURCE_LOCK_BEFORE_MODEL_EVAL")
+          PY
+      - name: Install native source Z3 independent cvc5 and real trained sklearn PCA
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: Actually trained PCA source model FIRST original full native Pre Trans Post 3VC unchanged study
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_v32_new12_full_source_20261021/first_12_unopened_learned_full_native_3VC.py \
+            --root original \
+            --freeze research/evidence/q3_v32_new12_full_source_20261021/PREOPEN_GENUINE_TWELVE_ORIGINAL_GITSHA_SOURCE_LOCK.json \
+            --out /tmp/q3_v32_first_new12_original_actual_learned_complete_3VC.json | tee /tmp/q3_v32_first_new12_original_actual_learned_complete_3VC.log
+          sha256sum /tmp/q3_v32_first_new12_original_actual_learned_complete_3VC.json
+      - name: Archive all source-first real trained original native dual 3VC receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-v32-first12-original-PCA-learned-full3VC-vs-no-fit-and-exact
+          path: |
+            /tmp/q3_v32_first_new12_original_actual_learned_complete_3VC.json
+            /tmp/q3_v32_first_new12_original_actual_learned_complete_3VC.log
+          if-no-files-found: warn
+      - name: No first source fabricated evidence, fail closed on full original 3VC absent dual
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open("/tmp/q3_v32_first_new12_original_actual_learned_complete_3VC.json"))
+          assert q["schema"]=="neumann.q3.v32_FIRST_ORIGINAL_UNOPENED_twelve_actual_learned_full_3VC.v1"
+          assert q["pre_SOURCE_body_sha_registration_commit"]=="cebc8f5609c483fdd9c3d6e10d982511e1298ca1"
+          assert q["new_original_source_sha_preopen_authenticated_count"]==12
+          assert len(q["true_originals"])==12
+          assert len({r["true_original_git_blob"] for r in q["true_originals"]})==12
+          assert q["same_full_method_proven_executable_before_new_source_first_open"]
+          assert q["matched_classical_has_equal_data_and_math_proof_tools"]
+          assert q["global_Q3"]==q["global_Q4"]==q["global_Q6"]=="OPEN"
+          for row in q["true_originals"]:
+              for key in ("POST_only_already_exact_original_dual","simple_NOLEARN_plus_original_POST",
+                          "TRAINED_PCA_plus_original_POST","EXACT_CLASSICAL_plus_original_POST"):
+                  proof=row.get(key)
+                  if proof and proof["fully_verified_complete_original_3VC"]:
+                      assert all(x["dual_pass"] for x in proof["independent_original_pre_trans_post_dual_proofs"].values())
+          print("GENUINE_FRESH_ORIGINAL_COMPLETE_LEARNED_SAFETY_CLAIMS_DOUBLE_CERTIFIED")
+          PY
