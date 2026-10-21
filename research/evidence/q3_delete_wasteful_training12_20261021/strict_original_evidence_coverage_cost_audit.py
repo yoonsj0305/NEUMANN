@@ -70,6 +70,19 @@ def main():
     paired=[x for x in classified if x["model_fit"]]
     model_search_ms=sum(x["model_training_and_calibration_ms"] for x in paired)
     baseline_search_ms=sum(x["same_input_exact_no_fit_search_ms"] for x in paired)
+    # Reconstructed conditional policies from individually measured search times.
+    # No live dispatcher or new solver execution is claimed.
+    learned_first_fallback_ms=(model_search_ms+
+        sum(q["same_input_exact_no_fit_search_ms"] for q in paired
+            if not q["adaptive_learned_original_full_safe"]))
+    classical_first_fallback_ms=(baseline_search_ms+
+        sum(q["model_training_and_calibration_ms"] for q in paired
+            if not q["adaptive_classical_original_full_safe"]))
+    learned_first_covered=sum(
+        q["adaptive_learned_original_full_safe"] or q["adaptive_classical_original_full_safe"]
+        for q in paired)
+    check(learned_first_covered==sum(q["adaptive_classical_original_full_safe"] for q in paired),
+          "FALLBACK_CHANGED_VALIDATED_PROOF_COVERAGE")
     check(len(dominated)==0,"MODEL_FOUND_NEW_PROOF_NOT_COVERED_BY_CLASSICAL_DO_NOT_DELETE")
     check(len(a_l)==4 and len(a_c)==6 and len(paired)==6,"ORIGINAL_RESULT_COUNTS_CHANGED")
     output={
@@ -83,6 +96,16 @@ def main():
         "learned_unique_beyond_equal_rights_classical":len(dominated),
         "actual_training_and_symbolic_calibration_sum_ms_on_paired_6":model_search_ms,
         "exact_no_fit_OR_symbolic_candidate_search_sum_ms_on_paired_6":baseline_search_ms,
+        "estimated_learning_first_then_exact_fallback_candidate_search_ms_from_individual_measurements":
+            learned_first_fallback_ms,
+        "estimated_exact_first_then_learning_fallback_candidate_search_ms_from_individual_measurements":
+            classical_first_fallback_ms,
+        "learning_first_fallback_proved_source_count_on_six":learned_first_covered,
+        "exact_classical_only_proved_source_count_on_six":
+            sum(q["adaptive_classical_original_full_safe"] for q in paired),
+        "measured_candidate_search_nofit_to_reconstructed_learning_first_ratio":
+            baseline_search_ms/learned_first_fallback_ms if learned_first_fallback_ms else None,
+        "counterfactual_routing_not_live_dispatched_or_end_to_end":True,
         "measured_model_to_nofit_candidate_search_wall_ratio":
             model_search_ms/baseline_search_ms if baseline_search_ms>0 else None,
         "cost_measurement_excludes_shared_data_collection_and_final_dual_3VC":True,
@@ -98,7 +121,10 @@ def main():
               "learned_unique_beyond_equal_rights_classical",
               "actual_training_and_symbolic_calibration_sum_ms_on_paired_6",
               "exact_no_fit_OR_symbolic_candidate_search_sum_ms_on_paired_6",
-              "measured_model_to_nofit_candidate_search_wall_ratio"):
+              "measured_model_to_nofit_candidate_search_wall_ratio",
+              "estimated_learning_first_then_exact_fallback_candidate_search_ms_from_individual_measurements",
+              "estimated_exact_first_then_learning_fallback_candidate_search_ms_from_individual_measurements",
+              "measured_candidate_search_nofit_to_reconstructed_learning_first_ratio"):
         print("ACTUAL_ORIGINAL_PROOF_FIRST_MODEL_DELETION",k,output[k],flush=True)
     print("GLOBAL_Q3_OPEN",flush=True)
 if __name__=="__main__":main()
