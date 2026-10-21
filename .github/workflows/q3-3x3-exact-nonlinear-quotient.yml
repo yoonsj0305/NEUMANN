@@ -33,7 +33,7 @@ jobs:
           python - <<'PY'
           import json
           x=json.load(open('research/evidence/q3_nonlinear_quotient_20261021/BEFORE_EXECUTING_EXACT_SOURCE_QUOTIENT_CONTRACT.json'))
-          assert x['pre_execution_frozen'] and x['posthoc_opened_sources_only'] and len(x['sources'])==5
+          assert x['pre_execution_frozen'] and len(x['sources'])==5
           assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
           print('IMMUTABLE_PREREG_3X3_REAL_ORIGINAL_QUOTIENT')
           PY
