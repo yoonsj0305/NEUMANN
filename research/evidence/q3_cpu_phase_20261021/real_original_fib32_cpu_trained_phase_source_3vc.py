@@ -187,13 +187,31 @@ def main():
         report["heldout_k_outside_training_support"]=all(r["k_training_or_test"]>5 for r in test)
         # Model absent entirely: same original trace data, source-feature grammar
         # supplied, deterministic finite bucket lookup with zero training.
+        table_begin=time.perf_counter_ns()
         buckets=defaultdict(set)
         for row in train:
             buckets[tuple(row["features"])].add(row["observed_offset_i_minus_j"])
         deterministic_mapping=( {key:next(iter(vals)) for key,vals in buckets.items()}
                                if len(buckets)==4 and all(len(v)==1 for v in buckets.values()) else None )
+        report["nonlearner_exact_finite_trace_lookup_build_ms"]=millis(table_begin)
         report["nonlearner_same_source_trace_lookup"]=independently_validate_candidate(
             src,native,deterministic_mapping,"zero_train_deterministic_original_trace_table")
+        report["learned_vs_zero_train_actual_typed_invariant_identical_SHA256"]=(
+            learned_result["original_true_source_AST_candidate_sha256"]==
+            report["nonlearner_same_source_trace_lookup"]["original_true_source_AST_candidate_sha256"])
+        report["finite_feature_domain_count"]=4
+        report["finite_source_feature_table_complete_and_unique"]=(
+            deterministic_mapping is not None and
+            all(len(values)==1 for values in buckets.values()))
+        # This *concrete bounded question* is now adjudicated:
+        # both mechanisms propose the IDENTICAL native original formula.
+        # A statistical fit cannot be a UNIQUE original-solving capability
+        # over a zero-learn direct exact four-key table on this program.
+        report["bounded_original_learned_unique_advantage_absent_on_this_domain"]=(
+            report["learned_vs_zero_train_actual_typed_invariant_identical_SHA256"] and
+            report["finite_source_feature_table_complete_and_unique"] and
+            learned_result["actual_original_3VC_dual_success"] and
+            report["nonlearner_same_source_trace_lookup"]["actual_original_3VC_dual_success"])
         report["no_train_hypothesis_constant_zero"]=independently_validate_candidate(
             src,native,{(p,b):0 for p in (0,1) for b in (0,1)},"nonlearner_constant_i_eq_j")
         parity_tree,parity_cost,parity_desc=actual_cpu_train(x,y,feature_indices=(0,))
@@ -230,6 +248,12 @@ def main():
           "/",report.get("heldout_original_transition_state_predictions_total"))
     print("Q3_REAL_CPU_TRAINED_NONLEARNER_SAME_SOURCE_TABLE_ORIGINAL_3VC",
           report.get("nonlearner_same_source_trace_lookup",{}).get("actual_original_3VC_dual_success"))
+    print("Q3_REAL_CPU_TRAINED_AND_NONLEARNED_PROPOSALS_EXACT_AST_HASH_EQUAL",
+          report.get("learned_vs_zero_train_actual_typed_invariant_identical_SHA256"))
+    print("Q3_REAL_CPU_TRAINED_ONLY_FOUR_FEATURE_CASES_CLASSICAL_LOOKUP_DOMINATES",
+          report.get("bounded_original_learned_unique_advantage_absent_on_this_domain"),
+          "MODEL_FIT_MS",report.get("CPU_decision_tree_training_wall_ms"),
+          "CLASSICAL_TABLE_BUILD_MS",report.get("nonlearner_exact_finite_trace_lookup_build_ms"))
     print("Q3_REAL_CPU_TRAINED_PARITY_ONLY_NEGATIVE",
           report.get("ablated_parity_only_full_original_verification",{}).get("actual_original_3VC_dual_success"))
     print("Q3_REAL_CPU_TRAINED_SHUFFLED_LABEL_NEGATIVE",
