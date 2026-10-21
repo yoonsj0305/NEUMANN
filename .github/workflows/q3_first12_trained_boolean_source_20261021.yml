@@ -1,0 +1,88 @@
+name: Q3 first 12 authentic originals trained Boolean DNF source-verified transfer
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_first12_trained_boolean_source_20261021.yml'
+      - 'research/evidence/q3_dnf_first12_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  unchanged_actual_tree_unopened_source12_against_strong_original_controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pre-source-body original SHA and unchanged trained Boolean learner preflight
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_dnf_first12_20261021/firstblind_transfer_unchanged_trained_boolean.py
+          python - <<'PY'
+          import json
+          q=json.load(open("research/evidence/q3_dnf_first12_20261021/NEW_UNSEEN_ORIGINALS_BEFORE_SOURCE_BODY_LOCK.json"))
+          assert q["schema"]=="neumann.q3.train_BOOLEAN_DNF_first12_unopened_xujie_SHA.v1"
+          assert q["original_source_bodies_not_read_before_freeze"]
+          assert len(q["cases"])==12 and len({x["git_blob"] for x in q["cases"]})==12
+          assert q["global_Q3"]==q["global_Q4"]==q["global_Q6"]=="OPEN"
+          print("FIRST_SOURCE_BODY_BLIND_TWELVE_BOOLEAN_SOURCE_LOCK_AUTHENTIC")
+          PY
+      - name: Install pinned independent Z3 cvc5 and CPU fitted real sklearn decision tree
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 z3-solver==4.13.3.0
+      - name: Actually learn Boolean DNF structure FIRST original source bodies vs same-authority nofit Boolean and SyGuS
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_dnf_first12_20261021/firstblind_transfer_unchanged_trained_boolean.py \
+            --root original \
+            --freeze research/evidence/q3_dnf_first12_20261021/NEW_UNSEEN_ORIGINALS_BEFORE_SOURCE_BODY_LOCK.json \
+            --out /tmp/q3_true_first12_boolean_learner_original_full3VC.json | tee /tmp/q3_true_first12_boolean_learner_original_full3VC.log
+          sha256sum /tmp/q3_true_first12_boolean_learner_original_full3VC.json
+      - name: Preserve all authentic first-source-body native proofs failures unsafe and abstentions
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-real-first12-original-trained-Boolean-vs-classical-and-unsafe
+          path: |
+            /tmp/q3_true_first12_boolean_learner_original_full3VC.json
+            /tmp/q3_true_first12_boolean_learner_original_full3VC.log
+          if-no-files-found: warn
+      - name: Validate exact original source proof authority and never close global Q3
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3_true_first12_boolean_learner_original_full3VC.json'))
+          assert r["schema"]=="neumann.q3.first_unseen_original12_actual_learned_boolean_DNF_vs_exact_classical.v1"
+          assert r["preregister_source_SHA_only_Git_commit"]=="ba08ffcf1760ef556d6f4fd058f81ef656263642"
+          assert r["first_source_originals_sha_verified"]==12
+          assert len(r["all_original_cases"])==12
+          assert len({q["source_git_blob"] for q in r["all_original_cases"]})==12
+          assert r["same_data_strong_OR_classical_equal_math_rights"]
+          assert r["model_DNF_not_model_only_verifier_calibrated"]
+          assert r["global_Q3"]==r["global_Q4"]==r["global_Q6"]=="OPEN"
+          for q in r["all_original_cases"]:
+              for key in ("trained_DNF_full_original_native_safe","same_data_no_fit_OR_full_original_native_safe"):
+                  obj=q.get(key)
+                  if obj and obj["certified"]:
+                      assert all(v["dual_pass"] for v in obj["full_genuine_source_Z3_cvc5_3VC"].values())
+          print("FIRST_UNOPENED_ORIGINAL_BOOLEAN_MODEL_REAL_ALL_RESULTS_HONEST")
+          PY
