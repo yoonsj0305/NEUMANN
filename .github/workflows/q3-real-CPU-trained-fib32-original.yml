@@ -130,3 +130,38 @@ jobs:
           print('Q6_FIXED_LEARNED_CPU_NATIVE_PROOF_NEW_ORIGINALS',q['q6_true_sealed_source_body_program_transfer_dual_count'])
           print('Q6_STRONG_CLASSICAL_SAME_ORIGINAL_PROGRAM_SAFE',q['new_original_source_matched_classical_original_safety_proofs'])
           PY
+      - name: Posthoc eight genuine original native source dynamic-arity canonicalization and 72 independent Z3 cvc5 alpha tests
+        run: |
+          set -o pipefail
+          python -m py_compile research/evidence/q6_alpha_arity_20261021/posthoc_eight_original_source_dynamic_arity_alpha_semantic_normalizer.py
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q6_alpha_arity_20261021/posthoc_eight_original_source_dynamic_arity_alpha_semantic_normalizer.py --root original --source24 research/evidence/q3_code2inv_presource24_20261021/BEFORE_ANY_ORIGINAL_SOURCE_BODY_OPEN_24_GIT_BLOBS.json --seven research/evidence/q6_cpu_transfer7_20261021/BEFORE_OPEN_SEVEN_NEW_ORIGINAL_FIB_CPU_MODEL_LOCK.json --contract research/evidence/q6_alpha_arity_20261021/PRE_EXECUTION_EIGHT_TRUE_ORIGINAL_DYNAMIC_ALPHA_CANONICAL_CONTRACT.json --out /tmp/q6_dynamic_source_name_arity_original_eight.json | tee /tmp/q6_dynamic_source_name_arity_original_eight.log
+          sha256sum /tmp/q6_dynamic_source_name_arity_original_eight.json
+      - name: Preserve eight genuine source full native alpha normalizer and incorrect semantic mutation controls
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q6-original-eight-source-dynamic-arity-alpha-normalizer-72-dual
+          path: |
+            /tmp/q6_dynamic_source_name_arity_original_eight.json
+            /tmp/q6_dynamic_source_name_arity_original_eight.log
+          if-no-files-found: warn
+      - name: Fail closed if native source semantics or alpha canonicalization is not independently proven
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          a=json.load(open('/tmp/q6_dynamic_source_name_arity_original_eight.json'))
+          assert a['preregistered_posthoc_original_source_structure_commit']=='f535c21787201c18e13d911f6208717d3e91ce48'
+          assert a['all_original_source_bodies_previously_opened_by_PR376_and_PR378']
+          assert a['same_8_original_git_source_files_retained']
+          assert a['true_original_sha_identity_authenticated']==8
+          assert a['dynamic_state_arity_independent_source_normalizer_pass']==8
+          assert a['synthetic_alpha_source_test_count']==24
+          assert a['true_native_3xdifferent_names_per_original_semantics_dual_pass']==72
+          assert a['all_actual_source_negative_post_mutations_detected']==8
+          assert a['no_new_source_original_SAFE_UNSAFE_claim'] and a['not_a_learned_role_mapping_model_yet']
+          assert a['global_Q3']==a['global_Q4']==a['global_Q5']==a['global_Q6']=='OPEN'
+          print('EIGHT_AUTHENTIC_ORIGINALS_ALPHA_NAME_ORDER_ARITY_NORMALIZATION_PROVED',a['dynamic_state_arity_independent_source_normalizer_pass'])
+          print('EIGHT_ORIGINALS_TWENTY_FOUR_ALPHA_RENAMES_SEVENTY_TWO_INDEPENDENT_NATIVE_DUAL_EQUIVALENCE_PROOFS')
+          print('EIGHT_DIFFERENT_SEMANTIC_POST_NEGATIVE_CONTROLS_ACTUALLY_REJECTED')
+          PY
