@@ -1,0 +1,70 @@
+name: Q3 exact nonspan certificate gate actual 24 nonlinear trained ASTs
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_exact_operator_nonspan_proofs.yml'
+      - 'research/evidence/q3_exact_operator_nonspan_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  exact_formal_operator_novelty_relative_dictionary_24:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile exact rational learned AST novelty proof
+        run: |
+          python -m py_compile research/evidence/q3_exact_operator_nonspan_20261021/independent_exact_dictionary_novelty_certificate.py
+          python -m pip install --disable-pip-version-check numpy==2.3.5 sympy==1.14.0
+      - name: Download official immutable original gradient fit AST actual original proof receipts
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39611027543
+          github-token: ${{ github.token }}
+          name: q3-raw-transitions-trained-nonlinear-source-exact-classical-full-receipts
+          path: /tmp/q3nonspan
+      - name: Exact all nonlinear AST target feature membership and explicit NONSPAN dual contradiction
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3_exact_operator_nonspan_20261021/independent_exact_dictionary_novelty_certificate.py \
+            --official /tmp/q3nonspan/neumann_actual_raw_transition_nonlinear_AST.json \
+            --out /tmp/q3nonspan/actual24_exact_nonspan_operator_admission.json | tee /tmp/q3nonspan/exact_dictionary_novelty.log
+          sha256sum /tmp/q3nonspan/actual24_exact_nonspan_operator_admission.json
+      - name: Preserve mathematical feature-space positive and negative witnesses
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-24-fitted-original-nonlinear-AST-exact-nonspan-certificates
+          path: |
+            /tmp/q3nonspan/actual24_exact_nonspan_operator_admission.json
+            /tmp/q3nonspan/exact_dictionary_novelty.log
+          if-no-files-found: warn
+      - name: Reject falsely novel original primitive when found in full frozen vocabulary
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/q3nonspan/actual24_exact_nonspan_operator_admission.json'))
+          assert q['schema']=='neumann.q3.exact_nonspan_certificate_trained24_original_operators_v1'
+          assert q['previously_actual_fitted_source_receipt_SHA256']=='07a914d0f391119d0089b25fa59afdea0fce87b2aaad1e30e9ee34b3adc14d97'
+          assert q['actual_trained_AST_count']==24
+          assert q['exact_left_kernel_NONSPAN_certificates']==24
+          assert q['polynomial_targets_already_inside_full_supplied_dictionary']==24
+          assert q['autonomously_discovered_operator_primitive_not_in_supplied_full_dictionary']==0
+          for row in q['all_evidence']:
+              a=row['relative_to_OLD_LINEAR_grammar']
+              b=row['relative_to_FULL_SUPPLIED_grammar']
+              assert not a['target_in_exact_rational_feature_span']
+              assert a['negative_exact_left_nullspace_witness']['mathematical_nonmembership_proved']
+              assert b['target_in_exact_rational_feature_span']
+              assert b['positive_exact_polynomial_identity_verified']
+          assert q['global_Q3']==q['global_Q4']==q['global_Q6']=='OPEN'
+          print('24_TRUE_FITTED_AST_OUTSIDE_AFFINE_BUT_INSIDE_SUPPLIED_POLYNOMIAL_GRAMMAR_NO_FALSE_Q3_NEW_OPERATOR')
+          PY
