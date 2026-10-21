@@ -1,0 +1,81 @@
+name: Q3 Strassen impossible true original 6-bilinear-rank bridge with external Winograd
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-strassen-impossible-original-rank6-winograd.yml'
+      - 'research/evidence/q3_strassen_winograd_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real_original_strassen6_external_published_math:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/NRA/20220222-strassen-matrix-multiplication
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate unchanged true source and published theorem scope
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/q3_strassen_winograd_20261021/true_original_strassen6_source_to_Winograd_lower_bound.py
+          python - <<'PY'
+          import json
+          q=json.load(open('research/evidence/q3_strassen_winograd_20261021/POSTHOC_ORIGINAL_RANK6_EXTERNAL_THEOREM_SOURCE_BRIDGE.json'))
+          assert q['schema']=='neumann.q3.posthoc_strassen_impossible_original_source_bilinear_rank6_winograd_external.v1'
+          assert q['source_previously_opened'] and q['global_Q3']==q['global_Q4']==q['global_Q5']=='OPEN'
+          assert 'Winograd' in q['mathematical_authority']
+          print('EXTERNAL_PUBLISHED_WINOGRAD_THEOREM_NOT_OWN_MATH_PROOF')
+          PY
+      - name: Independently run two authentic Real arithmetic SMT proof engines
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 sympy==1.14.0 numpy==2.3.5
+      - name: Original source ∃ 80 Real and ∀ eight Real 2x2-matmul with only six native bilinear products
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3_strassen_winograd_20261021/true_original_strassen6_source_to_Winograd_lower_bound.py --root original --freeze research/evidence/q3_fresh_real_nra_20261021/BEFORE_ANY_NEW_SOURCE_BODY_18_ORIGINALS.json --contract research/evidence/q3_strassen_winograd_20261021/POSTHOC_ORIGINAL_RANK6_EXTERNAL_THEOREM_SOURCE_BRIDGE.json --out /tmp/q3_source_strassen_rank6_conditional.json | tee /tmp/q3_source_strassen_rank6_conditional.log
+          sha256sum /tmp/q3_source_strassen_rank6_conditional.json
+      - name: Preserve every negative attempt and exact source certificate
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-real-strassen-original-rank6-external-Winograd-proof-bridge
+          path: |
+            /tmp/q3_source_strassen_rank6_conditional.json
+            /tmp/q3_source_strassen_rank6_conditional.log
+          if-no-files-found: warn
+      - name: Fail closed on any unmatched source tensor or incomplete dual proof
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/q3_source_strassen_rank6_conditional.json'))
+          assert q['pre_first_independent_published_theorem_source_run_git_commit']=='7f09ee21fb2d66f7301b3cfd00218222ae853b45'
+          assert q['all_80_source_exists_and_8_forall_reals_native_check']
+          assert q['all_four_original_multiplication_tensor_targets_validated']
+          assert q['all_six_native_common_rank_one_products_validated']
+          assert q['seventh_product_exact_original_literal_zero']
+          assert q['independent_source_to_rank6_premises_Z3_cvc5']['actual_source_native_left_targets_AND_zero_seventh_term_dual_unsat']
+          assert q['external_published_Winograd_rank7_required_not_locally_reproved']
+          assert q['external_theorem_disabled_ablation_original_status']=='UNKNOWN'
+          assert q['original_status']=='UNSAT_CONDITIONAL_ON_PUBLISHED_WINOGRAD_1971_RANK7_LOWER_BOUND'
+          assert q['global_Q3']==q['global_Q4']==q['global_Q5']=='OPEN'
+          print('TRUE_ORIGINAL_STRASSEN_IMPOSSIBLE_PUBLISHED_WINOGRAD_RANK7_CONDITIONAL_UNSAT')
+          PY
