@@ -1,0 +1,33 @@
+{
+  "schema": "neumann.g0.cubic_posthoc_CRT63_vs_mod9_frozen_expand_to50k.v1",
+  "date": "2026-10-21",
+  "source": "SMT-LIB/benchmark-submission-2022@81a39628827f61fbd74c6f3e67feb5c1b740d2f0",
+  "scientific_split": "POSTHOC_DEV_AFTER_SEVEN_FROZEN_ORIGINALS_ALREADY_OPENED; never relabel as prospective first source",
+  "reference_freeze": "research/evidence/g0_cubic_mod9_20261021/NEW_SEVEN_PRE_SOURCE_TRANSFER_FREEZE.json",
+  "candidates_exactly_five_previous_mod9_radius10000_UNKNOWN": [
+    "STC_0291.smt2",
+    "STC_0588.smt2",
+    "STC_0609.smt2",
+    "STC_0786.smt2",
+    "STC_0880.smt2"
+  ],
+  "positive_controls": [
+    "STC_0228.smt2",
+    "STC_0268.smt2",
+    "STC_0813.smt2"
+  ],
+  "preregistered_new_radius": 50000,
+  "preregistered_positive_control_radius": 10000,
+  "mathematical_filter": "Each integer cube mod9 and mod7 is in residues {0,1,-1}; for each ordered x,y pair, valid z mod9/mod7 exists iff corresponding cubic residue signature is in nine buckets. Exhaustive finite CRT63 proof over all integer residues r=0..62. Numeric misses in [-50000,+50000] = UNKNOWN wrt unbounded integers.",
+  "exact_arithmetic": "numpy int64 with absolute cubes<=125000000000000 and sum<=250000000000000 safely inside signed 64-bit 2^63-1; final candidate verified using Python unlimited int arithmetic; all source SAT independently Z3 and checksum-pinned cvc5 original SMT2 after exact grounding",
+  "algorithm": "Fixed 9 cubic-residue buckets indexed by (cube%9,cube%7); deterministic vectorized chunk size128, np.searchsorted against sorted exact cubes; for all 5 targets no tuning; all outcomes retained",
+  "controls": "Three previously truly SAT original SMT2 sources at radius10000 must produce verified true original Z3+cvc5 SAT; full finite exact residue certificates; negative wrong-grounding original source should be UNSAT by exact integer arithmetic and Z3, cvc5 UNKNOWN explicit if timeout",
+  "comparison": "Analytic exact filtered pair universe counts versus unfiltered, versus 2026 mod9-only; these are operation-candidate bounds not CPU wall speed ratios. Timed concurrent mod9 replay optional only under same radius and same CPU, no 10x claim from count alone.",
+  "strongest_specialist_prior_art": "Chinese remainder theorem/residue pruning and two-sum are existing classical math; strongest specialist can implement same method, so no unique NEUMANN superiority",
+  "Q3_B": "bounded structural solver proof positive only if original SAT dual; learned hidden structures absent",
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q5": "OPEN",
+  "global_Q6": "OPEN",
+  "global_Q7": "OPEN"
+}
