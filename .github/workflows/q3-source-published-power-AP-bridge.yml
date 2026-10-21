@@ -1,0 +1,89 @@
+name: Q3 published Darmon-Merel original magic cubes powers source bridge dual
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-source-published-power-AP-bridge.yml'
+      - 'research/evidence/q3_published_3power_AP_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  external_theorem_bridge_genuine_originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/QF_NIA/20220315-MathProblems
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Ensure external theorem remains separately identified from source formal certificates
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/q3_published_3power_AP_20261021/five_original_source_to_Darmon_Merel_AP_theorem.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/q3_published_3power_AP_20261021/POSTHOC_EXTERNAL_THEOREM_ORIGINAL_SOURCE_FIVE_CONTRACT.json'))
+          assert 'peer-reviewed external mathematical theorem' in x['scientific_scope']
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          print('EXTERNAL_PUBLISHED_THEOREM_NOT_NEUMANN_ORIGINAL_MATH')
+          PY
+      - name: Install two pinned original math proof backends and AST compiler
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0 sympy==1.14.0
+          cvc5 --version | grep -F 1.4.2
+      - name: Exact five source native sum and guards to peer-reviewed theorem premises
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3_published_3power_AP_20261021/five_original_source_to_Darmon_Merel_AP_theorem.py --root original --freeze research/evidence/q3_power_feature_20261021/PRE_SOURCE_FIRST_TEN_POSITIVE_MONOTONE_MAGIC_CONTRACT.json --contract research/evidence/q3_published_3power_AP_20261021/POSTHOC_EXTERNAL_THEOREM_ORIGINAL_SOURCE_FIVE_CONTRACT.json --out /tmp/q3_external_deep_theorem_true_source_bridge.json | tee /tmp/q3_external_deep_theorem_true_source_bridge.log
+          sha256sum /tmp/q3_external_deep_theorem_true_source_bridge.json
+      - name: Preserve complete source-to-external-theorem bridge and all abstentions
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-published-deep-n-theory-magic3-source-original-bridge
+          path: |
+            /tmp/q3_external_deep_theorem_true_source_bridge.json
+            /tmp/q3_external_deep_theorem_true_source_bridge.log
+          if-no-files-found: warn
+      - name: Strictly distinguish accepted literature theorem from independent full formalization
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_external_deep_theorem_true_source_bridge.json'))
+          assert x['pre_run_external_theorem_and_all_case_frozen_commit']=='7526ef89241594793eefe36c6337bc073ed53463'
+          assert x['all_previously_opened_five_originals_retained'] and len(x['five_originals'])==5
+          assert x['original_SHA_authenticated_count']==5
+          assert x['source_3x3_full_magic_external_theorem_conditions_verified_and_CLASSICAL_UNSAT_count']==3
+          assert x['this_is_NOT_a_self_contained_formal_proof_of_number_theory']
+          assert x['external_known_theorem_provided_as_separate_trusted_literature_premise']
+          assert x['do_not_count_these_as_Neumann_unique_or_neural_structure_discovery']
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          for q in x['five_originals']:
+              p=q['source_3x3_actual_original_to_three_term_AP_dual']
+              assert p['two_independent_provers_agree']
+              if q['original_unbounded_UNSAT_conditional_on_EXTERNAL_PUBLISHED_theorem']:
+                  assert q['original_three_variables_all_strictly_positive_NATIVE']
+                  assert q['original_three_variables_pairwise_distinct_NATIVE']
+                  assert q['source_has_8_full_3x3_magic_sum_constraints']
+                  assert p['full_original_sums_entail_three_power_AP_DUAL']
+              else:
+                  assert not q['original_unbounded_UNSAT_conditional_on_EXTERNAL_PUBLISHED_theorem']
+          print('KNOWN_PUBLISHED_THEOREM_CONDITIONAL_UNSAT_SOURCE',x['source_3x3_full_magic_external_theorem_conditions_verified_and_CLASSICAL_UNSAT_count'])
+          print('NOT_SELF_CONTAINED_ORIGINAL_DEEP_THEOREM_PROOF',True)
+          PY
