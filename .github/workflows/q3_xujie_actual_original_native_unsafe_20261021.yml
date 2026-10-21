@@ -1,0 +1,75 @@
+name: Q3 exact xujie real original SAFE UNSAFE zero one counterexample dual proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_xujie_actual_original_native_unsafe_20261021.yml'
+      - 'research/evidence/q3_xujie_original12_unsafe_posthoc_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual_original_zero_one_transition_unsafety_not_bounded_safe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check original witness generator and unchanged source SHA metadata
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_xujie_original12_unsafe_posthoc_20261021/verify_original_bounded_UNSAFE_Z3_cvc5.py
+      - name: Independent real source Z3 and pinned cvc5 safety counterexample checks
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Actually check original source Pre AND NotPost, and Pre AND Trans AND NotPost_next in independent native solvers
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 python research/evidence/q3_xujie_original12_unsafe_posthoc_20261021/verify_original_bounded_UNSAFE_Z3_cvc5.py \
+            --root original \
+            --freeze research/evidence/q3_ood_xujie12_20261021/PREBODY_GITSHA_UNSEEN_CROSS_FAMILY_XUJIE12.json \
+            --out /tmp/q3_xujie_original12_actual_unsafe_witness.json | tee /tmp/q3_xujie_original12_actual_unsafe_witness.log
+          sha256sum /tmp/q3_xujie_original12_actual_unsafe_witness.json
+      - name: Preserve independent SAFE UNSAFE UNKNOWN evidence of 12 real sources
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-actual-xujie12-true-original-unsafe-vs-unknown-native-dual
+          path: |
+            /tmp/q3_xujie_original12_actual_unsafe_witness.json
+            /tmp/q3_xujie_original12_actual_unsafe_witness.log
+          if-no-files-found: warn
+      - name: Do not interpret bounded absence of counterexample as full program SAFE
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/q3_xujie_original12_actual_unsafe_witness.json'))
+          assert q['schema']=='neumann.q3.actual_original_cross_family12_native_Z3_cvc5_bounded_unsafety_not_learned.v1'
+          assert q['real_original_sources_in_frozen_earlier_first_blind_cohort']==12
+          assert q['bounded_unsat_never_interpreted_as_complete_safe']
+          assert q['global_Q3']==q['global_Q4']==q['global_Q6']=='OPEN'
+          for r in q['true_original_cases']:
+            if 'ORIGINAL_UNSAFE_WITNESSED' in r['status']:
+              field=('actual_genuine_original_0_step_unsafe_query' if 'INIT' in r['status']
+                     else 'actual_genuine_original_1_step_unsafe_query')
+              assert r[field]['status']=='SAT' and r[field]['independent_dual_agreed']
+          print('ALL_GENUINE_UNSAFE_SAT_WITNESS_ONLY_ORIGINAL_FULL_SOURCE_ACCEPTED')
+          PY
