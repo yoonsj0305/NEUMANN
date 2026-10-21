@@ -58,7 +58,7 @@ jobs:
           python - <<'PY'
           import json
           x=json.load(open('/tmp/q3_dragon4_extracted_dual.json'))
-          assert x['global_Q3']=='OPEN'
+          assert x['Q3_global']=='OPEN'
           assert x['original']['original_git_blob']=='455422332af42a42d5f9c61562e1912f13bc2946'
           if x['original']['original_full_native_dual_3VC']:
               assert x['original']['PDR_result']=='unsat'
