@@ -9,7 +9,7 @@ This is POSTHOC after synthetic nonlinear SMT timeout & authentic first16
 source opens. Existing classical number theory; not learned unique novelty.
 """
 from __future__ import annotations
-import argparse,itertools,json,time
+import argparse,itertools,json,time,subprocess
 from pathlib import Path
 import z3
 from research.evidence.q3_cross_prefix_modulo_20261021.first16_general_polynomial_modulus_overapprox_vs_direct import (
@@ -126,8 +126,9 @@ def exact_finite_residue_images(source_eq,m):
         return None
 
 def independent_finite_QFLIA_certificate(info):
-    """Independent two-theorem-engine check over EXACT images produced by
-    source integer polynomial evaluation; no hardcoded degree or modulus."""
+    """Make a strict SMT-LIB QF_LIA input with SET-LOGIC. The initial CI
+    failed because bare Z3 to_smt2 omits set-logic, which strict cvc5 refuses.
+    Retain that immutable failure and fix only transport, not the maths."""
     m=info["modulus"]
     s=z3.Solver();s.set(timeout=1000)
     terms=[]
@@ -137,7 +138,25 @@ def independent_finite_QFLIA_certificate(info):
         terms.append(v)
     s.add((z3.Sum(terms)+info["true_source_literal_constant_modulus"])%m==0)
     z=s.check()
-    cvc=independent_cvc5_unsat(s) if z==z3.unsat else None
+    cvc=None
+    if z==z3.unsat:
+        payload="(set-logic QF_LIA)\n"+s.to_smt2()
+        start=time.perf_counter_ns()
+        cvc={"abstract_source_smt2_sha256":sha256(payload.encode()),
+             "cvc5_original_math_status":"UNKNOWN","cvc5_exit":None}
+        try:
+            r=subprocess.run(["cvc5","--lang=smt2","--tlimit-per=2000","-"],
+                input=payload,text=True,capture_output=True,timeout=3)
+            cvc["cvc5_exit"]=r.returncode
+            statuses=[q.strip().upper() for q in r.stdout.splitlines()
+                if q.strip().lower() in ("sat","unsat","unknown")]
+            if r.returncode==0 and statuses:
+                cvc["cvc5_original_math_status"]=statuses[0]
+            else:
+                cvc["cvc5_stderr_excerpt"]=r.stderr[:280]
+        except Exception as e:
+            cvc["error"]=type(e).__name__+":"+str(e)[:250]
+        cvc["cvc5_math_abstract_wall_ms"]=(time.perf_counter_ns()-start)/1e6
     return {"abstract_Z3":str(z).upper(),
             "independent_original_math_cvc5":cvc,
             "independent_source_modular_obstruction_dual_Z3_cvc5":(
