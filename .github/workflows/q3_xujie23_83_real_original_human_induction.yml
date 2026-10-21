@@ -1,0 +1,75 @@
+name: Q3 xujie exact two original previous abstentions full native induction
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_xujie23_83_real_original_human_induction.yml'
+      - 'research/evidence/q3_xujie_two_remainder_exact_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original23_83_true_source_induction_and_negative_controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate source freeze and human posthoc no ML claims
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_xujie_two_remainder_exact_20261021/verify_true_source23_83_human_disjunctive_inductive.py
+      - name: Original independent Z3 and cvc5 source verification
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Prove original 23 and 83 full true native source Pre Trans Post 3VC human candidate
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 python research/evidence/q3_xujie_two_remainder_exact_20261021/verify_true_source23_83_human_disjunctive_inductive.py \
+            --root original \
+            --freeze research/evidence/q3_ood_xujie12_20261021/PREBODY_GITSHA_UNSEEN_CROSS_FAMILY_XUJIE12.json \
+            --out /tmp/q3_xujie_original23_83_true_source_human_inductive.json | tee /tmp/q3_xujie_original23_83_true_source_human_inductive.log
+          sha256sum /tmp/q3_xujie_original23_83_true_source_human_inductive.json
+      - name: Preserve human candidate proof receipts and ablations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-xujie-two-original-human-disjunctive-native-full-safe-witness
+          path: |
+            /tmp/q3_xujie_original23_83_true_source_human_inductive.json
+            /tmp/q3_xujie_original23_83_true_source_human_inductive.log
+          if-no-files-found: warn
+      - name: Fail closed unless both true original 3VC and independent weakness ablation proven
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          a=json.load(open('/tmp/q3_xujie_original23_83_true_source_human_inductive.json'))
+          assert a['schema']=='neumann.q3.xujie_original2_human_posthoc_full_native_inductive_safe_v1'
+          assert a['safe_both_independent_Z3_cvc5_all3VC']==2
+          assert a['human_discovered_not_model_inferred']
+          assert a['DO_NOT_add_human_discovery_to_learned_Q3']
+          for row in a['two_posthoc_source_certificates']:
+              assert row['status']=='COMPLETE_POSTHOC_HUMAN_INVARIANT_PROVED_ORIGINAL_SAFE'
+              assert row['full_original_safe_inductive_source_proof']
+              assert row['negative_weak_control_genuine_source_proof_fails']
+              assert all(q['dual_pass'] for q in row['authentic_original_independent_Z3_cvc5_init_consecution_goal_receipts'].values())
+          assert a['global_Q3']==a['global_Q4']==a['global_Q6']=='OPEN'
+          print("ORIGINAL_TWO_EXTRA_TRUE_SAFE_INDEPENDENT_NATIVE_DUAL_PROVED_HUMAN")
+          PY
