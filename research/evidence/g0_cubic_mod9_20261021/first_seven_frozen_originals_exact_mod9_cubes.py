@@ -197,7 +197,21 @@ def evaluate(root,item,development=False):
                 negative=independent_original_grounded_certificate(
                     raw.decode("utf-8"),names,wrong,original_solver,"UNSAT")
                 row["wrong_candidate_original_dual_rejection"]=negative
-                row["negative_control_PASS"]=negative["independent_dual_result"]
+                row["wrong_candidate_independent_exact_integer_arithmetic"]={
+                    "source_literal_target":target,
+                    "false_grounded_cube_sum":sum(int(v)**3 for v in wrong),
+                    "is_not_true_original_source_assertion":sum(int(v)**3 for v in wrong)!=target
+                }
+                # First immutable CI discovered an honest cvc5 limitation:
+                # wrong grounded nonlinear original exhausted 15s and exited 1,
+                # while Z3 returns UNSAT and independent exact Python integer
+                # arithmetic evaluates 43035697 != 228. Preserve cvc5 UNKNOWN;
+                # never manufacture a second-solver UNSAT result.
+                row["negative_control_PASS"]=(
+                    negative["independent_Z3_status"]=="UNSAT"
+                    and row["wrong_candidate_independent_exact_integer_arithmetic"]["is_not_true_original_source_assertion"]
+                )
+                row["wrong_candidate_cvc5_independent_unsat"]="NOT_PROVED_CVC5_UNKNOWN" if negative["independent_cvc5_status"]!="UNSAT" else "PROVED"
     except Exception as exc:
         row["status"]="ABSTAIN_ORIGINAL_SOURCE_OR_REFRAME_ERROR"
         row["error"]=type(exc).__name__+":"+str(exc)[:400]
@@ -230,6 +244,10 @@ def main():
           "found_original_solver_witness":development.get("reframed_exact_bounded_numeric_search",{}).get("actual_numeric_witness"),
           "dual_valid_original_source":development["certified_original_SAT"],
           "negative_control_PASS":development.get("negative_control_PASS",False),
+          "negative_control_Z3_and_independent_integer_arithmetic":development.get("wrong_candidate_independent_exact_integer_arithmetic"),
+          "negative_control_cvc5_actual_status":development.get("wrong_candidate_original_dual_rejection",{}).get("independent_cvc5_status"),
+          "negative_control_Z3_actual_status":development.get("wrong_candidate_original_dual_rejection",{}).get("independent_Z3_status"),
+          "negative_control_cvc5_unsat_not_claimed":development.get("wrong_candidate_cvc5_independent_unsat"),
       },
       "first_seven_source_SHA_authenticated":sum(bool(x.get("authentic_original_source_sha256")) for x in future),
       "first_seven_source_source_form_compiles":sum(x.get("original_parsed_three_int_cubes",False) for x in future),
