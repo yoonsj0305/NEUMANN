@@ -1,0 +1,67 @@
+name: Q3 learned modular operator beyond frozen polynomial grammar, source-native proofs
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_learned_nonpolynomial_mod_operator.yml'
+      - 'research/evidence/q3_modular_operator_selection_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  learn_genuinely_nonpolynomial_operator_selector_against_exact_gcd:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Confirm syntax and required source-independent assumptions
+        run: |
+          python -m py_compile research/evidence/q3_modular_operator_selection_20261022/learn_mod_operator_and_dual_prove.py
+      - name: Install pinned independent source solvers and algebra
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: Fit real categorical operator models and independently certify original source with two SMT solvers
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_modular_operator_selection_20261022/learn_mod_operator_and_dual_prove.py \
+            --out /tmp/q3_source_modular_operator_gradient_native.json | tee /tmp/q3_source_modular_operator_gradient_native.log
+          sha256sum /tmp/q3_source_modular_operator_gradient_native.json
+      - name: Preserve every full original source proof, polynomial lower bound and classical baseline
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-24-source-trained-modulo-operator-double-proofs-and-classical-gcd
+          path: |
+            /tmp/q3_source_modular_operator_gradient_native.json
+            /tmp/q3_source_modular_operator_gradient_native.log
+          if-no-files-found: warn
+      - name: Do not claim new primitive or strong classical superiority from predefined modulo vocabulary
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open('/tmp/q3_source_modular_operator_gradient_native.json'))
+          assert p['schema']=='neumann.q3.learned_modular_selector_vs_exact_gcd_native_dual_source.v1'
+          assert p['trials']==24
+          assert p['learned_original_proven']==24
+          assert p['equal_rights_classical_exact_gcd_original_proven']==24
+          assert p['original_mutant_independent_rejected']==24
+          assert p['fixed_polynomial_degree3_single_equality_provably_insufficient']
+          assert p['supplied_mod_operator_IS_NOT_NEW_PRIMITIVE']
+          assert p['strong_classical_gcd_candidate_equal_rights']
+          assert p['global_Q3']==p['global_Q4']==p['global_Q6']=='OPEN'
+          for case in p['original_source_lemmas_and_all_receipts']:
+              for name in ('true_original_dual_source_3VC','exact_gcd_classical_dual_source_3VC'):
+                  assert len(case[name])==3 and all(z['independent_dual_unsat'] for z in case[name])
+              assert case['mutated_source_trans_k_plus_one_dual_3VC'][1]['independent_dual_sat']
+          print('SCOPED_NONPOLYNOMIAL_OPERATOR_SELECTION_AND_NATIVE_FULL_SOURCE_CERTIFIED_CLASSICAL_EQUAL')
+          PY
