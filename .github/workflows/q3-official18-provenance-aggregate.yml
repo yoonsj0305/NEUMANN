@@ -1,0 +1,93 @@
+name: Q3 18 true original source four-official-artifact evidence auditor
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-official18-provenance-aggregate.yml'
+      - 'research/evidence/q3_new18_authenticated_audit_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  evidence_four_cross_pr_real_original_run_artifacts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile immutable real-source evidence verifier
+        run: |
+          python -m py_compile research/evidence/q3_new18_authenticated_audit_20261021/verify_four_genuine_official_original_runs.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/q3_new18_authenticated_audit_20261021/REGISTERED_OFFICIAL_ARTIFACT_18_PROVENANCE.json'))
+          assert x['schema']=='neumann.q3.new_18_source_audit_immutable_official_CI.v1'
+          assert len(x['evidence'])==4
+          assert {v['run_id'] for v in x['evidence']}=={39549658968,39552574062,39551742047,39567897902}
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          print('ACCEPTED_FROZEN_TRUE_ORIGINAL_FOUR_IMMUTABLE_OFFICIAL_EVIDENCE_RUNS')
+          PY
+      - name: Fetch immutable published GitHub Actions first_baseline artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-authentic-first-new-18-other-family-nra-strong-expert-ceiling
+          run-id: 39549658968
+          github-token: ${{ github.token }}
+          path: /tmp/q3_official_audit_artifacts/first_baseline
+      - name: Fetch immutable published GitHub Actions strassen artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-original-strassen-public-seven-tensor-quantified-true-identity
+          run-id: 39552574062
+          github-token: ${{ github.token }}
+          path: /tmp/q3_official_audit_artifacts/strassen
+      - name: Fetch immutable published GitHub Actions circles2 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-circle2-quantifier-rational-full-original-counterexample
+          run-id: 39551742047
+          github-token: ${{ github.token }}
+          path: /tmp/q3_official_audit_artifacts/circles2
+      - name: Fetch immutable published GitHub Actions circles1 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-authentic-circle1-posthoc-classical-optimizer-exact-source
+          run-id: 39567897902
+          github-token: ${{ github.token }}
+          path: /tmp/q3_official_audit_artifacts/circles1
+      - name: Audit all genuine original SHA evidence and actual dual solver authorities
+        run: |
+          set -o pipefail
+          python research/evidence/q3_new18_authenticated_audit_20261021/verify_four_genuine_official_original_runs.py --manifest research/evidence/q3_new18_authenticated_audit_20261021/REGISTERED_OFFICIAL_ARTIFACT_18_PROVENANCE.json --original-freeze research/evidence/q3_fresh_real_nra_20261021/BEFORE_ANY_NEW_SOURCE_BODY_18_ORIGINALS.json --artifact-root /tmp/q3_official_audit_artifacts --out /tmp/q3_official_18_source_evidence_audit.json | tee /tmp/q3_official_18_source_evidence_audit.log
+          sha256sum /tmp/q3_official_18_source_evidence_audit.json
+      - name: Preserve verified exact original source authority ledger
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-true-18-original-source-cross-four-run-audit
+          path: |
+            /tmp/q3_official_18_source_evidence_audit.json
+            /tmp/q3_official_18_source_evidence_audit.log
+          if-no-files-found: warn
+      - name: Refuse fake model Q3 and external-theorem machine proof
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_official_18_source_evidence_audit.json'))
+          assert x['authentic_originals']==18
+          assert x['historical_frozen_FIRST_original_screen_solved_originals']==13
+          assert x['historical_first_original_screen_unsolved_originals']==5
+          assert x['POSTHOC_TRUE_ORIGINAL_Z3_CVC5_dual_certificate_new_case_count']==4
+          assert x['cumulative_true_original_solver_or_original_dual_proven_SAT_UNSAT']==17
+          assert x['additional_external_published_theorem_CONDITIONAL_original_unsat_count']==1
+          assert x['originals_with_sat_unsat_conditional_on_external_literature']==18
+          assert x['Winograd_original_6product_to_rank7_external_theorem_not_machine_proven']
+          assert x['learned_model_structure_unique_NOT_PROVEN']
+          assert x['full_original_unseen_model_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          print('ORIGINAL_AUTHENTIC18_INTERNAL_CERTIFIED17_WINOGRAD_CONDITIONAL1_LEARNED_Q3_OPEN')
+          PY
