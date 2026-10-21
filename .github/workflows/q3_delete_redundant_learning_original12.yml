@@ -1,0 +1,62 @@
+name: Q3 official source12 proof-first delete redundant training evidence audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_delete_redundant_learning_original12.yml'
+      - 'research/evidence/q3_delete_wasteful_training12_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independently_audit_12_original_learning_delete_rule:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate raw historic artifact auditor syntax
+        run: |
+          python -m py_compile research/evidence/q3_delete_wasteful_training12_20261021/strict_original_evidence_coverage_cost_audit.py
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39599100942
+          github-token: ${{ github.token }}
+          name: q3-real-original12-adaptive-semantic-learned-and-exact-native-3vc
+          path: /tmp/actual
+      - name: Recompute original per-source Z3 and cvc5 coverage and measured cost from SHA-pinned evidence
+        run: |
+          set -o pipefail
+          python research/evidence/q3_delete_wasteful_training12_20261021/strict_original_evidence_coverage_cost_audit.py \
+            --report /tmp/actual/q3_original12_adaptive_semantic_learned_vs_exact.json \
+            --freeze research/evidence/q3_dnf_first12_20261021/NEW_UNSEEN_ORIGINALS_BEFORE_SOURCE_BODY_LOCK.json \
+            --out /tmp/q3_proof_first_no_learn_audit.json | tee /tmp/q3_proof_first_no_learn_audit.log
+          sha256sum /tmp/q3_proof_first_no_learn_audit.json
+      - name: Archive source-authoritative learning deletion audit and costs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-audited-12-original-proofs-model-deletion-and-observed-cost
+          path: |
+            /tmp/q3_proof_first_no_learn_audit.json
+            /tmp/q3_proof_first_no_learn_audit.log
+          if-no-files-found: warn
+      - name: No false proof of model superiority nor unsupported tenfold speedup
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/q3_proof_first_no_learn_audit.json'))
+          assert q['schema']=='neumann.q3.immutable_original12_matched_model_vs_exact_proof_first_delete_training.v1'
+          assert q['source_prebody_locked_genuine_original_count']==12
+          assert q['learned_unique_beyond_equal_rights_classical']==0
+          assert q['safe_to_delete_all_model_fits_for_THIS_COHORT_WITHOUT_LOSING_ANY_PRIOR_PROVED_SAFE']
+          assert q['cost_measurement_excludes_shared_data_collection_and_final_dual_3VC']
+          assert q['does_not_establish_end_to_end_10x_speedup']
+          assert q['global_Q3']==q['global_Q4']==q['global_Q6']=='OPEN'
+          print('ACTUAL_COHORT_ONLY_FIRST_PRINCIPLES_MODEL_DELETION_SAFE_AND_EXACTLY_CITED')
+          PY
