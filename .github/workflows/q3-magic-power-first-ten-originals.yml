@@ -1,0 +1,90 @@
+name: Q3 genuine original power-magic structural injectivity five new and five controls
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-magic-power-first-ten-originals.yml'
+      - 'research/evidence/q3_power_feature_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  genuine_first_ten_originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/QF_NIA/20220315-MathProblems
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate frozen original source identities and method
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/q3_power_feature_20261021/first_ten_unchanged_power_magic_original_unbounded_unsat.py
+          python - <<'PY'
+          import json
+          q=json.load(open('research/evidence/q3_power_feature_20261021/PRE_SOURCE_FIRST_TEN_POSITIVE_MONOTONE_MAGIC_CONTRACT.json'))
+          assert q['source_body_unopened_for_ten_new_cases_at_freeze']
+          assert len(q['five_original_2x2_targets'])==5 and len(q['five_original_3x3_controls'])==5
+          assert len(q['two_previously_opened_development_controls'])==2
+          originals=q['five_original_2x2_targets']+q['five_original_3x3_controls']
+          assert len({x['sha1_git_blob'] for x in originals})==10
+          print('ORIGINAL_SOURCE_BEFORE_CONTENT_FROZEN_10')
+          PY
+      - name: Install source-native independent proof solvers
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+          lscpu | grep 'Model name' | head -1
+      - name: First ten unmodified genuine source geometry proofs and matched raw general-purpose Direct
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/q3_power_feature_20261021/first_ten_unchanged_power_magic_original_unbounded_unsat.py --root original --freeze research/evidence/q3_power_feature_20261021/PRE_SOURCE_FIRST_TEN_POSITIVE_MONOTONE_MAGIC_CONTRACT.json --out /tmp/q3_original10_power_magic.json | tee /tmp/q3_original10_power_magic.log
+          sha256sum /tmp/q3_original10_power_magic.json
+      - name: Archive ALL results including unknowns and no-proof controls
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-real-unopened-ten-power-magic-unbounded-geometry-safety
+          path: |
+            /tmp/q3_original10_power_magic.json
+            /tmp/q3_original10_power_magic.log
+          if-no-files-found: warn
+      - name: Fail closed on unsound power theorem, hidden source, or claim inflation
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/q3_original10_power_magic.json'))
+          assert q['ten_unopened_original_source_git_sha_pre_frozen_commit']=='941ec4d16357cb9120490506e7c45cc60c76e74a'
+          assert q['originals_10_plus_development_2_retained']
+          assert q['ten_new_genuine_authentic_original_SHA_count']==10
+          assert q['all_true_source_conflicts']==0
+          assert q['no_neural_forward_or_new_math_priority_claim']
+          assert q['strong_direct_with_equal_power_injectivity_theorem_can_do_same']
+          assert q['global_Q3']==q['global_Q4']==q['global_Q5']=='OPEN'
+          assert len(q['positive_integer_power_injectivity_mathematical_factorization_finite_controls'])==8
+          for x in q['originals']:
+              if x['certified_true_original_UNSAT']:
+                  assert x['exact_structural_geometry']['source_ast_verified_true_two_equal_sums']
+                  assert x['independent_Z3_cvc5_source_necessary_math_UNSAT']['both_independent_unbounded_necessary_condition_UNSAT']
+              if x['status'].startswith('UNKNOWN'):
+                  assert not x['certified_true_original_UNSAT']
+          print('TRUE_FIRST10_ORIGINAL_INDEPENDENT_MATH_UNSAT_2X2',q['new_first_five_2x2_unbounded_UNSAT_source_certified'])
+          print('TRUE_FIRST10_ORIGINAL_INDEPENDENT_MATH_UNSAT_3X3',q['new_first_five_3x3_unbounded_UNSAT_source_certified'])
+          print('TRUE_FIRST10_ORIGINAL_OVER_GENERIC_RAW_Z3_CVC5',q['new_10_source_proof_only_raw_direct_unknown'])
+          PY
