@@ -1,0 +1,39 @@
+{
+  "schema": "neumann.g0.posthoc_CRT15561_fixed_r50000_exact_specialist_matched.v1",
+  "date": "2026-10-21",
+  "source": "SMT-LIB/benchmark-submission-2022@81a39628827f61fbd74c6f3e67feb5c1b740d2f0",
+  "scientific_split": "POSTHOC after all five source originals/results opened. Developer local prototype already tested 5 targets before preregistration. NOT FIRST BLIND, NOT NEW LEARNED ARCHITECTURE.",
+  "five_originals_from_PR344": [
+    "STC_0291.smt2",
+    "STC_0588.smt2",
+    "STC_0609.smt2",
+    "STC_0786.smt2",
+    "STC_0880.smt2"
+  ],
+  "modulus": 15561,
+  "prime_power_factors": [
+    9,
+    7,
+    13,
+    19
+  ],
+  "mathematical_mechanism": "Every x^3 mod 15561 is a cube signature; bucket ALL true integer values x in [-50000,50000] by actual x^3 modulo15561. For candidate x,y, z residue must equal (source actual target - cube(x) - cube(y)) modulo15561. If no z bucket exists, no integer z can satisfy original equation. If bucket exists, exact sorted int64 cube binary search verifies equality; no numeric miss implies unbounded UNSAT.",
+  "fixed_radius": 50000,
+  "positive_controls_opened": [
+    "STC_0228.smt2",
+    "STC_0268.smt2",
+    "STC_0813.smt2"
+  ],
+  "control_radius": 10000,
+  "low_radius_independent_oracle": "Pure Python complete triple enumeration at radius 7,10,12,16,20 with 25 SAT and 25 true bounded missing numeric targets each => 250 different true oracle checks. Finite residues r=0..15560 check cube signatures and exact additive arithmetic theorem through direct modulo. Avoid 15561^3 enumeration.",
+  "source_dual": "Every SAT candidate grounded into unchanged original SMT2 source then independent Z3 4.13.3.0 and cvc5 1.4.2 SAT, original source hash+byte length match.",
+  "cost_baseline": "Original CRT63 fixed source-authentic program already in PR345. Same ±50000 radius, same actual source, original SMT2 parse and solver independent source-check costs charged, same runner same process, alternate execution order by case index.",
+  "second_baseline": "Prior exact mod9 direct specialist from PR344 + matched timing results PR346 included only historical controls, not matching newly as all three would triple CI time.",
+  "admission": "Exactly 5 cases retained, same bounded SAT vs bounded missed outcomes (2 SAT/3 MISS if reproduced). Numeric MISS is UNKNOWN for unbounded original. All integer witness statements independent source checked. Actual paid wall ratio vs CRT63 only if both source classifications identical across all 5. Never claim improvement versus strongest classical specialist with identical CRT15561 access.",
+  "no_neural": true,
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q5": "OPEN",
+  "global_Q6": "OPEN",
+  "global_Q7": "OPEN"
+}
