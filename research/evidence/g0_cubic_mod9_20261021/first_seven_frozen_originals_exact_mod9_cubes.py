@@ -237,6 +237,14 @@ def main():
     report={
       "schema":"neumann.g0.qfnia_cubic_mod9_original_first_seven_transfer.v1",
       "seven_before_source_read_frozen_commit":FIRST_FUTURE_FREEZE,
+      "this_execution_is_verifier_diagnostic_replay_after_first_open":True,
+      "immutable_first_execution":{
+          "actions_run_id":39531276557,
+          "first_archive_sha256":"96e1f43b7c1fda093be995b8e5b8bd7cf90a247e83c934e61f52cef13431dc00",
+          "first_archived_frozen_transfer_found_SAT":2,
+          "first_strict_gate_failure":"WRONG_228_WITNESS_CVC5_15SEC_TIMEOUT_FALSE_DUAL_NEGATIVE_REQUIREMENT",
+          "first_actual_original_numeric_search_code_unchanged_on_replay":True,
+      },
       "all_seven_FIRST_outcome_rows_kept":len(future)==7,
       "opened_posthoc_development_original_STC_0228":{
           "source":development["source"],
