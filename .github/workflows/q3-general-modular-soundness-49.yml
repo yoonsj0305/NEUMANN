@@ -1,0 +1,42 @@
+name: Q3 genuine general modular source abstraction 49 adversarial soundness guards
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-general-modular-soundness-49.yml'
+      - 'research/evidence/q3_cross_prefix_modulo_20261021/independent_metamorphic_finite_math_guards.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  math_soundness_adversarial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pinned independently executed modular theorem Z3 and cvc5
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+          python -m py_compile research/evidence/q3_cross_prefix_modulo_20261021/independent_metamorphic_finite_math_guards.py
+      - name: Fully independent 49 deliberately adversarial source programs, including 40 constructed SAT
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_cross_prefix_modulo_20261021/independent_metamorphic_finite_math_guards.py | tee /tmp/q3_general_soundness_49.log
+          grep -F 'Q3_GENERAL_POLYNOMIAL_SOUNDNESS_METAMORPHIC 49 /49 UNSAT_DUAL_PROVEN 4 POSITIVE_OR_ABSTAIN_NOT_FALSE_REFUTED 45' /tmp/q3_general_soundness_49.log
+      - name: Preserve all synthetic positive negative source controls
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-generic-modular-49-synthetic-soundness-guards
+          path: /tmp/q3_general_soundness_49.log
+          if-no-files-found: warn
