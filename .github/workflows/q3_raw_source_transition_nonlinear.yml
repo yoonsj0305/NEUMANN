@@ -1,0 +1,64 @@
+name: Q3 learned nonlinear source AST from raw transitions exact universal proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_raw_source_transition_nonlinear.yml'
+      - 'research/evidence/q3_raw_transition_nonlinear_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  learned_composed_nonlinear_AST_universal_source_proofs_and_strong_classical:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check exact source method and install minimal CPU dependencies
+        run: |
+          python -m py_compile research/evidence/q3_raw_transition_nonlinear_20261021/learned_original_source_nonlinear_AST.py
+          python -m pip install --disable-pip-version-check numpy==2.3.5 sympy==1.14.0
+      - name: Fit raw original transition representations, extract exact AST and universally certify original source
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_raw_transition_nonlinear_20261021/learned_original_source_nonlinear_AST.py \
+            --out /tmp/neumann_actual_raw_transition_nonlinear_AST.json | tee /tmp/neumann_actual_raw_transition_nonlinear_AST.log
+          sha256sum /tmp/neumann_actual_raw_transition_nonlinear_AST.json
+      - name: Preserve learning, exact classical rights, source negative controls, and every failed degree
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-raw-transitions-trained-nonlinear-source-exact-classical-full-receipts
+          path: |
+            /tmp/neumann_actual_raw_transition_nonlinear_AST.json
+            /tmp/neumann_actual_raw_transition_nonlinear_AST.log
+          if-no-files-found: warn
+      - name: Enforce scoped proof never falsely claim unique new architecture
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/neumann_actual_raw_transition_nonlinear_AST.json'))
+          assert r['schema']=='neumann.q3.source_transition_nonlinear_learned_AST_synthetic_v1'
+          assert len(r['all_original_source_trials'])==24
+          assert r['learned_quadratic_cubic_cross_term_original_proofs']==24
+          assert r['strong_same_data_exact_polynomial_baseline_proofs']==24
+          assert r['linear_only_learned_proofs']==0
+          assert r['untrained_random_anchor_ablation_proofs']==0
+          for trial in r['all_original_source_trials']:
+              assert trial['passed_degree'] in (2,3)
+              assert any(z['learned_full_original_PASS'] and
+                         z['learned_universal_original_source_certificate']['fully_inductive_and_original_Post']
+                         for z in trial['all_degree_trials'])
+              assert trial['all_degree_trials'][-1]['classical_full_original_PASS']
+          assert r['finite_source_sample_no_free_lunch']['exact_violation']==6
+          assert not r['learned_advantage_over_strong_classical']
+          assert not r['autonomously_invented_new_primitive']
+          assert not r['proven_ten_x_over_strongest_classical']
+          assert r['global_Q3']==r['global_Q4']==r['global_Q6']=='OPEN'
+          print('GIVEN_POLYNOMIAL_GRAMMAR_NONLINEAR_LEARNED_EXACT_SOURCE_REWRITE_PASS_NO_STRONG_CLASSICAL_WIN')
+          PY
