@@ -1,0 +1,78 @@
+name: Q3 actual source conditioned invariants original Pre plus Trans learned ablation
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_posthoc_precondition_joint_gradient_original8.yml'
+      - 'research/evidence/q3_precondition_transition_joint_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  condition_on_real_initial_fiber_to_invent_original_relational_invariants:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            comp/2017/Inv_Track
+            comp/2019/Inv_Track/From2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate same earlier SHA-locked real source and compiled posthoc new method
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_precondition_transition_joint_20261021/actual_model_precondition_conditioned_structure.py
+      - name: Install exact independent original proof tools
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: Learn generic Pre plus Trans conserved expressions against exact classical and same model without Pre
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_precondition_transition_joint_20261021/actual_model_precondition_conditioned_structure.py \
+            --root original \
+            --freeze research/evidence/q3_external_8_source_transition_20261021/PREBODY_GIT_SHA_FROZEN_8.json \
+            --out /tmp/q3_posthoc_real8_preconditioned_and_ablation.json | tee /tmp/q3_posthoc_real8_preconditioned_and_ablation.log
+          sha256sum /tmp/q3_posthoc_real8_preconditioned_and_ablation.json
+      - name: Preserve genuine dual source learning and ablation full receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-posthoc-source-conditioned-Pre-Trans-gradient-ablation-versus-exact-classical
+          path: |
+            /tmp/q3_posthoc_real8_preconditioned_and_ablation.json
+            /tmp/q3_posthoc_real8_preconditioned_and_ablation.log
+          if-no-files-found: warn
+      - name: Every PASS must independently certify unchanged original Init Consecution Goal
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3_posthoc_real8_preconditioned_and_ablation.json'))
+          assert r['schema']=='neumann.q3.posthoc_original8_Pre_plus_Trans_numeric_structure_ablated_v1'
+          assert r['posthoc_already_opened_originals_no_first_blind_claim']
+          assert r['exact_original_sources_sha_verified']==8
+          assert len(r['all_cases'])==8
+          assert r['same_math_classical_has_equal_grammar_and_source_samples']
+          for c in r['all_cases']:
+              for cand in c.get('source_generic_gradient_and_exact_classical_candidates',[]):
+                  for key in ('learned_candidate_original_proof','classical_exact_original_proof','transition_only_model_ablation'):
+                      p=cand.get(key)
+                      if p and p['exactly_full_source_3VC_proved']:
+                          assert all(z['dual_pass'] for z in p['full_original_independent_Z3_cvc5_3VC'].values())
+          assert r['global_Q3']==r['global_Q4']==r['global_Q6']=='OPEN'
+          print('POSTHOC_REAL_ORIGINAL_PREFERRED_RELATIONAL_FIBER_LEARNING_DUAL_AUDIT_COMPLETE')
+          PY
