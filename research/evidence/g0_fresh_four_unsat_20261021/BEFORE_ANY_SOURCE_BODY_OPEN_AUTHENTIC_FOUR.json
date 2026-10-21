@@ -1,0 +1,44 @@
+{
+  "schema": "neumann.g0.true_first_source_four_unbounded_cube_UNSAT_mod9.v1",
+  "pre_source_body_read": true,
+  "source_revision": "SMT-LIB/benchmark-submission-2022@81a39628827f61fbd74c6f3e67feb5c1b740d2f0",
+  "scientific_scope": "THESE EXACT FOUR original source bytes unopened before this SHA/size freeze; target file NAMES themselves suggest n 4,5,13,14 and modular hypothesis preregistered from names, so limited leakage and non-random distribution; do not call totally blind RHS",
+  "targets": [
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0004.smt2",
+      "sha1_git_blob": "f0f1cca43fdc065311cdfb79fa36bcf653c269a1",
+      "bytes": 623
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0005.smt2",
+      "sha1_git_blob": "0c851924b495253864862092bc0753686bb8d89c",
+      "bytes": 623
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0013.smt2",
+      "sha1_git_blob": "b29c3b57dd5ce045997224b91bdbca6e13056581",
+      "bytes": 624
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0014.smt2",
+      "sha1_git_blob": "39d073c1af137534f1ce8e14b08704f7053a3e98",
+      "bytes": 624
+    }
+  ],
+  "positive_source_controls": [
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0003.smt2",
+      "sha1_git_blob": "f6976aa6036b4765fb30e42394deb4bad280ca5c",
+      "bytes": 621
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0006.smt2",
+      "sha1_git_blob": "000c91cbb18ee072cc21018f4c24dc5e14f8ab01",
+      "bytes": 621
+    }
+  ],
+  "registered_method": "Parse true original Z3 AST independently. Only admit exactly one equality x^3+y^3+z^3=N over 3 distinct unconstrained integer symbols and original full source statements only. Enumerate all cube residues r^3 mod9 for r=0..8 with Python arbitrary ints and independently with Z3+cvc5 modular QF_LIA. If N mod9 unreachable by three signed cube residues, conclude true original unbounded integer UNSAT. If reachable, label MOD9_NOT_SUFFICIENT, never SAT or UNSAT without original certified integer witnesses. Compare same-CPU original unchanged Z3 4.13.3 and cvc5 1.4.2 direct 4sec each on original source. Semantic source checker authority verified source byte blob; SMT independently confirms finite modular arithmetic, not necessarily full raw original formula solver returns UNSAT.",
+  "performance": "Full numeric original parser, residue theorem, independent SMT verification charged; direct original 4 sec bound and full source read; if direct unknown, do not invent cost improvement at iso capability unless both original UNSAT independently certified.",
+  "negative_controls": "Original source N=3 and N=6 should remain NOT_MOD9_UNSAT (not incorrectly refuted); no need to find SAT witnesses for those sources. Contaminated source nonliteral or additional constraints ABSTAIN.",
+  "prior_art": "Elementary 3 integer cubes mod9 obstruction known since classical number theory. Strong direct with same modular theorem could duplicate; NO novelty/Q3 learned breakthrough/global Q3,Q4,Q5 pass."
+}
