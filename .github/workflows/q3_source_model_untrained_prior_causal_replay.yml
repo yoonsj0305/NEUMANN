@@ -1,0 +1,80 @@
+name: Q3 true causal knockout no training same operator on original16 and mixed semantic shift
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_source_model_untrained_prior_causal_replay.yml'
+      - 'research/evidence/q3_strong_counterfactual_no_training_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  real_original_solver_causal_knockout_test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate archived-original read-only independent causal experiment
+        run: |
+          python -m py_compile research/evidence/q3_strong_counterfactual_no_training_20261022/official_learned_vs_untrained_fixed_prior_and_mixed_nondet.py
+      - name: Install independent pinned Z3 cvc5 exact source proofs
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: Download SHA256-pinned official original PR442 learned native-safe experiment
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39687539419
+          github-token: ${{ github.token }}
+          name: q3-source-trained-modulus-constructor-outside-proven-finite-list
+          path: /tmp/q3counterfactual
+      - name: No-fit same architecture versus frozen trained original, and mixed source shift with independent native proofs
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python research/evidence/q3_strong_counterfactual_no_training_20261022/official_learned_vs_untrained_fixed_prior_and_mixed_nondet.py \
+            --official /tmp/q3counterfactual/q3_learned_unbounded_modulus_native_original16.json \
+            --out /tmp/q3counterfactual/NEUMANN_STRONG_CAUSAL_MODEL_KNOCKOUT_AND_SHIFT.json | tee /tmp/q3counterfactual/strong_causal_model_knockout_and_shift.log
+          sha256sum /tmp/q3counterfactual/NEUMANN_STRONG_CAUSAL_MODEL_KNOCKOUT_AND_SHIFT.json
+      - name: Archive complete independent original and modified source proofs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-model-necessity-rebuttal-16-real-source-mixed-original-independent-dual
+          path: |
+            /tmp/q3counterfactual/NEUMANN_STRONG_CAUSAL_MODEL_KNOCKOUT_AND_SHIFT.json
+            /tmp/q3counterfactual/strong_causal_model_knockout_and_shift.log
+          if-no-files-found: warn
+      - name: Fail closed on any missing native original source proof or false causal claim
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3counterfactual/NEUMANN_STRONG_CAUSAL_MODEL_KNOCKOUT_AND_SHIFT.json'))
+          assert r['schema']=='neumann.q3_PR442_untrained_fixed_prior_and_mixed_semantics_independent_native_replay.v1'
+          assert r['immutable_historical_PR442_raw_SHA256']=='7f2f88a67215bceefd7866fc5c82e350308001e7d8f3581d29028e5f13103457'
+          assert len(r['source_truth_ledger'])==16
+          for n in ('original_deterministic_source_untrained_theta6_safe',
+                    'original_deterministic_source_constant_one_no_model_safe',
+                    'mixed_source_frozen_learned_failed_consecution_independent_SAT',
+                    'mixed_source_GCD_complete_original_SAFE_independent_3VC'):
+              assert r[n]==16
+          for case in r['source_truth_ledger']:
+              for cert in case['deterministic_original_Z3_cvc5_3VC'].values():
+                  assert len(cert)==3 and all(p['independent_dual_unsat'] for p in cert)
+              shift=case['mixed_original_Z3_cvc5_3VC']
+              for bad in ('historical_frozen_learned','untrained_theta6_same_architecture','constant_one_no_model'):
+                  assert shift[bad][1]['independent_dual_sat']
+              assert all(p['independent_dual_unsat'] for p in shift['exact_gcd'])
+          assert r['trained_learning_NOT_CAUSALLY_NECESSARY_under_fixed_prior_comparator']
+          assert r['global_Q3']==r['global_Q4']==r['global_Q6']=='OPEN'
+          print('CAUSAL_LEARNING_NOT_NEEDED_FOR_DETERMINISTIC_SOURCE16_AND_MIXED_SHIFT_EXACT_GCD_ONLY')
+          PY
