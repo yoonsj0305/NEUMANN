@@ -1,0 +1,67 @@
+name: Q34 original mutated program semantic delta dual Z3 cvc5 audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q34-real-source-semantic-delta-audit.yml'
+      - 'research/evidence/q34_real_source_mutant_reuse_20261021/true_original_semantic_difference_audit.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real_source_mutant_semantic_delta:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: frozen_original
+          sparse-checkout: |
+            lib/Inv_Track/andrew_lustre
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Freeze original code audit script and benchmark identity
+        run: |
+          test "$(git -C frozen_original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q34_real_source_mutant_reuse_20261021/true_original_semantic_difference_audit.py
+      - name: Independent Z3 and cvc5 SMT original source formulas
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Authenticate real source mutants semantic formula changes with both solvers
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q34_real_source_mutant_reuse_20261021/true_original_semantic_difference_audit.py --root frozen_original --freeze research/evidence/q34_real_source_mutant_reuse_20261021/FROZEN_MUTANTS_PRE_CONTENT.json --out /tmp/real_source_semantic_deltas.json | tee /tmp/real_source_semantic_deltas.log
+          sha256sum /tmp/real_source_semantic_deltas.json
+      - name: Archive exact first semantic delta audit, including no-delta cases
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q34-actual-original-source-semantic-delta-dual
+          path: |
+            /tmp/real_source_semantic_deltas.json
+            /tmp/real_source_semantic_deltas.log
+          if-no-files-found: warn
+      - name: No false attribution to semantic novelty when only SHA changed
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/real_source_semantic_deltas.json'))
+          assert len(x['real_source_variants'])==8 and x['all_eight_first_source_mutants_retained']
+          assert x['all_original_baseline_positive_equivalence_controls_dual_pass']
+          assert x['number_source_mutants_sha_different_than_base']==8
+          assert x['global_Q3']==x['global_Q4']=='OPEN'
+          print('ORIGINAL_SEMANTIC_DIFFERENCE_VERIFIED_TWO_SOLVERS',
+                x['number_true_original_source_semantic_formula_deltas_independently_proven'],'/8')
+          PY
