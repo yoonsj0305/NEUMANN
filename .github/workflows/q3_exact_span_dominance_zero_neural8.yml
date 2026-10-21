@@ -1,0 +1,86 @@
+name: Q3 exact fixed grammar mathematical ceiling zero-gradient original8 proofs
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_exact_span_dominance_zero_neural8.yml'
+      - 'research/evidence/q3_exact_span_dominance_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact_rational_full_representation_space_and_zero_neural_proof_first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            comp/2017/Inv_Track
+            comp/2019/Inv_Track/From2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate immutable source original identity and exact rational theorem script
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_exact_span_dominance_20261021/zero_gradient_exact_source_certificate.py
+      - name: Install pinned original independent Z3 cvc5 and exact rational algebra
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: Original8 zero-gradient minimum work certified proof controller and exact solution subspace
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_exact_span_dominance_20261021/zero_gradient_exact_source_certificate.py \
+            --root original \
+            --freeze research/evidence/q3_external_8_source_transition_20261021/PREBODY_GIT_SHA_FROZEN_8.json \
+            --out /tmp/q3_source8_exact_coeff_space_classical_recovered.json | tee /tmp/q3_source8_exact_coeff_space_classical_recovered.log
+          sha256sum /tmp/q3_source8_exact_coeff_space_classical_recovered.json
+      - name: Archive original program exact basis proof and full original independent dual certificates
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-8-genuine-original-exact-span-impossibility-and-zero-neural-proofs
+          path: |
+            /tmp/q3_source8_exact_coeff_space_classical_recovered.json
+            /tmp/q3_source8_exact_coeff_space_classical_recovered.log
+          if-no-files-found: warn
+      - name: Require exact 8/8 original source native complete 3VC plus no model inference
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          j=json.load(open('/tmp/q3_source8_exact_coeff_space_classical_recovered.json'))
+          assert j['schema']=='neumann.q3.exact_span_dominance_8_originals_zero_neural_controller.v1'
+          assert j['original_programs']==j['all_8_source_identity_independently_audited']==8
+          assert j['true_original_full_SAFE_independent_dual_Z3_cvc5']==8
+          assert j['true_original_UNKNOWN_or_abstained']==0
+          assert j['all_originals_zero_neural_forwards']==j['all_originals_zero_model_fit']==0
+          assert j['all_exact_nullspace_basis_memberships_proved']
+          assert j['source_exact_constraint_rank_audit_count']>0
+          assert sum(j['winner_breakdown'].values())==8
+          for row in j['all_source_receipts']:
+              assert row['full_SAFE']
+              assert all(z['dual_pass'] for z in row['native_original_PreTransPost_parity'].values())
+              if row['winner']=='exact_rational_Pre_Trans_relation':
+                  p=next(x['original_program_cvc5_Z3_full_3VC'] for x in row['source_generic_grammar_analysis'] if x.get('certified_full_source_SAFE'))
+                  assert all(q['dual_pass'] for q in p['full_original_independent_Z3_cvc5_3VC'].values())
+              elif row['winner']=='original_Z3_SPACER':
+                  assert any(r['certified'] and all(x['dual_pass'] for x in r['original_full_dual_3VC'].values()) for r in row['original_Z3_SPACER']['original_independently_certified_candidates'])
+              elif row['winner']=='original_cvc5_SyGuS_2s':
+                  assert all(q['dual_pass'] for q in row['original_cvc5_SyGuS_2s']['original_native_Z3_cvc5_3VC'].values())
+              else:raise AssertionError('UNSUPPORTED_ORIGINAL_CERTIFIED_ROUTE')
+          assert j['global_Q3']==j['global_Q4']==j['global_Q6']=='OPEN'
+          print('EXACT_FINITE_POLYNOMIAL_GRAMMAR_SPAN_CERTIFIED_ZERO_GRADIENT_FULL_NATIVE_ORIGINAL8')
+          PY
