@@ -1,0 +1,71 @@
+{
+  "schema": "neumann.G0.QFNIA_sum_three_cubes.generic_mod9_cubic_search_first_external_transfer.v1",
+  "date": "2026-10-21",
+  "source": "SMT-LIB/benchmark-submission-2022@81a39628827f61fbd74c6f3e67feb5c1b740d2f0",
+  "original_context": "Eight STC original-source cases in 2026 SMT-COMP jointly unresolved over 17 submitted variants, same 2022 author family. Exclude already public STC_0087 and STC_0795 external answers.",
+  "development_original_STC_0228": {
+    "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0228.smt2",
+    "sha1_git_blob": "9e4db9d2e58133abbe1fdcdac22cbbd3b028abce",
+    "bytes": 623,
+    "status": "OPENED_DEVELOPMENT_ONLY - candidate discovered after reading original; NOT first blind transfer",
+    "candidate_x_y_z": [
+      -3788,
+      -1577,
+      3877
+    ],
+    "computed_exact_sum": 228,
+    "no_independent_actual_SMT2_proof_yet": true
+  },
+  "new_seven_source_content_unopened_before_this_freeze": true,
+  "first_transfer_cohort": [
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0268.smt2",
+      "sha1_git_blob": "c47ce1938899a5945a7eb41fa968bec5a4ae1429",
+      "bytes": 623
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0291.smt2",
+      "sha1_git_blob": "7118855e37eb4cb35a203ef8c6832524452ea668",
+      "bytes": 623
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0588.smt2",
+      "sha1_git_blob": "943d02c44c55b516597eab0f04c49cb4e646ee8b",
+      "bytes": 623
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0609.smt2",
+      "sha1_git_blob": "d4bc30003b4fe10cc07a992dd31e8c829cbac62c",
+      "bytes": 623
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0786.smt2",
+      "sha1_git_blob": "3a69dbb1d84e642243ec5c2b6ef61cb3a775a1cd",
+      "bytes": 623
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0813.smt2",
+      "sha1_git_blob": "da1524cccbaee945d5516f71158b11a18e6b6ff7",
+      "bytes": 623
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0880.smt2",
+      "sha1_git_blob": "92bd6867f302bda2cad4adf2970289b087722742",
+      "bytes": 623
+    }
+  ],
+  "registered_algorithm": {
+    "name": "generic exact modular cube residue filter + numpy sorted two-sum search; source-derived RHS, NEVER labels or stored external witness",
+    "for_any_target": "Check original source authentic and has one exact assertion sum of THREE Int symbolic cubes equals an Int constant; use actual z3 parsed AST to verify source equation is that form. If not, ABSTAIN.",
+    "residue_filter": "Enumerate r in Z/9 for variable cubes, cube value modulo9 in {-1,0,1}; permit only residue-triplets whose cube values sum to actual original target modulo9; filter integer candidates by full allowed per (x,y) then derive admissible z residue. Use no conjectural universal identity beyond finite exhaustive modulo9 certified cases.",
+    "integer_domain": "fixed symmetric [-10000,10000], bisection deterministic, sorted 64-bit cubes exact with 2K+1 <= 20001; no overflow because abs(x)^3 <= 10^12",
+    "work_bound": "candidate numeric complete for radius 10000, no genuine SAT iff no bounded witness is found; do not claim original unsat from finite search",
+    "verification": "If numeric candidate found, recheck full exact original source assert with Z3 and independent pinned cvc5 after grounding x,y,z, require both SAT; no source mutation or test-time teacher labels.",
+    "negative_controls": "wrong candidate near genuine 228 witness must be rejected by dual proof, syntax mutation and original Git source mismatches should ABSTAIN",
+    "first_vs_future": "Original STC0228 development proof posthoc; other 7 are prospective source-body-unopened transfer of fixed mod9 and 10k search algorithm. No tuning based on future results.",
+    "claim_limit": "No algorithmic novelty of elementary modular arithmetic or meet-in-middle; only source-specific exact certificates and bounded first-transfer utility. No full Q3/Q4/10x or neural discovery assertion."
+  },
+  "no_neural_calls": true,
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN"
+}

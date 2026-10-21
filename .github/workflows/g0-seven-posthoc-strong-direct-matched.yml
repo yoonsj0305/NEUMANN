@@ -1,0 +1,70 @@
+name: G0 posthoc seven original direct SMT2 Z3 cvc5 15second matched
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/g0-seven-posthoc-strong-direct-matched.yml'
+      - 'research/evidence/g0_original_seven_direct_posthoc_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  posthoc_same_cpu_all_frozen_seven:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/QF_NIA/20220315-MathProblems
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate pinned source original and script
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          python -m py_compile research/evidence/g0_original_seven_direct_posthoc_20261021/true_original_samecpu_z3_cvc5_after_first.py
+      - name: Pin original generic symbolic SMT solvers
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          lscpu | grep 'Model name' | head -1
+      - name: All seven authentic already-opened original hard source 15sec direct comparison
+        run: |
+          set -o pipefail
+          PYTHONPATH=. python research/evidence/g0_original_seven_direct_posthoc_20261021/true_original_samecpu_z3_cvc5_after_first.py --root original --freeze research/evidence/g0_cubic_mod9_20261021/NEW_SEVEN_PRE_SOURCE_TRANSFER_FREEZE.json --out /tmp/g0_seven_direct.json | tee /tmp/g0_seven_direct.log
+          sha256sum /tmp/g0_seven_direct.json
+      - name: Preserve all seven first posthoc direct original solver outcomes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g0-seven-original-posthoc-strong-direct-solver-reference
+          path: |
+            /tmp/g0_seven_direct.json
+            /tmp/g0_seven_direct.log
+          if-no-files-found: warn
+      - name: Require source identity and no overclaimed learned efficiency
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/g0_seven_direct.json'))
+          assert r['raw_original_authentic_source_count']==7
+          assert r['the_7_first_source_result_remains_actions_39531276557']
+          assert r['no_witness_given_to_generic_direct_solvers']
+          assert r['strongest_known_classical_specialized_three_cube_algorithm_not_compared']
+          assert r['not_certified_10x_vs_best_classical']
+          assert r['global_Q3']==r['global_Q4']==r['global_Q5']=='OPEN'
+          print('STRONG_DIRECT_SOLVED_ON_FIRST_FROZEN_7',r['full_original_strong_generic_direct_15sec_independently_proven_count'],'/7')
+          PY

@@ -1,0 +1,54 @@
+name: G0 development 228 wrong-witness negative control diagnostic
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/g0-development-wrong-cube-diagnostic.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact_negative_diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2022
+          ref: 81a39628827f61fbd74c6f3e67feb5c1b740d2f0
+          path: original
+          sparse-checkout: |
+            non-incremental/QF_NIA/20220315-MathProblems
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Actual original 228 WRONG witness diagnostic detailed independent receipts
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          from pathlib import Path
+          import json
+          from research.evidence.g0_cubic_mod9_20261021.first_seven_frozen_originals_exact_mod9_cubes import structural_source,independent_original_grounded_certificate
+          p=Path('original/non-incremental/QF_NIA/20220315-MathProblems/STC_0228.smt2')
+          raw=p.read_bytes()
+          target,names,solver=structural_source(raw)
+          good=(-3788,-1577,3877)
+          bad=(-3787,-1577,3877)
+          print('GROUND_MATH_GOOD',sum(v**3 for v in good), 'BAD',sum(v**3 for v in bad))
+          assert sum(v**3 for v in good)==228 and sum(v**3 for v in bad)!=228
+          a=independent_original_grounded_certificate(raw.decode(),names,good,solver,'SAT')
+          b=independent_original_grounded_certificate(raw.decode(),names,bad,solver,'UNSAT')
+          print('POSITIVE',json.dumps(a,sort_keys=True))
+          print('NEGATIVE',json.dumps(b,sort_keys=True))
+          assert a['independent_dual_result']
+          assert b['independent_Z3_status']=='UNSAT'
+          PY
