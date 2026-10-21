@@ -1,0 +1,86 @@
+name: Q3 first eight virgin originals ACTUAL trained structure discovery
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_first_eight_trained_native_structures_20261021.yml'
+      - 'research/evidence/q3_firstblind_eight_trained_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actually_trained_model_first_original_eight_source_body_unopened:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pre-source-body auth and fixed code static syntax
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_firstblind_eight_trained_20261021/execute_fixed_trained_miner_on_first8_real_originals.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/q3_firstblind_eight_trained_20261021/BEFORE_EIGHT_NEW_ORIGINAL_SOURCE_BODIES_SHA_LOCK.json'))
+          c=json.load(open('research/evidence/q3_firstblind_eight_trained_20261021/PREREG_EIGHT_FIXED_MODEL_AND_BASELINES.json'))
+          assert x['pre_source_bodies_OPENED'] is False
+          assert len(x['originals'])==8
+          assert c['source_SHA_before_body_commit']=='d712b313d3ffa32b0d1cda20a9b1f9fe693f0901'
+          assert c['global_Q3']==c['global_Q4']==c['global_Q6']=='OPEN'
+          print('FRESH_EIGHT_SOURCE_PRE_SHA_MODEL_FROZEN_BEFORE_ORIGINAL_BODY')
+          PY
+      - name: Install actual CPU fitted model and independently pinned original proof solvers
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 z3-solver==4.13.3.0
+      - name: First source-body execution exactly frozen QuantileRegressor Houdini no-fit classical
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q3_firstblind_eight_trained_20261021/execute_fixed_trained_miner_on_first8_real_originals.py \
+            --root original \
+            --freeze research/evidence/q3_firstblind_eight_trained_20261021/BEFORE_EIGHT_NEW_ORIGINAL_SOURCE_BODIES_SHA_LOCK.json \
+            --contract research/evidence/q3_firstblind_eight_trained_20261021/PREREG_EIGHT_FIXED_MODEL_AND_BASELINES.json \
+            --out /tmp/first_eight_original_actual_learned_native_relations.json | tee /tmp/first_eight_original_actual_learned_native_relations.log
+          sha256sum /tmp/first_eight_original_actual_learned_native_relations.json
+      - name: Preserve authentic original first source evidence and ALL unknowns
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-first8-real-original-trained-structural-discovery-and-classical-controls
+          path: |
+            /tmp/first_eight_original_actual_learned_native_relations.json
+            /tmp/first_eight_original_actual_learned_native_relations.log
+          if-no-files-found: warn
+      - name: Authoritative global Q3 remains open and exact complete proofs ONLY
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/first_eight_original_actual_learned_native_relations.json'))
+          assert q['schema']=='neumann.q3.first_source_unopened_eight_actual_learned_affine_original_proofs.v1'
+          assert q['new_genuine_originals']==8 and q['all_eight_original_SHA_authenticated']
+          assert len({x['original_git_blob'] for x in q['all_originals']})==8
+          assert q['global_Q3']==q['global_Q4']==q['global_Q6']=='OPEN'
+          assert q['strong_equal_authority_learner_unique_vs_best_classical_UNPROVEN']
+          assert q['source_specific_self_supervised_training_not_model_weight_generalization']
+          for x in q['all_originals']:
+            if x.get('TRAINED_model_source_invariant',{}).get('fully_verified_complete_original_3VC'):
+              assert all(r['dual_pass'] for r in x['TRAINED_model_source_invariant']['independent_original_pre_trans_post_dual_proofs'].values())
+          print('FRESH_SOURCE_REAL_TRAINED_MACHINE_VS_CLASSICAL_RESULT_RETAINED')
+          PY

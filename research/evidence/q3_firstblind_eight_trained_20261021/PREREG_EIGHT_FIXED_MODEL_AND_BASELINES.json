@@ -1,0 +1,27 @@
+{
+  "schema": "neumann.q3.preregistered_eight_source_first_body_CPU_discovery_no_retuning_v1",
+  "source_SHA_before_body_commit": "d712b313d3ffa32b0d1cda20a9b1f9fe693f0901",
+  "study_not_later_source_screen": true,
+  "original_upstream": "13c8deb68a873635879c9a69bc78caebd340f646",
+  "fully_frozen_model_code_from_prior_PR393": "research/evidence/q3_trained_affine_from_native_samples_20261021/actual_selfsupervised_candidate_miner.py",
+  "source_first_dev_run": 39582394143,
+  "learned_model_design": "same source-native Pre/Trans trajectory sample + fitted sklearn QuantileRegressor all pairwise lower/upper slopes; same Houdini inductive pruning; independent native Z3+cvc5 3VC; no source names or prior gold",
+  "three_competitors": [
+    "train numerical relation plus generic Houdini",
+    "no-fit same state samples generic ±1 and unary intervals plus same Houdini",
+    "original source cvc5 SyGuS 2s plus original Z3 SPACER 5s and independently original 3VC"
+  ],
+  "evaluation_metrics": [
+    "exact SHA authenticated and pre/native parity",
+    "fully certified original inductive invariant",
+    "trained proof - nofit proof count",
+    "trained proof - strong source classical prover count (diagnostic only)",
+    "total end to end wall and failed/unsupported cases"
+  ],
+  "new_programs_are_same_source_upstream_and_not_independent_authors": true,
+  "no_weight_transfer_across_programs": "Each source trains its own self-supervised numerical relation model from that source's execution traces; fixed algorithm is the entity transferred; NOT a model weights transfer.",
+  "admission": "Bounded fresh-source ability PASS only from independent original Z3+cvc5 full native three VCs; any unsupported or cap failure ABSTAIN. Claimed learned uniqueness limited to fixed no-fit baseline and never globally against unbounded strong Direct.",
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q6": "OPEN"
+}
