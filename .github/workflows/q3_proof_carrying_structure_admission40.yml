@@ -1,0 +1,73 @@
+name: Q3 proof carrying structure admission 40 true source receipts fail closed
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_proof_carrying_structure_admission40.yml'
+      - 'research/evidence/q3_proof_carrying_structural_gate_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_source_proof_carrying_structural_veto_and_fallback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify static proof gate contract
+        run: |
+          python -m py_compile research/evidence/q3_proof_carrying_structural_gate_20261022/admit_only_original_certified_structure.py
+      - name: Fetch source original 24 complete proofs and 24 mutation counterexamples
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39623533296
+          github-token: ${{ github.token }}
+          name: q3-24-source-trained-modulo-operator-double-proofs-and-classical-gcd
+          path: /tmp/proofgate/in
+      - name: Fetch additional 16 genuine model UNSAT failures and original classical full source proofs
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39624265173
+          github-token: ${{ github.token }}
+          name: q3-original-outside-fixed-operator-vocabulary-exact-negative-model-certificates
+          path: /tmp/proofgate/out
+      - name: Replay original source authenticated dual SAT or UNSAT gates and verified degrade branch
+        run: |
+          set -o pipefail
+          python research/evidence/q3_proof_carrying_structural_gate_20261022/admit_only_original_certified_structure.py \
+            --known /tmp/proofgate/in/q3_source_modular_operator_gradient_native.json \
+            --unseen /tmp/proofgate/out/q3_mod_OOD_original_negative_proofs.json \
+            --out /tmp/proofgate/NEUMANN_Q3_PROOF_CARRYING_STRUCTURAL_GATE40.json | tee /tmp/proofgate/proof_gate40.log
+          sha256sum /tmp/proofgate/NEUMANN_Q3_PROOF_CARRYING_STRUCTURAL_GATE40.json
+      - name: Preserve proof carrying source identity and original source proof decisions
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-proof-carrying-structural-admission40-official-dual-receipt-audit
+          path: |
+            /tmp/proofgate/NEUMANN_Q3_PROOF_CARRYING_STRUCTURAL_GATE40.json
+            /tmp/proofgate/proof_gate40.log
+          if-no-files-found: warn
+      - name: Require 24 accepted only if exact dual source proof plus 16 veto and correct classical recovery
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/proofgate/NEUMANN_Q3_PROOF_CARRYING_STRUCTURAL_GATE40.json'))
+          assert x['schema']=='neumann.q3.proof_carrying_structural_source_admission_40.v1'
+          assert x['total_original_source_observations']==40
+          assert x['independently_PREVIOUSLY_certified_model_admissions']==24
+          assert x['previously_source_SAT_refuted_model_proposals']==16
+          assert x['independent_original_classical_fallback_completed']==16
+          assert x['model_unsafe_original_source_admissions']==0
+          assert x['post_decision_source_safe']==40
+          assert x['novel_model_operator_primitive_count']==0
+          assert x['original_real_programs_not_tested']
+          assert x['global_Q3']==x['global_Q4']==x['global_Q6']=='OPEN'
+          print('SOURCE_PROOF_CARRYING_STRUCTURAL_ADMISSION_24_PASS_16_BLOCK_16_RECOVER_NO_FALSE_SAFE')
+          PY
