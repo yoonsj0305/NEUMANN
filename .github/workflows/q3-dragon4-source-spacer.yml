@@ -1,0 +1,67 @@
+name: Q3 residual DRAGON4 original full safety PDR SPACER
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-dragon4-source-spacer.yml'
+      - 'research/evidence/q3_affine_unopened_transfer_20261021/dragon4_source_published_spacer.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual_native_source_chc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: pinned_source
+          sparse-checkout: |
+            lib/Inv_Track/andrew_lustre
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Assert source Git head and script syntax
+        run: |
+          test "$(git -C pinned_source rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_affine_unopened_transfer_20261021/dragon4_source_published_spacer.py
+      - name: Install independent original parser parity solver prerequisites
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Bounded original full native property reachability PDR
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_affine_unopened_transfer_20261021/dragon4_source_published_spacer.py --root pinned_source --out /tmp/q3_dragon4_spacer.json | tee /tmp/q3_dragon4_spacer.log
+          sha256sum /tmp/q3_dragon4_spacer.json
+      - name: Save unknown and solver result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-dragon4-full-original-spacer-pdr
+          path: |
+            /tmp/q3_dragon4_spacer.json
+            /tmp/q3_dragon4_spacer.log
+          if-no-files-found: warn
+      - name: Preserve dual proof boundary
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_dragon4_spacer.json'))
+          assert x['global_Q3']=='OPEN'
+          assert x['original']['frozen_original_git_blob']=='455422332af42a42d5f9c61562e1912f13bc2946'
+          if x['original'].get('one_engine_safety_proved'):
+              assert x['original']['fixedpoint_query_result']=='unsat'
+              assert not x['original']['independent_dual_original_3VC_proved']
+          print('SCOPED_DRAGON4_SPACER',x['original']['status'])
+          PY
