@@ -1,0 +1,69 @@
+name: Q3 published Post original four bounded k induction affine strengthening
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-four-original-post-k-induction.yml'
+      - 'research/evidence/q3_affine_unopened_transfer_20261021/four_original_post_k_induction_affine.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_four_post_k_induction:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original_sources
+          sparse-checkout: |
+            lib/Inv_Track/andrew_lustre
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate original revision and syntax
+        run: |
+          test "$(git -C original_sources rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_affine_unopened_transfer_20261021/four_original_post_k_induction_affine.py
+      - name: Install independent Z3 and pinned cvc5
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Prove published post with original k induction and independent solver
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_affine_unopened_transfer_20261021/four_original_post_k_induction_affine.py --root original_sources --freeze research/evidence/q3_affine_unopened_transfer_20261021/ORIGINAL_FOUR_PRESOURCE_FREEZE.json --out /tmp/q3_post_k.json | tee /tmp/q3_post_k.log
+          sha256sum /tmp/q3_post_k.json
+      - name: Preserve all source post k induction outcomes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-original-four-goal-post-k-induction
+          path: |
+            /tmp/q3_post_k.json
+            /tmp/q3_post_k.log
+          if-no-files-found: warn
+      - name: Safe final accounting
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_post_k.json'))
+          assert x['origins_all_retained'] and len(x['results'])==4
+          assert x['global_Q3']==x['Q4_full']=='OPEN'
+          for row in x['results']:
+              if row['actual_full_original_Post_proven']:
+                  assert row['first_full_success_k'] in (1,2,3)
+                  assert any(t['status']=='ORIGINAL_PUBLISHED_POST_K_INDUCTIVE_DUAL_PROVED' for t in row['proof_trials'])
+          print('PUBLISHED_FULL_SOURCE_SAFETY_DUAL',x['original_published_safety_3VC_or_k_induction_pass'],'/4')
+          PY
