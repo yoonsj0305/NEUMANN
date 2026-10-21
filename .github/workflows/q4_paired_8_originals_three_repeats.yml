@@ -1,0 +1,86 @@
+name: Q4 paired actual original8 learned versus exact proof first repeat ABBA
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q4_paired_8_originals_three_repeats.yml'
+      - 'research/evidence/q4_matched_8_originals_repeated_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual_original8_paired_full_native_proof_cost:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            comp/2017/Inv_Track
+            comp/2019/Inv_Track/From2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate exact original source and paired experiment
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q4_matched_8_originals_repeated_20261021/paired_gradient_versus_exact_original_proof.py
+      - name: Install pinned independent proof tools and exact classical learned dependencies
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m pip install --disable-pip-version-check numpy==2.3.5 scipy==1.16.3 scikit-learn==1.8.0 sympy==1.14.0 z3-solver==4.13.3.0
+      - name: Three actual paired 8 source batches ABBA learned and exact both original full native proof
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python research/evidence/q4_matched_8_originals_repeated_20261021/paired_gradient_versus_exact_original_proof.py \
+            --root original \
+            --freeze research/evidence/q3_external_8_source_transition_20261021/PREBODY_GIT_SHA_FROZEN_8.json \
+            --out /tmp/q4_actual_paired_real8_x3_equal_rights.json | tee /tmp/q4_actual_paired_real8_x3_equal_rights.log
+          sha256sum /tmp/q4_actual_paired_real8_x3_equal_rights.json
+      - name: Preserve ALL per source independent Z3 cvc5 proof and measured repeated wall
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q4-paired-gradient-vs-exact8-3repeats-full-source-proofs
+          path: |
+            /tmp/q4_actual_paired_real8_x3_equal_rights.json
+            /tmp/q4_actual_paired_real8_x3_equal_rights.log
+          if-no-files-found: warn
+      - name: No source proof without actual native independent certificates in both branches
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q4_actual_paired_real8_x3_equal_rights.json'))
+          assert r['schema']=='neumann.q4.three_repeat_original8_matched_learner_vs_exact_pretrans_portfolio.v1'
+          assert r['total_paired_method_trials']==24
+          assert r['source_originals_per_repeat']==8 and r['paired_repetitions']==3
+          assert r['learned_certified_full_original_3vc']==24
+          assert r['exact_certified_full_original_3vc']==24
+          assert r['unchanged_original_source_preprocess_charged_to_each_route']
+          assert r['same_observed_original_pre_and_trans_data_for_both_routes']
+          assert r['identical_independent_native_Z3_and_cvc5_original_goal_proof_for_both']
+          assert r['global_Q3']==r['global_Q4']==r['global_Q6']=='OPEN'
+          for item in r['source_runs']:
+              for method in ('learned','exact'):
+                  x=item[method]
+                  assert x['certified']
+                  if x['winner']==method:
+                      t=next(t for t in x['methods'] if t['candidate_certified'])
+                      assert all(p['dual_pass'] for p in t['source_exact_original_3VC']['full_original_independent_Z3_cvc5_3VC'].values())
+                  else:
+                      assert x['winner']=='Z3_SPACER'
+                      assert any(z['certified'] and all(p['dual_pass'] for p in z['original_full_dual_3VC'].values())
+                                 for z in x['Z3_SPACER_native_source']['original_independently_certified_candidates'])
+          print('PAIRED_REAL_SOURCE8_X3_BOTH_METHODS_ALL_CERTIFIED_NO_FRONTIER_CLAIM')
+          PY
