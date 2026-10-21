@@ -1,0 +1,92 @@
+name: Q6 first 12 source-body-unopened ORIGINAL source canonical-role transfer 108 dual checks
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q6-first12-source-original-alpha.yml'
+      - 'research/evidence/q6_first12_unopened_alpha_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first_original_12_SHA_metadata_precommitted:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: original
+          sparse-checkout: |
+            lib/Inv_Track/from_2018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authentically prelocked fresh original SHA ids and unmodified proven source normalizer
+        run: |
+          test "$(git -C original rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q6_first12_unopened_alpha_20261021/first_unopened_12_original_alpha_replay.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/q6_first12_unopened_alpha_20261021/ORIGINAL_SOURCE_SHA_LOCK_BEFORE_FIRST_BODY.json'))
+          assert x['source_bodies_unopened_at_git_sha_registration']
+          assert x['schema']=='neumann.q6.first12_unopened_source_alpha_generalization_fixed_method.v1'
+          assert len(x['cases'])==12 and len({q['git_blob'] for q in x['cases']})==12
+          assert sum(q['family']=='fib_related' for q in x['cases'])==6
+          assert sum(q['family']=='other_2018_math_program' for q in x['cases'])==6
+          assert x['global_Q3']==x['global_Q6']=='OPEN'
+          print('PRE_SOURCE_LOCK_12_NEW_ORIGINALS_6_FIB_6_OTHER')
+          PY
+      - name: Install independent original source Z3 and pinned cvc5
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: FIRST twelve actual original code programs alpha structural representation and exact native dual semantic proofs
+        run: |
+          set -o pipefail
+          PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python research/evidence/q6_first12_unopened_alpha_20261021/first_unopened_12_original_alpha_replay.py --root original --freeze research/evidence/q6_first12_unopened_alpha_20261021/ORIGINAL_SOURCE_SHA_LOCK_BEFORE_FIRST_BODY.json --out /tmp/q6_first12_original_dynamic_alpha.json | tee /tmp/q6_first12_original_dynamic_alpha.log
+          sha256sum /tmp/q6_first12_original_dynamic_alpha.json
+      - name: Preserve all true original, unsupported and negative controls
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q6-first12-real-original-source-general-alpha-transfer
+          path: |
+            /tmp/q6_first12_original_dynamic_alpha.json
+            /tmp/q6_first12_original_dynamic_alpha.log
+          if-no-files-found: warn
+      - name: Source authenticity strict and original success counted only with all dual proof receipts
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q6_first12_original_dynamic_alpha.json'))
+          assert x['original_SHA_freeze_committed_before_any_test_source_BODY']=='d6120f92e898f0b4775dfaa96010d546dbe150e4'
+          assert x['all_12_original_source_Git_blob_SHA_and_bytes_authenticated']
+          assert x['source_original_count']==12 and len(x['originals'])==12
+          assert x['actual_alpha_copies_tested']<=36
+          assert x['independent_native_source_pre_trans_post_dual_proofs']<=108
+          assert x['model_gradient_updates']==x['trained_model_inference_calls']==0
+          assert x['best_classical_direct_with_same_normalizer_equal_rights']
+          assert x['global_Q3']==x['global_Q6']=='OPEN'
+          for q in x['originals']:
+              assert q['independent_exact_git_blob_matches_frozen']
+              if q['dynamic_arity_original_canonical_success']:
+                  assert q['original_source_and_renamed_3x_full_dual_equivalence_tests_passed']==9
+                  assert q['all_three_alpha_signature_digests_identical_to_original']
+                  assert q['negative_post_mutation_real_semantics_dual_SAT']
+                  assert q['negative_post_mutation_canonical_sha_differs']
+          print('TRUE_UNOPENED_SOURCE12_FIRST_SHA_AUTHENTIC')
+          print('TRUE_UNOPENED_SOURCE12_ALPHA_GENERALIZATION_PASS',x['fully_verified_source_programs'])
+          print('TRUE_UNOPENED_SOURCE12_REAL_DOUBLE_SEMANTIC_CHECKS',x['independent_native_source_pre_trans_post_dual_proofs'])
+          print('TRUE_UNOPENED_SOURCE12_FAIL_CLOSED_ABSTAIN',x['original_source_abstention_count'])
+          PY
