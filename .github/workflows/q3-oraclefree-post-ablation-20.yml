@@ -1,0 +1,79 @@
+name: Q3 genuine source-oraclefree structural discovery versus Post-only ablation
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-oraclefree-post-ablation-20.yml'
+      - 'research/evidence/q3_functional_ablation_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_bound_20_real_originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: frozen_source
+          sparse-checkout: |
+            lib/Inv_Track/andrew_lustre
+            lib/Inv_Track/from_2018
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authentic original and static source independent preregistration
+        run: |
+          test "$(git -C frozen_source rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3_functional_ablation_20261021/oraclefree_published_post_vs_real_invariant_20.py
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/q3_functional_ablation_20261021/REGISTERED_POST_ONLY_VS_REAL_SOURCE_DISCOVERY.json'))
+          assert x['preserve_all_20'] and len(x['historical_cohorts'])==4
+          print('Q3_ORACLEFREE_ABLATION_PRE_REGISTERED_20')
+          PY
+      - name: Independent original-source Z3 and pinned cvc5
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+      - name: Genuine program invariant discoverer versus naive original published Post
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3_functional_ablation_20261021/oraclefree_published_post_vs_real_invariant_20.py --root frozen_source --repo . --contract research/evidence/q3_functional_ablation_20261021/REGISTERED_POST_ONLY_VS_REAL_SOURCE_DISCOVERY.json --out /tmp/q3_oraclefree_20.json | tee /tmp/q3_oraclefree_20.log
+          sha256sum /tmp/q3_oraclefree_20.json
+      - name: Preserve every original full proof, genuine unsafe path, abstention
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-twenty-original-post-ablation-oraclefree-dual-proofs
+          path: |
+            /tmp/q3_oraclefree_20.json
+            /tmp/q3_oraclefree_20.log
+          if-no-files-found: warn
+      - name: Assert scope and no fake learned or unique NEUMANN Q3 claims
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3_oraclefree_20.json'))
+          assert x['all_real_original_source_ids_preserved'] and len(x['results'])==20
+          assert x['SPACER_IS_STRONG_DIRECT_CLASSICAL_COMPARATOR']
+          assert x['NEW_NEUMANN_SPECIFIC_ALGORITHM_CAUSAL_ADVANTAGE']=='NOT_DEMONSTRATED'
+          assert x['NEW_LEARNED_STRUCTURE']=='NOT_DEMONSTRATED'
+          assert x['global_Q3']==x['global_Q4']==x['global_Q5']=='OPEN'
+          assert x['authentic_git_sha_and_original_dual_pre_trans_post_count']==20
+          print('ORIGINAL_STRONG_CLASSICAL_STRUCTURE_NECESSITY',
+                x['SOURCE_POST_ALONE_ABLATION_FAILED_BUT_PDR_DISCOVERY_PROVED'])
+          print('SOURCE_PRE_POST_DUAL_3VC',x['actual_original_source_PDR_invariant_independently_dual_3VC_count'])
+          PY
