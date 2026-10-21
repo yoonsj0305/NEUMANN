@@ -1,0 +1,40 @@
+{
+  "schema": "neumann.G0.SMT_COMP_2026_first_four_originals_strong_direct_pre_source_read.v1",
+  "frozen_date": "2026-10-21",
+  "upstream": "SMT-LIB/benchmark-submission-2022",
+  "original_repo_revision": "81a39628827f61fbd74c6f3e67feb5c1b740d2f0",
+  "official_history_source": "docs/research/G0_SMT_COMP2026_REAL_UNION_AND_TWO_EXTERNAL_WITNESSES_20261020.md",
+  "historical_context": "17 jointly unresolved authentic originals over 17 official solver configurations at contest limits. Selected four from same 2022 submission folder, not four independent authors, not newly sealed labels. Two already published STC_0087/STC_0795 witnesses are explicitly excluded.",
+  "all_selected_from_official_joint_unsolved": true,
+  "source_body_not_read_before_freeze": true,
+  "targets": [
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/MC_07.smt2",
+      "sha1_git_blob": "f82b60f4511b8b9ecc2c7061b15c158c08e927a8",
+      "bytes": 43297
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/SC_08.smt2",
+      "sha1_git_blob": "2641f701a4d085737d12c7924a7511c9e25a381a",
+      "bytes": 71254
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/SC_09.smt2",
+      "sha1_git_blob": "acf0bf7bebd1b769a4bd2b5575313f1bcd3472e2",
+      "bytes": 112026
+    },
+    {
+      "path": "non-incremental/QF_NIA/20220315-MathProblems/STC_0228.smt2",
+      "sha1_git_blob": "9e4db9d2e58133abbe1fdcdac22cbbd3b028abce",
+      "bytes": 623
+    }
+  ],
+  "experiment": {
+    "question": "Does a 15-sec CPU current Z3 and independent pinned cvc5 direct symbolic SMT2 solver already solve one of four source-blind original competition-unresolved QF_NIA tasks? Unsolved classical headroom only if both remain UNKNOWN within this bound, not proof of frontier gap.",
+    "comparators": "Pinned z3-solver 4.13.3.0 Python SAT/UNSAT on actual original full SMT2 text; pinned cvc5 1.4.2 CLI --lang=smt2 --tlimit-per=15000. Same GitHub Actions runner, verify exact original source SHA1 Git blob and byte length independently.",
+    "validity": "Only UNSAT if independently both engines return UNSAT; SAT if actual z3 model (entire asserted state) independently rechecked as SAT by cvc5 with ground assignment; otherwise inconclusive. Never report SAT from raw solver claim alone. Any solver contradiction => RED ALERT.",
+    "per_source_cpu_solvers": "15sec each solver, all four kept, 8 possible bounded attempts, actual whole-wall recorded including source loading/model checking.",
+    "negative_control": "Known source-original STC_0087 with previously documented source-authenticated external witness remains a historical control, not novelty, not counted toward four.",
+    "admission": "Strong direct unresolved four cases within 15sec is CPU-local residual discovery opportunity; not NEUMANN success. If any solved, exclude from learned headroom. No model calls, no GPU, no new training; Q1-Q7 global OPEN."
+  }
+}
