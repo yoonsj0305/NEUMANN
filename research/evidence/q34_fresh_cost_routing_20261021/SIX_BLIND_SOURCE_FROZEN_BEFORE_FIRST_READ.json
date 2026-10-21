@@ -1,0 +1,50 @@
+{
+  "schema": "neumann.q34.pre_content_six_next_new_originals.v1",
+  "first_source_access": "No source body read; only GitHub /contents directory Git blob identity and size metadata",
+  "upstream": "SyGuS-Org/benchmarks",
+  "rev": "13c8deb68a873635879c9a69bc78caebd340f646",
+  "already_opened_cohort": "Prior separate 20 source experiments, no overlap",
+  "source_groups_author_independent": "UNKNOWN: 3 source directories, not proven 3 independent authors",
+  "sources": [
+    {
+      "path": "lib/Inv_Track/andrew_lustre/DRAGON_7.lus.sl",
+      "git_blob": "12e494e18682e1be636f09a9435ed8faf90307e7",
+      "bytes": 37910
+    },
+    {
+      "path": "lib/Inv_Track/andrew_lustre/FIREFLY_6.lus.sl",
+      "git_blob": "3b170fee74236b136d07570a8ee6659777290007",
+      "bytes": 24375
+    },
+    {
+      "path": "lib/Inv_Track/from_2018/fib_17n.sl",
+      "git_blob": "d66a8d61bd405a23fa2b3762e624adda2230c724",
+      "bytes": 1235
+    },
+    {
+      "path": "lib/Inv_Track/from_2018/fib_20.sl",
+      "git_blob": "3fe27f243c97fe5e6a43fccbfd9daf30791da755",
+      "bytes": 1333
+    },
+    {
+      "path": "lib/Inv_Track/xujie_code2inv/23.c.sl",
+      "git_blob": "0f49b7a857b8a12cce0c3d17c69197c1aa127448",
+      "bytes": 964
+    },
+    {
+      "path": "lib/Inv_Track/xujie_code2inv/87.c.sl",
+      "git_blob": "4c378e05357841e096a8db3192880ea45ff91aab",
+      "bytes": 1952
+    }
+  ],
+  "protocol": {
+    "objective": "One strictly unseen-source ORIGINAL task cohort; test actual conditional work elimination at exact original safety+unsafe correctness and complete wall.",
+    "selector": "If original bytes > 8192, first Z3 SPACER 15s and extracted original Z3+cvc5 3VC, then generic BMC 0..3 with actual Z3+cvc5 ground SAT then cvc5 SyGuS 0.75s and independent 3VC; else quick original Post 3VC, then BMC 0..3 grounded SAT, then cvc5 SyGuS 0.75s+3VC, then original SPACER+3VC. All methods use original unmodified source semantics.",
+    "baseline1": "Direct original native source SPACER 15s then real original BMC 0..3, source SyGuS 0.75s only if both fail; exact original certificate in both independent solvers.",
+    "baseline2": "Uniform-first route from already frozen Q3Q4 PR340: Post candidate, original grounded BMC 0..3, original 0.75s SyGuS 3VC, then PDR independent original 3VC.",
+    "all_arms": "Each source is run through all three same-cpu paths even after first selected result; all six original source identities preserved; equal native source Z3+cvc5 authority; no oracle labels at runtime; no neural forwards.",
+    "stop_success": "A method earns source-safe only if original 3VC UNSAT in Z3+cvc5; earns source-unsafe only if concrete time-indexed original Pre/Trans*/!Post SAT in both; else UNKNOWN. No weak fake success or timeout ratio.",
+    "economy_gate": "At identical certified task disposition coverage, ratio of aggregate complete wall including parser, verifier, routing and failed work. Repeated same-run ordering effects are caveat; not energy/FLOPs/cold start equivalence. Strong Direct can use same selector; no unique NEUMANN invention.",
+    "neural": "NO trained models or neural calls. Q3 oracle-free discovered structure is classical; strongest general solver also discovers it. No global Q3/Q4/5 PASS without separate frontier gap and truly learned residual headroom."
+  }
+}
