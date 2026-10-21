@@ -1,0 +1,78 @@
+name: Q3 Q4 model-free 20 genuine original complete certified classifications
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q34-zero-neural-20-full-source.yml'
+      - 'research/evidence/q3q4_zero_neural_20261021/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  zero_neural_hybrid_original_proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v4
+        with:
+          repository: SyGuS-Org/benchmarks
+          ref: 13c8deb68a873635879c9a69bc78caebd340f646
+          path: source
+          sparse-checkout: |
+            lib/Inv_Track/andrew_lustre
+            lib/Inv_Track/from_2018
+            lib/Inv_Track/xujie_code2inv
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Strict original Git SHA and independent proof source script
+        run: |
+          test "$(git -C source rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python -m py_compile research/evidence/q3q4_zero_neural_20261021/full_original_20_zero_neural_mincost_policy.py
+      - name: Pinned Z3 and cvc5 original source dual theorem proving
+        run: |
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version | grep -F 1.4.2
+          python -m pip install --disable-pip-version-check numpy==2.3.5 z3-solver==4.13.3.0
+          lscpu | grep 'Model name' | head -1
+      - name: Actual 20 source certified original programs zero-neural inference policy
+        run: |
+          set -o pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. python research/evidence/q3q4_zero_neural_20261021/full_original_20_zero_neural_mincost_policy.py --root source --repo . --out /tmp/q34_zero_neural_twenty.json | tee /tmp/q34_zero_neural_twenty.log
+          sha256sum /tmp/q34_zero_neural_twenty.json
+      - name: Preserve full original evidence including failures, comparator and costs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q34-twenty-real-original-zero-neural-full-evidence
+          path: |
+            /tmp/q34_zero_neural_twenty.json
+            /tmp/q34_zero_neural_twenty.log
+          if-no-files-found: warn
+      - name: Bound certification and global scientific attribution
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q34_zero_neural_twenty.json'))
+          assert x['all_actual_source_rows_retained'] and x['scope_exactly_20_unmodified_originals']
+          assert x['true_original_sha_parity_verified_count']==20
+          assert x['neural_calls']==x['training_updates']==x['paid_api_calls']==0
+          assert x['GLOBAL_Q3']==x['GLOBAL_Q4']==x['GLOBAL_Q5']=='OPEN'
+          assert x['FULL_Q3_LEARNED_STRUCTURE']=='NOT_DEMONSTRATED'
+          assert x['NO_strongest_direct_portfolio_cost_advantage_claim']
+          assert x['no_neural_full_source_SAFE'] + x['no_neural_full_source_UNSAFE'] + x['no_neural_original_UNKNOWN_or_exception_count']==20
+          assert x['no_neural_full_source_UNSAFE']>=1
+          print('ZERO_NEURAL_REAL_ORIGINAL_SAFETY_DISPOSITIONS',
+                x['no_neural_full_source_SAFE'],
+                x['no_neural_full_source_UNSAFE'],
+                x['no_neural_original_UNKNOWN_or_exception_count'])
+          print('DIRECT_MATCHED_STRONG_PDR',x['matched_direct_original_PDR_independent_3VC_certified_count'])
+          PY
