@@ -38,7 +38,7 @@ def structural_source(original_bytes):
         if term.decl().kind()!=z3.Z3_OP_MUL or term.num_args()!=3:
             raise RuntimeError("REJECT_NOT_EXACT_SYMBOLIC_CUBE")
         a,b,c=term.children()
-        if a!=b or b!=c or not z3.is_const(a) or a.sort().kind()!=z3.Z3_INT_SORT:
+        if not z3.eq(a,b) or not z3.eq(b,c) or not z3.is_const(a) or a.sort().kind()!=z3.Z3_INT_SORT:
             raise RuntimeError("REJECT_NOT_IDENTICAL_INTEGER_SYMBOL_CUBE")
         variables.append(a)
     names=[str(v) for v in variables]
