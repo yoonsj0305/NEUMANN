@@ -33,7 +33,7 @@ jobs:
           python - <<'PY'
           import json
           q=json.load(open('research/evidence/q3_cut1_exact_sat_20261021/POSTHOC_FROZEN_NUMERIC_THEN_EXACT_FULL_SOURCE_GATE.json'))
-          assert q['posthoc_original_source_already_opened'] and q['global_Q3']=='OPEN'
+          assert q['source_already_opened_in_prior_expert_screen'] and q['global_Q3']=='OPEN'
           assert q['original_git_blob_sha']=='0c0cd2fa878deac4791b790a8a13cb2747df5b14'
           print('TRUE_ORIGINAL_CIRCLE1_NOT_LEARNED_UNIQUE_AND_ALREADY_OPEN')
           PY
