@@ -1,0 +1,19 @@
+# Q3V pre-registration | Complete affine equality hull, not learned Q3
+
+2026-10-18 KST. FROZEN BEFORE FIRST Q3V CODE / CI RUN.
+
+## Exact theorem / scope
+For deterministic unguarded affine integer state transition x' = A x + b, with a uniquely fixed initial integer vector x0 and n variables, augment y=(x,1), M=[[A,b],[0,1]], d=n+1 and K=[y0,My0,...,M^(d-1)y0]. Rational left annihilator R = null(K^T) yields **all** rational affine equality invariants true on reachable trajectories, considered as a **joint** invariant R*y=0. M span(K) subset span(K) follows from Cayley-Hamilton, so base R*y0=0 and step R*M*ker(R)=0. Conversely any affine equality true on all reachable states must annihilate K; in particular no additional affine equalities exist. Integer normalize each rational R row for an exact certificate. The independently individually-inductive RESET / CONSERVATION Q3U methods need not be complete as generators of *joint* equalities.
+
+This result is algebraic and classical. It does NOT establish a learned neural operator, guarded/branching transitions, nondeterministic initial sets, general inequalities, full nonlinear loop safety, frontier parity, or 10x cost. Q1-Q7 remain OPEN.
+
+## Fixed falsification / tests before coding
+A. Exact centered rotation synthetic positive: x'=8-y, y'=x+2, init (3,5), goal x>=3. In A=[[0,-1],[1,0]], det(A) !=0 and det(A-I)!=0: the previous RESET/CONSERVATION kernel generators both have no vectors. New joint reachable equality hull must recover x=3 and y=5 and prove goal by exact symbolic constraints. Post x>=3 alone must fail one-step induction. Each of x=3 and y=5 alone must fail original-step induction; the **joint** equality invariant must pass.
+B. Negative control: change only y'=x+3 while retaining x'=8-y, init (3,5), goal x>=3; preserve the ORIGINAL old candidate x=3,y=5 as a frozen certificate, and demand its step proof fail. Do NOT claim the mutated program unsafe without a concrete counterexample/solver proof; no unsound proof admitted.
+C. Randomly generate 320 seeded exact integer affine systems for n=2,3,4,5 (80 each, coefficients [-3,3]); plus 40 separately seeded rational systems. For every case, certify base, M-stability of the entire generator row space, and trajectory membership for 2n+2 terms with exact rational arithmetic, no tolerances. Also require any independently hand-proposed rational equality not in hull to fail at one of first d terms, via exact row span criterion.
+D. Real source case ONLY: previously opened authentic `SaswatPadhi/LoopInvGen` `benchmarks/LIA/2017.ASE_FiB/fib_01.sl` original Git blob `480ddf9d1ddb0c2c3e6d2aabf6af2e38f8f26f09`, upstream SHA `6ac90265b11431c9477dfbd33e3e3380234c0499`. Reparse actual original with two previously implemented source parser paths, 3 formula XOR UNSAT parity; require exact source unguarded explicit affine update and unique original Pre state, no hidden original solution text. Compute joint R from source, prove original Pre=>I, I & Trans=>I', I=>Post, and nonvacuity SAT Pre and SAT NOT Post. Test original Post alone and source-only strong SPACER. Count wall time; the original is development, NOT unseen.
+E. Pure proof audit must NOT rely only on finite randomized tests: check row-space equality and exact M-invariance algebraically. If any source parser, solver or algebra times out, FAIL CLOSED.
+F. No newly opened external original family, no access to two sealed Q3F CHC holdouts, no claimed neural learning, no third-party source redistribution. First CI result immutable, no posthoc benchmark selection or retuning. Draft PR only, with outcome admitted even if FAIL.
+
+## Decision
+PASS a scoped complete equality-hull constructor if theorem certificates and all A-D controls pass. Mark global Q3/Q4/Q7 OPEN and classical SPACER baseline even on PASS. STOP after first result, except correcting implementation failures with first raw outcome retained.

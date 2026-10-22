@@ -1,0 +1,56 @@
+name: Q3V exact Krylov complete affine equality hull and original SyGuS 3VC
+on:
+  pull_request:
+    paths:
+      - 'research/evidence/q3v-krylov-20261018/**'
+      - 'docs/research/Q3V_KRYLOV_AFFINE_HULL_PREREG_20261018.md'
+      - '.github/workflows/q3v-complete-affine-hull.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-hull-and-original-theorem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SaswatPadhi/LoopInvGen
+          ref: 6ac90265b11431c9477dfbd33e3e3380234c0499
+          path: external_loopinvgen
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install exact algebra and independent original SMT runtime
+        run: |
+          python -m pip install --disable-pip-version-check sympy==1.13.3 z3-solver==4.13.3.0
+          python -m py_compile research/evidence/q3v-krylov-20261018/complete_affine_hull.py
+      - name: First preregistered exact completeness and authentic original source proofs
+        run: |
+          python research/evidence/q3v-krylov-20261018/complete_affine_hull.py --root external_loopinvgen --out /tmp/q3v-first-complete-affine-hull.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3v-first-complete-affine-hull.json'))
+          assert r['status']=='FIRST_EXACT_ALGEBRA_AND_ORIGINAL_3VC_PASS'
+          assert r['exact_random_regression']['rational_cases']==40
+          assert sum(r['exact_random_regression']['integer_cases'].values())==320
+          assert r['synthetic_joint_invariant_strict_advantage']['old_reset_nullspace_dim']==0
+          assert r['synthetic_joint_invariant_strict_advantage']['old_conservation_nullspace_dim']==0
+          assert r['synthetic_joint_invariant_strict_advantage']['mutated_old_certificate_rejected'] is True
+          assert all(x=='unsat' for x in r['authentic_original_formal_check']['parser_xor'].values())
+          assert all(x=='unsat' for x in r['authentic_original_formal_check']['source_3vc'].values())
+          assert r['authentic_original_formal_check']['strong_spacer']=='unsat'
+          assert r['trained_neural_forward_calls']==0
+          assert r['new_unseen_original_families_used']==0
+          assert not r['q3f_escrow_chc_targets_opened']
+          assert r['global_q1_q7']=='OPEN'
+          print('Q3V_BOUNDED_CLASSICAL_COMPLETE_AFFINE_EQUALITY_HULL_CERTIFIED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3v-first-complete-exact-affine-hull-and-authentic-source-proof
+          path: /tmp/q3v-first-complete-affine-hull.json
+          retention-days: 90
