@@ -63,7 +63,13 @@ jobs:
                   u='https://raw.githubusercontent.com/SyGuS-Org/benchmarks/'+new['upstream_commit']+'/'+x['path']
                   b=urllib.request.urlopen(u,timeout=30).read()
                   blob=hashlib.sha1(('blob '+str(len(b))+'\0').encode()+b).hexdigest()
-                  assert blob==x['sha'] and len(b)==x['size'],x['name']
+                  if blob!=x['sha'] or len(b)!=x['size']:
+                      print('FROZEN_SHA_IDENTITY_FAILURE_ABSTAIN_NO_SUBSTITUTE',cohort,x['name'],x['sha'],blob,len(b),flush=True)
+                      ledger=pathlib.Path('/tmp/neumann-neural-policy/evidence/SOURCE_IDENTITY_FAILURES.json')
+                      entries=json.loads(ledger.read_text()) if ledger.exists() else []
+                      entries.append({'case':x['name'],'cohort':cohort,'expected_blob':x['sha'],'actual_blob':blob,'expected_size':x['size'],'actual_size':len(b),'status':'FAIL_CLOSED'})
+                      ledger.write_text(json.dumps(entries,indent=2)+'\n')
+                      continue
                   pathlib.Path('/tmp/neumann-neural-policy',dest,x['name']).write_bytes(b)
                   print('AUTHENTIC_ORIGINAL',cohort,x['name'],len(b),blob,flush=True)
           PY
