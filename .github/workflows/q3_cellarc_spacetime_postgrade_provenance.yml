@@ -1,0 +1,51 @@
+name: NEUMANN Q3 independent original19 new-solve true-construction postgrade audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_cellarc_spacetime_postgrade_provenance.yml'
+      - 'research/evidence/q3_cellarc2000_20261023/postgrade_spacetime_construction.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_eighth_and_ninth_meta_only_after_frozen_truth_score:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Download eighth original predictions SHA-frozen in earlier successful independent score
+        uses: actions/download-artifact@v4
+        with:
+          name: eighth1000-latent-spacetime-all-predictions-before-truth
+          repository: yoonsj0305/NEUMANN
+          run-id: 39868780517
+          github-token: ${{ github.token }}
+          path: /tmp/first-real-eighth
+      - name: Download ninth original predictions SHA-frozen in second successful independent score
+        uses: actions/download-artifact@v4
+        with:
+          name: ninth1000-latent-spacetime-all-predictions-before-truth
+          repository: yoonsj0305/NEUMANN
+          run-id: 39869101062
+          github-token: ${{ github.token }}
+          path: /tmp/second-frozen-ninth
+      - name: Independent postgrade source identity, no change or access to frozen inference stage
+        run: |
+          set -euo pipefail
+          python -m py_compile research/evidence/q3_cellarc2000_20261023/postgrade_spacetime_construction.py
+          mkdir -p /tmp/postgrade-only
+          python research/evidence/q3_cellarc2000_20261023/postgrade_spacetime_construction.py \
+            --eighth-sealed /tmp/first-real-eighth/ALL1000_NO_TRUTH.json \
+            --ninth-sealed /tmp/second-frozen-ninth/ALL1000_NO_TRUTH.json \
+            --out /tmp/postgrade-only/ORIGINAL_2000_TRUE_GENERATOR_CLASSES_OF_19_NEW_SOLVES.json \
+            | tee /tmp/postgrade-only/POSTGRADE_TRUE_STRUCTURE_ONLY.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: real-original-cellarc2000-new-nineteen-true-construction-meta-audit
+          path: /tmp/postgrade-only/
+          if-no-files-found: error
