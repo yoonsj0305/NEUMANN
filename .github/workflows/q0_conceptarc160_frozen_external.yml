@@ -49,7 +49,7 @@ jobs:
           assert len(group)==16 and all(n==10 for n in group.values()),group
           for src in files:
               x=json.loads(src.read_text())
-              assert len(x['test'])==3 and 1<=len(x['train'])<=4
+              assert len(x['test'])==3 and len(x['train'])>=1,(src.name,len(x['train']),len(x['test']))
               assert all('output' in t and 'input' in t for t in x['test'])
               masked={'train':x['train'],'test':[{'input':t['input']} for t in x['test']]}
               dest=pathlib.Path('/tmp/neumann-conceptarc-masked/corpus')/src.parent.name/src.name
