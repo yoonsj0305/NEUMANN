@@ -6,6 +6,7 @@ def main():
     a=argparse.ArgumentParser()
     a.add_argument('--masked',required=True);a.add_argument('--meta',required=True);a.add_argument('--out',required=True)
     args=a.parse_args()
+    sys.path.insert(0,str(pathlib.Path('research/evidence/q0_arcagi2_fullfirst_20261022').resolve()))
     sys.path.insert(0,str(pathlib.Path('research/evidence/q0_arcagi2_trainholdout_first_20261022').resolve()))
     sys.path.insert(0,str(pathlib.Path('research/evidence/q0_arc2_typed_intermediate_20261022').resolve()))
     from arc_compositional_grammar import find_programs,choose_program,predict as old_predict
