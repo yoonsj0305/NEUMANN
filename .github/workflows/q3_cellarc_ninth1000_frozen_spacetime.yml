@@ -1,0 +1,137 @@
+name: NEUMANN Q3 locked-model replication original ninth1000
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_cellarc_ninth1000_frozen_spacetime.yml'
+      - 'research/evidence/q3_cellarc2000_20261023/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  PYTHONPATH: research/evidence/q3_cellarc2000_20261022
+jobs:
+  first_source_truth_stripping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Original unchanged fastest baseline SHA + original ninth1000 source only
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD:research/evidence/q3_cellarc2000_20261023/latent_spacetime_reconstruction.py)" = daee5861b510bceac302e17002963b3ef26c6445
+          test "$(git rev-parse HEAD:research/evidence/q3_cellarc2000_20261023/spacetime_source1000.py)" = 0be7b551871d92f173d755e0a7bc62d04cb50644
+          test "$(git rev-parse HEAD:research/evidence/q3_cellarc2000_20261022/debruijn_index_full_key_early.py)" = 2eb638ac6af79bddc5f91afbcaa6adb3b4e069b7
+          python -m py_compile research/evidence/q3_cellarc2000_20261023/*.py
+          mkdir -p /tmp/spacetime-first
+          python - <<'PY'
+          import pathlib,json,itertools,hashlib,urllib.request
+          sha='76040e6aef0edc4982e53c13a85ef227378ed171'
+          url=f'https://huggingface.co/datasets/mireklzicar/cellarc_100k/resolve/{sha}/data/train.jsonl'
+          with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'NEUMANN-original-ninth1000-study'}),timeout=120) as f:
+              raw=b''.join(itertools.islice(f,8000,9000))
+          records=[json.loads(q) for q in raw.splitlines()]
+          assert len(records)==1000 and len(set(q['id'] for q in records))==1000
+          target=pathlib.Path('/tmp/spacetime-first/NO_QUERY_SOLUTIONS.jsonl')
+          with target.open('w') as f:
+              for q in records:
+                  assert len(q['train'])==5 and 'solution' in q and 'query' in q
+                  f.write(json.dumps({'id':q['id'],'train':q['train'],'query':q['query']},sort_keys=True)+'\n')
+          manifest={'source':'mireklzicar/cellarc_100k','revision':sha,'range_start_zero':8000,
+                    'range_stop_zero':9000,'n':1000,'original_raw_sha256':hashlib.sha256(raw).hexdigest(),
+                    'source_only_sha256':hashlib.sha256(target.read_bytes()).hexdigest(),
+                    'trained_neural_model':False}
+          pathlib.Path('/tmp/spacetime-first/MANIFEST.json').write_text(json.dumps(manifest,sort_keys=True)+'\n')
+          print('SOURCE_NINTH1000_MASKED_BEFORE_INFERENCE',len(records),manifest['original_raw_sha256'],flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: source-ninth1000-without-query-truth
+          path: /tmp/spacetime-first/
+          if-no-files-found: error
+  source_only_old_and_latent_spacetime:
+    needs: first_source_truth_stripping
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: source-ninth1000-without-query-truth
+          path: /tmp/spacetime-first
+      - name: Synthetic CA sanity and first 1000 original source-only inference
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'research/evidence/q3_cellarc2000_20261023')
+          sys.path.insert(0,'research/evidence/q3_cellarc2000_20261022')
+          from latent_spacetime_reconstruction import obtain_rules,roll
+          from debruijn_structural_model import debruijn
+          d=debruijn(2,3)
+          rule={tuple(x):sum(x)%2 for x in ((a,b,c) for a in range(2) for b in range(2) for c in range(2))}
+          h=roll(d,rule,1,steps=7)
+          demo=[{'input':list(d),'output':list(h[1])} for _ in range(5)]
+          classes=obtain_rules(demo,2,1)
+          assert any(k=='sum' for k,_ in classes),classes
+          assert any(roll(d,rr,1,steps=7)==h for _,rr in classes),classes
+          print('SYNTHETIC_TRUE_GENERATOR_REPLAY_POSITIVE_CONTROL_PASS')
+          PY
+          mkdir -p /tmp/first-spacetime-pred
+          python research/evidence/q3_cellarc2000_20261023/spacetime_source1000.py --mode infer --masked /tmp/spacetime-first/NO_QUERY_SOLUTIONS.jsonl --out /tmp/first-spacetime-pred/ALL1000_NO_TRUTH.json | tee /tmp/first-spacetime-pred/ONLY_SOURCE_INPUTS.log
+          python - <<'PY'
+          import hashlib,json,pathlib
+          p=pathlib.Path('/tmp/first-spacetime-pred/ALL1000_NO_TRUTH.json')
+          d=json.loads(p.read_text())
+          assert d['n']==len(d['predictions'])==1000 and not d['test_truth_seen'] and not d['hidden_metadata_seen']
+          print('SEALED_SPACETIME_BEFORE_ANY_ORIGINAL_TRUTH',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ninth1000-latent-spacetime-all-predictions-before-truth
+          path: /tmp/first-spacetime-pred/
+          if-no-files-found: error
+  independent_original_query_truth_grade:
+    needs: source_only_old_and_latent_spacetime
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: source-ninth1000-without-query-truth
+          path: /tmp/spacetime-first
+      - uses: actions/download-artifact@v4
+        with:
+          name: ninth1000-latent-spacetime-all-predictions-before-truth
+          path: /tmp/first-spacetime-pred
+      - name: Independently recover 1000 true outputs from exact same source SHA only AFTER predictions
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import pathlib,json,itertools,hashlib,urllib.request
+          m=json.loads(pathlib.Path('/tmp/spacetime-first/MANIFEST.json').read_text())
+          url=f"https://huggingface.co/datasets/mireklzicar/cellarc_100k/resolve/{m['revision']}/data/train.jsonl"
+          with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'NEUMANN-independent-ninth1000-grade'}),timeout=120) as f:
+              raw=b''.join(itertools.islice(f,m['range_start_zero'],m['range_stop_zero']))
+          assert hashlib.sha256(raw).hexdigest()==m['original_raw_sha256']
+          pathlib.Path('/tmp/SPACETIME_INDEPENDENT_TRUE_SOURCE.jsonl').write_bytes(raw)
+          print('ORIGINAL_NINTH1000_TRUTH_HASH_VERIFIED_AFTER_SEALED_PREDICTIONS')
+          PY
+          mkdir -p /tmp/true-spacetime-grade
+          python research/evidence/q3_cellarc2000_20261023/spacetime_source1000.py --mode grade --sealed /tmp/first-spacetime-pred/ALL1000_NO_TRUTH.json --source /tmp/SPACETIME_INDEPENDENT_TRUE_SOURCE.jsonl --out /tmp/true-spacetime-grade/INDEPENDENT_ALL1000_ORIGINAL_SCORE.json | tee /tmp/true-spacetime-grade/INDEPENDENT_REAL_VERDICT.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ninth1000-true-spacetime-original-independent-verdict
+          path: /tmp/true-spacetime-grade/
+          if-no-files-found: error
