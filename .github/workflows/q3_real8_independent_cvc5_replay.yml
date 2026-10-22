@@ -1,0 +1,58 @@
+name: Q3 Real8 independent original second-SMT replay
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_real8_independent_cvc5_replay.yml'
+      - 'research/evidence/q3_real8_second_backend_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  dual_original_proof_and_unary_impossibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile independent replay without opening source files
+        run: python -m py_compile research/evidence/q3_real8_second_backend_20261022/dual_backend_replay.py
+      - name: Install Z3 runtime and checksum-pinned independent cvc5
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          curl -fL --retry 3 --connect-timeout 10 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5-bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5-bin
+          sudo install -m 755 "$(find /tmp/cvc5-bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version
+      - name: Reparse eight SHA-bound genuine original sources and independently test every original 3VC and source witness
+        run: |
+          mkdir -p /tmp/neumann-q3-real8
+          set -o pipefail
+          python research/evidence/q3_real8_second_backend_20261022/dual_backend_replay.py \
+            --backend dual \
+            --out /tmp/neumann-q3-real8/dual_original_independent_receipt.json \
+            | tee /tmp/neumann-q3-real8/run.log
+          sha256sum /tmp/neumann-q3-real8/dual_original_independent_receipt.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/neumann-q3-real8/dual_original_independent_receipt.json'))
+          c=r['counts']
+          assert r['status']=='DUAL_Z3_CVC5_ORIGINAL_FULL_INDUCTION_AND_REPRESENTATION_BARRIER_PASS'
+          assert c['unsat_vc']==24 and c['unary_witnesses']==8 and c['rejected_mutants']==16
+          assert c['z3']>=92 and c['z3']==c['cvc5']
+          assert len(r['cases'])==8
+          print('Q3_REAL8_ORIGINAL_2_INDEPENDENT_BACKENDS_PASS',c)
+          PY
+      - name: Preserve original first verdicts including FAIL or UNKNOWN
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-real8-source-exact-z3-cvc5-independent-double-replay
+          path: /tmp/neumann-q3-real8/
+          if-no-files-found: warn
