@@ -34,7 +34,17 @@ def make_source_query(source:str,timeout_ms:int):
 
 class Z3:
     def __init__(self):
-        z=ctypes.CDLL('libz3.so.4');self.z=z
+        # Pin the backend to the z3-solver wheel if present; the Ubuntu
+        # apt libz3 can be an older version with incompatible fixedpoint parser.
+        try:
+            import z3 as pyz3
+            wheel=pathlib.Path(pyz3.__file__).parent/'lib'/'libz3.so'
+            if not wheel.exists():wheel=pathlib.Path(pyz3.__file__).parent/'lib'/'libz3.so.4'
+            if not wheel.exists():raise RuntimeError('PINNED_WHEEL_LIBZ3_NOT_FOUND')
+            z=ctypes.CDLL(str(wheel))
+        except ImportError:
+            z=ctypes.CDLL('libz3.so.4')
+        self.z=z
         z.Z3_mk_config.restype=ctypes.c_void_p
         z.Z3_mk_context.argtypes=[ctypes.c_void_p];z.Z3_mk_context.restype=ctypes.c_void_p
         z.Z3_eval_smtlib2_string.argtypes=[ctypes.c_void_p,ctypes.c_char_p];z.Z3_eval_smtlib2_string.restype=ctypes.c_char_p
