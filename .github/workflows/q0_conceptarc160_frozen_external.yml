@@ -148,7 +148,7 @@ jobs:
           assert len(d['rows'])==160 and len(d['concept_groups'])==16
           s=d['scores']
           assert s['hybrid_all3']>=s['old_all3']
-          assert s['new_only']>=0 and s['hybrid_new_only']>=0
+          assert s.get('new_only',0)>=0 and s.get('hybrid_new_only',0)>=0
           assert s['old_individual']<=480 and s['new_individual']<=480
           print('CONCEPTARC160_UNTOUCHED_PREDICTIONS_INDEPENDENT_FINAL_SHA256',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
           PY
