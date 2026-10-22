@@ -1,0 +1,87 @@
+name: Q3 first eight posthoc original BMC truth audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_sha8_original_bmc_truth.yml'
+      - 'research/evidence/q4_adaptive_min_work_20261022/generic_original_bmc01.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact_pinned_original_pre_trans_post_one_step_truth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile original source BMC with no case-specific trace
+        run: |
+          set -euo pipefail
+          python -m py_compile research/evidence/q4_adaptive_min_work_20261022/generic_original_bmc01.py
+          mkdir -p /tmp/neumann-bmc8/sources /tmp/neumann-bmc8/evidence
+      - name: Install independent exact SMT backends
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check sympy==1.14.0
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          curl -fL --retry 3 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+      - name: Download exact SHA-locked official eight original source bytes
+        run: |
+          python - <<'PY'
+          import json,pathlib,hashlib,urllib.request
+          p=pathlib.Path('research/evidence/q4_adaptive_min_work_20261022/HELDOUT8_REGISTER_SHA_FIRST.json')
+          d=json.loads(p.read_text());assert len(d['cases'])==8
+          for x in d['cases']:
+              b=urllib.request.urlopen('https://raw.githubusercontent.com/SyGuS-Org/benchmarks/'+d['upstream_commit']+'/'+x['path'],timeout=30).read()
+              blob=hashlib.sha1(('blob '+str(len(b))+'\0').encode()+b).hexdigest()
+              assert blob==x['sha'] and len(b)==x['size'],x['name']
+              pathlib.Path('/tmp/neumann-bmc8/sources',x['name']).write_bytes(b)
+              print('SHA_MATCH',x['name'],blob,flush=True)
+          PY
+      - name: Generic original source BMC depth0+1, Z3 model auto extraction with independent cvc5 grounded crosscheck
+        run: |
+          set -o pipefail
+          python research/evidence/q4_adaptive_min_work_20261022/generic_original_bmc01.py \
+            --source-dir /tmp/neumann-bmc8/sources \
+            --registry research/evidence/q4_adaptive_min_work_20261022/HELDOUT8_REGISTER_SHA_FIRST.json \
+            --engine research/evidence/q3_source_houdini_sha12_20261022/classical_houdini.py \
+            --ast-parser research/evidence/q3_autonomous_arity_witness20261022/source_guarded_affine_autosynth.py \
+            --out /tmp/neumann-bmc8/evidence/ORIGINAL_SHA8_BMC_DEPTH01_Z3_CVC5.json --cvc5 \
+            | tee /tmp/neumann-bmc8/evidence/ORIGINAL_SHA8_BMC_DEPTH01_Z3_CVC5.log
+      - name: Preserve scientific safety classification, never promote bounded UNSAT to safe
+        run: |
+          python - <<'PY'
+          import json,pathlib,hashlib
+          p=pathlib.Path('/tmp/neumann-bmc8/evidence')
+          d=json.loads((p/'ORIGINAL_SHA8_BMC_DEPTH01_Z3_CVC5.json').read_text())
+          assert len(d['cases'])==8
+          actual=[z['file'] for z in d['cases'] if z['status']=='ORIGINAL_CONCRETE_UNSAFE_DUAL_SAT']
+          assert actual==['matrix2_simp.sl'],actual
+          assert d['totals']['genuine_unsafes']==1 and d['totals']['no_short_witness']==7 and d['totals']['abstain']==0
+          x=next(x for x in d['cases'] if x['file']=='matrix2_simp.sl')
+          assert x['witness_depth']==1
+          assert x['depth1']['grounded_z3']==x['depth1']['grounded_cvc5']=='sat'
+          verdict={'scope':'POSTHOC_FIRST_SHA8_ORIGINAL_TRUTH_COMBINATION','source_authentic_count':8,
+            'safe_original_full_dual_vcs_from_earlier_SHA8_first_action':7,
+            'original_unsafe_one_step_dual_SAT_now':1,'source_without_truth':0,
+            'unsafe_filename':'matrix2_simp.sl','real_original_witness':x['depth1']['values'],
+            'never_infer_safe_from_bounded_unsat':True,
+            'zero_neural_training_and_zero_exclusive_abilities':True,'new_hypothesis':'Source program can be inherently UNSAFE rather than algorithm unable to solve safe obligation.',
+            'source_bmc_receipt_sha256':hashlib.sha256((p/'ORIGINAL_SHA8_BMC_DEPTH01_Z3_CVC5.json').read_bytes()).hexdigest()}
+          (p/'POSTHOC_SHA8_SAFE7_UNSAFE1_VERDICT.json').write_text(json.dumps(verdict,indent=2,sort_keys=True)+'\n')
+          print('SHA8_TRUTH_EXACT_7_SAFE_1_UNSAFE',json.dumps(verdict),flush=True)
+          PY
+      - name: Archive original model and both grounded independent solver statuses
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-registered-original8-source-truth-safe7-unsafe1
+          path: /tmp/neumann-bmc8/evidence/
+          if-no-files-found: warn
