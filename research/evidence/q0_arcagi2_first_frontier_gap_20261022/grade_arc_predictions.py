@@ -46,4 +46,3 @@ def main():
  out=pathlib.Path(args.out);out.write_text(json.dumps(file,indent=2,sort_keys=True)+'\n')
  print(json.dumps({'status':'OFFICIAL_FROZEN_Q0_BENCHMARK_COMPLETE','solved':{k:v['solved'] for k,v in metrics.items()},'oracle_ceiling':len(ceiling),'n_eval':120,'train_wall_s':d['train_wall_total_s']},sort_keys=True),flush=True)
 if __name__=='__main__':main()
-if __name__=='__main__':main()
