@@ -6,7 +6,7 @@ All 3 methods enumerate same typed AST; caching memoizes pure source-local seman
 import argparse,hashlib,json,pathlib,statistics,sys,time,collections
 from contextlib import redirect_stdout
 sys.path.insert(0,str(pathlib.Path(__file__).resolve().parent))
-import proposal_source as v2
+import relational_pipeline_selector_memo_v2 as v2
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--source',required=True);parser.add_argument('--out',required=True);parser.add_argument('--pairs',type=int,default=5)
