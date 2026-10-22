@@ -86,6 +86,7 @@ jobs:
       - name: Exhaust ALL eligible source-conditioned candidates of EXACT frozen published DSL only AFTER first grade
         run: |
           set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check numpy==1.26.4
           DSL=research/evidence/q0_arc1_ood400_transfer_20261022
           AUDIT=research/evidence/q0_arc1_arc2_leakage_20261022
           echo "3ee062d8764b5c0a2da243fc6fecadec716739a5dd1ced8736e43c7a64185a77  $DSL/structural_object_language.py" | sha256sum -c -
