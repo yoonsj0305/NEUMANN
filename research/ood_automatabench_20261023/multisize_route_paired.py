@@ -48,7 +48,18 @@ def infer(source_syn,source_official):
             print("ORIGINAL_OBSERVABILITY_PAIRED_CPU",name,trial,
                   json.dumps({m:loops[m][-1] for m in METHODS},sort_keys=True),flush=True)
         for uid,pair in rows[name].items():
-            assert pair["strong_sat"]["prediction"]==pair["structural_router"]["prediction"],uid
+            old=pair["strong_sat"]["prediction"]
+            new=pair["structural_router"]["prediction"]
+            if old is not None and new is not None:
+                assert old==new,(uid,"TWO_CERTIFIED_DIFFERENT_INITIAL_STATES")
+            if old is None and new is not None:
+                counts["router_only_certified"]+=1
+                print("ROUTER_CERTIFIED_WHILE_STRONG_SAT_ABSTAINS",
+                      uid,pair["strong_sat"]["status"],pair["structural_router"]["status"],flush=True)
+            if old is not None and new is None:
+                counts["sat_only_certified"]+=1
+                print("SAT_CERTIFIED_WHILE_ROUTER_ABSTAINS",
+                      uid,pair["strong_sat"]["status"],pair["structural_router"]["status"],flush=True)
             counts["tasks"]+=1
             counts["solved"]+=int(pair["strong_sat"]["prediction"] is not None)
             counts["unsolved"]+=int(pair["strong_sat"]["prediction"] is None)
