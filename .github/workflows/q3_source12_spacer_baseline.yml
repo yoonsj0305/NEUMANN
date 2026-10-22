@@ -1,0 +1,57 @@
+name: Q3 strong source-only SPACER retrospective comparator
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_source12_spacer_baseline.yml'
+      - 'research/evidence/q3_source_houdini_sha12_20261022/posthoc_source_only_spacer_baseline.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  same_originals_same_cpu_source_only_spacer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Runtime and source-agnostic frozen baseline code
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          python -m py_compile research/evidence/q3_source_houdini_sha12_20261022/posthoc_source_only_spacer_baseline.py
+      - name: Load previously opened 12 originals with exact frozen SHA
+        run: |
+          mkdir -p /tmp/neumann-posthoc-spacer/source /tmp/neumann-posthoc-spacer/result
+          python - <<'PY'
+          import json,hashlib,pathlib,urllib.request
+          d=json.load(open('research/evidence/q3_source_houdini_sha12_20261022/FROZEN_BEFORE_SOURCE12.json'))
+          assert len(d['cases'])==12
+          for x in d['cases']:
+              uri='https://raw.githubusercontent.com/SyGuS-Org/benchmarks/'+d['upstream_commit']+'/'+x['path']
+              b=urllib.request.urlopen(uri,timeout=30).read()
+              sha=hashlib.sha1(('blob '+str(len(b))+'\0').encode()+b).hexdigest()
+              assert sha==x['sha'] and len(b)==x['size'],x['name']
+              pathlib.Path('/tmp/neumann-posthoc-spacer/source',x['name']).write_bytes(b)
+              print('MATCHED',x['name'],sha,flush=True)
+          PY
+      - name: Run strong original HORN solver on entire immutable 12 denominator
+        run: |
+          set -o pipefail
+          python research/evidence/q3_source_houdini_sha12_20261022/posthoc_source_only_spacer_baseline.py \
+            --manifest research/evidence/q3_source_houdini_sha12_20261022/FROZEN_BEFORE_SOURCE12.json \
+            --input /tmp/neumann-posthoc-spacer/source \
+            --timeout-ms 5000 \
+            --out /tmp/neumann-posthoc-spacer/result/SOURCE_ONLY_Z3_SPACER_12.json \
+          | tee /tmp/neumann-posthoc-spacer/result/spacer_first_comparator.log
+          sha256sum /tmp/neumann-posthoc-spacer/result/SOURCE_ONLY_Z3_SPACER_12.json
+      - name: Archive real SPACER statuses including all unknowns
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-exact-source12-posthoc-strong-spacer-control
+          path: /tmp/neumann-posthoc-spacer/result/
+          if-no-files-found: warn
