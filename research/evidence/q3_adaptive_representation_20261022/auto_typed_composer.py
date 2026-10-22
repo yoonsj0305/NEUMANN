@@ -8,6 +8,7 @@ Strong historical source-exact baseline is always prioritized.
 """
 import argparse,collections,hashlib,json,pathlib,sys,time
 import numpy as np
+sys.path.insert(0,str(pathlib.Path(__file__).resolve().parents[1]/'q3_object_synthesis_transfer_20261022'))
 from frozen_original_typed_selector_v2 import select,asarr,mapped,uniform_color_map,d4
 from object_relational_proposer import solve,operation
 
