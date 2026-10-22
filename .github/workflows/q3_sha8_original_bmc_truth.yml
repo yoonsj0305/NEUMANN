@@ -66,14 +66,14 @@ jobs:
           assert actual==['matrix2_simp.sl'],actual
           assert d['totals']['genuine_unsafes']==1 and d['totals']['no_short_witness']==7 and d['totals']['abstain']==0
           x=next(x for x in d['cases'] if x['file']=='matrix2_simp.sl')
-          assert x['witness_depth']==1
-          assert x['depth1']['grounded_z3']==x['depth1']['grounded_cvc5']=='sat'
+          assert x['witness_depth']==0
+          assert x['depth0']['grounded_z3']==x['depth0']['grounded_cvc5']=='sat'
           verdict={'scope':'POSTHOC_FIRST_SHA8_ORIGINAL_TRUTH_COMBINATION','source_authentic_count':8,
             'safe_original_full_dual_vcs_from_earlier_SHA8_first_action':7,
-            'original_unsafe_one_step_dual_SAT_now':1,'source_without_truth':0,
+            'original_unsafe_initial_state_dual_SAT_now':1,'source_without_truth':0,
             'unsafe_filename':'matrix2_simp.sl','real_original_witness':x['depth1']['values'],
             'never_infer_safe_from_bounded_unsat':True,
-            'zero_neural_training_and_zero_exclusive_abilities':True,'new_hypothesis':'Source program can be inherently UNSAFE rather than algorithm unable to solve safe obligation.',
+            'zero_neural_training_and_zero_exclusive_abilities':True,'new_hypothesis':'Source original Pre permits immediate Post violation; no sound SAFE invariant can exist regardless of search.',
             'source_bmc_receipt_sha256':hashlib.sha256((p/'ORIGINAL_SHA8_BMC_DEPTH01_Z3_CVC5.json').read_bytes()).hexdigest()}
           (p/'POSTHOC_SHA8_SAFE7_UNSAFE1_VERDICT.json').write_text(json.dumps(verdict,indent=2,sort_keys=True)+'\n')
           print('SHA8_TRUTH_EXACT_7_SAFE_1_UNSAFE',json.dumps(verdict),flush=True)
