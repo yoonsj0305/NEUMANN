@@ -1,0 +1,34 @@
+{
+  "schema": "NEUMANN_Q0_FIRST_FRONTIER_GAP_ARC_AGI_2.v1",
+  "frozen_before_ARC_source_body_read": true,
+  "source_repository": "arcprize/ARC-AGI-2",
+  "repository_commit": "f3283f727488ad98fe575ea6a5ac981e4a188e49",
+  "filename_manifest_sha256": "3014a6bf8feabbf650a27fd8b77eee7badbdeec6b63035d001ba0cad7cd884dd",
+  "training_count": 1000,
+  "evaluation_count": 120,
+  "eval_policy": "Single immutable first public evaluation run, no retuning; all tasks in denominator; first public eval answers never used in selector fitting",
+  "freeze_controls": {
+    "dsl_primitive_count": 96,
+    "classical_MDL": "First exact demonstration-fitting program in canonical 96-program order",
+    "classical_frequency": "Training-only Laplace-smoothed prior over same 96 programs",
+    "actual_neural_model": "PyTorch train-only 37 -> 48 -> 1 two-linear-layer ReLU, 65 epochs AdamW",
+    "hybrid": "Exact demonstration support check, bypass neural when only one valid candidate, otherwise trained selection",
+    "oracle": "Non-deployable representation upper bound: any of same finite 96 operators that matches all demonstrations AND hidden test answers, evaluated only after all predictions are archived",
+    "no_model_or_operator_invention_credit": true
+  },
+  "critical_execution_order": [
+    "Freeze complete source metadata and code in GitHub before fetching benchmark grid bodies",
+    "Checkout exactly SHA-pinned ARC-AGI-2 repository and authenticate complete 1120 names",
+    "Use 1000 training records only for training selector and empirical exact-prior control",
+    "Construct separate 120 input-only evaluation JSON files, leaving evaluation output labels unavailable to inference",
+    "Save and SHA256-hash predictions BEFORE grading begins in a separate Python process",
+    "Independent scorer reveals labels and computes strict grid-exact all-tests-correct, no invalid candidates counted",
+    "Preserve raw full result including zero solutions, training and inference elapsed time, and upper DSL oracle ceiling"
+  ],
+  "precommitted_scientific_admission": {
+    "frontier_parity": "Cannot be admitted without matched real frontier benchmark baseline and competitive test accuracy, neither guaranteed here",
+    "learned_unique_operator": "Not admissible: fixed hand-supplied 96-program grammar",
+    "total_compute_10x": "Not admissible: neural training cost must be charged and matched end-to-end baseline run",
+    "negative_results": "Publish all 120 results without selecting only easy tasks"
+  }
+}
