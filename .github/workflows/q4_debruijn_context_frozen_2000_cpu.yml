@@ -1,0 +1,125 @@
+name: NEUMANN Q4 same-source CPU useful solves original 2000 frozen code
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q4_debruijn_context_frozen_2000_cpu.yml'
+      - 'research/evidence/q3_cellarc2000_20261022/paired_frozen_2000_source_cpu.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pin_and_mask_original_source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Freeze old/new exact actual Git blob source model identities and original 2000 raw subset hashes
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD:research/evidence/q3_cellarc2000_20261022/debruijn_structural_model.py)" = fb12bc217178f7f3e89f0865987078e5dc367074
+          test "$(git rev-parse HEAD:research/evidence/q3_cellarc2000_20261022/debruijn_full_context.py)" = 47a03c3b6e679453215f674b4790f2ad82d1c0cb
+          python -m py_compile research/evidence/q3_cellarc2000_20261022/paired_frozen_2000_source_cpu.py
+          mkdir -p /tmp/source-only
+          python - <<'PY'
+          import urllib.request,itertools,pathlib,hashlib,json
+          sha='76040e6aef0edc4982e53c13a85ef227378ed171'
+          url=f'https://huggingface.co/datasets/mireklzicar/cellarc_100k/resolve/{sha}/data/train.jsonl'
+          with urllib.request.urlopen(url,timeout=120) as stream:
+              rows=list(itertools.islice(stream,3000,5000))
+          assert len(rows)==2000
+          expected=('beb24d46f2740dd46d24f75b634307cfa58225de5574e9ca32dafd200b4a2495',
+                    'e48f7eac77018c230e10a521e41cefabfaca73adad6aba3a8ef6020ff6a9bc28')
+          for i in (0,1):
+              assert hashlib.sha256(b''.join(rows[i*1000:(i+1)*1000])).hexdigest()==expected[i]
+          ids=set()
+          with pathlib.Path('/tmp/source-only/all2000.jsonl').open('w') as f:
+              for row in rows:
+                  d=json.loads(row);uid=d['id'];assert uid not in ids;ids.add(uid)
+                  f.write(json.dumps({'id':uid,'train':d['train'],'query':d['query']},sort_keys=True)+'\n')
+          pathlib.Path('/tmp/source-only/original-source-identity.json').write_text(json.dumps({'sha':sha,'raw_subset_sha256':list(expected),'n':2000}))
+          print('PAIRED_ORIGINAL_2000_SOURCE_NO_TEST_ANSWERS',len(ids),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q4-original2000-physically-masked-previous-frozen-source
+          path: /tmp/source-only/
+          if-no-files-found: error
+  five_runs_cpu_pair_before_true_labels:
+    needs: pin_and_mask_original_source
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q4-original2000-physically-masked-previous-frozen-source
+          path: /tmp/source-only
+      - name: Paired same hardware CPU and wall timers for actually frozen source-only methods, five alternating passes
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/frozen-q4-cpu
+          python research/evidence/q3_cellarc2000_20261022/paired_frozen_2000_source_cpu.py --mode benchmark --masked /tmp/source-only/all2000.jsonl --out /tmp/frozen-q4-cpu/ALL2000_CPU_AND_PREDICTIONS_BEFORE_TRUTH.json | tee /tmp/frozen-q4-cpu/RAW_FIVE_RUN_CPU_MEASUREMENTS.log
+          python - <<'PY'
+          import pathlib,json,hashlib
+          p=pathlib.Path('/tmp/frozen-q4-cpu/ALL2000_CPU_AND_PREDICTIONS_BEFORE_TRUTH.json')
+          d=json.loads(p.read_text())
+          assert d['n']==2000 and not d['source_target_labels_seen']
+          for name in ('old','aligned'):
+              assert len(d['runtime'][name]['cpu_s_five'])==5
+              assert len(d['raw_predictions'][name]['predictions'])==2000
+          print('FROZEN_PAIRED_SOURCE_CPU_RECEIPT_SHA256',hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q4-original2000-paired-source-cpu-five-trials-before-grading
+          path: /tmp/frozen-q4-cpu/
+          if-no-files-found: error
+  independent_original_truth_check_cpu_per_exact_solve:
+    needs: five_runs_cpu_pair_before_true_labels
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q4-original2000-physically-masked-previous-frozen-source
+          path: /tmp/source-only
+      - uses: actions/download-artifact@v4
+        with:
+          name: q4-original2000-paired-source-cpu-five-trials-before-grading
+          path: /tmp/frozen-q4-cpu
+      - name: Restore identical authentic originals only now, after five-run sealed model receipts
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import pathlib,hashlib,itertools,json,urllib.request
+          o=pathlib.Path('/tmp/source-only/original-source-identity.json')
+          ident=json.loads(o.read_text())
+          url=f"https://huggingface.co/datasets/mireklzicar/cellarc_100k/resolve/{ident['sha']}/data/train.jsonl"
+          with urllib.request.urlopen(url,timeout=120) as stream:
+              rows=list(itertools.islice(stream,3000,5000))
+          assert len(rows)==2000
+          for i,name in enumerate(('fourth','fifth')):
+              raw=b''.join(rows[i*1000:(i+1)*1000])
+              assert hashlib.sha256(raw).hexdigest()==ident['raw_subset_sha256'][i]
+              pathlib.Path('/tmp/source-only/'+name+'.jsonl').write_bytes(raw)
+          print('ORIGINAL_2000_INDEPENDENT_GRADER_FILE_IDENTITY_MATCH')
+          PY
+          mkdir -p /tmp/q4-independent
+          python research/evidence/q3_cellarc2000_20261022/paired_frozen_2000_source_cpu.py --mode grade --sealed /tmp/frozen-q4-cpu/ALL2000_CPU_AND_PREDICTIONS_BEFORE_TRUTH.json --original-fourth /tmp/source-only/fourth.jsonl --original-fifth /tmp/source-only/fifth.jsonl --out /tmp/q4-independent/ORIGINAL2000_SOURCE_WORK_PER_EXACT_SOLVE.json | tee /tmp/q4-independent/ACTUAL_Q4_COST_VERDICT.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q4-original2000-independent-same-CPU-useful-exact-verdict
+          path: /tmp/q4-independent/
+          if-no-files-found: error
