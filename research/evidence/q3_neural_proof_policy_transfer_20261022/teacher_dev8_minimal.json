@@ -1,0 +1,155 @@
+{
+  "cases": [
+    {
+      "attempts": 2,
+      "final_conjunct_count": 1,
+      "minimized_invariant": "(and (post-f x y z))",
+      "minimized_invariant_chars": 20,
+      "original_3vc": [
+        "unsat",
+        "unsat",
+        "unsat"
+      ],
+      "original_invariant_chars": 20,
+      "original_name": "array.sl",
+      "original_sha256": "0368f3be705ce605519414ab02e1c6ff2d8a04f2caba17e93bb668199569f460",
+      "prior_certified": true,
+      "prior_conjunct_count": 1,
+      "status": "EXACT_3VC_MINIMIZED",
+      "wall_s": 0.03
+    },
+    {
+      "attempts": 131,
+      "final_conjunct_count": 2,
+      "minimized_invariant": "(and (<= (+ n (- j) (- k)) (- 1)) (post-f n j k))",
+      "minimized_invariant_chars": 49,
+      "original_3vc": [
+        "unsat",
+        "unsat",
+        "unsat"
+      ],
+      "original_invariant_chars": 753,
+      "original_name": "fib_15.sl",
+      "original_sha256": "9b56be5d8fe8f7b86c0d82ba36eff8513b4c4961d8e8ac6ec3ff6c83f4e160ca",
+      "prior_certified": true,
+      "prior_conjunct_count": 43,
+      "status": "EXACT_3VC_MINIMIZED",
+      "wall_s": 1.054
+    },
+    {
+      "attempts": 149,
+      "final_conjunct_count": 2,
+      "minimized_invariant": "(and (<= (+ j (- n)) 0) (=> (= flag 1) (= b j)))",
+      "minimized_invariant_chars": 48,
+      "original_3vc": [
+        "unsat",
+        "unsat",
+        "unsat"
+      ],
+      "original_invariant_chars": 918,
+      "original_name": "fib_18.sl",
+      "original_sha256": "c03d7532e59a34e559290ed8cabb000b2ae65b46624dbee72c5a7378fd2d4f0b",
+      "prior_certified": true,
+      "prior_conjunct_count": 49,
+      "status": "EXACT_3VC_MINIMIZED",
+      "wall_s": 1.253
+    },
+    {
+      "attempts": 260,
+      "final_conjunct_count": 1,
+      "minimized_invariant": "(and (>= (+ k (- i) j) (- 1)))",
+      "minimized_invariant_chars": 30,
+      "original_3vc": [
+        "unsat",
+        "unsat",
+        "unsat"
+      ],
+      "original_invariant_chars": 1704,
+      "original_name": "fib_41.sl",
+      "original_sha256": "45f195656050572adf5e24284135ff680c7fe11dc15a29b878b8d7b8decf9bff",
+      "prior_certified": true,
+      "prior_conjunct_count": 86,
+      "status": "EXACT_3VC_MINIMIZED",
+      "wall_s": 2.451
+    },
+    {
+      "attempts": 2,
+      "final_conjunct_count": 1,
+      "minimized_invariant": "(and (post-f x1 x2 x3))",
+      "minimized_invariant_chars": 23,
+      "original_3vc": [
+        "unsat",
+        "unsat",
+        "unsat"
+      ],
+      "original_invariant_chars": 23,
+      "original_name": "formula22.sl",
+      "original_sha256": "68473698eb99da80a64cb986943d2d05dd1316320919e7caa170c4a11450389e",
+      "prior_certified": true,
+      "prior_conjunct_count": 1,
+      "status": "EXACT_3VC_MINIMIZED",
+      "wall_s": 0.014
+    },
+    {
+      "attempts": 134,
+      "final_conjunct_count": 2,
+      "minimized_invariant": "(and (<= (+ y (- n)) 0) (= (+ x y (- n)) 0))",
+      "minimized_invariant_chars": 44,
+      "original_3vc": [
+        "unsat",
+        "unsat",
+        "unsat"
+      ],
+      "original_invariant_chars": 822,
+      "original_name": "hola_countud.sl",
+      "original_sha256": "d41941824ae968040d271096c9c0f672ed367a1d3e3d53863a4165cb550b895f",
+      "prior_certified": true,
+      "prior_conjunct_count": 44,
+      "status": "EXACT_3VC_MINIMIZED",
+      "wall_s": 1.03
+    },
+    {
+      "attempts": 56,
+      "final_conjunct_count": 1,
+      "minimized_invariant": "(and (= (+ i (- j) (- x) y) 0))",
+      "minimized_invariant_chars": 31,
+      "original_3vc": [
+        "unsat",
+        "unsat",
+        "unsat"
+      ],
+      "original_invariant_chars": 458,
+      "original_name": "jmbl_tacas.sl",
+      "original_sha256": "5411771390158bfe371390b672e17c56683eb5a8888605b1f2024c6da2786380",
+      "prior_certified": true,
+      "prior_conjunct_count": 18,
+      "status": "EXACT_3VC_MINIMIZED",
+      "wall_s": 0.403
+    },
+    {
+      "attempts": 59,
+      "final_conjunct_count": 2,
+      "minimized_invariant": "(and (= (+ i (- sn)) 1) (post-f i n sn))",
+      "minimized_invariant_chars": 40,
+      "original_3vc": [
+        "unsat",
+        "unsat",
+        "unsat"
+      ],
+      "original_invariant_chars": 322,
+      "original_name": "sum1.sl",
+      "original_sha256": "a498dce42783324edcbe314b9bc6662ecbaf18f84f22c7a42426b9a8cb864cf8",
+      "prior_certified": true,
+      "prior_conjunct_count": 19,
+      "status": "EXACT_3VC_MINIMIZED",
+      "wall_s": 0.413
+    }
+  ],
+  "certified": 8,
+  "global_Q4": "OPEN",
+  "schema": "neumann.q3.classical_posthoc_cert_compaction.first_v1",
+  "scope": "Previously opened dev8 or already frozen SHA12; no learning, independent cvc5 replay required",
+  "sum_minimal_conjuncts": 12,
+  "sum_original_conjuncts": 261,
+  "total_wall_s": 6.648
+}

@@ -1,0 +1,125 @@
+name: Q3 actual trained out-of-grammar coefficient on authentic original
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_real_original_large_learned_coefficient_dual.yml'
+      - 'research/evidence/q3_neural_proof_policy_transfer_20261022/learned_large_coefficient.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_native_neural_large_coefficient_independent_double_original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile scoped POSTHOC source-only learned grammar escape
+        run: |
+          python -m py_compile research/evidence/q3_neural_proof_policy_transfer_20261022/learned_large_coefficient.py
+          python - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('research/evidence/q3_neural_proof_policy_transfer_20261022/HOLDOUT12_SHA_BEFORE_BODY.json')
+          d=json.loads(p.read_text());assert len(d['cases'])==12
+          print('POSTHOC_ALREADY_OPENED_SAME_SOURCE12_NOT_NEW_FIRSTBLIND',flush=True)
+          PY
+      - name: Install actual PyTorch CPU gradient and two independent exact SMT backends
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+          python -m pip install --quiet --disable-pip-version-check torch==2.5.1+cpu --index-url https://download.pytorch.org/whl/cpu
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          curl -fL --retry 3 --connect-timeout 10 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin /tmp/neumann-large-learned/sources /tmp/neumann-large-learned/evidence
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+      - name: Reauthenticate same original 12 programs, preserve old one SHA mismatch as fail-closed
+        run: |
+          python - <<'PY'
+          import json,hashlib,pathlib,urllib.request
+          m=json.load(open('research/evidence/q3_neural_proof_policy_transfer_20261022/HOLDOUT12_SHA_BEFORE_BODY.json'))
+          fails=[]
+          for x in m['cases']:
+              b=urllib.request.urlopen('https://raw.githubusercontent.com/SyGuS-Org/benchmarks/'+m['upstream_commit']+'/'+x['path'],timeout=30).read()
+              h=hashlib.sha1(('blob '+str(len(b))+'\0').encode()+b).hexdigest()
+              if h!=x['sha'] or len(b)!=x['size']:
+                  fails.append({'name':x['name'],'status':'IDENTITY_ABSTAIN','expected':x['sha'],'actual':h})
+                  print('FROZEN_SOURCE_ABSTAIN',x['name'],flush=True)
+                  continue
+              pathlib.Path('/tmp/neumann-large-learned/sources',x['name']).write_bytes(b)
+              print('ORIGINAL_SHA_OK',x['name'],h,flush=True)
+          pathlib.Path('/tmp/neumann-large-learned/evidence/SOURCE_SHA_FAILURES.json').write_text(json.dumps(fails,indent=2)+'\n')
+          PY
+      - name: Actual four-seed source-conservation PyTorch gradient with 64-denominator readout and classical controls
+        run: |
+          set -o pipefail
+          python research/evidence/q3_neural_proof_policy_transfer_20261022/learned_large_coefficient.py \
+            --engine research/evidence/q3_source_houdini_sha12_20261022/classical_houdini.py \
+            --manifest research/evidence/q3_neural_proof_policy_transfer_20261022/HOLDOUT12_SHA_BEFORE_BODY.json \
+            --source-dir /tmp/neumann-large-learned/sources \
+            --out /tmp/neumann-large-learned/evidence/POSTHOC_TRAINED_COEFF_AND_EXACT_ALL12.json \
+            | tee /tmp/neumann-large-learned/evidence/POSTHOC_TRAINED_COEFF_AND_EXACT_ALL12.log
+      - name: Build independent original source dual verifier arms, never auto-credit classical repair to neural
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('/tmp/neumann-large-learned/evidence')
+          d=json.load(open(p/'POSTHOC_TRAINED_COEFF_AND_EXACT_ALL12.json'))
+          assert len(d['cases'])==12
+          for arm in ('trained0','trained1','trained2','trained3','no_gradient0','exact','source_only'):
+              rows=[]
+              for x in d['cases']:
+                  z=None
+                  if arm.startswith('trained'): 
+                      index=int(arm[-1]);a=x['trained'];z=(a[index].get('with_classical_support') if len(a)>index else None)
+                      if not z or not z.get('eq_retained'):z=None
+                  elif arm=='no_gradient0':
+                      z=(x['no_gradient'][0].get('with_classical_support') if x['no_gradient'] else None)
+                      if not z or not z.get('eq_retained'):z=None
+                  elif arm=='exact':
+                      z=next((a.get('with_classical_support') for a in x['exact'] if a.get('with_classical_support',{}).get('safe_certified') and a['with_classical_support'].get('eq_retained')),None)
+                  elif arm=='source_only':z=x.get('source_literal_support_only')
+                  rows.append({'file':x['file'],'safe_certified':bool(z and z.get('safe_certified')),'invariant':z.get('invariant') if z else None,'source_algorithm':'NEUMANN_POSTHOC_ORIGINAL_'+arm})
+              (p/('INDEPENDENT_INPUT_'+arm+'.json')).write_text(json.dumps({'cases':rows},indent=2)+'\n')
+          PY
+      - name: Independent full native source Z3 and cvc5 3VC plus negative mutation for every admitted trained/classic witness
+        run: |
+          set -o pipefail
+          C=research/evidence/q3_source_houdini_sha12_20261022/independent_original_checker.py
+          M=research/evidence/q3_neural_proof_policy_transfer_20261022/HOLDOUT12_SHA_BEFORE_BODY.json
+          for arm in trained0 trained1 trained2 trained3 no_gradient0 exact source_only; do
+            python "$C" --receipt "/tmp/neumann-large-learned/evidence/INDEPENDENT_INPUT_${arm}.json" \
+              --input /tmp/neumann-large-learned/sources --manifest "$M" --backend dual \
+              --out "/tmp/neumann-large-learned/evidence/INDEPENDENT_RESULT_${arm}.json" \
+              | tee "/tmp/neumann-large-learned/evidence/INDEPENDENT_RESULT_${arm}.log"
+          done
+          python - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('/tmp/neumann-large-learned/evidence')
+          d=json.load(open(p/'POSTHOC_TRAINED_COEFF_AND_EXACT_ALL12.json'))
+          ledger={'original_denominator':12,'source_sha_failure':sum(x['status']=='ABSTAIN' for x in d['cases']),'cases':[],'arm_scores':{}}
+          for arm in ('trained0','trained1','trained2','trained3','no_gradient0','exact','source_only'):
+              a=json.load(open(p/('INDEPENDENT_INPUT_'+arm+'.json')))['cases']
+              b=json.load(open(p/('INDEPENDENT_RESULT_'+arm+'.json')))
+              claimed=sum(x['safe_certified'] for x in a);verified=b['totals']['dual_safe_certified']
+              assert claimed==verified,(arm,claimed,verified)
+              ledger['arm_scores'][arm]={'dual_proven':verified,'source_replayed_candidates':claimed}
+          for x in d['cases']:
+              y={'case':x['file'],'state':x['status'],'trained_coeff':[v['coeff'] for v in x['trained']],'trained_eq_proof':[v.get('with_classical_support',{}).get('safe_certified',False) and v.get('with_classical_support',{}).get('eq_retained',False) for v in x['trained']], 'exact_eq_proof':[v.get('with_classical_support',{}).get('safe_certified',False) and v.get('with_classical_support',{}).get('eq_retained',False) for v in x['exact']], 'source_only_proof':x.get('source_literal_support_only',{}).get('safe_certified',False)}
+              ledger['cases'].append(y)
+          (p/'SCOPED_LEARNED_NEW_COEFF_ADMISSION.json').write_text(json.dumps(ledger,indent=2,sort_keys=True)+'\n')
+          print('Q3_TRUE_ORIGINAL_LEARNED_COEFF_DUAL_GATES',json.dumps(ledger['arm_scores']),flush=True)
+          PY
+      - name: Preserve every true model and original solver first result even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-real-original-large-neural-coefficient-dual-certified-posthoc-and-exact
+          path: /tmp/neumann-large-learned/evidence/
+          if-no-files-found: warn
