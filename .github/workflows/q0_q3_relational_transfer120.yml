@@ -69,6 +69,8 @@ jobs:
         with:
           name: neumann-new-relational-learned-120-preground
           path: /tmp/preground
+      - name: Install source module dependencies for independent grading
+        run: python -m pip install --quiet numpy==2.3.5 scikit-learn==1.8.0
       - name: Original official labels accessed ONLY after pregrade prediction artifact frozen
         run: |
           git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arc2-independent-grade
