@@ -1,0 +1,68 @@
+name: Q3 authentic source finite grammar hard wall 425 dual original SMT obligations
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_ex23_frozen_grammar_dual_impossibility.yml'
+      - 'research/evidence/q3_neural_proof_policy_transfer_20261022/ex23_finite_grammar_barrier.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  dual_solver_source_native_every_houdini_step:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile proof transcript builder and install independent original SMT solvers
+        run: |
+          set -euo pipefail
+          python -m py_compile research/evidence/q3_neural_proof_policy_transfer_20261022/ex23_finite_grammar_barrier.py
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          curl -fL --retry 3 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          unzip -q /tmp/cvc5.zip -d /tmp
+          sudo install -m 755 "$(find /tmp -maxdepth 4 -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          mkdir -p /tmp/ex23-grammar
+      - name: Authenticate unchanged genuine original source ex23 before universal finite-pool proof
+        run: |
+          python - <<'PY'
+          import pathlib,hashlib,urllib.request
+          b=urllib.request.urlopen('https://raw.githubusercontent.com/SyGuS-Org/benchmarks/13c8deb68a873635879c9a69bc78caebd340f646/comp/2017/Inv_Track/ex23.sl',timeout=30).read()
+          git=hashlib.sha1(('blob '+str(len(b))+'\0').encode()+b).hexdigest()
+          assert len(b)==559 and git=='ada3eae4e8e9f4368c2a3ca0d2ecb900624dc7f9'
+          pathlib.Path('/tmp/ex23-grammar/ORIGINAL.ex23.sl').write_bytes(b)
+          PY
+      - name: Exhaust ALL 224 source-only frozen grammar atoms via 425 original Z3 and cvc5 SAT UNSAT proofs
+        run: |
+          set -o pipefail
+          python research/evidence/q3_neural_proof_policy_transfer_20261022/ex23_finite_grammar_barrier.py \
+            --original /tmp/ex23-grammar/ORIGINAL.ex23.sl \
+            --engine research/evidence/q3_source_houdini_sha12_20261022/classical_houdini.py \
+            --dual --out /tmp/ex23-grammar/DUAL_ORIGINAL_COMPLETE_224_GRAMMAR_BARRIER.json \
+            | tee /tmp/ex23-grammar/DUAL_ORIGINAL_COMPLETE_224_GRAMMAR_BARRIER.log
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/ex23-grammar/DUAL_ORIGINAL_COMPLETE_224_GRAMMAR_BARRIER.json'))
+          assert r['grammar_pool_size']==224 and r['initial_valid']==54
+          assert r['greatest_inductive_fixed_point_size']==46
+          assert len(r['rounds'])==4 and r['rounds'][-1]['removed']==0
+          assert r['whole_source_goal_from_strongest']=='SAT'
+          assert r['model_relation_is_outside_pool'] and r['smt_dual']
+          assert r['num_solver_queries_per_backend']==425
+          assert all(x['status']==x['cvc5'] for x in r['receipts'])
+          print('COMPLETE_SOURCE_GRAMMAR_EXCLUSION_DUAL_CERTIFIED_425',flush=True)
+          PY
+          sha256sum /tmp/ex23-grammar/DUAL_ORIGINAL_COMPLETE_224_GRAMMAR_BARRIER.json
+      - name: Keep every query receipt and zero-neural impossibility proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-ex23-all224-source-original-frozen-predicates-425-independent-z3-cvc5-theorem
+          path: /tmp/ex23-grammar/*.json
+          if-no-files-found: warn
