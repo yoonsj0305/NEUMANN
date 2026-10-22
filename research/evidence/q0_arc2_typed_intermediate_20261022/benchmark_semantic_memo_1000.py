@@ -34,7 +34,7 @@ for f in files:
 samples=[]; start=time.perf_counter(); seen=[]
 for n,(id,task) in enumerate(corpus):
  B=cache.task_rules(task);C=v2.task_rules(task)
- A=base.task_rules(task) if n<200 or n%10==0 else B
+ A=base.task_rules(task)
  if A!=B or B!=C:
   receipt=dict(id=id,legacy=len(A),cache=len(B),v2=len(C),legacy_repr=str(A)[:1000],v2_repr=str(C)[:1000])
   pathlib.Path(a.out).write_text(json.dumps({'status':'CANDIDATE_SET_MISMATCH','first_counterexample':receipt},indent=2))
