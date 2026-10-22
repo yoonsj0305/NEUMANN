@@ -1,0 +1,134 @@
+name: Q0 actual general problem-solving frontier gap first ARC-AGI-2 120
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q0_arcagi2_first_frontier_gap_20261022.yml'
+      - 'research/evidence/q0_arcagi2_first_frontier_gap_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  arc2_source_frozen_real_first_public_120:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Freeze all task identifiers and training/evaluation security boundary BEFORE first body exposure
+        run: |
+          set -euo pipefail
+          D=research/evidence/q0_arcagi2_first_frontier_gap_20261022
+          python -m py_compile "$D/arc_minimal_controller.py" "$D/grade_arc_predictions.py"
+          python "$D/arc_minimal_controller.py" --selftest
+          python - <<'PY'
+          import pathlib,hashlib,json
+          root=pathlib.Path('research/evidence/q0_arcagi2_first_frontier_gap_20261022')
+          freeze=root/'ARC2_FIRST_EVALUATION_FROZEN.json';d=json.loads(freeze.read_text())
+          assert d['frozen_before_ARC_source_body_read'] is True
+          assert d['repository_commit']=='f3283f727488ad98fe575ea6a5ac981e4a188e49'
+          assert d['filename_manifest_sha256']=='3014a6bf8feabbf650a27fd8b77eee7badbdeec6b63035d001ba0cad7cd884dd'
+          assert d['training_count']==1000 and d['evaluation_count']==120
+          assert d['freeze_controls']['dsl_primitive_count']==96
+          assert d['precommitted_scientific_admission']['total_compute_10x'].startswith('Not admissible')
+          print('FROZEN_CODE_SHA',hashlib.sha256((root/'arc_minimal_controller.py').read_bytes()).hexdigest(),flush=True)
+          print('FROZEN_GRADER_SHA',hashlib.sha256((root/'grade_arc_predictions.py').read_bytes()).hexdigest(),flush=True)
+          print('FROZEN_MANIFEST_SHA',hashlib.sha256(freeze.read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Install CPU-only PyTorch and grid mathematics
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check numpy==1.26.4
+          python -m pip install --quiet --disable-pip-version-check torch==2.5.1+cpu --index-url https://download.pytorch.org/whl/cpu
+          python - <<'PY'
+          import torch,numpy
+          print('TRUE_NEURAL_TRAINING_CPU',torch.__version__,numpy.__version__,torch.cuda.is_available())
+          PY
+      - name: FIRST official ARC grid body access on this SHA-frozen branch
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/neumann-arc2 /tmp/neumann-arc2/safe-data/data /tmp/neumann-arc2/evidence
+          git init -q /tmp/neumann-arc2/official
+          git -C /tmp/neumann-arc2/official remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/neumann-arc2/official -c protocol.version=2 fetch -q --depth=1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/neumann-arc2/official checkout -q --detach FETCH_HEAD
+          ACTUAL_SHA="$(git -C /tmp/neumann-arc2/official rev-parse HEAD)"
+          test "$ACTUAL_SHA" = 'f3283f727488ad98fe575ea6a5ac981e4a188e49'
+          python - <<'PY'
+          import hashlib,json,pathlib
+          root=pathlib.Path('/tmp/neumann-arc2/official')
+          d=root/'data';tr=list((d/'training').glob('*.json'));ev=list((d/'evaluation').glob('*.json'))
+          assert len(tr)==1000 and len(ev)==120,(len(tr),len(ev))
+          names=sorted([str(x.relative_to(root)) for x in tr+ev]);hashval=hashlib.sha256(('\n'.join(names)+'\n').encode()).hexdigest()
+          assert hashval=='3014a6bf8feabbf650a27fd8b77eee7badbdeec6b63035d001ba0cad7cd884dd',hashval
+          clean=pathlib.Path('/tmp/neumann-arc2/safe-data/data')
+          (clean/'training').symlink_to(d/'training',target_is_directory=True)
+          (clean/'evaluation').mkdir(parents=True,exist_ok=True)
+          answer_keys=0
+          for original in ev:
+              raw=json.loads(original.read_text())
+              assert all('output' in ex for ex in raw['test'])
+              answer_keys+=sum('output' in ex for ex in raw['test'])
+              safe={'train':raw['train'],'test':[{'input':t['input']} for t in raw['test']]}
+              assert all(set(ex)=={'input'} for ex in safe['test'])
+              (clean/'evaluation'/original.name).write_text(json.dumps(safe,separators=(',',':')))
+          for x in (clean/'evaluation').glob('*.json'):
+              a=json.loads(x.read_text())
+              assert all('output' not in ex for ex in a['test'])
+          print('FIRST_SOURCE_DATASET_AUTHENTIC',hashval,'WITHHELD_HIDDEN_LABELS',answer_keys,flush=True)
+          PY
+      - name: True 1000-task training and one-shot 120-task prediction, NO evaluation truth in model input
+        run: |
+          set -o pipefail
+          ROOT=research/evidence/q0_arcagi2_first_frontier_gap_20261022
+          python "$ROOT/arc_minimal_controller.py" \
+            --root /tmp/neumann-arc2/safe-data \
+            --freeze "$ROOT/ARC2_FIRST_EVALUATION_FROZEN.json" \
+            --out /tmp/neumann-arc2/evidence --predictions-only \
+            | tee /tmp/neumann-arc2/evidence/PREDICTION_RUN.log
+          python - <<'PY'
+          import json,hashlib,pathlib
+          p=pathlib.Path('/tmp/neumann-arc2/evidence/PREDICTIONS_BEFORE_GRADE.json')
+          d=json.loads(p.read_text())
+          assert d['evaluation_size']==120 and d['eval_test_labels_passed_to_inference']==0
+          assert len(d['rankers'])==4 and all(len(x)==120 for x in d['rankers'].values())
+          print('IMMUTABLE_PREGRADE_PREDICTION_HASH',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Only NOW reveal separately authenticated public evaluation answers and independent grade (no retuning)
+        run: |
+          set -o pipefail
+          ROOT=research/evidence/q0_arcagi2_first_frontier_gap_20261022
+          python "$ROOT/grade_arc_predictions.py" \
+            --predictions /tmp/neumann-arc2/evidence/PREDICTIONS_BEFORE_GRADE.json \
+            --eval-root /tmp/neumann-arc2/official/data/evaluation \
+            --out /tmp/neumann-arc2/evidence/OFFICIAL_FIRST_EVAL_RESULT.json \
+            | tee /tmp/neumann-arc2/evidence/INDEPENDENT_GRADE_RUN.log
+          sha256sum /tmp/neumann-arc2/evidence/*.json | tee /tmp/neumann-arc2/evidence/ALL_RECEIPT_HASHES.txt
+      - name: Validate all 120 tasks, safety of gap admission and full original sources
+        run: |
+          python - <<'PY'
+          import pathlib,json
+          p=pathlib.Path('/tmp/neumann-arc2/evidence')
+          a=json.loads((p/'OFFICIAL_FIRST_EVAL_RESULT.json').read_text())
+          assert a['n_public_eval']==120 and a['n_public_training']==1000
+          assert a['program_dsl_size']==96 and not a['inference_received_eval_output']
+          assert len(a['results'])==4
+          assert all(len(z['solved_ids'])+len(z['unsolved_ids'])==120 for z in a['results'].values())
+          assert all(z['solved']<=a['oracle_any_demo_fitting_program_solved'] for z in a['results'].values())
+          assert a['global_neumann_frontier_parity']=='OPEN'
+          assert a['neural_only_new_structure']=='OPEN'
+          assert a['global_Q4_10x']=='OPEN'
+          print('SCIENTIFICALLY_VALID_GAP_FIRST_MEASUREMENT',
+              {k:z['solved'] for k,z in a['results'].items()},
+              'source_grammar_ceiling',a['oracle_any_demo_fitting_program_solved'],flush=True)
+          PY
+      - name: Preserve initial results even on any failure or zero score; no posthoc sample substitution
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q0-official-arcagi2-120-first-frontier-gap-actual-trained-and-classical
+          path: /tmp/neumann-arc2/evidence/
+          if-no-files-found: warn
