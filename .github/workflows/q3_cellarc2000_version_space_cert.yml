@@ -1,0 +1,123 @@
+name: NEUMANN Q3 exact CA version-space certificate real CellARC2000
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_cellarc2000_version_space_cert.yml'
+      - 'research/evidence/q3_cellarc2000_20261022/version_space_certifier.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_source_mask_and_theorem_falsification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Synthetic generated true process counterexample search, then real source redaction
+        run: |
+          set -euo pipefail
+          python -m py_compile research/evidence/q3_cellarc2000_20261022/version_space_certifier.py
+          python - <<'PY'
+          import itertools,random,sys
+          sys.path.insert(0,'research/evidence/q3_cellarc2000_20261022')
+          from version_space_certifier import infer
+          rng=random.Random(22102026)
+          verified=0
+          for real_r in (1,2,3):
+              for trial in range(160):
+                  rule={w:rng.randrange(2) for w in itertools.product(range(2),repeat=2*real_r+1)}
+                  def evolve(x):
+                      n=len(x)
+                      return [rule[tuple(x[(i+j)%n] for j in range(-real_r,real_r+1))] for i in range(n)]
+                  examples=[]
+                  for _ in range(5):
+                      x=[rng.randrange(2) for _ in range(24)]
+                      y=evolve(x)
+                      examples.append({'input':x,'output':y})
+                  x=[rng.randrange(2) for _ in range(24)]
+                  truth=evolve(x)
+                  d={'train':examples,'query':x}
+                  result=infer(d)
+                  for maxr in range(real_r,4):
+                      arr=result['variants'][str(maxr)]['outputs']
+                      assert all(z==truth[i] for i,z in enumerate(arr) if z is not None),(real_r,maxr,trial)
+                      verified+=1
+          print('GENERATED_TRUE_CLASS_SOUNDNESS_CHECKS_PASS',verified,flush=True)
+          PY
+          python research/evidence/q3_cellarc2000_20261022/source_control.py --mode mask --dir /tmp/cellarc-sanitized/data --manifest /tmp/cellarc-sanitized/SOURCE_LOCK.json
+          python - <<'PY'
+          import json,pathlib
+          m=json.loads(pathlib.Path('/tmp/cellarc-sanitized/SOURCE_LOCK.json').read_text())
+          assert m['sha']=='76040e6aef0edc4982e53c13a85ef227378ed171'
+          for name in ('test_interpolation','test_extrapolation'):
+              records=[json.loads(x) for x in (pathlib.Path('/tmp/cellarc-sanitized/data')/(name+'.jsonl')).read_text().splitlines()]
+              assert len(records)==1000 and all('solution' not in q and 'meta' not in q and 'program' not in q for q in records)
+          print('ALL_2000_TRUE_TEST_SOLUTIONS_PHYSICALLY_REMOVED_FROM_INFERENCE')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-ca2000-identical-frozen-original-source-no-labels
+          path: /tmp/cellarc-sanitized/
+          if-no-files-found: error
+  source_only_all2000_version_space:
+    needs: original_source_mask_and_theorem_falsification
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-ca2000-identical-frozen-original-source-no-labels
+          path: /tmp/cellarc-sanitized
+      - name: Enumerate every source-consistent radius class, emit values only if ALL agree
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/ca-cert-pregrade
+          python research/evidence/q3_cellarc2000_20261022/version_space_certifier.py --mode infer --masked-dir /tmp/cellarc-sanitized/data --out /tmp/ca-cert-pregrade/2000_CERTIFIED_BEFORE_TRUTH.json | tee /tmp/ca-cert-pregrade/SOURCE_ONLY_EXECUTION.log
+          python - <<'PY'
+          import json,pathlib,hashlib
+          p=pathlib.Path('/tmp/ca-cert-pregrade/2000_CERTIFIED_BEFORE_TRUTH.json')
+          d=json.loads(p.read_text());assert d['n']==2000 and d['masked_query_solutions_not_accessed'] and d['metadata_not_accessed']
+          assert all(len(d['rows'][name])==1000 for name in ('test_interpolation','test_extrapolation'))
+          print('SOURCE_ONLY_VERSION_SPACE_LOCKED_SHA256',hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-ca2000-exact-version-space-predictions-before-grade
+          path: /tmp/ca-cert-pregrade/
+          if-no-files-found: error
+  independent_original2000_version_space_score:
+    needs: source_only_all2000_version_space
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-ca2000-identical-frozen-original-source-no-labels
+          path: /tmp/cellarc-sanitized
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-ca2000-exact-version-space-predictions-before-grade
+          path: /tmp/ca-cert-pregrade
+      - name: Independently restore original real truth ONLY after archived pregrade predictions
+        run: |
+          set -euo pipefail
+          python research/evidence/q3_cellarc2000_20261022/source_control.py --mode restore --dir /tmp/cellarc-original-truth --manifest /tmp/cellarc-sanitized/SOURCE_LOCK.json
+          mkdir -p /tmp/ca-cert-scored
+          python research/evidence/q3_cellarc2000_20261022/version_space_certifier.py --mode grade --sealed /tmp/ca-cert-pregrade/2000_CERTIFIED_BEFORE_TRUTH.json --original-dir /tmp/cellarc-original-truth --out /tmp/ca-cert-scored/ALL2000_VERSION_SPACE_INDEPENDENT_ORIGINAL_GRADE.json | tee /tmp/ca-cert-scored/INDEPENDENT_VERDICT.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-ca2000-conditional-certificate-original2000-independent-grade
+          path: /tmp/ca-cert-scored/
+          if-no-files-found: error
