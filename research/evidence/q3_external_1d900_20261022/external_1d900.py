@@ -25,9 +25,9 @@ def original_files(root):
     records=[]
     for folder in folders:
         files=sorted(folder.glob('*.json'))
-        assert len(files)==50,(folder,len(files))
+        assert len(files)==(51 if folder.name=='1d_scale_dp' else 50),(folder,len(files))
         for f in files: records.append((folder.name+'__'+f.stem,f))
-    assert len(records)==900 and len({id for id,_ in records})==900
+    assert len(records)==901 and len({id for id,_ in records})==901
     return records
 
 def main():
@@ -38,16 +38,16 @@ def main():
     if a.mode=='prepare':
         fs=original_files(pathlib.Path(a.source))
         masked=pathlib.Path(a.masked);assert not masked.exists();masked.mkdir(parents=True)
-        metadata={'schema':'SOURCE_1D_ARC_900_ORIGINAL_PINNED.v1','n':900,'groups':sorted({f.parent.name for _,f in fs}),'rows':[]}
+        metadata={'schema':'SOURCE_1D_ARC_901_ORIGINAL_PINNED.v1','n':901,'groups':sorted({f.parent.name for _,f in fs}),'rows':[]}
         for uid,f in fs:
             d=adapt_task(json.loads(f.read_text()),False)
             assert all('output' not in x for x in d['test'])
             (masked/(uid+'.json')).write_text(json.dumps(d,separators=(',',':'))+'\n')
             metadata['rows'].append({'uid':uid,'relative_source':str(f.relative_to(a.source))})
         out.write_text(json.dumps(metadata,sort_keys=True)+'\n')
-        print('SOURCE_900_TEST_LABELS_REMOVED',len(metadata['rows']),flush=True)
+        print('SOURCE_901_TEST_LABELS_REMOVED',len(metadata['rows']),flush=True)
     elif a.mode=='infer':
-        fs=sorted(pathlib.Path(a.masked).glob('*.json'));assert len(fs)==900
+        fs=sorted(pathlib.Path(a.masked).glob('*.json'));assert len(fs)==901
         rows={}
         for i,f in enumerate(fs):
             d=json.loads(f.read_text());assert all('output' not in z for z in d['test'])
@@ -55,7 +55,7 @@ def main():
             except Exception as err:r={'status':'ERROR','prediction':None,'error':type(err).__name__+': '+str(err)[:200]}
             rows[f.stem]=r
             if (i+1)%150==0:print('SOURCE_ONLY_1D_PROGRESS',i+1,dict(collections.Counter(x['status'] for x in rows.values())),flush=True)
-        payload={'schema':'NEUMANN_UNCHANGED_1D_ARC900_PRE_GRADE.v1','n':900,'test_truth_seen':False,
+        payload={'schema':'NEUMANN_UNCHANGED_1D_ARC901_PRE_GRADE.v1','n':901,'test_truth_seen':False,
                  'source_repo':'khalil-research/1D-ARC','git_commit':'1e74dc4cb4c58d8160e1fbd0ba638eb745f37147',
                  'status_counts':dict(collections.Counter(x['status'] for x in rows.values())),'rows':rows,
                  'elapsed_s':time.perf_counter()-start}
@@ -63,8 +63,8 @@ def main():
         print('SOURCE_1D_900_PRE_GRADE',json.dumps(payload['status_counts'],sort_keys=True),flush=True)
     else:
         sealed=pathlib.Path(a.sealed);before=json.loads(sealed.read_text())
-        assert before['n']==900 and before['test_truth_seen'] is False
-        fs=original_files(pathlib.Path(a.source));assert len(fs)==900
+        assert before['n']==901 and before['test_truth_seen'] is False
+        fs=original_files(pathlib.Path(a.source));assert len(fs)==901
         results={};totals=collections.Counter();group_counts={}
         for uid,f in fs:
             original=adapt_task(json.loads(f.read_text()),True)
@@ -76,8 +76,8 @@ def main():
             g=f.parent.name;group_counts.setdefault(g,{'n':0,'correct':0,'attempted':0})
             group_counts[g]['n']+=1;group_counts[g]['correct']+=int(correct);group_counts[g]['attempted']+=int(pred is not None)
             results[uid]={'status':r['status'],'exact_correct':correct}
-        report={'schema':'NEUMANN_FRESH_1D_ARC900_INDEPENDENT_EXACT_ORIGINAL.v1',
-          'n':900,'totals':dict(totals),'groups':group_counts,'rows':results,
+        report={'schema':'NEUMANN_FRESH_1D_ARC901_INDEPENDENT_EXACT_ORIGINAL.v1',
+          'n':901,'totals':dict(totals),'groups':group_counts,'rows':results,
           'sealed_pregrade_sha256':hashlib.sha256(sealed.read_bytes()).hexdigest(),
           'first_run_code_frozen_before_dataset_task_body_exposure':True,
           'not_comparable_to_2d_arc2_frontier_accuracy':True,'global_neural_operator_novelty':'OPEN',
