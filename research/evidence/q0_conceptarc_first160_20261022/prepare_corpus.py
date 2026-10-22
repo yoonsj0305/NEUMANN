@@ -19,7 +19,7 @@ def main():
         assert len(originals)==10,(group,len(originals))
         for path in originals:
             original=json.loads(path.read_text())
-            assert isinstance(original['train'],list) and 1<=len(original['train'])<=4
+            assert isinstance(original['train'],list) and 1<=len(original['train'])<=100  # protocol repair: published corpus includes more than four demonstrations
             assert len(original['test'])==3
             assert all('input' in r and 'output' in r for r in original['train'])
             assert all('input' in r and 'output' in r for r in original['test'])
