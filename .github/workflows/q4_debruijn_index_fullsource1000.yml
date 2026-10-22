@@ -1,0 +1,84 @@
+name: NEUMANN Q4 original sixth1000 exact indexed full-solver CPU benchmark
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q4_debruijn_index_fullsource1000.yml'
+      - 'research/evidence/q4_debruijn_source_index_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pin_original_source_before_any_benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin source model and fetch original train lines 5001 through 6000 only
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD:research/evidence/q3_cellarc2000_20261022/debruijn_structural_model.py)" = fb12bc217178f7f3e89f0865987078e5dc367074
+          python -m py_compile research/evidence/q4_debruijn_source_index_20261022/*.py
+          mkdir -p /tmp/sixth-original/
+          python - <<'PY'
+          import urllib.request,itertools,hashlib,json,pathlib
+          sha='76040e6aef0edc4982e53c13a85ef227378ed171'
+          url=f'https://huggingface.co/datasets/mireklzicar/cellarc_100k/resolve/{sha}/data/train.jsonl'
+          with urllib.request.urlopen(url,timeout=120) as r:raw=b''.join(itertools.islice(r,5000,6000))
+          records=raw.splitlines();assert len(records)==1000
+          original_sha=hashlib.sha256(raw).hexdigest()
+          out=pathlib.Path('/tmp/sixth-original/SOURCE_ONLY_1000.jsonl')
+          ids=set()
+          with out.open('w') as f:
+              for item in records:
+                  d=json.loads(item)
+                  assert d['id'] not in ids;ids.add(d['id'])
+                  assert all(k in d for k in ('train','query','solution'))
+                  f.write(json.dumps({'id':d['id'],'train':d['train'],'query':d['query']},sort_keys=True)+'\n')
+          assert len(ids)==1000
+          pathlib.Path('/tmp/sixth-original/SOURCE_SHA.json').write_text(json.dumps({'raw_sha256':original_sha,
+            'git_sha':sha,'source_range':[5001,6000],'heldout_solutions_removed':True}))
+          print('ORIGINAL_SIXTH_1000_SOURCE_ONLY_SHA',hashlib.sha256(out.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q4-sixth1000-source-no-target-labels
+          path: /tmp/sixth-original/
+          if-no-files-found: error
+  five_paired_complete_inference_repeats:
+    needs: pin_original_source_before_any_benchmark
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q4-sixth1000-source-no-target-labels
+          path: /tmp/sixth-original
+      - name: Test exact finite de Bruijn membership equivalence, then compare frozen vs indexed full source pipeline
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/bench-proof
+          python research/evidence/q4_debruijn_source_index_20261022/benchmark_full1000.py \
+            --input /tmp/sixth-original/SOURCE_ONLY_1000.jsonl \
+            --out /tmp/bench-proof/ORIGINAL1000_FULL_SOURCE_WALL_CPU.json \
+            | tee /tmp/bench-proof/FULL_EQUIVALENCE_AND_PERFORMANCE_LOG.txt
+          python - <<'PY'
+          import pathlib,json,hashlib
+          p=pathlib.Path('/tmp/bench-proof/ORIGINAL1000_FULL_SOURCE_WALL_CPU.json')
+          x=json.loads(p.read_text())
+          assert x['n']==1000 and x['full_ast_result_identical_for_each_trial'] and x['repeats']==5
+          assert len(set(x['all_solver_predictions_SHA_by_run'].values()))==1
+          print('EXACT_MODEL_IDENTITY_AUDIT_SHA256',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q4-sixth1000-full-source-exact-index-benchmark-receipt
+          path: /tmp/bench-proof/
+          if-no-files-found: error
