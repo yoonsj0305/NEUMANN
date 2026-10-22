@@ -9,6 +9,7 @@ def main():
     ap.add_argument('--typed-dir', required=True)
     ap.add_argument('--out', required=True)
     args = ap.parse_args()
+    sys.path.insert(0, str(pathlib.Path('research/evidence/q0_arcagi2_fullfirst_20261022').resolve()))
     sys.path.insert(0, str(pathlib.Path(args.baseline_dir).resolve()))
     sys.path.insert(0, str(pathlib.Path(args.typed_dir).resolve()))
     from arc_compositional_grammar import find_programs,choose_program,predict as basic_predict
