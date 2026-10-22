@@ -20,6 +20,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD:research/evidence/q3_object_synthesis_transfer_20261022/frozen_original_typed_selector_v2.py)" = a46dc5480f0819895effc48df1e0600a23640bdf
+          python -m pip install --quiet numpy==1.26.4 scipy==1.14.1
           python -m py_compile research/evidence/q3_external_1d900_20261022/external_1d900.py
           git clone -q --no-checkout https://github.com/khalil-research/1D-ARC.git /tmp/new-independent-author-1d
           git -C /tmp/new-independent-author-1d checkout -q --detach 1e74dc4cb4c58d8160e1fbd0ba638eb745f37147
