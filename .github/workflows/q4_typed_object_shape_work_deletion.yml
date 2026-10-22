@@ -1,0 +1,87 @@
+name: "Q4 exact type shape pruning same AST proof and real cost on ARC2 original 200"
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q4_typed_object_shape_work_deletion.yml'
+      - 'research/evidence/q0_arc2_typed_intermediate_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact_program_ast_equivalence_and_same_inference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin source grammar and compile both frozen and type-directed versions
+        run: |
+          set -euo pipefail
+          python -m py_compile research/evidence/q0_arc2_typed_intermediate_20261022/{relational_pipeline.py,relational_pipeline_shape_cached.py,benchmark_equivalent_search.py}
+          python - <<'PY'
+          import hashlib,pathlib,json
+          p=pathlib.Path('research/evidence/q0_arc2_typed_intermediate_20261022')
+          freeze=json.loads((p/'FROZEN_PRE_HOLDOUT_TYPED_RELATIONAL_GATE.json').read_text())
+          assert hashlib.sha256((p/'relational_pipeline.py').read_bytes()).hexdigest()==freeze['source_program_sha256']
+          print('UNCHANGED_FROZEN_PROPOSER_ORIGINAL_EXACT_SHA',freeze['source_program_sha256'],flush=True)
+          PY
+      - name: Install CPU scipy+numpy only for exact graph connected-components
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check numpy==1.26.4 scipy==1.14.1
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/original
+          git -C /tmp/original checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/original rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+      - name: Create one masked source corpus then physically delete original truth to make both arms equivalent
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/masked_arc2_all1000/
+          python - <<'PY'
+          import pathlib,json,hashlib
+          inp=pathlib.Path('/tmp/original/data/training')
+          fs=sorted(inp.glob('*.json'),key=lambda x:hashlib.sha256(x.stem.encode()).hexdigest())
+          assert len(fs)==1000
+          m=json.load(open('research/evidence/q0_arc2_typed_intermediate_20261022/FROZEN_PRE_HOLDOUT_TYPED_RELATIONAL_GATE.json'))['frozen_split']
+          digest=lambda xx:hashlib.sha256(('\n'.join(p.stem for p in xx)+'\n').encode()).hexdigest()
+          assert digest(fs[:800])==m['dev_id_sha256'] and digest(fs[800:])==m['val_id_sha256']
+          for f in fs:
+              x=json.loads(f.read_text());y={'train':x['train'],'test':[{'input':r['input']} for r in x['test']]}
+              (pathlib.Path('/tmp/masked_arc2_all1000')/f.name).write_text(json.dumps(y,separators=(',',':'))+'\n')
+          print('ALL_1000_TEST_ANSWERS_REMOVED',flush=True)
+          PY
+          rm -rf /tmp/original
+          python - <<'PY'
+          import json,pathlib
+          assert all(all('output' not in r for r in json.loads(p.read_text())['test']) for p in pathlib.Path('/tmp/masked_arc2_all1000').glob('*.json'))
+          PY
+      - name: Perform three ABBA source-exact dev40 CPU paired original-vs-shape-cache timings plus ALL 200 AST equality
+        run: |
+          set -o pipefail
+          mkdir -p /tmp/shape_q4_evidence
+          python research/evidence/q0_arc2_typed_intermediate_20261022/benchmark_equivalent_search.py \
+            --masked /tmp/masked_arc2_all1000 \
+            --pairs 3 \
+            --out /tmp/shape_q4_evidence/ALL200_EXACT_AST_AND_DEV40_THREE_PAIRED_TIMINGS.json \
+            | tee /tmp/shape_q4_evidence/RUN.log
+          python - <<'PY'
+          import json,pathlib,hashlib
+          p=pathlib.Path('/tmp/shape_q4_evidence/ALL200_EXACT_AST_AND_DEV40_THREE_PAIRED_TIMINGS.json')
+          x=json.loads(p.read_text())
+          assert x['all_dev_equal'] and x['all_holdout_equal']
+          assert x['n_dev_timing']==40 and x['n_holdout_semantic_equality']==200
+          assert len(x['trials'])==6 and len(x['holdout_checks'])==200
+          assert x['candidate_count_holdout']>0
+          print('EXACT_200_DSL_FUNCTIONAL_EQUIVALENCE_AND_PROPOSER_COST_VERDICT',x['proposer_speedup'],flush=True)
+          print('ORIGINAL_AST_PROOF_DIGEST',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Preserve even if optimization slows down or breaks semantic equivalence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q4-arc2-full200-exact-ast-invariance-and-dev40-cost
+          path: /tmp/shape_q4_evidence/
+          if-no-files-found: warn
