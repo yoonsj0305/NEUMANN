@@ -69,7 +69,8 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p /tmp/arc2-eval-pred
-          python research/evidence/q0_tasktrained_official120_20261022/frozen_model_eval120.py \
+          PYTHONPATH=research/evidence/q0_learned_local_structure_20261022 \
+            python research/evidence/q0_tasktrained_official120_20261022/frozen_model_eval120.py \
             --masked-dir /tmp/arc2-eval-mask \
             --out /tmp/arc2-eval-pred/FROZEN_ACTUAL_TRAINED_TREE_ALL120_PREGRADE.json \
             | tee /tmp/arc2-eval-pred/ACTUAL_CPU_TRAINING_INFERENCE.log
