@@ -1,0 +1,184 @@
+{
+  "decision": "hypothesis real typed intermediate object-selection+dihedral+scale+tile+recolor extends solution coverage on isolated train200; method is classical, 10x and frontier remain open.",
+  "dev800_no_target_engineering_uses_holdout": true,
+  "dev800_scoped_report": {
+    "added": [
+      [
+        "28bf18c6",
+        {
+          "mapping": {
+            "0": 0,
+            "1": 1,
+            "2": 2,
+            "8": 8
+          },
+          "scale": 1,
+          "select": [
+            "component",
+            "bottom",
+            8,
+            "global"
+          ],
+          "tile": "h2",
+          "transform": "id"
+        }
+      ],
+      [
+        "9565186b",
+        {
+          "mapping": {
+            "0": 5,
+            "1": 1,
+            "2": 2,
+            "4": 4
+          },
+          "scale": 1,
+          "select": [
+            "isolate_color",
+            "most"
+          ],
+          "tile": "none",
+          "transform": "id"
+        }
+      ],
+      [
+        "0b148d64",
+        {
+          "mapping": {
+            "0": 0,
+            "2": 2,
+            "3": 3,
+            "4": 4
+          },
+          "scale": 1,
+          "select": [
+            "crop_color",
+            "least"
+          ],
+          "tile": "none",
+          "transform": "id"
+        }
+      ],
+      [
+        "c909285e",
+        {
+          "mapping": {
+            "0": 0,
+            "1": 1,
+            "2": 2,
+            "3": 3,
+            "4": 4,
+            "6": 6,
+            "8": 8
+          },
+          "scale": 1,
+          "select": [
+            "crop_color",
+            "least"
+          ],
+          "tile": "none",
+          "transform": "id"
+        }
+      ],
+      [
+        "23b5c85d",
+        {
+          "mapping": {
+            "1": 1,
+            "4": 4,
+            "6": 6,
+            "7": 7,
+            "8": 8
+          },
+          "scale": 1,
+          "select": [
+            "component",
+            "smallest",
+            4,
+            "global"
+          ],
+          "tile": "none",
+          "transform": "id"
+        }
+      ],
+      [
+        "a87f7484",
+        {
+          "mapping": {
+            "0": 0,
+            "4": 4,
+            "7": 7,
+            "8": 8
+          },
+          "scale": 1,
+          "select": [
+            "component",
+            "largest",
+            8,
+            "global"
+          ],
+          "tile": "none",
+          "transform": "id"
+        }
+      ],
+      [
+        "a416b8f3",
+        {
+          "mapping": {
+            "0": 0,
+            "1": 1,
+            "2": 2,
+            "3": 3,
+            "5": 5,
+            "6": 6,
+            "8": 8
+          },
+          "scale": 1,
+          "select": [
+            "whole"
+          ],
+          "tile": "h2",
+          "transform": "id"
+        }
+      ]
+    ],
+    "baseline_correct": 24,
+    "grammar_admits": 21,
+    "lost": [
+      "67e8384a",
+      "4c4377d9",
+      "8be77c9e",
+      "0c786b71",
+      "68b67ca3",
+      "1a2e2828",
+      "62c24649",
+      "c9e6f938",
+      "a740d043",
+      "d9fac9be",
+      "3af2c5a8",
+      "5614dbcf",
+      "6fa7a44f"
+    ],
+    "typed_pipeline_correct": 18,
+    "union_correct": 31
+  },
+  "frozen_split": {
+    "composer_sha256": "72f0cb9d0a42e972eac1e0edf891858d0c1439401e29d90b9ecde4721fcce84c",
+    "dev_id_sha256": "b781269e0c7deaf49a212b666ddc94cff4915ebe5c8d5251c0134901f2f56281",
+    "dev_n": 800,
+    "dev_observation": "DEV800 initial composer before added baseline-attempt logging: 8 exact-demo base covered, 26 augmented covered, 24 augmented actual test solves. Dev is not validation.",
+    "grader_sha256": "8a40bb9ca47a3636f581c700b035b94bc0e7cb1b2233ee9bf67982dfc8cb33c2",
+    "no_public_eval_reused_for_development": true,
+    "pin": "f3283f727488ad98fe575ea6a5ac981e4a188e49",
+    "split_rule": "sort 1000 train task IDs by SHA256(ASCII task_id), first 800 dev, last 200 holdout",
+    "val_id_sha256": "9f9f9f80d9c51dd31e0ad999e7d2cf7289fcd2791f785ba41fd74d1b86c8dc9b",
+    "validation_first_run_gate": "all 200; pregrade output archived then separately scored; never rerun tuned as firstblind",
+    "validation_n": 200
+  },
+  "original_arc_repo": "arcprize/ARC-AGI-2",
+  "original_commit": "f3283f727488ad98fe575ea6a5ac981e4a188e49",
+  "runner_sha256": "e43ebbc04e93ada85f6a94d1358cf6c0d2e1a310ee2de40c79c84377c645ce4c",
+  "schema": "NEUMANN_TYPED_AST_SOURCE_CONDITIONAL_20261022.v1",
+  "source_program_sha256": "e50877b81eb3af1a09ff35f5c4e9c5a6d49d284d5db72626addd3be866ef1037",
+  "training_tree": "dac7259367cc5099ef6a7b604a50a93affbbee33"
+}
