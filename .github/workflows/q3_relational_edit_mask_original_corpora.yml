@@ -1,0 +1,122 @@
+name: NEUMANN Q3 infer spatial edit relations from source demos, two original corpora
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_relational_edit_mask_original_corpora.yml'
+      - 'research/evidence/q3_relational_edit_masks_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact_source_first_frozen_programs:
+    strategy:
+      fail-fast: false
+      matrix:
+        corpus: [conceptarc160, arc2eval120]
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Source authentic and test labels physically deleted for all problems
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD:research/evidence/q3_object_synthesis_transfer_20261022/frozen_original_typed_selector_v2.py)" = a46dc5480f0819895effc48df1e0600a23640bdf
+          mkdir -p /tmp/masked
+          CORPUS=${{ matrix.corpus }}
+          if [ "$CORPUS" = conceptarc160 ]; then
+            git clone -q --no-checkout https://github.com/victorvikram/ConceptARC.git /tmp/raw-original
+            git -C /tmp/raw-original checkout -q --detach 0e67da6af879e4bad3d7cd3c196e8d551b445725
+            test "$(git -C /tmp/raw-original rev-parse HEAD:corpus)" = a9e933c021388297f21fa1cded180105479addc0
+            python research/evidence/q3_conceptarc_independent_author_20261022/prepare_corpus.py \
+              --source /tmp/raw-original/corpus --masked /tmp/only-source160 \
+              --metadata /tmp/conceptarc-original-manifest.json
+            mv /tmp/only-source160/*.json /tmp/masked/
+            test "$(find /tmp/masked -name '*.json' | wc -l)" -eq 160
+          else
+            git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/raw-original
+            git -C /tmp/raw-original checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+            test "$(git -C /tmp/raw-original rev-parse HEAD:data/evaluation)" = 8d04288aac3146b7c47d0b799c18bc9c0217d838
+            python - <<'PY'
+          import pathlib,json
+          files=sorted(pathlib.Path('/tmp/raw-original/data/evaluation').glob('*.json'))
+          assert len(files)==120
+          for f in files:
+              task=json.loads(f.read_text())
+              no_labels={'train':task['train'],'test':[{'input':t['input']} for t in task['test']]}
+              assert all('output' not in t for t in no_labels['test'])
+              (pathlib.Path('/tmp/masked')/f.name).write_text(json.dumps(no_labels,separators=(',',':'))+'\n')
+          PY
+          fi
+          rm -rf /tmp/raw-original
+      - name: Program learn edited spatial relations, source-only, finite grammar, cost metering
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet numpy==1.26.4 scipy==1.14.1
+          mkdir -p /tmp/pregrade
+          if [ "${{ matrix.corpus }}" = conceptarc160 ]; then N=160; else N=120; fi
+          python research/evidence/q3_relational_edit_masks_20261022/infer_edit_rule.py \
+            --masked-dir /tmp/masked --n "$N" \
+            --out /tmp/pregrade/FROZEN_EDIT_RELATIONAL_ALL_PREDICTIONS.json \
+            | tee /tmp/pregrade/SOURCE_ONLY_ALL_RESULTS.log
+          python - <<'PY'
+          import pathlib,json,hashlib,os
+          f=pathlib.Path('/tmp/pregrade/FROZEN_EDIT_RELATIONAL_ALL_PREDICTIONS.json')
+          d=json.loads(f.read_text())
+          n=160 if os.environ['CORPUS']=='conceptarc160' else 120
+          assert d['n']==n and not d['test_labels_seen'] and len(d['rows'])==n
+          print('SOURCE_ONLY_INFERENCE_EVIDENCE_SHA256',hashlib.sha256(f.read_bytes()).hexdigest(),flush=True)
+          PY
+        env:
+          CORPUS: ${{ matrix.corpus }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-relational-edit-${{ matrix.corpus }}-pregrade
+          path: /tmp/pregrade/
+          if-no-files-found: error
+  independent_original_grade:
+    needs: exact_source_first_frozen_programs
+    strategy:
+      fail-fast: false
+      matrix:
+        corpus: [conceptarc160, arc2eval120]
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-relational-edit-${{ matrix.corpus }}-pregrade
+          path: /tmp/pregrade/
+      - name: Fetch only now the verified original test answers and independently score
+        run: |
+          set -euo pipefail
+          if [ "${{ matrix.corpus }}" = conceptarc160 ]; then
+            git clone -q --no-checkout https://github.com/victorvikram/ConceptARC.git /tmp/grade-source
+            git -C /tmp/grade-source checkout -q --detach 0e67da6af879e4bad3d7cd3c196e8d551b445725
+            test "$(git -C /tmp/grade-source rev-parse HEAD:corpus)" = a9e933c021388297f21fa1cded180105479addc0
+            ROOT=/tmp/grade-source/corpus
+          else
+            git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/grade-source
+            git -C /tmp/grade-source checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+            test "$(git -C /tmp/grade-source rev-parse HEAD:data/evaluation)" = 8d04288aac3146b7c47d0b799c18bc9c0217d838
+            ROOT=/tmp/grade-source/data/evaluation
+          fi
+          mkdir -p /tmp/independent-grades
+          python research/evidence/q3_relational_edit_masks_20261022/independent_original_grade.py \
+            --source "$ROOT" --corpus "${{ matrix.corpus }}" \
+            --sealed /tmp/pregrade/FROZEN_EDIT_RELATIONAL_ALL_PREDICTIONS.json \
+            --out /tmp/independent-grades/ALL_ORIGINALS_TRUE_EXACT_SCORE.json \
+            | tee /tmp/independent-grades/INDEPENDENT_GRADE.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-relational-edit-${{ matrix.corpus }}-independent-grade
+          path: /tmp/independent-grades/
+          if-no-files-found: error
