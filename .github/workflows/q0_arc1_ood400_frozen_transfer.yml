@@ -1,0 +1,169 @@
+name: "Q0 ARC1 public400 untouched-source-body transfer from frozen ARC2 structural DSL"
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q0_arc1_ood400_frozen_transfer.yml'
+      - 'research/evidence/q0_arc1_ood400_transfer_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  authenticate_and_isolate_arc1_eval400:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Freeze source metadata and immutable ARC2-dev grammar BEFORE first ARC1 body download
+        run: |
+          set -euo pipefail
+          D=research/evidence/q0_arc1_ood400_transfer_20261022
+          python -m py_compile "$D/structural_object_language.py" "$D/arc1_ood400_sourceonly_runner.py" "$D/arc1_ood400_strict_grader.py"
+          python - <<'PY'
+          import pathlib,json,hashlib
+          p=pathlib.Path('research/evidence/q0_arc1_ood400_transfer_20261022')
+          m=json.loads((p/'FREEZE_ARC1_EVAL400_OOD_20261022.json').read_text())
+          assert m['source_bodies_read_before_freeze'] is False
+          assert m['source_commit']=='399030444e0ab0cc8b4e199870fb20b863846f34'
+          assert m['evaluation_git_tree']=='4a19f8327d45dda5e1809ee47be08bf1484b493b'
+          assert m['evaluation_n']==400 and m['full_400_mandatory'] is True
+          assert hashlib.sha256((p/'structural_object_language.py').read_bytes()).hexdigest()==m['grammar_sha256']
+          print('FREEZE_BEFORE_SOURCE_OPEN',hashlib.sha256((p/'FREEZE_ARC1_EVAL400_OOD_20261022.json').read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Clone only fixed official ARC-AGI-1 data at recorded SHA and mask 400 test outputs
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/fchollet/ARC-AGI.git /tmp/arc1-original
+          git -C /tmp/arc1-original checkout -q --detach 399030444e0ab0cc8b4e199870fb20b863846f34
+          test "$(git -C /tmp/arc1-original rev-parse HEAD:data/evaluation)" = 4a19f8327d45dda5e1809ee47be08bf1484b493b
+          test "$(git -C /tmp/arc1-original rev-parse HEAD:data/training)" = c00693818df744970c1cd3e201a559e30b070bbe
+          mkdir -p /tmp/arc1-masked/evaluation/
+          python - <<'PY'
+          import pathlib,json,hashlib
+          root=pathlib.Path('/tmp/arc1-original/data/evaluation')
+          names=sorted(root.glob('*.json'))
+          assert len(names)==400
+          for path in names:
+              task=json.loads(path.read_text())
+              assert all('output' in q for q in task['test'])
+              masked={'train':task['train'],'test':[{'input':q['input']} for q in task['test']]}
+              (pathlib.Path('/tmp/arc1-masked/evaluation')/path.name).write_text(json.dumps(masked,separators=(',',':'))+'\n')
+          digest=hashlib.sha256(('\n'.join(p.stem for p in names)+'\n').encode()).hexdigest()
+          print('FIRST_ARC1_BODY_ACCESS_ALL400_MASKED',digest,flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q0-arc1-all400-evaluation-inputs-no-test-output
+          path: /tmp/arc1-masked/evaluation/
+          if-no-files-found: error
+
+  infer_frozen_arc2_grammar_no_arc1_answers:
+    needs: authenticate_and_isolate_arc1_eval400
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-arc1-all400-evaluation-inputs-no-test-output
+          path: /tmp/arc1-masked/evaluation/
+      - name: Install only ordinary CPU numpy and verify test outputs absent in inference filesystem
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check numpy==1.26.4
+          python - <<'PY'
+          import pathlib,json
+          a=sorted(pathlib.Path('/tmp/arc1-masked/evaluation').glob('*.json'))
+          assert len(a)==400
+          for path in a:
+              d=json.loads(path.read_text())
+              assert all('output' not in x for x in d['test'])
+          print('ALL400_NO_ANSWER_TRANSFER_IN_MODEL_RUNNER',flush=True)
+          PY
+      - name: FROZEN unchanged relational grammar, all 400 evaluation tasks, compare previous ARC2 object-color baseline
+        run: |
+          set -euo pipefail
+          D=research/evidence/q0_arc1_ood400_transfer_20261022
+          mkdir -p /tmp/arc1-first-pred
+          PYTHONPATH=research/evidence/q0_arcagi2_fullfirst_20261022:research/evidence/q0_arcagi2_trainholdout_first_20261022:$D \
+            python "$D/arc1_ood400_sourceonly_runner.py" \
+            --masked-evaluation-dir /tmp/arc1-masked/evaluation \
+            --registry "$D/FREEZE_ARC1_EVAL400_OOD_20261022.json" \
+            --out /tmp/arc1-first-pred/ARC1_EVAL400_FROZEN_PREDICTIONS.json \
+            | tee /tmp/arc1-first-pred/FIRST_SOURCE_INFERENCE.log
+          sha256sum /tmp/arc1-first-pred/ARC1_EVAL400_FROZEN_PREDICTIONS.json
+          python - <<'PY'
+          import pathlib,json,hashlib
+          p=pathlib.Path('/tmp/arc1-first-pred/ARC1_EVAL400_FROZEN_PREDICTIONS.json')
+          d=json.loads(p.read_text())
+          assert d['n']==400 and not d['eval_labels_seen'] and d['neural_training'] is False
+          assert len({x['id'] for x in d['rows']})==400
+          print('ALL400_PREGRADE_IMMUTABLE_SHA',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Preserve first ungraded predictions independent from grader environment
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-arc1-new-corpus-full400-first-frozen-predictions-before-scoring
+          path: /tmp/arc1-first-pred/
+          if-no-files-found: warn
+
+  independently_grade_and_measure_existing_grammar_ceiling:
+    needs: infer_frozen_arc2_grammar_no_arc1_answers
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-arc1-new-corpus-full400-first-frozen-predictions-before-scoring
+          path: /tmp/arc1-first-pred
+      - name: Retrieve original evaluation labels only after published prediction artifact exists
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check numpy==1.26.4
+          git clone -q --no-checkout https://github.com/fchollet/ARC-AGI.git /tmp/arc1-grade
+          git -C /tmp/arc1-grade checkout -q --detach 399030444e0ab0cc8b4e199870fb20b863846f34
+          test "$(git -C /tmp/arc1-grade rev-parse HEAD:data/evaluation)" = 4a19f8327d45dda5e1809ee47be08bf1484b493b
+      - name: Independently score grid exactness for all 400, paired tests and no learning uniqueness
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/arc1-grade-results
+          D=research/evidence/q0_arc1_ood400_transfer_20261022
+          python "$D/arc1_ood400_strict_grader.py" \
+            --predictions /tmp/arc1-first-pred/ARC1_EVAL400_FROZEN_PREDICTIONS.json \
+            --evaluation-dir /tmp/arc1-grade/data/evaluation \
+            --out /tmp/arc1-grade-results/ARC1_FULL400_POSTGRADE_VERDICT.json \
+            | tee /tmp/arc1-grade-results/STRICT_SCORE.log
+          python - <<'PY'
+          import json,pathlib,hashlib
+          root=pathlib.Path('/tmp/arc1-grade-results')
+          score=json.loads((root/'ARC1_FULL400_POSTGRADE_VERDICT.json').read_text())
+          assert score['n']==400
+          assert score['results']['baseline_correct']<=score['results']['baseline_demo_fit']
+          assert score['results']['new_correct']<=score['results']['new_demo_fit']
+          assert score['results']['baseline_only']+score['results']['new_only']<=400
+          score['claim_level']='POSTGRADUATE_SOURCED_OOD_PUBLIC400; unchanged classical DSL; no matched frontier inference baseline, no neural operator discovery'
+          print('FIRST_ARC1_FULL400_SCIENCE_EVIDENCE',hashlib.sha256((root/'ARC1_FULL400_POSTGRADE_VERDICT.json').read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Archive first-independent public ARC1 OOD scores even if no gains
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-arc1-unchanged-arc2-grammar-transfer400-independent-exact-score
+          path: /tmp/arc1-grade-results/
+          if-no-files-found: warn

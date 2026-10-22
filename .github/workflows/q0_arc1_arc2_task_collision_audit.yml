@@ -1,0 +1,77 @@
+name: "Q0 ARC1 vs ARC2 exact semantic task overlap admission audit"
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q0_arc1_arc2_task_collision_audit.yml'
+      - 'research/evidence/q0_arc1_ood400_transfer_20261022/audit_arc1_arc2_semantic_overlap.py'
+      - 'research/evidence/q0_arc1_ood400_transfer_20261022/FIRST_ARC1_PUBLIC400_SCORE_COMPACT.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  overlap_and_legitimate_disjoint_subset_verdict:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify immutable first result and freeze canonicalization method
+        run: |
+          set -euo pipefail
+          D=research/evidence/q0_arc1_ood400_transfer_20261022
+          python -m py_compile "$D/audit_arc1_arc2_semantic_overlap.py"
+          python - <<'PY'
+          import json,pathlib,hashlib
+          p=pathlib.Path('research/evidence/q0_arc1_ood400_transfer_20261022/FIRST_ARC1_PUBLIC400_SCORE_COMPACT.json')
+          b=p.read_bytes();assert hashlib.sha256(b).hexdigest()=='11ea8eb3438914e2ab7e9b5b83d80a8f3c3bea28d2f77e7b8d135544287d5878'
+          x=json.loads(b)
+          assert x['n']==len(x['score'])==400
+          assert x['pregade_artifact_sha256']=='98dba8c5432f437d296df95d0db2860f6354575313bfc18d5fb2bf713dd2ea47'
+          print('FIRST_POSTGRADE_LOCKED_BEFORE_OVERLAP_CONTENT_AUDIT',flush=True)
+          PY
+      - name: Authenticate Git object IDs of both dataset revisions
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/fchollet/ARC-AGI.git /tmp/arc1-source
+          git -C /tmp/arc1-source checkout -q --detach 399030444e0ab0cc8b4e199870fb20b863846f34
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arc2-source
+          git -C /tmp/arc2-source checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arc1-source rev-parse HEAD:data/evaluation)" = 4a19f8327d45dda5e1809ee47be08bf1484b493b
+          test "$(git -C /tmp/arc2-source rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          test "$(git -C /tmp/arc2-source rev-parse HEAD:data/evaluation)" = 8d04288aac3146b7c47d0b799c18bc9c0217d838
+          mkdir -p /tmp/overlap-evidence
+      - name: Full 400 original task ID and test-grid plus permutation-invariant training semantic collision proof
+        run: |
+          set -o pipefail
+          python research/evidence/q0_arc1_ood400_transfer_20261022/audit_arc1_arc2_semantic_overlap.py \
+            --arc1-eval /tmp/arc1-source/data/evaluation \
+            --arc2-train /tmp/arc2-source/data/training \
+            --arc2-eval /tmp/arc2-source/data/evaluation \
+            --first-score research/evidence/q0_arc1_ood400_transfer_20261022/FIRST_ARC1_PUBLIC400_SCORE_COMPACT.json \
+            --out /tmp/overlap-evidence/ARC1_VS_ARC2_SEMANTIC_COLLISION_ALL400.json \
+            | tee /tmp/overlap-evidence/AUDIT.log
+          python - <<'PY'
+          import json,hashlib,pathlib
+          p=pathlib.Path('/tmp/overlap-evidence/ARC1_VS_ARC2_SEMANTIC_COLLISION_ALL400.json')
+          d=json.load(open(p));c=d['observed_counts']
+          assert c['all_tasks']==400
+          assert c['arc2_training_id_overlap']==376
+          assert c['arc2_evaluation_id_overlap']==6
+          assert c['disjoint_id']==18
+          assert c['disjoint_baseline_correct']+c['overlap_baseline_correct']==5
+          assert c['disjoint_new_correct']+c['overlap_new_correct']==5
+          assert len(d['rows'])==400
+          print('EXACT_UNCHANGED_OOD_STUDY_CONTAMINATION_AUDIT_VERIFIED',c,flush=True)
+          print('CANONICAL_CORPUS_AUDIT_SHA256',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Preserve full leakage audit with original task content fingerprints
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q0-arc1-arc2-source-exact-overlap-400-task-audit
+          path: /tmp/overlap-evidence/
+          if-no-files-found: warn
