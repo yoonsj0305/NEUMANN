@@ -197,7 +197,7 @@ def unary_bounds(tree,vars_):
             for signs in itertools.product((-1,1),repeat=support-1):
                 coeffs=(1,)+signs
                 term=var_expr(coeffs,group)
-                for bound in (0,1,2):
+                for bound in (-2,-1,0,1,2):
                     for op in ('<=','>='):
                         out.append(f'({op} {term} {smt_int(bound)})')
     return sorted(set(out))
