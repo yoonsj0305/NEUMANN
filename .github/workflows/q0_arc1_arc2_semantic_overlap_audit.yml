@@ -1,0 +1,92 @@
+name: Q0 ARC1 vs ARC2 exact original content-leak audit 400 mandatory
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q0_arc1_arc2_semantic_overlap_audit.yml'
+      - 'research/evidence/q0_arc1_arc2_leakage_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_original_semantic_provenance_audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify immutable first 400 predictions and scoring ledger before any source body fetch
+        run: |
+          set -euo pipefail
+          ROOT=research/evidence/q0_arc1_arc2_leakage_20261022
+          python -m py_compile "$ROOT/arc_content_disjoint_audit_v2.py"
+          echo "11ea8eb3438914e2ab7e9b5b83d80a8f3c3bea28d2f77e7b8d135544287d5878  $ROOT/FIRST_ARC1_PUBLIC400_SCORE_COMPACT.json" | sha256sum -c -
+          python - <<'PY'
+          import json
+          p='research/evidence/q0_arc1_arc2_leakage_20261022/FIRST_ARC1_PUBLIC400_SCORE_COMPACT.json'
+          r=json.load(open(p))
+          assert len(r['score'])==r['n']==400
+          assert r['results']['baseline_correct']==r['results']['new_correct']==5
+          assert r['source_full_original_score_sha256']=='0f72e52b1ccc504a35717135d556090f34205a635e8f4dba050a47ce5aab035f'
+          print('FIRST_PREGRADE_AND_GRADED_RESULT_IDENTITY_LOCKED',flush=True)
+          PY
+      - name: Retrieve two published Git repositories ONLY at original source commits
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/neumann-q0-corpus
+          git clone --quiet --no-checkout https://github.com/fchollet/ARC-AGI.git /tmp/neumann-q0-corpus/arc1
+          git -C /tmp/neumann-q0-corpus/arc1 checkout --quiet --detach 399030444e0ab0cc8b4e199870fb20b863846f34
+          git clone --quiet --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/neumann-q0-corpus/arc2
+          git -C /tmp/neumann-q0-corpus/arc2 checkout --quiet --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/neumann-q0-corpus/arc1 rev-parse HEAD:data/evaluation)" = 4a19f8327d45dda5e1809ee47be08bf1484b493b
+          test "$(git -C /tmp/neumann-q0-corpus/arc2 rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          test "$(git -C /tmp/neumann-q0-corpus/arc2 rev-parse HEAD:data/evaluation)" = 8d04288aac3146b7c47d0b799c18bc9c0217d838
+          echo 'SOURCE_GIT_TREE_IDENTITIES_PASS'
+      - name: Compute exact semantic multisets across ALL 400 + 1000 + 120 originals, stratify UNCHANGED 400 predictions
+        run: |
+          set -o pipefail
+          mkdir -p /tmp/neumann-q0-audit
+          python research/evidence/q0_arc1_arc2_leakage_20261022/arc_content_disjoint_audit_v2.py \
+            --arc1-eval /tmp/neumann-q0-corpus/arc1/data/evaluation \
+            --arc2-train /tmp/neumann-q0-corpus/arc2/data/training \
+            --arc2-eval /tmp/neumann-q0-corpus/arc2/data/evaluation \
+            --score research/evidence/q0_arc1_arc2_leakage_20261022/FIRST_ARC1_PUBLIC400_SCORE_COMPACT.json \
+            --out /tmp/neumann-q0-audit/ALL400_ARC1_ARC2_SEMANTIC_PROVENANCE.json \
+            | tee /tmp/neumann-q0-audit/AUDIT_RUN.log
+          python - <<'PY'
+          import json,pathlib,hashlib
+          root=pathlib.Path('/tmp/neumann-q0-audit')
+          d=json.loads((root/'ALL400_ARC1_ARC2_SEMANTIC_PROVENANCE.json').read_text())
+          c=d['counts']; rows=d['rows']
+          assert len(rows)==400
+          assert c['arc1_ids_in_arc2_train']==376
+          assert c['arc1_ids_in_arc2_eval']==6
+          assert c['baseline_correct_all']==c['new_correct_all']==5
+          assert sum(x['strict_clean'] for x in rows)==c['conservatively_clean']
+          assert c['conservative_clean_n']+c['overlap_n']==400
+          assert not d['global_OOD_independence_proven']
+          assert d['frozen_first_pregrade_sha256']=='98dba8c5432f437d296df95d0db2860f6354575313bfc18d5fb2bf713dd2ea47'
+          summary={'scientific_status':'FULL_ORIGINAL_CORPUS_SEMANTIC_CONTAMINATION_AUDIT_COMPLETE',
+             'verified_arc1_originals':400,'verified_arc2_training_originals':1000,'verified_arc2_eval_originals':120,
+             'shared_arc1_eval_vs_arc2_train_ids':376,'shared_arc1_eval_vs_arc2_eval_ids':6,
+             'counts':c,'strict_content_and_id_disjoint_ids':d['strict_clean_ids'],
+             'original_grade_total_new_correct':5,
+             'general_OOD_transfer_claim':'NOT_ESTABLISHED; task overlap disqualifies whole400 as independent OOD',
+             'canonical_content_not_just_blob_hash':True,
+             'first_original_grade_unchanged':True,
+             'evaluation_posthoc_subsets_not_preregistered':True,
+             'trained_neural_exclusive_success':'NONE','frontier_parity':'OPEN',
+             'audit_sha256':hashlib.sha256((root/'ALL400_ARC1_ARC2_SEMANTIC_PROVENANCE.json').read_bytes()).hexdigest()}
+          (root/'SCOPE_DECISION.json').write_text(json.dumps(summary,indent=2,sort_keys=True)+'\n')
+          print('FULL_ORIGINAL_CANONICAL_LEAKAGE_GATE',json.dumps(c,sort_keys=True),flush=True)
+          PY
+      - name: Retain both fully graded original400 slices and all source canonical-hash receipts even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-arc1-arc2-1520-original-content-overlap-audit
+          path: /tmp/neumann-q0-audit/
+          if-no-files-found: warn
