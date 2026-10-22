@@ -1,0 +1,91 @@
+name: NEUMANN Q3 adaptive two-stage representation ConceptARC160 proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_adaptive_representation_conceptarc160.yml'
+      - 'research/evidence/q3_adaptive_representation_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preregister_then_predict_original160:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Exact old frozen typed solver verified before any original problem bodies
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD:research/evidence/q3_object_synthesis_transfer_20261022/frozen_original_typed_selector_v2.py)" = a46dc5480f0819895effc48df1e0600a23640bdf
+          test "$(git rev-parse HEAD:research/evidence/q3_conceptarc_independent_author_20261022/prepare_corpus.py)" = d88f55530660f0f6bfad5916456addd096b6dc84
+          python -m py_compile research/evidence/q3_adaptive_representation_20261022/*.py
+      - name: Fetch pinned independently authored ConceptARC and mask 480 test output grids
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/victorvikram/ConceptARC.git /tmp/independent-author-corpus
+          git -C /tmp/independent-author-corpus checkout -q --detach 0e67da6af879e4bad3d7cd3c196e8d551b445725
+          test "$(git -C /tmp/independent-author-corpus rev-parse HEAD:corpus)" = a9e933c021388297f21fa1cded180105479addc0
+          python research/evidence/q3_conceptarc_independent_author_20261022/prepare_corpus.py \
+            --source /tmp/independent-author-corpus/corpus \
+            --masked /tmp/only-demo160 \
+            --metadata /tmp/source160_manifest.json
+          rm -rf /tmp/independent-author-corpus
+          test "$(find /tmp/only-demo160 -name '*.json' | wc -l)" -eq 160
+      - name: Run actual deterministic bounded two-stage structural discovery on CPU
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet numpy==1.26.4 scipy==1.14.1
+          mkdir -p /tmp/pregrade
+          python research/evidence/q3_adaptive_representation_20261022/auto_typed_composer.py \
+            --masked-dir /tmp/only-demo160 \
+            --n 160 \
+            --out /tmp/pregrade/CONCEPTARC160_TWO_STAGE_ALL_PREDICTIONS.json \
+            | tee /tmp/pregrade/EXACT_DISCOVERY_LOG.txt
+          python - <<'PY'
+          import json,pathlib,hashlib
+          f=pathlib.Path('/tmp/pregrade/CONCEPTARC160_TWO_STAGE_ALL_PREDICTIONS.json')
+          d=json.loads(f.read_text())
+          assert len(d['rows'])==d['n']==160 and not d['test_labels_seen']
+          print('FROZEN_SOURCE_ONLY_160_SHA256',hashlib.sha256(f.read_bytes()).hexdigest(),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-adaptive-representation-concept160-source-predictions
+          path: /tmp/pregrade/
+          if-no-files-found: error
+  independent_real_labels_grader:
+    needs: preregister_then_predict_original160
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-adaptive-representation-concept160-source-predictions
+          path: /tmp/pregrade
+      - name: Fetch test truth only after successful source-only program freeze
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/victorvikram/ConceptARC.git /tmp/independent-grader-source
+          git -C /tmp/independent-grader-source checkout -q --detach 0e67da6af879e4bad3d7cd3c196e8d551b445725
+          test "$(git -C /tmp/independent-grader-source rev-parse HEAD:corpus)" = a9e933c021388297f21fa1cded180105479addc0
+          mkdir -p /tmp/grades
+          python research/evidence/q3_adaptive_representation_20261022/independent_exact_grade.py \
+            --sealed /tmp/pregrade/CONCEPTARC160_TWO_STAGE_ALL_PREDICTIONS.json \
+            --original /tmp/independent-grader-source/corpus \
+            --corpus conceptarc160 \
+            --out /tmp/grades/CONCEPT160_SOURCE_INDEPENDENT_SCORES.json \
+            | tee /tmp/grades/ALL160_EXACT_GRADE_LOG.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-adaptive-representation-conceptarc160-original-truth-grade
+          path: /tmp/grades/
+          if-no-files-found: error
