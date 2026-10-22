@@ -1,0 +1,89 @@
+name: Q3 source-original 3rd/4th arity expressivity proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_original_arity_hierarchy_20261022.yml'
+      - 'research/evidence/q3_original_arity_hierarchy_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_exact_kwise_arity_barrier_dual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile preregistered mathematical witness checker before downloading source
+        run: |
+          set -euo pipefail
+          python -m py_compile research/evidence/q3_original_arity_hierarchy_20261022/prove_arity_lower_bounds.py
+          mkdir -p /tmp/neumann-q3-arity/sources /tmp/neumann-q3-arity/smt2
+      - name: Install independent solver cvc5 with exact released distribution checksum
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          curl -fL --retry 3 --connect-timeout 10 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5-bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5-bin
+          sudo install -m 755 "$(find /tmp/cvc5-bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version
+      - name: Download all four genuine original SyGuS sources unchanged and pin Git blob identity
+        run: |
+          python - <<'PY'
+          import hashlib, urllib.request, pathlib
+          cases={
+           'hola_countud.sl':('comp/2017/Inv_Track/','5d7f07c0b5a35d119ebe2d59bd5f56e447c547bf'),
+           'fib_15.sl':('comp/2019/Inv_Track/From2018/','125d1f9a277e262df77bcbda1a77851841d563d3'),
+           'fib_18.sl':('comp/2019/Inv_Track/From2018/','03f37e87068ec2616c1747cf45860d7811c3ba99'),
+           'jmbl_tacas.sl':('comp/2019/Inv_Track/From2018/','07da5f3887401f7f778cf6cea87cea12a6fe1f83'),
+          }
+          for filename,(folder,expected) in cases.items():
+              url='https://raw.githubusercontent.com/SyGuS-Org/benchmarks/13c8deb68a873635879c9a69bc78caebd340f646/'+folder+filename
+              b=urllib.request.urlopen(url,timeout=30).read()
+              got=hashlib.sha1(('blob '+str(len(b))+'\0').encode()+b).hexdigest()
+              assert got==expected,(filename,expected,got)
+              pathlib.Path('/tmp/neumann-q3-arity/sources',filename).write_bytes(b)
+              print('SOURCE_VERIFIED',filename,got,len(b),flush=True)
+          PY
+      - name: Verify reachable projections, spurious original safety counterexamples and matching sufficient full 3VC in BOTH solvers
+        run: |
+          set -euo pipefail
+          python research/evidence/q3_original_arity_hierarchy_20261022/prove_arity_lower_bounds.py \
+            --source-dir /tmp/neumann-q3-arity/sources \
+            --out /tmp/neumann-q3-arity/RESULT.json \
+            --queries-dir /tmp/neumann-q3-arity/smt2 --cvc5 \
+            | tee /tmp/neumann-q3-arity/RUN.log
+          python - <<'PY'
+          import json,pathlib,hashlib
+          p=pathlib.Path('/tmp/neumann-q3-arity')
+          d=json.load(open(p/'RESULT.json'))
+          assert d['original_sha_verified']==d['original_count']==4
+          assert d['both_SMT_backends'] is True
+          assert d['verified_k_projection_witness_groups']==16
+          assert d['source_arity_lower_bound_distribution']=={'3_vars_required':3,'4_vars_required':1}
+          assert d['total_query_count_per_backend']==56
+          assert d['query_result_counts']=={'sat':36,'unsat':20}
+          assert len(list((p/'smt2').glob('*.smt2')))==56
+          for filename,r in d['proofs'].items():
+              assert all(x['z3']==x['cvc5']=='unsat' for x in r['source_original_full_invariant_three_vc'].values())
+              assert r['source_post_negative']['z3']==r['source_post_negative']['cvc5']=='sat'
+              assert r['source_post_positive_unsat']['z3']==r['source_post_positive_unsat']['cvc5']=='unsat'
+              assert r['spurious_original_pre_unsat']['z3']==r['spurious_original_pre_unsat']['cvc5']=='unsat'
+              assert all(z['z3']==z['cvc5']=='sat' for v in r['excluded_k_ary_projection_witnesses'].values() for z in v['checks'])
+          print('SOURCE_4_EXACT_INTERACTION_ARITY_LOWER_AND_UPPER_BOUND_CERTIFIED',
+                hashlib.sha256((p/'RESULT.json').read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Preserve all original SMT-LIB scripts and precise receipts even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-original4-arity3-arity4-56-cvc5-z3-certificate
+          path: /tmp/neumann-q3-arity/
+          if-no-files-found: warn
