@@ -51,7 +51,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p /tmp/frozen
-          python research/evidence/q3_cellarc2000_20261022/debruijn_phase_fifth1000.py --mode infer --source /tmp/original/masked.jsonl --out /tmp/frozen/UNSCORED.json | tee /tmp/frozen/SOURCE.log
+          python research/evidence/q3_cellarc2000_20261022/debruijn_phase_fourth1000.py --mode infer --source /tmp/original/masked.jsonl --out /tmp/frozen/UNSCORED.json | tee /tmp/frozen/SOURCE.log
           sha256sum /tmp/frozen/UNSCORED.json
       - uses: actions/upload-artifact@v4
         with:
@@ -84,7 +84,7 @@ jobs:
           pathlib.Path('/tmp/original/true.jsonl').write_bytes(raw)
           PY
           mkdir -p /tmp/graded
-          python research/evidence/q3_cellarc2000_20261022/debruijn_phase_fifth1000.py --mode grade --sealed /tmp/frozen/UNSCORED.json --source /tmp/original/true.jsonl --out /tmp/graded/ACTUAL.json | tee /tmp/graded/SCORE.log
+          python research/evidence/q3_cellarc2000_20261022/debruijn_phase_fourth1000.py --mode grade --sealed /tmp/frozen/UNSCORED.json --source /tmp/original/true.jsonl --out /tmp/graded/ACTUAL.json | tee /tmp/graded/SCORE.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
