@@ -1,0 +1,173 @@
+name: Q0 ARC2 new structure composition train800 heldout200 exact oracle
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q0_arc2_train200_composition.yml'
+      - 'research/evidence/q0_arcagi2_trainholdout_first_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  prepare_fixed_train_only_holdout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate frozen code, split rules and source trees before any body is read
+        run: |
+          set -euo pipefail
+          D=research/evidence/q0_arcagi2_trainholdout_first_20261022
+          python -m py_compile "$D/arc_compositional_grammar.py" "$D/grade_arc_train_holdout.py" "$D/postgrade_arc_train_oracle.py"
+          python - <<'PY'
+          import json,pathlib,hashlib
+          d=pathlib.Path('research/evidence/q0_arcagi2_trainholdout_first_20261022')
+          s=json.loads((d/'FROZEN_ARC2_TRAIN800_VALID200.json').read_text())
+          assert s['dev_n']==800 and s['validation_n']==200
+          assert s['pin']=='f3283f727488ad98fe575ea6a5ac981e4a188e49'
+          for basename,field in [('arc_compositional_grammar.py','composer_sha256'),('grade_arc_train_holdout.py','grader_sha256')]:
+              assert hashlib.sha256((d/basename).read_bytes()).hexdigest()==s[field],basename
+          print('COMPOSITIONAL_TRAIN800_VALID200_CODE_AND_SPLIT_FROZEN_BEFORE_DATA',flush=True)
+          PY
+      - name: Checkout immutable official ARC2 training only, redact 200 heldout answer fields
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arc2-official
+          git -C /tmp/arc2-official checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arc2-official rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          mkdir -p /tmp/arc2-masked-train/training
+          python - <<'PY'
+          import pathlib,hashlib,json,shutil
+          root=pathlib.Path('/tmp/arc2-official/data/training');r=pathlib.Path('/tmp/arc2-masked-train/training')
+          names=sorted(root.glob('*.json'),key=lambda z:hashlib.sha256(z.stem.encode()).hexdigest())
+          assert len(names)==1000
+          reg=json.load(open('research/evidence/q0_arcagi2_trainholdout_first_20261022/FROZEN_ARC2_TRAIN800_VALID200.json'))
+          def h(xs):return hashlib.sha256(('\n'.join(x.stem for x in xs)+'\n').encode()).hexdigest()
+          assert h(names[:800])==reg['dev_id_sha256'] and h(names[800:])==reg['val_id_sha256']
+          for f in names[:800]:shutil.copyfile(f,r/f.name)
+          for f in names[800:]:
+              x=json.loads(f.read_text())
+              assert all('output' in v for v in x['test'])
+              m={'train':x['train'],'test':[{'input':z['input']} for z in x['test']]}
+              (r/f.name).write_text(json.dumps(m,separators=(',',':'))+'\n')
+          assert len(list(r.glob('*.json')))==1000
+          print('PREPARED_ONLY_800_DEV_AND_200_MASKED_TEST_ANSWERS',flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q0-arc2-train200-hidden-validation-answers
+          path: /tmp/arc2-masked-train/training/
+          if-no-files-found: error
+  fixed_source_composer_inference:
+    needs: prepare_fixed_train_only_holdout
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-arc2-train200-hidden-validation-answers
+          path: /tmp/arc2-masked-train/training/
+      - name: Enforce no heldout test outputs on inference job filesystem
+        run: |
+          set -euo pipefail
+          python -m pip install -q --disable-pip-version-check numpy==1.26.4
+          python - <<'PY'
+          import pathlib,json,hashlib
+          files=sorted(pathlib.Path('/tmp/arc2-masked-train/training').glob('*.json'),key=lambda p:hashlib.sha256(p.stem.encode()).hexdigest())
+          assert len(files)==1000
+          for f in files[800:]:
+              x=json.loads(f.read_text())
+              assert all('output' not in z for z in x['test']),f
+          print('ANSWER_ISOLATION_HOLDOUT200_CONFIRMED',flush=True)
+          PY
+      - name: Run frozen source-only program composition on ALL 200; save predictions BEFORE grading
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/arc2-comp-pred
+          python research/evidence/q0_arcagi2_trainholdout_first_20261022/arc_compositional_grammar.py \
+            --data /tmp/arc2-masked-train/training \
+            --freeze research/evidence/q0_arcagi2_trainholdout_first_20261022/FROZEN_ARC2_TRAIN800_VALID200.json \
+            --out /tmp/arc2-comp-pred/ARC2_TRAIN200_FIRST_PREGRADE.json \
+            | tee /tmp/arc2-comp-pred/INFERENCE_ONLY.log
+          sha256sum /tmp/arc2-comp-pred/ARC2_TRAIN200_FIRST_PREGRADE.json
+          python - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('/tmp/arc2-comp-pred/ARC2_TRAIN200_FIRST_PREGRADE.json')
+          x=json.loads(p.read_bytes())
+          assert x['n']==200 and x['eval_labels_provided_to_solver'] is False
+          assert x['baseline_coverage']==7 and x['candidate_coverage']==11
+          print('FROZEN_PRE_GRADE_COVERAGE_200',x['baseline_coverage'],x['candidate_coverage'],flush=True)
+          PY
+      - name: Independently retain pre-grade predictions and all zero-candidate problems
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-arc2-train200-no-leaked-answers-before-grade
+          path: /tmp/arc2-comp-pred/
+          if-no-files-found: warn
+  independent_separate_holdout_grader:
+    needs: fixed_source_composer_inference
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-arc2-train200-no-leaked-answers-before-grade
+          path: /tmp/arc2-comp-pred/
+      - name: Download original full official train labels ONLY AFTER prediction artifact exists
+        run: |
+          set -euo pipefail
+          python -m pip install -q --disable-pip-version-check numpy==1.26.4
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arc2-grade
+          git -C /tmp/arc2-grade checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arc2-grade rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+      - name: Independent strict exact grid score and separately compute complete in-library oracle ceiling
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/arc2-comp-grade
+          ROOT=research/evidence/q0_arcagi2_trainholdout_first_20261022
+          IN=/tmp/arc2-comp-pred/ARC2_TRAIN200_FIRST_PREGRADE.json
+          python "$ROOT/grade_arc_train_holdout.py" --predictions "$IN" \
+            --training-root /tmp/arc2-grade/data/training \
+            --out /tmp/arc2-comp-grade/ARC2_TRAIN200_FIRST_INDEPENDENT_GRADE.json \
+            | tee /tmp/arc2-comp-grade/GRADING.log
+          python "$ROOT/postgrade_arc_train_oracle.py" --predictions "$IN" \
+            --training-root /tmp/arc2-grade/data/training \
+            --out /tmp/arc2-comp-grade/POSTGRADE_GRAMMAR_ORACLE.json \
+            | tee /tmp/arc2-comp-grade/ORACLE.log
+          python - <<'PY'
+          import json,pathlib,hashlib
+          root=pathlib.Path('/tmp/arc2-comp-grade')
+          result=json.loads((root/'ARC2_TRAIN200_FIRST_INDEPENDENT_GRADE.json').read_text())
+          oracle=json.loads((root/'POSTGRADE_GRAMMAR_ORACLE.json').read_text())
+          assert result['heldout']==200
+          assert result['exact_solves']=={'baseline':7,'composition':10,'new_comp_only':3}
+          assert result['coverage']=={'baseline':7,'composition':11}
+          assert oracle['oracle_true_program_count']==10 and oracle['ranker_headroom']==0
+          assert oracle['prediction_receipt_sha256']==result['prediction_archive_sha256']
+          print('Q0_INTERNAL_EXACT_COMPOSITION_TRANSFER_3_NEW_SOLVES_AND_ZERO_RERANKING_HEADROOM',flush=True)
+          print('COMMITMENT_SHA256',hashlib.sha256((root/'ARC2_TRAIN200_FIRST_INDEPENDENT_GRADE.json').read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Preserve all 200 exact results and oracle negative evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-arc2-first-200-trained-only-holdout-compose-vs-fixed-and-exact-oracle
+          path: /tmp/arc2-comp-grade/
+          if-no-files-found: warn
