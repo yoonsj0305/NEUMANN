@@ -1,0 +1,22 @@
+{
+  "schema": "NEUMANN_ARC2_Q0_METADATA_FROZEN_BEFORE_PUBLIC_EVAL_BODY.v1",
+  "repository": "arcprize/ARC-AGI-2",
+  "repository_commit": "f3283f727488ad98fe575ea6a5ac981e4a188e49",
+  "training_tree": "dac7259367cc5099ef6a7b604a50a93affbbee33",
+  "evaluation_tree": "8d04288aac3146b7c47d0b799c18bc9c0217d838",
+  "training_count": 1000,
+  "evaluation_count": 120,
+  "filename_manifest_sha256": "3014a6bf8feabbf650a27fd8b77eee7badbdeec6b63035d001ba0cad7cd884dd",
+  "candidate_programs": 96,
+  "program_universe": "8 fixed geometric transforms x 12 fixed post-transforms",
+  "training_rule": "PyTorch 65 AdamW epochs on public training tasks only, one CPU seed=20261022",
+  "reference_comparators": ["mdl", "frequency_prior_from_same_training", "neural", "hybrid", "exhaustive_demo_fitting_program_oracle_posthoc"],
+  "test_prediction_topk": 1,
+  "first_run_policy": "one official whole-public-120 eval, never swap/filter tasks, preserve first failure, any rerun posthoc",
+  "data_isolation": "inference job only receives eval grids with test output keys deleted; separate grading job fetches original eval labels AFTER archived predictions",
+  "cost_accounting": "record public-training model+data fit time, inference time, fixed candidate count; no claims of measured GPU joules, API frontier parity or 10x",
+  "novelty_claim": "No new primitives invented, supplied 96-program library. Passing would only verify transfer of learned ordering within fixed library.",
+  "global_Q1_to_Q7": "OPEN",
+  "source_metadata_committed_before_opening_evaluation_grids_for_this_experiment": true,
+  "caveat": "Public ARC2 tasks can have broad historical exposure in larger project; no claim of global firstblind independence. This code and exact test procedure are frozen for a single official run."
+}
