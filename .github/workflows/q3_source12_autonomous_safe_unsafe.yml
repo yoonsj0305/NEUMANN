@@ -1,0 +1,137 @@
+name: Q3 source-only 12 SAFE-or-UNSAFE complete independent verdict
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_source12_autonomous_safe_unsafe.yml'
+      - 'research/evidence/q3_original12_autonomous_truth_bmc_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  classified_original_truth_no_human_witnesses:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile source-only parsers and independent checkers
+        run: |
+          python -m py_compile research/evidence/q3_original12_autonomous_truth_bmc_20261022/original_source_bmc01.py
+          python -m py_compile research/evidence/q3_autonomous_relation_recovery12_20261022/affine_guard_autosynth.py
+          python -m py_compile research/evidence/q3_source_houdini_sha12_20261022/independent_original_checker.py
+          python -m py_compile research/evidence/q3_source_houdini_sha12_20261022/classical_houdini.py
+          python - <<'PY'
+          import json
+          p='research/evidence/q3_autonomous_relation_recovery12_20261022/SOURCE12_SHA_ONLY_NO_GOLD.json'
+          d=json.load(open(p))
+          assert len(d['cases'])==12 and d['firstblind'] is False
+          assert all(set(x)=={'name','path','sha','size'} for x in d['cases'])
+          print('FROZEN_POSTHOC_NO_WINNING_FORMULAS',len(d['cases']),flush=True)
+          PY
+      - name: Install CPU exact algebra and independent SMT engines
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --quiet sympy==1.14.0
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          curl -fL --retry 3 --connect-timeout 10 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5-bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5-bin
+          sudo install -m 755 "$(find /tmp/cvc5-bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version
+      - name: Retrieve exactly twelve genuine source originals and verify registered upstream Git blob
+        run: |
+          mkdir -p /tmp/neumann-q3-truth/source /tmp/neumann-q3-truth/evidence
+          python - <<'PY'
+          import json,pathlib,hashlib,urllib.request
+          d=json.load(open('research/evidence/q3_autonomous_relation_recovery12_20261022/SOURCE12_SHA_ONLY_NO_GOLD.json'))
+          for x in d['cases']:
+              b=urllib.request.urlopen('https://raw.githubusercontent.com/SyGuS-Org/benchmarks/'+d['upstream_commit']+'/'+x['path'],timeout=30).read()
+              git=hashlib.sha1(('blob '+str(len(b))+'\0').encode()+b).hexdigest()
+              if git!=x['sha'] or len(b)!=x['size']:raise RuntimeError('IMMUTABLE_SOURCE_IDENTITY_FAILURE '+x['name'])
+              pathlib.Path('/tmp/neumann-q3-truth/source',x['name']).write_bytes(b)
+              print('ORIGINAL_SHA_MATCH',x['name'],git,flush=True)
+          PY
+      - name: Autonomous Z3 plus cvc5 UNSAFE model discovery and grounded witness without supplied traces
+        run: |
+          set -o pipefail
+          python research/evidence/q3_original12_autonomous_truth_bmc_20261022/original_source_bmc01.py \
+            --source-dir /tmp/neumann-q3-truth/source \
+            --registry research/evidence/q3_autonomous_relation_recovery12_20261022/SOURCE12_SHA_ONLY_NO_GOLD.json \
+            --engine research/evidence/q3_source_houdini_sha12_20261022/classical_houdini.py \
+            --ast-parser research/evidence/q3_autonomous_relation_recovery12_20261022/affine_guard_autosynth.py \
+            --out /tmp/neumann-q3-truth/evidence/SOURCE_ONLY_BMC01_DUAL.json --cvc5 \
+            | tee /tmp/neumann-q3-truth/evidence/SOURCE_ONLY_BMC01_DUAL.log
+      - name: No-gold exact guarded source structure proposer across same twelve authentic originals
+        run: |
+          set -o pipefail
+          python research/evidence/q3_autonomous_relation_recovery12_20261022/affine_guard_autosynth.py \
+            --engine research/evidence/q3_source_houdini_sha12_20261022/classical_houdini.py \
+            --source-dir /tmp/neumann-q3-truth/source \
+            --manifest research/evidence/q3_autonomous_relation_recovery12_20261022/SOURCE12_SHA_ONLY_NO_GOLD.json \
+            --out /tmp/neumann-q3-truth/evidence/SOURCE_ONLY_GUARDED_SAFE12.json \
+            | tee /tmp/neumann-q3-truth/evidence/SOURCE_ONLY_GUARDED_SAFE12.log
+          python - <<'PY'
+          import json, pathlib
+          p=pathlib.Path('/tmp/neumann-q3-truth/evidence/SOURCE_ONLY_GUARDED_SAFE12.json')
+          r=json.loads(p.read_text())
+          assert len(r['cases'])==12
+          o={'cases':[{'file':z['file'],'safe_certified':z['safe'],
+            'invariant':z.get('invariant'),'source_algorithm':'SOURCE_ONLY_GUARDED_AFFINE' } for z in r['cases']]}
+          pathlib.Path('/tmp/neumann-q3-truth/evidence/CHECKER_INPUT.json').write_text(json.dumps(o,indent=2,sort_keys=True)+'\n')
+          PY
+      - name: Independent original SAFE inductive proof, Z3 and cvc5, no model reliance
+        run: |
+          set -o pipefail
+          python research/evidence/q3_source_houdini_sha12_20261022/independent_original_checker.py \
+            --receipt /tmp/neumann-q3-truth/evidence/CHECKER_INPUT.json \
+            --input /tmp/neumann-q3-truth/source \
+            --manifest research/evidence/q3_autonomous_relation_recovery12_20261022/SOURCE12_SHA_ONLY_NO_GOLD.json \
+            --backend dual \
+            --out /tmp/neumann-q3-truth/evidence/INDEPENDENT_SOURCE_DUAL_SAFE.json \
+            | tee /tmp/neumann-q3-truth/evidence/INDEPENDENT_SOURCE_DUAL_SAFE.log
+      - name: 'Final scientific gate: source-only 11 SAFE and 1 reachable UNSAFE, all twelve grounded'
+        run: |
+          python - <<'PY'
+          import json,pathlib,hashlib
+          root=pathlib.Path('/tmp/neumann-q3-truth/evidence')
+          safe=json.loads((root/'INDEPENDENT_SOURCE_DUAL_SAFE.json').read_text())
+          bmc=json.loads((root/'SOURCE_ONLY_BMC01_DUAL.json').read_text())
+          a=json.loads((root/'SOURCE_ONLY_GUARDED_SAFE12.json').read_text())
+          assert len(safe['rows'])==len(bmc['cases'])==len(a['cases'])==12
+          assert safe['totals']['dual_safe_certified']==11 and safe['totals']['unsat_vc']==33
+          assert safe['totals']['negative_controls']==22
+          assert bmc['totals']['genuine_unsafes']==1 and bmc['totals']['abstain']==0
+          assert bmc['totals']['no_short_witness']==11
+          b={z['file']:z for z in bmc['cases']}
+          proof={z['name']:z for z in safe['rows']}
+          for name,z in proof.items():
+              trace=b[name]
+              assert ('DUAL_ORIGINAL_SAFE_CERTIFIED'==z['status']) ^ ('ORIGINAL_CONCRETE_UNSAFE_DUAL_SAT'==trace['status']),(name,z['status'],trace['status'])
+          assert b['fib_07.sl']['witness_depth']==1
+          assert b['fib_07.sl']['depth1']['grounded_z3']==b['fib_07.sl']['depth1']['grounded_cvc5']=='sat'
+          verdict={'schema':'NEUMANN_Q3_AUTONOMOUS_SOURCE_ONLY_COMPLETE_12_REAL_ORIGINAL.v1',
+            'posthoc':True,'firstblind':False,'model_training_calls':0,'model_operator_novelty':False,
+            'originals_authenticated':12,'safe_proven_dual':11,'unsafe_witness_dual':1,
+            'three_vcs_original_dual_unsat':33,'false_true_controls_original_dual_sat':22,
+            'all_12_decided':True,'local_original_bmc_z3_queries':bmc['totals']['bmc_z3'],
+            'local_original_bmc_cvc5_queries':bmc['totals']['bmc_cvc5'],
+            'unsafe_concrete_witness':b['fib_07.sl']['depth1']['values'],
+            'source_bmc_receipt_sha256':hashlib.sha256((root/'SOURCE_ONLY_BMC01_DUAL.json').read_bytes()).hexdigest(),
+            'source_safe_receipt_sha256':hashlib.sha256((root/'INDEPENDENT_SOURCE_DUAL_SAFE.json').read_bytes()).hexdigest(),
+            'scientific_status':'SCOPED_CLASSICAL_SOURCE_STRUCTURE_DISCOVERY_AND_SAFETY_DISCRIMINATION_PASS; LEARNED_UNIQUENESS_OPEN'}
+          (root/'SCIENTIFIC_VERDICT.json').write_text(json.dumps(verdict,indent=2,sort_keys=True)+'\n')
+          print('AUTONOMOUS_12_REAL_SOURCE_TRUTH_FULL_PASS',json.dumps(verdict,sort_keys=True),flush=True)
+          PY
+      - name: Preserve all original SAT and UNSAT results including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-autonomous-original-safe11-unsafe1-independent-double-receipts
+          path: /tmp/neumann-q3-truth/evidence/
+          if-no-files-found: warn
