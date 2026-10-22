@@ -1,0 +1,94 @@
+name: NEUMANN Q3 learned spatial rule ARC2 original train200 cross-corpus transfer
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_relational_edit_train200_transfer.yml'
+      - 'research/evidence/q3_edit_rule_transfer200_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  prior_strong_source_then_learn_new_programs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Frozen historical strongest symbolic and source pins before any task test outputs
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD:research/evidence/q3_strong_classical_union_20261022/historical_strong_composer.py)" = 99649c3174710557e27c312a6e5af3eb8b375eb9
+          test "$(git rev-parse HEAD:research/evidence/q3_strong_classical_union_20261022/arc_minimal_controller.py)" = 8ca367b4f98d0b7bce46839c0291b536566df1d8
+          test "$(git rev-parse HEAD:research/evidence/q3_object_synthesis_transfer_20261022/frozen_original_typed_selector_v2.py)" = a46dc5480f0819895effc48df1e0600a23640bdf
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arc2-raw
+          git -C /tmp/arc2-raw checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arc2-raw rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          mkdir -p /tmp/arc200-masked
+          python - <<'PY'
+          import pathlib,json,hashlib
+          files=sorted(pathlib.Path('/tmp/arc2-raw/data/training').glob('*.json'),key=lambda f:hashlib.sha256(f.stem.encode()).hexdigest())
+          assert len(files)==1000
+          cohort=files[800:]
+          assert hashlib.sha256(('\n'.join(x.stem for x in cohort)+'\n').encode()).hexdigest()=='9f9f9f80d9c51dd31e0ad999e7d2cf7289fcd2791f785ba41fd74d1b86c8dc9b'
+          for f in cohort:
+              original=json.loads(f.read_text())
+              masked={'train':original['train'],'test':[{'input':q['input']} for q in original['test']]}
+              assert all('output' not in q for q in masked['test'])
+              (pathlib.Path('/tmp/arc200-masked')/f.name).write_text(json.dumps(masked,separators=(',',':'))+'\n')
+          print('ALL200_ORIGINAL_TEST_OUTPUTS_STRIPPED')
+          PY
+          rm -rf /tmp/arc2-raw
+      - name: Source-only full exact historical-first adaptive learner and pregrade seal
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet numpy==1.26.4 scipy==1.14.1
+          mkdir -p /tmp/pregrade
+          python research/evidence/q3_edit_rule_transfer200_20261022/strong_first_transfer.py \
+            --masked /tmp/arc200-masked \
+            --out /tmp/pregrade/ORIGINAL200_NEW_SPATIAL_RULES_PRE_GRADE.json \
+            | tee /tmp/pregrade/NO_TRUTH_TRANSFER_LOG.txt
+          python - <<'PY'
+          import hashlib,json,pathlib
+          p=pathlib.Path('/tmp/pregrade/ORIGINAL200_NEW_SPATIAL_RULES_PRE_GRADE.json')
+          d=json.loads(p.read_text());assert d['n']==200 and not d['test_labels_seen'] and len(d['rows'])==200
+          print('PRE_GRADE_SHA256',hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-new-spatial-edit-source200-preground
+          path: /tmp/pregrade/
+          if-no-files-found: error
+  independently_verify_source_original_test_outputs:
+    needs: prior_strong_source_then_learn_new_programs
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-new-spatial-edit-source200-preground
+          path: /tmp/pregrade/
+      - name: Retrieve original target labels only after successful frozen pregrade publication
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arc2-independent-scorer
+          git -C /tmp/arc2-independent-scorer checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arc2-independent-scorer rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          mkdir -p /tmp/grade
+          python research/evidence/q3_edit_rule_transfer200_20261022/independent_grade.py \
+            --sealed /tmp/pregrade/ORIGINAL200_NEW_SPATIAL_RULES_PRE_GRADE.json \
+            --source /tmp/arc2-independent-scorer/data/training \
+            --out /tmp/grade/ORIGINAL200_STRONGEST_AND_ADAPTIVE_EXACT.json \
+            | tee /tmp/grade/EXACT_INDEPENDENT_GRADE_LOG.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-arc2train200-independent-relational-learning-grade
+          path: /tmp/grade/
+          if-no-files-found: error
