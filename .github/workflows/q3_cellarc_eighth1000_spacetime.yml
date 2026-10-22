@@ -7,6 +7,8 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+env:
+  PYTHONPATH: research/evidence/q3_cellarc2000_20261022
 jobs:
   first_source_truth_stripping:
     runs-on: ubuntu-latest
