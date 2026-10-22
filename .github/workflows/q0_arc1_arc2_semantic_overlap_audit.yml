@@ -83,6 +83,40 @@ jobs:
           (root/'SCOPE_DECISION.json').write_text(json.dumps(summary,indent=2,sort_keys=True)+'\n')
           print('FULL_ORIGINAL_CANONICAL_LEAKAGE_GATE',json.dumps(c,sort_keys=True),flush=True)
           PY
+      - name: Exhaust ALL eligible source-conditioned candidates of EXACT frozen published DSL only AFTER first grade
+        run: |
+          set -euo pipefail
+          DSL=research/evidence/q0_arc1_ood400_transfer_20261022
+          AUDIT=research/evidence/q0_arc1_arc2_leakage_20261022
+          echo "3ee062d8764b5c0a2da243fc6fecadec716739a5dd1ced8736e43c7a64185a77  $DSL/structural_object_language.py" | sha256sum -c -
+          PYTHONPATH="$DSL:research/evidence/q0_arcagi2_trainholdout_first_20261022:research/evidence/q0_arcagi2_fullfirst_20261022" \
+            python "$AUDIT/arc1_postgrade_finite_grammar_oracle.py" \
+              --evaluation-dir /tmp/neumann-q0-corpus/arc1/data/evaluation \
+              --score "$AUDIT/FIRST_ARC1_PUBLIC400_SCORE_COMPACT.json" \
+              --audit /tmp/neumann-q0-audit/ALL400_ARC1_ARC2_SEMANTIC_PROVENANCE.json \
+              --out /tmp/neumann-q0-audit/FULL400_POSTGRADE_EXACT_FINITE_DSL_ORACLE.json \
+              | tee /tmp/neumann-q0-audit/FINITE_GRAMMAR_ORACLE.log
+          python - <<'PY'
+          import json,pathlib
+          root=pathlib.Path('/tmp/neumann-q0-audit')
+          d=json.loads((root/'FULL400_POSTGRADE_EXACT_FINITE_DSL_ORACLE.json').read_text())
+          r=d['oracle']
+          assert d['full_400_problems']==400
+          assert r['baseline_oracle']==5==r['extended_oracle']
+          assert r['candidate_coverage']==7
+          assert r['candidate_count_total']==19
+          assert r['new_only_oracle']==0
+          assert r['id_disjoint_18_covered']==r['id_disjoint_18_oracle']==0
+          import hashlib
+          report=json.loads((root/'SCOPE_DECISION.json').read_text())
+          report['frozen_exact_candidate_grammar_postgrade_ceiling_400']=5
+          report['frozen_exact_candidate_grammar_strict_id_disjoint18_ceiling']=0
+          report['zero_headroom_for_neural_reranking_within_frozen_grammar']=True
+          report['ceiling_limitation']='postgrade exhaustiveness only inside frozen generated candidate DSL, not all arbitrary programs or learned new grammar'
+          report['oracle_result_sha256']=hashlib.sha256((root/'FULL400_POSTGRADE_EXACT_FINITE_DSL_ORACLE.json').read_bytes()).hexdigest()
+          (root/'SCOPE_DECISION.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
+          print('EXACT_REPRESENTATION_GATE_ZERO_RERANKING_HEADROOM',report['oracle_result_sha256'],flush=True)
+          PY
       - name: Retain both fully graded original400 slices and all source canonical-hash receipts even on failure
         if: always()
         uses: actions/upload-artifact@v4
