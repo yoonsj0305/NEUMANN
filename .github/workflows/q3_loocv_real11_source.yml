@@ -1,0 +1,120 @@
+name: NEUMANN Q3 learned-source original11 leave-one-whole-demo-out
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_loocv_real11_source.yml'
+      - 'research/evidence/q3_source_cv_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  frozen_source_without_leftout_demo_answers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-relational-edit-conceptarc160-pregrade
+          run-id: 39769929883
+          repository: yoonsj0305/NEUMANN
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/prior-concept
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-new-spatial-edit-source200-preground
+          run-id: 39770694310
+          repository: yoonsj0305/NEUMANN
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/prior-arc
+      - name: Original source identities and preparation with published test labels stripped
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD:research/evidence/q3_object_synthesis_transfer_20261022/frozen_original_typed_selector_v2.py)" = a46dc5480f0819895effc48df1e0600a23640bdf
+          git clone -q --no-checkout https://github.com/victorvikram/ConceptARC.git /tmp/raw-concept
+          git -C /tmp/raw-concept checkout -q --detach 0e67da6af879e4bad3d7cd3c196e8d551b445725
+          test "$(git -C /tmp/raw-concept rev-parse HEAD:corpus)" = a9e933c021388297f21fa1cded180105479addc0
+          mkdir -p /tmp/masked-11
+          python research/evidence/q3_conceptarc_independent_author_20261022/prepare_corpus.py \
+            --source /tmp/raw-concept/corpus --masked /tmp/masked-11/conceptarc160 \
+            --metadata /tmp/concept-metadata.json
+          rm -rf /tmp/raw-concept
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/raw-arc2
+          git -C /tmp/raw-arc2 checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/raw-arc2 rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          mkdir -p /tmp/masked-11/arc2train200
+          python - <<'PY'
+          import json,pathlib,hashlib
+          source=pathlib.Path('/tmp/raw-arc2/data/training')
+          files=sorted(source.glob('*.json'),key=lambda f:hashlib.sha256(f.stem.encode()).hexdigest())[800:]
+          assert len(files)==200
+          assert hashlib.sha256(('\n'.join(f.stem for f in files)+'\n').encode()).hexdigest()=='9f9f9f80d9c51dd31e0ad999e7d2cf7289fcd2791f785ba41fd74d1b86c8dc9b'
+          for f in files:
+              d=json.loads(f.read_text())
+              masked={'train':d['train'],'test':[{'input':t['input']} for t in d['test']]}
+              (pathlib.Path('/tmp/masked-11/arc2train200')/f.name).write_text(json.dumps(masked,separators=(',',':'))+'\n')
+          print('ALL_360_ORIGINAL_TEST_LABELS_STRIPPED')
+          PY
+          rm -rf /tmp/raw-arc2
+      - name: Exactly 11 original source-learned programs, remove ONE full example each and retrain
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet numpy==1.26.4 scipy==1.14.1
+          mkdir -p /tmp/pregrade-cv
+          python research/evidence/q3_source_cv_20261022/leave_one_demo_predict.py \
+            --masked-root /tmp/masked-11 \
+            --concept-pregrade /tmp/prior-concept/FROZEN_EDIT_RELATIONAL_ALL_PREDICTIONS.json \
+            --arc-pregrade /tmp/prior-arc/ORIGINAL200_NEW_SPATIAL_RULES_PRE_GRADE.json \
+            --out /tmp/pregrade-cv/ALL11_NO_FOLD_TRUTH_PRE_GRADE.json \
+            | tee /tmp/pregrade-cv/RAW_SOURCE_CV_INFERENCE.txt
+          python - <<'PY'
+          import json,hashlib,pathlib
+          p=pathlib.Path('/tmp/pregrade-cv/ALL11_NO_FOLD_TRUTH_PRE_GRADE.json')
+          d=json.loads(p.read_text());assert not d['leftout_original_demo_outputs_given_to_trainer']
+          assert len(d['rows']['conceptarc160'])==6 and len(d['rows']['arc2train200'])==5
+          print('CV_PREGRADE_SHA256',hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-Q3-11-original-source-LOODO-before-grade
+          path: /tmp/pregrade-cv/
+          if-no-files-found: error
+  independent_grade_all_heldout_original_demo_examples:
+    needs: frozen_source_without_leftout_demo_answers
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-Q3-11-original-source-LOODO-before-grade
+          path: /tmp/pregrade-cv/
+      - name: Only now fetch original source-demo labels and grade frozen CV predictions
+        run: |
+          git clone -q --no-checkout https://github.com/victorvikram/ConceptARC.git /tmp/original-concept
+          git -C /tmp/original-concept checkout -q --detach 0e67da6af879e4bad3d7cd3c196e8d551b445725
+          test "$(git -C /tmp/original-concept rev-parse HEAD:corpus)" = a9e933c021388297f21fa1cded180105479addc0
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/original-arc2
+          git -C /tmp/original-arc2 checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/original-arc2 rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          mkdir -p /tmp/grade-cv
+          python research/evidence/q3_source_cv_20261022/independent_cv_grade.py \
+            --sealed /tmp/pregrade-cv/ALL11_NO_FOLD_TRUTH_PRE_GRADE.json \
+            --concept-original /tmp/original-concept/corpus \
+            --arc-original /tmp/original-arc2/data/training \
+            --out /tmp/grade-cv/ALL11_REAL_SOURCE_DEMO_HOLDOUT_VERDICTS.json \
+            | tee /tmp/grade-cv/REAL_CV_GRADING_LOG.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-Q3-original11-demo-LOODO-independent-verdict
+          path: /tmp/grade-cv/
+          if-no-files-found: error
