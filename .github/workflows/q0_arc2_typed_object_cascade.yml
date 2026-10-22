@@ -117,7 +117,7 @@ jobs:
           assert step['route_counts']=={'prior_first':13,'new_typed_object':1,'ABSTAIN':186},step['route_counts']
           assert full['coverage']==11
           print('PREGRADE_FULL_AND_ACTUAL_CONDITIONAL_MATCHED_ALL200',flush=True)
-          for f in p.glob('*.json'):print('PREGRADE_SHA',f.name,hashlib.sha256(f.read_bytes()).hexdigest(),flush=True)
+          for f in pathlib.Path('/tmp/q0-typed-preg').glob('*.json'):print('PREGRADE_SHA',f.name,hashlib.sha256(f.read_bytes()).hexdigest(),flush=True)
           PY
       - name: Preserve immutable predictions BEFORE independent original-test grading
         if: always()
