@@ -1,0 +1,42 @@
+name: NEUMANN Q3 original2000 exact information partition theorem
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_cellarc2000_information_partition.yml'
+      - 'research/evidence/q3_cellarc2000_20261022/information_conservation_audit.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  complete_source_only_known_or_impossible_certificate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Freeze original authentic repository and mask all truth + oracle metadata
+        run: |
+          set -euo pipefail
+          python -m py_compile research/evidence/q3_cellarc2000_20261022/{version_space_certifier.py,active_identifiability_bound.py,information_conservation_audit.py}
+          python research/evidence/q3_cellarc2000_20261022/source_control.py --mode mask --dir /tmp/original2000masked/data --manifest /tmp/original2000masked/LOCK.json
+          python - <<'PY'
+          import pathlib,json
+          m=json.loads(pathlib.Path('/tmp/original2000masked/LOCK.json').read_text())
+          assert m['sha']=='76040e6aef0edc4982e53c13a85ef227378ed171'
+          for name in ('test_interpolation','test_extrapolation'):
+              rows=[json.loads(x) for x in (pathlib.Path('/tmp/original2000masked/data')/(name+'.jsonl')).read_text().splitlines()]
+              assert len(rows)==1000 and all('solution' not in z and 'meta' not in z and 'program' not in z for z in rows)
+          print('IDENTICAL_ORIGINAL2000_ALL_TRUE_LABELS_STRIPPED')
+          PY
+      - name: Exhaustively account for every model-identifiable and two-model-indistinguishable interior cell
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/info-partition
+          python research/evidence/q3_cellarc2000_20261022/information_conservation_audit.py --masked-dir /tmp/original2000masked/data --out /tmp/info-partition/ALL2000_EXACT_KNOWN_OR_AMBIGUOUS.json | tee /tmp/info-partition/FULL_INFORMATION_AUDIT.log
+      - uses: actions/upload-artifact@v4
+        with:
+          name: original-cellarc2000-source-information-conservation
+          path: /tmp/info-partition/
+          if-no-files-found: error
