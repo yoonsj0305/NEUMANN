@@ -1,0 +1,156 @@
+name: "NEUMANN Q0 frozen typed AST official ARC2 public120 original generalization"
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/q0_frozen_typed_arc2_public120.yml"
+      - "research/evidence/q0_arc2_typed_public120_20261022/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  authenticate_and_mask_all_120:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Freeze PREEXISTING prior developed programs, parser and evaluator before reading evaluation originals
+        run: |
+          set -euo pipefail
+          python -m py_compile research/evidence/q0_arc2_typed_public120_20261022/*.py
+          echo "99649c3174710557e27c312a6e5af3eb8b375eb9  REPO_GIT_BLOB_PLACEHOLDER" >/dev/null
+          python - <<'PY'
+          import pathlib,hashlib
+          d=pathlib.Path('research/evidence/q0_arcagi2_trainholdout_first_20261022/arc_compositional_grammar.py')
+          t=pathlib.Path('research/evidence/q0_arc2_typed_intermediate_20261022/relational_pipeline_selector_memo_v2.py')
+          hashes=[]
+          for p in [d,t]:
+              b=p.read_bytes();v=hashlib.sha1(('blob '+str(len(b))+'\0').encode()+b).hexdigest()
+              hashes.append(v)
+              print('SOURCE_METHOD_FROZEN_GIT_BLOB',p,v,flush=True)
+          assert hashes==['99649c3174710557e27c312a6e5af3eb8b375eb9','a46dc5480f0819895effc48df1e0600a23640bdf'],hashes
+          PY
+      - name: Fetch official ARC2 dataset only at preregistered original HEAD and strip all evaluation test labels
+        run: |
+          set -euo pipefail
+          git clone --quiet --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/neumann-original-arc2
+          git -C /tmp/neumann-original-arc2 checkout --quiet --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/neumann-original-arc2 rev-parse HEAD:data/evaluation)" = 8d04288aac3146b7c47d0b799c18bc9c0217d838
+          mkdir -p /tmp/neumann-original-arc2-masked/evaluation
+          python - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('/tmp/neumann-original-arc2/data/evaluation')
+          fs=sorted(p.glob('*.json'))
+          assert len(fs)==120
+          out=pathlib.Path('/tmp/neumann-original-arc2-masked/evaluation')
+          for f in fs:
+              d=json.loads(f.read_text())
+              assert all('output' in x for x in d['test'])
+              (out/f.name).write_text(json.dumps({'train':d['train'],'test':[{'input':x['input']} for x in d['test']]},sort_keys=True,separators=(',',':'))+'\n')
+          assert all(all('output' not in x for x in json.loads(f.read_text())['test']) for f in out.glob('*.json'))
+          print('ALL_120_SOURCE_ORIGINAL_TASKS_MASKED_AND_PINNED',flush=True)
+          PY
+      - name: Publish ONLY 120 sanitized inputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-original-official-arc2-120-evaluation-input-only
+          path: /tmp/neumann-original-arc2-masked/evaluation/
+          if-no-files-found: error
+
+  frozen_no_answer_typed_inference:
+    needs: authenticate_and_mask_all_120
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-original-official-arc2-120-evaluation-input-only
+          path: /tmp/only-120-inputs
+      - name: Install pinned open CPU array packages and reconfirm NO labels
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check numpy==1.26.4 scipy==1.14.1
+          python - <<'PY'
+          import json,pathlib
+          files=list(pathlib.Path('/tmp/only-120-inputs').glob('*.json'))
+          assert len(files)==120
+          for f in files:
+              d=json.loads(f.read_text())
+              assert all('output' not in x for x in d['test'])
+          print('VALIDATED_EVAL_LABELS_ABSENT_120',flush=True)
+          PY
+      - name: Run prior source-only exact program composer AND unchanged source typed-AST v2 on ALL 120
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q0-typed-pregrade
+          python research/evidence/q0_arc2_typed_public120_20261022/evaluate_frozen_typed_public120.py \
+            --masked /tmp/only-120-inputs \
+            --baseline-dir research/evidence/q0_arcagi2_trainholdout_first_20261022 \
+            --typed-dir research/evidence/q0_arc2_typed_intermediate_20261022 \
+            --out /tmp/q0-typed-pregrade/immutable_before_any_target_grade.json \
+            | tee /tmp/q0-typed-pregrade/original_runner.log
+          sha256sum /tmp/q0-typed-pregrade/immutable_before_any_target_grade.json
+      - name: Preserve original predictions and model cost before any grading job receives labels
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-typed-arc2-public120-predictions-before-grade-immutable
+          path: /tmp/q0-typed-pregrade/
+          if-no-files-found: warn
+
+  strictly_independent_all_120_target_scoring:
+    needs: frozen_no_answer_typed_inference
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-typed-arc2-public120-predictions-before-grade-immutable
+          path: /tmp/q0-typed-pregrade
+      - name: Download official evaluation answers ONLY NOW, separated from source model run
+        run: |
+          set -euo pipefail
+          git clone --quiet --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/neumann-grader-arc2
+          git -C /tmp/neumann-grader-arc2 checkout --quiet --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/neumann-grader-arc2 rev-parse HEAD:data/evaluation)" = 8d04288aac3146b7c47d0b799c18bc9c0217d838
+      - name: Exact original 120 test-grid independent scorer and fair wall/coverage comparisons
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q0-typed-official-grade
+          python research/evidence/q0_arc2_typed_public120_20261022/grade_frozen_typed_public120.py \
+            --pred /tmp/q0-typed-pregrade/immutable_before_any_target_grade.json \
+            --truth /tmp/neumann-grader-arc2/data/evaluation \
+            --out /tmp/q0-typed-official-grade/independent_120_original_result.json \
+            | tee /tmp/q0-typed-official-grade/original_grading.log
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/q0-typed-official-grade/independent_120_original_result.json'))
+          assert d['n']==120 and len(d['rows'])==120
+          s=d['counts']
+          assert s['old']<=s['old_covered'] and s['typed']<=s['typed_covered']
+          assert s['hybrid_regressions']==0
+          print('OFFICIAL120_FROZEN_TWO_PROGRAM_FAMILY_SCIENCE_VERDICT',json.dumps(s,sort_keys=True),flush=True)
+          PY
+      - name: Preserve all 120 scored outcomes even when negative
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-official-arc2-public120-frozen-typed-original-exact-postgrade
+          path: /tmp/q0-typed-official-grade/
+          if-no-files-found: warn
