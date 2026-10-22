@@ -1,0 +1,74 @@
+name: NEUMANN Q3-Q4 authentic ARC structure information bound
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_q4_information_gate_source1120.yml'
+      - 'research/evidence/q3_q4_information_gate_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact_original_representation_boundary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Authenticate actual ARC-AGI-2 source and physically mask ALL 1120 test-output fields
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/original-arc2
+          git -C /tmp/original-arc2 checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/original-arc2 rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          test "$(git -C /tmp/original-arc2 rev-parse HEAD:data/evaluation)" = 8d04288aac3146b7c47d0b799c18bc9c0217d838
+          python - <<'PY'
+          import json,pathlib
+          for split,n in [('training',1000),('evaluation',120)]:
+              src=pathlib.Path('/tmp/original-arc2/data')/split
+              dst=pathlib.Path('/tmp/arc2-physically-masked')/split;dst.mkdir(parents=True,exist_ok=True)
+              fs=sorted(src.glob('*.json'));assert len(fs)==n,(split,len(fs))
+              for f in fs:
+                  d=json.loads(f.read_text())
+                  masked={'train':d['train'],'test':[{'input':x['input']} for x in d['test']]}
+                  assert all('output' not in x for x in masked['test'])
+                  (dst/f.name).write_text(json.dumps(masked,separators=(',',':'))+'\n')
+          print('ALL_1120_TEST_OUTPUTS_PHYSICALLY_STRIPPED')
+          PY
+          rm -rf /tmp/original-arc2
+      - name: Audit frozen original learner unchanged; install exact experimental runtime
+        run: |
+          set -euo pipefail
+          echo '0ebb17db4dba8ea047ba6f8f138885dc76bb483a9d52e7c2a4c9487491fd2649  research/evidence/q0_learned_local_structure_20261022/learned_local_rule.py' | sha256sum -c -
+          python -m pip install --quiet numpy==2.3.5 scikit-learn==1.8.0
+          python -m py_compile research/evidence/q3_q4_information_gate_20261022/capacity_probe.py
+      - name: Prove real-original feature collision and exact predefined relational repair boundary
+        run: |
+          mkdir -p /tmp/neumann-q3-q4-information
+          python research/evidence/q3_q4_information_gate_20261022/capacity_probe.py \
+            --masked-root /tmp/arc2-physically-masked \
+            --out /tmp/neumann-q3-q4-information/ORIGINAL1120_REPRESENTATION_CERTIFICATES.json \
+            | tee /tmp/neumann-q3-q4-information/EXECUTION_LOG.txt
+          python - <<'PY'
+          import json,hashlib,pathlib
+          p=pathlib.Path('/tmp/neumann-q3-q4-information/ORIGINAL1120_REPRESENTATION_CERTIFICATES.json')
+          d=json.loads(p.read_text());assert not d['test_output_labels_available_to_probe']
+          for split,n in [('training',1000),('evaluation',120)]:
+              assert d['stats'][split]['source_total']==n
+              assert len(d['source_rows'][split])==n
+              assert d['stats'][split]['fixed_original_feature_impossible']>=d['stats'][split]['combined_repairs']
+              for row in d['source_rows'][split].values():
+                  if row['status']=='EVALUATED':
+                      base=row['proofs']['base']
+                      if base['conflicting_groups']:
+                          assert base['exact_source_witness'] is not None
+                          assert len(set(base['exact_source_witness']['distinct_labels']))==2
+          print('NEUMANN_EXACT_STRUCTURAL_INFORMATION_WITNESS_CHECK_PASS',hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-q4-authentic-1120-exact-information-bound-original-source
+          path: /tmp/neumann-q3-q4-information/
+          if-no-files-found: error
