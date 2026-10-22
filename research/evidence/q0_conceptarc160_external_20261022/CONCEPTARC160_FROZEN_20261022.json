@@ -1,0 +1,17 @@
+{
+  "source_repo": "victorvikram/ConceptARC",
+  "source_git_sha": "0e67da6af879e4bad3d7cd3c196e8d551b445725",
+  "corpus_git_sha": "a9e933c021388297f21fa1cded180105479addc0",
+  "corpus_task_n": 160,
+  "concept_groups": 16,
+  "test_inputs_per_task": 3,
+  "evaluation_prelabel_access": false,
+  "new_model_origin": "source_structural_v2.py authored using ARC2 train 800 only. ARC2 train200 holdout later posthoc check 3/200 which was strict subset of old10/200. ConceptARC corpus bodies not inspected before immutable freeze.",
+  "model_training_calls": 0,
+  "baseline": "Previously frozen arc_compositional_grammar.py from research/q0-arc2-compositional-train200-first-20261022",
+  "new_structures": "source conditioned periodic tile reflection/rotation, pixel-scale, source-selected object/background crop, demo-induced palette mapping",
+  "predeclared_primary_metric": "160 tasks requiring ALL three predicted outputs correct",
+  "secondary_metric": "480 individual test inputs exact matches",
+  "denominator_fail_closed": true,
+  "firstblind_limit": "No ConceptARC task content read within this research campaign before source code commit. Public data may exist in wider training distributions; originality of underlying concept families not proven."
+}

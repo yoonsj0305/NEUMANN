@@ -1,0 +1,64 @@
+name: "Q0 ConceptARC external160 independent-source canonical content overlap audit"
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q0_conceptarc_external_content_overlap.yml'
+      - 'research/evidence/q0_conceptarc160_external_20261022/postgrade_conceptarc_duplicate_audit.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_2080_semantic_content_provenance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile provenance script in strict postgrade mode
+        run: |
+          python -m py_compile research/evidence/q0_conceptarc160_external_20261022/postgrade_conceptarc_duplicate_audit.py
+          mkdir -p /tmp/neumann-q0-canonical-results
+      - name: Retrieve three distinct original official Git sources at immutably pinned revisions
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/victorvikram/ConceptARC.git /tmp/neumann-ca-original
+          git -C /tmp/neumann-ca-original checkout -q --detach 0e67da6af879e4bad3d7cd3c196e8d551b445725
+          test "$(git -C /tmp/neumann-ca-original rev-parse HEAD:corpus)" = a9e933c021388297f21fa1cded180105479addc0
+          git clone -q --no-checkout https://github.com/fchollet/ARC-AGI.git /tmp/neumann-arc1-original
+          git -C /tmp/neumann-arc1-original checkout -q --detach 399030444e0ab0cc8b4e199870fb20b863846f34
+          test "$(git -C /tmp/neumann-arc1-original rev-parse HEAD:data/training)" = c00693818df744970c1cd3e201a559e30b070bbe
+          test "$(git -C /tmp/neumann-arc1-original rev-parse HEAD:data/evaluation)" = 4a19f8327d45dda5e1809ee47be08bf1484b493b
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/neumann-arc2-original
+          git -C /tmp/neumann-arc2-original checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/neumann-arc2-original rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          test "$(git -C /tmp/neumann-arc2-original rev-parse HEAD:data/evaluation)" = 8d04288aac3146b7c47d0b799c18bc9c0217d838
+      - name: Compare original train unordered demonstration sets and complete test+train semantics for all 2080 originals
+        run: |
+          set -o pipefail
+          python research/evidence/q0_conceptarc160_external_20261022/postgrade_conceptarc_duplicate_audit.py \
+             --conceptarc /tmp/neumann-ca-original/corpus \
+             --arc1 /tmp/neumann-arc1-original/data \
+             --arc2 /tmp/neumann-arc2-original/data \
+             --out /tmp/neumann-q0-canonical-results/POSTGRADE_CONCEPTARC160_VS_ARC1_ARC2_CANONICAL_CONTENT.json \
+             | tee /tmp/neumann-q0-canonical-results/CONTENT_AUDIT.log
+          python - <<'PY'
+          import pathlib,json,hashlib
+          p=pathlib.Path('/tmp/neumann-q0-canonical-results/POSTGRADE_CONCEPTARC160_VS_ARC1_ARC2_CANONICAL_CONTENT.json')
+          d=json.loads(p.read_text())
+          assert d['other_originals']==1920 and d['conceptarc_originals']==160
+          assert d['corpus_counts']=={'arc1_training':400,'arc1_evaluation':400,'arc2_training':1000,'arc2_evaluation':120,'conceptarc':160}
+          assert len(d['receipts'])==160
+          print('SOURCE_SEMANTIC_CONTENT_OVERLAP_RESULT',d['identical_demo_multiset_count'],d['identical_full_original_count'],flush=True)
+          print('CONTENT_AUDIT_SHA256',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Preserve all per-task SHA receipts and observed overlaps; no model rerun
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-conceptarc160-original-vs-arc1arc2-1920-exact-semantic-duplication
+          path: /tmp/neumann-q0-canonical-results/
+          if-no-files-found: warn

@@ -1,0 +1,160 @@
+name: "Q0 ConceptARC160 externally authored concept transfer - exact 480 withheld labels"
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q0_conceptarc160_frozen_external.yml'
+      - 'research/evidence/q0_conceptarc160_external_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  freeze_and_mask_external_conceptarc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Freeze and compile new structural-language transfer implementation BEFORE external bodies
+        run: |
+          set -euo pipefail
+          D=research/evidence/q0_conceptarc160_external_20261022
+          python -m py_compile "$D/source_structural_v2.py" "$D/run_conceptarc_masked.py" "$D/grade_conceptarc.py"
+          echo 'fbe64dc5021f6f1baf3a3a86c9090648ead1aa82614c87ba44eecedb22d67d6a  '"$D/source_structural_v2.py" | sha256sum -c -
+          echo '52864672ce904f5832231694cd8246f93d362da111f815b092fa8a18f4d5195b  '"$D/run_conceptarc_masked.py" | sha256sum -c -
+          echo '24ae0811622f4e74f8db6f05582ff2e43ab06410277ab30a4aa62bcb362916a9  '"$D/grade_conceptarc.py" | sha256sum -c -
+          echo '5051347dca14055233cd57dc6aca72bb380e51cd42b573ed24ac9dfeabacf8be  '"$D/CONCEPTARC160_FROZEN_20261022.json" | sha256sum -c -
+          python - <<'PY'
+          import json
+          d=json.load(open('research/evidence/q0_conceptarc160_external_20261022/CONCEPTARC160_FROZEN_20261022.json'))
+          assert d['corpus_git_sha']=='a9e933c021388297f21fa1cded180105479addc0'
+          assert d['corpus_task_n']==160 and d['test_inputs_per_task']==3 and not d['evaluation_prelabel_access']
+          print('BEFORE_FIRST_SOURCE_OPEN_FREEZE_COMMITTED_AND_HASHED',flush=True)
+          PY
+      - name: Authenticate original external ConceptARC Git tree and remove all test outputs
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/victorvikram/ConceptARC.git /tmp/neumann-conceptarc-original
+          git -C /tmp/neumann-conceptarc-original checkout -q --detach 0e67da6af879e4bad3d7cd3c196e8d551b445725
+          test "$(git -C /tmp/neumann-conceptarc-original rev-parse HEAD:corpus)" = a9e933c021388297f21fa1cded180105479addc0
+          python - <<'PY'
+          import json,pathlib,collections,hashlib
+          root=pathlib.Path('/tmp/neumann-conceptarc-original/corpus')
+          files=sorted(root.glob('*/*.json'))
+          assert len(files)==160
+          group=collections.Counter(x.parent.name for x in files)
+          assert len(group)==16 and all(n==10 for n in group.values()),group
+          for src in files:
+              x=json.loads(src.read_text())
+              assert len(x['test'])==3 and len(x['train'])>=1,(src.name,len(x['train']),len(x['test']))
+              assert all('output' in t and 'input' in t for t in x['test'])
+              masked={'train':x['train'],'test':[{'input':t['input']} for t in x['test']]}
+              dest=pathlib.Path('/tmp/neumann-conceptarc-masked/corpus')/src.parent.name/src.name
+              dest.parent.mkdir(parents=True,exist_ok=True)
+              dest.write_text(json.dumps(masked,separators=(',',':'))+'\n')
+          print('MASKED_ALL_160_CONCEPTS_480_TEST_LABELS_HIDDEN',dict(group),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q0-conceptarc160-mask-only-no-480-test-labels
+          path: /tmp/neumann-conceptarc-masked/corpus/
+          if-no-files-found: error
+
+  frozen_external_masked_inference:
+    needs: freeze_and_mask_external_conceptarc
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-conceptarc160-mask-only-no-480-test-labels
+          path: /tmp/neumann-conceptarc-masked/corpus/
+      - name: Install CPU-only numpy and verify all 160 test-output fields really absent
+        run: |
+          set -euo pipefail
+          python -m pip install -q --disable-pip-version-check numpy==1.26.4
+          python - <<'PY'
+          import pathlib,json
+          files=list(pathlib.Path('/tmp/neumann-conceptarc-masked/corpus').glob('*/*.json'))
+          assert len(files)==160
+          for f in files:
+            o=json.loads(f.read_text());assert len(o['test'])==3 and all('output' not in t for t in o['test'])
+          print('ZERO_ANSWER_EXPOSURE_IN_INFERENCE_JOB',flush=True)
+          PY
+      - name: Run baseline old 96+64 mapping candidates and frozen new geometry/object periodic composer, archive before grader
+        run: |
+          set -euo pipefail
+          D=research/evidence/q0_conceptarc160_external_20261022
+          mkdir -p /tmp/neumann-conceptarc-pred
+          PYTHONPATH="$D:research/evidence/q0_arcagi2_fullfirst_20261022:research/evidence/q0_arcagi2_trainholdout_first_20261022" \
+            python "$D/run_conceptarc_masked.py" \
+              --masked-dir /tmp/neumann-conceptarc-masked/corpus \
+              --frozen "$D/CONCEPTARC160_FROZEN_20261022.json" \
+              --out /tmp/neumann-conceptarc-pred/PREDICTIONS_ORIGINAL160_BEFORE_LABELS.json \
+              | tee /tmp/neumann-conceptarc-pred/MASKED_INFERENCE.log
+          sha256sum /tmp/neumann-conceptarc-pred/PREDICTIONS_ORIGINAL160_BEFORE_LABELS.json
+      - name: Persist immutable first predictions before grader may acquire target labels
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-conceptarc160-first-external-predictions-pregrade
+          path: /tmp/neumann-conceptarc-pred/
+          if-no-files-found: warn
+
+  grade_on_separately_retrieved_original_labels:
+    needs: frozen_external_masked_inference
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-conceptarc160-first-external-predictions-pregrade
+          path: /tmp/neumann-conceptarc-pred/
+      - name: Clone public source original targets NOW only in grader job after first prediction persisted
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/victorvikram/ConceptARC.git /tmp/neumann-conceptarc-grade-original
+          git -C /tmp/neumann-conceptarc-grade-original checkout -q --detach 0e67da6af879e4bad3d7cd3c196e8d551b445725
+          test "$(git -C /tmp/neumann-conceptarc-grade-original rev-parse HEAD:corpus)" = a9e933c021388297f21fa1cded180105479addc0
+      - name: Strict 160-task x three-test exact scoring, all concept categories, source-independent checker
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/neumann-conceptarc-grade
+          D=research/evidence/q0_conceptarc160_external_20261022
+          python "$D/grade_conceptarc.py" \
+            --source /tmp/neumann-conceptarc-grade-original/corpus \
+            --predictions /tmp/neumann-conceptarc-pred/PREDICTIONS_ORIGINAL160_BEFORE_LABELS.json \
+            --out /tmp/neumann-conceptarc-grade/FULL160_INDEPENDENT_FIRST_SCORE.json \
+            | tee /tmp/neumann-conceptarc-grade/GRADE.log
+          python - <<'PY'
+          import json,pathlib,hashlib
+          p=pathlib.Path('/tmp/neumann-conceptarc-grade/FULL160_INDEPENDENT_FIRST_SCORE.json');d=json.loads(p.read_text())
+          assert d['original_task_count']==160 and d['original_test_count']==480
+          assert len(d['rows'])==160 and len(d['concept_groups'])==16
+          s=d['scores']
+          assert s['hybrid_all3']>=s['old_all3']
+          assert s.get('new_only',0)>=0 and s.get('hybrid_new_only',0)>=0
+          assert s['old_individual']<=480 and s['new_individual']<=480
+          print('CONCEPTARC160_UNTOUCHED_PREDICTIONS_INDEPENDENT_FINAL_SHA256',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q0-conceptarc160-480-original-concept-independent-first-grade
+          path: /tmp/neumann-conceptarc-grade/
+          if-no-files-found: warn
