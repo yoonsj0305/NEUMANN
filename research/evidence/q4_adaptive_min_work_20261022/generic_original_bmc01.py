@@ -25,7 +25,18 @@ def num(node):
 def int_smt(a):return str(a) if a>=0 else '(- '+str(-a)+')'
 
 def smt_original(raw,engine):
- names,forms,fns=engine.parse(raw)
+ try:
+  names,forms,fns=engine.parse(raw)
+ except AssertionError:
+  # General AST input boundary repair: original classical router had a nonlogical
+  # five-state-variable limit. Only widen parsing for independent BMC.
+  synth=re.search(r'\\(synth-inv\\s+\\S+\\s+',raw)
+  if not synth:raise ValueError('ORIGINAL_SYNTH_SIGNATURE_ABSENT')
+  sig=engine.balanced(raw,synth.end())
+  names=re.findall(r'\\(\\s*([^\\s()]+)\\s+Int\\s*\\)',sig)
+  forms=[engine.balanced(raw,m.start()) for m in re.finditer(r'\\(define-fun\\s+',raw)]
+  if not (1<=len(names)<=32) or len(forms)!=3:raise ValueError('UNSUPPORTED_ORIGINAL_DECLARATIONS')
+  fns=[re.search(r'\\(define-fun\\s+(\\S+)',formula).group(1) for formula in forms]
  header='(set-logic LIA)\n'+'\n'.join('(declare-const '+v+' Int)\n(declare-const '+v+'! Int)' for v in names)+'\n'+'\n'.join(forms)+'\n'
  pre='('+fns[0]+' '+' '.join(names)+')'
  trans='('+fns[1]+' '+' '.join(names+[v+'!' for v in names])+')'
