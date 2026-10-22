@@ -1,0 +1,108 @@
+name: NEUMANN Q3 first-frozen external-author 1D-ARC900 transfer
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_external_1d900_first_frozen.yml'
+      - 'research/evidence/q3_external_1d900_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_lock_and_mask_900:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify unchanged frozen original transfer solver before reading unfamiliar task bodies
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD:research/evidence/q3_object_synthesis_transfer_20261022/frozen_original_typed_selector_v2.py)" = a46dc5480f0819895effc48df1e0600a23640bdf
+          python -m pip install --quiet numpy==1.26.4 scipy==1.14.1
+          python -m py_compile research/evidence/q3_external_1d900_20261022/external_1d900.py
+          git clone -q --no-checkout https://github.com/khalil-research/1D-ARC.git /tmp/new-independent-author-1d
+          git -C /tmp/new-independent-author-1d checkout -q --detach 1e74dc4cb4c58d8160e1fbd0ba638eb745f37147
+          test "$(git -C /tmp/new-independent-author-1d rev-parse HEAD)" = 1e74dc4cb4c58d8160e1fbd0ba638eb745f37147
+          echo "SOURCE_1D_DATASET_TREE_SHA=$(git -C /tmp/new-independent-author-1d rev-parse HEAD:dataset)"
+          mkdir -p /tmp/identity
+          python research/evidence/q3_external_1d900_20261022/external_1d900.py \
+            --mode prepare --source /tmp/new-independent-author-1d/dataset \
+            --masked /tmp/1d-original900-redacted \
+            --out /tmp/identity/SOURCE_ID_MANIFEST_1D900.json
+          test "$(find /tmp/1d-original900-redacted -maxdepth 1 -name '*.json' | wc -l)" -eq 901
+          rm -rf /tmp/new-independent-author-1d
+      - uses: actions/upload-artifact@v4
+        with:
+          name: unknown-before-first-1d-original900-task-inputs-masked
+          path: |
+            /tmp/1d-original900-redacted/
+            /tmp/identity/SOURCE_ID_MANIFEST_1D900.json
+          if-no-files-found: error
+  actual_frozen_algorithm_predictions:
+    needs: source_lock_and_mask_900
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: unknown-before-first-1d-original900-task-inputs-masked
+          path: /tmp/first-1d-masked-artifact
+      - name: Scan 900 source-only tasks with frozen solver code
+        run: |
+          python -m pip install --quiet numpy==1.26.4 scipy==1.14.1
+          mkdir -p /tmp/first-900-prediction
+          python research/evidence/q3_external_1d900_20261022/external_1d900.py \
+            --mode infer --masked /tmp/first-1d-masked-artifact/1d-original900-redacted \
+            --out /tmp/first-900-prediction/FROZEN_BEFORE_LABEL_900.json \
+            | tee /tmp/first-900-prediction/RAW_EXECUTION.log
+          python - <<'PY'
+          import json,pathlib,hashlib
+          p=pathlib.Path('/tmp/first-900-prediction/FROZEN_BEFORE_LABEL_900.json')
+          q=json.loads(p.read_text())
+          assert q['n']==len(q['rows'])==901 and not q['test_truth_seen']
+          print('FIRST_900_PREDICTION_FROZEN_SHA256',hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-frozen-new-author-1d900-original-pregrade
+          path: /tmp/first-900-prediction/
+          if-no-files-found: error
+  independent_original_1d_truth_grade:
+    needs: actual_frozen_algorithm_predictions
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-frozen-new-author-1d900-original-pregrade
+          path: /tmp/first-900-prediction
+      - name: Install frozen dependencies for separate truth checker
+        run: python -m pip install --quiet numpy==1.26.4 scipy==1.14.1
+      - name: Reopen actual original test targets after sealed 900 inference, never earlier
+        run: |
+          git clone -q --no-checkout https://github.com/khalil-research/1D-ARC.git /tmp/new-1d-original-score
+          git -C /tmp/new-1d-original-score checkout -q --detach 1e74dc4cb4c58d8160e1fbd0ba638eb745f37147
+          test "$(git -C /tmp/new-1d-original-score rev-parse HEAD)" = 1e74dc4cb4c58d8160e1fbd0ba638eb745f37147
+          mkdir -p /tmp/first-900-grade
+          python research/evidence/q3_external_1d900_20261022/external_1d900.py \
+            --mode grade --sealed /tmp/first-900-prediction/FROZEN_BEFORE_LABEL_900.json \
+            --source /tmp/new-1d-original-score/dataset \
+            --out /tmp/first-900-grade/REAL_1D900_ALL_ORIGINAL_INDEPENDENT_GRADE.json \
+            | tee /tmp/first-900-grade/INDEPENDENT_SCORE.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-frozen-new-author-1d900-exact-independent-grade
+          path: /tmp/first-900-grade/
+          if-no-files-found: error
