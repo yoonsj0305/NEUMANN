@@ -94,6 +94,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p /tmp/arc2-comp-pred
+          export PYTHONPATH="research/evidence/q0_arcagi2_fullfirst_20261022:${PYTHONPATH:-}"
           python research/evidence/q0_arcagi2_trainholdout_first_20261022/arc_compositional_grammar.py \
             --data /tmp/arc2-masked-train/training \
             --freeze research/evidence/q0_arcagi2_trainholdout_first_20261022/FROZEN_ARC2_TRAIN800_VALID200.json \
@@ -142,6 +143,7 @@ jobs:
           set -euo pipefail
           mkdir -p /tmp/arc2-comp-grade
           ROOT=research/evidence/q0_arcagi2_trainholdout_first_20261022
+          export PYTHONPATH="research/evidence/q0_arcagi2_fullfirst_20261022:${PYTHONPATH:-}"
           IN=/tmp/arc2-comp-pred/ARC2_TRAIN200_FIRST_PREGRADE.json
           python "$ROOT/grade_arc_train_holdout.py" --predictions "$IN" \
             --training-root /tmp/arc2-grade/data/training \
