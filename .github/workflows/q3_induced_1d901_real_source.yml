@@ -1,0 +1,117 @@
+name: NEUMANN Q3 induced relation rule on full original 1D-ARC901
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_induced_1d901_real_source.yml'
+      - 'research/evidence/q3_induced_segment_program_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_901_source_without_targets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Original provenance + unchanged old typed solver
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD:research/evidence/q3_object_synthesis_transfer_20261022/frozen_original_typed_selector_v2.py)" = a46dc5480f0819895effc48df1e0600a23640bdf
+          git clone -q --no-checkout https://github.com/khalil-research/1D-ARC.git /tmp/1d-source
+          git -C /tmp/1d-source checkout -q --detach 1e74dc4cb4c58d8160e1fbd0ba638eb745f37147
+          test "$(git -C /tmp/1d-source rev-parse HEAD)" = 1e74dc4cb4c58d8160e1fbd0ba638eb745f37147
+          python -m pip install --quiet numpy==1.26.4 scipy==1.14.1
+          python research/evidence/q3_external_1d900_20261022/external_1d900.py \
+            --mode prepare --source /tmp/1d-source/dataset \
+            --masked /tmp/1d901-without-test-labels \
+            --out /tmp/INDEPENDENT_901_ORIGINAL_ID_MANIFEST.json
+          python - <<'PY'
+          import pathlib,json
+          p=pathlib.Path('/tmp/1d901-without-test-labels')
+          fs=sorted(p.glob('*.json'));assert len(fs)==901
+          for f in fs:
+              d=json.loads(f.read_text())
+              assert all('output' not in t for t in d['test'])
+          print('SOURCE_901_ALL_TEST_TARGET_FIELDS_REMOVED',len(fs),flush=True)
+          PY
+          rm -rf /tmp/1d-source
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-induced-1d-original901-physically-target-masked
+          path: |
+            /tmp/1d901-without-test-labels/
+            /tmp/INDEPENDENT_901_ORIGINAL_ID_MANIFEST.json
+          if-no-files-found: error
+  actually_induce_rules_and_seal_all_predictions:
+    needs: original_901_source_without_targets
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-induced-1d-original901-physically-target-masked
+          path: /tmp/masked-artifact
+      - name: Run exact task-specific program induction on real source demos only
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet numpy==1.26.4 scipy==1.14.1
+          python -m py_compile research/evidence/q3_induced_segment_program_20261022/*.py
+          mkdir -p /tmp/q3-source-pred
+          python research/evidence/q3_induced_segment_program_20261022/independent_source901.py \
+            --mode infer --masked /tmp/masked-artifact/1d901-without-test-labels \
+            --out /tmp/q3-source-pred/ALL901_FROZEN_PROGRAMS_BEFORE_TRUTH.json \
+            | tee /tmp/q3-source-pred/SOURCE_ONLY_EXECUTION.log
+          python - <<'PY'
+          import pathlib,json,hashlib
+          p=pathlib.Path('/tmp/q3-source-pred/ALL901_FROZEN_PROGRAMS_BEFORE_TRUTH.json')
+          d=json.loads(p.read_text())
+          assert d['n']==len(d['rows'])==901 and not d['test_truth_seen']
+          assert d['neural_forward_count']==0 and d['model_generated_primitive_claim'] is False
+          print('FROZEN_901_PREDICTIONS_BEFORE_GRADING_SHA256',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-induced-original901-all-frozen-before-truth
+          path: /tmp/q3-source-pred/
+          if-no-files-found: error
+  independent_real_901_original_grade:
+    needs: actually_induce_rules_and_seal_all_predictions
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-induced-original901-all-frozen-before-truth
+          path: /tmp/q3-source-pred
+      - name: Read original target labels only now, after SHA-pinned predictions were stored
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet numpy==1.26.4 scipy==1.14.1
+          git clone -q --no-checkout https://github.com/khalil-research/1D-ARC.git /tmp/1d-independent-grade
+          git -C /tmp/1d-independent-grade checkout -q --detach 1e74dc4cb4c58d8160e1fbd0ba638eb745f37147
+          test "$(git -C /tmp/1d-independent-grade rev-parse HEAD)" = 1e74dc4cb4c58d8160e1fbd0ba638eb745f37147
+          mkdir -p /tmp/q3-graded
+          python research/evidence/q3_induced_segment_program_20261022/independent_source901.py \
+            --mode grade \
+            --sealed /tmp/q3-source-pred/ALL901_FROZEN_PROGRAMS_BEFORE_TRUTH.json \
+            --original /tmp/1d-independent-grade/dataset \
+            --out /tmp/q3-graded/ALL901_ORIGINAL_INDEPENDENT_GRADE.json \
+            | tee /tmp/q3-graded/ORIGINAL_SOURCE_EXACT_VERDICT.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-induced-original901-real-causal-grade
+          path: /tmp/q3-graded/
+          if-no-files-found: error
