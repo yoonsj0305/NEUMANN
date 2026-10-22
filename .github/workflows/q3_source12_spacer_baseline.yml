@@ -22,6 +22,12 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y libz3-4
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python - <<'PY'
+          import z3
+          assert z3.get_version_string().startswith('4.13.3'),z3.get_version_string()
+          print('PINNED_Z3',z3.get_version_string())
+          PY
           python -m py_compile research/evidence/q3_source_houdini_sha12_20261022/posthoc_source_only_spacer_baseline.py
       - name: Load previously opened 12 originals with exact frozen SHA
         run: |
