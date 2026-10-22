@@ -1,0 +1,96 @@
+name: NEUMANN Q3 CellARC2000 exact source-halo differential test
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_cellarc2000_halo_differential.yml'
+      - 'research/evidence/q3_cellarc2000_20261022/halo_boundary_probe.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  prepare_authentic_input_only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Lock original same-source revision and strip all query solutions before model
+        run: |
+          set -euo pipefail
+          python -m py_compile research/evidence/q3_cellarc2000_20261022/{halo_boundary_probe.py,exact_local_rule_probe.py,source_control.py}
+          python research/evidence/q3_cellarc2000_20261022/source_control.py --mode mask --dir /tmp/known-source-only/data --manifest /tmp/known-source-only/SOURCE_LOCK.json
+          python - <<'PY'
+          import json,pathlib
+          m=json.loads(pathlib.Path('/tmp/known-source-only/SOURCE_LOCK.json').read_text())
+          assert m['sha']=='76040e6aef0edc4982e53c13a85ef227378ed171',m['sha']
+          for split in ('test_interpolation','test_extrapolation'):
+              p=pathlib.Path('/tmp/known-source-only/data')/(split+'.jsonl')
+              rows=[json.loads(s) for s in p.read_text().splitlines()]
+              assert len(rows)==1000 and all('solution' not in q and 'meta' not in q and 'program' not in q for q in rows)
+          print('SAME_FROZEN_CELLARC_2000_ORIGINAL_PUBLISHED_INPUTS_NO_TARGETS')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cellarc2000-source-masked-same-original-release
+          path: /tmp/known-source-only/
+          if-no-files-found: error
+  actually_compare_original_and_halo_before_truth:
+    needs: prepare_authentic_input_only
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/download-artifact@v4
+        with:
+          name: cellarc2000-source-masked-same-original-release
+          path: /tmp/known-source-only
+      - name: Original legacy and new halo model both learn only source demonstrations
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/cellarc-halo-pregrade
+          python research/evidence/q3_cellarc2000_20261022/halo_boundary_probe.py --mode infer --masked-dir /tmp/known-source-only/data --out /tmp/cellarc-halo-pregrade/ORIGINAL_LEGACY_AND_HALO_SOURCE_ONLY.json | tee /tmp/cellarc-halo-pregrade/SOURCE_ONLY.log
+          python - <<'PY'
+          import hashlib,json,pathlib
+          p=pathlib.Path('/tmp/cellarc-halo-pregrade/ORIGINAL_LEGACY_AND_HALO_SOURCE_ONLY.json')
+          d=json.loads(p.read_text())
+          assert d['n']==2000 and not d['sees_original_truth'] and not d['sees_metadata']
+          assert all(len(d['rows'][k])==1000 for k in ('test_interpolation','test_extrapolation'))
+          print('SEALED_NO_TARGETS_HALO_PRE_GRADE_SHA256',hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-cellarc2000-halo-predictions-before-any-grade
+          path: /tmp/cellarc-halo-pregrade/
+          if-no-files-found: error
+  independent_truth_read_only_after_pregrade:
+    needs: actually_compare_original_and_halo_before_truth
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/download-artifact@v4
+        with:
+          name: cellarc2000-source-masked-same-original-release
+          path: /tmp/known-source-only
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-cellarc2000-halo-predictions-before-any-grade
+          path: /tmp/cellarc-halo-pregrade
+      - name: Independent original labels + exact source tree SHA identity
+        run: |
+          set -euo pipefail
+          python research/evidence/q3_cellarc2000_20261022/source_control.py --mode restore --dir /tmp/cellarc-truth-only --manifest /tmp/known-source-only/SOURCE_LOCK.json
+          mkdir -p /tmp/cellarc-halo-grade
+          python research/evidence/q3_cellarc2000_20261022/halo_boundary_probe.py --mode grade --sealed /tmp/cellarc-halo-pregrade/ORIGINAL_LEGACY_AND_HALO_SOURCE_ONLY.json --original-dir /tmp/cellarc-truth-only --out /tmp/cellarc-halo-grade/ALL2000_TRUE_ORIGINAL_EXACT_COMPARISON.json | tee /tmp/cellarc-halo-grade/INDEPENDENT_TRUTH_SCORE.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-cellarc2000-real-source-halo-independent-original-grade
+          path: /tmp/cellarc-halo-grade/
+          if-no-files-found: error
