@@ -1,0 +1,163 @@
+name: "Q0 ARC2 typed intermediate-object 800dev -> fixed 200holdout first reproducible truth"
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q0_arc2_typed_intermediate_first200.yml'
+      - 'research/evidence/q0_arc2_typed_intermediate_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  freeze_and_mask_all_1000_original_tasks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Preregister code checksum and holdout split WITHOUT opening task bodies
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,pathlib,hashlib
+          p=pathlib.Path('research/evidence/q0_arc2_typed_intermediate_20261022')
+          m=json.loads((p/'FROZEN_PRE_HOLDOUT_TYPED_RELATIONAL_GATE.json').read_text())
+          for name,key in [('relational_pipeline.py','source_program_sha256'),('holdout_runner.py','runner_sha256')]:
+              h=hashlib.sha256((p/name).read_bytes()).hexdigest()
+              assert h==m[key],(name,h,m[key])
+          assert m['frozen_split']['dev_n']==800 and m['frozen_split']['validation_n']==200
+          assert m['dev800_scoped_report']['union_correct']==31
+          assert m['dev800_scoped_report']['baseline_correct']==24
+          assert m['original_commit']=='f3283f727488ad98fe575ea6a5ac981e4a188e49'
+          print('ALL_CODE_AND_HOLDOUT_SPLIT_FROZEN_BEFORE_FIRST_TASK_BODY',flush=True)
+          PY
+      - name: Authenticate complete fixed 1000 ARC2 training corpus and physically strip holdout test answers
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arc2-fixed
+          git -C /tmp/arc2-fixed checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arc2-fixed rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          mkdir -p /tmp/arc2-masked/training
+          python - <<'PY'
+          import pathlib,json,hashlib
+          root=pathlib.Path('/tmp/arc2-fixed/data/training')
+          fs=sorted(root.glob('*.json'),key=lambda p:hashlib.sha256(p.stem.encode()).hexdigest())
+          assert len(fs)==1000
+          m=json.loads(pathlib.Path('research/evidence/q0_arc2_typed_intermediate_20261022/FROZEN_PRE_HOLDOUT_TYPED_RELATIONAL_GATE.json').read_text())['frozen_split']
+          digest=lambda x:hashlib.sha256(('\n'.join(p.stem for p in x)+'\n').encode()).hexdigest()
+          assert digest(fs[:800])==m['dev_id_sha256'] and digest(fs[800:])==m['val_id_sha256']
+          for f in fs:
+              original=json.loads(f.read_text())
+              assert len(original['train'])>=1 and all('output' in row for row in original['test'])
+              masked={'train':original['train'],'test':[{'input':row['input']} for row in original['test']]}
+              (pathlib.Path('/tmp/arc2-masked/training')/f.name).write_text(json.dumps(masked,separators=(',',':'))+'\n')
+          print('ALL_1000_MASKED_NO_TARGET_TEST_LABELS',flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q0-arc2-typed-first-source-blinded-1000-train
+          path: /tmp/arc2-masked/training/
+          if-no-files-found: error
+  predict_all_200_without_labels:
+    needs: freeze_and_mask_all_1000_original_tasks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-arc2-typed-first-source-blinded-1000-train
+          path: /tmp/arc2-masked/training/
+      - name: Install CPU-only object labelling without GPU
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check numpy==1.26.4 scipy==1.14.1
+          python - <<'PY'
+          import json,pathlib
+          fs=sorted(pathlib.Path('/tmp/arc2-masked/training').glob('*.json'))
+          assert len(fs)==1000
+          assert all(all('output' not in x for x in json.loads(p.read_text())['test']) for p in fs)
+          print('ZERO_TARGET_OUTPUT_IN_PREDICTOR_ISOLATION',flush=True)
+          PY
+      - name: Run frozen symbolic typed intermediate object to geometries and color for all 200
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/typed-first-pred
+          D=research/evidence/q0_arc2_typed_intermediate_20261022
+          PYTHONPATH=research/evidence/q0_arcagi2_fullfirst_20261022:research/evidence/q0_arcagi2_trainholdout_first_20261022 \
+            python "$D/holdout_runner.py" \
+            --source /tmp/arc2-masked/training \
+            --frozen research/evidence/q0_arcagi2_trainholdout_first_20261022/FROZEN_ARC2_TRAIN800_VALID200.json \
+            --out /tmp/typed-first-pred/FROZEN_TYPED_200_WITHOUT_ANSWER.json \
+            | tee /tmp/typed-first-pred/PREGRADE_RUN.log
+          python - <<'PY'
+          import pathlib,json,hashlib
+          p=pathlib.Path('/tmp/typed-first-pred/FROZEN_TYPED_200_WITHOUT_ANSWER.json')
+          d=json.loads(p.read_text());assert d['n']==200 and d['label_free'] and len(d['records'])==200
+          assert len({x['id'] for x in d['records']})==200
+          print('PREGRADE_COMPLETE_LOCKED',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Persist whole ungraded first-run exact candidate ASTs and timings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-arc2-typed-intermediate-200-first-immutable-predictions
+          path: /tmp/typed-first-pred/
+          if-no-files-found: warn
+  independent_original_truth_grade:
+    needs: predict_all_200_without_labels
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-arc2-typed-intermediate-200-first-immutable-predictions
+          path: /tmp/typed-first-pred/
+      - name: Fetch original target outputs for the FIRST TIME in a separate job AFTER predictions immutable
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arc2-grade
+          git -C /tmp/arc2-grade checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arc2-grade rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+      - name: All 200 strict grid exact independent grading and paired chance-aware admission
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/typed-first-score
+          python research/evidence/q0_arc2_typed_intermediate_20261022/independent_grader.py \
+            --pred /tmp/typed-first-pred/FROZEN_TYPED_200_WITHOUT_ANSWER.json \
+            --real /tmp/arc2-grade/data/training \
+            --out /tmp/typed-first-score/ORIGINAL_TRAIN200_TYPED_INTERMEDIATE_GRADE.json \
+            | tee /tmp/typed-first-score/SCIENCE_VERDICT.log
+          python - <<'PY'
+          import json,hashlib,pathlib
+          root=pathlib.Path('/tmp/typed-first-score')
+          x=json.loads((root/'ORIGINAL_TRAIN200_TYPED_INTERMEDIATE_GRADE.json').read_text())
+          s=x['scored']
+          assert x['n']==len(x['rows'])==200
+          assert s['hybrid_regressions']==0
+          assert s['hybrid']>=s['baseline'] and s['hybrid']<=200
+          assert s['hybrid_additional']+s['baseline']==s['hybrid']
+          print('REAL_FIRST_SCOPED_OUTCOME',s,flush=True)
+          print('SHA_VERDICT',hashlib.sha256((root/'ORIGINAL_TRAIN200_TYPED_INTERMEDIATE_GRADE.json').read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Archive exact original 200 independent result, with zero wins allowed
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-arc2-typed-intermediate-200-independent-original-exact-score
+          path: /tmp/typed-first-score/
+          if-no-files-found: warn
