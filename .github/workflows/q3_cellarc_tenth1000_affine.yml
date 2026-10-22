@@ -93,7 +93,7 @@ jobs:
           import hashlib,json,pathlib
           p=pathlib.Path('/tmp/first-spacetime-pred/ALL1000_AFFINE_BEFORE_TRUTH.json')
           d=json.loads(p.read_text())
-          assert d['n']==len(d['predictions'])==1000 and not d['test_truth_seen'] and not d['hidden_metadata_seen']
+          assert d['n']==len(d['rows'])==1000 and not d['original_test_answers_seen'] and not d['hidden_true_metadata_seen']
           print('SEALED_SPACETIME_BEFORE_ANY_ORIGINAL_TRUTH',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
           PY
       - uses: actions/upload-artifact@v4
