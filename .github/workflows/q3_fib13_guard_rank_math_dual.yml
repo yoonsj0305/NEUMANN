@@ -1,0 +1,75 @@
+name: Q3 authentic fib13 exact guard necessity dual certificate
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_fib13_guard_rank_math_dual.yml'
+      - 'research/evidence/q3_mode_affine_rank_barrier_fib13_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact_rational_source_mode_lower_bound_and_inductive_proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install exact symbolic math and two independent SMT backends
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check sympy==1.14.0
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          curl -fL --retry 3 --connect-timeout 10 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5-bin /tmp/neumann-rank-fib13/smt
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5-bin
+          sudo install -m 755 "$(find /tmp/cvc5-bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m py_compile research/evidence/q3_mode_affine_rank_barrier_fib13_20261022/branch_rank_original_certifier.py
+      - name: Verify SHA for authentic original published fib13 2019 unchanged source
+        run: |
+          python - <<'PY'
+          import hashlib,pathlib,urllib.request
+          u='https://raw.githubusercontent.com/SyGuS-Org/benchmarks/13c8deb68a873635879c9a69bc78caebd340f646/comp/2019/Inv_Track/From2018/fib_13.sl'
+          b=urllib.request.urlopen(u,timeout=30).read()
+          got=hashlib.sha1(('blob '+str(len(b))+'\0').encode()+b).hexdigest()
+          assert got=='b583a100b7c5a4b9b25a22c4c881b1cd90e2e3ee' and len(b)==586
+          pathlib.Path('/tmp/neumann-rank-fib13/original.sl').write_bytes(b)
+          print('AUTHENTIC_ORIGINAL_FIB13_SHA',got,flush=True)
+          PY
+      - name: Independently derive source native Pre row-space and both Trans modes, exactly prove guard necessity
+        run: |
+          set -o pipefail
+          python research/evidence/q3_mode_affine_rank_barrier_fib13_20261022/branch_rank_original_certifier.py \
+            --source /tmp/neumann-rank-fib13/original.sl \
+            --expected-gitblob b583a100b7c5a4b9b25a22c4c881b1cd90e2e3ee \
+            --affine-engine research/evidence/q3_autonomous_relation_recovery12_20261022/affine_guard_autosynth.py \
+            --classical-engine research/evidence/q3_source_houdini_sha12_20261022/classical_houdini.py \
+            --out /tmp/neumann-rank-fib13/RESULT.json \
+            --smt-out /tmp/neumann-rank-fib13/smt --cvc5 \
+            | tee /tmp/neumann-rank-fib13/run.log
+          python - <<'PY'
+          import json,pathlib,hashlib
+          p=pathlib.Path('/tmp/neumann-rank-fib13')
+          d=json.load(open(p/'RESULT.json'))
+          assert d['global_nullity']==0 and d['global_constraint_rank']==2
+          assert len(d['guarded_modes'])==2
+          assert sorted(x['nullity_C_mode_Mt'] for x in d['guarded_modes'])==[1,1]
+          assert all(x['Z3']==x['cvc5']=='unsat' for x in d['original_full_dual_vcs'].values())
+          assert len(d['original_full_dual_vcs'])==3
+          assert len(d['unguarded_removal_negative_controls'])==2
+          assert all(x['consecution_z3']==x['consecution_cvc5']=='sat' for x in d['unguarded_removal_negative_controls'])
+          assert len(list((p/'smt').glob('*.smt2')))==5
+          print('FIB13_MATHEMATICAL_EXPRESSIVITY_BARRIER_AND_DUAL_GUARD_CAUSAL_PASS',hashlib.sha256((p/'RESULT.json').read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Preserve full signed original proof and failed unguarded counterfactual scripts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-fib13-source-original-global-rank0-branch-rank1-dual
+          path: /tmp/neumann-rank-fib13/
+          if-no-files-found: warn
