@@ -1,0 +1,156 @@
+name: Q3 precommitted 8 source-original classical structural transfer
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_sha_first_eight_structural_transfer_20261022.yml'
+      - 'research/evidence/q4_adaptive_min_work_20261022/HELDOUT8_REGISTER_SHA_FIRST.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preregistered_sources_without_retuning_or_silent_exclusion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Confirm immutable metadata-only preregistered eight denominator
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import pathlib,hashlib,json
+          p=pathlib.Path('research/evidence/q4_adaptive_min_work_20261022/HELDOUT8_REGISTER_SHA_FIRST.json')
+          d=json.loads(p.read_text())
+          assert d['status']=='TARGET_BODY_NOT_OPENED_BEFORE_REGISTRATION_IN_THIS_STUDY'
+          assert len(d['cases'])==len({x['sha'] for x in d['cases']})==8
+          assert sum('comp/2017/' in x['path'] for x in d['cases'])==4
+          assert sum('comp/2019/' in x['path'] for x in d['cases'])==4
+          assert all(set(x)=={'name','path','sha','size'} for x in d['cases'])
+          print('SOURCE8_FROZEN_BEFORE_FIRST_BODY',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Setup unchanged source-original classical proposers and independent backends
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check sympy==1.14.0
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          curl -fL --retry 3 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5-bin /tmp/q3-outside8/sources /tmp/q3-outside8/receipts
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5-bin
+          sudo install -m 755 "$(find /tmp/cvc5-bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m py_compile research/evidence/q3_autonomous_arity_witness20261022/source_guarded_affine_autosynth.py
+          python -m py_compile research/evidence/q3_source_houdini_sha12_20261022/classical_houdini.py
+          python -m py_compile research/evidence/q3_source_houdini_sha12_20261022/independent_original_checker.py
+      - name: First actual body exposure AFTER immutable SHA-only Git commit; exact source identity enforced
+        run: |
+          python - <<'PY'
+          import hashlib,json,pathlib,urllib.request
+          d=json.load(open('research/evidence/q4_adaptive_min_work_20261022/HELDOUT8_REGISTER_SHA_FIRST.json'))
+          root='https://raw.githubusercontent.com/SyGuS-Org/benchmarks/'+d['upstream_commit']+'/'
+          for x in d['cases']:
+            b=urllib.request.urlopen(root+x['path'],timeout=35).read()
+            actual=hashlib.sha1(('blob '+str(len(b))+'\0').encode()+b).hexdigest()
+            assert actual==x['sha'] and len(b)==x['size'],('IDENTITY_FAILURE',x['name'])
+            pathlib.Path('/tmp/q3-outside8/sources',x['name']).write_bytes(b)
+            print('FIRST_BODY_SHA_ORIGINAL_PASS',x['name'],x['sha'],len(b),flush=True)
+          PY
+      - name: Run frozen strong Houdini and richer source-guard exact algebra independently per case, keep every failure or abstention
+        run: |
+          python - <<'PY'
+          import pathlib,json,subprocess,hashlib,time
+          base=pathlib.Path('/tmp/q3-outside8')
+          original=json.load(open('research/evidence/q4_adaptive_min_work_20261022/HELDOUT8_REGISTER_SHA_FIRST.json'))
+          engine='research/evidence/q3_source_houdini_sha12_20261022/classical_houdini.py'
+          advanced='research/evidence/q3_autonomous_arity_witness20261022/source_guarded_affine_autosynth.py'
+          allrows=[];arms={}
+          for method in ['legacy_houdini','source_guarded_exact']:
+            arm=[]
+            for x in original['cases']:
+              case=base/'receipts'/('case_'+x['name']+'_'+method)
+              case.mkdir(parents=True,exist_ok=True)
+              (case/x['name']).write_bytes((base/'sources'/x['name']).read_bytes())
+              manifest=case/'manifest.json'
+              manifest.write_text(json.dumps({'upstream_commit':original['upstream_commit'],'cases':[x]},indent=2))
+              target=case/'output.json'
+              if method=='legacy_houdini':
+                cmd=['python',engine,'--input',str(case),'--manifest',str(manifest),'--out',str(target)]
+              else:
+                cmd=['python',advanced,'--engine',engine,'--source-dir',str(case),'--manifest',str(manifest),'--out',str(target)]
+              t=time.perf_counter()
+              try:
+                r=subprocess.run(cmd,capture_output=True,text=True,timeout=25)
+                stdout=r.stdout[-20000:];stderr=r.stderr[-12000:]
+                (case/'stdout.log').write_text(stdout);(case/'stderr.log').write_text(stderr)
+                parsed=json.loads(target.read_text()) if r.returncode==0 and target.exists() else None
+                record=parsed['cases'][0] if parsed and len(parsed['cases'])==1 else {}
+                ok=bool(record.get('safe_certified',record.get('safe',False))) and bool(record.get('invariant'))
+                item={'file':x['name'],'safe_certified':ok,'invariant':record.get('invariant') if ok else None,
+                      'source_algorithm':method,'raw_success':ok,'source_sha':x['sha'],
+                      'exit_code':r.returncode,'wall_subprocess_s':time.perf_counter()-t,
+                      'raw_status':'CERTIFICATE_PROPOSED' if ok else ('PARSER_OR_RUNTIME_ERROR' if r.returncode!=0 else 'ABSTAIN_UNKNOWN'),
+                      'error_last':stderr[-1200:] if r.returncode!=0 else ''}
+              except Exception as e:
+                item={'file':x['name'],'safe_certified':False,'invariant':None,'source_algorithm':method,
+                      'raw_success':False,'source_sha':x['sha'],'exit_code':'EXCEPTION',
+                      'raw_status':'PARSER_OR_RUNTIME_ERROR','error_last':repr(e),
+                      'wall_subprocess_s':time.perf_counter()-t}
+              arm.append(item)
+              print('FROZEN_FIRST_SOURCE8',method,x['name'],item['raw_status'],'time_s',round(item['wall_subprocess_s'],3),flush=True)
+            arms[method]=arm
+            (base/'receipts'/('PROPOSALS_'+method+'.json')).write_text(json.dumps({'cases':arm},indent=2,sort_keys=True)+'\n')
+          (base/'receipts'/'FIRST_EIGHT_UNFILTERED.json').write_text(json.dumps({'schema':'NEUMANN_Q3_SHA_BEFORE_BODY8_NO_MODEL_RETUNE.v1',
+           'all_names':[x['name'] for x in original['cases']],'arms':arms,'all_denominator':8},indent=2,sort_keys=True)+'\n')
+          assert len(arms['legacy_houdini'])==len(arms['source_guarded_exact'])==8
+          PY
+      - name: Independent actual original full 3VC Z3 and cvc5, including 0 per-source hidden substitutions
+        run: |
+          set -euo pipefail
+          checker=research/evidence/q3_source_houdini_sha12_20261022/independent_original_checker.py
+          reg=research/evidence/q4_adaptive_min_work_20261022/HELDOUT8_REGISTER_SHA_FIRST.json
+          for method in legacy_houdini source_guarded_exact; do
+            python "$checker" \
+              --receipt "/tmp/q3-outside8/receipts/PROPOSALS_${method}.json" \
+              --input /tmp/q3-outside8/sources --manifest "$reg" --backend dual \
+              --out "/tmp/q3-outside8/receipts/INDEPENDENT_${method}.json" \
+              | tee "/tmp/q3-outside8/receipts/INDEPENDENT_${method}.log"
+          done
+      - name: Freeze scientific verdict with all failures and non-firstblind/global limitations
+        run: |
+          python - <<'PY'
+          import json,pathlib,hashlib
+          p=pathlib.Path('/tmp/q3-outside8/receipts')
+          old=json.loads((p/'INDEPENDENT_legacy_houdini.json').read_text())
+          new=json.loads((p/'INDEPENDENT_source_guarded_exact.json').read_text())
+          raw=json.loads((p/'FIRST_EIGHT_UNFILTERED.json').read_text())
+          assert len(old['rows'])==len(new['rows'])==8
+          all_names=raw['all_names']
+          assert len(set(all_names))==8
+          assert all(z['name']==all_names[i] for i,z in enumerate(old['rows']))
+          assert all(z['name']==all_names[i] for i,z in enumerate(new['rows']))
+          oldn=old['totals']['dual_safe_certified'];newn=new['totals']['dual_safe_certified']
+          assert oldn<=8 and newn<=8
+          detailed=[{'name':name,
+             'legacy_status':old['rows'][i]['status'],
+             'exact_guard_status':new['rows'][i]['status'],
+             'raw_exact_status':raw['arms']['source_guarded_exact'][i]['raw_status']}
+             for i,name in enumerate(all_names)]
+          d={'status':'SHA_FIRST_WITHIN_STUDY_SOURCE8_EXACT_CLASSICAL_STRUCTURAL_TRANSFER_FULL_DENOMINATOR',
+             'denominator':8,'legacy_full_original_dual_proved':oldn,'source_guarded_full_original_dual_proved':newn,
+             'learned_training_or_operator_discovery':False,'proofs_are_source_original_z3_cvc5':True,
+             'safe_truth_of_abstentions':'UNKNOWN_NOT_UNSAFE','historical_prior_exposure_unverified':True,
+             'complete_cost_10x_claim':False,'per_case':detailed,
+             'new_vs_legacy_original_verified_difference':newn-oldn,
+             'first_receipt_sha256':hashlib.sha256((p/'FIRST_EIGHT_UNFILTERED.json').read_bytes()).hexdigest()}
+          (p/'FROZEN8_VERDICT.json').write_text(json.dumps(d,indent=2,sort_keys=True)+'\n')
+          print('SHA8_FIRST_STUDY_VERDICT',json.dumps(d,sort_keys=True),flush=True)
+          PY
+      - name: Save every first outcome, error, proof check and source SHA including failed cases
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-sha-before-original8-exact-guard-vs-strong-classic-independent-dual
+          path: /tmp/q3-outside8/receipts/
+          if-no-files-found: warn

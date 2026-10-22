@@ -1,0 +1,148 @@
+name: Q4 paired minimum-needed k-witness search, original dual proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q4_adaptive_exact_source_cost_20261022.yml'
+      - 'research/evidence/q4_adaptive_min_work_20261022/**'
+      - 'research/decisions/NEUMANN_Q4_INCREMENTAL_COMPUTATION_DELETION_20261022_ko.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  q4_full_vs_minimum_with_original_smt_receipts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile fixed algorithms and verify independently certified source upper k values
+        run: |
+          set -euo pipefail
+          R=research/evidence/q4_adaptive_min_work_20261022
+          python -m py_compile "$R/targeted_kwise_recombination.py"
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/q4_adaptive_min_work_20261022/UPPER_AUTOSYNTH_VALIDATED.json'))
+          assert x['proven_upper_k']=={'fib_15.sl':3,'fib_18.sl':3,'hola_countud.sl':3,'jmbl_tacas.sl':4}
+          print('PRIOR_ORIGINAL_DUAL_CERTIFIED_UPPER_K_REUSED',x['proven_upper_k'],flush=True)
+          PY
+      - name: Install exact source SMT backends and arithmetic
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check sympy==1.14.0
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          curl -fL --retry 3 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin /tmp/q4-minwork/source /tmp/q4-minwork/receipts
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+      - name: Fetch unchanged authentic published source4 with strict SHA
+        run: |
+          python - <<'PY'
+          import pathlib,hashlib,urllib.request
+          q={
+            'fib_15.sl':('comp/2019/Inv_Track/From2018/','125d1f9a277e262df77bcbda1a77851841d563d3'),
+            'fib_18.sl':('comp/2019/Inv_Track/From2018/','03f37e87068ec2616c1747cf45860d7811c3ba99'),
+            'hola_countud.sl':('comp/2017/Inv_Track/','5d7f07c0b5a35d119ebe2d59bd5f56e447c547bf'),
+            'jmbl_tacas.sl':('comp/2019/Inv_Track/From2018/','07da5f3887401f7f778cf6cea87cea12a6fe1f83')
+          }
+          for n,(folder,blob) in q.items():
+             u='https://raw.githubusercontent.com/SyGuS-Org/benchmarks/13c8deb68a873635879c9a69bc78caebd340f646/'+folder+n
+             b=urllib.request.urlopen(u,timeout=35).read()
+             h=hashlib.sha1(('blob '+str(len(b))+'\0').encode()+b).hexdigest()
+             assert h==blob,(n,h,blob)
+             pathlib.Path('/tmp/q4-minwork/source',n).write_bytes(b)
+             print('SHA_ORIGINAL',n,h,flush=True)
+          PY
+      - name: Same-source full-k and necessary-only k=K-1 original SAT proofs, independently rechecked with both SMT engines
+        run: |
+          set -euo pipefail
+          R=research/evidence/q4_adaptive_min_work_20261022
+          for mode in full adaptive; do
+            mkdir -p "/tmp/q4-minwork/receipts/${mode}_smt"
+            if [ "$mode" = adaptive ]; then
+              python "$R/targeted_kwise_recombination.py" --source-dir /tmp/q4-minwork/source \
+                --target-k-map "$R/UPPER_AUTOSYNTH_VALIDATED.json" \
+                --out "/tmp/q4-minwork/receipts/${mode}_dual.json" \
+                --smt-out "/tmp/q4-minwork/receipts/${mode}_smt" --cvc5 \
+                | tee "/tmp/q4-minwork/receipts/${mode}_dual.log"
+            else
+              python "$R/targeted_kwise_recombination.py" --source-dir /tmp/q4-minwork/source \
+                --out "/tmp/q4-minwork/receipts/${mode}_dual.json" \
+                --smt-out "/tmp/q4-minwork/receipts/${mode}_smt" --cvc5 \
+                | tee "/tmp/q4-minwork/receipts/${mode}_dual.log"
+            fi
+          done
+      - name: Independently recreate sufficient upper original invariant and certify full three VCs Z3+cvc5
+        run: |
+          set -euo pipefail
+          R=research/evidence/q3_autonomous_arity_witness20261022
+          mkdir -p /tmp/q4-minwork/receipts/upper
+          python "$R/source_guarded_affine_autosynth.py" \
+            --engine research/evidence/q3_source_houdini_sha12_20261022/classical_houdini.py \
+            --source-dir /tmp/q4-minwork/source \
+            --manifest "$R/SOURCE4_ONLY_SHA_MANIFEST.json" \
+            --out /tmp/q4-minwork/receipts/UPPER_SOURCE_ONLY.json \
+            | tee /tmp/q4-minwork/receipts/UPPER_SOURCE_ONLY.log
+          python "$R/auto_upper_filter.py" \
+            --proposals /tmp/q4-minwork/receipts/UPPER_SOURCE_ONLY.json \
+            --lower-bounds /tmp/q4-minwork/receipts/adaptive_dual.json \
+            --out /tmp/q4-minwork/receipts/UPPER_FILTERED.json
+          python research/evidence/q3_source_houdini_sha12_20261022/independent_original_checker.py \
+            --receipt /tmp/q4-minwork/receipts/UPPER_FILTERED.json \
+            --input /tmp/q4-minwork/source \
+            --manifest "$R/SOURCE4_ONLY_SHA_MANIFEST.json" --backend dual \
+            --out /tmp/q4-minwork/receipts/UPPER_ORIGINAL_Z3_CVC5.json \
+            | tee /tmp/q4-minwork/receipts/UPPER_ORIGINAL_Z3_CVC5.log
+      - name: ABBA paired fixed CPU full vs adaptive search, charge upper acquisition separately and preserve each raw run
+        run: |
+          python - <<'PY'
+          import pathlib,json,subprocess,statistics,time,hashlib
+          p=pathlib.Path('/tmp/q4-minwork/receipts')
+          source=pathlib.Path('/tmp/q4-minwork/source')
+          script='research/evidence/q4_adaptive_min_work_20261022/targeted_kwise_recombination.py'
+          upper='research/evidence/q4_adaptive_min_work_20261022/UPPER_AUTOSYNTH_VALIDATED.json'
+          high=json.load(open(p/'UPPER_ORIGINAL_Z3_CVC5.json'))
+          assert high['totals']['dual_safe_certified']==4 and high['totals']['unsat_vc']==12
+          rows=[]
+          for i in range(4):
+            for mode in (('full','adaptive') if i%2==0 else ('adaptive','full')):
+              out=p/f'paired_{i}_{mode}.json'
+              cmd=['python',script,'--source-dir',str(source),'--out',str(out),'--smt-out',str(p/f'paired_{i}_{mode}_smt')]
+              if mode=='adaptive':cmd.extend(['--target-k-map',upper])
+              wall=time.perf_counter()
+              cp=subprocess.run(cmd,text=True,capture_output=True,timeout=35)
+              assert cp.returncode==0,(mode,cp.stderr[-2000:])
+              d=json.loads(out.read_text())
+              rows.append({'rep':i,'arm':mode,'wall_inside_s':d['wall_time_s'],
+                'wall_subprocess_s':time.perf_counter()-wall,'queries':d['query_count_verified'],
+                'arity':{k:z['necessary_support_at_least'] for k,z in d['certified'].items()}})
+          full=json.loads((p/'full_dual.json').read_text()); tar=json.loads((p/'adaptive_dual.json').read_text())
+          assert full['cvc5_run'] and tar['cvc5_run']
+          expected={'fib_15.sl':3,'fib_18.sl':3,'hola_countud.sl':3,'jmbl_tacas.sl':4}
+          for r in rows:assert r['arity']==expected
+          assert tar['query_count_verified']<full['query_count_verified']
+          assert all(r['z3']==r['cvc5']=='sat' for r in tar['verifier_receipt']+full['verifier_receipt'])
+          means={arm:statistics.mean(q['wall_inside_s'] for q in rows if q['arm']==arm) for arm in ('full','adaptive')}
+          meta=json.load(open(p/'UPPER_SOURCE_ONLY.json'))
+          decision={'science_status':'Q4_ADAPTIVE_INCREMENTAL_VERIFIER_WORK_DELETION_SCOPED_PASS','prior_upper_free':False,
+            'original_source_dual_3vc_proven':4,'all_four_minimal_k':expected,'paired':rows,'paired_mean_search_s':means,
+            'search_speedup':means['full']/means['adaptive'],
+            'full_dual_smt':full['query_count_verified'],'adaptive_dual_smt':tar['query_count_verified'],
+            'dual_smt_query_reduction_fraction':1-tar['query_count_verified']/full['query_count_verified'],
+            'source_upper_synthesis_wall_s':meta['total_wall_s'],
+            'not_claimed':'No neural contribution; full end-to-end savings, cross-hardware speedup and global 10x NOT proven.',
+            'source_verification_original_dual':high['totals']['unsat_vc']}
+          (p/'SCOPED_Q4_COST_VERDICT.json').write_text(json.dumps(decision,indent=2,sort_keys=True)+'\n')
+          print('SCOPED_Q4_COST_VERDICT',json.dumps({k:v for k,v in decision.items() if k!='paired'},sort_keys=True),flush=True)
+          PY
+      - name: Preserve all original positive proof scripts and failed original controls even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q4-exact-source-verified-minimum-arity-ABBA-full-work-accounting
+          path: /tmp/q4-minwork/receipts/
+          if-no-files-found: warn
