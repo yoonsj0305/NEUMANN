@@ -1,0 +1,147 @@
+name: "NEUMANN Q0 ConceptARC new-corpus full160 source-blind frozen symbolic vs typed AST"
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q0_conceptarc_frozen160.yml'
+      - 'research/evidence/q0_conceptarc_first160_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pin_and_mask_original160:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify immutable frozen old and typed source before ANY new benchmark body is opened
+        run: |
+          set -euo pipefail
+          P=research/evidence/q0_conceptarc_first160_20261022
+          python -m py_compile "$P/prepare_corpus.py" "$P/predict_frozen.py" "$P/grade_independent.py"
+          echo '689f1a1a380161f55ea13330f0dfa913d87cd537a9d6624dd10c7fda94d2487e  research/evidence/q0_conceptarc_first160_20261022/FREEZE_BEFORE_160_BODIES.json' | sha256sum -c -
+          test "$(git rev-parse HEAD:research/evidence/q0_arcagi2_trainholdout_first_20261022/arc_compositional_grammar.py)" = 99649c3174710557e27c312a6e5af3eb8b375eb9
+          test "$(git rev-parse HEAD:research/evidence/q0_arc2_typed_intermediate_20261022/relational_pipeline_selector_memo_v2.py)" = a46dc5480f0819895effc48df1e0600a23640bdf
+          echo 'MODEL_BASELINE_AND_AST_EXACT_PRIOR_COMMITS_MATCH'
+      - name: Clone only immutable third-party ConceptARC and enforce 160 benchmark files / tree sha
+        run: |
+          set -euo pipefail
+          git clone --quiet --no-checkout https://github.com/victorvikram/ConceptARC.git /tmp/conceptarc-original
+          git -C /tmp/conceptarc-original checkout --quiet --detach 0e67da6af879e4bad3d7cd3c196e8d551b445725
+          test "$(git -C /tmp/conceptarc-original rev-parse HEAD:corpus)" = a9e933c021388297f21fa1cded180105479addc0
+          test "$(find /tmp/conceptarc-original/corpus -name '*.json' | wc -l)" -eq 160
+          python research/evidence/q0_conceptarc_first160_20261022/prepare_corpus.py \
+            --source /tmp/conceptarc-original/corpus \
+            --masked /tmp/conceptarc-mask \
+            --metadata /tmp/conceptarc-metadata.json
+          python - <<'PY'
+          import pathlib,json
+          fs=list(pathlib.Path('/tmp/conceptarc-mask').glob('*.json'))
+          assert len(fs)==160
+          for p in fs:
+              q=json.loads(p.read_text())
+              assert len(q['test'])==3 and all('output' not in t for t in q['test'])
+          print('NO_EVALUATION_TEST_OUTPUTS_VISIBLE_IN_PREDICTION_ARTIFACT',flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q0-conceptarc-160-masked-input-no-test-output
+          path: |
+            /tmp/conceptarc-mask/
+            /tmp/conceptarc-metadata.json
+          if-no-files-found: error
+
+  first_neural_free_frozen_transfer_no_answers:
+    needs: pin_and_mask_original160
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-conceptarc-160-masked-input-no-test-output
+          path: /tmp/conceptarc-holdout
+      - name: Install exact frozen existing CPU dependency versions (no retraining)
+        run: |
+          python -m pip install --quiet --disable-pip-version-check numpy==1.26.4 scipy==1.14.1
+      - name: Run precommitted full160 old vs typed vs fallback without test targets anywhere in this job
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/conceptarc-first-pred
+          python research/evidence/q0_conceptarc_first160_20261022/predict_frozen.py \
+            --masked /tmp/conceptarc-holdout/conceptarc-mask \
+            --meta /tmp/conceptarc-holdout/conceptarc-metadata.json \
+            --out /tmp/conceptarc-first-pred/PREDICTIONS_160_BEFORE_LABELS.json \
+            | tee /tmp/conceptarc-first-pred/PREGRADE_RUN.log
+          sha256sum /tmp/conceptarc-first-pred/PREDICTIONS_160_BEFORE_LABELS.json
+          python - <<'PY'
+          import pathlib,json
+          d=json.loads(pathlib.Path('/tmp/conceptarc-first-pred/PREDICTIONS_160_BEFORE_LABELS.json').read_text())
+          assert d['n']==160 and d['test_grids']==480 and d['labels_seen'] is False
+          assert len(d['rows'])==160
+          print('ALL160_FROZEN_PREDICTIONS_COMMITTED_PRIOR_TO_GRADE',flush=True)
+          PY
+      - name: Preserve permanently ungraded original predictions before next job gets any evaluation labels
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-conceptarc-full160-immutable-original-predictions-prior-to-independent-grader
+          path: /tmp/conceptarc-first-pred/
+          if-no-files-found: warn
+
+  independently_grade_original160:
+    needs: first_neural_free_frozen_transfer_no_answers
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-conceptarc-full160-immutable-original-predictions-prior-to-independent-grader
+          path: /tmp/conceptarc-first-pred
+      - name: Retrieve original ConceptARC test labels ONLY AFTER model source-blind predictions were uploaded
+        run: |
+          set -euo pipefail
+          git clone --quiet --no-checkout https://github.com/victorvikram/ConceptARC.git /tmp/conceptarc-grader
+          git -C /tmp/conceptarc-grader checkout --quiet --detach 0e67da6af879e4bad3d7cd3c196e8d551b445725
+          test "$(git -C /tmp/conceptarc-grader rev-parse HEAD:corpus)" = a9e933c021388297f21fa1cded180105479addc0
+      - name: Exact task and grid score 160 and 480 independently, compare nonregressing gated fallback
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/conceptarc-grade
+          python research/evidence/q0_conceptarc_first160_20261022/grade_independent.py \
+            --pred /tmp/conceptarc-first-pred/PREDICTIONS_160_BEFORE_LABELS.json \
+            --corpus /tmp/conceptarc-grader/corpus \
+            --out /tmp/conceptarc-grade/INDEPENDENT_FULL160_EXACT_GRADING.json \
+            | tee /tmp/conceptarc-grade/GRADER.log
+          python - <<'PY'
+          import pathlib,json
+          d=json.loads(pathlib.Path('/tmp/conceptarc-grade/INDEPENDENT_FULL160_EXACT_GRADING.json').read_text())
+          assert d['n']==160 and d['test_grids']==480
+          assert sum(v['old'] for v in d['grouped'].values())==d['counts']['old']
+          assert sum(v['typed'] for v in d['grouped'].values())==d['counts']['typed']
+          assert d['counts']['fallback']>=d['counts']['old']
+          assert len(d['grouped'])==16 and len(d['rows'])==160
+          print('SOURCE_UNTOUCHED_CONCEPTARC_FULL160_FIRST_EXACT_GRADE_ACCEPTED',flush=True)
+          PY
+      - name: Save all results and first complete task-by-task evidence even if no solutions
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-conceptarc-160-real-source-new-corpus-first-independent-task-grid-results
+          path: /tmp/conceptarc-grade/
+          if-no-files-found: warn
