@@ -1,0 +1,89 @@
+name: "Q0 ARC1 public400 postgrade exact finite-grammar ceiling and disjoint subset"
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q0_arc1_full400_complete_postgrade_oracle.yml'
+      - 'research/evidence/q0_arc1_ood400_transfer_20261022/arc1_postgrade_finite_grammar_oracle.py'
+      - 'research/evidence/q0_arc1_ood400_transfer_20261022/FIRST_ARC1_PUBLIC400_SCORE_COMPACT.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original400_candidate_exhaustion_with_semantic_collision_audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install no-neural symbolic numpy, compile immutable source-only grammar and postgrade exhaustive checker
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check numpy==1.26.4
+          D=research/evidence/q0_arc1_ood400_transfer_20261022
+          python -m py_compile "$D/arc1_postgrade_finite_grammar_oracle.py" "$D/audit_arc1_arc2_semantic_overlap.py" "$D/structural_object_language.py"
+          python - <<'PY'
+          import hashlib,pathlib,json
+          p=pathlib.Path('research/evidence/q0_arc1_ood400_transfer_20261022')
+          assert hashlib.sha256((p/'FIRST_ARC1_PUBLIC400_SCORE_COMPACT.json').read_bytes()).hexdigest()=='11ea8eb3438914e2ab7e9b5b83d80a8f3c3bea28d2f77e7b8d135544287d5878'
+          assert hashlib.sha256((p/'structural_object_language.py').read_bytes()).hexdigest()=='3ee062d8764b5c0a2da243fc6fecadec716739a5dd1ced8736e43c7a64185a77'
+          print('SOURCE_FROZEN_FIRST_PREDICTIONS_FROZEN_CORPUS_MATCHER',flush=True)
+          PY
+      - name: Clone official old and new ARC cohorts at immutable exact original Git commits
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/fchollet/ARC-AGI.git /tmp/q0-arcone
+          git -C /tmp/q0-arcone checkout -q --detach 399030444e0ab0cc8b4e199870fb20b863846f34
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/q0-arctwo
+          git -C /tmp/q0-arctwo checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/q0-arcone rev-parse HEAD:data/evaluation)" = 4a19f8327d45dda5e1809ee47be08bf1484b493b
+          test "$(git -C /tmp/q0-arctwo rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          test "$(git -C /tmp/q0-arctwo rev-parse HEAD:data/evaluation)" = 8d04288aac3146b7c47d0b799c18bc9c0217d838
+          mkdir -p /tmp/arc1-full400-oracle
+      - name: Independently re-create exact first-study source-level corpus collision ledger
+        run: |
+          set -o pipefail
+          D=research/evidence/q0_arc1_ood400_transfer_20261022
+          python "$D/audit_arc1_arc2_semantic_overlap.py" \
+            --arc1-eval /tmp/q0-arcone/data/evaluation \
+            --arc2-train /tmp/q0-arctwo/data/training \
+            --arc2-eval /tmp/q0-arctwo/data/evaluation \
+            --first-score "$D/FIRST_ARC1_PUBLIC400_SCORE_COMPACT.json" \
+            --out /tmp/arc1-full400-oracle/ORIGINAL_SEMANTIC_DUPLICATE_LEDGER.json \
+            | tee /tmp/arc1-full400-oracle/DUPLICATE_AUDIT.log
+      - name: Compute 400-exact-output candidate oracle of all source-only accepted fixed-language programs POST-GRADE
+        run: |
+          set -o pipefail
+          D=research/evidence/q0_arc1_ood400_transfer_20261022
+          PYTHONPATH=research/evidence/q0_arcagi2_fullfirst_20261022:research/evidence/q0_arcagi2_trainholdout_first_20261022:$D \
+            python "$D/arc1_postgrade_finite_grammar_oracle.py" \
+            --evaluation-dir /tmp/q0-arcone/data/evaluation \
+            --score "$D/FIRST_ARC1_PUBLIC400_SCORE_COMPACT.json" \
+            --audit /tmp/arc1-full400-oracle/ORIGINAL_SEMANTIC_DUPLICATE_LEDGER.json \
+            --out /tmp/arc1-full400-oracle/EXHAUSTIVE_ALL_CANDIDATES_ORACLE.json \
+            | tee /tmp/arc1-full400-oracle/EXHAUSTIVE_ORACLE.log
+      - name: Preserve actual result no matter if larger or smaller than preliminary expected ceiling
+        run: |
+          python - <<'PY'
+          import pathlib,json,hashlib
+          p=pathlib.Path('/tmp/arc1-full400-oracle')
+          a=json.loads((p/'EXHAUSTIVE_ALL_CANDIDATES_ORACLE.json').read_text())
+          c=a['oracle'];d=json.loads((p/'ORIGINAL_SEMANTIC_DUPLICATE_LEDGER.json').read_text())
+          assert len(a['rows'])==400 and d['observed_counts']['all_tasks']==400
+          assert d['observed_counts']['disjoint_id']==18
+          assert c['baseline_oracle']>=5 and c['extended_oracle']>=5
+          assert c['baseline_oracle']<=c['extended_oracle']<=400
+          assert c['id_disjoint_18_oracle']<=18
+          print('Q0_ADMISSION_POSTGRADE_FINITE_LANGUAGE_EXACT_CEILING',c,flush=True)
+          print('RECEIPT_SHA256',hashlib.sha256((p/'EXHAUSTIVE_ALL_CANDIDATES_ORACLE.json').read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Archive postgrade oracle and counterexamples with source provenance; do not overwrite first predictions
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-arc1-full400-postgrade-exhaustive-grammar-oracle-and-source-collision
+          path: /tmp/arc1-full400-oracle/
+          if-no-files-found: warn
