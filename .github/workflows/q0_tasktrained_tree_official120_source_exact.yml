@@ -1,0 +1,135 @@
+name: "NEUMANN Q0 unchanged actually trained local rule on published ARC2 evaluation120"
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q0_tasktrained_tree_official120_source_exact.yml'
+      - 'research/evidence/q0_tasktrained_official120_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  freeze_and_mask_all120_source_outputs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prior already-frozen actual model source unchanged and code frozen before eval bodies are loaded
+        run: |
+          set -euo pipefail
+          echo '0ebb17db4dba8ea047ba6f8f138885dc76bb483a9d52e7c2a4c9487491fd2649  research/evidence/q0_learned_local_structure_20261022/learned_local_rule.py' | sha256sum -c -
+          echo '92ffbaf5c1ef6233a7374c461cd9dd18eaed0938b138386b0fafc6d27c8f43c4  research/evidence/q0_tasktrained_official120_20261022/frozen_model_eval120.py' | sha256sum -c -
+          echo '14b022a08f5200ca7d9585a2825aa364d3ecbb2d38706766a72b1539cfe68671  research/evidence/q0_tasktrained_official120_20261022/grade_official120.py' | sha256sum -c -
+      - name: Authenticate official ARC2 120 evaluation git tree and remove original test outputs
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arc2-official120
+          git -C /tmp/arc2-official120 checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arc2-official120 rev-parse HEAD:data/evaluation)" = 8d04288aac3146b7c47d0b799c18bc9c0217d838
+          mkdir -p /tmp/arc2-eval-mask
+          python - <<'PY'
+          import pathlib,json
+          root=pathlib.Path('/tmp/arc2-official120/data/evaluation')
+          fs=sorted(root.glob('*.json'));assert len(fs)==120
+          for f in fs:
+              d=json.loads(f.read_text())
+              masked={'train':d['train'],'test':[{'input':a['input']} for a in d['test']]}
+              assert all('output' not in a for a in masked['test'])
+              pathlib.Path('/tmp/arc2-eval-mask',f.name).write_text(json.dumps(masked,separators=(',',':'))+'\n')
+          print('ALL_120_ORIGINAL_TEST_OUTPUTS_STRIPPED_BEFORE_PREDICTION',flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q0-official120-fully-masked-source-authenticated
+          path: /tmp/arc2-eval-mask/
+          if-no-files-found: error
+  actual_trained_model_official120_infer_without_answers:
+    needs: freeze_and_mask_all120_source_outputs
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-official120-fully-masked-source-authenticated
+          path: /tmp/arc2-eval-mask/
+      - name: Pinned actual CPU supervised decision tree version
+        run: |
+          python -m pip install --quiet --disable-pip-version-check numpy==2.3.5 scikit-learn==1.8.0
+      - name: Fit only on original 120 evaluation demonstrations, never target outputs
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/arc2-eval-pred
+          python research/evidence/q0_tasktrained_official120_20261022/frozen_model_eval120.py \
+            --masked-dir /tmp/arc2-eval-mask \
+            --out /tmp/arc2-eval-pred/FROZEN_ACTUAL_TRAINED_TREE_ALL120_PREGRADE.json \
+            | tee /tmp/arc2-eval-pred/ACTUAL_CPU_TRAINING_INFERENCE.log
+          sha256sum /tmp/arc2-eval-pred/FROZEN_ACTUAL_TRAINED_TREE_ALL120_PREGRADE.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/arc2-eval-pred/FROZEN_ACTUAL_TRAINED_TREE_ALL120_PREGRADE.json'))
+          assert d['n']==120 and not d['eval_labels_seen'] and len(d['rows'])==120
+          print('PRE-GRADE_ALL120_RULES_LOCKED',flush=True)
+          PY
+      - name: Preserve FIRST predicted outputs before grader receives published originals
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-arc2-public120-actual-learned-rule-preground-receipts
+          path: /tmp/arc2-eval-pred/
+          if-no-files-found: warn
+  independently_grade_official120_original_source:
+    needs: actual_trained_model_official120_infer_without_answers
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-arc2-public120-actual-learned-rule-preground-receipts
+          path: /tmp/arc2-eval-pred/
+      - name: Only AFTER published predictions independently fetch genuine official evaluation source outputs
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arc2-grade120
+          git -C /tmp/arc2-grade120 checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arc2-grade120 rev-parse HEAD:data/evaluation)" = 8d04288aac3146b7c47d0b799c18bc9c0217d838
+          mkdir -p /tmp/arc2-eval-score
+      - name: Actual full120 exact task scores and strict failures without tweaking model
+        run: |
+          set -euo pipefail
+          python research/evidence/q0_tasktrained_official120_20261022/grade_official120.py \
+            --prediction /tmp/arc2-eval-pred/FROZEN_ACTUAL_TRAINED_TREE_ALL120_PREGRADE.json \
+            --official-dir /tmp/arc2-grade120/data/evaluation \
+            --out /tmp/arc2-eval-score/REAL_OFFICIAL120_STRICT_SCORE.json \
+            | tee /tmp/arc2-eval-score/REAL_GRADE.log
+          python - <<'PY'
+          import json,hashlib,pathlib
+          p=pathlib.Path('/tmp/arc2-eval-score/REAL_OFFICIAL120_STRICT_SCORE.json')
+          d=json.loads(p.read_text())
+          assert d['eval_tasks']==120 and d['historical_fixed96_exact']==0
+          assert d['actual_trained_model_cv_gated_exact']<=d['actual_trained_model_exact']
+          assert d['global_Q3']==d['global_Q4_10x']==d['frontier_parity']=='OPEN'
+          print('ACTUAL_OFFICIAL_ARC2_EVAL120_LEARNED_STRUCTURE_VERDICT_SHA',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Preserve official postgrade receipts even if model solves zero tasks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-tasktrained-real-arc2-eval120-independent-original-exact-scores
+          path: /tmp/arc2-eval-score/*.json
+          if-no-files-found: warn
