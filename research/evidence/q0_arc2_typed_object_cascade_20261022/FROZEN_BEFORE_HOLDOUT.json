@@ -1,0 +1,19 @@
+{
+  "schema": "NEUMANN_Q0_REPRESENTATION_OBJECT_PIPELINE_FIRST_HOLDOUT_V1",
+  "description": "Source-only compositional per-task typed AST SelectRegion->D4->Scale->Tile->uniform fitted color map; score after frozen first predictions, identical 800/200 split",
+  "method_sha256": "e50877b81eb3af1a09ff35f5c4e9c5a6d49d284d5db72626addd3be866ef1037",
+  "upstream_repository": "arcprize/ARC-AGI-2",
+  "pinned_original_commit": "f3283f727488ad98fe575ea6a5ac981e4a188e49",
+  "dataset_path": "/mnt/data/neumann_new_metamorph_20261022/dataset",
+  "dev_count": 800,
+  "holdout_count": 200,
+  "dev_id_sha256": "b781269e0c7deaf49a212b666ddc94cff4915ebe5c8d5251c0134901f2f56281",
+  "holdout_id_sha256": "9f9f9f80d9c51dd31e0ad999e7d2cf7289fcd2791f785ba41fd74d1b86c8dc9b",
+  "no_target_answers_supplied_to_model": true,
+  "first_for_this_grammar_in_this_campaign": true,
+  "global_first_blind": false,
+  "training_calls": 0,
+  "strong_old_source_baseline": "prior frozen ARC2 compositional no-neural with actual 10/200",
+  "scoring_rule": "all expected test output grids exact, all test cases per task; 200 denominator",
+  "claim_ceiling": "source-only classical generalization study, neural Q3 OPEN"
+}
