@@ -6,7 +6,38 @@ materialization. This does NOT accelerate source search or improve Q3 accuracy.
 """
 import collections,functools,numpy as np
 from scipy.ndimage import binary_fill_holes,label
-from infer_edit_rule import brect,border,spans,count_fg,paint,geometries,apply
+from infer_edit_rule import brect,border,geometries,apply
+
+def count_fg(a):
+    a=np.asarray(a)
+    nonzero=a[a!=0]
+    if not len(nonzero):return {}
+    vals,counts=np.unique(nonzero,return_counts=True)
+    return {int(v):int(n) for v,n in zip(vals,counts)}
+
+def spans(mask,axis):
+    mask=np.asarray(mask,bool)
+    if axis=='h':
+        count=mask.sum(axis=1);active=count>1
+        first=mask.argmax(axis=1)
+        last=mask.shape[1]-1-mask[:,::-1].argmax(axis=1)
+        loc=np.arange(mask.shape[1])[None,:]
+        return active[:,None]&(loc>=first[:,None])&(loc<=last[:,None])
+    count=mask.sum(axis=0);active=count>1
+    first=mask.argmax(axis=0)
+    last=mask.shape[0]-1-mask[::-1,:].argmax(axis=0)
+    loc=np.arange(mask.shape[0])[:,None]
+    return active[None,:]&(loc>=first[None,:])&(loc<=last[None,:])
+
+def paint(a,rule):
+    mode,c=rule
+    if mode=='fixed_output_color':return int(c)
+    q=count_fg(a)
+    if not q:return None
+    ranks=sorted(q.items(),key=lambda e:(-e[1],e[0]))
+    return int({'input_most':ranks[0][0],'input_least':ranks[-1][0],
+         'input_smallest_id':min(q),'input_largest_id':max(q)}[mode])
+
 
 def lazy_predicate(a,key,cache):
     if key in cache:return cache[key]
