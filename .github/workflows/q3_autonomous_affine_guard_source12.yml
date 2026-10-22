@@ -1,0 +1,130 @@
+name: Q3 zero-gold exact affine guard discovery original12 full proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_autonomous_affine_guard_source12.yml'
+      - 'research/evidence/q3_autonomous_relation_recovery12_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_12_automatic_safe_plus_source_unsafe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Audit source-only automatic experiment never consumes human winning invariant
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check sympy==1.14.0
+          python -m py_compile research/evidence/q3_autonomous_relation_recovery12_20261022/*.py
+          python - <<'PY'
+          import pathlib,json,hashlib
+          root=pathlib.Path('research/evidence/q3_autonomous_relation_recovery12_20261022')
+          registry=root/'SOURCE12_SHA_ONLY_NO_GOLD.json'
+          d=json.loads(registry.read_text())
+          assert len(d['cases'])==12
+          assert all(set(x)=={'name','path','sha','size'} for x in d['cases'])
+          assert 'invariant' not in registry.read_text().lower()
+          assert len({x['sha'] for x in d['cases']})==12
+          assert d['firstblind'] is False and d['known_posthoc_sha_amendment']==['fib_11.sl']
+          print('NO_MANUAL_GOLD_INPUT_SHA256',hashlib.sha256(registry.read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Install exact original Z3 and independent checksum-pinned cvc5
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          curl -fL --retry 3 --connect-timeout 10 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5-install
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5-install
+          sudo install -m 755 "$(find /tmp/cvc5-install -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          mkdir -p /tmp/neumann-auto12/sources /tmp/neumann-auto12/evidence
+      - name: Authenticate all 12 posthoc original source hashes, no gold or target hints consumed
+        run: |
+          python - <<'PY'
+          import json,pathlib,urllib.request,hashlib
+          d=json.load(open('research/evidence/q3_autonomous_relation_recovery12_20261022/SOURCE12_SHA_ONLY_NO_GOLD.json'))
+          for x in d['cases']:
+              b=urllib.request.urlopen('https://raw.githubusercontent.com/SyGuS-Org/benchmarks/'+d['upstream_commit']+'/'+x['path'],timeout=30).read()
+              sha=hashlib.sha1(('blob '+str(len(b))+'\0').encode()+b).hexdigest()
+              assert sha==x['sha'] and len(b)==x['size'],x['name']
+              pathlib.Path('/tmp/neumann-auto12/sources',x['name']).write_bytes(b)
+              print('AUTHENTIC_ORIGINAL',x['name'],sha,flush=True)
+          PY
+      - name: Run zero-neural exact source-derived conditional affine conservation and bounded Houdini
+        run: |
+          set -o pipefail
+          E=research/evidence/q3_autonomous_relation_recovery12_20261022
+          M="$E/SOURCE12_SHA_ONLY_NO_GOLD.json"
+          python "$E/affine_guard_autosynth.py" \
+            --engine research/evidence/q3_source_houdini_sha12_20261022/classical_houdini.py \
+            --source-dir /tmp/neumann-auto12/sources --manifest "$M" \
+            --out /tmp/neumann-auto12/evidence/AUTONOMOUS_AFFINE_GUARDED_12.json \
+            | tee /tmp/neumann-auto12/evidence/AUTONOMOUS_AFFINE_GUARDED_12.log
+          python research/evidence/q3_source_houdini_sha12_20261022/classical_houdini.py \
+            --input /tmp/neumann-auto12/sources --manifest "$M" \
+            --out /tmp/neumann-auto12/evidence/STRONG_FINITE_CLASSICAL_12.json \
+            | tee /tmp/neumann-auto12/evidence/STRONG_FINITE_CLASSICAL_12.log
+          python "$E/combine_zero_neural_sources.py" \
+            --affine /tmp/neumann-auto12/evidence/AUTONOMOUS_AFFINE_GUARDED_12.json \
+            --houdini /tmp/neumann-auto12/evidence/STRONG_FINITE_CLASSICAL_12.json \
+            --registry "$M" --out /tmp/neumann-auto12/evidence/AUTONOMOUS_ZERO_GOLD_UNION.json
+      - name: Independent original full three-VC dual solver proof, never trust proposer
+        run: |
+          set -o pipefail
+          C=research/evidence/q3_source_houdini_sha12_20261022/independent_original_checker.py
+          M=research/evidence/q3_autonomous_relation_recovery12_20261022/SOURCE12_SHA_ONLY_NO_GOLD.json
+          python "$C" --receipt /tmp/neumann-auto12/evidence/AUTONOMOUS_ZERO_GOLD_UNION.json \
+            --input /tmp/neumann-auto12/sources --manifest "$M" --backend dual \
+            --out /tmp/neumann-auto12/evidence/INDEPENDENT_DUAL_AUTONOMOUS.json \
+            | tee /tmp/neumann-auto12/evidence/INDEPENDENT_DUAL_AUTONOMOUS.log
+      - name: Separately preserve independent original source truth including reachable unsafe
+        run: |
+          set -o pipefail
+          python research/evidence/q3_original_truth_closure_20261022/original_truth_closure.py \
+            --source-dir /tmp/neumann-auto12/sources \
+            --registry research/evidence/q3_original_truth_closure_20261022/REGISTERED_ALL12_POSTHOC_TRUTH.json \
+            --out /tmp/neumann-auto12/evidence/TRUTH_SEPARATE_FROM_AUTOMATED_GENERATION --cvc5 \
+            | tee /tmp/neumann-auto12/evidence/INDEPENDENT_SOURCE_TRUTH.log
+      - name: Enforce exact scientific attribution: automatic eleven SAFE plus actual UNSAFE
+        run: |
+          python - <<'PY'
+          import json,hashlib,pathlib
+          p=pathlib.Path('/tmp/neumann-auto12/evidence')
+          auto=json.load(open(p/'AUTONOMOUS_AFFINE_GUARDED_12.json'))
+          h=json.load(open(p/'STRONG_FINITE_CLASSICAL_12.json'))
+          u=json.load(open(p/'AUTONOMOUS_ZERO_GOLD_UNION.json'))
+          checker=json.load(open(p/'INDEPENDENT_DUAL_AUTONOMOUS.json'))
+          truth=json.load(open(p/'TRUTH_SEPARATE_FROM_AUTOMATED_GENERATION/RESULT.json'))
+          assert len(auto['cases'])==len(h['cases'])==len(u['cases'])==len(checker['rows'])==12
+          assert checker['totals']['original_checked']==12
+          assert checker['totals']['dual_safe_certified']==u['union_success']==11
+          assert checker['totals']['unsat_vc']==33
+          assert sum(x['file']=='fib_07.sl' and not x['safe_certified'] for x in u['cases'])==1
+          assert truth['summary']['safe_full_three_vc']==11 and truth['summary']['unsafe_reachable_witness']==1
+          improvement=[x['file'] for x in auto['cases'] if x['safe'] and not next(y for y in h['cases'] if y['file']==x['file'])['safe_certified']]
+          ledger={'science_verdict':'POSTHOC_ZERO_NEURAL_AUTONOMOUS_11_SAFE_PLUS_AUTHENTIC_1_UNSAFE',
+             'firstblind':False,'learned_operator_uniqueness':False,'manual_invariant_input':False,
+             'advanced_success':auto['success_count'],'strong_old_houdini_success':h['full_3vc_count'],
+             'combined_automatic_independent_dual_safe':checker['totals']['dual_safe_certified'],
+             'genuinely_unsafe_independent_sat':truth['summary']['unsafe_reachable_witness'],
+             'independently_checked_vcs':checker['totals']['unsat_vc'],
+             'new_solved_by_derived_relations':improvement,'advanced_cpu_s':auto['total_wall_s'],
+             'legacy_cpu_s':h['total_wall_s'],'checker_wall_s':checker['wall_s']}
+          (p/'AUTOMATED_ORIGINAL12_VERDICT.json').write_text(json.dumps(ledger,indent=2,sort_keys=True)+'\n')
+          print('Q3_AUTONOMOUS_SCIENCE_VERDICT',json.dumps(ledger),flush=True)
+          PY
+      - name: Preserve every first result, partial and negative, even on CI failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-no-gold-source12-affine-guard-dual-original-autonomous
+          path: /tmp/neumann-auto12/evidence/
+          if-no-files-found: warn
