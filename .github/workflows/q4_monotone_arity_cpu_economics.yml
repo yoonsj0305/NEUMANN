@@ -1,0 +1,170 @@
+name: NEUMANN Q4 proof-informed monotone arity work-elimination real source paired test
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q4_monotone_arity_cpu_economics.yml'
+      - 'research/evidence/q4_monotone_k_work_elimination_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  full_source_independent_upper_plus_paired_lower_cost:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile fixed source-only cost algorithms
+        run: |
+          set -euo pipefail
+          python -m py_compile research/evidence/q4_monotone_k_work_elimination_20261022/*.py
+          python -m py_compile research/evidence/q3_autonomous_arity_witness20261022/source_guarded_affine_autosynth.py
+          python -m py_compile research/evidence/q3_autonomous_arity_witness20261022/auto_kwise_recombination.py
+      - name: Install exact algebra and independently pinned cvc5
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check sympy==1.14.0
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          curl -fL --retry 3 --connect-timeout 10 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5-bin /tmp/neumann-q4/source /tmp/neumann-q4/evidence
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5-bin
+          sudo install -m 755 "$(find /tmp/cvc5-bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+      - name: Authenticate all four original publicly pinned source blobs
+        run: |
+          python - <<'PY'
+          import hashlib,json,pathlib,urllib.request
+          m=json.load(open('research/evidence/q3_autonomous_arity_witness20261022/SOURCE4_ONLY_SHA_MANIFEST.json'))
+          assert len(m['cases'])==4
+          root='https://raw.githubusercontent.com/SyGuS-Org/benchmarks/'+m['upstream_commit']+'/'
+          for x in m['cases']:
+              folder='comp/2017/Inv_Track/' if x['name']=='hola_countud.sl' else 'comp/2019/Inv_Track/From2018/'
+              b=urllib.request.urlopen(root+folder+x['name'],timeout=30).read()
+              sha=hashlib.sha1(('blob '+str(len(b))+'\0').encode()+b).hexdigest()
+              assert sha==x['sha'] and len(b)==x['size'],x['name']
+              pathlib.Path('/tmp/neumann-q4/source',x['name']).write_bytes(b)
+              print('AUTHENTIC_ORIGINAL',x['name'],sha,flush=True)
+          PY
+      - name: Independently source-synthesize the common, no-human-invariant SAFE candidate upper pool
+        run: |
+          set -o pipefail
+          python - <<'PY'
+          import subprocess,sys,time,json,pathlib
+          cmd=[sys.executable,'research/evidence/q3_autonomous_arity_witness20261022/source_guarded_affine_autosynth.py',
+               '--engine','research/evidence/q3_source_houdini_sha12_20261022/classical_houdini.py',
+               '--source-dir','/tmp/neumann-q4/source',
+               '--manifest','research/evidence/q3_autonomous_arity_witness20261022/SOURCE4_ONLY_SHA_MANIFEST.json',
+               '--out','/tmp/neumann-q4/evidence/FRESH_ORIGINAL_SOURCE_UPPER_POOL.json']
+          t=time.perf_counter()
+          with open('/tmp/neumann-q4/evidence/FRESH_UPPER_GENERATOR.log','w') as f:
+              p=subprocess.run(cmd,stdout=f,stderr=subprocess.STDOUT,timeout=120)
+          assert p.returncode==0,p.returncode
+          d=json.load(open('/tmp/neumann-q4/evidence/FRESH_ORIGINAL_SOURCE_UPPER_POOL.json'))
+          assert len(d['cases'])==d['success_count']==4
+          cost={'proposer_wall_s':round(time.perf_counter()-t,5),'proposer_internal_wall_s':d['total_wall_s']}
+          pathlib.Path('/tmp/neumann-q4/evidence/SHARED_UPPER_GENERATION_COST.json').write_text(json.dumps(cost,indent=2)+'\n')
+          print('ORIGINAL_COMMON_UPPER_GENERATOR_COST',cost,flush=True)
+          PY
+      - name: Select minimum sufficient support K by exact original 3VC, never inspect known lower bounds or human winning invariant
+        run: |
+          set -o pipefail
+          python research/evidence/q4_monotone_k_work_elimination_20261022/select_verified_upper_k.py \
+            --proposals /tmp/neumann-q4/evidence/FRESH_ORIGINAL_SOURCE_UPPER_POOL.json \
+            --source-dir /tmp/neumann-q4/source \
+            --manifest research/evidence/q3_autonomous_arity_witness20261022/SOURCE4_ONLY_SHA_MANIFEST.json \
+            --out /tmp/neumann-q4/evidence/FRESH_VERIFIED_UPPER_K.json \
+            | tee /tmp/neumann-q4/evidence/FRESH_VERIFIED_UPPER_K.log
+      - name: Independently Z3 and cvc5 prove all four source-only upper K invariants using original 3VC and wrong-candidate controls
+        run: |
+          set -o pipefail
+          python - <<'PY'
+          import json,pathlib,re,runpy
+          P=pathlib.Path('/tmp/neumann-q4/evidence')
+          m=json.load(open('research/evidence/q3_autonomous_arity_witness20261022/SOURCE4_ONLY_SHA_MANIFEST.json'))
+          d=json.load(open(P/'FRESH_ORIGINAL_SOURCE_UPPER_POOL.json'))
+          k=json.load(open(P/'FRESH_VERIFIED_UPPER_K.json'))['proven_upper_k']
+          f=runpy.run_path('research/evidence/q4_monotone_k_work_elimination_20261022/select_verified_upper_k.py')
+          rows=[]
+          for row,meta in zip(d['cases'],m['cases']):
+              assert row['file']==meta['name']
+              raw=pathlib.Path('/tmp/neumann-q4/source',meta['name']).read_text()
+              p=re.search(r'\(synth-inv\s+[^\s()]+\s+',raw)
+              ns=re.findall(r'\(\s*([^\s()]+)\s+Int\s*\)',f['balanced'](raw,p.end()))
+              keep=[]
+              for x in f['atoms'](row['invariant']):
+                  tokens=set(re.findall(r'[A-Za-z_!][A-Za-z_0-9!]*',x))
+                  if sum(name in tokens for name in ns)<=k[meta['name']]:keep.append(x)
+              inv='(and '+' '.join(keep)+')' if keep else 'true'
+              rows.append({'file':meta['name'],'invariant':inv,'safe_certified':True,'source_algorithm':'SOURCE_ONLY_MINIMUM_UPPER_ADMITTED_IN_ORIGINAL_3VC'})
+          (P/'UPPER_DUAL_CHECKER_INPUT.json').write_text(json.dumps({'cases':rows},indent=2)+'\n')
+          PY
+          python research/evidence/q3_source_houdini_sha12_20261022/independent_original_checker.py \
+            --receipt /tmp/neumann-q4/evidence/UPPER_DUAL_CHECKER_INPUT.json \
+            --input /tmp/neumann-q4/source \
+            --manifest research/evidence/q3_autonomous_arity_witness20261022/SOURCE4_ONLY_SHA_MANIFEST.json \
+            --backend dual \
+            --out /tmp/neumann-q4/evidence/UPPER_INDEPENDENT_DUAL.json \
+            | tee /tmp/neumann-q4/evidence/UPPER_INDEPENDENT_DUAL.log
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/neumann-q4/evidence/UPPER_INDEPENDENT_DUAL.json'))
+          assert d['totals']['dual_safe_certified']==4 and d['totals']['unsat_vc']==12
+          assert d['totals']['negative_controls']==8
+          print('EXACT_SOURCE_UPPER_INDEPENDENT_DUAL_ALL_ORIGINAL_VCS_PASS',flush=True)
+          PY
+      - name: Run 7 paired order-counterbalanced ACTUAL complete lower-bound evaluations with Z3 plus cvc5 each concrete witness
+        run: |
+          set -o pipefail
+          python research/evidence/q4_monotone_k_work_elimination_20261022/measure_exact_computation.py \
+            --source-dir /tmp/neumann-q4/source \
+            --upper-k /tmp/neumann-q4/evidence/FRESH_VERIFIED_UPPER_K.json \
+            --baseline research/evidence/q3_autonomous_arity_witness20261022/auto_kwise_recombination.py \
+            --optimized research/evidence/q4_monotone_k_work_elimination_20261022/targeted_kwise_recombination.py \
+            --repetitions 7 --cvc5 \
+            --out /tmp/neumann-q4/evidence/PAIRED_RUNS \
+            | tee /tmp/neumann-q4/evidence/PAIRED_RUNS.log
+      - name: Publish complete provenance and full-cost admission including shared source synthesis
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('/tmp/neumann-q4/evidence')
+          d=json.load(open(p/'PAIRED_RUNS/COST_COMPARISON.json'))
+          u=json.load(open(p/'SHARED_UPPER_GENERATION_COST.json'))
+          k=json.load(open(p/'FRESH_VERIFIED_UPPER_K.json'))
+          v=json.load(open(p/'UPPER_INDEPENDENT_DUAL.json'))
+          assert k['proven_upper_k']=={'fib_15.sl':3,'fib_18.sl':3,'hola_countud.sl':3,'jmbl_tacas.sl':4}
+          assert d['summary']['adaptive']['total_z3_calls']<d['summary']['baseline']['total_z3_calls']
+          assert d['summary']['adaptive']['rechecked_original_smt_queries']<d['summary']['baseline']['rechecked_original_smt_queries']
+          assert v['totals']['dual_safe_certified']==4
+          shared=u['proposer_wall_s']+k['wall_s']+v['wall_s']
+          med0=d['summary']['baseline']['median_wall_s'];med1=d['summary']['adaptive']['median_wall_s']
+          o={'scope':'four previously read authentic SyGuS originals, original-source full inductive upper plus concrete lower cert, two independent SMT backends',
+             'Q3_higher_order_minimal_arity':['3','3','3','4'],
+             'representation_theorem':'J_K(R) subset J_k(R) for k<=K; one k=K-1 actual unsafe gluing witness excludes all lower tiers',
+             'training_s':0,'upper_shared_real_seconds':round(shared,4),
+             'baseline_full_protocol_estimated_median_s':round(shared+med0,4),
+             'adaptive_full_protocol_estimated_median_s':round(shared+med1,4),
+             'full_protocol_approx_median_ratio':round((shared+med0)/(shared+med1),4),
+             'lower_only_median_wall_ratio':d['lower_only_median_speedup'],
+             'baseline_original_SMT_rechecks':d['summary']['baseline']['rechecked_original_smt_queries'],
+             'adaptive_original_SMT_rechecks':d['summary']['adaptive']['rechecked_original_smt_queries'],
+             'baseline_total_Z3_calls':d['summary']['baseline']['total_z3_calls'],
+             'adaptive_total_Z3_calls':d['summary']['adaptive']['total_z3_calls'],
+             'dual_solvers':'Z3 and checksum-pinned cvc5', 'scoped_Q4_evidence':'CERTIFIED_UNNECESSARY_WORK_DELETION_PASS',
+             'global_Q4_10x':'OPEN','global_Q3_learned_only':'OPEN',
+             'benchmark_limitation':'posthoc known four original programs, no independent author generalization, no frontier model or compute-cost claim'}
+          (p/'FINAL_COST_VERDICT.json').write_text(json.dumps(o,indent=2,sort_keys=True)+'\n')
+          print('NEUMANN_Q4_CERTIFIED_WORK_DELETION',json.dumps(o,sort_keys=True),flush=True)
+          PY
+      - name: Preserve ALL failed and successful original scripts plus full cost receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q4-source-exact-monotone-k-two-backend-seven-pair-trials
+          path: /tmp/neumann-q4/evidence/
+          if-no-files-found: warn
