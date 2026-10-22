@@ -1,0 +1,92 @@
+name: NEUMANN Q4 exact lazy relational edit AST 10x scoped CPU gate
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q4_lazy_edit_ast_original_bench.yml'
+      - 'research/evidence/q4_lazy_relational_masks_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_sources_exact_semantics_and_paired_real_cpu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Frozen compiled rule source identity and syntax test
+        run: |
+          python -m py_compile research/evidence/q4_lazy_relational_masks_20261022/*.py
+          test "$(git rev-parse HEAD:research/evidence/q3_object_synthesis_transfer_20261022/frozen_original_typed_selector_v2.py)" = a46dc5480f0819895effc48df1e0600a23640bdf
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-relational-edit-conceptarc160-pregrade
+          run-id: 39769929883
+          repository: yoonsj0305/NEUMANN
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/concept-pregrade
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-new-spatial-edit-source200-preground
+          run-id: 39770694310
+          repository: yoonsj0305/NEUMANN
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/arc-pregrade
+      - name: Fetch two pinned original corpora and discard test labels before entering Q4
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/victorvikram/ConceptARC.git /tmp/original-concept
+          git -C /tmp/original-concept checkout -q --detach 0e67da6af879e4bad3d7cd3c196e8d551b445725
+          test "$(git -C /tmp/original-concept rev-parse HEAD:corpus)" = a9e933c021388297f21fa1cded180105479addc0
+          python research/evidence/q3_conceptarc_independent_author_20261022/prepare_corpus.py \
+            --source /tmp/original-concept/corpus --masked /tmp/masked-concept160 \
+            --metadata /tmp/concept-original-manifest.json
+          rm -rf /tmp/original-concept
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/original-arc2
+          git -C /tmp/original-arc2 checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/original-arc2 rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          mkdir -p /tmp/masked-arc200
+          python - <<'PY'
+          import json,pathlib,hashlib
+          files=sorted(pathlib.Path('/tmp/original-arc2/data/training').glob('*.json'),key=lambda x:hashlib.sha256(x.stem.encode()).hexdigest())
+          assert len(files)==1000
+          select=files[800:]
+          assert hashlib.sha256(('\n'.join(f.stem for f in select)+'\n').encode()).hexdigest()=='9f9f9f80d9c51dd31e0ad999e7d2cf7289fcd2791f785ba41fd74d1b86c8dc9b'
+          for f in select:
+              d=json.loads(f.read_text())
+              masked={'train':d['train'],'test':[{'input':t['input']} for t in d['test']]}
+              assert all('output' not in t for t in masked['test'])
+              (pathlib.Path('/tmp/masked-arc200')/f.name).write_text(json.dumps(masked,separators=(',',':'))+'\n')
+          print('REAL_CONCEPT160_AND_ARC200_TARGETS_STRIPPED',flush=True)
+          PY
+          rm -rf /tmp/original-arc2
+      - name: Exact all-key semantics plus ABBA paired CPU on every original newly learned program
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet numpy==1.26.4 scipy==1.14.1
+          mkdir -p /tmp/q4-proof
+          python research/evidence/q4_lazy_relational_masks_20261022/paired_real_source_benchmark.py \
+            --concept-inputs /tmp/masked-concept160 --arc-inputs /tmp/masked-arc200 \
+            --concept-pregrade /tmp/concept-pregrade/FROZEN_EDIT_RELATIONAL_ALL_PREDICTIONS.json \
+            --arc-pregrade /tmp/arc-pregrade/ORIGINAL200_NEW_SPATIAL_RULES_PRE_GRADE.json \
+            --trials 7 --repetitions 20 \
+            --out /tmp/q4-proof/REAL_ORIGINAL_LAZY_EXACT_AST_BENCH.json \
+            | tee /tmp/q4-proof/ACTUAL_REAL_CPU_AND_CERTIFICATE_LOG.txt
+          python - <<'PY'
+          import json,pathlib,hashlib
+          p=pathlib.Path('/tmp/q4-proof/REAL_ORIGINAL_LAZY_EXACT_AST_BENCH.json')
+          d=json.loads(p.read_text())
+          assert d['static_grammar_equivalence']['exact_boolean_predicate_checks']>5000
+          assert set(d['real_source_benchmarks'])=={'conceptarc160','arc2train200'}
+          assert all(x['programs']>0 and len(x['trials'])==7 for x in d['real_source_benchmarks'].values())
+          print('STRICT_SOURCE_CPU_EVIDENCE_SHA256',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q4-lazy-edit-real-two-corpora-bounded-typed-predicate-proof
+          path: /tmp/q4-proof/
+          if-no-files-found: error
