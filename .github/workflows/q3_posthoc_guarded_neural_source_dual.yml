@@ -1,0 +1,79 @@
+name: Q3 posthoc learned conditional relation original dual
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_posthoc_guarded_neural_source_dual.yml'
+      - 'research/evidence/q3_learned_source_conservation_firstnine_20261022/guarded_*'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  guarded_real_learned_relational_original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install CPU-only true training and independent Z3 and cvc5
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+          python -m pip install --quiet --disable-pip-version-check torch==2.5.1+cpu --index-url https://download.pytorch.org/whl/cpu
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          curl -fL --retry 3 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/neumann-guard /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python -m py_compile research/evidence/q3_learned_source_conservation_firstnine_20261022/guarded_original_development.py research/evidence/q3_learned_source_conservation_firstnine_20261022/guarded_dual_original_checker.py
+      - name: Authenticate one PREVIOUSLY OPENED original; not firstblind
+        run: |
+          python - <<'PY'
+          import urllib.request,hashlib,pathlib
+          u='https://raw.githubusercontent.com/SyGuS-Org/benchmarks/13c8deb68a873635879c9a69bc78caebd340f646/comp/2019/Inv_Track/From2018/fib_18.sl'
+          b=urllib.request.urlopen(u,timeout=30).read()
+          blob=hashlib.sha1(('blob '+str(len(b))+'\0').encode()+b).hexdigest()
+          assert blob=='03f37e87068ec2616c1747cf45860d7811c3ba99' and len(b)==858
+          pathlib.Path('/tmp/neumann-guard/source.sl').write_bytes(b)
+          print('ORIGINAL_GIT_SHA_MATCH',blob,flush=True)
+          PY
+      - name: Actual four-seed guarded PyTorch training and matched same-init no gradient and exact nullspace
+        run: |
+          set -o pipefail
+          python research/evidence/q3_learned_source_conservation_firstnine_20261022/guarded_original_development.py \
+            --source /tmp/neumann-guard/source.sl \
+            --expected-gitblob 03f37e87068ec2616c1747cf45860d7811c3ba99 \
+            --out /tmp/neumann-guard/GUARDED_LEARNED_FIRST_POSTHOC.json \
+          | tee /tmp/neumann-guard/train.log
+      - name: Independent second authored original source 3VC Z3 and cvc5 checker
+        run: |
+          set -o pipefail
+          python research/evidence/q3_learned_source_conservation_firstnine_20261022/guarded_dual_original_checker.py \
+            --source /tmp/neumann-guard/source.sl \
+            --expected-gitblob 03f37e87068ec2616c1747cf45860d7811c3ba99 \
+            --receipt /tmp/neumann-guard/GUARDED_LEARNED_FIRST_POSTHOC.json \
+            --out /tmp/neumann-guard/GUARDED_INDEPENDENT_Z3_CVC5.json \
+          | tee /tmp/neumann-guard/independent.log
+          sha256sum /tmp/neumann-guard/GUARDED_LEARNED_FIRST_POSTHOC.json /tmp/neumann-guard/GUARDED_INDEPENDENT_Z3_CVC5.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/neumann-guard/GUARDED_INDEPENDENT_Z3_CVC5.json'))
+          c=d['counts']
+          assert c['trained']==4, c
+          assert c['no_training']==0, c
+          assert c['exact_rational']>=1, c
+          assert c['z3_queries']==c['cvc5_queries'],c
+          print('POSTHOC_TRUE_LEARNED_RELATIONAL_CONDITIONAL_CERTIFIED_AND_CLASSICAL_TIE',c,flush=True)
+          PY
+      - name: Preserve full original receipts even on unsuccessful run
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-posthoc-learned-conditional-real-source-matched-causal-and-strong-classic
+          path: /tmp/neumann-guard/*.json
+          if-no-files-found: warn
