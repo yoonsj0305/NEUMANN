@@ -1,0 +1,21 @@
+{
+  "schema": "NEUMANN.Q3.ONE_FIXED_LEARNED_SOURCE_LOCAL_9_V1",
+  "cohort": "CROSS_COLLECTION_SOURCE_BODY_UNOPENED_WITHIN_THIS_STUDY_9",
+  "date_utc": "2026-10-22",
+  "original_body_read_by_current_study_before_freeze": false,
+  "selection": "Nine explicit files selected from GitHub folder metadata (names, sizes, Git blob SHAs only), across SyGuS-Org 2017 and 2019 collections plus LoopInvGen PolyRank and Code2Inv benchmark collections. No file replacements or exclusions after reading content. Prior NEUMANN project-wide source access/author independence not fully audited; no absolute fresh-blind/Q6 claims.",
+  "frozen_method": "Per-source self-supervised 2000-step Adam minimizing transition+Pre-fiber conservation of a real-weight affine equality; four seeds 0..3 and fixed integer coefficient distillation. No human source-specific invariant, no Post use during fitting. Post is conjoined ONLY in original inductive-checking. Arms same samples: exact rational nullspace (strongest), same-init no optimizer. Unmodified code and first attempt receipts preserved. Never credit a proof solely to learning if exact baseline produces it.",
+  "exact_source_verifier": "Full native original Pre/Trans/Post Z3 then independent cvc5 for all accepted learned/exact/no-training candidates; abstain unknown, verify original Git SHA.",
+  "generalization": "Algorithm transfers; trained weights are local per task, not across benchmarks. NOT generalization of pretrained weights.",
+  "cases": [
+    {"name":"sum3.sl","path":"comp/2017/Inv_Track/sum3.sl","sha":"9800f980ec2c95ff5cfe918d3b4905b1fcef301d","size":410,"upstream":"SyGuS-Org/benchmarks","commit":"13c8deb68a873635879c9a69bc78caebd340f646"},
+    {"name":"formula25.sl","path":"comp/2017/Inv_Track/formula25.sl","sha":"d8e92fe9469d7bcec883641219620dc45456a0be","size":703,"upstream":"SyGuS-Org/benchmarks","commit":"13c8deb68a873635879c9a69bc78caebd340f646"},
+    {"name":"fib_35.sl","path":"comp/2019/Inv_Track/From2018/fib_35.sl","sha":"8432ef97fae06e417b095c120a8afae83efe24e4","size":460,"upstream":"SyGuS-Org/benchmarks","commit":"13c8deb68a873635879c9a69bc78caebd340f646"},
+    {"name":"minor1.sl","path":"comp/2019/Inv_Track/From2018/minor1.sl","sha":"3d7e15a15a59ea78c4696baf369492dd56583c93","size":360,"upstream":"SyGuS-Org/benchmarks","commit":"13c8deb68a873635879c9a69bc78caebd340f646"},
+    {"name":"poly1.sl","path":"benchmarks/LIA/2005.ICALP_PolyRank/poly1.sl","sha":"b3edf598659e9147d43a7bfb7eeac0f6bc7ea59f","size":1129,"upstream":"SaswatPadhi/LoopInvGen","commit":"6ac90265b11431c9477dfbd33e3e3380234c0499"},
+    {"name":"poly9.sl","path":"benchmarks/LIA/2005.ICALP_PolyRank/poly9.sl","sha":"a2e785c1013e733e727f18a53ed8e4feb016845a","size":763,"upstream":"SaswatPadhi/LoopInvGen","commit":"6ac90265b11431c9477dfbd33e3e3380234c0499"},
+    {"name":"code2inv_1.sl","path":"benchmarks/LIA/2018.NeurIPS_Code2Inv/1.c.sl","sha":"859bae24a9f26044a40a3c97f1d2e5fc08504f06","size":980,"upstream":"SaswatPadhi/LoopInvGen","commit":"6ac90265b11431c9477dfbd33e3e3380234c0499"},
+    {"name":"code2inv_10.sl","path":"benchmarks/LIA/2018.NeurIPS_Code2Inv/10.c.sl","sha":"22bcd1792d96ccdfcd2c829999cb37f6b7f373ba","size":963,"upstream":"SaswatPadhi/LoopInvGen","commit":"6ac90265b11431c9477dfbd33e3e3380234c0499"},
+    {"name":"code2inv_103.sl","path":"benchmarks/LIA/2018.NeurIPS_Code2Inv/103.c.sl","sha":"0e5680739adfb911fcb948e1247d3de2bed6bdfe","size":621,"upstream":"SaswatPadhi/LoopInvGen","commit":"6ac90265b11431c9477dfbd33e3e3380234c0499"}
+  ]
+}
