@@ -1,0 +1,99 @@
+name: Q3 genuine first source9 learned structure vs exact nullspace and no-train
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_genuine_gradient_original9_v1.yml'
+      - 'research/evidence/q3_learned_source_conservation_firstnine_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  frozen_source_firstnine_training_and_independent_proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Freeze code and metadata BEFORE fetching source originals
+        run: |
+          set -euo pipefail
+          export R=research/evidence/q3_learned_source_conservation_firstnine_20261022
+          python -m py_compile "$R/learned_source_conservation.py" "$R/independent_dual_checker.py"
+          python - <<'PY'
+          import json,hashlib,os
+          p='research/evidence/q3_learned_source_conservation_firstnine_20261022/REGISTER_BEFORE_BODY_9.json'
+          m=json.load(open(p));assert m['original_body_read_by_current_study_before_freeze']==False
+          assert len(m['cases'])==9 and len({x['sha'] for x in m['cases']})==9
+          assert len({x['name'] for x in m['cases']})==9
+          for a in m['cases']:assert len(a['sha'])==40 and a['size']>0
+          print('PREBODY_MANIFEST_SHA256',hashlib.sha256(open(p,'rb').read()).hexdigest(),flush=True)
+          PY
+      - name: Install CPU-only training and two exact SMT checkers
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --quiet 'numpy==1.26.4' 'sympy==1.13.3'
+          python -m pip install --disable-pip-version-check --quiet torch==2.5.1+cpu --index-url https://download.pytorch.org/whl/cpu
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          curl -fL --retry 3 --connect-timeout 10 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          mkdir -p /tmp/q3-first-nine/source /tmp/q3-first-nine/result
+          python - <<'PY'
+          import torch,numpy,sympy
+          print('NEURAL_TORCH_ACTUAL',torch.__version__,'cuda',torch.cuda.is_available(),flush=True)
+          PY
+      - name: First source-body exposure only after exact method and registration frozen
+        run: |
+          python - <<'PY'
+          import json,hashlib,pathlib,urllib.request
+          p='research/evidence/q3_learned_source_conservation_firstnine_20261022/REGISTER_BEFORE_BODY_9.json'
+          m=json.load(open(p))
+          for x in m['cases']:
+            url='https://raw.githubusercontent.com/'+x['upstream']+'/'+x['commit']+'/'+x['path']
+            b=urllib.request.urlopen(url,timeout=30).read()
+            sha=hashlib.sha1(('blob '+str(len(b))+'\0').encode()+b).hexdigest()
+            if sha!=x['sha'] or len(b)!=x['size']:raise RuntimeError('SOURCE_MISMATCH '+x['name'])
+            pathlib.Path('/tmp/q3-first-nine/source',x['name']).write_bytes(b)
+            print('PREDECLARED_FIRST_SOURCE_EXPOSED',x['name'],len(b),sha,flush=True)
+          PY
+      - name: Execute frozen real 2000-step gradient, exact rational and no-training arms
+        run: |
+          set -o pipefail
+          python research/evidence/q3_learned_source_conservation_firstnine_20261022/learned_source_conservation.py \
+            --manifest research/evidence/q3_learned_source_conservation_firstnine_20261022/REGISTER_BEFORE_BODY_9.json \
+            --input /tmp/q3-first-nine/source \
+            --out /tmp/q3-first-nine/result/FIRST_ATTEMPT_ALL_9.json \
+          | tee /tmp/q3-first-nine/result/FIRST_ATTEMPT_ALL_9.log
+          sha256sum /tmp/q3-first-nine/result/FIRST_ATTEMPT_ALL_9.json
+      - name: Independent full original 3VC dual solver all model and ablation candidates
+        run: |
+          set -o pipefail
+          python research/evidence/q3_learned_source_conservation_firstnine_20261022/independent_dual_checker.py \
+            --manifest research/evidence/q3_learned_source_conservation_firstnine_20261022/REGISTER_BEFORE_BODY_9.json \
+            --input /tmp/q3-first-nine/source \
+            --receipt /tmp/q3-first-nine/result/FIRST_ATTEMPT_ALL_9.json \
+            --out /tmp/q3-first-nine/result/INDEPENDENT_ORIGINAL_Z3_CVC5_ALL_9.json --dual \
+          | tee /tmp/q3-first-nine/result/INDEPENDENT_DUAL_CHECKER.log
+          sha256sum /tmp/q3-first-nine/result/INDEPENDENT_ORIGINAL_Z3_CVC5_ALL_9.json
+      - name: Strong frozen classical affine plus guarded Houdini source-only control
+        run: |
+          set -o pipefail
+          python research/evidence/q3_source_houdini_sha12_20261022/classical_houdini.py \
+            --manifest research/evidence/q3_learned_source_conservation_firstnine_20261022/REGISTER_BEFORE_BODY_9.json \
+            --input /tmp/q3-first-nine/source \
+            --out /tmp/q3-first-nine/result/STRONG_CLASSICAL_HOUDINI_ALL_9.json \
+          | tee /tmp/q3-first-nine/result/STRONG_CLASSICAL_HOUDINI_ALL_9.log
+      - name: Preserve unfiltered first evidence and controls even on failed run
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-neural-learned-structure-first9-source-exact-frozen-and-strong-classical
+          path: /tmp/q3-first-nine/result/
+          if-no-files-found: warn
