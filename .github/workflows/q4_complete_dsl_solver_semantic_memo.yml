@@ -1,0 +1,90 @@
+name: "Q4 NEUMANN CPU full DSL inference 7-pair same-program speed gate"
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q4_complete_dsl_solver_semantic_memo.yml'
+      - 'research/evidence/q0_arc2_typed_intermediate_20261022/benchmark_complete_solver.py'
+      - 'research/evidence/q0_arc2_typed_intermediate_20261022/relational_pipeline_selector_memo_v2.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify_complete_zero_neural_dsl_inference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Independently authenticate public ARC-AGI-2 SHA before masking targets
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arc2-original
+          git -C /tmp/arc2-original checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arc2-original rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          mkdir -p /tmp/arc2-no-test-outputs
+          python - <<'PY'
+          import pathlib,json
+          root=pathlib.Path('/tmp/arc2-original/data/training')
+          files=sorted(root.glob('*.json'))
+          assert len(files)==1000
+          for f in files:
+            d=json.loads(f.read_text())
+            assert d['train'] and all('output' in a for a in d['test'])
+            pathlib.Path('/tmp/arc2-no-test-outputs',f.name).write_text(json.dumps({'train':d['train'],'test':[{'input':a['input']} for a in d['test']]},sort_keys=True)+'\n')
+          print('REAL1000_SOURCE_IDENTITY_AND_ALL_TEST_OUTPUTS_MASKED',flush=True)
+          PY
+      - name: Install pinned NumPy and SciPy from actual previous independent Q4 witness
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check numpy==1.26.4 scipy==1.14.1
+          python -m py_compile research/evidence/q0_arc2_typed_intermediate_20261022/benchmark_complete_solver.py
+      - name: Seven 3-arm CPU trials entire source-object DSL solve and TEST inference, exact final predictions and AST identity
+        run: |
+          set -o pipefail
+          D=research/evidence/q0_arc2_typed_intermediate_20261022
+          mkdir -p /tmp/neumann-q4-fullsolver
+          python -u "$D/benchmark_complete_solver.py" \
+            --source /tmp/arc2-no-test-outputs \
+            --old "$D/relational_pipeline.py" \
+            --v1 "$D/relational_pipeline_shape_cached.py" \
+            --v2 "$D/relational_pipeline_selector_memo_v2.py" \
+            --pairs 7 \
+            --out /tmp/neumann-q4-fullsolver/ALL40_7PAIRED_FULL_DSL_SOLVER.json \
+            | tee /tmp/neumann-q4-fullsolver/RUN.log
+      - name: Fail-closed entire original inference identity and precisely scoped cost admission
+        run: |
+          python - <<'PY'
+          import json,pathlib,hashlib
+          p=pathlib.Path('/tmp/neumann-q4-fullsolver')
+          x=json.load(open(p/'ALL40_7PAIRED_FULL_DSL_SOLVER.json'))
+          s=x['summary']
+          assert x['n_original_tasks']==40 and x['same_solution_and_all_program_choices']
+          assert len(x['paired'])==21 and all(x['n_repeats']==7 for x in (s['legacy'],s['shape_v1'],s['semantics_v2']))
+          assert len({z['exact_output_hash'] for z in x['paired']})==1
+          assert len({z['num_rules'] for z in x['paired']})==1
+          assert len({z['solution_count'] for z in x['paired']})==1
+          assert s['semantics_v2']['median_wall_s']<s['legacy']['median_wall_s']
+          assert s['semantics_v2']['median_wall_s']<s['shape_v1']['median_wall_s']
+          verdict={'same_original_grid_programs_and_predicted_test_grids':True,
+            'original_source_training_tasks_compared':40,'independent_7_matched_3_arm_real_cpu_trials':7,
+            'full_dsl_solver_gain_over_legacy':s['full_dsl_inference_gain_old_to_v2'],
+            'full_dsl_solver_gain_over_prior_shape_v1':s['full_dsl_inference_gain_v1_to_v2'],
+            'scoped_zero_neural_solver_10x':s['full_dsl_inference_gain_old_to_v2']>=10,
+            'global_Neumann_frontal_compute_10x':'OPEN',
+            'neural_learned_structure_unique':'OPEN',
+            'no_answer_leakage':True}
+          (p/'FINAL_SCIENCE_Q4_ADMISSION.json').write_text(json.dumps(verdict,sort_keys=True,indent=2)+'\n')
+          print('Q4_SOURCE_AUTHENTIC_MATCHED_FULL_DSL_INFERENCE_VERDICT',verdict,flush=True)
+          print('RESULT_JSON_SHA256',hashlib.sha256((p/'ALL40_7PAIRED_FULL_DSL_SOLVER.json').read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Preserve full outcomes and negative results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q4-cpu-full-dsl-source-40-seven-paired-identical-ast-and-predictions
+          path: /tmp/neumann-q4-fullsolver/
+          if-no-files-found: warn
