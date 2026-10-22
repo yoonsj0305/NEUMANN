@@ -26,6 +26,9 @@ def main():
         if r['status']=='NEW_RELATIONAL_PROGRAM':
             tally['new_operator_attempts']+=1
             tally['new_operator_exact_correct']+=int(good)
+            if good:
+                normalized=lambda x:json.dumps(x,sort_keys=True,separators=(',',':')).encode()
+                print('NEW_ORIGINAL_SOURCE_EXACT_PROGRAM',json.dumps({'subset':subset,'original_id':f.stem,'ast':r.get('ast'),'predicted_target_sha256':hashlib.sha256(normalized(r['prediction'])).hexdigest(),'independent_ground_truth_sha256':hashlib.sha256(normalized(y)).hexdigest(),'test_grid_count':len(y),'source_demo_count':len(d['train'])},sort_keys=True),flush=True)
         if r['status']=='FROZEN_CLASSICAL':
             tally['baseline_attempts']+=1
             tally['baseline_exact_correct']+=int(good)
