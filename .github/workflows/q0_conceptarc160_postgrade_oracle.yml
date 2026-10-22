@@ -1,0 +1,93 @@
+name: "Q0 ConceptARC first160 POSTGRADE exact finite two-grammar source capability audit"
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q0_conceptarc160_postgrade_oracle.yml'
+      - 'research/evidence/q0_conceptarc160_external_20261022/postgrade_conceptarc_oracle.py'
+      - 'research/evidence/q0_conceptarc160_external_20261022/FIRST_CONCEPTARC160_OFFICIAL_PREGRADE.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  full_160_candidate_source_truth_audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Require source frozen before first evaluation and exact original first pregrade SHA
+        run: |
+          set -euo pipefail
+          D=research/evidence/q0_conceptarc160_external_20261022
+          echo 'fbe64dc5021f6f1baf3a3a86c9090648ead1aa82614c87ba44eecedb22d67d6a  '"$D/source_structural_v2.py" | sha256sum -c -
+          echo 'd6307538661d8bf7124d6627cb22562b9e41fa04d62338fd56b7893f91539d23  '"$D/FIRST_CONCEPTARC160_OFFICIAL_PREGRADE.json" | sha256sum -c -
+          python -m py_compile "$D/postgrade_conceptarc_oracle.py" "$D/grade_conceptarc.py"
+          python - <<'PY'
+          import json
+          x=json.load(open('research/evidence/q0_conceptarc160_external_20261022/FIRST_CONCEPTARC160_OFFICIAL_PREGRADE.json'))
+          assert x['total_tasks']==160 and x['total_tests']==480 and x['labels_accessible'] is False
+          print('PRIOR_COMPLETED_OFFICIAL_PRE_GRADE_160_TASKS_FROZEN',flush=True)
+          PY
+      - name: Install only CPU numpy, original external ConceptARC corpus Git SHA, no model changes
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check numpy==1.26.4
+          git clone --quiet --no-checkout https://github.com/victorvikram/ConceptARC.git /tmp/neumann-ca-audit
+          git -C /tmp/neumann-ca-audit checkout --quiet --detach 0e67da6af879e4bad3d7cd3c196e8d551b445725
+          test "$(git -C /tmp/neumann-ca-audit rev-parse HEAD:corpus)" = a9e933c021388297f21fa1cded180105479addc0
+          mkdir -p /tmp/neumann-conceptarc-postgrade
+      - name: Reproduce previous independent first score EXACTLY from untouched 160 predictions and original 480 targets
+        run: |
+          set -euo pipefail
+          D=research/evidence/q0_conceptarc160_external_20261022
+          python "$D/grade_conceptarc.py" \
+            --source /tmp/neumann-ca-audit/corpus \
+            --predictions "$D/FIRST_CONCEPTARC160_OFFICIAL_PREGRADE.json" \
+            --out /tmp/neumann-conceptarc-postgrade/RECHECKED_ORIGINAL_FIRST_SCORE.json \
+            | tee /tmp/neumann-conceptarc-postgrade/INDEPENDENT_FIRST_REPLAY.log
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/neumann-conceptarc-postgrade/RECHECKED_ORIGINAL_FIRST_SCORE.json'))
+          s=d['scores']
+          assert d['original_task_count']==160 and d['original_test_count']==480
+          assert (s['old_all3'],s['new_all3'],s['hybrid_all3'],s['new_only'])==(1,2,1,1),s
+          assert (s['old_individual'],s['new_individual'],s['hybrid_individual'])==(8,9,8),s
+          print('FIRST_PREGRADES_REPLAY_IDENTICAL_ALL160_480',flush=True)
+          PY
+      - name: POSTGRADE oracle of all fit candidates, two frozen languages, independently prove new necessary operator against every baseline candidate
+        run: |
+          set -euo pipefail
+          D=research/evidence/q0_conceptarc160_external_20261022
+          PYTHONPATH="$D:research/evidence/q0_arcagi2_trainholdout_first_20261022:research/evidence/q0_arcagi2_fullfirst_20261022" \
+            python "$D/postgrade_conceptarc_oracle.py" \
+              --source-dir /tmp/neumann-ca-audit/corpus \
+              --first-predictions "$D/FIRST_CONCEPTARC160_OFFICIAL_PREGRADE.json" \
+              --out /tmp/neumann-conceptarc-postgrade/EXACT_FINITE_DSL_ORACLE_POSTGRADE.json \
+              | tee /tmp/neumann-conceptarc-postgrade/EXACT_FINITE_DSL_ORACLE.log
+          python - <<'PY'
+          import json,pathlib,hashlib
+          p=pathlib.Path('/tmp/neumann-conceptarc-postgrade/EXACT_FINITE_DSL_ORACLE_POSTGRADE.json')
+          d=json.loads(p.read_text());s=d['oracle_totals']
+          assert d['source_task_count']==160 and d['source_test_count']==480
+          assert d['pregrade_sha256']=='d6307538661d8bf7124d6627cb22562b9e41fa04d62338fd56b7893f91539d23'
+          assert s['old_oracle_all3']>=1 and s['new_oracle_all3']>=2
+          assert s['oracle_union']>=2 and s['new_only_oracle']>=1
+          case=d['extractobjects_structurally_new_certificate']
+          assert case['id']=='ExtractObjects/ExtractObjects1'
+          assert not case['old_oracle_all3'] and case['new_oracle_all3']
+          assert case['new_oracle_winners']==['biggest_component']
+          assert case['old_all_fitting_candidates']==case['new_all_fitting_candidates']==1
+          print('NEW_EXTERIOR_STRUCTURAL_CAPABILITY_CANNOT_BE_REACHED_IN_FROZEN_OLD_DSL',case['id'],flush=True)
+          print('POSTGRADE_DSL_ORACLE_SHA256',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Preserve genuine structural capability evidence with original first unchanged receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-conceptarc160-old-unable-new-capable-finite-proof-oracle
+          path: /tmp/neumann-conceptarc-postgrade/
+          if-no-files-found: warn
