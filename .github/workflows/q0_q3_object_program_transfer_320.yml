@@ -1,0 +1,102 @@
+name: NEUMANN Q0/Q3 original 320 object-program causal transfer
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q0_q3_object_program_transfer_320.yml'
+      - 'research/evidence/q3_object_synthesis_transfer_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  frozen_source_only_predict:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Freeze original historical typed compiler and original public corpus
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD:research/evidence/q3_object_synthesis_transfer_20261022/frozen_original_typed_selector_v2.py)" = a46dc5480f0819895effc48df1e0600a23640bdf
+          git clone --quiet --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arc2-source
+          git -C /tmp/arc2-source checkout --quiet --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arc2-source rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          test "$(git -C /tmp/arc2-source rev-parse HEAD:data/evaluation)" = 8d04288aac3146b7c47d0b799c18bc9c0217d838
+          python - <<'PY'
+          import pathlib,json,hashlib
+          source=pathlib.Path('/tmp/arc2-source/data');dest=pathlib.Path('/tmp/arc2-masked')
+          training=sorted((source/'training').glob('*.json'),key=lambda x:hashlib.sha256(x.stem.encode()).hexdigest())
+          evaluation=sorted((source/'evaluation').glob('*.json'))
+          assert len(training)==1000 and len(evaluation)==120
+          assert hashlib.sha256(('\n'.join(x.stem for x in training[800:])+'\n').encode()).hexdigest()=='9f9f9f80d9c51dd31e0ad999e7d2cf7289fcd2791f785ba41fd74d1b86c8dc9b'
+          src=training[800:]+evaluation
+          for f in src:
+              d=json.loads(f.read_text())
+              target=dest/f.name
+              target.parent.mkdir(exist_ok=True,parents=True)
+              task={'train':d['train'],'test':[{'input':q['input']} for q in d['test']]}
+              assert all('output' not in q for q in task['test'])
+              target.write_text(json.dumps(task,separators=(',',':'))+'\n')
+          assert len(list(dest.glob('*.json')))==320
+          print('SEALED_INPUT_320_ALL_TEST_OUTPUTS_REMOVED')
+          PY
+          rm -rf /tmp/arc2-source
+      - name: Use CPU only with source-pinned dependencies
+        run: |
+          python -m pip install --quiet numpy==1.26.4 scipy==1.14.1
+          python -m py_compile research/evidence/q3_object_synthesis_transfer_20261022/*.py
+      - name: Source-only synthesis on every original evaluation and reserved training task
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/neumann-candidates
+          python research/evidence/q3_object_synthesis_transfer_20261022/object_relational_proposer.py \
+            --masked-dir /tmp/arc2-masked \
+            --out /tmp/neumann-candidates/FROZEN_ALL320_REAL_PROGRAM_PREDICTIONS.json \
+            | tee /tmp/neumann-candidates/RAW_SOURCE_ONLY_LOG.txt
+          python - <<'PY'
+          import json,pathlib,hashlib
+          f=pathlib.Path('/tmp/neumann-candidates/FROZEN_ALL320_REAL_PROGRAM_PREDICTIONS.json')
+          d=json.loads(f.read_text());assert d['n']==320 and not d['test_labels_accessed']
+          assert len(d['rows'])==320
+          print('FROZEN_BEFORE_LABELS_SHA256',hashlib.sha256(f.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-original320-before-labels-typed-relational
+          path: /tmp/neumann-candidates/
+          if-no-files-found: error
+  independent_original320_grade:
+    needs: frozen_source_only_predict
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-original320-before-labels-typed-relational
+          path: /tmp/neumann-candidates/
+      - name: Retrieve original labels only AFTER pregrade prediction receipt exists
+        run: |
+          set -euo pipefail
+          git clone --quiet --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arc2-independent-original
+          git -C /tmp/arc2-independent-original checkout --quiet --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arc2-independent-original rev-parse HEAD:data/evaluation)" = 8d04288aac3146b7c47d0b799c18bc9c0217d838
+          test "$(git -C /tmp/arc2-independent-original rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          mkdir -p /tmp/neumann-grade
+          python research/evidence/q3_object_synthesis_transfer_20261022/independent_grade.py \
+            --sealed /tmp/neumann-candidates/FROZEN_ALL320_REAL_PROGRAM_PREDICTIONS.json \
+            --source-root /tmp/arc2-independent-original/data \
+            --out /tmp/neumann-grade/REAL_ORIGINAL320_INDEPENDENT_EXACT_SCORE.json \
+            | tee /tmp/neumann-grade/SCIENTIFIC_GRADE_LOG.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-source320-independent-exact-original-verdict
+          path: /tmp/neumann-grade/
+          if-no-files-found: error
