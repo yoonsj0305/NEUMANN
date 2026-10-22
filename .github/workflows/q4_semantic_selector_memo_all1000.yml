@@ -1,0 +1,112 @@
+name: "Q4 exact semantic memo: ARC2 original 1000 AST-equivalence, 3-way paired CPU"
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q4_semantic_selector_memo_all1000.yml'
+      - 'research/evidence/q0_arc2_typed_intermediate_20261022/relational_pipeline_selector_memo_v2.py'
+      - 'research/evidence/q0_arc2_typed_intermediate_20261022/benchmark_semantic_memo_1000.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  prepare_sha_bound_1000_without_test_answers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Immutable original training source SHA and source-only masking
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arc2-source
+          git -C /tmp/arc2-source checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arc2-source rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          mkdir -p /tmp/arc2-masked-only
+          python - <<'PY'
+          import json, pathlib, hashlib
+          source=pathlib.Path('/tmp/arc2-source/data/training')
+          masked=pathlib.Path('/tmp/arc2-masked-only')
+          originals=sorted(source.glob('*.json'))
+          assert len(originals)==1000
+          for p in originals:
+              d=json.loads(p.read_text())
+              assert all('output' in x for x in d['test'])
+              m={'train':d['train'],'test':[{'input':x['input']} for x in d['test']]}
+              (masked/p.name).write_text(json.dumps(m,sort_keys=True,separators=(',',':'))+'\n')
+          assert all('output' not in x for p in masked.glob('*.json') for x in json.loads(p.read_text())['test'])
+          print('PINNED_FULL1000_SOURCE_MASKED_NO_TEST_OUTPUT',hashlib.sha256(('\n'.join(p.stem for p in originals)+'\n').encode()).hexdigest(),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q4-pinned-arc2-training1000-no-target-test-output
+          path: /tmp/arc2-masked-only/
+          if-no-files-found: error
+
+  q4_prove_semantic_equivalence_and_cpu_cost:
+    needs: prepare_sha_bound_1000_without_test_answers
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q4-pinned-arc2-training1000-no-target-test-output
+          path: /tmp/arc2-masked-only/
+      - name: Install exactly pinned original library dependencies
+        run: |
+          python -m pip install --quiet --disable-pip-version-check numpy==1.26.4 scipy==1.14.1
+          python -m py_compile research/evidence/q0_arc2_typed_intermediate_20261022/{relational_pipeline.py,relational_pipeline_shape_cached.py,relational_pipeline_selector_memo_v2.py,benchmark_semantic_memo_1000.py}
+      - name: End-to-end list of ALL 1000 exact candidate programs identical to source baseline, then 5 order-counterbalanced CPU trials
+        run: |
+          set -o pipefail
+          mkdir -p /tmp/neumann-q4-memo1000/
+          D=research/evidence/q0_arc2_typed_intermediate_20261022
+          python -u "$D/benchmark_semantic_memo_1000.py" \
+            --source /tmp/arc2-masked-only \
+            --base "$D/relational_pipeline.py" \
+            --cache "$D/relational_pipeline_shape_cached.py" \
+            --out /tmp/neumann-q4-memo1000/EXACT_ALL1000_EQUIVALENCE_AND_5_PAIRED_TRIALS.json \
+            --max-cases 1000 --pairs 5 \
+            | tee /tmp/neumann-q4-memo1000/RUN.log
+      - name: Gate correctness and distinguish narrow 10x candidate-only from global frontier Q4
+        run: |
+          python - <<'PY'
+          import hashlib,json,pathlib
+          p=pathlib.Path('/tmp/neumann-q4-memo1000')
+          d=json.loads((p/'EXACT_ALL1000_EQUIVALENCE_AND_5_PAIRED_TRIALS.json').read_text())
+          assert d['status']=='EXACT_1000_AST_SEMANTIC_EQUIVALENCE'
+          assert d['original_source_count']==len(d['samples'])==1000
+          assert d['all_checked_exact_ordered_candidate_lists_equal']
+          assert len(d['paired'])==15
+          assert {x['method'] for x in d['paired']}=={'legacy','cached_v1','semantic_v2'}
+          assert all(x['candidate_count']==d['paired'][0]['candidate_count'] for x in d['paired'])
+          assert d['summary']['semantic_v2']['median_s']<d['summary']['legacy']['median_s']
+          assert d['summary']['semantic_v2']['median_s']<d['summary']['cached_v1']['median_s']
+          report={'originals_exact_AST_match':1000,'n_trials_per_arm':5,
+            'Q4_scoped_semantic_equivalence':'PASS',
+            'legacy_vs_v2_proposer_speedup':d['summary']['speedup_from_original_full_to_semantic_v2'],
+            'v1_vs_v2_proposer_speedup':d['summary']['speedup_from_cached_v1_to_semantic_v2'],
+            'Q4_global_total_compute_10x':'OPEN, proposer-only ratio not entire compute',
+            'neural_new_structure':'NOT_PROVEN, no neural training performed',
+            'no_evaluation_test_answers_visible':True,
+            'scorer_labels_not_used':True}
+          (p/'SCIENTIFIC_Q4_SCOPE_VERDICT.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
+          print('SCOPED_Q4_ALL1000_NEUMANN_PROOF_PRESERVING_WORK_DELETION',report,flush=True)
+          print('FROZEN_RECEIPT_SHA256',hashlib.sha256((p/'EXACT_ALL1000_EQUIVALENCE_AND_5_PAIRED_TRIALS.json').read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Preserve every measured result, even failure or parity
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q4-all1000-identical-programs-semantic-cache-triple-comparison
+          path: /tmp/neumann-q4-memo1000/
+          if-no-files-found: warn
