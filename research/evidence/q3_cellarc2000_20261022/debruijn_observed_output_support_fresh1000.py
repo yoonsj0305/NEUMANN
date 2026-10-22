@@ -1,4 +1,4 @@
-"""Source-code-derived 240-observation-symbol rejection; no fitted parameters."""
+"""Source-observed training output alphabet lower bound, without any held-out targets."""
 import argparse,collections,hashlib,json,pathlib
 from debruijn_structural_model import infer
 def compare(d):
@@ -26,7 +26,7 @@ def main():
             val=compare(t);rows[t['id']]=val
             for k in ('old','symbol_guarded'):counts[k+'/'+val[k]['status']]+=1
         assert len(rows)==1000
-        data={'schema':'NEUMANN_CELLARC_SOURCE_symbol_FRESH_TRAIN1000_BEFORE_GRADE.v1',
+        data={'schema':'NEUMANN_CELLARC_SOURCE_SYMBOL_FRESH_TRAIN1000_BEFORE_GRADE.v1',
             'n':1000,'source_only':True,'source_observed_output_contract':True,
             'original_model_blob':'fb12bc217178f7f3e89f0865987078e5dc367074',
             'test_solution_seen':False,'hidden_generator_meta_seen':False,
@@ -51,12 +51,12 @@ def main():
             ctr['guard_rejected_old_right']+=int(result['old'] and guess['symbol_guarded']['prediction'] is None)
             rows[task['id']]=result
         assert ctr['total_originals']==len(rows)==1000
-        data={'schema':'NEUMANN_CELLARC_FIRST_TRAIN1000_symbol_GUARD_INDEPENDENT_GRADE.v1',
+        data={'schema':'NEUMANN_CELLARC_FIRST_TRAIN1000_SYMBOL_GUARD_INDEPENDENT_GRADE.v1',
               'n':1000,'originals':dict(ctr),'rows':rows,
               'frozen_prediction_sha256':hashlib.sha256(prefile.read_bytes()).hexdigest(),
               'metadata_not_used_by_either_model':True,
               'no_global_frontier_performance_claim':True}
-        print('FIRST_TRAIN1000_REAL_symbol_ABLATION',json.dumps(dict(ctr),sort_keys=True),flush=True)
+        print('FIRST_TRAIN1000_REAL_SYMBOL_ABLATION',json.dumps(dict(ctr),sort_keys=True),flush=True)
     o=pathlib.Path(a.out);o.parent.mkdir(parents=True,exist_ok=True)
     o.write_text(json.dumps(data,sort_keys=True,separators=(',',':'))+'\n')
     print('FRESH_TRAIN1000_EVIDENCE_SHA256',hashlib.sha256(o.read_bytes()).hexdigest(),flush=True)
