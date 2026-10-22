@@ -1,0 +1,155 @@
+name: "Q4 compact source-proven certificates: tenfold representation with true dual replay economics"
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q4_source_proof_certificate_compaction.yml'
+      - 'research/evidence/q4_monotone_k_work_elimination_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact_smt_clauses_pruning_independent_verification_and_cost_recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile no-neural source exact pruning and matched independent replay
+        run: |
+          set -euo pipefail
+          python -m py_compile research/evidence/q4_monotone_k_work_elimination_20261022/*.py
+          python -m py_compile research/evidence/q3_autonomous_arity_witness20261022/source_guarded_affine_autosynth.py
+      - name: Install source algebra Z3 and checksum-pinned independent cvc5
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check sympy==1.14.0
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          curl -fL --retry 3 --connect-timeout 10 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5-bin /tmp/neumann-cert4/source /tmp/neumann-cert4/evidence
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5-bin
+          sudo install -m 755 "$(find /tmp/cvc5-bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+      - name: Authenticate official original source SHA identities
+        run: |
+          python - <<'PY'
+          import json,hashlib,pathlib,urllib.request
+          d=json.load(open('research/evidence/q3_autonomous_arity_witness20261022/SOURCE4_ONLY_SHA_MANIFEST.json'))
+          assert len(d['cases'])==4
+          base='https://raw.githubusercontent.com/SyGuS-Org/benchmarks/'+d['upstream_commit']+'/'
+          for r in d['cases']:
+              folder='comp/2017/Inv_Track/' if r['name']=='hola_countud.sl' else 'comp/2019/Inv_Track/From2018/'
+              b=urllib.request.urlopen(base+folder+r['name'],timeout=30).read()
+              sha=hashlib.sha1(('blob '+str(len(b))+'\0').encode()+b).hexdigest()
+              assert sha==r['sha'] and len(b)==r['size']
+              pathlib.Path('/tmp/neumann-cert4/source',r['name']).write_bytes(b)
+              print('SOURCE_ORIGINAL_BLOB_MATCH',r['name'],sha,flush=True)
+          PY
+      - name: Recreate source-generated full verified upper proof certificate rather than use stored answer
+        run: |
+          set -o pipefail
+          ROOT=research/evidence/q4_monotone_k_work_elimination_20261022
+          MAN=research/evidence/q3_autonomous_arity_witness20261022/SOURCE4_ONLY_SHA_MANIFEST.json
+          python research/evidence/q3_autonomous_arity_witness20261022/source_guarded_affine_autosynth.py \
+            --engine research/evidence/q3_source_houdini_sha12_20261022/classical_houdini.py \
+            --source-dir /tmp/neumann-cert4/source --manifest "$MAN" \
+            --out /tmp/neumann-cert4/evidence/SOURCE_GENERATED_UNMINIMIZED.json \
+            | tee /tmp/neumann-cert4/evidence/SOURCE_GENERATED_UNMINIMIZED.log
+          python "$ROOT/select_verified_upper_k.py" \
+            --proposals /tmp/neumann-cert4/evidence/SOURCE_GENERATED_UNMINIMIZED.json \
+            --source-dir /tmp/neumann-cert4/source --manifest "$MAN" \
+            --out /tmp/neumann-cert4/evidence/SOURCE_PROVEN_MINIMUM_UPPER_K.json \
+            | tee /tmp/neumann-cert4/evidence/SOURCE_PROVEN_MINIMUM_UPPER_K.log
+      - name: Build and source-original-verifiably prune every candidate conjunct
+        run: |
+          set -o pipefail
+          python research/evidence/q4_monotone_k_work_elimination_20261022/prune_inductive_certificate.py \
+            --source-dir /tmp/neumann-cert4/source \
+            --manifest research/evidence/q3_autonomous_arity_witness20261022/SOURCE4_ONLY_SHA_MANIFEST.json \
+            --proposals /tmp/neumann-cert4/evidence/SOURCE_GENERATED_UNMINIMIZED.json \
+            --upper /tmp/neumann-cert4/evidence/SOURCE_PROVEN_MINIMUM_UPPER_K.json \
+            --out /tmp/neumann-cert4/evidence/SMT_CONFIRMED_PROOF_PRUNING.json \
+            | tee /tmp/neumann-cert4/evidence/SMT_CONFIRMED_PROOF_PRUNING.log
+          python - <<'PY'
+          import json,pathlib,re,runpy
+          p=pathlib.Path('/tmp/neumann-cert4/evidence')
+          d=json.loads((p/'SOURCE_GENERATED_UNMINIMIZED.json').read_text())
+          m=json.load(open('research/evidence/q3_autonomous_arity_witness20261022/SOURCE4_ONLY_SHA_MANIFEST.json'))
+          ks=json.loads((p/'SOURCE_PROVEN_MINIMUM_UPPER_K.json').read_text())['proven_upper_k']
+          fn=runpy.run_path('research/evidence/q4_monotone_k_work_elimination_20261022/select_verified_upper_k.py')
+          original=[];pruned=[]
+          for c,meta in zip(d['cases'],m['cases']):
+              raw=pathlib.Path('/tmp/neumann-cert4/source',meta['name']).read_text()
+              q=re.search(r'\(synth-inv\s+[^\s()]+\s+',raw)
+              names=re.findall(r'\(\s*([^\s()]+)\s+Int\s*\)',fn['balanced'](raw,q.end()))
+              atoms=fn['atoms'](c['invariant']);keep=[]
+              for atom in atoms:
+                  toks=set(re.findall(r'[A-Za-z_!][A-Za-z_0-9!]*',atom))
+                  if sum(x in toks for x in names)<=ks[meta['name']]:keep.append(atom)
+              original.append({'file':c['file'],'safe_certified':True,'invariant':'(and '+' '.join(keep)+')' if keep else 'true'})
+          r=json.loads((p/'SMT_CONFIRMED_PROOF_PRUNING.json').read_text())
+          for c in r['cases']:
+              pruned.append({'file':c['file'],'safe_certified':True,'invariant':c['invariant']})
+          (p/'FULL_PROOF_CANDIDATE_ORIGINAL.json').write_text(json.dumps({'cases':original},indent=2)+'\n')
+          (p/'COMPACT_PROOF_CANDIDATE_ORIGINAL.json').write_text(json.dumps({'cases':pruned},indent=2)+'\n')
+          assert [x['file'] for x in pruned]==[x['file'] for x in original]
+          PY
+      - name: Independently dual certify four original full 3VCs for both big and small certificates
+        run: |
+          set -o pipefail
+          CHECK=research/evidence/q3_source_houdini_sha12_20261022/independent_original_checker.py
+          MAN=research/evidence/q3_autonomous_arity_witness20261022/SOURCE4_ONLY_SHA_MANIFEST.json
+          for suffix in FULL COMPACT; do
+            python "$CHECK" --receipt "/tmp/neumann-cert4/evidence/${suffix}_PROOF_CANDIDATE_ORIGINAL.json" \
+              --input /tmp/neumann-cert4/source --manifest "$MAN" --backend dual \
+              --out "/tmp/neumann-cert4/evidence/INDEPENDENT_DUAL_${suffix}.json" \
+              | tee "/tmp/neumann-cert4/evidence/INDEPENDENT_DUAL_${suffix}.log"
+          done
+          python - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('/tmp/neumann-cert4/evidence')
+          for x in ['FULL','COMPACT']:
+              d=json.loads((p/('INDEPENDENT_DUAL_'+x+'.json')).read_text())
+              assert d['totals']['dual_safe_certified']==4
+              assert d['totals']['unsat_vc']==12 and d['totals']['negative_controls']==8
+              assert d['totals']['q_z3']==d['totals']['q_cvc5']==20
+          s=json.loads((p/'SMT_CONFIRMED_PROOF_PRUNING.json').read_text())
+          assert s['total_old_atoms']>=100 and s['total_compacted_atoms']<=12
+          assert s['total_old_characters']>=10*s['total_compacted_characters']
+          print('Q4_TENFOLD_SOURCE_EXACT_CERTIFICATE_STORAGE_COMPRESSED_WITH_INDEPENDENT_DOUBLE_PROOF',flush=True)
+          PY
+      - name: Thirteen alternated-pair FULL end-to-end independent dual checker replays and true break-even calculation
+        run: |
+          set -o pipefail
+          python research/evidence/q4_monotone_k_work_elimination_20261022/measure_certificate_reuse.py \
+            --source-dir /tmp/neumann-cert4/source \
+            --manifest research/evidence/q3_autonomous_arity_witness20261022/SOURCE4_ONLY_SHA_MANIFEST.json \
+            --original /tmp/neumann-cert4/evidence/FULL_PROOF_CANDIDATE_ORIGINAL.json \
+            --compact /tmp/neumann-cert4/evidence/COMPACT_PROOF_CANDIDATE_ORIGINAL.json \
+            --checker research/evidence/q3_source_houdini_sha12_20261022/independent_original_checker.py \
+            --pruner-evidence /tmp/neumann-cert4/evidence/SMT_CONFIRMED_PROOF_PRUNING.json \
+            --backend dual --pairs 13 --out /tmp/neumann-cert4/evidence/DUAL_REUSE_13 \
+            | tee /tmp/neumann-cert4/evidence/DUAL_REUSE_13.log
+          python - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('/tmp/neumann-cert4/evidence')
+          d=json.loads((p/'DUAL_REUSE_13/DUAL_CERTIFICATE_REUSE_ECONOMICS.json').read_text())
+          assert d['source_count']==4 and d['paired_dual_trials']==13
+          assert d['size_compression_ratio']>=10
+          assert d['full_clause_count']>=100 and d['compacted_clause_count']<=12
+          assert len(d['times'])==26 and all(x['all_4_certified'] for x in d['times'])
+          print('SCOPED_PROOF_COMPACTION_RATIO',d['size_compression_ratio'],
+           'REVERIFY_BREAKEVEN',d['breakeven_replays_for_compaction_under_this_approx_median_delta'],
+           'TRUE_DUAL_MEDIAN_S',d['summary'],flush=True)
+          PY
+      - name: Archive all outcomes including possible failed economic amortization
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q4-tenfold-certificate-memory-reduction-and-dual-replay-economics
+          path: /tmp/neumann-cert4/evidence/
+          if-no-files-found: warn
