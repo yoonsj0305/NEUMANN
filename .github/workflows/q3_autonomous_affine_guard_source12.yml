@@ -93,7 +93,7 @@ jobs:
             --registry research/evidence/q3_original_truth_closure_20261022/REGISTERED_ALL12_POSTHOC_TRUTH.json \
             --out /tmp/neumann-auto12/evidence/TRUTH_SEPARATE_FROM_AUTOMATED_GENERATION --cvc5 \
             | tee /tmp/neumann-auto12/evidence/INDEPENDENT_SOURCE_TRUTH.log
-      - name: Enforce exact scientific attribution: automatic eleven SAFE plus actual UNSAFE
+      - name: 'Enforce exact scientific attribution: automatic eleven SAFE plus actual UNSAFE'
         run: |
           python - <<'PY'
           import json,hashlib,pathlib
