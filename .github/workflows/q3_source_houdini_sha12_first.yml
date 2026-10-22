@@ -1,0 +1,105 @@
+name: Q3 frozen twelve original source-only structural Houdini
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_source_houdini_sha12_first.yml'
+      - 'research/evidence/q3_source_houdini_sha12_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  frozen_original12_matched_source_proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Frozen compiler syntax and source-metadata admission
+        run: |
+          python -m py_compile research/evidence/q3_source_houdini_sha12_20261022/classical_houdini.py research/evidence/q3_source_houdini_sha12_20261022/independent_original_checker.py
+          python - <<'PY'
+          import json,hashlib
+          p='research/evidence/q3_source_houdini_sha12_20261022/FROZEN_BEFORE_SOURCE12.json'
+          r=json.load(open(p))
+          assert len(r['cases'])==12 and len({x['sha'] for x in r['cases']})==12
+          assert len({x['name'] for x in r['cases']})==12
+          assert r['original_body_read_by_current_study_before_frozen_registration'] is False
+          print('PROSPECTIVE_SOURCE_METADATA_SHA256',hashlib.sha256(open(p,'rb').read()).hexdigest())
+          PY
+      - name: Install Z3 and pinned independent cvc5
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          curl -fL --retry 3 --connect-timeout 10 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5-bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5-bin
+          sudo install -m 755 "$(find /tmp/cvc5-bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version
+      - name: Fetch 12 and 8 authenticated source originals only after SHA preregistration
+        run: |
+          mkdir -p /tmp/qs12 /tmp/qd8 /tmp/results
+          python - <<'PY'
+          import json,pathlib,urllib.request,hashlib
+          prefix='research/evidence/q3_source_houdini_sha12_20261022/'
+          for man,where in [('FROZEN_BEFORE_SOURCE12.json','/tmp/qs12'),('PREVIOUS_OPEN_DEV8.json','/tmp/qd8')]:
+            data=json.load(open(prefix+man))
+            for case in data['cases']:
+              addr='https://raw.githubusercontent.com/SyGuS-Org/benchmarks/13c8deb68a873635879c9a69bc78caebd340f646/'+case['path']
+              content=urllib.request.urlopen(addr,timeout=30).read()
+              sha=hashlib.sha1(('blob %d\0'%len(content)).encode()+content).hexdigest()
+              assert sha==case['sha'] and (case.get('size') is None or len(content)==case['size'])
+              pathlib.Path(where,case['name']).write_bytes(content)
+            print('ORIGINAL_PROVENANCE_ADMITTED',man,len(data['cases']))
+          PY
+      - name: First frozen 12-source exact zero-learning candidate synthesis
+        run: |
+          set -o pipefail
+          python research/evidence/q3_source_houdini_sha12_20261022/classical_houdini.py \
+            --manifest research/evidence/q3_source_houdini_sha12_20261022/FROZEN_BEFORE_SOURCE12.json \
+            --input /tmp/qs12 --out /tmp/results/sha12_first_original12.json | tee /tmp/results/sha12_first_original12.log
+          sha256sum /tmp/results/sha12_first_original12.json
+      - name: INDEPENDENT Z3 and pinned cvc5 original three-V C for every proposed new-source proof
+        run: |
+          set -o pipefail
+          python research/evidence/q3_source_houdini_sha12_20261022/independent_original_checker.py \
+            --receipt /tmp/results/sha12_first_original12.json --input /tmp/qs12 \
+            --manifest research/evidence/q3_source_houdini_sha12_20261022/FROZEN_BEFORE_SOURCE12.json \
+            --backend dual --out /tmp/results/sha12_first_independent_double.json | tee /tmp/results/sha12_first_independent_double.log
+          python - <<'PY'
+          import json
+          src=json.load(open('/tmp/results/sha12_first_original12.json'))
+          cert=json.load(open('/tmp/results/sha12_first_independent_double.json'))
+          assert src['number']==12 and cert['totals']['original_checked']==12
+          assert src['full_3vc_count']==cert['totals']['dual_safe_certified']
+          assert all((r['status']=='DUAL_ORIGINAL_SAFE_CERTIFIED') == x['safe_certified'] for r,x in zip(cert['rows'],src['cases']))
+          print('FIRST_FROZEN12_PAIRED_VERDICT',src['full_3vc_count'],'of',12,'all failures preserved')
+          PY
+      - name: Repeated previously opened dev8 exact zero-learning transfer regression
+        run: |
+          set -o pipefail
+          python research/evidence/q3_source_houdini_sha12_20261022/classical_houdini.py \
+            --manifest research/evidence/q3_source_houdini_sha12_20261022/PREVIOUS_OPEN_DEV8.json \
+            --input /tmp/qd8 --out /tmp/results/dev8_original8.json | tee /tmp/results/dev8_original8.log
+          python research/evidence/q3_source_houdini_sha12_20261022/independent_original_checker.py \
+            --receipt /tmp/results/dev8_original8.json --input /tmp/qd8 \
+            --manifest research/evidence/q3_source_houdini_sha12_20261022/PREVIOUS_OPEN_DEV8.json \
+            --backend dual --out /tmp/results/dev8_independent_double.json | tee /tmp/results/dev8_independent_double.log
+          python - <<'PY'
+          import json
+          a=json.load(open('/tmp/results/dev8_original8.json'))
+          b=json.load(open('/tmp/results/dev8_independent_double.json'))
+          assert a['full_3vc_count']==8 and b['totals']['dual_safe_certified']==8
+          print('DEVELOPMENT_OPEN8_SOURCE_ONLY_PROOF_8_OF_8')
+          PY
+      - name: Preserve every first attempt and certified proof receipt regardless of outcome
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-classical-source-only-frozen-sha12-prospective-first-and-dev8
+          path: /tmp/results/
+          if-no-files-found: warn
