@@ -1,0 +1,92 @@
+name: Q3 original 12 source-truth dual SAFE or UNSAFE closure
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_original12_source_truth_dual.yml'
+      - 'research/evidence/q3_original_truth_closure_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_all12_source_truth_audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Freeze provenance verification and Python compilation
+        run: |
+          set -euo pipefail
+          export ROOT=research/evidence/q3_original_truth_closure_20261022
+          python -m py_compile "$ROOT/original_truth_closure.py"
+          python - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('research/evidence/q3_original_truth_closure_20261022/REGISTERED_ALL12_POSTHOC_TRUTH.json')
+          x=json.loads(p.read_text())
+          a=x['cases']
+          assert len(a)==len({r['name'] for r in a})==len({r['sha'] for r in a})==12
+          assert sum(r['role']=='AUTOMATIC_PREVIOUS_FULL_HOUDINI' for r in a)==8
+          assert sum(r['role']=='HUMAN_POSTHOC_INVARIANT' for r in a)==3
+          assert sum(r['role']=='CONCRETE_REACHABLE_UNSAFE' for r in a)==1
+          assert [r['name'] for r in a if r['sha']!=r['original_registered_sha']]==['fib_11.sl']
+          assert x['evaluation_status'].startswith('POSTHOC')
+          print('AUDITED_12_ORIGINAL_POSTHOC_REGISTER_SHA',x['input_frozen_original_manifest_sha256'],flush=True)
+          PY
+      - name: Install independent Z3 and SHA256-pinned cvc5 1.4.2
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          curl -fL --retry 3 --connect-timeout 10 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5-install
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5-install
+          sudo install -m 755 "$(find /tmp/cvc5-install -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          cvc5 --version
+      - name: Retrieve all 12 original source bodies with posthoc separate fib11 identity correction
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/neumann-truth12/source /tmp/neumann-truth12/result
+          python - <<'PY'
+          import pathlib,hashlib,urllib.request,json
+          reg=json.load(open('research/evidence/q3_original_truth_closure_20261022/REGISTERED_ALL12_POSTHOC_TRUTH.json'))
+          for r in reg['cases']:
+              url='https://raw.githubusercontent.com/SyGuS-Org/benchmarks/'+reg['upstream_commit']+'/'+r['path']
+              b=urllib.request.urlopen(url,timeout=30).read()
+              h=hashlib.sha1(('blob '+str(len(b))+'\0').encode()+b).hexdigest()
+              assert h==r['sha'] and len(b)==r['size'],r['name']
+              pathlib.Path('/tmp/neumann-truth12/source',r['name']).write_bytes(b)
+              print('AUTHENTIC_ORIGINAL',r['name'],h,'AMENDMENT_POSTHOC',h!=r['original_registered_sha'],flush=True)
+          PY
+      - name: Independently re-prove all eleven original SAFE invariants and original one-step UNSAFE witness with Z3 and cvc5
+        run: |
+          set -euo pipefail
+          python research/evidence/q3_original_truth_closure_20261022/original_truth_closure.py \
+            --source-dir /tmp/neumann-truth12/source \
+            --registry research/evidence/q3_original_truth_closure_20261022/REGISTERED_ALL12_POSTHOC_TRUTH.json \
+            --out /tmp/neumann-truth12/result --cvc5 \
+            | tee /tmp/neumann-truth12/result/DUAL_RUN.log
+          python - <<'PY'
+          import json, pathlib,hashlib
+          p=pathlib.Path('/tmp/neumann-truth12/result/RESULT.json')
+          d=json.loads(p.read_text())
+          x=d['summary']
+          assert x['authenticated']==12 and x['safe_full_three_vc']==11 and x['unsafe_reachable_witness']==1 and x['queries']==58 and x['backend_count']==2,x
+          assert sum(c['posthoc_sha_amendment'] for c in d['cases'])==1
+          assert sum(c['status']=='DUAL_FULL_ORIGINAL_3VC_PASS' for c in d['cases'])==11
+          assert sum(c['status']=='DUAL_REACHABLE_UNSAFE_SAT_PASS' for c in d['cases'])==1
+          assert len(list(pathlib.Path('/tmp/neumann-truth12/result/queries').glob('*.smt2')))==58
+          print('ORIGINAL_TRUE_STATUS_12_12_Z3_CVC5_PROVED',x,flush=True)
+          print('ORIGINAL_REPLAY_HASH',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Archive full original proof scripts and the result even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-original12-dual-complete-safe11-unsafe1-source-truth
+          path: /tmp/neumann-truth12/result/
+          if-no-files-found: warn

@@ -1,0 +1,117 @@
+{
+  "cases": [
+    {
+      "invariant": "(and (<= 0 y) (<= y 127) (<= 0 c) (<= c 36) (= z (+ (* 36 y) c)))",
+      "name": "ex23.sl",
+      "original_registered_sha": "ada3eae4e8e9f4368c2a3ca0d2ecb900624dc7f9",
+      "path": "comp/2017/Inv_Track/ex23.sl",
+      "role": "HUMAN_POSTHOC_INVARIANT",
+      "sha": "ada3eae4e8e9f4368c2a3ca0d2ecb900624dc7f9",
+      "size": 559
+    },
+    {
+      "invariant": "(and (post-f x y))",
+      "name": "fig1.sl",
+      "original_registered_sha": "c670475683e0e8a80b86b132e587e618ce2b44e3",
+      "path": "comp/2017/Inv_Track/fig1.sl",
+      "role": "AUTOMATIC_PREVIOUS_FULL_HOUDINI",
+      "sha": "c670475683e0e8a80b86b132e587e618ce2b44e3",
+      "size": 407
+    },
+    {
+      "invariant": "(and (post-f x y lock))",
+      "name": "fig3.sl",
+      "original_registered_sha": "da4aaad6e92b4b38d93475f02ac5e267fab4a157",
+      "path": "comp/2017/Inv_Track/fig3.sl",
+      "role": "AUTOMATIC_PREVIOUS_FULL_HOUDINI",
+      "sha": "da4aaad6e92b4b38d93475f02ac5e267fab4a157",
+      "size": 624
+    },
+    {
+      "invariant": "(and (>= y (- 2)) (>= y (- 1)) (= y 0) (<= y 0) (>= y 0) (<= y 1) (<= y 2) (>= (+ x (- y)) (- 2)) (>= (+ x (- y)) (- 1)) (= (+ x (- y)) 0) (<= (+ x (- y)) 0) (>= (+ x (- y)) 0) (<= (+ x (- y)) 1) (<= (+ x (- y)) 2) (>= x (- 2)) (>= x (- 1)) (= x 0) (<= x 0) (>= x 0) (<= x 1) (<= x 2) (>= (+ x y) (- 2)) (>= (+ x y) (- 1)) (= (+ x y) 0) (<= (+ x y) 0) (>= (+ x y) 0) (<= (+ x y) 1) (<= (+ x y) 2) (post-f x y))",
+      "name": "fig9.sl",
+      "original_registered_sha": "85017c9e9304ef8a34d062034d1f01ec85d03cf1",
+      "path": "comp/2017/Inv_Track/fig9.sl",
+      "role": "AUTOMATIC_PREVIOUS_FULL_HOUDINI",
+      "sha": "85017c9e9304ef8a34d062034d1f01ec85d03cf1",
+      "size": 395
+    },
+    {
+      "invariant": "(and (>= n (- 2)) (>= n (- 1)) (>= n 0) (<= (+ y (- n)) 0) (<= (+ y (- n)) 1) (<= (+ y (- n)) 2) (>= y (- 2)) (>= y (- 1)) (>= y 0) (>= (+ y n) (- 2)) (>= (+ y n) (- 1)) (>= (+ y n) 0) (<= (+ x (- y) (- n)) 0) (<= (+ x (- y) (- n)) 1) (<= (+ x (- y) (- n)) 2) (>= (+ x (- y) n) (- 2)) (>= (+ x (- y) n) (- 1)) (>= (+ x (- y) n) 0) (<= (+ x (- n)) 0) (<= (+ x (- n)) 1) (<= (+ x (- n)) 2) (>= x (- 2)) (>= x (- 1)) (>= x 0) (>= (+ x n) (- 2)) (>= (+ x n) (- 1)) (>= (+ x n) 0) (>= (+ x y (- n)) (- 2)) (>= (+ x y (- n)) (- 1)) (= (+ x y (- n)) 0) (<= (+ x y (- n)) 0) (>= (+ x y (- n)) 0) (<= (+ x y (- n)) 1) (<= (+ x y (- n)) 2) (>= (+ x y) (- 2)) (>= (+ x y) (- 1)) (>= (+ x y) 0) (>= (+ x y n) (- 2)) (>= (+ x y n) (- 1)) (>= (+ x y n) 0) (=> (= y 0) (= x n)) (=> (= y 0) (<= x n)) (=> (= y 0) (>= x n)) (post-f x y n))",
+      "name": "hola_add.sl",
+      "original_registered_sha": "9305457661a7774851b90e1e74cf4fbee42dc105",
+      "path": "comp/2017/Inv_Track/hola_add.sl",
+      "role": "AUTOMATIC_PREVIOUS_FULL_HOUDINI",
+      "sha": "9305457661a7774851b90e1e74cf4fbee42dc105",
+      "size": 520
+    },
+    {
+      "invariant": "(and (post-f x))",
+      "name": "inc.sl",
+      "original_registered_sha": "8f3443128f531c31c2b081ccec1e6a870550e4dc",
+      "path": "comp/2017/Inv_Track/inc.sl",
+      "role": "AUTOMATIC_PREVIOUS_FULL_HOUDINI",
+      "sha": "8f3443128f531c31c2b081ccec1e6a870550e4dc",
+      "size": 321
+    },
+    {
+      "invariant": null,
+      "name": "fib_07.sl",
+      "original_registered_sha": "94386ca5ecad64a5267166d577c6bb690a55cf86",
+      "path": "comp/2019/Inv_Track/From2018/fib_07.sl",
+      "role": "CONCRETE_REACHABLE_UNSAFE",
+      "sha": "94386ca5ecad64a5267166d577c6bb690a55cf86",
+      "size": 766
+    },
+    {
+      "invariant": "(and (>= y (- 2)) (>= y (- 1)) (>= y 0) (<= (+ x (- y)) 0) (<= (+ x (- y)) 1) (<= (+ x (- y)) 2) (>= x (- 2)) (>= x (- 1)) (>= x 0) (>= (+ x y) (- 2)) (>= (+ x y) (- 1)) (>= (+ x y) 0) (post-f x y))",
+      "name": "fib_08.sl",
+      "original_registered_sha": "ecc2688533aad6188d111944d367cb697f80bd33",
+      "path": "comp/2019/Inv_Track/From2018/fib_08.sl",
+      "role": "AUTOMATIC_PREVIOUS_FULL_HOUDINI",
+      "sha": "ecc2688533aad6188d111944d367cb697f80bd33",
+      "size": 514
+    },
+    {
+      "invariant": "(and (> x 0) (<= 0 i) (<= i x) (= j (* 2 i)))",
+      "name": "fib_11.sl",
+      "original_registered_sha": "5fd3d40e22d7d724eb1e9002a5fe1f46bb3f",
+      "path": "comp/2019/Inv_Track/From2018/fib_11.sl",
+      "role": "HUMAN_POSTHOC_INVARIANT",
+      "sha": "5fd3d40e22d7d724eb1e9002a1c2a5fe1f46bb3f",
+      "size": 589
+    },
+    {
+      "invariant": "(and (=> (= t 0) (= k 0)) (=> (not (= t 0)) (= j (+ (* 2 k) 2))))",
+      "name": "fib_13.sl",
+      "original_registered_sha": "b583a100b7c5a4b9b25a22c4c881b1cd90e2e3ee",
+      "path": "comp/2019/Inv_Track/From2018/fib_13.sl",
+      "role": "HUMAN_POSTHOC_INVARIANT",
+      "sha": "b583a100b7c5a4b9b25a22c4c881b1cd90e2e3ee",
+      "size": 586
+    },
+    {
+      "invariant": "(and (>= m (- 2)) (>= m (- 1)) (>= m 0) (>= m 1) (<= (+ j (- m)) 1) (<= (+ j (- m)) 2) (>= j (- 2)) (>= j (- 1)) (>= j 0) (>= j 1) (>= (+ j m) (- 2)) (>= (+ j m) (- 1)) (>= (+ j m) 0) (>= (+ j m) 1) (>= (+ j m) 2) (<= (+ a (- j) (- m)) (- 2)) (<= (+ a (- j) (- m)) (- 1)) (<= (+ a (- j) (- m)) 0) (<= (+ a (- j) (- m)) 1) (<= (+ a (- j) (- m)) 2) (<= (+ a (- j)) (- 1)) (<= (+ a (- j)) 0) (<= (+ a (- j)) 1) (<= (+ a (- j)) 2) (<= (+ a (- m)) 0) (<= (+ a (- m)) 1) (<= (+ a (- m)) 2) (>= (+ a m) (- 2)) (>= (+ a m) (- 1)) (>= (+ a m) 0) (>= (+ a j) (- 2)) (>= (+ a j) (- 1)) (>= (+ a j) 0) (>= (+ a j) 1) (>= (+ a j m) (- 2)) (>= (+ a j m) (- 1)) (>= (+ a j m) 0) (>= (+ a j m) 1) (>= (+ a j m) 2) (=> (= j 1) (<= a m)) (post-f a j m))",
+      "name": "fib_14.sl",
+      "original_registered_sha": "c0ddd9212b949b149f6d9170b8c2940c4ab6953c",
+      "path": "comp/2019/Inv_Track/From2018/fib_14.sl",
+      "role": "AUTOMATIC_PREVIOUS_FULL_HOUDINI",
+      "sha": "c0ddd9212b949b149f6d9170b8c2940c4ab6953c",
+      "size": 677
+    },
+    {
+      "invariant": "(and (<= (+ y (- j)) 0) (<= (+ y (- j)) 1) (<= (+ y (- j)) 2) (>= (+ x (- y) (- i) j) (- 2)) (>= (+ x (- y) (- i) j) (- 1)) (= (+ x (- y) (- i) j) 0) (<= (+ x (- y) (- i) j) 0) (>= (+ x (- y) (- i) j) 0) (<= (+ x (- y) (- i) j) 1) (<= (+ x (- y) (- i) j) 2) (<= (+ x (- i)) 0) (<= (+ x (- i)) 1) (<= (+ x (- i)) 2) (<= (+ x y (- i) (- j)) 0) (<= (+ x y (- i) (- j)) 1) (<= (+ x y (- i) (- j)) 2) (=> (= x 0) (<= y j)) (post-f x y i j))",
+      "name": "fib_16.sl",
+      "original_registered_sha": "3dc0cce05bdd61d4847259f3744a57b1aeac74f9",
+      "path": "comp/2019/Inv_Track/From2018/fib_16.sl",
+      "role": "AUTOMATIC_PREVIOUS_FULL_HOUDINI",
+      "sha": "3dc0cce05bdd61d4847259f3744a57b1aeac74f9",
+      "size": 685
+    }
+  ],
+  "evaluation_status": "POSTHOC_SOURCE_TRUTH_CLASSIFICATION_ONLY; NEVER CALL FIRSTBLIND FOR WRONG-SHA FIB11",
+  "input_frozen_original_manifest_sha256": "1a9bcb366bdb600edad37d468653c87f445caa81cf7484a38e40a19f28825ae6",
+  "old_full_original_receipt_sha256": "86a1e2a6b614612c7e2dc59a2285fd29073a6ad9db81ed38b44bd0b6f9596127",
+  "schema": "neumann.q3.original_source_truth_comprehensive_v1",
+  "upstream_commit": "13c8deb68a873635879c9a69bc78caebd340f646"
+}
