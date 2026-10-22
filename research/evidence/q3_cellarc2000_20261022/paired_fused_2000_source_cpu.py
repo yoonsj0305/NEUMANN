@@ -35,7 +35,7 @@ def main():
         wall={name:[] for name in ('old','aligned','fast')}
         reference={}
         for n in range(5):
-            order=('old','aligned','fast') if n%2==0 else ('aligned','old')
+            order=('old','aligned','fast') if n%2==0 else ('fast','aligned','old')
             for name in order:
                 cpu_start=time.process_time_ns();w_start=time.perf_counter_ns()
                 preds={t['id']:predict(t,name) for t in tasks}
