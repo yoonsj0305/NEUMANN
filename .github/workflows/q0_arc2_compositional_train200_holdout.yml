@@ -1,0 +1,188 @@
+name: "Q0 ARC2 train-only 200 actual holdout: compositional symbolic generator vs frozen 96 baseline"
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q0_arc2_compositional_train200_holdout.yml'
+      - 'research/evidence/q0_arcagi2_trainholdout_first_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  freeze_and_mask_holdout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify source commit and frozen 800/200 split before seeing task bodies
+        run: |
+          set -euo pipefail
+          R=research/evidence/q0_arcagi2_trainholdout_first_20261022
+          python -m py_compile "$R/arc_compositional_grammar.py" "$R/grade_arc_train_holdout.py"
+          python - <<'PY'
+          import json,pathlib,hashlib
+          root=pathlib.Path('research/evidence/q0_arcagi2_trainholdout_first_20261022')
+          d=json.loads((root/'FROZEN_ARC2_TRAIN800_VALID200.json').read_text())
+          assert d['pin']=='f3283f727488ad98fe575ea6a5ac981e4a188e49'
+          assert d['dev_n']==800 and d['validation_n']==200
+          assert d['split_rule'].startswith('sort 1000 train task IDs by SHA256')
+          assert d['dev_id_sha256']=='b781269e0c7deaf49a212b666ddc94cff4915ebe5c8d5251c0134901f2f56281'
+          assert d['val_id_sha256']=='9f9f9f80d9c51dd31e0ad999e7d2cf7289fcd2791f785ba41fd74d1b86c8dc9b'
+          assert hashlib.sha256((root/'arc_compositional_grammar.py').read_bytes()).hexdigest()==d['composer_sha256']
+          assert hashlib.sha256((root/'grade_arc_train_holdout.py').read_bytes()).hexdigest()==d['grader_sha256']
+          print('CODE_AND_SPLIT_FROZEN_BEFORE_TASK_BODIES', flush=True)
+          PY
+      - name: Fetch official ARC2 training tree once, verify exact pinned revision and blind validation labels
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arc2-train-locked
+          git -C /tmp/arc2-train-locked checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arc2-train-locked rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          mkdir -p /tmp/arc2-holdout-masked/training
+          python - <<'PY'
+          import hashlib,json,pathlib
+          base=pathlib.Path('/tmp/arc2-train-locked/data/training')
+          dest=pathlib.Path('/tmp/arc2-holdout-masked/training')
+          a=sorted(base.glob('*.json'),key=lambda f:hashlib.sha256(f.stem.encode()).hexdigest())
+          assert len(a)==1000
+          h=lambda xx:hashlib.sha256(('\n'.join(f.stem for f in xx)+'\n').encode()).hexdigest()
+          assert h(a[:800])=='b781269e0c7deaf49a212b666ddc94cff4915ebe5c8d5251c0134901f2f56281'
+          assert h(a[800:])=='9f9f9f80d9c51dd31e0ad999e7d2cf7289fcd2791f785ba41fd74d1b86c8dc9b'
+          for idx,f in enumerate(a):
+              o=json.loads(f.read_text())
+              assert all('output' in t for t in o['test'])
+              if idx>=800:
+                  o['test']=[{'input':t['input']} for t in o['test']]
+                  assert all('output' not in t for t in o['test'])
+              (dest/f.name).write_text(json.dumps(o,separators=(',',':'))+'\n')
+          print('EXACT_800_DEV_200_HOLDOUT_SOURCE_MASKING_COMPLETE',len(a),flush=True)
+          PY
+      - name: Send train-only masked evaluation to inference without validation answers
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-arc2-800dev-200holdout-inputs-blinded
+          path: /tmp/arc2-holdout-masked/training/
+          if-no-files-found: error
+  generate_predictions_without_validation_answers:
+    needs: freeze_and_mask_holdout
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-arc2-800dev-200holdout-inputs-blinded
+          path: /tmp/arc2-holdout-masked/training/
+      - name: Install fixed no-learned symbolic composer and verify all 200 outputs absent
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check numpy==1.26.4
+          python - <<'PY'
+          import hashlib,json,pathlib
+          p=pathlib.Path('/tmp/arc2-holdout-masked/training')
+          files=sorted(p.glob('*.json'),key=lambda x:hashlib.sha256(x.stem.encode()).hexdigest())
+          assert len(files)==1000
+          assert all(all('output' not in t for t in json.loads(f.read_text())['test']) for f in files[800:])
+          print('ALL_200_HELDOUT_TEST_ANSWERS_ABSENT',flush=True)
+          PY
+      - name: First independent source-only rerun, fixed 200 denominator, write immutable prediction receipt
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q0-comp-predictions
+          export PYTHONPATH="$GITHUB_WORKSPACE/research/evidence/q0_arcagi2_fullfirst_20261022:$GITHUB_WORKSPACE/research/evidence/q0_arcagi2_trainholdout_first_20261022"
+          python research/evidence/q0_arcagi2_trainholdout_first_20261022/arc_compositional_grammar.py \
+            --data /tmp/arc2-holdout-masked/training \
+            --freeze research/evidence/q0_arcagi2_trainholdout_first_20261022/FROZEN_ARC2_TRAIN800_VALID200.json \
+            --out /tmp/q0-comp-predictions/ARC2_TRAIN200_PREDICTIONS_PRE_GRADE.json \
+            | tee /tmp/q0-comp-predictions/INFERENCE.log
+          python - <<'PY'
+          import hashlib,json,pathlib
+          f=pathlib.Path('/tmp/q0-comp-predictions/ARC2_TRAIN200_PREDICTIONS_PRE_GRADE.json')
+          r=json.loads(f.read_bytes())
+          assert r['split']=='holdout' and r['n']==len(r['decisions'])==200
+          assert r['baseline_coverage']<=r['candidate_coverage']
+          assert r['candidate_coverage']==11 and r['baseline_coverage']==7
+          print('FIRST_PREDICTIONS_SHA_LOCKED_BEFORE_LABEL_FETCH',hashlib.sha256(f.read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Archive prediction-only evidence before any grading step
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-arc2-train200-predictions-before-any-label-read
+          path: /tmp/q0-comp-predictions/
+          if-no-files-found: warn
+  independently_grade_frozen_predictions:
+    needs: generate_predictions_without_validation_answers
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-arc2-train200-predictions-before-any-label-read
+          path: /tmp/q0-comp-predictions/
+      - name: Fetch correct test answers ONLY now in independent grading job
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check numpy==1.26.4
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arc2-train-grade-only
+          git -C /tmp/arc2-train-grade-only checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arc2-train-grade-only rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+      - name: Independently evaluate exact grid matches, plus postgrade full candidate-class ceiling
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q0-comp-results
+          export PYTHONPATH="$GITHUB_WORKSPACE/research/evidence/q0_arcagi2_fullfirst_20261022:$GITHUB_WORKSPACE/research/evidence/q0_arcagi2_trainholdout_first_20261022"
+          python research/evidence/q0_arcagi2_trainholdout_first_20261022/grade_arc_train_holdout.py \
+            --predictions /tmp/q0-comp-predictions/ARC2_TRAIN200_PREDICTIONS_PRE_GRADE.json \
+            --training-root /tmp/arc2-train-grade-only/data/training \
+            --out /tmp/q0-comp-results/INDEPENDENT_HOLDOUT200_GRADE.json \
+            | tee /tmp/q0-comp-results/INDEPENDENT_GRADE.log
+          python - <<'PY'
+          import hashlib,json,pathlib
+          p=pathlib.Path('/tmp/q0-comp-results/INDEPENDENT_HOLDOUT200_GRADE.json')
+          d=json.loads(p.read_text())
+          assert d['heldout']==200 and d['exact_solves']=={'baseline':7,'composition':10,'new_comp_only':3}
+          assert d['coverage']=={'baseline':7,'composition':11}
+          pred=pathlib.Path('/tmp/q0-comp-predictions/ARC2_TRAIN200_PREDICTIONS_PRE_GRADE.json')
+          assert d['prediction_archive_sha256']==hashlib.sha256(pred.read_bytes()).hexdigest()
+          print('SCOPED_SOURCE_BLIND_200_HOLDOUT_FIRST_VERDICT',d['exact_solves'],flush=True)
+          PY
+      - name: Compute strictly postgrade compositional DSL candidate oracle headroom
+        run: |
+          set -euo pipefail
+          export PYTHONPATH="$GITHUB_WORKSPACE/research/evidence/q0_arcagi2_fullfirst_20261022:$GITHUB_WORKSPACE/research/evidence/q0_arcagi2_trainholdout_first_20261022"
+          python research/evidence/q0_arcagi2_trainholdout_first_20261022/postgrade_arc_train_oracle.py \
+            --predictions /tmp/q0-comp-predictions/ARC2_TRAIN200_PREDICTIONS_PRE_GRADE.json \
+            --training-root /tmp/arc2-train-grade-only/data/training \
+            --out /tmp/q0-comp-results/POSTGRADE_FINITE_GRAMMAR_ORACLE.json \
+            | tee /tmp/q0-comp-results/POSTGRADE_ORACLE.log
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/q0-comp-results/POSTGRADE_FINITE_GRAMMAR_ORACLE.json'))
+          assert d['holdout_total']==200 and d['demo_fitting_coverage']==11
+          assert d['oracle_true_program_count']==d['selection_exact']==10
+          assert d['ranker_headroom']==0
+          print('Q0_STRUCTURAL_CEILING_FINAL_10_OF_200_TRAINONLY',flush=True)
+          PY
+      - name: Archive complete results even on failure, never reinterpret first-run
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q0-arc2-train200-200-all-first-independent-grade-and-grammar-ceiling
+          path: /tmp/q0-comp-results/
+          if-no-files-found: warn
