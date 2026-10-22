@@ -265,4 +265,3 @@ def main():
     args.out.write_text(json.dumps(output,indent=2,sort_keys=True)+'\n')
     print('VERDICT',output['success_count'],'/',len(cases),'wall',output['total_wall_s'])
 if __name__=='__main__':main()
-if __name__=='__main__':main()
