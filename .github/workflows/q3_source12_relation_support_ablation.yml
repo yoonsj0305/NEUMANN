@@ -1,0 +1,70 @@
+name: Q3 real12 source relation support ablation posthoc
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_source12_relation_support_ablation.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  same_original12_fixed_grammar_ablations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Use original full source and exact checks
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          curl -fL --retry 3 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          mkdir -p /tmp/structural-ablation/source /tmp/structural-ablation/result
+          python - <<'PY'
+          import json,hashlib,pathlib,urllib.request
+          m=json.load(open('research/evidence/q3_source_houdini_sha12_20261022/FROZEN_BEFORE_SOURCE12.json'))
+          assert len(m['cases'])==12
+          for x in m['cases']:
+              b=urllib.request.urlopen('https://raw.githubusercontent.com/SyGuS-Org/benchmarks/'+m['upstream_commit']+'/'+x['path'],timeout=30).read()
+              assert hashlib.sha1(('blob '+str(len(b))+'\0').encode()+b).hexdigest()==x['sha'] and len(b)==x['size']
+              pathlib.Path('/tmp/structural-ablation/source',x['name']).write_bytes(b)
+          PY
+      - name: Existing generator only, delete cross-variable features to isolate necessary structural capacity
+        run: |
+          set -o pipefail
+          export M=research/evidence/q3_source_houdini_sha12_20261022/FROZEN_BEFORE_SOURCE12.json
+          export CODE=research/evidence/q3_source_houdini_sha12_20261022/classical_houdini.py
+          export CHECK=research/evidence/q3_source_houdini_sha12_20261022/independent_original_checker.py
+          for n in 1 2 3 4; do
+            python "$CODE" --input /tmp/structural-ablation/source --manifest "$M" --max-support "$n" --no-guards --out "/tmp/structural-ablation/result/SUPPORT_${n}.json" | tee "/tmp/structural-ablation/result/SUPPORT_${n}.log"
+            python "$CHECK" --receipt "/tmp/structural-ablation/result/SUPPORT_${n}.json" --input /tmp/structural-ablation/source --manifest "$M" --backend dual --out "/tmp/structural-ablation/result/CERT_SUPPORT_${n}.json" | tee "/tmp/structural-ablation/result/CERT_SUPPORT_${n}.log"
+          done
+          python "$CODE" --input /tmp/structural-ablation/source --manifest "$M" --max-support 4 --out "/tmp/structural-ablation/result/FULL_REFERENCE.json" | tee /tmp/structural-ablation/result/FULL_REFERENCE.log
+          python "$CHECK" --receipt /tmp/structural-ablation/result/FULL_REFERENCE.json --input /tmp/structural-ablation/source --manifest "$M" --backend dual --out /tmp/structural-ablation/result/CERT_FULL_REFERENCE.json | tee /tmp/structural-ablation/result/CERT_FULL_REFERENCE.log
+          python - <<'PY'
+          import json,hashlib,pathlib
+          root=pathlib.Path('/tmp/structural-ablation/result')
+          o={}
+          for name in ['SUPPORT_1','SUPPORT_2','SUPPORT_3','SUPPORT_4','FULL_REFERENCE']:
+              p=root/(name+'.json')
+              r=json.load(open(p));check=json.load(open(root/('CERT_'+name+'.json')))
+              assert len(r['cases'])==len(check['rows'])==12
+              o[name]={'raw_full_original_3vc':r['full_3vc_count'],'independent_double_3vc':check['totals']['dual_safe_certified'],'raw_wall_s':r['total_wall_s'],'checker_wall_s':check['wall_s'],'per_case':[{'name':x['file'],'safe':x['safe_certified']} for x in r['cases']], 'raw_sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
+              assert o[name]['raw_full_original_3vc']==o[name]['independent_double_3vc']
+          (root/'STRUCTURAL_CAPABILITY_REPORT.json').write_text(json.dumps(o,indent=2,sort_keys=True)+'\n')
+          print('Q3_ABLATION_EXACT',json.dumps({k:(v['raw_full_original_3vc'],v['raw_wall_s']) for k,v in o.items()}),flush=True)
+          PY
+      - name: Keep full evidence including failed conjunctive grammars
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-sha12-typed-relational-support-ablation-dual-full-source
+          path: /tmp/structural-ablation/result/
+          if-no-files-found: warn

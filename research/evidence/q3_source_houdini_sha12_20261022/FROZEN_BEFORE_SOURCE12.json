@@ -1,0 +1,83 @@
+{
+  "schema": "neumann.q3.source_body_unopened_within_new_study12.pre-registered-v1",
+  "selection": "Metadata-only from fixed SyGuS-Org/benchmarks git commit; 2017 Inv_Track & 2019 From2018; 350<=byte_size<=1100; .sl; exclude -new, _vars, _simp, _simpl, 8 preceding source8 names; 2017 matrix family excluded; 2019 jmbl_ wrappers excluded; Git blob SHA ascending first 6 each. No case substitution. Historical exposure elsewhere not exhaustively audited. These are two anthology folder cohorts, not proof of author-independent groups.",
+  "upstream_commit": "13c8deb68a873635879c9a69bc78caebd340f646",
+  "original_body_read_by_current_study_before_frozen_registration": false,
+  "untrained_algorithm": "Fixed AST parser + Post-only + feature vectors integer coefficients {-1,0,1} <=4 supports, constants [-2,-1,0,1,2], = <= >=, source syntactic guard implications, exact finite Houdini with round cap 8; Z3 first and independent cvc5 second check; no learned optimization and no human candidate input.",
+  "budget": "CPU, free GH Actions only; solver 2000ms per batched check-sat, fixed candidate grammar, unknown/unsupported counted as abstain; no replacements on failure.",
+  "success_definition": "Original 3VC all UNSAT per case independently by Z3+cvc5, no fallback count. Every one of 12 is denominator even if parser unsupported or UNKNOWN. No global Q3/Q4/Q6 or learned novelty claims.",
+  "cases": [
+    {
+      "path": "comp/2017/Inv_Track/anfp.sl",
+      "name": "anfp.sl",
+      "sha": "022a73280d454102da9e77a634f22a33f3aca6bc",
+      "size": 427
+    },
+    {
+      "path": "comp/2017/Inv_Track/sum4.sl",
+      "name": "sum4.sl",
+      "sha": "3a7fc946be36334bca504a3cfe88fa9f2e700c01",
+      "size": 438
+    },
+    {
+      "path": "comp/2017/Inv_Track/ex11.sl",
+      "name": "ex11.sl",
+      "sha": "40c70098a1f9c8f7a0d5823ffb4dc0e5e98501fd",
+      "size": 367
+    },
+    {
+      "path": "comp/2017/Inv_Track/ex14.sl",
+      "name": "ex14.sl",
+      "sha": "4d271e3c0255f7e8974a0f2aff30a7c9a386802a",
+      "size": 449
+    },
+    {
+      "path": "comp/2017/Inv_Track/w1.sl",
+      "name": "w1.sl",
+      "sha": "4f7f30fdbe9dd3575e871c62d405932573e832d2",
+      "size": 413
+    },
+    {
+      "path": "comp/2017/Inv_Track/cegar1.sl",
+      "name": "cegar1.sl",
+      "sha": "5265f78e457228bfb7eef931aca690ee40f53a31",
+      "size": 437
+    },
+    {
+      "path": "comp/2019/Inv_Track/From2018/gsv2008_true-unreach-call_true-termination.sl",
+      "name": "gsv2008_true-unreach-call_true-termination.sl",
+      "sha": "118870c53c8a9a67fabd03e6ff6f0dbbf0de8b2c",
+      "size": 437
+    },
+    {
+      "path": "comp/2019/Inv_Track/From2018/inria-00615623_4.sl",
+      "name": "inria-00615623_4.sl",
+      "sha": "14f6e474034796e299044c6fe0fd1e6784cadd75",
+      "size": 553
+    },
+    {
+      "path": "comp/2019/Inv_Track/From2018/gj2007b_true-unreach-call_true-termination.sl",
+      "name": "gj2007b_true-unreach-call_true-termination.sl",
+      "sha": "174ac5877c99312d54c6753a8bd4557af4a0daf6",
+      "size": 542
+    },
+    {
+      "path": "comp/2019/Inv_Track/From2018/fib_30_x.sl",
+      "name": "fib_30_x.sl",
+      "sha": "1816db0af37d732a38866a037d776bcdf2e43daf",
+      "size": 579
+    },
+    {
+      "path": "comp/2019/Inv_Track/From2018/minor3.sl",
+      "name": "minor3.sl",
+      "sha": "19c54cdba944e0deec2720d3d033427bec34c37e",
+      "size": 570
+    },
+    {
+      "path": "comp/2019/Inv_Track/From2018/fib_28.sl",
+      "name": "fib_28.sl",
+      "sha": "27bb8b46994f08f2577bed8fb60cc798c5f5f2ca",
+      "size": 598
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+name: Q3 SHA-before-body classical source-only 12 original gate
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_source_houdini_first_unopened12.yml'
+      - 'research/evidence/q3_source_houdini_sha12_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first_source_exposure_fixed12_full_original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify frozen preregistration is present and compile algorithms before reading original bodies
+        run: |
+          python -m py_compile research/evidence/q3_source_houdini_sha12_20261022/classical_houdini.py
+          python -m py_compile research/evidence/q3_source_houdini_sha12_20261022/independent_original_checker.py
+          python - <<'PY'
+          import json
+          p='research/evidence/q3_source_houdini_sha12_20261022/FROZEN_BEFORE_SOURCE12.json'
+          d=json.load(open(p))
+          assert d['original_body_read_by_current_study_before_frozen_registration'] is False
+          assert len(d['cases'])==12 and len({x['sha'] for x in d['cases']})==12
+          assert len({x['name'] for x in d['cases']})==12
+          assert all(x['sha'] and x['size']>=350 and x['size']<=1100 for x in d['cases'])
+          print('FREEZE_METADATA_ONLY_MATCH',len(d['cases']),flush=True)
+          PY
+      - name: Install free exact SMT backends with independent cvc5 checksum
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          curl -fL --retry 3 --connect-timeout 10 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+      - name: FIRST BODY EXPOSURE only now, exact Git blob identity and size
+        run: |
+          mkdir -p /tmp/q3sha12/sources
+          python - <<'PY'
+          import json, pathlib, urllib.request, hashlib
+          m=json.load(open('research/evidence/q3_source_houdini_sha12_20261022/FROZEN_BEFORE_SOURCE12.json'))
+          for row in m['cases']:
+              u='https://raw.githubusercontent.com/SyGuS-Org/benchmarks/'+m['upstream_commit']+'/'+row['path']
+              b=urllib.request.urlopen(u,timeout=30).read()
+              blob=hashlib.sha1(('blob '+str(len(b))+'\0').encode()+b).hexdigest()
+              if blob!=row['sha'] or len(b)!=row['size']: raise RuntimeError('FROZEN_SOURCE_BYTES_MISMATCH '+row['path'])
+              pathlib.Path('/tmp/q3sha12/sources',row['name']).write_bytes(b)
+              print('FIRST_BODY_SHA_MATCH',row['path'],len(b),blob,flush=True)
+          PY
+      - name: FIRST registered source-only Houdini on all 12 originals and persist unfiltered receipt
+        run: |
+          set -o pipefail
+          python research/evidence/q3_source_houdini_sha12_20261022/classical_houdini.py \
+            --input /tmp/q3sha12/sources \
+            --manifest research/evidence/q3_source_houdini_sha12_20261022/FROZEN_BEFORE_SOURCE12.json \
+            --out /tmp/q3sha12/FIRST12_PROPOSALS.json | tee /tmp/q3sha12/FIRST12_PROPOSALS.log
+          sha256sum /tmp/q3sha12/FIRST12_PROPOSALS.json
+      - name: Independent dual original 3VC checker for all submitted proposals
+        run: |
+          set -o pipefail
+          python research/evidence/q3_source_houdini_sha12_20261022/independent_original_checker.py \
+            --receipt /tmp/q3sha12/FIRST12_PROPOSALS.json \
+            --input /tmp/q3sha12/sources \
+            --manifest research/evidence/q3_source_houdini_sha12_20261022/FROZEN_BEFORE_SOURCE12.json \
+            --backend dual \
+            --out /tmp/q3sha12/INDEPENDENT_DUAL_FIRST12.json | tee /tmp/q3sha12/INDEPENDENT_DUAL_FIRST12.log
+          sha256sum /tmp/q3sha12/INDEPENDENT_DUAL_FIRST12.json
+      - name: Preserve all 12 cases including abstentions and scoped pass count
+        if: always()
+        run: |
+          python - <<'PY'
+          import pathlib,json,hashlib
+          p=pathlib.Path('/tmp/q3sha12')
+          d={}
+          for name in ('FIRST12_PROPOSALS.json','INDEPENDENT_DUAL_FIRST12.json'):
+              f=p/name
+              d[name]={'present':f.exists()}
+              if f.exists(): d[name]['sha256']=hashlib.sha256(f.read_bytes()).hexdigest()
+          f=p/'FIRST12_PROPOSALS.json'
+          if f.exists():
+              x=json.loads(f.read_text());d['raw_evaluated']=len(x['cases']);d['raw_full_3vc']=x['full_3vc_count'];d['raw_status']=[{'name':z['file'],'certified':z['safe_certified'],'abstain':z.get('abstain_reason')} for z in x['cases']]
+          g=p/'INDEPENDENT_DUAL_FIRST12.json'
+          if g.exists():
+              x=json.loads(g.read_text());d['independent_checker_totals']=x['totals'];d['independent_status']=[{'name':z['name'],'status':z['status']} for z in x['rows']]
+          (p/'SUMMARY.json').write_text(json.dumps(d,indent=2,sort_keys=True)+'\n')
+          print('FULL_FIRST12_SUMMARY',json.dumps(d),flush=True)
+          PY
+      - name: Immutable first evidence even on individual failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-sha12-first-native-classical-houdini-and-independent-dual
+          path: |
+            /tmp/q3sha12/*.json
+            /tmp/q3sha12/*.log
+          if-no-files-found: warn
