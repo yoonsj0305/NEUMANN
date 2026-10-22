@@ -1,0 +1,181 @@
+name: Q0 official ARC2 train200 actual typed-object source cascade and independent grade
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q0_arc2_typed_object_cascade.yml'
+      - 'research/evidence/q0_arc2_typed_object_cascade_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  authenticate_and_mask_all_public_training:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check SHA of frozen method and prior label-free 200 predictions before original data access
+        run: |
+          set -euo pipefail
+          DIR=research/evidence/q0_arc2_typed_object_cascade_20261022
+          echo "e50877b81eb3af1a09ff35f5c4e9c5a6d49d284d5db72626addd3be866ef1037  $DIR/relational_pipeline.py" | sha256sum -c -
+          echo "9761c2e6080021e16f5db34db12e1ad8a448b1ad5bd413cee9bdc8c48f9e6a94  $DIR/FIRST_OLD_PREGRADE_NO_TRUTH.json" | sha256sum -c -
+          python -m py_compile "$DIR/relational_pipeline.py" "$DIR/run_source_conditional.py" "$DIR/cascade_and_grade.py" "$DIR/score_source_original_after_inference.py"
+          python - <<'PY'
+          import json,pathlib,hashlib
+          d=pathlib.Path('research/evidence/q0_arc2_typed_object_cascade_20261022')
+          reg=json.loads((d/'FROZEN_BEFORE_HOLDOUT.json').read_text())
+          assert reg['method_sha256']==hashlib.sha256((d/'relational_pipeline.py').read_bytes()).hexdigest()
+          assert reg['holdout_count']==200 and reg['dev_count']==800
+          assert reg['pinned_original_commit']=='f3283f727488ad98fe575ea6a5ac981e4a188e49'
+          old=json.loads((d/'FIRST_OLD_PREGRADE_NO_TRUTH.json').read_text())
+          assert len(old['rows'])==200 and all('truth' not in x and 'exact' not in x for x in old['rows'])
+          print('FROZEN_PRIOR_PREDICTIONS_AND_NEW_CLASSICAL_AST_CODE_BEFORE_ORIGINAL_ACCESS_PASS',flush=True)
+          PY
+      - name: Authenticate original published ARC-AGI-2 1000 training files exact Git tree and strip ALL test outputs
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arc2-gold
+          git -C /tmp/arc2-gold checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arc2-gold rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          mkdir -p /tmp/arc2-1000-masked
+          python - <<'PY'
+          import pathlib,json,hashlib
+          original=pathlib.Path('/tmp/arc2-gold/data/training')
+          files=sorted(original.glob('*.json'),key=lambda p:hashlib.sha256(p.stem.encode()).hexdigest())
+          assert len(files)==1000
+          reg=json.loads(pathlib.Path('research/evidence/q0_arcagi2_trainholdout_first_20261022/FROZEN_ARC2_TRAIN800_VALID200.json').read_text())
+          sha=lambda ff:hashlib.sha256(('\n'.join(p.stem for p in ff)+'\n').encode()).hexdigest()
+          assert sha(files[:800])==reg['dev_id_sha256']
+          assert sha(files[800:])==reg['val_id_sha256']
+          for f in files:
+              o=json.loads(f.read_text())
+              assert all('output' in z for z in o['test'])
+              o['test']=[{'input':z['input']} for z in o['test']]
+              pathlib.Path('/tmp/arc2-1000-masked',f.name).write_text(json.dumps(o,separators=(',',':')))
+          print('MASKED_ALL_1000_ORIGINAL_TRAINING_TASKS_WITHOUT_TEST_ANSWERS',len(files),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q0-arc2-original1000-task-inputs-training-split-test-outputs-removed
+          path: /tmp/arc2-1000-masked/
+          if-no-files-found: error
+
+  source_only_first_typed_and_real_conditional_search:
+    needs: authenticate_and_mask_all_public_training
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-arc2-original1000-task-inputs-training-split-test-outputs-removed
+          path: /tmp/arc2-1000-masked
+      - name: Install only CPU tensor utilities, fail if any test answer can be accessed
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check numpy==1.26.4 scipy==1.14.1
+          python - <<'PY'
+          import json,pathlib
+          fs=list(pathlib.Path('/tmp/arc2-1000-masked').glob('*.json'))
+          assert len(fs)==1000 and all(all('output' not in z for z in json.loads(f.read_text())['test']) for f in fs)
+          print('CONFIRMED_GRADED_TARGETS_NOT_IN_INFERENCE_JOB',flush=True)
+          PY
+      - name: Frozen full typed pipeline all200, then actually execute old-first conditional without labels
+        run: |
+          set -o pipefail
+          mkdir -p /tmp/q0-typed-preg
+          DIR=research/evidence/q0_arc2_typed_object_cascade_20261022
+          S=research/evidence/q0_arcagi2_trainholdout_first_20261022/FROZEN_ARC2_TRAIN800_VALID200.json
+          python "$DIR/relational_pipeline.py" --data /tmp/arc2-1000-masked --freeze "$S" \
+            --subset holdout --out /tmp/q0-typed-preg/FROZEN_TYPED200_PREDICTIONS.json \
+            | tee /tmp/q0-typed-preg/NEW_FULL200_RUN.log
+          PYTHONPATH="$DIR" python "$DIR/run_source_conditional.py" \
+            --masked-data /tmp/arc2-1000-masked --freeze "$S" \
+            --old-pregrade "$DIR/FIRST_OLD_PREGRADE_NO_TRUTH.json" \
+            --out /tmp/q0-typed-preg/TRUE_CONDITIONAL200_PREDICTIONS.json \
+            | tee /tmp/q0-typed-preg/CONDITIONAL200_RUN.log
+          python - <<'PY'
+          import json,pathlib,hashlib
+          p=pathlib.Path('/tmp/q0-typed-preg');full=json.loads((p/'FROZEN_TYPED200_PREDICTIONS.json').read_text());step=json.loads((p/'TRUE_CONDITIONAL200_PREDICTIONS.json').read_text())
+          old=json.loads(pathlib.Path('research/evidence/q0_arc2_typed_object_cascade_20261022/FIRST_OLD_PREGRADE_NO_TRUTH.json').read_text())
+          assert full['num']==step['n']==200
+          assert len({x['id'] for x in step['records']})==200
+          new={x['id']:x for x in full['records']};prior={x['id']:x for x in old['rows']}
+          for q in step['records']:
+              o=prior[q['id']];p=new[q['id']]
+              assert q['prediction']==(o['new_guess'] if o['old_coverage']+o['new_coverage']>0 else p['pred'])
+          assert step['route_counts']=={'prior_first':13,'new_typed_object':1,'ABSTAIN':186},step['route_counts']
+          assert full['coverage']==11
+          print('PREGRADE_FULL_AND_ACTUAL_CONDITIONAL_MATCHED_ALL200',flush=True)
+          for f in p.glob('*.json'):print('PREGRADE_SHA',f.name,hashlib.sha256(f.read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Preserve immutable predictions BEFORE independent original-test grading
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-arc2-typed-object-first200-and-real-old-first-conditional-pregrade
+          path: /tmp/q0-typed-preg/
+          if-no-files-found: warn
+
+  independent_original_source_test_grading:
+    needs: source_only_first_typed_and_real_conditional_search
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-arc2-typed-object-first200-and-real-old-first-conditional-pregrade
+          path: /tmp/q0-typed-preg
+      - name: Get true original source 200 test answers for FIRST TIME IN DISTINCT grading job
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arc2-original-truth
+          git -C /tmp/arc2-original-truth checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arc2-original-truth rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+      - name: Independent full grid exact scores and keep previous successes; report total cost independently
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q0-typed-grade
+          DIR=research/evidence/q0_arc2_typed_object_cascade_20261022
+          python "$DIR/score_source_original_after_inference.py" \
+            --old-locked "$DIR/FIRST_OLD_PREGRADE_NO_TRUTH.json" \
+            --new-locked /tmp/q0-typed-preg/FROZEN_TYPED200_PREDICTIONS.json \
+            --cascade-locked /tmp/q0-typed-preg/TRUE_CONDITIONAL200_PREDICTIONS.json \
+            --truth-dir /tmp/arc2-original-truth/data/training \
+            --out /tmp/q0-typed-grade/POSTHOC_REPRODUCED_200_ORIGINAL_GRADE.json \
+            | tee /tmp/q0-typed-grade/INDEPENDENT_SCORE_RUN.log
+          python - <<'PY'
+          import json,pathlib,hashlib
+          root=pathlib.Path('/tmp/q0-typed-preg');g=json.load(open('/tmp/q0-typed-grade/POSTHOC_REPRODUCED_200_ORIGINAL_GRADE.json'))
+          full=json.load(open(root/'FROZEN_TYPED200_PREDICTIONS.json'))
+          step=json.load(open(root/'TRUE_CONDITIONAL200_PREDICTIONS.json'))
+          assert g['total']=={'old':10,'typed':8,'cascade':11}
+          assert g['new_only_ids']==['f25fbde4']
+          summary={'neumann_north_star':'UNPROVEN','scope':'POSTHOC previously evaluated ARC-AGI-2 public training split 200','all_source_task_outputs_are_original':True,'source_only_new_synthesis_gain':1,'baseline_correct':10,'new_typed_correct':8,'actual_conditional_correct':11,'neural_training_calls':0,
+            'typed_first_full_wall_s':full['wall_s'],'typed_actual_guarded_wall_s':step['wall_s'],'conditional_structure_calls':step['calls_to_expensive_new_synthesizer'],'source_first_200_predict_sha256':hashlib.sha256((root/'FROZEN_TYPED200_PREDICTIONS.json').read_bytes()).hexdigest(),'source_cascade_predict_sha256':hashlib.sha256((root/'TRUE_CONDITIONAL200_PREDICTIONS.json').read_bytes()).hexdigest(),'exact_scorer_source_grounded':True,'global_Q3_neural_exclusive':'OPEN','global_Q4_10x':'OPEN','frontier_parity':'OPEN'}
+          pathlib.Path('/tmp/q0-typed-grade/SCIENTIFIC_DECISION.json').write_text(json.dumps(summary,indent=2,sort_keys=True)+'\n')
+          print('Q0_REAL_SOURCE_ONLY_ONE_NEW_STRUCTURE_OUTSIDE_OLD_CANDIDATES_WITH_TRUE_CASCADE',json.dumps(summary,sort_keys=True),flush=True)
+          PY
+      - name: Preserve 200 independent postgrade receipts even for failed experiments
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-arc2-source-only-typed-object-200-paired-and-conditional-independent-grade
+          path: /tmp/q0-typed-grade/
+          if-no-files-found: warn
