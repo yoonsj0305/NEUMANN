@@ -1,0 +1,128 @@
+name: Q0 ConceptARC exact expression wall vs selection headroom on 160 original tasks
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q0_conceptarc160_exact_candidate_oracle.yml'
+      - 'research/evidence/q0_conceptarc160_oracle_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mask_original_truth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Lock exact unmodified original grammar and original corpus Git tree before extracting 160 masked tasks
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD:research/evidence/q0_arc2_typed_intermediate_20261022/relational_pipeline_selector_memo_v2.py)" = a46dc5480f0819895effc48df1e0600a23640bdf
+          python -m py_compile research/evidence/q0_conceptarc160_oracle_20261022/quantify_grammar_oracle.py
+          git clone -q --no-checkout https://github.com/victorvikram/ConceptARC.git /tmp/carc-original
+          git -C /tmp/carc-original checkout -q --detach 0e67da6af879e4bad3d7cd3c196e8d551b445725
+          test "$(git -C /tmp/carc-original rev-parse HEAD:corpus)" = a9e933c021388297f21fa1cded180105479addc0
+          python research/evidence/q0_conceptarc_first160_20261022/prepare_corpus.py \
+            --source /tmp/carc-original/corpus --masked /tmp/carc-masked --metadata /tmp/carc-meta.json
+          python - <<'PY'
+          import json,pathlib
+          f=list(pathlib.Path('/tmp/carc-masked').glob('*.json'))
+          assert len(f)==160
+          assert all(len((x:=json.loads(p.read_text()))['test'])==3 and all('output' not in t for t in x['test']) for p in f)
+          print('ALL_160_480_OUTPUTS_MASKED',flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q0-postgrade-oracle-inputs-no-test-labels
+          path: /tmp/carc-masked/
+          if-no-files-found: error
+  enumerate_all_behavior_classes_without_labels:
+    needs: mask_original_truth
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-postgrade-oracle-inputs-no-test-labels
+          path: /tmp/carc-masked
+      - name: Recompute ALL frozen ASTs, collapse equivalent test predictions, preserve every candidate before grading
+        run: |
+          set -euo pipefail
+          python -m pip install -q numpy==1.26.4 scipy==1.14.1
+          mkdir -p /tmp/carc-pregrade
+          python research/evidence/q0_conceptarc160_oracle_20261022/quantify_grammar_oracle.py \
+            --mode propose --masked /tmp/carc-masked \
+            --out /tmp/carc-pregrade/ALL_160_CANDIDATES_BEFORE_LABELS.json \
+          | tee /tmp/carc-pregrade/PRE_GRADE.log
+          python - <<'PY'
+          import json,pathlib,hashlib
+          p=pathlib.Path('/tmp/carc-pregrade/ALL_160_CANDIDATES_BEFORE_LABELS.json')
+          d=json.loads(p.read_text())
+          assert len(d['rows'])==d['n']==160 and not d['labels_seen']
+          assert sum(x['ast_count']>0 for x in d['rows'])==17
+          print('PREGRADE_REGISTERED_HASH',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-carc160-all-observational-AST-classes-before-targets
+          path: /tmp/carc-pregrade/
+          if-no-files-found: warn
+  independently_grade_expression_vs_selection:
+    needs: enumerate_all_behavior_classes_without_labels
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-carc160-all-observational-AST-classes-before-targets
+          path: /tmp/carc-pregrade
+      - name: Load original 480 ConceptARC output labels only AFTER candidate artifact was saved in separate prior job
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/victorvikram/ConceptARC.git /tmp/carc-targets
+          git -C /tmp/carc-targets checkout -q --detach 0e67da6af879e4bad3d7cd3c196e8d551b445725
+          test "$(git -C /tmp/carc-targets rev-parse HEAD:corpus)" = a9e933c021388297f21fa1cded180105479addc0
+      - name: Strict ORIGINAL task entire 3-grid exact upper oracle and equivalent output-class audit
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/carc-oracle
+          python research/evidence/q0_conceptarc160_oracle_20261022/quantify_grammar_oracle.py \
+            --mode grade \
+            --pred /tmp/carc-pregrade/ALL_160_CANDIDATES_BEFORE_LABELS.json \
+            --original /tmp/carc-targets/corpus \
+            --out /tmp/carc-oracle/POSTGRADE_ORIGINAL160_EXACT_ORACLE.json \
+          | tee /tmp/carc-oracle/INDEPENDENT_ORACLE_SCORE.log
+          python - <<'PY'
+          import json,pathlib,hashlib
+          p=pathlib.Path('/tmp/carc-oracle/POSTGRADE_ORIGINAL160_EXACT_ORACLE.json')
+          d=json.loads(p.read_text());c=d['counts']
+          assert c['total']==160 and c['covered']==17 and c['uncovered']==143
+          assert c['mdl_correct']==6
+          assert c['exact_oracle']>=c['mdl_correct']
+          assert len(d['group_counts'])==16
+          print('FROZEN_SOURCE_GRAMMAR_ORACLE_Q0_JOINT_GATE',c,flush=True)
+          print('EVIDENCE_SHA',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-carc160-original-exact-grammar-oracle-and-ambiguity-ledger
+          path: /tmp/carc-oracle/
+          if-no-files-found: warn
