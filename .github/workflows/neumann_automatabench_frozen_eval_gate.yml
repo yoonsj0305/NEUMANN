@@ -1,0 +1,145 @@
+name: NEUMANN external-author AutomataBench 2D CA frozen public eval
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/neumann_automatabench_frozen_eval_gate.yml'
+      - 'research/ood_automatabench_20261023/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  PYTHONPATH: research/ood_automatabench_20261023
+jobs:
+  authentic_eval_source_only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Freeze independent-author original 300 tasks and remove answers+metadata
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD:research/ood_automatabench_20261023/reversible_ca_solver.py)" = 623e63d92b100502b47896adc45f76e028d0cf07
+          test "$(git rev-parse HEAD:research/ood_automatabench_20261023/source_then_official_grade.py)" = 6742deffcdcb00019b1db18e9cf3d714d37e2652
+          echo 'IMMUTABLE_SOLVER_GIT_BLOBS_CONFIRMED_BEFORE_FIRST_PUBLIC_EVAL'
+          python -m py_compile research/ood_automatabench_20261023/*.py
+          mkdir -p /tmp/automata-original-source
+          python - <<'PY'
+          import urllib.request,json,hashlib,pathlib
+          sha='7d86373fdb63fe1bd3592ddf71d923ceebc5acd9'
+          url=f'https://raw.githubusercontent.com/neelsomani/automata-bench/{sha}/data/public_eval.jsonl'
+          with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'NEUMANN-independent-author-eval'}),timeout=120) as r:raw=r.read()
+          rows=[json.loads(x) for x in raw.splitlines()]
+          assert len(rows)==300 and len(set(x['id'] for x in rows))==300
+          target=pathlib.Path('/tmp/automata-original-source/MASKED_EVAL.jsonl')
+          with target.open('w') as out:
+              for z in rows:
+                  assert 'answer' in z and 'metadata' in z
+                  d={key:value for key,value in z.items() if key not in ('answer','metadata')}
+                  assert 'answer' not in d and 'metadata' not in d
+                  out.write(json.dumps(d,sort_keys=True,separators=(',',':'))+'\n')
+          manifest={'split':'public_eval','n':300,'upstream_repo':'neelsomani/automata-bench',
+                    'upstream_sha':sha,'exact_raw_sha256':hashlib.sha256(raw).hexdigest(),
+                    'masked_sha256':hashlib.sha256(target.read_bytes()).hexdigest()}
+          pathlib.Path('/tmp/automata-original-source/MANIFEST.json').write_text(json.dumps(manifest,sort_keys=True)+'\n')
+          print('EXTERNAL_AUTOMATA_EVAL_ORIGINAL_MASKED',manifest)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: automata-original-public-eval-masked-source-and-sha
+          path: /tmp/automata-original-source/
+          if-no-files-found: error
+  eval_source_exact_model_before_grading:
+    needs: authentic_eval_source_only
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+      - uses: actions/download-artifact@v4
+        with:
+          name: automata-original-public-eval-masked-source-and-sha
+          path: /tmp/automata-original-source
+      - name: Independent synthetic reversible CA controls before source-only 300
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from reversible_ca_solver import roll_one,solve,native_verify
+          h=w=4
+          initial=[[0,1,0,1],[1,1,0,0],[1,0,1,1],[0,1,0,0]]
+          rule={'type':'margolus_block_ca','permutation':list(range(15,-1,-1))}
+          state=initial
+          observations=[]
+          for t in range(5):
+              for y in range(h):
+                  for x in range(w):
+                      if t==0 or (t>0 and (x+y+t)%3==0):
+                          observations.append({'t':t,'x':x,'y':y,'value':state[y][x]})
+              if t<4:state=roll_one(state,t,rule['permutation'])
+          example={'id':'synthetic_only','grid':{'height':h,'width':w,'boundary':'torus'},
+                   'time_horizon':4,'rule':rule,'observations':observations}
+          for mode in ('plain','propagation'):
+              value=solve(example,policy=mode)
+              assert value['prediction'] is not None,value
+              assert native_verify(example,value['prediction'])
+              assert value['uniqueness']=='PROVEN'
+          print('SYNTHETIC_REAL_REVERSIBLE_2D_UNIQUE_CA_PASS')
+          PY
+          mkdir -p /tmp/automata-eval-pregrade
+          python research/ood_automatabench_20261023/source_then_official_grade.py --mode infer --source /tmp/automata-original-source/MASKED_EVAL.jsonl --out /tmp/automata-eval-pregrade/EVAL_300_BEFORE_ANY_ANSWERS.json | tee /tmp/automata-eval-pregrade/SOURCE_ONLY_PRE_GRADE.log
+          python - <<'PY'
+          import pathlib,json,hashlib
+          p=pathlib.Path('/tmp/automata-eval-pregrade/EVAL_300_BEFORE_ANY_ANSWERS.json')
+          x=json.loads(p.read_text())
+          assert x['n']==300 and not x['query_answers_seen'] and not x['dataset_metadata_seen']
+          print('AUTOMATA_EVAL_PREDICTIONS_SHA256_BEFORE_GRADE',hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: automata-2d-eval300-predictions-before-answers
+          path: /tmp/automata-eval-pregrade/
+          if-no-files-found: error
+  independent_eval_official_original_grade:
+    needs: eval_source_exact_model_before_grading
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+      - uses: actions/download-artifact@v4
+        with:
+          name: automata-original-public-eval-masked-source-and-sha
+          path: /tmp/automata-original-source
+      - uses: actions/download-artifact@v4
+        with:
+          name: automata-2d-eval300-predictions-before-answers
+          path: /tmp/automata-eval-pregrade
+      - name: Re-fetch exact original raw SHA and use official pinned verifier to grade 300
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import pathlib,json,urllib.request,hashlib
+          m=json.loads(pathlib.Path('/tmp/automata-original-source/MANIFEST.json').read_text())
+          url=f"https://raw.githubusercontent.com/{m['upstream_repo']}/{m['upstream_sha']}/data/{m['split']}.jsonl"
+          with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'NEUMANN-external-independent-eval-grader'}),timeout=120) as r:raw=r.read()
+          assert hashlib.sha256(raw).hexdigest()==m['exact_raw_sha256']
+          pathlib.Path('/tmp/AUTOMATA_TRUE_EVAL300_ONLY_AFTER_PRE_GRADE.jsonl').write_bytes(raw)
+          print('OFFICIAL_EVAL300_SOURCE_IDENTITY_VERIFIED_AFTER_SEAL')
+          PY
+          mkdir -p /tmp/automata-eval-official
+          python research/ood_automatabench_20261023/source_then_official_grade.py --mode grade --sealed /tmp/automata-eval-pregrade/EVAL_300_BEFORE_ANY_ANSWERS.json --original /tmp/AUTOMATA_TRUE_EVAL300_ONLY_AFTER_PRE_GRADE.jsonl --expected-raw-sha "$(python -c "import json;print(json.load(open('/tmp/automata-original-source/MANIFEST.json'))['exact_raw_sha256'])")" --out /tmp/automata-eval-official/EXTERNAL_EVAL300_OFFICIAL_SCORE.json | tee /tmp/automata-eval-official/ORIGINAL_OFFICIAL_INDEPENDENT_GRADE.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: automata-2d-eval300-independent-original-official-grade
+          path: /tmp/automata-eval-official/
+          if-no-files-found: error
