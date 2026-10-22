@@ -31,7 +31,7 @@ jobs:
             --mode prepare --source /tmp/new-independent-author-1d/dataset \
             --masked /tmp/1d-original900-redacted \
             --out /tmp/identity/SOURCE_ID_MANIFEST_1D900.json
-          test "$(find /tmp/1d-original900-redacted -maxdepth 1 -name '*.json' | wc -l)" -eq 900
+          test "$(find /tmp/1d-original900-redacted -maxdepth 1 -name '*.json' | wc -l)" -eq 901
           rm -rf /tmp/new-independent-author-1d
       - uses: actions/upload-artifact@v4
         with:
@@ -65,7 +65,7 @@ jobs:
           import json,pathlib,hashlib
           p=pathlib.Path('/tmp/first-900-prediction/FROZEN_BEFORE_LABEL_900.json')
           q=json.loads(p.read_text())
-          assert q['n']==len(q['rows'])==900 and not q['test_truth_seen']
+          assert q['n']==len(q['rows'])==901 and not q['test_truth_seen']
           print('FIRST_900_PREDICTION_FROZEN_SHA256',hashlib.sha256(p.read_bytes()).hexdigest())
           PY
       - uses: actions/upload-artifact@v4
