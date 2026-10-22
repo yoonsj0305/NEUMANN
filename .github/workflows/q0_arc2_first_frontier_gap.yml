@@ -1,0 +1,172 @@
+name: Q0 full ARC-AGI-2 first frontier gap frozen 1000train 120eval
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q0_arc2_first_frontier_gap.yml'
+      - 'research/evidence/q0_arcagi2_fullfirst_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  prepare_source_blind_evaluation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Freeze model and metadata before cloning source task bodies
+        run: |
+          set -euo pipefail
+          R=research/evidence/q0_arcagi2_fullfirst_20261022
+          python -m py_compile "$R/arc_minimal_controller.py" "$R/grade_arc_predictions.py"
+          python - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('research/evidence/q0_arcagi2_fullfirst_20261022/FREEZE_ARC2_PUBLIC_Q0_20261022.json')
+          d=json.loads(p.read_text())
+          assert d['repository_commit']=='f3283f727488ad98fe575ea6a5ac981e4a188e49'
+          assert d['training_count']==1000 and d['evaluation_count']==120 and d['candidate_programs']==96
+          assert d['training_tree']=='dac7259367cc5099ef6a7b604a50a93affbbee33'
+          assert d['evaluation_tree']=='8d04288aac3146b7c47d0b799c18bc9c0217d838'
+          assert d['filename_manifest_sha256']=='3014a6bf8feabbf650a27fd8b77eee7badbdeec6b63035d001ba0cad7cd884dd'
+          print('FROZEN_BEFORE_SOURCE_1K_TRAIN_120_EVAL',flush=True)
+          PY
+      - name: Checkout official full ARC2 immutable source tree, certify identities
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arc2-official
+          git -C /tmp/arc2-official checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arc2-official rev-parse HEAD)" = f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arc2-official rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          test "$(git -C /tmp/arc2-official rev-parse HEAD:data/evaluation)" = 8d04288aac3146b7c47d0b799c18bc9c0217d838
+          mkdir -p /tmp/arc2-public-mask/data/training /tmp/arc2-public-mask/data/evaluation
+          python - <<'PY'
+          import pathlib,hashlib,json,shutil
+          r=pathlib.Path('/tmp/arc2-official/data');dst=pathlib.Path('/tmp/arc2-public-mask/data')
+          train=sorted((r/'training').glob('*.json'));ev=sorted((r/'evaluation').glob('*.json'))
+          assert len(train)==1000 and len(ev)==120
+          arr=['data/'+split+'/'+p.name for split,xx in [('training',train),('evaluation',ev)] for p in xx]
+          h=hashlib.sha256(('\n'.join(sorted(arr))+'\n').encode()).hexdigest()
+          assert h=='3014a6bf8feabbf650a27fd8b77eee7badbdeec6b63035d001ba0cad7cd884dd',(h,'identity failure')
+          for x in train:shutil.copyfile(x,dst/'training'/x.name)
+          for x in ev:
+              src=json.loads(x.read_text());assert len(src['test'])>0
+              assert all('output' in ex for ex in src['test'])
+              masked={'train':src['train'],'test':[{'input':t['input']} for t in src['test']]}
+              assert all('output' not in q for q in masked['test'])
+              (dst/'evaluation'/x.name).write_text(json.dumps(masked,separators=(',',':'))+'\n')
+          print('MASKED_ALL_120_EVALUATION_ANSWERS_WITHOUT_REMOVING_ANY_TASK',h,flush=True)
+          PY
+      - name: Transfer ONLY training tasks and answer-stripped evaluation tasks to isolated inference job
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q0-pinned-arc2-inputs-without-evaluation-answers
+          path: /tmp/arc2-public-mask/data/
+          if-no-files-found: error
+  learn_and_infer_without_test_labels:
+    needs: prepare_source_blind_evaluation
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q0-pinned-arc2-inputs-without-evaluation-answers
+          path: /tmp/arc2-public-mask/data/
+      - name: Validate answer-free task isolation, install actual CPU learner
+        run: |
+          set -euo pipefail
+          python -m pip install -q --disable-pip-version-check numpy==1.26.4
+          python -m pip install -q --disable-pip-version-check 'torch==2.5.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python - <<'PY'
+          import pathlib,json
+          d=pathlib.Path('/tmp/arc2-public-mask/data/evaluation');paths=list(d.glob('*.json'))
+          assert len(paths)==120
+          for f in paths:
+              t=json.loads(f.read_text())
+              assert all('output' not in r for r in t['test']),f.name
+          assert len(list(pathlib.Path('/tmp/arc2-public-mask/data/training').glob('*.json')))==1000
+          print('MODEL_INFERENCE_ISOLATION_120_NO_EVAL_TEST_OUTPUT_BYTES',flush=True)
+          PY
+          python research/evidence/q0_arcagi2_fullfirst_20261022/arc_minimal_controller.py --selftest
+      - name: FIRST actual neural train-only model + full 120 eval predictions; archive before grading
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/arc2-prediction-receipt
+          python research/evidence/q0_arcagi2_fullfirst_20261022/arc_minimal_controller.py \
+            --root /tmp/arc2-public-mask \
+            --freeze research/evidence/q0_arcagi2_fullfirst_20261022/FREEZE_ARC2_PUBLIC_Q0_20261022.json \
+            --out /tmp/arc2-prediction-receipt --predictions-only \
+            | tee /tmp/arc2-prediction-receipt/INFERENCE_ONLY_NO_LABEL.log
+          python - <<'PY'
+          import pathlib,hashlib,json
+          p=pathlib.Path('/tmp/arc2-prediction-receipt/PREDICTIONS_BEFORE_GRADE.json')
+          d=json.loads(p.read_bytes())
+          assert d['evaluation_size']==120 and d['eval_test_labels_passed_to_inference']==0
+          assert all(len(x)==120 for x in d['rankers'].values())
+          assert d['train_only_fit']['n_parameters']>0 and d['train_only_fit']['epochs']==65
+          print('PREDICTIONS_IMMUTABLY_HASHED_PRIOR_TO_SEPARATE_JOB_GRADING',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Persist pre-grade predictions even if unsuccessful
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q0-first-arc2-predictions-before-revealing-test-answers
+          path: /tmp/arc2-prediction-receipt/
+          if-no-files-found: warn
+  grade_independently_after_prediction_artifact:
+    needs: learn_and_infer_without_test_labels
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q0-first-arc2-predictions-before-revealing-test-answers
+          path: /tmp/arc2-prediction-receipt/
+      - name: Fetch public ARC2 evaluation labels ONLY IN THIS JOB after prediction artifact is published
+        run: |
+          set -euo pipefail
+          python -m pip install -q --disable-pip-version-check numpy==1.26.4
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arc2-grading-only
+          git -C /tmp/arc2-grading-only checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arc2-grading-only rev-parse HEAD:data/evaluation)" = 8d04288aac3146b7c47d0b799c18bc9c0217d838
+      - name: Strict independent exact-grid scorer plus posthoc finite-library oracle ceiling
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/arc2-graded-receipt
+          python research/evidence/q0_arcagi2_fullfirst_20261022/grade_arc_predictions.py \
+            --predictions /tmp/arc2-prediction-receipt/PREDICTIONS_BEFORE_GRADE.json \
+            --eval-root /tmp/arc2-grading-only/data/evaluation \
+            --out /tmp/arc2-graded-receipt/OFFICIAL_FIRST_FULL120_RESULT.json \
+            | tee /tmp/arc2-graded-receipt/GRADING.log
+          python - <<'PY'
+          import json,hashlib,pathlib
+          p=pathlib.Path('/tmp/arc2-graded-receipt/OFFICIAL_FIRST_FULL120_RESULT.json')
+          r=json.loads(p.read_text())
+          assert r['n_public_eval']==120 and r['n_public_training']==1000
+          assert r['program_dsl_size']==96 and r['separate_original_grading']
+          assert all(len(x['solved_ids'])+len(x['unsolved_ids'])==120 for x in r['results'].values())
+          assert max(v['solved'] for v in r['results'].values())<=r['oracle_any_demo_fitting_program_solved']
+          print('REAL_FIRST_FROZEN_ALL_120_PUBLIC_RESULTS_PRESERVED',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Retain all scores, zero successes, gaps, and negative evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q0-arc2-first-full120-learned-vs-classical-frontier-gap
+          path: /tmp/arc2-graded-receipt/
+          if-no-files-found: warn
