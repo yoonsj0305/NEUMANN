@@ -25,14 +25,14 @@ def main():
   cc['baseline_oracle']+=oracleold;cc['extended_oracle']+=oraclenew
   cc['new_only_oracle']+=oraclenew and not oracleold
   cc['candidate_coverage']+=bool(old or new)
-  if m[id]['disjoint_id']:
+  if m[id]['id_disjoint']:
     cc['id_disjoint_18_oracle']+=oraclenew
     cc['id_disjoint_18_covered']+=bool(old or new)
   cc['candidate_count_total']+=len(old)+len(new)
   score=s[id]
   assert not bool(score[1]) or oracleold
   assert not bool(score[2]) or oraclenew
-  rows.append({'id':id,'old_oracle':oracleold,'new_oracle':oraclenew,'id_disjoint':m[id]['disjoint_id'],'n_old':len(old),'n_extension':len(new),'winners_old':win_old,'winners_new':win_new})
+  rows.append({'id':id,'old_oracle':oracleold,'new_oracle':oraclenew,'id_disjoint':m[id]['id_disjoint'],'n_old':len(old),'n_extension':len(new),'winners_old':win_old,'winners_new':win_new})
   if (i+1)%100==0:print('COMPLETE_POSTGRADE_ORACLE',i+1,flush=True)
  result={'schema':'NEUMANN_Q0_ARC1_PUBLIC400_FIXED_ALL_CANDIDATES_POSTGRADE_CEILING','first_score_sha256':hashlib.sha256(pathlib.Path(a.score).read_bytes()).hexdigest(),'first_pregade_sha256':compact['pregade_artifact_sha256'],'full_400_problems':400,'oracle':dict(cc),'wall_s':time.perf_counter()-st,'source_content_audit_sha256':hashlib.sha256(pathlib.Path(a.audit).read_bytes()).hexdigest(),'interpretation':'Exact ceiling for frozen finite source-conditioned candidate grammar only; arbitrary program synthesis or frontier model not bounded by this oracle','rows':rows}
  target=pathlib.Path(a.out);target.write_text(json.dumps(result,sort_keys=True,indent=2)+'\n')
