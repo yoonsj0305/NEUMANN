@@ -1,0 +1,134 @@
+name: Q3 fully autonomous exact MINIMUM interaction support four originals
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_source_minimal_k_upper_lower_autonomous.yml'
+      - 'research/evidence/q3_autonomous_arity_witness20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_only_discover_exact_minimal_proof_support:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check no winning invariants or witness coordinates as input
+        run: |
+          set -euo pipefail
+          python -m py_compile research/evidence/q3_autonomous_arity_witness20261022/auto_kwise_recombination.py
+          python -m py_compile research/evidence/q3_autonomous_arity_witness20261022/auto_upper_filter.py
+          python -m py_compile research/evidence/q3_autonomous_arity_witness20261022/source_guarded_affine_autosynth.py
+          python - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('research/evidence/q3_autonomous_arity_witness20261022/SOURCE4_ONLY_SHA_MANIFEST.json')
+          d=json.loads(p.read_text())
+          assert len(d['cases'])==4
+          assert all(set(row)=={'name','sha','size','path'} for row in d['cases'])
+          assert 'invariant' not in p.read_text().lower()
+          print('ORIGINAL_ONLY_NO_GOLD_SHA_LOCK',flush=True)
+          PY
+      - name: Install exact algebra, source Z3 and independent checksum-pinned cvc5
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check sympy==1.14.0
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          curl -fL --retry 3 --connect-timeout 10 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5-bin /tmp/auto-min-arity/sources /tmp/auto-min-arity/smt
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5-bin
+          sudo install -m 755 "$(find /tmp/cvc5-bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+      - name: Source-authenticate four original published SyGuS programs against frozen upstream blobs
+        run: |
+          python - <<'PY'
+          import pathlib,json,hashlib,urllib.request
+          p=pathlib.Path('/tmp/auto-min-arity/sources')
+          m=json.load(open('research/evidence/q3_autonomous_arity_witness20261022/SOURCE4_ONLY_SHA_MANIFEST.json'))
+          root='https://raw.githubusercontent.com/SyGuS-Org/benchmarks/'+m['upstream_commit']+'/'
+          dirs={'hola_countud.sl':'comp/2017/Inv_Track/'}
+          for c in m['cases']:
+              name=c['name']
+              folder=dirs.get(name,'comp/2019/Inv_Track/From2018/')
+              b=urllib.request.urlopen(root+folder+name,timeout=30).read()
+              h=hashlib.sha1(('blob '+str(len(b))+'\0').encode()+b).hexdigest()
+              assert h==c['sha'] and len(b)==c['size'],name
+              (p/name).write_bytes(b)
+              print('ORIGINAL_SHA_AUTHENTIC',name,h,flush=True)
+          PY
+      - name: LOWER bound is automatically generated projection gluing, cvc5 independently validates every original witness
+        run: |
+          set -o pipefail
+          P=research/evidence/q3_autonomous_arity_witness20261022
+          python "$P/auto_kwise_recombination.py" \
+            --source-dir /tmp/auto-min-arity/sources \
+            --out /tmp/auto-min-arity/AUTONOMOUS_LOWER.json \
+            --smt-out /tmp/auto-min-arity/smt --cvc5 \
+            | tee /tmp/auto-min-arity/AUTONOMOUS_LOWER.log
+      - name: UPPER bound from entirely automatic source original Pre/Trans affine guard synthesis, with no human-winning invariants
+        run: |
+          set -o pipefail
+          P=research/evidence/q3_autonomous_arity_witness20261022
+          python "$P/source_guarded_affine_autosynth.py" \
+            --engine research/evidence/q3_source_houdini_sha12_20261022/classical_houdini.py \
+            --source-dir /tmp/auto-min-arity/sources --manifest "$P/SOURCE4_ONLY_SHA_MANIFEST.json" \
+            --out /tmp/auto-min-arity/AUTO_SUFFICIENT_UNFILTERED.json \
+            | tee /tmp/auto-min-arity/AUTO_SUFFICIENT_UNFILTERED.log
+          python "$P/auto_upper_filter.py" \
+            --proposals /tmp/auto-min-arity/AUTO_SUFFICIENT_UNFILTERED.json \
+            --lower-bounds /tmp/auto-min-arity/AUTONOMOUS_LOWER.json \
+            --out /tmp/auto-min-arity/AUTONOMOUS_MIN_ARITY_INVARIANTS.json \
+            | tee /tmp/auto-min-arity/AUTONOMOUS_MIN_ARITY_INVARIANTS.log
+      - name: INDEPENDENT original source full 3VC Z3 and cvc5 for automatically minimal-arity candidate invariants
+        run: |
+          set -o pipefail
+          python research/evidence/q3_source_houdini_sha12_20261022/independent_original_checker.py \
+            --receipt /tmp/auto-min-arity/AUTONOMOUS_MIN_ARITY_INVARIANTS.json \
+            --input /tmp/auto-min-arity/sources \
+            --manifest research/evidence/q3_autonomous_arity_witness20261022/SOURCE4_ONLY_SHA_MANIFEST.json \
+            --backend dual \
+            --out /tmp/auto-min-arity/INDEPENDENT_MIN_ARITY_DUAL_ORIGINAL.json \
+            | tee /tmp/auto-min-arity/INDEPENDENT_MIN_ARITY_DUAL_ORIGINAL.log
+      - name: Accept only four BOTH-SIDED exact minimal structural arity proofs, no neural novelty claim
+        run: |
+          python - <<'PY'
+          import json,pathlib,hashlib
+          p=pathlib.Path('/tmp/auto-min-arity')
+          low=json.load(open(p/'AUTONOMOUS_LOWER.json'))
+          high=json.load(open(p/'AUTONOMOUS_MIN_ARITY_INVARIANTS.json'))
+          source=json.load(open(p/'AUTO_SUFFICIENT_UNFILTERED.json'))
+          dual=json.load(open(p/'INDEPENDENT_MIN_ARITY_DUAL_ORIGINAL.json'))
+          expected={'fib_15.sl':3,'fib_18.sl':3,'hola_countud.sl':3,'jmbl_tacas.sl':4}
+          assert low['original_count']==len(high['cases'])==len(source['cases'])==len(dual['rows'])==4
+          assert low['cvc5_run'] and low['query_count_verified']==low['totals']['cvc5_replays']
+          assert all(v['necessary_support_at_least']==expected[k] for k,v in low['certified'].items())
+          assert source['success_count']==4
+          assert all(x['safe_certified'] and x['max_k']==expected[x['file']] and x['count_kept']>0 for x in high['cases'])
+          assert dual['totals']['dual_safe_certified']==4 and dual['totals']['unsat_vc']==12 and dual['totals']['negative_controls']==8,dual['totals']
+          assert {x['file']:[z['term'] for z in x['removed']] for x in high['cases'] if x['removed']}=={'fib_18.sl':['(post-f b j n flag)']}
+          report={'science_status':'FULLY_AUTONOMOUS_MINIMAL_INTERACTION_ARITY_3_3_3_4_FOR_FOUR_KNOWN_REAL_ORIGINALS',
+             'firstblind':False,'neural_training_calls':0,'human_winning_invariant_input':False,
+             'human_glue_or_reachable_traces_input':False,
+             'exact_source_minimal_arity':expected,'automated_lower_witness_verified_z3_cvc5':low['query_count_verified'],
+             'automated_upper_original_full_3vc_verified_z3_cvc5':dual['totals']['unsat_vc'],
+             'rejected_invalid_original_certificates':dual['totals']['negative_controls'],
+             'automatic_post_removal':1,'single_certified_lower_search_wall_s':low['wall_time_s'],
+             'source_conservation_generator_wall_s':source['total_wall_s'],
+             'learned_exclusive_structure_capability':'UNPROVEN; ALL successes zero-training exact source solver',
+             'not_claimed':'NOT firstblind, universal neural advantage, novel operator invention, frontier parity, or 10x full costs'}
+          (p/'AUTONOMOUS_EXACT_MINIMAL_SUPPORT_VERDICT.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
+          print('Q3_AUTONOMOUS_BOTH_SIDED_EXACT_MINIMAL_ARITY_4_REAL_ORIGINALS_PASS',
+            json.dumps(report,sort_keys=True),flush=True)
+          PY
+      - name: Preserve unfiltered proposals, machine-generated witnesses and failed search events
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-autonomous-minimal-arity-two-sided-source-only-proof-original4
+          path: /tmp/auto-min-arity/
+          if-no-files-found: warn
