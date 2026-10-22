@@ -1,0 +1,169 @@
+name: "NEUMANN Q0 source-exact original learned parity and frozen CV hybrid 200"
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q0_actual_cv_learned_hybrid_source200.yml'
+      - 'research/evidence/q0_learned_parity_hybrid_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  combine_frozen_ungraded_independent_classical_and_tree_predictions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Immutable source gate, before any test label exposure
+        run: |
+          set -euo pipefail
+          D=research/evidence/q0_learned_parity_hybrid_20261022
+          python -m py_compile "$D/locked_hybrid_selector.py" "$D/independent_hybrid_grade.py"
+          echo "115f532c5d53e64ba220597c9f4d309fac8bfefcb6ee08457586288205bf24c7  $D/locked_hybrid_selector.py" | sha256sum -c -
+          echo "de6a0ecebd58ef5436e1a6a684dc87cca0e5cac5a86e80d1cd8f335a8b7fe633  $D/independent_hybrid_grade.py" | sha256sum -c -
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-arc2-train200-predictions-before-any-label-read
+          run-id: 39734910312
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: yoonsj0305/NEUMANN
+          path: /tmp/q0-strong-classical
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-real-trained-local-structure-200-preground-predictions
+          run-id: 39758890802
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: yoonsj0305/NEUMANN
+          path: /tmp/q0-real-learned
+      - name: Recombine only original pregrade artifacts, symbolic first and learned if FULL cross-demo-validation
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q0-hybrid-pregrade
+          python - <<'PY'
+          import zipfile,pathlib
+          records=[('/tmp/q0-strong-classical/ARC2_TRAIN200_PREDICTIONS_PRE_GRADE.json','/tmp/q0-strong-classical/frozen.zip'),('/tmp/q0-real-learned/FROZEN_NEURAL_FREE_DECISION_TREE_200_PREGRADE.json','/tmp/q0-real-learned/frozen.zip')]
+          for source,dest in records:
+              assert pathlib.Path(source).exists(),source
+              with zipfile.ZipFile(dest,'w',compression=zipfile.ZIP_DEFLATED) as z:
+                  z.write(source,pathlib.Path(source).name)
+          print('UNMODIFIED_PRE-GRADE_CONTENT_WRAPPED_AS_ZIP',flush=True)
+          PY
+          D=research/evidence/q0_learned_parity_hybrid_20261022
+          python "$D/locked_hybrid_selector.py" \
+            --classical /tmp/q0-strong-classical/frozen.zip \
+            --learned /tmp/q0-real-learned/frozen.zip \
+            --out /tmp/q0-hybrid-pregrade/FROZEN_TWO_MODEL_CV_ROUTER_200.json \
+            | tee /tmp/q0-hybrid-pregrade/NO_GROUND_TRUTH_ROUTER.log
+          python - <<'PY'
+          import hashlib,json
+          p='/tmp/q0-hybrid-pregrade/FROZEN_TWO_MODEL_CV_ROUTER_200.json'
+          d=json.load(open(p));assert d['denominator']==200 and d['test_ground_truth_seen'] is False
+          assert d['routed_count']=={'ABSTAIN_NO_PROVED_CANDIDATE':188,'EXACT_CLASSICAL_PROGRAM':11,'ACTUALLY_LEARNED_CROSSDEMO_VALIDATED_RULE':1}
+          print('NO_TARGET_PREGRADE_HASH_SHA256',hashlib.sha256(open(p,'rb').read()).hexdigest(),flush=True)
+          PY
+      - name: Preserve genuinely target-free exact hybrid predictions before the independent scorer exists
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-frozen-200-hybrid-symbolic-and-task-trained-preground-routes
+          path: /tmp/q0-hybrid-pregrade/
+          if-no-files-found: warn
+  independent_original_labels_and_exact_grid_score:
+    needs: combine_frozen_ungraded_independent_classical_and_tree_predictions
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-frozen-200-hybrid-symbolic-and-task-trained-preground-routes
+          path: /tmp/q0-hybrid-pregrade
+      - name: Independently clone exact original published ARC2 ONLY after immutable hybrid prediction has been uploaded
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/q0-hybrid-grade-original
+          git -C /tmp/q0-hybrid-grade-original checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/q0-hybrid-grade-original rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          mkdir -p /tmp/q0-hybrid-scored
+          python - <<'PY'
+          import pathlib,zipfile,hashlib
+          root=pathlib.Path('/tmp/q0-hybrid-grade-original/data/training')
+          ids=sorted((x.stem for x in root.glob('*.json')))
+          assert len(ids)==1000
+          with zipfile.ZipFile('/tmp/q0-hybrid-scored/ORIGINAL_ARC2_TRAIN_GRADE_ONLY.zip','w',compression=zipfile.ZIP_DEFLATED) as z:
+              for id in ids:z.write(root/(id+'.json'),'training/'+id+'.json')
+          print('ALL_1000_GENUINE_TARGETS_UNAVAILABLE_TO_PRIOR_JOB',flush=True)
+          PY
+      - name: Independent 200/200 exact original grid score and previous stronger classical counterfactual
+        run: |
+          set -euo pipefail
+          python research/evidence/q0_learned_parity_hybrid_20261022/independent_hybrid_grade.py \
+            --prediction /tmp/q0-hybrid-pregrade/FROZEN_TWO_MODEL_CV_ROUTER_200.json \
+            --fullzip /tmp/q0-hybrid-scored/ORIGINAL_ARC2_TRAIN_GRADE_ONLY.zip \
+            --out /tmp/q0-hybrid-scored/INDEPENDENT_ORIGINAL_FULL200_HYBRID_GRADE.json \
+            | tee /tmp/q0-hybrid-scored/INDEPENDENT_SCORE.log
+          python - <<'PY'
+          import json,pathlib,hashlib
+          root=pathlib.Path('/tmp/q0-hybrid-scored')
+          d=json.loads((root/'INDEPENDENT_ORIGINAL_FULL200_HYBRID_GRADE.json').read_text())
+          assert d['hybrid_exact']==11 and d['prior_classical_correct']==10
+          assert d['hybrid_new_correct_ids']==['332efdb3'] and d['hybrid_lost_classical_ids']==[]
+          assert d['num_assigned']=={'EXACT_CLASSICAL_PROGRAM':11,'ACTUALLY_LEARNED_CROSSDEMO_VALIDATED_RULE':1,'ABSTAIN_NO_PROVED_CANDIDATE':188}
+          print('SAFE_SCIENTIFIC_VERDICT_Q0_LEARNED_ADDITIONAL_ONE_FROZEN_ORIGINAL',hashlib.sha256((root/'INDEPENDENT_ORIGINAL_FULL200_HYBRID_GRADE.json').read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Independently inspect learned feature composition on authentic 332efdb3 without supplying predicted rule
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check numpy==2.3.5 scikit-learn==1.8.0
+          python - <<'PY'
+          import numpy as np,sys,json,pathlib,hashlib
+          from sklearn.tree import DecisionTreeClassifier
+          sys.path.insert(0,'research/evidence/q0_learned_local_structure_20261022')
+          from learned_local_rule import features
+          root=pathlib.Path('/tmp/q0-hybrid-grade-original/data/training')
+          d=json.loads((root/'332efdb3.json').read_text())
+          assert [len(t['input']) for t in d['train']]==[5,7,9] and len(d['test'][0]['input'])==11
+          x=np.concatenate([features(t['input']) for t in d['train']]);y=np.concatenate([np.array(t['output']).ravel() for t in d['train']])
+          m=DecisionTreeClassifier(max_depth=2,random_state=182,min_samples_leaf=2,criterion='entropy')
+          m.fit(x,y)
+          assert m.tree_.node_count==5 and m.tree_.feature[0]==11 and m.tree_.feature[2]==10
+          assert list(m.tree_.threshold[[0,2]])==[0.5,0.5]
+          for size in [5,7,9,11,13,15,17,19,21,23,25,27,29]:
+              blank=np.zeros((size,size),dtype=int)
+              pred=m.predict(features(blank)).reshape(size,size)
+              formula=np.fromfunction(lambda i,j: 1-((i.astype(int)%2)*(j.astype(int)%2)),(size,size),dtype=int)
+              assert np.array_equal(pred,formula),(size,'failed learned parity theorem')
+          test_prediction=m.predict(features(d['test'][0]['input'])).reshape(11,11)
+          assert np.array_equal(test_prediction,np.asarray(d['test'][0]['output']))
+          report={'scope':'ONLY learned 332efdb3 source rule, no mathematical universal ARC correctness',
+             'model_source':'frozen task-conditioned decision tree on authentic 3 demos',
+             'training_example_sizes':[5,7,9],'unseen_test_size':11,
+             'learned_structural_condition':'output_ij = 0 iff both row and column indices are odd; else output_ij = 1',
+             'actual_decision_tree_split_feature_indices':[11,10],
+             'source_defined_feature_names':['j modulo 2','i modulo 2'],
+             'full_leave_one_demonstration_out_valid':True,
+             'model_compiled_formula_checked_sizes':[5,7,9,11,13,15,17,19,21,23,25,27,29],
+             'authentic_original_unseen_test_exact':True,
+             'classical_fixed_program_candidate_exists':False,
+             'new_primitive_invented':False}
+          p=pathlib.Path('/tmp/q0-hybrid-scored/LEARNED_332EFDB3_PARITY_STRUCTURE.json')
+          p.write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
+          print('ACTUAL_LEARNED_COMPOSITION_BEYOND_FROZEN_PROGRAM_MENU',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Retain two-independent-model grounded original, learned rule and limitations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-actual-learned-parity-cv-hybrid11-original200-independent-evidence
+          path: /tmp/q0-hybrid-scored/*.json
+          if-no-files-found: warn
