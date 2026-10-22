@@ -1,0 +1,177 @@
+name: NEUMANN Q3Q4 4x4-8x8 reversible observable-state adaptive exact engine
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/neumann_multisize_reverse_obs.yml'
+      - 'research/ood_automatabench_20261023/reverse_observability_router.py'
+      - 'research/ood_automatabench_20261023/generated_6x6_8x8_source.py'
+      - 'research/ood_automatabench_20261023/multisize_route_paired.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  PYTHONPATH: research/ood_automatabench_20261023
+jobs:
+  pin_external_and_generated_source_separate_truth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Generate 160 pre-registered unselected source tasks, truth into isolated artifact
+        run: |
+          set -euo pipefail
+          python -m py_compile research/ood_automatabench_20261023/*.py
+          python research/ood_automatabench_20261023/generated_6x6_8x8_source.py --out-root /tmp/multisize
+          mkdir -p /tmp/official/source /tmp/official/only_after_grade
+          python - <<'PY'
+          import pathlib,json,hashlib,urllib.request
+          revision='7d86373fdb63fe1bd3592ddf71d923ceebc5acd9'
+          url=f'https://raw.githubusercontent.com/neelsomani/automata-bench/{revision}/data/public_eval.jsonl'
+          with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'NEUMANN-observability-multisize-original'}),timeout=120) as f:raw=f.read()
+          records=[json.loads(s) for s in raw.splitlines()]
+          assert len(records)==300
+          path=pathlib.Path('/tmp/official/source/ORIGINAL_PUBLIC_EVAL_300_NO_TRUTH.jsonl')
+          with path.open('w') as out:
+              ids=set()
+              for r in records:
+                  assert r['id'] not in ids and 'answer' in r and 'metadata' in r
+                  ids.add(r['id'])
+                  d={key:value for key,value in r.items() if key not in ('answer','metadata')}
+                  out.write(json.dumps(d,separators=(',',':'),sort_keys=True)+'\n')
+          dest=pathlib.Path('/tmp/official/only_after_grade/ORIGINAL_REAL_300_TRUTH.jsonl')
+          dest.write_bytes(raw)
+          manifest={'original_git_revision':revision,'n':300,'real_original_sha256':hashlib.sha256(raw).hexdigest(),
+                    'source_only_sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
+          pathlib.Path('/tmp/official/only_after_grade/IDENTITY.json').write_text(json.dumps(manifest,sort_keys=True))
+          print('EXTERNAL_300_SAME_ORIGINAL_SOURCE_MASKED_FROM_ALL_PREDICTORS',manifest,flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-multisize-source-synthetic160-no-labels
+          path: /tmp/multisize/source/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-multisize-source-official300-no-labels
+          path: /tmp/official/source/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-multisize-truth-synthetic160-after-locked-grade
+          path: /tmp/multisize/sealed_truth/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-multisize-truth-original300-after-locked-grade
+          path: /tmp/official/only_after_grade/
+          if-no-files-found: error
+  original_source_only_64bit_proof_and_CPU:
+    needs: pin_external_and_generated_source_separate_truth
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 z3-solver==4.13.3.0
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-multisize-source-synthetic160-no-labels
+          path: /tmp/stress/source
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-multisize-source-official300-no-labels
+          path: /tmp/official/source
+      - name: Generated independent forward vs vector reverse 4x4,6x6,8x8 x two phases
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import numpy as np,random
+          from reversible_ca_solver import roll_one
+          from reverse_observability_router import reverse_step_vector
+          rng=random.Random(20261023064)
+          count=0
+          for side in (4,6,8):
+              for trial in range(50):
+                  permutation=list(range(16));rng.shuffle(permutation)
+                  value=rng.getrandbits(side*side)
+                  initial=[[((value>>(y*side+x))&1) for x in range(side)] for y in range(side)]
+                  for parity in (0,1):
+                      nxt=roll_one(initial,parity,permutation)
+                      nextbits=sum(nxt[y][x]<<(y*side+x) for y in range(side) for x in range(side))
+                      recovered=reverse_step_vector(np.array([nextbits],dtype=np.uint64),permutation,side,side,parity)
+                      assert int(recovered[0])==value,(side,trial,parity)
+                      count+=1
+          assert count==300
+          print('GENERIC_4_6_8_SIZE_REVERSE_CA_EXACT_NATIVE_STEP_300_PASS',flush=True)
+          PY
+          mkdir -p /tmp/route-pregrade
+          python research/ood_automatabench_20261023/multisize_route_paired.py --mode infer \
+            --synthetic /tmp/stress/source/SYNTHETIC_160_NO_TRUTH.jsonl \
+            --official /tmp/official/source/ORIGINAL_PUBLIC_EVAL_300_NO_TRUTH.jsonl \
+            --out /tmp/route-pregrade/ALL_460_BEFORE_ANSWERS.json | tee /tmp/route-pregrade/SOURCE_EXACT_AND_PAIRED_CPU.log
+          python - <<'PY'
+          import pathlib,json,hashlib
+          p=pathlib.Path('/tmp/route-pregrade/ALL_460_BEFORE_ANSWERS.json')
+          d=json.loads(p.read_text())
+          assert d['n_synthetic']==160 and d['n_external']==300 and d['paired_trials']==3
+          assert d['query_truth_not_seen'] and d['generation_truth_not_seen']
+          assert all(len(d['rows'][k])==n for k,n in [('synthetic',160),('official',300)])
+          print('SOURCE_ONLY_460_NEW_MULTISIZE_PRE_GRADE_SHA256',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-multisize-460-safe-route-and-paired-cpu-before-all-answers
+          path: /tmp/route-pregrade/
+          if-no-files-found: error
+  independent_generated_and_original_author_truth:
+    needs: original_source_only_64bit_proof_and_CPU
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 z3-solver==4.13.3.0
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-multisize-truth-synthetic160-after-locked-grade
+          path: /tmp/stress/sealed_truth
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-multisize-truth-original300-after-locked-grade
+          path: /tmp/official/only_after_grade
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-multisize-460-safe-route-and-paired-cpu-before-all-answers
+          path: /tmp/route-pregrade
+      - name: Verify source-only full cohort IDs and exact original author's 300 truth only AFTER sealed predictions
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import pathlib,json,hashlib
+          manifest=json.loads(pathlib.Path('/tmp/stress/sealed_truth/MANIFEST.json').read_text())
+          b=pathlib.Path('/tmp/stress/sealed_truth/SYNTHETIC_160_TRUTH_ONLY_FOR_GRADER.jsonl').read_bytes()
+          assert hashlib.sha256(b).hexdigest()==manifest['truth_sha256']
+          original=json.loads(pathlib.Path('/tmp/official/only_after_grade/IDENTITY.json').read_text())
+          raw=pathlib.Path('/tmp/official/only_after_grade/ORIGINAL_REAL_300_TRUTH.jsonl').read_bytes()
+          assert original['original_git_revision']=='7d86373fdb63fe1bd3592ddf71d923ceebc5acd9'
+          assert hashlib.sha256(raw).hexdigest()==original['real_original_sha256']
+          print('INDEPENDENT_160_GENERATED_AND_300_EXTERNAL_REAL_TRUTH_HASH_CONFIRMED')
+          PY
+          mkdir -p /tmp/multisize-grade
+          python research/ood_automatabench_20261023/multisize_route_paired.py --mode grade \
+            --sealed /tmp/route-pregrade/ALL_460_BEFORE_ANSWERS.json \
+            --synthetic-truth /tmp/stress/sealed_truth/SYNTHETIC_160_TRUTH_ONLY_FOR_GRADER.jsonl \
+            --official-truth /tmp/official/only_after_grade/ORIGINAL_REAL_300_TRUTH.jsonl \
+            --official-sha "$(python -c "import json;print(json.load(open('/tmp/official/only_after_grade/IDENTITY.json'))['real_original_sha256'])")" \
+            --out /tmp/multisize-grade/ALL460_INDEPENDENT_REAL_AND_GENERATED_GRADE.json | tee /tmp/multisize-grade/INDEPENDENT_MULTISIZE_460_VERDICT.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-multisize-original-author300-plus-generated160-independent-verdict
+          path: /tmp/multisize-grade/
+          if-no-files-found: error
