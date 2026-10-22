@@ -1,0 +1,108 @@
+name: Q3 original20 classical certificate pruning double proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_original20_proof_prune_dual.yml'
+      - 'research/evidence/q3_source_houdini_sha12_20261022/posthoc_exact_certificate_minimizer.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  exact_source_invariant_compression_and_independent_native_verification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin unmodified generator and freshly added posthoc reducer
+        run: |
+          python -m py_compile research/evidence/q3_source_houdini_sha12_20261022/*.py
+          mkdir -p /tmp/neumann-prune/previous /tmp/neumann-prune/results /tmp/neumann-prune/source12 /tmp/neumann-prune/source8
+      - name: Original frozen first proof receipts exactly from immutable prior GitHub Action
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39700991534
+          github-token: ${{ github.token }}
+          name: q3-classical-source-only-frozen-sha12-prospective-first-and-dev8
+          path: /tmp/neumann-prune/previous
+      - name: Install original verifier backends
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          curl -fL --retry 3 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5-bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5-bin
+          sudo install -m 755 "$(find /tmp/cvc5-bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+      - name: Independently reacquire identical original 20 source files with immutable SHA
+        run: |
+          python - <<'PY'
+          import json,pathlib,urllib.request,hashlib
+          base='research/evidence/q3_source_houdini_sha12_20261022'
+          for src, dest in [('FROZEN_BEFORE_SOURCE12.json','source12'),('PREVIOUS_OPEN_DEV8.json','source8')]:
+            obj=json.load(open(f'{base}/{src}'))
+            for c in obj['cases']:
+              raw=urllib.request.urlopen('https://raw.githubusercontent.com/SyGuS-Org/benchmarks/13c8deb68a873635879c9a69bc78caebd340f646/'+c['path'],timeout=30).read()
+              sha=hashlib.sha1(('blob %d\0'%len(raw)).encode()+raw).hexdigest()
+              assert sha==c['sha']
+              pathlib.Path(f'/tmp/neumann-prune/{dest}',c['name']).write_bytes(raw)
+            print('SHA_PINNED_SOURCE_REACQUIRED',dest,len(obj['cases']))
+          PY
+      - name: Posthoc automatic proof literal minimization retaining original Z3 three-VC
+        run: |
+          set -o pipefail
+          P=research/evidence/q3_source_houdini_sha12_20261022
+          python "$P/posthoc_exact_certificate_minimizer.py" --receipt /tmp/neumann-prune/previous/sha12_first_original12.json --input /tmp/neumann-prune/source12 --out /tmp/neumann-prune/results/frozen12_minimized.json | tee /tmp/neumann-prune/results/frozen12_minimized.log
+          python "$P/posthoc_exact_certificate_minimizer.py" --receipt /tmp/neumann-prune/previous/dev8_original8.json --input /tmp/neumann-prune/source8 --out /tmp/neumann-prune/results/dev8_minimized.json | tee /tmp/neumann-prune/results/dev8_minimized.log
+      - name: Convert minified exactly certified candidates without changing frozen original source
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          based=pathlib.Path('/tmp/neumann-prune')
+          for s in ['sha12_first','dev8']:
+            old='sha12_first_original12' if s=='sha12_first' else 'dev8_original8'
+            new='frozen12_minimized' if s=='sha12_first' else 'dev8_minimized'
+            src=json.loads((based/'previous'/f'{old}.json').read_text())
+            mins=json.loads((based/'results'/f'{new}.json').read_text())
+            assert len(src['cases'])==len(mins['cases'])
+            for row,small in zip(src['cases'],mins['cases']):
+              assert row['file']==small['original_name'] and row['original_sha256']==small['original_sha256']
+              assert row['safe_certified'] and small['status']=='EXACT_3VC_MINIMIZED'
+              row['invariant']=small['minimized_invariant']
+              row['num_conjuncts']=small['final_conjunct_count']
+            (based/'results'/f'{s}_minimized_original_receipt.json').write_text(json.dumps(src,sort_keys=True,indent=2)+'\n')
+          PY
+      - name: Independent original 20 source double-Z3-cvc5 60-VC check on minimized statements and negative controls
+        run: |
+          set -o pipefail
+          P=research/evidence/q3_source_houdini_sha12_20261022
+          python "$P/independent_original_checker.py" --receipt /tmp/neumann-prune/results/sha12_first_minimized_original_receipt.json --input /tmp/neumann-prune/source12 --manifest "$P/FROZEN_BEFORE_SOURCE12.json" --backend dual --out /tmp/neumann-prune/results/sha12_double_minimized.json | tee /tmp/neumann-prune/results/sha12_double_minimized.log
+          python "$P/independent_original_checker.py" --receipt /tmp/neumann-prune/results/dev8_minimized_original_receipt.json --input /tmp/neumann-prune/source8 --manifest "$P/PREVIOUS_OPEN_DEV8.json" --backend dual --out /tmp/neumann-prune/results/dev8_double_minimized.json | tee /tmp/neumann-prune/results/dev8_double_minimized.log
+          python - <<'PY'
+          import json
+          root='/tmp/neumann-prune/results/'
+          a=json.load(open(root+'frozen12_minimized.json'))
+          b=json.load(open(root+'dev8_minimized.json'))
+          x=json.load(open(root+'sha12_double_minimized.json'))
+          y=json.load(open(root+'dev8_double_minimized.json'))
+          assert a['certified']==12 and b['certified']==8
+          assert x['totals']['dual_safe_certified']==12 and y['totals']['dual_safe_certified']==8
+          assert x['totals']['unsat_vc']==36 and y['totals']['unsat_vc']==24
+          assert x['totals']['negative_controls']==24 and y['totals']['negative_controls']==16
+          initial=a['sum_original_conjuncts']+b['sum_original_conjuncts']
+          final=a['sum_minimal_conjuncts']+b['sum_minimal_conjuncts']
+          assert 0<final<=initial
+          print('ORIGINAL_20_MINIMIZED_DUAL_CERTIFIED',initial,final,'compression',round(initial/final,3))
+          PY
+      - name: Archive all cost, mutation and original-3VC receipts including errors
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-20-original-exact-structure-prune-first-double-backend
+          path: /tmp/neumann-prune/results/
+          if-no-files-found: warn
