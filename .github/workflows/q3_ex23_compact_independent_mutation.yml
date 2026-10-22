@@ -1,0 +1,67 @@
+name: Q3 learned relation ex23 independent compact 3VC and ablation audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_ex23_compact_independent_mutation.yml'
+      - 'research/evidence/q3_neural_proof_policy_transfer_20261022/ex23_independent_compact_audit.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  double_original_source_full_proof_and_necessity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install two independently implemented SMT backends
+        run: |
+          set -euo pipefail
+          python -m py_compile research/evidence/q3_neural_proof_policy_transfer_20261022/ex23_independent_compact_audit.py
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          curl -fL --retry 3 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          unzip -q /tmp/cvc5.zip -d /tmp
+          sudo install -m 755 "$(find /tmp -maxdepth 4 -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          mkdir -p /tmp/compact-dual
+      - name: Re-fetch exact posthoc original, authenticate original bytes SHA before every proof
+        run: |
+          python - <<'PY'
+          import pathlib,urllib.request,hashlib
+          b=urllib.request.urlopen('https://raw.githubusercontent.com/SyGuS-Org/benchmarks/13c8deb68a873635879c9a69bc78caebd340f646/comp/2017/Inv_Track/ex23.sl',timeout=30).read()
+          sha=hashlib.sha1(('blob '+str(len(b))+'\0').encode()+b).hexdigest()
+          assert len(b)==559 and sha=='ada3eae4e8e9f4368c2a3ca0d2ecb900624dc7f9'
+          pathlib.Path('/tmp/compact-dual/ex23-original.sl').write_bytes(b)
+          print('SOURCE_AUTHENTIC',sha,flush=True)
+          PY
+      - name: Independent source exact 18 VCs FULL and mutant SAT Z3+cvc5
+        run: |
+          set -o pipefail
+          python research/evidence/q3_neural_proof_policy_transfer_20261022/ex23_independent_compact_audit.py \
+           --original /tmp/compact-dual/ex23-original.sl --dual \
+           --out /tmp/compact-dual/ORIGINAL_EX23_INDEPENDENT_COMPACT18.json \
+           | tee /tmp/compact-dual/ORIGINAL_EX23_INDEPENDENT_COMPACT18.log
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/compact-dual/ORIGINAL_EX23_INDEPENDENT_COMPACT18.json'))
+          assert len(d['checks'])==18
+          assert sum(x['expected']=='unsat' for x in d['checks'])==12
+          assert sum(x['expected']=='sat' for x in d['checks'])==6
+          assert all(x['expected']==x['z3']==x['cvc5'] for x in d['checks'])
+          print('ORIGINAL_18_STRICT_INDEPENDENT_DUAL_ASSERTS_MATCH',flush=True)
+          PY
+          sha256sum /tmp/compact-dual/ORIGINAL_EX23_INDEPENDENT_COMPACT18.json
+      - name: Preserve exact proofs and all negative mutants
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-real-ex23-learned-36-original-compact-three-clause-18-dual-mutation-proofs
+          path: |
+            /tmp/compact-dual/*.json
+            /tmp/compact-dual/*.log
+          if-no-files-found: warn
