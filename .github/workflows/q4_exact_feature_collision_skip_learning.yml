@@ -1,0 +1,87 @@
+name: "NEUMANN Q4 mathematical impossibility gate before learned model compute, paired 1000 public original tasks"
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q4_exact_feature_collision_skip_learning.yml'
+      - 'research/evidence/q4_feature_collision_training_deletion_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  math_source1000_same_solutions_less_compute:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Exact source code freeze, original-vs-only-necessary-work revision, all target labels withheld
+        run: |
+          set -euo pipefail
+          echo '0ebb17db4dba8ea047ba6f8f138885dc76bb483a9d52e7c2a4c9487491fd2649  research/evidence/q0_learned_local_structure_20261022/learned_local_rule.py' | sha256sum -c -
+          echo '5f64e1e2e2b07c9c42622a91395c555c46b2971be8a44974de64236c44a79946  research/evidence/q4_feature_collision_training_deletion_20261022/learned_local_rule_prefilter.py' | sha256sum -c -
+          echo '5dc39a991cd3fabd8b8fe8934ec508980d1d544c50d66634490576e005e247ed  research/evidence/q4_feature_collision_training_deletion_20261022/paired_collision_benchmark.py' | sha256sum -c -
+          python -m py_compile research/evidence/q0_learned_local_structure_20261022/learned_local_rule.py research/evidence/q4_feature_collision_training_deletion_20261022/*.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-local-tree-1000-public-train-only-last200-masked-input
+          run-id: 39758890802
+          repository: yoonsj0305/NEUMANN
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/q4-source-only-masked
+      - name: Verify all 1000 originally pinned real source tasks and 200 TEST outputs masked
+        run: |
+          python - <<'PY'
+          import hashlib,json,zipfile
+          p='/tmp/q4-source-only-masked/ARC2_PUBLIC_TRAIN1000_WITH_LAST200_MASKED.zip'
+          with zipfile.ZipFile(p) as z:
+              files=sorted((n.rsplit('/',1)[-1][:-5] for n in z.namelist()),key=lambda s:hashlib.sha256(s.encode()).hexdigest())
+              assert len(files)==1000
+              assert hashlib.sha256(('\n'.join(files[800:])+'\n').encode()).hexdigest()=='9f9f9f80d9c51dd31e0ad999e7d2cf7289fcd2791f785ba41fd74d1b86c8dc9b'
+              assert all(all('output' not in t for t in json.loads(z.read('training/'+n+'.json'))['test']) for n in files[800:])
+          print('SAME_SOURCE1000_WITHOUT_VALIDATION_TEST_LABELS',flush=True)
+          PY
+      - name: Install exact prior CPU sklearn and NumPy, no accelerator or remote inference
+        run: |
+          python -m pip install --quiet --disable-pip-version-check numpy==2.3.5 scikit-learn==1.8.0
+      - name: Five alternate-order genuine paired source original benchmarks of impossible-work elimination
+        run: |
+          set -euo pipefail
+          ROOT=research/evidence/q4_feature_collision_training_deletion_20261022
+          mkdir -p /tmp/q4-collision-evidence
+          python "$ROOT/paired_collision_benchmark.py" \
+            --masked-data /tmp/q4-source-only-masked/ARC2_PUBLIC_TRAIN1000_WITH_LAST200_MASKED.zip \
+            --baseline research/evidence/q0_learned_local_structure_20261022/learned_local_rule.py \
+            --optimized "$ROOT/learned_local_rule_prefilter.py" \
+            --out-dir /tmp/q4-collision-evidence \
+            --pairs 5 \
+            | tee /tmp/q4-collision-evidence/SAME_SOURCE_PAIRED_RUN.log
+          python - <<'PY'
+          import json,pathlib,hashlib
+          root=pathlib.Path('/tmp/q4-collision-evidence')
+          d=json.loads((root/'PAIRED_SOURCE1000_COST_EVIDENCE.json').read_text())
+          p=json.loads((root/'ALL272_EXACT_FEATURE_COLLISION_WITNESSES.json').read_text())
+          assert d['witnesses_total']==sum(map(len,p.values()))==272
+          assert d['both_split_learned_accepted_models_identical']
+          assert d['paired']['dev']['model_fit_predictions_unchanged']==43
+          assert d['paired']['valid']['model_fit_predictions_unchanged']==9
+          assert d['paired']['dev']['mathematically_impossible_candidate_models_skipped']==218
+          assert d['paired']['valid']['mathematically_impossible_candidate_models_skipped']==54
+          for r in d['paired'].values():
+              assert r['paired_trials']==5
+              assert all(x['baseline_process_wall_s']>0 and x['optimized_process_wall_s']>0 for x in r['individual_runs'])
+          assert all(w['distinct_labels'][0]!=w['distinct_labels'][1] for a in p.values() for w in a)
+          print('Q4_FORMALLY_SAFE_NEURAL_COMPUTATION_DELETION_PASSED',
+                hashlib.sha256((root/'PAIRED_SOURCE1000_COST_EVIDENCE.json').read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Preserve all source-grounded witnesses, original full model predictions and paired wall receipts even if fail
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q4-source1000-272-model-impossibility-witnesses-five-paired-real-cpu
+          path: /tmp/q4-collision-evidence/
+          if-no-files-found: warn
