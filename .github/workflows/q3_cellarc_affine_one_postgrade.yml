@@ -1,0 +1,41 @@
+name: NEUMANN Q3 first affine original true-family postgrade verification
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_cellarc_affine_one_postgrade.yml'
+      - 'research/evidence/q3_cellarc2000_20261023/affine_postgrade_true_family.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit_only_after_finished_original_tenth1000_grade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: tenth1000-latent-spacetime-all-predictions-before-truth
+          repository: yoonsj0305/NEUMANN
+          run-id: 39870262378
+          github-token: ${{ github.token }}
+          path: /tmp/affine-locked-before-grade
+      - name: After archived independent exact original score, inspect original hidden rule family
+        run: |
+          set -euo pipefail
+          python -m py_compile research/evidence/q3_cellarc2000_20261023/affine_postgrade_true_family.py
+          mkdir -p /tmp/postgrade-affine
+          python research/evidence/q3_cellarc2000_20261023/affine_postgrade_true_family.py \
+            --sealed /tmp/affine-locked-before-grade/ALL1000_AFFINE_BEFORE_TRUTH.json \
+            --out /tmp/postgrade-affine/ORIGINAL_AFFINE_NEW_SOLVE_TRUE_PROCESS.json \
+            | tee /tmp/postgrade-affine/TRUE_FAMILY_POSTGRADE.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: real-source-affine-one-causal-meta-after-original-grade
+          path: /tmp/postgrade-affine/
+          if-no-files-found: error
