@@ -71,7 +71,7 @@ jobs:
           verdict={'scope':'POSTHOC_FIRST_SHA8_ORIGINAL_TRUTH_COMBINATION','source_authentic_count':8,
             'safe_original_full_dual_vcs_from_earlier_SHA8_first_action':7,
             'original_unsafe_initial_state_dual_SAT_now':1,'source_without_truth':0,
-            'unsafe_filename':'matrix2_simp.sl','real_original_witness':x['depth1']['values'],
+            'unsafe_filename':'matrix2_simp.sl','real_original_witness':x['depth0']['values'],
             'never_infer_safe_from_bounded_unsat':True,
             'zero_neural_training_and_zero_exclusive_abilities':True,'new_hypothesis':'Source original Pre permits immediate Post violation; no sound SAFE invariant can exist regardless of search.',
             'source_bmc_receipt_sha256':hashlib.sha256((p/'ORIGINAL_SHA8_BMC_DEPTH01_Z3_CVC5.json').read_bytes()).hexdigest()}
