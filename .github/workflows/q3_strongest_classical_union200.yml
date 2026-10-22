@@ -1,0 +1,95 @@
+name: NEUMANN Q3 exact strongest historical classical versus new operator union200
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_strongest_classical_union200.yml'
+      - 'research/evidence/q3_strong_classical_union_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compare_all_200_source_before_test_truth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Strict previous original source SHA identity gates
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD:research/evidence/q3_strong_classical_union_20261022/historical_strong_composer.py)" = 99649c3174710557e27c312a6e5af3eb8b375eb9
+          test "$(git rev-parse HEAD:research/evidence/q3_strong_classical_union_20261022/arc_minimal_controller.py)" = 8ca367b4f98d0b7bce46839c0291b536566df1d8
+          test "$(git rev-parse HEAD:research/evidence/q3_object_synthesis_transfer_20261022/frozen_original_typed_selector_v2.py)" = a46dc5480f0819895effc48df1e0600a23640bdf
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arcsource
+          git -C /tmp/arcsource checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arcsource rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          python - <<'PY'
+          import hashlib,json,pathlib
+          files=sorted(pathlib.Path('/tmp/arcsource/data/training').glob('*.json'),key=lambda x:hashlib.sha256(x.stem.encode()).hexdigest())
+          assert len(files)==1000
+          hold=files[800:]
+          assert hashlib.sha256(('\n'.join(f.stem for f in hold)+'\n').encode()).hexdigest()=='9f9f9f80d9c51dd31e0ad999e7d2cf7289fcd2791f785ba41fd74d1b86c8dc9b'
+          root=pathlib.Path('/tmp/source200-no-truth');root.mkdir()
+          for f in hold:
+              d=json.loads(f.read_text())
+              (root/f.name).write_text(json.dumps({'train':d['train'],'test':[{'input':x['input']} for x in d['test']]},separators=(',',':'))+'\n')
+          assert all(all('output' not in q for q in json.loads(x.read_text())['test']) for x in root.glob('*.json'))
+          print('REAL_SOURCE_200_TRUTH_DELETED_BEFORE_ANY_SOLVER')
+          PY
+          rm -rf /tmp/arcsource
+      - name: CPU exact historical and extended program fitting and frozen prediction receipts
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet numpy==1.26.4 scipy==1.14.1
+          mkdir -p /tmp/pregrade
+          python research/evidence/q3_strong_classical_union_20261022/strong_union.py \
+            --mode infer --masked /tmp/source200-no-truth \
+            --out /tmp/pregrade/ALL200_STRONG_VS_NEW_SOURCE_ONLY.json \
+            | tee /tmp/pregrade/INFERENCE.log
+          python - <<'PY'
+          import json,hashlib,pathlib
+          p=pathlib.Path('/tmp/pregrade/ALL200_STRONG_VS_NEW_SOURCE_ONLY.json')
+          d=json.loads(p.read_text());assert len(d['rows'])==d['n']==200 and not d['test_output_labels_seen']
+          print('INDEPENDENT_SOURCE_ONLY_LOCK_SHA256',hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: source200-strongest-classical-vs-new-all-pregrade
+          path: /tmp/pregrade/
+          if-no-files-found: error
+  independent_original_truth_comparison:
+    needs: compare_all_200_source_before_test_truth
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: source200-strongest-classical-vs-new-all-pregrade
+          path: /tmp/pregrade
+      - name: Install frozen scientific runtime for independent scorer
+        run: python -m pip install --quiet numpy==1.26.4 scipy==1.14.1
+      - name: Fetch original source labels AFTER prior success and frozen SHA
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arc2-grade-only
+          git -C /tmp/arc2-grade-only checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arc2-grade-only rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          mkdir -p /tmp/graded
+          python research/evidence/q3_strong_classical_union_20261022/strong_union.py \
+            --mode grade --sealed /tmp/pregrade/ALL200_STRONG_VS_NEW_SOURCE_ONLY.json \
+            --source /tmp/arc2-grade-only/data/training \
+            --out /tmp/graded/FINAL_STRONG_ORIGINAL_200_HEADTOHEAD.json \
+            | tee /tmp/graded/SCIENTIFIC_RESULT.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: original200-exact-strongest-prior-causal-verdict
+          path: /tmp/graded/
+          if-no-files-found: error
