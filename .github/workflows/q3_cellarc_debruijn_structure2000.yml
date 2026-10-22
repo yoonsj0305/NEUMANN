@@ -1,0 +1,125 @@
+name: NEUMANN CellARC source-only latent generative structure original2000
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_cellarc_debruijn_structure2000.yml'
+      - 'research/evidence/q3_cellarc2000_20261022/debruijn_*.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_2000_redact_before_analysis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Lock exact known public revision and remove 2000 solutions and metadata
+        run: |
+          set -euo pipefail
+          python -m py_compile research/evidence/q3_cellarc2000_20261022/debruijn_*.py
+          python research/evidence/q3_cellarc2000_20261022/source_control.py --mode mask --dir /tmp/ca-masked/data --manifest /tmp/ca-masked/SOURCE_LOCK.json
+          python - <<'PY'
+          import json,pathlib
+          m=json.loads(pathlib.Path('/tmp/ca-masked/SOURCE_LOCK.json').read_text())
+          assert m['sha']=='76040e6aef0edc4982e53c13a85ef227378ed171'
+          for name in ('test_interpolation','test_extrapolation'):
+              rows=[json.loads(x) for x in (pathlib.Path('/tmp/ca-masked/data')/(name+'.jsonl')).read_text().splitlines()]
+              assert len(rows)==1000 and all('solution' not in x and 'meta' not in x for x in rows)
+          print('TRUE_GENERATOR_METADATA_AND_SOLUTIONS_HIDDEN_FOR_ALL2000')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: debruijn-source2000-original-no-solutions
+          path: /tmp/ca-masked/
+          if-no-files-found: error
+  infer_latent_source_generator:
+    needs: original_2000_redact_before_analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: debruijn-source2000-original-no-solutions
+          path: /tmp/ca-masked
+      - name: Infer k W construction compatibility and candidate rule source-only
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/ca-inferred
+          python research/evidence/q3_cellarc2000_20261022/debruijn_source2000.py --mode infer --input-dir /tmp/ca-masked/data --out /tmp/ca-inferred/ALL2000_BLIND_GENERATOR_STRUCTURE.json | tee /tmp/ca-inferred/SOURCE_ONLY_LOG.txt
+          python - <<'PY'
+          import json,hashlib,pathlib
+          p=pathlib.Path('/tmp/ca-inferred/ALL2000_BLIND_GENERATOR_STRUCTURE.json')
+          d=json.loads(p.read_text());assert d['n']==2000 and not d['test_truth_seen'] and not d['hidden_metadata_seen']
+          assert all(len(d['models'][k])==1000 for k in ('test_interpolation','test_extrapolation'))
+          print('SEALED_BLIND_GENERATOR_SHA256',hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: debruijn2000-inferred-all-before-true-grading
+          path: /tmp/ca-inferred/
+          if-no-files-found: error
+  independently_grade_predicted_original2000:
+    needs: infer_latent_source_generator
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: debruijn-source2000-original-no-solutions
+          path: /tmp/ca-masked
+      - uses: actions/download-artifact@v4
+        with:
+          name: debruijn2000-inferred-all-before-true-grading
+          path: /tmp/ca-inferred
+      - name: Original truth only in isolated separate grade runner
+        run: |
+          set -euo pipefail
+          python research/evidence/q3_cellarc2000_20261022/source_control.py --mode restore --dir /tmp/ca-actual-truth --manifest /tmp/ca-masked/SOURCE_LOCK.json
+          mkdir -p /tmp/ca-graded
+          python research/evidence/q3_cellarc2000_20261022/debruijn_source2000.py --mode grade --sealed /tmp/ca-inferred/ALL2000_BLIND_GENERATOR_STRUCTURE.json --source-dir /tmp/ca-actual-truth --out /tmp/ca-graded/INDEPENDENT_ORIGINAL2000_GENERATOR_SCORE.json | tee /tmp/ca-graded/ACTUAL_SCORE.log
+      - uses: actions/upload-artifact@v4
+        with:
+          name: debruijn2000-actual-independent-source-score
+          path: /tmp/ca-graded/
+          if-no-files-found: error
+  diagnostic_only_postgrade_hidden_generator_meta:
+    needs: independently_grade_predicted_original2000
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: debruijn-source2000-original-no-solutions
+          path: /tmp/ca-masked
+      - uses: actions/download-artifact@v4
+        with:
+          name: debruijn2000-inferred-all-before-true-grading
+          path: /tmp/ca-inferred
+      - name: Oracle identity classification after independently graded source, NEVER inference
+        run: |
+          set -euo pipefail
+          python research/evidence/q3_cellarc2000_20261022/source_control.py --mode restore --dir /tmp/ca-actual-truth --manifest /tmp/ca-masked/SOURCE_LOCK.json
+          mkdir -p /tmp/ca-postgrade
+          python research/evidence/q3_cellarc2000_20261022/debruijn_postgrade_meta.py --pregrade /tmp/ca-inferred/ALL2000_BLIND_GENERATOR_STRUCTURE.json --original-dir /tmp/ca-actual-truth --out /tmp/ca-postgrade/TRUE_GENERATOR_SOURCE_ONLY_MATCHES.json | tee /tmp/ca-postgrade/META_ONLY_AFTER_GRADING.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: debruijn2000-true-generator-meta-only-after-independent-score
+          path: /tmp/ca-postgrade/
+          if-no-files-found: error
