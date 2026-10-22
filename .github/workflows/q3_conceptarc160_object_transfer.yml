@@ -62,6 +62,8 @@ jobs:
         with:
           name: conceptarc160-actual-original-no-test-truth-programs
           path: /tmp/pregrade/
+      - name: Install frozen scientific runtime for independent scorer
+        run: python -m pip install --quiet numpy==1.26.4 scipy==1.14.1
       - name: Only after immutable prediction retrieve verified independently authored truth
         run: |
           git clone -q --no-checkout https://github.com/victorvikram/ConceptARC.git /tmp/other-author-original-grade
