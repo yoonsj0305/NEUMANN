@@ -1,0 +1,60 @@
+name: NEUMANN Q3 real CellARC2000 constructive two-model no-information proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_cellarc2000_active_info_lower_bound.yml'
+      - 'research/evidence/q3_cellarc2000_20261022/active_identifiability_bound.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original2000_full_constructive_counterexamples:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Read only unchanged real source demonstrations and mask all target solutions first
+        run: |
+          set -euo pipefail
+          python -m py_compile research/evidence/q3_cellarc2000_20261022/{version_space_certifier.py,active_identifiability_bound.py,source_control.py}
+          python research/evidence/q3_cellarc2000_20261022/source_control.py --mode mask --dir /tmp/ca-only-masked/data --manifest /tmp/ca-only-masked/SOURCE_LOCK.json
+          python - <<'PY'
+          import json,pathlib
+          m=json.loads(pathlib.Path('/tmp/ca-only-masked/SOURCE_LOCK.json').read_text())
+          assert m['sha']=='76040e6aef0edc4982e53c13a85ef227378ed171'
+          for name in ('test_interpolation','test_extrapolation'):
+              rows=[json.loads(s) for s in (pathlib.Path('/tmp/ca-only-masked/data')/(name+'.jsonl')).read_text().splitlines()]
+              assert len(rows)==1000
+              assert all('solution' not in v and 'meta' not in v and 'program' not in v for v in rows)
+          print('EXACT_REAL_2000_SOURCE_ONLY_NO_ORIGINAL_TARGET_FIELDS')
+          PY
+      - name: Construct two distinct source-consistent hidden transition tables for every ambiguous original
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/ca-active-proof
+          python research/evidence/q3_cellarc2000_20261022/active_identifiability_bound.py --masked-dir /tmp/ca-only-masked/data --out /tmp/ca-active-proof/REAL2000_CONSTRUCTIVE_UNKNOWN_AND_VOI.json | tee /tmp/ca-active-proof/EXECUTION_LOG.txt
+          python - <<'PY'
+          import pathlib,json,hashlib
+          p=pathlib.Path('/tmp/ca-active-proof/REAL2000_CONSTRUCTIVE_UNKNOWN_AND_VOI.json')
+          d=json.loads(p.read_text())
+          assert not d['test_solutions_seen'] and not d['metadata_seen'] and d['radius']==3
+          assert len(d['rows']['test_interpolation'])==len(d['rows']['test_extrapolation'])==1000
+          for name in d['rows']:
+              for v in d['rows'][name].values():
+                  if v['status']=='CONSTRUCTIVE_AMBIGUITY':
+                      w=v['witness']
+                      assert w['A_prediction_at_w']!=w['B_prediction_at_w']
+                      assert w['source_rule_sha256']!=w['model_A_extension_sha256']
+                      assert w['source_rule_sha256']!=w['model_B_extension_sha256']
+                  if v['status']!='UNSUPPORTED_NO_CONSISTENT_R3':
+                      assert v['interior_cells']>=v['known_r3']+v['missing_r3_cells']
+          print('ORIGINAL2000_TWO_MODELS_CERTIFIED_DIGEST',hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-cellarc2000-original-constructive-indeterminacy
+          path: /tmp/ca-active-proof/
+          if-no-files-found: error
