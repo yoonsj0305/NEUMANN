@@ -24,7 +24,10 @@ def profile(task):
     table=derive(task,r)
     valid=length>2*r and table is not None
     if not valid:
-        return {"status":"UNSUPPORTED_NO_CONSISTENT_R3" if table is None else "NO_INTERIOR_INPUT",
+        short_context=any(len(e["input"])<2*r+1 or len(e["input"])!=len(e["output"]) for e in task["train"])
+        reason=("UNSUPPORTED_SHORT_DEMONSTRATION_CONTEXT" if short_context else
+                "INCONSISTENT_R3_DEMONSTRATION_CONSTRAINTS") if table is None else "NO_INTERIOR_INPUT"
+        return {"status":reason,
                 "n":length,"interior_cells":max(0,length-2*r),"known_r3":0,"missing_r3_cells":0,"missing_distinct":0,
                 "maximum_new_cells_per_one_label":0,"witness":None}
     counts=collections.Counter(tuple(q[i-r:i+r+1]) for i in range(r,length-r))
