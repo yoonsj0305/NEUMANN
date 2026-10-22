@@ -1,0 +1,81 @@
+name: NEUMANN Q3 independent-author ConceptARC160 object-program transfer
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_conceptarc160_object_transfer.yml'
+      - 'research/evidence/q3_conceptarc_independent_author_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_only_programs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Original ConceptARC source pin, corpus tree and exact original 160 materialization
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD:research/evidence/q3_conceptarc_independent_author_20261022/prepare_corpus.py)" = d88f55530660f0f6bfad5916456addd096b6dc84
+          test "$(git rev-parse HEAD:research/evidence/q3_object_synthesis_transfer_20261022/frozen_original_typed_selector_v2.py)" = a46dc5480f0819895effc48df1e0600a23640bdf
+          git clone -q --no-checkout https://github.com/victorvikram/ConceptARC.git /tmp/independent-author
+          git -C /tmp/independent-author checkout -q --detach 0e67da6af879e4bad3d7cd3c196e8d551b445725
+          test "$(git -C /tmp/independent-author rev-parse HEAD:corpus)" = a9e933c021388297f21fa1cded180105479addc0
+          python research/evidence/q3_conceptarc_independent_author_20261022/prepare_corpus.py \
+            --source /tmp/independent-author/corpus \
+            --masked /tmp/other-author160-masked \
+            --metadata /tmp/concept160-metadata.json
+          rm -rf /tmp/independent-author
+      - name: Frozen CPU exact source-only candidate programs with no real test labels
+        run: |
+          python -m pip install --quiet numpy==1.26.4 scipy==1.14.1
+          mkdir -p /tmp/pregrade
+          python research/evidence/q3_conceptarc_independent_author_20261022/conceptarc_probe.py \
+            --mode predict --masked /tmp/other-author160-masked \
+            --out /tmp/pregrade/CONCEPTARC160_PRE_GRADE.json \
+            | tee /tmp/pregrade/RAW_SOURCE_ONLY_LOG.txt
+          python - <<'PY'
+          import json,pathlib,hashlib
+          p=pathlib.Path('/tmp/pregrade/CONCEPTARC160_PRE_GRADE.json')
+          d=json.loads(p.read_text());assert d['n']==160 and not d['test_truth_seen'] and len(d['rows'])==160
+          print('SEALED_CONCEPTARC160_SHA256',hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conceptarc160-actual-original-no-test-truth-programs
+          path: /tmp/pregrade/
+          if-no-files-found: error
+  independent_original_conceptarc_grade:
+    needs: source_only_programs
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: conceptarc160-actual-original-no-test-truth-programs
+          path: /tmp/pregrade/
+      - name: Only after immutable prediction retrieve verified independently authored truth
+        run: |
+          git clone -q --no-checkout https://github.com/victorvikram/ConceptARC.git /tmp/other-author-original-grade
+          git -C /tmp/other-author-original-grade checkout -q --detach 0e67da6af879e4bad3d7cd3c196e8d551b445725
+          test "$(git -C /tmp/other-author-original-grade rev-parse HEAD:corpus)" = a9e933c021388297f21fa1cded180105479addc0
+          mkdir -p /tmp/scored
+          python research/evidence/q3_conceptarc_independent_author_20261022/conceptarc_probe.py \
+            --mode grade --sealed /tmp/pregrade/CONCEPTARC160_PRE_GRADE.json \
+            --source /tmp/other-author-original-grade/corpus \
+            --out /tmp/scored/CONCEPTARC160_REAL_EXACT_GRADE.json \
+            | tee /tmp/scored/SCIENTIFIC_GRADE_LOG.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conceptarc160-independent-original-scientific-verdict
+          path: /tmp/scored/
+          if-no-files-found: error
