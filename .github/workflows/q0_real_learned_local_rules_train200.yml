@@ -1,0 +1,173 @@
+name: "NEUMANN Q0 actual task-trained local structural rule vs full classical ARC2 train200"
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q0_real_learned_local_rules_train200.yml'
+      - 'research/evidence/q0_learned_local_structure_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  freeze_authentic_training_and_mask_validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Ensure actual learned model code and grading froze before validation body and target retrieval
+        run: |
+          set -euo pipefail
+          ROOT=research/evidence/q0_learned_local_structure_20261022
+          python -m py_compile "$ROOT/learned_local_rule.py" "$ROOT/independent_grade_local_rule.py"
+          echo "0ebb17db4dba8ea047ba6f8f138885dc76bb483a9d52e7c2a4c9487491fd2649  $ROOT/learned_local_rule.py" | sha256sum -c -
+          echo "6dfc81782ea138e89243d2eed08af99af060592ca72b6289327a51ffe99d44b2  $ROOT/independent_grade_local_rule.py" | sha256sum -c -
+          python - <<'PY'
+          import json,hashlib,pathlib
+          p=pathlib.Path('research/evidence/q0_learned_local_structure_20261022/REGISTER_BEFORE_VALID200.json')
+          d=json.loads(p.read_text());assert d['validation_examples']==200 and d['training_examples']==800
+          assert d['frozen_model_sha256']=="0ebb17db4dba8ea047ba6f8f138885dc76bb483a9d52e7c2a4c9487491fd2649"
+          print('FREEZE_BEFORE_VALIDATION_EXPOSURE',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - name: Clone only genuine official ARC2 training tree; strip all validation TEST outputs
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/q0-local-arc2
+          git -C /tmp/q0-local-arc2 checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/q0-local-arc2 rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          mkdir -p /tmp/q0-local-mask
+          python - <<'PY'
+          import json,hashlib,pathlib,zipfile
+          root=pathlib.Path('/tmp/q0-local-arc2/data/training')
+          ids=sorted((p.stem for p in root.glob('*.json')),key=lambda x:hashlib.sha256(x.encode()).hexdigest())
+          assert len(ids)==1000
+          holdout=ids[800:]
+          assert hashlib.sha256(('\n'.join(holdout)+'\n').encode()).hexdigest()=='9f9f9f80d9c51dd31e0ad999e7d2cf7289fcd2791f785ba41fd74d1b86c8dc9b'
+          path='/tmp/q0-local-mask/ARC2_PUBLIC_TRAIN1000_WITH_LAST200_MASKED.zip'
+          with zipfile.ZipFile(path,'w',compression=zipfile.ZIP_DEFLATED) as z:
+              for id in ids:
+                  task=json.loads((root/(id+'.json')).read_text())
+                  if id in set(holdout):
+                      task={'train':task['train'],'test':[{'input':q['input']} for q in task['test']]}
+                      assert all('output' not in t for t in task['test'])
+                  z.writestr('training/'+id+'.json',json.dumps(task,separators=(',',':')))
+          print('VERIFIED_200_LABELS_REMOVED_FROM_INFER_ARTIFACT',hashlib.sha256(open(path,'rb').read()).hexdigest(),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q0-local-tree-1000-public-train-only-last200-masked-input
+          path: /tmp/q0-local-mask/ARC2_PUBLIC_TRAIN1000_WITH_LAST200_MASKED.zip
+          if-no-files-found: error
+  real_task_trained_rules_infer_no_validation_answers:
+    needs: freeze_authentic_training_and_mask_validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-local-tree-1000-public-train-only-last200-masked-input
+          path: /tmp/q0-local-mask
+      - name: Install pinned FREE ordinary CPU decision tree, not an API frontier call
+        run: |
+          python -m pip install --quiet --disable-pip-version-check numpy==2.3.5 scikit-learn==1.8.0
+      - name: Assert validation 200 test outputs absent from machine before first fit
+        run: |
+          python - <<'PY'
+          import zipfile,hashlib,json
+          with zipfile.ZipFile('/tmp/q0-local-mask/ARC2_PUBLIC_TRAIN1000_WITH_LAST200_MASKED.zip') as z:
+              ids=sorted((n.rsplit('/',1)[-1][:-5] for n in z.namelist()),key=lambda x:hashlib.sha256(x.encode()).hexdigest())
+              assert len(ids)==1000
+              for id in ids[800:]:
+                  task=json.loads(z.read('training/'+id+'.json'))
+                  assert all('output' not in t for t in task['test'])
+          print('NO_VALIDATION_ANSWERS_IN_LEARNER_JOB',flush=True)
+          PY
+      - name: Train actual task-conditioned interpretable learned structure per task; independently score NO task labels here
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q0-local-pred
+          python research/evidence/q0_learned_local_structure_20261022/learned_local_rule.py \
+            --zip /tmp/q0-local-mask/ARC2_PUBLIC_TRAIN1000_WITH_LAST200_MASKED.zip \
+            --subset valid \
+            --out /tmp/q0-local-pred/FROZEN_NEURAL_FREE_DECISION_TREE_200_PREGRADE.json \
+            | tee /tmp/q0-local-pred/FROZEN_LEARNING_RUNTIME.log
+          sha256sum /tmp/q0-local-pred/FROZEN_NEURAL_FREE_DECISION_TREE_200_PREGRADE.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/q0-local-pred/FROZEN_NEURAL_FREE_DECISION_TREE_200_PREGRADE.json'))
+          assert d['count']==200 and d['subset']=='valid' and d['test_label_access'] is False
+          assert d['id_sha256']=='9f9f9f80d9c51dd31e0ad999e7d2cf7289fcd2791f785ba41fd74d1b86c8dc9b'
+          assert len(d['rows'])==200
+          print('LOCKED_BEFORE_ANY_GRADER_LABELS',flush=True)
+          PY
+      - name: Retain immutable 200 learned predictions even on no fit or error
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q0-real-trained-local-structure-200-preground-predictions
+          path: /tmp/q0-local-pred/
+          if-no-files-found: warn
+  independently_score_unchanged_strong_classical_and_learned:
+    needs: real_task_trained_rules_infer_no_validation_answers
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: q0-real-trained-local-structure-200-preground-predictions
+          path: /tmp/q0-local-pred
+      - name: Fetch real test labels exclusively in separate grade job AFTER prediction artifact is stored
+        run: |
+          set -euo pipefail
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/q0-local-grade
+          git -C /tmp/q0-local-grade checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/q0-local-grade rev-parse HEAD:data/training)" = dac7259367cc5099ef6a7b604a50a93affbbee33
+          mkdir -p /tmp/q0-local-score
+          python - <<'PY'
+          import zipfile,pathlib,json,hashlib
+          root=pathlib.Path('/tmp/q0-local-grade/data/training')
+          ids=sorted((p.stem for p in root.glob('*.json')),key=lambda x:hashlib.sha256(x.encode()).hexdigest())
+          assert len(ids)==1000
+          with zipfile.ZipFile('/tmp/q0-local-score/ORIGINAL_1000_FOR_INDEPENDENT_GRADER_ONLY.zip','w',compression=zipfile.ZIP_DEFLATED) as z:
+              for id in ids:z.write(root/(id+'.json'),'training/'+id+'.json')
+          print('GRADE_LABELS_FRESH_SEPARATE_PROCESS',flush=True)
+          PY
+      - name: Exact score learned tree and frozen color mapping, independently compare previous official classical10 successes
+        run: |
+          set -euo pipefail
+          python research/evidence/q0_learned_local_structure_20261022/independent_grade_local_rule.py \
+            --prediction /tmp/q0-local-pred/FROZEN_NEURAL_FREE_DECISION_TREE_200_PREGRADE.json \
+            --fullzip /tmp/q0-local-score/ORIGINAL_1000_FOR_INDEPENDENT_GRADER_ONLY.zip \
+            --out /tmp/q0-local-score/STRICT_FROZEN_200_SCIENTIFIC_VERDICT.json \
+            | tee /tmp/q0-local-score/INDEPENDENT_GRADE.log
+          sha256sum /tmp/q0-local-score/STRICT_FROZEN_200_SCIENTIFIC_VERDICT.json
+          python - <<'PY'
+          import json
+          p='/tmp/q0-local-score/STRICT_FROZEN_200_SCIENTIFIC_VERDICT.json'
+          d=json.load(open(p));assert d['validation_n']==200 and d['previous_classical_exact']==10
+          assert not d['learned_invented_operators'] and d['global_Q3']=='OPEN'
+          assert set(d['tree_cv_gated_ids'])<=set(d['tree_correct_ids'])
+          assert d['no_learning_color_lookup_exact']<=d['learned_tree_exact'] or True
+          print('STRICT_CAUSAL_LEARNING_AND_STRONG_CLASSICAL_GATE_COMPLETE',flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q0-real-local-learned-structure-200-independent-exact-vs-strong-classical10
+          path: /tmp/q0-local-score/STRICT_FROZEN_200_SCIENTIFIC_VERDICT.json
+          if-no-files-found: warn

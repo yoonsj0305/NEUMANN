@@ -1,0 +1,20 @@
+{
+  "schema": "NEUMANN_Q0_REAL_LEARNED_TREE_PUBLIC_TRAIN200_ADMISSION_20261022.v1",
+  "date": "2026-10-22",
+  "published_arc2_commit": "f3283f727488ad98fe575ea6a5ac981e4a188e49",
+  "published_arc2_training_tree": "dac7259367cc5099ef6a7b604a50a93affbbee33",
+  "training_examples": 800,
+  "validation_examples": 200,
+  "split": "sort all 1000 task IDs by SHA256(ASCII ID), train first 800, use last 200 as evaluation",
+  "validation_ids_hash": "9f9f9f80d9c51dd31e0ad999e7d2cf7289fcd2791f785ba41fd74d1b86c8dc9b",
+  "frozen_model_sha256": "0ebb17db4dba8ea047ba6f8f138885dc76bb483a9d52e7c2a4c9487491fd2649",
+  "frozen_grader_sha256": "6dfc81782ea138e89243d2eed08af99af060592ca72b6289327a51ffe99d44b2",
+  "task_conditioned_supervised_model": "sklearn decision tree classifier entropy, fixed local multiscale pixel relation features; max depth 1..6, min_samples_leaf 2",
+  "simple_no_learning_control": "source-demo consistent center-color exact lookup, no learned decision tree",
+  "strong_prior_classical_control": "the existing frozen ARC2 internal200 exact symbolic composition predictions from earlier verified CI: 10/200, signed artifact hash",
+  "prior_classical_run_artifact_id": 12406672916,
+  "prior_classical_artifact_sha256": "30a90773f5791024a66d94f3eafbe651b84e328e7e3fdbe62feccc48e3a7ebd4",
+  "dev_observations": {"learned_train_exact_candidates": 43, "learned_test_correct": 15, "loo_cv_all": 7, "loo_cv_all_dev_test_correct": 6},
+  "holdout_contamination_limit": "These same 200 published training tasks had earlier benchmark aggregate results exposed; they are not global firstblind or independent new task family. Present performance as repeat-cohort model-independent new method, never claim frontier or learned-exclusive primitive invention.",
+  "pass_gate": "strict exact grid evidence on 200, simultaneous paired tests and full training/inference cost. No unconditional Q3/Q4/Q6 PASS."
+}
