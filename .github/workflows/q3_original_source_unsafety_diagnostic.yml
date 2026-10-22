@@ -1,0 +1,66 @@
+name: Q3 real original truth before scoring learned failure
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_original_source_unsafety_diagnostic.yml'
+      - 'research/evidence/q3_neural_proof_policy_transfer_20261022/source_truth_witness.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  complete_source_original_z3_cvc5_reachable_unsafety:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify source and install independent two SMT backends
+        run: |
+          set -euo pipefail
+          python -m py_compile research/evidence/q3_neural_proof_policy_transfer_20261022/source_truth_witness.py
+          sudo apt-get update -qq
+          sudo apt-get install -y libz3-4
+          curl -fL --retry 3 --connect-timeout 10 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          unzip -q /tmp/cvc5.zip -d /tmp
+          sudo install -m 755 "$(find /tmp -maxdepth 4 -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+      - name: Fetch exact frozen ORIGINAL program bodies with no case swaps
+        run: |
+          mkdir -p /tmp/q3-source-truth/sources /tmp/q3-source-truth/evidence
+          python - <<'PY'
+          import json,hashlib,pathlib,urllib.request
+          r=pathlib.Path('research/evidence/q3_neural_proof_policy_transfer_20261022/HOLDOUT12_SHA_BEFORE_BODY.json')
+          m=json.loads(r.read_text())
+          assert len(m['cases'])==12
+          failures=[]
+          for x in m['cases']:
+              b=urllib.request.urlopen('https://raw.githubusercontent.com/SyGuS-Org/benchmarks/'+m['upstream_commit']+'/'+x['path'],timeout=30).read()
+              blob=hashlib.sha1(('blob '+str(len(b))+'\0').encode()+b).hexdigest()
+              if blob!=x['sha'] or len(b)!=x['size']:
+                  failures.append({'name':x['name'],'registered':x['sha'],'actual':blob,'reason':'FROZEN_IDENTITY_MISMATCH'})
+                  print('FROZEN_INTEGRITY_FAIL_CLOSE',x['name'],x['sha'],blob,flush=True)
+                  continue
+              pathlib.Path('/tmp/q3-source-truth/sources',x['name']).write_bytes(b)
+              print('ORIGINAL_SHA_OK',x['name'],blob,flush=True)
+          pathlib.Path('/tmp/q3-source-truth/evidence/INPUT_IDENTITY_ERRORS.json').write_text(json.dumps(failures,indent=2)+'\n')
+          PY
+      - name: Compute true reachable counterexample to original safety and independently ground replay in cvc5
+        run: |
+          set -o pipefail
+          python research/evidence/q3_neural_proof_policy_transfer_20261022/source_truth_witness.py \
+            --manifest research/evidence/q3_neural_proof_policy_transfer_20261022/HOLDOUT12_SHA_BEFORE_BODY.json \
+            --source-dir /tmp/q3-source-truth/sources --max-depth 2 \
+            --out /tmp/q3-source-truth/evidence/ORIGINAL_SOURCE_SAFETY_REACHABLE_TRUTH.json \
+            | tee /tmp/q3-source-truth/evidence/ORIGINAL_SOURCE_SAFETY_REACHABLE_TRUTH.log
+          sha256sum /tmp/q3-source-truth/evidence/ORIGINAL_SOURCE_SAFETY_REACHABLE_TRUTH.json
+      - name: Preserve all exact source trace receipts, SAT and unknown
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-real12-source-original-reachable-unsafe-witnesses-independent-cvc5
+          path: /tmp/q3-source-truth/evidence/
+          if-no-files-found: warn
