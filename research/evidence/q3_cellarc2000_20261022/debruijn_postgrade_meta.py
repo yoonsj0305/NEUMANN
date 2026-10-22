@@ -34,6 +34,12 @@ def main():
                 ct['true_k_identified']+=int(int(guess['k'])==int(m['alphabet_size']))
                 ct['true_effective_radius_identified']+=int(int(guess['effective_radius'])==int(m['radius'])*int(m['steps']))
                 ct['true_construction_cycle']+=int(actualcycle)
+            if out.get('prediction') is not None and out['prediction']!=z['solution']:
+                print('POSTGRADE_WRONG_ID_NOT_INFERENCE',json.dumps({'split':split,'id':i,
+                    'actual_construction':m['construction'],'true_k':m['alphabet_size'],
+                    'true_W':m['window'],'true_r':m['radius'],'true_steps':m['steps'],
+                    'inferred_parameters':out.get('structural_model'),
+                    'model_families':out.get('compatible_model_families')},sort_keys=True),flush=True)
             group=m['construction']+'/'+str(m['window'])
             ct['group:'+group]+=1
         results[split]={'counts':dict(ct),'original_sha256':hashlib.sha256(raw).hexdigest()}
