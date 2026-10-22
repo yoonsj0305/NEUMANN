@@ -94,3 +94,33 @@ jobs:
           name: neumann-cellarc2000-real-source-halo-independent-original-grade
           path: /tmp/cellarc-halo-grade/
           if-no-files-found: error
+
+  postgrade_true_source_model_strata:
+    needs: independent_truth_read_only_after_pregrade
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/download-artifact@v4
+        with:
+          name: cellarc2000-source-masked-same-original-release
+          path: /tmp/known-source-only
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-cellarc2000-halo-predictions-before-any-grade
+          path: /tmp/cellarc-halo-pregrade
+      - name: After actual sealed scores only, inspect true family, radius and steps in external oracle metadata
+        run: |
+          set -euo pipefail
+          python -m py_compile research/evidence/q3_cellarc2000_20261022/postgrade_true_model_diagnostic.py
+          python research/evidence/q3_cellarc2000_20261022/source_control.py --mode restore --dir /tmp/real-original-truth --manifest /tmp/known-source-only/SOURCE_LOCK.json
+          mkdir -p /tmp/groundtruth-strata
+          python research/evidence/q3_cellarc2000_20261022/postgrade_true_model_diagnostic.py --pregrade /tmp/cellarc-halo-pregrade/ORIGINAL_LEGACY_AND_HALO_SOURCE_ONLY.json --original-dir /tmp/real-original-truth --out /tmp/groundtruth-strata/POSTGRADE_TRUE_CA_INFORMATION_STRATA.json | tee /tmp/groundtruth-strata/POSTGRADE_AUDIT.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cellarc2000-actual-external-postgrade-true-model-diagnosis
+          path: /tmp/groundtruth-strata/
+          if-no-files-found: error
