@@ -1,0 +1,89 @@
+name: NEUMANN Q0 Q3 independent relational transfer official ARC2 120
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q0_q3_relational_transfer120.yml'
+      - 'research/evidence/q3_q4_information_gate_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  fit_without_any_test_labels:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prove original existing local learner unchanged; pin real dataset
+        run: |
+          set -euo pipefail
+          echo '0ebb17db4dba8ea047ba6f8f138885dc76bb483a9d52e7c2a4c9487491fd2649  research/evidence/q0_learned_local_structure_20261022/learned_local_rule.py' | sha256sum -c -
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/raw-source
+          git -C /tmp/raw-source checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/raw-source rev-parse HEAD:data/evaluation)" = 8d04288aac3146b7c47d0b799c18bc9c0217d838
+          mkdir -p /tmp/masked-eval
+          python - <<'PY'
+          import pathlib,json
+          fs=sorted(pathlib.Path('/tmp/raw-source/data/evaluation').glob('*.json'));assert len(fs)==120
+          for f in fs:
+              d=json.loads(f.read_text())
+              masked={'train':d['train'],'test':[{'input':q['input']} for q in d['test']]}
+              assert all('output' not in q for q in masked['test'])
+              (pathlib.Path('/tmp/masked-eval')/f.name).write_text(json.dumps(masked,separators=(',',':'))+'\n')
+          print('BEFORE_MODEL_120_TEST_OUTPUTS_STRIPPED')
+          PY
+          rm -rf /tmp/raw-source
+      - name: Actually train and CV-gate source only, freeze every prediction before the scorer has labels
+        run: |
+          python -m pip install --quiet numpy==2.3.5 scikit-learn==1.8.0
+          python -m py_compile research/evidence/q3_q4_information_gate_20261022/capacity_probe.py research/evidence/q3_q4_information_gate_20261022/structural_transfer.py
+          mkdir -p /tmp/preground
+          python research/evidence/q3_q4_information_gate_20261022/structural_transfer.py \
+            --mode infer --masked-dir /tmp/masked-eval \
+            --out /tmp/preground/REAL_STRUCTURAL_MODEL_120_ALL_PRE_GRADE.json \
+            | tee /tmp/preground/TRAINED_PRE_GRADE_LOG.txt
+          python - <<'PY'
+          import json,pathlib,hashlib
+          p=pathlib.Path('/tmp/preground/REAL_STRUCTURAL_MODEL_120_ALL_PRE_GRADE.json')
+          d=json.loads(p.read_text())
+          assert d['n']==120 and not d['official_test_labels_seen'] and len(d['rows'])==120
+          print('FROZEN_PRE_GRADE_120_SHA256',hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-new-relational-learned-120-preground
+          path: /tmp/preground/
+          if-no-files-found: error
+  independent_source_exact_grade:
+    needs: fit_without_any_test_labels
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-new-relational-learned-120-preground
+          path: /tmp/preground
+      - name: Original official labels accessed ONLY after pregrade prediction artifact frozen
+        run: |
+          git clone -q --no-checkout https://github.com/arcprize/ARC-AGI-2.git /tmp/arc2-independent-grade
+          git -C /tmp/arc2-independent-grade checkout -q --detach f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(git -C /tmp/arc2-independent-grade rev-parse HEAD:data/evaluation)" = 8d04288aac3146b7c47d0b799c18bc9c0217d838
+          mkdir -p /tmp/graded
+          python research/evidence/q3_q4_information_gate_20261022/structural_transfer.py \
+            --mode grade \
+            --pred /tmp/preground/REAL_STRUCTURAL_MODEL_120_ALL_PRE_GRADE.json \
+            --official-dir /tmp/arc2-independent-grade/data/evaluation \
+            --out /tmp/graded/REAL_OFFICIAL_ARC2_120_STRUCTURAL_EXACT_GRADE.json \
+            | tee /tmp/graded/INDEPENDENT_GRADE_LOG.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-relational-learning-official120-independent-verdict
+          path: /tmp/graded/
+          if-no-files-found: error
