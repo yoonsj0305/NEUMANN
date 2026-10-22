@@ -75,12 +75,40 @@ def main():
             cv=[x.strip() for x in p.stdout.splitlines() if x.strip() in ('sat','unsat','unknown')]
         if z!=['unsat'] or (args.cvc5 and cv!=['unsat']):raise RuntimeError('FULL_ORIGINAL_3VC_FAIL_'+name+' '+str((z,cv)))
         cert[name]={'Z3':z[0],'cvc5':cv[0] if cv else 'NOT_RUN','script_sha256':hashlib.sha256(smt.encode()).hexdigest()}
+    # Causal removal controls: erase each source guard from its exact derived
+    # mode-local equality and prove the resulting unconditional equality is
+    # genuinely NOT inductive on the unchanged original transition system.
+    def to_smt(node):
+        return '('+' '.join(to_smt(x) for x in node)+')' if isinstance(node,list) else node
+    unguarded_controls=[]
+    for mode in guards:
+        for conditional in mode['source_only_generated_conditionals']:
+            term=A.parse_sexpr(conditional)
+            if not (isinstance(term,list) and len(term)==3 and term[0]=='=>'):
+                raise RuntimeError('GENERATED_CANDIDATE_NOT_GUARDED')
+            equality=to_smt(term[2])
+            plain_fun='(define-fun unguarded ('+' '.join('('+v+' Int)' for v in names)+') Bool '+equality+')\n'
+            old='(unguarded '+' '.join(names)+')'
+            new='(unguarded '+' '.join(n+'!' for n in names)+')'
+            smt=head+plain_fun+'(assert (and '+old+' '+trans+' (not '+new+')))\n(check-sat)\n'
+            label='unguarded_'+str(len(unguarded_controls))
+            (args.smt_out/(label+'.smt2')).write_text(smt)
+            z=[x.strip() for x in E.z.run(smt) if x.strip() in ('sat','unsat','unknown')]
+            cv=None
+            if args.cvc5:
+                cp=subprocess.run(['cvc5','--lang','smt2','--tlimit=10000'],input=smt,text=True,capture_output=True,timeout=16)
+                cv=[x.strip() for x in cp.stdout.splitlines() if x.strip() in ('sat','unsat','unknown')]
+            if z!=['sat'] or (args.cvc5 and cv!=['sat']):
+                raise RuntimeError('CONDITIONAL_GUARD_REMOVAL_DID_NOT_FAIL_'+label+' '+str((z,cv)))
+            unguarded_controls.append({'removed_source_guard_derived_unconditional':equality,
+                                       'consecution_z3':z[0],'consecution_cvc5':cv[0] if cv else 'NOT_RUN',
+                                       'original_smt_sha256':hashlib.sha256(smt.encode()).hexdigest()})
     out={'schema':'neumann.q3.original_source_exact_affine_global_barrier_guarded_full_proof.v1',
          'source_original_gitblob':blob,'source_sha256':hashlib.sha256(raw).hexdigest(),
          'variable_order':names,'original_pre_equalities_M':str(M),'original_pre_values_b':str(b),
          'all_original_source_branch_deltas_C':str(C),'full_constraint_C_M_transpose':str(product),
          'M_row_rank':int(M.rank()),'global_constraint_rank':rank,'global_nullity':nullity,
-         'guarded_modes':guards,'generated_conditional_invariant':expr,
+         'guarded_modes':guards,'generated_conditional_invariant':expr,'unguarded_removal_negative_controls':unguarded_controls,
          'original_full_dual_vcs':cert,'verified_backend_count':2 if args.cvc5 else 1,
          'scope':'unconditional affine equality w*x=k valid for every original initial state and preserved in every source transition mode',
          'scientific_boundary':'classical exact math, no neural weights, no global Q3/Q4 or universal affine impossibility',
