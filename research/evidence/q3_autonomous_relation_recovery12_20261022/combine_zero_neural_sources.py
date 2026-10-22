@@ -23,5 +23,3 @@ def main():
  o={'schema':'neumann.q3.source_truth_automated_classical_union.v1','autonomous_no_manual_invariant_inputs':True,'firstblind':False,'new_neural_structure_invention':False,'cases':rows,'source_registry_sha256':hashlib.sha256(a.registry.read_bytes()).hexdigest(),'affine_receipt_sha256':hashlib.sha256(a.affine.read_bytes()).hexdigest(),'baseline_receipt_sha256':hashlib.sha256(a.houdini.read_bytes()).hexdigest(),'union_success':sum(x['safe_certified'] for x in rows),'source_denominator':len(rows),'unsafe_requires_separate_original_sat':True}
  a.out.write_text(json.dumps(o,indent=2,sort_keys=True)+'\n');print('AUTONOMOUS_UNION',o['union_success'],'/',len(rows),'methods',{z:sum(c['source_algorithm']==z for c in rows) for z in ('EXACT_SOURCE_AFFINE_GUARDED','EXACT_SOURCE_FINITE_HOUDINI','NO_AUTOMATIC_CERTIFICATE')},flush=True)
 if __name__=='__main__':main()
-if __name__=='__main__':main()
-if __name__=='__main__':main()
