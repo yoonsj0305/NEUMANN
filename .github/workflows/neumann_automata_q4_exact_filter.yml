@@ -1,0 +1,137 @@
+name: NEUMANN Q4 exact 16bit reversible CA 300 source CPU equivalence
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/neumann_automata_q4_exact_filter.yml'
+      - 'research/ood_automatabench_20261023/exact_16bit_filter.py'
+      - 'research/ood_automatabench_20261023/exact_filter_paired300.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  PYTHONPATH: research/ood_automatabench_20261023
+jobs:
+  freeze_original_public_eval_source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: SHA pin original already-seen public eval and strip all task answers
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/automata-q4-authentic
+          python - <<'PY'
+          import pathlib,json,hashlib,urllib.request
+          rev='7d86373fdb63fe1bd3592ddf71d923ceebc5acd9'
+          url=f'https://raw.githubusercontent.com/neelsomani/automata-bench/{rev}/data/public_eval.jsonl'
+          with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'NEUMANN-q4-same-original-source'}),timeout=120) as f:raw=f.read()
+          records=[json.loads(s) for s in raw.splitlines()]
+          assert len(records)==300 and len({r['id'] for r in records})==300
+          path=pathlib.Path('/tmp/automata-q4-authentic/MASKED300.jsonl')
+          with path.open('w') as out:
+              for r in records:
+                  assert 'answer' in r and 'metadata' in r
+                  d={k:v for k,v in r.items() if k not in ('answer','metadata')}
+                  out.write(json.dumps(d,sort_keys=True,separators=(',',':'))+'\n')
+          ident={'n':300,'rev':rev,'raw_sha256':hashlib.sha256(raw).hexdigest(),
+                'masked_sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
+          pathlib.Path('/tmp/automata-q4-authentic/IDENTITY.json').write_text(json.dumps(ident,sort_keys=True))
+          print('Q4_AUTHENTIC_ORIGINAL_SOURCE_NO_TARGET',ident)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: automata-q4-same-original-source-no-answers
+          path: /tmp/automata-q4-authentic/
+          if-no-files-found: error
+  original_300_five_same_worker_cpu_trials:
+    needs: freeze_original_public_eval_source
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Install fixed classical solver and vector engine
+        run: python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 numpy==1.26.4
+      - uses: actions/download-artifact@v4
+        with:
+          name: automata-q4-same-original-source-no-answers
+          path: /tmp/automata-q4-authentic
+      - name: Independently prove vector step correctness under 320 random full-grid cases
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import numpy as np,random
+          from exact_16bit_filter import step_vectorized
+          from reversible_ca_solver import roll_one
+          rng=random.Random(23012026)
+          num=0
+          for pcase in range(5):
+              perm=list(range(16));rng.shuffle(perm)
+              for trial in range(32):
+                  b=rng.randrange(65536)
+                  orig=[[((b>>(y*4+x))&1) for x in range(4)] for y in range(4)]
+                  for parity in range(2):
+                      actual=step_vectorized(np.array([b],dtype=np.uint16),perm,4,4,parity)
+                      expect=roll_one(orig,parity,perm)
+                      encoded=sum(expect[y][x]<<(y*4+x) for y in range(4) for x in range(4))
+                      assert int(actual[0])==encoded,(pcase,trial,parity)
+                      num+=1
+          assert num==320
+          print('EXACT_VECTOR_SIMULATION_INDEPENDENT_320_STEP_EQUIVALENCE_PASS')
+          PY
+          mkdir -p /tmp/automata-q4-pregrade
+          python research/ood_automatabench_20261023/exact_filter_paired300.py --mode infer --masked /tmp/automata-q4-authentic/MASKED300.jsonl --out /tmp/automata-q4-pregrade/300_ALL_FIVE_PAIRED_CPU_NO_ANSWERS.json | tee /tmp/automata-q4-pregrade/CPU_EXACT_SOURCE_ONLY.log
+          python - <<'PY'
+          import pathlib,hashlib,json
+          p=pathlib.Path('/tmp/automata-q4-pregrade/300_ALL_FIVE_PAIRED_CPU_NO_ANSWERS.json')
+          d=json.loads(p.read_text())
+          assert d['n']==300 and d['n_trials']==5 and d['n_matched_original_predictions']==300
+          assert d['all_five_predictions_deterministic_and_equal'] and not d['answers_seen']
+          print('Q4_EXACT_300_MATCHED_PRE_GRADE_SHA256',hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: automata-q4-16bit-exact-all300-5cpu-trials-before-truth
+          path: /tmp/automata-q4-pregrade/
+          if-no-files-found: error
+  independent_authentic_300_official_grade:
+    needs: original_300_five_same_worker_cpu_trials
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 numpy==1.26.4
+      - uses: actions/download-artifact@v4
+        with:
+          name: automata-q4-same-original-source-no-answers
+          path: /tmp/automata-q4-authentic
+      - uses: actions/download-artifact@v4
+        with:
+          name: automata-q4-16bit-exact-all300-5cpu-trials-before-truth
+          path: /tmp/automata-q4-pregrade
+      - name: Independent official author verifier, no truth before CPU timing receipt sealed
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import pathlib,json,hashlib,urllib.request
+          m=json.loads(pathlib.Path('/tmp/automata-q4-authentic/IDENTITY.json').read_text())
+          url=f"https://raw.githubusercontent.com/neelsomani/automata-bench/{m['rev']}/data/public_eval.jsonl"
+          with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'NEUMANN-Q4-independent-original-grade'}),timeout=120) as f:raw=f.read()
+          assert hashlib.sha256(raw).hexdigest()==m['raw_sha256']
+          pathlib.Path('/tmp/NEUMANN_Q4_REAL_TRUTH_AFTER_PREGRADE.jsonl').write_bytes(raw)
+          print('Q4_ORIGINAL_TRUE_DATA_HASH_VERIFIED')
+          PY
+          mkdir -p /tmp/automata-q4-score
+          python research/ood_automatabench_20261023/exact_filter_paired300.py --mode grade --sealed /tmp/automata-q4-pregrade/300_ALL_FIVE_PAIRED_CPU_NO_ANSWERS.json --original /tmp/NEUMANN_Q4_REAL_TRUTH_AFTER_PREGRADE.jsonl --original-sha "$(python -c "import json;print(json.load(open('/tmp/automata-q4-authentic/IDENTITY.json'))['raw_sha256'])")" --out /tmp/automata-q4-score/INDEPENDENT_ORIGINAL_300_SPEED_AND_CORRECTNESS.json | tee /tmp/automata-q4-score/INDEPENDENT_ORIGINAL_VERDICT.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: automata-q4-independent-exact-bit-enum-original300-grader
+          path: /tmp/automata-q4-score/
+          if-no-files-found: error
