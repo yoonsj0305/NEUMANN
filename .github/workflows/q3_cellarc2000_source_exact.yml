@@ -1,0 +1,90 @@
+name: NEUMANN CellARC2000 first independent source exact gate
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_cellarc2000_source_exact.yml'
+      - 'research/evidence/q3_cellarc2000_20261022/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mask_original_targets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Revision lock and full test output redaction before using model
+        run: |
+          set -euo pipefail
+          python -m py_compile research/evidence/q3_cellarc2000_20261022/*.py
+          python research/evidence/q3_cellarc2000_20261022/source_control.py --mode mask --dir /tmp/cellarc-mask/data --manifest /tmp/cellarc-mask/LOCKED_SHA.json
+          test "$(wc -l < /tmp/cellarc-mask/data/test_interpolation.jsonl)" -eq 1000
+          test "$(wc -l < /tmp/cellarc-mask/data/test_extrapolation.jsonl)" -eq 1000
+      - uses: actions/upload-artifact@v4
+        with:
+          name: first-cellarc2000-fully-masked-source
+          path: /tmp/cellarc-mask/
+          if-no-files-found: error
+  frozen_2000_real_rule_predictions:
+    needs: mask_original_targets
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: first-cellarc2000-fully-masked-source
+          path: /tmp/cellarc-mask
+      - name: Original CA source-only program induction, no solution labels
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/cellarc-pred
+          python research/evidence/q3_cellarc2000_20261022/exact_local_rule_probe.py --mode predict --input-dir /tmp/cellarc-mask/data --out /tmp/cellarc-pred/ALL2000_SOURCE_ONLY.json | tee /tmp/cellarc-pred/RAW_INFERENCE.log
+          python - <<'PY'
+          import json,pathlib,hashlib
+          p=pathlib.Path('/tmp/cellarc-pred/ALL2000_SOURCE_ONLY.json');d=json.loads(p.read_text())
+          assert d['n']==2000 and not d['public_source_test_solutions_read'] and not d['meta_accessed']
+          for name in ('test_interpolation','test_extrapolation'):assert len(d['rows'][name])==1000
+          print('FIRST_2000_FROZEN_SOURCE_ONLY_SHA256',hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: first-cellarc2000-all-signed-predictions-before-truth
+          path: /tmp/cellarc-pred/
+          if-no-files-found: error
+  independent_real_2000_grade:
+    needs: frozen_2000_real_rule_predictions
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: first-cellarc2000-fully-masked-source
+          path: /tmp/cellarc-mask
+      - uses: actions/download-artifact@v4
+        with:
+          name: first-cellarc2000-all-signed-predictions-before-truth
+          path: /tmp/cellarc-pred
+      - name: Original answers re-fetched using SHA from sealed first job
+        run: |
+          set -euo pipefail
+          python research/evidence/q3_cellarc2000_20261022/source_control.py --mode restore --dir /tmp/cellarc-real --manifest /tmp/cellarc-mask/LOCKED_SHA.json
+          mkdir -p /tmp/cellarc-score
+          python research/evidence/q3_cellarc2000_20261022/exact_local_rule_probe.py --mode grade --prediction-dir /tmp/cellarc-pred/ALL2000_SOURCE_ONLY.json --source-dir /tmp/cellarc-real --out /tmp/cellarc-score/INDEPENDENT_ALL2000_ORIGINAL_SCORES.json | tee /tmp/cellarc-score/SCIENCE_GRADE.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: first-cellarc2000-independent-original-score
+          path: /tmp/cellarc-score/
+          if-no-files-found: error
