@@ -1,0 +1,121 @@
+name: NEUMANN Q3 immutable full context model original fifth1000 fresh replication
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_cellarc_frozen_debruijn_fifth1000.yml'
+      - 'research/evidence/q3_cellarc2000_20261022/debruijn_context_fifth1000.py'
+permissions:
+  contents: read
+jobs:
+  mask_original:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Original source fifth1000 only, freeze reference model and mask answers
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD:research/evidence/q3_cellarc2000_20261022/debruijn_structural_model.py)" = fb12bc217178f7f3e89f0865987078e5dc367074
+          test "$(git rev-parse HEAD:research/evidence/q3_cellarc2000_20261022/debruijn_full_context.py)" = 47a03c3b6e679453215f674b4790f2ad82d1c0cb
+          test "$(git rev-parse HEAD:research/evidence/q3_cellarc2000_20261022/debruijn_context_fourth1000.py)" = 8e238db4966c37054a2e3de3cdaa08ffd625ae50
+          python - <<'PY'
+          import random,sys
+          sys.path.insert(0,'research/evidence/q3_cellarc2000_20261022')
+          from debruijn_structural_model import debruijn
+          from debruijn_full_context import offsets_on_canonical,candidate
+          rng=random.Random(771)
+          checked=0
+          for k,W in ((2,3),(3,3),(2,5),(3,5)):
+              cycle=debruijn(k,W);n=len(cycle);R=(W-1)//2
+              for z in range(15):
+                  table={tuple(cycle[(i+t)%n] for t in range(-R,R+1)):rng.randrange(k) for i in range(n)}
+                  source=[table[tuple(cycle[(i+t)%n] for t in range(-R,R+1))] for i in range(n)]
+                  pairs=[]
+                  width=min(n,max(W+3,2*W+2))
+                  for j in range(5):
+                      pos=rng.randrange(n)
+                      a=[cycle[(pos+h)%n] for h in range(width)]
+                      b=[source[(pos+h)%n] for h in range(width)]
+                      assert offsets_on_canonical(a,cycle)==[pos]
+                      pairs.append({'input':a,'output':b})
+                  q=[rng.randrange(k) for _ in range(max(W+3,12))]
+                  d={'train':pairs,'query':q}
+                  model=candidate(d,{'k':k,'W':W,'effective_radius':R})
+                  assert model['status']!='REJECT_SOURCE_CONTEXT_SHORT',model
+                  checked+=1
+          print('SYNTHETIC_CANONICAL_GLOBAL_RECONSTRUCTION_INPUT_MATCH',checked)
+          PY
+          mkdir -p /tmp/original
+          python - <<'PY'
+          import json,hashlib,pathlib,urllib.request,itertools
+          sha='76040e6aef0edc4982e53c13a85ef227378ed171'
+          url=f'https://huggingface.co/datasets/mireklzicar/cellarc_100k/resolve/{sha}/data/train.jsonl'
+          with urllib.request.urlopen(url,timeout=120) as h:raw=b''.join(itertools.islice(h,4000,5000))
+          lines=raw.splitlines();assert len(lines)==1000
+          ids=set();p=pathlib.Path('/tmp/original/masked.jsonl')
+          with p.open('w') as f:
+              for x in lines:
+                  d=json.loads(x);assert d['id'] not in ids;ids.add(d['id'])
+                  f.write(json.dumps({'id':d['id'],'train':d['train'],'query':d['query']})+'\n')
+          pathlib.Path('/tmp/original/identity.json').write_text(json.dumps({'sha':sha,'raw':hashlib.sha256(raw).hexdigest(),'n':1000}))
+          print('BEFORE_MODEL_SHA',hashlib.sha256(raw).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: original-fifth1000-masked
+          path: /tmp/original/
+  source_only_pair:
+    needs: mask_original
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/download-artifact@v4
+        with:
+          name: original-fifth1000-masked
+          path: /tmp/original
+      - name: Both models predict without answers
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/frozen
+          python research/evidence/q3_cellarc2000_20261022/debruijn_context_fifth1000.py --mode infer --input /tmp/original/masked.jsonl --out /tmp/frozen/UNSCORED.json | tee /tmp/frozen/SOURCE.log
+          sha256sum /tmp/frozen/UNSCORED.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fresh1000-frozen-source-only-predictions
+          path: /tmp/frozen/
+  independently_grade:
+    needs: source_only_pair
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/download-artifact@v4
+        with:
+          name: original-fifth1000-masked
+          path: /tmp/original
+      - uses: actions/download-artifact@v4
+        with:
+          name: fresh1000-frozen-source-only-predictions
+          path: /tmp/frozen
+      - name: Reopen exactly same original SHA after prediction receipt
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,hashlib,pathlib,urllib.request,itertools
+          i=json.loads(pathlib.Path('/tmp/original/identity.json').read_text())
+          url=f"https://huggingface.co/datasets/mireklzicar/cellarc_100k/resolve/{i['sha']}/data/train.jsonl"
+          with urllib.request.urlopen(url,timeout=120) as h:raw=b''.join(itertools.islice(h,4000,5000))
+          assert hashlib.sha256(raw).hexdigest()==i['raw']
+          pathlib.Path('/tmp/original/true.jsonl').write_bytes(raw)
+          PY
+          mkdir -p /tmp/graded
+          python research/evidence/q3_cellarc2000_20261022/debruijn_context_fifth1000.py --mode grade --sealed /tmp/frozen/UNSCORED.json --source /tmp/original/true.jsonl --out /tmp/graded/ACTUAL.json | tee /tmp/graded/SCORE.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fresh-train1000-independent-budget-verdict
+          path: /tmp/graded/
