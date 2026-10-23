@@ -1,0 +1,54 @@
+name: NEUMANN G0 strict postgrade original ERBench32 representability audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/neumann_erbench_postgrade_grammar_audit.yml'
+      - 'research/g0/erbench_first32_grammar_audit.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  first_original_32_truth_after_frozen_prediction_grammar_ceiling:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          name: erbench-private-original-equations-grader-only
+          run-id: 39898356061
+          github-token: ${{ github.token }}
+          path: /tmp/g0-ERBench-first-private
+      - uses: actions/download-artifact@v4
+        with:
+          name: erbench-source-only-sealed-before-original-independent-grade
+          run-id: 39898356061
+          github-token: ${{ github.token }}
+          path: /tmp/g0-ERBench-first-predictions
+      - uses: actions/download-artifact@v4
+        with:
+          name: erbench-first-original-32-independent-symbolic-truth-grade
+          run-id: 39898356061
+          github-token: ${{ github.token }}
+          path: /tmp/g0-ERBench-first-grade
+      - name: Exact first-run immutable SHA audit; original source representability and no new first-blind claims
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g0-erbench-postgrade
+          PYTHONPATH=research/g0 python research/g0/erbench_first32_grammar_audit.py \
+            --truth /tmp/g0-ERBench-first-private/ORIGINAL_FORMULAS_ONLY_GRADER.json \
+            --pred /tmp/g0-ERBench-first-predictions/SOURCE_SEALED_PREDICTIONS.json \
+            --grade /tmp/g0-ERBench-first-grade/INDEPENDENT_ORIGINAL_FORMULA_GRADE.json \
+            --out /tmp/g0-erbench-postgrade/GRAMMAR_CEILING_POSTGRADE.json \
+            | tee /tmp/g0-erbench-postgrade/ORIGINAL_G0_POSTGRADE_LOG.txt
+          sha256sum /tmp/g0-erbench-postgrade/GRAMMAR_CEILING_POSTGRADE.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-erbench-first32-strict-postgrade-expressivity-ceiling-audit
+          path: /tmp/g0-erbench-postgrade/
+          if-no-files-found: error
