@@ -29,7 +29,7 @@ from learned_derived_power_eleventh32 import eval_action
 
 X=sp.Symbol("x")
 ACTIONS=("POLYNOMIAL","TRIG_PRODUCT","LOG_SUM","EXP_ROOT","SAFE")
-TRAIN_SEED=10172026
+TRAIN_SEED=10172026  # hard-frozen independent synthetic-reward exploration
 PROBE_SHAPE=(48,)
 
 def source_valid(r):
