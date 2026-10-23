@@ -33,7 +33,8 @@ def author_formula(raw):
            "sin":sp.sin,"cos":sp.cos,"tan":sp.tan,
            "sinh":sp.sinh,"cosh":sp.cosh,
            "log":sp.log,"ln":sp.log,"sqrt":sp.sqrt,
-           "exp":sp.exp,"abs":sp.Abs,"tanh":sp.tanh}
+           "exp":sp.exp,"abs":sp.Abs,"tanh":sp.tanh,
+           "harmonic":sp.harmonic}
     expr=sp.sympify(raw,locals=local,evaluate=True)
     assert not expr.free_symbols or expr.free_symbols.issubset({X})
     return expr
