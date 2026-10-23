@@ -1,0 +1,62 @@
+name: NEUMANN Q6 first frozen Nguyen public author ORIGINAL 8 strict source grade and failure audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_nguyen_first_original_sha_audit.yml'
+      - 'research/q3/nguyen_first_original_strict_transfer_audit.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  certify_prior_original_correctness_and_scope:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39939206590
+          name: neumann-q6-first-real-nguyen8-author-numeric-source-only
+          github-token: ${{ github.token }}
+          path: /tmp/q6-original/source
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39939206590
+          name: neumann-q6-first-real-nguyen8-original-gold-private-to-grader
+          github-token: ${{ github.token }}
+          path: /tmp/q6-original/truth
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39939206590
+          name: neumann-q6-first-real-nguyen8-frozen-neural-source-proposals-before-author-grader
+          github-token: ${{ github.token }}
+          path: /tmp/q6-original/pred
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39939206590
+          name: neumann-q6-first-real-nguyen8-full-analytic-author-exact-independent-grade
+          github-token: ${{ github.token }}
+          path: /tmp/q6-original/grade
+      - name: Audit first Nguyen REAL author equation exactness and pretrained-model weight SHA, and expose all8 per-case results
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q6-original/audit
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/q3/nguyen_first_original_strict_transfer_audit.py \
+            --source /tmp/q6-original/source/NON_ERBENCH_NGUYEN8_NUMERIC_ONLY_48PTS.json \
+            --truth /tmp/q6-original/truth/PUBLISHED_NGUYEN8_TRUE_AUTHOR_EQUATIONS_PRIVATE.json \
+            --pred /tmp/q6-original/pred/FIRST_FROZEN_NEURAL_VS_CLASSICAL_NEW_NGUYEN8_SOURCE_PREDICTIONS.json \
+            --grade /tmp/q6-original/grade/INDEPENDENT_NGUYEN8_FULL_AUTHOR_TRUTH_SCORE_FROZEN_NEURAL_AND_CLASSICAL.json \
+            --out /tmp/q6-original/audit/FIRST_NGUYEN_AUTHOR_FULL_TRUE_EQUATION_TRANSFER_PER_CASE_AUDIT.json \
+            | tee /tmp/q6-original/audit/FIRST_FROZEN_EXTERNAL_AUTHOR_LEARNED_TRANSFER_CORRECTNESS_AND_FAILURE_LOG.txt
+          sha256sum /tmp/q6-original/audit/FIRST_NGUYEN_AUTHOR_FULL_TRUE_EQUATION_TRANSFER_PER_CASE_AUDIT.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q6-first-Nguyen8-full-original-frozen-reproducible-transfer-case-by-case-audit
+          path: /tmp/q6-original/audit/
+          if-no-files-found: error
