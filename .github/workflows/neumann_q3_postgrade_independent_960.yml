@@ -1,0 +1,49 @@
+name: NEUMANN Q3 postgrade independent flattened local rule 960 replay
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/neumann_q3_postgrade_independent_960.yml'
+      - 'research/ood_automatabench_20261023/hidden_geometry_independent_replay.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independent_flat_grid_replay_of_original_frozen_prediction_artifacts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Download ORIGINAL truth-only sealed artifact from successful PR528 first run
+        uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39885239826
+          github-token: ${{ github.token }}
+          name: ca-hidden-geometry-original-rule-and-12x12-truth-grader-only
+          path: /tmp/original-untouched-truth
+      - name: Download ORIGINAL source-only predictions sealed BEFORE original grading
+        uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39885239826
+          github-token: ${{ github.token }}
+          name: ca-hidden-geometry-960-source-only-predictions-before-grade
+          path: /tmp/original-untouched-predictions
+      - name: Cross-check 12x12 original measurements via independent flat implementation and 14x18/30x34 fresh test
+        run: |
+          set -euo pipefail
+          python -m py_compile research/ood_automatabench_20261023/hidden_geometry_independent_replay.py
+          python research/ood_automatabench_20261023/hidden_geometry_independent_replay.py \
+            --truth-dir /tmp/original-untouched-truth \
+            --pred-dir /tmp/original-untouched-predictions \
+            --out /tmp/independent-960-geometry/SEALED_960_INDEPENDENT_FLAT_AND_UNSEEN_LARGER_GRID.json \
+            | tee /tmp/independent-960-geometry/INDEPENDENT_REPLAY_CONSOLE.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-independent-960-frozen-replay-two-larger-grids
+          path: /tmp/independent-960-geometry/
+          if-no-files-found: error
