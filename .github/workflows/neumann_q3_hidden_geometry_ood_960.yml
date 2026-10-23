@@ -1,0 +1,120 @@
+name: NEUMANN Q3 blind local geometry 600 original plus 360 out-of-family
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/neumann_q3_hidden_geometry_ood_960.yml'
+      - 'research/ood_automatabench_20261023/latent_geometry_induction.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  PYTHONPATH: research/ood_automatabench_20261023
+jobs:
+  authentic_original_and_generated_rule_truth_segregated:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 numpy==1.26.4
+      - name: Freeze original conditional rule solver and verify structure induction source
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD:research/ood_automatabench_20261023/hidden_rule_inference.py)" = 9c74ec9761bd983de62f70669155d20a05cc02e6
+          test "$(git rev-parse HEAD:research/ood_automatabench_20261023/reversible_ca_solver.py)" = 623e63d92b100502b47896adc45f76e028d0cf07
+          python -m py_compile research/ood_automatabench_20261023/latent_geometry_induction.py
+          python research/ood_automatabench_20261023/latent_geometry_induction.py --mode selftest
+      - name: Read pinned third-party 600 original source tasks into PRIVATE author truth
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/authentic-author-only
+          python - <<'PY'
+          import pathlib,urllib.request,hashlib,json
+          sha='7d86373fdb63fe1bd3592ddf71d923ceebc5acd9'
+          for split in ('public_dev','public_eval'):
+              url=f'https://raw.githubusercontent.com/neelsomani/automata-bench/{sha}/data/{split}.jsonl'
+              with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'NEUMANN-Q3-hidden-geometry'}),timeout=120) as resp:raw=resp.read()
+              assert len(raw.splitlines())==300
+              pathlib.Path('/tmp/authentic-author-only/'+split+'.jsonl').write_bytes(raw)
+              print('PINNED_ORIGINAL',split,hashlib.sha256(raw).hexdigest(),flush=True)
+          PY
+          python research/ood_automatabench_20261023/latent_geometry_induction.py --mode generate \
+            --original-dir /tmp/authentic-author-only \
+            --source-dir /tmp/ca-no-family-source \
+            --truth-dir /tmp/ca-private-geometry
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ca-hidden-geometry-source-without-family
+          path: /tmp/ca-no-family-source/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ca-hidden-geometry-original-private-grader-only
+          path: /tmp/authentic-author-only/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ca-hidden-geometry-original-rule-and-12x12-truth-grader-only
+          path: /tmp/ca-private-geometry/
+          if-no-files-found: error
+  blind_finite_grammar_discovery_and_source_only_predictions:
+    needs: authentic_original_and_generated_rule_truth_segregated
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 numpy==1.26.4
+      - uses: actions/download-artifact@v4
+        with:
+          name: ca-hidden-geometry-source-without-family
+          path: /tmp/ca-no-family-source
+      - name: Discover structure and program from four 8x8 transitions; seal 960 source-only results
+        run: |
+          set -euo pipefail
+          python research/ood_automatabench_20261023/latent_geometry_induction.py --mode predict \
+            --source-dir /tmp/ca-no-family-source \
+            --pred-dir /tmp/ca-frozen-pregrade-predictions
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ca-hidden-geometry-960-source-only-predictions-before-grade
+          path: /tmp/ca-frozen-pregrade-predictions/
+          if-no-files-found: error
+  independent_original_author_and_12x12_transfer_grader:
+    needs: blind_finite_grammar_discovery_and_source_only_predictions
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 numpy==1.26.4
+      - uses: actions/download-artifact@v4
+        with:
+          name: ca-hidden-geometry-original-private-grader-only
+          path: /tmp/authentic-author-only
+      - uses: actions/download-artifact@v4
+        with:
+          name: ca-hidden-geometry-original-rule-and-12x12-truth-grader-only
+          path: /tmp/ca-private-geometry
+      - uses: actions/download-artifact@v4
+        with:
+          name: ca-hidden-geometry-960-source-only-predictions-before-grade
+          path: /tmp/ca-frozen-pregrade-predictions
+      - name: Independent author original initial-state and held-out 12x12 oracle correctness
+        run: |
+          set -euo pipefail
+          python research/ood_automatabench_20261023/latent_geometry_induction.py --mode grade \
+            --original-dir /tmp/authentic-author-only \
+            --pred-dir /tmp/ca-frozen-pregrade-predictions \
+            --truth-dir /tmp/ca-private-geometry \
+            --out-dir /tmp/ca-independent-graded-evidence
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ca-hidden-geometry-960-exact-original-and-heldout-grade
+          path: /tmp/ca-independent-graded-evidence/
+          if-no-files-found: error
