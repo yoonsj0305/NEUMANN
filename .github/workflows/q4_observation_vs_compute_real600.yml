@@ -1,0 +1,49 @@
+name: NEUMANN Q4 cost-aware cheapest-safe compute-vs-probe controller
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q4_observation_vs_compute_real600.yml'
+      - 'research/ood_automatabench_20261023/probe_vs_inference_cost_controller.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  separate_actual_600_original_dev_threshold_and_eval_price_switch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: original-authentic-600-task-three-probe-early-stop-and-four-fallback
+          repository: yoonsj0305/NEUMANN
+          run-id: 39883173748
+          github-token: ${{ github.token }}
+          path: /tmp/original-600-three-stop
+      - uses: actions/download-artifact@v4
+        with:
+          name: original-author-600-exact-optimal-probe-postgrade-cost-verified
+          repository: yoonsj0305/NEUMANN
+          run-id: 39882653079
+          github-token: ${{ github.token }}
+          path: /tmp/original-600-four-cost
+      - name: Freeze real SHA receipt numbers then infer price threshold exclusively from dev300
+        run: |
+          set -euo pipefail
+          python -m py_compile research/ood_automatabench_20261023/probe_vs_inference_cost_controller.py
+          mkdir -p /tmp/ca-cost-controller
+          python research/ood_automatabench_20261023/probe_vs_inference_cost_controller.py \
+            --three-proof /tmp/original-600-three-stop/REAL_600_SOURCE_GOAL_CONDITIONED_THREE_OR_FOUR.json \
+            --source-cost /tmp/original-600-four-cost/REAL_ORIGINAL_600_OPTIMAL_EXPERIMENT_DESIGN_POSTGRADE_COST.json \
+            --out /tmp/ca-cost-controller/EXTERNAL_AUTHOR_ORIGINAL_DEV_CALIBRATED_EVAL_COST_FRONTIER.json \
+            | tee /tmp/ca-cost-controller/REAL_FROZEN_Q4_OBSERVATION_COMPUTE_FRONTIER.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-cost-aware-source-probe-choice-dev300-eval300-independent
+          path: /tmp/ca-cost-controller/
+          if-no-files-found: error
