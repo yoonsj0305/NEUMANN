@@ -1,0 +1,62 @@
+name: NEUMANN Q3 first authentic Livermore author expression graph headroom SHA-locked audit
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/q3_livermore_first_original_locked_audit.yml"
+      - "research/q3/livermore_first_original_locked_headroom_audit.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independently_audit_FIRST_full_original_Livermore_graph_witnesses:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39941664316
+          name: neumann-q3-first-livermore8-numeric-only-external-author-original
+          github-token: ${{ github.token }}
+          path: /tmp/q3-liv-audit/source
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39941664316
+          name: neumann-q3-first-livermore8-external-author-original-private-grader-only
+          github-token: ${{ github.token }}
+          path: /tmp/q3-liv-audit/truth
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39941664316
+          name: neumann-q3-livermore8-first-source-only-dynamic-recursive-graph-predictions
+          github-token: ${{ github.token }}
+          path: /tmp/q3-liv-audit/pred
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39941664316
+          name: neumann-q3-livermore8-first-source-original-native-symbolic-graph-grade
+          github-token: ${{ github.token }}
+          path: /tmp/q3-liv-audit/grade
+      - name: Require four immutable first source/gold/prediction/grade SHAs and independently verify full original mathematical expression each program
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-liv-audit/out
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/q3/livermore_first_original_locked_headroom_audit.py \
+            --source /tmp/q3-liv-audit/source/FIRST_LIVERMORE8_SOURCE_ONLY_NOT_AUTHOR_FORMULAS.json \
+            --truth /tmp/q3-liv-audit/truth/FIRST_LIVERMORE8_PUBLISHED_AUTHORED_TRUE_FORMULAS.json \
+            --pred /tmp/q3-liv-audit/pred/FIRST_RECURSIVE_AST_GRAMMAR_VS_CLASSICAL_SOURCE_ONLY_LIVERMORE8.json \
+            --grade /tmp/q3-liv-audit/grade/FIRST_LIVERMORE8_FULL_ORIGINAL_AUTHOR_RECURSIVE_GRAPH_EXACT_GRADE.json \
+            --out /tmp/q3-liv-audit/out/FIRST_LIVERMORE8_PUBLIC_AUTHOR_COMPLETELY_VERIFIED_EXPANDED_GRAPH_PROGRAMS.json \
+            | tee /tmp/q3-liv-audit/out/FIRST_PUBLISHED_AUTHOR_WITNESSES_AND_HUMAN_GRAMMAR_SCOPE.log
+          sha256sum /tmp/q3-liv-audit/out/FIRST_LIVERMORE8_PUBLIC_AUTHOR_COMPLETELY_VERIFIED_EXPANDED_GRAPH_PROGRAMS.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-livermore8-first-author-sha-locked-math-witnesses-and-original-grammars
+          path: /tmp/q3-liv-audit/out/
+          if-no-files-found: error
