@@ -1,0 +1,170 @@
+name: NEUMANN Q3 first new recursive SEMANTIC operator created from SOURCE then proven across all integer n
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_recursive_operator_keijzer_induction.yml'
+      - 'research/q3/recursive_operator_source_inventor.py'
+      - 'research/q3/learned_recursive_symbol_policy.py'
+      - 'research/q3/keijzer_original_recursive_6_9_source.py'
+      - 'research/q3/keijzer_recursive_operator_independent_grader.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  SELF_REWARDED_training_and_SERIALIZE_neural_model_BEFORE_other_author_source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2 joblib==1.4.2
+      - name: Safety controls generic source-only rational recurrence construction without author-specific primitive
+        run: |
+          set -euo pipefail
+          PYTHONPATH=research/q3 python - <<'PY'
+          import sympy as sp
+          from recursive_operator_source_inventor import recurrence_source,closed_form_source,N,LOG_SQRT_ATOMS
+          assert 'HARMONIC' not in LOG_SQRT_ATOMS
+          x=list(range(1,49));y=[sp.Rational(7,3)]
+          for i in x[:-1]:y.append(y[-1]+sp.Rational(2,i+4))
+          row={'x':x,'y':list(map(float,y)),'y_exact':list(map(str,y))}
+          program,calls=recurrence_source(row)
+          assert calls>0 and program is not None
+          assert sp.simplify(sp.sympify(program['step_increment_AST'],locals={'n':N})-2/(N+4))==0
+          assert program['all_47_source_rational_equalities_exact']
+          import math
+          ys=[math.log(float(k)) for k in x]
+          other={'x':x,'y':ys,'y_exact':[str(sp.Rational(float(z))) for z in ys]}
+          assert recurrence_source(other)[0] is None
+          assert closed_form_source(other)[0] is not None
+          print('Q3_UNNAMED_NEW_RECURSIVE_FUNCTION_GENERATOR_POSITIVE_AND_NEGATIVE_CONTROLS_PASS')
+          PY
+      - name: Actual self-rewarded train 240 generic source tasks, persist immutable model file as artifact
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-new-rec-train
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=research/q3 \
+            python research/q3/learned_recursive_symbol_policy.py --mode train \
+            --model /tmp/q3-new-rec-train/TRAINED_RECURSIVE_ACTION_POLICY_BEFORE_AUTHOR.joblib \
+            --meta /tmp/q3-new-rec-train/FROZEN_SOURCE_ONLY_RECURSIVE_MODEL_TRAINING_RECEIPT.json \
+            | tee /tmp/q3-new-rec-train/BEFORE_KEIJZER_TRAINED_NEURAL_STRUCTURE_REWARD_REPORT.log
+          sha256sum /tmp/q3-new-rec-train/TRAINED_RECURSIVE_ACTION_POLICY_BEFORE_AUTHOR.joblib
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-new-unnamed-recursive-operator-pretrained-frozen-joblib-before-keijzer-source
+          path: /tmp/q3-new-rec-train/
+          if-no-files-found: error
+  create_KIJZER6_9_published_actual_originals_without_given_formula_to_model:
+    needs: SELF_REWARDED_training_and_SERIALIZE_neural_model_BEFORE_other_author_source
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - name: Produce separate authentic EuroGP Keijzer author function and exact rational SOURCE observation artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-K6/source /tmp/q3-K6/gold
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/q3 \
+            python research/q3/keijzer_original_recursive_6_9_source.py \
+            --source /tmp/q3-K6/source/KEIJZER6_TO9_SOURCE_XY_ONLY.json \
+            --truth /tmp/q3-K6/gold/KEIJZER6_TO9_PRIVATE_TRUE_ORIGINALS.json
+          python - <<'PY'
+          import json
+          rows=json.load(open('/tmp/q3-K6/source/KEIJZER6_TO9_SOURCE_XY_ONLY.json'))['source_numeric_without_equations']
+          assert len(rows)==4
+          assert all('original_author_expression' not in r for r in rows)
+          assert all(len(r['x'])==len(r['y'])==len(r['y_exact'])==48 for r in rows)
+          print('Q3_FOUR_KEIJZER_TRUE_AUTHOR_FORMULAS_PHYSICALLY_WITHHELD_FROM_NEURAL_MODEL')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-keijzer6to9-original-source-only-exact-rational-observations
+          path: /tmp/q3-K6/source/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-keijzer6to9-original-author-targets-independent-grader-only
+          path: /tmp/q3-K6/gold/
+          if-no-files-found: error
+  apply_SAVED_neural_policy_model_and_same_rights_CLASSICAL_to_original_SOURCE_ONLY:
+    needs: create_KIJZER6_9_published_actual_originals_without_given_formula_to_model
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2 joblib==1.4.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-new-unnamed-recursive-operator-pretrained-frozen-joblib-before-keijzer-source
+          path: /tmp/q3-K6/model
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-keijzer6to9-original-source-only-exact-rational-observations
+          path: /tmp/q3-K6/source
+      - name: SHA VERIFY pretrained serialized model bytes then choose structural action and define new executable recursive SYMBOL
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-K6/pred
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=research/q3 \
+            python research/q3/learned_recursive_symbol_policy.py --mode infer \
+            --model /tmp/q3-K6/model/TRAINED_RECURSIVE_ACTION_POLICY_BEFORE_AUTHOR.joblib \
+            --meta /tmp/q3-K6/model/FROZEN_SOURCE_ONLY_RECURSIVE_MODEL_TRAINING_RECEIPT.json \
+            --source /tmp/q3-K6/source/KEIJZER6_TO9_SOURCE_XY_ONLY.json \
+            --out /tmp/q3-K6/pred/FIRST_SOURCE_ONLY_DEFINED_RECURSIVE_SYMBOL_AND_ALL_CLASSICAL_PREDICTIONS.json \
+            | tee /tmp/q3-K6/pred/FIRST_NEW_RECURSIVE_SYMBOL_SELF_DEFINITION_BEFORE_AUTHOR_TRUTH.log
+          sha256sum /tmp/q3-K6/pred/FIRST_SOURCE_ONLY_DEFINED_RECURSIVE_SYMBOL_AND_ALL_CLASSICAL_PREDICTIONS.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-keijzer6to9-model-defined-symbol-source-predictions-before-first-author-grade
+          path: /tmp/q3-K6/pred/
+          if-no-files-found: error
+  INDEPENDENT_MATH_INDUCTION_AUTHOR_WHOLE_INFINITE_INTEGER_DOMAIN:
+    needs: apply_SAVED_neural_policy_model_and_same_rights_CLASSICAL_to_original_SOURCE_ONLY
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-keijzer6to9-original-author-targets-independent-grader-only
+          path: /tmp/q3-K6/gold
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-keijzer6to9-model-defined-symbol-source-predictions-before-first-author-grade
+          path: /tmp/q3-K6/pred
+      - name: Prove ALL positive-integer author semantics by mathematical induction, not just first 48 points
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-K6/graded
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/q3 \
+            python research/q3/keijzer_recursive_operator_independent_grader.py \
+            --truth /tmp/q3-K6/gold/KEIJZER6_TO9_PRIVATE_TRUE_ORIGINALS.json \
+            --pred /tmp/q3-K6/pred/FIRST_SOURCE_ONLY_DEFINED_RECURSIVE_SYMBOL_AND_ALL_CLASSICAL_PREDICTIONS.json \
+            --out /tmp/q3-K6/graded/KEIJZER6_9_FIRST_ENTIRE_MATH_INDUCTION_OR_ANALYTIC_AUTHOR_GRADE.json \
+            | tee /tmp/q3-K6/graded/TRUE_SOURCE_HARMONIC_FUNCTION_RECURSION_MATH_INDUCTION.log
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3-K6/graded/KEIJZER6_9_FIRST_ENTIRE_MATH_INDUCTION_OR_ANALYTIC_AUTHOR_GRADE.json'))
+          assert len(r['all_methods_entire_math_author_proofs'])==5
+          assert all(x['author_total']==4 for x in r['all_methods_entire_math_author_proofs'].values())
+          assert r['G1']=='HOLD' and r['Q3_GLOBAL']=='OPEN'
+          print('Q3_ALL_PUBLISHED_KEIJZER4_ORIGINALS_INDEPENDENTLY_ACCOUNTED')
+          PY
+          sha256sum /tmp/q3-K6/graded/KEIJZER6_9_FIRST_ENTIRE_MATH_INDUCTION_OR_ANALYTIC_AUTHOR_GRADE.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-keijzer-first-original-mathematical-induction-new-operator-author-proof
+          path: /tmp/q3-K6/graded/
+          if-no-files-found: error
