@@ -1,0 +1,114 @@
+name: NEUMANN Q3 one 8x8 intervention on 600 independent-author CA tasks
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q34_one_8x8_intervention_600.yml'
+      - 'research/ood_automatabench_20261023/one_shot_8x8_oracle.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  PYTHONPATH: research/ood_automatabench_20261023
+jobs:
+  true_rules_isolated_during_calibration_construction:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 numpy==1.26.4
+      - name: Freeze previously-graded independent CA solver and author-native rule
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD:research/ood_automatabench_20261023/hidden_rule_inference.py)" = 9c74ec9761bd983de62f70669155d20a05cc02e6
+          test "$(git rev-parse HEAD:research/ood_automatabench_20261023/reversible_ca_solver.py)" = 623e63d92b100502b47896adc45f76e028d0cf07
+          test "$(git rev-parse HEAD:research/ood_automatabench_20261023/optimal_four_probe_generator.py)" = 9af6f9df595575ab34681d0ef66fafff9421928c
+          python -m py_compile research/ood_automatabench_20261023/one_shot_8x8_oracle.py
+          python research/ood_automatabench_20261023/one_shot_8x8_oracle.py --mode selftest
+      - name: Pin and download author's original separate 300+300 task splits
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/true-original-only
+          python - <<'PY'
+          import hashlib,pathlib,urllib.request,json
+          sha="7d86373fdb63fe1bd3592ddf71d923ceebc5acd9"
+          for split in ("public_dev","public_eval"):
+              url=f"https://raw.githubusercontent.com/neelsomani/automata-bench/{sha}/data/{split}.jsonl"
+              with urllib.request.urlopen(urllib.request.Request(url,headers={"User-Agent":"NEUMANN-one8-science"}),timeout=120) as f:raw=f.read()
+              ids=[json.loads(l)["id"] for l in raw.splitlines()]
+              assert len(set(ids))==len(ids)==300
+              pathlib.Path(f"/tmp/true-original-only/{split}.jsonl").write_bytes(raw)
+              print("ORIGINAL_PINNED",split,hashlib.sha256(raw).hexdigest(),flush=True)
+          PY
+          python research/ood_automatabench_20261023/one_shot_8x8_oracle.py --mode prepare \
+            --original-dir /tmp/true-original-only --source-dir /tmp/source-without-rule
+      - uses: actions/upload-artifact@v4
+        with:
+          name: one8-true-original-600-answers-and-rule-grader-only
+          path: /tmp/true-original-only/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: one8-single-intervention-source-only-600
+          path: /tmp/source-without-rule/
+          if-no-files-found: error
+  source_only_solver_frozen_before_grading:
+    needs: true_rules_isolated_during_calibration_construction
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 numpy==1.26.4
+      - uses: actions/download-artifact@v4
+        with:
+          name: one8-single-intervention-source-only-600
+          path: /tmp/source-without-rule
+      - name: Predict both original split initial states with no original answers or rules
+        run: |
+          set -euo pipefail
+          python research/ood_automatabench_20261023/one_shot_8x8_oracle.py --mode infer \
+            --source-dir /tmp/source-without-rule --pred-dir /tmp/pregrade-one8-predictions
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: one8-600-blind-predictions-sealed-before-original-grade
+          path: /tmp/pregrade-one8-predictions/
+          if-no-files-found: error
+  original_author_independent_two_split_grader:
+    needs: source_only_solver_frozen_before_grading
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 numpy==1.26.4
+      - uses: actions/download-artifact@v4
+        with:
+          name: one8-true-original-600-answers-and-rule-grader-only
+          path: /tmp/true-original-only
+      - uses: actions/download-artifact@v4
+        with:
+          name: one8-single-intervention-source-only-600
+          path: /tmp/source-without-rule
+      - uses: actions/download-artifact@v4
+        with:
+          name: one8-600-blind-predictions-sealed-before-original-grade
+          path: /tmp/pregrade-one8-predictions
+      - name: Independently grade exact hidden rule and true 4x4 initial state
+        run: |
+          set -euo pipefail
+          python research/ood_automatabench_20261023/one_shot_8x8_oracle.py --mode grade \
+            --original-dir /tmp/true-original-only \
+            --source-dir /tmp/source-without-rule \
+            --pred-dir /tmp/pregrade-one8-predictions \
+            --grade-dir /tmp/one8-independent-grader
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: one8-original-independent-author-two-split-600-grade
+          path: /tmp/one8-independent-grader/
+          if-no-files-found: error
