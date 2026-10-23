@@ -1,0 +1,55 @@
+name: NEUMANN Q3 immutable source-generated two cubic branches irreducible exact proof
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/q3_ninth32_two_cubic_exact_necessity.yml"
+      - "research/q3/ninth32_two_cubic_macro_nonstrivial_proof.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  prove_authentic_two_cubic_ast_and_single_cube_impossibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39923380389
+          name: neumann-q3-first-ninth32-actual-original-true-expression-private
+          github-token: ${{ github.token }}
+          path: /tmp/q3-cubic-proof/original
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39923380389
+          name: neumann-q3-ninth32-frozen-selfreward-composed-macros-before-grading
+          github-token: ${{ github.token }}
+          path: /tmp/q3-cubic-proof/proposed
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39923380389
+          name: neumann-q3-ninth32-full-original-exact-additive-macro-grader
+          github-token: ${{ github.token }}
+          path: /tmp/q3-cubic-proof/graded
+      - name: Validate immutable first-pass SHA, actual learned-created two cubics, and algebraic impossibility of one cubic
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-cubic-proof/out
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/q3/ninth32_two_cubic_macro_nonstrivial_proof.py \
+            --truth /tmp/q3-cubic-proof/original/REAL_NINTH32_PRIVATE_AUTHOR_TRUTH.json \
+            --pred /tmp/q3-cubic-proof/proposed/FIRST_NINTH_LEARNED_DYNAMIC_MACROS_AND_ALL_CLASSICAL_SOURCE_ONLY.json \
+            --grade /tmp/q3-cubic-proof/graded/FIRST_NINTH32_AUTHOR_FULL_EQUIVALENCE_NEURAL_AND_CLASSICAL.json \
+            --out /tmp/q3-cubic-proof/out/EXACT_ORIGINAL_CUBIC_REQUIRES_TWO_CUBIC_BRANCHES.json \
+            | tee /tmp/q3-cubic-proof/out/PROVEN_MATH_SOURCE_FIRST_RECEIPT.log
+          sha256sum /tmp/q3-cubic-proof/out/EXACT_ORIGINAL_CUBIC_REQUIRES_TWO_CUBIC_BRANCHES.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-original-two-cubes-provably-impossible-by-one-cube-proof
+          path: /tmp/q3-cubic-proof/out/
+          if-no-files-found: error
