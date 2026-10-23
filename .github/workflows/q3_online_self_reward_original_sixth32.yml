@@ -1,0 +1,149 @@
+name: NEUMANN Q3 online no-teacher own-reward AST transfer unseen original ERBench sixth32
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/q3_online_self_reward_original_sixth32.yml"
+      - "research/g0/erbench_original_sixth.py"
+      - "research/q3/online_self_reward_original_equation_ast.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first_original_source_and_true_formula_physically_isolated:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - name: Pin original independent EquationDiscovery corpus exact bytes before observing any sixth32 target expression
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/sixth-corpus /tmp/sixth-training /tmp/sixth-source /tmp/sixth-secret
+          python - <<'PY'
+          import urllib.request,pathlib,hashlib
+          revision="95bf15c27de68c3f170ca6140d2e4a811c60344f"
+          url="https://huggingface.co/datasets/EquationDiscovery/Equation_Recovery_Benchmark/resolve/"+revision+"/train.csv?download=true"
+          request=urllib.request.Request(url,headers={"User-Agent":"NEUMANN-Q3-online-ownreward-first-6th/1"})
+          with urllib.request.urlopen(request,timeout=60) as reply:raw=reply.read()
+          sha=hashlib.sha256(raw).hexdigest()
+          assert sha=="03c0ceb53ed0348650c0a94ed5cd1e452325d2b7c7d3be68f9a458316eda33b1"
+          pathlib.Path("/tmp/sixth-corpus/original.csv").write_bytes(raw)
+          print("OFFICIAL_EXTERNAL_AUTHOR_SOURCE_PIN_VERIFIED",revision,sha)
+          PY
+      - name: Create 128 DIFFERENT author training source-only samples without answer formulas
+        run: |
+          set -euo pipefail
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0 python research/q3/online_self_reward_original_equation_ast.py \
+            --mode train_source --csv-path /tmp/sixth-corpus/original.csv \
+            --train /tmp/sixth-training/OTHER_ORIGINAL128_NUMERIC_XY_NO_FORMULA.json
+      - name: Freeze unseen sixth32 original ID task cohort; keep original mathematical truth physically separate
+        run: |
+          set -euo pipefail
+          OPENBLAS_NUM_THREADS=1 python research/g0/erbench_original_sixth.py --mode prepare \
+            --csv-path /tmp/sixth-corpus/original.csv \
+            --revision 95bf15c27de68c3f170ca6140d2e4a811c60344f \
+            --source /tmp/sixth-source/UNSEEN_SIXTH32_NUMERIC_NO_ORIGINAL_FORMULA.json \
+            --truth /tmp/sixth-secret/UNSEEN_SIXTH32_TRUE_ORIGINAL_FORMULAS_PRIVATE.json
+          python - <<'PY'
+          import json
+          training=json.load(open("/tmp/sixth-training/OTHER_ORIGINAL128_NUMERIC_XY_NO_FORMULA.json"))
+          original=json.load(open("/tmp/sixth-source/UNSEEN_SIXTH32_NUMERIC_NO_ORIGINAL_FORMULA.json"))
+          assert len(training["train_source_only"])==128
+          assert original["all_selected"]==32
+          assert training["selection"].startswith("sha-rank 96:224")
+          assert len(set(r["id"] for r in training["train_source_only"]) &
+                     set(r["id"] for r in original["source_numeric_without_equations"]))==0
+          print("STRICT_SOURCE_ONLY_DISJOINT_ORIGINALS_TRAIN128_EVAL32")
+          PY
+          rm -f /tmp/sixth-corpus/original.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-sx-online-no-label-training-original128-only-numeric
+          path: /tmp/sixth-training/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-sx-first-fresh-original32-source-only-numeric
+          path: /tmp/sixth-source/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-sx-first-fresh-original32-secret-author-true-equations
+          path: /tmp/sixth-secret/
+          if-no-files-found: error
+  self_reward_learned_graph_construction_and_equal_language_classical_baselines:
+    needs: first_original_source_and_true_formula_physically_isolated
+    runs-on: ubuntu-latest
+    timeout-minutes: 23
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-sx-online-no-label-training-original128-only-numeric
+          path: /tmp/sixth-training
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-sx-first-fresh-original32-source-only-numeric
+          path: /tmp/sixth-source
+      - name: Learn actual neural six graph edits from own source reward then first-original source-only program proposals
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/sixth-pregrade
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/q3/online_self_reward_original_equation_ast.py --mode infer \
+            --train /tmp/sixth-training/OTHER_ORIGINAL128_NUMERIC_XY_NO_FORMULA.json \
+            --source /tmp/sixth-source/UNSEEN_SIXTH32_NUMERIC_NO_ORIGINAL_FORMULA.json \
+            --pred /tmp/sixth-pregrade/SIXTH32_TRAINED_NEW_AST_VS_EQUAL_GRAMMAR_CLASSICAL_SEALED.json \
+            | tee /tmp/sixth-pregrade/FIRST_SOURCE_ONLY_MODEL_AND_BASELINES.log
+          sha256sum /tmp/sixth-pregrade/SIXTH32_TRAINED_NEW_AST_VS_EQUAL_GRAMMAR_CLASSICAL_SEALED.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-sx-first-trained-synthetic-symbol-program-predictions-before-real-original-grade
+          path: /tmp/sixth-pregrade/
+          if-no-files-found: error
+  independent_external_original_full_expression_truth_after_all_predictions_sealed:
+    needs: self_reward_learned_graph_construction_and_equal_language_classical_baselines
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-sx-first-fresh-original32-secret-author-true-equations
+          path: /tmp/sixth-secret
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-sx-first-trained-synthetic-symbol-program-predictions-before-real-original-grade
+          path: /tmp/sixth-pregrade
+      - name: Independent original author mathematical FULL symbolic equality, all 32 including UNKNOWN
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/sixth-graded
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/q3/online_self_reward_original_equation_ast.py --mode grade \
+            --truth /tmp/sixth-secret/UNSEEN_SIXTH32_TRUE_ORIGINAL_FORMULAS_PRIVATE.json \
+            --pred /tmp/sixth-pregrade/SIXTH32_TRAINED_NEW_AST_VS_EQUAL_GRAMMAR_CLASSICAL_SEALED.json \
+            --out /tmp/sixth-graded/EXACT_ALL32_TRUE_AUTHOR_ORIGINAL_MACRO_COMPARISONS.json \
+            | tee /tmp/sixth-graded/FINAL_INDEPENDENT_ORIGINAL_AUTHOR_GRADE.log
+          python - <<'PY'
+          import json
+          v=json.load(open("/tmp/sixth-graded/EXACT_ALL32_TRUE_AUTHOR_ORIGINAL_MACRO_COMPARISONS.json"))
+          assert all(c["total"]==32 for c in v["scores"].values())
+          assert v["Q3_global"]=="OPEN" and v["G1"]=="HOLD"
+          print("INDEPENDENT_TRUTH_SAFETY_GATED_ALL_ORIGINAL32")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-sx-first-fresh-original32-full-equation-neural-vs-classical-proof
+          path: /tmp/sixth-graded/
+          if-no-files-found: error
