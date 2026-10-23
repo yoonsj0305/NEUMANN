@@ -227,6 +227,9 @@ def train_policy(trainfile):
     return model,output,positive
 
 def selected_basis(method,row,model,rng):
+    # Some authentic author originals legitimately yield too few finite source
+    # observations. Preserve them as UNKNOWN rather than dereferencing x.
+    if original_shape(row.get('x',[]),row.get('y',[])) is None:return []
     if method=="D_learned_macro_top80":
         if model is None:return rng.choice(len(BASIS),80,replace=False).tolist()
         shape=original_shape(row["x"],row["y"])
