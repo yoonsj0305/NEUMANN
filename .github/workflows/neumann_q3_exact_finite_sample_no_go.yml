@@ -1,0 +1,47 @@
+name: NEUMANN Q3 infinite ambiguity proof on 32 immutable original external ERBench source observations
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/neumann_q3_exact_finite_sample_no_go.yml'
+      - 'research/q3/finite_sample_identifiability_certificate.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independently_prove_all_finite_source_ambiguities:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-third-original-numeric-source-no-target-formulas
+          run-id: 39902306657
+          github-token: ${{ github.token }}
+          path: /tmp/third32-original-source-only
+      - name: Independently SHA-verify untouched original source and evaluate complete exact Lagrange certificates
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-math-identifiability-proof
+          python -m py_compile research/q3/finite_sample_identifiability_certificate.py
+          python research/q3/finite_sample_identifiability_certificate.py \
+            --source /tmp/third32-original-source-only/THIRD32_ONLY_NUMERIC_SOURCE.json \
+            --out /tmp/q3-math-identifiability-proof/ALL32_EXACT_INTERPOLATION_NONUNIQUENESS.json \
+            | tee /tmp/q3-math-identifiability-proof/ORIGINAL_SOURCE_EXACT_ARITHMETIC_AUDIT.log
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3-math-identifiability-proof/ALL32_EXACT_INTERPOLATION_NONUNIQUENESS.json'))
+          assert len(r['all_32_rows'])==32 and r['counts']['total']==32
+          assert all(v['status']!='UNKNOWN_ARITHMETIC_UNSUPPORTED' for v in r['all_32_rows'])
+          assert r['G1']=='HOLD' and r['Q3_primitive_invention']=='OPEN'
+          print("EXACT_ORIGINAL_FINITE_SAMPLES_THEOREM_CHECKED",r['counts'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-actual-external-original32-finite-sample-nonidentifiability-proof
+          path: /tmp/q3-math-identifiability-proof/
+          if-no-files-found: error
