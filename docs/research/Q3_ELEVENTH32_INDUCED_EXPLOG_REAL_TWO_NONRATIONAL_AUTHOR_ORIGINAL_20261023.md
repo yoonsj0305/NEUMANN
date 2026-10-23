@@ -34,3 +34,24 @@ Both authentic FULL author original equations were UNKNOWN for old safe additive
 **Still OPEN:** `MODEL_ITSELF_FREELY_INVENTS_NEW_ATOMIC_SEMANTICS`; learned exclusive against same-rights strong all-actions classical (0); truly independent external source family and author cross-transfer (all from same original public ERBench distribution); full frontier direct/CoT/tool performance parity; full compute/energy >=10x efficiency (actual known cost is worse than classical); full `Q3_GLOBAL`, `Q4_GLOBAL`, `Q6_GLOBAL`, `Q7_GLOBAL`. No claiming global success from scoped expression-grammar improvement.
 
 **Next high-value test, not repetitive fixed 32:** Remove finite hand-given `b=2..16` base list and let the model induce previously unavailable integer/algebraic power bases directly from numerically identified continuous exponential rate `lambda=log b`; independently prove exact compiler and source correction, compare with strongest same-parameter-rights classical inference on entirely new external author family, full training+probes cost. Aim real learned DEFINE/REUSE/MODIFY of compositional graph, not only sorting predefined macros.
+
+
+## Mathematical proof stronger than source symbolic identity: two exponentials absolutely necessary
+
+[**Independent SHA-locked first original two-exponential rank proof #39937555959**](https://github.com/yoonsj0305/NEUMANN/actions/runs/39937555959) **SUCCESS**, first exact report SHA256 `3dfff94817b1b51a56971cad1c93aac7988b1d1418e0f955128892e7b8fb95f3`. This verification asserted the ORIGINAL first **author truth, pregrade generated programs and independent exact author grade** SHA receipts before reading the answer.
+
+Original public `OEIS:oeis_428` is `f(x)=4**x + 8**x`. First source-only program actually generated `lambda x: 2**(2*x) + 8**x` by constructing executable functions `exp(2*x*log(2))` and `exp(x*log(8))` separately from numeric source; full original source symbolic equality PASS.
+
+For *arbitrary real coefficients and exponent rates*, a **SINGLE** exponential with output offset `g(x)=A*exp(rate*x)+C` must satisfy
+
+`g'(0)*g'''(0)-(g''(0))**2=0`.
+
+The actual first original function has exact derivative invariant
+
+`f'(0)*f'''(0)-(f''(0))**2=6*log(2)**4 > 0`.
+
+Thus NO one-term real exponential with any affine scalar/offset can express it, while the sealed learned policy supplied a TWO-exponential exact composition. **Minimum positive-base exponential dictionary rank=2** for this author original. Crucially same-rights classical A also constructed this function, old safe-only C did not. This is known elementary analysis, NOT a novel mathematics theorem or neural primitive-invention evidence. Proof source: `research/q3/eleventh32_two_exponential_exact_minimality.py`.
+
+Our PRIOR strict `OEIS:oeis_1468` two-shifted-cubics representation lower bound also passed on ninth originals; different compositional family. Both establish **representational necessity in real authored original functions**, not frontier capability of our learned controller.
+
+Global `Q3=OPEN`, `G1=HOLD`, `Q4_TOTAL10X=OPEN`, `Q6_INDEPENDENT_AUTHOR_TRANSFER=OPEN`, `Q7_FRONTIER=OPEN`.
