@@ -38,7 +38,7 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_q5*archive.py' -v
 
 
-  # SOURCE-FIRST original12 Keijzer/Neat three jobs from PR554; no model changes.
+  # SOURCE-FIRST original12 Keijzer/Neat three jobs from PR554; replay same first model without model changes.
   # Temporary independent scientific experiment branch; do not merge.
   physically_separate_first_12_authored_equations_from_source:
     runs-on: ubuntu-latest
