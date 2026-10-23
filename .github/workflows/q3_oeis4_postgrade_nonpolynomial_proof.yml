@@ -1,0 +1,55 @@
+name: NEUMANN Q3 FIRST OEIS4 original recursive function needed, no polynomial-step alternative certificate
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_oeis4_postgrade_nonpolynomial_proof.yml'
+      - 'research/q3/oeis4_frozen_nonpolynomial_recurrence_necessity_audit.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  prove_all_four_real_author_function_steps_are_irreducible_to_any_polynomial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39959183874
+          name: neumann-q3-oeis4-separate-original-author-sum-formulas-for-math-grader-only
+          github-token: ${{ github.token }}
+          path: /tmp/oeis-proof/gold
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39959183874
+          name: neumann-q3-oeis4-frozen-neural-source-repair-first-proposals
+          github-token: ${{ github.token }}
+          path: /tmp/oeis-proof/pred
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39959183874
+          name: neumann-q3-first-frozen-model-feedback-repaired-new-OEIS4-author-inductive-proofs
+          github-token: ${{ github.token }}
+          path: /tmp/oeis-proof/grade
+      - name: Math prove all 4 genuine source-created M need nonpolynomial rational increment, and exact revised-action count from first immutable SHA
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/oeis-proof/audit
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/q3 \
+            python research/q3/oeis4_frozen_nonpolynomial_recurrence_necessity_audit.py \
+            --true /tmp/oeis-proof/gold/FIRST_OEIS4_PRIVATE_FINITE_SUM_AUTHORED_GOLD.json \
+            --pred /tmp/oeis-proof/pred/FIRST_OEIS4_FROZEN_NEURAL_SOURCE_COUNTEREXAMPLE_REPAIR_AND_CLASSICAL.json \
+            --grade /tmp/oeis-proof/grade/FIRST_NEW_OEIS4_AUTHOR_COMPLETE_RATIONAL_RECURSIONS_INDUCTIVE_PROOFS.json \
+            --out /tmp/oeis-proof/audit/FIRST_AUTHOR_NEW_NONPOLYNOMIAL_RATIONAL_RECURRENCE_NECESSITY_CERTIFICATES.json \
+            | tee /tmp/oeis-proof/audit/MATH_ALL_NONPOLYNOMIAL_INCREMENTS_AND_CORRECTED_GRAPH_ACTIONS.log
+          sha256sum /tmp/oeis-proof/audit/FIRST_AUTHOR_NEW_NONPOLYNOMIAL_RATIONAL_RECURRENCE_NECESSITY_CERTIFICATES.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-first-real-original-four-new-recurrences-nonpolynomial-necessity-math-proof
+          path: /tmp/oeis-proof/audit/
+          if-no-files-found: error

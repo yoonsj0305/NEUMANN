@@ -1,0 +1,126 @@
+name: NEUMANN Q3 feedback repair using SAME frozen pretrained model on four new OEIS author original recurrences
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_oeis4_original_recursion_reflection.yml'
+      - 'research/q3/oeis_four_published_recursive_source.py'
+      - 'research/q3/oeis4_frozen_model_verifier_repair.py'
+      - 'research/q3/oeis4_published_original_induction_grader.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  new_public_OEIS_original_AUTHOR_truth_isolated_from_numerical_source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - name: Freeze published OEIS A007406 A007408 A075135 A025550 original finite sums and source numeric only as different artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-OEIS/source /tmp/q3-OEIS/gold
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/q3 \
+            python research/q3/oeis_four_published_recursive_source.py \
+            --source /tmp/q3-OEIS/source/FIRST_OEIS4_SOURCE_XY_EXACT_WITHOUT_FORMULA.json \
+            --truth /tmp/q3-OEIS/gold/FIRST_OEIS4_PRIVATE_FINITE_SUM_AUTHORED_GOLD.json
+          python - <<'PY'
+          import json
+          rows=json.load(open('/tmp/q3-OEIS/source/FIRST_OEIS4_SOURCE_XY_EXACT_WITHOUT_FORMULA.json'))['source_numeric_without_equations']
+          assert len(rows)==4
+          assert all('summand_expression' not in z for z in rows)
+          assert all(len(z['y_exact'])==len(z['y'])==48 for z in rows)
+          print('NEUMANN_Q3_OEIS4_SOURCE_SAMPLES_WITHOUT_AUTHOR_TRUE_MATH_CONFIRMED')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-oeis4-new-independent-published-source-exact-numeric-only
+          path: /tmp/q3-OEIS/source/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-oeis4-separate-original-author-sum-formulas-for-math-grader-only
+          path: /tmp/q3-OEIS/gold/
+          if-no-files-found: error
+  USE_PREVIOUSLY_FROZEN_NEURAL_MODEL_and_source_VERIFIER_ACTION_REPAIR:
+    needs: new_public_OEIS_original_AUTHOR_truth_isolated_from_numerical_source
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2 joblib==1.4.2
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39957688283
+          name: neumann-q3-new-unnamed-recursive-operator-pretrained-frozen-joblib-before-keijzer-source
+          github-token: ${{ github.token }}
+          path: /tmp/q3-OEIS/frozen_PREVIOUS_neural
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-oeis4-new-independent-published-source-exact-numeric-only
+          path: /tmp/q3-OEIS/source
+      - name: Reuse previous untouched exact MLP artifact sha, propose action, react to failed exact source verifier by alternative action
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-OEIS/pred
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/q3 \
+            python research/q3/oeis4_frozen_model_verifier_repair.py \
+            --model /tmp/q3-OEIS/frozen_PREVIOUS_neural/TRAINED_RECURSIVE_ACTION_POLICY_BEFORE_AUTHOR.joblib \
+            --meta /tmp/q3-OEIS/frozen_PREVIOUS_neural/FROZEN_SOURCE_ONLY_RECURSIVE_MODEL_TRAINING_RECEIPT.json \
+            --source /tmp/q3-OEIS/source/FIRST_OEIS4_SOURCE_XY_EXACT_WITHOUT_FORMULA.json \
+            --out /tmp/q3-OEIS/pred/FIRST_OEIS4_FROZEN_NEURAL_SOURCE_COUNTEREXAMPLE_REPAIR_AND_CLASSICAL.json \
+            | tee /tmp/q3-OEIS/pred/SOURCE_VERIFIER_FEEDBACK_STRUCTURAL_REVISION_BEFORE_AUTHOR_TRUTH.log
+          sha256sum /tmp/q3-OEIS/pred/FIRST_OEIS4_FROZEN_NEURAL_SOURCE_COUNTEREXAMPLE_REPAIR_AND_CLASSICAL.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-oeis4-frozen-neural-source-repair-first-proposals
+          path: /tmp/q3-OEIS/pred/
+          if-no-files-found: error
+  independent_OEIS_author_math_induction_for_all_positive_INTEGERS:
+    needs: USE_PREVIOUSLY_FROZEN_NEURAL_MODEL_and_source_VERIFIER_ACTION_REPAIR
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-oeis4-separate-original-author-sum-formulas-for-math-grader-only
+          path: /tmp/q3-OEIS/originals
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-oeis4-frozen-neural-source-repair-first-proposals
+          path: /tmp/q3-OEIS/pred
+      - name: Prove each SOURCE-generated new recurrence equals actual published OEIS function for all positive n by exact independent summation induction
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-OEIS/graded
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/q3 \
+            python research/q3/oeis4_published_original_induction_grader.py \
+            --truth /tmp/q3-OEIS/originals/FIRST_OEIS4_PRIVATE_FINITE_SUM_AUTHORED_GOLD.json \
+            --pred /tmp/q3-OEIS/pred/FIRST_OEIS4_FROZEN_NEURAL_SOURCE_COUNTEREXAMPLE_REPAIR_AND_CLASSICAL.json \
+            --out /tmp/q3-OEIS/graded/FIRST_NEW_OEIS4_AUTHOR_COMPLETE_RATIONAL_RECURSIONS_INDUCTIVE_PROOFS.json \
+            | tee /tmp/q3-OEIS/graded/INFINITE_POSITIVE_INTEGER_DOMAIN_AUTHOR_ORIGINAL_ALL_MATH_PROOFS.log
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/q3-OEIS/graded/FIRST_NEW_OEIS4_AUTHOR_COMPLETE_RATIONAL_RECURSIONS_INDUCTIVE_PROOFS.json'))
+          assert len(d['independent_whole_domain_original_accuracy'])==5
+          assert all(v['total_authored_originals']==4 for v in d['independent_whole_domain_original_accuracy'].values())
+          assert d['G1']=='HOLD' and d['Q3_global']=='OPEN'
+          print('P2_ALL_FOUR_NEW_PUBLIC_OEIS_AUTHORED_FUNCTIONS_ACCOUNTED')
+          PY
+          sha256sum /tmp/q3-OEIS/graded/FIRST_NEW_OEIS4_AUTHOR_COMPLETE_RATIONAL_RECURSIONS_INDUCTIVE_PROOFS.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-first-frozen-model-feedback-repaired-new-OEIS4-author-inductive-proofs
+          path: /tmp/q3-OEIS/graded/
+          if-no-files-found: error
