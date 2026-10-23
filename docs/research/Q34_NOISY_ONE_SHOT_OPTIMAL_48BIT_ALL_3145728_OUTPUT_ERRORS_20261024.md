@@ -59,3 +59,15 @@ Scientific admission:
 - `G1_MODEL_AUTONOMOUSLY_NEW_ATOMIC_SEMANTICS=HOLD`; `Q3_GLOBAL=OPEN`; `Q4_FRONTIER_ALL_IN_10X=OPEN`; `Q6/Q7=OPEN`.
 
 Next genuine Q3 gate is independently authored original task families with a learned **variable-length DEFINE/REUSE/REWRITE program** showing *new learned useful structures, equal-rights/compute stronger classical comparisons*; this bounded CA coding finding is a supporting verification substrate only.
+
+
+## CI evidence VERIFIED on real GitHub runners
+
+**2026-10-24 first complete replay** [GitHub Actions #40042071996](https://github.com/yoonsj0305/NEUMANN/actions/runs/40042071996), BOTH separate jobs SUCCESS:
+
+1. **Original bounded base proof:** `full_65536_truth_table_induction_and_independent_BDD`, job ID `120715228339`: ALL 65,536 arbitrary full truth table semantics recovered from the noiseless optimum 4×4 source; independently compiled ANF and BDD and confirmed identical all-domain outputs.
+2. **New adversarial proof:** `exhaustive_adversarial_noise_at_exact_48_bit_lower_bound`, job ID `120715228575`: ALL 3,145,728 single-bit-corrupted full-state outputs restored accurately; all 65,536 compiled ANFs verified on all 16 possible input words; strict two-copy error-collision witness; independent second context-keyed input construction and majority-decoder source proof; total 60,000 mixed noise/erasure checks. First human-readable primary SHA256 (excluding measured CPU variance) `a1742259b9eae362a69514d9fc8743b18b2c4ccb9f8e4fc2ff532238e8d3d95f`, independent SHA256 `babc220014ee16010511520fad75e8ddd645a03fd4ca89f4d6332bd0acd0e29a`. First GitHub artifact ID `12538799306`, named `neumann-q34-new-minimum-noisy48bit-all3145728-cases-and-independent-coding-audit`.
+
+Local user-deliverable full original CPU-source + primary raw stdout + independent raw stdout + separate SHA256 manifest ZIP name `NEUMANN_Q34_OPTIMAL_NOISE_3145728_VERIFIED_20261024.zip` and SHA256 `fd734bdfcc2017cf88a98e32500516b07e04ed1b1bf7b536b94885a0b06ef571`; ZIP CRC integrity PASS. The ZIP lives on the conversation artifact surface, not automatically stored in GitHub.
+
+**Gate:** bounded operator source mechanism and optimal adversarial-error recovery PASS. Not an independently learned primitive (classical program), not Q3/G1 GLOBAL, no frontier 10× and no mathematical priority novelty.
