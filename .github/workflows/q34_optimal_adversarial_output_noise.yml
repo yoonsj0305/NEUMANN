@@ -1,0 +1,65 @@
+name: NEUMANN Q34 optimal noise-resistant source operator full 3145728 adversarial cases
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q34_optimal_adversarial_output_noise.yml'
+      - 'research/q34/optimal_noisy_boolean_operator.py'
+      - 'research/q34/independent_noise_distance_audit.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  all_65536_unknown_operators_and_every_single_bit_corruption:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile new operator recovery algorithms
+        run: |
+          python -m py_compile research/q34/optimal_noisy_boolean_operator.py research/q34/independent_noise_distance_audit.py
+      - name: First exact exhaustive proof: 65536 unknown truth rules × 48 individual adversarial output flips, plus all 65536 full-domain executable ANF checks
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q34-resilient
+          python research/q34/optimal_noisy_boolean_operator.py | tee /tmp/q34-resilient/ALL_3145728_CORRUPTED_OUTPUT_OBSERVATIONS_AND_SYMBOLIC_ANF.log
+          python - <<'PY'
+          import json,pathlib
+          a=json.loads(pathlib.Path('/tmp/q34-resilient/ALL_3145728_CORRUPTED_OUTPUT_OBSERVATIONS_AND_SYMBOLIC_ANF.log').read_text().splitlines()[0])
+          assert a['all_possible_truth_table_operators']==65536
+          assert a['all_possible_single_output_bit_flip_trials']==65536*48
+          assert a['wrong_reconstructions']==0
+          assert a['every_unknown_rule_ANF_checked_all16_inputs']==65536
+          assert a['t1_optimal_output_bits']==a['t1_optimality_lower_bound']==48
+          assert a['t2_optimal_output_bits']==80
+          assert a['t2_two_flip_sampled_tests']==10000
+          assert a['scoped_optimal_noise_resilient_operator_discovery']=='PASS'
+          assert a['global_Q3']=='OPEN'
+          print('Q34_EXHAUSTIVE_ALL_OPERATOR_ALL_SINGLE_FLIP_ONE_ROUND_ERROR_CORRECTION_PASS')
+          PY
+      - name: Fully independent source geometry, 65536 unknown operator labels, direct grouped-majority correction, arbitrary flips and erasures
+        run: |
+          set -euo pipefail
+          python research/q34/independent_noise_distance_audit.py | tee /tmp/q34-resilient/INDEPENDENT_65536_GROUPED_CONTEXT_CODE_AND_60000_FLIP_ERASURE_TESTS.log
+          python - <<'PY'
+          import json,pathlib
+          d=json.loads(pathlib.Path('/tmp/q34-resilient/INDEPENDENT_65536_GROUPED_CONTEXT_CODE_AND_60000_FLIP_ERASURE_TESTS.log').read_text().splitlines()[0])
+          assert d['all65536_full_operator_tables_accepted']
+          assert d['every_corruption_at_each_of48_positions_on1024_rules']==49152
+          assert d['additional_randomized_flip_erasure_controls']==60000
+          assert d['min_one_output_bit_flip_observations']==48
+          assert d['min_one_flip_plus_one_erasure_observations']==64
+          assert d['min_two_output_bit_flips_observations']==80
+          assert d['min_one_output_erasure_bit_observations']==32
+          assert d['wrong_admissions']==0 and d['one_flip_two_copy_ambiguity_EXPLICIT']
+          print('Q34_INDEPENDENT_OPTIMAL_HAMMING_OUTPUT_DISTANCE_PROOF_PASS')
+          PY
+          sha256sum /tmp/q34-resilient/*.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q34-minimum-output-48bit-3145728-single-errors-full65536-and-60000-independent-flip-erasure-receipts
+          path: /tmp/q34-resilient/
+          if-no-files-found: error
