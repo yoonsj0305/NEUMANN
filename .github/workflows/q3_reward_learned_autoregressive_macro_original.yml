@@ -1,0 +1,133 @@
+name: NEUMANN Q3 actual self-supervised verifier reward neural GRAPH EDITS macro to authentic original SMT
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_reward_learned_autoregressive_macro_original.yml'
+      - 'research/q3/reward_learned_graph_edits_2adic_macro.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  learn_graph_edit_actions_from_math_reward_without_original_author_answer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Install pinned actual neural model and independent mathematical verifier
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check scikit-learn==1.5.2 sympy==1.13.3 z3-solver==4.13.3.0
+          python -m py_compile research/q3/reward_learned_graph_edits_2adic_macro.py
+          mkdir -p /tmp/neumann-q3-autoregressive-training
+      - name: Actual reward-driven feedback + graph-edit policy neural training; freeze before original source access
+        run: |
+          set -euo pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/q3/reward_learned_graph_edits_2adic_macro.py --mode train \
+            --out /tmp/neumann-q3-autoregressive-training/LEARNED_NAMED_LAMBDA_BEFORE_ORIGINAL_GRADE.json \
+            | tee /tmp/neumann-q3-autoregressive-training/SELF_SUPERVISED_ORACLE_TRAIN_LOG.txt
+          sha256sum /tmp/neumann-q3-autoregressive-training/LEARNED_NAMED_LAMBDA_BEFORE_ORIGINAL_GRADE.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-neural-graph-edit-source-lambda-before-real-original
+          path: /tmp/neumann-q3-autoregressive-training/
+          if-no-files-found: error
+  independently_grade_neural_generated_macro_as_theorem_on_real_original_4:
+    needs: learn_graph_edit_actions_from_math_reward_without_original_author_answer
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2023
+          ref: 7f993a017850ba547c6ea19a1bf3b54adf54a449
+          path: pinned-author-smt-original
+          sparse-checkout: |
+            non-incremental/QF_NIA/20230328-sqrtmodinv-hoenicke
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check scikit-learn==1.5.2 sympy==1.13.3 z3-solver==4.13.3.0
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-neural-graph-edit-source-lambda-before-real-original
+          path: /tmp/neumann-q3-autoregressive-training
+      - name: Verify learned new macro source AST, symbolic all-b recurrence and full unmodified author SMT four originals
+        run: |
+          set -euo pipefail
+          test "$(git -C pinned-author-smt-original rev-parse HEAD)" = 7f993a017850ba547c6ea19a1bf3b54adf54a449
+          mkdir -p /tmp/neumann-q3-real-author-original
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/q3/reward_learned_graph_edits_2adic_macro.py --mode grade \
+            --pred /tmp/neumann-q3-autoregressive-training/LEARNED_NAMED_LAMBDA_BEFORE_ORIGINAL_GRADE.json \
+            --source-root pinned-author-smt-original \
+            --out /tmp/neumann-q3-real-author-original/LEARNED_MACRO_PROOF_ALL_FOUR_ORIGINAL_SMT.json \
+            | tee /tmp/neumann-q3-real-author-original/LEARNED_PROGRAM_AUTHENTIC_PROOFS.log
+          sha256sum /tmp/neumann-q3-real-author-original/LEARNED_MACRO_PROOF_ALL_FOUR_ORIGINAL_SMT.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-native-original-four-trained-macro-proof-z3
+          path: /tmp/neumann-q3-real-author-original/
+          if-no-files-found: error
+  separate_independent_cvc5_original_source_plus_learned_proven_lemma:
+    needs: independently_grade_neural_generated_macro_as_theorem_on_real_original_4
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2023
+          ref: 7f993a017850ba547c6ea19a1bf3b54adf54a449
+          path: pinned-author-smt-original
+          sparse-checkout: |
+            non-incremental/QF_NIA/20230328-sqrtmodinv-hoenicke
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-native-original-four-trained-macro-proof-z3
+          path: /tmp/neumann-q3-real-author-original
+      - name: Independently verify whole original contradiction with cvc5 separately from neural and Z3
+        run: |
+          set -euo pipefail
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          mkdir -p /tmp/neumann-q3-cvc5-independent
+          python - <<'PY'
+          import json,subprocess,pathlib,re,hashlib
+          report=json.load(open('/tmp/neumann-q3-real-author-original/LEARNED_MACRO_PROOF_ALL_FOUR_ORIGINAL_SMT.json'))
+          assert len(report['real_originals'])==4
+          paths=pathlib.Path('pinned-author-smt-original/non-incremental/QF_NIA/20230328-sqrtmodinv-hoenicke')
+          records=[]
+          for row in report['real_originals']:
+              assert row['status']=='LEARNED_MACRO_PLUS_INDEPENDENT_ORIGINAL_PROVED',row
+              source=paths/row['original'];raw=source.read_text()
+              last=re.findall(r'\(assert\s+\(not\s+\(=\s+1\s+\(mod\s+\(\*\s+denominator\s+inv(\d+)\)\s+(\d+)\)\)\)\)',raw)
+              assert len(last)==1,(source,last)
+              i,m=last[0]
+              addition=f'(assert (= 1 (mod (* denominator inv{i}) {m})))\n'
+              assert raw.count('(check-sat)')==1
+              augmented=raw.replace('(check-sat)',addition+'(check-sat)')
+              cp=subprocess.run(['cvc5','--lang=smt2','--tlimit-per=4000','-'],
+                   input=augmented,capture_output=True,text=True,timeout=8)
+              values=[s.strip() for s in cp.stdout.splitlines() if s.strip() in ('sat','unsat','unknown')]
+              assert cp.returncode==0 and values==['unsat'],(row['original'],values,cp.stderr)
+              records.append({'original_source':row['original'],'independent_solver':'cvc5_1.4.2',
+                 'status':'ORIGINAL_PLUS_MATH_PROVED_LEMMA_UNSAT',
+                 'augmented_source_sha256':hashlib.sha256(augmented.encode()).hexdigest()})
+          output=pathlib.Path('/tmp/neumann-q3-cvc5-independent/FULL_SOURCE_INDEPENDENT_CVC5_AUTHOR_PROOFS.json')
+          output.write_text(json.dumps(records,indent=2,sort_keys=True)+'\n')
+          print('NEUMANN_Q3_LEARNED_NAMED_MACRO_INDEPENDENT_NATIVE_CVC5',len(records))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-native-original-four-trained-macro-independent-cvc5
+          path: /tmp/neumann-q3-cvc5-independent/
+          if-no-files-found: error
