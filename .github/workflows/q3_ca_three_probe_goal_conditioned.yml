@@ -1,0 +1,166 @@
+name: NEUMANN Q3 three probes before full hidden rule identification
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_ca_three_probe_goal_conditioned.yml'
+      - 'research/ood_automatabench_20261023/three_probe_task_identifiability.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  PYTHONPATH: research/ood_automatabench_20261023
+jobs:
+  physically_redact_fourth_intervention_before_source_inference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 z3-solver==4.13.3.0
+      - uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39881937232
+          github-token: ${{ github.token }}
+          name: optimal-4-vs-random-source-300x4-without-rule-or-test-answers
+          path: /tmp/dev/source_four
+      - uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39882226031
+          github-token: ${{ github.token }}
+          name: optimal-4-vs-random-source-300x4-without-rule-or-test-answers
+          path: /tmp/eval/source_four
+      - name: Copy only first three active demos and 24-completion proof per each actual original 600
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/blind-three-source
+          python research/ood_automatabench_20261023/three_probe_task_identifiability.py \
+            --mode prep \
+            --dev-source /tmp/dev/source_four/BLIND_300x4_ACTIVE_VS_RANDOM_SOURCE.jsonl \
+            --eval-source /tmp/eval/source_four/BLIND_300x4_ACTIVE_VS_RANDOM_SOURCE.jsonl \
+            --out /tmp/blind-three-source/ALL600_THREE_PROBES_ONLY_NO_FOURTH.jsonl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ca-600-three-probes-no-fourth-response-or-original-rules
+          path: /tmp/blind-three-source/
+          if-no-files-found: error
+  exact_24_rule_completion_before_original_truth:
+    needs: physically_redact_fourth_intervention_before_source_inference
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 z3-solver==4.13.3.0
+      - uses: actions/download-artifact@v4
+        with:
+          name: ca-600-three-probes-no-fourth-response-or-original-rules
+          path: /tmp/blind-three-source
+      - name: Original rule, fourth source response and original answer absent during source-only inference
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/third-only-inference
+          python research/ood_automatabench_20261023/three_probe_task_identifiability.py \
+            --mode infer \
+            --source /tmp/blind-three-source/ALL600_THREE_PROBES_ONLY_NO_FOURTH.jsonl \
+            --out /tmp/third-only-inference/ALL600_BEFORE_FOURTH_OR_ANSWERS.json \
+            | tee /tmp/third-only-inference/THIRD_ONLY_SOURCE_DECISION_LOG.txt
+          python - <<'PY'
+          import pathlib,json,hashlib
+          p=pathlib.Path('/tmp/third-only-inference/ALL600_BEFORE_FOURTH_OR_ANSWERS.json')
+          j=json.loads(p.read_text())
+          assert j['n']==600 and not j['test_targets_or_true_rules_seen']
+          assert not j['source_4th_probe_available']
+          print('THREE_SOURCE_PROBE_ALL600_SEALED_SHA256',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ca-600-source-three-probe-inference-sealed-before-truth
+          path: /tmp/third-only-inference/
+          if-no-files-found: error
+  real_original_600_third_probe_and_previous_fourth_fallback_grade:
+    needs: exact_24_rule_completion_before_original_truth
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 z3-solver==4.13.3.0
+      - uses: actions/download-artifact@v4
+        with:
+          name: ca-600-three-probes-no-fourth-response-or-original-rules
+          path: /tmp/blind-three-source
+      - uses: actions/download-artifact@v4
+        with:
+          name: ca-600-source-three-probe-inference-sealed-before-truth
+          path: /tmp/third-only-inference
+      - uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39881937232
+          github-token: ${{ github.token }}
+          name: true-original-rule-and-answers-only-for-after-seal-independent-scoring
+          path: /tmp/dev/original_truth
+      - uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39882226031
+          github-token: ${{ github.token }}
+          name: true-original-rule-and-answers-only-for-after-seal-independent-scoring
+          path: /tmp/eval/original_truth
+      - uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39881937232
+          github-token: ${{ github.token }}
+          name: opt4-rand4-6-12-all-source-only-predictions-sealed
+          path: /tmp/dev/four_predictions
+      - uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39882226031
+          github-token: ${{ github.token }}
+          name: opt4-rand4-6-12-all-source-only-predictions-sealed
+          path: /tmp/eval/four_predictions
+      - uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39881937232
+          github-token: ${{ github.token }}
+          name: original-author-optimal-4-rule-identification-and-score
+          path: /tmp/dev/four_scored
+      - uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39882226031
+          github-token: ${{ github.token }}
+          name: original-author-optimal-4-rule-identification-and-score
+          path: /tmp/eval/four_scored
+      - name: Test authentic source-only early decisions then calculate counterfactual 3-to-4 stop cost
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/independent-three-proof
+          python research/ood_automatabench_20261023/three_probe_task_identifiability.py \
+            --mode grade \
+            --source /tmp/blind-three-source/ALL600_THREE_PROBES_ONLY_NO_FOURTH.jsonl \
+            --sealed /tmp/third-only-inference/ALL600_BEFORE_FOURTH_OR_ANSWERS.json \
+            --dev-truth /tmp/dev/original_truth/ORIGINAL_TRUE_300.jsonl \
+            --eval-truth /tmp/eval/original_truth/ORIGINAL_TRUE_300.jsonl \
+            --dev-four-pregrade /tmp/dev/four_predictions/ALL1200_NO_RULE_OR_ANSWERS.json \
+            --eval-four-pregrade /tmp/eval/four_predictions/ALL1200_NO_RULE_OR_ANSWERS.json \
+            --dev-four-scored /tmp/dev/four_scored/REAL_ORIGINAL_300_OPTIMAL_FOUR_SCORE.json \
+            --eval-four-scored /tmp/eval/four_scored/REAL_ORIGINAL_300_OPTIMAL_FOUR_SCORE.json \
+            --out /tmp/independent-three-proof/REAL_600_SOURCE_GOAL_CONDITIONED_THREE_OR_FOUR.json \
+            | tee /tmp/independent-three-proof/INDEPENDENT_ORIGINAL_THREE_OR_FOUR_RESULT.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: original-authentic-600-task-three-probe-early-stop-and-four-fallback
+          path: /tmp/independent-three-proof/
+          if-no-files-found: error
