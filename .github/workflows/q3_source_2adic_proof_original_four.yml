@@ -1,0 +1,81 @@
+name: NEUMANN Q3 original four posthoc 2-adic source invariant discovery and proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_source_2adic_proof_original_four.yml'
+      - 'research/g0/source_newton_2adic_proof.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  old_opened_g0_unknown_originals_source_generated_2adic_proofs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SMT-LIB/benchmark-submission-2023
+          ref: 7f993a017850ba547c6ea19a1bf3b54adf54a449
+          path: official-original
+          sparse-checkout: |
+            non-incremental/QF_NIA/20230328-sqrtmodinv-hoenicke
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Pin exact source revision, original proof code and Z3 SMT engine
+        run: |
+          set -euo pipefail
+          test "$(git -C official-original rev-parse HEAD)" = 7f993a017850ba547c6ea19a1bf3b54adf54a449
+          python -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          python -m py_compile research/g0/source_newton_2adic_proof.py
+          mkdir -p /tmp/q3-2adic-real-original
+          lscpu | grep 'Model name' | head -1
+      - name: First full source checks plus certified 2-adic error squaring inference
+        run: |
+          set -euo pipefail
+          python research/g0/source_newton_2adic_proof.py \
+            --source-root official-original \
+            --out /tmp/q3-2adic-real-original/four_original_mathematical_certificates.json \
+            | tee /tmp/q3-2adic-real-original/actual_source_and_error_squaring.log
+      - name: Independently verify contradictions on unchanged originals plus proven final congruence using pinned cvc5
+        run: |
+          set -euo pipefail
+          curl -fL --retry 2 -o /tmp/cvc5.zip https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-static.zip
+          echo '7eb18f8c814c36a46c5a7d003983e9cfbc4b0a9828d6dd596239291bd4cc61d8  /tmp/cvc5.zip' | sha256sum -c -
+          mkdir -p /tmp/cvc5bin
+          unzip -q /tmp/cvc5.zip -d /tmp/cvc5bin
+          sudo install -m 755 "$(find /tmp/cvc5bin -type f -name cvc5 | head -1)" /usr/local/bin/cvc5
+          python - <<'PY'
+          import json,subprocess,pathlib,re,hashlib
+          raw=json.load(open('/tmp/q3-2adic-real-original/four_original_mathematical_certificates.json'))
+          assert len(raw['all_original_cases'])==4
+          result=[]
+          for row in raw['all_original_cases']:
+              assert row['status']=='ORIGINAL_UNSAT_CERTIFIED_BY_2ADIC_SOURCE_INVARIANT'
+              source=pathlib.Path('official-original/non-incremental/QF_NIA/20230328-sqrtmodinv-hoenicke')/row['source_name']
+              script=source.read_text()
+              assert hashlib.sha256(script.encode()).hexdigest()==row['original_sha256']
+              m=re.findall(r'\(assert\s+\(not\s+\(=\s+1\s+\(mod\s+\(\*\s+denominator\s+inv(\d+)\)\s+(\d+)\)\)\)\)',script)
+              assert len(m)==1
+              ident,modulus=m[0]
+              extra=f'(assert (= 1 (mod (* denominator inv{ident}) {modulus})))\n'
+              augmented=script.replace('(check-sat)',extra+'(check-sat)')
+              assert augmented!=script and augmented.count('(check-sat)')==1
+              call=subprocess.run(['cvc5','--lang=smt2','--tlimit-per=4000','-'],input=augmented,text=True,capture_output=True,timeout=7)
+              actual=[x.strip() for x in call.stdout.splitlines() if x.strip() in ('sat','unsat','unknown')]
+              assert call.returncode==0 and actual==['unsat'],(source.name,call.returncode,actual,call.stderr[-250:])
+              result.append({'source':source.name,'status':'ORIGINAL_PLUS_MATHEMATICALLY_PROVED_LEMMA_UNSAT',
+                             'original_sha256':row['original_sha256'],
+                             'independent_cvc5_receipt_sha256':hashlib.sha256(call.stdout.encode()).hexdigest(),
+                             'augmented_smt2_sha256':hashlib.sha256(augmented.encode()).hexdigest()})
+          out=pathlib.Path('/tmp/q3-2adic-real-original/independent_cvc5_original_source_bridge.json')
+          out.write_text(json.dumps(result,sort_keys=True,indent=2)+'\n')
+          print('INDEPENDENT_CVC5_ORIGINAL_PLUS_PROVED_2ADIC_LEMMA',len(result),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-four-authentic-posthoc-2adic-original-independent-mathematical-proof
+          path: /tmp/q3-2adic-real-original/
+          if-no-files-found: error
