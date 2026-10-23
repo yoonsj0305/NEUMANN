@@ -1,0 +1,129 @@
+name: NEUMANN Q34 exact seven oracle queries original ERBench fourth32 + sharp information theorem
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/neumann_exact7_original_fourth32.yml'
+      - 'research/g0/erbench_exact7_interpolation.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_author_exact_rational_oracle_private_formula_isolation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - name: Freeze official external ERBench public dataset SHA; independent universal sharp 7 point theorem
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/4th7-repo /tmp/4th7-source /tmp/4th7-private
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/g0/erbench_exact7_interpolation.py --mode theorem | tee /tmp/4th7-repo/SHARP_SEVEN_IS_MINIMUM_THEOREM.log
+          python - <<'PY'
+          import urllib.request,pathlib,hashlib
+          commit="95bf15c27de68c3f170ca6140d2e4a811c60344f"
+          uri="https://huggingface.co/datasets/EquationDiscovery/Equation_Recovery_Benchmark/resolve/"+commit+"/train.csv?download=true"
+          with urllib.request.urlopen(urllib.request.Request(uri,headers={"User-Agent":"NEUMANN-Q34-exact7/1"}),timeout=60) as res:
+              raw=res.read()
+          assert hashlib.sha256(raw).hexdigest()=="03c0ceb53ed0348650c0a94ed5cd1e452325d2b7c7d3be68f9a458316eda33b1"
+          pathlib.Path("/tmp/4th7-repo/frozen_author.csv").write_bytes(raw)
+          print("ORIGINAL_EQUATION_DISCOVERY_DATA_PIN_VERIFIED",commit,len(raw))
+          PY
+      - name: Freeze fourth untouched original task IDs then generate exact seven rational observations from private formula oracle
+        run: |
+          set -euo pipefail
+          export OPENBLAS_NUM_THREADS=1
+          PYTHONPATH=research/g0 python research/g0/erbench_exact7_interpolation.py --mode prepare \
+            --csv-path /tmp/4th7-repo/frozen_author.csv \
+            --source /tmp/4th7-source/FOURTH32_ORIGINAL_EXACT_RATIONAL_SOURCE_ONLY.json \
+            --private /tmp/4th7-private/FOURTH32_TRUE_FORMULA_PRIVATE_GRADER.json \
+            | tee /tmp/4th7-repo/ORIGINAL_SOURCE_PREP_FIRST.log
+          rm /tmp/4th7-repo/frozen_author.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: erbench-fourth32-exact7-external-original-numeric-only
+          path: /tmp/4th7-source/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: erbench-fourth32-true-author-formulas-grader-private
+          path: /tmp/4th7-private/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: erbench-fourth32-sharp-seven-mathematical-theorem-and-cohort
+          path: /tmp/4th7-repo/
+          if-no-files-found: error
+  pure_exact_rational_synthesis_from_only_seven_oracle_responses:
+    needs: source_author_exact_rational_oracle_private_formula_isolation
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          name: erbench-fourth32-exact7-external-original-numeric-only
+          path: /tmp/4th7-source
+      - name: Complete bounded-grammar classical exact interpolation with ALL probes charged and pre-grade SHA sealed
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/4th7-predictions
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/g0/erbench_exact7_interpolation.py --mode infer \
+            --source /tmp/4th7-source/FOURTH32_ORIGINAL_EXACT_RATIONAL_SOURCE_ONLY.json \
+            --out /tmp/4th7-predictions/ALL_ORIGINAL_32_SEALED_NO_TRUTH_PREDICTIONS.json \
+            | tee /tmp/4th7-predictions/BEFORE_ORIGINAL_AUTHOR_GRADE.log
+          sha256sum /tmp/4th7-predictions/ALL_ORIGINAL_32_SEALED_NO_TRUTH_PREDICTIONS.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: erbench-fourth32-exact7-original-programs-sealed-before-grade
+          path: /tmp/4th7-predictions/
+          if-no-files-found: error
+  original_full_expression_exact_independent_truth_verifier:
+    needs: pure_exact_rational_synthesis_from_only_seven_oracle_responses
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          name: erbench-fourth32-true-author-formulas-grader-private
+          path: /tmp/4th7-private
+      - uses: actions/download-artifact@v4
+        with:
+          name: erbench-fourth32-exact7-original-programs-sealed-before-grade
+          path: /tmp/4th7-predictions
+      - name: Strict original author full source symbolic identity after already sealed predictions
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/4th7-graded
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/g0/erbench_exact7_interpolation.py --mode grade \
+            --private /tmp/4th7-private/FOURTH32_TRUE_FORMULA_PRIVATE_GRADER.json \
+            --pred /tmp/4th7-predictions/ALL_ORIGINAL_32_SEALED_NO_TRUTH_PREDICTIONS.json \
+            --out /tmp/4th7-graded/FOURTH32_INDEPENDENT_FULL_ORIGINAL_AUTHOR_EQUIVALENCE.json \
+            | tee /tmp/4th7-graded/AFTER_FREEZE_EXACT_ORIGINAL_GRADE.log
+          python - <<'PY'
+          import json
+          data=json.load(open("/tmp/4th7-graded/FOURTH32_INDEPENDENT_FULL_ORIGINAL_AUTHOR_EQUIVALENCE.json"))
+          assert data['counts']['total_originals']==32 and len(data['rows'])==32
+          assert data['Q3_neurally_invented_operator']=='NOT_TESTED'
+          assert data['Q4_total_system_10x']=='NOT_PROVED'
+          print('FOURTH32_EXACT_SEVEN_ORIGINALS_ACCOUNTED')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-fourth32-exact-seven-rational-original-author-grader
+          path: /tmp/4th7-graded/
+          if-no-files-found: error
