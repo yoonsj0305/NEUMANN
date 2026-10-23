@@ -242,7 +242,7 @@ def first_source_inference(train_path,source_path,output):
                     detected.append(found)
             cases.append({"id":row["id"],
                           "status":"SOURCE_MACRO_PROPOSED" if detected else "UNKNOWN_NO_NUMERIC_MACRO",
-                          "generated_macros":detected[:30],
+                          "generated_macros":detected,
                           "actual_program_evaluations":len(trials)})
             counts["case_with_macro"]+=int(bool(detected))
             counts["macro_definitions"]+=len(detected)
