@@ -133,6 +133,7 @@ def main(a):
       "G1":"HOLD","Q4_all_in_10x":"UNPROVED"}
     path=pathlib.Path(a.out);path.parent.mkdir(parents=True,exist_ok=True)
     path.write_text(json.dumps(result,indent=2,sort_keys=True)+"\n")
+    print("Q3_NINTH32_FIVE_EXACT_PUBLIC_AUTHOR_FORMULAS_AND_NAMED_MACROS",json.dumps([{"id":x["id"],"task_ID":x["task_ID"],"author":x.get("public_author_original_expression"),"learned_macros":x["learned_certified_named_macro_expressions"][:2],"one_atom":next((v["control"].get("one_term_representable") for v in one_term_controls if v["id"]==x["id"]),None)} for x in cases if x.get("learned_certified_named_macro_expressions")],sort_keys=True),flush=True)
     print("Q3_FIRST_NINTH32_TRUE_ORIGINAL_MATH_CLASS_POSTGRADE_AUDIT",
         json.dumps({"counts":dict(totals),
            "known_train_and_eval_cpu":fullknown,
