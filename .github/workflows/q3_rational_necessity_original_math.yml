@@ -1,0 +1,42 @@
+name: NEUMANN Q3 decisive rational program necessity theorem and complete classical countercontrol
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_rational_necessity_original_math.yml'
+      - 'research/q3/compositional_rational_necessity.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  all_polynomial_no_go_quotient_constructive_theorem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check sympy==1.13.3
+      - name: Strict algebraic polynomial impossibility and genuinely new rational quotient AST syntax
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-rational-proof
+          python -m py_compile research/q3/compositional_rational_necessity.py
+          python research/q3/compositional_rational_necessity.py \
+            --out /tmp/q3-rational-proof/RATIONAL_VS_POLYNOMIAL_FORMAL_SEPARATION.json \
+            | tee /tmp/q3-rational-proof/EXACT_CERTIFICATE_CONSOLE.log
+          python - <<'PY'
+          import json
+          a=json.load(open('/tmp/q3-rational-proof/RATIONAL_VS_POLYNOMIAL_FORMAL_SEPARATION.json'))
+          assert a['primary_theorem']['symbolic_parameter_identity_proven']
+          assert len(a['positive'])==12 and len(a['negative'])==6
+          assert a['decision']['neural_expression_creation']=='NOT_PROVED'
+          assert all(r['strong_classical']['status']=='EXACT_CERTIFIED' for r in a['positive'])
+          print('STRONG_CLASSICAL_CONTROL_NOT_IGNORED')
+          PY
+          sha256sum /tmp/q3-rational-proof/RATIONAL_VS_POLYNOMIAL_FORMAL_SEPARATION.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-strict-polynomial-nogo-and-rational-div-program-strong-specialist
+          path: /tmp/q3-rational-proof/
+          if-no-files-found: error
