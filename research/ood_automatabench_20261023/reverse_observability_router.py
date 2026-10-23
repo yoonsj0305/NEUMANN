@@ -71,10 +71,30 @@ def solve_terminal_inverse(task,miss_cap=MAX_TERMINAL_MISSING):
         if not len(states):break
         if time_index>0:
             states=reverse_step_vector(states,perm,h,w,time_index-1)
-    if len(states)!=1:
-        return {"status":"UNKNOWN_NO_UNIQUE_REVERSE" if len(states)>1 else "UNSAT_NO_REVERSE",
-                "prediction":None,"remaining_states":len(states),
+    if len(states)>1:
+        # Bijection means distinct terminal completions map to DISTINCT
+        # initial states. Independently replay two source-compatible initial
+        # states to give a constructive, rather than heuristic, nonuniqueness
+        # proof. This is a complete decision within the <=2^10 terminal class.
+        witnesses=list(dict.fromkeys(int(v) for v in states))[:2]
+        if len(witnesses)!=2:
+            raise AssertionError("distinct terminal states collapsed during bijective inversion")
+        witness_grids=[["".join(str((value>>(y*w+x))&1) for x in range(w)) for y in range(h)]
+                       for value in witnesses]
+        assert witness_grids[0]!=witness_grids[1]
+        for candidate in witness_grids:
+            assert native_verify(task,candidate),"invalid reverse-model nonuniqueness proof"
+        return {"status":"PROVEN_NONUNIQUE_EXHAUSTIVE_TERMINAL_COMPLETIONS",
+                "prediction":None,"uniqueness":"DISPROVEN_BY_TWO_EXACT_INITIAL_STATES",
+                "remaining_states":len(states),"witness_count":2,
+                "witness_initial_states":witness_grids,
+                "witness_identity_sha256":hashlib.sha256(
+                    (str(witnesses[0])+":"+str(witnesses[1])).encode()).hexdigest(),
                 "terminal_unknown":m,"survivors_per_t":size_by_time,
+                "cpu_s":time.process_time()-t0}
+    if len(states)==0:
+        return {"status":"UNSAT_NO_REVERSE","prediction":None,
+                "remaining_states":0,"terminal_unknown":m,"survivors_per_t":size_by_time,
                 "cpu_s":time.process_time()-t0}
     bits=int(states[0])
     answer=["".join("1" if (bits>>(y*w+x))&1 else "0" for x in range(w)) for y in range(h)]
@@ -147,12 +167,14 @@ def prove_nonunique_two_reversible_witnesses(task,trial_cap=256):
         if t>0:states=reverse_step_vector(states,perm,h,w,t-1)
     witnesses=list(dict.fromkeys(int(v) for v in states))[:2]
     if len(witnesses)!=2:return None
-    for bits in witnesses:
-        initial=["".join(str((bits>>(y*w+x))&1) for x in range(w)) for y in range(h)]
+    witness_grids=[["".join(str((bits>>(y*w+x))&1) for x in range(w)) for y in range(h)]
+                   for bits in witnesses]
+    assert witnesses[0]!=witnesses[1] and witness_grids[0]!=witness_grids[1]
+    for initial in witness_grids:
         assert native_verify(task,initial),"false nonunique proof"
-    assert witnesses[0]!=witnesses[1]
     return {"status":"PROVEN_NONUNIQUE_TWO_DISTINCT_INITIAL_STATES",
             "prediction":None,"witnesses_verified_by_forward_simulation":2,
+            "witness_initial_states":witness_grids,
             "witness_identity_sha256":hashlib.sha256(
                 (str(witnesses[0])+":"+str(witnesses[1])).encode()).hexdigest(),
             "source_terminal_unobserved":len(missing),
