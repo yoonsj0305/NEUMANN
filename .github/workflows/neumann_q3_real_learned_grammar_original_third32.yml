@@ -1,0 +1,142 @@
+name: NEUMANN Q3 original ERBench third32 actual trained grammar proposal versus exhaustive same-program classical
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/neumann_q3_real_learned_grammar_original_third32.yml'
+      - 'research/g0/erbench_original_third.py'
+      - 'research/g0/erbench_learned_grammar_router.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_author_training_safely_separated_from_untouched_third32:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - name: Resolve and verify previously frozen upstream ORIGINAL author git and exact dataset SHA before reading rows
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/ERBthird-prepared/source /tmp/ERBthird-prepared/true-private /tmp/ERBthird-prepared/train
+          python - <<'PY'
+          import urllib.request,pathlib,hashlib
+          ref="95bf15c27de68c3f170ca6140d2e4a811c60344f"
+          url="https://huggingface.co/datasets/EquationDiscovery/Equation_Recovery_Benchmark/resolve/"+ref+"/train.csv?download=true"
+          req=urllib.request.Request(url,headers={"User-Agent":"NEUMANN-Q3-real-learned-grammar-originals/1"})
+          with urllib.request.urlopen(req,timeout=60) as f:raw=f.read()
+          sha=hashlib.sha256(raw).hexdigest()
+          assert sha=="03c0ceb53ed0348650c0a94ed5cd1e452325d2b7c7d3be68f9a458316eda33b1"
+          pathlib.Path("/tmp/ERBthird-prepared/train.csv").write_bytes(raw)
+          print('ORIGINAL_AUTHOR_THIRD32_PUBLIC_SOURCE_LOCKED',ref,sha,len(raw),flush=True)
+          PY
+      - name: Create actual other-original training grammar labels and third original source only, private answer isolated
+        run: |
+          set -euo pipefail
+          export OPENBLAS_NUM_THREADS=1
+          python research/g0/erbench_learned_grammar_router.py --mode prepare_train \
+            --csv-path /tmp/ERBthird-prepared/train.csv \
+            --train /tmp/ERBthird-prepared/train/DISJOINT_ORIGINAL_GRAMMAR_LABELS.json
+          python research/g0/erbench_original_third.py --mode prepare \
+            --csv-path /tmp/ERBthird-prepared/train.csv \
+            --revision 95bf15c27de68c3f170ca6140d2e4a811c60344f \
+            --source /tmp/ERBthird-prepared/source/THIRD32_ONLY_NUMERIC_SOURCE.json \
+            --truth /tmp/ERBthird-prepared/true-private/THIRD32_PRIVATE_ORIGINAL_FORMULAS.json
+          python - <<'PY'
+          import json
+          t=json.load(open('/tmp/ERBthird-prepared/train/DISJOINT_ORIGINAL_GRAMMAR_LABELS.json'))
+          s=json.load(open('/tmp/ERBthird-prepared/source/THIRD32_ONLY_NUMERIC_SOURCE.json'))
+          assert t['train_position_start']==96 and t['evaluation_position_end_exclusive']==96
+          assert s['all_selected']==32
+          print('NEUMANN_PUBLIC_TRAIN_VS_ORIGINAL_THIRD_DISJOINT',len(t['training_observed_numeric_and_target_grammar_category_only']),32)
+          PY
+          rm -f /tmp/ERBthird-prepared/train.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-third-original-train-labels-from-nonoverlap-author-originals
+          path: /tmp/ERBthird-prepared/train/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-third-original-numeric-source-no-target-formulas
+          path: /tmp/ERBthird-prepared/source/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-third-original-private-true-formulas-grader-only
+          path: /tmp/ERBthird-prepared/true-private/
+          if-no-files-found: error
+  actual_cross_task_MLP_training_and_source_only_expression_proposals:
+    needs: original_author_training_safely_separated_from_untouched_third32
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-third-original-train-labels-from-nonoverlap-author-originals
+          path: /tmp/ERBthird-train
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-third-original-numeric-source-no-target-formulas
+          path: /tmp/ERBthird-source
+      - name: Train real MLP; same expressions available to frozen exact full-library classical
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/ERBthird-pred
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python research/g0/erbench_learned_grammar_router.py --mode infer \
+            --train /tmp/ERBthird-train/DISJOINT_ORIGINAL_GRAMMAR_LABELS.json \
+            --source /tmp/ERBthird-source/THIRD32_ONLY_NUMERIC_SOURCE.json \
+            --pred /tmp/ERBthird-pred/LEARNED_AND_EXHAUSTIVE_SOURCE_PREDICTIONS.json \
+            | tee /tmp/ERBthird-pred/BEFORE_GRADE_ACTUAL_LEARNING.log
+          sha256sum /tmp/ERBthird-pred/LEARNED_AND_EXHAUSTIVE_SOURCE_PREDICTIONS.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-third-original-actual-learned-grammar-source-predictions-sealed
+          path: /tmp/ERBthird-pred/
+          if-no-files-found: error
+  independent_original_author_32_exact_expression_grader:
+    needs: actual_cross_task_MLP_training_and_source_only_expression_proposals
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-third-original-private-true-formulas-grader-only
+          path: /tmp/ERBthird-true-original
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-third-original-actual-learned-grammar-source-predictions-sealed
+          path: /tmp/ERBthird-pred
+      - name: Exact symbolic original formulas versus frozen MLP, fixed classical, strong full-library classical
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/ERBthird-grade
+          OPENBLAS_NUM_THREADS=1 python research/g0/erbench_learned_grammar_router.py --mode grade \
+            --truth /tmp/ERBthird-true-original/THIRD32_PRIVATE_ORIGINAL_FORMULAS.json \
+            --pred /tmp/ERBthird-pred/LEARNED_AND_EXHAUSTIVE_SOURCE_PREDICTIONS.json \
+            --out /tmp/ERBthird-grade/ALL_ORIGINAL32_EXACT_SYMBOLIC_GRADE.json \
+            | tee /tmp/ERBthird-grade/REAL_Q3_GRADE.log
+          python - <<'PY'
+          import json
+          p=json.load(open('/tmp/ERBthird-grade/ALL_ORIGINAL32_EXACT_SYMBOLIC_GRADE.json'))
+          assert all(x['all']==32 for x in p['independently_graded'].values())
+          assert not p['G1_pass']
+          print("GLOBAL_Q3_NEW_LEARNED_PRIMITIVE_STILL_NOT_PROVEN")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-third-original-independent-grade-and-matched-classical-analysis
+          path: /tmp/ERBthird-grade/
+          if-no-files-found: error
