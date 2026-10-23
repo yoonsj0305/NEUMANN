@@ -5,6 +5,8 @@ on:
       - '.github/workflows/q34_one_shot_boolean_operator.yml'
       - 'research/q34/one_shot_boolean_operator.py'
       - 'research/q34/independent_shannon_audit.py'
+      - 'research/q34/optimal_noisy_boolean_operator.py'
+      - 'research/q34/independent_noise_distance_audit.py'
   workflow_dispatch:
 permissions:
   contents: read
@@ -50,4 +52,55 @@ jobs:
         with:
           name: neumann-q34-first-exhaustive-65536-operator-one-probe-anf-plus-independent-shannon-exact
           path: /tmp/neumann-q34-first/
+          if-no-files-found: error
+
+  exhaustive_adversarial_noise_at_exact_48_bit_lower_bound:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prove every 4-input Boolean operator under every one of 48 adversarial observed output bit flips and compile all ANFs
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q34-noisy-one-shot
+          python research/q34/optimal_noisy_boolean_operator.py | tee /tmp/q34-noisy-one-shot/ALL_3145728_ADVERSARIAL_FLIPS_PRIMARY.log
+          python - <<'PY'
+          import json,pathlib
+          s=pathlib.Path('/tmp/q34-noisy-one-shot/ALL_3145728_ADVERSARIAL_FLIPS_PRIMARY.log').read_text().splitlines()
+          x=json.loads(s[0])
+          assert x['all_possible_truth_table_operators']==65536
+          assert x['all_possible_single_output_bit_flip_trials']==3145728
+          assert x['wrong_reconstructions']==0
+          assert x['every_unknown_rule_ANF_checked_all16_inputs']==65536
+          assert x['t1_optimal_output_bits']==x['t1_optimality_lower_bound']==48
+          assert x['t2_optimal_output_bits']==80
+          assert x['scoped_optimal_noise_resilient_operator_discovery']=='PASS'
+          assert x['global_Q3']=='OPEN'
+          print('Q34_TRUE_UNRESTRICTED_ALL_OPERATORS_EVERY_SINGLE_CORRUPTION_PROVEN')
+          PY
+      - name: Independent context-key grouped repetition/erasure decoder with impossible two-copy counterexample
+        run: |
+          set -euo pipefail
+          python research/q34/independent_noise_distance_audit.py | tee /tmp/q34-noisy-one-shot/INDEPENDENT_SOURCE_GROUPED_CODING_60000_ERROR_CONTROLS.log
+          python - <<'PY'
+          import json,pathlib
+          x=json.loads(pathlib.Path('/tmp/q34-noisy-one-shot/INDEPENDENT_SOURCE_GROUPED_CODING_60000_ERROR_CONTROLS.log').read_text().splitlines()[0])
+          assert x['all65536_full_operator_tables_accepted'] is True
+          assert x['every_corruption_at_each_of48_positions_on1024_rules']==49152
+          assert x['additional_randomized_flip_erasure_controls']==60000
+          assert x['wrong_admissions']==0
+          assert x['min_one_output_bit_flip_observations']==48
+          assert x['min_two_output_bit_flips_observations']==80
+          assert x['one_flip_two_copy_ambiguity_EXPLICIT'] is True
+          print('Q34_TRUE_INDEPENDENT_MINIMUM_HAMMING_DISTANCE_PROOF_PASS')
+          PY
+          sha256sum /tmp/q34-noisy-one-shot/*.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q34-new-minimum-noisy48bit-all3145728-cases-and-independent-coding-audit
+          path: /tmp/q34-noisy-one-shot/
           if-no-files-found: error
