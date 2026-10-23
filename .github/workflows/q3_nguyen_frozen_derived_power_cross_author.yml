@@ -1,10 +1,12 @@
-name: NEUMANN Q6 FIRST cross-author Nguyen originals frozen ERBench learned policy
+name: NEUMANN Q6 Nguyen and Q3 Keijzer independent real original source studies
 on:
   pull_request:
     paths:
       - '.github/workflows/q3_nguyen_frozen_derived_power_cross_author.yml'
       - 'research/q3/nguyen_external_first8_prepare.py'
       - 'research/q3/nguyen_frozen_real_model_cross_author.py'
+      - 'research/q3/keijzer6_induced_fold_source_model.py'
+      - '.github/workflows/q3_keijzer6_source_induced_all_integer_proof.yml'
   workflow_dispatch:
 permissions:
   contents: read
@@ -126,4 +128,115 @@ jobs:
         with:
           name: neumann-q6-first-real-nguyen8-full-analytic-author-exact-independent-grade
           path: /tmp/q6ng/graded
+          if-no-files-found: error
+
+  keijzer6_original_source_and_physically_private_author:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 scipy==1.14.1 sympy==1.13.3 scikit-learn==1.5.2
+      - name: Separate original published Keijzer6 n1..50 SOURCE and true author n51..120 heldout exact rationals
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/keijzer-auth/source /tmp/keijzer-auth/private
+          OPENBLAS_NUM_THREADS=1 python research/q3/keijzer6_induced_fold_source_model.py --mode prepare \
+            --source /tmp/keijzer-auth/source/KEIJZER6_SOURCE_NUMERIC_ONLY.json \
+            --truth /tmp/keijzer-auth/private/KEIJZER6_TRUE_ORIGINAL_AND_EXTRAPOLATION.json
+          python - <<'PY'
+          import json
+          p=json.load(open('/tmp/keijzer-auth/source/KEIJZER6_SOURCE_NUMERIC_ONLY.json'))
+          assert len(p['source_numeric_without_equations'][0]['x'])==50
+          assert 'harmonic' not in str(p)
+          print('Q3_KEIJZER6_ONLY_SOURCE_NUMERIC_AVAILABLE_TO_NEXT_JOB')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: keijzer6-public-original-numeric-only-no-formula-source
+          path: /tmp/keijzer-auth/source/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: keijzer6-physically-private-real-original-author-and-70-rationals
+          path: /tmp/keijzer-auth/private/
+          if-no-files-found: error
+  keijzer6_neural_frozen_source_numeric_pregrade:
+    needs: keijzer6_original_source_and_physically_private_author
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 scipy==1.14.1 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: keijzer6-public-original-numeric-only-no-formula-source
+          path: /tmp/keijzer-auth/source
+      - name: Positive shifted reciprocal and direct polynomial controls, corrupted source negative control
+        run: |
+          set -euo pipefail
+          OPENBLAS_NUM_THREADS=1 python - <<'PY'
+          import importlib.util,numpy as np
+          spec=importlib.util.spec_from_file_location('q3_fold','research/q3/keijzer6_induced_fold_source_model.py')
+          mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod)
+          n=np.arange(1,51)
+          x={'x':n.tolist(),'y':np.cumsum(3/(n+7)**2).tolist()}
+          assert mod.fold(x)[0] is not None and mod.direct(x)[0] is None
+          y={'x':n.tolist(),'y':(2*n**3-3*n+7).tolist()}
+          assert mod.direct(y)[0] is not None and mod.fold(y)[0] is None
+          z={'x':n.tolist(),'y':x['y'].copy()}
+          z['y'][35]+=0.05
+          assert mod.fold(z)[0] is None
+          print('KEIJZER6_POSITIVE_NEGATIVE_SOURCE_VALIDATION_CONTROLS_PASS')
+          PY
+      - name: Train real neural policy on 112 OTHER synthetic numeric sequences and freeze first original symbolic macro without gold
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/keijzer-auth/pred
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python research/q3/keijzer6_induced_fold_source_model.py --mode infer \
+            --source /tmp/keijzer-auth/source/KEIJZER6_SOURCE_NUMERIC_ONLY.json \
+            --pred /tmp/keijzer-auth/pred/FIRST_KEIJZER6_NEURAL_RECURSIVE_MACRO_BEFORE_ORIGINAL_GOLD.json \
+            | tee /tmp/keijzer-auth/pred/ORIGINAL_SOURCE_ONLY_NEURAL_POLICY_AND_MACRO.log
+          sha256sum /tmp/keijzer-auth/pred/FIRST_KEIJZER6_NEURAL_RECURSIVE_MACRO_BEFORE_ORIGINAL_GOLD.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: keijzer6-first-trained-neural-generated-named-recursive-programs-pregrade
+          path: /tmp/keijzer-auth/pred/
+          if-no-files-found: error
+  keijzer6_independent_real_author_mathematical_whole_domain_proof:
+    needs: keijzer6_neural_frozen_source_numeric_pregrade
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 scipy==1.14.1 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: keijzer6-physically-private-real-original-author-and-70-rationals
+          path: /tmp/keijzer-auth/true
+      - uses: actions/download-artifact@v4
+        with:
+          name: keijzer6-first-trained-neural-generated-named-recursive-programs-pregrade
+          path: /tmp/keijzer-auth/pred
+      - name: Independent published author whole n-positive-integer proof via base and recurrence + exact 70 unseen heldout rationals, compare all classical
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/keijzer-auth/grade
+          OPENBLAS_NUM_THREADS=1 python research/q3/keijzer6_induced_fold_source_model.py --mode grade \
+            --truth /tmp/keijzer-auth/true/KEIJZER6_TRUE_ORIGINAL_AND_EXTRAPOLATION.json \
+            --pred /tmp/keijzer-auth/pred/FIRST_KEIJZER6_NEURAL_RECURSIVE_MACRO_BEFORE_ORIGINAL_GOLD.json \
+            --out /tmp/keijzer-auth/grade/FIRST_KEIJZER6_TRUE_AUTHOR_ALL_N_INDUCTION_AND_70_EXACT.json \
+            | tee /tmp/keijzer-auth/grade/INDEPENDENT_RECURSIVE_ORIGINAL_WHOLE_DOMAIN_PROOF.log
+          sha256sum /tmp/keijzer-auth/grade/FIRST_KEIJZER6_TRUE_AUTHOR_ALL_N_INDUCTION_AND_70_EXACT.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: keijzer6-first-full-source-mathematical-induction-and-exact-70-holdouts
+          path: /tmp/keijzer-auth/grade/
           if-no-files-found: error
