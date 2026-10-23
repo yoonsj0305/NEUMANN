@@ -1,0 +1,64 @@
+name: NEUMANN Q3Q4 original 600 optimal four-probe postgrade CPU audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q34_optimal_probe_postgrade_600_cost.yml'
+      - 'research/ood_automatabench_20261023/optimal_probe_cost_after_grade.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_two_cohorts_frozen_source_cpu_and_independent_original_grades:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39881937232
+          github-token: ${{ github.token }}
+          name: opt4-rand4-6-12-all-source-only-predictions-sealed
+          path: /tmp/dev/pregrade
+      - uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39881937232
+          github-token: ${{ github.token }}
+          name: original-author-optimal-4-rule-identification-and-score
+          path: /tmp/dev/grade
+      - uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39882226031
+          github-token: ${{ github.token }}
+          name: opt4-rand4-6-12-all-source-only-predictions-sealed
+          path: /tmp/eval/pregrade
+      - uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39882226031
+          github-token: ${{ github.token }}
+          name: original-author-optimal-4-rule-identification-and-score
+          path: /tmp/eval/grade
+      - name: Audit four original immutable prediction/score receipts without rerunning or refitting
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/audited-sample-and-cpu
+          python -m py_compile research/ood_automatabench_20261023/optimal_probe_cost_after_grade.py
+          python research/ood_automatabench_20261023/optimal_probe_cost_after_grade.py \
+            --public_dev-pregrade /tmp/dev/pregrade/ALL1200_NO_RULE_OR_ANSWERS.json \
+            --public_dev-scored /tmp/dev/grade/REAL_ORIGINAL_300_OPTIMAL_FOUR_SCORE.json \
+            --public_eval-pregrade /tmp/eval/pregrade/ALL1200_NO_RULE_OR_ANSWERS.json \
+            --public_eval-scored /tmp/eval/grade/REAL_ORIGINAL_300_OPTIMAL_FOUR_SCORE.json \
+            --out /tmp/audited-sample-and-cpu/REAL_ORIGINAL_600_OPTIMAL_EXPERIMENT_DESIGN_POSTGRADE_COST.json \
+            | tee /tmp/audited-sample-and-cpu/REAL_TWO_SPLIT_SCIENTIFIC_RESULT.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: original-author-600-exact-optimal-probe-postgrade-cost-verified
+          path: /tmp/audited-sample-and-cpu/
+          if-no-files-found: error
