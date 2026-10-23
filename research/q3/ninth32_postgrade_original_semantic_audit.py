@@ -91,7 +91,7 @@ def main(a):
         totals["all"]+=1;totals[cls]+=1
         exact=first["D_learned_macro_top80"][id]["certified_named_macros"]
         if exact:
-            label["public_author_original_expression"]=str(expression)
+            author_repr=str(expression)
             one=one_rational_primitive_suffices(sp.cancel(sp.together(expression))) if cls in ("AFFINE_RATIONAL_ORIGINAL","NONAFFINE_RATIONAL_ORIGINAL") else {"status":"UNKNOWN_NOT_RATIONAL"}
             one_term_controls.append({"id":id,"control":one})
             if one.get("one_term_representable") is False:totals["learned_exact_requiring_two_rational_bases"]+=1
@@ -102,6 +102,7 @@ def main(a):
            "id":id,"collection":row["collection"],"task_ID":row["task_ID"],
            "author_formula_SHA256":hashlib.sha256(row["original_expression"].encode()).hexdigest(),
            "mathematical_author_original_category":cls,
+           "public_author_original_expression":(author_repr if exact else None),
            "author_rational_numerator_denominator_degrees":degrees,
            "original_exact_grade":{k:id in v for k,v in original_exact_ids.items()},
            "learned_certified_named_macro_expressions":[v["named_lambda"] for v in exact],
