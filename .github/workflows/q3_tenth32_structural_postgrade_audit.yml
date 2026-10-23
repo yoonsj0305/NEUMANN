@@ -1,0 +1,62 @@
+name: NEUMANN Q3 first tenth32 real learned structural-action FULL immutable evidence audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_tenth32_structural_postgrade_audit.yml'
+      - 'research/q3/tenth32_immutable_structure_action_audit.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify_source_first_original_and_learning_counterfactuals_without_retuning:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39934318424
+          name: neumann-q3-tenth32-author-source-only-numeric
+          github-token: ${{ github.token }}
+          path: /tmp/q3-tenth-first/source
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39934318424
+          name: neumann-q3-tenth32-private-true-author-function-grader-only
+          github-token: ${{ github.token }}
+          path: /tmp/q3-tenth-first/truth
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39934318424
+          name: neumann-q3-tenth32-frozen-structural-action-neural-macros-before-authored-grade
+          github-token: ${{ github.token }}
+          path: /tmp/q3-tenth-first/pred
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39934318424
+          name: neumann-q3-tenth32-independent-original-author-full-symbolic-proof-structural-edit
+          github-token: ${{ github.token }}
+          path: /tmp/q3-tenth-first/grade
+      - name: Compare original math and learned graph actions only after all SHA source receipts assert first-run identity
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-tenth-first/audit
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/q3/tenth32_immutable_structure_action_audit.py \
+            --source /tmp/q3-tenth-first/source/TENTH32_PUBLIC_SOURCE_NUMERIC_ONLY.json \
+            --truth /tmp/q3-tenth-first/truth/TENTH32_PRIVATE_TRUE_AUTHOR_EQUATIONS.json \
+            --pred /tmp/q3-tenth-first/pred/FIRST_TENTH32_LEARNED_STRUCTURAL_EDIT_MACROS_AND_ALL_CLASSICAL.json \
+            --grade /tmp/q3-tenth-first/grade/TENTH32_FIRST_TRUE_AUTHOR_SYMBOLIC_EQUIVALENCE_ALL_STRUCTURAL_ARMS.json \
+            --out /tmp/q3-tenth-first/audit/FIRST_TENTH32_SOURCE_FROZEN_STRUCTURAL_ACTION_LEARNING_VS_CLASSICAL.json \
+            | tee /tmp/q3-tenth-first/audit/ACTUAL_MODEL_SELECTED_GRAPH_EDIT_ACTION_COUNTERFACTUALS.log
+          sha256sum /tmp/q3-tenth-first/audit/FIRST_TENTH32_SOURCE_FROZEN_STRUCTURAL_ACTION_LEARNING_VS_CLASSICAL.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-tenth32-first-real-original-structural-action-neural-macro-failure-audit
+          path: /tmp/q3-tenth-first/audit/
+          if-no-files-found: error
