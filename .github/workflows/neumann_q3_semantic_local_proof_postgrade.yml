@@ -1,0 +1,50 @@
+name: NEUMANN Q3 all-input local equivalence proof of 960 prior source programs
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/neumann_q3_semantic_local_proof_postgrade.yml'
+      - 'research/ood_automatabench_20261023/local_equivalence_certificate.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  PYTHONPATH: research/ood_automatabench_20261023
+jobs:
+  source_proof_then_compare_true_only_after_all_local_program_equivalences:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39885239826
+          github-token: ${{ github.token }}
+          name: ca-hidden-geometry-source-without-family
+          path: /tmp/original-unmodified-no-family-source
+      - uses: actions/download-artifact@v4
+        with:
+          repository: yoonsj0305/NEUMANN
+          run-id: 39885239826
+          github-token: ${{ github.token }}
+          name: ca-hidden-geometry-original-rule-and-12x12-truth-grader-only
+          path: /tmp/original-ground-truth-after-first-grade
+      - name: Exhaustively prove same local program outputs for all input 3x3 supports and four site parities
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/semantic-postgrade
+          python -m py_compile research/ood_automatabench_20261023/local_equivalence_certificate.py
+          python research/ood_automatabench_20261023/local_equivalence_certificate.py \
+            --source-dir /tmp/original-unmodified-no-family-source \
+            --truth-dir /tmp/original-ground-truth-after-first-grade \
+            --out /tmp/semantic-postgrade/ALL960_LOCAL_OPERATOR_EQUIVALENCE_POSTGRADE.json \
+            | tee /tmp/semantic-postgrade/SEMANTIC_AUDIT.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-finite-block-semantic-equivalence-960-after-grade-proof
+          path: /tmp/semantic-postgrade/
+          if-no-files-found: error
