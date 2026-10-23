@@ -1,0 +1,58 @@
+name: NEUMANN postgrade 64bit terminal reverse mismatch investigation
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/neumann_multisize_postgrade_diagnostic.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  PYTHONPATH: research/ood_automatabench_20261023
+jobs:
+  postgrade_reproduce_source_and_trace_known_initial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 numpy==1.26.4
+      - name: ONLY after original independent scoring, compare known real forward states vs reversed candidate survival
+        run: |
+          set -euo pipefail
+          python research/ood_automatabench_20261023/generated_6x6_8x8_source.py --out-root /tmp/diagnostic
+          python - <<'PY'
+          import collections,json,pathlib
+          import numpy as np
+          from reversible_ca_solver import roll_one
+          from reverse_observability_router import solve_terminal_inverse,reverse_step_vector
+          source=[json.loads(x) for x in pathlib.Path('/tmp/diagnostic/source/SYNTHETIC_160_NO_TRUTH.jsonl').read_text().splitlines()]
+          truth={x['id']:x for x in (json.loads(z) for z in pathlib.Path('/tmp/diagnostic/sealed_truth/SYNTHETIC_160_TRUTH_ONLY_FOR_GRADER.jsonl').read_text().splitlines())}
+          for idx in (0,1,2,20,40,59):
+              task=next(z for z in source if z['id']==f'independent_author_ca_8x8_dense_terminal_{idx:03}')
+              h=w=8;T=task['time_horizon'];perm=task['rule']['permutation']
+              init=[[int(v) for v in row] for row in truth[task['id']]['answer']['initial_state']]
+              history=[init]
+              for t in range(T):history.append(roll_one(history[-1],t,perm))
+              mk=lambda s:sum(v<<(y*8+x) for y,row in enumerate(s) for x,v in enumerate(row))
+              true=[mk(s) for s in history]
+              actual=solve_terminal_inverse(task)
+              observations=collections.defaultdict(list)
+              for o in task['observations']:observations[o['t']].append(o)
+              terminal={o['y']*8+o['x']:o['value'] for o in observations[T]}
+              missing=[p for p in range(64) if p not in terminal]
+              fixed=sum(np.uint64(val)<<np.uint64(pos) for pos,val in terminal.items())
+              choices=np.arange(1<<len(missing),dtype=np.uint64)
+              states=np.full(len(choices),np.uint64(fixed),dtype=np.uint64)
+              for j,pos in enumerate(missing):states|=((choices>>np.uint64(j))&np.uint64(1))<<np.uint64(pos)
+              trace=[]
+              for at in range(T,-1,-1):
+                  for o in observations[at]:
+                      pos=o['y']*8+o['x']
+                      states=states[((states>>np.uint64(pos))&np.uint64(1))==o['value']]
+                  trace.append([at,int(len(states)),bool(np.any(states==np.uint64(true[at])))])
+                  if not len(states):break
+                  if at>0:states=reverse_step_vector(states,perm,8,8,at-1)
+              print('POSTGRADE_8X8_DIAGNOSTIC',idx,'status',actual['status'],'true_final',hex(true[T]),
+                    'trace',trace,'numpy',np.__version__,flush=True)
+          PY
