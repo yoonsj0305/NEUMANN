@@ -1,0 +1,153 @@
+name: NEUMANN Q3 four optimal source probes versus twelve random observations
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_hidden_rule_optimal_four_probe_dev.yml'
+      - 'research/ood_automatabench_20261023/optimal_four_probe_generator.py'
+      - 'research/ood_automatabench_20261023/optimal_four_probe_source_grade.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  PYTHONPATH: research/ood_automatabench_20261023
+jobs:
+  pinned_original_true_rule_only_in_calibration_construction:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 numpy==1.26.4
+      - name: Pin original independent author's DEV300 and mathematically audit 4-probe coverage
+        run: |
+          set -euo pipefail
+          python -m py_compile research/ood_automatabench_20261023/optimal_four_probe_*.py
+          mkdir -p /tmp/true-rule-only /tmp/optimal-calibration-source
+          python - <<'PY'
+          import pathlib,urllib.request,json,hashlib
+          sha='7d86373fdb63fe1bd3592ddf71d923ceebc5acd9'
+          url=f'https://raw.githubusercontent.com/neelsomani/automata-bench/{sha}/data/public_dev.jsonl'
+          with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'NEUMANN-optimal-4-probes-original'}),timeout=120) as f:
+              raw=f.read()
+          orig=[json.loads(l) for l in raw.splitlines()]
+          assert len(orig)==len({d['id'] for d in orig})==300
+          pathlib.Path('/tmp/true-rule-only/ORIGINAL_TRUE_300.jsonl').write_bytes(raw)
+          pathlib.Path('/tmp/true-rule-only/ORIGINAL_IDENTITY.json').write_text(
+              json.dumps({'sha':sha,'original_sha256':hashlib.sha256(raw).hexdigest()}))
+          PY
+          python research/ood_automatabench_20261023/optimal_four_probe_generator.py \
+            --original /tmp/true-rule-only/ORIGINAL_TRUE_300.jsonl \
+            --out /tmp/optimal-calibration-source
+          python - <<'PY'
+          from optimal_four_probe_generator import design_probe
+          from hidden_rule_inference import source_pair_mapping,candidate_rules
+          from reversible_ca_solver import roll_one
+          import random
+          rng=random.Random(202610230909)
+          for trial in range(64):
+              perm=list(range(16));rng.shuffle(perm)
+              generated=[]
+              for i in range(4):
+                  orig=design_probe(i)
+                  future=roll_one(orig,0,perm)
+                  generated.append({'before':[''.join(map(str,r)) for r in orig],
+                                    'after':[''.join(map(str,r)) for r in future]})
+              partial,error=source_pair_mapping(generated[:3])
+              assert error is None and len(partial)==12
+              solutions,missing=candidate_rules(partial,4)
+              assert missing==4 and len(solutions)==24
+              assert tuple(perm) in solutions
+              complete,error=source_pair_mapping(generated)
+              assert error is None and len(complete)==16
+              assert tuple(complete[x] for x in range(16))==tuple(perm)
+          print('64_INDEPENDENT_RANDOM_REVERSIBLE_RULES_4_PROBE_EXACT_AND_3_PROBE_24_FOLD_AMBIGUITY_PASS',flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: optimal-4-vs-random-source-300x4-without-rule-or-test-answers
+          path: /tmp/optimal-calibration-source/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: true-original-rule-and-answers-only-for-after-seal-independent-scoring
+          path: /tmp/true-rule-only/
+          if-no-files-found: error
+  model_only_sees_supervised_calibration_not_original_rule:
+    needs: pinned_original_true_rule_only_in_calibration_construction
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 numpy==1.26.4
+      - uses: actions/download-artifact@v4
+        with:
+          name: optimal-4-vs-random-source-300x4-without-rule-or-test-answers
+          path: /tmp/optimal-calibration-source
+      - name: Source-only same frozen rule learner on optimal4 versus random4/6/12
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/4-probe-source-predictions
+          python research/ood_automatabench_20261023/optimal_four_probe_source_grade.py \
+            --mode infer \
+            --source /tmp/optimal-calibration-source/BLIND_300x4_ACTIVE_VS_RANDOM_SOURCE.jsonl \
+            --out /tmp/4-probe-source-predictions/ALL1200_NO_RULE_OR_ANSWERS.json \
+            | tee /tmp/4-probe-source-predictions/BLIND_COST_AND_PROBES.log
+          python - <<'PY'
+          import pathlib,json,hashlib
+          p=pathlib.Path('/tmp/4-probe-source-predictions/ALL1200_NO_RULE_OR_ANSWERS.json')
+          d=json.loads(p.read_text())
+          assert d['n_episodes']==len(d['rows'])==1200
+          assert d['no_original_rule_exposed'] and d['no_original_query_answers_exposed']
+          for r in d['rows'].values():
+              if r['calibration']=='designed4':
+                  assert r['observed_rule_entries']==16
+          print('OPTIMAL_FOUR_VS_RANDOM_PRE_GRADE_SHA256',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: opt4-rand4-6-12-all-source-only-predictions-sealed
+          path: /tmp/4-probe-source-predictions/
+          if-no-files-found: error
+  original_independent_author_rule_and_answer_grader:
+    needs: model_only_sees_supervised_calibration_not_original_rule
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 numpy==1.26.4
+      - uses: actions/download-artifact@v4
+        with:
+          name: true-original-rule-and-answers-only-for-after-seal-independent-scoring
+          path: /tmp/true-rule-only
+      - uses: actions/download-artifact@v4
+        with:
+          name: optimal-4-vs-random-source-300x4-without-rule-or-test-answers
+          path: /tmp/optimal-calibration-source
+      - uses: actions/download-artifact@v4
+        with:
+          name: opt4-rand4-6-12-all-source-only-predictions-sealed
+          path: /tmp/4-probe-source-predictions
+      - name: Author's official verifier checks exact initial state and reconstruction of all 16 true hidden rule entries
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/independent-four-score
+          python research/ood_automatabench_20261023/optimal_four_probe_source_grade.py \
+            --mode grade \
+            --sealed /tmp/4-probe-source-predictions/ALL1200_NO_RULE_OR_ANSWERS.json \
+            --source /tmp/optimal-calibration-source/BLIND_300x4_ACTIVE_VS_RANDOM_SOURCE.jsonl \
+            --original /tmp/true-rule-only/ORIGINAL_TRUE_300.jsonl \
+            --expected-original-sha "$(python -c "import json;print(json.load(open('/tmp/true-rule-only/ORIGINAL_IDENTITY.json'))['original_sha256'])")" \
+            --out /tmp/independent-four-score/REAL_ORIGINAL_300_OPTIMAL_FOUR_SCORE.json \
+            | tee /tmp/independent-four-score/ORIGINAL_INDEPENDENT_RULE_AND_INITIAL_STATE_SCORE.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: original-author-optimal-4-rule-identification-and-score
+          path: /tmp/independent-four-score/
+          if-no-files-found: error
