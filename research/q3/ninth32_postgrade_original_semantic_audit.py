@@ -91,6 +91,7 @@ def main(a):
         totals["all"]+=1;totals[cls]+=1
         exact=first["D_learned_macro_top80"][id]["certified_named_macros"]
         if exact:
+            label["public_author_original_expression"]=str(expression)
             one=one_rational_primitive_suffices(sp.cancel(sp.together(expression))) if cls in ("AFFINE_RATIONAL_ORIGINAL","NONAFFINE_RATIONAL_ORIGINAL") else {"status":"UNKNOWN_NOT_RATIONAL"}
             one_term_controls.append({"id":id,"control":one})
             if one.get("one_term_representable") is False:totals["learned_exact_requiring_two_rational_bases"]+=1
