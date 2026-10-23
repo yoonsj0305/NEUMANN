@@ -1,0 +1,61 @@
+name: NEUMANN Q3 immutable Ninth32 postgrade true nonrational and full source-work audit
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/q3_ninth32_strict_postgrade_native_truth.yml"
+      - "research/q3/ninth32_postgrade_original_semantic_audit.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  strict_immutable_original_author_math_and_cost:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39923380389
+          name: neumann-q3-first-ninth32-original-source-only-no-truth
+          github-token: ${{ github.token }}
+          path: /tmp/ninth-audit/source
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39923380389
+          name: neumann-q3-first-ninth32-actual-original-true-expression-private
+          github-token: ${{ github.token }}
+          path: /tmp/ninth-audit/truth
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39923380389
+          name: neumann-q3-ninth32-frozen-selfreward-composed-macros-before-grading
+          github-token: ${{ github.token }}
+          path: /tmp/ninth-audit/pred
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39923380389
+          name: neumann-q3-ninth32-full-original-exact-additive-macro-grader
+          github-token: ${{ github.token }}
+          path: /tmp/ninth-audit/grade
+      - name: Require first SOURCE/TRUTH/PRED/GRADE SHA before original class analysis; preserve genuine nonlinear/affine distinction
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/ninth-audit/audit
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/q3/ninth32_postgrade_original_semantic_audit.py \
+            --source /tmp/ninth-audit/source/FIRST_NINTH32_SOURCE_ONLY_NUMERIC.json \
+            --truth /tmp/ninth-audit/truth/REAL_NINTH32_PRIVATE_AUTHOR_TRUTH.json \
+            --pred /tmp/ninth-audit/pred/FIRST_NINTH_LEARNED_DYNAMIC_MACROS_AND_ALL_CLASSICAL_SOURCE_ONLY.json \
+            --grade /tmp/ninth-audit/grade/FIRST_NINTH32_AUTHOR_FULL_EQUIVALENCE_NEURAL_AND_CLASSICAL.json \
+            --out /tmp/ninth-audit/audit/IMMUTABLE_FIRST_NINTH32_REAL_AUTHOR_NONLINEAR_MACRO_AUDIT.json \
+            | tee /tmp/ninth-audit/audit/AFTER_FIRST_FULL_ORIGINAL_SYMBOLIC_ANALYSIS.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-first-original-ninth32-postgrade-true-nonlinear-grammatical-audit
+          path: /tmp/ninth-audit/audit/
+          if-no-files-found: error
