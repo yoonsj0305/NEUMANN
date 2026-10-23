@@ -1,0 +1,47 @@
+name: NEUMANN Q34 universal six adaptive query lower bound on actual external source query locations
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/neumann_q34_adaptive_six_info_lower_bound.yml'
+      - 'research/g0/erbench_adaptive_six_query_adversarial_certificate.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  universal_adaptive_lower_bound_exact_original_query_locations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39905500072
+          name: erbench-fourth32-exact7-external-original-numeric-only
+          github-token: ${{ github.token }}
+          path: /tmp/q34-adaptive-original-source
+      - name: Exact six-query adversarial class-pair on source-selected arbitrary rational coordinates
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q34-adaptive-proof
+          python research/g0/erbench_adaptive_six_query_adversarial_certificate.py \
+            --source /tmp/q34-adaptive-original-source/FOURTH32_ORIGINAL_EXACT_RATIONAL_SOURCE_ONLY.json \
+            --out /tmp/q34-adaptive-proof/SIX_ACTIVE_QUERIES_NEVER_ENOUGH_GENERAL_EXACT_CLASS.json \
+            | tee /tmp/q34-adaptive-proof/ADAPTIVE_IMPOSSIBILITY_FIRST_RECEIPT.log
+          python - <<'PY'
+          import json
+          p=json.load(open('/tmp/q34-adaptive-proof/SIX_ACTIVE_QUERIES_NEVER_ENOUGH_GENERAL_EXACT_CLASS.json'))
+          assert p['counts']['certified']==13 and p['counts']['unavailable']==19
+          assert p['proof_generalizes_to_any_six_distinct_rational_query_points']
+          assert p['autonomous_neural_primitive']=='NOT_TESTED'
+          print('CONDITIONAL_ADAPTIVE_INFORMATION_LOWER_BOUND_EXACT_PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-exact-adaptive-6query-adversary-real-external-query-locations
+          path: /tmp/q34-adaptive-proof/
+          if-no-files-found: error
