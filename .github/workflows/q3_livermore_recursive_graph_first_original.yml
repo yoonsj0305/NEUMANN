@@ -1,0 +1,137 @@
+name: NEUMANN Q3 FIRST external Livermore8 dynamic recursive symbolic DAG vs prior fixed grammar
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/q3_livermore_recursive_graph_first_original.yml"
+      - "research/q3/livermore_original_source_eight.py"
+      - "research/q3/dynamic_source_ast_graph_livermore_first8.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_external_Livermore_author_true_formula_physically_isolated:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - name: Fetch and verify PUBLISHED DSO original git blob exactly, preselected Livermore1D originals, separate numeric source and author truth
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3lm/source /tmp/q3lm/secret
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/q3/livermore_original_source_eight.py \
+            --source /tmp/q3lm/source/FIRST_LIVERMORE8_SOURCE_ONLY_NOT_AUTHOR_FORMULAS.json \
+            --truth /tmp/q3lm/secret/FIRST_LIVERMORE8_PUBLISHED_AUTHORED_TRUE_FORMULAS.json
+          python - <<'PY'
+          import json
+          s=json.load(open('/tmp/q3lm/source/FIRST_LIVERMORE8_SOURCE_ONLY_NOT_AUTHOR_FORMULAS.json'))
+          assert len(s['source_numeric_without_equations'])==8
+          assert all('original_expression' not in x for x in s['source_numeric_without_equations'])
+          print('LIVERMORE_PUBLISHED_TRUE_FORMULAS_NOT_IN_SOURCE_VERIFIED')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-first-livermore8-numeric-only-external-author-original
+          path: /tmp/q3lm/source/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-first-livermore8-external-author-original-private-grader-only
+          path: /tmp/q3lm/secret/
+          if-no-files-found: error
+  real_dynamic_graph_construction_from_source_only:
+    needs: original_external_Livermore_author_true_formula_physically_isolated
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-first-livermore8-numeric-only-external-author-original
+          path: /tmp/q3lm/source
+      - name: Prior OPENED Nguyen source development positives only, prove recursive power/unary nesting/macro product and two distinct log programs before Livermore author truth
+        run: |
+          set -euo pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/g0:research/q3 python - <<'PY'
+          import numpy as np,sympy as sp
+          from dynamic_source_ast_graph_livermore_first8 import search,X
+          cases=[
+            ("POLY_RECURSIVE",lambda x:x**6+x**5+x**4+x**3+x**2+x,(-1.,1.)),
+            ("TRIG_PRODUCT",lambda x:np.sin(x*x)*np.cos(x)-1,(-1.,1.)),
+            ("LOG_TWO_MACROS",lambda x:np.log(x+1)+np.log(x*x+1),(0.,2.))
+          ]
+          for name,fn,domain in cases:
+            x=np.random.default_rng(3).uniform(*domain,48)
+            y=fn(x)
+            result=search({"x":x.tolist(),"y":y.tolist()})
+            assert result["source_verified_program"] is not None,(name,result)
+            guess=result["source_verified_program"]["defined_operator_AST"]
+            known=sp.sympify(guess,locals={"x":X})
+            assert np.allclose(sp.lambdify(X,known,"numpy")(x),y,atol=1e-8,rtol=1e-8)
+            print("KNOWN_DEVELOPMENT_DYNAMIC_GRAPH_STRUCTURE_PASS",name,
+                  result["source_verified_program"]["named_lambda"],flush=True)
+          PY
+      - name: FIRST source-only dynamic expression construction, old SAFE baseline, recursive powers and composed AST complete source sha freeze
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3lm/pregrade
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/g0:research/q3 \
+            python research/q3/dynamic_source_ast_graph_livermore_first8.py --mode infer \
+            --source /tmp/q3lm/source/FIRST_LIVERMORE8_SOURCE_ONLY_NOT_AUTHOR_FORMULAS.json \
+            --pred /tmp/q3lm/pregrade/FIRST_RECURSIVE_AST_GRAMMAR_VS_CLASSICAL_SOURCE_ONLY_LIVERMORE8.json \
+            | tee /tmp/q3lm/pregrade/FIRST_ACTUAL_EXTERNAL_AUTHOR_SOURCE_ONLY_DYNAMIC_PROGRAMS.log
+          sha256sum /tmp/q3lm/pregrade/FIRST_RECURSIVE_AST_GRAMMAR_VS_CLASSICAL_SOURCE_ONLY_LIVERMORE8.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-livermore8-first-source-only-dynamic-recursive-graph-predictions
+          path: /tmp/q3lm/pregrade/
+          if-no-files-found: error
+  independent_original_author_complete_symbolic_identity_grader:
+    needs: real_dynamic_graph_construction_from_source_only
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-first-livermore8-external-author-original-private-grader-only
+          path: /tmp/q3lm/true
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-livermore8-first-source-only-dynamic-recursive-graph-predictions
+          path: /tmp/q3lm/pregrade
+      - name: Math certify FULL Livermore published original analytic identity of every source-only generated AST only AFTER first predictions sealed
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3lm/graded
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0:research/q3 \
+            python research/q3/dynamic_source_ast_graph_livermore_first8.py --mode grade \
+            --truth /tmp/q3lm/true/FIRST_LIVERMORE8_PUBLISHED_AUTHORED_TRUE_FORMULAS.json \
+            --pred /tmp/q3lm/pregrade/FIRST_RECURSIVE_AST_GRAMMAR_VS_CLASSICAL_SOURCE_ONLY_LIVERMORE8.json \
+            --out /tmp/q3lm/graded/FIRST_LIVERMORE8_FULL_ORIGINAL_AUTHOR_RECURSIVE_GRAPH_EXACT_GRADE.json \
+            | tee /tmp/q3lm/graded/INDEPENDENT_ACTUAL_PUBLISHED_ORIGINAL_COMPLETE_MATH_PROOFS.log
+          python - <<'PY'
+          import json
+          g=json.load(open('/tmp/q3lm/graded/FIRST_LIVERMORE8_FULL_ORIGINAL_AUTHOR_RECURSIVE_GRAPH_EXACT_GRADE.json'))
+          assert len(g["methods"])==3 and all(m["total"]==8 for m in g["methods"].values())
+          assert g["Q3_GLOBAL"]=="OPEN" and g["DYNAMIC_PLAIN_CLASSICAL_NOT_NEURAL"]
+          print("REAL_LIVERMORE_EIGHT_COMPLETE_SOURCE_AUTHOR_CASES_ACCOUNTED")
+          PY
+          sha256sum /tmp/q3lm/graded/FIRST_LIVERMORE8_FULL_ORIGINAL_AUTHOR_RECURSIVE_GRAPH_EXACT_GRADE.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-livermore8-first-source-original-native-symbolic-graph-grade
+          path: /tmp/q3lm/graded/
+          if-no-files-found: error
