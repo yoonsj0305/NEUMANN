@@ -89,7 +89,7 @@ jobs:
           set -euo pipefail
           OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0:research/q3 python - <<'PY'
           import numpy as np,sympy as sp
-          from learned_compositional_unary_macro_ninth32 import numeric_exact_source_reward,build_macro,X,ACTIONS
+          from learned_compositional_unary_macro_eighth32 import numeric_exact_source_reward,build_macro,X,ACTIONS
           x=np.linspace(.2,1.9,48)
           examples=[
              (("S2","Z1","ID","SIN"),lambda x:3*np.sin(2*x+1)+2),
