@@ -1,0 +1,157 @@
+name: NEUMANN Q3 frozen hidden-rule discovery original public dev300
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_automata_hidden_rule_frozen_public_dev.yml'
+      - 'research/ood_automatabench_20261023/hidden_rule_inference.py'
+      - 'research/ood_automatabench_20261023/hidden_rule_source_generator.py'
+      - 'research/ood_automatabench_20261023/hidden_rule_source_then_grade.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  PYTHONPATH: research/ood_automatabench_20261023
+jobs:
+  source_only_rule_observations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 numpy==1.26.4
+      - name: Pin original different-author 300 benchmark tasks then redact true rules and answers
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD:research/ood_automatabench_20261023/hidden_rule_inference.py)" = 9c74ec9761bd983de62f70669155d20a05cc02e6
+          test "$(git rev-parse HEAD:research/ood_automatabench_20261023/hidden_rule_source_generator.py)" = a3dc5d2aaa9b0718325bfb69e99da284631532ab
+          test "$(git rev-parse HEAD:research/ood_automatabench_20261023/hidden_rule_source_then_grade.py)" = 28aef8cc1e03660772f95b5acd3454a0ed86134c
+          echo 'FROZEN_SOURCE_AND_RULE_PROGRAM_BEFORE_NEW_PUBLIC_DEV300'
+          mkdir -p /tmp/original-rule-only /tmp/hidden-ca-source
+          python - <<'PY'
+          import hashlib,urllib.request,pathlib,json
+          sha='7d86373fdb63fe1bd3592ddf71d923ceebc5acd9'
+          url=f'https://raw.githubusercontent.com/neelsomani/automata-bench/{sha}/data/public_dev.jsonl'
+          with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'NEUMANN-hidden-rule-infer-src'}),timeout=120) as f:raw=f.read()
+          rows=[json.loads(r) for r in raw.splitlines()]
+          assert len(rows)==300 and len(set(r['id'] for r in rows))==300
+          pathlib.Path('/tmp/original-rule-only/ORIGINAL_TRUE_300.jsonl').write_bytes(raw)
+          pathlib.Path('/tmp/original-rule-only/ORIGINAL_SHA.json').write_text(
+              json.dumps({'raw_sha256':hashlib.sha256(raw).hexdigest(),'source_sha':sha}))
+          print('SEALED_ORIGINAL_300_BEFORE_SOURCE_RULE_CALIBRATION',hashlib.sha256(raw).hexdigest(),flush=True)
+          PY
+          python research/ood_automatabench_20261023/hidden_rule_source_generator.py \
+            --original /tmp/original-rule-only/ORIGINAL_TRUE_300.jsonl \
+            --out /tmp/hidden-ca-source
+          python - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('/tmp/hidden-ca-source/HIDDEN_RULE_CALIBRATION_900_SOURCE_ONLY.jsonl')
+          for line in p.read_text().splitlines():
+              x=json.loads(line)
+              assert 'answer' not in x['task'] and 'metadata' not in x['task']
+              assert 'permutation' not in x['task']['rule']
+          assert len(p.read_text().splitlines())==900
+          print('MASKED_SOURCE_RULE_AND_TEST_LABELS_900_PASS',flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: original-2d-ca-300-masked-rule-calibration900-only
+          path: /tmp/hidden-ca-source/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: original-2d-ca-300-original-rules-and-hidden-truth-only-for-independent-grade
+          path: /tmp/original-rule-only/
+          if-no-files-found: error
+  direct_vs_joint_source_inference:
+    needs: source_only_rule_observations
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 numpy==1.26.4
+      - uses: actions/download-artifact@v4
+        with:
+          name: original-2d-ca-300-masked-rule-calibration900-only
+          path: /tmp/hidden-ca-source
+      - name: Original true permutation and reference initial state inaccessible to this job
+        run: |
+          set -euo pipefail
+          python -m py_compile research/ood_automatabench_20261023/hidden_rule_*.py
+          python - <<'PY'
+          from hidden_rule_inference import source_pair_mapping,candidate_rules
+          from reversible_ca_solver import roll_one
+          before=['0011','0101','1010','1100']
+          before_array=[[int(v) for v in row] for row in before]
+          for shift in (0,3,7):
+              rule=list(range(16))
+              rule=rule[shift:]+rule[:shift]
+              after=roll_one(before_array,0,rule)
+              demo=[{'before':before,'after':[''.join(map(str,row)) for row in after]}]
+              mapping,error=source_pair_mapping(demo)
+              assert error is None and len(mapping)==4
+              assert all(rule[a]==b for a,b in mapping.items())
+              assert candidate_rules(mapping,5)[0] is None
+          print('BLIND_MASKED_CA_SOURCE_PAIR_POSITIVE_CONTROL_PASS')
+          PY
+          mkdir -p /tmp/hidden-ca-pregate
+          python research/ood_automatabench_20261023/hidden_rule_source_then_grade.py \
+            --mode infer \
+            --source /tmp/hidden-ca-source/HIDDEN_RULE_CALIBRATION_900_SOURCE_ONLY.jsonl \
+            --out /tmp/hidden-ca-pregate/SEALED_900_MODEL_PREDICTIONS_BEFORE_TRUE_RULE_AND_TEST_ANSWER.json \
+            | tee /tmp/hidden-ca-pregate/SOURCE_ONLY_INFER_COUNTS_AND_COST.log
+          python - <<'PY'
+          import json,pathlib,hashlib
+          p=pathlib.Path('/tmp/hidden-ca-pregate/SEALED_900_MODEL_PREDICTIONS_BEFORE_TRUE_RULE_AND_TEST_ANSWER.json')
+          s=json.loads(p.read_text())
+          assert s['n_episodes']==len(s['rows'])==900
+          assert s['source_hidden_true_rule_absent'] and s['query_answer_never_seen']
+          print('BLIND_PRE_GRADE_900_SOURCE_RULE_EVIDENCE_SHA256',hashlib.sha256(p.read_bytes()).hexdigest(),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: original-2d-hidden-rule-900-unknown-rule-before-grading
+          path: /tmp/hidden-ca-pregate/
+          if-no-files-found: error
+  independent_actual_original_rule_and_truth_grading:
+    needs: direct_vs_joint_source_inference
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check z3-solver==4.13.3.0 numpy==1.26.4
+      - uses: actions/download-artifact@v4
+        with:
+          name: original-2d-ca-300-original-rules-and-hidden-truth-only-for-independent-grade
+          path: /tmp/original-rule-only
+      - uses: actions/download-artifact@v4
+        with:
+          name: original-2d-ca-300-masked-rule-calibration900-only
+          path: /tmp/hidden-ca-source
+      - uses: actions/download-artifact@v4
+        with:
+          name: original-2d-hidden-rule-900-unknown-rule-before-grading
+          path: /tmp/hidden-ca-pregate
+      - name: Original author's pinned verifier checks actual tasks and inferred answer with rule still unknown to model
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/actual-hidden-rule-score
+          python research/ood_automatabench_20261023/hidden_rule_source_then_grade.py \
+            --mode grade \
+            --sealed /tmp/hidden-ca-pregate/SEALED_900_MODEL_PREDICTIONS_BEFORE_TRUE_RULE_AND_TEST_ANSWER.json \
+            --source /tmp/hidden-ca-source/HIDDEN_RULE_CALIBRATION_900_SOURCE_ONLY.jsonl \
+            --original /tmp/original-rule-only/ORIGINAL_TRUE_300.jsonl \
+            --expected-original-sha "$(python -c "import json;print(json.load(open('/tmp/original-rule-only/ORIGINAL_SHA.json'))['raw_sha256'])")" \
+            --out /tmp/actual-hidden-rule-score/ORIGINAL_AUTHOR_300x3_BLIND_PERMUTATION_EVIDENCE.json \
+            | tee /tmp/actual-hidden-rule-score/INDEPENDENT_ORIGINAL_300x3_VERDICT.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: real-original-automata-300x3-unknown-rule-independent-grader
+          path: /tmp/actual-hidden-rule-score/
+          if-no-files-found: error
