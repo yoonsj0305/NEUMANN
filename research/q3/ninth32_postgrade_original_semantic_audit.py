@@ -27,6 +27,43 @@ def classify(expr):
         if d[0]<=1 and d[1]==0:return "AFFINE_RATIONAL_ORIGINAL",d
         return "NONAFFINE_RATIONAL_ORIGINAL",d
     except Exception as e:return "UNKNOWN_CLASSIFICATION_"+type(e).__name__,None
+def one_rational_primitive_suffices(author):
+    """EXACT proof within the supplied one-term human base grammar.
+
+    For a NONCONSTANT rational f over Q(x), affine transform of a
+    nonrational elementary base function cannot be rational over Q(x).
+    So it suffices to check the rational base atoms ID, SQUARE,
+    CUBE, RECIP at the exact same scale/shift grid used by the model.
+    If f=A*b(x)+C, then f'/b'=A as rational functions of x, and
+    f-A*b=C; this is an exhaustive algebraic necessary/sufficient test
+    allowing ANY rational A,C, stronger than limited denominator fitting.
+    """
+    x=X
+    scales=(sp.Rational(1),sp.Rational(-1),sp.Rational(2),sp.Rational(1,2))
+    shifts=tuple(map(sp.Rational,(-2,-1,0,1,2)))
+    primitives=(lambda z:z,lambda z:z**2,lambda z:z**3,lambda z:1/z)
+    tried=0
+    for f in primitives:
+        for aa in scales:
+            for bb in shifts:
+                atom=sp.cancel(f(aa*x+bb))
+                dx=sp.diff(atom,x)
+                if dx==0:continue
+                tried+=1
+                try:
+                    ratio=sp.cancel(sp.diff(author,x)/dx)
+                    if not ratio.is_Rational or ratio==0:continue
+                    residual=sp.cancel(author-ratio*atom)
+                    if residual.is_Rational:
+                        assert sp.cancel(author-(ratio*atom+residual))==0
+                        return {"one_term_representable":True,
+                            "basis":str(atom),"gain":str(ratio),
+                            "offset":str(residual),"exact_candidates_checked":tried}
+                except Exception:continue
+    return {"one_term_representable":False,
+            "exact_candidates_checked":tried,
+            "logical_coverage":"All rational elementary basis atoms; nonrational base atoms cannot equal any nonconstant rational true function under nonzero scalar+constant"}
+
 def main(a):
     for k,expected in EXPECTED.items():
         got=checksum(getattr(a,k))
@@ -43,6 +80,7 @@ def main(a):
     assert all(len(ids)==5 for ids in original_exact_ids.values())
     assert len(learner)==5
     totals=collections.Counter();cases=[]
+    one_term_controls=[]
     for row in truth:
         id=row["id"]
         try:
@@ -53,6 +91,10 @@ def main(a):
         totals["all"]+=1;totals[cls]+=1
         exact=first["D_learned_macro_top80"][id]["certified_named_macros"]
         if exact:
+            one=one_rational_primitive_suffices(sp.cancel(sp.together(expression))) if cls in ("AFFINE_RATIONAL_ORIGINAL","NONAFFINE_RATIONAL_ORIGINAL") else {"status":"UNKNOWN_NOT_RATIONAL"}
+            one_term_controls.append({"id":id,"control":one})
+            if one.get("one_term_representable") is False:totals["learned_exact_requiring_two_rational_bases"]+=1
+            if one.get("one_term_representable") is True:totals["learned_exact_already_representable_by_one_rational_basis"]+=1
             totals["learned_exact_total"]+=1
             totals["learned_exact_"+cls]+=1
         report={
