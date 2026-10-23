@@ -1,0 +1,62 @@
+name: NEUMANN Q3 FIRST OEIS six minimum hidden state original SHA-locked theorem audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_oeis6_source_locked_rank_audit.yml'
+      - 'research/q3/oeis6_first_sha_locked_state_lower_bound_audit.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  four_evidence_receipts_original_all_n_and_negative_falsification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39957412796
+          name: neumann-q3-first-six-published-oeis-source-only-prefix16
+          github-token: ${{ github.token }}
+          path: /tmp/q3-rank/source
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39957412796
+          name: neumann-q3-first-six-published-oeis-private-author-recursion-holdout105
+          github-token: ${{ github.token }}
+          path: /tmp/q3-rank/gold
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39957412796
+          name: neumann-q3-first-oeis6-frozen-learning-minimal-state-MACHINE-before-author-truth
+          github-token: ${{ github.token }}
+          path: /tmp/q3-rank/pred
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39957412796
+          name: neumann-q3-first-oeis6-published-all-n-recursion-105-future-exact-minimal-hankel-grade
+          github-token: ${{ github.token }}
+          path: /tmp/q3-rank/grade
+      - name: Assert four first SHA receipts then independently certify rank minimum, six published all-n recursions and factorial out-of-class rejection
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-rank/audit
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/q3 \
+            python research/q3/oeis6_first_sha_locked_state_lower_bound_audit.py \
+            --source /tmp/q3-rank/source/ORIGINAL_SIX_PUBLIC_NUMERIC_INTEGER_PREFIX16_WITHOUT_AUTHOR_RECURRENCE.json \
+            --truth /tmp/q3-rank/gold/PRIVATE_SIX_TRUE_AUTHOR_RECURRENCES_EXACT_FUTURE_16_120.json \
+            --pred /tmp/q3-rank/pred/FIRST_SIX_PUBLISHED_OEIS_NEURAL_STATE_VECTOR_AND_STRONG_CLASSICAL_PRE_GOLD.json \
+            --grade /tmp/q3-rank/grade/FIRST_SIX_OEIS_AUTHOR_FULL_ALL_N_INDUCTION_MINIMAL_STATE_HANKEL_PROOF.json \
+            --out /tmp/q3-rank/audit/FIRST_OEIS6_AUTHORED_EXACT_ALL_N_MINIMUM_STATE_AND_NEGATIVE_CONTROL.json \
+            | tee /tmp/q3-rank/audit/FIRST_IMMUTABLE_MINIMAL_RANK_MATH_AUDIT_LOG.txt
+          sha256sum /tmp/q3-rank/audit/FIRST_OEIS6_AUTHORED_EXACT_ALL_N_MINIMUM_STATE_AND_NEGATIVE_CONTROL.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-first-oeis6-first-source-rank-lower-bound-original-630-holdout-independent-audit
+          path: /tmp/q3-rank/audit
+          if-no-files-found: error
