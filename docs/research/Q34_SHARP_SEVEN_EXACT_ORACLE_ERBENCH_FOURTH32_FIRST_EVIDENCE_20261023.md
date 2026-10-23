@@ -44,3 +44,21 @@ This is a **sharp, reproducible information-complexity mechanism** for minimizin
 **G0 restricted hypothesis identifiability gate = PASS for class R_(4,2); G1 autonomous learned operator invention = HOLD; Q3 global OPEN; Q4 frontier/10× OPEN; Q6 unseen-author transfer OPEN; Q7 frontier gap unmeasured**. Do not prolong closed-grammar neural routing tests based solely on this mathematically classical success.
 
 [Current parent decision issue #530](https://github.com/yoonsj0305/NEUMANN/issues/530). Source code: `research/g0/erbench_exact7_interpolation.py`, postgrade strict audit `research/g0/erbench_exact7_postgrade_original_grammar.py`. No paid model APIs/GPU.
+
+
+## Strengthened scientific boundary: even SIX ADAPTIVE source queries cannot guarantee unique exact identification
+
+Original theorem above proved a concrete six-query failure (x=1..6). We now close the stronger **arbitrary six adaptive locations** case constructively, not just the fixed locations. After any 6 pairwise distinct rational query locations `x_1...x_6` obtained on the target `f1(x)=x^4/(1+x²)`, define:
+- `W(x)=prod_i(x−x_i)`, degree 6;
+- `P(x)=x^4`, `Q(x)=1+x²`;
+- `V(x) = −(W(x) remainder modulo Q(x))`, degree at most 1 (because x^4≡1 mod Q);
+- `U(x)=(W(x)+P(x)V(x))/Q(x)`, a polynomial of degree at most 4 with exact rational coefficients;
+- choose any nonzero rational `epsilon` avoiding finitely many denominator poles at queried points and one more unused point; `f2(x)=(P(x)+epsilon U(x))/(Q(x)+epsilon V(x))`.
+
+Both `f1` and `f2` belong to exactly the SAME `deg P<=4,deg Q<=2` class, and
+`f2(x)−f1(x)=epsilon W(x)/(Q(x)*(Q(x)+epsilon V(x)))`.
+The difference is 0 at ALL six query locations and nonzero at a seventh rational location outside that finite set (with denominator nonzero). In an adaptive oracle transcript against `f1`, replacing it by `f2` would give identical previous responses, therefore the controller would have selected the SAME earlier six queries; its complete six-query transcript cannot certify a unique arbitrary member of the class. This is a *general adversarial proof* for any deterministic query choices, not a fixed-six-examples anecdote.
+
+**New exact executed real-source-query-coordinate audit:** [GitHub Actions #39906593700](https://github.com/yoonsj0305/NEUMANN/actions/runs/39906593700) SUCCESS. Previously SHA-locked source-only exact ERBench fourth32 original numeric observation input `151c9e2e2731d50fefc1e75b56c58b3971067a058cff77c04cdc67033cdb420a`. For all **13 authentic ERBench fourth32 source cases containing 7 exact rational source queries**, took their ACTUAL first six x positions (not fixed x=1..6), generated the two adversarial P4/Q2 rational programs and verified in exact rational arithmetic that all six match and an unused query point differs. **13/13 exact general-case source-position proof receipts**, **19 unavailable original source cases UNKNOWN**, no false mathematical proof. First dedicated proof receipt JSON SHA256 `f0a8918353ec0556a83a5dd7d5edf0ba7715514430b2cff3e224981285ec0164`.
+
+**Causality boundary:** This establishes a conditional worst-case black-box information lower bound for the HUMAN-DEFINED bounded rational class, and is a theorem of elementary polynomial congruences. The constructed `f1,f2` need not be the actual EquationDiscovery original generating formula; the external original cases provide independent arbitrary query *locations*, not evidence those adversarial functions are the original source labels. A controller can achieve unique identification after seven valid exact samples if an appropriate member of the specified grammar is known to underlie the oracle, as separately proved. It does not provide a learned policy, a new mathematical priority claim, frontier-level general reasoning, or 10× total costs.
