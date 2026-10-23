@@ -1,0 +1,101 @@
+name: NEUMANN Q3 fresh semantic program discovery 640 and 160 negative controls
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/neumann_q3_fresh_semantic_800.yml'
+      - 'research/ood_automatabench_20261023/semantic_fresh_800.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  PYTHONPATH: research/ood_automatabench_20261023
+jobs:
+  fresh_seed_precommitted_structure_and_truth_segregated:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Lock existing grammar, local semantic proof, separate verifier and NEW experiment runner
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD:research/ood_automatabench_20261023/latent_geometry_induction.py)" = 2d24f0ebbd3d01e3a62724339754f2eea09ffe51
+          test "$(git rev-parse HEAD:research/ood_automatabench_20261023/local_equivalence_certificate.py)" = f21137cc4b6961330c184ce6152d7f1136662b87
+          test "$(git rev-parse HEAD:research/ood_automatabench_20261023/hidden_geometry_independent_replay.py)" = 78f15d4968290f1fbc4c2032822b617050785c47
+          test "$(git rev-parse HEAD:research/ood_automatabench_20261023/semantic_fresh_800.py)" = 950f67927a8fe74e668ade2fbaf19a360ede9461
+          echo PREEXISTING_GRAMMAR_AND_NEW_EXPERIMENT_FROZEN_BEFORE_SEEING_800
+          python -m py_compile research/ood_automatabench_20261023/semantic_fresh_800.py
+          python research/ood_automatabench_20261023/semantic_fresh_800.py --mode gen \
+            --source-dir /tmp/fresh-800-only-source \
+            --truth-dir /tmp/fresh-800-private-truth
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fresh-800-calibration-source-with-no-family
+          path: /tmp/fresh-800-only-source/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fresh-800-original-hidden-laws-grader-only
+          path: /tmp/fresh-800-private-truth/
+          if-no-files-found: error
+  source_only_semantic_quotient_inference_no_true_families:
+    needs: fresh_seed_precommitted_structure_and_truth_segregated
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/download-artifact@v4
+        with:
+          name: fresh-800-calibration-source-with-no-family
+          path: /tmp/fresh-800-only-source
+      - name: Freeze all 800 inferred/abstained programs before grading
+        run: |
+          set -euo pipefail
+          python research/ood_automatabench_20261023/semantic_fresh_800.py --mode infer \
+            --source-dir /tmp/fresh-800-only-source \
+            --pred-dir /tmp/fresh-800-before-grade-sealed
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fresh-800-source-only-predictions-before-independent-grader
+          path: /tmp/fresh-800-before-grade-sealed/
+          if-no-files-found: error
+  completely_separate_independent_flat_grid_truth_grader:
+    needs: source_only_semantic_quotient_inference_no_true_families
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/download-artifact@v4
+        with:
+          name: fresh-800-calibration-source-with-no-family
+          path: /tmp/fresh-800-only-source
+      - uses: actions/download-artifact@v4
+        with:
+          name: fresh-800-original-hidden-laws-grader-only
+          path: /tmp/fresh-800-private-truth
+      - uses: actions/download-artifact@v4
+        with:
+          name: fresh-800-source-only-predictions-before-independent-grader
+          path: /tmp/fresh-800-before-grade-sealed
+      - name: Independent exact original rule semantic certificates and all three heldout sizes
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/fresh-800-independent-grade
+          python research/ood_automatabench_20261023/semantic_fresh_800.py --mode grade \
+            --source-dir /tmp/fresh-800-only-source \
+            --truth-dir /tmp/fresh-800-private-truth \
+            --pred-dir /tmp/fresh-800-before-grade-sealed \
+            --out-dir /tmp/fresh-800-independent-grade \
+            | tee /tmp/fresh-800-independent-grade/GRADE_LOG.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fresh-800-independent-grammatical-and-out-of-family-proof
+          path: /tmp/fresh-800-independent-grade/
+          if-no-files-found: error
