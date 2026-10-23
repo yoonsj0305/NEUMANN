@@ -1,0 +1,53 @@
+name: NEUMANN Q34 original seven-point conditional theorem first-cohort immutable postgrade audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/neumann_exact7_fourth32_postgrade_original_grammar.yml'
+      - 'research/g0/erbench_exact7_postgrade_original_grammar.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source_native_conditional_theorem_truth_audit_after_first_grade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39905500072
+          name: erbench-fourth32-true-author-formulas-grader-private
+          github-token: ${{ github.token }}
+          path: /tmp/exact7-truth
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39905500072
+          name: erbench-fourth32-exact7-original-programs-sealed-before-grade
+          github-token: ${{ github.token }}
+          path: /tmp/exact7-pred
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39905500072
+          name: neumann-fourth32-exact-seven-rational-original-author-grader
+          github-token: ${{ github.token }}
+          path: /tmp/exact7-firstgrade
+      - name: Assert first three original SHA artifacts before any postgrade original grammar examination
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/exact7-postgrade
+          PYTHONPATH=research/g0 python research/g0/erbench_exact7_postgrade_original_grammar.py \
+            --private /tmp/exact7-truth/FOURTH32_TRUE_FORMULA_PRIVATE_GRADER.json \
+            --pred /tmp/exact7-pred/ALL_ORIGINAL_32_SEALED_NO_TRUTH_PREDICTIONS.json \
+            --grade /tmp/exact7-firstgrade/FOURTH32_INDEPENDENT_FULL_ORIGINAL_AUTHOR_EQUIVALENCE.json \
+            --out /tmp/exact7-postgrade/STRICT_CONDITIONAL_THEOREM_AND_ORIGINAL_GRAMMAR.json \
+            | tee /tmp/exact7-postgrade/ORIGINAL_AFTER_GRADE_TRUTH_DIAGNOSTIC.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-exact7-sha-verified-first32-postgrade-conditional-theorem-originals
+          path: /tmp/exact7-postgrade/
+          if-no-files-found: error
