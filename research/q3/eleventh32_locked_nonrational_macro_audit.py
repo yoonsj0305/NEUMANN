@@ -65,6 +65,8 @@ def inspect(a):
                 'induced_composite_exp_log_macros':certs,
                 'strict_whole_original_symbolic_identity':True,
                 'original_nonrational_function':nonrat,
+                'asymptotic_limit_f_over_x_to_any_symbolic_nonnegative_integer_n':str(infinite_vs_any_power),
+                'nonrationality_proof':'Any rational P/Q has at most polynomial growth; this limit is infinity for all symbolic n>=0',
                 'old_safe_classical_original_SOLVED':first_safe,
                 'all_same_rights_classical_original_SOLVED':first_full})
         if good:
