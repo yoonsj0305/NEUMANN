@@ -1,0 +1,69 @@
+name: NEUMANN Q3 immutable external original sixth32 first-run source grammar ceiling and complete cost audit
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/q3_original_sixth32_postgrade_ceiling.yml"
+      - "research/q3/postgrade_sixth32_representability_and_cost.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  exact_first_original_sha_locked_scientific_attribution:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39913799990
+          name: q3-sx-online-no-label-training-original128-only-numeric
+          github-token: ${{ github.token }}
+          path: /tmp/q3-audit/train
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39913799990
+          name: q3-sx-first-fresh-original32-source-only-numeric
+          github-token: ${{ github.token }}
+          path: /tmp/q3-audit/source
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39913799990
+          name: q3-sx-first-fresh-original32-secret-author-true-equations
+          github-token: ${{ github.token }}
+          path: /tmp/q3-audit/truth
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39913799990
+          name: q3-sx-first-trained-synthetic-symbol-program-predictions-before-real-original-grade
+          github-token: ${{ github.token }}
+          path: /tmp/q3-audit/pred
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39913799990
+          name: q3-sx-first-fresh-original32-full-equation-neural-vs-classical-proof
+          github-token: ${{ github.token }}
+          path: /tmp/q3-audit/grade
+      - name: Refuse mutation of any of FIVE first-run original receipts before postgrade oracle inspection
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-audit/out
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/q3/postgrade_sixth32_representability_and_cost.py \
+            --train /tmp/q3-audit/train/OTHER_ORIGINAL128_NUMERIC_XY_NO_FORMULA.json \
+            --source /tmp/q3-audit/source/UNSEEN_SIXTH32_NUMERIC_NO_ORIGINAL_FORMULA.json \
+            --truth /tmp/q3-audit/truth/UNSEEN_SIXTH32_TRUE_ORIGINAL_FORMULAS_PRIVATE.json \
+            --pred /tmp/q3-audit/pred/SIXTH32_TRAINED_NEW_AST_VS_EQUAL_GRAMMAR_CLASSICAL_SEALED.json \
+            --grade /tmp/q3-audit/grade/EXACT_ALL32_TRUE_AUTHOR_ORIGINAL_MACRO_COMPARISONS.json \
+            --out /tmp/q3-audit/out/FIRST_SIXTH32_NONSOLVABILITY_AND_CPU_SCOPED.json \
+            | tee /tmp/q3-audit/out/IMMUTABLE_SOURCE_POSTGRADE_LOG.txt
+          sha256sum /tmp/q3-audit/out/FIRST_SIXTH32_NONSOLVABILITY_AND_CPU_SCOPED.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-original-sixth32-immutable-after-first-grade-expression-limit-and-cost-audit
+          path: /tmp/q3-audit/out/
+          if-no-files-found: error
