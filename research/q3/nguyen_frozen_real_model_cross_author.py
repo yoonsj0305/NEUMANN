@@ -24,6 +24,7 @@ def infer(trainfile,first_pregrade,nguyen_source,out):
     # Nothing trained on Nguyen target; exact SAME model and training source.
     for k in ("training_numeric_source_sha256","trained_weights_SHA256",
               "training_rewards_SHA256","memory_SHA256"):
+        print("FROZEN_MODEL_DIGEST",k,meta[k],frozen[k],flush=True)
         assert meta[k]==frozen[k],("NEURAL_WEIGHTS_OR_SOURCE_CHANGED",k)
     source=json.loads(pathlib.Path(nguyen_source).read_text())
     assert len(source["source_numeric_without_equations"])==8
