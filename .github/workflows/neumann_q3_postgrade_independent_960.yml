@@ -35,6 +35,7 @@ jobs:
       - name: Cross-check 12x12 original measurements via independent flat implementation and 14x18/30x34 fresh test
         run: |
           set -euo pipefail
+          mkdir -p /tmp/independent-960-geometry
           python -m py_compile research/ood_automatabench_20261023/hidden_geometry_independent_replay.py
           python research/ood_automatabench_20261023/hidden_geometry_independent_replay.py \
             --truth-dir /tmp/original-untouched-truth \
