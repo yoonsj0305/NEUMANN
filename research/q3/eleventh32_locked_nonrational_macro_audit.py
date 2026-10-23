@@ -50,6 +50,15 @@ def inspect(a):
                 assert sp.powdenest(lowered,force=True)==canonical
                 assert k['positive_base_certified_compiled_graph']==str(canonical)
             nonrat=not sp.cancel(sp.together(fn)).is_rational_function(X)
+            # Analytic proof outside every fixed-degree rational function:
+            # a rational R(x)=P(x)/Q(x) grows at most polynomially as
+            # x -> +infinity (outside finite poles). For these positive
+            # exponential whole author functions the quotient by x**n
+            # diverges for EVERY symbolic nonnegative integer n.
+            symbolic_degree=sp.Symbol("n",integer=True,nonnegative=True)
+            infinite_vs_any_power=sp.limit(fn/X**symbolic_degree,X,sp.oo)
+            assert nonrat and infinite_vs_any_power==sp.oo,(
+                "STRONG_NONRATIONAL_GROWTH_NOT_PROVED",truth["task_ID"],infinite_vs_any_power)
             good.append({'original_public_name':truth['collection']+':'+truth['task_ID'],
                 'original_author_expression':truth['original_expression'],
                 'source_generated_lambda':cand['named_lambda'],
