@@ -24,9 +24,9 @@ jobs:
       - name: Generate 160 pre-registered unselected source tasks, truth into isolated artifact
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD:research/ood_automatabench_20261023/reverse_observability_router.py)" = 8eee2dee851ea683702d7bd0831b84d13071503b
+          test "$(git rev-parse HEAD:research/ood_automatabench_20261023/reverse_observability_router.py)" = 1c1a491043c45d5660181852ea8ce88860f999df
           test "$(git rev-parse HEAD:research/ood_automatabench_20261023/generated_6x6_8x8_source.py)" = 2e7d981982b8901b541af885ce23c2bd6b475518
-          test "$(git rev-parse HEAD:research/ood_automatabench_20261023/multisize_witness_paired.py)" = c79ff25260b36c18f90722289667b6b273232d24
+          test "$(git rev-parse HEAD:research/ood_automatabench_20261023/multisize_witness_paired.py)" = 8f17080866516f0c9cf1f4310b34e7b3c4d67cdb
           test "$(git rev-parse HEAD:research/ood_automatabench_20261023/exact_16bit_filter.py)" = 58a46abab2041b8e8d7573c30a794f3e19a03893
           test "$(git rev-parse HEAD:research/ood_automatabench_20261023/reversible_ca_solver.py)" = 623e63d92b100502b47896adc45f76e028d0cf07
           echo 'FROZEN_COMPLETE_MULTISIZE_SOLVER_AND_GENERATOR_CODE_BEFORE_SECOND_SEED'
