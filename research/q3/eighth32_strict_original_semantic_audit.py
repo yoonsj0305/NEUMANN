@@ -101,6 +101,24 @@ def audit(inp,out):
         "Q3_global":"OPEN","Q4_full_cost_10x":"OPEN","Q6_external_independent_author_transfer":"OPEN"}
     dest=pathlib.Path(out);dest.parent.mkdir(parents=True,exist_ok=True)
     dest.write_text(json.dumps(result,sort_keys=True,indent=2)+"\n")
+    learned_verified_details=[]
+    for a in annotations:
+        if a.get("learned_true_macro_definitions"):
+            original_row=next(v for v in truth if v["id"]==a["id"])
+            expr_original=sp.cancel(sp.together(calc(allowed_formula(original_row["original_expression"])[0],
+                                  {allowed_formula(original_row["original_expression"])[1]:X},SYM)))
+            if expr_original.is_rational_function(X):
+                num,den=sp.fraction(expr_original)
+                try: is_affine=sp.degree(num,X)<=1 and sp.degree(den,X)==0
+                except Exception: is_affine=False
+            else: is_affine=False
+            learned_verified_details.append({
+                "id":a["id"],"task_ID":a["task_ID"],"category":a["original_symbolic_semantic_class"],
+                "source_original_expression":str(expr_original),
+                "original_function_is_affine":bool(is_affine),
+                "certified_named_macros":a["learned_true_macro_definitions"]})
+    print("Q3_EIGHTH_FIRST_VERIFIED_NAMED_MACRO_SEMANTIC_DETAILS",
+          json.dumps(learned_verified_details,sort_keys=True),flush=True)
     print("Q3_EIGHTH_FIRST_FROZEN_AUTHOR_SEMANTIC_AUDIT",json.dumps({
        "categories":dict(count),
        "learned_originals":result["first_orig_exact_methods"]["learned_graph_edit_512"],
