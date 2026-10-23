@@ -289,8 +289,13 @@ def grade(gold_path,pred_path,out_path):
         for source in arm["cases"]:
             original_row=true[source["id"]]
             exact=[]
+            # The published-generator sympy uses real=True for x; all
+            # candidate programs use plain x. Substitute identical symbols
+            # before strict whole analytic original equality, never grade
+            # two physically distinct SymPy x objects as mismatch.
             f=sp.sympify(original_row["author_full_expression_sympy"],
-                locals={"x":sp.Symbol("x",real=True)})
+                locals={"x":sp.Symbol("x",real=True)}).subs(
+                    sp.Symbol("x",real=True),X)
             for prop in source["source_valid_defined_macros"]:
                 try:
                     h=sp.sympify(prop["defined_operator_AST"],locals={"x":X})
