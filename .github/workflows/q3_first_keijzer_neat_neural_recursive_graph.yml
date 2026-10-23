@@ -10,6 +10,11 @@ on:
 permissions:
   contents: read
   actions: read
+# Stabilize source-only numeric training on CI host CPU; no source truth exposed.
+env:
+  PYTHONHASHSEED: '0'
+  OPENBLAS_NUM_THREADS: '1'
+  OMP_NUM_THREADS: '1'
 jobs:
   physically_separate_first_12_authored_equations_from_source:
     runs-on: ubuntu-latest
