@@ -52,11 +52,15 @@ def solve_terminal_inverse(task,miss_cap=MAX_TERMINAL_MISSING):
     if m>miss_cap:
         return {"status":"INELIGIBLE_TOO_MANY_UNOBSERVED_TERMINAL",
                 "prediction":None,"unobserved_terminal":m,"cpu_s":time.process_time()-t0}
-    fixed=sum(np.uint64(val)<<np.uint64(pos) for pos,val in terminal.items()) if terminal else np.uint64(0)
-    candidates=np.arange(1<<m,dtype=np.uint64)
-    states=np.full(len(candidates),np.uint64(fixed),dtype=np.uint64)
-    for j,pos in enumerate(absent):
-        states|=((candidates>>np.uint64(j))&np.uint64(1))<<np.uint64(pos)
+    # Build all candidate bitfields with Python integers FIRST. NumPy 1.26 can
+    # silently lose upper bits in mixed scalar/array uint64 shift expressions.
+    # <=2^10 candidates is tiny, so this removes a correctness hazard without
+    # changing the exhaustive search semantics or the vectorized CA inverse.
+    fixed=sum(int(val)<<int(pos) for pos,val in terminal.items())
+    states=np.asarray([
+        fixed | sum(((assignment>>j)&1)<<int(pos) for j,pos in enumerate(absent))
+        for assignment in range(1<<m)
+    ],dtype=np.uint64)
     size_by_time={}
     for time_index in range(T,-1,-1):
         for o in observations[time_index]:
