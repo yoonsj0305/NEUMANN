@@ -422,3 +422,91 @@ jobs:
           if-no-files-found: error
 
 # Q3 first-authored original-only audit refresh: same frozen first SHA, exhaustive 10 static pairs, not new first-blind.
+
+  q3_postgrade_first_source_all5_individual_action_no_dedup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-source-only-real-original-x-y
+          github-token: ${{ github.token }}
+          path: /tmp/q3-pair-counter/source
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-sealed-real-learned-graph-edit-predictions
+          github-token: ${{ github.token }}
+          path: /tmp/q3-pair-counter/first
+      - name: Assert first source/pred SHA, replay every original action by same unchanged graph executor and retain DUPLICATED actions rather than hiding routes
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-pair-counter/peraction
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/q3:research/g0 \
+            python research/q3/keijzer_neat12_static2_exhaustive_original_counterfactual.py --mode infer \
+            --source /tmp/q3-pair-counter/source/ORIGINAL12_XY_SOURCE_ONLY.json \
+            --first_pred /tmp/q3-pair-counter/first/FIRST_NEURAL_RECURSIVE_GRAPH_AND_FOUR_CLASSICAL_12_PRED.json \
+            --out /tmp/q3-pair-counter/peraction/FROZEN_ORIGINAL12_5_GRAPH_ACTIONS_UNDEDUPLICATED_SOURCE.json \
+            | tee /tmp/q3-pair-counter/peraction/ORIGINAL_UNDEDUPLICATED_FIVE_SOURCE_REPLAY_LOG.txt
+          sha256sum /tmp/q3-pair-counter/peraction/FROZEN_ORIGINAL12_5_GRAPH_ACTIONS_UNDEDUPLICATED_SOURCE.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-first-keijzer-neat12-all5-action-source-only-without-dedup
+          path: /tmp/q3-pair-counter/peraction
+          if-no-files-found: error
+
+  q3_postgrade_independent_real_author_grade_of_ALL10_STATIC_pairs:
+    needs: q3_postgrade_first_source_all5_individual_action_no_dedup
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-first-keijzer-neat12-all5-action-source-only-without-dedup
+          path: /tmp/q3-pair-grade/source
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-gold-full-author-original-graders-only
+          github-token: ${{ github.token }}
+          path: /tmp/q3-pair-grade/true
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-whole-original-real-author-sympy-math-grade
+          github-token: ${{ github.token }}
+          path: /tmp/q3-pair-grade/firstgrade
+      - name: Full native original analytic truth equality of EACH action, exhaustive all 10 fixed 2-action pairs and all 31 global subsets; preserve first learned 5/12
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-pair-grade/audit
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/q3:research/g0 \
+            python research/q3/keijzer_neat12_static2_exhaustive_original_counterfactual.py --mode grade \
+            --pred /tmp/q3-pair-grade/source/FROZEN_ORIGINAL12_5_GRAPH_ACTIONS_UNDEDUPLICATED_SOURCE.json \
+            --truth /tmp/q3-pair-grade/true/ORIGINAL12_TRUE_AUTHOR_FORMULAS_GRADER_ONLY.json \
+            --first_grade /tmp/q3-pair-grade/firstgrade/FIRST_KEIJZER7_NEAT5_PUBLISHED_AUTHOR_ORIGINAL_EXACT_GRADE.json \
+            --out /tmp/q3-pair-grade/audit/FIRST12_ADAPTIVE2_VS_ALL_STATIC2_EXACT_AUTHOR_GRADE.json \
+            | tee /tmp/q3-pair-grade/audit/ALL10_TWO_ACTION_STATIC_CLASSICAL_COMPARE.log
+          sha256sum /tmp/q3-pair-grade/audit/FIRST12_ADAPTIVE2_VS_ALL_STATIC2_EXACT_AUTHOR_GRADE.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-12-real-original-each-fixed-action-10staticpairs-original-math-certified
+          path: /tmp/q3-pair-grade/audit
+          if-no-files-found: error
