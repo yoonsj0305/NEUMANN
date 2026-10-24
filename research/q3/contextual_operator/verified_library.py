@@ -103,6 +103,26 @@ class VerifiedLibrary:
         return {'status':'PREDICTED_UNVERIFIED', 'operator_id':item.id,
                 'output':output, 'code_sha256':item.sha256}
 
+    def solve_or_invent(self, demos, heldout, query, proposer=None):
+        """Propose new code ONCE on library miss, never pass gold to proposer.
+
+        The proposer sees ONLY demonstrations, not holdout or test truth.
+        New predictions remain PREDICTED_UNVERIFIED until independent grade.
+        """
+        previous = self.reuse(demos, query)
+        if previous['status'] != 'UNKNOWN' or proposer is None:
+            return previous
+        if len(demos) < 2 or not heldout:
+            return previous
+        candidate = proposer(demos)
+        self.stats['proposal_requests'] += 1
+        if not candidate:
+            return previous
+        if not self.admit(candidate['id'], candidate['source'],
+                          candidate['function'], demos, heldout, candidate['origin']):
+            return previous
+        return self.reuse(demos, query)
+
     def snapshot(self):
         return {'operators':[dict(id=i.id, sha256=i.sha256, origin=i.origin)
                              for i in self.items],
