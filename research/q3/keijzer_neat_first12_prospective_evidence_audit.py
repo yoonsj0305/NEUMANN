@@ -16,7 +16,7 @@ Scientific outcomes:
 Necessary and sufficient model source actions, primitive meanings, fixed CPU
 budget, external PySR baseline and global Q3/Q4 remain separate hypotheses.
 """
-import argparse,collections,hashlib,json,math,pathlib
+import argparse,collections,hashlib,itertools,json,math,pathlib
 import sympy as sp
 
 LOCKS={
@@ -133,6 +133,36 @@ def report(args):
             "D_original_graph_nodes":source_cases[D][task_id]["constructed_graph_nodes"],
             "D_original_verifier_calls":source_cases[D][task_id]["verifier_calls"],
         })
+    # Exhaust all 10 STATIC two-family choices using the FIRST true
+    # original source-compiled full 5-family arm receipts, no new predictions.
+    # The full arm deduplicates syntactically equal macros in ACTIONS order.
+    # Therefore this is an evidence-backed LOWER BOUND on each pair's
+    # capability, NOT proof that an unfound pair cannot succeed by itself.
+    five_actions=tuple(pred["methods"][A]["cases"][0]["selected_graph_edit_families"])
+    assert len(five_actions)==5 and len(set(five_actions))==5
+    exact_first_family={}
+    for row in rows:
+        exact_first_family[row["id"]]={
+            p.get("structural_action_family") for p in
+            first_grade[A][row["id"]]["certified_source_built_macros"]
+        }
+    static_two_families=[]
+    for pair in itertools.combinations(five_actions,2):
+        known={q["id"] for q in rows
+               if exact_first_family[q["id"]].intersection(pair)}
+        static_two_families.append({
+            "family_actions":list(pair),
+            "certified_first_full_5_arm_proven_author_originals":[
+                q["task_ID"] for q in rows if q["id"] in known],
+            "minimum_proven_exact_count_from_first_full_arm_candidates":len(known),
+            "up_to_12_additional_possible_from_elided_duplicate_provenance":True,
+        })
+    best_static_first=max(p["minimum_proven_exact_count_from_first_full_arm_candidates"]
+                          for p in static_two_families)
+    # If a static pair has 5 first-program full original witnesses in the
+    # original A receipt, it PROVES that two static semantic graph actions
+    # can match D in exact accuracy (although elapsed CPU may differ).
+    static_pair_exactly_matches_all_A=(best_static_first==len(solved[A]))
     training=pred["synthetic_neural_training"]
     train_cpu=training["source_verifier_train_cpu"]+training["trained_neural_CPU"]
     train_calls=training["source_verifier_calls"]
@@ -181,6 +211,10 @@ def report(args):
         "conditional_minimum_similar_12_task_batches_to_amortize_CPU":cpu_batches,
         "conditional_minimum_similar_12_task_batches_to_amortize_verifier_calls":call_batches,
         "conditional_amortization_requires":"Identical pretrained policy reused with no refit; each UNSEEN future 12-task batch has observed first-batch accuracy and speed; common preprocessing and grading costs ignored. NOT measured actual cross-task amortized 10x.",
+        "static_two_action_proven_solution_lower_bounds_from_first_FULL5_candidates":static_two_families,
+        "best_static_two_proven_correct_count_without_new_executions":best_static_first,
+        "a_static_two_pair_exactly_matches_complete_author_accuracy_CERTIFIED":static_pair_exactly_matches_all_A,
+        "static_pair_INFERIORITY_claim_if_unmatched":"FORBIDDEN: A method's first macro dedup can hide other action paths; only confirmed positive lower bounds can be stated",
         "source_budget_comparison_note":"All5 classical expands five legal programs versus learned chooses two; both same primitive rights and 48 input y/x, but total training cost must be charged to learned arm.",
         "strong_GP_CEGIS_baseline":"NOT_EXECUTED",
         "independent_original_author_family":True,
@@ -200,6 +234,8 @@ def report(args):
            "verifier_call_speedup":calls_a/calls_d,
            "amortization_batches_CPU_conditional":cpu_batches,
            "amortization_batches_calls_conditional":call_batches,
+           "best_static_two_positive_receipt":best_static_first,
+           "static_two_proved_full_parity":static_pair_exactly_matches_all_A,
            "report_sha256":sha(path)},sort_keys=True),flush=True)
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
