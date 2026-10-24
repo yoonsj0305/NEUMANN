@@ -1,0 +1,129 @@
+name: NEUMANN Q6 FIRST cross-author Nguyen originals frozen ERBench learned policy
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_nguyen_frozen_derived_power_cross_author.yml'
+      - 'research/q3/nguyen_external_first8_prepare.py'
+      - 'research/q3/nguyen_frozen_real_model_cross_author.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  external_published_Nguyen_author_source_withheld_from_model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - name: Freeze published independent Nguyen1-8 original author targets in a separate source-generation job
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q6ng/source /tmp/q6ng/true
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0 python research/q3/nguyen_external_first8_prepare.py \
+            --source /tmp/q6ng/source/NON_ERBENCH_NGUYEN8_NUMERIC_ONLY_48PTS.json \
+            --truth /tmp/q6ng/true/PUBLISHED_NGUYEN8_TRUE_AUTHOR_EQUATIONS_PRIVATE.json
+          python - <<'PY'
+          import json
+          src=json.load(open('/tmp/q6ng/source/NON_ERBENCH_NGUYEN8_NUMERIC_ONLY_48PTS.json'))
+          assert len(src['source_numeric_without_equations'])==8
+          assert all('original_expression' not in x for x in src['source_numeric_without_equations'])
+          assert all(len(x['x'])==len(x['y'])==48 for x in src['source_numeric_without_equations'])
+          print('Q6_NGUYEN_EXTERNAL_AUTHOR_TRUTH_PHYSICALLY_WITHHELD')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q6-first-real-nguyen8-author-numeric-source-only
+          path: /tmp/q6ng/source
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q6-first-real-nguyen8-original-gold-private-to-grader
+          path: /tmp/q6ng/true
+          if-no-files-found: error
+  frozen_already_trained_model_exact_weights_vs_first_eleventh_original:
+    needs: external_published_Nguyen_author_source_withheld_from_model
+    runs-on: ubuntu-latest
+    timeout-minutes: 23
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39913799990
+          name: q3-sx-online-no-label-training-original128-only-numeric
+          github-token: ${{ github.token }}
+          path: /tmp/q6ng/train_prior_only
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39936479218
+          name: neumann-q3-eleventh-original-sealed-learned-exp-log-derived-macros
+          github-token: ${{ github.token }}
+          path: /tmp/q6ng/old_model_proof
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q6-first-real-nguyen8-author-numeric-source-only
+          path: /tmp/q6ng/source
+      - name: Refuse learned weight/training reward/memory SHA changes, use EXACT previous ERBench neural policy on non-ERBench publisher's original functions
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q6ng/proposals
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/g0:research/q3 \
+            python research/q3/nguyen_frozen_real_model_cross_author.py --mode infer \
+            --train /tmp/q6ng/train_prior_only/OTHER_ORIGINAL128_NUMERIC_XY_NO_FORMULA.json \
+            --old /tmp/q6ng/old_model_proof/FIRST_ELEVENTH32_DERIVED_EXPLOG_POWER_AND_CLASSICAL_MACROS.json \
+            --source /tmp/q6ng/source/NON_ERBENCH_NGUYEN8_NUMERIC_ONLY_48PTS.json \
+            --pred /tmp/q6ng/proposals/FIRST_FROZEN_NEURAL_VS_CLASSICAL_NEW_NGUYEN8_SOURCE_PREDICTIONS.json \
+            | tee /tmp/q6ng/proposals/ERBENCH_MODEL_NGUYEN_FROZEN_WEIGHTS_ATTESTATION.log
+          sha256sum /tmp/q6ng/proposals/FIRST_FROZEN_NEURAL_VS_CLASSICAL_NEW_NGUYEN8_SOURCE_PREDICTIONS.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q6-first-real-nguyen8-frozen-neural-source-proposals-before-author-grader
+          path: /tmp/q6ng/proposals
+          if-no-files-found: error
+  independent_Nguyen_author_entire_analytic_expression_grader:
+    needs: frozen_already_trained_model_exact_weights_vs_first_eleventh_original
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q6-first-real-nguyen8-original-gold-private-to-grader
+          path: /tmp/q6ng/original
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q6-first-real-nguyen8-frozen-neural-source-proposals-before-author-grader
+          path: /tmp/q6ng/pred
+      - name: Score every published original Nguyen1..8 as whole exact symbolic function or UNKNOWN and count learner-only over original strong classical rights
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q6ng/graded
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0:research/q3 \
+            python research/q3/nguyen_frozen_real_model_cross_author.py --mode grade \
+            --truth /tmp/q6ng/original/PUBLISHED_NGUYEN8_TRUE_AUTHOR_EQUATIONS_PRIVATE.json \
+            --pred /tmp/q6ng/pred/FIRST_FROZEN_NEURAL_VS_CLASSICAL_NEW_NGUYEN8_SOURCE_PREDICTIONS.json \
+            --out /tmp/q6ng/graded/INDEPENDENT_NGUYEN8_FULL_AUTHOR_TRUTH_SCORE_FROZEN_NEURAL_AND_CLASSICAL.json \
+            | tee /tmp/q6ng/graded/NATIVE_CROSS_AUTHOR_VERIFIER_FULL_ANALYTIC_FUNCTION.log
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/q6ng/graded/INDEPENDENT_NGUYEN8_FULL_AUTHOR_TRUTH_SCORE_FROZEN_NEURAL_AND_CLASSICAL.json'))
+          assert len(d['grades'])==5 and all(k['total']==8 for k in d['grades'].values())
+          assert d['G1']=='HOLD' and d['Q3_GLOBAL']=='OPEN'
+          print('Q6_PUBLISHED_INDEPENDENT_AUTHOR_ALL_EIGHT_ACCOUNTED')
+          PY
+          sha256sum /tmp/q6ng/graded/INDEPENDENT_NGUYEN8_FULL_AUTHOR_TRUTH_SCORE_FROZEN_NEURAL_AND_CLASSICAL.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q6-first-real-nguyen8-full-analytic-author-exact-independent-grade
+          path: /tmp/q6ng/graded
+          if-no-files-found: error

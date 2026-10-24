@@ -1,0 +1,137 @@
+name: NEUMANN Q3 source-induced EXPLOG derived operator true eleventh32
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_derived_exp_log_power_eleventh32.yml'
+      - 'research/g0/erbench_original_eleventh.py'
+      - 'research/q3/exp_log_derived_power_core.py'
+      - 'research/q3/learned_derived_power_eleventh32.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_true_author_physically_separated:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - name: Pin external original equation source; freeze never-used eleventh32 metadata
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3p/data /tmp/q3p/source /tmp/q3p/truth
+          python - <<'PY'
+          import hashlib,pathlib,urllib.request
+          rev='95bf15c27de68c3f170ca6140d2e4a811c60344f'
+          url='https://huggingface.co/datasets/EquationDiscovery/Equation_Recovery_Benchmark/resolve/'+rev+'/train.csv?download=true'
+          with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'NEUMANN-composed-power-original-eleventh/1'}),timeout=70) as u:raw=u.read()
+          assert hashlib.sha256(raw).hexdigest()=='03c0ceb53ed0348650c0a94ed5cd1e452325d2b7c7d3be68f9a458316eda33b1'
+          pathlib.Path('/tmp/q3p/data/original.csv').write_bytes(raw)
+          print('EXTERNAL_ELEVENTH_ORIGINAL_PUBLIC_DATA_PIN_SHA_PASS')
+          PY
+          OPENBLAS_NUM_THREADS=1 python research/g0/erbench_original_eleventh.py --mode prepare \
+            --csv-path /tmp/q3p/data/original.csv \
+            --revision 95bf15c27de68c3f170ca6140d2e4a811c60344f \
+            --source /tmp/q3p/source/ELEVENTH32_NUMERIC_NO_AUTHOR_TRUTH.json \
+            --truth /tmp/q3p/truth/ELEVENTH32_PRIVATE_AUTHOR_EQUATIONS.json
+          rm /tmp/q3p/data/original.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-eleventh-original-source-only
+          path: /tmp/q3p/source/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-eleventh-original-private-author-truth
+          path: /tmp/q3p/truth/
+          if-no-files-found: error
+  train_learned_derived_operator_graph_policy_before_true_author:
+    needs: original_true_author_physically_separated
+    runs-on: ubuntu-latest
+    timeout-minutes: 23
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39913799990
+          name: q3-sx-online-no-label-training-original128-only-numeric
+          github-token: ${{ github.token }}
+          path: /tmp/q3p/train
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-eleventh-original-source-only
+          path: /tmp/q3p/source
+      - name: Source-only tests show exact semantic composition from EXP LOG and reject arbitrary wrong form
+        run: |
+          set -euo pipefail
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0:research/q3 python - <<'PY'
+          import sympy as s,numpy as np
+          from exp_log_derived_power_core import best_power,macro,COMBINATIONS
+          x=np.linspace(-.5,.7,48)
+          assert len(COMBINATIONS)==75
+          for b,k in COMBINATIONS: macro(b,k)
+          for arity,fn in [(1,lambda x:10**(4*x+1)),(2,lambda x:2**x+3**x-1)]:
+              err,valid,count=best_power({'x':x.tolist(),'y':fn(x).tolist()},arity)
+              assert count>0 and valid is not None,(arity,err)
+              print('DERIVED_POWER_SOURCE_UNIT_PASS',arity,valid['named_lambda'])
+          err,bad,count=best_power({'x':x.tolist(),'y':np.exp(np.sin(x)).tolist()},2)
+          assert bad is None,'UNSUPPORTED_EQUIVALENCE_ACCEPTED'
+          print('DERIVED_EXACT_EXP_LOG_CANONICAL_PROOFS_75_AND_NEGATIVE_PASS')
+          PY
+      - name: Actual MLP learns structure actions by source reward, seals first eleventh original programs before true answer
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3p/pred
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/g0:research/q3 \
+            python research/q3/learned_derived_power_eleventh32.py --mode infer \
+            --train /tmp/q3p/train/OTHER_ORIGINAL128_NUMERIC_XY_NO_FORMULA.json \
+            --source /tmp/q3p/source/ELEVENTH32_NUMERIC_NO_AUTHOR_TRUTH.json \
+            --pred /tmp/q3p/pred/FIRST_ELEVENTH32_DERIVED_EXPLOG_POWER_AND_CLASSICAL_MACROS.json \
+            | tee /tmp/q3p/pred/FIRST_DERIVED_OPERATOR_SOURCE_ONLY.log
+          sha256sum /tmp/q3p/pred/FIRST_ELEVENTH32_DERIVED_EXPLOG_POWER_AND_CLASSICAL_MACROS.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-eleventh-original-sealed-learned-exp-log-derived-macros
+          path: /tmp/q3p/pred/
+          if-no-files-found: error
+  independent_exact_full_original_author_function_grade:
+    needs: train_learned_derived_operator_graph_policy_before_true_author
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-eleventh-original-private-author-truth
+          path: /tmp/q3p/truth
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-eleventh-original-sealed-learned-exp-log-derived-macros
+          path: /tmp/q3p/pred
+      - name: Independently certify FULL authored expression equality and every UNKNOWN after first frozen model
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3p/grade
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0:research/q3 \
+            python research/q3/learned_derived_power_eleventh32.py --mode grade \
+            --truth /tmp/q3p/truth/ELEVENTH32_PRIVATE_AUTHOR_EQUATIONS.json \
+            --pred /tmp/q3p/pred/FIRST_ELEVENTH32_DERIVED_EXPLOG_POWER_AND_CLASSICAL_MACROS.json \
+            --out /tmp/q3p/grade/FIRST_ELEVENTH32_DERIVED_OPERATOR_EXACT_AUTHOR_FUNCTION_GRADE.json \
+            | tee /tmp/q3p/grade/FIRST_AUTHOR_ORIGINAL_FULL_SYMBOLIC_VERIFICATION.log
+          sha256sum /tmp/q3p/grade/FIRST_ELEVENTH32_DERIVED_OPERATOR_EXACT_AUTHOR_FUNCTION_GRADE.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-eleventh-original-full-authored-exact-derived-operator-grade
+          path: /tmp/q3p/grade/
+          if-no-files-found: error

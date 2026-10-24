@@ -1,0 +1,90 @@
+name: NEUMANN Q3 two preregistered ninth32 branches frozen weight transfer versus additive macro exact original
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_ninth32_immutable_frozen_vs_additive.yml'
+      - 'research/q3/ninth32_frozen_unary_vs_additive_first_original_attribution.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independent_sha_asserted_identical_author_cohort_first_frozen_branches:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39927068026
+          name: q3-ninth32-source-only-actual-public-author-numeric
+          github-token: ${{ github.token }}
+          path: /tmp/q3-ff/source
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39927068026
+          name: q3-ninth32-actual-private-full-author-equations-grader-only
+          github-token: ${{ github.token }}
+          path: /tmp/q3-ff/truth
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39927068026
+          name: q3-ninth32-frozen-nonlinear-learned-generated-macro-and-classical-pregrade
+          github-token: ${{ github.token }}
+          path: /tmp/q3-ff/pred
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39927068026
+          name: q3-ninth32-first-real-author-full-original-nonlinear-macro-independent-grade
+          github-token: ${{ github.token }}
+          path: /tmp/q3-ff/grade
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39923380389
+          name: neumann-q3-first-ninth32-original-source-only-no-truth
+          github-token: ${{ github.token }}
+          path: /tmp/q3-add/source
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39923380389
+          name: neumann-q3-first-ninth32-actual-original-true-expression-private
+          github-token: ${{ github.token }}
+          path: /tmp/q3-add/truth
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39923380389
+          name: neumann-q3-ninth32-frozen-selfreward-composed-macros-before-grading
+          github-token: ${{ github.token }}
+          path: /tmp/q3-add/pred
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39923380389
+          name: neumann-q3-ninth32-full-original-exact-additive-macro-grader
+          github-token: ${{ github.token }}
+          path: /tmp/q3-add/grade
+      - name: Freeze all eight SOURCE/PRED/TRUE/GRADE receipts and compare same original32 exact witness sets, numeric fidelity and known costs
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-cross/audit
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/q3/ninth32_frozen_unary_vs_additive_first_original_attribution.py \
+            --frozen-source /tmp/q3-ff/source/NINTH32_NUMERIC_SOURCE_WITHOUT_TRUE_FORMULAS.json \
+            --frozen-truth /tmp/q3-ff/truth/NINTH32_PRIVATE_FULL_AUTHOR_EQUATIONS.json \
+            --frozen-pred /tmp/q3-ff/pred/FIRST_NEURAL_AND_CLASSICAL_NESTED_MACRO_PREDICTIONS.json \
+            --frozen-grade /tmp/q3-ff/grade/FIRST_NINTH32_FULL_ORIGINAL_NONLINEAR_MACRO_EXACT_GRADE.json \
+            --additive-source /tmp/q3-add/source/FIRST_NINTH32_SOURCE_ONLY_NUMERIC.json \
+            --additive-truth /tmp/q3-add/truth/REAL_NINTH32_PRIVATE_AUTHOR_TRUTH.json \
+            --additive-pred /tmp/q3-add/pred/FIRST_NINTH_LEARNED_DYNAMIC_MACROS_AND_ALL_CLASSICAL_SOURCE_ONLY.json \
+            --additive-grade /tmp/q3-add/grade/FIRST_NINTH32_AUTHOR_FULL_EQUIVALENCE_NEURAL_AND_CLASSICAL.json \
+            --out /tmp/q3-cross/audit/FROZEN_MODEL_TRANSFER_VS_NEW_ADDITIVE_AUTHOR_EQUATION_ACCURACY.json \
+            | tee /tmp/q3-cross/audit/IMMUTABLE_BOTH_ORIGINAL_FIRST_GRADES_LOG.txt
+          sha256sum /tmp/q3-cross/audit/FROZEN_MODEL_TRANSFER_VS_NEW_ADDITIVE_AUTHOR_EQUATION_ACCURACY.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-two-first-ninth32-frozen-weight-and-additive-macro-causal-boundary-audit
+          path: /tmp/q3-cross/audit/
+          if-no-files-found: error

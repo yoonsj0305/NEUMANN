@@ -1,0 +1,54 @@
+name: NEUMANN Q3 real original cubic requires two independently discovered cube branches proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_ninth32_two_cube_strict_necessity.yml'
+      - 'research/q3/ninth32_two_cubic_macro_nonstrivial_proof.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  author_original_nonlinear_two_cubic_exact_impossibility_for_one:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39923380389
+          name: neumann-q3-first-ninth32-actual-original-true-expression-private
+          github-token: ${{ github.token }}
+          path: /tmp/ninth2cube/truth
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39923380389
+          name: neumann-q3-ninth32-frozen-selfreward-composed-macros-before-grading
+          github-token: ${{ github.token }}
+          path: /tmp/ninth2cube/pred
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39923380389
+          name: neumann-q3-ninth32-full-original-exact-additive-macro-grader
+          github-token: ${{ github.token }}
+          path: /tmp/ninth2cube/grade
+      - name: Verify public original author polynomial, unchanged before-grade source-composed cubics, and strict ANY-single-shifted-cube lower bound
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/ninth2cube/proof
+          PYTHONPATH=research/g0 \
+            python research/q3/ninth32_two_cubic_macro_nonstrivial_proof.py \
+              --truth /tmp/ninth2cube/truth/REAL_NINTH32_PRIVATE_AUTHOR_TRUTH.json \
+              --pred /tmp/ninth2cube/pred/FIRST_NINTH_LEARNED_DYNAMIC_MACROS_AND_ALL_CLASSICAL_SOURCE_ONLY.json \
+              --grade /tmp/ninth2cube/grade/FIRST_NINTH32_AUTHOR_FULL_EQUIVALENCE_NEURAL_AND_CLASSICAL.json \
+              --out /tmp/ninth2cube/proof/STRICT_UNIVERSAL_SINGLE_CUBIC_IMPOSSIBILITY_AND_TWO_CUBIC_ORIGINAL_IDENTITY.json \
+              | tee /tmp/ninth2cube/proof/FIRST_NATIVE_ORIGINAL_CUBIC_LOWER_BOUND_PROOF.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-ninth-original-two-cubics-single-cubic-universal-impossibility
+          path: /tmp/ninth2cube/proof/
+          if-no-files-found: error
