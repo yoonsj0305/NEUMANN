@@ -275,7 +275,7 @@ jobs:
         with:
           name: q3-first-new-keijzer7-neat5-source-only-real-original-x-y
           path: /tmp/q3-q3new/source/
-      - name: Mechanism controls: all five graph-edit families actually execute, graph constructs new lambda and no fabricated source exact
+      - name: "Mechanism controls: all five graph-edit families actually execute, graph constructs new lambda and no fabricated source exact"
         run: |
           set -euo pipefail
           OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/q3:research/g0 python - <<'PY'
