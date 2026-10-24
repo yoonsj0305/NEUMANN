@@ -365,3 +365,58 @@ jobs:
           if-no-files-found: error
 
 # Synchronization marker only: frozen author tasks/model/train/classical comparators unchanged.
+
+  q3_immutable_first_12_true_authors_math_and_learning_cost_audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-source-only-real-original-x-y
+          github-token: ${{ github.token }}
+          path: /tmp/q3-first-audit/source
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-gold-full-author-original-graders-only
+          github-token: ${{ github.token }}
+          path: /tmp/q3-first-audit/truth
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-sealed-real-learned-graph-edit-predictions
+          github-token: ${{ github.token }}
+          path: /tmp/q3-first-audit/pred
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-whole-original-real-author-sympy-math-grade
+          github-token: ${{ github.token }}
+          path: /tmp/q3-first-audit/grade
+      - name: SHA pin all four first source/truth/model/grade, independently reprove exact authors and calculate strict break-even cost
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-first-audit/audit
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 \
+            python research/q3/keijzer_neat_first12_prospective_evidence_audit.py \
+              --source /tmp/q3-first-audit/source/ORIGINAL12_XY_SOURCE_ONLY.json \
+              --truth /tmp/q3-first-audit/truth/ORIGINAL12_TRUE_AUTHOR_FORMULAS_GRADER_ONLY.json \
+              --pred /tmp/q3-first-audit/pred/FIRST_NEURAL_RECURSIVE_GRAPH_AND_FOUR_CLASSICAL_12_PRED.json \
+              --grade /tmp/q3-first-audit/grade/FIRST_KEIJZER7_NEAT5_PUBLISHED_AUTHOR_ORIGINAL_EXACT_GRADE.json \
+              --out /tmp/q3-first-audit/audit/KEIJZER_NEAT12_ORIGINAL_FIRST_MATH_COST_AUTHOR_FAMILY_AUDIT.json \
+              | tee /tmp/q3-first-audit/audit/ORIGINAL_FIRST_TRUE_AUTHOR_MATH_AND_COST_SUMMARY.log
+          sha256sum /tmp/q3-first-audit/audit/KEIJZER_NEAT12_ORIGINAL_FIRST_MATH_COST_AUTHOR_FAMILY_AUDIT.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-keijzer-neat12-first-frozen-author-family-source-math-and-cost-audit
+          path: /tmp/q3-first-audit/audit/
+          if-no-files-found: error
