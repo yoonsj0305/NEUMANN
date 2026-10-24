@@ -32,8 +32,20 @@ def log_ratio(expr,x):
         coeff,rest=term.as_coeff_Mul()
         if not coeff.is_Integer or rest.func is not sp.log:
             return {"status":"UNKNOWN_NON_INTEGRAL_LOG_SUM","term":str(term)}
-        g=sp.factor(rest.args[0])
-        if g.is_positive is not True:
+        # Do not factor before testing positivity: factoring a manifest
+        # positive polynomial x**5+1 into alternating-coefficient factors
+        # can destroy SymPy's straightforward x>0 positivity proof.
+        g=rest.args[0]
+        certified=g.is_positive is True
+        if not certified:
+            try:
+                polynomial=sp.Poly(sp.expand(g),x)
+                coeffs=polynomial.all_coeffs()
+                certified=(bool(coeffs) and all(c.is_nonnegative is True for c in coeffs)
+                           and any(c.is_positive is True for c in coeffs))
+            except Exception:
+                certified=False
+        if not certified:
             return {"status":"UNKNOWN_ARG_NOT_PROVEN_POSITIVE","argument":str(g)}
         ratio*=g**coeff
         atoms.append({"argument":str(g),"integer_log_coefficient":str(coeff),
