@@ -567,3 +567,65 @@ jobs:
           path: /tmp/q3-positive-domain/audit
           if-no-files-found: error
 # Exact positive-real logarithm source proof: original author SHA preserved, factorization no longer masks manifest positivity.
+
+  q3_first_keijzer_neat12_ALL_static_pair_real_positive_corrected_math:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check sympy==1.13.3 numpy==1.26.4
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-gold-full-author-original-graders-only
+          github-token: ${{ github.token }}
+          path: /tmp/q3-final-author/truth
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-whole-original-real-author-sympy-math-grade
+          github-token: ${{ github.token }}
+          path: /tmp/q3-final-author/first
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40075877886
+          name: neumann-q3-first-keijzer-neat12-all5-action-source-only-without-dedup
+          github-token: ${{ github.token }}
+          path: /tmp/q3-final-author/peraction
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40075877886
+          name: neumann-q3-12-real-original-each-fixed-action-10staticpairs-original-math-certified
+          github-token: ${{ github.token }}
+          path: /tmp/q3-final-author/static-grade
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40076362548
+          name: neumann-q3-original-Keijzer7-real-positive-log-domain-identity-math-proof
+          github-token: ${{ github.token }}
+          path: /tmp/q3-final-author/log-proof
+      - name: Strict SHA five source/grade/math sources; mathematically correct Keijzer7 log and prove all 10 static two-family abilities
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-final-author/proof
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/q3 \
+            python research/q3/keijzer_neat12_real_domain_all_static2_corrected_audit.py \
+            --original_truth /tmp/q3-final-author/truth/ORIGINAL12_TRUE_AUTHOR_FORMULAS_GRADER_ONLY.json \
+            --original_firstgrade /tmp/q3-final-author/first/FIRST_KEIJZER7_NEAT5_PUBLISHED_AUTHOR_ORIGINAL_EXACT_GRADE.json \
+            --source_each_action /tmp/q3-final-author/peraction/FROZEN_ORIGINAL12_5_GRAPH_ACTIONS_UNDEDUPLICATED_SOURCE.json \
+            --independent_first_static_grade /tmp/q3-final-author/static-grade/FIRST12_ADAPTIVE2_VS_ALL_STATIC2_EXACT_AUTHOR_GRADE.json \
+            --original_real_positive_domain_grade /tmp/q3-final-author/log-proof/AFTERGRADE_FIRST_SOURCE_KEIJZER7_CERTIFIED_LOG_IDENTITY_ON_POSITIVE_REALS.json \
+            --out /tmp/q3-final-author/proof/REAL_DOMAIN_CORRECTED_AUTHOR12_LEARNED_ADAPTIVE_VS_10_STATIC_PAIRS.json \
+            | tee /tmp/q3-final-author/proof/MATHEMATICALLY_CORRECTED_AUTHOR12_PERPAIR_FAMILY_PROOF.log
+          sha256sum /tmp/q3-final-author/proof/REAL_DOMAIN_CORRECTED_AUTHOR12_LEARNED_ADAPTIVE_VS_10_STATIC_PAIRS.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-two-authors-all10-fixed2-versus-neural-adaptive-real-domain-corrected-math-proof
+          path: /tmp/q3-final-author/proof
+          if-no-files-found: error
