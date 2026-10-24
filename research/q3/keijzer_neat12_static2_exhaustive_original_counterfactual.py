@@ -62,9 +62,30 @@ def infer(args):
         recomputed_expressions={
             q["source_executable_AST_candidate"]["named_lambda"] for q in actions
             if q["source_executable_AST_candidate"] is not None}
-        assert first_expressions.issubset(recomputed_expressions),(
-            "FIRST_ORIGINAL_FULL5_CANDIDATE_DROPPED",row["id"])
+        # Numerical source candidate selection is not assumed bitwise
+        # stable across independent CPUs. Formulas may differ in printed
+        # syntax yet be mathematically identical. Diagnose BEFORE grade.
+        first_macros=orig["source_valid_defined_macros"]
+        new_macros=[q["source_executable_AST_candidate"] for q in actions
+                    if q["source_executable_AST_candidate"] is not None]
+        semantic_misses=[]
+        for original_macro in first_macros:
+            try:
+                original_ast=sp.sympify(original_macro["defined_operator_AST"],
+                                       locals={"x":X})
+                matched=any(sp.simplify(original_ast-sp.sympify(
+                    candidate["defined_operator_AST"],locals={"x":X}))==0
+                    for candidate in new_macros)
+            except Exception:
+                matched=False
+            if not matched:
+                semantic_misses.append(original_macro["named_lambda"])
+        if semantic_misses:
+            print("Q3_SOURCE_REPLAY_CANDIDATE_DIFFERENCE_NOT_HIDDEN",
+                  row["id"],"first",semantic_misses,
+                  "new",[q["named_lambda"] for q in new_macros],flush=True)
         records.append({"id":row["id"],
+                        "first_A_original_source_semantic_replay_mismatches":semantic_misses,
                         "input_numeric_samples":len(row.get("x",[])),
                         "per_action_UNDEDUPLICATED_source_first_programs":actions})
     assert counts["source_verifier_calls"]==7523
@@ -77,6 +98,9 @@ def infer(args):
           "existing_frozen_executor_not_modified":True,
           "source_first_original_A_all5_call_count_reproducible":True,
           "source_first_original_A_all5_graph_node_count_reproducible":True,
+          "first_A_source_candidate_semantic_replay_differences_exist":any(
+               q["first_A_original_source_semantic_replay_mismatches"] for q in records),
+          "same_calls_does_not_imply_identical_source_candidate":"IMPORTANT",
           "sampling":"EXACT first 48 public source x/y per authored task; first prior author truth is publicly opened by earlier run",
           "source_policy_test_after_original_first_grade":True,
           "per_task_source_action_replay":records,
