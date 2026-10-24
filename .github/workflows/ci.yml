@@ -511,3 +511,58 @@ jobs:
           path: /tmp/q3-pair-grade/audit
           if-no-files-found: error
 # Q3 source replay strict semantic equivalence diagnostic only; first author truth artifact never changed.
+
+  q3_strict_real_domain_Keijzer7_first_log_identity_mathematical_audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check sympy==1.13.3 numpy==1.26.4
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-source-only-real-original-x-y
+          github-token: ${{ github.token }}
+          path: /tmp/q3-positive-domain/source
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-gold-full-author-original-graders-only
+          github-token: ${{ github.token }}
+          path: /tmp/q3-positive-domain/truth
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-sealed-real-learned-graph-edit-predictions
+          github-token: ${{ github.token }}
+          path: /tmp/q3-positive-domain/pred
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-whole-original-real-author-sympy-math-grade
+          github-token: ${{ github.token }}
+          path: /tmp/q3-positive-domain/grade
+      - name: Fully symbolic REAL-POSITIVE original Keijzer7 logarithm laws, first four SHA pins and corrected full-domain author mathematical equivalence only
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-positive-domain/audit
+          OPENBLAS_NUM_THREADS=1 \
+            python research/q3/keijzer7_strict_positive_real_log_author_firstgrade_audit.py \
+            --source /tmp/q3-positive-domain/source/ORIGINAL12_XY_SOURCE_ONLY.json \
+            --truth /tmp/q3-positive-domain/truth/ORIGINAL12_TRUE_AUTHOR_FORMULAS_GRADER_ONLY.json \
+            --pred /tmp/q3-positive-domain/pred/FIRST_NEURAL_RECURSIVE_GRAPH_AND_FOUR_CLASSICAL_12_PRED.json \
+            --grade /tmp/q3-positive-domain/grade/FIRST_KEIJZER7_NEAT5_PUBLISHED_AUTHOR_ORIGINAL_EXACT_GRADE.json \
+            --out /tmp/q3-positive-domain/audit/AFTERGRADE_FIRST_SOURCE_KEIJZER7_CERTIFIED_LOG_IDENTITY_ON_POSITIVE_REALS.json \
+            | tee /tmp/q3-positive-domain/audit/STRICT_REAL_DOMAIN_POSITIVE_LOG_PROOF_READOUT.txt
+          sha256sum /tmp/q3-positive-domain/audit/AFTERGRADE_FIRST_SOURCE_KEIJZER7_CERTIFIED_LOG_IDENTITY_ON_POSITIVE_REALS.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-original-Keijzer7-real-positive-log-domain-identity-math-proof
+          path: /tmp/q3-positive-domain/audit
+          if-no-files-found: error
