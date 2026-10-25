@@ -95,3 +95,25 @@ SHA256 `c95076a510193400961437779cebdc08955de8e05346d163bc2224ea4efb56db`.
 Run `bash REPRODUCE.sh` to verify original SHA manifest and clean-room
 first-decision replay. RC9 and RC10 are mechanism evidence only, both
 remaining subordinate to frozen Q1-Q7 and Frontier Gap requirements.
+
+
+## RC9.2 independent RNG cohort, architecture frozen beforehand
+
+A NEW, DISJOINT 12-seed cohort (20261201..20261212) was executed AFTER
+the original RC9.1 architecture/600 epochs/Adam learning rate/84 source
+examples/selection contract were frozen. ZERO retuning. All **12/12**
+new initializations inferred equivalent accurate local logic and route.
+Frozen model RAW neural n4..6 **5,376/5,376**, compiled n4..8
+**87,296/87,296**, random width16..256 **150/150**, and 8-entry universal
+inductive proof all PASS after source-only prediction SHA seal. Independent
+full retraining initial cohort12/12 plus fresh cohort12/12 gives 24/24
+across 24 distinct initializations, though the first cohort reused four
+exploratory initializations. Fresh cohort measured training CPU25.6463s,
+same-rights classical full9216 enumeration CPU0.0158s. This provides a
+seed-robustness evidence only, not new external family/Q6 or Q4 win.
+
+Full distinct 17-file fresh sample/real weights/first predictions/replay ZIP:
+`NEUMANN1_Q3_RC9_FRESH_12_SEED_VALIDATION_20261025.zip`,
+SHA256 `ffd35466868516954996eeadc09d4e941aaea120b88b14eb4e27ec5828857220`.
+Local independent grade+full receipt replay EXIT0. Same human-bounded DSL
+scientific caveat; global G1/Q3, Q4, Q6, Q7 still OPEN.
