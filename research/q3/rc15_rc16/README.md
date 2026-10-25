@@ -26,3 +26,16 @@ Classical same-rights full candidate audit: 1-state **4** programs best172/258, 
 - Important local scoped PASS: discovery of different reusable state rules, selection and proof of minimum 3-state machine on a different task, two cold model fits, honest zero-shot transfer FAIL, strong classical control and failure-recovery gates.
 - Frozen North Star Q3 **oracle-free general new representation**, Q4 complete 10x, Q6 independent external-author/open-set/scaling, Q7 frontier capability gap all remain OPEN. Do not relabel as global PASS.
 
+
+## RC16.1 direct old-vs-new structural insufficiency (supplemental)
+
+One more exact comparison against PREVIOUS RC14 six-axis DSL: exhaustive
+**6,144 of 6,144** original human-grammar programs evaluated on exactly the
+same 62 RC16 original source I/O sequences (258 output bits), best score
+**229/258, ZERO perfect**. New m=3 finite-state grammar does have exact
+source-perfect, all-length-correct programs, one found by NEW own weights.
+This proves **strict representational separation within the two explicitly
+human-defined program classes**, not impossibility of all register algorithms.
+Full first sealed outputs and every actual PyTorch tensor in updated 33-file
+archive SHA256 **bf0e4e2b42b3ef17ea82126883c57402c3d45c55206635a71689752d655c59a6**.
+Clean extraction REPRODUCE and all36 seed RETRAIN PASS. No global Q3 PASS.
