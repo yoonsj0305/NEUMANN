@@ -1,0 +1,19 @@
+# Q3 RC5 | Membership-only W-method, independent certification boundary
+
+**Date 2026-10-25. Research draft. DO NOT MERGE without review.**
+
+Earlier PR #575 generated variable-size programs using an own-weight 3-parameter neural equality scorer inside a classical active observation table, but every finished program depended on a gold-transition-aware complete equivalence oracle. This PR adds a self-contained classical **membership-only, resettable W-method conformance checker**, with only target input/output traces and a separately trusted upper bound on target state count.
+
+**Formal conditional guarantee:** candidate and target are deterministic complete Mealy machines with the same finite input/output alphabet, reset and initial state, candidate minimal and reachable, target has at most U states. Candidate n states uses state cover P, distinguishing suffixes W and finite tests P Σ^{≤U−n+1} W. Under assumptions, passing implies same outputs on every finite input string, without reading target transitions. The bound cannot be established from finite output samples alone. Without a bound, return UNKNOWN; a FALSE bound can cause false admission.
+
+**Frozen NEUMANN study (local ZIP, not CI):** original own-weight 3-parameter equality checkpoint SHA256 4c3fb7cc3a8d01e0f2e4ed5e5c7c7eee530de5cb8886bb8c39070f4070801787, reused with NO re-training. 36 fresh 5–7-state internal targets, first model proposals SHA-sealed before accessing private grader; **36/36** exact minimum states and independent product-bisimulation proof for arbitrary finite input words; **3,902 distinct output-only membership queries**, **76 W candidate checks**, **ZERO privileged gold-aware complete-equivalence calls**. Matched classical active observer also **36/36, identical 3,902+76**, no neural-exclusive gain.
+
+**Verifier regression:** each possible 2-state binary Mealy target (65,536) tested against two distinct minimal candidates = 131,072 independent comparisons; false approval0 and false rejection0. This empirically validates one subdomain, not the general theorem. Cross input-alphabet8 three-operand binary adder with known bound3: 534 membership queries, two W checks, independent 4,680/4,680 short triples and all-length bisimulation. Already known addition, not a new primitive.
+
+**Negative:** actual 10-state delayed-output machine under false bound7 can receive false conditional approval for a one-state candidate. Bound10 gives the ten-symbol counterexample; no bound yields UNKNOWN. Unqualified general-purpose CERTIFIED is forbidden.
+
+**Full source and weights archive:** NEUMANN1_Q3_MEMBERSHIP_ONLY_W_METHOD_INDEPENDENT_CERT_20261025.zip, 26 members, 30,349 bytes. ZIP SHA256 b80a735123853364d040dfa79d9444538097f6363d82dc8a0f470002dcfa9527. Manifest SHA256 1349c717b46e624094dc978ad1aaec2d3c25225a6f3d750341c1be33e3706d20. Clean-extract bash REPRODUCE.sh EXIT0: byte-sealed first outputs, independent36 grader, exhaustive131,072 tests, false bound, eight-symbol case, 5 local pytest.
+
+GitHub PR includes minimal verification runtime and 4 pytest guards, not actual PyTorch .pt, first study corpus or gold truth. Existing external prior art: https://link.springer.com/article/10.1007/s11219-018-9422-x and https://eprints.whiterose.ac.uk/id/eprint/78801/7/WRRO_78801.pdf.
+
+**Gates:** scoped membership-only completeness PASS *under externally trusted U*, neural program36/36 PASS, 131072 verifier stress PASS, false-bound negative PASS, own-weight-exclusive0, neural-autonomous new operator body OPEN, all-in Q4 10x OPEN, Q6 external-author OPEN, Q7 frontier OPEN. Stop toy state-size inflation. Next true bottleneck: model itself selects representation type and invents semantic operator definitions rather than classical controller doing that work.
