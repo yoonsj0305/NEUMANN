@@ -1,0 +1,23 @@
+# NEUMANN 1 · RC21 | Counterexample-driven grammar growth + own-weight new loop opcode
+
+**2026-10-25 · RESEARCH ONLY · DRAFT, DO NOT MERGE WITHOUT REVIEW.**
+
+## Experiment A (CLASSICAL, NOT NEURAL)
+Classical L*-style observation table starts with ONE state and no supplied upper state count, then constructs fresh state syntax `LEARNED_STATE_<hash>` and binary transition productions from membership queries and exact external equivalence counterexamples. It never imports target transitions, state count or hidden-state labels into the learner. Independent verifier (target machine PRODUCT oracle) confirms equivalence on ALL finite strings and pairwise state distinguishability. Eight target families: modulo3/5/7/11, suffix101, seen101, suffix0101, seen0011, respectively learned minimal **3,5,7,11,4,4,5,5** states (44 total); **348 distinct membership queries + 16 exact equivalence requests** combined. Further modulo2/13/17/23/31/47 auto-grows to **47 states** with 2,302 membership and two equivalence queries. Critically exact equivalence uses an independent gold-machine oracle: **NOT oracle-free Q3.** The generated state grammar is Classical CEGAR, NOT autonomous neural language invention.
+
+## Experiment B (ACTUAL OWN PyTorch weights)
+A distinct neural categorical policy (5 human-supplied microcode slots, 1,080 candidate programs, CEM classical elite sampling + Adam) is trained on 95 opaque end-to-end integer-division I/O pairs (x0..18, base2..6). The EXECUTOR instruction set contains integer registers, primitive WHILE/COMPARE/ADD/SUB, and NO primitive division or remainder. OWN weights synthesize a new **compound** opcode: initialize q0,r=x; while r>=base, r-=base and q+=1; emit (q,r). Original seeds **16/16 best and greedy**, fresh postfreeze seeds **8/8** best and greedy. The source-selected new program is (0,0,0,0,0), dynamically registered token `LEARNED_LOOP_6da4eabc0051`. Fresh, source-blind frozen first predictions **5000/5000** new divmod inputs, and **16,516** development-holdout pairs. Exact ALL nonnegative x / base>=2 follows from q*base+r=x, r>=0, strictly descending r and terminal r<base. The exact SAME learned opcode, without retraining, is reused in **480** independent digit carry-normalization streams of length up to1,024; all pass reference arithmetic.
+
+Strong SAME-RIGHTS classical exhaustive full 1080 program search yields unique source-perfect in measured ~0.002353 CPU s. 16 PyTorch runs cost ~0.8721 CPU s, so neural is ~371x SLOWER for discovery. 200 streams ×128 digits execute ~17x slower than builtin arithmetic (median of five CPU measures, measurement from single process). Human supplied generic loop VM, program slots, primitive instructions, optimizer, source data, target proof and new application orchestration. The model **did not invent this foundational meta-ISA**.
+
+## Scientific impossibility boundary
+Any finite membership observation set is consistent with a delayed adversarial function that matches every observed word and differs on one longer unqueried word. Eight explicit negative witnesses independently audited. Therefore unbounded truth cannot be deduced from arbitrarily restricted finite I/O alone. Full equivalence PASS for all eight DFA families **depends on privileged trusted external equivalence oracle**; not allowed to be silently counted as oracle-free Q3.
+
+## Archive and run
+Full original 29-file executable PyTorch data/weight/frozen first predictions + all exact proof, classical controls, formal conditional external-equivalence checks and clean fresh 8-seed retrain:
+`NEUMANN1_Q3_RC21_COUNTEREXAMPLE_GRAMMAR_AND_LEARNED_DIVREM_20261025.zip` SHA256 `58026e036ce278c318c7b59b42f0bf58d03b431650facb869f294634a15520c1`, delivered as a conversation artifact. CLEAN ZIP extraction `bash REPRODUCE.sh` (manifest + independent grader + pytest PASS); `bash RETRAIN.sh` (fresh PyTorch seed cohort source-only bit-exact weights PASS). This GitHub branch intentionally commits only a compact independent runtime and regression tests, **not raw Torch weights**.
+
+## Admission
+- **SCOPED PASS:** actual neural own-weight composite opcode generation/inductive proof/reuse, classical state-grammar growth and conditional product-state all-length verification; zero prior state bound.
+- **GLOBAL OPEN:** self-invention of new base language/ISA, Q3 oracle-free general hidden structure, Q4 all-in 10x classical advantage, Q6 independent external tasks, Q7 actual frontier capability.
+- **Architecture decision:** do not pay for the neural search when strong classical is much cheaper. Finite data alone cannot provide universal authority; fail CLOSED/UNKNOWN until an independent proof is supplied.
