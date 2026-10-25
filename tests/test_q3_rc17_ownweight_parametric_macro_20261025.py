@@ -34,3 +34,23 @@ def test_k_states_pairwise_distinguishable():
             outa=run_compiled_learned_macro(k,(1,)*a+suffix)[-1]
             outb=run_compiled_learned_macro(k,(1,)*b+suffix)[-1]
             assert (outa,outb)==(1,0)
+
+
+def test_new_nested_macro_language_task_without_retraining():
+    # Frozen learned macro is used as a proper compositional language primitive.
+    rng=random.Random(2026102505)
+    count=0
+    for first_k,second_k in ((5,7),(7,5),(11,13),(17,31),(3,29),(64,2)):
+        for n in (8,31,127,1024):
+            for _ in range(8):
+                word=tuple(rng.getrandbits(1) for _ in range(n))
+                inner=run_compiled_learned_macro(first_k,word)
+                predicted=run_compiled_learned_macro(second_k,inner)
+                c1=c2=0;expected=[]
+                for b in word:
+                    c1+=b
+                    c2+=int(c1%first_k==0)
+                    expected.append(int(c2%second_k==0))
+                assert predicted==tuple(expected)
+                count+=1
+    assert count==192
