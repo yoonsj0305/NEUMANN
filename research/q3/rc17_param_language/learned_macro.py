@@ -33,7 +33,7 @@ def proof_gated_registration(candidate,has_weight_receipt=True):
     if tuple(candidate)!=FROZEN_SOURCE_PROGRAM:
         return {"status":"UNKNOWN_NOT_PROVEN"}
     # Independent all-k proof documented in README, not guessed from test rates.
-    content=json.dumps({"selected":FROZEN_SOURCE_PROGRAM,
+    content=json.dumps({"code":FROZEN_SOURCE_PROGRAM,
         "body":{"initial":1,"step":"ADD_DIGIT","condition":"GT",
                 "threshold":"PARAM_MINUS_ONE","on_true":"ZERO",
                 "output":"IS_ONE","emit_timing":"PRE_RESET"}},
