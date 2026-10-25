@@ -33,7 +33,22 @@ All 16 OWN-model trains cost ~**24.67 CPU process seconds** versus classical ~0.
 ### Original first-class evidence
 
 User downloadable `NEUMANN1_Q3_RC25_DIFFERENTIABLE_STATE_TO_GRAMMAR_20261025.zip`
-SHA256 **57460133980e9f21b903c0c50c921ef1de74298c788b75ea4c4c225e278ae063**.
-This **94-file ZIP** contains ALL 16 authentic .pt tensors, original source-only differentiable trainers, all FIRST input and predicted binary bytes + corresponding SHA freeze, all14 learned .nsl language definitions and original behavioral-signature JSONs, independent heldout grader, independent all-length product proofs/minimality, strong exhaustive classical synthesizer and explicit fail-closed host tests. Clean extraction `sh REPRODUCE.sh` PASSED. **All 16 freshly retrained original model weight tensors, first prediction byte hashes, and generated language JSON EXACTLY matched: `sh RETRAIN.sh` PASSED**. This PR versions only an extracted three-program readable fixture and regression guards, NOT the full raw 94-file experiment.
+SHA256 **77bcfe4f352ae78d06b9a24296518dc17d539b0b23c1442c2710e1a65976ba43**.
+This **96-file ZIP** contains ALL 16 authentic .pt tensors, original source-only differentiable trainers, all FIRST input and predicted binary bytes + corresponding SHA freeze, all14 learned .nsl language definitions and original behavioral-signature JSONs, independent heldout grader, independent all-length product proofs/minimality, strong exhaustive classical synthesizer and explicit fail-closed host tests. Clean extraction `sh REPRODUCE.sh` PASSED. **All 16 freshly retrained original model weight tensors, first prediction byte hashes, and generated language JSON EXACTLY matched: `sh RETRAIN.sh` PASSED**. This PR versions only an extracted three-program readable fixture and regression guards, NOT the full raw 94-file experiment.
 
 **Admission boundary:** own neural weights learn useful continuous internal representations; model-behavior-generated new symbolic state names/grammar and proof-gated compilation 11/16 is SCOPED_PASS. BUT the host metalanguage, objective, recurrent memory container, probe/signature algorithm, grammar parser, target specs and proof system are HUMAN designed. Autonomous invention of the foundational instruction grammar itself remains **GLOBAL Q3 OPEN**. Efficiency Q4, external-author Q6, frontier-level Q7 OPEN. Preserve frozen North Star.
+
+### RC25.1 inference-only latency comparison, no resource breakthrough
+Same source-frozen **128×256** batch, median of 7 process-CPU observations:
+- Addition: **0.005101s** generated 2-state grammar interpreter vs
+  **0.008252s** 8D Torch RNN batch vs **0.001370s** strong classical NumPy.
+- Seen-one: **0.005216s** compiled interpreter vs **0.008050s** RNN vs
+  **0.000540s** direct NumPy.
+Thus learned *model-to-symbolic compression* reduces this RNN's CPU only
+~1.6× but direct classical remains 3.7×–9.7× cheaper than the generated
+language interpreter, and source fitting took ~24.67s. This is not
+all-in 10x / Q4.
+Updated FINAL 96-file ZIP SHA256
+77bcfe4f352ae78d06b9a24296518dc17d539b0b23c1442c2710e1a65976ba43;
+full REPRODUCE with benchmark rerun clean extraction PASS, full 16-seed
+RETRAIN already clean-extract PASS on original byte-identical model data.
