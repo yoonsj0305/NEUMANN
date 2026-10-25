@@ -26,7 +26,19 @@ No full body, state offset, MOD operation, or target state count was provided as
 
 Complete clean-extraction ZIP with actual .pt, all 12 seed receipts, frozen first predictions, symbolic proof, invalid mutation gates, strong classical audit, isolated 12-run fresh retraining and manifest:
 `NEUMANN1_Q3_RC17_OWNWEIGHT_PARAMETRIC_LANGUAGE_20261025.zip`
-SHA256 `218447d4d6a0d565b7192d9f69c7d83156213ed10d347d9ff8abec3334967ded`.
+SHA256 `c5995d5967df32ed21d30a6bc2f3dbc11f65ddc3f07e13168a5b31dc48879695`.
 `bash REPRODUCE.sh` and `bash RETRAIN.sh` both independently completed EXIT0. The GitHub draft includes only a compact extracted runtime/proof and quick regression; ZIP contains raw full torch weights.
 
 **SCOPED PASS:** learned macro body with shifted representation, previously absent from registered library, parametric unbounded-capacity-in-k reuse, universal correctness, minimal state capacity, proof-gated language extension. **GLOBAL OPEN:** entirely self-invented base DSL/ISA, no human-coded reward optimizer/proof/compiler, independent external-author open-family tasks, classical efficiency superiority, full Q3/Q4/Q6/Q7. Q7 Frontier Gap still totally unproven.
+
+## RC17.1 compositional execution, no additional model learning
+Use the SAME frozen learned lexical symbol twice: `AUTO_q(AUTO_k(stream))`.
+Independent two-counter reference from primitives (not the learned program)
+checks **192/192** fresh nested tasks: 6 unseen parameter-pairs × 4 string
+lengths (8,31,127,1024) × 8 seeded binary input streams. This is
+compositional language-element reuse, NOT independent author/new-domain Q6.
+The theorem above applies to each invocation, so all-finite-length correctness
+also holds for their composition (function composition of two exact operators).
+Original source-weight and first 53,376 post-freeze predictions unchanged.
+Six standalone clean-extract reproduction tests PASS. Final **19-file**
+ZIP SHA256 c5995d5967df32ed21d30a6bc2f3dbc11f65ddc3f07e13168a5b31dc48879695.
