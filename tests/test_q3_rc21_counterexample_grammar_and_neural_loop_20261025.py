@@ -31,5 +31,5 @@ def test_classical_state_symbols_grow_without_maximum_state_capacity():
                     if machine['output'][s]!=target(w):return w
             return None # this *bounded* check alone cannot prove unbounded equivalence
         r=ConditionalStateGrammar(target,check).synthesize()
-        assert r['status']=='CONDITIONAL_EQ_CERTIFIED' and r['states']==k
-        assert r['equivalence_queries']>0
+        assert r['status']=='UNKNOWN_EQUIVALENCE_PROOF_MISSING'
+        assert r['candidate_states']==k and r['equivalence_queries']>0
