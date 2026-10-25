@@ -46,3 +46,18 @@ def test_strict_three_state_composite_and_unknown_unregistered():
     try:reg.run("UNKNOWN",(0,1))
     except ValueError:pass
     else:raise AssertionError("invalid authorization")
+
+
+def test_own_policy_generated_variable_length_code():
+    reg,parity,seen=setup()
+    code=FROZEN_MODEL_GENERATED_FREEFORM_PROGRAM
+    assert code==(1,0,2)
+    assert len(code[:-1])==2
+    for n in range(1,10):
+        for v in range(1<<n):
+            word=tuple((v>>i)&1 for i in range(n))
+            assert execute_model_generated_freeform(reg,code,word)==run_proven_three_state_reference(word)
+    for wrong in ((2,), (1,2,0), (1,0,0,0,0,0,2)):
+        try:execute_model_generated_freeform(reg,wrong,(1,0))
+        except ValueError:pass
+        else:raise AssertionError("invalid program admitted")
