@@ -63,7 +63,7 @@ def grammar_science_boundary():
 # an END token; fully original 5x3 logits and first predictions are in ZIP.
 FROZEN_MODEL_GENERATED_FREEFORM_PROGRAM=(1,0,2)  # 1=SEEN_ONE, 0=PARITY, 2=END
 def execute_model_generated_freeform(registry, tokens, bits):
-    if not tokens or len(tokens)>6 or tokens[-1]!=2 or any(t not in (0,1,2) for t in tokens):
+    if len(tokens)<2 or len(tokens)>6 or tokens[-1]!=2 or any(t not in (0,1,2) for t in tokens):
         raise ValueError("invalid instruction stream")
     if any(t==2 for t in tokens[:-1]):raise ValueError("premature stop")
     names=(generated_token(FROZEN_LEARNED_TABLES["PARITY"]),
