@@ -8,7 +8,7 @@ def test_correct_and_incorrect_candidates_are_distinguished():
     model=VerifiedNumericMacro()
     r=model.register(FROZEN_LEARNED_CODE,"a"*64)
     assert r["status"]=="SCOPED_CERTIFIED"
-    assert r["token"].startswith("LEARNED_NUMMEM_")
+    assert r["token"]=="LEARNED_NUMMEM_dac6ad97831b"
     variants=[(base,dm,0,1,0,0,0,0,0)
              for base in (1,2,3) for dm in (1,2)]
     assert all(universal_radix_proof(x) for x in variants)
