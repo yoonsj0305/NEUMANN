@@ -4,7 +4,7 @@ sys.path.insert(0,str(pathlib.Path(__file__).resolve().parents[1]/"research"/"q3
 from learned_macro import *
 
 def test_parametric_macro_all_new_params():
-    assert proof_gated_registration(FROZEN_SOURCE_PROGRAM)["status"]=="SCOPED_CERTIFIED"
+    assert proof_gated_registration(FROZEN_SOURCE_PROGRAM)=={"status":"SCOPED_CERTIFIED","token":"AUTO_a4f32841906f"}
     assert proof_gated_registration((0,0,0,0,0,0,0))["status"]=="UNKNOWN_NOT_PROVEN"
     for k in (2,3,4,5,6,7,8,9,11,16,31,64):
         for n in range(1,10):
