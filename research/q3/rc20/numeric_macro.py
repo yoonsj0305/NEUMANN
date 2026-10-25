@@ -40,9 +40,9 @@ def learned_radix_execute(code,k,word):
     return tuple(out)
 
 def token_from_code(code):
-    payload=json.dumps({"isa":"human-arithmetic-v1",
+    payload=json.dumps({"isa":"register-arithmetic-v1",
                        "program":list(code),
-                       "contract":"all-k>=2-typed-nesting"},sort_keys=True,separators=(",",":"))
+                       "contract":"nested-typed-delimiters-all-k>=2"},sort_keys=True,separators=(",",":"))
     return "LEARNED_NUMMEM_"+hashlib.sha256(payload.encode()).hexdigest()[:12]
 
 class VerifiedNumericMacro:
