@@ -68,3 +68,24 @@ study defines invention RELATIVE to the minimal provided Python interpreter.
 **Do not merge** this as completion of the NEUMANN 1 North Star. The proper
 next gate is learned-core proposal provenance and an external-author
 evaluation against strong classical and frontier systems at measured costs.
+
+
+## RC23.1 actually executable syntax, not only a grammar string
+
+After the original model proposal SHA was frozen, a generic researcher-authored
+host AST interpreter was added. It authorizes opcodes by reading the literal
+names in GPT-6's NEW_SYNTAX and parses programs such as
+`t=MAKE(3); t=WRITE(t,1); v,t=READ_FRONT(t)`.
+The original frozen candidate is UNCHANGED. Parser tests: **2/2 legitimate
+programs correct, 10/10 adversarial or unsupported programs rejected** in
+the standalone reference package. This demonstrates executable grammar,
+but interpreter and parser were human/assistant-authored after proposal
+freeze, not NEUMANN own-weight model invention. Strict no `eval`/`exec`,
+attribute access, imports, undeclared instructions or unrestricted loops.
+
+**Updated FINAL 12-file cleanly re-extracted source ZIP**:
+`NEUMANN1_RC23_MODEL_GENERATED_EXECUTABLE_GRAMMAR_20261025.zip`,
+SHA256 `1438e2d05a55a85e65e8faaa0c14b5a4528738d7d820a4a81527c42b1cb4321b`.
+`sh REPRODUCE.sh` PASS in NEW clean directory, checks actual frozen SHA,
+348,912 source comparisons, third family 143,366 streams,
+plus new grammar parser and fail-closed negative cases.
