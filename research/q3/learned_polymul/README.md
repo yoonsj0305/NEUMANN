@@ -18,3 +18,33 @@ It includes `weights.pt`, frozen prediction binaries/JSON, source-only learner, 
 **PASS (narrow)**: a real locally trained own-weight model learns gate semantics within an existing dynamic-memory architecture, generalizes with original raw inference to unseen widths, and symbolic extraction makes an exact all-width operator. **OPEN (global)**: weight model *invents/grows its own representation* rather than receiving the diagonal convolution template, external-author novelty, same-rights classical superiority, Q4 10x all-in, Q6 external, Q7 frontier.
 
 This is scoped operator-learning evidence, **NOT global G1/Q3 PASS**, and neither PR nor CI success should be presented as breakthrough frontier intelligence.
+
+
+## RC8 follow-on: eliminate needless learning when grammar is only 256 candidates
+
+A model does not have to train on all 84 inputs if the finite operator
+grammar is already available. The newly committed `active_two_query_certifier.py`
+chooses each query using ONLY candidate partitions, before calling the
+unknown function. On the same exact GF(2) multiplication target:
+first q=(n3, a1,b1) -> y1 leaves30/256; second q=(n3,a3,b6) -> y2
+leaves two internally distinct but universally equivalent operators
+(NAND/XNOR and AND/XOR). Their 8-entry composed transition table is identical.
+
+An INDEPENDENT posthoc one-query lower-bound check enumerates ALL 84
+potential single queries and ALL 256 programs. The most informative
+single observation for this target leaves >=4 candidate programs with
+>=2 different effective transition functions. **2 queries are optimal**
+among the precommitted pool on this target.
+
+Compared to acquiring all84 training pairs: **42x fewer oracle calls**
+(2 instead of84) and **38x fewer observed output bits** (6 vs228).
+Source-only candidate precomputation+adaptive selection local CPU
+0.01856s in one measurement. This eliminates the need for neural training
+*for this restricted known-grammar instance*, NOT Q4 global compute
+superiority or novel external-author structural invention. Without an
+externally trusted grammar completeness promise, this runtime returns
+UNKNOWN_UNTRUSTED_GRAMMAR rather than a false universal certificate.
+A separate 5-file stdlib ZIP and SHA receipt:
+`NEUMANN1_Q34_RC8_OPTIMAL_2_QUERY_STRUCTURE_DISCOVERY_20261025.zip`,
+SHA256 `d270e283d52648aac3d28cd89e965d78316b08aef021fd037e02d283b866d444`.
+3/3 standalone unit tests PASS. Research draft remains unmerged.
