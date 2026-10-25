@@ -66,3 +66,32 @@ induction, independent frozen holdout, full matched classical audit.
 dynamic memory mechanism rather than picking a human-written grammar;
 strong-classical superiority and Q4 10x all-in; Q6 independent external
 authors; Q7 frontier task competence.
+
+
+## RC10: delete unnecessary training and adapt information acquisition
+
+A CLASSICAL 9,216-program complete DSL observer `active_grammar_9216.py`
+uses only CANDIDATE output partitions to choose each membership query, never
+reads target result before choosing its query. On original GF(2) source, four
+queries (n3,a1,b2), (n3,a2,b6), (n3,a4,b3), (n2,a3,b3) leave four candidates,
+all independently symbolically proven equivalent for every finite length.
+Compared with 84 full training I/O examples, **21x fewer actual target
+queries**. Without independently trusted grammar completeness, it returns
+UNKNOWN. A delayed change at index3 is an explicit outside-grammar witness.
+
+A separate AFTER-FIRST post-hoc bitset auditor finds a two-query witness
+for this SPECIFIC target, so the live source-only adaptive minimax strategy's
+four calls are not universally or target-optimal. Gold was NOT used to tune
+the original query chooser. Candidate simulation prep1.156s + active
+selection0.055s measured process CPU versus previous eager full-sample
+classical checker0.0155s. Active's 80 saved oracle calls justify this only
+if marginal oracle cost is large enough: under explicit equal-call-cost
+assumption, break-even near **15ms per call** in this measured environment.
+This is not a measured energy / remote query result nor global Q4 pass.
+
+Full distinct reproducible 8-file classical archive:
+`NEUMANN1_Q34_RC10_ACTIVE_9216_CERTIFIER_20261025.zip`,
+SHA256 `c95076a510193400961437779cebdc08955de8e05346d163bc2224ea4efb56db`.
+Run `bash REPRODUCE.sh` to verify original SHA manifest and clean-room
+first-decision replay. RC9 and RC10 are mechanism evidence only, both
+remaining subordinate to frozen Q1-Q7 and Frontier Gap requirements.
