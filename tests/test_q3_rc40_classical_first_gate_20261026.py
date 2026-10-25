@@ -44,6 +44,6 @@ def test_underconstrained_source_and_small_budget_do_not_trigger_neural():
     ambiguous=classical_affine([{"input":"AAAA","output":"AAAA"}])
     assert ambiguous["status"]=="SOURCE_AMBIGUOUS"
     assert classical_first_route(ambiguous)["decision"]=="GET_MORE_DISTINGUISHING_IO"
-    b=classical_min_reads([{"input":"AB","output":"CC"}],max_heads=4,max_candidates=1)
+    b=classical_min_reads([{"input":"AA","output":"AC"}],max_heads=4,max_candidates=1)
     assert b["status"]=="UNKNOWN_BUDGET"
     assert classical_first_route(b)["neural"] is False
