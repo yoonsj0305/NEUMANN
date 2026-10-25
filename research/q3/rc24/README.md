@@ -75,8 +75,21 @@ dramatically faster: Q4 speed-up NOT proven.**
 
 ## Full self-contained original evidence
 `NEUMANN1_Q3_RC24_OWNWEIGHT_BOOLEAN_ISA_CLOSURE_20261025.zip`,
-SHA256 **828879bde274396359a5821e080701140a5dd369f3e1963abc2a4eb3f477fda3**.
+SHA256 **f928ebbba86c7da8419c1716c5a7163ef53d9756971e34962669e53f41430ceb**.
 ZIP CRC+SHA verified; clean extraction `sh REPRODUCE.sh` PASS; isolated
 full 112-fit `sh RETRAIN.sh` PASS, retaining first freeze hashes. GitHub
 contains only readable extracted human-vetted interpreter, model-emitted
 code and scope tests. Do not merge as global Q3.
+
+## RC24.2 exact minimum gate-count closure (postfreeze independent audit)
+Comparing the OWN policy's BEST sampled output over up to 4 restarts per
+Boolean function with a SAME-PRIMITIVE exhaustive classical lower bound,
+**16/16** Boolean meanings have at least one SOURCE-LEARNED program with
+**provably minimal NAND count**. This does NOT mean each greedy program is
+minimal (notably XNOR all 4 final greedy outputs were wrong).
+Independent audit `independent_minimality.py` returns PASS with 16/16 and
+0 mismatches. Archived 53 files have checksum verified in a clean extraction;
+`REPRODUCE.sh` PASS. Isolated 112-run `RETRAIN.sh` already passed including
+bitwise-equal original 19 weight files and matching first prediction SHA.
+This is all existing 2-input Boolean function semantics, not an externally
+novel logic theorem or a neural-native cost win.
