@@ -11,3 +11,42 @@ The user conversation's full **17-file** SHA-audited artifact: `NEUMANN1_Q3_EXPO
 Measured same set of 100 n64..512 random products: built-in Python `a*b` process CPU0.000024 seconds, online convolution ~0.895 seconds, human shift-add using own-weight learned adder ~1.586 seconds. Native Python optimized implementation and process timing on specific CPU are not an algorithmic benchmark across identical hardware languages, but no claim of Q4 all-in savings is remotely supported. Past six neural training attempts total CPU15.53 seconds, none trained in this study.
 
 **PASS**: fixed-state universal streaming multiplier **mathematically refuted**; memory-growing human authored operator **independently complete-tested and inductively verified**; original learned adder reused by a HUMAN classical planner, scoped pass. **OPEN**: own-weight model autonomously invents memory/interface/synthesis logic, outperforms strongest same-rights classical on independent multi-author tasks, Q3/Q4/Q6/Q7 global. Avoid inflating Q3 from impossibility theorem or code authored by the assistant. Draft PR not merged.
+
+## RC6.1 independent extension · same date · stronger theorem
+
+For a width-n ONLINE LSB multiplier producing only its low n product bits, choose
+k=floor(n/2). The same 2^k indistinguishable prefixes and one common continuation
+work whenever **n>=2k**, not merely the earlier sufficient condition n>=2k+1.
+The suffix reveals all k bits of u by output positions k..2k-1, which fit
+within the first n outputs. Any exact deterministic transducer thus needs at
+least **2^floor(n/2) states**, or **floor(n/2) state bits** at that point.
+
+The human-coded streaming binary-convolution upper-bound witness uses 2n
+historical input bits and O(log n) bits for carry/index, with O(n^2) elementary
+bit work. Its arithmetic recurrence is
+d_i=sum_(j=0..i) a_j b_(i-j),
+y_i=(d_i+c_i) mod 2, c_(i+1)=floor((d_i+c_i)/2).
+The invariant for output prefix length t,
+sum_(i<t) y_i 2^i + c_t 2^t = sum_(i<t) d_i 2^i,
+implies exact low product modulo 2^n for all n. This establishes the
+**tight asymptotic space complexity Theta(n) bits** in this streaming model;
+it does NOT establish time optimality or neural self-invention.
+
+The new `streaming_space_contract.py` includes an intentionally conservative
+memory gate: capacity below floor(n/2) => IMPOSSIBLE_UNDER_CONTRACT;
+otherwise => UNKNOWN_NOT_CERTIFIED, never unsupported PASS.
+The independent new pytest contract enumerates witnesses n=2..20,
+all **87,380** input pairs for n=1..8 low products, 300 width16..512
+random cases, and capacity boundary checks n=2..100.
+
+Full same-day local 5/5 PASS reproducible evidence:
+`NEUMANN1_Q3_STREAMING_SPACE_TIGHT_BOUND_20261025.zip`
+SHA256 `c300ea41344ea1d2654917115cadd46b195b848724a3b8039a7bed6b355dc901`.
+Previous own-weight learned adder (PR #573) is 2-state with exact 8-rule
+induction, whereas exact streamed multiplication requires linearly growing
+state bits. This is a **human-proven representation-class separation**,
+not a model-weight-generated architecture choice.
+
+New scoped gate PASS: exact-n online memory lower bound and matching
+asymptotic upper bound. Global G1/Q3 own-weight new primitive OPEN;
+Q4 all-in 10x OPEN; Q6/Q7 OPEN. Research-only draft; do not merge on this result.
