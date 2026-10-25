@@ -38,7 +38,9 @@ def after_neural_proposal(observations,selected_length_triplet):
     """
     try:
         lens=tuple(selected_length_triplet)
-        if len(observations)!=3 or any(not isinstance(w,str) or any(c not in ABC for c in w) for w in observations):\n            return {"status":"UNKNOWN_INVALID"}\n        if lens not in OPTIONS:return {"status":"UNKNOWN_OUTSIDE_METAGRAMMAR"}
+        if len(observations)!=3 or any(not isinstance(w,str) or any(c not in ABC for c in w) for w in observations):
+            return {"status":"UNKNOWN_INVALID"}
+        if lens not in OPTIONS:return {"status":"UNKNOWN_OUTSIDE_METAGRAMMAR"}
         if (not isinstance(observations,(tuple,list)) or len(observations)!=3
             or any(not isinstance(y,str) or not set(y).issubset(ABC) for y in observations)):
             return {"status":"UNKNOWN_INVALID"}
