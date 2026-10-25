@@ -44,8 +44,12 @@ class ConditionalStateGrammar:
                      'new_productions':tuple(names.values())}
             ce=self.equivalence(machine);self.eq_queries+=1
             if ce is None:
-                return {'status':'CONDITIONAL_EQ_CERTIFIED','machine':machine,
-                        'states':len(reps),'membership_queries':len(self.cache),
+                # An ordinary callback returning None cannot prove all-length
+                # equivalence. The RC21 smoke comparator checked ONLY <=2*k.
+                # In RC22, use a bound-conditional W-method proof receipt.
+                return {'status':'UNKNOWN_EQUIVALENCE_PROOF_MISSING',
+                        'candidate_states':len(reps),
+                        'membership_queries':len(self.cache),
                         'equivalence_queries':self.eq_queries}
             if not isinstance(ce,str) or any(c not in '01' for c in ce):
                 return {'status':'UNKNOWN_BAD_VERIFIER'}
