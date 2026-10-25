@@ -17,10 +17,24 @@ The user asked for autonomous basic-instruction and grammar invention. RC18 supp
 
 ## Evidence
 
-Full **23-file** clean-extracted executable Python/Torch experiment (real weights, full source-only training code, SHA-frozen first predictions, independently authored gold, 3-state minimal proof checks, ablations, classical baseline and full reproducibility) delivered in the conversation:
+Full **29-file** clean-extracted executable Python/Torch experiment (real weights, full source-only training code, SHA-frozen first predictions, independently authored gold, 3-state minimal proof checks, ablations, classical baseline and full reproducibility) delivered in the conversation:
 `NEUMANN1_Q3_RC18_OWN_WEIGHT_PRIMITIVE_GRAMMAR_INVENTION_20261025.zip`
-SHA-256 `c98c1a79857362f5c210087ff594b02f59dd32052bee6fd38bf6f62e0a1a3846`.
+SHA-256 `473ce483f95a0e2a863aa32422e333e41ee3ef2a9f807f0082d297d47d7f8d59`.
 
 Clean `bash REPRODUCE.sh`: SHA manifest / all negative gates / independent orig-weight grade **PASS**.
 Clean `bash RETRAIN.sh`: re-train 24 neural primitive policies and 12 neural composition policies in a fresh temp directory, matching **bit-exact original weights/program selections/first predictions** **PASS**. CPU time intentionally excluded from equality.
 Compact tested runtime/proof logic in this draft is NOT the 23-file original experiment or raw checkpoint.
+
+## RC18.1 extra, syntax length no longer prescribed by two fields
+A third (not recycled) 5-position × 3-token learned PyTorch categorical
+sequence policy generates any bounded length1..5 operator chain and its own
+END location from opaque I/O only. Neural selection 12/12 best sampled AND
+12/12 final greedy selects token stream [SEEN_ONE, PARITY, END]. Postfreeze
+2,016 / 2,016 unseen traces and 18,336/18,336 bits correct, 120 long tests.
+Strong 62 possible chain same-rights exhaustive audit finds minimum valid
+length2, attained exactly by model output (other longer candidates exist).
+Meta-grammar, tokens and upper program bound5 still HUMAN-authored. No
+proof of model-independent fundamental syntax invention, Q3 global OPEN.
+Original third model weights, first frozen output, full source trainer and
+isolated 48-run re-training incorporated into FINAL 29-file archive above,
+both REPRODUCE and RETRAIN on CLEAN ZIP EXIT0.
