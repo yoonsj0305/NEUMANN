@@ -53,12 +53,12 @@ the full18 neural campaign is more expensive. Energy/GPU cost unknown.
 No Q4 all-in10x frontier efficiency gain.
 
 ## Reproducible original user archive
-**58 files**, original source-only I/O, 18 ACTUAL Torch .pt, all receipts,
+**60 files**, original source-only I/O, 18 ACTUAL Torch .pt, all receipts,
 original first output bytes & SHA-freeze, independent all-length proof and
 adversarial verifier, same-IO classical comparator, actual runnable parser,
 4 regressions, 18-seed isolated retrain, manifest:
 `NEUMANN1_Q3_RC36_OWNWEIGHT_INFORMATION_ACCESS_GRAMMAR_20261025.zip`
-SHA256 **563d80e9212421d2ba28405af7de683e112a7178500818da1879ae1a60514c12**.
+SHA256 **62929a0ec9323d9185e383f79d68ba5b2be46f4e52f5f84ec31689ff545a6df0**.
 CLEAN temp ZIP extraction SHA manifest PASS, `bash REPRODUCE.sh` PASS,
 and new clean extracted four representative success/failure isolated
 checkpoint/first-output RETRAIN PASS; all 18 seed isolation passed in
@@ -70,3 +70,18 @@ the real 18 saved PyTorch model tensors (in conversation artifact).
 syntax under given generic input substrate. **NOT PASS** model invention of
 READ_REL itself, metasyntax/compiler, unbounded memory, independent-author Q6,
 frontier Q7, all-in Q4. All global gates remain OPEN, North Star unchanged.
+
+
+### RC36.1 extra postfreeze direct float-actor replay
+We also loaded ALL 18 original frozen PyTorch checkpoint tensors and reran the
+CONTINUOUS soft-attention models themselves, without discrete program
+compilation, over the same 224 independent inputs per model. Their empirical
+finite-string predictions exactly agree with the compiled-program predictions:
+**3,956/4,032 complete strings, 353,086/355,680 output characters** across
+ALL successes and failures. This is POST-FIRST-FREEZE analysis, not a
+pre-graded raw-continuous model proof. It does NOT certify all finite lengths
+for continuous floating-point actor. FINAL original ZIP has **60 files**
+including raw-actor replay Python and its original receipt, SHA256
+`62929a0ec9323d9185e383f79d68ba5b2be46f4e52f5f84ec31689ff545a6df0`. Both clean full REPRODUCE.sh and clean isolated 4-seed RETRAIN
+PASS; full 18 isolated Torch tensor/first-code retrains also already passed
+in separately batched invocations.
