@@ -66,3 +66,30 @@ compositionality. **FAIL** for unfactorized own GRU meta-generalization.
 **OPEN** for totally autonomous creation of the meta-grammar, Python host,
 new pattern logic parser, strong-classical total-cost advantage, external
 independently authored task families, and frozen global Q3/Q4/Q6/Q7.
+
+## RC29c: learn both new opcode semantics, not a provided AND instruction
+
+A separate 9-scalar own PyTorch model learns two four-entry truth tables,
+PAIR and REDUCE, plus their initial bit from the SAME source motif
+input/output examples (6 patterns ×8 input windows =48 labels).
+The human still supplies the generic fold recurrence skeleton and compiler,
+but DOES NOT provide the semantic values for EITHER learned opcode.
+All12 original frozen policies train-perfect48/48; 12/12 frozen first
+heldout 16/16; 786432/786432 independent newly sampled unseen pattern bits.
+Both discovered new instruction decompositions are sound:
+(A) PAIR1001 (XNOR), REDUCE0001 (AND), INIT1.
+(B) PAIR0110 (XOR), REDUCE0010 (state AND NOT mismatch), INIT1.
+The eight-case invariant next_state = old_state AND (input bits equal)
+proves correctness for ALL finite pattern lengths conditional on the
+human-provided fold skeleton. Same information classical enumerates ALL
+2^9 =512 programs in about 0.039 CPU seconds and finds precisely TWO
+complete programs; own neural12 fits total~19.22 CPU seconds, so Q4 FAIL
+for this subexperiment. These are learned executable opcode MEANINGS,
+not autonomous invention of the base grammar/compiler.
+
+Complete FINAL 70-file independently re-extracted ZIP:
+NEUMANN1_Q3_RC29_JOINT_TWO_PRIMITIVE_GRAMMAR_20261025.zip
+SHA256 93000e0b1c9379b21cc6d3cf6487d0c86e0977e64b91e05e8742ad281ebb1786.
+REPRODUCE.sh PASS; distinct isolated RETRAIN.sh PASS with 26/26 actual
+PyTorch tensor states bit-exact and 24/24 original first predictions exact.
+No global Q3/Q4/Q6/Q7 PASS. This lean GitHub branch does NOT host full .pt.
