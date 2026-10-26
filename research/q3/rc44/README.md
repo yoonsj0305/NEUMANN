@@ -44,3 +44,29 @@ SHA256 `9065f41339e2389c6635d9cecf14bdc244b74b19e51c0b87d8d2c37aa5d9cef7`.
 Fresh extraction `bash REPRODUCE.sh` PASSED; 0 further neural calls.
 ARC upstream data licensed Apache-2.0; see
 https://github.com/arcprize/ARC-AGI-2/blob/main/LICENSE.
+
+## RC44.1 · STRICT untouched cross-task source admission
+No tuning or further GPT-6 prompt was performed after task12422b43 FIRST
+source+prediction freeze. We fetched the OTHER eleven identities from the
+same RC43 second tranche directly from ARC-AGI-2 official Git blobs, and
+applied the exact marker-repeat source-IO admission predicate. **0/11**
+other problems passed source consistency and were ALL **ABSTAINED**.
+No target labels were scored on these 11. This means **no demonstrated
+prospective reuse** beyond the originally selected public-training
+task. It does NOT mean eleven incorrect predictions.
+
+Pin list and full external source-only receipts are in the new FINAL
+10-file conversation ZIP:
+`NEUMANN1_RC44_1_EXTERNAL_OPERATOR_TRANSFER_AUDIT_20261026.zip`,
+SHA256 `b67a258b02fc0c6401d3b7c68ded72136aa472957a355112dcce0eff88f72344`.
+Clean new-directory SHA manifest and `bash REPRODUCE.sh` **6/6 PASS**.
+The other 11 were inspected using GitHub-connected original blob contents;
+local Python cannot directly download all upstream contents because of
+network restrictions, so this transport boundary is explicitly recorded
+inside `TRANSFER_AUDIT.json`.
+
+**Do not promote the learned operator as generally successful.** It stays a
+SOURCE-CONDITIONAL deterministic classical primitive only. Global Q3/Q4/Q6/Q7
+remain OPEN. This is a scoped successful neural (GPT-6) proposal under a
+restricted classical gap, NOT an own-neural NEUMANN invention, reliable
+cross-task transfer, or an all-in cheap inference result.
