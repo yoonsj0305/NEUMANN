@@ -1,0 +1,47 @@
+{
+  "schema": "neumann.rc46.mechanism-smoke-frozen-first-20261026.v1",
+  "date": "2026-10-26",
+  "archive": "NEUMANN1_RC46_OEIT_MECHANISM_SMOKE_20261026.zip",
+  "archive_sha256": "c7b5a8614bd96a355d480e21420d6e5b9a6d93fe2cefecda8143958833104884",
+  "original_first_predictions_sha256": "322eea6d40266301773682ee7218c4903dfbaa69a058a09e7da08d28e585d6a3",
+  "original_training_search_calls": 1179,
+  "original_training_wall_ns": 13957068,
+  "original_heldout_scores": [
+    {
+      "domain": "token_tuple",
+      "strong_classical_correct": true,
+      "macro_correct": true,
+      "strong_classical_candidate_evals": 393,
+      "macro_candidate_evals": 1,
+      "strong_classical_wall_ns": 6594976,
+      "macro_wall_ns": 715109
+    },
+    {
+      "domain": "emoji_tuple",
+      "strong_classical_correct": true,
+      "macro_correct": true,
+      "strong_classical_candidate_evals": 393,
+      "macro_candidate_evals": 1,
+      "strong_classical_wall_ns": 6301643,
+      "macro_wall_ns": 690291
+    }
+  ],
+  "original_no_memory_wall_ns": 12896619,
+  "original_with_memory_and_discovery_wall_ns": 15362468,
+  "actual_trained_ownweight_neural_model": false,
+  "external_author_benchmark": false,
+  "true_discovery_policy_transfer": false,
+  "original_interpreter_extended_from_scratch": false,
+  "all_global_gates": {
+    "Q1": "OPEN",
+    "Q2": "OPEN",
+    "Q3": "OPEN",
+    "Q4": "OPEN",
+    "Q5": "OPEN",
+    "Q6": "OPEN",
+    "Q7": "OPEN"
+  },
+  "historical_v0_underidentified": true,
+  "next_step": "independently authored sealed third-domain tests with learn/no-learn matched baselines, owning model weights and full-cost resource accounting",
+  "scope": "synthetic code-level mechanism smoke; all-in negative result; file-backed independent clean replay from ChatGPT attachment"
+}
