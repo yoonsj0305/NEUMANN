@@ -25,10 +25,12 @@ def test_original_opened_set_saturated_by_extra_model_free_baseline():
         assert r["status"]=="CANDIDATE",task["id"]
         value=r["answer"]
         if task["family"]=="coding":
+            # Keep both the AST-semantic audit and ORIGINAL isolated resource
+            # capped Python worker check. A fallback to execute() alone is
+            # NOT admission to the original AM1 runtime.
             outputs=execute({"source":value,"arguments":[x["input"] for x in private["tests"]]})
-            accepted=outputs==[x["output"] for x in private["tests"]]
-        else:
-            accepted=verify_original(task,value,private,deadline_ms=2000)
+            assert outputs==[x["output"] for x in private["tests"]]
+        accepted=verify_original(task,value,private,deadline_ms=2000)
         assert accepted,task["id"]
         results.append((task["id"],r["route"]))
     assert len(results)==12
