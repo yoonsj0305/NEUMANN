@@ -1,0 +1,169 @@
+{
+  "schema": "neumann.rc43.external-classic.portfolio-record.v1",
+  "date": "2026-10-26",
+  "source": "arcprize/ARC-AGI-2",
+  "upstream_commit": "f3283f727488ad98fe575ea6a5ac981e4a188e49",
+  "task_selection": "first 24 lex filenames from data/training of size <=2500 original bytes",
+  "frozen_python_sha256": "872bc99c57f61729801f6a2207033a751dd6e6376d889c7d14872a391c8c23cc",
+  "audit_implementation": "separate JS same-rule over actual original data, Python corpus-full parity PENDING due sandbox networking",
+  "opened_simple": 1,
+  "opened_expanded": 8,
+  "heldout_training_expanded": 2,
+  "zero_neural_calls": true,
+  "source_training_count": 12,
+  "heldout_training_count": 12,
+  "records": [
+    {
+      "id": "00576224",
+      "split": "development",
+      "correct": true,
+      "program": "checker3x3"
+    },
+    {
+      "id": "007bbfb7",
+      "split": "development",
+      "correct": true,
+      "program": "kronecker"
+    },
+    {
+      "id": "017c7c7b",
+      "split": "development",
+      "correct": true,
+      "program": "periodic9"
+    },
+    {
+      "id": "025d127b",
+      "split": "development",
+      "correct": false,
+      "program": null
+    },
+    {
+      "id": "0520fde7",
+      "split": "development",
+      "correct": true,
+      "program": "maskhboth"
+    },
+    {
+      "id": "05269061",
+      "split": "development",
+      "correct": false,
+      "program": null
+    },
+    {
+      "id": "0692e18c",
+      "split": "development",
+      "correct": false,
+      "program": null
+    },
+    {
+      "id": "08ed6ac7",
+      "split": "development",
+      "correct": true,
+      "program": "rank"
+    },
+    {
+      "id": "0c786b71",
+      "split": "development",
+      "correct": true,
+      "program": "mirrortruetrue"
+    },
+    {
+      "id": "0c9aba6e",
+      "split": "development",
+      "correct": true,
+      "program": "maskvbothzero"
+    },
+    {
+      "id": "0ca9ddb6",
+      "split": "development",
+      "correct": false,
+      "program": null
+    },
+    {
+      "id": "0d3d703e",
+      "split": "development",
+      "correct": true,
+      "program": "morph0"
+    },
+    {
+      "id": "10fcaaa3",
+      "split": "heldout_training",
+      "correct": false,
+      "program": null
+    },
+    {
+      "id": "1190bc91",
+      "split": "heldout_training",
+      "correct": false,
+      "program": null
+    },
+    {
+      "id": "12422b43",
+      "split": "heldout_training",
+      "correct": false,
+      "program": null
+    },
+    {
+      "id": "12eac192",
+      "split": "heldout_training",
+      "correct": false,
+      "program": null
+    },
+    {
+      "id": "137eaa0f",
+      "split": "heldout_training",
+      "correct": false,
+      "program": null
+    },
+    {
+      "id": "1478ab18",
+      "split": "heldout_training",
+      "correct": false,
+      "program": null
+    },
+    {
+      "id": "150deff5",
+      "split": "heldout_training",
+      "correct": false,
+      "program": null
+    },
+    {
+      "id": "15696249",
+      "split": "heldout_training",
+      "correct": false,
+      "program": null
+    },
+    {
+      "id": "17cae0c1",
+      "split": "heldout_training",
+      "correct": false,
+      "program": null
+    },
+    {
+      "id": "195ba7dc",
+      "split": "heldout_training",
+      "correct": true,
+      "program": "maskhbothzero"
+    },
+    {
+      "id": "1a2e2828",
+      "split": "heldout_training",
+      "correct": false,
+      "program": null
+    },
+    {
+      "id": "1b2d62fb",
+      "split": "heldout_training",
+      "correct": true,
+      "program": "maskhbothzero"
+    }
+  ],
+  "classical_exhaustion_proven": false,
+  "neural_admitted": false,
+  "global_gates": {
+    "Q3": "OPEN",
+    "Q4": "OPEN",
+    "Q6": "OPEN",
+    "Q7": "OPEN"
+  }
+}
