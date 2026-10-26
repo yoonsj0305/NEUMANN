@@ -32,5 +32,7 @@ def evaluate_record(path):
 
 if __name__=="__main__":
     from pathlib import Path
-    root=Path(__file__).resolve().parents[1]
-    print(evaluate_record(root/"rc50"/"cross_task_transfer_first.json"))
+    import sys
+    if len(sys.argv)!=2:
+        raise SystemExit("Usage: python support_bound.py <frozen-source-first.json> (from RC50 PR #615)")
+    print(evaluate_record(sys.argv[1]))
