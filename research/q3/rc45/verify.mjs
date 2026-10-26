@@ -33,10 +33,11 @@ async function grade(records, fn,field) {
    const d=await official(x);
    assert(d.train.every(y=>eq(fn(x.id,y.input),y.output)),"train mismatch "+x.id);
    assert(x.first_predictions.length===d.test.length,"test cardinality "+x.id);
+   tasks++;
    d.test.forEach((y,i)=>{
      assert(eq(fn(x.id,y.input),x.first_predictions[i]),"replay prediction mismatch "+x.id);
      assert(eq(x.first_predictions[i],y.output),"first prediction wrong "+x.id);
-     tasks++; tests++;
+     tests++;
      cells+=y.output.flat().length;
    });
  }
@@ -59,7 +60,7 @@ if(online){
  const b=await grade(second,op2,"status");
  const c=await verifyReuse();
  assert(a.tasks===9&&a.tests===9&&a.cells===389,"cohort one exact totals");
- assert(b.tasks===9&&b.tests===9&&b.cells===344,"cohort two exact totals");
+ assert(b.tasks===8&&b.tests===9&&b.cells===344,"cohort two exact totals");
  console.log(JSON.stringify({status:"REPRO_PASS",first:a,adapted:b,prospective:c,all_first_exact:18,all_cells:733}));
 }else{
  console.log(JSON.stringify({status:"FROZEN_RECEIPT_SHAPE_PASS",source_admission_first:9,source_admission_adapted:8,prospective_abstention:12,full_external_gold_replay:"NOT_RUN; use --online"}));
