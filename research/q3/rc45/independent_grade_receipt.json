@@ -1,0 +1,53 @@
+{
+  "schema": "neumann.rc45.independent.grade.v1",
+  "date": "2026-10-26",
+  "verification": "Independent source original Git blobs read only AFTER each corresponding first-prediction Git commit",
+  "upstream": "arcprize/ARC-AGI-2",
+  "commit": "f3283f727488ad98fe575ea6a5ac981e4a188e49",
+  "frozen_first_cohort_commit": "89d40dc2c806c6958dd048f77c37926530446525",
+  "frozen_transfer_commit": "777a8b70f78dbafb99bbb54807bd0ef19f4756fe",
+  "frozen_adaptation_commit": "b978c31cac73ce14544ea23a56e7ae86d9c09c92",
+  "frozen_third_reuse_commit": "805e220e8a7039fefc08d41bce010a26adae2146",
+  "cohort_25_36": {
+    "n_tasks": 12,
+    "n_exact_tasks": 9,
+    "n_unknown": 3,
+    "n_wrong_submitted": 0,
+    "n_exact_tests": 9,
+    "output_cells_exact": 389
+  },
+  "cohort_37_48": {
+    "n_tasks": 12,
+    "original_nine_operator_source_fit": 0,
+    "n_adaptation_exact_tasks": 8,
+    "n_unknown": 4,
+    "n_wrong_submitted": 0,
+    "n_exact_tests": 9,
+    "output_cells_exact": 344
+  },
+  "cohort_49_60": {
+    "n_tasks": 12,
+    "number_of_frozen_operators": 17,
+    "n_source_fit": 0,
+    "n_unknown": 12,
+    "n_test_gold_read": false
+  },
+  "totals": {
+    "human_selected_external_tasks": 36,
+    "selected_two_development_cohorts": 24,
+    "frozen_first_exact_tasks": 17,
+    "first_predictions_wrong": 0,
+    "total_grid_tests_correct": 18,
+    "total_cells_correct": 733,
+    "prospective_reuse_correct_tasks": 0,
+    "neural_ownweight_for_this_experiment": 0
+  },
+  "important_limits": [
+    "All are ARC-AGI-2 PUBLIC TRAINING tasks potentially exposed to GPT6 pretraining.",
+    "GPT-6 CHAT ASSISTANT authored operator programs after seeing each task source. No NEUMANN small learner.",
+    "Selected first and adapted 24 tasks NOT a prospective operator-transfer result; posthoc task-specific additions.",
+    "12 prospective reusable-operator tasks received zero proposals, hence cannot claim cross-task transfer.",
+    "No actual same-budget strong-classical competitor or all-in model generation cost measured.",
+    "Conditional source fit NOT a general behavior proof; global Q1-Q7 remain OPEN."
+  ]
+}
