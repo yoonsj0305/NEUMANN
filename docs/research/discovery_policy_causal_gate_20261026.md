@@ -59,3 +59,44 @@ Degraded mode: return HOLD_UNKNOWN with explicit disputed assumptions; no downst
 ## Historical evidence verdict
 
 RC48 checks that actual Torch weights exist and narrow in-grammar structure can be proposed. It does **NOT** check A>B with libraries reset on independently authored novel tasks. No existing retained RC experiment establishes the core causal claim. Therefore CREATIVE DISCOVERY POLICY LEARNING remains OPEN, not PASS.
+
+
+## 2026-10-26 — New evidence absorption (NO new RC, NO global promotions)
+
+**Research center unchanged**: learn to invent genuinely new verified problem representations and transfer that *discovery capability* after clearing stored solutions. We adopt minimal prior-work mechanisms as controls or audit gates, NOT a 10-model stack.
+
+| Paper / original source | Reduce to one accountable mechanism | Admission |
+|---|---|---|
+| DreamCoder (PLDI 2021 / 2023; DOI 10.1145/3453483.3454080) | Symbolic library growth separate from learnable discovery/search policy; memory-on vs memory-off ablation | Experimental baseline after G0 |
+| Discovering state-of-the-art reinforcement learning algorithms, DiscoRL (Nature 2025; DOI 10.1038/s41586-025-09761-x) | Meta-reward on future discovery across **diverse** environments; do NOT reproduce 1024/2048 TPUv3 training | Long-term learner design |
+| SkillGen: Verified Inference-Time Agent Skill Synthesis (Microsoft Research, May 2026) | Contrast successes and failures; paired repairs, regressions, still-fails on same original tasks | **Adopt now** as outcome accounting |
+| Scaling Agentic Verifier for Competitive Coding (ICML 2026) | Select discriminative counterexamples, with independent oracle; candidate disagreement != correctness | **Adopt now** conditional on source-consistent multiple candidates |
+| Budget-Aware Tool Use Enables Effective Agent Scaling / CATS (COLM 2026) | Count model tokens and **tool calls**, optimize allocation under preregistered cap | **Adopt now** as spending measurement, not new large controller |
+| GEPA (ICLR 2026) | Reflections grounded in execution failures, record exact specificity and heldout net effect | Optional proposer; failure trajectories may be untrusted |
+| AlphaEvolve (Google DeepMind 2025/26) and CodeEvolve (Findings EMNLP 2026) | Executable program proposals, diversity and fitness verified by independent evaluator | Strong baseline / expensive large evolution DEFER |
+| Absolute Zero (NeurIPS 2025) | Generator creates verifiable training challenges **only within train fold**; reward-hacking audited | Conditional after G0 |
+| Do Self-Evolving Skills Generalize to Held-Out Tasks? (arXiv:2609.39148; Sep 30, 2026) | Test against unseen cases, demand regression/overfitting accounting; 5/21 retained ALL train improvement | **Hard transfer guard** |
+| Does Failure Feedback Direct Agent Self-Modification? (arXiv:2610.14662; Oct 10, 2026) | Separate target repair, same-mechanism transfer and independently heldout net changes | **Hard causal guard** |
+| Are Self-Evolving Agents Continual Learners? (arXiv:2610.25858; Oct 19, 2026) | Retest old successes after each update, forbid cross-domain retrieval collisions and forgetting | **Regression and memory compatibility guard** |
+
+### Executed historical external outcome audit, not a NEW model result
+
+We fetched and cross-checked the original frozen first receipts for 12 ARC-AGI-2 **PUBLIC TRAINING** tasks, original corpus pin `f3283f727488ad98fe575ea6a5ac981e4a188e49`:
+- 8/12 first-frozen original tasks correct under combined **classical** program portfolio;
+- 11/12 with three extra proposals from **ChatGPT GPT-6**, NOT NEUMANN ownweight;
+- Pairwise skill intervention, same original 12 tasks: **REPAIR 3, REGRESSION 0, RETAINED 8, STILL UNSOLVED 1**. These figures are retrospective and are NOT independent sealed generalization.
+- On next 12 external public-training tasks, original frozen new-operator candidates **SOURCE FIT 0/12**, hold 12/12. This is not evidence of test-gold failure nor general classical impossibility. It demonstrates that exact candidate reuse did not cover this sequence.
+- Model-discovery-policy learning A>B, A>C on new authored families remains **NOT RUN**. GPT-6 API inference/training/joules/storage total-cost UNKNOWN. No Q1–Q7 PASS.
+
+**Executable local audit**: `NEUMANN1_DISCOVERY_POLICY_VALUE_GATE_20261026.zip`, SHA-256 `e4f566e7eff092ef180946d2f46ed9a7364bbed25a82623a97e9ee48034cb7d1`, distributed as conversation attachment. New isolated extraction: manifest 5 files PASS, historical audit deterministic replay PASS, pytest **9/9 PASS** (engineering tests, no new tasks). The GitHub document records method decisions; the full standalone code is attached in the conversation, not falsely claimed committed to repository.
+
+**Single G0 decision**: ownweight generator that can synthesize useful **semantic hypotheses not reducible to input-provided feature predicate** is currently NOT demonstrated; do not spend on new meta-training until an independent verifier, strong classical gap, discovery-policy A/B/C/D and matched rights/cost source are assembled. RC48 neural SLOT controller is specifically **out**. Return HOLD on G0; retain frozen evidence. Avoid new RC and PR proliferation.
+
+Full original references:
+https://www.nature.com/articles/s41586-025-09761-x
+https://www.microsoft.com/en-us/research/publication/skillgen-verified-inference-time-agent-skill-synthesis/
+https://proceedings.mlr.press/v306/ma26av.html
+https://research.google/pubs/cost-effective-agent-test-time-scaling/
+https://arxiv.org/abs/2609.39148
+https://arxiv.org/abs/2610.14662
+https://arxiv.org/abs/2610.25858
