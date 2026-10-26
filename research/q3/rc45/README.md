@@ -54,9 +54,10 @@ AFTER reading each task's public source examples.
 
 **Decisive adverse result:** both prospective source-only zero-retraining
 cross-task reuse experiments were **0/12**. The 17-op library did NOT
-generalize to the third cohort. Its 12 public test gold outputs have **NOT**
-been opened by the experiment. A source admission is never a universal
-equivalence proof.
+generalize to the third cohort. Its 12 public test gold outputs were **never
+model-visible or scored**. The independent replay retrieves whole original
+Git blobs but deliberately does not inspect the third cohort's test outputs.
+A source admission is never a universal equivalence proof.
 
 ## Scientific value and controls
 
