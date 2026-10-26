@@ -27,3 +27,14 @@ A `gate(Evidence)` classifier differentiates `EXECUTE_CLASSICAL`, `HOLD_UNKNOWN`
 Independent, actual external problem families and matching tool rights; preregister a small but REAL strong-classical capability gap, freeze own trained semantic-proposal policy before third-domain opening, register all failed trials and CPU/VRAM/J/API costs, score independently. **If a superior classical method solves under the budget, delete learned search.** Do not keep widening human-coded SLOT toy grammars for invented PASS counts.
 
 See original North Star `docs/research/frozen_north_star.md` and PR #612/#613/#615 for retained first-hash evidence. All global Q1–Q7 remain OPEN.
+
+
+## RC52 follow-up: actual RC50 external semantic ambiguity (retrospective)
+
+Reconstructed original ARC Prize ARC-AGI-2 **PUBLIC TRAINING** task `351d6448` from pinned upstream commit `f3283f727488ad98fe575ea6a5ac981e4a188e49`, Git blob `d79f5eb78e36a92db8d8433664d02841f912f06d`.
+
+The historical source-fitting `TEMPORAL_RUN_INDUCTION` from RC50 was wrong by exactly **1 of 39 test-grid cells**. A **SECOND semantic hypothesis created AFTER the gold was seen** also fits original training 2/2 but predicts a different value in exactly cell (row1,col5); this retrospective hypothesis matches gold. Hence the original task's examples underidentify the correct candidate inside this pair. The honest source-only action is `HOLD_SEMANTIC_AMBIGUITY`, not confident wrong prediction or unearned model authorization. Conditional on precisely these two candidates, one authoritative binary answer distinguishing value 2 from 3 suffices for the remaining entire grid. It cannot be obtained from source demos alone; unknown other hypotheses may require additional information.
+
+**New real executable package** `NEUMANN1_RC52_SEMANTIC_UNCERTAINTY_20261026.zip` (conversation artifact), archive SHA256 `2ceaf02211a0006b4d3dbc284324a70def66d242e54c8d138a03c5ec9f395679`, clean-replayed source SHA256 manifest 5/5 and pytest **55/55 PASS** (including 42 synthetic color-renaming variants, not 42 new external tasks). The general small `research/q3/rc52/disagreement.py` auditing interface and smoke tests are included on this branch.
+
+**HARD PROVENANCE**: the alternative was authored with prior test-gold exposure. Therefore no prospective new-case correctness, own-weight learned semantic invention, actual model call cost, frontier capability recovery, or global Q1–Q7 promotion is claimed. The result closes a scoped *root-cause diagnosis and fail-closed arbitration*, not B/C. The correct scientific next target is a sealed third-domain test where an ownweight semantic proposer supplies meaningful competing hypotheses BEFORE labels, strong classics are compared at equal rights and full cost, and independent evidence arbitrates only the unresolved distinction.
