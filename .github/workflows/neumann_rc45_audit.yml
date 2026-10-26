@@ -1,0 +1,35 @@
+name: NEUMANN RC45 frozen external audit
+on:
+  pull_request:
+    paths:
+      - 'research/q3/rc45/**'
+      - '.github/workflows/neumann_rc45_audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frozen-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout minimal immutable evidence
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/q3/rc45
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Verify script syntax and immutable receipt structure
+        run: |
+          node --check research/q3/rc45/solver.mjs
+          node --check research/q3/rc45/adaptation.mjs
+          node --check research/q3/rc45/dispatch17.mjs
+          node --check research/q3/rc45/verify.mjs
+          node research/q3/rc45/verify.mjs
+      - name: Independent pinned official-data replay
+        run: node research/q3/rc45/verify.mjs --online
