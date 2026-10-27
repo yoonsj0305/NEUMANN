@@ -28,43 +28,59 @@ jobs:
           python3 -m pip install -q pytest
           python3 -m pytest -q tests/test_q3_portfolio_consensus_evidence_gate_20261027.py tests/test_q3_source_input_identifiability_guard_20261027.py
 
-  official-sygus-9-native-candidates-z3-proof:
+  official-sygus-two-holds-modern-cvc5-142:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 9
     steps:
       - uses: actions/checkout@v4
         with:
           ref: research/rc51-intelligence-spend-gate-20261026
           persist-credentials: false
-      - name: Preregistered separate exact original semantics Z3 obligations
+      - name: Check prereg and freeze exact newest binary/version and old first
         run: |
-          test -s docs/research/G0_OFFICIAL_SYGUS_C16_Z3_ORDINARY_CONSTRAINTS_POSTFIRST_PREREG_20261027.md
-          python3 -m py_compile research/q3/discovery_policy/sygus_official_independent_ordinary_z3_postfirst_20261027.py
-          sha256sum research/q3/discovery_policy/sygus_official_independent_ordinary_z3_postfirst_20261027.py
+          set -euo pipefail
+          test -s docs/research/G0_OFFICIAL_SYGUS_TWO_HOLD_MODERN_CVC5_142_POSTFIRST_PREREG_20261027.md
+          python3 -m py_compile research/q3/discovery_policy/sygus_official_modern_cvc5_142_twohold_postfirst_20261027.py
+          sha256sum research/q3/discovery_policy/sygus_official_modern_cvc5_142_twohold_postfirst_20261027.py
       - uses: actions/download-artifact@v4
         with:
           name: neumann-g0-official-SyGuS-four-families-C16-FIRST-source
           run-id: 40490276713
           repository: yoonsj0305/NEUMANN
           github-token: ${{ github.token }}
-          path: official_original_first
-      - name: Restore pinned independent original and verify unmodified classical first
+          path: official_old_cvc5_first
+      - name: Verify latest official cvc5 1.4.2 release ZIP SHA and install only pinned binary
         run: |
           set -euo pipefail
-          echo 'a648346b162b3c76d4c60283f339c1a3c54016ad374128c1b4135453c27a5ba5  official_original_first/OFFICIAL_C16_FIRST_UNGRADED_CLASSICAL_HEADROOM.json' | sha256sum -c
+          echo 'a648346b162b3c76d4c60283f339c1a3c54016ad374128c1b4135453c27a5ba5  official_old_cvc5_first/OFFICIAL_C16_FIRST_UNGRADED_CLASSICAL_HEADROOM.json' | sha256sum --check
+          curl -fSL --retry 3 --max-time 180 \
+            'https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-libcxx-static.zip' \
+            -o official-cvc5-142.zip
+          echo '0af677313c8277dc558d3049b192389db4d975d31c968fbd6f31cf0849ee411d  official-cvc5-142.zip' | sha256sum --check
+          unzip -q official-cvc5-142.zip -d official-bin
+          f="$(find official-bin -type f -name cvc5 | head -n 1)"
+          test -n "$f"
+          chmod +x "$f"
+          mkdir -p native_solver_bin
+          cp "$f" native_solver_bin/cvc5
+          echo "$(pwd)/native_solver_bin" >> "$GITHUB_PATH"
+          native_solver_bin/cvc5 --version | head -n 3
+      - name: Same pinned original official full source, identical native budget
+        run: |
+          set -euo pipefail
           git init -q official_repo
           git -C official_repo remote add origin https://github.com/SyGuS-Org/benchmarks.git
           git -C official_repo fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
           git -C official_repo checkout --detach -q FETCH_HEAD
-          python3 -m pip install -q 'z3-solver==4.13.3.0'
-      - name: Check native first candidate full original semantic obligations with Z3
-        run: |
-          set -euo pipefail
-          python3 research/q3/discovery_policy/sygus_official_independent_ordinary_z3_postfirst_20261027.py
-          sha256sum official_z3_semantic_grade/OFFICIAL_9_CANDIDATES_ORDINARY_Z3_GRADE_POSTFIRST.json
+          test "$(git -C official_repo rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python3 research/q3/discovery_policy/sygus_official_modern_cvc5_142_twohold_postfirst_20261027.py
+          sha256sum official_cvc5_142_retest/POSTFIRST_OFFICIAL_TWO_HOLDS_CVC5_142_MATCHED.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: neumann-g0-official-C16-first-Z3-independent-ordinary-candidate-verdicts
-          path: official_z3_semantic_grade/OFFICIAL_9_CANDIDATES_ORDINARY_Z3_GRADE_POSTFIRST.json
+          name: neumann-g0-official-two-1-4-2-version-fair-C-benchmark-postfirst
+          path: |
+            official_cvc5_142_retest/POSTFIRST_OFFICIAL_TWO_HOLDS_CVC5_142_MATCHED.json
+            official_cvc5_142_retest/*.stdout
+            official_cvc5_142_retest/*.stderr
           if-no-files-found: warn
