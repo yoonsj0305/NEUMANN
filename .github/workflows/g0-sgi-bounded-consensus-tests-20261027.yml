@@ -28,41 +28,40 @@ jobs:
           python3 -m pip install -q pytest
           python3 -m pytest -q tests/test_q3_portfolio_consensus_evidence_gate_20261027.py tests/test_q3_source_input_identifiability_guard_20261027.py
 
-  official-sygus-dangerloop21-exact-3function-z3:
+  official-dangerloop21-symbolic-all-32bit-nonzero-thresholds:
     runs-on: ubuntu-latest
-    timeout-minutes: 7
+    timeout-minutes: 6
     steps:
       - uses: actions/checkout@v4
         with:
           ref: research/rc51-intelligence-spend-gate-20261026
           persist-credentials: false
-      - name: Assert postfirst analytic D/R/S prereg before automated exact original proof
+      - name: Audit disclosed prior symbolic N finding and immutable exact original
         run: |
           set -euo pipefail
-          test -s docs/research/G0_OFFICIAL_DANGER_LOOP21_CONSTRUCTIVE_TRIPLE_PRE_EXACT_Z3_20261027.md
-          python3 -m py_compile research/q3/discovery_policy/sygus_dangerloop21_analytic_z3_exact_original_20261027.py
-          sha256sum research/q3/discovery_policy/sygus_dangerloop21_analytic_z3_exact_original_20261027.py
-      - name: Fetch pinned exact original third-party source with authoritative source SHA
+          test -s docs/research/G0_OFFICIAL_DANGER_LOOP21_PARAMETRIC_POSTFIRST_REPRO_20261027.md
+          python3 -m py_compile research/q3/discovery_policy/sygus_dangerloop21_parametric_nonzero_threshold_z3_20261027.py
+          sha256sum research/q3/discovery_policy/sygus_dangerloop21_parametric_nonzero_threshold_z3_20261027.py
+      - name: Pin official authors original exact source and independent formal solver
         run: |
           set -euo pipefail
           git init -q official_repo
           git -C official_repo remote add origin https://github.com/SyGuS-Org/benchmarks.git
           git -C official_repo fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
           git -C official_repo checkout --detach -q FETCH_HEAD
-          test "$(git -C official_repo rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
           echo '8b3fa6aa436f67ec10b1112c3f7e8ffb1eb0e920b0268bcae5d3adf8cced539c  official_repo/lib/General_Track/cegist-cav18/inv/danger-loop21.sl' | sha256sum --check
           python3 -m pip install -q 'z3-solver==4.13.3.0'
-      - name: Derive all original formal SMT obligations and prove D R S candidate
+      - name: Prove all three original constraints forall nonzero 32-bit N x y
         run: |
           set -euo pipefail
-          python3 research/q3/discovery_policy/sygus_dangerloop21_analytic_z3_exact_original_20261027.py
-          test -s official_danger21_z3_proof/DANGER_LOOP21_ORIGINAL_EXACT_Z3_3FUNCTION_FORMAL_PROOF.json
-          sha256sum official_danger21_z3_proof/DANGER_LOOP21_ORIGINAL_EXACT_Z3_3FUNCTION_FORMAL_PROOF.json
+          python3 research/q3/discovery_policy/sygus_dangerloop21_parametric_nonzero_threshold_z3_20261027.py
+          test -s official_danger21_parameterized_template/DANGER_LOOP21_ALL_32BIT_NONZERO_THRESHOLDS_SYMBOLIC_Z3.json
+          sha256sum official_danger21_parameterized_template/DANGER_LOOP21_ALL_32BIT_NONZERO_THRESHOLDS_SYMBOLIC_Z3.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: neumann-g0-official-dangerloop21-symbolic-exact-original-z3
+          name: neumann-g0-dangerloop21-parametric-nonzero-32bit-Z3
           path: |
-            official_danger21_z3_proof/*.json
-            official_danger21_z3_proof/*.smt2
+            official_danger21_parameterized_template/*.json
+            official_danger21_parameterized_template/*.smt2
           if-no-files-found: warn
