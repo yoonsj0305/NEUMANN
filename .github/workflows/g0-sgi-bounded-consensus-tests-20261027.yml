@@ -28,40 +28,40 @@ jobs:
           python3 -m pip install -q pytest
           python3 -m pytest -q tests/test_q3_portfolio_consensus_evidence_gate_20261027.py tests/test_q3_source_input_identifiability_guard_20261027.py
 
-  official-danger42-four-function-and-danger37-unsat-postfirst:
+  official-danger39-exact-source-cyclic-ranking-impossibility:
     runs-on: ubuntu-latest
-    timeout-minutes: 7
+    timeout-minutes: 6
     steps:
       - uses: actions/checkout@v4
         with:
           ref: research/rc51-intelligence-spend-gate-20261026
           persist-credentials: false
-      - name: Verify postfirst analytic candidate and grounded impossibility hypothesis fixed
+      - name: Check source and pre-experiment retrospective mathematical theorem disclosure
         run: |
           set -euo pipefail
-          test -s docs/research/G0_OFFICIAL_DANGER8_POSTFIRST_DANGER42_SOLUTION_DANGER37_UNSAT_HYPOTHESES_20261027.md
-          python3 -m py_compile research/q3/discovery_policy/sygus_danger42_4fun_and_danger37_unsat_exact_original_postfirst_20261027.py
-          sha256sum research/q3/discovery_policy/sygus_danger42_4fun_and_danger37_unsat_exact_original_postfirst_20261027.py
-      - name: Read only original pinned officially published source and install independent Z3
+          test -s docs/research/G0_OFFICIAL_DANGER39_CYCLIC_RANK_IMPOSSIBILITY_POSTFIRST_PREREG_20261027.md
+          python3 -m py_compile research/q3/discovery_policy/sygus_danger39_cyclic_rank_unsat_20261027.py
+          sha256sum research/q3/discovery_policy/sygus_danger39_cyclic_rank_unsat_20261027.py
+      - name: Pin original independent source and install proof engine
         run: |
           set -euo pipefail
           git init -q official_repo
           git -C official_repo remote add origin https://github.com/SyGuS-Org/benchmarks.git
           git -C official_repo fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
           git -C official_repo checkout --detach -q FETCH_HEAD
-          echo '47a78c4a3d6bd715ee57db8044bb140858d8809bbd3b6522af46793d5905ee5e  official_repo/lib/General_Track/cegist-cav18/inv/danger-loop42.sl' | sha256sum -c
-          echo '11f19d4bab4f637492dee2bee9e8d6fadf8d2de04eaa5aa2ef2b0fa9c1485c31  official_repo/lib/General_Track/cegist-cav18/inv/danger-loop37.sl' | sha256sum -c
+          echo 'c9f45a3e85860f3161fb948a85489777498d64656673364b328162af1d9f2b2d  official_repo/lib/General_Track/cegist-cav18/inv/danger-loop39.sl' | sha256sum --check
           python3 -m pip -q install 'z3-solver==4.13.3.0'
-      - name: Independently check full source danger42 valid and danger37 UNSAT for all uninterpreted D R y0
+      - name: Seven exact universal source implications + mathematical modular rank cycle
         run: |
           set -euo pipefail
-          python3 research/q3/discovery_policy/sygus_danger42_4fun_and_danger37_unsat_exact_original_postfirst_20261027.py
-          sha256sum official_danger42_37_semantic_proofs/DANGER42_FOUR_FUNCTION_SOLUTION_AND_DANGER37_UNSAT_POSTFIRST.json
+          python3 research/q3/discovery_policy/sygus_danger39_cyclic_rank_unsat_20261027.py
+          test -s official_danger39_cyclic_rank_proof/DANGER39_SOURCE_CHECKED_CYCLIC_RANK_UNREALIZABLE.json
+          sha256sum official_danger39_cyclic_rank_proof/DANGER39_SOURCE_CHECKED_CYCLIC_RANK_UNREALIZABLE.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: neumann-g0-official-danger42-candidate-and-danger37-infeasibility
+          name: neumann-g0-official-danger39-rank-cycle-original-unsat
           path: |
-            official_danger42_37_semantic_proofs/*.json
-            official_danger42_37_semantic_proofs/*.smt2
+            official_danger39_cyclic_rank_proof/*.json
+            official_danger39_cyclic_rank_proof/*.smt2
           if-no-files-found: warn
