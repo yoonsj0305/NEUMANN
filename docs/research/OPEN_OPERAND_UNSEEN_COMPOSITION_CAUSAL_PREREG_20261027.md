@@ -1,0 +1,21 @@
+# NEUMANN 1 | Micro G1 open-operand / unseen-composition causal experiment: prereg 2026-10-27
+
+**Research-only, simulated problems: NOT external, NOT Q1-Q7 PASS.** This is a fixed-grammar representation smoke test and a real ownweight-learning ablation, not invention of new primitive semantics. It exists because the frozen 19-fully-parameterized-token GRU cannot express unseen numeric operands. Do NOT claim an open-ended program language from this.
+
+## Scientific question
+Can a small learned model predict **unseen two-step typed bitvector compositions** without memorizing any complete program/constant, and thereby save verification/proposal work relative to an equally trained shuffled-target control while retaining heldout execution correctness? A strong classical full search C receives all example IO too. Any classical equal-or-better exact/cost keeps G1 HOLD.
+
+## Fixed execution universe
+- 8-bit unsigned scalar IO, primitive types `ADD(c)`, `XOR(c)`, `ROL(r)`, with operands c chosen from [0,255] for ADD/XOR and r from [1,7] for ROL. Bitvector mod 256.
+- Composite program always *exactly two operations* on each input. Six ordered type pairs with no duplicates: AX=(ADD,XOR), XA, AR, RA, XR, RX.
+- Training type pairs **AX, XA, AR, XR**; evaluation never-seen ordered pair types **RA, RX**. This is unseen composition of known primitives, **NOT new primitive invention**.
+- Training operands for ADD/XOR drawn from 0..127 inclusive; heldout operands from 128..255 inclusive. ROL operands 1..7 in all groups. Every task has 6 source IO examples and 6 disjoint heldout inputs. Input draws use deterministic numpy seeds. Training N=2400 tasks; evaluation unseen-type N=160 tasks and known-type diagnostic N=160. Training seed global=271027, evaluation seeds 99027 (new compositions) and 99028 (known compositions). Test outputs hidden from A/B/C until frozen executable proposal list output is serialized.
+- Seeded PyTorch neural model: MLP on normalized bit-decomposed source IO; two separate 3-way operator-type output heads, no 256-way constant softmax; output is only two op types. Source-conditioned typed operand solver computes arbitrary parameters, even never-used 128..255, **without consulting heldout outputs**.
+- Compare A = supervised true program-type labels, B = same architecture, epochs, source and optimizer but training labels shuffled at task-level; C = exhaustive all 6 pair types with same operand inverse-solver, same 6 known IO, no test gold. Source-only candidate must agree on ALL 6 demonstrations. Proposed top-1 and top-3 A/B; C up to 6; verify candidate outputs against 6 new heldout inputs AFTER candidate JSON sealed. Source consensus ambiguity reported separately, never quietly select an answer with heldout gold.
+
+## Interpretation and stop conditions
+- A>B in heldout new-type first-candidate/3-candidate exact is *local evidence of learning* for a predefined representation, not meta-learning new operators, not general transfer, and not proof that novel base primitive semantics were invented.
+- C success at equal/lower end-to-end cost rejects global advantage. Measure training CPU/wall, task-level candidate verification counts, end-to-end inference CPU/wall, and process RAM; energy/industrial costs UNKNOWN. For parity, amortize A/B training cost across test tasks and never compare inference-only A to C for a 10x claim.
+- If A cannot emit any heldout new composition or is no better than shuffled B, mark `REPRESENTATION_OR_TRANSFER_FAILURE` and stop MLP iteration. If A has narrow local benefit but C dominates, mark `LOCAL_LEARNABILITY_ONLY`; no G1 admission.
+- Evidence: executable code SHA, exact first proposal SHA before any grade, full result including incorrect/HOLD; 4 independent regression tests for bitvector semantics, inverse operand solving, source/test separation and fixed corpus split.
+- Authentic external cross-author task families and real independently verified semantic repair trajectories remain prerequisites for any NEUMANN Q claim.
