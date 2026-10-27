@@ -28,3 +28,9 @@
 3. First runner selects 6+6 and runs source-only C; uploads first proposals.
 4. Only then run independent original-heldout verifier V, preserve first result.
 5. Admit learning only if strong C falls short and a verified, nonduplicate semantic gap exists.
+
+## POST-FIRST EXECUTOR-ELIGIBILITY AMENDMENT, before any selected benchmark content access
+
+First GitHub Actions run [#40451521100](https://github.com/yoonsj0305/NEUMANN/actions/runs/40451521100) actually installed cvc5 and pinned upstream but **stopped before it read any selected .sl file content**: glob data/benchmarks/easy/*/*.sl returned ONLY **3** candidates; the original 6-easy/6-hard prereg was impossible. The first job failed with RuntimeError not-six-easy-3, not a scientific benchmark failure. Raw first job log and first failure artifact are preserved.
+
+Amend sampling to **all 3 available easy source IDs plus first 9 hard source IDs by the SAME predeclared SHA256 path-ranking rule**. Total stays 12 and no filenames or solution contents have been manually selected. This is a transparent pre-content-but-post-execution-eligibility repair, **not** the original 6+6 cohort nor a fresh sealed blind; 9 hard requires at least 9 eligible filenames, otherwise classify NOT RUN instead of cherry-picking replacements. Solver/grader rights, logic, time budget, source-only heldout isolation and fixed commit unchanged. A new post-first code/first-receipt seal must be retained separately. Q1-Q7 remain OPEN.
