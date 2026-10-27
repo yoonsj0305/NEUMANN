@@ -28,53 +28,43 @@ jobs:
           python3 -m pip install -q pytest
           python3 -m pytest -q tests/test_q3_portfolio_consensus_evidence_gate_20261027.py tests/test_q3_source_input_identifiability_guard_20261027.py
 
-  official-sygus-names-only-inventory:
+  official-sygus-four-family-strong-c-first:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 9
     steps:
       - uses: actions/checkout@v4
         with:
           ref: research/rc51-intelligence-spend-gate-20261026
           persist-credentials: false
-      - name: Assert prereg BEFORE external source inventory
+      - name: Strict preregistration and runner syntax verification
         run: |
           set -euo pipefail
-          test -s docs/research/G0_OFFICIAL_SYGUS_MULTIFAMILY_INVENTORY_PRECOMMIT_20261027.md
-      - name: Fetch official SyGuS multi-author repository, list path names ONLY
+          test -s docs/research/G0_OFFICIAL_SYGUS_C_MULTI_FAMILY_16_FIRST_PREREG_20261027.md
+          python3 -m py_compile research/q3/discovery_policy/sygus_official_multifamily_classical_first_20261027.py
+          sha256sum research/q3/discovery_policy/sygus_official_multifamily_classical_first_20261027.py
+      - name: Fetch EXACT pinned external official SyGuS originals and native CVC5
         run: |
           set -euo pipefail
           git init -q official_repo
           git -C official_repo remote add origin https://github.com/SyGuS-Org/benchmarks.git
-          git -C official_repo fetch --depth 1 origin master
+          git -C official_repo fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
           git -C official_repo checkout --detach -q FETCH_HEAD
-          python3 - <<'PY'
-          import collections,hashlib,json,pathlib,subprocess
-          base=pathlib.Path('official_repo')
-          commit=subprocess.check_output(['git','-C',str(base),'rev-parse','HEAD'],text=True).strip()
-          # File PATHS from git object tree, not contents, benchmark descriptions or gold
-          names=subprocess.check_output(['git','-C',str(base),'ls-tree','-r','--name-only','HEAD'],text=True).splitlines()
-          files=sorted(x for x in names if x.endswith(('.sl','.sl2','.sy','.sl3')))
-          groups=collections.defaultdict(list)
-          for path in files:
-              x=path.split('/')
-              key='/'.join(x[:min(3,len(x))])
-              groups[key].append(path)
-          out={'source':'SyGuS-Org/benchmarks','exact_commit':commit,'filenames_only':True,
-               'n_files':len(files),'category_counts':{k:len(v) for k,v in sorted(groups.items())},
-               'examples_per_group':{k:v[:3] for k,v in sorted(groups.items())},
-               'all_filenames':files}
-          pathlib.Path('official_inventory').mkdir(exist_ok=True)
-          p=pathlib.Path('official_inventory/ALL_OFFICIAL_SYGUS_FILENAMES_ONLY.json')
-          p.write_text(json.dumps(out,indent=2,sort_keys=True))
-          print('OFFICIAL_UPSTREAM_SHA',commit)
-          print('N_SMT_BENCHMARKS',len(files))
-          print('FILENAME_JSON_SHA256',hashlib.sha256(p.read_bytes()).hexdigest())
-          print('GROUP_COUNTS',json.dumps(out['category_counts'],sort_keys=True)[:14000])
-          print('GROUP_FIRST_PATHS',json.dumps(out['examples_per_group'],sort_keys=True)[:14000])
-          PY
+          test "$(git -C official_repo rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -y -qq install cvc5
+          cvc5 --version
+      - name: Run all original official tasks under one 15-second cap each
+        run: |
+          set -euo pipefail
+          python3 research/q3/discovery_policy/sygus_official_multifamily_classical_first_20261027.py
+          test -s official_c16_first/OFFICIAL_C16_FIRST_UNGRADED_CLASSICAL_HEADROOM.json
+          sha256sum official_c16_first/OFFICIAL_C16_FIRST_UNGRADED_CLASSICAL_HEADROOM.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: neumann-g0-official-sygus-filenames-only-prereg
-          path: official_inventory/ALL_OFFICIAL_SYGUS_FILENAMES_ONLY.json
+          name: neumann-g0-official-SyGuS-four-families-C16-FIRST-source
+          path: |
+            official_c16_first/OFFICIAL_C16_FIRST_UNGRADED_CLASSICAL_HEADROOM.json
+            official_c16_first/*.stdout
+            official_c16_first/*.stderr
           if-no-files-found: warn
