@@ -27,3 +27,52 @@ jobs:
         run: |
           python3 -m pip install -q pytest
           python3 -m pytest -q tests/test_q3_portfolio_consensus_evidence_gate_20261027.py
+  # TEMPORARY instrumentation of an existing visible CI workflow.
+  # Remove this block after verifying one immutable experimental result.
+  opened-dev-adversarial-witness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/rc51-intelligence-spend-gate-20261026
+          persist-credentials: false
+      - name: Validate frozen experiment source
+        run: |
+          python3 -m py_compile research/q3/discovery_policy/sgi_adversarial_witness_opened_dev.py
+          sha256sum research/q3/discovery_policy/sgi_adversarial_witness_opened_dev.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-g0-sgi12-active-oracle-FIRST-UNgraded-20261027
+          run-id: 40456478489
+          repository: yoonsj0305/NEUMANN
+          github-token: ${{ github.token }}
+          path: previous_first
+      - name: Install published native classical and Z3
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cvc5
+          python3 -m pip -q install 'z3-solver==4.13.3.0'
+      - name: Sanitize full original source before program synthesis
+        run: |
+          echo 'a2713cee7e4a54506501927c07ff65f78d4ad110e4c9568892d937f3a0aa8185  previous_first/FIRST_PROPOSALS_AND_QUERY_DECISIONS_UNGRADED.json' | sha256sum -c
+          git init -q upstream
+          git -C upstream remote add origin https://github.com/Barnard-PL-Labs/sygus-sgi-1.git
+          git -C upstream fetch --depth 1 origin e7ae840e5546e9243ff94afb1a29064fc050011c
+          git -C upstream checkout --detach -q FETCH_HEAD
+          python3 research/q3/discovery_policy/sgi_adversarial_witness_opened_dev.py prepare
+          rm -rf upstream
+      - name: Run twelve forced-source counterprogram probes on opened SGI problems
+        run: |
+          test ! -e upstream
+          python3 research/q3/discovery_policy/sgi_adversarial_witness_opened_dev.py propose
+          sha256sum adversarial_dev_first/DEV_V2_SEMANTIC_ADVERSARIAL_WITNESS.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-g0-sgi-adversarial-opened-dev-linked-visible
+          path: |
+            adversarial_dev_first/*.json
+            adversarial_dev_first/*.stdout
+            adversarial_dev_first/*.stderr
+          if-no-files-found: warn
