@@ -39,7 +39,7 @@ def features(program,src_count,src_bytes,probe_pred,future_pred,arm):
 
 def main():
     import z3
-    import numpy as np
+    import random
     import torch
     torch.set_num_threads(1)
     assert subprocess.check_output(["git","-C",str(SOURCE),"rev-parse","HEAD"],text=True).strip()==PIN
@@ -90,8 +90,8 @@ def main():
         print("TRAIN_SOURCE_ONLY",r["index"],[c.get("train_label_exact","HOLD") for c in row["cases"]],flush=True)
     if len(X)<12 or len(set(Y))<2:
         raise RuntimeError("TRAINING_NOT_ADMISSIBLE_INSUFFICIENT_OR_ALL_ONE_CLASS")
-    x=torch.tensor(np.asarray(X,dtype="float32"))
-    y=torch.tensor(np.asarray(Y,dtype="float32")).unsqueeze(-1)
+    x=torch.tensor(X,dtype=torch.float32)
+    y=torch.tensor(Y,dtype=torch.float32).unsqueeze(-1)
     weights={}
     for mode in ("A","B"):
         for seed in SEEDS:
@@ -100,16 +100,17 @@ def main():
             optimizer=torch.optim.Adam(model.parameters(),lr=.025,weight_decay=.01)
             yy=y.clone()
             if mode=="B":
-                g=np.random.default_rng(seed+11089)
-                yy=torch.tensor(g.permutation(np.asarray(Y)).astype("float32")).unsqueeze(-1)
+                permutation=list(Y)
+                random.Random(seed+11089).shuffle(permutation)
+                yy=torch.tensor(permutation,dtype=torch.float32).unsqueeze(-1)
             for _ in range(240):
                 optimizer.zero_grad()
                 loss=torch.nn.functional.binary_cross_entropy_with_logits(model(x),yy)
                 loss.backward();optimizer.step()
             with torch.no_grad():
                 score=torch.sigmoid(model(x))
-                w=model.weight.detach().numpy().flatten().tolist()
-                bias=float(model.bias.detach().numpy().flatten()[0])
+                w=model.weight.detach().flatten().tolist()
+                bias=float(model.bias.detach().item())
                 loss=float(torch.nn.functional.binary_cross_entropy(score,yy).item())
             weights[f"{mode}_{seed}"]={
                 "mode":mode,"seed":seed,"weights":[float(u) for u in w],
