@@ -34,3 +34,17 @@ Of these twelve, the prior *binary original eligible cohort* was seven: `ufliate
 - The bundle includes **no third-party original benchmark source file** or JAR.
 
 **Verdict: G0_SPECIALIST_BASELINE_POSTFIRST_SCOPED_PASS_7/7; G1_HOLD; Q1–Q7_GLOBAL_OPEN.**
+
+
+## Additional post-first telemetry replay — completed, 2026-10-27
+
+Historical measurement runner had missing RSS samples and omitted JSON artifact. A subsequent instrumentation-only edit mistakenly wrote escaped Python newline characters; **GitHub Actions #40442989716 failed at syntax parse** (no original task solved in that attempt). Failure retained, not conflated with research outcome. Following newline repair, [GitHub Actions #40443063729](https://github.com/yoonsj0305/NEUMANN/actions/runs/40443063729), commit `c49259c73f423df1ee1bc7c94add259e9fdf5a14`, **completed all 12** and emitted JSON artifact **[#12707491784](https://github.com/yoonsj0305/NEUMANN/actions/runs/40443063729/artifacts/12707491784)**. All 12 stdout SHA256 identical to earlier successful professional replay. The 7/7 checked Craig conclusion unchanged.
+
+Measured child process samples (12 separate runs; sums do NOT include fetch, harness, independent Z3 verification, storage, network or energy):
+- All 12: CPU user **3.232046 s**, system **0.321123 s**, sum per-process wall **1.979776 s**; process wall range **0.107674–0.215692 s**; sampled per-process RSS maxima **51,664–77,900 KiB**.
+- Seven binary Craig eligible: CPU user **2.381631 s**, system **0.198167 s**, sum per-process wall **1.334517 s**, sampled per-process RSS maxima **62,772–77,900 KiB**.
+- Child CPU can exceed wall due JVM parallelism. RSS is polling-based and can miss transient peaks, so it is a lower bound on actual peak. There is **no measured full-system 10x improvement**, and there is no additional learned capacity.
+
+Raw JSON SHA256 `ac0b19493ae4949e25dbe3d9fc88f03effe1289588219fa52328cdb4defd6f07`. Updated standalone receipt bundle `NEUMANN1_G0_POSTFIRST_PROFESSIONAL_MEASURED_20261027.zip` SHA256 `f4428802083c907ff9f2b37ffc753344082ff2b0bfc073648c2082b56244aeaa`, original 12 stdout/stderr, seven Z3 checks and full matched telemetry JSON; rechecked offline 7/7.
+
+Scientific status unchanged: `G0_POSTFIRST_PROFESSIONAL_7/7_SCOPED_PASS`; `G1_HOLD`; `Q1_Q7_OPEN`.
