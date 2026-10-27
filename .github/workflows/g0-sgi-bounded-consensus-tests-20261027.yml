@@ -41,6 +41,7 @@ jobs:
           set -euo pipefail
           test -s docs/research/G0_OFFICIAL_DANGER_LOOP21_PARAMETRIC_POSTFIRST_REPRO_20261027.md
           python3 -m py_compile research/q3/discovery_policy/sygus_dangerloop21_parametric_nonzero_threshold_z3_20261027.py
+          grep -Fq 'statements.insert(1,' research/q3/discovery_policy/sygus_dangerloop21_parametric_nonzero_threshold_z3_20261027.py
           sha256sum research/q3/discovery_policy/sygus_dangerloop21_parametric_nonzero_threshold_z3_20261027.py
       - name: Pin official authors original exact source and independent formal solver
         run: |
