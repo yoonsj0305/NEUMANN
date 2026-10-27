@@ -28,3 +28,53 @@ jobs:
           python3 -m pip install -q pytest
           python3 -m pytest -q tests/test_q3_portfolio_consensus_evidence_gate_20261027.py tests/test_q3_source_input_identifiability_guard_20261027.py
 
+  official-dangerloop-prospective-eight-template-vs-modern-c:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/rc51-intelligence-spend-gate-20261026
+          persist-credentials: false
+      - name: Pre-content original task identities and executor syntax
+        run: |
+          set -euo pipefail
+          test -s docs/research/G0_OFFICIAL_DANGERLOOP_UNSEEN8_FAMILY_TRANSFER_PREREG_20261027.md
+          python3 -m py_compile research/q3/discovery_policy/sygus_dangerloop_unseen8_classical_template_transfer_20261027.py
+          sha256sum research/q3/discovery_policy/sygus_dangerloop_unseen8_classical_template_transfer_20261027.py
+      - name: Verify official native modern CVC5 SHA256 and build executable
+        run: |
+          set -euo pipefail
+          curl -fSL --retry 3 --max-time 120 \
+            'https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-libcxx-static.zip' \
+            -o official-cvc5-142.zip
+          echo '0af677313c8277dc558d3049b192389db4d975d31c968fbd6f31cf0849ee411d  official-cvc5-142.zip' | sha256sum --check
+          unzip -q official-cvc5-142.zip -d official-bin
+          f="$(find official-bin -type f -name cvc5 | head -n 1)"
+          test -n "$f"
+          mkdir -p native_solver_bin
+          cp "$f" native_solver_bin/cvc5
+          chmod +x native_solver_bin/cvc5
+          echo "$(pwd)/native_solver_bin" >> "$GITHUB_PATH"
+          native_solver_bin/cvc5 --version | head -n 1
+      - name: Fetch pinned uninspected official originals and independent Z3
+        run: |
+          set -euo pipefail
+          git init -q official_repo
+          git -C official_repo remote add origin https://github.com/SyGuS-Org/benchmarks.git
+          git -C official_repo fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
+          git -C official_repo checkout --detach -q FETCH_HEAD
+          echo '8b3fa6aa436f67ec10b1112c3f7e8ffb1eb0e920b0268bcae5d3adf8cced539c  official_repo/lib/General_Track/cegist-cav18/inv/danger-loop21.sl' | sha256sum --check
+          python3 -m pip -q install 'z3-solver==4.13.3.0'
+      - name: Exactly eight original prospective tasks, automatic template or fail-closed, native baseline
+        run: |
+          set -euo pipefail
+          python3 research/q3/discovery_policy/sygus_dangerloop_unseen8_classical_template_transfer_20261027.py
+          test -s official_danger8_first/DANGERLOOP_SAME_AUTHOR_PROSPECTIVE_EIGHT_TEMPLATE_VS_CVC5_142.json
+          sha256sum official_danger8_first/DANGERLOOP_SAME_AUTHOR_PROSPECTIVE_EIGHT_TEMPLATE_VS_CVC5_142.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-g0-official-danger8-prospective-structure-vs-modern-c-first
+          path: official_danger8_first
+          if-no-files-found: warn
