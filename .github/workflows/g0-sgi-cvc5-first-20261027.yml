@@ -1,4 +1,4 @@
-name: NEUMANN G0 SGI original source-only CVC5 first
+name: NEUMANN G0 SGI original source-only CVC5 (first + selection repair)
 on:
   push:
     branches: [research/rc51-intelligence-spend-gate-20261026]
@@ -23,6 +23,10 @@ jobs:
         with:
           ref: research/rc51-intelligence-spend-gate-20261026
           persist-credentials: false
+      - name: Verify post-first selection correction is disclosed and freeze code identity
+        run: |
+          test -f docs/research/G0_SGI_AUTHENTIC_SYGUS_CVC5_PREREG_20261027.md
+          grep -q 'POST-FIRST EXECUTOR-ELIGIBILITY AMENDMENT' docs/research/G0_SGI_AUTHENTIC_SYGUS_CVC5_PREREG_20261027.md
       - name: Freeze implementation identity and compile
         run: |
           set -euo pipefail
@@ -54,7 +58,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: neumann-g0-sgi-first-CVC5-source-only-20261027
+          name: neumann-g0-sgi-postfirst-selection-repair-CVC5-20261027
           path: |
             first_receipts/FIRST_CVC5_SOURCE_ONLY.json
             first_receipts/FIRST_SHA256.txt
