@@ -43,3 +43,11 @@ Existing classical C has already solved 11/12 original heldouts with independent
 - Global Q1-Q7 OPEN; G1 HOLD; G2 NOT RUN. Research PR #616 remains draft.
 
 **Portable evidence ZIP**: `NEUMANN1_SGI_G0_CVC5_Z3_AND_SEMANTIC_PROOF_20261027.zip`, SHA256 **`ec34459cc9b081142a6626b988bdcee44ec80874e030fae6f43e6e0e248dfa0e`**, 6 entries, CRC PASS, inner SHA manifest of 5 files, with original CVC5 first ZIP, independent Z3 grade ZIP, 3-case semantic theorem JSON, rerunnable cert script, README and manifest. No upstream benchmark source files redistributed.
+
+## 5. Independent original-input disjointness audit after first-grade freeze
+
+After freezing both original FIRST and post-first Z3 results, the upstream repository's **exact same pinned commit** was re-read through GitHub and all twelve full original files scanned for every simple ground `(constraint (= (f #xINPUT) #xOUTPUT))` expression. In **all 12/12**, parsed count equals the original top-level constraint count: respectively **10,10,10,10,30,10,100,1000,100,1000,1000,40**. The **final withheld INPUT was absent from all preceding source inputs for 12/12**. Thus the 11/12 heldout-exact outcomes do not arise merely because the final input was duplicated in the source. **One internal source-input duplicate** occurs in `PRE_icfp_gen_11.20.sl`, but its withheld final input is new. All other 11 files have no repeated input across the selected original constraints.
+
+This is a *post-grade integrity audit*, NOT a fresh blinded experiment, and the benchmark tasks remain correlated (three related easy tasks share identical input values, and the hard tasks reuse benchmark families). The audit does **not** prove OOD family-level transfer, universal generalization or frontier parity; nor does it rule out prior public-benchmark memorization by any hypothetical pretrained language model (no such model was called).
+
+Report and first model outputs remain unchanged. Re-running G0 on this same suite would be retrospective development and cannot acquire a new FIRST claim.
