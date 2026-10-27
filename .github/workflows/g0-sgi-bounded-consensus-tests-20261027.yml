@@ -28,23 +28,24 @@ jobs:
           python3 -m pip install -q pytest
           python3 -m pytest -q tests/test_q3_portfolio_consensus_evidence_gate_20261027.py tests/test_q3_source_input_identifiability_guard_20261027.py
 
-  # One-time never-opened SGI12 source-only A/B prior FIRST.
-  new-ownweight-program-prior-first:
+  # Separate POST-FIRST original test grade after recorded immutable first commit.
+  ownweight-prior-original-heldout-grade:
     runs-on: ubuntu-latest
-    timeout-minutes: 13
+    timeout-minutes: 10
     env:
       SEALED_TRAIN_SHA256: aa43cf5f770b351ac3848fb0f9ece9e1e4255715d5029bd9164c61c5dd113edd
+      SEALED_NEWPRIOR_FIRST_SHA256: 6db0e6473b7041dfbeb316ba42851f88b5bf1db1020c4d330cb838e400433761
     steps:
       - uses: actions/checkout@v4
         with:
           ref: research/rc51-intelligence-spend-gate-20261026
           persist-credentials: false
-      - name: Verify training checkpoint was independently sealed first
+      - name: Freeze first and trained SHA as recorded before original grade
         run: |
           set -euo pipefail
-          grep -q 'aa43cf5f770b351ac3848fb0f9ece9e1e4255715d5029bd9164c61c5dd113edd' docs/research/G0_OWNWEIGHT_PROGRAM_PRIOR_A_B_TRAINED_WEIGHTS_PRETEST_SEAL_20261027.md
-          python3 -m py_compile research/q3/discovery_policy/sgi_ownweight_prior_new12_first.py
-          sha256sum research/q3/discovery_policy/sgi_ownweight_prior_new12_first.py
+          grep -q '6db0e6473b7041dfbeb316ba42851f88b5bf1db1020c4d330cb838e400433761' docs/research/G0_OWNWEIGHT_PROGRAM_PRIOR_NEW12_FIRST_PREGOLD_SEALED_20261027.md
+          python3 -m py_compile research/q3/discovery_policy/sgi_ownweight_prior_new12_postfirst_grade.py
+          sha256sum research/q3/discovery_policy/sgi_ownweight_prior_new12_postfirst_grade.py
       - uses: actions/download-artifact@v4
         with:
           name: neumann-g0-SGI-ownweight-trained-A-B-weights-20261027
@@ -52,36 +53,33 @@ jobs:
           repository: yoonsj0305/NEUMANN
           github-token: ${{ github.token }}
           path: training_weights
-      - name: Install native CVC5 and independent source Z3
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-g0-SGI-ownweight-new12-FROZEN-FIRST-ungRADED
+          run-id: 40483045901
+          repository: yoonsj0305/NEUMANN
+          github-token: ${{ github.token }}
+          path: newprior_first
+      - name: Original frozen SHA checks before opening new gold
         run: |
+          echo 'aa43cf5f770b351ac3848fb0f9ece9e1e4255715d5029bd9164c61c5dd113edd  training_weights/FROZEN_TRAINED_A_B_WEIGHTS.json' | sha256sum --check
+          echo '6db0e6473b7041dfbeb316ba42851f88b5bf1db1020c4d330cb838e400433761  newprior_first/UNSEEN12_FIRST_PROGRAM_SELECTIONS_BEFORE_GOLD.json' | sha256sum --check
+      - name: Independent Z3 and native strong C1 with one additional authentic label
+        run: |
+          set -euo pipefail
           sudo apt-get update -qq
           sudo DEBIAN_FRONTEND=noninteractive apt-get -y -qq install cvc5
           python3 -m pip -q install 'z3-solver==4.13.3.0'
-          cvc5 --version
-      - name: Prepare EXACT fixed new original filenames, source-only body and unlabeled inputs
-        run: |
-          set -euo pipefail
-          echo 'aa43cf5f770b351ac3848fb0f9ece9e1e4255715d5029bd9164c61c5dd113edd  training_weights/FROZEN_TRAINED_A_B_WEIGHTS.json' | sha256sum -c
           git init -q upstream
           git -C upstream remote add origin https://github.com/Barnard-PL-Labs/sygus-sgi-1.git
           git -C upstream fetch --depth 1 origin e7ae840e5546e9243ff94afb1a29064fc050011c
           git -C upstream checkout -q --detach FETCH_HEAD
-          python3 research/q3/discovery_policy/sgi_ownweight_prior_new12_first.py prepare
-          test -s newprior_source_pack.json
-          rm -rf upstream
-      - name: Freeze all test arm programs and A/B/MDL/C0 selections without heldout outputs
-        run: |
-          set -euo pipefail
-          test ! -e upstream
-          python3 research/q3/discovery_policy/sgi_ownweight_prior_new12_first.py propose
-          test -s newprior_first/UNSEEN12_FIRST_PROGRAM_SELECTIONS_BEFORE_GOLD.json
-          sha256sum newprior_first/UNSEEN12_FIRST_PROGRAM_SELECTIONS_BEFORE_GOLD.json
+          test "$(git -C upstream rev-parse HEAD)" = e7ae840e5546e9243ff94afb1a29064fc050011c
+          python3 research/q3/discovery_policy/sgi_ownweight_prior_new12_postfirst_grade.py
+          sha256sum newprior_grade/POSTFIRST_NEW12_ORIGINAL_SGI_OWNWEIGHT_VS_CLASSICAL_GRADE.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: neumann-g0-SGI-ownweight-new12-FROZEN-FIRST-ungRADED
-          path: |
-            newprior_first/UNSEEN12_FIRST_PROGRAM_SELECTIONS_BEFORE_GOLD.json
-            newprior_first/*.stdout
-            newprior_first/*.stderr
+          name: neumann-g0-SGI-ownweight-AB-vs-MDL-C0-C1-ORIGINAL-GRADE
+          path: newprior_grade/POSTFIRST_NEW12_ORIGINAL_SGI_OWNWEIGHT_VS_CLASSICAL_GRADE.json
           if-no-files-found: warn
