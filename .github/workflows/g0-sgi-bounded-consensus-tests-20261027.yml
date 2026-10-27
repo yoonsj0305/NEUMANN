@@ -41,6 +41,7 @@ jobs:
           set -euo pipefail
           test -s docs/research/G0_OFFICIAL_SYGUS_TWO_HOLD_MODERN_CVC5_142_POSTFIRST_PREREG_20261027.md
           python3 -m py_compile research/q3/discovery_policy/sygus_official_modern_cvc5_142_twohold_postfirst_20261027.py
+          grep -Fq 'startswith("cvc5 1.4.2 ")' research/q3/discovery_policy/sygus_official_modern_cvc5_142_twohold_postfirst_20261027.py
           sha256sum research/q3/discovery_policy/sygus_official_modern_cvc5_142_twohold_postfirst_20261027.py
       - uses: actions/download-artifact@v4
         with:
