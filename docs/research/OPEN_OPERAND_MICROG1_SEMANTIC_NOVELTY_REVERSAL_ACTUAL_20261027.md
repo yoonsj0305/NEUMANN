@@ -47,3 +47,8 @@ Do NOT rerun/optimize this 8-bit MLP to chase an apparent gain. Fix the benchmar
 ## 5. Reproduction and contents
 
 Local conversation artifact `NEUMANN1_OPEN_OPERAND_CAUSAL_20261027.zip` includes untouched original executable and FIRST proposal hashes, all actual PyTorch weights and training logs, postfirst cache grade, semantic algebra audit, full 136,448-enumeration membership/exclusion record and separate integrity manifest. No third-party copyrighted corpus embedded. Run engineering tests first. **Do not rerun training in-place over the frozen FIRST files**; copy into a fresh directory, compare behavioral predictions rather than wall times/SHA of timing-containing JSON.
+
+## Artifact verified after writing this report
+
+- [Local generated standalone package](sandbox:/mnt/data/NEUMANN1_OPEN_OPERAND_CAUSAL_20261027.zip) (conversation container attachment, not GitHub-hosted source code), SHA256 **`834739799e9d891582f9ed3cdc64477bda1c759d0e1ff0965f94dddd7dd4a886`**, **17 archived entries**, ZIP CRC PASS, SHA256 manifest **16/16** PASS. Original first files and models remain unchanged. Contains all four post-first evaluation/semantics scripts in addition to the pre-grade PyTorch script.
+- Separate explicit test for semantic candidate audit: **all 61/57/55 exact A1 proposals across three seeds** implement already-trained `RX`, verified identical to true `XR` on all 256 possible byte inputs; none uses syntactically heldout XR as top-1.
