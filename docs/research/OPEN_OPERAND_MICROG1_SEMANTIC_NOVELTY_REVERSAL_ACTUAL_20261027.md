@@ -52,3 +52,9 @@ Local conversation artifact `NEUMANN1_OPEN_OPERAND_CAUSAL_20261027.zip` includes
 
 - [Local generated standalone package](sandbox:/mnt/data/NEUMANN1_OPEN_OPERAND_CAUSAL_20261027.zip) (conversation container attachment, not GitHub-hosted source code), SHA256 **`834739799e9d891582f9ed3cdc64477bda1c759d0e1ff0965f94dddd7dd4a886`**, **17 archived entries**, ZIP CRC PASS, SHA256 manifest **16/16** PASS. Original first files and models remain unchanged. Contains all four post-first evaluation/semantics scripts in addition to the pre-grade PyTorch script.
 - Separate explicit test for semantic candidate audit: **all 61/57/55 exact A1 proposals across three seeds** implement already-trained `RX`, verified identical to true `XR` on all 256 possible byte inputs; none uses syntactically heldout XR as top-1.
+
+## Promoted as a reusable **research-only** semantic gate
+
+- [8-bit full-function equivalence engine](https://github.com/yoonsj0305/NEUMANN/blob/research/rc51-intelligence-spend-gate-20261026/research/q3/discovery_policy/semantic_equivalence_8bit.py), GitHub commit `7875c68b89c721827d9ee91097f39e0179923536`.
+- [Three fail-closed regression tests](https://github.com/yoonsj0305/NEUMANN/blob/research/rc51-intelligence-spend-gate-20261026/tests/test_q3_semantic_equivalence_8bit_20261027.py), commit `cc6c685530512de2b469c9f4bca4f64b8f6765a4`: local pytest **3/3 PASS**. Two-pair typed programs compare their complete 256-byte truth tables with exact Python byte keys rather than assuming any hash collision bound.
+- Narrow gate only: `NOT_IN_THIS_LIBRARY` means the enumerated finite library cannot express the candidate, **not** that strong classical algorithms outside that grammar fail, and **not** permission to promote Q gates. Full 136,448 original enumeration remains an independently preserved evidence script in the ZIP.
