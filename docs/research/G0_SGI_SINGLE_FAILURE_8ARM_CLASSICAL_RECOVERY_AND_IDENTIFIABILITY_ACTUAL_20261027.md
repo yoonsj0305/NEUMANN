@@ -37,3 +37,9 @@ The eight source-only classical processes consumed **2.567934 seconds sum of per
 The true bottleneck here is **underdetermination of function on the source examples**, not proof of an absent neural operator. To improve a *deployable* method, study source-only verifiable program diversity and/or a genuinely permitted extra labeled counterexample with all oracle and wall costs charged. A prospective new benchmark must freeze policy and models **before** source and gold; do NOT use `PRE_76_10` as new blind.
 
 Next gated experiment: a new independent multi-author exact executable task family, with strong native C first, source/heldout isolation, semantic equivalence quotient, and learned ownweight policy proposed before graded gold. Q1–Q7 unchanged. Research PR #616 remains DRAFT.
+
+## Portable evidence package verification
+
+- `NEUMANN1_SGI_CLASSICAL_RESIDUAL_IDENTIFIABILITY_20261027.zip`, SHA256 **`6cae2cfcc0e820298695dfd9db3bf4eb3e05949defbbefcf0bd03e4c66f9e021`**, 8 archive entries, ZIP CRC PASS, internal 7/7 SHA256 manifest PASS, assembled in this conversation's runtime and linked in user answer.
+- Includes original 12-task FIRST CVC5 stdout and independent Z3 original grade, ALL eight original ungraded post-first outputs, ALL eight Z3 results, explicit first CVC5-vs-original alternative function ambiguity replay Python, source-only and heldout reference values, and README. Does not redistribute third-party original benchmark files.
+- GitHub/Notion are documentary mirrors. The full raw eight-arm candidates and proof are in artifacts/ZIP; do not assert that all implementation dependencies or weights were committed to the repo. **No NEUMANN ownweight model was trained in this experiment.**
