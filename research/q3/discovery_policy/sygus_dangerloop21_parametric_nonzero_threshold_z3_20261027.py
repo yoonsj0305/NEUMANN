@@ -45,7 +45,7 @@ def main():
     R=PROGRAMS[1].replace(OLD_THRESHOLD,"N")
     assert R!=PROGRAMS[1] and "bvsub N x" in R
     model=PROGRAMS[0]+"\n"+R+"\n"+PROGRAMS[2]
-    header="\n".join(statements)+"\n(declare-const N (_ BitVec 32))\n"+model+"\n"
+    assert statements and get_cmd(statements[0])=="set-logic"\n    statements.insert(1,"(declare-const N (_ BitVec 32))")\n    header="\n".join(statements)+"\n"+model+"\n"
     DEST.mkdir(exist_ok=True)
     proofs=[]
     for i in range(5):
