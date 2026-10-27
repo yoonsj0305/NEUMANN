@@ -1,0 +1,55 @@
+name: NEUMANN G0 OpenSMT2 external independent Craig audit
+on:
+  push:
+    branches: [research/rc51-intelligence-spend-gate-20261026]
+    paths:
+      - .github/workflows/g0-opensmt2-external-craig-audit-20261027.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/g0-opensmt2-external-craig-audit-20261027.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independent-original-goal-judge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/rc51-intelligence-spend-gate-20261026
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-g0-opensmt2-cross-author-executor-repair
+          run-id: 40446877079
+          repository: yoonsj0305/NEUMANN
+          github-token: ${{ github.token }}
+          path: first_artifact
+      - name: Check frozen original interpreter source hash
+        run: |
+          set -euo pipefail
+          git init -q src
+          git -C src remote add origin https://github.com/aehyvari/OpenSMT2.git
+          git -C src fetch --depth 1 origin 76ee514d36e0a033a160da5e0a138f6fd83e1bcc
+          git -C src checkout -q --detach FETCH_HEAD
+          test "$(git -C src rev-parse HEAD)" = "76ee514d36e0a033a160da5e0a138f6fd83e1bcc"
+          ls -l first_artifact/originals
+      - name: Pin second checker implementation
+        run: |
+          python3 -m pip install --disable-pip-version-check 'z3-solver==4.13.3.0'
+          python3 -c 'import z3; assert z3.get_version_string() == "4.13.3"'
+      - name: Independently check original A/B and specialist-produced I
+        run: |
+          python3 research/q3/discovery_policy/opensmt2_external_craig_postfirst_audit.py
+          test -s receipt/POSTFIRST_INDEPENDENT_CRAIG.json
+          sha256sum receipt/POSTFIRST_INDEPENDENT_CRAIG.json
+      - name: Publish immutable post-first validator receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-g0-opensmt2-cross-author-independent-z3-postfirst
+          path: receipt/POSTFIRST_INDEPENDENT_CRAIG.json
+          if-no-files-found: warn
