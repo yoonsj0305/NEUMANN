@@ -28,45 +28,43 @@ jobs:
           python3 -m pip install -q pytest
           python3 -m pytest -q tests/test_q3_portfolio_consensus_evidence_gate_20261027.py tests/test_q3_source_input_identifiability_guard_20261027.py
 
-  official-sygus-strings-v1-v2-postfirst:
+  official-sygus-9-native-candidates-z3-proof:
     runs-on: ubuntu-latest
-    timeout-minutes: 9
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
         with:
           ref: research/rc51-intelligence-spend-gate-20261026
           persist-credentials: false
-      - name: Verify separate prereg and only four fixed failed task IDs
+      - name: Preregistered separate exact original semantics Z3 obligations
+        run: |
+          test -s docs/research/G0_OFFICIAL_SYGUS_C16_Z3_ORDINARY_CONSTRAINTS_POSTFIRST_PREREG_20261027.md
+          python3 -m py_compile research/q3/discovery_policy/sygus_official_independent_ordinary_z3_postfirst_20261027.py
+          sha256sum research/q3/discovery_policy/sygus_official_independent_ordinary_z3_postfirst_20261027.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-g0-official-SyGuS-four-families-C16-FIRST-source
+          run-id: 40490276713
+          repository: yoonsj0305/NEUMANN
+          github-token: ${{ github.token }}
+          path: official_original_first
+      - name: Restore pinned independent original and verify unmodified classical first
         run: |
           set -euo pipefail
-          test -s docs/research/G0_OFFICIAL_SYGUS_STRING_V1V2_POSTFIRST_PREREG_20261027.md
-          test -s docs/research/G0_OFFICIAL_SYGUS_C16_FIRST_ACTUAL_2TIMEOUT_4PARSER_FROZEN_20261027.md
-          python3 -m py_compile research/q3/discovery_policy/sygus_official_string_converter_postfirst_20261027.py
-          sha256sum research/q3/discovery_policy/sygus_official_string_converter_postfirst_20261027.py
-      - name: Pin official original external source and official converter version
-        run: |
-          set -euo pipefail
+          echo 'a648346b162b3c76d4c60283f339c1a3c54016ad374128c1b4135453c27a5ba5  official_original_first/OFFICIAL_C16_FIRST_UNGRADED_CLASSICAL_HEADROOM.json' | sha256sum -c
           git init -q official_repo
           git -C official_repo remote add origin https://github.com/SyGuS-Org/benchmarks.git
           git -C official_repo fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
           git -C official_repo checkout --detach -q FETCH_HEAD
-          git init -q official_tools
-          git -C official_tools remote add origin https://github.com/SyGuS-Org/tools.git
-          git -C official_tools fetch --depth 1 origin master
-          git -C official_tools checkout --detach -q FETCH_HEAD
-          git -C official_tools rev-parse HEAD
-          python3 -m pip install -q ply pyparsing
-          sudo apt-get update -qq
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -qq -y cvc5
-      - name: Process exactly four previous SYGUS2 parse errors after original first
+          python3 -m pip install -q 'z3-solver==4.13.3.0'
+      - name: Check native first candidate full original semantic obligations with Z3
         run: |
           set -euo pipefail
-          python3 research/q3/discovery_policy/sygus_official_string_converter_postfirst_20261027.py
-          test -s official_string_converter/OFFICIAL_PBE_SLIA_V1_TO_V2_POSTFIRST_NATIVE_C_GRADE.json
-          sha256sum official_string_converter/OFFICIAL_PBE_SLIA_V1_TO_V2_POSTFIRST_NATIVE_C_GRADE.json
+          python3 research/q3/discovery_policy/sygus_official_independent_ordinary_z3_postfirst_20261027.py
+          sha256sum official_z3_semantic_grade/OFFICIAL_9_CANDIDATES_ORDINARY_Z3_GRADE_POSTFIRST.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: neumann-g0-official-EUPHONY-v1-v2-converter-postfirst
-          path: official_string_converter
+          name: neumann-g0-official-C16-first-Z3-independent-ordinary-candidate-verdicts
+          path: official_z3_semantic_grade/OFFICIAL_9_CANDIDATES_ORDINARY_Z3_GRADE_POSTFIRST.json
           if-no-files-found: warn
