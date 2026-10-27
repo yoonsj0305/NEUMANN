@@ -101,7 +101,7 @@ jobs:
             tmp.write_text(adapted)
             def cpu_limit():
               resource.setrlimit(resource.RLIMIT_CPU,(4,5))
-            stdout,stderr=''
+            stdout,stderr='',''
             before=resource.getrusage(resource.RUSAGE_CHILDREN)
             start=time.monotonic()
             try:
@@ -153,13 +153,13 @@ jobs:
             else:
               x['status']='C2_CANDIDATE_OUTPUT_UNCHECKED'
             results.append(x)
-          out={'scope':'FIRST externally authored OpenSMT2 files, index snippets exposed; professional classical only, no NEUMANN ownweight',
+          out={'scope':'POSTFIRST EXECUTOR REPAIR after initial uninitialized stdout/stderr; original 12 unchanged; index snippets exposed; no NEUMANN ownweight',
                'upstream':repo,'upstream_commit':upstream,
                'prereg_commit':'8ae6dc5f9b7127b72bfb7d5875a7501f8f780981',
                'source_exposure':'INDEX_SNIPPET_EXPOSED',
-               'whole_goal_independent_validation':'NOT_RUN',
+               'whole_goal_independent_validation':'NOT_RUN', 'historical_first_failed_run_id':40446804675,
                'G1':'HOLD','global_Q1_Q7':'OPEN','results':results}
-          (receipt/'FIRST_CROSS_AUTHOR_C2_RAW.json').write_text(json.dumps(out,sort_keys=True,indent=2))
+          (receipt/'POSTFIRST_CROSS_AUTHOR_C2_RAW_EXECUTOR_REPAIR.json').write_text(json.dumps(out,sort_keys=True,indent=2))
           print('COUNTS',json.dumps({k:sum(r.get('status')==k for r in results) for k in set(r['status'] for r in results)},sort_keys=True))
           for r in results:
             print('ROW',r['index'],r['source_path'],r['status'],r.get('exit_code'),repr(r.get('output_after_unsat_excerpt')))
@@ -173,7 +173,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: neumann-g0-opensmt2-cross-author-first-frozen
+          name: neumann-g0-opensmt2-cross-author-executor-repair
           path: |
             receipt/FIRST_CROSS_AUTHOR_C2_RAW.json
             receipt/originals
