@@ -46,6 +46,10 @@ def get_inputs_and_source():
     PACK.write_text(json.dumps({"upstream":UPSTREAM,"sealed_first":FIRST_SHA,"rows":rows},indent=2))
     print("SOURCE_PACK",[(r["index"],len(r["source_input_only"])) for r in rows],flush=True)
 
+def parse_hex(s):
+    if not isinstance(s,str):raise ValueError("NOT_SMT_HEX")
+    return int(s[2:],16) if s.startswith("#x") else int(s,16)
+
 def greedy_bits(sources,t):
     unmatched=set(sources)
     selected=[]
@@ -124,22 +128,22 @@ def actual():
         firstprogram=proposal_function(a.decode(errors="replace"))
         record={"index":i,"name":r["name"],"source_sha256":r["source_sha256"],
                 "default_stdout_sha256":r["default_stdout_sha256"],"targets":[]}
-        source_inputs=[int(x,16) for x in r["source_input_only"]]
+        source_inputs=[parse_hex(x) for x in r["source_input_only"]]
         for key in ("probe_input","future_input"):
             t0=time.process_time()
             target=r[key]
             entry={"input_type":key,"target_input":target}
             try:
-                bits=greedy_bits(source_inputs,int(target,16))
-                assert all(mask_ref(bits,x,int(target,16))==0 for x in source_inputs)
-                assert mask_ref(bits,int(target,16),int(target,16))==1
-                guard=guard_expr(bits,int(target,16))
+                bits=greedy_bits(source_inputs,parse_hex(target))
+                assert all(mask_ref(bits,x,parse_hex(target))==0 for x in source_inputs)
+                assert mask_ref(bits,parse_hex(target),parse_hex(target))==1
+                guard=guard_expr(bits,parse_hex(target))
                 body=original_body(firstprogram)
                 # Every token, constant and helper is already in upstream author grammar.
                 newbody=f"(im {guard} (bvnot {body}) {body})"
                 rival=f"(define-fun f ((x (_ BitVec 64))) (_ BitVec 64) {newbody})"
                 zcheck=independent_z3_certificate(r["source_only_text"],firstprogram,
-                                rival,target,guard,bits,source_inputs,int(target,16))
+                                rival,target,guard,bits,source_inputs,parse_hex(target))
                 entry.update({"bit_positions":bits,"bit_count":len(bits),
                   "guard_chars":len(guard),"new_candidate_chars":len(rival),
                   "first_candidate_sha256":sha256(firstprogram.encode()),
