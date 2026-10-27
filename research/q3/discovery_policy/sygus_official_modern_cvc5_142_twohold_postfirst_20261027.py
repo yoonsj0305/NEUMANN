@@ -25,7 +25,7 @@ def main():
     assert sorted(r["path"] for r in old["results"] if r["status"]=="C_BUDGET_HOLD")==sorted(EXACT_PATHS)
     version=subprocess.check_output(["cvc5","--version"],text=True,stderr=subprocess.STDOUT).strip()
     print("MODERN_SOLVER_VERSION",version.splitlines()[0],flush=True)
-    assert "cvc5 version 1.4.2" in version, "WRONG_SOLVER_VERSION"
+    assert version.splitlines()[0].startswith("cvc5 1.4.2 "), "WRONG_SOLVER_VERSION"
     NEW.mkdir(exist_ok=True)
     rows=[]
     for rel in EXACT_PATHS:
