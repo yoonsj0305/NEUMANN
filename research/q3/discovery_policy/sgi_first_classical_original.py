@@ -12,7 +12,7 @@ import subprocess
 import time
 
 UPSTREAM_SHA = "e7ae840e5546e9243ff94afb1a29064fc050011c"
-PREREG_SHA = "4a5ae8b89e46b5b5a618043c9e2ea4f1de770788"
+PREREG_SHA = "a49478b83570447bdc186c0ec849d4253acec956"
 SELECTION_SEED = "neumann1-semantic-gap-v1/"
 OUT = pathlib.Path("first_receipts")
 SRC = pathlib.Path("upstream")
@@ -73,9 +73,10 @@ def choose_paths(root):
     for kind in ("easy","hard"):
         entries = sorted(root.glob(kind + "/*/*.sl"))
         choices = sorted(entries, key=lambda p:(sha256((SELECTION_SEED+p.relative_to(SRC).as_posix()).encode()),p.as_posix()))
-        if len(choices) < 6:
-            raise RuntimeError("not-six-"+kind+"-"+str(len(choices)))
-        groups[kind] = choices[:6]
+        requested = 3 if kind == "easy" else 9
+        if len(choices) < requested:
+            raise RuntimeError("not-enough-"+kind+"-"+str(len(choices))+"-need-"+str(requested))
+        groups[kind] = choices[:requested]
     return groups["easy"]+groups["hard"]
 
 def cpu_limit():
@@ -135,7 +136,7 @@ def main():
         row={
           "index":i,
           "path":rel,
-          "category":"easy" if i<6 else "hard",
+          "category":"easy" if i<3 else "hard",
           "source_blob_sha1":hashlib.sha1(b"blob "+str(len(raw)).encode()+bytes([0])+raw).hexdigest(),
           "source_original_sha256":sha256(raw),
           "source_bytes":len(raw),
