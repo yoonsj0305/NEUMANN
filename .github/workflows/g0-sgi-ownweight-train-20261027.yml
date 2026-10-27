@@ -1,7 +1,7 @@
 name: NEUMANN G0 ownweight prior TRAIN old originals only
 on:
   push:
-    branches: [research/rc51-intelligence-spend-gate-20261026]
+    branches: [research/ownweight-prior-g0-20261027]
     paths:
       - .github/workflows/g0-sgi-ownweight-train-20261027.yml
   workflow_dispatch:
@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: research/rc51-intelligence-spend-gate-20261026
+          ref: research/ownweight-prior-g0-20261027
           persist-credentials: false
       - name: Check prereg and freeze source before network input
         run: |
