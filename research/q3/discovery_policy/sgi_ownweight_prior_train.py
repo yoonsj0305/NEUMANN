@@ -26,6 +26,7 @@ def features(program,src_count,src_bytes,probe_pred,future_pred,arm):
         math.log1p(program.count("("))/8.,
         *(min(count(op),20.)/10. for op in OPS),
         min(program.count("#x"),40)/20.,
+        min(count("bvshl"),20.)/10.,
         min(len(re.findall(r"\bx\b",program)),30)/15.,
         math.log1p(src_count)/8.,
         math.log1p(src_bytes)/12.,
