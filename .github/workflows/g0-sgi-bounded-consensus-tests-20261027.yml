@@ -41,6 +41,7 @@ jobs:
         run: |
           test -s docs/research/G0_OWNWEIGHT_PROGRAM_PRIOR_NEW12_PREREG_20261027.md
           python3 -m py_compile research/q3/discovery_policy/sgi_ownweight_prior_train.py
+          ! grep -q 'import numpy' research/q3/discovery_policy/sgi_ownweight_prior_train.py
           sha256sum research/q3/discovery_policy/sgi_ownweight_prior_train.py
       - uses: actions/download-artifact@v4
         with:
