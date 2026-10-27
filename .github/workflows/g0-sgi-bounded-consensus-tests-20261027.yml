@@ -28,45 +28,21 @@ jobs:
           python3 -m pip install -q pytest
           python3 -m pytest -q tests/test_q3_portfolio_consensus_evidence_gate_20261027.py tests/test_q3_source_input_identifiability_guard_20261027.py
 
-  official-sygus-two-holds-modern-cvc5-142:
+  official-sygus-dangerloop21-exact-3function-z3:
     runs-on: ubuntu-latest
-    timeout-minutes: 9
+    timeout-minutes: 7
     steps:
       - uses: actions/checkout@v4
         with:
           ref: research/rc51-intelligence-spend-gate-20261026
           persist-credentials: false
-      - name: Check prereg and freeze exact newest binary/version and old first
+      - name: Assert postfirst analytic D/R/S prereg before automated exact original proof
         run: |
           set -euo pipefail
-          test -s docs/research/G0_OFFICIAL_SYGUS_TWO_HOLD_MODERN_CVC5_142_POSTFIRST_PREREG_20261027.md
-          python3 -m py_compile research/q3/discovery_policy/sygus_official_modern_cvc5_142_twohold_postfirst_20261027.py
-          grep -Fq 'startswith("cvc5 1.4.2 ")' research/q3/discovery_policy/sygus_official_modern_cvc5_142_twohold_postfirst_20261027.py
-          sha256sum research/q3/discovery_policy/sygus_official_modern_cvc5_142_twohold_postfirst_20261027.py
-      - uses: actions/download-artifact@v4
-        with:
-          name: neumann-g0-official-SyGuS-four-families-C16-FIRST-source
-          run-id: 40490276713
-          repository: yoonsj0305/NEUMANN
-          github-token: ${{ github.token }}
-          path: official_old_cvc5_first
-      - name: Verify latest official cvc5 1.4.2 release ZIP SHA and install only pinned binary
-        run: |
-          set -euo pipefail
-          echo 'a648346b162b3c76d4c60283f339c1a3c54016ad374128c1b4135453c27a5ba5  official_old_cvc5_first/OFFICIAL_C16_FIRST_UNGRADED_CLASSICAL_HEADROOM.json' | sha256sum --check
-          curl -fSL --retry 3 --max-time 180 \
-            'https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-libcxx-static.zip' \
-            -o official-cvc5-142.zip
-          echo '0af677313c8277dc558d3049b192389db4d975d31c968fbd6f31cf0849ee411d  official-cvc5-142.zip' | sha256sum --check
-          unzip -q official-cvc5-142.zip -d official-bin
-          f="$(find official-bin -type f -name cvc5 | head -n 1)"
-          test -n "$f"
-          chmod +x "$f"
-          mkdir -p native_solver_bin
-          cp "$f" native_solver_bin/cvc5
-          echo "$(pwd)/native_solver_bin" >> "$GITHUB_PATH"
-          native_solver_bin/cvc5 --version | head -n 3
-      - name: Same pinned original official full source, identical native budget
+          test -s docs/research/G0_OFFICIAL_DANGER_LOOP21_CONSTRUCTIVE_TRIPLE_PRE_EXACT_Z3_20261027.md
+          python3 -m py_compile research/q3/discovery_policy/sygus_dangerloop21_analytic_z3_exact_original_20261027.py
+          sha256sum research/q3/discovery_policy/sygus_dangerloop21_analytic_z3_exact_original_20261027.py
+      - name: Fetch pinned exact original third-party source with authoritative source SHA
         run: |
           set -euo pipefail
           git init -q official_repo
@@ -74,14 +50,19 @@ jobs:
           git -C official_repo fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
           git -C official_repo checkout --detach -q FETCH_HEAD
           test "$(git -C official_repo rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
-          python3 research/q3/discovery_policy/sygus_official_modern_cvc5_142_twohold_postfirst_20261027.py
-          sha256sum official_cvc5_142_retest/POSTFIRST_OFFICIAL_TWO_HOLDS_CVC5_142_MATCHED.json
+          echo '8b3fa6aa436f67ec10b1112c3f7e8ffb1eb0e920b0268bcae5d3adf8cced539c  official_repo/lib/General_Track/cegist-cav18/inv/danger-loop21.sl' | sha256sum --check
+          python3 -m pip install -q 'z3-solver==4.13.3.0'
+      - name: Derive all original formal SMT obligations and prove D R S candidate
+        run: |
+          set -euo pipefail
+          python3 research/q3/discovery_policy/sygus_dangerloop21_analytic_z3_exact_original_20261027.py
+          test -s official_danger21_z3_proof/DANGER_LOOP21_ORIGINAL_EXACT_Z3_3FUNCTION_FORMAL_PROOF.json
+          sha256sum official_danger21_z3_proof/DANGER_LOOP21_ORIGINAL_EXACT_Z3_3FUNCTION_FORMAL_PROOF.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: neumann-g0-official-two-1-4-2-version-fair-C-benchmark-postfirst
+          name: neumann-g0-official-dangerloop21-symbolic-exact-original-z3
           path: |
-            official_cvc5_142_retest/POSTFIRST_OFFICIAL_TWO_HOLDS_CVC5_142_MATCHED.json
-            official_cvc5_142_retest/*.stdout
-            official_cvc5_142_retest/*.stderr
+            official_danger21_z3_proof/*.json
+            official_danger21_z3_proof/*.smt2
           if-no-files-found: warn
