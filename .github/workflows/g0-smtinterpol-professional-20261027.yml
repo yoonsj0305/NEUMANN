@@ -75,7 +75,7 @@ jobs:
               d['status']='NOT_RUN_MISSING_SOURCE';results.append(d);continue
             b=path.read_bytes()
             d['sha256']=hashlib.sha256(b).hexdigest()
-            d['git_blob_sha1']=hashlib.sha1(b'blob '+str(len(b)).encode()+b'\\x00'+b).hexdigest()
+            d['git_blob_sha1']=hashlib.sha1(b'blob '+str(len(b)).encode()+bytes([0])+b).hexdigest()
             d['original_bytes']=len(b)
             def limits():
               resource.setrlimit(resource.RLIMIT_AS,(800*1024*1024,800*1024*1024))
