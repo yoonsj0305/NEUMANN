@@ -11,6 +11,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
 concurrency:
   group: neumann-g0-opensmt2-cross-author-frozen
   cancel-in-progress: false
@@ -19,6 +20,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/rc51-intelligence-spend-gate-20261026
+          persist-credentials: false
       - name: Pin upstream source author and original commit
         run: |
           set -euo pipefail
@@ -164,6 +169,21 @@ jobs:
           for r in results:
             print('ROW',r['index'],r['source_path'],r['status'],r.get('exit_code'),repr(r.get('output_after_unsat_excerpt')))
           PY
+      - name: Restore prior immutable raw C2 output (NOT current rerun)
+        uses: actions/download-artifact@v4
+        with:
+          name: neumann-g0-opensmt2-cross-author-executor-repair
+          run-id: 40446877079
+          repository: yoonsj0305/NEUMANN
+          github-token: ${{ github.token }}
+          path: first_artifact
+      - name: Run independent Z3 original Craig obligations on sealed prior specialist outputs
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check 'z3-solver==4.13.3.0'
+          python3 research/q3/discovery_policy/opensmt2_external_craig_postfirst_audit.py
+          test -s receipt/POSTFIRST_INDEPENDENT_CRAIG.json
+          sha256sum receipt/POSTFIRST_INDEPENDENT_CRAIG.json
       - name: Store first immutable output receipt
         if: always()
         run: |
@@ -179,5 +199,6 @@ jobs:
             receipt/originals
             receipt/java.txt
             receipt/upstream_git_identity.txt
+            receipt/POSTFIRST_INDEPENDENT_CRAIG.json
             receipt/sha256-manifest.txt
           if-no-files-found: error
