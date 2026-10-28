@@ -26,7 +26,7 @@ jobs:
       - name: focused six tests on real first-benchmark false-consensus diagnosis
         run: |
           python3 -m pip install -q pytest
-          python3 -m pytest -q tests/test_q3_portfolio_consensus_evidence_gate_20261027.py tests/test_q3_source_input_identifiability_guard_20261027.py tests/test_ownweight_direct_program_evidence_gate_20261028.py tests/test_typed_ast_semantics_guard_v2_20261028.py tests/test_source_feedback_contract_v1_20261028.py tests/test_original_source_information_rights_gate_20261028.py
+          python3 -m pytest -q tests/test_q3_portfolio_consensus_evidence_gate_20261027.py tests/test_q3_source_input_identifiability_guard_20261027.py tests/test_ownweight_direct_program_evidence_gate_20261028.py tests/test_typed_ast_semantics_guard_v2_20261028.py tests/test_source_feedback_contract_v1_20261028.py tests/test_original_source_information_rights_gate_20261028.py tests/test_native_original_solver_outcome_taxonomy_20261028.py
 
 
       - name: Independent standard-library original 8-bit finite semantic optimality certificate
@@ -63,45 +63,3 @@ jobs:
           PY
 
 
-  lastname-comma-specialist-two-independent-SMT-proofs-postfirst:
-    runs-on: ubuntu-latest
-    timeout-minutes: 6
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: research/rc51-intelligence-spend-gate-20261026
-          persist-credentials: false
-      - name: Preregister specialist original typed grammar and original constraints
-        run: |
-          set -euo pipefail
-          test -s docs/research/G1_EXTERNAL_STRING_LASTNAME_POSTFIRST_CLASSICAL_TWO_PROVER_PREREG_20261028.md
-          python3 -m py_compile research/q3/discovery_policy/sygus_external_lastname_classic_original_grammar_two_provers_20261028.py
-      - name: Fetch actual external original published source, pin source tree
-        run: |
-          set -euo pipefail
-          git init -q official_repo
-          git -C official_repo remote add origin https://github.com/SyGuS-Org/benchmarks.git
-          git -C official_repo fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
-          git -C official_repo checkout -q --detach FETCH_HEAD
-          python3 -m pip -q install 'z3-solver==4.13.3.0'
-      - name: Independently install official published CVC5 1.4.2 exact binary
-        run: |
-          set -euo pipefail
-          curl -fSL --retry 3 --max-time 150 \
-            'https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-libcxx-static.zip' -o official-cvc5-142.zip
-          echo '0af677313c8277dc558d3049b192389db4d975d31c968fbd6f31cf0849ee411d  official-cvc5-142.zip' | sha256sum -c
-          unzip -q official-cvc5-142.zip -d official-bin
-          f="$(find official-bin -type f -name cvc5 | head -1)"
-          mkdir -p native_solver_bin
-          cp "$f" native_solver_bin/cvc5
-          chmod +x native_solver_bin/cvc5
-          export PATH="$(pwd)/native_solver_bin:$PATH"
-          native_solver_bin/cvc5 --version | head -1
-          python3 research/q3/discovery_policy/sygus_external_lastname_classic_original_grammar_two_provers_20261028.py
-          sha256sum postfirst_lastname_classical_smt/LASTNAME_CLASSICAL_EXACT_GRAMMAR_TWO_INDEPENDENT_SMT_PROOFS.json
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: neumann-G1-postfirst-original-lastname-classical-grammar-Z3-CVC5-2prover
-          path: postfirst_lastname_classical_smt/
-          if-no-files-found: warn
