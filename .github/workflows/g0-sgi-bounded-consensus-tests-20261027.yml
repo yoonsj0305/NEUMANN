@@ -110,3 +110,52 @@ jobs:
           name: neumann-g1-new-external-fourtrack16-native-original-cvc5-first
           path: external_4track16_FIRST/
           if-no-files-found: warn
+
+  external-original-string-example-identifiability-two-sat-programs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/rc51-intelligence-spend-gate-20261026
+          persist-credentials: false
+      - name: Explicit post-content two candidate source contract precedes SMT test
+        run: |
+          set -euo pipefail
+          test -s docs/research/G1_EXTERNAL_STRING_PBE_GROUND_EXAMPLES_NONIDENTIFIABILITY_TWO_PROGRAMS_POSTCONTENT_PREREG_20261028.md
+          python3 -m py_compile research/q3/discovery_policy/sygus_external_original_string_PBE_identifiability_two_programs_20261028.py
+          sha256sum research/q3/discovery_policy/sygus_external_original_string_PBE_identifiability_two_programs_20261028.py
+      - name: Two independent published SMT engines, pinned cvc5 1.4.2 ZIP
+        run: |
+          set -euo pipefail
+          curl -fSL --retry 3 --max-time 150 \
+            'https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-libcxx-static.zip' \
+            -o official-cvc5-142.zip
+          echo '0af677313c8277dc558d3049b192389db4d975d31c968fbd6f31cf0849ee411d  official-cvc5-142.zip' | sha256sum -c
+          unzip -q official-cvc5-142.zip -d official-bin
+          f="$(find official-bin -type f -name cvc5 | head -n 1)"
+          test -n "$f"
+          mkdir -p native_solver_bin
+          cp "$f" native_solver_bin/cvc5
+          chmod +x native_solver_bin/cvc5
+          echo "$(pwd)/native_solver_bin" >> "$GITHUB_PATH"
+          python3 -m pip -q install 'z3-solver==4.13.3.0'
+      - name: Fetch original third-party source at frozen upstream commit
+        run: |
+          set -euo pipefail
+          git init -q official_repo
+          git -C official_repo remote add origin https://github.com/SyGuS-Org/benchmarks.git
+          git -C official_repo fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
+          git -C official_repo checkout -q --detach FETCH_HEAD
+          test "$(git -C official_repo rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+      - name: Reprove all original 3 examples for both programs, plus unseen divergence, by Z3 AND CVC5
+        run: |
+          set -euo pipefail
+          python3 research/q3/discovery_policy/sygus_external_original_string_PBE_identifiability_two_programs_20261028.py
+          sha256sum original_external_pbe_underidentification/*.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-g1-original-source-string-PBE-two-legal-different-programs
+          path: original_external_pbe_underidentification/
+          if-no-files-found: warn
