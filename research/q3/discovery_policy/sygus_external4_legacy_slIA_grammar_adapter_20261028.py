@@ -43,7 +43,7 @@ def normalize(original):
         names.add(name)
         headers.append("("+name+" "+sort+")")
     assert headers[0].startswith("(Start ")
-    newgrammar="(\n  ("+" ".join(headers)+")\n  "+oldgrammar+"\n)"
+    newgrammar="\n  ("+" ".join(headers)+")\n  "+oldgrammar+"\n"
     # Replace ONLY the final source grammar group text, never substitutions
     # inside original constraints or productions.
     oldstart=first[0]+1+children[-1][0]
@@ -57,11 +57,9 @@ def normalize(original):
     norm_synth=[f for f in new_forms if get_cmd(f[2])=="synth-fun"]
     assert len(norm_synth)==1
     nc=top_level_forms(norm_synth[0][2][1:-1])
-    assert len(nc)==2
-    split=top_level_forms(nc[-1][2][1:-1])
-    assert len(split)==2
-    newheaders=[f[2] for f in top_level_forms(split[0][2][1:-1])]
-    newrules=[f[2] for f in top_level_forms(split[1][2][1:-1])]
+    assert len(nc)==3 # binders, grammar header, grammar rules are ADJACENT
+    newheaders=[f[2] for f in top_level_forms(nc[1][2][1:-1])]
+    newrules=[f[2] for f in top_level_forms(nc[2][2][1:-1])]
     assert newheaders==headers
     assert newrules==original_rules
     return changed,{
