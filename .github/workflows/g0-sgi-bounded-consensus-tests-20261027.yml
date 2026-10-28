@@ -28,3 +28,54 @@ jobs:
           python3 -m pip install -q pytest
           python3 -m pytest -q tests/test_q3_portfolio_consensus_evidence_gate_20261027.py tests/test_q3_source_input_identifiability_guard_20261027.py
 
+  new-official-four-family-12-modern-cvc5-headroom-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/rc51-intelligence-spend-gate-20261026
+          persist-credentials: false
+      - name: Assert benchmark filenames chosen before original task bodies opened
+        run: |
+          set -euo pipefail
+          test -s docs/research/G1_FOUR_FAMILY_OFFICIAL_STRONG_C_HEADROOM_12_PREREG_20261028.md
+          python3 -m py_compile research/q3/discovery_policy/sygus_official_diverse_new12_strong_c_first_20261028.py
+          sha256sum research/q3/discovery_policy/sygus_official_diverse_new12_strong_c_first_20261028.py
+      - name: Verify official professional native CVC5 1.4.2 ZIP SHA
+        run: |
+          set -euo pipefail
+          curl -fSL --retry 3 --max-time 150 \
+            'https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-libcxx-static.zip' \
+            -o official-cvc5-142.zip
+          echo '0af677313c8277dc558d3049b192389db4d975d31c968fbd6f31cf0849ee411d  official-cvc5-142.zip' | sha256sum --check
+          unzip -q official-cvc5-142.zip -d official-bin
+          f="$(find official-bin -type f -name cvc5 | head -n 1)"
+          test -n "$f"
+          mkdir -p native_solver_bin
+          cp "$f" native_solver_bin/cvc5
+          chmod +x native_solver_bin/cvc5
+          echo "$(pwd)/native_solver_bin" >> "$GITHUB_PATH"
+          native_solver_bin/cvc5 --version | head -n 1
+      - name: Fetch pinned original public benchmark data, untouched complete constraints
+        run: |
+          set -euo pipefail
+          git init -q official_repo
+          git -C official_repo remote add origin https://github.com/SyGuS-Org/benchmarks.git
+          git -C official_repo fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
+          git -C official_repo checkout --detach -q FETCH_HEAD
+          test "$(git -C official_repo rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+      - name: Run exactly all twelve precommitted originals, no neural or source changes
+        run: |
+          set -euo pipefail
+          python3 research/q3/discovery_policy/sygus_official_diverse_new12_strong_c_first_20261028.py
+          sha256sum official_four_family_new12_first/FOUR_FAMILY_NEW12_OFFICIAL_CVC5_142_FIRST.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-g1-readiness-official-diverse-four-family-12-native-cvc5-FIRST
+          path: |
+            official_four_family_new12_first/*.json
+            official_four_family_new12_first/*.stdout
+            official_four_family_new12_first/*.stderr
+          if-no-files-found: warn
