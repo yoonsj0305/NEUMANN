@@ -63,7 +63,7 @@ jobs:
           PY
 
 
-  new16-original-native-z3-proof-and-pbe-oracle-rights:
+  four-original-SLIA-modern-operator-compatibility-after-frozen-original-first:
     runs-on: ubuntu-latest
     timeout-minutes: 9
     steps:
@@ -71,20 +71,20 @@ jobs:
         with:
           ref: research/rc51-intelligence-spend-gate-20261026
           persist-credentials: false
-      - name: Freeze first before original proof grade; post-content PBE prereg
+      - name: Prereg source-constraint-preserving modern SyGuS string-name translation
         run: |
           set -euo pipefail
-          test -s docs/research/G1_EXTERNAL_NEW16_FIRST_SEALED_PRE_INDEPENDENT_GRADE_20261028.md
-          test -s docs/research/G1_EXTERNAL_STRING_PBE_GROUND_EXAMPLES_NONIDENTIFIABILITY_TWO_PROGRAMS_POSTCONTENT_PREREG_20261028.md
-          python3 -m py_compile research/q3/discovery_policy/sygus_external_new16_native_original_z3_postfirst_20261028.py research/q3/discovery_policy/sygus_external_string_pbe_nonidentifiability_z3_20261028.py
+          test -s docs/research/G1_EXTERNAL4_SLIA2_TWO_LEGACY_STRING_OPS_NORM_PREREG_20261028.md
+          python3 -m py_compile research/q3/discovery_policy/sygus_external_slIA4_modern_operators_v2_postfirst_20261028.py
+          sha256sum research/q3/discovery_policy/sygus_external_slIA4_modern_operators_v2_postfirst_20261028.py
       - uses: actions/download-artifact@v4
         with:
           name: neumann-g1-new-external-fourtrack16-native-original-cvc5-first
-          run-id: 40643083431
+          run-id: 40664922994
           repository: yoonsj0305/NEUMANN
           github-token: ${{ github.token }}
           path: external_new16_frozen_FIRST
-      - name: Pin original first and source; install independent proof backend
+      - name: Verify original first before any postfirst solver experiment
         run: |
           set -euo pipefail
           echo '7acee7938ea2b8d18db2dd38058de36f7abdcf5116fbd703f6fce048b3a4418c  external_new16_frozen_FIRST/NEUMANN_G1_EXTERNAL_NEW16_FOUR_TRACKS_CVC5_FIRST.json' | sha256sum -c
@@ -93,204 +93,24 @@ jobs:
           git -C official_repo fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
           git -C official_repo checkout -q --detach FETCH_HEAD
           python3 -m pip -q install 'z3-solver==4.13.3.0'
-      - name: Independent Z3 prove all native 10, retain original all16 denominator
+      - name: Verify official solver binary and run only four original grammar-only translated task files
         run: |
           set -euo pipefail
-          python3 research/q3/discovery_policy/sygus_external_new16_native_original_z3_postfirst_20261028.py
-          sha256sum external_new16_z3_postfirst/*.json
-      - name: Prove original SLIA finite source example underdetermination with two distinct executable programs
-        run: |
-          set -euo pipefail
-          python3 research/q3/discovery_policy/sygus_external_string_pbe_nonidentifiability_z3_20261028.py
-          sha256sum external_pbe_source_nonidentifiability/*.json
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: neumann-g1-new16-native-full-original-z3-and-string-multiple-solutions
-          path: |
-            external_new16_z3_postfirst/*.json
-            external_pbe_source_nonidentifiability/*.json
-            external_pbe_source_nonidentifiability/*.smt2
-          if-no-files-found: warn
-
-
-  three-external-native-invariants-nine-full-original-vcs-two-provers:
-    runs-on: ubuntu-latest
-    timeout-minutes: 9
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: research/rc51-intelligence-spend-gate-20261026
-          persist-credentials: false
-      - name: Original source and candidate prereg integrity
-        run: |
-          set -euo pipefail
-          test -s docs/research/G1_EXTERNAL16_THREE_INVARIANTS_NINE_FULL_ORIGINAL_VCS_TWO_BACKENDS_PREREG_20261028.md
-          python3 -m py_compile research/q3/discovery_policy/sygus_external_3invariants_nine_vcs_two_engines_20261028.py
-          sha256sum research/q3/discovery_policy/sygus_external_3invariants_nine_vcs_two_engines_20261028.py
-      - uses: actions/download-artifact@v4
-        with:
-          name: neumann-g1-new-external-fourtrack16-native-original-cvc5-first
-          run-id: 40643083431
-          repository: yoonsj0305/NEUMANN
-          github-token: ${{ github.token }}
-          path: external_new16_frozen_FIRST
-      - name: Source first immutable SHA and independent published solver
-        run: |
-          set -euo pipefail
-          echo '7acee7938ea2b8d18db2dd38058de36f7abdcf5116fbd703f6fce048b3a4418c  external_new16_frozen_FIRST/NEUMANN_G1_EXTERNAL_NEW16_FOUR_TRACKS_CVC5_FIRST.json' | sha256sum -c
-          git init -q official_repo
-          git -C official_repo remote add origin https://github.com/SyGuS-Org/benchmarks.git
-          git -C official_repo fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
-          git -C official_repo checkout -q --detach FETCH_HEAD
-          python3 -m pip -q install 'z3-solver==4.13.3.0'
           curl -fSL --retry 3 --max-time 150 \
-            'https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-libcxx-static.zip' \
-            -o official-cvc5-142.zip
+            'https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-libcxx-static.zip' -o official-cvc5-142.zip
           echo '0af677313c8277dc558d3049b192389db4d975d31c968fbd6f31cf0849ee411d  official-cvc5-142.zip' | sha256sum -c
           unzip -q official-cvc5-142.zip -d official-bin
           f="$(find official-bin -type f -name cvc5 | head -1)"
-          test -n "$f"
           mkdir -p native_solver_bin
           cp "$f" native_solver_bin/cvc5
           chmod +x native_solver_bin/cvc5
           echo "$(pwd)/native_solver_bin" >> "$GITHUB_PATH"
-      - name: Actually create 9 full original SMT VCs and prove by independent Z3 and CVC5
-        run: |
-          set -euo pipefail
-          python3 research/q3/discovery_policy/sygus_external_3invariants_nine_vcs_two_engines_20261028.py
-          sha256sum external_invariant3_two_provers/*.json
+          native_solver_bin/cvc5 --version | head -1
+          python3 research/q3/discovery_policy/sygus_external_slIA4_modern_operators_v2_postfirst_20261028.py
+          sha256sum external_slIA4_semantics_preserving_v2/EXTERNAL4_SLIA_MODERN_OPERATOR_ONLY_COMPATIBILITY_POSTFIRST.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: neumann-g1-external3-original-invariants-nine-vcs-cvc5-z3
-          path: |
-            external_invariant3_two_provers/*.json
-            external_invariant3_two_provers/*.smt2
-          if-no-files-found: warn
-
-  external-original-106-one-step-infeasible-and-four-SLIA-diagnostic:
-    runs-on: ubuntu-latest
-    timeout-minutes: 7
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: research/rc51-intelligence-spend-gate-20261026
-          persist-credentials: false
-      - name: Certify post-first original 106 safety counterexample prereg before actual Z3 and CVC5
-        run: |
-          set -euo pipefail
-          test -s docs/research/G1_ORIGINAL_106_INFEASIBLE_ONE_STEP_REACHABILITY_FORMAL_PREREG_20261028.md
-          python3 -m py_compile research/q3/discovery_policy/sygus_external106_one_reachable_unsafe_invariant_unsat_20261028.py
-          python3 -m py_compile research/q3/discovery_policy/sygus_external16_slIA_native_error_audit_20261028.py
-      - uses: actions/download-artifact@v4
-        with:
-          name: neumann-g1-new-external-fourtrack16-native-original-cvc5-first
-          run-id: 40643083431
-          repository: yoonsj0305/NEUMANN
-          github-token: ${{ github.token }}
-          path: external_new16_frozen_FIRST
-      - name: Original immutable first + external Git original + published CVC5 binary
-        run: |
-          set -euo pipefail
-          echo '7acee7938ea2b8d18db2dd38058de36f7abdcf5116fbd703f6fce048b3a4418c  external_new16_frozen_FIRST/NEUMANN_G1_EXTERNAL_NEW16_FOUR_TRACKS_CVC5_FIRST.json' | sha256sum -c
-          git init -q official_repo
-          git -C official_repo remote add origin https://github.com/SyGuS-Org/benchmarks.git
-          git -C official_repo fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
-          git -C official_repo checkout -q --detach FETCH_HEAD
-          python3 -m pip -q install 'z3-solver==4.13.3.0'
-          curl -fSL --retry 3 --max-time 150 \
-            'https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-libcxx-static.zip' \
-            -o official-cvc5-142.zip
-          echo '0af677313c8277dc558d3049b192389db4d975d31c968fbd6f31cf0849ee411d  official-cvc5-142.zip' | sha256sum -c
-          unzip -q official-cvc5-142.zip -d official-bin
-          f="$(find official-bin -type f -name cvc5 | head -1)"
-          test -n "$f"
-          mkdir -p native_solver_bin
-          cp "$f" native_solver_bin/cvc5
-          chmod +x native_solver_bin/cvc5
-          echo "$(pwd)/native_solver_bin" >> "$GITHUB_PATH"
-      - name: Actually prove source original 106 has reachable bad state with two independent solvers
-        run: |
-          set -euo pipefail
-          python3 research/q3/discovery_policy/sygus_external106_one_reachable_unsafe_invariant_unsat_20261028.py
-          sha256sum external_106_unrealizability_proof/*.json
-      - name: Four original xujie invariant one-step unsafe prepass, two real independent solver results
-        run: |
-          set -euo pipefail
-          test -s docs/research/G1_EXTERNAL4_INVARIANTS_ONE_STEP_SOUND_TRIAGE_PREREG_20261028.md
-          python3 research/q3/discovery_policy/sygus_external4_invariant_onesafe_triage_two_solvers_20261028.py
-          sha256sum external_4invariants_one_step_triage/*.json
-      - name: Read-only diagnose FOUR original SLIA native holds
-        run: |
-          set -euo pipefail
-          python3 research/q3/discovery_policy/sygus_external16_slIA_native_error_audit_20261028.py
-          sha256sum external_slIA_original_error_diagnosis/*.json
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: neumann-g1-external106-reachable-unsafe-proof-and-SLIA4-error-audit
-          path: |
-            external_106_unrealizability_proof/*.json
-            external_106_unrealizability_proof/*.smt2
-            external_slIA_original_error_diagnosis/*.json
-            external_4invariants_one_step_triage/*.json
-            external_4invariants_one_step_triage/*.smt2
-          if-no-files-found: warn
-
-  external-four-SLIA-legacy-grammar-only-repair-postfirst:
-    runs-on: ubuntu-latest
-    timeout-minutes: 9
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: research/rc51-intelligence-spend-gate-20261026
-          persist-credentials: false
-      - name: Check post-FIRST four original parser errors and syntax-only adapter freeze
-        run: |
-          set -euo pipefail
-          test -s docs/research/G1_EXTERNAL_SLIA4_LEGACY_SYGUS_GRAMMAR_WRAPPER_ADAPTER_PREREG_20261028.md
-          python3 -m py_compile research/q3/discovery_policy/sygus_external4_legacy_slIA_grammar_adapter_20261028.py
-          sha256sum research/q3/discovery_policy/sygus_external4_legacy_slIA_grammar_adapter_20261028.py
-      - uses: actions/download-artifact@v4
-        with:
-          name: neumann-g1-new-external-fourtrack16-native-original-cvc5-first
-          run-id: 40643083431
-          repository: yoonsj0305/NEUMANN
-          github-token: ${{ github.token }}
-          path: external_new16_frozen_FIRST
-      - name: Original immutable first and exact pinned third-party source
-        run: |
-          set -euo pipefail
-          echo '7acee7938ea2b8d18db2dd38058de36f7abdcf5116fbd703f6fce048b3a4418c  external_new16_frozen_FIRST/NEUMANN_G1_EXTERNAL_NEW16_FOUR_TRACKS_CVC5_FIRST.json' | sha256sum -c
-          git init -q official_repo
-          git -C official_repo remote add origin https://github.com/SyGuS-Org/benchmarks.git
-          git -C official_repo fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
-          git -C official_repo checkout -q --detach FETCH_HEAD
-          python3 -m pip -q install 'z3-solver==4.13.3.0'
-          curl -fSL --retry 3 --max-time 150 \
-            'https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-libcxx-static.zip' \
-            -o official-cvc5-142.zip
-          echo '0af677313c8277dc558d3049b192389db4d975d31c968fbd6f31cf0849ee411d  official-cvc5-142.zip' | sha256sum -c
-          unzip -q official-cvc5-142.zip -d official-bin
-          f="$(find official-bin -type f -name cvc5 | head -1)"
-          test -n "$f"
-          mkdir -p native_solver_bin
-          cp "$f" native_solver_bin/cvc5
-          chmod +x native_solver_bin/cvc5
-          echo "$(pwd)/native_solver_bin" >> "$GITHUB_PATH"
-      - name: Actually translate ONLY original SyGuS grammar wrappers of four SLIA sources then independently grade native outputs
-        run: |
-          set -euo pipefail
-          python3 research/q3/discovery_policy/sygus_external4_legacy_slIA_grammar_adapter_20261028.py
-          sha256sum external_slIA4_syntax_normalized/EXTERNAL4_SLIA_LEGACY_GRAMMAR_ONLY_POSTFIRST_RESULTS.json
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: neumann-g1-SLIA4-original-legacy-syntax-only-postfirst-adapter
-          path: |
-            external_slIA4_syntax_normalized/*.json
-            external_slIA4_syntax_normalized/*.sl
-            external_slIA4_syntax_normalized/*.stdout
-            external_slIA4_syntax_normalized/*.stderr
+          name: neumann-external-four-SLIA-source-preserving-modern-operator-postfirst-v2
+          path: external_slIA4_semantics_preserving_v2/
           if-no-files-found: warn
