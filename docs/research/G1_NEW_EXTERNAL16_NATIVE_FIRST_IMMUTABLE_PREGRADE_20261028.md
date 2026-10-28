@@ -1,0 +1,13 @@
+# NEUMANN 1 | external four new track 16 ORIGINAL strong C first sealed BEFORE semantic grading (2026-10-28)
+
+Source/selection prereg committed **before contents**: `G1_FOUR_NEW_EXTERNAL_TRACKS16_ORIGINAL_RIGHTS_CLASSICAL_PREREG_20261028.md`, repo `SyGuS-Org/benchmarks`, Git pin `13c8deb68a873635879c9a69bc78caebd340f646`, four tracks CLIA, xujie_code2inv invariants, BV-PBE and SLIA-PBE, 4 per group selected by deterministic filename SHA256. Entire 16 exact source filenames and selection SHA256 `a24acb1fed0d195b48e08bcffbc27f5af2d06eefcd98937f326236798f4b1295` pinned.
+
+Original FIRST completed **GitHub Actions #40643083431**, official SHA-verified published CVC5 **1.4.2** release ZIP sha256 `0af677313c8277dc558d3049b192389db4d975d31c968fbd6f31cf0849ee411d`. Each ORIGINAL complete source one run CPU hard12s/wall15s/800MiB RSS sampled. Native 16 tasks results **10 CVC5 candidate programs returned UNVERIFIED** (CLIA4, invariants3, BV-PBE3), **1 C budget TIMEOUT** (`PRE_27_1000.sl`), **1 returned 'infeasible' UNPROVED** (`106.c.sl`), **4 SLIA native exception or unsupported**. No independent model trained, no adapted hindsight filter, no native graded candidate credited as solved.
+
+**Immutable FIRST result JSON sha256 `7acee7938ea2b8d18db2dd38058de36f7abdcf5116fbd703f6fce048b3a4418c`**, artifact raw **[12796670775](https://github.com/yoonsj0305/NEUMANN/actions/runs/40643083431/artifacts/12796670775)**, artifact zip SHA256 `31330cf1638ea934a9f213121d7ee791f28085abd6abafc9b9f3a50983ae3d4d`. Original raw per-task stdout/stderr source SHA/cost retained 33 files. Native child CPU sum **16.890389s** (no env/download/cloud/human/Z3), not candidate validation cost.
+
+**After this seal:** independent checker must download ORIGINAL first artifact, verify FIRST JSON SHA and all original source bytes/outputs; on 10 native programs prove *full source universal constraints* via independent Z3 4.13.3, including three full init/transition/post VCs for genuine invariants. Any parser/problem unsupported is HOLD. Do not silently infer 4 SLIA errors imply solver unable to solve their true synthesis; return code/flags/errors need separate diagnosis. Don't call claimed 'infeasible' a mathematical certificate.
+
+**Interface rights:** original CLIA/invariant sources specify full semantic requirements, not arbitrary ideal target-output oracle. Original BV-PBE/SLIA-PBE provide only FINITE listed examples, so source constraints checked vs those examples do NOT show hidden intended real-world function generalization. Source original rights audit cannot add arbitrary unlabeled input→ground truth oracle to this test.
+
+**Global Q1–Q7 OPEN, G1 HOLD, G2 NOT RUN, draft PR #616 unmerged.**
