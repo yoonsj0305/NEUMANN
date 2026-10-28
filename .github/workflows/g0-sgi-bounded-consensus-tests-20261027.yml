@@ -105,6 +105,7 @@ jobs:
           cp "$f" native_solver_bin/cvc5
           chmod +x native_solver_bin/cvc5
           echo "$(pwd)/native_solver_bin" >> "$GITHUB_PATH"
+          export PATH="$(pwd)/native_solver_bin:$PATH"
           native_solver_bin/cvc5 --version | head -1
           python3 research/q3/discovery_policy/sygus_external_slIA4_modern_operators_v2_postfirst_20261028.py
           sha256sum external_slIA4_semantics_preserving_v2/EXTERNAL4_SLIA_MODERN_OPERATOR_ONLY_COMPATIBILITY_POSTFIRST.json
