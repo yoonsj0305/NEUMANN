@@ -28,3 +28,19 @@ jobs:
           python3 -m pip install -q pytest
           python3 -m pytest -q tests/test_q3_portfolio_consensus_evidence_gate_20261027.py tests/test_q3_source_input_identifiability_guard_20261027.py tests/test_ownweight_direct_program_evidence_gate_20261028.py tests/test_typed_ast_semantics_guard_v2_20261028.py
 
+
+      - name: Independent standard-library original 8-bit finite semantic optimality certificate
+        run: |
+          set -euo pipefail
+          python3 research/q3/discovery_policy/finite_semantic_query_certificate_20261028.py
+          python3 - <<'PY'
+          import json
+          x=json.load(open("FINITE_8BIT_QUERY_OPTIMALITY_CERTIFICATE.json"))
+          assert x["original_full_semantic_functions"] == 3639
+          assert x["original_unidentifiable_without_more_observations"] == 257
+          assert x["DP_minimum_total_extra_queries_uniform_semantics"] == 333
+          assert x["greedy_total_extra_queries_uniform_semantics"] == 333
+          assert x["G1"] == "HOLD"
+          print("FINITESPACE_SOURCE_QUERY_THEOREM_REPLAY_PASS")
+          PY
+          sha256sum FINITE_8BIT_QUERY_OPTIMALITY_CERTIFICATE.json
