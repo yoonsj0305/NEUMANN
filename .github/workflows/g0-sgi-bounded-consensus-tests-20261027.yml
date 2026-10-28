@@ -28,40 +28,40 @@ jobs:
           python3 -m pip install -q pytest
           python3 -m pytest -q tests/test_q3_portfolio_consensus_evidence_gate_20261027.py tests/test_q3_source_input_identifiability_guard_20261027.py
 
-  official-sorting-naive-SymPy-true-grammar-CFG-Z3:
+  official-firefly-five-preregistered-classical-invariant-VCS:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
         with:
           ref: research/rc51-intelligence-spend-gate-20261026
           persist-credentials: false
-      - name: Pre-frozen post-FIRST grammar-aware classical compression contract
+      - name: Assert exact five precommitted original FIREFLY hypotheses
         run: |
           set -euo pipefail
-          test -s docs/research/G1_SORTING_NAIVE_POSTFIRST_SYMPY_GRAMMAR_SPECIALIST_PREREG_20261028.md
-          python3 -m py_compile research/q3/discovery_policy/sygus_sortingnaive_boolean_cnf_cfg_z3_postfirst_20261028.py
-          sha256sum research/q3/discovery_policy/sygus_sortingnaive_boolean_cnf_cfg_z3_postfirst_20261028.py
-      - name: Official externally authored exact pinned original Boolean circuit and two independent checker libraries
+          test -s docs/research/G1_FIREFLY_POSTFIRST_FIVE_FIXED_CLASSICAL_INVARIANT_VC_PREREG_20261028.md
+          python3 -m py_compile research/q3/discovery_policy/sygus_firefly_five_classic_invariants_postfirst_20261028.py
+          sha256sum research/q3/discovery_policy/sygus_firefly_five_classic_invariants_postfirst_20261028.py
+      - name: Fetch exact 3rd party FIREFLY original source
         run: |
           set -euo pipefail
           git init -q official_repo
           git -C official_repo remote add origin https://github.com/SyGuS-Org/benchmarks.git
           git -C official_repo fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
           git -C official_repo checkout --detach -q FETCH_HEAD
-          echo '07ec6bd54cdf81008dcb273cb7528c3c5ad30843b0642262ef8b8731cb5137e6  official_repo/lib/General_Track/woosuk/sorting_naive.eqn_sygus_iter_256_0.sl' | sha256sum -c
-          python3 -m pip -q install 'z3-solver==4.13.3.0' 'sympy==1.14.0'
-      - name: Actually compute 64 truth table, SymPy canonical CNF, original grammar derivation and native independent Z3 proof
+          test "$(git -C official_repo rev-parse HEAD)" = 13c8deb68a873635879c9a69bc78caebd340f646
+          python3 -m pip -q install 'z3-solver==4.13.3.0'
+      - name: Independently check fixed 5 typed invariant candidates original three full inductive VCs
         run: |
           set -euo pipefail
-          python3 research/q3/discovery_policy/sygus_sortingnaive_boolean_cnf_cfg_z3_postfirst_20261028.py
-          test -s official_sortingnaive_bool_specialist/SORTING_NAIVE_ORIGINAL_BOOL_COMPRESSED_AST_CFG_Z3_PROOF.json
-          sha256sum official_sortingnaive_bool_specialist/SORTING_NAIVE_ORIGINAL_BOOL_COMPRESSED_AST_CFG_Z3_PROOF.json
+          python3 research/q3/discovery_policy/sygus_firefly_five_classic_invariants_postfirst_20261028.py
+          test -s official_firefly_classic_five/FIREFLY_ORIGINAL_5_CLASSIC_INVARIANTS_3VC_POSTFIRST.json
+          sha256sum official_firefly_classic_five/FIREFLY_ORIGINAL_5_CLASSIC_INVARIANTS_3VC_POSTFIRST.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: neumann-g1-no-neural-spend-sortingnaive-sympy-original-cfg-z3
+          name: neumann-g1-official-FIREFLY-5-classical-inductive-candidates
           path: |
-            official_sortingnaive_bool_specialist/*.json
-            official_sortingnaive_bool_specialist/*.smt2
+            official_firefly_classic_five/*.json
+            official_firefly_classic_five/*.smt2
           if-no-files-found: warn
