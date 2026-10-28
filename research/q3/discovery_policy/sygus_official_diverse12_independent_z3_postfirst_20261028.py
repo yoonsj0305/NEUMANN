@@ -37,9 +37,22 @@ def parameter_signature(definition,command,name):
     h=re.match(r"^\(\s*"+re.escape(command)+r"\s+"+re.escape(name)+r"\s+",definition)
     if h is None:raise ValueError("HEADER_MISMATCH_"+command)
     remaining=definition[h.end():]
-    blocks=top_level_forms(remaining)
-    if not blocks:raise ValueError("NO_FUNCTION_PARAMS")
-    params=top_level_forms(blocks[0][2][1:-1])
+    # The surrounding define-fun closes AFTER its body. Only extract the FIRST
+    # balanced parameter group; parsing the remainder as standalone SMT-LIB
+    # would see the outer parenthesis and raise extra-closing.
+    if not remaining.startswith("("):raise ValueError("MISSING_PARAM_GROUP")
+    depth=0
+    end=None
+    for k,c in enumerate(remaining):
+        if c=="(":depth+=1
+        elif c==")":
+            depth-=1
+            if depth==0:
+                end=k+1
+                break
+    if end is None:raise ValueError("PARAM_GROUP_NOT_CLOSED")
+    parameter_group=remaining[:end]
+    params=top_level_forms(parameter_group[1:-1])
     out=[]
     for p in params:
         m=re.fullmatch(r"\(\s*([^\s()]+)\s+(.+?)\s*\)",p[2],re.S)
