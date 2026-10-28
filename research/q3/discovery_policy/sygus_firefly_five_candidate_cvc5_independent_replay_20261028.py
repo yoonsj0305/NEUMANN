@@ -97,7 +97,12 @@ def main():
         candidate=candidate_bytes.decode().strip()
         assert form_name(candidate,"define-fun")=="str_invariant"
         assert parameter_signature(candidate,"define-fun","str_invariant")==sig
-        pre=["(set-logic ALL)"]+[f for c,f in forms if c=="define-fun"]+[candidate]+decls
+        # Original nondeterministic source variables must be explicitly available
+        # BEFORE the original define-fun helper bodies referencing them.
+        source_vars=[re.sub(r"^\(\s*declare-var\b","(declare-const",f,count=1)
+                     for c,f in forms if c=="declare-var"]
+        assert len(source_vars)==20
+        pre=["(set-logic ALL)"]+source_vars+[f for c,f in forms if c=="define-fun"]+[candidate]+decls
         clauses=[
             "(and "+call("init",a)+" (not "+call("str_invariant",a)+"))",
             "(and "+call("str_invariant",a)+" "+call("trans",a+a1)+
