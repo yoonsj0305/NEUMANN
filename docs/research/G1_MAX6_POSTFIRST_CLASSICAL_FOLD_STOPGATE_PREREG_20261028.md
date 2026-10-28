@@ -1,0 +1,9 @@
+# NEUMANN 1 | max6 post-FIRST specialist classical STOP gate | 2026-10-28
+
+**Post-FIRST, not blind ownweight learning.** Official SyGuS-Org/benchmarks Git pin 13c8deb68a873635879c9a69bc78caebd340f646, file lib/General_Track/from_2018/max6.sl, file SHA256 04c4f22a8ccfb85dfdfe05f9aedfd710985578f8a5cb195da239176aab43331c. The original has six integer arguments and seven universal constraints. Previous official real CVC5 1.4.2 12 CPU/15 wall hard original baseline TIMEOUT: native user CPU 11.973035s, sys CPU 0.051987s, wall 12.266585s, frozen first JSON bde9d71dc8e9120a4178e29cb1e758014c2f7effcade3ccec1e75fdc1c1505ba, GitHub Action #40607539670.
+
+**Strong same-original-grammar specialist C**: Original Start grammar admits (ite StartBool Start Start) and original StartBool admits (>= Start Start), and input terminals x1..x6. Define the explicit executable recursive fold pair MAX(a,b)=ite(a>=b,a,b), nested from x1 through x6. Generate program from the ORIGINAL synth-fun typed arguments, no gold leakage. Require Z3 4.13.3 independent original seven separate universal constraint negations UNSAT plus whole conjunction UNSAT (8/8). The folded AST must use only source-declared grammar symbols. No Q pass unless actual independent Z3 cert exists.
+
+This task is ALREADY OPENED DEV. The fold was chosen after original source inspected. Human/assistant reasoning time and code generation overhead are separate, so Z3 quick checking is not fairly equivalent to original CVC5 synthesis. If simple classical fold completely solves original, DO NOT train a neural network just to memorize cheaper directly derivable work. This is a computation-spend STOP gate, not evidence of learned novel structure. Compare against a specialist classical fold, not only 12s generic cvc5.
+
+Global Q1-Q7 OPEN, G1 HOLD, G2 NOT RUN; PR #616 DRAFT unmerged.
