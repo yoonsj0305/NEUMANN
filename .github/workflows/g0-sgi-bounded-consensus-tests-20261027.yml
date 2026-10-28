@@ -63,3 +63,36 @@ jobs:
           PY
 
 
+
+  postfirst-pre27-exact-thousand-BV-branch-components-source-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/rc51-intelligence-spend-gate-20261026
+          persist-credentials: false
+      - name: Require predeclared source-opened hypothesis and exact source code
+        run: |
+          set -euo pipefail
+          test -s docs/research/G1_PRE27_1000_THREE_BRANCH_OUTPUT_FAMILY_POSTFIRST_PREREG_20261028.md
+          python3 -m py_compile research/q3/discovery_policy/sygus_pre27_1000_exact_output_components_postfirst_20261028.py
+      - name: Fetch exact third-party original only, no hidden target oracle
+        run: |
+          set -euo pipefail
+          git init -q official_repo
+          git -C official_repo remote add origin https://github.com/SyGuS-Org/benchmarks.git
+          git -C official_repo fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
+          git -C official_repo checkout -q --detach FETCH_HEAD
+      - name: Formally exact classify all 1000 source examples into 3 grammar subexpressions
+        run: |
+          set -euo pipefail
+          python3 research/q3/discovery_policy/sygus_pre27_1000_exact_output_components_postfirst_20261028.py
+          sha256sum official_pre27_pbe_components_postfirst/PRE27_ALL1000_THREE_OUTPUT_COMPONENTS_POSTFIRST.json
+          sha256sum official_pre27_pbe_components_postfirst/PRE27_ALL1000_ORIGINAL_SOURCE_COMPONENTS.tsv
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-g1-BV-PRE27-original-1000-postfirst-three-output-components
+          path: official_pre27_pbe_components_postfirst/
+          if-no-files-found: warn
