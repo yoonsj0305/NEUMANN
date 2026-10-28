@@ -41,6 +41,7 @@ jobs:
           set -euo pipefail
           grep -Fq 'bde9d71dc8e9120a4178e29cb1e758014c2f7effcade3ccec1e75fdc1c1505ba' docs/research/G1_FOUR_FAMILY_NEW12_MODERN_C_FIRST_FROZEN_PREGRADE_20261028.md
           python3 -m py_compile research/q3/discovery_policy/sygus_official_diverse12_independent_z3_postfirst_20261028.py
+          grep -Fq 'parameter_group=remaining[:end]' research/q3/discovery_policy/sygus_official_diverse12_independent_z3_postfirst_20261028.py
           sha256sum research/q3/discovery_policy/sygus_official_diverse12_independent_z3_postfirst_20261028.py
       - uses: actions/download-artifact@v4
         with:
