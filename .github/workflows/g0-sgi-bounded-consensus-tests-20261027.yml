@@ -28,45 +28,39 @@ jobs:
           python3 -m pip install -q pytest
           python3 -m pytest -q tests/test_q3_portfolio_consensus_evidence_gate_20261027.py tests/test_q3_source_input_identifiability_guard_20261027.py
 
-  official-four-family-12-original-Z3-postfirst-grade:
+  official-max6-specialist-same-grammar-smt-formal:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 6
     steps:
       - uses: actions/checkout@v4
         with:
           ref: research/rc51-intelligence-spend-gate-20261026
           persist-credentials: false
-      - name: Original new12 native FIRST strictly sealed BEFORE independent grade
+      - name: Ensure post-FIRST classical fold spend-stop prereg
         run: |
           set -euo pipefail
-          grep -Fq 'bde9d71dc8e9120a4178e29cb1e758014c2f7effcade3ccec1e75fdc1c1505ba' docs/research/G1_FOUR_FAMILY_NEW12_MODERN_C_FIRST_FROZEN_PREGRADE_20261028.md
-          python3 -m py_compile research/q3/discovery_policy/sygus_official_diverse12_independent_z3_postfirst_20261028.py
-          grep -Fq 'parameter_group=remaining[:end]' research/q3/discovery_policy/sygus_official_diverse12_independent_z3_postfirst_20261028.py
-          sha256sum research/q3/discovery_policy/sygus_official_diverse12_independent_z3_postfirst_20261028.py
-      - uses: actions/download-artifact@v4
-        with:
-          name: neumann-g1-readiness-official-diverse-four-family-12-native-cvc5-FIRST
-          run-id: 40607539670
-          repository: yoonsj0305/NEUMANN
-          github-token: ${{ github.token }}
-          path: official_diverse12_sealed_first
-      - name: Exact original first SHA before any new original full semantics accessed
+          test -s docs/research/G1_MAX6_POSTFIRST_CLASSICAL_FOLD_STOPGATE_PREREG_20261028.md
+          python3 -m py_compile research/q3/discovery_policy/sygus_max6_original_classical_fold_z3_20261028.py
+          sha256sum research/q3/discovery_policy/sygus_max6_original_classical_fold_z3_20261028.py
+      - name: Verify exact source original and install independent SMT Z3
         run: |
           set -euo pipefail
-          echo 'bde9d71dc8e9120a4178e29cb1e758014c2f7effcade3ccec1e75fdc1c1505ba  official_diverse12_sealed_first/FOUR_FAMILY_NEW12_OFFICIAL_CVC5_142_FIRST.json' | sha256sum --check
           git init -q official_repo
           git -C official_repo remote add origin https://github.com/SyGuS-Org/benchmarks.git
           git -C official_repo fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
           git -C official_repo checkout --detach -q FETCH_HEAD
+          echo '04c4f22a8ccfb85dfdfe05f9aedfd710985578f8a5cb195da239176aab43331c  official_repo/lib/General_Track/from_2018/max6.sl' | sha256sum -c
           python3 -m pip -q install 'z3-solver==4.13.3.0'
-      - name: Prove all original ordinary and exact invariant initialization, consecution and post VCs
+      - name: Build max6 fold from exactly original typed grammar and prove seven source clauses and conjunction
         run: |
           set -euo pipefail
-          python3 research/q3/discovery_policy/sygus_official_diverse12_independent_z3_postfirst_20261028.py
-          sha256sum official_diverse12_independent_z3_grade/FOUR_FAMILY_ORIGINAL12_CLASSICAL_POSTFIRST_Z3_FULL_PROOF.json
+          python3 research/q3/discovery_policy/sygus_max6_original_classical_fold_z3_20261028.py
+          sha256sum official_max6_specialist/MAX6_ORIGINAL_GRAMMAR_SPECIALIST_CLASSICAL_Z3_FULL.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: neumann-g1-readiness-diverse-12-original-Z3-inductive-VC-postfirst
-          path: official_diverse12_independent_z3_grade/FOUR_FAMILY_ORIGINAL12_CLASSICAL_POSTFIRST_Z3_FULL_PROOF.json
+          name: neumann-g1-no-neural-spend-max6-original-classical-fold-formal
+          path: |
+            official_max6_specialist/*.json
+            official_max6_specialist/*.smt2
           if-no-files-found: warn
