@@ -41,6 +41,7 @@ jobs:
           set -euo pipefail
           test -s docs/research/G1_FIREFLY_INDEPENDENT_CVC5_SECOND_BACKEND_PARITY_PREREG_20261028.md
           python3 -m py_compile research/q3/discovery_policy/sygus_firefly_five_candidate_cvc5_independent_replay_20261028.py
+          grep -Fq 'assert len(source_vars)==20' research/q3/discovery_policy/sygus_firefly_five_candidate_cvc5_independent_replay_20261028.py
           sha256sum research/q3/discovery_policy/sygus_firefly_five_candidate_cvc5_independent_replay_20261028.py
       - uses: actions/download-artifact@v4
         with:
