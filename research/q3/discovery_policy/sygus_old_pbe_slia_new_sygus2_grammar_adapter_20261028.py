@@ -55,7 +55,7 @@ def convert(old):
     assert orig[args_start]=='('
     args_end=span(orig,args_start)
     # These four original tasks' typed result sort is String (not guessed).
-    m=re.match(r"\s+String\s+",orig[args_end:])
+    m=re.match(r"\s+(?:String|Int|Bool)\s+",orig[args_end:])
     assert m,"NOT_ORIGINAL_STRING_FUNCTION"
     gr_start=args_end+m.end()
     assert orig[gr_start]=='('
@@ -71,14 +71,14 @@ def convert(old):
         extracted.append((q.group(1),q.group(2),q.group(3)))
     assert len({a for a,_,_ in extracted})==len(extracted),"DUPLICATE_NONTERMINAL"
     typed='('+' '.join('('+a+' '+b+')' for a,b,_ in extracted)+')'
-    productions='('+' '.join('('+a+' '+expr[1:-1]+')' for a,b,expr in extracted)+')'
+    productions='('+' '.join('('+a+' '+expr+')' for a,b,expr in extracted)+')'
     # Lossless production extraction+reconstruction, independent of whitespace.
     decls=top_level_forms(typed[1:-1])
     bodies=top_level_forms(productions[1:-1])
     assert len(decls)==len(bodies)==len(extracted)
     for src,d,b in zip(extracted,decls,bodies):
         assert d[2].strip()=='('+src[0]+' '+src[1]+')'
-        assert re.sub(r"\s+","",b[2])==re.sub(r"\s+","",'('+src[0]+' '+src[2][1:-1]+')')
+        assert re.sub(r"\s+","",b[2])==re.sub(r"\s+","",'('+src[0]+' '+src[2]+')')
     converted=orig[:gr_start]+typed+"\n"+productions+orig[gr_end:]
     output=old[:start]+converted+old[end:]
     original=[(get_cmd(f[2]),f[2]) for f in forms if get_cmd(f[2])!="synth-fun"]
