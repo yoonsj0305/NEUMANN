@@ -237,3 +237,60 @@ jobs:
             external_4invariants_one_step_triage/*.json
             external_4invariants_one_step_triage/*.smt2
           if-no-files-found: warn
+
+  external-four-SLIA-legacy-grammar-only-repair-postfirst:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/rc51-intelligence-spend-gate-20261026
+          persist-credentials: false
+      - name: Check post-FIRST four original parser errors and syntax-only adapter freeze
+        run: |
+          set -euo pipefail
+          test -s docs/research/G1_EXTERNAL_SLIA4_LEGACY_SYGUS_GRAMMAR_WRAPPER_ADAPTER_PREREG_20261028.md
+          python3 -m py_compile research/q3/discovery_policy/sygus_external4_legacy_slIA_grammar_adapter_20261028.py
+          sha256sum research/q3/discovery_policy/sygus_external4_legacy_slIA_grammar_adapter_20261028.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-g1-new-external-fourtrack16-native-original-cvc5-first
+          run-id: 40643083431
+          repository: yoonsj0305/NEUMANN
+          github-token: ${{ github.token }}
+          path: external_new16_frozen_FIRST
+      - name: Original immutable first and exact pinned third-party source
+        run: |
+          set -euo pipefail
+          echo '7acee7938ea2b8d18db2dd38058de36f7abdcf5116fbd703f6fce048b3a4418c  external_new16_frozen_FIRST/NEUMANN_G1_EXTERNAL_NEW16_FOUR_TRACKS_CVC5_FIRST.json' | sha256sum -c
+          git init -q official_repo
+          git -C official_repo remote add origin https://github.com/SyGuS-Org/benchmarks.git
+          git -C official_repo fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
+          git -C official_repo checkout -q --detach FETCH_HEAD
+          python3 -m pip -q install 'z3-solver==4.13.3.0'
+          curl -fSL --retry 3 --max-time 150 \
+            'https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-libcxx-static.zip' \
+            -o official-cvc5-142.zip
+          echo '0af677313c8277dc558d3049b192389db4d975d31c968fbd6f31cf0849ee411d  official-cvc5-142.zip' | sha256sum -c
+          unzip -q official-cvc5-142.zip -d official-bin
+          f="$(find official-bin -type f -name cvc5 | head -1)"
+          test -n "$f"
+          mkdir -p native_solver_bin
+          cp "$f" native_solver_bin/cvc5
+          chmod +x native_solver_bin/cvc5
+          echo "$(pwd)/native_solver_bin" >> "$GITHUB_PATH"
+      - name: Actually translate ONLY original SyGuS grammar wrappers of four SLIA sources then independently grade native outputs
+        run: |
+          set -euo pipefail
+          python3 research/q3/discovery_policy/sygus_external4_legacy_slIA_grammar_adapter_20261028.py
+          sha256sum external_slIA4_syntax_normalized/EXTERNAL4_SLIA_LEGACY_GRAMMAR_ONLY_POSTFIRST_RESULTS.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-g1-SLIA4-original-legacy-syntax-only-postfirst-adapter
+          path: |
+            external_slIA4_syntax_normalized/*.json
+            external_slIA4_syntax_normalized/*.sl
+            external_slIA4_syntax_normalized/*.stdout
+            external_slIA4_syntax_normalized/*.stderr
+          if-no-files-found: warn
