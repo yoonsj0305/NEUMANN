@@ -215,6 +215,12 @@ jobs:
           set -euo pipefail
           python3 research/q3/discovery_policy/sygus_external106_one_reachable_unsafe_invariant_unsat_20261028.py
           sha256sum external_106_unrealizability_proof/*.json
+      - name: Four original xujie invariant one-step unsafe prepass, two real independent solver results
+        run: |
+          set -euo pipefail
+          test -s docs/research/G1_EXTERNAL4_INVARIANTS_ONE_STEP_SOUND_TRIAGE_PREREG_20261028.md
+          python3 research/q3/discovery_policy/sygus_external4_invariant_onesafe_triage_two_solvers_20261028.py
+          sha256sum external_4invariants_one_step_triage/*.json
       - name: Read-only diagnose FOUR original SLIA native holds
         run: |
           set -euo pipefail
@@ -228,4 +234,6 @@ jobs:
             external_106_unrealizability_proof/*.json
             external_106_unrealizability_proof/*.smt2
             external_slIA_original_error_diagnosis/*.json
+            external_4invariants_one_step_triage/*.json
+            external_4invariants_one_step_triage/*.smt2
           if-no-files-found: warn
