@@ -65,8 +65,8 @@ def main():
     allsymbols=symbols+next_symbols
     declarations=["(declare-const "+x+" Int)" for x in allsymbols]
     fixed=["(= "+x+" "+str(v)+")" for x,v in zip(allsymbols,S0+S1)]
-    unsafe="(and "+term("pre-f",symbols)+" "+term("trans-f",symbols+next_symbols)+
-            " (not "+term("post-f",next_symbols)+"))"
+    unsafe=("(and "+term("pre-f",symbols)+" "+term("trans-f",symbols+next_symbols)+
+            " (not "+term("post-f",next_symbols)+"))")
     header="\n".join(["(set-logic ALL)",*funcs.values(),*declarations])
     # Free SAT establishes existential unsafe path. Fixed SAT demonstrates
     # published explicit 28-integer witness. Fixed negation UNSAT is direct
