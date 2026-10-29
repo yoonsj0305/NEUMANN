@@ -65,59 +65,22 @@ jobs:
 
 
 
-  external-euphony4-postfirst-original-PBE-Z3-three-native-programs:
+  external-inv106-original-unsafe-source-three-ways-postfirst:
     runs-on: ubuntu-latest
-    timeout-minutes: 7
+    timeout-minutes: 6
     steps:
       - uses: actions/checkout@v4
         with:
           ref: research/rc51-intelligence-spend-gate-20261026
           persist-credentials: false
-      - name: Freeze three original normalized C first outputs BEFORE Z3 formal original example proof
-        run: |
-          set -euo pipefail
-          test -s docs/research/G1_EUPHONY_POSTFIRST_THREE_NORMALIZED_NATIVE_PBE_ORIGINAL_Z3_GRADE_PREREG_20261029.md
-          python3 -m py_compile research/q3/discovery_policy/sygus_euphony_four_postfirst_original_pbe_Z3_grade_20261029.py
-      - uses: actions/download-artifact@v4
-        with:
-          name: neumann-g1-euphony4-postfirst-original-grammar-modern-two-operator-synonyms
-          run-id: 40795847511
-          repository: yoonsj0305/NEUMANN
-          github-token: ${{ github.token }}
-          path: external_euphony4_normalized_frozen
-      - name: Independently check frozen first and original exact source sha
-        run: |
-          set -euo pipefail
-          echo 'f5262b793e1a77a96d6aa316e61be1531047c6b7da930c9f2008ea2ae1287fe0  external_euphony4_normalized_frozen/G1_EUPHONY4_POSTFIRST_ALIAS_MODERN_CVC5_SOURCE_REPAIR.json' | sha256sum --check
-          git init -q official_repo
-          git -C official_repo remote add origin https://github.com/SyGuS-Org/benchmarks.git
-          git -C official_repo fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
-          git -C official_repo checkout -q --detach FETCH_HEAD
-          python3 -m pip -q install 'z3-solver==4.13.3.0'
-          python3 research/q3/discovery_policy/sygus_euphony_four_postfirst_original_pbe_Z3_grade_20261029.py
-          sha256sum external_euphony4_source_semantic_Z3/G1_EUPHONY4_POSTFIRST_NATIVE_C_ORIGINAL_Z3_FORMAL_GRADE.json
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: neumann-g1-euphony4-postfirst-three-original-PBE-example-programs-z3
-          path: external_euphony4_source_semantic_Z3/
-          if-no-files-found: warn
-
-  external-inv106-one-step-unsafety-original-dual-SMT-verified-syntax:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: research/rc51-intelligence-spend-gate-20261026
-          persist-credentials: false
-      - name: Check precommitted original exact one-step witness and code-only Python syntax repair
+      - name: Original fixed 28 integers and disclosure of two prior executor-only technical failures
         run: |
           set -euo pipefail
           test -s docs/research/G1_EXTERNAL_INV106_POSTFIRST_EXPLICIT_ONE_STEP_UNSAFETY_PREREG_20261029.md
           python3 -m py_compile research/q3/discovery_policy/sygus_external_inv106_one_step_safety_dual_prover.py
+          python3 -m py_compile research/q3/discovery_policy/sygus_external_inv106_stdlib_original_one_step_replay_20261029.py
           sha256sum research/q3/discovery_policy/sygus_external_inv106_one_step_safety_dual_prover.py
-      - name: Independently verify original source exact Git and official two SMT solvers
+      - name: Pin both independent verifier backends and original public benchmark
         run: |
           set -euo pipefail
           curl -fSL --retry 3 --max-time 150 \
@@ -136,11 +99,20 @@ jobs:
           git -C official_repo fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
           git -C official_repo checkout -q --detach FETCH_HEAD
           python3 -m pip -q install 'z3-solver==4.13.3.0'
+      - name: Independently prove same precommitted reachable unsafe step 3 ways
+        run: |
+          set -euo pipefail
+          command -v cvc5
+          cvc5 --version | head -1
           python3 research/q3/discovery_policy/sygus_external_inv106_one_step_safety_dual_prover.py
+          python3 research/q3/discovery_policy/sygus_external_inv106_stdlib_original_one_step_replay_20261029.py
           sha256sum external_inv106_one_step_unsafety/G1_EXTERNAL_INV106_ORIGINAL_ONE_STEP_UNSAFE_DUAL_SMT.json
+          sha256sum INV106_ORIGINAL_SOURCE_PURE_INTERPRETER_WITNESS.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: neumann-g1-inv106-original-unsafe-trace-z3-cvc5-exact
-          path: external_inv106_one_step_unsafety/
+          name: neumann-g1-inv106-original-one-step-unsafe-Z3-CVC5-pure-source
+          path: |
+            external_inv106_one_step_unsafety/
+            INV106_ORIGINAL_SOURCE_PURE_INTERPRETER_WITNESS.json
           if-no-files-found: warn
