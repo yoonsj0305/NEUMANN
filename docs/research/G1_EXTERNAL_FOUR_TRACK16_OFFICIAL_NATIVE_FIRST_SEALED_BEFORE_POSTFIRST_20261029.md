@@ -1,0 +1,18 @@
+# NEUMANN 1 | NEW official external four-track 16 FIRST SEALED before postfirst independent grade · 2026-10-29
+
+**Research status:** G1 HOLD, Q1–Q7 OPEN, G2 NOT RUN; NO neural A/B policy trained or evaluated on this new external cohort. Scientific objective: distinguish professional symbolic solver successes, hard budget holds and **unsupported original source grammar**, not manufacture a model win.
+
+Official `SyGuS-Org/benchmarks` source SHA **`13c8deb68a873635879c9a69bc78caebd340f646`**. Sixteen exact source filenames selected hash-deterministically from four distinct tracks before inspecting their bodies, source filename list SHA256 `a24acb1fed0d195b48e08bcffbc27f5af2d06eefcd98937f326236798f4b1295`; [prereg](https://github.com/yoonsj0305/NEUMANN/blob/research/rc51-intelligence-spend-gate-20261026/docs/research/G1_FOUR_NEW_EXTERNAL_TRACKS16_ORIGINAL_RIGHTS_CLASSICAL_PREREG_20261028.md). The cohort has four tracks, NOT proven four independent authors.
+
+**Immutable original FIRST** [GitHub run #40643083431](https://github.com/yoonsj0305/NEUMANN/actions/runs/40643083431), original first JSON SHA256 **`7acee7938ea2b8d18db2dd38058de36f7abdcf5116fbd703f6fce048b3a4418c`**, exact 16 CVC5 original stdout/stderr artifact ZIP **`31330cf1638ea934a9f213121d7ee791f28085abd6abafc9b9f3a50983ae3d4d`** [artifact #12796670775](https://github.com/yoonsj0305/NEUMANN/actions/runs/40643083431/artifacts/12796670775). Official published cvc5 1.4.2 binary release ZIP pinned `0af677313c8277dc558d3049b192389db4d975d31c968fbd6f31cf0849ee411d`, fixed **12s CPU/15s wall/800MiB sampled RSS per original**, one attempt, raw full specification unchanged, native child CPU total **16.890389s** (not a full environment cost).
+
+- **10/16 CVC5 returned native candidate program, independent semantic grade NOT RUN IN FIRST**: CLIA/from_2018 4/4; xujie_code2inv invariant 3/4; BV PBE/from_2018 3/4.
+- **1/16 CVC5 declared `infeasible`, NOT an independent logical impossibility proof**: `lib/Inv_Track/xujie_code2inv/106.c.sl`.
+- **1/16 native CPU budget HOLD**: `lib/PBE_BV_Track/from_2018/PRE_27_1000.sl`.
+- **4/16 native source parser/unsupported error**: all `lib/PBE_SLIA_Track/euphony/` files selected, which use a published track-specific SyGuS syntax/grammar. These must be classified `HOLD_NATIVE_FORMAT_UNSUPPORTED`, **NOT classical problem-synthesis failure** and not proof no string solution exists.
+
+After this first SEALED result, separately grade the 10 native candidates on **full original source obligations** with Z3 4.13.3, including actual 3-VC inductive proof for three invariants, full original symbolic source constraints and original listed PBE examples. A checker parsing failure must be HOLD, not solver failure. Do not rerun or rewrite first CVC5 outputs. For string sources, formally check a separate post-content concrete pair of admissible programs proving finite PBE examples don't uniquely identify a desired *unprovided* output oracle. The specific string original is already OPENED DEV and cannot qualify as blind source test.
+
+Research conclusion at seal: external active oracle **cannot** be assumed from source PBE examples or original invariant pre/transition/post proof. Source may provide a **candidate counterexample verifier** but not the intended target-output y for arbitrary x. The internal 8-bit oracle optimum 333 and 14-input static design remain mathematical statements restricted to that finite toy grammar, not promises for these external track sources.
+
+No NEUMANN ownweight G1 PASS, no 10x compute claims, original draft PR #616 unmerged.
