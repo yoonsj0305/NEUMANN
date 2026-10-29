@@ -64,3 +64,91 @@ jobs:
 
 
 
+
+  external-fourtrack16-postfirst-independent-full-Z3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/rc51-intelligence-spend-gate-20261026
+          persist-credentials: false
+      - name: Immutable full original first receipt sealed before independent candidate grade
+        run: |
+          set -euo pipefail
+          test -s docs/research/G1_EXTERNAL_FOUR_TRACK16_OFFICIAL_NATIVE_FIRST_SEALED_BEFORE_POSTFIRST_20261029.md
+          grep -Fq '7acee7938ea2b8d18db2dd38058de36f7abdcf5116fbd703f6fce048b3a4418c' docs/research/G1_EXTERNAL_FOUR_TRACK16_OFFICIAL_NATIVE_FIRST_SEALED_BEFORE_POSTFIRST_20261029.md
+          python3 -m py_compile research/q3/discovery_policy/sygus_external_fourtrack16_native_postfirst_z3.py
+          sha256sum research/q3/discovery_policy/sygus_external_fourtrack16_native_postfirst_z3.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-g1-new-external-fourtrack16-native-original-cvc5-first
+          run-id: 40643083431
+          repository: yoonsj0305/NEUMANN
+          github-token: ${{ github.token }}
+          path: external_fourtrack16_frozen_first
+      - name: Original first bytes strictly checked, original official source pin, independent Z3
+        run: |
+          set -euo pipefail
+          echo '7acee7938ea2b8d18db2dd38058de36f7abdcf5116fbd703f6fce048b3a4418c  external_fourtrack16_frozen_first/NEUMANN_G1_EXTERNAL_NEW16_FOUR_TRACKS_CVC5_FIRST.json' | sha256sum --check
+          git init -q official_repo
+          git -C official_repo remote add origin https://github.com/SyGuS-Org/benchmarks.git
+          git -C official_repo fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
+          git -C official_repo checkout --detach -q FETCH_HEAD
+          python3 -m pip -q install 'z3-solver==4.13.3.0'
+      - name: Verify native original candidates against every source constraint and all 3 invariant VCs
+        run: |
+          set -euo pipefail
+          python3 research/q3/discovery_policy/sygus_external_fourtrack16_native_postfirst_z3.py
+          sha256sum external_fourtrack16_independent_z3/G1_EXTERNAL16_ORIGINAL_CVC5_FULL_INDEPENDENT_Z3_GRADE.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-g1-external-fourtrack16-postfirst-independent-original-Z3
+          path: external_fourtrack16_independent_z3/
+          if-no-files-found: warn
+
+  external-original-SLIA-two-valid-programs-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/rc51-intelligence-spend-gate-20261026
+          persist-credentials: false
+      - name: Frozen two-original-programs proposition from preexisting original source
+        run: |
+          set -euo pipefail
+          test -s docs/research/G1_EXTERNAL_STRING_PBE_GROUND_EXAMPLES_NONIDENTIFIABILITY_TWO_PROGRAMS_POSTCONTENT_PREREG_20261028.md
+          python3 -m py_compile research/q3/discovery_policy/sygus_external_string_pbe_two_valid_programs_20261029.py
+      - name: Official independent string-capable CVC5 1.4.2 release asset SHA
+        run: |
+          set -euo pipefail
+          curl -fSL --retry 3 --max-time 150 \
+            'https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.2/cvc5-Linux-x86_64-libcxx-static.zip' \
+            -o official-cvc5-142.zip
+          echo '0af677313c8277dc558d3049b192389db4d975d31c968fbd6f31cf0849ee411d  official-cvc5-142.zip' | sha256sum -c
+          unzip -q official-cvc5-142.zip -d official-bin
+          f="$(find official-bin -type f -name cvc5 | head -n 1)"
+          test -n "$f"
+          mkdir -p native_solver_bin
+          cp "$f" native_solver_bin/cvc5
+          chmod +x native_solver_bin/cvc5
+          echo "$(pwd)/native_solver_bin" >> "$GITHUB_PATH"
+          native_solver_bin/cvc5 --version | head -1
+      - name: Fetch official original exact file and run two different source-admissible programs
+        run: |
+          set -euo pipefail
+          git init -q official_repo
+          git -C official_repo remote add origin https://github.com/SyGuS-Org/benchmarks.git
+          git -C official_repo fetch --depth 1 origin 13c8deb68a873635879c9a69bc78caebd340f646
+          git -C official_repo checkout --detach -q FETCH_HEAD
+          python3 -m pip -q install 'z3-solver==4.13.3.0'
+          python3 research/q3/discovery_policy/sygus_external_string_pbe_two_valid_programs_20261029.py
+          sha256sum external_string_spec_ambiguity/G1_EXTERNAL_STRING_PBE_TWO_PROGRAMS_SOURCE_AMBIGUITY.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-g1-external-string-pbe-two-programs-formal-witness
+          path: external_string_spec_ambiguity/
+          if-no-files-found: warn
