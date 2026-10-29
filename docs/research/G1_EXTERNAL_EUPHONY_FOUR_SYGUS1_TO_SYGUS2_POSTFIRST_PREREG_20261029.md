@@ -1,0 +1,18 @@
+# NEUMANN 1 | POST-FIRST OLD single-grammar SLIA Euphony source compatibility repair, 4 tasks · 2026-10-29
+
+**Retrospective exact native syntax diagnosis after immutable sixteen-first:** Official 16 strong cvc5 1.4.2 native [run #40643083431](https://github.com/yoonsj0305/NEUMANN/actions/runs/40643083431) first JSON SHA256 `7acee7938ea2b8d18db2dd38058de36f7abdcf5116fbd703f6fce048b3a4418c`, four Euphony original string tasks reported parser `Parse Error line4 expected RPAREN got LPAREN` ~0.001-0.002s CPU each. This is **format incompatibility, NOT inference/synthesis performance**. Preserve old first unchanged and do not count parser repair as a new blind neural success. G1 HOLD, Q1–Q7 OPEN, G2 NOT RUN.
+
+Official original pin `SyGuS-Org/benchmarks` `13c8deb68a873635879c9a69bc78caebd340f646`. Four source files in exact original first indices12–15:
+`lib/PBE_SLIA_Track/euphony/get-last-name-from-name-with-comma.sl`;
+`lib/PBE_SLIA_Track/euphony/count-consecutive-monthly-orders.sl`;
+`lib/PBE_SLIA_Track/euphony/get-first-word.sl`;
+`lib/PBE_SLIA_Track/euphony/25239569.sl`.
+All source bodies already OPENED DEV.
+
+**ONE deterministic semantics-preserving grammar-display normalization:** Their original `(synth-fun f ((_arg_0 String)) RETURN_SORT ((Start TYPE (RULES)) (ntString TYPE (RULES)) (ntInt TYPE (RULES)) (ntBool TYPE (RULES))))` old **one grammar list** differs from modern two-list notation accepted by original modern CVC5 on BV track. Convert ONLY that single `synth-fun` to `(synth-fun f ((_arg_0 String)) RETURN_SORT ((Start TYPE)(ntString TYPE)(ntInt TYPE)(ntBool TYPE)) ((Start TYPE (RULES))(ntString TYPE (RULES))...))`. Reuse the precise original rule block text for each nonterminal; preserve literal string tokens, operators, start rule, all original authored constraints byte-for-byte. Store original source SHA + normalized full source SHA and exact original rule-block digest. Parse original top-level expressions string-aware. No guessing an ideal target oracle or altering provided examples. This form-level rewrite should have exactly one possible deterministic output for each source.
+
+**Original-source professional strong C:** Official hash-verified CVC5 1.4.2 unchanged binary ZIP SHA `0af677313c8277dc558d3049b192389db4d975d31c968fbd6f31cf0849ee411d`; run each normalized but otherwise original full task once under SAME native 12 CPU/15 wall/800MiB sampled RSS cap. Preserve stdout/stderr, all failures, no per-case additional flag tuning or further rewriting. Candidate outputs initially `UNVERIFIED`, not original FIRST success. Any unsupported native parser errors still HOLD.
+
+**Semantic followup:** If C returns candidate, separately independently check **ALL author's original PBE examples** using Z3 4.13.3 against the ORIGINAL SOURCE, and examine whether the candidate uses only productions supplied in original grammar. A source program may implement only examples, not uniquely desired real-world function. The postfirst two-original-programs proof for `get-first-word` already showed two valid string programs with different output on unlabeled "hello "; do not assume target oracle.
+
+If old grammar cannot be parsed by cvc5 after the one transformation, report technical compatibility HOLD and do not erase original4 from denominator. This is a one-shot postfirst tool interoperability benchmark, not ownweight discovery, 10x performance or G1 promotion.
