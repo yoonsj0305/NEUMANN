@@ -113,6 +113,7 @@ jobs:
           chmod +x native_solver_bin/cvc5
           echo "$(pwd)/native_solver_bin" >> "$GITHUB_PATH"
           native_solver_bin/cvc5 --version | head -1
+          export PATH="$(pwd)/native_solver_bin:$PATH"
           python3 research/q3/discovery_policy/sygus_external_string_firstword_two_grammar_valid_formal_postfirst_20261030.py
           sha256sum external_string_pbe_two_source_solutions/*.json
       - uses: actions/upload-artifact@v4
