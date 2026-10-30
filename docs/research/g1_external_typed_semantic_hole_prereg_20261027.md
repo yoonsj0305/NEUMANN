@@ -1,0 +1,14 @@
+# Frozen G1 typed semantic-hole dynamic *calendar operator* external validation
+2026-10-27. No new RC/PR. All global Q1–Q7 OPEN. This is classical source-conditioned synthesis, NOT weight learning/invented base primitive.
+
+Before reading any external original target spec.json content, implementation code SHA256 `45bc0ecda79ba12a4e2305c5140851ebe2b620f51bf7854ab6e5301c1ded9855` (date_semantics.py). Focused tests 4/4 before externals, test sha256 6033bf0e292e5aa8ae4e97dfd5a4675491ccc4e4e87a6f10c4508e46c2b9ab86. Code uses human-provided Python calendar/date parsing, previously UNAVAILABLE from old substring-only grammar, and enumerates 8 generic typed AST operator templates, fitting actual 3 source examples, independent of task names. This is a classical grammar extension, not neural discovery.
+
+Original previously unopened Microsoft PROSE spec IDs (no substitution): DateTime.000017, DateTime.000018, DateTime.000019, DateTime.000020, DateTime.000021, DateTime.000022, DateTime.000023, DateTime.000024, DateTime.000025, DateTime.000026, DateTime.000027, DateTime.000028. For eligibility require >=5 original examples with first THREE output strings. Source = original first3 IO, test original inputs #4/5 with output withheld. Full first code, source and predicted outputs to be SHA/GitHub frozen BEFORE accessing test output gold. Ineligible tasks stay in denominator audit but not scoring.
+
+Arms:
+C: existing strong 3-example classical substring Dijkstra source synthesis, cap 1800 expansions / top12 / maxnodes7, parser originally frozen `synthesis_import.py` SHA256 092165e7b93d0f8229da47f7f8abed54547b4ecc3e34c3f1df3fc631e122ff47.
+N: new eight-source-independent Gregorian typed Program ASTs (weekday of month, ISO week, short weekday + week, month/year, day). N requires explicit 4-digit year in source input and ISO/English date marker, fail-closed on disagreement/unsupported null.
+H: C first if C emits one source-consistent class; if N also emits a *different* class abstain; otherwise C. If C HOLD and N one class, use N. Uses no task ID or hidden labels.
+Measure C/N/H original whole-task future exact, wrong, HOLD, CPU process time incl both engines, training zero, and degree of novelty over C. Strong baselines are same-authentic-source, not granted gold. Proposals are unsupported hypotheses, not verified generality. All 12 same DATE subdomain public task authorship, potential LLM familiar examples, not entire-domain transfer or frontier result. Null/unsupported input in heldout -> fail-closed.
+
+If N improves H but strong more expressive classical with equal compute does better, do not claim NEUMANN dominance; if no N novelty, STOP more manual opcode patches. Entire cost includes task labels procurement unknown in deployment. No claim of exact source code mining privacy.

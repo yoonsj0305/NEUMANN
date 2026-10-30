@@ -1,0 +1,11 @@
+# NEUMANN 1 | typed-AST generator executor restart amendment, NO heldout scoring
+
+Original scientific experiment prereg commit `1d4e7647af965117f2c2aef4b6b3d913eae8c28e`. Original executable source SHA256 `a27a8ff1cbfe4e799cf2eb317c2a3c5368a04b37799c93c7ee44a4cf0503afd8` before first training run. The first actual local run generated **partial train logs** for A seed5/13/29 and B seed5 then exceeded container command timeout **before B13/B29 were completed, before first heldout generation or grading, and before any final receipt**. This is EXECUTION_INCOMPLETE, not scientific PASS/FAIL. The partial train-only log was retained in research runtime; no test gold viewed for model selection, architecture/seed/beam/search rights unchanged.
+
+**Restart amendment (implementation only, made before ANY test scoring):**
+- Same model, exact training set, seed order and randomized label alignment as original prereg: A/B seeds 5/13/29, model 128→256→63, Adam 150 epochs batch 128, identical 21-token/3-position AST corpus, source 16 IO pairs, beam 32.
+- After each genuinely trained seed, save its actual torch state_dict and training receipt in `model_cache/`. On a process timeout, a fresh invocation can resume already trained models with exact byte-for-byte weights, avoiding redoing them. Evaluator executes **only after all six model states are complete**, never uses partial outcomes.
+- Hoist unchanged exact 2000 training truth table membership set outside heldout grading's loop to avoid rebuilding the same list 480 times; model candidate ranking/source checks and correctness are unchanged.
+- New exact executor SHA256 **`2536401f20b1c33c74d71b5c78ac79b073f0ec2d46f4f42967eb5c1f76383c8a`**. Both implementations and run receipts will be retained in full portable code package.
+
+No model hyperparameter/benchmark sampling changes permitted after these adjustments. Any future rerun must record CPU/wall of all attempts, including failed training launch when reporting end-to-end cost. All Q1–Q7 OPEN, G1 HOLD.

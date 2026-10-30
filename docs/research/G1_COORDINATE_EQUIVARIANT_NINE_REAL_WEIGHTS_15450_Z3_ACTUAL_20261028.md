@@ -1,0 +1,36 @@
+# NEUMANN 1 | Actual 9-network causal coordinate equivariance A/B/R vs strong classical C, 15,450 original-source Z3 checks (2026-10-28)
+
+## Research classification and decisive result
+
+**Positive local architecture engineering:** Real PyTorch ownweight model predicts typed executable polynomial invariant `I(x,y)` from five observed (x,y) trajectory points, and when an *engineered canonical coordinate transform* `x_i−x0` is fed into the neural encoder, the same 145 heldout L/Q tasks shifted from source origin 0 to 2 or 7 reproduce **EXACTLY identical 116/114/117 verified program successes** across fixed seeds 5/13/29. The same architecture trained on raw absolute x falls from 116/114/117 at origin0 to 2/6/6 at origin2 and 1/1/0 at origin7. All 3 shuffled-label B models fail all three ID/shift sets. **But on novel cubic d3: A/B/R 0/80, matched classical C 80/80**, hence NO operator-novelty transfer and NO superiority to strong specialist C.
+
+This is **ONLY an internally generated toy translation-*covariant* program family**. The original prior study's shift x0=2 kept `y=a*x^d+c` (fixed global polynomial); THIS study deliberately uses co-moving specification `y=a*(x−x0)^d+c` with parameterized original source and generated AST. Therefore this demonstrates architectural *guaranteed equivariance by construction*, **not** a generic fix for that prior globally fixed-polynomial OOD extrapolation. Do not conflate.
+
+## Preregistration, reproducibility and actual costs
+
+Prospective exact protocol committed **BEFORE the nine training and test runs** [prereg GitHub `74f393e46997116961c4edddb0cff6354a97040e`](https://github.com/yoonsj0305/NEUMANN/blob/research/rc51-intelligence-spend-gate-20261026/docs/research/G1_DIRECT_AST_COORDINATE_EQUIVARIANCE_A_B_RAW_C_PREREG_20261028.md). Source `x'=x+1`, `y'=y+a*((x+1−x0)^d−(x−x0)^d)`, initialized `x=x0,y=c`, property `y=a*(x−x0)^d+c`; training source L/Q d1/d2, coefficients a16*c17, exactly 399 training tuples and 145 hash-heldout tuples, unseen x0 origin2/7 with same heldout tuple. Cubic d3 unseen family 80. Five source-only public (x,y) trace inputs. **No evaluator test feature accessed before all 9 model weight files frozen and SHA hashed.**
+
+Nine REAL trained models with 22,435 trained weights each, same 700 fullbatch AdamW gradients and seeds5,13,29: A canonical input, B canonical but shuffled labels (correct triple relation broken), R raw input as architectural ablation. Ten arms total with C direct exact finite differences from the same traces (degree1/2/3) and same typed SMT candidate output rights. A/B/R only emit two fixed structure labels L/Q plus 16-bin coefficient and 17-bin constant, not an open grammar, and x0 is *public embedded problem parameter*.
+
+| Test split | Actual trained equivariant A (seed5/13/29) | Raw R (seed5/13/29) | Shuffled B | Specialist C |
+|---|---|---|---|---|
+| 145 unseen ID x0=0 | **116,114,117** | **116,114,117** | 0,0,0 | 145/145 |
+| 145 same heldout source tuples shifted x0=2 | **116,114,117** | **2,6,6** | 0,0,0 | 145/145 |
+| 145 same heldout source tuples shifted x0=7 | **116,114,117** | **1,1,0** | 0,0,0 | 145/145 |
+| 80 completely untrained cubic degree3 x0=7 | **0,0,0** | 0,0,0 | 0,0,0 | 80/80 |
+
+**ALL 515×10 = 5,150 actual executable typed SMT programs, and 15,450 genuine unbounded-integer Z3 4.13.3 C-API verification queries**, checking each source-specific `init→I`, `I∧trans→I'`, `I→safe` in an isolated `push/pop` per original condition. Original actual machine full results JSON SHA256 **`1f2ac3c68ed67c13c073d4f4a7448999fc300c05f65d857d2c06228d56aeca25`**. All original nine checkpoint tensors individually saved and hash frozen. All incorrect predictions were SMT counterexamples, not template-matched guesses. First naive three-fresh-contexts-per-condition evaluator exceeded local timeout **after all 9 weights frozen**, before any first score receipt was saved; code-only replacement to 3 separate push/pop inside one Z3 context and evaluation-only checkpoint loader was used, no data/model/hyperparameter change. The original timeout stdout log retained in package.
+
+Measured **nine real network training CPU 21.282310s**, ten-arm evaluation including full 15,450 source Z3 queries **39.078887s**, sum **60.361197s CPU** for DIFFERENT workload than C only. Separate **C-only same-right classic generation and all three Z3 checks on all 515 tasks** measured **1.667499s CPU, exact 515/515 valid**. No fair 36× same-task wall advantage claim; A not even as capable as C; training data and source/experiment design overhead, RAM, power, dollars not captured.
+
+## Fresh independent verification, immutable proof records
+
+Fresh SECOND Python process reconstructed the 515 source tasks and all 5,150 frozen prediction ASTs, reread 9 checkpoint raw weight SHA256 files, recomputed all `AST_sha256` and reexecuted **15,450 actual Z3 3VC SMT checks** in full; **all identical to first 5,150 original result JSON records**, no training and no neural inference needed. Reproduction process CPU **23.470409s**. Explicit metamorphic test confirmed **all A and B source program AST labels and coefficients are identical** for each ID heldout tuple across x0=0,2,7, showing representation-level translation equivariance (engineered). Second check JSON created `INDEPENDENT_5150_15450_REPLAY_AUDIT.json`. No external original SyGuS task claimed as blind here.
+
+**Exact portable generated archive** `NEUMANN1_G1_COORDINATE_EQUIVARIANCE_OWNWEIGHT_AB_RAW_C_20261028.zip`, SHA256 **`1cb8dd452b41a6838282858ffd9bcb2c8bd07ff4b2a4d9abcd743efb111b1666`**, **1,065,225 bytes**, frozen trained model weights ×9, actual training/eval Python sources, all task split JSON SHA, full original 5150 proof rows, 15450 independent replay script/log, standalone classical-only run, SHA256 manifest and instructions. Packaged and verified 22 artifact file hashes and ZIP CRC in a FRESH extracted temp directory. The downloadable archive lives on the ChatGPT conversation sandbox; not copied to GitHub by the GitHub connector in this operation. GitHub preserves prereg, this report, and fast fail-closed evidence rules.
+
+## Scientific and architecture gate
+
+This identifies a **systematic preventable source-equivariance error**: absolute-coordinate neural features can spuriously depend on arbitrary origin and shatter under translation even when source semantics are co-moving; coordinate-canonicalization enforces exact consistency by design. **NOT** learned discovery of translation symmetry and **NOT** compositional semantic novelty beyond preenumerated degree1/2 class heads. Cubic heldout 0/80, specialist C 80/80 and 1.67 seconds standalone. The second prereg variable-length operator decoder tests whether emitting variable sequence `MUL_REL_X ... EOS` helps extrapolate beyond learned lengths; whatever its result, all synthetic toy evidence remains scientifically insufficient for original G1 global PASS.
+
+**Global Q1–Q7 OPEN, G1 HOLD, G2 NOT RUN. PR #616 remains DRAFT, main unmerged.**

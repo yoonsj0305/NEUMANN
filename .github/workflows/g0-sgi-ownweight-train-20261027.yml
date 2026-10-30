@@ -1,0 +1,60 @@
+name: NEUMANN G0 ownweight prior TRAIN old originals only
+on:
+  push:
+    branches: [research/rc51-intelligence-spend-gate-20261026]
+    paths:
+      - .github/workflows/g0-sgi-ownweight-train-20261027.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  old-training-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/rc51-intelligence-spend-gate-20261026
+          persist-credentials: false
+      - name: Check prereg and freeze source before network input
+        run: |
+          set -euo pipefail
+          test -s docs/research/G0_OWNWEIGHT_PROGRAM_PRIOR_NEW12_PREREG_20261027.md
+          python3 -m py_compile research/q3/discovery_policy/sgi_ownweight_prior_train.py
+          sha256sum research/q3/discovery_policy/sgi_ownweight_prior_train.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-g0-sgi12-active-oracle-FIRST-UNgraded-20261027
+          run-id: 40456478489
+          repository: yoonsj0305/NEUMANN
+          github-token: ${{ github.token }}
+          path: training_first
+      - name: Install native Z3 + true cpu PyTorch for gradient learning
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q 'z3-solver==4.13.3.0'
+          python3 -m pip install -q 'torch==2.5.1' --index-url https://download.pytorch.org/whl/cpu
+          python3 -c 'import torch,z3; print(torch.__version__,z3.get_version_string()); assert z3.get_version_string()=="4.13.3"'
+      - name: Fetch pinned upstream and read only the twelve opened TRAIN source task bodies
+        run: |
+          set -euo pipefail
+          echo 'a2713cee7e4a54506501927c07ff65f78d4ad110e4c9568892d937f3a0aa8185  training_first/FIRST_PROPOSALS_AND_QUERY_DECISIONS_UNGRADED.json' | sha256sum -c
+          git init -q upstream
+          git -C upstream remote add origin https://github.com/Barnard-PL-Labs/sygus-sgi-1.git
+          git -C upstream fetch --depth 1 origin e7ae840e5546e9243ff94afb1a29064fc050011c
+          git -C upstream checkout -q --detach FETCH_HEAD
+      - name: Genuine PyTorch A vs shuffled-output B gradient training, test never opened
+        run: |
+          set -euo pipefail
+          python3 research/q3/discovery_policy/sgi_ownweight_prior_train.py
+          test -s training_weights/FROZEN_TRAINED_A_B_WEIGHTS.json
+          sha256sum training_weights/FROZEN_TRAINED_A_B_WEIGHTS.json
+          rm -rf upstream
+      - name: Preserve immutable trained model parameters and causal controls
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-g0-SGI-ownweight-trained-A-B-weights-20261027
+          path: training_weights/FROZEN_TRAINED_A_B_WEIGHTS.json
+          if-no-files-found: warn

@@ -1,0 +1,7 @@
+# NEUMANN 1 | open AST post-train summary-key executor fix
+
+The original scientific G0 prereg is GitHub commit `1d4e7647af965117f2c2aef4b6b3d913eae8c28e`. The resume amendment is GitHub `49557b3f265c9dbe807041cdf49deb45916495be`, checksum `2536401f20b1c33c74d71b5c78ac79b073f0ec2d46f4f42967eb5c1f76383c8a`. A genuine local run **completed all six neural trainings** (A5/A13/A29 and shuffled B5/B13/B29), and ran all 80 neural proposal + classical evaluations. The runner then crashed **after computing rows but before writing the final JSON**, because the C summary incorrectly read `r['exact']` instead of the already existing row `r['C']`. The traceback and console outputs are preserved in `run_retry.log`.
+
+**Executor-only fix before final result file**: replace exactly `sum(r['exact'] for r in details)` with `sum(r['C'] for r in details)`, leave every train/eval seed, task, grammar, 16 input rights, AST decoding, beam 32, original C enumeration, frozen checkpoint and program result algorithm unchanged. New file SHA256 `db57697ceac09ad1c3dd8f3de1fb421969061164cfc375dc7c7c77cd3db7a6a4`. Rerun loads six exact cached Torch `state_dict` files from prior completed training; no new training or parameter selection from heldout grades. CPU across interrupted executions must not be erased from any all-in cost accounting.
+
+No model evaluation claim until a validated complete machine result is written. Q1–Q7 OPEN; G1 HOLD.

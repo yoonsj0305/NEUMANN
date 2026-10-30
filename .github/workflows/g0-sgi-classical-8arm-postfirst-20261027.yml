@@ -1,0 +1,57 @@
+name: NEUMANN G0 SGI residual cvc5 8 pre-fixed variants postfirst
+on:
+  push:
+    branches: [research/rc51-intelligence-spend-gate-20261026]
+    paths:
+      - .github/workflows/g0-sgi-classical-8arm-postfirst-20261027.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/g0-sgi-classical-8arm-postfirst-20261027.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  frozen-eight-classical-proposals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/rc51-intelligence-spend-gate-20261026
+          persist-credentials: false
+      - name: Freeze code and recorded options
+        run: |
+          set -euo pipefail
+          grep -q 'Eight pre-fixed classical C arms' docs/research/G0_SGI_SINGLE_FAILURE_CLASSICAL_VARIANT_PREREG_POSTFIRST_20261027.md
+          python3 -m py_compile research/q3/discovery_policy/sgi_residual_classical_8arm_postfirst.py
+          sha256sum research/q3/discovery_policy/sgi_residual_classical_8arm_postfirst.py
+      - name: Install native expert classical synthesizer
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -qq -y cvc5
+          cvc5 --version | head -n 3
+      - name: Fetch pinned original, keeping tenth constraint out of solver
+        run: |
+          set -euo pipefail
+          git init -q upstream
+          git -C upstream remote add origin https://github.com/Barnard-PL-Labs/sygus-sgi-1.git
+          git -C upstream fetch --depth 1 origin e7ae840e5546e9243ff94afb1a29064fc050011c
+          git -C upstream checkout --detach -q FETCH_HEAD
+          test "$(git -C upstream rev-parse HEAD)" = e7ae840e5546e9243ff94afb1a29064fc050011c
+      - name: Run every pre-fixed source-only config, do NOT grade heldout
+        run: |
+          set -euo pipefail
+          python3 research/q3/discovery_policy/sgi_residual_classical_8arm_postfirst.py
+          test -s residual_first/POSTFIRST_EIGHT_CONFIGS_CANDIDATES_BEFORE_GRADE.json
+          sha256sum residual_first/POSTFIRST_EIGHT_CONFIGS_CANDIDATES_BEFORE_GRADE.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-g0-sgi-eight-classical-postfirst-UNgraded
+          path: |
+            residual_first/*.json
+            residual_first/*.stdout
+            residual_first/*.stderr
+          if-no-files-found: warn

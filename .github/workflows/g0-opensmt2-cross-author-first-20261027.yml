@@ -1,0 +1,204 @@
+name: NEUMANN G0 OpenSMT2 independent-source first classical gate
+on:
+  push:
+    branches: [research/rc51-intelligence-spend-gate-20261026]
+    paths:
+      - .github/workflows/g0-opensmt2-cross-author-first-20261027.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/g0-opensmt2-cross-author-first-20261027.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: neumann-g0-opensmt2-cross-author-frozen
+  cancel-in-progress: false
+jobs:
+  first-C2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/rc51-intelligence-spend-gate-20261026
+          persist-credentials: false
+      - name: Pin upstream source author and original commit
+        run: |
+          set -euo pipefail
+          mkdir -p receipt/originals
+          git init -q src
+          git -C src remote add origin https://github.com/aehyvari/OpenSMT2.git
+          git -C src fetch --depth 1 origin 76ee514d36e0a033a160da5e0a138f6fd83e1bcc
+          git -C src checkout -q --detach FETCH_HEAD
+          test "$(git -C src rev-parse HEAD)" = 76ee514d36e0a033a160da5e0a138f6fd83e1bcc
+          git -C src show -s --format='%H %ci %an' HEAD > receipt/upstream_git_identity.txt
+          java -version 2>&1 | tee receipt/java.txt
+      - name: Fetch official professional classical solver
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 2 --max-time 70 \
+            -o smtinterpol.jar \
+            https://ultimate.informatik.uni-freiburg.de/smtinterpol/smtinterpol-2.5-1453-gedae1f37.jar
+          echo "8d42e87614fcdbe6fce5233b91f20563dfd9a854d999127d70cfb42853e091c7  smtinterpol.jar" | sha256sum -c
+      - name: FIRST frozen raw specialist on exact 12 pre-registered paths
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os,re,json,time,hashlib,pathlib,subprocess,resource
+          repo='aehyvari/OpenSMT2'
+          upstream='76ee514d36e0a033a160da5e0a138f6fd83e1bcc'
+          paths=[
+            'regression_itp/uf_bug.smt2',
+            'regression_itp/dec-far2.smt2',
+            'regression_itp/bug_mask_ite.smt2',
+            'regression_itp/itp_bug_small.smt2',
+            'regression_itp/uf_itp_problem.smt2',
+            'regression_itp/distinct_unsat.smt2',
+            'regression_itp/uf-itp-edge-split.smt2',
+            'regression_itp/LIA/lia_itp_split.smt2',
+            'regression_itp/trivial-proof-A.smt2',
+            'regression_itp/trivial-proof-B.smt2',
+            'regression_itp/LIA/issue213_itp.smt2',
+            'regression_itp/dec-far1.smt2',
+          ]
+          results=[]
+          receipt=pathlib.Path('receipt')
+          for idx,rel in enumerate(paths):
+            x={'index':idx,'source_path':rel,'upstream_commit':upstream}
+            p=pathlib.Path('src')/rel
+            if not p.is_file():
+              x['status']='NOT_RUN_SOURCE_MISSING'
+              results.append(x)
+              continue
+            data=p.read_bytes()
+            x['original_size_bytes']=len(data)
+            x['git_blob_sha1']=hashlib.sha1(b'blob '+str(len(data)).encode()+bytes([0])+data).hexdigest()
+            x['original_sha256']=hashlib.sha256(data).hexdigest()
+            try:
+              src=data.decode('utf-8')
+            except UnicodeDecodeError:
+              x['status']='HOLD_NON_UTF8'
+              results.append(x)
+              continue
+            named=re.findall(r':named\s+([A-Za-z_][A-Za-z0-9_-]*)',src)
+            queries=re.findall(r'\(\s*get-interpolants\s+([^)]*)\)',src)
+            checks=re.findall(r'\(\s*check-sat\s*\)',src)
+            x['named_annotation_count_raw']=len(named)
+            x['interpolation_queries_raw']=len(queries)
+            x['check_sat_queries_raw']=len(checks)
+            # Narrow gate is deliberately provisional until a complete SMT-LIB parser checks it.
+            x['binary_syntax_candidate']= (
+              len(named)==2 and len(set(named))==2
+              and len(queries)==1 and len(checks)==1
+              and queries[0].split()==named
+              and '(push ' not in src and '(pop ' not in src
+              and '(get-proof' not in src)
+            # First-source adapter: ONLY preregistered OpenSMT2-exclusive options removed.
+            remove_option=r'\(\s*set-option\s+:(?:produce-interpolants|certify-interpolants|interpolation-[^\s()]+)\s+[^()]*\)'
+            adapted=re.sub(remove_option,'',src,flags=re.IGNORECASE)
+            changed=adapted!=src
+            adapted='(set-option :produce-proofs true)\n(set-option :print-success false)\n'+adapted
+            x['options_filtered']=changed
+            x['adapter_sha256']=hashlib.sha256(adapted.encode()).hexdigest()
+            tmp=receipt/f'input_{idx:02d}.smt2'
+            tmp.write_text(adapted)
+            def cpu_limit():
+              resource.setrlimit(resource.RLIMIT_CPU,(4,5))
+            stdout,stderr='',''
+            before=resource.getrusage(resource.RUSAGE_CHILDREN)
+            start=time.monotonic()
+            try:
+              proc=subprocess.Popen(['java','-Xmx512m','-XX:MaxMetaspaceSize=128m',
+                '-XX:ReservedCodeCacheSize=32m','-jar','smtinterpol.jar',str(tmp)],
+                stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,
+                errors='replace',preexec_fn=cpu_limit)
+              peak=0;forced=None
+              while proc.poll() is None:
+                try:
+                  status=pathlib.Path(f'/proc/{proc.pid}/status').read_text(errors='replace')
+                  m=re.search(r'^VmRSS:\s+(\d+)\s+kB',status,re.MULTILINE)
+                  if m:
+                    peak=max(peak,int(m.group(1)))
+                    if peak>800*1024:
+                      forced='RSS_EXCEEDED';proc.kill()
+                except (FileNotFoundError,ProcessLookupError): pass
+                if time.monotonic()-start>7:
+                  forced='TIMEOUT_7_SECONDS';proc.kill()
+                time.sleep(.012)
+              stdout,stderr=proc.communicate(timeout=2)
+              x['exit_code']=proc.returncode
+              x['sampled_peak_rss_kib']=peak or None
+              x['forced']=forced
+            except Exception as e:
+              x['exception']=type(e).__name__
+              x['exit_code']=None
+            after=resource.getrusage(resource.RUSAGE_CHILDREN)
+            x['user_cpu_seconds']=round(after.ru_utime-before.ru_utime,6)
+            x['system_cpu_seconds']=round(after.ru_stime-before.ru_stime,6)
+            x['wall_seconds']=round(time.monotonic()-start,6)
+            x['stdout_sha256']=hashlib.sha256(stdout.encode()).hexdigest()
+            x['stderr_sha256']=hashlib.sha256(stderr.encode()).hexdigest()
+            (receipt/'originals'/f'{idx:02d}.stdout').write_text(stdout)
+            (receipt/'originals'/f'{idx:02d}.stderr').write_text(stderr)
+            lines=[s.strip() for s in stdout.splitlines() if s.strip() and s.strip()!='success']
+            x['exact_unsat_lines']=sum(1 for s in lines if s=='unsat')
+            x['contains_error']=bool(re.search(r'unsupported|exception|\(error|error:',stdout+'\n'+stderr,re.I))
+            x['output_after_unsat_excerpt']=[]
+            if 'unsat' in lines:
+              i=lines.index('unsat')
+              x['output_after_unsat_excerpt']=lines[i+1:i+5]
+            if x.get('exit_code')!=0 or x.get('forced') or x['contains_error']:
+              x['status']='HOLD_EXECUTOR_OR_SOLVER'
+            elif not x['binary_syntax_candidate']:
+              x['status']='HOLD_OUT_OF_NARROW_BINARY_SCOPE'
+            elif x['exact_unsat_lines']!=1 or not x['output_after_unsat_excerpt']:
+              x['status']='HOLD_MISSING_INTERPOLANT_OUTPUT'
+            else:
+              x['status']='C2_CANDIDATE_OUTPUT_UNCHECKED'
+            results.append(x)
+          out={'scope':'POSTFIRST EXECUTOR REPAIR after initial uninitialized stdout/stderr; original 12 unchanged; index snippets exposed; no NEUMANN ownweight',
+               'upstream':repo,'upstream_commit':upstream,
+               'prereg_commit':'8ae6dc5f9b7127b72bfb7d5875a7501f8f780981',
+               'source_exposure':'INDEX_SNIPPET_EXPOSED',
+               'whole_goal_independent_validation':'NOT_RUN', 'historical_first_failed_run_id':40446804675,
+               'G1':'HOLD','global_Q1_Q7':'OPEN','results':results}
+          (receipt/'POSTFIRST_CROSS_AUTHOR_C2_RAW_EXECUTOR_REPAIR.json').write_text(json.dumps(out,sort_keys=True,indent=2))
+          print('COUNTS',json.dumps({k:sum(r.get('status')==k for r in results) for k in set(r['status'] for r in results)},sort_keys=True))
+          for r in results:
+            print('ROW',r['index'],r['source_path'],r['status'],r.get('exit_code'),repr(r.get('output_after_unsat_excerpt')))
+          PY
+      - name: Restore prior immutable raw C2 output (NOT current rerun)
+        uses: actions/download-artifact@v4
+        with:
+          name: neumann-g0-opensmt2-cross-author-executor-repair
+          run-id: 40446877079
+          repository: yoonsj0305/NEUMANN
+          github-token: ${{ github.token }}
+          path: first_artifact
+      - name: Run independent Z3 original Craig obligations on sealed prior specialist outputs
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check 'z3-solver==4.13.3.0'
+          python3 research/q3/discovery_policy/opensmt2_external_craig_postfirst_audit.py
+          test -s receipt/POSTFIRST_INDEPENDENT_CRAIG.json
+          sha256sum receipt/POSTFIRST_INDEPENDENT_CRAIG.json
+      - name: Store first immutable output receipt
+        if: always()
+        run: |
+          if test -d receipt; then
+            find receipt -type f ! -name 'sha256-manifest.txt' -print0 | sort -z | xargs -0 -r sha256sum > receipt/sha256-manifest.txt
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-g0-opensmt2-cross-author-executor-repair
+          path: |
+            receipt/FIRST_CROSS_AUTHOR_C2_RAW.json
+            receipt/originals
+            receipt/java.txt
+            receipt/upstream_git_identity.txt
+            receipt/POSTFIRST_INDEPENDENT_CRAIG.json
+            receipt/sha256-manifest.txt
+          if-no-files-found: error

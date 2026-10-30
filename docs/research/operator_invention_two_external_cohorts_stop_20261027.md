@@ -1,0 +1,26 @@
+# NEUMANN 1 — Two prospective semantic-operator expansions FAIL to generalize (2026-10-27)
+
+**Research decision: STOP manually enumerated semantic operator templates. Q1–Q7 all globally OPEN. NO new RC or PR.**
+
+The prior classical macro-selection study was 163/439 exact vs same-search classic 172/439, and exhaustive classic 439/439 on SYNTHETIC task-generated data. We tested a more realistic **externally authored**, executable typed semantic-operator mechanism, not a neural reranker, with separate ORIGINAL Microsoft PROSE DateTime task cohort freezes.
+
+| G0 REAL benchmark arm, first heldout output frozen | Eligible ORIGINAL tasks | Original classic full-task exact | Typed NEW exact | Hybrid exact | Incremental gain |
+|---|---:|---:|---:|---:|---:|
+| G1 limited Gregorian typed parser, DateTime.000017–.000028 | 11 | 0 | 0 | 0 | 0 |
+| G2 heterogeneous Gregorian parser+format algebra, DateTime.000029–.000040 | 11 | 3 | 0 | 3 | 0 |
+| Total, correlated SAME DateTime subdomain | **22** | **3** | **0** | **3** | **0** |
+
+**Actual chronology and first evidence**
+- G1 pre-source protocol code freeze at GitHub `b9acc7d54e4267b45fadd68b0d7064cd544f5bf7`, first prediction SHA256 `879ca03d0b0c0081dff10ddc185b1c273e2f8a90bd1883b27660155ff87e1f0c` sealed under GitHub `1c4cb942ff0e1f5e968a2f14f0a95c5c7d4292d8`, BEFORE opening original 4th/5th output gold.
+- G2 code `semantic_parser_induction.py` SHA256 `1050d8adbfe576cb4f0502bcbed5393f03134ae51400255efd14be98f93bafc9` and exact 12 untouched source IDs frozen at GitHub `1498a5ecb0ee42e6d984d346dfb3a18f30882df2`. First prediction SHA256 `c0482ec12ea6f5aa72c821fad89fd91cf80a51a0d91c64d034346ffb38f7fd49` sealed at GitHub `b32bfc4b52dd9e601e0374febe395cc5747893c2`, BEFORE original 4th/5th output labels.
+- G2 human-authored typed operation grammar has 18 generic Gregorian output meanings and two source-conditioned date-parse choices (max36 executable programs). It correctly source-fitted 9/11 G1 **previously opened DEVELOPMENT** problems after multi-format parse repair, but G2 independent original-source first predicted 0/11. This dramatic apparent in-dev improvement did **NOT** transfer to other DateTime programs (time formats, weekdays, HTML-ish strings etc). No neural weights, self-invention or global Q success.
+- Dijkstra strong C old source-only, 1800 expansions, max12 completed, original same source labels, found complete solutions on DateTime.000036/037/038, all exactly matched independently revealed fourth/fifth outputs. N added no new original external program. G2 source+future input transcription verified **12/12** against original independently re-fetched GitHub content and source blob SHA1, pre-gold. 
+- **Audit exception G1 DateTime.000020**: source fixture was manually misrepresented as two-element input though upstream normalized original input was scalar string. Its first3 original outputs are NULL so it was **INELIGIBLE** under prereg no matter what; 11/12 G1 original inputs verified, the 11 eligible correct. Preserve bad G1 first, no posthoc edit or extra score.
+- CPU from frozen first G2 local process one run: strong classic 11 tasks sum 101.08 ms; new typed 11 tasks 3.30 ms, but new typed solved **0** versus strong C's **3**; lower unproductive work is not better computing on same capability, and complete training/oracle/energy/RAM costs unknown.
+
+**Interpretation:** The ability to implement and execute a newly supplied semantic operator is NOT an ability of a model to invent, learn and transfer a new operator. More human-written calendar programs improve retrospective source fits and fail prospective test. Stop adding date/numeric/formatted-output DSL templates just to raise developer accuracy, and stop feeding those classes into yet another tiny neural ranker. Minimum meaningful next study: an **open-expression typed AST emitter with actual ownweight update from independent confirmed counterexamples**, stronger same-rights classical source/verification controls, shuffled task-group reward or target control and no exact program cache. New benchmark task families (not merely new IDs inside DateTime), frozen new original gold. A useful claim requires new semantically executable syntax outside pre-registered fixed grammar, transfer to entirely new tasks, A>B and A vs C on incremental verified capability or full normalized cost. No artificial PASS.
+
+## Executable code and provenance
+Complete conversation ZIP `NEUMANN1_OPERATOR_INVENTION_STOP_GATE_20261027.zip`, contains TWO first prediction JSONs, independently opened later original gold, strong classical C, G1 & G2 typed generators, source-only frozen fixtures, grade, PyTest and first replay, independent data quality exception and Codex next experiment brief. Local replay passes **21/21 SHA256 file checks** and **15/15 tests**, including first prediction behavior replay ignoring CPU time, and both original exact grades. FULL source is in ZIP; this GitHub file doesn't pretend weights or all files are on repo. Separate minimal admission logic actually committed under `research/q3/discovery_policy/operator_invention_admission_gate.py`.
+
+**State:** bounded parser templating FAILURE to add meaningful external capability, learned-semantic-invention OPEN, strong-classical-first retained, global Q1–Q7 OPEN.

@@ -1,0 +1,63 @@
+name: NEUMANN G0 SGI adversarial source-only witness DEV
+on:
+  push:
+    branches: [research/rc51-intelligence-spend-gate-20261026]
+    paths:
+      - .github/workflows/g0-sgi-adversarial-witness-dev-20261027.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  prove-disagreement:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/rc51-intelligence-spend-gate-20261026
+          persist-credentials: false
+      - name: Lock dev-only protocol
+        run: |
+          set -euo pipefail
+          test -s docs/research/G0_SGI_ADVERSARIAL_WITNESS_OPENED_DEV_PREREG_20261027.md
+          python3 -m py_compile research/q3/discovery_policy/sgi_adversarial_witness_opened_dev.py
+          sha256sum research/q3/discovery_policy/sgi_adversarial_witness_opened_dev.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-g0-sgi12-active-oracle-FIRST-UNgraded-20261027
+          run-id: 40456478489
+          repository: yoonsj0305/NEUMANN
+          github-token: ${{ github.token }}
+          path: previous_first
+      - name: Install independent Z3 and CVC5
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -qq -y cvc5
+          python3 -m pip -q install 'z3-solver==4.13.3.0'
+          cvc5 --version
+      - name: Build exact original identities then delete original labels
+        run: |
+          set -euo pipefail
+          echo 'a2713cee7e4a54506501927c07ff65f78d4ad110e4c9568892d937f3a0aa8185  previous_first/FIRST_PROPOSALS_AND_QUERY_DECISIONS_UNGRADED.json' | sha256sum -c
+          git init -q upstream
+          git -C upstream remote add origin https://github.com/Barnard-PL-Labs/sygus-sgi-1.git
+          git -C upstream fetch --depth 1 origin e7ae840e5546e9243ff94afb1a29064fc050011c
+          git -C upstream checkout -q --detach FETCH_HEAD
+          python3 research/q3/discovery_policy/sgi_adversarial_witness_opened_dev.py prepare
+          rm -rf upstream
+      - name: Search for exact counterprogram without original probe or future gold
+        run: |
+          set -euo pipefail
+          test ! -e upstream
+          python3 research/q3/discovery_policy/sgi_adversarial_witness_opened_dev.py propose
+          sha256sum adversarial_dev_first/DEV_V2_SEMANTIC_ADVERSARIAL_WITNESS.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-g0-sgi-adversarial-source-only-witness-opened-dev
+          path: |
+            adversarial_dev_first/*.json
+            adversarial_dev_first/*.stdout
+            adversarial_dev_first/*.stderr
+          if-no-files-found: warn

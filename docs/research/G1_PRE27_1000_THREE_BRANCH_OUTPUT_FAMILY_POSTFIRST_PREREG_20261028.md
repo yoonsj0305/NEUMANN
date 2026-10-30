@@ -1,0 +1,12 @@
+# NEUMANN 1 | POSTFIRST PRE_27_1000 published BV PBE three-output-algebra decomposition, 2026-10-28
+
+**NOT BLIND; NOT SOLVED; NO NEUMANN OWNWEIGHT SUCCESS.** Original `SyGuS-Org/benchmarks` pinned `13c8deb68a873635879c9a69bc78caebd340f646`, `lib/PBE_BV_Track/from_2018/PRE_27_1000.sl` was already opened and professional cvc5 1.4.2 **TIMEOUT** under exact 12s CPU initial native 16 original first. After reading its original 1,000 author supplied (x,y) constraints and source grammar helper functions `smol(x)=bvshl x #1`, simple descriptive analysis found each observed output belongs to exactly ONE of three source-expressible patterns:
+1. `(bvadd x #x0000000000000001)` with 665 provided rows;
+2. `(bvadd x (bvadd #x0000000000000001 #x0000000000000001))` with 234 rows;
+3. `(bvand x (smol x))` with 101 rows.
+
+All calculations use precise 64bit modulo semantics. 665+234+101=1000, but **this DOES NOT provide a unified executable program without the missing branch-selection conditions**. The 1000 finite labeled examples do not prove ANY ideal unseen target function or causal rule; all source example labels are known after opening. We will not claim solved unless a single grammar-derivable typed AST is independently checked against all 1000 original conditions.
+
+**Preregistered POSTFIRST verification contract**: Re-fetch exact original pinned source; parse exactly 1000 authored ground constraints and verify each x is distinct and each y exactly one of these three patterns, fail on any exception. Verify source syntactic presence of helper `smol` and allowed grammar operators `bvadd`, `bvand`, `im`, `smol` and literal `#x..1`. Analyze necessary but not sufficient guard observations: all 101 bitwise outputs occur only on x even and x bit16=1, all odd x with low two bits 01 correspond to +2, other non-bitwise samples to +1; do NOT assert these are sufficient. Preserve source path original SHA256, all 1000 per-example classification hash and exact totals, CPU, GitHub worker independent execution. Strong baseline CVC5 full original still not solved; no new neural training or test, no arbitrary extra oracle right. Keep last original source task **OPEN**.
+
+This is narrow **data/program-structure inference on opened external DEV**: reduces synthesis of all 1000 original examples to finding a selector over three known output expressions. May guide future source-aware compositional AST generator, but is neither finding selector nor proving a general new operation. Q1–Q7 OPEN, G1 HOLD/G2 NOT RUN and PR #616 DRAFT.

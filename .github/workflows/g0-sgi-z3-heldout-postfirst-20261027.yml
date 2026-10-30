@@ -1,0 +1,57 @@
+name: NEUMANN G0 SGI Z3 withheld original proof-check postfirst
+on:
+  push:
+    branches: [research/rc51-intelligence-spend-gate-20261026]
+    paths:
+      - .github/workflows/g0-sgi-z3-heldout-postfirst-20261027.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/g0-sgi-z3-heldout-postfirst-20261027.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  grade-frozen-source-only-solutions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/rc51-intelligence-spend-gate-20261026
+          persist-credentials: false
+      - name: Download immutable FIRST CVC5 stdout receipts only
+        uses: actions/download-artifact@v4
+        with:
+          name: neumann-g0-sgi-postfirst-selection-repair-CVC5-20261027
+          run-id: 40451797444
+          repository: yoonsj0305/NEUMANN
+          github-token: ${{ github.token }}
+          path: first_artifact
+      - name: Independently pin whole original source before grading
+        run: |
+          set -euo pipefail
+          git init -q upstream
+          git -C upstream remote add origin https://github.com/Barnard-PL-Labs/sygus-sgi-1.git
+          git -C upstream fetch --depth 1 origin e7ae840e5546e9243ff94afb1a29064fc050011c
+          git -C upstream checkout --detach -q FETCH_HEAD
+          test "$(git -C upstream rev-parse HEAD)" = e7ae840e5546e9243ff94afb1a29064fc050011c
+          echo "44047cd18e17e517cf0029329589411b997f53427d8fa3e152b044183d8524f0  first_artifact/FIRST_CVC5_SOURCE_ONLY.json" | sha256sum -c
+      - name: Install independent Z3 solver with pinned version
+        run: |
+          python3 -m pip install --disable-pip-version-check 'z3-solver==4.13.3.0'
+          python3 -c 'import z3; print("Z3",z3.get_version_string()); assert z3.get_version_string()=="4.13.3"'
+      - name: Verify earlier source-only candidates on original withheld and source constraints
+        run: |
+          set -euo pipefail
+          sha256sum research/q3/discovery_policy/sgi_postfirst_original_heldout_z3.py
+          python3 research/q3/discovery_policy/sgi_postfirst_original_heldout_z3.py
+          test -s verifier_receipts/POSTFIRST_INDEPENDENT_HELDOUT_Z3.json
+      - name: Preserve post-first verifier outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-g0-sgi-sourceonly-original-heldout-z3-audit-20261027
+          path: verifier_receipts/POSTFIRST_INDEPENDENT_HELDOUT_Z3.json
+          if-no-files-found: warn
