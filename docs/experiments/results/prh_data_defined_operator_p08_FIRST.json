@@ -1,0 +1,1087 @@
+{
+  "JEPA_train_or_inference": "NOT_RUN",
+  "contract": {
+    "base_seed": 20261103,
+    "draw_rule_ids": "default_rng(base_seed).choice(256, size=16, replace=False)",
+    "frozen_gate": {
+      "heldout_1d_exact": 48,
+      "heldout_2d_exact": 32,
+      "independent_rule_certificate_passes": 16,
+      "negative_controls_rejected": 5,
+      "unique_complete_operator_tables": 16
+    },
+    "global_q1_to_q7": "OPEN",
+    "jepa_or_neural_training": "NOT_RUN",
+    "negative_controls": [
+      "undercoverage",
+      "contradictory_label",
+      "wrong_output_shape",
+      "unsupported_alphabet",
+      "nonlocal_dependence"
+    ],
+    "no_conditional_resampling": true,
+    "novelty_scope": "novel_semantic_table_within_predeclared_local_stencil",
+    "schema": "neumann.prh.data-defined-local-op.p08.v1",
+    "stencil": "binary-radius-1-periodic",
+    "task_count": 16,
+    "test_1d_lengths": [
+      41,
+      53,
+      67
+    ],
+    "test_2d_shapes": [
+      [
+        4,
+        43
+      ],
+      [
+        7,
+        59
+      ]
+    ],
+    "train_lengths": [
+      19,
+      23,
+      29,
+      31,
+      37
+    ]
+  },
+  "energy_joules": null,
+  "environment": {
+    "machine": "x86_64",
+    "numpy": "2.3.5",
+    "python": "3.13.5"
+  },
+  "first_local_gate": "P08_CLOSED_STENCIL_OPERATOR_INDUCTION_PASS",
+  "flops": null,
+  "global_Q1_to_Q7": "OPEN",
+  "metrics": {
+    "baseline_catalog_tasks_exact": 16,
+    "catalog_candidate_programs_tested": 4096,
+    "catalog_train_replays": 4167,
+    "enumeration_plus_certificate_and_test_ns": 12856522,
+    "heldout_1d_exact": 48,
+    "heldout_2d_exact": 32,
+    "independent_certificates_passed": 16,
+    "induced_rule_ids_exact": 16,
+    "induction_plus_certificate_and_test_ns": 8173560,
+    "induction_train_cells_observed": 2224,
+    "negative_rejections": 5,
+    "unique_complete_tables": 16
+  },
+  "negative_control_expected_rejected": {
+    "contradictory_label": true,
+    "nonlocal_dependence": true,
+    "undercoverage": true,
+    "unsupported_alphabet": true,
+    "wrong_output_shape": true
+  },
+  "negative_controls": {
+    "contradictory_label": "ABSTAIN_CONTRADICTORY_LOCAL_RULE",
+    "nonlocal_dependence": "ABSTAIN_CONTRADICTORY_LOCAL_RULE",
+    "undercoverage": "ABSTAIN_INCOMPLETE_CONTEXT",
+    "unsupported_alphabet": "ABSTAIN_ALPHABET_OR_LENGTH",
+    "wrong_output_shape": "ABSTAIN_OUTPUT_SHAPE_OR_ALPHABET"
+  },
+  "open_ended_opcode_invention": "NOT_DEMONSTRATED",
+  "peak_ram_bytes": null,
+  "rows": [
+    {
+      "baseline_catalog": {
+        "candidates_scanned": 256,
+        "consistent_candidate_count": 1,
+        "enumeration_ns": 529159,
+        "train_replays": 261,
+        "unique_rule_id": 161
+      },
+      "baseline_heldout_all_correct": true,
+      "baseline_rule_correct": true,
+      "catalog_original_verification_and_test_ns": 244560,
+      "heldout_1d_exact": [
+        true,
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_truth_certificate": {
+        "complete": true,
+        "train_replay_exact": true,
+        "verified_entries": 8
+      },
+      "induced_rule_correct": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "op": "LOCAL_RULE8",
+          "radius": 1,
+          "table": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        "compile_and_replay_ns": 287453,
+        "coverage": [
+          15,
+          19,
+          16,
+          18,
+          19,
+          15,
+          18,
+          19
+        ],
+        "rule_id": 161,
+        "status": "INDUCED_COMPLETE_LOCAL_OPERATOR",
+        "train_cells_observed": 139
+      },
+      "original_verification_and_test_ns": 368153,
+      "reference_rule_for_independent_scorer_only": 161,
+      "task_index": 0,
+      "train_sha256": "9a928ce503e32ccf0959a65ac0a83c9c9b1508234b9c972648263b72b3360a76"
+    },
+    {
+      "baseline_catalog": {
+        "candidates_scanned": 256,
+        "consistent_candidate_count": 1,
+        "enumeration_ns": 585382,
+        "train_replays": 260,
+        "unique_rule_id": 36
+      },
+      "baseline_heldout_all_correct": true,
+      "baseline_rule_correct": true,
+      "catalog_original_verification_and_test_ns": 293752,
+      "heldout_1d_exact": [
+        true,
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_truth_certificate": {
+        "complete": true,
+        "train_replay_exact": true,
+        "verified_entries": 8
+      },
+      "induced_rule_correct": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "op": "LOCAL_RULE8",
+          "radius": 1,
+          "table": [
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0
+          ]
+        },
+        "compile_and_replay_ns": 207536,
+        "coverage": [
+          17,
+          17,
+          12,
+          19,
+          17,
+          14,
+          19,
+          24
+        ],
+        "rule_id": 36,
+        "status": "INDUCED_COMPLETE_LOCAL_OPERATOR",
+        "train_cells_observed": 139
+      },
+      "original_verification_and_test_ns": 353701,
+      "reference_rule_for_independent_scorer_only": 36,
+      "task_index": 1,
+      "train_sha256": "e92944cd17b9b442d03caa94a5bb67379ecc5a8be4e617fc0ddb34ad909d56c3"
+    },
+    {
+      "baseline_catalog": {
+        "candidates_scanned": 256,
+        "consistent_candidate_count": 1,
+        "enumeration_ns": 563119,
+        "train_replays": 260,
+        "unique_rule_id": 49
+      },
+      "baseline_heldout_all_correct": true,
+      "baseline_rule_correct": true,
+      "catalog_original_verification_and_test_ns": 277930,
+      "heldout_1d_exact": [
+        true,
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_truth_certificate": {
+        "complete": true,
+        "train_replay_exact": true,
+        "verified_entries": 8
+      },
+      "induced_rule_correct": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "op": "LOCAL_RULE8",
+          "radius": 1,
+          "table": [
+            1,
+            0,
+            0,
+            0,
+            1,
+            1,
+            0,
+            0
+          ]
+        },
+        "compile_and_replay_ns": 134358,
+        "coverage": [
+          18,
+          14,
+          15,
+          18,
+          14,
+          19,
+          18,
+          23
+        ],
+        "rule_id": 49,
+        "status": "INDUCED_COMPLETE_LOCAL_OPERATOR",
+        "train_cells_observed": 139
+      },
+      "original_verification_and_test_ns": 574306,
+      "reference_rule_for_independent_scorer_only": 49,
+      "task_index": 2,
+      "train_sha256": "94b7158949db623fd2510f491c2d8d9bdae6523e0314d7642335544b90918cbd"
+    },
+    {
+      "baseline_catalog": {
+        "candidates_scanned": 256,
+        "consistent_candidate_count": 1,
+        "enumeration_ns": 637549,
+        "train_replays": 261,
+        "unique_rule_id": 233
+      },
+      "baseline_heldout_all_correct": true,
+      "baseline_rule_correct": true,
+      "catalog_original_verification_and_test_ns": 237219,
+      "heldout_1d_exact": [
+        true,
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_truth_certificate": {
+        "complete": true,
+        "train_replay_exact": true,
+        "verified_entries": 8
+      },
+      "induced_rule_correct": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "op": "LOCAL_RULE8",
+          "radius": 1,
+          "table": [
+            1,
+            0,
+            0,
+            1,
+            0,
+            1,
+            1,
+            1
+          ]
+        },
+        "compile_and_replay_ns": 138404,
+        "coverage": [
+          25,
+          16,
+          13,
+          19,
+          16,
+          16,
+          19,
+          15
+        ],
+        "rule_id": 233,
+        "status": "INDUCED_COMPLETE_LOCAL_OPERATOR",
+        "train_cells_observed": 139
+      },
+      "original_verification_and_test_ns": 366911,
+      "reference_rule_for_independent_scorer_only": 233,
+      "task_index": 3,
+      "train_sha256": "cd08641e8315302cc62c94fcb5ee64c6a3841ff730d6c61b8e84a6b2f8d7c657"
+    },
+    {
+      "baseline_catalog": {
+        "candidates_scanned": 256,
+        "consistent_candidate_count": 1,
+        "enumeration_ns": 520216,
+        "train_replays": 260,
+        "unique_rule_id": 208
+      },
+      "baseline_heldout_all_correct": true,
+      "baseline_rule_correct": true,
+      "catalog_original_verification_and_test_ns": 236468,
+      "heldout_1d_exact": [
+        true,
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_truth_certificate": {
+        "complete": true,
+        "train_replay_exact": true,
+        "verified_entries": 8
+      },
+      "induced_rule_correct": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "op": "LOCAL_RULE8",
+          "radius": 1,
+          "table": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            1,
+            1
+          ]
+        },
+        "compile_and_replay_ns": 137863,
+        "coverage": [
+          13,
+          17,
+          16,
+          21,
+          17,
+          20,
+          21,
+          14
+        ],
+        "rule_id": 208,
+        "status": "INDUCED_COMPLETE_LOCAL_OPERATOR",
+        "train_cells_observed": 139
+      },
+      "original_verification_and_test_ns": 338649,
+      "reference_rule_for_independent_scorer_only": 208,
+      "task_index": 4,
+      "train_sha256": "a338111e94308f90df21332f2448780eda29b42aa6e52d38d14bb661fc82468d"
+    },
+    {
+      "baseline_catalog": {
+        "candidates_scanned": 256,
+        "consistent_candidate_count": 1,
+        "enumeration_ns": 547526,
+        "train_replays": 260,
+        "unique_rule_id": 115
+      },
+      "baseline_heldout_all_correct": true,
+      "baseline_rule_correct": true,
+      "catalog_original_verification_and_test_ns": 235657,
+      "heldout_1d_exact": [
+        true,
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_truth_certificate": {
+        "complete": true,
+        "train_replay_exact": true,
+        "verified_entries": 8
+      },
+      "induced_rule_correct": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "op": "LOCAL_RULE8",
+          "radius": 1,
+          "table": [
+            1,
+            1,
+            0,
+            0,
+            1,
+            1,
+            1,
+            0
+          ]
+        },
+        "compile_and_replay_ns": 127919,
+        "coverage": [
+          14,
+          16,
+          17,
+          18,
+          16,
+          19,
+          18,
+          21
+        ],
+        "rule_id": 115,
+        "status": "INDUCED_COMPLETE_LOCAL_OPERATOR",
+        "train_cells_observed": 139
+      },
+      "original_verification_and_test_ns": 323126,
+      "reference_rule_for_independent_scorer_only": 115,
+      "task_index": 5,
+      "train_sha256": "0f08278dee1a22bb92487d0a2dd0ba4a82432cf16d028bbb9980bc5708561669"
+    },
+    {
+      "baseline_catalog": {
+        "candidates_scanned": 256,
+        "consistent_candidate_count": 1,
+        "enumeration_ns": 545474,
+        "train_replays": 260,
+        "unique_rule_id": 145
+      },
+      "baseline_heldout_all_correct": true,
+      "baseline_rule_correct": true,
+      "catalog_original_verification_and_test_ns": 237089,
+      "heldout_1d_exact": [
+        true,
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_truth_certificate": {
+        "complete": true,
+        "train_replay_exact": true,
+        "verified_entries": 8
+      },
+      "induced_rule_correct": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "op": "LOCAL_RULE8",
+          "radius": 1,
+          "table": [
+            1,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1
+          ]
+        },
+        "compile_and_replay_ns": 131353,
+        "coverage": [
+          14,
+          16,
+          23,
+          16,
+          16,
+          23,
+          16,
+          15
+        ],
+        "rule_id": 145,
+        "status": "INDUCED_COMPLETE_LOCAL_OPERATOR",
+        "train_cells_observed": 139
+      },
+      "original_verification_and_test_ns": 344186,
+      "reference_rule_for_independent_scorer_only": 145,
+      "task_index": 6,
+      "train_sha256": "c26c260887bb13758811907f3632453fc1f2ca787a8ce5739327d6a12a057318"
+    },
+    {
+      "baseline_catalog": {
+        "candidates_scanned": 256,
+        "consistent_candidate_count": 1,
+        "enumeration_ns": 543380,
+        "train_replays": 260,
+        "unique_rule_id": 93
+      },
+      "baseline_heldout_all_correct": true,
+      "baseline_rule_correct": true,
+      "catalog_original_verification_and_test_ns": 338368,
+      "heldout_1d_exact": [
+        true,
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_truth_certificate": {
+        "complete": true,
+        "train_replay_exact": true,
+        "verified_entries": 8
+      },
+      "induced_rule_correct": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "op": "LOCAL_RULE8",
+          "radius": 1,
+          "table": [
+            1,
+            0,
+            1,
+            1,
+            1,
+            0,
+            1,
+            0
+          ]
+        },
+        "compile_and_replay_ns": 128339,
+        "coverage": [
+          16,
+          17,
+          16,
+          18,
+          17,
+          17,
+          18,
+          20
+        ],
+        "rule_id": 93,
+        "status": "INDUCED_COMPLETE_LOCAL_OPERATOR",
+        "train_cells_observed": 139
+      },
+      "original_verification_and_test_ns": 322465,
+      "reference_rule_for_independent_scorer_only": 93,
+      "task_index": 7,
+      "train_sha256": "fe4087baaba03e3fceacfa72d022d8c7b7e4eb95c346fbed32eeeef59a2ee431"
+    },
+    {
+      "baseline_catalog": {
+        "candidates_scanned": 256,
+        "consistent_candidate_count": 1,
+        "enumeration_ns": 522449,
+        "train_replays": 260,
+        "unique_rule_id": 211
+      },
+      "baseline_heldout_all_correct": true,
+      "baseline_rule_correct": true,
+      "catalog_original_verification_and_test_ns": 263949,
+      "heldout_1d_exact": [
+        true,
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_truth_certificate": {
+        "complete": true,
+        "train_replay_exact": true,
+        "verified_entries": 8
+      },
+      "induced_rule_correct": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "op": "LOCAL_RULE8",
+          "radius": 1,
+          "table": [
+            1,
+            1,
+            0,
+            0,
+            1,
+            0,
+            1,
+            1
+          ]
+        },
+        "compile_and_replay_ns": 136541,
+        "coverage": [
+          18,
+          24,
+          22,
+          14,
+          24,
+          12,
+          14,
+          11
+        ],
+        "rule_id": 211,
+        "status": "INDUCED_COMPLETE_LOCAL_OPERATOR",
+        "train_cells_observed": 139
+      },
+      "original_verification_and_test_ns": 337758,
+      "reference_rule_for_independent_scorer_only": 211,
+      "task_index": 8,
+      "train_sha256": "c98b00d2af6a43c2e76c2c0cc292b9eb679d75cffc39661a55880ff318df320e"
+    },
+    {
+      "baseline_catalog": {
+        "candidates_scanned": 256,
+        "consistent_candidate_count": 1,
+        "enumeration_ns": 554146,
+        "train_replays": 261,
+        "unique_rule_id": 240
+      },
+      "baseline_heldout_all_correct": true,
+      "baseline_rule_correct": true,
+      "catalog_original_verification_and_test_ns": 239513,
+      "heldout_1d_exact": [
+        true,
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_truth_certificate": {
+        "complete": true,
+        "train_replay_exact": true,
+        "verified_entries": 8
+      },
+      "induced_rule_correct": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "op": "LOCAL_RULE8",
+          "radius": 1,
+          "table": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1
+          ]
+        },
+        "compile_and_replay_ns": 126456,
+        "coverage": [
+          23,
+          17,
+          12,
+          16,
+          17,
+          11,
+          16,
+          27
+        ],
+        "rule_id": 240,
+        "status": "INDUCED_COMPLETE_LOCAL_OPERATOR",
+        "train_cells_observed": 139
+      },
+      "original_verification_and_test_ns": 319691,
+      "reference_rule_for_independent_scorer_only": 240,
+      "task_index": 9,
+      "train_sha256": "df42946f814696c5899bd9df3284e869b68a3fe3066a0a683ac56265f6aa9d96"
+    },
+    {
+      "baseline_catalog": {
+        "candidates_scanned": 256,
+        "consistent_candidate_count": 1,
+        "enumeration_ns": 534967,
+        "train_replays": 260,
+        "unique_rule_id": 172
+      },
+      "baseline_heldout_all_correct": true,
+      "baseline_rule_correct": true,
+      "catalog_original_verification_and_test_ns": 241225,
+      "heldout_1d_exact": [
+        true,
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_truth_certificate": {
+        "complete": true,
+        "train_replay_exact": true,
+        "verified_entries": 8
+      },
+      "induced_rule_correct": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "op": "LOCAL_RULE8",
+          "radius": 1,
+          "table": [
+            0,
+            0,
+            1,
+            1,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        "compile_and_replay_ns": 129340,
+        "coverage": [
+          14,
+          12,
+          19,
+          19,
+          12,
+          26,
+          19,
+          18
+        ],
+        "rule_id": 172,
+        "status": "INDUCED_COMPLETE_LOCAL_OPERATOR",
+        "train_cells_observed": 139
+      },
+      "original_verification_and_test_ns": 337848,
+      "reference_rule_for_independent_scorer_only": 172,
+      "task_index": 10,
+      "train_sha256": "9ea3c370980f144c6b11ad09045d3d44f6e7838398d05f6874149d8dcc2b0c5d"
+    },
+    {
+      "baseline_catalog": {
+        "candidates_scanned": 256,
+        "consistent_candidate_count": 1,
+        "enumeration_ns": 564932,
+        "train_replays": 260,
+        "unique_rule_id": 45
+      },
+      "baseline_heldout_all_correct": true,
+      "baseline_rule_correct": true,
+      "catalog_original_verification_and_test_ns": 240965,
+      "heldout_1d_exact": [
+        true,
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_truth_certificate": {
+        "complete": true,
+        "train_replay_exact": true,
+        "verified_entries": 8
+      },
+      "induced_rule_correct": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "op": "LOCAL_RULE8",
+          "radius": 1,
+          "table": [
+            1,
+            0,
+            1,
+            1,
+            0,
+            1,
+            0,
+            0
+          ]
+        },
+        "compile_and_replay_ns": 127238,
+        "coverage": [
+          17,
+          15,
+          22,
+          15,
+          15,
+          22,
+          15,
+          18
+        ],
+        "rule_id": 45,
+        "status": "INDUCED_COMPLETE_LOCAL_OPERATOR",
+        "train_cells_observed": 139
+      },
+      "original_verification_and_test_ns": 350456,
+      "reference_rule_for_independent_scorer_only": 45,
+      "task_index": 11,
+      "train_sha256": "04204c860c270533605f1b10236cda5e3756f5b32a3cf6fa30a80493054e43c3"
+    },
+    {
+      "baseline_catalog": {
+        "candidates_scanned": 256,
+        "consistent_candidate_count": 1,
+        "enumeration_ns": 531623,
+        "train_replays": 261,
+        "unique_rule_id": 22
+      },
+      "baseline_heldout_all_correct": true,
+      "baseline_rule_correct": true,
+      "catalog_original_verification_and_test_ns": 236668,
+      "heldout_1d_exact": [
+        true,
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_truth_certificate": {
+        "complete": true,
+        "train_replay_exact": true,
+        "verified_entries": 8
+      },
+      "induced_rule_correct": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "op": "LOCAL_RULE8",
+          "radius": 1,
+          "table": [
+            0,
+            1,
+            1,
+            0,
+            1,
+            0,
+            0,
+            0
+          ]
+        },
+        "compile_and_replay_ns": 134678,
+        "coverage": [
+          14,
+          20,
+          23,
+          16,
+          20,
+          19,
+          16,
+          11
+        ],
+        "rule_id": 22,
+        "status": "INDUCED_COMPLETE_LOCAL_OPERATOR",
+        "train_cells_observed": 139
+      },
+      "original_verification_and_test_ns": 341823,
+      "reference_rule_for_independent_scorer_only": 22,
+      "task_index": 12,
+      "train_sha256": "0d97f6f60933367673629e97aa56a06d97511df202007e42dd823693ef1cbd54"
+    },
+    {
+      "baseline_catalog": {
+        "candidates_scanned": 256,
+        "consistent_candidate_count": 1,
+        "enumeration_ns": 550431,
+        "train_replays": 261,
+        "unique_rule_id": 90
+      },
+      "baseline_heldout_all_correct": true,
+      "baseline_rule_correct": true,
+      "catalog_original_verification_and_test_ns": 238662,
+      "heldout_1d_exact": [
+        true,
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_truth_certificate": {
+        "complete": true,
+        "train_replay_exact": true,
+        "verified_entries": 8
+      },
+      "induced_rule_correct": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "op": "LOCAL_RULE8",
+          "radius": 1,
+          "table": [
+            0,
+            1,
+            0,
+            1,
+            1,
+            0,
+            1,
+            0
+          ]
+        },
+        "compile_and_replay_ns": 125926,
+        "coverage": [
+          21,
+          14,
+          18,
+          18,
+          14,
+          22,
+          18,
+          14
+        ],
+        "rule_id": 90,
+        "status": "INDUCED_COMPLETE_LOCAL_OPERATOR",
+        "train_cells_observed": 139
+      },
+      "original_verification_and_test_ns": 325049,
+      "reference_rule_for_independent_scorer_only": 90,
+      "task_index": 13,
+      "train_sha256": "06a5ea85ba819ceb11235c2d18184dea9c6b391a75ca0b056ed73a7ea592e345"
+    },
+    {
+      "baseline_catalog": {
+        "candidates_scanned": 256,
+        "consistent_candidate_count": 1,
+        "enumeration_ns": 552314,
+        "train_replays": 261,
+        "unique_rule_id": 244
+      },
+      "baseline_heldout_all_correct": true,
+      "baseline_rule_correct": true,
+      "catalog_original_verification_and_test_ns": 237961,
+      "heldout_1d_exact": [
+        true,
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_truth_certificate": {
+        "complete": true,
+        "train_replay_exact": true,
+        "verified_entries": 8
+      },
+      "induced_rule_correct": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "op": "LOCAL_RULE8",
+          "radius": 1,
+          "table": [
+            0,
+            0,
+            1,
+            0,
+            1,
+            1,
+            1,
+            1
+          ]
+        },
+        "compile_and_replay_ns": 130082,
+        "coverage": [
+          22,
+          20,
+          18,
+          15,
+          20,
+          13,
+          15,
+          16
+        ],
+        "rule_id": 244,
+        "status": "INDUCED_COMPLETE_LOCAL_OPERATOR",
+        "train_cells_observed": 139
+      },
+      "original_verification_and_test_ns": 490713,
+      "reference_rule_for_independent_scorer_only": 244,
+      "task_index": 14,
+      "train_sha256": "16f5d03243a93388e0fe9740741e13404cd64566a9762974c81b167bfe6f7722"
+    },
+    {
+      "baseline_catalog": {
+        "candidates_scanned": 256,
+        "consistent_candidate_count": 1,
+        "enumeration_ns": 514768,
+        "train_replays": 261,
+        "unique_rule_id": 71
+      },
+      "baseline_heldout_all_correct": true,
+      "baseline_rule_correct": true,
+      "catalog_original_verification_and_test_ns": 259101,
+      "heldout_1d_exact": [
+        true,
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_truth_certificate": {
+        "complete": true,
+        "train_replay_exact": true,
+        "verified_entries": 8
+      },
+      "induced_rule_correct": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "op": "LOCAL_RULE8",
+          "radius": 1,
+          "table": [
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            1,
+            0
+          ]
+        },
+        "compile_and_replay_ns": 151633,
+        "coverage": [
+          17,
+          20,
+          18,
+          19,
+          20,
+          17,
+          19,
+          9
+        ],
+        "rule_id": 71,
+        "status": "INDUCED_COMPLETE_LOCAL_OPERATOR",
+        "train_cells_observed": 139
+      },
+      "original_verification_and_test_ns": 323606,
+      "reference_rule_for_independent_scorer_only": 71,
+      "task_index": 15,
+      "train_sha256": "f6ce6d3c7d2ea272b6587bebc3a75accfd6b4528d53c4fe04a02749ea3d06bbe"
+    }
+  ],
+  "source_family": "synthetic_binary_radius1_periodic_CA",
+  "total_cost_scope": "CPU-region timers; do not infer hardware energy/FLOPs/VRAM or direct-model cost",
+  "total_cost_usd": null,
+  "total_study_wall_ns_including_synthetic_source_generation": 26191900
+}
