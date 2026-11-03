@@ -1,0 +1,1678 @@
+{
+  "JEPA": "NOT_RUN",
+  "contract": {
+    "allowed_boundary": [
+      "none",
+      "periodic",
+      "zero-pad"
+    ],
+    "allowed_radius": [
+      0,
+      1,
+      2
+    ],
+    "base_seed": 20261109,
+    "cases": [
+      [
+        0,
+        "none",
+        4
+      ],
+      [
+        1,
+        "periodic",
+        4
+      ],
+      [
+        1,
+        "zero-pad",
+        4
+      ],
+      [
+        2,
+        "periodic",
+        4
+      ],
+      [
+        2,
+        "zero-pad",
+        4
+      ]
+    ],
+    "gate": {
+      "complete_independent_correct": 20,
+      "negative_rejections": 7,
+      "one_d_exact": 40,
+      "two_d_exact": 40
+    },
+    "global_q1_to_q7": "OPEN",
+    "jepa": "NOT_RUN",
+    "negative_controls": [
+      "undercoverage",
+      "contradiction",
+      "shape",
+      "alphabet",
+      "radius3_nonlocal",
+      "bool_radius_ast",
+      "invalid_boundary_ast"
+    ],
+    "no_resampling_on_results": true,
+    "rule_sampling_seed": "base_seed+task_index*101",
+    "schema": "neumann.prh.local-structure-discovery.p09.v1",
+    "source_rule_condition": "outermost_left_and_right_bits_essential_for_radius_gt_0",
+    "test_1d_lengths": [
+      173,
+      211
+    ],
+    "test_2d_shapes": [
+      [
+        3,
+        181
+      ],
+      [
+        5,
+        199
+      ]
+    ],
+    "test_sampling_seed": "base_seed+task_index*101+911",
+    "train_lengths": [
+      89,
+      97,
+      113,
+      131,
+      149
+    ],
+    "train_sampling_seed": "base_seed+task_index*101+11"
+  },
+  "energy_joule": null,
+  "environment": {
+    "machine": "x86_64",
+    "numpy": "2.3.5",
+    "python": "3.13.5"
+  },
+  "first_local_gate": "P09_BOUNDED_SCOPE_DISCOVERY_PASS",
+  "flops": null,
+  "frontier_gap": "NOT_RUN",
+  "global_Q1_to_Q7": "OPEN",
+  "metrics": {
+    "complete_original_train_certificates": 20,
+    "exact_structure_and_table": 20,
+    "examinations_of_training_cells": 13822,
+    "full_induction_plus_verify_test_ns": 19990752,
+    "heldout_1d_exact": 40,
+    "heldout_2d_exact": 40,
+    "negative_controls_rejected": 7,
+    "restricted_baseline_ns_not_iso_capability": 7885843,
+    "restricted_fixed_radius1_periodic_solved": 8,
+    "trials_total": 68
+  },
+  "monetary_cost_usd": null,
+  "negative_controls": {
+    "alphabet": "ABSTAIN_BAD_INPUT_ALPHABET_OR_LENGTH",
+    "bool_radius_ast": "ABSTAIN_ILLTYPED_RADIUS",
+    "contradiction": "ABSTAIN_NO_UNIQUE_LOCAL_STRUCTURE",
+    "invalid_boundary_ast": "ABSTAIN_ILLTYPED_BOUNDARY",
+    "radius3_nonlocal": "ABSTAIN_NO_UNIQUE_LOCAL_STRUCTURE",
+    "shape": "ABSTAIN_BAD_OUTPUT_SHAPE_OR_ALPHABET",
+    "undercoverage": "ABSTAIN_NO_UNIQUE_LOCAL_STRUCTURE"
+  },
+  "negative_rejections": {
+    "alphabet": true,
+    "bool_radius_ast": true,
+    "contradiction": true,
+    "invalid_boundary_ast": true,
+    "radius3_nonlocal": true,
+    "shape": true,
+    "undercoverage": true
+  },
+  "open_ended_grammar_invention": "NOT_DEMONSTRATED",
+  "peak_ram_bytes": null,
+  "rows": [
+    {
+      "full_induction_plus_original_verify_and_test_ns": 700151,
+      "heldout_1d_exact": [
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_complete_structure_verified": true,
+      "independent_original_train_verified": true,
+      "induction": {
+        "ast": {
+          "boundary": "none",
+          "kind": "LOCAL_CA",
+          "radius": 0,
+          "table": [
+            1,
+            0
+          ]
+        },
+        "elapsed_ns": 445155,
+        "status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+        "trials": [
+          {
+            "boundary": "none",
+            "covered": 2,
+            "observations": 579,
+            "radius": 0,
+            "reason": "SUCCESS"
+          }
+        ]
+      },
+      "local_table_certificate_correct_entries": 2,
+      "reference_boundary_for_scorer_only": "none",
+      "reference_radius_for_scorer_only": 0,
+      "reference_table_sha256_for_scorer_only": "fad748aa45cceb7106caff3dd83175c7d1c0a42e88e9faec3b815e53725e65a3",
+      "restricted_fixed_radius1_periodic_heldout_all_correct": true,
+      "restricted_fixed_radius1_periodic_train_status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+      "restricted_induction_plus_test_ns": 942838,
+      "source_rule_sampling_attempts": 1,
+      "table_entries_total": 2,
+      "task_index": 0,
+      "training_pairs_sha256": "b3e0fdc29d2e254537ef043776cf61d291a0f37e303bf7bd11d42d0ca3c649ab"
+    },
+    {
+      "full_induction_plus_original_verify_and_test_ns": 635936,
+      "heldout_1d_exact": [
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_complete_structure_verified": true,
+      "independent_original_train_verified": true,
+      "induction": {
+        "ast": {
+          "boundary": "none",
+          "kind": "LOCAL_CA",
+          "radius": 0,
+          "table": [
+            0,
+            0
+          ]
+        },
+        "elapsed_ns": 395012,
+        "status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+        "trials": [
+          {
+            "boundary": "none",
+            "covered": 2,
+            "observations": 579,
+            "radius": 0,
+            "reason": "SUCCESS"
+          }
+        ]
+      },
+      "local_table_certificate_correct_entries": 2,
+      "reference_boundary_for_scorer_only": "none",
+      "reference_radius_for_scorer_only": 0,
+      "reference_table_sha256_for_scorer_only": "ab395cb4c41927dc03d8d0b9e1de32ba2761d97d7d85b9c89fc54ae3591dc0e1",
+      "restricted_fixed_radius1_periodic_heldout_all_correct": true,
+      "restricted_fixed_radius1_periodic_train_status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+      "restricted_induction_plus_test_ns": 790995,
+      "source_rule_sampling_attempts": 1,
+      "table_entries_total": 2,
+      "task_index": 1,
+      "training_pairs_sha256": "6f89fb11082386904bbeeb246c4c39fa4622bb704e77df4063df4803fe85c91d"
+    },
+    {
+      "full_induction_plus_original_verify_and_test_ns": 491424,
+      "heldout_1d_exact": [
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_complete_structure_verified": true,
+      "independent_original_train_verified": true,
+      "induction": {
+        "ast": {
+          "boundary": "none",
+          "kind": "LOCAL_CA",
+          "radius": 0,
+          "table": [
+            1,
+            1
+          ]
+        },
+        "elapsed_ns": 253854,
+        "status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+        "trials": [
+          {
+            "boundary": "none",
+            "covered": 2,
+            "observations": 579,
+            "radius": 0,
+            "reason": "SUCCESS"
+          }
+        ]
+      },
+      "local_table_certificate_correct_entries": 2,
+      "reference_boundary_for_scorer_only": "none",
+      "reference_radius_for_scorer_only": 0,
+      "reference_table_sha256_for_scorer_only": "e718fe8edf8a7c2917cd7444286b7048042a74abf5208f1d70933c08dbd6b7e9",
+      "restricted_fixed_radius1_periodic_heldout_all_correct": true,
+      "restricted_fixed_radius1_periodic_train_status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+      "restricted_induction_plus_test_ns": 777925,
+      "source_rule_sampling_attempts": 1,
+      "table_entries_total": 2,
+      "task_index": 2,
+      "training_pairs_sha256": "5d8f1060ea44aab16c71dd7a6e080355ba8e55662b715da21f73ecc209c9b59a"
+    },
+    {
+      "full_induction_plus_original_verify_and_test_ns": 485386,
+      "heldout_1d_exact": [
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_complete_structure_verified": true,
+      "independent_original_train_verified": true,
+      "induction": {
+        "ast": {
+          "boundary": "none",
+          "kind": "LOCAL_CA",
+          "radius": 0,
+          "table": [
+            0,
+            0
+          ]
+        },
+        "elapsed_ns": 249107,
+        "status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+        "trials": [
+          {
+            "boundary": "none",
+            "covered": 2,
+            "observations": 579,
+            "radius": 0,
+            "reason": "SUCCESS"
+          }
+        ]
+      },
+      "local_table_certificate_correct_entries": 2,
+      "reference_boundary_for_scorer_only": "none",
+      "reference_radius_for_scorer_only": 0,
+      "reference_table_sha256_for_scorer_only": "ab395cb4c41927dc03d8d0b9e1de32ba2761d97d7d85b9c89fc54ae3591dc0e1",
+      "restricted_fixed_radius1_periodic_heldout_all_correct": true,
+      "restricted_fixed_radius1_periodic_train_status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+      "restricted_induction_plus_test_ns": 767760,
+      "source_rule_sampling_attempts": 1,
+      "table_entries_total": 2,
+      "task_index": 3,
+      "training_pairs_sha256": "42467d40ff8c57624a33822b896bbca6a181e208b13033f1ba1d8e6860d9cbec"
+    },
+    {
+      "full_induction_plus_original_verify_and_test_ns": 1181290,
+      "heldout_1d_exact": [
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_complete_structure_verified": true,
+      "independent_original_train_verified": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "kind": "LOCAL_CA",
+          "radius": 1,
+          "table": [
+            0,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0
+          ]
+        },
+        "elapsed_ns": 631270,
+        "status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+        "trials": [
+          {
+            "boundary": "none",
+            "covered": 2,
+            "observations": 5,
+            "radius": 0,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 8,
+            "observations": 579,
+            "radius": 1,
+            "reason": "SUCCESS"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 8,
+            "observations": 430,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          }
+        ]
+      },
+      "local_table_certificate_correct_entries": 8,
+      "reference_boundary_for_scorer_only": "periodic",
+      "reference_radius_for_scorer_only": 1,
+      "reference_table_sha256_for_scorer_only": "b26e7e25fcb42c217fe28945ad57470617aceef150f852cffb9f16cf106d2c07",
+      "restricted_fixed_radius1_periodic_heldout_all_correct": true,
+      "restricted_fixed_radius1_periodic_train_status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+      "restricted_induction_plus_test_ns": 1486660,
+      "source_rule_sampling_attempts": 1,
+      "table_entries_total": 8,
+      "task_index": 4,
+      "training_pairs_sha256": "583de0707d5b4dc495f3b26f78ce4db1c180c40e0dd44b478c57f5a441a7193e"
+    },
+    {
+      "full_induction_plus_original_verify_and_test_ns": 1222742,
+      "heldout_1d_exact": [
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_complete_structure_verified": true,
+      "independent_original_train_verified": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "kind": "LOCAL_CA",
+          "radius": 1,
+          "table": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            0,
+            1
+          ]
+        },
+        "elapsed_ns": 701683,
+        "status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+        "trials": [
+          {
+            "boundary": "none",
+            "covered": 2,
+            "observations": 3,
+            "radius": 0,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 8,
+            "observations": 579,
+            "radius": 1,
+            "reason": "SUCCESS"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 8,
+            "observations": 579,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          }
+        ]
+      },
+      "local_table_certificate_correct_entries": 8,
+      "reference_boundary_for_scorer_only": "periodic",
+      "reference_radius_for_scorer_only": 1,
+      "reference_table_sha256_for_scorer_only": "29c2907016087eedd7f1fd9275a572b4c9902bb5cfe6f07012dee7d3fdfc968c",
+      "restricted_fixed_radius1_periodic_heldout_all_correct": true,
+      "restricted_fixed_radius1_periodic_train_status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+      "restricted_induction_plus_test_ns": 724336,
+      "source_rule_sampling_attempts": 1,
+      "table_entries_total": 8,
+      "task_index": 5,
+      "training_pairs_sha256": "480c615d97d57f04334879e3190a29af3887d7487c7e764968c9addc6c2bf07d"
+    },
+    {
+      "full_induction_plus_original_verify_and_test_ns": 1095742,
+      "heldout_1d_exact": [
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_complete_structure_verified": true,
+      "independent_original_train_verified": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "kind": "LOCAL_CA",
+          "radius": 1,
+          "table": [
+            0,
+            1,
+            1,
+            1,
+            1,
+            0,
+            1,
+            0
+          ]
+        },
+        "elapsed_ns": 579183,
+        "status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+        "trials": [
+          {
+            "boundary": "none",
+            "covered": 2,
+            "observations": 4,
+            "radius": 0,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 8,
+            "observations": 579,
+            "radius": 1,
+            "reason": "SUCCESS"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 5,
+            "observations": 6,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          }
+        ]
+      },
+      "local_table_certificate_correct_entries": 8,
+      "reference_boundary_for_scorer_only": "periodic",
+      "reference_radius_for_scorer_only": 1,
+      "reference_table_sha256_for_scorer_only": "be025cd71af941662508a5df34ecdba99b5225cba05710a1afe7dc55d529bfd0",
+      "restricted_fixed_radius1_periodic_heldout_all_correct": true,
+      "restricted_fixed_radius1_periodic_train_status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+      "restricted_induction_plus_test_ns": 785668,
+      "source_rule_sampling_attempts": 1,
+      "table_entries_total": 8,
+      "task_index": 6,
+      "training_pairs_sha256": "03b5d642ec1984506f8fc7c3b7c150565a48fdf3df50fb2893e56b2eeac7eb9a"
+    },
+    {
+      "full_induction_plus_original_verify_and_test_ns": 971430,
+      "heldout_1d_exact": [
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_complete_structure_verified": true,
+      "independent_original_train_verified": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "kind": "LOCAL_CA",
+          "radius": 1,
+          "table": [
+            0,
+            1,
+            1,
+            0,
+            1,
+            0,
+            0,
+            1
+          ]
+        },
+        "elapsed_ns": 491895,
+        "status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+        "trials": [
+          {
+            "boundary": "none",
+            "covered": 2,
+            "observations": 6,
+            "radius": 0,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 8,
+            "observations": 579,
+            "radius": 1,
+            "reason": "SUCCESS"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 8,
+            "observations": 89,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          }
+        ]
+      },
+      "local_table_certificate_correct_entries": 8,
+      "reference_boundary_for_scorer_only": "periodic",
+      "reference_radius_for_scorer_only": 1,
+      "reference_table_sha256_for_scorer_only": "c2a6fb6a86cca6091910d7bb9ab5b5be756e713e56b292575873ff8a857225f4",
+      "restricted_fixed_radius1_periodic_heldout_all_correct": true,
+      "restricted_fixed_radius1_periodic_train_status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+      "restricted_induction_plus_test_ns": 771286,
+      "source_rule_sampling_attempts": 1,
+      "table_entries_total": 8,
+      "task_index": 7,
+      "training_pairs_sha256": "4fbe1d441c5562378de25d93781ee3fd5d87239adc13be2ca58eb5e3f36f0fda"
+    },
+    {
+      "full_induction_plus_original_verify_and_test_ns": 972853,
+      "heldout_1d_exact": [
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_complete_structure_verified": true,
+      "independent_original_train_verified": true,
+      "induction": {
+        "ast": {
+          "boundary": "zero-pad",
+          "kind": "LOCAL_CA",
+          "radius": 1,
+          "table": [
+            1,
+            1,
+            1,
+            1,
+            0,
+            1,
+            0,
+            0
+          ]
+        },
+        "elapsed_ns": 668034,
+        "status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+        "trials": [
+          {
+            "boundary": "none",
+            "covered": 1,
+            "observations": 2,
+            "radius": 0,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 7,
+            "observations": 13,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 8,
+            "observations": 579,
+            "radius": 1,
+            "reason": "SUCCESS"
+          }
+        ]
+      },
+      "local_table_certificate_correct_entries": 8,
+      "reference_boundary_for_scorer_only": "zero-pad",
+      "reference_radius_for_scorer_only": 1,
+      "reference_table_sha256_for_scorer_only": "2927332b248bd1b0a41ecc65e57724f1a80a03d8215509069e381facc381c3df",
+      "restricted_fixed_radius1_periodic_heldout_all_correct": false,
+      "restricted_fixed_radius1_periodic_train_status": "ABSTAIN_NO_UNIQUE_LOCAL_STRUCTURE",
+      "restricted_induction_plus_test_ns": 64094,
+      "source_rule_sampling_attempts": 1,
+      "table_entries_total": 8,
+      "task_index": 8,
+      "training_pairs_sha256": "e63f02d76b8196899130cd74a2f05bf504bdfa8a42d141ffc644ac3c008a1495"
+    },
+    {
+      "full_induction_plus_original_verify_and_test_ns": 886685,
+      "heldout_1d_exact": [
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_complete_structure_verified": true,
+      "independent_original_train_verified": true,
+      "induction": {
+        "ast": {
+          "boundary": "zero-pad",
+          "kind": "LOCAL_CA",
+          "radius": 1,
+          "table": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            1,
+            1
+          ]
+        },
+        "elapsed_ns": 560315,
+        "status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+        "trials": [
+          {
+            "boundary": "none",
+            "covered": 2,
+            "observations": 3,
+            "radius": 0,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 8,
+            "observations": 187,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 8,
+            "observations": 579,
+            "radius": 1,
+            "reason": "SUCCESS"
+          }
+        ]
+      },
+      "local_table_certificate_correct_entries": 8,
+      "reference_boundary_for_scorer_only": "zero-pad",
+      "reference_radius_for_scorer_only": 1,
+      "reference_table_sha256_for_scorer_only": "e5e9f7323f023fb7aa3236fb88e82432390a05bc149322e1132207792785e3b6",
+      "restricted_fixed_radius1_periodic_heldout_all_correct": false,
+      "restricted_fixed_radius1_periodic_train_status": "ABSTAIN_NO_UNIQUE_LOCAL_STRUCTURE",
+      "restricted_induction_plus_test_ns": 121850,
+      "source_rule_sampling_attempts": 1,
+      "table_entries_total": 8,
+      "task_index": 9,
+      "training_pairs_sha256": "4fe4e5235a052930e2cd08bfd172e002ff9ecea2f08b034f3311b111ec64159b"
+    },
+    {
+      "full_induction_plus_original_verify_and_test_ns": 694062,
+      "heldout_1d_exact": [
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_complete_structure_verified": true,
+      "independent_original_train_verified": true,
+      "induction": {
+        "ast": {
+          "boundary": "zero-pad",
+          "kind": "LOCAL_CA",
+          "radius": 1,
+          "table": [
+            0,
+            0,
+            1,
+            1,
+            0,
+            1,
+            1,
+            1
+          ]
+        },
+        "elapsed_ns": 394210,
+        "status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+        "trials": [
+          {
+            "boundary": "none",
+            "covered": 2,
+            "observations": 12,
+            "radius": 0,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 8,
+            "observations": 12,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 8,
+            "observations": 579,
+            "radius": 1,
+            "reason": "SUCCESS"
+          }
+        ]
+      },
+      "local_table_certificate_correct_entries": 8,
+      "reference_boundary_for_scorer_only": "zero-pad",
+      "reference_radius_for_scorer_only": 1,
+      "reference_table_sha256_for_scorer_only": "3b07b0bc23372d78edcd235b257bedffe28c68d44446e438fdb227aca856acc9",
+      "restricted_fixed_radius1_periodic_heldout_all_correct": false,
+      "restricted_fixed_radius1_periodic_train_status": "ABSTAIN_NO_UNIQUE_LOCAL_STRUCTURE",
+      "restricted_induction_plus_test_ns": 95561,
+      "source_rule_sampling_attempts": 1,
+      "table_entries_total": 8,
+      "task_index": 10,
+      "training_pairs_sha256": "40c93ba5ad00e3883ae1598da7d5435a7ff8ead0bb308f0ff9f26e8af37e4cb2"
+    },
+    {
+      "full_induction_plus_original_verify_and_test_ns": 835581,
+      "heldout_1d_exact": [
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_complete_structure_verified": true,
+      "independent_original_train_verified": true,
+      "induction": {
+        "ast": {
+          "boundary": "zero-pad",
+          "kind": "LOCAL_CA",
+          "radius": 1,
+          "table": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1
+          ]
+        },
+        "elapsed_ns": 410645,
+        "status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+        "trials": [
+          {
+            "boundary": "none",
+            "covered": 2,
+            "observations": 6,
+            "radius": 0,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 8,
+            "observations": 90,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 8,
+            "observations": 579,
+            "radius": 1,
+            "reason": "SUCCESS"
+          }
+        ]
+      },
+      "local_table_certificate_correct_entries": 8,
+      "reference_boundary_for_scorer_only": "zero-pad",
+      "reference_radius_for_scorer_only": 1,
+      "reference_table_sha256_for_scorer_only": "358a268fde92333a7e87365ff92e27753335c9ff9fc385601c0487f1fd828cc9",
+      "restricted_fixed_radius1_periodic_heldout_all_correct": false,
+      "restricted_fixed_radius1_periodic_train_status": "ABSTAIN_NO_UNIQUE_LOCAL_STRUCTURE",
+      "restricted_induction_plus_test_ns": 84705,
+      "source_rule_sampling_attempts": 1,
+      "table_entries_total": 8,
+      "task_index": 11,
+      "training_pairs_sha256": "f711e75a5be6d9bbf554ccfce11e46de2d067c1dddc0582e578064300bdf1c49"
+    },
+    {
+      "full_induction_plus_original_verify_and_test_ns": 1409967,
+      "heldout_1d_exact": [
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_complete_structure_verified": true,
+      "independent_original_train_verified": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "kind": "LOCAL_CA",
+          "radius": 2,
+          "table": [
+            1,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            1,
+            1,
+            0,
+            0,
+            1,
+            1,
+            0,
+            0
+          ]
+        },
+        "elapsed_ns": 639251,
+        "status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+        "trials": [
+          {
+            "boundary": "none",
+            "covered": 2,
+            "observations": 4,
+            "radius": 0,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 6,
+            "observations": 7,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 3,
+            "observations": 4,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 32,
+            "observations": 579,
+            "radius": 2,
+            "reason": "SUCCESS"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 25,
+            "observations": 48,
+            "radius": 2,
+            "reason": "CONTRADICTION"
+          }
+        ]
+      },
+      "local_table_certificate_correct_entries": 32,
+      "reference_boundary_for_scorer_only": "periodic",
+      "reference_radius_for_scorer_only": 2,
+      "reference_table_sha256_for_scorer_only": "0de07fd1c4cb242ec8e08d4c2d2e13bc9e658a47078d05a3c2c995a27389b3f7",
+      "restricted_fixed_radius1_periodic_heldout_all_correct": false,
+      "restricted_fixed_radius1_periodic_train_status": "ABSTAIN_NO_UNIQUE_LOCAL_STRUCTURE",
+      "restricted_induction_plus_test_ns": 59477,
+      "source_rule_sampling_attempts": 1,
+      "table_entries_total": 32,
+      "task_index": 12,
+      "training_pairs_sha256": "72f4c544d7996198052be893c938c1c597caf82ede01786baf66de136a13bf10"
+    },
+    {
+      "full_induction_plus_original_verify_and_test_ns": 1477547,
+      "heldout_1d_exact": [
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_complete_structure_verified": true,
+      "independent_original_train_verified": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "kind": "LOCAL_CA",
+          "radius": 2,
+          "table": [
+            0,
+            0,
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            1,
+            0,
+            1,
+            0
+          ]
+        },
+        "elapsed_ns": 746409,
+        "status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+        "trials": [
+          {
+            "boundary": "none",
+            "covered": 2,
+            "observations": 3,
+            "radius": 0,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 3,
+            "observations": 4,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 3,
+            "observations": 4,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 32,
+            "observations": 579,
+            "radius": 2,
+            "reason": "SUCCESS"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 32,
+            "observations": 186,
+            "radius": 2,
+            "reason": "CONTRADICTION"
+          }
+        ]
+      },
+      "local_table_certificate_correct_entries": 32,
+      "reference_boundary_for_scorer_only": "periodic",
+      "reference_radius_for_scorer_only": 2,
+      "reference_table_sha256_for_scorer_only": "8fa0b941dbd62a09fdb44826ab2907ea2abb9aa52ca4c1aac25d932f13406070",
+      "restricted_fixed_radius1_periodic_heldout_all_correct": false,
+      "restricted_fixed_radius1_periodic_train_status": "ABSTAIN_NO_UNIQUE_LOCAL_STRUCTURE",
+      "restricted_induction_plus_test_ns": 57594,
+      "source_rule_sampling_attempts": 1,
+      "table_entries_total": 32,
+      "task_index": 13,
+      "training_pairs_sha256": "e7f6c5c1f95ebe8216753b73cf2f829f7b032677722861e7da35bfebcf4d4133"
+    },
+    {
+      "full_induction_plus_original_verify_and_test_ns": 1306704,
+      "heldout_1d_exact": [
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_complete_structure_verified": true,
+      "independent_original_train_verified": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "kind": "LOCAL_CA",
+          "radius": 2,
+          "table": [
+            0,
+            0,
+            1,
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            1,
+            1,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "elapsed_ns": 627454,
+        "status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+        "trials": [
+          {
+            "boundary": "none",
+            "covered": 2,
+            "observations": 6,
+            "radius": 0,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 5,
+            "observations": 6,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 5,
+            "observations": 6,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 32,
+            "observations": 579,
+            "radius": 2,
+            "reason": "SUCCESS"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 30,
+            "observations": 89,
+            "radius": 2,
+            "reason": "CONTRADICTION"
+          }
+        ]
+      },
+      "local_table_certificate_correct_entries": 32,
+      "reference_boundary_for_scorer_only": "periodic",
+      "reference_radius_for_scorer_only": 2,
+      "reference_table_sha256_for_scorer_only": "35c6896ac819483cadac71aa2f6a0ba1fbeadb98c024dde13072649b74324245",
+      "restricted_fixed_radius1_periodic_heldout_all_correct": false,
+      "restricted_fixed_radius1_periodic_train_status": "ABSTAIN_NO_UNIQUE_LOCAL_STRUCTURE",
+      "restricted_induction_plus_test_ns": 56705,
+      "source_rule_sampling_attempts": 1,
+      "table_entries_total": 32,
+      "task_index": 14,
+      "training_pairs_sha256": "42bc25f6a4c6a6e0dd191e82bc43d35292b9e7d09b18c7ef13b1572d7dfe74c4"
+    },
+    {
+      "full_induction_plus_original_verify_and_test_ns": 1486690,
+      "heldout_1d_exact": [
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_complete_structure_verified": true,
+      "independent_original_train_verified": true,
+      "induction": {
+        "ast": {
+          "boundary": "periodic",
+          "kind": "LOCAL_CA",
+          "radius": 2,
+          "table": [
+            0,
+            1,
+            1,
+            1,
+            1,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            0,
+            1,
+            0,
+            0,
+            1,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            0
+          ]
+        },
+        "elapsed_ns": 651710,
+        "status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+        "trials": [
+          {
+            "boundary": "none",
+            "covered": 2,
+            "observations": 6,
+            "radius": 0,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 5,
+            "observations": 7,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 6,
+            "observations": 7,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 32,
+            "observations": 579,
+            "radius": 2,
+            "reason": "SUCCESS"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 32,
+            "observations": 89,
+            "radius": 2,
+            "reason": "CONTRADICTION"
+          }
+        ]
+      },
+      "local_table_certificate_correct_entries": 32,
+      "reference_boundary_for_scorer_only": "periodic",
+      "reference_radius_for_scorer_only": 2,
+      "reference_table_sha256_for_scorer_only": "651cf703aea6d983711ad11dd8c9d595491afecec9a37e29e76520e12eeee67c",
+      "restricted_fixed_radius1_periodic_heldout_all_correct": false,
+      "restricted_fixed_radius1_periodic_train_status": "ABSTAIN_NO_UNIQUE_LOCAL_STRUCTURE",
+      "restricted_induction_plus_test_ns": 57184,
+      "source_rule_sampling_attempts": 1,
+      "table_entries_total": 32,
+      "task_index": 15,
+      "training_pairs_sha256": "8515a559d18087268d7127f55d81d45ba93d222f9e99084351bde9aa206e403a"
+    },
+    {
+      "full_induction_plus_original_verify_and_test_ns": 949108,
+      "heldout_1d_exact": [
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_complete_structure_verified": true,
+      "independent_original_train_verified": true,
+      "induction": {
+        "ast": {
+          "boundary": "zero-pad",
+          "kind": "LOCAL_CA",
+          "radius": 2,
+          "table": [
+            1,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            0,
+            1,
+            0,
+            1,
+            1,
+            0,
+            1,
+            1,
+            1,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            1,
+            1,
+            0,
+            0
+          ]
+        },
+        "elapsed_ns": 580605,
+        "status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+        "trials": [
+          {
+            "boundary": "none",
+            "covered": 1,
+            "observations": 2,
+            "radius": 0,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 5,
+            "observations": 6,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 5,
+            "observations": 6,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 19,
+            "observations": 21,
+            "radius": 2,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 32,
+            "observations": 579,
+            "radius": 2,
+            "reason": "SUCCESS"
+          }
+        ]
+      },
+      "local_table_certificate_correct_entries": 32,
+      "reference_boundary_for_scorer_only": "zero-pad",
+      "reference_radius_for_scorer_only": 2,
+      "reference_table_sha256_for_scorer_only": "7a95bb0ebb5e823562966181040c52d6479f72466948b3115d7131be48f3fd66",
+      "restricted_fixed_radius1_periodic_heldout_all_correct": false,
+      "restricted_fixed_radius1_periodic_train_status": "ABSTAIN_NO_UNIQUE_LOCAL_STRUCTURE",
+      "restricted_induction_plus_test_ns": 58045,
+      "source_rule_sampling_attempts": 1,
+      "table_entries_total": 32,
+      "task_index": 16,
+      "training_pairs_sha256": "300030433cec8459729ec5060de7f44cbf6ed09e29935f7561238a3193df0082"
+    },
+    {
+      "full_induction_plus_original_verify_and_test_ns": 931612,
+      "heldout_1d_exact": [
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_complete_structure_verified": true,
+      "independent_original_train_verified": true,
+      "induction": {
+        "ast": {
+          "boundary": "zero-pad",
+          "kind": "LOCAL_CA",
+          "radius": 2,
+          "table": [
+            1,
+            1,
+            0,
+            0,
+            1,
+            1,
+            0,
+            1,
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0
+          ]
+        },
+        "elapsed_ns": 566945,
+        "status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+        "trials": [
+          {
+            "boundary": "none",
+            "covered": 2,
+            "observations": 3,
+            "radius": 0,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 6,
+            "observations": 9,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 6,
+            "observations": 9,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 13,
+            "observations": 20,
+            "radius": 2,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 32,
+            "observations": 579,
+            "radius": 2,
+            "reason": "SUCCESS"
+          }
+        ]
+      },
+      "local_table_certificate_correct_entries": 32,
+      "reference_boundary_for_scorer_only": "zero-pad",
+      "reference_radius_for_scorer_only": 2,
+      "reference_table_sha256_for_scorer_only": "6d71c9bf05138e8d85df34263751531d7f0c790d23c87168486435cff575342f",
+      "restricted_fixed_radius1_periodic_heldout_all_correct": false,
+      "restricted_fixed_radius1_periodic_train_status": "ABSTAIN_NO_UNIQUE_LOCAL_STRUCTURE",
+      "restricted_induction_plus_test_ns": 57905,
+      "source_rule_sampling_attempts": 1,
+      "table_entries_total": 32,
+      "task_index": 17,
+      "training_pairs_sha256": "4be398700c95adf320773ac1ea03c8dab48f4f936072c36ca4f43eb2b2cb169d"
+    },
+    {
+      "full_induction_plus_original_verify_and_test_ns": 1254937,
+      "heldout_1d_exact": [
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_complete_structure_verified": true,
+      "independent_original_train_verified": true,
+      "induction": {
+        "ast": {
+          "boundary": "zero-pad",
+          "kind": "LOCAL_CA",
+          "radius": 2,
+          "table": [
+            1,
+            0,
+            0,
+            1,
+            1,
+            1,
+            0,
+            1,
+            0,
+            1,
+            1,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            1,
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            1,
+            1
+          ]
+        },
+        "elapsed_ns": 855950,
+        "status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+        "trials": [
+          {
+            "boundary": "none",
+            "covered": 1,
+            "observations": 4,
+            "radius": 0,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 5,
+            "observations": 11,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 5,
+            "observations": 11,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 30,
+            "observations": 88,
+            "radius": 2,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 32,
+            "observations": 579,
+            "radius": 2,
+            "reason": "SUCCESS"
+          }
+        ]
+      },
+      "local_table_certificate_correct_entries": 32,
+      "reference_boundary_for_scorer_only": "zero-pad",
+      "reference_radius_for_scorer_only": 2,
+      "reference_table_sha256_for_scorer_only": "dab94d80d2caf1a2a1606400f58c51951218f78d3ed1c74e76950b11a0015d8f",
+      "restricted_fixed_radius1_periodic_heldout_all_correct": false,
+      "restricted_fixed_radius1_periodic_train_status": "ABSTAIN_NO_UNIQUE_LOCAL_STRUCTURE",
+      "restricted_induction_plus_test_ns": 64416,
+      "source_rule_sampling_attempts": 1,
+      "table_entries_total": 32,
+      "task_index": 18,
+      "training_pairs_sha256": "c35609e79ab9b6434c1459af9896e219694041b83bd83446bbea6e776b11a560"
+    },
+    {
+      "full_induction_plus_original_verify_and_test_ns": 1000905,
+      "heldout_1d_exact": [
+        true,
+        true
+      ],
+      "heldout_2d_exact": [
+        true,
+        true
+      ],
+      "independent_complete_structure_verified": true,
+      "independent_original_train_verified": true,
+      "induction": {
+        "ast": {
+          "boundary": "zero-pad",
+          "kind": "LOCAL_CA",
+          "radius": 2,
+          "table": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            1,
+            1,
+            0,
+            1,
+            1,
+            0,
+            1,
+            0,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            0,
+            1,
+            1
+          ]
+        },
+        "elapsed_ns": 600384,
+        "status": "INFERRED_UNIQUE_LOCAL_STRUCTURE",
+        "trials": [
+          {
+            "boundary": "none",
+            "covered": 2,
+            "observations": 5,
+            "radius": 0,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 7,
+            "observations": 17,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 7,
+            "observations": 17,
+            "radius": 1,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "periodic",
+            "covered": 31,
+            "observations": 90,
+            "radius": 2,
+            "reason": "CONTRADICTION"
+          },
+          {
+            "boundary": "zero-pad",
+            "covered": 32,
+            "observations": 579,
+            "radius": 2,
+            "reason": "SUCCESS"
+          }
+        ]
+      },
+      "local_table_certificate_correct_entries": 32,
+      "reference_boundary_for_scorer_only": "zero-pad",
+      "reference_radius_for_scorer_only": 2,
+      "reference_table_sha256_for_scorer_only": "9ef598fabcfac693616b7ac6f29c371431ba248162239904cc5e905d1c66ed4d",
+      "restricted_fixed_radius1_periodic_heldout_all_correct": false,
+      "restricted_fixed_radius1_periodic_train_status": "ABSTAIN_NO_UNIQUE_LOCAL_STRUCTURE",
+      "restricted_induction_plus_test_ns": 60839,
+      "source_rule_sampling_attempts": 1,
+      "table_entries_total": 32,
+      "task_index": 19,
+      "training_pairs_sha256": "b545754b1e5a0a9338a5fc1fc1e05fe794e57b38645d2d9ef4eb185bb2ba6338"
+    }
+  ],
+  "strong_classical_match": "EXACT_ADAPTIVE_SEARCH_IS_ITSELF_CLASSICAL_DIRECT",
+  "total_study_cpu_wall_ns_including_source_generation": 51913543
+}
