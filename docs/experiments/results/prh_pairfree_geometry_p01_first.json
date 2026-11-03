@@ -1,0 +1,66 @@
+{
+  "cells": {
+    "independent_world_sets": {
+      "candidate_count": 128,
+      "complete_pairfree_wall_ns": 1919476,
+      "geometry_consistency_error": 0.248495244482501,
+      "mean_fingerprint_distance": 0.2957591478449991,
+      "pairfree_correct": null,
+      "pairfree_r1": null,
+      "raw_coordinate_correct": null,
+      "raw_coordinate_r1": null
+    },
+    "new_sensor_iid": {
+      "candidate_count": 128,
+      "complete_pairfree_wall_ns": 1945013,
+      "geometry_consistency_error": 0.014336050696472044,
+      "mean_fingerprint_distance": 0.12337916515123037,
+      "pairfree_correct": 128,
+      "pairfree_r1": 1.0,
+      "raw_coordinate_correct": 8,
+      "raw_coordinate_r1": 0.0625
+    },
+    "new_sensor_sparse": {
+      "candidate_count": 128,
+      "complete_pairfree_wall_ns": 1693800,
+      "geometry_consistency_error": 0.01710596540527139,
+      "mean_fingerprint_distance": 0.12385090759748721,
+      "pairfree_correct": 118,
+      "pairfree_r1": 0.921875,
+      "raw_coordinate_correct": 6,
+      "raw_coordinate_r1": 0.046875
+    }
+  },
+  "contract": {
+    "base_seed": 20261104,
+    "cases_per_cell": 128,
+    "controls": [
+      "raw-coordinate-dot-product",
+      "independent-world-sets"
+    ],
+    "dimension": 8,
+    "gate": {
+      "new_sensor_r1_min": 0.75,
+      "new_sensor_sparse_r1_min": 0.5
+    },
+    "global_questions_closed": [],
+    "gold_pair_ids_as_input": false,
+    "new_training": false,
+    "observation_noise_std": 0.035,
+    "schema": "neumann.prh.pairfree-geometry.p01.v1",
+    "stage": "OPENED_DEVELOPMENT_FIRST_RUN_ONLY"
+  },
+  "cost_usd": null,
+  "energy_joule": null,
+  "environment": {
+    "numpy": "2.3.5",
+    "python": "3.13.5"
+  },
+  "flops": null,
+  "independent_task_verification": "NOT_RUN",
+  "jepa_training": "NOT_RUN",
+  "new_executable_program": "NOT_DISCOVERED",
+  "peak_memory_bytes": null,
+  "q1_to_q7": "OPEN",
+  "result": "P01_RELATIONAL_ALIGNMENT_LOCAL_PASS"
+}
