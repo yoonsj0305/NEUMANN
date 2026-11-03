@@ -1,0 +1,117 @@
+{
+  "complete_iso_capability": "NOT_MEASURED",
+  "contract": {
+    "claims": {
+      "frontier_gap": false,
+      "global_q1_to_q7": "OPEN",
+      "jepa_run": false,
+      "new_operator_invented": false
+    },
+    "fallback": "ABSTAIN_ON_NO_PROGRAM_OR_AMBIGUOUS_TEST_PREDICTIONS",
+    "fixture_source": "fchollet/ARC-AGI data/training, Apache-2.0",
+    "schema": "neumann.prh.arc.program-probe.p03.v1",
+    "stage": "OPENED_DEVELOPMENT_NOT_HOLDOUT",
+    "task_ids": [
+      "007bbfb7",
+      "08ed6ac7",
+      "0d3d703e",
+      "05f2a901"
+    ],
+    "test_outputs_for_selection": false,
+    "test_outputs_for_training": false
+  },
+  "energy_joule": null,
+  "flops": null,
+  "global_q1_to_q7": "OPEN",
+  "jepa_training": "NOT_RUN",
+  "new_program_invention": "NOT_DEMONSTRATED",
+  "opened_dev_solved": 3,
+  "opened_dev_total": 4,
+  "peak_memory_bytes": null,
+  "rows": [
+    {
+      "candidate_count": 12,
+      "prediction_status": [
+        "PREDICT_UNANIMOUS"
+      ],
+      "program_evaluations": 20,
+      "programs": [
+        "kron_nonzero_first",
+        "kron_nonzero_second"
+      ],
+      "search_plus_prediction_wall_ns": 826029,
+      "search_status": "CANDIDATES_FOUND",
+      "source": "official public ARC-AGI-1 training/opened development",
+      "synthetic": false,
+      "task_id": "007bbfb7",
+      "task_solved": true,
+      "test_count": 1,
+      "test_exact": [
+        true
+      ],
+      "train_count": 5
+    },
+    {
+      "candidate_count": 12,
+      "prediction_status": [
+        "PREDICT_UNANIMOUS"
+      ],
+      "program_evaluations": 13,
+      "programs": [
+        "column_rank_by_height"
+      ],
+      "search_plus_prediction_wall_ns": 563288,
+      "search_status": "CANDIDATES_FOUND",
+      "source": "official public ARC-AGI-1 training/opened development",
+      "synthetic": false,
+      "task_id": "08ed6ac7",
+      "task_solved": true,
+      "test_count": 1,
+      "test_exact": [
+        true
+      ],
+      "train_count": 2
+    },
+    {
+      "candidate_count": 13,
+      "prediction_status": [
+        "PREDICT_UNANIMOUS"
+      ],
+      "program_evaluations": 16,
+      "programs": [
+        "inferred_color_map"
+      ],
+      "search_plus_prediction_wall_ns": 306086,
+      "search_status": "CANDIDATES_FOUND",
+      "source": "official public ARC-AGI-1 training/opened development",
+      "synthetic": false,
+      "task_id": "0d3d703e",
+      "task_solved": true,
+      "test_count": 1,
+      "test_exact": [
+        true
+      ],
+      "train_count": 4
+    },
+    {
+      "candidate_count": 12,
+      "prediction_status": [
+        "ABSTAIN_NO_PROGRAM"
+      ],
+      "program_evaluations": 12,
+      "programs": [],
+      "search_plus_prediction_wall_ns": 312806,
+      "search_status": "ABSTAIN_NO_PROGRAM",
+      "source": "official public ARC-AGI-1 training/opened development",
+      "synthetic": false,
+      "task_id": "05f2a901",
+      "task_solved": false,
+      "test_count": 1,
+      "test_exact": [
+        false
+      ],
+      "train_count": 3
+    }
+  ],
+  "unavailable_task_ids": []
+}
