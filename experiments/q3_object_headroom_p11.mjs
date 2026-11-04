@@ -96,6 +96,23 @@ function objectOp(g,rule,style,adj){
  if(style==="bboxFill"||style==="bboxBorder"){for(let r=b.r0;r<=b.r1;r++)for(let c=b.c0;c<=b.c1;c++)if(style==="bboxFill"||r===b.r0||r===b.r1||c===b.c0||c===b.c1)z[r][c]=o.color;return z;}
  return null;
 }
+function relationalMove(g,role,gapTarget){
+ const objects=components(g,4);
+ if(objects.length!==2||objects[0].area===objects[1].area)return null;
+ const m=role==="largest"?(objects[0].area>objects[1].area?objects[0]:objects[1]):(objects[0].area<objects[1].area?objects[0]:objects[1]);
+ const a=objects[0]===m?objects[1]:objects[0],M=m.box,A=a.box;
+ const rowOverlap=Math.max(M.r0,A.r0)<=Math.min(M.r1,A.r1);
+ const colOverlap=Math.max(M.c0,A.c0)<=Math.min(M.c1,A.c1);
+ let dr=0,dc=0,clearance=-1;
+ if(colOverlap&&!rowOverlap){if(M.r1<A.r0){clearance=A.r0-M.r1-1;dr=clearance-gapTarget;}else{clearance=M.r0-A.r1-1;dr=gapTarget-clearance;}}
+ else if(rowOverlap&&!colOverlap){if(M.c1<A.c0){clearance=A.c0-M.c1-1;dc=clearance-gapTarget;}else{clearance=M.c0-A.c1-1;dc=gapTarget-clearance;}}
+ else return null;
+ if(clearance<gapTarget)return null;
+ const out=copy(g);
+ for(const [r,c]of m.points)out[r][c]=0;
+ for(const [r,c]of m.points){const rr=r+dr,cc=c+dc;if(rr<0||cc<0||rr>=g.length||cc>=g[0].length||out[rr][cc]!==0)return null;out[rr][cc]=m.color;}
+ return out;
+}
 function inferPalette(srcs,train){
  const mapping={};for(let i=0;i<srcs.length;i++){
  const x=srcs[i],y=grid(train[i].output);
@@ -106,13 +123,14 @@ function inferPalette(srcs,train){
  return mapping;
 }
 function applyPalette(g,map){if(!g)return null;let out=[];for(let r=0;r<g.length;r++){let row=[];for(let c=0;c<g[0].length;c++){const k=g[r][c];if(!Object.prototype.hasOwnProperty.call(map,k))return null;row.push(map[k]);}out.push(row);}return out;}
-function programFn(steps){return raw=>{let g=grid(raw);if(!g)return null;for(const step of steps){g=step.kind==="grid"?applyGrid(g,step.op):objectOp(g,step.selector,step.style,step.adj);if(!grid(g))return null;}return g;};}
+function programFn(steps){return raw=>{let g=grid(raw);if(!g)return null;for(const step of steps){g=step.kind==="grid"?applyGrid(g,step.op):step.kind==="rel"?relationalMove(g,step.role,step.clearance):objectOp(g,step.selector,step.style,step.adj);if(!grid(g))return null;}return g;};}
 function allCandidates(arm){
  const single=GRIDOPS.map(op=>[{kind:"grid",op}]);
  const pairs=[];for(let a of GRIDOPS)for(let b of GRIDOPS)if(a!=="id"&&b!=="id")pairs.push([{kind:"grid",op:a},{kind:"grid",op:b}]);
  const base=single.concat(pairs);
  if(arm==="A")return base.slice(0,SPEC.maxHypotheses);
  const objs=[];
+ for(const role of ["largest","smallest"])for(let clearance=0;clearance<=4;clearance++)objs.push([{kind:"rel",role,clearance}]);
  for(const adj of [4,8])for(const selector of ["largest","smallest","top","bottom","left","right","wide","tall"])
  for(const style of ["crop","mask","erase","bboxCrop","bboxFill","bboxBorder"]){
   objs.push([{kind:"object",adj,selector,style}]);
