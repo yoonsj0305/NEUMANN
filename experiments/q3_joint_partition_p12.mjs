@@ -99,18 +99,17 @@ function propose(train,testInputs){
  trace.programs=fits.slice(0,3).map(x=>({ast:x.ast,map:x.p}));trace.elapsed_ms=Date.now()-t0;
  return {prediction:predicted,trace};
 }
-function evaluate(task,existingEvaluate,existingPropose){
- const base=existingEvaluate(task);
- // Baseline B is independently computed by the frozen earlier engine.
- const testInputs=task.test.map(x=>x.input);
- const earlier=existingPropose(task.train,testInputs,"B");
- if(!equal(earlier.proposals===null?[]:earlier.proposals,earlier.proposals===null?[]:earlier.proposals))throw Error("invalid");
- const J=earlier.proposals!==null?{prediction:earlier.proposals,trace:{skipped_due_to_baseline:true,attempted:0,elapsed_ms:0}}:propose(task.train,testInputs);
- const reference=task.test.map(x=>x.output); // accessed only after both proposers finished
+function evaluate(task,existingPropose){
+ // The two frozen baseline arms and joint proposer receive train + test INPUTS ONLY.
+ const inputOnly=task.test.map(x=>x.input);
+ const A=existingPropose(task.train,inputOnly,"A");
+ const B=existingPropose(task.train,inputOnly,"B");
+ const J=B.proposals!==null?{prediction:B.proposals,trace:{skipped_due_to_baseline:true,attempted:0,elapsed_ms:0}}:propose(task.train,inputOnly);
+ const reference=task.test.map(x=>x.output); // opened strictly after proposals
  const exact=p=>p!==null&&p.length===reference.length&&p.every((x,i)=>equal(x,reference[i]));
- const j=exact(J.prediction),b=exact(earlier.proposals);
- if(b!==base.B_exact)throw Error("baseline re-evaluation inconsistency");
- return {base_A:base.A_exact,base_B:base.B_exact,J_exact:j,additional:j&&!b,baseline_lost:b&&!j,base_B_trace:base.B_trace,joint_trace:J.trace,test_count:task.test.length};
+ const a=exact(A.proposals),b=exact(B.proposals),j=exact(J.prediction);
+ return {base_A:a,base_B:b,J_exact:j,additional:j&&!b,baseline_lost:b&&!j,
+         base_A_trace:A.trace,base_B_trace:B.trace,joint_trace:J.trace,test_count:task.test.length};
 }
 function fnv32(s){let h=2166136261;for(let i=0;i<s.length;i++)h=Math.imul(h^s.charCodeAt(i),16777619)>>>0;return h>>>0;}
 function cohort(filenames,excludes){const ban=new Set(excludes);return filenames.filter(x=>x.endsWith(".json")&&!ban.has(x)).map(name=>({name,v:fnv32("neumann-q3-p12-20261105|"+name)})).sort((a,b)=>a.v-b.v||a.name.localeCompare(b.name)).slice(0,24).map(x=>x.name);}
