@@ -1,0 +1,91 @@
+{
+  "schema": "neumann.q3.verified-candidate-operator-registry.v1",
+  "version": "2026-11-05",
+  "purpose": "provenance-aware research-only operator catalog, not a production self-improving learner",
+  "first_teacher_source": "experiments/q3_teacher_generated_p13_FIRST_PROPOSAL.mjs",
+  "first_teacher_blob_sha": "52bf8a757c7315951ef9a50f527949cb74ba506a",
+  "first_teacher_model": "GPT-6 external teacher in ChatGPT conversation",
+  "gold_not_model_visible_before_source_commit": true,
+  "original_replay": "docs/experiments/results/q3_teacher_generated_p13_INDEPENDENT_AUDIT.json",
+  "metamorphic_evidence": "docs/experiments/results/q3_teacher_generated_p13_METAMORPHIC_AUDIT.json",
+  "library_transfer_first": "docs/experiments/results/q3_operator_library_p14_FIRST_COMPLETE.json",
+  "status": "RESEARCH_ONLY",
+  "guards": [
+    "NO_PRODUCTION_IMPORT",
+    "NO_UNTRUSTED_SOURCE_EXECUTION",
+    "FULL_ORIGINAL_TASK_TRAIN_CHECK_REQUIRED",
+    "ABSTAIN_ON_AMBIGUITY",
+    "NO_MODEL_COST_PROOF"
+  ],
+  "entries": [
+    {
+      "source_id": "6aa20dc0",
+      "semantic_name": "oriented-scaled-motif-fill",
+      "type": "Grid -> Grid",
+      "expression": "infer three-color 3x3 motif, identify endpoint colors and unique filler; place rotated/reflected/repeated filler motif between paired anchor squares at same scale",
+      "preconditions": [
+        "dominant background",
+        "unique multicolor motif",
+        "two endpoint colors with square components",
+        "unambiguous matching",
+        "no destination collisions"
+      ],
+      "original_test_grids_exact": 1,
+      "original_train_grids_exact": 3,
+      "novel_primitive_in_computer_science": "NOT_CLAIMED"
+    },
+    {
+      "source_id": "25ff71a9",
+      "semantic_name": "nonwrapping-shift-down",
+      "type": "Grid -> Grid",
+      "expression": "shift every row down exactly one, replacing top row with zeros and dropping last row",
+      "preconditions": [
+        "rectangular <=30x30 integer grid"
+      ],
+      "original_test_grids_exact": 2,
+      "original_train_grids_exact": 4,
+      "novel_primitive_in_computer_science": "NO"
+    },
+    {
+      "source_id": "6430c8c4",
+      "semantic_name": "separator-split-empty-intersection",
+      "type": "Grid -> Grid",
+      "expression": "split into equal upper/lower layers across uniform separator; mark only coordinates that are empty in both",
+      "preconditions": [
+        "odd grid height",
+        "uniform separator row color 4",
+        "0-as-empty and output marker 3 inferred from examples"
+      ],
+      "original_test_grids_exact": 1,
+      "original_train_grids_exact": 4,
+      "novel_primitive_in_computer_science": "NO"
+    },
+    {
+      "source_id": "6d0160f0",
+      "semantic_name": "marker-indexed-block-relocation",
+      "type": "Grid -> Grid",
+      "expression": "find sole marker 4 in an 11x11 3x3-block grid separated by 5; copy the marked source block to the destination block indexed by marker position inside its source block",
+      "preconditions": [
+        "11x11 block grid",
+        "row/column separators color5",
+        "exactly one marker4",
+        "marker inside block not separator"
+      ],
+      "original_test_grids_exact": 1,
+      "original_train_grids_exact": 4,
+      "novel_primitive_in_computer_science": "NOT_CLAIMED"
+    }
+  ],
+  "summary": {
+    "original_public_task_exact": 4,
+    "original_public_test_grids_exact": 5,
+    "train_grids_exact": 15,
+    "metamorphic_transformations_exact": 52,
+    "unseen_public_library_transfer_task_exact": 0,
+    "unseen_public_library_transfer_task_total": 24,
+    "unseen_library_false_accepted": 0,
+    "full_total_cost_status": "UNKNOWN",
+    "Q1_Q7": "OPEN"
+  },
+  "next_admission": "learn operator proposal semantics and applicability, verify in task-disjoint natural families against strong Direct, account teacher discovery amortization; never promote merely from a source cache"
+}
