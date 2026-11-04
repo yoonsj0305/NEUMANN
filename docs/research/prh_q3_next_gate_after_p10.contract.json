@@ -1,0 +1,94 @@
+{
+  "schema": "neumann.q3.next-critical-gate.v1",
+  "date_registered": "2026-11-05",
+  "global_objective": "Frontier-level problem solving with minimum necessary computation",
+  "authority": "docs/research/frozen_north_star.md",
+  "prior_p10_verdict": "FAIL_NO_TRANSFER_SIGNAL",
+  "prior_p10_outcomes": {
+    "baseline": 0,
+    "cascade": 0,
+    "cohort": 32
+  },
+  "status": "DESIGNED_NOT_RUN",
+  "global_Q1_Q7": "OPEN",
+  "no_sealed_data_authorized": true,
+  "primary_hypothesis": "A learned representation or discovered executable macro must recover original-task capability above a strongly matched classical program synthesizer, not merely align views or reduce parameter count.",
+  "arms": [
+    {
+      "id": "A",
+      "name": "STRONG_CLASSICAL_DIRECT",
+      "spec": "Optimized typed enumeration with source-conditioned dynamic composition under identical input/output examples, primitive budget, checker and search ceiling."
+    },
+    {
+      "id": "B",
+      "name": "OBJECT_RELATIONAL_ABSTRACTION",
+      "spec": "Same strong classical synthesizer plus typed objects, topology and relations; no neural training; all parsing, induction and verification counted."
+    },
+    {
+      "id": "C",
+      "name": "LEARNED_GOOD_VIEWS_OPTIONAL",
+      "spec": "Exactly B plus learned representation proposals only if registered capability gap exists; train/serve/checkpoint costs fully counted. Can be eliminated if no capability or Pareto gain."
+    }
+  ],
+  "preconditions": [
+    "Source rights, training provenance and immutable task identifiers vetted",
+    "Opened development, locked validation and independent original-task checker separated",
+    "Near-duplicate/leakage audit; no scored tasks used for candidate edits",
+    "Same checker and execution authority for all arms",
+    "Frozen detailed total-cost instrumentation and timeouts",
+    "At least one predeclared task family with strong Direct verified capability gap, otherwise no neural expansion"
+  ],
+  "bounded_experiment_contract": {
+    "original_task_success": "entire original task exact output including shape and every test input",
+    "new_structure": "verifier-checkable typed executable AST or reusable macro not supplied as a task-specific answer",
+    "independence": "gold rule, oracle test answer and source label never enter candidate generation",
+    "novelty_audit": "compare synthesized AST semantics and equivalence class with all supplied primitive/macro templates; only compositional novelty can be claimed if all primitive semantics are human supplied",
+    "cost_axes": [
+      "measured CPU wall ns",
+      "peak RSS bytes",
+      "GPU allocation bytes when applicable",
+      "estimated or measured FLOPs with provenance",
+      "joules when metered",
+      "dollars when known",
+      "model and verifier calls",
+      "failed attempts",
+      "training amortization"
+    ],
+    "initial_stop": "If neither B nor C improves original-task success over A under a frozen search budget, retain FAIL and stop scaling/architecture embellishment",
+    "evidence_rule": "First actual result immutable; no threshold retuning, favorable seed selection or evaluation set re-use",
+    "degraded_mode": "ABSTAIN; only independently verified traditional Direct may provide a fallback result, counted separately",
+    "global_Q3": "OPEN",
+    "global_Q4": "OPEN",
+    "global_Q5": "OPEN",
+    "global_Q6": "OPEN",
+    "global_Q7": "OPEN"
+  },
+  "cost_criterion": "No 10x claim without strong Direct iso-capability full pipeline. Do not compute software raw-material Idiot Index without a meaningful material basis.",
+  "work_breakdown_estimates_hours": [
+    {
+      "task": "Spec and audit original-task interfaces",
+      "hours_estimate": 2
+    },
+    {
+      "task": "Strong classical baseline with reproducible verifier",
+      "hours_estimate": 6
+    },
+    {
+      "task": "Typed semantic representations and explicit ablation",
+      "hours_estimate": 8
+    },
+    {
+      "task": "Fresh cohort pre-registration and first evaluation",
+      "hours_estimate": 4
+    },
+    {
+      "task": "Independent replay, cost audit and first-only decision",
+      "hours_estimate": 4
+    },
+    {
+      "task": "Integration/contingency buffer",
+      "hours_estimate": 6
+    }
+  ],
+  "estimates_not_deadlines": true
+}
