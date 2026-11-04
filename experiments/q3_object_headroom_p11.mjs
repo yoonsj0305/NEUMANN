@@ -116,9 +116,9 @@ function allCandidates(arm){
  for(const adj of [4,8])for(const selector of ["largest","smallest","top","bottom","left","right","wide","tall"])
  for(const style of ["crop","mask","erase","bboxCrop","bboxFill","bboxBorder"]){
   objs.push([{kind:"object",adj,selector,style}]);
-  if(style==="crop"||style==="bboxCrop")objs.push([{kind:"object",adj,selector,style},{kind:"grid",op:"rot90"}]);
+  for(const op of ["cropNZ","rot90","rot180","transpose","flipH","flipV"])objs.push([{kind:"object",adj,selector,style},{kind:"grid",op}]);
  }
- return base.concat(objs).slice(0,SPEC.maxHypotheses);
+ return base.slice(0,260).concat(objs).slice(0,SPEC.maxHypotheses);
 }
 function propose(train,testInputs,arm){
  const t0=Date.now();
