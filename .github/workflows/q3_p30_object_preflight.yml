@@ -1,0 +1,19 @@
+name: NEUMANN P3.0 object-relational semantic generalization preflight
+on:
+  push:
+    branches:
+      - research/q3-p30-relational-object-language-20261105
+    paths:
+      - .github/workflows/q3_p30_object_preflight.yml
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Source-only generalization, anti-memorization and abstention
+        run: node --test tests/test_q3_p30_object_rewrite_language.mjs
