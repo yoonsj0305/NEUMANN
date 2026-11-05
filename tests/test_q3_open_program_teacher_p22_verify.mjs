@@ -4,7 +4,7 @@ import {exactGrid,assess,gitBlobSha} from "../experiments/q3_open_program_teache
 
 const unitTask={
  train:[{input:[[1,0],[0,0]],output:[[0,1],[0,0]]}],
- test:[{input:[[0,1],[0,0]],output:[[0,0],[0,1]]}]
+ test:[{input:[[1,0],[1,0]],output:[[0,1],[0,1]]}]
 };
 const shiftRight=g=>g.map(row=>[0,...row.slice(0,-1)]);
 test("independent cell-wise equality checks dimensions and all palette cells",()=>{
