@@ -3,7 +3,7 @@ import json
 import sys
 from pathlib import Path
 import numpy as np
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'experiments'))
 from q3_operator_good_views_p17 import CONTRACT, ALL_OPS, execute, pair_batch, make_split
 
