@@ -51,6 +51,22 @@ jobs:
           assert d["new_architecture_multiplier_executed"] is False
           print("Result:",d["result"])
           PY
+      - name: Test previously proven strongest 12/12 static tool without neural calls
+        run: python -m unittest -v tests.test_am2_strong_matched_baseline_admission
+      - name: Recheck original strong-baseline saturation and fail the unnecessary +2 capability spend
+        run: |
+          set -euo pipefail
+          python -m experiments.am2_strong_matched_baseline_admission > am2-strong-tool-12of12.json
+          python - <<'PY'
+          import json
+          x=json.load(open("am2-strong-tool-12of12.json"))
+          assert x["statistics"]["TOOL"]["original_solved"] == 12
+          assert x["statistics"]["NEUMANN"]["original_solved"] == 12
+          assert not x["plus_two_accuracy_gate_possible"]
+          assert x["max_extra_accuracy_with_this_toolbox"] == 0
+          assert x["source_git_blob"] == "8440a8dc13fa8084fd48407462deb7ef41c5e715"
+          print("STRONGEST_MATCHED_OPENED_12_OF_12",x["decision"])
+          PY
       - name: Preserve actual first model-free controls
         if: always()
         uses: actions/upload-artifact@v4
@@ -59,5 +75,6 @@ jobs:
           path: |
             am2-first-model-free-opened.json
             am2-no-headroom.json
+            am2-strong-tool-12of12.json
           if-no-files-found: warn
           retention-days: 90
