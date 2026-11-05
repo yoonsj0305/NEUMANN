@@ -1,0 +1,42 @@
+{
+  "schema": "neumann.q3.rc39.active-causal-discovery.prereg.v1",
+  "date": "2026-11-06",
+  "problem": "Learn sparse conditional remote READ_REL instructions from one labeled satisfying witness and membership oracle; compare query and CPU cost against same-rights classical methods.",
+  "status": "PREREGISTERED_BEFORE_INDEPENDENT_TEST_AUTHOR_AND_FIRST_HELDOUT",
+  "fixed_task_family": "Output center B -> A iff all hidden exact character tests (offset, symbol) are satisfied. Symbols ABC, positive witness center B, noncenter length 2R positions, no other conditions.",
+  "human_supplied_prior": [
+    "sparse exact character conjunction",
+    "relative READ_REL host interpreter",
+    "safe oracle query with positive witness",
+    "assumption that unknown target belongs to fixed family"
+  ],
+  "learned": "Specific dependency offsets and required symbols discovered by source-only group perturbations. No pretrained neural network; classical algorithm.",
+  "development_source": "One explicitly identified local exploratory pilot used R=512,k=4, discovered 4/4, 75 membership oracle calls, single-site classical 1025. Pilot not heldout and not used as Q3 evidence.",
+  "test_author_first": "Separate author task source created ONLY AFTER these learner source bytes and prereg are committed. Fixed heldout count 12, R=512 (1024 candidate positions) with sparse k=0..4 and independent seeds. No favorable parameter changes after original grade.",
+  "positive_witness_cost": "One externally supplied exact labeled positive string, not counted as learned discovery; one actual confirmation query counted for both arms.",
+  "task_seeds_policy": "12 tasks derived from author-held separate seed namespace; exact individual offsets/types not passed to proposer; first source proposals frozen and hashed before independent author grade.",
+  "preregistered_goals": {
+    "exact_induced_programs_min": 12,
+    "original_task_count": 12,
+    "programs_match_oracle_full_spec": 12,
+    "group_query_reduction_over_single_site_min": 10,
+    "strong_equal_rights_classical_group_test_expected": "parity",
+    "oracle_cost_unit": "one membership call",
+    "number_of_independent_generated_test_words_per_task_min": 100,
+    "negative_controls": [
+      "no satisfying witness -> ABSTAIN",
+      "low query budget -> ABSTAIN",
+      "XOR nonconjunction -> ABSTAIN if witnessed"
+    ],
+    "all_domain_proof": "Conditioned on exact hidden (offset,symbol) mapping, inductive pointwise equality for all finite strings and all valid indices; not unqualified proof on arbitrary unknown black box."
+  },
+  "nogo": [
+    "No 10x all-in compute/energy claim from oracle count",
+    "No claim human-free opcode/metagrammar invention",
+    "No Q6 external independently authored family",
+    "No Q3/Q4/Q7 closure if classical equal-rights also succeeds"
+  ],
+  "degraded_mode": "ABSTAIN if source missing, budget exceeded, malformed oracle, contradiction, unsupported grammar evidence",
+  "last_ARC_public_evaluation_reserve": "DO NOT ACCESS, 11 IDs unregistered in 12 cohort manifests; historical unmanifested exposure unknown",
+  "independent_grader_policy": "Separate author module, after source frozen, independent reference semantics and process-time; no label leaks via program inputs."
+}
