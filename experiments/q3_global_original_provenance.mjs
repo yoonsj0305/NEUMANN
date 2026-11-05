@@ -88,12 +88,26 @@ export function admitNewOriginalIds(registry,ids){
  if(ids.length>registry.remaining_unscored)throw Error("EXCEEDS_LAST_UNOPENED_ORIGINAL_BUDGET");
  return {admitted:true,new_unique_originals:ids.length,remaining_after:registry.remaining_unscored-ids.length};
 }
+/** Strict admission of an unmodified manifest from a new prospective experiment.
+ * Call before any original TEST data body is opened, never after first scoring.
+ */
+export function admitManifest(registry,manifestPath) {
+ const doc=read(manifestPath);
+ const ids=doc.ids;
+ if(doc.source_folder!=="data/evaluation"||
+    doc.upstream_commit!=="399030444e0ab0cc8b4e199870fb20b863846f34"||
+    doc.filename_selection_only!==true)
+  throw Error("NEW_COHORT_SOURCE_OR_PROTOCOL_NOT_FROZEN");
+ const result=admitNewOriginalIds(registry,ids);
+ return {...result,source_manifest_sha256:sha256(fs.readFileSync(manifestPath)),
+  note:"Preflight admission only; no claim of model generalization or original scoring"};
+}
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
- if(process.argv.length!==3){console.error("Usage: node experiments/q3_global_original_provenance.mjs PINNED_ARC_ROOT");process.exitCode=2;}
+ if(process.argv.length<3||process.argv.length>4){console.error("Usage: node experiments/q3_global_original_provenance.mjs PINNED_ARC_ROOT [NEW_COHORT_MANIFEST.json]");process.exitCode=2;}
  else{try {
   const output=computeRegistry(process.argv[2]);
   // Never leak future first evaluation filenames into a printed report.
   const {alreadyUsed,...publicReceipt}=output;
-  console.log(JSON.stringify(publicReceipt,null,2));
+  console.log(JSON.stringify(process.argv[3]?{global_registry:publicReceipt,new_cohort_admission:admitManifest(output,process.argv[3])}:publicReceipt,null,2));
  }catch(e){console.error(String(e.stack||e));process.exitCode=1;}}
 }
