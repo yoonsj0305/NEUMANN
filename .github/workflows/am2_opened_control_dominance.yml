@@ -23,6 +23,20 @@ jobs:
         run: python -m unittest -v tests.test_am2_dual_plane_runtime
       - name: Test AM2 dual-plane candidate parity and authority isolation
         run: python -m unittest -v tests.test_am2_dual_plane_semantic_parity
+      - name: Certify no new semantic hypothesis before GPU spend
+        run: |
+          set -euo pipefail
+          python -m experiments.am2_same_hypothesis_kill_gate > am2-no-headroom.json
+          python - <<'PY'
+          import json
+          x=json.load(open("am2-no-headroom.json"))
+          assert x["same_semantic_result_under_matched_responses"] == 12
+          assert x["identical_coding_prompts"] == 4
+          assert x["actual_model_calls"] == 0
+          assert x["architecture_multiplier"] == "NOT_EVALUATED"
+          assert x["status"] == "STOP_CURRENT_AM2_BEFORE_EXPENSIVE_MODEL_RUN"
+          print(x["status"],"matched 12/12, fixture-only")
+          PY
       - name: Execute original-tool/checker matched capability assay
         run: |
           set -euo pipefail
@@ -42,6 +56,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: neumann-am2-first-model-free-opened-headroom
-          path: am2-first-model-free-opened.json
+          path: |
+            am2-first-model-free-opened.json
+            am2-no-headroom.json
           if-no-files-found: warn
           retention-days: 90
