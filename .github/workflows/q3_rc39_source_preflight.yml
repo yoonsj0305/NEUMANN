@@ -1,0 +1,24 @@
+name: NEUMANN RC39 causal-grammar source-only preflight
+on:
+  push:
+    branches:
+      - research/q3-rc39-active-causal-discovery-20261106
+    paths:
+      - .github/workflows/q3_rc39_source_preflight.yml
+permissions:
+  contents: read
+jobs:
+  source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Preflight ACTUAL source-only code and fail-closed tests (no heldout author task imported)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p test_q3_rc39_active_sparse_source.py -v
+          python -m py_compile research/q3/rc39/active_sparse.py
+          git hash-object research/q3/rc39/active_sparse.py
