@@ -1,0 +1,60 @@
+name: NEUMANN P3.0 read-only full 11-classical novelty audit
+on:
+  push:
+    branches:
+      - research/q3-p30-relational-object-language-20261105
+    paths:
+      - .github/workflows/q3_p30_prior11_audit.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-p30-first-public-training400
+          run-id: 42026964385
+          github-token: ${{ github.token }}
+          path: p30
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-p29-400-training-grammar-census
+          run-id: 42021735122
+          github-token: ${{ github.token }}
+          path: p29
+      - name: Fetch official public ARC-AGI original TRAINING 400 only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+      - name: Re-evaluate ALL prior eleven classical modes on original nine positives only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node experiments/q3_p30_prior11_audit.mjs "$RUNNER_TEMP/arc-agi" p30/P30-FIRST-PUBLIC-TRAIN400.json p29/P29-TRAIN400-CENSUS.json > P30-FIRST-PRIOR11-AUDIT.json
+          node - <<'NODE'
+          const fs=require('fs');
+          const j=JSON.parse(fs.readFileSync('P30-FIRST-PRIOR11-AUDIT.json','utf8'));
+          if(j.stats.p30_FIRST_public_training_original_exact!==9 ||
+             !j.zero_new_evaluation_tasks_used ||
+             j.stats.p30_FIRST_false_submit_count!==1)process.exit(1);
+          console.log(JSON.stringify({opened_scope:j.task_scope,stats:j.stats,decision:j.STOP_GATE}));
+          NODE
+      - name: Preserve source-independent prior coverage comparison
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-p30-prior11-classical-first-original9
+          path: P30-FIRST-PRIOR11-AUDIT.json
+          if-no-files-found: warn
+          retention-days: 90
