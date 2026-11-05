@@ -1,0 +1,19 @@
+name: NEUMANN RC39 finite-observation impossibility control
+on:
+  push:
+    branches:
+      - research/q3-rc39-active-automata-induction-20261106
+    paths:
+      - .github/workflows/q3_rc39_IDENTIFIABILITY_IMPOSSIBILITY.yml
+permissions:
+  contents: read
+jobs:
+  theorem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Construct indistinguishable finite logs and a longer separating word
+        run: python3 -m unittest -v tests/test_q3_rc39_finite_observation_impossibility.py
