@@ -61,7 +61,7 @@ const join=(base,next)=>{
  if(base!==null&&next!==null&&!eq(base,next))return null;
  return base??next;
 };
-function assess(task,id) {
+export function assess(task,id) {
  const train=task.train,testInputs=task.test.map(x=>x.input);
  const t=process.hrtime.bigint();
  const b=B.propose(train,testInputs,"B");
