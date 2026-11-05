@@ -1,0 +1,65 @@
+name: NEUMANN P3.0 FIRST 48 untouched original ARC evaluation
+on:
+  push:
+    branches:
+      - research/q3-p30-first-unseen48-20261105
+    paths:
+      - .github/workflows/q3_p30_FIRST_UNSEEN48.yml
+permissions:
+  contents: read
+jobs:
+  first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify existing source-level contracts before reading ARC eval originals
+        run: node --test tests/test_q3_p30_object_coordinate_composition.mjs tests/test_q3_p29_induced_coordinate_programs.mjs
+      - name: Exact upstream official ARC revision
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = "399030444e0ab0cc8b4e199870fb20b863846f34"
+      - name: Source identity, filename-only cohort 48, all previous 328 excluded (NO ORIGINAL TASK BODY READ)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module -e 'import {preflight} from "./experiments/q3_p30_first_unseen48.mjs";const a=preflight(process.argv[1]);console.log(JSON.stringify({status:"PRECHECK_PASS",new_original:a.manifest.ids.length,previous_used:a.manifest.previous_unique_original_eval_files,still_reserved:a.manifest.unconsumed_after_selection}));' "$RUNNER_TEMP/arc-agi"
+      - name: First and ONLY score against original task TEST gold after P30 and six classic arms have run
+        shell: bash
+        run: |
+          set -euo pipefail
+          node experiments/q3_p30_first_unseen48.mjs "$RUNNER_TEMP/arc-agi" > P30-FIRST-UNSEEN-ORIGINAL48.json
+          node - <<'NODE'
+          const fs=require("fs");
+          const x=JSON.parse(fs.readFileSync('P30-FIRST-UNSEEN-ORIGINAL48.json','utf8'));
+          if(x.counts.N!==48||x.previous_original_evaluation_excluded!==328||
+             x.untouched_eval_reserve!==24||!x.original_test_gold_read_only_after_all_predictions||
+             !x.source_and_task_cohort_frozen_before_scoring||x.neural_calls!==0)process.exit(1);
+          console.log(JSON.stringify({first_scientific_verdict:x.science_status,original_counts:x.counts,
+             Q3:x.Q3_autonomous_new_opcode,Q6:x.Q6_unseen_semantic_family}));
+          NODE
+      - name: Preserve first raw SHA256 even if original scientific verdict FAIL
+        if: always()
+        shell: bash
+        run: |
+          if test -f P30-FIRST-UNSEEN-ORIGINAL48.json; then
+            sha256sum P30-FIRST-UNSEEN-ORIGINAL48.json > P30-FIRST-UNSEEN-ORIGINAL48.sha256
+            cat P30-FIRST-UNSEEN-ORIGINAL48.sha256
+          fi
+      - name: Upload FIRST original artifacts without rerun or score correction
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-P30-FIRST-UNSEEN-ORIGINAL48
+          path: |
+            P30-FIRST-UNSEEN-ORIGINAL48.json
+            P30-FIRST-UNSEEN-ORIGINAL48.sha256
+          if-no-files-found: warn
+          retention-days: 90
