@@ -23,6 +23,7 @@ jobs:
             experiments/q3_cached_typed_guard_p24.mjs
             experiments/q3_generated_decision_trees_p25.mjs
             experiments/q3_p25_representability_ceiling_p26.mjs
+            experiments/q3_p26_paired_preflight_cost.mjs
             tests/test_q3_p25_representability_ceiling_p26.mjs
             docs/experiments/q3_generated_decision_trees_p25_COHORT_FROZEN.json
             docs/experiments/results/q3_generated_decision_trees_p25_FIRST_COMPLETE.json
@@ -43,10 +44,18 @@ jobs:
           set -euo pipefail
           node experiments/q3_p25_representability_ceiling_p26.mjs "$RUNNER_TEMP/arc-agi" > p26-representability-certificate.json
           node -e 'const r=require("./p26-representability-certificate.json");if(r.original_count!==32||r.disproved_by_shape!==9||r.disproved_by_feature_collision!==22||r.not_disproved!==0)process.exit(1);console.log(JSON.stringify({original:r.original_count,shape:r.disproved_by_shape,feature:r.disproved_by_feature_collision,unproved:r.not_disproved,conclusion:r.conclusion}))'
+      - name: Same-runner paired preflight cost measurement (opened cohort only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node experiments/q3_p26_paired_preflight_cost.mjs "$RUNNER_TEMP/arc-agi" > p26-paired-cost.json
+          node -e 'const x=require("./p26-paired-cost.json");if(x.compared_unsolved_tasks!==31||!x.all_predictions_abstained||!(x.p25_ms>0)||!(x.preflight_ms>0))process.exit(1);console.log(JSON.stringify({cases:x.compared_unsolved_tasks,p25_ms:x.p25_ms,preflight_ms:x.preflight_ms,ratio:x.p25_over_preflight_ratio,scope:x.scope}))'
       - name: Upload first original certificate
         uses: actions/upload-artifact@v4
         with:
           name: neumann-q3-p26-representability-certificate
-          path: p26-representability-certificate.json
+          path: |
+            p26-representability-certificate.json
+            p26-paired-cost.json
           if-no-files-found: error
           retention-days: 90
