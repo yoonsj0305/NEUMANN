@@ -1,0 +1,21 @@
+name: NEUMANN Q3 RC39 opened active automata smoke
+on:
+  push:
+    branches:
+      - research/q3-rc39-active-automata-induction-20261106
+    paths:
+      - .github/workflows/q3_rc39_OPENED_SMOKE.yml
+      - research/q3/rc39/active_mealy.py
+      - tests/test_q3_rc39_opened_smoke.py
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Test opened active automata learning and parser; no sealed task grader
+        run: python3 -m unittest -v tests/test_q3_rc39_opened_smoke.py
