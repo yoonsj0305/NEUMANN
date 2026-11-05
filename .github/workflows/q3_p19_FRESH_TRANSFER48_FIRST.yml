@@ -1,0 +1,66 @@
+name: NEUMANN P1.9 FIRST original transfer48 preregistered
+on:
+  push:
+    branches:
+      - research/q3-p19-first-fresh-original-transfer48-20261105
+    paths:
+      - .github/workflows/q3_p19_FRESH_TRANSFER48_FIRST.yml
+permissions:
+  contents: read
+jobs:
+  original-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - name: Checkout frozen untouched P1.9 model-free executable induction
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Original P1.9 mechanism tests and TEST-oracle poisoning
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test tests/test_q3_goal_conditioned_induction_p19.mjs tests/test_q3_p19_FIRST_FRESH_TRANSFER48.mjs
+      - name: Fetch upstream official 400 public original eval files pinned at source revision
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = "399030444e0ab0cc8b4e199870fb20b863846f34"
+      - name: Preflight only public evaluation filenames source/hash and prior exclusions, never task bodies
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module -e 'import {verifyP19OriginalRoot} from "./experiments/q3_p19_FIRST_FRESH_TRANSFER48.mjs";const v=verifyP19OriginalRoot(process.argv[1]);console.log(JSON.stringify({selected:v.cohort.ids.length,excluded:v.cohort.excluded,reserved:v.cohort.held_back}))' "$RUNNER_TEMP/arc-agi"
+      - name: FIRST actual prospective 48 original task run, immutable result even if gate FAIL
+        shell: bash
+        run: |
+          set -euo pipefail
+          node experiments/q3_p19_FIRST_FRESH_TRANSFER48.mjs "$RUNNER_TEMP/arc-agi" > p19-FIRST-ORIGINAL-TRANSFER48.json
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const r=JSON.parse(fs.readFileSync('p19-FIRST-ORIGINAL-TRANSFER48.json','utf8'));
+          if(r.fresh_originals!==48||r.reserved_next_unopened!==72||r.model_or_teacher_calls!==0||!r.all_original_test_gold_after_all_proposals)process.exit(1);
+          console.log(JSON.stringify({science:r.scientific_status,totals:r.totals,Q3:r.Q3_autonomous_opcode_invention,frontier:r.full_10x_cost_or_frontier}));
+          NODE
+      - name: Preserve FIRST unchanged original test evidence SHA regardless of scientific outcome
+        if: always()
+        shell: bash
+        run: |
+          if test -f p19-FIRST-ORIGINAL-TRANSFER48.json; then
+            sha256sum p19-FIRST-ORIGINAL-TRANSFER48.json > p19-FIRST-ORIGINAL-TRANSFER48.sha256
+            cat p19-FIRST-ORIGINAL-TRANSFER48.sha256
+          fi
+      - name: Upload FIRST full 48-task original proofs and experimental results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-p19-FIRST-original-transfer48
+          path: |
+            p19-FIRST-ORIGINAL-TRANSFER48.json
+            p19-FIRST-ORIGINAL-TRANSFER48.sha256
+          if-no-files-found: warn
+          retention-days: 90
