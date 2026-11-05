@@ -1,0 +1,42 @@
+name: NEUMANN P2.9 read-only original 400 diagnostic
+on:
+  push:
+    branches:
+      - research/q3-p29-inferred-coordinate-programs-20261105
+    paths:
+      - .github/workflows/q3_p29_training400_READONLY.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-p29-400-training-grammar-census
+          run-id: 42021735122
+          github-token: ${{ github.token }}
+          path: retained
+      - name: Print only immutable audit failure signatures
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('fs');
+          const x=JSON.parse(fs.readFileSync('retained/P29-TRAIN400-CENSUS.json','utf8'));
+          const items=x.rows.filter(r=>r.submitted).map(r=>({
+             id:r.id,correct:r.correct,train:r.train,test:r.test,
+             traceReason:r.reason,shape:r.program?.outputShape,
+             kind:r.program?.kind,
+             view:r.program?.view,
+             outer:r.program?.outer,inner:r.program?.inner,
+             selector:r.program?.selector,
+             palette:r.program?.palette
+          }));
+          console.log(JSON.stringify({positive_programs:items},null,2));
+          NODE
