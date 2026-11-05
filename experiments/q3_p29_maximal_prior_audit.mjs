@@ -9,6 +9,11 @@ import fs from "node:fs";
 import path from "node:path";
 import {createHash} from "node:crypto";
 import {fileURLToPath} from "node:url";
+import * as B from "./q3_object_headroom_p11.mjs";
+import * as P20 from "./q3_shape_pruned_synthesis_p20.mjs";
+import * as P24 from "./q3_cached_typed_guard_p24.mjs";
+import * as P25 from "./q3_generated_decision_trees_p25.mjs";
+import * as P27 from "./q3_compositional_schema_learning_p27.mjs";
 import * as P19 from "./q3_goal_conditioned_induction_p19.mjs";
 import * as P21 from "./q3_object_rule_induction_p21.mjs";
 import * as P211 from "./q3_object_rule_induction_p211.mjs";
@@ -25,27 +30,32 @@ const eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const expectedExact=(pred,gold)=>pred!==null&&eq(pred,gold);
 const incoming=(t)=>Array.isArray(t?.train)&&t.train.length>0&&Array.isArray(t?.test)&&t.test.length>0;
 
-export function audit(arcRoot,p29FirstFile,priorFiveFile) {
- const p29bytes=fs.readFileSync(p29FirstFile),priorbytes=fs.readFileSync(priorFiveFile);
+export function audit(arcRoot,p29FirstFile) {
+ const p29bytes=fs.readFileSync(p29FirstFile);
  if(sha(p29bytes)!==FROZEN_P29_RECEIPT_SHA)throw Error("FIRST_P29_RECEIPT_SHA_DRIFT");
  if(blob(path.join(ROOT,"experiments/q3_p29_induced_coordinate_programs.mjs"))!==CORE_GIT_BLOB)
    throw Error("P29_FIRST_SOURCE_CHANGED");
- const first=JSON.parse(p29bytes),old=JSON.parse(priorbytes);
- if(first.stats.N!==400||first.stats.correct!==19||first.stats.false_submit!==1||
-    old.counts.N!==400||old.counts.old_consensus_correct!==39||
-    old.P29_first_receipt_sha256!==FROZEN_P29_RECEIPT_SHA)
+ const first=JSON.parse(p29bytes);
+ if(first.stats.N!==400||first.stats.correct!==19||first.stats.false_submit!==1)
    throw Error("RECEIPT_OR_STRONG_BASELINE_COUNTS_DRIFT");
  const positive=first.rows.filter(x=>x.correct);
  if(positive.length!==19)throw Error("NOT_NINETEEN_ORIGINAL_POSITIVES");
- const oldById=new Map(old.rows.map(x=>[x.id,x]));
  const t0=process.hrtime.bigint(),rows=[];
  for(const originalRow of positive) {
-   const id=originalRow.id,prior=oldById.get(id),file=path.join(arcRoot,"data/training",id);
-   if(!prior||!fs.existsSync(file))throw Error("MISSING_ORIGINAL:"+id);
+   const id=originalRow.id,file=path.join(arcRoot,"data/training",id);
+   if(!fs.existsSync(file))throw Error("MISSING_ORIGINAL:"+id);
    const task=JSON.parse(fs.readFileSync(file,"utf8"));
    if(!incoming(task))throw Error("INVALID_ORIGINAL:"+id);
    const tr=task.train,inputs=task.test.map(x=>x.input);
-   const begin=process.hrtime.bigint(),extras=[
+   const begin=process.hrtime.bigint();
+   const oldFive=[
+      B.propose(tr,inputs,"B").proposals,
+      P20.propose(tr,inputs).prediction,
+      P24.solve(tr,inputs).prediction,
+      P25.solve(tr,inputs).prediction,
+      P27.synthesize(tr,inputs,{selector:"classical",maxCandidates:P27.allASTs.length}).prediction
+   ];
+   const extras=[
      {name:"P19",prediction:P19.propose(tr,inputs).prediction},
      {name:"P21",prediction:P21.propose(tr,inputs).prediction},
      {name:"P211",prediction:P211.propose(tr,inputs).prediction},
@@ -60,7 +70,7 @@ export function audit(arcRoot,p29FirstFile,priorFiveFile) {
    // Only score after every original prior proposer has returned.
    const gold=task.test.map(x=>x.output);
    if(!expectedExact(p29exec,gold))throw Error("ORIGINAL_P29_FIRST_SCORE_MISMATCH:"+id);
-   const priorFive=prior.old_flags.map(Boolean);
+   const priorFive=oldFive.map(x=>expectedExact(x,gold));
    if(priorFive.length!==5)throw Error("MISSING_5_STRONG_BASELINES:"+id);
    const extrasResults=extras.map(x=>({
       name:x.name,submitted:x.prediction!==null,exact:expectedExact(x.prediction,gold),
@@ -87,12 +97,13 @@ export function audit(arcRoot,p29FirstFile,priorFiveFile) {
   schema:"neumann.q3.p29.maximal-prior-classical-coverage-on-first-positive19.v1",
   author_scope:"POST_HOC_OPENED_19_ONLY__NO_NEW_EVALUATION_OR_UNSEEN_TRANSFER",
   original_p29_census_sha256:sha(p29bytes),
-  first_prior_five_full400_receipt_sha256:sha(priorbytes),
+  first_prior_five_full400_receipt_sha256:null,
   first_p29_source_git_blob:CORE_GIT_BLOB,
   old_arm_names:["P11 B","P20","P24","P25","P27 classical","P19","P21","P211","P23","P28"],
   omitted_neural_controls:"None relevant; all matched arms here are classical fixed-language synthesis.",
   zero_new_heldout_consumed:true,
   zero_neural_calls:true,
+  previous_five_recomputed_on_exact_same_19:true,
   first_p29_correct_19_from_original_receipt:true,
   independent_first_p29_ast_replay:true,
   gold_only_for_diagnostic_score:true,
@@ -112,7 +123,7 @@ export function audit(arcRoot,p29FirstFile,priorFiveFile) {
  };
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)) {
- if(process.argv.length!==5)throw Error("node experiments/q3_p29_maximal_prior_audit.mjs ARC_ROOT P29_FIRST400_JSON PREVIOUS5_400_JSON");
- try{process.stdout.write(JSON.stringify(audit(process.argv[2],process.argv[3],process.argv[4]),null,2)+"\n");}
+ if(process.argv.length!==4)throw Error("node experiments/q3_p29_maximal_prior_audit.mjs ARC_ROOT P29_FIRST400_JSON");
+ try{process.stdout.write(JSON.stringify(audit(process.argv[2],process.argv[3]),null,2)+"\n");}
  catch(e){process.stderr.write(String(e.stack||e)+"\n");process.exitCode=1;}
 }
