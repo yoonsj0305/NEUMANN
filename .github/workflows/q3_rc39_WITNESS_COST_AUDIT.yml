@@ -1,0 +1,62 @@
+name: NEUMANN RC39 witness-acquisition lower bound and full-oracle cost audit
+on:
+  push:
+    branches:
+      - research/q3-rc39-active-causal-discovery-20261106
+    paths:
+      - .github/workflows/q3_rc39_WITNESS_COST_AUDIT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  afterfirst:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Reuse exact original first artifact without calling or modifying the prover
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-RC39-FIRST-12-SOURCE-IMMUTABLE
+          run-id: 42131758955
+          github-token: ${{ github.token }}
+          path: first-immutable
+      - name: Verify immutable original first bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(sha256sum first-immutable/RC39-FIRST-12-SOURCE.json | cut -d' ' -f1)" = 8be501ee87f432ffdededb093421095ea8438befc8cafe497a08aa502648cab3
+      - name: Estimate random positive witness acquisition on EXACT frozen author distribution
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research.q3.rc39.positive_witness_audit first-immutable/RC39-FIRST-12-SOURCE.json > RC39-POSTFIRST-POSITIVE-WITNESS-COST.json
+          python - <<'PY'
+          import json
+          r=json.load(open("RC39-POSTFIRST-POSITIVE-WITNESS-COST.json"))
+          assert r['task_count']==12
+          assert r['total_simulations']==32
+          assert r['discovered_prog_original_query_count']==644
+          assert r['single_site_original_query_count']==12300
+          assert r['strong_classical_adaptive_original_query_count']==644
+          assert r['paid_witness_ratio_median']<r['unpriced_satisfying_witness_ratio']
+          assert all(c['exact_hypothesis_success_probability']<=c['union_bound'] for c in r['small_exact_unconditional_hypothesis_census'])
+          assert r['q3_global']=='OPEN'
+          print({'AFTER_FIRST_FULL_SOURCE_RIGHTS_AUDIT':'PASS',
+            'witness_free_ratio':r['unpriced_satisfying_witness_ratio'],
+            'witness_paid_median_ratio':r['paid_witness_ratio_median'],
+            'witness_paid_p05_ratio':r['paid_witness_ratio_p05'],
+            'cohorts_reaching_10x':r['simulations_exceed_tenfold_ratio'],
+            'median_new_witness_queries':r['paid_acquisition_query_total_median'],
+            'unconditional_10x':'NOT_PROVEN'})
+          PY
+      - name: Retain postgrade audit separate from original first receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-RC39-POSTFIRST-WITNESS-COST-ABLATION
+          path: RC39-POSTFIRST-POSITIVE-WITNESS-COST.json
+          if-no-files-found: warn
+          retention-days: 90
