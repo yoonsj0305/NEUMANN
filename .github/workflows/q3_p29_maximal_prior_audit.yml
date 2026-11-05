@@ -24,13 +24,6 @@ jobs:
           run-id: 42021735122
           github-token: ${{ github.token }}
           path: source-receipt
-      - name: Read immutable prior-five matched controls receipt
-        uses: actions/download-artifact@v4
-        with:
-          name: neumann-p29-public400-matched-classical-audit
-          run-id: 42022318273
-          github-token: __GITHUB_TOKEN__
-          path: old-controls
       - name: Fetch official ARC-AGI corpus at unchanged upstream SHA
         shell: bash
         run: |
@@ -40,11 +33,11 @@ jobs:
           git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
           git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
           test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = "399030444e0ab0cc8b4e199870fb20b863846f34"
-      - name: Source-locked prior full classical portfolio audit, exactly 19 already scored positives
+      - name: Source-locked all 10 classical prior arms on 19 already scored positive originals
         shell: bash
         run: |
           set -euo pipefail
-          node experiments/q3_p29_maximal_prior_audit.mjs "$RUNNER_TEMP/arc-agi" source-receipt/P29-TRAIN400-CENSUS.json old-controls/P29-FIRST-TRAIN400-STRONG-MATCHED.json > p29-PREVIOUS-10-ARMS-AUDIT.json
+          node experiments/q3_p29_maximal_prior_audit.mjs "$RUNNER_TEMP/arc-agi" source-receipt/P29-TRAIN400-CENSUS.json > p29-PREVIOUS-10-ARMS-AUDIT.json
           node - <<'NODE'
           const fs=require("fs");
           const x=JSON.parse(fs.readFileSync("p29-PREVIOUS-10-ARMS-AUDIT.json","utf8"));
