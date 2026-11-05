@@ -1,0 +1,81 @@
+name: NEUMANN P3.0 independent first original 48 program replay
+on:
+  push:
+    branches:
+      - research/q3-p30-first-unseen48-20261105
+    paths:
+      - .github/workflows/q3_p30_FIRST48_INDEPENDENT_PYTHON.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Retain unchanged FIRST 48 original model-free P30 evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-P30-FIRST-UNSEEN-ORIGINAL48
+          run-id: 42025416909
+          github-token: ${{ github.token }}
+          path: first-original
+      - name: Fetch pinned official source for independent Python original checker
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = "399030444e0ab0cc8b4e199870fb20b863846f34"
+      - name: Independently execute P30 AST in Python; no new Node proposing or training
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m experiments.q3_p30_first_unseen48_python_audit . "$RUNNER_TEMP/arc-agi" first-original/P30-FIRST-UNSEEN-ORIGINAL48.json > P30-FIRST48-INDEPENDENT-AUDIT.json
+          python - <<'PY'
+          import json
+          j=json.load(open('P30-FIRST48-INDEPENDENT-AUDIT.json'))
+          assert j['audit_pass'],j['errors']
+          assert j['first_original_new_evaluation']==48
+          assert j['independent_P30_programs_executed']==1
+          assert j['independent_original_exact']==1
+          assert j['independent_original_wrong']==0
+          assert j['independent_new_crop_programs']==0
+          assert j['scientific_status']=='P30_FIRST_UNSEEN_FAIL_OR_UNSAFE'
+          assert j['Q3']==j['Q6']==j['Q7']=='OPEN'
+          print({'audit':'PASS','first_original_sha256':j['original_first_sha256'],
+                 'independent_programs':j['independent_P30_programs_executed'],
+                 'new_crop_programs':j['independent_new_crop_programs'],
+                 'original_correct_ids':j['correct_original_ids']})
+          PY
+      - name: Forged positive scientific score must be rejected
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          from experiments.q3_p30_first_unseen48_python_audit import audit
+          first=json.loads(Path('first-original/P30-FIRST-UNSEEN-ORIGINAL48.json').read_text())
+          first['counts']['safe_added_exact']=48
+          temp=Path('/tmp/fake-p30-first.json')
+          temp.write_text(json.dumps(first))
+          a=audit('.',os.environ['RUNNER_TEMP']+'/arc-agi',str(temp))
+          assert not a['audit_pass']
+          assert 'ORIGINAL_FIRST_SHA256_DRIFT' in a['errors']
+          assert 'FIRST_CLASSICAL_BASELINE_OR_GATE_DRIFT' in a['errors']
+          print('Fake positive first score rejected')
+          PY
+      - name: Preserve independent read-only result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-P30-FIRST48-INDEPENDENT-PYTHON
+          path: P30-FIRST48-INDEPENDENT-AUDIT.json
+          if-no-files-found: warn
+          retention-days: 90
