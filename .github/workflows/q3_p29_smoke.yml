@@ -1,0 +1,22 @@
+name: NEUMANN P2.9 coordinate generalization smoke tests
+on:
+  push:
+    branches:
+      - research/q3-p29-inferred-coordinate-programs-20261105
+    paths:
+      - .github/workflows/q3_p29_smoke.yml
+      - experiments/q3_p29_induced_coordinate_programs.mjs
+      - tests/test_q3_p29_induced_coordinate_programs.mjs
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Synthetic cross-shape tests, no real eval data, no original oracle
+        run: node --test tests/test_q3_p29_induced_coordinate_programs.mjs
