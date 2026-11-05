@@ -46,6 +46,12 @@ def _solver(task,private,view,method,budget):
         trace["complete_ms"]=(perf_counter_ns()-start)/1e6
         trace["accepted"]=bool(accepted)
         return trace
+    # Trust boundary: visible bytes must be the authorized original problem.
+    # Without this check a reducer could silently solve a different original.
+    if canonical(view)!=canonical(model_view(task)):
+        trace["error"]="ABSTAIN_MODEL_VIEW_ORIGINAL_MISMATCH"
+        trace["degraded"]=True
+        return finish()
     if code is None:
         trace["error"]="ABSTAIN_UNKNOWN_OR_AMBIGUOUS_VIEW"
         trace["degraded"]=True
