@@ -1,0 +1,52 @@
+name: NEUMANN P2.6 P25 representability ceiling
+
+on:
+  push:
+    branches:
+      - research/q3-p25-representability-ceiling-p26-20261105
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  certificate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout pinned source and receipts
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            experiments/q3_cached_typed_guard_p24.mjs
+            experiments/q3_generated_decision_trees_p25.mjs
+            experiments/q3_p25_representability_ceiling_p26.mjs
+            tests/test_q3_p25_representability_ceiling_p26.mjs
+            docs/experiments/q3_generated_decision_trees_p25_COHORT_FROZEN.json
+            docs/experiments/results/q3_generated_decision_trees_p25_FIRST_COMPLETE.json
+      - name: Execute negative and nonnegative synthetic contracts
+        run: node --test tests/test_q3_p25_representability_ceiling_p26.mjs
+      - name: Fetch original public ARC dataset at pinned upstream commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = "399030444e0ab0cc8b4e199870fb20b863846f34"
+      - name: Independently certify all original train examples
+        shell: bash
+        run: |
+          set -euo pipefail
+          node experiments/q3_p25_representability_ceiling_p26.mjs "$RUNNER_TEMP/arc-agi" > p26-representability-certificate.json
+          node -e 'const r=require("./p26-representability-certificate.json");if(r.original_count!==32||r.disproved_by_shape!==9||r.disproved_by_feature_collision!==22||r.not_disproved!==0)process.exit(1);console.log(JSON.stringify({original:r.original_count,shape:r.disproved_by_shape,feature:r.disproved_by_feature_collision,unproved:r.not_disproved,conclusion:r.conclusion}))'
+      - name: Upload first original certificate
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-p26-representability-certificate
+          path: p26-representability-certificate.json
+          if-no-files-found: error
+          retention-days: 90
