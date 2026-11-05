@@ -21,6 +21,8 @@ jobs:
         run: python -m unittest -v tests.test_am2_opened_control_dominance
       - name: Test AM2 dual-plane interface against original checkers (fixture model only)
         run: python -m unittest -v tests.test_am2_dual_plane_runtime
+      - name: Test AM2 dual-plane candidate parity and authority isolation
+        run: python -m unittest -v tests.test_am2_dual_plane_semantic_parity
       - name: Execute original-tool/checker matched capability assay
         run: |
           set -euo pipefail
