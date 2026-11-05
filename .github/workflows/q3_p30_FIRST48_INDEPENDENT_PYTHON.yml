@@ -36,7 +36,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python experiments/q3_p30_first_unseen48_python_audit.py . "$RUNNER_TEMP/arc-agi" first-original/P30-FIRST-UNSEEN-ORIGINAL48.json > P30-FIRST48-INDEPENDENT-AUDIT.json
+          python -m experiments.q3_p30_first_unseen48_python_audit . "$RUNNER_TEMP/arc-agi" first-original/P30-FIRST-UNSEEN-ORIGINAL48.json > P30-FIRST48-INDEPENDENT-AUDIT.json
           python - <<'PY'
           import json
           j=json.load(open('P30-FIRST48-INDEPENDENT-AUDIT.json'))
