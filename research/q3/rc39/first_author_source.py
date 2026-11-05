@@ -27,7 +27,7 @@ PREREG_EXPECTED="e7469632595727d1d6ad108c8b34b60305c6e483"
 LOCK=Path("docs/experiments/q3_RC39_FIRST_SOURCE_BLOB_LOCK_2026_11_06.json")
 def blob(p):
     b=Path(p).read_bytes()
-    return sha1(b"blob "+str(len(b)).encode()+b"\0").hexdigest()
+    return sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest()
 def clean_bytes(o):
     return json.dumps(o,sort_keys=True,separators=(",",":"),ensure_ascii=False).encode()
 def reference(author,word,center):
