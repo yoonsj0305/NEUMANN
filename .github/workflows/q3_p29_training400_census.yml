@@ -1,0 +1,45 @@
+name: NEUMANN P2.9 400 public training representation census
+on:
+  push:
+    branches:
+      - research/q3-p29-inferred-coordinate-programs-20261105
+    paths:
+      - .github/workflows/q3_p29_training400_census.yml
+permissions:
+  contents: read
+jobs:
+  census:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Frozen upstream ARC training corpus
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+      - name: Execute 400 public training task representation ceiling audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          node experiments/q3_p29_training400_census.mjs "$RUNNER_TEMP/arc-agi" > P29-TRAIN400-CENSUS.json
+          node - <<'NODE'
+          const fs=require("node:fs");
+          const x=JSON.parse(fs.readFileSync("P29-TRAIN400-CENSUS.json","utf8"));
+          if(x.stats.N!==400 || x.test_gold_read_after_proposal!==true)process.exit(1);
+          console.log(JSON.stringify({stats:x.stats,abstention_reasons:x.reasons,Q3:x.Q3}));
+          NODE
+      - name: Retain original diagnostic
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-p29-400-training-grammar-census
+          path: P29-TRAIN400-CENSUS.json
+          if-no-files-found: warn
+          retention-days: 90
