@@ -1,0 +1,17 @@
+{
+  "schema": "neumann.q3.p21.first-run-blocker.v1",
+  "date": "2026-11-05",
+  "frozen_cohort": "docs/experiments/q3_object_rule_induction_p21_COHORT_FROZEN.json",
+  "first_original_source_evaluation": "ABORTED",
+  "fetched_first_12_task_bodies": true,
+  "gold_scores_computed": false,
+  "gold_scores_reported": false,
+  "source_modified_after_freeze": false,
+  "exception_type": "TypeError",
+  "exception_message": "Cannot read properties of undefined (reading '0')",
+  "offending_function": "coloredDiff(input, output) called from shiftHints",
+  "root_cause": "original ARC tasks can change grid dimensions; original P21 move proposal assumed input and output dimensions identical",
+  "source_only_train_pair_bug": true,
+  "decision": "BLOCKED_RUNTIME_EXCEPTION; first P21 cannot PASS; preserve unmodified, correct under new experiment P21.1 with fresh task cohort",
+  "global_Q1_Q7": "OPEN"
+}
