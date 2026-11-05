@@ -1,0 +1,13 @@
+{
+  "schema": "neumann.q3.rc39.first-preflight-error.v1",
+  "failed_run": 42131590811,
+  "reported_stage": "AUTHOR_METADATA_BLOB_PRECHECK",
+  "status": "NOT_EVALUATED",
+  "hidden_author_tasks_executed": 0,
+  "learner_calls": 0,
+  "model_output_files_generated": false,
+  "problem": "Git blob helper omitted file body bytes when hashing first-author source, despite hash source preflight passing via git hash-object.",
+  "frozen_proposer_source_git_blob": "bcfd1a6ac52f8e6e806fbf35bef5a0f7f2b48411",
+  "old_author_source_blob": "a4a96087ebbd71be252a7b01ffb6107960952540",
+  "remediation_scope": "metadata hash helper only, exact author seed and proposer untouched. This is not an inference rerun or result repair."
+}
