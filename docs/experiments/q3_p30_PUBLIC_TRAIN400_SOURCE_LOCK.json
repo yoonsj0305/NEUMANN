@@ -1,0 +1,19 @@
+{
+  "schema": "neumann.q3.p30.public400.first.source-lock.v1",
+  "upstream": "fchollet/ARC-AGI@399030444e0ab0cc8b4e199870fb20b863846f34",
+  "reference_scope": "PUBLIC_TRAINING_400_ALREADY_OPENED; no unseen original eval test consumed",
+  "source_blobs": {
+    "experiments/q3_p30_object_rewrite_language.mjs": "398b9bb869b1f53c6f90c6f5fc47fa78a7167954",
+    "experiments/q3_p30_public400_first.mjs": "e6f0538fec418bc6914138e8046a8ee01a0368f0",
+    "tests/test_q3_p30_object_rewrite_language.mjs": "4c9650a6157725418c772df6f4aeb22683f7fcfe"
+  },
+  "max_candidate_budget": 60000,
+  "model_calls": 0,
+  "teacher_calls": 0,
+  "exact_train_replay_required": true,
+  "original_test_oracle_access": "after public proposal only",
+  "local_go": "At least 2 correct original cases not solvable by prior 10, and zero false submissions, before new untouched evaluation. Otherwise STOP.",
+  "global_Q3": "OPEN",
+  "global_Q6": "OPEN",
+  "frontier": "OPEN"
+}
