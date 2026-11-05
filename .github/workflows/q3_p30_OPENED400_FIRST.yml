@@ -1,0 +1,67 @@
+name: NEUMANN P3.0 first 400 opened original matched headroom
+on:
+  push:
+    branches:
+      - research/q3-p30-object-coordinate-composition-20261105
+    paths:
+      - .github/workflows/q3_p30_OPENED400_FIRST.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify unchanged original P2.9 core source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object experiments/q3_p29_induced_coordinate_programs.mjs)" = ca6f76504be5cf2fc00709b6479f0e8436c6fa18
+          node --test tests/test_q3_p30_object_coordinate_composition.mjs tests/test_q3_p29_induced_coordinate_programs.mjs
+      - name: Load exact original 400 P2.9 first artifact only, never rescore P29 as new evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: neumann-p29-400-training-grammar-census
+          run-id: 42021735122
+          github-token: ${{ github.token }}
+          path: retained
+      - name: Retrieve official public ARC training corpus exactly pinned
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = "399030444e0ab0cc8b4e199870fb20b863846f34"
+      - name: First 400 opened-classical comparison with full original TEST checker
+        shell: bash
+        run: |
+          set -euo pipefail
+          node experiments/q3_p30_opened_train400_first.mjs "$RUNNER_TEMP/arc-agi" retained/P29-TRAIN400-CENSUS.json > P30-OPENED400-FIRST.json
+          node - <<'NODE'
+          const fs=require('fs');
+          const x=JSON.parse(fs.readFileSync('P30-OPENED400-FIRST.json','utf8'));
+          if(x.stats.tasks!==400||x.stats.old_baseline_exact!==39||x.stats.p29_exact!==19||
+             !x.original_test_gold_after_all_proposals||!x.reopened_public_train_not_fresh)process.exit(1);
+          console.log(JSON.stringify({scope:x.reopened_public_train_not_fresh,stats:x.stats,Q3:x.Q3}));
+          NODE
+      - name: Hash and preserve first 400 P3.0 result even when scientific gate fails
+        if: always()
+        shell: bash
+        run: |
+          if test -f P30-OPENED400-FIRST.json; then
+            sha256sum P30-OPENED400-FIRST.json
+          fi
+      - name: Preserve original opened P30 receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-p30-first-opened-train400
+          path: P30-OPENED400-FIRST.json
+          if-no-files-found: warn
+          retention-days: 90

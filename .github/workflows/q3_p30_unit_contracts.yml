@@ -1,0 +1,26 @@
+name: NEUMANN P3.0 object-coordinate composition contracts
+on:
+  push:
+    branches:
+      - research/q3-p30-object-coordinate-composition-20261105
+    paths:
+      - .github/workflows/q3_p30_unit_contracts.yml
+      - experiments/q3_p30_object_coordinate_composition.mjs
+      - tests/test_q3_p30_object_coordinate_composition.mjs
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify original P29 is identical to frozen first model
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object experiments/q3_p29_induced_coordinate_programs.mjs)" = ca6f76504be5cf2fc00709b6479f0e8436c6fa18
+      - name: Generalization and fail-closed source-level synthetic contracts
+        run: node --test tests/test_q3_p29_induced_coordinate_programs.mjs tests/test_q3_p30_object_coordinate_composition.mjs
