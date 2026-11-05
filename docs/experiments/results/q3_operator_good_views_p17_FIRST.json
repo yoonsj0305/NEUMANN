@@ -1,0 +1,352 @@
+{
+  "bad": {
+    "confusion": [
+      [
+        19,
+        4,
+        6,
+        11,
+        0,
+        1,
+        6,
+        1
+      ],
+      [
+        2,
+        18,
+        2,
+        5,
+        8,
+        3,
+        0,
+        10
+      ],
+      [
+        7,
+        5,
+        7,
+        6,
+        3,
+        4,
+        4,
+        12
+      ],
+      [
+        8,
+        8,
+        5,
+        11,
+        2,
+        6,
+        4,
+        4
+      ],
+      [
+        6,
+        4,
+        3,
+        7,
+        3,
+        8,
+        10,
+        7
+      ],
+      [
+        2,
+        4,
+        3,
+        3,
+        10,
+        10,
+        6,
+        10
+      ],
+      [
+        7,
+        4,
+        3,
+        6,
+        4,
+        8,
+        8,
+        8
+      ],
+      [
+        3,
+        4,
+        4,
+        2,
+        5,
+        6,
+        13,
+        11
+      ]
+    ],
+    "correct": 87,
+    "prototype_inference_ns": 43550585,
+    "query_amortized_ns_per_item": 113412.98177083333,
+    "query_count": 384,
+    "seen_top1": 0.2361111111111111,
+    "top1": 0.2265625,
+    "unseen_top1": 0.19791666666666666
+  },
+  "bad_train": {
+    "final_loss": 0.06274625658988953,
+    "parameter_count": 122744,
+    "training_ns": 1709809212
+  },
+  "complete_system_cost": {
+    "energy_joule": null,
+    "flops": null,
+    "monetary_usd": null,
+    "teacher_cost": null
+  },
+  "contract": {
+    "JEPA": "NOT_RUN",
+    "bad_view_flip_probability": 0.025,
+    "embedding_dim": 48,
+    "foreground_probability": 0.18,
+    "full_cost_gate": "NOT_RUN",
+    "global_q1_q7": "OPEN",
+    "local_gate": {
+      "good_minus_bad_min": 0.15,
+      "good_top1_min": 0.8,
+      "unseen_top1_min": 0.5
+    },
+    "lr": 0.002,
+    "minibatches": 400,
+    "program_semantics": "eight human-defined grid transforms; six in training",
+    "query_per_operator": 48,
+    "query_seed": 20261119,
+    "schema": "neumann.q3.operator-good-views.p17.v1",
+    "shape": [
+      12,
+      12
+    ],
+    "support_per_operator": 24,
+    "support_seed": 20261118,
+    "temperature": 0.12,
+    "torch_batch_seed": 20261121,
+    "train_seed": 20261117,
+    "training_operators": [
+      "up",
+      "down",
+      "left",
+      "right",
+      "flip_h",
+      "flip_v"
+    ],
+    "training_pair_size": 6,
+    "unseen_operators": [
+      "rot90",
+      "rot270"
+    ],
+    "weights_seed": 20261120
+  },
+  "environment": {
+    "cpu_threads": 1,
+    "numpy": "2.3.5",
+    "peak_rss_kib_process": 372016,
+    "python": "3.13.5",
+    "torch": "2.10.0+cpu"
+  },
+  "global_q1_q7": "OPEN",
+  "good": {
+    "confusion": [
+      [
+        48,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        48,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        48,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        48,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        42,
+        0,
+        3,
+        3
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        45,
+        3,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        10,
+        13,
+        16,
+        9
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        12,
+        8,
+        13,
+        15
+      ]
+    ],
+    "correct": 310,
+    "prototype_inference_ns": 162167751,
+    "query_amortized_ns_per_item": 422311.8515625,
+    "query_count": 384,
+    "seen_top1": 0.96875,
+    "top1": 0.8072916666666666,
+    "unseen_top1": 0.3229166666666667
+  },
+  "good_train": {
+    "final_loss": 0.032797835767269135,
+    "parameter_count": 122744,
+    "training_ns": 1794164240
+  },
+  "local_view_gate": "FAIL_OPERATOR_VIEW_ABLATION",
+  "public_arc_original_task_score": "NOT_RUN",
+  "strong_symbolic_direct": {
+    "abstain": 0,
+    "correct": 384,
+    "exact_task_accuracy": 1.0,
+    "program_executions": 3072,
+    "queries": 384,
+    "time_ns": 18797293
+  },
+  "synthetic_only": true,
+  "untrained": {
+    "confusion": [
+      [
+        13,
+        2,
+        3,
+        8,
+        7,
+        4,
+        5,
+        6
+      ],
+      [
+        3,
+        14,
+        0,
+        6,
+        8,
+        8,
+        1,
+        8
+      ],
+      [
+        7,
+        3,
+        14,
+        5,
+        12,
+        3,
+        2,
+        2
+      ],
+      [
+        10,
+        5,
+        3,
+        8,
+        6,
+        4,
+        4,
+        8
+      ],
+      [
+        8,
+        2,
+        9,
+        6,
+        5,
+        4,
+        6,
+        8
+      ],
+      [
+        13,
+        5,
+        5,
+        8,
+        4,
+        3,
+        3,
+        7
+      ],
+      [
+        9,
+        5,
+        6,
+        5,
+        7,
+        2,
+        4,
+        10
+      ],
+      [
+        13,
+        4,
+        2,
+        9,
+        8,
+        3,
+        2,
+        7
+      ]
+    ],
+    "correct": 68,
+    "prototype_inference_ns": 44865023,
+    "query_amortized_ns_per_item": 116835.99739583333,
+    "query_count": 384,
+    "seen_top1": 0.19791666666666666,
+    "top1": 0.17708333333333334,
+    "unseen_top1": 0.11458333333333333
+  }
+}
