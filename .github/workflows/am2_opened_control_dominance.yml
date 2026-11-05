@@ -1,0 +1,41 @@
+name: NEUMANN AM2 mainline opened control dominance
+on:
+  push:
+    branches:
+      - research/am2-mainline-control-pivot-20261105
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  opened-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout only existing opened tasks and model-free runner
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Test zero-model fail-closed comparator
+        run: python -m unittest -v tests.test_am2_opened_control_dominance
+      - name: Execute original-tool/checker matched capability assay
+        run: |
+          set -euo pipefail
+          python -m experiments.am2_opened_control_dominance > am2-first-model-free-opened.json
+          python - <<'PY'
+          import json
+          d=json.load(open("am2-first-model-free-opened.json"))
+          for arm in ("TOOL","NEUMANN"):
+              a=d["totals"][arm]
+              assert a["accepted"]==8 and a["terminal"]==12 and a["model_calls"]==0
+              print(f"{arm}: {a['accepted']}/12 tool_calls={a['tool_calls']} original_checker_calls={a['checker_calls']}")
+          assert d["new_architecture_multiplier_executed"] is False
+          print("Result:",d["result"])
+          PY
+      - name: Preserve actual first model-free controls
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-am2-first-model-free-opened-headroom
+          path: am2-first-model-free-opened.json
+          if-no-files-found: warn
+          retention-days: 90
