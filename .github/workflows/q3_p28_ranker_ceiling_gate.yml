@@ -1,0 +1,46 @@
+name: NEUMANN P2.8 fixed-language ceiling stop gate
+on:
+  push:
+    branches:
+      - research/q3-p28-stop-ranking-bootstrapping-20261105
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  p28-theorem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Download IMMUTABLE P2.7 first original receipt only
+        uses: actions/download-artifact@v4
+        with:
+          name: neumann-p27-first-original-32
+          run-id: 42003978711
+          github-token: ${{ github.token }}
+          path: original-first
+      - name: Fetch PINNED ARC-AGI original dataset
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = "399030444e0ab0cc8b4e199870fb20b863846f34"
+      - name: Independent complete 157-program TRAIN replay, NO new original scoring
+        shell: bash
+        run: |
+          set -euo pipefail
+          node experiments/q3_p28_ranker_ceiling_gate.mjs "$RUNNER_TEMP/arc-agi" original-first/p27-FIRST-ORIGINAL-32.json > p28-FIRST-RANKER-CEILING.json
+          node -e 'const x=require("./p28-FIRST-RANKER-CEILING.json");if(x.original_count!==32||x.no_fit!==31||x.exactly_one_fit!==1||x.programs_independently_rechecked!==5024||x.meta_correct_tasks!==9||x.meta_distinct_macro_keys!==6||x.test_gold_read||x.research_decision!=="STOP_FIXED_H_RANKING")process.exit(1);console.log(JSON.stringify({verified:x.original_count,programs:x.programs_independently_rechecked,noFit:x.no_fit,oneFit:x.exactly_one_fit,metaPositive:x.meta_correct_tasks,uniqueMacros:x.meta_distinct_macro_keys,decision:x.research_decision}))'
+      - name: Keep first independent proof as archived artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-p28-first-ranker-ceiling-certificate
+          path: p28-FIRST-RANKER-CEILING.json
+          if-no-files-found: error
+          retention-days: 90
