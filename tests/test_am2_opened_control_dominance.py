@@ -39,9 +39,16 @@ class AM2ControlDominanceTests(unittest.TestCase):
         neumann=_solver(task,private,view,"NEUMANN",budget)
         self.assertFalse(tool["accepted"])
         self.assertFalse(neumann["accepted"])
-        self.assertEqual(tool["checker_calls"],1)
+        self.assertEqual(tool["checker_calls"],0)
         self.assertEqual(neumann["checker_calls"],0)
-        self.assertIn("ValueError",neumann["error"])
+        self.assertIn("ABSTAIN_MODEL_VIEW_ORIGINAL_MISMATCH",tool["error"])
+        self.assertIn("ABSTAIN_MODEL_VIEW_ORIGINAL_MISMATCH",neumann["error"])
+        # The original independent checker must also reject the wrong value.
+        from neumann1.general_runtime_v106 import ToolPool,verify_original
+        trial=ToolPool(task,private,budget).call("arithmetic",{
+            "expression":view["public"]["expression"],
+            "bindings":view["public"]["bindings"]},budget.tool_ms)
+        self.assertFalse(verify_original(task,trial,private,budget.tool_ms))
     def test_no_program_source_is_invented_for_coding(self):
         task,private=multiplier_tasks()[4]
         view=model_view(task)
