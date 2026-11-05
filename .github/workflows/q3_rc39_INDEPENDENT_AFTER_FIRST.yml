@@ -1,0 +1,91 @@
+name: NEUMANN RC39 independent FIRST original causal-program grader
+on:
+  push:
+    branches:
+      - research/q3-rc39-active-causal-discovery-20261106
+    paths:
+      - .github/workflows/q3_rc39_INDEPENDENT_AFTER_FIRST.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  grade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Fetch FIRST unmodified pre-grader inference receipts, no program rerun
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-RC39-FIRST-12-SOURCE-IMMUTABLE
+          run-id: 42131758955
+          github-token: ${{ github.token }}
+          path: first-locked
+      - name: Verify original FIRST byte SHA and unchanged source blob
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(sha256sum first-locked/RC39-FIRST-12-SOURCE.json | cut -d' ' -f1)" = 8be501ee87f432ffdededb093421095ea8438befc8cafe497a08aa502648cab3
+          test "$(git hash-object research/q3/rc39/active_sparse.py)" = bcfd1a6ac52f8e6e806fbf35bef5a0f7f2b48411
+          test "$(git hash-object research/q3/rc39/first_author_source.py)" = 74e8af2676ac50fc418546e9f271a4f5413799a7
+      - name: Independent hidden author exact semantics and 2880 new contexts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research.q3.rc39.independent_grade . first-locked/RC39-FIRST-12-SOURCE.json > RC39-INDEPENDENT-FIRST-GRADE.json
+          python - <<'PY'
+          import json
+          p=json.load(open("RC39-INDEPENDENT-FIRST-GRADE.json"))
+          assert p['audit_pass'],p['errors']
+          assert p['candidate_original_full_mapping_correct']==12
+          assert p['single_site_classical_full_mapping_correct']==12
+          assert p['strong_equal_rights_classical_full_mapping_correct']==12
+          assert p['independent_new_words_and_centers']==2880
+          assert p['all_domain_proved_programs']==12
+          assert p['different_program_mutation_counterexamples']==12
+          assert p['query_saving_vs_single_site']>=10
+          assert p['candidate_original_queries']==p['strong_adaptive_original_queries']
+          assert p['q3_autonomous_base_opcode']=='OPEN'
+          print({'RC39_INDEPENDENT':'PASS','proofs':p['all_domain_proved_programs'],
+             'source_ratio':p['query_saving_vs_single_site'],
+             'adaptive_parity':p['candidate_original_queries']==p['strong_adaptive_original_queries'],
+             'frozen_first_sha256':p['frozen_first_sha256'],'outside_contract_global_Q3':'OPEN'})
+          PY
+      - name: Tampering negative controls reject forged original successes without new learner calls
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from research.q3.rc39.independent_grade import grade
+          original=json.loads(Path('first-locked/RC39-FIRST-12-SOURCE.json').read_text())
+          original['summary']['candidate_source_queries']=1
+          f=Path('/tmp/rc39-fake-first.json')
+          f.write_text(json.dumps(original,sort_keys=True))
+          bad=grade('.',str(f))
+          assert not bad['audit_pass']
+          assert 'ORIGINAL_FIRST_RECEIPT_HASH_CHANGED' in bad['errors']
+          assert 'FIRST_GROUP_CALLS_AGG_CHANGED' in bad['errors']
+          print('Forged first proof and source cost both rejected')
+          PY
+      - name: Freeze independent grader result even if scientific claim is negative
+        if: always()
+        shell: bash
+        run: |
+          if test -f RC39-INDEPENDENT-FIRST-GRADE.json; then
+            sha256sum RC39-INDEPENDENT-FIRST-GRADE.json > RC39-INDEPENDENT-FIRST-GRADE.sha256
+            cat RC39-INDEPENDENT-FIRST-GRADE.sha256
+          fi
+      - name: Retain independent proof and original first result separately
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-RC39-FIRST-INDEPENDENT-GRADE
+          path: |
+            RC39-INDEPENDENT-FIRST-GRADE.json
+            RC39-INDEPENDENT-FIRST-GRADE.sha256
+          if-no-files-found: warn
+          retention-days: 90
