@@ -1,0 +1,84 @@
+name: NEUMANN P2.8 FIRST fresh transfer48 after metadata preflight fix
+on:
+  push:
+    branches:
+      - research/q3-p28-first-fresh-original-transfer48-20261105
+    paths:
+      - .github/workflows/q3_p28_TRANSFER48_FIRST_AFTER_PREFLIGHT.yml
+permissions:
+  contents: read
+jobs:
+  original-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - name: Checkout fully precommitted NEUMANN branch
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Run mechanism and hidden-original-gold-poison tests before acquiring evaluation tasks
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test tests/test_q3_p28_factorized_operator.mjs tests/test_q3_p28_transfer48_first.mjs
+      - name: Fetch official original public ARC exactly at preregistered SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = "399030444e0ab0cc8b4e199870fb20b863846f34"
+      - name: Verify prior 232 exclusions, 48 frozen task names, source hashes without opening original task bodies
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module -e 'import {verifyOriginalRoot} from "./experiments/q3_p28_transfer48_first.mjs";const r=verifyOriginalRoot(process.argv[1]);console.log({fresh:r.cohort.ids.length,already_opened:r.cohort.prior_unique_excluded,still_reserved:r.cohort.next_unopened_eval_reserve});' "$RUNNER_TEMP/arc-agi"
+      - name: FIRST and ONLY permitted prospective original scoring for this frozen hypothesis
+        shell: bash
+        run: |
+          set -euo pipefail
+          node experiments/q3_p28_transfer48_first.mjs "$RUNNER_TEMP/arc-agi" > p28-FIRST-ORIGINAL-TRANSFER48.json
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const r=JSON.parse(fs.readFileSync('p28-FIRST-ORIGINAL-TRANSFER48.json','utf8'));
+          if(r.stats.n!==48||r.reserved_unopened_file_count!==120||!r.gold_used_only_after_all_proposals||r.neural_model_calls!==0)process.exit(1);
+          console.log(JSON.stringify({science:r.science_status,stats:r.stats,Q3:r.q3_autonomous_invention,Q6:r.q6_unseen_semantic_family}));
+          for(const row of r.rows)if(row.P28_certificate)fs.writeFileSync('p28-cert-'+row.id+'.json',JSON.stringify(row.P28_certificate));
+          NODE
+      - name: Independently replay each generated executable AST with DIFFERENT Python interpreter
+        shell: bash
+        run: |
+          set -euo pipefail
+          count=0
+          for file in p28-cert-*.json; do
+            if [ ! -f "$file" ]; then break; fi
+            python experiments/q3_p28_verify_certificate.py "$file"
+            count=$((count+1))
+          done
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const r=JSON.parse(fs.readFileSync('p28-FIRST-ORIGINAL-TRANSFER48.json','utf8'));
+          const certs=fs.readdirSync('.').filter(x=>x.startsWith('p28-cert-')&&x.endsWith('.json')).length;
+          if(certs!==r.stats.P28_submitted)process.exit(1);
+          console.log('Independent Python replayed P28 certs: '+certs);
+          NODE
+      - name: Record immutable FIRST receipt hashes regardless of scientific FAIL
+        if: always()
+        shell: bash
+        run: |
+          if test -f p28-FIRST-ORIGINAL-TRANSFER48.json; then
+            sha256sum p28-FIRST-ORIGINAL-TRANSFER48.json > p28-FIRST-ORIGINAL-TRANSFER48.sha256
+            cat p28-FIRST-ORIGINAL-TRANSFER48.sha256
+          fi
+      - name: Preserve ORIGINAL raw evidence (do not rerun to rescue FAIL)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-p28-FIRST-original-transfer48
+          path: |
+            p28-FIRST-ORIGINAL-TRANSFER48.json
+            p28-FIRST-ORIGINAL-TRANSFER48.sha256
+          if-no-files-found: warn
+          retention-days: 90

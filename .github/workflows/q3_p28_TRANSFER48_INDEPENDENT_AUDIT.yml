@@ -1,0 +1,88 @@
+name: NEUMANN P2.8 FIRST transfer48 independent proof ceiling audit
+on:
+  push:
+    branches:
+      - research/q3-p28-first-fresh-original-transfer48-20261105
+    paths:
+      - .github/workflows/q3_p28_TRANSFER48_INDEPENDENT_AUDIT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout read-only research branch
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Download immutable FIRST real 48 original receipt; never rerun inference
+        uses: actions/download-artifact@v4
+        with:
+          name: neumann-p28-FIRST-original-transfer48
+          run-id: 42018227034
+          github-token: ${{ github.token }}
+          path: first-retained
+      - name: Read pinned original ARC source without changing cohort
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+      - name: Independent 81-program Python ceiling proof and exact previous-source hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python experiments/q3_p28_transfer48_independent_audit.py . "$RUNNER_TEMP/arc-agi" first-retained/p28-FIRST-ORIGINAL-TRANSFER48.json > p28-first-independent-audit.json
+          python - <<'PY'
+          import json
+          x=json.load(open('p28-first-independent-audit.json'))
+          assert x['auditor_pass'],x['errors']
+          assert x['tested_originals']==48
+          assert x['input_scope_eligible']==4
+          assert x['input_scope_not_eligible']==44
+          assert x['independently_train_fitting_programs']==0
+          assert x['P28_submissions']==0
+          assert x['P28_candidates_tested']==324
+          assert x['independent_train_pair_checks']==324
+          assert x['original_baseline_correct_from_hashlocked_flags']==3
+          assert x['first_reported_additional_exact']==0
+          assert x['Q3']==x['Q6']==x['Q7']=='OPEN'
+          print({'independent_audit':'PASS',
+             'source_first_sha256':x['original_first_sha256'],
+             'eligible':x['input_scope_eligible'],
+             'out_of_scope':x['input_scope_not_eligible'],
+             'exact_fits':x['independently_train_fitting_programs'],
+             'additional_exact':x['first_reported_additional_exact']})
+          PY
+      - name: "Strong negative control: original receipt substitution must fail"
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from experiments.q3_p28_transfer48_independent_audit import independent_first
+          p=Path('first-retained/p28-FIRST-ORIGINAL-TRANSFER48.json')
+          raw=json.loads(p.read_text())
+          raw['stats']['added_exact']=42
+          q=Path('/tmp/forged-first-transfer.json')
+          q.write_text(json.dumps(raw))
+          result=independent_first('.',__import__('os').environ['RUNNER_TEMP']+'/arc-agi',q)
+          assert not result['auditor_pass']
+          assert 'FIRST_RECEIPT_BYTES_DRIFT' in result['errors']
+          assert 'RECEIPT_AGGREGATE_MISMATCH:added_exact' in result['errors']
+          print('Forged success rejected by independent original source auditor')
+          PY
+      - name: Preserve audit without altering first run evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-p28-FIRST-transfer48-independent-python-audit
+          path: p28-first-independent-audit.json
+          if-no-files-found: warn
+          retention-days: 90
