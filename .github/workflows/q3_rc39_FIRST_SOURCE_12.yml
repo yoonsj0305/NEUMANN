@@ -1,0 +1,60 @@
+name: NEUMANN RC39 FIRST source-only 12 synthetic-author cases
+on:
+  push:
+    branches:
+      - research/q3-rc39-active-causal-discovery-20261106
+    paths:
+      - .github/workflows/q3_rc39_FIRST_SOURCE_12.yml
+permissions:
+  contents: read
+jobs:
+  first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify locked source was tested before independent author
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object research/q3/rc39/active_sparse.py)" = bcfd1a6ac52f8e6e806fbf35bef5a0f7f2b48411
+          test "$(git hash-object docs/research/q3_RC39_ACTIVE_CAUSAL_DISCOVERY_PREREG_2026_11_06.json)" = e7469632595727d1d6ad108c8b34b60305c6e483
+          python -m unittest discover -s tests -p test_q3_rc39_active_sparse_source.py
+      - name: FIRST program proposals, hide independent original grader and author target mappings
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research.q3.rc39.first_author_source RC39-FIRST-12-SOURCE.json
+          python - <<'PY'
+          import json
+          p=json.load(open("RC39-FIRST-12-SOURCE.json"))
+          s=p["summary"]
+          assert s["N"]==12
+          assert s["candidate_fitted"]==12
+          assert s["baseline_single_site_fitted"]==12
+          assert s["baseline_strong_adaptive_fitted"]==12
+          assert s["candidate_source_queries"]<=s["classical_single_site_queries"]/10
+          assert all(x["hidden_author_mapping_in_first_receipt"] is False for x in p["tasks"])
+          print({"PROSPECTIVE_FIRST_SOURCE":"PASS","counts":s,
+            "neural_calls":0,"author_spec_output_leakage":False})
+          PY
+      - name: Freeze first source receipt, including successes and failures
+        if: always()
+        shell: bash
+        run: |
+          if test -f RC39-FIRST-12-SOURCE.json; then
+            sha256sum RC39-FIRST-12-SOURCE.json > RC39-FIRST-12-SOURCE.sha256
+            cat RC39-FIRST-12-SOURCE.sha256
+          fi
+      - name: Retain exact first raw source artifact for post-first independent grading
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-RC39-FIRST-12-SOURCE-IMMUTABLE
+          path: |
+            RC39-FIRST-12-SOURCE.json
+            RC39-FIRST-12-SOURCE.sha256
+          if-no-files-found: warn
+          retention-days: 90
