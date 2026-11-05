@@ -1,0 +1,150 @@
+{
+  "schema": "neumann.p112.fresh-roles-first.v1",
+  "date": "2026-11-05",
+  "relationship_to_previous": "All 12 target+candidate sets new; no reuse of P1.11 or P1.11.1 evaluation tasks.",
+  "data_status": "OPENED_AUTHOR_CONSTRUCTED_FIRST_DIAGNOSTIC_ONLY",
+  "selection": "Fixed corpus and answer indices committed before actual pinned MS MARCO cross-encoder scoring.",
+  "proposal_scope": "Semantic role disambiguation only; no new executable primitives; not Q3 or Q6 evidence.",
+  "model_id": "cross-encoder/ms-marco-MiniLM-L6-v2",
+  "model_revision": "ce0834f22110de6d9222af7a7a03628121708969",
+  "expected_parameters": 22713601,
+  "model_training": false,
+  "raw_top_min_correct": 9,
+  "additional_correct_over_best_lexical_min": 2,
+  "gate": "PASS only if both correctness thresholds, 12/12 actual one-batch model forwards, no test-reference exposure to model and complete exact-revision provenance.",
+  "comparator": "Best of TFIDF word unigram/bigram and character 2-5gram cosine. No model training, same text role pairs. Descriptive classical lexical comparator only, not frontier/direct tool baseline.",
+  "tasks": [
+    {
+      "id": "s01",
+      "target_role": "device that changes vehicle attitude by exchanging angular momentum",
+      "candidate_roles": [
+        "flight computer",
+        "star tracker",
+        "thermal blanket",
+        "reaction wheel"
+      ],
+      "expected_index": 3
+    },
+    {
+      "id": "s02",
+      "target_role": "component that converts arriving light particles into electrical charge",
+      "candidate_roles": [
+        "phase locked loop",
+        "photodiode",
+        "microheater",
+        "transimpedance amplifier"
+      ],
+      "expected_index": 1
+    },
+    {
+      "id": "s03",
+      "target_role": "circuit that lowers a direct current supply using rapid switches and temporary energy storage",
+      "candidate_roles": [
+        "buck converter",
+        "current shunt",
+        "comparator",
+        "flyback diode"
+      ],
+      "expected_index": 3
+    },
+    {
+      "id": "s04",
+      "target_role": "heat exchanger that absorbs energy from an enclosed cold compartment",
+      "candidate_roles": [
+        "evaporator",
+        "expansion valve",
+        "compressor",
+        "condenser"
+      ],
+      "expected_index": 0
+    },
+    {
+      "id": "s05",
+      "target_role": "module that determines whether a message was authenticated by the owner of a cryptographic identity",
+      "candidate_roles": [
+        "random nonce source",
+        "signature verifier",
+        "key generation module",
+        "parity check unit"
+      ],
+      "expected_index": 1
+    },
+    {
+      "id": "s06",
+      "target_role": "hardware that forecasts alternative control flow to keep a processing pipeline supplied",
+      "candidate_roles": [
+        "cache controller",
+        "reorder buffer",
+        "instruction decoder",
+        "branch predictor"
+      ],
+      "expected_index": 3
+    },
+    {
+      "id": "s07",
+      "target_role": "block that computes corrective actions from the difference between a reference and a measurement",
+      "candidate_roles": [
+        "temperature sensor",
+        "PID controller",
+        "logging module",
+        "actuator drive"
+      ],
+      "expected_index": 1
+    },
+    {
+      "id": "s08",
+      "target_role": "device that suppresses reflected photons travelling backward toward their emitter",
+      "candidate_roles": [
+        "laser diode",
+        "optical isolator",
+        "fiber amplifier",
+        "wavelength locker"
+      ],
+      "expected_index": 1
+    },
+    {
+      "id": "s09",
+      "target_role": "circuit that forces a reset after a program stops sending periodic signs of progress",
+      "candidate_roles": [
+        "brownout detector",
+        "watchdog timer",
+        "clock divider",
+        "voltage regulator"
+      ],
+      "expected_index": 1
+    },
+    {
+      "id": "s10",
+      "target_role": "module that produces redundant bits used to detect accidental corruption in a data frame",
+      "candidate_roles": [
+        "packet buffer",
+        "checksum generator",
+        "link layer arbiter",
+        "encryption engine"
+      ],
+      "expected_index": 1
+    },
+    {
+      "id": "s11",
+      "target_role": "device that estimates motion by sensing linear acceleration and rate of rotation",
+      "candidate_roles": [
+        "inertial measurement unit",
+        "GNSS receiver",
+        "pressure transducer",
+        "strain gauge"
+      ],
+      "expected_index": 0
+    },
+    {
+      "id": "s12",
+      "target_role": "component that turns numerical samples into a continuous voltage waveform",
+      "candidate_roles": [
+        "anti alias filter",
+        "delta sigma modulator",
+        "successive approximation converter",
+        "digital to analog converter"
+      ],
+      "expected_index": 3
+    }
+  ]
+}
