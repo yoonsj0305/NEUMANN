@@ -1,0 +1,238 @@
+{
+  "schema": "neumann.q3.p19.first-shard.v1",
+  "index": 5,
+  "range": [
+    24,
+    29
+  ],
+  "frozen_cohort_sha": "68c99bb5cc6ccd550c12a316b7cca99fb947b286",
+  "source_blob": "60815950cd5e7da777e20547bb7389cd0de994a7",
+  "B_blob": "e2583c641426a51b1945b8fff7b1f9bba5bf9982",
+  "Q_blob": "038cdcee8d8c8bf9c84e790056cdb80f5fa6ac82",
+  "rows": [
+    {
+      "id": "68b16354",
+      "B_exact": true,
+      "Q_exact": true,
+      "baseline_exact": true,
+      "C_exact": null,
+      "combined_exact": true,
+      "C_new_correct": false,
+      "C_false_accept": false,
+      "baseline_conflict": false,
+      "combined_false_accept": false,
+      "B_attempted": 500,
+      "Q_operator_calls": 4682,
+      "Q_wall_ms": 261,
+      "B_wall_ms": 76,
+      "C_trace": null,
+      "test_count": 1,
+      "train_count": 3
+    },
+    {
+      "id": "ce4f8723",
+      "B_exact": false,
+      "Q_exact": false,
+      "baseline_exact": false,
+      "C_exact": true,
+      "combined_exact": true,
+      "C_new_correct": true,
+      "C_false_accept": false,
+      "baseline_conflict": false,
+      "combined_false_accept": false,
+      "B_attempted": 500,
+      "Q_operator_calls": 6993,
+      "Q_wall_ms": 238,
+      "B_wall_ms": 71,
+      "C_trace": {
+        "candidate_ast_count": 1598,
+        "train_sample_evaluations": 6347,
+        "test_sample_evaluations": 4,
+        "training_fit_count": 4,
+        "distinct_test_predictions": 1,
+        "ambiguous": false,
+        "abstention": null,
+        "wall_ms": 222,
+        "representative_ASTs": [
+          {
+            "ast": {
+              "type": "split",
+              "mode": "predicate",
+              "orientation": "horizontal",
+              "op": "bothZero"
+            },
+            "palette": [
+              [
+                0,
+                3
+              ],
+              [
+                1,
+                0
+              ]
+            ]
+          },
+          {
+            "ast": {
+              "type": "split",
+              "mode": "predicate",
+              "orientation": "horizontal",
+              "op": "same"
+            },
+            "palette": [
+              [
+                0,
+                3
+              ],
+              [
+                1,
+                0
+              ]
+            ]
+          },
+          {
+            "ast": {
+              "type": "split",
+              "mode": "predicate",
+              "orientation": "horizontal",
+              "op": "different"
+            },
+            "palette": [
+              [
+                0,
+                0
+              ],
+              [
+                1,
+                3
+              ]
+            ]
+          }
+        ],
+        "model_forwards": 0
+      },
+      "test_count": 1,
+      "train_count": 4
+    },
+    {
+      "id": "06df4c85",
+      "B_exact": false,
+      "Q_exact": false,
+      "baseline_exact": false,
+      "C_exact": false,
+      "combined_exact": false,
+      "C_new_correct": false,
+      "C_false_accept": false,
+      "baseline_conflict": false,
+      "combined_false_accept": false,
+      "B_attempted": 500,
+      "Q_operator_calls": 1074,
+      "Q_wall_ms": 109,
+      "B_wall_ms": 779,
+      "C_trace": {
+        "candidate_ast_count": 1598,
+        "train_sample_evaluations": 4734,
+        "test_sample_evaluations": 0,
+        "training_fit_count": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 1507,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "test_count": 1,
+      "train_count": 3
+    },
+    {
+      "id": "97999447",
+      "B_exact": false,
+      "Q_exact": false,
+      "baseline_exact": false,
+      "C_exact": false,
+      "combined_exact": false,
+      "C_new_correct": false,
+      "C_false_accept": false,
+      "baseline_conflict": false,
+      "combined_false_accept": false,
+      "B_attempted": 500,
+      "Q_operator_calls": 5738,
+      "Q_wall_ms": 168,
+      "B_wall_ms": 51,
+      "C_trace": {
+        "candidate_ast_count": 1598,
+        "train_sample_evaluations": 4734,
+        "test_sample_evaluations": 0,
+        "training_fit_count": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 249,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "test_count": 1,
+      "train_count": 3
+    },
+    {
+      "id": "32597951",
+      "B_exact": false,
+      "Q_exact": false,
+      "baseline_exact": false,
+      "C_exact": false,
+      "combined_exact": false,
+      "C_new_correct": false,
+      "C_false_accept": false,
+      "baseline_conflict": false,
+      "combined_false_accept": false,
+      "B_attempted": 500,
+      "Q_operator_calls": 1702,
+      "Q_wall_ms": 89,
+      "B_wall_ms": 142,
+      "C_trace": {
+        "candidate_ast_count": 1598,
+        "train_sample_evaluations": 4749,
+        "test_sample_evaluations": 0,
+        "training_fit_count": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 858,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "test_count": 1,
+      "train_count": 3
+    },
+    {
+      "id": "e40b9e2f",
+      "B_exact": false,
+      "Q_exact": false,
+      "baseline_exact": false,
+      "C_exact": false,
+      "combined_exact": false,
+      "C_new_correct": false,
+      "C_false_accept": false,
+      "baseline_conflict": false,
+      "combined_false_accept": false,
+      "B_attempted": 500,
+      "Q_operator_calls": 6025,
+      "Q_wall_ms": 392,
+      "B_wall_ms": 93,
+      "C_trace": {
+        "candidate_ast_count": 1598,
+        "train_sample_evaluations": 4734,
+        "test_sample_evaluations": 0,
+        "training_fit_count": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 276,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "test_count": 1,
+      "train_count": 3
+    }
+  ]
+}
