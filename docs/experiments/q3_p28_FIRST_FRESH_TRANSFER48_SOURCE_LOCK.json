@@ -1,0 +1,31 @@
+{
+  "schema": "neumann.q3.p28.first-fresh-original-transfer48.source-lock.v1",
+  "date": "2026-11-05",
+  "filename_only_cohort_registration": true,
+  "original_upstream_sha": "399030444e0ab0cc8b4e199870fb20b863846f34",
+  "cohort_blob": "a55f0b9483832ca001fe7bc3a63737bec56dc06c",
+  "source_blobs": {
+    "experiments/q3_p28_transfer48_first.mjs": "c69a199087bda6fc8656676dc0380e05e5a3504d",
+    "tests/test_q3_p28_transfer48_first.mjs": "7d96a76546d69b369c29048a067045ae03fd21de",
+    "experiments/q3_p28_factorized_operator.mjs": "024bdbb902d8d63a1a47095ba592b8f26df71ec4",
+    "experiments/q3_compositional_schema_learning_p27.mjs": "5210428523d3311110c9dd94e2c5ddd985874087",
+    "experiments/q3_object_headroom_p11.mjs": "e2583c641426a51b1945b8fff7b1f9bba5bf9982",
+    "experiments/q3_shape_pruned_synthesis_p20.mjs": "c36849af2fc9f8651a94d2233cb3ec060dc370e3",
+    "experiments/q3_cached_typed_guard_p24.mjs": "671e01fb2bf309e84b6f3c1f25ac110f7ac121a",
+    "experiments/q3_generated_decision_trees_p25.mjs": "5c9971100865e529a2f259bac19a9c1d1658c599",
+    "experiments/q3_p28_verify_certificate.py": "f1b27db7f1614013b15f4f9174ef8c5817fcb999"
+  },
+  "new_hypothesis_class_vs_prior": "human-designed 81-program 2-input factorization; copied BYTE-EXACT from previous selected-original P28 mechanism.",
+  "fair_matched_classical_with_equal_new_hypothesis": "same 81-program enumerable grammar; P28 is classical itself, never learned-vs-classical advantage",
+  "stopping_rule": {
+    "min_additional_exact_vs_frozen_old": 2,
+    "P28_additional_wrong_max": 0,
+    "combined_wrong_max": 0,
+    "lost_exact_max": 0
+  },
+  "exact_original_eval_task_count": 48,
+  "no_hidden_training_on_this_eval": true,
+  "read_original_test_gold_only_after_all_proposals": true,
+  "first_execution_only": true,
+  "failure_action": "Record actual FIRST unchanged, STOP P28 transfer unless passing hard gate. Q3/Q6/Q7 OPEN even if PASS."
+}
