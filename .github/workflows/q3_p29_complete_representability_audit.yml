@@ -1,0 +1,86 @@
+name: NEUMANN P29 independent COMPLETE representability audit, no new eval
+on:
+  push:
+    branches:
+      - research/q3-p29-strongest-classical-novelty-audit-20261105
+    paths:
+      - .github/workflows/q3_p29_complete_representability_audit.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  complete:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Independent semantic grammar tests before any ARC data
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from experiments.q3_p29_complete_representability_audit import audit_one
+          # Unary conditional map, TRAIN-fit without a per-task lookup.
+          x=[[1,2],[3,1]]
+          tr={"train":[{"input":x,"output":[[3,1],[2,3]]}],"test":[{"input":x}]}
+          result=audit_one(tr)
+          assert result["training_unary_fit"],result
+          # Cross-copy factorization: outer nonzero gates inner when both nonzero.
+          def fact(g):
+              h,w=len(g),len(g[0])
+              return [[g[r//h][c//w] if g[r//h][c//w] and g[r%h][c%w] else 0
+                       for c in range(w*w)] for r in range(h*h)]
+          a=[[1,0],[2,1]]
+          b=[[2,1],[0,2]]
+          res=audit_one({"train":[{"input":a,"output":fact(a)},{"input":b,"output":fact(b)}],
+                        "test":[{"input":a}]})
+          assert res["training_binary_fit"] or res["training_unary_fit"],res
+          # Contradictory one-pixel color rewriting cannot be represented.
+          neg=audit_one({"train":[{"input":[[1]],"output":[[2]]},
+                                  {"input":[[1]],"output":[[3]]}],
+                         "test":[{"input":[[1]]}]})
+          assert not neg["training_unary_fit"] and not neg["training_binary_fit"],neg
+          print({"unary":"PASS","binary":"PASS","unsat":"PASS"})
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-p29-FIRST-fresh-public-original48
+          run-id: 42022961142
+          github-token: ${{ github.token }}
+          path: first
+      - name: Fetch exact original public ARC task files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+      - name: Independently enumerate every source-typed view and pixel selector over prior 48
+        shell: bash
+        run: |
+          set -euo pipefail
+          python experiments/q3_p29_complete_representability_audit.py . "$RUNNER_TEMP/arc-agi" first/P29-FIRST-FRESH48.json > P29-COMPLETE-REPRESENTABILITY48.json
+          python - <<'PY'
+          import json
+          r=json.load(open("P29-COMPLETE-REPRESENTABILITY48.json"))
+          assert r["original_count"]==48
+          assert r["no_test_oracle_used"] and r["q3_new_primitive"]=="OPEN"
+          assert r["shape_fit_count"]==35
+          assert r["complete_no_train_fit"]+r["complete_unary_train_fit"]+r["complete_binary_train_fit"]==48
+          print({k:r[k] for k in ("shape_fit_count","complete_unary_train_fit",
+             "complete_binary_train_fit","complete_no_train_fit",
+             "counterexample_to_runtime_pruning_missed_train_programs",
+             "total_view_pairs_checked_masks","total_view_pairs_early_rejected","runtime_seconds")})
+          PY
+      - name: Preserve independent full grammar/representability proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-p29-source-independent-full-representability48
+          path: P29-COMPLETE-REPRESENTABILITY48.json
+          if-no-files-found: warn
+          retention-days: 90
