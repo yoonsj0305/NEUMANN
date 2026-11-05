@@ -1,0 +1,65 @@
+{
+  "schema": "neumann.q3.p26.first-summary.v1",
+  "date": "2026-11-05",
+  "scientific_scope": "synthetic 5x5 program composition; 8 primitive opcodes all seen during training; 16 ordered compositions held out",
+  "first_source_sha256": "1d5c58a2e66a75ada28e87dc309b2dd5cbd739cf9e2da8313b6796727bc0e7e0",
+  "first_full_json_sha256": "3f2b159a337685e0507cec107d9ee6da41a061b377307ced1e453efb4fde76b9",
+  "full_first_source_and_json_location": "Reproducibility ZIP attached in associated research chat, not in this GitHub PR; do not treat this summary as the full first receipt",
+  "train_program_compositions": 48,
+  "heldout_unseen_compositions": 16,
+  "train_task_count": 4800,
+  "heldout_task_count": 1024,
+  "model_parameters": 69136,
+  "training_CPU_seconds_first": 0.820131445,
+  "neural_top4": {
+    "correct": 474,
+    "total": 1024,
+    "accepted_wrong": 0,
+    "ratio": 0.462890625,
+    "programs_checked": 4096,
+    "primitive_executions": 10328
+  },
+  "random_top4": {
+    "correct": 142,
+    "total": 1024,
+    "accepted_wrong": 0,
+    "ratio": 0.138671875,
+    "programs_checked": 4096,
+    "primitive_executions": 8814
+  },
+  "classical_full64": {
+    "correct": 1024,
+    "total": 1024,
+    "accepted_wrong": 0,
+    "ratio": 1,
+    "programs_checked": 65536,
+    "primitive_executions": 141464
+  },
+  "heldout_accuracy_margin_percentage_points": 32.421875,
+  "local_policy_gate": "FAIL_BELOW_PREDECLARED_60_PERCENT",
+  "complete_system_10x_gate": "FAIL",
+  "trained_policy_genuinely_cross_task": true,
+  "generated_new_primitive_semantics": false,
+  "original_ARC_results": "NOT_RUN",
+  "repeat_replay_measures": 22,
+  "repeat_replay_all_identical": true,
+  "cost_audit_posthoc": {
+    "training_data_generation_seconds": 0.617387706,
+    "training_seconds": 0.694654163,
+    "nn_forward_seconds": 0.002367332,
+    "hybrid_verification_seconds": 0.625001507,
+    "hybrid_full_coverage_correct": 1024,
+    "hybrid_fallback_cases": 550,
+    "hybrid_total_seconds": 1.939410708,
+    "classical_full64_total_seconds": 0.993772978,
+    "relative_cost_ratio_hybrid_over_classical": 1.9515631345733775,
+    "relative_verifier_primitive_executions": [
+      85720,
+      141464
+    ]
+  },
+  "cost_note": "Separate posthoc cost diagnostic. Both arms matched 100% exact; neural hybrid slower when including training and synthetic data generation.",
+  "training_energy_joules": null,
+  "monetary_cost_usd": null,
+  "global_Q1_Q7": "OPEN"
+}
