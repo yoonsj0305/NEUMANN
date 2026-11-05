@@ -1,0 +1,61 @@
+name: NEUMANN P29 strongest-prior classical novelty audit, NO NEW HOLDOUT
+on:
+  push:
+    branches:
+      - research/q3-p29-strongest-classical-novelty-audit-20261105
+    paths:
+      - .github/workflows/q3_p29_maximal_prior_audit.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 23
+    steps:
+      - name: Checkout research branch with frozen prior sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Read immutable first 400 train corpus receipt
+        uses: actions/download-artifact@v4
+        with:
+          name: neumann-p29-400-training-grammar-census
+          run-id: 42021735122
+          github-token: ${{ github.token }}
+          path: source-receipt
+      - name: Read immutable prior-five matched controls receipt
+        uses: actions/download-artifact@v4
+        with:
+          name: neumann-p29-public400-matched-classical-audit
+          run-id: 42022318273
+          github-token: __GITHUB_TOKEN__
+          path: old-controls
+      - name: Fetch official ARC-AGI corpus at unchanged upstream SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = "399030444e0ab0cc8b4e199870fb20b863846f34"
+      - name: Source-locked prior full classical portfolio audit, exactly 19 already scored positives
+        shell: bash
+        run: |
+          set -euo pipefail
+          node experiments/q3_p29_maximal_prior_audit.mjs "$RUNNER_TEMP/arc-agi" source-receipt/P29-TRAIN400-CENSUS.json old-controls/P29-FIRST-TRAIN400-STRONG-MATCHED.json > p29-PREVIOUS-10-ARMS-AUDIT.json
+          node - <<'NODE'
+          const fs=require("fs");
+          const x=JSON.parse(fs.readFileSync("p29-PREVIOUS-10-ARMS-AUDIT.json","utf8"));
+          if(x.stats.already_opened_p29_first_correct!==19||x.rows.length!==19||!x.zero_new_heldout_consumed)process.exit(1);
+          console.log(JSON.stringify({science:x.author_scope,stats:x.stats,global_Q3:x.Q3_spontaneous_new_primitive,global_Q6:x.Q6_unseen_semantic_family}));
+          NODE
+      - name: Preserve unchanged comparison, even negative novelty
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-p29-prior10-on-original19
+          path: p29-PREVIOUS-10-ARMS-AUDIT.json
+          if-no-files-found: warn
+          retention-days: 90
