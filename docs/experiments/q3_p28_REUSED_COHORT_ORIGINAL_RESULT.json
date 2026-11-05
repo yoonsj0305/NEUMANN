@@ -1,0 +1,29 @@
+{
+  "schema": "neumann.q3.p28.reused-original-first-audit.v1",
+  "date": "2026-11-05",
+  "source": "fchollet/ARC-AGI@399030444e0ab0cc8b4e199870fb20b863846f34",
+  "evaluation_manifest": "docs/experiments/q3_p27_COHORT_FROZEN.json",
+  "cohort_status": "REUSED_PUBLIC_EVALUATION_NOT_FRESH_OR_SEALED",
+  "code_changed_after_scoring": false,
+  "evaluation_protocol": "For each task read TRAIN inputs+outputs and TEST inputs; synthesize exact TRAIN candidates, then score against TEST gold",
+  "result": {
+    "original_tasks": 32,
+    "out_of_scope": 30,
+    "in_scope": 2,
+    "train_fit_tasks": 0,
+    "submitted": 0,
+    "exact_correct": 0,
+    "false_accepts": 0
+  },
+  "eligible_task_ids": [
+    "60c09cac",
+    "8b28cd80"
+  ],
+  "scores_by_id": "All other 30 from frozen manifest: out of scope; both eligible IDs had no exact train-fitting AST",
+  "source_evidence": "32 source-pinned original JSON files fetched via connected GitHub API in 4 disjoint groups of 8; scorer executed in JS tool isolate",
+  "independent_cli_replay": "experiments/q3_p28_reused_cohort_audit.mjs <ARC-AGI-root>",
+  "limitation": "Historical P2.7 cohort was already used; 0/32 is a scope ceiling diagnosis, not a sealed new first evaluation",
+  "q3_global": "OPEN",
+  "q4_global": "OPEN",
+  "frontier": "OPEN"
+}
