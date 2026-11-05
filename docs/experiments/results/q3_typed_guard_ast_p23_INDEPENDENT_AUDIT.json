@@ -1,0 +1,19 @@
+{
+  "schema": "neumann.q3.p23.independent-original-winner-audit.v1",
+  "date": "2026-11-05",
+  "upstream_commit": "399030444e0ab0cc8b4e199870fb20b863846f34",
+  "source_sha": "d398d009f175d8c2b0e3c4fe1a364aa27e2ce8a1",
+  "cohort_sha": "49c3fbfd673a4b4371697ad0a1e498386ca5c343",
+  "first_complete_sha": "63761c800372f7aa75944bfeea310a3d6361d30f",
+  "original_task_id": "e345f17b",
+  "independent_rule": "output[r][c] = (input[r][c] === input[r][c+width/2]) ? 4 : 0",
+  "exact_train_pairs": 4,
+  "total_train_pairs": 4,
+  "exact_original_test_grids": 2,
+  "total_original_test_grids": 2,
+  "source_contains_no_test_gold_or_task_id": true,
+  "mutation_changes_only_correctness_not_program": true,
+  "first_local_gate_unchanged": "INCONCLUSIVE_SINGLE_NEW_ORIGINAL_TASK",
+  "global_Q1_Q7": "OPEN",
+  "independent_audit_pass": true
+}
