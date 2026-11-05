@@ -1,0 +1,73 @@
+name: NEUMANN P3.0 read-only overlap with stronger P2.9
+on:
+  push:
+    branches:
+      - research/q3-p30-relational-object-language-20261105
+    paths:
+      - .github/workflows/q3_p30_readonly_overlap.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-p30-first-public-training400
+          run-id: 42026964385
+          github-token: ${{ github.token }}
+          path: p30-first
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-p29-400-training-grammar-census
+          run-id: 42021735122
+          github-token: ${{ github.token }}
+          path: p29-first
+      - name: Stronger-model overlap and exact first SHA checks without reopening ANY original test
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE' > P30-READONLY-OVERLAP.json
+          const fs=require('fs'),crypto=require('crypto');
+          function first(path,sha) {
+             const b=fs.readFileSync(path);
+             if(crypto.createHash('sha256').update(b).digest('hex')!==sha)throw Error('ORIGINAL_FIRST_SHA_MISMATCH:'+path);
+             return JSON.parse(b);
+          }
+          const p30=first('p30-first/P30-FIRST-PUBLIC-TRAIN400.json','9f7415d9ee0cd633fd67a0a87e4518f473c2d7124ce92773b13cd8412a6b8452');
+          const p29=first('p29-first/P29-TRAIN400-CENSUS.json','d26186c52c2b3f6f7c969476aeeef47ff55dff3c026d220ee6e7a51a3670651a');
+          if(p30.stats.N!==400||p29.stats.N!==400||p30.stats.correct!==9||p29.stats.correct!==19)throw Error('RECEIPT_DRIFT');
+          if(p30.rows.length!==400||p29.rows.length!==400||p30.rows.some((x,i)=>x.id!==p29.rows[i].id))throw Error('COHORT_ID_DRIFT');
+          const s29=new Set(p29.rows.filter(x=>x.correct).map(x=>x.id));
+          const s30=new Set(p30.rows.filter(x=>x.correct).map(x=>x.id));
+          const both=[...s30].filter(x=>s29.has(x));
+          const only30=[...s30].filter(x=>!s29.has(x));
+          const wrong30=p30.rows.filter(x=>x.false_submit).map(x=>x.id);
+          const report={schema:'neumann.q3.p30.source-first-overlap-audit.v1',
+            already_opened_originals:400,original_gold_not_reopened:true,
+            p29_correct:s29.size,p30_correct:s30.size,intersection:both.length,
+            additional_p30_over_p29:only30.length,
+            p30_new_positive_ids:only30,p30_false_submit_ids:wrong30,
+            P30_total_candidate_programs:p30.stats.candidates,
+            P30_full_wall_ms:p30.stats.total_wall_ms,
+            status:only30.length===0?'P30_DOMINATED_BY_P29_STOP':'P30_HAS_UNCHECKED_POTENTIAL_GAINS_NEEDS_OLDER10_AUDIT',
+            Q3:'OPEN',Q6:'OPEN',Q7:'OPEN'};
+          console.log(JSON.stringify(report,null,2));
+          NODE
+          node - <<'NODE'
+          const j=require('./P30-READONLY-OVERLAP.json');
+          console.log({scope:'previously opened public TRAINING only',intersection:j.intersection,
+             p30_additional:j.additional_p30_over_p29,p30_false:j.p30_false_submit_ids,
+             next:j.status});
+          NODE
+      - name: Save immutable read-only comparison
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-p30-first-positive-overlap-audit
+          path: P30-READONLY-OVERLAP.json
+          retention-days: 90
