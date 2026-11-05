@@ -1,0 +1,21 @@
+# NEUMANN P1.9 | First original-task capability expansion and cost decision
+Date: 2026-11-05 KST.
+
+## Immutable first experiment and precommitted sample
+- Registration `docs/research/q3_goal_conditioned_induction_p19_PREREG_2026_11_05.md` committed before fresh task bodies. Public `fchollet/ARC-AGI` training source pinned `399030444e0ab0cc8b4e199870fb20b863846f34`; 48 filenames selected by hash, excluding all 168 earlier opened IDs.
+- Frozen executable source `experiments/q3_goal_conditioned_induction_p19.mjs` (blob SHA `60815950cd5e7da777e20547bb7389cd0de994a7`), 5/5 local Node contract tests PASS. Source unchanged while scoring. Eight six-task first shards and immutable `docs/experiments/results/q3_goal_conditioned_induction_p19_FIRST_COMPLETE.json` preserve all 48 first outcomes.
+- **Strong classical B + exact quotient Q baseline** solved **3/48 entire original ARC tasks**. B alone solved 2/48, Q 3/48. Adding classical task-conditioned rule constructor **C raised this to 5/48, +2 verified entire original tasks** (IDs `ce4f8723`, `a79310a0`). No baseline correct task lost, no new or combined accepted-wrong original prediction across 48.
+- `ce4f8723`: from training learned an output relational predicate comparing paired half-grids split by a separator, with a learned color mapping; 4 candidate ASTs fit train and agree on test. `a79310a0`: inferred coordinate offset one row down plus color mapping 8→2, 2 train-consistent ASTs agree. These executable AST parameters were **derived from training examples**; no task IDs or gold test output accessed in generation.
+- The separate independent audit `docs/experiments/results/q3_goal_conditioned_induction_p19_INDEPENDENT_AUDIT.json` checked original upstream commit, 48 hash-selected filenames, frozen source identity, both winners with an independently authored direct cell-by-cell interpreter on every original train and test grid and changed-gold isolation. Audit **PASS**.
+
+## Full honest mechanism cost
+- C evaluated **71,910 candidate ASTs** across 45 B/Q-abstaining tasks, with **208,611 training primitive sample evaluations** and 6 test-input evaluations.
+- C's additional coarse in-isolate fitting/execution time **21,922 ms** across those tasks; B **6,105 ms** plus Q **11,236 ms** over all 48. These are task-region `Date.now()` clocks, not complete system costs.
+- New method increases exact solved task count by two but **does not demonstrate iso-capability 10x compute reduction**; full cold start, evaluation code transfer, energy, peak RSS, monetized AI model inference and deployment costs unmeasured.
+- The new candidate constructor is **bounded** human-defined typed schemas (affine coordinate shift/orientation, separator split, Boolean equality/zero predicates and palette map), with parameters learned on task examples. It is classical inductive synthesis, **not spontaneous invention of the primitive schema**, learned Q3 discovery policy, new natural-domain family transfer, GPT-6/JEPA neural benefit or frontier capability.
+- First local gate from prereg (≥2 novel verified tasks, zero false accepts, zero baseline losses) **PASS_BOUNDED_PROGRAM_INDUCTION_HEADROOM**. This is a very narrow local Q3 capability signal, NOT a global Q3 PASS.
+
+## What should actually change
+The candidate generator solved two original tasks that previous fixed programs could not express, yet it spent most CPU on rules with incompatible output shapes. Under the Musk requirement-deletion discipline, do **not** increase model size or run a JEPA. Next implementation should compute training **shape constraints** before actually executing AST candidates, while guaranteeing *the same* fitted candidate set, predicted outputs and original-task judgments. Test it on a fresh cohort and against this frozen P1.9 version (no favorable edits to P1.9 first results).
+
+If goal-directed shape pruning saves compute while maintaining 5/48 or better on newly selected original tasks, it is an important efficiency mechanism; it still does not establish frontier-level problem solving, new opcode invention, or 10x complete-system advantage. All Q1–Q7 globally OPEN; original P1.12/P2/Decision3 sealed gates unaffected. No mainline merge.
