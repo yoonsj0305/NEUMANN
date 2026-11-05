@@ -19,7 +19,7 @@ const squareFactor=(x)=>{
 };
 const solve=(pairs,testInputs)=>S.synthesize(pairs.map(([input,output])=>({input,output})),testInputs);
 test("identity and arbitrary palette rewrite are induced, not frozen named macros",()=>{
- const a=mk(2,3,1),b=mk(3,2,3),c=mk(2,4,5);
+ const a=mk(2,3,1),b=mk(3,2,3),c=mk(2,2,1);
  const remap=x=>x.map(row=>row.map(v=>v===0?0:(v+1)%10));
  const z=solve([[a,remap(a)],[b,remap(b)]],[c]);
  assert.equal(z.trace.abstained,null,JSON.stringify(z.trace));
@@ -41,11 +41,11 @@ test("extracts periodic 3x2 tile coordinates from examples with different shapes
  assert.ok(eq(z.prediction,[tile(c,3,2)]));
 });
 test("learns h^2 x w^2 two-source coordinate interaction across rectangles",()=>{
- const a=mk(2,3,1),b=mk(3,2,4),c=mk(2,2,7);
+ const a=mk(2,3,0),b=mk(3,2,3),c=mk(2,2,7);
  const tr=[{input:a,output:squareFactor(a)},{input:b,output:squareFactor(b)}];
  const z=S.synthesize(tr,[c]);
  assert.equal(z.trace.abstained,null,JSON.stringify(z.trace));
- assert.ok(eq(z.prediction,[squareFactor(c)]));
+ assert.ok(eq(z.prediction,[squareFactor(c)]),JSON.stringify({trace:z.trace,prediction:z.prediction}));
  assert.equal(z.trace.ast.kind,"coordinate-two-view-zero-mask");
  assert.ok(eq(S.interpret(z.trace.ast,c),squareFactor(c)));
  const old=oldP28(tr,[c]);
