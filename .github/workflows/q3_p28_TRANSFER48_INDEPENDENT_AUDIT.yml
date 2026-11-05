@@ -59,7 +59,7 @@ jobs:
              'exact_fits':x['independently_train_fitting_programs'],
              'additional_exact':x['first_reported_additional_exact']})
           PY
-      - name: Strong negative control: original receipt substitution must fail
+      - name: "Strong negative control: original receipt substitution must fail"
         shell: bash
         run: |
           set -euo pipefail
