@@ -68,6 +68,8 @@ export function computeRegistry(arcRoot) {
   verified:true,
   stage_count:rows.length,unique_registered_or_scored:seen.size,
   total_official_eval:400,remaining_unscored:remaining.length,
+  unregistered_in_twelve_source_locked_manifests:remaining.length,
+  no_prior_unmanifested_inspection_proven:false,
   remaining_ids_sha256:sha256(remaining.join("\n")+"\n"),
   independent_source_task_bodies_opened:false,
   P29_A_original_correct_novel:tag("0692e18c.json")==="P29_first_A",
@@ -100,7 +102,7 @@ export function admitManifest(registry,manifestPath) {
   throw Error("NEW_COHORT_SOURCE_OR_PROTOCOL_NOT_FROZEN");
  const result=admitNewOriginalIds(registry,ids);
  return {...result,source_manifest_sha256:sha256(fs.readFileSync(manifestPath)),
-  note:"Preflight admission only; no claim of model generalization or original scoring"};
+  note:"Preflight admission only; does not prove absence of unmanifested historical exposure or original generalization"};
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  if(process.argv.length<3||process.argv.length>4){console.error("Usage: node experiments/q3_global_original_provenance.mjs PINNED_ARC_ROOT [NEW_COHORT_MANIFEST.json]");process.exitCode=2;}
