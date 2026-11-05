@@ -1,0 +1,121 @@
+{
+  "schema": "neumann.q3.p29.first-independent-original-eval48.precommit.v1",
+  "date": "2026-11-05",
+  "upstream_repository": "fchollet/ARC-AGI",
+  "upstream_commit": "399030444e0ab0cc8b4e199870fb20b863846f34",
+  "folder": "data/evaluation",
+  "historic_previous_manifests": [
+    {
+      "path": "docs/experiments/q3_object_rule_induction_p21_COHORT_FROZEN.json",
+      "blob_sha": "33da9126d57afd3348fec361d5fd54a42bca0fb3",
+      "count": 48
+    },
+    {
+      "path": "docs/experiments/q3_object_rule_induction_p211_COHORT_FROZEN.json",
+      "blob_sha": "79cd9eb4349c40ee972bc0aaf634444398b312d4",
+      "count": 48
+    },
+    {
+      "path": "docs/experiments/q3_open_program_teacher_p22_COHORT_FROZEN.json",
+      "blob_sha": "d3efeae438f3d1d32fae235fd349ccbcd4b96df1",
+      "count": 8
+    },
+    {
+      "path": "docs/experiments/q3_typed_guard_ast_p23_COHORT_FROZEN.json",
+      "blob_sha": "49c3fbfd673a4b4371697ad0a1e498386ca5c343",
+      "count": 32
+    },
+    {
+      "path": "docs/experiments/q3_sound_feature_caching_p24_COHORT_FROZEN.json",
+      "blob_sha": "599db16677abc31b0d9f6a6f68c3802a374f3208",
+      "count": 32
+    },
+    {
+      "path": "docs/experiments/q3_generated_decision_trees_p25_COHORT_FROZEN.json",
+      "blob_sha": "104c10e70ec1d3ef55fac6000a6bfcdbb544a981",
+      "count": 32
+    },
+    {
+      "path": "docs/experiments/q3_p27_COHORT_FROZEN.json",
+      "blob_sha": "bd9898cc408ee2ccddc9c2d963d368f107a5a63c",
+      "count": 32
+    },
+    {
+      "path": "docs/experiments/q3_p28_FIRST_FRESH_TRANSFER48_COHORT_FROZEN.json",
+      "blob_sha": "a55f0b9483832ca001fe7bc3a63737bec56dc06c",
+      "count": 48
+    }
+  ],
+  "evaluated_prior_unique": 280,
+  "source_original_file_count": 400,
+  "still_unused_before_selection": 120,
+  "preregistered_first_eval_count": 48,
+  "selected_by": "Unsigned FNV1a32('neumann-p29-FIRST-SEMANTIC-TRANSFER-20261105|'+filename) ascending, tiebreak filename, from prior-unused files",
+  "ids": [
+    "b7cb93ac.json",
+    "7d18a6fb.json",
+    "ca8f78db.json",
+    "62b74c02.json",
+    "13713586.json",
+    "696d4842.json",
+    "6ad5bdfd.json",
+    "a934301b.json",
+    "9b365c51.json",
+    "e2092e0c.json",
+    "dd2401ed.json",
+    "11e1fe23.json",
+    "2c0b0aff.json",
+    "b15fca0b.json",
+    "5a5a2103.json",
+    "00dbd492.json",
+    "12422b43.json",
+    "03560426.json",
+    "2753e76c.json",
+    "f9a67cb5.json",
+    "c658a4bd.json",
+    "292dd178.json",
+    "92e50de0.json",
+    "22a4bbc2.json",
+    "52fd389e.json",
+    "506d28a5.json",
+    "9b2a60aa.json",
+    "e5c44e8f.json",
+    "aee291af.json",
+    "782b5218.json",
+    "ad7e01d0.json",
+    "9f27f097.json",
+    "e760a62e.json",
+    "20981f0e.json",
+    "3490cc26.json",
+    "9def23fe.json",
+    "50f325b5.json",
+    "e7a25a18.json",
+    "d304284e.json",
+    "c3202e5a.json",
+    "642d658d.json",
+    "58e15b12.json",
+    "a59b95c0.json",
+    "705a3229.json",
+    "bf32578f.json",
+    "992798f6.json",
+    "ca8de6ea.json",
+    "2697da3f.json"
+  ],
+  "unopened_after_this_selection": 72,
+  "status": "COHORT_ONLY_FROZEN_BEFORE_READING_SELECTED_TASK_CONTENTS",
+  "first_eval_admission": "Core algorithm and 400 public-training/48 previous-eval development diagnostics complete BEFORE choosing this 48; no further model/source changes permitted after seeing selected outputs.",
+  "scoring": {
+    "strong_TOOL": "P11 B/P20/P24/P25/P27 classical source identical budgets; disagreement causes ABSTAIN",
+    "new_P29": "Original P29 coordinate source ca6f76504be5cf2fc00709b6479f0e8436c6fa18 unchanged; output from TRAIN+TEST input only",
+    "hard_pass": "At least 2 additional correct above old consensus, zero additional false submissions, zero lost correct, no new unsafe conflicts"
+  },
+  "hard_gate": {
+    "additional_exact_min": 2,
+    "additional_false_submit_max": 0,
+    "lost_correct_max": 0
+  },
+  "evidence_scope": "Fresh original 48 files relative to all eight prior official evaluation manifests, PUBLIC ARC-AGI-1, not ARC-AGI-2 or truly private",
+  "q3_autonomous_opcode_invention": "NOT_PROVEN",
+  "q6_new_semantic_family": "NOT_PROVEN",
+  "cost10x": "NOT_PROVEN"
+}

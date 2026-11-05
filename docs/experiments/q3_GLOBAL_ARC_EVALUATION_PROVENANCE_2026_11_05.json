@@ -1,0 +1,127 @@
+{
+  "schema": "neumann.q3.arc-agi-1.global-original-evaluation-ledger.v1",
+  "date": "2026-11-05",
+  "source": "fchollet/ARC-AGI",
+  "upstream_sha": "399030444e0ab0cc8b4e199870fb20b863846f34",
+  "source_folder": "data/evaluation",
+  "official_eval_original_count": 400,
+  "policy": "Conservatively reserve EVERY previously registered/scored original evaluation task across all branches. Before any new original validation, compare exact source hashes and prove ZERO overlap with cumulative ledger, not only ancestors of current Git branch.",
+  "chronology_provenance": "Earlier cohorts P21-P27 are preserved in historical order; later first-score runs ordered by GitHub Actions creation timestamp. Two P29 first studies ran independently and overlapped.",
+  "registered_or_scored_cohorts": [
+    {
+      "tag": "P21",
+      "path": "docs/experiments/q3_object_rule_induction_p21_COHORT_FROZEN.json",
+      "source_blob_sha": "33da9126d57afd3348fec361d5fd54a42bca0fb3",
+      "taskCount": 48,
+      "first_run_id": null,
+      "expectedCumulativeUnique": 48
+    },
+    {
+      "tag": "P211",
+      "path": "docs/experiments/q3_object_rule_induction_p211_COHORT_FROZEN.json",
+      "source_blob_sha": "79cd9eb4349c40ee972bc0aaf634444398b312d4",
+      "taskCount": 48,
+      "first_run_id": null,
+      "expectedCumulativeUnique": 96
+    },
+    {
+      "tag": "P22",
+      "path": "docs/experiments/q3_open_program_teacher_p22_COHORT_FROZEN.json",
+      "source_blob_sha": "d3efeae438f3d1d32fae235fd349ccbcd4b96df1",
+      "taskCount": 8,
+      "first_run_id": null,
+      "expectedCumulativeUnique": 104
+    },
+    {
+      "tag": "P23",
+      "path": "docs/experiments/q3_typed_guard_ast_p23_COHORT_FROZEN.json",
+      "source_blob_sha": "49c3fbfd673a4b4371697ad0a1e498386ca5c343",
+      "taskCount": 32,
+      "first_run_id": null,
+      "expectedCumulativeUnique": 136
+    },
+    {
+      "tag": "P24",
+      "path": "docs/experiments/q3_sound_feature_caching_p24_COHORT_FROZEN.json",
+      "source_blob_sha": "599db16677abc31b0d9f6a6f68c3802a374f3208",
+      "taskCount": 32,
+      "first_run_id": null,
+      "expectedCumulativeUnique": 168
+    },
+    {
+      "tag": "P25",
+      "path": "docs/experiments/q3_generated_decision_trees_p25_COHORT_FROZEN.json",
+      "source_blob_sha": "104c10e70ec1d3ef55fac6000a6bfcdbb544a981",
+      "taskCount": 32,
+      "first_run_id": null,
+      "expectedCumulativeUnique": 200
+    },
+    {
+      "tag": "P27",
+      "path": "docs/experiments/q3_p27_COHORT_FROZEN.json",
+      "source_blob_sha": "bd9898cc408ee2ccddc9c2d963d368f107a5a63c",
+      "taskCount": 32,
+      "first_run_id": null,
+      "expectedCumulativeUnique": 232
+    },
+    {
+      "tag": "P28_first",
+      "path": "docs/experiments/q3_p28_FIRST_FRESH_TRANSFER48_COHORT_FROZEN.json",
+      "source_blob_sha": "a55f0b9483832ca001fe7bc3a63737bec56dc06c",
+      "taskCount": 48,
+      "first_run_id": 42018227034,
+      "expectedCumulativeUnique": 280
+    },
+    {
+      "tag": "P19_first",
+      "path": "docs/experiments/q3_p19_FIRST_FRESH_TRANSFER48_COHORT_FROZEN.json",
+      "source_blob_sha": "b25b44955457d6732ed64aceddedcbc32773daaa",
+      "taskCount": 48,
+      "first_run_id": 42019505824,
+      "expectedCumulativeUnique": 328
+    },
+    {
+      "tag": "P29_first_A",
+      "path": "docs/experiments/q3_p29_FIRST_FRESH_ORIGINAL48_COHORT.json",
+      "source_blob_sha": "819cd66b42c94c25e81e300df75a574ec5b676b4",
+      "taskCount": 48,
+      "first_run_id": 42022927624,
+      "expectedCumulativeUnique": 353
+    },
+    {
+      "tag": "P29_first_B_parallel",
+      "path": "docs/experiments/q3_p29_FIRST_FRESH48_COHORT_FROZEN.json",
+      "source_blob_sha": "14752efaca19178eb97277f501e1de2809300cde",
+      "taskCount": 48,
+      "first_run_id": 42022961142,
+      "expectedCumulativeUnique": 366
+    },
+    {
+      "tag": "P30_first",
+      "path": "docs/experiments/q3_p30_FIRST_UNSEEN48_COHORT_FROZEN.json",
+      "source_blob_sha": "126cadca6f2a7a54b6b8eecbff253ad3ec8599f4",
+      "taskCount": 48,
+      "first_run_id": 42025416909,
+      "expectedCumulativeUnique": 389
+    }
+  ],
+  "exact_project_union_unique": 389,
+  "unused_original_evaluation_files": 11,
+  "corrections": [
+    {
+      "claim": "P29 first has 48 wholly unseen eval files",
+      "correct": "23/48 reused from earlier P19 study; only 25/48 new relative to prior cross-branch tests. P29 one correct id 0692e18c not reused in P19 and retains independent source proof."
+    },
+    {
+      "claim": "P30 first has 48 wholly unseen eval files",
+      "correct": "16/48 reused from P19, and 19/48 reused from parallel P29-B, with 10 in BOTH reuse groups. Therefore 25/48 distinct previous repeats and only 23/48 first-use relative to all earlier runs. P30 had no additional exact answers and zero new crop-composed submissions."
+    },
+    {
+      "claim": "After P30 there are 24 untouched original evaluation files",
+      "correct": "11 unused once P19, both parallel P29 studies and P30 are included in one global ledger."
+    }
+  ],
+  "distinction": "A first-run result can be valid as a source-executed performance measurement even if its 'newly unseen cohort' claim fails provenance. Do not relabel it a clean blind validation or close Q3/Q6/Q7.",
+  "heldout_policy": "Protect 11 remaining original public evaluation file IDs. No new seal/unseal until a fundamentally different generated executable-semantic architecture passes development against strongest equal-rights TOOL with complete costs.",
+  "global_Q1_to_Q7": "OPEN"
+}
