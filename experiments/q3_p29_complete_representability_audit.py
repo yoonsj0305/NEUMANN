@@ -92,11 +92,10 @@ def generate_views(inputs,shapes):
                 h,w=len(x),len(x[0])
                 out=[]
                 for r in range(H):
-                    rr=index(row_term,r,0,h,w,H,W,"row")
-                    if rr is None:valid=False;break
                     for c in range(W):
+                        rr=index(row_term,r,c,h,w,H,W,"row")
                         cc=index(col_term,r,c,h,w,H,W,"col")
-                        if cc is None:valid=False;break
+                        if rr is None or cc is None:valid=False;break
                         out.append(x[rr][cc])
                     if not valid:break
                 if not valid:break
