@@ -52,7 +52,7 @@ export function audit(arc,reportFile) {
    // Gold accessed after generating all 5 strong controls and replaying P29.
    const original=task.test.map(x=>x.output);
    const correctP29=exact(p29,original);
-   if(correctP29!==p29r.correct||p29r.false_submit===(p29r.correct))
+   if(correctP29!==p29r.correct||p29r.false_submit!==(p29!==null&&!correctP29))
        throw Error("FIRST_P29_ORIGINAL_GOLD_FLAG_MISMATCH:"+id);
    rows.push({
      id,old_flags:old.map(x=>exact(x,original)),old_conflict:conflict,
