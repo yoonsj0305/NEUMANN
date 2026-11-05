@@ -1,0 +1,78 @@
+name: NEUMANN P1.12 immutable first independent audit
+on:
+  push:
+    branches:
+      - research/p112-first-fresh-semantic-gate-20261105
+    paths:
+      - .github/workflows/control_plane_p112_immutable_first_audit.yml
+      - experiments/p112_immutable_first_audit.py
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Retrieve immutable first model receipt (do not rerun or retrain)
+        uses: actions/download-artifact@v4
+        with:
+          name: neumann-p112-first-fresh-real-model
+          run-id: 42013751594
+          github-token: ${{ github.token }}
+          path: p112-first-retained
+      - name: Verify immutable original SHA256 and independent scoring without any neural model
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum p112-first-retained/p112-first-actual.json
+          python -m experiments.p112_immutable_first_audit . p112-first-retained/p112-first-actual.json > p112-independent-first-audit.json
+          python - <<'PY'
+          import json
+          j=json.load(open('p112-independent-first-audit.json'))
+          assert j['auditor_pass'], j['errors']
+          assert j['independent_model_correct']==3
+          assert j['independent_best_lexical_correct']==3
+          assert j['additional_correct']==0
+          assert j['scientific_verdict']=='P112_FIRST_FAIL_RETENTION_AND_STOP'
+          assert j['actual_pretrained_forward_count']==12
+          print({'audit':'PASS','independently_scored_real_model':j['independent_model_correct'],
+                 'strongest_lexical':j['independent_best_lexical_correct'],
+                 'first_sha256':j['first_receipt_sha256'],
+                 'retained_scientific_result':j['scientific_verdict']})
+          PY
+      - name: Audit negative controls must detect tampering, mislabels and wrong score
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from experiments.p112_immutable_first_audit import verify
+          raw=Path('p112-first-retained/p112-first-actual.json').read_bytes()
+          original=verify(Path('.'),raw)
+          assert original['auditor_pass']
+          for name,edit in (
+            ('wrong_logged_score',lambda x:x['scores'].__setitem__('cross_correct',12)),
+            ('wrong_raw_top',lambda x:x['rows'][0].__setitem__('raw_candidate',2)),
+            ('wrong_gold',lambda x:x['rows'][0].__setitem__('gold_index',-1)),
+            ('false_Q3_claim',lambda x:x.__setitem__('Q1_Q7','PASS')),
+          ):
+            x=json.loads(raw)
+            edit(x)
+            y=verify(Path('.'),json.dumps(x).encode())
+            assert not y['auditor_pass'],name
+            print(name,': rejected')
+          PY
+      - name: Preserve independent read-only audit even though scientific gate FAILED
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-p112-independent-first-fail-audit
+          path: p112-independent-first-audit.json
+          if-no-files-found: warn
+          retention-days: 90
