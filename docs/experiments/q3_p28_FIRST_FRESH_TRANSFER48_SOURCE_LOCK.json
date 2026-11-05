@@ -1,5 +1,5 @@
 {
-  "schema": "neumann.q3.p28.first-fresh-original-transfer48.source-lock.v1",
+  "schema": "neumann.q3.p28.first-fresh-original-transfer48.source-lock.correction-v2",
   "date": "2026-11-05",
   "filename_only_cohort_registration": true,
   "original_upstream_sha": "399030444e0ab0cc8b4e199870fb20b863846f34",
@@ -11,7 +11,7 @@
     "experiments/q3_compositional_schema_learning_p27.mjs": "5210428523d3311110c9dd94e2c5ddd985874087",
     "experiments/q3_object_headroom_p11.mjs": "e2583c641426a51b1945b8fff7b1f9bba5bf9982",
     "experiments/q3_shape_pruned_synthesis_p20.mjs": "c36849af2fc9f8651a94d2233cb3ec060dc370e3",
-    "experiments/q3_cached_typed_guard_p24.mjs": "671e01fb2bf309e84b6f3c1f25ac110f7ac121a",
+    "experiments/q3_cached_typed_guard_p24.mjs": "671e01fb2bf309e84b6bf3c1f25ac110f7ac121a",
     "experiments/q3_generated_decision_trees_p25.mjs": "5c9971100865e529a2f259bac19a9c1d1658c599",
     "experiments/q3_p28_verify_certificate.py": "f1b27db7f1614013b15f4f9174ef8c5817fcb999"
   },
@@ -27,5 +27,9 @@
   "no_hidden_training_on_this_eval": true,
   "read_original_test_gold_only_after_all_proposals": true,
   "first_execution_only": true,
-  "failure_action": "Record actual FIRST unchanged, STOP P28 transfer unless passing hard gate. Q3/Q6/Q7 OPEN even if PASS."
+  "failure_action": "Record actual FIRST unchanged, STOP P28 transfer unless passing hard gate. Q3/Q6/Q7 OPEN even if PASS.",
+  "precheck_error_original_blob": "508e5707708ba932bbf7df3ffd1000f0ba369786",
+  "precheck_failed_run_id": 42018000699,
+  "precheck_science_status": "NOT_EVALUATED_NO_EVAL_BODIES_READ",
+  "precheck_erratum": "Only the P24 Git blob SHA in original source-lock was mistyped. Live source byte-identical and program hypothesis unchanged. First run aborted before reading any original task body. Original erroneous lock archived."
 }
