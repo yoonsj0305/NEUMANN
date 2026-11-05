@@ -21,7 +21,7 @@ import * as P23 from "./q3_typed_guard_ast_p23.mjs";
 import * as P28 from "./q3_p28_factorized_operator.mjs";
 import * as P29 from "./q3_p29_induced_coordinate_programs.mjs";
 
-const FROZEN_P29_RECEIPT_SHA="d26186c52c2b3f6f7c969476aeeef47ff55dff3c026d220ee6e7a51a";
+const FROZEN_P29_RECEIPT_SHA="d26186c52c2b3f6f7c969476aeeef47ff55dff3c026d220ee6e7a51a3670651a";
 const CORE_GIT_BLOB="ca6f76504be5cf2fc00709b6479f0e8436c6fa18";
 const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
 const sha=b=>createHash("sha256").update(b).digest("hex");
