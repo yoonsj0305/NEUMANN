@@ -1,0 +1,69 @@
+name: NEUMANN P3.0 public 400 relational-object headroom first
+on:
+  push:
+    branches:
+      - research/q3-p30-object-relation-recolor-20261105
+    paths:
+      - .github/workflows/q3_p30_training400_headroom.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  census:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Rerun synthetic relational mechanism tests only
+        run: node --test tests/test_q3_p30_object_relational_recolor.mjs
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-p29-400-training-grammar-census
+          run-id: 42021735122
+          github-token: ${{ github.token }}
+          path: first-p29
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-p29-public400-matched-classical-audit
+          run-id: 42022318273
+          github-token: ${{ github.token }}
+          path: matched-classical
+      - name: Fetch official ARC original 400 public training tasks
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = "399030444e0ab0cc8b4e199870fb20b863846f34"
+      - name: P3.0 FIRST public TRAIN400 outcome vs strongest previous matched solutions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node experiments/q3_p30_training400_census.mjs "$RUNNER_TEMP/arc-agi" first-p29/P29-TRAIN400-CENSUS.json matched-classical/P29-FIRST-TRAIN400-STRONG-MATCHED.json > P30-TRAIN400-FIRST.json
+          node - <<'NODE'
+          const fs=require('fs');
+          const x=JSON.parse(fs.readFileSync('P30-TRAIN400-FIRST.json','utf8'));
+          if(x.stats.N!==400||x.stats.oldCombined!==50||x.scope!=='OPENED_PUBLIC_400_TRAINING_DIAGNOSTIC_ONLY')process.exit(1);
+          console.log(JSON.stringify({stats:x.stats,global_Q3:x.Q3,scope:x.scope}));
+          NODE
+      - name: Original P3.0 receipts SHA256
+        if: always()
+        shell: bash
+        run: |
+          if test -f P30-TRAIN400-FIRST.json; then
+            sha256sum P30-TRAIN400-FIRST.json > P30-TRAIN400-FIRST.sha256
+            cat P30-TRAIN400-FIRST.sha256
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-p30-original-train400-relational-first
+          path: |
+            P30-TRAIN400-FIRST.json
+            P30-TRAIN400-FIRST.sha256
+          if-no-files-found: warn
+          retention-days: 90
