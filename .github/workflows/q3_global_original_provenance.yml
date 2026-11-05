@@ -1,0 +1,57 @@
+name: NEUMANN Q3 GLOBAL original ARC anti-overlap contract
+on:
+  push:
+    branches:
+      - research/q3-global-original-eval-ledger-20261105
+      - research/q3-global-ledger-mainline-20261105
+    paths:
+      - .github/workflows/q3_global_original_provenance.yml
+      - experiments/q3_global_original_provenance.mjs
+      - tests/test_q3_global_original_provenance.mjs
+      - docs/experiments/q3_GLOBAL_ARC_EVALUATION_PROVENANCE_2026_11_05.json
+permissions:
+  contents: read
+jobs:
+  provenance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Unit tests reject global original task reuse
+        run: node --test tests/test_q3_global_original_provenance.mjs
+      - name: Obtain exact frozen official ARC file names; do not access task JSON bodies
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = "399030444e0ab0cc8b4e199870fb20b863846f34"
+      - name: First independent global source-hash and 12-cohort chronological overlap audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          node experiments/q3_global_original_provenance.mjs "$RUNNER_TEMP/arc-agi" > Q3-GLOBAL-ORIGINAL-LEDGER-AUDIT.json
+          node - <<'NODE'
+          const r=require("./Q3-GLOBAL-ORIGINAL-LEDGER-AUDIT.json");
+          if(!r.verified||r.stage_count!==12||r.unique_registered_or_scored!==389||
+             r.remaining_unscored!==11||!r.P29_A_original_correct_novel||
+             !r.P30_original_correct_novel)process.exit(1);
+          const find=k=>r.rows.find(x=>x.tag===k);
+          if(find("P29_first_A").reused!==23||find("P29_first_B_parallel").reused!==35||
+             find("P30_first").reused!==25)process.exit(1);
+          console.log(JSON.stringify({verification:"GLOBAL_LEDGER_PASS",unique_evaluated:r.unique_registered_or_scored,
+             remaining:r.remaining_unscored,remaining_sha256:r.remaining_ids_sha256,
+             overlaps:r.rows.slice(-4).map(x=>({tag:x.tag,reused:x.reused,new:x.first_time}))}));
+          NODE
+      - name: Preserve anti-contamination proof artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-global-original-389-used-11-remain
+          path: Q3-GLOBAL-ORIGINAL-LEDGER-AUDIT.json
+          if-no-files-found: warn
+          retention-days: 90
