@@ -26,6 +26,12 @@ The next test reused the **same already opened 24 task families**. It is a sourc
 - This source-only interface required **~159×** the earlier ordinary learner's membership query count (172,051 / 1,082). CPU was also higher in separate runs, but the interfaces differ, so raw CPU ratios are NOT a same-rights performance comparison.
 - Trust boundary: theorem assumes complete deterministic Mealy target with ≤5 states and truthful membership responses; absent such a bound, finite data alone cannot certify arbitrary all-length behavior.
 
+## Fundamental identifiability boundary
+
+It is impossible to promote finite source observations to an all-length theorem **without a trusted state/grammar bound or a sufficiently strong proof oracle**. Constructively, for any observed finite input set whose longest string has length L, two deterministic complete Mealy machines agree on every observed word: (i) one-state ALL_ZERO, and (ii) an (L+2)-state counter emitting 1 only at the (L+1)th observed A. Yet A repeated L+1 times separates them. Thus no learner observing only finitely many queried strings can rule out arbitrary larger machines. This is a counterexample to *unconditional* all-length certainty, not a failure of the legitimate bounded-state RC39 certificates.
+
+[First mathematical negative-control CI #42132637162](https://github.com/yoonsj0305/NEUMANN/actions/runs/42132637162): 2/2 tests PASS; for source length L=0..6, all alphabet-ABC words up to L match and the length L+1 witness differs. The bound-5 premise is necessary and visible, not hidden in the verification procedure.
+
 ## Gate status and decision
 | Question | Evidence | Status |
 |---|---|---|
