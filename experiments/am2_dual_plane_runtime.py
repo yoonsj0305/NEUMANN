@@ -98,6 +98,7 @@ def run_observation(task,private,view,arm,core=None,budget=None):
       "schema":SCHEMA,"arm":arm,"task_id":task.get("id"),
       "model_view_sha256":sha(view),"original_task_sha256":sha(task),
       "model_calls":0,"tool_calls":0,"input_tokens":0,"output_tokens":0,
+      "token_accounting_complete":True,
       "checker_calls":0,"representation_certified":False,"thinking_enabled":False,
       "events":[],"accepted":False,"answer":None,"error":None,
       "peak_accelerator_memory_bytes":0,
@@ -130,6 +131,7 @@ def run_observation(task,private,view,arm,core=None,budget=None):
         allowance=min(budget.per_call_tokens,budget.output_tokens,budget.context_tokens-prompt_tokens)
         if allowance<1:raise ValueError("ABSTAIN_NO_OUTPUT_BUDGET")
         trace["model_calls"]+=1
+        trace["token_accounting_complete"]=False
         rec=core.generate(messages,allowance,False,left())
         trace["events"].append({"kind":"model_call","receipt":rec})
         if sha(core.identity)!=trace["model_identity_sha256"]:
@@ -142,6 +144,7 @@ def run_observation(task,private,view,arm,core=None,budget=None):
             raise ValueError("GENERATION_BUDGET_OR_DEADLINE")
         trace["input_tokens"]+=prompt_tokens
         trace["output_tokens"]+=rec["output_tokens"]
+        trace["token_accounting_complete"]=True
         trace["peak_accelerator_memory_bytes"]=max(
             trace["peak_accelerator_memory_bytes"],int(rec.get("peak_accelerator_memory_bytes",0)))
         return rec["raw"]
