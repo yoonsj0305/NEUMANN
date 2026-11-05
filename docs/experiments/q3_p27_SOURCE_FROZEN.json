@@ -1,0 +1,39 @@
+{
+  "schema": "neumann.q3.p27.source-freeze.v1",
+  "registered": "2026-11-05",
+  "first_eval_task_bodies_not_fetched": true,
+  "cohort_sha": "bd9898cc408ee2ccddc9c2d963d368f107a5a63c",
+  "sources": {
+    "experiments/q3_compositional_schema_learning_p27.mjs": "5210428523d3311110c9dd94e2c5ddd985874087",
+    "experiments/q3_compositional_schema_learning_p27_scorer.mjs": "8616e6c9d5e02c31a43cb870ad6c5e261e9e2363",
+    "experiments/q3_object_headroom_p11.mjs": "e2583c641426a51b1945b8fff7b1f9bba5bf9982",
+    "experiments/q3_goal_conditioned_induction_p19.mjs": "60815950cd5e7da777e20547bb7389cd0de994a7",
+    "experiments/q3_shape_pruned_synthesis_p20.mjs": "c36849af2fc9f8651a94d2233cb3ec060dc370e3",
+    "experiments/q3_cached_typed_guard_p24.mjs": "671e01fb2bf309e84b6bf3c1f25ac110f7ac121a",
+    "experiments/q3_generated_decision_trees_p25.mjs": "5c9971100865e529a2f259bac19a9c1d1658c599",
+    "experiments/q3_compositional_schema_learning_p27_first.mjs": "a4873c895bd78c4c410c378a273ccf39883c6951",
+    "experiments/q3_p27_independent_audit.mjs": "5f947c0bb24cbe07dc52a6b91e906c9eab912a2c"
+  },
+  "upstream_commit": "399030444e0ab0cc8b4e199870fb20b863846f34",
+  "train_source": "data/training (400 public tasks, meta train, test outputs permitted here)",
+  "evaluation_source": "data/evaluation (32 first unopened selected, gold unseen until score after proposals)",
+  "control_arms": [
+    "P11 B",
+    "P20",
+    "P24",
+    "P25",
+    "P27 classical full 157 hypotheses",
+    "P27 meta learned prior full identical 157 hypotheses"
+  ],
+  "max_candidate_per_P27_arm": 157,
+  "primitives_human_designed": 12,
+  "max_compose_depth": 2,
+  "goal": "Frontier-level problem solving with minimum necessary computation",
+  "local_gate": {
+    "min_additional_exact_over_legacy_baseline": 2,
+    "min_learned_exact_over_same_grammar_classical": 1,
+    "max_new_combined_false_accepts": 0
+  },
+  "global_q1_to_q7": "OPEN",
+  "interpretation": "Even if local gate passes, human-provided primitive grammar and public ARC benchmark do NOT prove autonomous opcode invention, heldout family transfer, frontier intelligence, or 10x total cost."
+}

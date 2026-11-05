@@ -1,0 +1,22 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {evaluateOriginal,aggregate,learnPrior} from "../experiments/q3_compositional_schema_learning_p27_scorer.mjs";
+const pair=(g)=>({input:g,output:g.map(row=>row.slice())});
+const grid=[[1,2],[2,1]];
+test("independent original scorer is well-typed and has no gold oracle in proposals",()=>{
+ const tr=[pair(grid),pair([[3,4],[4,3]])],evalInput=[[1,2],[2,1]];
+ const a={train:tr,test:[{input:evalInput,output:[[1,2],[2,1]]}]};
+ const b={train:tr,test:[{input:evalInput,output:[[9,9],[9,9]]}]};
+ const prior={same:{identity:3}};
+ const x=evaluateOriginal(a,prior),y=evaluateOriginal(b,prior);
+ assert.deepEqual(x.classical_trace.selected_AST,y.classical_trace.selected_AST);
+ assert.deepEqual(x.learned_trace.selected_AST,y.learned_trace.selected_AST);
+ assert.equal(x.classical_trace.geometry_attempts,157);
+ assert.equal(y.learned_trace.geometry_attempts,157);
+ assert.equal(x.classical_combined_false_accept,false);
+ assert.ok(["number","boolean"].includes(typeof x.baseline_exact));
+ const receipt=learnPrior([{train:tr,test:[pair(evalInput)]}]);
+ const totals=aggregate([x],receipt);
+ assert.equal(totals.original_test_predictions_made_without_test_gold,true);
+ assert.equal(totals.global_Q1_Q7,"OPEN");
+});

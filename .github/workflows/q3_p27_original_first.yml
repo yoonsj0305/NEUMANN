@@ -1,0 +1,53 @@
+name: NEUMANN P2.7 first original heldout gate
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout frozen NEUMANN research sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Synthetic mechanism and oracle separation checks
+        run: |
+          node --test tests/test_q3_compositional_schema_learning_p27.mjs tests/test_q3_compositional_schema_learning_p27_scorer.mjs
+      - name: Fetch official ARC-AGI original upstream commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = "399030444e0ab0cc8b4e199870fb20b863846f34"
+      - name: Preflight only filenames and source identities before reading evaluation bodies
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module -e 'import {verifyPinnedData} from "./experiments/q3_compositional_schema_learning_p27_first.mjs";const x=verifyPinnedData(process.argv[1]);console.log(JSON.stringify({new_original:x.cohort.ids.length,excluded:x.cohort.previous_excluded_unique,public_meta_training:x.trainNames.length}));' "$RUNNER_TEMP/arc-agi"
+      - name: First immutable 400-task meta-training and 32-task original evaluation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node experiments/q3_compositional_schema_learning_p27_first.mjs "$RUNNER_TEMP/arc-agi" > p27-FIRST-ORIGINAL-32.json
+          node -e 'const x=require("./p27-FIRST-ORIGINAL-32.json");if(x.stats.task_count!==32||x.stats.meta_training_tasks!==400||!x.original_test_predictions_made_without_test_gold)process.exit(1);console.log(JSON.stringify({stats:x.stats,local_gate:x.local_gate,status:x.status,scope:x.evaluation_scope}))'
+      - name: Independent original first prediction and oracle audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          node experiments/q3_p27_independent_audit.mjs "$RUNNER_TEMP/arc-agi" p27-FIRST-ORIGINAL-32.json > p27-FIRST-AUDIT.json
+          node -e 'const a=require("./p27-FIRST-AUDIT.json");if(!a.good||a.errors.length)process.exit(1);console.log(JSON.stringify({reproduction:a.good,counts:a.counts,errors:a.errors.length}))'
+      - name: Preserve first unedited receipt and audit (even negative result)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-p27-first-original-32
+          path: |
+            p27-FIRST-ORIGINAL-32.json
+            p27-FIRST-AUDIT.json
+          if-no-files-found: warn
+          retention-days: 90

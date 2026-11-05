@@ -2,7 +2,7 @@
 import sys, json
 from pathlib import Path
 import numpy as np
-ROOT=Path(__file__).resolve().parent
+ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'experiments'))
 from q3_task_sufficiency_p18 import CONTRACT, build_scenes, run
 

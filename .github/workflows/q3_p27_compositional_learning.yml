@@ -1,0 +1,29 @@
+name: NEUMANN P2.7 compositional learning controls
+on:
+  push:
+    branches:
+      - research/q3-p27-compositional-schema-learning-20261105
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            experiments/q3_compositional_schema_learning_p27.mjs
+            experiments/q3_cached_typed_guard_p24.mjs
+            experiments/q3_compositional_schema_learning_p27_scorer.mjs
+            experiments/q3_object_headroom_p11.mjs
+            experiments/q3_goal_conditioned_induction_p19.mjs
+            experiments/q3_shape_pruned_synthesis_p20.mjs
+            experiments/q3_generated_decision_trees_p25.mjs
+            tests/test_q3_compositional_schema_learning_p27_scorer.mjs
+            tests/test_q3_compositional_schema_learning_p27.mjs
+      - name: Test independently generated compositional structures
+        run: node --test tests/test_q3_compositional_schema_learning_p27.mjs tests/test_q3_compositional_schema_learning_p27_scorer.mjs
