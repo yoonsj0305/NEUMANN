@@ -18,6 +18,12 @@ jobs:
           sparse-checkout: |
             experiments/q3_compositional_schema_learning_p27.mjs
             experiments/q3_cached_typed_guard_p24.mjs
+            experiments/q3_compositional_schema_learning_p27_scorer.mjs
+            experiments/q3_object_headroom_p11.mjs
+            experiments/q3_goal_conditioned_induction_p19.mjs
+            experiments/q3_shape_pruned_synthesis_p20.mjs
+            experiments/q3_generated_decision_trees_p25.mjs
+            tests/test_q3_compositional_schema_learning_p27_scorer.mjs
             tests/test_q3_compositional_schema_learning_p27.mjs
       - name: Test independently generated compositional structures
-        run: node --test tests/test_q3_compositional_schema_learning_p27.mjs
+        run: node --test tests/test_q3_compositional_schema_learning_p27.mjs tests/test_q3_compositional_schema_learning_p27_scorer.mjs
