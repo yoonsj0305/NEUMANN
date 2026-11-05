@@ -1,0 +1,37 @@
+name: NEUMANN P3.0 first positive strong baseline conflict audit
+on:
+  push:
+    branches:
+      - research/q3-p30-object-relation-recolor-20261105
+    paths:
+      - .github/workflows/q3_p30_positive_conflict.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-p30-original-train400-relational-first
+          run-id: 42024204275
+          github-token: ${{ github.token }}
+          path: first-p30
+      - name: Fetch frozen original 400 training source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+      - name: Recalculate all strong classical controls on the one newly correct P3.0 original
+        shell: bash
+        run: |
+          set -euo pipefail
+          node experiments/q3_p30_positive_original_conflict_audit.mjs "$RUNNER_TEMP/arc-agi" first-p30/P30-TRAIN400-FIRST.json
