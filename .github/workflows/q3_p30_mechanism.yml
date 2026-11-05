@@ -1,0 +1,21 @@
+name: NEUMANN P3.0 role-relation program induction mechanistic tests
+on:
+  push:
+    branches:
+      - research/q3-p30-object-relation-recolor-20261105
+    paths:
+      - .github/workflows/q3_p30_mechanism.yml
+      - experiments/q3_p30_object_relational_recolor.mjs
+      - tests/test_q3_p30_object_relational_recolor.mjs
+permissions:
+  contents: read
+jobs:
+  mechanism:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Prove cross-example object rule induction and safe abstention
+        run: node --test tests/test_q3_p30_object_relational_recolor.mjs
