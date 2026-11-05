@@ -1,0 +1,60 @@
+name: NEUMANN RC39.1 FIRST NO-WITNESS offset-only source 16
+on:
+  push:
+    branches:
+      - research/q3-rc39-active-causal-discovery-20261106
+    paths:
+      - .github/workflows/q3_rc39_1_FIRST_NO_WITNESS_16.yml
+permissions:
+  contents: read
+jobs:
+  first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Lock source and prereg before first hidden author queries
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object research/q3/rc39/explainable_no_witness.py)" = da6d4f5ec5b5826683bd867e40c0590828d1b727
+          test "$(git hash-object docs/experiments/q3_RC39_1_NO_POSITIVE_WITNESS_EXPLAINABLE_ORACLE_PREREG.json)" = fbd3a88a61e39c233dcda8baabd4315bd0c0235a
+          python -m unittest discover -s tests -p test_q3_rc39_explainable_no_witness.py
+      - name: FIRST hidden author 16 source-only executable proposals
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research.q3.rc39.first_explainable_author RC39-1-FIRST-16-NO-WITNESS.json
+          python - <<'PY'
+          import json
+          r=json.load(open("RC39-1-FIRST-16-NO-WITNESS.json"))
+          s=r["counts"]
+          assert s["tasks"]==16
+          assert s["candidate_source_consistent"]==16
+          assert s["strong_classical_consistent"]==16
+          assert s["max_candidate_calls"]<=64
+          assert s["candidate_query_calls"]==s["strong_classical_query_calls"]
+          assert r["new_no_positive_examples"] and r["new_model_training_calls"]==0
+          assert all(not x["satisfying_witness_given"] and x["author_hidden_spec_not_passed_to_proposers"] for x in r["rows"])
+          print({"FIRST_NO_WITNESS":"PASS","counts":s,"proof_status":"PENDING_INDEPENDENT_GRADE"})
+          PY
+      - name: Hash FIRST original proposals even if failure
+        if: always()
+        shell: bash
+        run: |
+          if test -f RC39-1-FIRST-16-NO-WITNESS.json; then
+            sha256sum RC39-1-FIRST-16-NO-WITNESS.json > RC39-1-FIRST-16-NO-WITNESS.sha256
+            cat RC39-1-FIRST-16-NO-WITNESS.sha256
+          fi
+      - name: Preserve FIRST original source, never rewrite to rescue failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-RC39-1-FIRST-16-NO-WITNESS
+          path: |
+            RC39-1-FIRST-16-NO-WITNESS.json
+            RC39-1-FIRST-16-NO-WITNESS.sha256
+          if-no-files-found: warn
+          retention-days: 90
