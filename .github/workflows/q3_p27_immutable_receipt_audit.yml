@@ -41,11 +41,18 @@ jobs:
           set -euo pipefail
           node --input-type=module -e 'import fs from "node:fs";import {createHash} from "node:crypto";import {independentAudit} from "./experiments/q3_p27_independent_audit.mjs";const b=fs.readFileSync(process.argv[2]);const d=JSON.parse(b);d.meta_training_tasks=d.stats.meta_training_tasks;const a=independentAudit(process.argv[1],d);a.archived_first_sha256=createHash("sha256").update(b).digest("hex");a.read_only_receipt_adapter="Promote existing stats.meta_training_tasks into top-level metadata for frozen auditor; no modification to archived receipt or executable solver.";fs.writeFileSync("p27-FIRST-IMMUTABLE-AUDIT.json",JSON.stringify(a,null,2)+"\n");if(!a.good)process.exit(1);' "$RUNNER_TEMP/arc-agi" original-first/p27-FIRST-ORIGINAL-32.json
           node -e 'const x=require("./p27-FIRST-IMMUTABLE-AUDIT.json");if(!x.good||x.errors.length)process.exit(1);console.log(JSON.stringify({independent_audit_pass:x.good,counts:x.counts,error_count:x.errors.length}))'
+      - name: Independently recompute original classical baseline and learned meta-prior
+        run: |
+          set -euo pipefail
+          node experiments/q3_p27_baseline_meta_audit.mjs "$RUNNER_TEMP/arc-agi" original-first/p27-FIRST-ORIGINAL-32.json > p27-BASELINE-META-AUDIT.json
+          node -e 'const a=require("./p27-BASELINE-META-AUDIT.json");if(!a.verified||a.errors.length)process.exit(1);console.log(JSON.stringify({baseline_independent_pass:a.verified,original_baseline_correct:a.baseline_correct,meta_prior_positives:a.meta_prior_positive,unrepresentable_P27:a.no_train_consistent_P27_program_count}))'
       - name: Preserve independent original evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: neumann-p27-first-independent-audit
-          path: p27-FIRST-IMMUTABLE-AUDIT.json
+          path: |
+            p27-FIRST-IMMUTABLE-AUDIT.json
+            p27-BASELINE-META-AUDIT.json
           if-no-files-found: warn
           retention-days: 90
