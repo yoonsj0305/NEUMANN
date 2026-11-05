@@ -1,0 +1,63 @@
+name: NEUMANN P2.9 FIRST real prospective ARC eval48
+on:
+  push:
+    branches:
+      - research/q3-p29-unseen-first48-20261105
+    paths:
+      - .github/workflows/q3_p29_FIRST_FRESH48.yml
+permissions:
+  contents: read
+jobs:
+  original-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - name: Checkout frozen P29 source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Existing synthetic cross-size and unseen-color safety invariants
+        run: node --test tests/test_q3_p29_induced_coordinate_programs.mjs
+      - name: Fetch exactly pinned fchollet ARC original source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = "399030444e0ab0cc8b4e199870fb20b863846f34"
+      - name: Verify source and 48 new original filenames BEFORE opening task bodies
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module -e 'import {verifyPinned} from "./experiments/q3_p29_unseen_first48.mjs";const x=verifyPinned(process.argv[1]);console.log(JSON.stringify({preflight:"PASS",fresh:x.manifest.ids.length,previously_used:x.manifest.prior_seen_unique,remaining_untouched:x.manifest.remaining_reserve}));' "$RUNNER_TEMP/arc-agi"
+      - name: FIRST original model-free P29 against five matched classical TOOL solvers
+        shell: bash
+        run: |
+          set -euo pipefail
+          node experiments/q3_p29_unseen_first48.mjs "$RUNNER_TEMP/arc-agi" > P29-FIRST-FRESH-ORIGINAL48.json
+          node - <<'NODE'
+          const fs=require('fs');
+          const x=JSON.parse(fs.readFileSync('P29-FIRST-FRESH-ORIGINAL48.json','utf8'));
+          if(x.counts.n!==48||x.earlier_evaluation_files_excluded!==280||x.reserved_untouched_remaining!==72||!x.original_test_gold_accessed_only_after_all_proposals)process.exit(1);
+          console.log(JSON.stringify({science:x.science_status,counts:x.counts,autonomous_Q3:x.core_Q3,unseen_semantic_family_Q6:x.unseen_family_Q6}));
+          NODE
+      - name: Hash immutable FIRST receipt even on negative science result
+        if: always()
+        shell: bash
+        run: |
+          if test -f P29-FIRST-FRESH-ORIGINAL48.json; then
+            sha256sum P29-FIRST-FRESH-ORIGINAL48.json > P29-FIRST-FRESH-ORIGINAL48.sha256
+            cat P29-FIRST-FRESH-ORIGINAL48.sha256
+          fi
+      - name: Preserve exact first unmodified raw receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-P29-FIRST-FRESH-ORIGINAL48
+          path: |
+            P29-FIRST-FRESH-ORIGINAL48.json
+            P29-FIRST-FRESH-ORIGINAL48.sha256
+          if-no-files-found: warn
+          retention-days: 90
