@@ -1,0 +1,76 @@
+name: NEUMANN P2.9 first 48 independent Python executable audit
+on:
+  push:
+    branches:
+      - research/q3-p29-unseen-first48-20261105
+    paths:
+      - .github/workflows/q3_p29_FIRST_FRESH48_INDEPENDENT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Download ORIGINAL first raw source receipt; do not regenerate proposals
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-P29-FIRST-FRESH-ORIGINAL48
+          run-id: 42022927624
+          github-token: ${{ github.token }}
+          path: first-immutable
+      - name: Fetch original ARC source exactly at registered revision
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+      - name: Different-language replay of independently generated programs on actual original task targets
+        shell: bash
+        run: |
+          set -euo pipefail
+          python experiments/q3_p29_fresh48_independent_audit.py . "$RUNNER_TEMP/arc-agi" first-immutable/P29-FIRST-FRESH-ORIGINAL48.json > p29-FIRST-FRESH48-INDEPENDENT-AUDIT.json
+          python - <<'PY'
+          import json
+          x=json.load(open('p29-FIRST-FRESH48-INDEPENDENT-AUDIT.json'))
+          assert x['auditor_pass'], x['errors']
+          assert x['new_eval_items']==48
+          assert x['independent_original_correct']==1
+          assert x['independent_original_wrong']==0
+          assert x['independently_replayed_programs']==1
+          assert x['old_consensus_correct_from_sha_locked_first_receipt']==1
+          assert x['scientific_status']=='P29_FIRST_FRESH_TRANSFER_FAIL_OR_UNSAFE'
+          assert x['q3']==x['q6']==x['q7']=='OPEN'
+          print({'independent_execution':'PASS','original_programs':x['independently_replayed_programs'],'exact':x['independent_original_correct'],'first_sha256':x['first_receipt_sha256'],'correct_ids':x['correct_ids'],'shape_rules':x['shape_rules_found']})
+          PY
+      - name: Ensure forged first-science promotion is rejected without original inference
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          from experiments.q3_p29_fresh48_independent_audit import audit
+          import json,os
+          first=json.loads(Path('first-immutable/P29-FIRST-FRESH-ORIGINAL48.json').read_text())
+          first['counts']['additional_safe_exact']=48
+          Path('/tmp/p29-forged-first.json').write_text(json.dumps(first))
+          x=audit('.',os.environ['RUNNER_TEMP']+'/arc-agi','/tmp/p29-forged-first.json')
+          assert not x['auditor_pass'] and 'FIRST_RECEIPT_SHA256_DRIFT' in x['errors']
+          assert 'FIRST_OLD_CLASSICAL_FLAG_DRIFT' in x['errors']
+          print('Forged original score rejected')
+          PY
+      - name: Preserve independent audit without changing official first evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-P29-FIRST48-independent-source-audit
+          path: p29-FIRST-FRESH48-INDEPENDENT-AUDIT.json
+          if-no-files-found: warn
+          retention-days: 90
