@@ -1,0 +1,662 @@
+{
+  "schema": "neumann.q3.p20.posthoc-regression.v1",
+  "non_independent_development_cohort": true,
+  "range": [
+    24,
+    35
+  ],
+  "rows": [
+    {
+      "id": "68b16354",
+      "same_exact_prediction": true,
+      "same_abstention_reason": true,
+      "P19_correct": true,
+      "P20_correct": true,
+      "P19_false_accept": false,
+      "P20_false_accept": false,
+      "P19": {
+        "candidate_ast_count": 1598,
+        "train_sample_evaluations": 2382,
+        "test_sample_evaluations": 1,
+        "training_fit_count": 1,
+        "distinct_test_predictions": 1,
+        "ambiguous": false,
+        "abstention": null,
+        "wall_ms": 51,
+        "representative_ASTs": [
+          {
+            "ast": {
+              "type": "affine",
+              "crop": false,
+              "orientation": "flipV",
+              "dy": 0,
+              "dx": 0,
+              "fill": "zero"
+            },
+            "palette": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                4
+              ],
+              [
+                7,
+                7
+              ],
+              [
+                8,
+                8
+              ]
+            ]
+          }
+        ],
+        "model_forwards": 0
+      },
+      "P20": {
+        "candidate_ast_count": 1598,
+        "abstract_shape_classes": 18,
+        "shape_pruned_ast_count": 814,
+        "actual_primitive_train_calls": 786,
+        "invalid_or_shape_primitive_pruned": 392,
+        "conflict_pruned": 391,
+        "training_fit_count": 1,
+        "test_sample_evaluations": 1,
+        "distinct_test_predictions": 1,
+        "ambiguous": false,
+        "abstention": null,
+        "wall_ms": 25,
+        "representative_ASTs": [
+          {
+            "ast": {
+              "type": "affine",
+              "crop": false,
+              "orientation": "flipV",
+              "dy": 0,
+              "dx": 0,
+              "fill": "zero"
+            },
+            "palette": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                3,
+                3
+              ],
+              [
+                4,
+                4
+              ],
+              [
+                7,
+                7
+              ],
+              [
+                8,
+                8
+              ]
+            ]
+          }
+        ],
+        "model_forwards": 0
+      },
+      "train_count": 3,
+      "test_count": 1
+    },
+    {
+      "id": "ce4f8723",
+      "same_exact_prediction": true,
+      "same_abstention_reason": true,
+      "P19_correct": true,
+      "P20_correct": true,
+      "P19_false_accept": false,
+      "P20_false_accept": false,
+      "P19": {
+        "candidate_ast_count": 1598,
+        "train_sample_evaluations": 6347,
+        "test_sample_evaluations": 4,
+        "training_fit_count": 4,
+        "distinct_test_predictions": 1,
+        "ambiguous": false,
+        "abstention": null,
+        "wall_ms": 275,
+        "representative_ASTs": [
+          {
+            "ast": {
+              "type": "split",
+              "mode": "predicate",
+              "orientation": "horizontal",
+              "op": "bothZero"
+            },
+            "palette": [
+              [
+                0,
+                3
+              ],
+              [
+                1,
+                0
+              ]
+            ]
+          },
+          {
+            "ast": {
+              "type": "split",
+              "mode": "predicate",
+              "orientation": "horizontal",
+              "op": "same"
+            },
+            "palette": [
+              [
+                0,
+                3
+              ],
+              [
+                1,
+                0
+              ]
+            ]
+          },
+          {
+            "ast": {
+              "type": "split",
+              "mode": "predicate",
+              "orientation": "horizontal",
+              "op": "different"
+            },
+            "palette": [
+              [
+                0,
+                0
+              ],
+              [
+                1,
+                3
+              ]
+            ]
+          }
+        ],
+        "model_forwards": 0
+      },
+      "P20": {
+        "candidate_ast_count": 1598,
+        "abstract_shape_classes": 18,
+        "shape_pruned_ast_count": 1583,
+        "actual_primitive_train_calls": 27,
+        "invalid_or_shape_primitive_pruned": 0,
+        "conflict_pruned": 11,
+        "training_fit_count": 4,
+        "test_sample_evaluations": 4,
+        "distinct_test_predictions": 1,
+        "ambiguous": false,
+        "abstention": null,
+        "wall_ms": 4,
+        "representative_ASTs": [
+          {
+            "ast": {
+              "type": "split",
+              "mode": "predicate",
+              "orientation": "horizontal",
+              "op": "bothZero"
+            },
+            "palette": [
+              [
+                0,
+                3
+              ],
+              [
+                1,
+                0
+              ]
+            ]
+          },
+          {
+            "ast": {
+              "type": "split",
+              "mode": "predicate",
+              "orientation": "horizontal",
+              "op": "same"
+            },
+            "palette": [
+              [
+                0,
+                3
+              ],
+              [
+                1,
+                0
+              ]
+            ]
+          },
+          {
+            "ast": {
+              "type": "split",
+              "mode": "predicate",
+              "orientation": "horizontal",
+              "op": "different"
+            },
+            "palette": [
+              [
+                0,
+                0
+              ],
+              [
+                1,
+                3
+              ]
+            ]
+          }
+        ],
+        "model_forwards": 0
+      },
+      "train_count": 4,
+      "test_count": 1
+    },
+    {
+      "id": "06df4c85",
+      "same_exact_prediction": true,
+      "same_abstention_reason": true,
+      "P19_correct": false,
+      "P20_correct": false,
+      "P19_false_accept": false,
+      "P20_false_accept": false,
+      "P19": {
+        "candidate_ast_count": 1598,
+        "train_sample_evaluations": 4734,
+        "test_sample_evaluations": 0,
+        "training_fit_count": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 1590,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "P20": {
+        "candidate_ast_count": 1598,
+        "abstract_shape_classes": 18,
+        "shape_pruned_ast_count": 30,
+        "actual_primitive_train_calls": 1568,
+        "invalid_or_shape_primitive_pruned": 0,
+        "conflict_pruned": 1568,
+        "training_fit_count": 0,
+        "test_sample_evaluations": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 489,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "train_count": 3,
+      "test_count": 1
+    },
+    {
+      "id": "97999447",
+      "same_exact_prediction": true,
+      "same_abstention_reason": true,
+      "P19_correct": false,
+      "P20_correct": false,
+      "P19_false_accept": false,
+      "P20_false_accept": false,
+      "P19": {
+        "candidate_ast_count": 1598,
+        "train_sample_evaluations": 4734,
+        "test_sample_evaluations": 0,
+        "training_fit_count": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 236,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "P20": {
+        "candidate_ast_count": 1598,
+        "abstract_shape_classes": 18,
+        "shape_pruned_ast_count": 1206,
+        "actual_primitive_train_calls": 392,
+        "invalid_or_shape_primitive_pruned": 0,
+        "conflict_pruned": 392,
+        "training_fit_count": 0,
+        "test_sample_evaluations": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 21,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "train_count": 3,
+      "test_count": 1
+    },
+    {
+      "id": "32597951",
+      "same_exact_prediction": true,
+      "same_abstention_reason": true,
+      "P19_correct": false,
+      "P20_correct": false,
+      "P19_false_accept": false,
+      "P20_false_accept": false,
+      "P19": {
+        "candidate_ast_count": 1598,
+        "train_sample_evaluations": 4749,
+        "test_sample_evaluations": 0,
+        "training_fit_count": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 1039,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "P20": {
+        "candidate_ast_count": 1598,
+        "abstract_shape_classes": 18,
+        "shape_pruned_ast_count": 814,
+        "actual_primitive_train_calls": 784,
+        "invalid_or_shape_primitive_pruned": 0,
+        "conflict_pruned": 784,
+        "training_fit_count": 0,
+        "test_sample_evaluations": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 129,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "train_count": 3,
+      "test_count": 1
+    },
+    {
+      "id": "e40b9e2f",
+      "same_exact_prediction": true,
+      "same_abstention_reason": true,
+      "P19_correct": false,
+      "P20_correct": false,
+      "P19_false_accept": false,
+      "P20_false_accept": false,
+      "P19": {
+        "candidate_ast_count": 1598,
+        "train_sample_evaluations": 4734,
+        "test_sample_evaluations": 0,
+        "training_fit_count": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 273,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "P20": {
+        "candidate_ast_count": 1598,
+        "abstract_shape_classes": 18,
+        "shape_pruned_ast_count": 814,
+        "actual_primitive_train_calls": 784,
+        "invalid_or_shape_primitive_pruned": 0,
+        "conflict_pruned": 784,
+        "training_fit_count": 0,
+        "test_sample_evaluations": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 51,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "train_count": 3,
+      "test_count": 1
+    },
+    {
+      "id": "29c11459",
+      "same_exact_prediction": true,
+      "same_abstention_reason": true,
+      "P19_correct": false,
+      "P20_correct": false,
+      "P19_false_accept": false,
+      "P20_false_accept": false,
+      "P19": {
+        "candidate_ast_count": 1598,
+        "train_sample_evaluations": 3196,
+        "test_sample_evaluations": 0,
+        "training_fit_count": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 116,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "P20": {
+        "candidate_ast_count": 1598,
+        "abstract_shape_classes": 18,
+        "shape_pruned_ast_count": 1206,
+        "actual_primitive_train_calls": 392,
+        "invalid_or_shape_primitive_pruned": 0,
+        "conflict_pruned": 392,
+        "training_fit_count": 0,
+        "test_sample_evaluations": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 16,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "train_count": 2,
+      "test_count": 1
+    },
+    {
+      "id": "6150a2bd",
+      "same_exact_prediction": true,
+      "same_abstention_reason": true,
+      "P19_correct": false,
+      "P20_correct": false,
+      "P19_false_accept": false,
+      "P20_false_accept": false,
+      "P19": {
+        "candidate_ast_count": 1598,
+        "train_sample_evaluations": 1990,
+        "test_sample_evaluations": 0,
+        "training_fit_count": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 17,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "P20": {
+        "candidate_ast_count": 1598,
+        "abstract_shape_classes": 18,
+        "shape_pruned_ast_count": 814,
+        "actual_primitive_train_calls": 788,
+        "invalid_or_shape_primitive_pruned": 392,
+        "conflict_pruned": 391,
+        "training_fit_count": 0,
+        "test_sample_evaluations": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 10,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "train_count": 2,
+      "test_count": 1
+    },
+    {
+      "id": "80af3007",
+      "same_exact_prediction": true,
+      "same_abstention_reason": true,
+      "P19_correct": false,
+      "P20_correct": false,
+      "P19_false_accept": false,
+      "P20_false_accept": false,
+      "P19": {
+        "candidate_ast_count": 1598,
+        "train_sample_evaluations": 4734,
+        "test_sample_evaluations": 0,
+        "training_fit_count": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 709,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "P20": {
+        "candidate_ast_count": 1598,
+        "abstract_shape_classes": 18,
+        "shape_pruned_ast_count": 814,
+        "actual_primitive_train_calls": 784,
+        "invalid_or_shape_primitive_pruned": 0,
+        "conflict_pruned": 784,
+        "training_fit_count": 0,
+        "test_sample_evaluations": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 115,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "train_count": 3,
+      "test_count": 1
+    },
+    {
+      "id": "8731374e",
+      "same_exact_prediction": true,
+      "same_abstention_reason": true,
+      "P19_correct": false,
+      "P20_correct": false,
+      "P19_false_accept": false,
+      "P20_false_accept": false,
+      "P19": {
+        "candidate_ast_count": 1598,
+        "train_sample_evaluations": 4734,
+        "test_sample_evaluations": 0,
+        "training_fit_count": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 1598,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "P20": {
+        "candidate_ast_count": 1598,
+        "abstract_shape_classes": 18,
+        "shape_pruned_ast_count": 1598,
+        "actual_primitive_train_calls": 0,
+        "invalid_or_shape_primitive_pruned": 0,
+        "conflict_pruned": 0,
+        "training_fit_count": 0,
+        "test_sample_evaluations": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 5,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "train_count": 3,
+      "test_count": 1
+    },
+    {
+      "id": "f8c80d96",
+      "same_exact_prediction": true,
+      "same_abstention_reason": true,
+      "P19_correct": false,
+      "P20_correct": false,
+      "P19_false_accept": false,
+      "P20_false_accept": false,
+      "P19": {
+        "candidate_ast_count": 1598,
+        "train_sample_evaluations": 4734,
+        "test_sample_evaluations": 0,
+        "training_fit_count": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 320,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "P20": {
+        "candidate_ast_count": 1598,
+        "abstract_shape_classes": 18,
+        "shape_pruned_ast_count": 814,
+        "actual_primitive_train_calls": 784,
+        "invalid_or_shape_primitive_pruned": 0,
+        "conflict_pruned": 784,
+        "training_fit_count": 0,
+        "test_sample_evaluations": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 50,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "train_count": 3,
+      "test_count": 1
+    },
+    {
+      "id": "ef135b50",
+      "same_exact_prediction": true,
+      "same_abstention_reason": true,
+      "P19_correct": false,
+      "P20_correct": false,
+      "P19_false_accept": false,
+      "P20_false_accept": false,
+      "P19": {
+        "candidate_ast_count": 1598,
+        "train_sample_evaluations": 4734,
+        "test_sample_evaluations": 0,
+        "training_fit_count": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 395,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "P20": {
+        "candidate_ast_count": 1598,
+        "abstract_shape_classes": 18,
+        "shape_pruned_ast_count": 814,
+        "actual_primitive_train_calls": 784,
+        "invalid_or_shape_primitive_pruned": 0,
+        "conflict_pruned": 784,
+        "training_fit_count": 0,
+        "test_sample_evaluations": 0,
+        "distinct_test_predictions": 0,
+        "ambiguous": false,
+        "abstention": "NO_TRAIN_CONSISTENT_AST",
+        "wall_ms": 49,
+        "representative_ASTs": [],
+        "model_forwards": 0
+      },
+      "train_count": 3,
+      "test_count": 1
+    }
+  ]
+}
