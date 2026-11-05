@@ -1,0 +1,23 @@
+name: NEUMANN RC39.1 explanation-only source preflight
+on:
+  push:
+    branches:
+      - research/q3-rc39-active-causal-discovery-20261106
+    paths:
+      - .github/workflows/q3_rc39_EXPLAIN_SOURCE_UNIT.yml
+permissions:
+  contents: read
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Run source-only tests with no future author hidden target data
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p test_q3_rc39_explainable_no_witness.py -v
+          git hash-object research/q3/rc39/explainable_no_witness.py
