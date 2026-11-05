@@ -1,0 +1,80 @@
+name: NEUMANN P1.9 immutable fresh original48 independent Python audit
+on:
+  push:
+    branches:
+      - research/q3-p19-first-fresh-original-transfer48-20261105
+    paths:
+      - .github/workflows/q3_p19_FRESH_TRANSFER48_INDEPENDENT_AUDIT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independent-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Retrieve pristine original P1.9 first receipt WITHOUT any model or algorithm rerun
+        uses: actions/download-artifact@v4
+        with:
+          name: neumann-p19-FIRST-original-transfer48
+          run-id: 42019505824
+          github-token: ${{ github.token }}
+          path: first-evidence
+      - name: Checkout same original upstream to verify source-bound independent interpreter
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+      - name: Independently execute previously inferred P1.9 AST with original test checker
+        shell: bash
+        run: |
+          set -euo pipefail
+          python experiments/q3_p19_FIRST_FRESH_TRANSFER48_INDEPENDENT_AUDIT.py . "$RUNNER_TEMP/arc-agi" first-evidence/p19-FIRST-ORIGINAL-TRANSFER48.json > p19-first-independent-audit.json
+          python - <<'PY'
+          import json
+          x=json.load(open('p19-first-independent-audit.json'))
+          assert x['audit_pass'],x['errors']
+          assert x['n']==48
+          assert x['matched_baseline_original_exact_from_hashlocked_flags']==2
+          assert x['P19_submitted_programs']==1
+          assert x['independent_python_replayed_certificate_count']==1
+          assert x['independent_original_exact']==1
+          assert x['additional_original_exact']==0
+          assert x['previously_unevaluated_original_reserve']==72
+          assert x['Q3']==x['Q6']=='OPEN'
+          print({'independent':'PASS','correct':x['independent_original_exact'],
+            'added':x['additional_original_exact'],'first_sha':x['first_sha256']})
+          PY
+      - name: Tamper test refuses fabricated accuracy and different unpinned first JSON
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          from experiments.q3_p19_FIRST_FRESH_TRANSFER48_INDEPENDENT_AUDIT import verify
+          p=Path('first-evidence/p19-FIRST-ORIGINAL-TRANSFER48.json')
+          x=json.loads(p.read_text())
+          x['totals']['gained']=47
+          f=Path('/tmp/p19-fabricated-score.json');f.write_text(json.dumps(x))
+          r=verify('.',os.environ['RUNNER_TEMP']+'/arc-agi',f)
+          assert not r['audit_pass']
+          assert 'IMMUTABLE_FIRST_RAW_HASH_CHANGED' in r['errors']
+          assert 'GAIN_SUM_DRIFT' in r['errors']
+          print('fabricated first-run gain correctly rejected')
+          PY
+      - name: Preserve independent signed-off result from immutable first data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-p19-fresh48-independent-python-first-audit
+          path: p19-first-independent-audit.json
+          if-no-files-found: warn
+          retention-days: 90
