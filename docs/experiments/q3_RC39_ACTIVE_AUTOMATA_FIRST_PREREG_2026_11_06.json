@@ -1,0 +1,55 @@
+{
+  "schema": "neumann.q3.rc39.state-structure-induction-first-gate.v1",
+  "date": "2026-11-06",
+  "hypothesis": "Source-only active learning generates an executable finite-state transducer from black-box I/O and counterexamples, with independent all-length proofs. Unbounded prefix-state functions are outside RC38 bounded relative-read grammar.",
+  "method": "Classical L*-style Mealy observation table, closure, consistency, counterexample refinement, compiled source interpreter; no human task-specific output labels or reference state graph in learner.",
+  "benchmark": {
+    "alphabet": [
+      "A",
+      "B",
+      "C"
+    ],
+    "outputs": [
+      "0",
+      "1"
+    ],
+    "families": [
+      "prefix_parity",
+      "prefix_mod3",
+      "presence",
+      "random_3state",
+      "random_4state",
+      "random_5state"
+    ],
+    "seeds": [
+      39,
+      40,
+      41,
+      42
+    ],
+    "tasks": 24,
+    "deterministic_generation": true,
+    "oracle_cap_per_task": 20000,
+    "equivalence_cap_per_task": 200,
+    "max_states": 8,
+    "independent_proof": "Unbounded-length equivalence by BFS of reachable product states; test all possible input continuations at each reachable pair",
+    "negative_controls": [
+      "RC38 local-radius language cannot express unbounded prefix parity",
+      "mutated compiled transition must be rejected"
+    ],
+    "first_gate": "24/24 independent all-length exact proofs, zero unsupported certifications; report query and CPU costs",
+    "baseline": "Same-access classical L* or equivalent active automata learner has equal rights; do not infer speed advantage",
+    "degraded": "UNKNOWN on budget exhaustion or underdetermination"
+  },
+  "scientific_limits": "Human-authored classical automata-learning algorithm and finite-state interpreter. Does NOT prove neural invention of ISA, Q3 neural unique invention, Q6 truly independent semantic families, Q7 frontier or all-in 10x.",
+  "metrics": [
+    "membership_calls",
+    "membership_symbol_total",
+    "equivalence_calls",
+    "state_count",
+    "time_ms",
+    "product_check_nodes"
+  ],
+  "no_arc_eval_use": true,
+  "first_score_lock": "Lock source before generating scorer and do not tune after FIRST hidden results."
+}

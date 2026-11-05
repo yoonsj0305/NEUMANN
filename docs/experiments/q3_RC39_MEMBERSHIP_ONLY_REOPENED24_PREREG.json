@@ -1,0 +1,30 @@
+{
+  "schema": "neumann.q3.rc39.membership-only-ablation.prereg.v1",
+  "date": "2026-11-06",
+  "why": "RC39 first 24/24 used a powerful perfect counterexample/equivalence oracle. Verify whether finite source-only membership queries can replace that stronger interface without exposing hidden transition graph.",
+  "scope": "POST-FIRST rights ablation on SAME already opened original 24 deterministic state machines. NOT independent unseen-family transfer.",
+  "prior_first": "42130628242",
+  "prior_readonly_audit": "42130960223",
+  "first_sha256": "829bab136751cc72f972d489d25ace9bde9cae0b29208a3c99a04d1fe66f1a05",
+  "original_learner_blob": "83bd15d98b8fa02f4427b26c27264d35c0ec261e",
+  "source_rights": {
+    "allowed": "membership(word): one complete output string per chosen input, fixed upper bound true state count ≤5, input alphabet ABC and output alphabet 01",
+    "forbidden": "access to hidden state count, transition graph, direct all-length product counterexample oracle or labeled target program in the learner",
+    "finite_conformance": "Enumerate ALL words of length ≤ (5 + candidate_state_count - 1), since a pair of deterministic Mealy machines with at most n and m states, if distinct, has a distinguishing word of length ≤n+m-1 under partition refinement of their disjoint union. Every checked word charged as a source membership request.",
+    "upperbound_true_states": 5,
+    "max_distinct_membership_queries_per_task": 100000,
+    "max_active_equivalence_callback_calls_per_task": 200,
+    "first_task_count": 24
+  },
+  "gate": "24/24 independently product-proven all-length generated programs, zero invalid certificates; strict charge of all membership calls, including those used by finite conformance.",
+  "interpretation": "Even 24/24 would prove a scoped classical source-only finite-state learner under a 5-state assumption, not neural Q3, independent Q6 or 10x cost. Strong equal-rights classical L* is the same policy.",
+  "costs": [
+    "unique_membership_calls",
+    "unique_membership_symbols",
+    "conformance_words_checked",
+    "learner_cpu_ms",
+    "total_cpu_ms",
+    "full_source_query_rights"
+  ],
+  "fallback": "UNKNOWN if 100k unique word budget or other source cap exceeded; never assert all-length certainty without complete finite conformance and independently checking hidden product."
+}

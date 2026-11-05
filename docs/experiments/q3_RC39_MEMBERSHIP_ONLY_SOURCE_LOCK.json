@@ -1,0 +1,18 @@
+{
+  "schema": "neumann.q3.rc39.membership-only-source-lock.v1",
+  "date": "2026-11-06",
+  "source_blobs": {
+    "docs/experiments/q3_RC39_MEMBERSHIP_ONLY_REOPENED24_PREREG.json": "61bca61048f902af0216372017dc2cbb97e6b3f3",
+    "research/q3/rc39/membership_conformance.py": "70fe3bb7527a130d21f98bdb4f1809c7f42e6d01",
+    "research/q3/rc39/membership_only_reopened24.py": "90b61be347b80410cf3c687040ef514296512b1e",
+    "research/q3/rc39/active_mealy.py": "83bd15d98b8fa02f4427b26c27264d35c0ec261e",
+    "research/q3/rc39/independent_first_grader.py": "b24c8a1b947f8a21c3bf0d64719f4ec2c0b665e6"
+  },
+  "already_scored_first_equivalence_oracle_run_id": 42130628242,
+  "known_tasks": "same previously graded 24 reference machines; reused not sealed",
+  "guarantee": "Independent all-length checker used only AFTER candidate compiled; live learning/conformance accesses source membership strings only. Trust assumption: ≤5 source states.",
+  "gate": "24/24 complete source-only length N+m-1 proofs, 24/24 independent product states, no false certificates",
+  "status_before_first": "PRECOMMITTED_NOT_RUN",
+  "no_original_arc_eval": true,
+  "refusal_to_overclaim": "Classical learning and classical exhaustive finite conformance; no novel neural policy, Q3 Q6 10x remain OPEN."
+}

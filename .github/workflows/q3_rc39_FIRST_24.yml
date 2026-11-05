@@ -1,0 +1,81 @@
+name: NEUMANN Q3 RC39 FIRST 24 independent all-length state proof
+on:
+  push:
+    branches:
+      - research/q3-rc39-active-automata-induction-20261106
+    paths:
+      - .github/workflows/q3_rc39_FIRST_24.yml
+permissions:
+  contents: read
+jobs:
+  scoped-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Assert original learner, preregistration and grader were HASH-FROZEN before score
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          from hashlib import sha1
+          import json
+          L=json.loads(Path('docs/experiments/q3_RC39_FIRST_LEARNER_SOURCE_LOCK.json').read_text())
+          V=json.loads(Path('docs/experiments/q3_RC39_FIRST_GRADER_LOCK.json').read_text())
+          def git(p):
+            b=Path(p).read_bytes()
+            return sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()
+          assert git('research/q3/rc39/active_mealy.py')==L['original_source_git_blob']
+          assert git('docs/experiments/q3_RC39_ACTIVE_AUTOMATA_FIRST_PREREG_2026_11_06.json')==L['preregistered_experiment_git_blob']
+          assert git('research/q3/rc39/independent_first_grader.py')==V['grader_sha']
+          assert V['tasks']==24
+          print({'preflight':'SOURCE_AND_GRADER_LOCK_PASS','tasks':24})
+          PY
+      - name: Opened smoke controls, no grader training or neural calls
+        run: python3 -m unittest -v tests/test_q3_rc39_opened_smoke.py
+      - name: FIRST original 24 task source-only active automata learning and independent finite-state proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          python3 -m research.q3.rc39.independent_first_grader > RC39-FIRST-24.json
+          grader_code=$?
+          set -e
+          if test ! -s RC39-FIRST-24.json; then
+            echo 'No original result emitted: infrastructure error'
+            exit 1
+          fi
+          python3 - <<'PY'
+          import json
+          r=json.load(open('RC39-FIRST-24.json'))
+          print(json.dumps({'science_status':r['science_status'],
+            'first_tasks':r['first_tasks'],
+            'all_length_proven':r['all_finite_word_proven'],
+            'mutated_program_rejected':r['negative_mutation_rejected'],
+            'locality_impossibility':r['local_RC38_radius7_unbounded_state_impossibility'],
+            'metrics':r['metrics'],'claims':r['claims']},sort_keys=True))
+          assert r['first_tasks']==24 and r['source_only_membership_and_equivalence_oracles']
+          assert r['torch_training_calls']==0
+          PY
+          echo "original_grader_process_exit=$grader_code; preserve original science FAIL if present"
+      - name: Hash FIRST immutable scientific evidence even on negative result
+        if: always()
+        shell: bash
+        run: |
+          if test -s RC39-FIRST-24.json; then
+            sha256sum RC39-FIRST-24.json > RC39-FIRST-24.sha256
+            cat RC39-FIRST-24.sha256
+          fi
+      - name: Upload FIRST original raw receipt, no rerun to rescue science FAIL
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-RC39-FIRST-24-ACTIVE-STATE-STRUCTURE
+          path: |
+            RC39-FIRST-24.json
+            RC39-FIRST-24.sha256
+          if-no-files-found: warn
+          retention-days: 90

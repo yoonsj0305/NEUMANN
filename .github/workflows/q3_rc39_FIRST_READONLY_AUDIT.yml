@@ -1,0 +1,69 @@
+name: NEUMANN RC39 FIRST read-only independent semantic audit
+on:
+  push:
+    branches:
+      - research/q3-rc39-active-automata-induction-20261106
+    paths:
+      - .github/workflows/q3_rc39_FIRST_READONLY_AUDIT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  certify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Download immutable first 24, DO NOT run learner
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-RC39-FIRST-24-ACTIVE-STATE-STRUCTURE
+          run-id: 42130628242
+          github-token: ${{ github.token }}
+          path: preserved
+      - name: Audit source locks and reconstruct all 24 ORIGINAL programs with separate executor
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m research.q3.rc39.independent_readonly_audit preserved/RC39-FIRST-24.json > RC39-INDEPENDENT-AUDIT.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open('RC39-INDEPENDENT-AUDIT.json'))
+          assert x["independent_audit_PASS"],x["errors"]
+          assert x["verified_24_executable_generated_programs"]==24
+          assert x["mutated_first_programs_rejected"]==24
+          assert x["original_membership_calls"]==1082
+          assert x["original_equivalence_calls"]==30
+          assert x["no_new_learning_or_inference"]
+          assert x["Q3"]==x["Q6"]==x["Q7"]=="OPEN"
+          print({"independent_verification":"PASS",
+                 "all_length_source_proofs":x["verified_24_executable_generated_programs"],
+                 "negative_mutation_rejects":x["mutated_first_programs_rejected"],
+                 "first_source_sha256":x["original_first_sha256"]})
+          PY
+      - name: Reject forged favorable FIRST receipts without rereading task labels
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          from research.q3.rc39.independent_readonly_audit import audit
+          x=json.loads(Path("preserved/RC39-FIRST-24.json").read_text())
+          x["all_finite_word_proven"]=243
+          Path("/tmp/forged-rc39-first.json").write_text(json.dumps(x))
+          y=audit("/tmp/forged-rc39-first.json")
+          assert not y["independent_audit_PASS"]
+          assert "FIRST_RECEIPT_SHA" in y["errors"] and "COUNT_TAMPER" in y["errors"]
+          print("Forged result rejected; original first evidence left untouched")
+          PY
+      - name: Preserve independent certification
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-RC39-FIRST-24-independent-readonly-proof
+          path: RC39-INDEPENDENT-AUDIT.json
+          if-no-files-found: warn
+          retention-days: 90

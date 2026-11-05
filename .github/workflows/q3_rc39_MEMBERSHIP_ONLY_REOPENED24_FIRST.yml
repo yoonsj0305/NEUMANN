@@ -1,0 +1,84 @@
+name: NEUMANN RC39 FIRST reopened24 membership-only complete-source evidence
+on:
+  push:
+    branches:
+      - research/q3-rc39-active-automata-induction-20261106
+    paths:
+      - .github/workflows/q3_rc39_MEMBERSHIP_ONLY_REOPENED24_FIRST.yml
+permissions:
+  contents: read
+jobs:
+  source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validate original source hashes and finite-state conformance prereg
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          from hashlib import sha1
+          import json
+          x=json.loads(Path('docs/experiments/q3_RC39_MEMBERSHIP_ONLY_SOURCE_LOCK.json').read_text())
+          def git(p):
+            b=Path(p).read_bytes()
+            return sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()
+          for p,h in x['source_blobs'].items():
+            assert git(p)==h,p
+          y=json.loads(Path('docs/experiments/q3_RC39_MEMBERSHIP_ONLY_REOPENED24_PREREG.json').read_text())
+          assert y['source_rights']['upperbound_true_states']==5
+          assert y['source_rights']['first_task_count']==24
+          print({'frozen_source':'PASS','reference_state_bound':5,'opened_task_count':24})
+          PY
+      - name: Syntax check without grading task families
+        run: |
+          python3 -m py_compile research/q3/rc39/active_mealy.py research/q3/rc39/membership_conformance.py research/q3/rc39/membership_only_reopened24.py
+      - name: FIRST source membership-only complete conformance; NO perfect equivalence teacher
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          python3 -m research.q3.rc39.membership_only_reopened24 > RC39-MEMBERSHIP-ONLY-FIRST24.json
+          first_exit=$?
+          set -e
+          if test ! -s RC39-MEMBERSHIP-ONLY-FIRST24.json; then
+            echo 'INFRASTRUCTURE_ERROR: original grader produced no first result'
+            exit 1
+          fi
+          python3 - <<'PY'
+          import json
+          x=json.load(open('RC39-MEMBERSHIP-ONLY-FIRST24.json'))
+          assert x['tasks']==24
+          assert not x['uses_hidden_reference_graph_during_learning']
+          assert not x['uses_true_equivalence_counterexamples_during_learning']
+          print(json.dumps({'science':x['science_status'],
+            'all_length_independent_proofs':x['independently_all_length_proven'],
+            'false_certificates':x['false_all_length_certificates'],
+            'finite_membership_certificates':x['completed_finite_membership_conformance_certificates'],
+            'metrics':x['metrics'],
+            'global_Q3':x['Q3_autonomous_neural_opcode'],
+            'global_Q6':x['Q6_unseen_semantic_family']},sort_keys=True))
+          PY
+          echo "FIRST_science_process_exit=$first_exit; retained irrespective of status"
+      - name: Hash retained first result, no favorable rerun
+        if: always()
+        shell: bash
+        run: |
+          if test -s RC39-MEMBERSHIP-ONLY-FIRST24.json; then
+            sha256sum RC39-MEMBERSHIP-ONLY-FIRST24.json > RC39-MEMBERSHIP-ONLY-FIRST24.sha256
+            cat RC39-MEMBERSHIP-ONLY-FIRST24.sha256
+          fi
+      - name: Preserve immutable first source-only conformance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-RC39-MEMBERSHIP-ONLY-REOPENED24-FIRST
+          path: |
+            RC39-MEMBERSHIP-ONLY-FIRST24.json
+            RC39-MEMBERSHIP-ONLY-FIRST24.sha256
+          if-no-files-found: warn
+          retention-days: 90

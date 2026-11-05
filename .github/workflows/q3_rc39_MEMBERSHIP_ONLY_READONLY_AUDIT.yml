@@ -1,0 +1,71 @@
+name: NEUMANN RC39 source-only FIRST read-only independent audit
+on:
+  push:
+    branches:
+      - research/q3-rc39-active-automata-induction-20261106
+    paths:
+      - .github/workflows/q3_rc39_MEMBERSHIP_ONLY_READONLY_AUDIT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independent:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Download exact untouched FIRST membership-only source evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-RC39-MEMBERSHIP-ONLY-REOPENED24-FIRST
+          run-id: 42131620991
+          github-token: ${{ github.token }}
+          path: immutable-first
+      - name: Verify first source costs and all 24 executable ASTs with alternative all-length product checker
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m research.q3.rc39.membership_first_readonly_audit immutable-first/RC39-MEMBERSHIP-ONLY-FIRST24.json > RC39-MEMBERSHIP-FIRST-INDEPENDENT.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open('RC39-MEMBERSHIP-FIRST-INDEPENDENT.json'))
+          assert x['auditor_pass'],x['errors']
+          assert x['original_24_mealy_all_length_certificates_replayed']==24
+          assert x['independent_mutated_programs_rejected']==24
+          assert x['original_distinct_membership_query_cost']==172051
+          assert x['original_total_membership_symbols']==1362696
+          assert x['original_word_conformance_checks']==172499
+          assert not x['true_equivalence_oracle_used_during_training']
+          assert x['q3']==x['q6']==x['q7']=='OPEN'
+          print({'audit':'PASS','certified_automata':24,'falsified_mutations':24,
+             'true_EQ_calls':0,'distinct_membership_queries':x['original_distinct_membership_query_cost'],
+             'source_first_sha256':x['first_receipt_sha256']})
+          PY
+      - name: Negative control rejects favorable first score tampering
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          from research.q3.rc39.membership_first_readonly_audit import audit
+          first=json.loads(Path('immutable-first/RC39-MEMBERSHIP-ONLY-FIRST24.json').read_text())
+          first['independently_all_length_proven']=240
+          p=Path('/tmp/forged-membership-first.json')
+          p.write_text(json.dumps(first))
+          out=audit(str(p))
+          assert not out['auditor_pass']
+          assert 'ORIGINAL_FIRST_RECEIPT_SHA_DRIFT' in out['errors']
+          assert 'ORIGINAL_TOTAL_CORRECTNESS_CHANGED' in out['errors']
+          print('FIRST certificate tampering rejected')
+          PY
+      - name: Upload independent original read-only audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-RC39-MEMBERSHIP-FIRST-INDEPENDENT
+          path: RC39-MEMBERSHIP-FIRST-INDEPENDENT.json
+          if-no-files-found: warn
+          retention-days: 90
