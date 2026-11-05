@@ -1,0 +1,24 @@
+# NEUMANN P2.6 · Across-task learning of executable program proposals (PREREGISTRATION)
+Date 2026-11-05 KST, before training and before first results. North Star **Frontier-level problem solving with minimum necessary computation**. Q1–Q7 globally OPEN.
+
+## Purpose
+After a teacher-free per-task typed AST P23 solved +1/32 and bounded multi-branch P25 solved +0/32 extra, test a fundamentally different mechanism: **train a small neural across-task proposal policy** to propose executable symbolic **program compositions not present among the exact training program sequences**. This is an honest, narrow controlled **compositional meta-learning** probe, NOT new-to-science opcode invention, general ARC capability or autonomous Q3 closure.
+
+## Frozen synthetic distribution
+Eight human-coded deterministic 5×5 integer-grid primitives: identity, flip-horizontal, flip-vertical, transpose, rotate90, replace color 1 with 2, one-cell shift-down with zero fill, and one-cell shift-right with zero fill. A program consists of exactly TWO ordered primitive tokens `p2(p1(grid))` (8²=64 compositions). There are algebraic aliases: scoring uses exact query-output behavior, not exact program-token equality; train token CE may penalize semantically equivalent programs.
+
+- Split all 64 ordered programs by **FNV1a32('neumann-p26-20261105|'+op1_index+','+op2_index)** ascending, heldout first **16** ordered compositions, training remaining **48**. Every atomic primitive occurs in training. The heldout contains unseen *combinations*, NOT unseen underlying primitive meanings. Freeze program lists and code before any training.
+- Source grids 5×5, independent cells drawn from `P(0)=0.60, P(1)=P(2)=P(3)=0.13333...`, seeded NumPy RNG. Each task has THREE independently drawn labeled examples (input, executable-program output) and ONE independent query input. Train tasks **48×100=4,800**, validation familiar compositions **48×16=768**, heldout unfamiliar compositions **16×64=1,024**. Separate seeds `261101`, `261102`, `261103`, model initialization seed `261104`. No query gold enters the model or ranker. Self-generated synthetic tasks are **NOT** a public original ARC benchmark.
+- Input to learner: flattened 3 paired 5×5 input/output arrays scaled by 1/3. Pure MLP: 150 inputs, two hidden GELU layers width 192, separate two 8-class logits. CPU-only `torch`, no pretrained checkpoint, AdamW lr 0.001, fixed **12 epochs**, batch 128, torch CPU one thread. Cross-entropy for both intended tokens. No adaptive hyperparameter tuning after first result.
+- Rank all 64 program hypotheses by sum of two log-softmax token scores. **Neural-top4** proposes first four. Independently verify each proposed program on all 3 original training grids before accepting; if multiple train-fitting programs imply different query outputs => ABSTAIN, if none fit => ABSTAIN. Wrong accepted query output => false accept, not silently dropped.
+- **Classical controls**: (a) first four programs from seeded task-local random shuffle of 64 candidate lists, same checker, and (b) full exhaustive search over 64 programs, identical independent validator. Count all 3-example primitive execution evaluations, query verification, and exact task success/false accepted/ABSTAIN.
+- Report training wall seconds, model forward seconds, parameter count, estimated matrix MACs/sample from layers, sample count, verifier work; peak RSS/energy and dollars if not measured = UNKNOWN. Learning cost must be counted and amortized over test tasks. The teacher here is a **deterministic simulator generating labeled tasks**, not GPT-6 and not a novel operator oracle.
+
+## Frozen local decision
+- Learned proposal policy local PASS iff on **1,024 heldout unseen program compositions**: exact accepted query accuracy >=0.60, **exceeds randomized classical top4 by >=0.15 absolute**, and false accepted count = 0. Otherwise local FAIL.
+- Full-system 10x cost gate separate: student must match or exceed full 64 classical accuracy and be >=10x cheaper including amortized training and all verification. Do not derive a cost victory from fewer candidates alone.
+- Any unseen-sequence improvement is a constrained syntactic composition result, **not semantic-family transfer to genuinely unseen operators**, public ARC correctness, frontier-level capability or Q3/Q6 PASS.
+- Preserve first results immutably; later iterations must preregister new seeds/splits. Degraded mode: no verified unique program -> ABSTAIN and route to full Direct only if policy explicitly allows. No arbitrary generated JS code execution.
+
+## Why this is high value
+This measures directly whether spending training computation on a proposal distribution actually reduces verified program search, as opposed to learning only aligned scene embeddings or hardcoding more finished program templates. A negative result would justify rejecting the neural policy for this workload and seeking richer semantic program generators instead.
