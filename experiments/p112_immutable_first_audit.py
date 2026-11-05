@@ -57,7 +57,7 @@ def verify(root,receipt_bytes):
            d["tasks"][2]["candidate_roles"][0]=="buck converter","PRE_INFERENCE_ERRATUM_DRIFT")
 
     model=0
-    lex=Counter()
+    lex=Counter({"word":0,"char":0,"constant_first":0})
     correct_ids=[]
     wrong_ids=[]
     top_counts=Counter()
