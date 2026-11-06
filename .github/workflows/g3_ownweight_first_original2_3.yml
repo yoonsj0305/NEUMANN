@@ -1,16 +1,15 @@
 name: G3 own-weight quantified AST FIRST registered originals 2+3
+# Historical first already archived; disable duplicate evaluation.
 on:
-  pull_request:
-    paths:
-      - 'research/g3/ownweight_schema_original_first.py'
-      - 'tests/test_g3_ownweight_first_safety.py'
-      - 'docs/experiments/G3_OWNWEIGHT_QUANTIFIER_STUDENT_FROZEN_BEFORE_INIT2_INIT3_2026_11_06.json'
-      - '.github/workflows/g3_ownweight_first_original2_3.yml'
+  workflow_dispatch:
+
 permissions:
   contents: read
   actions: read
 jobs:
   first-original-only:
+    if: false # archived immutable first result
+
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
