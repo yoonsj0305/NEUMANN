@@ -1,0 +1,81 @@
+name: NEUMANN G3 source-only Golem 0.7.1 and Eldarica 2.2 toolchain pilot
+on:
+  push:
+    branches:
+      - research/q3-g3-2025-chc-native-first-20261106
+    paths:
+      - .github/workflows/G3_PEER_2025_GOLEM_ELDARICA_SOURCEFREE_PREFLIGHT.yml
+permissions:
+  contents: read
+jobs:
+  peer-specialist-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Fetch competition EXACT native binaries, print reproducible asset hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq default-jre unzip bzip2
+          mkdir -p "$RUNNER_TEMP/golem" "$RUNNER_TEMP/eldarica"
+          curl --fail --location --silent --show-error --retry 3 \
+            --output "$RUNNER_TEMP/golem-v0.7.1.tar.bz2" \
+            'https://github.com/usi-verification-and-security/golem/releases/download/v0.7.1/golem-x64-linux.tar.bz2'
+          curl --fail --location --silent --show-error --retry 3 \
+            --output "$RUNNER_TEMP/eldarica-bin-v2.2.zip" \
+            'https://github.com/uuverifiers/eldarica/releases/download/v2.2/eldarica-bin-2.2.zip'
+          sha256sum "$RUNNER_TEMP/golem-v0.7.1.tar.bz2" "$RUNNER_TEMP/eldarica-bin-v2.2.zip"
+          tar -tjf "$RUNNER_TEMP/golem-v0.7.1.tar.bz2" | head -25
+          unzip -l "$RUNNER_TEMP/eldarica-bin-v2.2.zip" | head -35
+          tar -xjf "$RUNNER_TEMP/golem-v0.7.1.tar.bz2" -C "$RUNNER_TEMP/golem"
+          unzip -oq "$RUNNER_TEMP/eldarica-bin-v2.2.zip" -d "$RUNNER_TEMP/eldarica"
+          find "$RUNNER_TEMP/golem" "$RUNNER_TEMP/eldarica" -maxdepth 4 -type f | head -45
+      - name: Source-FREE small safe/unsafe synthetics with actual native versions
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/SYNTHETIC-safe-HORN.smt2" <<'EOF'
+          (set-logic HORN)
+          (declare-fun Inv (Int) Bool)
+          (assert (forall ((x Int)) (=> (= x 0) (Inv x))))
+          (assert (forall ((x Int) (y Int)) (=> (and (Inv x) (= y (+ x 1))) (Inv y))))
+          (assert (forall ((x Int)) (=> (and (Inv x) (< x 0)) false)))
+          (check-sat)
+          EOF
+          sed 's/(< x 0)/(> x 0)/' "$RUNNER_TEMP/SYNTHETIC-safe-HORN.smt2" > "$RUNNER_TEMP/SYNTHETIC-unsafe-HORN.smt2"
+          export GOLEM_BIN
+          GOLEM_BIN="$(find "$RUNNER_TEMP/golem" -type f -name golem | head -1)"
+          test -n "$GOLEM_BIN"
+          chmod +x "$GOLEM_BIN"
+          echo "GOLEM_BIN=$GOLEM_BIN"
+          "$GOLEM_BIN" -h | head -15 || true
+          export ELD_BIN
+          ELD_BIN="$(find "$RUNNER_TEMP/eldarica" -type f -name eld | head -1)"
+          echo "ELD_BIN=$ELD_BIN"
+          if test -n "$ELD_BIN"; then chmod +x "$ELD_BIN"; "$ELD_BIN" -h 2>&1 | head -18 || true; fi
+          echo 'G3-SOURCEFREE-GOLEM-SAFE'
+          timeout 9 "$GOLEM_BIN" -l QF_LIA --input "$RUNNER_TEMP/SYNTHETIC-safe-HORN.smt2" > G3-GOLEM-SAFE.log 2>&1 || echo "GOLEM_SAFE_NONZERO=$?"
+          head -12 G3-GOLEM-SAFE.log
+          echo 'G3-SOURCEFREE-GOLEM-UNSAFE'
+          timeout 9 "$GOLEM_BIN" -l QF_LIA --input "$RUNNER_TEMP/SYNTHETIC-unsafe-HORN.smt2" > G3-GOLEM-UNSAFE.log 2>&1 || echo "GOLEM_UNSAFE_NONZERO=$?"
+          head -12 G3-GOLEM-UNSAFE.log
+          echo 'G3-SOURCEFREE-ELDARICA-SAFE'
+          if test -n "$ELD_BIN"; then timeout 12 "$ELD_BIN" "$RUNNER_TEMP/SYNTHETIC-safe-HORN.smt2" > G3-ELD-SAFE.log 2>&1 || echo "ELD_SAFE_NONZERO=$?"; head -16 G3-ELD-SAFE.log; fi
+          echo 'G3-SOURCEFREE-ELDARICA-UNSAFE'
+          if test -n "$ELD_BIN"; then timeout 12 "$ELD_BIN" "$RUNNER_TEMP/SYNTHETIC-unsafe-HORN.smt2" > G3-ELD-UNSAFE.log 2>&1 || echo "ELD_UNSAFE_NONZERO=$?"; head -16 G3-ELD-UNSAFE.log; fi
+      - name: Preserve source-free actual binary syntax, hash and output before first official 15
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G3-2025-PEER-ENGINES-SOURCEFREE-DIAGNOSTICS
+          path: |
+            G3-GOLEM-SAFE.log
+            G3-GOLEM-UNSAFE.log
+            G3-ELD-SAFE.log
+            G3-ELD-UNSAFE.log
+          if-no-files-found: warn
+          retention-days: 90
