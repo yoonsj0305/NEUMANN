@@ -1,10 +1,8 @@
 name: Q3 source-free afterfirst semantic congruence for all arrays/indices
 
+# Historical first already retained; stop automatic rescore.
 on:
-  pull_request:
-    paths:
-      - 'research/q3/collision_allindex_semantic_readonly.py'
-      - '.github/workflows/q3_collision_allindex_semantic_readonly.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -12,6 +10,8 @@ permissions:
 
 jobs:
   allindex-sourcefree-audit:
+    if: false # archived immutable first / post-first proof
+
     runs-on: ubuntu-latest
     timeout-minutes: 6
     steps:
