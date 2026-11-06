@@ -1,0 +1,51 @@
+name: Q3 postfirst exact affine semantic-dependency control
+on:
+  pull_request:
+    paths:
+      - 'research/q3/affine_semantic_dependency.py'
+      - 'tests/test_q3_affine_semantic_dependency.py'
+      - '.github/workflows/q3_affine_semantic_control.yml'
+permissions:
+  contents: read
+jobs:
+  postfirst-analytic-vs-independent-z3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Install independent reference semantics oracle
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq z3
+          z3 --version
+      - name: Exact local normal form and degraded mode unit tests
+        run: |
+          set -euo pipefail
+          python3 -m unittest tests/test_q3_affine_semantic_dependency.py -v
+      - name: Postfirst opened 8+6 semantic evaluation, same runner
+        run: |
+          set -euo pipefail
+          python3 -m research.q3.affine_semantic_dependency --out AFFINE-DEPENDENCY-POSTFIRST.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path('AFFINE-DEPENDENCY-POSTFIRST.json').read_text())
+          assert a['sourcefree_opened_cases']==14
+          assert a['analytic_matches_independent_Z3']==14
+          assert a['analytic_Z3_calls']==0 and a['SMT_reference_calls']==14
+          assert a['Q3']==a['Q4']==a['Q6']=='OPEN'
+          assert not a['trained_self_invention']
+          print('EXACT_AFFINE_CONTROL_MATCHES_ALL_14_INDEPENDENT_SMT_POSTFIRST')
+          PY
+      - name: Archive complete read-only afterfirst receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-POSTFIRST-AFFINE-DEPENDENCY
+          path: AFFINE-DEPENDENCY-POSTFIRST.json
+          retention-days: 90
+          if-no-files-found: warn
