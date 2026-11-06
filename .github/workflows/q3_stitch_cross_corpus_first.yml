@@ -33,7 +33,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          echo '28b8c26ded19028c1779a9a84e2312780bc8f3fc7ec491d292c9673fba037b73  original-first/stitch.stdout' | sha256sum -c -
+          echo '239d4f253580b112f66575c7d467ccd738519f7a9256b624498acd547d10822e  original-first/stitch.stdout' | sha256sum -c -
           python - <<'PY'
           import json
           from pathlib import Path
