@@ -1,0 +1,77 @@
+name: NEUMANN G0 original VeryMax hard-family semantic headroom FIRST
+on:
+  push:
+    branches:
+      - research/g0-tqli-original-branch-gate-20261106
+    paths:
+      - .github/workflows/G0_VERYMAX_TQLI_ORIGINAL_FIRST.yml
+permissions:
+  contents: read
+jobs:
+  g0-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install pinned same-runner Z3 and independent cvc5 validator
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --user z3-solver==4.13.3.0
+          sudo apt-get update -qq
+          if ! sudo apt-get install -y -qq cvc5; then
+            echo "CVC5_NOT_INSTALLED: original SAT requires independent verifier, therefore FAIL CLOSED"
+          fi
+          python3 - <<'PY'
+          import z3
+          print('PINNED_NATIVE_Z3', z3.get_version_string())
+          PY
+          command -v cvc5 || echo "CVC5_NOT_FOUND"
+      - name: Six software-only branch equivalence and false-certificate controls
+        run: python3 -m unittest discover -s tests -p test_g0_tqli_branch_first.py -v
+      - name: One original FIRST source-only headroom test
+        shell: bash
+        run: |
+          set -uo pipefail
+          python3 -m research.g0.tqli_branch_first > G0-TQLI-ORIGINAL-FIRST.json 2> G0-TQLI-ORIGINAL-FIRST.stderr
+          rc=$?
+          if test -s G0-TQLI-ORIGINAL-FIRST.json; then
+            python3 - <<'PY'
+          import json
+          x=json.load(open('G0-TQLI-ORIGINAL-FIRST.json'))
+          print(json.dumps({
+            'science_status':x.get('scientific_status'),
+            'original_assertions':x.get('original_assertion_count'),
+            'original_git_blob':x.get('original_git_blob'),
+            'direct':x.get('direct_z3'),
+            'branch_status':x.get('branch_reframe',{}).get('status'),
+            'branch_count':x.get('branch_reframe',{}).get('candidates'),
+            'original_native_model':x.get('original_all_assertions_evaluated'),
+            'independent_cvc5':x.get('independent_original_cvc5_with_exact_witness')
+          },sort_keys=True))
+          PY
+          fi
+          cat G0-TQLI-ORIGINAL-FIRST.stderr
+          echo "G0_ORIGINAL_FIRST_PROCESS_EXIT=$rc"
+          exit "$rc"
+      - name: Hash first receipt irrespective of scientific outcome
+        if: always()
+        shell: bash
+        run: |
+          if test -s G0-TQLI-ORIGINAL-FIRST.json; then
+            sha256sum G0-TQLI-ORIGINAL-FIRST.json > G0-TQLI-ORIGINAL-FIRST.sha256
+            cat G0-TQLI-ORIGINAL-FIRST.sha256
+          fi
+      - name: Archive all original FIRST receipts even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G0-TQLI-ORIGINAL-FIRST
+          path: |
+            G0-TQLI-ORIGINAL-FIRST.json
+            G0-TQLI-ORIGINAL-FIRST.sha256
+            G0-TQLI-ORIGINAL-FIRST.stderr
+          if-no-files-found: warn
+          retention-days: 90
