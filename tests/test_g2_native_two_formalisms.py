@@ -51,9 +51,10 @@ class NativeTwoFormalismTests(unittest.TestCase):
   self.assertEqual(bad["reason"],"INV_STEP_NOT_PROVEN")
  def test_original_BV_source_helper_ground_proved(self):
   v=prepare_bv_train(SYN_BV)
-  good=prove_bv("(define-fun f ((x (_ BitVec 8))) (_ BitVec 8) (helper x))",v)
+  modern=SYN_BV.replace('(BitVec 8)','(_ BitVec 8)')
+  good=prove_bv("(define-fun f ((x (_ BitVec 8))) (_ BitVec 8) (helper x))",v,modern)
   self.assertTrue(good["verified"],good)
-  bad=prove_bv("(define-fun f ((x (_ BitVec 8))) (_ BitVec 8) x)",v)
+  bad=prove_bv("(define-fun f ((x (_ BitVec 8))) (_ BitVec 8) x)",v,modern)
   self.assertFalse(bad["verified"],bad)
  def test_first_define_wrap_and_no_forge(self):
   s="(\n(define-fun inv-f ((x Int)) Bool (>= x 0))\n)"
