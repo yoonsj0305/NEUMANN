@@ -1,0 +1,32 @@
+{
+  "schema": "neumann.g1.external-sygus-first-only-source-metadata-erratum.v1",
+  "date": "2026-11-06",
+  "original_first": {
+    "run": 42154882039,
+    "result_sha256": "38708107241472eba84d8b46b6fe814ecf08e9ad0140a6f88d502c341edd19f3",
+    "status": "INFRA_OR_SOURCE_FAIL_CLOSED",
+    "error": "ORIGINAL_EXTERNAL_SYGUS_GIT_BLOB_CHANGED_reverse-name.sl",
+    "original_completed_rows": 0,
+    "immutable": true
+  },
+  "independent_first_readonly_audit": {
+    "run": 42155056277,
+    "conclusion": "SUCCESS"
+  },
+  "actual_source_error": {
+    "original_frozen_contract": "docs/experiments/G1_OWNWEIGHT_STRING_AST_EXTERNAL_FIRST_PREREG_2026_11_06.json",
+    "file": "reverse-name.sl",
+    "previous_typo_39_hex": "015131e076e00c63e41ff4a89591375ca495c77",
+    "correct_original_github_blob_40_hex": "015131e076e00c63e41ff4a89591375ca495c77e",
+    "cause": "Single omitted last hex digit transcribing original GitHub metadata; no modification to source file, original source owner, researcher-selected 8-task denominator, student weights, model training, grammar, score cutoff or rights.",
+    "upstream_repo": "SyGuS-Org/benchmarks",
+    "upstream_commit": "13c8deb68a873635879c9a69bc78caebd340f646",
+    "upstream_path": "comp/2018/PBE_Strings_Track/reverse-name.sl",
+    "source_file_was_opened_during_failed_first": true,
+    "cannot_claim_entire_8_still_first_blind": true
+  },
+  "weights_v2_checkpoint_sha256": "ae5e291d525098b05ade6eaaf5be76c5fc432fb20a39306be8b782377e4c1641",
+  "next_execution": "FIRST_COMPLETE_AFTER_METADATA_SHA_CORRECTION, original first remains immutable; no retraining, no task additions/removals and no changes to thresholds. Explicit partial prior exposure limits first-use claims.",
+  "risk": "Two prior source files may have been internally scored before source mismatch even though no rows saved, therefore do not call corrected run entire-cohort blind.",
+  "global_Q3": "OPEN"
+}
