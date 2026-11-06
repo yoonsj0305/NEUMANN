@@ -1,0 +1,41 @@
+{
+  "schema": "neumann.q3.rc39.wmethod-cross-alphabet-preregistered-stress.v1",
+  "date": "2026-11-06",
+  "scope": "POST-FIRST structural verification generalization; NOT independent semantic-family Q6",
+  "frozen_implementation_file": "research/q3/rc39/wmethod_conformance.py",
+  "cross_axes": {
+    "alphabets": [
+      "ABC",
+      "ABCD"
+    ],
+    "output_alphabets": [
+      "01",
+      "012"
+    ],
+    "target_state_counts": [
+      3,
+      4,
+      5,
+      6
+    ],
+    "seeds_per_cross": 16
+  },
+  "proposed_references": 256,
+  "comparisons_per_reference": 2,
+  "minimum_independent_all_length_comparisons": 512,
+  "generation_seed": "sha256('RC39-W-CROSS|alphabet|outputs|states|replicate|2026-11-06')",
+  "hypotheses": [
+    "one-state constant-zero",
+    "random same-state-count structure, every fifth target replaced with exact reference"
+  ],
+  "oracle_rights": "Only black-box membership for verifier; reference graph available only to separate product equivalence scorer",
+  "primary_gate": "512/512 equivalence classifications match independent BFS on full reachable state product; zero incorrect all-length certificates; no Wmethod production change",
+  "important_assumptions": [
+    "resettable deterministic complete finite-state transducers",
+    "input alphabet from 3 to 4 symbols",
+    "output alphabet from 2 to 3 symbols",
+    "trusted true reachable-state bound <=6"
+  ],
+  "limits": "No trained policy, no semantic Q6 and no guaranteed OOD on arbitrary programs; validates W-method implementation portability only",
+  "error_policy": "Any mismatch FAIL; preserve first outcome without favorable reruns"
+}
