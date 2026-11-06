@@ -1,0 +1,93 @@
+name: NEUMANN G4 own-weight first 10 independent entire original CHC clause proof AUDIT
+on:
+  push:
+    branches:
+      - research/q3-g4-ownweight-array-lemma-proof-interface-20261106
+    paths:
+      - .github/workflows/G4_FIRST_10_FULL_HORN_READONLY_INDEPENDENT_AUDIT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  strict-first-ownweights-all-original-clauses:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G4-OWNWEIGHT-TYPED-ARRAY-SOURCEFREE-FIRST
+          run-id: 42181679987
+          github-token: ${{ github.token }}
+          path: original-first
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install independent Z3 only; never train or infer from G4 policy or fetch 2025 reserved
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile research/g4/independent_ownweight_first_full_horn_audit.py
+          python -m pip install -q 'z3-solver==4.13.3.0'
+          echo '0b3f898e7f36cea5ae8011de74af57e3058322795a5ceb35c0aa37c16af5dbf2  original-first/G4-OWNWEIGHT-ARRAY-SYNTHETIC-FIRST.json' | sha256sum -c -
+      - name: Recheck all ten exact first generated model ASTs by independent FULL Horn proof, reject false invariants
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research.g4.independent_ownweight_first_full_horn_audit \
+            original-first/G4-OWNWEIGHT-ARRAY-SYNTHETIC-FIRST.json \
+            > G4-OWNWEIGHT-10-INDEPENDENT-FULL-HORN-AUDIT.json
+          python - <<'PY'
+          import json
+          x=json.load(open('G4-OWNWEIGHT-10-INDEPENDENT-FULL-HORN-AUDIT.json'))
+          print(json.dumps({
+             'independent_full_HORN_valid':x['independent_original_HORN_clause_proven'],
+             'synthetic_test_programs':x['synthetic_heldout_programs'],
+             'false_mutants_refused':x['false_mutation_rejected'],
+             'source_first_sha':x['original_first_SHA256'],
+             'neural_exclusive_over_classical':x['NEUMANN_learned_exclusive_over_classical'],
+             'reserved_originals_accessed':x['external_G3_unopened_array8_originals_accessed'],
+             'scientific_status_Q3':x['Q3']},sort_keys=True))
+          assert x['audit_pass'] is True
+          assert x['independent_original_HORN_clause_proven']==10
+          assert x['false_mutation_rejected']==10
+          assert x['external_G3_unopened_array8_originals_accessed']==0
+          assert x['NEUMANN_learned_exclusive_over_classical']==0
+          print('G4_10_OF_10_FULL_CHC_SOURCE_HORN_INDEPENDENT_UNSAT_VERIFIED')
+          PY
+      - name: Refuse fabricated improved original first receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from research.g4.independent_ownweight_first_full_horn_audit import audit
+          raw=Path('original-first/G4-OWNWEIGHT-ARRAY-SYNTHETIC-FIRST.json')
+          x=json.loads(raw.read_text())
+          x['metrics']['learned_exclusive_over_strong_classical']=10
+          f=Path('/tmp/FORGED_OWNWEIGHT_FIRST.json')
+          f.write_text(json.dumps(x))
+          try:audit(f)
+          except ValueError as err:
+              assert 'G4_ORIGINAL_WEIGHT_FIRST_RECEIPT_CHANGED' in str(err)
+              print('FAKE_LEARNED_EXCLUSIVITY_10_OUT_OF_10_REFUSED_BY_SHA')
+          else:raise AssertionError('FAVORABLE_METRIC_FORGERY_NOT_REJECTED')
+          PY
+      - name: Preserve immutable second mathematical proof evidence
+        if: always()
+        shell: bash
+        run: |
+          if test -s G4-OWNWEIGHT-10-INDEPENDENT-FULL-HORN-AUDIT.json; then
+            sha256sum G4-OWNWEIGHT-10-INDEPENDENT-FULL-HORN-AUDIT.json
+          fi
+      - name: Archive independent whole-source proof without model calls
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G4-OWNWEIGHT-10-FIRST-INDEPENDENT-FULL-HORN-PROOFS
+          path: G4-OWNWEIGHT-10-INDEPENDENT-FULL-HORN-AUDIT.json
+          if-no-files-found: warn
+          retention-days: 90
