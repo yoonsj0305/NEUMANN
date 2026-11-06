@@ -66,6 +66,70 @@ def convert_original_training(original_train:str,tools_root:Path)->dict:
         "converter_stderr_tail":proc.stderr[-400:]}
 
 
+def canonicalize_legacy_string_builtins(source:str)->tuple[str,dict[str,int]]:
+    """Replace ONLY operator tokens, outside strings/comments; keep I/O exact.
+
+    SyGuS-IF 2016 "int.to.str" and "str.to.int" correspond to modern
+    SMT-LIB "str.from_int" and "str.to_int". Not adding new operators.
+    """
+    names={"int.to.str":"str.from_int","str.to.int":"str.to_int"}
+    counts={key:0 for key in names}
+    out=[]
+    i=0
+    quote=False
+    comment=False
+    while i<len(source):
+        c=source[i]
+        if comment:
+            out.append(c)
+            if c in "\r\n":comment=False
+            i+=1
+            continue
+        if quote:
+            out.append(c)
+            if c=='"':
+                if i+1<len(source) and source[i+1]=='"':
+                    out.append(source[i+1])
+                    i+=2
+                    continue
+                quote=False
+            i+=1
+            continue
+        if c==";":
+            comment=True
+            out.append(c)
+            i+=1
+            continue
+        if c=='"':
+            quote=True
+            out.append(c)
+            i+=1
+            continue
+        if c=="(":
+            out.append("(")
+            i+=1
+            while i<len(source) and source[i].isspace():
+                out.append(source[i])
+                i+=1
+            replaced=False
+            for old,new in names.items():
+                if source.startswith(old,i) and (
+                    i+len(old)==len(source) or
+                    source[i+len(old)].isspace() or
+                    source[i+len(old)]==")"
+                ):
+                    out.append(new)
+                    counts[old]+=1
+                    i+=len(old)
+                    replaced=True
+                    break
+            if replaced:continue
+            continue
+        out.append(c)
+        i+=1
+    return "".join(out),counts
+
+
 def verify_exact_train_conservation(original_train:list,converted_source:str)->dict:
     """Same list of ground PBE examples, no hidden test in source."""
     try:
@@ -89,6 +153,9 @@ def run(tools_root:Path)->dict:
     pre=json.loads(PRE.read_text())
     err=json.loads(ERR.read_text())["actual_source_error"]
     contract=json.loads(CON.read_text())
+    operator_contract=json.loads((ROOT/"docs/experiments/G1_CVC5_LEGACY_STRING_OPERATOR_TOKEN_ERRATUM_2026_11_06.json").read_text())
+    if operator_contract["exact_source_compatibility_fix"]["tokens"]!={"int.to.str":"str.from_int","str.to.int":"str.to_int"}:
+        raise ValueError("UNAUTHORIZED_LEGACY_OPERATOR_MAP")
     if len(pre["external_original"]["tasks"])!=8 or contract["originals"]["original_n"]!=8:
         raise ValueError("ORIGINAL_TARGET_DENOMINATOR_DRIFT")
     # The official repository is cloned with a pinned Git SHA by CI. Never
@@ -137,7 +204,20 @@ def run(tools_root:Path)->dict:
             rows.append(row)
             continue
         source=converted.pop("converted")
-        row["conversion"]={**converted,"original_PBE_examples_preserved":True}
+        source,operator_alias_counts=canonicalize_legacy_string_builtins(source)
+        # The publisher converter made the V2 syntax, and this exact,
+        # separately registered modern SMT-LIB operator renaming completes
+        # the dialect adapter. Both keep all original PBE examples.
+        after_alias=verify_exact_train_conservation(originals,source)
+        if not after_alias["pass"]:
+            row.update({"status":"OPERATOR_RENAME_CHANGED_ORIGINAL_EXAMPLES",
+                "source_verified":after_alias,"verified_heldout":False})
+            rows.append(row)
+            continue
+        row["conversion"]={**converted,"original_PBE_examples_preserved":True,
+            "legacy_builtins_renamed":operator_alias_counts,
+            "converted_plus_alias_sha256":sha(source.encode()),
+            "post_alias_original_train_examples_preserved":True}
         specialist=professional_solver(source,12.)
         if specialist["status"]=="CANDIDATE_UNVERIFIED":
             solution=specialist.pop("candidate")
