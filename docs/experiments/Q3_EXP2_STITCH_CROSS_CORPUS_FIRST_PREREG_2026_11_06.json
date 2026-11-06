@@ -1,0 +1,49 @@
+{
+  "schema": "neumann.exp2.stitch.cross-original-corpus.verified-transfer-prereg.v1",
+  "date": "2026-11-06",
+  "train_macro": {
+    "engine_first_run": 42192798081,
+    "upstream_commit": "350804b7b35807c78bd21c313785ae5152ae2985",
+    "stitch_original_stdout_sha256": "28b8c26ded19028c1779a9a84e2312780bc8f3fc7ec491d292c9673fba037b73",
+    "source_corpus": "data/cogsci/nuts-bolts.json"
+  },
+  "targets": [
+    {
+      "path": "data/cogsci/bridge.json",
+      "git_blob": "1e3e461faa74e1b9d4f01708d8d875893e08ff60",
+      "bytes": 96393
+    },
+    {
+      "path": "data/cogsci/castle.json",
+      "git_blob": "230f9dbe92d5dd428202f9c741071cd93ad668b9",
+      "bytes": 128331
+    },
+    {
+      "path": "data/cogsci/city.json",
+      "git_blob": "7dd3319f9cf91f86f1073a7741950738dce29763",
+      "bytes": 110045
+    }
+  ],
+  "target_source_bodies_read_before_this_file": false,
+  "method": "For all three externally published program collections, match the FROZEN training macro in an independent S-expression AST parser; reconstruct every occurrence; test wrong mutated macro; no engine/model/training calls.",
+  "gates": {
+    "source_blob_all_three_match": true,
+    "all_target_original_programs_parsed": true,
+    "all_rewrites_expand_original": true,
+    "wrong_macro_refuted_if_any_hit": true,
+    "record_zero_hit_corpora": true,
+    "min_nonzero_target_corpora_for_scoped_positive": 2
+  },
+  "boundaries": {
+    "same_dsl": true,
+    "new_original_problem_solving": false,
+    "new_author_independence_not_proved": true,
+    "neural_model_training": false,
+    "source_level_classical_program_library_reuse": true,
+    "global_Q3": "OPEN",
+    "global_Q4": "OPEN",
+    "global_Q6": "OPEN",
+    "global_Q7": "OPEN"
+  },
+  "actual_run": "NOT_RUN"
+}
