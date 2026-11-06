@@ -35,7 +35,7 @@
     "max_w_callbacks_per_case": 200
   },
   "primary_gate": "Three distinct external DOT blob hashes and models, all 3 executable learned ASTs independently product-equivalent on all finite inputs, no false certificates, mutated model rejected, query costs and cpu recorded. No success threshold on query efficiency vs arbitrary other baseline.",
-  "negative_control": "Flip an emitted initial-state output; independently reject mutated machine. An invalid or missing source state upper bound must return UNKNOWN, not PASS.",
+  "negative_control": "Flip an emitted initial-state output and independently reject the mutation. Reject broken DOT, incorrect pinned blob, incomplete transition model and query-budget exhaustion. The completeness theorem REQUIRES a correct externally trusted state bound; if bound is wrong, this implementation cannot guarantee detecting that mistake by membership alone.",
   "baseline": "Unchanged pre-external RC39 L* + W is classical. No neural source policy, no claims of improvement over strongest classical software. A passive zero-query baseline is incomplete; not used for performance superiority claims.",
   "note": "No original ARC-AGI-1 evaluation IDs; no external .dot bytes are committed; fetch three pinned paths and verify original Git blobs at runtime. Preserve first success or failure without favorable rewrite."
 }
