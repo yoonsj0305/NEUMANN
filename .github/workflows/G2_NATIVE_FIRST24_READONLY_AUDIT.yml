@@ -1,0 +1,106 @@
+name: NEUMANN G2 source FIRST24 immutable read-only audit and failure classification
+on:
+  push:
+    branches:
+      - research/q3-g2-native-residual-two-formalisms-20261106
+    paths:
+      - .github/workflows/G2_NATIVE_FIRST24_READONLY_AUDIT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  immutable-first-24:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G2-NATIVE-INV_INDUCTION-ORIGINAL-FIRST
+          run-id: 42167219443
+          github-token: ${{ github.token }}
+          path: original-inv
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G2-NATIVE-BV_FINITE-ORIGINAL-FIRST
+          run-id: 42167219443
+          github-token: ${{ github.token }}
+          path: original-bv
+      - name: Pin exact original FIRST bytes even though old CI red after scientific JSON was made
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo 'df7486f738cc47aa59b3fc91569ca73ccebb53da0b06ad4892c8f74e16d96229  original-inv/G2-INV_INDUCTION-ORIGINAL-FIRST.json' | sha256sum -c -
+          echo '45bb7b75af101a334f1eff393483f03a3bfc017e0077405599c21cf1041c3d7b  original-bv/G2-BV_FINITE-ORIGINAL-FIRST.json' | sha256sum -c -
+      - name: Audit all 24 original precommit blobs and classify actual source proof/timeout/failure WITHOUT a solver rerun
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          manifest=json.loads(Path('docs/experiments/G2_NATIVE_RESIDUAL_24_SOURCE_METADATA_FIRST_PREREG_2026_11_06.json').read_text())
+          original=[]
+          first_paths={'INV_INDUCTION':'original-inv/G2-INV_INDUCTION-ORIGINAL-FIRST.json',
+               'BV_FINITE':'original-bv/G2-BV_FINITE-ORIGINAL-FIRST.json'}
+          for cohort in manifest['cohorts']:
+              name=cohort['id']
+              result=json.loads(Path(first_paths[name]).read_text())
+              assert result['cohort']==name and result['first_original_denominator']==12
+              assert len(result['rows'])==12
+              assert result['student_training_calls']==0
+              assert result['stats']['original_arc_evaluation_IDs_consumed']==0
+              original_targets=cohort['targets']
+              for expected,actual in zip(original_targets,result['rows']):
+                  assert expected['file']==actual['file']
+                  assert expected['git_blob']==actual['blob']
+              counts=result['stats']
+              assert counts['total_original_tasks']==12
+              assert counts['native_independently_proved']==sum(r['verified'] for r in result['rows'])
+              for r in result['rows']:
+                  original.append({'cohort':name,'file':r['file'],'status':r['status'],
+                    'verified':r['verified'],
+                    'candidate_sha256':r.get('candidate_sha256'),
+                    'proof_failure':r.get('proof',{}).get('reason'),
+                    'failed_obligation':r.get('proof',{}).get('obligations',[])[-1] if r.get('proof',{}).get('obligations') and not r['verified'] else None,
+                    'stderr_tail':r.get('solver',{}).get('stderr_tail','')[:400],
+                    'native_gap':r.get('native_gap')})
+              print('IMMUTABLE_FIRST',name,json.dumps(counts,sort_keys=True))
+          assert len(original)==24 and len({r['file'] for r in original})==24
+          inv=[r for r in original if r['cohort']=='INV_INDUCTION']
+          bv=[r for r in original if r['cohort']=='BV_FINITE']
+          assert sum(r['verified'] for r in inv)==7,inv
+          assert sum(r['verified'] for r in bv)==12,bv
+          assert sum(r['status']=='SOLVER_BUDGET_TIMEOUT' for r in inv)==2
+          assert sum(r['status']=='SOLVER_NO_PROGRAM' for r in inv)==1
+          assert sum(r['status']=='NATIVE_CANDIDATE_NOT_PROVEN' for r in inv)==2
+          result={'schema':'neumann.q3.g2.first24-immutable-readonly-audit.v1',
+             'science_status':'CLASSICAL_FIRST_BASELINE_SATURATED_BV_AND_PARTIALLY_UNRESOLVED_INV',
+             'audit_pass':True,
+             'original_first_inv_sha256':'df7486f738cc47aa59b3fc91569ca73ccebb53da0b06ad4892c8f74e16d96229',
+             'original_first_bv_sha256':'45bb7b75af101a334f1eff393483f03a3bfc017e0077405599c21cf1041c3d7b',
+             'original_total':24,
+             'verified_native':19,
+             'unresolved_within_12_seconds':2,
+             'solver_no_program_not_proof_of_impossibility':1,
+             'native_candidate_source_not_proven':2,
+             'no_new_neumann_Q3_pass':True,
+             'no_student_training_or_original_synthesis_rerun':True,
+             'ARC_public_eval_IDs_used':0,
+             'Q3':'OPEN','Q4':'OPEN','Q6':'OPEN','Q7':'OPEN',
+             'cases':original}
+          Path('G2-NATIVE-FIRST24-INDEPENDENT-READONLY.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
+          print('RECEIPT_INTEGRITY_PASS')
+          for r in original:
+              if not r['verified']:print('UNVERIFIED_ORIGINAL',json.dumps(r,sort_keys=True))
+          PY
+      - name: Archive independent original 24 classification and negative evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G2-NATIVE-24-FIRST-INDEPENDENT-READONLY-AUDIT
+          path: G2-NATIVE-FIRST24-INDEPENDENT-READONLY.json
+          if-no-files-found: warn
+          retention-days: 90
