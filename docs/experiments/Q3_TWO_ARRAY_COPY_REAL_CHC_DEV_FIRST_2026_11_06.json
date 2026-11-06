@@ -1,0 +1,32 @@
+{
+  "schema": "neumann.q3.two-array-copy-human-operator-original-chc-development.v1",
+  "date": "2026-11-06",
+  "status": "PREREG_BEFORE_FIRST_REAL_SOURCE_PROOF",
+  "original": {
+    "repo": "chc-comp/chc-comp25-benchmarks",
+    "commit": "ddd279cab0717db6effe69baad451a8eb04ffd86",
+    "file": "quic3/data/standard_copy2_true-unreach-call_ground_000.smt2",
+    "git_blob": "30b3bab8834aa6f834cf493539180e6b92caf16f",
+    "bytes": 6318,
+    "claim": "ALREADY_OPENED_DEVELOPMENT_ORIGINAL; not a new untouched holdout"
+  },
+  "old_expression_H0": "single array constant prefix/suffix stage representations as in prior G3",
+  "new_expression_H1": "COPY_PREFIX(A,baseA,B,baseB,cursor) universally equates corresponding reads from TWO independent arrays",
+  "human_design_origin": true,
+  "training_model_used": false,
+  "desired_original_proof": "All unchanged original source Horn clauses separately independently refuted UNSAT under model: pair-fill, copy and final scan",
+  "gate": "all original 9 unchanged CHC clauses must prove UNSAT, plus one intentionally corrupted copy relation must give SAT counterexample, no skipping or strengthening source",
+  "verifier": "apt z3 SMT-LIB2 original clauses, independent obligation negation, 7s cap per clause",
+  "classically_strong_baseline": "original source Z3 first 2025 G3 (bounded 15s, no grounded verdict); do not claim impossible",
+  "afterfirst_intent": "only after successful development proof register a genuinely uninspected compatible source and freeze generator before source-body access; no code modification informed by unseen source",
+  "out_of_scope": [
+    "not own-weight invented operator",
+    "not new unseen author generalization",
+    "not demonstrated 10x total economics",
+    "not full Q3 or Q6"
+  ],
+  "Q3": "OPEN",
+  "Q4": "OPEN",
+  "Q6": "OPEN",
+  "Q7": "OPEN"
+}

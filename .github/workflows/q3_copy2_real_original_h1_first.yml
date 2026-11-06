@@ -1,0 +1,50 @@
+name: Q3 H1 human relational COPY actual CHC published original dev proof
+# First original complete; no repeat source scoring.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+jobs:
+  original-copy2-dev:
+    if: false # retained historical first CI contract; do not rerun
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Install original SMT clause verifier
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq z3
+          z3 --version
+      - name: Python source compilation, freeze source and human-only scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q3/real_copy2_chc_h1.py
+          python3 - <<'PY'
+          import json
+          c=json.load(open('docs/experiments/Q3_TWO_ARRAY_COPY_REAL_CHC_DEV_FIRST_2026_11_06.json'))
+          assert c['original']['git_blob']=='30b3bab8834aa6f834cf493539180e6b92caf16f'
+          assert c['human_design_origin'] and not c['training_model_used']
+          print('OPENED_DEV_ORIGINAL_REGISTERED_AND_H1_NOT_A_LEARNED_INVENTION')
+          PY
+      - name: Original 9 Horn clauses each independently refuted with symbolic COPY and mutant
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'ACTUAL_ORIGINAL_H1_WALL_S=%e PEAK_RSS_KB=%M' \
+            python3 -m research.q3.real_copy2_chc_h1 --out H1-REAL-COPY2-FIRST
+          sha256sum H1-REAL-COPY2-FIRST/FIRST_REPORT.json
+      - name: Save all source-first proof files and negatives even on scientific failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-H1-REAL-COPY2-OPENED-DEV-FIRST
+          path: H1-REAL-COPY2-FIRST/
+          retention-days: 90
+          if-no-files-found: warn
