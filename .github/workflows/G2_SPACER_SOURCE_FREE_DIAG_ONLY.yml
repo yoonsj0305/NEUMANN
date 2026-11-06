@@ -1,0 +1,42 @@
+name: NEUMANN G2 Z3 Spacer synthetic first toolchain failure diagnosis only
+on:
+  push:
+    branches:
+      - research/q3-g2-native-residual-two-formalisms-20261106
+    paths:
+      - .github/workflows/G2_SPACER_SOURCE_FREE_DIAG_ONLY.yml
+permissions:
+  contents: read
+jobs:
+  inspect-actual-sourcefree-SMT-CHC:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install original Z3 Spacer CLI, never fetch source originals
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq z3
+          z3 --version
+      - name: Show both raw synthetic CHC results even if negative
+        shell: bash
+        run: |
+          set +e
+          python3 -m research.g2.z3_spacer_postfirst --synthetic > G2-SPACER-ONLY-SYNTHETIC-DIAG.json
+          code=$?
+          set -e
+          cat G2-SPACER-ONLY-SYNTHETIC-DIAG.json
+          echo "SOURCE_FREE_NATIVE_SPACER_DIAG_EXIT=$code"
+          exit "$code"
+      - name: Retain synthetic failure evidence, not an original benchmark attempt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G2-SPACER-SYNTHETIC-DIAG
+          path: G2-SPACER-ONLY-SYNTHETIC-DIAG.json
+          if-no-files-found: warn
+          retention-days: 90
