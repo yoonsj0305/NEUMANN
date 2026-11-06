@@ -1,0 +1,41 @@
+{
+  "schema": "neumann.q3.rc41.external-mqtt-source-only-first.prereg.v1",
+  "date": "2026-11-06",
+  "purpose": "Unmodified RC39 classical state learner and existing RC39 W-method on independently authored, real protocol extracted transition models. This tests transfer from synthetic human-constructed 24 to external real-world Mealy machines; not new neural structure, not cross-formalism Q6.",
+  "provenance": "Public external MQTT DOT models were browsed by researcher before this prereg; NOT blind-to-researcher. The original learner source and W-method were hash frozen before these external files were examined in this turn. Exact compiled executable output has never been scored on these 3 models in this project.",
+  "external_repo": "mtappler/mut-learn",
+  "external_commit": "24b5535f37ca92745ddb4c3a5a5381b6ccfa87ce",
+  "external_models": [
+    {
+      "case": "mosquitto",
+      "path": "eval/src/main/resources/mqtt/mosquitto/mosquitto.dot",
+      "git_blob": "c6a9116200542ff55acca8f8d02b8bb6ef9ce486",
+      "max_reference_states": 3
+    },
+    {
+      "case": "activemq",
+      "path": "eval/src/main/resources/mqtt/ActiveMQ/simple.dot",
+      "git_blob": "cf6b8db0a25b7c56497f77234e4304f13a06da77",
+      "max_reference_states": 4
+    },
+    {
+      "case": "hbmqtt",
+      "path": "eval/src/main/resources/mqtt/hbmqtt/simple.dot",
+      "git_blob": "4d339c12c75921ba7786dc54dfd2bdebd9f37691",
+      "max_reference_states": 5
+    }
+  ],
+  "fixed_original_active_mealy_git_blob": "83bd15d98b8fa02f4427b26c27264d35c0ec261e",
+  "fixed_wmethod_git_blob": "86a413ff5e002995e0c79e625abe22d5877ae424",
+  "machine_model": "Resettable complete deterministic Mealy; trust external DOT model as reference and publication-independent source. Alphabet encoding assigned by sorted labels only; raw names not used for policy choice. Reference state graph NOT given to learner or W tester; graph used only in the source membership backend and in independent after-freeze proof.",
+  "budgets": {
+    "max_unique_membership_per_case": 200000,
+    "max_w_suite_words": 200000,
+    "max_lstar_membership_per_case": 200000,
+    "max_w_callbacks_per_case": 200
+  },
+  "primary_gate": "Three distinct external DOT blob hashes and models, all 3 executable learned ASTs independently product-equivalent on all finite inputs, no false certificates, mutated model rejected, query costs and cpu recorded. No success threshold on query efficiency vs arbitrary other baseline.",
+  "negative_control": "Flip an emitted initial-state output; independently reject mutated machine. An invalid or missing source state upper bound must return UNKNOWN, not PASS.",
+  "baseline": "Unchanged pre-external RC39 L* + W is classical. No neural source policy, no claims of improvement over strongest classical software. A passive zero-query baseline is incomplete; not used for performance superiority claims.",
+  "note": "No original ARC-AGI-1 evaluation IDs; no external .dot bytes are committed; fetch three pinned paths and verify original Git blobs at runtime. Preserve first success or failure without favorable rewrite."
+}
