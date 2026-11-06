@@ -160,6 +160,14 @@ def run(out_dir:Path,seconds:float=7.0)->dict:
         "receipts":receipts
     }
     (out_dir/"first_theorem_report.json").write_text(json.dumps(report,indent=2,sort_keys=True)+"\n")
+    # Emit individual verdicts to CI logs before any failure so that UNKNOWN,
+    # syntax errors and genuine counterexamples remain observable.
+    print(json.dumps({"theorems_passed":report["theorems_passed"],
+                      "theorems_total":report["theorems_total"],
+                      "outcomes":[{"name":x["proof_name"],"actual":x["actual"],
+                                   "expected":x["expected"],
+                                   "stderr":x["z3_stderr_tail"]} for x in receipts]},
+                     indent=2,sort_keys=True))
     if report["theorems_passed"]!=len(receipts):
         raise RuntimeError("H0_H1_PROOF_OBLIGATION_FAILED_OR_UNKNOWN")
     return report
