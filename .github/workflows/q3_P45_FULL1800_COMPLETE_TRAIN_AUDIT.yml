@@ -1,0 +1,83 @@
+name: NEUMANN P45 complete 720000 one-seed original TRAIN hypothesis certificate
+on:
+  push:
+    branches:
+      - research/q3-p45-single-seed-mask-lift-20261106
+    paths:
+      - .github/workflows/q3_P45_FULL1800_COMPLETE_TRAIN_AUDIT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independent-complete:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Load original immutable FIRST P45 without running any P45 proposer
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-P45-ONE-SEED-MASK-TRAIN400-FIRST
+          run-id: 42148341148
+          github-token: ${{ github.token }}
+          path: immutable-p45
+      - name: Verify earliest original negative first receipt SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '38e41ddd312eb451745f2d73194840e98464e9660d14c52c30537fb7e30bfff5  immutable-p45/P45-MASK-TRAIN400-FIRST.json' | sha256sum -c -
+          node --version
+      - name: Retrieve original public ARC training source commit without EVALUATION
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+          test "$(find "$RUNNER_TEMP/arc-agi/data/training" -maxdepth 1 -name '*.json' | wc -l)" = 400
+      - name: Exhaust all 720000 exact candidate-task pairs without delta pruning, TRAIN only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node experiments/q3_p45_full1800_train_reachability_CERTIFICATE.mjs "$RUNNER_TEMP/arc-agi" immutable-p45/P45-MASK-TRAIN400-FIRST.json > P45-FULL1800-COMPLETE-TRAIN-CERTIFICATE.json
+          cat P45-FULL1800-COMPLETE-TRAIN-CERTIFICATE.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open('P45-FULL1800-COMPLETE-TRAIN-CERTIFICATE.json'))
+          assert x['independent_exhaustive_candidate_task_pairs']==720000
+          assert x['original_test_outputs_read_by_completeness_audit'] is False
+          assert x['tasks_with_at_least_one_nontrivial_exact_train_program']==1
+          assert x['scientific_status']=='FIXED_LANGUAGE_TRAIN_CEILING_CERTIFIED'
+          assert x['original_ARC_evaluation_IDs_consumed']==0
+          print('COMPLETE_720000_FIXED_HYPOTHESIS_BOUND_PASS')
+          PY
+      - name: Forged earliest first receipt cannot yield an apparent stronger conclusion
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          import {audit} from './experiments/q3_p45_full1800_train_reachability_CERTIFICATE.mjs';
+          const f=JSON.parse(fs.readFileSync('immutable-p45/P45-MASK-TRAIN400-FIRST.json','utf8'));
+          f.stats.p45_new_exact_beyond_prior55=100;
+          f.science_status='SCOPED_ONE_SEED_MASK_LIFT_PASS';
+          fs.writeFileSync('/tmp/fake-P45.json',JSON.stringify(f));
+          let rejected=false;
+          try{audit(process.env.RUNNER_TEMP+'/arc-agi','/tmp/fake-P45.json');}catch(e){
+            rejected=String(e).includes('ORIGINAL_IMMUTABLE_P45_FIRST_SHA_DRIFT');
+          }
+          if(!rejected)process.exit(1);
+          console.log('PINNED_P45_FIRST_FABRICATED_SUCCESS_REJECTED');
+          NODE
+      - name: Archive exact complete 720000-candidate original TRAIN bound
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-P45-FULL1800-TRAIN-COMPLETE-CERTIFICATE
+          path: P45-FULL1800-COMPLETE-TRAIN-CERTIFICATE.json
+          if-no-files-found: warn
+          retention-days: 90

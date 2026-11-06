@@ -1,0 +1,127 @@
+name: NEUMANN Q3 P45 one frozen source MASK project merge original FIRST
+on:
+  push:
+    branches:
+      - research/q3-p45-single-seed-mask-lift-20261106
+    paths:
+      - .github/workflows/q3_P45_ONE_SEED_MASK_FIRST.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify source frozen and typed mask composition independent correctness
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json
+          p=json.loads(Path('docs/experiments/q3_P45_ONE_SEED_MASK_LIFT_FIRST_PREREG_2026_11_06.json').read_text())
+          b=Path(p['provenance']['seed_file']).read_bytes()
+          sha=hashlib.sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()
+          assert sha==p['provenance']['seed_git_blob']
+          assert p['parametric_family']['total_distinct_syntactic_programs']==1800
+          print('FROZEN_TEACHER_KERNEL',sha)
+          PY
+          node --test tests/test_q3_p45_one_seed_mask.mjs
+      - name: Load previous immutable strongest P30 400-original first
+        uses: actions/download-artifact@v4
+        with:
+          name: neumann-p30-first-opened-train400
+          run-id: 42024425446
+          github-token: ${{ github.token }}
+          path: frozen-p30
+      - name: Load previous immutable P43 7-teacher transfer first
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-P43-TEACHER-TRANSFER400-FIRST
+          run-id: 42145135283
+          github-token: ${{ github.token }}
+          path: frozen-p43
+      - name: Load previous immutable P44 180 symmetry closure first
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-P44-ORBIT-TRAIN400-FIRST
+          run-id: 42147159711
+          github-token: ${{ github.token }}
+          path: frozen-p44
+      - name: Check all three immutable source first hashes before reading original tasks
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "0fb747b4fd7355649465b8ff3424c0170d6d178f47fd1ea64ca486c416672b79  frozen-p30/P30-OPENED400-FIRST.json" | sha256sum -c -
+          echo "8b5cb4927133930f6238adb17dbeba5a73d6955a368965b67318cc6aca78a398  frozen-p43/P43-TEACHER-TRANSFER400-FIRST.json" | sha256sum -c -
+          echo "8efe48796c15f8f322124afa6751dca1ea7816c93e038e4a38b90d08dcc3e639  frozen-p44/P44-ORBIT-TRAIN400-FIRST.json" | sha256sum -c -
+      - name: Checkout original public ARC train400 exactly pinned, no public evaluation touched
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+          test "$(find "$RUNNER_TEMP/arc-agi/data/training" -maxdepth 1 -name '*.json' | wc -l)" = 400
+      - name: ORIGINAL FIRST mask projection and original 400 gold under strict precommitted gate
+        shell: bash
+        run: |
+          set -uo pipefail
+          node experiments/q3_p45_one_seed_mask_FIRST.mjs "$RUNNER_TEMP/arc-agi" frozen-p30/P30-OPENED400-FIRST.json frozen-p43/P43-TEACHER-TRANSFER400-FIRST.json frozen-p44/P44-ORBIT-TRAIN400-FIRST.json > P45-MASK-TRAIN400-FIRST.json 2> P45-MASK-TRAIN400-FIRST.stderr
+          rc=$?
+          if test -s P45-MASK-TRAIN400-FIRST.json; then
+            python3 - <<'PY'
+          import json
+          x=json.load(open('P45-MASK-TRAIN400-FIRST.json'))
+          print(json.dumps({
+            'science':x['science_status'],
+            'stats':x['stats'],
+            'new_exact_rows':[{'id':r['id'],'candidates':r['p45_candidate_programs'][:6],
+             'reason':r['p45_reason']} for r in x['rows'] if r['p45_new_exact']]
+          },sort_keys=True))
+          PY
+            python3 - <<'PY'
+          import json,sys
+          x=json.load(open('P45-MASK-TRAIN400-FIRST.json'))
+          assert x['stats']['tasks']==400
+          assert x['stats']['total_generic_programs']==1800
+          assert x['stats']['original_historical_oracle_upper_bound']==55
+          assert x['arc_evaluation_IDs_consumed']==0
+          if x['science_status']!='SCOPED_ONE_SEED_MASK_LIFT_PASS':
+              print('P45_ORIGINAL_FIRST_SCIENTIFIC_FAIL_FREEZE')
+              sys.exit(1)
+          PY
+            scientific=$?
+            if test "$scientific" -ne 0; then rc=1; fi
+          else
+            echo 'P45_SOURCE_OR_INFRA_FAIL_NO_JSON'
+            rc=1
+          fi
+          cat P45-MASK-TRAIN400-FIRST.stderr
+          echo "P45_ORIGINAL_FIRST_PROCESS_EXIT=$rc"
+          exit "$rc"
+      - name: Preserve immutable first content hash
+        if: always()
+        shell: bash
+        run: |
+          if test -s P45-MASK-TRAIN400-FIRST.json; then
+            sha256sum P45-MASK-TRAIN400-FIRST.json > P45-MASK-TRAIN400-FIRST.sha256
+            cat P45-MASK-TRAIN400-FIRST.sha256
+          fi
+      - name: Preserve FIRST even when scientific gate fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-P45-ONE-SEED-MASK-TRAIN400-FIRST
+          path: |
+            P45-MASK-TRAIN400-FIRST.json
+            P45-MASK-TRAIN400-FIRST.sha256
+            P45-MASK-TRAIN400-FIRST.stderr
+          if-no-files-found: warn
+          retention-days: 90

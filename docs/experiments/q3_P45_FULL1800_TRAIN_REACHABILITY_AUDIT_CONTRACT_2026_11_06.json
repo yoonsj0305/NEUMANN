@@ -1,0 +1,20 @@
+{
+  "schema": "neumann.q3.p45.full1800.exhaustive-train-reachability-audit.v1",
+  "date": "2026-11-06",
+  "provenance": "Post-FIRST independent completeness audit, not an unbiased first new-ability test. Original P45 first 42148341148 SHA256 38e41ddd312eb451745f2d73194840e98464e9660d14c52c30537fb7e30bfff5, science FAIL; independent alternate audit 42148654995 PASS.",
+  "original": "fchollet/ARC-AGI@399030444e0ab0cc8b4e199870fb20b863846f34/data/training (400 opened original tasks), no ARC evaluation IDs",
+  "frozen_seed": "P22 external GPT-6 source aa18de87 Git blob d82f09406b4b3ee4e9651c261013c8ce8aa850c7",
+  "hypothesis": "Independent complete enumeration without source-delta pruning of 2 axes x 10 background colors x 9 nonmatching fill colors x 10 marker modes = 1800 programs x 400 tasks = 720000 parameter attempts proves that at most one original source task permits any nontrivial full-TRAIN-exact program in this exact human-supplied one-seed mask/merge grammar.",
+  "necessary_invariant": "A program only changes original background b to the single fill c while preserving shape and all other colors. If a TRAIN pair demands two source colors, two destination colors, dimension change or no nontrivial changes, no valid candidate exists under this exact grammar.",
+  "method": "No import from P45 generator/selector; alternate direct mathematical row/column scan. Enumerate ALL 1800 tuples per original task, independently compare ALL TRAIN inputs and target outputs (not test gold). A valid task requires at least one changed training cell and exact match of every TRAIN pair. Validate source IDs and pinned historical first hash.",
+  "expected": "Historical original-first predicted one compatible task a699fb00.json and 337 incompatible uniform-delta tasks, 62 uniform-delta but no fitting variants. This audit can contradict these observations, preserve contradictions rather than edit them.",
+  "pass_gate": "720000 tuples enumerated, exactly one original source task with at least one full-TRAIN-fit program, other 399 with none, source SHA and first receipt checks pass; does NOT imply global Q3 success.",
+  "negative_controls": "Contradictory synthetic two-fill target must have no consistent one-seed program, a synthetic one-fill target must have a candidate, forged P45 first cannot pass.",
+  "risk": "Public opened originals; post-first audit, not independent distribution holdout; oracle no-new exact ceiling only within finite defined grammar. Uniform-delta pruning is sound here but may be harmful for future different semantic formalisms.",
+  "no_training": true,
+  "ARC_evaluation_IDs_consumed": 0,
+  "Q3": "OPEN",
+  "Q4": "OPEN",
+  "Q6": "OPEN",
+  "Q7": "OPEN"
+}

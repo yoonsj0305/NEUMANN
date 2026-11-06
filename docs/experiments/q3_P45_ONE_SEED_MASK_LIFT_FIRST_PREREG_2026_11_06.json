@@ -1,0 +1,64 @@
+{
+  "schema": "neumann.q3.p45.one-seed-mask-project-lift.prereg.v1",
+  "date": "2026-11-06",
+  "north_star": "Frontier-level problem solving with minimum necessary computation",
+  "hypothesis": "The same frozen one source program 'aa18de87', composed with a generic typed MASK-PROJECT and non-destructive MERGE adapter, can solve >=2 new original public ARC TRAIN tasks beyond the frozen classical+P43+P44 correct-set union 55. This changes representation, unlike failed pure D4×S10 symmetry closure, without modifying seed code or adding any second ARC-specific primitive.",
+  "provenance": {
+    "seed_repo": "yoonsj0305/NEUMANN",
+    "seed_file": "experiments/q3_open_program_teacher_p22_FIRST_PROPOSAL.mjs",
+    "seed_git_blob": "d82f09406b4b3ee4e9651c261013c8ce8aa850c7",
+    "seed_function": "aa18de87",
+    "previous_success_task": "a699fb00.json",
+    "parent_P44_science": "SCOPED_ONE_SEED_ORBIT_REUSE_FAIL, only 1 original correct and +0 beyond prior 55",
+    "original_400_public": "fchollet/ARC-AGI@399030444e0ab0cc8b4e199870fb20b863846f34 data/training, previously OPENED public",
+    "historical_P30_first_sha256": "0fb747b4fd7355649465b8ff3424c0170d6d178f47fd1ea64ca486c416672b79",
+    "historical_P43_first_sha256": "8b5cb4927133930f6238adb17dbeba5a73d6955a368965b67318cc6aca78a398",
+    "historical_P44_first_sha256": "8efe48796c15f8f322124afa6751dca1ea7816c93e038e4a38b90d08dcc3e639",
+    "global_ARC_eval_IDs_remaining": 11
+  },
+  "invariant_structure": "Source f_seed connects first and last nonzero in each canonical row by filling intervening zero with color 2. New type adapter: for selected axis, background b, marker predicate M ('all non-b' or one particular color m!=b), project raw color grid to Boolean mask 1 if M, else 0; apply frozen f_seed to projected mask; merge ONLY where source input cell==b and f_seed produced 2, writing c!=b. Nonselected colors always retained. This is human-authored typed structural lifting, not a neural-generated new operator.",
+  "parametric_family": {
+    "orientations": [
+      "row",
+      "column"
+    ],
+    "background_colors": 10,
+    "output_fill_colors_per_background": 9,
+    "marker_options_per_background": 10,
+    "marker_option_semantics": "One ALL_NON_BACKGROUND plus nine equal_to_marker(m), m != b",
+    "total_distinct_syntactic_programs": 1800,
+    "search_contraction": "Infer background b and fill c uniquely from ORIGINAL TRAIN changed pixels (every changed input must share b and changed target must share c); if no changes or inconsistent b/c or shape change, ABSTAIN. Only evaluate 20 marker+axis candidates with inferred b/c. TRAIN-only inference, TEST inputs used for prediction, original TEST outputs read only after source programs finish.",
+    "candidate_per_eligible_task": 20,
+    "all_original_denominator": 400,
+    "no_source_filename_routing": true,
+    "all_original_predictions_validate_dimensions_and_colors": true
+  },
+  "comparison": {
+    "historical_strong_p30_correct": 54,
+    "historical_strong_p30_wrong": 8,
+    "prior_p43_exact": 1,
+    "prior_p44_exact": 1,
+    "historic_oracle_union_correct": 55,
+    "statistic": "new exact original cases outside frozen correct-set OR(P30,P43,P44). Only an oracle union upper bound, not a conflict-safe deployable merger.",
+    "equal_rights_classical": "The mask adapter and full 20-candidate exact enumeration are deterministic CLASSICAL. The same expanded representation is offered to GP/CEGIS; no learned-exclusive advantage can be claimed from this study."
+  },
+  "initial_gate": "SCOPED_ONE_SEED_MASK_LIFT_PASS iff >=2 new original test-exact cases beyond prior 55, zero incorrect accepted programs, and >=1 new correct case with selective marker m (not ALL_NON_BACKGROUND). Otherwise FAIL/STOP.",
+  "controls": [
+    "Frozen seed source Git blob, old three historical first receipts and original ARC commit pinned",
+    "Synthetic independent direct graph/line reference checks over arbitrary palette and orientation",
+    "Exact TRAIN-only changed-pixel inference; no score-gold or filename as selector",
+    "At least one nontrivial changed training cell; guard identity degenerate programs",
+    "All consistent candidate TEST outputs must agree, else ABSTAIN",
+    "Unknown/candidate exceptions/invalid grids => ABSTAIN; no unsafe output accepted",
+    "No mutation of first P44 or original P43 evidence",
+    "Alternate independent source audit from immutable P45 first, no learned model rerun"
+  ],
+  "costs": "Count candidate execution, CPU and wall, source fetch; teacher original generation and human operator-adapter authoring NOT METERED. No Q4/10x claim.",
+  "degraded_mode": "Malformed original files, changed source/git blob, incompatible TRAIN deltas, conflicting plausible candidates, runtime error, or unverified result => no prediction / no scientific proof.",
+  "global_science": {
+    "Q3_neural_self_discovery": "OPEN",
+    "Q4_equal_rights_cost_10x": "OPEN",
+    "Q6_new_formalism_transfer": "OPEN",
+    "Q7_frontier": "OPEN"
+  }
+}

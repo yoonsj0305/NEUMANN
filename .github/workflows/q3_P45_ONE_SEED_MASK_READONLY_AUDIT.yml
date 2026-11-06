@@ -1,0 +1,91 @@
+name: NEUMANN Q3 P45 one seed 1800 exact program first independent audit
+on:
+  push:
+    branches:
+      - research/q3-p45-single-seed-mask-lift-20261106
+    paths:
+      - .github/workflows/q3_P45_ONE_SEED_MASK_READONLY_AUDIT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original-readonly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Pin original P45 FIRST receipt from one-and-only natural 400 run
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-P45-ONE-SEED-MASK-TRAIN400-FIRST
+          run-id: 42148341148
+          github-token: ${{ github.token }}
+          path: first-p45
+      - name: Pin original P44 FIRST receipt
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-P44-ORBIT-TRAIN400-FIRST
+          run-id: 42147159711
+          github-token: ${{ github.token }}
+          path: first-p44
+      - name: Pin original P43 FIRST receipt
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-P43-TEACHER-TRANSFER400-FIRST
+          run-id: 42145135283
+          github-token: ${{ github.token }}
+          path: first-p43
+      - name: Pin original P30 FIRST classical receipt
+        uses: actions/download-artifact@v4
+        with:
+          name: neumann-p30-first-opened-train400
+          run-id: 42024425446
+          github-token: ${{ github.token }}
+          path: first-p30
+      - name: Fetch official public original train400 source exactly, never official evaluation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+      - name: Alternate math/reference source audit of exact 1800 candidate family and original first
+        shell: bash
+        run: |
+          set -euo pipefail
+          node experiments/q3_p45_one_seed_mask_READONLY_AUDIT.mjs "$RUNNER_TEMP/arc-agi" first-p45/P45-MASK-TRAIN400-FIRST.json first-p44/P44-ORBIT-TRAIN400-FIRST.json first-p43/P43-TEACHER-TRANSFER400-FIRST.json first-p30/P30-OPENED400-FIRST.json > P45-MASK-ORIGINAL-INDEPENDENT-AUDIT.json
+          cat P45-MASK-ORIGINAL-INDEPENDENT-AUDIT.json
+      - name: Attempted fake improved original first is rejected
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          import {audit} from './experiments/q3_p45_one_seed_mask_READONLY_AUDIT.mjs';
+          const first=JSON.parse(fs.readFileSync('first-p45/P45-MASK-TRAIN400-FIRST.json','utf8'));
+          first.science_status='SCOPED_ONE_SEED_MASK_LIFT_PASS';
+          first.stats.p45_new_exact_beyond_prior55=100;
+          fs.writeFileSync('/tmp/P45-FAKE-FIRST.json',JSON.stringify(first));
+          const result=audit(process.env.RUNNER_TEMP+'/arc-agi',
+             '/tmp/P45-FAKE-FIRST.json','first-p44/P44-ORBIT-TRAIN400-FIRST.json',
+             'first-p43/P43-TEACHER-TRANSFER400-FIRST.json',
+             'first-p30/P30-OPENED400-FIRST.json');
+          if(result.audit_pass||
+             !result.errors.includes('FIRST_IMMUTABLE_SHA_MISMATCH_P45')||
+             !result.errors.includes('FALSE_SCIENCE_PASS_PROMOTED')||
+             !result.errors.includes('P45_FIRST_AGGREGATE_MISMATCH_p45_new_exact_beyond_prior55'))
+               process.exit(1);
+          console.log('P45_FAVOURABLE_FALSE_FIRST_RECEIPT_REJECTED');
+          NODE
+      - name: Preserve independent math/first source audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-P45-MASK-FIRST-INDEPENDENT-AUDIT
+          path: P45-MASK-ORIGINAL-INDEPENDENT-AUDIT.json
+          if-no-files-found: warn
+          retention-days: 90
