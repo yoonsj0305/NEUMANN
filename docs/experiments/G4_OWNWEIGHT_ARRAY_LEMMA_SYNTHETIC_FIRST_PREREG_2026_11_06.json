@@ -1,0 +1,45 @@
+{
+  "schema": "neumann.q3.g4.typed-quantified-array-lemma-ownweights-synthetic-only.v1",
+  "date": "2026-11-06",
+  "purpose": "Build FIRST source-to-owned-weights-typed-index-relational-invariant-to-independent-universal-SMT-proof execution interface without reading or consuming G3 reserved original array8. This is necessary architecture, NOT full Q3 proof.",
+  "north_star": "Frontier-level problem solving with minimum necessary computation",
+  "exact_heldout_synthetic_pairs": [
+    [
+      "FILL",
+      "C",
+      null
+    ],
+    [
+      "COPY",
+      "C",
+      "A"
+    ],
+    [
+      "COPY",
+      "A",
+      "C"
+    ],
+    [
+      "ADD",
+      "B",
+      "C"
+    ],
+    [
+      "ADD",
+      "A",
+      "B"
+    ]
+  ],
+  "admissible_synthetic_programs": "FILL store destination[i]=constant; COPY store destination[i]=source[i]; ADD store destination[i]=source[i]+constant. Only distinct dst/src for copy/add, array names A B C, arbitrary Int counter i and bound n. Train on remaining combinations; holdout entire source/destination/operation tuples and vary constant literals.",
+  "own_weights": "Numpy 3-head gradient softmax, model receives only source program lexical typed graph features; constant passed through as typed source literal, never a task ID cache. Fix seed 1729 before first.",
+  "candidate_ast": "And(0<=i<=n, ForAll(k, Implies(0<=k<i, select(dest,k)=VALUE_EXPRESSION(src,k,const))))",
+  "independent_checker": "z3-solver source-original PRE/TRANS/POST, 3 UNSAT counterexample queries: init, inductiveness, terminal safety. No model confidence acceptance, timeout -> UNKNOWN. Fail-closed wrong candidate/mutant. No original external task read.",
+  "strong_classical_baseline": "Deterministic source-to-invariant AST compiler with exact same source rights, plus same independent source verifier. It can outperform NN; no equal-rights model exclusivity claim unless externally demonstrated.",
+  "metrics": "Exact heldout generated AST structure, actual universal SMT certificates, ablation with randomly initialized weights, native classical source compiler, neural full training/inference/proof ms vs classical compile/proof ms (single hosted Actions runtime; no reliable energy).",
+  "scope_protection": "NEVER consume G3_ARRAY_STRUCTURAL_TRANSFER_8_UNTOUCHED_RESERVED_2026_11_06.json target bodies or gold or scores in G4. Only source-free synthetic plus independent prover. Subsequent original first requires separate frozen checkpoint, stronger natural baselines, cross-format unseen transfer, and exact-rights cost.",
+  "success_condition": "At least 4/5 reserved synthetic source tuple AST predictions independently 3/3 universal proved, every deliberate invalid mutation rejected. Strong classical baseline separately measured; model-only frontier Q3 still OPEN.",
+  "Q3": "OPEN",
+  "Q4": "OPEN",
+  "Q6": "OPEN",
+  "Q7": "OPEN"
+}
