@@ -1,0 +1,75 @@
+name: NEUMANN G3 all N ARRAY FILL generic invariant induction theorems
+on:
+  push:
+    branches:
+      - research/g3-array-init-parametric-proof-transfer-20261106
+    paths:
+      - .github/workflows/G3_ARRAY_ALL_N_GENERIC_THEOREM.yml
+permissions:
+  contents: read
+jobs:
+  symbolic-conditional-all-N:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Source-free and immutable experiment prerequisite
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/g3/array_fill_general_stage_theorem.py
+          test "$(git hash-object research/g3/array_fill_parametric_invariant.py)" = 8043d84210822f9a47d78568c25ea97cb0c175dd
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('docs/experiments/G3_ARRAY_FILL_ALL_N_SYMBOLIC_STAGE_THEOREM_CONTRACT_2026_11_06.json').read_text())
+          assert x['prerequisite_source_unseen_first_run']==42178462607
+          assert x['first_unseen_sha256']=='86cc31057e2fe96c412d39b5ff395ecde03aef9990df0df30ec63be6091c883a'
+          assert x['frozen_generator_blob_sha']=='8043d84210822f9a47d78568c25ea97cb0c175dd'
+          print('ALL_N_THEOREM_PREDECLARED_AFTER_TRUE_SOURCE_UNSEEN_FIRST')
+          PY
+      - name: Install actual independent Z3 SMT checker
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq z3
+          z3 --version
+      - name: Prove generic ARRAY prefix/suffix stage without hardcoding ANY finite stage count
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m research.g3.array_fill_general_stage_theorem --output G3-ARRAY-ALL-N-THEOREMS > G3-ARRAY-ALL-N-THEOREMS-SUMMARY.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open('G3-ARRAY-ALL-N-THEOREMS/G3-ARRAY-FILL-ALL-N-THEOREM.json'))
+          print(json.dumps({'all_theorems_valid':x['all_valid_theorems_UNSAT_and_mutant_SAT'],
+              'stage_count_symbolic':x['stage_count_symbolic_not_unrolled'],
+              'source_tasks_consumed':x['original_source_tasks_fetched'],
+              'source_lemmas':[{'name':y['lemma'],'expected':y['expected'],
+                 'actual':y['status'],'time_ms':y['wall_ms']}
+                 for y in x['lemmas']]},sort_keys=True))
+          assert x['all_valid_theorems_UNSAT_and_mutant_SAT'] is True
+          assert x['number_of_native_universal_lemmas']==5
+          assert x['number_of_nonvacuity_and_wrong_rule_refutations']==2
+          assert x['original_source_tasks_fetched']==0
+          assert all(t['status']==t['expected'] for t in x['lemmas'])
+          print('GENERIC_ARRAY_STAGE_INDUCTIVE_ALL_N_THEOREM_PASS')
+          PY
+      - name: Pin original symbolic SMT proof scripts and output hashes
+        if: always()
+        shell: bash
+        run: |
+          find G3-ARRAY-ALL-N-THEOREMS -type f -print0 | sort -z | xargs -0 -r sha256sum
+      - name: Archive reusable mathematical lemma proof original SMT source
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G3-ARRAY-ALL-N-GENERIC-STAGE-THEOREM
+          path: |
+            G3-ARRAY-ALL-N-THEOREMS
+            G3-ARRAY-ALL-N-THEOREMS-SUMMARY.json
+          if-no-files-found: warn
+          retention-days: 90
