@@ -1,0 +1,194 @@
+{
+  "schema": "neumann.q3.g2.native-headroom-first-two-formalisms.v1",
+  "date": "2026-11-06",
+  "north_star": "Frontier-level problem solving with minimum necessary computation",
+  "reason": "Native cvc5 solved previous original STRING PBE cohort 8/8 independently. Cannot claim learned-exclusive capability until strong classical residual exists on an independently authored, different mathematical formalism.",
+  "original": {
+    "repo": "SyGuS-Org/benchmarks",
+    "commit": "13c8deb68a873635879c9a69bc78caebd340f646",
+    "public_previously_published": true,
+    "source_bodies_NOT_viewed_before_registration": true,
+    "source_selection": "Deterministic 32-bit FNV1a ASCII on N1-G2-20261106-{INV|BV}:<file name>, smallest scores; INV all .sl <5000 bytes with per prefix caps fib=3,jmbl=3,other=6; BV _100.sl <15000 bytes. Chosen on file names + repository Git blob metadata only, never content or benchmark outcome."
+  },
+  "cohorts": [
+    {
+      "id": "INV_INDUCTION",
+      "mathematics": "inductive safety invariants over integer state transitions, original synth-inv and inv-constraint, not string PBE",
+      "folder": "comp/2018/Inv_Track",
+      "source_count": 12,
+      "targets": [
+        {
+          "file": "fib_11.sl",
+          "git_blob": "f03710add65f9571586077e48d635d6887bc7b54",
+          "size_bytes": 572,
+          "group": "fib"
+        },
+        {
+          "file": "vardep.sl",
+          "git_blob": "6c64c4d7b22cc8e27c8008fce5f644097ae70acc",
+          "size_bytes": 501,
+          "group": "other"
+        },
+        {
+          "file": "fib_14.sl",
+          "git_blob": "7509048a5864bd320de8a674644f8df4d4e37eb9",
+          "size_bytes": 660,
+          "group": "fib"
+        },
+        {
+          "file": "fib_19.sl",
+          "git_blob": "fa53fad298c2af8fe5a4139f90f19c9f07ecbf48",
+          "size_bytes": 814,
+          "group": "fib"
+        },
+        {
+          "file": "jmbl_dec_simpl.sl",
+          "git_blob": "847837f087ef29542a96a9458b617e80d0b8bfcb",
+          "size_bytes": 411,
+          "group": "jmbl"
+        },
+        {
+          "file": "jmbl_cegar1_vars-new.sl",
+          "git_blob": "dd52125398e768969ce48487f2e8013bc19f37c8",
+          "size_bytes": 656,
+          "group": "jmbl"
+        },
+        {
+          "file": "jmbl_matrix2.sl",
+          "git_blob": "87604f8c96e62c6cd878c515be8aa6564a98cef5",
+          "size_bytes": 669,
+          "group": "jmbl"
+        },
+        {
+          "file": "brett.sl",
+          "git_blob": "28c4346868605a5b5a46fa880309c2884071541b",
+          "size_bytes": 604,
+          "group": "other"
+        },
+        {
+          "file": "gcnr_tacas08.sl",
+          "git_blob": "1954aea16e81cbe9a1067313c956091585503757",
+          "size_bytes": 895,
+          "group": "other"
+        },
+        {
+          "file": "cggmp2005_true-unreach-call_true-termination.sl",
+          "git_blob": "3304ff5fd5bf854b296b6cd82f6b40724c2c29e8",
+          "size_bytes": 555,
+          "group": "other"
+        },
+        {
+          "file": "minor1.sl",
+          "git_blob": "bf4a432737a02360a3e5b67ef6dd7f0b01a87e52",
+          "size_bytes": 360,
+          "group": "other"
+        },
+        {
+          "file": "minor2.sl",
+          "git_blob": "5eb08040ecf66f1cf43eeb342dbc8b9fefed1ce1",
+          "size_bytes": 480,
+          "group": "other"
+        }
+      ],
+      "cap_s": 12
+    },
+    {
+      "id": "BV_FINITE",
+      "mathematics": "finite bit-vector program-by-examples, fixed-width BV semantics not string concatenation",
+      "folder": "comp/2018/PBE_BV_Track",
+      "source_count": 12,
+      "targets": [
+        {
+          "file": "PRE_65_100.sl",
+          "git_blob": "45b2af8d270e1a5c342b3d8f010b1b1db0d49747",
+          "size_bytes": 6840
+        },
+        {
+          "file": "PRE_24_100.sl",
+          "git_blob": "a21dd624ce1ac4eb2af1f9f95dd115039778179f",
+          "size_bytes": 6840
+        },
+        {
+          "file": "PRE_102_100.sl",
+          "git_blob": "5e7e2510c392dd586fdc3a780ffd2bd8400122a5",
+          "size_bytes": 6840
+        },
+        {
+          "file": "PRE_138_100.sl",
+          "git_blob": "09ae54aec6b812158bb5be14015d9c5e35e4b20a",
+          "size_bytes": 6840
+        },
+        {
+          "file": "PRE_90_100.sl",
+          "git_blob": "4e0db7b7e2e232e646c6adcb8b2c38022397aeb4",
+          "size_bytes": 6840
+        },
+        {
+          "file": "PRE_137_100.sl",
+          "git_blob": "a063a337c8f5593c7063513db8472320c58fb053",
+          "size_bytes": 6840
+        },
+        {
+          "file": "PRE_10_100.sl",
+          "git_blob": "f833853a29f7c852ca7d6a5bf9877a8641b8f7a2",
+          "size_bytes": 6840
+        },
+        {
+          "file": "PRE_114_100.sl",
+          "git_blob": "f685e714d0a11b3b68ef9b61ee3c5719847a59d1",
+          "size_bytes": 6840
+        },
+        {
+          "file": "PRE_27_100.sl",
+          "git_blob": "1f4a718b8448ad363df2fe900b3e4aff3d9e41c1",
+          "size_bytes": 6840
+        },
+        {
+          "file": "PRE_37_100.sl",
+          "git_blob": "58599482ffc679c44a3ec07417b42adcbe0f4981",
+          "size_bytes": 6840
+        },
+        {
+          "file": "PRE_39_100.sl",
+          "git_blob": "ad19a4bb96f7b568e09336284849ad97988f2e17",
+          "size_bytes": 6840
+        },
+        {
+          "file": "PRE_67_100.sl",
+          "git_blob": "aab368a12e578709b0cc41f882de280440181e4c",
+          "size_bytes": 6840
+        }
+      ],
+      "cap_s": 12
+    }
+  ],
+  "strong_baseline": {
+    "engine": "real apt cvc5 CLI, pinned version printed in first receipt",
+    "original_grammar_rights": true,
+    "official_source_converter": {
+      "repo": "SyGuS-Org/tools",
+      "commit": "9f5cc084b77ce172a22c646dc54528b639ffb139",
+      "CLI": "python -m sygus.bin.convert -s 1 -t 2"
+    },
+    "first_policy": "One FIRST per cohort, 12 exact task IDs and hashes, never change target list based on outcomes. Record compiler/parser/timeout/UNKNOWN separate from genuine source-invalid.",
+    "BV_original_last_constraint_heldout": true,
+    "INV_original_synthesizer_gets_inv_constraints": true,
+    "proof_policy": "Candidate synth output is not a scientific PASS until original-source independent verifier proves the registered original property. For INV, prove initiation, inductiveness, safety across all integer states via UNSAT of negated implications. For BV, independently verify all original TRAIN plus last heldout examples, and optionally if original broader functional spec available use universal comparison.",
+    "runtime_s": 12
+  },
+  "scoring": {
+    "native_residual": "Only original source for which native specialist does not produce independently verified solution within 12 seconds, and syntax + verifier have passed on a separate compatible source, can be labeled *budget-unresolved* (NOT unsolvable). Parser errors, wrong dialect, and infrastructure errors NOT residual.",
+    "automatic_next_architecture": "Do not train any new NEUMANN policy on the selected 24 opened residual until a different frozen outer evaluation source has been preregistered. The 24 become development observations after first. To prove Q3 learning-only novelty, design separate new source-author blind cohort and equal-rights GP/CEGIS.",
+    "zero_new_ARC_evaluation_IDs": true,
+    "Q3": "OPEN",
+    "Q4": "OPEN",
+    "Q6": "OPEN",
+    "Q7": "OPEN"
+  },
+  "cost": {
+    "unit": "wall-ms per source program and end-to-end native solver and independent verifier separately, single core budget where possible",
+    "energy": "NOT_METERED",
+    "extra_training_cost": "ZERO_THIS_EXPERIMENT",
+    "budget_note": "12s cap per task per dialect, fixed. Do not compare to own-weight G1 runtime across GitHub runners as 10x."
+  }
+}
