@@ -1,0 +1,37 @@
+{
+  "schema": "neumann.g3.array-fill-generic-stage-inductive-theorem.v1",
+  "date": "2026-11-06",
+  "prerequisite_source_unseen_first_run": 42178462607,
+  "first_unseen_sha256": "86cc31057e2fe96c412d39b5ff395ecde03aef9990df0df30ec63be6091c883a",
+  "frozen_generator_blob_sha": "8043d84210822f9a47d78568c25ea97cb0c175dd",
+  "first_source_unseen_results": {
+    "stage5": "15/15",
+    "stage8": "21/21",
+    "stage9": "23/23"
+  },
+  "mathematical_parameters": [
+    "array A: Int→Int",
+    "base n:Int >0",
+    "length L:Int >0",
+    "cursor i:Int with 0≤i≤L",
+    "old value w:Int, new value v:Int",
+    "step A' := store(A,n+i,v), i':=i+1"
+  ],
+  "invariant": "Forall j in [0,i): select(A,n+j)=v AND Forall j in [i,L): select(A,n+j)=w.",
+  "inductive_lemmas": [
+    "Stage0 starts at i=0: prefix value condition vacuous for ANY original array, assuming n,L>0.",
+    "Next-stage initialization: all elements of previous full array [0,L) equal w implies invariant at i=0 for arbitrary v.",
+    "Atomic store: invariant at 0≤i<L and store(A,n+i,v), i'=i+1 implies invariant at next cursor, for ALL arrays, values, lengths and offsets.",
+    "Stage completion: invariant at cursor i=L implies every element in [0,L) equals v; this is the precondition for next stage.",
+    "Final scan: all written array values equal v ensures read/select(A,n+i)=v for ANY 0≤i<L.",
+    "State invariant is satisfiable with arbitrary distinct old and new values (nonvacuity).",
+    "Mutating the store to wrong value (v+1) must have a satisfiable counterexample (cannot falsely PASS)."
+  ],
+  "proof_method": "Construct generic SMT-LIB2 script with free integer and array parameters and quantified index j; disprove each universal implication by showing its negation UNSAT. Never instantiate a fixed finite number of stages or indexes. Real Z3 must return exactly unsat for every valid lemma and sat for explicit wrong-value mutant.",
+  "scope": "Proof scheme is mathematical induction on the repeated stage count N, conditional on parser verifying original CHC matches this precise stage machine. Individual source verification 108/108 includes 6 concrete programs. Do NOT infer generic theorem covers arbitrary arrays, arbitrary array programs, or learned neural invention.",
+  "cost": "Only theorem-generation and SMT proof runtime measured. No 10x total compute claim without baseline comparison on matched hardware and solver rights.",
+  "Q3": "OPEN",
+  "Q4": "OPEN",
+  "Q6": "OPEN",
+  "Q7": "OPEN"
+}
