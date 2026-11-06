@@ -1,0 +1,113 @@
+name: NEUMANN G3 2025 competition original24 first independent label and source audit
+on:
+  push:
+    branches:
+      - research/q3-g3-2025-chc-native-first-20261106
+    paths:
+      - .github/workflows/G3_OFFICIAL_2025_FIRST24_READONLY_AUDIT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  exact-source-verdict-readonly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-2025-CHC-LIA_MULTIPHASE-NATIVE-ORIGINAL-FIRST
+          run-id: 42174775254
+          github-token: ${{ github.token }}
+          path: original-LIA
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-2025-CHC-ARRAY_CHC-NATIVE-ORIGINAL-FIRST
+          run-id: 42174775254
+          github-token: ${{ github.token }}
+          path: original-ARRAY
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-2025-CHC-ADT_CHC-NATIVE-ORIGINAL-FIRST
+          run-id: 42174775254
+          github-token: ${{ github.token }}
+          path: original-ADT
+      - name: Pin every byte of original 3x8 native FIRST, never re-run any solver
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo 'c4529472973dc7e102e3b755ff866ccac5f285a9d7206488d65dd054f5b41535  original-LIA/G3-LIA_MULTIPHASE-NATIVE-ORIGINAL-FIRST.json' | sha256sum -c -
+          echo '47d2776afe699cccab8dc6d6e4b4f06707522f61e8d3d079c478c5614ed5f8c8  original-ARRAY/G3-ARRAY_CHC-NATIVE-ORIGINAL-FIRST.json' | sha256sum -c -
+          echo '84e35263eb08153776ccb1fb6ae97a1a76b82b8ca8959fd8b6502987474c6376  original-ADT/G3-ADT_CHC-NATIVE-ORIGINAL-FIRST.json' | sha256sum -c -
+      - name: Original success metric can never be favorably forged in source audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          from research.g3.chccomp2025_official_readonly import audit
+          files={
+            'LIA_MULTIPHASE':Path('original-LIA/G3-LIA_MULTIPHASE-NATIVE-ORIGINAL-FIRST.json'),
+            'ARRAY_CHC':Path('original-ARRAY/G3-ARRAY_CHC-NATIVE-ORIGINAL-FIRST.json'),
+            'ADT_CHC':Path('original-ADT/G3-ADT_CHC-NATIVE-ORIGINAL-FIRST.json')
+          }
+          l=json.loads(files['LIA_MULTIPHASE'].read_text())
+          l['stats']['Z3_grounded_claim']=8
+          p=Path('/tmp/G3_FAKE_ORIGINAL_FIRST.json')
+          p.write_text(json.dumps(l))
+          try:
+              audit({**files,'LIA_MULTIPHASE':p})
+          except ValueError as e:
+              assert 'IMMUTABLE_ORIGINAL_FIRST_SHA_CHANGED' in str(e)
+              print('FORGED_NATIVE_2025_COMP_FIRST_REJECTED_BEFORE_SOURCE_READ')
+          else:
+              raise AssertionError('FAVORABLE_G3_FIRST_FORGERY_PASSED')
+          PY
+      - name: Read-only independent official 2025 competition YAML corroboration of native original outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m research.g3.chccomp2025_official_readonly \
+            --lia_multiphase original-LIA/G3-LIA_MULTIPHASE-NATIVE-ORIGINAL-FIRST.json \
+            --array_chc original-ARRAY/G3-ARRAY_CHC-NATIVE-ORIGINAL-FIRST.json \
+            --adt_chc original-ADT/G3-ADT_CHC-NATIVE-ORIGINAL-FIRST.json \
+            > G3-2025-ORIGINAL24-INDEPENDENT-OFFICIAL-METADATA-AUDIT.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open('G3-2025-ORIGINAL24-INDEPENDENT-OFFICIAL-METADATA-AUDIT.json'))
+          print(json.dumps({'audit_pass':x['audit_pass'],
+             'totals':x['totals'],
+             'cases':[{
+                 'file':r['file'],'cohort':r['cohort'],
+                 'official_expected':r['official_competition']['expected'],
+                 'original_Z3':r['first_Z3_native_status'],
+                 'matches':r['Z3_native_claim_matches_competition_metadata'],
+                 'budget_status':r['Z3_budget_status']}
+                for r in x['cases']]},sort_keys=True))
+          assert x['audit_pass'] is True
+          assert x['totals']['original_total']==24
+          assert x['totals']['first_source_authoritative_blobs_rechecked']==24
+          assert x['totals']['neumann_training_calls']==0
+          assert x['totals']['new_arc_eval_ids']==0
+          PY
+      - name: SHA original independent 2025 competition source and verdict audit
+        if: always()
+        shell: bash
+        run: |
+          if test -s G3-2025-ORIGINAL24-INDEPENDENT-OFFICIAL-METADATA-AUDIT.json; then
+            sha256sum G3-2025-ORIGINAL24-INDEPENDENT-OFFICIAL-METADATA-AUDIT.json > G3-2025-ORIGINAL24-INDEPENDENT-OFFICIAL-METADATA-AUDIT.sha256
+            cat G3-2025-ORIGINAL24-INDEPENDENT-OFFICIAL-METADATA-AUDIT.sha256
+          fi
+      - name: Preserve expert comparison including all verified source and label negative evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G3-CHC-COMP2025-24-INDEPENDENT-OFFICIAL-VERDICT-AUDIT
+          path: |
+            G3-2025-ORIGINAL24-INDEPENDENT-OFFICIAL-METADATA-AUDIT.json
+            G3-2025-ORIGINAL24-INDEPENDENT-OFFICIAL-METADATA-AUDIT.sha256
+          if-no-files-found: warn
+          retention-days: 90
