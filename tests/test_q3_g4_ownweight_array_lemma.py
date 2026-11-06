@@ -45,14 +45,24 @@ class ArrayLearnedProofInterface(unittest.TestCase):
     with self.assertRaises(ValueError):
        Candidate("FILL","B","A")
 
+ def test_semantic_equivalence_of_reversed_copy_equality_is_accepted(self):
+    task=ArrayTask("COPY","B","A",0)
+    canonical=check_invariant(task,Candidate("COPY","B","A"),timeout_ms=3500)
+    reversed_equality=check_invariant(task,Candidate("COPY","A","B"),timeout_ms=3500)
+    self.assertTrue(canonical["verified"],canonical)
+    self.assertTrue(reversed_equality["verified"],reversed_equality)
+    # Candidate AST strings differ, but the generated quantified equality
+    # is symmetric; independent SOURCE UNSAT is the authority.
+    self.assertNotEqual(Candidate("COPY","A","B"),Candidate("COPY","B","A"))
+
  def test_independent_all_three_universal_SMT_proofs_and_bad_mutant(self):
     for source,valid,mutant in (
       (ArrayTask("FILL","A",None,4),
        Candidate("FILL","A",None),
        Candidate("FILL","B",None)),
-      (ArrayTask("COPY","B","A",0),
+      (ArrayTask("COPY","B","A",3),
        Candidate("COPY","B","A"),
-       Candidate("COPY","A","B")),
+       Candidate("ADD","B","A")),
       (ArrayTask("ADD","C","B",7),
        Candidate("ADD","C","B"),
        Candidate("COPY","C","B")),
