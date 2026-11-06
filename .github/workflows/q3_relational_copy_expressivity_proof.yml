@@ -1,0 +1,47 @@
+name: Q3 symbolic H0 impossibility and H1 two-array COPY inductive proof
+on:
+  pull_request:
+    paths:
+      - 'research/q3/relational_copy_expressivity.py'
+      - '.github/workflows/q3_relational_copy_expressivity_proof.yml'
+permissions:
+  contents: read
+jobs:
+  symbolic-expressivity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Independent original symbolic theorem solver
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq z3
+          z3 --version
+      - name: All 8 formally named original proof and negative-control obligations
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q3/relational_copy_expressivity.py
+          python3 -m research.q3.relational_copy_expressivity --out H0-H1-SYMBOLIC-FIRST
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('H0-H1-SYMBOLIC-FIRST/first_theorem_report.json').read_text())
+          assert r['theorems_passed']==8 and r['theorems_total']==8
+          assert r['H0_expressivity_barrier_proven']
+          assert r['H1_inductive_abstract_copy_under_explicit_premises_proven']
+          assert r['trained_neural_student_evaluation']=='NOT_RUN'
+          print('H0_PROVEN_INSUFFICIENT_FOR_CROSS_ARRAY_RELATION')
+          print('H1_ABSTRACT_CROSS_ARRAY_COPY_8_OF_8_VALIDATED')
+          PY
+      - name: Preserve first source-free typed operator theorem scripts, no benchmark leakage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-H0-H1-CROSSARRAY-COPY-INDUCTION-FIRST
+          path: H0-H1-SYMBOLIC-FIRST/
+          retention-days: 90
+          if-no-files-found: warn
