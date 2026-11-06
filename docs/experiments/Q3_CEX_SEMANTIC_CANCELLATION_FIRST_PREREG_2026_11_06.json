@@ -6,7 +6,7 @@
     "run": 42204120156,
     "artifact": "NEUMANN-Q3-CEGAR-REPAIR-GROWER-ORIGINAL-FIRST",
     "file": "Q3-COUNTEREXAMPLE-REPRESENTATION-FIRST.json",
-    "original_JSON_sha256": "c05a039ecb371279de66714bafcd1a5b6c05eb18d7477ce4c77f302d9e21127",
+    "original_JSON_sha256": "c05a039ecb371279de66714bafcd1a5b6c05ebc18d7477ce4c77f302d9e21127",
     "checkpoint_sha256": "0e8f31b31e89f211455634fa460605df6d6f53aa67bdf75629b692320f20d276"
   },
   "preregistered_heldout_not_in_initial_first": [
@@ -232,5 +232,14 @@
   "global_Q3": "OPEN",
   "global_Q6": "OPEN",
   "global_Q5": "OPEN",
-  "actual_run": "NOT_RUN"
+  "actual_run": "NOT_RUN",
+  "pre_target_metadata_erratum": {
+    "failed_pre_verifier_run": 42204704757,
+    "reason": "A 63-hex transcription omitted the 'c' in original sha from FIRST GitHub Actions log; sha256sum refused malformed stdin before any of the six SMT examples ran",
+    "wrong_63_hex": "c05a039ecb371279de66714bafcd1a5b6c05eb18d7477ce4c77f302d9e21127",
+    "correct_64_hex": "c05a039ecb371279de66714bafcd1a5b6c05ebc18d7477ce4c77f302d9e21127",
+    "source_authoritative_run": 42204120156,
+    "weights_unchanged": true,
+    "heldout_decision_thresholds_unchanged": true
+  }
 }
