@@ -1,0 +1,26 @@
+{
+  "schema": "neumann.g1.ownweight-ast-v2-source-first-freeze.v1",
+  "date": "2026-11-06",
+  "prior_source_free_V1": {
+    "run": 42154037295,
+    "sha256": "8dc216068f511c72a2ef0a3f9b4b5fcc897d7cca2d986f1a0722f6648de979bf"
+  },
+  "external_originals_viewed_by_v2_training": 0,
+  "amendment": "docs/experiments/G1_SOURCE_ONLY_TRAIN_V2_PRE_EXTERNAL_ERRATUM_2026_11_06.json",
+  "source_free_V2": {
+    "run": 42154315193,
+    "weights_sha256": "ae5e291d525098b05ade6eaaf5be76c5fc432fb20a39306be8b782377e4c1641",
+    "artifact": "NEUMANN-G1-OWNWEIGHT-AST-RESERVED-V2-FREEZE",
+    "train_tasks": 3200,
+    "training_distinct_AST_pairs": 180,
+    "heldout_compositional_AST_pairs": 45,
+    "synthetic_reserved_validation_tasks": 320,
+    "heldout_compositional_exact_AST_top1": 0.315625,
+    "validation_token_accuracy": [
+      0.525,
+      0.58125
+    ]
+  },
+  "external_original_first_contract": "No target source bodies inspected before this freeze; 8 original SyGuS file Git blobs frozen in earlier prereg; no source gold used for re-training or re-targeting. V2 exactly one external first run. 32 matched token program checks vs 32 shortest-first and full 225 equal-rights classical. Gold only used after all candidate programs frozen.",
+  "model_limitation": "Two token generator in human atom grammar; does not prove neural novel opcodes or Q3 globally."
+}
