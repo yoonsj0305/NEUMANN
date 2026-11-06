@@ -1,0 +1,33 @@
+{
+  "schema": "neumann.g1.sygus-specialist-full-grammar-post-first-audit.v1",
+  "date": "2026-11-06",
+  "purpose": "Use actual external professional SyGuS synthesizer, NOT another hand-coded bounded enumerator, to assess if first G1 neural claims are simply weaker than standard specialist.",
+  "first_original": {
+    "run": 42155439426,
+    "sha256": "6d9940cefc43d9b8ccb93b375bcaf4ba02690481ca432637e54de28a09bfe8cc",
+    "result": "SCOPED_LEARNED_CROSS_AUTHOR_AST_TRANSFER_FAIL",
+    "learned_exact": 1,
+    "classical225_exact": 1,
+    "original_denominator": 8
+  },
+  "first_independent_audit": {
+    "run": 42155850890,
+    "pass": true
+  },
+  "external_originals": "FROZEN eight SyGuS-Org/benchmarks comp/2018/PBE_Strings_Track from existing G1 external prereg, no task additions or deletions",
+  "checkpoint_sha256": "ae5e291d525098b05ade6eaaf5be76c5fc432fb20a39306be8b782377e4c1641",
+  "model_and_weights_frozen": true,
+  "assessor": "apt installed cvc5 CLI, exact version printed, published original SyGuS grammar and original inputs except *LAST* constraint; last constraint gold never passed to synthesizer, only independent postfreeze validation.",
+  "variants": "Try --lang=sygus2 --sygus then --lang=sygus1 --sygus ONLY as dialect compatibility, never different source task split, solver, grammar or original gold.",
+  "runtime_per_case_seconds": 12,
+  "original_task_denominator": 8,
+  "failure_policy": "Solver error, unsupported syntax, timeout, no parseable solution, invalid training semantics, untrusted full grammar, no ground SMT verifier => UNSUPPORTED/UNKNOWN, not successful specialist proof. No claim of equivalence for arbitrary strings from finite PBE examples.",
+  "safe_validation": "Fresh cvc5 SMT-LIB ground equality for each original TRAIN and withheld LAST constraint after candidate program frozen; syntactically reported synthesis not a pass until validation.",
+  "fixed_non_leakage": "Remove only final original (constraint...) form from full source, preserve unchanged grammar; parse exact original constraints and source identifier before deleting, hash both train-only and original source.",
+  "interpretation": "If cvc5 solves original where student fails, demonstrates missing coverage and strong-classical precedence; if both fail, result insufficient for learning advantage. Never claim student > specialist from a single timeout.",
+  "matched_cost_limit": "Published original grammar is much more expressive than student 225. This is deliberately stronger-rights expert reference, not equal-rights efficiency comparison. Any CPU timing from apt cvc5 and numpy first in different runner cannot support 10x claim.",
+  "Q3": "OPEN",
+  "Q4": "OPEN",
+  "Q6": "OPEN",
+  "Q7": "OPEN"
+}
