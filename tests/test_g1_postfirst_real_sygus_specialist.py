@@ -19,7 +19,7 @@ class G1SpecialistSmoke(unittest.TestCase):
     def test_top_level_original_forms(self):
         f=top_forms(SOURCE)
         self.assertEqual(len(f),5)
-        self.assertTrue(f[2][2].startswith("(synth-fun f"))
+        self.assertTrue(f[1][2].startswith("(synth-fun f"))
     def test_exact_heldout_removed_not_training(self):
         p=prepare_original(SOURCE.encode())
         self.assertEqual(p["original_constraint_count"],2)
