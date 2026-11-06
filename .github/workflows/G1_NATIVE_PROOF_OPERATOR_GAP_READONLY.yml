@@ -1,0 +1,93 @@
+name: NEUMANN G1 core causal gap from real native proof ASTs, no training
+on:
+  push:
+    branches:
+      - research/g1-first-ownweight-ast-sygus-20261106
+    paths:
+      - .github/workflows/G1_NATIVE_PROOF_OPERATOR_GAP_READONLY.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  native-structure-gap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G1-SYGUS8-AFTER-ONE-SHA-ERRATUM
+          run-id: 42155439426
+          github-token: ${{ github.token }}
+          path: frozen-student-first
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G1-CVC5-REAL-8-LEGACY-COMPAT
+          run-id: 42163480878
+          github-token: ${{ github.token }}
+          path: frozen-expert-first
+      - name: Compare immutable original model version space to native verified source witness structures
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '6d9940cefc43d9b8ccb93b375bcaf4ba02690481ca432637e54de28a09bfe8cc  frozen-student-first/G1-SYGUS8-AFTER-SHA-ERRATUM-ORIGINAL.json' | sha256sum -c -
+          echo '0650d9c9d75f8f25311ee5b522ac6aed8ca9c6b1941a283e013cd6cb5019835f  frozen-expert-first/G1-CVC5-8-LEGACY-COMPAT-POSTFIRST.json' | sha256sum -c -
+          python3 - <<'PY'
+          import hashlib,json,re
+          from pathlib import Path
+          from research.g1.postfirst_real_cvc5_specialist import extract_define
+          student=json.loads(Path('frozen-student-first/G1-SYGUS8-AFTER-SHA-ERRATUM-ORIGINAL.json').read_text())
+          expert=json.loads(Path('frozen-expert-first/G1-CVC5-8-LEGACY-COMPAT-POSTFIRST.json').read_text())
+          assert len(student['rows'])==len(expert['rows'])==8
+          rows=[]
+          for s,e in zip(student['rows'],expert['rows']):
+              assert s['task_file']==e['name']
+              native=e['specialist']
+              a=next(x for x in native['attempts'] if x['dialect']==native['dialect'])
+              program=extract_define(a['stdout_excerpt'])
+              assert program and hashlib.sha256(program.encode()).hexdigest()==native['candidate_sha256']
+              original=(s['status']=='ORIGINAL_SCORED')
+              full=s['classical225'] if original else None
+              learned=s['learned'] if original else None
+              native_ops=sorted(set(re.findall(r'\b(?:str\.[a-z_]+|ite|\+|-|div|mod)\b',program)))
+              rows.append({
+                'original':e['name'],
+                'student_source_supported':original,
+                'student_full225_fitting_AST_count':(full or {}).get('source_fit_count'),
+                'student_full225_submitted':(full or {}).get('submitted'),
+                'student_full225_correct':(full or {}).get('correct_original_heldout'),
+                'student_full225_predictions_conflict':(full or {}).get('predictions_conflict'),
+                'own_weight_original_correct':(learned or {}).get('correct_original_heldout'),
+                'native_full_original_grammar_exact':e['verified_heldout'],
+                'native_candidate_sha':native['candidate_sha256'],
+                'native_candidate_source':program,
+                'native_operators':native_ops
+              })
+          stats={
+            'n_external_original':len(rows),
+            'student_original_supported':sum(x['student_source_supported'] for x in rows),
+            'supported_no_fitting_AST_in_complete225':sum(x['student_full225_fitting_AST_count']==0 for x in rows if x['student_source_supported']),
+            'supported_fitting_AST_but_ambiguous':sum(x['student_full225_predictions_conflict'] is True for x in rows if x['student_source_supported']),
+            'supported_fitting_AST_but_not_correct':sum(x['student_full225_fitting_AST_count']>0 and x['student_full225_correct'] is False for x in rows if x['student_source_supported']),
+            'native_original_verified':sum(x['native_full_original_grammar_exact'] for x in rows)
+          }
+          result={'schema':'neumann.g1.original-8-native-proof-vs-225-DSL-causal-gap.readonly.v1',
+            'source_student_first_sha':'6d9940cefc43d9b8ccb93b375bcaf4ba02690481ca432637e54de28a09bfe8cc',
+            'source_expert_first_sha':'0650d9c9d75f8f25311ee5b522ac6aed8ca9c6b1941a283e013cd6cb5019835f',
+            'no_student_training':True,'no_specialist_rerun':True,'G1_GLOBAL':'OPEN',
+            'stats':stats,'original_cases':rows}
+          Path('G1-NATIVE-PROOF-OPERATOR-GAP-READONLY.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
+          print(json.dumps(result,sort_keys=True))
+          assert stats['native_original_verified']==8
+          assert stats['student_original_supported']==5
+          PY
+      - name: Archive original proof-program structural gap for architecture decisions
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G1-NATIVE-PROOF-OPERATOR-GAP-READONLY
+          path: G1-NATIVE-PROOF-OPERATOR-GAP-READONLY.json
+          if-no-files-found: warn
+          retention-days: 90
