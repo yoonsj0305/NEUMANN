@@ -1,0 +1,59 @@
+{
+  "schema": "neumann.g3.array-fill-parametric-inductive-invariant-one-rule-transfer.v1",
+  "date": "2026-11-06",
+  "research_question": "Can one source-derived, deterministic typed parametric invariant construction correctly and independently prove future uninspected CHC array initialization programs of different stage lengths without per-target handwritten formula?",
+  "source_of_rule": "One already OPENED independent-author quic3/data/standard_init4_true-unreach-call_ground_000.smt2, SHA 174d192924d11f0863bbb28466613b72f825a962; related 6 and 7 already opened, may be nonblind development checks only.",
+  "native_baselines": {
+    "original_2025_official": "No expected verdict for original init4,6,7, 2025 competition no solver successful.",
+    "G3_first_z3_v4": "15s no grounded verdict on init4,6,7",
+    "G3_2026_z3_5": "15s no grounded verdict on init4,6,7",
+    "G3_eldarica_v2_3": "20s timeout on init4,6,7"
+  },
+  "approach": "Build a general, types/variable-role-checked stage-indexed prefix/suffix array-property invariant generator: stage k in a chain of consecutive store-values has prefix array[j]=new value and suffix array[j]=previous value. Verify EVERY original CHC implication after substituting all relation interpretations by SMT UNSAT of its negation. No target-specific constants or program-name guesses in code, no original benchmark changed.",
+  "strict_rules": [
+    "No model weights trained in this experiment; success is a reusable CLASSICAL structural transformation/proof, NOT Q3 learned autonomous invention.",
+    "Do not inspect/test the contents of heldout 5,8,9 before implementation and development decision frozen.",
+    "First development target only exact opened init4, then opened init6 and init7 (nonblind, count separately).",
+    "Before first blind transfer, freeze same original algorithm code blob SHA; no target-specific edits or correction using heldout contents.",
+    "All original published source clauses intact; generated interpretations cannot change original definitions or requirements. Check unsat of every negated universal Horn implication or equivalent global conjunction.",
+    "Every result record original SHA, generator SHA, stage detection, native proof results, counterexample or UNKNOWN vs genuine PASS.",
+    "One intentional corrupted stage constant mutant must be rejected by independent source proof; no favorable proof acceptance by model claim.",
+    "No public ARC evaluation ID consumption.",
+    "If initial rule fails on developer cases, record FAIL and do not call future transfer FIRST; if after first transfer failure, preserve negative and never re-label as blind."
+  ],
+  "unopened_heldout_transfer": {
+    "repo": "chc-comp/chc-comp25-benchmarks",
+    "commit": "ddd279cab0717db6effe69baad451a8eb04ffd86",
+    "folder": "quic3/data",
+    "n": 3,
+    "selected_file_metadata_before_body": [
+      {
+        "file": "standard_init5_true-unreach-call_ground_000.smt2",
+        "git_blob": "004c0e10555cacd91aea253e4787603f8d9e6b4d",
+        "bytes": 8704
+      },
+      {
+        "file": "standard_init8_true-unreach-call_ground_000.smt2",
+        "git_blob": "6d6a82bf2694fb978ef45d49ab26aa1897e8adaa",
+        "bytes": 12610
+      },
+      {
+        "file": "standard_init9_true-unreach-call_ground_000.smt2",
+        "git_blob": "fc46208475e55071ce5af94726284d01f8145d52",
+        "bytes": 13912
+      }
+    ],
+    "source_body_unopened_before_this_manifest": true,
+    "test_every_target_regardless_first_outcome": true,
+    "proof_time_cap_seconds_per_target": 60
+  },
+  "science_scope": {
+    "new_mathematical_formalism_transfer": "NOT TESTED across formalisms; all source are CHC array initialization loop programs",
+    "Q3_learned_invention": "OPEN",
+    "Q4_all_in_10x": "OPEN",
+    "Q6_cross_formalism": "OPEN",
+    "Q7_frontier_problem_solving": "OPEN",
+    "human_rule_origin": true,
+    "first_new_source_transfer_only_after_code_freeze": true
+  }
+}
