@@ -1,0 +1,85 @@
+{
+  "schema": "neumann.north-star.q3-ownweight-stitch-library-first-prereg-draft.v1",
+  "date": "2026-11-06",
+  "stage": "PREPARATION_ONLY_NOT_FROZEN_NO_TEST_ACCESS",
+  "north_star": "Frontier-level problem solving with minimum necessary computation",
+  "hypothesis": "Does an own-weight typed structural proposer trained on independently verified TRAIN programs with Stitch-derived reusable macros create a novel H0-outside executable operator with a positive causal contribution on independently authored original problems?",
+  "no_existing_frozen_fail_rescue": true,
+  "first_original_forbidden_until_complete_manifest": true,
+  "test_manifest_status": "UNSELECTED_NOT_OPENED",
+  "task_splits": {
+    "train": "licensed independent authored examples; original sources legal to open",
+    "dev": "opened different source targets used for design only",
+    "test": "unopened, independent author, immutable Git blob and original metadata sealed before first source-body access",
+    "cross_formalism": "separate independent author and different mechanism/formal family, not array-stage-count variation"
+  },
+  "original_source_integrity": {
+    "require_git_commit": true,
+    "require_git_blob_sha": true,
+    "require_license_evidence": true,
+    "preserve_first_raw_output_sha256": true,
+    "required_before_unopened_test": [
+      "exact IDs",
+      "source SHA",
+      "solver caps",
+      "generator weights SHA",
+      "grammar H0",
+      "cost ledger",
+      "first run command"
+    ]
+  },
+  "roles": {
+    "classical_first": [
+      "Z3",
+      "cvc5",
+      "Eldarica",
+      "Golem"
+    ],
+    "equal_language_classical": "same typed grammar GP/CEGIS",
+    "learned_student": "trained proposer uses OWN weights, not teacher inference at evaluation",
+    "optional_stitch": "pinned TRAIN-only macro miner; independently expand and verify, not Q3 evidence by itself",
+    "separate_external_teacher": "separately charged API/reference; never attribute generated code to student"
+  },
+  "ablation_arms": [
+    "strong_native",
+    "same_language_classical",
+    "student_untrained",
+    "student_trained_without_stitch",
+    "student_trained_with_stitch",
+    "external_frontier_teacher_separate"
+  ],
+  "proof_gate": {
+    "require_original_independent_boolean_or_formal_proof": true,
+    "require_new_typed_operator_outside_frozen_H0": true,
+    "require_positive_trained_vs_untrained_contribution": true,
+    "no_wrong_submission_promoted": true,
+    "score_unknown_as_unknown": true,
+    "stop_if_all_orig_native_saturated": true
+  },
+  "future_thresholds_proposed_not_frozen": {
+    "Q3_scoped": "at least one independently authored original solved via learned newly proposed operator, absent from frozen H0, and positive ablation",
+    "Q6_scoped": "frozen student transfers to second, distinct formal family meeting predeclared independent proof gate",
+    "Q4_Q5": "same verified capability total cost, including training/discovery/proof/failed attempts/fallback and amortized independent reuse",
+    "ten_x_target": "C_strong_baseline/C_NEUMANN >= 10 at iso-capability, unmeasured"
+  },
+  "cost_required": [
+    "training_s",
+    "mining_s",
+    "discovery_s",
+    "failed_attempts_s",
+    "verification_s",
+    "execution_s",
+    "fallback_s",
+    "cold_start_s",
+    "peak_ram_bytes",
+    "peak_vram_bytes"
+  ],
+  "cost_optional_unknown_if_unmeasured": [
+    "FLOPs",
+    "energy_J",
+    "USD"
+  ],
+  "all_global_Q_status": "OPEN",
+  "new_ARC_eval_spending_allowed": false,
+  "experiment_executed": false
+}
