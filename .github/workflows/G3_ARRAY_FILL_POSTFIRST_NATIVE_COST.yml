@@ -63,7 +63,7 @@ jobs:
                 assert p.returncode==0 and p.stdout.strip()==expected,(solver,case,p.stdout,p.stderr)
           print('G3_NATIVE_STRONG_Z3_AND_ELDARICA_SAT_UNSAT_SOURCEFREE_PASS')
           PY
-      - name: FROZEN N5,N8,N9 original three: compare FULL native solver wall clocks vs source verified structural first
+      - name: "FROZEN N5,N8,N9 original three: compare native wall clocks vs verified structural first"
         shell: bash
         run: |
           set -euo pipefail
