@@ -1,0 +1,54 @@
+{
+  "schema": "neumann.q3.g4.array-frame-single-structural-operator.postfirst-hypothesis.v1",
+  "date": "2026-11-06",
+  "north_star": "Discover structurally reusable program/invariant hypotheses with minimum computation; no ungrounded Q3 invented-neural claims.",
+  "source_first_context": {
+    "competition": "chc-comp/chc-comp25-benchmarks",
+    "commit": "ddd279cab0717db6effe69baad451a8eb04ffd86",
+    "prior_2025_first_run": 42174775254,
+    "prior_2025_official_readonly_audit": 42175491787,
+    "original_8_array_no_2025_competition_verdict": true,
+    "not_new_unseen_benchmark": true
+  },
+  "single_hypothesis": "A parameterized relational ARRAY_FRAME(A_before,A_after,ModifiedIndexSet) formula generated from source write effects (array store/select) can reduce a hard array CHC property to independently SMT-provable local obligations, then generalize without per-task modifications.",
+  "pre_source_inspection_selection": {
+    "main": {
+      "name": "array_swap_000.smt2",
+      "folder": "quic3/data",
+      "git_blob": "15a748101c2c778db570b4bfa456cdb56817b965",
+      "bytes": 7160
+    },
+    "transfer_without_rewrite": [
+      {
+        "name": "array_swap_twice_000.smt2",
+        "folder": "quic3/data",
+        "git_blob": "d91427ae167f37cf35d4c2908167ec05ecde273a",
+        "bytes": 11144
+      },
+      {
+        "name": "standard_copy2_true-unreach-call_ground_000.smt2",
+        "folder": "quic3/data",
+        "git_blob": "30b3bab8834aa6f834cf493539180e6b92caf16f",
+        "bytes": 6318
+      }
+    ],
+    "chosen_from_filenames_before_any_assistant_body_read": true,
+    "limitation": "All three source files had already been fetched by earlier native CI original FIRST. This is post-first analysis only, not a new blind Q3 test."
+  },
+  "research_gates": {
+    "G4A": "Inspect exact primary ORIGINAL source and derive one typed frame operator, verify with an independent SMT obligation. PASS only on certified original program safety, not mere lemma tautology.",
+    "G4B": "Freeze operator source+parameters before opening transfer source bodies in this branch. Apply one unchanged operator to BOTH original secondary source tasks. PASS only if separate original CHC safety proof on both without task-specific patches.",
+    "G4C": "Even if G4A/B PASS, must compare against 2026 Z3 5.0, Eldarica, Golem and equal-rights classical abstract interpretation, and account for human construction time. No neural Q3 without learned own weights and fresh independent owner first."
+  },
+  "controls": [
+    "wrong primary source hash => FAIL",
+    "tautological frame lemma without original end-to-end safety => NOT PROVEN",
+    "mutated array source relation rejected",
+    "no budget escalation to fake native timeout results",
+    "not all human-coded array lemmas count as learned inventions"
+  ],
+  "Q3": "OPEN",
+  "Q4": "OPEN",
+  "Q6": "OPEN",
+  "Q7": "OPEN"
+}
