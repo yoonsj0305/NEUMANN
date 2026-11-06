@@ -157,7 +157,7 @@ def check_math_lemma_cvc5(L,U,seconds):
     expr="(* "+integer(U)+" y)"
     for v in range(U-1,L-1,-1):
         mult="(* "+integer(v)+" y)"
-        expr="(ite (= b "+str(v)+") "+mult+" "+expr+")"
+        expr="(ite (= b "+integer(v)+") "+mult+" "+expr+")"
     script=(" (set-logic QF_NIA)\n"
             "(declare-fun b () Int)\n(declare-fun y () Int)\n"
             "(assert (<= "+integer(L)+" b))\n"
