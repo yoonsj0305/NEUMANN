@@ -1,0 +1,84 @@
+name: NEUMANN RC41 external-authored MQTT Mealy first generalization
+on:
+  push:
+    branches:
+      - research/q3-rc41-external-mqtt-20261106
+    paths:
+      - .github/workflows/q3_rc41_EXTERNAL_MQTT_FIRST.yml
+permissions:
+  contents: read
+jobs:
+  first-external:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Freeze learner and independent-source experiment contract before network fetch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          p=json.loads(Path("docs/experiments/q3_RC41_EXTERNAL_MQTT_FIRST_PREREG_2026_11_06.json").read_text())
+          def blob(path):
+              d=Path(path).read_bytes()
+              return hashlib.sha1(b'blob '+str(len(d)).encode()+b'\0'+d).hexdigest()
+          assert blob("research/q3/rc39/active_mealy.py")==p["fixed_original_active_mealy_git_blob"]
+          assert blob("research/q3/rc39/wmethod_conformance.py")==p["fixed_wmethod_git_blob"]
+          assert len(p["external_models"])==3
+          assert len({m["git_blob"] for m in p["external_models"]})==3
+          print("FROZEN_SOURCES_AND_EXTERNAL_SHA_CONTRACT_PASS")
+          PY
+      - name: Run software-only parser negative controls
+        run: python3 -m unittest -v tests/test_q3_rc41_external_parser.py
+      - name: FIRST external-author source-only membership induction
+        shell: bash
+        run: |
+          set -uo pipefail
+          python3 -m research.q3.rc41.external_mqtt_first > RC41-MQTT-EXTERNAL-FIRST.json 2> RC41-MQTT-EXTERNAL-FIRST.stderr
+          rc=$?
+          if test -s RC41-MQTT-EXTERNAL-FIRST.json; then
+            python3 - <<'PY'
+          import json
+          x=json.load(open('RC41-MQTT-EXTERNAL-FIRST.json'))
+          print(json.dumps({
+            "science_status":x["science_status"],
+            "count":x["real_external_model_count"],
+            "unique_blobs":x["distinct_model_blobs"],
+            "exact":x["independent_all_length"],
+            "wrong_mutant_rejected":x["negative_mutations_rejected"],
+            "membership_queries":x["total_unique_source_queries"],
+            "rows":[{"model":r["source_case"],"status":r["learner_status"],
+                     "queries":r["unique_source_queries"],
+                     "exact":r["after_freeze_independent_all_length"]}
+                    for r in x["rows"]]
+          },sort_keys=True))
+          PY
+          else
+            echo "NO_JSON_FIRST: never promote infrastructure failure to scientific PASS"
+          fi
+          cat RC41-MQTT-EXTERNAL-FIRST.stderr
+          echo "ORIGINAL_FIRST_PROCESS_EXIT=$rc"
+          exit "$rc"
+      - name: Hash original external-first source receipt
+        if: always()
+        shell: bash
+        run: |
+          if test -s RC41-MQTT-EXTERNAL-FIRST.json; then
+            sha256sum RC41-MQTT-EXTERNAL-FIRST.json > RC41-MQTT-EXTERNAL-FIRST.sha256
+            cat RC41-MQTT-EXTERNAL-FIRST.sha256
+          fi
+      - name: Preserve first external result even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-RC41-EXTERNAL-MQTT-FIRST
+          path: |
+            RC41-MQTT-EXTERNAL-FIRST.json
+            RC41-MQTT-EXTERNAL-FIRST.sha256
+            RC41-MQTT-EXTERNAL-FIRST.stderr
+          if-no-files-found: warn
+          retention-days: 90
