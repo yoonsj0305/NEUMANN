@@ -1,0 +1,116 @@
+name: NEUMANN G2 ORIGINAL FIRST 24 two-formalism native expert residual screen
+on:
+  push:
+    branches:
+      - research/q3-g2-native-residual-two-formalisms-20261106
+    paths:
+      - .github/workflows/G2_NATIVE_EXPERT_24_ORIGINAL_FIRST.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  native-original-first:
+    strategy:
+      fail-fast: false
+      matrix:
+        cohort:
+          - INV_INDUCTION
+          - BV_FINITE
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Freeze pre-opened SHA manifest and nonselected pilot exception
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('docs/experiments/G2_NATIVE_RESIDUAL_24_SOURCE_METADATA_FIRST_PREREG_2026_11_06.json').read_text())
+          e=json.loads(Path('docs/experiments/G2_PILOT_ONLY_BEFORE_FIRST_VERIFIER_ERRATUM_2026_11_06.json').read_text())
+          assert p['schema']=='neumann.q3.g2.native-headroom-first-two-formalisms.v1'
+          assert e['registered_original_24_bodies_opened'] is False
+          assert [len(c['targets']) for c in p['cohorts']]==[12,12]
+          assert len({t['git_blob'] for c in p['cohorts'] for t in c['targets']})==24
+          for c in p['cohorts']:
+              assert c['cap_s']==12
+              assert all(len(t['git_blob'])==40 for t in c['targets'])
+          print('24_ORIGINAL_PREOPEN_METADATA_SHA_AND_DENOMINATOR_FROZEN')
+          PY
+      - name: Install pinned external original author converter and real expert
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq cvc5
+          python3 -m pip install --quiet --user ply==3.11 pyparsing==2.4.7
+          git init "$RUNNER_TEMP/sygus-tools"
+          git -C "$RUNNER_TEMP/sygus-tools" remote add origin https://github.com/SyGuS-Org/tools.git
+          git -C "$RUNNER_TEMP/sygus-tools" fetch --depth=1 origin 9f5cc084b77ce172a22c646dc54528b639ffb139
+          git -C "$RUNNER_TEMP/sygus-tools" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/sygus-tools" rev-parse HEAD)" = '9f5cc084b77ce172a22c646dc54528b639ffb139'
+          cvc5 --version | head -1
+      - name: Universal original INV and raw heldout BV independent proof controls on synthetic only
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tests -p test_g2_native_two_formalisms.py -v
+      - name: ORIGINAL first frozen cohort native solver and independent source proof
+        shell: bash
+        env:
+          COHORT: ${{ matrix.cohort }}
+        run: |
+          set -uo pipefail
+          python3 -m research.g2.native_residual --tools "$RUNNER_TEMP/sygus-tools" --cohort "$COHORT" > "G2-$COHORT-ORIGINAL-FIRST.json" 2> "G2-$COHORT-ORIGINAL-FIRST.stderr"
+          rc=$?
+          if test -s "G2-$COHORT-ORIGINAL-FIRST.json"; then
+            python3 - "$COHORT" <<'PY'
+          import json,sys
+          c=sys.argv[1]
+          x=json.load(open('G2-'+c+'-ORIGINAL-FIRST.json'))
+          print(json.dumps({
+              'cohort':c,'science_status':x.get('science_status'),
+              'stats':x.get('stats'),
+              'first_original_statuses':[{'file':r['file'],'status':r['status'],
+               'verified':r['verified'],
+               'native_gap':r.get('native_gap'),
+               'solver_stdout':(r.get('solver') or {}).get('stdout_excerpt','')[:130]}
+                 for r in x.get('rows',[])]
+          },sort_keys=True))
+          assert x.get('first_original_denominator')==12
+          assert x.get('stats',{}).get('total_original_tasks')==12
+          assert x.get('stats',{}).get('original_arc_evaluation_IDs_consumed')==0
+          assert x.get('student_training_calls')==0
+          PY
+            valid=$?
+            if test "$valid" -ne 0;then rc=1;fi
+          else
+            rc=1
+          fi
+          cat "G2-$COHORT-ORIGINAL-FIRST.stderr"
+          echo "G2_$COHORT_FIRST_NATIVE_ORIGINAL_EXIT=$rc"
+          exit "$rc"
+      - name: Preserve byte SHA of FIRST even with no solver discovery or CI failure
+        if: always()
+        shell: bash
+        env:
+          COHORT: ${{ matrix.cohort }}
+        run: |
+          if test -s "G2-$COHORT-ORIGINAL-FIRST.json"; then
+            sha256sum "G2-$COHORT-ORIGINAL-FIRST.json" > "G2-$COHORT-ORIGINAL-FIRST.sha256"
+            cat "G2-$COHORT-ORIGINAL-FIRST.sha256"
+          fi
+      - name: Archive FIRST original source properties, candidates, negative evidence and errors
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G2-NATIVE-${{ matrix.cohort }}-ORIGINAL-FIRST
+          path: |
+            G2-${{ matrix.cohort }}-ORIGINAL-FIRST.json
+            G2-${{ matrix.cohort }}-ORIGINAL-FIRST.sha256
+            G2-${{ matrix.cohort }}-ORIGINAL-FIRST.stderr
+          if-no-files-found: warn
+          retention-days: 90
