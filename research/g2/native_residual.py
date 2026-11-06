@@ -173,11 +173,14 @@ def check_smt(source:str):
     return {"proof":"UNSAT" if r.returncode==0 and results==["unsat"] else "NOT_PROVED",
        "stdout":results[:3],"exit":r.returncode,"stderr":r.stderr[-350:]}
 
-def prove_bv(program:str,prepared:dict)->dict:
+def prove_bv(program:str,prepared:dict,converted_source:str)->dict:
     # Complete source helpers are part of the published original semantics.
     # Prove the DISJUNCTION of all possible ground sample violations UNSAT
     # in one SMT call, not 100 separate expensive cvc5 process launches.
-    helpers=[f for f in top_forms(prepared["train"]) if form_name(f)=="define-fun"]
+    # The official version converter fixes old (BitVec 64) helper signatures.
+    # Keep original heldout TRAIN/TEST equalities, but use the publisher's
+    # type-normalized source helper definitions for the independent SMT proof.
+    helpers=[f for f in top_forms(converted_source) if form_name(f)=="define-fun"]
     checks=[]
     for label,cs in (("TRAIN",prepared["train_constraints"]),
                      ("HELDOUT",[prepared["heldout"]])):
@@ -263,7 +266,21 @@ def probe_one(folder:str, target:dict,ref:str,cohort:str,tools:Path)->dict:
         record.update({"status":"INFRA_SOURCE_CONVERTER_FAIL","conversion":cv,"verified":False})
         return record
     converted=cv["source"]
-    original_count=sum(form_name(f)=="constraint" for f in top_forms(converted))
+    converted_constraints=[f for f in top_forms(converted) if form_name(f)=="constraint"]
+    original_count=len(converted_constraints)
+    if cohort=="BV_FINITE":
+        # Ensure publisher converter did NOT silently alter any literal
+        # training input/output pair. It may normalize only syntax/layout.
+        def ground_literals(text:str)->tuple[str,...]:
+            return tuple(re.findall(r'#x[0-9A-Fa-f]+|#b[01]+',text))
+        raw_constraints=spec["train_constraints"]
+        if len(raw_constraints)!=len(converted_constraints) or any(
+            ground_literals(a)!=ground_literals(b)
+            for a,b in zip(raw_constraints,converted_constraints)
+        ):
+            record.update({"status":"CONVERTER_CHANGED_SOURCE_GOLD",
+                "verified":False})
+            return record
     if cohort=="BV_FINITE" and expected_n!=original_count:
         record.update({"status":"INCOMPATIBLE_CONVERTED_SOURCE","verified":False,
             "expected_training":expected_n,"actual_training":original_count})
@@ -291,7 +308,7 @@ def probe_one(folder:str, target:dict,ref:str,cohort:str,tools:Path)->dict:
     # Freeze candidate before independent original source proof.
     record["candidate"]=candidate
     record["candidate_sha256"]=sha(candidate.encode())
-    proof=prove_inv(candidate,spec) if cohort=="INV_INDUCTION" else prove_bv(candidate,spec)
+    proof=prove_inv(candidate,spec) if cohort=="INV_INDUCTION" else prove_bv(candidate,spec,converted)
     record["proof"]=proof
     record["verified"]=proof["verified"]
     record["status"]="NATIVE_ORIGINAL_PROVED" if proof["verified"] else "NATIVE_CANDIDATE_NOT_PROVEN"
