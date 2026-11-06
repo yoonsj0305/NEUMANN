@@ -1,0 +1,94 @@
+{
+  "schema": "neumann.g0.exact-bounded-bilinear.cross-author.first.prereg.v1",
+  "date": "2026-11-06",
+  "purpose": "One genuinely different semantic source-to-source representation change, exact finite-domain bilinear linearization, against full original solver. Transfer unchanged converter to publicly independently authored 2023 QF_NIA source family. Strong classical equal-rights baseline and independent cvc5 SAT witness checks.",
+  "source_exposure": "VeryMax TQLI development source has been researcher-opened, its FIRST OR-specialization FAIL preserved. External 9 UltimateAutomizer file names, Git blob IDs and lengths inspected metadata-only before converter first run; original formula bodies NOT inspected by researcher before prereg. Selection is human-chosen one representative for each of nine distinct filename stems; not random and not independent individual authors.",
+  "dev_original": {
+    "repo": "ilanashapiro/FMCAD26_Artifact",
+    "commit": "abba4cbda58f7e21ece28b6c854ab675404d340b",
+    "path": "scripts_datasets/inputs/QF_NIA_2313/From_T2__tqli.t2__p25231_terminationG_0.smt2",
+    "git_blob": "72b1b77ed5996b5a3e6d81fd75d7ea3b58347ff7",
+    "bytes": 547273,
+    "expected_status": "sat"
+  },
+  "external_corpus": {
+    "repo": "SMT-LIB/benchmark-submission-2023",
+    "commit": "7f993a017850ba547c6ea19a1bf3b54adf54a449",
+    "files": [
+      {
+        "path": "non-incremental/QF_NIA/20230321-UltimateAutomizerSvcomp2023/cohencu.c_2.smt2",
+        "git_blob": "4697f127e5fa7b174b376376467ce6ab54f1e572",
+        "bytes": 1981
+      },
+      {
+        "path": "non-incremental/QF_NIA/20230321-UltimateAutomizerSvcomp2023/divbin2.c_3.smt2",
+        "git_blob": "c5d2db50302c6c7d16b78407b8ab5ddee850f502",
+        "bytes": 2209
+      },
+      {
+        "path": "non-incremental/QF_NIA/20230321-UltimateAutomizerSvcomp2023/egcd.c_0.smt2",
+        "git_blob": "91e9a96cf036370d06b67278a331a8f524aea301",
+        "bytes": 3939
+      },
+      {
+        "path": "non-incremental/QF_NIA/20230321-UltimateAutomizerSvcomp2023/hard-ll.c_0.smt2",
+        "git_blob": "8066da9cce695fedee5963352636a68e03967990",
+        "bytes": 2758
+      },
+      {
+        "path": "non-incremental/QF_NIA/20230321-UltimateAutomizerSvcomp2023/hard.c_2.smt2",
+        "git_blob": "dc1abb964f5e2eba804cd3ee507e1a78f617d981",
+        "bytes": 2774
+      },
+      {
+        "path": "non-incremental/QF_NIA/20230321-UltimateAutomizerSvcomp2023/interleave_bits.c_1.smt2",
+        "git_blob": "9dec9ff9487cb05892b9d0d2716e72551cd0c96f",
+        "bytes": 2053
+      },
+      {
+        "path": "non-incremental/QF_NIA/20230321-UltimateAutomizerSvcomp2023/jain_5-2.c_0.smt2",
+        "git_blob": "e3398cc8ed6cb43b3c8e18b8d9f570900147f8b6",
+        "bytes": 1932
+      },
+      {
+        "path": "non-incremental/QF_NIA/20230321-UltimateAutomizerSvcomp2023/nested5-2.c_0.smt2",
+        "git_blob": "a70f2d7c20a7da2a088ccc504e3d15aaccf35ae2",
+        "bytes": 3167
+      },
+      {
+        "path": "non-incremental/QF_NIA/20230321-UltimateAutomizerSvcomp2023/soft_float_3a.c.cil.c_0.smt2",
+        "git_blob": "e1acb95912ea23de421cccfc89d67248594cbdbc",
+        "bytes": 2179
+      }
+    ]
+  },
+  "language": "Quantifier-free integer arithmetic SMT2, no external hints or gold used for synthesis; complete original asserts retained.",
+  "transformation": "From ONLY unconditional top-level asserted integer inequalities, infer finite tight syntactic lower/upper bounds for any original declared integer variable. On original multiplication AST with a DIRECT finite-domain factor v having <=8 integer choices, replace v*e with an exact nested ite over ALL values L..U evaluating k*e for each; do NOT rewrite variables whose bounds are inside disjunctions/conditional constraints. Preserve all other operators and clauses. Never assume originally `set-info :status` is a proof, use it only as metadata.",
+  "soundness": "For any integer L<=v<=U, an exhaustive finite integer case split equal to v*e is an algebraic identity; cvc5 independently verifies generic pairwise source-lemma for each encountered width/range; a correct unconditional-bound source implication is necessary, and should be checked by source AST syntactic proof. Full original SAT claims need original 100% assertion model validation + cvc5 on unmodified original with concrete witness. UNSAT outputs are NOT accepted as original proofs unless independent equivalence verified and original UNSAT independently proved.",
+  "negative_controls": [
+    "Bogus bound inside source OR is NOT promoted",
+    "Missing lower or upper bound remains nonlinear",
+    "Bounds with width>8 remain untouched",
+    "Source hash change aborts original-source first",
+    "Unsupported syntax or slow compilation returns UNKNOWN; no favorable data filtering",
+    "Unverified SAT never counted as proven; no neural invention claim"
+  ],
+  "budgets": {
+    "max_range_values": 8,
+    "max_distinct_rewrites": 15000,
+    "dev_direct_z3_seconds": 30,
+    "dev_reframe_z3_seconds": 30,
+    "external_each_direct_seconds": 2,
+    "external_each_reframe_seconds": 2,
+    "independent_cvc5_witness_seconds": 10,
+    "independent_lemma_timeout_seconds": 10,
+    "max_job_minutes": 18
+  },
+  "primary_gate": "Full original source hash pinned. On opened TQLI at least one new independently source-validated original SAT compared to direct 30s UNKNOWN OR on the external 9 model at least one newly certified original outcome vs equally privileged classical native Z3; no false claims. Separately test converter semantic correctness and raw external transfer denominator 9/9 (ABSTAIN counts); 0 UNSAFE admissions.",
+  "secondary_gate": "If only mathematical equivalence and compiler works but zero new independently verified original solutions, classify SEMANTIC_OPERATOR_PASS_CAPABILITY_NO_GO, not Q3 invention and not G1 headroom.",
+  "stop": "No post-FIRST retuning on opened TQLI or nine original holdouts. Every original and failure saved. No neural training, no ARC evaluation IDs. If no strong new source theorem, STOP and preserve.",
+  "Q3_neural_new_operator": "OPEN",
+  "Q4_all_cost_advantage": "OPEN",
+  "Q6_cross_formalism_learning": "OPEN",
+  "Q7_frontier": "OPEN"
+}
