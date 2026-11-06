@@ -1,4 +1,5 @@
 name: NEUMANN G3 2025 actual Golem Eldarica original15 immutable FIRST scientific audit
+# V1 READONLY failed after first LIA group on ARRAY, before any recomputation. Print SHA and scope, then fail closed. No solver reruns.
 on:
   push:
     branches:
@@ -52,9 +53,12 @@ jobs:
           cases=[]
           for cohort,path in files.items():
               content=Path(path).read_bytes()
-              assert hashlib.sha256(content).hexdigest()==sha[cohort]
+              got=hashlib.sha256(content).hexdigest()
+              print('POSTFIRST_EXACT_SHA_DIAG',cohort,got,sha[cohort])
+              assert got==sha[cohort],(cohort,got,sha[cohort])
               x=json.loads(content)
               assert x['schema']=='neumann.q3.g3.postfirst-reproduction-native-CHCCOMP2025-actual-peers.v1'
+              print('POSTFIRST_FIRST_SCOPE_DIAG',cohort,x.get('science_status'),x.get('peer_version'))
               assert x['science_status']=='POSTFIRST_KNOWN_NATIVE_COMPARISON_NEUMANN_LEARNED_Q3_OPEN'
               assert x['peer_version']==('Golem-0.7.1' if cohort=='LIA_MULTIPHASE' else 'Eldarica-2.2')
               assert x['first_z3_original_sha256']==original_first_sha[cohort]
