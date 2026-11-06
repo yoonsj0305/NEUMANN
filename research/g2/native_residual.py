@@ -311,7 +311,18 @@ def probe_one(folder:str, target:dict,ref:str,cohort:str,tools:Path)->dict:
     proof=prove_inv(candidate,spec) if cohort=="INV_INDUCTION" else prove_bv(candidate,spec,converted)
     record["proof"]=proof
     record["verified"]=proof["verified"]
-    record["status"]="NATIVE_ORIGINAL_PROVED" if proof["verified"] else "NATIVE_CANDIDATE_NOT_PROVEN"
+    if proof["verified"]:
+        record["status"]="NATIVE_ORIGINAL_PROVED"
+    elif (cohort=="BV_FINITE" and proof.get("reason")==
+          "ORIGINAL_HELDOUT_COUNTEREXAMPLE_NOT_UNSAT"
+          and len(proof.get("checks",[]))==2
+          and proof["checks"][0]["counterexample_proof"]["proof"]=="UNSAT"
+          and proof["checks"][1]["counterexample_proof"]["proof"]=="NOT_PROVED"
+          and proof["checks"][1]["counterexample_proof"].get("stdout")==["sat"]):
+        record["status"]="NATIVE_HELDOUT_REFUTED"
+        record["native_gap"]="CERTIFIED_SINGLE_ORIGINAL_WITHHELD_GENERALIZATION_FAIL_NOT_UNSOLVABILITY"
+    else:
+        record["status"]="NATIVE_CANDIDATE_NOT_PROVEN"
     return record
 
 def main()->int:
@@ -354,6 +365,7 @@ def main()->int:
           "SOLVER_PARSER_OR_INFRA_FAILURE","INCOMPATIBLE_CONVERTED_SOURCE",
           "UNSUPPORTED_ORIGINAL_SIGNATURE","UNSUPPORTED_PBE_SOURCE") for r in results),
       "native_candidate_unproven":sum(r["status"]=="NATIVE_CANDIDATE_NOT_PROVEN" for r in results),
+      "native_heldout_refuted":sum(r["status"]=="NATIVE_HELDOUT_REFUTED" for r in results),
       "original_arc_evaluation_IDs_consumed":0,
     }
     result={
