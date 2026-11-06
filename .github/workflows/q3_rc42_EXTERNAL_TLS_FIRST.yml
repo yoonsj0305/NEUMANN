@@ -1,0 +1,81 @@
+name: NEUMANN RC42 independently authored TLS protocol FIRST transfer
+on:
+  push:
+    branches:
+      - research/q3-rc42-cross-protocol-tls-20261106
+    paths:
+      - .github/workflows/q3_rc42_EXTERNAL_TLS_FIRST.yml
+permissions:
+  contents: read
+jobs:
+  first-tls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check frozen RC39 source and two external TLS model IDs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          from hashlib import sha1
+          import json
+          p=json.loads(Path("docs/experiments/q3_RC42_TLS_FIRST_PREREG_2026_11_06.json").read_text())
+          def blob(path):
+              b=Path(path).read_bytes()
+              return sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()
+          assert blob('research/q3/rc39/active_mealy.py')==p['frozen_original_lstar_git_blob']
+          assert blob('research/q3/rc39/wmethod_conformance.py')==p['frozen_classical_wmethod_git_blob']
+          assert len(p['external_models'])==2
+          assert len({m['git_blob'] for m in p['external_models']})==2
+          print('FROZEN_ORIGINAL_LEARNER_W_AND_EXTERNAL_PROVENANCE_PASS')
+          PY
+      - name: Numeric node TLS parser adversarial controls
+        run: python3 -m unittest -v tests/test_q3_rc42_tls_adapter.py
+      - name: ORIGINAL first actual cross-protocol source-only state induction
+        shell: bash
+        run: |
+          set -uo pipefail
+          python3 -m research.q3.rc42.external_tls_first > RC42-TLS-FIRST.json 2> RC42-TLS-FIRST.stderr
+          rc=$?
+          if test -s RC42-TLS-FIRST.json; then
+            python3 - <<'PY'
+          import json
+          x=json.load(open('RC42-TLS-FIRST.json'))
+          print(json.dumps({'science':x['science_status'],
+             'independent_all_lengths':x['independent_all_length_proven'],
+             'mutants_rejected':x['wrong_mutants_rejected'],
+             'source_query_calls':x['source_membership_queries_total'],
+             'rows':[{'case':r['case'],'status':r['learner_status'],
+                      'queries':r['distinct_source_queries'],
+                      'exact':r['independent_after_freeze_all_lengths']}
+                     for r in x['rows']]},sort_keys=True))
+          PY
+          else
+            echo 'FIRST_NO_JSON: infrastructure failure not interpreted as scientific success'
+          fi
+          cat RC42-TLS-FIRST.stderr
+          echo "ORIGINAL_RC42_PROCESS_EXIT=$rc"
+          exit "$rc"
+      - name: Hash original-first result, not a rerun
+        if: always()
+        shell: bash
+        run: |
+          if test -s RC42-TLS-FIRST.json; then
+            sha256sum RC42-TLS-FIRST.json > RC42-TLS-FIRST.sha256
+            cat RC42-TLS-FIRST.sha256
+          fi
+      - name: Retain immutable result whether scientific PASS or FAIL
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-RC42-TLS-FIRST
+          path: |
+            RC42-TLS-FIRST.json
+            RC42-TLS-FIRST.sha256
+            RC42-TLS-FIRST.stderr
+          if-no-files-found: warn
+          retention-days: 90

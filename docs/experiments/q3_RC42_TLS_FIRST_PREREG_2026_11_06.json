@@ -1,0 +1,43 @@
+{
+  "schema": "neumann.q3.rc42.external-tls.cross-protocol-first.preregister.v1",
+  "date": "2026-11-06",
+  "purpose": "Test unchanged RC39 original classical active learner+W-method on independent external TLS protocol machine graphs and a DOT syntax different from MQTT, after RC41 external MQTT first PASS. No re-training, no change to learner policy, no ARC task consumption.",
+  "scope": "Separate externally authored legacy TLS Mealy models, public and researcher-opened before prereg, not blind to experiment author. This is external protocol family portability within the SAME Mealy formalism, not general Q6 cross-formalism semantics and not autonomous neural invention.",
+  "external_repo": "damascenodiego/DynamicLstarM",
+  "external_commit": "5095464d597c68a4899cc81e3d415e3696a00242",
+  "external_models": [
+    {
+      "case": "miTLS_0.1.3_server",
+      "path": "experiments/2021_03_dTTT/subjects/tls/miTLS_0.1.3_server_regular.dot",
+      "git_blob": "ecf8810111e643065700e5517740ac88f610a4e4",
+      "reference_bound": 6,
+      "inputs": 8,
+      "outputs": 8
+    },
+    {
+      "case": "OpenSSL_1.0.2_server",
+      "path": "experiments/2021_03_dTTT/subjects/tls/OpenSSL_1.0.2_server_regular.dot",
+      "git_blob": "2bde886cab3155ca5388f1f36605f5eb6fd9a660",
+      "reference_bound": 7,
+      "inputs": 7,
+      "outputs": 7
+    }
+  ],
+  "frozen_original_lstar_git_blob": "83bd15d98b8fa02f4427b26c27264d35c0ec261e",
+  "frozen_classical_wmethod_git_blob": "86a413ff5e002995e0c79e625abe22d5877ae424",
+  "source_rights": "Learner receives source membership(input_string)->output_string, external fixed alphabet and trusted model upper bound only; full reference table passed only to resettable output backend and independent after-freeze checker.",
+  "protocol_conversion": "Different published DOT format uses numeric state nodes, first standalone numeric state denotes start, no semicolon on transitions, labels 'input/output'. Generic strict adapter encodes sorted input/output labels into single ASCII characters, without changing original frozen learner or W-method.",
+  "budgets": {
+    "max_unique_membership_per_case": 200000,
+    "max_w_test_words_per_case": 200000,
+    "max_lstar_membership_per_case": 200000,
+    "max_w_calls": 200
+  },
+  "primary_gate": "2/2 exact independent all-length equivalent, 2/2 altered emission output negative rejected, 2 unique frozen external DOT blob SHA, strict source parser rejects malformed/incomplete/incorrect-state-count input; preserve ORIGINAL FIRST even if FAIL.",
+  "degraded_mode": "If source model incompatible/too large, model state limit, query budget, wrong hash, inconsistent output or otherwise invalid, report FAIL or UNKNOWN and do not claim proof. A FALSE trusted bound can produce incorrect certificate and is not discoverable by finite samples alone.",
+  "Q3_autonomous_neural_discovery": "OPEN",
+  "Q4_equal_rights_strongest_classical_cost": "OPEN",
+  "Q6_independent_cross_formalism_transfer": "OPEN",
+  "Q7_frontier": "OPEN",
+  "original_arc_remaining": "DO NOT TOUCH 11/400 reserved evaluation IDs"
+}
