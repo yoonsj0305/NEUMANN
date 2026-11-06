@@ -50,7 +50,9 @@ def horn(original:str)->str:
     ]
     return (
        "(set-logic HORN)\n"
-       "(set-option :fixedpoint.engine spacer)\n"+
+       # This bundled Z3 Horn interpreter selects Spacer for HORN by default.
+       # Old Z3 rejects the nonportable ':fixedpoint.engine' option.
+
        definitions+"\n"+
        "(declare-rel Inv ("+arg_sorts+"))\n"+
        "(declare-rel Bad ())\n"+names+"\n"+
