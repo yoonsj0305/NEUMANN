@@ -173,31 +173,35 @@ def check_smt(source:str):
     return {"proof":"UNSAT" if r.returncode==0 and results==["unsat"] else "NOT_PROVED",
        "stdout":results[:3],"exit":r.returncode,"stderr":r.stderr[-350:]}
 
-def counterexample_unsat_bv(program:str,original:str)->dict:
-    parts=[x for x in top_forms(original) if form_name(x)=="define-fun"]
-    expr=original.strip()
-    if not expr.startswith("(constraint ") or not expr.endswith(")"):
-        return {"proof":"BAD_ORIGINAL_CONSTRAINT"}
-    assertion="(assert (not "+expr[len("(constraint "):-1]+"))"
-    return check_smt("(set-logic ALL)\n"+"\n".join(parts)+"\n"+program+"\n"+assertion+"\n(check-sat)\n")
-
 def prove_bv(program:str,prepared:dict)->dict:
-    # More stringent than SAT of positive equalities: no counterexample
-    # to each concrete ground source equality may exist.
-    result=[]
-    for label,cs in [("TRAIN",prepared["train_constraints"]),
-                     ("HELDOUT",[prepared["heldout"]])]:
-        # Original source macros may call one another; include original
-        # full DEFINE functions before the candidate f.
-        for c in cs:
-            v=counterexample_unsat_bv(program,prepared["train"])
-            # Above per-case validator needs specific c, not full train.
-            v=counterexample_unsat_bv(program,c)
-            result.append({"split":label,"proof":v["proof"]})
-            if v["proof"]!="UNSAT":
-                return {"verified":False,"errors":result[-3:],"reason":"COUNTEREXAMPLE_NOT_UNSAT"}
-    return {"verified":True,"original_source_examples_proven":len(result),
-       "train_examples":len(prepared["train_constraints"]),"heldout_examples":1}
+    # Complete source helpers are part of the published original semantics.
+    # Prove the DISJUNCTION of all possible ground sample violations UNSAT
+    # in one SMT call, not 100 separate expensive cvc5 process launches.
+    helpers=[f for f in top_forms(prepared["train"]) if form_name(f)=="define-fun"]
+    checks=[]
+    for label,cs in (("TRAIN",prepared["train_constraints"]),
+                     ("HELDOUT",[prepared["heldout"]])):
+        neg=[]
+        for original in cs:
+            expr=original.strip()
+            if not expr.startswith("(constraint ") or not expr.endswith(")"):
+                return {"verified":False,"reason":"MALFORMED_ORIGINAL_PBE",
+                    "checks":checks}
+            neg.append("(not "+expr[len("(constraint "):-1]+")")
+        any_violation=neg[0] if len(neg)==1 else "(or "+" ".join(neg)+")"
+        source="(set-logic ALL)\n"+"\n".join(helpers)+"\n"+program+ \
+               "\n(assert "+any_violation+")\n(check-sat)\n"
+        result=check_smt(source)
+        checks.append({"split":label,"original_ground_constraints":len(cs),
+                       "counterexample_proof":result})
+        if result["proof"]!="UNSAT":
+            return {"verified":False,"checks":checks,
+                    "reason":"ORIGINAL_"+label+"_COUNTEREXAMPLE_NOT_UNSAT"}
+    return {"verified":True,
+       "original_source_examples_proven":len(prepared["train_constraints"])+1,
+       "train_examples":len(prepared["train_constraints"]),
+       "heldout_examples":1,
+       "checks":checks}
 
 def prove_inv(program:str,spec:dict)->dict:
     ps=spec["params"]
