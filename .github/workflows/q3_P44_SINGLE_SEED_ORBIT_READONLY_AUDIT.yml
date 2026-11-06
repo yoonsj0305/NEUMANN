@@ -1,0 +1,81 @@
+name: NEUMANN P44 immutable ONE seed 180 orbit independent original read-only audit
+on:
+  push:
+    branches:
+      - research/q3-p44-single-seed-orbit-generalization-20261106
+    paths:
+      - .github/workflows/q3_P44_SINGLE_SEED_ORBIT_READONLY_AUDIT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  alternate-400:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Download first eligible original P44 receipt, never rerun generator
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-P44-ORBIT-TRAIN400-FIRST
+          run-id: 42147159711
+          github-token: ${{ github.token }}
+          path: original-p44-first
+      - name: Download prior immutable P43 original full score
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-P43-TEACHER-TRANSFER400-FIRST
+          run-id: 42145135283
+          github-token: ${{ github.token }}
+          path: original-p43-first
+      - name: Download prior immutable P30 classical original score
+        uses: actions/download-artifact@v4
+        with:
+          name: neumann-p30-first-opened-train400
+          run-id: 42024425446
+          github-token: ${{ github.token }}
+          path: original-p30-first
+      - name: Retrieve public 400 original train tasks, do not consume ARC evaluation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+      - name: Alternate independent 180 direct gap algorithms, original test gold replay
+        shell: bash
+        run: |
+          set -euo pipefail
+          node experiments/q3_p44_one_seed_orbit_READONLY_AUDIT.mjs "$RUNNER_TEMP/arc-agi" original-p44-first/P44-ORBIT-TRAIN400-FIRST.json original-p43-first/P43-TEACHER-TRANSFER400-FIRST.json original-p30-first/P30-OPENED400-FIRST.json > P44-ORBIT-ORIGINAL-READONLY-AUDIT.json
+          cat P44-ORBIT-ORIGINAL-READONLY-AUDIT.json
+      - name: Falsified first result cannot masquerade as progress
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          import {audit} from './experiments/q3_p44_one_seed_orbit_READONLY_AUDIT.mjs';
+          const first=JSON.parse(fs.readFileSync('original-p44-first/P44-ORBIT-TRAIN400-FIRST.json','utf8'));
+          first.stats.p44_new_original_exact_vs_p30_and_p43=20;
+          first.science_status='SCOPED_ONE_SEED_ORBIT_REUSE_PASS';
+          fs.writeFileSync('/tmp/P44-FORGED-FIRST.json',JSON.stringify(first));
+          const a=audit(process.env.RUNNER_TEMP+'/arc-agi','/tmp/P44-FORGED-FIRST.json',
+            'original-p43-first/P43-TEACHER-TRANSFER400-FIRST.json',
+            'original-p30-first/P30-OPENED400-FIRST.json');
+          if(a.audit_pass||!a.errors.includes('ORIGINAL_P44_FIRST_SHA_DRIFT')||
+             !a.errors.includes('FIRST_SCIENTIFIC_FAILURE_WAS_PROMOTED')||
+             !a.errors.includes('ORIGINAL_STAT_MISMATCH_p44_new_original_exact_vs_p30_and_p43'))process.exit(1);
+          console.log('P44_FIRST_FAKE_20_NEW_EXACT_REJECTED');
+          NODE
+      - name: Retain independent proof or fail
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-P44-ONE-SEED-180-READONLY-AUDIT
+          path: P44-ORBIT-ORIGINAL-READONLY-AUDIT.json
+          if-no-files-found: warn
+          retention-days: 90
