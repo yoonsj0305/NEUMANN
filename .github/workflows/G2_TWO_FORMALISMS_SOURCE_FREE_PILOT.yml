@@ -1,4 +1,5 @@
 name: NEUMANN G2 source-blind real native pilot two new mathematical formalisms
+# V1 pilot 42166709344 exposed only NON-selected pilot sources; native BV source verifier rejected old (BitVec 64) helper SORT syntax. This rerun changes verifier ONLY before any registered 24 original FIRST.
 on:
   push:
     branches:
@@ -54,6 +55,7 @@ jobs:
               assert r['status'] not in ('INFRA_FAIL_CLOSED','INFRA_SOURCE_CONVERTER_FAIL',
                    'SOLVER_PARSER_OR_INFRA_FAILURE','INCOMPATIBLE_CONVERTED_SOURCE',
                    'UNSUPPORTED_ORIGINAL_SIGNATURE','UNSUPPORTED_PBE_SOURCE'),r
+          assert r['verified'] is True,r
           print('NATIVE_TWO_INDEPENDENT_MATH_GRAMMAR_PILOT_COMPAT_PASS')
           PY
       - name: Preserve disjoint pilot first receipts, never reuse as fresh original target
