@@ -26,7 +26,7 @@ def sha(x:bytes)->str:
 
 
 def blob(x:bytes)->str:
- return hashlib.sha1(b"blob "+str(len(x)).encode()+b"\\0"+x).hexdigest()
+ return hashlib.sha1(b"blob "+str(len(x)).encode()+b"\0"+x).hexdigest()
 
 
 def atom(i:int,src:str)->str:
@@ -62,12 +62,12 @@ def direct_ast(p:list[int],src:str)->str:
 
 
 def parse_constraints(x:bytes):
- source=x.decode("utf-8").replace("\\r","\\n")
+ source=x.decode("utf-8").replace("\r","\n")
  # Independently validate each simple unary original PBE constraint.
  q=r'"(?:[^"]|"")*"'
- rexp=r"\\(constraint\\s+\\(=\\s+\\(f\\s+("+q+r")\\)\\s+("+q+r")\\s*\\)\\s*\\)"
+ rexp=r"\(constraint\s+\(=\s+\(f\s+("+q+r")\)\s+("+q+r")\s*\)\s*\)"
  matches=re.findall(rexp,source,re.DOTALL)
- n=len(re.findall(r"\\(constraint\\b",source))
+ n=len(re.findall(r"\(constraint\b",source))
  if len(matches)!=n or n<2:
   return None,"UNSUPPORTED_ARITY_OR_SOURCE_CONSTRAINT_PATTERN"
  rows=[]
