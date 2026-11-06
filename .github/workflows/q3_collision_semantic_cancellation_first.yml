@@ -1,12 +1,8 @@
 name: Q3 frozen first model semantic-vs-syntax relevance adversarial FIRST
 
+# Historical first already retained; stop automatic rescore.
 on:
-  pull_request:
-    paths:
-      - 'docs/experiments/Q3_CEX_SEMANTIC_CANCELLATION_FIRST_PREREG_2026_11_06.json'
-      - 'research/q3/collision_semantic_cancellation_first.py'
-      - 'tests/test_q3_collision_semantic_cancellation_first.py'
-      - '.github/workflows/q3_collision_semantic_cancellation_first.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -14,6 +10,8 @@ permissions:
 
 jobs:
   frozen-semantic-first:
+    if: false # archived immutable first / post-first proof
+
     runs-on: ubuntu-latest
     timeout-minutes: 6
     steps:
