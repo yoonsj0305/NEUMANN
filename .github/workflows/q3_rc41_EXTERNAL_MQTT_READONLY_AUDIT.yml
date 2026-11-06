@@ -1,0 +1,57 @@
+name: NEUMANN RC41 independent original MQTT read-only audit
+on:
+  push:
+    branches:
+      - research/q3-rc41-external-mqtt-20261106
+    paths:
+      - .github/workflows/q3_rc41_EXTERNAL_MQTT_READONLY_AUDIT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Download immutable original RC41 first receipt
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-RC41-EXTERNAL-MQTT-FIRST
+          run-id: 42139496328
+          github-token: ${{ github.token }}
+          path: locked-first
+      - name: Independent raw-dot/AST product proof and source cost audit, NO learner rerun
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m research.q3.rc41.independent_first_readonly_audit locked-first/RC41-MQTT-EXTERNAL-FIRST.json > RC41-MQTT-INDEPENDENT-AUDIT.json
+          cat RC41-MQTT-INDEPENDENT-AUDIT.json
+      - name: Mutated saved metric cannot rewrite pinned first result
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          from research.q3.rc41.independent_first_readonly_audit import audit
+          data=json.loads(Path('locked-first/RC41-MQTT-EXTERNAL-FIRST.json').read_text())
+          data['rows'][0]['unique_source_queries']=1
+          forged=Path('/tmp/rc41-forged.json')
+          forged.write_text(json.dumps(data))
+          out=audit(str(forged))
+          assert not out['audit_pass'],out
+          assert 'PINNED_FIRST_SHA_DRIFT' in out['errors']
+          assert 'ORIGINAL_QUERY_METRIC_DRIFT' in out['errors']
+          print('PINNED_FIRST_FORGERY_REJECTED')
+          PY
+      - name: Preserve alternate independent proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-RC41-MQTT-FIRST-INDEPENDENT-AUDIT
+          path: RC41-MQTT-INDEPENDENT-AUDIT.json
+          if-no-files-found: warn
+          retention-days: 90
