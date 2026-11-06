@@ -47,7 +47,7 @@ test('180 unique quotient parameter sets, bijective color map and rectangular tr
  eq(transpose(transpose(g)),g);
 });
 
-test('independent direct reference matches conjugated source on 3000 deterministic multishape cases',()=>{
+test('independent direct reference matches conjugated source on 4500 deterministic multishape cases',()=>{
  let n=0;
  for(let H=1;H<=5;H++)for(let W=1;W<=5;W++)
   for(let b=0;b<10;b++)for(let c=0;c<10;c++)if(b!==c){
@@ -78,7 +78,7 @@ test('exhaustive 3x3 3-palette source-conjugation equivalence',()=>{
 test('TRAIN nontrivial causal effect, disallow all-identity matches',()=>{
  const family=makeFamily();
  const train=[{input:[[1,0,3]],output:[[1,0,3]]}];
- const p=proposer(train,[[1,0,3]],family);
+ const p=proposer(train,[[[1,0,3]]],family);
  assert.equal(p.submitted,false);
  assert.equal(p.accepted_programs.length,0);
 });
@@ -87,10 +87,10 @@ test('TRAIN exact match + source ID independence + disagreement abstention',()=>
  const a={axis:'row',b:0,c:2,key:'a',program:g=>[[1,2,3]]};
  const b={axis:'row',b:0,c:3,key:'b',program:g=>g[0][0]===1?[[1,2,3]]:[[1,3,3]]};
  const train=[{input:[[1,0,3]],output:[[1,2,3]]}];
- const p=proposer(train,[[4,0,3]],[a,b]);
+ const p=proposer(train,[[[4,0,3]]],[a,b]);
  assert.equal(p.ambiguous,true);
  assert.equal(p.submitted,false);
- const q=proposer(train,[[4,0,3]],[a]);
+ const q=proposer(train,[[[4,0,3]]],[a]);
  assert.equal(q.submitted,true);
 });
 
