@@ -1,0 +1,86 @@
+name: NEUMANN G2 stronger Z3 Spacer native CHC original twelve after FIRST
+on:
+  push:
+    branches:
+      - research/q3-g2-native-residual-two-formalisms-20261106
+    paths:
+      - .github/workflows/G2_Z3_SPACER_ALL12_ORIGINAL_SOURCE.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  postfirst-spacer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Actual independent Z3 Spacer install and fixed version
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq z3
+          z3 --version
+      - name: Synthetic-only safe and unsafe CHC original interface controls BEFORE any source fetch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m research.g2.z3_spacer_postfirst --synthetic > G2-SPACER-SYNTHETIC-CONTROLS.json
+          cat G2-SPACER-SYNTHETIC-CONTROLS.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open('G2-SPACER-SYNTHETIC-CONTROLS.json'))
+          assert x['controls_pass'] is True
+          assert x['safe']['status']=='SAFE_UNSAT'
+          assert x['unsafe']['status']=='UNSAFE_SAT'
+          print('INDEPENDENT_Z3_STRONGER_NATIVE_SAFETY_AND_UNSAFETY_CONTROLS_PASS')
+          PY
+      - name: All original 12 source SHA pinned, Z3 native Spacer CHC source proof (not learned)
+        shell: bash
+        run: |
+          set -uo pipefail
+          python3 -m research.g2.z3_spacer_postfirst > G2-Z3-SPACER-ORIGINAL12-POSTFIRST.json 2> G2-Z3-SPACER-ORIGINAL12-POSTFIRST.stderr
+          rc=$?
+          if test -s G2-Z3-SPACER-ORIGINAL12-POSTFIRST.json; then
+            python3 - <<'PY'
+          import json
+          x=json.load(open('G2-Z3-SPACER-ORIGINAL12-POSTFIRST.json'))
+          print(json.dumps({'science':x.get('science_status'),
+           'stats':x.get('stats'),
+           'source_cases':[{'name':r['name'],'status':r['status'],
+                            'solver':r.get('native_SPACER')}
+                           for r in x.get('rows',[])]},sort_keys=True))
+          assert len(x.get('rows',[]))==12
+          assert x['stats']['original_arc_eval_IDs_used']==0
+          assert x['stats']['training_runs']==0
+          PY
+            parsed=$?
+            if test "$parsed" -ne 0;then rc=1;fi
+          else
+            rc=1
+          fi
+          cat G2-Z3-SPACER-ORIGINAL12-POSTFIRST.stderr
+          echo "G2_SPACER_POSTFIRST_ORIGINAL_RESULT_EXIT=$rc"
+          exit "$rc"
+      - name: Preserve alternate original solver result and SHA even if source or UNKNOWN failure
+        if: always()
+        shell: bash
+        run: |
+          if test -s G2-Z3-SPACER-ORIGINAL12-POSTFIRST.json; then
+            sha256sum G2-Z3-SPACER-ORIGINAL12-POSTFIRST.json > G2-Z3-SPACER-ORIGINAL12-POSTFIRST.sha256
+            cat G2-Z3-SPACER-ORIGINAL12-POSTFIRST.sha256
+          fi
+      - name: Archive real stronger native classical comparison, no student's model run
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G2-Z3-SPACER-NATIVE-CHC-ORIGINAL12
+          path: |
+            G2-Z3-SPACER-ORIGINAL12-POSTFIRST.json
+            G2-Z3-SPACER-ORIGINAL12-POSTFIRST.sha256
+            G2-Z3-SPACER-ORIGINAL12-POSTFIRST.stderr
+            G2-SPACER-SYNTHETIC-CONTROLS.json
+          if-no-files-found: warn
+          retention-days: 90
