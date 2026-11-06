@@ -1,0 +1,88 @@
+name: NEUMANN G3 postFIRST Eldarica2.3 Golem0.9 fifteen original immutable READONLY
+on:
+  push:
+    branches:
+      - research/q3-g3-2025-chc-native-first-20261106
+    paths:
+      - .github/workflows/G3_POSTFIRST_15_EXPERT_READONLY_AUDIT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  strict-original-immutable-readonly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-2025-CHC-LIA_MULTIPHASE-NATIVE-ORIGINAL-FIRST
+          run-id: 42174775254
+          github-token: ${{ github.token }}
+          path: frozen-z3-first-lia
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-2025-CHC-ARRAY_CHC-NATIVE-ORIGINAL-FIRST
+          run-id: 42174775254
+          github-token: ${{ github.token }}
+          path: frozen-z3-first-array
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-LIA_MULTIPHASE-ELDARICA23-GOLEM09-POSTFIRST
+          run-id: 42179065682
+          github-token: ${{ github.token }}
+          path: frozen-expert-postfirst-lia
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-ARRAY_CHC-ELDARICA23-GOLEM09-POSTFIRST
+          run-id: 42179065682
+          github-token: ${{ github.token }}
+          path: frozen-expert-postfirst-array
+      - name: Assert exact prior first and 20s expert original receipt SHAs, not CI shell exit
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo 'c4529472973dc7e102e3b755ff866ccac5f285a9d7206488d65dd054f5b41535  frozen-z3-first-lia/G3-LIA_MULTIPHASE-NATIVE-ORIGINAL-FIRST.json' | sha256sum -c -
+          echo '47d2776afe699cccab8dc6d6e4b4f06707522f61e8d3d079c478c5614ed5f8c8  frozen-z3-first-array/G3-ARRAY_CHC-NATIVE-ORIGINAL-FIRST.json' | sha256sum -c -
+          echo '03f8472108478bf0cd6ce6b2620be3b317a5231b3ccb34cca274bae4a9a49a6d  frozen-expert-postfirst-lia/G3-LIA_MULTIPHASE-ELDARICA-GOLEM-POSTFIRST.json' | sha256sum -c -
+          echo '5cceacc9e494e0ee75e9b3747a753e37b632b7f64dcecd5afdcf14df282f576a  frozen-expert-postfirst-array/G3-ARRAY_CHC-ELDARICA-GOLEM-POSTFIRST.json' | sha256sum -c -
+      - name: Cross-audit 15 original source IDs, 7 LIA + 8 arrays, no native solver execution
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m research.g3.eldarica_golem20s_original_readonly_audit \
+            frozen-z3-first-lia/G3-LIA_MULTIPHASE-NATIVE-ORIGINAL-FIRST.json \
+            frozen-z3-first-array/G3-ARRAY_CHC-NATIVE-ORIGINAL-FIRST.json \
+            frozen-expert-postfirst-lia/G3-LIA_MULTIPHASE-ELDARICA-GOLEM-POSTFIRST.json \
+            frozen-expert-postfirst-array/G3-ARRAY_CHC-ELDARICA-GOLEM-POSTFIRST.json \
+            > G3-15-EXPERT20S-INDEPENDENT-READONLY.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open('G3-15-EXPERT20S-INDEPENDENT-READONLY.json'))
+          print(json.dumps({'pass':x['audit_pass'],'original_n':x['originals_postfirst_checked'],
+            'counts':x['counts'],'first_run':x['first_original_run'],
+            'postfirst_run':x['new_original_postfirst_run_with_shell_epilogue_only_error']},sort_keys=True))
+          assert x['audit_pass'] is True
+          assert x['originals_postfirst_checked']==15
+          assert x['counts']['ARRAY_CHC']['still_resource_unresolved']==8
+          assert x['counts']['LIA_MULTIPHASE']['new_native_SAT_claim_consistent_with_official_label']==3
+          assert x['student_neural_calls']==0 and x['original_solver_reexecutions_in_audit']==0
+          print('G3_EXPERT_15_POSTFIRST_FIRST_SHA_READONLY_PASS')
+          PY
+      - name: Preserve alternate scientific audit SHA and original 15 decisions
+        if: always()
+        shell: bash
+        run: |
+          if test -s G3-15-EXPERT20S-INDEPENDENT-READONLY.json; then
+            sha256sum G3-15-EXPERT20S-INDEPENDENT-READONLY.json
+          fi
+      - name: Archive original evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G3-15-ELDARICA-GOLEM-20S-INDEPENDENT-READONLY-AUDIT
+          path: G3-15-EXPERT20S-INDEPENDENT-READONLY.json
+          if-no-files-found: warn
+          retention-days: 90
