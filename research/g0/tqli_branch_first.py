@@ -47,8 +47,9 @@ def solve_native(clauses,timeout_ms):
     t=time.perf_counter()
     res=solver.check()
     elapsed=(time.perf_counter()-t)*1000
-    return str(res),elapsed,(solver.model() if res==z3.sat else None),
-           (solver.reason_unknown() if res==z3.unknown else None)
+    return (str(res),elapsed,
+            (solver.model() if res==z3.sat else None),
+            (solver.reason_unknown() if res==z3.unknown else None))
 
 def direct_solver(clauses,seconds):
     solver=z3.Solver()
