@@ -1,0 +1,50 @@
+{
+  "schema": "neumann.q3.p43.opened-external-teacher-program-transfer400.prereg.v1",
+  "date": "2026-11-06",
+  "question": "Do seven exact pure-JS teacher-derived programs from distinct original ARC public evaluation tasks transfer without editing to ANY other official ARC training task, when task applicability is selected only by new task TRAIN pair consistency?",
+  "epistemics": "This is an opened public benchmark, and a cache/transfer REJECTION GATE before training a student, NOT a new neural structure discovery or uncontaminated holdout. All 400 ARC train originals have been opened by prior P29/P30; 7 external teacher programs come from public eval data and may have been exposed in model pretraining.",
+  "source_teacher": {
+    "repo": "yoonsj0305/NEUMANN",
+    "branch": "research/q3-open-program-teacher-p22-20261105",
+    "path": "experiments/q3_open_program_teacher_p22_FIRST_PROPOSAL.mjs",
+    "git_blob": "d82f09406b4b3ee4e9651c261013c8ce8aa850c7",
+    "source_existing": "immutable original P22 FIRST",
+    "teacher_program_count": 7
+  },
+  "official_original": {
+    "repo": "fchollet/ARC-AGI",
+    "commit": "399030444e0ab0cc8b4e199870fb20b863846f34",
+    "folder": "data/training",
+    "original_count": 400,
+    "source_status": "OPENED previously, not sealed"
+  },
+  "strong_classical": {
+    "evidence": "P30 actual opened 400 full first run #42024425446 (also includes old B P20 P24 P25 P27 union)",
+    "artifact_name": "neumann-p30-first-opened-train400",
+    "artifact_run_id": 42024425446,
+    "first_receipt_file": "P30-OPENED400-FIRST.json",
+    "first_receipt_sha256": "0fb747b4fd7355649465b8ff3424c0170d6d178f47fd1ea64ca486c416672b79",
+    "expected_original_count": 400,
+    "expected_classical_union_safe_exact": 54,
+    "expected_classical_union_safe_wrong": 8,
+    "expected_p30_exact": 27,
+    "caution": "classical safe union is not literally sound; published first has 8 wrong safe submissions. Compare exact source records, also wrong counts."
+  },
+  "frozen_program_application": "Compile candidate programs exactly from original teacher JS (no code modifications, no task ID routing). Run each candidate on original TRAIN pairs for each of all 400 tasks. A proposal exists only if >=1 frozen program fits ALL TRAIN and all test predictions are valid, and all fitting programs give byte-identical TEST grids. Original TEST gold used only after candidate filtering/predictions complete. No programs trained on 400, zero new teacher calls.",
+  "control": "Byte-exact source hash, ARC commit, 400 task IDs and original P30 receipt hash, task order equality. Baseline historical P30 FIRST provides correct/wrong flags but NOT candidate output grids; thus measured incremental teacher-only over baseline-safe-correct is an exact ORACLE-UNION UPPER BOUND, not an executable deployed merged predictor. Do not claim a conflict-free deployable merge.",
+  "gate": "GO TO STUDENT PROPOSER EXPERIMENT ONLY if seven frozen teacher programs add >=2 original TEST-exact tasks beyond baseline-safe-correct historical 54/400 via *oracle union upper bound*, add zero wrong teacher submissions, and reuse >=2 distinct teacher program functions on different original task IDs; otherwise STOP fixed-program caching and HOLD G1.",
+  "negative_controls": [
+    "tampered teacher hash fails",
+    "tampered baseline first hash fails",
+    "two TRAIN fits disagree on TEST => ABSTAIN",
+    "a TRAIN mismatch => disallow even if TEST would match",
+    "no original TEST gold read in any program or selector"
+  ],
+  "cost": "count exact source program executions, train comparisons, wall and CPU on same runner; do not invent all-in neural token power cost for original external teacher.",
+  "degraded_mode": "Any mismatch in external original or baseline, execution exception, invalid output shape, ambiguous predictions, or source commit mismatch => abstain or stop, never a positive proof.",
+  "original_arc_eval_ids_consumed": 0,
+  "Q3_neural_discovery": "OPEN",
+  "Q4_total_compute_advantage": "OPEN",
+  "Q6_independent_cross_formalism": "OPEN",
+  "Q7_frontier": "OPEN"
+}

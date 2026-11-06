@@ -1,0 +1,69 @@
+name: NEUMANN P43 independent pinned 400-original teacher transfer audit
+on:
+  push:
+    branches:
+      - research/q3-p43-teacher-program-transfer400-20261106
+    paths:
+      - .github/workflows/q3_P43_TEACHER_TRANSFER400_READONLY_AUDIT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independent-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Download pinned first teacher transfer result, never rerun the P43 original selector
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-P43-TEACHER-TRANSFER400-FIRST
+          run-id: 42145135283
+          github-token: ${{ github.token }}
+          path: original-first
+      - name: Download original P30 strongest-classical 400-task FIRST baseline
+        uses: actions/download-artifact@v4
+        with:
+          name: neumann-p30-first-opened-train400
+          run-id: 42024425446
+          github-token: ${{ github.token }}
+          path: frozen-baseline
+      - name: Fetch exact original official 400, no public ARC evaluation IDs used
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+      - name: Independent full original-input/train-to-TEST source replay, alternate selector and checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          node experiments/q3_p43_teacher_transfer400_readonly_audit.mjs "$RUNNER_TEMP/arc-agi" original-first/P43-TEACHER-TRANSFER400-FIRST.json frozen-baseline/P30-OPENED400-FIRST.json > P43-INDEPENDENT-READONLY-AUDIT.json
+          cat P43-INDEPENDENT-READONLY-AUDIT.json
+      - name: Forged first improved result or changed original metric never certifies
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          import {audit} from './experiments/q3_p43_teacher_transfer400_readonly_audit.mjs';
+          const o=JSON.parse(fs.readFileSync('original-first/P43-TEACHER-TRANSFER400-FIRST.json','utf8'));
+          o.stats.teacher_extra_exact_over_strong_classical_safe=100;
+          fs.writeFileSync('/tmp/P43-FORGED-FIRST.json',JSON.stringify(o));
+          const a=audit(process.env.RUNNER_TEMP+'/arc-agi','/tmp/P43-FORGED-FIRST.json','frozen-baseline/P30-OPENED400-FIRST.json');
+          if(a.audit_pass||!a.errors.includes('ORIGINAL_P43_FIRST_RECEIPT_DRIFT')||!a.errors.includes('FIRST_AGGREGATE_MISMATCH_teacher_extra_exact_over_strong_classical_safe'))process.exit(1);
+          console.log('P43_FIRST_FAVORABLE_METRIC_FORGERY_REJECTED');
+          NODE
+      - name: Retain read-only alternate 400-task original score evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-P43-TEACHER-TRANSFER400-READONLY-AUDIT
+          path: P43-INDEPENDENT-READONLY-AUDIT.json
+          if-no-files-found: warn
+          retention-days: 90

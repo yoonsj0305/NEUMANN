@@ -1,0 +1,104 @@
+name: NEUMANN Q3 P43 original 400 frozen teacher transfer FIRST
+on:
+  push:
+    branches:
+      - research/q3-p43-teacher-program-transfer400-20261106
+    paths:
+      - .github/workflows/q3_P43_TEACHER_TRANSFER400_FIRST.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify exact original frozen teacher code and program selection controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          p=json.loads(Path("docs/experiments/q3_P43_TEACHER_PROGRAM_TRANSFER400_PREREG_2026_11_06.json").read_text())
+          b=Path(p["source_teacher"]["path"]).read_bytes()
+          blob=hashlib.sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()
+          assert blob==p["source_teacher"]["git_blob"]
+          assert p["official_original"]["original_count"]==400
+          print("TEACHER_7_FROZEN",blob)
+          PY
+          node --test tests/test_q3_p43_teacher_transfer400.mjs
+      - name: Download strong P30 ORIGINAL first instead of rerunning classical competitors
+        uses: actions/download-artifact@v4
+        with:
+          name: neumann-p30-first-opened-train400
+          run-id: 42024425446
+          github-token: ${{ github.token }}
+          path: pinned-baseline
+      - name: Check strong classical first SHA before any original task access
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "0fb747b4fd7355649465b8ff3424c0170d6d178f47fd1ea64ca486c416672b79  pinned-baseline/P30-OPENED400-FIRST.json" | sha256sum -c -
+      - name: Fetch official upstream ARC original 400 at frozen commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+          test "$(find "$RUNNER_TEMP/arc-agi/data/training" -maxdepth 1 -name '*.json' | wc -l)" = 400
+      - name: FIRST complete opened-original teacher transfer against real strong classical receipt
+        shell: bash
+        run: |
+          set -uo pipefail
+          node experiments/q3_p43_teacher_transfer400_first.mjs "$RUNNER_TEMP/arc-agi" pinned-baseline/P30-OPENED400-FIRST.json > P43-TEACHER-TRANSFER400-FIRST.json 2> P43-TEACHER-TRANSFER400-FIRST.stderr
+          rc=$?
+          if test -s P43-TEACHER-TRANSFER400-FIRST.json; then
+            python3 - <<'PY'
+          import json
+          x=json.load(open('P43-TEACHER-TRANSFER400-FIRST.json'))
+          print(json.dumps({"scientific_status":x["science_status"],
+            "scope":"public opened ARC train400","original_first_baseline_sha256":x["original_P30_first_sha256"],
+            "stats":x["stats"]},sort_keys=True))
+          PY
+            python3 - <<'PY'
+          import json,sys
+          x=json.load(open('P43-TEACHER-TRANSFER400-FIRST.json'))
+          assert x["stats"]["original_training_tasks"]==400
+          assert x["stats"]["classical_safe_union_exact"]==54
+          assert x["original_arc_eval_ids_used"]==0
+          if x["science_status"]!="P43_FROZEN_TEACHER_PROGRAM_TRANSFER_PRESTUDENT_GATE_PASS":sys.exit(1)
+          PY
+            verdict=$?
+            if [ "$verdict" -ne 0 ]; then echo 'SCIENTIFIC_FIRST_NEGATIVE: retain immutable evidence';rc=1;fi
+          else
+            echo 'FIRST_NO_JSON: infrastructure fail closed';rc=1
+          fi
+          cat P43-TEACHER-TRANSFER400-FIRST.stderr
+          echo "P43_FIRST_EXIT=$rc"
+          exit "$rc"
+      - name: Preserve exact first SHA irrespective of scientific result
+        if: always()
+        shell: bash
+        run: |
+          if test -s P43-TEACHER-TRANSFER400-FIRST.json; then
+            sha256sum P43-TEACHER-TRANSFER400-FIRST.json > P43-TEACHER-TRANSFER400-FIRST.sha256
+            cat P43-TEACHER-TRANSFER400-FIRST.sha256
+          fi
+      - name: Archive FIRST independent external task transfer result even on scientific FAIL
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-P43-TEACHER-TRANSFER400-FIRST
+          path: |
+            P43-TEACHER-TRANSFER400-FIRST.json
+            P43-TEACHER-TRANSFER400-FIRST.sha256
+            P43-TEACHER-TRANSFER400-FIRST.stderr
+          if-no-files-found: warn
+          retention-days: 90
