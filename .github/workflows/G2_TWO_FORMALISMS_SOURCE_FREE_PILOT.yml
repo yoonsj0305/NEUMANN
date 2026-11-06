@@ -1,0 +1,68 @@
+name: NEUMANN G2 source-blind real native pilot two new mathematical formalisms
+on:
+  push:
+    branches:
+      - research/q3-g2-native-residual-two-formalisms-20261106
+    paths:
+      - .github/workflows/G2_TWO_FORMALISMS_SOURCE_FREE_PILOT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  pilot-not-24-originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install actual specialist and pinned official grammar adapter
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq cvc5
+          python3 -m pip install --user --quiet ply==3.11 pyparsing==2.4.7
+          git init "$RUNNER_TEMP/sygus-tools"
+          git -C "$RUNNER_TEMP/sygus-tools" remote add origin https://github.com/SyGuS-Org/tools.git
+          git -C "$RUNNER_TEMP/sygus-tools" fetch --depth=1 origin 9f5cc084b77ce172a22c646dc54528b639ffb139
+          git -C "$RUNNER_TEMP/sygus-tools" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/sygus-tools" rev-parse HEAD)" = 9f5cc084b77ce172a22c646dc54528b639ffb139
+          cvc5 --version | head -1
+      - name: Mandatory synthetic-only source proof positive and mutation controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tests -p test_g2_native_two_formalisms.py -v
+      - name: Read ONLY two disjoint nonselected pilot sources and test native compatibility
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m research.g2.native_residual --tools "$RUNNER_TEMP/sygus-tools" --cohort PILOT_INV > G2-PILOT-INV.json
+          python3 -m research.g2.native_residual --tools "$RUNNER_TEMP/sygus-tools" --cohort PILOT_BV > G2-PILOT-BV.json
+          python3 - <<'PY'
+          import json
+          for k in ('INV','BV'):
+              v=json.load(open(f'G2-PILOT-{k}.json'))
+              r=v['rows'][0]
+              print(json.dumps({'pilot':k,'name':r['file'],'status':r['status'],
+                'verified':r['verified'],'solver':r.get('solver',{}),
+                'proof':r.get('proof'),
+                'stats':v['stats']},sort_keys=True))
+              assert v['first_original_denominator']==1
+              assert v['stats']['original_arc_evaluation_IDs_consumed']==0
+              assert r['status'] not in ('INFRA_FAIL_CLOSED','INFRA_SOURCE_CONVERTER_FAIL',
+                   'SOLVER_PARSER_OR_INFRA_FAILURE','INCOMPATIBLE_CONVERTED_SOURCE',
+                   'UNSUPPORTED_ORIGINAL_SIGNATURE','UNSUPPORTED_PBE_SOURCE'),r
+          print('NATIVE_TWO_INDEPENDENT_MATH_GRAMMAR_PILOT_COMPAT_PASS')
+          PY
+      - name: Preserve disjoint pilot first receipts, never reuse as fresh original target
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G2-TWO-MATH-PILOT-NONSELECTED-ORIGINAL-FIRST
+          path: |
+            G2-PILOT-INV.json
+            G2-PILOT-BV.json
+          if-no-files-found: warn
+          retention-days: 90
