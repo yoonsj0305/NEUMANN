@@ -1,0 +1,57 @@
+name: Q3 already-opened copy originals typed H0 gap and two-array motif audit
+on:
+  pull_request:
+    paths:
+      - 'research/q3/copy_original_operator_gap.py'
+      - '.github/workflows/q3_copy_original_operator_gap.yml'
+permissions:
+  contents: read
+jobs:
+  published-copy-development:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Validate parser source without original benchmark payloads
+        run: python3 -m py_compile research/q3/copy_original_operator_gap.py
+      - name: Fetch two already-opened, source-pinned original CHC programs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p COPY-GAP-DEVELOPMENT
+          base='https://raw.githubusercontent.com/chc-comp/chc-comp25-benchmarks/ddd279cab0717db6effe69baad451a8eb04ffd86/quic3/data'
+          for task in standard_copy2_true-unreach-call_ground_000.smt2 standard_copy3_true-unreach-call_ground_000.smt2; do
+            curl --fail --location --silent --show-error --max-time 20 --retry 2 "$base/$task" -o "COPY-GAP-DEVELOPMENT/$task"
+          done
+          test "$(git hash-object COPY-GAP-DEVELOPMENT/standard_copy2_true-unreach-call_ground_000.smt2)" = 30b3bab8834aa6f834cf493539180e6b92caf16f
+          test "$(git hash-object COPY-GAP-DEVELOPMENT/standard_copy3_true-unreach-call_ground_000.smt2)" = f8fd0b73c3aa45ee5f49426416a378bcfc462605
+      - name: Machine-check unchanged original loop signatures and copy motifs
+        shell: bash
+        run: |
+          set -euo pipefail
+          for family in standard_copy2_true-unreach-call_ground_000.smt2 standard_copy3_true-unreach-call_ground_000.smt2; do
+            python3 -m research.q3.copy_original_operator_gap \
+              "COPY-GAP-DEVELOPMENT/$family" "$family" "COPY-GAP-DEVELOPMENT/$family.gap.json"
+          done
+          python3 - <<'PY'
+          import json, pathlib
+          rows=[json.loads(p.read_text()) for p in pathlib.Path('COPY-GAP-DEVELOPMENT').glob('*.gap.json')]
+          assert len(rows)==2
+          for r in rows:
+            assert not r['H0_type_admissible']
+            assert r['copy_motif_count']>0
+            assert not r['actual_original_CHC_formally_proven']
+            assert r['Q3']=='OPEN'
+          print('TWO_ALREADY_OPENED_ORIGINAL_ARRAY_RELATION_GAPS_CONFIRMED',sum(x['copy_motif_count'] for x in rows))
+          PY
+      - name: Keep original source and results as research evidence, no sealed test consumption
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-TWO-COPY-ORIGINAL-H0-EXPRESSION-GAP
+          path: COPY-GAP-DEVELOPMENT/
+          retention-days: 90
+          if-no-files-found: warn
