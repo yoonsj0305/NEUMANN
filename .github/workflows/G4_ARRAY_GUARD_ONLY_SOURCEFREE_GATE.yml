@@ -1,0 +1,54 @@
+name: NEUMANN G4 array CHC guard structure source-free preservation gate
+on:
+  push:
+    branches:
+      - research/q3-g4-array-frame-single-structure-20261106
+    paths:
+      - .github/workflows/G4_ARRAY_GUARD_ONLY_SOURCEFREE_GATE.yml
+permissions:
+  contents: read
+jobs:
+  sourcefree-one-operator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Stable first-party Z3 2026 5.0.0.0 import and source syntax check
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile research/g4/array_guard_normalizer.py
+          python -m pip install --quiet --no-cache-dir z3-solver==5.0.0.0
+          python - <<'PY'
+          import z3
+          print('Z3_CANONICALIZER_PROOF_LIBRARY',z3.get_version_string())
+          assert z3.get_version_string().startswith('5.0.'),z3.get_version_string()
+          PY
+      - name: Check logic preserving quantified Horn simplification on safe and intentionally unsafe synthetic models
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research.g4.array_guard_normalizer --synthetic > G4-SOURCEFREE-ONE-ARRAY-GUARD-RESULT.json
+          python - <<'PY'
+          import json
+          x=json.load(open('G4-SOURCEFREE-ONE-ARRAY-GUARD-RESULT.json'))
+          print(json.dumps(x,sort_keys=True))
+          assert x['pass'] is True,x
+          assert x['original_benchmark_bytes_read']==0
+          assert x['control_safe']['outcome']=='sat'
+          assert x['control_unsafe']['outcome']=='unsat'
+          print('G4_ONE_OPERATOR_SOURCEFREE_SEMANTIC_PRESERVATION_PASS')
+          PY
+      - name: Preserve source-free first result with no original benchmark opens
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G4-SOURCEFREE-GUARD-NORMALIZER-FROZEN
+          path: G4-SOURCEFREE-ONE-ARRAY-GUARD-RESULT.json
+          if-no-files-found: warn
+          retention-days: 90
