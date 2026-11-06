@@ -79,6 +79,19 @@ class Q3CoreCycleBreakTests(unittest.TestCase):
         self.assertEqual(out["Q3_learned_discovery"], "NOT_PROVEN")
         self.assertFalse(out["can_consume_untouched_arc_eval"])
 
+    def test_g2_bv_and_integer_invariant_originals_native_completely_cover_and_block_repeat(self):
+        s = copy.deepcopy(self.spec)
+        s["strategy"] = "NATIVE_SATURATED_SYGUS_BV64_AND_INTEGER_INV"
+        # Native source proof: 12/12 BV PBE and 11 safe + 1 unsafe
+        # full CHC classification by Z3 Spacer. Model has zero uncovered
+        # capability-only original targets in this exact registered set.
+        result = analyze(s, self.repo)
+        self.assertEqual(result["decision"], "HARD_STOP_REPEAT_CLASS")
+        self.assertFalse(result["spend_authorized"])
+        self.assertEqual(result["Q3_learned_discovery"], "NOT_PROVEN")
+        self.assertFalse(result["can_consume_untouched_arc_eval"])
+        self.assertIn("24/24", result["reason"])
+
     def test_g1_saturated_native_original_family_is_hard_stop_even_with_trained_weights(self):
         s = copy.deepcopy(self.spec)
         s["strategy"] = "OWN_WEIGHT_FIXED_TWO_TOKEN_STRING_AST"
