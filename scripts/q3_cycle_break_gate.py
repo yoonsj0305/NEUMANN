@@ -24,6 +24,7 @@ CLOSED_MECHANISM_CLASSES = {
     "HAND_EXPANDED_FINITE_GRAMMAR": "P2.5/P2.6 and P44/P45: manual H growth is not learned Q3",
     "EASY_CLASSICAL_ROUTE_ONLY": "AM3 12/12 already solved by classical, no learned-only headroom",
     "KNOWN_VERYMAX_OR_SPLIT": "G0 original source UNKNOWN in both branches, subsequent posthoc tuning barred",
+    "OWN_WEIGHT_FIXED_TWO_TOKEN_STRING_AST": "G1 31.5625% heldout synthetic pair composition, but real independent original model 1/5, equal-language complete classical 1/5, real native cvc5 full source grammar independently 8/8. No remaining capability-only headroom in these 8 originals.",
 }
 
 HEX="0123456789abcdef"

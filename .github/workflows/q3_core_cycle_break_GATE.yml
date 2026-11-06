@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - research/q3-root-cause-cycle-break-20261106
+      - research/q3-g1-native-saturation-stop-20261106
     paths:
       - .github/workflows/q3_core_cycle_break_GATE.yml
   workflow_dispatch:
@@ -49,11 +50,41 @@ jobs:
           assert x['can_consume_untouched_arc_eval'] is False
           print('P45_REPEATED_HYPOTHESIS_FAMILY_HARD_STOP_PASS')
           PY
+      - name: Verify actual native-saturated learned AST cannot reenter Q3 experimentation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          Path('/tmp/known_g1.json').write_text(json.dumps({
+           "schema":"neumann.q3.unseen-semantic-proposer-admission.v1",
+           "strategy":"OWN_WEIGHT_FIXED_TWO_TOKEN_STRING_AST",
+           "generator":{"own_weights_trained":True,
+             "typed_executable_AST":True}
+          }))
+          PY
+          set +e
+          python3 scripts/q3_cycle_break_gate.py /tmp/known_g1.json --repo . > Q3-CYCLE-BREAK-G1-NATIVE-SATURATION.json
+          rc=$?
+          set -e
+          test "$rc" = 2
+          python3 - <<'PY'
+          import json
+          v=json.load(open('Q3-CYCLE-BREAK-G1-NATIVE-SATURATION.json'))
+          assert v['decision']=='HARD_STOP_REPEAT_CLASS'
+          assert v['spend_authorized'] is False
+          assert v['Q3_learned_discovery']=='NOT_PROVEN'
+          assert v['can_consume_untouched_arc_eval'] is False
+          print('G1_TRAINED_TWO_TOKEN_AST_NATIVE_8_OF_8_SATURATION_HARD_STOP_PASS')
+          PY
       - name: Preserve original software gate evidence without a capability claim
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: NEUMANN-Q3-CYCLE-BREAK-P45-NEGATIVE-GATE
-          path: Q3-CYCLE-BREAK-P45-NEGATIVE-RECEIPT.json
+          path: |
+            Q3-CYCLE-BREAK-P45-NEGATIVE-RECEIPT.json
+            Q3-CYCLE-BREAK-G1-NATIVE-SATURATION.json
           if-no-files-found: warn
           retention-days: 90
