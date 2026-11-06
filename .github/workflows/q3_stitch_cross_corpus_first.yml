@@ -1,0 +1,66 @@
+name: Q3 EXP2 three independently published target program corpora read-only first
+
+on:
+  pull_request:
+    paths:
+      - 'research/exp2/stitch_cross_corpus.py'
+      - 'docs/experiments/Q3_EXP2_STITCH_CROSS_CORPUS_FIRST_PREREG_2026_11_06.json'
+      - '.github/workflows/q3_stitch_cross_corpus_first.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  cross-original-source-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-EXP2-STITCH-REAL-PUBLISHED-CORPUS-FIRST
+          run-id: 42192798081
+          github-token: ${{ github.token }}
+          path: original-first
+      - name: Lock first-source macro and original metadata before opening target bodies
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '28b8c26ded19028c1779a9a84e2312780bc8f3fc7ec491d292c9673fba037b73  original-first/stitch.stdout' | sha256sum -c -
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('docs/experiments/Q3_EXP2_STITCH_CROSS_CORPUS_FIRST_PREREG_2026_11_06.json').read_text())
+          assert len(p['targets'])==3 and p['actual_run']=='NOT_RUN'
+          for x in p['targets']:
+              assert len(x['git_blob'])==40 and x['bytes']>0
+          print('THREE_TARGET_SOURCE_METADATA_FROZEN_BEFORE_BODY_OPEN')
+          PY
+      - name: Retrieve exact upstream commit; fail closed if target Git blobs changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/author-corpus"
+          git -C "$RUNNER_TEMP/author-corpus" remote add origin https://github.com/mlb2251/stitch.git
+          git -C "$RUNNER_TEMP/author-corpus" fetch --depth=1 origin 350804b7b35807c78bd21c313785ae5152ae2985
+          git -C "$RUNNER_TEMP/author-corpus" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/author-corpus" hash-object data/cogsci/bridge.json)" = 1e3e461faa74e1b9d4f01708d8d875893e08ff60
+          test "$(git -C "$RUNNER_TEMP/author-corpus" hash-object data/cogsci/castle.json)" = 230f9dbe92d5dd428202f9c741071cd93ad668b9
+          test "$(git -C "$RUNNER_TEMP/author-corpus" hash-object data/cogsci/city.json)" = 7dd3319f9cf91f86f1073a7741950738dce29763
+      - name: One first cross-corpus read-only independent AST transfer and negative proof
+        run: python -m research.exp2.stitch_cross_corpus --source-root "$RUNNER_TEMP/author-corpus" --first-stdout original-first/stitch.stdout --out STITCH-EXP2-CROSS-CORPUS-FIRST.json
+      - name: Preserve FIRST, including scientific negatives
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-EXP2-STITCH-THREE-CROSS-CORPUS-FIRST
+          path: STITCH-EXP2-CROSS-CORPUS-FIRST.json
+          if-no-files-found: warn
+          retention-days: 90
