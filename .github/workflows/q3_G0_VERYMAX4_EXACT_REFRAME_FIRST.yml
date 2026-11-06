@@ -1,4 +1,4 @@
-name: NEUMANN Q3 G0 VeryMax four ORIGINAL exact reframe FIRST
+name: NEUMANN Q3 G0 VeryMax original exact reframe first executable after infra abort
 on:
   push:
     branches:
@@ -55,7 +55,7 @@ jobs:
               dest.write_bytes(paths[0].read_bytes())
           print('ALL_FOUR_FULL_ORIGINALS_FROM_MD5_PINNED_EXTERNAL_ARCHIVE')
           PY
-      - name: ORIGINAL FIRST complete four-source matched classical vs exact reframe
+      - name: First executable (prior #42144201913 preflight root path abort preserved)
         shell: bash
         run: |
           set -uo pipefail
@@ -78,7 +78,7 @@ jobs:
             echo 'NO_VALID_FIRST_JSON: source/infrastructure not scientific win'
           fi
           cat G0-VERYMAX4-FIRST.stderr
-          echo "ORIGINAL_FIRST_PROCESS_EXIT=$rc"
+          echo "FIRST_EXECUTABLE_AFTER_INFRA_ABORT_EXIT=$rc"
           exit "$rc"
       - name: Preserve exact first result checksum and source identity
         if: always()
@@ -95,7 +95,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: NEUMANN-Q3-G0-VERYMAX4-ORIGINAL-FIRST
+          name: NEUMANN-Q3-G0-VERYMAX4-FIRST-EXECUTABLE
           path: |
             G0-VERYMAX4-FIRST.json
             G0-VERYMAX4-FIRST.sha256
