@@ -1,0 +1,41 @@
+{
+  "schema": "neumann.q3.g3.array-one-index-quantified-invariant-after-2025-first.v1",
+  "date": "2026-11-06",
+  "registered_source": {
+    "upstream": "chc-comp/chc-comp25-benchmarks",
+    "commit": "ddd279cab0717db6effe69baad451a8eb04ffd86",
+    "first_original_run": 42174775254,
+    "first_array_sha256": "47d2776afe699cccab8dc6d6e4b4f06707522f61e8d3d079c478c5614ed5f8c8",
+    "official_2025_array_8_all_missing_expected_verdict": true,
+    "first_elderica_default_run": 42176459753,
+    "first_elderica_default_array_sha256": "28b1131382f42fef480223d648ef48d4823a979d63ad3e016996628c9a8d58e0",
+    "all_8_default_elapsed_approx_ms": 22000,
+    "result": "8/8 no grounded source program or verdict with default current Eldarica2.3"
+  },
+  "single_physically_grounded_hypothesis": "Array predicates store arbitrarily many indexed elements; ordinary finite scalar interpolants cannot express element-wise properties. Eldarica's documented -arrayQuans:1 introduces exactly one universally quantified index variable for each array argument, supplying a reusable quantified invariant hypothesis space. Freeze this ONE structural mechanism for ALL EIGHT previous sources, not per-task manual rules or many flag sweeps.",
+  "method": {
+    "binary": "Eldarica 2.3 Linux static",
+    "binary_release_sha256": "6815742c34e92d26b379006029eeeb1877757947206b5af9c2f7ff61a5e9440d",
+    "solver_options": [
+      "-arrayQuans:1",
+      "-verifySolutions"
+    ],
+    "source": "Original eight raw .smt2 Git blobs exactly as original 2025 meta manifest, no source or grammar rewrites",
+    "inference_unit": "One immutable original task",
+    "per_source_solver_wall_budget_seconds": 30,
+    "sourcefree_before_original": "Two synthetic known safe/unsafe source-free array/Horn tests must pass and checksum. Positive and negative control, no original target consulted.",
+    "claim_type": "Any sat/unsat is a native expert claim; even -verifySolutions is in-tool checking, not independent external proof, and must not be promoted to NEUMANN learned Q3."
+  },
+  "stop_conditions": {
+    "success_predicate": "At least one previously unlabeled original receives verified internally native verdict AND separate independently checked source witness for mathematical PASS; merely printed sat not independent proof.",
+    "negative_predicate": "0/8 original grounded claims => STOP this single Eldarica-array-index idea; no options sweep on same original cohort.",
+    "all_8_denominator_nonnegotiable": true,
+    "model_training_calls": 0,
+    "new_arc_eval_ids": 0,
+    "Q3": "OPEN",
+    "Q4": "OPEN",
+    "Q6": "OPEN",
+    "Q7": "OPEN"
+  },
+  "cost": "30 seconds configured cap, Python process timeout cap+1 or cap+2 overhead reported separately. All initial methods' non-GPU/wall measured but not comparable 10x learner compute."
+}

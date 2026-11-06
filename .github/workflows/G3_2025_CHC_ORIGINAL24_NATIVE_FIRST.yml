@@ -1,0 +1,127 @@
+name: NEUMANN G3 FIRST 24 CHC-COMP 2025 original Z3 native expert screening
+on:
+  push:
+    branches:
+      - research/q3-g3-2025-chc-native-first-20261106
+    paths:
+      - .github/workflows/G3_2025_CHC_ORIGINAL24_NATIVE_FIRST.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  first-original-source:
+    strategy:
+      fail-fast: false
+      matrix:
+        cohort:
+          - LIA_MULTIPHASE
+          - ARRAY_CHC
+          - ADT_CHC
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Prove EXACT original-24 file selection unchanged after pre-open only typo erratum
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path('docs/experiments/G3_2025_CHCCOMP_24_FIRST_METADATA_PREREG_2026_11_06.json').read_text())
+          e=json.loads(Path('docs/experiments/G3_SOURCEFREE_PREOPEN_ONE_GIT_BLOB_ERRATUM_2026_11_06.json').read_text())
+          p=json.loads(Path('docs/experiments/G3_SOURCEFREE_NATIVE_COMPAT_VERDICT_BEFORE_ORIGINAL24_2026_11_06.json').read_text())
+          assert a['selection']['n_total']==24
+          assert len(a['cohorts'])==3
+          assert all(len(c['targets'])==8 for c in a['cohorts'])
+          assert e['first_scorer_original_cases_executed']==0
+          assert p['first24_source_manifest_unchanged']
+          assert p['first_source_free_success_run']==42174529337
+          assert p['verified']['repo_original_24_contents_opened'] is False
+          assert all(len(v['git_blob'])==40 for c in a['cohorts'] for v in c['targets']
+              if v['file']!=e['exact_single_metadata_transcription_error']['file'])
+          print('G3_ORIGINAL_FIRST_24_METADATA_FREEZE_AND_SOURCEFREE_PASS')
+          PY
+      - name: Install pinned native Z3 CHC specialist and document cvc5 unknown limitation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/g3/chccomp2025_native_first.py
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq z3 cvc5
+          z3 --version
+          cvc5 --version | head -1
+      - name: Synthetic-only Z3 SAT/UNSAT correctness and disjoint pilot checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m research.g3.chccomp2025_native_first --synthetic > G3-FIRST-NATIVE-SOURCEFREE-CONTROLS.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open('G3-FIRST-NATIVE-SOURCEFREE-CONTROLS.json'))
+          assert x['sourcefree_Z3_semantic_controls_pass'] is True
+          assert x['CVC5_safe']['status']=='UNKNOWN' and x['CVC5_unsafe']['status']=='UNKNOWN'
+          print('G3_SOURCES_FREE_NATIVE_TWO_HORN_THEORY_CONTROLS_PASS')
+          PY
+      - name: Actual FIRST original eight in fixed math theory with raw original source SHA and both native receipts
+        shell: bash
+        env:
+          COHORT: ${{ matrix.cohort }}
+        run: |
+          set -uo pipefail
+          python3 -m research.g3.chccomp2025_native_first --cohort "$COHORT" > "G3-$COHORT-NATIVE-ORIGINAL-FIRST.json" 2> "G3-$COHORT-NATIVE-ORIGINAL-FIRST.stderr"
+          rc=$?
+          if test -s "G3-$COHORT-NATIVE-ORIGINAL-FIRST.json"; then
+            python3 - "$COHORT" <<'PY'
+          import json,sys
+          c=sys.argv[1]
+          p='G3-'+c+'-NATIVE-ORIGINAL-FIRST.json'
+          x=json.load(open(p))
+          print(json.dumps({
+            'cohort':c,'scientific_scope':x.get('science_status'),
+            'stats':x.get('stats'),
+            'original_eight_statuses':[{
+             'file':r['file'],
+             'sha':r.get('git_blob'),
+             'status':r['status'],
+             'engines':[(v['engine'],v['status'],v.get('wall_ms')) for v in r.get('native',[])]
+             } for r in x.get('rows',[])],
+            },sort_keys=True))
+          assert x.get('first_original_denominator')==8
+          assert len(x.get('rows',[]))==8
+          assert x['stats']['original_denominator']==8
+          assert x['stats']['student_training_runs']==0
+          assert x['stats']['ARC_public_eval_new_IDs']==0
+          PY
+            valid=$?
+            if test "$valid" -ne 0; then rc=1; fi
+          else
+            rc=1
+          fi
+          cat "G3-$COHORT-NATIVE-ORIGINAL-FIRST.stderr"
+          echo "G3_NATIVE_FIRST_ORIGINAL_EXIT=$rc"
+          exit "$rc"
+      - name: Lock byte-identical original FIRST science even when negative or CI error
+        if: always()
+        shell: bash
+        env:
+          COHORT: ${{ matrix.cohort }}
+        run: |
+          if test -s "G3-$COHORT-NATIVE-ORIGINAL-FIRST.json"; then
+            sha256sum "G3-$COHORT-NATIVE-ORIGINAL-FIRST.json" > "G3-$COHORT-NATIVE-ORIGINAL-FIRST.sha256"
+            cat "G3-$COHORT-NATIVE-ORIGINAL-FIRST.sha256"
+          fi
+      - name: Archive immutable first original cohort, including all failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G3-2025-CHC-${{ matrix.cohort }}-NATIVE-ORIGINAL-FIRST
+          path: |
+            G3-${{ matrix.cohort }}-NATIVE-ORIGINAL-FIRST.json
+            G3-${{ matrix.cohort }}-NATIVE-ORIGINAL-FIRST.sha256
+            G3-${{ matrix.cohort }}-NATIVE-ORIGINAL-FIRST.stderr
+            G3-FIRST-NATIVE-SOURCEFREE-CONTROLS.json
+          if-no-files-found: warn
+          retention-days: 90
