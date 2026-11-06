@@ -64,9 +64,16 @@ def audit(original_first_path:Path):
             proposal={name:{"params":typed_param_map[name],"body":flag}
                       for name in names}
             mutants[flag]=independent_verify_original_chc_sat(whole,proposal,2000)
-        # Rejection is a semantic finding, not mere parsing failure.
-        if any(mutants[x]["verified"] for x in mutants):
-            raise ValueError("G4_FULL_ORIGINAL_CHC_FALSE_MUTANT_UNEXPECTEDLY_ACCEPTED_"+target["file"])
+        # A rejected mutation is a meaningful scientific negative ONLY
+        # with an actual SAT counterexample to some original clause.
+        # A timeout/UNKNOWN, parser error or malformed SMT is NOT an observed
+        # counterexample and must fail closed instead of counting as success.
+        for flag in ("false","true"):
+            checks=mutants[flag].get("independent_checks",[])
+            if mutants[flag].get("verified") or not checks or (
+                checks[-1].get("counterexample")!="sat"):
+                raise ValueError("G4_NEGATIVE_MUTATION_NEEDS_ACTUAL_SOURCE_COUNTEREXAMPLE_"+
+                    target["file"]+"_"+flag)
         rows.append({
            "source_file":target["file"],"source_git_blob":target["git_blob"],
            "original_source_sha256":sha(raw),
@@ -74,8 +81,8 @@ def audit(original_first_path:Path):
            "Horn_original_assertions":len(spec["assertions"]),
            "source_relation_max_arity":max(deg),
            "original_array_sort_argument_slots":arrays,
-           "semantic_false_model_rejected":not mutants["false"]["verified"],
-           "semantic_true_model_rejected":not mutants["true"]["verified"],
+           "semantic_false_model_rejected":mutants["false"]["independent_checks"][-1]["counterexample"]=="sat",
+           "semantic_true_model_rejected":mutants["true"]["independent_checks"][-1]["counterexample"]=="sat",
            "false_model_first_failed_obligation":mutants["false"]["independent_checks"][-1] if mutants["false"]["independent_checks"] else None,
            "true_model_first_failed_obligation":mutants["true"]["independent_checks"][-1] if mutants["true"]["independent_checks"] else None,
            "supported_generic_original_types":True,
