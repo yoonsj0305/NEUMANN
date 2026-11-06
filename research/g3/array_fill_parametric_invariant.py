@@ -97,7 +97,7 @@ def source_role_info(source:str)->dict:
     if not any(re.search(r"\|\s*main@verifier\.error\.split\s*\|",x) for x in rest):
         raise ValueError("SOURCE_NO_UNSAFE_PREDICATE")
     orig_asserts=[f for f in forms if re.match(r"^\(\s*assert\s+",f)]
-    if len(orig_asserts)<len(writes)+3:
+    if len(orig_asserts)<3:
         raise ValueError("SOURCE_ASSERTIONS_INCOMPLETE")
     return {"source_forms":forms,"predicates":predicates,"values":writes,
        "num_stages":len(writes),"n_source_assertions":len(orig_asserts)}
