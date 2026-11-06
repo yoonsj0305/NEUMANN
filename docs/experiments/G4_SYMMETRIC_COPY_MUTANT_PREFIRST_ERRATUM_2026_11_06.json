@@ -1,0 +1,14 @@
+{
+  "schema": "neumann.q3.g4.synthetic-first-pre-proposal-proof-test-erratum.v1",
+  "date": "2026-11-06",
+  "first_workflow_run": 42181015996,
+  "first_workflow_status": "FAILED_AT_MANDATORY_SYNTHETIC_ONLY_SOURCE_VERIFIER_CONTROLS; student training or heldout model scoring NOT RUN, no source targets from CHC-COMP accessed",
+  "scientific_root_cause": "COPY source B[i] <- A[i] has correct relational invariant ∀k<i B[k]=A[k]. First deliberately bad mutant mistakenly chose ∀k<i A[k]=B[k], mathematically EQUIVALENT by symmetry, and the Z3 source checker correctly PROVED both. The test assertion was mathematically false, not an unsound proof engine.",
+  "correction": "Preserve original CI red. In a synthetic source-only test, change fake bad mutant to ADD copy with nonzero source constant 3, requiring B[k]=A[k]+3 while actual copy uses B[k]=A[k], and separately positively assert flipped equality is valid. No training code, model architecture, frozen heldout AST pairs, original source rights or checker modified.",
+  "source_originals_consumed": 0,
+  "expected_after_fix": "All synthetic positive/negative checks pass then first actually executed trained model 10 heldout proof results produced. Report numeric results without faking Q3.",
+  "Q3": "OPEN",
+  "Q4": "OPEN",
+  "Q6": "OPEN",
+  "Q7": "OPEN"
+}
