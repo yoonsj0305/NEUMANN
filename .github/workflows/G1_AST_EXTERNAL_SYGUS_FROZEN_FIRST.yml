@@ -1,0 +1,102 @@
+name: NEUMANN G1 FIRST external 8 SyGuS original own-weight AST vs complete classical
+on:
+  push:
+    branches:
+      - research/g1-first-ownweight-ast-sygus-20261106
+    paths:
+      - .github/workflows/G1_AST_EXTERNAL_SYGUS_FROZEN_FIRST.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  one-original-sygus-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Load V2 checkpoint from synthetic-only run before external original source
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G1-OWNWEIGHT-AST-RESERVED-V2-FREEZE
+          run-id: 42154315193
+          github-token: ${{ github.token }}
+          path: frozen-ownweight
+      - name: Check checkpoint SHA and true held-out AST composition before original source
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo 'ae5e291d525098b05ade6eaaf5be76c5fc432fb20a39306be8b782377e4c1641  frozen-ownweight/G1-SOURCE-FREE-AST-V2-WEIGHTS.json' | sha256sum -c -
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('docs/experiments/G1_OWNWEIGHT_STRING_AST_EXTERNAL_FIRST_PREREG_2026_11_06.json').read_text())
+          m=json.loads(Path('docs/experiments/G1_OWNWEIGHT_AST_V2_FROZEN_BEFORE_EXTERNAL_FIRST_2026_11_06.json').read_text())
+          w=json.loads(Path('frozen-ownweight/G1-SOURCE-FREE-AST-V2-WEIGHTS.json').read_text())
+          assert len(p['external_original']['tasks'])==8
+          assert m['source_free_V2']['weights_sha256']=='ae5e291d525098b05ade6eaaf5be76c5fc432fb20a39306be8b782377e4c1641'
+          assert w['training_distinct_program_pairs']==180
+          assert w['reserved_pair_count']==45
+          assert w['original_external_tasks_accessed']==0
+          print('READY_FOR_ONLY_ONE_EIGHT_TARGET_ORIGINAL_FIRST')
+          PY
+      - name: Run source-free integrity tests before first external target source fetch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet numpy==2.2.6
+          python -m unittest discover -s tests -p test_g1_ownweight_string_ast.py -v
+          python -m unittest discover -s tests -p test_g1_external_sygus_preflight.py -v
+      - name: One and only source first, with BOTH 32-rights arms and full 225 classical
+        shell: bash
+        run: |
+          set -uo pipefail
+          python -m research.g1.first_external_sygus frozen-ownweight/G1-SOURCE-FREE-AST-V2-WEIGHTS.json > G1-EXTERNAL-SYGUS8-ORIGINAL-FIRST.json 2> G1-EXTERNAL-SYGUS8-ORIGINAL-FIRST.stderr
+          rc=$?
+          if test -s G1-EXTERNAL-SYGUS8-ORIGINAL-FIRST.json; then
+            python - <<'PY'
+          import json
+          x=json.load(open('G1-EXTERNAL-SYGUS8-ORIGINAL-FIRST.json'))
+          print(json.dumps({
+             'science':x['science_status'],
+             'first_was_frozen':x.get('one_original_external_FIRST'),
+             'stats':x.get('stats'),
+             'per_task':[
+                 {'name':row['task_file'],'status':row['status'],
+                  'learned_correct':(row.get('learned') or {}).get('correct_original_heldout'),
+                  'classic32_correct':(row.get('classical32') or {}).get('correct_original_heldout'),
+                  'classic225_correct':(row.get('classical225') or {}).get('correct_original_heldout')}
+                  for row in x.get('rows',[])]
+          },sort_keys=True))
+          PY
+          fi
+          cat G1-EXTERNAL-SYGUS8-ORIGINAL-FIRST.stderr
+          echo "G1_FIRST_SCIENTIFIC_OR_INFRA_EXIT=$rc"
+          exit "$rc"
+      - name: Preserve immutable original-first SHA even on scientific failure
+        if: always()
+        shell: bash
+        run: |
+          if test -s G1-EXTERNAL-SYGUS8-ORIGINAL-FIRST.json; then
+            sha256sum G1-EXTERNAL-SYGUS8-ORIGINAL-FIRST.json > G1-EXTERNAL-SYGUS8-ORIGINAL-FIRST.sha256
+            cat G1-EXTERNAL-SYGUS8-ORIGINAL-FIRST.sha256
+          fi
+      - name: Upload first source originals and failure/invalid source records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G1-OWNWEIGHT-SYGUS8-ORIGINAL-FIRST
+          path: |
+            G1-EXTERNAL-SYGUS8-ORIGINAL-FIRST.json
+            G1-EXTERNAL-SYGUS8-ORIGINAL-FIRST.sha256
+            G1-EXTERNAL-SYGUS8-ORIGINAL-FIRST.stderr
+          if-no-files-found: warn
+          retention-days: 90

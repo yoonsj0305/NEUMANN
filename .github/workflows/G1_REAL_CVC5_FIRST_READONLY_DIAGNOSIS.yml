@@ -1,0 +1,42 @@
+name: NEUMANN G1 cvc5 original eight specialist first read-only dialect diagnosis
+on:
+  push:
+    branches:
+      - research/g1-first-ownweight-ast-sygus-20261106
+    paths:
+      - .github/workflows/G1_REAL_CVC5_FIRST_READONLY_DIAGNOSIS.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  diagnose-without-rerun:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G1-REAL-CVC5-SYGUS-POSTFIRST
+          run-id: 42160877103
+          github-token: ${{ github.token }}
+          path: pinned-cvc5-first
+      - name: Strict pinned original SHA, read tool stderr and attempt exit reason
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '6862e598419ab2d3563f1db9ff442aa5b07d0f6bb1a6e43e43e6d7da6de119e3  pinned-cvc5-first/G1-CVC5-REAL-SPECIALIST-POSTFIRST.json' | sha256sum -c -
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('pinned-cvc5-first/G1-CVC5-REAL-SPECIALIST-POSTFIRST.json').read_text())
+          assert len(x['rows'])==8
+          assert x['stats']['independent_original_heldout_verified']==0
+          for r in x['rows']:
+              print(json.dumps({'name':r['name'],
+                  'status':r['status'],
+                  'attempts':(r.get('specialist') or {}).get('attempts',[])},
+                   sort_keys=True))
+          print('NO_SPECIALIST_ORIGINAL_REEXECUTION')
+          PY

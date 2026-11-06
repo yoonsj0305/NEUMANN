@@ -1,0 +1,64 @@
+name: NEUMANN G1 immutable eight external SyGuS original independent audit
+on:
+  push:
+    branches:
+      - research/g1-first-ownweight-ast-sygus-20261106
+    paths:
+      - .github/workflows/G1_SYGUS8_FIRST_INDEPENDENT_READONLY_AUDIT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independently-verify-original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G1-SYGUS8-AFTER-ONE-SHA-ERRATUM
+          run-id: 42155439426
+          github-token: ${{ github.token }}
+          path: original-first
+      - name: Verify original real experiment SHA prior to source access
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '6d9940cefc43d9b8ccb93b375bcaf4ba02690481ca432637e54de28a09bfe8cc  original-first/G1-SYGUS8-AFTER-SHA-ERRATUM-ORIGINAL.json' | sha256sum -c -
+      - name: Independently re-fetch eight exact external authors' originals and verify source, program semantics and final gold
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m research.g1.independent_original_sygus_readonly original-first/G1-SYGUS8-AFTER-SHA-ERRATUM-ORIGINAL.json > G1-SYGUS8-INDEPENDENT-READONLY-AUDIT.json
+          cat G1-SYGUS8-INDEPENDENT-READONLY-AUDIT.json
+      - name: Favorably edited first original result can never become a pass
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          from research.g1.independent_original_sygus_readonly import audit
+          p=Path('original-first/G1-SYGUS8-AFTER-SHA-ERRATUM-ORIGINAL.json')
+          obj=json.loads(p.read_text())
+          obj['science_status']='SCOPED_LEARNED_CROSS_AUTHOR_AST_TRANSFER_PASS'
+          obj['stats']['learned_original_heldout_correct']=8
+          q=Path('/tmp/FORGED_G1_SCIENCE.json')
+          q.write_text(json.dumps(obj))
+          a=audit(q)
+          assert not a['audit_pass'],a
+          assert 'FROZEN_FIRST_JSON_SHA_MISMATCH' in a['errors'],a
+          assert 'UNAUTHORIZED_FIRST_SCIENCE_PROMOTION' in a['errors'],a
+          assert 'FROZEN_AGGREGATE_CORRECTNESS_DRIFT' in a['errors'],a
+          print('FAVORABLE_EXTERNAL_SYGUS_FIRST_FORGERY_REJECTED')
+          PY
+      - name: Retain read-only independently scored external source audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G1-OWNWEIGHT-EXTERNAL-SYGUS8-INDEPENDENT-AUDIT
+          path: G1-SYGUS8-INDEPENDENT-READONLY-AUDIT.json
+          if-no-files-found: warn
+          retention-days: 90

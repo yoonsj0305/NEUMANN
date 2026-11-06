@@ -1,0 +1,52 @@
+{
+  "schema": "neumann.g1.external-sygus1-to-sygus2-official-converter-specialist-postfirst.v1",
+  "date": "2026-11-06",
+  "question": "After *published* official semantics-preserving SyGuS-IF v1→v2 conversion, does real cvc5 1.1.2 solve and independently verify the frozen eight original benchmarks where NEUMANN own-weight student achieved 1/5?",
+  "previous_first": {
+    "real_specialist_run": 42160877103,
+    "original_receipt_sha256": "6862e598419ab2d3563f1db9ff442aa5b07d0f6bb1a6e43e43e6d7da6de119e3",
+    "parser_diagnostic_run": 42161153565,
+    "actual_reason": "--lang=sygus1 unsupported; --lang=sygus2 fails at original SyGuS1 missing grammar predeclaration, not a solver inability",
+    "original_successful_synthesis": 0,
+    "all_original_task_bodies_exposed": true
+  },
+  "official_converter": {
+    "repo": "SyGuS-Org/tools",
+    "commit": "9f5cc084b77ce172a22c646dc54528b639ffb139",
+    "entrypoint": "python -m sygus.bin.convert -s 1 -t 2",
+    "requirements": "ply==3.11 pyparsing==2.4.7",
+    "source": "https://github.com/SyGuS-Org/tools",
+    "syntax_only": true,
+    "convert_training_constraints_only": true
+  },
+  "originals": {
+    "repo": "SyGuS-Org/benchmarks",
+    "commit": "13c8deb68a873635879c9a69bc78caebd340f646",
+    "existing_frozen_manifest": "docs/experiments/G1_OWNWEIGHT_STRING_AST_EXTERNAL_FIRST_PREREG_2026_11_06.json",
+    "original_n": 8,
+    "source_metadata_erratum": "docs/experiments/G1_EXTERNAL_SYGUS_FIRST_METADATA_SHA_ERRATUM_2026_11_06.json"
+  },
+  "synthesis": {
+    "solver": "apt cvc5",
+    "expected_version": "1.1.2",
+    "per_case_timeout_sec": 12,
+    "language": "sygus2",
+    "source_grammar": "exact published original grammar converted by official syntax transformer",
+    "data_rights": "original TRAIN constraints only; final original constraint completely removed before converter and solver access",
+    "validation": "test candidate on all original TRAIN and final withheld original constraint via fresh SMT ground checks. No candidate = UNKNOWN, never conclude impossible"
+  },
+  "source_conservation_controls": [
+    "all eight exact original source Git blobs verified",
+    "original grammar full nonterminal rules carried through official converter with predeclaration added",
+    "converted source contains exactly n-1 source constraints with same literal argument/output pairs",
+    "last original constraint unavailable to converter, learned model or synthesizer",
+    "last gold only used in independent post-synthesis validator",
+    "no weights retrained, no new original targets, no new ARC evaluation consumption"
+  ],
+  "admission": "Only original heldout ground-verified cvc5 solution counts. Any non-positive result due to unsupported parser/timeout is NOT evidence of neural superiority.",
+  "scientific_scope": "posthoc already-opened stronger specialist baseline, not first-unseen Q3 learned discovery, not equal-rights 10x cost",
+  "Q3": "OPEN",
+  "Q4": "OPEN",
+  "Q6": "OPEN",
+  "Q7": "OPEN"
+}
