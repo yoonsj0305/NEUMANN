@@ -1,0 +1,78 @@
+name: NEUMANN G2 post-FIRST two analytic invariants and one unsafe original proof
+on:
+  push:
+    branches:
+      - research/q3-g2-native-residual-two-formalisms-20261106
+    paths:
+      - .github/workflows/G2_THREE_ORIGINAL_ANALYTIC_UNSAT_SAT_PROOFS.yml
+permissions:
+  contents: read
+jobs:
+  original-mathematical-theorems:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install SMT checker, never a new SyGuS model training/synthesis run
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq cvc5
+          cvc5 --version | head -1
+      - name: Freeze all three exact after-FIRST hypotheses and Git blob provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('docs/experiments/G2_POSTFIRST_THREE_SOURCE_ANALYTIC_PROOFS_CONTRACT_2026_11_06.json').read_text())
+          assert p['source_provenance']['original_first_native_inv_sha256' if 'original_first_native_inv_sha256' in p['source_provenance'] else 'first_native_inv_sha256']=='df7486f738cc47aa59b3fc91569ca73ccebb53da0b06ad4892c8f74e16d96229'
+          assert [x['file'] for x in p['manual_analytic_proposals']]==['fib_19.sl','gcnr_tacas08.sl','jmbl_matrix2.sl']
+          assert all(len(x['source_git_blob'])==40 for x in p['manual_analytic_proposals'])
+          print('ANALYST_HYPOTHESES_PINNED_SOURCE_ONLY_NOT_OWN_WEIGHT')
+          PY
+      - name: Verify original source counterexample-UNSAT invariants and unsafe one-step SAT, all independent
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m research.g2.postfirst_three_analytic_source_proofs > G2-THREE-POSTFIRST-ORIGINAL-ANALYTIC-PROOFS.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open('G2-THREE-POSTFIRST-ORIGINAL-ANALYTIC-PROOFS.json'))
+          print(json.dumps({
+            'audit_pass':x['audit_pass'],
+            'proof_of_two_timedout_sources':x['two_previous_native_12s_timeouts_universally_proven'],
+            'proof_of_prior_source_unsafe':x['previous_native_infeasible_original_one_step_unsafe_proven'],
+            'all_12_orig_mathematically_classified':x['all_original_12_mathematically_classified_if_pass'],
+            'cases':[{'name':r['file'],'correct_original_math_proof':r['proof_success'],
+              'hypothesis_class':r['hypothesis_type'],
+              'proof':r['independent_result']} for r in x['cases']]
+           },sort_keys=True))
+          assert x['audit_pass'] is True
+          assert x['two_previous_native_12s_timeouts_universally_proven']==2
+          assert x['previous_native_infeasible_original_one_step_unsafe_proven'] is True
+          assert x['all_original_12_mathematically_classified_if_pass'] is True
+          assert x['no_new_arc_eval_originals_used'] is True
+          PY
+      - name: SHA and preserve original analytical proof, even if any original obligation fails
+        if: always()
+        shell: bash
+        run: |
+          if test -s G2-THREE-POSTFIRST-ORIGINAL-ANALYTIC-PROOFS.json; then
+            sha256sum G2-THREE-POSTFIRST-ORIGINAL-ANALYTIC-PROOFS.json > G2-THREE-POSTFIRST-ORIGINAL-ANALYTIC-PROOFS.sha256
+            cat G2-THREE-POSTFIRST-ORIGINAL-ANALYTIC-PROOFS.sha256
+          fi
+      - name: Archive original mathematical proof or immutable failed hypothesis
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G2-THREE-POSTFIRST-ANALYTIC-SOURCE-PROOFS
+          path: |
+            G2-THREE-POSTFIRST-ORIGINAL-ANALYTIC-PROOFS.json
+            G2-THREE-POSTFIRST-ORIGINAL-ANALYTIC-PROOFS.sha256
+          if-no-files-found: warn
+          retention-days: 90
