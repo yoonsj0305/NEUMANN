@@ -1,0 +1,61 @@
+name: Q3 source-free afterfirst semantic congruence for all arrays/indices
+
+on:
+  pull_request:
+    paths:
+      - 'research/q3/collision_allindex_semantic_readonly.py'
+      - '.github/workflows/q3_collision_allindex_semantic_readonly.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  allindex-sourcefree-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Independent Z3 source-free semantic congruence oracle
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y z3
+          z3 --version
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-Q3-CEGAR-REPAIR-GROWER-ORIGINAL-FIRST
+          run-id: 42204120156
+          github-token: ${{ github.token }}
+          path: original-8-FIRST
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-Q3-SEMANTIC-CANCELLATION-ORIGINAL-FIRST
+          run-id: 42204887589
+          github-token: ${{ github.token }}
+          path: original-6-FIRST
+      - name: Retain first SHA and independent verifier code
+        run: |
+          set -euo pipefail
+          echo 'c05a039ecb371279de66714bafcd1a5b6c05ebc18d7477ce4c77f302d9e21127  original-8-FIRST/Q3-COUNTEREXAMPLE-REPRESENTATION-FIRST.json' | sha256sum -c -
+          python -m py_compile research/q3/collision_allindex_semantic_readonly.py
+      - name: Test original first 14 opened symbolic cases using stronger all-source-all-index model checker
+        run: |
+          /usr/bin/time -f 'AFTERFIRST_EXACT_SEMANTIC_AUDIT_WALL_S=%e MAX_RSS_KB=%M' \
+            python -m research.q3.collision_allindex_semantic_readonly \
+              --original-learned-first original-8-FIRST/Q3-COUNTEREXAMPLE-REPRESENTATION-FIRST.json \
+              --original-adversarial-first original-6-FIRST/Q3-CEX-SEMANTIC-CANCELLATION-ORIGINAL-FIRST.json \
+              --out Q3-EXACT-ALLINDEX-CONGRUENCE-AFTERFIRST.json
+      - name: Preserve exact first audit and potential verifier disagreement
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-EXACT-H0-CONGRUENCE-READONLY-AUDIT
+          path: Q3-EXACT-ALLINDEX-CONGRUENCE-AFTERFIRST.json
+          if-no-files-found: warn
+          retention-days: 90
