@@ -1,0 +1,42 @@
+name: NEUMANN G4 independent original CHC all-clause typed SAT witness proof (SOURCEFREE)
+on:
+  push:
+    branches:
+      - research/q3-g4-ownweight-array-lemma-proof-interface-20261106
+    paths:
+      - .github/workflows/G4_GENERIC_CHC_SOURCEFREE_INDEPENDENT_SAT_PROOF.yml
+permissions:
+  contents: read
+jobs:
+  true-typed-horn-proof-without-reserved-originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Source-only independent checker compile before any original access
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile research/g4/generic_chc_independent_proof.py
+          python -m pip install -q 'z3-solver==4.13.3.0'
+      - name: Prove complete original-source Horn clauses with typed array quantified invariant and reject false witnesses
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p test_q3_g4_original_chc_independent_proof.py -v
+          python - <<'PY'
+          from research.g4.generic_chc_independent_proof import independent_verify_original_chc_sat
+          from tests.test_q3_g4_original_chc_independent_proof import FILL_HORN,FILL_REL
+          x=independent_verify_original_chc_sat(FILL_HORN,FILL_REL)
+          assert x['verified']
+          assert x['original_assertion_count']==4
+          assert x['original_CHC_assertions_untouched'] is True
+          assert x['this_is_only_a_CHC_SAT_witness'] is True
+          print('SOURCE_FREE_TYPED_CHC_INDEPENDENT_ALL_FOUR_CLAUSES_PROVED_UNSAT_ON_NEGATION')
+          print('RESERVED_2025_REAL_ARRAY_CHC_TASKS_NOT_ACCESSED')
+          PY
