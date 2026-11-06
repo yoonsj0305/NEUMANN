@@ -42,7 +42,7 @@ def label_from_yml(raw:bytes,original:str)->str:
   if listed!=[original]:raise ValueError("OFFICIAL_METADATA_TASK_NAME_NOT_MATCHING_SOURCE")
   if len(specified)>1:raise ValueError("DUPLICATE_ORIGINAL_EXPECTED_VERDICT")
   x=specified[0].lower() if specified else "ABSENT_NO_SOLVER_SUCCESS_REPORTED_IN_2025"
-  if x not in ("true","false","inconsistent","ABSENT_NO_SOLVER_SUCCESS_REPORTED_IN_2025".lower()):
+  if x not in ("true","false","inconsistent","ABSENT_NO_SOLVER_SUCCESS_REPORTED_IN_2025"):
      raise ValueError("UNKNOWN_PUBLISHED_EXPECTED_VERDICT")
   return x
 
