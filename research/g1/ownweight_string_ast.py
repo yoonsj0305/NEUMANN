@@ -122,11 +122,20 @@ def sample_input(rng: random.Random, style: int) -> str:
     return a + " " + b + str(rng.randint(10, 99))
 
 
-def synthetic_task(rng: random.Random) -> tuple[list[tuple[str,str]],tuple[int,int],tuple[str,str]]:
-    # The *code sequence* is sampled by grammar. The model must learn to
-    # produce its TWO tokens for new input/output examples, not whole IDs.
-    left = rng.randrange(ATOM_COUNT)
-    right = rng.randrange(ATOM_COUNT)
+def reserved_pair(pair: tuple[int,int]) -> bool:
+    # Roughly one fifth of possible AST compositions NEVER occur in TRAIN.
+    # A true compositional novelty target must generate a held-out PAIR.
+    return (pair[0]+3*pair[1])%5==0
+
+
+def synthetic_task(rng: random.Random, split: str="train") -> tuple[list[tuple[str,str]],tuple[int,int],tuple[str,str]]:
+    if split not in ("train","reserved"):
+        raise ValueError("UNKNOWN_SYNTHETIC_SPLIT")
+    while True:
+        left = rng.randrange(ATOM_COUNT)
+        right = rng.randrange(ATOM_COUNT)
+        if reserved_pair((left,right))==(split=="reserved"):
+            break
     style = rng.randrange(6)
     xs = [sample_input(rng, style) for _ in range(4)]
     pair = (left, right)
@@ -135,12 +144,12 @@ def synthetic_task(rng: random.Random) -> tuple[list[tuple[str,str]],tuple[int,i
     return train,pair,heldout
 
 
-def make_data(n:int, rng: random.Random):
+def make_data(n:int, rng: random.Random, split: str='train'):
     X=np.empty((n,ATOM_COUNT*6+6),dtype=np.float64)
     Y=np.empty((n,2),dtype=np.int64)
     examples=[]
     for i in range(n):
-        train, ast, heldout=synthetic_task(rng)
+        train, ast, heldout=synthetic_task(rng,split)
         X[i]=features(train)
         Y[i]=ast
         examples.append((train,heldout))
@@ -165,7 +174,7 @@ def topk(weights: dict[str,Any], x:np.ndarray, max_pairs=32)->list[tuple[int,int
 def train(out:Path)->dict[str,Any]:
     rng=random.Random(TRAIN_SEED)
     X,Y,_=make_data(N_TRAIN,rng)
-    validX,validY,_=make_data(N_VALID,rng)
+    validX,validY,_=make_data(N_VALID,rng,'reserved')
     mean=np.mean(X,axis=0)
     std=np.maximum(np.std(X,axis=0),0.05)
     normalized=np.clip((X-mean)/std,-6,6)
@@ -197,7 +206,7 @@ def train(out:Path)->dict[str,Any]:
         w-=lr*(mw/(1-beta1**step))/(np.sqrt(vw/(1-beta2**step))+1e-8)
         bias-=lr*(mb/(1-beta1**step))/(np.sqrt(vb/(1-beta2**step))+1e-8)
     weights={
-        "schema":"neumann.g1.ownweight-two-token-string-ast-checkpoint.v1",
+        "schema":"neumann.g1.ownweight-two-token-string-ast-checkpoint.v2",
         "seed":TRAIN_SEED,"train_tasks":N_TRAIN,"validation_tasks":N_VALID,
         "gradient_steps":STEPS,
         "atoms":list(ATOMS),
@@ -205,6 +214,9 @@ def train(out:Path)->dict[str,Any]:
         "weights":w.round(9).tolist(),"bias":bias.round(9).tolist(),
         "mean":mean.round(9).tolist(),"std":std.round(9).tolist(),
         "trained_programs_count":N_TRAIN,
+        "training_program_pairs_reserved_rule":"(left+3*right)%5!=0",
+        "training_distinct_program_pairs":len({tuple(p) for p in Y.tolist()}),
+        "reserved_pair_count":sum(reserved_pair((a,b)) for a in range(ATOM_COUNT) for b in range(ATOM_COUNT)),
         "original_external_tasks_accessed":0,
         "whole_program_label_classifier":False,
         "model_generates_two_independently_parameterized_AST_tokens":True
@@ -222,6 +234,12 @@ def train(out:Path)->dict[str,Any]:
         "model_seed":TRAIN_SEED,
         "training_tasks":N_TRAIN,"validation_tasks":N_VALID,
         "validation_token_accuracy":validation_position_accuracy,
+        "validation_entire_AST_accuracy":float(np.mean([
+            tuple(topk(weights,validX[i],1)[0])==tuple(int(t) for t in validY[i])
+            for i in range(N_VALID)
+        ])),
+        "training_distinct_program_pairs":weights["training_distinct_program_pairs"],
+        "reserved_pair_count":weights["reserved_pair_count"],
         "checkpoint_size_bytes":len(data),
         "external_targets_opened":0
     }
