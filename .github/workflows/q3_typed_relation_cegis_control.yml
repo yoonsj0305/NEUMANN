@@ -1,0 +1,57 @@
+name: Q3 typed relational CEGIS strong-classical source-free control
+
+on:
+  pull_request:
+    paths:
+      - 'research/q3/typed_relation_cegis_classical_control.py'
+      - 'tests/test_typed_relation_cegis_classical_control.py'
+      - '.github/workflows/q3_typed_relation_cegis_control.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-free-classical-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Install independent SMT checker
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq z3
+          z3 --version
+      - name: Pure Python contracts and fail-closed safeguards
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q3/typed_relation_cegis_classical_control.py
+          python3 -m unittest tests/test_typed_relation_cegis_classical_control.py -v
+      - name: Run three distinct source-free relational CEGIS controls
+        run: |
+          set -euo pipefail
+          python3 -m research.q3.typed_relation_cegis_classical_control --out TYPED-CEGIS-FIRST
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('TYPED-CEGIS-FIRST/classical_control.json').read_text())
+          assert r['task_count']==3 and r['classical_proofs']==3, r
+          assert all(x['H0_collision'] for x in r['cases'])
+          assert all(x['proof_status']=='unsat' and x['mutant_status']=='sat' for x in r['cases'])
+          assert not r['trained_model_used'] and r['grammar_human_designed']
+          assert not r['original_external_CHC_checked'] and not r['cross_formalism_transfer']
+          assert r['Q3']==r['Q4']==r['Q6']==r['Q7']=='OPEN'
+          print('CLASSICAL_SOURCE_FREE_TYPED_RELATIONAL_SYNTHESIS_PROVED_3_OF_3')
+          PY
+      - name: Preserve actual first control receipts, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-RELATIONAL-CEGIS-CLASSICAL-CONTROL
+          path: TYPED-CEGIS-FIRST/
+          retention-days: 90
+          if-no-files-found: warn
