@@ -1,0 +1,55 @@
+name: NEUMANN G1 official SyGuS1 to 2 converter SYNTHETIC-ONLY toolchain gate
+on:
+  push:
+    branches:
+      - research/g1-first-ownweight-ast-sygus-20261106
+    paths:
+      - .github/workflows/G1_OFFICIAL_SYGUS_FORMAT_TOOLCHAIN_PREFLIGHT.yml
+permissions:
+  contents: read
+jobs:
+  format-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install pinned original SyGuS-Org converter and real specialist (NO original target files)
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq cvc5
+          python3 -m pip install --user --quiet 'ply==3.11' 'pyparsing==2.4.7'
+          git init "$RUNNER_TEMP/sygus-tools"
+          git -C "$RUNNER_TEMP/sygus-tools" remote add origin https://github.com/SyGuS-Org/tools.git
+          git -C "$RUNNER_TEMP/sygus-tools" fetch --depth=1 origin 9f5cc084b77ce172a22c646dc54528b639ffb139
+          git -C "$RUNNER_TEMP/sygus-tools" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/sygus-tools" rev-parse HEAD)" = '9f5cc084b77ce172a22c646dc54528b639ffb139'
+          cvc5 --version | head -1
+      - name: Convert one completely synthetic original-dialect string example, verify by actual cvc5
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/SYNTHETIC-ORIGINAL-SYGUS1.sl" <<'EOF'
+          (set-logic SLIA)
+          (synth-fun f ((name String)) String
+            ((Start String (ntString))
+             (ntString String (name " " (str.++ ntString ntString)))))
+          (declare-var name String)
+          (constraint (= (f "Kara") "Kara"))
+          (constraint (= (f "Mina") "Mina"))
+          (check-synth)
+          EOF
+          export PYTHONPATH="$RUNNER_TEMP/sygus-tools"
+          python3 -m sygus.bin.convert -s 1 -t 2 "$RUNNER_TEMP/SYNTHETIC-ORIGINAL-SYGUS1.sl" > "$RUNNER_TEMP/SYNTHETIC-CONVERTED-SYGUS2.sl"
+          echo 'OFFICIAL_CONVERTER_OUTPUT'
+          cat "$RUNNER_TEMP/SYNTHETIC-CONVERTED-SYGUS2.sl"
+          grep -q '(check-synth)' "$RUNNER_TEMP/SYNTHETIC-CONVERTED-SYGUS2.sl"
+          grep -q '(synth-fun f ' "$RUNNER_TEMP/SYNTHETIC-CONVERTED-SYGUS2.sl"
+          cvc5 --lang=sygus2 --sygus --tlimit-per=5000 "$RUNNER_TEMP/SYNTHETIC-CONVERTED-SYGUS2.sl" > "$RUNNER_TEMP/CVC5-SYNTHETIC-SOLUTION.txt" 2> "$RUNNER_TEMP/CVC5-SYNTHETIC.stderr"
+          cat "$RUNNER_TEMP/CVC5-SYNTHETIC-SOLUTION.txt"
+          test ! -s "$RUNNER_TEMP/CVC5-SYNTHETIC.stderr" || cat "$RUNNER_TEMP/CVC5-SYNTHETIC.stderr"
+          grep -q 'define-fun f' "$RUNNER_TEMP/CVC5-SYNTHETIC-SOLUTION.txt"
+          echo 'REAL_SPECIALIST_SYNTHETIC_CONVERTER_AND_PROGRAM_PASS'
