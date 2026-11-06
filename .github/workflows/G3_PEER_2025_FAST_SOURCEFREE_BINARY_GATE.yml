@@ -1,0 +1,90 @@
+name: NEUMANN G3 fast 2025 native binary exact SHA and SAT UNSAT preflight
+on:
+  push:
+    branches:
+      - research/q3-g3-2025-chc-native-first-20261106
+    paths:
+      - .github/workflows/G3_PEER_2025_FAST_SOURCEFREE_BINARY_GATE.yml
+permissions:
+  contents: read
+jobs:
+  native-actual-2025-preflight:
+    strategy:
+      fail-fast: false
+      matrix:
+        specialist:
+          - golem
+          - eldarica
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Extract ONLY the actual solver binary (no regression suite)
+        shell: bash
+        env:
+          SPECIALIST: ${{ matrix.specialist }}
+        run: |
+          set -euo pipefail
+          if test "$SPECIALIST" = golem; then
+            curl --fail --silent --show-error --location --retry 3 --max-time 90 \
+              --output "$RUNNER_TEMP/golem.tar.bz2" \
+              https://github.com/usi-verification-and-security/golem/releases/download/v0.7.1/golem-x64-linux.tar.bz2
+            echo '5ce28dd6f60c70ef68d1a1fd563cb6bd442a79618e1b9826c34c34e17899d82d  '  >/dev/null
+            echo "5ce28dd6f60c70ef68d1a1fd563cb6bd442a79618e1b9826c34c34e17899d82d  $RUNNER_TEMP/golem.tar.bz2" | sha256sum -c -
+            tar -xjf "$RUNNER_TEMP/golem.tar.bz2" -C "$RUNNER_TEMP"
+            chmod +x "$RUNNER_TEMP/golem"
+            echo "SOLVER_BIN=$RUNNER_TEMP/golem" >> "$GITHUB_ENV"
+          else
+            curl --fail --silent --show-error --location --retry 3 --max-time 120 \
+              --output "$RUNNER_TEMP/eldarica.zip" \
+              https://github.com/uuverifiers/eldarica/releases/download/v2.2/eldarica-bin-2.2.zip
+            echo "5b35abf7a8b0a29a048c64e1045a27e7d61196ec9c1d3e869b0dc9caf21746b6  $RUNNER_TEMP/eldarica.zip" | sha256sum -c -
+            unzip -p "$RUNNER_TEMP/eldarica.zip" \
+              eldarica-2.2/target/scala-2.11/Eldarica-assembly-2.2.jar > "$RUNNER_TEMP/eldarica-2.2.jar"
+            test -s "$RUNNER_TEMP/eldarica-2.2.jar"
+            echo "ELDARICA_JAR=$RUNNER_TEMP/eldarica-2.2.jar" >> "$GITHUB_ENV"
+          fi
+      - name: Real safe and unsafe synthetic CHC source-free correctness
+        shell: bash
+        env:
+          SPECIALIST: ${{ matrix.specialist }}
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/SAFE-original-free.smt2" <<'EOF'
+          (set-logic HORN)
+          (declare-fun Inv (Int) Bool)
+          (assert (forall ((x Int)) (=> (= x 0) (Inv x))))
+          (assert (forall ((x Int) (y Int)) (=> (and (Inv x) (= y (+ x 1))) (Inv y))))
+          (assert (forall ((x Int)) (=> (and (Inv x) (< x 0)) false)))
+          (check-sat)
+          EOF
+          sed 's/(< x 0)/(> x 0)/' "$RUNNER_TEMP/SAFE-original-free.smt2" > "$RUNNER_TEMP/UNSAFE-original-free.smt2"
+          for kind in SAFE UNSAFE; do
+            if test "$SPECIALIST" = golem; then
+              timeout 12 "$SOLVER_BIN" -l QF_LIA --input "$RUNNER_TEMP/$kind-original-free.smt2" > "G3-PEER-$kind.log" 2>&1 || echo "$kind EXIT=$?"
+            else
+              timeout 12 java -jar "$ELDARICA_JAR" "$RUNNER_TEMP/$kind-original-free.smt2" > "G3-PEER-$kind.log" 2>&1 || echo "$kind EXIT=$?"
+            fi
+            echo "ACTUAL_2025_COMPETITION_SPECIALIST=$SPECIALIST TEST=$kind"
+            tail -25 "G3-PEER-$kind.log"
+          done
+          python3 - <<'PY'
+          from pathlib import Path
+          a=Path('G3-PEER-SAFE.log').read_text().splitlines()
+          b=Path('G3-PEER-UNSAFE.log').read_text().splitlines()
+          print('REAL_2025_NATIVE_EXACT_SAFE_TOKENS',a[-8:])
+          print('REAL_2025_NATIVE_EXACT_UNSAFE_TOKENS',b[-8:])
+          assert any(x.strip().lower()=='sat' for x in a),a[-12:]
+          assert any(x.strip().lower()=='unsat' for x in b),b[-12:]
+          print('REAL_2025_SPECIALIST_SOURCEFREE_SAFE_UNSAFE_VERIFIED')
+          PY
+      - name: Preserve source-free real 2025 binary outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G3-2025-FAST-${{ matrix.specialist }}-SOURCEFREE
+          path: G3-PEER-*.log
+          if-no-files-found: warn
+          retention-days: 90
