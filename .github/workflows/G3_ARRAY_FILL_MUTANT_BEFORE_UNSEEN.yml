@@ -1,0 +1,81 @@
+name: NEUMANN G3 array-fill one-rule independent mutant source-prover gate
+on:
+  push:
+    branches:
+      - research/g3-array-init-parametric-proof-transfer-20261106
+    paths:
+      - .github/workflows/G3_ARRAY_FILL_MUTANT_BEFORE_UNSEEN.yml
+permissions:
+  contents: read
+jobs:
+  source-locked-negative-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Lock pre-unseen source generator Git SHA, never load heldout original source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object research/g3/array_fill_parametric_invariant.py)" = 8043d84210822f9a47d78568c25ea97cb0c175dd
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('docs/experiments/G3_ARRAY_INIT_ALGORITHM_SHA_AND_MUTANT_FIRST_FREEZE_2026_11_06.json').read_text())
+          assert x['frozen_source']['git_blob']=='8043d84210822f9a47d78568c25ea97cb0c175dd'
+          assert x['development_proofs']=={'stage4':13,'stage6':17,'stage7':19}
+          assert x['development_only_run']==42177964703
+          print('FROZEN_ONE_RULE_BEFORE_UNSEEN_N5_N8_N9_FIRST')
+          PY
+      - name: Install SMT independent checker
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq z3
+      - name: A corrupted middle stage MUST be refuted by SAT of an original CHC implication counterexample
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          from research.g3.array_fill_parametric_invariant import source,solution_from_original,prove_each
+          name='standard_init4_true-unreach-call_ground_000.smt2'
+          original=source(name,'174d192924d11f0863bbb28466613b72f825a962').decode()
+          mutant=solution_from_original(original,stage_mutant=1)
+          p=prove_each(mutant,7)
+          print('BAD_RULE_FIRST_NONPROOF',json.dumps(p['first_nonproof'],sort_keys=True))
+          print('BAD_RULE_ORIGINAL_CLAUSES',p['total_original_clauses'])
+          assert p['all_original_clauses_proven'] is False
+          assert p['first_nonproof'] is not None
+          assert p['first_nonproof']['status']=='SAT_COUNTEREXAMPLE',p['first_nonproof']
+          out={'schema':'neumann.g3.array-one-rule-before-heldout-mutant.v1',
+            'mutant_source':'already opened standard_init4 original only',
+            'frozen_original_clause_count':13,
+            'mutant_stage':1,'mutant_new_value_plus':17,
+            'mutant_accepted':False,
+            'independently_observed_actual_original_source_counterexample':True,
+            'failed_original_clause_index':p['first_nonproof']['original_clause_index'],
+            'no_blind_heldout_sources_opened':True,
+            'Q3':'OPEN','Q4':'OPEN','Q6':'OPEN','Q7':'OPEN'}
+          Path('G3-ARRAY-ONE-RULE-MUTANT-NEGATIVE-CONTROL.json').write_text(json.dumps(out,indent=2,sort_keys=True)+'\n')
+          print('ONE_RULE_ORIGINAL_SOURCE_MUTANT_REFUTED_BY_SMT_SAT')
+          PY
+      - name: SHA and archive strict actual counterexample evidence
+        if: always()
+        shell: bash
+        run: |
+          if test -s G3-ARRAY-ONE-RULE-MUTANT-NEGATIVE-CONTROL.json; then
+            sha256sum G3-ARRAY-ONE-RULE-MUTANT-NEGATIVE-CONTROL.json
+          fi
+      - name: Archive proof gate without heldout source evaluation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G3-ARRAY-ONE-RULE-MUTANT-BEFORE-UNSEEN
+          path: G3-ARRAY-ONE-RULE-MUTANT-NEGATIVE-CONTROL.json
+          if-no-files-found: warn
+          retention-days: 90

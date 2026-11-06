@@ -1,0 +1,55 @@
+{
+  "schema": "neumann.g3.array-fill-unseen-first-postfirst-native-baseline-cost.v1",
+  "date": "2026-11-06",
+  "frozen_unseen_first": {
+    "run": 42178462607,
+    "receipt_sha256": "86cc31057e2fe96c412d39b5ff395ecde03aef9990df0df30ec63be6091c883a",
+    "original_n": 3,
+    "solved_original_clauses": 59,
+    "generator_git_blob": "8043d84210822f9a47d78568c25ea97cb0c175dd",
+    "family_stages": [
+      5,
+      8,
+      9
+    ]
+  },
+  "reference_formula_theorem": {
+    "run": 42179034835,
+    "SMT_theorem_receipt_sha256": "9943b9447993ade35a823bfdfd7e9b2febac382ec8ffae361674cfa9ca4388ed",
+    "five_symbolic_unsat": true,
+    "two_sat_controls": true
+  },
+  "specialist_baselines": {
+    "z3_ubuntu_apt": {
+      "version": "Ubuntu apt on GitHub Actions, print exact; expected Z3 4.8.12",
+      "original_source_rights": "full original CHC",
+      "cap_seconds_per_original": 15
+    },
+    "eldarica": {
+      "release": "uuverifiers/eldarica@v2.3 Linux static",
+      "url": "https://github.com/uuverifiers/eldarica/releases/download/v2.3/eldarica-x86-linux-static.gz",
+      "sha256": "6815742c34e92d26b379006029eeeb1877757947206b5af9c2f7ff61a5e9440d",
+      "original_source_rights": "full original CHC",
+      "cap_seconds_per_original": 20
+    },
+    "target_n_3_exact": [
+      "standard_init5_true-unreach-call_ground_000.smt2",
+      "standard_init8_true-unreach-call_ground_000.smt2",
+      "standard_init9_true-unreach-call_ground_000.smt2"
+    ],
+    "controls": "On entirely synthetic HORN safe and unsafe cases, each native engine MUST produce SAT and UNSAT respectively before original scoring. Wrong solver result/syntax is infrastructure failure and doesn't count as hard benchmark.",
+    "protocol": "Run both on byte-identical published original source with exact SHA and 0 changes. Preserve time, verdict/timeout, per-solver stderr and native original stdout. Do not modify first generator proof. Record all 3 originals, including native successes."
+  },
+  "cost_definition": {
+    "per_instance_new_method": "frozen original structural Python generator and independent Z3 per-clause UNSAT proof from unseen first, excluding input network; no learning cost amortization.",
+    "native": "one Z3 or Eldarica solver invocation on each raw original, same GitHub Ubuntu runner class and per engine wall ms excluding setup/network",
+    "ratio": "only comparable if same correctness and rights; for native timeout, only report lower bound on restricted per-instance wall ratio, NOT whole-system 10x due uncaptured researcher/time/build cost",
+    "human_rule_design": "NOT_METERED",
+    "training_cost": "NO_NEURAL_TRAINING",
+    "energy": "NOT_METERED"
+  },
+  "Q3": "OPEN",
+  "Q4": "OPEN",
+  "Q6": "OPEN",
+  "Q7": "OPEN"
+}
