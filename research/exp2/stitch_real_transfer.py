@@ -122,9 +122,13 @@ def macro_from_stdout(stdout):
         m = re.search(r"body:\s*\[fn_0 arity=(\d+):\s*(.+)\]\s*$", line)
         if m:
             candidates.append((int(m.group(1)), parse(m.group(2).strip())))
-    if len(candidates) != 1:
-        raise ValueError("exactly one actual new Stitch fn_0 macro required")
-    arity, pattern = candidates[0]
+    # Upstream writes the same one invention in its search trace, chosen
+    # invention and final summary. Multiple text sightings are NOT multiple
+    # discovered macros; conflicting definitions still fail closed.
+    unique = list(dict.fromkeys(candidates))
+    if len(unique) != 1:
+        raise ValueError("exactly one consistent actual new Stitch fn_0 macro required")
+    arity, pattern = unique[0]
     if not 1 <= arity <= 3:
         raise ValueError("unexpected macro arity")
     holes = set(re.findall(r"#\d+", canonical(pattern)))
