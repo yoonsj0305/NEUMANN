@@ -1,15 +1,12 @@
 name: G3 own-weight quantified AST TRAIN first, original tests unopened
+# FROZEN ORIGINAL FIRST: retained workflow, no new training or original rescores.
 on:
-  pull_request:
-    paths:
-      - 'research/g3/ownweight_schema_student.py'
-      - 'tests/test_g3_ownweight_schema_student.py'
-      - 'docs/experiments/G3_OWNWEIGHT_QUANTIFIED_SCHEMA_FIRST_PREREG_2026_11_06.json'
-      - '.github/workflows/g3_ownweight_quantified_train.yml'
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
   actual-train-before-original:
+    if: false # Historical first receipt only
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
