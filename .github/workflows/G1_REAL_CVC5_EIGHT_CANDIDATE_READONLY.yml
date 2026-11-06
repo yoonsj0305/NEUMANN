@@ -1,0 +1,46 @@
+name: NEUMANN G1 real cvc5 eight original FIRST candidate read-only integrity
+on:
+  push:
+    branches:
+      - research/g1-first-ownweight-ast-sygus-20261106
+    paths:
+      - .github/workflows/G1_REAL_CVC5_EIGHT_CANDIDATE_READONLY.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original-first-readonly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G1-CVC5-REAL-8-LEGACY-COMPAT
+          run-id: 42163480878
+          github-token: ${{ github.token }}
+          path: pinned-first
+      - name: Inspect only frozen candidate excerpts and SHA without re-running model or specialist
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '0650d9c9d75f8f25311ee5b522ac6aed8ca9c6b1941a283e013cd6cb5019835f  pinned-first/G1-CVC5-8-LEGACY-COMPAT-POSTFIRST.json' | sha256sum -c -
+          python3 - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          from research.g1.postfirst_real_cvc5_specialist import extract_define
+          x=json.loads(Path('pinned-first/G1-CVC5-8-LEGACY-COMPAT-POSTFIRST.json').read_text())
+          for row in x['rows']:
+            obj=row['specialist']
+            att=next((a for a in obj['attempts'] if a.get('dialect')==obj.get('dialect')),None)
+            cand=extract_define(att['stdout_excerpt']) if att else None
+            h=hashlib.sha256(cand.encode()).hexdigest() if cand else None
+            print(json.dumps({'source':row['name'],'expected_candidate_sha':obj.get('candidate_sha256'),
+               'excerpt_bytes':len(att['stdout_excerpt']) if att else 0,
+               'fully_extracted':bool(cand),
+               'excerpt_SHA_matches':h==obj.get('candidate_sha256'),
+               'independent_verification':obj['independent_check']},
+               sort_keys=True))
+          PY
