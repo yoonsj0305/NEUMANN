@@ -1,11 +1,8 @@
 name: G3 own-weight frozen original init2 init3 FIRST, native and human matched
 
+# FROZEN ORIGINAL FIRST: retained workflow, no new training or original rescores.
 on:
-  pull_request:
-    paths:
-      - 'research/g3/ownweight_schema_external_first.py'
-      - 'docs/experiments/G3_OWNWEIGHT_FROZEN_BEFORE_EXTERNAL_FIRST_2026_11_06.json'
-      - '.github/workflows/g3_ownweight_original_first.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -13,6 +10,7 @@ permissions:
 
 jobs:
   first-external-native:
+    if: false # Historical first receipt only
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
