@@ -1,0 +1,27 @@
+{
+  "schema": "neumann.q3.g2.postfirst-negative-numeral-source-verifier-erratum.v1",
+  "date": "2026-11-06",
+  "original_first_run": 42167219443,
+  "original_inv_FIRST_sha256": "df7486f738cc47aa59b3fc91569ca73ccebb53da0b06ad4892c8f74e16d96229",
+  "original_first_readonly_audit_run": 42167502277,
+  "target_cases": [
+    {
+      "file": "minor1.sl",
+      "source_git_blob": "bf4a432737a02360a3e5b67ef6dd7f0b01a87e52",
+      "candidate_sha256": "2392498ce6c693e77bfdef24593041e70a17e327cbc08fcf20e41e9ade273f9e"
+    },
+    {
+      "file": "minor2.sl",
+      "source_git_blob": "5eb08040ecf66f1cf43eeb342dbc8b9fefed1ce1",
+      "candidate_sha256": "abcc61a06a1fba68eccfa1485ccdc1eb3fe42059f576250e831cf10cfba97f0b"
+    }
+  ],
+  "first_failure_provenance": "Original first cvc5 independently sourced these programs but original SMT proof errored before semantic checking on legacy Int negative lexemes '-2' and '-3'; not certified false program. No new native synthesis or student.",
+  "change": "Only for SMT2 independent proof, rewrite each standalone negative INTEGER token -N into unary minus S-expression (- N), outside source strings/comments, preserve raw source/candidate byte SHA. Do not rewrite identifiers containing hyphen, arithmetic subtraction forms, inputs, outputs or previous first JSON.",
+  "proof": "Independently assert violation of each original init, induction, safety condition; 3/3 UNSAT per exact candidate. Also positive and mutated invariants controls. First 7 already proven sources remain untouched. No rechecking different source candidates.",
+  "scientific_interpretation": "PASS only means two previously unproven native-first candidates valid all integer state transitions; not a learned NEUMANN result, not a fresh native first and not source solver novelty.",
+  "Q3": "OPEN",
+  "Q4": "OPEN",
+  "Q6": "OPEN",
+  "Q7": "OPEN"
+}
