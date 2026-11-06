@@ -45,7 +45,7 @@ H0_BASE=r"""
 (declare-const good_src (Array Int Int))
 (declare-const bad_src (Array Int Int))
 (declare-const p Bool)
-(assert (= dst ((as const (Array Int Int)) 0)))
+(assert (= (select dst 0) 0))
 (assert (= good_src dst))
 (assert (= bad_src (store dst 0 1)))
 """
@@ -92,8 +92,9 @@ OBLIGATIONS={
 (assert (not (= (select dst (+ n k)) (select src (+ m k)))))
 """),
  "H1_COPY_NONVACUOUS_2_CELL_INSTANCE":("sat",TYPED_RELATION+r"""
-(assert (= src ((as const (Array Int Int)) 3)))
-(assert (= dst ((as const (Array Int Int)) 3)))
+(assert (= n 0))
+(assert (= m 0))
+(assert (= src dst))
 (assert (= lim 4))
 (assert (= i 2))
 (assert (Prefix src dst n m i))
@@ -103,8 +104,8 @@ OBLIGATIONS={
 (assert (= m 0))
 (assert (= i 0))
 (assert (= lim 1))
-(assert (= src ((as const (Array Int Int)) 0)))
-(assert (= dst ((as const (Array Int Int)) 0)))
+(assert (= (select src 0) 0))
+(assert (= dst src))
 (assert (Prefix src dst n m i))
 (assert (not (Prefix src
    (store dst (+ n i) (+ (select src (+ m i)) 1))
@@ -131,13 +132,14 @@ def run(out_dir:Path,seconds:float=7.0)->dict:
             tokens=[s.strip() for s in completed.stdout.splitlines() if s.strip()]
             actual=tokens[0] if completed.returncode==0 and len(tokens)==1 and tokens[0] in ("sat","unsat") else "UNKNOWN_OR_ENGINE_ERROR"
             stderr=completed.stderr[-300:]
+            stdout_head=completed.stdout[:320]
             exitcode=completed.returncode
         except subprocess.TimeoutExpired:
-            actual="TIMEOUT_NOT_PROOF";stderr="TIMEOUT";exitcode=None
+            actual="TIMEOUT_NOT_PROOF";stderr="TIMEOUT";stdout_head="";exitcode=None
         receipts.append({
             "proof_name":name,"expected":expected,"actual":actual,"pass":expected==actual,
             "smt2_sha256":hashlib.sha256(script.encode()).hexdigest(),
-            "z3_exit":exitcode,"z3_stderr_tail":stderr,
+            "z3_exit":exitcode,"z3_stderr_tail":stderr,"z3_stdout_head":stdout_head,
             "wall_ms":round((time.perf_counter_ns()-begin)/1e6,3),
             "is_genuine_counterexample":expected=="sat",
             "original_external_CHC_problem_solved":False
@@ -166,7 +168,8 @@ def run(out_dir:Path,seconds:float=7.0)->dict:
                       "theorems_total":report["theorems_total"],
                       "outcomes":[{"name":x["proof_name"],"actual":x["actual"],
                                    "expected":x["expected"],
-                                   "stderr":x["z3_stderr_tail"]} for x in receipts]},
+                                   "stderr":x["z3_stderr_tail"],
+                                   "stdout":x["z3_stdout_head"]} for x in receipts]},
                      indent=2,sort_keys=True))
     if report["theorems_passed"]!=len(receipts):
         raise RuntimeError("H0_H1_PROOF_OBLIGATION_FAILED_OR_UNKNOWN")
