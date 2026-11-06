@@ -1,15 +1,14 @@
 name: G3 own-weight quantified student ORIGINAL init2/init3 FIRST, frozen checkpoint
+# Historical FIRST original evaluated in run 42198669136.
+# Archived so subsequent PR edits cannot rescore original test bodies.
 on:
-  pull_request:
-    paths:
-      - 'research/g3/ownweight_schema_original_first.py'
-      - 'docs/experiments/G3_OWNWEIGHT_QUANTIFIER_STUDENT_FROZEN_BEFORE_INIT2_INIT3_2026_11_06.json'
-      - '.github/workflows/g3_ownweight_quantified_original_first.yml'
+  workflow_dispatch:
 permissions:
   contents: read
   actions: read
 jobs:
   original-first-only:
+    if: false # immutable first; no repeat original trial
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
