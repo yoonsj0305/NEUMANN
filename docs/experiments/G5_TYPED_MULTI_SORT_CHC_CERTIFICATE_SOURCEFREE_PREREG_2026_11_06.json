@@ -1,0 +1,22 @@
+{
+  "schema": "neumann.q3.g5.multisort-CHC-original-universal-witness-gate.v1",
+  "date": "2026-11-06",
+  "north_star": "Frontier-level problem solving with minimum necessary computation",
+  "decisive_bottleneck": "Existing 2025 array CHC solves lack a typed multi-predicate original-source independent invariant proof certificate. Without it a learned policy can output arbitrary SAT/UNSAT tokens and falsely claim Q3. Build proof-before-credit engine; no new network training until this works.",
+  "scope": "Given any independently published SMT-LIB2 HORN file with declare-fun Bool relations and universally quantified assert rules, require an explicit candidate invariant body for EVERY Bool relation, typed using original signatures (Int, Bool, Array Int Int, ADT), build complete original CHC source by replacing declarations with candidate function definitions, and discharge EVERY original quantified Horn clause as UNSAT of its negation with an independent SMT engine. No original clauses may be dropped, no false vacuous 'true' accepted unless it satisfies source safety, no source edits or hidden rights.",
+  "source_free_tests": [
+    "one integer induction invariant positive, one mutated always-true invariant negative",
+    "one ARRAY Int Int induction/frame invariant positive, mutated array-true negative",
+    "two interdependent typed Bool relations both must be provided and checked",
+    "malicious missing mapping rejected; extra unknown mapping rejected; original source with no definitions rejected",
+    "unsafe reachability original rejects all supplied candidate invariants tested",
+    "original source Git blob and proposed certificate SHA256 recorded; exact per-clause source-truth proof (unsat)"
+  ],
+  "no_experiment_claims": "Verifier PASS means validity of an externally supplied candidate, not learned generation, generalization or total compute advantage. At most a necessary capability enabling true Q3, with source-free formal proof controls. Source classes for future independent evaluations remain untouched.",
+  "trusted_checkers": "Z3 via official z3-solver==5.0.0.0; original CHC source independent byte authority; 5000ms per proof clause, never interpret UNKNOWN as proof.",
+  "per_clause_proof": "Given original universally-quantified clause C and semantics instantiated for all relation predicates, verify SMT result Not(C)=UNSAT. Conjunction of proved clauses establishes source satisfiability (safety) for the proposed interpretation over all states.",
+  "Q3": "OPEN",
+  "Q4": "OPEN",
+  "Q6": "OPEN",
+  "Q7": "OPEN"
+}
