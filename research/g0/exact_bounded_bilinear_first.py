@@ -152,14 +152,16 @@ def check_math_lemma_cvc5(L,U,seconds):
     """Independent source-free universal product counterexample = UNSAT."""
     if L>U or U-L+1>8:
         raise ValueError("LEMMA_OUTSIDE_FROZEN_SCOPE")
-    expr="(* "+str(U)+" y)"
+    def integer(k):
+        return str(k) if k>=0 else "(- "+str(-k)+")"
+    expr="(* "+integer(U)+" y)"
     for v in range(U-1,L-1,-1):
-        mult="(* "+str(v)+" y)"
+        mult="(* "+integer(v)+" y)"
         expr="(ite (= b "+str(v)+") "+mult+" "+expr+")"
     script=(" (set-logic QF_NIA)\n"
             "(declare-fun b () Int)\n(declare-fun y () Int)\n"
-            "(assert (<= "+str(L)+" b))\n"
-            "(assert (<= b "+str(U)+"))\n"
+            "(assert (<= "+integer(L)+" b))\n"
+            "(assert (<= b "+integer(U)+"))\n"
             "(assert (not (= (* b y) "+expr+")))\n(check-sat)\n(exit)\n")
     return run_cvc5(script,seconds)
 
@@ -340,7 +342,13 @@ def run():
 
 if __name__=="__main__":
     import sys
-    result=run()
+    try:
+        result=run()
+    except Exception as exc:
+        result={"schema":"neumann.g0.exact-bounded-bilinear-original-first.v1",
+                "science_status":"INFRA_OR_COMPILER_FAIL_CLOSED",
+                "exception_type":type(exc).__name__,
+                "exception_message":str(exc)[:350]}
     print(json.dumps(result,indent=2,sort_keys=True))
     if result["science_status"]!="G0_CLASSICAL_REFRAME_ORIGINAL_NEW_PROOF_SCOPED_PASS":
         raise SystemExit(1)
