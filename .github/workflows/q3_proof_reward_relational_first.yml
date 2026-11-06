@@ -1,18 +1,15 @@
 name: Q3 proof-reward own-weight relational selector FIRST, synthetic only
 
+# Historical FIRST succeeded at GitHub Actions #42202214767; no rescore.
 on:
-  pull_request:
-    paths:
-      - 'research/q3/proof_reward_relational_student.py'
-      - 'tests/test_q3_proof_reward_relational_student.py'
-      - 'docs/experiments/Q3_PROOF_REWARD_RELATIONAL_STRUCTURE_FIRST_PREREG_2026_11_06.json'
-      - '.github/workflows/q3_proof_reward_relational_first.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
   proof-reward-first:
+    if: false # frozen original first; no repeat training or favorable test rerun
     runs-on: ubuntu-latest
     timeout-minutes: 9
     steps:
