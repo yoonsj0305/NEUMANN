@@ -79,6 +79,27 @@ class Q3CoreCycleBreakTests(unittest.TestCase):
         self.assertEqual(out["Q3_learned_discovery"], "NOT_PROVEN")
         self.assertFalse(out["can_consume_untouched_arc_eval"])
 
+    def test_g1_saturated_native_original_family_is_hard_stop_even_with_trained_weights(self):
+        s = copy.deepcopy(self.spec)
+        s["strategy"] = "OWN_WEIGHT_FIXED_TWO_TOKEN_STRING_AST"
+        # The real G1 student actually trained weights. That alone must NOT
+        # override the first original 1/5 or native specialist 8/8 proof.
+        decision = analyze(s, self.repo)
+        self.assertEqual(decision["decision"], "HARD_STOP_REPEAT_CLASS")
+        self.assertFalse(decision["spend_authorized"])
+        self.assertFalse(decision["can_consume_untouched_arc_eval"])
+        self.assertEqual(decision["Q3_learned_discovery"], "NOT_PROVEN")
+        self.assertIn("8/8", decision["reason"])
+
+    def test_g1_stop_does_not_ban_other_new_learned_source_families(self):
+        # A truly novel own-weight generator on a separate real source family
+        # still needs to pass all independent evidence and cost preflights.
+        s = copy.deepcopy(self.spec)
+        self.assertEqual(
+            analyze(s, self.repo)["decision"],
+            "READY_FOR_ONE_FIRST_ATTEMPT_NOT_A_PROOF",
+        )
+
     def test_closed_classes_all_blocked_even_with_positive_bools(self):
         for strategy in CLOSED_MECHANISM_CLASSES:
             with self.subTest(strategy=strategy):
