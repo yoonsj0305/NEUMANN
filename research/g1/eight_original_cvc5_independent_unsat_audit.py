@@ -74,8 +74,33 @@ def full_source_candidate(excerpt:str)->str|None:
     m=re.search(r"\(\s*define-fun\s+f\b",excerpt)
     if not m:return None
     fragment=excerpt[m.start():]
-    fs=forms(fragment)
-    return fs[0][2] if fs and re.match(r"^\(\s*define-fun\s+f\b",fs[0][2]) else None
+    # cvc5 wraps solutions in an outer S-expression. The excerpt still
+    # contains the OUTER closing paren after this define-fun, so do not
+    # parse the entire suffix as if it were one balanced document.
+    depth=0
+    in_string=False
+    i=0
+    while i<len(fragment):
+        ch=fragment[i]
+        if in_string:
+            if ch=='"':
+                if i+1<len(fragment) and fragment[i+1]=='"':
+                    i+=2
+                    continue
+                in_string=False
+        elif ch=='"':
+            in_string=True
+        elif ch=='(':
+            depth+=1
+        elif ch==')':
+            depth-=1
+            if depth==0:
+                candidate=fragment[:i+1]
+                return candidate if re.match(r"^\(\s*define-fun\s+f\b",candidate) else None
+            if depth<0:
+                return None
+        i+=1
+    return None
 
 def original_split(raw:bytes):
     text=raw.decode("utf-8")
