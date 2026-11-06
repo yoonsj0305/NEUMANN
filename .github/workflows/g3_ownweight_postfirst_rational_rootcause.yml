@@ -1,0 +1,44 @@
+name: G3 frozen own-weight N40 failure exact rational post-first certificate
+on:
+  pull_request:
+    paths:
+      - 'research/g3/ownweight_postfirst_rational_rootcause.py'
+      - '.github/workflows/g3_ownweight_postfirst_rational_rootcause.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  exact-postfirst-no-new-original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-OWNWEIGHT-QUANTIFIED-TRAIN-FIRST
+          run-id: 42198111692
+          github-token: ${{ github.token }}
+          path: original-weights
+      - name: Exact immutable checkpoint and source-free rational proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '982ef08b88758537dfe56f3ad8451de26fbd438df295802c491c25d231de9bdc  original-weights/G3-OWNWEIGHT-QUANTIFIED-AST-FROZEN.json' | sha256sum -c -
+          python -m research.g3.ownweight_postfirst_rational_rootcause \
+            --checkpoint original-weights/G3-OWNWEIGHT-QUANTIFIED-AST-FROZEN.json \
+            --output G3-POSTFIRST-EXACT-RATIONAL-FAILURE-CERTIFICATE.json
+          sha256sum G3-POSTFIRST-EXACT-RATIONAL-FAILURE-CERTIFICATE.json
+      - name: Archive strict post-first failure explanation, never call original sources
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G3-N40-EXACT-RATIONAL-FAILURE-CERTIFICATE-FIRST
+          path: G3-POSTFIRST-EXACT-RATIONAL-FAILURE-CERTIFICATE.json
+          retention-days: 90
+          if-no-files-found: warn
