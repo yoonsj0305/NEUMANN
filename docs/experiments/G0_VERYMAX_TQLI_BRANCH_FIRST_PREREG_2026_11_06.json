@@ -1,0 +1,38 @@
+{
+  "schema": "neumann.g0.original-verymax-branch-disjunction-first.prereg.v1",
+  "date_utc": "2026-11-06",
+  "north_star": "Frontier-level problem solving with minimum necessary computation",
+  "purpose": "One real, hard original QF_NIA structural headroom test, before any learned proposer training. Do semantic-preserving top-level OR branch specialization generate an exact SAT proof on a pinned original source where previously reported strongest tournament solvers and external 600s parallel Z3 did not finish?",
+  "original_evidence": "SMT-COMP 2026 official per-task 17-solver union: 17 jointly unresolved/2857, of which this named VeryMax original was one of 4 VeryMax entries. Prior benchmark source path and SAT metadata were already public.",
+  "source": {
+    "repo": "ilanashapiro/FMCAD26_Artifact",
+    "commit": "abba4cbda58f7e21ece28b6c854ab675404d340b",
+    "path": "scripts_datasets/inputs/QF_NIA_2313/From_T2__tqli.t2__p25231_terminationG_0.smt2",
+    "git_blob_sha1": "72b1b77ed5996b5a3e6d81fd75d7ea3b58347ff7",
+    "expected_source_status": "sat",
+    "source_bytes": 547273,
+    "source_licensed": "CC BY 4.0 according to original SMT-LIB header"
+  },
+  "prior_independent_baseline": "FMCAD26 GitHub published same-named 8-thread Z3 run May 7, 2026, 600.530s wall without conclusive proof; this is contextual, not a matched present-run baseline.",
+  "author_exposure": "The researcher viewed file header, variable declaration and general assertion structure during planning, so this is a previously opened hard external original; not a blind generalization holdout.",
+  "frozen_method": "Z3 original full QF_NIA SAT baseline vs semantics-preserving disjunction branch split: each candidate strengthens exactly ONE existing top-level OR assertion to one of its original disjuncts, keeping ALL other original assertions unchanged. No candidate is inserted or inferred from expected SAT labels. No source-specific arithmetic hacks, model weights, or learned selection.",
+  "same_run_budget": {
+    "direct_z3_timeout_s": 30,
+    "branch_z3_total_timeout_s": 30,
+    "branch_per_candidate_timeout_s": 3,
+    "max_first_disjunct_candidates": 64,
+    "native_independent_witness_validation_timeout_s": 20,
+    "max_pipeline_minutes": 10
+  },
+  "algorithm_stoppage": "Fixed source and one run, no posthoc switching branches or increasing timeouts after FIRST. Any timeout, unsupported SMT syntax, or absent independent exact witness => G0_NOT_PROVEN. Preserve all first failures.",
+  "positive_gate": "Original pinned SHA matches, full native Z3 source parses, direct and specialized run same runner and same 30s CPU-task time cap, specialized model SAT, independently evaluate all original assertions under fully concrete integer assignments as True and independently validate via original source with fixed model using cvc5. If direct baseline also SAT, not learned-exclusive/capability headroom, only possible cost difference.",
+  "negative_controls": [
+    "Wrong source SHA rejected",
+    "Unsound branch replacement not accepted",
+    "No original assertion may be dropped",
+    "UNKNOWN and timeouts cannot turn into SAT/UNSAT proof"
+  ],
+  "degraded_mode": "UNKNOWN_NO_PROOF with original source error/timing recorded, no Q3 or Q6 PASS",
+  "G1_learning_eligibility": "HOLD until original deterministic complete denominator, stronger specialists (not only Z3) and free-oracle value gap verified",
+  "scope": "G0 structural reduction preflight only. No neural invention, no Q4 total-cost advantage claim, no Q6 independent semantic-family generalization, no Q7 frontier claim."
+}
