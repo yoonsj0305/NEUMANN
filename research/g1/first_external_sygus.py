@@ -112,6 +112,15 @@ def classical_order()->list[tuple[int,int]]:
 def external_first(weights_file:Path)->dict[str,Any]:
     pre=json.loads(PREREG.read_text())
     frozen=json.loads(FROZEN.read_text())
+    # The ORIGINAL first run aborted with an already-frozen 39-char source
+    # Git-blob typo. Its SHA and infra outcome remain immutable, and this
+    # one-character correction is explicit, never a favorable retuning.
+    metadata_erratum=json.loads((ROOT/"docs/experiments/G1_EXTERNAL_SYGUS_FIRST_METADATA_SHA_ERRATUM_2026_11_06.json").read_text())
+    correction=metadata_erratum["actual_source_error"]
+    if correction["file"]!="reverse-name.sl" or \
+       correction["previous_typo_39_hex"]!="015131e076e00c63e41ff4a89591375ca495c77" or \
+       correction["correct_original_github_blob_40_hex"]!="015131e076e00c63e41ff4a89591375ca495c77e":
+        raise ValueError("UNAUTHORIZED_SOURCE_METADATA_CHANGE")
     wdata=weights_file.read_bytes()
     weights_sha=hashlib.sha256(wdata).hexdigest()
     if weights_sha!=frozen["source_free_V2"]["weights_sha256"]:
@@ -134,7 +143,10 @@ def external_first(weights_file:Path)->dict[str,Any]:
         with urlopen(Request(url,headers={"User-Agent":"NEUMANN-G1-first"}),timeout=40) as response:
             raw=response.read(50000)
         source_blob=gitblob(raw)
-        if source_blob!=target["git_blob"]:
+        original_pin=target["git_blob"]
+        corrected_pin=(correction["correct_original_github_blob_40_hex"]
+                        if target["name"]==correction["file"] else original_pin)
+        if len(corrected_pin)!=40 or source_blob!=corrected_pin:
             raise ValueError("ORIGINAL_EXTERNAL_SYGUS_GIT_BLOB_CHANGED_"+target["name"])
         pairs,problem=parse_original(raw)
         row={"task_file":target["name"],"original_git_blob":source_blob,
@@ -223,7 +235,11 @@ def external_first(weights_file:Path)->dict[str,Any]:
       "science_status":"SCOPED_LEARNED_CROSS_AUTHOR_AST_TRANSFER_PASS" if passed
           else "SCOPED_LEARNED_CROSS_AUTHOR_AST_TRANSFER_FAIL",
       "global_Q3":"OPEN","global_Q4":"OPEN","global_Q6":"OPEN","global_Q7":"OPEN",
-      "one_original_external_FIRST":True,
+      "one_original_external_FIRST":False,
+      "original_first_infra_result_run":42154882039,
+      "original_first_infra_result_sha256":"38708107241472eba84d8b46b6fe814ecf08e9ad0140a6f88d502c341edd19f3",
+      "first_complete_after_one_character_source_metadata_erratum":True,
+      "source_exposure_in_prior_failed_first":True,
       "source_type":"2018 SyGuS public PBE-String; no full all-string equivalence proof",
       "model_training_token_and_energy_cost":"UNKNOWN",
       "model_was_trained_from_scratch":True,
