@@ -1,0 +1,62 @@
+name: Q3 learned representation repair from genuine H0 collision witnesses FIRST
+
+# Original first run #42204120156 preserved; never retrain or rescore as FIRST.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  first-proof-reward-representation:
+    if: false # archived scientific FIRST, no automatic experiment replay
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Independent SMT verifier, no ML framework or external LLM
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y z3
+          z3 --version
+      - name: Typed grammar and label-provenance negative controls
+        run: python -m unittest discover -s tests -p 'test_q3_counterexample_representation_grower.py' -v
+      - name: One actual first training from SAT/UNSAT H0 collisions and heldout symbolic proofs
+        run: |
+          set -euo pipefail
+          mkdir -p cegar-first
+          /usr/bin/time -f 'COMPLETE_TRAIN_EVAL_PROOF_WALL_S=%e MAX_RSS_KB=%M' \
+            python -m research.q3.counterexample_representation_grower \
+              --out cegar-first/Q3-COUNTEREXAMPLE-REPRESENTATION-FIRST.json
+          sha256sum cegar-first/Q3-COUNTEREXAMPLE-REPRESENTATION-FIRST.json
+      - name: Independent evidence contract, never declare general Q3
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          o=json.loads(Path('cegar-first/Q3-COUNTEREXAMPLE-REPRESENTATION-FIRST.json').read_text())
+          assert o['train_example_count']==6
+          assert o['heldout_example_count']==8
+          assert o['train_label_information']=='BOOLEAN_SAT_UNSAT_ONLY_NO_OPERATOR_ID'
+          assert o['external_original_CHC_full_proofs']==0
+          assert o['Q3']=='OPEN' and o['Q6']=='OPEN'
+          assert o['model_automatically_invents_base_grammar'] is False
+          print('CANDIDATE_PROOF_COUNT',o['sourcefree_heldout_inductively_certified'])
+          print('CLASSICAL_SAME_RIGHTS_COUNT',o['classical_same_rights_inductively_certified'])
+          print('UNTRAINED_COUNT',o['untrained_policy_correct'])
+          PY
+      - name: Preserve first positive or negative training, counterexamples and proof ledgers
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-CEGAR-REPAIR-GROWER-ORIGINAL-FIRST
+          path: cegar-first/
+          if-no-files-found: warn
+          retention-days: 90
