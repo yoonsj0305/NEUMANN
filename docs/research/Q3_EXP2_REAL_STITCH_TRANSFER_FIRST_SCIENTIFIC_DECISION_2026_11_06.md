@@ -29,3 +29,18 @@ STOP selecting additional corpora/macro based on this failure to obtain a favora
 Next decisive experiment: trained own-weight typed/quantified new-operator proposer on an independently-authored, classically hard original, frozen H0, model SHA and source blinding, native plus equal-language GP/CEGIS, untrained/no-Stitch and with-Stitch ablations, and independent original proof. Then freeze and test genuinely different formal mechanism for Q6. Charge training, source mining, failed proposals, verification, fallback and startup for Q4/Q5.
 
 Science status: in-family static reuse PASS_SCOPED; three-corpus literal-transfer FAIL; own-weight invention NOT RUN; global Q3/Q4/Q5/Q6/Q7 OPEN.
+
+
+## 2026-11-06 post-FIRST root-cause correction: incompatible expression languages
+
+[Read-only operator signature diagnostic #42194417100](https://github.com/yoonsj0305/NEUMANN/actions/runs/42194417100) read only the *already opened* failed target corpora and the immutable first frozen macro; no new source-blind test, no Stitch rerun and no trained model.
+
+The macro needs operator heads T, M, repeat, tan, plus arithmetic * and /. On all 750 new program ASTs, the relevant operator heads occurred in **zero** programs, including T/M/repeat/tan. The macro's matching conditions were therefore **unsatisfiable by syntactic interface mismatch** before any sophisticated search or learning could help.
+
+**Corrections to interpretation:**
+- Preserve preregistered first 0/750 FAIL unchanged as the exact-match transfer test result. The result does NOT establish that Stitch fails to generalize on semantically compatible external target tasks: the three datasets have incompatible operator vocabularies and may implement different DSLs, despite sharing the cogsci folder.
+- The earlier phrase "within the same graphics DSL" is unsupported and should not be used. Distinct graphics program corpora do not guarantee the same function/operator signature.
+- A correct future transfer experiment must register source/target typed DSL signatures and cross-DSL adapters (if proposed) **before** exposing target task contents. When no compatibility map exists, return INCOMPATIBLE_INTERFACE rather than silently running a meaningful-transfer trial.
+- Never use a post-FIRST adapter inferred from the failed 750 targets and then call their favorable rerun blind. Original science remains first-source FAIL; future typed interface fixes require new, independently authored frozen source targets.
+
+This is an architecture-level finding: **interface qualification precedes representation reuse**. No proof that NEUMANN has learned the cross-DSL semantic mapping exists. Global Q3/Q6 remain OPEN.
