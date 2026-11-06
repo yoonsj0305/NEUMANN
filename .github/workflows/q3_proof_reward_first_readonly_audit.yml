@@ -1,0 +1,42 @@
+name: Q3 proof-reward FIRST read-only identical-proofs economic audit
+on:
+  pull_request:
+    paths:
+      - 'research/q3/proof_reward_first_readonly_economics.py'
+      - '.github/workflows/q3_proof_reward_first_readonly_audit.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original-first-readonly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-Q3-PROOF-REWARD-RELATIONAL-STRUCTURE-FIRST
+          run-id: 42202214767
+          github-token: ${{ github.token }}
+          path: immutable-first
+      - name: Verify actual FIRST SHA without retraining or re-verifying
+        shell: bash
+        run: |
+          echo 'ab14bc7d798da9ef05c06a4ae3b6a29e7fb04e76b672601e2f6703bf4fe3f5bf  immutable-first/Q3-PROOF-REWARD-RELATIONAL-FIRST.json' | sha256sum -c -
+          python -m research.q3.proof_reward_first_readonly_economics \
+            --first immutable-first/Q3-PROOF-REWARD-RELATIONAL-FIRST.json \
+            --out Q3-PROOF-REWARD-COST-AND-IDENTICAL-PROOF-FIRST-AUDIT.json
+      - name: Independently preserve causal non-advantage as read-only report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-PROOF-REWARD-FIRST-READONLY-COST-AND-NOVELTY
+          path: Q3-PROOF-REWARD-COST-AND-IDENTICAL-PROOF-FIRST-AUDIT.json
+          if-no-files-found: warn
+          retention-days: 90

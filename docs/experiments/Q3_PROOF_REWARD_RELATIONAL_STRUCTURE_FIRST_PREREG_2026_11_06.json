@@ -1,0 +1,90 @@
+{
+  "schema": "neumann.q3.proof-reward-relational-typed-grammar-frozen-first.v1",
+  "date": "2026-11-06",
+  "north_star": "Frontier-level problem solving with minimum necessary computation",
+  "hypothesis": "For a source-free verified array-update transfer family, proof reward without human candidate labels can train own-weight policy to choose a typed two-array relational predicate outside frozen destination-only H0, and independently prove heldout symbolic transitions.",
+  "origin": "AUTHOR_CONSTRUCTED_SYNTHETIC_TRANSITION_TASKS_NOT_EXTERNAL_ORIGINAL_CHC",
+  "training_cases": {
+    "operator": [
+      "COPY",
+      "ADD1",
+      "SUB1"
+    ],
+    "source_destination_index_shift_pairs": [
+      [
+        0,
+        0
+      ],
+      [
+        2,
+        -3
+      ]
+    ],
+    "n": 6,
+    "each_verifier_receives_exact_semantic_update_and_proposed_candidate": true,
+    "trainer_receives_only_yes_no_proof_feedback_not_correct_token_label": true
+  },
+  "heldout_cases": {
+    "operator": [
+      "COPY",
+      "ADD1",
+      "SUB1"
+    ],
+    "source_destination_index_shift_pairs": [
+      [
+        17,
+        -11
+      ],
+      [
+        -40,
+        29
+      ],
+      [
+        93,
+        107
+      ],
+      [
+        0,
+        71
+      ]
+    ],
+    "n": 12,
+    "target_source_bodies_not_authored_by_third_party": true,
+    "no_target_reward_or_hidden_semantics_training": true
+  },
+  "H0_frozen": [
+    "destination_only_unary_constant_prefix_predicate"
+  ],
+  "H1_proposals_by_generic_typed_composition": [
+    "destination_only_constant",
+    "cross_array_offset_-2",
+    "cross_array_offset_-1",
+    "cross_array_offset_0",
+    "cross_array_offset_1",
+    "cross_array_offset_2"
+  ],
+  "models": [
+    "frozen_before_training_zero_untrained",
+    "train_weights_with_independent_Z3_proof_reward",
+    "human_direct_program_AST_rule",
+    "classical_complete_same_grammar_enumeration"
+  ],
+  "learning": {
+    "seed": 22,
+    "updates_per_training_case": 1,
+    "model": "own-weight 3-category op signature -> 6 candidate logits",
+    "no_pretrained_LLM": true,
+    "no_Stitch_required": true
+  },
+  "verification": {
+    "Z3_independent_original_transition_induction": true,
+    "real_nonvacuity_sat_control": true,
+    "deliberately_wrong_candidate_sat": true,
+    "complete_symbolic_index_any_integer": true,
+    "time_cap_seconds_each": 5
+  },
+  "first_gate": "TRAINED 12/12 independent source-free symbolic update transfer proofs; ZERO-WEIGHT 0/12, also record classical direct 12/12 if so; no autonomous discovery PASS.",
+  "necessary_provenance": "H1 cross-array typed grammar and candidate delta set are HUMAN-BUILT. Student learns score selection from proof feedback but does not invent a new general-purpose operator or solve external original CHC. Q3, Q6, Q4, Q5, Q7 global OPEN.",
+  "all_costs_measured": "wall training + all model proposals + independent verification + baseline, record every failed candidate and solver subcall",
+  "first_result": "NOT_RUN"
+}
