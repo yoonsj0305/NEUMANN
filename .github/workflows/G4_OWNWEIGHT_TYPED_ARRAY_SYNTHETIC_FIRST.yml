@@ -1,0 +1,110 @@
+name: NEUMANN G4 actual own-weight array AST model independent Z3 proof SYNTHETIC FIRST
+on:
+  push:
+    branches:
+      - research/q3-g4-ownweight-array-lemma-proof-interface-20261106
+    paths:
+      - .github/workflows/G4_OWNWEIGHT_TYPED_ARRAY_SYNTHETIC_FIRST.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  sourcefree-ownweights-and-independent-allstate-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Exact Python source compile and freeze no external original targets policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile research/g4/array_invariant_verifier.py
+          python -m py_compile research/g4/ownweight_array_invariant_proposer.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          spec=json.loads(Path('docs/experiments/G4_OWNWEIGHT_ARRAY_LEMMA_SYNTHETIC_FIRST_PREREG_2026_11_06.json').read_text())
+          assert spec['schema']=='neumann.q3.g4.typed-quantified-array-lemma-ownweights-synthetic-only.v1'
+          assert len(spec['exact_heldout_synthetic_pairs'])==5
+          assert 'NEVER consume' in spec['scope_protection']
+          print('G4_ONLY_SYNTHETIC_HELDOUT_5_WHOLE_COMPOSITIONS_FROZEN')
+          PY
+      - name: Install pinned NumPy and independent Z3 SMT proof engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -q 'numpy==2.2.6' 'z3-solver==4.13.3.0'
+          python - <<'PY'
+          import numpy,z3
+          print('NUMPY',numpy.__version__)
+          print('Z3',z3.get_version_string())
+          PY
+      - name: Model-free source-to-3-UNSAT proof positive, mutant and parser guards
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p test_q3_g4_ownweight_array_lemma.py -v
+      - name: FIRST own-weights trained synthetic cross-program structure and source-independent source SMT
+        shell: bash
+        run: |
+          set -uo pipefail
+          python -m research.g4.ownweight_array_invariant_proposer > G4-OWNWEIGHT-ARRAY-SYNTHETIC-FIRST.json 2> G4-OWNWEIGHT-ARRAY-SYNTHETIC-FIRST.stderr
+          rc=$?
+          if test -s G4-OWNWEIGHT-ARRAY-SYNTHETIC-FIRST.json; then
+            python - <<'PY'
+          import json
+          x=json.load(open('G4-OWNWEIGHT-ARRAY-SYNTHETIC-FIRST.json'))
+          s=x['metrics']
+          print(json.dumps({'science_scope':x['scientific_scope'],
+            'train_weight_SHA256':x['model_weights_sha256'],
+            'heldout_programs':x['total_synthetic_heldout_programs'],
+            'model_valid_proven':s['learned_source_UNSAT_threeproof'],
+            'random_untrained_valid_proven':s['ablation_source_UNSAT_threeproof'],
+            'strong_same_source_rights_classical_valid_proven':s['strong_classical_same_source_rights_source_UNSAT_threeproof'],
+            'learned_exclusive':s['learned_exclusive_over_strong_classical'],
+            'real_training_ms':s['neural_training_ms'],
+            'neural_inference_ms':s['neural_inference_total_ms'],
+            'neural_source_verification_ms':s['neural_verifier_total_ms'],
+            'classical_compile_ms':s['classical_compilation_total_ms'],
+            'classical_verification_ms':s['classical_verifier_total_ms'],
+            'external_original_consumed':s['external_original_reserved_2025_array8_consumed']
+            },sort_keys=True))
+          assert x['learning_real_update'] is True
+          assert x['total_synthetic_heldout_programs']==10
+          assert s['new_ARC_public_eval_IDs']==0
+          assert s['external_original_reserved_2025_array8_consumed']==0
+          assert s['strong_classical_same_source_rights_source_UNSAT_threeproof']==10
+          assert x['Q3']=='OPEN'
+          PY
+            parsed=$?
+            if test "$parsed" -ne 0;then rc=1;fi
+          else
+            rc=1
+          fi
+          cat G4-OWNWEIGHT-ARRAY-SYNTHETIC-FIRST.stderr
+          echo "G4_SYNTHETIC_FIRST_PROCESS_EXIT=$rc"
+          exit "$rc"
+      - name: Freeze exact first training, decoded AST, counterexample proofs and costs
+        if: always()
+        shell: bash
+        run: |
+          if test -s G4-OWNWEIGHT-ARRAY-SYNTHETIC-FIRST.json; then
+            sha256sum G4-OWNWEIGHT-ARRAY-SYNTHETIC-FIRST.json > G4-OWNWEIGHT-ARRAY-SYNTHETIC-FIRST.sha256
+            cat G4-OWNWEIGHT-ARRAY-SYNTHETIC-FIRST.sha256
+          fi
+      - name: Archive original FIRST with any true failure and no external source artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G4-OWNWEIGHT-TYPED-ARRAY-SOURCEFREE-FIRST
+          path: |
+            G4-OWNWEIGHT-ARRAY-SYNTHETIC-FIRST.json
+            G4-OWNWEIGHT-ARRAY-SYNTHETIC-FIRST.stderr
+            G4-OWNWEIGHT-ARRAY-SYNTHETIC-FIRST.sha256
+          if-no-files-found: warn
+          retention-days: 90
