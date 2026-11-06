@@ -1,15 +1,14 @@
 name: G3 own-weight quantified invariant student TRAIN only (no test source)
+# Historical first already archived; disable duplicate evaluation.
 on:
-  pull_request:
-    paths:
-      - research/g3/ownweight_schema_student.py
-      - tests/test_g3_ownweight_schema_student.py
-      - docs/experiments/G3_OWNWEIGHT_QUANTIFIED_SCHEMA_FIRST_PREREG_2026_11_06.json
-      - .github/workflows/g3_ownweight_quantified_train_only.yml
+  workflow_dispatch:
+
 permissions:
   contents: read
 jobs:
   train-frozen-before-original:
+    if: false # archived immutable first result
+
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
