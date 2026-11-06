@@ -1,0 +1,57 @@
+{
+  "schema": "neumann.g2.post-first-three-source-analytic-invariant-hypotheses.v1",
+  "date": "2026-11-06",
+  "source_provenance": {
+    "original_repo": "SyGuS-Org/benchmarks",
+    "commit": "13c8deb68a873635879c9a69bc78caebd340f646",
+    "first_native_run": 42167219443,
+    "first_native_inv_sha256": "df7486f738cc47aa59b3fc91569ca73ccebb53da0b06ad4892c8f74e16d96229",
+    "native_12s_result": "Two timeouts, jmbl_matrix2 no program; all three original task contents opened AFTER first for posthoc source reasoning. Not independent blinded or automated NEUMANN proposal."
+  },
+  "manual_analytic_proposals": [
+    {
+      "file": "fib_19.sl",
+      "source_git_blob": "fa53fad298c2af8fe5a4139f90f19c9f07ecbf48",
+      "type": "INVARIANT_UNIVERSAL",
+      "candidate": "(define-fun inv-f ((n Int) (m Int) (x Int) (y Int)) Bool (and (>= n 0) (>= m 0) (< m n) (>= x 0) (<= x n) (ite (<= x m) (= y m) (= y x))))",
+      "interpretation": "x ranges from 0 to n; y=max(x,m). n and m remain constants and m<n; after reaching n, y=n."
+    },
+    {
+      "file": "gcnr_tacas08.sl",
+      "source_git_blob": "1954aea16e81cbe9a1067313c956091585503757",
+      "type": "INVARIANT_UNIVERSAL",
+      "candidate": "(define-fun inv-f ((w Int) (x Int) (y Int) (z Int)) Bool (and (= w x) (= z (* 10 w)) (>= x 0) (>= y x) (<= y (* 100 x))))",
+      "interpretation": "affine conservation w=x, z=10w and linear cone x<=y<=100x makes third transition disjunct unreachable; y>=x then ensures safety."
+    },
+    {
+      "file": "jmbl_matrix2.sl",
+      "source_git_blob": "87604f8c96e62c6cd878c515be8aa6564a98cef5",
+      "type": "UNSAFE_1_STEP_REACHABILITY_WITNESS",
+      "initial_state": {
+        "m": 0,
+        "a": 0,
+        "j": 0,
+        "k": 0
+      },
+      "next_state": {
+        "m!": 1,
+        "a!": 1,
+        "j!": 0,
+        "k!": 1
+      },
+      "interpretation": "PreF holds; TransF first branch holds; PostF fails on next state. Therefore NO invariant can satisfy all three obligations for these original semantics, not a solver performance deficit."
+    }
+  ],
+  "proof_protocol": "For each proposed invariant verify universal initiation/inductiveness/safety by SMT UNSAT of counterexample using ORIGINAL pre-f,trans-f,post-f. For unsafe source, verify explicit concrete pre∧transition∧¬post SAT and disallow malformed witness via deliberate mutant test. Source original Git blob must match prereg; old integer literal -1 modernized only inside verification expressions. No SyGuS synthesis rerun.",
+  "claims": {
+    "manual_source_derived_after_first": true,
+    "learned_model_invention": false,
+    "unmeasured_human_search_cost": true,
+    "not_original_first_blind": true,
+    "not_10x": true,
+    "Q3": "OPEN",
+    "Q4": "OPEN",
+    "Q6": "OPEN",
+    "Q7": "OPEN"
+  }
+}
