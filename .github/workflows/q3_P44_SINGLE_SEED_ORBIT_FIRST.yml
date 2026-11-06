@@ -1,0 +1,125 @@
+name: NEUMANN Q3 P44 ONE teacher seed D4 S10 orbit real 400 FIRST
+on:
+  push:
+    branches:
+      - research/q3-p44-single-seed-orbit-generalization-20261106
+    paths:
+      - .github/workflows/q3_P44_SINGLE_SEED_ORBIT_FIRST.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  first-original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Freeze original one seed and test exact group conjugation on various shapes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          p=json.loads(Path('docs/experiments/q3_P44_ONE_SEED_D4_S10_ORBIT_FIRST_PREREG_2026_11_06.json').read_text())
+          b=Path(p['single_seed']['path']).read_bytes()
+          sha=hashlib.sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()
+          assert sha==p['single_seed']['git_blob']
+          assert p['group_closure']['unique_semantics_count']==180
+          print('FROZEN_ONE_TEACHER_SOURCE_BLOB',sha)
+          PY
+          node --test tests/test_q3_p44_one_seed_orbit.mjs
+      - name: Retrieve frozen original P30 strongest classical 400-task first receipt
+        uses: actions/download-artifact@v4
+        with:
+          name: neumann-p30-first-opened-train400
+          run-id: 42024425446
+          github-token: ${{ github.token }}
+          path: frozen-p30
+      - name: Retrieve frozen original P43 one-success exact 400-task first receipt
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-P43-TEACHER-TRANSFER400-FIRST
+          run-id: 42145135283
+          github-token: ${{ github.token }}
+          path: frozen-p43
+      - name: Verify both independent historical first hashes before touching originals
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "0fb747b4fd7355649465b8ff3424c0170d6d178f47fd1ea64ca486c416672b79  frozen-p30/P30-OPENED400-FIRST.json" | sha256sum -c -
+          echo "8b5cb4927133930f6238adb17dbeba5a73d6955a368965b67318cc6aca78a398  frozen-p43/P43-TEACHER-TRANSFER400-FIRST.json" | sha256sum -c -
+      - name: Retrieve upstream original public ARC train400 from exact commit, no eval
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+          test "$(find "$RUNNER_TEMP/arc-agi/data/training" -maxdepth 1 -name '*.json' | wc -l)" = 400
+      - name: ORIGINAL P44 FIRST 180 mechanically derived source programs vs P30 P43
+        shell: bash
+        run: |
+          set -uo pipefail
+          node experiments/q3_p44_one_seed_orbit_FIRST.mjs "$RUNNER_TEMP/arc-agi" frozen-p30/P30-OPENED400-FIRST.json frozen-p43/P43-TEACHER-TRANSFER400-FIRST.json > P44-ORBIT-TRAIN400-FIRST.json 2> P44-ORBIT-TRAIN400-FIRST.stderr
+          rc=$?
+          if test -s P44-ORBIT-TRAIN400-FIRST.json; then
+            python3 - <<'PY'
+          import json
+          x=json.load(open('P44-ORBIT-TRAIN400-FIRST.json'))
+          print(json.dumps({
+            "science":x["science_status"],
+            "historic_p43_first":x["original_p43_first_sha256"],
+            "historic_p30_first":x["original_p30_first_sha256"],
+            "original_arc_eval_ids":x["arc_evaluation_IDs_consumed"],
+            "stats":x["stats"],
+            "new_exact_rows":[{
+              "id":r["id"],
+              "candidate_count":len(r["p44_candidate_programs"]),
+              "programs":r["p44_candidate_programs"][:5]
+             } for r in x["rows"] if r["p44_new_exact_over_both"]]
+          },sort_keys=True))
+          PY
+            python3 - <<'PY'
+          import json,sys
+          x=json.load(open('P44-ORBIT-TRAIN400-FIRST.json'))
+          assert x['stats']['original_tasks']==400
+          assert x['stats']['group_orbit_distinct_candidate_programs']==180
+          assert x['stats']['historical_oracle_union_correct']==55
+          assert x['arc_evaluation_IDs_consumed']==0
+          if x['science_status']!='SCOPED_ONE_SEED_ORBIT_REUSE_PASS':
+              print('PRECOMMITTED_SCIENCE_GATE_FAIL_RETAIN_FIRST')
+              sys.exit(1)
+          PY
+            scientific=$?
+            if test "$scientific" -ne 0; then rc=1; fi
+          else
+            echo 'NO_FIRST_JSON_INFRASTRUCTURE_FAIL_CLOSED'
+            rc=1
+          fi
+          cat P44-ORBIT-TRAIN400-FIRST.stderr
+          echo "ORIGINAL_P44_FIRST_PROCESS_EXIT=$rc"
+          exit "$rc"
+      - name: Hash original source result, including scientific failure
+        if: always()
+        shell: bash
+        run: |
+          if test -s P44-ORBIT-TRAIN400-FIRST.json; then
+            sha256sum P44-ORBIT-TRAIN400-FIRST.json > P44-ORBIT-TRAIN400-FIRST.sha256
+            cat P44-ORBIT-TRAIN400-FIRST.sha256
+          fi
+      - name: Archive original first source and stderr even on FAIL
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-P44-ORBIT-TRAIN400-FIRST
+          path: |
+            P44-ORBIT-TRAIN400-FIRST.json
+            P44-ORBIT-TRAIN400-FIRST.sha256
+            P44-ORBIT-TRAIN400-FIRST.stderr
+          if-no-files-found: warn
+          retention-days: 90
