@@ -45,10 +45,10 @@ def atom(name: str, src: str) -> str:
     if name == "TAIL2":
         return src[-2:]
     if name == "BEFORE_DIGIT":
-        m = re.search(r"\\d", src)
+        m = re.search(r"\d", src)
         return src[:m.start()] if m else src
     if name == "DIGIT_SUFFIX":
-        m = re.search(r"\\d+$", src)
+        m = re.search(r"\d+$", src)
         return m.group(0) if m else ""
     if name == "LOWER":
         return src.lower()
@@ -215,7 +215,7 @@ def train(out:Path)->dict[str,Any]:
         z=np.clip((validX-mean)/std,-6,6)@w[j]+bias[j]
         validation_position_accuracy.append(float(np.mean(z.argmax(axis=1)==validY[:,j])))
     weights["synthetic_validation_token_accuracy"]=validation_position_accuracy
-    data=(json.dumps(weights,sort_keys=True,separators=(",",":"),allow_nan=False)+"\\n").encode()
+    data=(json.dumps(weights,sort_keys=True,separators=(",",":"),allow_nan=False)+"\n").encode()
     out.write_bytes(data)
     return {
         "checkpoint_sha256":hashlib.sha256(data).hexdigest(),
