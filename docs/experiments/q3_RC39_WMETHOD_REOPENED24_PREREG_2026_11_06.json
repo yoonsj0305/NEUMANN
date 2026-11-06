@@ -1,0 +1,54 @@
+{
+  "schema": "neumann.q3.rc39.wmethod-postfirst-classical-ablation-prereg.v1",
+  "date": "2026-11-06",
+  "status": "SOURCE_AND_CRITERIA_FROZEN_BEFORE_REMOTE_FIRST_RUN",
+  "scope": "REOPENED original 24 existing RC39 finite-state targets, NOT novel heldout Q6",
+  "target": "Reduce query overhead of membership-only complete-state conformance on SAME targets without modifying frozen original learner",
+  "baseline": "research.q3.rc39.membership_conformance.compare_source_rights",
+  "challenger": "research.q3.rc39.wmethod_conformance.compare_wmethod_source_rights",
+  "interface": "identical membership(word) only, alphabet ABC, output 01, known target state bound <=5; target graph inaccessible to conformance checkers",
+  "fixed_cohort": {
+    "families": [
+      "prefix_parity",
+      "prefix_mod3",
+      "presence",
+      "random_3state",
+      "random_4state",
+      "random_5state"
+    ],
+    "seeds": [
+      39,
+      40,
+      41,
+      42
+    ],
+    "total_cases": 24,
+    "already_opened_originals": true
+  },
+  "primary_gate": {
+    "independent_all_length_product_proofs_24_of_24": true,
+    "baseline_24_of_24": true,
+    "zero_false_certificates": true,
+    "W_method_total_distinct_membership_queries_at_most_one_tenth_of_baseline": true
+  },
+  "supporting_tests": "all 260 one-or-two-state reference tables x 3 hypotheses, 250 seeded three-state reference tables x 2 hypotheses, invalid bound counterexample, fail-closed budgets",
+  "algorithm": "known classical W-method: minimal reachable candidate, shortest state cover P, characterization suffix set W, test P * Sigma^{<=5-n+1} * W",
+  "correctness_assumptions": [
+    "complete deterministic Mealy reference/candidate",
+    "trusted reference bound <=5 reachable states",
+    "membership resets reference and returns truthful full trace",
+    "candidate minimized before k and W",
+    "on budget or other failure return UNKNOWN"
+  ],
+  "metrics": [
+    "unique source queries",
+    "source input characters",
+    "conformance words",
+    "CPU ms secondary",
+    "independent product proof"
+  ],
+  "interpretation_if_pass": "ONLY classical conformance query-cost improvement under fixed valid state bound, NOT Q3 neural invention, Q6 independent-family, Q4 learned-vs-classical or Q7",
+  "arc_remaining_original_unseen": "11 DO NOT TOUCH",
+  "degraded_mode": "UNKNOWN on budget exhaustion, mismatch, impossible minimization, or excessive candidate state count",
+  "scientific_integrity": "Keep original failed and passed receipts; no post-hoc favorable adjustments"
+}
