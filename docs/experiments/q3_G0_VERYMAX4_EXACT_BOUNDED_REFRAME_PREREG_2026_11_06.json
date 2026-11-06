@@ -1,0 +1,38 @@
+{
+  "schema": "neumann.q3.g0.verymax4.exact-bounded-reframe.prereg.v1",
+  "date": "2026-11-06",
+  "goal": "Resolve whether a universally applicable, source-derived bounded-variable case split provides genuinely correct new original satisfiability solutions to four externally authored 2017 VeryMax original QF_NIA instances that 17 solver variants left unsolved in official SMT-COMP 2026.",
+  "source_study": "SMT-COMP 2026 published exact per-task union via repo issue #218, 17 jointly unresolved, VeryMax/ITS exactly four. Source names known, original formulas not examined by this new algorithm's author as part of this prereg. Historical GitHub exposure beyond this turn not independently ruled out; DO NOT claim researcher blind.",
+  "prior_official_audit_run": "https://github.com/yoonsj0305/NEUMANN/actions/runs/39421585497",
+  "corpus_release": {
+    "url": "https://zenodo.org/records/16740866/files/QF_NIA.tar.zst?download=1",
+    "record": "16740866",
+    "name": "SMT-LIB non-incremental 2025.08.04 QF_NIA.tar.zst",
+    "published_md5": "6a3ae3b7eb10688070c44922ccd940aa",
+    "expected_compressed_bytes_approx": 191200000,
+    "source_status": "source release MD5 and exact original file SHA256 to record, no substitution; if archive inaccessible -> INFRA_BLOCKED"
+  },
+  "full_four_source_file_names": [
+    "From_AProVE_2014__Velroyen08-narrowing.jar-obl-8__p14386_terminationG_0.smt2",
+    "From_T2__fun5.t2_fixed__p1007_terminationG_0.smt2",
+    "From_T2__nakata.t2__p5330_terminationG_0.smt2",
+    "From_T2__tqli.t2__p25231_terminationG_0.smt2"
+  ],
+  "protocol": "Pin all 4 before reading problem bodies, keep all four in denominator. Never replace any failing original. Source parse not allowed to see expected satisfiability status except for posthoc comparison.",
+  "algorithm": "Generic source-only identify Int variables with universal syntactic conjunct literal bounds, isolate bounded vars occurring as factors of nonlinear multiplication with at least one other symbolic variable; enumerate all integer assignments of selected variables whose Cartesian range product <=64. For each assignment substitute constants, simplify, use exact unchanged original constraints AND assignment. On SAT verify full original formula using original evaluation of model and independent cvc5 model checker if accessible. On UNSAT require every branch certified by independent Z3 and cvc5 on exact branch constraints AND exhaustive finite cover; otherwise UNKNOWN. Unsupported/proof timeout -> UNKNOWN, never UNSAT by heuristic. No per-file constants, hardcoded answers, expected statuses, or model APIs.",
+  "control_suite": "Strong source-only original full Z3 at 15 seconds per case; independent cvc5 15 seconds per case; structural reframe total 15 seconds per case including all branches, source parsing + verification; no larger entitlement than baseline. SMT-COMP published 17 variants at 1200sec is historical comparison, not matched runner.",
+  "research_gate": "SCOPED G0 PASS iff at least one full-original SAT witness independently validated or every finite branch independently Z3/cvc5 UNSAT, while both equal-budget classical baselines UNKNOWN on that same source; 0 wrong model, no false UNSAT, all four source paths exact and source archive md5 pinned. Else scoped G0 FAIL/UNKNOWN, preserving receipt. This is classical mechanism headroom only, not learned invention.",
+  "negative_controls": "Perturbed incorrect external model must reject; missing source must block; finite branch incomplete may never certify UNSAT; unsafe or unsound inferred constraints must fail closed.",
+  "budgets": {
+    "max_selected_bounded_vars": 3,
+    "max_cartesian_cases": 64,
+    "source_solver_wall_seconds_each": 15,
+    "refame_total_wall_seconds_each": 15,
+    "whole_ci_minutes": 20,
+    "max_raw_source_bytes_per_case": 2000000
+  },
+  "science_exclusions": [
+    "No Q3 neural invented semantics, no Q6 independent cross-formalism transfer, no frontier competence, no general-case 10x cost, no success claim based on green CI alone"
+  ],
+  "actual_first_experiment_started": false
+}
