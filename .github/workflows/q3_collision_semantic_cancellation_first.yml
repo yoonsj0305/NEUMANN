@@ -1,0 +1,58 @@
+name: Q3 frozen first model semantic-vs-syntax relevance adversarial FIRST
+
+# Historical first already retained; stop automatic rescore.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  frozen-semantic-first:
+    if: false # archived immutable first / post-first proof
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Source-free scientific integrity tests
+        run: python -m unittest discover -s tests -p 'test_q3_collision_semantic_cancellation_first.py' -v
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-Q3-CEGAR-REPAIR-GROWER-ORIGINAL-FIRST
+          run-id: 42204120156
+          github-token: ${{ github.token }}
+          path: original-first
+      - name: Verify immutable original FIRST before any adversarial Z3 question
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo 'c05a039ecb371279de66714bafcd1a5b6c05ebc18d7477ce4c77f302d9e21127  original-first/Q3-COUNTEREXAMPLE-REPRESENTATION-FIRST.json' | sha256sum -c -
+      - name: Install independent Z3 semantic-collision proof engine
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y z3
+          z3 --version
+      - name: Strict first evaluation, exact frozen weights, no training or original CHC
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'POSTFIRST_SEMANTIC_CHALLENGE_WALL_S=%e MAX_RSS_KB=%M' \
+            python -m research.q3.collision_semantic_cancellation_first \
+             --first original-first/Q3-COUNTEREXAMPLE-REPRESENTATION-FIRST.json \
+             --out Q3-CEX-SEMANTIC-CANCELLATION-ORIGINAL-FIRST.json
+      - name: Preserve negative scientific first result without favorable replays
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-SEMANTIC-CANCELLATION-ORIGINAL-FIRST
+          path: Q3-CEX-SEMANTIC-CANCELLATION-ORIGINAL-FIRST.json
+          retention-days: 90
+          if-no-files-found: warn
