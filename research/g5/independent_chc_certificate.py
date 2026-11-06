@@ -138,10 +138,12 @@ def contract(source:bytes,witness:dict[str,str])->dict:
         body=witness[name]
         if not isinstance(body,str) or len(body)>20000:
             raise ValueError("INVALID_OR_TOO_LONG_WITNESS_BODY")
-        parsed=forms(body)
-        if len(parsed)!=1:
+        # SMT terms may be atoms such as true/false. Parse inside a
+        # synthetic one-expression wrapper, NEVER execute its contents.
+        wrapped=forms("(proof_expr "+body+")")
+        if len(wrapped)!=1 or len(wrapped[0])!=2:
             raise ValueError("WITNESS_MUST_BE_ONE_SMT_EXPR")
-        e=parsed[0]
+        e=wrapped[0][1]
         if not isinstance(e,list) and e not in ("true","false"):
             raise ValueError("WITNESS_MUST_BE_BOOLEAN_EXPRESSION")
         formals=[[f"arg{i}",sort] for i,sort in enumerate(declarations[name])]
@@ -188,14 +190,12 @@ def prove(source:bytes,witness:dict[str,str],cap_ms:int=5000)->dict:
         try:why=s.reason_unknown() if str(verdict)=="unknown" else None
         except Exception:why=None
         checks.append({"original_clause_index":i,
-           "source_clause_sha256":sha(emit(forms(emit(["assert",str(clause)]))[0]).encode()) if False else None,
-           "counterexample_status":str(verdict),
+            "counterexample_status":str(verdict),
            "negated_original_rule_UNSAT":proved,
            "verify_wall_ms":ms,
            "unknown_reason":why})
         if not proved:
             break
-    checks=[{k:v for k,v in row.items() if k!="source_clause_sha256"} for row in checks]
     ok=(len(checks)==doc["exact_original_clause_count"] and
             all(row["negated_original_rule_UNSAT"] for row in checks))
     return {"schema":"neumann.g5.exact-CHC-source-universal-witness.v1",
