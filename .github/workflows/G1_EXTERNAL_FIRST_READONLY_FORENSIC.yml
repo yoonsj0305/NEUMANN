@@ -1,0 +1,42 @@
+name: NEUMANN G1 immutable FIRST source failure forensic read-only
+on:
+  push:
+    branches:
+      - research/g1-first-ownweight-ast-sygus-20261106
+    paths:
+      - .github/workflows/G1_EXTERNAL_FIRST_READONLY_FORENSIC.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original-readonly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G1-OWNWEIGHT-SYGUS8-ORIGINAL-FIRST
+          run-id: 42154882039
+          github-token: ${{ github.token }}
+          path: original-immutable-first
+      - name: Analyze original FIRST receipt without re-running model or opening target
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo 'ORIGINAL_G1_FIRST_RESULT_SHA'
+          sha256sum original-immutable-first/G1-EXTERNAL-SYGUS8-ORIGINAL-FIRST.json
+          cat original-immutable-first/G1-EXTERNAL-SYGUS8-ORIGINAL-FIRST.json
+          echo 'ORIGINAL_G1_FIRST_STDERR'
+          cat original-immutable-first/G1-EXTERNAL-SYGUS8-ORIGINAL-FIRST.stderr
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          p=Path('original-immutable-first/G1-EXTERNAL-SYGUS8-ORIGINAL-FIRST.json')
+          obj=json.loads(p.read_text())
+          assert obj.get('science_status') in ('INFRA_OR_SOURCE_FAIL_CLOSED','SCOPED_LEARNED_CROSS_AUTHOR_AST_TRANSFER_FAIL','SCOPED_LEARNED_CROSS_AUTHOR_AST_TRANSFER_PASS')
+          print('FIRST_AS_RECORDED',obj['science_status'])
+          print('ORIGINAL_TASKS_COMPLETED',len(obj.get('rows',[])))
+          PY
