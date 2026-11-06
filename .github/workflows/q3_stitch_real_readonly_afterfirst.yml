@@ -1,0 +1,61 @@
+name: Q3 EXP2 independent read-only Stitch heldout audit after FIRST
+
+on:
+  pull_request:
+    paths:
+      - 'research/exp2/stitch_real_transfer.py'
+      - 'tests/test_stitch_real_transfer.py'
+      - '.github/workflows/q3_stitch_real_readonly_afterfirst.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  readonly-independent:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Source-free tests of read-only S-expression audit
+        run: python -m unittest discover -s tests -p 'test_stitch_real_transfer.py' -v
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-EXP2-STITCH-REAL-PUBLISHED-CORPUS-FIRST
+          run-id: 42192798081
+          github-token: ${{ github.token }}
+          path: first
+      - name: Recreate frozen original split and certify pinned source, no Stitch build or execution
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/stitch-original"
+          git -C "$RUNNER_TEMP/stitch-original" remote add origin https://github.com/mlb2251/stitch.git
+          git -C "$RUNNER_TEMP/stitch-original" fetch --depth=1 origin 350804b7b35807c78bd21c313785ae5152ae2985
+          git -C "$RUNNER_TEMP/stitch-original" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/stitch-original" hash-object data/cogsci/nuts-bolts.json)" = 85f142ef8c536463f8b55f2d0d7633d05efd03e7
+          python -m research.exp2.stitch_real_transfer prepare --source "$RUNNER_TEMP/stitch-original/data/cogsci/nuts-bolts.json" --directory "$RUNNER_TEMP/reconstructed"
+          cmp first/split_receipt.json "$RUNNER_TEMP/reconstructed/split_receipt.json"
+          cp "$RUNNER_TEMP/reconstructed/train.json" "$RUNNER_TEMP/reconstructed/heldout.json" first/
+          python - <<'PY'
+          from pathlib import Path
+          assert len(Path('first/stitch.stdout').read_bytes()) > 150
+          assert 'Found 1 inventions' in Path('first/stitch.stdout').read_text()
+          print('IMMUTABLE_FIRST_UPSTREAM_ENGINE_STDOUT_READONLY; NO_STITCH_RERUN')
+          PY
+      - name: Independent macro site transfer and exact reconstruction on frozen 55 heldout programs
+        run: python -m research.exp2.stitch_real_transfer audit --directory first
+      - name: Archive strictly read-only independent audit, retaining original first failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-EXP2-STITCH-REAL-ORIGINAL-READONLY-HOLDOUT-AUDIT
+          path: first/first_audit.json
+          retention-days: 90
+          if-no-files-found: warn
