@@ -1,0 +1,73 @@
+name: Q3 opened COPY2 COPY3 Eldarica 2.2 native strong baseline FIRST
+
+# Historical original FIRST #42204574420: BOTH 60s TIMEOUT_CENSORED.
+# Archive only; no repeated original scoring.
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_classical_eldarica_copy_first.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  native-once:
+    if: false # FIRST #42204574420 has completed; permanently disable source rescoring
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Preflight exact native-status parser, no original read
+        run: |
+          python -m py_compile research/q3/eldarica_public_original_native_first.py
+          python - <<'PY'
+          from research.q3.eldarica_public_original_native_first import classify, git_blob
+          assert classify("sat\n", False, 0) == "sat"
+          assert classify("unknown\n", False, 0) == "unknown"
+          assert classify("timeout\n", False, 124) == "CHECKER_ERROR_OR_UNPARSABLE"
+          assert classify("sat\n", True, None) == "TIMEOUT_CENSORED"
+          assert len(git_blob(b"test")) == 40
+          print("NATIVE_PROVENANCE_PREFLIGHT_PASS")
+          PY
+      - name: Download original public Eldarica CHC-COMP 2025 version 2.2
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 2 --silent --show-error \
+            --output eldarica-bin-2.2.zip \
+            https://github.com/uuverifiers/eldarica/releases/download/v2.2/eldarica-bin-2.2.zip
+          sha256sum eldarica-bin-2.2.zip
+          mkdir -p eld-native
+          unzip -q eldarica-bin-2.2.zip -d eld-native
+          eld_path="$(find "$PWD/eld-native" -type f -name eld | head -n 1)"
+          test -n "$eld_path"
+          chmod +x "$eld_path"
+          echo "ELD_EXECUTABLE=$eld_path" >> "$GITHUB_ENV"
+      - name: FIRST only two already opened published originals, sixty seconds each
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'NATIVE_TWO_ORIGINALS_PROCESS_WALL_S=%e MAX_RSS_KB=%M' \
+            python -m research.q3.eldarica_public_original_native_first \
+              --eld "$ELD_EXECUTABLE" \
+              --release-archive eldarica-bin-2.2.zip \
+              --out Q3-ELDARICA-OPENED-COPY2-COPY3-NATIVE-FIRST
+          sha256sum Q3-ELDARICA-OPENED-COPY2-COPY3-NATIVE-FIRST/FIRST_NATIVE_STATUS.json
+      - name: Retain raw native stdout, exact sources and first results even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-ELDARICA-OPENED-COPY2-COPY3-STRONG-BASELINE-FIRST
+          path: Q3-ELDARICA-OPENED-COPY2-COPY3-NATIVE-FIRST/
+          retention-days: 90
+          if-no-files-found: warn
