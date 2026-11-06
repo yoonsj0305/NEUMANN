@@ -1,0 +1,76 @@
+name: NEUMANN EXP2 Stitch pinned first program macro independent syntactic expansion audit
+on:
+  push:
+    branches:
+      - research/q3-stitch-minimal-external-abstraction-20261106
+    paths:
+      - .github/workflows/NEUMANN_EXP2_STITCH_FIRST_READONLY_MACRO_AUDIT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independent-stitch-original-rewrite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-EXP2-STITCH-REAL-UPSTREAM-SOURCEFREE-PILOT
+          run-id: 42182841182
+          github-token: ${{ github.token }}
+          path: pinned-original
+      - name: Check immutable first output SHA, original program exact reconstruct and wrong-macro rejection, no Stitch rerun
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '3e40357e645bfcfb6d6eb768b624da4ca40a2d684dc2737ef3fc84709d50a947  pinned-original/STITCH-PINNED-EXTERNAL-SOURCEFREE-FIRST.stdout' | sha256sum -c -
+          python3 - <<'PY'
+          import hashlib,json,re
+          from pathlib import Path
+          s=Path('pinned-original/STITCH-PINNED-EXTERNAL-SOURCEFREE-FIRST.stdout').read_text()
+          assert "Found 1 inventions" in s
+          assert "Cost Improvement: (1.33x better) 806 -> 604" in s
+          assert "uses: 2" in s
+          assert re.search(r'fn_0 arity=1: \(#0 #0 #0\)',s)
+          original=['(foo (a a a))','(bar (b b b))']
+          rewrite=['(foo (fn_0 a))','(bar (fn_0 b))']
+          assert all(row in s for row in rewrite)
+          def expand(program,repeat=3):
+              m=re.fullmatch(r'\(([a-z]+) \(fn_0 ([a-z]+)\)\)',program)
+              if not m: raise AssertionError('NOT_THE_PINNED_ORIGINAL_GRAMMAR')
+              outer,v=m.groups()
+              return '('+outer+' ('+' '.join(v for _ in range(repeat))+'))'
+          recovered=[expand(p) for p in rewrite]
+          assert recovered==original
+          assert [expand(p,2) for p in rewrite]!=original
+          evidence={
+            'schema':'neumann.exp2.stitch.upstream-2-original-readonly-macro-proof.v1',
+            'actual_first_engine_run':42182841182,
+            'upstream_stitch_sha':'350804b7b35807c78bd21c313785ae5152ae2985',
+            'actual_first_stdout_sha256':hashlib.sha256(s.encode()).hexdigest(),
+            'program_count':2,
+            'actual_macro':'fn_0(x) = (x x x)',
+            'syntactic_macro_expansion_back_to_original':True,
+            'wrong_two_term_macro_rejected':True,
+            'static_stitch_cost_before':806,
+            'static_stitch_cost_after':604,
+            'static_cost_ratio':806/604,
+            'native_engine_reexecutions':0,
+            'student_training_runs':0,
+            'independent_external_original_new_tests':0,
+            'Q3':'OPEN','Q4':'OPEN','Q6':'OPEN','Q7':'OPEN'
+          }
+          Path('EXP2-STITCH-READONLY-MACRO-EXACT-RECONSTRUCTION.json').write_text(json.dumps(evidence,sort_keys=True,indent=2)+'\n')
+          print(json.dumps(evidence,sort_keys=True))
+          PY
+      - name: Preserve strict read-only after-first independent macro reconstruction
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-EXP2-STITCH-FIRST-READONLY-EXACT-MACRO-PROOF
+          path: EXP2-STITCH-READONLY-MACRO-EXACT-RECONSTRUCTION.json
+          if-no-files-found: warn
+          retention-days: 90
