@@ -1,11 +1,8 @@
 name: Q3 EXP2 independent read-only Stitch heldout audit after FIRST
 
+# Archived after retained first outcome; no favorable original reruns.
 on:
-  pull_request:
-    paths:
-      - 'research/exp2/stitch_real_transfer.py'
-      - 'tests/test_stitch_real_transfer.py'
-      - '.github/workflows/q3_stitch_real_readonly_afterfirst.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -13,6 +10,7 @@ permissions:
 
 jobs:
   readonly-independent:
+    if: false # read-only historical archive, no new runs
     runs-on: ubuntu-latest
     timeout-minutes: 6
     steps:
