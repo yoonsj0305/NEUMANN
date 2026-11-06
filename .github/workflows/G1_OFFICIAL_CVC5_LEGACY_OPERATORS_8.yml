@@ -1,0 +1,117 @@
+name: NEUMANN G1 cvc5 old string operators fixed, original eight specialist
+on:
+  push:
+    branches:
+      - research/g1-first-ownweight-ast-sygus-20261106
+    paths:
+      - .github/workflows/G1_OFFICIAL_CVC5_LEGACY_OPERATORS_8.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original-specialist-after-compat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install genuine cvc5 and exact official SyGuS converter
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq cvc5
+          python -m pip install --quiet ply==3.11 pyparsing==2.4.7
+          git init "$RUNNER_TEMP/sygus-tools"
+          git -C "$RUNNER_TEMP/sygus-tools" remote add origin https://github.com/SyGuS-Org/tools.git
+          git -C "$RUNNER_TEMP/sygus-tools" fetch --depth=1 origin 9f5cc084b77ce172a22c646dc54528b639ffb139
+          git -C "$RUNNER_TEMP/sygus-tools" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/sygus-tools" rev-parse HEAD)" = '9f5cc084b77ce172a22c646dc54528b639ffb139'
+          cvc5 --version | head -1
+      - name: Strict synthetic-only typed compatibility controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p test_g1_postfirst_legacy_operator_tokens.py -v
+          python -m unittest discover -s tests -p test_g1_postfirst_official_converter.py -v
+          python - <<'PY'
+          from research.g1.postfirst_official_converter_cvc5 import canonicalize_legacy_string_builtins
+          import subprocess,tempfile,pathlib
+          source='''(set-logic SLIA)
+          (synth-fun f ((name String)) String ((Start String) (G String))
+             ((Start String (G))
+              (G String (name (int.to.str 123) (str.++ G G)))))
+          (declare-var name String)
+          (constraint (= (f "Kara") "Kara"))
+          (check-synth)
+          '''
+          modern,c=canonicalize_legacy_string_builtins(source)
+          assert c['int.to.str']==1
+          assert 'str.from_int' in modern
+          with tempfile.TemporaryDirectory() as d:
+              f=pathlib.Path(d)/'synthetic-compat.sl'
+              f.write_text(modern)
+              p=subprocess.run(['cvc5','--lang=sygus2','--sygus','--tlimit-per=5000',str(f)],
+                 capture_output=True,text=True,timeout=8)
+              print('SYNTHETIC_EXPERT_EXIT',p.returncode)
+              print('SYNTHETIC_EXPERT_STDOUT',p.stdout[:450])
+              print('SYNTHETIC_EXPERT_STDERR',p.stderr[:450])
+              assert p.returncode==0 and 'define-fun f' in p.stdout
+          PY
+      - name: Original eight publisher-converted and legacy operator normalized expert evaluation
+        shell: bash
+        run: |
+          set -uo pipefail
+          python -m research.g1.postfirst_official_converter_cvc5 "$RUNNER_TEMP/sygus-tools" > G1-CVC5-8-LEGACY-COMPAT-POSTFIRST.json 2> G1-CVC5-8-LEGACY-COMPAT-POSTFIRST.stderr
+          rc=$?
+          if test -s G1-CVC5-8-LEGACY-COMPAT-POSTFIRST.json; then
+            python - <<'PY'
+          import json
+          x=json.load(open('G1-CVC5-8-LEGACY-COMPAT-POSTFIRST.json'))
+          print(json.dumps({
+           'science':x.get('scientific_status'),
+           'stats':x.get('stats'),
+           'originals':[{
+              'file':r['name'],
+              'status':r['status'],
+              'valid':r['verified_heldout'],
+              'solver_status':(r.get('specialist') or {}).get('status'),
+              'dialect':(r.get('specialist') or {}).get('dialect'),
+              'aliases':(r.get('conversion') or {}).get('legacy_builtins_renamed'),
+              'errors':[a.get('stderr_tail','')[:250] for a in (r.get('specialist') or {}).get('attempts',[])]
+           } for r in x.get('rows',[])]},sort_keys=True))
+          assert x.get('stats',{}).get('original_external_denominator')==8
+          assert x.get('stats',{}).get('original_training_weights_retrained') is False
+          assert x.get('stats',{}).get('ARC_public_eval_originals_consumed')==0
+          PY
+            parsed=$?
+            if test "$parsed" -ne 0;then rc=1;fi
+          else
+            rc=1
+          fi
+          cat G1-CVC5-8-LEGACY-COMPAT-POSTFIRST.stderr
+          echo "ORIGINAL_SPECIALIST_RESULT_EXIT=$rc"
+          exit "$rc"
+      - name: Hash original real specialist result even if negative
+        if: always()
+        shell: bash
+        run: |
+          if test -s G1-CVC5-8-LEGACY-COMPAT-POSTFIRST.json; then
+            sha256sum G1-CVC5-8-LEGACY-COMPAT-POSTFIRST.json > G1-CVC5-8-LEGACY-COMPAT-POSTFIRST.sha256
+            cat G1-CVC5-8-LEGACY-COMPAT-POSTFIRST.sha256
+          fi
+      - name: Preserve all original per-case specialist and independent verification receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G1-CVC5-REAL-8-LEGACY-COMPAT
+          path: |
+            G1-CVC5-8-LEGACY-COMPAT-POSTFIRST.json
+            G1-CVC5-8-LEGACY-COMPAT-POSTFIRST.stderr
+            G1-CVC5-8-LEGACY-COMPAT-POSTFIRST.sha256
+          if-no-files-found: warn
+          retention-days: 90
