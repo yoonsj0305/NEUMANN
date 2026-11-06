@@ -49,7 +49,7 @@ def horn(original:str)->str:
         " (not "+call(spec["post"],args)+")) Bad))"
     ]
     return (
-       "(set-logic HORN)\n"
+       "(set-logic HORN)\n"+
        # This bundled Z3 Horn interpreter selects Spacer for HORN by default.
        # Old Z3 rejects the nonportable ':fixedpoint.engine' option.
 
