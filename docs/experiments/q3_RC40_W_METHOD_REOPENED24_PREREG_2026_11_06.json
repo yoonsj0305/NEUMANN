@@ -1,0 +1,23 @@
+{
+  "schema": "neumann.q3.rc40.classical-w-method-reopened24.preregister.v1",
+  "date": "2026-11-06",
+  "research_question": "Can an exact hypothesis-driven W-method replace exhaustive all-strings conformance at the same source-only rights and trusted reference state bound N<=5?",
+  "scope": "POSTFIRST SAME 24 ALREADY OPEN RC39 tasks. Never claim newly unseen transfer, neural discovery, global Q3/Q6 or 10x end-to-end model cost.",
+  "fixed_learner_git_blob": "83bd15d98b8fa02f4427b26c27264d35c0ec261e",
+  "reference": "RC39 original membership-only 24 tasks. Original FIRST: 172051 unique membership words, 1362696 unique source symbols, 172499 conformance probes.",
+  "method": "Known classical Mealy W-method. Reachable pairwise-distinguishable m-state candidate. Test (state_cover UNION transition_cover)·Sigma^[0..N-m]·characterization_set, N=5. Any untrusted state bound, nonminimal/ unreachable model, or budget violation => UNKNOWN.",
+  "rights": "All learner and conformance access to target MUST pass through membership(input_word) returning output_word only. Target transition graph available to independent auditor AFTER model frozen.",
+  "metrics": [
+    "w_unique_source_membership_calls",
+    "w_unique_source_symbols",
+    "w_conformance_words_checked",
+    "baseline_same_runner_unique_source_calls",
+    "both_exact_all_length_independently_proven",
+    "negative_mutant_detection",
+    "cpu_ms_both_same_runner"
+  ],
+  "prereg_primary_gate": "W method 24/24 independently exact all-length PASS, 24/24 original exhaustive reference PASS, ZERO false certificates; W unique membership query total <= 17205 (>=10x reduction in same rights/query count).",
+  "explicit_secondary_gate": "Same-runner compare W against full-string baseline, source characters, process CPU; report even if query primary gate fails. Synthetic mutation false-cert rate ZERO.",
+  "failure": "Retain original first result even if FAIL. Never rerun failed first to select favorable result. No leftover ARC original 11 IDs touched.",
+  "future_external_generalization": "A newly authored external-domain family with precommitted source-only reference rights, controlled fresh task generation, equal-rights strong classic baseline, and independent product proof is required for Q6. This reopened24 test is insufficient."
+}
