@@ -1,0 +1,60 @@
+{
+  "schema": "neumann.q3.p44.single-seed-group-orbit.prereg.v1",
+  "date": "2026-11-06",
+  "north_star": "Frontier-level problem solving with minimum necessary computation",
+  "hypothesis": "Automatically close ONE previously exact working source program under geometric D4 orientation and bijective palette relabeling, yielding one parametric program family that solves at least two new original opened ARC train tasks beyond the frozen P43 plus P30 correct-set union, without adding any other handcrafted ARC operator.",
+  "single_seed": {
+    "source_branch": "research/q3-open-program-teacher-p22-20261105",
+    "path": "experiments/q3_open_program_teacher_p22_FIRST_PROPOSAL.mjs",
+    "git_blob": "d82f09406b4b3ee4e9651c261013c8ce8aa850c7",
+    "name": "aa18de87",
+    "origin_first_verified_transfer_task": "a699fb00.json",
+    "action": "For each ROW, connect positions from first through last nonzero marker by changing only the zeros strictly between them to source fill color 2",
+    "source_type": "GPT-6 externally authored teacher source, not NEUMANN own learned weight invention."
+  },
+  "group_closure": {
+    "spatial_group": "D4 action on rectangular grids by rotation/reflection; quotient orientation stabilizer of row-interval fill => 2 distinct axes, row/column. Representative T0 identity, T1 transpose.",
+    "palette_group": "S10 palette permutations; the seed only checks background color and writes exactly one fill constant. Conjugacy quotient identified by ordered (background b,fill c), b != c, each in {0,...,9}. Other 8 colors permuted canonically and inverted.",
+    "unique_semantics_count": 180,
+    "conjugation": "f_[axis,b,c](x) = T_axis^-1 o pi_(b,c)^-1 o f_seed o pi_(b,c) o T_axis(x), where pi_(b,c)(b)=0 and pi_(b,c)(c)=2 and pi is a bijection.",
+    "total_per_task_syntactic_candidates": 180,
+    "allowed_learner": "Pure exact TRAIN consistency for all examples, plus observed at least one pixel changed on TRAIN, and unanimity of accepted programs on all TEST inputs. No ranker weights, no score-gold in proposal, no task IDs.",
+    "source_interface": "original grid values 0..9, each H,W 1..30; no partial evaluation beyond seeded operator.",
+    "forbidden": "No new manual fill primitive, no learned model calls, no external pretrained outputs, no source-id/test-gold-based choosing or oracle merge."
+  },
+  "originals": {
+    "repo": "fchollet/ARC-AGI",
+    "commit": "399030444e0ab0cc8b4e199870fb20b863846f34",
+    "scope": "data/training",
+    "n": 400,
+    "exposure": "Previously OPENED original data, not new blind task family; no ARC public evaluation ID touched.",
+    "baseline_original_p30_run": 42024425446,
+    "baseline_original_p30_sha256": "0fb747b4fd7355649465b8ff3424c0170d6d178f47fd1ea64ca486c416672b79",
+    "baseline_original_p43_run": 42145135283,
+    "baseline_original_p43_sha256": "8b5cb4927133930f6238adb17dbeba5a73d6955a368965b67318cc6aca78a398",
+    "old_p30_correct": 54,
+    "old_p30_wrong": 8,
+    "p43_teacher_correct": 1,
+    "p43_teacher_wrong": 0,
+    "prior_oracle_union_correct": 55
+  },
+  "precommitted_first_gate": "SCOPED_ONE_SEED_ORBIT_REUSE_PASS iff new generalized family adds >=2 additional original test-exact tasks beyond frozen correct-set OR(P30,P43) of 55, zero newly submitted wrong outputs, and at least one new success using axis=column or b!=0 or c!=2. Otherwise scientific FAIL. PASS is a classical seeded structural closure, NOT NEUMANN Q3 neural invention or Q6 independent formalism.",
+  "cost_accounting": "Meter candidate train/test program executions, CPU and wall. Include separate one-time human/external-teacher cost as UNMETERED. The classical full search over the same 180 variants is the equal-rights baseline and must obtain identical predictions, so no learned-exclusive result.",
+  "controls": [
+    "All parameters b!=c produce exact source conjugation using unchanged frozen aa18de87 function and invertible maps.",
+    "D4 quotient identities/involution and palette bijection verified on generated multishape examples.",
+    "Nontrivial TRAIN change required to avoid identity false-positive matches.",
+    "All TRAIN examples exactly matched, each TEST output valid, disagreeing fitting variants cause ABSTAIN.",
+    "Tampered original P30 or P43 FIRST hash or source blob fails closed.",
+    "Original TEST gold strictly read after all proposals frozen.",
+    "Independent audit from original immutable FIRST, alternate program implementation and original gold scoring, no rerun of original producer.",
+    "Original public evaluation reserve 11 unaffected."
+  ],
+  "degraded_mode": "Invalid original source, unmetered or invalid gold, shape >30, insufficient TRAIN evidence, ambiguous outputs, runtime exception or verification failure means ABSTAIN or FAIL_CLOSED.",
+  "global_science": {
+    "Q3_learned_new_executable_semantics": "OPEN",
+    "Q4_equal_rights_10x_all_in_cost": "OPEN",
+    "Q6_independent_formalism": "OPEN",
+    "Q7_frontier": "OPEN"
+  }
+}
