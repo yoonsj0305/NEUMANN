@@ -1,0 +1,58 @@
+name: G3 own-weight frozen 2 to 128 symbolic stage extrapolation (source-free)
+on:
+  pull_request:
+    paths:
+      - 'research/g3/ownweight_symbolic_n_readonly.py'
+      - 'tests/test_g3_ownweight_symbolic_n_readonly.py'
+      - 'docs/experiments/G3_OWNWEIGHT_ALL_N_2_TO_128_PREREG_2026_11_06.json'
+      - '.github/workflows/g3_ownweight_all_n_readonly.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  first-source-free-extrapolation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Pure Python original-source-free negative-control tests
+        run: python -m unittest discover -s tests -p 'test_g3_ownweight_symbolic_n_readonly.py' -v
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-OWNWEIGHT-QUANTIFIED-TRAIN-FIRST
+          run-id: 42198111692
+          github-token: ${{ github.token }}
+          path: archived-first-weights
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-OWNWEIGHT-QUANTIFIED-ORIGINAL-INIT2INIT3-FIRST
+          run-id: 42198669136
+          github-token: ${{ github.token }}
+          path: archived-first-original
+      - name: Exact SHA check before reading model-stage results, no unseen original source fetch
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '982ef08b88758537dfe56f3ad8451de26fbd438df295802c491c25d231de9bdc  archived-first-weights/G3-OWNWEIGHT-QUANTIFIED-AST-FROZEN.json' | sha256sum -c -
+          echo '04a8cac1f5b886ee5b242844f6fc3ff9ceb202c17332dba37271c6d3b2c546c7  archived-first-original/G3-OWNWEIGHT-ORIGINAL-FIRST.json' | sha256sum -c -
+      - name: FIRST frozen independent n2..128 four-head model stage-role extrapolation
+        run: |
+          python -m research.g3.ownweight_symbolic_n_readonly \
+            --checkpoint archived-first-weights/G3-OWNWEIGHT-QUANTIFIED-AST-FROZEN.json \
+            --first-original archived-first-original/G3-OWNWEIGHT-ORIGINAL-FIRST.json \
+            --report G3-OWNWEIGHT-SYMBOLIC-N-2-128-FIRST.json
+          sha256sum G3-OWNWEIGHT-SYMBOLIC-N-2-128-FIRST.json
+      - name: Preserve first positive or negative extrapolation with zero original task reruns
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G3-OWNWEIGHT-FROZEN-SYMBOLIC-N-2-128-FIRST
+          path: G3-OWNWEIGHT-SYMBOLIC-N-2-128-FIRST.json
+          if-no-files-found: warn
+          retention-days: 90
