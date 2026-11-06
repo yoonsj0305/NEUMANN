@@ -1,0 +1,83 @@
+name: NEUMANN Q3 G0 pinned first four hard originals read-only no-go audit
+on:
+  push:
+    branches:
+      - research/q3-g0-verymax4-exact-reframe-20261106
+    paths:
+      - .github/workflows/q3_G0_VERYMAX4_FIRST_READONLY.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original-no-go-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Download original first executable result, not rerun solver
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-Q3-G0-VERYMAX4-FIRST-EXECUTABLE
+          run-id: 42144606986
+          github-token: ${{ github.token }}
+          path: first-locked
+      - name: Independently compare frozen first bytes and all four verdicts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          path=Path('first-locked/G0-VERYMAX4-FIRST.json')
+          data=path.read_bytes()
+          digest=hashlib.sha256(data).hexdigest()
+          assert digest=='ea8df5dd7f6f3ce494a096f8dfca88a7e7e556e51608f4e480ce3f4a92a3107a',digest
+          p=json.loads(Path('docs/experiments/q3_G0_VERYMAX4_EXACT_BOUNDED_REFRAME_PREREG_2026_11_06.json').read_text())
+          x=json.loads(data)
+          assert len(x['records'])==4
+          assert set(z['file'] for z in x['records'])==set(p['full_four_source_file_names'])
+          assert x['science_status']=='G0_NO_CERTIFIED_MATCHED_HEADROOM'
+          assert x['matched_original_positive_count']==0
+          assert x['all_four_original_sources_present']
+          expected={
+          'From_AProVE_2014__Velroyen08-narrowing.jar-obl-8__p14386_terminationG_0.smt2':'8443699407ec30931eed79834d360229247734109cd67e7e0e6a22f3a267e097',
+          'From_T2__fun5.t2_fixed__p1007_terminationG_0.smt2':'a3bb6da0ada1f5fdb3f87f4a3bab49fe975d4ce14768fc9d85d5278a38425f30',
+          'From_T2__nakata.t2__p5330_terminationG_0.smt2':'c1a1f5cfd7ffc2935b70400b94cd86479f28296411b0c7f25d5963f194bf1d35',
+          'From_T2__tqli.t2__p25231_terminationG_0.smt2':'1872a2978bd3b0238fa660d8fa962402255e9600a9fda821cc5c0119b9e45c17'}
+          rows=[]
+          for z in x['records']:
+              assert z['source_sha256']==expected[z['file']]
+              assert z['baseline_z3']['status']=='unknown'
+              assert z['reframe']['outcome']=='UNKNOWN_BRANCH_NOT_Z3_UNSAT'
+              assert z['reframe']['branches_checked']==1
+              assert not z['new_matched_positive']
+              rows.append({'file':z['file'],'source_sha256':z['source_sha256'],
+                'bounded_vars':z['reframe']['chosen_bound_vars'],
+                'branch_count':z['reframe']['branch_count'],
+                'branches_checked':z['reframe']['branches_checked'],
+                'z3':z['baseline_z3'],'cvc5':z['baseline_cvc5'],
+                'reframe_outcome':z['reframe']['outcome'],
+                'reframe_wall_seconds':z['reframe_wall_seconds']})
+          out={'schema':'neumann.q3.g0.verymax4.pinned-readonly-first-audit.v1',
+               'audit_pass':True,'original_first_sha256':digest,
+               'original_first_run':42144606986,'no_solver_rerun':True,
+               'source_metadata_matched':4,'new_proven_results':0,
+               'global_Q3_Q4_Q6_Q7':'OPEN','rows':rows}
+          Path('G0-VERYMAX4-PINNED-NOGO-AUDIT.json').write_text(json.dumps(out,indent=2,sort_keys=True)+'\n')
+          print(json.dumps(out,sort_keys=True))
+          forged=json.loads(data)
+          forged['matched_original_positive_count']=1
+          changed=json.dumps(forged).encode()
+          assert hashlib.sha256(changed).hexdigest()!=digest
+          print('FORGED_POSITIVE_REJECTED')
+          PY
+      - name: Preserve immutable original no-go audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-G0-VERYMAX4-FIRST-NOGO-READONLY-AUDIT
+          path: G0-VERYMAX4-PINNED-NOGO-AUDIT.json
+          retention-days: 90
+          if-no-files-found: warn
