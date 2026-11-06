@@ -1,0 +1,236 @@
+{
+  "schema": "neumann.q3.postfirst-frozen-collision-semantic-sufficiency-challenge.v1",
+  "date": "2026-11-06",
+  "hypothesis": "Does the frozen collision-trained policy identify semantically irrelevant source mentions (S-S, 0*S) rather than merely counting syntactic S references?",
+  "original_first": {
+    "run": 42204120156,
+    "artifact": "NEUMANN-Q3-CEGAR-REPAIR-GROWER-ORIGINAL-FIRST",
+    "file": "Q3-COUNTEREXAMPLE-REPRESENTATION-FIRST.json",
+    "original_JSON_sha256": "c05a039ecb371279de66714bafcd1a5b6c05eb18d7477ce4c77f302d9e21127",
+    "checkpoint_sha256": "0e8f31b31e89f211455634fa460605df6d6f53aa67bdf75629b692320f20d276"
+  },
+  "preregistered_heldout_not_in_initial_first": [
+    {
+      "expr": [
+        "add",
+        [
+          "select",
+          "S",
+          [
+            "add",
+            [
+              "var",
+              "b"
+            ],
+            [
+              "var",
+              "i"
+            ]
+          ]
+        ],
+        [
+          "neg",
+          [
+            "select",
+            "S",
+            [
+              "add",
+              [
+                "var",
+                "b"
+              ],
+              [
+                "var",
+                "i"
+              ]
+            ]
+          ]
+        ]
+      ],
+      "db": 1,
+      "sb": 0
+    },
+    {
+      "expr": [
+        "mul",
+        [
+          "const",
+          0
+        ],
+        [
+          "select",
+          "S",
+          [
+            "add",
+            [
+              "var",
+              "b"
+            ],
+            [
+              "var",
+              "i"
+            ]
+          ]
+        ]
+      ],
+      "db": -9,
+      "sb": 5
+    },
+    {
+      "expr": [
+        "add",
+        [
+          "mul",
+          [
+            "const",
+            2
+          ],
+          [
+            "select",
+            "S",
+            [
+              "add",
+              [
+                "var",
+                "b"
+              ],
+              [
+                "var",
+                "i"
+              ]
+            ]
+          ]
+        ],
+        [
+          "neg",
+          [
+            "mul",
+            [
+              "const",
+              2
+            ],
+            [
+              "select",
+              "S",
+              [
+                "add",
+                [
+                  "var",
+                  "b"
+                ],
+                [
+                  "var",
+                  "i"
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      "db": 3,
+      "sb": 3
+    },
+    {
+      "expr": [
+        "add",
+        [
+          "const",
+          7
+        ],
+        [
+          "mul",
+          [
+            "const",
+            0
+          ],
+          [
+            "select",
+            "S",
+            [
+              "add",
+              [
+                "var",
+                "b"
+              ],
+              [
+                "var",
+                "i"
+              ]
+            ]
+          ]
+        ]
+      ],
+      "db": 12,
+      "sb": -12
+    },
+    {
+      "expr": [
+        "add",
+        [
+          "select",
+          "S",
+          [
+            "add",
+            [
+              "var",
+              "b"
+            ],
+            [
+              "var",
+              "i"
+            ]
+          ]
+        ],
+        [
+          "neg",
+          [
+            "const",
+            3
+          ]
+        ]
+      ],
+      "db": 0,
+      "sb": 4
+    },
+    {
+      "expr": [
+        "mul",
+        [
+          "const",
+          5
+        ],
+        [
+          "select",
+          "S",
+          [
+            "add",
+            [
+              "var",
+              "b"
+            ],
+            [
+              "var",
+              "i"
+            ]
+          ]
+        ]
+      ],
+      "db": -5,
+      "sb": 8
+    }
+  ],
+  "decisive_first_gate": "6/6 trained decisions correct under independent semantic H0-collision SMT oracle; record all wrong predictions in first result; independent semantic-oracle direct baseline should be 6/6 but is counted as higher inference cost",
+  "ablations": [
+    "original frozen trained logits",
+    "zero untrained policy",
+    "syntactic S-occurrence classical baseline",
+    "real Z3 semantic-collision oracle baseline"
+  ],
+  "model_frozen_no_retraining": true,
+  "scientific_scope": "Author-constructed symbolic ASTs, still NOT external original, same finite typed grammar. Nothing about Q3/Q6 autonomous generalization.",
+  "no_favorable_resampling": true,
+  "global_Q3": "OPEN",
+  "global_Q6": "OPEN",
+  "global_Q5": "OPEN",
+  "actual_run": "NOT_RUN"
+}
