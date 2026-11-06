@@ -99,9 +99,9 @@ def analyze(spec: dict[str,Any],repo: Path) -> dict[str,Any]:
         errors.append("TEST_GOLD_LEAK_RISK")
     if evaluation.get("training_and_test_task_ids_disjoint") is not True:
         errors.append("TRAIN_TEST_IDS_NOT_DISJOINT")
-    if evaluation.get("source_manifest_sha256") is None or not is_hash(
-        evaluation.get("source_manifest_sha256")):
-        errors.append("SOURCE_MANIFEST_UNPINNED")
+    if not valid_original_sha(evaluation.get("source_manifest_file"),
+                              evaluation.get("source_manifest_sha256"),repo):
+        errors.append("SOURCE_MANIFEST_UNPINNED_OR_UNVERIFIED")
     if evaluation.get("from_arc_agi_1_evaluation") is True:
         # Globally only 11/400 remain untouched; no new source evaluation
         # without the separate PR #650 ledger + novel semantic proposal.
@@ -126,7 +126,7 @@ def analyze(spec: dict[str,Any],repo: Path) -> dict[str,Any]:
     first=spec.get("first_run",{})
     if not isinstance(first,dict):
         first={}
-    if first.get("original_denominator",0)<1 or type(first.get("original_denominator")) is not int:
+    if type(first.get("original_denominator")) is not int or first["original_denominator"]<1:
         errors.append("NO_FROZEN_ORIGINAL_DENOMINATOR")
     if first.get("one_original_FIRST_only") is not True:
         errors.append("FAVORABLE_RERUN_RISK")
