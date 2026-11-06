@@ -18,7 +18,7 @@
 | False all-length certificates | 0 | **0** |
 | Deliberately altered state programs rejected | 24 (independent audit of W) | **24** |
 
-**Query reduction:** 172051/6117 = **28.126696x**. **Source-symbol reduction:** 1362696/28354 = **48.0592x**. CPU values are single-run empirical process-time observations, not hardware-independent performance or financial/energy cost. Direct real-world API latency was not measured.
+**Query reduction:** 172051/6117 = **28.126696x**. **Source-symbol reduction:** 1362696/28354 = **48.0601x**. CPU values are single-run empirical process-time observations, not hardware-independent performance or financial/energy cost. Direct real-world API latency was not measured.
 
 Test suite: [3000 synthetic Mealy source/hypothesis pairs](https://github.com/yoonsj0305/NEUMANN/actions/runs/42136993787) independently checked against exact reachable-product equivalence. Reachability/nonminimality violations are UNKNOWN. Negative controls include an output discrepancy delayed until a fifth A.
 
