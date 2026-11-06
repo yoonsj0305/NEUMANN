@@ -1,14 +1,14 @@
 name: Q3 H1 human relational COPY actual CHC published original dev proof
+# First original complete; no repeat source scoring.
 on:
-  pull_request:
-    paths:
-      - 'research/q3/real_copy2_chc_h1.py'
-      - 'docs/experiments/Q3_TWO_ARRAY_COPY_REAL_CHC_DEV_FIRST_2026_11_06.json'
-      - '.github/workflows/q3_copy2_real_original_h1_first.yml'
+  workflow_dispatch:
+
 permissions:
   contents: read
 jobs:
   original-copy2-dev:
+    if: false # retained historical first CI contract; do not rerun
+
     runs-on: ubuntu-latest
     timeout-minutes: 6
     steps:
