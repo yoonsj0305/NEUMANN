@@ -1,11 +1,8 @@
 name: Q3 EXP2 three independently published target program corpora read-only first
 
+# Archived after retained first outcome; no favorable original reruns.
 on:
-  pull_request:
-    paths:
-      - 'research/exp2/stitch_cross_corpus.py'
-      - 'docs/experiments/Q3_EXP2_STITCH_CROSS_CORPUS_FIRST_PREREG_2026_11_06.json'
-      - '.github/workflows/q3_stitch_cross_corpus_first.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -13,6 +10,7 @@ permissions:
 
 jobs:
   cross-original-source-first:
+    if: false # read-only historical archive, no new runs
     runs-on: ubuntu-latest
     timeout-minutes: 6
     steps:
