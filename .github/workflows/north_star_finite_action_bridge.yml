@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'neumann1/finite_action_boundary_v1.py'
+      - 'neumann1/structural_library_admission_v1.py'
+      - 'tests/test_structural_library_admission_v1.py'
       - 'tests/test_finite_action_boundary_v1.py'
       - 'experiments/north_star_opened_actual.py'
       - 'docs/research/NORTH_STAR_LEARNED_STRUCTURE_EXECUTION_PLAN_2026_11_06.md'
@@ -31,5 +33,7 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_finite_action_boundary_v1.py' -v
       - name: Actual existing arithmetic and CSP solvers plus original independent verifier
         run: python -m experiments.north_star_opened_actual
+      - name: Typed library operator/signature fail-closed admission
+        run: python -m unittest discover -s tests -p 'test_structural_library_admission_v1.py' -v
       - name: Existing control-plane compatibility
         run: python -m unittest discover -s tests -p 'test_control_plane_v1.py' -q
