@@ -1,0 +1,342 @@
+{
+  "schema": "neumann.q3.representation-repair-from-collision-witness-v1",
+  "date": "2026-11-06",
+  "hypothesis": "A learned own-weight policy trained ONLY from formal H0 collision oracle feedback, without a human target relation label, selects when to expand destination-only H0 and composes a new typed relation from the source transition AST, proving arbitrary symbolic prefix lengths by independent Z3.",
+  "initial_H0": "All destination-only predicates P(D,a,i) and metadata, no source array S read",
+  "typed_H1_constructor": "Generic symbolic binder-lift of the public transition's typed STORE right-hand AST; not a manually enumerated COPY_PREFIX/ADD1/SUB1 candidate list; human-designed grammar and compiler remain present",
+  "source_provenance": "AUTHOR-CONSTRUCTED_SYNTHETIC_TYPED_TRANSITION_PROGRAMS_NOT_EXTERNAL_ORIGINAL_CHC",
+  "original_CHC_Copy2": "Previously OPENED real COPY2 is NOT being rescored or counted as newly solved",
+  "train": {
+    "examples": [
+      {
+        "expr": [
+          "select",
+          "S",
+          [
+            "add",
+            [
+              "var",
+              "b"
+            ],
+            [
+              "var",
+              "i"
+            ]
+          ]
+        ],
+        "db": 0,
+        "sb": 0
+      },
+      {
+        "expr": [
+          "add",
+          [
+            "select",
+            "S",
+            [
+              "add",
+              [
+                "var",
+                "b"
+              ],
+              [
+                "var",
+                "i"
+              ]
+            ]
+          ],
+          [
+            "const",
+            1
+          ]
+        ],
+        "db": 1,
+        "sb": 2
+      },
+      {
+        "expr": [
+          "mul",
+          [
+            "const",
+            2
+          ],
+          [
+            "select",
+            "S",
+            [
+              "add",
+              [
+                "var",
+                "b"
+              ],
+              [
+                "var",
+                "i"
+              ]
+            ]
+          ]
+        ],
+        "db": 4,
+        "sb": -7
+      },
+      {
+        "expr": [
+          "neg",
+          [
+            "select",
+            "S",
+            [
+              "add",
+              [
+                "var",
+                "b"
+              ],
+              [
+                "var",
+                "i"
+              ]
+            ]
+          ]
+        ],
+        "db": -2,
+        "sb": 5
+      },
+      {
+        "expr": [
+          "const",
+          0
+        ],
+        "db": 0,
+        "sb": 0
+      },
+      {
+        "expr": [
+          "const",
+          2
+        ],
+        "db": 3,
+        "sb": -2
+      }
+    ],
+    "weights_init": [
+      0,
+      0,
+      0
+    ],
+    "learning_rate": 0.2,
+    "gradient_steps": 250,
+    "feature_schema": [
+      "bias",
+      "count_source_select",
+      "AST_node_count_div_12"
+    ],
+    "label_source": "INDEPENDENT_Z3_SAT_COLLISION_BOOLEAN_ONLY"
+  },
+  "heldout": {
+    "examples": [
+      {
+        "expr": [
+          "select",
+          "S",
+          [
+            "add",
+            [
+              "var",
+              "b"
+            ],
+            [
+              "var",
+              "i"
+            ]
+          ]
+        ],
+        "db": 2,
+        "sb": -7
+      },
+      {
+        "expr": [
+          "add",
+          [
+            "select",
+            "S",
+            [
+              "add",
+              [
+                "var",
+                "b"
+              ],
+              [
+                "var",
+                "i"
+              ]
+            ]
+          ],
+          [
+            "const",
+            3
+          ]
+        ],
+        "db": 100,
+        "sb": -30
+      },
+      {
+        "expr": [
+          "mul",
+          [
+            "const",
+            3
+          ],
+          [
+            "select",
+            "S",
+            [
+              "add",
+              [
+                "var",
+                "b"
+              ],
+              [
+                "var",
+                "i"
+              ]
+            ]
+          ]
+        ],
+        "db": 0,
+        "sb": 0
+      },
+      {
+        "expr": [
+          "neg",
+          [
+            "add",
+            [
+              "select",
+              "S",
+              [
+                "add",
+                [
+                  "var",
+                  "b"
+                ],
+                [
+                  "var",
+                  "i"
+                ]
+              ]
+            ],
+            [
+              "const",
+              1
+            ]
+          ]
+        ],
+        "db": 4,
+        "sb": 4
+      },
+      {
+        "expr": [
+          "add",
+          [
+            "mul",
+            [
+              "const",
+              2
+            ],
+            [
+              "select",
+              "S",
+              [
+                "add",
+                [
+                  "var",
+                  "b"
+                ],
+                [
+                  "var",
+                  "i"
+                ]
+              ]
+            ]
+          ],
+          [
+            "const",
+            -3
+          ]
+        ],
+        "db": 7,
+        "sb": -2
+      },
+      {
+        "expr": [
+          "const",
+          7
+        ],
+        "db": 0,
+        "sb": 0
+      },
+      {
+        "expr": [
+          "neg",
+          [
+            "const",
+            2
+          ]
+        ],
+        "db": 4,
+        "sb": 6
+      },
+      {
+        "expr": [
+          "add",
+          [
+            "mul",
+            [
+              "const",
+              4
+            ],
+            [
+              "select",
+              "S",
+              [
+                "add",
+                [
+                  "var",
+                  "b"
+                ],
+                [
+                  "var",
+                  "i"
+                ]
+              ]
+            ]
+          ],
+          [
+            "const",
+            4
+          ]
+        ],
+        "db": 10,
+        "sb": -5
+      }
+    ],
+    "model_checkpoint_must_freeze_before_ORACLE_eval": true,
+    "expected_scoped_gate": "at least 6/6 source-dependent cases (actually 6) choose representation growth, and 2/2 constant-only cases stay H0, all generated relations prove INIT+STEP universally and SAT NONVACUITY+BAD_STORE; zero-weight fails at least one, strong classical same-rights counted",
+    "no_new_original_task_access": true
+  },
+  "reference_baselines": [
+    "strong_classical_typed_AST_dependency_analysis",
+    "untrained_zero_weight_logistic_policy",
+    "human_fixed_relation_if_given (not used as answer labels)"
+  ],
+  "model_returns_action_only": true,
+  "costs": "all Z3 subprocess calls, wall time, training fit, verification, failed candidates, first retained; USD/FLOPs unknown",
+  "intended_theorem": "If phi(x)=phi(y) and f(x) != f(y), every deterministic g∘phi fails on at least one. Does not guarantee any finite H1 or profitable discovery.",
+  "future_Q6": "Actual different formalism needs a preregistered alpha and full commuting/simulation proof; NOT provided here",
+  "Q3": "OPEN",
+  "Q4": "OPEN",
+  "Q5": "OPEN",
+  "Q6": "OPEN",
+  "Q7": "OPEN",
+  "actual_run": "NOT_RUN"
+}
