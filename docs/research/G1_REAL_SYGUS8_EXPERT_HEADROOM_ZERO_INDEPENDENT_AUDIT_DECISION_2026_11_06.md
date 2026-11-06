@@ -62,6 +62,25 @@ The [read-only original native-program and first-model version-space comparison 
 
 This pins the G1 scientific failure directly to **missing executable hypothesis coverage**, not a weak selector over an otherwise complete candidate set. It is a *finite-language* impossibility for four original TRAIN datasets. Do not implement a larger manually authored 2-token ranker or reuse these same opened originals as an external transfer gate. The next learned proposal mechanism must **generate genuinely different compositional operator structures**, and be compared with strong equal-rights GP/CEGIS using that same new structure language.
 
+### 8 real native proof programs isolate TWO independent interface failures
+
+[Read-only proof-source gap receipt #42164685351](https://github.com/yoonsj0305/NEUMANN/actions/runs/42164685351) reconstructed **all eight exact original cvc5 programs from the first locked source** with code hashes; no new neural training or cvc5 program synthesis. The original 225-variant learner lacked two independent requirements:
+
+| Original source | Original 225-program training fit | Published-grammar native cvc5 original witness structure |
+|---|---|---|
+| `lastname.sl` | **4** fitting ASTs; first original correct | substring starting at dynamic space position, valid 1-argument function |
+| `dr-name.sl` | **0** | literal prefix, `str.indexof`, dynamic `str.substr`, concatenation |
+| `phone-1.sl` | **0** | `str.substr` at non-default offset and explicit length |
+| `phone-3.sl` | **0** | nested concatenation, substring, `str.at`, position arithmetic |
+| `phone-7.sl` | **0** | delimiter-relative indexing, `str.at`, `str.indexof`, arithmetic |
+| `reverse-name.sl` | Unsupported by unary-only student | Native function has **two input strings** and concatenates in reverse |
+| `univ_1.sl` | Unsupported by unary-only student | Native function has **two input strings** and separators |
+| `univ_3.sl` | Unsupported by unary-only student | Native function has **two input strings** and a generated conditional/substring composition |
+
+The source program ASTs demonstrate *possible* solutions, NOT that every printed operator is indispensable. The first four zero-fit cases are stronger: no program at all in the **complete 225** matches every TRAIN pair, irrespective of learned ranking. The remaining three expose a **function-signature/interface failure** rather than an incorrect ranking of executable 1-input functions.
+
+**Next interface contract (not another handwritten program catalogue):** variable-arity typed arguments; types `String/Int/Bool`; recursively compositional bounded AST with dynamic index computations and multi-step intermediate values; canonical executable code; independent native solver checking; explicit abstain/error. Learned policy must propose programs *outside old frozen H*, then earn a measured exclusive gain over a **same-rights** full grammar GP/CEGIS / specialized native reference on **different, previously unopened originals where the strongest native baseline has unresolved residual**. A new manually hardcoded operator list is infrastructure and must not be called autonomous learned invention.
+
 ## 3. A strict mathematical STOP condition, not another sweep
 
 Let `D` be the registered original set of eight, and `C` be cvc5 with original source rights. The independent original verifier now establishes `Correct(C,x)=1` for **every** `x∈D` under last-example criterion. Therefore
