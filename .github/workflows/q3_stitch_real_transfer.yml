@@ -1,18 +1,16 @@
 name: Q3 EXP2 real published Stitch program-library holdout transfer
 
+# Source-first engine receipts are already immutable in run 42192798081.
+# This workflow is archived to prevent accidental further engine runs.
 on:
-  pull_request:
-    paths:
-      - 'research/exp2/stitch_real_transfer.py'
-      - 'tests/test_stitch_real_transfer.py'
-      - 'docs/experiments/Q3_EXP2_STITCH_REAL_CORPUS_TRAIN_HOLDOUT_PREREG_2026_11_06.json'
-      - '.github/workflows/q3_stitch_real_transfer.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
   pinned-original:
+    if: false # Archive only: never rescore first source after opening output
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
