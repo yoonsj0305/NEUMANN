@@ -117,10 +117,27 @@ def run_cohort(name:str):
         raise ValueError("G3_SOURCE_MANIFEST_DENOMINATOR_CHANGED")
     c=next(x for x in reg["cohorts"] if x["id"]==name)
     if len(c["targets"])!=8:raise ValueError("G3_GROUP_N_CHANGED")
+    # Pre-original source-free CI failed before any of 24 bodies were read.
+    # Preserve that manifest. Exactly ONE metadata transcription typo is
+    # corrected by verified upstream GitHub Contents SHA, never task content.
+    err=json.loads((ROOT/"docs/experiments/G3_SOURCEFREE_PREOPEN_ONE_GIT_BLOB_ERRATUM_2026_11_06.json").read_text())
+    fix=err["exact_single_metadata_transcription_error"]
+    if (fix["folder"]!="adt-purified-benchmarks" or
+        fix["file"]!="6-lists-0-append-sum-1.Z3.0_000.smt2" or
+        fix["original_38hex"]!="be2d26d30df39059ea94ea9c33cddf51aaa19d" or
+        fix["publisher_verified_40hex"]!="be2d26d30df39059ea94ea9a9c33cddf51aaa19d"):
+        raise ValueError("UNAPPROVED_G3_SOURCE_METADATA_CORRECTION")
     rows=[]
     for item in c["targets"]:
+        effective=dict(item)
+        if c["folder"]==fix["folder"] and item["file"]==fix["file"]:
+            if item["git_blob"]!=fix["original_38hex"]:
+                raise ValueError("G3_ORIGINAL_MANIFEST_PUBLISHER_ERRATUM_MISMATCH")
+            effective["git_blob"]=fix["publisher_verified_40hex"]
+        elif len(item["git_blob"])!=40:
+            raise ValueError("SECOND_UNAPPROVED_G3_SOURCE_GIT_BLOB")
         try:
-            out=source_probe(c["folder"],reg["upstream"]["commit"],item,name,15)
+            out=source_probe(c["folder"],reg["upstream"]["commit"],effective,name,15)
         except Exception as error:
             out={"cohort":name,"file":item["file"],"original_expected_git_blob":item["git_blob"],
                 "status":"SOURCE_ACCESS_OR_INFRA_FAIL_CLOSED",
