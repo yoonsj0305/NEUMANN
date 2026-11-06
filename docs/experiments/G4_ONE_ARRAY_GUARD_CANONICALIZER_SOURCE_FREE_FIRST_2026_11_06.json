@@ -1,0 +1,23 @@
+{
+  "schema": "neumann.q3.g4.array-guard-canonicalization-one-mechanism-after-source.v1",
+  "date": "2026-11-06",
+  "scoped_under": "docs/experiments/G4_ONE_ARRAY_FRAME_OPERATOR_POSTFIRST_SOURCE_SELECTION_2026_11_06.json",
+  "reason": "Primary array_swap original exposes array stores/selects behind hundreds of redundant Boolean guard disjunctions. Try ONE reusable array-effect/guard normalization, without changing source predicate signatures or adding learned states, as a required interface simplification before array-frame structure inference.",
+  "operator": "Parse ORIGINAL CHC into Z3 HORN formulae. Apply only Z3's semantics-preserving local formula simplifier (no unproven lemma addition and no new arrays) to each quantifier, then reserialize unchanged predicate arities and assertions. Always check original raw Git blob.",
+  "unchanged_target3": [
+    "array_swap_000.smt2",
+    "array_swap_twice_000.smt2",
+    "standard_copy2_true-unreach-call_ground_000.smt2"
+  ],
+  "source_previously_opened_by_first": true,
+  "frozen_strong_baseline": "2025 official 0/8 published array verdict; Z3 4.8.12 and 2026 5.0.0 both timed out at 15 seconds on all eight array originals.",
+  "preflight": "Source-free simple safe and unsafe quantified Horn clauses must preserve SAT/UNSAT. The operator must not erase clauses or change declare-fun arity, and an intentionally mutated safety case must remain UNSAT.",
+  "success": "Only an originally unsupported/timeout problem returning SAT/UNSAT on transformed whole source plus independently validated original source proof counts as genuine new solving. A transformed solver claim alone is provisional, NO learned Q3. If all three UNKNOWN, HARD STOP the canonicalization strategy, do NOT hand-tune based on original cases.",
+  "no_neural_training": true,
+  "no_new_ARC_eval_consumption": true,
+  "model_full_cost": "SOURCE_NORMALIZATION_MS+SOLVER_MS; no 10x unless compared apples-to-apples.",
+  "Q3": "OPEN",
+  "Q4": "OPEN",
+  "Q6": "OPEN",
+  "Q7": "OPEN"
+}
