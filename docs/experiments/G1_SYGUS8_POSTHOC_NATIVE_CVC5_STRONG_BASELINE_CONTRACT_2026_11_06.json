@@ -1,0 +1,26 @@
+{
+  "schema": "neumann.g1.sygus8-posthoc-strong-native-specialist-contract.v1",
+  "date": "2026-11-06",
+  "honest_exposure": "ALL eight public SyGuS files have now been viewed by original G1 first-complete. This is a POSTHOC stronger-baseline audit, not a fresh blind holdout and never replaces initial student results.",
+  "original_first_frozen": {
+    "run": 42155439426,
+    "sha256": "6d9940cefc43d9b8ccb93b375bcaf4ba02690481ca432637e54de28a09bfe8cc",
+    "learned_correct": 1,
+    "limited_classical225_correct": 1
+  },
+  "external_original": "SyGuS-Org/benchmarks@13c8deb68a873635879c9a69bc78caebd340f646, eight exact filenames and source blobs fixed in prior G1 prereg + one-character SHA erratum",
+  "baseline": "Use actual installed cvc5 SyGuS synthesis solver with original per-file native grammar; strip exactly the LAST published constraint as TEST from the solver input and retain all other original constraints as TRAIN. Each original benchmark stays in denominator. Solver receives zero withheld gold. Its synthesized define-fun, when available, must be independently evaluated against original complete TRAIN and heldout using separate Z3 string SMT theory. 8 tasks including 3 formerly unsupported by two-token student's unary grammar.",
+  "budget": {
+    "cvc5_tlimit_ms_per_original": 7000,
+    "subprocess_wall_limit_s_per_original": 9,
+    "Z3_ground_original_train_and_heldout_tlimit_ms_each": 1500,
+    "total_original_tasks": 8
+  },
+  "strict_scientific_scope": "A cvc5 synthesized function validated on heldout original examples is a stronger native classical baseline, not a proof of all-input equivalence or unique mapping. Its candidate native grammar and richer parameter arity are not same as student's small 225 program grammar; compare both separately, never claim full iso-rights or advantage.",
+  "independent_proof": "Z3 accepts original native define-fun and original constraints; reject any candidate with Z3 parse error, unknown, timeout or not-UNSAT train/heldout negation. Z3 and cvc5 distinct implementations.",
+  "degraded_mode": "Source SHA change, solution parse missing, unsupported native grammar, timeout, or unverified candidate => UNKNOWN_NO_CERTIFIED_SOLUTION, not a solved claim.",
+  "Q3": "OPEN",
+  "Q4": "OPEN",
+  "Q6": "OPEN",
+  "Q7": "OPEN"
+}
