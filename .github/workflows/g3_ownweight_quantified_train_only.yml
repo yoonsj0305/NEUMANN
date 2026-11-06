@@ -1,0 +1,67 @@
+name: G3 own-weight quantified invariant student TRAIN only (no test source)
+# Historical first already archived; disable duplicate evaluation.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+jobs:
+  train-frozen-before-original:
+    if: false # archived immutable first result
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded numeric and independent verifier
+        run: |
+          python -m pip install numpy==2.2.6
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y z3
+          z3 --version
+      - name: Source-free grammar and untrained model negative checks
+        run: python -m unittest discover -s tests -p 'test_g3_ownweight_schema_student.py' -v
+      - name: Train actual own weights on opened development original source only
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'TRAIN_AND_OPENED_PROOF_CPU_WALL=%e MAX_RSS_KB=%M' \
+            python -m research.g3.ownweight_schema_student \
+              --checkpoint G3-STUDENT-ACTUAL-TRAIN-FIRST.json \
+              --report G3-STUDENT-OPENED-FIRST-REPORT.json
+          sha256sum G3-STUDENT-ACTUAL-TRAIN-FIRST.json G3-STUDENT-OPENED-FIRST-REPORT.json
+      - name: Audit actual trained checkpoint, 49 opened original clauses, embargo on target sources
+        run: |
+          python - <<'PY'
+          import hashlib,json,pathlib
+          w=pathlib.Path('G3-STUDENT-ACTUAL-TRAIN-FIRST.json').read_bytes()
+          model=json.loads(w)
+          report=json.loads(pathlib.Path('G3-STUDENT-OPENED-FIRST-REPORT.json').read_text())
+          assert report['checkpoint_SHA256']==hashlib.sha256(w).hexdigest()
+          assert model['original_external_test_sources_opened']==0
+          assert report['actual_weights_updated'] is True
+          assert report['num_train_originals']==3
+          assert report['training_exact_four_head_symbols']==20
+          assert report['opened_originals_all_independently_verified']
+          assert report['opened_original_total_clauses']==49
+          assert report['opened_original_proved']==49
+          assert report['Q3']=='OPEN'
+          print('ACTUAL_TRAINED_WEIGHTS_SHA256',report['checkpoint_SHA256'])
+          print('OPENED_DEV_INDEPENDENT_ORIGINAL_HORN_PROOF',report['opened_original_proved'])
+          print('UNOPENED_TARGET_ORIGINAL_BODY_FETCHES',report['original_test_sources_fetched'])
+          PY
+      - name: Preserve first genuine trained student checkpoint and 49 independent proofs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G3-OWNWEIGHT-QUANTIFIED-TRAIN-FIRST
+          path: |
+            G3-STUDENT-ACTUAL-TRAIN-FIRST.json
+            G3-STUDENT-OPENED-FIRST-REPORT.json
+          if-no-files-found: warn
+          retention-days: 90

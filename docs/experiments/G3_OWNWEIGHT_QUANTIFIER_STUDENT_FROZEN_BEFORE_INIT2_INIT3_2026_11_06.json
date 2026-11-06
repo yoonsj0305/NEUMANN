@@ -1,0 +1,68 @@
+{
+  "schema": "neumann.g3.ownweight.teacher-distilled-first-frozen-before-typed-targets.v1",
+  "date": "2026-11-06",
+  "training_first": {
+    "run_id": 42198111692,
+    "head_sha": "0fbd2ae8f115788ea1073a474b771d991997a879",
+    "artifact_name": "NEUMANN-G3-OWNWEIGHT-QUANTIFIED-TRAIN-FIRST",
+    "checkpoint_relative_path": "G3-OWNWEIGHT-QUANTIFIED-AST-FROZEN.json",
+    "checkpoint_sha256": "982ef08b88758537dfe56f3ad8451de26fbd438df295802c491c25d231de9bdc",
+    "opened_train_proved_clauses": 49,
+    "opened_train_total_clauses": 49,
+    "opened_original_source_names": [
+      "standard_init4_true-unreach-call_ground_000.smt2",
+      "standard_init6_true-unreach-call_ground_000.smt2",
+      "standard_init7_true-unreach-call_ground_000.smt2"
+    ],
+    "trained_generator_github_file_blob_sha": "f3e2cd0e2f359dca5ec97e9076999ca97b7c4563",
+    "original_test_body_fetch_count_before_freeze": 0
+  },
+  "hypothesis": "On two already-registered external-author CHC init2/init3 original files held out from this learner's training, frozen trained own-weight four-token quantifier policy outputs independently proven original Horn assertions and untrained initialized policy fails at least one.",
+  "source_scope": "separate original family variants withheld from THIS STUDENT training; NOT evidence of unseen new formalism nor independently authored family. Other G3 research may have referenced this source family.",
+  "target_registry": [
+    {
+      "file": "standard_init2_true-unreach-call_ground_000.smt2",
+      "blob": "cba84803dc722ac8e556daf196578793f4400947",
+      "bytes": 4798
+    },
+    {
+      "file": "standard_init3_true-unreach-call_ground_000.smt2",
+      "blob": "1a2f2c157fa25e6dd89850c8bf4239d052143207",
+      "bytes": 6100
+    }
+  ],
+  "upstream": {
+    "repo": "chc-comp/chc-comp25-benchmarks",
+    "commit": "ddd279cab0717db6effe69baad451a8eb04ffd86",
+    "folder": "quic3/data"
+  },
+  "no_target_body_access_before_first_weight_sha_frozen": true,
+  "original_eval_budget": {
+    "native_z3_seconds_per_original": 15,
+    "per_clause_proof_seconds": 7,
+    "max_originals": 2
+  },
+  "matched_paths": [
+    "trained_own_weight_fourhead",
+    "same_architecture_untrained_original_seed_weights",
+    "human_defined_G3_same_formal_grammar",
+    "original_source_Z3_strong_native"
+  ],
+  "pass_gate_scope": "Both original program clause sets independently proven from frozen STUDENT four-head outputs, learned-vs-untrained proof advantage; human template and strong-native outcomes counted separately; no Q3 global promotion.",
+  "failure_policy": "Any original source drift, checkpoint drift, semantic/proof failure or loss against native => first original FAIL or UNKNOWN with immutable logs; never use test to tune and rerun as first.",
+  "human_designed_grammar_is_reused": true,
+  "own_weight_operator_invention_claim": false,
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q5": "OPEN",
+  "global_Q6": "OPEN",
+  "global_Q7": "OPEN",
+  "eval_executed": false,
+  "pre_first_code_freeze": {
+    "original_evaluator_blob_sha": "b1eaa0728e27976a28c05fcc4c8bb49249c817db",
+    "source_parser_blob_sha": "8043d84210822f9a47d78568c25ea97cb0c175dd",
+    "student_model_code_blob_sha": "f3e2cd0e2f359dca5ec97e9076999ca97b7c4563",
+    "original_first_evaluation_actual_run": "NOT_RUN",
+    "hidden_source_bodies_not_accessed_by_this_eval": true
+  }
+}

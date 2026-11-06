@@ -1,0 +1,55 @@
+name: G3 own-weight ORIGINAL first independent read-only certificate audit
+
+# READONLY FIRST audit proved; disabled against additional source scoring.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  independently-check-original-FIRST:
+    if: false # permanently archived independent first only
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install independent SMT verifier, no model fitting or evaluation imports
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq z3
+          z3 --version
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-OWNWEIGHT-QUANTIFIED-TRAIN-FIRST
+          run-id: 42198111692
+          github-token: ${{ github.token }}
+          path: archived-student
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-OWNWEIGHT-QUANTIFIED-ORIGINAL-INIT2INIT3-FIRST
+          run-id: 42198669136
+          github-token: ${{ github.token }}
+          path: archived-first
+      - name: Strict independent source/original weights/original clauses/mutant proof read-only
+        run: |
+          set -euo pipefail
+          python -m research.g3.ownweight_first_independent_readonly_audit \
+            --first archived-first/G3-OWNWEIGHT-ORIGINAL-FIRST.json \
+            --checkpoint archived-student/G3-OWNWEIGHT-QUANTIFIED-AST-FROZEN.json \
+            --report G3-OWNWEIGHT-FIRST-STRICT-INDEPENDENT-AUDIT.json
+      - name: Preserve independent evidence and original failure if any
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G3-OWNWEIGHT-FIRST-READONLY-THIRD-PROOF
+          path: G3-OWNWEIGHT-FIRST-STRICT-INDEPENDENT-AUDIT.json
+          if-no-files-found: warn
+          retention-days: 90
