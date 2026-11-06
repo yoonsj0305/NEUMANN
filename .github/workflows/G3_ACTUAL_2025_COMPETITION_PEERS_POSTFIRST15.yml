@@ -1,0 +1,155 @@
+name: NEUMANN G3 original 2025 CHC-COMP Golem 0.7.1 and Eldarica 2.2 peer 15
+on:
+  push:
+    branches:
+      - research/q3-g3-2025-chc-native-first-20261106
+    paths:
+      - .github/workflows/G3_ACTUAL_2025_COMPETITION_PEERS_POSTFIRST15.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  exact-original-peer-specialist:
+    strategy:
+      fail-fast: false
+      matrix:
+        cohort:
+          - LIA_MULTIPHASE
+          - ARRAY_CHC
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-2025-CHC-LIA_MULTIPHASE-NATIVE-ORIGINAL-FIRST
+          run-id: 42174775254
+          github-token: ${{ github.token }}
+          path: locked-LIA-FIRST
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-2025-CHC-ARRAY_CHC-NATIVE-ORIGINAL-FIRST
+          run-id: 42174775254
+          github-token: ${{ github.token }}
+          path: locked-ARRAY-FIRST
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-CHC-COMP2025-24-INDEPENDENT-OFFICIAL-VERDICT-AUDIT
+          run-id: 42175491787
+          github-token: ${{ github.token }}
+          path: locked-2025-COMPETITION
+      - name: Lock all original first science SHA and published competition adjudication BEFORE peer execution
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/g3/postfirst_2025_competition_peer_baselines.py
+          echo 'c4529472973dc7e102e3b755ff866ccac5f285a9d7206488d65dd054f5b41535  locked-LIA-FIRST/G3-LIA_MULTIPHASE-NATIVE-ORIGINAL-FIRST.json' | sha256sum -c -
+          echo '47d2776afe699cccab8dc6d6e4b4f06707522f61e8d3d079c478c5614ed5f8c8  locked-ARRAY-FIRST/G3-ARRAY_CHC-NATIVE-ORIGINAL-FIRST.json' | sha256sum -c -
+          echo '8e05b0a75ad63883daa6bc1fda5d6853c62a08b5b869b9d6c43b1946f55af3df  locked-2025-COMPETITION/G3-2025-ORIGINAL24-INDEPENDENT-OFFICIAL-METADATA-AUDIT.json' | sha256sum -c -
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('docs/experiments/G3_PEER_2025_RELEASE_ASSETS_SHA_BEFORE_NATIVE_ORIGINAL_2026_11_06.json').read_text())
+          assert x['source_free_first_asset_attempt']==42176262380
+          assert x['peer_run_on_original_15_not_yet'] is True
+          print('EXACT_2025_RELEASE_BINARIES_REGISTERED_AND_FIRST_SCIENCE_IMMUTABLE')
+          PY
+      - name: Fetch exact 2025 actual competition binary only, SHA checked
+        shell: bash
+        env:
+          COHORT: ${{ matrix.cohort }}
+        run: |
+          set -euo pipefail
+          if test "$COHORT" = LIA_MULTIPHASE; then
+            curl --fail --silent --show-error --location --retry 3 --max-time 90 \
+              --output "$RUNNER_TEMP/golem-071.tar.bz2" \
+              https://github.com/usi-verification-and-security/golem/releases/download/v0.7.1/golem-x64-linux.tar.bz2
+            echo "5ce28dd6f60c70ef68d1a1fd563cb6bd442a79618e1b9826c34c34e17899d82d  $RUNNER_TEMP/golem-071.tar.bz2" | sha256sum -c -
+            tar -xjf "$RUNNER_TEMP/golem-071.tar.bz2" -C "$RUNNER_TEMP"
+            chmod +x "$RUNNER_TEMP/golem"
+            echo "PEER_BIN=$RUNNER_TEMP/golem" >> "$GITHUB_ENV"
+            echo 'RUNNING_EXACT_COMP_2025_GOLEM_0_7_1'
+          else
+            curl --fail --silent --show-error --location --retry 3 --max-time 120 \
+              --output "$RUNNER_TEMP/eldarica-22.zip" \
+              https://github.com/uuverifiers/eldarica/releases/download/v2.2/eldarica-bin-2.2.zip
+            echo "5b35abf7a8b0a29a048c64e1045a27e7d61196ec9c1d3e869b0dc9caf21746b6  $RUNNER_TEMP/eldarica-22.zip" | sha256sum -c -
+            unzip -p "$RUNNER_TEMP/eldarica-22.zip" \
+              eldarica-2.2/target/scala-2.11/Eldarica-assembly-2.2.jar > "$RUNNER_TEMP/eldarica-22.jar"
+            test -s "$RUNNER_TEMP/eldarica-22.jar"
+            cat > "$RUNNER_TEMP/eldarica-22-peer" <<EOF
+          #!/bin/sh
+          exec java -jar "$RUNNER_TEMP/eldarica-22.jar" "\$@"
+          EOF
+            chmod +x "$RUNNER_TEMP/eldarica-22-peer"
+            echo "PEER_BIN=$RUNNER_TEMP/eldarica-22-peer" >> "$GITHUB_ENV"
+            echo 'RUNNING_EXACT_COMP_2025_ELDARICA_2_2'
+          fi
+      - name: Run exact 7+8 original Z3 budget failures through published competition 2025 peer specialist
+        shell: bash
+        env:
+          COHORT: ${{ matrix.cohort }}
+        run: |
+          set -uo pipefail
+          if test "$COHORT" = LIA_MULTIPHASE; then
+            orig=locked-LIA-FIRST/G3-LIA_MULTIPHASE-NATIVE-ORIGINAL-FIRST.json
+          else
+            orig=locked-ARRAY-FIRST/G3-ARRAY_CHC-NATIVE-ORIGINAL-FIRST.json
+          fi
+          python3 -m research.g3.postfirst_2025_competition_peer_baselines \
+            --cohort "$COHORT" \
+            --first "$orig" \
+            --official locked-2025-COMPETITION/G3-2025-ORIGINAL24-INDEPENDENT-OFFICIAL-METADATA-AUDIT.json \
+            --binary "$PEER_BIN" \
+            > "G3-2025-$COHORT-PEER-POSTFIRST.json" \
+            2> "G3-2025-$COHORT-PEER-POSTFIRST.stderr"
+          rc=$?
+          if test -s "G3-2025-$COHORT-PEER-POSTFIRST.json"; then
+            python3 - "$COHORT" <<'PY'
+          import json,sys
+          c=sys.argv[1]
+          x=json.load(open('G3-2025-'+c+'-PEER-POSTFIRST.json'))
+          print(json.dumps({'cohort':c,'peer':x.get('peer_version'),'stats':x.get('stats'),
+             'originals':[{'file':r['name'],'outcome':r['status'],
+               'wall_ms':(r.get('peer') or {}).get('wall_ms'),
+               'stdout':(r.get('peer') or {}).get('stdout_excerpt','')[:170],
+               'official_agreement':r.get('official_competition_verdict_matches'),
+               'official_contradiction':r.get('disagrees_with_official_competition')}
+               for r in x.get('rows',[])]},sort_keys=True))
+          assert x['stats']['source_denominator']==8
+          assert x['stats']['peer_originals_executed']==(7 if c=='LIA_MULTIPHASE' else 8)
+          assert x['stats']['student_neural_training_invocations']==0
+          assert x['stats']['new_ARC_eval_originals']==0
+          assert x['stats']['peer_verdict_conflicts_with_official_competition']==0
+          PY
+            valid=$?
+            if test "$valid" -ne 0; then rc=1; fi
+          else
+            rc=1
+          fi
+          cat "G3-2025-$COHORT-PEER-POSTFIRST.stderr"
+          echo "ACTUAL_2025_PEER_ORIGINAL_EXIT=$rc"
+          exit "$rc"
+      - name: Freeze peer source results even if negative or source infrastructure error
+        if: always()
+        shell: bash
+        env:
+          COHORT: ${{ matrix.cohort }}
+        run: |
+          if test -s "G3-2025-$COHORT-PEER-POSTFIRST.json"; then
+            sha256sum "G3-2025-$COHORT-PEER-POSTFIRST.json" > "G3-2025-$COHORT-PEER-POSTFIRST.sha256"
+            cat "G3-2025-$COHORT-PEER-POSTFIRST.sha256"
+          fi
+      - name: Preserve immutable exact historical peer rerun and objective original source rights
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G3-2025-ACTUAL-${{ matrix.cohort }}-PEER-POSTFIRST
+          path: |
+            G3-2025-${{ matrix.cohort }}-PEER-POSTFIRST.json
+            G3-2025-${{ matrix.cohort }}-PEER-POSTFIRST.sha256
+            G3-2025-${{ matrix.cohort }}-PEER-POSTFIRST.stderr
+          if-no-files-found: warn
+          retention-days: 90
