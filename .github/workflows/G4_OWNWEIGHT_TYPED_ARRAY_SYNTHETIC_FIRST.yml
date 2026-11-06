@@ -1,4 +1,5 @@
 name: NEUMANN G4 actual own-weight array AST model independent Z3 proof SYNTHETIC FIRST
+# First CI 42181015996 failed BEFORE model training: copied equality A=B / B=A was incorrectly called a negative; Z3 rightly proved both. Frozen erratum documents actual false ADD mutation and positive semantic-equivalence test. No original 2025 target opened.
 on:
   push:
     branches:
@@ -48,6 +49,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          test -f docs/experiments/G4_SYMMETRIC_COPY_MUTANT_PREFIRST_ERRATUM_2026_11_06.json
           python -m unittest discover -s tests -p test_q3_g4_ownweight_array_lemma.py -v
       - name: FIRST own-weights trained synthetic cross-program structure and source-independent source SMT
         shell: bash
