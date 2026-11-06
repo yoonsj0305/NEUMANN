@@ -1,0 +1,67 @@
+name: Q3 EXP2 real published Stitch program-library holdout transfer
+
+# Source-first engine receipts are already immutable in run 42192798081.
+# This workflow is archived to prevent accidental further engine runs.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pinned-original:
+    if: false # Archive only: never rescore first source after opening output
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Source-free S-expression test suite, no model or other runtime dependencies
+        run: python -m unittest discover -s tests -p 'test_stitch_real_transfer.py' -v
+      - name: Fetch exact upstream program corpus and MIT Stitch binary source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/stitch"
+          git -C "$RUNNER_TEMP/stitch" remote add origin https://github.com/mlb2251/stitch.git
+          git -C "$RUNNER_TEMP/stitch" fetch --depth=1 origin 350804b7b35807c78bd21c313785ae5152ae2985
+          git -C "$RUNNER_TEMP/stitch" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/stitch" rev-parse HEAD)" = 350804b7b35807c78bd21c313785ae5152ae2985
+          test "$(git -C "$RUNNER_TEMP/stitch" hash-object data/cogsci/nuts-bolts.json)" = 85f142ef8c536463f8b55f2d0d7633d05efd03e7
+          grep -q '^MIT License' "$RUNNER_TEMP/stitch/LICENSE"
+      - name: Immutable original author corpus split to train and holdout BEFORE actual compressor
+        shell: bash
+        run: |
+          python -m research.exp2.stitch_real_transfer prepare --source "$RUNNER_TEMP/stitch/data/cogsci/nuts-bolts.json" --directory "$GITHUB_WORKSPACE/stitch-exp2-evidence"
+      - name: ONE actual pinned original Stitch run, TRAIN only, never feed holdout program AST to learner
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/stitch"
+          /usr/bin/time -f 'COLD_BUILD_PLUS_RUN_WALL_SEC=%e\nMAX_RSS_KB=%M' \
+            cargo run --release --bin compress -- "$GITHUB_WORKSPACE/stitch-exp2-evidence/train.json" --max-arity=3 --iterations=1 --threads=1 \
+            --out "$GITHUB_WORKSPACE/stitch-exp2-evidence/upstream_output.json" \
+            > "$GITHUB_WORKSPACE/stitch-exp2-evidence/stitch.stdout" 2> "$GITHUB_WORKSPACE/stitch-exp2-evidence/stitch.stderr"
+          tail -12 "$GITHUB_WORKSPACE/stitch-exp2-evidence/stitch.stdout"
+          tail -6 "$GITHUB_WORKSPACE/stitch-exp2-evidence/stitch.stderr"
+      - name: Strict independent unmodified holdout macro transfer and deliberate incorrect macro negative
+        shell: bash
+        run: python -m research.exp2.stitch_real_transfer audit --directory "$GITHUB_WORKSPACE/stitch-exp2-evidence"
+      - name: Preserve all first outputs, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-EXP2-STITCH-REAL-PUBLISHED-CORPUS-FIRST
+          path: |
+            stitch-exp2-evidence/split_receipt.json
+            stitch-exp2-evidence/stitch.stdout
+            stitch-exp2-evidence/stitch.stderr
+            stitch-exp2-evidence/upstream_output.json
+            stitch-exp2-evidence/first_audit.json
+          retention-days: 90
+          if-no-files-found: warn

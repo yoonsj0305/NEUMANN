@@ -1,0 +1,50 @@
+{
+  "schema": "neumann.exp2.stitch-real-published-corpus-macro-transfer.pre.v1",
+  "date": "2026-11-06",
+  "origin": {
+    "repo": "mlb2251/stitch",
+    "commit": "350804b7b35807c78bd21c313785ae5152ae2985",
+    "path": "data/cogsci/nuts-bolts.json",
+    "git_blob_sha1": "85f142ef8c536463f8b55f2d0d7633d05efd03e7",
+    "bytes": 62580,
+    "license": "verify pinned upstream LICENSE",
+    "original_program_source": "published cogsci shape program dataset, researcher-opened public"
+  },
+  "split": {
+    "seed": "NEUMANN-STITCH-REAL-CORPUS-2026-11-06-v1",
+    "algorithm": "sha256(seed||':'||original-index) modulo 5, residues 0,1,2,3 TRAIN, residue 4 HOLDOUT",
+    "holdout_program_body_opened_claim": false,
+    "train_only_upstream_stitch": true,
+    "all_program_ids_stable_source_index": true
+  },
+  "hypothesis": "Does the actual upstream Stitch macro learned solely from training programs match heldout original programs and independently expand back to the entire untouched AST without target-specific macro edits?",
+  "budget": {
+    "one_engine_call": true,
+    "iterations": 1,
+    "max_arity": 3,
+    "threads": 1,
+    "ci_minutes": 15,
+    "model_training": false
+  },
+  "gates": {
+    "engine_found_at_least_one_macro": true,
+    "nonzero_heldout_match_required": true,
+    "independent_expansion_all_holdout_rewrites": true,
+    "intentionally_mutated_macro_must_fail": true,
+    "read_only_heldout_source_no_stitch": true
+  },
+  "comparisons": [
+    "no_macro_original_AST",
+    "single_train_mined_macro_reused_on_heldout_AST"
+  ],
+  "science_boundaries": [
+    "This is existing-program abstraction generalization, not solving an unseen task.",
+    "No learned weights or semantic invention; Q3 remains OPEN.",
+    "No model-training costs; never compare static compression to full AI compute."
+  ],
+  "actual_run": "NOT_RUN",
+  "Q3": "OPEN",
+  "Q4": "OPEN",
+  "Q6": "OPEN",
+  "Q7": "OPEN"
+}
