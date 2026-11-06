@@ -1,0 +1,36 @@
+{
+  "schema": "neumann.g3.array-one-rule-immutable-algorithm-before-unseen-first.v1",
+  "date": "2026-11-06",
+  "frozen_source": {
+    "path": "research/g3/array_fill_parametric_invariant.py",
+    "git_blob": "8043d84210822f9a47d78568c25ea97cb0c175dd"
+  },
+  "original_first_preg": "docs/experiments/G3_ARRAY_FILL_ONE_RULE_UNSEEN_N5_N8_N9_FIRST_PREREG_2026_11_06.json",
+  "development_only_run": 42177964703,
+  "development_first_json_sha256": "7cbf1eade93e987391205115c916f0efe1bf63cf2a19708f90595272feb9ab1b",
+  "development_proofs": {
+    "stage4": 13,
+    "stage6": 17,
+    "stage7": 19
+  },
+  "original_source_exposed_for_dev": true,
+  "heldout": [
+    "standard_init5_true-unreach-call_ground_000.smt2",
+    "standard_init8_true-unreach-call_ground_000.smt2",
+    "standard_init9_true-unreach-call_ground_000.smt2"
+  ],
+  "replay_controls": {
+    "mutant": "Only original already-opened standard_init4; mutate generated stage index 1's new constant by +17. Must produce a SAT counterexample to at least one original clause (unknown not sufficient).",
+    "valid_dev": "49/49 source clause UNSAT proofs already preserved in original dev first. No changes or re-running optimization based on new heldout.",
+    "single_first_only": true
+  },
+  "scientific_gates": {
+    "PASS": "all three heldout original source SHA match, same code blob SHA; every original Horn clause negation independently UNSAT; validator mutant definitively SAT; 3/3 predeclared targets succeed without code changes; all original source evidence retained.",
+    "FAIL": "any target's original proof SAT or UNKNOWN or error; no source-specific patch/retry to call FIRST; post-first improvements separate.",
+    "SCOPE": "Classical typed parametric invariant generalization within array-fill class, NOT trained NN autonomous invention and NOT cross-domain/formalism."
+  },
+  "Q3": "OPEN",
+  "Q4": "OPEN",
+  "Q6": "OPEN",
+  "Q7": "OPEN"
+}
