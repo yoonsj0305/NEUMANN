@@ -1,0 +1,74 @@
+{
+  "schema": "neumann.g3.ownweight-quantified-ast-proof-first-prereg.v1",
+  "date": "2026-11-06",
+  "goal": "Build an actually trained own-weight 4-head AST-token proposer for quantified array invariant structure, independently prove original source Horn clauses, and compare strong classical native + human rule.",
+  "claim_limit": "HUMAN-G3-TEACHER_DISTILLATION_NOT_AUTONOMOUS_Q3_INVENTION",
+  "training": {
+    "upstream_repo": "chc-comp/chc-comp25-benchmarks",
+    "commit": "ddd279cab0717db6effe69baad451a8eb04ffd86",
+    "folder": "quic3/data",
+    "already_opened_originals": [
+      {
+        "file": "standard_init4_true-unreach-call_ground_000.smt2",
+        "git_blob": "174d192924d11f0863bbb28466613b72f825a962"
+      },
+      {
+        "file": "standard_init6_true-unreach-call_ground_000.smt2",
+        "git_blob": "c00fbed8d20b3b724fb71fb6aebd9c8b443fad13"
+      },
+      {
+        "file": "standard_init7_true-unreach-call_ground_000.smt2",
+        "git_blob": "b603b46cb0b6e9e9c6ae9cb2af6615c8e3a5813c"
+      }
+    ],
+    "source_programs_teacher": "Existing G3 human-derived, formally verified prefix/suffix/whole schemas; supervised labels from *already certified* relation roles only.",
+    "training_seed": 2077,
+    "gradient_steps": 320,
+    "feature_count": 6,
+    "model_heads": 4,
+    "categories_per_head": 4,
+    "quantifier_program_language": "4 factorized categorical token heads: for each of two slots, interval choice OFF/PREFIX/SUFFIX/WHOLE and value role OFF/NEW/PREVIOUS/NEGATIVE_CONTROL. This grammar, quantifier syntax, semantic feature extraction and variable role are HUMAN-SPECIFIED.",
+    "no_original_test_access_before_training_freeze": true
+  },
+  "external_first_candidate": {
+    "source_bodies_unopened_before_this_contract": true,
+    "cross_independent_original_cohort": [
+      {
+        "file": "standard_init2_true-unreach-call_ground_000.smt2",
+        "git_blob": "cba84803dc722ac8e556daf196578793f4400947",
+        "bytes": 4798
+      },
+      {
+        "file": "standard_init3_true-unreach-call_ground_000.smt2",
+        "git_blob": "1a2f2c157fa25e6dd89850c8bf4239d052143207",
+        "bytes": 6100
+      }
+    ],
+    "zero_original_test_body_for_training": true,
+    "no_target_specific_adjustment_after_first": true,
+    "source_original_clause_boolean_negation_proof": true,
+    "independent_verifier": "Z3 negated every unchanged CHC original assertion; no supplied expected-verdict shortcuts.",
+    "native_first": "Run strong native Z3 15s per original or classify correctly as timeout/unknown. No claims of native impossibility.",
+    "once_only_first_gate": "2/2 correct model-generated original source proofs + strictly greater success than untrained weights on those originals; record strong classical human template comparable right.",
+    "no_semantic_cross_formalism_claim": true
+  },
+  "ablations": [
+    "trained_fourhead_weights",
+    "untrained_zero_weights",
+    "human_explicit_G3_template",
+    "native_Z3_original_15s"
+  ],
+  "accounting": [
+    "training_wall_s",
+    "compile_and_verification_wall_s",
+    "peak_rss_KB",
+    "native_solver_timeout_s",
+    "failed_trials"
+  ],
+  "no_arc_eval_spent": true,
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q6": "OPEN",
+  "global_Q7": "OPEN",
+  "phase": "FROZEN_TRAIN_ONLY_NO_TARGET_EVALUATED"
+}
