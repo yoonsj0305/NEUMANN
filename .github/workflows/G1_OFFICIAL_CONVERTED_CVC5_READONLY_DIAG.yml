@@ -1,0 +1,42 @@
+name: NEUMANN G1 official converted cvc5 immutable first read-only diagnosis
+on:
+  push:
+    branches:
+      - research/g1-first-ownweight-ast-sygus-20261106
+    paths:
+      - .github/workflows/G1_OFFICIAL_CONVERTED_CVC5_READONLY_DIAG.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  read-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G1-OFFICIAL-CONVERTER-CVC5-EIGHT-POSTFIRST
+          run-id: 42162826286
+          github-token: ${{ github.token }}
+          path: pinned-original
+      - name: Diagnose original cvc5 failures, no source refetch or solver re-execution
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '777ed4e585297685926f14b5da52e132f87d12f5aacadc38cc5b7cb302879695  pinned-original/G1-REAL-CVC5-OFFICIAL-CONVERTED-8.json' | sha256sum -c -
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('pinned-original/G1-REAL-CVC5-OFFICIAL-CONVERTED-8.json').read_text())
+          assert len(x['rows'])==8
+          assert x['stats']['strict_source_conversion_proven']==8
+          for r in x['rows']:
+              attempts=r.get('specialist',{}).get('attempts',[])
+              print(json.dumps({'name':r['name'],'conversion':r['conversion']['status'],
+                  'train_examples':r['conversion']['original_PBE_examples_preserved'],
+                  'attempts':attempts},sort_keys=True))
+          print('IMMUTABLE_ORIGINAL_NO_RERUN')
+          PY
