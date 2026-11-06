@@ -1,0 +1,83 @@
+name: NEUMANN G0 exact bounded bilinear original FIRST cross-author
+on:
+  push:
+    branches:
+      - research/g0-exact-bounded-bilinear-reframe-20261106
+    paths:
+      - .github/workflows/G0_BOUNDED_BILINEAR_CROSS_AUTHOR_FIRST.yml
+permissions:
+  contents: read
+jobs:
+  original-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Pinned Z3 and independent original cvc5 verifier
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --user z3-solver==4.13.3.0
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq cvc5
+          python3 -c "import z3; print('FROZEN_Z3',z3.get_version_string())"
+          cvc5 --version
+      - name: Software-only semantic identity and negative controls (no originals)
+        run: python3 -m unittest discover -s tests -p test_g0_bounded_bilinear_first.py -v
+      - name: Source-frozen exact bilinear semantic operator ORIGINAL FIRST run
+        shell: bash
+        run: |
+          set +e
+          python3 -m research.g0.exact_bounded_bilinear_first > G0-BOUNDED-BILINEAR-FIRST.json 2> G0-BOUNDED-BILINEAR-FIRST.stderr
+          result=$?
+          if test -s G0-BOUNDED-BILINEAR-FIRST.json; then
+            python3 - <<'PY'
+          import json
+          x=json.load(open('G0-BOUNDED-BILINEAR-FIRST.json'))
+          print("G0_FIRST_SCIENCE",json.dumps({
+            'science_status':x.get('science_status'),
+            'source_count':x.get('total_original_source_count'),
+            'originals_completed':x.get('all_origins_pinned_and_executed'),
+            'new_source_proofs_vs_classical':x.get('source_verifiable_original_new_solutions_vs_native'),
+            'rewrites':x.get('total_distinct_nonconstant_product_nodes_rewritten'),
+            'external_originals_with_rewrites':x.get('externally_authored_sources_rewritten'),
+            'all_independent_semantics_lemmas':x.get('all_independent_math_lemmas_verified'),
+            'unsafe':x.get('unsafe_original_sat_admissions'),
+            'exception_type':x.get('exception_type'),
+            'exception_message':x.get('exception_message'),
+          },sort_keys=True))
+          for r in x.get('rows',[]):
+            print("G0_FIRST_CASE",json.dumps({
+              'case':r.get('case'),
+              'status':r.get('science_status'),
+              'replaced':r.get('replaced_unique_product_nodes'),
+              'direct':r.get('baseline_native_full',{}).get('status'),
+              'transformed':r.get('transformed_native_full',{}).get('status'),
+              'cvc5_original':r.get('independent_original_cvc5',{}).get('status'),
+              'error':r.get('error')},sort_keys=True))
+          PY
+          fi
+          tail -c 4500 G0-BOUNDED-BILINEAR-FIRST.stderr
+          echo "FIRST_ORIGINAL_PROCESS_EXIT=$result"
+          exit "$result"
+      - name: Hash immutable first JSON even if red science verdict
+        if: always()
+        shell: bash
+        run: |
+          if test -s G0-BOUNDED-BILINEAR-FIRST.json; then
+            sha256sum G0-BOUNDED-BILINEAR-FIRST.json > G0-BOUNDED-BILINEAR-FIRST.sha256
+            cat G0-BOUNDED-BILINEAR-FIRST.sha256
+          fi
+      - name: Preserve COMPLETE original first and errors regardless of verdict
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G0-BOUNDED-BILINEAR-ORIGINAL-FIRST
+          path: |
+            G0-BOUNDED-BILINEAR-FIRST.json
+            G0-BOUNDED-BILINEAR-FIRST.sha256
+            G0-BOUNDED-BILINEAR-FIRST.stderr
+          if-no-files-found: warn
+          retention-days: 90
