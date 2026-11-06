@@ -27,7 +27,7 @@ FROZEN=ROOT/"docs/experiments/G1_OWNWEIGHT_AST_V2_FROZEN_BEFORE_EXTERNAL_FIRST_2
 
 
 def gitblob(data:bytes)->str:
-    return hashlib.sha1(b"blob "+str(len(data)).encode()+b"\\0"+data).hexdigest()
+    return hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
 
 
 def smt_value(source:str)->str:
@@ -43,18 +43,18 @@ def smt_value(source:str)->str:
 
 QSTR=r'"(?:[^"]|"")*"'
 PAT=re.compile(
-    r"\\(constraint\\s+\\(=\\s+\\(f\\s+("+QSTR+r")\\)\\s+("+QSTR+r")\\s*\\)\\s*\\)",
+    r"\(constraint\s+\(=\s+\(f\s+("+QSTR+r")\)\s+("+QSTR+r")\s*\)\s*\)",
     re.DOTALL)
 
 
 def parse_original(data:bytes)->tuple[list[tuple[str,str]]|None,str|None]:
     try:
-        source=data.decode("utf-8").replace("\\r","\\n")
+        source=data.decode("utf-8").replace("\r","\n")
     except UnicodeError:
         return None,"NON_UTF8_SOURCE"
     if "(check-synth)" not in source or "(set-logic SLIA)" not in source:
         return None,"UNSUPPORTED_NOT_ORIGINAL_SLIA"
-    all_constraints=len(re.findall(r"\\(constraint\\b",source))
+    all_constraints=len(re.findall(r"\(constraint\b",source))
     matches=PAT.findall(source)
     if len(matches)!=all_constraints or all_constraints<2:
         return None,"UNSUPPORTED_ARITY_OR_SOURCE_CONSTRAINT_PATTERN"
