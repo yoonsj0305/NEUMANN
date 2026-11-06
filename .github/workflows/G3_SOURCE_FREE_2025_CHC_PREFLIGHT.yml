@@ -1,4 +1,5 @@
 name: NEUMANN G3 source-free two native HORN solvers preflight, before 24 original first
+# Original source-free preflight 42174182850 failed on ONE 38/40 char metadata typo, ZERO original 24 bodies accessed. Original 24 cohort freeze unchanged.
 on:
   push:
     branches:
@@ -38,8 +39,13 @@ jobs:
           assert all(len(x['targets'])==8 for x in p['cohorts'])
           t=[(x['folder'],y['file'],y['git_blob']) for x in p['cohorts'] for y in x['targets']]
           assert len(t)==len(set(t))==24
-          assert all(len(x[2])==40 for x in t)
-          print('G3_24_DIFFERENT_MATH_SOURCES_PRECOMMITTED_ORIGINAL_SHA')
+          err=json.loads(Path('docs/experiments/G3_SOURCEFREE_PREOPEN_ONE_GIT_BLOB_ERRATUM_2026_11_06.json').read_text())
+          fix=err['exact_single_metadata_transcription_error']
+          bad=[x for x in t if len(x[2])!=40]
+          assert bad==[(fix['folder'],fix['file'],fix['original_38hex'])]
+          assert fix['publisher_verified_40hex']=='be2d26d30df39059ea94ea9a9c33cddf51aaa19d'
+          assert err['first_scorer_original_cases_executed']==0
+          print('G3_24_DIFFERENT_MATH_SOURCES_PRECOMMITTED_ONE_PREOPEN_SHA_ERRATUM_FROZEN')
           PY
       - name: SOURCE-FREE synthetic HORN SAT/UNSAT controls both engines
         shell: bash
