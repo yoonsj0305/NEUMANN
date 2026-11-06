@@ -1,0 +1,58 @@
+name: NEUMANN RC40 independent pinned FIRST read-only proof
+on:
+  push:
+    branches:
+      - research/q3-rc40-wmethod-conformance-20261106
+    paths:
+      - .github/workflows/q3_rc40_W_METHOD_READONLY_AUDIT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independent-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Download EXACT first RC40 immutable artifact from completed first run
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-RC40-W-METHOD-REOPENED24-FIRST
+          run-id: 42136993787
+          github-token: ${{ github.token }}
+          path: locked-first
+      - name: Check independently all 24 all-length state programs and source metrics
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m research.q3.rc39.w_method_readonly_audit locked-first/RC40-W-METHOD-REOPENED24-FIRST.json > RC40-W-METHOD-INDEPENDENT-AUDIT.json
+          cat RC40-W-METHOD-INDEPENDENT-AUDIT.json
+      - name: Negative test cannot favorably rewrite the first source score
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          from research.q3.rc39.w_method_readonly_audit import audit
+          source=Path('locked-first/RC40-W-METHOD-REOPENED24-FIRST.json')
+          data=json.loads(source.read_text())
+          data['metrics']['w_unique_source_queries']=1
+          bogus=Path('/tmp/rc40-rewritten-first.json')
+          bogus.write_text(json.dumps(data))
+          check=audit(str(bogus))
+          assert not check['audit_pass'],check
+          assert 'ORIGINAL_FIRST_RECEIPT_SHA_DRIFT' in check['errors']
+          assert 'REPORTED_METRIC_DRIFT_w_unique_source_queries' in check['errors']
+          print('PINNED_FIRST_TAMPER_REJECTED')
+          PY
+      - name: Save independent read-only audit receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-RC40-W-METHOD-FIRST-READONLY-AUDIT
+          path: RC40-W-METHOD-INDEPENDENT-AUDIT.json
+          if-no-files-found: warn
+          retention-days: 90
