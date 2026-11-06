@@ -1,0 +1,106 @@
+name: NEUMANN Q3 G0 VeryMax four ORIGINAL exact reframe FIRST
+on:
+  push:
+    branches:
+      - research/q3-g0-verymax4-exact-reframe-20261106
+    paths:
+      - .github/workflows/q3_G0_VERYMAX4_EXACT_REFRAME_FIRST.yml
+permissions:
+  contents: read
+jobs:
+  source-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install matched exact classical solvers and zstd
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq cvc5 zstd
+          python3 -m pip install --disable-pip-version-check z3-solver==4.13.3.0
+          command -v cvc5
+          cvc5 --version
+          python3 - <<'PY'
+          import z3
+          print('Z3_VERSION',z3.get_version_string())
+          PY
+      - name: Unit negative controls BEFORE actual original source fetch
+        run: python3 -m unittest -v tests/test_q3_g0_exact_bounded_reframe.py
+      - name: Download exact official 2025 non-incremental QF NIA archive and MD5 lock
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fLSs --retry 2 --connect-timeout 20 --max-time 260 \
+            'https://zenodo.org/records/16740866/files/QF_NIA.tar.zst?download=1' \
+            -o QF_NIA.tar.zst
+          echo '6a3ae3b7eb10688070c44922ccd940aa  QF_NIA.tar.zst' | md5sum -c -
+          sha256sum QF_NIA.tar.zst | tee G0-OFFICIAL-ARCHIVE.sha256
+          mkdir -p g0_raw g0_originals
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,subprocess
+          p=json.loads(Path('docs/experiments/q3_G0_VERYMAX4_EXACT_BOUNDED_REFRAME_PREREG_2026_11_06.json').read_text())
+          globs=['*'+name for name in p['full_four_source_file_names']]
+          subprocess.run(['tar','--use-compress-program=zstd','-xf','QF_NIA.tar.zst',
+               '--wildcards','--no-anchored','-C','g0_raw',*globs],check=True)
+          for name in p['full_four_source_file_names']:
+              paths=list(Path('g0_raw').rglob(name))
+              if len(paths)!=1:
+                  raise ValueError('G0_ORIGINAL_NOT_EXACTLY_ONCE '+name+' '+repr(paths))
+              dest=Path('g0_originals')/name
+              dest.write_bytes(paths[0].read_bytes())
+          print('ALL_FOUR_FULL_ORIGINALS_FROM_MD5_PINNED_EXTERNAL_ARCHIVE')
+          PY
+      - name: ORIGINAL FIRST complete four-source matched classical vs exact reframe
+        shell: bash
+        run: |
+          set -uo pipefail
+          python3 -m research.q3.g0_exact_bounded_reframe > G0-VERYMAX4-FIRST.json 2> G0-VERYMAX4-FIRST.stderr
+          rc=$?
+          if test -s G0-VERYMAX4-FIRST.json; then
+            python3 - <<'PY'
+          import json
+          x=json.load(open('G0-VERYMAX4-FIRST.json'))
+          print(json.dumps({'science_status':x['science_status'],
+          'positives':x['matched_original_positive_count'],
+          'cases':[{'file':z['file'],'status':z['status'],
+              'z3':z.get('baseline_z3',{}).get('status'),
+              'cvc5':z.get('baseline_cvc5',{}).get('status'),
+              'reframe':z.get('reframe',{}).get('outcome'),
+              'branches':z.get('reframe',{}).get('branches_checked',0)}
+              for z in x['records']]},sort_keys=True))
+          PY
+          else
+            echo 'NO_VALID_FIRST_JSON: source/infrastructure not scientific win'
+          fi
+          cat G0-VERYMAX4-FIRST.stderr
+          echo "ORIGINAL_FIRST_PROCESS_EXIT=$rc"
+          exit "$rc"
+      - name: Preserve exact first result checksum and source identity
+        if: always()
+        shell: bash
+        run: |
+          if test -s G0-VERYMAX4-FIRST.json; then
+            sha256sum G0-VERYMAX4-FIRST.json | tee G0-VERYMAX4-FIRST.sha256
+          fi
+          if test -d g0_originals; then
+            find g0_originals -type f -name '*.smt2' -print0 | sort -z | xargs -0 -r sha256sum > G0-VERYMAX4-SOURCE-SHA256.txt
+            cat G0-VERYMAX4-SOURCE-SHA256.txt
+          fi
+      - name: Archive FIRST PASS FAIL or infrastructure blocker, no favorable rerun
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-G0-VERYMAX4-ORIGINAL-FIRST
+          path: |
+            G0-VERYMAX4-FIRST.json
+            G0-VERYMAX4-FIRST.sha256
+            G0-VERYMAX4-FIRST.stderr
+            G0-VERYMAX4-SOURCE-SHA256.txt
+            G0-OFFICIAL-ARCHIVE.sha256
+          if-no-files-found: warn
+          retention-days: 90
