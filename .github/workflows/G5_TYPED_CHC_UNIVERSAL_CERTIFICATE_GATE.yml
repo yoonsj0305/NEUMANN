@@ -1,4 +1,5 @@
 name: NEUMANN G5 typed multi-theory original CHC invariant witness proof FIRST
+# Original first 42178981223 was failed controls, emitted no log due redirection. This rerun solely exposes synthetic test failures. No benchmark originals consumed.
 on:
   push:
     branches:
@@ -34,8 +35,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python -m unittest discover -s tests -p test_g5_independent_chc_certificate.py -v > G5-TYPED-SOURCEFREE-UNIVERSAL-PROOF-FIRST.log 2>&1
-          cat G5-TYPED-SOURCEFREE-UNIVERSAL-PROOF-FIRST.log
+          python -m unittest discover -s tests -p test_g5_independent_chc_certificate.py -v 2>&1 | tee G5-TYPED-SOURCEFREE-UNIVERSAL-PROOF-FIRST.log
           grep -q 'Ran 16 tests' G5-TYPED-SOURCEFREE-UNIVERSAL-PROOF-FIRST.log
           grep -q '^OK$' G5-TYPED-SOURCEFREE-UNIVERSAL-PROOF-FIRST.log
           echo 'G5_SOURCEFREE_TYPED_ALLSTATE_INDEPENDENT_CHC_WITNESS_GATE_PASS'
