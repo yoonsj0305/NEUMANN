@@ -1,0 +1,31 @@
+{
+  "schema": "neumann.q3.g2.pre-registered-original-first-pilot-result-and-verifier-correction.v1",
+  "date": "2026-11-06",
+  "pilot_nonselected_only": [
+    {
+      "name": "comp/2018/Inv_Track/ex1.sl",
+      "sha": "29420aae47ca3ee36fab64c8e3a17759eac778a8",
+      "source_pilot_result": "cvc5 candidate + 3/3 universal UNSAT induction proofs PASS"
+    },
+    {
+      "name": "comp/2018/PBE_BV_Track/PRE_100_10.sl",
+      "sha": "86a82144d3fc75a5c7d3cb76742b1d2639dfa593",
+      "source_pilot_result": "Native candidate fits original 9 TRAIN; independently negated last ground equality SAT, so true original withheld transfer FAIL"
+    }
+  ],
+  "first_pilot_ci": 42166709344,
+  "second_pilot_ci": 42166918032,
+  "only_pilot_file_bodies_opened": true,
+  "registered_original_24_bodies_opened": false,
+  "bug_fixed": "Original 64-bit BV helper sorts were represented as legacy (BitVec 64) and incorrectly fed to SMT2. Proof now imports type-correct helper functions from official publisher v1→v2 converter, while comparing all source input/output literals and proving raw original PBE constraints.",
+  "pilot_gate_bug": "Second pilot workflow erroneously asserted verified=True for both sources; rejecting an actually sound heldout generalization FAIL. The benchmark candidate failing test is a legitimate NEGATIVE research finding, not an infrastructure failure.",
+  "scientific_changes_BEFORE_FIRST": [
+    "No change to original 24 filenames, Git blobs, cohort groups, 12s native limit or withheld source split",
+    "Classify native-candidate original TRAIN proved but original heldout SAT as NATIVE_HELDOUT_REFUTED rather than non-specific missing proof",
+    "Require independent BV raw TRAIN and heldout original constraint UNSAT as full source correctness; actual overfit is part of honest first denominator"
+  ],
+  "no_neumann_student_training": true,
+  "ARC_eval_IDs_consumed": 0,
+  "global_Q3": "OPEN",
+  "global_Q6": "OPEN"
+}
