@@ -36,7 +36,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          echo 'c05a039ecb371279de66714bafcd1a5b6c05eb18d7477ce4c77f302d9e21127  original-first/Q3-COUNTEREXAMPLE-REPRESENTATION-FIRST.json' | sha256sum -c -
+          echo 'c05a039ecb371279de66714bafcd1a5b6c05ebc18d7477ce4c77f302d9e21127  original-first/Q3-COUNTEREXAMPLE-REPRESENTATION-FIRST.json' | sha256sum -c -
       - name: Install independent Z3 semantic-collision proof engine
         run: |
           sudo apt-get update -qq
