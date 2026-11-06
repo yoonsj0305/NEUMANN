@@ -15,7 +15,7 @@ import time
 
 import z3
 
-ROOT=Path(__file__).resolve().parents[3]
+ROOT=Path(__file__).resolve().parents[2]
 PRE=ROOT/"docs/experiments/q3_G0_VERYMAX4_EXACT_BOUNDED_REFRAME_PREREG_2026_11_06.json"
 INPUT=ROOT/"g0_originals"  # job populates from SHA-validated official release
 
