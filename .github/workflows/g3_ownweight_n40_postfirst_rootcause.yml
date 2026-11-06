@@ -1,0 +1,53 @@
+name: G3 frozen Q3 model n40 post-FIRST analytic root cause only
+on:
+  pull_request:
+    paths:
+      - 'research/g3/ownweight_n_failure_rootcause.py'
+      - '.github/workflows/g3_ownweight_n40_postfirst_rootcause.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  readonly-afterfirst:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-OWNWEIGHT-QUANTIFIED-TRAIN-FIRST
+          run-id: 42198111692
+          github-token: ${{ github.token }}
+          path: original-frozen-weights
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-OWNWEIGHT-FROZEN-SYMBOLIC-N-2-128-FIRST
+          run-id: 42200289388
+          github-token: ${{ github.token }}
+          path: archived-ood-first
+      - name: Check actual frozen weight and negative-first immutable identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '982ef08b88758537dfe56f3ad8451de26fbd438df295802c491c25d231de9bdc  original-frozen-weights/G3-OWNWEIGHT-QUANTIFIED-AST-FROZEN.json' | sha256sum -c -
+          python -m py_compile research/g3/ownweight_n_failure_rootcause.py
+      - name: Explain first n40 failure from original trained logits, no model reruns
+        run: |
+          python -m research.g3.ownweight_n_failure_rootcause \
+            --checkpoint original-frozen-weights/G3-OWNWEIGHT-QUANTIFIED-AST-FROZEN.json \
+            --original-first archived-ood-first/G3-OWNWEIGHT-SYMBOLIC-N-2-128-FIRST.json \
+            --report G3-OWNWEIGHT-N40-POSTFIRST-ROOT-CAUSE.json
+      - name: Retain analytic first-negative explanation, never overwrite originals
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G3-OWNWEIGHT-N40-ANALYTIC-AFTER-FIRST
+          path: G3-OWNWEIGHT-N40-POSTFIRST-ROOT-CAUSE.json
+          if-no-files-found: warn
+          retention-days: 90
