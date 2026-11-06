@@ -1,0 +1,25 @@
+{
+  "schema": "neumann.q3.g3.2025-chc-native-first-competition-label-audit.v1",
+  "date": "2026-11-06",
+  "first_engine_job_run": 42174775254,
+  "first_original_frozen_before_audit": true,
+  "purpose": "Independently verify first Z3 SAT/UNSAT claims against independently published CHC-COMP 2025 expected_verdict metadata AFTER first source scoring; avoid false classical residual claims from cvc5-HORN UNKNOWN.",
+  "upstream": {
+    "repo": "chc-comp/chc-comp25-benchmarks",
+    "commit": "ddd279cab0717db6effe69baad451a8eb04ffd86"
+  },
+  "first_source_manifest": "docs/experiments/G3_2025_CHCCOMP_24_FIRST_METADATA_PREREG_2026_11_06.json",
+  "official_metadata_format": "YAML properties:- expected_verdict: true/false, input_files: same .smt2 (aeval-benchmarks/multi-phase uses corresponding filename with _000 appended before .yml). Do not accept inconsistent/missing official labels as proof. Expected true => SMT-LIB sat, false=>unsat.",
+  "first_integrity": "Require SHA256 of all 3 exact FIRST 8-source JSON artefacts, source Git blob matches 24 immutable prereg including exactly one SOURCE-FREE typo erratum; no new original tasks permitted.",
+  "classification": "Original expert raw sat/unsat is a claim, corroborated only when matching published 2025 verdict. Z3 UNKNOWN/TIMEOUT is a 15s Z3 budget failure, NOT a whole-classical unsolved result. Published metadata expected verdict indicates at least one competition solver agreed but cannot prove which solver or universal correctness on its own. No new model training, not a Q3 PASS.",
+  "negative_controls": [
+    "wrong original source blob rejected",
+    "counterfeit success metric rejected by receipt SHA",
+    "wrong expected_verdict or input_files mismatch fails closed",
+    "no-model-run recorded"
+  ],
+  "Q3": "OPEN",
+  "Q4": "OPEN",
+  "Q6": "OPEN",
+  "Q7": "OPEN"
+}
