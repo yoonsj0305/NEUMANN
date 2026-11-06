@@ -1,18 +1,16 @@
 name: Q3 learned representation repair from genuine H0 collision witnesses FIRST
 
+# Original first run #42204120156 preserved; never retrain or rescore as FIRST.
 on:
-  pull_request:
-    paths:
-      - 'research/q3/counterexample_representation_grower.py'
-      - 'tests/test_q3_counterexample_representation_grower.py'
-      - 'docs/experiments/Q3_COUNTEREXAMPLE_GROWER_FIRST_PREREG_2026_11_06.json'
-      - '.github/workflows/q3_counterexample_representation_grower_first.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
   first-proof-reward-representation:
+    if: false # archived scientific FIRST, no automatic experiment replay
+
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
