@@ -1,14 +1,15 @@
 name: G3 frozen own-weight N40 failure exact rational post-first certificate
+# Frozen immutable original result; no repeat runs.
 on:
-  pull_request:
-    paths:
-      - 'research/g3/ownweight_postfirst_rational_rootcause.py'
-      - '.github/workflows/g3_ownweight_postfirst_rational_rootcause.yml'
+  workflow_dispatch:
+
 permissions:
   contents: read
   actions: read
 jobs:
   exact-postfirst-no-new-original:
+    if: false # retained only as historical reproducibility contract
+
     runs-on: ubuntu-latest
     timeout-minutes: 4
     steps:
