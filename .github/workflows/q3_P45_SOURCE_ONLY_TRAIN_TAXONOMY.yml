@@ -1,0 +1,53 @@
+name: NEUMANN Q3 P45 exact source-only failure taxonomy no new ARC score
+on:
+  push:
+    branches:
+      - research/q3-p45-single-seed-mask-lift-20261106
+    paths:
+      - .github/workflows/q3_P45_SOURCE_ONLY_TRAIN_TAXONOMY.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source-reasons:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Unit controls for classification without any official original
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tests -p test_q3_p45_original_train_taxonomy.py -v
+      - name: Download original FIRST P45, do not rerun failed semantic search
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-P45-ONE-SEED-MASK-TRAIN400-FIRST
+          run-id: 42148341148
+          github-token: ${{ github.token }}
+          path: original-first
+      - name: Fetch original public training only, no evaluation or new test gold
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/arc-agi"
+          git -C "$RUNNER_TEMP/arc-agi" remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C "$RUNNER_TEMP/arc-agi" fetch --depth=1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C "$RUNNER_TEMP/arc-agi" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/arc-agi" rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+      - name: Produce exact post-FIRST source TRAIN-only representational diagnosis
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m experiments.q3_p45_original_train_only_failure_taxonomy "$RUNNER_TEMP/arc-agi" original-first/P45-MASK-TRAIN400-FIRST.json > P45-TRAIN-ONLY-REPRESENTATION-CEILING.json
+          cat P45-TRAIN-ONLY-REPRESENTATION-CEILING.json
+      - name: Save original-source post-FIRST class counts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-P45-TRAIN-ONLY-REPRESENTATION-TAXONOMY
+          path: P45-TRAIN-ONLY-REPRESENTATION-CEILING.json
+          if-no-files-found: warn
+          retention-days: 90
