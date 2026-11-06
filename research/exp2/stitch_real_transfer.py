@@ -106,6 +106,13 @@ def mutate_nonhole(node):
         changed = mutate_nonhole(x)
         if changed is not None:
             return tuple(changed if j == i else node[j] for j in range(len(node)))
+    # A macro can consist entirely of reusable argument holes, e.g.
+    # (#0 #0 #0); corrupt a direct hole rather than silently skip the
+    # mandatory negative control.
+    for i, x in enumerate(node):
+        if isinstance(x, str) and re.fullmatch(r"#\d+", x):
+            return tuple("__NEGATIVE_CONTROL_WRONG_HOLE__" if j == i else node[j]
+                         for j in range(len(node)))
     return None
 
 
