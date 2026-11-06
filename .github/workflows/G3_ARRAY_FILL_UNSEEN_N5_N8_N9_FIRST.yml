@@ -1,0 +1,129 @@
+name: NEUMANN G3 ONE RULE UNSEEN original arrays N5 N8 N9 FIRST PROOF
+on:
+  push:
+    branches:
+      - research/g3-array-init-parametric-proof-transfer-20261106
+    paths:
+      - .github/workflows/G3_ARRAY_FILL_UNSEEN_N5_N8_N9_FIRST.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  unseen-single-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Enforce exact preregistered three unseen original Git blobs and frozen proof generator SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object research/g3/array_fill_parametric_invariant.py)" = 8043d84210822f9a47d78568c25ea97cb0c175dd
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path('docs/experiments/G3_ARRAY_INIT_ALGORITHM_SHA_AND_MUTANT_FIRST_FREEZE_2026_11_06.json').read_text())
+          t=json.loads(Path('docs/experiments/G3_ARRAY_FILL_ONE_RULE_UNSEEN_N5_N8_N9_FIRST_PREREG_2026_11_06.json').read_text())
+          assert a['frozen_source']['git_blob']=='8043d84210822f9a47d78568c25ea97cb0c175dd'
+          assert a['development_only_run']==42177964703
+          assert a['development_first_json_sha256']=='7cbf1eade93e987391205115c916f0efe1bf63cf2a19708f90595272feb9ab1b'
+          assert t['unopened_heldout_transfer']['n']==3
+          expected={
+            'standard_init5_true-unreach-call_ground_000.smt2':'004c0e10555cacd91aea253e4787603f8d9e6b4d',
+            'standard_init8_true-unreach-call_ground_000.smt2':'6d6a82bf2694fb978ef45d49ab26aa1897e8adaa',
+            'standard_init9_true-unreach-call_ground_000.smt2':'fc46208475e55071ce5af94726284d01f8145d52'
+          }
+          actual={x['file']:x['git_blob'] for x in t['unopened_heldout_transfer']['selected_file_metadata_before_body']}
+          assert actual==expected
+          assert t['unopened_heldout_transfer']['source_body_unopened_before_this_manifest'] is True
+          print('UNSEEN_THREE_ORIGINAL_FIRST_SOURCE_FILE_SHA_AND_PROOF_GENERATOR_CODE_SHA_PINNED')
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-ARRAY-ONE-RULE-MUTANT-BEFORE-UNSEEN
+          run-id: 42178278127
+          github-token: ${{ github.token }}
+          path: frozen-original-mutant
+      - name: Confirm already-opened original bad rule was ACTUALLY REFUTED before unseen original access
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('frozen-original-mutant/G3-ARRAY-ONE-RULE-MUTANT-NEGATIVE-CONTROL.json').read_text())
+          assert m['mutant_accepted'] is False
+          assert m['independently_observed_actual_original_source_counterexample'] is True
+          assert m['failed_original_clause_index']==4
+          assert m['no_blind_heldout_sources_opened'] is True
+          print('IMMUTABLE_MUTANT_NEGATIVE_CONTROL_BEFORE_UNSEEN_TRUE')
+          PY
+      - name: Install actual Z3 independent refutation checker
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq z3
+          z3 --version
+      - name: FIRST apply same frozen structural invariant generator to ALL THREE previously unopened original CHC arrays
+        shell: bash
+        run: |
+          set -uo pipefail
+          python3 -m research.g3.array_fill_parametric_invariant --mode UNSEEN_FIRST --per-clause-cap 7 > G3-ARRAY-FILL-UNSEEN-N5-N8-N9-FIRST.json 2> G3-ARRAY-FILL-UNSEEN-N5-N8-N9-FIRST.stderr
+          rc=$?
+          if test -s G3-ARRAY-FILL-UNSEEN-N5-N8-N9-FIRST.json; then
+            python3 - <<'PY'
+          import json
+          d=json.load(open('G3-ARRAY-FILL-UNSEEN-N5-N8-N9-FIRST.json'))
+          print(json.dumps({
+            'science_scope':d['science_claim'],
+            'mode':d['mode'],
+            'original_denominator':d['stats']['original_denominator'],
+            'independently_proven_originals':d['stats']['independent_full_original_clause_proofs'],
+            'original_cases':[{
+              'file':x['source'],
+              'source_blob':x['original_git_blob'],
+              'n_stages':x.get('num_store_stages'),
+              'all_original_Horn_clauses_proven':x['certified_original'],
+              'clauses':x.get('independent_original_all_chc_proof',{}).get('total_original_clauses'),
+              'proven':x.get('independent_original_all_chc_proof',{}).get('original_clauses_independently_proven'),
+              'nonproof':x.get('independent_original_all_chc_proof',{}).get('first_nonproof'),
+              'error':x.get('error')
+              } for x in d['cases']]
+          },sort_keys=True))
+          assert d['mode']=='UNSEEN_FIRST'
+          assert d['stats']['original_denominator']==3
+          assert d['stats']['neural_model_trained'] is False
+          assert d['stats']['new_ARC_public_eval_IDs_consumed']==0
+          assert d['stats']['independent_full_original_clause_proofs']==3
+          assert all(x['certified_original'] for x in d['cases'])
+          PY
+            valid=$?
+            if test "$valid" -ne 0; then rc=1; fi
+          else
+            rc=1
+          fi
+          cat G3-ARRAY-FILL-UNSEEN-N5-N8-N9-FIRST.stderr
+          echo "G3_ARRAY_ONE_RULE_UNSEEN_FIRST_EXIT=$rc"
+          exit "$rc"
+      - name: Preserve exact first original source proof, regardless of success or negative outcome
+        if: always()
+        shell: bash
+        run: |
+          if test -s G3-ARRAY-FILL-UNSEEN-N5-N8-N9-FIRST.json; then
+            sha256sum G3-ARRAY-FILL-UNSEEN-N5-N8-N9-FIRST.json > G3-ARRAY-FILL-UNSEEN-N5-N8-N9-FIRST.sha256
+            cat G3-ARRAY-FILL-UNSEEN-N5-N8-N9-FIRST.sha256
+          fi
+      - name: Archive immutable first previously uninspected source results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G3-ARRAY-FILL-ONE-RULE-UNSEEN-FIRST3
+          path: |
+            G3-ARRAY-FILL-UNSEEN-N5-N8-N9-FIRST.json
+            G3-ARRAY-FILL-UNSEEN-N5-N8-N9-FIRST.sha256
+            G3-ARRAY-FILL-UNSEEN-N5-N8-N9-FIRST.stderr
+          if-no-files-found: warn
+          retention-days: 90
