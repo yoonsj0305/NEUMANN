@@ -1,4 +1,5 @@
 name: NEUMANN G5 typed multi-theory original CHC invariant witness proof FIRST
+# First original run 42178981223 failed because fixture bytes vs str in SHA test, 15 other controls passed; second diagnostic 42179079229 established same. This rerun fixes source-free TEST only.
 # Original first 42178981223 was failed controls, emitted no log due redirection. This rerun solely exposes synthetic test failures. No benchmark originals consumed.
 on:
   push:
