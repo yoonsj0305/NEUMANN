@@ -1,4 +1,5 @@
 name: NEUMANN G2 stronger Z3 Spacer native CHC original twelve after FIRST
+# Both previous attempted runs scored ZERO original Z3 tasks. V1 unsupported :fixedpoint.engine; V2 42168887627 failed Python preflight syntax. Fix pure source before any original benchmark.
 # Preflight-only run 42168652935 used an invalid :fixedpoint.engine option; even Z3 reported unsat/sat but exited with parse error. Removed option before first original Z3 scoring.
 on:
   push:
@@ -21,6 +22,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 -m py_compile research/g2/z3_spacer_postfirst.py
           sudo apt-get update -qq
           sudo apt-get install -y -qq z3
           z3 --version
