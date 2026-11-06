@@ -1,0 +1,79 @@
+name: NEUMANN G1 REAL cvc5 SyGuS specialist on original eight heldout cases
+on:
+  push:
+    branches:
+      - research/g1-first-ownweight-ast-sygus-20261106
+    paths:
+      - .github/workflows/G1_REAL_CVC5_SPECIALIST_POSTFIRST.yml
+permissions:
+  contents: read
+jobs:
+  real-specialist-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install unmodified published expert solver
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq cvc5
+          command -v cvc5
+          cvc5 --version
+          cvc5 --help | grep -E 'sygus|tlimit-per|lang' | head -30 || true
+      - name: Synthetic-only independently checked source withholding and SMT controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tests -p test_g1_postfirst_real_sygus_specialist.py -v
+      - name: Complete original same-source eight tasks with true cvc5 and withheld final constraint
+        shell: bash
+        run: |
+          set -uo pipefail
+          python3 -m research.g1.postfirst_real_cvc5_specialist > G1-CVC5-REAL-SPECIALIST-POSTFIRST.json 2> G1-CVC5-REAL-SPECIALIST-POSTFIRST.stderr
+          rc=$?
+          if test -s G1-CVC5-REAL-SPECIALIST-POSTFIRST.json; then
+            python3 - <<'PY'
+          import json
+          x=json.load(open('G1-CVC5-REAL-SPECIALIST-POSTFIRST.json'))
+          print(json.dumps({
+           'status':x.get('scientific_status'),'stats':x.get('stats'),
+           'task_results':[{
+              'name':r['name'],'status':r['status'],
+              'candidate':(r.get('specialist') or {}).get('status'),
+              'valid_heldout':(r.get('specialist') or {}).get('verified_exact'),
+              'dialect':(r.get('specialist') or {}).get('dialect')
+            } for r in x.get('rows',[])]
+          },sort_keys=True))
+          PY
+            parsed=$?
+            if test "$parsed" -ne 0; then rc=1;fi
+          else
+            echo "NO_ORIGINAL_RECEIPT" 
+            rc=1
+          fi
+          cat G1-CVC5-REAL-SPECIALIST-POSTFIRST.stderr
+          echo "SPECIALIST_PROCESS_EXIT=$rc"
+          exit "$rc"
+      - name: SHA original expert receipt even when no solver proof
+        if: always()
+        shell: bash
+        run: |
+          if test -s G1-CVC5-REAL-SPECIALIST-POSTFIRST.json; then
+            sha256sum G1-CVC5-REAL-SPECIALIST-POSTFIRST.json > G1-CVC5-REAL-SPECIALIST-POSTFIRST.sha256
+            cat G1-CVC5-REAL-SPECIALIST-POSTFIRST.sha256
+          fi
+      - name: Preserve original expert solver full receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G1-REAL-CVC5-SYGUS-POSTFIRST
+          path: |
+            G1-CVC5-REAL-SPECIALIST-POSTFIRST.json
+            G1-CVC5-REAL-SPECIALIST-POSTFIRST.stderr
+            G1-CVC5-REAL-SPECIALIST-POSTFIRST.sha256
+          if-no-files-found: warn
+          retention-days: 90
