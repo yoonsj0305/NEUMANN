@@ -85,6 +85,7 @@ class FiniteActionBridgeTests(unittest.TestCase):
             self.assertEqual(r["action"], "ABSTAIN")
             self.assertFalse(r["accepted"])
             self.assertEqual(r["selector_calls"], 1)
+            self.assertFalse(r["cost_accounting_complete"])
 
     def test_inadmissible_hidden_or_missing_data_fails_closed(self):
         for view in (
@@ -107,6 +108,7 @@ class FiniteActionBridgeTests(unittest.TestCase):
         self.assertEqual(r["trace"], ["GENERATE", "VERIFY"])
         self.assertEqual(r["candidate_provenance"], "OWN_WEIGHT_TEST_MOCK")
         self.assertEqual(r["Q3"], "OPEN")
+        self.assertFalse(r["cost_accounting_complete"])  # scorer cost unmetered
 
     def test_external_escalation_origin_never_promotes_q3(self):
         scores = lambda view, labels: {k: (2 if k == "ESCALATE" else 0) for k in labels}
