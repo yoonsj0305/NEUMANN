@@ -1,0 +1,74 @@
+name: Q3 proof-reward own-weight relational selector FIRST, synthetic only
+
+on:
+  pull_request:
+    paths:
+      - 'research/q3/proof_reward_relational_student.py'
+      - 'tests/test_q3_proof_reward_relational_student.py'
+      - 'docs/experiments/Q3_PROOF_REWARD_RELATIONAL_STRUCTURE_FIRST_PREREG_2026_11_06.json'
+      - '.github/workflows/q3_proof_reward_relational_first.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  proof-reward-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install actual independent symbolic verifier, no student neural package
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y z3
+          z3 --version
+      - name: Test source-free typed AST grammar and fail-closed gate
+        run: |
+          python -m py_compile research/q3/proof_reward_relational_student.py
+          python -m unittest discover -s tests -p 'test_q3_proof_reward_relational_student.py' -v
+      - name: Exactly one proof-reward training and first synthetic heldout evaluation
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'COMPLETE_TRAIN+FIRST_PROOF_WALL_S=%e MAX_RSS_KB=%M' \
+            python -m research.q3.proof_reward_relational_student \
+              --out Q3-PROOF-REWARD-RELATIONAL-FIRST.json \
+            > Q3-PROOF-REWARD-RELATIONAL-FIRST.stdout \
+            2> Q3-PROOF-REWARD-RELATIONAL-FIRST.stderr
+          cat Q3-PROOF-REWARD-RELATIONAL-FIRST.stdout
+          tail -12 Q3-PROOF-REWARD-RELATIONAL-FIRST.stderr
+          sha256sum Q3-PROOF-REWARD-RELATIONAL-FIRST.json
+      - name: Require all controls and keep Q3 OPEN
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('Q3-PROOF-REWARD-RELATIONAL-FIRST.json').read_text())
+          assert r['train_sourcefree_synthetic_tasks']==6
+          assert r['heldout_sourcefree_synthetic_tasks']==12
+          assert r['trained_policy_proven']==12
+          assert r['untrained_policy_proven']==0
+          assert r['classical_direct_original_proven']==12
+          assert r['typed_H1_grammar_given_by_humans']
+          assert r['new_general_operator_invented_by_model'] is False
+          assert r['independent_external_original_CHC_solved']==0
+          assert r['Q3']==r['Q6']=='OPEN'
+          PY
+      - name: Immutable original first proof receipts even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-PROOF-REWARD-RELATIONAL-STRUCTURE-FIRST
+          path: |
+            Q3-PROOF-REWARD-RELATIONAL-FIRST.json
+            Q3-PROOF-REWARD-RELATIONAL-FIRST.stdout
+            Q3-PROOF-REWARD-RELATIONAL-FIRST.stderr
+          if-no-files-found: warn
+          retention-days: 90
