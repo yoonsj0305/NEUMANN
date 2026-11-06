@@ -3,7 +3,8 @@ from __future__ import annotations
 import unittest
 
 from research.g1.postfirst_official_converter_cvc5 import (
-    strict_original_train_examples,verify_exact_train_conservation
+    strict_original_train_examples,verify_exact_train_conservation,
+    canonicalize_legacy_string_builtins
 )
 from research.g1.postfirst_real_cvc5_specialist import prepare_original
 
@@ -58,6 +59,19 @@ class G1OfficialFormatControls(unittest.TestCase):
   tampered=CONVERTED.replace('(f "Kara Lee")','(f "Kara" "Lee")')
   a=verify_exact_train_conservation(examples,tampered)
   self.assertFalse(a["pass"])
+
+ def test_legacy_builtins_semantic_names_only_not_literals_or_comments(self):
+  source='''(synth-fun f ((x String)) String ((N String (x "int.to.str" "(str.to.int)"
+     (int.to.str 1) (str.to.int x) (str.++ x x)))))
+; old int.to.str and str.to.int operators in comment should stay unchanged
+'''
+  converted,count=canonicalize_legacy_string_builtins(source)
+  self.assertEqual(count,{"int.to.str":1,"str.to.int":1})
+  self.assertIn("(str.from_int 1)",converted)
+  self.assertIn("(str.to_int x)",converted)
+  self.assertIn('"int.to.str"',converted)
+  self.assertIn('"(str.to.int)"',converted)
+  self.assertIn('; old int.to.str and str.to.int operators in comment',converted)
 
  def test_different_constraint_order_cannot_pass(self):
   train='''(set-logic SLIA)
