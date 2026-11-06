@@ -1,0 +1,57 @@
+name: NEUMANN RC42 pinned FIRST external TLS independent read-only audit
+on:
+  push:
+    branches:
+      - research/q3-rc42-cross-protocol-tls-20261106
+    paths:
+      - .github/workflows/q3_rc42_TLS_READONLY_AUDIT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Download original immutable RC42 FIRST TLS result
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-RC42-TLS-FIRST
+          run-id: 42140318676
+          github-token: ${{ github.token }}
+          path: locked-first
+      - name: Independent numeric-DOT parser and all-length raw-product checker
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m research.q3.rc42.independent_tls_first_audit locked-first/RC42-TLS-FIRST.json > RC42-TLS-INDEPENDENT-AUDIT.json
+          cat RC42-TLS-INDEPENDENT-AUDIT.json
+      - name: Tampering and forged query result are rejected
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          from research.q3.rc42.independent_tls_first_audit import audit
+          data=json.loads(Path('locked-first/RC42-TLS-FIRST.json').read_text())
+          data['rows'][0]['distinct_source_queries']=0
+          forged=Path('/tmp/rc42-forged.json')
+          forged.write_text(json.dumps(data))
+          result=audit(str(forged))
+          assert not result['audit_pass']
+          assert 'ORIGINAL_FIRST_SHA_DRIFT' in result['errors']
+          assert 'ORIGINAL_QUERY_COUNTER_DRIFT' in result['errors']
+          print('FORGED_FIRST_RESULT_REJECTED')
+          PY
+      - name: Archive independent original-first TLS audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-RC42-TLS-FIRST-INDEPENDENT-AUDIT
+          path: RC42-TLS-INDEPENDENT-AUDIT.json
+          if-no-files-found: warn
+          retention-days: 90
