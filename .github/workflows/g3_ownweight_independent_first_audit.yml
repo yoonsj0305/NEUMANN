@@ -1,10 +1,8 @@
 name: G3 own-weight ORIGINAL first independent read-only certificate audit
 
+# READONLY FIRST audit proved; disabled against additional source scoring.
 on:
-  pull_request:
-    paths:
-      - 'research/g3/ownweight_first_independent_readonly_audit.py'
-      - '.github/workflows/g3_ownweight_independent_first_audit.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -12,6 +10,7 @@ permissions:
 
 jobs:
   independently-check-original-FIRST:
+    if: false # permanently archived independent first only
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
