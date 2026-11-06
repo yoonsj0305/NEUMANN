@@ -1,0 +1,62 @@
+{
+  "schema": "neumann.q3.g3.postfirst-actual-chccomp-2025-peer-engines.v1",
+  "date": "2026-11-06",
+  "purpose": "Repair weak-native Z3/cvc5 portfolio against EXACT CHC-COMP 2025 specialist engines, BEFORE any new NEUMANN training or claims of learned gap.",
+  "source_first": {
+    "run": 42174775254,
+    "official_readonly_audit_run": 42175491787,
+    "sha256": {
+      "LIA_MULTIPHASE": "c4529472973dc7e102e3b755ff866ccac5f285a9d7206488d65dd054f5b41535",
+      "ARRAY_CHC": "47d2776afe699cccab8dc6d6e4b4f06707522f61e8d3d079c478c5614ed5f8c8",
+      "ADT_CHC": "84e35263eb08153776ccb1fb6ae97a1a76b82b8ca8959fd8b6502987474c6376"
+    },
+    "same_source_ids_and_git_blobs": true
+  },
+  "specialists": [
+    {
+      "cohort": "LIA_MULTIPHASE",
+      "engine": "Golem",
+      "version": "v0.7.1",
+      "repo": "usi-verification-and-security/golem",
+      "asset": "https://github.com/usi-verification-and-security/golem/releases/download/v0.7.1/golem-x64-linux.tar.bz2",
+      "language": "QF_LIA",
+      "native_default": "golem -l QF_LIA --input original.smt2",
+      "source_only": true
+    },
+    {
+      "cohort": "ARRAY_CHC",
+      "engine": "Eldarica",
+      "version": "v2.2",
+      "repo": "uuverifiers/eldarica",
+      "asset": "https://github.com/uuverifiers/eldarica/releases/download/v2.2/eldarica-bin-2.2.zip",
+      "language": "SMT-LIB2 Horn with Arrays",
+      "native_default": "eld original.smt2",
+      "source_only": true
+    }
+  ],
+  "preflight": {
+    "only_synthetic_control_and_nonselected_sources": "extra-small-lia/const_mod_1_000.smt2; quic3/data/array_init_const_000.smt2, neither is among selected 24",
+    "asset_sha256_must_be_recorded_before_original_specialist_run": true,
+    "tool_exit_stderr_preserved": true,
+    "positive_and_mutant_controls": true
+  },
+  "evaluation": {
+    "original_count_in_each_failed_group": 8,
+    "original_first_Z3_15s_no_verdict": {
+      "LIA_MULTIPHASE": 7,
+      "ARRAY_CHC": 8
+    },
+    "peer_per_case_timeout_sec": 15,
+    "do_not_change_task_denominator": true,
+    "independent_2025_official_expected_verdict_only_where_provided": true,
+    "source_only": "one exact raw published Git blob per run, no hand supplied invariants",
+    "never_call_old_cvc5_unknown_a_real_capability_failure": true,
+    "global_Q3": "OPEN",
+    "global_Q4": "OPEN",
+    "global_Q6": "OPEN",
+    "global_Q7": "OPEN"
+  },
+  "native_ability_gate": "Only official verdict-matching sat/unsat counts as peer corroborated. If both native versions fail within budget, remains budget-unresolved, never unsolvable or neural-only Q3.",
+  "no_ownweight_neumann_training": true,
+  "no_new_arc_eval_IDs": true
+}
