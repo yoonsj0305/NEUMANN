@@ -1,5 +1,5 @@
 name: NEUMANN G3 2025 actual Golem Eldarica original15 immutable FIRST scientific audit
-# V1 READONLY failed after first LIA group on ARRAY, before any recomputation. Print SHA and scope, then fail closed. No solver reruns.
+# V1/V2 READONLY had one copied 64-char array SHA typo in *Python* assertion. Shell artifact hashes always passed. Correct exact sha; neither 2025 native original is rerun.
 on:
   push:
     branches:
@@ -47,7 +47,7 @@ jobs:
           files={'LIA_MULTIPHASE':'first-go-071/G3-2025-LIA_MULTIPHASE-PEER-POSTFIRST.json',
                  'ARRAY_CHC':'first-eld-22/G3-2025-ARRAY_CHC-PEER-POSTFIRST.json'}
           sha={'LIA_MULTIPHASE':'67e3955f9b5c45c82076400ffd375cddc69ff7b95c403608bc5eac906e8c2f56',
-               'ARRAY_CHC':'668bcaed18b4933b80861ddc65f66ca621d6e70fbdbe565398610db5bf3864'}
+               'ARRAY_CHC':'668bcaed18b4933b80861dd1dc65f66ca621d6e70fbdbe565398610db5bf3864'}
           original_first_sha={'LIA_MULTIPHASE':'c4529472973dc7e102e3b755ff866ccac5f285a9d7206488d65dd054f5b41535',
                               'ARRAY_CHC':'47d2776afe699cccab8dc6d6e4b4f06707522f61e8d3d079c478c5614ed5f8c8'}
           cases=[]
