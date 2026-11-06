@@ -30,6 +30,30 @@ is **READY FOR ONE FIRST ATTEMPT, NOT a Q3 scientific PASS**.
 The experimental code alone cannot establish blind authorship, learned
 novelty or real performance. Global Q3/Q4/Q6/Q7 remain **OPEN**.
 
+### 2026-11-06 G1 learned AST native-baseline headroom is ZERO
+
+In [G1 Draft PR #663](https://github.com/yoonsj0305/NEUMANN/pull/663),
+the genuinely own-weight two-token string-AST proposer generated **31.5625%**
+top-1 exact on synthetically held-out AST compositions. But its original
+independent-author SyGuS evaluation only solved **1/5 supported source
+tasks**; full 225-program same-language classical solved **1/5**, with
+**zero learned-exclusive successes**. After official historical SyGuS
+grammar/operator compatibility correction, real `cvc5` synthesized
+**8/8 of all eight external original tasks**, independently proved again by
+negating original TRAIN/heldout ground equalities and obtaining **UNSAT**
+([source FIRST](https://github.com/yoonsj0305/NEUMANN/actions/runs/42163480878),
+[independent audit](https://github.com/yoonsj0305/NEUMANN/actions/runs/42163880751)).
+The specialist had a richer original grammar, so this is **not** a
+matched-rights cost comparison, but the family has no capability-only
+headroom beyond that native specialist. STOP further fixed two-atom
+program token sweeps or reusing those eight to claim G1 generalization.
+
+Require a different externally authored task family with a **genuine
+strong-native-solver unresolved residual**, then freeze a learned
+new-operator proposal generator and compare its original native witnesses
+against full same-language GP/CEGIS and exact all-in cost.
+`Q3/Q4/Q6/Q7=OPEN`.
+
 ## Frozen North Star — highest authority
 
 The user's 2026-10-02 [Frozen North Star](docs/research/frozen_north_star.md)
