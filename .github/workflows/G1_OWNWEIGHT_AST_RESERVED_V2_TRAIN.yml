@@ -1,0 +1,59 @@
+name: NEUMANN G1 ownweight RESERVED AST composition source-free V2
+on:
+  push:
+    branches:
+      - research/g1-first-ownweight-ast-sygus-20261106
+    paths:
+      - .github/workflows/G1_OWNWEIGHT_AST_RESERVED_V2_TRAIN.yml
+permissions:
+  contents: read
+jobs:
+  source-free-training-v2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Train source-free two-token neural policy with 45 never-trained AST pairs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet numpy==2.2.6
+          python -m unittest discover -s tests -p test_g1_ownweight_string_ast.py -v
+          mkdir -p original-v2
+          python -m research.g1.ownweight_string_ast original-v2/G1-SOURCE-FREE-AST-V2-WEIGHTS.json > original-v2/G1-SOURCE-FREE-AST-V2-TRAIN-RECEIPT.json
+          cat original-v2/G1-SOURCE-FREE-AST-V2-TRAIN-RECEIPT.json
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          p=Path('original-v2/G1-SOURCE-FREE-AST-V2-WEIGHTS.json')
+          w=json.loads(p.read_text())
+          assert w['schema']=='neumann.g1.ownweight-two-token-string-ast-checkpoint.v2'
+          assert w['reserved_pair_count']==45
+          assert w['training_distinct_program_pairs']<=180
+          assert w['training_distinct_program_pairs']>=150
+          assert w['original_external_tasks_accessed']==0
+          assert w['whole_program_label_classifier'] is False
+          print('EXTERNAL_TASK_BODY_READS=0')
+          print('RESERVED_AST_PAIRS=45')
+          print('ACTUAL_TRAINED_AST_PAIR_COUNT',w['training_distinct_program_pairs'])
+          print('WEIGHTS_SHA256',hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+          sha256sum original-v2/G1-SOURCE-FREE-AST-V2-WEIGHTS.json > original-v2/G1-SOURCE-FREE-AST-V2-WEIGHTS.sha256
+          cat original-v2/G1-SOURCE-FREE-AST-V2-WEIGHTS.sha256
+      - name: Archive unique source-free V2 without overwriting original V1
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G1-OWNWEIGHT-AST-RESERVED-V2-FREEZE
+          path: original-v2/
+          if-no-files-found: warn
+          retention-days: 90
