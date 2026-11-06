@@ -1,0 +1,59 @@
+name: NEUMANN Q3 core anti-loop admission FIRST software gate
+on:
+  push:
+    branches:
+      - research/q3-root-cause-cycle-break-20261106
+    paths:
+      - .github/workflows/q3_core_cycle_break_GATE.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  reject-repeated-fixed-H:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Run precise fail-closed admission controls, no ARC task bodies or model inference
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tests -p test_q3_cycle_break_gate.py -v
+      - name: P45 known-failure strategy is hard rejected, not Q3 promoted
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          example={
+            "schema":"neumann.q3.unseen-semantic-proposer-admission.v1",
+            "strategy":"ONE_SEED_MASK_MERGE"
+          }
+          Path('/tmp/closed_p45.json').write_text(json.dumps(example))
+          PY
+          set +e
+          python3 scripts/q3_cycle_break_gate.py /tmp/closed_p45.json --repo . > Q3-CYCLE-BREAK-P45-NEGATIVE-RECEIPT.json
+          code=$?
+          set -e
+          test "$code" = 2
+          cat Q3-CYCLE-BREAK-P45-NEGATIVE-RECEIPT.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open('Q3-CYCLE-BREAK-P45-NEGATIVE-RECEIPT.json'))
+          assert x['decision']=='HARD_STOP_REPEAT_CLASS'
+          assert x['spend_authorized'] is False
+          assert x['Q3_learned_discovery']=='NOT_PROVEN'
+          assert x['can_consume_untouched_arc_eval'] is False
+          print('P45_REPEATED_HYPOTHESIS_FAMILY_HARD_STOP_PASS')
+          PY
+      - name: Preserve original software gate evidence without a capability claim
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-CYCLE-BREAK-P45-NEGATIVE-GATE
+          path: Q3-CYCLE-BREAK-P45-NEGATIVE-RECEIPT.json
+          if-no-files-found: warn
+          retention-days: 90

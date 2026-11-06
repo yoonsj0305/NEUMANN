@@ -8,6 +8,28 @@ same useful capability with much less complete compute, memory, energy, latency
 and monetary cost. Learned intelligence discovers meaning/structure and chooses
 computation; cheaper derivable work belongs outside neural inference.
 
+## 2026-11-06 Q3 cycle break: do not repeat fixed-H search
+
+The [root-cause postmortem](docs/research/NEUMANN_Q3_ROOT_CAUSE_CYCLE_BREAK_2026_11_06.md)
+shows that P2.5/P2.6 and P43/P44/P45 repeatedly altered or searched
+a bounded program language rather than teaching NEUMANN to propose genuinely
+new executable semantics. The P45 **complete 720,000 candidate-task check**
+proves **399/400 opened ARC training tasks** lack a nontrivial TRAIN-consistent
+program *within that 1,800-program mask/merge language*. **Stop more seed/color,
+D4, marker, ranker, beam/depth variants on this exhausted class.**
+
+Before spending any remaining original ARC-AGI-1 public evaluation tasks, run
+`python scripts/q3_cycle_break_gate.py <contract.json> --repo .` and review
+the independently pinned global original-usage ledger
+([#650](https://github.com/yoonsj0305/NEUMANN/pull/650)):
+**389/400 public evaluation task IDs already used, 11 remaining**.
+The preflight hard-rejects known repeated mechanisms, missing own-weight
+generative checkpoint, non-independent targets, weak classical baselines,
+unverified original proof and missing full-cost metering. Its best outcome
+is **READY FOR ONE FIRST ATTEMPT, NOT a Q3 scientific PASS**.
+The experimental code alone cannot establish blind authorship, learned
+novelty or real performance. Global Q3/Q4/Q6/Q7 remain **OPEN**.
+
 ## Frozen North Star — highest authority
 
 The user's 2026-10-02 [Frozen North Star](docs/research/frozen_north_star.md)
