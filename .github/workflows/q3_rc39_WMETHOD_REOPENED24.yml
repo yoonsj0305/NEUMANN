@@ -6,7 +6,9 @@ on:
     paths:
       - 'research/q3/rc39/wmethod_*.py'
       - 'tests/test_q3_rc39_wmethod_conformance.py'
+      - 'tests/test_q3_rc39_wmethod_cross_alphabet.py'
       - 'docs/experiments/q3_RC39_WMETHOD_REOPENED24_PREREG_2026_11_06.json'
+      - 'docs/experiments/q3_RC39_WMETHOD_CROSS_ALPHABET_PREREG_2026_11_06.json'
       - '.github/workflows/q3_rc39_WMETHOD_REOPENED24.yml'
   workflow_dispatch:
 jobs:
@@ -20,6 +22,8 @@ jobs:
           python-version: '3.11'
       - name: Independent finite fault-domain and negative safety tests
         run: python -m unittest discover -s tests -p 'test_q3_rc39_wmethod_conformance.py' -v
+      - name: Preregistered cross-alphabet generalization stress
+        run: python -m unittest discover -s tests -p 'test_q3_rc39_wmethod_cross_alphabet.py' -v
       - name: Reopened original 24 and original exhaustive comparator
         run: |
           set -o pipefail
