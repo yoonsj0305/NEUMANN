@@ -1,0 +1,149 @@
+name: NEUMANN G3 original 15 first-gap strongest Eldarica and Golem pinned post-first
+on:
+  push:
+    branches:
+      - research/q3-g3-2025-chc-native-first-20261106
+    paths:
+      - .github/workflows/G3_POSTFIRST_STRONG_NATIVE_15.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  postfirst-native:
+    strategy:
+      fail-fast: false
+      matrix:
+        cohort: [ARRAY_CHC, LIA_MULTIPHASE]
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-2025-CHC-LIA_MULTIPHASE-NATIVE-ORIGINAL-FIRST
+          run-id: 42174775254
+          github-token: ${{ github.token }}
+          path: immutable-first-lia
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-2025-CHC-ARRAY_CHC-NATIVE-ORIGINAL-FIRST
+          run-id: 42174775254
+          github-token: ${{ github.token }}
+          path: immutable-first-array
+      - name: Exact FIRST receipt integrity and frozen second-stage contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/g3/chccomp2025_postfirst_specialists.py
+          echo 'c4529472973dc7e102e3b755ff866ccac5f285a9d7206488d65dd054f5b41535  immutable-first-lia/G3-LIA_MULTIPHASE-NATIVE-ORIGINAL-FIRST.json' | sha256sum -c -
+          echo '47d2776afe699cccab8dc6d6e4b4f06707522f61e8d3d079c478c5614ed5f8c8  immutable-first-array/G3-ARRAY_CHC-NATIVE-ORIGINAL-FIRST.json' | sha256sum -c -
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('docs/experiments/G3_POSTFIRST_STRONG_2025_CHC_2_NEW_NATIVE_SPECIALISTS_CONTRACT_2026_11_06.json').read_text())
+          assert x['postfirst_scope']['unit_budget_seconds_per_source_solver']==20
+          assert [(c['id'],c['n']) for c in x['postfirst_scope']['groups']]==[('ARRAY_CHC',8),('LIA_MULTIPHASE',7)]
+          print('ORIGINAL_15_POSTFIRST_BUDGET_AND_FIRST_SHA_FROZEN')
+          PY
+      - name: Download actual version-pinned strong third party CHC engines
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/native"
+          curl -fLsS --retry 2 --max-time 75 https://github.com/uuverifiers/eldarica/releases/download/v2.3/eldarica-x86-linux-static.gz -o "$RUNNER_TEMP/native/eld.gz"
+          echo "6815742c34e92d26b379006029eeeb1877757947206b5af9c2f7ff61a5e9440d  $RUNNER_TEMP/native/eld.gz" | sha256sum -c -
+          gunzip -c "$RUNNER_TEMP/native/eld.gz" > "$RUNNER_TEMP/native/eld"
+          chmod 755 "$RUNNER_TEMP/native/eld"
+          curl -fLsS --retry 2 --max-time 75 https://github.com/usi-verification-and-security/golem/releases/download/v0.9.0/golem-x64-linux.tar.bz2 -o "$RUNNER_TEMP/native/golem.tar.bz2"
+          echo "8209e804c6d4870e52d8d53b605a19145309445bffbd7e89f3ab4db31afdc490  $RUNNER_TEMP/native/golem.tar.bz2" | sha256sum -c -
+          tar -xjf "$RUNNER_TEMP/native/golem.tar.bz2" -C "$RUNNER_TEMP/native"
+          test -f "$RUNNER_TEMP/native/golem"
+          chmod 755 "$RUNNER_TEMP/native/golem"
+          echo "ELDARICA_PATH=$RUNNER_TEMP/native/eld" >> "$GITHUB_ENV"
+          echo "GOLEM_PATH=$RUNNER_TEMP/native/golem" >> "$GITHUB_ENV"
+      - name: Repeat source-free positive/negative Horn controls with EXACT engine binaries, abort original scoring on failures
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/safe.smt2" <<'EOF'
+          (set-logic HORN)
+          (declare-fun Inv (Int) Bool)
+          (assert (forall ((x Int)) (=> (= x 0) (Inv x))))
+          (assert (forall ((x Int) (y Int)) (=> (and (Inv x) (= y (+ x 1))) (Inv y))))
+          (assert (forall ((x Int)) (=> (and (Inv x) (< x 0)) false)))
+          (check-sat)
+          EOF
+          sed 's/(< x 0)/(> x 0)/' "$RUNNER_TEMP/safe.smt2" > "$RUNNER_TEMP/unsafe.smt2"
+          for cmd in "$ELDARICA_PATH" "$GOLEM_PATH"; do
+            if test "$cmd" = "$GOLEM_PATH"; then
+              safe="$(timeout 8 "$cmd" -l QF_LIA "$RUNNER_TEMP/safe.smt2")"
+              unsafe="$(timeout 8 "$cmd" -l QF_LIA "$RUNNER_TEMP/unsafe.smt2")"
+            else
+              safe="$(timeout 8 "$cmd" "$RUNNER_TEMP/safe.smt2")"
+              unsafe="$(timeout 8 "$cmd" "$RUNNER_TEMP/unsafe.smt2")"
+            fi
+            echo "SOURCEFREE_NATIVE_EXPERT $cmd SAFE=$safe UNSAFE=$unsafe"
+            test "$safe" = sat
+            test "$unsafe" = unsat
+          done
+      - name: Execute exactly eight arrays or seven Z3-original-unknown integer sources
+        shell: bash
+        env:
+          COHORT: ${{ matrix.cohort }}
+        run: |
+          set -uo pipefail
+          args=()
+          if test "$COHORT" = LIA_MULTIPHASE; then args+=(--golem "$GOLEM_PATH"); fi
+          python3 -m research.g3.chccomp2025_postfirst_specialists \
+            --cohort "$COHORT" --eld "$ELDARICA_PATH" "${args[@]}" \
+            --first-array immutable-first-array/G3-ARRAY_CHC-NATIVE-ORIGINAL-FIRST.json \
+            --first-lia immutable-first-lia/G3-LIA_MULTIPHASE-NATIVE-ORIGINAL-FIRST.json \
+            > "G3-$COHORT-NEW-STRONG-NATIVES-POSTFIRST.json" \
+            2> "G3-$COHORT-NEW-STRONG-NATIVES-POSTFIRST.stderr"
+          rc=$?
+          if test -s "G3-$COHORT-NEW-STRONG-NATIVES-POSTFIRST.json"; then
+            python3 - "$COHORT" <<'PY'
+          import json,sys
+          c=sys.argv[1]
+          v=json.load(open(f'G3-{c}-NEW-STRONG-NATIVES-POSTFIRST.json'))
+          print(json.dumps({'cohort':c,'science_status':v.get('science_status'),
+            'n_original':v.get('postfirst_original_denominator'),
+            'counts':v.get('stats'),
+            'cases':[{'file':r['original_file'],'status':r['postfirst_status'],
+              'natives':[(n['engine'],n['status'],n.get('wall_ms'),n.get('stderr_tail')) for n in r['natives']]}
+              for r in v.get('rows',[])]},sort_keys=True))
+          assert v['postfirst_original_denominator']==(8 if c=='ARRAY_CHC' else 7)
+          assert v['extra_training_and_neural_model_calls']==0
+          assert v['stats']['ARC_public_eval_new_IDs']==0
+          PY
+            auditrc=$?
+            if test "$auditrc" -ne 0; then rc=1; fi
+          else
+            rc=1
+          fi
+          cat "G3-$COHORT-NEW-STRONG-NATIVES-POSTFIRST.stderr"
+          echo "POSTFIRST_STRONG_NATIVE_COHORT_PROCESS_EXIT=$rc"
+          exit "$rc"
+      - name: Hash FIRST new expert outcomes without mutating previous original FIRST
+        if: always()
+        shell: bash
+        env:
+          COHORT: ${{ matrix.cohort }}
+        run: |
+          if test -s "G3-$COHORT-NEW-STRONG-NATIVES-POSTFIRST.json"; then
+            sha256sum "G3-$COHORT-NEW-STRONG-NATIVES-POSTFIRST.json" > "G3-$COHORT-NEW-STRONG-NATIVES-POSTFIRST.sha256"
+            cat "G3-$COHORT-NEW-STRONG-NATIVES-POSTFIRST.sha256"
+          fi
+      - name: Preserve complete postfirst expert receipts and negative evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G3-${{ matrix.cohort }}-ELDARICA23-GOLEM09-POSTFIRST
+          path: |
+            G3-${{ matrix.cohort }}-NEW-STRONG-NATIVES-POSTFIRST.json
+            G3-${{ matrix.cohort }}-NEW-STRONG-NATIVES-POSTFIRST.stderr
+            G3-${{ matrix.cohort }}-NEW-STRONG-NATIVES-POSTFIRST.sha256
+          if-no-files-found: warn
+          retention-days: 90
