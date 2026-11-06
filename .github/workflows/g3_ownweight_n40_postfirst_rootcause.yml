@@ -1,14 +1,15 @@
 name: G3 frozen Q3 model n40 post-FIRST analytic root cause only
+# Frozen immutable original result; no repeat runs.
 on:
-  pull_request:
-    paths:
-      - 'research/g3/ownweight_n_failure_rootcause.py'
-      - '.github/workflows/g3_ownweight_n40_postfirst_rootcause.yml'
+  workflow_dispatch:
+
 permissions:
   contents: read
   actions: read
 jobs:
   readonly-afterfirst:
+    if: false # retained only as historical reproducibility contract
+
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
