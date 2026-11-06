@@ -1,0 +1,96 @@
+name: NEUMANN G1 real cvc5 original eight READONLY independent UNSAT proof
+on:
+  push:
+    branches:
+      - research/g1-first-ownweight-ast-sygus-20261106
+    paths:
+      - .github/workflows/G1_EXPERT_EIGHT_INDEPENDENT_UNSAT_AUDIT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independently-prove-expert:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G1-CVC5-REAL-8-LEGACY-COMPAT
+          run-id: 42163480878
+          github-token: ${{ github.token }}
+          path: pinned-expert-first
+      - name: Install independent SMT checker, no SyGuS synthesis and no student training
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq cvc5
+          echo '0650d9c9d75f8f25311ee5b522ac6aed8ca9c6b1941a283e013cd6cb5019835f  pinned-expert-first/G1-CVC5-8-LEGACY-COMPAT-POSTFIRST.json' | sha256sum -c -
+          python3 - <<'PY'
+          from research.g1.eight_original_cvc5_independent_unsat_audit import (
+              full_source_candidate,prove_by_unsat
+          )
+          s='(\n(define-fun f ((name String)) String name)\n)'
+          p=full_source_candidate(s)
+          assert p=='(define-fun f ((name String)) String name)'
+          good=prove_by_unsat(p,['(constraint (= (f "Yuna") "Yuna"))'])
+          bad=prove_by_unsat(p,['(constraint (= (f "Yuna") "WRONG"))'])
+          assert good['proof']=='ALL_ORIGINAL_GROUND_EQUALITIES_PROVEN',good
+          assert bad['proof']!='ALL_ORIGINAL_GROUND_EQUALITIES_PROVEN',bad
+          print('INDEPENDENT_NEGATED_GROUND_EQUALITY_POSITIVE_AND_MUTANT_CHECK_PASS')
+          PY
+      - name: Independently prove all eight original training and heldout constraints unsat-on-counterexample
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m research.g1.eight_original_cvc5_independent_unsat_audit pinned-expert-first/G1-CVC5-8-LEGACY-COMPAT-POSTFIRST.json > G1-EXPERT-EIGHT-INDEPENDENT-UNSAT-AUDIT.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open('G1-EXPERT-EIGHT-INDEPENDENT-UNSAT-AUDIT.json'))
+          print(json.dumps({'audit_pass':x['audit_pass'],
+           'original_independently_proven_count':x['original_independently_proven_count'],
+           'independent_full_first_candidate_sha_verified':x['independent_full_first_candidate_sha_verified'],
+           'first_sha':x['first_source_receipt_SHA256'],
+           'task_verdicts':[{'file':r['original_file'],'source_exact':r['independent_original_verified']} for r in x['originals']]},sort_keys=True))
+          assert x['audit_pass'] and x['original_independently_proven_count']==8
+          assert x['NN_retrained'] is False and x['original_specialist_synthesis_rerun'] is False
+          PY
+      - name: Favorably forged original eight FIRST receipt fails independently
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          from research.g1.eight_original_cvc5_independent_unsat_audit import audit
+          f=Path('pinned-expert-first/G1-CVC5-8-LEGACY-COMPAT-POSTFIRST.json')
+          x=json.loads(f.read_text())
+          x['stats']['independently_original_heldout_verified']=100
+          x['scientific_status']='NEUMANN_Q3_PASS'
+          bad=Path('/tmp/FORGED_G1_EIGHT_EXPERT_FIRST.json')
+          bad.write_text(json.dumps(x))
+          verdict=audit(bad)
+          assert not verdict['audit_pass']
+          assert 'IMMUTABLE_EIGHT_ORIGINAL_FIRST_SHA256_DRIFT' in verdict['errors']
+          assert 'FIRST_AGGREGATE_CORRUPTED' in verdict['errors']
+          assert 'SCOPED_FIRST_STATUS_DRIFT' in verdict['errors']
+          print('FAVORABLE_FIRST_RESULT_FORGERY_REJECTED')
+          PY
+      - name: Lock exact independent alternate proof output
+        if: always()
+        shell: bash
+        run: |
+          if test -s G1-EXPERT-EIGHT-INDEPENDENT-UNSAT-AUDIT.json; then
+            sha256sum G1-EXPERT-EIGHT-INDEPENDENT-UNSAT-AUDIT.json
+          fi
+      - name: Preserve independently checked eight original programs and source provenance
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G1-CVC5-EIGHT-INDEPENDENT-NEGATED-UNSAT-AUDIT
+          path: G1-EXPERT-EIGHT-INDEPENDENT-UNSAT-AUDIT.json
+          if-no-files-found: warn
+          retention-days: 90
