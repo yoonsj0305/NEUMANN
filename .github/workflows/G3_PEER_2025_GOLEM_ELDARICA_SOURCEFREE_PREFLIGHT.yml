@@ -1,4 +1,5 @@
 name: NEUMANN G3 source-only Golem 0.7.1 and Eldarica 2.2 toolchain pilot
+# 42176262380 failed BEFORE any source-based solver execution solely because find|head triggered Bash pipefail(SIGPIPE) on long Eldarica directory listing. Both release archives were successfully downloaded and hashed.
 on:
   push:
     branches:
@@ -29,11 +30,11 @@ jobs:
             --output "$RUNNER_TEMP/eldarica-bin-v2.2.zip" \
             'https://github.com/uuverifiers/eldarica/releases/download/v2.2/eldarica-bin-2.2.zip'
           sha256sum "$RUNNER_TEMP/golem-v0.7.1.tar.bz2" "$RUNNER_TEMP/eldarica-bin-v2.2.zip"
-          tar -tjf "$RUNNER_TEMP/golem-v0.7.1.tar.bz2" | head -25
-          unzip -l "$RUNNER_TEMP/eldarica-bin-v2.2.zip" | head -35
+          tar -tjf "$RUNNER_TEMP/golem-v0.7.1.tar.bz2" | sed -n '1,25p'
+          unzip -l "$RUNNER_TEMP/eldarica-bin-v2.2.zip" | sed -n '1,35p'
           tar -xjf "$RUNNER_TEMP/golem-v0.7.1.tar.bz2" -C "$RUNNER_TEMP/golem"
           unzip -oq "$RUNNER_TEMP/eldarica-bin-v2.2.zip" -d "$RUNNER_TEMP/eldarica"
-          find "$RUNNER_TEMP/golem" "$RUNNER_TEMP/eldarica" -maxdepth 4 -type f | head -45
+          find "$RUNNER_TEMP/golem" "$RUNNER_TEMP/eldarica" -maxdepth 4 -type f | sed -n '1,45p'
       - name: Source-FREE small safe/unsafe synthetics with actual native versions
         shell: bash
         run: |
