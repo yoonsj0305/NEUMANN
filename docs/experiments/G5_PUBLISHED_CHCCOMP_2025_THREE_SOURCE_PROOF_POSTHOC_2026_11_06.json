@@ -1,0 +1,36 @@
+{
+  "schema": "neumann.g5.published-2025-LIA-3-postsource-original-proof.v1",
+  "date": "2026-11-06",
+  "scope": "External actual-source validation of one unchanged multi-sort multi-arity exact CHC witness proof engine; candidate invariants manually authored after source inspection. Therefore positive is proof-tool generalization, NEVER neural generalization or Q3.",
+  "source": "chc-comp/chc-comp25-benchmarks@ddd279cab0717db6effe69baad451a8eb04ffd86",
+  "tasks": [
+    {
+      "file": "extra-small-lia/const_mod_1_000.smt2",
+      "git_blob": "3f814a05b5e518c3a0bf18d3e67c22a50bd6a185",
+      "witness": {
+        "|inv|": "(= (mod arg0 2) 0)"
+      }
+    },
+    {
+      "file": "extra-small-lia/const_mod_2_000.smt2",
+      "git_blob": "29bc1ac796422ba92b47459bc96d0b68df77f100",
+      "witness": {
+        "|inv|": "(= (mod arg0 23468) 0)"
+      }
+    },
+    {
+      "file": "extra-small-lia/const_mod_3_000.smt2",
+      "git_blob": "f79a7e18f6b03aaff5954bd38f8426a8be6140e6",
+      "witness": {
+        "|inv|": "(= (mod arg0 2) arg1)"
+      }
+    }
+  ],
+  "scoped_precommit": "All three 2025 source bodies were inspected before this posthoc audit; no fresh unseen guarantee or source blind test.",
+  "acceptance": "Every ORIGINAL source assertion independently UNSAT when negated with supplied typed predicate interpretations, all source Git blobs exact, program SHA logged, no changes to verifier per task. Three mutants with inv=true must be rejected, wrong original blob rejected. No learned generator or extra ARC-evaluation tasks.",
+  "generalization": "Same universal certificate verifier supports different mod constants 2 and 23468 and changes predicate arity from 1 to 2, without writing a task-specific verification rule. These original invariants are HUMAN supplied, not discovered by policy.",
+  "Q3": "OPEN",
+  "Q4": "OPEN",
+  "Q6": "OPEN",
+  "Q7": "OPEN"
+}
