@@ -81,5 +81,13 @@
   ],
   "all_global_Q_status": "OPEN",
   "new_ARC_eval_spending_allowed": false,
-  "experiment_executed": false
+  "experiment_executed": false,
+  "pretransfer_interface_gate": {
+    "status": "ADDED_AFTER_EXP2_PR670_CROSS_DSL_DIAGNOSTIC",
+    "rule": "Direct macro reuse requires frozen target/source DSL ID, typed input/output signatures, and a complete supported-operator metadata set BEFORE opening target problem bodies. No matching operators or unknown signatures -> ABSTAIN, not source test.",
+    "cross_formalism": "If target DSL differs, the learner must PROPOSE a typed translation/representation from public data; an independent target-original proof must validate it before admission. Do not fake same-DSL reuse.",
+    "authority": "neumann1/structural_library_admission_v1.py",
+    "limitation": "This is compatibility and safety filtering, not proof of semantic correctness or learned Q6 transfer.",
+    "failure_origin": "PR #670 first external program-corpus transfer 0/750: target lacked all T/M/repeat/tan operators used by source macro"
+  }
 }
