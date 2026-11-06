@@ -1,0 +1,78 @@
+name: NEUMANN RC40 preregistered W-method original24 same-source comparison
+on:
+  push:
+    branches:
+      - research/q3-rc40-wmethod-conformance-20261106
+    paths:
+      - .github/workflows/q3_rc40_W_METHOD_REOPENED24.yml
+      - research/q3/rc39/w_method_conformance.py
+      - research/q3/rc39/w_method_reopened24.py
+      - tests/test_q3_rc40_w_method.py
+      - docs/experiments/q3_RC40_W_METHOD_REOPENED24_PREREG_2026_11_06.json
+permissions:
+  contents: read
+jobs:
+  original24:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validate exact frozen original learner and prereg
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, hashlib
+          from pathlib import Path
+          l=json.loads(Path('docs/experiments/q3_RC39_FIRST_LEARNER_SOURCE_LOCK.json').read_text())
+          p=json.loads(Path('docs/experiments/q3_RC40_W_METHOD_REOPENED24_PREREG_2026_11_06.json').read_text())
+          b=Path('research/q3/rc39/active_mealy.py').read_bytes()
+          sha=hashlib.sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()
+          assert sha==l['original_source_git_blob']==p['fixed_learner_git_blob']
+          print({'frozen_learner_source':sha,'scope':'SAME_OPENED_24_NOT_UNSEEN'})
+          PY
+      - name: Independent W-method stress, 3000 machine pairs and negative controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest -v tests/test_q3_rc40_w_method.py
+      - name: First RC40 same-source comparison, retain favorable or unfavorable result
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          python3 -m research.q3.rc39.w_method_reopened24 > RC40-W-METHOD-REOPENED24-FIRST.json
+          rc=$?
+          set -e
+          if test -s RC40-W-METHOD-REOPENED24-FIRST.json; then
+            python3 - <<'PY'
+          import json
+          x=json.load(open('RC40-W-METHOD-REOPENED24-FIRST.json'))
+          print(json.dumps({'science_status':x['science_status'],
+            'scope':x['reopened_original_tasks'],
+            'metrics':x['metrics'],
+            'limits':x['scientific_limits']},sort_keys=True))
+          PY
+          fi
+          echo "RC40_FIRST_exit=$rc"
+          exit "$rc"
+      - name: Hash immutable original first RC40 receipt
+        if: always()
+        shell: bash
+        run: |
+          if test -s RC40-W-METHOD-REOPENED24-FIRST.json; then
+            sha256sum RC40-W-METHOD-REOPENED24-FIRST.json > RC40-W-METHOD-REOPENED24-FIRST.sha256
+            cat RC40-W-METHOD-REOPENED24-FIRST.sha256
+          fi
+      - name: Preserve original result whether PASS or FAIL
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-RC40-W-METHOD-REOPENED24-FIRST
+          path: |
+            RC40-W-METHOD-REOPENED24-FIRST.json
+            RC40-W-METHOD-REOPENED24-FIRST.sha256
+          if-no-files-found: warn
+          retention-days: 90
