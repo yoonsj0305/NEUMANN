@@ -1,0 +1,99 @@
+name: NEUMANN G1 corrected full SyGuS8 original after 39hex metadata failure
+on:
+  push:
+    branches:
+      - research/g1-first-ownweight-ast-sygus-20261106
+    paths:
+      - .github/workflows/G1_SYGUS8_COMPLETE_AFTER_SHA_ERRATUM.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  complete-after-metadata-erratum:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Download original untouched V2 trained weights, never re-train
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G1-OWNWEIGHT-AST-RESERVED-V2-FREEZE
+          run-id: 42154315193
+          github-token: ${{ github.token }}
+          path: frozen-ownweight
+      - name: Pin V2 model SHA and exact one-hex-only corrected original source
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo 'ae5e291d525098b05ade6eaaf5be76c5fc432fb20a39306be8b782377e4c1641  frozen-ownweight/G1-SOURCE-FREE-AST-V2-WEIGHTS.json' | sha256sum -c -
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('docs/experiments/G1_OWNWEIGHT_STRING_AST_EXTERNAL_FIRST_PREREG_2026_11_06.json').read_text())
+          e=json.loads(Path('docs/experiments/G1_EXTERNAL_SYGUS_FIRST_METADATA_SHA_ERRATUM_2026_11_06.json').read_text())['actual_source_error']
+          assert len(p['external_original']['tasks'])==8
+          assert [x['git_blob'] for x in p['external_original']['tasks'] if len(x['git_blob'])!=40]==[e['previous_typo_39_hex']]
+          assert e['correct_original_github_blob_40_hex']==e['previous_typo_39_hex']+'e'
+          print('EXACT_ONE_SOURCE_HASH_TRANSCRIPTION_ERRATUM_ONLY')
+          PY
+      - name: Preflight source parser, no new source original task
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet numpy==2.2.6
+          python -m unittest discover -s tests -p test_g1_ownweight_string_ast.py -v
+          python -m unittest discover -s tests -p test_g1_external_sygus_preflight.py -v
+      - name: Preserve full corrected first-complete scientific FAIL as a real outcome
+        shell: bash
+        run: |
+          set +e
+          python -m research.g1.first_external_sygus frozen-ownweight/G1-SOURCE-FREE-AST-V2-WEIGHTS.json > G1-SYGUS8-AFTER-SHA-ERRATUM-ORIGINAL.json 2> G1-SYGUS8-AFTER-SHA-ERRATUM.stderr
+          rc=$?
+          set -e
+          if test -s G1-SYGUS8-AFTER-SHA-ERRATUM-ORIGINAL.json; then
+            python - <<'PY'
+          import json
+          x=json.load(open('G1-SYGUS8-AFTER-SHA-ERRATUM-ORIGINAL.json'))
+          print(json.dumps({
+              'scoped_science':x.get('science_status'),
+              'stats':x.get('stats'),
+              'per_task':[
+               {'name':z['task_file'],'status':z['status'],
+                'learnt_correct':(z.get('learned') or {}).get('correct_original_heldout'),
+                'classical32_correct':(z.get('classical32') or {}).get('correct_original_heldout'),
+                'full225_correct':(z.get('classical225') or {}).get('correct_original_heldout')}
+               for z in x.get('rows',[])]
+             },sort_keys=True))
+          PY
+          fi
+          cat G1-SYGUS8-AFTER-SHA-ERRATUM.stderr
+          echo "COMPLETE_SCIENCE_PROCESS_EXIT=$rc"
+          exit "$rc"
+      - name: Lock full corrected original SHA even if scientific negative
+        if: always()
+        shell: bash
+        run: |
+          if test -s G1-SYGUS8-AFTER-SHA-ERRATUM-ORIGINAL.json; then
+            sha256sum G1-SYGUS8-AFTER-SHA-ERRATUM-ORIGINAL.json > G1-SYGUS8-AFTER-SHA-ERRATUM.sha256
+            cat G1-SYGUS8-AFTER-SHA-ERRATUM.sha256
+          fi
+      - name: Archive complete original 8 denominator, original result and status
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G1-SYGUS8-AFTER-ONE-SHA-ERRATUM
+          path: |
+            G1-SYGUS8-AFTER-SHA-ERRATUM-ORIGINAL.json
+            G1-SYGUS8-AFTER-SHA-ERRATUM.sha256
+            G1-SYGUS8-AFTER-SHA-ERRATUM.stderr
+          if-no-files-found: warn
+          retention-days: 90
