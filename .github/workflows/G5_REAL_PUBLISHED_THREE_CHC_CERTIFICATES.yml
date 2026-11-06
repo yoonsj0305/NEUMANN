@@ -1,0 +1,83 @@
+name: NEUMANN G5 verifier transfer three real published CHC-2025 originals
+on:
+  push:
+    branches:
+      - research/q3-typed-array-universal-certificate-gate-20261106
+    paths:
+      - .github/workflows/G5_REAL_PUBLISHED_THREE_CHC_CERTIFICATES.yml
+permissions:
+  contents: read
+jobs:
+  independent-original-allstate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Exactly pinned 2026 Z3 trusted original theorem checker
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/g5/independent_chc_certificate.py research/g5/published_three_source_proof.py
+          python -m pip install --quiet --no-cache-dir z3-solver==5.0.0.0
+          python - <<'PY'
+          import z3
+          assert z3.get_version_string().startswith('5.0.'),z3.get_version_string()
+          print('FULL_SOURCE_ORIGINAL_CHC_CHECKER',z3.get_version_string())
+          PY
+      - name: Reuse exact unchanged G5 source-free proof checker controls before 2025 originals
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p test_g5_independent_chc_certificate.py -v
+      - name: Exact source Git blob CHC 2025 published original 3 complete universal proofs and negative mutants
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research.g5.published_three_source_proof > G5-PUBLISHED-CHC-2025-THREE-ORIGINAL-UNIVERSAL-PROOFS.json
+          python - <<'PY'
+          import json
+          x=json.load(open('G5-PUBLISHED-CHC-2025-THREE-ORIGINAL-UNIVERSAL-PROOFS.json'))
+          print(json.dumps({
+           'audit_pass':x['audit_pass'],
+           'full_original_allstate_certificates':x['full_inductive_allstate_original_certificates_verified'],
+           'original_wrong_invariants_refuted':x['mutants_refuted'],
+           'source_git_blobs_verified':x['all_origins_exact_git_blobs_verified'],
+           'science_scope':x['science_scope'],
+           'originals':[{
+               'file':r['original_source'],
+               'verified':r['real_original_allstate_certificate_pass'],
+               'orig_rules':r['source_assertions'],
+               'proof_signatures':r['original_source_witness_proof']['candidate_predicate_signatures'],
+               'mutant_rejected':r['mutated_always_true_invariant_rejected']
+           } for r in x['originals']]},sort_keys=True))
+          assert x['audit_pass'] is True
+          assert x['original_total']==3
+          assert x['full_inductive_allstate_original_certificates_verified']==3
+          assert x['mutants_refuted']==3
+          assert x['all_origins_exact_git_blobs_verified']==3
+          assert x['neumann_learned_model_called'] is False
+          assert x['no_ARC_eval_IDs_touched'] is True
+          PY
+      - name: SHA preserve actual original source proof evidence, even first scientific fail
+        if: always()
+        shell: bash
+        run: |
+          if test -s G5-PUBLISHED-CHC-2025-THREE-ORIGINAL-UNIVERSAL-PROOFS.json; then
+            sha256sum G5-PUBLISHED-CHC-2025-THREE-ORIGINAL-UNIVERSAL-PROOFS.json > G5-PUBLISHED-CHC-2025-THREE-ORIGINAL-UNIVERSAL-PROOFS.sha256
+            cat G5-PUBLISHED-CHC-2025-THREE-ORIGINAL-UNIVERSAL-PROOFS.sha256
+          fi
+      - name: Archive all source theorem receipts for independent review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G5-CHC-2025-THREE-ORIGINAL-UNIVERSAL-PROOFS
+          path: |
+            G5-PUBLISHED-CHC-2025-THREE-ORIGINAL-UNIVERSAL-PROOFS.json
+            G5-PUBLISHED-CHC-2025-THREE-ORIGINAL-UNIVERSAL-PROOFS.sha256
+          if-no-files-found: warn
+          retention-days: 90
