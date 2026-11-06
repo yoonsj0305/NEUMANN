@@ -51,6 +51,17 @@ The final, **post-infrastructure-erratum** specialist uses the official v1→v2 
 
 **Warning:** The original student source parser counted 3 unsupported, **not** as wrong accepted predictions. cvc5 was granted the *full richer published grammar*, whereas NEUMANN had 225 fixed 2-atom CONCAT expressions. The cvc5 result proves that the original tasks are solvable by an existing stronger classical system, **not** equal-rights 8:1 model superiority, whole-string semantic equivalence or actual global compute efficiency.
 
+### Further causal isolation: 4/5 require a different executable hypothesis class
+
+The [read-only original native-program and first-model version-space comparison #42164685351](https://github.com/yoonsj0305/NEUMANN/actions/runs/42164685351) checked exact byte-pinned source files and all eight code SHA fingerprints **without any new model training or native synthesis**. Among the five originals supported by the existing G1 learned/225 classical student parser:
+
+- **Four** original sources have **zero full-TRAIN-consistent AST pairs** in the exhaustively enumerated 225-program hypothesis language.
+- **One** original source has a working train-compatible program and exactly one original last-example success.
+- **Zero** failure cases arose from different train-compatible programs disagreeing at test time.
+- The real full-original-grammar cvc5 proof independently solved **5/5** of those supported tasks and **8/8** across the entire registered source set.
+
+This pins the G1 scientific failure directly to **missing executable hypothesis coverage**, not a weak selector over an otherwise complete candidate set. It is a *finite-language* impossibility for four original TRAIN datasets. Do not implement a larger manually authored 2-token ranker or reuse these same opened originals as an external transfer gate. The next learned proposal mechanism must **generate genuinely different compositional operator structures**, and be compared with strong equal-rights GP/CEGIS using that same new structure language.
+
 ## 3. A strict mathematical STOP condition, not another sweep
 
 Let `D` be the registered original set of eight, and `C` be cvc5 with original source rights. The independent original verifier now establishes `Correct(C,x)=1` for **every** `x∈D` under last-example criterion. Therefore
