@@ -1,0 +1,17 @@
+{
+  "schema": "neumann.q3.g3.source-free-pilot-strong-native-horn-compatibility-note.v1",
+  "date": "2026-11-06",
+  "first_source_free_success_run": 42174529337,
+  "first_source_free_failed_before_any_24_run": 42174182850,
+  "verified": {
+    "z3": "Z3 v4.8.12 correctly outputs sat for synthetic safe Horn and unsat for unsafe; also reads disjoint official 2025 CHC source extra-small-lia/const_mod_1_000.smt2 and outputs sat.",
+    "cvc5": "cvc5 v1.1.2 returns unknown on BOTH synthetic Horn safe/unsafe and disjoint pilot. It is not a reliable second CHC-specialized classical solver; its UNKNOWN must NEVER be promoted to a hard-classical unsolved claim.",
+    "repo_original_24_contents_opened": false
+  },
+  "interpretation": "Preserve originally preregistered dual engine calls, but require Z3 specialist supported and independently competition-grounded result; for any remaining Z3 UNKNOWN/TIMEOUT also compare with another specialist such as Eldarica / Golem or published CHC-COMP 2025 standings before calling capability headroom.",
+  "first24_source_manifest_unchanged": true,
+  "Q3": "OPEN",
+  "Q4": "OPEN",
+  "Q6": "OPEN",
+  "Q7": "OPEN"
+}
