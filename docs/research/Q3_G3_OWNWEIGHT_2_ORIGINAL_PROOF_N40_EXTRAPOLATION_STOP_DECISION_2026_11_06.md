@@ -47,3 +47,20 @@ New learning work must aim **outside frozen human H0** on a different mechanism,
 Q6 requires a frozen learned candidate with separately author-sourced different formalism and original proof. Q4/Q5 require entire cumulative training/search/proof/fail/fallback/cold-start costs at iso-capability; Q7 requires real frontier-gap recovery. Each remains **OPEN**.
 
 **Decision:** do not expand G3 student role-count benchmarks. Preserve the independently verified teaching-distillation mechanism as a reusable component, but redirect further discovery computation to a harder unsaturated semantic class. The moment an independent original under equal source rights is uniquely solved by a novel learned operator will be a legitimate Q3 scoped result; no such result has yet been obtained.
+
+
+## 2026-11-06 actual frozen-weight analytic root cause, independently executed
+
+[POST-FIRST analytic audit #42200792140](https://github.com/yoonsj0305/NEUMANN/actions/runs/42200792140) downloaded ONLY the original training checkpoint and the original **FAILED** 8,382-point source-free extrapolation artifact; no source program, proof engine, or model training was executed.
+
+At the **final stage** of an N-stage initialization, the required first AST head is category 3 (`WHOLE`), not category 1 (`PREFIX`). For the original trained four-head linear model, the exact two-logit difference at the last stage reduces to
+
+`logit(WHOLE) - logit(PREFIX) = 8.16567575830 - 0.2059240841417 * N`
+
+because the original input contains an **unnecessary absolute stage-count feature `N/12`** in addition to the role flags. Observed `N=39` difference **+0.13463647677** and `N=40` difference **-0.07128760737**. Analytical crossing **N=39.65381607662**, exactly accounting for the first recorded error at N=40. This is not statistical speculation: the affine crossing follows by direct decomposition of the *frozen original weights*.
+
+It proves a concrete **inductive-bias defect**: a hypothesis learned from lengths 4,6,7 inadvertently depends on the absolute stage count even though the general human theorem's role does not. Retraining on N=40 after opening this FIRST would not count as a corrected blind result. No such retraining was performed.
+
+**Architectural decision:** for already proven `standard_init` structures, invoke the certified deterministic generalized human G3 rule directly and check all original clauses. Do **not** use the neural policy's size-dependent role decision by default. Reserve learned compute for structure operators genuinely missing from the classical hypothesis space, with independent original verifier and degraded fallback. Global Q3/Q6 still OPEN.
+
+**Original negative first retained:** [#42200289388](https://github.com/yoonsj0305/NEUMANN/actions/runs/42200289388), **8,257/8,382 predictions**, **38/127 exact entire stage counts**. Post-FIRST audit does not change this verdict.
