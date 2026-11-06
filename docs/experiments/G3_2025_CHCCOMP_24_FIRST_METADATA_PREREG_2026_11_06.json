@@ -1,0 +1,182 @@
+{
+  "schema": "neumann.q3.g3.chccomp2025.first-24-metadata-source-blind.v1",
+  "date": "2026-11-06",
+  "goal": "Find legitimate strong-native-solver cost/ability residual in independently authored 2025 competition formal verification originals, BEFORE training any further NEUMANN learned proposer. Previous G1 G2 benchmarks 8 strings+12 BV+12 INV all have native complete proof coverage.",
+  "upstream": {
+    "repo": "chc-comp/chc-comp25-benchmarks",
+    "commit": "ddd279cab0717db6effe69baad451a8eb04ffd86",
+    "source_format": "SMT-LIB2 constrained Horn clauses (.smt2)",
+    "labels": "2025 competition YAML expected verdict NOT consulted before first native run"
+  },
+  "selection": {
+    "policy": "FNV-1a 32bit unsigned over ASCII 'NEUMANN-G3-20261106:'+folder+'/'+filename, sort ascending. For each fixed folder, eligible .smt2 size 301..19999 bytes; exactly first 8 sorted names. Listing GitHub source metadata only; selected original bodies not read. No target edits after original scoring.",
+    "n_total": 24,
+    "n_per_formal_theory": 8,
+    "nonselected_pilot": "extra-small-lia/const_mod_1_000.smt2, SHA 3f814a05b5e518c3a0bf18d3e67c22a50bd6a185, source seen for syntax only, NOT part of 24."
+  },
+  "cohorts": [
+    {
+      "id": "LIA_MULTIPHASE",
+      "folder": "aeval-benchmarks/multi-phase",
+      "theory": "integer arithmetic and multi-phase loop invariants",
+      "targets": [
+        {
+          "file": "s_split_52_000.smt2",
+          "git_blob": "aee5e67442ebbe6f9ae29b5e31ef179ca99ed081",
+          "bytes": 747
+        },
+        {
+          "file": "s_split_07_000.smt2",
+          "git_blob": "c241eaba877621a9eda92e61362b121a97ceb68d",
+          "bytes": 864
+        },
+        {
+          "file": "s_split_53_000.smt2",
+          "git_blob": "b46852d43f4e7ece59a784efa0c29285560fedd8",
+          "bytes": 888
+        },
+        {
+          "file": "s_split_21_000.smt2",
+          "git_blob": "db600f9e4566b1c4ebeb2fa883f470d09144d2e5",
+          "bytes": 860
+        },
+        {
+          "file": "s_split_40_000.smt2",
+          "git_blob": "5d7bd9eeea8d4d5450a7cbdc4fbc7ea1d34415b3",
+          "bytes": 823
+        },
+        {
+          "file": "s_split_20_000.smt2",
+          "git_blob": "f5c5119261cf456477a1c3c3cf27555c3094ae15",
+          "bytes": 815
+        },
+        {
+          "file": "s_split_28_000.smt2",
+          "git_blob": "6f87459343aee392dc18184a240e99235562c44b",
+          "bytes": 781
+        },
+        {
+          "file": "s_split_24_000.smt2",
+          "git_blob": "81cc567f0c5c3c52bab8edc54d59a4a5852d67fc",
+          "bytes": 823
+        }
+      ]
+    },
+    {
+      "id": "ARRAY_CHC",
+      "folder": "quic3/data",
+      "theory": "transition system safety with array theory",
+      "targets": [
+        {
+          "file": "standard_init6_true-unreach-call_ground_000.smt2",
+          "git_blob": "c00fbed8d20b3b724fb71fb6aebd9c8b443fad13",
+          "bytes": 10006
+        },
+        {
+          "file": "standard_vector_difference_true-unreach-call_ground_000.smt2",
+          "git_blob": "ec0cd373aedd6ddc8474908994a00dc05fae8360",
+          "bytes": 6537
+        },
+        {
+          "file": "standard_init4_true-unreach-call_ground_000.smt2",
+          "git_blob": "174d192924d11f0863bbb28466613b72f825a962",
+          "bytes": 7402
+        },
+        {
+          "file": "array_swap_000.smt2",
+          "git_blob": "15a748101c2c778db570b4bfa456cdb56817b965",
+          "bytes": 7160
+        },
+        {
+          "file": "standard_init7_true-unreach-call_ground_000.smt2",
+          "git_blob": "b603b46cb0b6e9e9c6ae9cb2af6615c8e3a5813c",
+          "bytes": 11308
+        },
+        {
+          "file": "standard_copy2_true-unreach-call_ground_000.smt2",
+          "git_blob": "30b3bab8834aa6f834cf493539180e6b92caf16f",
+          "bytes": 6318
+        },
+        {
+          "file": "standard_copy3_true-unreach-call_ground_000.smt2",
+          "git_blob": "f8fd0b73c3aa45ee5f49426416a378bcfc462605",
+          "bytes": 8201
+        },
+        {
+          "file": "array_swap_twice_000.smt2",
+          "git_blob": "d91427ae167f37cf35d4c2908167ec05ecde273a",
+          "bytes": 11144
+        }
+      ]
+    },
+    {
+      "id": "ADT_CHC",
+      "folder": "adt-purified-benchmarks",
+      "theory": "algebraic data types plus integer/inference relations",
+      "targets": [
+        {
+          "file": "list_len.Z3.0_000.smt2",
+          "git_blob": "ed85dfb88bbce44dddb11b4bebe3c760d1a77d4d",
+          "bytes": 1603
+        },
+        {
+          "file": "list_len_stren.Z3.0_000.smt2",
+          "git_blob": "abafc04842da552958445f622b014e216978b352",
+          "bytes": 2058
+        },
+        {
+          "file": "4-just-rec-just-rec-00-1.Z3.0_000.smt2",
+          "git_blob": "53e969a9673b098e8d523d6d107ab23069cd15bf",
+          "bytes": 3494
+        },
+        {
+          "file": "1-bmc-test-bmc-2-false.Z3.0_000.smt2",
+          "git_blob": "989a79f87ac098b429cd85408df5935ca02bcbd2",
+          "bytes": 3965
+        },
+        {
+          "file": "1-bmc-test-bmc-1-false.Z3.0_000.smt2",
+          "git_blob": "f148d7a63f0c8666d7f5a7d1e9c68411c7b515ea",
+          "bytes": 8941
+        },
+        {
+          "file": "2-inc-max-inc-max-10-1.Z3.0_000.smt2",
+          "git_blob": "248ff9e147506c1d2624a364a228b4836a38ce93",
+          "bytes": 9358
+        },
+        {
+          "file": "6-lists-0-append-sum-1.Z3.0_000.smt2",
+          "git_blob": "be2d26d30df39059ea94ea9c33cddf51aaa19d",
+          "bytes": 10427
+        },
+        {
+          "file": "1-bmc-test-bmc-diamond-1-false.Z3.0_000.smt2",
+          "git_blob": "dea2ec40abc9839e6540362f8330171b0eb66bdd",
+          "bytes": 13569
+        }
+      ]
+    }
+  ],
+  "solver_rights": {
+    "native_A": "apt z3 SMT-LIB2 HORN, exact published source, 15s per original",
+    "native_B": "apt cvc5 SMT-LIB2, exact same published source, 15s per original; if unsupported syntax or unknown mark that, not classical failure",
+    "interpretation": "For CHC SMT-LIB2 check-sat, 'sat' means clauses satisfiable/safe-in-model, 'unsat' means constraints inconsistent/unsafe, but independent 2025 competition verdict and source proof needed for scientific ability. No native mere token counted as Q3 model solving.",
+    "native_residual": "Only *parse-valid*, *grounded* UNKNOWN/TIMEOUT in BOTH independent engines is a budget-limited residual, never impossible proof; a 'sat/unsat' token needs original task metadata corroboration and/or independent SMT proof/countermodel.",
+    "budgets": {
+      "per_native_engine_per_original_seconds": 15,
+      "one_original_first": true,
+      "trained_NEUMANN_zero_calls": true
+    },
+    "full_cost_note": "Only solver processing wall clock measured; hardware installation, source fetch and solver differences must not be represented as model-wide 10x."
+  },
+  "guardrails": {
+    "original_24_source_unopened_before_freeze": true,
+    "safety_mutation_controls": true,
+    "avoid_selecting_by_known_yaml_verdict": true,
+    "ARC_eval_unused": true,
+    "Q3": "OPEN",
+    "Q4": "OPEN",
+    "Q6": "OPEN",
+    "Q7": "OPEN"
+  }
+}
