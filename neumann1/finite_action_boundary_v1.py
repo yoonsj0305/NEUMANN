@@ -83,6 +83,9 @@ def run(view, *, classical=None, generator=None, escalator=None,
         out["allowed_actions"] = allowed
         if action_scorer is not None:
             out["selector_calls"] = 1
+            # A callback may have made partial neural forwards. Without a
+            # complete scorer receipt, its cost is UNKNOWN, never free.
+            out["cost_accounting_complete"] = False
         try:
             choice = _select(view, allowed, action_scorer)
         except Exception as exc:
@@ -108,7 +111,7 @@ def run(view, *, classical=None, generator=None, escalator=None,
         out["candidate_provenance"] = candidate["provenance"]
         if verify_original is None:
             out["error"] = "NO_INDEPENDENT_VERIFIER"
-            out["cost_accounting_complete"] = True
+            out["cost_accounting_complete"] = action_scorer is None
             return out
         out["trace"].append("VERIFY")
         out["verifier_calls"] += 1
@@ -117,7 +120,7 @@ def run(view, *, classical=None, generator=None, escalator=None,
             raise ValueError("original verifier must return exact bool")
         out["accepted"] = ok
         out["status"] = "VERIFIED" if ok else "UNKNOWN"
-        out["cost_accounting_complete"] = True
+        out["cost_accounting_complete"] = action_scorer is None
         return out
     except Exception as exc:
         out["error"] = type(exc).__name__ + ": " + str(exc)
