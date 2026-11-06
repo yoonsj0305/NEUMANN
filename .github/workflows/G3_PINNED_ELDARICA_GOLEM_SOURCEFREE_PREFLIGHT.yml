@@ -1,0 +1,106 @@
+name: NEUMANN G3 Eldarica2.3 and Golem0.9 source-free original compatibility preflight
+on:
+  push:
+    branches:
+      - research/q3-g3-2025-chc-native-first-20261106
+    paths:
+      - .github/workflows/G3_PINNED_ELDARICA_GOLEM_SOURCEFREE_PREFLIGHT.yml
+permissions:
+  contents: read
+jobs:
+  compatible-specialists:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Fetch two precisely pinned public specialist release binaries with strict SHA256 verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/independent-solvers"
+          curl -fLsS --retry 2 --max-time 75 \
+            https://github.com/uuverifiers/eldarica/releases/download/v2.3/eldarica-x86-linux-static.gz \
+            -o "$RUNNER_TEMP/independent-solvers/eldarica-v2.3-static.gz"
+          echo "6815742c34e92d26b379006029eeeb1877757947206b5af9c2f7ff61a5e9440d  $RUNNER_TEMP/independent-solvers/eldarica-v2.3-static.gz" | sha256sum -c -
+          gunzip -c "$RUNNER_TEMP/independent-solvers/eldarica-v2.3-static.gz" > "$RUNNER_TEMP/independent-solvers/eld"
+          chmod 755 "$RUNNER_TEMP/independent-solvers/eld"
+          curl -fLsS --retry 2 --max-time 75 \
+            https://github.com/usi-verification-and-security/golem/releases/download/v0.9.0/golem-x64-linux.tar.bz2 \
+            -o "$RUNNER_TEMP/independent-solvers/golem-v0.9.0.tar.bz2"
+          echo "8209e804c6d4870e52d8d53b605a19145309445bffbd7e89f3ab4db31afdc490  $RUNNER_TEMP/independent-solvers/golem-v0.9.0.tar.bz2" | sha256sum -c -
+          tar -tjf "$RUNNER_TEMP/independent-solvers/golem-v0.9.0.tar.bz2" | head -40
+          mkdir -p "$RUNNER_TEMP/independent-solvers/golem-release"
+          tar -xjf "$RUNNER_TEMP/independent-solvers/golem-v0.9.0.tar.bz2" -C "$RUNNER_TEMP/independent-solvers/golem-release"
+          find "$RUNNER_TEMP/independent-solvers/golem-release" -maxdepth 4 -type f -printf '%p %s bytes\n' | head -40
+          GOLEM_PATH="$(find "$RUNNER_TEMP/independent-solvers/golem-release" -type f -name golem | head -1)"
+          test -n "$GOLEM_PATH" && test -f "$GOLEM_PATH"
+          chmod 755 "$GOLEM_PATH"
+          echo "GOLEM_PATH=$GOLEM_PATH" >> "$GITHUB_ENV"
+          echo "ELDARICA_PATH=$RUNNER_TEMP/independent-solvers/eld" >> "$GITHUB_ENV"
+      - name: Read actual expert CLI interface and binary version; never read any G3 original target
+        shell: bash
+        run: |
+          set +e
+          "$ELDARICA_PATH" -h > "$RUNNER_TEMP/eldarica-help.txt" 2>&1
+          echo 'ELDARICA_HELP_FIRST_LINES'
+          head -55 "$RUNNER_TEMP/eldarica-help.txt"
+          "$GOLEM_PATH" -h > "$RUNNER_TEMP/golem-help.txt" 2>&1
+          echo 'GOLEM_HELP_FIRST_LINES'
+          head -60 "$RUNNER_TEMP/golem-help.txt"
+          exit 0
+      - name: Two manually source-free synthetic safe and unsafe CHC controls for BOTH strong solvers
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/synthetic-safe.smt2" <<'EOF'
+          (set-logic HORN)
+          (declare-fun Inv (Int) Bool)
+          (assert (forall ((x Int)) (=> (= x 0) (Inv x))))
+          (assert (forall ((x Int) (y Int)) (=> (and (Inv x) (= y (+ x 1))) (Inv y))))
+          (assert (forall ((x Int)) (=> (and (Inv x) (< x 0)) false)))
+          (check-sat)
+          EOF
+          sed 's/(< x 0)/(> x 0)/' "$RUNNER_TEMP/synthetic-safe.smt2" > "$RUNNER_TEMP/synthetic-unsafe.smt2"
+          set +e
+          timeout 9 "$ELDARICA_PATH" "$RUNNER_TEMP/synthetic-safe.smt2" > G3-ELDARICA-SYNTHETIC-SAFE.log 2>&1
+          es=$?
+          timeout 9 "$ELDARICA_PATH" "$RUNNER_TEMP/synthetic-unsafe.smt2" > G3-ELDARICA-SYNTHETIC-UNSAFE.log 2>&1
+          eu=$?
+          timeout 9 "$GOLEM_PATH" -l QF_LIA "$RUNNER_TEMP/synthetic-safe.smt2" > G3-GOLEM-SYNTHETIC-SAFE.log 2>&1
+          gs=$?
+          timeout 9 "$GOLEM_PATH" -l QF_LIA "$RUNNER_TEMP/synthetic-unsafe.smt2" > G3-GOLEM-SYNTHETIC-UNSAFE.log 2>&1
+          gu=$?
+          set -e
+          echo "ELDARICA_SAFE_EXIT=$es"; cat G3-ELDARICA-SYNTHETIC-SAFE.log
+          echo "ELDARICA_UNSAFE_EXIT=$eu"; cat G3-ELDARICA-SYNTHETIC-UNSAFE.log
+          echo "GOLEM_SAFE_EXIT=$gs"; cat G3-GOLEM-SYNTHETIC-SAFE.log
+          echo "GOLEM_UNSAFE_EXIT=$gu"; cat G3-GOLEM-SYNTHETIC-UNSAFE.log
+          python3 - <<'PY'
+          import pathlib,re
+          good=True
+          for name in ('ELDARICA','GOLEM'):
+              a=pathlib.Path('G3-'+name+'-SYNTHETIC-SAFE.log').read_text()
+              b=pathlib.Path('G3-'+name+'-SYNTHETIC-UNSAFE.log').read_text()
+              print('SYNTHETIC_'+name+'_SAFE',a[-800:])
+              print('SYNTHETIC_'+name+'_UNSAFE',b[-800:])
+              s=re.search(r'(?<![a-z])(sat|unsat)(?![a-z])',a,re.I)
+              u=re.search(r'(?<![a-z])(sat|unsat)(?![a-z])',b,re.I)
+              if not s or not u or s.group(1).lower()!='sat' or u.group(1).lower()!='unsat':
+                  good=False
+          assert good,'SOURCE_FREE_EXPERT_SYNTAX_OR_SEMANTICS_NOT_PROVEN'
+          print('G3_TWO_NEW_PINNED_SPECIALISTS_SOURCEFREE_SAFE_UNSAFE_PASS')
+          PY
+      - name: Archive source-free controls, version evidence and rejection if not compatible
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G3-ELDARICA23-GOLEM09-SOURCEFREE-CONTROLS
+          path: |
+            G3-ELDARICA-SYNTHETIC-SAFE.log
+            G3-ELDARICA-SYNTHETIC-UNSAFE.log
+            G3-GOLEM-SYNTHETIC-SAFE.log
+            G3-GOLEM-SYNTHETIC-UNSAFE.log
+          if-no-files-found: warn
+          retention-days: 90
