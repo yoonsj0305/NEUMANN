@@ -25,6 +25,7 @@ CLOSED_MECHANISM_CLASSES = {
     "EASY_CLASSICAL_ROUTE_ONLY": "AM3 12/12 already solved by classical, no learned-only headroom",
     "KNOWN_VERYMAX_OR_SPLIT": "G0 original source UNKNOWN in both branches, subsequent posthoc tuning barred",
     "OWN_WEIGHT_FIXED_TWO_TOKEN_STRING_AST": "G1 31.5625% heldout synthetic pair composition, but real independent original model 1/5, equal-language complete classical 1/5, real native cvc5 full source grammar independently 8/8. No remaining capability-only headroom in these 8 originals.",
+    "NATIVE_SATURATED_SYGUS_BV64_AND_INTEGER_INV": "G2 exact original 12 BV PBE cvc5 12/12 independently original source proved; original 12 integer invariants Z3 Spacer all 11 safe UNSAT and 1 unsafe SAT. Native coverage 24/24, zero learned-only capability headroom in these opened original source sets.",
 }
 
 HEX="0123456789abcdef"
