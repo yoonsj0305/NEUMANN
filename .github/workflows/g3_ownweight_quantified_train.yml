@@ -1,0 +1,79 @@
+name: G3 own-weight quantified AST TRAIN first, original tests unopened
+on:
+  pull_request:
+    paths:
+      - 'research/g3/ownweight_schema_student.py'
+      - 'tests/test_g3_ownweight_schema_student.py'
+      - 'docs/experiments/G3_OWNWEIGHT_QUANTIFIED_SCHEMA_FIRST_PREREG_2026_11_06.json'
+      - '.github/workflows/g3_ownweight_quantified_train.yml'
+permissions:
+  contents: read
+jobs:
+  actual-train-before-original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install actual train and independent source proof dependencies
+        run: |
+          python -m pip install 'numpy>=1.26,<3'
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq z3
+          z3 --version
+      - name: Source-free grammar and negative tests
+        run: python -m unittest discover -s tests -p 'test_g3_ownweight_schema_student.py' -v
+      - name: Contract remains train-only with untouched external original target SHA metadata
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.loads(Path("docs/experiments/G3_OWNWEIGHT_QUANTIFIED_SCHEMA_FIRST_PREREG_2026_11_06.json").read_text())
+          assert c['phase']=='FROZEN_TRAIN_ONLY_NO_TARGET_EVALUATED'
+          assert c['external_first_candidate']['source_bodies_unopened_before_this_contract']
+          assert {x['file'] for x in c['training']['already_opened_originals']}=={
+            'standard_init4_true-unreach-call_ground_000.smt2',
+            'standard_init6_true-unreach-call_ground_000.smt2',
+            'standard_init7_true-unreach-call_ground_000.smt2'}
+          assert {x['file'] for x in c['external_first_candidate']['cross_independent_original_cohort']}=={
+            'standard_init2_true-unreach-call_ground_000.smt2',
+            'standard_init3_true-unreach-call_ground_000.smt2'}
+          print('EXTERNAL_INIT2_INIT3_BODIES_NOT_OPENED_BY_THIS_WORKFLOW')
+          PY
+      - name: Actually train four token-head weights and prove 49 unchanged development original CHC clauses
+        run: |
+          set -euo pipefail
+          mkdir -p train-first
+          /usr/bin/time -f 'TRAIN_AND_OPENED_PROOF_WALL_SEC=%e\nTRAIN_AND_OPENED_PROOF_MAX_RSS_KB=%M' \
+            python -m research.g3.ownweight_schema_student \
+              --checkpoint train-first/G3-OWNWEIGHT-QUANTIFIED-AST-FROZEN.json \
+              --report train-first/G3-OWNWEIGHT-QUANTIFIED-TRAIN-FIRST.json \
+              > train-first/stdout.txt 2> train-first/stderr.txt
+          cat train-first/stdout.txt
+          tail -5 train-first/stderr.txt
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          p=Path('train-first/G3-OWNWEIGHT-QUANTIFIED-AST-FROZEN.json')
+          m=json.loads(Path('train-first/G3-OWNWEIGHT-QUANTIFIED-TRAIN-FIRST.json').read_text())
+          assert hashlib.sha256(p.read_bytes()).hexdigest()==m['checkpoint_SHA256']
+          assert m['actual_weights_updated'] is True
+          assert m['training_exact_four_head_symbols']==20
+          assert m['opened_originals_all_independently_verified']
+          assert m['opened_original_proved']==49
+          assert m['original_test_sources_fetched']==0
+          print('FROZEN_BEFORE_EXTERNAL_FIRST_STUDENT_SHA256='+m['checkpoint_SHA256'])
+          PY
+      - name: Preserve FIRST weight SHA, all role labels and independent opened proofs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G3-OWNWEIGHT-QUANTIFIED-TRAIN-FIRST
+          path: train-first/
+          if-no-files-found: warn
+          retention-days: 90
