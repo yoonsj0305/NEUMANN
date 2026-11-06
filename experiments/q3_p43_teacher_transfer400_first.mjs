@@ -132,7 +132,6 @@ function run(originalRoot,baselinePath){
    teacher_wrong_submitted:total('teacher_wrong_submitted'),
    teacher_extra_exact_over_strong_classical_safe:total('teacher_extra_exact_over_baseline_safe'),
    teacher_baseline_safe_correct_not_solved:total('teacher_misses_baseline_safe'),
-   *[Symbol.iterator](){return[]},
    upper_bound_oracle_union_exact:rows.filter(r=>r.teacher_original_exact||r.baseline_safe_correct).length,
    teacher_ambiguous:total('teacher_ambiguous'),
    teacher_unanimous_train_fit:rows.filter(r=>r.teacher_fitting_count>0&&!r.teacher_ambiguous).length,
