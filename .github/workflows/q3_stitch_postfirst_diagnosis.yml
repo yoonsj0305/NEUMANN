@@ -1,0 +1,45 @@
+name: Q3 EXP2 post-FIRST open-corpus structural failure mechanism diagnosis
+on:
+  pull_request:
+    paths:
+      - 'research/exp2/stitch_postfirst_diagnosis.py'
+      - '.github/workflows/q3_stitch_postfirst_diagnosis.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  readonly-mechanism:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-EXP2-STITCH-REAL-PUBLISHED-CORPUS-FIRST
+          run-id: 42192798081
+          github-token: ${{ github.token }}
+          path: original-first
+      - name: Source is ALREADY OPENED after cross-corpus first FAIL; no new blind test
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$RUNNER_TEMP/author-data"
+          git -C "$RUNNER_TEMP/author-data" remote add origin https://github.com/mlb2251/stitch.git
+          git -C "$RUNNER_TEMP/author-data" fetch --depth=1 origin 350804b7b35807c78bd21c313785ae5152ae2985
+          git -C "$RUNNER_TEMP/author-data" checkout --detach FETCH_HEAD
+      - name: Count necessary operator signatures and skeletons without new training
+        run: python -m research.exp2.stitch_postfirst_diagnosis --source-root "$RUNNER_TEMP/author-data" --first-stdout original-first/stitch.stdout --out STITCH-POSTFIRST-MECHANISM-DIAGNOSIS.json
+      - name: Preserve read-only cause diagnosis; original FIRST remains scientific FAIL
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-EXP2-STITCH-CROSS-CORPUS-FAILURE-CAUSE-AUDIT
+          path: STITCH-POSTFIRST-MECHANISM-DIAGNOSIS.json
+          if-no-files-found: warn
+          retention-days: 90
