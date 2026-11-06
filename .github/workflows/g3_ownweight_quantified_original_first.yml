@@ -1,0 +1,107 @@
+name: G3 own-weight quantified student ORIGINAL init2/init3 FIRST, frozen checkpoint
+on:
+  pull_request:
+    paths:
+      - 'research/g3/ownweight_schema_original_first.py'
+      - 'docs/experiments/G3_OWNWEIGHT_QUANTIFIER_STUDENT_FROZEN_BEFORE_INIT2_INIT3_2026_11_06.json'
+      - '.github/workflows/g3_ownweight_quantified_original_first.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original-first-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Freeze contract / original code blobs before source or model evaluation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          p=Path('docs/experiments/G3_OWNWEIGHT_QUANTIFIER_STUDENT_FROZEN_BEFORE_INIT2_INIT3_2026_11_06.json')
+          c=json.loads(p.read_text())
+          assert c['eval_executed'] is False
+          assert c['training_first']['run_id']==42198111692
+          assert c['training_first']['checkpoint_sha256']=='982ef08b88758537dfe56f3ad8451de26fbd438df295802c491c25d231de9bdc'
+          assert [t['file'] for t in c['target_registry']]==[
+            'standard_init2_true-unreach-call_ground_000.smt2',
+            'standard_init3_true-unreach-call_ground_000.smt2']
+          for path,want in [
+            ('research/g3/ownweight_schema_original_first.py',c['pre_first_code_freeze']['original_evaluator_blob_sha']),
+            ('research/g3/array_fill_parametric_invariant.py',c['pre_first_code_freeze']['source_parser_blob_sha']),
+            ('research/g3/ownweight_schema_student.py',c['pre_first_code_freeze']['student_model_code_blob_sha'])
+          ]:
+            got=subprocess.check_output(['git','hash-object',path],text=True).strip()
+            assert got==want,(path,got,want)
+          print('FROZEN_EVALUATOR_MODEL_AND_CHECKER_CHECKSUMS_CONFIRMED')
+          print('TEST_SOURCE_BODIES_FETCHED',0)
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-OWNWEIGHT-QUANTIFIED-TRAIN-FIRST
+          run-id: 42198111692
+          github-token: ${{ github.token }}
+          path: first-weights
+      - name: Verify pinned original trained weights, before opening any original target
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '982ef08b88758537dfe56f3ad8451de26fbd438df295802c491c25d231de9bdc  first-weights/G3-OWNWEIGHT-QUANTIFIED-AST-FROZEN.json' | sha256sum -c -
+      - name: Install fixed numeric stack and independent Z3, without generating new weights
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install numpy==2.2.6
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq z3
+          z3 --version
+      - name: FIRST actual external original student proof vs untrained/human/native
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'EVAL_WALL_SEC=%e EVAL_PEAK_RSS_KB=%M' \
+            python -m research.g3.ownweight_schema_original_first \
+              --checkpoint first-weights/G3-OWNWEIGHT-QUANTIFIED-AST-FROZEN.json \
+              --report G3-OWNWEIGHT-QUANTIFIER-INIT2-INIT3-ORIGINAL-FIRST.json \
+            > G3-OWNWEIGHT-ORIGINAL-FIRST-stdout.txt 2> G3-OWNWEIGHT-ORIGINAL-FIRST-stderr.txt
+          cat G3-OWNWEIGHT-ORIGINAL-FIRST-stdout.txt
+          tail -12 G3-OWNWEIGHT-ORIGINAL-FIRST-stderr.txt
+      - name: Independently inspect original first output without new solver/model run
+        if: always()
+        shell: bash
+        run: |
+          if test -s G3-OWNWEIGHT-QUANTIFIER-INIT2-INIT3-ORIGINAL-FIRST.json; then
+            sha256sum G3-OWNWEIGHT-QUANTIFIER-INIT2-INIT3-ORIGINAL-FIRST.json
+            python - <<'PY'
+          import json
+          x=json.load(open('G3-OWNWEIGHT-QUANTIFIER-INIT2-INIT3-ORIGINAL-FIRST.json'))
+          print('FIRST_STATUS',x['scientific_status'])
+          print('FIRST_STATS',json.dumps(x['stats'],sort_keys=True))
+          for r in x['rows']:
+              print('ORIGINAL',r['original_file'])
+              for a in ('trained_own_weight','untrained_original_seed_weight','human_written_G3_template','native_Z3_full_original'):
+                  print('  ',a,r[a]['status'],r[a].get('original_independently_proven'),r[a].get('verdict'))
+          PY
+          else
+            echo 'NO_FIRST_OUTPUT: original evidence must remain INFRA_FAILURE'
+          fi
+      - name: Preserve first full raw outcomes and failures, do not rescore
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G3-OWNWEIGHT-INIT2-INIT3-ORIGINAL-FIRST
+          path: |
+            G3-OWNWEIGHT-QUANTIFIER-INIT2-INIT3-ORIGINAL-FIRST.json
+            G3-OWNWEIGHT-ORIGINAL-FIRST-stdout.txt
+            G3-OWNWEIGHT-ORIGINAL-FIRST-stderr.txt
+          retention-days: 90
+          if-no-files-found: warn
