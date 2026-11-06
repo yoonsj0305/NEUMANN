@@ -1,0 +1,100 @@
+name: NEUMANN EXP2 pinned actual Stitch external abstraction primitive source-free
+on:
+  push:
+    branches:
+      - research/q3-stitch-minimal-external-abstraction-20261106
+    paths:
+      - .github/workflows/NEUMANN_EXP2_STITCH_PINNED_SOURCEFREE_PILOT.yml
+permissions:
+  contents: read
+jobs:
+  official-stitch-executable-pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Pin author Git version, MIT license and source-only prereg
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('docs/experiments/Q3_EXP2_STITCH_MINIMAL_ACTUAL_SOURCE_PILOT_PREREG_2026_11_06.json').read_text())
+          assert x['external_project']['git_commit']=='350804b7b35807c78bd21c313785ae5152ae2985'
+          assert x['external_project']['license']=='MIT'
+          assert x['original_published_demo']==['(foo (a a a))','(bar (b b b))']
+          assert x['Q3']=='OPEN'
+          print('STITCH_ONE_HYPOTHESIS_AND_BUDGET_FROZEN')
+          PY
+      - name: Check real Rust toolchain and exact public upstream source version
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustc --version
+          cargo --version
+          mkdir -p "$RUNNER_TEMP/upstream-stitch"
+          git init "$RUNNER_TEMP/upstream-stitch"
+          git -C "$RUNNER_TEMP/upstream-stitch" remote add origin https://github.com/mlb2251/stitch.git
+          git -C "$RUNNER_TEMP/upstream-stitch" fetch --depth=1 origin 350804b7b35807c78bd21c313785ae5152ae2985
+          git -C "$RUNNER_TEMP/upstream-stitch" checkout --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/upstream-stitch" rev-parse HEAD)" = 350804b7b35807c78bd21c313785ae5152ae2985
+          grep -q '^MIT License' "$RUNNER_TEMP/upstream-stitch/LICENSE"
+          echo "UPSTREAM_STITCH_SHA=$(git -C "$RUNNER_TEMP/upstream-stitch" rev-parse HEAD)"
+      - name: Exact source-free author example, no real benchmark original and no LLM calls
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s\n' '["(foo (a a a))","(bar (b b b))"]' > "$RUNNER_TEMP/upstream-stitch/sourcefree-original-demo.json"
+          python3 - "$RUNNER_TEMP/upstream-stitch/sourcefree-original-demo.json" <<'PY'
+          import json,sys
+          x=json.load(open(sys.argv[1]))
+          assert len(x)==2 and x[0]=='(foo (a a a))' and x[1]=='(bar (b b b))'
+          print('STITCH_2_PROGRAM_ORIGINAL_AUTHOR_DEMO_FROZEN')
+          PY
+      - name: Compile and RUN actual pinned Stitch library learning executable once on 2 input programs
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/upstream-stitch"
+          /usr/bin/time -f 'STITCH_SOURCE_FREE_BUILD_PLUS_EXEC_WALL_SEC=%e\nSTITCH_MAX_RSS_KB=%M' \
+            cargo run --release --bin compress -- sourcefree-original-demo.json --max-arity=3 --iterations=1 --show-rewritten \
+            > "$GITHUB_WORKSPACE/STITCH-PINNED-EXTERNAL-SOURCEFREE-FIRST.stdout" \
+            2> "$GITHUB_WORKSPACE/STITCH-PINNED-EXTERNAL-SOURCEFREE-FIRST.stderr"
+          head -80 "$GITHUB_WORKSPACE/STITCH-PINNED-EXTERNAL-SOURCEFREE-FIRST.stdout"
+          tail -25 "$GITHUB_WORKSPACE/STITCH-PINNED-EXTERNAL-SOURCEFREE-FIRST.stderr"
+          if test -s out/out.json; then
+            cp out/out.json "$GITHUB_WORKSPACE/STITCH-PINNED-EXTERNAL-SOURCEFREE-FIRST.json"
+          fi
+      - name: Treat static compression and executable invention as local adoption evidence ONLY
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,re
+          from pathlib import Path
+          stdout=Path('STITCH-PINNED-EXTERNAL-SOURCEFREE-FIRST.stdout').read_text()
+          print('STITCH_CLI_STDOUT_SHA256='+hashlib.sha256(stdout.encode()).hexdigest())
+          evidence={
+              'found_invention':bool(re.search(r'Found\s+1\s+inventions',stdout)),
+              'nontrivial_arity_one_reused_function':bool(re.search(r'fn_0[^\n]*arity=1',stdout)),
+              'documented_program_cost_reduced':bool(re.search(r'Cost Improvement:',stdout)),
+              'upstream_compression_receipt_exists':Path('STITCH-PINNED-EXTERNAL-SOURCEFREE-FIRST.json').is_file(),
+          }
+          print('STITCH_DEMO_LOCAL_EVIDENCE',evidence)
+          assert all(evidence.values()),'DO_NOT_ADOPT_ENGINE_IF_UPSTREAM_LOCAL_CLI_FAIL'
+          print('STITCH_SOURCEFREE_ABSTRACTION_EXECUTED_NOT_NEUMANN_Q3')
+          PY
+      - name: Archive first engine actual results and build resource evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-EXP2-STITCH-REAL-UPSTREAM-SOURCEFREE-PILOT
+          path: |
+            STITCH-PINNED-EXTERNAL-SOURCEFREE-FIRST.stdout
+            STITCH-PINNED-EXTERNAL-SOURCEFREE-FIRST.stderr
+            STITCH-PINNED-EXTERNAL-SOURCEFREE-FIRST.json
+          if-no-files-found: warn
+          retention-days: 90
