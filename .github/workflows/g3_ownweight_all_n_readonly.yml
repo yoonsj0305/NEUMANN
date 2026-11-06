@@ -1,16 +1,15 @@
 name: G3 own-weight frozen 2 to 128 symbolic stage extrapolation (source-free)
+# Science first 42200289388 has completed (FAIL); no repeat on edits.
 on:
-  pull_request:
-    paths:
-      - 'research/g3/ownweight_symbolic_n_readonly.py'
-      - 'tests/test_g3_ownweight_symbolic_n_readonly.py'
-      - 'docs/experiments/G3_OWNWEIGHT_ALL_N_2_TO_128_PREREG_2026_11_06.json'
-      - '.github/workflows/g3_ownweight_all_n_readonly.yml'
+  workflow_dispatch:
+
 permissions:
   contents: read
   actions: read
 jobs:
   first-source-free-extrapolation:
+    if: false # scientific FIRST archived; never rescore favorable rerun
+
     runs-on: ubuntu-latest
     timeout-minutes: 6
     steps:
