@@ -1,0 +1,42 @@
+{
+  "schema": "neumann.g3.ownweight-frozen-stage-count-extrapolation-first.v1",
+  "date": "2026-11-06",
+  "hypothesis": "The already-frozen, actually-trained 4-head own-weight G3 quantifier AST student extrapolates the first/middle/final role program exactly for every stage of each previously absent symbolic stage count n=2..128, without new fitting or source access.",
+  "frozen_checkpoint": {
+    "first_train_run": 42198111692,
+    "checkpoint_sha256": "982ef08b88758537dfe56f3ad8451de26fbd438df295802c491c25d231de9bdc",
+    "artifact_name": "NEUMANN-G3-OWNWEIGHT-QUANTIFIED-TRAIN-FIRST",
+    "artifact_file": "G3-OWNWEIGHT-QUANTIFIED-AST-FROZEN.json"
+  },
+  "registered_n_range": {
+    "min": 2,
+    "max_inclusive": 128,
+    "independent_stage_count_values": 127,
+    "total_token_prediction_points": 8382
+  },
+  "source_read_policy": {
+    "external_original_task_bodies_allowed": false,
+    "original_eval_reruns": 0,
+    "new_training": 0,
+    "new_solving_calls": 0
+  },
+  "teacher_contract": "First/middle/final four-token target rules are explicitly human-authored in preexisting G3 formal rule. For each n first=(1,1,0,0), middle=(1,1,2,2), final=(3,2,0,0). This evaluation is NOT new mathematical operator invention.",
+  "required_comparators": [
+    "trained_ownweight",
+    "zero_untrained_same_architecture",
+    "human_symbolic_rule"
+  ],
+  "predeclared_gate": "PASS_SCOPED iff trained model emits all 8382 human-defined role programs exactly; any mismatch FAIL with first counterexample; record untrained and symbolic rule separately. Zero heldout original tasks are solved by this experiment.",
+  "postfirst_native_metadata_correction": {
+    "original_first_run": 42198669136,
+    "original_first_json_sha256": "04a8cac1f5b886ee5b242844f6fc3ff9ceb202c17332dba37271c6d3b2c546c7",
+    "stdout_sha256_for_Z3_literal_timeout_newline": "7ed6120912d915f6ba8ef82ba3ec0b703265a0979bc0a243e0144580ad0c0b6b",
+    "claim": "Original first `CHECKER_ERROR` at exactly 15s with this stdout SHA should be reclassified as bounded solver TIMEOUT, without rescoring source."
+  },
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q5": "OPEN",
+  "global_Q6": "OPEN",
+  "global_Q7": "OPEN",
+  "result": "NOT_RUN"
+}
