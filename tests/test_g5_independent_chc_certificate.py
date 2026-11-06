@@ -137,7 +137,7 @@ class G5OriginalCHCProofControls(unittest.TestCase):
 
     def test_source_or_witness_sha_changes(self):
         good=prove(INTEGER,{"|inv|":"(>= arg0 0)"})
-        good2=prove(INTEGER.replace(b"(|inv| x)","(|inv| x) "),{"|inv|":"(>= arg0 0)"})
+        good2=prove(INTEGER.replace(b"(|inv| x)",b"(|inv| x) "),{"|inv|":"(>= arg0 0)"})
         self.assertNotEqual(good["original_source_sha256"],good2["original_source_sha256"])
         bad=prove(INTEGER,{"|inv|":"true"})
         self.assertNotEqual(good["certificate_sha256"],bad["certificate_sha256"])
