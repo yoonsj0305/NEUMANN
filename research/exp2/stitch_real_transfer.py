@@ -101,7 +101,7 @@ def mutate_nonhole(node):
     if isinstance(node, str):
         if not re.fullmatch(r"#\d+", node):
             return "__NEGATIVE_CONTROL_WRONG_OPERATOR__"
-        return node
+        return None
     for i, x in enumerate(node):
         changed = mutate_nonhole(x)
         if changed is not None:
