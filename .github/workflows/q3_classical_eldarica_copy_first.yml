@@ -1,6 +1,7 @@
 name: Q3 opened COPY2 COPY3 Eldarica 2.2 native strong baseline FIRST
 
-# One independent classical comparison, not a Q3 learned result.
+# Historical original FIRST #42204574420: BOTH 60s TIMEOUT_CENSORED.
+# Archive only; no repeated original scoring.
 on:
   pull_request:
     paths:
@@ -11,6 +12,7 @@ permissions:
 
 jobs:
   native-once:
+    if: false # FIRST #42204574420 has completed; permanently disable source rescoring
     runs-on: ubuntu-latest
     timeout-minutes: 6
     steps:
