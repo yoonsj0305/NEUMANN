@@ -4,7 +4,7 @@
   "train_macro": {
     "engine_first_run": 42192798081,
     "upstream_commit": "350804b7b35807c78bd21c313785ae5152ae2985",
-    "stitch_original_stdout_sha256": "28b8c26ded19028c1779a9a84e2312780bc8f3fc7ec491d292c9673fba037b73",
+    "stitch_original_stdout_sha256": "239d4f253580b112f66575c7d467ccd738519f7a9256b624498acd547d10822e",
     "source_corpus": "data/cogsci/nuts-bolts.json"
   },
   "targets": [
@@ -45,5 +45,13 @@
     "global_Q6": "OPEN",
     "global_Q7": "OPEN"
   },
-  "actual_run": "NOT_RUN"
+  "actual_run": "NOT_RUN",
+  "metadata_erratum_before_target_body_access": {
+    "wrong_sha": "28b8c26ded19028c1779a9a84e2312780bc8f3fc7ec491d292c9673fba037b73",
+    "correct_first_sha": "239d4f253580b112f66575c7d467ccd738519f7a9256b624498acd547d10822e",
+    "first_readonly_evidence_run": 42193162902,
+    "original_first_engine_run": 42192798081,
+    "first_infrastructure_attempt_run": 42193602989,
+    "reason": "Different repeated runner log time; first_engine stdout SHA from independent read-only run, original target bodies not yet opened"
+  }
 }
