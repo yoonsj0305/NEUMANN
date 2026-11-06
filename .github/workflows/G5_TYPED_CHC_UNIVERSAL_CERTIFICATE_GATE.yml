@@ -1,0 +1,49 @@
+name: NEUMANN G5 typed multi-theory original CHC invariant witness proof FIRST
+on:
+  push:
+    branches:
+      - research/q3-typed-array-universal-certificate-gate-20261106
+    paths:
+      - .github/workflows/G5_TYPED_CHC_UNIVERSAL_CERTIFICATE_GATE.yml
+permissions:
+  contents: read
+jobs:
+  allstate-original-certificate-verifier:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin real 2026 Z3 engine and compile independent checker before source proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile research/g5/independent_chc_certificate.py
+          python -m py_compile tests/test_g5_independent_chc_certificate.py
+          python -m pip install --quiet --no-cache-dir z3-solver==5.0.0.0
+          python - <<'PY'
+          import z3
+          assert z3.get_version_string().startswith('5.0.'),z3.get_version_string()
+          print('ACTUAL_INDEPENDENT_SMT_CHECKER_Z3',z3.get_version_string())
+          PY
+      - name: Run all source-free original Int, Array, ADT, multi-predicate, mutation and injection tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p test_g5_independent_chc_certificate.py -v > G5-TYPED-SOURCEFREE-UNIVERSAL-PROOF-FIRST.log 2>&1
+          cat G5-TYPED-SOURCEFREE-UNIVERSAL-PROOF-FIRST.log
+          grep -q 'Ran 16 tests' G5-TYPED-SOURCEFREE-UNIVERSAL-PROOF-FIRST.log
+          grep -q '^OK$' G5-TYPED-SOURCEFREE-UNIVERSAL-PROOF-FIRST.log
+          echo 'G5_SOURCEFREE_TYPED_ALLSTATE_INDEPENDENT_CHC_WITNESS_GATE_PASS'
+      - name: Preserve immutable checker first tests and scientific scope
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G5-TYPED-MULTITHEORY-CHC-UNIVERSAL-FIRST
+          path: G5-TYPED-SOURCEFREE-UNIVERSAL-PROOF-FIRST.log
+          if-no-files-found: warn
+          retention-days: 90
