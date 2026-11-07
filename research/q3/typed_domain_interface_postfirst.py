@@ -100,6 +100,7 @@ def candidate_typed(task):
 
 def execute(p,x):
     if not isinstance(p,list):raise ValueError("UNKNOWN_AST")
+    if p[0]=="ite":return execute(p[2],x) if old.ev(p[1],x) else execute(p[3],x)
     if p[0]=="bool":return p[1]
     if p[0]=="str_eq":return old.ev(p[1],x)==old.ev(p[2],x)
     if p[0]=="int_eq":return old.ev(p[1],x)==old.ev(p[2],x)
