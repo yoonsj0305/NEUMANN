@@ -1,0 +1,47 @@
+name: Q6 compositional pointwise transfer after immutable first failure
+on:
+  pull_request:
+    paths:
+      - 'research/q6/compositional_simulation_postfirst.py'
+      - '.github/workflows/q6_compositional_transfer_postfirst.yml'
+permissions:
+  contents: read
+jobs:
+  compositional-postfirst:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Install independent Z3
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq z3
+          z3 --version
+      - name: Verify postfirst pointwise composition with unchanged string abstraction proof
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q6/compositional_simulation_postfirst.py
+          /usr/bin/time -f 'COMPOSITION_WALL_S=%e RSS_KB=%M' \
+           python3 -m research.q6.compositional_simulation_postfirst --out Q6-COMPOSITION-POSTFIRST
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('Q6-COMPOSITION-POSTFIRST/POSTFIRST_REPORT.json').read_text())
+          assert r['passed']==r['checks']==6
+          assert r['frozen_original_first_status']=='FAIL_7_OF_9'
+          assert r['model_inference_calls']==0 and r['external_original_tasks']==0
+          assert r['Q3']==r['Q4']==r['Q6']==r['Q7']=='OPEN'
+          print('ARRAY_STRING_POINTWISE_ABSTRACT_SIMULATION_COMPOSED')
+          PY
+      - name: Keep postfirst source-free proof obligations, never overwrite FIRST
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q6-POINTWISE-COMPOSITION-POSTFIRST
+          path: Q6-COMPOSITION-POSTFIRST/
+          retention-days: 90
+          if-no-files-found: warn
