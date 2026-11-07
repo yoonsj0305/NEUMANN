@@ -1,0 +1,42 @@
+name: Q3 Frozen Metaprogram Independent SyGuS 64-bit FIRST
+
+on:
+  push:
+    branches:
+      - research/q3-unseen-sygus-hard-metaprogram-20261107
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  q3_external_original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Preflight fixed evaluator and immutable source
+        run: |
+          python -m py_compile research/q3/hard_original_unopened_method_gate.py
+          git hash-object research/q3/hard_original_unopened_method_gate.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,"research/q3")
+          import hard_original_unopened_method_gate as q
+          assert len(q.TASK_NAMES)==24
+          assert q.UPSTREAM_COMMIT=="e7ae840e5546e9243ff94afb1a29064fc050011c"
+          assert q.BUDGET==500
+          a=next(q.learned_candidates())
+          assert a["kind"]=="GeneratedBitRelation"
+          assert q.exact({"kind":"GeneratedBitRelation","coefficients":[1,0,0],"invert":0,"boundary":0},[([0]*64,[0]*64)])
+          PY
+      - name: Fetch all predeclared original task data only after source freeze
+        run: |
+          python research/q3/hard_original_unopened_method_gate.py
+      - name: Archive every failure and original prediction
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-frozen-sygus-64bit-hard-original-first
+          path: Q3_HARD_EXTERNAL_FIRST.json
+          if-no-files-found: warn
