@@ -1,0 +1,125 @@
+name: Q3 frozen typed inventor ALL remaining external CodeARC originals strict novelty FIRST
+on:
+  pull_request:
+    paths:
+      - 'research/q3/codearc_full_remaining_novelty_first.py'
+      - '.github/workflows/q3_full_remaining_codearc_strict_novelty_first.yml'
+permissions:
+  contents: read
+
+jobs:
+  remaining-originals:
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0,1,2,3,4,5,6,7]
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      SHARD: ${{ matrix.shard }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: LOCK inventor and original evaluator exactly as PRIOR external first
+        run: |
+          set -euo pipefail
+          test "$(git hash-object research/q3/typed_semantic_delta_inventor.py)" = 01862093cf68c0a3425002a01fa8f83967bbcd23
+          test "$(git hash-object research/q3/codearc_typed_delta_novel_original_first.py)" = ca2c6c19119fa3fe724eb2471f95ad1439e0bec8
+          python3 -m py_compile research/q3/codearc_full_remaining_novelty_first.py
+          mkdir -p "Q3-FULL-REMAINING-SHARD-$SHARD"
+      - name: Exact same externally authored CodeARC commit and file SHA
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --silent --show-error \
+            "https://huggingface.co/datasets/anjiangwei/CodeARC-Invocations/resolve/119512573bf96148cbb95e99cf7cdd21c06153e4/invocations.jsonl" \
+            -o /tmp/codearc.jsonl
+          test "$(sha256sum /tmp/codearc.jsonl | awk '{print $1}')" = 3f08820594d4825c78bbdcc3b8eb2e6c8c0285fb3de966e900463b53f1723962
+      - name: All remaining independent original IDs, same frozen program
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_FULL_REMAINING_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.codearc_full_remaining_novelty_first \
+              --dataset /tmp/codearc.jsonl \
+              --out "Q3-FULL-REMAINING-SHARD-$SHARD/RESULTS" \
+              --shard "$SHARD" --shards 8
+          python3 - <<'PY'
+          import os,json
+          from pathlib import Path
+          folder=Path('Q3-FULL-REMAINING-SHARD-'+os.environ['SHARD'])
+          r=json.loads((folder/'RESULTS/FIRST.json').read_text())
+          assert r['summary']['source_total_originals']==1114
+          assert r['summary']['assigned_originals']>80
+          assert r['summary']['shard']==int(os.environ['SHARD'])
+          assert r['proposer_source_blob_unchanged']=='01862093cf68c0a3425002a01fa8f83967bbcd23'
+          assert r['no_novelty_for_constant_or_identity']
+          assert r['scientific_status']=='Q3_GLOBAL_OPEN'
+          print('Q3_COMPLETE_SHARD_STRICT_NOVELTY_CHECKED',os.environ['SHARD'],r['summary'])
+          PY
+      - name: Publish all candidate ASTs, first results, wrong and abstain records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-FULL-REMAINING-STRICT-NOVELTY-SHARD-${{ matrix.shard }}
+          path: Q3-FULL-REMAINING-SHARD-${{ matrix.shard }}/
+          if-no-files-found: warn
+          retention-days: 90
+
+  total-originals-audit:
+    needs: remaining-originals
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: NEUMANN-Q3-FULL-REMAINING-STRICT-NOVELTY-SHARD-*
+          path: /tmp/q3-full-remaining
+      - name: Verify every original once and distinguish nontrivial invention
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('/tmp/q3-full-remaining')
+          paths=list(root.rglob('RESULTS/FIRST.json'))
+          assert len(paths)==8,(len(paths),paths)
+          reports=[json.loads(p.read_text()) for p in paths]
+          assert {r['summary']['shard'] for r in reports}==set(range(8))
+          cohort=reports[0]['full_source_id_cohort']
+          assert all(r['full_source_id_cohort']==cohort for r in reports)
+          rows=sorted((q for r in reports for q in r['rows']),
+                      key=lambda x:x['original_id'])
+          assert [q['original_id'] for q in rows]==cohort
+          assert all(r['proposer_source_blob_unchanged']=='01862093cf68c0a3425002a01fa8f83967bbcd23'
+                     for r in reports)
+          eligible=[x for x in rows if x.get('test_total')==3]
+          substantive=[x for x in eligible if x['substantive_operator_grading']=='NONTRIVIAL_EXACT_SOURCE_DISTINCT']
+          result={
+            'previously_unexposed_source_distinct_originals':len(cohort),
+            'eligible_originals':len(eligible),
+            'total_full_heldout_exact_originals':sum(x['all_3_test_exact'] for x in eligible),
+            'NONCONSTANT_NONTRIVIAL_INVENTED_OPERATOR_EXACT':len(substantive),
+            'nontrivial_filter_exact':sum(x['generated_operator_AST']['kind']=='DerivedSequenceFilter' for x in substantive),
+            'nontrivial_numeric_exact':sum(x['generated_operator_AST']['kind']=='DerivedPolynomial' for x in substantive),
+            'original_test_exact':sum(x['test_exact'] for x in eligible),
+            'original_test_total':3*len(eligible),
+            'constant_polynomial_FALSE_POSITIVE_rejected':sum(
+              x.get('constant_polynomial_rejected_as_novel',False) for x in eligible),
+            'old_baseline_exact':sum(x['old_core_all_3_exact'] for x in eligible),
+            'new_cold_without_memory_exact':sum(x['cold_new_all_3_exact'] for x in eligible),
+            'no_cherry_picking_entire_hash_buckets_2_to_16':True,
+            'Q3_GLOBAL':'OPEN','Q4_GLOBAL':'OPEN','Q6_GLOBAL':'OPEN',
+            'exact_original_source_sha256':'3f08820594d4825c78bbdcc3b8eb2e6c8c0285fb3de966e900463b53f1723962',
+            'learner_unchanged_after_bucket1_external_exposure':True}
+          Path('Q3-ALL-REMAINING-STRICT-FIRST.json').write_text(json.dumps(
+            {'summary':result,'nontrivial_source_originals':substantive,
+             'complete_rows':rows},indent=2,sort_keys=True)+'\n')
+          print('Q3_ALL_REMAINING_ORIGINAL_STRICT_NOVELTY_AUDIT',json.dumps(result,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: NEUMANN-Q3-ALL-REMAINING-STRICT-NOVELTY-AUDIT
+          path: Q3-ALL-REMAINING-STRICT-FIRST.json
+          retention-days: 90
