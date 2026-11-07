@@ -1,0 +1,72 @@
+name: Q3 universal recursive inventor on independently authored CodeARC FIRST
+on:
+  pull_request:
+    paths:
+      - 'research/q3/universal_recursive_meta_inventor.py'
+      - 'research/q3/codearc_universal_meta_external_first.py'
+      - 'tests/test_q3_universal_recursive_meta_inventor.py'
+      - '.github/workflows/q3_universal_recursion_codearc_external_first.yml'
+permissions:
+  contents: read
+jobs:
+  q3-independent-original-io-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Freeze local universal constructor and learn meta rule before external data
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q3/universal_recursive_meta_inventor.py
+          python3 -m py_compile research/q3/codearc_universal_meta_external_first.py
+          python3 -m unittest tests/test_q3_universal_recursive_meta_inventor.py -v
+          git hash-object research/q3/universal_recursive_meta_inventor.py
+      - name: Fetch independently published CodeARC original I/O at a frozen revision
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/neumann-codearc Q3-UNIVERSAL-CODEARC-FIRST
+          URI=https://huggingface.co/datasets/anjiangwei/CodeARC-Invocations
+          REV="$(git ls-remote "$URI" HEAD | awk '{print $1}')"
+          test "${#REV}" -eq 40
+          curl --fail --location --retry 3 --silent --show-error \
+            "$URI/resolve/$REV/invocations.jsonl" \
+            -o /tmp/neumann-codearc/invocations.jsonl
+          test -s /tmp/neumann-codearc/invocations.jsonl
+          DATA_SHA="$(sha256sum /tmp/neumann-codearc/invocations.jsonl | awk '{print $1}')"
+          printf '{"dataset":"anjiangwei/CodeARC-Invocations","revision":"%s","downloaded_sha256":"%s","origin":"published by Anjiang Wei et al COLM 2025","copyright":"Apache-2.0"}\n' \
+            "$REV" "$DATA_SHA" > Q3-UNIVERSAL-CODEARC-FIRST/SOURCE_PROVENANCE.json
+          cat Q3-UNIVERSAL-CODEARC-FIRST/SOURCE_PROVENANCE.json
+      - name: External I/O only, fixed subset, no source code, no retuning
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_EXTERNAL_CODEARC_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.codearc_universal_meta_external_first \
+              --dataset /tmp/neumann-codearc/invocations.jsonl \
+              --out Q3-UNIVERSAL-CODEARC-FIRST/RESULTS \
+              --modulus 17 \
+              --budget 34000
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          p=Path('Q3-UNIVERSAL-CODEARC-FIRST')
+          r=json.loads((p/'RESULTS/FIRST.json').read_text())
+          src=json.loads((p/'SOURCE_PROVENANCE.json').read_text())
+          assert len(src['revision'])==40 and len(src['downloaded_sha256'])==64
+          assert r['summary']['original_problem_ids']>=1000
+          assert r['summary']['preregistered_cohort_size']>=40
+          assert r['summary']['source_exposed_ids_excluded']==list(range(21))
+          assert r['Q3_GLOBAL']==r['Q4_GLOBAL']==r['Q6_GLOBAL']=='OPEN'
+          assert r['all_original_outcomes_retained']
+          print('Q3_INDEPENDENT_CODEARC_FIRST_FINISHED__GLOBAL_Q3_OPEN')
+          PY
+      - name: Preserve ALL first outcomes, failed candidates, provenance, invented operator library
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-UNIVERSAL-RECURSIVE-CODEARC-INDEPENDENT-FIRST
+          path: Q3-UNIVERSAL-CODEARC-FIRST/
+          if-no-files-found: warn
+          retention-days: 90
