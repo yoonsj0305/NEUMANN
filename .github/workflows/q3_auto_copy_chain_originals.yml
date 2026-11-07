@@ -1,0 +1,59 @@
+name: Q3 generic typed COPY chain original all-clause automatic proof
+
+on:
+  pull_request:
+    paths:
+      - 'research/q3/auto_copy_chain_chc.py'
+      - 'tests/test_q3_auto_copy_chain_chc.py'
+      - 'docs/experiments/Q3_COPY_PIPELINE_AUTOGEN_OPENED_DEV_2026_11_07.json'
+      - '.github/workflows/q3_auto_copy_chain_originals.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  auto-copy-chain-original-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Install independently executable SMT checker
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq z3
+          z3 --version
+      - name: Frozen syntactic contracts and malformed layouts
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q3/auto_copy_chain_chc.py
+          python3 -m unittest tests/test_q3_auto_copy_chain_chc.py -v
+      - name: Generate without handwritten stage relations and prove untouched CHC copies
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'AUTOGEN_COPY_BOTH_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.auto_copy_chain_chc --out COPY-PIPELINE-AUTOGEN-ORIGINAL-FIRST
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path('COPY-PIPELINE-AUTOGEN-ORIGINAL-FIRST/RUN_REPORT.json').read_text())
+          assert a['programs_expected']==2 and a['programs_passed']==2, a
+          assert a['original_proved_clauses']==20 and a['original_expected_clauses']==20
+          assert a['human_designed_copy_relation_grammar']
+          assert not a['human_supplied_specific_CHC_predicate_interpretation']
+          assert not a['learned_model_used'] and a['new_original_holdout_bodies_opened']==0
+          assert all(x['original_all_proved'] and x['wrong_operator_has_SAT_witness'] for x in a['rows'])
+          assert a['Q3']==a['Q4']==a['Q6']==a['Q7']=='OPEN'
+          print('REAL_CHC_COPY2_COPY3_ALL_20_UNCHANGED_CLAUSES_INDUCTIVELY_PROVED')
+          PY
+      - name: Keep the first original sources, proof scripts, counterexamples, failure evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-AUTOGEN-REAL-COPY2-COPY3-CHC-FIRST
+          path: COPY-PIPELINE-AUTOGEN-ORIGINAL-FIRST/
+          retention-days: 90
+          if-no-files-found: warn
