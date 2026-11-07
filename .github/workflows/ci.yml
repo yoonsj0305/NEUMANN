@@ -6,6 +6,64 @@ on:
   pull_request:
 
 jobs:
+  q3-frozen-library-hole-only-transfer:
+    if: github.event_name == 'pull_request' && github.head_ref == 'research/q3-library-only-transfer-actual-causal-run-20261107'
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Exact original source programs from previously frozen FIRST artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api /repos/yoonsj0305/NEUMANN/actions/artifacts/13558051217/zip > /tmp/q3-prior-source.zip
+          echo '6c9616b9f70e33675c0b4e7835bfecd5ad4c4e64030fda76d979379fe04488a3  /tmp/q3-prior-source.zip' | sha256sum -c -
+          unzip -p /tmp/q3-prior-source.zip FIRST.json > /tmp/q3-prior-source-first.json
+      - name: Official source-pin, no reserved originals
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-prior-arc
+          git -C /tmp/q3-prior-arc init -q
+          git -C /tmp/q3-prior-arc remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C /tmp/q3-prior-arc fetch -q --depth 1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C /tmp/q3-prior-arc checkout -q --detach FETCH_HEAD
+          test "$(git -C /tmp/q3-prior-arc rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+      - name: Generated library MUST drive hole-only original transfer
+        run: |
+          set -euo pipefail
+          python3 -m unittest tests/test_q3_autonomous_operator_library_reuse.py -v
+          /usr/bin/time -f 'Q3_LIBRARY_ONLY_CAUSAL_WALL_S=%e RSS_KB=%M' \
+            python3 -m research.q3.autonomous_operator_library_reuse \
+              --parent-first /tmp/q3-prior-source-first.json \
+              --arc-root /tmp/q3-prior-arc \
+              --out Q3-LIBRARY-ONLY-CAUSAL-POSTFIRST
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('Q3-LIBRARY-ONLY-CAUSAL-POSTFIRST/FIRST_REPORT.json').read_text())
+          assert r['original_target']['status']=='REUSED_COMPILED_FUNCTION'
+          assert r['original_target']['train_fit']
+          assert r['original_target']['test_exact']
+          assert r['full_library_frozen_before_target_training']
+          assert r['global_Q3']=='OPEN'
+          print('SCOPED_FUNCTION_SELF_DEFINITION_AND_REUSE__CAUSAL_POSTFIRST_PASS')
+          PY
+      - name: Archive exact postfirst receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-LIBRARY-ONLY-CAUSAL-POSTFIRST
+          path: Q3-LIBRARY-ONLY-CAUSAL-POSTFIRST/
+          retention-days: 90
+          if-no-files-found: warn
+
   test:
     runs-on: ubuntu-latest
     env:
