@@ -1,0 +1,38 @@
+name: Q3 FIRST exposed CodeARC train-only diagnosis no test leakage
+on:
+  pull_request:
+    paths:
+      - 'research/q3/codearc_train_only_bottleneck_audit.py'
+      - '.github/workflows/q3_codearc_train_only_bottleneck_audit.yml'
+permissions:
+  contents: read
+jobs:
+  type-structure-diagnosis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Same pinned external published source and frozen old parser
+        run: |
+          set -euo pipefail
+          test "$(git hash-object research/q3/codearc_universal_meta_external_first.py)" = 6deefed52645e40065ffdb0e2114bf18f548a0a2
+          test "$(git hash-object research/q3/universal_recursive_meta_inventor.py)" = 07e7eb245f46005fd11ab308ac1c3311ab2b0bc9
+          curl -L --fail --retry 3 -sS \
+            "https://huggingface.co/datasets/anjiangwei/CodeARC-Invocations/resolve/119512573bf96148cbb95e99cf7cdd21c06153e4/invocations.jsonl" -o /tmp/codearc.jsonl
+          test "$(sha256sum /tmp/codearc.jsonl | cut -d' ' -f1)" = 3f08820594d4825c78bbdcc3b8eb2e6c8c0285fb3de966e900463b53f1723962
+      - name: Exposed FIRST cohort TRAIN only, no test labels loaded
+        run: |
+          set -euo pipefail
+          python3 -m research.q3.codearc_train_only_bottleneck_audit \
+            --dataset /tmp/codearc.jsonl --out Q3-TRAIN-ONLY-BOTTLENECK
+      - name: Retain diagnosis independent of cancelled 84-cohort evaluation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-TRAIN-ONLY-BOTTLENECK-DIAGNOSIS
+          path: Q3-TRAIN-ONLY-BOTTLENECK/
+          if-no-files-found: warn
+          retention-days: 90
