@@ -1,0 +1,34 @@
+name: Q3 own-weight variable-length operator AST generator contract
+on:
+  pull_request:
+    paths:
+      - 'research/q3/generative_typed_operator_policy.py'
+      - 'tests/test_q3_generative_typed_operator_policy.py'
+      - '.github/workflows/q3_generative_operator_ast_contract.yml'
+permissions:
+  contents: read
+jobs:
+  learnable-generator-contract-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Ensure learned-generator is executable and fails closed
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q3/generative_typed_operator_policy.py
+          python3 -m unittest tests/test_q3_generative_typed_operator_policy.py -v
+      - name: Q3 scientific status guard
+        run: |
+          python3 - <<'PY'
+          import inspect
+          from research.q3 import generative_typed_operator_policy as m
+          source=inspect.getsource(m)
+          assert 'human' in source.lower()
+          assert '"Q3":"OPEN"' in source
+          assert 'COPY_PREFIX' not in str(m.PRODUCTIONS)
+          print('CORE_EXECUTABLE_ONLY__NO_CLAIM_OF_Q3_DISCOVERY')
+          PY
