@@ -1,0 +1,72 @@
+name: Q3 post-FIRST semantic equivalence independent Z3 and Unicode audit
+on:
+  pull_request:
+    paths:
+      - 'research/q3/postfirst_typed_predicate_semantic_proof.py'
+      - '.github/workflows/q3_postfirst_typed_predicate_semantics.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit-immutable-first-original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Assert source inventor is EXACT frozen first version
+        run: |
+          set -euo pipefail
+          test "$(git hash-object research/q3/feature_predicate_from_counterexample.py)" = 53513a57efc6f49b6154a7ec2f10742960588aad
+          python3 -m py_compile research/q3/postfirst_typed_predicate_semantic_proof.py
+          if ! command -v z3 >/dev/null 2>&1; then
+             sudo apt-get update -qq
+             sudo apt-get install -y z3
+          fi
+          z3 --version
+      - name: Retrieve original immutable #714 FIRST artifact, not refitted predictions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-immutable-first
+          gh run download 42354198810 \
+            --repo yoonsj0305/NEUMANN \
+            -n NEUMANN-Q3-PREDICATE-ABSTRACTION-FRESH-MBPP-ORIGINALS \
+            -D /tmp/q3-immutable-first
+          test -s /tmp/q3-immutable-first/FIRST_RESULTS/FIRST.json
+          sha256sum /tmp/q3-immutable-first/FIRST_RESULTS/FIRST.json
+      - name: Check INTEGER parity semantics with Z3 and ALL Unicode codepoints
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_SEMANTIC_AUDIT_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.postfirst_typed_predicate_semantic_proof \
+              --first /tmp/q3-immutable-first/FIRST_RESULTS/FIRST.json \
+              --out Q3-TYPED-PREDICATE-SEMANTIC-AUDIT
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          path=Path('Q3-TYPED-PREDICATE-SEMANTIC-AUDIT/POSTFIRST_SEMANTIC_AUDIT.json')
+          data=json.loads(path.read_text())
+          assert data['postfirst_not_blind_new_original']
+          assert data['original_FIRST_actions_run']==42354198810
+          assert data['first_original_heldout_correct']==4
+          assert data['reference_equivalent_under_the_stated_function_domains']==3
+          assert data['original_test_correct_but_reference_SEMANTICS_FALSE_POSITIVE']==1
+          assert data['stronger_semantic_proof_pass']
+          assert data['expected_counterexample_against_IP_zero_stripper']
+          assert data['unicode_semantic_equivalence']['Python_Unicode_codepoints_tested']==1114112
+          assert data['unicode_semantic_equivalence']['differences']==0
+          assert data['Q3_GLOBAL']==data['Q4_GLOBAL']==data['Q6_GLOBAL']=='OPEN'
+          print('Q3_INDEPENDENT_POSTFIRST_SEMANTICS_VERIFIED_GLOBAL_OPEN')
+          PY
+      - name: Persist full audit, Z3 independent scripts and false positive
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-POSTFIRST-SEMANTIC-PROOF-AND-FALSE-POSITIVE
+          path: Q3-TYPED-PREDICATE-SEMANTIC-AUDIT/
+          retention-days: 90
+          if-no-files-found: warn
