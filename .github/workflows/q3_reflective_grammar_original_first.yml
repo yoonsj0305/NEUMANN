@@ -1,0 +1,60 @@
+name: Q3 reflective self-extending grammar FIRST | source-frozen synthetic dev
+on:
+  pull_request:
+    paths:
+      - 'research/q3/reflective_grammar_inventor.py'
+      - 'research/q3/reflective_grammar_experiment.py'
+      - 'tests/test_q3_reflective_grammar_inventor.py'
+      - '.github/workflows/q3_reflective_grammar_original_first.yml'
+permissions:
+  contents: read
+jobs:
+  reflective-grammar-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: No external model dependency or task-specific language extension
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q3/reflective_grammar_inventor.py
+          python3 -m py_compile research/q3/reflective_grammar_experiment.py
+          python3 -m unittest tests/test_q3_reflective_grammar_inventor.py -v
+      - name: ACTUAL immutable self-invented meta grammar FIRST
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_REFLECTIVE_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.reflective_grammar_experiment \
+              --out Q3-REFLECTIVE-GRAMMAR-SYNTHETIC-FIRST
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          root=Path('Q3-REFLECTIVE-GRAMMAR-SYNTHETIC-FIRST')
+          r=json.loads((root/'FIRST.json').read_text())
+          source=json.loads((root/'FROZEN_SOURCE_LANGUAGE.json').read_text())
+          grown=json.loads((root/'GROWN_LANGUAGE.json').read_text())
+          assert source['schema']=='neumann.reflective-self-extending-language.v1'
+          assert source['productions'] and not len(source['productions'])==0
+          assert r['source_generated_grammar_productions']==5
+          assert r['source_programs_learned']==12
+          assert r['target_new_function_definitions']==6
+          assert r['heldout_exact']==r['heldout_total']==214
+          assert r['target_tasks_invented_grammar_necessary']==6
+          assert len(grown['defs'])==len(source['defs'])+6
+          assert r['human_authored_seed_runtime']
+          assert r['human_authored_synthetic_target_families']
+          assert not r['trained_neural_policy']
+          assert r['Q3_GLOBAL']==r['Q4_GLOBAL']==r['Q6_GLOBAL']=='OPEN'
+          print('Q3_REFLECTIVE_GRAMMAR_SYNTH_DEV_SUBGATE_PASS__GLOBAL_Q3_OPEN')
+          PY
+      - name: Preserve source-before-target, grown language, and complete data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-REFLECTIVE-METAGRAMMAR-SYNTHETIC-FIRST
+          path: Q3-REFLECTIVE-GRAMMAR-SYNTHETIC-FIRST/
+          retention-days: 90
+          if-no-files-found: warn
