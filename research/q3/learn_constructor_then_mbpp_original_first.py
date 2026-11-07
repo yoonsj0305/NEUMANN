@@ -36,15 +36,10 @@ from research.q3.typed_semantic_delta_inventor import (
 CODEARC_SHA256="3f08820594d4825c78bbdcc3b8eb2e6c8c0285fb3de966e900463b53f1723962"
 SOURCE_TASKS=(834,841)
 SOURCE_AST={
-    834:{"kind":"DerivedSequenceFilter","source_arg":0,
-         "removed":["!"],"output_container":"str",
-         "predicate_ast":["lambda","item",["not",["member",
-                       ["arg","item"],["set",["!"]]]]]},
-    841:{"kind":"DerivedSequenceFilter","source_arg":0,
-         "removed":[" "],"output_container":"str",
-         "predicate_ast":["lambda","item",["not",["member",
-                       ["arg","item"],["set",[" "]]]]}
+    834:{"kind":"DerivedSequenceFilter","source_arg":0,"removed":["!"]},
+    841:{"kind":"DerivedSequenceFilter","source_arg":0,"removed":[" "]},
 }
+
 SCHEMA="neumann.q3.self-generated-constructor-external-mbpp.v1"
 
 
