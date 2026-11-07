@@ -1,0 +1,58 @@
+name: Q6 frozen no-str.at-candidate causal ablation on source-exposed String
+on:
+  pull_request:
+    paths:
+      - 'research/q6/frozen_auto_alpha_withhold_at_ablation.py'
+      - '.github/workflows/q6_frozen_alpha_withhold_at_ablation.yml'
+permissions:
+  contents: read
+jobs:
+  frozen-prior-inventor-one-head-withheld:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Verify previous inventor byte unchanged and Z3
+        run: |
+          set -euo pipefail
+          test "$(git hash-object research/q6/auto_structural_mapping_proof_memory.py)" = 66e76f829e2245b34327b609dc62e6075e15e317
+          if ! command -v z3 >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y z3
+          fi
+          z3 --version
+          python3 -m py_compile research/q6/frozen_auto_alpha_withhold_at_ablation.py
+      - name: Exclude prior correct primitive HEAD and re-prove newly generated alternate AST
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q6_AUTO_ALPHA_NO_AT_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q6.frozen_auto_alpha_withhold_at_ablation \
+              --out Q6-ALPHA-HEAD-WITHHELD-FIRST
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          report=json.loads(Path('Q6-ALPHA-HEAD-WITHHELD-FIRST/FIRST.json').read_text())
+          assert report['frozen_proposer_unchanged']
+          assert report['ablated_head']=='str.at'
+          assert 'str.at' not in report['candidate_proposer_heads']
+          assert report['candidates_surviving']>=1
+          assert any(x['allproofs'] for x in report['generated_alternative_programs'])
+          assert all(x['generated_AST'][1] != 'str.at'
+                     for x in report['generated_alternative_programs'])
+          assert report['wrong_same_primitive_index_proof']['pass']
+          assert report['scoped_ablation_pass']
+          assert report['Q3_GLOBAL']==report['Q4_GLOBAL']==report['Q6_GLOBAL']=='OPEN'
+          assert report['postfirst_diagnostic_same_originals']
+          print('Q6_FROZEN_ALTERNATIVE_OBSERVATION_TERM_PROVED__GLOBAL_OPEN')
+          PY
+      - name: Archive all results, including failed proofs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q6-FROZEN-ALPHA-WITHHOLD-STRAT-FIRST
+          path: Q6-ALPHA-HEAD-WITHHELD-FIRST/
+          if-no-files-found: warn
+          retention-days: 90
