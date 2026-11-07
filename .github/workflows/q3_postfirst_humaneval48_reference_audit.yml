@@ -1,0 +1,48 @@
+name: Q3 POSTFIRST HumanEval 48 semantic source audit, never blind
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_postfirst_humaneval48_reference_audit.yml'
+permissions:
+  contents: read
+jobs:
+  audit-one-false-novelty-risk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Only now (AFTER #716 original tests) inspect published task 48 reference
+        run: |
+          set -euo pipefail
+          mkdir -p Q3-HUMANEVAL48-POSTFIRST-REFERENCE
+          curl --fail --location --retry 3 -sS \
+            https://raw.githubusercontent.com/openai/human-eval/b9453e8f1865df0a0057a1383767caa400acfbcf/data/HumanEval.jsonl.gz \
+            -o /tmp/q3-reference-human-eval.gz
+          test "$(sha256sum /tmp/q3-reference-human-eval.gz | awk '{print $1}')" = b796127e635a67f93fb35c04f4cb03cf06f38c8072ee7cee8833d7bee06979ef
+          python3 - <<'PY'
+          import gzip,json
+          from pathlib import Path
+          with gzip.open('/tmp/q3-reference-human-eval.gz','rt') as f:
+            data=[json.loads(x) for x in f if x.strip()]
+          q=next(x for x in data if x['task_id']=='HumanEval/48')
+          print('POSTFIRST_REFERENCE_TASK_ID',q['task_id'],flush=True)
+          print('POSTFIRST_REFERENCE_PROMPT',q['prompt'][:1800],flush=True)
+          print('POSTFIRST_REFERENCE_CANONICAL',q['canonical_solution'][:1400],flush=True)
+          print('POSTFIRST_REFERENCE_TEST_SNIPPET',q['test'][:900],flush=True)
+          (Path('Q3-HUMANEVAL48-POSTFIRST-REFERENCE')/'REFERENCE_EXPOSED_ONLY.json').write_text(
+              json.dumps({'task_id':q['task_id'],'postfirst_exposure':True,
+                'official_original_first_run':42361601013,
+                'postfirst_development_run':42362322818,
+                'source_prompt':q['prompt'],'reference':q['canonical_solution'],
+                'source_test':q['test']},sort_keys=True,indent=2)+'\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: NEUMANN-Q3-HUMANEVAL48-POSTFIRST-REFERENCE-AUDIT
+          path: Q3-HUMANEVAL48-POSTFIRST-REFERENCE/
+          if-no-files-found: warn
+          retention-days: 90
