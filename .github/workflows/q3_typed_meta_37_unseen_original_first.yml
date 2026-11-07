@@ -1,0 +1,73 @@
+name: Q3 Frozen typed meta-grammar 37 unseen string originals FIRST
+
+on:
+  push:
+    branches:
+      - research/q3-cross-domain-metagrammar-string-original-20261107
+    paths:
+      - research/q3/typed_metagrammar_37_new_original_first.py
+      - .github/workflows/q3_typed_meta_37_unseen_original_first.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  q3_37_new_original_first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Load immutable source-only meta grammar from earlier independent run
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-typed-metagrammar-cross-domain-string-original-first
+          run-id: 42373106360
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: prior
+      - name: Strict preflight before any of 37 target bytes are fetched
+        run: |
+          python -m py_compile research/q3/typed_meta_hole_binder_v2.py research/q3/typed_metagrammar_37_new_original_first.py
+          git hash-object research/q3/typed_meta_hole_binder_v2.py
+          git hash-object research/q3/typed_metagrammar_37_new_original_first.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'research/q3')
+          import typed_metagrammar_37_new_original_first as exp
+          import typed_meta_hole_binder_v2 as b
+          import typed_domain_interface_postfirst as t
+          policy=exp.old.frozen_policy()
+          assert len(policy["learned_productions"])==2
+          assert len(exp.TARGET)==37 and len(set(exp.TARGET))==37
+          assert exp.TARGET[0]=="get-last-name-from-name.sl"
+          assert exp.TARGET[-1]=="strip-numeric-characters-from-cell.sl"
+          example='''(synth-fun f ((name String)) String
+           ((Start String (ntString))
+            (ntString String (name " " "." (str.substr ntString ntInt ntInt)))
+            (ntInt Int (0 1 (+ ntInt ntInt) (str.len ntString) (str.indexof ntString ntString ntInt)))))
+          (constraint (= (f "Nancy FreeHafer") "Nancy"))
+          (constraint (= (f "Andrew Cencici") "Andrew"))
+          (constraint (= (f "Jan Kotas") "Jan"))
+          (constraint (= (f "Mariya Sergienko") "Mariya"))'''
+          task=t.decode_any(example)
+          guess=b.memory_search(policy["learned_productions"],task,task["examples"][:3])
+          assert guess["status"]=="SOURCE_LEARNED_TYPED_CONSTRUCTOR",guess
+          assert t.score_any(guess["ast"],task["examples"][3:])["exact"]
+          unknown='''(synth-fun f ((x Int)) String ((Start String ("ok"))))
+          (constraint (= (f 1) "ok"))'''
+          try:t.decode_any(unknown)
+          except ValueError:pass
+          else:raise AssertionError("FAIL_OPEN")
+          print("FROZEN_SOURCE_META_HASH",policy["content_sha256"])
+          print("TYPE_HOLE_PRETARGET_GATE_PASS")
+          PY
+      - name: Evaluate all 37 unopened official original problems
+        run: python research/q3/typed_metagrammar_37_new_original_first.py
+      - name: Archive every original result without modifying FIRST
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-typed-constructor-37-unseen-official-original-first
+          path: Q3_TYPED_METAGRAMMAR_FRESH_37_ORIGINAL_FIRST.json
+          if-no-files-found: warn
