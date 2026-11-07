@@ -1,0 +1,56 @@
+name: Q3 heterogenous self-invented data representations ORIGINAL FIRST
+on:
+  pull_request:
+    paths:
+      - 'research/q3/heterogeneous_representation_invention.py'
+      - 'research/q3/heterogeneous_type_first.py'
+      - 'tests/test_q3_heterogeneous_type_invention.py'
+      - '.github/workflows/q3_heterogeneous_type_first.yml'
+permissions:
+  contents: read
+jobs:
+  q3-new-representation-family:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: No per-family model code; type-invention and negative controls
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q3/heterogeneous_representation_invention.py
+          python3 -m py_compile research/q3/heterogeneous_type_first.py
+          python3 -m unittest tests/test_q3_heterogeneous_type_invention.py -v
+      - name: ACTUAL mixed-family arithmetic and finite-state source-unknown FIRST
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_HETEROGENEOUS_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.heterogeneous_type_first \
+              --out Q3-NEW-HETEROGENEOUS-REPRESENTATIONS-FIRST \
+              --extra-unknown 32
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          data=json.loads(Path(
+            'Q3-NEW-HETEROGENEOUS-REPRESENTATIONS-FIRST/FIRST.json').read_text())
+          stats=data['summary']
+          assert stats['problems']==65
+          assert stats['heldout_total']==65*24
+          assert stats['invented_integer_state_programs']>0
+          assert stats['invented_finite_variant_programs']>0
+          assert stats['correct_new_out_of_training_value_tests']>0
+          assert data['same_frozen_model_selection_policy_across_finite_and_integer']
+          assert data['human_bootstrap_two_representation_constructor_families']
+          assert data['Q3_GLOBAL']==data['Q4']==data['Q6']=='OPEN'
+          print('Q3_HETEROGENEOUS_FIRST_RECORDED_GLOBAL_UNRESTRICTED_Q3_OPEN')
+          PY
+      - name: Preserve every generated representation and failed heldout
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-HETEROGENEOUS-TYPE-INVENTION-FIRST
+          path: Q3-NEW-HETEROGENEOUS-REPRESENTATIONS-FIRST/
+          if-no-files-found: warn
+          retention-days: 90
