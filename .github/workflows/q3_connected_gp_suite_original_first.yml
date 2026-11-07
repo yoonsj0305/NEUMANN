@@ -1,0 +1,195 @@
+name: Q3 connected learned representation across independent-author GP-suite originals
+on:
+  pull_request:
+    paths:
+      - 'research/q3/connected_constructor_router.py'
+      - 'research/q3/gp_suite_connected_router_original_first.py'
+      - 'tests/test_q3_connected_constructor_router.py'
+      - '.github/workflows/q3_connected_gp_suite_original_first.yml'
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  q3-linked-representation-new-author-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Freeze original inventors and pass controls BEFORE external corpus access
+        run: |
+          set -euo pipefail
+          test "$(git hash-object research/q3/discover_index_relation_constructor.py)" = ddfe23f374e84914b239476b4fbdfdfa96807579
+          test "$(git hash-object research/q3/typed_semantic_delta_inventor.py)" = 01862093cf68c0a3425002a01fa8f83967bbcd23
+          test "$(git hash-object research/q3/universal_typed_state_fold_postfirst.py)" = 20ed922ffe2c44878f1a2769915cb62731a0631b
+          python3 -m py_compile research/q3/connected_constructor_router.py research/q3/gp_suite_connected_router_original_first.py
+          python3 -m unittest tests/test_q3_connected_constructor_router.py -v
+          mkdir -p Q3-GP-INDEPENDENT-ORIGINAL-FIRST
+          git hash-object research/q3/connected_constructor_router.py \
+            > Q3-GP-INDEPENDENT-ORIGINAL-FIRST/ROUTER_SOURCE_BLOB.txt
+          git hash-object research/q3/gp_suite_connected_router_original_first.py \
+            > Q3-GP-INDEPENDENT-ORIGINAL-FIRST/EVALUATOR_SOURCE_BLOB.txt
+      - name: Retrieve EXACT earlier generated relation AST from immutable #717 artifact, not new domain code
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-source-prior
+          gh run download 42363017165 \
+            --repo yoonsj0305/NEUMANN \
+            -n NEUMANN-Q3-SELF-INVENTED-COORDINATE-RELATION-POSTFIRST \
+            -D /tmp/q3-source-prior
+          test -s /tmp/q3-source-prior/RESULTS/POSTFIRST.json
+          python3 - <<'PY'
+          from research.q3.gp_suite_connected_router_original_first import load_prior_learned_representation
+          from pathlib import Path
+          import json
+          p=Path('/tmp/q3-source-prior/RESULTS/POSTFIRST.json')
+          obj=load_prior_learned_representation(p)
+          assert obj['source_original']=='HumanEval/48'
+          assert obj['source_proof_status']=='POSTFIRST_DEVELOPMENT_VERIFIED'
+          Path('Q3-GP-INDEPENDENT-ORIGINAL-FIRST/PRIOR_MEMORY_PROVENANCE.json').write_text(
+              json.dumps(obj,sort_keys=True,indent=2)+'\n')
+          print('PREVIOUS_PROGRAM_ACTUALLY_LOADED_AND_VERIFIED',obj['sha256'])
+          PY
+      - name: Only now INVENTORY all GP-Suite 29 independently authored program families
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          REF="$(git ls-remote https://github.com/thelmuth/program-synthesis-benchmark-datasets.git refs/heads/master | awk '{print $1}')"
+          test "${#REF}" -eq 40
+          gh api "repos/thelmuth/program-synthesis-benchmark-datasets/git/trees/$REF?recursive=1" \
+            > /tmp/q3-gp-source-tree.json
+          mkdir -p /tmp/q3-gp-external-data
+          printf '%s\n' "$REF" > Q3-GP-INDEPENDENT-ORIGINAL-FIRST/GP_SOURCE_GIT_SHA.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          from collections import defaultdict
+          import json
+          root=json.loads(Path('/tmp/q3-gp-source-tree.json').read_text())
+          tree=root['tree'];groups=defaultdict(lambda:{"edge":[],"random":[]})
+          for obj in tree:
+              if obj.get('type')!='blob':continue
+              path=obj['path'];name=path.split('/')[-1].lower()
+              seg=path.split('/')
+              if len(seg)<3 or seg[0]!='datasets':continue
+              # Dataset descriptions specify compressed JSON/JSONL originals.
+              if not (name.endswith('.json.gz') or name.endswith('.jsonl.gz') or
+                      name.endswith('.json') or name.endswith('.jsonl')):
+                  continue
+              part='edge' if 'edge' in name else 'random' if 'random' in name else None
+              if part is not None:
+                  groups[seg[1]][part].append(obj)
+          manifest=[]
+          for task in sorted(groups):
+              edges=sorted(groups[task]['edge'],key=lambda x:(not x['path'].endswith('.gz'),x['path']))
+              random=sorted(groups[task]['random'],key=lambda x:(not x['path'].endswith('.gz'),x['path']))
+              selected={p:a[0] if a else None for p,a in [('edge',edges),('random',random)]}
+              manifest.append({
+                  'task':task,'paths':{
+                     kind:entry['path'] if entry else ''
+                     for kind,entry in selected.items()},
+                  'size_B':{
+                     kind:entry.get('size',0) if entry else 0
+                     for kind,entry in selected.items()},
+                  'downloaded':False,
+                  'download_reason':'NOT_ATTEMPTED',
+              })
+          assert len(manifest)>=20,(len(manifest),list(groups)[:40])
+          Path('Q3-GP-INDEPENDENT-ORIGINAL-FIRST/ORIGINAL_FILE_INVENTORY.json').write_text(
+              json.dumps({'git_revision':Path('Q3-GP-INDEPENDENT-ORIGINAL-FIRST/GP_SOURCE_GIT_SHA.txt').read_text().strip(),
+                          'tree_entries':len(tree),
+                          'families_detected':len(manifest),
+                          'manifest':manifest},sort_keys=True,indent=2)+'\n')
+          print('GP_SUITE_PRIOR_TO_DATA_DOWNLOAD',len(manifest),
+                [(r['task'],r['paths'],r['size_B']) for r in manifest[:8]],flush=True)
+          PY
+      - name: Download all size-supported GP-Suite original edge/random files, no result-informed selection
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          root=Path('Q3-GP-INDEPENDENT-ORIGINAL-FIRST')
+          rev=(root/'GP_SOURCE_GIT_SHA.txt').read_text().strip()
+          manifest=json.loads((root/'ORIGINAL_FILE_INVENTORY.json').read_text())['manifest']
+          downloads=Path('/tmp/q3-gp-external-data')
+          max_file_bytes=20000000
+          for row in manifest:
+              names=row['paths'];sizes=row['size_B']
+              if not names.get('edge') or not names.get('random'):
+                  row['download_reason']='MISSING_EDGE_OR_RANDOM_ORIGINAL'
+                  continue
+              if any(sizes[p]<=0 or sizes[p]>max_file_bytes for p in ('edge','random')):
+                  row['download_reason']='ORIGINAL_FILE_EXCEEDS_20MB_BOUND'
+                  continue
+              success=True;received={}
+              for p in ('edge','random'):
+                  path=names[p]
+                  # Only Git-tree-provided paths; no path selected by task gold.
+                  if not path.startswith('datasets/') or '..' in path:
+                      success=False;break
+                  dst=downloads/path
+                  dst.parent.mkdir(parents=True,exist_ok=True)
+                  url='https://raw.githubusercontent.com/thelmuth/program-synthesis-benchmark-datasets/'+rev+'/'+path
+                  proc=subprocess.run(
+                      ['curl','--fail','--location','--silent','--show-error',
+                       '--retry','2','--max-time','75','--max-filesize',
+                       str(max_file_bytes),url,'-o',str(dst)],
+                      capture_output=True,text=True,timeout=90)
+                  if proc.returncode!=0 or not dst.exists() or not dst.stat().st_size:
+                      success=False
+                      row['download_reason']='NETWORK_OR_CONTENT_DOWNLOAD_FAILED'
+                      break
+                  received[p]=dst.stat().st_size
+              if success:
+                  row['downloaded']=True
+                  row['download_reason']='ORIGINAL_FILE_PAIR_ACQUIRED'
+                  row['downloaded_B']=received
+          (root/'MANIFEST.json').write_text(json.dumps(
+              manifest,sort_keys=True,indent=2)+'\n')
+          summary={'total_detected':len(manifest),
+                   'downloaded_pairs':sum(x['downloaded'] for x in manifest),
+                   'incomplete_pairs':sum(not x['downloaded'] for x in manifest),
+                   'max_compressed_file_B':max_file_bytes,
+                   'zero_score_based_corpus_filtering':True}
+          (root/'DATA_ACQUISITION.json').write_text(
+              json.dumps(summary,sort_keys=True,indent=2)+'\n')
+          print('GP_SUITE_FULL_ORIGINAL_DOWNLOAD_RECEIPT',summary,flush=True)
+          assert summary['downloaded_pairs']>=1, 'SCIENTIFICALLY_NO_EVALUABLE_FILES'
+          PY
+      - name: Freeze every synthesized program before its random holdout, same-core cold and memory ablation
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_GP_CONNECTED_FIRST_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.gp_suite_connected_router_original_first \
+              --data /tmp/q3-gp-external-data \
+              --manifest Q3-GP-INDEPENDENT-ORIGINAL-FIRST/MANIFEST.json \
+              --source-artifact /tmp/q3-source-prior/RESULTS/POSTFIRST.json \
+              --out Q3-GP-INDEPENDENT-ORIGINAL-FIRST/RESULTS \
+              --fold-budget 1000 --relation-budget 1200
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          folder=Path('Q3-GP-INDEPENDENT-ORIGINAL-FIRST')
+          x=json.loads((folder/'RESULTS/FIRST.json').read_text())
+          s=x['summary']
+          assert s['all_source_family_directories']>=20
+          assert len(x['rows'])==s['all_source_family_directories']
+          assert x['previously_generated_relational_representation_artifact_loaded_NOT_literal_inserted']
+          assert x['global_Q3']==x['global_Q4']==x['global_Q6']=='OPEN'
+          assert all(z['original_author']=='Thomas Helmuth / Lee Spector' for z in x['rows'])
+          print('Q3_INDEPENDENT_AUTHOR_CONNECTED_CONSTRUCTOR_FIRST_COMPLETE',s,flush=True)
+          PY
+      - name: Always preserve the exact FIRST, even if no target eligible or no wins
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-CONNECTED-GP-SUITE-ORIGINAL-FIRST
+          path: Q3-GP-INDEPENDENT-ORIGINAL-FIRST/
+          if-no-files-found: warn
+          retention-days: 90

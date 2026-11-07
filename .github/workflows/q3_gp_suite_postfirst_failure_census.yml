@@ -1,0 +1,59 @@
+name: Q3 exact external 29-family failure census after first, NO solver retuning
+on:
+  pull_request:
+    paths:
+      - 'research/q3/gp_suite_postfirst_failure_census.py'
+      - '.github/workflows/q3_gp_suite_postfirst_failure_census.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  diagnosis-not-posthoc-solver-tuning:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Confirm all scientific computation source unchanged
+        run: |
+          set -euo pipefail
+          test "$(git hash-object research/q3/connected_constructor_router.py)" = 616aae13f35304fd2572dd5a666499984566b7e6
+          test "$(git hash-object research/q3/gp_suite_connected_router_original_first.py)" = c26e8cb7705fecf53ce5d61deba67103eb0f60aa
+          test "$(git hash-object research/q3/discover_index_relation_constructor.py)" = ddfe23f374e84914b239476b4fbdfdfa96807579
+          test "$(git hash-object research/q3/typed_semantic_delta_inventor.py)" = 01862093cf68c0a3425002a01fa8f83967bbcd23
+          test "$(git hash-object research/q3/universal_typed_state_fold_postfirst.py)" = 20ed922ffe2c44878f1a2769915cb62731a0631b
+          python3 -m py_compile research/q3/gp_suite_postfirst_failure_census.py
+      - name: Retrieve 29-family independently authored original postfirst archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-29-original-archive
+          gh run download 42365349653 \
+            --repo yoonsj0305/NEUMANN \
+            -n NEUMANN-Q3-GP-ALL29-STREAMED-POSTFIRST-COVERAGE \
+            -D /tmp/q3-29-original-archive
+          test -s /tmp/q3-29-original-archive/SCORER_AS_FROZEN/FIRST.json
+          python3 -m research.q3.gp_suite_postfirst_failure_census \
+            --input /tmp/q3-29-original-archive/SCORER_AS_FROZEN/FIRST.json \
+            --out Q3-29-CORPUS-FAILURE-TAXONOMY
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          r=json.loads(Path('Q3-29-CORPUS-FAILURE-TAXONOMY/FAILURE_CENSUS.json').read_text())
+          assert sum(r['counts'].values())==29
+          assert r['counts']['HELDOUT_ALL_32_EXACT']==3
+          assert r['source_memory_causal_additions']==0
+          assert r['global_Q3']==r['global_Q4']==r['global_Q6']=='OPEN'
+          print('Q3_29_SOURCE_ERROR_TAXONOMY_PRESERVED_NO_GLOBAL_PASS')
+          PY
+      - name: Archive all failed task names, candidate ASTs and original metadata
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-GP-29-ORIGINAL-FAILURE-TAXONOMY
+          path: Q3-29-CORPUS-FAILURE-TAXONOMY/
+          retention-days: 90
+          if-no-files-found: warn

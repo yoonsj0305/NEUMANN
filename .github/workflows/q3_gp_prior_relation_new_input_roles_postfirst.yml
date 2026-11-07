@@ -1,0 +1,103 @@
+name: Q3 PRIOR discovered coordinate relation -> new argument roles, 29-family POSTFIRST
+on:
+  pull_request:
+    paths:
+      - 'research/q3/learn_argument_roles_for_prior_relation.py'
+      - 'research/q3/gp_suite_prior_relation_role_transfer_postfirst.py'
+      - 'tests/test_q3_learn_argument_roles_for_prior_relation.py'
+      - '.github/workflows/q3_gp_prior_relation_new_input_roles_postfirst.yml'
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  no_named-task-rule-and-generic-role-transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Test prior generated index AST transfers to binary roles, before reading original test corpus
+        run: |
+          set -euo pipefail
+          test "$(git hash-object research/q3/discover_index_relation_constructor.py)" = ddfe23f374e84914b239476b4fbdfdfa96807579
+          test "$(git hash-object research/q3/connected_constructor_router.py)" = 616aae13f35304fd2572dd5a666499984566b7e6
+          test "$(git hash-object research/q3/gp_suite_connected_router_original_first.py)" = c26e8cb7705fecf53ce5d61deba67103eb0f60aa
+          python3 -m py_compile research/q3/learn_argument_roles_for_prior_relation.py research/q3/gp_suite_prior_relation_role_transfer_postfirst.py
+          python3 -m unittest tests/test_q3_learn_argument_roles_for_prior_relation.py -v
+          mkdir -p Q3-GP-ARGROLE-TRANSFER-POSTFIRST
+          git hash-object research/q3/learn_argument_roles_for_prior_relation.py \
+            > Q3-GP-ARGROLE-TRANSFER-POSTFIRST/ROLE_INVENTOR_SOURCE_SHA.txt
+      - name: Reuse immutable prior learned relation and previously public original source inventory
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-prior-frozen-memory /tmp/q3-prior-source-inventory /tmp/q3-gp-29-all-data
+          gh run download 42363017165 \
+            --repo yoonsj0305/NEUMANN \
+            -n NEUMANN-Q3-SELF-INVENTED-COORDINATE-RELATION-POSTFIRST \
+            -D /tmp/q3-prior-frozen-memory
+          gh run download 42365072610 \
+            --repo yoonsj0305/NEUMANN \
+            -n NEUMANN-Q3-CONNECTED-GP-SUITE-ORIGINAL-FIRST \
+            -D /tmp/q3-prior-source-inventory
+          test -s /tmp/q3-prior-frozen-memory/RESULTS/POSTFIRST.json
+          test -s /tmp/q3-prior-source-inventory/GP_SOURCE_GIT_SHA.txt
+          python3 - <<'PY'
+          from research.q3.gp_suite_connected_router_original_first import load_prior_learned_representation
+          from pathlib import Path
+          p=Path('/tmp/q3-prior-frozen-memory/RESULTS/POSTFIRST.json')
+          memory=load_prior_learned_representation(p)
+          assert memory['source_original']=='HumanEval/48'
+          assert memory['sha256']=='d6108d6e320b8911d380145895b646663700dd9850131ac6dc3dcf250714aa10'
+          print('EXACT_SOURCE_RELATION_AST_RESTORED_FROM_HISTORIC_GITHUB_ARTIFACT',memory['sha256'])
+          PY
+      - name: Acquire exact 29 existing original author datasets by bound gzip stream, POSTFIRST
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          from research.q3.gp_suite_streaming_postfirst import acquire_first_pinned_inventory
+          info=acquire_first_pinned_inventory(
+            Path('/tmp/q3-prior-source-inventory'),
+            Path('/tmp/q3-gp-29-all-data'),
+            Path('Q3-GP-ARGROLE-TRANSFER-POSTFIRST/ACQUIRED'))
+          assert info['original_original_family_count']==29
+          assert info['original_first_downloaded']==17
+          assert info['new_postfirst_downloaded']==29
+          print('GP_ALL_29_FAMILIES_STREAMING_ACQUIRED_POSTFIRST',info)
+          PY
+      - name: SOURCE discovers new input roles around prior generated coordinate relation, same-core cold control
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_GENERIC_INPUT_ROLES_POSTFIRST_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.gp_suite_prior_relation_role_transfer_postfirst \
+              --data /tmp/q3-gp-29-all-data \
+              --manifest Q3-GP-ARGROLE-TRANSFER-POSTFIRST/ACQUIRED/POSTFIRST_MANIFEST.json \
+              --source-memory /tmp/q3-prior-frozen-memory/RESULTS/POSTFIRST.json \
+              --out Q3-GP-ARGROLE-TRANSFER-POSTFIRST/RESULTS
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.loads(Path('Q3-GP-ARGROLE-TRANSFER-POSTFIRST/RESULTS/POSTFIRST.json').read_text())
+          x=s['summary']
+          assert x['original_program_families_total']==29
+          assert x['original_families_two_sequence_inputs_to_bool']>=1
+          assert len(s['rows'])==29
+          assert s['not_independent_first']
+          assert s['generic_role_binding_human_authored']
+          assert s['Q3_GLOBAL']==s['Q4_GLOBAL']==s['Q6_GLOBAL']=='OPEN'
+          print('Q3_COORDINATE_MEMORY_NEW_ROLE_TRANSFER_DEV_ONLY_SCORED',x)
+          PY
+      - name: Keep immutable first untouched, archive all original misses and matched-budget controls
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-PREVIOUSLY-INVENTED-INDEX-NEW-INPUT-ROLES-GPCS-POSTFIRST
+          path: Q3-GP-ARGROLE-TRANSFER-POSTFIRST/
+          if-no-files-found: warn
+          retention-days: 90
