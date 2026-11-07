@@ -58,7 +58,7 @@ def walk(node):
 def decode_original(source):
     forms=parse(source)
     synth=[s for s in forms if isinstance(s,list) and s and s[0]=="synth-fun"]
-    if len(synth)!=1 or len(synth[0])<6:raise ValueError("UNSUPPORTED_SYNTH_DECL")
+    if len(synth)!=1 or len(synth[0])<5:raise ValueError("UNSUPPORTED_SYNTH_DECL")
     fun=synth[0];fn=fun[1];params=fun[2]
     if (not isinstance(params,list) or not params or len(params)>3 or
         any(type(p) is not list or len(p)!=2 or p[1]!="String" for p in params) or
@@ -274,12 +274,29 @@ def learn_templates(verified_programs,max_rules=32):
 
 def candidates_from_templates(templates,task,cap=2500):
     pool=candidate_library(task,limit=500)
-    # Uniform unknown-subtree adapter. The metadata / content of target
-    # grammar constrains every possible hole filler, never target gold.
-    hole_pool=pool[:100]
+    # A hole is typed by its syntactic position. Replacing a literal with
+    # an arbitrary AST would be invalid: learn the binder's TYPE, not just
+    # template similarity. No target outputs enter bindings.
+    def kinds(node,parent=None):
+        if isinstance(node,dict) and set(node)=={"hole"}:
+            yield (node["hole"],parent)
+        elif isinstance(node,list):
+            for j,v in enumerate(node[1:],1):
+                context=node[0] if j==1 and node[0] in ("lit","arg","num") else None
+                yield from kinds(v,context)
     seen=set();count=0
     for rule in templates:
-        for values in itertools.product(hole_pool,repeat=rule["holes"]):
+        found=dict(kinds(rule["template"]))
+        choices=[]
+        for i in range(rule["holes"]):
+            cls=found.get(i)
+            if cls=="lit":opts=task["constants"]
+            elif cls=="arg":opts=list(range(task["nargs"]))
+            elif cls=="num":opts=task["numbers"]
+            else:opts=pool[:80]
+            choices.append(opts)
+        if not choices or any(not x for x in choices):continue
+        for values in itertools.product(*choices):
             p=substitute(rule["template"],{i:v for i,v in enumerate(values)})
             # Target's grammar might not license the learned whole pattern:
             if not grammar_compatible(p,task):continue
