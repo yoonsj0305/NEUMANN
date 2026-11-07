@@ -1,0 +1,64 @@
+name: Q3 Postfirst FAIR Same-Typed-Grammar Classical Control
+
+on:
+  push:
+    branches:
+      - research/q3-cross-domain-metagrammar-string-original-20261107
+    paths:
+      - research/q3/fair_cold_same_typed_subexpression_grammar.py
+      - research/q3/q3_fair_typed_baseline_postfirst.py
+      - .github/workflows/q3_fair_typed_baseline_postfirst.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  q3_nonstrawman:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download immutable 37-task original FIRST without replacing it
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-typed-constructor-37-unseen-official-original-first
+          run-id: 42373905695
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: previous
+      - name: Compile and verify fair comparator
+        run: |
+          python -m py_compile research/q3/fair_cold_same_typed_subexpression_grammar.py research/q3/q3_fair_typed_baseline_postfirst.py
+          git hash-object research/q3/fair_cold_same_typed_subexpression_grammar.py
+          python - <<'PY'
+          import sys,json
+          sys.path.insert(0,'research/q3')
+          import fair_cold_same_typed_subexpression_grammar as s
+          import typed_domain_interface_postfirst as typed
+          r=json.load(open("previous/Q3_TYPED_METAGRAMMAR_FRESH_37_ORIGINAL_FIRST.json"))
+          assert r["original_count"]==37
+          sample='''(synth-fun f ((x String)) String
+           ((Start String (ntString))
+            (ntString String (x " " "Inc" (str.substr ntString ntInt ntInt)))
+            (ntInt Int (0 1 (- ntInt ntInt) (str.indexof ntString ntString ntInt)))))
+          (constraint (= (f "Trucking Inc") "Trucking"))
+          (constraint (= (f "New Truck Inc") "New Truck"))'''
+          task=typed.decode_any(sample)
+          options=list(s.all_direct_candidates(task))
+          required=["substr",["arg",0],["num",0],
+                 ["minus",["index",["arg",0],["lit","Inc"],["num",0]],["num",1]]]
+          assert required in options, 'MISSING_EQUAL_EXPRESSIVITY'
+          matched=s.solve(task,task["examples"],budget=25000)
+          assert matched["ast"] is not None,matched
+          print("FAIR_COLD_FULL_GRAMMAR_PREFLIGHT_PASS",len(options))
+          PY
+      - name: Evaluate prior opened originals only as POSTFIRST audit
+        run: python research/q3/q3_fair_typed_baseline_postfirst.py
+      - name: Preserve scientific correction without changing old FIRST
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-postfirst-fair-same-language-classical-control
+          path: Q3_FAIR_TYPED_CLASSICAL_POSTFIRST.json
+          if-no-files-found: warn
