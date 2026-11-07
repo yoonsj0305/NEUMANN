@@ -1,0 +1,65 @@
+name: Q3 Meta-Grammar Typed Hole Repair POSTFIRST DEV
+
+on:
+  push:
+    branches:
+      - research/q3-cross-domain-metagrammar-string-original-20261107
+    paths:
+      - research/q3/typed_meta_hole_binder_v2.py
+      - research/q3/typed_binder_postfirst_dev.py
+      - .github/workflows/q3_typed_hole_binder_postfirst_dev.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  typed_hole_postfirst:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch preserved source method, never overwrite original FIRST
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-typed-metagrammar-cross-domain-string-original-first
+          run-id: 42373106360
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: prior
+      - name: Validate typed hole contract with synthetic unknown-token tasks
+        run: |
+          python -m py_compile research/q3/typed_meta_hole_binder_v2.py research/q3/typed_binder_postfirst_dev.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'research/q3')
+          import typed_meta_hole_binder_v2 as b
+          import typed_cross_domain_meta_engine as core
+          import typed_domain_interface_postfirst as typed
+          import typed_new_named_sl_original_first as old
+          policy=old.frozen_policy()
+          assert len(policy["learned_productions"])==2
+          root='''(synth-fun f ((name String)) String
+           ((Start String (ntString))
+            (ntString String (name " " "." (str.substr ntString ntInt ntInt)))
+            (ntInt Int (0 1 (+ ntInt ntInt) (str.len ntString) (str.indexof ntString ntString ntInt)))))
+          (constraint (= (f "Nancy FreeHafer") "Nancy"))
+          (constraint (= (f "Andrew Cencici") "Andrew"))
+          (constraint (= (f "Jan Kotas") "Jan"))
+          (constraint (= (f "Mariya Sergienko") "Mariya"))'''
+          task=typed.decode_any(root)
+          res=b.memory_search(policy["learned_productions"],task,task["examples"][:3])
+          assert res["ast"] is not None,res
+          assert typed.score_any(res["ast"],task["examples"][3:])["exact"]
+          assert b.holes_with_types(["substr",["arg",0],["num",0],{"hole":0}],"String",{}) is None
+          print("POSTFIRST_TYPED_BINDER_PREFLIGHT_PASS")
+          PY
+      - name: Recheck already exposed cohort as DEVELOPMENT ONLY
+        run: python research/q3/typed_binder_postfirst_dev.py
+      - name: Preserve postfirst repair, old original FIRST remains immutable
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-typed-hole-binder-postfirst-development
+          path: Q3_TYPED_BINDER_POSTFIRST_DEV.json
+          if-no-files-found: warn
