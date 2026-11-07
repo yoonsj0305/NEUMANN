@@ -159,7 +159,8 @@ class Generator:
                 float(quantifier_open))
 
     def sample(self, *, collision: bool, failed_proofs: int,
-               max_depth: int = 6, max_nodes: int = 96):
+               max_depth: int = 6, max_nodes: int = 96,
+               root_kind: str = "Bool", bound_index: bool = False):
         if max_depth < 2 or max_depth > 15 or max_nodes < 3:
             raise ValueError("INVALID_SAMPLING_BUDGET")
         events = []
@@ -191,8 +192,10 @@ class Generator:
             return AST(kind, name,
                 tuple(expand(c, depth+1, scope or name == "forall")
                       for c in children))
-        root = expand("Bool", 0, False)
-        check_ast(root, ceiling=max_nodes)
+        if root_kind not in PRODUCTIONS:
+            raise ValueError("UNKNOWN_TYPED_ROOT")
+        root = expand(root_kind, 0, bound_index)
+        check_ast(root, bound_j=bound_index, ceiling=max_nodes)
         return root, events
 
     def apply_feedback(self, events, reward: float, *, lr: float = 0.04):
