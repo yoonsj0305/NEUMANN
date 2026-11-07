@@ -1,0 +1,52 @@
+name: Q3 graph invention mechanism frozen ARC2 to ARC1 real originals
+on:
+  pull_request:
+    paths:
+      - 'research/q3/frozen_graph_inventor_arc1_cross_source.py'
+      - '.github/workflows/q3_graph_inventor_arc1_cross_source.yml'
+permissions:
+  contents: read
+jobs:
+  graph-invention-other-original-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Exact original ARC-AGI-1 source commit
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-cfg-arc1
+          git -C /tmp/q3-cfg-arc1 init -q
+          git -C /tmp/q3-cfg-arc1 remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C /tmp/q3-cfg-arc1 fetch -q --depth 1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C /tmp/q3-cfg-arc1 checkout -q --detach FETCH_HEAD
+          test "$(git -C /tmp/q3-cfg-arc1 rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+      - name: Old-new semantic mechanism is immutable cross-source
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_GRAPH_XSOURCE_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.frozen_graph_inventor_arc1_cross_source \
+              --arc-root /tmp/q3-cfg-arc1 \
+              --out Q3-FROZEN-GRAPH-CROSS-SOURCE-ARC1-FIRST
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('Q3-FROZEN-GRAPH-CROSS-SOURCE-ARC1-FIRST/FIRST.json').read_text())
+          assert r['source_blob']=='99eac52f4dd965f2f9ba8b7ac5315aa43a03d0d7'
+          assert r['summary']['ARC1_TRAIN_400']['originals']==400
+          assert r['summary']['ARC1_ALREADY_OPENED_EVAL_32']['originals']==32
+          assert r['none_of_11_sealed_eval_ids_consumed']
+          assert r['Q3_GLOBAL']==r['Q4']==r['Q6']=='OPEN'
+          print('Q3_UNMODIFIED_GRAPH_INVENTION_CROSS_SOURCE_FIRST_RECORDED')
+          PY
+      - name: Preserve all old-source outcomes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-FROZEN-GRAPH-INVENTOR-ARC1-X-SOURCE-FIRST
+          path: Q3-FROZEN-GRAPH-CROSS-SOURCE-ARC1-FIRST/
+          retention-days: 90
+          if-no-files-found: warn
