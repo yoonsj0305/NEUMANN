@@ -1,0 +1,68 @@
+name: Q3 post-FIRST matched identical typed grammar memory ablation
+on:
+  pull_request:
+    paths:
+      - 'research/q3/postfirst_matched_memory_ablation.py'
+      - '.github/workflows/q3_postfirst_matched_memory_ablation.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  prove-memory-or-cold-causality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: SAME feature grammar as original first and parse audit
+        run: |
+          set -euo pipefail
+          test "$(git hash-object research/q3/feature_predicate_from_counterexample.py)" = 53513a57efc6f49b6154a7ec2f10742960588aad
+          python3 -m py_compile research/q3/postfirst_matched_memory_ablation.py
+      - name: Get immutable original first and exact pinned original MBPP file
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-original-first
+          gh run download 42354198810 \
+            --repo yoonsj0305/NEUMANN \
+            -n NEUMANN-Q3-PREDICATE-ABSTRACTION-FRESH-MBPP-ORIGINALS \
+            -D /tmp/q3-original-first
+          test -s /tmp/q3-original-first/FIRST_RESULTS/FIRST.json
+          curl --fail --location --retry 3 --silent --show-error \
+            "https://raw.githubusercontent.com/google-research/google-research/master/mbpp/sanitized-mbpp.json" \
+            -o /tmp/q3-mbpp-sanitized.json
+          test "$(git hash-object /tmp/q3-mbpp-sanitized.json)" = a999d25df7e489e4c183cadfa5c0ecf557a702b6
+      - name: Same typed predicate search plus cold universal fold, no SOURCE constructor memory
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_MATCHED_MEMORY_ABLATION_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.postfirst_matched_memory_ablation \
+              --mbpp /tmp/q3-mbpp-sanitized.json \
+              --first /tmp/q3-original-first/FIRST_RESULTS/FIRST.json \
+              --out Q3-POSTFIRST-MATCHED-MEMORY-COLD
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          p=Path('Q3-POSTFIRST-MATCHED-MEMORY-COLD/POSTFIRST_MATCHED_MEMORY_ABLATION.json')
+          d=json.loads(p.read_text())
+          assert d['original_first_run']==42354198810
+          assert d['same_typed_feature_grammar_as_memory_arm']
+          assert d['only_learned_constructor_AST_removed']
+          assert d['summary']['same_previous_MBBP_original_task_IDs']==163
+          assert d['summary']['eligible_originals']==21
+          assert d['summary']['with_source_learned_constructor_exact']==4
+          assert d['global_Q3']==d['global_Q4']==d['global_Q6']=='OPEN'
+          print('Q3_CAUSAL_MEMORY_CONTROL_FINAL_RECORDED_NOT_FIRST')
+          PY
+      - name: Preserve all post-first matched old/new details
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-POSTFIRST-MATCHED-COLD-MEMORY-ABLATION
+          path: Q3-POSTFIRST-MATCHED-MEMORY-COLD/
+          retention-days: 90
+          if-no-files-found: warn
