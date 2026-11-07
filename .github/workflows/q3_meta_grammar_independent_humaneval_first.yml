@@ -1,0 +1,121 @@
+name: Q3 causal source-invented grammar -> independent HumanEval FIRST
+on:
+  pull_request:
+    paths:
+      - 'research/q3/causal_learned_grammar_inventor.py'
+      - 'research/q3/learn_grammar_then_humaneval_original_first.py'
+      - 'tests/test_q3_causal_learned_grammar_inventor.py'
+      - 'tests/test_q3_humaneval_safe_parser.py'
+      - '.github/workflows/q3_meta_grammar_independent_humaneval_first.yml'
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  freeze-source-first-before-new-author-original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Unit and causal baseline BEFORE author-target access
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q3/causal_learned_grammar_inventor.py
+          python3 -m py_compile research/q3/learn_grammar_then_humaneval_original_first.py
+          python3 -m unittest \
+            tests/test_q3_causal_learned_grammar_inventor.py \
+            tests/test_q3_humaneval_safe_parser.py -v
+          mkdir -p Q3-CAUSAL-META-GRAMMAR-HUMANEVAL-FIRST
+          git hash-object research/q3/causal_learned_grammar_inventor.py \
+            > Q3-CAUSAL-META-GRAMMAR-HUMANEVAL-FIRST/GRAMMAR_DISCOVERY_SOURCE_BLOB.txt
+          git hash-object research/q3/learn_grammar_then_humaneval_original_first.py \
+            > Q3-CAUSAL-META-GRAMMAR-HUMANEVAL-FIRST/EVALUATOR_SOURCE_BLOB.txt
+      - name: Retrieve original immutable MBPP source certificates and POSTFIRST independent semantic controls
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-preexisting-first /tmp/q3-preexisting-independent-proof
+          gh run download 42354198810 \
+            --repo yoonsj0305/NEUMANN \
+            -n NEUMANN-Q3-PREDICATE-ABSTRACTION-FRESH-MBPP-ORIGINALS \
+            -D /tmp/q3-preexisting-first
+          gh run download 42354597895 \
+            --repo yoonsj0305/NEUMANN \
+            -n NEUMANN-Q3-POSTFIRST-SEMANTIC-PROOF-AND-FALSE-POSITIVE \
+            -D /tmp/q3-preexisting-independent-proof
+          test -s /tmp/q3-preexisting-first/FIRST_RESULTS/FIRST.json
+          test -s /tmp/q3-preexisting-independent-proof/POSTFIRST_SEMANTIC_AUDIT.json
+      - name: Autonomously SELECT verified source pair and FREEZE discovered new grammar before HumanEval download
+        run: |
+          set -euo pipefail
+          python3 -m research.q3.learn_grammar_then_humaneval_original_first source \
+            --source-first /tmp/q3-preexisting-first/FIRST_RESULTS/FIRST.json \
+            --source-proof /tmp/q3-preexisting-independent-proof/POSTFIRST_SEMANTIC_AUDIT.json \
+            --out Q3-CAUSAL-META-GRAMMAR-HUMANEVAL-FIRST/GRAMMAR_FROZEN
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('Q3-CAUSAL-META-GRAMMAR-HUMANEVAL-FIRST/GRAMMAR_FROZEN/SOURCE_FIRST_FROZEN_GRAMMAR.json')
+          x=json.loads(p.read_text())
+          assert x['original_first_source_run']==42354198810
+          assert x['source_pairs_considered']>=3
+          assert x['machine_selected_production']['variable_parameters']==1
+          assert not x['machine_selected_production']['base_vm_modified']
+          assert len(x['frozen_production_sha256'])==64
+          assert x['independent_author_target_NOT_DOWNLOADED']
+          print('Q3_NEW_GRAMMAR_IMMUTABLY_FROZEN_BEFORE_OPENAI_HUMANEVAL')
+          PY
+      - name: ONLY NOW fetch externally authored OpenAI HumanEval and freeze commit/file SHA
+        run: |
+          set -euo pipefail
+          URL=https://github.com/openai/human-eval.git
+          REV="$(git ls-remote "$URL" refs/heads/master | awk '{print $1}')"
+          test "${#REV}" -eq 40
+          curl --fail --location --retry 3 --silent --show-error \
+            "https://raw.githubusercontent.com/openai/human-eval/$REV/data/HumanEval.jsonl.gz" \
+            -o /tmp/q3-external-humaneval.jsonl.gz
+          test -s /tmp/q3-external-humaneval.jsonl.gz
+          gzip -t /tmp/q3-external-humaneval.jsonl.gz
+          DATASHA="$(sha256sum /tmp/q3-external-humaneval.jsonl.gz | awk '{print $1}')"
+          printf '{"independent_original_author":"OpenAI","corpus":"HumanEval original public 164","revision":"%s","source_data_sha256":"%s","first_source_grammar_frozen_before_external_download":true}\n' \
+            "$REV" "$DATASHA" \
+            > Q3-CAUSAL-META-GRAMMAR-HUMANEVAL-FIRST/HUMANEVAL_SOURCE_PROVENANCE.json
+          cat Q3-CAUSAL-META-GRAMMAR-HUMANEVAL-FIRST/HUMANEVAL_SOURCE_PROVENANCE.json
+      - name: Full HumanEval originals; learned grammar vs identical cold bounded/full search, code never executed
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_HUMANEVAL_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.learn_grammar_then_humaneval_original_first external \
+              --humaneval /tmp/q3-external-humaneval.jsonl.gz \
+              --frozen Q3-CAUSAL-META-GRAMMAR-HUMANEVAL-FIRST/GRAMMAR_FROZEN/SOURCE_FIRST_FROZEN_GRAMMAR.json \
+              --out Q3-CAUSAL-META-GRAMMAR-HUMANEVAL-FIRST/EXTERNAL_FIRST \
+              --budget 16
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('Q3-CAUSAL-META-GRAMMAR-HUMANEVAL-FIRST/EXTERNAL_FIRST/FIRST.json')
+          d=json.loads(p.read_text())
+          s=d['summary']
+          assert s['original_humaneval_tasks']==164
+          assert len(d['rows'])==164
+          assert s['learned_grammar_sha256'] == json.loads(
+            Path('Q3-CAUSAL-META-GRAMMAR-HUMANEVAL-FIRST/GRAMMAR_FROZEN/SOURCE_FIRST_FROZEN_GRAMMAR.json').read_text()
+          )['frozen_production_sha256']
+          assert d['same_base_VM_same_budget_for_memory_ablation']
+          assert d['no_reference_code_executed']
+          assert d['no_reference_solution_field_read']
+          assert d['global_Q3']==d['global_Q4']==d['global_Q6']=='OPEN'
+          print('Q3_CAUSAL_NEW_AUTHORIGINAL_FULL_COHORT_SCORED_NO_CHERRY_PICK')
+          PY
+      - name: Preserve all original outcomes, source grammar, provenance and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-GRAMMAR-INVENTION-COLD-ABLATION-HUMANEVAL-FIRST
+          path: Q3-CAUSAL-META-GRAMMAR-HUMANEVAL-FIRST/
+          if-no-files-found: warn
+          retention-days: 90
