@@ -1,0 +1,59 @@
+name: Q3 counterexample-induced NEW operator semantics original FIRST
+on:
+  pull_request:
+    paths:
+      - 'research/q3/failure_triggered_semantic_operator_invention.py'
+      - 'tests/test_q3_failure_triggered_semantic_operator_invention.py'
+      - '.github/workflows/q3_failure_triggered_new_semantics_original.yml'
+permissions:
+  contents: read
+jobs:
+  q3-new-semantic-operator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Pinned official external-original data, zero new reserved eval IDs
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-semantic-source
+          git -C /tmp/q3-semantic-source init -q
+          git -C /tmp/q3-semantic-source remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C /tmp/q3-semantic-source fetch -q --depth 1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C /tmp/q3-semantic-source checkout -q --detach FETCH_HEAD
+          test "$(git -C /tmp/q3-semantic-source rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+      - name: New program definitions and unknown-abstain type-correctness
+        run: |
+          set -euo pipefail
+          python3 -m unittest tests/test_q3_failure_triggered_semantic_operator_invention.py -v
+      - name: True FIRST all 432 old-opened external originals with new semantic type
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_NEW_SEMANTICS_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.failure_triggered_semantic_operator_invention \
+              --arc-root /tmp/q3-semantic-source \
+              --out Q3-NEW-SEMANTICS-ORIGINAL-FIRST
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          r=json.loads(Path('Q3-NEW-SEMANTICS-ORIGINAL-FIRST/FIRST.json').read_text())
+          assert r['pin']=='399030444e0ab0cc8b4e199870fb20b863846f34'
+          assert r['summary']['public_TRAIN_400']['tasks']==400
+          assert r['summary']['previously_opened_EVAL_32']['tasks']==32
+          assert r['old_conservative_operator_impossibility_witness_required']
+          assert r['new_semantics_generated_from_external_train']
+          assert r['untouched_eval_ids_consumed']==0
+          assert r['Q3_GLOBAL']==r['Q4']==r['Q6']=='OPEN'
+          print('Q3_NEW_TYPE_ORIGINAL_FIRST_RECORDED__GLOBAL_Q3_OPEN')
+          PY
+      - name: Archive full positive and negative original receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-COUNTEREXAMPLE-NEW-SEMANTICS-ORIGINAL-FIRST
+          path: Q3-NEW-SEMANTICS-ORIGINAL-FIRST/
+          retention-days: 90
+          if-no-files-found: warn
