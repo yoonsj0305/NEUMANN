@@ -214,8 +214,12 @@ def best_split(X,Y,indices,features):
             right_sq=0.
             for label,count in total.items():
                 right_sq+=(wt(label)*(count-left[label]))**2
-            score=base-(left_count/n*(1-left_sq/(left_weight*left_weight))
-                         +(n-left_count)/n*(1-right_sq/(rw*rw)))
+            # The impurity uses class reweighting (changed pixels=6x).
+            # The child mixture MUST use the same weighted mass, not raw
+            # sample fractions: the old mixed objective could reject real
+            # information-gain splits in imbalanced ARC change masks.
+            score=base-(left_weight/totalweight*(1-left_sq/(left_weight*left_weight))
+                         +rw/totalweight*(1-right_sq/(rw*rw)))
             if best is None or score>best[0]:
                 # Find exact midpoint to next distinct observed value
                 nxt=ordered[pos][0]
