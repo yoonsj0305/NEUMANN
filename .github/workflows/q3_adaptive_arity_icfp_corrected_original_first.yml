@@ -1,0 +1,39 @@
+name: Q3 Adaptive Arity Metadata-Corrected ICFP Original FIRST
+
+on:
+  push:
+    branches:
+      - research/q3-unseen-sygus-hard-metaprogram-20261107
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  q3_icfp_24:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Freeze unchanged Q3 inventor and predeclared original source IDs
+        run: |
+          python -m py_compile research/q3/hard_unseen_adaptive_arity_gate.py research/q3/hard_metadata_corrected_icfp_first.py
+          git hash-object research/q3/hard_unseen_adaptive_arity_gate.py
+          git hash-object research/q3/hard_metadata_corrected_icfp_first.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'research/q3')
+          import hard_metadata_corrected_icfp_first as q
+          assert len(q.COHORT)==24
+          assert q.base.MAX_ARITY==3
+          assert q.COHORT==[f'PRE_icfp_gen_{family}.{i}' for family in (1,2) for i in range(1,13)]
+          PY
+      - name: Test 24 untouched existing external ICFP originals
+        run: python research/q3/hard_metadata_corrected_icfp_first.py
+      - name: Archive complete new original first
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-icfp-metadata-corrected-adaptive-arity-first
+          path: Q3_ADAPTIVE_ARITY_EXTERNAL_FIRST.json
+          if-no-files-found: warn
