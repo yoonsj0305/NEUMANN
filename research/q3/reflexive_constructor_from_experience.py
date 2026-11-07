@@ -87,7 +87,7 @@ def compile_verified_source_filter(old):
 def antiunify(a,b,holes):
     if a==b:return a
     if (type(a) is list and type(b) is list and len(a)==len(b)
-            and a and b and a[0]==b[0]):
+            and a and b and a[0]==b[0] and a[0]!="constant"):
         return [antiunify(x,y,holes) for x,y in zip(a,b)]
     pair=(canonical(a),canonical(b))
     if pair not in holes:holes[pair]=len(holes)
