@@ -57,14 +57,25 @@ def run(arc2_root:Path,arc1_root:Path,frozen_first:Path,out:Path):
     if out.exists():raise ValueError("NO_OVERWRITE_REAL_SOURCE_FIRST")
     learned=load_only_frozen_operator_type(frozen_first)
     frozen_hash=sha(learned.ast())
-    old=[f.stem for f in (arc1_root/"data"/"training").glob("*.json")]
+    arc1train={f.stem for f in (arc1_root/"data"/"training").glob("*.json")}
+    arc1eval={f.stem for f in (arc1_root/"data"/"evaluation").glob("*.json")}
     fresh=sorted((arc2_root/"data"/"training").glob("*.json"))
-    if len(old)!=400 or len(fresh)!=1000:
+    if len(arc1train)!=400 or len(arc1eval)!=400 or len(fresh)!=1000:
         raise ValueError("PINNED_ORIGINAL_COHORT_SIZE_CHANGED")
-    old_ids=set(old)
+    old_ids=arc1train|arc1eval
+    # ARC-AGI-2 TRAIN includes some ARC-AGI-1 EVAL as well as TRAIN.
+    # Exclude BOTH instead of guessing the overlap from README prose.
+    # The blocked earlier run saw ONLY file names/counts, not test outputs.
     newfiles=[f for f in fresh if f.stem not in old_ids]
-    if len(newfiles)!=600:
-        raise ValueError("ARC2_EXPECTED_EXACTLY_600_NEW_FILES")
+    print("EXTERNAL_COHORT_MANIFEST",json.dumps({
+        "ARC1_train_ids":len(arc1train),"ARC1_eval_ids":len(arc1eval),
+        "ARC1_overlap_ids":len(old_ids),
+        "ARC2_training_ids":len(fresh),
+        "ARC2_overlap_OLD_TRAIN":sum(f.stem in arc1train for f in fresh),
+        "ARC2_overlap_OLD_EVAL":sum(f.stem in arc1eval for f in fresh),
+        "ARC2_genuinely_new_file_ids":len(newfiles),
+    },sort_keys=True),flush=True)
+    if not newfiles:raise ValueError("NO_SOURCE_DISTINCT_ORIGINALS")
     out.mkdir(parents=True)
     (out/"FROZEN_IMPORTED_OPERATOR.json").write_text(json.dumps(
         learned.to_json(),indent=2,sort_keys=True)+"\n")
@@ -82,7 +93,7 @@ def run(arc2_root:Path,arc1_root:Path,frozen_first:Path,out:Path):
         raise ValueError("OPERATOR_CHANGED_AFTER_ARC2_EXPOSURE")
     stats={
         "new_original_cases":len(results),
-        "new_original_distinct_from_source_by_id":600,
+        "new_original_distinct_from_both_arc1_original_groups":len(newfiles),
         "frozen_operator_instantiations":sum(
             x["status"]=="REUSED_SELF_DISCOVERED_SEMANTIC_TYPE"
             for x in results),
@@ -97,7 +108,8 @@ def run(arc2_root:Path,arc1_root:Path,frozen_first:Path,out:Path):
         "frozen_parent_original_first_run":PRIOR_FIRST_RUN,
         "source_programs_from_arcagi1":True,
         "new_cases_from_arcagi2_training_only":True,
-        "overlapping_400_original_ids_excluded":True,
+        "new_source_exact_original_count":len(newfiles),
+        "overlapping_800_arc1_training_and_eval_ids_excluded":True,
         "original_task_ids_not_handpicked":True,
         "new_operator_semantics_never_refit":True,
         "original_test_gold_only_after_frozen_predictions":True,
