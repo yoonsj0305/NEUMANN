@@ -312,6 +312,27 @@ def infer_bindings_using_only_target_train(lib,target_train):
     return list(found.values())
 
 
+def ablate_learned_parameter(lib,parameter,source_binding):
+    """Restore one formerly constant source-site and remove its learned hole.
+
+    Any loss of capacity on the same target TRAIN is a scoped causal
+    witness that source-program abstraction, not just direct memorization,
+    enabled this particular kind of reuse.
+    """
+    if parameter not in lib.parameters:raise ValueError("UNKNOWN_LEARNED_HOLE")
+    def fixed(term):
+        if isinstance(term,dict) and set(term)=={"$param"}:
+            if term["$param"]==parameter:return source_binding
+            return term
+        if isinstance(term,list):return [fixed(x) for x in term]
+        if isinstance(term,dict):return {k:fixed(v) for k,v in term.items()}
+        return term
+    new_body=fixed(lib.body)
+    return LearnedLibrary("ABLATION_"+lib.name,new_body,
+                tuple(p for p in lib.parameters if p!=parameter),
+                lib.training_source_hashes)
+
+
 def transfer_to_new_original(lib,target,task_id):
     """Frozen library first. Only then load unseen target TRAIN observations."""
     candidates=infer_bindings_using_only_target_train(lib,target["train"])
@@ -370,6 +391,19 @@ def run(first:Path,arc_root:Path,out:Path):
         raise ValueError("FROZEN_TRANSFER_SOURCE_MISSING")
     task=json.loads(file.read_text())
     result=transfer_to_new_original(lib,task,FROZEN_REUSE_TARGET)
+    # No full direct-program solver is used. Remove each abstraction slot in
+    # turn and test whether the formerly frozen source parameter can still
+    # explain the target TRAIN. This identifies which invention was useful.
+    ablations={}
+    for slot in lib.parameters:
+        constrained=ablate_learned_parameter(lib,slot,bind_a[slot])
+        surviving=infer_bindings_using_only_target_train(
+            constrained,task["train"])
+        ablations[slot]={
+          "source_literal_forced":bind_a[slot],
+          "target_train_programs_without_slot":len(surviving),
+          "target_train_reuse_requires_this_slot":len(surviving)==0
+        }
     if frozen_library_sha!=digest(lib.to_ast()):
         raise RuntimeError("LIBRARY_MUTATED_AFTER_TARGET_EXPOSURE")
     report={
@@ -389,6 +423,10 @@ def run(first:Path,arc_root:Path,out:Path):
       "source_a_full_reconstruction":substitute(lib.body,bind_a)==source_asts[0],
       "source_b_full_reconstruction":substitute(lib.body,bind_b)==source_asts[1],
       "original_target":result,
+      "automatic_parameter_ablation_causal_results":ablations,
+      "learned_slots_necessary_for_target":sum(
+          v["target_train_reuse_requires_this_slot"] for v in ablations.values()),
+      "old_full_task_resolver_reused_for_target":False,
       "no_globally_new_public_eval_ids_consumed":True,
       "global_Q3":"OPEN","global_Q4":"OPEN","global_Q6":"OPEN",
     }
