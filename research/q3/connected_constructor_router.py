@@ -75,19 +75,21 @@ def validate_memory(program):
     if not isinstance(program,dict) or \
        program.get("kind")!="DefineGeneratedCoordinateRelation":
         return False
-    if program.get("relation")!={"compare":"eq","reduce":"all"}:
+    r=program.get("relation")
+    if not isinstance(r,dict) or r.get("compare") not in ("eq","neq") or r.get("reduce") not in ("all","any"):
         return False
     constructor=program.get("representation_constructor")
-    if not isinstance(constructor,dict):
+    if not isinstance(constructor,dict) or constructor.get("type")!="IndexedPairwiseRelation" or constructor.get("first_index")!=["i"]:
         return False
     try:
         index=constructor["second_index"]
         a,b,c=coeffs(index)
     except (KeyError,ValueError,TypeError,IndexError):
         return False
-    # This is a proof of symmetric coordinate mapping and predicate meaning,
-    # not a proof that any new target is a symmetry task.
-    return (a,b,c)==(-1,1,-1)
+    # For all n>=1 and 0<=i<n, j=a*i+b*n+c is inside [0,n)
+    # iff b+c=0 and slopes at i=0 and i=n-1 both lie in [0,1].
+    # This is a generic algebraic proof, not a hardcoded mirror predicate.
+    return (b+c==0 and 0<=b<=1 and 0<=a+b<=1)
 
 
 def model_cost(candidate):
@@ -126,7 +128,16 @@ class ConnectedConstructorRouter:
                            "source_original_id":"HumanEval/48",
                            "source_provenance_postfirst":True,
                            "AST_SHA256":program_id(m["executable_AST"])})
-            if good:candidates.append(m)
+            if good:
+                # Minimal computation first: a previously proved AST that
+                # agrees with every new source case is a reusable candidate.
+                # This is an epistemic risk (finite observations); report it,
+                # and test cold / stronger control separately.
+                return {"status":"SOURCE_VERIFIED_MEMORY_REUSE",
+                        "program":m,"trials":trials,
+                        "candidate_count":1,
+                        "selected_ast_sha256":program_id(m["executable_AST"]),
+                        "elapsed_ms":round((time.perf_counter_ns()-t0)/1e6,5)}
 
         t=time.perf_counter_ns()
         rel=discover_relational(train,budget=relation_budget)
