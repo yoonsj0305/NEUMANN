@@ -1,0 +1,51 @@
+name: Q3 behavioral own-weight vs strong classical proof FIRST
+on:
+  pull_request:
+    paths:
+      - 'research/q3/behavioral_proof_reward_first.py'
+      - 'research/q3/task_conditional_operator_generator.py'
+      - '.github/workflows/q3_behavioral_proof_reward_first.yml'
+permissions:
+  contents: read
+jobs:
+  q3-strict-proved-program-admission:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Z3 independent all-domain original checker
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq z3
+          z3 --version
+      - name: Train own weights on observed behavior and compare equal-language GP
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q3/task_conditional_operator_generator.py \
+             research/q3/behavioral_proof_reward_first.py
+          /usr/bin/time -f 'Q3_BEHAVIORAL_FIRST_WALL_S=%e MAX_RSS_KB=%M' \
+             python3 -m research.q3.behavioral_proof_reward_first \
+             --out Q3-BEHAVIORAL-PROOF-FIRST
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          r=json.loads(Path('Q3-BEHAVIORAL-PROOF-FIRST/FIRST_REPORT.json').read_text())
+          assert r['test_tasks']==2 and r['source_free_development_only']
+          assert r['independent_all_domain_z3_required_for_proof']
+          assert not r['human_macro_answer_list_supplied_to_actor']
+          assert not r['hidden_reference_AST_supplied_to_actor']
+          assert r['Q3']==r['Q4']==r['Q6']==r['Q7']=='OPEN'
+          print('Q3_ACTUAL_LEARNED_PROPOSER_VS_CLASSICAL_AND_UNTRAINED_EVALUATED__Q3_OPEN')
+          PY
+      - name: Archive immutable first even if all neural programs FAIL
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-BEHAVIORAL-PROOF-LEARNER-FIRST
+          path: Q3-BEHAVIORAL-PROOF-FIRST/
+          retention-days: 90
+          if-no-files-found: warn
