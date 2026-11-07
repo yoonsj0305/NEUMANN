@@ -1,0 +1,59 @@
+name: Q3 invent new executable algebraic operator from real original examples FIRST
+on:
+  pull_request:
+    paths:
+      - 'research/q3/induce_binary_algebra_original.py'
+      - 'tests/test_q3_induced_binary_algebra_original.py'
+      - '.github/workflows/q3_induced_binary_algebra_original_first.yml'
+permissions:
+  contents: read
+jobs:
+  actual-operator-invention:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Pinned upstream 400 TRAIN and 32 already-opened EVAL originals
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-induct-official-arc
+          git -C /tmp/q3-induct-official-arc init -q
+          git -C /tmp/q3-induct-official-arc remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C /tmp/q3-induct-official-arc fetch -q --depth 1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C /tmp/q3-induct-official-arc checkout -q --detach FETCH_HEAD
+          test "$(git -C /tmp/q3-induct-official-arc rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+      - name: Actual operator law inference and causal learning necessity tests
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q3/induce_binary_algebra_original.py
+          python3 -m unittest tests/test_q3_induced_binary_algebra_original.py -v
+      - name: Run all 400+32 original task gates without target answer code
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_OPERATOR_INVENTION_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.induce_binary_algebra_original \
+              --arc-root /tmp/q3-induct-official-arc \
+              --out Q3-INDUCED-BINARY-LAW-FIRST
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('Q3-INDUCED-BINARY-LAW-FIRST/FIRST.json').read_text())
+          assert r['pin']=='399030444e0ab0cc8b4e199870fb20b863846f34'
+          assert r['groups']['official_public_TRAIN_400']['original_tasks']==400
+          assert r['groups']['previously_opened_eval_P25_32']['original_tasks']==32
+          assert not r['prewritten_target_priority']
+          assert not r['new_public_eval_reserved_ids_consumed']
+          assert r['Q3_GLOBAL']==r['Q4']==r['Q6']=='OPEN'
+          print('Q3_OPERATOR_LAW_REAL_ORIGINAL_FIRST_RECORDED__GLOBAL_Q3_OPEN')
+          PY
+      - name: Preserve exact original operator definitions, successes and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-INDUCED-OPERATOR-LAW-ORIGINAL-FIRST
+          path: Q3-INDUCED-BINARY-LAW-FIRST/
+          retention-days: 90
+          if-no-files-found: warn
