@@ -78,7 +78,7 @@ class TypedSemanticDeltaInventorTest(unittest.TestCase):
 
     def test_bad_unhashable_or_conflicting_filter_abstains(self):
         self.assertIsNone(synth_filter([([[1,1]],[[1]])])[0])
-        inp=[(["aba"],"aa"),(["a"],"a")]
+        inp=[(["aba"],"aa"),(["b"],"b")]
         self.assertIsNone(synth_filter(inp)[0])
         self.assertIsNone(TypeGuidedInventor().propose(
             [([object()],1)])["program"])
