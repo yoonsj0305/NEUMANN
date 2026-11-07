@@ -1,0 +1,96 @@
+name: Q3 reflexive constructor invention source-frozen and external MBPP FIRST
+on:
+  pull_request:
+    paths:
+      - 'research/q3/reflexive_constructor_from_experience.py'
+      - 'research/q3/learn_constructor_then_mbpp_original_first.py'
+      - 'tests/test_q3_reflexive_constructor_from_experience.py'
+      - 'tests/test_q3_reflexive_constructor_mbpp_first.py'
+      - '.github/workflows/q3_reflexive_constructor_mbpp_independent_first.yml'
+permissions:
+  contents: read
+jobs:
+  q3-constructor-source-before-external:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Source-only new meta-program discovery and safety tests
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q3/reflexive_constructor_from_experience.py
+          python3 -m py_compile research/q3/learn_constructor_then_mbpp_original_first.py
+          python3 -m unittest \
+            tests/test_q3_reflexive_constructor_from_experience.py \
+            tests/test_q3_reflexive_constructor_mbpp_first.py -v
+          mkdir -p Q3-REFLECTIVE-CONSTRUCTOR-FIRST
+          git hash-object research/q3/reflexive_constructor_from_experience.py \
+            > Q3-REFLECTIVE-CONSTRUCTOR-FIRST/META_KERNEL_BLOB.txt
+      - name: Original formerly solved CodeARC SOURCE only, exact pinned dataset SHA
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --silent --show-error \
+            "https://huggingface.co/datasets/anjiangwei/CodeARC-Invocations/resolve/119512573bf96148cbb95e99cf7cdd21c06153e4/invocations.jsonl" \
+            -o /tmp/codearc.jsonl
+          test "$(sha256sum /tmp/codearc.jsonl | awk '{print $1}')" = 3f08820594d4825c78bbdcc3b8eb2e6c8c0285fb3de966e900463b53f1723962
+      - name: ACTUAL learn and freeze NEW executable program constructor before MBPP download
+        run: |
+          set -euo pipefail
+          python3 -m research.q3.learn_constructor_then_mbpp_original_first source \
+            --codearc /tmp/codearc.jsonl \
+            --out Q3-REFLECTIVE-CONSTRUCTOR-FIRST/FROZEN
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          p=Path('Q3-REFLECTIVE-CONSTRUCTOR-FIRST/FROZEN/FROZEN_CONSTRUCTOR.json')
+          obj=json.loads(p.read_text())
+          assert obj['source_originals']==[834,841]
+          assert obj['source_test_gold_NOT_READ_now']
+          assert obj['compiler_adapter_human_authored']
+          assert len(obj['frozen_generated_constructor_sha256'])==64
+          assert obj['learned_program_generator']['constructor_program']['hole_count']==1
+          print('Q3_NEW_CONSTRUCTOR_FROZEN_BEFORE_EXTERNAL_DATA',obj['frozen_generated_constructor_sha256'])
+          PY
+      - name: Only NOW retrieve independent-author Google Research MBPP originals, pinned Git blob
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --silent --show-error \
+            "https://raw.githubusercontent.com/google-research/google-research/master/mbpp/sanitized-mbpp.json" \
+            -o /tmp/independent_google_mbpp.json
+          test "$(git hash-object /tmp/independent_google_mbpp.json)" = a999d25df7e489e4c183cadfa5c0ecf557a702b6
+          sha256sum /tmp/independent_google_mbpp.json \
+            > Q3-REFLECTIVE-CONSTRUCTOR-FIRST/MBPP_DATA_SHA256.txt
+      - name: Full official MBPP test cohort, source-trained learned constructor and STRONG competing old filter
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_REFLECTIVE_MBPP_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.learn_constructor_then_mbpp_original_first mbpp \
+              --mbpp /tmp/independent_google_mbpp.json \
+              --frozen Q3-REFLECTIVE-CONSTRUCTOR-FIRST/FROZEN/FROZEN_CONSTRUCTOR.json \
+              --out Q3-REFLECTIVE-CONSTRUCTOR-FIRST/MBPP_EXTERNAL_ORIGINALS
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          root=Path('Q3-REFLECTIVE-CONSTRUCTOR-FIRST')
+          freeze=json.loads((root/'FROZEN/FROZEN_CONSTRUCTOR.json').read_text())
+          first=json.loads((root/'MBPP_EXTERNAL_ORIGINALS/FIRST.json').read_text())
+          assert freeze['frozen_generated_constructor_sha256']==first['summary']['learned_meta_program_sha256']
+          assert first['summary']['original_source_tasks_in_official_test_split']>100
+          assert first['summary']['eligible_typed_literal_equality_originals']>=1
+          assert first['new_constructor_ast_generated_before_mbpp_download']
+          assert first['mbpp_author_code_not_used']
+          assert first['one_heldout_assertion_PER_TASK_limit']
+          assert first['global_Q3']==first['global_Q4']==first['global_Q6']=='OPEN'
+          print('Q3_NEW_CONSTRUCTOR_EXTERNAL_SCORED_GLOBAL_Q3_OPEN')
+          PY
+      - name: Preserve source-freeze, independent original scores, negative controls and costs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-SELF-GENERATED-CONSTRUCTOR-INDEPENDENT-MBPP-FIRST
+          path: Q3-REFLECTIVE-CONSTRUCTOR-FIRST/
+          if-no-files-found: warn
+          retention-days: 90
