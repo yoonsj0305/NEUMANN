@@ -3,7 +3,8 @@ import unittest
 
 from research.q3.autonomous_operator_library_reuse import (
     AntiUnifier,bind_pattern,substitute,invent_library_from_programs,
-    compile_as_executable,
+    compile_as_executable, LearnedLibrary,
+    infer_bindings_using_only_target_train, semantic_interface_of_frozen_library,
 )
 
 
@@ -36,6 +37,17 @@ class ReusableDiscoveryTests(unittest.TestCase):
         x,_,_=invent_library_from_programs(a,b)
         y,_,_=invent_library_from_programs(a,b)
         self.assertEqual(x.to_data(),y.to_data())
+
+    def test_old_program_resolver_is_not_called_by_library_transfer(self):
+        import inspect
+        source=inspect.getsource(infer_bindings_using_only_target_train)
+        self.assertNotIn("train_invention(",source)
+        # Forbidden fallback: a malformed/invented-but-inapplicable library
+        # must reject every target, even if the old direct resolver might fit.
+        bad=LearnedLibrary("not_a_law",["Keep"],("p0",),("src1","src2"))
+        self.assertIsNone(semantic_interface_of_frozen_library(bad))
+        train=[{"input":[[1,2]],"output":[[2]]}]
+        self.assertEqual(infer_bindings_using_only_target_train(bad,train),[])
 
     def test_malformed_program_compiler_fails_closed(self):
         with self.assertRaisesRegex(ValueError,"NOT_COMPILED"):
