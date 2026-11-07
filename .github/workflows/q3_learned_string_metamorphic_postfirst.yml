@@ -1,0 +1,40 @@
+name: Q3 Learned String Programs Scoped Metamorphic POSTFIRST
+
+on:
+  push:
+    branches:
+      - research/q3-cross-domain-metagrammar-string-original-20261107
+    paths:
+      - research/q3/learned_cross_domain_metamorphic_postfirst.py
+      - .github/workflows/q3_learned_string_metamorphic_postfirst.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  metamorphic_postfirst:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Load immutable first target evidence only
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-typed-constructor-37-unseen-official-original-first
+          run-id: 42373905695
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: previous
+      - name: Test generated AST semantics and wrong-operator mutation
+        run: |
+          python -m py_compile research/q3/learned_cross_domain_metamorphic_postfirst.py
+          git hash-object research/q3/learned_cross_domain_metamorphic_postfirst.py
+          python research/q3/learned_cross_domain_metamorphic_postfirst.py
+      - name: Save scoped post-first development evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-scoped-string-semantic-metamorphic-postfirst
+          path: Q3_POSTFIRST_METAMORPHIC_SEMANTICS.json
+          if-no-files-found: warn
