@@ -22,9 +22,9 @@ from pathlib import Path
 
 from research.q6.array_string_simulation import OBLIGATIONS
 
-SCHEMA="neumann.q6.pointwise-commuting-compositional-transfer-postfirst-v1"
+SCHEMA="neumann.q6.pointwise-commuting-compositional-logic-corrected-v2"
 ABSTRACT_PREFIX=r"""
-(set-logic AUFLIA)
+(set-logic ALL)
 (declare-const src (Array Int String))
 (declare-const dst (Array Int String))
 (declare-const next (Array Int String))
