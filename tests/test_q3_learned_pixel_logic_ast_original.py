@@ -1,7 +1,7 @@
 """Software contract only. Real ARC ORIGINAL evaluation is separate."""
 import unittest
 from research.q3.learned_pixel_logic_ast_original import (
-    FEATURE_NAMES,build_features,learn_ast,execute,count_nodes,KEEP
+    FEATURE_NAMES,build_features,learn_ast,execute,count_nodes,best_split,KEEP
 )
 
 
@@ -23,6 +23,18 @@ class LearnedRuleASTSoftwareContract(unittest.TestCase):
         self.assertEqual(len(feats[0]),len(FEATURE_NAMES))
         self.assertIn("color_bbox_xmin_delta_4",FEATURE_NAMES)
         self.assertEqual(KEEP,-1)
+    def test_real_weighted_gini_sign_error_is_repaired(self):
+        # Old raw-count mixture: -0.035555 gain, rejects the split.
+        # Coherent class-weighted mixture: +0.053333 gain, accepts it.
+        # This matters when rare changed pixels carry 6x label mass.
+        X=[(0,), (0,), (1,), (0,), (0,)]
+        Y=[8, KEEP, 8, KEEP, KEEP]
+        decision=best_split(X,Y,list(range(5)),[0])
+        self.assertIsNotNone(decision)
+        self.assertGreater(decision[0],0.05)
+        self.assertEqual(decision[1],0)
+        self.assertEqual(decision[2],0.5)
+
     def test_invalid_color_fails_closed(self):
         with self.assertRaisesRegex(ValueError,"UNSUPPORTED_COLOR"):
             build_features([[55]])
