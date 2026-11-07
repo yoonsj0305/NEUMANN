@@ -52,6 +52,8 @@ jobs:
           assert r['original_target']['train_fit']
           assert r['original_target']['test_exact']
           assert r['full_library_frozen_before_target_training']
+          assert not r['old_full_task_resolver_reused_for_target']
+          assert r['learned_slots_necessary_for_target'] >= 2
           assert r['global_Q3']=='OPEN'
           print('SCOPED_FUNCTION_SELF_DEFINITION_AND_REUSE__CAUSAL_POSTFIRST_PASS')
           PY
