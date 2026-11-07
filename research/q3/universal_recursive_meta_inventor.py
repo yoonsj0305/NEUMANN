@@ -172,8 +172,9 @@ def enumerate_solution(examples,budget=DEFAULT_BUDGET,
     candidate=atoms[:]
     for a in atoms:
         for op in ("len","int","abs","not","unit"):candidate.append([op,a])
-    for a in candidate[:]:
-        for b in candidate[:]:
+    frozen_unary_candidates = candidate[:]
+    for a in frozen_unary_candidates:
+        for b in frozen_unary_candidates:
             for op in ("add","sub","mul","mod","cat","eq","lt","in"):
                 candidate.append([op,a,b])
     for expression in candidate[:min(budget//2,len(candidate))]:
