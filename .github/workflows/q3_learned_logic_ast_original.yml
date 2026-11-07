@@ -1,4 +1,4 @@
-name: Q3 learn new executable rule topology on real opened ARC originals
+name: Q3 weighted semantic split causal POSTFIRST
 on:
   pull_request:
     paths:
@@ -29,29 +29,29 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m unittest tests/test_q3_learned_pixel_logic_ast_original.py -v
-      - name: Actual learned rule AST source FIRST across all 32 originals
+      - name: After-FIRST controlled correction on unchanged already-opened originals
         run: |
           set -euo pipefail
           /usr/bin/time -f 'Q3_LOGIC_FIRST_WALL_S=%e MAX_RSS_KB=%M' \
             python3 -m research.q3.learned_pixel_logic_ast_original \
-              --arc-root /tmp/q3-frozen-arc --out Q3-LEARNED-LOGIC-FIRST
+              --arc-root /tmp/q3-frozen-arc --out Q3-WEIGHTED-GINI-POSTFIRST
           python3 - <<'PY'
           from pathlib import Path
           import json
-          p=Path('Q3-LEARNED-LOGIC-FIRST/FIRST.json')
+          p=Path('Q3-WEIGHTED-GINI-POSTFIRST/FIRST.json')
           r=json.loads(p.read_text())
           assert len(r['rows'])==32
           assert not r['new_unopened_eval_ids_consumed']
           assert r['human_supplied_primitives_and_feature_vocabulary']
           assert r['global_Q3']==r['global_Q4']==r['global_Q6']=='OPEN'
           assert r['model_generated_variable_topology_AST']
-          print('Q3_LEARNED_EXECUTABLE_RULE_ACTUAL_FIRST_RECORDED_SCOPE_HONEST')
+          print('Q3_WEIGHTED_GINI_POSTFIRST_RECORDED_Q3_OPEN')
           PY
-      - name: Preserve first evidence including every failure
+      - name: Preserve causal postfirst independent of frozen original
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: NEUMANN-Q3-LEARNED-LOGIC-ORIGINAL-FIRST
-          path: Q3-LEARNED-LOGIC-FIRST/
+          name: NEUMANN-Q3-LEARNED-LOGIC-WEIGHTED-POSTFIRST
+          path: Q3-WEIGHTED-GINI-POSTFIRST/
           retention-days: 90
           if-no-files-found: warn
