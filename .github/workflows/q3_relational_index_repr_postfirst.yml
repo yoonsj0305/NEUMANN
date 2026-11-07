@@ -1,0 +1,65 @@
+name: Q3 source-inferred coordinate-pair representation POSTFIRST symbolic gate
+on:
+  pull_request:
+    paths:
+      - 'research/q3/discover_index_relation_constructor.py'
+      - 'research/q3/postfirst_discovered_relation_humaneval.py'
+      - 'tests/test_q3_discover_index_relation_constructor.py'
+      - '.github/workflows/q3_relational_index_repr_postfirst.yml'
+permissions:
+  contents: read
+
+jobs:
+  index-relationship-autogeneration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Unit test coordinate-language invention and exhaustive binary/tuple transfer BEFORE source access
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q3/discover_index_relation_constructor.py
+          python3 -m py_compile research/q3/postfirst_discovered_relation_humaneval.py
+          python3 -m unittest tests/test_q3_discover_index_relation_constructor.py -v
+          mkdir -p Q3-RELATIONAL-REPRESENTATION-POSTFIRST
+          git hash-object research/q3/discover_index_relation_constructor.py \
+            > Q3-RELATIONAL-REPRESENTATION-POSTFIRST/INVENTOR_SOURCE_BLOB.txt
+      - name: Reacquire unchanged official HumanEval original corpus (POSTFIRST only)
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --silent --show-error \
+            https://raw.githubusercontent.com/openai/human-eval/b9453e8f1865df0a0057a1383767caa400acfbcf/data/HumanEval.jsonl.gz \
+            -o /tmp/humaneval-original-postfirst.gz
+          test "$(sha256sum /tmp/humaneval-original-postfirst.gz | awk '{print $1}')" = b796127e635a67f93fb35c04f4cb03cf06f38c8072ee7cee8833d7bee06979ef
+      - name: Generate new pairwise coordinate rule from original I/O, symbolically prove affine coefficients
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_PAIRWISE_POSTFIRST_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.postfirst_discovered_relation_humaneval \
+              --humaneval /tmp/humaneval-original-postfirst.gz \
+              --out Q3-RELATIONAL-REPRESENTATION-POSTFIRST/RESULTS
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('Q3-RELATIONAL-REPRESENTATION-POSTFIRST/RESULTS/POSTFIRST.json').read_text())
+          s=r['summary']
+          assert len(r['rows'])==164
+          assert s['source_total_original_HumanEval_tasks']==164
+          assert s['post_first_exposed_originals']
+          assert s['external_blind_originals']==0
+          assert r['global_Q3']==r['global_Q4']==r['global_Q6']=='OPEN'
+          # A source-original post-first relationship exact is allowed, not
+          # a global Q3 claim. Never insist on a success number via CI.
+          print('Q3_PAIRWISE_RELATION_AUDIT_RECORDED_NOT_GLOBAL_BLIND')
+          PY
+      - name: Preserve all first code, failure receipts, and generated algebraic symbolic certificate
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-SELF-INVENTED-COORDINATE-RELATION-POSTFIRST
+          path: Q3-RELATIONAL-REPRESENTATION-POSTFIRST/
+          retention-days: 90
+          if-no-files-found: warn
