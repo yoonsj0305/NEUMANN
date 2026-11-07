@@ -1,0 +1,190 @@
+name: Q3 same frozen inventor CodeARC external 4-shard complete source cohort
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_universal_codearc_sharded_first.yml'
+permissions:
+  contents: read
+
+jobs:
+  original-cohort-shard:
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SHARD: ${{ matrix.shard }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Immutable original inventor and evaluator, no post-exposure tuning
+        run: |
+          set -euo pipefail
+          test "$(git hash-object research/q3/universal_recursive_meta_inventor.py)" = 07e7eb245f46005fd11ab308ac1c3311ab2b0bc9
+          test "$(git hash-object research/q3/codearc_universal_meta_external_first.py)" = 6deefed52645e40065ffdb0e2114bf18f548a0a2
+          python3 -m py_compile research/q3/universal_recursive_meta_inventor.py
+          python3 -m py_compile research/q3/codearc_universal_meta_external_first.py
+      - name: Exact SAME previously acquired full public CodeARC corpus, content hashed
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/neumann-codearc "Q3-CODEARC-SHARD-$SHARD"
+          REV=119512573bf96148cbb95e99cf7cdd21c06153e4
+          curl --fail --location --retry 3 --silent --show-error \
+            "https://huggingface.co/datasets/anjiangwei/CodeARC-Invocations/resolve/$REV/invocations.jsonl" \
+            -o /tmp/neumann-codearc/invocations.jsonl
+          SHA="$(sha256sum /tmp/neumann-codearc/invocations.jsonl | awk '{print $1}')"
+          test "$SHA" = 3f08820594d4825c78bbdcc3b8eb2e6c8c0285fb3de966e900463b53f1723962
+          printf '{"dataset":"anjiangwei/CodeARC-Invocations","revision":"%s","sha256":"%s","shard":%s,"target_exposure":"POST_PREEMPTION_SAME_FROZEN_SOURCE"}\n' \
+            "$REV" "$SHA" "$SHARD" > "Q3-CODEARC-SHARD-$SHARD/SOURCE_PROVENANCE.json"
+      - name: Metadata-only partition; preserve COMPLETE original mod17 cohort
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from collections import defaultdict
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          shard=int(os.environ['SHARD'])
+          raw=Path('/tmp/neumann-codearc/invocations.jsonl')
+          dst=Path('/tmp/neumann-codearc/shard.jsonl')
+          rows=[]
+          ids=set()
+          with raw.open(encoding='utf-8') as f:
+            for line in f:
+              obj=json.loads(line)
+              rows.append((obj,line))
+              try:
+                if obj.get('type')=='annotated':
+                  ids.add(int(obj['problem_id']))
+              except (KeyError,ValueError,TypeError):
+                pass
+          selected=sorted(i for i in ids if i>20 and
+            int(hashlib.sha256(('NEUMANN-Q3-FIRST/'+str(i)).encode()).hexdigest()[:8],16)%17==0)
+          assigned=selected[shard::4]
+          chosen=set(assigned)
+          with dst.open('w',encoding='utf-8') as f:
+            for obj,line in rows:
+              try:
+                if int(obj['problem_id']) in chosen:
+                  f.write(line)
+              except (KeyError,ValueError,TypeError):
+                continue
+          manifest={'all_original_ids':len(ids),'cohort':selected,
+                    'shard_index':shard,'shard_total':4,'assigned':assigned,
+                    'selection_sha256':hashlib.sha256(json.dumps(selected).encode()).hexdigest()}
+          (Path('Q3-CODEARC-SHARD-'+str(shard))/'COHORT_IDS.json').write_text(
+              json.dumps(manifest,sort_keys=True,indent=2)+'\n')
+          assert len(ids)>=1000 and len(selected)>=40
+          assert len(assigned)>=5
+          print('COHORT',len(ids),'TOTAL',len(selected),'SHARD',shard,
+                'ASSIGNED',len(assigned),flush=True)
+          PY
+      - name: Same frozen 34000-candidate interpreter and original 7/3 score
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_SHARD_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.codearc_universal_meta_external_first \
+              --dataset /tmp/neumann-codearc/shard.jsonl \
+              --out "Q3-CODEARC-SHARD-$SHARD/RESULTS" \
+              --modulus 17 --budget 34000
+          python3 - <<'PY'
+          import os,json
+          from pathlib import Path
+          d=Path('Q3-CODEARC-SHARD-'+os.environ['SHARD'])
+          x=json.loads((d/'RESULTS/FIRST.json').read_text())
+          m=json.loads((d/'COHORT_IDS.json').read_text())
+          assert len(x['results'])==len(m['assigned'])
+          assert sorted(a['id'] for a in x['results'])==m['assigned']
+          assert x['Q3_GLOBAL']=='OPEN'
+          assert x['summary']['search_budget_each']==34000
+          print('SHARD_FIRST_DONE',os.environ['SHARD'],x['summary'],flush=True)
+          PY
+      - name: Always retain independent first per-shard results, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-CODEARC-FROZEN-SHARD-${{ matrix.shard }}
+          path: Q3-CODEARC-SHARD-${{ matrix.shard }}/
+          retention-days: 90
+          if-no-files-found: warn
+
+  audit-all-shards:
+    needs: original-cohort-shard
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: NEUMANN-Q3-CODEARC-FROZEN-SHARD-*
+          path: /tmp/neumann-q3-codearc-shards
+      - name: Independently check 100 percent cohort coverage and aggregate cold/static/warm receipts
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          root=Path('/tmp/neumann-q3-codearc-shards')
+          members=list(root.glob('**/COHORT_IDS.json'))
+          assert len(members)==4,(len(members),members)
+          cohort=None
+          rows=[];summaries=[]
+          sources=set();sha=set()
+          for manifest_file in members:
+            base=manifest_file.parent
+            m=json.loads(manifest_file.read_text())
+            result=json.loads((base/'RESULTS/FIRST.json').read_text())
+            src=json.loads((base/'SOURCE_PROVENANCE.json').read_text())
+            assert len(result['results'])==len(m['assigned'])
+            assert sorted(a['id'] for a in result['results'])==m['assigned']
+            assert result['Q3_GLOBAL']=='OPEN'
+            if cohort is None:cohort=m['cohort']
+            assert cohort==m['cohort']
+            rows.extend(result['results'])
+            summaries.append(result['summary'])
+            sources.add(src['revision'])
+            sha.add(src['sha256'])
+          assert len(sources)==len(sha)==1
+          assert sorted(x['id'] for x in rows)==cohort, 'MISSING_OR_DUPLICATED_COHORT'
+          eligible=[x for x in rows if x.get('test_total')==3]
+          summary={
+            'cohort_original_count':len(cohort),
+            'verified_eligible_originals':len(eligible),
+            'exact_growing_language':sum(x.get('heldout_exact',False) for x in eligible),
+            'exact_cold_recursion':sum(x.get('cold_test_exact',False) for x in eligible),
+            'exact_static_only':sum(x.get('static_test_exact',False) for x in eligible),
+            'original_heldout_exact_examples':sum(x.get('heldout_correct',0) for x in eligible),
+            'original_heldout_examples_total':len(eligible)*3,
+            'invented_recursive_exact':sum(
+              x.get('status')=='invented_recursive_operator' and x.get('heldout_exact',False)
+              for x in eligible),
+            'new_meta_grammar_exact':sum(
+              x.get('status')=='learned_meta_grammar' and x.get('heldout_exact',False)
+              for x in eligible),
+            'reused_library_exact':sum(
+              x.get('status')=='reused' and x.get('heldout_exact',False)
+              for x in eligible),
+            'shard_local_library_resets':True,
+            'unit_of_generalization':'external function with 7 train and 3 original published heldout examples',
+            'global_Q3':'OPEN','global_Q4':'OPEN','global_Q6':'OPEN',
+            'fixed_program_source_blob':'07e7eb245f46005fd11ab308ac1c3311ab2b0bc9',
+            'fixed_evaluator_source_blob':'6deefed52645e40065ffdb0e2114bf18f548a0a2',
+            'external_data_sha256':next(iter(sha)),
+            'external_data_revision':next(iter(sources)),
+            'prior_original_single_runner_status':'PREEMPTED_NO_RESULT',
+            'all_first_outcomes_preserved':True,
+          }
+          Path('FINAL_SHARDED_FIRST.json').write_text(
+              json.dumps({'summary':summary,'rows':rows},sort_keys=True,indent=2)+'\n')
+          print('Q3_CODEARC_SHARDED_FIRST_SUMMARY',json.dumps(summary,sort_keys=True),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: NEUMANN-Q3-CODEARC-FROZEN-SHARDED-AUDIT
+          path: FINAL_SHARDED_FIRST.json
+          retention-days: 90
