@@ -1,0 +1,60 @@
+name: Q3 new object-relational learned structural operator real ARC originals FIRST
+on:
+  pull_request:
+    paths:
+      - 'research/q3/relational_object_program_inventor.py'
+      - 'tests/test_q3_object_relational_inventor.py'
+      - '.github/workflows/q3_object_relational_original_first.yml'
+permissions:
+  contents: read
+jobs:
+  q3-object-invention-real-original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Original dataset exactly pinned, no reserved new evaluation IDs
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-arc-original
+          git -C /tmp/q3-arc-original init -q
+          git -C /tmp/q3-arc-original remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C /tmp/q3-arc-original fetch -q --depth 1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C /tmp/q3-arc-original checkout -q --detach FETCH_HEAD
+          test "$(git -C /tmp/q3-arc-original rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+          echo 'ARC_ORIGINAL_SOURCE_EXACT_SHA_PINNED'
+      - name: Execute typed interpreter and own-weight training invariants
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q3/relational_object_program_inventor.py
+          python3 -m unittest tests/test_q3_object_relational_inventor.py -v
+      - name: FIRST on all 32 previously opened original problems, no hand-picked success subset
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_REAL_ORIGINAL_WALL_S=%e MAX_RSS_KB=%M' \
+             python3 -m research.q3.relational_object_program_inventor \
+             --arc-root /tmp/q3-arc-original \
+             --episodes 600 --out Q3-OBJECT-ORIGINAL-FIRST
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('Q3-OBJECT-ORIGINAL-FIRST/FIRST.json').read_text())
+          assert r['previously_opened_original_32']==32
+          assert r['all_32_fixed_before_source_execution']
+          assert not r['test_gold_used_to_generate_program']
+          assert r['grammar_semantics_human_authored']
+          assert r['new_external_unopened_originals']==0
+          assert r['Q3']==r['Q4']==r['Q6']=='OPEN'
+          print('Q3_EXECUTED_REAL_ORIGINAL_32_WITH_HONEST_SCIENTIFIC_CEILING')
+          PY
+      - name: Preserve complete original first, success or failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-OBJECT-RELATIONAL-P25-32-ORIGINAL-FIRST
+          path: Q3-OBJECT-ORIGINAL-FIRST/
+          retention-days: 90
+          if-no-files-found: warn
