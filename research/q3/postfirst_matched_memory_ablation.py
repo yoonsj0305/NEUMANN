@@ -67,8 +67,8 @@ def audit(dataset:Path,original_first:Path,out:Path):
             pred,attempts,_=infer_predicate(train)
             cold_ms=(time.perf_counter_ns()-t)/1e6
             args,y=calls[-1][1]
-            prediction=cold_fold_with_full_same_feature_vocabulary(args,pred)
-                        if pred is not None else None
+            prediction=(cold_fold_with_full_same_feature_vocabulary(args,pred)
+                        if pred is not None else None)
             exact=pred is not None and same(prediction,y)
             case.update({"status":"SCORED",
                          "cold_predicate_ast":pred,
