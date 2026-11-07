@@ -1,0 +1,72 @@
+name: Q3 autonomously abstract NEW semantic operator type and reuse originals FIRST
+on:
+  pull_request:
+    paths:
+      - 'research/q3/autonomously_invent_reusable_semantic_type.py'
+      - 'tests/test_q3_autonomously_invent_reusable_semantic_type.py'
+      - '.github/workflows/q3_self_invented_semantic_type_reuse_first.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  q3-typed-library-transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Freeze prior independently discovered original operator ASTs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api -H 'Accept: application/vnd.github+json' \
+            /repos/yoonsj0305/NEUMANN/actions/artifacts/13560341998/zip \
+            > /tmp/q3-new-operator-raw-source-FIRST.zip
+          echo 'f3b2b00de88049947b083f8e455932f62c253997e38aa6c69e7ea4d086329de2  /tmp/q3-new-operator-raw-source-FIRST.zip' | sha256sum -c -
+          unzip -p /tmp/q3-new-operator-raw-source-FIRST.zip FIRST.json \
+            > /tmp/q3-new-op-parent-first.json
+      - name: Original ARC pinned; sources and targets in previously opened cohort
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-operator-type-arc
+          git -C /tmp/q3-operator-type-arc init -q
+          git -C /tmp/q3-operator-type-arc remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C /tmp/q3-operator-type-arc fetch -q --depth 1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C /tmp/q3-operator-type-arc checkout -q --detach FETCH_HEAD
+          test "$(git -C /tmp/q3-operator-type-arc rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+      - name: Semantic type algebra and fail-closed new-function reusability controls
+        run: |
+          set -euo pipefail
+          python3 -m unittest tests/test_q3_autonomously_invent_reusable_semantic_type.py -v
+      - name: ACTUAL FIRST new function type inferred before all remaining original targets
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_NEW_TYPE_REUSE_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.autonomously_invent_reusable_semantic_type \
+              --parent-first /tmp/q3-new-op-parent-first.json \
+              --arc-root /tmp/q3-operator-type-arc \
+              --out Q3-SELF-INVENTED-TYPE-REUSE-FIRST
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('Q3-SELF-INVENTED-TYPE-REUSE-FIRST/FIRST.json').read_text())
+          assert r['source_preregistered_original_ids']==['94f9d214','f2829549']
+          assert r['source_external_original_first_run']==42338077481
+          assert r['summary']['public_TRAIN_400']['original_targets']==398
+          assert r['summary']['previously_opened_EVAL_32']['original_targets']==32
+          assert r['new_type_frozen_before_target_data']
+          assert not r['direct_target_program_or_semantic_table_inventor_called']
+          assert r['global_Q3']==r['global_Q4']==r['global_Q6']=='OPEN'
+          print('Q3_NEW_OPERATOR_TYPE_LIBRARY_REUSE_FIRST_COMPLETE__Q3_OPEN')
+          PY
+      - name: Preserve new named operator type and every transfer outcome
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-SELF-INVENTED-NONCONSERVATIVE-TYPE-REUSE-FIRST
+          path: Q3-SELF-INVENTED-TYPE-REUSE-FIRST/
+          if-no-files-found: warn
+          retention-days: 90
