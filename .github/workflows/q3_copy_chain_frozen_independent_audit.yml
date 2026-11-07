@@ -1,0 +1,59 @@
+name: Q3 independent original CHC and nonvacuity audit
+on:
+  pull_request:
+    paths:
+      - 'research/q3/copy_chain_frozen_independent_audit.py'
+      - '.github/workflows/q3_copy_chain_frozen_independent_audit.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  frozen-original-independent-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Fetch only frozen original postfirst proof artifact, NO rerun of generator
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-Q3-COPY-CHAIN-POSTFIRST-SEMANTIC-ROLE
+          run-id: 42320886672
+          repository: yoonsj0305/NEUMANN
+          github-token: ${{ github.token }}
+          path: FROZEN-POSTFIRST
+      - name: Install independent SMT solver
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y z3
+          z3 --version
+      - name: Recheck every original clause, negative mutant, and invariant nonvacuity
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q3/copy_chain_frozen_independent_audit.py
+          /usr/bin/time -f 'READONLY_CERTIFICATE_AUDIT_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.copy_chain_frozen_independent_audit \
+              --artifact-dir FROZEN-POSTFIRST \
+              --out Q3-COPY-CHAIN-INDEPENDENT-AUDIT.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('Q3-COPY-CHAIN-INDEPENDENT-AUDIT.json').read_text())
+          assert x['all_original_horn_clauses_rechecked']==20
+          assert x['all_recovered_invariant_stages_sat']==7
+          assert x['all_wrong_operator_mutants_refuted']
+          assert x['original_failed_first_preserved']
+          assert x['Q3']==x['Q4']==x['Q6']=='OPEN'
+          print('READ_ONLY_CERTIFICATE_AUDIT_20_UNSAT_7_NONVACUOUS_SAT_2_MUTANTS')
+          PY
+      - name: Retain second independent receipt, also on error
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-COPY3-INDEPENDENT-NONVACUITY-AUDIT
+          path: Q3-COPY-CHAIN-INDEPENDENT-AUDIT.json
+          retention-days: 90
+          if-no-files-found: warn
