@@ -1,0 +1,57 @@
+name: Q3 learn new executable rule topology on real opened ARC originals
+on:
+  pull_request:
+    paths:
+      - 'research/q3/learned_pixel_logic_ast_original.py'
+      - 'tests/test_q3_learned_pixel_logic_ast_original.py'
+      - '.github/workflows/q3_learned_logic_ast_original.yml'
+permissions:
+  contents: read
+jobs:
+  q3-original-generated-rule:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Exact official upstream public ARC data, prior opened IDs only
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-frozen-arc
+          git -C /tmp/q3-frozen-arc init -q
+          git -C /tmp/q3-frozen-arc remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C /tmp/q3-frozen-arc fetch -q --depth 1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C /tmp/q3-frozen-arc checkout -q --detach FETCH_HEAD
+          test "$(git -C /tmp/q3-frozen-arc rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+      - name: AST learner contract
+        run: |
+          set -euo pipefail
+          python3 -m unittest tests/test_q3_learned_pixel_logic_ast_original.py -v
+      - name: Actual learned rule AST source FIRST across all 32 originals
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_LOGIC_FIRST_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.learned_pixel_logic_ast_original \
+              --arc-root /tmp/q3-frozen-arc --out Q3-LEARNED-LOGIC-FIRST
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          p=Path('Q3-LEARNED-LOGIC-FIRST/FIRST.json')
+          r=json.loads(p.read_text())
+          assert len(r['rows'])==32
+          assert not r['new_unopened_eval_ids_consumed']
+          assert r['human_supplied_primitives_and_feature_vocabulary']
+          assert r['global_Q3']==r['global_Q4']==r['global_Q6']=='OPEN'
+          assert r['model_generated_variable_topology_AST']
+          print('Q3_LEARNED_EXECUTABLE_RULE_ACTUAL_FIRST_RECORDED_SCOPE_HONEST')
+          PY
+      - name: Preserve first evidence including every failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-LEARNED-LOGIC-ORIGINAL-FIRST
+          path: Q3-LEARNED-LOGIC-FIRST/
+          retention-days: 90
+          if-no-files-found: warn
