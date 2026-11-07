@@ -46,7 +46,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m unittest tests/test_q3_frozen_invented_type_transfer_arc2.py -v
-      - name: REAL external frozen-first across 600 new ARC-AGI-2 TRAIN originals
+      - name: REAL external frozen-first across ALL source-distinct ARC-AGI-2 TRAIN originals
         run: |
           set -euo pipefail
           /usr/bin/time -f 'Q3_FROZEN_ARC2_WALL_S=%e MAX_RSS_KB=%M' \
@@ -61,7 +61,9 @@ jobs:
           r=json.loads(Path('Q3-FROZEN-NEW-OPERATOR-ARC2-FIRST/FIRST.json').read_text())
           assert r['new_operator_semantics_never_refit']
           assert r['new_cases_from_arcagi2_training_only']
-          assert r['full_original_cohort_statistics']['new_original_cases']==600
+          assert r['full_original_cohort_statistics']['new_original_cases']>0
+          assert r['full_original_cohort_statistics']['new_original_cases']==r['new_source_exact_original_count']
+          assert r['overlapping_800_arc1_training_and_eval_ids_excluded']
           assert r['reserved_EVAL_originals_consumed']==0
           assert r['Q3_GLOBAL']==r['Q4']==r['Q6']=='OPEN'
           print('Q3_NEW_OPERATOR_ARC2_FROZEN_EXTERNAL_FIRST_COMPLETE')
