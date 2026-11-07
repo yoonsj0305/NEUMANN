@@ -1,0 +1,58 @@
+name: Q3 unchanged new-semantic inventor on 233 external ARC-AGI-2 originals
+on:
+  pull_request:
+    paths:
+      - 'research/q3/frozen_invention_mechanism_arc2_source_first.py'
+      - '.github/workflows/q3_frozen_invention_mechanism_arc2.yml'
+permissions:
+  contents: read
+jobs:
+  q3-new-source-real-operator-invention:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Exact old and new public ORIGINAL source pins
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-arc1-pin /tmp/q3-arc2-pin
+          git -C /tmp/q3-arc1-pin init -q
+          git -C /tmp/q3-arc1-pin remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C /tmp/q3-arc1-pin fetch -q --depth 1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C /tmp/q3-arc1-pin checkout -q --detach FETCH_HEAD
+          test "$(git -C /tmp/q3-arc1-pin rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C /tmp/q3-arc2-pin init -q
+          git -C /tmp/q3-arc2-pin remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/q3-arc2-pin fetch -q --depth 1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/q3-arc2-pin checkout -q --detach FETCH_HEAD
+          test "$(git -C /tmp/q3-arc2-pin rev-parse HEAD)" = f3283f727488ad98fe575ea6a5ac981e4a188e49
+      - name: Actual new code invention on entire external-source original cohort
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_NEW_SEMANTICS_ARC2_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.frozen_invention_mechanism_arc2_source_first \
+              --arc1-root /tmp/q3-arc1-pin \
+              --arc2-root /tmp/q3-arc2-pin \
+              --out Q3-FROZEN-INVENTOR-ARC2-NEW-SOURCE
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          r=json.loads(Path('Q3-FROZEN-INVENTOR-ARC2-NEW-SOURCE/FIRST_AFTER_ARC2_EXPOSURE.json').read_text())
+          assert r['stats']['source_distinct_originals']==233
+          assert r['source_frozen_git_blob']=='4dca73336ace47cd3133aecc49b81e207291a48c'
+          assert r['no_new_operator_family_handwritten_for_arc2']
+          assert r['public_evaluation_tasks_used']==0
+          assert r['Q3_GLOBAL']==r['Q4']==r['Q6']=='OPEN'
+          print('Q3_UNCHANGED_INVENTOR_ON_ALL_SOURCE_DISTINCT_ARC2_ORIGINALS')
+          PY
+      - name: Preserve every original success and failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-UNCHANGED-INVENTOR-ARC2-233-ORIGINALS
+          path: Q3-FROZEN-INVENTOR-ARC2-NEW-SOURCE/
+          retention-days: 90
+          if-no-files-found: warn
