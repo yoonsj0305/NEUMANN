@@ -277,6 +277,11 @@ def infer_programs(train):
                 "decomposition":d.to_data(),
                 "learned_binary_operator_AST":program.to_ast(),
                 "learned_comparison_edges":len(program.edges),
+                # Identity must be inferred from input frequency, not from
+                # a source-dependent hand-authored target color.
+                "identity_input_occurrences":sum(
+                    row.count(identity) for task in train
+                    for row in task["input"]),
                 "inferred_type":"Grid -> List[Grid] -> Fold(LearnedJoin) -> Grid",
                 "source_external_target_code_given_to_learner":False,
                 "learned_law_semantics":True,
@@ -292,17 +297,22 @@ def infer_programs(train):
 def admit_program(train):
     programs=infer_programs(train)
     if not programs:return None
-    # Choose the minimum program description independently of test input;
-    # more constraints = more source-dependent bits, and fewer edges preferred.
-    # Identical learned laws are already deduplicated.
+    # Identity is NOT chosen by minimizing the number of learned edges:
+    # that wrongly favored arbitrary non-background colors, exactly a
+    # structural underidentification counterexample caught before ORIGINAL.
+    # Prefer the observed input modal color first (generic inductive bias),
+    # then the shortest law among equally supported identities.
     programs.sort(key=lambda p:(
-        p["learned_comparison_edges"],p["decomposition"]["gutter"],
-        p["decomposition"]["axis"],p["_law"].identity))
+        -p["identity_input_occurrences"],p["learned_comparison_edges"],
+        p["decomposition"]["gutter"],p["decomposition"]["axis"]))
     best=programs[0]
-    # Freeze all identical-minimum candidate programs; block if different ASTs
-    # have equal MDL rather than cherry-picking after seeing test.
-    minimum=best["learned_comparison_edges"]
-    equal=[p for p in programs if p["learned_comparison_edges"]==minimum]
+    # Freeze every equally good observed-data model, reject disagreeing
+    # answers after test inputs without ever inspecting test gold.
+    optimum=(best["identity_input_occurrences"],
+             best["learned_comparison_edges"])
+    equal=[p for p in programs
+           if (p["identity_input_occurrences"],p["learned_comparison_edges"])
+              == optimum]
     return {"models":equal,"selected_programs":len(equal),
             "candidate_programs":len(programs)}
 
