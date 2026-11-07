@@ -1,0 +1,131 @@
+name: Q3 NEW externally authored CodeARC original cohort typed-delta FIRST
+on:
+  pull_request:
+    paths:
+      - 'research/q3/typed_semantic_delta_inventor.py'
+      - 'research/q3/codearc_typed_delta_novel_original_first.py'
+      - 'tests/test_q3_typed_semantic_delta_inventor.py'
+      - '.github/workflows/q3_codearc_typed_delta_fresh_first.yml'
+permissions:
+  contents: read
+
+jobs:
+  independently-authored-originals:
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1]
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      SHARD: ${{ matrix.shard }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Fix source before consuming ANY fresh original cohort
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q3/typed_semantic_delta_inventor.py
+          python3 -m py_compile research/q3/codearc_typed_delta_novel_original_first.py
+          python3 -m unittest tests/test_q3_typed_semantic_delta_inventor.py -v
+          mkdir -p "Q3-TYPED-DELTA-SHARD-$SHARD"
+          git hash-object research/q3/typed_semantic_delta_inventor.py > "Q3-TYPED-DELTA-SHARD-$SHARD/INVENTOR_BLOB.txt"
+          git hash-object research/q3/codearc_typed_delta_novel_original_first.py > "Q3-TYPED-DELTA-SHARD-$SHARD/EVALUATOR_BLOB.txt"
+          cat "Q3-TYPED-DELTA-SHARD-$SHARD/INVENTOR_BLOB.txt"
+      - name: Download original CodeARC external source at old pinned revision
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --silent --show-error \
+            "https://huggingface.co/datasets/anjiangwei/CodeARC-Invocations/resolve/119512573bf96148cbb95e99cf7cdd21c06153e4/invocations.jsonl" \
+            -o /tmp/neumann-codearc-pinned.jsonl
+          test "$(sha256sum /tmp/neumann-codearc-pinned.jsonl | awk '{print $1}')" = 3f08820594d4825c78bbdcc3b8eb2e6c8c0285fb3de966e900463b53f1723962
+      - name: ALL NEW original IDs with hash %17 = 1, source-first full 7/3
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_TYPED_DELTA_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.codearc_typed_delta_novel_original_first \
+              --dataset /tmp/neumann-codearc-pinned.jsonl \
+              --out "Q3-TYPED-DELTA-SHARD-$SHARD/RESULTS" \
+              --shard "$SHARD" --shards 2
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,os
+          p=Path('Q3-TYPED-DELTA-SHARD-'+os.environ['SHARD'])
+          r=json.loads((p/'RESULTS/FIRST.json').read_text())
+          assert r['summary']['source_total_originals']==1114
+          assert r['summary']['cohort_total']>=40
+          assert r['summary']['assigned_originals']>=20
+          assert r['global_Q3']==r['global_Q4']==r['global_Q6']=='OPEN'
+          assert all(row['original_id']>20 for row in r['rows'])
+          assert all(
+             int(__import__('hashlib').sha256(('NEUMANN-Q3-FIRST/'+str(row['original_id'])).encode()).hexdigest()[:8],16)%17==1
+             for row in r['rows'])
+          assert r['source_test_gold_parsed_only_after_all_model_proposals']
+          print('Q3_NEW_EXTERNAL_ORIGINALS_COMPLETED',os.environ['SHARD'],r['summary'])
+          PY
+      - name: Preserve original results whether positive, negative, or incomplete
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-TYPED-DELTA-FIRST-SHARD-${{ matrix.shard }}
+          path: Q3-TYPED-DELTA-SHARD-${{ matrix.shard }}/
+          retention-days: 90
+          if-no-files-found: warn
+
+  audit-complete-fresh-cohort:
+    needs: independently-authored-originals
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: NEUMANN-Q3-TYPED-DELTA-FIRST-SHARD-*
+          path: /tmp/q3-fresh-audit
+      - name: Validate entire cohort coverage, source hashes, independent totals
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          root=Path('/tmp/q3-fresh-audit')
+          files=list(root.rglob('RESULTS/FIRST.json'))
+          assert len(files)==2,files
+          reports=[json.loads(p.read_text()) for p in files]
+          assert {r['summary']['shard'] for r in reports}=={0,1}
+          assert len(set((p.parent.parent/'INVENTOR_BLOB.txt').read_text().strip() for p in files))==1
+          assert len(set((p.parent.parent/'EVALUATOR_BLOB.txt').read_text().strip() for p in files))==1
+          cohorts=[r['full_source_id_cohort'] for r in reports]
+          assert cohorts[0]==cohorts[1]
+          rows=sorted((x for r in reports for x in r['rows']),
+                      key=lambda r:r['original_id'])
+          assert [r['original_id'] for r in rows]==cohorts[0]
+          eligible=[r for r in rows if r.get('test_total')==3]
+          summary={
+             'originals_preregistered':len(cohorts[0]),
+             'originals_eligible':len(eligible),
+             'exact_operator_inventor':sum(r['all_3_test_exact'] for r in eligible),
+             'exact_old_core_ablation':sum(r['old_core_all_3_exact'] for r in eligible),
+             'exact_cold_without_memory':sum(r['cold_new_all_3_exact'] for r in eligible),
+             'novel_executable_representation_beating_old_core':sum(
+                  r.get('earned_new_representation',False) for r in eligible),
+             'heldout_examples_exact':sum(r['test_exact'] for r in eligible),
+             'heldout_examples_total':3*len(eligible),
+             'source_only_derived_functions':sum(r.get('generated_operator_AST') is not None for r in eligible),
+             'heldout_failures_or_abstentions':sum(not r['all_3_test_exact'] for r in eligible),
+             'exposed_old_cohort_overlap':0,
+             'global_Q3':'OPEN','global_Q4':'OPEN','global_Q6':'OPEN',
+             'growing_memory_was_reset_per_shard':True,
+             'two_broad_generic_hypothesis_families_human_installed':True,
+             'model_weights_trained':False}
+          Path('Q3-TYPED-DELTA-FULL-FIRST.json').write_text(
+              json.dumps({'summary':summary,'rows':rows},sort_keys=True,indent=2)+'\n')
+          print('Q3_TYPED_DELTA_FULL_INDEPENDENT_ORIGINAL_FIRST',json.dumps(summary,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: NEUMANN-Q3-TYPED-DELTA-FIRST-ENTIRE-COHORT-AUDIT
+          path: Q3-TYPED-DELTA-FULL-FIRST.json
+          retention-days: 90
