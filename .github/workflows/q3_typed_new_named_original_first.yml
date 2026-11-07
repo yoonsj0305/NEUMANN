@@ -1,0 +1,76 @@
+name: Q3 Type-polymorphic source-learned grammar untouched named originals FIRST
+
+on:
+  push:
+    branches:
+      - research/q3-cross-domain-metagrammar-string-original-20261107
+    paths:
+      - research/q3/typed_domain_interface_postfirst.py
+      - research/q3/typed_new_named_sl_original_first.py
+      - .github/workflows/q3_typed_new_named_original_first.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  new_typed_original_first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch immutable PRIOR verified programs and grammar (not target gold)
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-typed-metagrammar-cross-domain-string-original-first
+          run-id: 42373106360
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: prior
+      - name: Freeze source and validate compiler and exact untouched target set
+        run: |
+          python -m py_compile research/q3/typed_domain_interface_postfirst.py research/q3/typed_new_named_sl_original_first.py
+          git hash-object research/q3/typed_domain_interface_postfirst.py
+          git hash-object research/q3/typed_new_named_sl_original_first.py
+          python - <<'PY'
+          import sys,json
+          sys.path.insert(0,'research/q3')
+          import typed_domain_interface_postfirst as q
+          import typed_new_named_sl_original_first as exp
+          import typed_cross_domain_meta_engine as old
+          assert len(exp.TARGET)==36
+          assert exp.TARGET[0]=="cell-contains-all-of-many-things.sl"
+          assert exp.TARGET[-1]=="get-last-name-from-name-with-comma.sl"
+          model=exp.frozen_policy()
+          assert len(model["verified_program_ids"])==5
+          assert len(model["learned_productions"])==2
+          original='''(set-logic SLIA)
+          (synth-fun f ((_arg_0 String)) Bool
+           ((Start Bool (true false (str.contains ntString ntString)))
+            (ntString String (_arg_0 "" "a"))))
+          (constraint (= (f "abc") true))
+          (constraint (= (f "xyz") false))
+          (constraint (= (f "aa") true))
+          (constraint (= (f "bc") false))
+          (check-synth)'''
+          task=q.decode_any(original)
+          assert task["output"]=="Bool" and len(task["examples"])==4
+          guess=q.search(task,task["examples"][:3],allow_branch=True)
+          assert guess["ast"] is not None,guess
+          assert q.score_any(guess["ast"],task["examples"][3:])["exact"]
+          failing='''(synth-fun f ((_arg_0 Int)) String ((Start String ("ok"))))
+          (constraint (= (f 1) "ok"))'''
+          try:q.decode_any(failing)
+          except ValueError:pass
+          else:raise AssertionError('UNSUPPORTED_INPUT_FAIL_OPEN')
+          print("FROZEN_TYPED_SCHEMA_PRETARGET_PASS",model["content_sha256"])
+          PY
+      - name: Run frozen source grammar against first 36 new named original tasks
+        run: python research/q3/typed_new_named_sl_original_first.py
+      - name: Upload full original first without editing results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-frozen-typed-interface-36-independent-named-original-first
+          path: Q3_TYPED_INDEPENDENT_NEW_NAMED_FIRST.json
+          if-no-files-found: warn
