@@ -1,0 +1,56 @@
+name: Q3 causal local-credit repair vs strong same-rights GP
+on:
+  pull_request:
+    paths:
+      - 'research/q3/local_credit_inverse_repair_postfirst.py'
+      - 'tests/test_q3_local_credit_inverse_repair_postfirst.py'
+      - '.github/workflows/q3_local_credit_inverse_postfirst.yml'
+permissions:
+  contents: read
+jobs:
+  q3-afterfirst-causal-repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Independent all-domain Z3
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq z3
+          z3 --version
+      - name: No solver oracle shortcuts, precise local credit
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q3/local_credit_inverse_repair_postfirst.py
+          python3 -m unittest \
+            tests/test_q3_full_semantic_gradient_repair.py \
+            tests/test_q3_local_credit_inverse_repair_postfirst.py -v
+      - name: Measure learned vs untrained vs full GP vs inverse GP
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_LOCAL_CREDIT_WALL_S=%e MAX_RSS_KB=%M' \
+           python3 -m research.q3.local_credit_inverse_repair_postfirst \
+           --out Q3-LOCAL-CREDIT-POSTFIRST
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('Q3-LOCAL-CREDIT-POSTFIRST/POSTFIRST_REPORT.json').read_text())
+          assert r['result_tasks']==2 and r['external_original_tasks']==0
+          assert r['frozen_orig_FIRST_run']==42325390566
+          assert r['frozen_86_grad_fix_run']==42326733253
+          assert r['same_inverse_operator_rights_for_strong_classical']
+          assert r['Q3']==r['Q4']==r['Q6']==r['Q7']=='OPEN'
+          print('CAUSAL_AFTERFIRST_RECORDED__NO_FALSE_Q3_Q4_Q6_PASS')
+          PY
+      - name: Immutable independent failure and proof receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-LOCAL-SEMANTIC-CREDIT-POSTFIRST
+          path: Q3-LOCAL-CREDIT-POSTFIRST/
+          retention-days: 90
+          if-no-files-found: warn
