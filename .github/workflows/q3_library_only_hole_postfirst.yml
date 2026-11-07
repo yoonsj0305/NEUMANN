@@ -1,0 +1,73 @@
+name: Q3 causal library-only hole transfer isolated
+on:
+  pull_request:
+    paths:
+      - 'research/q3/autonomous_operator_library_reuse.py'
+      - 'tests/test_q3_autonomous_operator_library_reuse.py'
+      - '.github/workflows/q3_library_only_hole_postfirst.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  q3-library-invention-transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Freeze prior first-run SOURCE candidate programs (different original IDs)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api -H 'Accept: application/vnd.github+json' \
+             /repos/yoonsj0305/NEUMANN/actions/artifacts/13558051217/zip \
+             > /tmp/q3-learned-original-law-first.zip
+          echo '6c9616b9f70e33675c0b4e7835bfecd5ad4c4e64030fda76d979379fe04488a3  /tmp/q3-learned-original-law-first.zip' | sha256sum -c -
+          unzip -p /tmp/q3-learned-original-law-first.zip FIRST.json \
+              > /tmp/q3-source-programs-first.json
+      - name: Official original bytes PINNED; only old project-opened data
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-library-arc
+          git -C /tmp/q3-library-arc init -q
+          git -C /tmp/q3-library-arc remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C /tmp/q3-library-arc fetch -q --depth 1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C /tmp/q3-library-arc checkout -q --detach FETCH_HEAD
+          test "$(git -C /tmp/q3-library-arc rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+      - name: General-purpose syntax abstraction and reusability regression
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q3/autonomous_operator_library_reuse.py
+          python3 -m unittest tests/test_q3_autonomous_operator_library_reuse.py -v
+      - name: No direct solver: frozen library holes drive original transfer
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_REUSABLE_FUNCTION_REAL_ORIGINAL_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.autonomous_operator_library_reuse \
+              --parent-first /tmp/q3-source-programs-first.json \
+              --arc-root /tmp/q3-library-arc \
+              --out Q3-GENERATED-REUSABLE-LIBRARY-POSTFIRST
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('Q3-GENERATED-REUSABLE-LIBRARY-POSTFIRST/FIRST_REPORT.json')
+          j=json.loads(p.read_text())
+          assert j['source_program_ids']==['281123b4','6a11f6da']
+          assert j['target_heldout_only_from_library_induction']=='cf98881b'
+          assert j['source_a_full_reconstruction'] and j['source_b_full_reconstruction']
+          assert j['full_library_frozen_before_target_training']
+          assert j['global_Q3']==j['global_Q4']==j['global_Q6']=='OPEN'
+          assert j['no_globally_new_public_eval_ids_consumed']
+          print('Q3_REUSABLE_FUNCTION_HOLE_ONLY_POSTFIRST__SOURCE_WITHHELD')
+          PY
+      - name: Preserve frozen invented library AND actual transfer first
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-LEARNED-LIBRARY-HOLE-ONLY-POSTFIRST
+          path: Q3-GENERATED-REUSABLE-LIBRARY-POSTFIRST/
+          if-no-files-found: warn
+          retention-days: 90
