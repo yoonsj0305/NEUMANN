@@ -32,7 +32,7 @@ from typing import Any
 
 from research.q3.induce_binary_algebra_original import (
     Decomposition, InventedJoin, enumerate_decompositions,
-    train_invention, predict_single, grid_ok,
+    subgrids, closure_relations, predict_single, grid_ok,
 )
 
 SOURCE_IDS=("281123b4","6a11f6da")
@@ -196,37 +196,116 @@ def invent_library_from_programs(a,b):
           (digest(a),digest(b))),left,right
 
 
-def infer_bindings_using_only_target_train(lib,target_train):
-    """Solve parameters for the already frozen library function.
+def semantic_interface_of_frozen_library(lib):
+    """Extract only what the *previously learned library function* permits.
 
-    NOTE: the constraint solver is classical. It does not invent the library
-    structure: only instantiates its typed free variables. This distinction
-    prevents rebranding trivial fitting as new reusable semantics.
+    The entire target inference is driven by the frozen program structure.
+    No previous full-task program synthesis solver is called; no new target
+    function template can be created on the fly. Unknown library syntax must
+    return an empty admissible hypothesis space, not a favorable fallback.
     """
+    body=lib.body
+    try:
+        if body[0]!="MapZipFold" or body[1][0]!="DivideIntoPanels":
+            return None
+        op=body[2]
+        if op[0]!="DefineOperator" or op[2][0]!="lambda":
+            return None
+        rule=op[2][2]
+        if rule[0]!="ChooseUniqueMaxUnder" or rule[1][0]!="Identity" \
+           or rule[2][0]!="LearnedStrictOrder":
+            return None
+        # The two original source ASTs agreed about the identity. It stays
+        # a frozen literal, never secretly re-learned by a direct solver.
+        identity=rule[1][1]
+        hole=rule[2][1]
+        if type(identity) is not int or not (
+            isinstance(hole,dict) and set(hole)=={"$param"} and
+            hole["$param"] in lib.parameters):
+            return None
+        if rule[3]!=["Vars","a","b"] or rule[4]!=["Unknown","ABSTAIN"]:
+            return None
+        return identity
+    except (IndexError,KeyError,TypeError,AttributeError):
+        return None
+
+
+def infer_binary_law_parameters_from_observations(train,decomposition,identity):
+    """Infer the UNKNOWN slot of a frozen invented operator from I/O equations.
+
+    This is NOT the old direct program synthesis path. A code interpreter
+    already told us via the reusable function that its free slot is a
+    strict ordering on same-cell operands. Training examples now constrain
+    only that slot's pairwise relation, never the function's operator kind,
+    workflow topology, identity or control flow.
+    """
+    edges=set()
+    used={identity}
+    competitive_observations=0
+    source_constraints=0
+    for row in train:
+        panels=subgrids(row["input"],decomposition)
+        target=row["output"]
+        if panels is None:return None
+        h=len(target);w=len(target[0])
+        if any(len(panel)!=h or len(panel[0])!=w for panel in panels):
+            return None
+        for y in range(h):
+            for x in range(w):
+                inputs={p[y][x] for p in panels if p[y][x]!=identity}
+                observed=target[y][x]
+                used.update(inputs)
+                if not inputs:
+                    if observed!=identity:return None
+                    continue
+                if observed not in inputs:return None
+                if len(inputs)>1:competitive_observations+=1
+                for loser in inputs-{observed}:
+                    edges.add((loser,observed))
+                    source_constraints+=1
+    # No trivial one-equation relabeling is called a new law.
+    if competitive_observations<2 or source_constraints<3 or \
+       len(edges)<2 or len(used)<4:
+        return None
+    try:
+        closure_relations(used,edges)
+    except Exception:
+        return None
+    op=InventedJoin(identity,tuple(sorted(edges)),tuple(sorted(used)))
+    if not op.all_laws_hold():return None
+    return op
+
+
+def infer_bindings_using_only_target_train(lib,target_train):
+    """Instantiate *only* the frozen new library's typed holes.
+
+    In particular, DO NOT call the original source program resolver:
+    it could solve the target independently, falsely making library reuse
+    appear causally necessary. This procedure cannot synthesize anything
+    unless a specific frozen reusable library describes the semantics.
+    """
+    identity=semantic_interface_of_frozen_library(lib)
+    if identity is None:return []
     candidates=[]
     for decomposition in enumerate_decompositions(target_train):
-        # Identity is sourced from the visible input only, and law edges
-        # from genuine observed target TRAIN behavior, not test output.
-        all_color=[v for pair in target_train for row in pair["input"] for v in row]
-        from collections import Counter
-        for identity,_ in Counter(all_color).most_common():
-            law=train_invention(target_train,decomposition,identity)
-            if law is None:continue
-            formal_ast=["MapZipFold",["DivideIntoPanels",
-                                     decomposition.axis,decomposition.panel,
-                                     decomposition.gutter,decomposition.count],
-                        law.to_ast()]
-            binding=bind_pattern(lib.body,formal_ast)
-            if binding is None:continue
-            if set(binding)!=set(lib.parameters):continue
-            if substitute(lib.body,binding)!=formal_ast:
-                raise RuntimeError("PARAMETER_BINDING_INVALID")
-            function=compile_as_executable(formal_ast)
-            if not all(function(row["input"])==row["output"]
-                       for row in target_train):
-                raise RuntimeError("FALSE_PROGRAM_TRAIN_FIT")
-            candidates.append((binding,formal_ast,function))
-    # Deduplicate the semantics without inspecting test gold.
+        learned_relation=infer_binary_law_parameters_from_observations(
+            target_train,decomposition,identity)
+        if learned_relation is None:continue
+        candidate_ast=["MapZipFold",
+             ["DivideIntoPanels",
+              decomposition.axis,decomposition.panel,
+              decomposition.gutter,decomposition.count],
+             learned_relation.to_ast()]
+        binding=bind_pattern(lib.body,candidate_ast)
+        if binding is None or set(binding)!=set(lib.parameters):
+            continue  # The new frozen library actually constrains programs.
+        if substitute(lib.body,binding)!=candidate_ast:
+            raise RuntimeError("PARAMETER_BINDING_INVALID")
+        function=compile_as_executable(candidate_ast)
+        if not all(function(row["input"])==row["output"]
+                   for row in target_train):
+            raise RuntimeError("FALSE_PROGRAM_TRAIN_FIT")
+        candidates.append((binding,candidate_ast,function))
     found={}
     for vals,ast,fn in candidates:
         found[digest(ast)]=(vals,ast,fn)
