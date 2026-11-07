@@ -1,0 +1,52 @@
+name: Q3 task-conditioned generative actor no-go and semantic-input tests
+on:
+  pull_request:
+    paths:
+      - 'research/q3/task_conditional_operator_generator.py'
+      - 'research/q3/generative_typed_operator_policy.py'
+      - 'tests/test_q3_task_conditional_operator_generator.py'
+      - '.github/workflows/q3_semantically_conditioned_generator.yml'
+permissions:
+  contents: read
+jobs:
+  actual-q3-input-repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Test old no-go and semantic-input repair without false Q3 success
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q3/generative_typed_operator_policy.py \
+             research/q3/task_conditional_operator_generator.py
+          python3 -m unittest \
+             tests/test_q3_generative_typed_operator_policy.py \
+             tests/test_q3_task_conditional_operator_generator.py -v
+      - name: Preserve independent first output of the no-go witness
+        run: |
+          set -euo pipefail
+          mkdir -p Q3-SEMANTIC-ACTOR-FIRST
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          from research.q3.task_conditional_operator_generator import certify_original_blindness_pair
+          evidence=certify_original_blindness_pair()
+          Path('Q3-SEMANTIC-ACTOR-FIRST/NO_GO_WITNESS.json').write_text(
+              json.dumps(evidence,sort_keys=True,indent=2)+'\n')
+          assert evidence['original_task_mutual_information_given_same_metadata']==0
+          assert evidence['original_identical_first_24_proposals']
+          assert evidence['conditional_semantic_feature_difference_max']>0
+          assert evidence['Q3']=='OPEN'
+          print('Q3_OLD_TASK_BLINDNESS_PROVED__NEW_SEMANTIC_INPUT_VERIFIED__Q3_OPEN')
+          PY
+      - name: Preserve receipts even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-TASK-CONDITIONING-NO-GO-FIRST
+          path: Q3-SEMANTIC-ACTOR-FIRST/
+          retention-days: 90
+          if-no-files-found: warn
