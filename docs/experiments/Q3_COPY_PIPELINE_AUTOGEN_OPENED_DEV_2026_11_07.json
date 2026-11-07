@@ -1,0 +1,40 @@
+{
+  "schema": "neumann.q3.typed-copy-pipeline-invariant-generator-opened-development-v1",
+  "date": "2026-11-07",
+  "status": "OPENED_DEVELOPMENT_ONLY",
+  "hypothesis": "Given only an unchanged linear Horn dependency graph, typed signature layout and a human-defined generic aligned-prefix relation grammar, a source-independent structural compiler can instantiate all stage interpretations for two previously opened external COPY originals and Z3 independently refutes every original Horn clause.",
+  "admissions": [
+    "No hardcoded original predicate names or hand-constructed per-stage assignments",
+    "All original Horn assertions remain untouched",
+    "Original already-opened COPY2/COPY3, not a blind holdout",
+    "Other algorithms could construct the same invariants; no unique neural ability",
+    "Stop on first fail; retain immutable first",
+    "Do not fetch reserved COPY4-COPY6 source bodies",
+    "All Q3 Q4 Q6 Q7 remain OPEN"
+  ],
+  "cases": [
+    {
+      "name": "copy2",
+      "repository": "chc-comp/chc-comp25-benchmarks",
+      "commit": "ddd279cab0717db6effe69baad451a8eb04ffd86",
+      "file": "quic3/data/standard_copy2_true-unreach-call_ground_000.smt2",
+      "git_blob": "30b3bab8834aa6f834cf493539180e6b92caf16f",
+      "bytes": 6318,
+      "assertions": 9
+    },
+    {
+      "name": "copy3",
+      "repository": "chc-comp/chc-comp25-benchmarks",
+      "commit": "ddd279cab0717db6effe69baad451a8eb04ffd86",
+      "file": "quic3/data/standard_copy3_true-unreach-call_ground_000.smt2",
+      "git_blob": "f8fd0b73c3aa45ee5f49426416a378bcfc462605",
+      "bytes": 8201,
+      "assertions": 11
+    }
+  ],
+  "outcome": "NOT_RUN",
+  "Q3": "OPEN",
+  "Q4": "OPEN",
+  "Q6": "OPEN",
+  "Q7": "OPEN"
+}
