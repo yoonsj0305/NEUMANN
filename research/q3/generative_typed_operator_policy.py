@@ -167,7 +167,8 @@ class Generator:
             choices = PRODUCTIONS[kind]
             allowed = [
                 i for i,(name,children) in enumerate(choices)
-                if ((not children) or depth < max_depth)
+                if all(depth + 1 + (1 if child_kind == "Bool" else 0) <= max_depth
+                       for child_kind in children)
                 and (name != "j" or scope)
             ]
             if not allowed:
