@@ -208,7 +208,12 @@ class Generator:
         for kind, allowed, probs, selected, f in events:
             for i, pr in zip(allowed, probs):
                 coefficient = ((1.0 if i == selected else 0.0) - pr)
-                for k in range(DIM):
+                # Model subclasses may supply semantic features beyond DIM=6.
+                # Silent truncation here previously froze all 80 task-specific
+                # observation coefficients in TaskConditionalGenerator.
+                if len(self.weights[kind][i]) != len(f):
+                    raise ValueError("LEARNED_FEATURE_DIMENSION_MISMATCH")
+                for k in range(len(f)):
                     self.weights[kind][i][k] += lr * advantage * coefficient * f[k]
         self.gradient_steps += 1
 

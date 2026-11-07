@@ -1,0 +1,52 @@
+name: Q3 strict after-FIRST semantic gradient bug repair
+on:
+  pull_request:
+    paths:
+      - 'research/q3/generative_typed_operator_policy.py'
+      - 'tests/test_q3_full_semantic_gradient_repair.py'
+      - '.github/workflows/q3_full_semantic_gradient_postfirst.yml'
+permissions:
+  contents: read
+jobs:
+  q3-gradient-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Independent all-domain Z3
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq z3
+          z3 --version
+      - name: Typed feature-dimension and reward regression tests
+        run: |
+          set -euo pipefail
+          python3 -m unittest \
+            tests/test_q3_generative_typed_operator_policy.py \
+            tests/test_q3_task_conditional_operator_generator.py \
+            tests/test_q3_full_semantic_gradient_repair.py -v
+      - name: Post-FIRST diagnostic ONLY, not a fresh heldout
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'POSTFIRST_GRADIENT_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.behavioral_proof_reward_first \
+              --out Q3-FULL-SEMANTIC-GRADIENT-POSTFIRST
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('Q3-FULL-SEMANTIC-GRADIENT-POSTFIRST/FIRST_REPORT.json').read_text())
+          assert r['test_tasks']==2 and r['source_free_development_only']
+          assert r['Q3']=='OPEN' and r['new_independent_external_originals']==0
+          print('GRADIENT_FIXED_POSTFIRST__RESULT_NOT_GLOBAL_Q3_PROOF')
+          PY
+      - name: Retain diagnostic independent of previous frozen FIRST
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-FULL-SEMANTIC-GRADIENT-POSTFIRST
+          path: Q3-FULL-SEMANTIC-GRADIENT-POSTFIRST/
+          retention-days: 90
+          if-no-files-found: warn
