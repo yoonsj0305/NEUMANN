@@ -1,0 +1,89 @@
+name: Q3 GP Suite 29-family bounded stream POST-FIRST source-frozen infrastructure audit
+on:
+  pull_request:
+    paths:
+      - 'research/q3/gp_suite_streaming_postfirst.py'
+      - '.github/workflows/q3_gp_suite_streaming_postfirst.yml'
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  postfirst-complete-29-families:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Verify identical old source code, no domain retuning
+        run: |
+          set -euo pipefail
+          test "$(git hash-object research/q3/connected_constructor_router.py)" = 616aae13f35304fd2572dd5a666499984566b7e6
+          test "$(git hash-object research/q3/gp_suite_connected_router_original_first.py)" = c26e8cb7705fecf53ce5d61deba67103eb0f60aa
+          test "$(git hash-object research/q3/discover_index_relation_constructor.py)" = ddfe23f374e84914b239476b4fbdfdfa96807579
+          test "$(git hash-object research/q3/typed_semantic_delta_inventor.py)" = 01862093cf68c0a3425002a01fa8f83967bbcd23
+          test "$(git hash-object research/q3/universal_typed_state_fold_postfirst.py)" = 20ed922ffe2c44878f1a2769915cb62731a0631b
+          python3 -m py_compile research/q3/gp_suite_streaming_postfirst.py
+          python3 -m unittest tests/test_q3_connected_constructor_router.py -v
+      - name: Retrieve ORIGINAL first full source metadata and memory from immutable Actions artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-original-first /tmp/q3-previous-memory
+          gh run download 42365072610 \
+            --repo yoonsj0305/NEUMANN \
+            -n NEUMANN-Q3-CONNECTED-GP-SUITE-ORIGINAL-FIRST \
+            -D /tmp/q3-original-first
+          gh run download 42363017165 \
+            --repo yoonsj0305/NEUMANN \
+            -n NEUMANN-Q3-SELF-INVENTED-COORDINATE-RELATION-POSTFIRST \
+            -D /tmp/q3-previous-memory
+          test -s /tmp/q3-original-first/RESULTS/FIRST.json
+          test -s /tmp/q3-original-first/ORIGINAL_FILE_INVENTORY.json
+          test -s /tmp/q3-original-first/GP_SOURCE_GIT_SHA.txt
+          test -s /tmp/q3-previous-memory/RESULTS/POSTFIRST.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/q3-original-first/RESULTS/FIRST.json').read_text())
+          assert r['summary']['all_source_family_directories']==29
+          assert r['summary']['eligible_full_32_holdout_families']==13
+          assert r['summary']['memory_full_original_exact_families']==2
+          assert r['summary']['memory_additional_full_exact_families']==0
+          print('IMMUTABLE_29_FAMILY_FIRST_RETAINED_AS_13_ELIGIBLE_2_EXACT_ZERO_MEMORY')
+          PY
+      - name: Bounded gzip stream for all 29 originals, SAME frozen solver/evaluator
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-gp-all-families-data
+          /usr/bin/time -f 'Q3_GP_POSTFIRST_ALL_SOURCE_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.gp_suite_streaming_postfirst \
+              --first-artifact /tmp/q3-original-first \
+              --prior-memory /tmp/q3-previous-memory/RESULTS/POSTFIRST.json \
+              --dataset /tmp/q3-gp-all-families-data \
+              --out Q3-GP-STREAMING-POSTFIRST
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          root=Path('Q3-GP-STREAMING-POSTFIRST')
+          r=json.loads((root/'POSTFIRST_DIAGNOSIS.json').read_text())
+          assert r['original_first_run']==42365072610
+          assert r['evaluation_postfirst_not_independent_original']
+          assert r['same_frozen_existing_evaluator_and_inventor']
+          assert r['acquisition']['original_original_family_count']==29
+          assert r['acquisition']['original_first_downloaded']==17
+          assert r['postfirst_extended_coverage']['all_source_family_directories']==29
+          assert r['Q3_GLOBAL']==r['Q4_GLOBAL']==r['Q6_GLOBAL']=='OPEN'
+          print('GP_POSTFIRST_COVERAGE_AND_MEMORY_CAUSAL_AUDIT_RECORDED',r['postfirst_extended_coverage'])
+          PY
+      - name: Archive exact old-first comparisons and new post-first complete coverage failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-GP-ALL29-STREAMED-POSTFIRST-COVERAGE
+          path: Q3-GP-STREAMING-POSTFIRST/
+          if-no-files-found: warn
+          retention-days: 90
