@@ -26,7 +26,7 @@ class ReflectiveConstructorTests(unittest.TestCase):
         self.assertEqual(learned["constructor_program"]["hole_count"],1)
         self.assertEqual(len(learned["source_programs"]),2)
         self.assertEqual(learned["constructor_program"]["parameter_binder"][0],"minus")
-        self.assertTrue(all(any(q["source_consistency"]) for q in audit
+        self.assertTrue(any(all(q["source_consistency"]) for q in audit
                                 if q["binder"][0]=="minus"))
         self.assertNotIn("a!b",canonical(learned))
 
