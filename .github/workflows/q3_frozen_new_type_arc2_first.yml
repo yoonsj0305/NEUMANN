@@ -1,0 +1,76 @@
+name: Q3 NEW invented semantic operator FROZEN transfer to ARC-AGI-2 source-originals
+on:
+  pull_request:
+    paths:
+      - 'research/q3/frozen_invented_type_transfer_arc2_new_originals.py'
+      - 'tests/test_q3_frozen_invented_type_transfer_arc2.py'
+      - '.github/workflows/q3_frozen_new_type_arc2_first.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  q3-frozen-type-arc2-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Read-only original FIRST frozen new operator TYPE, no model training
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api -H 'Accept: application/vnd.github+json' \
+            /repos/yoonsj0305/NEUMANN/actions/artifacts/13559894156/zip \
+            > /tmp/q3-invented-type-first-arc1.zip
+          echo 'f2bb8dcbaaa6395e9410e82e033e2547f4c109012011bed976eaf2aac823d707  /tmp/q3-invented-type-first-arc1.zip' | sha256sum -c -
+          unzip -p /tmp/q3-invented-type-first-arc1.zip FIRST.json \
+            > /tmp/q3-frozen-type-original-first.json
+      - name: Upstream 1 and 2 both pinned exact Git SHA, no EVAL originals
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-arc1-pin /tmp/q3-arc2-pin
+          git -C /tmp/q3-arc1-pin init -q
+          git -C /tmp/q3-arc1-pin remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C /tmp/q3-arc1-pin fetch -q --depth 1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C /tmp/q3-arc1-pin checkout -q --detach FETCH_HEAD
+          test "$(git -C /tmp/q3-arc1-pin rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C /tmp/q3-arc2-pin init -q
+          git -C /tmp/q3-arc2-pin remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/q3-arc2-pin fetch -q --depth 1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/q3-arc2-pin checkout -q --detach FETCH_HEAD
+          test "$(git -C /tmp/q3-arc2-pin rev-parse HEAD)" = f3283f727488ad98fe575ea6a5ac981e4a188e49
+      - name: Frozen type tampering and byte-bound proof-of-source
+        run: |
+          set -euo pipefail
+          python3 -m unittest tests/test_q3_frozen_invented_type_transfer_arc2.py -v
+      - name: REAL external frozen-first across 600 new ARC-AGI-2 TRAIN originals
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_FROZEN_ARC2_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.frozen_invented_type_transfer_arc2_new_originals \
+              --frozen-first /tmp/q3-frozen-type-original-first.json \
+              --arc1-root /tmp/q3-arc1-pin \
+              --arc2-root /tmp/q3-arc2-pin \
+              --out Q3-FROZEN-NEW-OPERATOR-ARC2-FIRST
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          r=json.loads(Path('Q3-FROZEN-NEW-OPERATOR-ARC2-FIRST/FIRST.json').read_text())
+          assert r['new_operator_semantics_never_refit']
+          assert r['new_cases_from_arcagi2_training_only']
+          assert r['full_original_cohort_statistics']['new_original_cases']==600
+          assert r['reserved_EVAL_originals_consumed']==0
+          assert r['Q3_GLOBAL']==r['Q4']==r['Q6']=='OPEN'
+          print('Q3_NEW_OPERATOR_ARC2_FROZEN_EXTERNAL_FIRST_COMPLETE')
+          PY
+      - name: Archive exact frozen type and all external-source results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-FROZEN-INVENTED-OPERATOR-ARC2-NEW-ORIGINAL-FIRST
+          path: Q3-FROZEN-NEW-OPERATOR-ARC2-FIRST/
+          retention-days: 90
+          if-no-files-found: warn
