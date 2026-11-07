@@ -1,4 +1,4 @@
-name: Q3 newly self-defined reusable operator library FIRST
+name: Q3 library-only hole inference causal POSTFIRST
 on:
   pull_request:
     paths:
@@ -42,18 +42,18 @@ jobs:
           set -euo pipefail
           python3 -m py_compile research/q3/autonomous_operator_library_reuse.py
           python3 -m unittest tests/test_q3_autonomous_operator_library_reuse.py -v
-      - name: ACTUAL source-withheld original transfer with generated library function
+      - name: No direct solver: frozen library holes drive original transfer
         run: |
           set -euo pipefail
           /usr/bin/time -f 'Q3_REUSABLE_FUNCTION_REAL_ORIGINAL_WALL_S=%e MAX_RSS_KB=%M' \
             python3 -m research.q3.autonomous_operator_library_reuse \
               --parent-first /tmp/q3-source-programs-first.json \
               --arc-root /tmp/q3-library-arc \
-              --out Q3-GENERATED-REUSABLE-LIBRARY-FIRST
+              --out Q3-GENERATED-REUSABLE-LIBRARY-POSTFIRST
           python3 - <<'PY'
           import json
           from pathlib import Path
-          p=Path('Q3-GENERATED-REUSABLE-LIBRARY-FIRST/FIRST_REPORT.json')
+          p=Path('Q3-GENERATED-REUSABLE-LIBRARY-POSTFIRST/FIRST_REPORT.json')
           j=json.loads(p.read_text())
           assert j['source_program_ids']==['281123b4','6a11f6da']
           assert j['target_heldout_only_from_library_induction']=='cf98881b'
@@ -61,13 +61,13 @@ jobs:
           assert j['full_library_frozen_before_target_training']
           assert j['global_Q3']==j['global_Q4']==j['global_Q6']=='OPEN'
           assert j['no_globally_new_public_eval_ids_consumed']
-          print('Q3_REUSABLE_FUNCTION_FIRST__SOURCE_WITHHELD_ORIGINAL_EVIDENCE')
+          print('Q3_REUSABLE_FUNCTION_HOLE_ONLY_POSTFIRST__SOURCE_WITHHELD')
           PY
       - name: Preserve frozen invented library AND actual transfer first
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: NEUMANN-Q3-LEARNED-LIBRARY-AUTONOMOUS-REUSE-FIRST
-          path: Q3-GENERATED-REUSABLE-LIBRARY-FIRST/
+          name: NEUMANN-Q3-LEARNED-LIBRARY-HOLE-ONLY-POSTFIRST
+          path: Q3-GENERATED-REUSABLE-LIBRARY-POSTFIRST/
           if-no-files-found: warn
           retention-days: 90
