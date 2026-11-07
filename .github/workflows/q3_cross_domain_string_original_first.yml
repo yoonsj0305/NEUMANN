@@ -1,0 +1,71 @@
+name: Q3 Cross-Domain Learned Metagrammar Fresh String Originals
+
+on:
+  push:
+    branches:
+      - research/q3-cross-domain-metagrammar-string-original-20261107
+    paths:
+      - research/q3/typed_cross_domain_meta_engine.py
+      - research/q3/cross_domain_string_original_first.py
+      - .github/workflows/q3_cross_domain_string_original_first.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source_then_unopened_targets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: First frozen source and blind target contract
+        run: |
+          python -m py_compile research/q3/typed_cross_domain_meta_engine.py research/q3/cross_domain_string_original_first.py
+          git hash-object research/q3/typed_cross_domain_meta_engine.py
+          git hash-object research/q3/cross_domain_string_original_first.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,"research/q3")
+          import typed_cross_domain_meta_engine as q
+          import cross_domain_string_original_first as exp
+          assert len(exp.TARGET)==24 and len(exp.SOURCE)==31
+          assert set(exp.TARGET).isdisjoint(exp.SOURCE)
+          assert exp.UPSTREAM=="13c8deb68a873635879c9a69bc78caebd340f646"
+          source='''(set-logic SLIA)
+          (synth-fun f ((name String)) String
+           ((Start String (ntString))
+            (ntString String (name " " (str.substr ntString ntInt ntInt)))
+            (ntInt Int (0 1 (+ ntInt ntInt) (str.len ntString) (str.indexof ntString ntString ntInt)))))
+          (constraint (= (f "Nancy FreeHafer") "Nancy"))
+          (constraint (= (f "Andrew Cencici") "Andrew"))
+          (constraint (= (f "Jan Kotas") "Jan"))
+          (constraint (= (f "Mariya Sergienko") "Mariya"))
+          (check-synth)'''
+          task=q.decode_original(source)
+          assert task["nargs"]==1
+          assert len(task["examples"])==4
+          train=task["examples"][:3]
+          program=q.expression_search(task,train)
+          assert program["ast"] is not None,program
+          assert q.score(program["ast"],task["examples"][3:])["exact"]
+          a=["substr",["arg",0],["num",0],["index",["arg",0],["lit"," "],["num",0]]]
+          b=["substr",["arg",0],["num",0],["index",["arg",0],["lit","."],["num",0]]]
+          templates=q.learn_templates([("alpha",a),("beta",b)])
+          assert len(templates)==1 and templates[0]["holes"]==1,templates
+          assert q.grammar_compatible(a,task)
+          assert not q.grammar_compatible(b,task)
+          assert q.score(None,task["examples"])["submitted"] is False
+          print("TYPE_SAFE_PRETARGET_PASS")
+          PY
+      - name: Induce constructor from source originals and freeze before new target downloads
+        run: python research/q3/cross_domain_string_original_first.py
+      - name: Archive frozen learned method and complete original target ledger
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-typed-metagrammar-cross-domain-string-original-first
+          path: |
+            Q3_SOURCE_ONLY_TYPED_META_GRAMMAR_FROZEN.json
+            Q3_CROSS_DOMAIN_STRING_UNOPENED_FIRST.json
+          if-no-files-found: warn
