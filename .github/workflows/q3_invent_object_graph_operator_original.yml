@@ -1,0 +1,63 @@
+name: Q3 failure-triggered new OBJECT GRAPH operator original source FIRST
+on:
+  pull_request:
+    paths:
+      - 'research/q3/invent_object_graph_coordinate_operator.py'
+      - 'tests/test_q3_invent_object_graph_coordinate_operator.py'
+      - '.github/workflows/q3_invent_object_graph_operator_original.yml'
+permissions:
+  contents: read
+jobs:
+  q3-new-object-semantics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Exact official ARC1 and ARC2 source-pin, no EVAL problems loaded
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-object-arc1 /tmp/q3-object-arc2
+          git -C /tmp/q3-object-arc1 init -q
+          git -C /tmp/q3-object-arc1 remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C /tmp/q3-object-arc1 fetch -q --depth 1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C /tmp/q3-object-arc1 checkout -q --detach FETCH_HEAD
+          test "$(git -C /tmp/q3-object-arc1 rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C /tmp/q3-object-arc2 init -q
+          git -C /tmp/q3-object-arc2 remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/q3-object-arc2 fetch -q --depth 1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/q3-object-arc2 checkout -q --detach FETCH_HEAD
+          test "$(git -C /tmp/q3-object-arc2 rev-parse HEAD)" = f3283f727488ad98fe575ea6a5ac981e4a188e49
+      - name: Causal novel graph-type inference and actual executable rules
+        run: |
+          set -euo pipefail
+          python3 -m unittest tests/test_q3_invent_object_graph_coordinate_operator.py -v
+      - name: Real source-distinct ARC2 233 first operator invention with train ONLY
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_GRAPH_FIRST_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.invent_object_graph_coordinate_operator \
+              --arc1-root /tmp/q3-object-arc1 \
+              --arc2-root /tmp/q3-object-arc2 \
+              --out Q3-OBJECT-GRAPH-INVENTION-ARC2-FIRST
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          r=json.loads(Path('Q3-OBJECT-GRAPH-INVENTION-ARC2-FIRST/FIRST.json').read_text())
+          assert r['stats']['source_distinct_originals']==233
+          assert r['ARC2_PIN']=='f3283f727488ad98fe575ea6a5ac981e4a188e49'
+          assert r['train_only_graph_semantics_inferred']
+          assert r['reserved_public_EVAL_ids_consumed']==0
+          assert r['Q3_GLOBAL']==r['Q4']==r['Q6']=='OPEN'
+          print('Q3_GRAPH_PRIMITIVE_ACTUAL_ORIGINAL_FIRST_FINISHED__GLOBAL_Q3_OPEN')
+          PY
+      - name: Preserve ALL original outcomes and generated semantics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-GRAPH-COORDINATE-INVENTION-ARC2-FIRST
+          path: Q3-OBJECT-GRAPH-INVENTION-ARC2-FIRST/
+          retention-days: 90
+          if-no-files-found: warn
