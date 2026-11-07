@@ -164,29 +164,69 @@ def weighted_gini(labels):
 
 
 def best_split(X,Y,indices,features):
-    # Searches split values only on observed TRAIN, no target code and no
-    # memorized original task ID. Model policy proposes features.
-    base=weighted_gini(Y[i] for i in indices)
-    if base<=1e-12:return None
+    """One sort per proposed predicate, linear histogram scan.
+
+    Both threshold and the chosen predicate are inferred from real
+    input/output examples. No named target operator or ARC task switch.
+    """
+    n=len(indices)
+    if n<3:return None
+    classes=set(Y[i] for i in indices)
+    if len(classes)==1:return None
+    def wt(k):return 1. if k==KEEP else 6.
+    total=Counter(Y[i] for i in indices)
+    totalweight=sum(wt(k)*v for k,v in total.items())
+    if totalweight<=0:return None
+    total_sq=sum((wt(k)*v)**2 for k,v in total.items())
+    base=1-total_sq/(totalweight*totalweight)
     best=None
     for fi in features:
-        uniques=sorted(set(X[i][fi] for i in indices))
-        if len(uniques)<2:continue
-        if len(uniques)>18:
-            step=(len(uniques)-1)/17
-            positions=sorted({min(len(uniques)-2,round(j*step)) for j in range(17)})
-        else:positions=range(len(uniques)-1)
-        for j in positions:
-            thresh=(uniques[j]+uniques[j+1])/2
-            lo=[i for i in indices if X[i][fi]<=thresh]
-            if not lo or len(lo)==len(indices):continue
-            hi=[i for i in indices if X[i][fi]>thresh]
-            n=len(indices)
-            score=base-(len(lo)/n*weighted_gini(Y[i] for i in lo)
-                  +len(hi)/n*weighted_gini(Y[i] for i in hi))
+        ordered=sorted((X[i][fi],Y[i]) for i in indices)
+        vals=[]
+        last=None
+        for value,k in ordered:
+            if value!=last:
+                vals.append(value);last=value
+        if len(vals)<2:continue
+        # Up to 17 possible thresholds; never choose from hidden test.
+        if len(vals)>18:
+            step=(len(vals)-1)/17
+            split_values={vals[min(len(vals)-2,round(j*step))]
+                          for j in range(17)}
+        else:split_values=set(vals[:-1])
+        left=Counter()
+        left_count=0
+        left_weight=0.
+        left_sq=0.
+        pos=0
+        for value in vals[:-1]:
+            while pos<n and ordered[pos][0]<=value:
+                label=ordered[pos][1]
+                before=left[label]
+                left[label]+=1
+                ww=wt(label)
+                left_sq+=(2*before+1)*ww*ww
+                left_weight+=ww
+                left_count+=1
+                pos+=1
+            if value not in split_values or pos==0 or pos==n:continue
+            rw=totalweight-left_weight
+            right_sq=0.
+            for label,count in total.items():
+                right_sq+=(wt(label)*(count-left[label]))**2
+            score=base-(left_count/n*(1-left_sq/(left_weight*left_weight))
+                         +(n-left_count)/n*(1-right_sq/(rw*rw)))
             if best is None or score>best[0]:
-                best=(score,fi,thresh,lo,hi)
-    return best if best is not None and best[0]>1e-7 else None
+                # Find exact midpoint to next distinct observed value
+                nxt=ordered[pos][0]
+                threshold=(value+nxt)/2
+                best=(score,fi,threshold)
+    if best is None or best[0]<=1e-7:return None
+    gain,fi,threshold=best
+    lo=[i for i in indices if X[i][fi]<=threshold]
+    hi=[i for i in indices if X[i][fi]>threshold]
+    if not lo or not hi:return None
+    return (gain,fi,threshold,lo,hi)
 
 
 class LearnedSplitPolicy:
