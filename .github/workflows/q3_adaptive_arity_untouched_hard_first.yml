@@ -1,0 +1,42 @@
+name: Q3 Frozen Self-Expanding Arity 3rd Original FIRST
+
+on:
+  push:
+    branches:
+      - research/q3-unseen-sygus-hard-metaprogram-20261107
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  q3_adaptive_arity_first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Freeze new method before seeing original outputs
+        run: |
+          python -m py_compile research/q3/hard_original_unopened_method_gate.py research/q3/hard_unseen_adaptive_arity_gate.py
+          git hash-object research/q3/hard_unseen_adaptive_arity_gate.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'research/q3')
+          import hard_unseen_adaptive_arity_gate as m
+          assert len(m.COHORT)==24
+          assert m.COHORT[0]=='PRE_148_10' and m.COHORT[-1]=='PRE_171_10'
+          assert m.MAX_ARITY==3
+          # Program must respond to all 3-bit truth-table combinations.
+          p={'arity':3,'offsets':[0,1,2],'boundary_bits':[0,0,0],
+             'truth_table':[0,1,1,0,1,0,0,1]}
+          assert m.bit_eval(p,[0]*64)==[0]*64
+          PY
+      - name: Run untouched independent 64-bit originals
+        run: python research/q3/hard_unseen_adaptive_arity_gate.py
+      - name: Upload immutable complete first evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-adaptive-arity-unseen-64bit-original-first
+          path: Q3_ADAPTIVE_ARITY_EXTERNAL_FIRST.json
+          if-no-files-found: warn
