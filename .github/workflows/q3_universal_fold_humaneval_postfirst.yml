@@ -1,0 +1,63 @@
+name: Q3 generic typed state fold on exposed HumanEval POST-FIRST audit
+on:
+  pull_request:
+    paths:
+      - 'research/q3/universal_typed_state_fold_postfirst.py'
+      - 'research/q3/universal_fold_humaneval_postfirst_audit.py'
+      - 'tests/test_q3_universal_typed_state_fold_postfirst.py'
+      - '.github/workflows/q3_universal_fold_humaneval_postfirst.yml'
+permissions:
+  contents: read
+jobs:
+  one-generic-state-loop-multiple-output-types:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Tests before any external target exposure
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q3/universal_typed_state_fold_postfirst.py
+          python3 -m py_compile research/q3/universal_fold_humaneval_postfirst_audit.py
+          python3 -m unittest tests/test_q3_universal_typed_state_fold_postfirst.py -v
+          mkdir -p Q3-GENERIC-STATE-TYPE-CHANGE-POSTFIRST
+          git hash-object research/q3/universal_typed_state_fold_postfirst.py \
+            > Q3-GENERIC-STATE-TYPE-CHANGE-POSTFIRST/INVENTOR_SOURCE_BLOB.txt
+      - name: Download exact SAME HumanEval original corpus already accessed in #715
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --silent --show-error \
+            "https://raw.githubusercontent.com/openai/human-eval/b9453e8f1865df0a0057a1383767caa400acfbcf/data/HumanEval.jsonl.gz" \
+            -o /tmp/q3-postfirst-human-eval.gz
+          test "$(sha256sum /tmp/q3-postfirst-human-eval.gz | awk '{print $1}')" = b796127e635a67f93fb35c04f4cb03cf06f38c8072ee7cee8833d7bee06979ef
+      - name: Post-first expanded type interface; never masquerade as new blind evaluation
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_GENERIC_FOLD_POSTFIRST_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.universal_fold_humaneval_postfirst_audit \
+              --humaneval /tmp/q3-postfirst-human-eval.gz \
+              --out Q3-GENERIC-STATE-TYPE-CHANGE-POSTFIRST/RESULTS \
+              --budget 5000
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          r=json.loads(Path('Q3-GENERIC-STATE-TYPE-CHANGE-POSTFIRST/RESULTS/POSTFIRST.json').read_text())
+          assert len(r['rows'])==164
+          assert r['summary']['original_HumanEval_program_tasks']==164
+          assert r['summary']['same_author_originals_previously_exposed']
+          assert r['summary']['experimental_not_original_FIRST']
+          assert r['postfirst_DEVELOPMENT_ONLY']
+          assert r['global_Q3']==r['global_Q4']==r['global_Q6']=='OPEN'
+          print('POSTFIRST_TYPE_GENERALIZATION_RECORDED_NOT_GLOBAL_Q3_PROOF')
+          PY
+      - name: Preserve entire task denominator, generated ASTs, failures, resource costs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-TYPE-RELAXED-EXPOSED-HUMANEVAL-POSTFIRST
+          path: Q3-GENERIC-STATE-TYPE-CHANGE-POSTFIRST/
+          if-no-files-found: warn
+          retention-days: 90
