@@ -129,15 +129,6 @@ def acquire_first_pinned_inventory(first_artifact:Path,
     return source_report
 
 
-def run(first_artifact:Path,prior_memory:Path,dataset:Path,out:Path):
-    info=acquire_first_pinned_inventory(first_artifact,dataset,out)
-    existing_frozen_evaluator(
-        dataset,out/"SOURCE_UNCHANGED_INTERNAL",
-        prior_memory,out/"SOURCE_UNCHANGED_INTERNAL_RESULTS",
-    )
-    return info
-
-
 if __name__=="__main__":
     p=argparse.ArgumentParser()
     p.add_argument("--first-artifact",required=True,type=Path)
