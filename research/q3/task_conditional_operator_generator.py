@@ -52,6 +52,62 @@ def tokens_from_public_rhs(rhs:str)->tuple[str,...]:
     return items
 
 
+HASHED_STRUCTURAL_DIM=64
+
+def public_rhs_tree(rhs:str):
+    """Parse *ordered* observed transition tree, preserving operand roles.
+
+    Bag of tokens alone confuses (sub src 1) with (sub 1 src), exactly the
+    kind of semantic information collision that broke Q3 before. This tree
+    representation is NOT a target solution or supervisor.
+    """
+    toks=tokens_from_public_rhs(rhs)
+    stack=[]
+    root=[]
+    for token in toks:
+        if token=="(":
+            new=[]
+            if stack: stack[-1].append(new)
+            else: root.append(new)
+            stack.append(new)
+        elif token==")":
+            if not stack: raise ValueError("UNMATCHED_RPAREN")
+            stack.pop()
+        else:
+            if stack:stack[-1].append(token)
+            else:root.append(token)
+    if stack or len(root)!=1:
+        raise ValueError("NOT_ONE_PUBLIC_TRANSITION_EXPRESSION")
+    def validate(node):
+        if isinstance(node,str):return
+        if not node or not isinstance(node[0],str):
+            raise ValueError("MALFORMED_PUBLIC_TRANSITION_TREE")
+        ops={"+","-","*","select","store","ite"}
+        if node[0] not in ops:
+            raise ValueError("UNSUPPORTED_PUBLIC_TRANSITION_OPERATOR")
+        arity={"+":2,"-":2,"*":2,"select":2,"store":3,"ite":3}
+        if len(node)!=arity[node[0]]+1:
+            raise ValueError("INVALID_PUBLIC_TRANSITION_ARITY")
+        for child in node[1:]:validate(child)
+    validate(root[0])
+    return root[0]
+
+
+def hashed_tree_features(tree)->tuple[float,...]:
+    """Fixed-width structural paths, not unordered bag. SHA256 stable across hosts."""
+    acc=[0.]*HASHED_STRUCTURAL_DIM
+    def walk(node,ancestor=()):
+        head=node if isinstance(node,str) else node[0]
+        path=("/".join(ancestor)+"|"+head).encode("utf-8")
+        d=hashlib.sha256(path).digest()
+        acc[int.from_bytes(d[:4],"big")%HASHED_STRUCTURAL_DIM]+=1.
+        if not isinstance(node,str):
+            for i,ch in enumerate(node[1:]):
+                walk(ch,ancestor+((head+"["+str(i)+"]"),))
+    walk(tree)
+    return tuple(min(1.0,x/4.0) for x in acc)
+
+
 @dataclass(frozen=True)
 class ObservedProblem:
     transition_rhs: str
@@ -72,7 +128,8 @@ class ObservedProblem:
 
     def vector(self)->tuple[float,...]:
         tokens=tokens_from_public_rhs(self.transition_rhs)
-        return tuple(min(1.,tokens.count(tok)/4.) for tok in TOKENS)
+        lexical=tuple(min(1.,tokens.count(tok)/4.) for tok in TOKENS)
+        return lexical + hashed_tree_features(public_rhs_tree(self.transition_rhs))
 
 
 class TaskConditionalGenerator(Generator):
@@ -82,7 +139,7 @@ class TaskConditionalGenerator(Generator):
         super().__init__(seed=seed)
         self.observation:ObservedProblem|None=None
         self.weights={
-           kind:[[self.rng.gauss(0,0.02) for _ in range(6+len(TOKENS))]
+           kind:[[self.rng.gauss(0,0.02) for _ in range(6+len(TOKENS)+HASHED_STRUCTURAL_DIM)]
                 for _ in productions]
            for kind, productions in PRODUCTIONS.items()
         }
@@ -126,7 +183,7 @@ def certify_original_blindness_pair():
     that task-blind random search can never find a candidate by chance.
     """
     a=ObservedProblem("(select src cursor)",True,0)
-    b=ObservedProblem("(+ (select src cursor) 1)",True,0)
+    b=ObservedProblem("(- (select src cursor) 1)",True,0)
     old_a=Generator(seed=61)
     old_b=Generator(seed=61)
     original_a=[old_a.sample(collision=True,failed_proofs=0,
