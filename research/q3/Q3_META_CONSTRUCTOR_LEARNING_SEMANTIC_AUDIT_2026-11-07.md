@@ -27,6 +27,14 @@ Instead of calling a new literal an invention, test whether a generated **progra
 - #593 generated `remove if c == '0'`, passed one original test but is **NOT correct** for the reference `re.sub(r'\.[0]*','.',ip)`: on `10.01`, generated `1.1`, reference `10.1`. This is a false positive and is preserved as FAIL.
 - [Independent POST-FIRST proof #42354597895](https://github.com/yoonsj0305/NEUMANN/actions/runs/42354597895) [proof artifact #13566977208](https://github.com/yoonsj0305/NEUMANN/actions/runs/42354597895/artifacts/13566977208): exact original generated ASTs loaded from frozen #714 action artifact, Z3 integer equivalence both UNSAT for counterexample, full Unicode category exhaustive check 0 mismatches, expected #593 counterexample confirmed.
 
+## C. Exact matched memory causality, separate post-FIRST run
+
+- [Actual matching vocabulary ablation #42354886619](https://github.com/yoonsj0305/NEUMANN/actions/runs/42354886619), [full artifact #13567365743](https://github.com/yoonsj0305/NEUMANN/actions/runs/42354886619/artifacts/13567365743). This is explicitly POST-FIRST on exposed original tasks, not a new independent external test.
+- The cold arm receives the **EXACT same human-coded typed predicate search grammar and primitive generic fold**, but no previously source-learned constructor AST or source-memory entry. All other I/O, source-training split, predicate candidate rank and original heldout are identical.
+- Official MBPP task IDs 511..974: 163 source original IDs, 21 supported. With memory **4/21 exact**; same grammar without memory **4/21 exact**; **memory-specific accuracy lift 0/21**. Exactly **21/21 generated predicate expressions identical** in both arms. Cold feature search used 27 candidate checks and its evaluation recorded 3.2585 ms for the 163 source tasks, excluding dataset download and integration overhead. No 10x end-to-end cost claim.
+- Therefore +2 successes versus the older literal-only strong filter are **causally attributable to access to a human-programmed wider feature grammar**, not to an experimentally proven autonomous improvement of the generator's discovery policy. A real Q3 learning-to-learn PASS must survive this stronger matched ablation. This is currently **FAIL/NOT DEMONSTRATED**.
+
+---
 ## Scientific causal attribution and limits
 
 1. Source-learned constructor AST generation: **SCOPED PASS**. New executable meta-program actually created automatically from two prior verified programs. But its human-coded source adapter, fold core, anti-unifier and set-expression binder grammar are preinstalled. The source examples are from a known human-coded filter hypothesis family.
