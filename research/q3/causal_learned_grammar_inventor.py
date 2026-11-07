@@ -148,13 +148,20 @@ def learn_production(source_programs):
     programs=[source_lowering(s["program"]) for s in source_programs]
     holes={}
     grammar=antiunify(programs[0],programs[1],holes)
-    if len(holes)!=1 or not (
-        grammar[:2]==["fold","keep_if_false"] and
-        grammar[2][0]=="eq" and
-        grammar[2][1][0]=="mod" and
-        grammar[2][2]==["hole",0]):
-        # Refuse to claim useful generalized source grammar if sources
-        # disagree on more than one independent role.
+    def structural_ops(x):
+        if not isinstance(x,list):return []
+        found=[x[0]] if x and x[0] in ("eq","mod","lt","not","character") else []
+        for v in x[1:]:
+            found+=structural_ops(v)
+        return found
+    if (len(holes)!=1 or not isinstance(grammar,list) or
+        grammar[:2]!=["fold","keep_if_false"] or
+        grammar[2]==["hole",0] or
+        len(structural_ops(grammar[2]))<2):
+        # General scientific novelty gate: the entire predicate cannot
+        # be a single blank hole. At least TWO compositional operators
+        # must remain from the paired learned programs. No named target
+        # predicate class or k=2 code in the grammar-induction rule.
         raise ValueError("NO_USEFUL_SOURCE_ABSTRACTION")
     learned={
         "type":"DefineNewGrammarProduction",
