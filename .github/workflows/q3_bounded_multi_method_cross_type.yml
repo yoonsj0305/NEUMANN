@@ -1,0 +1,47 @@
+name: Q3 Bounded Executable Multi-Method and Cross-Type Generalization
+
+on:
+  push:
+    branches:
+      - research/q3-type-generalization-cost-gate-20261107
+    paths:
+      - research/q3/executable_affine_metagrammar_cross_type.py
+      - .github/workflows/q3_bounded_multi_method_cross_type.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic_cross_type_first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate frozen executable and safe dependency-free runtime
+        run: |
+          python -m py_compile research/q3/executable_affine_metagrammar_cross_type.py
+          git hash-object research/q3/executable_affine_metagrammar_cross_type.py
+      - name: Source-verify ASTs, invent two relations, and test unseen types
+        run: python research/q3/executable_affine_metagrammar_cross_type.py
+      - name: Validate outputs and hard failure boundaries
+        run: |
+          python - <<'PY'
+          import json
+          a=json.load(open("Q3_CROSS_TYPE_EXECUTABLE_CI.json"))
+          s=a["summary"]
+          assert s["source_programs"]==16
+          assert s["new_relations"]==2
+          assert s["new_width_bitvector_full_exact"]==s["new_width_bitvector_tasks"]==48
+          assert s["array_meta_exact"]==s["array_cold_exact"]==s["array_tasks"]==70
+          assert s["ood_abstain"]==3
+          assert sorted(r["solved"] for r in s["single_relation_ablations"])==[26,26]
+          assert set(map(tuple,a["learned_method"]["relations"]))=={(0,1,0),(1,-1,0)}
+          PY
+      - name: Preserve full predictions and costs, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-bounded-cross-type-metagrammar-full-original-first-synthetic
+          path: Q3_CROSS_TYPE_EXECUTABLE_CI.json
+          if-no-files-found: warn
