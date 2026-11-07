@@ -1,0 +1,51 @@
+name: Q3 Conditional Graph Fresh Independent BV FIRST
+
+on:
+  push:
+    branches:
+      - research/q3-graph-conditional-source-invention-20261107
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  q3_bv_graph_original_first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Preflight before fetching original 24 inputs
+        run: |
+          python -m py_compile research/q3/executable_conditional_graph_external_first.py
+          git hash-object research/q3/executable_conditional_graph_external_first.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,"research/q3")
+          import executable_conditional_graph_external_first as q
+          assert q.IDS == [f"PRE_{i}_100" for i in range(30,54)]
+          assert len(q.IDS)==24 and q.HELDOUT_COUNT==32
+          pairs=[(x, (x>>16)+1 if x&1 else x+2) for x in range(32)]
+          cold=q.synthesize(pairs,allow_guard=False)
+          learned=q.synthesize(pairs,allow_guard=True)
+          assert cold["ast"] is None
+          assert learned["ast"] is not None
+          assert all(q.run(learned["ast"],i)==((i>>16)+1 if i&1 else i+2) for i in range(32,1024))
+          assert q.run(("ite",("bit",0),0,1),1)==0
+          assert q.run(("ite",("bit",0),0,1),2)==1
+          for invalid in ([0]*63, [0]*63+[2]):
+            try:q.bits_to_int(invalid)
+            except ValueError:pass
+            else:raise AssertionError("FAIL_OPEN_INVALID_BIT")
+          print("PREFLIGHT_PASS")
+          PY
+      - name: Immutable 24 unopened original 64-bit expression problems
+        run: |
+          python research/q3/executable_conditional_graph_external_first.py
+      - name: Archive full first source and heldout evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-conditional-bv-graph-24-untouched-original-first
+          path: Q3_CONDITIONAL_GRAPH_EXTERNAL_FIRST.json
+          if-no-files-found: warn

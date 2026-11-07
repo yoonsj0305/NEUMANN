@@ -1,0 +1,29 @@
+name: Q3 Postfirst Conditional Graph Impossibility Audit
+
+on:
+  push:
+    branches:
+      - research/q3-graph-conditional-source-invention-20261107
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  guard_impossibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit finite 64-bit graph language, already-open PRE_10
+        run: |
+          python -m py_compile research/q3/postfirst_finite_guard_impossibility_audit.py
+          git hash-object research/q3/postfirst_finite_guard_impossibility_audit.py
+          python research/q3/postfirst_finite_guard_impossibility_audit.py
+      - name: Preserve bounded proof and falsification
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-postfirst-finite-guard-impossibility
+          path: Q3_POSTFIRST_GUARD_IMPOSSIBILITY.json
+          if-no-files-found: warn
