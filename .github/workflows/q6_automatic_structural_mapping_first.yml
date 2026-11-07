@@ -1,0 +1,69 @@
+name: Q6 automatic structure mapping with proof-carrying transfer FIRST
+on:
+  pull_request:
+    paths:
+      - 'research/q6/auto_structural_mapping_proof_memory.py'
+      - 'tests/test_q6_auto_structural_mapping_proof_memory.py'
+      - '.github/workflows/q6_automatic_structural_mapping_first.yml'
+permissions:
+  contents: read
+jobs:
+  auto-alpha-source-reuse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Install independent Z3 proof checker if missing
+        run: |
+          set -euo pipefail
+          if ! command -v z3 >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y z3
+          fi
+          z3 --version
+      - name: Assert source semantics are EXACT earlier certified immutable Git blobs
+        run: |
+          set -euo pipefail
+          test "$(git hash-object research/q6/array_string_simulation.py)" = a9744d0cf88f196600acf0f225e988273e67976f
+          test "$(git hash-object research/q6/compositional_simulation_postfirst.py)" = 1da58b324666c4cc207c042d15d555629ca277be
+      - name: Candidate invention, typed retrieval mismatch, counterexamples
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q6/auto_structural_mapping_proof_memory.py
+          python3 -m unittest tests/test_q6_auto_structural_mapping_proof_memory.py -v
+      - name: Machine-induce alpha and verify independent Z3 proof obligations
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q6_AUTO_ALPHA_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q6.auto_structural_mapping_proof_memory \
+              --out Q6-AUTO-STRUCTURAL-MAP-FIRST
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          data=json.loads(Path('Q6-AUTO-STRUCTURAL-MAP-FIRST/FIRST.json').read_text())
+          assert data['schema']=='neumann.q6.auto-generated-proof-carrying-observation.v1'
+          assert data['source_memories_searched']==3
+          assert data['source_memories_compatible']==1
+          assert data['typed_candidates_generated']>=15
+          assert data['candidates_surviving_relational_counterexamples']>=1
+          assert data['learned_observation_ast'] is not None
+          assert data['frozen_before_final_proofs_sha256'] is not None
+          assert all(x['pass'] for x in data['independent_final_checks'].values())
+          assert all(x['pass'] for x in data['original_independent_source_checks'].values())
+          assert any(x['pass'] for x in data['hard_negative_proof_receipts'])
+          assert data['pass_scoped']
+          assert data['Q3_GLOBAL']==data['Q4_GLOBAL']==data['Q6_GLOBAL']=='OPEN'
+          assert data['corpus_external_first_new_problem_families']==0
+          print('SCOPED_AUTO_ALPHA_VERIFIED__GLOBAL_Q3_Q4_Q6_OPEN')
+          PY
+      - name: Preserve candidate traces, generated alpha, counterexamples, Z3 scripts and receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q6-PROOF-CARRYING-STRUCTURAL-MAPPING-FIRST
+          path: Q6-AUTO-STRUCTURAL-MAP-FIRST/
+          if-no-files-found: warn
+          retention-days: 90
