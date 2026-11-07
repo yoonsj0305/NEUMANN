@@ -52,8 +52,8 @@ class Q3MetaConstructorTests(unittest.TestCase):
         baseline,_=synth_filter(train)
         self.assertIsNotNone(derived)
         self.assertIsNotNone(baseline)
-        self.assertEqual(execute_safe(derived,["k4m5"]), (True,"km"))
-        self.assertEqual(execute(baseline,["k4m5"]),"km")
+        self.assertEqual(execute_safe(derived,["k1m2"]), (True,"km"))
+        self.assertEqual(execute(baseline,["k1m2"]),"km")
         # Do NOT claim a general accuracy improvement over this strong core.
 
     def test_does_not_invent_mismatched_causal_rules(self):
