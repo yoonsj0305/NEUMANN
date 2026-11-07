@@ -1,0 +1,54 @@
+name: Q3 semantic guard role recovery postfirst real CHC originals
+on:
+  pull_request:
+    paths:
+      - 'research/q3/auto_copy_chain_semantic_role_postfirst.py'
+      - 'tests/test_q3_copy_chain_semantic_role_postfirst.py'
+      - '.github/workflows/q3_copy_chain_semantic_role_postfirst.yml'
+permissions:
+  contents: read
+jobs:
+  original-postfirst-semantics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Independent Z3 checker
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq z3
+          z3 --version
+      - name: Semantic role and old failure regression tests
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q3/auto_copy_chain_semantic_role_postfirst.py
+          python3 -m unittest tests/test_q3_copy_chain_semantic_role_postfirst.py -v
+      - name: Postfirst already-opened original clauses with real guard-derived roles
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'SEMANTIC_ROLE_POSTFIRST_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.auto_copy_chain_semantic_role_postfirst --out SEMANTIC-ROLE-POSTFIRST
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          a=json.loads(Path('SEMANTIC-ROLE-POSTFIRST/POSTFIRST_REPORT.json').read_text())
+          assert a['first_run_id_preserved']==42320555670
+          assert a['programs_pass']==a['programs_expected']==2
+          assert a['original_clauses_unsat']==a['original_clauses_expected']==20
+          assert not a['model_train_or_inference_calls']
+          assert a['Q3']==a['Q4']==a['Q6']==a['Q7']=='OPEN'
+          assert a['rows'][1]['semantic_roles_from_original_guards']['bb32.i']['bound_argument']==8
+          print('COPY3_TYPED_INT_ROLE_COLLISION_FIXED_AND_ALL_20_UNMODIFIED_CLAUSES_PROVED')
+          PY
+      - name: Preserve actual postfirst proof receipts and SAT mutant, including failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-COPY-CHAIN-POSTFIRST-SEMANTIC-ROLE
+          path: SEMANTIC-ROLE-POSTFIRST/
+          retention-days: 90
+          if-no-files-found: warn
