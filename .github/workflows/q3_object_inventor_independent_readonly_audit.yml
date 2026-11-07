@@ -1,0 +1,53 @@
+name: Q3 independent readonly original AST witness audit
+on:
+  pull_request:
+    paths:
+      - 'research/q3/object_inventor_independent_readonly_audit.py'
+      - '.github/workflows/q3_object_inventor_independent_readonly_audit.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  q3-readonly-certificate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Retrieve frozen first archived emitted AST, never re-run learner
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api -H 'Accept: application/vnd.github+json' \
+            /repos/yoonsj0305/NEUMANN/actions/artifacts/13556483861/zip \
+            > /tmp/q3-original-first.zip
+          unzip -p /tmp/q3-original-first.zip FIRST.json > /tmp/Q3_FROZEN_FIRST.json
+          echo 'b90e1b73f61a4ada2b71d34126c605b5f3ab1aced0cccccc4f60e9161a9442ef  /tmp/Q3_FROZEN_FIRST.json' | sha256sum -c -
+      - name: Re-fetch exact official original, pin Git commit
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-arc-readonly
+          git -C /tmp/q3-arc-readonly init -q
+          git -C /tmp/q3-arc-readonly remote add origin https://github.com/fchollet/ARC-AGI.git
+          git -C /tmp/q3-arc-readonly fetch -q --depth 1 origin 399030444e0ab0cc8b4e199870fb20b863846f34
+          git -C /tmp/q3-arc-readonly checkout -q --detach FETCH_HEAD
+          test "$(git -C /tmp/q3-arc-readonly rev-parse HEAD)" = 399030444e0ab0cc8b4e199870fb20b863846f34
+      - name: Independent union-find-based interpreter, frozen AST replay, mutation negative
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q3/object_inventor_independent_readonly_audit.py
+          python3 -m research.q3.object_inventor_independent_readonly_audit \
+             --first /tmp/Q3_FROZEN_FIRST.json \
+             --arc-root /tmp/q3-arc-readonly \
+             --out Q3-OBJECT-READONLY-AUDIT
+      - name: Preserve standalone evidence even if FAIL
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-OBJECT-ORIGINAL-READONLY-INDEPENDENT-AUDIT
+          path: Q3-OBJECT-READONLY-AUDIT/
+          retention-days: 90
+          if-no-files-found: warn
