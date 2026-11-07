@@ -1,0 +1,47 @@
+name: Q6 source-free cross-theory array-string simulation FIRST
+on:
+  pull_request:
+    paths:
+      - 'research/q6/array_string_simulation.py'
+      - '.github/workflows/q6_array_string_simulation.yml'
+permissions:
+  contents: read
+jobs:
+  independent-sourcefree:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Install independent SMT checker
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq z3
+          z3 --version
+      - name: Fresh source-free nine-obligation FIRST
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/q6/array_string_simulation.py
+          /usr/bin/time -f 'SIMULATION_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q6.array_string_simulation --out Q6-ARRAY-STRING-FIRST
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path("Q6-ARRAY-STRING-FIRST/FIRST_REPORT.json").read_text())
+          assert r["passed"]==r["obligations"]==9
+          assert r["abstraction_machine_checked_pointwise"]
+          assert not r["weights_trained"] and not r["autonomous_operator_invention"]
+          assert r["Q3"]==r["Q4"]==r["Q6"]==r["Q7"]=="OPEN"
+          print("SOURCE_FREE_ARRAY_STRING_POINTWISE_SIMULATION_PROVED")
+          PY
+      - name: Preserve any counterexample or timeout evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q6-ARRAY-STRING-POINTWISE-SIMULATION-FIRST
+          path: Q6-ARRAY-STRING-FIRST/
+          retention-days: 90
+          if-no-files-found: warn
