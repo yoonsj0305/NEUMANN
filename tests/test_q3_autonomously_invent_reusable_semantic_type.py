@@ -36,7 +36,7 @@ class ActualReusableTypeDiscovery(unittest.TestCase):
                 "output":[[0,8],[0,8]]},
             ],
             "test":[
-               {"input":[[0,2,4,0],[0,4,2,0]],
+               {"input":[[0,2,0,4],[4,0,2,0]],
                 "output":[[8,0],[0,8]]}
             ]
         }
