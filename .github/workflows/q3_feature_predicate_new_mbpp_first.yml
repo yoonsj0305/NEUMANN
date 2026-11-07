@@ -1,0 +1,88 @@
+name: Q3 source-frozen inferred Boolean AST on previously unscored MBPP originals
+on:
+  pull_request:
+    paths:
+      - 'research/q3/feature_predicate_from_counterexample.py'
+      - 'research/q3/feature_predicate_new_mbpp_cohort_first.py'
+      - 'tests/test_q3_feature_predicate_invention.py'
+      - '.github/workflows/q3_feature_predicate_new_mbpp_first.yml'
+permissions:
+  contents: read
+jobs:
+  q3-original-new-predicate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Fixed old generated constructor and candidate grammar pre-external
+        run: |
+          set -euo pipefail
+          test "$(git hash-object research/q3/reflexive_constructor_from_experience.py)" = 3e166a74dcbcd069f13128bfee7f2148cfbba09a
+          test "$(git hash-object research/q3/learn_constructor_then_mbpp_original_first.py)" = f1036b14ba8cffd204fff91e2eb460e48cea4c07
+          python3 -m py_compile research/q3/feature_predicate_from_counterexample.py
+          python3 -m py_compile research/q3/feature_predicate_new_mbpp_cohort_first.py
+          python3 -m unittest tests/test_q3_feature_predicate_invention.py -v
+          mkdir -p Q3-PREDICATE-NEW-COHORT-FIRST
+          git hash-object research/q3/feature_predicate_from_counterexample.py \
+            > Q3-PREDICATE-NEW-COHORT-FIRST/PREDICATE_INVENTOR_BLOB.txt
+      - name: Reconstruct EXACT original CodeARC-experience constructor before MBPP download
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --silent --show-error \
+            "https://huggingface.co/datasets/anjiangwei/CodeARC-Invocations/resolve/119512573bf96148cbb95e99cf7cdd21c06153e4/invocations.jsonl" \
+            -o /tmp/q3-source-original.jsonl
+          test "$(sha256sum /tmp/q3-source-original.jsonl | awk '{print $1}')" = 3f08820594d4825c78bbdcc3b8eb2e6c8c0285fb3de966e900463b53f1723962
+          python3 -m research.q3.learn_constructor_then_mbpp_original_first source \
+            --codearc /tmp/q3-source-original.jsonl \
+            --out Q3-PREDICATE-NEW-COHORT-FIRST/SOURCE_FROZEN
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          f=Path('Q3-PREDICATE-NEW-COHORT-FIRST/SOURCE_FROZEN/FROZEN_CONSTRUCTOR.json')
+          data=json.loads(f.read_text())
+          assert data['frozen_generated_constructor_sha256']=='2cd85f1712ef91dbcab4a3bc85c583dfd235dd9ef451ae13282c25aef1cfa332'
+          assert data['source_originals']==[834,841]
+          print('Q3_SAME_SOURCE_CONSTRUCTOR_IMMUTABLE',data['frozen_generated_constructor_sha256'])
+          PY
+      - name: Now download OFFICIAL Google MBPP and verify identical prior pinned blob
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --silent --show-error \
+            "https://raw.githubusercontent.com/google-research/google-research/master/mbpp/sanitized-mbpp.json" \
+            -o /tmp/q3-mbpp-public.json
+          test "$(git hash-object /tmp/q3-mbpp-public.json)" = a999d25df7e489e4c183cadfa5c0ecf557a702b6
+          sha256sum /tmp/q3-mbpp-public.json \
+            > Q3-PREDICATE-NEW-COHORT-FIRST/SOURCE_MBPP_SHA256.txt
+      - name: Honest post-FIRST exposed counterexamples and previously UNSCORED 511..974 original MBPP test assertions
+        run: |
+          set -euo pipefail
+          /usr/bin/time -f 'Q3_PREDICATE_NEW_SOURCE_WALL_S=%e MAX_RSS_KB=%M' \
+            python3 -m research.q3.feature_predicate_new_mbpp_cohort_first \
+              --mbpp /tmp/q3-mbpp-public.json \
+              --source-frozen Q3-PREDICATE-NEW-COHORT-FIRST/SOURCE_FROZEN/FROZEN_CONSTRUCTOR.json \
+              --out Q3-PREDICATE-NEW-COHORT-FIRST/FIRST_RESULTS
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('Q3-PREDICATE-NEW-COHORT-FIRST/FIRST_RESULTS/FIRST.json')
+          r=json.loads(p.read_text())
+          s=r['summary']
+          assert s['official_validation_and_train_IDs']>=100
+          assert s['new_originals_eligible']>=1
+          assert s['source_learned_constructor_frozen_sha256']=='2cd85f1712ef91dbcab4a3bc85c583dfd235dd9ef451ae13282c25aef1cfa332'
+          assert all(511<=q['id']<=974 for q in r['rows'])
+          assert r['source_MBPP_first_test_IDs_11_510_EXCLUDED']
+          assert r['global_Q3']==r['global_Q4']==r['global_Q6']=='OPEN'
+          print('Q3_PREDICATE_NEW_ORIGINALS_SCORED_HONESTLY')
+          PY
+      - name: Preserve source proof, generated AST and every missed original
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-Q3-PREDICATE-ABSTRACTION-FRESH-MBPP-ORIGINALS
+          path: Q3-PREDICATE-NEW-COHORT-FIRST/
+          retention-days: 90
+          if-no-files-found: warn
