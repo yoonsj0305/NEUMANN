@@ -132,6 +132,65 @@ class ObservedProblem:
         return lexical + hashed_tree_features(public_rhs_tree(self.transition_rhs))
 
 
+@dataclass(frozen=True)
+class BehavioralProblem:
+    """Q3 black-box observed I/O, no source transition or correct AST exposed.
+
+    Only independently measured input/output examples are passed to the actor.
+    The hidden semantic program belongs exclusively to the verifier. This
+    avoids leaking the target source RHS to a trivial AST-copy classical path.
+    """
+    observations: tuple[tuple[int,int], ...]
+    collision: bool = True
+    failed_proofs: int = 0
+
+    def __post_init__(self):
+        if (not isinstance(self.observations,tuple)
+            or not 8 <= len(self.observations) <= 256
+            or any(not isinstance(row,tuple) or len(row)!=2
+                   or any(type(v) is not int or abs(v)>100000 for v in row)
+                   for row in self.observations)):
+            raise ValueError("INVALID_Q3_BEHAVIORAL_OBSERVATIONS")
+        if not isinstance(self.collision,bool) or type(self.failed_proofs) is not int or self.failed_proofs<0:
+            raise ValueError("INVALID_Q3_BEHAVIORAL_METADATA")
+
+    def sha(self)->str:
+        raw=json.dumps({"examples":self.observations,"collision":self.collision,
+                        "failed":self.failed_proofs},sort_keys=True).encode()
+        return hashlib.sha256(raw).hexdigest()
+
+    def vector(self)->tuple[float,...]:
+        import math
+        x=[float(a) for a,b in self.observations]
+        y=[float(b) for a,b in self.observations]
+        n=len(x)
+        mean=lambda v:sum(v)/n
+        # Generic moments: no target operator, source code or AST teacher.
+        mu=mean(x);mv=mean(y)
+        sx=math.sqrt(mean([(z-mu)**2 for z in x])+1.)
+        sy=math.sqrt(mean([(z-mv)**2 for z in y])+1.)
+        corr=mean([(a-mu)*(b-mv) for a,b in zip(x,y)])/(sx*sy)
+        moments=[
+            1., min(n/32.,1.), math.tanh(mu/10.),
+            math.tanh(mv/10.), math.tanh(sx/10.), math.tanh(sy/10.),
+            max(-1.,min(1.,corr)),
+            math.tanh(mean([a*b for a,b in zip(x,y)])/50.),
+            math.tanh(mean([(a-b)**2 for a,b in zip(x,y)])/30.),
+            math.tanh(mean([(a+b)**2 for a,b in zip(x,y)])/30.),
+            math.tanh(min(x)/10.),math.tanh(max(x)/10.),
+            math.tanh(min(y)/10.),math.tanh(max(y)/10.),
+            math.tanh(mean([abs(a) for a in x])/10.),
+            math.tanh(mean([abs(b) for b in y])/10.)
+        ]
+        structural=[0.]*HASHED_STRUCTURAL_DIM
+        for a,b in self.observations:
+            # Hashed observable numeric cooccurrences, without a gold formula.
+            key=f"{a}:{b}".encode()
+            index=int.from_bytes(hashlib.sha256(key).digest()[:4],"big")%HASHED_STRUCTURAL_DIM
+            structural[index]+=1./n
+        return tuple(moments)+tuple(structural)
+
+
 class TaskConditionalGenerator(Generator):
     """Own-weight autoregressive AST policy with verifiable semantic conditioning."""
 
@@ -145,7 +204,7 @@ class TaskConditionalGenerator(Generator):
         }
 
     def set_observation(self,problem:ObservedProblem)->None:
-        if not isinstance(problem,ObservedProblem):
+        if not isinstance(problem,(ObservedProblem,BehavioralProblem)):
             raise ValueError("TASK_SEMANTICS_REQUIRED")
         self.observation=problem
 
