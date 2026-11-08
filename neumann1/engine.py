@@ -454,3 +454,30 @@ class NeumannEngine:
             source_oracle,width=width,max_degree=max_degree,
             independent_checks=independent_checks,seed=seed,
             classical_solvers=classical_solvers)
+
+    def discover_structural_orbit_representation(
+            self, source_pairs, independent_source_checks, source_schema,
+            *, classical_solvers=(), max_degree=4, max_source_ms=3000):
+        """Invent latent source features, then discover a NEW orbit grammar.
+
+        With an explicit coordinate-topology schema, source-induced
+        interactions must form complete source symmetry orbits. If source
+        evidence cannot certify the abstraction, return the source result
+        without a structural program. Never read unseen target gold.
+        """
+        from .causal_representation_inventor import (
+            CausalRepresentationInventor)
+        from .symmetry_orbit_inventor import SymmetryOrbitInventor
+        result=CausalRepresentationInventor(
+            max_degree=max_degree,max_source_ms=max_source_ms).invent(
+                source_pairs,
+                independent_source_checks=independent_source_checks,
+                classical_solvers=classical_solvers)
+        if result.program is None:
+            return result,None
+        try:
+            orbit=SymmetryOrbitInventor().invent(result.program,
+                                                 source_schema)
+        except (ValueError,TypeError):
+            orbit=None
+        return result,orbit
