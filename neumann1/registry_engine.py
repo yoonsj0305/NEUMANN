@@ -611,3 +611,67 @@ class RegistryEngine:
             source_oracle,width=width,seed=seed,
             forbidden_inputs=forbidden_inputs,
             classical_solvers=classical_solvers)
+
+    def meta_learn_recursive_discovery_method(
+            self, meta_source_cases, *, max_complexity=9,
+            challenges=(4,8,16,32,64,96)):
+        """Learn a RECURSIVE discovery PROCEDURE, not a domain-specific solver.
+
+        Each task supplies its existing classical backend via a typed
+        attempt(complexity,source_checks) contract. Domain labels are audit
+        metadata only and are never inputs to the learned policy.
+        """
+        from .recursive_method_discovery import RecursiveMethodInventor
+        tasks=tuple(meta_source_cases)
+        learner=RecursiveMethodInventor(
+            max_complexity=max_complexity,challenges=challenges)
+        result=learner.learn(tasks)
+        if (result.correct_on_meta_training!=len(tasks)
+                or result.incorrect_on_meta_training):
+            raise ValueError("meta-training evidence insufficient")
+        self._q3_recursive_method_learner=learner
+        self._q3_recursive_method=result
+        self._q3_recursive_method_training=tasks
+        return result
+
+    def meta_revise_recursive_discovery_method(self, feedback_cases):
+        """Falsification-driven rewrite of the *discovery procedure itself*."""
+        from .recursive_method_discovery import ObservedOracle,execute
+        if not hasattr(self,"_q3_recursive_method"):
+            raise ValueError("meta method not previously learned")
+        feedback=tuple(feedback_cases)
+        if not feedback:
+            raise ValueError("independent counterexamples required")
+        wrong=0
+        for task in feedback:
+            run=execute(
+                self._q3_recursive_method.method,
+                task.backend_factory(ObservedOracle(
+                    task.oracle,task.heldout)))
+            if run.model is None or any(
+                    run.apply(x)!=task.oracle(x)
+                    for x in task.heldout):
+                wrong+=1
+        if not wrong:
+            raise ValueError("no falsifying evidence, do not rewrite policy")
+        tasks=self._q3_recursive_method_training+feedback
+        proposed=self._q3_recursive_method_learner.learn(tasks)
+        if (proposed.correct_on_meta_training!=len(tasks)
+                or proposed.incorrect_on_meta_training
+                or proposed.method.ast==self._q3_recursive_method.method.ast):
+            raise ValueError("revision failed to repair evidence")
+        self._q3_recursive_method=proposed
+        self._q3_recursive_method_training=tasks
+        return proposed
+
+    def meta_execute_recursive_discovery_method(
+            self, domain_source_backend, *, known_classical=(),
+            classical_probe_inputs=()):
+        """Run frozen learned control AST on any classical domain backend."""
+        from .recursive_method_discovery import execute
+        if not hasattr(self,"_q3_recursive_method"):
+            raise ValueError("no frozen learned discovery method")
+        return execute(
+            self._q3_recursive_method.method,domain_source_backend,
+            known_classical=known_classical,
+            classical_probe_inputs=classical_probe_inputs)
