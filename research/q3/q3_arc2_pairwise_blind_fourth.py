@@ -182,15 +182,15 @@ def score(upstream,predictions,sha,output):
             return any(tuple(old.G(x) for x in candidate)==answers
                        for candidate in candidates)
         classical=right(row["classical"])
-        old=right(row["prior_two_attempt"])
+        prior_correct=right(row["prior_two_attempt"])
         novel=right(row["new_causal"])
         integrated=right(row["integrated_two_attempt"])
         scored.append({
             "task_id":row["task_id"],"status":"SCORED",
-            "classical":classical,"prior":old,"causal":novel,
+            "classical":classical,"prior":prior_correct,"causal":novel,
             "integrated":integrated,
-            "new_residual_vs_prior":novel and not old,
-            "integrated_regression":old and not integrated})
+            "new_residual_vs_prior":novel and not prior_correct,
+            "integrated_regression":prior_correct and not integrated})
     valid=[r for r in scored if r["status"]=="SCORED"]
     predicted=[r for r in source["records"] if r["status"]=="PREDICTED"]
     summary={
