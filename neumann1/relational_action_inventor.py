@@ -84,7 +84,7 @@ def _selector_map(objects,shape):
     return result
 
 
-def _witnesses(g,y,objects):
+def _witnesses(g,y,objects,deadline):
     """Invert every observed pixel change; output constrains translations.
 
     For each source object and move/copy mode, erase source iff moving and
@@ -96,6 +96,7 @@ def _witnesses(g,y,objects):
     h,w=_shape(g)
     witnessed=set()
     for i,mover in enumerate(objects):
+        if perf_counter_ns()>deadline:return
         for operation in OPERATIONS:
             base=[list(row) for row in g]
             if operation=="move":
@@ -104,6 +105,7 @@ def _witnesses(g,y,objects):
                      if base[r][c]!=y[r][c] and y[r][c]!=0]
             if not changed:continue
             for r,c,color in changed:
+                if perf_counter_ns()>deadline:return
                 for sy,sx in mover.cells:
                     dr,dc=r-sy,c-sx
                     dest_r=mover.bounds[0]+dr
@@ -189,13 +191,13 @@ def _signature_for_pair(g,objects,selectors,w):
                     yield (m_selector,a_selector,operation,paint,rexpr,cexpr)
 
 
-def _signature_set(g,y,max_witnesses):
+def _signature_set(g,y,max_witnesses,deadline):
     objects=_objs(g)
-    if len(objects)<2:return set()
+    if not 2<=len(objects)<=14:return set()
     selectors=_selector_map(objects,_shape(g))
     rules=set()
-    for k,w in enumerate(_witnesses(g,y,objects)):
-        if k>=max_witnesses:break
+    for k,w in enumerate(_witnesses(g,y,objects,deadline)):
+        if k>=max_witnesses or perf_counter_ns()>deadline:break
         rules.update(_signature_for_pair(g,objects,selectors,w))
     return rules
 
@@ -218,12 +220,13 @@ class RelationalActionInventor:
         if any(_shape(x)!=_shape(y) for x,y in train+checks):
             return RelationalDiscovery((),len(train),len(checks),0,
                                        (perf_counter_ns()-start)/1e6)
+        deadline=start+int(self.max_source_ms*1e6)
         current=None
         for x,y in train:
             if (perf_counter_ns()-start)/1e6>self.max_source_ms:
                 return RelationalDiscovery((),len(train),len(checks),0,
                                            (perf_counter_ns()-start)/1e6)
-            candidates=_signature_set(x,y,self.max_witnesses)
+            candidates=_signature_set(x,y,self.max_witnesses,deadline)
             current=(candidates if current is None else current & candidates)
             if not current:break
         remaining=len(current or ())
