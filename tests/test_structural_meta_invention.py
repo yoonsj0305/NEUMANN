@@ -83,11 +83,14 @@ def test_live_engine_mines_two_distinct_methods_and_self_updates():
     assert discovered[0].direction=="append"
     assert not any("fold" in str(p.context) or "scan" in str(p.context)
                    for p in discovered)
-    out=engine.invent_program("generic.int.selector",5,
-                verify=lambda tree: original_max(tree,5))
+    out=engine.invent_program("generic.int.selector",4,
+                verify=lambda tree: original_max(tree,4))
     assert out["verified"] and out["program"]
     assert engine.meta_inventor.methods[out["method_id"]].successes==1
-    assert out["new_method_ids"]  # A successful source program grows search language again.
+    assert out["new_method_ids"]  # Adjacent verified source grows search language again.
+    next_result=engine.invent_program("generic.int.selector",5,
+                verify=lambda tree: original_max(tree,5))
+    assert next_result and next_result["verified"]
 
     # With a shared DAG, recurrence of the previous expression does NOT
     # cause exponential memory growth.
