@@ -29,6 +29,14 @@ class Entity:
         return cls(key,tuple(sorted(attributes.items())),value)
 
     def attr(self,name):
+        if isinstance(name,tuple):
+            op,a,b=name
+            x,y=self.attr(a),self.attr(b)
+            if op=="sub":return x-y
+            if op=="add":return x+y
+            if op=="abs_sub":return abs(x-y)
+            if op=="mul":return x*y
+            raise ValueError("unsupported generated feature constructor")
         return dict(self.attributes)[name]
 
 
@@ -49,14 +57,14 @@ class Scene:
 def _predicate(atom,entity,scene):
     kind,name,value=atom
     n=entity.attr(name)
+    if kind=="eq":return n==value
+    if kind=="le":return n<=value
+    if kind=="ge":return n>=value
     values=[e.attr(name) for e in scene.entities]
     if kind=="min":return n==min(values)
     if kind=="max":return n==max(values)
     if kind=="ltmax":return n<max(values)
     if kind=="gtmin":return n>min(values)
-    if kind=="eq":return n==value
-    if kind=="le":return n<=value
-    if kind=="ge":return n>=value
     raise ValueError("unrecognized learned predicate")
 
 
@@ -119,13 +127,15 @@ class Discovery:
 class DomainIndependentRuleInventor:
     """Learn typed operations without task names, then fail closed on checks."""
 
-    def __init__(self,*,max_ms=750,max_atoms=500,max_pairs=80000):
+    def __init__(self,*,max_ms=750,max_atoms=500,max_pairs=80000,
+                 feature_depth=1):
         if not (1<=max_ms<=120000 and 1<=max_atoms<=10000 and
-                1<=max_pairs<=1000000):
+                1<=max_pairs<=1000000 and feature_depth in (0,1)):
             raise ValueError("finite search budget required")
         self.max_ms=max_ms
         self.max_atoms=max_atoms
         self.max_pairs=max_pairs
+        self.feature_depth=feature_depth
 
     def invent(self,train,*,verification,classical_solvers=(),
                known_programs=()):
@@ -171,8 +181,15 @@ class DomainIndependentRuleInventor:
         if not mask or not negative or not features:
             return Discovery(None,len(pairs),0,(perf_counter_ns()-start)/1e6)
         deadline=start+int(self.max_ms*1e6)
+        if self.feature_depth:
+            base=sorted(features)
+            for a in base:
+                for b in base:
+                    if a==b:continue
+                    for op in ("sub","add","abs_sub","mul"):
+                        features.add((op,a,b))
         atoms=[]
-        for name in sorted(features):
+        for name in sorted(features,key=repr):
             vals=sorted({e.attr(name) for scene,e,_,flag in rows})
             atoms.extend((kind,name,None)
                          for kind in ("min","max","ltmax","gtmin"))
@@ -188,18 +205,20 @@ class DomainIndependentRuleInventor:
                     else:unwanted|=1<<i
             if positive:cover.append((atom,positive,unwanted))
 
-        observed=sorted({target for scene,e,target,flag in rows if flag})
-        expressions=[("literal",value) for value in observed]
+        # The FIRST changed source row uniquely fixes every possible
+        # affine offset. Do not enumerate redundant constant hypotheses
+        # from every later source observation.
+        seed_scene,seed_entity,seed_target,_=next(
+            row for row in rows if row[3])
+        expressions=[("literal",seed_target)]
         for a in (-3,-2,-1,0,1,2,3):
-            for scene,e,target,flag in rows:
-                if not flag:continue
-                b=target-a*e.value
-                if abs(b)<=32:expressions.append(("affine",a,b))
-                for name in features:
-                    b=target-a*e.attr(name)
-                    if abs(b)<=32:
-                        expressions.append(("affine_feature",name,a,b))
-        for name in sorted(features):
+            b=seed_target-a*seed_entity.value
+            if abs(b)<=32:expressions.append(("affine",a,b))
+            for name in features:
+                b=seed_target-a*seed_entity.attr(name)
+                if abs(b)<=32:
+                    expressions.append(("affine_feature",name,a,b))
+        for name in sorted(features,key=repr):
             expressions.extend((("scene_min",name),("scene_max",name),
                                 ("role",name,"min"),("role",name,"max")))
         expressions=sorted(set(expressions),key=lambda x:(
@@ -213,7 +232,18 @@ class DomainIndependentRuleInventor:
         safe=[];checked=0
         for atom,positive,unwanted in cover:
             checked+=1
-            if unwanted==0:safe.append(((atom,),positive))
+            if unwanted==0:
+                safe.append(((atom,),positive))
+                # Complete one-clause witnesses must precede pair search.
+                if positive==mask:
+                    for expression in candidates:
+                        program=InventedRelationalProgram(((atom,),),
+                                                          expression)
+                        if all(program.apply(scene)==target
+                               for scene,target in verification):
+                            return Discovery(program,len(pairs),checked,
+                                (perf_counter_ns()-start)/1e6,
+                                "SOURCE_VERIFIED_INVENTION")
         for (a,ay,an),(b,by,bn) in combinations(cover,2):
             if perf_counter_ns()>deadline or checked>=self.max_pairs:
                 break
