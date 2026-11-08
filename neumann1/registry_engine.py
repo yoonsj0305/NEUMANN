@@ -3,6 +3,7 @@ from __future__ import annotations
 from .types import Problem, SolveResult, CostLedger, display_kind, is_unknown_kind
 from .family_registry import FamilyRegistry
 from .plugin_isolation import PluginProcessError
+from .structural_meta_invention import StructuralMetaInventor, CertifiedProgram
 
 
 class RegistryEngine:
@@ -13,10 +14,13 @@ class RegistryEngine:
         structure_former: object,
         registry: FamilyRegistry,
         min_confidence: float = 0.8,
+        *,
+        meta_inventor: StructuralMetaInventor | None = None,
     ):
         self.structure_former = structure_former
         self.registry = registry
         self.min_confidence = min_confidence
+        self.meta_inventor = meta_inventor if meta_inventor is not None else StructuralMetaInventor()
 
     def solve(self, problem: Problem) -> SolveResult:
         ledger = CostLedger()
@@ -118,3 +122,12 @@ class RegistryEngine:
             ledger=ledger,
             trace=trace,
         )
+
+    def observe_program(self, evidence: CertifiedProgram, *, verify):
+        """Promote source-verified programs to the mutable method inventory."""
+        return self.meta_inventor.observe(evidence, verify=verify)
+
+    def invent_program(self, family: str, arity: int, *, params=(), verify=None, promote=True):
+        """Run learned constructors through the caller's ORIGINAL verifier."""
+        return self.meta_inventor.solve(
+            family, arity, params=params, verify=verify, promote=promote)
