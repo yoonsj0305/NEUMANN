@@ -1,0 +1,64 @@
+name: Q3 Source-Invented Constant Macro to Fresh Formal Inverses FIRST
+
+on:
+  push:
+    branches:
+      - research/q3-independent-formal-bv-inversion-20261108
+    paths:
+      - research/q3/source_derived_formal_macro_unseen_first.py
+      - .github/workflows/q3_formal_macro_new_original_first.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  generated_macro_original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download PRIOR fully proved original source records
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-formal-fourbit-grown-grammar-new-32-original-first
+          run-id: 42432876840
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: prior
+      - name: Source-only self-extracted constant macro before target fetch
+        run: |
+          python -m py_compile research/q3/source_derived_formal_macro_unseen_first.py
+          git hash-object research/q3/source_derived_formal_macro_unseen_first.py
+          python research/q3/source_derived_formal_macro_unseen_first.py source
+          python - <<'PY'
+          import sys,json
+          sys.path.insert(0,"research/q3")
+          import source_derived_formal_macro_unseen_first as x
+          policy=json.load(open("Q3_EXTERNAL_SOURCE_MACRO_FROZEN.json"))
+          assert len(x.TARGET)==32
+          assert x.TARGET==[f"find_inv_{r}_{op}_4bit.sl"
+                           for r in ("bvugt","ne") for op in x.base.OPS]
+          assert policy["source_new_program_ids"]==["find_inv_bvslt_bvudiv1_4bit.sl"]
+          assert len(policy["derived_constant_macros"])>0
+          for m in policy["derived_constant_macros"]:
+              assert m["verified_256_inputs"] is True
+              assert m["value"] not in (0,7,8)
+          print("SOURCE_ONLY_MACRO_FINGERPRINT",policy["sha256"])
+          PY
+      - name: Archive the method frozen before new targets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-formal-source-proven-macros-frozen-before-new-target
+          path: Q3_EXTERNAL_SOURCE_MACRO_FROZEN.json
+          if-no-files-found: warn
+      - name: Evaluate 32 untouched external 4-bit inverse originals
+        run: python research/q3/source_derived_formal_macro_unseen_first.py target
+      - name: Preserve original first source and matched-language controls
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-source-macro-cross-operator-new-32-original-FIRST
+          path: Q3_MACRO_GENERALIZATION_NEW_ORIGINAL_FIRST.json
+          if-no-files-found: warn

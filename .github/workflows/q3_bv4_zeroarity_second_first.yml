@@ -1,0 +1,55 @@
+name: Q3 Formal BV4 Parser Repaired NEW 32 Originals FIRST
+
+on:
+  push:
+    branches:
+      - research/q3-independent-formal-bv-inversion-20261108
+    paths:
+      - research/q3/formal_bv4_zeroarity_second_unopened_first.py
+      - .github/workflows/q3_bv4_zeroarity_second_first.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  frozen_source_untouched_target:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reuse immutable source policy from first formal original run
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-formal-bv4-source-policy-FROZEN-before-target
+          run-id: 42432369260
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: source_policy
+      - name: Freeze code and validate zero-arity SMT constant repair
+        run: |
+          python -m py_compile research/q3/formal_bv4_zeroarity_second_unopened_first.py
+          git hash-object research/q3/formal_bv4_zeroarity_second_unopened_first.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'research/q3')
+          import formal_bv4_zeroarity_second_unopened_first as g
+          assert len(g.TARGET)==32
+          assert len(set(g.TARGET))==32
+          assert g.load_source_method()[0]["source_proved_count"]==8
+          defines={
+            'min':([] , ['bvnot',['bvlshr',['bvnot','#x0'],'#x1']]),
+            'max':([] , ['bvnot','min'])}
+          assert g.base.expr("min",{},defines,0)==8
+          assert g.base.expr("max",{},defines,0)==7
+          print("ZERO_ARITY_PARSER_AND_FROZEN_SOURCE_PASS",g.load_source_method()[1])
+          PY
+      - name: Check 32 new untouched formal specifications exhaustively
+        run: python research/q3/formal_bv4_zeroarity_second_unopened_first.py
+      - name: Save all FIRST results including any parser or math failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-formal-bv4-patched-32-new-originals-FIRST
+          path: Q3_FORMAL_SECOND_ORIGINAL_FIRST.json
+          if-no-files-found: warn

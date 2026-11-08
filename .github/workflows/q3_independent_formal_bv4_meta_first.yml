@@ -1,0 +1,67 @@
+name: Q3 Independent Formal BV4 Full-Domain Meta-Policy Transfer FIRST
+
+on:
+  push:
+    branches:
+      - research/q3-independent-formal-bv-inversion-20261108
+    paths:
+      - research/q3/formal_bv4_independent_author_original_first.py
+      - .github/workflows/q3_independent_formal_bv4_meta_first.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source_and_untouched_target:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Freeze solver and predeclared source and untouched targets
+        run: |
+          python -m py_compile research/q3/formal_bv4_independent_author_original_first.py
+          git hash-object research/q3/formal_bv4_independent_author_original_first.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,"research/q3")
+          import formal_bv4_independent_author_original_first as m
+          assert len(m.SOURCE)==16 and len(m.TARGET)==32
+          assert set(m.SOURCE).isdisjoint(m.TARGET)
+          assert m.MAX_CANDIDATES==5000
+          assert len(m.PAIRS)==256
+          assert m.bv("bvsub",0,1)==15
+          assert m.bv("bvashr",8,1)==12
+          test='''(set-logic BV)
+          (synth-fun inv ((s (BitVec 4)) (t (BitVec 4))) (BitVec 4)
+            ((Start (BitVec 4) (s t #x0 #x8 #x7 (bvadd Start Start)))))
+          (define-fun l ((s (BitVec 4)) (t (BitVec 4))) Bool
+            (= (bvadd (inv s t) s) t))
+          (define-fun SC ((s (BitVec 4)) (t (BitVec 4))) Bool true)
+          (constraint (=> (SC s t) (l s t)))
+          (check-synth)'''
+          p=m.parse_benchmark(test)
+          tab=m.allowed_table(p)
+          assert len(tab)==256
+          for (s,t),valid in zip(m.PAIRS,tab):
+              assert valid==(1<<((t-s)&15))
+          print("PRE_TARGET_FORMAL_PARSER_AND_CHECKER_PASS")
+          PY
+      - name: Source proofs only, learn program-constructor search policy and hash
+        run: python research/q3/formal_bv4_independent_author_original_first.py source
+      - name: Preserve source-only method even if target execution fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-formal-bv4-source-policy-FROZEN-before-target
+          path: Q3_FORMAL_SOURCE_FROZEN.json
+          if-no-files-found: warn
+      - name: Score 32 genuinely unopened 4-bit formal inversion originals
+        run: python research/q3/formal_bv4_independent_author_original_first.py target
+      - name: Preserve full first original target predictions and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-independent-formal-bv4-target-FIRST
+          path: Q3_FORMAL_TARGET_FIRST.json
+          if-no-files-found: warn
