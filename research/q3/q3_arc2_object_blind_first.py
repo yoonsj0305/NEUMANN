@@ -29,25 +29,32 @@ from neumann1.scene_graph_inventor import ObjectGrammarInventor
 HERE=pathlib.Path(__file__).resolve().parent
 EXCLUSION=HERE/"arc2_previous_96_exclusions.json"
 SECOND_EXCLUSION=HERE/"arc2_object_first128_exclusions.json"
+THIRD_EXCLUSION=HERE/"arc2_object_second128_exclusions.json"
 
 
-def freeze_options(cohort="second"):
+def freeze_options(cohort="third"):
     rules=json.loads(EXCLUSION.read_text())
     ids=set(rules["excluded_prior_ids"])
     if len(ids)!=96:
         raise ValueError("pre-exposed task exclusion contract invalid")
     if cohort=="first":
         return ids,rules["salt"]
-    if cohort=="second":
+    if cohort in ("second","third"):
         second=json.loads(SECOND_EXCLUSION.read_text())
         new=set(second["excluded_second_prior_ids"])
         if len(new)!=128 or new & ids:
             raise ValueError("second-original first cohort not disjoint")
-        return ids|new,second["salt"]
+        if cohort=="second":
+            return ids|new,second["salt"]
+        third=json.loads(THIRD_EXCLUSION.read_text())
+        fresh=set(third["excluded_third_prior_ids"])
+        if len(fresh)!=128 or fresh & (ids|new):
+            raise ValueError("third-source original IDs not independent")
+        return ids|new|fresh,third["salt"]
     raise ValueError("unknown cohort; cannot reuse previously scored target gold")
 
 
-def prepare(upstream,blind,n,*,cohort="second"):
+def prepare(upstream,blind,n,*,cohort="third"):
     excluded,salt=freeze_options(cohort)
     root=checked_upstream(upstream)
     candidates=[p for p in root.glob("*.json")
@@ -312,7 +319,7 @@ def main():
     q.add_argument("--upstream",type=pathlib.Path,required=True)
     q.add_argument("--blind",type=pathlib.Path,required=True)
     q.add_argument("--n",type=int,default=128)
-    q.add_argument("--cohort",choices=("first","second"),default="second")
+    q.add_argument("--cohort",choices=("first","second","third"),default="third")
     q=sub.add_parser("propose")
     q.add_argument("--blind",type=pathlib.Path,required=True)
     q.add_argument("--output",type=pathlib.Path,required=True)
