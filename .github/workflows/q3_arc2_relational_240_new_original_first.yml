@@ -40,7 +40,7 @@ jobs:
           v=json.load(open(q.POLICY))
           d=v.pop("sha256")
           assert q.sha(v)==d
-          assert d=="a660b65c325c277f99b02c69969b5fd0197a46832e6531c44c14db3ca986"
+          assert d=="a660b65c325c277f99b02c69969b5fd0197a46832e6531c44c14db3ca986dafe"
           for name,path in (
               ("source_code_sha256","neumann1/relational_grid_inventor.py"),
               ("legacy_classical_code_sha256","neumann1/arc2_meta_grid_reasoner.py"),
