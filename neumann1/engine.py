@@ -189,3 +189,22 @@ class NeumannEngine:
         return invent_numeric_function(
             source_oracle,arity=arity,max_degree=max_degree,
             budget=query_budget,seed=seed,validation=validation_queries)
+
+    def synthesize_relational_operator_active(self, row_symbols, column_symbols,
+                                             source_oracle, *,
+                                             query_budget, seed=0,
+                                             patience=6, validation_queries=24,
+                                             max_rank=12,
+                                             trusted_rank_upper_bound=None):
+        """Infer a NEW compact relation and executable rule from source queries.
+
+        Independent of polynomial and associative-monad discovery. Provisional
+        unless all cells observed or a trusted external rank premise holds.
+        The rank premise is NOT certified by source fit.
+        """
+        from .active_rank_inventor import invent_rank_operator
+        return invent_rank_operator(
+            row_symbols, column_symbols, source_oracle,
+            query_budget=query_budget, seed=seed, patience=patience,
+            validation=validation_queries, max_rank=max_rank,
+            rank_upper_bound=trusted_rank_upper_bound)
