@@ -125,9 +125,9 @@ def strong_classical_reference(tasks,challenge_count=64):
 
 def experiment():
     start=perf_counter_ns()
-    source=tuple(example("boolean",i+600,1+i%2)
+    source=tuple(example("boolean",i+3000,3)
                  for i in range(12))+tuple(
-        example("period",i+700,2+i%2) for i in range(12))
+        example("period",i+700,3) for i in range(12))
     feedback=tuple(example("boolean",i+80000,4+i%2)
                    for i in range(15))
     learner=RecursiveMethodInventor(
@@ -137,6 +137,10 @@ def experiment():
     revised=learner.learn(source+feedback)
     revised_feedback=evaluate(revised.method,feedback)
     assert initial.method.ast!=revised.method.ast
+    assert initial.method.transition==("increment",2)
+    assert revised.method.transition==("increment",1)
+    assert initial.method.challenges==16
+    assert revised.method.challenges==64
     assert initial_feedback["correct"]<15
     assert revised_feedback["correct"]==15
     assert revised.correct_on_meta_training==39
