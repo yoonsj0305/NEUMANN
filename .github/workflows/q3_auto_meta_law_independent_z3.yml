@@ -1,0 +1,60 @@
+name: Q3 Independent Z3 Certification of Self-Generated Boolean Meta Laws
+
+on:
+  push:
+    branches:
+      - research/q3-invariant-quotient-boolean-20261108
+    paths:
+      - research/q3/independent_z3_auto_meta_law_original_audit.py
+      - .github/workflows/q3_auto_meta_law_independent_z3.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  z3_all_new_method_programs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Independent pinned SMT checker
+        run: |
+          python -m pip install -q --disable-pip-version-check z3-solver==4.13.3.0
+          python - <<'PY'
+          import z3
+          assert z3.get_version_string().startswith("4.13.3")
+          PY
+      - name: Read immutable untouched 32-target original FIRST only
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-inferred-boolean-meta-laws-32-new-original-FIRST
+          run-id: 42435101680
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: new
+      - name: Check independent verifier accepts correct and rejects faulty code
+        run: |
+          python -m py_compile research/q3/independent_z3_auto_meta_law_original_audit.py
+          git hash-object research/q3/independent_z3_auto_meta_law_original_audit.py
+          python - <<'PY'
+          import json,sys
+          sys.path.insert(0,"research/q3")
+          import independent_z3_auto_meta_law_original_audit as x
+          import independent_z3_causal_boolean_proof_audit as z
+          j=json.load(open(x.SOURCE))
+          assert len(j["target_registry"])==32
+          assert j["errors"]==0
+          assert j["summary"]["automatically_proven_invariant"]["exact"]==19
+          assert z.ast_smt(["not",["or",["=",["s"],["t"]],["const",False]]])
+          print("FROZEN_ORIGINAL_LEDGER_VERIFIER_PREFLIGHT_PASS")
+          PY
+      - name: Formally certify entire immutable original meta-invention proof ledger
+        run: python research/q3/independent_z3_auto_meta_law_original_audit.py
+      - name: Preserve every independent Z3 counterexample and proof result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-auto-generated-boolean-methods-independent-z3-proofs
+          path: Q3_META_BOOLEAN_INDEPENDENT_Z3_AUDIT.json
+          if-no-files-found: warn

@@ -1,0 +1,63 @@
+name: Q3 Optimized Invariant DNF Method New 32 Official Originals FIRST
+
+on:
+  push:
+    branches:
+      - research/q3-invariant-quotient-boolean-20261108
+    paths:
+      - research/q3/causal_residual_compiler_optimized_unseen_first.py
+      - .github/workflows/q3_optimized_residual_new_unseen_first.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  source_then_unseen_boolean:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Load previous source-only original model
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-causal-existence-bool-source-FROZEN
+          run-id: 42434312622
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: source_policy
+      - name: Freeze improved conditional compiler and distinct new cohort
+        run: |
+          python -m py_compile research/q3/causal_residual_compiler_optimized_unseen_first.py
+          git hash-object research/q3/causal_residual_compiler_optimized_unseen_first.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'research/q3')
+          import causal_residual_compiler_optimized_unseen_first as g
+          assert len(g.NEW_TARGET)==32
+          assert g.NEW_TARGET==[f"ic_{r}_{op}.sl" for r in ("bvule","bvult") for op in g.old.base.OPS]
+          assert not set(g.NEW_TARGET)&set(g.old.TARGET+[f'ic_{r}_{op}.sl' for r in ('bvugt','ne') for op in g.old.base.OPS])
+          atoms=g.old.atom_library()
+          mask=atoms[5][1]
+          ast,_,_=g.fast_residual(mask,atoms)
+          assert g.old.independently_check(ast,mask)
+          print("CAUSAL_RESIDUAL_SOURCE_ONLY_PREFLIGHT_PASS")
+          PY
+      - name: Learn dual method and DNF activation from ONLY previous source group
+        run: python research/q3/causal_residual_compiler_optimized_unseen_first.py source
+      - name: Archive frozen source rules before any target bytes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-causal-optimized-dnf-source-only-FROZEN
+          path: Q3_CAUSAL_DUAL_AND_DNF_SOURCE_FROZEN.json
+          if-no-files-found: warn
+      - name: Evaluate fresh untouched 32 existential predicates
+        run: python research/q3/causal_residual_compiler_optimized_unseen_first.py target
+      - name: Archive true first target predictions
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-optimized-causal-method-32-new-formal-FIRST
+          path: Q3_CAUSAL_DUAL_FRESH_ORIGINAL_FIRST.json
+          if-no-files-found: warn

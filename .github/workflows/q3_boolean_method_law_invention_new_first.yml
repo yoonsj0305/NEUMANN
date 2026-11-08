@@ -1,0 +1,73 @@
+name: Q3 Auto-Synthesize Boolean Method Laws - New Formal Original FIRST
+
+on:
+  push:
+    branches:
+      - research/q3-invariant-quotient-boolean-20261108
+    paths:
+      - research/q3/self_discovered_boolean_semantic_laws_original_first.py
+      - .github/workflows/q3_boolean_method_law_invention_new_first.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  blind_symbolic_method_transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve source-verified original OR constructor (not new targets)
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-causal-existence-bool-source-FROZEN
+          run-id: 42434312622
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: prior
+      - name: Freeze generic meta generator and 32 untouched task names
+        run: |
+          python -m py_compile research/q3/self_discovered_boolean_semantic_laws_original_first.py
+          git hash-object research/q3/self_discovered_boolean_semantic_laws_original_first.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,"research/q3")
+          import self_discovered_boolean_semantic_laws_original_first as x
+          assert len(x.TARGET)==32
+          assert x.TARGET==[f"ic_{r}_{op}.sl"
+              for r in ("bvsle","eq") for op in x.src.base.OPS]
+          assert not set(x.TARGET)&set(x.src.SOURCE+x.src.TARGET)
+          funcs,seed=x.compile_meta_functions()
+          assert len(funcs)==16
+          assert "Z_SUBSET_A" in x.prove_laws(8) and "Z_SUBSET_B" in x.prove_laws(8)
+          assert "A_SUBSET_Z" in x.prove_laws(14) and "B_SUBSET_Z" in x.prove_laws(14)
+          assert x.truth_signature(funcs[8])==8
+          atoms=x.src.atom_library()
+          singleton=atoms[0][1]
+          model={"functions":[{"truth_signature":i,
+                 "expression":e,"proved_laws":x.prove_laws(i),
+                 "program_nodes":x.complexity(e)}
+                  for i,e in funcs.items()]}
+          p,c,_,_,_=x.fast_search(singleton,atoms,model,True)
+          assert x.src.independently_check(p,singleton)
+          print("SOURCE-ONLY-METHOD-DISCOVERY-PREFLIGHT_PASS")
+          PY
+      - name: Discover 16 executable Boolean method templates and proof laws from source
+        run: python research/q3/self_discovered_boolean_semantic_laws_original_first.py source
+      - name: Preserve original source-only generated method SHA before targets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-inferred-boolean-functional-basis-and-proven-laws-FROZEN
+          path: Q3_AUTO_DISCOVERED_BOOLEAN_METHOD_LAWS_SOURCE.json
+          if-no-files-found: warn
+      - name: Compare on untouched official 32 inverse-condition originals
+        run: python research/q3/self_discovered_boolean_semantic_laws_original_first.py target
+      - name: Archive first original predictions, proven laws, and negative results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-inferred-boolean-meta-laws-32-new-original-FIRST
+          path: Q3_AUTO_LAWS_BV_CROSS_RELATION_ORIGINAL_FIRST.json
+          if-no-files-found: warn

@@ -1,0 +1,72 @@
+name: Q3 Formal Causal Existence Invariants NEW 32 ORIGINAL FIRST
+
+on:
+  push:
+    branches:
+      - research/q3-invariant-quotient-boolean-20261108
+    paths:
+      - research/q3/causal_invariant_boolean_existence_first.py
+      - .github/workflows/q3_causal_invariant_boolean_first.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  freeze_source_then_new_conditions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Source and target registry, interpreter and strict semantic preflight
+        run: |
+          python -m py_compile research/q3/causal_invariant_boolean_existence_first.py
+          git hash-object research/q3/causal_invariant_boolean_existence_first.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,"research/q3")
+          import causal_invariant_boolean_existence_first as m
+          assert len(m.SOURCE)==16 and len(m.TARGET)==32
+          assert set(m.SOURCE).isdisjoint(m.TARGET)
+          assert m.MAX_ATOMS==220
+          clauses="(or "+" ".join(f"(case #x{i:X} s t)" for i in range(16))+")"
+          raw='''(set-logic BV)
+          (synth-fun SC ((s (BitVec 4)) (t (BitVec 4))) Bool
+            ((Start Bool (true false (and Start Start) (or Start Start) (= StartBv StartBv)))
+             (StartBv (BitVec 4) (s t #x0 #x8 #x7 (bvnot StartBv)))))
+          (declare-var s (BitVec 4))
+          (declare-var t (BitVec 4))
+          (define-fun case ((x (BitVec 4)) (s (BitVec 4)) (t (BitVec 4))) Bool (= x s))
+          (constraint (= '''+clauses+''' (SC s t)))
+          (check-synth)'''
+          y,checks=m.existential_truth(raw)
+          assert y==m.FULL
+          assert checks>0
+          atoms=m.atom_library()
+          assert len(atoms)>=10
+          a,n=m.cold_solve(y,atoms)
+          b,_,cert=m.invariant_solve(y,atoms,{"enabled_compositions":["and","or"]})
+          assert a==("const",True)
+          assert b==("const",True)
+          assert m.independently_check(a,y)
+          assert m.independently_check(b,y)
+          print("SEMANTIC_EXISTENTIAL_SOURCE_ONLY_PREFLIGHT_PASS",len(atoms))
+          PY
+      - name: Learn causal predicate roles and executable source constructors
+        run: python research/q3/causal_invariant_boolean_existence_first.py source
+      - name: Archive immutable method BEFORE target documents are accessed
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-causal-existence-bool-source-FROZEN
+          path: Q3_BOOLEAN_INVARIANT_SOURCE_FROZEN.json
+          if-no-files-found: warn
+      - name: Test 32 UNOPENED official existential-condition originals
+        run: python research/q3/causal_invariant_boolean_existence_first.py target
+      - name: Archive original-first full results including negative outcomes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-causal-existence-bool-32-untouched-original-FIRST
+          path: Q3_BOOLEAN_INVARIANT_FRESH_FIRST.json
+          if-no-files-found: warn
