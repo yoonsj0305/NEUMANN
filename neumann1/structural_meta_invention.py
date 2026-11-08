@@ -226,9 +226,24 @@ class StructuralMetaInventor:
         b = {x[1] for x in _nodes(larger.expr) if
              x[0] == "lit" and type(x[1]) is int and x[1] not in (0, 1)}
         constants = tuple(sorted(a & b))
-        slots = {value: i for i, value in enumerate(constants)}
-        base = _map_constants(smaller.expr, slots)
-        extended = _map_constants(larger.expr, slots)
+        # Parameter identity is structural; its observed numeric value may
+        # change from one certified program to the next. Preserve the slot,
+        # not the observed source value (e.g. threshold 5 -> threshold 15).
+        if smaller.params or larger.params:
+            if len(smaller.params) != len(larger.params):
+                return []
+            if any(v in (0, 1) for v in smaller.params + larger.params):
+                return []  # avoid abstracting structural literal 0/1
+            old_slots = {v: i for i, v in enumerate(smaller.params)}
+            new_slots = {v: i for i, v in enumerate(larger.params)}
+            parameter_count = len(smaller.params)
+            reconstruction_parameters = larger.params
+        else:
+            old_slots = new_slots = {v: i for i, v in enumerate(constants)}
+            parameter_count = len(constants)
+            reconstruction_parameters = constants
+        base = _map_constants(smaller.expr, old_slots)
+        extended = _map_constants(larger.expr, new_slots)
         invented = []
         for direction in ("append", "prepend"):
             previous = base if direction == "append" else _shift(base, 1)
@@ -240,12 +255,12 @@ class StructuralMetaInventor:
             method = InventedMethod(
                 family=smaller.family, source_arity=smaller.arity,
                 direction=direction, base=base, context=skeleton,
-                parameters=len(constants),
+                parameters=parameter_count,
                 source_hash=_hash((smaller.certificate, larger.certificate)))
             if _size(base) + _size(skeleton) > self.max_nodes:
                 continue
             try:
-                if method.generate(larger.arity, constants) != larger.expr:
+                if method.generate(larger.arity, reconstruction_parameters) != larger.expr:
                     continue
             except (ValueError, AssertionError):
                 continue
