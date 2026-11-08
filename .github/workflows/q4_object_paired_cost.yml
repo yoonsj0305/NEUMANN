@@ -23,11 +23,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Reproduce EXACT prior object enumerator from immutable commit
+      - name: Restore two TRUE historical forward solvers by immutable SHA
         run: |
-          git fetch -q --depth 1 origin c193e291f37936a59c74f12be60479f62ad8a73f
-          git show c193e291f37936a59c74f12be60479f62ad8a73f:neumann1/scene_graph_inventor.py > neumann1/_q3_forward_reference.py
-          test -s neumann1/_q3_forward_reference.py
+          git fetch -q --depth 1 origin c0569e915de56128f87d40df05c6c6b68552c747
+          git fetch -q --depth 1 origin de59b6bcec4a37f0acbfdc0c2fd55f54f811b676
+          git show c0569e915de56128f87d40df05c6c6b68552c747:neumann1/scene_graph_inventor.py > neumann1/_q3_forward_raw.py
+          git show de59b6bcec4a37f0acbfdc0c2fd55f54f811b676:neumann1/scene_graph_inventor.py > neumann1/_q3_forward_pruned.py
+          grep -q 'for mode in RENDERS' neumann1/_q3_forward_raw.py
+          grep -q 'Shape-first pruning' neumann1/_q3_forward_pruned.py
+          test -s neumann1/_q3_forward_raw.py
+          test -s neumann1/_q3_forward_pruned.py
       - name: Fetch fixed independently-authored training source originals
         run: |
           mkdir -p /tmp/q4-object-source
@@ -57,7 +62,10 @@ jobs:
               assert s['source_checked']+s['skipped']==128
               assert not s['external_target_gold_used']
               assert not s['global_q4_pass']
-              print(cohort,s['paired_source_speedup'],s['old_forward_source_fits'],s['new_inverse_source_fits'])
+              print(cohort,'RAW / INV',s['raw_to_inverse_paired_speedup'],
+                    'PRUNED / INV',s['shape_pruned_to_inverse_paired_speedup'],
+                    'SOURCE FITS',s['raw_forward_source_fits'],
+                    s['shape_pruned_source_fits'],s['inverse_source_fits'])
           print('PAIRED SOURCE DSL OPTIMIZATION; NOT STRONGEST CLASSICAL/FULL Q4')
           PY
       - uses: actions/upload-artifact@v4
