@@ -28,18 +28,27 @@ from neumann1.scene_graph_inventor import ObjectGrammarInventor
 
 HERE=pathlib.Path(__file__).resolve().parent
 EXCLUSION=HERE/"arc2_previous_96_exclusions.json"
+SECOND_EXCLUSION=HERE/"arc2_object_first128_exclusions.json"
 
 
-def freeze_options():
+def freeze_options(cohort="second"):
     rules=json.loads(EXCLUSION.read_text())
     ids=set(rules["excluded_prior_ids"])
     if len(ids)!=96:
         raise ValueError("pre-exposed task exclusion contract invalid")
-    return ids,rules["salt"]
+    if cohort=="first":
+        return ids,rules["salt"]
+    if cohort=="second":
+        second=json.loads(SECOND_EXCLUSION.read_text())
+        new=set(second["excluded_second_prior_ids"])
+        if len(new)!=128 or new & ids:
+            raise ValueError("second-original first cohort not disjoint")
+        return ids|new,second["salt"]
+    raise ValueError("unknown cohort; cannot reuse previously scored target gold")
 
 
-def prepare(upstream,blind,n):
-    excluded,salt=freeze_options()
+def prepare(upstream,blind,n,*,cohort="second"):
+    excluded,salt=freeze_options(cohort)
     root=checked_upstream(upstream)
     candidates=[p for p in root.glob("*.json")
                 if p.stem not in excluded]
@@ -67,6 +76,7 @@ def prepare(upstream,blind,n):
         "external_commit":PINNED_ARC2,
         "salt":salt,
         "excluded_prior_training_tasks":len(excluded),
+        "cohort":cohort,
         "all_test_answers_removed":True,
         "files":manifest},indent=2)+"\n")
     print("NEW EXTERNAL TASK IDS FROZEN:",n, "EXCLUDED:",len(excluded))
@@ -205,7 +215,8 @@ def propose(blind,out,*,relational_ms,object_ms):
     output={
         "schema":"NEUMANN.Q3.object-grammar-external-fresh-128.blind.v1",
         "upstream_commit":PINNED_ARC2,
-        "old_ids_excluded":96,
+        "old_ids_excluded":manifest["excluded_prior_training_tasks"],
+        "cohort":manifest["cohort"],
         "all_test_outputs_removed_before_proposal":True,
         "records":records
     }
@@ -219,7 +230,9 @@ def score(upstream,predictions,frozen_sha,out):
         raise ValueError("the predictions changed after source-only proposal")
     root=checked_upstream(upstream)
     data=json.loads(predictions.read_text())
-    excluded,_=freeze_options()
+    excluded,_=freeze_options(data.get("cohort","first"))
+    if data.get("old_ids_excluded")!=len(excluded):
+        raise ValueError("frozen excluded-cohort contract changed")
     scored=[]
     for rec in data["records"]:
         if rec["task_id"] in excluded:
@@ -299,6 +312,7 @@ def main():
     q.add_argument("--upstream",type=pathlib.Path,required=True)
     q.add_argument("--blind",type=pathlib.Path,required=True)
     q.add_argument("--n",type=int,default=128)
+    q.add_argument("--cohort",choices=("first","second"),default="second")
     q=sub.add_parser("propose")
     q.add_argument("--blind",type=pathlib.Path,required=True)
     q.add_argument("--output",type=pathlib.Path,required=True)
@@ -310,7 +324,7 @@ def main():
     q.add_argument("--expected-sha",required=True)
     q.add_argument("--output",type=pathlib.Path,required=True)
     a=p.parse_args()
-    if a.cmd=="prepare":prepare(a.upstream,a.blind,a.n)
+    if a.cmd=="prepare":prepare(a.upstream,a.blind,a.n,cohort=a.cohort)
     elif a.cmd=="propose":propose(a.blind,a.output,
                                  relational_ms=a.rel_ms,object_ms=a.obj_ms)
     else:score(a.upstream,a.predictions,a.expected_sha,a.output)
