@@ -33,10 +33,23 @@ def _deadline(deadline):
         raise SearchBudgetExceeded('causal representation search cost cap')
 
 
+def _shape_ok(height,width):
+    """Same pixel memory bound, but permit arbitrary aspect ratio for 1D.
+
+    Canonical ARC2 maps are <=30 x <=30. Independently authored 1D ARC
+    problems are naturally 1 x N or N x 1 with N sometimes >30.
+    A pixel-count cap, not arbitrary axis cap, is the physical limit.
+    """
+    return (1<=height and 1<=width and height*width<=MAX_PIXELS
+            and (min(height,width)==1 or (height<=30 and width<=30)))
+
+
 def grid(data):
-    if not 1<=len(data)<=30 or not 1<=len(data[0])<=30:
+    if not isinstance(data,(list,tuple)) or not data or not data[0]:
         raise ValueError("invalid grid size")
     g=tuple(tuple(int(x) for x in row) for row in data)
+    if not _shape_ok(len(g),len(g[0])):
+        raise ValueError("invalid grid size")
     if any(len(r)!=len(g[0]) or any(x<0 or x>9 for x in r) for r in g):
         raise ValueError("invalid grid values")
     return g
@@ -91,6 +104,12 @@ def _fields(g):
     """
     h,w=len(g),len(g[0])
     counts=Counter(v for row in g for v in row)
+    # Keep cost linear in pixel count, including long 1D grids. Previously
+    # the same row and column counts were recomputed for EVERY pixel.
+    row_hist=[Counter(row) for row in g]
+    col_hist=[Counter(g[r][c] for r in range(h)) for c in range(w)]
+    row_nz=[sum(v!=0 for v in row) for row in g]
+    col_nz=[sum(g[r][c]!=0 for r in range(h)) for c in range(w)]
     roles=_color_roles(g)
     nonzero=[(r,c) for r in range(h) for c in range(w) if g[r][c]!=0]
     if nonzero:
@@ -123,10 +142,10 @@ def _fields(g):
                 "anti_diagonal":int(r+c==w-1),
                 "row_parity":r%2,"col_parity":c%2,
                 "checker_parity":(r+c)%2,
-                "row_color_count":sum(x==v for x in g[r]),
-                "col_color_count":sum(g[y][c]==v for y in range(h)),
-                "row_nonzero_count":sum(x!=0 for x in g[r]),
-                "col_nonzero_count":sum(g[y][c]!=0 for y in range(h)),
+                "row_color_count":row_hist[r][v],
+                "col_color_count":col_hist[c][v],
+                "row_nonzero_count":row_nz[r],
+                "col_nonzero_count":col_nz[c],
                 "color_count":counts[v],
                 "component_size":comp["size"],
                 "component_h":comp["r1"]-comp["r0"]+1,
