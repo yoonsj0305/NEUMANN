@@ -1,0 +1,52 @@
+name: Q3 ARC2 Relational Predicate SOURCE-ONLY Discovery Freeze
+
+on:
+  push:
+    branches:
+      - feature/q3-relational-predicate-invention-arc2-20261108
+    paths:
+      - neumann1/relational_grid_inventor.py
+      - neumann1/arc2_meta_grid_reasoner.py
+      - research/q3/arc2_relational_invention_official_source_then_fresh_first.py
+      - .github/workflows/q3_arc2_relational_source_frozen.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  develop_source_and_freeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 23
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch exact original ARC2 revision
+        run: |
+          git init -q arc2_official
+          git -C arc2_official fetch -q --depth 1 https://github.com/arcprize/ARC-AGI-2.git f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C arc2_official checkout -q FETCH_HEAD
+          test "$(git -C arc2_official rev-parse HEAD)" = f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(find arc2_official/data/training -name '*.json' | wc -l)" -eq 1000
+      - name: Confirm generated-predicate core interface and no target read
+        run: |
+          python -m compileall -q neumann1
+          python -m pytest -q tests/test_relational_grid_inventor.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0, "research/q3")
+          import arc2_relational_invention_official_source_then_fresh_first as t
+          src,val,new=t.registries()
+          assert len(src)==256 and len(val)==128 and len(new)==240
+          assert not set(p.stem for p in src+val)&set(p.stem for p in new)
+          assert not t.INSPECTED&set(p.stem for p in new)
+          print("SOURCE_AND_240_UNOPENED_TARGET_FILENAMES_FROZEN")
+          PY
+      - name: Learn and diagnose representation on old development SOURCE only
+        run: python research/q3/arc2_relational_invention_official_source_then_fresh_first.py source
+      - name: Archive source methods, failures, code hashes and untouched 240 target IDs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-relational-inventor-384-source-before-240-new-original-FROZEN
+          path: Q3_RELATIONAL_PROGRAM_LANGUAGE_SOURCE_ONLY_FROZEN.json
+          if-no-files-found: warn
