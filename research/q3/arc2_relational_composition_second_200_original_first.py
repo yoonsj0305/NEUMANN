@@ -14,6 +14,7 @@ retains 2 attempts and candidate scoring rights.
 """
 from __future__ import annotations
 import hashlib,json,pathlib,sys,time
+sys.path.insert(0,".")
 sys.path.insert(0,"neumann1")
 import arc2_meta_grid_reasoner as old
 from neumann1.relational_grid_inventor import grid
