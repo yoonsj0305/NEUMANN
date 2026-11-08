@@ -77,9 +77,10 @@ class NeumannEngine:
                            params=(), verify=None, classical=None):
         """Solve a program task AND improve NEUMANN's reusable method language.
 
-        No human observe_program call is needed. Certified classical outputs
-        are inducted automatically; learned programs are preferred and
-        independently reverified on each target obligation.
+        Trustworthy classical solutions are tried first and independently
+        checked. Invented methods execute only after a classical gap or an
+        independent source-only utility admission. Verified classical ASTs
+        may still grow the offline method inventory.
         """
         return self.meta_inventor.solve_or_discover(
             family, arity, params=params, verify=verify, classical=classical)
