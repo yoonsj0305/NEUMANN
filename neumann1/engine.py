@@ -316,4 +316,20 @@ class NeumannEngine:
         from .induced_fixpoint_grammar import InsufficientEvidence
         if not hasattr(self, "_recursive_grammar"):
             raise InsufficientEvidence("no learned recursive grammar")
+        rule = self._recursive_grammar.learned[0]
+        if optimized and rule.verified_for_all_finite_graphs:
+            # The discovered rule is provably equivalent to a known BFS.
+            # Use the strong established algorithm, not the slower invented
+            # delta interpreter. Conditional on task semantics as elsewhere.
+            from .classical_kernels import classical_directed_reachability
+            return classical_directed_reachability(target_input)
         return self._recursive_grammar.solve(target_input, optimized=optimized)
+
+    def solve_known_classical(self, task, *, semantics):
+        """Zero-invention path for a caller-certified classical obligation.
+
+        A trusted semantic adapter supplies 'semantics'. No source pattern
+        or few-shot example is mistaken for mathematical certification.
+        """
+        from .classical_kernels import solve_with_semantic_contract
+        return solve_with_semantic_contract(task, semantics=semantics)
