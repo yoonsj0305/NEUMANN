@@ -242,6 +242,13 @@ class ObjectGrammarInventor:
         self.max_source_ms=max_source_ms
 
     def invent(self,demonstrations,*,verification=(),max_programs=2):
+        """Shape-first pruning: never render a size-impossible program.
+
+        Every candidate is a source-inferred AST; classical segmentation and
+        D4 execution remain pre-existing algorithms. Crucially the shape
+        constraints are a SOUND necessary condition of every constructed
+        rendering program. They delete work, not valid solutions.
+        """
         start=perf_counter_ns()
         train=tuple((grid(x),grid(y)) for x,y in demonstrations)
         checks=tuple((grid(x),grid(y)) for x,y in verification)
@@ -252,11 +259,30 @@ class ObjectGrammarInventor:
         deadline=start+int(self.max_source_ms*1e6)
         counter=0
         found=[]
-        seen_program_signatures=set()
-        # Source-relative background, connectivity, color partitions.
+        def finish():
+            return ObjectInvention(
+                tuple(found),counter,
+                (perf_counter_ns()-start)/1e6,
+                bool(found),len(checks))
+
+        def output_shape(g,obj,mode,transform,factor):
+            if mode.startswith("crop_"):
+                h,w=obj.height,obj.width
+            elif mode.startswith("scalar_"):
+                h,w=1,1
+            else:
+                h,w=len(g),len(g[0])
+            if transform in ("rotate90","rotate270",
+                             "transpose","anti_transpose"):
+                h,w=w,h
+            return h*factor,w*factor
+
+        # The 8 segmentation policies are cheap classical graph procedures.
+        # Color, area and relative position ranking determine new objects.
         for bg_policy in ("zero","modal"):
             for diagonal in (False,True):
                 for mixed_colors in (False,True):
+                    if perf_counter_ns()>deadline:return finish()
                     groups=[]
                     for g,y in train:
                         hist=Counter(v for row in g for v in row)
@@ -264,71 +290,49 @@ class ObjectGrammarInventor:
                             min(hist,key=lambda v:(-hist[v],v)))
                         objects=extract(g,bg,diagonal=diagonal,
                                         mixed_colors=mixed_colors)
-                        groups.append((g,y,bg,objects))
-                    if not all(objects for g,y,bg,objects in groups):
+                        groups.append((g,y,objects))
+                    if not all(objects for g,y,objects in groups):
                         continue
                     for feature in FEATURES:
                         for rank in RANKS:
+                            if perf_counter_ns()>deadline:return finish()
                             selected=[select_object(objects,_dim(g),
-                                feature,rank) for g,y,bg,objects in groups]
+                                feature,rank) for g,y,objects in groups]
                             if any(x is None for x in selected):
                                 continue
+                            # Evaluate only typed size-compatible render ASTs.
+                            # The old implementation eagerly rendered 10 modes
+                            # for 65 selectors per graph, even if the output
+                            # dimensions made all candidates impossible.
                             for mode in RENDERS:
-                                rendered=[]
-                                skip=False
-                                for (g,y,bg,objects),obj in zip(groups,selected):
-                                    temp=render(g,obj,bg,mode)
-                                    if temp is None:
-                                        skip=True;break
-                                    rendered.append(temp)
-                                if skip:continue
+                                if perf_counter_ns()>deadline:return finish()
                                 for transform in D4:
-                                    transforms=tuple(old.d4(x,transform)
-                                                     for x in rendered)
                                     for factor in SCALES:
-                                        if any(not _compatible(_dim(y),
-                                                (obj.height,obj.width),
-                                                mode,transform,factor)
-                                               for (g,y,bg,objects),obj
+                                        if any(output_shape(g,obj,mode,transform,factor)
+                                               !=_dim(y)
+                                               for (g,y,objects),obj
                                                in zip(groups,selected)):
-                                            continue
-                                        if any(_dim(y)!=
-                                               (_dim(o)[0]*factor,
-                                                _dim(o)[1]*factor)
-                                               for o,(g,y,bg,objs) in
-                                               zip(transforms,groups)):
                                             continue
                                         counter+=1
                                         if counter>self.max_candidates or (
                                                 perf_counter_ns()>deadline):
-                                            return ObjectInvention(
-                                                tuple(found),counter,
-                                                (perf_counter_ns()-start)/1e6,
-                                                bool(found),len(checks))
-                                        if any(scale(o,factor)!=y for o,
-                                               (g,y,bg,objs) in
-                                               zip(transforms,groups)):
-                                            continue
+                                            return finish()
                                         program=ObjectProgram(
                                             bg_policy,diagonal,mixed_colors,
                                             feature,rank,mode,transform,factor)
                                         try:
-                                            if not all(program.apply(x)==y
-                                                       for x,y in checks):
+                                            # Early bail: a single source
+                                            # counterexample refutes candidate.
+                                            if not all(program.apply(g)==y
+                                                       for g,y in train):
+                                                continue
+                                            if not all(program.apply(g)==y
+                                                       for g,y in checks):
                                                 continue
                                         except (ValueError,TypeError):
                                             continue
-                                        signature=tuple(program.apply(x)
-                                                        for x,y in checks)
-                                        if signature in seen_program_signatures:
-                                            continue
-                                        seen_program_signatures.add(signature)
-                                        found.append(program)
-                                        if len(found)>=max_programs:
-                                            return ObjectInvention(
-                                                tuple(found),counter,
-                                                (perf_counter_ns()-start)/1e6,
-                                                True,len(checks))
-        return ObjectInvention(tuple(found),counter,
-                               (perf_counter_ns()-start)/1e6,bool(found),
-                               len(checks))
+                                        if program not in found:
+                                            found.append(program)
+                                            if len(found)>=max_programs:
+                                                return finish()
+        return finish()
