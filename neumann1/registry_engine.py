@@ -268,3 +268,34 @@ class RegistryEngine:
             query_budget=query_budget, seed=seed, patience=patience,
             validation=validation_queries, max_rank=max_rank,
             rank_upper_bound=trusted_rank_upper_bound)
+
+    def learn_boolean_constructor(self, source_oracle, *,
+                                  max_source_queries=28):
+        """Grow a persistent invented-method inventory from source tasks.
+
+        The Boolean fold expression is not in a predefined operator list.
+        Source programs at arity 2/3 are analyzed to construct a new reusable
+        transition program; arity 4 provides an independent source check.
+        """
+        from .boolean_meta_inventor import invent_boolean_fold
+        method = invent_boolean_fold(
+            source_oracle, max_source_queries=max_source_queries)
+        if not hasattr(self, "_source_invented_boolean_methods"):
+            self._source_invented_boolean_methods = {}
+        key = method.fingerprint()
+        novel = key not in self._source_invented_boolean_methods
+        self._source_invented_boolean_methods[key] = method
+        return {"method_id": key, "method": method, "new_constructor": novel,
+                "source_query_count": method.source_observations}
+
+    def execute_boolean_constructor(self, method_id, input_bits):
+        """Reuse a previously source-constructed executable method without queries.
+
+        The result is conditional on the unproven recurrence hypothesis;
+        caller's independent target verifier retains final authority.
+        """
+        inventory = getattr(self, "_source_invented_boolean_methods", {})
+        if method_id not in inventory:
+            from .boolean_meta_inventor import InsufficientEvidence
+            raise InsufficientEvidence("constructor not in learned inventory")
+        return inventory[method_id].apply(input_bits)
