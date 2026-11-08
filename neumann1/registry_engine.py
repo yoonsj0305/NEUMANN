@@ -483,3 +483,34 @@ class RegistryEngine:
                 existing.append(evidence.program)
             self._q3_typed_methods=tuple(existing[-32:])
         return evidence
+
+    def invent_latent_representation(self, source_pairs,
+                                     independent_source_checks, *,
+                                     classical_solvers=(), max_degree=3,
+                                     max_features=1000, max_source_ms=3000):
+        """Create new symbolic interaction features from source-only raw facts.
+
+        Classical solvers take priority; source/full-rank uniqueness and
+        independent verification are required before any invented rule is
+        executable. The language is bounded GF2 polynomials, not universal.
+        """
+        from .causal_representation_inventor import CausalRepresentationInventor
+        return CausalRepresentationInventor(
+            max_degree=max_degree,max_features=max_features,
+            max_source_ms=max_source_ms).invent(
+                source_pairs,
+                independent_source_checks=independent_source_checks,
+                classical_solvers=classical_solvers)
+
+    def actively_invent_latent_representation(self, source_oracle, *,
+                                               width,max_degree=3,
+                                               independent_checks=64,
+                                               seed=1007,
+                                               classical_solvers=()):
+        """Select source probes for latent features, never read target gold."""
+        from .causal_representation_inventor import (
+            invent_with_active_source_queries)
+        return invent_with_active_source_queries(
+            source_oracle,width=width,max_degree=max_degree,
+            independent_checks=independent_checks,seed=seed,
+            classical_solvers=classical_solvers)
