@@ -55,14 +55,21 @@ def atom(name,x):
     return INVALID
 
 
-def eval_ast(ast,input_value):
+def eval_ast(ast,input_value,*,dynamic_primitives=None):
     tag=ast[0]
     if tag=='input':return freeze(input_value)
     if tag=='call':
-        value=eval_ast(ast[2],input_value)
-        return INVALID if value is INVALID else atom(ast[1],value)
+        value=eval_ast(ast[2],input_value,dynamic_primitives=dynamic_primitives)
+        if value is INVALID:return INVALID
+        if dynamic_primitives and ast[1] in dynamic_primitives:
+            try:
+                task=dict(value) if isinstance(value,tuple) else value
+                return dynamic_primitives[ast[1]].apply_delta(task)
+            except (TypeError,ValueError,KeyError):
+                return INVALID
+        return atom(ast[1],value)
     if tag=='map':
-        value=eval_ast(ast[2],input_value)
+        value=eval_ast(ast[2],input_value,dynamic_primitives=dynamic_primitives)
         if not isinstance(value,tuple):return INVALID
         result=tuple(atom(ast[1],x) for x in value)
         return INVALID if any(x is INVALID for x in result) else result
@@ -152,6 +159,15 @@ class GrammarInventor:
         self.max_candidates=max_candidates
         self.source_solutions={}
         self.productions=[]
+        self.dynamic_primitives={}
+
+    def register_generated_primitive(self,name,rule):
+        """Admit only a verified symbolic least-fixedpoint constructor."""
+        if (not isinstance(name,str) or not name.startswith('invented:') or
+                name in ATOMIC or name in self.dynamic_primitives or
+                not getattr(rule,'verified_for_all_finite_graphs',False)):
+            raise ValueError('unverified invented primitive must not enter grammar')
+        self.dynamic_primitives[name]=rule
 
     def invent_from_source(self,task_id,examples,*,verification_pairs=None):
         if task_id in self.source_solutions:
@@ -203,7 +219,7 @@ class GrammarInventor:
         def check(ast,used):
             nonlocal checked
             if cost(ast)>self.max_cost:return None
-            outputs=tuple(eval_ast(ast,x) for x in xs)
+            outputs=tuple(eval_ast(ast,x,dynamic_primitives=self.dynamic_primitives) for x in xs)
             if any(o is INVALID for o in outputs):return None
             if outputs in seen:return None
             seen[outputs]=ast
@@ -225,22 +241,22 @@ class GrammarInventor:
                             if cost(ast)!=depth:continue
                             r=check(ast,True)
                             if r:return r
-                            if seen.get(tuple(eval_ast(ast,x) for x in xs))==ast:
+                            if seen.get(tuple(eval_ast(ast,x,dynamic_primitives=self.dynamic_primitives) for x in xs))==ast:
                                 next_level.append(ast)
                             if checked>=self.max_candidates:
                                 return Synthesis(None,checked,(perf_counter_ns()-start)/1e6,False,False)
             for child in by_depth.get(depth-1,[]):
-                for name in ATOMIC:
+                for name in ATOMIC + tuple(self.dynamic_primitives):
                     ast=('call',name,child)
                     r=check(ast,False)
                     if r:return r
-                    if seen.get(tuple(eval_ast(ast,x) for x in xs))==ast:
+                    if seen.get(tuple(eval_ast(ast,x,dynamic_primitives=self.dynamic_primitives) for x in xs))==ast:
                         next_level.append(ast)
                 for name in MAP_OPS:
                     ast=('map',name,child)
                     r=check(ast,False)
                     if r:return r
-                    if seen.get(tuple(eval_ast(ast,x) for x in xs))==ast:
+                    if seen.get(tuple(eval_ast(ast,x,dynamic_primitives=self.dynamic_primitives) for x in xs))==ast:
                         next_level.append(ast)
                 if checked>=self.max_candidates:
                     return Synthesis(None,checked,(perf_counter_ns()-start)/1e6,False,False)
