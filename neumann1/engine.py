@@ -264,3 +264,32 @@ class NeumannEngine:
         """Expose generated productions, not only cached task solutions."""
         return tuple(getattr(self,"_invented_grammar",None).productions) \
             if hasattr(self,"_invented_grammar") else ()
+
+    def learn_recursive_control(self, source_tasks, *, independent_source_checks,
+                                max_candidates=128):
+        """Generate executable fixed-point/control grammar from source I/O.
+
+        A separate source verifier must support the rule. This API does NOT
+        claim to infer arbitrary new instruction semantics or target output.
+        """
+        from .induced_fixpoint_grammar import RecursiveGrammarInventor
+        if not hasattr(self, "_recursive_grammar"):
+            self._recursive_grammar = RecursiveGrammarInventor(
+                max_candidates=max_candidates)
+        return self._recursive_grammar.invent(
+            source_tasks, verification_tasks=independent_source_checks)
+
+    def revise_recursive_control(self, source_counterexample):
+        """Falsify and re-invent control structure; fail closed during repair."""
+        from .induced_fixpoint_grammar import InsufficientEvidence
+        if not hasattr(self, "_recursive_grammar"):
+            raise InsufficientEvidence("no learned recursive grammar")
+        return self._recursive_grammar.revise_with_source_counterexample(
+            source_counterexample)
+
+    def execute_recursive_control(self, target_input, *, optimized=True):
+        """Execute only the promoted rule; unknown structures fail closed."""
+        from .induced_fixpoint_grammar import InsufficientEvidence
+        if not hasattr(self, "_recursive_grammar"):
+            raise InsufficientEvidence("no learned recursive grammar")
+        return self._recursive_grammar.solve(target_input, optimized=optimized)
