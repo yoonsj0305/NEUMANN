@@ -121,6 +121,35 @@ def _shift(ast, delta, memo=None):
     return out
 
 
+def _reindex_with_fresh(ast, old_arity, insertion_index, reverse=False, memo=None):
+    """Execute an automatically inferred argument-alignment PROGRAM.
+
+    Old argument positions are embedded in an enlarged arity by inserting
+    one fresh argument at any index, with optional reversal. This transforms
+    a whole prior solution, not a named task-specific algorithm.
+    """
+    if type(insertion_index) is not int or not 0 <= insertion_index <= old_arity:
+        raise ValueError("insertion index out of range")
+    if memo is None:
+        memo = {}
+    if id(ast) in memo:
+        return memo[id(ast)]
+    if ast[0] == "arg":
+        index = ast[1]
+        if not 0 <= index < old_arity:
+            raise ValueError("source argument outside old arity")
+        index = old_arity - 1 - index if reverse else index
+        out = ("arg", index + int(index >= insertion_index))
+    elif ast[0] in ("lit", "_meta_param", "_meta_hole", "_meta_new"):
+        out = ast
+    else:
+        out = (ast[0], *(_reindex_with_fresh(
+            child, old_arity, insertion_index, reverse, memo)
+            for child in ast[1:]))
+    memo[id(ast)] = out
+    return out
+
+
 def _extract(outer, repeated):
     if outer == repeated:
         return ("_meta_hole",), 1
@@ -189,14 +218,20 @@ class InventedMethod:
     context: Expr
     parameters: int
     source_hash: str
+    insertion_index: int = -1
+    reverse: bool = False
     successes: int = 0
     failures: int = 0
     verifier_queries: int = 0
 
     @property
     def identity(self):
-        return _hash((self.family, self.direction, self.base, self.context,
-                      self.parameters, self.source_hash))
+        # Keep historical append/prepend identities stable for checkpoints.
+        identity = (self.family, self.direction, self.base, self.context,
+                    self.parameters, self.source_hash)
+        if self.direction in ("insert", "permuted_insert"):
+            identity = (*identity, self.insertion_index, self.reverse)
+        return _hash(identity)
 
     def generate(self, arity: int, params: tuple = ()) -> Expr:
         if type(arity) is not int or arity < self.source_arity:
@@ -209,6 +244,13 @@ class InventedMethod:
                 out = _materialize(self.context, out, n, params)
             elif self.direction == "prepend":
                 out = _materialize(self.context, _shift(out, 1), 0, params)
+            elif self.direction in ("insert", "permuted_insert"):
+                if self.insertion_index >= n + 1:
+                    raise ValueError("insertion index invalid for arity")
+                previous = _reindex_with_fresh(
+                    out, n, self.insertion_index, self.reverse)
+                out = _materialize(
+                    self.context, previous, self.insertion_index, params)
             else:
                 raise AssertionError("unknown learned method direction")
         if any(i >= arity for i in _args(out)):
@@ -268,28 +310,46 @@ class StructuralMetaInventor:
         base = _map_constants(smaller.expr, old_slots)
         extended = _map_constants(larger.expr, new_slots)
         invented = []
-        for direction in ("append", "prepend"):
-            previous = base if direction == "append" else _shift(base, 1)
-            context, count = _extract(extended, previous)
-            new_index = smaller.arity if direction == "append" else 0
-            if not count or new_index not in _args(context):
-                continue
-            skeleton = _fresh_to_marker(context, new_index)
-            method = InventedMethod(
-                family=smaller.family, source_arity=smaller.arity,
-                direction=direction, base=base, context=skeleton,
-                parameters=parameter_count,
-                source_hash=_hash((smaller.certificate, larger.certificate)))
-            if _size(base) + _size(skeleton) > self.max_nodes:
-                continue
-            try:
-                if method.generate(larger.arity, reconstruction_parameters) != larger.expr:
+        # Search over EDIT OPERATORS themselves: the expanded program
+        # determines WHERE an old argument sequence is embedded and whether
+        # its order is reversed. Previously only the two endpoints were
+        # representable, so genuine interior insertion was impossible.
+        #
+        # The discovered reindexing program is persisted with its context.
+        for reverse in (False, True):
+            for insertion_index in range(smaller.arity + 1):
+                previous = _reindex_with_fresh(
+                    base, smaller.arity, insertion_index, reverse)
+                context, count = _extract(extended, previous)
+                if not count or insertion_index not in _args(context):
                     continue
-            except (ValueError, AssertionError):
-                continue
-            if method.identity not in self.methods:
-                self.methods[method.identity] = method
-                invented.append(method)
+                skeleton = _fresh_to_marker(context, insertion_index)
+                if reverse:
+                    direction = "permuted_insert"
+                elif insertion_index == 0:
+                    direction = "prepend"
+                elif insertion_index == smaller.arity:
+                    direction = "append"
+                else:
+                    direction = "insert"
+                method = InventedMethod(
+                    family=smaller.family, source_arity=smaller.arity,
+                    direction=direction, base=base, context=skeleton,
+                    parameters=parameter_count,
+                    source_hash=_hash((smaller.certificate, larger.certificate)),
+                    insertion_index=insertion_index,
+                    reverse=reverse)
+                if _size(base) + _size(skeleton) > self.max_nodes:
+                    continue
+                try:
+                    if method.generate(
+                            larger.arity, reconstruction_parameters) != larger.expr:
+                        continue
+                except (ValueError, AssertionError):
+                    continue
+                if method.identity not in self.methods:
+                    self.methods[method.identity] = method
+                    invented.append(method)
         # Store source evidence whether or not the bounded grammar can
         # represent its recurrence: future source solutions may extend it.
         self.observations[smaller.family][smaller.arity] = smaller
@@ -364,19 +424,33 @@ class StructuralMetaInventor:
                 "direction": m.direction, "base": m.base,
                 "context": m.context, "parameters": m.parameters,
                 "source_hash": m.source_hash,
+                "insertion_index": m.insertion_index,
+                "reverse": m.reverse,
                 "successes": m.successes, "failures": m.failures,
                 "verifier_queries": m.verifier_queries,
             })
-        state = {"schema": "neumann.structural-meta-methods.v1",
+        # Keep certified observations, not only methods: after a restart a
+        # new verified n+1 program must still be able to grow the discovery
+        # language from the stored n program. Version 1 lost that ability.
+        observed = []
+        for family, family_observations in sorted(self.observations.items()):
+            for arity, p in sorted(family_observations.items()):
+                observed.append({
+                    "family": p.family, "arity": arity, "expr": p.expr,
+                    "params": p.params, "certificate": p.certificate,
+                })
+        state = {"schema": "neumann.structural-meta-methods.v2",
                  "max_nodes": self.max_nodes, "max_arity": self.max_arity,
-                 "methods": rows}
+                 "methods": rows, "observations": observed}
         state["sha256"] = _hash(state)
         return state
 
     @classmethod
     def from_checkpoint(cls, checkpoint):
         """Restore verified-USE-ONLY method grammar; never deserialize code."""
-        if type(checkpoint) is not dict or checkpoint.get("schema") != "neumann.structural-meta-methods.v1":
+        if (type(checkpoint) is not dict or checkpoint.get("schema") not in (
+                "neumann.structural-meta-methods.v1",
+                "neumann.structural-meta-methods.v2")):
             raise ValueError("unsupported method checkpoint")
         payload = {k:v for k,v in checkpoint.items() if k != "sha256"}
         if _hash(payload) != checkpoint.get("sha256"):
@@ -417,11 +491,22 @@ class StructuralMetaInventor:
                 family=row["family"], source_arity=row["source_arity"],
                 direction=row["direction"], base=ast(row["base"]),
                 context=ast(row["context"]), parameters=row["parameters"],
-                source_hash=row["source_hash"], successes=row["successes"],
+                source_hash=row["source_hash"],
+                insertion_index=row.get("insertion_index", -1),
+                reverse=row.get("reverse", False),
+                successes=row["successes"],
                 failures=row["failures"],
                 verifier_queries=row["verifier_queries"])
-            if m.direction not in ("append", "prepend") or m.source_arity < 1:
+            if m.direction not in (
+                    "append", "prepend", "insert", "permuted_insert"
+            ) or m.source_arity < 1:
                 raise ValueError("invalid learned method")
+            if m.direction in ("insert", "permuted_insert"):
+                if (type(m.insertion_index) is not int or
+                        not 0 <= m.insertion_index <= m.source_arity or
+                        type(m.reverse) is not bool or
+                        m.reverse != (m.direction == "permuted_insert")):
+                    raise ValueError("invalid learned alignment")
             if type(m.parameters) is not int or m.parameters < 0:
                 raise ValueError("invalid method parameters")
             if _size(m.base) + _size(m.context) > inventory.max_nodes:
@@ -430,4 +515,26 @@ class StructuralMetaInventor:
                    (m.successes, m.failures, m.verifier_queries)):
                 raise ValueError("invalid method costs")
             inventory.methods[m.identity] = m
+        if checkpoint["schema"] == "neumann.structural-meta-methods.v2":
+            records = payload.get("observations")
+            if type(records) is not list or len(records) > 512:
+                raise ValueError("invalid certified observation count")
+            for record in records:
+                if type(record) is not dict or set(record) != {
+                        "family", "arity", "expr", "params", "certificate"}:
+                    raise ValueError("invalid certified source record")
+                if type(record["params"]) not in (list, tuple):
+                    raise ValueError("bad source parameter slots")
+                source = CertifiedProgram(
+                    family=record["family"], arity=record["arity"],
+                    expr=ast(record["expr"]),
+                    params=tuple(record["params"]),
+                    certificate=record["certificate"])
+                if (source.arity > inventory.max_arity or
+                        _expanded_size(source.expr, inventory.max_nodes) >
+                        inventory.max_nodes):
+                    raise ValueError("unsafe stored source AST size")
+                if source.arity in inventory.observations[source.family]:
+                    raise ValueError("duplicate source observation")
+                inventory.observations[source.family][source.arity] = source
         return inventory

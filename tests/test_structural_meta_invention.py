@@ -180,3 +180,113 @@ def test_invalid_truthy_verifier_cannot_certify_a_method():
     core.learn(src2,src3,verify=lambda x:True)
     assert core.solve("not-proved",4,verify=lambda x:"false") is None
     assert all(m.successes==0 for m in core.methods.values())
+
+
+def test_discovers_interior_insert_alignment_from_program_structure():
+    """The old append/prepend-only engine cannot represent arg insertion at 1."""
+    s2=mx2()
+    a0,a1,a2=arg(0),arg(1),arg(2)
+    old_in_new=("ite",("lt",a0,a2),a2,a0)
+    s3=("ite",("lt",old_in_new,a1),a1,old_in_new)
+    miner=StructuralMetaInventor(max_arity=12)
+    source2=CertifiedProgram("unseen.middle.max",2,s2,certificate="2-certified")
+    source3=CertifiedProgram("unseen.middle.max",3,s3,certificate="3-certified")
+    assert miner.observe(source2,verify=lambda p:original_max(p.expr,p.arity))==[]
+    methods=miner.observe(source3,verify=lambda p:original_max(p.expr,p.arity))
+    assert methods and any(m.direction=="insert" and m.insertion_index==1
+                           and m.reverse is False for m in methods)
+    candidate=miner.solve("unseen.middle.max",4,
+                          verify=lambda ast:original_max(ast,4),promote=True)
+    assert candidate and candidate["verified"]
+    assert miner.solve("unseen.middle.max",5,
+                       verify=lambda ast:original_max(ast,5))
+    snapshot=miner.checkpoint()
+    restored=StructuralMetaInventor.from_checkpoint(snapshot)
+    assert any(x.direction=="insert" and x.insertion_index==1
+               for x in restored.methods.values())
+    assert restored.solve("unseen.middle.max",6,
+                          verify=lambda ast:original_max(ast,6))
+
+
+def test_discovers_reversed_variable_alignment_by_source_only():
+    """A reverse-and-insert transformation is inferred without source hints."""
+    s2=mx2()
+    a0,a1,a2=arg(0),arg(1),arg(2)
+    reversed_old=("ite",("lt",a2,a0),a0,a2)
+    s3=("ite",("lt",reversed_old,a1),a1,reversed_old)
+    miner=StructuralMetaInventor(max_arity=7)
+    src2=CertifiedProgram("reverse.max",2,s2,certificate="2")
+    src3=CertifiedProgram("reverse.max",3,s3,certificate="3")
+    miner.observe(src2,verify=lambda p:original_max(p.expr,p.arity))
+    learned=miner.observe(src3,verify=lambda p:original_max(p.expr,p.arity))
+    assert learned
+    assert any(x.direction=="permuted_insert" and x.reverse and
+               x.insertion_index==1 for x in learned)
+    assert miner.solve("reverse.max",4,
+                       verify=lambda tree:original_max(tree,4))
+    assert miner.solve("reverse.max",5,
+                       verify=lambda tree:original_max(tree,5))
+
+
+def test_new_alignment_does_not_forge_correctness_on_negative_target():
+    s2=CertifiedProgram("counterexample.family",2,mx2(),certificate="source2")
+    a0,a1,a2=arg(0),arg(1),arg(2)
+    old=("ite",("lt",a0,a2),a2,a0)
+    s3=CertifiedProgram("counterexample.family",3,
+                        ("ite",("lt",old,a1),a1,old),certificate="source3")
+    miner=StructuralMetaInventor()
+    miner.learn(s2,s3,verify=lambda p:True)
+    # A valid structural continuation need not satisfy a different target's
+    # mathematical specification. Require external verifier approval.
+    assert miner.solve("counterexample.family",4,
+                       verify=lambda tree:all(ev(tree,row)==min(row)
+                           for row in product((-1,0,3),repeat=4))) is None
+    assert all(x.successes==0 for x in miner.methods.values())
+
+
+def test_method_search_continues_after_checkpoint_reload():
+    """Fix real runtime limitation: methods-only state had lost source n+1."""
+    from neumann1.structural_meta_invention import _hash
+    a0,a1,a2=arg(0),arg(1),arg(2)
+    old=("ite",("lt",a0,a2),a2,a0)
+    s3=("ite",("lt",old,a1),a1,old)
+    miner=StructuralMetaInventor()
+    miner.observe(CertifiedProgram("long.lived",2,mx2(),certificate="s2"),
+                  verify=lambda p:original_max(p.expr,p.arity))
+    miner.observe(CertifiedProgram("long.lived",3,s3,certificate="s3"),
+                  verify=lambda p:original_max(p.expr,p.arity))
+    stored=miner.checkpoint()
+    assert stored["schema"].endswith("v2")
+    assert len(stored["observations"])==2
+    reloaded=StructuralMetaInventor.from_checkpoint(stored)
+    answer=reloaded.solve("long.lived",4,
+                          verify=lambda p:original_max(p,4),
+                          promote=True)
+    assert answer and answer["verified"]
+    assert answer["new_method_ids"]  # New method induced using restored n3.
+    assert reloaded.solve("long.lived",5,
+                          verify=lambda p:original_max(p,5))
+    # Old snapshots remain readable, but correctly cannot claim persisted
+    # source observations that the old format never serialized.
+    old_version={k:v for k,v in stored.items() if k not in ("observations","sha256")}
+    old_version["schema"]="neumann.structural-meta-methods.v1"
+    old_version["sha256"]=_hash(old_version)
+    previous=StructuralMetaInventor.from_checkpoint(old_version)
+    assert previous.methods and not previous.observations
+    assert previous.solve("long.lived",4,
+                          verify=lambda p:original_max(p,4))
+
+
+def test_checkpoint_rejects_corrupted_source_program_state():
+    from neumann1.structural_meta_invention import _hash
+    m=StructuralMetaInventor()
+    m.observe(CertifiedProgram("x",2,mx2(),certificate="source"),
+              verify=lambda _:True)
+    state=m.checkpoint()
+    state["observations"][0]["expr"]=["arg",3]  # nonexistent arity
+    state["sha256"]=_hash({k:v for k,v in state.items() if k!="sha256"})
+    try:
+        StructuralMetaInventor.from_checkpoint(state)
+        assert False, "malformed restored program must be rejected"
+    except ValueError:
+        pass
