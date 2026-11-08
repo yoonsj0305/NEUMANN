@@ -1,0 +1,82 @@
+name: Q6 Long-1D Interface Repair Third-180 Original FIRST
+
+on:
+  push:
+    branches:
+      - feature/q6-variable-axis-grid-20261108
+    paths:
+      - research/q3/q6_variable_axis_1d_new_180_source_then_first.py
+      - neumann1/relational_grid_inventor.py
+      - neumann1/arc2_meta_grid_reasoner.py
+      - .github/workflows/q6_long_1d_third_180_first.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  source_domain_repair_then_frozen_third_originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install unchanged NEUMANN core dependencies
+        run: |
+          python -m pip install -q --disable-pip-version-check numpy scipy scikit-learn
+          python -m compileall -q neumann1
+      - name: Exact independently authored 1D-ARC original source revision
+        run: |
+          git init -q independent_1d_arc
+          git -C independent_1d_arc fetch -q --depth 1 https://github.com/khalil-research/1D-ARC.git 1e74dc4cb4c58d8160e1fbd0ba638eb745f37147
+          git -C independent_1d_arc checkout -q FETCH_HEAD
+          test "$(git -C independent_1d_arc rev-parse HEAD)" = 1e74dc4cb4c58d8160e1fbd0ba638eb745f37147
+      - name: Previously opened first 180 1D source originals
+        uses: actions/download-artifact@v4
+        with:
+          name: q6-1d-arc-180-independent-author-original-FIRST
+          run-id: 42447279658
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: old_first
+      - name: Previously opened second 180 1D original registry
+        uses: actions/download-artifact@v4
+        with:
+          name: q4-second-1d-originals-180-registry-FROZEN
+          run-id: 42447827455
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: old_second
+      - name: Freeze new shape contract and third 180 ORIGINAL FILENAMES only
+        run: |
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,"research/q3")
+          import q6_variable_axis_1d_new_180_source_then_first as x
+          import neumann1.relational_grid_inventor as r
+          import neumann1.arc2_meta_grid_reasoner as o
+          assert r.grid([[0]*32])==o.G([[0]*32])
+          assert r.grid([[0]*90])==o.G([[0]*90])
+          s,t=x.registries()  # names only
+          assert len(s)==len(t)==180
+          assert not set(p.name for p in s)&set(p.name for p in t)
+          assert len({p.parent.name for p in t})==18
+          print("THIRD_180_NEW_ORIGINAL_NAMES_UNOPENED",flush=True)
+          PY
+          git hash-object research/q3/q6_variable_axis_1d_new_180_source_then_first.py
+          git hash-object neumann1/relational_grid_inventor.py
+      - name: Evaluate input-contract repair on EXPOSED source original 180 only
+        run: python research/q3/q6_variable_axis_1d_new_180_source_then_first.py source
+      - name: Preserve source repair and method SHA before opening any third target
+        uses: actions/upload-artifact@v4
+        with:
+          name: q6-generalized-1d-axis-contract-180-exposed-source-FROZEN
+          path: Q6_LONG_1D_INTERFACE_REPAIR_SOURCE_ONLY_FROZEN.json
+          if-no-files-found: error
+      - name: Execute third NEW 180 independently authored originals FIRST
+        run: python research/q3/q6_variable_axis_1d_new_180_source_then_first.py target
+      - name: Preserve ALL 180 third-original score, failures, costs and source SHA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q6-generalized-1d-axis-third-180-new-original-FIRST
+          path: Q6_LONG_1D_NEW_180_THIRD_AUTHORIGINAL_FIRST.json
+          if-no-files-found: warn
