@@ -1,0 +1,43 @@
+name: Q3 NO SECRET ORACLE source-only method selection and full-domain audit
+
+on:
+  push:
+    branches:
+      - research/q3-independent-formal-bv-inversion-20261108
+    paths:
+      - research/q3/without_hidden_oracle_revalidation.py
+      - .github/workflows/q3_without_hidden_oracle_audit.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  no_oracle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Freeze code and assert no secret truth is passed to candidate selector
+        run: |
+          python -m py_compile research/q3/without_hidden_oracle_revalidation.py
+          git hash-object research/q3/without_hidden_oracle_revalidation.py
+          python - <<'PY'
+          import sys,inspect
+          sys.path.insert(0,'research/q3')
+          import without_hidden_oracle_revalidation as q
+          code=inspect.getsource(q.select_source_only)
+          assert 'secret_teacher' not in code
+          assert 'exact(' not in code
+          assert 'verifier' not in code
+          assert q.select_source_only(4,[(0,0)],[('x',)])[0]==('x',)
+          PY
+      - name: Re-learn both methods from observed source only and verify after selection
+        run: python research/q3/without_hidden_oracle_revalidation.py
+      - name: Archive source-only and full-domain audited rows
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-no-secret-teacher-oracle-program-selection
+          path: Q3_NO_ORACLE_METHOD_DISCOVERY.json
+          if-no-files-found: warn
