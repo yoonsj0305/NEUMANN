@@ -57,6 +57,7 @@ class Episode:
     status: str
     model: object | None
     source_queries: int
+    work_units: int
     trace: tuple
     elapsed_ms: float
 
@@ -112,9 +113,10 @@ def execute(method,backend,*,start=1,
     k=start
     seen=set()
     trace=[]
+    work=0
 
     def episode(status,model):
-        return Episode(status,model,len(backend.source.cache),
+        return Episode(status,model,len(backend.source.cache),work,
                        tuple(trace),(perf_counter_ns()-t0)/1e6)
 
     if known_classical:
@@ -137,6 +139,7 @@ def execute(method,backend,*,start=1,
             result=backend.attempt(k,method.challenges)
         except InsufficientEvidence:
             return episode("ABSTAIN_SOURCE_LIMIT",None)
+        work+=result.cost
         trace.append((k,result.status))
         if result.status=="VERIFIED":
             if result.hypothesis is None:
@@ -167,6 +170,7 @@ class LearnedMethod:
     correct_on_meta_training: int
     incorrect_on_meta_training: int
     total_source_queries: int
+    training_work_units: int
     training_cost_queries: int
     candidate_trace: tuple
     grade_label_cost: int
@@ -206,22 +210,23 @@ class RecursiveMethodInventor:
                  for case in cases]
         scores=[]
         for candidate in self.proposals():
-            correct=wrong=queries=0
+            correct=wrong=queries=work=0
             for i,case in enumerate(cases):
                 source=ObservedOracle(case.oracle,case.heldout,shared[i])
                 run=execute(candidate,case.backend_factory(source))
                 queries+=run.source_queries
+                work+=run.work_units
                 if run.model is not None:
                     if all(run.apply(x)==y for x,y in
                            zip(case.heldout,grading[i])):
                         correct+=1
                     else:
                         wrong+=1
-            scores.append((candidate,correct,wrong,queries))
+            scores.append((candidate,correct,wrong,queries,work))
         winner=min(scores,key=lambda r:(
-            -r[1],r[2],r[3],len(str(r[0].ast))))
+            -r[1],r[2],r[3],r[4],len(str(r[0].ast))))
         return LearnedMethod(
-            winner[0],winner[1],winner[2],winner[3],
+            winner[0],winner[1],winner[2],winner[3],winner[4],
             sum(len(cache) for cache in shared),tuple(scores),
             sum(len(c.heldout) for c in cases),
             (perf_counter_ns()-start)/1e6)
