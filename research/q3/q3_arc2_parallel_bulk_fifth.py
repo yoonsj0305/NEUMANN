@@ -28,8 +28,8 @@ FIFTH_EXCLUSION=HERE/"arc2_pairwise_fourth128_exclusions.json"
 
 
 def fifth_manifest():
-    from q3_arc2_pairwise_blind_fifth import fourth_manifest
-    prior,_=fifth_manifest()
+    from q3_arc2_pairwise_blind_fourth import fourth_manifest
+    prior,_=fourth_manifest()
     other=json.loads(FIFTH_EXCLUSION.read_text())
     fresh=set(other["excluded_fifth_prior_ids"])
     if len(prior)!=480 or len(fresh)!=128 or prior & fresh:
