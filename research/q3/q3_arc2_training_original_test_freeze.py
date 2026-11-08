@@ -22,8 +22,11 @@ from collections import Counter
 
 from neumann1.composed_grid_inventor import ComposedGridInventor
 from neumann1 import arc2_meta_grid_reasoner as old
-from research.q3.q3_arc2_composed_training_source_diagnostic import (
-    PINNED_ARC2, SALT)
+# Direct script invocation needs an explicit sibling import path when the
+# source tree has not been installed as a package.
+import sys
+sys.path.insert(0,str(pathlib.Path(__file__).resolve().parent))
+from q3_arc2_composed_training_source_diagnostic import PINNED_ARC2, SALT
 
 
 def sha_bytes(blob:bytes):
