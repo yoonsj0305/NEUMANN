@@ -429,16 +429,28 @@ class StructuralMetaInventor:
                 "successes": m.successes, "failures": m.failures,
                 "verifier_queries": m.verifier_queries,
             })
-        state = {"schema": "neumann.structural-meta-methods.v1",
+        # Keep certified observations, not only methods: after a restart a
+        # new verified n+1 program must still be able to grow the discovery
+        # language from the stored n program. Version 1 lost that ability.
+        observed = []
+        for family, family_observations in sorted(self.observations.items()):
+            for arity, p in sorted(family_observations.items()):
+                observed.append({
+                    "family": p.family, "arity": arity, "expr": p.expr,
+                    "params": p.params, "certificate": p.certificate,
+                })
+        state = {"schema": "neumann.structural-meta-methods.v2",
                  "max_nodes": self.max_nodes, "max_arity": self.max_arity,
-                 "methods": rows}
+                 "methods": rows, "observations": observed}
         state["sha256"] = _hash(state)
         return state
 
     @classmethod
     def from_checkpoint(cls, checkpoint):
         """Restore verified-USE-ONLY method grammar; never deserialize code."""
-        if type(checkpoint) is not dict or checkpoint.get("schema") != "neumann.structural-meta-methods.v1":
+        if (type(checkpoint) is not dict or checkpoint.get("schema") not in (
+                "neumann.structural-meta-methods.v1",
+                "neumann.structural-meta-methods.v2")):
             raise ValueError("unsupported method checkpoint")
         payload = {k:v for k,v in checkpoint.items() if k != "sha256"}
         if _hash(payload) != checkpoint.get("sha256"):
@@ -503,4 +515,26 @@ class StructuralMetaInventor:
                    (m.successes, m.failures, m.verifier_queries)):
                 raise ValueError("invalid method costs")
             inventory.methods[m.identity] = m
+        if checkpoint["schema"] == "neumann.structural-meta-methods.v2":
+            records = payload.get("observations")
+            if type(records) is not list or len(records) > 512:
+                raise ValueError("invalid certified observation count")
+            for record in records:
+                if type(record) is not dict or set(record) != {
+                        "family", "arity", "expr", "params", "certificate"}:
+                    raise ValueError("invalid certified source record")
+                if type(record["params"]) is not list:
+                    raise ValueError("bad source parameter slots")
+                source = CertifiedProgram(
+                    family=record["family"], arity=record["arity"],
+                    expr=ast(record["expr"]),
+                    params=tuple(record["params"]),
+                    certificate=record["certificate"])
+                if (source.arity > inventory.max_arity or
+                        _expanded_size(source.expr, inventory.max_nodes) >
+                        inventory.max_nodes):
+                    raise ValueError("unsafe stored source AST size")
+                if source.arity in inventory.observations[source.family]:
+                    raise ValueError("duplicate source observation")
+                inventory.observations[source.family][source.arity] = source
         return inventory
