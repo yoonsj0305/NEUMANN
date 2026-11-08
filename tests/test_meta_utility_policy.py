@@ -50,6 +50,11 @@ def source_fixture(**changes):
     return MetaUtilityEvidence(**data)
 
 
+def as_engine_source(evidence):
+    return {key:value for key,value in evidence.__dict__.items()
+            if key!='source_only'}
+
+
 def test_arc2_source_cost_cannot_pay_for_frozen_method():
     # Both validator arms share an exhaustive same-language grammar;
     # this fixture isolates utility decision, not the ARC2 answer rate.
@@ -71,7 +76,7 @@ def test_live_core_deletes_unprofitable_candidate_generation_but_not_evidence():
     assert engine.meta_inventor.methods
     record=engine.admit_meta_method_utility(
         "economic.max",
-        **source_fixture().__dict__)
+        **as_engine_source(source_fixture()))
     assert record.route=="CLASSICAL_FIRST"
     old=sum(m.verifier_queries for m in engine.meta_inventor.methods.values())
     actual=[]
