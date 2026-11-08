@@ -1,0 +1,81 @@
+name: Q3 Evidence-Based Method Deletion 15 Untouched Formal FIRST
+
+on:
+  push:
+    branches:
+      - research/q3-independent-formal-bv-inversion-20261108
+    paths:
+      - research/q3/cost_aware_method_deletion_new_formal_original.py
+      - .github/workflows/q3_method_deletion_fresh_formal_first.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  method_deletion_external_first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read prior original FIRST, no new target data
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-independent-formal-bv4-target-FIRST
+          run-id: 42432369260
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: history/a
+      - name: Read prior corrected original FIRST, no new target data
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-formal-bv4-patched-32-new-originals-FIRST
+          run-id: 42432544881
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: history/b
+      - name: Read prior macro original FIRST, no new target data
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-source-macro-cross-operator-new-32-original-FIRST
+          run-id: 42433082556
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: history/c
+      - name: Load old frozen source policy, unchanged and immutable
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-formal-bv4-source-policy-FROZEN-before-target
+          run-id: 42432369260
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: policy
+      - name: Infer method selection entirely from history and freeze SHA
+        run: |
+          python -m py_compile research/q3/cost_aware_method_deletion_new_formal_original.py
+          git hash-object research/q3/cost_aware_method_deletion_new_formal_original.py
+          python research/q3/cost_aware_method_deletion_new_formal_original.py source
+          python - <<'PY'
+          import sys,json
+          sys.path.insert(0,'research/q3')
+          import cost_aware_method_deletion_new_formal_original as r
+          x=json.load(open(r.CONFIG))
+          assert len(r.TARGET)==15
+          assert 'find_inv_bvsgt_bvshl1_4bit.sl' not in r.TARGET
+          assert r.TARGET[0]=='find_inv_bvsgt_bvadd_4bit.sl'
+          assert x["selection"]=='cold'
+          print("FROZEN_BEFORE_NEW_BVSGT_DATA",x["sha256"])
+          PY
+      - name: Preserve frozen rational router
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-cost-based-method-deletion-frozen-pretarget
+          path: Q3_COST_AWARE_DELETION_POLICY_BEFORE_TEST.json
+          if-no-files-found: warn
+      - name: Evaluate 15 untouched BVSGT inverse originals, 256 inputs each
+        run: python research/q3/cost_aware_method_deletion_new_formal_original.py target
+      - name: Preserve full original-first method selection results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-cost-based-method-router-15-new-formal-FIRST
+          path: Q3_METHOD_DELETION_EXTERNAL_FIRST.json
+          if-no-files-found: warn
