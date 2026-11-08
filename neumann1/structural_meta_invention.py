@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from typing import Any
 import hashlib
 import json
+from .meta_utility_policy import MetaUtilityEvidence, decide_meta_method, source_evidence_dict
 
 Expr = tuple[Any, ...]
 
@@ -274,6 +275,7 @@ class StructuralMetaInventor:
         self.max_arity = max_arity
         self.methods: dict[str, InventedMethod] = {}
         self.observations: dict[str, dict[int, CertifiedProgram]] = defaultdict(dict)
+        self.meta_utility_evidence: dict[str, dict] = {}
 
     def learn(self, smaller: CertifiedProgram, larger: CertifiedProgram, *,
               verify: Callable[[CertifiedProgram], bool]) -> list[InventedMethod]:
@@ -411,6 +413,27 @@ class StructuralMetaInventor:
             method.failures += 1
         return None
 
+    def admit_meta_method_utility(self, family, evidence: MetaUtilityEvidence):
+        """Record source-only capability + amortized compute admission.
+
+        The discovery engine itself now learns when to DELETE a nonproductive
+        method from an affected family's inference hot path. It never deletes
+        retained source proof evidence; the policy can be updated when a
+        new independent source study has better evidence.
+        """
+        if type(family) is not str or not family:
+            raise ValueError("valid method family required")
+        if not isinstance(evidence, MetaUtilityEvidence):
+            raise TypeError("MetaUtilityEvidence required")
+        verdict=decide_meta_method(evidence)
+        self.meta_utility_evidence[family]=source_evidence_dict(evidence)
+        return verdict
+
+    def meta_utility_decision(self, family):
+        evidence=self.meta_utility_evidence.get(family)
+        return decide_meta_method(
+            MetaUtilityEvidence(**evidence)) if evidence is not None else None
+
     def solve_or_discover(self, family, arity, *, params=(), verify=None,
                           classical=None):
         """Autonomous METHOD-LEARNING execution loop.
@@ -433,11 +456,19 @@ class StructuralMetaInventor:
         if type(family) is not str or not family:
             raise ValueError("valid synthesis family required")
         params = tuple(params)
-        before = sum(m.verifier_queries for m in self.methods.values())
-        learned = self.solve(family, arity, params=params, verify=verify,
-                             promote=True)
-        method_queries = (
-            sum(m.verifier_queries for m in self.methods.values()) - before)
+        decision=self.meta_utility_decision(family)
+        # A non-productive method is not worth querying even once at the
+        # deployment horizon; retain all prior source evidence for later
+        # retraining, but skip its actual target candidate generation.
+        if decision is not None and not decision.use_invented_first:
+            learned=None
+            method_queries=0
+        else:
+            before=sum(m.verifier_queries for m in self.methods.values())
+            learned=self.solve(
+                family, arity, params=params, verify=verify, promote=True)
+            method_queries=(
+                sum(m.verifier_queries for m in self.methods.values())-before)
         if learned is not None:
             return {**learned, "origin": "self_invented_method",
                     "method_queries": method_queries,
@@ -509,7 +540,8 @@ class StructuralMetaInventor:
                 })
         state = {"schema": "neumann.structural-meta-methods.v2",
                  "max_nodes": self.max_nodes, "max_arity": self.max_arity,
-                 "methods": rows, "observations": observed}
+                 "methods": rows, "observations": observed,
+                 "source_only_meta_utility": self.meta_utility_evidence}
         state["sha256"] = _hash(state)
         return state
 
@@ -605,4 +637,13 @@ class StructuralMetaInventor:
                 if source.arity in inventory.observations[source.family]:
                     raise ValueError("duplicate source observation")
                 inventory.observations[source.family][source.arity] = source
+        evidence=payload.get("source_only_meta_utility", {})
+        if type(evidence) is not dict or len(evidence)>256:
+            raise ValueError("invalid utility evidence inventory")
+        for family, rec in evidence.items():
+            if type(family) is not str or not family or type(rec) is not dict:
+                raise ValueError("invalid utility family or source record")
+            # Recompute, never trust an unverified stored admission flag.
+            typed=MetaUtilityEvidence(**rec)
+            inventory.admit_meta_method_utility(family,typed)
         return inventory

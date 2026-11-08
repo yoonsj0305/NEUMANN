@@ -4,6 +4,7 @@ from .types import Problem, SolveResult, CostLedger, display_kind, is_unknown_ki
 from .family_registry import FamilyRegistry
 from .plugin_isolation import PluginProcessError
 from .structural_meta_invention import StructuralMetaInventor, CertifiedProgram
+from .meta_utility_policy import MetaUtilityEvidence
 
 
 class RegistryEngine:
@@ -142,3 +143,26 @@ class RegistryEngine:
         """
         return self.meta_inventor.solve_or_discover(
             family, arity, params=params, verify=verify, classical=classical)
+
+    def admit_meta_method_utility(self, family: str, *, discovery_wall_seconds: float,
+            discovery_candidate_checks: int, validation_tasks: int,
+            validation_cold_candidate_checks: int,
+            validation_learned_candidate_checks: int,
+            validation_cold_solved: int, validation_learned_solved: int,
+            intended_future_tasks: int):
+        """Admit or DELETE method search from the real inference hot path.
+
+        Costs are source-only, must be measured before opening any target.
+        Returning CLASSICAL_FIRST means the method remains archived but is
+        not queried in solve_or_discover for this family.
+        """
+        evidence=MetaUtilityEvidence(
+            discovery_wall_seconds=discovery_wall_seconds,
+            discovery_candidate_checks=discovery_candidate_checks,
+            validation_tasks=validation_tasks,
+            validation_cold_candidate_checks=validation_cold_candidate_checks,
+            validation_learned_candidate_checks=validation_learned_candidate_checks,
+            validation_cold_solved=validation_cold_solved,
+            validation_learned_solved=validation_learned_solved,
+            intended_future_tasks=intended_future_tasks)
+        return self.meta_inventor.admit_meta_method_utility(family,evidence)
