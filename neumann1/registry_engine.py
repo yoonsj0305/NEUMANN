@@ -131,3 +131,14 @@ class RegistryEngine:
         """Run learned constructors through the caller's ORIGINAL verifier."""
         return self.meta_inventor.solve(
             family, arity, params=params, verify=verify, promote=promote)
+
+    def synthesize_program(self, family: str, arity: int, *,
+                           params=(), verify=None, classical=None):
+        """Solve a program task AND improve NEUMANN's reusable method language.
+
+        No human observe_program call is needed. Certified classical outputs
+        are inducted automatically; learned programs are preferred and
+        independently reverified on each target obligation.
+        """
+        return self.meta_inventor.solve_or_discover(
+            family, arity, params=params, verify=verify, classical=classical)
