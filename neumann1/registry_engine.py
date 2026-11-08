@@ -541,3 +541,28 @@ class RegistryEngine:
         except (ValueError,TypeError):
             orbit=None
         return result,orbit
+
+    def invent_hidden_graph_ontology(self, source_pairs,
+                                      independent_source_checks,
+                                      *, classical_solvers=(),
+                                      max_degree=3,max_source_ms=3000):
+        """Recover an otherwise unnamed graph ontology from source I/O.
+
+        No graph schema or edges are supplied to the inventor. The method
+        may abstain if source interactions do not identify unique star
+        cliques and a complete learned structural motif.
+        """
+        from .causal_representation_inventor import (
+            CausalRepresentationInventor)
+        from .latent_graph_ontology import LatentGraphOntologyInventor
+        learned=CausalRepresentationInventor(
+            max_degree=max_degree,max_source_ms=max_source_ms).invent(
+                source_pairs,independent_source_checks=independent_source_checks,
+                classical_solvers=classical_solvers)
+        if learned.program is None:
+            return learned,None
+        try:
+            recovered=LatentGraphOntologyInventor().invent(learned.program)
+        except (TypeError,ValueError):
+            recovered=None
+        return learned,recovered
