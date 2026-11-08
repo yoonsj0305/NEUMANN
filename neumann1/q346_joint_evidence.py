@@ -18,10 +18,10 @@ class OriginalCohort:
     author: str
     originals: int
     learned_correct: int
-    strongest_classical_correct: int
+    strongest_matched_correct: int
     learned_only_originals: int | None
     learned_target_seconds: float
-    strongest_classical_target_seconds: float
+    strongest_matched_target_seconds: float
     upstream_frozen: bool
     original_verifier: bool
     same_input_rights: bool
@@ -35,7 +35,7 @@ class OriginalCohort:
             raise ValueError("source labels and author required")
         if type(self.originals) is not int or self.originals < 1:
             raise ValueError("positive original denominator")
-        for count in (self.learned_correct, self.strongest_classical_correct):
+        for count in (self.learned_correct, self.strongest_matched_correct):
             if type(count) is not int or count < 0 or count > self.originals:
                 raise ValueError("invalid number of correct originals")
         if self.learned_only_originals is not None:
@@ -44,7 +44,7 @@ class OriginalCohort:
                     self.learned_only_originals > self.learned_correct):
                 raise ValueError("invalid exact residual witness count")
         for cost in (self.learned_target_seconds,
-                     self.strongest_classical_target_seconds):
+                     self.strongest_matched_target_seconds):
             if type(cost) not in (float, int) or not math.isfinite(cost) or cost < 0:
                 raise ValueError("missing/invalid nonnegative full candidate runtime")
         for flag in (self.upstream_frozen, self.original_verifier,
@@ -88,9 +88,9 @@ class JointFinding:
     recommend_invention_hotpath: bool
     original_count: int
     learned_correct: int
-    classical_correct: int
+    comparator_correct: int
     source_inclusive_learned_seconds: float
-    matched_classical_seconds: float
+    matched_comparator_seconds: float
     measured_speed_ratio: float | None
     reasons: tuple[str, ...]
 
@@ -124,11 +124,11 @@ def evaluate_original_joint_gate(cohorts: tuple[OriginalCohort, ...],
                             ("unverified original/author/source rights",))
     n=sum(c.originals for c in cohorts)
     learned=sum(c.learned_correct for c in cohorts)
-    classic=sum(c.strongest_classical_correct for c in cohorts)
+    comparator=sum(c.strongest_matched_correct for c in cohorts)
     learn_time=(discovery.total_seconds
                 +sum(c.learned_target_seconds for c in cohorts))
-    classic_time=sum(c.strongest_classical_target_seconds for c in cohorts)
-    ratio=(classic_time/learn_time) if learn_time>0 else None
+    comparator_time=sum(c.strongest_matched_target_seconds for c in cohorts)
+    ratio=(comparator_time/learn_time) if learn_time>0 else None
     observed_residual=any((c.learned_only_originals or 0)>0
                           and c.new_grammar_witness for c in cohorts)
     residual_unknown=any(c.learned_only_originals is None for c in cohorts)
@@ -144,10 +144,10 @@ def evaluate_original_joint_gate(cohorts: tuple[OriginalCohort, ...],
         "OPEN_UNRELATED_MATH_TRANSFER")
     capability_ok=learned>=classic
     q4=("SCOPED_10X_FULL_COST_AND_EQUAL_ACCURACY"
-        if capability_ok and learn_time>0 and classic_time>=learn_time*requested_speedup
+        if capability_ok and learn_time>0 and comparator_time>=learn_time*requested_speedup
         else "NO_10X_MATCHED_FULL_COST")
     reasons=[]
-    if learned<classic:
+    if learned<comparator:
         reasons.append("verified original capability regression")
     if discovery.total_seconds>0:
         reasons.append("includes source preparation/training/discovery/verification costs")
@@ -164,4 +164,4 @@ def evaluate_original_joint_gate(cohorts: tuple[OriginalCohort, ...],
         all((q3=="SCOPED_NEW_ORIGINAL_CAPABILITY",
              q4=="SCOPED_10X_FULL_COST_AND_EQUAL_ACCURACY",
              q6=="SCOPED_DIFFERENT_SEMANTIC_TRANSFER")),
-        n,learned,classic,learn_time,classic_time,ratio,tuple(reasons))
+        n,learned,comparator,learn_time,comparator_time,ratio,tuple(reasons))
