@@ -411,6 +411,74 @@ class StructuralMetaInventor:
             method.failures += 1
         return None
 
+    def solve_or_discover(self, family, arity, *, params=(), verify=None,
+                          classical=None):
+        """Autonomous METHOD-LEARNING execution loop.
+
+        1. Reuse invented program generators, with exact original proof.
+        2. If no generator works, run the caller's trusted classic solver.
+        3. Verify the classic answer against the ORIGINAL obligation.
+        4. Promote its AST into source memory. Adjacent successes induce a
+           NEW reusable method, automatically enabling future solve calls.
+
+        The program's mathematics and classical fallback are supplied by
+        domain adapters, not hidden target answers. If no verifier is given,
+        nothing is accepted or learned. A failed discovered method cannot
+        contaminate the memory with an unverified program.
+        """
+        if verify is None or not callable(verify):
+            return None
+        if type(arity) is not int or not 1 <= arity <= self.max_arity:
+            raise ValueError("invalid synthesis arity")
+        if type(family) is not str or not family:
+            raise ValueError("valid synthesis family required")
+        params = tuple(params)
+        before = sum(m.verifier_queries for m in self.methods.values())
+        learned = self.solve(family, arity, params=params, verify=verify,
+                             promote=True)
+        method_queries = (
+            sum(m.verifier_queries for m in self.methods.values()) - before)
+        if learned is not None:
+            return {**learned, "origin": "self_invented_method",
+                    "method_queries": method_queries,
+                    "classical_invocations": 0}
+        if classical is None:
+            return None  # Out of support; no invent-and-guess success.
+        if not callable(classical):
+            raise TypeError("classical baseline must be a callable")
+        # A classic solver is used only when learned methods are unavailable
+        # or failed. Incorrect old code is not repeatedly reinforced.
+        proposed = classical(arity, params)
+        if proposed is None:
+            return None
+        try:
+            program = _validate(proposed)
+        except (TypeError, ValueError):
+            return None
+        if (any(i >= arity for i in _args(program)) or
+                _size(program) > self.max_nodes or
+                _expanded_size(program, self.max_nodes) > self.max_nodes):
+            return None
+        if verify(program) is not True:
+            return None
+        # Never promote mere syntactic consistency or a previous guessed
+        # answer. The current original-verifier callback just returned True.
+        source = CertifiedProgram(
+            family=family, arity=arity, expr=program, params=params,
+            certificate="original-verifier:" +
+                        _hash((family, arity, params, program)))
+        discovered = self.observe(
+            source, verify=lambda p:
+                p == source or
+                p in self.observations[p.family].values())
+        return {"program": program, "verified": True,
+                "origin": "classical_verified_then_learned",
+                "method_id": None,
+                "source_certificate_digest": source.certificate,
+                "method_queries": method_queries,
+                "classical_invocations": 1,
+                "new_method_ids": [m.identity for m in discovered]}
+
     def checkpoint(self):
         """Serialize learned method PROGRAMS, not cached target solutions.
 
