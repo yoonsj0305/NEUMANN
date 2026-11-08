@@ -158,7 +158,7 @@ def test_invalid_denominator_nan_forged_or_duplicate_rejected():
     with pytest.raises(ValueError):
         cohort(learned_target_seconds=float('nan'))
     with pytest.raises(ValueError):
-        cohort(source_author="oops")
+        cohort(author="")
     with pytest.raises(ValueError):
         DiscoveryCost(training_seconds=-1)
     with pytest.raises(ValueError):
