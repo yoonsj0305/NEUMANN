@@ -180,3 +180,65 @@ def test_invalid_truthy_verifier_cannot_certify_a_method():
     core.learn(src2,src3,verify=lambda x:True)
     assert core.solve("not-proved",4,verify=lambda x:"false") is None
     assert all(m.successes==0 for m in core.methods.values())
+
+
+def test_discovers_interior_insert_alignment_from_program_structure():
+    """The old append/prepend-only engine cannot represent arg insertion at 1."""
+    s2=mx2()
+    a0,a1,a2=arg(0),arg(1),arg(2)
+    old_in_new=("ite",("lt",a0,a2),a2,a0)
+    s3=("ite",("lt",old_in_new,a1),a1,old_in_new)
+    miner=StructuralMetaInventor(max_arity=12)
+    source2=CertifiedProgram("unseen.middle.max",2,s2,certificate="2-certified")
+    source3=CertifiedProgram("unseen.middle.max",3,s3,certificate="3-certified")
+    assert miner.observe(source2,verify=lambda p:original_max(p.expr,p.arity))==[]
+    methods=miner.observe(source3,verify=lambda p:original_max(p.expr,p.arity))
+    assert methods and any(m.direction=="insert" and m.insertion_index==1
+                           and m.reverse is False for m in methods)
+    candidate=miner.solve("unseen.middle.max",4,
+                          verify=lambda ast:original_max(ast,4),promote=True)
+    assert candidate and candidate["verified"]
+    assert miner.solve("unseen.middle.max",5,
+                       verify=lambda ast:original_max(ast,5))
+    snapshot=miner.checkpoint()
+    restored=StructuralMetaInventor.from_checkpoint(snapshot)
+    assert any(x.direction=="insert" and x.insertion_index==1
+               for x in restored.methods.values())
+    assert restored.solve("unseen.middle.max",6,
+                          verify=lambda ast:original_max(ast,6))
+
+
+def test_discovers_reversed_variable_alignment_by_source_only():
+    """A reverse-and-insert transformation is inferred without source hints."""
+    s2=mx2()
+    a0,a1,a2=arg(0),arg(1),arg(2)
+    reversed_old=("ite",("lt",a2,a0),a0,a2)
+    s3=("ite",("lt",reversed_old,a1),a1,reversed_old)
+    miner=StructuralMetaInventor(max_arity=7)
+    src2=CertifiedProgram("reverse.max",2,s2,certificate="2")
+    src3=CertifiedProgram("reverse.max",3,s3,certificate="3")
+    miner.observe(src2,verify=lambda p:original_max(p.expr,p.arity))
+    learned=miner.observe(src3,verify=lambda p:original_max(p.expr,p.arity))
+    assert learned
+    assert any(x.direction=="permuted_insert" and x.reverse and
+               x.insertion_index==1 for x in learned)
+    assert miner.solve("reverse.max",4,
+                       verify=lambda tree:original_max(tree,4))
+    assert miner.solve("reverse.max",5,
+                       verify=lambda tree:original_max(tree,5))
+
+
+def test_new_alignment_does_not_forge_correctness_on_negative_target():
+    s2=CertifiedProgram("counterexample.family",2,mx2(),certificate="source2")
+    a0,a1,a2=arg(0),arg(1),arg(2)
+    old=("ite",("lt",a0,a2),a2,a0)
+    s3=CertifiedProgram("counterexample.family",3,
+                        ("ite",("lt",old,a1),a1,old),certificate="source3")
+    miner=StructuralMetaInventor()
+    miner.learn(s2,s3,verify=lambda p:True)
+    # A valid structural continuation need not satisfy a different target's
+    # mathematical specification. Require external verifier approval.
+    assert miner.solve("counterexample.family",4,
+                       verify=lambda tree:all(ev(tree,row)==min(row)
+                           for row in product((-1,0,3),repeat=4))) is None
+    assert all(x.successes==0 for x in miner.methods.values())
