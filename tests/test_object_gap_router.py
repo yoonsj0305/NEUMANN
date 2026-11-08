@@ -61,3 +61,40 @@ def test_no_hidden_target_gold_required():
     assert result.origin in (
         "SOURCE_VERIFIED_PRIOR","SOURCE_VERIFIED_NEW_OBJECT_RULE")
     assert len(result.candidates[0])==1
+
+
+def test_live_routers_invent_new_multiobject_causal_grammar_at_real_gap():
+    """No classical or one-object source rule can move a source entity
+    based on ANOTHER entity's dynamically changing anchor position."""
+    from random import Random
+    def relation_input(seed):
+        rng=Random(seed)
+        h,w=16,20
+        colors=rng.sample(range(1,10),3)
+        ar=rng.choice((3,5,7,8))
+        acol=rng.choice((5,7,9))
+        ah=rng.choice((2,3))
+        aw=rng.choice((3,4))
+        x=[[0]*w for _ in range(h)]
+        for rr in range(ar,ar+ah):
+            for cc in range(acol,acol+aw):
+                x[rr][cc]=colors[0]
+        for rr in (12,13):
+            for cc in (16,17):
+                x[rr][cc]=colors[2]
+        mover_r,mover_c=rng.choice((0,1,14)),rng.choice((1,3))
+        x[mover_r][mover_c]=colors[1]
+        y=[row[:] for row in x]
+        y[mover_r][mover_c]=0
+        y[ar][acol+aw]=colors[1]
+        return tuple(map(tuple,x)),tuple(map(tuple,y))
+    train=[relation_input(i) for i in (7,19,23)]
+    source_verify=[relation_input(i) for i in (41,59)]
+    withheld=[relation_input(i) for i in range(100,109)]
+    for engine in (NeumannEngine(None,[],None),RegistryEngine(None,None)):
+        r=engine.invent_arc_object_only_on_classical_gap(
+            train,source_verify,[x for x,y in withheld])
+        assert r.origin=="SOURCE_VERIFIED_NEW_CAUSAL_RELATION"
+        assert r.object_inventor_invocations==2
+        assert tuple(y for x,y in withheld) in r.candidates
+        assert r.invented_programs[0].ast[0]=="relational_action"
