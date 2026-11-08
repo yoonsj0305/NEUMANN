@@ -1,0 +1,54 @@
+name: Q3 External ARC2 Training Source Grammar Gap
+
+on:
+  pull_request:
+    paths:
+      - "neumann1/composed_grid_inventor.py"
+      - "neumann1/relational_grid_inventor.py"
+      - "research/q3/q3_arc2_composed_training_source_diagnostic.py"
+      - ".github/workflows/q3_external_arc2_source.yml"
+  workflow_dispatch:
+
+jobs:
+  actual-external-training-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Fetch only PINNED ARC-AGI-2 training originals
+        run: |
+          mkdir -p /tmp/arc2-external-source
+          git -C /tmp/arc2-external-source init -q
+          git -C /tmp/arc2-external-source remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/arc2-external-source fetch -q --depth 1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/arc2-external-source checkout -q FETCH_HEAD
+          test "$(git -C /tmp/arc2-external-source rev-parse HEAD)" = f3283f727488ad98fe575ea6a5ac981e4a188e49
+      - name: Run author independent SOURCE-only fixed-grammar residual diagnostic
+        run: |
+          python -m pip install -e . pytest
+          PYTHONPATH=. python research/q3/q3_arc2_composed_training_source_diagnostic.py \
+            --upstream /tmp/arc2-external-source \
+            --n 96 \
+            --max-rel-ms 120 \
+            --output q3_arc2_train_source_diagnostic.json
+          python - <<'PY'
+          import json
+          d=json.load(open('q3_arc2_train_source_diagnostic.json'))
+          assert d['used_official_public_evaluation_originals'] is False
+          assert d['used_original_test_answers'] is False
+          assert d['summary']['source_cases_selected']==96
+          assert d['summary']['source_cases_checked'] + d['summary']['source_skipped']==96
+          print('NO CLAIM OF FIRST EVAL, NO GLOBAL Q3 PROOF')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-arc2-independent-author-training-source-diagnostic
+          path: q3_arc2_train_source_diagnostic.json
+          if-no-files-found: error
