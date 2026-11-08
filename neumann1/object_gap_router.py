@@ -15,14 +15,15 @@ from time import perf_counter_ns
 
 from .composed_grid_inventor import ComposedGridInventor
 from .relational_grid_inventor import grid
-from .scene_graph_inventor import ObjectGrammarInventor, ObjectProgram
+from .scene_graph_inventor import ObjectGrammarInventor
+from .relational_action_inventor import RelationalActionInventor
 
 
 @dataclass(frozen=True)
 class ObjectGapResult:
     origin: str
     candidates: tuple[tuple, ...]
-    invented_programs: tuple[ObjectProgram, ...]
+    invented_programs: tuple[object, ...]
     object_inventor_invocations: int
     source_checks: int
     classical_source_verified: bool
@@ -34,11 +35,15 @@ class ObjectGapResult:
 
 
 class ObjectGapRouter:
-    def __init__(self,*,max_relational_ms=120,max_object_ms=350):
-        if not 1<=max_relational_ms<=5000 or not 1<=max_object_ms<=120000:
+    def __init__(self,*,max_relational_ms=120,max_object_ms=350,
+                 max_causal_ms=350):
+        if (not 1<=max_relational_ms<=5000 or
+                not 1<=max_object_ms<=120000 or
+                not 1<=max_causal_ms<=120000):
             raise ValueError("finite execution caps required")
         self.max_relational_ms=max_relational_ms
         self.max_object_ms=max_object_ms
+        self.max_causal_ms=max_causal_ms
 
     def solve(self,source_examples,independent_source_checks,target_inputs):
         start=perf_counter_ns()
@@ -81,9 +86,31 @@ class ObjectGapRouter:
                 predictions.append(trial)
                 accepted.append(p)
             if len(predictions)==2:break
+        if predictions:
+            return ObjectGapResult(
+                "SOURCE_VERIFIED_NEW_OBJECT_RULE",tuple(predictions),
+                tuple(accepted),1,invented.source_checks,False,
+                (perf_counter_ns()-start)/1e6)
+        # Discover an entirely different executable grammar: transfer one
+        # entity's pixels under a causal positional relation to another.
+        # This is only activated after two stronger original source
+        # grammars failed; it cannot contaminate a solved classical case.
+        causal=RelationalActionInventor(
+            max_source_ms=self.max_causal_ms).invent(
+                demonstrations,verification=verified,max_rules=2)
+        for p in causal.rules:
+            try:
+                trial=tuple(p.apply(x) for x in targets)
+            except (ValueError,TypeError):
+                continue
+            if any(y is None for y in trial):continue
+            if trial not in predictions:
+                predictions.append(trial)
+                accepted.append(p)
+            if len(predictions)==2:break
         return ObjectGapResult(
-            "SOURCE_VERIFIED_NEW_OBJECT_RULE" if predictions
+            "SOURCE_VERIFIED_NEW_CAUSAL_RELATION" if predictions
             else "ABSTAIN_UNSUPPORTED",
             tuple(predictions),tuple(accepted),
-            1,invented.source_checks,False,
+            2,invented.source_checks+causal.witness_signatures,False,
             (perf_counter_ns()-start)/1e6)
