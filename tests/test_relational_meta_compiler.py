@@ -119,3 +119,41 @@ def test_unseen_one_point_exception_blocks_unrestricted_proof():
     exceptional=dict(original);exceptional[0]+=1
     assert r.apply(scene)!=exceptional
     assert all(r.apply(x)==y for x,y in train+verification)
+
+
+
+@pytest.mark.parametrize("engine_factory",[
+    lambda: __import__("neumann1",fromlist=["NeumannEngine"]).NeumannEngine(None,[],None),
+    lambda: __import__("neumann1",fromlist=["RegistryEngine"]).RegistryEngine(None,None),
+])
+def test_live_engine_invents_and_reuses_generalized_program_syntax(engine_factory):
+    engine=engine_factory()
+    first=engine.invent_typed_relational_method(
+        [numeric(i) for i in (1,11,23,31,37)],
+        [numeric(i) for i in (41,47,53,59)])
+    assert first.status=="SOURCE_VERIFIED_INVENTION"
+    assert len(engine._q3_typed_methods)==1
+
+    # New source history but the same learned program. No answer cache.
+    reused=engine.invent_typed_relational_method(
+        [numeric(i) for i in (201,211,223)],
+        [numeric(i) for i in (241,247)])
+    assert reused.status=="SOURCE_VERIFIED_REUSED_PROGRAM"
+    assert reused.clauses_tested==0
+    assert all(reused.apply(numeric(s)[0])==numeric(s)[1]
+               for s in range(301,341))
+
+    # Different attribute names and underlying relational semantics.
+    # Old numeric method is invalid, so the same controller must discover
+    # an entirely new graph law instead of silently transplanting it.
+    different=engine.invent_typed_relational_method(
+        [graph(i) for i in (1,11,23,31,37)],
+        [graph(i) for i in (41,47,53,59)])
+    assert different.status=="SOURCE_VERIFIED_INVENTION"
+    assert len(engine._q3_typed_methods)==2
+    spatial_result=engine.invent_typed_relational_method(
+        [spatial(i) for i in (1,11,23,31,37)],
+        [spatial(i) for i in (41,47,53,59)])
+    assert spatial_result.status=="SOURCE_VERIFIED_INVENTION"
+    assert len(engine._q3_typed_methods)==3
+    assert spatial_result.apply(spatial(99)[0])==spatial(99)[1]
