@@ -143,3 +143,40 @@ def test_input_rejection_and_budget():
         assert False, "cap must fail"
     except ValueError:
         pass
+
+def test_durable_method_inventory_reloads_without_relearning():
+    from neumann1 import RegistryEngine
+    creator=NeumannEngine(None,[],None)
+    creator.observe_program(
+        CertifiedProgram("persistence.max",2,mx2(),certificate="source2"),
+        verify=lambda p:original_max(p.expr,p.arity))
+    creator.observe_program(
+        CertifiedProgram("persistence.max",3,mx3(),certificate="source3"),
+        verify=lambda p:original_max(p.expr,p.arity))
+    snapshot=creator.meta_inventor.checkpoint()
+    assert snapshot["methods"]
+    restored=StructuralMetaInventor.from_checkpoint(snapshot)
+    # Check the SECOND official production routing engine can use the same
+    # checkpoint without source examples or hardcoded templates.
+    engine=RegistryEngine(None,None,meta_inventor=restored)
+    proposal=engine.invent_program(
+        "persistence.max",4,
+        verify=lambda p:original_max(p,4))
+    assert proposal and proposal["verified"]
+    damaged=dict(snapshot,sha256="0"*64)
+    try:
+        StructuralMetaInventor.from_checkpoint(damaged)
+        assert False, "checksum must reject accidental drift"
+    except ValueError:
+        pass
+
+
+def test_invalid_truthy_verifier_cannot_certify_a_method():
+    core=StructuralMetaInventor()
+    src2=CertifiedProgram("not-proved",2,mx2(),certificate="untrusted2")
+    src3=CertifiedProgram("not-proved",3,mx3(),certificate="untrusted3")
+    assert core.learn(src2,src3,verify=lambda x:"false")==[]
+    assert not core.methods
+    core.learn(src2,src3,verify=lambda x:True)
+    assert core.solve("not-proved",4,verify=lambda x:"false") is None
+    assert all(m.successes==0 for m in core.methods.values())
