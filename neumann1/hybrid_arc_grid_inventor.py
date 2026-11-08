@@ -54,7 +54,16 @@ class HybridArcGridInventor:
         elapsed_new=(perf_counter_ns()-t)/1e6
         t=perf_counter_ns()
         baseline,index_checks=old.fit_task(
-            demo,range(len(old.PROGRAMS)),len(old.PROGRAMS),2)
+            demo,range(len(old.PROGRAMS)),len(old.PROGRAMS),
+            max_hits=len(old.PROGRAMS))
+        # A recoloring adapter has up to 10 additional fitted variables.
+        # If an exact geometric transformation exists, it is strictly
+        # simpler and more likely to survive unseen input colors. The old
+        # interpreter used first-two syntax enumeration and overfit such
+        # examples (e.g. synthetic rotation with disjoint palettes).
+        baseline=sorted(baseline,
+            key=lambda item:(item[1]["kind"]!="exact",
+                             len(old.PROGRAMS[item[0]]),item[0]))[:2]
         old_programs=[]
         for idx,adapter in baseline:
             pred=[]
