@@ -16,7 +16,7 @@ No target family labels, expected solution program, source task ASTs, hidden tar
 
 ## Local development result (no external independent-author claims)
 
-Six source tasks span characters and signed number arrays; they are deliberately held separate from nine subsequent target tasks involving character manipulation, integer digits, signed arrays and weighted graph adjacency matrices. The matrix tasks are data transformations, **not** graph traversal or graph optimization. The source and target task definitions were all authored for this development experiment, so distribution-specific advantage is possible.
+Six source tasks span characters and signed number arrays; an additional 30 SOURCE-only verification examples per task (180 total) must agree with each source program before it is admitted into the grammar, and these verification I/O examples are never target samples. they are deliberately held separate from nine subsequent target tasks involving character manipulation, integer digits, signed arrays and weighted graph adjacency matrices. The matrix tasks are data transformations, **not** graph traversal or graph optimization. The source and target task definitions were all authored for this development experiment, so distribution-specific advantage is possible.
 
 | Metric | Learned metagrammar | Identical base DSL, cold enumerative search |
 |---|---:|---:|
@@ -28,7 +28,7 @@ Six source tasks span characters and signed number arrays; they are deliberately
 | Target semantic candidate checks | 596 | 1108 |
 | **Source + target semantic candidate checks** | **847** | **1108** |
 
-- Target-only semantic candidate checks reduction: \`(1108-596)/1108 = 46.21%\`.
+- Source verification additionally evaluates 180 I/O samples (not included in candidate checks); no full-cost claim is made.\n- Target-only semantic candidate checks reduction: \`(1108-596)/1108 = 46.21%\`.
 - Including one-time source discovery candidate checks: \`(1108-847)/1108 = 23.56%\`.
 - **Neither is a CPU/FLOP or total wall-clock claim.** Primitive evaluation overhead, source input preparation, runtime cache, prior R&D, and memory are not captured by this metric.
 - The learned search occasionally executes more candidates or takes longer on individual tasks. On one target, the cold solver finds the program first. Do not promote a universal improvement claim.
