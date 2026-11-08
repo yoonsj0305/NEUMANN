@@ -382,7 +382,8 @@ class NeumannEngine:
         response=ObjectGapRouter(
             max_relational_ms=max_relational_ms,
             max_object_ms=max_object_ms,
-            known_causal_rules=getattr(self,"_q3_relation_memory",())).solve(
+            known_causal_rules=getattr(self,"_q3_relation_memory",()),
+            known_bulk_rules=getattr(self,"_q3_bulk_memory",())).solve(
                 source_examples, independent_source_checks, target_inputs)
         # Method memory stores executable PROGRAM structure, never the
         # source/target answer table. Each later task re-verifies this
@@ -393,4 +394,10 @@ class NeumannEngine:
                 if rule not in library:
                     library.append(rule)
             self._q3_relation_memory=tuple(library[-32:])
+        if response.origin=="SOURCE_VERIFIED_NEW_BULK_RULE":
+            library=list(getattr(self,"_q3_bulk_memory",()))
+            for rule in response.invented_programs:
+                if rule not in library:
+                    library.append(rule)
+            self._q3_bulk_memory=tuple(library[-32:])
         return response
