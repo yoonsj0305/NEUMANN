@@ -159,3 +159,19 @@ class NeumannEngine:
         return {"operator": operator,
                 "representation": operator.normal_forms,
                 "predictions": predictions}
+
+    def synthesize_binary_operator_active(self, universe, source_oracle, *,
+                                          query_budget, seed=0,
+                                          validation_queries=12,
+                                          allow_full_table=False):
+        """Actively propose algebraic equations, query evidence and compile IR.
+
+        The oracle is explicitly a source-time observation capability.
+        Predictions are conditional unless all pairs have been observed.
+        Source budget exhaustion, contradictions and unknown structures
+        fail closed; full-table degraded mode requires explicit opt-in.
+        """
+        from .active_law_inventor import invent_with_oracle
+        return invent_with_oracle(
+            universe, source_oracle, budget=query_budget, seed=seed,
+            validation=validation_queries, allow_full_table=allow_full_table)
