@@ -66,6 +66,26 @@ def _size(ast):
     return sum(1 for _ in _nodes(ast))
 
 
+def _expanded_size(ast, cap):
+    """Bound cost for target adapters that serialize a shared DAG as a tree."""
+    memo = {}
+
+    def count(node):
+        ident = id(node)
+        if ident in memo:
+            return memo[ident]
+        size = 1
+        for child in node[1:]:
+            if isinstance(child, tuple):
+                size = min(cap + 1, size + count(child))
+            if size > cap:
+                break
+        memo[ident] = size
+        return size
+
+    return count(ast)
+
+
 def _args(ast):
     return {x[1] for x in _nodes(ast) if x[0] == "arg"}
 
@@ -221,6 +241,9 @@ class StructuralMetaInventor:
             raise ValueError("source exceeds arity cap")
         if verify(smaller) is not True or verify(larger) is not True:
             return []
+        if (_expanded_size(smaller.expr, self.max_nodes) > self.max_nodes or
+                _expanded_size(larger.expr, self.max_nodes) > self.max_nodes):
+            return []  # DAG is compact, but naive target serialization may not be.
         a = {x[1] for x in _nodes(smaller.expr) if
              x[0] == "lit" and type(x[1]) is int and x[1] not in (0, 1)}
         b = {x[1] for x in _nodes(larger.expr) if
@@ -300,7 +323,8 @@ class StructuralMetaInventor:
         for method in order:
             try:
                 expr = method.generate(arity, params)
-                if _size(expr) <= self.max_nodes:
+                if (_size(expr) <= self.max_nodes and
+                        _expanded_size(expr, self.max_nodes) <= self.max_nodes):
                     yield method, expr
             except (ValueError, AssertionError):
                 continue
