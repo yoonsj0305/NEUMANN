@@ -1,0 +1,106 @@
+name: Q4 FROZEN Paired 180 NEW 1D-ARC Originals Same DSL Cache FIRST
+
+on:
+  push:
+    branches:
+      - feature/q4-semantic-memoized-invention-20261108
+    paths:
+      - research/q3/q4_1d_semantic_cache_second_180_original_first.py
+      - .github/workflows/q4_semantic_cache_1d_second_180_original_first.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  memoized_vs_uncached_original_first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Core runtime required by both frozen implementations
+        run: |
+          python -m pip install -q --disable-pip-version-check numpy scipy scikit-learn
+          python -m compileall -q neumann1
+      - name: Official 1D-ARC creator repository exactly pinned
+        run: |
+          git init -q independent_1d_arc
+          git -C independent_1d_arc fetch -q --depth 1 https://github.com/khalil-research/1D-ARC.git 1e74dc4cb4c58d8160e1fbd0ba638eb745f37147
+          git -C independent_1d_arc checkout -q FETCH_HEAD
+          test "$(git -C independent_1d_arc rev-parse HEAD)" = 1e74dc4cb4c58d8160e1fbd0ba638eb745f37147
+      - name: Exclude the exact 180 previously opened original 1D task IDs
+        uses: actions/download-artifact@v4
+        with:
+          name: q6-1d-arc-180-independent-author-original-FIRST
+          run-id: 42447279658
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: prior_1d
+      - name: Freeze complete second 180 task registry before ANY new original bytes
+        run: |
+          python research/q3/q4_1d_semantic_cache_second_180_original_first.py prefreeze
+          test -f Q4_SECOND_1D_180_FILENAMES_FROZEN.json
+          git hash-object neumann1/relational_grid_inventor.py
+          git hash-object research/q3/q4_1d_semantic_cache_second_180_original_first.py
+      - name: Archive immutable original set before opening
+        uses: actions/upload-artifact@v4
+        with:
+          name: q4-second-1d-originals-180-registry-FROZEN
+          path: Q4_SECOND_1D_180_FILENAMES_FROZEN.json
+          if-no-files-found: error
+      - name: FROZEN old meta-program on FIRST read of the second 180 original tasks
+        run: |
+          git show 3f00f54ff71070cf3f9356099775e2afbec6fa61:neumann1/relational_grid_inventor.py > neumann1/relational_grid_inventor.py
+          python research/q3/q4_1d_semantic_cache_second_180_original_first.py target uncached
+      - name: FROZEN new same DSL with input features shared across candidates
+        run: |
+          git checkout HEAD -- neumann1/relational_grid_inventor.py
+          python research/q3/q4_1d_semantic_cache_second_180_original_first.py target cached
+      - name: Same-original paired capability and total inference-cost audit
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          a=json.load(open('Q4_SECOND_1D_ORIGINAL_UNCACHED.json'))
+          b=json.load(open('Q4_SECOND_1D_ORIGINAL_CACHED.json'))
+          assert a['frozen_registry_sha256']==b['frozen_registry_sha256']
+          assert a['source_code_sha256']!=b['source_code_sha256']
+          ax=a['original_evaluation'];bx=b['original_evaluation']
+          assert ax['originals']==bx['originals']==180
+          assert ax['errors']==bx['errors']
+          p={x['id']:x for x in a['rows']}
+          q={x['id']:x for x in b['rows']}
+          assert set(p)==set(q)
+          changed=[k for k in p if p[k].get('hybrid_correct',False)!=q[k].get('hybrid_correct',False)]
+          s1=ax['hybrid_search_s'];s2=bx['hybrid_search_s']
+          receipt={'schema':'neumann.q4.same-language-180-original-first-paired-results.v1',
+              'registry_sha256':a['frozen_registry_sha256'],
+              'old_source_sha256':a['source_code_sha256'],
+              'new_source_sha256':b['source_code_sha256'],
+              'originals':180,
+              'same_grammar':True,'same_task_ids':True,'same_output_attempt_limit':2,
+              'uncached':ax,'cached':bx,
+              'changed_correctness_task_ids':changed,
+              'search_speed_ratio_uncached_over_cached':s1/s2 if s2 else None,
+              'full_solver_wall_ratio':a['total_wall_s']/b['total_wall_s'] if b['total_wall_s'] else None,
+              'time_scope':'Recorded same-worker Python elapsed on new independent-author originals; excludes prior meta-discovery, CI startup and frontier proprietary FLOPs. No global Q4 10x claim.'}
+          pathlib.Path('Q4_SECOND_180_COST_CORRECTNESS_COMPARISON.json').write_text(json.dumps(receipt,indent=2))
+          print(json.dumps({'old_solved':ax['hybrid_exact_orig'],
+              'new_solved':bx['hybrid_exact_orig'],
+              'original_size_errors':ax['errors'],
+              'old_inference_s':s1,'new_inference_s':s2,
+              'search_speed_ratio':receipt['search_speed_ratio_uncached_over_cached'],
+              'full_wall_ratio':receipt['full_solver_wall_ratio'],
+              'different_original_results':len(changed)},indent=2),flush=True)
+          PY
+      - name: Preserve BOTH FIRST evidence, including errors and true timings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q4-second-180-1d-originals-same-language-paired-FIRST
+          path: |
+            Q4_SECOND_1D_ORIGINAL_UNCACHED.json
+            Q4_SECOND_1D_ORIGINAL_CACHED.json
+            Q4_SECOND_180_COST_CORRECTNESS_COMPARISON.json
+          if-no-files-found: warn

@@ -16,6 +16,7 @@ unseen original test grids separately, after the program is frozen.
 from __future__ import annotations
 from collections import Counter, defaultdict
 from dataclasses import dataclass
+from functools import lru_cache
 import itertools
 import math
 import time
@@ -40,6 +41,7 @@ def grid(data):
         raise ValueError("invalid grid values")
     return g
 
+@lru_cache(maxsize=64)
 def _color_roles(g):
     c=Counter(x for row in g for x in row)
     nz={k:v for k,v in c.items() if k!=0}
@@ -62,6 +64,7 @@ def _color_roles(g):
         role["least_components_color"]=min(by_col,key=lambda k:(by_col[k],k))
     return role
 
+@lru_cache(maxsize=64)
 def _components(g):
     h,w=len(g),len(g[0]);seen=set();out=[]
     for i in range(h):
@@ -81,6 +84,7 @@ def _components(g):
                         "r0":r0,"r1":r1,"c0":c0,"c1":c1})
     return out
 
+@lru_cache(maxsize=48)
 def _fields(g):
     """A typed object/coordinate graph: a feature vector for EVERY pixel.
     Output answers never participate in generating these input features.
@@ -481,7 +485,14 @@ class GridInventionResult:
     elapsed_ms: float
 
 class RelationalGridInventor:
-    """NEUMANN executable causal method invention with explicit cost bound."""
+    """NEUMANN executable causal method invention with bounded structural memo.
+
+    Object topology, relative colors and pixel feature maps are PURE
+    functions of immutable input tuples. The old solver recomputed these
+    from scratch for each program candidate; memoizing them shares one
+    representation across hundreds of invented counterfactual hypotheses.
+    Cache size is bounded and independent of task labels.
+    """
     def __init__(self,max_search_ms=450):
         if type(max_search_ms) not in (int,float) or not 1<=max_search_ms<=120000:
             raise ValueError("finite bounded meta-invention budget required")
