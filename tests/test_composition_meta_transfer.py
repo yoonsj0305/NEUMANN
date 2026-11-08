@@ -197,3 +197,30 @@ def test_engine_plugin_interface_never_auto_assumes_semantics():
             exact_polynomial_residual(rows,max_degree=1))
         assert result.status=="SOURCE_VERIFIED_NEW_COMPOSITION"
         assert result.apply(held[0])==target(held[0])
+
+
+def test_strong_classical_degree_two_interpolation_wins_numeric_before_invention():
+    """Conventional interpolation is a fully adequate competitor on this task.
+
+    Do not misreport a degree-one-composition gain over an intentionally weak
+    identity-only classical list as an ORIGINAL novel capability.
+    """
+    target,train,checks,held=numeric_sources()
+    specialist=exact_polynomial_residual(train,max_degree=2)
+    assert specialist is not None
+    assert all(specialist(x)==target(x) for x in held)
+    called=[]
+    def forbidden_residual(rows):
+        called.append(rows)
+        raise AssertionError("do not invent when classical interpolation solves")
+    result=CompositionInventor().discover(
+        train,checks,
+        classical_candidates=[
+            CallablePrimitive("classical-exact-polynomial-interpolation-degree2",
+                              specialist)],
+        pre_candidates=[],
+        learn_residual=forbidden_residual)
+    assert result.status=="CLASSICAL_VERIFIED"
+    assert result.residual_attempts==0
+    assert result.exact_source_checks==len(train)+len(checks)
+    assert not called
