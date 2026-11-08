@@ -1,0 +1,84 @@
+{
+  "schema": "NEUMANN.Q3.active-rank-repair.first-local.v1",
+  "kind": "same-author synthetic repaired source-only replay, not external first holdout",
+  "families": [
+    {
+      "family": "random3",
+      "cases": 20,
+      "passed": 20,
+      "source_queries": 12520,
+      "full_table_queries": 48600,
+      "heldout": 36080,
+      "heldout_correct": 36080,
+      "representation_repairs": 0
+    },
+    {
+      "family": "random5",
+      "cases": 20,
+      "passed": 20,
+      "source_queries": 15920,
+      "full_table_queries": 48600,
+      "heldout": 32680,
+      "heldout_correct": 32680,
+      "representation_repairs": 0
+    },
+    {
+      "family": "nonsquare2",
+      "cases": 20,
+      "passed": 20,
+      "source_queries": 13120,
+      "full_table_queries": 78000,
+      "heldout": 64880,
+      "heldout_correct": 64880,
+      "representation_repairs": 0
+    },
+    {
+      "family": "bipartite_graph",
+      "cases": 20,
+      "passed": 20,
+      "source_queries": 14128,
+      "full_table_queries": 78000,
+      "heldout": 63872,
+      "heldout_correct": 63872,
+      "representation_repairs": 0
+    },
+    {
+      "family": "hidden_rank",
+      "cases": 20,
+      "passed": 20,
+      "source_queries": 10921,
+      "full_table_queries": 48600,
+      "heldout": 37679,
+      "heldout_correct": 37679,
+      "representation_repairs": 20
+    },
+    {
+      "family": "rational3",
+      "cases": 20,
+      "passed": 20,
+      "source_queries": 12520,
+      "full_table_queries": 48600,
+      "heldout": 36080,
+      "heldout_correct": 36080,
+      "representation_repairs": 0
+    }
+  ],
+  "totals": {
+    "cases": 120,
+    "passed": 120,
+    "source_queries": 79129,
+    "full_table_queries": 350400,
+    "heldout": 271271,
+    "heldout_correct": 271271,
+    "representation_repairs": 20
+  },
+  "first_diagnostic": "Before validation-stratification hidden_rank seed=1 escaped; 119/120 positive runs",
+  "after_fix": "Counterexample-driven rank repair, stratified novel-row validation, 120/120 replay",
+  "limitations": [
+    "six manually authored matrix families",
+    "twenty seeds per family are not independently authored problems",
+    "unknown low-rank assumption cannot be proved from sparse source",
+    "single-cell false friend still defeats provisional extrapolation",
+    "no CPU/FLOP or strong-classical 10x efficiency proven"
+  ]
+}
