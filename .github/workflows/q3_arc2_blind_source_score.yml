@@ -1,0 +1,71 @@
+name: Q3 ARC2 Blind Source Proposal and Original Training-Test Audit
+
+on:
+  pull_request:
+    paths:
+      - "neumann1/composed_grid_inventor.py"
+      - "research/q3/q3_arc2_training_original_test_freeze.py"
+      - ".github/workflows/q3_arc2_blind_source_score.yml"
+  workflow_dispatch:
+
+jobs:
+  blind-proposal-then-original-scoring:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Checkout pinned independent external training author
+        run: |
+          mkdir -p /tmp/arc2-external-source
+          git -C /tmp/arc2-external-source init -q
+          git -C /tmp/arc2-external-source remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/arc2-external-source fetch -q --depth 1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/arc2-external-source checkout -q FETCH_HEAD
+          test "$(git -C /tmp/arc2-external-source rev-parse HEAD)" = f3283f727488ad98fe575ea6a5ac981e4a188e49
+      - name: Prepare mathematically blind data copy without test gold
+        run: |
+          python -m pip install -e .
+          python research/q3/q3_arc2_training_original_test_freeze.py prepare \
+            --upstream /tmp/arc2-external-source \
+            --blind /tmp/arc2-blind-input \
+            --n 96
+      - name: PROPOSE and cryptographically freeze every output before gold is seen
+        run: |
+          python research/q3/q3_arc2_training_original_test_freeze.py propose \
+            --blind /tmp/arc2-blind-input \
+            --output q3_frozen_predictions.json \
+            --max-rel-ms 120
+          sha256sum q3_frozen_predictions.json > q3_frozen_predictions.sha256
+          cat q3_frozen_predictions.sha256
+      - name: SCORE only after explicit proposal artifact freeze
+        run: |
+          frozen_sha="$(cut -d' ' -f1 q3_frozen_predictions.sha256)"
+          python research/q3/q3_arc2_training_original_test_freeze.py score \
+            --upstream /tmp/arc2-external-source \
+            --predictions q3_frozen_predictions.json \
+            --expected-sha "$frozen_sha" \
+            --output q3_arc2_training_test_score.json
+          python - <<'PY'
+          import json
+          d=json.load(open('q3_arc2_training_test_score.json'))
+          assert d['summary']['source_samples_selected']==96
+          assert d['summary']['source_samples_scored']+d['summary']['source_samples_skipped']==96
+          assert not d['summary']['original_first_claim']
+          assert not d['summary']['global_q3_q4_q6_pass']
+          print('ARC2 TRAINING-TEST SCORE IS NOT ARC2 EVALUATION NOR GLOBAL Q3 Q4 Q6 PROOF')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-arc2-training-test-frozen-proposal-and-audit
+          path: |
+            q3_frozen_predictions.json
+            q3_frozen_predictions.sha256
+            q3_arc2_training_test_score.json
+          if-no-files-found: error
