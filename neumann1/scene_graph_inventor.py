@@ -242,12 +242,19 @@ class ObjectGrammarInventor:
         self.max_source_ms=max_source_ms
 
     def invent(self,demonstrations,*,verification=(),max_programs=2):
-        """Shape-first pruning: never render a size-impossible program.
+        """Inverse synthesize: derive feasible render witnesses FROM output first.
 
-        Every candidate is a source-inferred AST; classical segmentation and
-        D4 execution remain pre-existing algorithms. Crucially the shape
-        constraints are a SOUND necessary condition of every constructed
-        rendering program. They delete work, not valid solutions.
+        The old forward compiler enumerated 8 segmentation policies * 65
+        selectors * 10 render modes * 8 symmetries * 3 scales and executed
+        most of them. This inverse compiler uses the original I/O outputs to
+        find ONLY per-source object→output witnesses. It intersects witness
+        TRANSFORMATION STRUCTURES across independent demonstrations, THEN
+        infers a reusable selector and validates on disjoint source I/O.
+
+        The pruning is structurally sound relative to the fixed object DSL:
+        every correct program must map one source object via one of these
+        render transforms, so its mode/transform/scale must occur in every
+        demo's inverse witness set.
         """
         start=perf_counter_ns()
         train=tuple((grid(x),grid(y)) for x,y in demonstrations)
@@ -255,14 +262,15 @@ class ObjectGrammarInventor:
         if len(train)<2 or not checks:
             raise ValueError("2 source I/O and >=1 independent SOURCE verifier required")
         if max_programs not in (1,2):
-            raise ValueError("at most two competing original predictions")
+            raise ValueError("at most two original predictions")
         deadline=start+int(self.max_source_ms*1e6)
-        counter=0
+        work=0
         found=[]
+        seen_segment_structures=set()
+
         def finish():
             return ObjectInvention(
-                tuple(found),counter,
-                (perf_counter_ns()-start)/1e6,
+                tuple(found),work,(perf_counter_ns()-start)/1e6,
                 bool(found),len(checks))
 
         def output_shape(g,obj,mode,transform,factor):
@@ -277,62 +285,102 @@ class ObjectGrammarInventor:
                 h,w=w,h
             return h*factor,w*factor
 
-        # The 8 segmentation policies are cheap classical graph procedures.
-        # Color, area and relative position ranking determine new objects.
+        def background(g,policy):
+            if policy=="zero":return 0
+            hist=Counter(v for row in g for v in row)
+            return min(hist,key=lambda v:(-hist[v],v))
+
+        # Reify only genuinely different object partitions. Duplicated
+        # partitions (e.g. modal background == zero) must not be rescanned.
         for bg_policy in ("zero","modal"):
             for diagonal in (False,True):
                 for mixed_colors in (False,True):
                     if perf_counter_ns()>deadline:return finish()
                     groups=[]
                     for g,y in train:
-                        hist=Counter(v for row in g for v in row)
-                        bg=(0 if bg_policy=="zero" else
-                            min(hist,key=lambda v:(-hist[v],v)))
+                        bg=background(g,bg_policy)
                         objects=extract(g,bg,diagonal=diagonal,
                                         mixed_colors=mixed_colors)
-                        groups.append((g,y,objects))
-                    if not all(objects for g,y,objects in groups):
+                        groups.append((g,y,bg,objects))
+                    if not all(objs for g,y,bg,objs in groups):
                         continue
-                    for feature in FEATURES:
-                        for rank in RANKS:
+                    signature=tuple(
+                        (bg,tuple(sorted(tuple(sorted(o.cells))
+                                         for o in objs)))
+                        for g,y,bg,objs in groups)
+                    if signature in seen_segment_structures:
+                        continue
+                    seen_segment_structures.add(signature)
+
+                    # Inverse witnesses: a mode/D4/scale is feasible only
+                    # if at least one SOURCE object renders to the EXACT
+                    # original SOURCE output. No selector guesses yet.
+                    per_source=[]
+                    for g,y,bg,objects in groups:
+                        witnesses={}
+                        target_dim=_dim(y)
+                        for obj in objects:
                             if perf_counter_ns()>deadline:return finish()
-                            selected=[select_object(objects,_dim(g),
-                                feature,rank) for g,y,objects in groups]
-                            if any(x is None for x in selected):
-                                continue
-                            # Evaluate only typed size-compatible render ASTs.
-                            # The old implementation eagerly rendered 10 modes
-                            # for 65 selectors per graph, even if the output
-                            # dimensions made all candidates impossible.
                             for mode in RENDERS:
+                                # Avoid creating any candidate image until
+                                # target dimensions are mathematically valid.
+                                possible=[
+                                    (transform,factor)
+                                    for transform in D4 for factor in SCALES
+                                    if output_shape(
+                                        g,obj,mode,transform,factor)==target_dim
+                                ]
+                                if not possible:continue
+                                rendered=render(g,obj,bg,mode)
+                                if rendered is None:continue
+                                for transform,factor in possible:
+                                    work+=1
+                                    if work>self.max_candidates or (
+                                            perf_counter_ns()>deadline):
+                                        return finish()
+                                    changed=old.d4(rendered,transform)
+                                    predicted=scale(changed,factor)
+                                    if predicted==y:
+                                        key=(mode,transform,factor)
+                                        witnesses.setdefault(key,set()).add(obj)
+                        if not witnesses:
+                            per_source=[]
+                            break
+                        per_source.append(witnesses)
+                    if len(per_source)!=len(train):continue
+                    common=set.intersection(*(set(w) for w in per_source))
+                    if not common:continue
+
+                    # Infer an invariant object selection program ONLY for
+                    # output structures supported by ALL source examples.
+                    for mode,transform,factor in sorted(
+                        common,key=lambda item:(
+                            item[2]!=1,item[1]!="identity",
+                            item[0],item[1],item[2])):
+                        if perf_counter_ns()>deadline:return finish()
+                        valid_objects=[w[(mode,transform,factor)]
+                                       for w in per_source]
+                        for feature in FEATURES:
+                            for rank in RANKS:
                                 if perf_counter_ns()>deadline:return finish()
-                                for transform in D4:
-                                    for factor in SCALES:
-                                        if any(output_shape(g,obj,mode,transform,factor)
-                                               !=_dim(y)
-                                               for (g,y,objects),obj
-                                               in zip(groups,selected)):
-                                            continue
-                                        counter+=1
-                                        if counter>self.max_candidates or (
-                                                perf_counter_ns()>deadline):
-                                            return finish()
-                                        program=ObjectProgram(
-                                            bg_policy,diagonal,mixed_colors,
-                                            feature,rank,mode,transform,factor)
-                                        try:
-                                            # Early bail: a single source
-                                            # counterexample refutes candidate.
-                                            if not all(program.apply(g)==y
-                                                       for g,y in train):
-                                                continue
-                                            if not all(program.apply(g)==y
-                                                       for g,y in checks):
-                                                continue
-                                        except (ValueError,TypeError):
-                                            continue
-                                        if program not in found:
-                                            found.append(program)
-                                            if len(found)>=max_programs:
-                                                return finish()
+                                selected=[
+                                    select_object(objs,_dim(g),feature,rank)
+                                    for g,y,bg,objs in groups]
+                                if any(o not in valid
+                                       for o,valid in zip(
+                                           selected,valid_objects)):
+                                    continue
+                                proposal=ObjectProgram(
+                                    bg_policy,diagonal,mixed_colors,
+                                    feature,rank,mode,transform,factor)
+                                try:
+                                    if not all(proposal.apply(x)==y
+                                               for x,y in checks):
+                                        continue
+                                except (TypeError,ValueError):
+                                    continue
+                                if proposal not in found:
+                                    found.append(proposal)
+                                    if len(found)>=max_programs:
+                                        return finish()
         return finish()
