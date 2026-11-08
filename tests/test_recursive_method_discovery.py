@@ -142,3 +142,37 @@ def test_invalid_discovery_method_guard_rejects_infinite_or_nonprogressing_loop(
         # These contracts are required to fail if the first stage refutes.
         with pytest.raises(InsufficientEvidence):
             execute(method,backend)
+
+
+@pytest.mark.parametrize("engine_type",["NeumannEngine","RegistryEngine"])
+def test_live_engines_self_rewrite_method_then_transfer_without_new_solvers(
+        engine_type):
+    from neumann1 import NeumannEngine,RegistryEngine
+    engine=(NeumannEngine(None,[],None) if engine_type=="NeumannEngine"
+            else RegistryEngine(None,None))
+    train,feedback,_=studies()
+    first=engine.meta_learn_recursive_discovery_method(train)
+    assert first.method.challenges==4
+    revision=engine.meta_revise_recursive_discovery_method(feedback)
+    assert revision.method.challenges==64
+    assert revision.method.ast!=first.method.ast
+    unseen=case("period",700009,9)
+    run=engine.meta_execute_recursive_discovery_method(
+        unseen.backend_factory(
+            ObservedOracle(unseen.oracle,unseen.heldout)))
+    assert run.status=="SOURCE_VERIFIED"
+    assert all(run.apply(t)==unseen.oracle(t)
+               for t in unseen.heldout)
+    # Already verified classical algorithms bypass both source-invented
+    # feature generation and the learned conditional meta search.
+    classical=case("boolean",201,2)
+    backend=classical.backend_factory(
+        ObservedOracle(classical.oracle,classical.heldout))
+    probes=[tuple((i>>j)&1 for j in range(10)) for i in range(24)]
+    bypass=engine.meta_execute_recursive_discovery_method(
+        backend,known_classical=(classical.oracle,),
+        classical_probe_inputs=probes)
+    assert bypass.status=="CLASSICAL_SOURCE_VERIFIED"
+    with pytest.raises(ValueError):
+        engine.meta_revise_recursive_discovery_method(
+            tuple(case("boolean",i+400,1) for i in range(2)))
