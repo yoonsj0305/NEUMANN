@@ -429,3 +429,17 @@ class RegistryEngine:
                 classical_candidates=classical_candidates,
                 pre_candidates=pre_candidates,
                 learn_residual=learn_residual)
+
+    def invent_arc_object_only_on_classical_gap(
+            self, source_examples, independent_source_checks, target_inputs,
+            *, max_relational_ms=120, max_object_ms=350):
+        """Use classical/previous original verifier FIRST, invent only on gap.
+
+        Original target outputs are not accepted. Object grammar is learned
+        from SOURCE observations and independently verified source checks.
+        """
+        from .object_gap_router import ObjectGapRouter
+        return ObjectGapRouter(
+            max_relational_ms=max_relational_ms,
+            max_object_ms=max_object_ms).solve(
+                source_examples, independent_source_checks, target_inputs)
