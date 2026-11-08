@@ -325,12 +325,93 @@ def execute(inp,program):
         new.append(tuple(outrow))
     return tuple(new)
 
+def _source_parallel_parts(demo,max_parts=3):
+    """Invent a parallel operator by composing independent source-verified
+    relational rewrites, rejecting contradictory proposed pixel values."""
+    if any(len(a)!=len(b) or len(a[0])!=len(b[0]) for a,b in demo):
+        return None
+    changed_colors=[
+        {b[r][c] for r in range(len(a)) for c in range(len(a[0]))
+         if a[r][c]!=b[r][c]} for a,b in demo]
+    if max(map(len,changed_colors),default=0)<2:
+        return None
+    if max(map(len,changed_colors),default=0)>5:
+        return None
+    prepared=_features_for_demos(demo)
+    if prepared is None:return None
+    features,output_rows=prepared
+    slices=[];start=0
+    for a,b in demo:
+        n=len(a)*len(a[0]);slices.append(slice(start,start+n));start+=n
+    changed={i for i,(a,b,_) in enumerate(output_rows) if a!=b}
+    actions=[]
+    for role,colors in _output_roles(demo):
+        positive=[];negative=[]
+        for gi,span in enumerate(slices):
+            target_color=colors[gi]
+            for i in range(span.start,span.stop):
+                src,tgt,_=output_rows[i]
+                if src!=tgt and tgt==target_color:
+                    positive.append(i)
+                elif src!=target_color and tgt!=target_color:
+                    negative.append(i)
+        if not positive:continue
+        guard=_cover_rule(features,positive,negative,max_clauses=3)
+        if guard is None:continue
+        part={"action":role,"guard":guard}
+        generated=[execute(a,part) for a,b in demo]
+        if any(p is None for p in generated):continue
+        coverage=set();ok=True;at=0
+        for (a,b),proposal in zip(demo,generated):
+            for r in range(len(a)):
+                for c in range(len(a[0])):
+                    if proposal[r][c]!=a[r][c]:
+                        if proposal[r][c]!=b[r][c]:ok=False
+                        else:coverage.add(at)
+                    at+=1
+        if not ok or not coverage:continue
+        complexity=(sum(len(clause) for clause in guard)
+                    +.5*len(guard)+int(role[0]=="constant"))
+        actions.append((part,coverage,complexity))
+    if len(actions)<2:return None
+    actions.sort(key=lambda x:(-len(x[1])/max(1,x[2]),x[2],str(x[0])))
+    actions=actions[:14]
+    best=None;best_cost=float("inf")
+    for k in range(2,min(max_parts,len(actions))+1):
+        for positions in itertools.combinations(range(len(actions)),k):
+            coverage=set().union(*(actions[j][1] for j in positions))
+            if not changed.issubset(coverage):continue
+            parts=[actions[j][0] for j in positions]
+            if all(_parallel_predict(a,parts)==b for a,b in demo):
+                cost=sum(actions[j][2] for j in positions)+k
+                if cost<best_cost:best=parts;best_cost=cost
+        if best is not None:
+            return {"kind":"parallel_relational_rewrites","parts":best}
+    return None
+
+
+def _parallel_predict(inp,parts):
+    candidates=[execute(inp,p) for p in parts]
+    if any(p is None for p in candidates):return None
+    final=[]
+    for r,row in enumerate(inp):
+        out=[]
+        for c,v in enumerate(row):
+            updates={p[r][c] for p in candidates if p[r][c]!=v}
+            if len(updates)>1:return None
+            out.append(next(iter(updates)) if updates else v)
+        final.append(tuple(out))
+    return tuple(final)
+
+
 def induce(demo):
     """Return a new executable source-grounded program, never just labels."""
     if not demo or any(len(x)*len(x[0])>MAX_PIXELS for x,y in demo):
         return None
     out=_source_one_step(demo)
     if out:return {"kind":"cell_relational_rewrite","program":out}
+    multi=_source_parallel_parts(demo)
+    if multi:return multi
     # Shape-changing role abstraction: infer output as a global color
     # selected by a relational statistic of the new input.
     if all(len(y)==1 and len(y[0])==1 for _,y in demo):
@@ -343,6 +424,8 @@ def predict(inp,method):
     if method is None:return None
     if method["kind"]=="cell_relational_rewrite":
         return execute(inp,method["program"])
+    if method["kind"]=="parallel_relational_rewrites":
+        return _parallel_predict(inp,method["parts"])
     if method["kind"]=="select_color_role":
         typ,val=method["role"]
         color=val if typ=="constant" else _color_roles(inp).get(val)
