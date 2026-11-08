@@ -53,6 +53,23 @@ The corrected `research/q3/q3_object_inverse_paired_cost.py` and `.github/workfl
 
 The corrected cost study uses identical 128 original source tasks and source verifiers per cohort on a single runner, reports RAW-vs-INVERSE and PRUNED-vs-INVERSE separately, never opens original test gold, and keeps all results labeled as **retained original source development**. Do not convert a cross-cohort speed ratio into Q4 success.
 
+## CORRECTED exact matched source-cost evidence: PASS within object DSL
+
+[GitHub Actions run 42462819679](https://github.com/yoonsj0305/NEUMANN/actions/runs/42462819679) restored **three distinct historical versions** and executed each on the **same original training source examples** within the same Python 3.11 runner. The restored SHAs were validated explicitly before execution. Unlike the INVALID former 1× run, this is a true paired comparison.
+
+| Retained original cohort | Source cases checked | RAW forward cost | Shape-pruned forward cost | INVERSE witness cost | Shape-pruned / INVERSE | Original SOURCE-fit cases, all three |
+|---|---:|---:|---:|---:|---:|---:|
+| FIRST | 115 | 44.13894 s | 31.12362 s | 2.26555 s | **13.74×** | 3 |
+| SECOND | 107 | 38.67408 s | 29.93193 s | 1.36361 s | **21.95×** | 4 |
+| THIRD | 105 | 40.20369 s | 28.26259 s | 0.93920 s | **30.09×** | 9 |
+| ALL, **same stable solver across each retained case** | **327** | **123.01671 s** | **89.31814 s** | **4.56836 s** | **19.55×** | **16** |
+
+The three retained cohorts are mutually disjoint. This is **one source-programming comparison over 327 author-original training source tasks**, not proof of original unseen test generalization on 327 target tasks. All old/new algorithms achieved exactly the same source demonstration verification count, 16/327. (The actual frozen test prediction scores are separately recorded above for the chronological, changing production policies.)
+
+**Why this is a real scoped Q4 improvement:** Inverse output witness construction evaluates only source-compatible semantic structures, while forward enumeration usually consumes a 350 ms search cap even when it cannot fit. Matching actual programs and exact source I/O checks confirms that the inverse search maintained source fitting at ~19.55× lower measured search runtime than the previously shape-pruned object compiler.
+
+**Why full Q4 stays OPEN:** The comparison covers the object-program source discovery *subprocess only*. It omits source data preparation, test prediction and independent scoring costs, memory/GPU/energy, metagrammar research effort, and a strongest contemporary specialist or frontier comparator. The faster method improves an internal classic program-enumeration approach rather than proving frontier-level 10× total advantage. The previous invalid ~1× measurement is explicitly withdrawn.
+
 ## Code and reproducibility
 
 - \`neumann1/scene_graph_inventor.py\` (inverse causal-object witness synthesis)
