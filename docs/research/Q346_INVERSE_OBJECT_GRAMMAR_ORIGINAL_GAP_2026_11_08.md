@@ -42,6 +42,17 @@ THIRD object-only residual wins (previous composer wrong): \`b9b7f026\`, \`a87f7
 - **Q6:** The same inverse algorithm learned object programs with different colors, object sizes and layouts in synthetic controlled cases, with real ARC originals not seen in earlier 352 tasks. This is transfer to different spatial tasks **within one semantic superfamily**; cross-formalism autonomous generalization remains OPEN. The separate exact polynomial/graph grammar components do not magically prove that this learned object grammar transfers to unrelated mathematics.
 - **Fail-closed and Degraded Mode:** Strong previous classic/source-certified program executes first; no need to run invented object method on that task. If learned object AST cannot explain source and independent source verification, no target answer is fabricated.
 
+## Reproducibility correction: an invalid 1× matched comparison withdrawn
+
+An earlier matched-cost experiment mistakenly restored source commit `c193e291f37936a59c74f12be60479f62ad8a73f` as the "forward" reference. **That commit already contained the INVERSE-witness implementation.** It was, in substance, a comparison between two copies of the same algorithm. Consequently, its ~1.0× result is INVALID as evidence of either success or failure of inverse search and must not be reported as a genuine paired baseline.
+
+The corrected `research/q3/q3_object_inverse_paired_cost.py` and `.github/workflows/q4_object_paired_cost.yml` restore all three *verified distinct source commits*:
+- Raw forward enumerator: `c0569e915de56128f87d40df05c6c6b68552c747`
+- Shape-pruned forward enumerator: `de59b6bcec4a37f0acbfdc0c2fd55f54f811b676`
+- Current inverse witness enumerator: the PR HEAD after commit `791a4de9634b61269365340a41b51ebdddf6333c`
+
+The corrected cost study uses identical 128 original source tasks and source verifiers per cohort on a single runner, reports RAW-vs-INVERSE and PRUNED-vs-INVERSE separately, never opens original test gold, and keeps all results labeled as **retained original source development**. Do not convert a cross-cohort speed ratio into Q4 success.
+
 ## Code and reproducibility
 
 - \`neumann1/scene_graph_inventor.py\` (inverse causal-object witness synthesis)
