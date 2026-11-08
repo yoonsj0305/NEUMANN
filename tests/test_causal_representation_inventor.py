@@ -160,3 +160,18 @@ def test_unsound_source_reuse_and_invalid_budget_rejected():
     with pytest.raises(IncompleteInformation):
         invent_with_active_source_queries(
             lambda x:0,width=2,max_degree=2,independent_checks=1)
+
+
+def test_both_live_engines_can_autonomously_invent_representations():
+    from neumann1 import NeumannEngine,RegistryEngine
+    train,checks,unseen=source_design(12,2,numeric_law,70)
+    for engine in (NeumannEngine(None,[],None),RegistryEngine(None,None)):
+        r=engine.invent_latent_representation(
+            train,checks,max_degree=3)
+        assert r.status=="SOURCE_VERIFIED_NEW_REPRESENTATION"
+        assert all(r.apply(x)==numeric_law(x) for x in unseen)
+        queries=engine.actively_invent_latent_representation(
+            numeric_law,width=12,max_degree=2,independent_checks=70)
+        assert queries.source_probes==79
+        assert queries.discovery.program.ast[0]==(
+            "learned_GF2_polynomial_representation")
