@@ -36,7 +36,7 @@ jobs:
           import causal_residual_compiler_optimized_unseen_first as g
           assert len(g.NEW_TARGET)==32
           assert g.NEW_TARGET==[f"ic_{r}_{op}.sl" for r in ("bvule","bvult") for op in g.old.base.OPS]
-          assert not set(g.NEW_TARGET)&set(g.old.TARGET+g.parent.TARGET)
+          assert not set(g.NEW_TARGET)&set(g.old.TARGET+[f'ic_{r}_{op}.sl' for r in ('bvugt','ne') for op in g.old.base.OPS])
           atoms=g.old.atom_library()
           mask=atoms[5][1]
           ast,_,_=g.fast_residual(mask,atoms)
