@@ -33,18 +33,25 @@ def canon(x):
     return json.dumps(x,sort_keys=True,separators=(",",":"),allow_nan=False)
 def sha(x):
     return hashlib.sha256(canon(x).encode()).hexdigest()
+def _shape_ok(h,w):
+    # Identical interface for 2D ARC2, but a 1D row/column may be longer
+    # than 30 under the SAME bounded 900-pixel memory budget.
+    return (1<=h and 1<=w and h*w<=PIXEL_CAP
+            and (min(h,w)==1 or (h<=30 and w<=30)))
+
+
 def G(rows):
-    if not isinstance(rows,(list,tuple)) or not 1<=len(rows)<=30:
+    if not isinstance(rows,(list,tuple)) or not rows or not rows[0]:
         raise ValueError("invalid grid rows")
     g=tuple(tuple(row) for row in rows)
     w=len(g[0])
-    if w<1 or w>30 or any(len(row)!=w for row in g):
+    if not _shape_ok(len(g),w) or any(len(row)!=w for row in g):
         raise ValueError("grid not rectangular")
     if any(type(v) is not int or not 0<=v<=9 for row in g for v in row):
         raise ValueError("invalid palette")
     return g
 def valid(g):
-    if not g or not 1<=len(g)<=30 or not 1<=len(g[0])<=30:
+    if not g or not g[0] or not _shape_ok(len(g),len(g[0])):
         return False
     if any(len(row)!=len(g[0]) or any(not 0<=x<=9 for x in row) for row in g):
         return False
