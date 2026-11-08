@@ -181,3 +181,14 @@ class RegistryEngine:
                 "method": hypothesis.method,
                 "source_fit": hypothesis.source_fit,
                 "search_ms": hypothesis.elapsed_ms}
+
+    def synthesize_arc_grid(self, source_examples, target_inputs, *, max_attempts=2):
+        """Invent, route and execute two complementary ARC grid methods.
+
+        Both branches receive the same original training examples. Neither
+        receives held-out gold; the two final candidates are frozen before
+        any independent task-level verifier scores their exact outputs.
+        """
+        from .hybrid_arc_grid_inventor import HybridArcGridInventor
+        router=HybridArcGridInventor(max_attempts=max_attempts)
+        return router.solve(source_examples,target_inputs)
