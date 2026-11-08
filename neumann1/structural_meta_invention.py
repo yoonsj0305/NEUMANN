@@ -523,7 +523,7 @@ class StructuralMetaInventor:
                 if type(record) is not dict or set(record) != {
                         "family", "arity", "expr", "params", "certificate"}:
                     raise ValueError("invalid certified source record")
-                if type(record["params"]) is not list:
+                if type(record["params"]) not in (list, tuple):
                     raise ValueError("bad source parameter slots")
                 source = CertifiedProgram(
                     family=record["family"], arity=record["arity"],
