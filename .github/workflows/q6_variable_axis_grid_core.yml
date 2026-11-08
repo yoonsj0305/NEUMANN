@@ -1,0 +1,32 @@
+name: Q6 CORE Generalize Typed Grid Interface Beyond 30-Cell 1D
+
+on:
+  push:
+    branches:
+      - feature/q6-variable-axis-grid-20261108
+    paths:
+      - neumann1/relational_grid_inventor.py
+      - neumann1/arc2_meta_grid_reasoner.py
+      - tests/test_grid_variable_axis_q6.py
+      - .github/workflows/q6_variable_axis_grid_core.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  variable_dimension_interface:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Core runtime dependencies
+        run: |
+          python -m pip install -q --disable-pip-version-check numpy scipy scikit-learn pytest
+          python -m compileall -q neumann1
+      - name: Core typed dimension extension, old ARC2 and meta-method regressions
+        run: |
+          python -m pytest -q tests/test_grid_variable_axis_q6.py tests/test_relational_composition_hybrid.py tests/test_relational_grid_inventor.py tests/test_autonomous_synthesis_core.py tests/test_structural_meta_invention.py tests/test_meta_utility_policy.py tests/test_engine.py
