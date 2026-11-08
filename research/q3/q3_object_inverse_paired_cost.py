@@ -19,7 +19,8 @@ sys.path.insert(0,str(pathlib.Path(__file__).resolve().parent))
 from q3_arc2_object_blind_first import freeze_options
 from q3_arc2_training_original_test_freeze import checked_upstream
 from neumann1.scene_graph_inventor import ObjectGrammarInventor as Inverse
-from neumann1._q3_forward_reference import ObjectGrammarInventor as Forward
+from neumann1._q3_forward_raw import ObjectGrammarInventor as ForwardRaw
+from neumann1._q3_forward_pruned import ObjectGrammarInventor as ForwardPruned
 from neumann1 import arc2_meta_grid_reasoner as old
 
 
@@ -46,48 +47,58 @@ def main():
             continue
         pairs=[(old.G(r["input"]),old.G(r["output"])) for r in source]
         kwargs={"verification":[pairs[-1]],"max_programs":2}
-        t0=perf_counter_ns()
-        forward=Forward(max_source_ms=a.max_source_ms).invent(
-            pairs[:-1],**kwargs)
-        elapsed_fwd=(perf_counter_ns()-t0)/1e6
-        t0=perf_counter_ns()
-        inverse=Inverse(max_source_ms=a.max_source_ms).invent(
-            pairs[:-1],**kwargs)
-        elapsed_inv=(perf_counter_ns()-t0)/1e6
+        timing=[]
+        for model in (ForwardRaw, ForwardPruned, Inverse):
+            t0=perf_counter_ns()
+            result=model(max_source_ms=a.max_source_ms).invent(
+                pairs[:-1],**kwargs)
+            timing.append((result,(perf_counter_ns()-t0)/1e6))
+        raw,raw_elapsed=timing[0]
+        pruned,pruned_elapsed=timing[1]
+        inverse,inverse_elapsed=timing[2]
         ledger.append({
             "source_id":path.stem,"status":"CHECKED",
-            "forward_source_fit":forward.source_fit,
+            "raw_forward_source_fit":raw.source_fit,
+            "shape_pruned_source_fit":pruned.source_fit,
             "inverse_source_fit":inverse.source_fit,
-            "forward_ms":round(elapsed_fwd,5),
-            "inverse_ms":round(elapsed_inv,5),
-            "forward_candidates":forward.source_checks,
+            "raw_forward_ms":round(raw_elapsed,5),
+            "shape_pruned_ms":round(pruned_elapsed,5),
+            "inverse_ms":round(inverse_elapsed,5),
+            "raw_source_checks":raw.source_checks,
+            "pruned_source_checks":pruned.source_checks,
             "inverse_witness_checks":inverse.source_checks,
         })
     valid=[r for r in ledger if r["status"]=="CHECKED"]
-    old_total=sum(r["forward_ms"] for r in valid)
-    new_total=sum(r["inverse_ms"] for r in valid)
+    old_raw=sum(r["raw_forward_ms"] for r in valid)
+    old_pruned=sum(r["shape_pruned_ms"] for r in valid)
+    new=sum(r["inverse_ms"] for r in valid)
     summary={
         "cohort":a.cohort,
         "retained_source_cases":len(selected),
         "source_checked":len(valid),"skipped":len(ledger)-len(valid),
-        "old_forward_source_fits":sum(r["forward_source_fit"] for r in valid),
-        "new_inverse_source_fits":sum(r["inverse_source_fit"] for r in valid),
-        "inverse_source_fits_not_old":sum(
-            r["inverse_source_fit"] and not r["forward_source_fit"] for r in valid),
-        "forward_source_fits_missed":sum(
-            r["forward_source_fit"] and not r["inverse_source_fit"] for r in valid),
-        "forward_total_seconds":round(old_total/1000,5),
-        "inverse_total_seconds":round(new_total/1000,5),
-        "paired_source_speedup":round(old_total/new_total,2) if new_total else None,
-        "forward_median_ms":round(statistics.median(r["forward_ms"] for r in valid),4),
-        "inverse_median_ms":round(statistics.median(r["inverse_ms"] for r in valid),4),
+        "raw_forward_source_fits":sum(r["raw_forward_source_fit"] for r in valid),
+        "shape_pruned_source_fits":sum(r["shape_pruned_source_fit"] for r in valid),
+        "inverse_source_fits":sum(r["inverse_source_fit"] for r in valid),
+        "raw_forward_total_seconds":round(old_raw/1000,5),
+        "shape_pruned_total_seconds":round(old_pruned/1000,5),
+        "inverse_total_seconds":round(new/1000,5),
+        "raw_to_inverse_paired_speedup":round(old_raw/new,2) if new else None,
+        "shape_pruned_to_inverse_paired_speedup":round(old_pruned/new,2) if new else None,
+        "raw_forward_median_ms":round(statistics.median(
+            r["raw_forward_ms"] for r in valid),5),
+        "pruned_median_ms":round(statistics.median(
+            r["shape_pruned_ms"] for r in valid),5),
+        "inverse_median_ms":round(statistics.median(
+            r["inverse_ms"] for r in valid),5),
         "external_target_gold_used":False,
         "retained_after_prior_evaluation":True,
         "global_q4_pass":False,
     }
     result={
         "schema":"NEUMANN.Q4.object-inverse-retained-paired-cost.v1",
-        "old_module_commit":"c193e291f37936a59c74f12be60479f62ad8a73f",
+        "raw_forward_commit":"c0569e915de56128f87d40df05c6c6b68552c747",
+        "shape_pruned_commit":"de59b6bcec4a37f0acbfdc0c2fd55f54f811b676",
+        "invalid_comparison_note":"Earlier c193e291 was ALREADY inverse, so its 1x comparison is withdrawn.",
         "new_module_current_head":True,
         "summary":summary,"records":ledger,
         "limits":["Both are custom grammar enumeration, NOT strong specialist baseline.",
