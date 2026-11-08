@@ -39,23 +39,29 @@ jobs:
       - name: Matched same-run old/new source search with no original test labels
         run: |
           python -m pip install -e .
-          python research/q3/q3_object_inverse_paired_cost.py \
-            --upstream /tmp/q4-object-source \
-            --n 128 \
-            --max-source-ms 350 \
-            --output q3_object_inverse_matched_cost.json
+          for cohort in first second third; do
+            python research/q3/q3_object_inverse_paired_cost.py \
+              --upstream /tmp/q4-object-source \
+              --cohort "$cohort" \
+              --n 128 \
+              --max-source-ms 350 \
+              --output "q3_object_inverse_matched_${cohort}_cost.json"
+          done
           python - <<'PY'
           import json
-          d=json.load(open('q3_object_inverse_matched_cost.json'))
-          s=d['summary']
-          assert s['retained_source_cases']==128
-          assert s['source_checked']+s['skipped']==128
-          assert not s['external_target_gold_used']
-          assert not s['global_q4_pass']
+          for cohort in ('first','second','third'):
+              d=json.load(open(f'q3_object_inverse_matched_{cohort}_cost.json'))
+              s=d['summary']
+              assert s['cohort']==cohort
+              assert s['retained_source_cases']==128
+              assert s['source_checked']+s['skipped']==128
+              assert not s['external_target_gold_used']
+              assert not s['global_q4_pass']
+              print(cohort,s['paired_source_speedup'],s['old_forward_source_fits'],s['new_inverse_source_fits'])
           print('PAIRED SOURCE DSL OPTIMIZATION; NOT STRONGEST CLASSICAL/FULL Q4')
           PY
       - uses: actions/upload-artifact@v4
         with:
           name: q4-matched-forward-inverse-128-source-cost
-          path: q3_object_inverse_matched_cost.json
+          path: q3_object_inverse_matched_*_cost.json
           if-no-files-found: error
