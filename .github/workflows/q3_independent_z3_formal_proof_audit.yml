@@ -1,0 +1,95 @@
+name: Q3 Independent Z3 Proof of All Claimed Formal Inverse Programs
+
+on:
+  push:
+    branches:
+      - research/q3-independent-formal-bv-inversion-20261108
+    paths:
+      - research/q3/independent_z3_formal_inverse_certificate_audit.py
+      - .github/workflows/q3_independent_z3_formal_proof_audit.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  independent_z3_crosscheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup independent SMT verification library
+        run: |
+          python -m pip install --disable-pip-version-check -q z3-solver==4.13.3.0
+          python - <<'PY'
+          import z3
+          assert str(z3.get_version_string()).startswith("4.13.3"),z3.get_version_string()
+          PY
+      - name: Download unmodified FIRST result ledger A
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-independent-formal-bv4-target-FIRST
+          run-id: 42432369260
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: historical_a
+      - name: Download unmodified FIRST result ledger B
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-formal-bv4-patched-32-new-originals-FIRST
+          run-id: 42432544881
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: historical_b
+      - name: Download unmodified FIRST result ledger C
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-formal-fourbit-grown-grammar-new-32-original-first
+          run-id: 42432876840
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: historical_c
+      - name: Download unmodified FIRST result ledger D
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-source-macro-cross-operator-new-32-original-FIRST
+          run-id: 42433082556
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: historical_d
+      - name: Download unmodified FIRST result ledger E
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-cost-based-method-router-15-new-formal-FIRST
+          run-id: 42433229391
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: historical_e
+      - name: Validate independent symbolic translator with known expected counterexample
+        run: |
+          python -m py_compile research/q3/independent_z3_formal_inverse_certificate_audit.py
+          git hash-object research/q3/independent_z3_formal_inverse_certificate_audit.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'research/q3')
+          import independent_z3_formal_inverse_certificate_audit as m
+          raw='''(set-logic BV)
+          (synth-fun inv ((s (BitVec 4)) (t (BitVec 4))) (BitVec 4)
+            ((Start (BitVec 4) (s t #x0 (bvsub Start Start)))))
+          (declare-var s (BitVec 4))
+          (declare-var t (BitVec 4))
+          (define-fun l ((s (BitVec 4)) (t (BitVec 4))) Bool
+            (= (bvadd (inv s t) s) t))
+          (constraint (l s t))
+          (check-synth)'''
+          good=m.build_smt(raw,['bvsub',['t'],['s']])
+          bad=m.build_smt(raw,['s'])
+          assert m.prove(good)[0]=='PROVED_UNSAT'
+          assert m.prove(bad)[0]=='COUNTEREXAMPLE_SAT'
+          print("INDEPENDENT_Z3_POSITIVE_AND_NEGATIVE_CONTROL_PASS")
+          PY
+      - name: Check every original FIRST positive against independent Z3 solver
+        run: python research/q3/independent_z3_formal_inverse_certificate_audit.py
+      - name: Archive all outcomes including invalid claims and solver errors
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-independent-z3-proof-audit-all-formal-originals
+          path: Q3_INDEPENDENT_Z3_FORMAL_AUDIT.json
+          if-no-files-found: warn
