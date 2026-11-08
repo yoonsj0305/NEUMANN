@@ -219,7 +219,7 @@ class StructuralMetaInventor:
             raise ValueError("certified adjacent source programs required")
         if larger.arity > self.max_arity:
             raise ValueError("source exceeds arity cap")
-        if not verify(smaller) or not verify(larger):
+        if verify(smaller) is not True or verify(larger) is not True:
             return []
         a = {x[1] for x in _nodes(smaller.expr) if
              x[0] == "lit" and type(x[1]) is int and x[1] not in (0, 1)}
@@ -275,7 +275,7 @@ class StructuralMetaInventor:
 
     def observe(self, source: CertifiedProgram, *,
                 verify: Callable[[CertifiedProgram], bool]) -> list[InventedMethod]:
-        if not verify(source):
+        if verify(source) is not True:
             return []
         known = self.observations[source.family]
         neighbors = [known[n] for n in (source.arity-1, source.arity+1)
@@ -310,7 +310,7 @@ class StructuralMetaInventor:
             return None  # No original checker -> no unverified "success".
         for method, candidate in self.candidates(family, arity, params=params):
             method.verifier_queries += 1
-            if verify(candidate):
+            if verify(candidate) is True:
                 method.successes += 1
                 grown = []
                 if promote:
