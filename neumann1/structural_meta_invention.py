@@ -436,18 +436,14 @@ class StructuralMetaInventor:
 
     def solve_or_discover(self, family, arity, *, params=(), verify=None,
                           classical=None):
-        """Autonomous METHOD-LEARNING execution loop.
+        """Original-verified CLASSICAL FIRST; invention only for measured gains or gaps.
 
-        1. Reuse invented program generators, with exact original proof.
-        2. If no generator works, run the caller's trusted classic solver.
-        3. Verify the classic answer against the ORIGINAL obligation.
-        4. Promote its AST into source memory. Adjacent successes induce a
-           NEW reusable method, automatically enabling future solve calls.
-
-        The program's mathematics and classical fallback are supplied by
-        domain adapters, not hidden target answers. If no verifier is given,
-        nothing is accepted or learned. A failed discovered method cannot
-        contaminate the memory with an unverified program.
+        The default prior is economical: do not invoke an uncalibrated
+        method inventer before an available trusted classic solver.
+        A source-verified positive-utility policy may explicitly admit
+        INVENTED_FIRST.  If cold fails and there is no negative utility
+        policy, a learned constructor is permitted to attempt the gap.
+        All success must pass the actual target original verifier.
         """
         if verify is None or not callable(verify):
             return None
@@ -455,60 +451,71 @@ class StructuralMetaInventor:
             raise ValueError("invalid synthesis arity")
         if type(family) is not str or not family:
             raise ValueError("valid synthesis family required")
-        params = tuple(params)
-        decision=self.meta_utility_decision(family)
-        # A non-productive method is not worth querying even once at the
-        # deployment horizon; retain all prior source evidence for later
-        # retraining, but skip its actual target candidate generation.
-        if decision is not None and not decision.use_invented_first:
-            learned=None
-            method_queries=0
-        else:
-            before=sum(m.verifier_queries for m in self.methods.values())
-            learned=self.solve(
-                family, arity, params=params, verify=verify, promote=True)
-            method_queries=(
-                sum(m.verifier_queries for m in self.methods.values())-before)
-        if learned is not None:
-            return {**learned, "origin": "self_invented_method",
-                    "method_queries": method_queries,
-                    "classical_invocations": 0}
-        if classical is None:
-            return None  # Out of support; no invent-and-guess success.
-        if not callable(classical):
+        if classical is not None and not callable(classical):
             raise TypeError("classical baseline must be a callable")
-        # A classic solver is used only when learned methods are unavailable
-        # or failed. Incorrect old code is not repeatedly reinforced.
-        proposed = classical(arity, params)
-        if proposed is None:
-            return None
-        try:
-            program = _validate(proposed)
-        except (TypeError, ValueError):
-            return None
-        if (any(i >= arity for i in _args(program)) or
-                _size(program) > self.max_nodes or
-                _expanded_size(program, self.max_nodes) > self.max_nodes):
-            return None
-        if verify(program) is not True:
-            return None
-        # Never promote mere syntactic consistency or a previous guessed
-        # answer. The current original-verifier callback just returned True.
-        source = CertifiedProgram(
-            family=family, arity=arity, expr=program, params=params,
-            certificate="original-verifier:" +
-                        _hash((family, arity, params, program)))
-        discovered = self.observe(
-            source, verify=lambda p:
-                p == source or
-                p in self.observations[p.family].values())
-        return {"program": program, "verified": True,
-                "origin": "classical_verified_then_learned",
-                "method_id": None,
-                "source_certificate_digest": source.certificate,
-                "method_queries": method_queries,
-                "classical_invocations": 1,
-                "new_method_ids": [m.identity for m in discovered]}
+        params = tuple(params)
+        decision = self.meta_utility_decision(family)
+        invented_first = bool(decision and decision.use_invented_first)
+        classical_attempted = False
+
+        def try_classical():
+            nonlocal classical_attempted
+            if classical is None or classical_attempted:
+                return None
+            classical_attempted = True
+            proposed = classical(arity, params)
+            if proposed is None:
+                return None
+            try:
+                program = _validate(proposed)
+            except (TypeError, ValueError):
+                return None
+            if (any(i >= arity for i in _args(program)) or
+                    _size(program) > self.max_nodes or
+                    _expanded_size(program, self.max_nodes) > self.max_nodes):
+                return None
+            if verify(program) is not True:
+                return None
+            source = CertifiedProgram(
+                family=family, arity=arity, expr=program, params=params,
+                certificate="original-verifier:" +
+                            _hash((family, arity, params, program)))
+            discovered = self.observe(
+                source, verify=lambda p:
+                    p == source or p in self.observations[p.family].values())
+            return {"program": program, "verified": True,
+                    "origin": "classical_verified_then_learned",
+                    "method_id": None,
+                    "source_certificate_digest": source.certificate,
+                    "method_queries": 0,
+                    "classical_invocations": 1,
+                    "new_method_ids": [m.identity for m in discovered]}
+
+        # A known solver with an original-semantic checker is tried first
+        # unless an independent source-only cost/capability gate admits
+        # invented-first search.
+        if not invented_first:
+            result = try_classical()
+            if result is not None:
+                return result
+
+        # A source study with negative amortized utility deletes the
+        # inventor from the hot path, even if the classical algorithm
+        # fails on a different problem instance.
+        inventor_allowed = decision is None or decision.use_invented_first
+        if inventor_allowed:
+            before = sum(m.verifier_queries for m in self.methods.values())
+            learned = self.solve(
+                family, arity, params=params, verify=verify, promote=True)
+            method_queries = (
+                sum(m.verifier_queries for m in self.methods.values()) - before)
+            if learned is not None:
+                return {**learned, "origin": "self_invented_method",
+                        "method_queries": method_queries,
+                        "classical_invocations": int(classical_attempted)}
+        if invented_first:
+            return try_classical()
+        return None
 
     def checkpoint(self):
         """Serialize learned method PROGRAMS, not cached target solutions.
