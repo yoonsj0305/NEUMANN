@@ -1,0 +1,61 @@
+name: Q3 RELATIONAL ARC2 240 NEW Original FIRST After Source Freeze
+
+on:
+  push:
+    branches:
+      - feature/q3-relational-predicate-invention-arc2-20261108
+    paths:
+      - .github/workflows/q3_arc2_relational_240_new_original_first.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  frozen_new_240_original_first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 23
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch exact official ARC2 original training revision
+        run: |
+          git init -q arc2_official
+          git -C arc2_official fetch -q --depth 1 https://github.com/arcprize/ARC-AGI-2.git f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C arc2_official checkout -q FETCH_HEAD
+          test "$(git -C arc2_official rev-parse HEAD)" = f3283f727488ad98fe575ea6a5ac981e4a188e49
+      - name: Download immutable SOURCE policy from before target bytes were accessed
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-relational-inventor-384-source-before-240-new-original-FROZEN
+          run-id: 42442712903
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: .
+      - name: Freeze original code and source findings before new target access
+        run: |
+          python - <<'PY'
+          import json,hashlib,pathlib,sys
+          sys.path.insert(0,"research/q3")
+          import arc2_relational_invention_official_source_then_fresh_first as q
+          v=json.load(open(q.POLICY))
+          d=v.pop("sha256")
+          assert q.sha(v)==d
+          assert d=="a660b65c325c277f99b02c69969b5fd0197a46832e6531c44c14db3ca986dafe"
+          for name,path in (
+              ("source_code_sha256","neumann1/relational_grid_inventor.py"),
+              ("legacy_classical_code_sha256","neumann1/arc2_meta_grid_reasoner.py"),
+              ("eval_code_sha256","research/q3/arc2_relational_invention_official_source_then_fresh_first.py")):
+              assert v[name]==q.file_sha(pathlib.Path(path)),name
+          assert len(v["holdout_ids"])==240
+          assert not set(v["holdout_ids"])&set(v["source_ids"]+v["source_validation_ids"])
+          print("METHOD_AND_240_ORIGINAL_IDS_FROZEN_BEFORE_FIRST_BYTES",d,flush=True)
+          PY
+      - name: Execute FIRST 240 new original tests, one prediction and strong prior 626-program pass-at-two
+        run: python research/q3/arc2_relational_invention_official_source_then_fresh_first.py target
+      - name: Preserve ALL FIRST predictions, costs, counterexamples and failure records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-relational-new-240-original-holdout-FIRST
+          path: Q3_RELATIONAL_NEW_TRAINING_ORIGINALS_240_FIRST.json
+          if-no-files-found: warn

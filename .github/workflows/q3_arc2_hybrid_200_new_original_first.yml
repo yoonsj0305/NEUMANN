@@ -1,0 +1,74 @@
+name: Q3 RELATIONAL COMPOSITION 200 Fresh Official Original FIRST
+
+on:
+  push:
+    branches:
+      - feature/q3-relational-composition-hybrid-20261108
+    paths:
+      - .github/workflows/q3_arc2_hybrid_200_new_original_first.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  exact_original_first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install production NEUMANN runtime dependencies
+        run: python -m pip install -q --disable-pip-version-check numpy scipy scikit-learn
+      - name: Fetch official ARC2 original SHA commit
+        run: |
+          git init -q arc2_official
+          git -C arc2_official fetch -q --depth 1 https://github.com/arcprize/ARC-AGI-2.git f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C arc2_official checkout -q FETCH_HEAD
+          test "$(git -C arc2_official rev-parse HEAD)" = f3283f727488ad98fe575ea6a5ac981e4a188e49
+      - name: Load original previous v1 source policy to exclude 240 previously opened
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-relational-inventor-384-source-before-240-new-original-FROZEN
+          run-id: 42442712903
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: previous_source
+      - name: Load V3 source-only verified code and cost policy before target bytes
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-relational-multirule-costbounded-240-source-FROZEN
+          run-id: 42444162093
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: .
+      - name: Independently freeze source code/registry and exactly two attempts
+        run: |
+          python - <<'PY'
+          import json,pathlib,sys
+          sys.path.insert(0,'research/q3')
+          import arc2_relational_composition_second_200_original_first as q
+          model=json.load(open(q.MODEL))
+          digest=model.pop("sha256")
+          assert q.sha(model)==digest
+          assert digest=="27f875304b1cd96de5612676bcd3fc687757bcaff3a5db91778a0f317fce4de9"
+          assert model["original_attempt_cap"]==2
+          for key,path in (
+            ("relational_code_sha256","neumann1/relational_grid_inventor.py"),
+            ("hybrid_core_code_sha256","neumann1/hybrid_arc_grid_inventor.py"),
+            ("previous_strong_classic_code_sha256","neumann1/arc2_meta_grid_reasoner.py"),
+            ("this_evaluator_code_sha256",q.__file__)
+          ):
+            assert model[key]==q.fsha(path),key
+          source,targets=q.registries()
+          assert len(targets)==200 and len(set(x.stem for x in targets))==200
+          assert model["fresh_target_ids"]==[p.stem for p in targets]
+          print("SOURCE_ONLY_INVENTED_METHOD_AND_NEW_200_ORIGINALS_FROZEN",digest,flush=True)
+          PY
+      - name: Execute 200 untouched original tests once, prior strong control vs self-invented compound relational grammar
+        run: python research/q3/arc2_relational_composition_second_200_original_first.py target
+      - name: Archive all FIRST failures, original SHA IDs, candidate costs and successes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-relational-composition-200-new-original-FIRST
+          path: Q3_RELATIONAL_MULTI_HYBRID_200_NEW_ORIGINAL_FIRST.json
+          if-no-files-found: warn
