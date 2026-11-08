@@ -392,7 +392,7 @@ def _source_parallel_parts(demo,max_parts=3,deadline=None):
                 elif src!=target_color and tgt!=target_color:
                     negative.append(i)
         if not positive:continue
-        guard=_cover_rule(features,positive,negative,max_clauses=3)
+        guard=_cover_rule(features,positive,negative,max_clauses=3,deadline=deadline)
         if guard is None:continue
         part={"action":role,"guard":guard}
         generated=[execute(a,part) for a,b in demo]
