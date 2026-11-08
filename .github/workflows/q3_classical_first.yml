@@ -1,0 +1,48 @@
+name: Q3 Classical-First No-Reinvention Contract
+
+on:
+  pull_request:
+    paths:
+      - "neumann1/structural_meta_invention.py"
+      - "neumann1/classical_kernels.py"
+      - "neumann1/engine.py"
+      - "neumann1/registry_engine.py"
+      - "tests/test_classical_first_q3_contract.py"
+      - ".github/workflows/q3_classical_first.yml"
+  workflow_dispatch:
+
+jobs:
+  classical-first:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run direct economical routing tests plus existing policy contracts
+        run: |
+          python -m pip install -e . pytest
+          python -m pytest -q \
+            tests/test_classical_first_q3_contract.py \
+            tests/test_meta_utility_policy.py \
+            tests/test_structural_meta_invention.py \
+            tests/test_induced_fixpoint_grammar.py
+      - name: Source task path has zero invention calls
+        run: |
+          python - <<'PY'
+          from neumann1 import NeumannEngine
+          from neumann1.classical_kernels import DIRECTED_REACHABILITY
+          e=NeumannEngine(None, [], None)
+          t={'nodes':tuple(range(1000)),
+             'edges':tuple((i,i+1) for i in range(999)),
+             'seeds':(0,)}
+          assert len(e.solve_known_classical(
+              t,semantics=DIRECTED_REACHABILITY))==1000
+          assert not hasattr(e,'_recursive_grammar')
+          assert not hasattr(e,'_invented_grammar')
+          print('CLASSICAL FIRST: zero invention attempted')
+          PY
