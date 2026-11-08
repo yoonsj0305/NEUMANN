@@ -27,11 +27,12 @@ def main():
     p=argparse.ArgumentParser()
     p.add_argument("--upstream",type=pathlib.Path,required=True)
     p.add_argument("--n",type=int,default=128)
+    p.add_argument("--cohort",choices=("first","second","third"),default="third")
     p.add_argument("--max-source-ms",type=int,default=350)
     p.add_argument("--output",type=pathlib.Path,
                    default=pathlib.Path("q3_object_paired_cost.json"))
     a=p.parse_args()
-    exclude,salt=freeze_options("third")
+    exclude,salt=freeze_options(a.cohort)
     root=checked_upstream(a.upstream)
     selected=sorted(
         [x for x in root.glob("*.json") if x.stem not in exclude],
@@ -66,6 +67,7 @@ def main():
     old_total=sum(r["forward_ms"] for r in valid)
     new_total=sum(r["inverse_ms"] for r in valid)
     summary={
+        "cohort":a.cohort,
         "retained_source_cases":len(selected),
         "source_checked":len(valid),"skipped":len(ledger)-len(valid),
         "old_forward_source_fits":sum(r["forward_source_fit"] for r in valid),
