@@ -299,3 +299,26 @@ class RegistryEngine:
             from .boolean_meta_inventor import InsufficientEvidence
             raise InsufficientEvidence("constructor not in learned inventory")
         return inventory[method_id].apply(input_bits)
+
+    def learn_invention_grammar(self, source_task_id, demonstrations, *, max_cost=4):
+        """Induce reusable program grammar from certified source I/O only.
+
+        Invented productions persist on this engine instance and do not use
+        target gold. No arbitrary code execution or privileged family routing.
+        """
+        from .induced_grammar import GrammarInventor
+        if not hasattr(self, "_invented_grammar"):
+            self._invented_grammar=GrammarInventor(max_cost=max_cost)
+        return self._invented_grammar.invent_from_source(source_task_id,demonstrations)
+
+    def synthesize_with_invented_grammar(self, demonstrations):
+        """Search the learned program grammar; source learning is separate."""
+        from .induced_grammar import GrammarInventor
+        if not hasattr(self, "_invented_grammar"):
+            self._invented_grammar=GrammarInventor()
+        return self._invented_grammar.solve(demonstrations,learned=True)
+
+    def invention_grammar_rules(self):
+        """Expose generated productions, not only cached task solutions."""
+        return tuple(getattr(self,"_invented_grammar",None).productions) \
+            if hasattr(self,"_invented_grammar") else ()
