@@ -153,10 +153,16 @@ class GrammarInventor:
         self.source_solutions={}
         self.productions=[]
 
-    def invent_from_source(self,task_id,examples):
+    def invent_from_source(self,task_id,examples,*,verification_pairs=None):
         if task_id in self.source_solutions:
             raise ValueError('duplicate source ID')
         result=self.solve(examples,learned=False)
+        if result.solved and verification_pairs is not None:
+            # Independent SOURCE-only counterexamples, never target data.
+            if not verification_pairs or any(
+                eval_ast(result.expression,x)!=freeze(y)
+                for x,y in verification_pairs):
+                return Synthesis(None,result.checked,result.elapsed_ms,False,False)
         if result.solved:
             self.source_solutions[task_id]=result.expression
             self._induce()
