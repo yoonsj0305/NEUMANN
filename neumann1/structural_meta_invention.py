@@ -326,3 +326,84 @@ class StructuralMetaInventor:
                         "new_method_ids": [m.identity for m in grown]}
             method.failures += 1
         return None
+
+    def checkpoint(self):
+        """Serialize learned method PROGRAMS, not cached target solutions.
+
+        The SHA detects accidental state drift. It does not authenticate an
+        untrusted writer; all restored proposals still need target proof.
+        """
+        rows = []
+        for m in sorted(self.methods.values(), key=lambda x: x.identity):
+            rows.append({
+                "family": m.family, "source_arity": m.source_arity,
+                "direction": m.direction, "base": m.base,
+                "context": m.context, "parameters": m.parameters,
+                "source_hash": m.source_hash,
+                "successes": m.successes, "failures": m.failures,
+                "verifier_queries": m.verifier_queries,
+            })
+        state = {"schema": "neumann.structural-meta-methods.v1",
+                 "max_nodes": self.max_nodes, "max_arity": self.max_arity,
+                 "methods": rows}
+        state["sha256"] = _hash(state)
+        return state
+
+    @classmethod
+    def from_checkpoint(cls, checkpoint):
+        """Restore verified-USE-ONLY method grammar; never deserialize code."""
+        if type(checkpoint) is not dict or checkpoint.get("schema") != "neumann.structural-meta-methods.v1":
+            raise ValueError("unsupported method checkpoint")
+        payload = {k:v for k,v in checkpoint.items() if k != "sha256"}
+        if _hash(payload) != checkpoint.get("sha256"):
+            raise ValueError("method checkpoint checksum failure")
+        inventory = cls(max_nodes=payload["max_nodes"],
+                        max_arity=payload["max_arity"])
+        if type(payload["methods"]) is not list or len(payload["methods"]) > 256:
+            raise ValueError("invalid method count")
+
+        def ast(value):
+            if not isinstance(value, (tuple, list)) or not value or type(value[0]) is not str:
+                raise ValueError("invalid method AST")
+            op = value[0]
+            if op in ("_meta_hole", "_meta_new"):
+                if len(value) != 1:
+                    raise ValueError("malformed method hole")
+                return (op,)
+            if op == "_meta_param":
+                if len(value) != 2 or type(value[1]) is not int or value[1] < 0:
+                    raise ValueError("malformed method parameter")
+                return (op, value[1])
+            if op == "arg":
+                if len(value) != 2 or type(value[1]) is not int or value[1] < 0:
+                    raise ValueError("invalid argument")
+                return ("arg", value[1])
+            if op == "lit":
+                if len(value) != 2 or type(value[1]) not in (int, bool, str):
+                    raise ValueError("invalid literal")
+                return ("lit", value[1])
+            if op.startswith("_meta_") or len(value) < 2:
+                raise ValueError("unsupported method expression")
+            return (op, *(ast(x) for x in value[1:]))
+
+        for row in payload["methods"]:
+            if type(row) is not dict:
+                raise ValueError("invalid method record")
+            m = InventedMethod(
+                family=row["family"], source_arity=row["source_arity"],
+                direction=row["direction"], base=ast(row["base"]),
+                context=ast(row["context"]), parameters=row["parameters"],
+                source_hash=row["source_hash"], successes=row["successes"],
+                failures=row["failures"],
+                verifier_queries=row["verifier_queries"])
+            if m.direction not in ("append", "prepend") or m.source_arity < 1:
+                raise ValueError("invalid learned method")
+            if type(m.parameters) is not int or m.parameters < 0:
+                raise ValueError("invalid method parameters")
+            if _size(m.base) + _size(m.context) > inventory.max_nodes:
+                raise ValueError("oversized method")
+            if any(type(x) is not int or x < 0 for x in
+                   (m.successes, m.failures, m.verifier_queries)):
+                raise ValueError("invalid method costs")
+            inventory.methods[m.identity] = m
+        return inventory
