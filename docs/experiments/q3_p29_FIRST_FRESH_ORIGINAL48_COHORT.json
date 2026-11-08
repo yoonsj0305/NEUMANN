@@ -1,0 +1,113 @@
+{
+  "schema": "neumann.q3.p29.first-fresh-original-eval48.v1",
+  "date": "2026-11-05",
+  "source": "fchollet/ARC-AGI",
+  "upstream_commit": "399030444e0ab0cc8b4e199870fb20b863846f34",
+  "prior_registration_manifests": [
+    {
+      "path": "docs/experiments/q3_object_rule_induction_p21_COHORT_FROZEN.json",
+      "blob": "33da9126d57afd3348fec361d5fd54a42bca0fb3",
+      "n": 48
+    },
+    {
+      "path": "docs/experiments/q3_object_rule_induction_p211_COHORT_FROZEN.json",
+      "blob": "79cd9eb4349c40ee972bc0aaf634444398b312d4",
+      "n": 48
+    },
+    {
+      "path": "docs/experiments/q3_open_program_teacher_p22_COHORT_FROZEN.json",
+      "blob": "d3efeae438f3d1d32fae235fd349ccbcd4b96df1",
+      "n": 8
+    },
+    {
+      "path": "docs/experiments/q3_typed_guard_ast_p23_COHORT_FROZEN.json",
+      "blob": "49c3fbfd673a4b4371697ad0a1e498386ca5c343",
+      "n": 32
+    },
+    {
+      "path": "docs/experiments/q3_sound_feature_caching_p24_COHORT_FROZEN.json",
+      "blob": "599db16677abc31b0d9f6a6f68c3802a374f3208",
+      "n": 32
+    },
+    {
+      "path": "docs/experiments/q3_generated_decision_trees_p25_COHORT_FROZEN.json",
+      "blob": "104c10e70ec1d3ef55fac6000a6bfcdbb544a981",
+      "n": 32
+    },
+    {
+      "path": "docs/experiments/q3_p27_COHORT_FROZEN.json",
+      "blob": "bd9898cc408ee2ccddc9c2d963d368f107a5a63c",
+      "n": 32
+    },
+    {
+      "path": "docs/experiments/q3_p28_FIRST_FRESH_TRANSFER48_COHORT_FROZEN.json",
+      "blob": "a55f0b9483832ca001fe7bc3a63737bec56dc06c",
+      "n": 48
+    }
+  ],
+  "prior_seen_unique": 280,
+  "remaining_before_first": 120,
+  "original_eval_total": 400,
+  "filename_selection_only": true,
+  "selection_algorithm": "FNV1a32(NEUMANN_P29_UNSEEN_FIRST_2026_11_05_original_eval_only| + filename) unsigned ascending then lexical filename; first 48",
+  "salt": "NEUMANN_P29_UNSEEN_FIRST_2026_11_05_original_eval_only|",
+  "ids": [
+    "20981f0e.json",
+    "0d87d2a6.json",
+    "9b365c51.json",
+    "845d6e51.json",
+    "712bf12e.json",
+    "c92b942c.json",
+    "642d658d.json",
+    "3d31c5b3.json",
+    "423a55dc.json",
+    "6ad5bdfd.json",
+    "a59b95c0.json",
+    "7c9b52a0.json",
+    "ca8de6ea.json",
+    "929ab4e9.json",
+    "e760a62e.json",
+    "9def23fe.json",
+    "0c786b71.json",
+    "a8610ef7.json",
+    "15663ba9.json",
+    "c48954c1.json",
+    "c97c0139.json",
+    "e74e1818.json",
+    "f3b10344.json",
+    "ba9d41b8.json",
+    "506d28a5.json",
+    "ce8d95cc.json",
+    "e78887d1.json",
+    "3490cc26.json",
+    "13713586.json",
+    "22a4bbc2.json",
+    "c64f1187.json",
+    "b7cb93ac.json",
+    "1990f7a8.json",
+    "2697da3f.json",
+    "696d4842.json",
+    "e2092e0c.json",
+    "e1d2900e.json",
+    "5b526a93.json",
+    "a096bf4d.json",
+    "0692e18c.json",
+    "992798f6.json",
+    "18419cfa.json",
+    "e7639916.json",
+    "bbb1b8b6.json",
+    "7d18a6fb.json",
+    "8fbca751.json",
+    "dd2401ed.json",
+    "03560426.json"
+  ],
+  "remaining_reserve": 72,
+  "note": "Registered before accessing any selected evaluation task body. Original public evaluation is not ARC-AGI-2/private. P29 source human-designed classical grammar and real previous 400 TRAIN accuracy=19, plus 11 over five classical variants; reported 1 P29 wrong. Never adapt source after first score.",
+  "gate": {
+    "minimum_P29_additional_exact_vs_5_strong_old_union": 2,
+    "maximum_new_P29_wrong_submissions": 0,
+    "maximum_combined_lost_exact": 0,
+    "minimum_joint_true_generalization_claim": "Not applicable: this is same ARC domain. Autonomously invented novel ops remain NOT PROVEN."
+  },
+  "global_questions": "OPEN"
+}

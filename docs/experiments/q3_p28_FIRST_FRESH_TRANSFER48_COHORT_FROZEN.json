@@ -1,0 +1,107 @@
+{
+  "schema": "neumann.q3.p28.first-fresh-transfer-cohort.v1",
+  "date": "2026-11-05",
+  "goal": "test whether the selected original P28 1/1 mechanism transfers, without source retuning",
+  "upstream": "fchollet/ARC-AGI",
+  "upstream_sha": "399030444e0ab0cc8b4e199870fb20b863846f34",
+  "eval_dir": "data/evaluation",
+  "historic_previous_manifests": [
+    {
+      "path": "docs/experiments/q3_object_rule_induction_p21_COHORT_FROZEN.json",
+      "blob": "33da9126d57afd3348fec361d5fd54a42bca0fb3",
+      "count": 48
+    },
+    {
+      "path": "docs/experiments/q3_object_rule_induction_p211_COHORT_FROZEN.json",
+      "blob": "79cd9eb4349c40ee972bc0aaf634444398b312d4",
+      "count": 48
+    },
+    {
+      "path": "docs/experiments/q3_open_program_teacher_p22_COHORT_FROZEN.json",
+      "blob": "d3efeae438f3d1d32fae235fd349ccbcd4b96df1",
+      "count": 8
+    },
+    {
+      "path": "docs/experiments/q3_typed_guard_ast_p23_COHORT_FROZEN.json",
+      "blob": "49c3fbfd673a4b4371697ad0a1e498386ca5c343",
+      "count": 32
+    },
+    {
+      "path": "docs/experiments/q3_sound_feature_caching_p24_COHORT_FROZEN.json",
+      "blob": "599db16677abc31b0d9f6a6f68c3802a374f3208",
+      "count": 32
+    },
+    {
+      "path": "docs/experiments/q3_generated_decision_trees_p25_COHORT_FROZEN.json",
+      "blob": "104c10e70ec1d3ef55fac6000a6bfcdbb544a981",
+      "count": 32
+    },
+    {
+      "path": "docs/experiments/q3_p27_COHORT_FROZEN.json",
+      "blob": "bd9898cc408ee2ccddc9c2d963d368f107a5a63c",
+      "count": 32
+    }
+  ],
+  "prior_unique_excluded": 232,
+  "official_filename_count": 400,
+  "remaining_before_select": 168,
+  "selection": "FNV1a32(\"neumann-q3-p28-FIRST-FRESH-TRANSFER-20261105|\" + filename) unsigned ascending, then filename alphabetical; first 48 not in prior seven registered cohorts.",
+  "cohort_size": 48,
+  "ids": [
+    "212895b5.json",
+    "0bb8deee.json",
+    "695367ec.json",
+    "d5c634a2.json",
+    "b7f8a4d8.json",
+    "2546ccf6.json",
+    "47996f11.json",
+    "48131b3c.json",
+    "b9630600.json",
+    "0becf7df.json",
+    "17cae0c1.json",
+    "ac3e2b04.json",
+    "256b0a75.json",
+    "0e671a1a.json",
+    "7d1f7ee8.json",
+    "88207623.json",
+    "103eff5b.json",
+    "2c737e39.json",
+    "7953d61e.json",
+    "12eac192.json",
+    "070dd51e.json",
+    "8597cfd7.json",
+    "09c534e7.json",
+    "bcb3040b.json",
+    "f0df5ff0.json",
+    "ce039d91.json",
+    "1d0a4b61.json",
+    "575b1a71.json",
+    "d492a647.json",
+    "626c0bcc.json",
+    "f45f5ca7.json",
+    "6ea4a07e.json",
+    "bf699163.json",
+    "5b692c0f.json",
+    "fd096ab6.json",
+    "b1fc8b8e.json",
+    "a406ac07.json",
+    "1c0d0a4b.json",
+    "84db8fc4.json",
+    "516b51b7.json",
+    "e9b4f6fc.json",
+    "f5aa3634.json",
+    "cfb2ce5a.json",
+    "9b4c17c4.json",
+    "332efdb3.json",
+    "e133d23d.json",
+    "d56f2372.json",
+    "37d3e8b2.json"
+  ],
+  "experiment_classification": "fresh relative to 7 registered ARC evaluation cohorts, NOT private ARC-AGI-2; no claim of complete global novelty beyond named manifests",
+  "no_upstream_task_body_read_before_precommit": true,
+  "original_gold_inference_forbidden": true,
+  "candidate_code_locked_to_earlier_P28": true,
+  "PASS": "At least 2 original exact test wins beyond the frozen union of P11 B,P20,P24,P25,P27-classical, zero additional wrong submissions; otherwise STOP P28 transfer. No autonomous opcode claim in any case.",
+  "selected_task_007bbfb7_exclusion": "Prior selected diagnostic was an official TRAINING file, never part of these official EVALUATION 48.",
+  "next_unopened_eval_reserve": 120
+}
