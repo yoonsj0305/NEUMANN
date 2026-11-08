@@ -43,7 +43,18 @@ def test_middle_area_object_induction_outside_frozen_626():
     train,verify=demonstrate("crop")
     old_winners,_=old.fit_task(train,range(len(old.PROGRAMS)),
                               len(old.PROGRAMS),max_hits=len(old.PROGRAMS))
-    assert not old_winners
+    # The old 626 program grammar can OVERFIT the source with a literal
+    # palette mapping; novelty is tested against source-heldout ORIGINAL
+    # obligations, not by falsely claiming zero source fits.
+    def known_predict(program,adapter,inp):
+        out=old.predict(inp,program)
+        return (old.recolor(out,adapter["mapping"]) if
+                out is not None and adapter["kind"]=="recolor" else out)
+    certified_old=any(
+        all(known_predict(old.PROGRAMS[j],adapter,x)==y
+            for x,y in verify)
+        for j,adapter in old_winners)
+    assert not certified_old
     r=ObjectGrammarInventor().invent(train,verification=verify)
     assert r.source_fit
     assert r.programs
