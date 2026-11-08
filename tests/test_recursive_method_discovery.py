@@ -56,9 +56,9 @@ def run(policy,cases):
 
 
 def studies():
-    train=tuple(case("boolean",i+600,1+i%2)
+    train=tuple(case("boolean",i+3000,3)
                 for i in range(12))+tuple(
-          case("period",i+700,2+i%2) for i in range(12))
+          case("period",i+700,3) for i in range(12))
     feedback=tuple(case("boolean",i+80000,4+i%2)
                    for i in range(15))
     inventor=RecursiveMethodInventor(
@@ -72,7 +72,8 @@ def test_meta_policy_is_rewritten_by_real_source_counterexamples():
     assert first.correct_on_meta_training==24
     assert first.incorrect_on_meta_training==0
     assert first.method.ast[0]=="repeat"
-    assert first.method.challenges==4
+    assert first.method.challenges==16
+    assert first.method.transition==("increment",2)
     failure=run(first.method,feedback)
     assert sum(r[0] for r in failure)<15
     revised=inventor.learn(train+feedback)
@@ -80,6 +81,8 @@ def test_meta_policy_is_rewritten_by_real_source_counterexamples():
     assert revised.incorrect_on_meta_training==0
     assert revised.method.ast!=first.method.ast
     assert revised.method.challenges==64
+    assert revised.method.transition==("increment",1)
+    assert revised.training_work_units>0
     assert revised.method.transition==("increment",1)
     assert revised.training_cost_queries>0
     assert revised.grade_label_cost==3360
@@ -152,7 +155,8 @@ def test_live_engines_self_rewrite_method_then_transfer_without_new_solvers(
             else RegistryEngine(None,None))
     train,feedback,_=studies()
     first=engine.meta_learn_recursive_discovery_method(train)
-    assert first.method.challenges==4
+    assert first.method.challenges==16
+    assert first.method.transition==("increment",2)
     revision=engine.meta_revise_recursive_discovery_method(feedback)
     assert revision.method.challenges==64
     assert revision.method.ast!=first.method.ast
