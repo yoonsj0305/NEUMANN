@@ -192,3 +192,15 @@ class RegistryEngine:
         from .hybrid_arc_grid_inventor import HybridArcGridInventor
         router=HybridArcGridInventor(max_attempts=max_attempts)
         return router.solve(source_examples,target_inputs)
+
+    def synthesize_arc_grid_cost_aware(self, category: str, source_examples,
+                                       target_inputs, *, source_policy):
+        """Run exactly ONE source-selected program-discovery strategy.
+
+        No target outputs are accepted, and a source-calibrated policy is
+        required. Unlisted families fail closed rather than guessing
+        whether to use the relational or cold execution path.
+        """
+        from .source_learned_grid_router import SourceLearnedGridRouter
+        return SourceLearnedGridRouter(source_policy).solve(
+            category, source_examples, target_inputs)

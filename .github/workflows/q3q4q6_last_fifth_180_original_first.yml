@@ -1,0 +1,75 @@
+name: Q3 Q4 Q6 FIFTH 180 Untouched Original Transfer No Relearning
+on:
+  push:
+    branches:
+      - feature/q3q4q6-source-learned-lazy-utility-routing-20261108
+    paths:
+      - research/q3/q3q4q6_fifth_last_180_author_original_first.py
+      - .github/workflows/q3q4q6_last_fifth_180_original_first.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  same_frozen_policy_fifth_first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 23
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch pinned independent-author 1D ARC
+        run: |
+          git init -q independent_1d_arc
+          git -C independent_1d_arc fetch -q --depth 1 https://github.com/khalil-research/1D-ARC.git 1e74dc4cb4c58d8160e1fbd0ba638eb745f37147
+          git -C independent_1d_arc checkout -q FETCH_HEAD
+          test "$(git -C independent_1d_arc rev-parse HEAD)" = 1e74dc4cb4c58d8160e1fbd0ba638eb745f37147
+      - name: Existing core dependencies
+        run: python -m pip install -q --disable-pip-version-check numpy scipy scikit-learn
+      - name: First 180 previously exposed source registry
+        uses: actions/download-artifact@v4
+        with:
+          name: q6-1d-arc-180-independent-author-original-FIRST
+          run-id: 42447279658
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: prior_first
+      - name: Second 180 previously exposed registry
+        uses: actions/download-artifact@v4
+        with:
+          name: q4-second-1d-originals-180-registry-FROZEN
+          run-id: 42447827455
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: prior_second
+      - name: Third 180 previously exposed original results
+        uses: actions/download-artifact@v4
+        with:
+          name: q6-generalized-1d-axis-third-180-new-original-FIRST
+          run-id: 42448550138
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: prior_third
+      - name: Retrieve exact prior meta-policy FROZEN before fourth original
+        uses: actions/download-artifact@v4
+        with:
+          name: q3q4q6-independent-author-lazy-router-source-FROZEN
+          run-id: 42449484388
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: source_policy
+      - name: Freeze all source policy SHAs and final 180 unique filenames
+        run: |
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,"research/q3")
+          import q3q4q6_fifth_last_180_author_original_first as x
+          policy,sig,files=x.source_locked()
+          assert sig=="42d79f3d69c332599c6aea6ecdb3c34126a6fb03d372f2c572269d28245aed21"
+          assert len(files)==180
+          assert len({f.parent.name for f in files})==18
+          print("LAST_180_NAME_REGISTRY_FROZEN_NO_NEW_SOURCE_LEARNING",sig,flush=True)
+          PY
+      - name: Execute FINAL fifth 180 new original FIRST with UNCHANGED source strategy
+        run: python research/q3/q3q4q6_fifth_last_180_author_original_first.py
+      - name: Preserve every FIRST outcome and frozen source method receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3q4q6-last-fifth-180-independent-original-FIRST
+          path: Q3Q4Q6_LAZY_ROUTER_FIFTH_LAST_180_ORIGINAL_FIRST.json
+          if-no-files-found: warn

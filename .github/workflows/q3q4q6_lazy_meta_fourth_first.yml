@@ -1,0 +1,78 @@
+name: Q3 Q4 Q6 Meta-Strategy Discovery Fourth-180 Original First
+on:
+  push:
+    branches:
+      - feature/q3q4q6-source-learned-lazy-utility-routing-20261108
+    paths:
+      - research/q3/q3q4q6_lazy_meta_router_fourth_180_first.py
+      - neumann1/source_learned_grid_router.py
+      - .github/workflows/q3q4q6_lazy_meta_fourth_first.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source_and_new_independent:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+      - name: Exact independent-author 1D-ARC repo
+        run: |
+          git init -q independent_1d_arc
+          git -C independent_1d_arc fetch -q --depth 1 https://github.com/khalil-research/1D-ARC.git 1e74dc4cb4c58d8160e1fbd0ba638eb745f37147
+          git -C independent_1d_arc checkout -q FETCH_HEAD
+          test "$(git -C independent_1d_arc rev-parse HEAD)" = 1e74dc4cb4c58d8160e1fbd0ba638eb745f37147
+      - name: Existing package requirements
+        run: python -m pip install -q --disable-pip-version-check numpy scipy scikit-learn
+      - name: SOURCE registry from already-exposed first 180
+        uses: actions/download-artifact@v4
+        with:
+          name: q6-1d-arc-180-independent-author-original-FIRST
+          run-id: 42447279658
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: prior_first
+      - name: SOURCE registry from exposed second 180
+        uses: actions/download-artifact@v4
+        with:
+          name: q4-second-1d-originals-180-registry-FROZEN
+          run-id: 42447827455
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: prior_second
+      - name: SOURCE from exposed third 180
+        uses: actions/download-artifact@v4
+        with:
+          name: q6-generalized-1d-axis-third-180-new-original-FIRST
+          run-id: 42448550138
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: prior_third
+      - name: Freeze source and next 180 original FILE NAMES before target bytes
+        run: |
+          python -m compileall -q neumann1
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'research/q3')
+          import q3q4q6_lazy_meta_router_fourth_180_first as q
+          src,target=q.registries()
+          assert len(src)==len(target)==180
+          assert len({p.parent.name for p in target})==18
+          assert not set(str(p.relative_to(q.DATA)) for p in src)&set(str(p.relative_to(q.DATA)) for p in target)
+          print("FOURTH_ORIGINAL_NAMES_FROZEN_NEVER_OPENED")
+          PY
+      - name: LEARN executable strategy policy from 180 PREVIOUSLY OPENED source only
+        run: python research/q3/q3q4q6_lazy_meta_router_fourth_180_first.py source
+      - name: Archive source policy PRIOR to new target access
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3q4q6-independent-author-lazy-router-source-FROZEN
+          path: Q3Q4Q6_LAZY_META_ROUTER_SOURCE_ONLY_FROZEN.json
+          if-no-files-found: error
+      - name: FIRST score 180 new original 1D tasks with unchanged source policy
+        run: python research/q3/q3q4q6_lazy_meta_router_fourth_180_first.py target
+      - name: Preserve all new original FIRST, errors and cost receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3q4q6-lazy-router-fourth-180-new-independent-FIRST
+          path: Q3Q4Q6_LAZY_META_ROUTER_FOURTH_180_ORIGINAL_FIRST.json
+          if-no-files-found: warn
