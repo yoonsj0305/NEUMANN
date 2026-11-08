@@ -1,0 +1,40 @@
+name: NEUMANN Core Structural Meta-Invention Integration
+
+on:
+  push:
+    branches:
+      - feature/core-structural-meta-invention-20261108
+    paths:
+      - neumann1/structural_meta_invention.py
+      - neumann1/engine.py
+      - neumann1/__init__.py
+      - tests/test_structural_meta_invention.py
+      - .github/workflows/core_structural_meta_invention.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  core_runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install only core regression dependencies
+        run: python -m pip install -q numpy scipy scikit-learn pytest
+      - name: Confirm actual NEUMANN core module, not detached experiment
+        run: |
+          python -m compileall -q neumann1
+          python - <<'PY'
+          from neumann1 import NeumannEngine, StructuralMetaInventor, CertifiedProgram
+          assert hasattr(NeumannEngine, 'observe_program')
+          assert hasattr(NeumannEngine, 'invent_program')
+          assert issubclass(StructuralMetaInventor, object)
+          print('PRODUCTION_CORE_META_DISCOVERY_API_PRESENT')
+          PY
+      - name: Live engine meta-method discovery, promotion and old solver regression
+        run: python -m pytest -q tests/test_structural_meta_invention.py tests/test_engine.py
