@@ -110,7 +110,8 @@ class Discovery:
     def apply(self,scene):
         if self.status=="CLASSICAL_VERIFIED" and self.classical is not None:
             return self.classical(scene)
-        if self.status!="SOURCE_VERIFIED_INVENTION" or self.program is None:
+        if self.status not in ("SOURCE_VERIFIED_INVENTION",
+                               "SOURCE_VERIFIED_REUSED_PROGRAM") or self.program is None:
             raise ValueError("abstain without source verification")
         return self.program.apply(scene)
 
@@ -126,7 +127,8 @@ class DomainIndependentRuleInventor:
         self.max_atoms=max_atoms
         self.max_pairs=max_pairs
 
-    def invent(self,train,*,verification,classical_solvers=()):
+    def invent(self,train,*,verification,classical_solvers=(),
+               known_programs=()):
         start=perf_counter_ns()
         if len(train)<2 or not verification:
             raise ValueError("2 source pairs and independent checks required")
@@ -144,6 +146,19 @@ class DomainIndependentRuleInventor:
                 return Discovery(None,len(pairs),0,
                                  (perf_counter_ns()-start)/1e6,
                                  "CLASSICAL_VERIFIED",known)
+        # Prior inventions are real executable syntax, not an answer cache.
+        # Every remembered program must pass THIS new task's source examples
+        # and independent verifier before it can run on a target input.
+        for program in known_programs:
+            if not isinstance(program,InventedRelationalProgram):
+                raise TypeError("only typed executable laws can be remembered")
+            try:
+                if all(program.apply(scene)==target for scene,target in pairs):
+                    return Discovery(program,len(pairs),0,
+                                     (perf_counter_ns()-start)/1e6,
+                                     "SOURCE_VERIFIED_REUSED_PROGRAM")
+            except (ValueError,KeyError,TypeError):
+                continue
         rows=[]
         features=None
         for scene,target in train:
