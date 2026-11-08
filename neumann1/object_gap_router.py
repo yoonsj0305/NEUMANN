@@ -16,7 +16,7 @@ from time import perf_counter_ns
 from .composed_grid_inventor import ComposedGridInventor
 from .relational_grid_inventor import grid
 from .scene_graph_inventor import ObjectGrammarInventor
-from .relational_action_inventor import RelationalActionInventor
+from .relational_action_inventor import RelationalActionInventor, RelationalAction
 
 
 @dataclass(frozen=True)
@@ -36,7 +36,7 @@ class ObjectGapResult:
 
 class ObjectGapRouter:
     def __init__(self,*,max_relational_ms=120,max_object_ms=350,
-                 max_causal_ms=350):
+                 max_causal_ms=350,known_causal_rules=()):
         if (not 1<=max_relational_ms<=5000 or
                 not 1<=max_object_ms<=120000 or
                 not 1<=max_causal_ms<=120000):
@@ -44,6 +44,10 @@ class ObjectGapRouter:
         self.max_relational_ms=max_relational_ms
         self.max_object_ms=max_object_ms
         self.max_causal_ms=max_causal_ms
+        self.known_causal_rules=tuple(known_causal_rules)
+        if any(not isinstance(p,RelationalAction)
+               for p in self.known_causal_rules):
+            raise TypeError('known causal programs must be typed and verifiable')
 
     def solve(self,source_examples,independent_source_checks,target_inputs):
         start=perf_counter_ns()
@@ -72,6 +76,24 @@ class ObjectGapRouter:
             return ObjectGapResult(
                 "SOURCE_VERIFIED_PRIOR",tuple(certified),
                 (),0,0,True,(perf_counter_ns()-start)/1e6)
+        # A previously SOURCE-VERIFIED invented operator may be reused as an
+        # executable law, but only after the classical source-verifier fails.
+        # Recheck the learned law on the NEW task's original source data:
+        # source-driven transfer, not answer caching or unverified imitation.
+        for remembered in self.known_causal_rules:
+            try:
+                if not all(remembered.apply(x)==y
+                           for x,y in demonstrations+verified):
+                    continue
+                predicted=tuple(remembered.apply(x) for x in targets)
+                if any(x is None for x in predicted):
+                    continue
+                return ObjectGapResult(
+                    "SOURCE_VERIFIED_REUSED_CAUSAL_RELATION",
+                    (predicted,), (remembered,),
+                    0,0,False,(perf_counter_ns()-start)/1e6)
+            except (ValueError,TypeError):
+                continue
         # The old language is insufficient on fresh source verification.
         # Only now spend computation on new object predicates and actions.
         invented=ObjectGrammarInventor(
