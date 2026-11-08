@@ -1,0 +1,109 @@
+name: Q4 CORE Semantic Memoization Paired SOURCE Cost Benchmark
+
+on:
+  push:
+    branches:
+      - feature/q4-semantic-memoized-invention-20261108
+    paths:
+      - neumann1/relational_grid_inventor.py
+      - .github/workflows/q4_semantic_memo_source_paired.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  identical_semantics_different_compute:
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python dependencies
+        run: |
+          python -m pip install -q --disable-pip-version-check numpy scipy scikit-learn pytest
+          python -m pytest -q tests/test_relational_composition_hybrid.py tests/test_relational_grid_inventor.py tests/test_autonomous_synthesis_core.py tests/test_meta_utility_policy.py tests/test_engine.py
+      - name: Exact official ARC2 development source revision
+        run: |
+          git init -q arc2_official
+          git -C arc2_official fetch -q --depth 1 https://github.com/arcprize/ARC-AGI-2.git f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C arc2_official checkout -q FETCH_HEAD
+          test "$(git -C arc2_official rev-parse HEAD)" = f3283f727488ad98fe575ea6a5ac981e4a188e49
+      - name: Earlier original ARC source-registry freeze used only for source dev
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-relational-inventor-384-source-before-240-new-original-FROZEN
+          run-id: 42442712903
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: previous_source
+      - name: FROZEN uncached prior algorithm on same 240 previously seen SOURCE
+        run: |
+          git show 3f00f54ff71070cf3f9356099775e2afbec6fa61:neumann1/relational_grid_inventor.py > neumann1/relational_grid_inventor.py
+          python research/q3/arc2_relational_composition_second_200_original_first.py source
+          mv Q3_RELATIONAL_MULTI_HYBRID_SOURCE_ONLY_V2_FROZEN.json Q4_SOURCE_UNCACHED.json
+      - name: Modified cached algorithm on same source originals and same machine
+        run: |
+          git checkout HEAD -- neumann1/relational_grid_inventor.py
+          python - <<'PY'
+          import neumann1.relational_grid_inventor as r
+          x=r.grid([[0,1,0],[0,1,0]])
+          a=r._fields(x)
+          b=r._fields(x)
+          assert a is b and r._fields.cache_info().hits>=1
+          print("EXECUTION_SEMANTICS_IDENTICAL_AND_INPUT_FEATURES_SHARED")
+          PY
+          python research/q3/arc2_relational_composition_second_200_original_first.py source
+          mv Q3_RELATIONAL_MULTI_HYBRID_SOURCE_ONLY_V2_FROZEN.json Q4_SOURCE_CACHED.json
+      - name: Compare same-language successful program counts and complete costs
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          a=json.load(open("Q4_SOURCE_UNCACHED.json"))
+          b=json.load(open("Q4_SOURCE_CACHED.json"))
+          x=a["source_dev_summary"];y=b["source_dev_summary"]
+          assert x["count"]==y["count"]==240
+          assert x["errors"]==y["errors"]==0
+          assert x["legacy_exact_original"]==y["legacy_exact_original"]
+          old_map={r["id"]:r for r in a["source_dev_rows"]}
+          new_map={r["id"]:r for r in b["source_dev_rows"]}
+          assert set(old_map)==set(new_map)
+          changes={k:{
+            "old":old_map[k]["hybrid_original_test_correct"],
+            "new":new_map[k]["hybrid_original_test_correct"]}
+            for k in old_map
+            if old_map[k]["hybrid_original_test_correct"]!=
+               new_map[k]["hybrid_original_test_correct"]}
+          report={"schema":"neumann.q4.paired-source-same-language-cache-speed.v1",
+            "source_prior_algorithm_commit":"3f00f54ff71070cf3f9356099775e2afbec6fa61",
+            "old_method_sha256":a["relational_code_sha256"],
+            "new_method_sha256":b["relational_code_sha256"],
+            "official_source_240_count":240,
+            "uncached":x,"cached":y,
+            "source_process_wall_old":a["source_dev_wall_s"],
+            "source_process_wall_new":b["source_dev_wall_s"],
+            "paired_changed_original_outcomes":changes,
+            "hybrid_speed_ratio_old_over_new":
+              x["hybrid_search_wall_s"]/y["hybrid_search_wall_s"] if y["hybrid_search_wall_s"] else None,
+            "source_process_wall_ratio":
+              a["source_dev_wall_s"]/b["source_dev_wall_s"] if b["source_dev_wall_s"] else None,
+            "limitations":"Identical previously opened ARC2 SOURCE tasks; NOT fresh heldout. Same algorithm DSL and answer cap; cache alters time-budget feasibility only. No GPU, energy, frontier FLOPs or global full-cost 10x claim."}
+          pathlib.Path("Q4_SEMANTIC_MEMO_PAIRED_SOURCE_RESULT.json").write_text(json.dumps(report,indent=2))
+          print(json.dumps({
+            "correct_old":x["hybrid_exact_original"],"correct_new":y["hybrid_exact_original"],
+            "hybrid_s_old":x["hybrid_search_wall_s"],"hybrid_s_new":y["hybrid_search_wall_s"],
+            "hybrid_speedup":report["hybrid_speed_ratio_old_over_new"],
+            "source_full_wall_old":a["source_dev_wall_s"],
+            "source_full_wall_new":b["source_dev_wall_s"],
+            "source_full_speedup":report["source_process_wall_ratio"],
+            "changed_outcomes":len(changes)},indent=2))
+          PY
+      - name: Preserve same-worker source receipts, all originally successful programs and costs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q4-semantic-representation-memoized-same-source-paired
+          path: |
+            Q4_SOURCE_UNCACHED.json
+            Q4_SOURCE_CACHED.json
+            Q4_SEMANTIC_MEMO_PAIRED_SOURCE_RESULT.json
+          if-no-files-found: warn
