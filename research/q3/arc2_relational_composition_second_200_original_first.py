@@ -16,8 +16,8 @@ from __future__ import annotations
 import hashlib,json,pathlib,sys,time
 sys.path.insert(0,"neumann1")
 import arc2_meta_grid_reasoner as old
-from relational_grid_inventor import grid
-from hybrid_arc_grid_inventor import HybridArcGridInventor
+from neumann1.relational_grid_inventor import grid
+from neumann1.hybrid_arc_grid_inventor import HybridArcGridInventor
 ROOT=pathlib.Path("arc2_official/data/training")
 PRIOR="previous_source/Q3_RELATIONAL_PROGRAM_LANGUAGE_SOURCE_ONLY_FROZEN.json"
 MODEL="Q3_RELATIONAL_MULTI_HYBRID_SOURCE_ONLY_V2_FROZEN.json"
