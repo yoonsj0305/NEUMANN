@@ -336,16 +336,40 @@ class RegistryEngine:
         if not hasattr(self, "_recursive_grammar"):
             self._recursive_grammar = RecursiveGrammarInventor(
                 max_candidates=max_candidates)
-        return self._recursive_grammar.invent(
+        rule = self._recursive_grammar.invent(
             source_tasks, verification_tasks=independent_source_checks)
+        if rule.verified_for_all_finite_graphs:
+            from .induced_grammar import GrammarInventor
+            from hashlib import sha256
+            if not hasattr(self, "_invented_grammar"):
+                self._invented_grammar = GrammarInventor()
+            name = "invented:" + sha256(repr(rule.ast).encode()).hexdigest()[:16]
+            if name not in self._invented_grammar.dynamic_primitives:
+                self._invented_grammar.register_generated_primitive(name, rule)
+            self._recursive_primitive_name = name
+        return rule
 
     def revise_recursive_control(self, source_counterexample):
         """Falsify and re-invent control structure; fail closed during repair."""
         from .induced_fixpoint_grammar import InsufficientEvidence
         if not hasattr(self, "_recursive_grammar"):
             raise InsufficientEvidence("no learned recursive grammar")
-        return self._recursive_grammar.revise_with_source_counterexample(
+        if hasattr(self, "_invented_grammar") and hasattr(
+                self, "_recursive_primitive_name"):
+            self._invented_grammar.dynamic_primitives.pop(
+                self._recursive_primitive_name, None)
+        revised = self._recursive_grammar.revise_with_source_counterexample(
             source_counterexample)
+        rule = self._recursive_grammar.learned[0]
+        if rule.verified_for_all_finite_graphs:
+            from .induced_grammar import GrammarInventor
+            from hashlib import sha256
+            if not hasattr(self, "_invented_grammar"):
+                self._invented_grammar = GrammarInventor()
+            name = "invented:" + sha256(repr(rule.ast).encode()).hexdigest()[:16]
+            self._invented_grammar.register_generated_primitive(name, rule)
+            self._recursive_primitive_name = name
+        return revised
 
     def execute_recursive_control(self, target_input, *, optimized=True):
         """Execute only the promoted rule; unknown structures fail closed."""
