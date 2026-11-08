@@ -24,6 +24,14 @@ Grid=tuple[tuple[int,...],...]
 MAX_PIXELS=900
 MAX_SOURCE_CELLS=4200
 
+class SearchBudgetExceeded(Exception):
+    pass
+
+def _deadline(deadline):
+    if deadline is not None and time.perf_counter_ns()>deadline:
+        raise SearchBudgetExceeded('causal representation search cost cap')
+
+
 def grid(data):
     if not 1<=len(data)<=30 or not 1<=len(data[0])<=30:
         raise ValueError("invalid grid size")
@@ -157,7 +165,7 @@ def _features_for_demos(demo):
         if len(rows)>MAX_SOURCE_CELLS:return None
     return rows,outputs
 
-def _guards(features, positives):
+def _guards(features, positives,deadline=None):
     """Invent relational comparisons from actual positive/negative feature
     distributions. Every predicate is a newly generated executable AST;
     NONE of the resulting formulas is hardcoded before demonstrations.
@@ -167,6 +175,7 @@ def _guards(features, positives):
     n=len(features)
     answer=[]
     for name in names:
+        _deadline(deadline)
         vector=[x.get(name,0) for x in features]
         unique=sorted(set(vector))
         if len(unique)>25:
@@ -203,13 +212,13 @@ def _guards(features, positives):
             dedup[key]=(pred,bits,complexity)
     return sorted(dedup.values(),key=lambda x:(x[2],x[0]))
 
-def _cover_rule(features,positives,negatives,max_clauses=3):
+def _cover_rule(features,positives,negatives,max_clauses=3,deadline=None):
     if not positives:return None
     if not negatives:
         return ((('__always__','eq',1),),)
     P=sum(1<<i for i in positives)
     N=sum(1<<i for i in negatives)
-    atomics=_guards(features,positives)
+    atomics=_guards(features,positives,deadline)
     compatible=[]
     for pred,bits,cost in atomics:
         hit=bits & P
@@ -218,6 +227,7 @@ def _cover_rule(features,positives,negatives,max_clauses=3):
     # observed relational features, not by pre-enumerated ARC templates.
     # Thresholds are dynamically inferred from source labels.
     for i,(p,b,c) in enumerate(atomics):
+        if i%16==0:_deadline(deadline)
         if not b&P:continue
         for q,d,e in atomics[i+1:]:
             both=b&d
@@ -270,7 +280,7 @@ def _output_roles(demo):
         options.append((("constant",color),[color]*len(demo)))
     return options
 
-def _source_one_step(demo,*,max_guards=3):
+def _source_one_step(demo,*,max_guards=3,deadline=None):
     prepared=_features_for_demos(demo)
     if prepared is None:return None
     features,output_rows=prepared
@@ -280,6 +290,7 @@ def _source_one_step(demo,*,max_guards=3):
         slices.append(slice(start,start+n));start+=n
     best=None;best_cost=math.inf
     for role,colors in _output_roles(demo):
+        _deadline(deadline)
         positive=[];negative=[]
         for gi,s in enumerate(slices):
             color=colors[gi]
@@ -293,7 +304,7 @@ def _source_one_step(demo,*,max_guards=3):
         # For a single-step program, this role must explain ALL changes.
         total_changes=sum(a!=b for a,b,_ in output_rows)
         if len(positive)!=total_changes:continue
-        guard=_cover_rule(features,positive,negative,max_guards)
+        guard=_cover_rule(features,positive,negative,max_guards,deadline)
         if guard is None:continue
         program={"action":role,"guard":guard}
         predictions=[execute(inp,program) for inp,out in demo]
@@ -325,7 +336,7 @@ def execute(inp,program):
         new.append(tuple(outrow))
     return tuple(new)
 
-def _source_parallel_parts(demo,max_parts=3):
+def _source_parallel_parts(demo,max_parts=3,deadline=None):
     """Invent a parallel operator by composing independent source-verified
     relational rewrites, rejecting contradictory proposed pixel values."""
     if any(len(a)!=len(b) or len(a[0])!=len(b[0]) for a,b in demo):
@@ -335,8 +346,32 @@ def _source_parallel_parts(demo,max_parts=3):
          if a[r][c]!=b[r][c]} for a,b in demo]
     if max(map(len,changed_colors),default=0)<2:
         return None
-    if max(map(len,changed_colors),default=0)>5:
-        return None
+    if max(map(len,changed_colors),default=0)>max_parts:
+        return None  # one rule supplies only one target color per example
+    # A mathematically necessary role-cover lower bound comes BEFORE any
+    # expensive pixel-level causal-guard search. Every changed pixel must
+    # be explained by one of at most max_parts role-bound actions.
+    positions=[]
+    for gi,(a,b) in enumerate(demo):
+        positions.extend((gi,b[r][c]) for r in range(len(a))
+                         for c in range(len(a[0])) if a[r][c]!=b[r][c])
+    candidates=_output_roles(demo)
+    covers=[]
+    for role,colors in candidates:
+        covers.append(sum(1<<i for i,(gi,col) in enumerate(positions)
+                          if col==colors[gi]))
+    full=(1<<len(positions))-1
+    if not covers or not any(
+            (covers[i]|covers[j])==full
+            for i in range(len(covers)) for j in range(i,len(covers))):
+        # Some problems genuinely need three actions; before abstaining,
+        # check exactly those distinct semantic color-role triples.
+        if not any((covers[i]|covers[j]|covers[k])==full
+                   for i in range(len(covers))
+                   for j in range(i,len(covers))
+                   for k in range(j,len(covers))):
+            return None
+    _deadline(deadline)
     prepared=_features_for_demos(demo)
     if prepared is None:return None
     features,output_rows=prepared
@@ -346,6 +381,7 @@ def _source_parallel_parts(demo,max_parts=3):
     changed={i for i,(a,b,_) in enumerate(output_rows) if a!=b}
     actions=[]
     for role,colors in _output_roles(demo):
+        _deadline(deadline)
         positive=[];negative=[]
         for gi,span in enumerate(slices):
             target_color=colors[gi]
@@ -404,13 +440,14 @@ def _parallel_predict(inp,parts):
     return tuple(final)
 
 
-def induce(demo):
+def induce(demo,deadline=None):
     """Return a new executable source-grounded program, never just labels."""
     if not demo or any(len(x)*len(x[0])>MAX_PIXELS for x,y in demo):
         return None
-    out=_source_one_step(demo)
+    out=_source_one_step(demo,deadline=deadline)
     if out:return {"kind":"cell_relational_rewrite","program":out}
-    multi=_source_parallel_parts(demo)
+    _deadline(deadline)
+    multi=_source_parallel_parts(demo,deadline=deadline)
     if multi:return multi
     # Shape-changing role abstraction: infer output as a global color
     # selected by a relational statistic of the new input.
@@ -444,16 +481,22 @@ class GridInventionResult:
     elapsed_ms: float
 
 class RelationalGridInventor:
-    """NEUMANN native typed semantic front-end for relational grid programs.
+    """NEUMANN executable causal method invention with explicit cost bound."""
+    def __init__(self,max_search_ms=450):
+        if type(max_search_ms) not in (int,float) or not 1<=max_search_ms<=120000:
+            raise ValueError("finite bounded meta-invention budget required")
+        self.max_search_ms=max_search_ms
 
-    Runtime core receives executable newly invented Boolean formulas instead
-    of being restricted to a fixed finite macro-program menu.
-    """
     def solve(self,demonstrations):
         t=time.perf_counter_ns()
         demo=[(grid(a),grid(b)) for a,b in demonstrations]
-        method=induce(demo)
-        correct=check_demonstrations(demo,method)
+        deadline=t+int(self.max_search_ms*1e6)
+        try:
+            method=induce(demo,deadline=deadline)
+            correct=check_demonstrations(demo,method)
+        except SearchBudgetExceeded:
+            method=None
+            correct=False
         return GridInventionResult(
             method=method if correct else None,
             source_fit=bool(correct),
