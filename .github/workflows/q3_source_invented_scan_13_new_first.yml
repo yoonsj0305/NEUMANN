@@ -1,0 +1,86 @@
+name: Q3 SOURCE-INVENTED First-Hit Scan 13 Unseen Integer Originals FIRST
+
+on:
+  push:
+    branches:
+      - research/q3-discover-scan-constructor-from-integer-failures-20261108
+    paths:
+      - research/q3/autodiscover_first_hit_scan_source_then_new_original_first.py
+      - .github/workflows/q3_source_invented_scan_13_new_first.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  source_only_then_new_scan_originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup independent unbounded integer SMT checker
+        run: |
+          python -m pip install -q --disable-pip-version-check z3-solver==4.13.3.0
+          python - <<'PY'
+          import z3
+          assert z3.get_version_string().startswith("4.13.3")
+          PY
+      - name: Load immutable prior BV-boolean law library (not target solutions)
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-inferred-boolean-functional-basis-and-proven-laws-FROZEN
+          run-id: 42435101680
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: frozen_bool
+      - name: Load immutable prior integer folding model (not target solutions)
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-cross-theory-BV-invariant-to-unbounded-int-FROZEN-source
+          run-id: 42436072641
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: prior
+      - name: Freeze generic scan invention/search language and untouched target registry
+        run: |
+          python -m py_compile research/q3/autodiscover_first_hit_scan_source_then_new_original_first.py
+          git hash-object research/q3/autodiscover_first_hit_scan_source_then_new_original_first.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'research/q3')
+          import autodiscover_first_hit_scan_source_then_new_original_first as p
+          assert len(p.TARGET)==13 and len(set(p.TARGET))==13
+          assert len(p.variants())==16
+          assert set(p.TARGET).isdisjoint(p.SOURCE+p.old.SOURCE+p.old.TARGET)
+          original='''(set-logic LIA)
+          (synth-fun g ((x Int) (y Int) (z Int)) Int)
+          (declare-var x Int)(declare-var y Int)(declare-var z Int)
+          (constraint (=> (> (+ x y) 5) (= (g x y z) (+ x y))))
+          (constraint (=> (and (<= (+ x y) 5) (> (+ y z) 5))
+                    (= (g x y z) (+ y z))))
+          (constraint (=> (and (<= (+ x y) 5) (<= (+ y z) 5))
+                    (= (g x y z) 0)))
+          (check-synth)'''
+          a=p.prove(original,("+",">","forward"),5)
+          b=p.prove(original,("+",">","reverse"),5)
+          assert a["status"]=="PROVED_ALL_INTEGERS",a
+          assert b["status"]=="SAT_COUNTEREXAMPLE",b
+          print("MATH_GENERIC_FIRST_HIT_PRETARGET_POSITIVE_NEGATIVE_PASS")
+          PY
+      - name: Discover new priority-scan constructor using two SOURCE originals only
+        run: python research/q3/autodiscover_first_hit_scan_source_then_new_original_first.py source
+      - name: Preserve source-only model SHA before ANY new target download
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-priority-scan-meta-constructor-FROZEN-source
+          path: Q3_NEW_SCAN_CONSTRUCTOR_SOURCE_FROZEN.json
+          if-no-files-found: warn
+      - name: Prove 13 new untouched array-sum LIA original functions for all Int
+        run: python research/q3/autodiscover_first_hit_scan_source_then_new_original_first.py target
+      - name: Archive immutable first run including unexpected failures and costs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-discovered-first-hit-scan-13-new-original-FIRST
+          path: Q3_SOURCE_DISPATCH_SCAN_13_INTEGER_ORIGINAL_FIRST.json
+          if-no-files-found: warn

@@ -1,0 +1,72 @@
+name: Q3 Algebraic Invariants Across Unbounded Integer Original Families
+
+on:
+  push:
+    branches:
+      - research/q3-bv-boolean-invariants-to-unbounded-integer-20261108
+    paths:
+      - research/q3/cross_family_integer_algebraic_invariants_first.py
+      - .github/workflows/q3_cross_family_algebraic_int_first.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  source_laws_then_fresh_integer_domains:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Independent unbounded integer theorem prover
+        run: |
+          python -m pip install -q --disable-pip-version-check z3-solver==4.13.3.0
+      - name: Immutable BITVECTOR learned source method, not targets
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-inferred-boolean-functional-basis-and-proven-laws-FROZEN
+          run-id: 42435101680
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: frozen_bool
+      - name: Immutable INT source fold method, not new targets
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-cross-theory-BV-invariant-to-unbounded-int-FROZEN-source
+          run-id: 42436072641
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: source_policy
+      - name: Freeze static cohort and test symbolic positive/negative controls
+        run: |
+          python -m py_compile research/q3/cross_family_integer_algebraic_invariants_first.py
+          git hash-object research/q3/cross_family_integer_algebraic_invariants_first.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'research/q3')
+          import cross_family_integer_algebraic_invariants_first as q
+          assert len(q.TARGET)==14 and len(set(q.TARGET))==14
+          assert q.COHORTS['alternate_max_name']==[f"max{i}.sl" for i in range(16,21)]
+          assert q.COHORTS['array_search_ood']==[f"arraysearch{i}.sl" for i in range(16,21)]
+          assert not set(q.TARGET)&set(q.prior.TARGET+q.prior.SOURCE)
+          _,sha=q.prior_policy()
+          assert sha=='b9690bb6a14a565e5ecb3b11abf09a9d671ad757d0673a537108b95c6c5cbde4'
+          print("SECOND_COHORT_NOT_READ_PRETARGET_SOURCE_SHA",sha)
+          PY
+      - name: Autonomously select proven algebra properties of learned INT fold
+        run: python research/q3/cross_family_integer_algebraic_invariants_first.py source
+      - name: Preserve all verified and refuted source laws before new original FIRST
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-unbounded-integer-algebra-proofs-frozen-before-other-domains
+          path: Q3_INTEGER_ALGEBRAIC_LAWS_SOURCE_ONLY_FROZEN.json
+          if-no-files-found: warn
+      - name: Test 14 new original integer programs and out-of-distribution controls
+        run: python research/q3/cross_family_integer_algebraic_invariants_first.py target
+      - name: Archive strict first-run records and errors
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-new-integer-families-algebraic-original-FIRST
+          path: Q3_INTEGER_DIVERSE_CO_12_UNSEEN_ORIGINAL_FIRST.json
+          if-no-files-found: warn

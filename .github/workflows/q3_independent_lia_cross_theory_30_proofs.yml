@@ -1,0 +1,79 @@
+name: Q3 INDEPENDENT Z3 audit of 30 cross-theory integer originals
+
+on:
+  push:
+    branches:
+      - research/q3-discover-scan-constructor-from-integer-failures-20261108
+    paths:
+      - research/q3/independent_lia_cross_domain_30_original_proof_audit.py
+      - .github/workflows/q3_independent_lia_cross_theory_30_proofs.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  independent_30_certificates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pin independent Z3 SMT prover
+        run: python -m pip install -q --disable-pip-version-check z3-solver==4.13.3.0
+      - name: Immutable 12 original-fold target FIRST
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-cross-theory-unbounded-int-12-new-original-FIRST
+          run-id: 42436072641
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: original_max
+      - name: Immutable 5 different-named max source original FIRST
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-new-integer-families-algebraic-original-FIRST
+          run-id: 42436279062
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: original_alt
+      - name: Immutable 13 new source-invented scan original FIRST
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-discovered-first-hit-scan-13-new-original-FIRST
+          run-id: 42436650641
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: original_scan
+      - name: Load unchanged source-learned fold before examining original programs
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-cross-theory-BV-invariant-to-unbounded-int-FROZEN-source
+          run-id: 42436072641
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: source_fold
+      - name: Freeze independent translator, control cases and exact denominator
+        run: |
+          python -m py_compile research/q3/independent_lia_cross_domain_30_original_proof_audit.py
+          git hash-object research/q3/independent_lia_cross_domain_30_original_proof_audit.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'research/q3')
+          import independent_lia_cross_domain_30_original_proof_audit as p
+          b='''(synth-fun f ((x Int) (y Int)) Int)
+          (declare-var x Int)(declare-var y Int)
+          (constraint (>= (f x y) x))
+          (constraint (>= (f x y) y))
+          (constraint (or (= (f x y) x) (= (f x y) y)))'''
+          good=p.prove(b,'(ite (< x y) y x)')
+          bad=p.prove(b,'0')
+          assert good['status']=='INDEPENDENT_UNBOUNDED_INT_PROVED_UNSAT',good
+          assert bad['status']=='COUNTEREXAMPLE_SAT',bad
+          print('SECOND_INDEPENDENT_TRANSLATOR_PASS')
+          PY
+      - name: Independently certify 30 new original successes, plus false programs
+        run: python research/q3/independent_lia_cross_domain_30_original_proof_audit.py
+      - name: Preserve all certificate verdicts, error cases and two negative controls
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-30-cross-theory-int-originals-independent-z3-proofs
+          path: Q3_INDEPENDENT_Z3_UNBOUNDED_INTEGER_30_ORIGINAL_AUDIT.json
+          if-no-files-found: warn
