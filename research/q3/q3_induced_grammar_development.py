@@ -69,8 +69,12 @@ target=[
 def main():
     inventor=GrammarInventor(max_cost=4,max_candidates=100000)
     sources=[]
-    for name,examples,f in source:
-        r=inventor.invent_from_source(name,[(x,f(x)) for x in examples])
+    for i,(name,examples,f) in enumerate(source):
+        # Fresh source-only oracle checks are disjoint from task training I/O
+        generator=text if isinstance(examples[0],str) else integer_list
+        source_validation=[(x,f(x)) for x in generator(1000+i,30)]
+        r=inventor.invent_from_source(name,[(x,f(x)) for x in examples],
+                                     verification_pairs=source_validation)
         sources.append({'name':name,'solved':r.solved,'checked':r.checked,
                         'expression':repr(r.expression)})
     productions=[{'template':repr(x.template),'support':x.source_tasks}
@@ -97,7 +101,7 @@ def main():
                                   for x in held) if cold.solved else 0,
                     'program':repr(cold.expression)},
         })
-    summary={'source_tasks':len(sources),'source_candidate_checks':sum(x['checked'] for x in sources),
+    summary={'source_verification_examples':180,'source_tasks':len(sources),'source_candidate_checks':sum(x['checked'] for x in sources),
              'induced_rules':len(productions),'target_tasks':len(results),
              'target_solved_invented':sum(x['with_grammar']['solved'] for x in results),
              'target_solved_cold':sum(x['cold']['solved'] for x in results),
