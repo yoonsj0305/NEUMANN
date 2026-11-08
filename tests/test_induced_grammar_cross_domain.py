@@ -84,3 +84,24 @@ def test_replay_both_classical_and_invented_grammars():
     assert s['target_candidate_checks_invented'] == 596
     assert s['target_candidate_checks_cold'] == 1108
     assert s['correct_invented']==s['correct_cold']==1080
+
+
+def test_false_source_fit_cannot_be_promoted_after_counterexample():
+    g=GrammarInventor(max_cost=2)
+    r=g.invent_from_source('false_claim',
+        [('AB','ab'),('Yz','yz'),('Zz','zz')],
+        verification_pairs=[('UNSEEN','one_cell_exception')])
+    assert not r.solved
+    assert not g.source_solutions and not g.productions
+
+
+def test_verified_source_program_enables_production_transfer():
+    g=GrammarInventor(max_cost=4)
+    for i,(name,examples,f) in enumerate(source):
+        generator=(lambda seed,n: [''.join('abBCz'[(seed+j+k)%5] for k in range(5+j%3))
+                                  for j in range(n)]) if isinstance(examples[0],str) else \
+                   (lambda seed,n: [tuple(((seed+j+k)%13)-6 for k in range(6)) for j in range(n)])
+        checks=[(x,f(x)) for x in generator(100+i,20)]
+        assert g.invent_from_source(name,[(x,f(x)) for x in examples],
+                                    verification_pairs=checks).solved
+    assert len(g.productions)==3
