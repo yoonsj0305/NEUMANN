@@ -457,6 +457,7 @@ class StructuralMetaInventor:
         decision = self.meta_utility_decision(family)
         invented_first = bool(decision and decision.use_invented_first)
         classical_attempted = False
+        invented_attempts = 0
 
         def try_classical():
             nonlocal classical_attempted
@@ -487,7 +488,7 @@ class StructuralMetaInventor:
                     "origin": "classical_verified_then_learned",
                     "method_id": None,
                     "source_certificate_digest": source.certificate,
-                    "method_queries": 0,
+                    "method_queries": invented_attempts,
                     "classical_invocations": 1,
                     "new_method_ids": [m.identity for m in discovered]}
 
@@ -509,6 +510,7 @@ class StructuralMetaInventor:
                 family, arity, params=params, verify=verify, promote=True)
             method_queries = (
                 sum(m.verifier_queries for m in self.methods.values()) - before)
+            invented_attempts += method_queries
             if learned is not None:
                 return {**learned, "origin": "self_invented_method",
                         "method_queries": method_queries,
