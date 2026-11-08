@@ -1,0 +1,83 @@
+name: Q3 FROZEN Boolean Invariants Transfer to Unbounded Int New Originals FIRST
+
+on:
+  push:
+    branches:
+      - research/q3-bv-boolean-invariants-to-unbounded-integer-20261108
+    paths:
+      - research/q3/cross_theory_boolean_invariant_to_unbounded_lia_first.py
+      - .github/workflows/q3_bool_semantic_to_unbounded_lia_original_first.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  cross_domain_int_orig_first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pin independent SMT solver
+        run: |
+          python -m pip install -q --disable-pip-version-check z3-solver==4.13.3.0
+          python - <<'PY'
+          import z3
+          assert z3.get_version_string().startswith("4.13.3")
+          PY
+      - name: Fetch immutable prior BITVECTOR-generated Boolean meta-method
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-inferred-boolean-functional-basis-and-proven-laws-FROZEN
+          run-id: 42435101680
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: frozen_bool
+      - name: Freeze cross-type adapter, new original registry and semantic controls
+        run: |
+          python -m py_compile research/q3/cross_theory_boolean_invariant_to_unbounded_lia_first.py
+          git hash-object research/q3/cross_theory_boolean_invariant_to_unbounded_lia_first.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,"research/q3")
+          import cross_theory_boolean_invariant_to_unbounded_lia_first as x
+          assert len(x.SOURCE)==2 and len(x.TARGET)==12
+          assert x.SOURCE==["jmbl_fg_max2.sl","jmbl_fg_max3.sl"]
+          assert x.TARGET==[f"jmbl_fg_max{i}.sl" for i in range(4,16)]
+          assert len(x.all_variants())==12
+          prior=x.load_prior()
+          theorem=x.cross_type_law_check(prior["or_ast"])
+          assert theorem["unbounded_integer_ite_implies_branch_union"]=="Z3_UNSAT"
+          assert theorem["false_intersection_mutant"]=="Z3_SAT"
+          original='''(set-logic LIA)
+          (synth-fun max2 ((x Int) (y Int)) Int)
+          (declare-var x Int)
+          (declare-var y Int)
+          (constraint (>= (max2 x y) x))
+          (constraint (>= (max2 x y) y))
+          (constraint (or (= (max2 x y) x) (= (max2 x y) y)))
+          (check-synth)'''
+          good=x.prove_candidate(original,("<","right"))
+          bad=x.prove_candidate(original,("<","left"))
+          assert good["status"]=="UNBOUNDED_INT_Z3_UNSAT",good
+          assert bad["status"]=="INVALID_Z3_COUNTEREXAMPLE",bad
+          print("PRETARGET_CROSS_THEORY_POSITIVE_AND_NEGATIVE_PROOF_PASS",prior["frozen_source_sha256"])
+          PY
+      - name: Read 2 officially published SOURCE integer problems and induce fold
+        run: python research/q3/cross_theory_boolean_invariant_to_unbounded_lia_first.py source
+      - name: Archive frozen cross-type method BEFORE target bytes accessed
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-cross-theory-BV-invariant-to-unbounded-int-FROZEN-source
+          path: Q3_CROSS_THEORY_INTEGER_SOURCE_POLICY_FROZEN.json
+          if-no-files-found: warn
+      - name: Prove 12 untouched independent original integer programs over all Int
+        run: python research/q3/cross_theory_boolean_invariant_to_unbounded_lia_first.py target
+      - name: Save all FIRST results including failures and full classical budgets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-cross-theory-unbounded-int-12-new-original-FIRST
+          path: Q3_CROSS_THEORY_INTEGER_MAX_ORIGINAL_FIRST.json
+          if-no-files-found: warn
