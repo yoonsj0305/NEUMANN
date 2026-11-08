@@ -1,0 +1,66 @@
+name: Q3 Boolean Duality and Source Counterexample DNF NEW FIRST
+
+on:
+  push:
+    branches:
+      - research/q3-invariant-quotient-boolean-20261108
+    paths:
+      - research/q3/source_proven_duality_and_residual_dnf_first.py
+      - .github/workflows/q3_dual_residual_dnf_new_first.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  source_then_new_original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read immutable prior source-only method
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-causal-existence-bool-source-FROZEN
+          run-id: 42434312622
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: source_policy
+      - name: Freeze duality and residual grammar BEFORE unseen target access
+        run: |
+          python -m py_compile research/q3/source_proven_duality_and_residual_dnf_first.py
+          git hash-object research/q3/source_proven_duality_and_residual_dnf_first.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'research/q3')
+          import source_proven_duality_and_residual_dnf_first as x
+          from pathlib import Path
+          assert len(x.TARGET)==32
+          assert not set(x.TARGET)&set(x.old.TARGET)
+          assert x.verify_dual("or")=="and"
+          assert x.verify_dual("and")=="or"
+          atoms=x.old.atom_library()
+          y=atoms[2][1]
+          p,_,_=x.dnf_from_residual(y,atoms)
+          assert x.old.independently_check(p,y)
+          assert p is not None
+          print("MATH_REPRESENTATION_PREFLIGHT_PASS")
+          PY
+      - name: Learn new duality operation and residual procedure from prior SOURCE only
+        run: python research/q3/source_proven_duality_and_residual_dnf_first.py source
+      - name: Archive SHA-fixed source method before any new target
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-source-proved-duality-and-dnf-method-FROZEN
+          path: Q3_CAUSAL_DUAL_AND_DNF_SOURCE_FROZEN.json
+          if-no-files-found: warn
+      - name: Test fresh 32 official inverse-condition originals
+        run: python research/q3/source_proven_duality_and_residual_dnf_first.py target
+      - name: Archive all independent first target results and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-duality-residual-32-unseen-formal-bool-FIRST
+          path: Q3_CAUSAL_DUAL_FRESH_ORIGINAL_FIRST.json
+          if-no-files-found: warn
