@@ -53,7 +53,7 @@ def test_affine_four_independent_dimensions():
 
 def test_nonpolynomial_under_bound_abstains():
     with pytest.raises(EvidenceInsufficient):
-        invent_numeric_function(lambda x:2**int(x),arity=1,
+        invent_numeric_function(lambda x:2**abs(int(x)),arity=1,
                                 max_degree=2,budget=80,seed=4)
 
 
