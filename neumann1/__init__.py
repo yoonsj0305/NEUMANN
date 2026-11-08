@@ -315,3 +315,8 @@ __all__ += [
     "FrozenV033CheckpointProposer",
     "checkpoint_state_sha256",
 ]
+
+# Live structural meta-invention: the engine learns executable constructor
+# programs from certified source ASTs (no human-named fold/scan methods).
+from .structural_meta_invention import CertifiedProgram, InventedMethod, StructuralMetaInventor
+__all__ += ["CertifiedProgram", "InventedMethod", "StructuralMetaInventor"]
