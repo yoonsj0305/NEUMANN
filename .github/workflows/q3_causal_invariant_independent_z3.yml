@@ -1,0 +1,79 @@
+name: Q3 INDEPENDENT Z3 proof of all causal Boolean existence programs
+
+on:
+  push:
+    branches:
+      - research/q3-invariant-quotient-boolean-20261108
+    paths:
+      - research/q3/independent_z3_causal_boolean_proof_audit.py
+      - .github/workflows/q3_causal_invariant_independent_z3.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  independent_z3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned independent SMT verification engine
+        run: |
+          python -m pip install -q --disable-pip-version-check z3-solver==4.13.3.0
+          python - <<'PY'
+          import z3
+          assert z3.get_version_string().startswith("4.13.3")
+          PY
+      - name: Download original FIRST 32 Boolean programs cohort A
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-causal-existence-bool-32-untouched-original-FIRST
+          run-id: 42434312622
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: prior_first
+      - name: Download original FIRST 32 Boolean programs cohort B
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-duality-residual-32-unseen-formal-bool-FIRST
+          run-id: 42434513657
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: prior_second
+      - name: Download original FIRST 32 Boolean programs cohort C
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-optimized-causal-method-32-new-formal-FIRST
+          run-id: 42434705764
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: prior_third
+      - name: Independent symbolic positive and negative verification controls
+        run: |
+          python -m py_compile research/q3/independent_z3_causal_boolean_proof_audit.py
+          git hash-object research/q3/independent_z3_causal_boolean_proof_audit.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,"research/q3")
+          import independent_z3_causal_boolean_proof_audit as v
+          b='''(set-logic BV)
+          (synth-fun SC ((s (BitVec 4)) (t (BitVec 4))) Bool
+            ((Start Bool (true false (and Start Start) (= StartBv StartBv)))
+            (StartBv (BitVec 4) (s t #x0))))
+          (declare-var s (BitVec 4))
+          (declare-var t (BitVec 4))
+          (define-fun case ((x (BitVec 4)) (s (BitVec 4)) (t (BitVec 4))) Bool (= x s))
+          (constraint (= (or '''+" ".join(f"(case #x{i:X} s t)" for i in range(16))+''') (SC s t)))
+          (check-synth)'''
+          assert v.prove(v.build(b,["const",True]))[0]=="INDEPENDENT_Z3_UNSAT"
+          assert v.prove(v.build(b,["const",False]))[0]=="COUNTEREXAMPLE_Z3_SAT"
+          print("INDEPENDENT_BOOLEAN_Z3_POSITIVE_NEGATIVE_CONTROL_PASS")
+          PY
+      - name: Check all previously claimed Boolean programs against original SMT specs
+        run: python research/q3/independent_z3_causal_boolean_proof_audit.py
+      - name: Save complete results including SAT counterexamples and all errors
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-causal-existence-independent-z3-audit-all-originals
+          path: Q3_BOOLEAN_INDEPENDENT_Z3_PROOFS.json
+          if-no-files-found: warn
