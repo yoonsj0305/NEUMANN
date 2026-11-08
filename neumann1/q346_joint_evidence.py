@@ -101,12 +101,12 @@ def evaluate_original_joint_gate(cohorts: tuple[OriginalCohort, ...],
     """Compare matched originals, new generated witnesses and amortized total time.
 
     Q3 scoped positive requires independent original verified NEW executable
-    program that solves a gap the strongest classical comparator did not.
+    program that solves a gap the strongest matched comparator did not.
     Q6 scoped cross-semantic transfer requires >=2 separate semantic families
     with those positive witnesses; simply changing data encoding never counts.
     Q4 requires equal-or-greater verified correctness AND total discovery +
     failed attempts + target inference cost to be <=1/target_speedup of the
-    strongest matched classical TOTAL cost. Explicit recorded costs are not
+    strongest matched comparator TOTAL cost. Explicit recorded costs are not
     a claim to model FLOPs, electricity or frontier cloud-equivalence.
 
     Returns only scoped evidence decisions. Never 'global universal PASS'.
@@ -142,7 +142,7 @@ def evaluate_original_joint_gate(cohorts: tuple[OriginalCohort, ...],
     q6=("SCOPED_DIFFERENT_SEMANTIC_TRANSFER"
         if len(transfer_domains)>=2 else
         "OPEN_UNRELATED_MATH_TRANSFER")
-    capability_ok=learned>=classic
+    capability_ok=learned>=comparator
     q4=("SCOPED_10X_FULL_COST_AND_EQUAL_ACCURACY"
         if capability_ok and learn_time>0 and comparator_time>=learn_time*requested_speedup
         else "NO_10X_MATCHED_FULL_COST")
