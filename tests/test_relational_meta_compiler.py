@@ -157,3 +157,69 @@ def test_live_engine_invents_and_reuses_generalized_program_syntax(engine_factor
     assert spatial_result.status=="SOURCE_VERIFIED_INVENTION"
     assert len(engine._q3_typed_methods)==3
     assert spatial_result.apply(spatial(99)[0])==spatial(99)[1]
+
+
+
+def derived_feature_source(seed,keys=("reading","reference")):
+    """A two-feature inequality whose boundary cannot be expressed by
+    the old <=2-clause axis-aligned predicate language on the entire source.
+    The *new* feature grammar invents an AST for feature_a-feature_b.
+    """
+    rng=Random(seed)
+    coordinates=[(a,b) for a in range(1,10) for b in range(1,10)]
+    rng.shuffle(coordinates)
+    field_a,field_b=keys
+    entities=[]
+    target={}
+    for i,(a,b) in enumerate(coordinates):
+        current=rng.randint(-6,8)
+        entities.append(Entity.from_attrs(
+            i,{field_a:a,field_b:b},current))
+        target[i]=current+2 if a>b else current
+    return Scene(tuple(entities)),target
+
+
+@pytest.mark.parametrize("attributes",(
+    ("reading","reference"),
+    ("outdegree_src","outdegree_dst"),
+    ("width","height"),
+))
+def test_new_feature_grammar_closes_an_original_relational_capability_gap(attributes):
+    train=[derived_feature_source(i,attributes)
+           for i in (1,11,23,31,37)]
+    checks=[derived_feature_source(i,attributes)
+            for i in (41,47,53)]
+    # The previous grammar can use existing features only.
+    original=DomainIndependentRuleInventor(
+        max_ms=1000,max_atoms=1000,
+        feature_depth=0).invent(train,verification=checks)
+    assert original.status=="ABSTAIN_UNSUPPORTED"
+    # A single unchanged construction rule creates an executable
+    # feature difference, rank predicate and output algebra in ALL
+    # three source schemas without domain labels.
+    invented=DomainIndependentRuleInventor(
+        max_ms=10000,max_atoms=1600,
+        feature_depth=1).invent(train,verification=checks)
+    assert invented.status=="SOURCE_VERIFIED_INVENTION"
+    assert invented.program is not None
+    assert any(isinstance(atom[1],tuple)
+               for clause in invented.program.clauses for atom in clause)
+    assert invented.clauses_tested<600
+    assert all(invented.apply(derived_feature_source(i,attributes)[0])==
+               derived_feature_source(i,attributes)[1]
+               for i in range(100,200))
+
+
+def test_derived_feature_classical_specialist_still_blocks_reinvention():
+    source=[derived_feature_source(i) for i in (1,11,23,31,37)]
+    check=[derived_feature_source(i) for i in (41,47,53)]
+    def classical(scene):
+        return {e.key:e.value+2 if
+                e.attr("reading")>e.attr("reference") else e.value
+                for e in scene.entities}
+    r=DomainIndependentRuleInventor(
+        feature_depth=1).invent(
+        source,verification=check,classical_solvers=(classical,))
+    assert r.status=="CLASSICAL_VERIFIED"
+    assert r.clauses_tested==0
+    assert r.apply(derived_feature_source(900)[0])==derived_feature_source(900)[1]
