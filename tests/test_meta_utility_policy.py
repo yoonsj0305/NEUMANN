@@ -140,7 +140,7 @@ def test_source_capability_priority_and_fail_closed_incorrect():
 def test_economic_decision_survives_method_inventory_checkpoint():
     engine=NeumannEngine(None,[],None)
     result=engine.admit_meta_method_utility("persist.policy",
-        **source_fixture().__dict__)
+        **as_engine_source(source_fixture()))
     checkpoint=engine.meta_inventor.checkpoint()
     loaded=StructuralMetaInventor.from_checkpoint(checkpoint)
     decision=loaded.meta_utility_decision("persist.policy")
