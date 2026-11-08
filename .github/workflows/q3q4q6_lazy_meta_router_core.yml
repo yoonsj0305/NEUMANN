@@ -1,0 +1,30 @@
+name: Q3 Q4 Q6 Lazy Meta-Router Core Integration
+on:
+  push:
+    branches:
+      - feature/q3q4q6-source-learned-lazy-utility-routing-20261108
+    paths:
+      - neumann1/source_learned_grid_router.py
+      - neumann1/engine.py
+      - neumann1/registry_engine.py
+      - tests/test_source_learned_grid_router.py
+      - .github/workflows/q3q4q6_lazy_meta_router_core.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  core_regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install actual NEUMANN runtime dependencies
+        run: |
+          python -m pip install -q --disable-pip-version-check numpy scipy scikit-learn pytest
+          python -m compileall -q neumann1
+      - name: Validate source-trained method routing and existing engine behavior
+        run: |
+          python -m pytest -q tests/test_source_learned_grid_router.py tests/test_relational_composition_hybrid.py tests/test_relational_grid_inventor.py tests/test_autonomous_synthesis_core.py tests/test_structural_meta_invention.py tests/test_meta_utility_policy.py tests/test_engine.py
