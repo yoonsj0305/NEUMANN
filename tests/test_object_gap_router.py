@@ -149,3 +149,45 @@ def test_source_counterexample_revokes_reuse_instead_of_hiding_failure():
     result=ObjectGapRouter(known_causal_rules=[bogus]).solve(
         src,checks,[specimen(89)[0]])
     assert result.origin!="SOURCE_VERIFIED_REUSED_CAUSAL_RELATION"
+
+
+def _bulk_q3_example(seed):
+    from random import Random
+    rng=Random(seed)
+    colors=rng.sample(range(1,9),4)
+    g=[[0]*22 for _ in range(16)]
+    ar,ac=2+seed%3,7+seed%4
+    for r in range(ar,ar+3):
+        for c in range(ac,ac+3):
+            g[r][c]=colors[0]
+    for r in (12,13):
+        for c in (15,16):
+            g[r][c]=colors[1]
+    g[1][1]=colors[2]
+    g[13][3]=colors[3]
+    y=[list(row) for row in g]
+    y[1][1]=9
+    y[13][3]=9
+    return tuple(map(tuple,g)),tuple(map(tuple,y))
+
+
+def test_both_live_engines_autonomously_invent_and_reuse_bulk_object_grammar():
+    first=[_bulk_q3_example(s) for s in (7,11,19)]
+    validation=[_bulk_q3_example(s) for s in (29,41)]
+    withheld=[_bulk_q3_example(s) for s in (101,103,107,109)]
+    second=[_bulk_q3_example(s) for s in (203,211,223)]
+    second_verify=[_bulk_q3_example(s) for s in (227,229)]
+    second_withheld=[_bulk_q3_example(s) for s in (251,257,263)]
+    for engine in (NeumannEngine(None,[],None),RegistryEngine(None,None)):
+        invented=engine.invent_arc_object_only_on_classical_gap(
+            first,validation,[x for x,y in withheld])
+        assert invented.origin=="SOURCE_VERIFIED_NEW_BULK_RULE"
+        assert invented.object_inventor_invocations==3
+        assert tuple(y for x,y in withheld) in invented.candidates
+        assert invented.invented_programs[0].ast[0]=="parallel_map_objects"
+        assert engine._q3_bulk_memory
+        reused=engine.invent_arc_object_only_on_classical_gap(
+            second,second_verify,[x for x,y in second_withheld])
+        assert reused.origin=="SOURCE_VERIFIED_REUSED_BULK_RULE"
+        assert reused.object_inventor_invocations==0
+        assert tuple(y for x,y in second_withheld) in reused.candidates
