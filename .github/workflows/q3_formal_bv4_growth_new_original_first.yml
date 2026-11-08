@@ -1,0 +1,56 @@
+name: Q3 Formal Specification Directed Grammar Growth NEW Originals FIRST
+
+on:
+  push:
+    branches:
+      - research/q3-independent-formal-bv-inversion-20261108
+    paths:
+      - research/q3/formal_bv4_failure_triggered_grammar_growth_first.py
+      - .github/workflows/q3_formal_bv4_growth_new_original_first.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  grammar_first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download immutable source policy, never alter original results
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-formal-bv4-source-policy-FROZEN-before-target
+          run-id: 42432369260
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: source_policy
+      - name: Freeze growth algorithm, source method and untouched registry
+        run: |
+          python -m py_compile research/q3/formal_bv4_failure_triggered_grammar_growth_first.py
+          git hash-object research/q3/formal_bv4_failure_triggered_grammar_growth_first.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'research/q3')
+          import formal_bv4_failure_triggered_grammar_growth_first as q
+          assert q.TARGET==[f"find_inv_{r}_{op}_4bit.sl"
+                   for r in ("bvslt","bvule") for op in q.base.OPS]
+          assert len(q.TARGET)==32
+          assert q.fixed.load_source_method()[0]["source_proved_count"]==8
+          before,sigs=q.base.library()
+          after,_=q.enlarge(before,sigs)
+          assert before and after
+          assert len(before)+len(after)<=14000
+          assert len(set(before).intersection(after))==0
+          print("SOURCE_AND_LANGUAGE_FROZEN_BEFORE_TARGETS",len(before),len(after))
+          PY
+      - name: Test 32 untouched formal inverses, 256 inputs each
+        run: python research/q3/formal_bv4_failure_triggered_grammar_growth_first.py
+      - name: Preserve complete immutable original first and negative results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-formal-fourbit-grown-grammar-new-32-original-first
+          path: Q3_FORMAL_GRAMMAR_GROWTH_NEW_FIRST.json
+          if-no-files-found: warn
