@@ -394,3 +394,18 @@ class RegistryEngine:
         """
         from .classical_kernels import solve_with_semantic_contract
         return solve_with_semantic_contract(task, semantics=semantics)
+
+    def synthesize_composed_arc_grid(self, source_examples, target_inputs, *,
+                                     max_geometries=12,
+                                     max_relational_ms=120):
+        """Classical geometry first; invent only missing relational semantics.
+
+        If strong classical grammar already EXACTLY fits source, no new
+        relation is synthesized. This is a bounded source-only language
+        expansion, not a proof of unrelated-domain universal generalization.
+        """
+        from .composed_grid_inventor import ComposedGridInventor
+        return ComposedGridInventor(
+            max_geometries=max_geometries,
+            max_relational_ms=max_relational_ms).solve(
+                source_examples,target_inputs)
