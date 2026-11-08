@@ -506,3 +506,48 @@ class NeumannEngine:
         except (TypeError,ValueError):
             recovered=None
         return learned,recovered
+
+    def meta_learn_discovery_method(
+            self, meta_source_tasks, *, max_degree=3,
+            verifier_counts=(8,16,32), max_queries=1024):
+        """Q3: learn a new DISCOVERY policy AST from source experiments.
+
+        The learner's source observation cache persists across policy
+        revisions. Family labels or target outputs are never accepted.
+        """
+        from .discovery_policy_core import DiscoveryMethodLearner
+        learner=DiscoveryMethodLearner(
+            max_degree=max_degree,
+            verifier_counts=verifier_counts,max_queries=max_queries)
+        result=learner.learn(meta_source_tasks)
+        self._q3_discovery_policy_learner=learner
+        self._q3_discovery_policy=result
+        self._q3_discovery_original_tasks=tuple(meta_source_tasks)
+        return result
+
+    def meta_revise_discovery_method(self, counterexample_task):
+        """Autonomously regenerate policy after a falsifying SOURCE task."""
+        from .discovery_policy_core import revise_discovery_method
+        if not hasattr(self,"_q3_discovery_policy"):
+            raise ValueError("must first meta-learn a discovery policy")
+        amended=revise_discovery_method(
+            self._q3_discovery_policy_learner,
+            self._q3_discovery_policy,
+            self._q3_discovery_original_tasks,counterexample_task)
+        self._q3_discovery_policy=amended.revised
+        self._q3_discovery_original_tasks+=(
+            counterexample_task,)
+        return amended
+
+    def meta_execute_discovery_method(
+            self, source_oracle, *, width, seed,
+            forbidden_inputs=(), classical_solvers=()):
+        """Classical-first execution of the latest source-invented method."""
+        from .discovery_policy_core import DiscoveryProcedureExecutor
+        if not hasattr(self,"_q3_discovery_policy"):
+            raise ValueError("no source-verified invented discovery method")
+        return DiscoveryProcedureExecutor().run(
+            self._q3_discovery_policy.policy,
+            source_oracle,width=width,seed=seed,
+            forbidden_inputs=forbidden_inputs,
+            classical_solvers=classical_solvers)
