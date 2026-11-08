@@ -1,0 +1,69 @@
+name: Q3 ARC-AGI-2 Original Frontier Gap - Source FROZEN Before Evaluation FIRST
+
+on:
+  push:
+    branches:
+      - research/q3-frontier-arc2-semantic-meta-transfer-20261108
+    paths:
+      - neumann1/arc2_meta_grid_reasoner.py
+      - .github/workflows/q3_arc2_frontier_frozen_original_first.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  arc2_original_first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch OFFICIAL upstream ARC2 revision, no target opened during method design
+        run: |
+          git init -q arc2_official
+          git -C arc2_official fetch -q --depth 1 https://github.com/arcprize/ARC-AGI-2.git f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C arc2_official checkout -q FETCH_HEAD
+          test "$(git -C arc2_official rev-parse HEAD)" = f3283f727488ad98fe575ea6a5ac981e4a188e49
+          test "$(find arc2_official/data/training -name '*.json' | wc -l)" -eq 1000
+          test "$(find arc2_official/data/evaluation -name '*.json' | wc -l)" -eq 120
+      - name: Freeze candidate grammar, operator semantics and output scoring controls
+        run: |
+          python -m py_compile neumann1/arc2_meta_grid_reasoner.py
+          git hash-object neumann1/arc2_meta_grid_reasoner.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,"neumann1")
+          import arc2_meta_grid_reasoner as q
+          a=q.G([[1,2],[3,4]])
+          assert q.d4(a,"rotate90")==((3,1),(4,2))
+          assert q.d4(a,"flip_lr")==((2,1),(4,3))
+          assert q.apply(a,"up2")==((1,1,2,2),(1,1,2,2),(3,3,4,4),(3,3,4,4))
+          assert len(q.PROGRAMS)==len(set(q.PROGRAMS))
+          assert len(q.PROGRAMS)<q.DEFAULT_BUDGET
+          orig=[(q.G([[1,0],[0,2]]),q.G([[1,0],[0,2]]))]
+          p=q.P2ID[("identity",)]
+          x,c=q.fit_task(orig,(p,),1)
+          assert c==1 and x
+          assert q.test_task(x,[(orig[0][0],orig[0][1])])[0]
+          # A pretest false result must be detected.
+          assert not q.test_task(x,[(orig[0][0],q.G([[9,9],[9,9]]))])[0]
+          print("GENERIC_SOURCE_ONLY_GRID_PROGRAM_REPRESENTATION_PASS",len(q.PROGRAMS))
+          PY
+      - name: Discover reusable method orders from official TRAINING ONLY
+        run: python neumann1/arc2_meta_grid_reasoner.py source
+      - name: Preserve source-policy immutable method BEFORE touching public evaluation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-arc2-source-invented-typed-grid-method-policy-FROZEN
+          path: ARC2_Q3_META_METHOD_SOURCE_FROZEN.json
+          if-no-files-found: warn
+      - name: Execute ONE new 120-task public original evaluation, same-grammar classical comparator
+        run: python neumann1/arc2_meta_grid_reasoner.py target
+      - name: Preserve all original FIRST outcomes including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-arc2-public-120-same-language-frontier-FIRST
+          path: ARC2_Q3_FRONTIER_PUBLIC_120_FIRST.json
+          if-no-files-found: warn
