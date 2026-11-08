@@ -40,7 +40,7 @@ def registries():
         raise ValueError("DIFFERENT_OFFICIAL_REPO")
     old1=set(p["original_task_names"])
     old2=set(s["original_names"])
-    if len(old1)!=len(old2)!=180:
+    if len(old1)!=180 or len(old2)!=180:
         raise ValueError("PRIOR_RECORD_SIZE")
     if len(old1 & old2):raise ValueError("PREVIOUS_TESTS_OVERLAP")
     opened=old1|old2
@@ -56,7 +56,7 @@ def registries():
         if len(candidates)<N_PER_GROUP:
             raise ValueError("EXPECTED_ENOUGH_NEW_1D_ORIGINALS")
         target.extend(candidates[:N_PER_GROUP])
-    if len(src)!=180 or len(target)!=180:return ValueError("WRONG_SET_SIZE")
+    if len(src)!=180 or len(target)!=180:raise ValueError("WRONG_SET_SIZE")
     if set(str(x.relative_to(ROOT)) for x in target)&opened:
         raise ValueError("FROZEN_REGISTRY_OVERLAP")
     return src,target
