@@ -235,3 +235,17 @@ class RegistryEngine:
         return invent_with_oracle(
             universe, source_oracle, budget=query_budget, seed=seed,
             validation=validation_queries, allow_full_table=allow_full_table)
+
+    def synthesize_numeric_function_active(self, source_oracle, *, arity,
+                                           max_degree=3, query_budget=120,
+                                           seed=0, validation_queries=8):
+        """Discover exact rational basis, coefficients and executable function.
+
+        This source-oracle method is a second, independent math superfamily:
+        polynomial functions, not finite associative binary operations.
+        Its extrapolation remains conditional on the discovered grammar.
+        """
+        from .active_numeric_inventor import invent_numeric_function
+        return invent_numeric_function(
+            source_oracle,arity=arity,max_degree=max_degree,
+            budget=query_budget,seed=seed,validation=validation_queries)
