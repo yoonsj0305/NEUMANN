@@ -1,0 +1,27 @@
+name: Q6 Cross-Representation Method Transfer
+
+on:
+  pull_request:
+    paths:
+      - "neumann1/typed_representation_transfer.py"
+      - "neumann1/parallel_object_edit_inventor.py"
+      - "tests/test_typed_representation_transfer.py"
+      - ".github/workflows/q6_typed_representation.yml"
+  workflow_dispatch:
+
+jobs:
+  typed-method-transport:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Independent Q6 graph and table representation transfer
+        run: |
+          python -m pip install -e . pytest
+          python -m pytest -q tests/test_typed_representation_transfer.py
