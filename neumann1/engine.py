@@ -401,3 +401,25 @@ class NeumannEngine:
                     library.append(rule)
             self._q3_bulk_memory=tuple(library[-32:])
         return response
+
+    def invent_typed_relational_method(
+            self, source_pairs, independent_source_checks, *,
+            classical_solvers=(), max_source_ms=750):
+        """Induce a typed program without a numeric/graph/spatial router.
+
+        Classical specialist verified FIRST. Learned executable ASTs stored
+        with a bounded library and independently SOURCE rechecked before
+        reuse. This is bounded relational language, NOT universal Q3.
+        """
+        from .relational_meta_compiler import DomainIndependentRuleInventor
+        evidence=DomainIndependentRuleInventor(
+            max_ms=max_source_ms).invent(
+                source_pairs,verification=independent_source_checks,
+                classical_solvers=classical_solvers,
+                known_programs=getattr(self,"_q3_typed_methods",()))
+        if evidence.status=="SOURCE_VERIFIED_INVENTION":
+            existing=list(getattr(self,"_q3_typed_methods",()))
+            if evidence.program not in existing:
+                existing.append(evidence.program)
+            self._q3_typed_methods=tuple(existing[-32:])
+        return evidence
