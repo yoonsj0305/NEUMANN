@@ -17,6 +17,7 @@ from .composed_grid_inventor import ComposedGridInventor
 from .relational_grid_inventor import grid
 from .scene_graph_inventor import ObjectGrammarInventor
 from .relational_action_inventor import RelationalActionInventor, RelationalAction
+from .parallel_object_edit_inventor import ParallelObjectEditInventor, BulkEditProgram
 
 
 @dataclass(frozen=True)
@@ -36,14 +37,20 @@ class ObjectGapResult:
 
 class ObjectGapRouter:
     def __init__(self,*,max_relational_ms=120,max_object_ms=350,
-                 max_causal_ms=350,known_causal_rules=()):
+                 max_causal_ms=350,max_bulk_ms=350,
+                 known_causal_rules=(),known_bulk_rules=()):
         if (not 1<=max_relational_ms<=5000 or
                 not 1<=max_object_ms<=120000 or
-                not 1<=max_causal_ms<=120000):
+                not 1<=max_causal_ms<=120000 or
+                not 1<=max_bulk_ms<=120000):
             raise ValueError("finite execution caps required")
         self.max_relational_ms=max_relational_ms
         self.max_object_ms=max_object_ms
         self.max_causal_ms=max_causal_ms
+        self.max_bulk_ms=max_bulk_ms
+        self.known_bulk_rules=tuple(known_bulk_rules)
+        if any(not isinstance(p,BulkEditProgram) for p in self.known_bulk_rules):
+            raise TypeError('remembered bulk programs must be typed')
         self.known_causal_rules=tuple(known_causal_rules)
         if any(not isinstance(p,RelationalAction)
                for p in self.known_causal_rules):
@@ -94,6 +101,19 @@ class ObjectGapRouter:
                     0,0,False,(perf_counter_ns()-start)/1e6)
             except (ValueError,TypeError):
                 continue
+        for remembered in self.known_bulk_rules:
+            try:
+                if not all(remembered.apply(x)==y
+                           for x,y in demonstrations+verified):
+                    continue
+                predicted=tuple(remembered.apply(x) for x in targets)
+                if any(x is None for x in predicted):continue
+                return ObjectGapResult(
+                    "SOURCE_VERIFIED_REUSED_BULK_RULE",
+                    (predicted,),(remembered,),0,0,False,
+                    (perf_counter_ns()-start)/1e6)
+            except (ValueError,TypeError):
+                continue
         # The old language is insufficient on fresh source verification.
         # Only now spend computation on new object predicates and actions.
         invented=ObjectGrammarInventor(
@@ -130,9 +150,32 @@ class ObjectGapRouter:
                 predictions.append(trial)
                 accepted.append(p)
             if len(predictions)==2:break
+        if predictions:
+            return ObjectGapResult(
+                "SOURCE_VERIFIED_NEW_CAUSAL_RELATION",
+                tuple(predictions),tuple(accepted),2,
+                invented.source_checks+causal.witness_signatures,False,
+                (perf_counter_ns()-start)/1e6)
+        # A new language for mapping a learned predicate over MANY objects.
+        # Unlike a one-object source action, this may recolor or delete
+        # an arbitrary number of objects in a single learned program.
+        bulk=ParallelObjectEditInventor(
+            max_source_ms=self.max_bulk_ms).invent(
+                demonstrations,verification=verified,max_programs=2)
+        for p in bulk.programs:
+            try:
+                trial=tuple(p.apply(x) for x in targets)
+            except (ValueError,TypeError):
+                continue
+            if any(x is None for x in trial):continue
+            if trial not in predictions:
+                predictions.append(trial)
+                accepted.append(p)
+            if len(predictions)==2:break
         return ObjectGapResult(
-            "SOURCE_VERIFIED_NEW_CAUSAL_RELATION" if predictions
+            "SOURCE_VERIFIED_NEW_BULK_RULE" if predictions
             else "ABSTAIN_UNSUPPORTED",
             tuple(predictions),tuple(accepted),
-            2,invented.source_checks+causal.witness_signatures,False,
+            3,invented.source_checks+causal.witness_signatures+
+              bulk.evaluated_clauses,False,
             (perf_counter_ns()-start)/1e6)
