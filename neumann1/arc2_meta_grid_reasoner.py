@@ -18,6 +18,7 @@ leaderboard is an external, not same-run, comparison.
 from __future__ import annotations
 
 from collections import Counter, defaultdict, deque
+from functools import lru_cache
 import hashlib,itertools,json,math,os,pathlib,statistics,time,sys,tracemalloc
 
 ARC_COMMIT="f3283f727488ad98fe575ea6a5ac981e4a188e49"
@@ -107,7 +108,7 @@ def component_transform(g,name):
     c0=min(x for y,x in chosen);c1=max(x for y,x in chosen)
     return tuple(tuple(g[y][x] if (y,x) in cells else 0
                   for x in range(c0,c1+1)) for y in range(r0,r1+1))
-def apply(g,op):
+def _apply_uncached(g,op):
     try:
         if op in ("identity","flip_lr","flip_ud","transpose","rotate90","rotate180","rotate270","anti_transpose"):
             out=d4(g,op)
@@ -161,6 +162,29 @@ def apply(g,op):
         return out if out is not None and valid(out) else None
     except (IndexError,ValueError,TypeError):
         return None
+
+
+@lru_cache(maxsize=4096)
+def _apply_immutable(g,op):
+    """Exact memo of a pure grid-algebra subexpression, including None.
+
+    The same left transformation occurs in up to 25 two-operation program
+    candidates and multiple source demonstrations. Compute once and share
+    the immutable result. Not a learned answer cache or gold-label lookup.
+    """
+    return _apply_uncached(g,op)
+
+
+def apply(g,op):
+    """Unchanged public operator contract with bounded structural reuse."""
+    if isinstance(g,tuple):
+        try:
+            return _apply_immutable(g,op)
+        except TypeError:
+            # Preserve historical behavior for noncanonical values in
+            # user-side callers; canonical G produces tuple-of-tuples.
+            pass
+    return _apply_uncached(g,op)
 
 OPERATORS=(
     "identity","flip_lr","flip_ud","transpose",
