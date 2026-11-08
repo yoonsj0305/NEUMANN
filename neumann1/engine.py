@@ -144,3 +144,18 @@ class NeumannEngine:
         from .source_learned_grid_router import SourceLearnedGridRouter
         return SourceLearnedGridRouter(source_policy).solve(
             category, source_examples, target_inputs)
+
+    def synthesize_binary_operator(self, source_observations, query_pairs):
+        """Induce a new finite-algebra representation and executable operator.
+
+        This is not a choice among pre-coded task operators. It is an
+        associativity/identity-conditional synthesis from I/O observations.
+        All unseen query outputs are excluded from source_observations.
+        Missing or contradictory evidence fails closed.
+        """
+        from .monoid_operator_inventor import invent_operator
+        operator = invent_operator(source_observations)
+        predictions = tuple(operator.apply(a, b) for a, b in query_pairs)
+        return {"operator": operator,
+                "representation": operator.normal_forms,
+                "predictions": predictions}
