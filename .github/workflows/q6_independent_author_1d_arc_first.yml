@@ -1,0 +1,60 @@
+name: Q6 FIRST Independent-Author 1D-ARC Transfer of FROZEN ARC2 Method
+
+on:
+  push:
+    branches:
+      - feature/q3-relational-composition-hybrid-20261108
+    paths:
+      - .github/workflows/q6_independent_author_1d_arc_first.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  independent_author_transfer_first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - name: Production NEUMANN source dependencies
+        run: python -m pip install -q --disable-pip-version-check numpy scipy scikit-learn
+      - name: Fetch independently authored 1D-ARC original tasks, PINNED SHA
+        run: |
+          git init -q independent_1d_arc
+          git -C independent_1d_arc fetch -q --depth 1 https://github.com/khalil-research/1D-ARC.git 1e74dc4cb4c58d8160e1fbd0ba638eb745f37147
+          git -C independent_1d_arc checkout -q FETCH_HEAD
+          test "$(git -C independent_1d_arc rev-parse HEAD)" = 1e74dc4cb4c58d8160e1fbd0ba638eb745f37147
+      - name: Load immutable ARC2-only source-discovered algorithm from BEFORE independent-domain access
+        uses: actions/download-artifact@v4
+        with:
+          name: q3-relational-multirule-costbounded-240-source-FROZEN
+          run-id: 42447026346
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: frozen_source
+      - name: Freeze source-method SHA, task registry and one-dimensional adapter BEFORE original bytes
+        run: |
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,"research/q3")
+          import q6_independent_author_1d_arc_transfer_first as q
+          p,sig=q.source_method_preflight()
+          assert sig=="73a2e8beff407adb29c88f13451febca61d66d591e8b0fa8b08669d14cc56ec7"
+          paths=q.registry()  # filenames only
+          assert len(paths)==180
+          assert len({x.parent.name for x in paths})==18
+          assert len({str(x) for x in paths})==180
+          assert q.G([1,2,3])==((1,2,3),)
+          assert q.G([[2,3]])==((2,3),)
+          print("Q6_1D_NEW_AUTHOR_TARGET_FILENAMES_AND_SOURCE_FROZEN",sig,flush=True)
+          PY
+      - name: First zero-tuning independent-author 180 original 1D-ARC tests
+        run: python research/q3/q6_independent_author_1d_arc_transfer_first.py
+      - name: Preserve ALL original author-transfer first-run success, failure and costs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q6-1d-arc-180-independent-author-original-FIRST
+          path: Q6_1D_ARC_180_DIFFERENT_AUTHOR_ORIGINAL_FIRST.json
+          if-no-files-found: warn
