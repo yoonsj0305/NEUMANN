@@ -73,7 +73,10 @@ def test_real_1d_arc_360_originals_failure_of_joint_10x():
         learned_target_seconds=12.52114,
         strongest_matched_target_seconds=21.81670,
         new_grammar_witness=False,
-        training_domain_adapted=True)
+        training_domain_adapted=True,
+        full_learned_execution_metered=False,
+        full_comparator_execution_metered=False,
+        independent_semantic_audit=False)
     result=evaluate_original_joint_gate(
         (evidence,),cost(discovery_seconds=24.76895))
     assert result.original_count==360
