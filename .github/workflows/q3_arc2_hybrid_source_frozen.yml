@@ -43,12 +43,18 @@ jobs:
           assert not set(p.stem for p in source)&set(p.stem for p in new)
           print("TWO_HUNDRED_NEW_ORIGINALS_NAMES_FROZEN_NOT_OPENED")
           PY
+      - name: Source-only review of necessary role-cover bounds and 450ms cost cap
+        run: |
+          python - <<'PY'
+          from neumann1.relational_grid_inventor import RelationalGridInventor
+          assert RelationalGridInventor().max_search_ms==450
+          PY
       - name: Source-only review of new rule composition and two-output classical retention
         run: python research/q3/arc2_relational_composition_second_200_original_first.py source
       - name: Preserve original SOURCE report and frozen language SHA
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: q3-relational-multirule-hybrid-development-240-source-FROZEN
+          name: q3-relational-multirule-costbounded-240-source-FROZEN
           path: Q3_RELATIONAL_MULTI_HYBRID_SOURCE_ONLY_V2_FROZEN.json
           if-no-files-found: warn
