@@ -137,3 +137,24 @@ def test_partial_orbit_and_position_specific_rule_are_rejected():
     with pytest.raises(ValueError):
         SymmetryOrbitInventor().invent(
             learned.program,SequenceSchema(12))
+
+
+def test_both_production_engines_generate_transferable_new_representation():
+    from neumann1 import NeumannEngine,RegistryEngine
+    source,checks=source_cases(
+        10,3,lambda x:graph_motif_oracle(x,5,TRIANGLE))
+    for engine in (NeumannEngine(None,[],None),RegistryEngine(None,None)):
+        result,structural=engine.discover_structural_orbit_representation(
+            source,checks,GraphSchema(5),max_degree=3)
+        assert result.status=="SOURCE_VERIFIED_NEW_REPRESENTATION"
+        assert structural is not None
+        for graph in range(32):
+            bits7=bits(graph,21)
+            assert structural.apply(bits7,GraphSchema(7))==(
+                graph_motif_oracle(bits7,7,TRIANGLE))
+        # Stronger trusted classical direct answer requires no structural
+        # invention. The initial source-check probe is still measured.
+        direct,_=engine.discover_structural_orbit_representation(
+            source,checks,GraphSchema(5),max_degree=3,
+            classical_solvers=(lambda x:graph_motif_oracle(x,5,TRIANGLE),))
+        assert direct.status=="CLASSICAL_VERIFIED"
