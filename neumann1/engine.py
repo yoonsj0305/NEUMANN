@@ -349,3 +349,23 @@ class NeumannEngine:
             max_geometries=max_geometries,
             max_relational_ms=max_relational_ms).solve(
                 source_examples,target_inputs)
+
+    def synthesize_composed_semantics(self, source_examples,
+                                      independent_source_checks, *,
+                                      classical_candidates,
+                                      pre_candidates, learn_residual,
+                                      max_pre_candidates=16):
+        """Single typed composition-discovery interface across data domains.
+
+        Classical solutions are verified first. Unsupported residual tasks
+        abstain; no target answers, family labels or hidden gold are used.
+        Domain-specific primitive and residual plugins are caller-supplied,
+        so this is not proof of universally self-invented semantics.
+        """
+        from .composition_meta_inventor import CompositionInventor
+        return CompositionInventor(
+            max_pre_candidates=max_pre_candidates).discover(
+                source_examples,independent_source_checks,
+                classical_candidates=classical_candidates,
+                pre_candidates=pre_candidates,
+                learn_residual=learn_residual)
