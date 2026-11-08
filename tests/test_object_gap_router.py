@@ -98,3 +98,54 @@ def test_live_routers_invent_new_multiobject_causal_grammar_at_real_gap():
         assert r.object_inventor_invocations==2
         assert tuple(y for x,y in withheld) in r.candidates
         assert r.invented_programs[0].ast[0]=="relational_action"
+
+
+def test_new_program_grammar_is_reused_on_different_task_without_discovery():
+    """Same learned causal AST transfers across independent source families.
+
+    The second task has new colors, placements and source verification data.
+    Only the PROGRAM is remembered. No answer table or hidden target gold.
+    """
+    from random import Random
+    def pair(seed):
+        rng=Random(seed)
+        g=[[0]*20 for _ in range(16)]
+        color_a,color_b,color_d=rng.sample(range(1,10),3)
+        row,col=rng.choice((3,5,7,8)),rng.choice((5,7,9))
+        ah,aw=rng.choice((2,3)),rng.choice((3,4))
+        for y in range(row,row+ah):
+            for x in range(col,col+aw):g[y][x]=color_a
+        for y in (12,13):
+            for x in (16,17):g[y][x]=color_d
+        mr,mc=rng.choice((0,1,14)),rng.choice((1,3))
+        g[mr][mc]=color_b
+        out=[v[:] for v in g]
+        out[mr][mc]=0
+        out[row][col+aw]=color_b
+        return tuple(map(tuple,g)),tuple(map(tuple,out))
+    for engine in (NeumannEngine(None,[],None),RegistryEngine(None,None)):
+        first=engine.invent_arc_object_only_on_classical_gap(
+            [pair(s) for s in (7,19,23)],
+            [pair(s) for s in (41,59)],
+            [pair(151)[0]])
+        assert first.origin=="SOURCE_VERIFIED_NEW_CAUSAL_RELATION"
+        assert len(engine._q3_relation_memory)>=1
+        later=engine.invent_arc_object_only_on_classical_gap(
+            [pair(s) for s in (213,217,241)],
+            [pair(s) for s in (251,269)],
+            [pair(s)[0] for s in (301,307,311,317)])
+        assert later.origin=="SOURCE_VERIFIED_REUSED_CAUSAL_RELATION"
+        assert later.object_inventor_invocations==0
+        assert tuple(pair(s)[1] for s in (301,307,311,317)) in later.candidates
+
+
+def test_source_counterexample_revokes_reuse_instead_of_hiding_failure():
+    from neumann1.relational_action_inventor import RelationalAction
+    bogus=RelationalAction(
+        ("area","min"),("area","max"),"move","source",
+        ("anchor_low",0),("anchor_next",0))
+    src=[specimen(n) for n in (11,23,41)]
+    checks=[specimen(71)]
+    result=ObjectGapRouter(known_causal_rules=[bogus]).solve(
+        src,checks,[specimen(89)[0]])
+    assert result.origin!="SOURCE_VERIFIED_REUSED_CAUSAL_RELATION"
