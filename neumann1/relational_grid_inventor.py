@@ -205,6 +205,8 @@ def _guards(features, positives):
 
 def _cover_rule(features,positives,negatives,max_clauses=3):
     if not positives:return None
+    if not negatives:
+        return ((('__always__','eq',1),),)
     P=sum(1<<i for i in positives)
     N=sum(1<<i for i in negatives)
     atomics=_guards(features,positives)
@@ -239,6 +241,7 @@ def _cover_rule(features,positives,negatives,max_clauses=3):
 
 def _match(pred,feat):
     name,op,value=pred
+    if name=='__always__':return True
     x=feat.get(name,0)
     if op=="eq":return x==value
     if op=="le":return x<=value
