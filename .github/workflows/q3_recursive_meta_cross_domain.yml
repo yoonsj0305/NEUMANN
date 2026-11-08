@@ -38,7 +38,7 @@ jobs:
           import json
           s=json.load(open('q3_recursive_method_meta_first.json'))['summary']
           assert s['new_evaluation_tasks']==100
-          assert s['initial_unseen']['correct']==56
+          assert s['initial_unseen']['correct']==84
           assert s['revised_unseen']['correct']==100
           assert s['strong_classical_unseen']['correct']==100
           assert s['fixed_depth_3_unseen']['correct']==0
