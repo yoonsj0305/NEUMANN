@@ -106,3 +106,18 @@ class NeumannEngine:
             validation_learned_solved=validation_learned_solved,
             intended_future_tasks=intended_future_tasks)
         return self.meta_inventor.admit_meta_method_utility(family,evidence)
+
+    def synthesize_relational_grid(self, source_examples, target_input):
+        """Infer an executable relational spatial program from example I/O.
+
+        No gold target output or preferred ARC task ID is accepted. This
+        complements the existing verification-gated symbolic method learner.
+        An independent original target verifier still determines correctness.
+        """
+        from .relational_grid_inventor import RelationalGridInventor
+        miner = RelationalGridInventor()
+        hypothesis = miner.solve(source_examples)
+        return {"prediction": miner.apply(hypothesis,target_input),
+                "method": hypothesis.method,
+                "source_fit": hypothesis.source_fit,
+                "search_ms": hypothesis.elapsed_ms}
