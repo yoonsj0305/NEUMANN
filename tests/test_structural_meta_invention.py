@@ -242,3 +242,51 @@ def test_new_alignment_does_not_forge_correctness_on_negative_target():
                        verify=lambda tree:all(ev(tree,row)==min(row)
                            for row in product((-1,0,3),repeat=4))) is None
     assert all(x.successes==0 for x in miner.methods.values())
+
+
+def test_method_search_continues_after_checkpoint_reload():
+    """Fix real runtime limitation: methods-only state had lost source n+1."""
+    from neumann1.structural_meta_invention import _hash
+    a0,a1,a2=arg(0),arg(1),arg(2)
+    old=("ite",("lt",a0,a2),a2,a0)
+    s3=("ite",("lt",old,a1),a1,old)
+    miner=StructuralMetaInventor()
+    miner.observe(CertifiedProgram("long.lived",2,mx2(),certificate="s2"),
+                  verify=lambda p:original_max(p.expr,p.arity))
+    miner.observe(CertifiedProgram("long.lived",3,s3,certificate="s3"),
+                  verify=lambda p:original_max(p.expr,p.arity))
+    stored=miner.checkpoint()
+    assert stored["schema"].endswith("v2")
+    assert len(stored["observations"])==2
+    reloaded=StructuralMetaInventor.from_checkpoint(stored)
+    answer=reloaded.solve("long.lived",4,
+                          verify=lambda p:original_max(p,4),
+                          promote=True)
+    assert answer and answer["verified"]
+    assert answer["new_method_ids"]  # New method induced using restored n3.
+    assert reloaded.solve("long.lived",5,
+                          verify=lambda p:original_max(p,5))
+    # Old snapshots remain readable, but correctly cannot claim persisted
+    # source observations that the old format never serialized.
+    old_version={k:v for k,v in stored.items() if k not in ("observations","sha256")}
+    old_version["schema"]="neumann.structural-meta-methods.v1"
+    old_version["sha256"]=_hash(old_version)
+    previous=StructuralMetaInventor.from_checkpoint(old_version)
+    assert previous.methods and not previous.observations
+    assert previous.solve("long.lived",4,
+                          verify=lambda p:original_max(p,4))
+
+
+def test_checkpoint_rejects_corrupted_source_program_state():
+    from neumann1.structural_meta_invention import _hash
+    m=StructuralMetaInventor()
+    m.observe(CertifiedProgram("x",2,mx2(),certificate="source"),
+              verify=lambda _:True)
+    state=m.checkpoint()
+    state["observations"][0]["expr"]=["arg",3]  # nonexistent arity
+    state["sha256"]=_hash({k:v for k,v in state.items() if k!="sha256"})
+    try:
+        StructuralMetaInventor.from_checkpoint(state)
+        assert False, "malformed restored program must be rejected"
+    except ValueError:
+        pass
