@@ -26,19 +26,22 @@ jobs:
       - name: Install and run direct active invention contracts
         run: |
           python -m pip install -e . pytest
-          python -m pytest -q tests/test_monoid_operator_inventor.py tests/test_active_law_inventor.py tests/test_active_numeric_inventor.py
-      - name: Regenerate both source-only FIRST result snapshots
+          python -m pytest -q tests/test_monoid_operator_inventor.py tests/test_active_law_inventor.py tests/test_active_numeric_inventor.py tests/test_active_rank_inventor.py
+      - name: Regenerate all three synthetic source-only FIRST result snapshots
         run: |
           PYTHONPATH=. python research/q3/q3_active_law_first.py > /tmp/q3_active_law_result.txt
           PYTHONPATH=. python research/q3/q3_active_numeric_first.py > /tmp/q3_active_numeric_result.txt
+          PYTHONPATH=. python research/q3/q3_active_rank_first.py > /tmp/q3_active_rank_result.txt
           python - <<'PY'
           import json
           a=json.load(open("research/q3/q3_active_law_first_result.json"))
           n=json.load(open("research/q3/q3_active_numeric_first_result.json"))
+          r=json.load(open("research/q3/q3_active_rank_first_results.json"))
           assert a["totals"]=={"accepted":150,"source_queries":53582,"unqueried":114718,
                               "correct":114718,"full_table_source_queries":168300}
           assert a["counterexample"]["wrong_unqueried_prediction"]
           assert n["totals"]=={"constructed":180,"source_queries":4590,
                               "heldout":36000,"correct":36000}
-          print("Q3 FIRST REPLAY VERIFIED: 150+180 syntheses, both negative and positive evidence")
+          assert {k:r["totals"][k] for k in ("cases","passed","source_queries","full_table_queries","heldout","heldout_correct","representation_repairs")}=={"cases":120,"passed":120,"source_queries":79129,"full_table_queries":350400,"heldout":271271,"heldout_correct":271271,"representation_repairs":20}
+          print("Q3 FIRST REPLAY VERIFIED: 150+180+120 syntheses and negative controls")
           PY
