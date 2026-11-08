@@ -29,6 +29,9 @@ class OriginalCohort:
     new_grammar_witness: bool
     previously_unopened: bool
     training_domain_adapted: bool = False
+    full_learned_execution_metered: bool = False
+    full_comparator_execution_metered: bool = False
+    independent_semantic_audit: bool = False
 
     def __post_init__(self):
         if not self.name or not self.semantic_family or not self.author:
@@ -50,7 +53,10 @@ class OriginalCohort:
         for flag in (self.upstream_frozen, self.original_verifier,
                      self.same_input_rights, self.same_answer_attempts,
                      self.new_grammar_witness, self.previously_unopened,
-                     self.training_domain_adapted):
+                     self.training_domain_adapted,
+                     self.full_learned_execution_metered,
+                     self.full_comparator_execution_metered,
+                     self.independent_semantic_audit):
             if type(flag) is not bool:
                 raise ValueError("real boolean evidence fields required")
 
@@ -63,12 +69,12 @@ class OriginalCohort:
 
 @dataclass(frozen=True)
 class DiscoveryCost:
-    preparation_seconds: float = 0.0
-    training_seconds: float = 0.0
-    discovery_seconds: float = 0.0
-    verification_seconds: float = 0.0
-    failed_attempts_seconds: float = 0.0
-    fallback_seconds: float = 0.0
+    preparation_seconds: float
+    training_seconds: float
+    discovery_seconds: float
+    verification_seconds: float
+    failed_attempts_seconds: float
+    fallback_seconds: float
 
     def __post_init__(self):
         for v in self.__dict__.values():
@@ -135,7 +141,8 @@ def evaluate_original_joint_gate(cohorts: tuple[OriginalCohort, ...],
     transfer_domains={c.semantic_family for c in cohorts
                       if c.new_grammar_witness
                       and (c.learned_only_originals or 0)>0
-                      and not c.training_domain_adapted}
+                      and not c.training_domain_adapted
+                      and c.independent_semantic_audit}
     q3=("SCOPED_NEW_ORIGINAL_CAPABILITY" if observed_residual else
         "OPEN_RESIDUAL_WITNESS_MISSING" if residual_unknown else
         "NO_VERIFIED_NEW_RESIDUAL_CAPABILITY")
@@ -143,9 +150,17 @@ def evaluate_original_joint_gate(cohorts: tuple[OriginalCohort, ...],
         if len(transfer_domains)>=2 else
         "OPEN_UNRELATED_MATH_TRANSFER")
     capability_ok=learned>=comparator
-    q4=("SCOPED_10X_FULL_COST_AND_EQUAL_ACCURACY"
-        if capability_ok and learn_time>0 and comparator_time>=learn_time*requested_speedup
-        else "NO_10X_MATCHED_FULL_COST")
+    complete_target_metering=all(
+        c.full_learned_execution_metered and
+        c.full_comparator_execution_metered for c in cohorts)
+    if not capability_ok:
+        q4="NO_10X_MATCHED_FULL_COST"
+    elif not complete_target_metering:
+        q4="OPEN_INCOMPLETE_FULL_COST_TELEMETRY"
+    elif learn_time>0 and comparator_time>=learn_time*requested_speedup:
+        q4="SCOPED_10X_FULL_COST_AND_EQUAL_ACCURACY"
+    else:
+        q4="NO_10X_MATCHED_FULL_COST"
     reasons=[]
     if learned<comparator:
         reasons.append("verified original capability regression")
