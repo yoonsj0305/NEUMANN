@@ -37,7 +37,7 @@ def certificate():
       "step_dominates_new":g>=y,
       "arbitrary_prior_upper_bound_preserved":z3.Implies(x>=z,g>=z),
       "arbitrary_prior_witness_selector_preserved":z3.Implies(x==w,z3.Or(g==w,g==y)),
-      "incorrect_zero_identity_is_not_universal":g==x if False else z3.BoolVal(False)}
+      "incorrect_zero_identity_is_not_universal":z3.substitute(g,(y,z3.IntVal(0)))==x}
     proof_rows=[]
     for name,formula in laws.items():
         check=z3.Solver();check.set("timeout",7000)
