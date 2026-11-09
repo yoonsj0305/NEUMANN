@@ -64,7 +64,7 @@ def propose(outpath: Path):
         oracle=_source_oracle(kind)
         learned=engine.meta_invent_active_terminal_process(
             train,checks,oracle,max_nodes=8,max_expressions=150000,
-            max_source_ms=25000,max_oracle_queries=160,
+            max_source_ms=25000,max_oracle_queries=512,
             max_rounds=5)
         if learned.program is None:
             raise RuntimeError(kind+" failed source invention: "+learned.status)
