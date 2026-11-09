@@ -1,0 +1,57 @@
+name: Q3 Recursive Discovery-Method Invention and Cross-Domain Transfer
+on:
+  pull_request:
+    paths:
+      - "neumann1/recursive_method_discovery.py"
+      - "research/q3/meta_domain_adapters.py"
+      - "research/q3/q3_recursive_method_meta_first.py"
+      - "tests/test_recursive_method_discovery.py"
+      - "neumann1/engine.py"
+      - "neumann1/registry_engine.py"
+      - ".github/workflows/q3_recursive_meta_cross_domain.yml"
+  workflow_dispatch:
+
+jobs:
+  self-revising-procedural-invention:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install research core
+        run: python -m pip install -e . pytest
+      - name: Unit proof of recursive method synthesis and source controls
+        run: python -m pytest -q tests/test_recursive_method_discovery.py
+      - name: Reproduce SOURCE-method revision and 100 unseen semantic tasks
+        run: |
+          python research/q3/q3_recursive_method_meta_first.py \
+            --output q3_recursive_method_meta_first.json
+          sha256sum q3_recursive_method_meta_first.json \
+            > q3_recursive_method_meta_first.sha256
+          python - <<'PY'
+          import json
+          s=json.load(open('q3_recursive_method_meta_first.json'))['summary']
+          assert s['new_evaluation_tasks']==100
+          assert s['initial_unseen']['correct']==84
+          assert s['revised_unseen']['correct']==100
+          assert s['strong_classical_unseen']['correct']==100
+          assert s['fixed_depth_3_unseen']['correct']==0
+          assert s['all_boolean_finite_input_matches']==102400
+          assert s['independent_periodic_future_matches']==108000
+          assert s['meta_total_source_and_training_queries']>=s['classical_eval_only_source_queries']
+          assert not s['global_q3_q4_q6_pass']
+          print('Q3 scoped meta-policy rewrite verified; Q4 strong-classical global NOT PASSED')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-100-unseen-two-math-domains-self-invented-method
+          path: |
+            q3_recursive_method_meta_first.json
+            q3_recursive_method_meta_first.sha256
+          if-no-files-found: error

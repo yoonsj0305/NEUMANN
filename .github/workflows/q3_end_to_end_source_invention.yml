@@ -1,0 +1,59 @@
+name: Q3 Source-Invent Both Transition and Method - 496 Blind Tasks
+
+on:
+  pull_request:
+    paths:
+      - "neumann1/typed_transition_inventor.py"
+      - "neumann1/higher_order_method_inventor.py"
+      - "neumann1/engine.py"
+      - "research/q3/q3_autonomous_transition_and_control_blind.py"
+      - ".github/workflows/q3_end_to_end_source_invention.yml"
+  workflow_dispatch:
+
+jobs:
+  source-first-self-invent-both:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install production NEUMANN
+        run: python -m pip install -e .
+      - name: Generate and freeze source-invented T and control AST predictions
+        run: |
+          python research/q3/q3_autonomous_transition_and_control_blind.py propose \
+            --output q3_end_to_end_frozen_predictions.json
+          sha256sum q3_end_to_end_frozen_predictions.json \
+            > q3_end_to_end_frozen.sha256
+      - name: Independent scorer opens hidden reference after prediction SHA freeze
+        run: |
+          locked="$(cut -d' ' -f1 q3_end_to_end_frozen.sha256)"
+          python research/q3/q3_autonomous_transition_and_control_blind.py score \
+            --predictions q3_end_to_end_frozen_predictions.json \
+            --expected-sha "$locked" \
+            --output q3_end_to_end_scored.json
+          python - <<'PY'
+          import json
+          s=json.load(open('q3_end_to_end_scored.json'))['summary']
+          assert s['heldout_tasks']==496
+          assert s['heldout_correct']==496
+          assert s['new_transition_programs']==3
+          assert s['method_structural_rewrites']==2
+          assert not s['target_gold_used_to_synthesize_programs']
+          assert not s['global_Q3_Q6_pass']
+          print('BOUNDED SOURCE-INVENTION PIPELINE PASS; UNIVERSAL Q3 OPEN')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-source-invented-transition-and-method-496-frozen
+          path: |
+            q3_end_to_end_frozen_predictions.json
+            q3_end_to_end_frozen.sha256
+            q3_end_to_end_scored.json
+          if-no-files-found: error

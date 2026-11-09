@@ -1,0 +1,58 @@
+name: Q3 Recursive Meta Method - Second Frozen 150
+on:
+  pull_request:
+    paths:
+      - "neumann1/recursive_method_discovery.py"
+      - "research/q3/meta_domain_adapters.py"
+      - "research/q3/q3_recursive_method_meta_first.py"
+      - "research/q3/q3_recursive_method_second_first.py"
+      - ".github/workflows/q3_recursive_meta_second_first.yml"
+  workflow_dispatch:
+
+jobs:
+  freeze-before-new-target-score:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install system
+        run: python -m pip install -e .
+      - name: Learn method, freeze source-only predictions, 150 new IDs
+        run: |
+          python research/q3/q3_recursive_method_second_first.py propose \
+            --output q3_second_meta_frozen_predictions.json
+          sha256sum q3_second_meta_frozen_predictions.json > q3_second_meta.sha256
+          cat q3_second_meta.sha256
+      - name: Independently score after frozen predictor SHA, including all finite test inputs
+        run: |
+          locked="$(cut -d' ' -f1 q3_second_meta.sha256)"
+          python research/q3/q3_recursive_method_second_first.py score \
+            --predictions q3_second_meta_frozen_predictions.json \
+            --expected-sha "$locked" \
+            --output q3_second_meta_scored.json
+          python - <<'PY'
+          import json
+          s=json.load(open('q3_second_meta_scored.json'))['summary']
+          assert s['second_cohort_tasks']==150
+          assert s['boolean_tasks']==90
+          assert s['period_tasks']==60
+          assert s['total_scored_finite_or_distant_inputs']>200000
+          assert s['frozen_prediction_sha256']
+          assert not s['global_q3_q4_q6_pass']
+          print('Q3 scoped source-frozen evidence. Never imply universal PASS.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-150-fresh-self-invented-meta-method-predictions
+          path: |
+            q3_second_meta_frozen_predictions.json
+            q3_second_meta.sha256
+            q3_second_meta_scored.json
+          if-no-files-found: error

@@ -1,0 +1,79 @@
+{
+  "schema": "NEUMANN.Q3.active-numeric-synthesis.synthetic-FIRST.v1",
+  "date": "2026-11-08",
+  "suites": [
+    {
+      "name": "cubic_1d",
+      "variables": 1,
+      "degree": 3,
+      "constructed": 30,
+      "source_queries": 540,
+      "heldout": 6000,
+      "correct": 6000,
+      "min_nonzero_terms": 4,
+      "max_nonzero_terms": 4
+    },
+    {
+      "name": "quadratic_2d",
+      "variables": 2,
+      "degree": 2,
+      "constructed": 30,
+      "source_queries": 570,
+      "heldout": 6000,
+      "correct": 6000,
+      "min_nonzero_terms": 5,
+      "max_nonzero_terms": 5
+    },
+    {
+      "name": "cubic_2d",
+      "variables": 2,
+      "degree": 3,
+      "constructed": 30,
+      "source_queries": 660,
+      "heldout": 6000,
+      "correct": 6000,
+      "min_nonzero_terms": 5,
+      "max_nonzero_terms": 5
+    },
+    {
+      "name": "cubic_3d",
+      "variables": 3,
+      "degree": 3,
+      "constructed": 30,
+      "source_queries": 900,
+      "heldout": 6000,
+      "correct": 6000,
+      "min_nonzero_terms": 5,
+      "max_nonzero_terms": 5
+    },
+    {
+      "name": "affine_4d",
+      "variables": 4,
+      "degree": 1,
+      "constructed": 30,
+      "source_queries": 570,
+      "heldout": 6000,
+      "correct": 6000,
+      "min_nonzero_terms": 5,
+      "max_nonzero_terms": 5
+    },
+    {
+      "name": "quartic_3d",
+      "variables": 3,
+      "degree": 4,
+      "constructed": 30,
+      "source_queries": 1350,
+      "heldout": 6000,
+      "correct": 6000,
+      "min_nonzero_terms": 5,
+      "max_nonzero_terms": 5
+    }
+  ],
+  "totals": {
+    "constructed": 180,
+    "source_queries": 4590,
+    "heldout": 36000,
+    "correct": 36000
+  },
+  "caveat": "Synthetic exact polynomials; prior polynomial grammar and bounded degree human-provided. Same-author oracles; not autonomous global axioms or independent-author proofs."
+}

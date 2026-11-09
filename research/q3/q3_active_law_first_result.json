@@ -1,0 +1,85 @@
+{
+  "schema": "NEUMANN.Q3.active-law-source-query-FIRST.v1",
+  "date": "2026-11-08",
+  "results": [
+    {
+      "family": "cyclic_group",
+      "domain_size": 31,
+      "runs": 30,
+      "source_query_budget_per_run": 450,
+      "accepted": 30,
+      "abstained": 0,
+      "source_queries": 5117,
+      "original_unqueried_pairs": 23713,
+      "exact_unqueried_pairs": 23713,
+      "full_table_source_queries_for_30_runs": 28830
+    },
+    {
+      "family": "noncommutative_group",
+      "domain_size": 30,
+      "runs": 30,
+      "source_query_budget_per_run": 700,
+      "accepted": 30,
+      "abstained": 0,
+      "source_queries": 6307,
+      "original_unqueried_pairs": 20693,
+      "exact_unqueried_pairs": 20693,
+      "full_table_source_queries_for_30_runs": 27000
+    },
+    {
+      "family": "noninvertible_monoid",
+      "domain_size": 42,
+      "runs": 30,
+      "source_query_budget_per_run": 1000,
+      "accepted": 30,
+      "abstained": 0,
+      "source_queries": 9071,
+      "original_unqueried_pairs": 43849,
+      "exact_unqueried_pairs": 43849,
+      "full_table_source_queries_for_30_runs": 52920
+    },
+    {
+      "family": "union_semilattice",
+      "domain_size": 32,
+      "runs": 30,
+      "source_query_budget_per_run": 800,
+      "accepted": 30,
+      "abstained": 0,
+      "source_queries": 19135,
+      "original_unqueried_pairs": 11585,
+      "exact_unqueried_pairs": 11585,
+      "full_table_source_queries_for_30_runs": 30720
+    },
+    {
+      "family": "bounded_string_concat",
+      "domain_size": 31,
+      "runs": 30,
+      "source_query_budget_per_run": 850,
+      "accepted": 30,
+      "abstained": 0,
+      "source_queries": 13952,
+      "original_unqueried_pairs": 14878,
+      "exact_unqueried_pairs": 14878,
+      "full_table_source_queries_for_30_runs": 28830
+    }
+  ],
+  "totals": {
+    "accepted": 150,
+    "source_queries": 53582,
+    "unqueried": 114718,
+    "correct": 114718,
+    "full_table_source_queries": 168300
+  },
+  "counterexample": {
+    "one_cell_nonassociative_false_friend_accepted": true,
+    "wrong_unqueried_prediction": true
+  },
+  "limitations": [
+    "synthetic author-programmed oracles",
+    "all five families share associativity + identity",
+    "discovered laws empirical, not independently proved",
+    "relabeling seeds are not independent math domains",
+    "query savings not CPU or frontier efficiency",
+    "cannot claim global Q3, Q4 or Q6"
+  ]
+}

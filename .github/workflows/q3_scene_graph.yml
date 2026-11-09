@@ -1,0 +1,24 @@
+name: Q3 Source-Invented Object Scene Graphs
+on:
+  pull_request:
+    paths:
+      - "neumann1/scene_graph_inventor.py"
+      - "neumann1/object_gap_router.py"
+      - "neumann1/engine.py"
+      - "neumann1/registry_engine.py"
+      - "tests/test_scene_graph_inventor.py"
+      - "tests/test_object_gap_router.py"
+      - ".github/workflows/q3_scene_graph.yml"
+  workflow_dispatch:
+jobs:
+  object-grammar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Test object semantics, sourced new syntax and classical original baseline
+        run: |
+          python -m pip install -e . pytest
+          python -m pytest -q tests/test_scene_graph_inventor.py tests/test_object_gap_router.py
