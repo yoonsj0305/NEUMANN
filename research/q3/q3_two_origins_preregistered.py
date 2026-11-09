@@ -222,6 +222,11 @@ def propose(blind, teachers, adapter, model_revision, output):
                 one["status"]="ABSTAIN_"+type(exc).__name__
             row["arms"][name]=one
         rows.append(row)
+        # In a bounded original-author run, preserve unscored SOURCE-only
+        # partials if external runner times out; these are NEVER target gold.
+        Path(str(output)+".SOURCE_PARTIAL.json").write_text(
+            canonical({"origin":data["origin"],"source_only":True,
+                       "scored":False,"records":rows})+"\\n")
         print("Q3_TWO_ORIGIN_SOURCE_ONLY",data["origin"],entry["id"],
               [(k,v["status"]) for k,v in row["arms"].items()],flush=True)
     p={"schema":"NEUMANN.Q3.TWO-ORIGIN.PREDICTIONS.v1",
