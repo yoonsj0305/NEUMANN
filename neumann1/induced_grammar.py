@@ -63,8 +63,16 @@ def eval_ast(ast,input_value,*,dynamic_primitives=None):
         if value is INVALID:return INVALID
         if dynamic_primitives and ast[1] in dynamic_primitives:
             try:
+                primitive=dynamic_primitives[ast[1]]
+                # Newly learned, SOURCE-certified hidden-state operators are
+                # actual runtime instructions, not just an answer cache.
+                # Other registered primitives retain their existing
+                # separately verified finite-relation delta interface.
+                from .unknown_state_operator_inventor import InventedStateOperator
+                if isinstance(primitive,InventedStateOperator):
+                    return primitive.apply(value) if type(value) is str else INVALID
                 task=dict(value) if isinstance(value,tuple) else value
-                return dynamic_primitives[ast[1]].apply_delta(task)
+                return primitive.apply_delta(task)
             except (TypeError,ValueError,KeyError):
                 return INVALID
         return atom(ast[1],value)
@@ -167,6 +175,35 @@ class GrammarInventor:
                 name in ATOMIC or name in self.dynamic_primitives or
                 not getattr(rule,'verified_for_all_finite_graphs',False)):
             raise ValueError('unverified invented primitive must not enter grammar')
+        self.dynamic_primitives[name]=rule
+
+    def register_source_invented_state_operator(
+            self,name,rule,*,independent_source_checks):
+        """Promote a new hidden-state instruction into the live grammar.
+
+        The runtime operator and its state transitions are data-derived, not
+        fixed in the old ATOMIC language. The DFA upper bound is a human-supplied
+        conditional prior; promoting it does NOT prove universal correctness.
+        New verification examples must lie beyond the exact source-query
+        horizon 2*N-1 to prevent re-certifying the same observations.
+        """
+        from .unknown_state_operator_inventor import InventedStateOperator
+        checks=tuple(independent_source_checks)
+        if (not isinstance(name,str) or
+                not name.startswith("invented:state:") or
+                name in ATOMIC or name in self.dynamic_primitives or
+                not isinstance(rule,InventedStateOperator) or
+                rule.state_count<1 or rule.state_count>rule.state_bound or
+                rule.independent_source_checks<3 or len(checks)<3):
+            raise ValueError("only certified source-invented state instructions")
+        if any(
+                type(x) is not str or
+                len(x)<=2*rule.state_bound-1 or
+                any(c not in rule.alphabet for c in x) or
+                type(y) is not int or y not in (0,1) or
+                rule.apply(x)!=y
+                for x,y in checks):
+            raise ValueError("independent SOURCE falsifies invented state operator")
         self.dynamic_primitives[name]=rule
 
     def invent_from_source(self,task_id,examples,*,verification_pairs=None):
