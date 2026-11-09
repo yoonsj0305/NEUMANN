@@ -111,7 +111,7 @@ jobs:
                 current["model_generated_falsified_repairs"],
                 "equal_steps",current["steps"],flush=True)
           PY
-      - name: SAME original SOURCE tasks: base A, imitation B, AST repair C, actual model-failure repair D
+      - name: Same SOURCE original task four-arm A B C D comparison
         run: |
           set -euo pipefail
           REV="$(cat inputs/first/MODEL_REVISION.txt)"
