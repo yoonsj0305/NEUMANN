@@ -322,6 +322,12 @@ class GenerativeProgramInventor:
         if len(check_inputs)!=len(set(check_inputs)) or (
                 train_inputs & set(check_inputs)):
             raise ValueError("SOURCE verifier must be disjoint from training")
+        # Same SINGLE Q3 invention loop, with structured SOURCE-only
+        # preparation for learned structural policies. Neural proposers keep
+        # their original prompt interface without any task-family routing.
+        prepare=getattr(self.policy,"prepare",None)
+        if prepare is not None:
+            prepare(train)
         prompt=source_discovery_prompt(train,method_context=method_context)
         seen=set()
         receipts=[]
