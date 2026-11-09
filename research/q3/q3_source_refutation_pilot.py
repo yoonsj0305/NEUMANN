@@ -56,10 +56,11 @@ def run(blind, teachers, adapter, context_adapter, revision, output):
         if len(source)!=7:raise ValueError("original SOURCE split changed")
         row={"id":pid,"arms":{}}
         for name,policy in (("A",base),("B",contextual),("C",modified)):
-            discovery=SingleDiscoveryCore(
+            core_outcome=SingleDiscoveryCore(
                 policy,sandbox,memory=memory,max_proposals=2).discover(
                     source[:6],source[6:],
                     reuse_memory=True)
+            discovery=core_outcome.discovery
             row["arms"][name]={
                 "status":discovery.status,"source_verified":discovery.verified,
                 "program_sha256":discovery.frozen_sha256,
