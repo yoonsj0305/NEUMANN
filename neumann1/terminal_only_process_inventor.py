@@ -23,6 +23,20 @@ from .typed_transition_inventor import (
     _kind, _primitive_ops, evaluate_ast)
 
 
+def _bounded_state(value):
+    # A synthesized candidate must not amplify raw input into an
+    # enormous state during its own multi-step execution. These are
+    # RESOURCE bounds, not semantic assumptions about the true law.
+    if type(value) is int:
+        return abs(value)<=16_777_216
+    if type(value) is str:
+        return len(value)<=4096
+    if type(value) is frozenset:
+        return len(value)<=4096
+    return False
+
+
+
 @dataclass(frozen=True)
 class ProcessExpr:
     ast: tuple
@@ -55,7 +69,10 @@ class InventedLatentProcess:
     def transition(self, x):
         if _kind(x)!=self.transition_type:
             raise TypeError("latent process state type mismatch")
-        return evaluate_ast(self.transition_ast,x)
+        result=evaluate_ast(self.transition_ast,x)
+        if _kind(result)!=self.transition_type or not _bounded_state(result):
+            raise ValueError("generated process exceeds typed state bounds")
+        return result
 
     def compile(self, *, max_steps=256):
         return ControlProgram(self.control_ast,max_steps).compile(
@@ -112,7 +129,8 @@ class TerminalOnlyProcessInventor:
             nonlocal seen
             pytype={"int":int,"str":str,"set":frozenset}[typ]
             if len(values)!=len(inputs) or any(
-                    type(v) is not pytype for v in values):
+                    type(v) is not pytype or not _bounded_state(v)
+                    for v in values):
                 return
             key=(typ,values)
             if signature_counts.get(key,0)>=3:
@@ -152,7 +170,10 @@ class TerminalOnlyProcessInventor:
             if not is_input_dependent(expr.ast):
                 return None
             def latent(x):
-                return evaluate_ast(expr.ast,x)
+                result=evaluate_ast(expr.ast,x)
+                if _kind(result)!=state_type or not _bounded_state(result):
+                    raise ValueError("candidate state over resource limit")
+                return result
             compiled=control.compile(latent)
             max_steps=0
             for x,y in pairs:
@@ -214,8 +235,9 @@ class TerminalOnlyProcessInventor:
                         except (TypeError,IndexError,ValueError,
                                 OverflowError,ZeroDivisionError):
                             continue
-                        insert((name,)+tuple(t.ast for t in terms),
-                               outtype,size,result)
+                        if all(_bounded_state(v) for v in result):
+                            insert((name,)+tuple(t.ast for t in terms),
+                                   outtype,size,result)
         raise ValueError(
             "ABSTAIN: no independently SOURCE-verified latent "
             "multi-step process compatible with endpoint observations")
