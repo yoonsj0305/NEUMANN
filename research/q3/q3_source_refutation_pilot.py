@@ -64,6 +64,9 @@ def run(blind, teachers, adapter, context_adapter, revision, output):
             row["arms"][name]={
                 "status":discovery.status,"source_verified":discovery.verified,
                 "program_sha256":discovery.frozen_sha256,
+                "source_program":discovery.program if discovery.verified else None,
+                "original_target_predictions":[],
+                "original_target_execution_status":"NOT_RUN_SOURCE_ABSTAIN",
                 "attempts":[{
                     "iteration":a.iteration,"source_correct":a.source_correct,
                     "source_total":a.source_total,"status":a.status,
@@ -71,6 +74,17 @@ def run(blind, teachers, adapter, context_adapter, revision, output):
                     # The hypothesis is SOURCE-only, no test gold.
                     "source_hypothesis":a.program}
                     for a in discovery.attempts]}
+            if discovery.verified:
+                # Only test INPUTS, not author-gold outputs, are exposed here.
+                # Freeze all emitted target predictions before a separate
+                # independent-author scorer opens withheld originals.
+                held_inputs=indexed[pid].get("target_inputs",[])
+                if len(held_inputs)!=3:
+                    raise ValueError("expected three source-blind original inputs")
+                o=sandbox.evaluate(discovery.program,held_inputs)
+                row["arms"][name]["original_target_execution_status"]=o.status
+                if o.status=="EXECUTED":
+                    row["arms"][name]["original_target_predictions"]=list(o.outputs)
         records.append(row)
         print("Q3_STATEFUL_SOURCE_PILOT",pid,
               {k:(v["status"],[
@@ -90,6 +104,8 @@ def run(blind, teachers, adapter, context_adapter, revision, output):
             r["arms"]["C"]["source_verified"]
             and not r["arms"]["B"]["source_verified"] for r in records),
         "global_q3":"OPEN","original_target_gold_seen":False,
+        "model_scientific_scope":"PREEXPOSED_CODEARC_DEV_ONLY",
+        "original_outputs_only_independent_score_after_SHA_freeze":True,
         "records":records}
     Path(output).write_text(
         json.dumps(output_record,sort_keys=True,ensure_ascii=True,indent=2)+"\n")
