@@ -1,0 +1,27 @@
+name: Q3 Hidden State Operator Invention (Source-Only)
+on:
+  pull_request:
+    paths:
+      - "neumann1/unknown_state_operator_inventor.py"
+      - "neumann1/engine.py"
+      - "neumann1/registry_engine.py"
+      - "tests/test_unknown_state_operator_inventor.py"
+      - ".github/workflows/q3_hidden_state_operator.yml"
+  workflow_dispatch:
+
+jobs:
+  exhaustive-discovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -e . pytest
+      - name: Discover hidden states for 5832 unknown 3-state transition languages
+        run: python -m pytest -q -s tests/test_unknown_state_operator_inventor.py
