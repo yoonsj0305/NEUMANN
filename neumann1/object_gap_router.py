@@ -18,6 +18,7 @@ from .relational_grid_inventor import grid
 from .scene_graph_inventor import ObjectGrammarInventor
 from .relational_action_inventor import RelationalActionInventor, RelationalAction
 from .parallel_object_edit_inventor import ParallelObjectEditInventor, BulkEditProgram
+from .source_born_representation_inventor import SourceBornRepresentationInventor
 
 
 @dataclass(frozen=True)
@@ -38,7 +39,8 @@ class ObjectGapResult:
 class ObjectGapRouter:
     def __init__(self,*,max_relational_ms=120,max_object_ms=350,
                  max_causal_ms=350,max_bulk_ms=350,
-                 known_causal_rules=(),known_bulk_rules=()):
+                 known_causal_rules=(),known_bulk_rules=(),
+                 max_raw_source_ms=2500):
         if (not 1<=max_relational_ms<=5000 or
                 not 1<=max_object_ms<=120000 or
                 not 1<=max_causal_ms<=120000 or
@@ -48,6 +50,7 @@ class ObjectGapRouter:
         self.max_object_ms=max_object_ms
         self.max_causal_ms=max_causal_ms
         self.max_bulk_ms=max_bulk_ms
+        self._source_born=SourceBornRepresentationInventor(max_ms=max_raw_source_ms)
         self.known_bulk_rules=tuple(known_bulk_rules)
         if any(not isinstance(p,BulkEditProgram) for p in self.known_bulk_rules):
             raise TypeError('remembered bulk programs must be typed')
@@ -172,10 +175,30 @@ class ObjectGapRouter:
                 predictions.append(trial)
                 accepted.append(p)
             if len(predictions)==2:break
+        # If every previously implemented object ontology failed,
+        # invent an executable *program* from raw source correspondence.
+        # This bootstrap route does not need two already-solved ASTs.
+        # It uses one generic tensor-index algebra for any rank; source
+        # and verifier data decide which executable syntax survives.
+        invented_from_raw=False
+        raw_checks=0
+        if not predictions:
+            discovery=self._source_born.invent(
+                demonstrations,independent_source_checks=verified)
+            raw_checks=discovery.source_candidates_examined
+            for p in discovery.programs:
+                trial=tuple(p.apply(x) for x in targets)
+                if all(x is not None for x in trial) and trial not in predictions:
+                    predictions.append(trial)
+                    accepted.append(p)
+                    invented_from_raw=True
+                if len(predictions)==2:break
         return ObjectGapResult(
-            "SOURCE_VERIFIED_NEW_BULK_RULE" if predictions
-            else "ABSTAIN_UNSUPPORTED",
+            ("SOURCE_VERIFIED_NEW_RAW_INDEX_PROGRAM" if invented_from_raw
+             else "SOURCE_VERIFIED_NEW_BULK_RULE" if predictions
+             else "ABSTAIN_UNSUPPORTED"),
             tuple(predictions),tuple(accepted),
-            3,invented.source_checks+causal.witness_signatures+
-              bulk.evaluated_clauses,False,
+            4 if invented_from_raw else 3,
+            invented.source_checks+causal.witness_signatures+
+              bulk.evaluated_clauses+raw_checks,False,
             (perf_counter_ns()-start)/1e6)
