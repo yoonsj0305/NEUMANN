@@ -70,6 +70,7 @@ def test_real_docker_source_negative_origin_and_correct_method_recertification()
         assert "SOURCE-ONLY REPAIR EPISODE" in x["prompt"]
         assert x["program"] not in x["prompt"]
         assert len(x["negative_sha256"])==64
+        assert len(x["witness_sha256"])==64
 
 
 def test_source_oracle_rejects_fabricated_failure_and_stolen_gold():
