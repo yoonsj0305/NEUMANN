@@ -84,3 +84,51 @@ def test_refutation_teacher_never_sees_target_gold_sentinel():
     assert episodes
     assert "TARGET outputs are UNKNOWN" in episodes[0]["prompt"]
     assert "987654321" not in json.dumps(episodes)
+
+
+
+def test_actual_model_pilot_unwraps_coreoutcome_without_loading_neural_weights(
+        tmp_path,monkeypatch):
+    """Prevent a 10-minute SOURCE model run from failing on an API wrapper."""
+    import neumann1.open_program_inventor as inv
+    from research.q3 import q3_source_refutation_pilot as pilot
+
+    identity="def transform(x):"+chr(10)+"    return x"
+    class FakeSandbox:
+        def __init__(self,*args,**kwargs):pass
+        def evaluate(self,code,inputs):
+            if code==INC:
+                outputs=tuple(x+1 for x in inputs)
+            elif code==REV:
+                outputs=tuple(x[::-1] for x in inputs)
+            elif code==identity:
+                outputs=tuple(inputs)
+            else:
+                return Execution("ABSTAIN_UNSAFE_SYNTAX",(),0)
+            return Execution("EXECUTED",outputs,0,(None,)*len(inputs))
+    class FakePolicy:
+        def __init__(self,**kwargs):pass
+        def propose(self,prompt):return identity
+    monkeypatch.setattr(pilot,"IsolatedPython",FakeSandbox)
+    monkeypatch.setattr(pilot,"LocalCausalCodePolicy",FakePolicy)
+    rows=examples()
+    teacher_path=tmp_path/"teachers.jsonl"
+    teacher_path.write_text("".join(json.dumps(x)+"\n" for x in rows))
+    blind_path=tmp_path/"blind.json"
+    blind_path.write_text(json.dumps({
+       "schema":"NEUMANN.Q3.NEURAL.CODEARC.BLIND.v1",
+       "records":[{
+           "id":task,
+           "source":[[x,x] for x in range(start,start+7)]}
+           for task,start in ((184,10),(255,100))]}))
+    out=tmp_path/"results.json"
+    pilot.run(str(blind_path),str(teacher_path),
+              "fake-repair-adapter","fake-context-adapter",
+              "frozen-model-revision",str(out))
+    result=json.loads(out.read_text())
+    assert result["original_target_gold_seen"] is False
+    assert result["pretrained_memory_correct_source"]==2
+    assert result["contextual_imitation_10step_correct_source"]==2
+    assert result["source_refutation_10step_correct_source"]==2
+    assert all(x["arms"]["C"]["source_verified"]
+               for x in result["records"])
