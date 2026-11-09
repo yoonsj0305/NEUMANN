@@ -203,7 +203,7 @@ def test_incumbent_5_of_6_is_not_discarded_by_later_rejected_hypothesis():
             if len(self.prompts)==1:return partial
             if len(self.prompts)==2:return broken
             assert partial in prompt
-            assert "SOURCE observations" in prompt
+            assert "Observed SOURCE failure kind: source" in prompt
             assert "below retained" not in prompt or "hypothesis" in prompt
             assert "TARGET outputs are UNKNOWN" in prompt
             return complete
