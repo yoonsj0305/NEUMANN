@@ -1,0 +1,64 @@
+name: Q3 Score Already Frozen Model Predictions Only - Zero Reruns
+on:
+  push:
+    branches:
+      - research/q3-stateful-counterexample-policy-20261109
+    paths:
+      - ".github/workflows/q3_source_refutation_resume.yml"
+      - "research/q3/q3_postfirst_repair_original_score.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_author_score_only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Reuse SHA-frozen A/B/C model predictions from completed run, never re-infer
+        run: |
+          set -euo pipefail
+          mkdir -p scored /tmp/q3-model-original
+          gh run download 42612877663 \
+            --name Q3-STATEFUL-SOURCE-REPAIR-ORIGINAL-CAUSAL-RECEIPTS \
+            --dir scored
+          test -s scored/PREDICTIONS.json
+          EXPECTED="$(cut -d ' ' -f1 scored/PREDICTIONS.sha256)"
+          ACTUAL="$(sha256sum scored/PREDICTIONS.json | cut -d ' ' -f1)"
+          test "$ACTUAL" = "$EXPECTED"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path("scored/PREDICTIONS.json").read_text())
+          assert x["original_target_gold_seen"] is False
+          assert [r["id"] for r in x["records"]]==[184,255]
+          print("Q3_FROZEN_REPAIR_OUTPUTS_REUSED_NO_MODEL_REPLAY",
+                {r["id"]:{k:(v["source_verified"],len(v["original_target_predictions"]))
+                 for k,v in r["arms"].items()} for r in x["records"]},flush=True)
+          PY
+      - name: Only now download original author's withheld outputs and SHA-gated score
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 --silent --show-error \
+            https://huggingface.co/datasets/anjiangwei/CodeARC-Invocations/resolve/119512573bf96148cbb95e99cf7cdd21c06153e4/invocations.jsonl \
+            -o /tmp/q3-model-original/invocations.jsonl
+          FROZEN="$(cut -d ' ' -f1 scored/PREDICTIONS.sha256)"
+          python -m research.q3.q3_postfirst_repair_original_score \
+            --original /tmp/q3-model-original/invocations.jsonl \
+            --predictions scored/PREDICTIONS.json \
+            --expected-sha "$FROZEN" \
+            --output scored/ORIGINAL_POSTFIRST_SCORE.json
+          sha256sum scored/ORIGINAL_POSTFIRST_SCORE.json \
+            > scored/ORIGINAL_POSTFIRST_SCORE.sha256
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Q3-REPAIR-PREVIOUSLY-FROZEN-ORIGINAL-SCORE
+          path: scored/
+          retention-days: 90

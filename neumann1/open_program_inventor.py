@@ -21,7 +21,7 @@ import re
 import shutil
 import subprocess
 from time import perf_counter_ns
-from .q3_prompt_contract import source_discovery_prompt
+from .q3_prompt_contract import source_discovery_prompt, source_revision_prompt
 
 OPS=(
     ast.Module,ast.FunctionDef,ast.arguments,ast.arg,ast.Return,ast.Assign,
@@ -309,9 +309,15 @@ class GenerativeProgramInventor:
         if len(check_inputs)!=len(set(check_inputs)) or (
                 train_inputs & set(check_inputs)):
             raise ValueError("SOURCE verifier must be disjoint from training")
-        prompt=source_discovery_prompt(train,method_context=method_context)
+        base_prompt=source_discovery_prompt(train,method_context=method_context)
+        prompt=base_prompt
         seen=set()
         receipts=[]
+        # The program with the most original SOURCE observations satisfied
+        # remains the repair anchor. Earlier attempts could attain 5/6 and
+        # then LOSE that working hypothesis to one rejected proposal.
+        incumbent_correct=0
+        incumbent_prompt=None
         for step in range(self.max_proposals):
             raw=None
             try:
@@ -327,15 +333,34 @@ class GenerativeProgramInventor:
                 receipts.append(Attempt(
                     raw_hash,0,len(train),"REJECTED",step,
                     raw[:3000] if isinstance(raw,str) else None))
-                prompt+=(
-                    "\nYour proposed code failed the deterministic Python "
-                    "preflight. Fix the code while preserving its hypothesized "
-                    "algorithm. Error: "+type(exc).__name__+": "+
-                    str(exc)[:220]+"\n")
+                if incumbent_prompt is not None:
+                    # The last syntax error has zero verified SOURCE utility.
+                    # Keep the strongest source-observed hypothesis instead
+                    # of overwriting it with the invalid program.
+                    prompt=incumbent_prompt+(
+                        "\nA later alternative failed Python preflight: "
+                        +type(exc).__name__+": "+str(exc)[:180]
+                        +". Continue repairing the prior SOURCE-strong "
+                          "hypothesis above, not that invalid alternative. "
+                        +"Trial="+str(step)+"\n")
+                else:
+                    prompt=source_revision_prompt(
+                        base_prompt,raw if isinstance(raw,str) else "",
+                        {"error_type":type(exc).__name__,
+                         "message":str(exc)[:220]},kind="preflight")
                 continue
             sha=hashlib.sha256(code.encode()).hexdigest()
             if sha in seen:
-                prompt+="\nYou repeated a disproven proposal. Invent new code."
+                if incumbent_prompt is not None:
+                    prompt=incumbent_prompt+(
+                        "\nExact prior SOURCE-falsified hypothesis repeated, "
+                        "SHA="+sha[:16]+". Invent a genuinely different "
+                        "repair of the incumbent. Trial="+str(step)+"\n")
+                else:
+                    prompt=source_revision_prompt(
+                        base_prompt,code,
+                        {"reason":"identical already-falsified program",
+                         "trial":step},kind="duplicate")
                 continue
             seen.add(sha)
             result=self.runner.evaluate(code,[x for x,y in train])
@@ -371,16 +396,12 @@ class GenerativeProgramInventor:
                                 "source_expected":y,
                                 "previous_observed":got,
                                 "runtime_error":error})
-                    prompt+=(
-                        "\nYour proposed algorithm passed the first SOURCE "
-                        "examples but FAILED on NEW SOURCE observations. "
-                        "Identify the missing invariant and revise the "
-                        "algorithm. New SOURCE counterexamples:\n"+
-                        json.dumps(witness[:3],ensure_ascii=True)[:3500])
+                    candidate_prompt=source_revision_prompt(
+                        base_prompt,code,witness[:3],kind="independent_source")
                 else:
-                    prompt+=(
-                        "\nAn independent SOURCE verifier refuted your "
-                        "program. Propose a different general algorithm.")
+                    candidate_prompt=source_revision_prompt(
+                        base_prompt,code,{"verifier_status":final.status},
+                        kind="independent_source")
             else:
                 errors=[]
                 if source_executed and self.rich_runtime_feedback:
@@ -396,10 +417,25 @@ class GenerativeProgramInventor:
                 else:
                     errors=["ABSTAIN_RUNTIME_ERROR" if source_executed
                             else result.status]
-                prompt+=(
-                    "\nYour last source program was falsified. "
-                    "Fix the causal rule, not individual examples. Errors:\n"+
-                    json.dumps(errors[:3],ensure_ascii=True)[:3500])
+                candidate_prompt=source_revision_prompt(
+                    base_prompt,code,errors[:3],kind="source")
+            # Prefer a source-supported program over a later regression.
+            # The independent SOURCE verifier remains separate; no target gold.
+            if correct>0 and correct>=incumbent_correct:
+                incumbent_correct=correct
+                incumbent_prompt=candidate_prompt
+                prompt=candidate_prompt
+            elif incumbent_prompt is not None:
+                prompt=incumbent_prompt+(
+                    "\nA new hypothesis satisfied only "
+                    +str(correct)+"/"+str(len(train))
+                    +" SOURCE observations, below retained "
+                    +str(incumbent_correct)+"/"+str(len(train))
+                    +". Improve the retained algorithm instead. Trial="
+                    +str(step)+"\n")
+            else:
+                prompt=candidate_prompt
+
         return Discovery("ABSTAIN_NO_SOURCE_PROGRAM",None,None,
                          tuple(receipts),len(checks),False)
 

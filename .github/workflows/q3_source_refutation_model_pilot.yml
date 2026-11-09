@@ -1,0 +1,104 @@
+name: Q3 Real Model Source-Refutation Policy vs Equal-Step Control
+on:
+  push:
+    branches:
+      - research/q3-stateful-counterexample-policy-20261109
+    paths:
+      - ".github/workflows/q3_source_refutation_model_pilot.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  refutation_causal_source_pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 95
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "2"
+      OPENBLAS_NUM_THREADS: "2"
+      MKL_NUM_THREADS: "2"
+      TOKENIZERS_PARALLELISM: "false"
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      HF_HUB_DOWNLOAD_TIMEOUT: "180"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install actual CPU neural weights and locked no-network SOURCE checker
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          python -m pip install -q --index-url https://download.pytorch.org/whl/cpu 'torch==2.5.1'
+          python -m pip install -q 'transformers==4.48.3' 'peft==0.14.0' 'accelerate==1.3.0' pytest sentencepiece
+          docker pull python:3.11-alpine
+          python -m pytest -q -x tests/test_q3_open_program_discovery.py tests/test_q3_source_refutation_learning.py
+      - name: Download source-only immutable prior MODEL / teacher / equal-step control artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-first /tmp/q3-context /tmp/q3-repair
+          gh run download 42593621076 \
+            --name Q3-REAL-WEIGHT-LEARNING-ORIGINAL-SOURCE-BLIND \
+            --dir /tmp/q3-first
+          gh run download 42602782399 \
+            --name Q3-TWO-ORIGIN-FROZEN-SOURCE-ADAPTER \
+            --dir /tmp/q3-context
+          cmp /tmp/q3-first/SOURCE_TEACHERS.jsonl /tmp/q3-context/SOURCE_TEACHERS.jsonl
+          cmp /tmp/q3-first/MODEL_REVISION.txt /tmp/q3-context/MODEL_REVISION.txt
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          records=json.loads(Path("/tmp/q3-first/BLIND.json").read_text())["records"]
+          assert {184,255}.issubset({t["id"] for t in records})
+          assert all(len(t["source"])==7 for t in records if t["id"] in (184,255))
+          print("Q3_PREEXPOSED_ORIGINAL_SOURCE_REPAIR_IDS",[184,255],flush=True)
+          PY
+      - name: Train ACTUAL neural repair policy from real SOURCE-refuted programs
+        run: |
+          set -euo pipefail
+          REV="$(cat /tmp/q3-context/MODEL_REVISION.txt)"
+          python -m neumann1.q3_trainable_code_policy \
+            --sources /tmp/q3-context/SOURCE_TEACHERS.jsonl \
+            --adapter-output /tmp/q3-repair/adapter \
+            --model Qwen/Qwen2.5-Coder-0.5B-Instruct \
+            --model-revision "$REV" \
+            --steps 10 \
+            --contextual-method-training \
+            --source-refutation-training
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path("/tmp/q3-repair/adapter/neumann_source_training_manifest.json").read_text())
+          b=json.loads(Path("/tmp/q3-context/adapter/neumann_source_training_manifest.json").read_text())
+          assert a["steps"]==b["steps"]==10
+          assert a["base_model"]==b["base_model"]
+          assert a["model_revision"]==b["model_revision"]
+          assert a["source_sha256"]==b["source_sha256"]
+          assert a["source_counterexample_repair_training"] is True
+          assert a["source_falsified_repair_episodes"]>=2
+          assert b["contextual_method_training"] is True
+          print("Q3_EQUAL_BUDGET_REPAIR_CURRICULUM_FROZEN",
+                a["source_falsified_repair_episodes"],flush=True)
+          PY
+      - name: Actual unchanged code model B vs C, independent SOURCE checks, no TARGET gold
+        run: |
+          set -euo pipefail
+          REV="$(cat /tmp/q3-context/MODEL_REVISION.txt)"
+          python research/q3/q3_source_refutation_pilot.py \
+            --blind /tmp/q3-first/BLIND.json \
+            --teachers /tmp/q3-first/SOURCE_TEACHERS.jsonl \
+            --adapter /tmp/q3-repair/adapter \
+            --context-adapter /tmp/q3-context/adapter \
+            --revision "$REV" \
+            --out /tmp/q3-repair/SOURCE_ONLY_PILOT.json
+          sha256sum /tmp/q3-repair/SOURCE_ONLY_PILOT.json \
+            > /tmp/q3-repair/SOURCE_ONLY_PILOT.sha256
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Q3-SOURCE-COUNTEREXAMPLE-MODEL-REPAIR-PILOT
+          path: /tmp/q3-repair/
+          if-no-files-found: warn
+          retention-days: 90
