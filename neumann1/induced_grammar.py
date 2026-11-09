@@ -225,7 +225,7 @@ class GrammarInventor:
                 rule.source_verifiers<3 or len(checks)<3):
             raise ValueError("certified SOURCE counter instruction required")
         if any(
-                type(x) is not str or len(x)<=8 or
+                type(x) is not str or len(x)<=rule.source_horizon or
                 any(c not in rule.alphabet for c in x) or
                 type(y) is not int or y not in (0,1) or
                 rule.apply(x)!=y
