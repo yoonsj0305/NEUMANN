@@ -27,6 +27,7 @@ from time import monotonic
 from typing import Any, Iterable
 
 from .open_program_inventor import source_same_value, validate_code
+from .q3_structure_factorization import induce_structural_factors
 
 _INVALID = object()
 
@@ -227,10 +228,23 @@ class LearnedDiscoveryPolicy:
                                 for k, v in counts.items())),
                    tuple(sorted(set(provenance))))
 
-    def weight(self, op: str, input_type: str, output_type: str) -> int:
-        return sum(value for in_type, out_type, operator, value in self.weights
-                   if operator == op and
-                   (in_type == input_type and out_type == output_type))
+    def weight(self, op: str, input_type: str, output_type: str,
+               *, transfer=False) -> int:
+        direct=sum(
+            value for in_type,out_type,operator,value in self.weights
+            if operator==op
+            and in_type==input_type and out_type==output_type)
+        if not transfer:
+            return direct
+        # The previous policy silently yielded 0 on every unseen I/O type
+        # signature. A representation-changing task is exactly where prior
+        # discovery experience must survive. The global method structural
+        # prior is learned from old SOURCE-verified ASTs, not old answers.
+        others=sum(
+            value for in_type,out_type,operator,value in self.weights
+            if operator==op and
+            (in_type!=input_type or out_type!=output_type))
+        return 2*direct+min(3,others)
 
 
 @dataclass(frozen=True)
@@ -291,6 +305,11 @@ class StructuralInventionPolicy:
         source_constant = len(outputs) == 1
 
         begin = monotonic()
+        # Induce the missing intermediate structure from SOURCE before
+        # guessing whole-array scalar expressions. One generic JSON-tree
+        # factorizer, not a separate ARC/list/string task solver.
+        factors=induce_structural_factors(
+            source_pairs,max_candidates=self.max_candidates)
         pool: list[Candidate] = []
         observed: dict[tuple[str, ...], Candidate] = {}
         exact: list[Candidate] = []
@@ -299,7 +318,8 @@ class StructuralInventionPolicy:
         def preference(op: str) -> int:
             if self.learned is None:
                 return 0
-            return min(8, self.learned.weight(op, input_type, output_type))
+            return min(8,self.learned.weight(
+                op,input_type,output_type,transfer=True))
 
         def admit(source: str, values, depth: int, cost: float, op: str):
             if len(pool) >= self.max_states:
@@ -388,12 +408,23 @@ class StructuralInventionPolicy:
                 candidates.append(text)
             if len(candidates) >= self.max_candidates:
                 break
-        self._candidates = tuple(candidates)
+        # Factorized plans are evaluated on current SOURCE already and
+        # independently Docker-verified in the one existing discovery core.
+        # Both classical A and learned C share these exact same plans and
+        # search budget. No retrieval from TARGET or benchmark identity.
+        structured=[item.program for item in factors]
+        ordered=[]
+        for program in structured+candidates:
+            if program not in ordered:
+                ordered.append(program)
+            if len(ordered)>=self.max_candidates:
+                break
+        self._candidates = tuple(ordered)
         self._cursor = 0
         self.receipt = InventionReceipt(
             candidates=self._candidates,
             evaluated_expressions=evaluations,
-            unique_semantics=len(observed),
+            unique_semantics=len(observed)+len(factors),
             source_constant=source_constant,
             elapsed_seconds=monotonic() - begin,
             learned_policy=self.learned is not None,
