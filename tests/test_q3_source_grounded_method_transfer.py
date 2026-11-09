@@ -98,3 +98,30 @@ def test_generic_core_excludes_irrelevant_memory_not_family_routed():
     with pytest.raises(ValueError,match="memory"):
         core.discover([(2,3)],[(7,8)],reuse_memory=True,
                       memory_mode="hidden_human_domain")
+
+
+def test_source_verifier_does_not_accept_int_zero_for_boolean_false():
+    from neumann1.open_program_inventor import (
+        source_same_value,GenerativeProgramInventor,UnsafeProposal)
+    assert not source_same_value(0,False)
+    assert not source_same_value(1,True)
+    assert not source_same_value({"a":[0]},{"a":[False]})
+    assert source_same_value({"a":[1,True]},{"a":[1,True]})
+    assert not source_same_value(float("nan"),float("nan"))
+
+    runner=IsolatedPython(max_seconds=8)
+    memory=SourceMethodMemory(runner)
+    wrong="def transform(x):"+chr(10)+"    return 0"
+    with pytest.raises(UnsafeProposal,match="SOURCE-certified"):
+        memory.admit("wrong_boolean_method",
+                     [("a",False),("b",False)],[("c",False)],wrong)
+
+    class WrongPolicy:
+        def propose(self,prompt):
+            return wrong
+    outcome=GenerativeProgramInventor(
+        WrongPolicy(),runner,max_proposals=1).discover(
+        [("x",False),("y",False)],
+        independent_source_checks=[("z",False)])
+    assert not outcome.verified
+    assert outcome.attempts[0].source_correct==0
