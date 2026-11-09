@@ -49,6 +49,10 @@ def _leaves(a, b):
             if pairs is None:return None
             result.extend(pairs)
         return result
+    # Source can induce the same atomic-token relation for both strings
+    # and nested arrays, without inventing one domain-specific solver.
+    if type(a) is str and type(b) is str and len(a)==len(b):
+        return list(zip(a,b))
     if type(a) is list or type(b) is list:
         return None
     if _kind(a)=="unsupported" or _kind(b)=="unsupported":
@@ -121,14 +125,29 @@ def _propose_leaf_relationship(source_pairs):
         if body=="return x":
             program="def transform(x):\n    return x"
         else:
-            program=(
-                "def transform(x):\n"
-                "    def factor(v):\n"
-                "        if isinstance(v,list):\n"
-                "            return [factor(t) for t in v]\n"
-                f"        {body}\n"
-                "    return factor(x)"
-            )
+            if representation=="leaf-category-relation":
+                # SOURCE-derived atomic substitutions apply to characters
+                # or nested JSON values using one inferred mapping.
+                token_table=body[len("return "):].split(".get(v,v)")[0]
+                program=(
+                    "def transform(x):\n"
+                    "    def factor(v):\n"
+                    "        if isinstance(v,list):\n"
+                    "            return [factor(t) for t in v]\n"
+                    "        if isinstance(v,str):\n"
+                    f"            return ''.join({token_table}.get(c,c) for c in v)\n"
+                    f"        {body}\n"
+                    "    return factor(x)"
+                )
+            else:
+                program=(
+                    "def transform(x):\n"
+                    "    def factor(v):\n"
+                    "        if isinstance(v,list):\n"
+                    "            return [factor(t) for t in v]\n"
+                    f"        {body}\n"
+                    "    return factor(x)"
+                )
         out.append(StructuralFactor(
             validate_code(program),representation,dl,len(source_pairs)))
     return out
