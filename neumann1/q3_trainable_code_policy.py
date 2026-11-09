@@ -168,7 +168,7 @@ def contextual_training_prompt(row, memory):
 def finetune_source_policy(
         source_jsonl,adapter_output,*,model_name=DEFAULT_MODEL,
         model_revision=None,max_steps=40,lr=0.00015,rank=4,seed=1007,
-        contextual_methods=False):
+        contextual_methods=False,source_refutation_training=False):
     """LoRA gradient update of generator weights on prior certified SOURCE.
 
     Does NOT train on target test answers or private reference programs.
@@ -178,6 +178,8 @@ def finetune_source_policy(
     if (not 1<=max_steps<=10000 or not 0<lr<=0.01 or
             not 1<=rank<=32):
         raise ValueError("bounded explicit training contract")
+    if source_refutation_training and not contextual_methods:
+        raise ValueError("self-refutation requires common method-context training")
     source,source_sha=source_training_rows(source_jsonl)
     if not source:
         raise ValueError("no independently source-certified programs to learn")
@@ -185,6 +187,15 @@ def finetune_source_policy(
     teacher_receipts=tuple(e.identity for e in certified_memory.episodes)
     if contextual_methods and len(teacher_receipts)<2:
         raise ValueError("meta-learning requires >=2 independent source methods")
+    refutations=[]
+    if source_refutation_training:
+        from .q3_refutation_learning import source_refutation_episodes
+        # Real independent SOURCE executions, not guessed mutation rewards.
+        refutations=source_refutation_episodes(
+            source,certified_memory,certified_memory.runner,
+            max_per_teacher=2)
+        if len(refutations)<2:
+            raise ValueError("no SOURCE-falsified method repair episodes")
     torch,Model,Tokenizer=_dependencies()
     try:
         from peft import LoraConfig,get_peft_model
@@ -216,6 +227,10 @@ def finetune_source_policy(
         prompt=(contextual_training_prompt(row,certified_memory)
                 if contextual_methods else source_discovery_prompt(teacher_pairs))
         completion=row["program"]+tokenizer.eos_token
+        if source_refutation_training and step%2==1:
+            repair=refutations[(step//2)%len(refutations)]
+            prompt=repair["prompt"]
+            completion=repair["program"]+tokenizer.eos_token
         full_ids,labels=model_training_ids(
             tokenizer,prompt,completion,max_length=1536)
         inputs=torch.tensor([full_ids],dtype=torch.long,device=device)
@@ -239,6 +254,13 @@ def finetune_source_policy(
         "prompt_contract":"source_discovery_prompt+chat_template.v1",
         "contextual_method_training":bool(contextual_methods),
         "leave_self_out_from_past_methods":bool(contextual_methods),
+        "source_counterexample_repair_training":bool(source_refutation_training),
+        "source_falsified_repair_episodes":len(refutations),
+        "repair_teacher_sources":sorted({
+            x["original_source_id"] for x in refutations}),
+        "repair_witness_sha256":hashlib.sha256(
+            json.dumps([x["witness_sha256"] for x in refutations],
+                       sort_keys=True).encode()).hexdigest(),
         "source_sha256":source_sha,
         "source_programs":len(source),
         "docker_source_reverified":len(teacher_receipts),
@@ -263,10 +285,12 @@ if __name__=="__main__":
     p.add_argument("--steps",type=int,default=40)
     p.add_argument("--seed",type=int,default=1007)
     p.add_argument("--contextual-method-training",action="store_true")
+    p.add_argument("--source-refutation-training",action="store_true")
     args=p.parse_args()
     print(json.dumps(
         finetune_source_policy(
             args.sources,args.adapter_output,model_name=args.model,
             model_revision=args.model_revision,
             max_steps=args.steps,seed=args.seed,
-            contextual_methods=args.contextual_method_training),indent=2))
+            contextual_methods=args.contextual_method_training,
+            source_refutation_training=args.source_refutation_training),indent=2))
