@@ -741,3 +741,29 @@ class NeumannEngine:
                 control=self._q3_higher_order_method.program,
                 forbidden_target_inputs=forbidden_target_inputs,
                 known_classical=known_classical)
+
+
+    def invent_unknown_state_operator(
+            self, source_membership, *,
+            alphabet=("0", "1"), max_states=4,
+            independent_source_checks=(),
+            forbidden_target_words=(), known_classical=None,
+            max_queries=10000, max_source_ms=15000):
+        """Q3: generate a novel latent state machine from SOURCE observations.
+
+        No hidden states or transitions, successor examples, target gold,
+        or reference regex/arithmetical rules are passed to this learner.
+        The source contract assumes finite deterministic-state semantics
+        with an external state-count upper bound. If the assumption holds,
+        the induced minimal machine generalizes to arbitrary input length.
+        The finite SOURCE evidence alone cannot establish that assumption.
+        """
+        from .unknown_state_operator_inventor import (
+            UnknownStateOperatorInventor)
+        return UnknownStateOperatorInventor(
+            max_states=max_states,max_queries=max_queries,
+            max_source_ms=max_source_ms).invent(
+                source_membership,alphabet=alphabet,
+                independent_source_checks=independent_source_checks,
+                forbidden_target_words=forbidden_target_words,
+                known_classical=known_classical)
