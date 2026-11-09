@@ -168,7 +168,8 @@ def contextual_training_prompt(row, memory):
 def finetune_source_policy(
         source_jsonl,adapter_output,*,model_name=DEFAULT_MODEL,
         model_revision=None,max_steps=40,lr=0.00015,rank=4,seed=1007,
-        contextual_methods=False,source_refutation_training=False):
+        contextual_methods=False,source_refutation_training=False,
+        onpolicy_repair_episodes_path=None):
     """LoRA gradient update of generator weights on prior certified SOURCE.
 
     Does NOT train on target test answers or private reference programs.
@@ -178,8 +179,10 @@ def finetune_source_policy(
     if (not 1<=max_steps<=10000 or not 0<lr<=0.01 or
             not 1<=rank<=32):
         raise ValueError("bounded explicit training contract")
-    if source_refutation_training and not contextual_methods:
-        raise ValueError("self-refutation requires common method-context training")
+    if (source_refutation_training or onpolicy_repair_episodes_path) and not contextual_methods:
+        raise ValueError("repair learning requires shared method-context training")
+    if source_refutation_training and onpolicy_repair_episodes_path:
+        raise ValueError("synthetic and on-policy curricula are distinct A/B controls")
     source,source_sha=source_training_rows(source_jsonl)
     if not source:
         raise ValueError("no independently source-certified programs to learn")
@@ -190,12 +193,21 @@ def finetune_source_policy(
     refutations=[]
     if source_refutation_training:
         from .q3_refutation_learning import source_refutation_episodes
-        # Real independent SOURCE executions, not guessed mutation rewards.
         refutations=source_refutation_episodes(
             source,certified_memory,certified_memory.runner,
             max_per_teacher=2)
         if len(refutations)<2:
-            raise ValueError("no SOURCE-falsified method repair episodes")
+            raise ValueError("no SOURCE-falsified AST mutation repair episodes")
+    if onpolicy_repair_episodes_path:
+        from .q3_onpolicy_repair import verify_onpolicy_episodes
+        raw=[
+            json.loads(line)
+            for line in Path(onpolicy_repair_episodes_path).open(
+                encoding="utf-8") if line.strip()]
+        refutations=verify_onpolicy_episodes(
+            source,certified_memory,certified_memory.runner,raw)
+        if len(refutations)<2:
+            raise ValueError("at least 2 real model-generated SOURCE failures required")
     torch,Model,Tokenizer=_dependencies()
     try:
         from peft import LoraConfig,get_peft_model
@@ -227,7 +239,7 @@ def finetune_source_policy(
         prompt=(contextual_training_prompt(row,certified_memory)
                 if contextual_methods else source_discovery_prompt(teacher_pairs))
         completion=row["program"]+tokenizer.eos_token
-        if source_refutation_training and step%2==1:
+        if (source_refutation_training or onpolicy_repair_episodes_path) and step%2==1:
             repair=refutations[(step//2)%len(refutations)]
             prompt=repair["prompt"]
             completion=repair["program"]+tokenizer.eos_token
@@ -254,8 +266,18 @@ def finetune_source_policy(
         "prompt_contract":"source_discovery_prompt+chat_template.v1",
         "contextual_method_training":bool(contextual_methods),
         "leave_self_out_from_past_methods":bool(contextual_methods),
-        "source_counterexample_repair_training":bool(source_refutation_training),
+        "source_counterexample_repair_training":bool(
+            source_refutation_training or onpolicy_repair_episodes_path),
+        "repair_negative_origin":(
+            "REAL_FROZEN_MODEL_GENERATION" if onpolicy_repair_episodes_path else
+            "SYNTHETIC_AST_MUTATION" if source_refutation_training else
+            "NONE"),
+        "model_generated_falsified_repairs":(
+            len(refutations) if onpolicy_repair_episodes_path else 0),
         "source_falsified_repair_episodes":len(refutations),
+        "onpolicy_source_file_sha256":(
+            hashlib.sha256(Path(onpolicy_repair_episodes_path).read_bytes()).hexdigest()
+            if onpolicy_repair_episodes_path else None),
         "repair_teacher_sources":sorted({
             x["original_source_id"] for x in refutations}),
         "repair_witness_sha256":hashlib.sha256(
@@ -286,6 +308,8 @@ if __name__=="__main__":
     p.add_argument("--seed",type=int,default=1007)
     p.add_argument("--contextual-method-training",action="store_true")
     p.add_argument("--source-refutation-training",action="store_true")
+    p.add_argument("--onpolicy-source-repairs",default=None,
+                   help="frozen model-generated SOURCE failures, independently recertified")
     args=p.parse_args()
     print(json.dumps(
         finetune_source_policy(
@@ -293,4 +317,5 @@ if __name__=="__main__":
             model_revision=args.model_revision,
             max_steps=args.steps,seed=args.seed,
             contextual_methods=args.contextual_method_training,
-            source_refutation_training=args.source_refutation_training),indent=2))
+            source_refutation_training=args.source_refutation_training,
+            onpolicy_repair_episodes_path=args.onpolicy_source_repairs),indent=2))
