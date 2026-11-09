@@ -22,7 +22,7 @@ from typing import Any
 
 from .open_program_inventor import (
     Discovery, GenerativeProgramInventor, IsolatedPython,
-    UnsafeProposal, validate_code,
+    UnsafeProposal, validate_code, source_same_value,
 )
 
 
@@ -100,7 +100,7 @@ class SourceMethodMemory:
         outcome = self.runner.evaluate(code, [x for x, _ in (*train, *checks)])
         if (outcome.status != "EXECUTED" or
                 len(outcome.outputs) != len(train) + len(checks) or
-                any(a != b for a, (_, b) in zip(
+                any(not source_same_value(a,b) for a, (_, b) in zip(
                     outcome.outputs, (*train, *checks)))):
             raise UnsafeProposal("prior method not independently SOURCE-certified")
         row = CertifiedMethodEpisode(
@@ -195,7 +195,7 @@ class SourceMethodMemory:
             witness=None
             for got,err,(x,y) in zip(
                     trial.outputs,trial.errors,outcomes):
-                if err is None and got==y:
+                if err is None and source_same_value(got,y):
                     correct+=1
                 elif witness is None:
                     witness={"input":x,"expected":y,
