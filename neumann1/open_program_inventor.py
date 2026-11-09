@@ -23,6 +23,25 @@ import subprocess
 from time import perf_counter_ns
 from .q3_prompt_contract import source_discovery_prompt, source_revision_prompt
 
+def source_same_value(actual, expected):
+    """Type-respecting original JSON semantics, not Python bool/int coercion.
+
+    Python considers 0 == False and 1 == True. Independent SOURCE verification
+    must not count either as an exact original-author answer. JSON arrays and
+    nested objects use the identical canonical value representation used for
+    frozen task receipts. Invalid/unserializable outputs fail closed.
+    """
+    try:
+        return json.dumps(
+            actual,sort_keys=True,separators=(",",":"),
+            ensure_ascii=True,allow_nan=False
+        )==json.dumps(
+            expected,sort_keys=True,separators=(",",":"),
+            ensure_ascii=True,allow_nan=False)
+    except (TypeError,ValueError,OverflowError):
+        return False
+
+
 OPS=(
     ast.Module,ast.FunctionDef,ast.arguments,ast.arg,ast.Return,ast.Assign,
     ast.AugAssign,ast.Expr,ast.If,ast.For,ast.While,ast.Break,ast.Continue,
@@ -367,7 +386,7 @@ class GenerativeProgramInventor:
             source_executed=result.status in (
                 "EXECUTED","EXECUTED_WITH_ERRORS")
             correct=sum(
-                source_executed and error is None and got==y
+                source_executed and error is None and source_same_value(got,y)
                 for got,error,(_,y) in zip(
                     result.outputs,result.errors,train))
             if not self.rich_runtime_feedback and result.status=="EXECUTED_WITH_ERRORS":
@@ -376,7 +395,7 @@ class GenerativeProgramInventor:
             if correct==len(train):
                 final=self.runner.evaluate(code,[x for x,y in checks])
                 if final.status=="EXECUTED" and all(
-                        got==y for got,(_,y) in zip(final.outputs,checks)):
+                        source_same_value(got,y) for got,(_,y) in zip(final.outputs,checks)):
                     return Discovery("SOURCE_VERIFIED_OPEN_PROGRAM",code,sha,
                                      tuple(receipts),len(checks),True)
                 # A failed disjoint SOURCE verifier is a SOURCE label, not
@@ -390,7 +409,7 @@ class GenerativeProgramInventor:
                     witness=[]
                     for got,error,(x,y) in zip(
                             final.outputs,final.errors,checks):
-                        if error is not None or got!=y:
+                        if error is not None or not source_same_value(got,y):
                             witness.append({
                                 "source_input":x,
                                 "source_expected":y,
@@ -411,7 +430,7 @@ class GenerativeProgramInventor:
                             errors.append({
                                 "input":x,"expected":y,
                                 "runtime_failure":error})
-                        elif got!=y:
+                        elif not source_same_value(got,y):
                             errors.append({
                                 "input":x,"expected":y,"got":got})
                 else:
