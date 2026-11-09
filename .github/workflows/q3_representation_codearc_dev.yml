@@ -1,0 +1,92 @@
+name: Q3 Generic Representation DEV - Already Exposed CodeARC Original Author
+on:
+  push:
+    branches:
+      - research/q3-representation-invention-cross-type-20261110
+    paths:
+      - ".github/workflows/q3_representation_codearc_dev.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  same_author_source_development_only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install one common core and actual independent Docker SOURCE verifier
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          docker pull python:3.11-alpine
+          python -m pytest -q -x tests/test_q3_structure_factorization.py
+      - name: Preserve exact old 8 author-original SOURCE IDs, seven past SOURCE teachers
+        run: |
+          set -euo pipefail
+          mkdir -p previous frozen evidence score
+          gh run download 42593621076 \
+            --name Q3-REAL-WEIGHT-LEARNING-ORIGINAL-SOURCE-BLIND \
+            --dir previous
+          python -m research.q3.q3_structural_original_gate freeze-codearc \
+            --original previous/BLIND.json --out frozen/BLIND.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("frozen/BLIND.json").read_text())
+          assert d["origin"]=="codearc"
+          assert d["scope"]=="POSTFIRST_ALREADY_EXPOSED"
+          assert [r["id"] for r in d["records"]]==[
+              "255","921","184","116","128","897","573","103"]
+          print("Q3_FIXED_EXPOSED_CODEARC_DEV_REGISTRY",
+                len(d["records"]),flush=True)
+          PY
+      - name: Same cost and source-only data A uniform B memorized C cross-type learned factorization
+        run: |
+          set -euo pipefail
+          python -m research.q3.q3_structural_original_gate infer \
+            --blind frozen/BLIND.json \
+            --teachers previous/SOURCE_TEACHERS.jsonl \
+            --out evidence/PREDICTIONS.json
+          sha256sum evidence/PREDICTIONS.json > evidence/PREDICTIONS.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("evidence/PREDICTIONS.json").read_text())
+          assert p["target_gold_accessed"] is False
+          for r in p["records"]:
+              print("Q3_REPRESENTATION_CODEARC_DEV_SOURCE",
+                    r["id"],{k:{"program":v["program"],
+                                "source_pass":v["source_verified"]}
+                             for k,v in r["arms"].items()},flush=True)
+          PY
+      - name: AFTER SHA freeze compare already exposed external author answers
+        run: |
+          set -euo pipefail
+          mkdir -p original
+          curl -fL --retry 3 --silent --show-error \
+            https://huggingface.co/datasets/anjiangwei/CodeARC-Invocations/resolve/119512573bf96148cbb95e99cf7cdd21c06153e4/invocations.jsonl \
+            -o original/invocations.jsonl
+          SHA="$(cut -d ' ' -f1 evidence/PREDICTIONS.sha256)"
+          python -m research.q3.q3_structural_original_gate score \
+            --blind frozen/BLIND.json \
+            --predictions evidence/PREDICTIONS.json \
+            --expected-sha "$SHA" \
+            --original original/invocations.jsonl \
+            --out score/EXPOSED_DEV_SCORE.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Q3-GENERIC-REPRESENTATION-OLD-CODEARC-DEV
+          path: |
+            evidence/
+            score/
+          if-no-files-found: warn
+          retention-days: 90
