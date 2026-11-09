@@ -28,6 +28,7 @@ from typing import Any, Iterable
 
 from .open_program_inventor import source_same_value, validate_code
 from .q3_structure_factorization import induce_structural_factors
+from .q3_object_graph_invention import induce_object_graph_factors
 
 _INVALID = object()
 
@@ -308,8 +309,14 @@ class StructuralInventionPolicy:
         # Induce the missing intermediate structure from SOURCE before
         # guessing whole-array scalar expressions. One generic JSON-tree
         # factorizer, not a separate ARC/list/string task solver.
-        factors=induce_structural_factors(
-            source_pairs,max_candidates=self.max_candidates)
+        factors=list(induce_structural_factors(
+            source_pairs,max_candidates=self.max_candidates))
+        # A general graph correspondence representation is attempted on
+        # each valid SOURCE topology. It never handles a named benchmark
+        # differently and is open to unlearned A on identical terms.
+        factors.extend(induce_object_graph_factors(
+            source_pairs,max_candidates=self.max_candidates))
+        factors.sort(key=lambda f:(f.description_length,f.representation))
         pool: list[Candidate] = []
         observed: dict[tuple[str, ...], Candidate] = {}
         exact: list[Candidate] = []
