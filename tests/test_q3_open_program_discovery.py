@@ -85,3 +85,45 @@ def test_no_unverified_model_outputs_promoted_into_training(tmp_path):
     source.write_text(json.dumps(example)+"\n")
     with pytest.raises(ValueError,match="tampered"):
         source_training_rows(source)
+
+
+def test_executable_model_code_is_not_discarded_for_harmless_wrapper():
+    candidate=(
+        "Here is the implementation:\n"
+        "def transform(x):\n"
+        "    if isinstance(x, list):\n"
+        "        return sum(x)\n"
+        "    return x\n"
+        "\nThis concludes the answer.")
+    extracted=validate_code(candidate)
+    assert extracted.startswith("def transform(x):")
+    assert "This concludes" not in extracted
+
+
+def test_recursive_pure_helper_remains_in_isolated_runtime():
+    candidate=(
+        "def transform(x):\n"
+        "    def walk(seq):\n"
+        "        if not seq:\n"
+        "            return 0\n"
+        "        return seq[0] + walk(seq[1:])\n"
+        "    return walk(x)")
+    outcome=IsolatedPython(max_seconds=12).evaluate(
+        candidate,[[2,5,7],[1,3,9]])
+    assert outcome.status=="EXECUTED",outcome
+    assert outcome.outputs==(14,13)
+
+
+def test_preflight_refutation_is_given_to_generator_without_target_gold():
+    bad="def transform(x):\n    return open('secret')"
+    correct="def transform(x):\n    return x"
+    policy=ScriptedSourcePolicy((bad,correct))
+    result=GenerativeProgramInventor(
+        policy,IsolatedPython(max_seconds=12),max_proposals=2
+    ).discover(
+        [([1,2],[1,2])],
+        independent_source_checks=[([5,6],[5,6])])
+    assert result.verified and result.program==correct
+    assert len(result.attempts)==2
+    assert result.attempts[0].status=="REJECTED"
+    assert "unknown builtin or helper" in policy.prompts[1]
