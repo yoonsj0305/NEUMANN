@@ -117,7 +117,7 @@ class SourceMethodMemory:
         witnesses must be re-executed on the same independent executor.
         """
         inserted = []
-        for idx, row in enumerate(rows):
+        for row in rows:
             if (row.get("schema") !=
                     "NEUMANN.Q3.PROGRAM-SOURCE-TEACHER.v1" or
                     row.get("provenance") != "ORIGINAL_SOURCE_ONLY" or
@@ -176,7 +176,6 @@ class SourceMethodMemory:
 @dataclass(frozen=True)
 class CoreOutcome:
     discovery: Discovery
-    method_memory_count: int
     source_context_sha256: str
 
 
@@ -214,7 +213,6 @@ class SingleDiscoveryCore:
                 method_context=context)
         return CoreOutcome(
             discovery=proposal,
-            method_memory_count=(len(self.memory.episodes) if context else 0),
             source_context_sha256=sha256(context.encode()).hexdigest(),
         )
 
