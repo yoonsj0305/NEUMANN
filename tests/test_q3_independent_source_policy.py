@@ -44,3 +44,19 @@ def test_frozen_uniform_policy_does_not_learn():
     p.learn("transfer",6,6,source_total=6,
             independent_verified=True)
     assert p.updates==0 and not p.weights
+
+
+def test_policy_freeze_retains_learned_rank_without_test_updates():
+    p=SourcePolicyLearner(adapt=True)
+    p.learn("valid",6,6,source_total=6,independent_verified=True)
+    p.learn("invalid",6,6,source_total=6,independent_verified=False)
+    variants=[
+        ("valid", "def transform(x):\\n    return x[0]"),
+        ("invalid", "def transform(x):\\n    return x[1]"),
+    ]
+    prior=p.rank(variants)
+    before=(dict(p.weights),p.updates)
+    p.freeze()
+    p.learn("valid",6,6,source_total=6,independent_verified=False)
+    assert (p.weights,p.updates)==before
+    assert p.rank(variants)==prior
