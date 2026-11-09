@@ -801,3 +801,21 @@ class RegistryEngine:
                 control=self._q3_higher_order_method.program,
                 forbidden_target_inputs=forbidden_target_inputs,
                 known_classical=known_classical)
+
+
+    def invent_topological_region_operator(
+            self, source_examples, independent_source_checks, *,
+            known_classical=(), max_source_ms=1500):
+        """Q3: infer dual foreground/empty-face ontology from independent SOURCE.
+
+        Old object grammars are not enough when output depends on the
+        connectivity/rank of EMPTY regions. The new runnable face operator
+        is induced from source effects, not from ARC task IDs or target gold.
+        It fails closed for unknown roles and preserves old classical-first.
+        """
+        from .topological_region_inventor import TopologicalRegionInventor
+        return TopologicalRegionInventor(
+            max_source_ms=max_source_ms).invent(
+                source_examples,
+                independent_source_checks=independent_source_checks,
+                known_classical=known_classical)
