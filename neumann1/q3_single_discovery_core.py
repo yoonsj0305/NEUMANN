@@ -76,6 +76,10 @@ class SourceMethodMemory:
     def freeze(self):
         self._frozen = True
 
+    @property
+    def frozen(self):
+        return self._frozen
+
     def admit(self, source_id, train, checks, program):
         """Recertify both SOURCE partitions in locked executor, fail closed."""
         if self._frozen:
@@ -125,7 +129,10 @@ class SourceMethodMemory:
             if (not isinstance(program, str) or
                     sha256(program.encode()).hexdigest() != row.get("sha256")):
                 raise ValueError("teacher code SHA mismatch")
-            source_id = str(row.get("original_id", idx))
+            original_id = row.get("original_id", row.get("source_id"))
+            if not isinstance(original_id, (str, int)) or not str(original_id):
+                raise ValueError("teacher missing original source identity")
+            source_id = str(original_id)
             items = row["pairs"]
             k = row["independent_checks"]
             inserted.append(self.admit(
@@ -171,7 +178,7 @@ class CoreOutcome:
     discovery: Discovery
     method_memory_count: int
     source_context_sha256: str
-    status: str
+
 
 
 class SingleDiscoveryCore:
@@ -194,7 +201,7 @@ class SingleDiscoveryCore:
         self.max_proposals = max_proposals
 
     def discover(self, source_pairs, independent_source_checks, *,
-                 excluded_source_ids=(), reuse_memory=True):
+                 excluded_source_ids=(), reuse_memory=False):
         train = tuple((x, y) for x, y in source_pairs)
         checks = tuple((x, y) for x, y in independent_source_checks)
         _check_pairs(train, checks)
@@ -207,9 +214,8 @@ class SingleDiscoveryCore:
                 method_context=context)
         return CoreOutcome(
             discovery=proposal,
-            method_memory_count=(len(self.memory.episodes) if reuse_memory else 0),
+            method_memory_count=(len(self.memory.episodes) if context else 0),
             source_context_sha256=sha256(context.encode()).hexdigest(),
-            status=proposal.status,
         )
 
     def learn_from_verified_source(self, source_id, train, checks, outcome):
@@ -218,3 +224,43 @@ class SingleDiscoveryCore:
             raise UnsafeProposal("cannot learn from unverified candidate")
         return self.memory.admit(
             source_id, train, checks, outcome.discovery.program)
+
+
+def invent_open_program_for_engine(
+        engine, source_pairs, independent_source_checks, *,
+        proposal_policy, runner=None, max_proposals=8,
+        method_memory=None, reuse_memory=False,
+        source_identity=None, excluded_source_ids=()):
+    """ONE production Q3 interface used without code forks by both engines.
+
+    There is no eager persistent method memory, auto-retrieval or family
+    dispatch. Reuse is an explicit experimental intervention (B/C), not a
+    default claim that two arbitrary past programs aid a new unknown task.
+    """
+    runtime = runner if runner is not None else IsolatedPython()
+    memory = method_memory
+    if memory is None and (reuse_memory or source_identity is not None):
+        memory = getattr(engine, "_q3_single_method_memory", None)
+        if memory is None:
+            memory = SourceMethodMemory(runtime)
+            engine._q3_single_method_memory = memory
+    if memory is not None and source_identity is not None:
+        if memory.frozen:
+            raise ValueError("frozen holdout memory cannot accept new episodes")
+        if any(
+                e.source_id == str(source_identity) or
+                e.source_id.endswith("/" + str(source_identity))
+                for e in memory.episodes):
+            raise ValueError("source identity already present in method memory")
+    core = SingleDiscoveryCore(
+        proposal_policy, runtime, memory=memory,
+        max_proposals=max_proposals)
+    result = core.discover(
+        source_pairs, independent_source_checks,
+        reuse_memory=reuse_memory,
+        excluded_source_ids=excluded_source_ids)
+    if source_identity is not None and result.discovery.verified:
+        core.learn_from_verified_source(
+            str(source_identity), source_pairs,
+            independent_source_checks, result)
+    return result.discovery
