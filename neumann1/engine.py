@@ -784,3 +784,54 @@ class NeumannEngine:
             name, invented_program,
             independent_source_checks=independent_source_checks)
         return name
+
+
+    def invent_unbounded_counter_operator(
+            self, source_membership, *,
+            alphabet=("a","b"), max_source_length=8,
+            verification_queries=256, forbidden_target_words=()):
+        """Q3: synthesize a genuinely unbounded latent numeric state from I/O.
+
+        Count weights, prefix invariants, and symbolic temporal order
+        constraints are generated and SOURCE verified, not supplied as a
+        complete solution program. The typed counter grammar is supplied.
+        """
+        from .unbounded_counter_inventor import UnboundedCounterInventor
+        return UnboundedCounterInventor(
+            max_source_length=max_source_length,
+            verification_queries=verification_queries).invent(
+            source_membership,alphabet=alphabet,
+            forbidden_target_words=forbidden_target_words)
+
+    def invent_representation_class_adaptive(
+            self, source_membership, *,
+            alphabet, max_dfa_states=4, max_source_length=8,
+            forbidden_target_words=()):
+        """Q3: SOURCE-falsify bounded DFA representation and grow counter state.
+
+        This chooses between two human-specified mathematical metalanguages,
+        never a target task family label or target output. If neither is
+        source sufficient, ABSTAIN.
+        """
+        from .unbounded_counter_inventor import AdaptiveStateLanguageInventor
+        return AdaptiveStateLanguageInventor(
+            max_dfa_states=max_dfa_states,
+            max_source_length=max_source_length).invent(
+            source_membership,alphabet=alphabet,
+            forbidden_target_words=forbidden_target_words)
+
+
+    def promote_unbounded_counter_operator(
+            self,name,invented_program,*,independent_source_checks):
+        """Add source-derived unbounded counter semantics to actual synthesis DSL.
+
+        The learned instruction is reusable on future program tasks.
+        Conditional source evidence is not promoted to a universal theorem.
+        """
+        from .induced_grammar import GrammarInventor
+        if not hasattr(self,"_invented_grammar"):
+            self._invented_grammar=GrammarInventor()
+        self._invented_grammar.register_source_invented_counter_operator(
+            name,invented_program,
+            independent_source_checks=independent_source_checks)
+        return name
