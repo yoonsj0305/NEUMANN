@@ -89,7 +89,7 @@ def all_originals(path):
     return corpus
 
 
-def prepare(original,blind,n):
+def prepare(original,blind,n,offset=0):
     corpus=all_originals(original)
     eligible=[]
     for pid,rows in corpus.items():
@@ -107,19 +107,21 @@ def prepare(original,blind,n):
         eligible.append((pid,source,input_only))
     eligible.sort(key=lambda row:sha256(
         (SALT+"/"+str(row[0])).encode()).hexdigest())
-    if len(eligible)<n:raise ValueError("too few parseable original tasks")
-    selected=eligible[:n]
-    # Index 0..7 were scored in the 0.5B feedback study. Identities
-    # 8..15 are selected BEFORE any holdout gold is opened in this run.
-    # CodeARC is still POSTFIRST for the project as a whole.
+    if offset<0 or len(eligible)<offset+n:
+        raise ValueError("fresh cohort slice out of available range")
+    selected=eligible[offset:offset+n]
+    # 0..7 and 8..15 were already scored by earlier model studies;
+    # 16+ are selected as new source-only originals before scoring.
+    # CodeARC is POSTFIRST at the project level.
     # The original heldout OUTPUT strings are never copied or parsed here.
     clean={"schema":"NEUMANN.Q3.NEURAL.CODEARC.BLIND.v1",
            "original_sha256":_sha(original),
            "dataset_revision":DATA_REV,
            "salt":SALT,"selected":len(selected),
            "records":[{"id":pid,"source":source,"target_inputs":inputs,
-                       "cohort":("PRIOR_0P5B_EXPOSED" if idx<8
-                                 else "NEW_1P5B_POSTFIRST")}
+                       "cohort":("PRIOR_0P5B_EXPOSED" if offset+idx<8
+                                 else "NEW_1P5B_POSTFIRST" if offset+idx<16
+                                 else "NEW_SYNTAX_POSTFIRST")}
                       for idx,(pid,source,inputs) in enumerate(selected)]}
     blind.write_text(json.dumps(clean,separators=(",",":"))+"\n")
     print("Q3_MODEL_BLIND_PREPARED",len(selected),_sha(blind))
@@ -258,7 +260,8 @@ def score(original,predictions,expected_sha,out):
                     e["typed_feedback_new_residual"] for e in entries
                     if e["cohort"]==name)}
             for name in ("PRIOR_0P5B_EXPOSED",
-                         "NEW_1P5B_POSTFIRST")}}
+                         "NEW_1P5B_POSTFIRST",
+                         "NEW_SYNTAX_POSTFIRST")}}
     out.write_text(json.dumps(
         {"summary":summary,"records":entries},indent=2)+"\n")
     print("Q3_MODEL_EXTERNAL_SCORE",json.dumps(summary,sort_keys=True))
@@ -271,6 +274,7 @@ if __name__=="__main__":
     a.add_argument("--original",type=Path,required=True)
     a.add_argument("--blind",type=Path,required=True)
     a.add_argument("--n",type=int,default=N)
+    a.add_argument("--offset",type=int,default=0)
     a=commands.add_parser("propose")
     a.add_argument("--blind",type=Path,required=True)
     a.add_argument("--output",type=Path,required=True)
@@ -282,7 +286,8 @@ if __name__=="__main__":
     a.add_argument("--expected-sha",required=True)
     a.add_argument("--output",type=Path,required=True)
     args=p.parse_args()
-    if args.cmd=="prepare":prepare(args.original,args.blind,args.n)
+    if args.cmd=="prepare":
+        prepare(args.original,args.blind,args.n,args.offset)
     elif args.cmd=="propose":propose(
         args.blind,args.output,model_revision=args.model_revision,
         proposals=args.proposals)
