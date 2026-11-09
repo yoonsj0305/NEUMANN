@@ -202,10 +202,23 @@ class SourcePolicyLearner:
             return (-estimate,_complexity(src),action,src)
         return sorted(variants,key=score)
 
-    def learn(self,action,old_fit,new_fit):
-        if not self.adapt:return
-        delta=new_fit-old_fit
-        self.weights[action]=0.85*self.weights.get(action,0)+0.15*delta
+    def learn(self,action,old_fit,new_fit,*,source_total=1,
+              independent_verified=None,source_executed=True):
+        """Update from genuine disjoint SOURCE evidence, not train fit alone.
+
+        A training-fit gain is a weak search hint (bounded by 0.1); passing
+        or failing independent SOURCE dominates that hint by 10x. Missing
+        oracle/sandbox evidence is never counted as a failed generalization.
+        This is a prior over useful edits, NOT a guarantee on TARGET data.
+        """
+        if not self.adapt or not source_executed:return
+        if not 1<=source_total<=32:
+            raise ValueError("bounded source_total required")
+        progress=(new_fit-old_fit)/source_total
+        evidence=(1.0 if independent_verified is True
+                  else -1.0 if independent_verified is False else 0.0)
+        reward=0.1*progress+evidence
+        self.weights[action]=0.85*self.weights.get(action,0.0)+0.15*reward
         self.updates+=1
 
 
@@ -287,13 +300,20 @@ class SourceProgramReviser:
                         for expected,got,err in zip(
                             outputs,result.outputs,result.errors))
                 maxfit=max(maxfit,changed)
-                self.policy.learn(action,fit,changed)
-                if changed<len(tr):continue
-                cv=self.runner.evaluate(
-                    candidate,[x for x,y in checks])
-                if cv.status!="EXECUTED" or not all(
-                        got==y for got,(_,y) in zip(cv.outputs,checks)):
-                    continue
+                independent_verified=None
+                if changed==len(tr):
+                    cv=self.runner.evaluate(
+                        candidate,[x for x,y in checks])
+                    if cv.status=="EXECUTED":
+                        independent_verified=all(
+                            got==y for got,(_,y) in zip(cv.outputs,checks))
+                    # A sandbox failure is UNKNOWN, not a negative label.
+                self.policy.learn(
+                    action,fit,changed,source_total=len(tr),
+                    independent_verified=independent_verified,
+                    source_executed=result.status in (
+                        "EXECUTED","EXECUTED_WITH_ERRORS"))
+                if independent_verified is not True:continue
                 cost=_complexity(candidate)
                 if best_cost is None or cost<best_cost:
                     verified=candidate
