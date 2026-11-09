@@ -1,0 +1,96 @@
+name: Q3 Real Neural Weight Learning vs Pretrained Original Author
+on:
+  pull_request:
+    paths:
+      - "neumann1/q3_prompt_contract.py"
+      - "neumann1/q3_trainable_code_policy.py"
+      - "neumann1/open_program_inventor.py"
+      - "research/q3/q3_real_source_teacher_builder.py"
+      - "research/q3/q3_score_neural_adaptation.py"
+      - "research/q3/q3_open_neural_codearc_postfirst.py"
+      - "tests/test_q3_neural_gradient_contract.py"
+      - ".github/workflows/q3_real_neural_weight_learning.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  weight-updated-original-blind:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "2"
+      OPENBLAS_NUM_THREADS: "2"
+      MKL_NUM_THREADS: "2"
+      TOKENIZERS_PARALLELISM: "false"
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      HF_HUB_DOWNLOAD_TIMEOUT: "180"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Pin original author dataset and same-model pretrained weights
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-original Q3-NEURAL-META
+          curl --fail --location --retry 3 --silent --show-error             "https://huggingface.co/datasets/anjiangwei/CodeARC-Invocations/resolve/119512573bf96148cbb95e99cf7cdd21c06153e4/invocations.jsonl"             -o /tmp/q3-original/invocations.jsonl
+          MODEL=https://huggingface.co/Qwen/Qwen2.5-Coder-0.5B-Instruct
+          git ls-remote "$MODEL" HEAD | awk '{print $1}' > Q3-NEURAL-META/MODEL_REVISION.txt
+          test "$(wc -c < Q3-NEURAL-META/MODEL_REVISION.txt)" -eq 41
+          sha256sum /tmp/q3-original/invocations.jsonl > Q3-NEURAL-META/DATASET_SHA256.txt
+      - name: Install CPU-only source-verifier and real gradient learner
+        run: |
+          python -m pip install -e .
+          python -m pip install --index-url https://download.pytorch.org/whl/cpu 'torch==2.5.1'
+          python -m pip install 'transformers==4.48.3' 'peft==0.14.0' 'accelerate==1.3.0' pytest sentencepiece
+          docker pull python:3.11-alpine
+      - name: Validate train-infer prompt and source teacher contracts
+        run: |
+          python -m pytest -q -x tests/test_q3_neural_gradient_contract.py tests/test_q3_open_program_discovery.py
+      - name: Freeze heldout ORIGINAL inputs before source teacher collection
+        run: |
+          python research/q3/q3_open_neural_codearc_postfirst.py prepare             --original /tmp/q3-original/invocations.jsonl             --blind Q3-NEURAL-META/BLIND.json --n 8 --offset 80
+      - name: Download prior immutable generated SOURCE programs, not original solutions
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/prior1 /tmp/prior2 /tmp/prior3
+          gh run download 42560914319             --name Q3-NEURAL-CODEARC-POSTFIRST-REAL-MODEL             --dir /tmp/prior1
+          gh run download 42567509069             --name Q3-NEURAL-CODEARC-POSTFIRST-REAL-MODEL             --dir /tmp/prior2
+          gh run download 42585323888             --name Q3-NEURAL-CODEARC-POSTFIRST-INDEPENDENT-SOURCE-REWARD-64             --dir /tmp/prior3
+          ls -l /tmp/prior{1,2,3}/BLIND.json
+      - name: Docker recertify all SOURCE teachers and exclude heldout originals
+        run: |
+          python research/q3/q3_real_source_teacher_builder.py             --prior /tmp/prior1 /tmp/prior2 /tmp/prior3             --holdout-blind Q3-NEURAL-META/BLIND.json             --output Q3-NEURAL-META/SOURCE_TEACHERS.jsonl
+      - name: ACTUALLY UPDATE open model neural weights using SOURCE-only LoRA
+        run: |
+          REV="$(cat Q3-NEURAL-META/MODEL_REVISION.txt)"
+          python -m neumann1.q3_trainable_code_policy             --sources Q3-NEURAL-META/SOURCE_TEACHERS.jsonl             --adapter-output Q3-NEURAL-META/adapter             --model Qwen/Qwen2.5-Coder-0.5B-Instruct             --model-revision "$REV" --steps 6
+      - name: Predict same 8 original holdouts with identical pretrained model, freeze
+        run: |
+          REV="$(cat Q3-NEURAL-META/MODEL_REVISION.txt)"
+          python research/q3/q3_open_neural_codearc_postfirst.py propose             --blind Q3-NEURAL-META/BLIND.json             --output Q3-NEURAL-META/BASE_PREDICTIONS.json             --model Qwen/Qwen2.5-Coder-0.5B-Instruct             --model-revision "$REV" --proposals 2
+          sha256sum Q3-NEURAL-META/BASE_PREDICTIONS.json             > Q3-NEURAL-META/BASE_PREDICTIONS.sha256
+      - name: Predict with actual adapted neural model, same budget, freeze
+        run: |
+          REV="$(cat Q3-NEURAL-META/MODEL_REVISION.txt)"
+          python research/q3/q3_open_neural_codearc_postfirst.py propose             --blind Q3-NEURAL-META/BLIND.json             --output Q3-NEURAL-META/ADAPTED_PREDICTIONS.json             --model Qwen/Qwen2.5-Coder-0.5B-Instruct             --model-revision "$REV" --proposals 2             --adapter-path Q3-NEURAL-META/adapter
+          sha256sum Q3-NEURAL-META/ADAPTED_PREDICTIONS.json             > Q3-NEURAL-META/ADAPTED_PREDICTIONS.sha256
+      - name: ONLY NOW open true original withheld author outputs
+        run: |
+          BASE_SHA="$(cut -d' ' -f1 Q3-NEURAL-META/BASE_PREDICTIONS.sha256)"
+          ADAPTED_SHA="$(cut -d' ' -f1 Q3-NEURAL-META/ADAPTED_PREDICTIONS.sha256)"
+          python research/q3/q3_open_neural_codearc_postfirst.py score             --original /tmp/q3-original/invocations.jsonl             --predictions Q3-NEURAL-META/BASE_PREDICTIONS.json             --expected-sha "$BASE_SHA"             --output Q3-NEURAL-META/BASE_SCORE.json
+          python research/q3/q3_open_neural_codearc_postfirst.py score             --original /tmp/q3-original/invocations.jsonl             --predictions Q3-NEURAL-META/ADAPTED_PREDICTIONS.json             --expected-sha "$ADAPTED_SHA"             --output Q3-NEURAL-META/ADAPTED_SCORE.json
+          python research/q3/q3_score_neural_adaptation.py             --base-score Q3-NEURAL-META/BASE_SCORE.json             --adapted-score Q3-NEURAL-META/ADAPTED_SCORE.json             --base-predictions Q3-NEURAL-META/BASE_PREDICTIONS.json             --adapted-predictions Q3-NEURAL-META/ADAPTED_PREDICTIONS.json             --teachers Q3-NEURAL-META/SOURCE_TEACHERS.jsonl             --output Q3-NEURAL-META/ORIGINAL_CAUSAL_COMPARISON.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Q3-REAL-WEIGHT-LEARNING-ORIGINAL-SOURCE-BLIND
+          path: Q3-NEURAL-META/
+          if-no-files-found: warn
+          retention-days: 90
