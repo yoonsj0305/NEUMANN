@@ -22,7 +22,7 @@ import sys
 
 from neumann1.active_oracle_challenges import choose_probes, perturb_inputs
 from neumann1.open_program_inventor import IsolatedPython
-from research.q3.pinned_author_function_oracle import AuthorFunctionOracle
+from pinned_author_function_oracle import AuthorFunctionOracle
 
 
 # Original development SOURCE observations, fixed from the previous frozen
