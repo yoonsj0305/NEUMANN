@@ -67,9 +67,14 @@ class LocalCausalCodePolicy:
 
     def propose(self,prompt):
         rendered=model_prefix(self.tokenizer,prompt)
+        # Never silently delete original SOURCE evidence to fit a model:
+        # abstain if memory+problem cannot fit the actual prompt budget.
         tokens=self.tokenizer(
             rendered,return_tensors="pt",add_special_tokens=False,
-            truncation=True,max_length=1536).to(self.device)
+            truncation=False)
+        if tokens["input_ids"].shape[1] > 1536:
+            raise ValueError("SOURCE_PROMPT_EXCEEDS_CONTEXT:ABSTAIN")
+        tokens=tokens.to(self.device)
         # Source-prompt-derived RNG makes first proposals IDENTICAL across
         # the opaque-error and typed-counterexample causal ablations.
         # Later prompts legitimately diverge only when feedback differs.
