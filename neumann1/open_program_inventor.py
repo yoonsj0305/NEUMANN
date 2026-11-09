@@ -75,6 +75,19 @@ def validate_code(text):
             if (lines[j].strip() and not lines[j].startswith((" ","\t","#"))):
                 b=j
                 break
+        # Explanatory natural-language text may be discarded, but actual
+        # top-level executable Python may NEVER be silently removed.
+        # This prevents stripping malicious "import os" or "raise ..."
+        # before/after an otherwise benign transform function.
+        for extra in ("\n".join(lines[:a]),"\n".join(lines[b:])):
+            if not extra.strip():
+                continue
+            try:
+                external=ast.parse(extra)
+            except SyntaxError:
+                continue  # non-code model commentary only
+            if external.body:
+                raise UnsafeProposal("unexpected executable source outside transform")
         code="\n".join(lines[a:b]).strip()
     try:
         tree=ast.parse(code)
