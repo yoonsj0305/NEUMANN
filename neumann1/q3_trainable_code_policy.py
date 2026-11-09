@@ -72,7 +72,7 @@ class LocalCausalCodePolicy:
         tokens=self.tokenizer(
             rendered,return_tensors="pt",add_special_tokens=False,
             truncation=False)
-        if tokens["input_ids"].shape[1] > 1536:
+        if tokens["input_ids"].shape[1] > 4096:
             raise ValueError("SOURCE_PROMPT_EXCEEDS_CONTEXT:ABSTAIN")
         tokens=tokens.to(self.device)
         # Source-prompt-derived RNG makes first proposals IDENTICAL across
