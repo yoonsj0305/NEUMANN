@@ -73,7 +73,7 @@ def test_neural_training_requires_reexecuted_independent_source_teachers():
         def evaluate(self,code,inputs):
             return SimpleNamespace(status="EXECUTED",
                                    outputs=tuple(x+1 for x in inputs))
-    program="def transform(x):\\n    return x + 1".replace("\\\\n","\\n")
+    program="def transform(x):" + chr(10) + "    return x + 1"
     teacher={
         "schema":"NEUMANN.Q3.PROGRAM-SOURCE-TEACHER.v1",
         "provenance":"ORIGINAL_SOURCE_ONLY",
