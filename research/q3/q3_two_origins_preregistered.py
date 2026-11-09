@@ -72,7 +72,7 @@ def _codearc_output(row):
 
 def codearc_corpus(original):
     corpus={}
-    for line in Path(original).read_text().splitlines():
+    for line in Path(original).open(encoding="utf-8"):
         if not line:continue
         row=json.loads(line)
         if row.get("type")!="annotated":continue
