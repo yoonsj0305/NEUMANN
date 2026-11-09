@@ -741,3 +741,25 @@ class NeumannEngine:
                 control=self._q3_higher_order_method.program,
                 forbidden_target_inputs=forbidden_target_inputs,
                 known_classical=known_classical)
+
+
+    def invent_from_raw_source_relations(
+            self, source_pairs, independent_source_checks, *,
+            classical_solvers=(), max_ms=2500, max_programs=2):
+        """Q3: bootstrap an executable new operator directly from raw SOURCE.
+
+        No existing solved program is required. Invent shape and element
+        correspondence ASTs, reject them against independent source data,
+        and keep successful executable macros for later source-verified reuse.
+        The typed arithmetic bytecode remains an explicitly bounded prior.
+        """
+        from .source_born_representation_inventor import (
+            SourceBornRepresentationInventor)
+        if not hasattr(self,"_source_born_inventor"):
+            self._source_born_inventor=SourceBornRepresentationInventor(
+                max_ms=max_ms)
+        return self._source_born_inventor.invent(
+            source_pairs,
+            independent_source_checks=independent_source_checks,
+            classical_solvers=classical_solvers,
+            max_programs=max_programs)
