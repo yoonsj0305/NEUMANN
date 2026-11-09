@@ -110,3 +110,28 @@ frontier generalization is still OPEN.
 
 Workflow and archived predictions:
 https://github.com/yoonsj0305/NEUMANN/actions/runs/42546939669
+
+
+## Higher-order experiment invention (source-only hypothesis disagreement)
+
+Additional production improvements on this branch preserve multiple executable
+source-fitting process hypotheses that differ on **unlabeled, generated SOURCE
+experiments**. They then synthesize a question maximizing pairwise
+terminal-prediction disagreement among the surviving hypotheses. The
+question generator does not access target labels or successor trajectories.
+Every SOURCE answer filters the executable hypothesis version space, and an
+answer falsifying the chosen process invokes a NEW AST synthesis.
+
+GitHub Actions 42547326943 proved this path was exercised:
+- 3 executable version hypotheses examined in the signed-integer study.
+- 1 source-oracle question with positive hypothesis disagreement.
+- 1 counterexample-driven transition AST revision.
+- 53 SOURCE terminal-oracle queries including ordinary verification.
+- All 12 targeted production/regression tests PASSED.
+
+This is a verified **bounded source-question-generation plus program revision**
+result. It does NOT imply the learner autonomously discovered its own primitive
+instruction semantics, uniquely recovered hidden state trajectories, or
+generalized to unseen independent-author mathematics.
+
+Evidence: https://github.com/yoonsj0305/NEUMANN/actions/runs/42547326943
