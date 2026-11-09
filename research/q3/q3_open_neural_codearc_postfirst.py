@@ -24,10 +24,10 @@ from neumann1.q3_trainable_code_policy import (
     LocalCausalCodePolicy,DEFAULT_MODEL)
 
 SALT="NEUMANN_Q3_OPEN_NEURAL_POSTFIRST_20261109_V1"
-MODEL=DEFAULT_MODEL
+MODEL="Qwen/Qwen2.5-Coder-1.5B-Instruct"
 DATA_REV="119512573bf96148cbb95e99cf7cdd21c06153e4"
 LABEL=re.compile(r"^Result\s+\d+\s*:\s?")
-N=4
+N=16
 
 
 def _sha(path):
@@ -109,16 +109,17 @@ def prepare(original,blind,n):
         (SALT+"/"+str(row[0])).encode()).hexdigest())
     if len(eligible)<n:raise ValueError("too few parseable original tasks")
     selected=eligible[:n]
-    # Index 0-3 were already exposed in the initial postfirst study.
-    # Remaining tasks are new for this specific feedback-causality test.
+    # Index 0..7 were scored in the 0.5B feedback study. Identities
+    # 8..15 are selected BEFORE any holdout gold is opened in this run.
+    # CodeARC is still POSTFIRST for the project as a whole.
     # The original heldout OUTPUT strings are never copied or parsed here.
     clean={"schema":"NEUMANN.Q3.NEURAL.CODEARC.BLIND.v1",
            "original_sha256":_sha(original),
            "dataset_revision":DATA_REV,
            "salt":SALT,"selected":len(selected),
            "records":[{"id":pid,"source":source,"target_inputs":inputs,
-                       "cohort":("PRIOR_EXPOSED_DEV" if idx<4
-                                 else "NEW_FOR_FEEDBACK_POSTFIRST")}
+                       "cohort":("PRIOR_0P5B_EXPOSED" if idx<8
+                                 else "NEW_1P5B_POSTFIRST")}
                       for idx,(pid,source,inputs) in enumerate(selected)]}
     blind.write_text(json.dumps(clean,separators=(",",":"))+"\n")
     print("Q3_MODEL_BLIND_PREPARED",len(selected),_sha(blind))
@@ -130,7 +131,7 @@ def propose(blind,out,*,model_revision,proposals=2):
         raise ValueError("not original blind source")
     model=LocalCausalCodePolicy(
         model_name=MODEL,model_revision=model_revision,
-        max_new_tokens=256,temperature=0.3)
+        max_new_tokens=384,temperature=0.3)
     sandbox=IsolatedPython(max_seconds=6)
     rows=[]
     for rec in data["records"]:
@@ -140,11 +141,13 @@ def propose(blind,out,*,model_revision,proposals=2):
         # differs between the two invention policies.
         legacy=GenerativeProgramInventor(
             model,sandbox,max_proposals=proposals,
-            rich_runtime_feedback=False).discover(
+            rich_runtime_feedback=False,
+            reveal_independent_counterexample=False).discover(
                 source[:6],independent_source_checks=(source[6],))
         discovery=GenerativeProgramInventor(
             model,sandbox,max_proposals=proposals,
-            rich_runtime_feedback=True).discover(
+            rich_runtime_feedback=True,
+            reveal_independent_counterexample=True).discover(
                 source[:6],independent_source_checks=(source[6],))
         if (legacy.attempts and discovery.attempts and
                 legacy.attempts[0].sha256!=discovery.attempts[0].sha256):
@@ -254,8 +257,8 @@ def score(original,predictions,expected_sha,out):
                 "typed_new":sum(
                     e["typed_feedback_new_residual"] for e in entries
                     if e["cohort"]==name)}
-            for name in ("PRIOR_EXPOSED_DEV",
-                         "NEW_FOR_FEEDBACK_POSTFIRST")}}
+            for name in ("PRIOR_0P5B_EXPOSED",
+                         "NEW_1P5B_POSTFIRST")}}
     out.write_text(json.dumps(
         {"summary":summary,"records":entries},indent=2)+"\n")
     print("Q3_MODEL_EXTERNAL_SCORE",json.dumps(summary,sort_keys=True))
