@@ -38,6 +38,10 @@ def file_sha(path):
 
 
 def _codearc_input(row):
+    # EXACT prior original CodeARC eligibility. Error-returned calls must
+    # never enter the source cohort or shift the frozen hash rank.
+    if row.get("errored") not in (False,0,"false","False"):
+        raise ValueError("original source function errored")
     expr=ast.parse(row["input"],mode="exec").body
     if len(expr)!=1 or not isinstance(expr[0],ast.Expr):
         raise ValueError("not an original codearc invocation")
@@ -93,7 +97,7 @@ def codearc_registry(corpus):
             source=[[_codearc_input(rows[i]),_codearc_output(rows[i])]
                     for i in range(7)]
             target=[_codearc_input(rows[i]) for i in (7,8,9)]
-            if len(canonical(source))>40000:continue
+            if len(json.dumps(source))>40000:continue
         except (SyntaxError,ValueError,TypeError,KeyError,IndexError):
             continue
         eligible.append((pid,source,target))
@@ -105,6 +109,12 @@ def codearc_registry(corpus):
     selected=eligible[CODEARC_OFFSET:CODEARC_OFFSET+SIZES["codearc"]]
     if len(selected)!=SIZES["codearc"]:
         raise ValueError("CodeARC original registry cannot be frozen")
+    # An earlier diagnostic (frozen #744, offset80..87) opened these IDs.
+    # The original-score registry must reproduce the prior eligibility
+    # exactly; otherwise a reused ID could masquerade as a new original.
+    prior_last={255,921,184,116,128,897,573,103}
+    if {pid for pid,_,_ in selected} & prior_last:
+        raise ValueError("HISTORICAL_ORIGINAL_OVERLAP: do not claim first")
     return [{"id":str(pid),"source":src,"target_inputs":dst}
             for pid,src,dst in selected]
 
