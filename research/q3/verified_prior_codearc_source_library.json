@@ -1,0 +1,168 @@
+{
+  "schema": "NEUMANN.Q3.INDEPENDENT.SOURCE.MACROS.v1",
+  "prior_artifact": "https://github.com/yoonsj0305/NEUMANN/actions/runs/42559144993/artifacts/13648534568",
+  "prior_frozen_sha": "83d760d8faf901102cd72dfec4909157880e4a612e1f81f4ac54b2cf4b51090a",
+  "records": [
+    {
+      "external_original_id": 611,
+      "program": "def transform(x):\n    return x[0] % x[1] == 0",
+      "program_sha256": "f8e13ffd115ebb0f8ad2220b7f2835311181ea8c637d93faf0c81fcc073104af",
+      "source_pairs": [
+        [
+          [
+            10,
+            2
+          ],
+          true
+        ],
+        [
+          [
+            15,
+            3
+          ],
+          true
+        ],
+        [
+          [
+            18,
+            7
+          ],
+          false
+        ],
+        [
+          [
+            21,
+            3
+          ],
+          true
+        ],
+        [
+          [
+            28,
+            14
+          ],
+          true
+        ],
+        [
+          [
+            30,
+            5
+          ],
+          true
+        ],
+        [
+          [
+            33,
+            11
+          ],
+          true
+        ]
+      ]
+    },
+    {
+      "external_original_id": 273,
+      "program": "def transform(x):\n    return x[::-1]",
+      "program_sha256": "45a2a440539ad1b2b91923e0da16060cbc3144142d31223925eca9d9ff055a4f",
+      "source_pairs": [
+        [
+          "hello",
+          "olleh"
+        ],
+        [
+          "world",
+          "dlrow"
+        ],
+        [
+          "python",
+          "nohtyp"
+        ],
+        [
+          "strings",
+          "sgnirts"
+        ],
+        [
+          "function",
+          "noitcnuf"
+        ],
+        [
+          "example",
+          "elpmaxe"
+        ],
+        [
+          "input",
+          "tupni"
+        ]
+      ]
+    },
+    {
+      "external_original_id": 817,
+      "program": "def transform(x):\n    return x[:x.find(',')]",
+      "program_sha256": "1d706266b4461cdbe730510bbb5ec845057bbd427968e332bbb78495acc311f2",
+      "source_pairs": [
+        [
+          "October 5, 2023, Thursday",
+          "October 5"
+        ],
+        [
+          "March 12, 2024, Tuesday",
+          "March 12"
+        ],
+        [
+          "January 1, 2020, Wednesday",
+          "January 1"
+        ],
+        [
+          "July 4, 1776, Thursday",
+          "July 4"
+        ],
+        [
+          "December 25, 2021, Saturday",
+          "December 25"
+        ],
+        [
+          "August 15, 1947, Friday",
+          "August 15"
+        ],
+        [
+          "November 11, 1918, Monday",
+          "November 11"
+        ]
+      ]
+    },
+    {
+      "external_original_id": 133,
+      "program": "def transform(x):\n    return '-'.join(reversed(x.split('-')))",
+      "program_sha256": "efbc1199e1a18318f36d610878599369e8584c3c3b9279b0404ac921792e2c5a",
+      "source_pairs": [
+        [
+          "2023-10-01",
+          "01-10-2023"
+        ],
+        [
+          "1999-12-25",
+          "25-12-1999"
+        ],
+        [
+          "2000-01-01",
+          "01-01-2000"
+        ],
+        [
+          "2021-09-15",
+          "15-09-2021"
+        ],
+        [
+          "1985-11-30",
+          "30-11-1985"
+        ],
+        [
+          "2010-07-04",
+          "04-07-2010"
+        ],
+        [
+          "1995-02-14",
+          "14-02-1995"
+        ]
+      ]
+    }
+  ]
+}
