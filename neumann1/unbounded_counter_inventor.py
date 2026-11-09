@@ -151,12 +151,12 @@ class UnboundedCounterInventor:
                 if type(label) is not int or label not in (0,1):
                     raise NoCounterRepresentation("ABSTAIN_SOURCE_NONBINARY")
                 observed[w]=label
-        except (ValueError,TypeError,KeyError,OverflowError) as e:
-            return CounterDiscovery("ABSTAIN_SOURCE_ORACLE",None,len(observed),
-                                    0,0,(perf_counter_ns()-start)/1e6)
         except NoCounterRepresentation as e:
             return CounterDiscovery(str(e),None,len(observed),0,0,
                                     (perf_counter_ns()-start)/1e6)
+        except (ValueError,TypeError,KeyError,OverflowError):
+            return CounterDiscovery("ABSTAIN_SOURCE_ORACLE",None,len(observed),
+                                    0,0,(perf_counter_ns()-start)/1e6)
         candidates=0
         counterexamples=0
         # Grammar atoms are count increments/decrements, a running-prefix
@@ -231,11 +231,24 @@ class AdaptiveStateLanguageInventor:
         # Independent SOURCE probes of longer words for falsifying the
         # conditional finite-state hypothesis.
         rng=Random(78431)
-        verification_words=tuple("".join(
+        verification_words=set("".join(
             rng.choice(alphabet)
             for _ in range(2*self.max_dfa_states+2+j%5))
-            for j in range(64))
-        long_checks=tuple((w,oracle(w)) for w in verification_words)
+            for j in range(160))
+        # Generic symmetry/order probes, generated without task labels.
+        # These are important for falsifying a spurious bounded DFA on
+        # rare positive, long structured words; random words alone can be
+        # almost entirely negative on many nonregular languages.
+        a,b=alphabet
+        for n in range(self.max_dfa_states,9):
+            verification_words.update((
+                a*n+b*n,b*n+a*n,(a+b)*n,(b+a)*n,
+                a*n+b*n+a*n+b*n,b*n+a*n+b*n+a*n))
+        verification_words={
+            w for w in verification_words if len(w)>2*self.max_dfa_states-1}
+        long_checks=tuple(
+            (w,oracle(w)) for w in sorted(
+                verification_words,key=lambda w:(len(w),w)))
         finite=UnknownStateOperatorInventor(
             max_states=self.max_dfa_states,max_queries=25000).invent(
             oracle,alphabet=alphabet,
