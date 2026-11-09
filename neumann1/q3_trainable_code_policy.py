@@ -32,14 +32,14 @@ def _dependencies():
 
 
 class LocalCausalCodePolicy:
-    def __init__(self,*,model_name=DEFAULT_MODEL,adapter_path=None,
-                 max_new_tokens=400,temperature=0.3):
+    def __init__(self,*,model_name=DEFAULT_MODEL,model_revision=None,
+                 adapter_path=None,max_new_tokens=400,temperature=0.3):
         if not 32<=max_new_tokens<=2048 or not 0<temperature<=1:
             raise ValueError("finite generation bounds required")
         torch,Model,Tokenizer=_dependencies()
         self.torch=torch
         self.tokenizer=Tokenizer.from_pretrained(
-            model_name,trust_remote_code=False)
+            model_name,trust_remote_code=False,revision=model_revision)
         self.model=Model.from_pretrained(
             model_name,trust_remote_code=False)
         if adapter_path is not None:
