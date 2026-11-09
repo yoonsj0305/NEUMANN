@@ -1,0 +1,42 @@
+name: Q3 Active Endpoint Source-First Frozen 800
+on:
+  pull_request:
+    paths:
+      - "neumann1/active_terminal_process_inventor.py"
+      - "neumann1/terminal_only_process_inventor.py"
+      - "research/q3/q3_active_terminal_frozen_first.py"
+      - ".github/workflows/q3_active_endpoint_frozen.yml"
+  workflow_dispatch:
+
+jobs:
+  frozen-propose-then-score:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -e .
+      - name: Source-only invention and 800 first target proposals
+        run: |
+          python -m research.q3.q3_active_terminal_frozen_first propose --output q3_active_frozen_800.json
+          sha256sum q3_active_frozen_800.json > q3_active_frozen_800.sha256
+      - name: Open synthetic gold AFTER proposal freeze
+        run: |
+          frozen_sha="$(cut -d' ' -f1 q3_active_frozen_800.sha256)"
+          python -m research.q3.q3_active_terminal_frozen_first score \
+            --predictions q3_active_frozen_800.json \
+            --sha "$frozen_sha" --output q3_active_800_score.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-active-source-first-800-frozen-evidence
+          path: |
+            q3_active_frozen_800.json
+            q3_active_frozen_800.sha256
+            q3_active_800_score.json
+          if-no-files-found: error
