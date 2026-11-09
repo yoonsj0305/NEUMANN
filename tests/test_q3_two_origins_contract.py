@@ -124,3 +124,13 @@ def test_never_use_dev_original_in_arcana_registry(tmp_path):
     data=json.loads(blind.read_text())
     assert "archimedes1.json" not in {t["id"] for t in data["records"]}
     assert len(data["records"])==4
+
+
+def test_codearc_registry_exactly_excludes_errored_originals():
+    from research.q3.q3_two_origins_preregistered import _codearc_input
+    source={"input":"print('Result 0: ' + str(hidden(12)))",
+            "errored":True}
+    with pytest.raises(ValueError,match="errored"):
+        _codearc_input(source)
+    source["errored"]=False
+    assert _codearc_input(source)==12
