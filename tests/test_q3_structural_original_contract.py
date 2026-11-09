@@ -113,3 +113,33 @@ def test_no_nonconstant_credit_from_constant_source_output(tmp_path):
     assert summary["C"]==4
     assert summary["C_exclusive_nonconstant"]==0
     assert summary["C_new_executable_original_exact"]==0
+
+
+
+def test_next_eight_external_originals_pre_registered_and_old_ones_excluded(tmp_path):
+    from research.q3.q3_structural_original_gate import freeze_arcana_next8
+    root=tmp_path/"external"
+    root.mkdir()
+    specimen={
+        "train":[{"input":[[i]],"output":[[i+1]]}
+                 for i in (0,2,4)],
+        "test":[{"input":[[6]],"output":[["HIDDEN_ORIGINAL_GOLD"]]}],
+    }
+    for i in range(16):
+        (root/f"independent_{i}.json").write_text(json.dumps(specimen))
+    for old in ("archimedes1.json","magnetic1.json","mop2.json",
+                "cup1.json","pocket_watch1.json"):
+        (root/old).write_text(json.dumps(specimen))
+    out=tmp_path/"NEW_BLIND.json"
+    freeze_arcana_next8(str(root),str(out))
+    frozen=json.loads(out.read_text())
+    assert frozen["scope"]=="NEWLY_FROZEN_AUTHOR_ORIGINALS_NO_TUNING"
+    assert frozen["origin"]=="arcana"
+    assert len(frozen["records"])==8
+    assert len({r["id"] for r in frozen["records"]})==8
+    assert not ({r["id"] for r in frozen["records"]} &
+                set(frozen["prior_excluded"]))
+    assert frozen["no_target_gold_in_blind"] is True
+    assert "HIDDEN_ORIGINAL_GOLD" not in out.read_text()
+    assert all("target_inputs" in r and "test" not in r
+               for r in frozen["records"])
