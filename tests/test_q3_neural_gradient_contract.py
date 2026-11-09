@@ -28,7 +28,7 @@ def test_real_inference_prefix_and_training_mask_are_identical():
     observed=[([3,5],8),([4,6],10)]
     prompt=source_discovery_prompt(observed)
     prefix=model_prefix(tok,prompt)
-    program="def transform(x):\n    return sum(x)"
+    program="def transform(x):" + chr(10) + "    return x + 1"
     tokens,labels=model_training_ids(
         tok,prompt,program,max_length=10000)
     expected=tok(prefix)["input_ids"]
