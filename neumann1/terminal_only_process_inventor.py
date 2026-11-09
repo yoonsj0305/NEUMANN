@@ -117,7 +117,12 @@ class TerminalOnlyProcessInventor:
                 known_classical(x)==y for x,y in pairs+verified):
             return None
 
-        inputs=tuple(x for x,y in pairs)
+        # CRITICAL Q3: distinguish candidate representations using ALL
+        # legally observed SOURCE inputs, including newly obtained independent
+        # counterexamples. Training-only output-signature pruning can silently
+        # delete a valid structural repair before the verifier ever sees it.
+        # This never consumes target data or hidden successor trajectories.
+        inputs=tuple(x for x,y in pairs+verified)
         goal=tuple(y for x,y in pairs)
         pool={}
         signature_counts={}
