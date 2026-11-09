@@ -1,0 +1,56 @@
+name: Q3 Independent Author Hidden State Discovery First
+on:
+  pull_request:
+    paths:
+      - "neumann1/unknown_state_operator_inventor.py"
+      - "research/q3/q3_unknown_state_external_first.py"
+      - ".github/workflows/q3_hidden_state_external_first.yml"
+  workflow_dispatch:
+
+jobs:
+  freeze-first-before-opening-gold:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -e .
+      - name: Pin independent author's original published DFA tasks
+        run: |
+          mkdir -p /tmp/dfa-original-author
+          curl --fail --location --silent --show-error \
+            https://raw.githubusercontent.com/eendor/formal-languages/9f43910c2d2facfcc3c8e1510dcfae7003caf638/examples/dfa_even_zeros.json \
+            -o /tmp/dfa-original-author/dfa_even_zeros.json
+          curl --fail --location --silent --show-error \
+            https://raw.githubusercontent.com/eendor/formal-languages/9f43910c2d2facfcc3c8e1510dcfae7003caf638/examples/dfa_div3.json \
+            -o /tmp/dfa-original-author/dfa_div3.json
+          sha256sum /tmp/dfa-original-author/*.json
+      - name: SOURCE-only worker and source-frozen 4096 first target predictions
+        run: |
+          python -m research.q3.q3_unknown_state_external_first propose \
+            --data-dir /tmp/dfa-original-author \
+            --output q3_unknown_state_original_first.json
+          sha256sum q3_unknown_state_original_first.json \
+            > q3_unknown_state_original_first.sha256
+      - name: Score ORIGINAL gold only after SHA freeze
+        run: |
+          frozen_sha="$(cut -d' ' -f1 q3_unknown_state_original_first.sha256)"
+          python -m research.q3.q3_unknown_state_external_first score \
+            --data-dir /tmp/dfa-original-author \
+            --predictions q3_unknown_state_original_first.json \
+            --expected-sha "$frozen_sha" \
+            --output q3_unknown_state_original_score.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-independent-author-state-invention-first-frozen
+          path: |
+            q3_unknown_state_original_first.json
+            q3_unknown_state_original_first.sha256
+            q3_unknown_state_original_score.json
+          if-no-files-found: error
