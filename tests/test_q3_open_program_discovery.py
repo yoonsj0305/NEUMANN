@@ -35,7 +35,9 @@ def test_source_refutation_and_proposal_revision_in_sandbox(tmp_path):
     assert record.verified and len(record.attempts)==2
     assert record.attempts[0].source_correct==0
     assert record.attempts[1].source_correct==2
-    assert "falsified" in policy.prompts[1]
+    assert "Observed SOURCE failure kind: source" in policy.prompts[1]
+    assert old in policy.prompts[1]
+    assert "Original-semantics SOURCE feedback:" in policy.prompts[1]
     assert record.apply([3,8],runner)==[9,64]
     sample=source_training_example(source,record)
     saved=tmp_path/"source.jsonl"
@@ -127,3 +129,61 @@ def test_preflight_refutation_is_given_to_generator_without_target_gold():
     assert len(result.attempts)==2
     assert result.attempts[0].status=="REJECTED"
     assert "unknown builtin or helper" in policy.prompts[1]
+
+
+
+def test_disjoint_source_counterexample_carries_actual_failed_program():
+    """The previous real model was asked to revise a program it could not see."""
+    first="def transform(x):"+chr(10)+"    return x[0]"
+    repaired="def transform(x):"+chr(10)+"    return min(x)"
+    class RequiresPriorHypothesis:
+        def __init__(self):
+            self.history=[]
+        def propose(self,prompt):
+            self.history.append(prompt)
+            if len(self.history)==1:
+                return first
+            assert first in prompt
+            assert "Observed SOURCE failure kind: independent_source" in prompt
+            assert '"previous_observed":9' in prompt
+            assert '"source_expected":1' in prompt
+            assert "TARGET outputs are UNKNOWN" in prompt
+            return repaired
+    policy=RequiresPriorHypothesis()
+    solver=GenerativeProgramInventor(
+        policy,IsolatedPython(max_seconds=10),max_proposals=2)
+    result=solver.discover(
+        [([1,2],1),([3,4],3)],
+        independent_source_checks=[([9,1],1)])
+    assert result.verified
+    assert result.program==repaired
+    assert result.attempts[0].source_correct==2
+    assert len(policy.history)==2
+
+
+def test_preflight_rejection_includes_rejected_model_code_not_just_error():
+    unsafe="def transform(x):"+chr(10)+"    return eval('2+2')"
+    good="def transform(x):"+chr(10)+"    return x + 1"
+    policy=ScriptedSourcePolicy((unsafe,good))
+    result=GenerativeProgramInventor(
+        policy,IsolatedPython(max_seconds=10),max_proposals=2).discover(
+        [(1,2)],independent_source_checks=[(2,3)])
+    assert result.verified
+    assert "Observed SOURCE failure kind: preflight" in policy.prompts[1]
+    assert unsafe in policy.prompts[1]
+    assert "unknown builtin or helper" in policy.prompts[1]
+
+
+def test_repair_prompt_forgets_older_failures_but_keeps_current_source():
+    from neumann1.q3_prompt_contract import source_discovery_prompt,source_revision_prompt
+    base=source_discovery_prompt([(1,2)])
+    first=source_revision_prompt(base,"def transform(x): return x",
+                                  [{"expected":2,"got":1}],kind="source")
+    second=source_revision_prompt(base,"def transform(x): return x+3",
+                                   [{"expected":2,"got":4}],kind="source")
+    assert "def transform(x): return x" in first
+    assert "def transform(x): return x+3" in second
+    assert '"got":1' not in second
+    assert '"got":4' in second
+    assert base in second
+    assert len(second) < len(first)+len(second)
