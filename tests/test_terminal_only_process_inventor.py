@@ -30,8 +30,8 @@ def endpoint_cases():
     # Integer process needs multiple unobserved steps to reach 0.
     numbers=tuple((x,0) for x in (0,1,2,3,5,8,13,17))
     number_checks=tuple((x,0) for x in (4,7,11,19))
-    # Set process ends with maximal element; there is no 'max_element'
-    # extractor in the typed set action vocabulary.
+    # Set process removes elements until it reaches empty; this is
+    # multi-step unless the source set contains <=1 item.
     sets=(
         frozenset(),frozenset((3,)),
         frozenset((2,5)),
@@ -40,7 +40,7 @@ def endpoint_cases():
         frozenset((4,8,12,16,20)),
         frozenset((5,9,13,14)),
     )
-    final_set=lambda s:frozenset({max(s)}) if s else frozenset()
+    final_set=lambda s:frozenset()
     set_source=tuple((s,final_set(s)) for s in sets)
     set_checks=tuple((s,final_set(s)) for s in (
         frozenset((7,11)),frozenset((4,9,23)),
@@ -81,7 +81,7 @@ def test_synthesizes_nontrivial_latent_process_without_successor_examples(family
             answer=0
         elif family=="set":
             x=frozenset(rng.sample(range(10,999),rng.randrange(1,100)))
-            answer=frozenset({max(x)})
+            answer=frozenset()
         else:
             x="".join(rng.choice("aabbb")
                       for i in range(rng.randrange(12,180)))
