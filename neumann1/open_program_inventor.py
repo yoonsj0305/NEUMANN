@@ -231,11 +231,12 @@ class Discovery:
 class GenerativeProgramInventor:
     """Model-policy -> new Python algorithm -> source refutation -> revision."""
 
-    def __init__(self,policy,runner,*,max_proposals=8):
+    def __init__(self,policy,runner,*,max_proposals=8,rich_runtime_feedback=True):
         if not 1<=max_proposals<=64:raise ValueError("finite source budget")
         self.policy=policy
         self.runner=runner
         self.max_proposals=max_proposals
+        self.rich_runtime_feedback=bool(rich_runtime_feedback)
 
     def discover(self,source_pairs,*,independent_source_checks):
         train=tuple(source_pairs)
@@ -282,6 +283,8 @@ class GenerativeProgramInventor:
                 source_executed and error is None and got==y
                 for got,error,(_,y) in zip(
                     result.outputs,result.errors,train))
+            if not self.rich_runtime_feedback and result.status=="EXECUTED_WITH_ERRORS":
+                correct=0  # historical opaque runtime-error feedback ablation
             receipts.append(Attempt(sha,correct,len(train),result.status,step,code))
             if correct==len(train):
                 final=self.runner.evaluate(code,[x for x,y in checks])
@@ -294,7 +297,7 @@ class GenerativeProgramInventor:
                     "program. Propose a different general algorithm.")
             else:
                 errors=[]
-                if source_executed:
+                if source_executed and self.rich_runtime_feedback:
                     for got,error,(x,y) in zip(
                             result.outputs,result.errors,train):
                         if error is not None:
@@ -305,7 +308,8 @@ class GenerativeProgramInventor:
                             errors.append({
                                 "input":x,"expected":y,"got":got})
                 else:
-                    errors=[result.status]
+                    errors=["ABSTAIN_RUNTIME_ERROR" if source_executed
+                            else result.status]
                 prompt+=(
                     "\nYour last source program was falsified. "
                     "Fix the causal rule, not individual examples. Errors:\n"+

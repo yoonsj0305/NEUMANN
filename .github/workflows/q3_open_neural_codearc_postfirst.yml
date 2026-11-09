@@ -54,7 +54,7 @@ jobs:
         run: |
           python research/q3/q3_open_neural_codearc_postfirst.py prepare \
             --original /tmp/q3-neural-original/invocations.jsonl \
-            --blind Q3-OPEN-NEURAL-POSTFIRST/BLIND.json --n 4
+            --blind Q3-OPEN-NEURAL-POSTFIRST/BLIND.json --n 8
       - name: Generate and source-repair actual model code; freeze predictions
         run: |
           REV="$(cat Q3-OPEN-NEURAL-POSTFIRST/MODEL_REVISION.txt)"

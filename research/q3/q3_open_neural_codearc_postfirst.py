@@ -109,13 +109,17 @@ def prepare(original,blind,n):
         (SALT+"/"+str(row[0])).encode()).hexdigest())
     if len(eligible)<n:raise ValueError("too few parseable original tasks")
     selected=eligible[:n]
+    # Index 0-3 were already exposed in the initial postfirst study.
+    # Remaining tasks are new for this specific feedback-causality test.
     # The original heldout OUTPUT strings are never copied or parsed here.
     clean={"schema":"NEUMANN.Q3.NEURAL.CODEARC.BLIND.v1",
            "original_sha256":_sha(original),
            "dataset_revision":DATA_REV,
            "salt":SALT,"selected":len(selected),
-           "records":[{"id":pid,"source":source,"target_inputs":inputs}
-                      for pid,source,inputs in selected]}
+           "records":[{"id":pid,"source":source,"target_inputs":inputs,
+                       "cohort":("PRIOR_EXPOSED_DEV" if idx<4
+                                 else "NEW_FOR_FEEDBACK_POSTFIRST")}
+                      for idx,(pid,source,inputs) in enumerate(selected)]}
     blind.write_text(json.dumps(clean,separators=(",",":"))+"\n")
     print("Q3_MODEL_BLIND_PREPARED",len(selected),_sha(blind))
 
@@ -131,9 +135,25 @@ def propose(blind,out,*,model_revision,proposals=2):
     rows=[]
     for rec in data["records"]:
         source=rec["source"]
-        discovery=GenerativeProgramInventor(
-            model,sandbox,max_proposals=proposals).discover(
+        # Matched first-program intervention: identical frozen model weights,
+        # same data, same per-prompt RNG seed. Only runtime-error feedback
+        # differs between the two invention policies.
+        legacy=GenerativeProgramInventor(
+            model,sandbox,max_proposals=proposals,
+            rich_runtime_feedback=False).discover(
                 source[:6],independent_source_checks=(source[6],))
+        discovery=GenerativeProgramInventor(
+            model,sandbox,max_proposals=proposals,
+            rich_runtime_feedback=True).discover(
+                source[:6],independent_source_checks=(source[6],))
+        if (legacy.attempts and discovery.attempts and
+                legacy.attempts[0].sha256!=discovery.attempts[0].sha256):
+            raise AssertionError("first-program causal ablation not matched")
+        legacy_predictions=[]
+        if legacy.verified:
+            oldout=sandbox.evaluate(legacy.program,rec["target_inputs"])
+            if oldout.status=="EXECUTED":
+                legacy_predictions=list(oldout.outputs)
         predicted=[]
         if discovery.verified:
             outcome=sandbox.evaluate(discovery.program,rec["target_inputs"])
@@ -151,8 +171,11 @@ def propose(blind,out,*,model_revision,proposals=2):
                 if result.status=="EXECUTED":
                     first_pred=list(result.outputs)
         row={
-            "id":rec["id"],
+            "id":rec["id"],"cohort":rec["cohort"],
             "status":discovery.status,
+            "opaque_error_status":legacy.status,
+            "opaque_error_predictions":legacy_predictions,
+            "causal_first_program_identical":True,
             "model_only_first_checked":first_source_verified,
             "first_predictions":first_pred,
             "refined_predictions":predicted,
@@ -191,11 +214,17 @@ def score(original,predictions,expected_sha,out):
         source=corpus[row["id"]]
         gold=[original_output(source[i]) for i in (7,8,9)]
         first=bool(row["first_predictions"] and row["first_predictions"]==gold)
+        opaque=bool(row["opaque_error_predictions"] and
+                    row["opaque_error_predictions"]==gold)
         repaired=bool(row["refined_predictions"] and
                       row["refined_predictions"]==gold)
         entries.append({
-            "id":row["id"],"source_status":row["status"],
+            "id":row["id"],"cohort":row["cohort"],
+            "source_status":row["status"],
+            "opaque_source_status":row["opaque_error_status"],
             "first_original_exact":first,"revised_original_exact":repaired,
+            "opaque_feedback_exact":opaque,
+            "typed_feedback_new_residual":repaired and not opaque,
             "revised_new_residual":repaired and not first,
             "source_model_train_fitted":bool(row["refined_predictions"])})
     summary={
@@ -204,12 +233,29 @@ def score(original,predictions,expected_sha,out):
         "source_repaired_exact":sum(
             e["revised_original_exact"] for e in entries),
         "causal_new_exact":sum(e["revised_new_residual"] for e in entries),
+        "opaque_runtime_error_exact":sum(e["opaque_feedback_exact"] for e in entries),
+        "typed_feedback_new_vs_opaque":sum(e["typed_feedback_new_residual"] for e in entries),
         "source_verified_predictions":sum(
             e["source_model_train_fitted"] for e in entries),
         "sha256_frozen":expected_sha,
         "scope":"POSTFIRST independent-author original I/O, NOT unopened frontier",
         "global_q3_q6":"OPEN",
-        "weights_finetuned_during_study":False}
+        "weights_finetuned_during_study":False,
+        "matched_initial_proposal":True,
+        "by_cohort":{
+            name:{
+                "n":sum(e["cohort"]==name for e in entries),
+                "opaque_correct":sum(
+                    e["opaque_feedback_exact"] for e in entries
+                    if e["cohort"]==name),
+                "typed_correct":sum(
+                    e["revised_original_exact"] for e in entries
+                    if e["cohort"]==name),
+                "typed_new":sum(
+                    e["typed_feedback_new_residual"] for e in entries
+                    if e["cohort"]==name)}
+            for name in ("PRIOR_EXPOSED_DEV",
+                         "NEW_FOR_FEEDBACK_POSTFIRST")}}
     out.write_text(json.dumps(
         {"summary":summary,"records":entries},indent=2)+"\n")
     print("Q3_MODEL_EXTERNAL_SCORE",json.dumps(summary,sort_keys=True))

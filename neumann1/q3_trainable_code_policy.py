@@ -33,7 +33,8 @@ def _dependencies():
 
 class LocalCausalCodePolicy:
     def __init__(self,*,model_name=DEFAULT_MODEL,model_revision=None,
-                 adapter_path=None,max_new_tokens=400,temperature=0.3):
+                 adapter_path=None,max_new_tokens=400,temperature=0.3,
+                 seed=1007):
         if not 32<=max_new_tokens<=2048 or not 0<temperature<=1:
             raise ValueError("finite generation bounds required")
         torch,Model,Tokenizer=_dependencies()
@@ -53,6 +54,7 @@ class LocalCausalCodePolicy:
         self.model.eval()
         self.max_new_tokens=max_new_tokens
         self.temperature=temperature
+        self.seed=seed
         self.device=next(self.model.parameters()).device
 
     def propose(self,prompt):
@@ -71,6 +73,12 @@ class LocalCausalCodePolicy:
         tokens=self.tokenizer(
             rendered,return_tensors="pt",truncation=True,
             max_length=1536).to(self.device)
+        # Source-prompt-derived RNG makes first proposals IDENTICAL across
+        # the opaque-error and typed-counterexample causal ablations.
+        # Later prompts legitimately diverge only when feedback differs.
+        generated_seed=(self.seed+int(hashlib.sha256(
+            prompt.encode()).hexdigest()[:8],16))%(2**31)
+        self.torch.manual_seed(generated_seed)
         with self.torch.inference_mode():
             output=self.model.generate(
                 **tokens,do_sample=True,temperature=self.temperature,
