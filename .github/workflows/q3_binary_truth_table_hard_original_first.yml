@@ -1,0 +1,40 @@
+name: Q3 Frozen Binary Truth Table New 64-bit Original FIRST
+
+on:
+  push:
+    branches:
+      - research/q3-unseen-sygus-hard-metaprogram-20261107
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  binary_table_external_first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Freeze source before accessing 24 new original tasks
+        run: |
+          python -m py_compile research/q3/hard_original_unopened_method_gate.py research/q3/hard_unseen_two_bit_truth_table_gate.py
+          git hash-object research/q3/hard_unseen_two_bit_truth_table_gate.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'research/q3')
+          import hard_unseen_two_bit_truth_table_gate as q
+          assert q.IDS==['PRE_'+str(i)+'_10' for i in range(124,148)]
+          assert len(q.IDS)==24
+          assert q.UNARY_BUDGET==500 and q.BINARY_BUDGET==1000
+          cases=[([0]*64,[0]*64)]*3
+          assert q.derive(cases)[0] is None
+          PY
+      - name: External 64-bit original blind evaluation
+        run: python research/q3/hard_unseen_two_bit_truth_table_gate.py
+      - name: Archive complete first result including all failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q3-new-binary-representation-hard-original-first
+          path: Q3_BINARY_NEW_ORIGINAL_FIRST.json
+          if-no-files-found: warn
