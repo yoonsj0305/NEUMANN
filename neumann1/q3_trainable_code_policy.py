@@ -38,7 +38,7 @@ def _dependencies():
 class LocalCausalCodePolicy:
     def __init__(self,*,model_name=DEFAULT_MODEL,model_revision=None,
                  adapter_path=None,max_new_tokens=400,temperature=0.3,
-                 seed=1007):
+                 seed=1007,paired_sampling=False):
         if not 32<=max_new_tokens<=2048 or not 0<temperature<=1:
             raise ValueError("finite generation bounds required")
         torch,Model,Tokenizer=_dependencies()
@@ -63,6 +63,7 @@ class LocalCausalCodePolicy:
         self.max_new_tokens=max_new_tokens
         self.temperature=temperature
         self.seed=seed
+        self.paired_sampling=bool(paired_sampling)
         self.device=next(self.model.parameters()).device
 
     def propose(self,prompt):
@@ -78,8 +79,13 @@ class LocalCausalCodePolicy:
         # Source-prompt-derived RNG makes first proposals IDENTICAL across
         # the opaque-error and typed-counterexample causal ablations.
         # Later prompts legitimately diverge only when feedback differs.
-        generated_seed=(self.seed+int(hashlib.sha256(
-            prompt.encode()).hexdigest()[:8],16))%(2**31)
+        # When causal arms differ only in SOURCE method context, hash-based
+        # prompt seeds would silently give them DIFFERENT random samples.
+        # Matched arms use one task-derived seed set by the evaluation harness.
+        generated_seed=(
+            self.seed%(2**31) if self.paired_sampling else
+            (self.seed+int(hashlib.sha256(
+                prompt.encode()).hexdigest()[:8],16))%(2**31))
         self.torch.manual_seed(generated_seed)
         with self.torch.inference_mode():
             output=self.model.generate(
