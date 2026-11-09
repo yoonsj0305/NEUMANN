@@ -134,11 +134,39 @@ def test_actual_model_pilot_unwraps_coreoutcome_without_loading_neural_weights(
                for x in result["records"])
     assert all(
         x["arms"]["C"]["original_target_predictions"]
-        == [a for a in (
-            (10,11,12) if x["id"]==184 else (100,101,102))]
-        for x in result["records"]) is False  # offsets 7..9, not 0..2
-    assert all(
-        x["arms"]["C"]["original_target_predictions"]
         == [i for i in range((10 if x["id"]==184 else 100)+7,
                              (10 if x["id"]==184 else 100)+10)]
         for x in result["records"])
+
+
+
+def test_original_author_gold_only_available_after_frozen_prediction_hash(tmp_path):
+    from research.q3.q3_postfirst_repair_original_score import score
+    import hashlib
+    rows=[]
+    for pid in (184,255):
+        for index in range(10):
+            rows.append({"type":"annotated","problem_id":pid,
+                         "index":index,"output":"Result "+str(index)+": "+str(index)})
+    original=tmp_path/"author_original.jsonl"
+    original.write_text("".join(json.dumps(x)+"\n" for x in rows))
+    predictions={
+        "schema":"NEUMANN.Q3.SOURCE-REPAIR-PILOT.v1",
+        "original_target_gold_seen":False,
+        "model_scientific_scope":"PREEXPOSED_CODEARC_DEV_ONLY",
+        "records":[{
+            "id":pid,"arms":{
+                k:{"source_verified":True,
+                   "original_target_predictions":([7,8,9] if k=="C" else [])}
+                for k in ("A","B","C")}
+        } for pid in (184,255)]}
+    frozen=tmp_path/"frozen.json"
+    frozen.write_text(json.dumps(predictions))
+    expected=hashlib.sha256(frozen.read_bytes()).hexdigest()
+    summary=score(str(original),str(frozen),expected,str(tmp_path/"score.json"))
+    assert summary["repair_curriculum_equal_step_exact"]==2
+    assert summary["C_only_vs_B"]==2
+    assert summary["global_q3"]=="OPEN"
+    assert not summary["novel_original_independent_first"]
+    with pytest.raises(ValueError,match="frozen"):
+        score(str(original),str(frozen),"0"*64,str(tmp_path/"other.json"))
