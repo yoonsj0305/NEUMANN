@@ -8,7 +8,8 @@ import json
 import pytest
 from neumann1.q3_prompt_contract import (
     source_discovery_prompt,model_prefix,model_training_ids)
-from neumann1.q3_trainable_code_policy import source_training_rows
+from neumann1.q3_trainable_code_policy import (
+    source_training_rows, recertify_source_rows)
 
 
 class TinyTokenizer:
@@ -63,3 +64,34 @@ def test_verified_teacher_source_integrity(tmp_path):
     file.write_text(json.dumps(teacher)+"\n")
     with pytest.raises(ValueError,match="tampered"):
         source_training_rows(file)
+
+
+def test_neural_training_requires_reexecuted_independent_source_teachers():
+    from types import SimpleNamespace
+    from neumann1.open_program_inventor import UnsafeProposal
+    class Runner:
+        def evaluate(self,code,inputs):
+            return SimpleNamespace(status="EXECUTED",
+                                   outputs=tuple(x+1 for x in inputs))
+    program="def transform(x):\\n    return x + 1".replace("\\\\n","\\n")
+    teacher={
+        "schema":"NEUMANN.Q3.PROGRAM-SOURCE-TEACHER.v1",
+        "provenance":"ORIGINAL_SOURCE_ONLY",
+        "original_id":"external-author-source-1",
+        "pairs":[[i,i+1] for i in range(7)],
+        "independent_checks":1,
+        "program":program,
+        "sha256":hashlib.sha256(program.encode()).hexdigest()
+    }
+    receipts=recertify_source_rows([teacher],runner=Runner())
+    assert len(receipts)==1 and len(receipts[0])==64
+    false_teacher=dict(teacher)
+    false_teacher["pairs"]=[list(p) for p in teacher["pairs"]]
+    false_teacher["pairs"][-1][1]=999
+    with pytest.raises(UnsafeProposal,match="SOURCE-certified"):
+        recertify_source_rows([false_teacher],runner=Runner())
+    class AbsentSandbox:
+        def evaluate(self,code,inputs):
+            return SimpleNamespace(status="ABSTAIN_NO_SANDBOX",outputs=())
+    with pytest.raises(UnsafeProposal,match="SOURCE-certified"):
+        recertify_source_rows([teacher],runner=AbsentSandbox())
