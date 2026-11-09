@@ -33,12 +33,16 @@ def score(original, prediction_file, expected_prediction_sha, output):
         raise ValueError("not a frozen pre-exposed SOURCE repair study")
 
     originals=codearc_corpus(original)
+    extra_d=all("D" in x["arms"] for x in rows["records"])
+    if any(("D" in x["arms"])!=extra_d for x in rows["records"]):
+        raise ValueError("inconsistent on-policy arm coverage")
+    active_arms=("A","B","C","D") if extra_d else ("A","B","C")
     scored=[]
     for record in rows["records"]:
         pid=record["id"]
         gold=[_codearc_output(originals[pid][i]) for i in (7,8,9)]
         arm_result={}
-        for arm in ("A","B","C"):
+        for arm in active_arms:
             armrow=record["arms"][arm]
             predicted=armrow.get("original_target_predictions",[])
             exact=bool(
@@ -51,7 +55,12 @@ def score(original, prediction_file, expected_prediction_sha, output):
                        "C_only_over_B":arm_result["C"] and not arm_result["B"],
                        "C_only_over_A_and_B":arm_result["C"] and
                            not arm_result["B"] and not arm_result["A"],
-                       "B_only_over_C":arm_result["B"] and not arm_result["C"]})
+                       "B_only_over_C":arm_result["B"] and not arm_result["C"],
+                       **({
+                         "D_only_over_A_B_C":arm_result["D"] and not any(
+                             arm_result[k] for k in ("A","B","C")),
+                         "B_only_over_D":arm_result["B"] and not arm_result["D"]
+                       } if extra_d else {})})
     summary={
         "scope":"PREEXPOSED_CODEARC_POSTFIRST_ONLY",
         "n_original_authors":len(scored),
@@ -66,6 +75,14 @@ def score(original, prediction_file, expected_prediction_sha, output):
         "global_q3":"OPEN",
         "novel_original_independent_first":False,
     }
+    if extra_d:
+        summary.update({
+            "onpolicy_model_failure_repair_equal_step_exact":sum(
+                x["D"] for x in scored),
+            "D_only_over_A_B_C":sum(
+                x["D_only_over_A_B_C"] for x in scored),
+            "B_only_over_D":sum(x["B_only_over_D"] for x in scored),
+            "onpolicy_scientific_scope":"PREEXPOSED_DEVELOPMENT_ONLY"})
     Path(output).write_text(json.dumps(
         {"summary":summary,"records":scored},sort_keys=True,indent=2)+"\n")
     print("Q3_POSTFIRST_REPAIR_ORIGINAL_SCORE",
