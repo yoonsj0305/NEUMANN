@@ -130,4 +130,4 @@ def test_no_unrestricted_identifiability_from_finite_automaton_probes():
     assert learned.status=="SOURCE_CERTIFIED_CONDITIONAL_DFA"
     assert learned.apply("1"*11)==0
     assert delayed("1"*11)==1
-    assert "CONDITIONAL" in learned.program.conditional_proof.upper()
+    assert "IF THE SOURCE BEHAVIOR" in learned.program.conditional_proof.upper()
