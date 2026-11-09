@@ -69,7 +69,7 @@ def test_counter_promotion_refuses_reused_or_falsified_source_checks():
         engine.promote_unbounded_counter_operator(
             "invented:counter:reused",invented.program,
             independent_source_checks=reused)
-    false_checks=(checks[0][0],1-checks[0][1]),*checks[1:]
+    false_checks=((checks[0][0],1-checks[0][1]),)+checks[1:]
     with pytest.raises(ValueError):
         engine.promote_unbounded_counter_operator(
             "invented:counter:false",invented.program,
