@@ -50,6 +50,8 @@ class ActiveProcessResult:
     revisions: tuple[ProcessRevision, ...]
     source_endpoints: int
     duration_ms: float
+    version_hypotheses_examined: int = 0
+    disagreement_oracle_queries: int = 0
 
     @property
     def source_consistent(self):
@@ -137,6 +139,43 @@ def _source_probe_pool(kind, train_inputs, source_seen, forbidden, *,
     return tuple(sorted(probes, key=priority)), len(experiments)
 
 
+def _terminal_behavior(program, x):
+    try:
+        result = program.compile().run(x)
+        if result.status != "HALT_CERTIFIED_FIXED_POINT":
+            return ("UNRESOLVED", result.status)
+        return ("FIXED", result.value)
+    except (IndexError, TypeError, ValueError,
+            OverflowError, RecursionError):
+        return ("UNRESOLVED", "EXCEPTION")
+
+
+def _most_discriminating_probe(programs, probes, observed):
+    """Generate a separating experiment from competing SOURCE-fit programs.
+
+    Maximize the number of disagreeing candidate pairs (integer Gini score).
+    When no pair disagrees, the source probe generator's own fixed ordering
+    is used. Target labels are never used to select an experiment.
+    """
+    remaining = (x for x in probes if x not in observed)
+    best = None
+    best_disagreement = -1
+    for x in remaining:
+        if best is None:
+            best = x
+        if len(programs) <= 1:
+            break
+        labels = {}
+        for program in programs:
+            behavior = _terminal_behavior(program, x)
+            labels[behavior] = labels.get(behavior, 0) + 1
+        n = len(programs)
+        disagreement = (n*n - sum(v*v for v in labels.values())) // 2
+        if disagreement > best_disagreement:
+            best, best_disagreement = x, disagreement
+    return best, max(0, best_disagreement)
+
+
 class ActiveTerminalProcessInventor:
     """Endpoint-only, source-oracle-active CEGIS of a *process AST*.
 
@@ -193,22 +232,31 @@ class ActiveTerminalProcessInventor:
         queries = 0
         revisions = []
         candidate = None
+        compared_versions = 0
+        discriminating_queries = 0
 
         def record(status, program=None):
             return ActiveProcessResult(
                 status, program, queries, program_count, len(probes),
                 tuple(revisions), len(observed),
-                (perf_counter_ns() - started) / 1e6)
+                (perf_counter_ns() - started) / 1e6,
+                compared_versions, discriminating_queries)
 
         for round_index in range(self.max_rounds + 1):
             try:
-                candidate = self.inventor.invent(
+                # Unlabeled probes are part of SOURCE expression signatures.
+                # They are NOT examples or verifier labels. This preserves
+                # source-equivalent but extrapolation-distinct candidates.
+                versions = self.inventor.invent_candidates(
                     train, independent_terminal_checks=tuple(checks),
-                    control=control, known_classical=known_classical)
+                    control=control, known_classical=known_classical,
+                    exploratory_probes=probes[:32], max_candidates=12)
             except (ValueError, TypeError):
                 return record("ABSTAIN_GRAMMAR_GAP")
-            if candidate is None:
+            if not versions:
                 return record("CLASSICAL_FIRST")
+            compared_versions += len(versions)
+            candidate = versions[0]
             if revisions and revisions[-1].new_ast is None:
                 prior = revisions[-1]
                 if candidate.transition_ast == prior.old_ast:
@@ -217,11 +265,16 @@ class ActiveTerminalProcessInventor:
                     prior.counterexample_input, prior.expected_terminal,
                     prior.predicted_terminal, prior.old_ast,
                     candidate.transition_ast)
-            compiled = candidate.compile()
+
             counterexample = None
-            for probe in probes:
-                if probe in observed:
-                    continue
+            # Select NEW questions by disagreement between SOURCE-fit
+            # executable programs. After every oracle answer, filter the
+            # version space without reading target data or successor states.
+            while True:
+                probe, disagreement = _most_discriminating_probe(
+                    versions, probes, observed)
+                if probe is None:
+                    break
                 if queries >= self.max_oracle_queries:
                     return record("ABSTAIN_ORACLE_BUDGET")
                 try:
@@ -229,6 +282,7 @@ class ActiveTerminalProcessInventor:
                 except (ValueError, TypeError, OverflowError):
                     return record("ABSTAIN_SOURCE_ORACLE_ERROR")
                 queries += 1
+                discriminating_queries += int(disagreement > 0)
                 try:
                     valid_gold = (_kind(gold) == kind and _bounded_state(gold))
                 except TypeError:
@@ -236,26 +290,21 @@ class ActiveTerminalProcessInventor:
                 if not valid_gold:
                     return record("ABSTAIN_INVALID_SOURCE_EVIDENCE")
                 observed[probe] = gold
-                try:
-                    pred = compiled.run(probe)
-                    predicted = (pred.value if
-                        pred.status == "HALT_CERTIFIED_FIXED_POINT"
-                        else None)
-                except (ValueError, TypeError, OverflowError, IndexError):
-                    predicted = None
+                behavior = _terminal_behavior(candidate, probe)
+                predicted = behavior[1] if behavior[0] == "FIXED" else None
                 if predicted != gold:
                     counterexample = (probe, gold, predicted)
                     checks.append((probe, gold))
                     break
+                versions = tuple(
+                    method for method in versions
+                    if _terminal_behavior(method, probe) == ("FIXED", gold))
             if counterexample is None:
                 return record("SOURCE_PROBE_CONSISTENT", candidate)
             if round_index >= self.max_rounds:
                 revisions.append(ProcessRevision(
                     *counterexample, candidate.transition_ast, None))
                 return record("ABSTAIN_REPAIR_BUDGET")
-            # Preserve every source counterexample in checks for the next
-            # actual program induction. If the grammar lacks a new program,
-            # explicitly ABSTAIN, never silently reuse a falsified AST.
             revisions.append(ProcessRevision(
                 *counterexample, candidate.transition_ast, None))
         return record("ABSTAIN_REPAIR_BUDGET")
