@@ -675,3 +675,40 @@ class RegistryEngine:
             self._q3_recursive_method.method,domain_source_backend,
             known_classical=known_classical,
             classical_probe_inputs=classical_probe_inputs)
+
+    def meta_learn_higher_order_method(self, source_cases, *,
+                                        max_unroll=3,max_steps=256):
+        """Invent a reusable program-GENERATOR, not a task answer table."""
+        from .higher_order_method_inventor import HigherOrderMethodInventor
+        src=tuple(source_cases)
+        inventor=HigherOrderMethodInventor(
+            max_unroll=max_unroll,max_steps=max_steps)
+        learned=inventor.discover(src)
+        self._q3_higher_order_inventor=inventor
+        self._q3_higher_order_sources=src
+        self._q3_higher_order_method=learned
+        return learned
+
+    def meta_revise_higher_order_method(self, new_source_counterexamples):
+        """Recompile control AST after SOURCE falsifies previous method."""
+        if not hasattr(self,"_q3_higher_order_method"):
+            raise ValueError("no previously invented meta-method")
+        feedback=tuple(new_source_counterexamples)
+        if not feedback:
+            raise ValueError("source counterexamples required")
+        old=self._q3_higher_order_method
+        sources=self._q3_higher_order_sources+feedback
+        revised=self._q3_higher_order_inventor.discover(sources,old=old)
+        self._q3_higher_order_sources=sources
+        self._q3_higher_order_method=revised
+        return revised
+
+    def meta_compile_higher_order_method(self, transition, *,
+                                          known_classical=None,
+                                          independent_source_checks=()):
+        """Generate an executable solver for an unseen domain transition."""
+        if not hasattr(self,"_q3_higher_order_method"):
+            raise ValueError("no source-invented method to compile")
+        return self._q3_higher_order_method.program.compile(
+            transition,known_classical=known_classical,
+            independent_source_checks=independent_source_checks)
