@@ -130,7 +130,7 @@ def _source_probe_pool(kind, train_inputs, source_seen, forbidden, *,
         def priority(x):
             outside = x < low or x > high
             distance = min(abs(x - v) for v in train_inputs)
-            return (not outside, -distance, x)
+            return (not outside, x >= low, -distance, x)
     else:
         def priority(x):
             return (len(x), repr(x))
@@ -209,6 +209,14 @@ class ActiveTerminalProcessInventor:
                 return record("ABSTAIN_GRAMMAR_GAP")
             if candidate is None:
                 return record("CLASSICAL_FIRST")
+            if revisions and revisions[-1].new_ast is None:
+                prior = revisions[-1]
+                if candidate.transition_ast == prior.old_ast:
+                    return record("ABSTAIN_NO_STRUCTURAL_REVISION")
+                revisions[-1] = ProcessRevision(
+                    prior.counterexample_input, prior.expected_terminal,
+                    prior.predicted_terminal, prior.old_ast,
+                    candidate.transition_ast)
             compiled = candidate.compile()
             counterexample = None
             for probe in probes:
@@ -221,7 +229,11 @@ class ActiveTerminalProcessInventor:
                 except (ValueError, TypeError, OverflowError):
                     return record("ABSTAIN_SOURCE_ORACLE_ERROR")
                 queries += 1
-                if _kind(gold) != kind or not _bounded_state(gold):
+                try:
+                    valid_gold = (_kind(gold) == kind and _bounded_state(gold))
+                except TypeError:
+                    valid_gold = False
+                if not valid_gold:
                     return record("ABSTAIN_INVALID_SOURCE_EVIDENCE")
                 observed[probe] = gold
                 try:
