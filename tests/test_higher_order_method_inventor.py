@@ -150,3 +150,52 @@ def test_meta_policy_ignores_domain_names_and_requires_real_counterexamples():
                   for v in a+b+c)
     assert learner.discover(renamed).program.ast==learner.discover(
         a+b+c).program.ast
+
+
+def test_exhaustive_all_1024_small_state_transition_systems():
+    """Conditional method theorem tested against ALL 4^4 finite functions,
+    for each of four starting states, including convergent and cyclic."""
+    from itertools import product
+    initial,long,preserving=source_families()
+    method=HigherOrderMethodInventor(max_steps=256).discover(
+        initial+long+preserving).program
+    total=0
+    for mapping in product(range(4),repeat=4):
+        for first_state in range(4):
+            state=first_state
+            fixed=None
+            for _ in range(12):
+                nxt=mapping[state]
+                if nxt==state:
+                    fixed=state
+                    break
+                state=nxt
+            result=method.compile(lambda x,m=mapping:m[x]).run(first_state)
+            if fixed is None:
+                assert result.status=="ABSTAIN_BUDGET"
+                assert result.value is None
+            else:
+                assert result.status=="HALT_CERTIFIED_FIXED_POINT"
+                assert result.value==fixed
+            total+=1
+    assert total==1024
+
+
+def test_zero_shot_generated_method_on_untrained_binary_interval_search():
+    """The control AST never saw intervals/comparison search during training.
+    The classical transition primitive is provided, not re-invented."""
+    training,long,preserving=source_families()
+    method=HigherOrderMethodInventor().discover(
+        training+long+preserving).program
+    rng=Random(20261109)
+    for _ in range(100):
+        n=rng.randrange(1024,10000000)
+        target=rng.randrange(n)
+        def search_step(interval,answer=target):
+            lo,hi=interval
+            if lo==hi:return interval
+            mid=(lo+hi)//2
+            return ((mid+1,hi) if mid<answer else (lo,mid))
+        result=method.compile(search_step).run((0,n-1))
+        assert result.status=="HALT_CERTIFIED_FIXED_POINT"
+        assert result.value==(target,target)
