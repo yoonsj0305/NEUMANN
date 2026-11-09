@@ -51,8 +51,8 @@ def test_policy_freeze_retains_learned_rank_without_test_updates():
     p.learn("valid",6,6,source_total=6,independent_verified=True)
     p.learn("invalid",6,6,source_total=6,independent_verified=False)
     variants=[
-        ("valid", "def transform(x):\\n    return x[0]"),
-        ("invalid", "def transform(x):\\n    return x[1]"),
+        ("valid", "def transform(x):\n    return x[0]"),
+        ("invalid", "def transform(x):\n    return x[1]"),
     ]
     prior=p.rank(variants)
     before=(dict(p.weights),p.updates)
