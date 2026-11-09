@@ -124,3 +124,32 @@ def test_original_target_not_used_to_pick_structural_representation():
     assert len(before)<=12
     # A later unknown author test cannot modify a frozen prepared candidate.
     assert p.receipt.candidates==before
+
+
+def test_same_source_induced_atomic_operator_generalizes_between_strings_and_arrays():
+    # A string is a sequence of tokens, not an indivisible input object.
+    # This is NOT a handcrafted named-text solver or an original benchmark.
+    source=[
+        ("aabb","bbaa"),
+        ("bbaa","aabb"),
+        ("abab","baba"),
+        ("abcabc","bacbac"),
+    ]
+    check=[("bcbcab","acacba")]
+    candidates=induce_structural_factors(source)
+    assert any(p.representation=="leaf-category-relation"
+               for p in candidates)
+    code=_solve(source,check)
+    assert "join" in code
+    assert ".get(c,c)" in code
+
+    runner=IsolatedPython(max_seconds=8)
+    other_inputs=[[[1,2,1],[2,1,2]],[[2,2],[1,1]]]
+    other_train=[
+        ([[1,2,1],[2,1,2]],[[2,1,2],[1,2,1]]),
+        ([[2,2,1],[1,1,2]],[[1,1,2],[2,2,1]]),
+    ]
+    other_check=[
+        ([[2,1],[2,2]],[[1,2],[1,1]])]
+    c2=_solve(other_train,other_check)
+    assert "factor" in c2 and ".get(c,c)" in c2 or ".get(v,v)" in c2
