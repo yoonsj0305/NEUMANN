@@ -1,0 +1,56 @@
+name: Q3 Active Oracle Author Original Development Refutation
+on:
+  pull_request:
+    paths:
+      - "neumann1/active_oracle_challenges.py"
+      - "research/q3/pinned_author_function_oracle.py"
+      - "research/q3/q3_active_oracle_source_development.py"
+      - "tests/test_q3_active_oracle_challenges.py"
+      - ".github/workflows/q3_active_author_oracle_dev.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-only-contradiction-dev:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    env:
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Retrieve pinned external-author reference functions into evaluator ONLY
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-author-functions Q3-ORACLE-DEV
+          AUTHOR_SHA=32f2a1e1ba3bdf8a7d5057aacbd665edaf441ce0
+          for id in 447 416 1055; do
+            curl --fail --location --retry 3 --silent --show-error \
+              "https://raw.githubusercontent.com/Anjiang-Wei/CodeARC/$AUTHOR_SHA/dataset/annotated/$id.py" \
+              -o "/tmp/q3-author-functions/$id.py"
+            test -s "/tmp/q3-author-functions/$id.py"
+            sha256sum "/tmp/q3-author-functions/$id.py" \
+              >> Q3-ORACLE-DEV/ORIGINAL_FUNCTION_SHA256.txt
+          done
+      - name: Install NEUMANN and locked Python containers
+        run: |
+          python -m pip install -e . pytest
+          docker pull python:3.11-alpine
+      - name: Active intervention source-only unit tests
+        run: python -m pytest -q -x tests/test_q3_active_oracle_challenges.py
+      - name: Refute old false programs via 4 source oracle queries each
+        run: |
+          python research/q3/q3_active_oracle_source_development.py \
+            --author-root /tmp/q3-author-functions \
+            --output Q3-ORACLE-DEV/RESULTS.json --budget 4
+          sha256sum Q3-ORACLE-DEV/RESULTS.json \
+            > Q3-ORACLE-DEV/RESULTS.sha256
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Q3-ACTIVE-AUTHOR-ORACLE-DEVELOPMENT
+          path: Q3-ORACLE-DEV/
+          if-no-files-found: warn
+          retention-days: 90
