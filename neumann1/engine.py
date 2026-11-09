@@ -652,3 +652,34 @@ class NeumannEngine:
         return self._q3_higher_order_method.program.compile(
             transition,known_classical=known_classical,
             independent_source_checks=independent_source_checks)
+
+    def meta_invent_transition_and_solver(
+            self, transition_source_pairs,
+            transition_source_checks, terminal_source_checks,
+            *, max_nodes=6,max_expressions=80000,max_source_ms=2500):
+        """End-to-end Q3: SOURCE invent T then compile via invented METHOD.
+
+        Neither a complete transition implementation nor terminal target
+        labels are provided to the inventor. SOURCE next-state examples
+        determine a new typed AST; separate source successor and terminal
+        checks must pass before the program can be used on new tasks.
+        """
+        from .typed_transition_inventor import TypedTransitionInventor
+        if not hasattr(self,"_q3_higher_order_method"):
+            raise ValueError("first learn a source-verified discovery method")
+        rule=TypedTransitionInventor(
+            max_nodes=max_nodes,max_expressions=max_expressions,
+            max_source_ms=max_source_ms).invent(
+                transition_source_pairs,
+                independent_source_checks=transition_source_checks)
+        compiled=self.meta_compile_higher_order_method(rule)
+        checked=tuple(terminal_source_checks)
+        if len(checked)<2:
+            raise ValueError("two independent terminal SOURCE checks required")
+        for source,goal in checked:
+            result=compiled.run(source)
+            if (result.status!="HALT_CERTIFIED_FIXED_POINT"
+                    or result.value!=goal):
+                raise ValueError(
+                    "source falsifies learned transition+method composition")
+        return rule,compiled
