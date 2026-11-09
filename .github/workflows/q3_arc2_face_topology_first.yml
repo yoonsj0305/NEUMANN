@@ -1,0 +1,55 @@
+name: Q3 ARC2 Source-Invented Topological Operator Original FIRST
+on:
+  pull_request:
+    paths:
+      - "neumann1/topological_region_inventor.py"
+      - "research/q3/q3_arc2_face_topology_original_first.py"
+      - ".github/workflows/q3_arc2_face_topology_first.yml"
+  workflow_dispatch:
+
+jobs:
+  original-author-before-gold:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Pin independent original ARC-AGI-2 source commit
+        run: |
+          mkdir -p /tmp/arc2-author
+          git -C /tmp/arc2-author init -q
+          git -C /tmp/arc2-author remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/arc2-author fetch -q --depth 1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/arc2-author checkout -q FETCH_HEAD
+          test "$(git -C /tmp/arc2-author rev-parse HEAD)" = f3283f727488ad98fe575ea6a5ac981e4a188e49
+      - run: python -m pip install -e .
+      - name: Remove all original TARGET gold and freeze selected first IDs
+        run: |
+          python research/q3/q3_arc2_face_topology_original_first.py prepare \
+            --upstream /tmp/arc2-author --blind /tmp/q3-face-blind --n 32
+      - name: Invent SOURCE operator and cryptographically freeze first predictions
+        run: |
+          python research/q3/q3_arc2_face_topology_original_first.py propose \
+            --blind /tmp/q3-face-blind --output q3_face_frozen_predictions.json
+          sha256sum q3_face_frozen_predictions.json > q3_face_frozen_predictions.sha256
+      - name: Read original test answers only AFTER predictor SHA freeze
+        run: |
+          frozen_sha="$(cut -d' ' -f1 q3_face_frozen_predictions.sha256)"
+          python research/q3/q3_arc2_face_topology_original_first.py score \
+            --upstream /tmp/arc2-author \
+            --predictions q3_face_frozen_predictions.json \
+            --sha "$frozen_sha" --output q3_face_original_score.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-arc2-face-topology-33-original-first
+          path: |
+            q3_face_frozen_predictions.json
+            q3_face_frozen_predictions.sha256
+            q3_face_original_score.json
+          if-no-files-found: error
