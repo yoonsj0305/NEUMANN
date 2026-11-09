@@ -1,0 +1,157 @@
+name: Q3 Evaluate SAVED On-policy Weights - No Repeated Generation or Training
+on:
+  push:
+    branches:
+      - research/q3-onpolicy-source-repair-20261109
+    paths:
+      - ".github/workflows/q3_onpolicy_rescue_score.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  recover_saved_model_then_score:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "2"
+      OPENBLAS_NUM_THREADS: "2"
+      MKL_NUM_THREADS: "2"
+      TOKENIZERS_PARALLELISM: "false"
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      HF_HUB_DOWNLOAD_TIMEOUT: "180"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install exact frozen CPU neural runtime and independent SOURCE sandbox
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          python -m pip install -q --index-url https://download.pytorch.org/whl/cpu 'torch==2.5.1'
+          python -m pip install -q 'transformers==4.48.3' 'peft==0.14.0' 'accelerate==1.3.0' pytest sentencepiece
+          docker pull python:3.11-alpine
+          python -m pytest -q -x tests/test_q3_onpolicy_repair.py tests/test_q3_source_refutation_learning.py
+      - name: Reuse actual 10-step-trained on-policy adapter from prior immutable failed receipt
+        run: |
+          set -euo pipefail
+          mkdir -p saved/onpolicy saved/first saved/context saved/synthetic results
+          gh run download 42616984918 \
+            --name Q3-ACTUAL-MODEL-SOURCE-REPAIR-WEIGHTS-AND-FOUR-ARM-RECEIPTS \
+            --dir saved/onpolicy
+          gh run download 42593621076 \
+            --name Q3-REAL-WEIGHT-LEARNING-ORIGINAL-SOURCE-BLIND \
+            --dir saved/first
+          gh run download 42602782399 \
+            --name Q3-TWO-ORIGIN-FROZEN-SOURCE-ADAPTER \
+            --dir saved/context
+          gh run download 42607278598 \
+            --name Q3-SOURCE-COUNTEREXAMPLE-MODEL-REPAIR-PILOT \
+            --dir saved/synthetic
+          test -s saved/onpolicy/onpolicy_adapter/adapter_model.safetensors
+          test -s saved/onpolicy/FROZEN_REAL_MODEL_SOURCE_FAILURES.jsonl
+          cmp saved/first/SOURCE_TEACHERS.jsonl saved/context/SOURCE_TEACHERS.jsonl
+          cmp saved/first/MODEL_REVISION.txt saved/context/MODEL_REVISION.txt
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          from neumann1.q3_trainable_code_policy import source_training_rows,certified_source_memory
+          from neumann1.q3_onpolicy_repair import verify_onpolicy_episodes
+          from neumann1.open_program_inventor import IsolatedPython
+          raw=Path("saved/onpolicy/FROZEN_REAL_MODEL_SOURCE_FAILURES.jsonl")
+          digest=hashlib.sha256(raw.read_bytes()).hexdigest()
+          asserted=Path("saved/onpolicy/FROZEN_REAL_MODEL_SOURCE_FAILURES.sha256").read_text().split()[0]
+          assert digest==asserted
+          rows,source_sha=source_training_rows("saved/first/SOURCE_TEACHERS.jsonl")
+          memory=certified_source_memory(rows,runner=IsolatedPython(max_seconds=8))
+          episodes=[json.loads(s) for s in raw.read_text().splitlines() if s.strip()]
+          verified=verify_onpolicy_episodes(rows,memory,memory.runner,episodes)
+          assert len(verified)==len(episodes)==5
+          assert len({x["original_source_id"] for x in verified})==5
+          context=json.loads(Path("saved/context/adapter/neumann_source_training_manifest.json").read_text())
+          synth=json.loads(Path("saved/synthetic/adapter/neumann_source_training_manifest.json").read_text())
+          assert context["steps"]==synth["steps"]==10
+          assert source_sha==context["source_sha256"]==synth["source_sha256"]
+          revision=Path("saved/first/MODEL_REVISION.txt").read_text().strip()
+          assert revision==context["model_revision"]==synth["model_revision"]
+          config=json.loads(Path("saved/onpolicy/onpolicy_adapter/adapter_config.json").read_text())
+          assert "Qwen2.5-Coder-0.5B-Instruct" in config["base_model_name_or_path"]
+          model_path=Path("saved/onpolicy/onpolicy_adapter/adapter_model.safetensors")
+          evidence={
+            "schema":"NEUMANN.Q3.ONPOLICY-RECOVERED-TRAINING-EVIDENCE.v1",
+            "source_only":True,
+            "model_revision":revision,
+            "model_generated_negatives_verified_in_Docker":len(verified),
+            "onpolicy_failure_source_sha256":digest,
+            "source_teachers_sha256":source_sha,
+            "adapter_weights_sha256":hashlib.sha256(model_path.read_bytes()).hexdigest(),
+            "provenance":"SAVED_BY_PREVIOUS_GITHUB_ACTION_AFTER_GRADIENT_UPDATES",
+            "training_steps_intended_and_executed":10,
+            "steps_provenance":"Pinned original workflow 42616984918, model.save_pretrained prior to manifest KeyError",
+            "training_loss":"NOT_RECORDED_DUE_TO_MANIFEST_ERROR",
+            "target_gold_available_in_model":False,
+            "q3_global":"OPEN"}
+          Path("results/RECOVERED_WEIGHT_EVIDENCE.json").write_text(
+            json.dumps(evidence,sort_keys=True,indent=2)+"\n")
+          print("Q3_REUSED_5_ACTUAL_MODEL_SOURCE_FAILURES_AND_SAVED_WEIGHTS",
+                json.dumps(evidence,sort_keys=True),flush=True)
+          PY
+      - name: Actual A B C D model program hypotheses, same SOURCE and budget
+        run: |
+          set -euo pipefail
+          REV="$(cat saved/first/MODEL_REVISION.txt)"
+          python research/q3/q3_source_refutation_pilot.py \
+            --blind saved/first/BLIND.json \
+            --teachers saved/first/SOURCE_TEACHERS.jsonl \
+            --adapter saved/synthetic/adapter \
+            --context-adapter saved/context/adapter \
+            --onpolicy-adapter saved/onpolicy/onpolicy_adapter \
+            --revision "$REV" \
+            --out results/FOUR_ARM_FROZEN_PREDICTIONS.json
+          sha256sum results/FOUR_ARM_FROZEN_PREDICTIONS.json \
+            > results/FOUR_ARM_FROZEN_PREDICTIONS.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          q=json.loads(Path("results/FOUR_ARM_FROZEN_PREDICTIONS.json").read_text())
+          assert q["original_target_gold_seen"] is False
+          assert q["model_scientific_scope"]=="PREEXPOSED_CODEARC_DEV_ONLY"
+          assert [r["id"] for r in q["records"]]==[184,255]
+          assert all(set(r["arms"])=={"A","B","C","D"} for r in q["records"])
+          print("Q3_REAL_ONPOLICY_SOURCE_CAUSAL_COMPARE",
+                json.dumps({
+                  "n":len(q["records"]),
+                  "A":q["pretrained_memory_correct_source"],
+                  "B":q["contextual_imitation_10step_correct_source"],
+                  "C":q["source_refutation_10step_correct_source"],
+                  "D":q["model_generated_repair_10step_correct_source"],
+                  "D_only_over_A_B_C":q["model_generated_repair_residual_over_all_controls"],
+                  "B_only_over_D":q["model_generated_repair_regressions_vs_control_B"],
+                  "q3_global":"OPEN","source_only":True},sort_keys=True),flush=True)
+          PY
+      - name: Only AFTER SHA freeze independently score original author withheld gold
+        run: |
+          set -euo pipefail
+          mkdir -p original
+          curl -fL --retry 3 --silent --show-error \
+            https://huggingface.co/datasets/anjiangwei/CodeARC-Invocations/resolve/119512573bf96148cbb95e99cf7cdd21c06153e4/invocations.jsonl \
+            -o original/invocations.jsonl
+          EXPECTED="3f08820594d4825c78bbdcc3b8eb2e6c8c0285fb3de966e900463b53f1723962"
+          ACTUAL="$(sha256sum original/invocations.jsonl | cut -d ' ' -f1)"
+          test "$EXPECTED" = "$ACTUAL"
+          SHA="$(cut -d ' ' -f1 results/FOUR_ARM_FROZEN_PREDICTIONS.sha256)"
+          python -m research.q3.q3_postfirst_repair_original_score \
+            --original original/invocations.jsonl \
+            --predictions results/FOUR_ARM_FROZEN_PREDICTIONS.json \
+            --expected-sha "$SHA" \
+            --output results/FOUR_ARM_ORIGINAL_POSTFIRST_SCORE.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Q3-REUSED-REAL-MODEL-REPAIR-FOUR-ARM-FROZEN-EVIDENCE
+          path: results/
+          if-no-files-found: warn
+          retention-days: 90
