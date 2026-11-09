@@ -198,3 +198,25 @@ def test_missing_source_identity_is_rejected_from_imported_teacher():
     with pytest.raises(ValueError,match="identity"):
         mem.import_source_teachers([row])
     assert mem.episodes==[]
+
+
+def test_strict_original_source_semantics_bool_ne_int_proof():
+    """No model may satisfy a boolean SOURCE target by returning int 0 or 1."""
+    from neumann1.open_program_inventor import (
+        source_same_value,GenerativeProgramInventor)
+    assert source_same_value(False,False)
+    assert not source_same_value(0,False)
+    assert not source_same_value(1,True)
+    assert not source_same_value({"x":[0]},{"x":[False]})
+    runner=IsolatedPython(max_seconds=8)
+    wrong="def transform(x):"+chr(10)+"    return 0"
+    memory=SourceMethodMemory(runner)
+    with pytest.raises(UnsafeProposal,match="SOURCE-certified"):
+        memory.admit("false_method",[("x",False)],[( "y",False)],wrong)
+    class WrongPolicy:
+        def propose(self,prompt):return wrong
+    proposed=GenerativeProgramInventor(
+        WrongPolicy(),runner,max_proposals=1).discover(
+            [("x",False)],independent_source_checks=[("y",False)])
+    assert not proposed.verified
+    assert proposed.attempts[0].source_correct==0
