@@ -21,6 +21,7 @@ import re
 import shutil
 import subprocess
 from time import perf_counter_ns
+from .q3_prompt_contract import source_discovery_prompt
 
 OPS=(
     ast.Module,ast.FunctionDef,ast.arguments,ast.arg,ast.Return,ast.Assign,
@@ -307,16 +308,7 @@ class GenerativeProgramInventor:
         if len(check_inputs)!=len(set(check_inputs)) or (
                 train_inputs & set(check_inputs)):
             raise ValueError("SOURCE verifier must be disjoint from training")
-        prompt=(
-            "Infer a general executable operator. Respond ONLY with Python "
-            "code: exactly one function def transform(x) that returns output. "
-            "No imports, other functions, globals, reflection or file access. "
-            "Use arithmetic, loops, conditionals and list operations to "
-            "express your own new algorithm. Do NOT memorize examples.\n"+
-            "\n".join("Source input: "+json.dumps(x,ensure_ascii=True)+
-                      "\nExpected source output: "+
-                      json.dumps(y,ensure_ascii=True)
-                      for x,y in train))
+        prompt=source_discovery_prompt(train)
         seen=set()
         receipts=[]
         for step in range(self.max_proposals):
