@@ -12,7 +12,7 @@ permissions:
 jobs:
   independent-author-original-neural-pilot:
     runs-on: ubuntu-latest
-    timeout-minutes: 28
+    timeout-minutes: 50
     env:
       PYTHONHASHSEED: "0"
       OMP_NUM_THREADS: "2"
@@ -40,7 +40,7 @@ jobs:
       - name: Pin open-weight program generator revision
         run: |
           set -euo pipefail
-          MODEL=https://huggingface.co/Qwen/Qwen2.5-Coder-0.5B-Instruct
+          MODEL=https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B-Instruct
           REV="$(git ls-remote "$MODEL" HEAD | awk '{print $1}')"
           test "$(printf %s "$REV" | wc -c)" -eq 40
           printf "%s\n" "$REV" > Q3-OPEN-NEURAL-POSTFIRST/MODEL_REVISION.txt
@@ -54,7 +54,7 @@ jobs:
         run: |
           python research/q3/q3_open_neural_codearc_postfirst.py prepare \
             --original /tmp/q3-neural-original/invocations.jsonl \
-            --blind Q3-OPEN-NEURAL-POSTFIRST/BLIND.json --n 8
+            --blind Q3-OPEN-NEURAL-POSTFIRST/BLIND.json --n 16 --offset 16
       - name: Generate and source-repair actual model code; freeze predictions
         run: |
           REV="$(cat Q3-OPEN-NEURAL-POSTFIRST/MODEL_REVISION.txt)"

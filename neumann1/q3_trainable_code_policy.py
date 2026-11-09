@@ -41,8 +41,12 @@ class LocalCausalCodePolicy:
         self.torch=torch
         self.tokenizer=Tokenizer.from_pretrained(
             model_name,trust_remote_code=False,revision=model_revision)
+        # Pin weights as well as tokenizer. BF16 memory reduces host
+        # requirement for an unbiased CPU-only comparison.
         self.model=Model.from_pretrained(
-            model_name,trust_remote_code=False)
+            model_name,trust_remote_code=False,
+            revision=model_revision,
+            torch_dtype=torch.bfloat16)
         if adapter_path is not None:
             try:
                 from peft import PeftModel
