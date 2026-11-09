@@ -58,7 +58,7 @@ jobs:
         run: |
           set -euo pipefail
           REV="$(cat previous/MODEL_REVISION.txt)"
-          python research/q3/q3_source_grounded_method_pilot.py infer \
+          python -m research.q3.q3_source_grounded_method_pilot infer \
             --blind previous/BLIND.json \
             --teachers previous/SOURCE_TEACHERS.jsonl \
             --revision "$REV" \
@@ -86,7 +86,7 @@ jobs:
             https://huggingface.co/datasets/anjiangwei/CodeARC-Invocations/resolve/119512573bf96148cbb95e99cf7cdd21c06153e4/invocations.jsonl \
             -o original/invocations.jsonl
           FROZEN="$(cut -d ' ' -f1 results/PAIRED_SOURCE_PREDICTIONS.sha256)"
-          python research/q3/q3_source_grounded_method_pilot.py score \
+          python -m research.q3.q3_source_grounded_method_pilot score \
             --original original/invocations.jsonl \
             --blind previous/BLIND.json \
             --predictions results/PAIRED_SOURCE_PREDICTIONS.json \
