@@ -127,12 +127,14 @@ def prepare(original,blind,n,offset=0):
     print("Q3_MODEL_BLIND_PREPARED",len(selected),_sha(blind))
 
 
-def propose(blind,out,*,model_revision,proposals=2):
+def propose(blind,out,*,model_revision,proposals=2,
+            model_name=MODEL,adapter_path=None):
     data=json.loads(blind.read_text())
     if data["schema"]!="NEUMANN.Q3.NEURAL.CODEARC.BLIND.v1":
         raise ValueError("not original blind source")
     model=LocalCausalCodePolicy(
-        model_name=MODEL,model_revision=model_revision,
+        model_name=model_name,model_revision=model_revision,
+        adapter_path=adapter_path,
         max_new_tokens=384,temperature=0.3)
     sandbox=IsolatedPython(max_seconds=6)
     rows=[]
@@ -197,7 +199,8 @@ def propose(blind,out,*,model_revision,proposals=2):
               "attempts",len(discovery.attempts),flush=True)
     payload={
         "schema":"NEUMANN.Q3.NEURAL.CODEARC.POSTFIRST.v1",
-        "model_id":MODEL,"model_revision":model_revision,
+        "model_id":model_name,"model_revision":model_revision,
+        "adapted_neural_weights":bool(adapter_path),
         "dataset_revision":DATA_REV,"dataset_sha256":data["original_sha256"],
         "blind_sha256":_sha(blind),"source_only":True,
         "no_external_target_gold_in_proposals":True,
@@ -245,7 +248,8 @@ def score(original,predictions,expected_sha,out):
         "sha256_frozen":expected_sha,
         "scope":"POSTFIRST independent-author original I/O, NOT unopened frontier",
         "global_q3_q6":"OPEN",
-        "weights_finetuned_during_study":False,
+        "weights_finetuned_during_study":bool(
+            plan.get("adapted_neural_weights",False)),
         "matched_initial_proposal":True,
         "by_cohort":{
             name:{
@@ -280,6 +284,8 @@ if __name__=="__main__":
     a.add_argument("--output",type=Path,required=True)
     a.add_argument("--model-revision",required=True)
     a.add_argument("--proposals",type=int,default=2)
+    a.add_argument("--model",default=MODEL)
+    a.add_argument("--adapter-path",default=None)
     a=commands.add_parser("score")
     a.add_argument("--original",type=Path,required=True)
     a.add_argument("--predictions",type=Path,required=True)
@@ -290,5 +296,6 @@ if __name__=="__main__":
         prepare(args.original,args.blind,args.n,args.offset)
     elif args.cmd=="propose":propose(
         args.blind,args.output,model_revision=args.model_revision,
-        proposals=args.proposals)
+        proposals=args.proposals,model_name=args.model,
+        adapter_path=args.adapter_path)
     else:score(args.original,args.predictions,args.expected_sha,args.output)
