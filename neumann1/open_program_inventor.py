@@ -21,7 +21,7 @@ import re
 import shutil
 import subprocess
 from time import perf_counter_ns
-from .q3_prompt_contract import source_discovery_prompt
+from .q3_prompt_contract import source_discovery_prompt, source_revision_prompt
 
 OPS=(
     ast.Module,ast.FunctionDef,ast.arguments,ast.arg,ast.Return,ast.Assign,
@@ -309,7 +309,8 @@ class GenerativeProgramInventor:
         if len(check_inputs)!=len(set(check_inputs)) or (
                 train_inputs & set(check_inputs)):
             raise ValueError("SOURCE verifier must be disjoint from training")
-        prompt=source_discovery_prompt(train,method_context=method_context)
+        base_prompt=source_discovery_prompt(train,method_context=method_context)
+        prompt=base_prompt
         seen=set()
         receipts=[]
         for step in range(self.max_proposals):
@@ -327,15 +328,16 @@ class GenerativeProgramInventor:
                 receipts.append(Attempt(
                     raw_hash,0,len(train),"REJECTED",step,
                     raw[:3000] if isinstance(raw,str) else None))
-                prompt+=(
-                    "\nYour proposed code failed the deterministic Python "
-                    "preflight. Fix the code while preserving its hypothesized "
-                    "algorithm. Error: "+type(exc).__name__+": "+
-                    str(exc)[:220]+"\n")
+                prompt=source_revision_prompt(
+                    base_prompt,raw if isinstance(raw,str) else "",
+                    {"error_type":type(exc).__name__,
+                     "message":str(exc)[:220]},kind="preflight")
                 continue
             sha=hashlib.sha256(code.encode()).hexdigest()
             if sha in seen:
-                prompt+="\nYou repeated a disproven proposal. Invent new code."
+                prompt=source_revision_prompt(
+                    base_prompt,code,{"reason":"identical already-falsified program"},
+                    kind="duplicate")
                 continue
             seen.add(sha)
             result=self.runner.evaluate(code,[x for x,y in train])
@@ -371,16 +373,12 @@ class GenerativeProgramInventor:
                                 "source_expected":y,
                                 "previous_observed":got,
                                 "runtime_error":error})
-                    prompt+=(
-                        "\nYour proposed algorithm passed the first SOURCE "
-                        "examples but FAILED on NEW SOURCE observations. "
-                        "Identify the missing invariant and revise the "
-                        "algorithm. New SOURCE counterexamples:\n"+
-                        json.dumps(witness[:3],ensure_ascii=True)[:3500])
+                    prompt=source_revision_prompt(
+                        base_prompt,code,witness[:3],kind="independent_source")
                 else:
-                    prompt+=(
-                        "\nAn independent SOURCE verifier refuted your "
-                        "program. Propose a different general algorithm.")
+                    prompt=source_revision_prompt(
+                        base_prompt,code,{"verifier_status":final.status},
+                        kind="independent_source")
             else:
                 errors=[]
                 if source_executed and self.rich_runtime_feedback:
@@ -396,10 +394,8 @@ class GenerativeProgramInventor:
                 else:
                     errors=["ABSTAIN_RUNTIME_ERROR" if source_executed
                             else result.status]
-                prompt+=(
-                    "\nYour last source program was falsified. "
-                    "Fix the causal rule, not individual examples. Errors:\n"+
-                    json.dumps(errors[:3],ensure_ascii=True)[:3500])
+                prompt=source_revision_prompt(
+                    base_prompt,code,errors[:3],kind="source")
         return Discovery("ABSTAIN_NO_SOURCE_PROGRAM",None,None,
                          tuple(receipts),len(checks),False)
 
