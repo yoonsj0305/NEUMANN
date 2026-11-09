@@ -1,9 +1,7 @@
 name: Q3 Real Neural Open-Program External Original POSTFIRST
+# Original-author gold may be opened only in deliberately frozen one-shot
+# evaluations. Routine Q3 edits must not silently relaunch 50-90min studies.
 on:
-  pull_request:
-    paths:
-      - "research/q3/q3_open_neural_codearc_postfirst.py"
-      - ".github/workflows/q3_open_neural_codearc_postfirst.yml"
   workflow_dispatch:
 
 permissions:
