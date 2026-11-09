@@ -260,8 +260,11 @@ class SourceBornRepresentationInventor:
                 (perf_counter_ns()-t)/1e6,
                 "no human per-task rank coercion")
         observations=tuple((a,b) for a,b in all_pairs)
-        if any(all(c(a)==b[2] for (a,b) in observations)
-               for c in classical_solvers):
+        if any(all(solver(a)==_normalise(b)[2]
+                   if _normalise(b)[0]=="matrix"
+                   else solver(a)==b
+                   for a,b in all_pairs)
+               for solver in classical_solvers):
             return InventionResult(
                 "CLASSICAL_FIRST",(),0,0,
                 (perf_counter_ns()-t)/1e6,
