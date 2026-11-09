@@ -187,3 +187,37 @@ def test_repair_prompt_forgets_older_failures_but_keeps_current_source():
     assert '"got":4' in second
     assert base in second
     assert len(second) < len(base)+650
+
+
+
+def test_incumbent_5_of_6_is_not_discarded_by_later_rejected_hypothesis():
+    """Replays observed 5/6 -> REJECTED failure mechanism from real CodeARC."""
+    partial="def transform(x):"+chr(10)+"    return x[0]"
+    broken="def transform(x):"+chr(10)+"    return eval('untrusted')"
+    complete="def transform(x):"+chr(10)+"    return min(x)"
+    class RequiresIncumbent:
+        def __init__(self):
+            self.prompts=[]
+        def propose(self,prompt):
+            self.prompts.append(prompt)
+            if len(self.prompts)==1:return partial
+            if len(self.prompts)==2:return broken
+            assert partial in prompt
+            assert "SOURCE observations" in prompt
+            assert "below retained" not in prompt or "hypothesis" in prompt
+            assert "TARGET outputs are UNKNOWN" in prompt
+            return complete
+    p=RequiresIncumbent()
+    samples=[
+        ([1,2],1),([3,5],3),([4,8],4),
+        ([6,9],6),([7,8],7),([9,1],1)]
+    outcome=GenerativeProgramInventor(
+        p,IsolatedPython(max_seconds=10),max_proposals=3).discover(
+            samples,independent_source_checks=[([8,2],2)])
+    assert outcome.verified
+    assert len(outcome.attempts)==3
+    assert outcome.attempts[0].source_correct==5
+    assert outcome.attempts[1].status=="REJECTED"
+    assert outcome.program==complete
+    assert partial in p.prompts[2]
+    assert "preflight" in p.prompts[2]
