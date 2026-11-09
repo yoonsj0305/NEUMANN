@@ -1,0 +1,56 @@
+name: Q3 Read Frozen Two-Author Original Scores - No Model or Synthesis Reruns
+on:
+  push:
+    branches:
+      - research/q3-general-semantic-program-invention-20261109
+    paths:
+      - ".github/workflows/q3_structural_score_rescue.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  frozen_original_author_gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install same scorer dependencies, no model weights or sandbox rerun
+        run: python -m pip install -q -e .
+      - name: Recover only immutable original-author score/prediction receipts from prior two-origin run
+        run: |
+          set -euo pipefail
+          mkdir -p codearc arcana
+          gh run download 42636672306 \
+            --name q3-invented-structures-codearc --dir codearc
+          gh run download 42636672306 \
+            --name q3-invented-structures-arcana --dir arcana
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          for origin, expected_n in (("codearc",8),("arcana",4)):
+              r=Path(origin)
+              o=json.loads((r/"score/ORIGINAL_SCORE.json").read_text())
+              p=(r/"evidence/PREDICTIONS.json")
+              pp=json.loads(p.read_text())
+              first=(r/"evidence/PREDICTIONS.sha256").read_text().split()[0]
+              actual=hashlib.sha256(p.read_bytes()).hexdigest()
+              assert actual==first==o["summary"]["original_predictions_sha256"]
+              assert pp["target_gold_accessed"] is False
+              assert pp["same_general_executable_substrate"]
+              assert len(o["records"])==expected_n
+              assert o["summary"]["q3_global"]=="OPEN"
+              print("Q3_AUTHOR_FROZEN_RECEIPTS",origin,
+                    o["summary"],flush=True)
+          PY
+      - name: Final pre-registered scientific gate with both independently scored original origins
+        run: |
+          set -euo pipefail
+          python -m research.q3.q3_structural_original_gate gate \
+            --codearc codearc/score/ORIGINAL_SCORE.json \
+            --arcana arcana/score/ORIGINAL_SCORE.json
