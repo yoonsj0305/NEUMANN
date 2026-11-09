@@ -1,0 +1,93 @@
+name: Q3 Representation Causal DEV - Reuse Existing 4 ARCANA Originals
+on:
+  push:
+    branches:
+      - research/q3-representation-invention-cross-type-20261110
+    paths:
+      - ".github/workflows/q3_representation_dev.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  replay_frozen_source_development:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install one common structural invention core and isolated Docker
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          docker pull python:3.11-alpine
+          python -m pytest -q -x tests/test_q3_structure_factorization.py
+      - name: Reuse OLD already exposed ARCANA SOURCE and original seven certified teachers
+        run: |
+          set -euo pipefail
+          mkdir -p frozen previous evidence score
+          gh run download 42636672306 \
+            --name q3-invented-structures-arcana \
+            --dir /tmp/prior-arcana
+          cp /tmp/prior-arcana/frozen/BLIND.json frozen/BLIND.json
+          gh run download 42593621076 \
+            --name Q3-REAL-WEIGHT-LEARNING-ORIGINAL-SOURCE-BLIND \
+            --dir previous
+          test -s previous/SOURCE_TEACHERS.jsonl
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          q=json.loads(Path("frozen/BLIND.json").read_text())
+          assert q["origin"]=="arcana"
+          assert q["scope"]=="FIRST_AUTHOR_BLIND"
+          assert [r["id"] for r in q["records"]]==[
+              "magnetic1.json","mop2.json","cup1.json","pocket_watch1.json"]
+          print("Q3_DEV_ONLY_NO_NEW_FIRST_COHORT",len(q["records"]),flush=True)
+          PY
+      - name: Same original frozen SOURCE four problems, same A B C policy learning
+        run: |
+          set -euo pipefail
+          python -m research.q3.q3_structural_original_gate infer \
+            --blind frozen/BLIND.json \
+            --teachers previous/SOURCE_TEACHERS.jsonl \
+            --out evidence/PREDICTIONS.json
+          sha256sum evidence/PREDICTIONS.json > evidence/PREDICTIONS.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          q=json.loads(Path("evidence/PREDICTIONS.json").read_text())
+          assert q["target_gold_accessed"] is False
+          print("Q3_FACTORIZED_DEV_SOURCE",
+                {r["id"]:{a:p["status"] for a,p in r["arms"].items()}
+                 for r in q["records"]},flush=True)
+          PY
+      - name: Only after predictions freeze score already studied author originals
+        run: |
+          set -euo pipefail
+          git init -q /tmp/arcana
+          git -C /tmp/arcana fetch -q --depth 1 \
+            https://github.com/density-11/arcana-test.git \
+            3f3dc8f650deb271a29e282bfb0e5ca95a7d64d6
+          git -C /tmp/arcana checkout -q FETCH_HEAD
+          expected="$(cut -d ' ' -f1 evidence/PREDICTIONS.sha256)"
+          python -m research.q3.q3_structural_original_gate score \
+            --blind frozen/BLIND.json \
+            --predictions evidence/PREDICTIONS.json \
+            --expected-sha "$expected" \
+            --original /tmp/arcana/data \
+            --out score/DEV_SCORE.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Q3-REPRESENTATION-FACTORIZATION-OLD-ARCANA-DEV
+          path: |
+            evidence/
+            score/
+          if-no-files-found: warn
+          retention-days: 90
