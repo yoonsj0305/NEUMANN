@@ -805,19 +805,26 @@ class RegistryEngine:
 
     def invent_open_program_from_source(
             self, source_pairs, independent_source_checks, *,
-            proposal_policy, runner=None, max_proposals=8):
-        """Q3 learned code generator: produce new full programs, not DSL picks.
-
-        The policy may use locally fine-tuned neural weights; generated code
-        is executed ONLY in an isolated Docker worker. No Docker means
-        abstention. Target gold is not an input; independent original SOURCE
-        checks establish admission. This does not imply universal Q3 success.
-        """
-        from .open_program_inventor import (
-            GenerativeProgramInventor, IsolatedPython)
+            proposal_policy, runner=None, max_proposals=8,
+            method_memory=None, reuse_memory=True,
+            source_identity=None):
+        """Same SINGLE task-agnostic Q3 policy as NeumannEngine, no domain route."""
+        from .q3_single_discovery_core import (
+            SingleDiscoveryCore, SourceMethodMemory)
+        from .open_program_inventor import IsolatedPython
         runtime=runner if runner is not None else IsolatedPython()
-        return GenerativeProgramInventor(
-            proposal_policy,runtime,
-            max_proposals=max_proposals).discover(
-                source_pairs,
-                independent_source_checks=independent_source_checks)
+        if method_memory is None:
+            if not hasattr(self, "_q3_single_method_memory"):
+                self._q3_single_method_memory=SourceMethodMemory(runtime)
+            method_memory=self._q3_single_method_memory
+        core=SingleDiscoveryCore(
+            proposal_policy, runtime,
+            memory=method_memory,max_proposals=max_proposals)
+        outcome=core.discover(
+            source_pairs,independent_source_checks,
+            reuse_memory=reuse_memory)
+        if source_identity is not None and outcome.discovery.verified:
+            core.learn_from_verified_source(
+                source_identity,source_pairs,
+                independent_source_checks,outcome)
+        return outcome.discovery
