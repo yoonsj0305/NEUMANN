@@ -17,6 +17,7 @@ import ast
 from dataclasses import dataclass
 import hashlib
 import json
+import re
 import shutil
 import subprocess
 from time import perf_counter_ns
@@ -31,10 +32,13 @@ OPS=(
     ast.Add,ast.Sub,ast.Mult,ast.Div,ast.FloorDiv,ast.Mod,
     ast.USub,ast.UAdd,ast.Not,ast.And,ast.Or,ast.Eq,ast.NotEq,
     ast.Lt,ast.LtE,ast.Gt,ast.GtE,ast.In,ast.NotIn,
+    ast.keyword,ast.Lambda,ast.BitAnd,ast.BitOr,ast.BitXor,
+    ast.LShift,ast.RShift,ast.Is,ast.IsNot,
 )
 BUILTINS=("len","range","enumerate","zip","min","max","sum","abs",
           "int","str","bool","list","tuple","dict","set","sorted",
-          "reversed","all","any")
+          "reversed","all","any","isinstance","float",
+          "round","ord","chr","divmod","pow","map","filter")
 METHODS=("append","extend","insert","reverse","sort","copy","count",
          "index","get","items","keys","values","pop",
          "lower","upper","strip","lstrip","rstrip","replace","split",
@@ -42,6 +46,8 @@ METHODS=("append","extend","insert","reverse","sort","copy","count",
          "startswith","endswith","find","rfind")
 
 class UnsafeProposal(ValueError):pass
+
+_CODE_START=re.compile(r"^def\s+transform\s*\(\s*x\s*\)\s*:")
 
 def validate_code(text):
     """Only simple non-reflective transform(x) accepted; not a sandbox."""
@@ -54,6 +60,22 @@ def validate_code(text):
         if len(lines)<3 or lines[-1].strip()!=fence:
             raise UnsafeProposal("invalid model code fence")
         code="\n".join(lines[1:-1])
+    elif not code.startswith("def transform"):
+        # If the model adds a plain-language preamble, extract ONLY its
+        # unique transform function. This is never arbitrary exec: the
+        # extracted code is still AST-validated and sandboxed.
+        lines=code.splitlines()
+        starts=[i for i,line in enumerate(lines)
+                if _CODE_START.match(line)]
+        if len(starts)!=1:
+            raise UnsafeProposal("a single def transform(x) is required")
+        a=starts[0]
+        b=len(lines)
+        for j in range(a+1,len(lines)):
+            if (lines[j].strip() and not lines[j].startswith((" ","\t","#"))):
+                b=j
+                break
+        code="\n".join(lines[a:b]).strip()
     try:
         tree=ast.parse(code)
     except SyntaxError as exc:
@@ -66,26 +88,38 @@ def validate_code(text):
             or fn.args.defaults or fn.args.kwonlyargs
             or fn.args.vararg or fn.args.kwarg):
         raise UnsafeProposal("transform(x) signature only")
+    helpers={
+        n.name for n in ast.walk(fn)
+        if isinstance(n,ast.FunctionDef) and n is not fn
+    }
+    if any(x.startswith("_") or "__" in x for x in helpers):
+        raise UnsafeProposal("reserved helper function name")
     for n in ast.walk(tree):
         if not isinstance(n,OPS):
             raise UnsafeProposal("forbidden syntax: "+type(n).__name__)
-        if isinstance(n,ast.FunctionDef) and n is not fn:
-            raise UnsafeProposal("nested code definitions forbidden")
+        if isinstance(n,ast.FunctionDef) and n is not fn and (
+                n.decorator_list or n.returns is not None or
+                n.args.defaults or n.args.kw_defaults or
+                n.args.vararg or n.args.kwarg or
+                any(a.annotation is not None for a in n.args.args)):
+            raise UnsafeProposal("non-pure helper function signature")
         if isinstance(n,ast.Name) and (
-                n.id.startswith("_") or "__" in n.id):
+                (n.id.startswith("_") and n.id!="_") or "__" in n.id):
             raise UnsafeProposal("reflection/private names forbidden")
         if isinstance(n,ast.Attribute) and n.attr not in METHODS:
             raise UnsafeProposal("method/reflection forbidden")
         if isinstance(n,ast.Call):
             if isinstance(n.func,ast.Name):
-                if n.func.id not in BUILTINS:
-                    raise UnsafeProposal("unknown builtin")
+                if n.func.id not in BUILTINS and n.func.id not in helpers:
+                    raise UnsafeProposal("unknown builtin or helper")
             elif isinstance(n.func,ast.Attribute):
                 if n.func.attr not in METHODS:
                     raise UnsafeProposal("unknown container method")
             else:
                 raise UnsafeProposal("callable expression forbidden")
-            if n.keywords:raise UnsafeProposal("keyword forwarding forbidden")
+            if any(k.arg is None or k.arg.startswith("_")
+                   for k in n.keywords):
+                raise UnsafeProposal("dynamic/private keywords forbidden")
         if isinstance(n,ast.comprehension) and n.is_async:
             raise UnsafeProposal("async forbidden")
         if isinstance(n,ast.Constant):
@@ -103,7 +137,8 @@ import builtins,json,sys
 payload=json.loads(sys.stdin.read())
 good={name:getattr(builtins,name) for name in (
  'len','range','enumerate','zip','min','max','sum','abs','int','str',
- 'bool','list','tuple','dict','set','sorted','reversed','all','any')}
+ 'bool','list','tuple','dict','set','sorted','reversed','all','any',
+ 'isinstance','float','round','ord','chr','divmod','pow','map','filter')}
 namespace={'__builtins__':good}
 try:
  exec(compile(payload['code'],'<generated>','exec'),namespace,namespace)
@@ -272,11 +307,25 @@ class GenerativeProgramInventor:
         seen=set()
         receipts=[]
         for step in range(self.max_proposals):
+            raw=None
             try:
-                code=validate_code(self.policy.propose(prompt))
-            except (UnsafeProposal,ValueError,TypeError):
-                receipts.append(Attempt("",0,len(train),"REJECTED",step))
-                prompt+="\nYour previous program was syntactically invalid."
+                raw=self.policy.propose(prompt)
+                code=validate_code(raw)
+            except (UnsafeProposal,ValueError,TypeError) as exc:
+                # The previous policy threw away 9/27 original candidate
+                # proposals as REJECTED but supplied zero preflight detail.
+                # This is source-independent compiler feedback, never
+                # information about a withheld target answer.
+                raw_hash=(hashlib.sha256(raw.encode()).hexdigest()
+                          if isinstance(raw,str) else "")
+                receipts.append(Attempt(
+                    raw_hash,0,len(train),"REJECTED",step,
+                    raw[:3000] if isinstance(raw,str) else None))
+                prompt+=(
+                    "\nYour proposed code failed the deterministic Python "
+                    "preflight. Fix the code while preserving its hypothesized "
+                    "algorithm. Error: "+type(exc).__name__+": "+
+                    str(exc)[:220]+"\n")
                 continue
             sha=hashlib.sha256(code.encode()).hexdigest()
             if sha in seen:
