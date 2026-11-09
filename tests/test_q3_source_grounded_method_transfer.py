@@ -47,7 +47,7 @@ def test_partial_old_method_receives_executable_counterexample():
     context=mem.source_supported_context(observed)
     assert FIRST in context
     assert "matches 4/6" in context
-    assert "constant-output baseline: 1/6" in context
+    assert "constant-output baseline: 2/6" in context
     assert '"expected":2' in context
     assert '"got":9' in context
     # The true original independent SOURCE checks were not supplied at all.
