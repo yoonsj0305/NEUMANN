@@ -188,6 +188,9 @@ def verify_onpolicy_episodes(rows,memory,runner,episodes):
             "train_total":current["train_total"],
             "independent_correct":current["independent_correct"],
             "kind":current["kind"],
+            "witness_sha256":_sha(json.dumps(
+                current["evidence"],ensure_ascii=True,sort_keys=True,
+                separators=(",",":"))),
             "source_only":True,
         })
     return verified
