@@ -1,15 +1,7 @@
 name: Q3 Real Neural Weight Learning vs Pretrained Original Author
+# Original-author gold may be opened only in deliberately frozen one-shot
+# evaluations. Routine Q3 edits must not silently relaunch 50-90min studies.
 on:
-  pull_request:
-    paths:
-      - "neumann1/q3_prompt_contract.py"
-      - "neumann1/q3_trainable_code_policy.py"
-      - "neumann1/open_program_inventor.py"
-      - "research/q3/q3_real_source_teacher_builder.py"
-      - "research/q3/q3_score_neural_adaptation.py"
-      - "research/q3/q3_open_neural_codearc_postfirst.py"
-      - "tests/test_q3_neural_gradient_contract.py"
-      - ".github/workflows/q3_real_neural_weight_learning.yml"
   workflow_dispatch:
 
 permissions:
