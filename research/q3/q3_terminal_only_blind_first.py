@@ -42,7 +42,7 @@ def source_endpoints():
         frozenset((4,8,12,16,20)),
         frozenset((5,9,13,14)),
     )
-    ref_set=lambda s:frozenset((max(s),)) if s else frozenset()
+    ref_set=lambda s:frozenset()
     sets=tuple((s,ref_set(s)) for s in source_sets)
     set_checks=tuple((s,ref_set(s)) for s in (
         frozenset((7,11)),frozenset((4,9,23)),
@@ -81,7 +81,7 @@ def decode(kind,raw):
 def hidden_target_gold(kind,raw):
     """REFERENCE; only the independent score() function may call this."""
     if kind=="int":return 0
-    if kind=="set":return frozenset({max(raw)}) if raw else frozenset()
+    if kind=="set":return frozenset()
     if kind=="str":return re.sub(r"b+","b",raw)
     raise ValueError("unknown target state type")
 
