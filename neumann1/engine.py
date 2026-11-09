@@ -741,3 +741,23 @@ class NeumannEngine:
                 control=self._q3_higher_order_method.program,
                 forbidden_target_inputs=forbidden_target_inputs,
                 known_classical=known_classical)
+
+
+    def invent_open_program_from_source(
+            self, source_pairs, independent_source_checks, *,
+            proposal_policy, runner=None, max_proposals=8):
+        """Q3 learned code generator: produce new full programs, not DSL picks.
+
+        The policy may use locally fine-tuned neural weights; generated code
+        is executed ONLY in an isolated Docker worker. No Docker means
+        abstention. Target gold is not an input; independent original SOURCE
+        checks establish admission. This does not imply universal Q3 success.
+        """
+        from .open_program_inventor import (
+            GenerativeProgramInventor, IsolatedPython)
+        runtime=runner if runner is not None else IsolatedPython()
+        return GenerativeProgramInventor(
+            proposal_policy,runtime,
+            max_proposals=max_proposals).discover(
+                source_pairs,
+                independent_source_checks=independent_source_checks)
