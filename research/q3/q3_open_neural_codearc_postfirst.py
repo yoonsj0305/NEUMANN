@@ -22,6 +22,8 @@ from neumann1.open_program_inventor import (
     GenerativeProgramInventor,IsolatedPython)
 from neumann1.q3_trainable_code_policy import (
     LocalCausalCodePolicy,DEFAULT_MODEL)
+from neumann1.source_program_reviser import (
+    SourceProgramReviser,SourcePolicyLearner)
 
 SALT="NEUMANN_Q3_OPEN_NEURAL_POSTFIRST_20261109_V1"
 MODEL="Qwen/Qwen2.5-Coder-1.5B-Instruct"
@@ -135,6 +137,11 @@ def propose(blind,out,*,model_revision,proposals=2):
         model_name=MODEL,model_revision=model_revision,
         max_new_tokens=384,temperature=0.3)
     sandbox=IsolatedPython(max_seconds=6)
+    # Both arms see the identical frozen pretrained generator, its exact
+    # SOURCE attempts, and a matched isolated execution budget. The adaptive
+    # arm updates ONLY its code-edit action weights from earlier SOURCE.
+    adaptive_policy=SourcePolicyLearner(adapt=True)
+    static_policy=SourcePolicyLearner(adapt=False)
     rows=[]
     for rec in data["records"]:
         source=rec["source"]
@@ -164,6 +171,28 @@ def propose(blind,out,*,model_revision,proposals=2):
             outcome=sandbox.evaluate(discovery.program,rec["target_inputs"])
             if outcome.status=="EXECUTED":
                 predicted=list(outcome.outputs)
+        # Offline program minimization / counterexample repair is an
+        # independently ablated capability; not extra LLM samples.
+        static=SourceProgramReviser(
+            sandbox,max_source_evals=36,policy=static_policy).repair(
+                discovery.attempts,source[:6],
+                independent_source_checks=(source[6],),
+                initial_source_verified=discovery.program)
+        adaptive=SourceProgramReviser(
+            sandbox,max_source_evals=36,policy=adaptive_policy).repair(
+                discovery.attempts,source[:6],
+                independent_source_checks=(source[6],),
+                initial_source_verified=discovery.program)
+        static_outputs=[]
+        adaptive_outputs=[]
+        if static.program is not None:
+            direct=sandbox.evaluate(static.program,rec["target_inputs"])
+            if direct.status=="EXECUTED":
+                static_outputs=list(direct.outputs)
+        if adaptive.program is not None:
+            direct=sandbox.evaluate(adaptive.program,rec["target_inputs"])
+            if direct.status=="EXECUTED":
+                adaptive_outputs=list(direct.outputs)
         first=discovery.attempts[0] if discovery.attempts else None
         first_source_verified=False
         first_pred=[]
@@ -184,6 +213,15 @@ def propose(blind,out,*,model_revision,proposals=2):
             "model_only_first_checked":first_source_verified,
             "first_predictions":first_pred,
             "refined_predictions":predicted,
+            "static_repair_predictions":static_outputs,
+            "adaptive_repair_predictions":adaptive_outputs,
+            "static_repair_program":static.program,
+            "adaptive_repair_program":adaptive.program,
+            "static_repair_action":static.action,
+            "adaptive_repair_action":adaptive.action,
+            "static_repair_source_checked":static.source_checked,
+            "adaptive_repair_source_checked":adaptive.source_checked,
+            "adaptive_policy_updates":adaptive.policy_updates,
             "program_sha256":discovery.frozen_sha256,
             "verified_program":discovery.program if discovery.verified else None,
             "attempts":[{
@@ -223,12 +261,26 @@ def score(original,predictions,expected_sha,out):
                     row["opaque_error_predictions"]==gold)
         repaired=bool(row["refined_predictions"] and
                       row["refined_predictions"]==gold)
+        static=bool(row.get("static_repair_predictions") and
+                    row["static_repair_predictions"]==gold)
+        adaptive=bool(row.get("adaptive_repair_predictions") and
+                      row["adaptive_repair_predictions"]==gold)
         entries.append({
             "id":row["id"],"cohort":row["cohort"],
             "source_status":row["status"],
             "opaque_source_status":row["opaque_error_status"],
             "first_original_exact":first,"revised_original_exact":repaired,
             "opaque_feedback_exact":opaque,
+            "static_source_repair_exact":static,
+            "adaptive_source_repair_exact":adaptive,
+            "static_residual_vs_generator":static and not repaired,
+            "adaptive_residual_vs_generator":adaptive and not repaired,
+            "adaptive_residual_vs_static":adaptive and not static,
+            "static_action":row.get("static_repair_action"),
+            "adaptive_action":row.get("adaptive_repair_action"),
+            "adaptive_policy_updates":row.get("adaptive_policy_updates",0),
+            "static_source_evals":row.get("static_repair_source_checked",0),
+            "adaptive_source_evals":row.get("adaptive_repair_source_checked",0),
             "typed_feedback_new_residual":repaired and not opaque,
             "revised_new_residual":repaired and not first,
             "source_model_train_fitted":bool(row["refined_predictions"])})
@@ -237,6 +289,20 @@ def score(original,predictions,expected_sha,out):
         "one_shot_first_exact":sum(e["first_original_exact"] for e in entries),
         "source_repaired_exact":sum(
             e["revised_original_exact"] for e in entries),
+        "uniform_source_reviser_exact":sum(
+            e["static_source_repair_exact"] for e in entries),
+        "adaptive_source_reviser_exact":sum(
+            e["adaptive_source_repair_exact"] for e in entries),
+        "new_original_vs_pretrained_baseline":sum(
+            e["adaptive_residual_vs_generator"] for e in entries),
+        "new_original_from_learned_policy_vs_uniform":sum(
+            e["adaptive_residual_vs_static"] for e in entries),
+        "adaptive_edit_policy_updates":max(
+            (e["adaptive_policy_updates"] for e in entries),default=0),
+        "uniform_source_evaluations":sum(
+            e["static_source_evals"] for e in entries),
+        "adaptive_source_evaluations":sum(
+            e["adaptive_source_evals"] for e in entries),
         "causal_new_exact":sum(e["revised_new_residual"] for e in entries),
         "opaque_runtime_error_exact":sum(e["opaque_feedback_exact"] for e in entries),
         "typed_feedback_new_vs_opaque":sum(e["typed_feedback_new_residual"] for e in entries),
