@@ -7,6 +7,8 @@ on:
       - "neumann1/engine.py"
       - "neumann1/registry_engine.py"
       - "tests/test_unbounded_counter_inventor.py"
+      - "tests/test_unbounded_counter_promotion.py"
+      - "neumann1/induced_grammar.py"
       - ".github/workflows/q3_unbounded_counter_invention.yml"
   workflow_dispatch:
 
@@ -28,4 +30,5 @@ jobs:
         run: |
           python -m pytest -q -s \
             tests/test_unbounded_counter_inventor.py \
+            tests/test_unbounded_counter_promotion.py \
             tests/test_unknown_state_operator_inventor.py
