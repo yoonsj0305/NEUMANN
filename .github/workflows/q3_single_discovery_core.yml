@@ -11,6 +11,8 @@ on:
       - "tests/test_q3_single_discovery_core.py"
       - "tests/test_q3_two_origins_contract.py"
       - "tests/test_q3_source_refutation_learning.py"
+      - "neumann1/q3_onpolicy_repair.py"
+      - "tests/test_q3_onpolicy_repair.py"
       - "neumann1/q3_refutation_learning.py"
       - "research/q3/q3_two_origins_preregistered.py"
       - ".github/workflows/q3_single_discovery_core.yml"
@@ -35,4 +37,4 @@ jobs:
         run: python -m pip install -e . pytest
       - name: Run one core across arithmetic and strings, verify memory and sandbox
         run: |
-          python -m pytest -q -x tests/test_q3_single_discovery_core.py tests/test_q3_neural_gradient_contract.py tests/test_q3_open_program_discovery.py tests/test_q3_two_origins_contract.py tests/test_q3_source_refutation_learning.py
+          python -m pytest -q -x tests/test_q3_single_discovery_core.py tests/test_q3_neural_gradient_contract.py tests/test_q3_open_program_discovery.py tests/test_q3_two_origins_contract.py tests/test_q3_source_refutation_learning.py tests/test_q3_onpolicy_repair.py
