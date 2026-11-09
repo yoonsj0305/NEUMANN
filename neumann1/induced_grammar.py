@@ -69,7 +69,8 @@ def eval_ast(ast,input_value,*,dynamic_primitives=None):
                 # Other registered primitives retain their existing
                 # separately verified finite-relation delta interface.
                 from .unknown_state_operator_inventor import InventedStateOperator
-                if isinstance(primitive,InventedStateOperator):
+                from .unbounded_counter_inventor import InventedCounterOperator
+                if isinstance(primitive,(InventedStateOperator,InventedCounterOperator)):
                     return primitive.apply(value) if type(value) is str else INVALID
                 task=dict(value) if isinstance(value,tuple) else value
                 return primitive.apply_delta(task)
@@ -204,6 +205,32 @@ class GrammarInventor:
                 rule.apply(x)!=y
                 for x,y in checks):
             raise ValueError("independent SOURCE falsifies invented state operator")
+        self.dynamic_primitives[name]=rule
+
+    def register_source_invented_counter_operator(
+            self,name,rule,*,independent_source_checks):
+        """Add a NEW unbounded-state instruction after source-only validation.
+
+        This is conditional on the human-provided typed counter metagrammar.
+        It does not imply the true unknown function universally follows that
+        language: finite independent SOURCE checks are not a global proof.
+        """
+        from .unbounded_counter_inventor import InventedCounterOperator
+        checks=tuple(independent_source_checks)
+        if (not isinstance(name,str) or
+                not name.startswith("invented:counter:") or
+                name in ATOMIC or name in self.dynamic_primitives or
+                not isinstance(rule,InventedCounterOperator) or
+                rule.source_examples<31 or
+                rule.source_verifiers<3 or len(checks)<3):
+            raise ValueError("certified SOURCE counter instruction required")
+        if any(
+                type(x) is not str or len(x)<=8 or
+                any(c not in rule.alphabet for c in x) or
+                type(y) is not int or y not in (0,1) or
+                rule.apply(x)!=y
+                for x,y in checks):
+            raise ValueError("independent SOURCE falsifies generated counter")
         self.dynamic_primitives[name]=rule
 
     def invent_from_source(self,task_id,examples,*,verification_pairs=None):
