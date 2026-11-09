@@ -22,6 +22,8 @@ from neumann1.open_program_inventor import (
     GenerativeProgramInventor,IsolatedPython)
 from neumann1.q3_trainable_code_policy import (
     LocalCausalCodePolicy,DEFAULT_MODEL)
+from neumann1.verified_fragment_transfer import (
+    CertifiedFragmentLibrary,transfer_from_verified_sources)
 
 SALT="NEUMANN_Q3_OPEN_NEURAL_POSTFIRST_20261109_V1"
 MODEL="Qwen/Qwen2.5-Coder-1.5B-Instruct"
@@ -127,7 +129,7 @@ def prepare(original,blind,n,offset=0):
     print("Q3_MODEL_BLIND_PREPARED",len(selected),_sha(blind))
 
 
-def propose(blind,out,*,model_revision,proposals=2):
+def propose(blind,out,*,model_revision,proposals=2,library_path=None):
     data=json.loads(blind.read_text())
     if data["schema"]!="NEUMANN.Q3.NEURAL.CODEARC.BLIND.v1":
         raise ValueError("not original blind source")
@@ -135,6 +137,8 @@ def propose(blind,out,*,model_revision,proposals=2):
         model_name=MODEL,model_revision=model_revision,
         max_new_tokens=384,temperature=0.3)
     sandbox=IsolatedPython(max_seconds=6)
+    library=(CertifiedFragmentLibrary.load(library_path).certify(sandbox)
+             if library_path else None)
     rows=[]
     for rec in data["records"]:
         source=rec["source"]
@@ -164,6 +168,21 @@ def propose(blind,out,*,model_revision,proposals=2):
             outcome=sandbox.evaluate(discovery.program,rec["target_inputs"])
             if outcome.status=="EXECUTED":
                 predicted=list(outcome.outputs)
+        # This is a real cross-original program constructor transfer:
+        # the old SOURCE-certified programs are frozen BEFORE this cohort;
+        # the new task does not supply its reference implementation.
+        transfer=None
+        transfer_predictions=[]
+        if library is not None and not predicted:
+            transfer=transfer_from_verified_sources(
+                discovery.attempts,source[:6],(source[6],),
+                library,sandbox,max_variants_per_program=32,
+                exclude_origin_ids=(rec["id"],))
+            if transfer.program is not None:
+                out_x=sandbox.evaluate(
+                    transfer.program,rec["target_inputs"])
+                if out_x.status=="EXECUTED":
+                    transfer_predictions=list(out_x.outputs)
         first=discovery.attempts[0] if discovery.attempts else None
         first_source_verified=False
         first_pred=[]
@@ -184,6 +203,15 @@ def propose(blind,out,*,model_revision,proposals=2):
             "model_only_first_checked":first_source_verified,
             "first_predictions":first_pred,
             "refined_predictions":predicted,
+            "transferred_predictions":transfer_predictions,
+            "transfer_status":transfer.status if transfer else "ABSTAIN_NO_LIBRARY",
+            "transfer_program":transfer.program if transfer else None,
+            "transfer_program_sha256":(
+                transfer.program_sha256 if transfer else None),
+            "transfer_candidates":(
+                transfer.source_candidates_checked if transfer else 0),
+            "transfer_source_best":(
+                transfer.source_correct_max if transfer else 0),
             "program_sha256":discovery.frozen_sha256,
             "verified_program":discovery.program if discovery.verified else None,
             "attempts":[{
@@ -201,7 +229,12 @@ def propose(blind,out,*,model_revision,proposals=2):
         "dataset_revision":DATA_REV,"dataset_sha256":data["original_sha256"],
         "blind_sha256":_sha(blind),"source_only":True,
         "no_external_target_gold_in_proposals":True,
-        "unrestricted_Q3_Q6_claim":False,"records":rows}
+        "unrestricted_Q3_Q6_claim":False,
+        "source_library_sha256":(
+            _sha(library_path) if library_path else None),
+        "source_operator_library_count":(
+            len(library.records) if library else 0),
+        "records":rows}
     out.write_text(json.dumps(payload,separators=(",",":"))+"\n")
     print("Q3_MODEL_PREDICTIONS_FROZEN_SHA256",_sha(out))
 
@@ -223,12 +256,19 @@ def score(original,predictions,expected_sha,out):
                     row["opaque_error_predictions"]==gold)
         repaired=bool(row["refined_predictions"] and
                       row["refined_predictions"]==gold)
+        transferred=bool(row.get("transferred_predictions") and
+                         row["transferred_predictions"]==gold)
         entries.append({
             "id":row["id"],"cohort":row["cohort"],
             "source_status":row["status"],
             "opaque_source_status":row["opaque_error_status"],
             "first_original_exact":first,"revised_original_exact":repaired,
             "opaque_feedback_exact":opaque,
+            "transfer_status":row.get("transfer_status"),
+            "transfer_source_candidates":row.get("transfer_candidates",0),
+            "transfer_original_exact":transferred,
+            "transfer_residual_vs_neural":transferred and not repaired,
+            "combined_exact":repaired or transferred,
             "typed_feedback_new_residual":repaired and not opaque,
             "revised_new_residual":repaired and not first,
             "source_model_train_fitted":bool(row["refined_predictions"])})
@@ -237,6 +277,13 @@ def score(original,predictions,expected_sha,out):
         "one_shot_first_exact":sum(e["first_original_exact"] for e in entries),
         "source_repaired_exact":sum(
             e["revised_original_exact"] for e in entries),
+        "source_memory_transfer_exact":sum(
+            e["transfer_original_exact"] for e in entries),
+        "new_residual_vs_neural_baseline":sum(
+            e["transfer_residual_vs_neural"] for e in entries),
+        "combined_neural_plus_transfer_exact":sum(
+            e["combined_exact"] for e in entries),
+        "prior_source_macro_count":plan.get("source_operator_library_count",0),
         "causal_new_exact":sum(e["revised_new_residual"] for e in entries),
         "opaque_runtime_error_exact":sum(e["opaque_feedback_exact"] for e in entries),
         "typed_feedback_new_vs_opaque":sum(e["typed_feedback_new_residual"] for e in entries),
@@ -280,6 +327,7 @@ if __name__=="__main__":
     a.add_argument("--output",type=Path,required=True)
     a.add_argument("--model-revision",required=True)
     a.add_argument("--proposals",type=int,default=2)
+    a.add_argument("--source-library",type=Path)
     a=commands.add_parser("score")
     a.add_argument("--original",type=Path,required=True)
     a.add_argument("--predictions",type=Path,required=True)
@@ -290,5 +338,5 @@ if __name__=="__main__":
         prepare(args.original,args.blind,args.n,args.offset)
     elif args.cmd=="propose":propose(
         args.blind,args.output,model_revision=args.model_revision,
-        proposals=args.proposals)
+        proposals=args.proposals,library_path=args.source_library)
     else:score(args.original,args.predictions,args.expected_sha,args.output)
