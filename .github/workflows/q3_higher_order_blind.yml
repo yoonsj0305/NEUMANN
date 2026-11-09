@@ -1,0 +1,61 @@
+name: Q3 Higher-Order Method Blind Source-First Generalization
+
+on:
+  pull_request:
+    paths:
+      - "neumann1/higher_order_method_inventor.py"
+      - "research/q3/q3_higher_order_method_blind.py"
+      - ".github/workflows/q3_higher_order_blind.yml"
+  workflow_dispatch:
+
+jobs:
+  freeze-then-score-new-semantic-domains:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install exact research source
+        run: python -m pip install -e .
+      - name: Learn and twice self-rewrite method before generating any unseen gold
+        run: |
+          python research/q3/q3_higher_order_method_blind.py propose \
+            --output q3_higher_order_source_frozen.json
+          sha256sum q3_higher_order_source_frozen.json \
+            > q3_higher_order_frozen.sha256
+      - name: Independently score SHA-sealed predictions on new domains
+        run: |
+          digest="$(cut -d' ' -f1 q3_higher_order_frozen.sha256)"
+          python research/q3/q3_higher_order_method_blind.py score \
+            --predictions q3_higher_order_source_frozen.json \
+            --expected-sha "$digest" \
+            --output q3_higher_order_scored.json
+          python - <<'PY'
+          import json
+          s=json.load(open('q3_higher_order_scored.json'))['summary']
+          assert s['convergent_heldout_tasks']==252
+          assert s['convergent_heldout_correct']==252
+          assert s['previous_method_correct']==2
+          assert s['unseen_euclid_dedup_interval_cases']==220
+          assert s['unseen_euclid_dedup_interval_correct']==220
+          assert s['nonconvergent_cases']==10
+          assert s['nonconvergent_safe_abstains']==10
+          assert s['independent_source_verifiers']==15
+          assert s['method_rewrites']==2
+          assert not s['global_Q3_Q6_pass']
+          print('CONDITIONAL HIGHER-ORDER Q3/Q6 TEST PASS; UNRESTRICTED PASS NOT CLAIMED')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-higher-order-self-invented-method-blind-262-original-synthetic
+          path: |
+            q3_higher_order_source_frozen.json
+            q3_higher_order_frozen.sha256
+            q3_higher_order_scored.json
+          if-no-files-found: error
