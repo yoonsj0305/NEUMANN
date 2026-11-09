@@ -186,4 +186,4 @@ def test_repair_prompt_forgets_older_failures_but_keeps_current_source():
     assert '"got":1' not in second
     assert '"got":4' in second
     assert base in second
-    assert len(second) < len(first)+len(second)
+    assert len(second) < len(base)+650
