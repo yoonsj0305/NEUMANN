@@ -10,7 +10,10 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
-from research.q3.q3_source_refutation_pilot import SCHEMA, IDS
+# This scoring process must be pure standard-library Python and must never
+# import model/runtime modules. The policy and oracle run in different jobs.
+SCHEMA="NEUMANN.Q3.SOURCE-REPAIR-PILOT.v1"
+IDS=(184,255)
 from research.q3.q3_two_origins_preregistered import codearc_corpus, _codearc_output
 
 
