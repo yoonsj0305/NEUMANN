@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
-      GH_TOKEN: \${{ github.token }}
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -108,7 +108,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 160
     env:
-      GH_TOKEN: \${{ github.token }}
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -121,8 +121,8 @@ jobs:
       - name: Pinned external originals, never train on original TARGET answers
         run: |
           set -euo pipefail
-          mkdir -p "original-\${{ matrix.origin }}"
-          if [ "\${{ matrix.origin }}" = "codearc" ]; then
+          mkdir -p "original-${{ matrix.origin }}"
+          if [ "${{ matrix.origin }}" = "codearc" ]; then
             curl -fL --retry 3 --silent --show-error \
               https://huggingface.co/datasets/anjiangwei/CodeARC-Invocations/resolve/119512573bf96148cbb95e99cf7cdd21c06153e4/invocations.jsonl \
               -o original-codearc/invocations.jsonl
@@ -149,7 +149,7 @@ jobs:
       - name: Freeze full ORIGINAL tasks and author provenance, SOURCE I/O only
         run: |
           set -euo pipefail
-          ORIGIN="\${{ matrix.origin }}"
+          ORIGIN="${{ matrix.origin }}"
           mkdir -p "result-$ORIGIN"
           if [ "$ORIGIN" = "codearc" ]; then
             ORIGINAL=original-codearc/invocations.jsonl
@@ -167,7 +167,7 @@ jobs:
       - name: A pretrained vs B certified-memory vs C actual learned weights
         run: |
           set -euo pipefail
-          ORIGIN="\${{ matrix.origin }}"
+          ORIGIN="${{ matrix.origin }}"
           REV="$(cat training/MODEL_REVISION.txt)"
           python research/q3/q3_two_origins_preregistered.py propose \
             --blind "result-$ORIGIN/BLIND.json" \
@@ -180,7 +180,7 @@ jobs:
       - name: ONLY NOW score heldout original-author gold, immutable A/B/C predictions
         run: |
           set -euo pipefail
-          ORIGIN="\${{ matrix.origin }}"
+          ORIGIN="${{ matrix.origin }}"
           if [ "$ORIGIN" = "codearc" ]; then
             ORIGINAL=original-codearc/invocations.jsonl
           else
@@ -196,8 +196,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: q3-two-origin-\${{ matrix.origin }}-original-receipts
-          path: result-\${{ matrix.origin }}/
+          name: q3-two-origin-${{ matrix.origin }}-original-receipts
+          path: result-${{ matrix.origin }}/
           if-no-files-found: warn
           retention-days: 90
 
