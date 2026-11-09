@@ -204,8 +204,12 @@ class SingleDiscoveryCore:
         train = tuple((x, y) for x, y in source_pairs)
         checks = tuple((x, y) for x, y in independent_source_checks)
         _check_pairs(train, checks)
-        context = (self.memory.context(excluded_ids=excluded_source_ids)
-                   if reuse_memory else "")
+        # Same exact context contract is used by leave-one-out LoRA training.
+        # Two short, independently certified methods, never target-selected.
+        context = (self.memory.context(
+            excluded_ids=excluded_source_ids,
+            max_methods=2,max_chars_per_method=320)
+            if reuse_memory else "")
         proposal = GenerativeProgramInventor(
             self.policy, self.runner,
             max_proposals=self.max_proposals).discover(
