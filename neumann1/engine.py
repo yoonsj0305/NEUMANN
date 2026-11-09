@@ -767,3 +767,20 @@ class NeumannEngine:
                 independent_source_checks=independent_source_checks,
                 forbidden_target_words=forbidden_target_words,
                 known_classical=known_classical)
+
+
+    def promote_unknown_state_operator(
+            self, name, invented_program, *, independent_source_checks):
+        """Q3: add an independently checked new state operation to the live DSL.
+
+        This makes source-discovered semantic content executable in later
+        program synthesis, not merely retrievable as a completed solution.
+        The DFA-class assumption remains conditional and explicitly recorded.
+        """
+        from .induced_grammar import GrammarInventor
+        if not hasattr(self, "_invented_grammar"):
+            self._invented_grammar = GrammarInventor()
+        self._invented_grammar.register_source_invented_state_operator(
+            name, invented_program,
+            independent_source_checks=independent_source_checks)
+        return name
