@@ -56,7 +56,7 @@ def test_import_prior_original_source_teachers_and_reverify():
 def test_falsified_verifier_refused_and_failed_source_not_memorized():
     memory=SourceMethodMemory(StubRunner())
     with pytest.raises(UnsafeProposal,match="SOURCE-certified"):
-        memory.admit("false","a",[(10,11)],INC)
+        memory.admit("false",[(10,100)],[(11,12)],INC)
     assert not memory.episodes
 
 
