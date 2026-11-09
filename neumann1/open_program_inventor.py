@@ -104,10 +104,30 @@ good={name:getattr(builtins,name) for name in (
 namespace={'__builtins__':good}
 try:
  exec(compile(payload['code'],'<generated>','exec'),namespace,namespace)
- results=[namespace['transform'](x) for x in payload['inputs']]
- print(json.dumps({'ok':True,'outputs':results},separators=(',',':')))
+ outputs=[]
+ errors=[]
+ for x in payload['inputs']:
+  try:
+   result=namespace['transform'](x)
+   json.dumps(result)
+   outputs.append(result)
+   errors.append(None)
+  except Exception as error:
+   frame=error.__traceback__
+   while frame is not None and frame.tb_next is not None:
+    frame=frame.tb_next
+   lineno=frame.tb_lineno if frame is not None else 0
+   outputs.append(None)
+   errors.append({
+     'type':type(error).__name__[:80],
+     'message':str(error)[:160],
+     'line':lineno
+   })
+ print(json.dumps({'ok':True,'outputs':outputs,'errors':errors},
+                  separators=(',',':')))
 except Exception:
- print(json.dumps({'ok':False,'outputs':[]},separators=(',',':')))
+ print(json.dumps({'ok':False,'outputs':[],'errors':[]},
+                  separators=(',',':')))
 """
 
 @dataclass(frozen=True)
@@ -115,6 +135,7 @@ class Execution:
     status:str
     outputs:tuple
     wall_ms:float
+    errors:tuple=()
 
 class IsolatedPython:
     def __init__(self,*,image="python:3.11-alpine",max_seconds=5):
@@ -159,11 +180,25 @@ class IsolatedPython:
                              (perf_counter_ns()-start)/1e6)
         if (answer.get("ok") is not True or
                 not isinstance(answer.get("outputs"),list) or
-                len(answer["outputs"])!=len(inputs)):
+                len(answer["outputs"])!=len(inputs) or
+                not isinstance(answer.get("errors"),list) or
+                len(answer["errors"])!=len(inputs)):
             return Execution("ABSTAIN_RUNTIME_ERROR",(),
                              (perf_counter_ns()-start)/1e6)
-        return Execution("EXECUTED",tuple(answer["outputs"]),
-                         (perf_counter_ns()-start)/1e6)
+        errs=tuple(answer["errors"])
+        if any(x is not None and (
+                not isinstance(x,dict) or
+                type(x.get("type")) is not str or
+                type(x.get("message")) is not str or
+                type(x.get("line")) is not int)
+               for x in errs):
+            return Execution("ABSTAIN_PROTOCOL",(),
+                             (perf_counter_ns()-start)/1e6)
+        return Execution(
+            "EXECUTED_WITH_ERRORS" if any(x is not None for x in errs)
+            else "EXECUTED",
+            tuple(answer["outputs"]),
+            (perf_counter_ns()-start)/1e6,errs)
 
 
 @dataclass(frozen=True)
@@ -241,8 +276,12 @@ class GenerativeProgramInventor:
                 continue
             seen.add(sha)
             result=self.runner.evaluate(code,[x for x,y in train])
-            correct=sum(result.status=="EXECUTED" and
-                        got==y for got,(_,y) in zip(result.outputs,train))
+            source_executed=result.status in (
+                "EXECUTED","EXECUTED_WITH_ERRORS")
+            correct=sum(
+                source_executed and error is None and got==y
+                for got,error,(_,y) in zip(
+                    result.outputs,result.errors,train))
             receipts.append(Attempt(sha,correct,len(train),result.status,step,code))
             if correct==len(train):
                 final=self.runner.evaluate(code,[x for x,y in checks])
@@ -254,10 +293,19 @@ class GenerativeProgramInventor:
                     "\nAn independent SOURCE verifier refuted your "
                     "program. Propose a different general algorithm.")
             else:
-                errors=[
-                    {"input":x,"expected":y,"got":got}
-                    for got,(x,y) in zip(result.outputs,train) if got!=y
-                ] if result.status=="EXECUTED" else [result.status]
+                errors=[]
+                if source_executed:
+                    for got,error,(x,y) in zip(
+                            result.outputs,result.errors,train):
+                        if error is not None:
+                            errors.append({
+                                "input":x,"expected":y,
+                                "runtime_failure":error})
+                        elif got!=y:
+                            errors.append({
+                                "input":x,"expected":y,"got":got})
+                else:
+                    errors=[result.status]
                 prompt+=(
                     "\nYour last source program was falsified. "
                     "Fix the causal rule, not individual examples. Errors:\n"+
