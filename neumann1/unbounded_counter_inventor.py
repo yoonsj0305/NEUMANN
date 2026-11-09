@@ -37,6 +37,7 @@ class InventedCounterOperator:
     source_verifiers: int
     candidates_checked: int
     source_queries: int
+    source_horizon: int
 
     @property
     def ast(self):
@@ -170,7 +171,8 @@ class UnboundedCounterInventor:
             candidates+=1
             program=InventedCounterOperator(
                 alphabet,weights,check_prefix,order,
-                len(train),len(extra),candidates,len(observed))
+                len(train),len(extra),candidates,len(observed),
+                self.max_source_length+6)
             if any(program.apply(x)!=observed[x] for x in train):
                 counterexamples+=1
                 continue
