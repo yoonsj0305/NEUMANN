@@ -36,7 +36,10 @@ BUILTINS=("len","range","enumerate","zip","min","max","sum","abs",
           "int","str","bool","list","tuple","dict","set","sorted",
           "reversed","all","any")
 METHODS=("append","extend","insert","reverse","sort","copy","count",
-         "index","get","items","keys","values","pop")
+         "index","get","items","keys","values","pop",
+         "lower","upper","strip","lstrip","rstrip","replace","split",
+         "join","isalnum","isalpha","isdigit","isnumeric",
+         "startswith","endswith","find","rfind")
 
 class UnsafeProposal(ValueError):pass
 
@@ -231,12 +234,16 @@ class Discovery:
 class GenerativeProgramInventor:
     """Model-policy -> new Python algorithm -> source refutation -> revision."""
 
-    def __init__(self,policy,runner,*,max_proposals=8,rich_runtime_feedback=True):
+    def __init__(self,policy,runner,*,max_proposals=8,
+                 rich_runtime_feedback=True,
+                 reveal_independent_counterexample=True):
         if not 1<=max_proposals<=64:raise ValueError("finite source budget")
         self.policy=policy
         self.runner=runner
         self.max_proposals=max_proposals
         self.rich_runtime_feedback=bool(rich_runtime_feedback)
+        self.reveal_independent_counterexample=bool(
+            reveal_independent_counterexample)
 
     def discover(self,source_pairs,*,independent_source_checks):
         train=tuple(source_pairs)
@@ -292,9 +299,33 @@ class GenerativeProgramInventor:
                         got==y for got,(_,y) in zip(final.outputs,checks)):
                     return Discovery("SOURCE_VERIFIED_OPEN_PROGRAM",code,sha,
                                      tuple(receipts),len(checks),True)
-                prompt+=(
-                    "\nAn independent SOURCE verifier refuted your "
-                    "program. Propose a different general algorithm.")
+                # A failed disjoint SOURCE verifier is a SOURCE label, not
+                # any hidden TARGET answer. Previously, this true new
+                # observation was discarded and the model was told only
+                # "refuted". Give an explicit causal witness to the next
+                # synthesis attempt. The ablation can retain the old opaque
+                # feedback, while both arms see identical first proposals.
+                if self.reveal_independent_counterexample and (
+                        final.status in ("EXECUTED","EXECUTED_WITH_ERRORS")):
+                    witness=[]
+                    for got,error,(x,y) in zip(
+                            final.outputs,final.errors,checks):
+                        if error is not None or got!=y:
+                            witness.append({
+                                "source_input":x,
+                                "source_expected":y,
+                                "previous_observed":got,
+                                "runtime_error":error})
+                    prompt+=(
+                        "\nYour proposed algorithm passed the first SOURCE "
+                        "examples but FAILED on NEW SOURCE observations. "
+                        "Identify the missing invariant and revise the "
+                        "algorithm. New SOURCE counterexamples:\n"+
+                        json.dumps(witness[:3],ensure_ascii=True)[:3500])
+                else:
+                    prompt+=(
+                        "\nAn independent SOURCE verifier refuted your "
+                        "program. Propose a different general algorithm.")
             else:
                 errors=[]
                 if source_executed and self.rich_runtime_feedback:
