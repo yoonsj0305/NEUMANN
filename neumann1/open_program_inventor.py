@@ -173,6 +173,7 @@ class Attempt:
     source_total:int
     status:str
     iteration:int
+    program:str|None=None
 
 @dataclass(frozen=True)
 class Discovery:
@@ -242,7 +243,7 @@ class GenerativeProgramInventor:
             result=self.runner.evaluate(code,[x for x,y in train])
             correct=sum(result.status=="EXECUTED" and
                         got==y for got,(_,y) in zip(result.outputs,train))
-            receipts.append(Attempt(sha,correct,len(train),result.status,step))
+            receipts.append(Attempt(sha,correct,len(train),result.status,step,code))
             if correct==len(train):
                 final=self.runner.evaluate(code,[x for x,y in checks])
                 if final.status=="EXECUTED" and all(
