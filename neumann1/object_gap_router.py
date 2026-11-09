@@ -40,7 +40,7 @@ class ObjectGapRouter:
     def __init__(self,*,max_relational_ms=120,max_object_ms=350,
                  max_causal_ms=350,max_bulk_ms=350,
                  known_causal_rules=(),known_bulk_rules=(),
-                 max_raw_source_ms=2500):
+                 max_raw_source_ms=2500,enable_source_born=True):
         if (not 1<=max_relational_ms<=5000 or
                 not 1<=max_object_ms<=120000 or
                 not 1<=max_causal_ms<=120000 or
@@ -51,6 +51,7 @@ class ObjectGapRouter:
         self.max_causal_ms=max_causal_ms
         self.max_bulk_ms=max_bulk_ms
         self._source_born=SourceBornRepresentationInventor(max_ms=max_raw_source_ms)
+        self.enable_source_born=bool(enable_source_born)
         self.known_bulk_rules=tuple(known_bulk_rules)
         if any(not isinstance(p,BulkEditProgram) for p in self.known_bulk_rules):
             raise TypeError('remembered bulk programs must be typed')
@@ -182,7 +183,7 @@ class ObjectGapRouter:
         # and verifier data decide which executable syntax survives.
         invented_from_raw=False
         raw_checks=0
-        if not predictions:
+        if not predictions and self.enable_source_born:
             discovery=self._source_born.invent(
                 demonstrations,independent_source_checks=verified)
             raw_checks=discovery.source_candidates_examined
