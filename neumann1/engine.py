@@ -819,3 +819,19 @@ class NeumannEngine:
             max_source_length=max_source_length).invent(
             source_membership,alphabet=alphabet,
             forbidden_target_words=forbidden_target_words)
+
+
+    def promote_unbounded_counter_operator(
+            self,name,invented_program,*,independent_source_checks):
+        """Add source-derived unbounded counter semantics to actual synthesis DSL.
+
+        The learned instruction is reusable on future program tasks.
+        Conditional source evidence is not promoted to a universal theorem.
+        """
+        from .induced_grammar import GrammarInventor
+        if not hasattr(self,"_invented_grammar"):
+            self._invented_grammar=GrammarInventor()
+        self._invented_grammar.register_source_invented_counter_operator(
+            name,invented_program,
+            independent_source_checks=independent_source_checks)
+        return name
