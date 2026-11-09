@@ -34,7 +34,7 @@ OLD_SALT="NEUMANN_Q3_FIRST_FACE_GRAPH_2026_11_09_v1"
 SALT="NEUMANN_Q3_SOURCE_BORN_2026_11_09_v1"
 EXTRA_EXCLUDED={"00576224","0e671a1a","a65b410d",
                 "d6542281","ce8d95cc","20818e16",
-                "5833af48","90c28cc7","272f95fa","00576224"}
+                "5833af48","90c28cc7","272f95fa"}
 
 
 def prepare(upstream,blind,n=32):
@@ -47,6 +47,7 @@ def prepare(upstream,blind,n=32):
     previous=sorted(available,key=lambda p:hashlib.sha256(
         (OLD_SALT+p.name).encode()).hexdigest())[:32]
     excluded|={p.stem for p in previous}
+    excluded|=set(DEVELOPMENT)
     untouched=[p for p in available if p.stem not in excluded]
     chosen=sorted(untouched,key=lambda p:hashlib.sha256(
         (SALT+p.name).encode()).hexdigest())[:n]
