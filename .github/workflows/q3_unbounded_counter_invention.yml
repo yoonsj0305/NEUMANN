@@ -1,0 +1,31 @@
+name: Q3 Nonregular Unbounded-State Semantic Invention
+on:
+  pull_request:
+    paths:
+      - "neumann1/unbounded_counter_inventor.py"
+      - "neumann1/unknown_state_operator_inventor.py"
+      - "neumann1/engine.py"
+      - "neumann1/registry_engine.py"
+      - "tests/test_unbounded_counter_inventor.py"
+      - ".github/workflows/q3_unbounded_counter_invention.yml"
+  workflow_dispatch:
+
+jobs:
+  cross-representation-source-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -e . pytest
+      - name: Falsify bounded DFA and SOURCE-invent an unbounded counter semantic AST
+        run: |
+          python -m pytest -q -s \
+            tests/test_unbounded_counter_inventor.py \
+            tests/test_unknown_state_operator_inventor.py
