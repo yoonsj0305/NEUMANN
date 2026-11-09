@@ -1,0 +1,139 @@
+name: Q3 New Executable Invention - Two Author Original Gate
+on:
+  push:
+    branches:
+      - research/q3-general-semantic-program-invention-20261109
+    paths:
+      - ".github/workflows/q3_structural_original_invention.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independent_author_originals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    strategy:
+      fail-fast: false
+      matrix:
+        origin: [codearc, arcana]
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install identical program synthesis substrate and isolated SOURCE verifier
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          docker pull python:3.11-alpine
+          python -m pytest -q -x tests/test_q3_structural_invention.py tests/test_q3_structural_original_contract.py
+      - name: Reuse SOURCE-only previously verified method teachers, no hand-coded task solution
+        run: |
+          set -euo pipefail
+          mkdir -p previous frozen evidence score
+          gh run download 42593621076 \
+            --name Q3-REAL-WEIGHT-LEARNING-ORIGINAL-SOURCE-BLIND \
+            --dir previous
+          test -s previous/BLIND.json
+          test -s previous/SOURCE_TEACHERS.jsonl
+          sha256sum previous/SOURCE_TEACHERS.jsonl
+      - name: Freeze author-source registry without target outputs in inference payload
+        run: |
+          set -euo pipefail
+          if [ "${{ matrix.origin }}" = "codearc" ]; then
+            python -m research.q3.q3_structural_original_gate freeze-codearc \
+              --original previous/BLIND.json --out frozen/BLIND.json
+          else
+            git init -q /tmp/arcana
+            git -C /tmp/arcana fetch -q --depth 1 \
+              https://github.com/density-11/arcana-test.git \
+              3f3dc8f650deb271a29e282bfb0e5ca95a7d64d6
+            git -C /tmp/arcana checkout -q FETCH_HEAD
+            test "$(git -C /tmp/arcana rev-parse HEAD)" = \
+              3f3dc8f650deb271a29e282bfb0e5ca95a7d64d6
+            python -m research.q3.q3_structural_original_gate freeze-arcana \
+              --original /tmp/arcana/data --out frozen/BLIND.json
+            rm -rf /tmp/arcana
+          fi
+          sha256sum frozen/BLIND.json > frozen/BLIND.sha256
+      - name: A uniform classical vs B cached original methods vs C learned operator discovery
+        run: |
+          set -euo pipefail
+          python -m research.q3.q3_structural_original_gate infer \
+            --blind frozen/BLIND.json \
+            --teachers previous/SOURCE_TEACHERS.jsonl \
+            --out evidence/PREDICTIONS.json
+          sha256sum evidence/PREDICTIONS.json > evidence/PREDICTIONS.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path("evidence/PREDICTIONS.json").read_text())
+          assert x["schema"]=="NEUMANN.Q3.STRUCTURAL-PREDICTIONS.v1"
+          assert x["target_gold_accessed"] is False
+          assert x["same_general_executable_substrate"]
+          assert len(x["records"]) in (4,8)
+          print("Q3_STRUCTURAL_POLICY_SOURCE_VERIFIED",
+                x["origin"],{a:sum(r["arms"][a]["source_verified"] for r in x["records"])
+                             for a in ("A","B","C")},flush=True)
+          PY
+      - name: ONLY NOW download gold and SHA-gate independent author original scoring
+        run: |
+          set -euo pipefail
+          mkdir -p original
+          SHA="$(cut -d ' ' -f1 evidence/PREDICTIONS.sha256)"
+          test "$SHA" = "$(sha256sum evidence/PREDICTIONS.json | cut -d ' ' -f1)"
+          if [ "${{ matrix.origin }}" = "codearc" ]; then
+            curl -fL --retry 3 --silent --show-error \
+              https://huggingface.co/datasets/anjiangwei/CodeARC-Invocations/resolve/119512573bf96148cbb95e99cf7cdd21c06153e4/invocations.jsonl \
+              -o original/invocations.jsonl
+            ORIGINAL=original/invocations.jsonl
+          else
+            git init -q /tmp/arcana-score
+            git -C /tmp/arcana-score fetch -q --depth 1 \
+              https://github.com/density-11/arcana-test.git \
+              3f3dc8f650deb271a29e282bfb0e5ca95a7d64d6
+            git -C /tmp/arcana-score checkout -q FETCH_HEAD
+            ORIGINAL=/tmp/arcana-score/data
+          fi
+          python -m research.q3.q3_structural_original_gate score \
+            --blind frozen/BLIND.json \
+            --predictions evidence/PREDICTIONS.json \
+            --expected-sha "$SHA" \
+            --original "$ORIGINAL" \
+            --out score/ORIGINAL_SCORE.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-invented-structures-${{ matrix.origin }}
+          path: |
+            frozen/
+            evidence/
+            score/
+          if-no-files-found: warn
+          retention-days: 90
+
+  joint_causal_gate:
+    needs: independent_author_originals
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-invented-structures-codearc
+          path: codearc
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-invented-structures-arcana
+          path: arcana
+      - name: Independent author shared-policy Q3 causal residual and failure audit
+        run: |
+          set -euo pipefail
+          python -m research.q3.q3_structural_original_gate gate \
+            --codearc codearc/score/ORIGINAL_SCORE.json \
+            --arcana arcana/score/ORIGINAL_SCORE.json
