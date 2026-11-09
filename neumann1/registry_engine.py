@@ -743,3 +743,29 @@ class RegistryEngine:
                 raise ValueError(
                     "source falsifies learned transition+method composition")
         return rule,compiled
+
+    def meta_invent_terminal_only_process(
+            self, endpoint_source_pairs, independent_endpoint_checks,
+            *, max_nodes=6, max_expressions=35000,
+            max_source_ms=12000, min_proven_steps=3,
+            known_classical=None):
+        """Q3: synthesize NEW latent transition + discovered loop from ENDPOINTS.
+
+        Unlike meta_invent_transition_and_solver, this accepts NO successor
+        (state -> next state) training pairs. Source only specifies initial
+        and terminal states. It seeks a nontrivial process, not a unique
+        physical true trajectory; true latent transitions may be
+        underdetermined without intermediate observations.
+        """
+        from .terminal_only_process_inventor import (
+            TerminalOnlyProcessInventor)
+        if not hasattr(self,"_q3_higher_order_method"):
+            raise ValueError("learn and source-verify control method first")
+        return TerminalOnlyProcessInventor(
+            max_nodes=max_nodes,max_expressions=max_expressions,
+            max_source_ms=max_source_ms,
+            min_proven_steps=min_proven_steps).invent(
+                endpoint_source_pairs,
+                independent_terminal_checks=independent_endpoint_checks,
+                control=self._q3_higher_order_method.program,
+                known_classical=known_classical)
