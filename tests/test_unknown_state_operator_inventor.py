@@ -43,7 +43,7 @@ def test_discovers_numeric_modular_operator_from_raw_binary_symbols():
     # transition table are inferred solely from word membership responses.
     oracle=lambda w:int(int(w or "0",2)%5==0)
     checks=tuple((w,oracle(w)) for w in (
-        "110010101","10111100001","100000000000","111011100010"))
+        "11001010111","10111100001","100000000000","111011100010"))
     result=UnknownStateOperatorInventor(max_states=5).invent(
         oracle,alphabet=("0","1"),independent_source_checks=checks)
     assert result.status=="SOURCE_CERTIFIED_CONDITIONAL_DFA",result
@@ -56,7 +56,7 @@ def test_discovers_numeric_modular_operator_from_raw_binary_symbols():
 def test_unknown_state_discovery_is_not_a_fixed_regex_solver():
     # Third independent meaning: consecutive "ba" signal in protocol log.
     oracle=lambda w:int("ba" in w)
-    checks=(("aaabba",1),("bbbbab",1),("aaabb",0))
+    checks=(("aaabba",1),("bbbbab",1),("aaabbb",0))
     result=UnknownStateOperatorInventor(max_states=3).invent(
         oracle,alphabet=("a","b"),independent_source_checks=checks)
     assert result.status=="SOURCE_CERTIFIED_CONDITIONAL_DFA",result
