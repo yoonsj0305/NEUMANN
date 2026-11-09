@@ -79,7 +79,7 @@ def test_same_neural_core_reuses_certified_memory_on_unrelated_task():
     policy=StaticPolicy(REV)
     core=SingleDiscoveryCore(policy,runner,memory=mem,max_proposals=1)
     ans=core.discover([("abcd","dcba"),("str","rts")],
-                      [("cats","stac")])
+                      [("cats","stac")],reuse_memory=True)
     assert ans.discovery.verified
     assert ans.method_memory_count==1
     assert "Past SOURCE-certified general method" in policy.prompts[-1]
@@ -119,7 +119,7 @@ def test_real_locked_docker_two_source_types_and_learned_memory():
     memory.freeze()
     policy=StaticPolicy(REV)
     core=SingleDiscoveryCore(policy,runner,memory=memory,max_proposals=1)
-    out=core.discover([("robot","tobor")],[("space","ecaps")])
+    out=core.discover([("robot","tobor")],[("space","ecaps")],reuse_memory=True)
     assert out.discovery.verified
     assert len(out.discovery.attempts)==1
     assert out.discovery.program==REV
@@ -134,4 +134,70 @@ def test_fail_closed_no_isolated_executor(monkeypatch):
                              max_proposals=1)
     x=core.discover([(1,2)],[(2,3)])
     assert not x.discovery.verified
-    assert x.status=="ABSTAIN_NO_SOURCE_PROGRAM"
+    assert x.discovery.status=="ABSTAIN_NO_SOURCE_PROGRAM"
+
+
+def test_first_principles_default_has_no_random_old_method_prompt():
+    runner=StubRunner()
+    memory=SourceMethodMemory(runner)
+    memory.admit("old_task",[(1,2)],[(2,3)],INC)
+    policy=StaticPolicy(REV)
+    core=SingleDiscoveryCore(policy,runner,memory=memory,max_proposals=1)
+    outcome=core.discover([("abc","cba")],[("xyz","zyx")])
+    assert outcome.discovery.verified
+    assert outcome.method_memory_count==0
+    assert "Past SOURCE-certified general method" not in policy.prompts[0]
+    assert memory.episodes[0].source_id=="old_task"
+
+
+def test_both_engines_use_the_identical_minimal_discovery_function():
+    from neumann1.engine import NeumannEngine
+    from neumann1.registry_engine import RegistryEngine
+    from neumann1.q3_single_discovery_core import invent_open_program_for_engine
+    assert NeumannEngine.invent_open_program_from_source is invent_open_program_for_engine
+    assert RegistryEngine.invent_open_program_from_source is invent_open_program_for_engine
+
+
+def test_source_identity_overlap_is_rejected_before_policy_inference():
+    from neumann1.q3_single_discovery_core import invent_open_program_for_engine
+    from types import SimpleNamespace
+    runner=StubRunner()
+    mem=SourceMethodMemory(runner)
+    mem.admit("source-teacher/123",[(1,2)],[(2,3)],INC)
+    policy=StaticPolicy(INC)
+    engine=SimpleNamespace()
+    with pytest.raises(ValueError,match="already present"):
+        invent_open_program_for_engine(
+            engine,[(4,5)],[(5,6)],proposal_policy=policy,
+            runner=runner,method_memory=mem,source_identity="123",
+            reuse_memory=True)
+    assert policy.prompts==[]
+
+
+def test_frozen_holdout_memory_refuses_source_admission_prior_to_generation():
+    from neumann1.q3_single_discovery_core import invent_open_program_for_engine
+    from types import SimpleNamespace
+    runner=StubRunner()
+    mem=SourceMethodMemory(runner)
+    mem.freeze()
+    policy=StaticPolicy(INC)
+    with pytest.raises(ValueError,match="frozen"):
+        invent_open_program_for_engine(
+            SimpleNamespace(),[(4,5)],[(5,6)],proposal_policy=policy,
+            runner=runner,method_memory=mem,source_identity="fresh")
+    assert policy.prompts==[]
+
+
+def test_missing_source_identity_is_rejected_from_imported_teacher():
+    mem=SourceMethodMemory(StubRunner())
+    row={
+        "schema":"NEUMANN.Q3.PROGRAM-SOURCE-TEACHER.v1",
+        "provenance":"ORIGINAL_SOURCE_ONLY",
+        "pairs":[[1,2],[2,3]],
+        "independent_checks":1,
+        "program":INC,
+        "sha256":hashlib.sha256(INC.encode()).hexdigest()
+    }
+    with pytest.raises(ValueError,match="identity"):
+        mem.import_source_teachers([row])
+    assert mem.episodes==[]
