@@ -1,0 +1,101 @@
+name: Q3 Source-Grounded Method Transfer - Equal-Noise Original Developer Gate
+on:
+  push:
+    branches:
+      - research/q3-evidence-grounded-method-transfer-20261109
+    paths:
+      - ".github/workflows/q3_source_grounded_method_transfer.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  causal_original_source_transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "2"
+      OPENBLAS_NUM_THREADS: "2"
+      MKL_NUM_THREADS: "2"
+      TOKENIZERS_PARALLELISM: "false"
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      HF_HUB_DOWNLOAD_TIMEOUT: "180"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned same neural inference and genuine isolated source verifier
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          python -m pip install -q --index-url https://download.pytorch.org/whl/cpu 'torch==2.5.1'
+          python -m pip install -q 'transformers==4.48.3' 'peft==0.14.0' 'accelerate==1.3.0' pytest sentencepiece
+          docker pull python:3.11-alpine
+          python -m pytest -q -x tests/test_q3_source_grounded_method_transfer.py tests/test_q3_single_discovery_core.py
+      - name: Reuse exact previously opened author SOURCE, prior verified method episodes and frozen model revision
+        run: |
+          set -euo pipefail
+          mkdir -p previous results
+          gh run download 42593621076 \
+            --name Q3-REAL-WEIGHT-LEARNING-ORIGINAL-SOURCE-BLIND \
+            --dir previous
+          test -s previous/BLIND.json
+          test -s previous/SOURCE_TEACHERS.jsonl
+          test -s previous/MODEL_REVISION.txt
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          b=json.loads(Path("previous/BLIND.json").read_text())
+          assert b["schema"]=="NEUMANN.Q3.NEURAL.CODEARC.BLIND.v1"
+          ids=[x["id"] for x in b["records"]]
+          assert ids[:4]==[255,921,184,116]
+          print("Q3_SOURCE_METHOD_TRANSFER_DEV_IDS_FROZEN",ids[:4],flush=True)
+          PY
+      - name: SAME neural checkpoint and task RNG with no-memory, SHA-memory and source-evidence-memory
+        run: |
+          set -euo pipefail
+          REV="$(cat previous/MODEL_REVISION.txt)"
+          python research/q3/q3_source_grounded_method_pilot.py infer \
+            --blind previous/BLIND.json \
+            --teachers previous/SOURCE_TEACHERS.jsonl \
+            --revision "$REV" \
+            --out results/PAIRED_SOURCE_PREDICTIONS.json
+          sha256sum results/PAIRED_SOURCE_PREDICTIONS.json \
+            > results/PAIRED_SOURCE_PREDICTIONS.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("results/PAIRED_SOURCE_PREDICTIONS.json").read_text())
+          assert p["no_original_gold_in_inference"] is True
+          assert p["paired_noise_across_arms"] is True
+          assert p["task_ids"]==[255,921,184,116]
+          print("Q3_METHOD_TRANSFER_SOURCE_RECEIPTS_FROZEN",
+                {x["id"]:{k:(v["source_verified"],
+                            [a["source_correct"] for a in v["attempts"]])
+                    for k,v in x["arms"].items()} for x in p["results"]},
+                flush=True)
+          PY
+      - name: Only after frozen predictions open external original author labels and score exact
+        run: |
+          set -euo pipefail
+          mkdir -p original
+          curl -fL --retry 3 --silent --show-error \
+            https://huggingface.co/datasets/anjiangwei/CodeARC-Invocations/resolve/119512573bf96148cbb95e99cf7cdd21c06153e4/invocations.jsonl \
+            -o original/invocations.jsonl
+          FROZEN="$(cut -d ' ' -f1 results/PAIRED_SOURCE_PREDICTIONS.sha256)"
+          python research/q3/q3_source_grounded_method_pilot.py score \
+            --original original/invocations.jsonl \
+            --blind previous/BLIND.json \
+            --predictions results/PAIRED_SOURCE_PREDICTIONS.json \
+            --expected-sha "$FROZEN" \
+            --out results/POSTFIRST_METHOD_TRANSFER_ORIGINAL_SCORE.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Q3-SOURCE-GROUNDED-TRANSFER-ORIGINAL-FOUR-PROBLEMS
+          path: results/
+          if-no-files-found: warn
+          retention-days: 90
