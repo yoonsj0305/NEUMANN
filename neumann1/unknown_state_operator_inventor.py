@@ -157,6 +157,12 @@ class UnknownStateOperatorInventor:
         edges = tuple(_words(alphabet, n))
         suffixes = tuple(_words(alphabet, n - 1))
         all_needed = frozenset(p+s for p in edges for s in suffixes)
+        # Independent SOURCE checks must be outside the identification
+        # experiment basis. Otherwise the same oracle observations could be
+        # misleadingly counted twice as an independent verifier.
+        if any(w in all_needed for w, _ in checks):
+            return result("ABSTAIN_NONINDEPENDENT_SOURCE_CHECKS", None, 0,
+                          "SOURCE verifier overlaps identification experiments")
         if forbidden.intersection(all_needed):
             return result("ABSTAIN_TARGET_OVERLAP", None, 0,
                           "a requested SOURCE probe is a forbidden target")
