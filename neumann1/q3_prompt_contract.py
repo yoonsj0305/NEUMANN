@@ -36,6 +36,43 @@ def source_discovery_prompt(pairs, *, method_context=""):
             for x,y in pairs))
 
 
+def source_revision_prompt(base_prompt, previous_program, evidence, *, kind):
+    """Carry the failed *hypothesis* AND exact SOURCE witness across calls.
+
+    The proposal policy is stateless. Merely saying 'revise your previous
+    program' without including the prior executable hypothesis was a real
+    information-flow bug. Never include target gold or reference solutions.
+
+    Use only the most recent hypothesis and witness: do not amplify a long
+    failed context with each attempt. Training and inference use this SAME
+    repair-message contract.
+    """
+    if kind not in ("preflight", "source", "independent_source", "duplicate"):
+        raise ValueError("unknown SOURCE observation type")
+    if not isinstance(base_prompt, str) or not base_prompt:
+        raise ValueError("original SOURCE prompt required")
+    if not isinstance(previous_program, str):
+        raise ValueError("last proposed program required")
+    if len(previous_program) > 6000:
+        previous_program = previous_program[:6000]
+    raw = json.dumps(evidence, ensure_ascii=True, allow_nan=False,
+                     separators=(',', ':'), sort_keys=True)
+    if len(raw) > 3600:
+        raw = raw[:3600]
+    return (
+        base_prompt
+        + "\n\nSOURCE-ONLY REPAIR EPISODE; independent TARGET outputs are UNKNOWN.\n"
+        + "Previous proposed Python program (this is the hypothesis to MODIFY, "
+          "not a reference answer):\n"
+        + previous_program
+        + "\nObserved SOURCE failure kind: " + kind
+        + "\nOriginal-semantics SOURCE feedback: " + raw
+        + "\nInfer the failed causal assumption. Preserve working portions "
+          "and return ONE corrected complete def transform(x), not a patch "
+          "or an explanation.\n"
+    )
+
+
 def model_prefix(tokenizer,prompt):
     messages=[
         {"role":"system","content":SYSTEM_TEXT},
