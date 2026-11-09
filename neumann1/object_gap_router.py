@@ -18,6 +18,7 @@ from .relational_grid_inventor import grid
 from .scene_graph_inventor import ObjectGrammarInventor
 from .relational_action_inventor import RelationalActionInventor, RelationalAction
 from .parallel_object_edit_inventor import ParallelObjectEditInventor, BulkEditProgram
+from .topological_region_inventor import TopologicalRegionInventor
 
 
 @dataclass(frozen=True)
@@ -172,10 +173,29 @@ class ObjectGapRouter:
                 predictions.append(trial)
                 accepted.append(p)
             if len(predictions)==2:break
+        # Q3 capability gap: if all foreground-object grammars fail, seek
+        # a new DUAL ontology whose entities are connected EMPTY REGIONS.
+        # Do not pay this cost or override successful older algorithms.
+        new_topology=False
+        if not predictions:
+            try:
+                face=TopologicalRegionInventor(
+                    max_source_ms=self.max_bulk_ms).invent(
+                    demonstrations,independent_source_checks=verified)
+                if face.operator is not None:
+                    trial=tuple(face.operator.apply(x) for x in targets)
+                    if all(x is not None for x in trial):
+                        predictions.append(trial)
+                        accepted.append(face.operator)
+                        new_topology=True
+            except (ValueError,TypeError,ArithmeticError):
+                pass
         return ObjectGapResult(
-            "SOURCE_VERIFIED_NEW_BULK_RULE" if predictions
-            else "ABSTAIN_UNSUPPORTED",
+            ("SOURCE_VERIFIED_NEW_FACE_GRAPH" if new_topology
+             else "SOURCE_VERIFIED_NEW_BULK_RULE" if predictions
+             else "ABSTAIN_UNSUPPORTED"),
             tuple(predictions),tuple(accepted),
-            3,invented.source_checks+causal.witness_signatures+
+            4 if new_topology else 3,
+            invented.source_checks+causal.witness_signatures+
               bulk.evaluated_clauses,False,
             (perf_counter_ns()-start)/1e6)
