@@ -769,3 +769,35 @@ class RegistryEngine:
                 independent_terminal_checks=independent_endpoint_checks,
                 control=self._q3_higher_order_method.program,
                 known_classical=known_classical)
+
+
+    def meta_invent_active_terminal_process(
+            self, endpoint_source_pairs, independent_endpoint_checks,
+            source_terminal_oracle, *,
+            forbidden_target_inputs=(), known_classical=None,
+            max_nodes=8, max_expressions=150000, max_source_ms=25000,
+            max_rounds=5, max_oracle_queries=160,
+            max_probe_programs=512, max_probe_inputs=512):
+        """Q3: autonomously propose SOURCE experiments and repair an invented AST.
+
+        The oracle supplies NEW initial->terminal SOURCE labels only. It
+        must never expose target test labels or hidden successor states.
+        Falsifying observations cause the entire latent transition AST
+        to be resynthesized; an unrepairable grammar gap ABSTAINS.
+        """
+        from .active_terminal_process_inventor import (
+            ActiveTerminalProcessInventor)
+        if not hasattr(self, "_q3_higher_order_method"):
+            raise ValueError("learn a source-certified higher-order method first")
+        return ActiveTerminalProcessInventor(
+            max_nodes=max_nodes, max_expressions=max_expressions,
+            max_source_ms=max_source_ms, max_rounds=max_rounds,
+            max_oracle_queries=max_oracle_queries,
+            max_probe_programs=max_probe_programs,
+            max_probe_inputs=max_probe_inputs).discover(
+                endpoint_source_pairs,
+                independent_terminal_checks=independent_endpoint_checks,
+                source_terminal_oracle=source_terminal_oracle,
+                control=self._q3_higher_order_method.program,
+                forbidden_target_inputs=forbidden_target_inputs,
+                known_classical=known_classical)

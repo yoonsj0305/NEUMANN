@@ -95,6 +95,28 @@ class TerminalOnlyProcessInventor:
 
     def invent(self,source_endpoints,*,independent_terminal_checks,
                control:ControlProgram,known_classical=None):
+        """Return first source-verified program (historical public interface)."""
+        found=self.invent_candidates(
+            source_endpoints,
+            independent_terminal_checks=independent_terminal_checks,
+            control=control, known_classical=known_classical,
+            max_candidates=1)
+        return found[0] if found else None
+
+    def invent_candidates(self,source_endpoints,*,
+                          independent_terminal_checks,
+                          control:ControlProgram,known_classical=None,
+                          max_candidates=12, exploratory_probes=()):
+        """Enumerate observationally distinct executable method hypotheses.
+
+        Unlabeled experiment inputs are included in the representation
+        SIGNATURE only, never in a target/gold verifier.  This prevents
+        deleting semantically distinguishable candidate constructions
+        before source experiments decide between them.
+        """
+        if not 1<=max_candidates<=128:
+            raise ValueError("finite version space size required")
+        exploratory_probes=tuple(exploratory_probes)
         started=perf_counter_ns()
         pairs=tuple(source_endpoints)
         verified=tuple(independent_terminal_checks)
@@ -115,10 +137,25 @@ class TerminalOnlyProcessInventor:
         # SOURCE-verified. This method's purpose is invention at a gap.
         if known_classical is not None and all(
                 known_classical(x)==y for x,y in pairs+verified):
-            return None
+            return ()
 
-        inputs=tuple(x for x,y in pairs)
+        # CRITICAL Q3: distinguish candidate representations using ALL
+        # legally observed SOURCE inputs, including newly obtained independent
+        # counterexamples. Training-only output-signature pruning can silently
+        # delete a valid structural repair before the verifier ever sees it.
+        # This never consumes target data or hidden successor trajectories.
+        if (len(exploratory_probes)>96 or
+                any(_kind(x)!=state_type or not _bounded_state(x)
+                    for x in exploratory_probes)):
+            raise ValueError("bounded same-type SOURCE experiment inputs required")
+        observed_inputs=tuple(x for x,y in pairs+verified)
+        if set(exploratory_probes)&set(observed_inputs):
+            exploratory_probes=tuple(
+                x for x in exploratory_probes if x not in observed_inputs)
+        inputs=observed_inputs+exploratory_probes
         goal=tuple(y for x,y in pairs)
+        candidate_versions=[]
+        version_signatures=set()
         pool={}
         signature_counts={}
         seen=0
@@ -213,7 +250,30 @@ class TerminalOnlyProcessInventor:
             for expr in tuple(pool.get(nodes,())):
                 if expr.out_type==state_type:
                     invented=test_candidate(expr)
-                    if invented is not None:return invented
+                    if invented is not None:
+                        # Compare predictions WITHOUT reading source-oracle
+                        # labels for any novel experiment input.
+                        if exploratory_probes:
+                            compiled=invented.compile()
+                            fingerprint=[]
+                            for x in exploratory_probes:
+                                try:
+                                    out=compiled.run(x)
+                                    fingerprint.append((
+                                        out.status,
+                                        out.value if out.status==
+                                        "HALT_CERTIFIED_FIXED_POINT" else None))
+                                except (IndexError,TypeError,ValueError,
+                                        OverflowError,RecursionError):
+                                    fingerprint.append(("ABSTAIN",None))
+                            signature=tuple(fingerprint)
+                        else:
+                            signature=(repr(invented.transition_ast),)
+                        if signature not in version_signatures:
+                            version_signatures.add(signature)
+                            candidate_versions.append(invented)
+                            if len(candidate_versions)>=max_candidates:
+                                return tuple(candidate_versions)
             if nodes==self.max_nodes:break
             size=nodes+1
             for name,operand_types,outtype,fn in _primitive_ops():
@@ -238,6 +298,8 @@ class TerminalOnlyProcessInventor:
                         if all(_bounded_state(v) for v in result):
                             insert((name,)+tuple(t.ast for t in terms),
                                    outtype,size,result)
+        if candidate_versions:
+            return tuple(candidate_versions)
         raise ValueError(
             "ABSTAIN: no independently SOURCE-verified latent "
             "multi-step process compatible with endpoint observations")
