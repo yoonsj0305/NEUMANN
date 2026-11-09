@@ -14,10 +14,17 @@ SYSTEM_TEXT=(
 )
 
 
-def source_discovery_prompt(pairs):
+def source_discovery_prompt(pairs, *, method_context=""):
     if not pairs:
         raise ValueError("SOURCE examples required")
-    return (
+    if not isinstance(method_context,str) or len(method_context)>12000:
+        raise ValueError("source-only method context must be bounded")
+    prefix=(
+        "Verified prior SOURCE examples can suggest method structure but "
+        "DO NOT determine this task's answer. Infer from current SOURCE.\\n"
+        + method_context + "\\n"
+        if method_context else "")
+    return prefix + (
         "Infer a general executable operator. Respond ONLY with Python "
         "code: exactly one function def transform(x) that returns output. "
         "No imports, other functions, globals, reflection or file access. "
