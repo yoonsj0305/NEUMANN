@@ -247,16 +247,17 @@ def _move_label_program(label,dr,dc,bg):
 
 
 def _propose_index_relationship(source_pairs,max_structural):
-    if not _same_shape_sources(source_pairs,2):
+    one_dimensional=_same_shape_sources(source_pairs,1)
+    two_dimensional=_same_shape_sources(source_pairs,2)
+    if not (one_dimensional or two_dimensional):
         return []
     results=[]
-    for axis in ("reverse-outer",):
-        if all(source_same_value(_flip_transform(x,axis),y)
-               for x,y in source_pairs):
-            results.append(StructuralFactor(
-                _flip_program(axis),"index-isomorphism/"+axis,
-                6,len(source_pairs)))
-    if not _same_shape_sources(source_pairs,3):
+    if all(source_same_value(_flip_transform(x,"reverse-outer"),y)
+           for x,y in source_pairs):
+        results.append(StructuralFactor(
+            _flip_program("reverse-outer"),
+            "index-isomorphism/reverse-outer",6,len(source_pairs)))
+    if not two_dimensional:
         return results
     for axis in ("reverse-inner","transpose","rot180"):
         if all(source_same_value(_flip_transform(x,axis),y)
