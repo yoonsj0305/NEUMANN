@@ -90,7 +90,6 @@ def test_refutation_teacher_never_sees_target_gold_sentinel():
 def test_actual_model_pilot_unwraps_coreoutcome_without_loading_neural_weights(
         tmp_path,monkeypatch):
     """Prevent a 10-minute SOURCE model run from failing on an API wrapper."""
-    import neumann1.open_program_inventor as inv
     from research.q3 import q3_source_refutation_pilot as pilot
 
     identity="def transform(x):"+chr(10)+"    return x"
