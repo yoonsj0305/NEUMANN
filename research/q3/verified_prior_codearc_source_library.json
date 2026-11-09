@@ -1,7 +1,5 @@
 {
   "schema": "NEUMANN.Q3.INDEPENDENT.SOURCE.MACROS.v1",
-  "prior_artifact": "https://github.com/yoonsj0305/NEUMANN/actions/runs/42559144993/artifacts/13648534568",
-  "prior_frozen_sha": "83d760d8faf901102cd72dfec4909157880e4a612e1f81f4ac54b2cf4b51090a",
   "records": [
     {
       "external_original_id": 611,
@@ -163,6 +161,132 @@
           "14-02-1995"
         ]
       ]
+    },
+    {
+      "external_original_id": 679,
+      "program": "def transform(x):\n    return x % 9 == 0",
+      "program_sha256": "37b4ebc594e188adcf7b476ebabd99e6a0f73c993ec6b5eac9540b28b228d520",
+      "source_pairs": [
+        [
+          9,
+          true
+        ],
+        [
+          18,
+          true
+        ],
+        [
+          27,
+          true
+        ],
+        [
+          36,
+          true
+        ],
+        [
+          45,
+          true
+        ],
+        [
+          2,
+          false
+        ],
+        [
+          11,
+          false
+        ]
+      ]
+    },
+    {
+      "external_original_id": 690,
+      "program": "def transform(x):\n    return {char: x.count(char) for char in set(x)}",
+      "program_sha256": "7832bd3560dd2e613f979859bd4945884d24faef570bf850f5a63a1d34a42def",
+      "source_pairs": [
+        [
+          "hello",
+          {
+            "h": 1,
+            "e": 1,
+            "l": 2,
+            "o": 1
+          }
+        ],
+        [
+          "world",
+          {
+            "w": 1,
+            "o": 1,
+            "r": 1,
+            "l": 1,
+            "d": 1
+          }
+        ],
+        [
+          "python",
+          {
+            "p": 1,
+            "y": 1,
+            "t": 1,
+            "h": 1,
+            "o": 1,
+            "n": 1
+          }
+        ],
+        [
+          "function",
+          {
+            "f": 1,
+            "u": 1,
+            "n": 2,
+            "c": 1,
+            "t": 1,
+            "i": 1,
+            "o": 1
+          }
+        ],
+        [
+          "testcase",
+          {
+            "t": 2,
+            "e": 2,
+            "s": 2,
+            "c": 1,
+            "a": 1
+          }
+        ],
+        [
+          "character",
+          {
+            "c": 2,
+            "h": 1,
+            "a": 2,
+            "r": 2,
+            "t": 1,
+            "e": 1
+          }
+        ],
+        [
+          "frequency",
+          {
+            "f": 1,
+            "r": 1,
+            "e": 2,
+            "q": 1,
+            "u": 1,
+            "n": 1,
+            "c": 1,
+            "y": 1
+          }
+        ]
+      ]
     }
+  ],
+  "prior_artifacts": [
+    "https://github.com/yoonsj0305/NEUMANN/actions/runs/42559144993/artifacts/13648534568",
+    "https://github.com/yoonsj0305/NEUMANN/actions/runs/42560914319/artifacts/13650160799"
+  ],
+  "prior_frozen_sha256": [
+    "83d760d8faf901102cd72dfec4909157880e4a612e1f81f4ac54b2cf4b51090a",
+    "516db27015a38f2e7cdf3a027039da0f7908a3f65019f6c0763173771928c06c"
   ]
 }
