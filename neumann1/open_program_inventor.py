@@ -206,6 +206,15 @@ class GenerativeProgramInventor:
         checks=tuple(independent_source_checks)
         if not train or not checks or len(train)>32 or len(checks)>32:
             raise ValueError("source pairs and independent verifier required")
+        # "Independent SOURCE" must mean new input information, not
+        # the same observed label checked a second time.
+        train_inputs={json.dumps(x,sort_keys=True,separators=(",",":"))
+                      for x,y in train}
+        check_inputs=[json.dumps(x,sort_keys=True,separators=(",",":"))
+                      for x,y in checks]
+        if len(check_inputs)!=len(set(check_inputs)) or (
+                train_inputs & set(check_inputs)):
+            raise ValueError("SOURCE verifier must be disjoint from training")
         prompt=(
             "Infer a general executable operator. Respond ONLY with Python "
             "code: exactly one function def transform(x) that returns output. "
