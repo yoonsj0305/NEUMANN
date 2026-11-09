@@ -35,6 +35,16 @@ def _dependencies():
     return torch,AutoModelForCausalLM,AutoTokenizer
 
 
+def generation_seed(seed,prompt,*,paired_sampling=False):
+    """Identical task RNG across source-only causal arms, not prompt text."""
+    if not isinstance(seed,int) or not isinstance(prompt,str):
+        raise ValueError("seed and prompt required")
+    if paired_sampling:
+        return seed%(2**31)
+    return (seed+int(hashlib.sha256(
+        prompt.encode()).hexdigest()[:8],16))%(2**31)
+
+
 class LocalCausalCodePolicy:
     def __init__(self,*,model_name=DEFAULT_MODEL,model_revision=None,
                  adapter_path=None,max_new_tokens=400,temperature=0.3,
@@ -82,10 +92,8 @@ class LocalCausalCodePolicy:
         # When causal arms differ only in SOURCE method context, hash-based
         # prompt seeds would silently give them DIFFERENT random samples.
         # Matched arms use one task-derived seed set by the evaluation harness.
-        generated_seed=(
-            self.seed%(2**31) if self.paired_sampling else
-            (self.seed+int(hashlib.sha256(
-                prompt.encode()).hexdigest()[:8],16))%(2**31))
+        generated_seed=generation_seed(
+            self.seed,prompt,paired_sampling=self.paired_sampling)
         self.torch.manual_seed(generated_seed)
         with self.torch.inference_mode():
             output=self.model.generate(
