@@ -92,7 +92,7 @@ def _eval(expr, dims, indices):
 def _shape_programs(source, output, axis):
     """Source-derived output shape relation, not a task-family classifier."""
     candidates=[]
-    for src_dim in range(len(source)):
+    for src_dim in range(len(source[0])):
         d=("d",src_dim)
         candidates.append(d)
         for factor in range(2,9):
@@ -101,7 +101,7 @@ def _shape_programs(source, output, axis):
             candidates.append(("add",d,("k",delta)))
     for dim in range(1,21):
         candidates.append(("k",dim))
-    if len(source)==2:
+    if len(source[0])==2:
         candidates.append(("add",("d",0),("d",1)))
         for factor in (2,3,4):
             candidates.append(("mul",("add",("d",0),("d",1)),("k",factor)))
