@@ -118,6 +118,24 @@ def source_training_rows(path):
     return records,hashlib.sha256(source_bytes).hexdigest()
 
 
+def recertify_source_rows(rows, *, runner=None):
+    """No self-signed JSON may train weights without executing all SOURCE labels.
+
+    Reuse the exact same SOURCE-only memory verifier, not a second
+    task-domain-specific oracle. No isolated Docker => fail closed.
+    """
+    from .open_program_inventor import IsolatedPython
+    from .q3_single_discovery_core import SourceMethodMemory
+    if not rows or len(rows) > 4096:
+        raise ValueError("bounded nonempty original SOURCE teachers required")
+    memory = SourceMethodMemory(
+        runner if runner is not None else IsolatedPython(max_seconds=8),
+        max_episodes=len(rows))
+    imported = memory.import_source_teachers(rows)
+    memory.freeze()
+    return tuple(entry.identity for entry in imported)
+
+
 def finetune_source_policy(
         source_jsonl,adapter_output,*,model_name=DEFAULT_MODEL,
         model_revision=None,max_steps=40,lr=0.00015,rank=4,seed=1007):
@@ -133,6 +151,7 @@ def finetune_source_policy(
     source,source_sha=source_training_rows(source_jsonl)
     if not source:
         raise ValueError("no independently source-certified programs to learn")
+    teacher_receipts=recertify_source_rows(source)
     torch,Model,Tokenizer=_dependencies()
     try:
         from peft import LoraConfig,get_peft_model
@@ -185,7 +204,11 @@ def finetune_source_policy(
         "base_model":model_name,"model_revision":model_revision,
         "prompt_contract":"source_discovery_prompt+chat_template.v1",
         "source_sha256":source_sha,
-        "source_programs":len(source),"steps":max_steps,
+        "source_programs":len(source),
+        "docker_source_reverified":len(teacher_receipts),
+        "source_proof_receipts_sha256":hashlib.sha256(
+            json.dumps(teacher_receipts).encode()).hexdigest(),
+        "steps":max_steps,
         "learning_rate":lr,"rank":rank,"seed":seed,
         "loss_first":losses[0],"loss_last":losses[-1],
         "no_target_gold_or_external_solution_training":True,
