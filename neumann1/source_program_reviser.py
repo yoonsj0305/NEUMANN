@@ -191,8 +191,13 @@ class SourcePolicyLearner:
     """
     def __init__(self,*,adapt=True):
         self.adapt=bool(adapt)
+        self.frozen=False
         self.weights={}
         self.updates=0
+
+    def freeze(self):
+        """Retain learned ranking, prohibit updates on heldout task sources."""
+        self.frozen=True
 
     def rank(self,variants):
         def score(item):
@@ -211,7 +216,7 @@ class SourcePolicyLearner:
         oracle/sandbox evidence is never counted as a failed generalization.
         This is a prior over useful edits, NOT a guarantee on TARGET data.
         """
-        if not self.adapt or not source_executed:return
+        if not self.adapt or self.frozen or not source_executed:return
         if not 1<=source_total<=32:
             raise ValueError("bounded source_total required")
         progress=(new_fit-old_fit)/source_total
