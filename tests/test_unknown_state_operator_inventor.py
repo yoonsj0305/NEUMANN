@@ -66,7 +66,7 @@ def test_unknown_state_discovery_is_not_a_fixed_regex_solver():
 
 
 def test_full_exhaustive_all_binary_three_state_transition_semantics():
-    # 2^(3*2) transition tables * 2^3 acceptance assignments = 512
+    # 3^(3*2) transition tables * 2^3 acceptance assignments = 5832
     # differently encoded SOURCE functions. No hidden state information is
     # passed to the learner, only membership oracle labels.
     n=3
@@ -88,7 +88,7 @@ def test_full_exhaustive_all_binary_three_state_transition_semantics():
                          "1010"*31):
                 assert learned.apply(word)==oracle(word)
                 checked+=1
-    assert checked==512*4
+    assert checked==(3**6)*(2**3)*4
 
 
 def test_known_classical_preempts_zero_invention_queries():
