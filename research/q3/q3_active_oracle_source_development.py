@@ -20,7 +20,7 @@ import json
 from pathlib import Path
 import sys
 
-from neumann1.active_oracle_challenges import choose_probes
+from neumann1.active_oracle_challenges import choose_probes, perturb_inputs
 from neumann1.open_program_inventor import IsolatedPython
 from research.q3.pinned_author_function_oracle import AuthorFunctionOracle
 
@@ -85,7 +85,22 @@ def evaluate(*,author_root,output,query_budget=4):
             source_path=Path(author_root)/task["file"],
             entrypoint=task["entry"],arity=task["arity"])
         source=tuple((x,y) for x,y in task["source"])
+        # A single Docker invocation per <=64 proposed SOURCE inputs,
+        # not hundreds of isolated containers during input ranking.
+        pool=perturb_inputs([x for x,y in source])
+        memo={}
+        for first in range(0,len(pool),64):
+            shard=pool[first:first+64]
+            r=runner.evaluate(task["hypothesis"],list(shard))
+            if r.status not in ("EXECUTED","EXECUTED_WITH_ERRORS"):
+                continue
+            for item,value,error in zip(shard,r.outputs,r.errors):
+                if error is None:
+                    memo[json.dumps(item,sort_keys=True)]=value
         def predict(x):
+            key=json.dumps(x,sort_keys=True)
+            if key in memo:
+                return memo[key]
             r=runner.evaluate(task["hypothesis"],[x])
             if r.status!="EXECUTED":
                 raise ValueError("model program runtime error")
