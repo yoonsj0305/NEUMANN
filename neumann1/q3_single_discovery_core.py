@@ -16,6 +16,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from hashlib import sha256
+from collections import Counter
 import json
 from typing import Any
 
@@ -158,6 +159,66 @@ class SourceMethodMemory:
                 e.program[:max_chars_per_method])
         return "\n\n".join(parts)
 
+    def source_supported_context(
+            self, source_pairs, *, excluded_ids=(), max_methods=2,
+            max_chars_per_method=320):
+        """Transfer only methods that beat a constant-output SOURCE baseline.
+
+        Previously 5/7 tasks received the exact same two programs selected
+        by unrelated SHA sort order. This optional, task-agnostic alternative
+        executes each prior method on the CURRENT training SOURCE inputs,
+        without accessing independently reserved SOURCE checks or TARGET gold.
+
+        A method is not presumed causally valid because it happened to be
+        certified on a different task: it must explain MORE observations
+        than predicting the modal output (the minimum useful evidence).
+        The model receives its current counterexample, not a false assertion
+        that it is a solution. No program is installed by this selector.
+        """
+        if not 1 <= len(source_pairs) <= 32:
+            raise ValueError("nonempty bounded SOURCE training required")
+        if not 0 <= max_methods <= 8 or not 100 <= max_chars_per_method <= 3000:
+            raise ValueError("bounded method source context required")
+        outcomes=[(x,y) for x,y in source_pairs]
+        baseline=max(Counter(_canonical(y) for _,y in outcomes).values())
+        forbidden=set(excluded_ids)
+        ranked=[]
+        for method in self.episodes:
+            if method.source_id in forbidden:
+                continue
+            trial=self.runner.evaluate(method.program,[x for x,y in outcomes])
+            if (trial.status not in ("EXECUTED","EXECUTED_WITH_ERRORS")
+                or len(trial.outputs)!=len(outcomes)
+                or len(trial.errors)!=len(outcomes)):
+                continue
+            correct=0
+            witness=None
+            for got,err,(x,y) in zip(
+                    trial.outputs,trial.errors,outcomes):
+                if err is None and got==y:
+                    correct+=1
+                elif witness is None:
+                    witness={"input":x,"expected":y,
+                             "got":got,"runtime_error":err}
+            if correct<=baseline:
+                continue
+            ranked.append((-correct,method.identity,method,witness))
+        ranked.sort()
+        selected=[]
+        for neg_count,_,method,witness in ranked[:max_methods]:
+            selected.append(
+                "Previously SOURCE-certified executable method, NOT a "
+                "verified solution to the current problem; matches "
+                +str(-neg_count)+"/"+str(len(outcomes))
+                +" current original SOURCE observations (constant-output "
+                "baseline: "+str(baseline)+"/"+str(len(outcomes))+"). "
+                "Observed current SOURCE counterexample: "
+                +(_canonical(witness)[:420] if witness is not None
+                  else "none on training SOURCE")
+                +"\nMethod program (SHA "+method.program_sha256[:12]+"):\n"
+                +method.program[:max_chars_per_method])
+        return "\n\n".join(selected)
+
     def teacher_rows(self):
         """Teacher forcing for the SAME generator, no labels from heldout."""
         return [
@@ -200,16 +261,25 @@ class SingleDiscoveryCore:
         self.max_proposals = max_proposals
 
     def discover(self, source_pairs, independent_source_checks, *,
-                 excluded_source_ids=(), reuse_memory=False):
+                 excluded_source_ids=(), reuse_memory=False,
+                 memory_mode="sha"):
         train = tuple((x, y) for x, y in source_pairs)
         checks = tuple((x, y) for x, y in independent_source_checks)
         _check_pairs(train, checks)
         # Same exact context contract is used by leave-one-out LoRA training.
         # Two short, independently certified methods, never target-selected.
-        context = (self.memory.context(
-            excluded_ids=excluded_source_ids,
-            max_methods=2,max_chars_per_method=320)
-            if reuse_memory else "")
+        if memory_mode not in ("sha","source_grounded"):
+            raise ValueError("one of the two frozen causal memory controls required")
+        if not reuse_memory:
+            context=""
+        elif memory_mode=="source_grounded":
+            context=self.memory.source_supported_context(
+                train,excluded_ids=excluded_source_ids,
+                max_methods=2,max_chars_per_method=320)
+        else:
+            context=self.memory.context(
+                excluded_ids=excluded_source_ids,
+                max_methods=2,max_chars_per_method=320)
         proposal = GenerativeProgramInventor(
             self.policy, self.runner,
             max_proposals=self.max_proposals).discover(
@@ -232,7 +302,8 @@ def invent_open_program_for_engine(
         engine, source_pairs, independent_source_checks, *,
         proposal_policy, runner=None, max_proposals=8,
         method_memory=None, reuse_memory=False,
-        source_identity=None, excluded_source_ids=()):
+        source_identity=None, excluded_source_ids=(),
+        memory_mode="sha"):
     """ONE production Q3 interface used without code forks by both engines.
 
     There is no eager persistent method memory, auto-retrieval or family
@@ -260,7 +331,8 @@ def invent_open_program_for_engine(
     result = core.discover(
         source_pairs, independent_source_checks,
         reuse_memory=reuse_memory,
-        excluded_source_ids=excluded_source_ids)
+        excluded_source_ids=excluded_source_ids,
+        memory_mode=memory_mode)
     if source_identity is not None and result.discovery.verified:
         core.learn_from_verified_source(
             str(source_identity), source_pairs,
