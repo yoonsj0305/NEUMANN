@@ -17,6 +17,10 @@ import json
 from pathlib import Path
 from typing import Sequence
 
+from .q3_prompt_contract import (
+    model_prefix,model_training_ids,source_discovery_prompt)
+
+
 
 DEFAULT_MODEL="Qwen/Qwen2.5-Coder-0.5B-Instruct"
 
@@ -62,21 +66,10 @@ class LocalCausalCodePolicy:
         self.device=next(self.model.parameters()).device
 
     def propose(self,prompt):
-        msgs=[
-            {"role":"system","content":
-             "You synthesize correct general Python algorithms from source "
-             "input/output. Output only a single transform(x) function, "
-             "no imports, no comments outside Python source."},
-            {"role":"user","content":prompt},
-        ]
-        if self.tokenizer.chat_template is not None:
-            rendered=self.tokenizer.apply_chat_template(
-                msgs,tokenize=False,add_generation_prompt=True)
-        else:
-            rendered=msgs[0]["content"]+"\n"+prompt+"\nPROGRAM:\n"
+        rendered=model_prefix(self.tokenizer,prompt)
         tokens=self.tokenizer(
-            rendered,return_tensors="pt",truncation=True,
-            max_length=1536).to(self.device)
+            rendered,return_tensors="pt",add_special_tokens=False,
+            truncation=True,max_length=1536).to(self.device)
         # Source-prompt-derived RNG makes first proposals IDENTICAL across
         # the opaque-error and typed-counterexample causal ablations.
         # Later prompts legitimately diverge only when feedback differs.
@@ -127,7 +120,7 @@ def source_training_rows(path):
 
 def finetune_source_policy(
         source_jsonl,adapter_output,*,model_name=DEFAULT_MODEL,
-        max_steps=40,lr=0.00015,rank=4,seed=1007):
+        model_revision=None,max_steps=40,lr=0.00015,rank=4,seed=1007):
     """LoRA gradient update of generator weights on prior certified SOURCE.
 
     Does NOT train on target test answers or private reference programs.
@@ -146,10 +139,12 @@ def finetune_source_policy(
     except ImportError as exc:
         raise RuntimeError("optional peft package required") from exc
     torch.manual_seed(seed)
-    tokenizer=Tokenizer.from_pretrained(model_name,trust_remote_code=False)
+    tokenizer=Tokenizer.from_pretrained(model_name,trust_remote_code=False,
+                                       revision=model_revision)
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token=tokenizer.eos_token
-    base=Model.from_pretrained(model_name,trust_remote_code=False)
+    base=Model.from_pretrained(model_name,trust_remote_code=False,
+                              revision=model_revision)
     config=LoraConfig(
         r=rank,lora_alpha=rank*2,lora_dropout=0.0,
         bias="none",task_type="CAUSAL_LM",
@@ -163,24 +158,13 @@ def finetune_source_policy(
     losses=[]
     for step in range(max_steps):
         row=source[step%len(source)]
-        preamble=(
-            "Infer a reusable Python transform(x) program from these "
-            "independently certified SOURCE observations. Output only code.\n"+
-            "\n".join(
-                "Input: "+json.dumps(pair[0],ensure_ascii=True)+
-                "\nOutput: "+json.dumps(pair[1],ensure_ascii=True)
-                for pair in row["pairs"])+"\nPROGRAM:\n")
+        # Match the live SOURCE-only 6-example prompt *exactly*, rather
+        # than training with a separate text format never seen at inference.
+        teacher_pairs=row["pairs"][:6]
+        prompt=source_discovery_prompt(teacher_pairs)
         completion=row["program"]+tokenizer.eos_token
-        prompt_ids=tokenizer(
-            preamble,add_special_tokens=False)["input_ids"]
-        full_ids=tokenizer(
-            preamble+completion,add_special_tokens=False,
-            truncation=True,max_length=1536)["input_ids"]
-        if len(full_ids)<=len(prompt_ids):
-            raise ValueError("training example truncated target code")
-        # Teacher-forcing loss only on previously SOURCE-certified code,
-        # never on the prompt or original TARGET outputs.
-        labels=[-100]*len(prompt_ids)+full_ids[len(prompt_ids):]
+        full_ids,labels=model_training_ids(
+            tokenizer,prompt,completion,max_length=1536)
         inputs=torch.tensor([full_ids],dtype=torch.long,device=device)
         targets=torch.tensor([labels],dtype=torch.long,device=device)
         optimizer.zero_grad(set_to_none=True)
@@ -198,7 +182,9 @@ def finetune_source_policy(
     tokenizer.save_pretrained(directory)
     manifest={
         "schema":"NEUMANN.Q3.SOURCE-PROGRAM-LORA.v1",
-        "base_model":model_name,"source_sha256":source_sha,
+        "base_model":model_name,"model_revision":model_revision,
+        "prompt_contract":"source_discovery_prompt+chat_template.v1",
+        "source_sha256":source_sha,
         "source_programs":len(source),"steps":max_steps,
         "learning_rate":lr,"rank":rank,"seed":seed,
         "loss_first":losses[0],"loss_last":losses[-1],
@@ -214,10 +200,12 @@ if __name__=="__main__":
     p.add_argument("--sources",required=True)
     p.add_argument("--adapter-output",required=True)
     p.add_argument("--model",default=DEFAULT_MODEL)
+    p.add_argument("--model-revision",default=None)
     p.add_argument("--steps",type=int,default=40)
     p.add_argument("--seed",type=int,default=1007)
     args=p.parse_args()
     print(json.dumps(
         finetune_source_policy(
             args.sources,args.adapter_output,model_name=args.model,
+            model_revision=args.model_revision,
             max_steps=args.steps,seed=args.seed),indent=2))
