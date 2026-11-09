@@ -111,10 +111,10 @@ def _pair_nodes(src,dst,background):
     best=None;best_cost=None;examined=0
     def dfs(pos,used,matching,cost):
         nonlocal best,best_cost,examined
+        examined+=1
         if examined>=15000:return
         if best_cost is not None and cost>best_cost:return
         if pos==len(order):
-            examined+=1
             sig=tuple(matching[i] for i in range(len(left)))
             if best_cost is None or (cost,sig)<(best_cost,best):
                 best_cost=cost;best=sig
@@ -188,11 +188,13 @@ def _choose_law(source_pairs):
         good=True
         for features,action in all_examples:
             value="ALL" if key=="global" else features[key]
-            frozen=_key(value)
-            if frozen in mapping and mapping[frozen]!=action:
+            # Native hashable feature values (int/str/tuple) preserve typed
+            # equality at code generation and runtime. Do NOT stringify them:
+            # a str encoding mismatch previously made all rules unreachable.
+            if value in mapping and mapping[value]!=action:
                 good=False;break
-            mapping[frozen]=action
-            supports[frozen]+=1
+            mapping[value]=action
+            supports[value]+=1
         if not good or len(mapping)>10:continue
         if any(n<2 for n in supports.values()):
             # Each learned branch must receive repeat SOURCE evidence.
@@ -264,12 +266,9 @@ def _compiled_program(key,mapping):
         "        elif key=='top_half':val=int(2*r0<h)\n"
         "        elif key=='bbox_aspect':val=(rh,cw)\n"
         "        else:val=shape\n"
-        "        import_guard = False\n"  # local ordinary assignment, no imports
-        "        signature=str(val) if type(val)!=str else val\n"
-        "        # marker\n"
-        "        if signature not in mapping:\n"
+        "        if val not in mapping:\n"
         "            return x\n"
-        "        dr,dc,dest=mapping[signature]\n"
+        "        dr,dc,dest=mapping[val]\n"
         "        for y,z in pts:\n"
         "            yy=y+dr\n"
         "            xx=z+dc\n"
