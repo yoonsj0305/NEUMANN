@@ -79,3 +79,34 @@ frontier-level autonomous invention claim. Typed atoms, search bounds and
 source oracle availability are supplied by the researcher.
 
 Status: **SCOPED AST REPAIR PASS; GLOBAL Q3/Q6 OPEN; Q4 DEFERRED**.
+
+
+## Frozen 800 evidence after source-only repair
+
+GitHub Actions 42546939669 completed SUCCESS. The proposer SHA locked all
+800 target predictions BEFORE the scorer opened their synthetic expected
+terminal outputs. The SHA-256 was
+26e12b70640b1e5ec8d41e34e5b57b30cb6f925b0901bf53d6ac5a179d10ec2b.
+
+Matched first-proposal exact scores:
+- Integer signed-domain: old 200/400, revised 400/400.
+- Finite set: old 200/200, revised 200/200.
+- String: old 200/200, revised 200/200.
+- TOTAL: **600/800 -> 800/800**. The 200 newly corrected answers are in
+  ONE signed-integer family; neither other family improved its accuracy.
+
+The source-only falsifier found input -17; the prior program predicted 0
+when the permitted SOURCE oracle returned -17. The invented transition AST
+changed from a decrement-to-zero update to the sign-preserving update
+T(x) = x - max(0, min(x,1)). A source-verified full-state fixedpoint loop
+then produces the correct terminal map for the frozen extended-range
+signed-integer target inputs.
+
+Source-query counts on this run: integer 53, sets 5, strings 296. These
+are additional permitted SOURCE observations, so the result demonstrates
+ability correction, **not** an inference-efficiency win. The source oracle
+and target input families are researcher-authored. Independent-author
+frontier generalization is still OPEN.
+
+Workflow and archived predictions:
+https://github.com/yoonsj0305/NEUMANN/actions/runs/42546939669
