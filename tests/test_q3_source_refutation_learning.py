@@ -118,7 +118,8 @@ def test_actual_model_pilot_unwraps_coreoutcome_without_loading_neural_weights(
        "schema":"NEUMANN.Q3.NEURAL.CODEARC.BLIND.v1",
        "records":[{
            "id":task,
-           "source":[[x,x] for x in range(start,start+7)]}
+           "source":[[x,x] for x in range(start,start+7)],
+           "target_inputs":[start+7,start+8,start+9]}
            for task,start in ((184,10),(255,100))]}))
     out=tmp_path/"results.json"
     pilot.run(str(blind_path),str(teacher_path),
@@ -131,3 +132,13 @@ def test_actual_model_pilot_unwraps_coreoutcome_without_loading_neural_weights(
     assert result["source_refutation_10step_correct_source"]==2
     assert all(x["arms"]["C"]["source_verified"]
                for x in result["records"])
+    assert all(
+        x["arms"]["C"]["original_target_predictions"]
+        == [a for a in (
+            (10,11,12) if x["id"]==184 else (100,101,102))]
+        for x in result["records"]) is False  # offsets 7..9, not 0..2
+    assert all(
+        x["arms"]["C"]["original_target_predictions"]
+        == [i for i in range((10 if x["id"]==184 else 100)+7,
+                             (10 if x["id"]==184 else 100)+10)]
+        for x in result["records"])
