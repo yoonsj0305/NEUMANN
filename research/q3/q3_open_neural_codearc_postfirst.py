@@ -143,7 +143,13 @@ def propose(blind,out,*,model_revision,proposals=2):
     adaptive_policy=SourcePolicyLearner(adapt=True)
     static_policy=SourcePolicyLearner(adapt=False)
     rows=[]
-    for rec in data["records"]:
+    # Fixed before TARGET gold: early tasks train only on SOURCE feedback;
+    # later tasks cannot update the policy. This is genuine heldout
+    # source-to-source meta-policy transfer rather than online test learning.
+    policy_train_count=len(data["records"])//2
+    for idx,rec in enumerate(data["records"]):
+        if idx==policy_train_count:
+            adaptive_policy.freeze()
         source=rec["source"]
         # Matched first-program intervention: identical frozen model weights,
         # same data, same per-prompt RNG seed. Only runtime-error feedback
@@ -206,6 +212,9 @@ def propose(blind,out,*,model_revision,proposals=2):
                     first_pred=list(result.outputs)
         row={
             "id":rec["id"],"cohort":rec["cohort"],
+            "policy_phase":(
+                "SOURCE_META_TRAIN" if idx<policy_train_count
+                else "FROZEN_POLICY_TRANSFER"),
             "status":discovery.status,
             "opaque_error_status":legacy.status,
             "opaque_error_predictions":legacy_predictions,
@@ -238,6 +247,8 @@ def propose(blind,out,*,model_revision,proposals=2):
         "model_id":MODEL,"model_revision":model_revision,
         "dataset_revision":DATA_REV,"dataset_sha256":data["original_sha256"],
         "blind_sha256":_sha(blind),"source_only":True,
+        "policy_train_count":policy_train_count,
+        "frozen_meta_policy_transfer":True,
         "no_external_target_gold_in_proposals":True,
         "unrestricted_Q3_Q6_claim":False,"records":rows}
     out.write_text(json.dumps(payload,separators=(",",":"))+"\n")
@@ -267,6 +278,7 @@ def score(original,predictions,expected_sha,out):
                       row["adaptive_repair_predictions"]==gold)
         entries.append({
             "id":row["id"],"cohort":row["cohort"],
+            "policy_phase":row.get("policy_phase","UNDECLARED"),
             "source_status":row["status"],
             "opaque_source_status":row["opaque_error_status"],
             "first_original_exact":first,"revised_original_exact":repaired,
@@ -299,6 +311,21 @@ def score(original,predictions,expected_sha,out):
             e["adaptive_residual_vs_static"] for e in entries),
         "adaptive_edit_policy_updates":max(
             (e["adaptive_policy_updates"] for e in entries),default=0),
+        "frozen_transfer_tasks":sum(
+            e["policy_phase"]=="FROZEN_POLICY_TRANSFER" for e in entries),
+        "frozen_transfer_uniform_exact":sum(
+            e["static_source_repair_exact"] for e in entries
+            if e["policy_phase"]=="FROZEN_POLICY_TRANSFER"),
+        "frozen_transfer_adaptive_exact":sum(
+            e["adaptive_source_repair_exact"] for e in entries
+            if e["policy_phase"]=="FROZEN_POLICY_TRANSFER"),
+        "frozen_transfer_new_exact":sum(
+            e["adaptive_residual_vs_static"] for e in entries
+            if e["policy_phase"]=="FROZEN_POLICY_TRANSFER"),
+        "frozen_transfer_regressions":sum(
+            e["static_source_repair_exact"]
+            and not e["adaptive_source_repair_exact"] for e in entries
+            if e["policy_phase"]=="FROZEN_POLICY_TRANSFER"),
         "uniform_source_evaluations":sum(
             e["static_source_evals"] for e in entries),
         "adaptive_source_evaluations":sum(
