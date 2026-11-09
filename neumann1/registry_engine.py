@@ -1,4 +1,5 @@
 from __future__ import annotations
+from .q3_single_discovery_core import invent_open_program_for_engine
 
 from .types import Problem, SolveResult, CostLedger, display_kind, is_unknown_kind
 from .family_registry import FamilyRegistry
@@ -803,28 +804,6 @@ class RegistryEngine:
                 known_classical=known_classical)
 
 
-    def invent_open_program_from_source(
-            self, source_pairs, independent_source_checks, *,
-            proposal_policy, runner=None, max_proposals=8,
-            method_memory=None, reuse_memory=True,
-            source_identity=None):
-        """Same SINGLE task-agnostic Q3 policy as NeumannEngine, no domain route."""
-        from .q3_single_discovery_core import (
-            SingleDiscoveryCore, SourceMethodMemory)
-        from .open_program_inventor import IsolatedPython
-        runtime=runner if runner is not None else IsolatedPython()
-        if method_memory is None:
-            if not hasattr(self, "_q3_single_method_memory"):
-                self._q3_single_method_memory=SourceMethodMemory(runtime)
-            method_memory=self._q3_single_method_memory
-        core=SingleDiscoveryCore(
-            proposal_policy, runtime,
-            memory=method_memory,max_proposals=max_proposals)
-        outcome=core.discover(
-            source_pairs,independent_source_checks,
-            reuse_memory=reuse_memory)
-        if source_identity is not None and outcome.discovery.verified:
-            core.learn_from_verified_source(
-                source_identity,source_pairs,
-                independent_source_checks,outcome)
-        return outcome.discovery
+    # One exact shared function; no duplicated discovery glue, hidden routes,
+    # or silent in-context method injection on ordinary Q3 calls.
+    invent_open_program_from_source = invent_open_program_for_engine
