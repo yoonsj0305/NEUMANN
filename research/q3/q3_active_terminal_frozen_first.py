@@ -75,6 +75,8 @@ def propose(outpath: Path):
         stats[kind]={
             "status":learned.status,
             "source_queries":learned.source_oracle_queries,
+            "version_hypotheses_examined":learned.version_hypotheses_examined,
+            "disagreement_oracle_queries":learned.disagreement_oracle_queries,
             "source_experiment_programs":learned.source_experiment_programs,
             "source_experiment_inputs":learned.source_experiment_inputs,
             "revisions":[{
