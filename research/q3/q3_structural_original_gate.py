@@ -104,6 +104,57 @@ def freeze_arcana(author_data_dir,output):
           [r["id"] for r in entries],sha_file(output),flush=True)
 
 
+def freeze_arcana_next8(author_data_dir,output):
+    """New SOURCE registry frozen before reading chosen author TARGET labels.
+
+    Excludes every previously opened ARCANA development task, including the
+    original 4 in PR #753. No model, selected operator or prompt is tuned
+    against new heldout target correctness. Author identity/shape never
+    dispatches the discovery algorithm.
+    """
+    exclude={
+        ARCANA_DEV_EXCLUSION,
+        "magnetic1.json","mop2.json","cup1.json","pocket_watch1.json",
+    }
+    root=Path(author_data_dir)
+    files=[p for p in root.glob("*.json") if p.name not in exclude]
+    salt="NEUMANN-Q3-STRUCTURAL-LIFT-NEXT8-20261110-FROZEN-V1"
+    files.sort(key=lambda p:sha256((salt+"/"+p.name).encode()).hexdigest())
+    selected=files[:8]
+    if len(selected)!=8:
+        raise ValueError("independent-author holdout not available")
+    entries=[]
+    for file in selected:
+        record=json.loads(file.read_text())
+        train=record.get("train",[])
+        held=record.get("test",[])
+        if len(train)<3 or not held:
+            raise ValueError("author original lacks independent SOURCE verifier")
+        entries.append({
+            "id":file.name,
+            "source":[[r["input"],r["output"]] for r in train[:3]],
+            "target_inputs":[r["input"] for r in held],
+            "file_sha256":sha_file(file),
+        })
+    out={
+        "schema":SCHEMA,
+        "origin":"arcana",
+        "scope":"NEWLY_FROZEN_AUTHOR_ORIGINALS_NO_TUNING",
+        "revision":ARCANA_REVISION,
+        "source_fingerprint":sha256(canonical(
+            [(p.name,sha_file(p)) for p in selected]
+            ).encode()).hexdigest(),
+        "records":entries,
+        "no_target_gold_in_blind":True,
+        "prior_excluded":sorted(exclude),
+        "salt":salt,
+        "run_pre_registration":"No representation-policy changes after first freeze",
+    }
+    Path(output).write_text(canonical(out)+"\n")
+    print("Q3_NEXT8_EXTERNAL_SOURCE_BLIND_FROZEN",
+          [x["id"] for x in entries],sha_file(output),flush=True)
+
+
 def _verified_method(memory,train,checks):
     """Strong B: past programs can be reused directly, no learning at test."""
     inputs=[x for x,y in (*train,*checks)]
@@ -348,9 +399,9 @@ def gate(codearc,arcana):
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
     sp=parser.add_subparsers(dest="cmd",required=True)
-    for name in ("freeze-codearc","freeze-arcana","infer","score","gate"):
+    for name in ("freeze-codearc","freeze-arcana","freeze-arcana-next8","infer","score","gate"):
         x=sp.add_parser(name)
-        if name in ("freeze-codearc","freeze-arcana"):
+        if name in ("freeze-codearc","freeze-arcana","freeze-arcana-next8"):
             x.add_argument("--original",required=True)
             x.add_argument("--out",required=True)
         if name=="infer":
@@ -371,6 +422,8 @@ if __name__=="__main__":
         freeze_codearc(args.original,args.out)
     elif args.cmd=="freeze-arcana":
         freeze_arcana(args.original,args.out)
+    elif args.cmd=="freeze-arcana-next8":
+        freeze_arcana_next8(args.original,args.out)
     elif args.cmd=="infer":
         infer(args.blind,args.teachers,args.out)
     elif args.cmd=="score":
