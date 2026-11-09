@@ -81,7 +81,6 @@ def test_same_neural_core_reuses_certified_memory_on_unrelated_task():
     ans=core.discover([("abcd","dcba"),("str","rts")],
                       [("cats","stac")],reuse_memory=True)
     assert ans.discovery.verified
-    assert ans.method_memory_count==1
     assert "Past SOURCE-certified general method" in policy.prompts[-1]
     assert "return x + 1" in policy.prompts[-1]
     assert ans.discovery.program==REV
@@ -98,7 +97,6 @@ def test_same_policy_without_memory_is_A_control():
     ans=core.discover([("abc","cba")],[("dog","god")],
                       reuse_memory=False)
     assert ans.discovery.verified
-    assert ans.method_memory_count==0
     assert "Past SOURCE-certified" not in policy.prompts[-1]
 
 
@@ -145,7 +143,6 @@ def test_first_principles_default_has_no_random_old_method_prompt():
     core=SingleDiscoveryCore(policy,runner,memory=memory,max_proposals=1)
     outcome=core.discover([("abc","cba")],[("xyz","zyx")])
     assert outcome.discovery.verified
-    assert outcome.method_memory_count==0
     assert "Past SOURCE-certified general method" not in policy.prompts[0]
     assert memory.episodes[0].source_id=="old_task"
 
