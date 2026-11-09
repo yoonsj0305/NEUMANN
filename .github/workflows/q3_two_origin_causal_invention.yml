@@ -126,8 +126,9 @@ jobs:
             curl -fL --retry 3 --silent --show-error \
               https://huggingface.co/datasets/anjiangwei/CodeARC-Invocations/resolve/119512573bf96148cbb95e99cf7cdd21c06153e4/invocations.jsonl \
               -o original-codearc/invocations.jsonl
-            sha256sum -c training/CODEARC_DATA_SHA256.txt || \
-              { sha256sum original-codearc/invocations.jsonl; exit 1; }
+            EXPECTED="$(cut -d ' ' -f1 training/CODEARC_DATA_SHA256.txt)"
+            ACTUAL="$(sha256sum original-codearc/invocations.jsonl | cut -d ' ' -f1)"
+            test "$ACTUAL" = "$EXPECTED"
           else
             git init -q original-arcana
             git -C original-arcana fetch -q --depth 1 \
