@@ -200,7 +200,7 @@ def propose(blind, teachers, adapter, model_revision, output):
         for name,policy,reuse in [
             ("A",base,False),("B",base,True),("C",adapted,True)]:
             one={"status":"ABSTAIN","program_sha256":None,
-                 "target_predictions":[],"source_pass":False}
+                 "program":None,"target_predictions":[],"source_pass":False}
             try:
                 result=SingleDiscoveryCore(
                     policy,runner,memory=memory,max_proposals=1).discover(
@@ -210,6 +210,7 @@ def propose(blind, teachers, adapter, model_revision, output):
                 one["source_pass"]=bool(discovery.verified)
                 one["program_sha256"]=discovery.frozen_sha256
                 if discovery.verified:
+                    one["program"]=discovery.program
                     scored=runner.evaluate(discovery.program,entry["target_inputs"])
                     if scored.status=="EXECUTED":
                         one["target_predictions"]=json.loads(canonical(scored.outputs))
