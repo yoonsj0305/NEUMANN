@@ -294,7 +294,8 @@ class GenerativeProgramInventor:
         self.reveal_independent_counterexample=bool(
             reveal_independent_counterexample)
 
-    def discover(self,source_pairs,*,independent_source_checks):
+    def discover(self,source_pairs,*,independent_source_checks,
+                 method_context=""):
         train=tuple(source_pairs)
         checks=tuple(independent_source_checks)
         if not train or not checks or len(train)>32 or len(checks)>32:
@@ -308,7 +309,7 @@ class GenerativeProgramInventor:
         if len(check_inputs)!=len(set(check_inputs)) or (
                 train_inputs & set(check_inputs)):
             raise ValueError("SOURCE verifier must be disjoint from training")
-        prompt=source_discovery_prompt(train)
+        prompt=source_discovery_prompt(train,method_context=method_context)
         seen=set()
         receipts=[]
         for step in range(self.max_proposals):
