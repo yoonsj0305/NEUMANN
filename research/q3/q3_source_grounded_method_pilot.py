@@ -151,7 +151,7 @@ def score(original,blind,predictions,expected_sha,out):
         scored.append({"id":pid,**arms,
                        "C_only_vs_A_B":arms["C"] and not (arms["A"] or arms["B"]),
                        "B_only_vs_C":arms["B"] and not arms["C"],
-                       "identifiable_development_contrast":
+                       "has_nonconstant_SOURCE_outputs":
                        task["original_source_output_diversity"]>1})
     summary={
         "originals":len(scored),
@@ -161,7 +161,7 @@ def score(original,blind,predictions,expected_sha,out):
         "C_only_vs_A_B":sum(x["C_only_vs_A_B"] for x in scored),
         "B_only_vs_C":sum(x["B_only_vs_C"] for x in scored),
         "C_exclusive_on_nonconstant_SOURCE":sum(
-            x["C_only_vs_A_B"] and x["identifiable_development_contrast"]
+            x["C_only_vs_A_B"] and x["has_nonconstant_SOURCE_outputs"]
             for x in scored),
         "q3_global":"OPEN",
         "original_scope":"PREVIOUSLY_OPENED_DEVELOPMENT",
