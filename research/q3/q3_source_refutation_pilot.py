@@ -27,7 +27,8 @@ def digest(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def run(blind, teachers, adapter, context_adapter, revision, output):
+def run(blind, teachers, adapter, context_adapter, revision, output,
+        onpolicy_adapter=None):
     dataset=json.loads(Path(blind).read_text())
     if dataset.get("schema")!="NEUMANN.Q3.NEURAL.CODEARC.BLIND.v1":
         raise ValueError("expected immutable previous original SOURCE")
@@ -50,12 +51,18 @@ def run(blind, teachers, adapter, context_adapter, revision, output):
     modified=LocalCausalCodePolicy(
         model_revision=revision,adapter_path=adapter,
         max_new_tokens=384,temperature=0.3)
+    policies=[("A",base),("B",contextual),("C",modified)]
+    if onpolicy_adapter:
+        actual_model_failures=LocalCausalCodePolicy(
+            model_revision=revision,adapter_path=onpolicy_adapter,
+            max_new_tokens=384,temperature=0.3)
+        policies.append(("D",actual_model_failures))
     records=[]
     for pid in IDS:
         source=indexed[pid]["source"]
         if len(source)!=7:raise ValueError("original SOURCE split changed")
         row={"id":pid,"arms":{}}
-        for name,policy in (("A",base),("B",contextual),("C",modified)):
+        for name,policy in policies:
             core_outcome=SingleDiscoveryCore(
                 policy,sandbox,memory=memory,max_proposals=2).discover(
                     source[:6],source[6:],
@@ -92,7 +99,7 @@ def run(blind, teachers, adapter, context_adapter, revision, output):
                   for k,v in row["arms"].items()},flush=True)
     scores={
         k:sum(row["arms"][k]["source_verified"] for row in records)
-        for k in ("A","B","C")}
+        for k,_ in policies}
     output_record={
         "schema":SCHEMA,"original_scope":"POSTFIRST_SOURCE_ONLY",
         "model_revision":revision,"blind_sha256":digest(blind),
@@ -100,6 +107,18 @@ def run(blind, teachers, adapter, context_adapter, revision, output):
         "pretrained_memory_correct_source":scores["A"],
         "contextual_imitation_10step_correct_source":scores["B"],
         "source_refutation_10step_correct_source":scores["C"],
+        "model_generated_repair_10step_correct_source":scores.get("D"),
+        "model_generated_repair_residual_over_all_controls":(
+            sum(
+                r["arms"]["D"]["source_verified"] and not any(
+                    r["arms"][k]["source_verified"] for k in ("A","B","C"))
+                for r in records)
+            if onpolicy_adapter else None),
+        "model_generated_repair_regressions_vs_control_B":(
+            sum(
+                r["arms"]["B"]["source_verified"] and not r["arms"]["D"]["source_verified"]
+                for r in records)
+            if onpolicy_adapter else None),
         "pre_registered_source_residual":sum(
             r["arms"]["C"]["source_verified"]
             and not r["arms"]["B"]["source_verified"] for r in records),
@@ -120,7 +139,10 @@ if __name__=="__main__":
     p.add_argument("--teachers",required=True)
     p.add_argument("--adapter",required=True)
     p.add_argument("--context-adapter",required=True)
+    p.add_argument("--onpolicy-adapter",default=None,
+                   help="model-trained on its own independently refuted SOURCE hypotheses")
     p.add_argument("--revision",required=True)
     p.add_argument("--out",required=True)
     x=p.parse_args()
-    run(x.blind,x.teachers,x.adapter,x.context_adapter,x.revision,x.out)
+    run(x.blind,x.teachers,x.adapter,x.context_adapter,x.revision,x.out,
+        onpolicy_adapter=x.onpolicy_adapter)
