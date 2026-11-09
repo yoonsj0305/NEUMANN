@@ -53,6 +53,16 @@ def test_active_source_falsification_rewrites_latent_process_ast():
     assert len(result.revisions)>=1
     assert result.program.transition_ast!=old.transition_ast
     assert result.source_oracle_queries<=160
+    # Candidate hypotheses must actually disagree on a SOURCE input;
+    # otherwise "active learning" is merely brute extra source probing.
+    assert result.version_hypotheses_examined >= 2
+    assert result.disagreement_oracle_queries >= 1
+    assert result.revisions[0].new_ast is not None
+    print("Q3 active version-space witnesses:",
+          "versions",result.version_hypotheses_examined,
+          "discriminating queries",result.disagreement_oracle_queries,
+          "total source queries",result.source_oracle_queries,
+          "revisions",len(result.revisions))
     for x in tuple(range(-24,0))+tuple(range(0,100)):
         execution=result.program.compile().run(x)
         assert execution.status=="HALT_CERTIFIED_FIXED_POINT"
