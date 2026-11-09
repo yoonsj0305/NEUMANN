@@ -130,9 +130,9 @@ def verify_source_method(method):
         a,b=rng.randrange(1000,100000),rng.randrange(1,1000)
         verifiers.append(("euclid",[a,b]))
         verifiers.append(("dedup",[rng.randrange(10) for _ in range(23)]))
-        verifiers.append(("sort",11+i))
-        verifiers.append(("graph",31+i))
-        n=1024*(i+1)
+        verifiers.append(("sort",15+i))
+        verifiers.append(("graph",44+i))
+        n=50000000+i
         verifiers.append(("interval",[n,n//3]))
     # These 15 SOURCE cases are disjoint from all final target seeds/specs;
     # they verify the frozen method but are never used to refit it.
