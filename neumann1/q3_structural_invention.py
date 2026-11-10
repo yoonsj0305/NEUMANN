@@ -337,6 +337,19 @@ class StructuralInventionPolicy:
             else:
                 family.sort(key=lambda f:(
                     f.description_length,f.representation,len(f.program)))
+        # The previous 173-real-trial posterior was learned, yet the 2-step
+        # proposer always tried only the same first two *fixed* families.
+        # Give C a causal policy over which REPRESENTATION mechanism to
+        # investigate, not merely which candidate inside a never-reached
+        # mechanism. The default A/B order stays unchanged.
+        if self.representation_prior is not None:
+            families=tuple(sorted(
+                families,key=lambda family:(
+                    -max((self.representation_prior.score(
+                        item.representation) for item in family),
+                         default=0.0),
+                    min((item.description_length for item in family),
+                        default=1000000))))
         # Interleave: at a 2-proposal budget an added family cannot consume
         # both places solely because it assigned an arbitrary cheap cost.
         # All A/B/C arms share the identical four families and limits.
