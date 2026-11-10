@@ -1,0 +1,172 @@
+name: Q3 Residual CEGIS - Fourth Disjoint Author Original Exact Gate
+on:
+  push:
+    branches:
+      - research/q3-composable-source-program-invention-20261110
+    paths:
+      - ".github/workflows/q3_residual_cegis_fourth_original.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONHASHSEED: "0"
+  OMP_NUM_THREADS: "1"
+  OPENBLAS_NUM_THREADS: "1"
+
+jobs:
+  preregister:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Freeze fourth external original author cohort without author target answers
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          git init -q /tmp/author
+          git -C /tmp/author fetch -q --depth 1 https://github.com/density-11/arcana-test.git 3f3dc8f650deb271a29e282bfb0e5ca95a7d64d6
+          git -C /tmp/author checkout -q FETCH_HEAD
+          test "$(git -C /tmp/author rev-parse HEAD)" = 3f3dc8f650deb271a29e282bfb0e5ca95a7d64d6
+          mkdir -p frozen
+          python -m research.q3.q3_structural_original_gate freeze-arcana-next8-v4 --original /tmp/author/data --out frozen/BLIND.json
+          sha256sum frozen/BLIND.json > frozen/BLIND.sha256
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path("frozen/BLIND.json").read_text())
+          assert d["scope"]=="FOURTH_DISJOINT_SOURCE_AUTHOR_ORIGINALS_NO_TUNING"
+          assert len(d["records"])==8
+          assert d["no_target_gold_in_blind"]
+          assert len(set(x["id"] for x in d["records"]))==8
+          assert not set(x["id"] for x in d["records"])&set(d["prior_excluded"])
+          print("Q3_FOURTH_EXTERNAL_SOURCE_IDS_SHA_FROZEN",
+                [x["id"] for x in d["records"]],flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-residual-cegis-fourth-external-source-blind
+          path: frozen/
+          retention-days: 90
+
+  invent_and_freeze:
+    needs: preregister
+    runs-on: ubuntu-latest
+    timeout-minutes: 85
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-residual-cegis-fourth-external-source-blind
+          path: frozen
+      - name: Same no-network Docker and self-composing SOURCE policy
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          docker pull python:3.11-alpine
+          python -m pytest -q -x tests/test_q3_residual_composition.py
+          mkdir -p real_source old frozen_policy predictions
+          gh run download 42735035357 --name q3-original-arc2-source-only-frozen --dir real_source
+          gh run download 42593621076 --name Q3-REAL-WEIGHT-LEARNING-ORIGINAL-SOURCE-BLIND --dir old
+          test "$(cut -d ' ' -f1 real_source/ORIGINAL_SOURCE_ONLY.sha256)" = "$(sha256sum real_source/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+          test "$(cut -d ' ' -f1 frozen/BLIND.sha256)" = "$(sha256sum frozen/BLIND.json | cut -d ' ' -f1)"
+      - name: Fit causal representation selection from 50 distinct ARC2 SOURCE originals only
+        run: |
+          set -euo pipefail
+          python -m research.q3.q3_representation_original_source_training learn --source-only real_source/ORIGINAL_SOURCE_ONLY.json --out frozen_policy/NEW_SOURCE_REPRESENTATION_POLICY.json
+          sha256sum frozen_policy/NEW_SOURCE_REPRESENTATION_POLICY.json > frozen_policy/POLICY.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("frozen_policy/NEW_SOURCE_REPRESENTATION_POLICY.json").read_text())
+          assert p["target_gold_read"] is False and p["source_teacher_count"]==50
+          assert p["check_executions"]>0
+          print("Q3_LEARNED_CEGIS_REAL_SOURCE_POLICY",
+                [(x["name"],x["successful_transfer"],x["partial_transfer"])
+                 for x in p["outcomes"]],flush=True)
+          PY
+      - name: SHA-freeze A2 B2 C2 and stronger untrained A12 before external gold
+        run: |
+          set -euo pipefail
+          python -m research.q3.q3_structural_original_gate infer --blind frozen/BLIND.json --teachers old/SOURCE_TEACHERS.jsonl --representation-prior frozen_policy/NEW_SOURCE_REPRESENTATION_POLICY.json --max-proposals 2 --out predictions/TWO.json
+          sha256sum predictions/TWO.json > predictions/TWO.sha256
+          python -m research.q3.q3_structural_original_gate infer --blind frozen/BLIND.json --teachers old/SOURCE_TEACHERS.jsonl --representation-prior frozen_policy/NEW_SOURCE_REPRESENTATION_POLICY.json --max-proposals 12 --out predictions/TWELVE.json
+          sha256sum predictions/TWELVE.json > predictions/TWELVE.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          for name,budget in (("TWO",2),("TWELVE",12)):
+              p=json.loads(Path("predictions/"+name+".json").read_text())
+              assert not p["target_gold_accessed"]
+              assert p["max_proposals"]==budget
+              assert len(p["records"])==8
+              print("Q3_CEGIS_FOURTH_FROZEN_SOURCE_VERIFY",name,
+                    {x:sum(r["arms"][x]["source_verified"] for r in p["records"])
+                     for x in "ABC"},flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-residual-cegis-fourth-author-predictions-source-frozen
+          path: |
+            predictions/
+            frozen_policy/
+          if-no-files-found: warn
+          retention-days: 90
+
+  original_score:
+    needs: invent_and_freeze
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-residual-cegis-fourth-external-source-blind
+          path: frozen
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-residual-cegis-fourth-author-predictions-source-frozen
+          path: source_receipts
+      - name: Only after all original SOURCE predictions frozen, independently score external author gold
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          mkdir -p score
+          git init -q /tmp/grade
+          git -C /tmp/grade fetch -q --depth 1 https://github.com/density-11/arcana-test.git 3f3dc8f650deb271a29e282bfb0e5ca95a7d64d6
+          git -C /tmp/grade checkout -q FETCH_HEAD
+          python -m research.q3.q3_structural_original_gate score --blind frozen/BLIND.json --predictions source_receipts/predictions/TWO.json --expected-sha "$(cut -d ' ' -f1 source_receipts/predictions/TWO.sha256)" --original /tmp/grade/data --out score/TWO.json
+          python -m research.q3.q3_structural_original_gate score --blind frozen/BLIND.json --predictions source_receipts/predictions/TWELVE.json --expected-sha "$(cut -d ' ' -f1 source_receipts/predictions/TWELVE.sha256)" --original /tmp/grade/data --out score/TWELVE.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          two=json.loads(Path("score/TWO.json").read_text())
+          strong=json.loads(Path("score/TWELVE.json").read_text())
+          assert two["summary"]["originals"]==strong["summary"]["originals"]==8
+          baseline={r["id"]:r for r in strong["records"]}
+          exclusive=sum(r["C"] and not(
+              r["A"] or r["B"] or r["native_exact"] or baseline[r["id"]]["A"])
+              for r in two["records"])
+          print("Q3_CEGIS_FOURTH_AUTHOR_ORIGINAL_EXACT",
+                {"A2":two["summary"]["A"],"B2":two["summary"]["B"],
+                 "C2":two["summary"]["C"],"A12":strong["summary"]["A"],
+                 "native":two["summary"]["native_exact"],
+                 "C2_exclusive_over_A_B_A12_native":exclusive,
+                 "q3_global":"OPEN"},flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-residual-cegis-fourth-external-author-original-exact-score
+          path: score/
+          retention-days: 90
