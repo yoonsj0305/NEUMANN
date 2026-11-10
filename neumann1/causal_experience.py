@@ -294,7 +294,19 @@ class CausalExperienceCore:
                 observed,evidence_id) is not True:
             raise ValueError("unverified sealed SOURCE observation")
         hypothesis=self._hypotheses[0]
+        # A hypothesis that contradicts *known* SOURCE may not be admitted
+        # just because one sealed example happens to agree.
+        known={
+            e["query_id"]:e["observed"] for e in self.experiences
+            if e["task_id"]==self._task and
+               e["query_id"] not in self._sealed_queries
+        }
+        consistent_training=bool(known) and all(
+            q in hypothesis.predictions and
+            _json(hypothesis.predictions[q])==_json(actual)
+            for q,actual in known.items())
         self._source_certified=(
+            consistent_training and
             query_id in hypothesis.predictions and
             _json(hypothesis.predictions[query_id])==_json(observed))
         return self._source_certified
@@ -306,16 +318,17 @@ class CausalExperienceCore:
             return Representation(IRKind.UNKNOWN,{},0.0,
                                   "no model-generated latent hypothesis")
         h=self._hypotheses[0]
-        # SOURCE prediction checks are not calibrated posterior confidence.
-        # 0.85 is a *bounded research admission gate*, not certainty about
-        # unobserved consequences or a physical-safety certificate.
+        # Boolean SOURCE admission is represented as 1.0/0.0 only because
+        # the existing Representation interface requires a float. This is
+        # observed SOURCE consistency, NOT statistical or physical certainty.
         return Representation(
             kind=h.kind,
             payload={"latent_variables":h.latent_variables,
                      "relations":h.relations,
                      "hypothesis_sha256":h.digest},
-            confidence=0.85 if self._source_certified else 0.0,
-            rationale=("sealed independent SOURCE prediction agreed; "
+            confidence=1.0 if self._source_certified else 0.0,
+            rationale=("observed SOURCE plus one-shot sealed SOURCE agreed; "
+                       "binary admission, not calibrated probability; "
                        "still requires downstream TARGET verification"
                        if self._source_certified else
                        "unverified model-induced latent representation; "
