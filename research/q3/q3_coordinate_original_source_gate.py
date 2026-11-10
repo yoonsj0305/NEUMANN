@@ -35,18 +35,91 @@ def sha(p):
     return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
 
+
+def freeze_prospective(original_root,prior_source_only,out):
+    """Pre-register 100 author files by filename SHA, not SOURCE correctness.
+
+    This cohort is disjoint from the already inspected 50 author SOURCE
+    development tasks. It is NOT guaranteed globally first-exposure across
+    the entire long-lived repository. We never cherry-pick IDs after
+    generating programs or inspecting any target author output.
+    """
+    prior=json.loads(Path(prior_source_only).read_text())
+    if (prior.get("schema")!="NEUMANN.Q3.ORIGINAL-ARC2-SOURCE-TEACHING.v1"
+        or prior.get("upstream_revision")!=UPSTREAM
+        or prior.get("original_source_count")!=50
+        or prior.get("no_target_gold_in_payload") is not True):
+        raise ValueError("frozen fifty SOURCE developers required")
+    excluded=set(prior["original_ids"])
+    if len(excluded)!=50:
+        raise ValueError("prior development overlap registry ambiguous")
+    root=Path(original_root)
+    files=list(root.glob("*.json"))
+    if len(files)!=1000:
+        raise ValueError("expected exactly official ARC2 training original files")
+    salt="NEUMANN.Q3.COORDINATE.PROSPECTIVE.100.20261110.v1"
+    files=[f for f in files if f.stem not in excluded]
+    files.sort(key=lambda p:hashlib.sha256(
+        (salt+"/"+p.stem).encode()).hexdigest())
+    selected=files[:100]
+    if len(selected)!=100 or any(p.stem in excluded for p in selected):
+        raise ValueError("not a disjoint, preregistered SOURCE registry")
+    rows=[]
+    for path in selected:
+        original=json.loads(path.read_text())
+        training=original.get("train",[])
+        if not isinstance(training,list):
+            training=[]
+        # This payload includes *only source training observations*. It
+        # explicitly excludes target test inputs and labels.
+        pairs=[[v["input"],v["output"]] for v in training]
+        rows.append({
+            "source_id":path.stem,
+            "original_author_file_sha256":sha(path),
+            "source_pairs":pairs,
+        })
+    receipt={
+        "schema":"NEUMANN.Q3.ORIGINAL-ARC2-SOURCE-TEACHING.v1",
+        "upstream_revision":UPSTREAM,
+        "original_source_count":100,
+        "no_target_gold_in_payload":True,
+        "source_scope":"PROSPECTIVE_100_RELATIVE_TO_PRIOR_50_ONLY",
+        "source_registry":"sha256-file-names:"+salt,
+        "prior_development_count":len(excluded),
+        "prior_development_ids_sha256":hashlib.sha256(
+            canonical(sorted(excluded)).encode()).hexdigest(),
+        "original_ids":[r["source_id"] for r in rows],
+        "records":rows,
+        "q3_global":"OPEN",
+    }
+    Path(out).write_text(canonical(receipt)+"\n")
+    print("Q3_PROSPECTIVE_SOURCE_100_ID_FROZEN",
+          {"count":len(rows),"sha256":sha(out),
+           "prior_overlap":0,"target_gold_in_payload":False},
+          flush=True)
+
+
 def invent(original_source,out):
     r=json.loads(Path(original_source).read_text())
     if (r.get("schema")!="NEUMANN.Q3.ORIGINAL-ARC2-SOURCE-TEACHING.v1"
         or r.get("upstream_revision")!=UPSTREAM
-        or r.get("original_source_count")!=50
-        or r.get("no_target_gold_in_payload") is not True):
+        or r.get("original_source_count") not in (50,100)
+        or r.get("no_target_gold_in_payload") is not True
+        or r.get("source_scope","PREVIOUSLY_EXPOSED_SOURCE_DEV")
+            not in ("PREVIOUSLY_EXPOSED_SOURCE_DEV",
+                    "PROSPECTIVE_100_RELATIVE_TO_PRIOR_50_ONLY")):
         raise ValueError("not previously frozen author original SOURCE")
     runner=IsolatedPython(max_seconds=8)
     receipts=[]
     for task in r["records"]:
         original=task["source_id"]
         source=task["source_pairs"]
+        if len(source)<3 or len(source)>32:
+            receipts.append({
+                "id":original,"status":"ABSTAIN_NOT_ENOUGH_DISJOINT_SOURCE",
+                "original_author_file_sha256":
+                    task["original_author_file_sha256"],"certified":[]})
+            continue
         train=source[:-1]
         checks=source[-1:]
         seen={canonical(x) for x,y in train}
@@ -97,7 +170,8 @@ def invent(original_source,out):
         "source_originals":len(r["records"]),
         "source_verified_count":sum(
             bool(x.get("certified")) for x in receipts),
-        "prior_exposure":"PREVIOUSLY_EXPOSED_SOURCE_DEV",
+        "prior_exposure":r.get("source_scope",
+                               "PREVIOUSLY_EXPOSED_SOURCE_DEV"),
         "target_gold_accessed":False,
         "receipts":receipts,
         "q3_global":"OPEN",
@@ -133,7 +207,7 @@ def blind(original_dir,methods,out):
         "methods_sha256":sha(methods),
         "entries":entries,
         "target_gold_not_serialized":True,
-        "scope":"POSTFIRST_ALREADY_EXPOSED_SOURCE",
+        "scope":source["prior_exposure"],
     }
     Path(out).write_text(canonical(output)+"\n")
 
@@ -212,7 +286,8 @@ def score(author_root,blind_file,methods,predictions,expected_sha,out):
     summary={
         "source_certified_originals":len(scores),
         "exact_originals":sum(item["solved"] for item in scores),
-        "scientific_scope":"PREVIOUSLY_EXPOSED_AUTHOR_SOURCE_DEV",
+        "scientific_scope":m["prior_exposure"],
+        "source_original_cohort_denominator":m["source_originals"],
         "prediction_sha256":expected_sha,
         "q3_global":"OPEN"}
     Path(out).write_text(canonical({
@@ -224,11 +299,14 @@ def score(author_root,blind_file,methods,predictions,expected_sha,out):
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
     sp=parser.add_subparsers(dest="cmd",required=True)
-    for name in ("invent","blind","predict","score"):
+    for name in ("freeze-prospective","invent","blind","predict","score"):
         p=sp.add_parser(name)
         p.add_argument("--out",required=True)
         if name=="invent":
             p.add_argument("--source",required=True)
+        if name=="freeze-prospective":
+            p.add_argument("--old-source",required=True)
+            p.add_argument("--author-root",required=True)
         if name in ("blind","predict","score"):
             p.add_argument("--methods",required=True)
             p.add_argument("--blind",required=name!="blind")
@@ -238,7 +316,9 @@ if __name__=="__main__":
             p.add_argument("--predictions",required=True)
             p.add_argument("--expected-sha",required=True)
     a=parser.parse_args()
-    if a.cmd=="invent":
+    if a.cmd=="freeze-prospective":
+        freeze_prospective(a.author_root,a.old_source,a.out)
+    elif a.cmd=="invent":
         invent(a.source,a.out)
     elif a.cmd=="blind":
         blind(a.author_root,a.methods,a.out)
