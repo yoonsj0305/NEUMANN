@@ -64,3 +64,26 @@ def model_training_ids(tokenizer,prompt,completion,*,max_length=1536):
         raise ValueError("SOURCE teacher would truncate code or prompt")
     return (input_prefix+code_ids,
             [-100]*len(input_prefix)+code_ids)
+
+
+class SourceContextOverflow(ValueError):
+    """A model must never silently drop SOURCE or the latest counterexample."""
+
+
+def require_full_source_context(tokenizer,rendered,*,max_tokens=1536):
+    """Return complete model token IDs or fail closed, never right-truncate.
+
+    Both inference and gradient learning MUST see the exact same SOURCE
+    evidence. If a task exceeds capacity, a generic *pre-registered*
+    lossless adapter is required instead of silently deleting examples.
+    """
+    if not 128<=max_tokens<=32768:
+        raise ValueError("explicit finite context cap required")
+    ids=tokenizer(
+        rendered,add_special_tokens=False,truncation=False
+    )["input_ids"]
+    if len(ids)>max_tokens:
+        raise SourceContextOverflow(
+            f"SOURCE+causal-repair prompt requires {len(ids)} "
+            f"tokens; model budget {max_tokens}; no observations discarded")
+    return ids
