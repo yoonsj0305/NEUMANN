@@ -308,7 +308,7 @@ class GenerativeProgramInventor:
             reveal_independent_counterexample)
 
     def discover(self,source_pairs,*,independent_source_checks,
-                 method_context=""):
+                 method_context="",source_observer="raw"):
         train=tuple(source_pairs)
         checks=tuple(independent_source_checks)
         if not train or not checks or len(train)>32 or len(checks)>32:
@@ -331,8 +331,17 @@ class GenerativeProgramInventor:
         # One feedback contract for live invention and supervised repair.
         # Local import avoids a cyclic module dependency.
         from .q3_source_repair_learning import source_refutation_feedback
-        base_prompt=source_discovery_prompt(
-            train,method_context=method_context)
+        if source_observer=="raw":
+            base_prompt=source_discovery_prompt(
+                train,method_context=method_context)
+        elif source_observer=="lossless-causal-edits":
+            if method_context:
+                raise ValueError(
+                    "do not mix prior answer-bearing methods with causal observer")
+            from .q3_causal_observer import lossless_causal_source_prompt
+            base_prompt=lossless_causal_source_prompt(train)
+        else:
+            raise ValueError("unregistered general SOURCE observation view")
         prompt=base_prompt
         seen=set()
         receipts=[]
