@@ -62,6 +62,18 @@ def audit(source_file,out,model_revision):
         "over_budget_rescued_by_lossless_json_compaction":sum(
             r["original_over_1536"] and not r["compact_over_1536"]
             for r in records),
+        "original_exceeded_by_limit":{
+            str(cap):sum(r["tokens_original"]>cap for r in records)
+            for cap in (1536,2048,3072,4096)},
+        "compact_exceeded_by_limit":{
+            str(cap):sum(r["tokens_compact"]>cap for r in records)
+            for cap in (1536,2048,3072,4096)},
+        "preexisting_six_model_ablation_tokens":{
+            r["id"]:{"original":r["tokens_original"],
+                      "compact":r["tokens_compact"]}
+            for r in records if r["id"] in (
+                "67e8384a","a87f7484","c909285e",
+                "575b1a71","c8f0f002","c8b7cc0f")},
         "lossless_source_json_compaction_only":True,
         "original_TARGET_gold_accessed":False,"q3_global":"OPEN",
         "model_revision":model_revision,
