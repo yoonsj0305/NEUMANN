@@ -59,14 +59,20 @@ class ExperienceStructureFormer:
         if self.core.task_id!=ident:
             queries=md.get("source_queries")
             sealed=md.get("sealed_source_query_ids",())
-            if not isinstance(queries,dict) or not sealed:
+            bindings=md.get("source_episode_bindings")
+            if (not isinstance(queries,dict) or not sealed or
+                    not isinstance(bindings,dict) or
+                    set(bindings)!=set(queries) or
+                    len(set(bindings.values()))!=1):
                 return Representation(
                     kind=IRKind.UNKNOWN,payload={},confidence=0.0,
-                    rationale="no registered train/sealed observation boundary")
+                    rationale="source observations do not establish one "
+                              "predeclared common causal mechanism; ABSTAIN")
             self.core.start(
                 ident,{"problem":problem.raw_text,
                        "observations":md.get("observations",())},
-                queries,sealed_queries=sealed)
+                queries,sealed_queries=sealed,
+                episode_bindings=bindings)
         return self.core.representation()
 
     def observe_source(self,query_id,actual,*,evidence_id,verify_source,
