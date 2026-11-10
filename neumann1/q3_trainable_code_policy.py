@@ -68,6 +68,47 @@ class LocalCausalCodePolicy:
         self.max_context_tokens=max_context_tokens
         self.device=next(self.model.parameters()).device
 
+    def hypothesize(self,prompt):
+        """The SAME trainable model invents latent causal variables and rules.
+
+        Hypotheses are model-authored TEXT, not trusted symbolic operators.
+        They cannot be accepted as methods until the generated full Python
+        program is independently SOURCE verified. No task-name dispatch.
+        """
+        system=(
+            "You are a mathematical hypothesis generator. Given only "
+            "observed SOURCE input-output examples, infer hidden variables, "
+            "invariants and causal rules. Do not write Python, and never "
+            "copy a solved example as a general law. Return a short JSON "
+            "object with keys latent_variables, invariant, transformation, "
+            "uncertainty. All hypotheses may be wrong and require testing."
+        )
+        if self.tokenizer.chat_template is None:
+            rendered=system+"\n"+prompt+"\nHYPOTHESIS:\n"
+        else:
+            rendered=self.tokenizer.apply_chat_template(
+                [{"role":"system","content":system},
+                 {"role":"user","content":prompt}],
+                tokenize=False,add_generation_prompt=True)
+        ids=require_full_source_context(
+            self.tokenizer,rendered,max_tokens=self.max_context_tokens)
+        inp=self.torch.tensor(
+            [ids],dtype=self.torch.long,device=self.device)
+        self.torch.manual_seed((self.seed+int(hashlib.sha256(
+            ("latent-hypothesis/"+prompt).encode()
+        ).hexdigest()[:8],16))%(2**31))
+        with self.torch.inference_mode():
+            generated=self.model.generate(
+                input_ids=inp,attention_mask=self.torch.ones_like(inp),
+                do_sample=True,temperature=self.temperature,top_p=0.9,
+                max_new_tokens=220,
+                pad_token_id=self.tokenizer.eos_token_id)
+        answer=self.tokenizer.decode(
+            generated[0][inp.shape[1]:],
+            skip_special_tokens=True).strip()
+        # Hypotheses are advisory. Never interpret them as trusted commands.
+        return answer[:2200]
+
     def propose(self,prompt):
         rendered=model_prefix(self.tokenizer,prompt)
         # Never silently right-truncate the end of the prompt, where the
