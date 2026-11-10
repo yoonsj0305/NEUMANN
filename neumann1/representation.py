@@ -42,11 +42,14 @@ class ExperienceStructureFormer:
     output assumption. Existing ExplicitStructureFormer stays a comparator.
     """
 
-    def __init__(self,causal_core):
+    def __init__(self,causal_core,*,allow_grounded_bootstrap=False):
         from .causal_experience import CausalExperienceCore
         if not isinstance(causal_core,CausalExperienceCore):
             raise TypeError("shared CausalExperienceCore required")
         self.core=causal_core
+        # An experimenter-controlled construction flag, not a problem-
+        # supplied authorization switch. Default remains fail closed.
+        self.allow_grounded_bootstrap=bool(allow_grounded_bootstrap)
 
     def form(self,problem: Problem,ledger: CostLedger) -> Representation:
         ledger.representation_steps+=1
@@ -72,7 +75,8 @@ class ExperienceStructureFormer:
                 ident,{"problem":problem.raw_text,
                        "observations":md.get("observations",())},
                 queries,sealed_queries=sealed,
-                episode_bindings=bindings)
+                episode_bindings=bindings,
+                allow_grounded_bootstrap=self.allow_grounded_bootstrap)
         return self.core.representation()
 
     def observe_source(self,query_id,actual,*,evidence_id,verify_source,
