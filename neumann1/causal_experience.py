@@ -107,6 +107,7 @@ class CausalExperienceCore:
         self._evaluated_queries=set()
         self._last_update=None
         self._sealed_queries=set()
+        self._episode_bindings={}
         self._source_certified=False
         self._source_certification_opened=False
 
@@ -126,7 +127,8 @@ class CausalExperienceCore:
     def task_id(self):
         return self._task
 
-    def start(self,task_id,context,allowed_queries,*,sealed_queries=()):
+    def start(self,task_id,context,allowed_queries,*,
+              sealed_queries=(),episode_bindings=None):
         """Open only explicit, bounded observations; never open target gold."""
         if self._frozen:
             raise ValueError("cannot start new hypothesis during frozen scoring")
@@ -139,6 +141,18 @@ class CausalExperienceCore:
         sealed=set(sealed_queries)
         if not sealed.issubset(allowed_queries) or not sealed:
             raise ValueError("at least one predeclared sealed SOURCE check required")
+        # SOURCE interventions used to certify one latent mechanism must
+        # belong to that same externally registered episode/mechanism.
+        # A sample of unrelated stories may test broad domain accuracy,
+        # but it CANNOT certify discovery of the TARGET causal mechanism.
+        if (not isinstance(episode_bindings,dict) or
+                set(episode_bindings)!=set(allowed_queries) or
+                any(not isinstance(x,str) or not x
+                    for x in episode_bindings.values()) or
+                len(set(episode_bindings.values()))!=1):
+            raise ValueError(
+                "causal SOURCE certificate requires one predeclared "
+                "same-mechanism episode across all queried interventions")
         # Reuse causal failures as SOURCE experience, not cached answers.
         history=tuple(self.experiences[-self.max_experiences:])
         raw=self.policy.hypotheses(context,history,dict(allowed_queries))
@@ -159,6 +173,7 @@ class CausalExperienceCore:
         self._hypotheses=candidates
         self._evaluated_queries=set()
         self._sealed_queries=sealed
+        self._episode_bindings=dict(episode_bindings)
         self._source_certified=False
         self._source_certification_opened=False
         self._last_update=None
@@ -266,7 +281,10 @@ class CausalExperienceCore:
         task=self._task
         allowed=dict(self._allowed)
         sealed=set(self._sealed_queries)
-        result=self.start(task,context,allowed,sealed_queries=sealed)
+        bindings=dict(self._episode_bindings)
+        result=self.start(
+            task,context,allowed,
+            sealed_queries=sealed,episode_bindings=bindings)
         self._evaluated_queries=used
         return result
 
