@@ -15,7 +15,12 @@ from .q3_source_repair_learning import recertified_repair_prompt
 
 def hypothesis_prompt(source_prompt, prior_hypothesis=None):
     """Same prompt string at neural training and inference time."""
-    if prior_hypothesis is not None:\n        if not isinstance(prior_hypothesis,str) or not 10<=len(prior_hypothesis)<=3000:\n            raise ValueError("bounded prior model hypothesis required")\n        source_prompt += ("\\nPrevious model-authored hypothesis to revise: "\n                          +prior_hypothesis+"\\n")\n    return (source_prompt +
+    if prior_hypothesis is not None:
+        if not isinstance(prior_hypothesis,str) or not 10<=len(prior_hypothesis)<=3000:
+            raise ValueError("bounded prior model hypothesis required")
+        source_prompt += ("\\nPrevious model-authored hypothesis to revise: "
+                          +prior_hypothesis+"\\n")
+    return (source_prompt +
         "\nBefore choosing an implementation, infer a falsifiable internal "
         "explanation of the observations. You may introduce new latent "
         "variables, relations and coordinate systems. Do not select a "
