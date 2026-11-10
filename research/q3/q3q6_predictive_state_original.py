@@ -35,6 +35,27 @@ def context_for_task(task):
     }
 
 
+def source_can_certify_target(task):
+    """No independent causal certificate from unrelated original worlds.
+
+    SOURCE demo/probe/sealed and TARGET must share the SAME predeclared
+    task-level causal mechanism. A mere domain label, task-ID concatenation,
+    or high classification accuracy on other original stories does not
+    establish causal consistency for this target. Absence of a grounded
+    source/target relationship is a scientific ABSTAIN, not a model failure.
+    """
+    group_hashes=task.get("source_target_world_group_hashes",{})
+    if not isinstance(group_hashes,dict):
+        return False
+    expected={"demonstration","probe","sealed","target"}
+    if set(group_hashes)!=expected:
+        return False
+    values=list(group_hashes.values())
+    return (task.get("source_target_common_world_certificate") is True
+            and all(isinstance(g,str) and g for g in values)
+            and len(set(values))==1)
+
+
 def evaluate(*,visible_path,source_path,out,revision):
     visible=load(visible_path)
     oracle=load(source_path)
@@ -103,9 +124,13 @@ def evaluate(*,visible_path,source_path,out,revision):
                 target_guess=model.predict(
                     ctx,allowed_history,task["target"]["input"])
                 raw=target_guess["prediction"]
-                if correct_source==2:
+                # Accuracy on unrelated author stories is *not*
+                # independent evidence that this hidden task's rule holds.
+                if correct_source==2 and source_can_certify_target(task):
                     submitted=raw
-                    status="CERTIFIED_ON_TWO_UNSEEN_SOURCE"
+                    status="CERTIFIED_SAME_CAUSAL_WORLD"
+                elif not source_can_certify_target(task):
+                    status="ABSTAIN_NO_GROUNDED_SOURCE_TARGET_LINKAGE"
                 else:
                     status="ABSTAIN_SOURCE_PREDICTIVE_CONTRADICTION"
             except (ValueError,TypeError,RuntimeError,KeyError) as exc:
@@ -119,9 +144,12 @@ def evaluate(*,visible_path,source_path,out,revision):
                 "task_id":task["task_id"],
                 "domain":task["domain"],
                 "original_id":task["target"]["original_id"],
-                "source_certified":correct_source==2,
+                "source_certified":(
+                    correct_source==2 and source_can_certify_target(task)),
                 "status":status,
                 "number_correct_independent_source_checks":correct_source,
+                "different_author_worlds_never_causal_certification":(
+                    not source_can_certify_target(task)),
                 "frozen_submitted_prediction":submitted,
                 "frozen_raw_diagnostic_prediction":raw,
                 "classical_matched_source_prediction":nearest(
