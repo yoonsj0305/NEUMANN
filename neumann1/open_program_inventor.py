@@ -331,7 +331,9 @@ class GenerativeProgramInventor:
         # One feedback contract for live invention and supervised repair.
         # Local import avoids a cyclic module dependency.
         from .q3_source_repair_learning import source_refutation_feedback
-        prompt=source_discovery_prompt(train,method_context=method_context)
+        base_prompt=source_discovery_prompt(
+            train,method_context=method_context)
+        prompt=base_prompt
         seen=set()
         receipts=[]
         for step in range(self.max_proposals):
@@ -349,7 +351,7 @@ class GenerativeProgramInventor:
                 receipts.append(Attempt(
                     raw_hash,0,len(train),"REJECTED",step,
                     raw[:3000] if isinstance(raw,str) else None))
-                prompt+=(
+                prompt=base_prompt+(
                     "\nYour last program failed Python preflight. "
                     "Prior proposed code (never executed):\n"+
                     (raw[:1500] if isinstance(raw,str) else "")+
@@ -358,7 +360,10 @@ class GenerativeProgramInventor:
                 continue
             sha=hashlib.sha256(code.encode()).hexdigest()
             if sha in seen:
-                prompt+="\nYou repeated a disproven proposal. Invent new code."
+                prompt=base_prompt+(
+                    "\nYou repeated a disproven proposal. The exact repeated "
+                    "code to replace is:\n"+code[:3000]+
+                    "\nInvent a different executable causal program.")
                 continue
             seen.add(sha)
             result=self.runner.evaluate(code,[x for x,y in train])
@@ -392,7 +397,7 @@ class GenerativeProgramInventor:
                         not all(source_same_value(got,y)
                             for got,(_,y) in zip(
                                 diagnostic.outputs,feedback_checks))):
-                        prompt+=source_refutation_feedback(
+                        prompt=base_prompt+source_refutation_feedback(
                             code,feedback_checks,diagnostic,
                             independent=True,rich=True)
                         continue
@@ -412,7 +417,7 @@ class GenerativeProgramInventor:
                     "ABSTAIN_SEALED_SOURCE_REFUTED",None,None,
                     tuple(receipts),len(checks),False)
             else:
-                prompt+=source_refutation_feedback(
+                prompt=base_prompt+source_refutation_feedback(
                     code,train,result,rich=self.rich_runtime_feedback)
         return Discovery("ABSTAIN_NO_SOURCE_PROGRAM",None,None,
                          tuple(receipts),len(checks),False)
