@@ -1,0 +1,97 @@
+name: Q3 Failure Taxonomy - 100 Real Original SOURCE and Existing Engines
+on:
+  push:
+    branches:
+      - research/q3-policy-evidence-reconnect-20261110
+    paths:
+      - ".github/workflows/q3_failure_taxonomy_original_source.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONHASHSEED: "0"
+jobs:
+  identify_actual_bottleneck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Inspect existing signed original SOURCE only, never TARGET test gold
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          mkdir -p original100 known_methods evidence
+          gh run download 42757846590 --name q3-prospective-source-100-originals-frozen --dir original100
+          gh run download 42757846590 --name q3-coordinate-frozen-source-methods --dir known_methods
+          test "$(cut -d ' ' -f1 original100/ORIGINAL_SOURCE_ONLY.sha256)" = "$(sha256sum original100/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+          test "$(cut -d ' ' -f1 known_methods/FROZEN_SOURCE_METHODS.sha256)" = "$(sha256sum known_methods/FROZEN_SOURCE_METHODS.json | cut -d ' ' -f1)"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from collections import Counter
+          from neumann1.q3_structure_factorization import induce_structural_factors
+          from neumann1.q3_object_graph_invention import induce_object_graph_factors
+          from neumann1.q3_source_residual_probes import induce_source_residual_probes
+          from neumann1.q3_residual_composition import induce_source_compositions
+          from neumann1.q3_coordinate_morphisms import induce_coordinate_morphisms
+          from neumann1.q3_periodic_residual_invention import induce_periodic_residual_rules
+          original=json.loads(Path("original100/ORIGINAL_SOURCE_ONLY.json").read_text())
+          methods=json.loads(Path("known_methods/FROZEN_SOURCE_METHODS.json").read_text())
+          assert original["original_source_count"]==100
+          assert original["no_target_gold_in_payload"] is True
+          assert methods["source_originals"]==100 and methods["target_gold_accessed"] is False
+          status=Counter(x["status"] for x in methods["receipts"])
+          family_counts=Counter()
+          family_added=Counter()
+          source_len=Counter()
+          shape_changed=Counter()
+          no_program=[]
+          for r in original["records"]:
+              pairs=r["source_pairs"]
+              source_len[str(len(pairs))]+=1
+              if len(pairs)<3:continue
+              train=pairs[:-1]
+              dims=lambda v:(len(v),len(v[0])) if isinstance(v,list) and v and isinstance(v[0],list) else None
+              shape_changed[str(any(dims(x)!=dims(y) for x,y in train))]+=1
+              families={
+                  "structural":induce_structural_factors(train,max_candidates=4),
+                  "object_graph":induce_object_graph_factors(train,max_candidates=4),
+                  "source_composition":induce_source_compositions(train,max_candidates=4),
+                  "source_residual":induce_source_residual_probes(train,max_probes=4),
+                  "coordinate":induce_coordinate_morphisms(train,max_candidates=4),
+                  "periodic_causal":induce_periodic_residual_rules(train,max_candidates=4),
+              }
+              for name,programs in families.items():
+                  family_counts[name]+=len(programs)
+                  if programs: family_added[name]+=1
+              if not any(families.values()):
+                  no_program.append(r["source_id"])
+          result={
+              "scope":"REAL_AUTHOR_SOURCE_100_ONLY_NOT_TARGET_EXACT",
+              "source_sha256":methods["original_source_file_sha256"],
+              "source_count":100,
+              "source_certified_previous":methods["source_verified_count"],
+              "previous_status":dict(status),
+              "source_example_counts":dict(sorted(source_len.items())),
+              "source_train_shape_changed":dict(shape_changed),
+              "families_proposals":dict(family_counts),
+              "families_tasks_with_proposals":dict(family_added),
+              "any_family_no_candidate_count":len(no_program),
+              "q3_global":"OPEN",
+              "this_is_pre_verification_coverage_not_success":True,
+          }
+          Path("evidence/Q3_REAL_FAILURE_TAXONOMY.json").write_text(json.dumps(result,sort_keys=True,indent=2)+"\\n")
+          print("Q3_ACTUAL_ORIGINAL_AUTHOR_FAILURE_TAXONOMY",result,flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-real-original-100-source-failure-taxonomy
+          path: evidence/
+          if-no-files-found: warn
+          retention-days: 90
