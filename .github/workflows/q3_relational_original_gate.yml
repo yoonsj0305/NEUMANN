@@ -3,10 +3,13 @@ on:
   push:
     branches:
       - research/q3-relational-causal-language-induction-20261110
+      - research/q3-relational-reducer-induction-20261110
     paths:
       - "neumann1/q3_relational_predicate_invention.py"
+      - "neumann1/q3_relational_reduce_invention.py"
       - "research/q3/q3_relational_original_source_gate.py"
       - "tests/test_q3_relational_predicate_invention.py"
+      - "tests/test_q3_relational_reduce_invention.py"
       - ".github/workflows/q3_relational_original_gate.yml"
   workflow_dispatch:
 permissions:
@@ -29,7 +32,7 @@ jobs:
           set -euo pipefail
           python -m pip install -q -e . pytest
           docker pull python:3.11-alpine
-          python -m pytest -q -x tests/test_q3_relational_predicate_invention.py
+          python -m pytest -q -x tests/test_q3_relational_predicate_invention.py tests/test_q3_relational_reduce_invention.py
           mkdir -p frozen_source methods
           gh run download 42757846590 --name q3-prospective-source-100-originals-frozen --dir frozen_source
           test "$(cut -d ' ' -f1 frozen_source/ORIGINAL_SOURCE_ONLY.sha256)" = "$(sha256sum frozen_source/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
