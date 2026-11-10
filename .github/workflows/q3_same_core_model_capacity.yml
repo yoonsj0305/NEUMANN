@@ -1,0 +1,81 @@
+name: Q3 Minimal Core Capacity Causality - Same SOURCE 0.5B vs 1.5B
+on:
+  push:
+    branches:
+      - research/q3-one-core-model-capacity-causal-test-20261110
+    paths:
+      - ".github/workflows/q3_same_core_model_capacity.yml"
+      - "research/q3/q3_same_core_model_capacity_original_source.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONHASHSEED: "0"
+  OMP_NUM_THREADS: "2"
+  OPENBLAS_NUM_THREADS: "2"
+  TOKENIZERS_PARALLELISM: "false"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+jobs:
+  real_original_source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Pin original SOURCE, 0.5B and 1.5B same code model family, actual no-network verifier
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          python -m pip install -q --index-url https://download.pytorch.org/whl/cpu 'torch==2.5.1'
+          python -m pip install -q 'transformers==4.46.3' 'huggingface_hub==0.27.1' 'jinja2>=3.1.4,<4'
+          docker pull python:3.11-alpine
+          mkdir -p source evidence
+          gh run download 42757846590 --name q3-prospective-source-100-originals-frozen --dir source
+          test "$(cut -d ' ' -f1 source/ORIGINAL_SOURCE_ONLY.sha256)" = "$(sha256sum source/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+          python - <<'PY'
+          from huggingface_hub import model_info
+          from pathlib import Path
+          small=model_info("Qwen/Qwen2.5-Coder-0.5B-Instruct").sha
+          large=model_info("Qwen/Qwen2.5-Coder-1.5B-Instruct").sha
+          assert small=="ea3f2471cf1b1f0db85067f1ef93848e38e88c25"
+          for code in (small,large):
+              assert len(code)==40 and all(ch in "0123456789abcdef" for ch in code)
+          Path("evidence/MODEL_SMALL_SHA.txt").write_text(small+"\n")
+          Path("evidence/MODEL_LARGE_SHA.txt").write_text(large+"\n")
+          print("Q3_FROZEN_PAIRED_CAPACITY_REVISIONS",small,large,flush=True)
+          PY
+      - name: Same original SOURCE and exactly matched budgets, no target original test labels
+        run: |
+          set -euo pipefail
+          python -u -m research.q3.q3_same_core_model_capacity_original_source \
+            --source source/ORIGINAL_SOURCE_ONLY.json \
+            --small-revision "$(cat evidence/MODEL_SMALL_SHA.txt)" \
+            --large-revision "$(cat evidence/MODEL_LARGE_SHA.txt)" \
+            --out evidence/Q3_PAIRED_MODEL_CAPACITY_SOURCE.json
+          sha256sum evidence/Q3_PAIRED_MODEL_CAPACITY_SOURCE.json > evidence/Q3_PAIRED_MODEL_CAPACITY_SOURCE.sha256
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          s=json.loads(Path("evidence/Q3_PAIRED_MODEL_CAPACITY_SOURCE.json").read_text())["summary"]
+          assert s["same_proposals_per_task"]==2 and s["six_real_author_source"]==6
+          assert s["original_author_TARGET_gold_read"] is False
+          assert s["q3_global"]=="OPEN"
+          print("Q3_CAPACITY_CAUSAL_GATE_0p5_VS_1p5",{
+              "A":s["small_model_source_verified"],
+              "L":s["large_model_source_verified"],
+              "L_only":s["large_exclusive"],
+              "L_regressions":s["large_regressions"],
+              "capacity_gate":s["capacity_hypothesis_dev_gate_pass"],
+              "Q3_global":"OPEN"},flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-same-core-model-capacity-6-original-author-source-only
+          path: evidence/
+          if-no-files-found: warn
+          retention-days: 90
