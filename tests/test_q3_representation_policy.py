@@ -13,7 +13,7 @@ from neumann1.q3_object_graph_invention import induce_object_graph_factors
 from neumann1.q3_single_discovery_core import (
     SourceMethodMemory,SingleDiscoveryCore)
 from neumann1.q3_structural_invention import StructuralInventionPolicy
-from neumann1.q3_representation_policy import LearnedRepresentationPrior
+from neumann1.q3_representation_policy import LearnedRepresentationPrior, FeatureOutcome
 
 
 def scene(top_color,bottom_color,*,top_r=1,swapped=False):
@@ -109,3 +109,33 @@ def test_untrusted_or_corrupt_teacher_does_not_update_learned_representation():
     with pytest.raises(RuntimeError,match="offline"):
         LearnedRepresentationPrior.learn(
             library.episodes,NoExecutor())
+
+
+def test_refuted_representation_cannot_outrank_unobserved_hypothesis():
+    """Posterior evidence must be SIGNED, not merely positive probability."""
+    prior=LearnedRepresentationPrior((
+        FeatureOutcome("always_refuted",0,12),
+        FeatureOutcome("independently_verified",4,0),
+        FeatureOutcome("partial_but_wrong",0,8,8),
+    ),(),24)
+    assert prior.score("always_refuted") < prior.score("unobserved") == 0
+    assert prior.score("independently_verified") > prior.score("unobserved")
+    assert prior.score("partial_but_wrong") < 0
+
+
+def test_source_trial_policy_now_observes_coordinate_morphism_family():
+    """Unit contract only. Independent original AUTHOR transfer is separate."""
+    def pair(a,b):
+        return [[a,b]], [[a,b,a,b]]
+    train=[pair(1,2),pair(3,4)]
+    checks=[pair(5,6)]
+    prior=LearnedRepresentationPrior.learn_source_trials(
+        [("synthetic-coordinate-contract",train,checks)],
+        IsolatedPython(max_seconds=8),max_episodes=1)
+    coordinate=[
+        x for x in prior.outcomes
+        if x.name.startswith("source-inferred-coordinate/")
+    ]
+    assert coordinate, "coordinate hypotheses must enter learned evidence"
+    assert any(x.successful_transfer>0 for x in coordinate)
+    assert prior.evidence()["target_gold_read"] is False
