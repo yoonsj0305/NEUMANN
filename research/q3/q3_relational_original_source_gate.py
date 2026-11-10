@@ -13,6 +13,8 @@ from pathlib import Path
 from neumann1.open_program_inventor import IsolatedPython,source_same_value
 from neumann1.q3_relational_predicate_invention import (
     induce_relational_comprehensions)
+from neumann1.q3_relational_reduce_invention import (
+    induce_relational_reducers)
 from research.q3.q3_coordinate_original_source_gate import (
     canonical,SCHEMA,UPSTREAM)
 
@@ -37,8 +39,10 @@ def invent(source_file,out):
             stats["source_eligible"]+=1
             train=pairs[:-1]
             checks=pairs[-1:]
-            candidates=induce_relational_comprehensions(
-                train,max_candidates=4)
+            candidates=(
+                *induce_relational_comprehensions(train,max_candidates=4),
+                *induce_relational_reducers(train,max_candidates=4),
+            )
             generated=len(candidates)
             stats["train_hypotheses"]+=generated
             for hypothesis in candidates:
