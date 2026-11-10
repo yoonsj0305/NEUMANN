@@ -141,7 +141,10 @@ def test_same_source_induced_atomic_operator_generalizes_between_strings_and_arr
                for p in candidates)
     code=_solve(source,check)
     assert "join" in code
-    assert ".get(c,c)" in code
+    # The exact variable name is not a semantic property: composed code
+    # represents the same SOURCE-derived token relation with mapping.get(t,t).
+    assert ".get(" in code
+    assert "'a':'b'" in code or "'a': 'b'" in code
 
     runner=IsolatedPython(max_seconds=8)
     other_inputs=[[[1,2,1],[2,1,2]],[[2,2],[1,1]]]
