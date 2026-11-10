@@ -1,0 +1,124 @@
+name: Q3 Initial Latent Hypothesis SOURCE-Only Failure Diagnosis
+on:
+  push:
+    branches:
+      - research/q3q6-frozen-crosssemantic-original-20261110
+    paths:
+      - ".github/workflows/q3q6_source_only_debug.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+env:
+  PYTHONHASHSEED: "0"
+  OMP_NUM_THREADS: "2"
+  OPENBLAS_NUM_THREADS: "2"
+  TOKENIZERS_PARALLELISM: "false"
+
+jobs:
+  diagnose_first_original_SOURCE_hypothesis_only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3q6-frozen-original-author-visible-source
+          path: visible
+          run-id: 42834364029
+          github-token: ${{ github.token }}
+      - name: Pin the SAME original pretrained model, NO TARGET gold anywhere
+        run: |
+          set -euo pipefail
+          test ! -e target_gold/original_gold.json
+          test ! -e oracle/source_oracle.json
+          python -m pip install -q -e .
+          python -m pip install -q --index-url https://download.pytorch.org/whl/cpu 'torch==2.5.1'
+          python -m pip install -q 'transformers==4.46.3' 'peft==0.14.0' \
+            'accelerate==1.2.1' 'huggingface_hub==0.27.1' 'jinja2>=3.1.4,<4'
+          python - <<'PY'
+          from huggingface_hub import model_info
+          assert model_info("Qwen/Qwen2.5-Coder-0.5B-Instruct").sha=="ea3f2471cf1b1f0db85067f1ef93848e38e88c25"
+          print("Q3_SOURCE_ONLY_DEBUG_SAME_BASE_PINNED",flush=True)
+          PY
+      - name: Diagnose EXACT first SOURCE failure without opening 8 original TARGETs, training, or retry loops
+        run: |
+          set -euo pipefail
+          mkdir -p diag
+          python -u - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          from neumann1.causal_experience import CausalExperienceCore
+          from neumann1.q3_latent_world_policy import TrainableLatentWorldPolicy
+          from research.q3.q3q6_original_transfer_run import PolicyView
+          from research.q3.q3q6_two_author_freeze import canonical,digest,REV
+          visible=Path("visible/model_visible.json")
+          m=json.loads(Path("visible/frozen_original_manifest.json").read_text())
+          assert digest(visible.read_bytes())==m["model_visible_sha256"]
+          v=json.loads(visible.read_text())
+          e=v["training_episodes"][0]
+          assert "target" not in e
+          model=TrainableLatentWorldPolicy(
+              revision=REV,max_new_tokens=500,
+              max_context_tokens=4096,max_updates=4,seed=1007)
+          policy=PolicyView(model,v["memory_examples"],False)
+          core=CausalExperienceCore(
+              policy,max_hypotheses=2,max_experiences=16)
+          context={
+              "original_author_domain":e["domain"],
+              "known_source_example":e["demonstration"],
+              "infer_new_latent_variables":"Use observed examples and falsifiable relations, not a task-specific solver",
+          }
+          queries={
+              "probe":e["probe"]["input"],
+              "sealed":e["sealed"]["input"],
+          }
+          receipt={
+              "schema":"NEUMANN.Q3.SOURCE-ONLY-INITIAL-WORLD-DIAGNOSIS.v1",
+              "model_visible_sha256":m["model_visible_sha256"],
+              "source_episode_id":e["task_id"],
+              "same_original_model_revision":REV,
+              "original_TARGET_gold_accessed":False,
+              "model_gradient_updates":0,
+              "one_model_hypothesis_call_only":True,
+          }
+          try:
+              core.start(
+                  e["task_id"],context,queries,sealed_queries={"sealed"})
+              receipt["failure_step"]="NONE"
+              receipt["first_hypothesis_has_probe"]=(
+                  "probe" in core.hypotheses[0].predictions)
+              receipt["number_valid_latent_hypotheses"]=len(core.hypotheses)
+          except Exception as exc:
+              raw=model.last_raw_hypothesis
+              receipt["failure_step"]=(
+                  "BEFORE_MODEL_OUTPUT" if raw is None else
+                  "MODEL_OUTPUT_OR_HYPOTHESIS_VALIDATION")
+              receipt["exception_type"]=type(exc).__name__
+              receipt["exception_message"]=str(exc)[:600]
+              receipt["generated_text_sha256"]=(
+                  hashlib.sha256(raw.encode()).hexdigest() if raw is not None else None)
+              receipt["generated_text_prefix"]=raw[:1200] if raw is not None else None
+              if raw is not None:
+                  try:
+                      obj=json.loads(raw)
+                      receipt["strict_json_parse"]=True
+                      receipt["json_root_type"]=type(obj).__name__
+                      receipt["json_keys"]=list(obj)[:12] if isinstance(obj,dict) else None
+                  except (ValueError,TypeError):
+                      receipt["strict_json_parse"]=False
+          Path("diag/Q3_SOURCE_ONLY_INITIAL_HYPOTHESIS_FAILURE.json").write_text(
+              canonical(receipt)+"\n")
+          print("Q3_EXACT_MISSING_LATENT_LEARNING_SIGNAL",receipt,flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-source-only-initial-model-interface-failure-no-target
+          path: diag/
+          if-no-files-found: warn
+          retention-days: 90
