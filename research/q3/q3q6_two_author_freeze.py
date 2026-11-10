@@ -62,13 +62,13 @@ def _rows_folio(path):
         if not all(k in r for k in (
                 "story_id","example_id","premises","conclusion","label")):
             raise ValueError("unexpected original FOLIO schema")
-        if r["label"] not in ("True","False","Uncertain"):
+        if r["label"] not in ("True","False","Unknown"):
             raise ValueError("unexpected FOLIO original label")
         rows.append({
             "id":str(r["example_id"]),"group_id":str(r["story_id"]),
             "input":{"premises":r["premises"],
                      "conclusion":r["conclusion"],
-                     "answer_set":["True","False","Uncertain"]},
+                     "answer_set":["True","False","Unknown"]},
             "label":r["label"],
         })
     return rows
