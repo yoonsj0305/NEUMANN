@@ -175,12 +175,14 @@ def finetune_source_policy(
         from .q3_source_repair_learning import recertified_repair_prompt
         runner=IsolatedPython(max_seconds=8)
         learning_rows=[]
+        negative_programs=[]
         for row in source:
             if "repair_prior_program" not in row:
                 continue
             prompt,phase=recertified_repair_prompt(row,runner)
             learning_rows.append((prompt,row["program"],phase,
                                   row["repair_prior_sha256"],row["sha256"]))
+            negative_programs.append(row["repair_prior_program"])
         if not learning_rows:
             raise ValueError("no independently SOURCE-falsified repair episodes")
     else:
@@ -221,7 +223,7 @@ def finetune_source_policy(
         optimizer.zero_grad(set_to_none=True)
         if training_objective=="source_preference":
             from .q3_preference_learning import preference_loss
-            negative=source[index]["repair_prior_program"]
+            negative=negative_programs[index]
             loss,comparison=preference_loss(
                 model,tokenizer,prompt,teacher_code,negative,
                 device=device,beta=1.0,max_length=4096)
