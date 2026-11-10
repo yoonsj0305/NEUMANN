@@ -238,7 +238,14 @@ class CausalExperienceCore:
             raise ValueError("cannot revise during independent evaluation")
         if self._task is None:
             raise ValueError("no open SOURCE investigation")
-        return self.start(self._task,context,self._allowed)
+        # A revision is NOT a new task. Keep already disclosed SOURCE
+        # query IDs sealed against repeat optimization after the revision.
+        used=set(self._evaluated_queries)
+        task=self._task
+        allowed=dict(self._allowed)
+        result=self.start(task,context,allowed)
+        self._evaluated_queries=used
+        return result
 
     def representation(self):
         """Expose an unverified latent state; downstream verifier still rules."""
