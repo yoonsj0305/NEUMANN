@@ -65,11 +65,14 @@ class HypothesisConditionedPolicy:
     """
     def __init__(self,base_policy):
         self.base_policy=base_policy
-        self.hypothesis_attempts=[]\n        self._previous_hypothesis=None
+        self.hypothesis_attempts=[]
+        self._previous_hypothesis=None
 
     def propose(self,source_prompt):
-        raw=self.base_policy.propose(\n            hypothesis_prompt(source_prompt,self._previous_hypothesis))
+        raw=self.base_policy.propose(
+            hypothesis_prompt(source_prompt,self._previous_hypothesis))
         hypothesis,code=parse_hypothesis_proposal(raw)
+        self._previous_hypothesis=hypothesis
         self.hypothesis_attempts.append({
             "hypothesis":hypothesis,
             "hypothesis_sha256":sha256(hypothesis.encode()).hexdigest(),
@@ -93,6 +96,11 @@ def recertified_hypothesis_repair_row(row,runner):
     if (not isinstance(hypothesis,str) or
         sha256(hypothesis.encode()).hexdigest()!=row.get("corrected_hypothesis_sha256")):
         raise ValueError("missing or tampered model-authored explanation")
+    prior=row.get("repair_prior_hypothesis")
+    if (row.get("repair_prior_hypothesis_provenance")!="MODEL_AUTHORED"
+        or not isinstance(prior,str)
+        or sha256(prior.encode()).hexdigest()!=row.get("repair_prior_hypothesis_sha256")):
+        raise ValueError("missing model-authored prior explanation")
     prompt,phase=recertified_repair_prompt(row,runner)
-    return (hypothesis_prompt(prompt),
+    return (hypothesis_prompt(prompt,prior),
             completion(hypothesis,row["program"]),phase)
