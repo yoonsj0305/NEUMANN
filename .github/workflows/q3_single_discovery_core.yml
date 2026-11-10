@@ -18,7 +18,7 @@ on:
       - "research/q3/q3q6_two_author_freeze.py"
       - "research/q3/q3q6_original_transfer_run.py"
       - "neumann1/registry_engine.py"
-      - "tests/test_q3_single_discovery_core.py tests/test_q3q6_original_transfer_gate.py tests/test_q3_predictive_state_contract.py"
+      - "tests/test_q3_single_discovery_core.py"
       - ".github/workflows/q3_single_discovery_core.yml"
   workflow_dispatch:
 permissions:
@@ -43,4 +43,4 @@ jobs:
           python -m pip install 'torch==2.5.1' --index-url https://download.pytorch.org/whl/cpu
       - name: Run one core across arithmetic and strings, verify memory and sandbox
         run: |
-          python -m pytest -q -x tests/test_causal_experience_core.py tests/test_q3_neural_gradient_contract.py tests/test_q3_open_program_discovery.py tests/test_q3_single_discovery_core.py
+          python -m pytest -q -x tests/test_causal_experience_core.py tests/test_q3_neural_gradient_contract.py tests/test_q3_open_program_discovery.py tests/test_q3_single_discovery_core.py tests/test_q3q6_original_transfer_gate.py tests/test_q3_predictive_state_contract.py
