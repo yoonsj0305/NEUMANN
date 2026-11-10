@@ -152,7 +152,10 @@ def test_same_source_induced_atomic_operator_generalizes_between_strings_and_arr
         ([[1,2,1],[2,1,2]],[[2,1,2],[1,2,1]]),
         ([[2,2,1],[1,1,2]],[[1,1,2],[2,2,1]]),
     ]
+    # The first check may become SOURCE repair feedback. Reserve a second,
+    # still-unseen check for an actual independent post-repair certificate.
     other_check=[
-        ([[2,1],[2,2]],[[1,2],[1,1]])]
+        ([[2,1],[2,2]],[[1,2],[1,1]]),
+        ([[1,2,2],[1,1,2]],[[2,1,1],[2,2,1]])]
     c2=_solve(other_train,other_check)
     assert "factor" in c2 and ".get(c,c)" in c2 or ".get(v,v)" in c2
