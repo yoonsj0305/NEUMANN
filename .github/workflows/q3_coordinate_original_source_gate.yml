@@ -1,9 +1,10 @@
-name: Q3 SOURCE-Invented Coordinate and Causal Residual - Real Original Gate
+name: Q3 Prospective 100 Original Source - Coordinate and Causal Invention Gate
 on:
   push:
     branches:
       - research/q3-source-inferred-coordinate-morphism-20261110
       - research/q3-periodic-residual-causal-invention-20261110
+      - research/q3-coordinate-prospective-100-original-20261110
     paths:
       - ".github/workflows/q3_coordinate_original_source_gate.yml"
       - "neumann1/q3_periodic_residual_invention.py"
@@ -18,7 +19,56 @@ env:
   PYTHONHASHSEED: "0"
   OMP_NUM_THREADS: "1"
 jobs:
+  freeze_prospective_source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Pre-register 100 original author SOURCE IDs by SHA, exclude prior 50 before looking at SOURCE results
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          python -m pytest -q -x tests/test_q3_prospective_source_contract.py
+          mkdir -p old prospective
+          gh run download 42735035357 \
+            --name q3-original-arc2-source-only-frozen \
+            --dir old
+          test "$(cut -d ' ' -f1 old/ORIGINAL_SOURCE_ONLY.sha256)" = \
+               "$(sha256sum old/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+          git init -q /tmp/prospective-author
+          git -C /tmp/prospective-author fetch -q --depth 1 \
+            https://github.com/arcprize/ARC-AGI-2.git \
+            f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/prospective-author checkout -q FETCH_HEAD
+          test "$(git -C /tmp/prospective-author rev-parse HEAD)" = \
+            f3283f727488ad98fe575ea6a5ac981e4a188e49
+          python -m research.q3.q3_coordinate_original_source_gate freeze-prospective \
+            --author-root /tmp/prospective-author/data/training \
+            --old-source old/ORIGINAL_SOURCE_ONLY.json \
+            --out prospective/ORIGINAL_SOURCE_ONLY.json
+          sha256sum prospective/ORIGINAL_SOURCE_ONLY.json > prospective/ORIGINAL_SOURCE_ONLY.sha256
+          rm -rf /tmp/prospective-author
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("prospective/ORIGINAL_SOURCE_ONLY.json").read_text())
+          assert d["original_source_count"]==100
+          assert d["source_scope"]=="PROSPECTIVE_100_RELATIVE_TO_PRIOR_50_ONLY"
+          assert d["no_target_gold_in_payload"] is True
+          print("Q3_PROSPECTIVE_UNTUNED_METHOD_SOURCE_COHORT_FROZEN",
+                [r["source_id"][:8] for r in d["records"]],flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-prospective-source-100-originals-frozen
+          path: prospective/
+          retention-days: 90
+
   source_invention:
+    needs: freeze_prospective_source
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -26,6 +76,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-prospective-source-100-originals-frozen
+          path: previous
       - name: Same single SOURCE core; new general index representation, actual isolated Docker
         run: |
           set -euo pipefail
@@ -33,9 +87,6 @@ jobs:
           docker pull python:3.11-alpine
           python -m pytest -q -x tests/test_q3_coordinate_morphisms.py tests/test_q3_periodic_residual_invention.py
           mkdir -p previous methods
-          gh run download 42735035357 \
-            --name q3-original-arc2-source-only-frozen \
-            --dir previous
           test "$(cut -d ' ' -f1 previous/ORIGINAL_SOURCE_ONLY.sha256)" = \
                "$(sha256sum previous/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
           python -m research.q3.q3_coordinate_original_source_gate invent \
@@ -47,10 +98,12 @@ jobs:
           import json
           from pathlib import Path
           x=json.loads(Path("methods/FROZEN_SOURCE_METHODS.json").read_text())
-          assert x["source_originals"]==50
+          assert x["source_originals"]==100
           assert x["target_gold_accessed"] is False
-          print("Q3_ORIGINAL_SOURCE_COORDINATE_CERTIFICATIONS",
-                x["source_verified_count"],flush=True)
+          print("Q3_PROSPECTIVE_100_ORIGINAL_SOURCE_CERTIFICATIONS",
+                {"source_certified":x["source_verified_count"],
+                 "total":x["source_originals"],
+                 "scope":x["prior_exposure"]},flush=True)
           PY
       - uses: actions/upload-artifact@v4
         with:
