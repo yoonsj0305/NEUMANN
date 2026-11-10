@@ -279,12 +279,16 @@ class StructuralInventionPolicy:
 
     def __init__(self, learned: LearnedDiscoveryPolicy | None = None,
                  *, max_states=6500, max_evaluations=250000,
-                 max_candidates=12, prior_method_count=0):
+                 max_candidates=12, prior_method_count=0,
+                 representation_prior=None):
         if not (500 <= max_states <= 50000 and
                 1000 <= max_evaluations <= 1000000 and
                 1 <= max_candidates <= 64):
             raise ValueError("bounded single-core structural search required")
         self.learned = learned
+        # Frozen cross-task preference learned from independently refuted
+        # SOURCE candidates, never from TARGET author gold.
+        self.representation_prior = representation_prior
         self.max_states = max_states
         self.max_evaluations = max_evaluations
         self.max_candidates = max_candidates
@@ -316,7 +320,10 @@ class StructuralInventionPolicy:
         # differently and is open to unlearned A on identical terms.
         factors.extend(induce_object_graph_factors(
             source_pairs,max_candidates=self.max_candidates))
-        factors.sort(key=lambda f:(f.description_length,f.representation))
+        if self.representation_prior is not None:
+            factors.sort(key=self.representation_prior.order_key)
+        else:
+            factors.sort(key=lambda f:(f.description_length,f.representation))
         pool: list[Candidate] = []
         observed: dict[tuple[str, ...], Candidate] = {}
         exact: list[Candidate] = []
