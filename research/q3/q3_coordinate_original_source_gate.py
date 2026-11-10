@@ -17,6 +17,7 @@ from pathlib import Path
 
 from neumann1.open_program_inventor import IsolatedPython,source_same_value
 from neumann1.q3_coordinate_morphisms import induce_coordinate_morphisms
+from neumann1.q3_periodic_residual_invention import induce_periodic_residual_rules
 from neumann1.q3_structure_factorization import induce_structural_factors
 from neumann1.q3_residual_composition import induce_source_compositions
 from neumann1.q3_object_graph_invention import induce_object_graph_factors
@@ -52,7 +53,13 @@ def invent(original_source,out):
         if canonical(checks[0][0]) in seen:
             receipts.append({"id":original,"status":"ABSTAIN_SOURCE_ID_OVERLAP"})
             continue
-        methods=induce_coordinate_morphisms(train,max_candidates=4)
+        # Two general SOURCE-induced coordinate representations, one
+        # identity/projection and one factorized periodic quotient plus
+        # inferred causal relational residue. Never dispatch by task ID.
+        methods=tuple(induce_coordinate_morphisms(
+            train,max_candidates=4))+tuple(
+            induce_periodic_residual_rules(
+                train,max_candidates=4))
         certified=[]
         for candidate in methods:
             check=runner.evaluate(
