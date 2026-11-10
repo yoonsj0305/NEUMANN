@@ -160,8 +160,14 @@ def _pair_nodes(src,dst,background):
         cost,i,orient=min(options,key=lambda x:(
             x[0]+3*len(children[x[1]]),x[0],x[1]))
         old=left[i];new=right[j]
+        # Invent a relative role when the symbol is preserved. Never
+        # memorize absolute palette values when the same transformation
+        # should apply to unseen symbols in an independent original.
+        out_role=(("source",)
+                  if source_same_value(old.color,new.color)
+                  else ("constant",new.color))
         children[i].append((new.r0-old.r0,new.c0-old.c0,
-                            new.color,orient))
+                            out_role,orient))
         if len(children[i])>6:return None
     result=[]
     for i,old in enumerate(left):
@@ -203,7 +209,9 @@ def _apply_learned_law(inp,key,mapping):
             node,nodes,len(inp),len(inp[0]))[key]
         actions=mapping.get(value)
         if actions is None:return None
-        for dr,dc,color,orientation in actions:
+        for dr,dc,color_role,orientation in actions:
+            color=(node.color if color_role[0]=="source"
+                   else color_role[1])
             shifted=_symmetry_points(node.shape,orientation)
             for dy,dx in shifted:
                 rr=node.r0+dr+dy
@@ -231,7 +239,7 @@ def _choose_law(source_pairs):
                 (_features(src,original_nodes,len(inp),len(inp[0])),
                  offspring))
     if not all_examples or all(
-            a==((0,0,f["category"],"identity"),)
+            a==((0,0,("source",),"identity"),)
             for f,a in all_examples):
         return None
     keys=("global","category","area","height","width","row_rank",
@@ -326,7 +334,8 @@ def _compiled_program(key,mapping):
         "        else:val=shape\n"
         "        if val not in mapping:\n"
         "            return x\n"
-        "        for dr,dc,dest,orientation in mapping[val]:\n"
+        "        for dr,dc,color_role,orientation in mapping[val]:\n"
+        "            dest=color if color_role[0]=='source' else color_role[1]\n"
         "            rel=[]\n"
         "            for y,z in pts:\n"
         "                dy=y-r0\n"
