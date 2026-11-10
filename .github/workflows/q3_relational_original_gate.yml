@@ -1,0 +1,150 @@
+name: Q3 Induced Relational Law - Real Original SOURCE and Author Test
+on:
+  push:
+    branches:
+      - research/q3-relational-causal-language-induction-20261110
+    paths:
+      - "neumann1/q3_relational_predicate_invention.py"
+      - "research/q3/q3_relational_original_source_gate.py"
+      - "tests/test_q3_relational_predicate_invention.py"
+      - ".github/workflows/q3_relational_original_gate.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONHASHSEED: "0"
+  OMP_NUM_THREADS: "1"
+jobs:
+  synthesize_and_source_certify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          docker pull python:3.11-alpine
+          python -m pytest -q -x tests/test_q3_relational_predicate_invention.py
+          mkdir -p frozen_source methods
+          gh run download 42757846590 --name q3-prospective-source-100-originals-frozen --dir frozen_source
+          test "$(cut -d ' ' -f1 frozen_source/ORIGINAL_SOURCE_ONLY.sha256)" = "$(sha256sum frozen_source/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+          python -m research.q3.q3_relational_original_source_gate --source frozen_source/ORIGINAL_SOURCE_ONLY.json --out methods/FROZEN_SOURCE_METHODS.json
+          sha256sum methods/FROZEN_SOURCE_METHODS.json > methods/FROZEN_SOURCE_METHODS.sha256
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-relational-source-certificates-frozen
+          path: methods/
+          if-no-files-found: warn
+          retention-days: 90
+  freeze_author_inputs_only:
+    needs: synthesize_and_source_certify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-relational-source-certificates-frozen
+          path: methods
+      - run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          test "$(cut -d ' ' -f1 methods/FROZEN_SOURCE_METHODS.sha256)" = "$(sha256sum methods/FROZEN_SOURCE_METHODS.json | cut -d ' ' -f1)"
+          git init -q /tmp/author
+          git -C /tmp/author fetch -q --depth 1 https://github.com/arcprize/ARC-AGI-2.git f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/author checkout -q FETCH_HEAD
+          mkdir -p blind
+          python -m research.q3.q3_coordinate_original_source_gate blind --methods methods/FROZEN_SOURCE_METHODS.json --author-root /tmp/author/data/training --out blind/TARGET_INPUTS_ONLY.json
+          sha256sum blind/TARGET_INPUTS_ONLY.json > blind/TARGET_INPUTS_ONLY.sha256
+          rm -rf /tmp/author
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-relational-blind-target-inputs-only
+          path: blind/
+          retention-days: 90
+  predict_then_hash:
+    needs: freeze_author_inputs_only
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-relational-source-certificates-frozen
+          path: methods
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-relational-blind-target-inputs-only
+          path: blind
+      - run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          docker pull python:3.11-alpine
+          mkdir -p predictions
+          test "$(cut -d ' ' -f1 blind/TARGET_INPUTS_ONLY.sha256)" = "$(sha256sum blind/TARGET_INPUTS_ONLY.json | cut -d ' ' -f1)"
+          python -m research.q3.q3_coordinate_original_source_gate predict --methods methods/FROZEN_SOURCE_METHODS.json --blind blind/TARGET_INPUTS_ONLY.json --out predictions/PREDICTIONS.json
+          sha256sum predictions/PREDICTIONS.json > predictions/PREDICTIONS.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-relational-original-predictions-before-gold
+          path: predictions/
+          retention-days: 90
+  score_original_gold_after_frozen_predictions:
+    needs: predict_then_hash
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-relational-source-certificates-frozen
+          path: methods
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-relational-blind-target-inputs-only
+          path: blind
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-relational-original-predictions-before-gold
+          path: predictions
+      - run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          test "$(cut -d ' ' -f1 predictions/PREDICTIONS.sha256)" = "$(sha256sum predictions/PREDICTIONS.json | cut -d ' ' -f1)"
+          git init -q /tmp/author
+          git -C /tmp/author fetch -q --depth 1 https://github.com/arcprize/ARC-AGI-2.git f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/author checkout -q FETCH_HEAD
+          mkdir -p scores
+          python -m research.q3.q3_coordinate_original_source_gate score --methods methods/FROZEN_SOURCE_METHODS.json --blind blind/TARGET_INPUTS_ONLY.json --predictions predictions/PREDICTIONS.json --expected-sha "$(cut -d ' ' -f1 predictions/PREDICTIONS.sha256)" --author-root /tmp/author/data/training --out scores/RELATIONAL_AUTHOR_EXACT.json
+          sha256sum scores/RELATIONAL_AUTHOR_EXACT.json > scores/RELATIONAL_AUTHOR_EXACT.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.loads(Path("scores/RELATIONAL_AUTHOR_EXACT.json").read_text())["summary"]
+          assert s["q3_global"]=="OPEN"
+          assert s["source_original_cohort_denominator"]==100
+          assert s["scientific_scope"]=="PROSPECTIVE_100_RELATIVE_TO_PRIOR_50_ONLY"
+          print("Q3_NEW_RELATIONAL_AUTHOR_EXACT_AFTER_FROZEN_PREDICTIONS",s,flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-relational-original-author-scored-after-freeze
+          path: scores/
+          if-no-files-found: warn
+          retention-days: 90
