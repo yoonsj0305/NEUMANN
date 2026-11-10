@@ -151,7 +151,7 @@ def finetune_source_policy(
             not 1<=rank<=32):
         raise ValueError("bounded explicit training contract")
     if training_objective not in (
-            "source_program_imitation","source_repair"):
+            "source_program_imitation","source_repair","source_hypothesis_repair"):
         raise ValueError("unknown Q3 learning objective")
     source,source_sha=source_training_rows(source_jsonl)
     if not source:
@@ -160,16 +160,22 @@ def finetune_source_policy(
     # A real invention-policy update conditions the new program on an
     # *actual failed executable method* and an independent SOURCE
     # counterexample, NOT merely on unrelated solved program texts.
-    if training_objective=="source_repair":
+    if training_objective in ("source_repair","source_hypothesis_repair"):
         from .open_program_inventor import IsolatedPython
         from .q3_source_repair_learning import recertified_repair_prompt
         runner=IsolatedPython(max_seconds=8)
+        if training_objective=="source_hypothesis_repair":
+            from .q3_latent_hypothesis_policy import recertified_hypothesis_repair_row
         learning_rows=[]
         for row in source:
             if "repair_prior_program" not in row:
                 continue
-            prompt,phase=recertified_repair_prompt(row,runner)
-            learning_rows.append((prompt,row["program"],phase,
+            if training_objective=="source_hypothesis_repair":
+                prompt,teacher_completion,phase=recertified_hypothesis_repair_row(row,runner)
+            else:
+                prompt,phase=recertified_repair_prompt(row,runner)
+                teacher_completion=row["program"]
+            learning_rows.append((prompt,teacher_completion,phase,
                                   row["repair_prior_sha256"],row["sha256"]))
         if not learning_rows:
             raise ValueError("no independently SOURCE-falsified repair episodes")
@@ -230,7 +236,9 @@ def finetune_source_policy(
     manifest={
         "schema":"NEUMANN.Q3.SOURCE-PROGRAM-LORA.v1",
         "base_model":model_name,"model_revision":model_revision,
-        "prompt_contract":"source_discovery_prompt+chat_template.v1",
+        "prompt_contract":("source_hypothesis_repair+chat_template.v1"
+            if training_objective=="source_hypothesis_repair"
+            else "source_discovery_prompt+chat_template.v1"),
         "source_sha256":source_sha,
         "source_programs":len(source),
         "training_objective":training_objective,
@@ -261,7 +269,7 @@ if __name__=="__main__":
     p.add_argument("--steps",type=int,default=40)
     p.add_argument("--seed",type=int,default=1007)
     p.add_argument("--objective",choices=(
-        "source_program_imitation","source_repair"),
+        "source_program_imitation","source_repair","source_hypothesis_repair"),
         default="source_program_imitation")
     args=p.parse_args()
     print(json.dumps(

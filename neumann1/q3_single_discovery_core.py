@@ -190,7 +190,11 @@ class SingleDiscoveryCore:
     episodes after freeze().
     """
 
-    def __init__(self, policy, runner=None, *, memory=None, max_proposals=8):
+    def __init__(self, policy, runner=None, *, memory=None, max_proposals=8,
+                 hypothesis_mode=False):
+        if hypothesis_mode:
+            from .q3_latent_hypothesis_policy import HypothesisConditionedPolicy
+            policy = HypothesisConditionedPolicy(policy)
         self.policy = policy
         self.runner = runner if runner is not None else IsolatedPython()
         self.memory = (memory if memory is not None
@@ -227,7 +231,7 @@ class SingleDiscoveryCore:
 def invent_open_program_for_engine(
         engine, source_pairs, independent_source_checks, *,
         proposal_policy, runner=None, max_proposals=8,
-        method_memory=None, reuse_memory=False,
+        method_memory=None, reuse_memory=False, hypothesis_mode=False,
         source_identity=None, excluded_source_ids=()):
     """ONE production Q3 interface used without code forks by both engines.
 
@@ -252,7 +256,7 @@ def invent_open_program_for_engine(
             raise ValueError("source identity already present in method memory")
     core = SingleDiscoveryCore(
         proposal_policy, runtime, memory=memory,
-        max_proposals=max_proposals)
+        max_proposals=max_proposals, hypothesis_mode=hypothesis_mode)
     result = core.discover(
         source_pairs, independent_source_checks,
         reuse_memory=reuse_memory,
