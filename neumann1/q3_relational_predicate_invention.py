@@ -37,7 +37,7 @@ def _rect(x):
 
 def _bg(x):
     counts=Counter(v for row in x for v in row)
-    return sorted(counts.items(),key=lambda p:(-p[1],repr(p[0])))[0][0]
+    return sorted(counts.items(),key=lambda p:(-p[1],str(p[0])))[0][0]
 
 
 def _locations(x,color):
@@ -167,7 +167,7 @@ def _compile(a,b,symbol,clauses):
         "    counts={}\n"
         "    for row in x:\n"
         "        for v in row:counts[v]=counts.get(v,0)+1\n"
-        "    bg=sorted(counts,key=lambda v:(-counts[v],repr(v)))[0]\n"
+        "    bg=sorted(counts,key=lambda v:(-counts[v],str(v)))[0]\n"
         "    loc_a=[]\n"
         "    loc_b=[]\n"
         "    for r in range(len(x)):\n"
