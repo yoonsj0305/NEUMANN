@@ -139,3 +139,42 @@ def test_single_sealed_source_check_is_never_used_as_adaptive_oracle():
     assert discovery.program is None
     assert len(discovery.attempts)==1
     assert len(policy.prompts)==1, "the sealed check must never be reused"
+
+
+def test_revision_prompt_keeps_only_latest_witness_not_accumulated_history():
+    """Three sequential hypotheses share one bounded feedback interface."""
+    from neumann1.open_program_inventor import IsolatedPython
+    runner=IsolatedPython(max_seconds=12)
+    p1="def transform(x):\n    return x"
+    p2="def transform(x):\n    return x+1"
+    p3="def transform(x):\n    return x*x"
+    policy=RecordedScriptPolicy((p1,p2,p3))
+    d=GenerativeProgramInventor(
+        policy,runner,max_proposals=3).discover(
+            [(2,4),(3,9)],independent_source_checks=[(5,25)])
+    assert d.verified
+    assert len(policy.prompts)==3
+    assert "\n    return x\n" not in policy.prompts[2]
+    assert p2 in policy.prompts[2]
+    assert policy.prompts[2].count("The exact prior program to REVISE") == 1
+    assert len(policy.prompts[2]) < len(policy.prompts[1])+100
+
+
+def test_context_overflow_abstains_without_ever_querying_sealed_source():
+    """The fallback on unsupported prompt capacity is ABSTAIN, not fake PASS."""
+    from neumann1.q3_prompt_contract import SourceContextOverflow
+    class OverflowPolicy:
+        attempts=0
+        def propose(self,prompt):
+            self.attempts+=1
+            raise SourceContextOverflow("token capacity exceeded")
+    class NoExecutor:
+        def evaluate(self,program,inputs):
+            raise AssertionError("SOURCE verification must never run")
+    policy=OverflowPolicy()
+    d=GenerativeProgramInventor(
+        policy,NoExecutor(),max_proposals=8).discover(
+            [(1,2)],independent_source_checks=[(3,4)])
+    assert policy.attempts==1
+    assert d.status=="ABSTAIN_CONTEXT_OVERFLOW"
+    assert not d.verified and d.program is None
