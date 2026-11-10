@@ -1,0 +1,100 @@
+name: Q3 Shared Policy On-Policy Partial SOURCE Gradient and Independent Original SOURCE A/C
+on:
+  push:
+    branches:
+      - research/q3-one-core-onpolicy-semantic-credit-20261110
+    paths:
+      - ".github/workflows/q3_partial_credit_gradient.yml"
+      - "research/q3/q3_train_self_generated_partial.py"
+      - "research/q3/q3_model_repair_real_source_ablation.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONHASHSEED: "0"
+  OMP_NUM_THREADS: "2"
+  OPENBLAS_NUM_THREADS: "2"
+  TOKENIZERS_PARALLELISM: "false"
+jobs:
+  real_weight_update_heldout_original_source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 85
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install fixed original SOURCE verifier and real 0.5B trainable model
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          python -m pip install -q --index-url https://download.pytorch.org/whl/cpu 'torch==2.5.1'
+          python -m pip install -q 'transformers==4.46.3' 'peft==0.14.0' 'accelerate==1.2.1' 'huggingface_hub==0.27.1' 'jinja2>=3.1.4,<4'
+          docker pull python:3.11-alpine
+          python -m pytest -q -x tests/test_q3_semantic_credit.py tests/test_q3_preference_learning.py
+      - name: Exact frozen on-policy partial program evidence, never independent SOURCE training
+        run: |
+          set -euo pipefail
+          mkdir -p provenance cohort evidence
+          gh run download 42773428267 \
+            --name q3-one-core-onpolicy-semantic-source-program-preferences-actual \
+            --dir provenance
+          gh run download 42757846590 \
+            --name q3-prospective-source-100-originals-frozen --dir cohort
+          test "$(cut -d ' ' -f1 cohort/ORIGINAL_SOURCE_ONLY.sha256)" = "$(sha256sum cohort/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+          test "$(cut -d ' ' -f1 provenance/ACTUAL_SELF_GENERATED_PARTIAL_PREFERENCES.sha256)" = "$(sha256sum provenance/ACTUAL_SELF_GENERATED_PARTIAL_PREFERENCES.jsonl | cut -d ' ' -f1)"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("provenance/SELF_GENERATED_PROGRAM_CREDIT.json").read_text())
+          assert p["all_preferences_uncertified"] is True
+          assert p["independent_source_checks_read"] is False
+          assert p["original_target_gold_read"] is False
+          assert p["q3_global"]=="OPEN"
+          print("Q3_SELF_GENERATED_RELATIVE_PAIRS_FROZEN",
+                p["genuine_executable_partial_preferences"],flush=True)
+          PY
+      - name: Train same policy if true source partial signals exist, evaluate strictly heldout real originals
+        run: |
+          set -euo pipefail
+          if [ ! -s provenance/ACTUAL_SELF_GENERATED_PARTIAL_PREFERENCES.jsonl ]; then
+            echo "Q3_NO_SOURCE_SEMANTIC_PREFERENCE_AVAILABLE_ABSTAIN" \
+              | tee evidence/Q3_ABORT_NO_PREFERENCE.txt
+            exit 0
+          fi
+          python -u -m research.q3.q3_train_self_generated_partial \
+            --pairs provenance/ACTUAL_SELF_GENERATED_PARTIAL_PREFERENCES.jsonl \
+            --adapter-output adapter \
+            --model-revision ea3f2471cf1b1f0db85067f1ef93848e38e88c25 \
+            --steps 8
+          python -u -m research.q3.q3_model_repair_real_source_ablation \
+            --cohort cohort/ORIGINAL_SOURCE_ONLY.json \
+            --model-revision ea3f2471cf1b1f0db85067f1ef93848e38e88c25 \
+            --adapter adapter \
+            --limit 6 --max-proposals 2 \
+            --out evidence/ACTUAL_PARTIAL_CREDIT_A_C_SOURCE_COMPARISON.json
+          sha256sum evidence/ACTUAL_PARTIAL_CREDIT_A_C_SOURCE_COMPARISON.json \
+            > evidence/ACTUAL_PARTIAL_CREDIT_A_C_SOURCE_COMPARISON.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          summary=json.loads(Path("evidence/ACTUAL_PARTIAL_CREDIT_A_C_SOURCE_COMPARISON.json").read_text())["summary"]
+          assert summary["source_originals"]==6
+          assert summary["original_TEST_gold_accessed"] is False
+          assert summary["q3_global"]=="OPEN"
+          print("Q3_REAL_SELF_GENERATED_PARTIAL_CREDIT_HELDOUT_ABLATION",{
+            k:summary[k] for k in (
+                "A_exact_source","C_exact_source",
+                "C_exclusive_source","A_exclusive_source")},flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-onpolicy-graded-source-partial-to-learned-policy-actual-A-C-receipt
+          path: |
+            evidence/
+            adapter/neumann_source_training_manifest.json
+          if-no-files-found: warn
+          retention-days: 90
