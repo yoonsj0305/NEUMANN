@@ -50,6 +50,26 @@ def audit(train,heldout,out):
             fingerprints[w["program_sha256"]]=hashlib.sha256(
                 key.encode()).hexdigest()
             executions[w["program_sha256"]]="EXECUTED"
+    # SHA-distinct training programs can still encode the same behavior.
+    # Counting them as independent invented methods inflates the diversity
+    # of the self-generated curriculum, even if the heldout is separate.
+    training_behavioral_collisions=[]
+    for i,t in enumerate(a):
+        for other in a[i+1:]:
+            if (t["program_generation_type"]==other["program_generation_type"]
+                and t["program_sha256"] in fingerprints
+                and other["program_sha256"] in fingerprints
+                and fingerprints[t["program_sha256"]]==fingerprints[
+                    other["program_sha256"]]):
+                training_behavioral_collisions.append({
+                    "train_sha_1":t["program_sha256"],
+                    "train_sha_2":other["program_sha256"],
+                    "kind":t["program_generation_type"],
+                })
+    effective_train_behavior_classes=len({
+        (t["program_generation_type"],
+         fingerprints[t["program_sha256"]])
+        for t in a if t["program_sha256"] in fingerprints})
     collisions=[]
     for h in b:
         for t in a:
@@ -69,6 +89,8 @@ def audit(train,heldout,out):
         "kind_is_not_semantic_family":True,
         "program_SHA_disjoint":True,
         "finite_probe_exact_behavioral_collisions":collisions,
+        "train_behavioral_collisions":training_behavioral_collisions,
+        "train_distinct_observed_behavior_classes":effective_train_behavior_classes,
         "unexecutable_probe_worlds":[
             {"sha":k,"status":v} for k,v in executions.items()
             if v!="EXECUTED"],
