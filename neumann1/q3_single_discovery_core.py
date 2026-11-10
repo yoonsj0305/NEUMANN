@@ -231,7 +231,8 @@ class SingleDiscoveryCore:
 def invent_open_program_for_engine(
         engine, source_pairs, independent_source_checks, *,
         proposal_policy, runner=None, max_proposals=8,
-        method_memory=None, reuse_memory=False, hypothesis_mode=False,\n        source_identity=None, excluded_source_ids=()):
+        method_memory=None, reuse_memory=False, hypothesis_mode=False,
+        source_identity=None, excluded_source_ids=()):
     """ONE production Q3 interface used without code forks by both engines.
 
     There is no eager persistent method memory, auto-retrieval or family
