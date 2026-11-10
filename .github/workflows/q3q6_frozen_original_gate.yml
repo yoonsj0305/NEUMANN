@@ -1,0 +1,220 @@
+name: Q3Q6 Frozen Two-Author Latent-World Original Causal Gate
+
+on:
+  push:
+    branches:
+      - research/q3q6-frozen-crosssemantic-original-20261110
+    paths:
+      - ".github/workflows/q3q6_frozen_original_gate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONHASHSEED: "0"
+  OMP_NUM_THREADS: "2"
+  OPENBLAS_NUM_THREADS: "2"
+  TOKENIZERS_PARALLELISM: "false"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+
+jobs:
+  freeze_original_ids_and_separate_gold:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run original-corpus split and source/target leakage contracts
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          python -m pytest -q -x \
+            tests/test_q3q6_original_transfer_gate.py \
+            tests/test_causal_experience_core.py
+      - name: Download ONLY pinned separately authored original corpora
+        run: |
+          set -euo pipefail
+          mkdir -p public_originals visible oracle target_gold
+          FOLIO=5d7bb84c7edab3fb358e057d2807f19cf5cf5e2d
+          BBH=9ee07bd481feebf959a6b59d61ea57bdcf30964d
+          curl -fsSL --retry 2 \
+            "https://raw.githubusercontent.com/Yale-LILY/FOLIO/$FOLIO/data/v0.0/folio-train.jsonl" \
+            -o public_originals/folio-train.jsonl
+          curl -fsSL --retry 2 \
+            "https://raw.githubusercontent.com/Yale-LILY/FOLIO/$FOLIO/data/v0.0/folio-validation.jsonl" \
+            -o public_originals/folio-validation.jsonl
+          curl -fsSL --retry 2 \
+            "https://raw.githubusercontent.com/suzgunmirac/BIG-Bench-Hard/$BBH/bbh/causal_judgement.json" \
+            -o public_originals/causal_judgement.json
+      - name: Freeze SOURCE and untouched original TARGET by ID hash BEFORE model inference
+        run: |
+          set -euo pipefail
+          python -m research.q3.q3q6_two_author_freeze freeze \
+            --folio-train public_originals/folio-train.jsonl \
+            --folio-validation public_originals/folio-validation.jsonl \
+            --bbh public_originals/causal_judgement.json \
+            --out-visible visible/model_visible.json \
+            --out-source-oracle oracle/source_oracle.json \
+            --out-target-gold target_gold/original_gold.json \
+            --out-manifest visible/frozen_original_manifest.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          v=json.loads(Path("visible/model_visible.json").read_text())
+          m=json.loads(Path("visible/frozen_original_manifest.json").read_text())
+          assert len(v["training_episodes"])==4
+          assert len(v["evaluation_tasks"])==8
+          assert m["no_TARGET_gold_in_model_visible_bundle"] is True
+          assert all("label" not in t["target"] for t in v["evaluation_tasks"])
+          print("Q3Q6_TARGET_LABELS_ARE_EXCLUDED_FROM_MODEL_ARTIFACTS",flush=True)
+          PY
+          sha256sum public_originals/* \
+            > visible/original_corpora_sha256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3q6-frozen-original-author-visible-source
+          path: visible/
+          if-no-files-found: error
+          retention-days: 90
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3q6-independent-source-checker-only
+          path: oracle/
+          if-no-files-found: error
+          retention-days: 90
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3q6-original-target-gold-sealed-scorer-only
+          path: target_gold/
+          if-no-files-found: error
+          retention-days: 90
+
+  learn_and_freeze_neural_predictions:
+    needs: freeze_original_ids_and_separate_gold
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3q6-frozen-original-author-visible-source
+          path: visible
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3q6-independent-source-checker-only
+          path: oracle
+      - name: Verify original TARGET gold not present or readable here
+        run: |
+          set -euo pipefail
+          test ! -e target_gold/original_gold.json
+          test ! -e oracle/original_gold.json
+          test ! -e visible/original_gold.json
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          m=json.loads(Path("visible/frozen_original_manifest.json").read_text())
+          f=Path("visible/model_visible.json").read_bytes()
+          s=Path("oracle/source_oracle.json").read_bytes()
+          assert hashlib.sha256(f).hexdigest()==m["model_visible_sha256"]
+          assert hashlib.sha256(s).hexdigest()==m["SOURCE_oracle_sha256"]
+          print("Q3Q6_VISIBLE_AND_SOURCE_ONLY_HASHES_FROZEN",flush=True)
+          PY
+      - name: Install exactly the pinned 0.5B model with real LoRA gradient on CPU
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          python -m pip install -q --index-url https://download.pytorch.org/whl/cpu 'torch==2.5.1'
+          python -m pip install -q 'transformers==4.46.3' 'peft==0.14.0' \
+            'accelerate==1.2.1' 'huggingface_hub==0.27.1' 'jinja2>=3.1.4,<4'
+          python - <<'PY'
+          from huggingface_hub import model_info
+          sha=model_info("Qwen/Qwen2.5-Coder-0.5B-Instruct").sha
+          assert sha=="ea3f2471cf1b1f0db85067f1ef93848e38e88c25"
+          print("Q3Q6_IDENTICAL_WEIGHT_CHECKPOINT_SHA_VERIFIED",sha,flush=True)
+          PY
+      - name: Run real A/B/C learning, freeze all eight original TARGET predictions, never open gold
+        run: |
+          set -euo pipefail
+          mkdir -p frozen_predictions
+          python -u -m research.q3.q3q6_original_transfer_run infer \
+            --visible visible/model_visible.json \
+            --source-oracle oracle/source_oracle.json \
+            --revision ea3f2471cf1b1f0db85067f1ef93848e38e88c25 \
+            --out frozen_predictions/learned_latent_original_predictions.json
+          sha256sum frozen_predictions/learned_latent_original_predictions.json \
+            > frozen_predictions/predictions.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("frozen_predictions/learned_latent_original_predictions.json").read_text())
+          assert p["original_TARGET_gold_read"] is False
+          assert p["same_pretrained_weights"] is True
+          assert p["B_C_same_approved_source_memory"] is True
+          assert all(len(p["A_B_C"][a])==8 for a in ("A","B","C"))
+          print("Q3Q6_ORIGINAL_PREDICTIONS_COMMITTED_NO_GOLD",flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3q6-neural-source-learned-frozen-original-predictions
+          path: frozen_predictions/
+          if-no-files-found: warn
+          retention-days: 90
+
+  independent_original_target_scorer:
+    needs: [freeze_original_ids_and_separate_gold, learn_and_freeze_neural_predictions]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3q6-frozen-original-author-visible-source
+          path: visible
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3q6-original-target-gold-sealed-scorer-only
+          path: target_gold
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3q6-neural-source-learned-frozen-original-predictions
+          path: frozen_predictions
+      - name: Score only after model-output SHA freeze; no model runtime installed
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          cd frozen_predictions
+          sha256sum -c predictions.sha256
+          cd ..
+          mkdir -p scored_originals
+          python -m research.q3.q3q6_original_transfer_run score \
+            --predictions frozen_predictions/learned_latent_original_predictions.json \
+            --gold target_gold/original_gold.json \
+            --manifest visible/frozen_original_manifest.json \
+            --out scored_originals/q3q6_original_two_domain_verdict.json
+          sha256sum scored_originals/q3q6_original_two_domain_verdict.json \
+            > scored_originals/scorer_sha256.txt
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("scored_originals/q3q6_original_two_domain_verdict.json").read_text())
+          assert d["Q3_global"]=="OPEN" and d["Q6_global"]=="OPEN"
+          assert len(d["domains"])==2 and len(d["originals"])==8
+          print("Q3Q6_GLOBAL_QUESTIONS_STILL_REQUIRE_STRONGER_SPECIALISTS_AND_REPRODUCTION",flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3q6-independent-original-two-domain-causal-scored-receipt
+          path: scored_originals/
+          if-no-files-found: warn
+          retention-days: 90
