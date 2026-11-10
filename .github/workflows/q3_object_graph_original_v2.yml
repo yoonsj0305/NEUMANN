@@ -1,0 +1,165 @@
+name: Q3 General Graph Rewrite - Disjoint Second Eight External Originals
+on:
+  push:
+    branches:
+      - research/q3-structural-graph-policy-20261110
+    paths:
+      - ".github/workflows/q3_object_graph_original_v2.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  PYTHONHASHSEED: "0"
+  OMP_NUM_THREADS: "1"
+  OPENBLAS_NUM_THREADS: "1"
+  MKL_NUM_THREADS: "1"
+
+jobs:
+  freeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Freeze source-only author original registry and program policy BEFORE target use
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          python -m pytest -q -x tests/test_q3_structural_original_contract.py
+          mkdir -p /tmp/author frozen
+          git init -q /tmp/author
+          git -C /tmp/author fetch -q --depth 1 \
+            https://github.com/density-11/arcana-test.git \
+            3f3dc8f650deb271a29e282bfb0e5ca95a7d64d6
+          git -C /tmp/author checkout -q FETCH_HEAD
+          test "$(git -C /tmp/author rev-parse HEAD)" = \
+            3f3dc8f650deb271a29e282bfb0e5ca95a7d64d6
+          python -m research.q3.q3_structural_original_gate freeze-arcana-next8-v2 \
+            --original /tmp/author/data \
+            --out frozen/BLIND.json
+          sha256sum frozen/BLIND.json > frozen/BLIND.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          q=json.loads(Path("frozen/BLIND.json").read_text())
+          assert q["scope"]=="SECOND_DISJOINT_SOURCE_AUTHOR_ORIGINALS"
+          assert len(q["records"])==8
+          assert "test" not in json.dumps(q)
+          print("Q3_FROZEN_DISJOINT_SECOND8_EXTERNAL_AUTHOR_IDS",
+                [x["id"] for x in q["records"]],flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-graph-v2-frozen-input-source-only
+          path: frozen/
+          retention-days: 90
+
+  discover:
+    needs: freeze
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-graph-v2-frozen-input-source-only
+          path: frozen
+      - name: Same general grammar for A uniform B memory and C learned policy
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          docker pull python:3.11-alpine
+          python -m pytest -q -x tests/test_q3_structure_factorization.py tests/test_q3_object_graph_invention.py
+          mkdir -p prior evidence
+          gh run download 42593621076 \
+            --name Q3-REAL-WEIGHT-LEARNING-ORIGINAL-SOURCE-BLIND \
+            --dir prior
+          SHA="$(cut -d ' ' -f1 frozen/BLIND.sha256)"
+          test "$SHA" = "$(sha256sum frozen/BLIND.json | cut -d ' ' -f1)"
+          python -m research.q3.q3_structural_original_gate infer \
+            --blind frozen/BLIND.json \
+            --teachers prior/SOURCE_TEACHERS.jsonl \
+            --out evidence/PREDICTIONS.json
+          sha256sum evidence/PREDICTIONS.json \
+            > evidence/PREDICTIONS.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("evidence/PREDICTIONS.json").read_text())
+          assert p["target_gold_accessed"] is False
+          assert p["origin"]=="arcana"
+          assert len(p["records"])==8
+          assert p["same_general_executable_substrate"] is True
+          print("Q3_GRAPH_SECOND8_AUTHOR_SOURCE_PROGRAM_COUNTS",
+                {a:sum(r["arms"][a]["source_verified"]
+                       for r in p["records"]) for a in ("A","B","C")},
+                flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-graph-v2-original-predictions-frozen
+          path: evidence/
+          if-no-files-found: warn
+          retention-days: 90
+
+  grade:
+    needs: discover
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-graph-v2-frozen-input-source-only
+          path: frozen
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-graph-v2-original-predictions-frozen
+          path: evidence
+      - name: Verify pre-gold prediction and problem SHA, then independently grade original author
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          SHA="$(cut -d ' ' -f1 evidence/PREDICTIONS.sha256)"
+          test "$SHA" = "$(sha256sum evidence/PREDICTIONS.json | cut -d ' ' -f1)"
+          test "$(cut -d ' ' -f1 frozen/BLIND.sha256)" = \
+            "$(sha256sum frozen/BLIND.json | cut -d ' ' -f1)"
+          git init -q /tmp/author
+          git -C /tmp/author fetch -q --depth 1 \
+            https://github.com/density-11/arcana-test.git \
+            3f3dc8f650deb271a29e282bfb0e5ca95a7d64d6
+          git -C /tmp/author checkout -q FETCH_HEAD
+          mkdir -p score
+          python -m research.q3.q3_structural_original_gate score \
+            --blind frozen/BLIND.json \
+            --predictions evidence/PREDICTIONS.json \
+            --expected-sha "$SHA" \
+            --original /tmp/author/data \
+            --out score/NEW_AUTHOR_ORIGINAL_SCORE.json
+          sha256sum score/NEW_AUTHOR_ORIGINAL_SCORE.json \
+            > score/NEW_AUTHOR_ORIGINAL_SCORE.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.loads(Path("score/NEW_AUTHOR_ORIGINAL_SCORE.json").read_text())["summary"]
+          assert s["q3_global"]=="OPEN"
+          assert s["originals"]==8
+          print("Q3_GRAPH_SECOND8_AUTHOR_ORIGINAL_RESULT",s,flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-graph-v2-independent-author-original-score
+          path: score/
+          retention-days: 90
