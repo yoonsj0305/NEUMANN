@@ -1,0 +1,78 @@
+name: Q3 Model-Authored Latent Causal Hypotheses vs Direct Program Generation
+on:
+  push:
+    branches:
+      - research/q3-one-core-latent-hypothesis-policy-20261110
+    paths:
+      - ".github/workflows/q3_latent_causal_original_source.yml"
+      - "neumann1/q3_trainable_code_policy.py"
+      - "neumann1/q3_latent_hypothesis_policy.py"
+      - "neumann1/q3_causal_observer.py"
+      - "tests/test_q3_latent_hypothesis_policy.py"
+      - "research/q3/q3_latent_causal_real_original_source.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONHASHSEED: "0"
+  OMP_NUM_THREADS: "2"
+  OPENBLAS_NUM_THREADS: "2"
+  TOKENIZERS_PARALLELISM: "false"
+jobs:
+  same_pretrained_model_and_sealed_source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Generic latent policy interface and no-network SOURCE verifier
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          docker pull python:3.11-alpine
+          python -m pytest -q -x tests/test_q3_latent_hypothesis_policy.py tests/test_q3_causal_observer.py
+      - name: Pin real local code model weights and original SOURCE
+        run: |
+          set -euo pipefail
+          python -m pip install -q --index-url https://download.pytorch.org/whl/cpu 'torch==2.5.1'
+          python -m pip install -q 'transformers==4.46.3' 'huggingface_hub==0.27.1' 'jinja2>=3.1.4,<4'
+          mkdir -p source evidence
+          gh run download 42757846590 --name q3-prospective-source-100-originals-frozen --dir source
+          test "$(cut -d ' ' -f1 source/ORIGINAL_SOURCE_ONLY.sha256)" = "$(sha256sum source/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+          python - <<'PY'
+          from huggingface_hub import model_info
+          assert model_info("Qwen/Qwen2.5-Coder-0.5B-Instruct").sha=="ea3f2471cf1b1f0db85067f1ef93848e38e88c25"
+          print("Q3_LATENT_SAME_BASE_REAL_ORIGINAL_SOURCE_PINNED",flush=True)
+          PY
+      - name: Strict SAME code model two-call budget and sealed SOURCE, compare direct vs neural latent invention
+        run: |
+          set -euo pipefail
+          python -u -m research.q3.q3_latent_causal_real_original_source \
+            --source source/ORIGINAL_SOURCE_ONLY.json \
+            --revision ea3f2471cf1b1f0db85067f1ef93848e38e88c25 \
+            --out evidence/Q3_LATENT_CAUSAL_AUTHOR_SOURCE.json
+          sha256sum evidence/Q3_LATENT_CAUSAL_AUTHOR_SOURCE.json > evidence/Q3_LATENT_CAUSAL_AUTHOR_SOURCE.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("evidence/Q3_LATENT_CAUSAL_AUTHOR_SOURCE.json").read_text())["summary"]
+          assert d["same_pretrained_weights"] is True
+          assert d["model_calls_per_task"]==2
+          assert d["original_TARGET_gold_read"] is False
+          assert d["global_Q3"]=="OPEN"
+          print("Q3_NEURAL_LATENT_UNSEEN_SOURCE_VERDICT",{
+            k:d[k] for k in ("direct_source_certified",
+                             "latent_source_certified",
+                             "latent_exclusive","direct_exclusive")},flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-neural-latent-hypothesis-real-original-author-source
+          path: evidence/
+          if-no-files-found: warn
+          retention-days: 90
