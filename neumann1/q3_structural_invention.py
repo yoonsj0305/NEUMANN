@@ -34,6 +34,7 @@ from .q3_residual_composition import induce_source_compositions
 from .q3_coordinate_morphisms import induce_coordinate_morphisms
 from .q3_periodic_residual_invention import induce_periodic_residual_rules
 from .q3_relational_predicate_invention import induce_relational_comprehensions
+from .q3_relational_reduce_invention import induce_relational_reducers
 
 _INVALID = object()
 
@@ -349,6 +350,10 @@ class StructuralInventionPolicy:
             # witnesses; it is one shared method language for A and C,
             # not a pre-written task-specific output.
             list(induce_relational_comprehensions(
+                source_pairs,max_candidates=min(4,self.max_candidates))),
+            # Discover symbolic aggregates as argument-selection laws over
+            # components, not hand-authored answer branches.
+            list(induce_relational_reducers(
                 source_pairs,max_candidates=min(4,self.max_candidates))),
         )
         for family in families:
