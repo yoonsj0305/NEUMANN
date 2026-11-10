@@ -16,7 +16,8 @@ solved original or independently invented operator grammar.
 from __future__ import annotations
 
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Callable, Any
 
 from .open_program_inventor import source_same_value,validate_code
 from .q3_structure_factorization import (
@@ -29,6 +30,11 @@ class SourceProbe:
     representation: str
     description_length: int
     source_train_edit_f1: float
+    # This pure interpretation is owned only by SOURCE candidate synthesis.
+    # Independent SOURCE correctness is still established using the
+    # compiled program in no-network Docker, not this helper.
+    execute: Callable[[Any],Any] = field(
+        default=lambda value:value,compare=False,repr=False)
 
 
 def _aligned_triplets(inp,goal,proposal):
@@ -137,7 +143,7 @@ def induce_source_residual_probes(train,*,max_probes=8):
             continue
         if fit>0.0:
             filtered.append(SourceProbe(
-                program,label,cost,round(fit,6)))
+                program,label,cost,round(fit,6),fn))
     filtered.sort(key=lambda p:(
         -p.source_train_edit_f1,p.description_length,
         p.representation,p.program))
