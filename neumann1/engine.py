@@ -1,7 +1,7 @@
 from __future__ import annotations
 from .q3_single_discovery_core import invent_open_program_for_engine
 from typing import Iterable
-from .types import Problem, SolveResult, CostLedger, IRKind
+from .types import Problem, SolveResult, CostLedger, IRKind, display_kind, is_unknown_kind
 from .interfaces import StructureFormer, Solver, Verifier
 from .structural_meta_invention import StructuralMetaInventor, CertifiedProgram
 from .meta_utility_policy import MetaUtilityEvidence
@@ -20,9 +20,9 @@ class NeumannEngine:
         ledger = CostLedger()
         trace = []
         rep = self.structure_former.form(problem, ledger)
-        trace.append(f"representation={rep.kind.value} confidence={rep.confidence:.3f}")
+        trace.append(f"representation={display_kind(rep.kind)} confidence={rep.confidence:.3f}")
 
-        if rep.kind == IRKind.UNKNOWN or rep.confidence < self.min_confidence:
+        if is_unknown_kind(rep.kind) or rep.confidence < self.min_confidence:
             ledger.fallback_steps += 1
             return SolveResult(
                 answer=None,
@@ -60,6 +60,31 @@ class NeumannEngine:
             ledger=ledger,
             trace=trace,
         )
+
+    def observe_source_experience(
+            self,query_id,actual,*,evidence_id,verify_source,
+            revise_context=None):
+        """Feed real trusted SOURCE changes into the SAME representation policy.
+
+        This explicit SOURCE interface cannot consume independent TARGET
+        labels. Learning is opt-in; legacy deterministic engines are intact.
+        """
+        observe=getattr(self.structure_former,"observe_source",None)
+        if not callable(observe):
+            raise RuntimeError("structure former has no causal experience learner")
+        return observe(
+            query_id,actual,evidence_id=evidence_id,
+            verify_source=verify_source,revise_context=revise_context)
+
+    def certify_source_representation(
+            self,query_id,actual,*,evidence_id,verify_source):
+        """Freeze and independently check latent representation before use."""
+        certify=getattr(self.structure_former,"certify_source",None)
+        if not callable(certify):
+            raise RuntimeError("structure former has no latent verifier")
+        return certify(
+            query_id,actual,evidence_id=evidence_id,
+            verify_source=verify_source)
 
     def observe_program(self, evidence: CertifiedProgram, *, verify):
         """Improve the live discovery METHOD INVENTORY from original-certified code."""
