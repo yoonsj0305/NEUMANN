@@ -107,6 +107,7 @@ class CausalExperienceCore:
         self._evaluated_queries=set()
         self._last_update=None
         self._sealed_queries=set()
+        self._target_queries=set()
         self._source_certified=False
         self._source_certification_opened=False
 
@@ -126,7 +127,8 @@ class CausalExperienceCore:
     def task_id(self):
         return self._task
 
-    def start(self,task_id,context,allowed_queries,*,sealed_queries=()):
+    def start(self,task_id,context,allowed_queries,*,
+              sealed_queries=(),target_queries=()):
         """Open only explicit, bounded observations; never open target gold."""
         if self._frozen:
             raise ValueError("cannot start new hypothesis during frozen scoring")
@@ -137,8 +139,12 @@ class CausalExperienceCore:
         context=json.loads(_json(context))
         allowed_queries=json.loads(_json(allowed_queries))
         sealed=set(sealed_queries)
+        targets=set(target_queries)
         if not sealed.issubset(allowed_queries) or not sealed:
             raise ValueError("at least one predeclared sealed SOURCE check required")
+        if (not targets.issubset(allowed_queries) or
+                targets & sealed or not all(isinstance(q,str) for q in targets)):
+            raise ValueError("TARGET identifiers must be declared and distinct from sealed SOURCE")
         # Reuse causal failures as SOURCE experience, not cached answers.
         history=tuple(self.experiences[-self.max_experiences:])
         raw=self.policy.hypotheses(context,history,dict(allowed_queries))
@@ -159,6 +165,7 @@ class CausalExperienceCore:
         self._hypotheses=candidates
         self._evaluated_queries=set()
         self._sealed_queries=sealed
+        self._target_queries=targets
         self._source_certified=False
         self._source_certification_opened=False
         self._last_update=None
@@ -175,7 +182,9 @@ class CausalExperienceCore:
             raise ValueError("start a SOURCE hypothesis first")
         choices=[]
         for query in sorted(self._allowed):
-            if query in self._evaluated_queries or query in self._sealed_queries:
+            if (query in self._evaluated_queries or
+                    query in self._sealed_queries or
+                    query in self._target_queries):
                 continue
             guesses=[_json(h.predictions[query]) for h in self._hypotheses
                      if query in h.predictions]
@@ -201,6 +210,8 @@ class CausalExperienceCore:
             raise ValueError("unregistered SOURCE query")
         if query_id in self._sealed_queries:
             raise ValueError("reserved independent SOURCE check may not train policy")
+        if query_id in self._target_queries:
+            raise ValueError("TARGET observation is forbidden for learning")
         if query_id in self._evaluated_queries:
             raise ValueError("no repeat tuning on an already revealed query")
         if len(self.experiences)+len(self._hypotheses)>self.max_experiences:
@@ -266,7 +277,10 @@ class CausalExperienceCore:
         task=self._task
         allowed=dict(self._allowed)
         sealed=set(self._sealed_queries)
-        result=self.start(task,context,allowed,sealed_queries=sealed)
+        targets=set(self._target_queries)
+        result=self.start(
+            task,context,allowed,sealed_queries=sealed,
+            target_queries=targets)
         self._evaluated_queries=used
         return result
 
@@ -310,6 +324,24 @@ class CausalExperienceCore:
             query_id in hypothesis.predictions and
             _json(hypothesis.predictions[query_id])==_json(observed))
         return self._source_certified
+
+    def predict_target(self,query_id):
+        """Frozen model-authored prediction for a *new* unlabeled task input.
+
+        The input was visible, but its actual TARGET outcome is NEVER
+        accepted into this interface. The independent original scorer owns
+        ground truth and may check this SHA-frozen prediction afterward.
+        A learned representation admitted by SOURCE is NOT itself proof of
+        correctness on this TARGET.
+        """
+        if not self._frozen or not self._source_certified:
+            raise ValueError("no independent SOURCE certificate; ABSTAIN")
+        if query_id not in self._target_queries:
+            raise ValueError("only predeclared unlabeled TARGET may be predicted")
+        predictions=self._hypotheses[0].predictions
+        if query_id not in predictions:
+            raise ValueError("model did not predict this TARGET; ABSTAIN")
+        return json.loads(_json(predictions[query_id]))
 
     def representation(self):
         """Expose an unverified latent state; downstream verifier still rules."""
