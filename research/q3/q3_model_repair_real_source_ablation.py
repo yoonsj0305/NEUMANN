@@ -65,8 +65,19 @@ def compare(cohort,*,model_revision,adapter,out,limit=6,max_proposals=2):
             row[name]=bool(discovery.verified)
             row[name+"_program_sha256"]=discovery.frozen_sha256
             row[name+"_attempts"]=len(discovery.attempts)
+            row[name+"_attempt_statuses"]=[
+                a.status for a in discovery.attempts]
+            row[name+"_max_train_correct"]=max(
+                (a.source_correct for a in discovery.attempts),default=0)
+            row[name+"_train_pair_count"]=len(pairs)-1
+            row[name+"_abstention_reason"]=(
+                discovery.status if not discovery.verified else None)
             print("Q3_MODEL_SOURCE_TRANSFER",name,task["source_id"],
-                  discovery.verified,flush=True)
+                  {"source_verified":discovery.verified,
+                   "statuses":row[name+"_attempt_statuses"],
+                   "best_train":row[name+"_max_train_correct"],
+                   "train_count":len(pairs)-1,
+                   "outcome":discovery.status},flush=True)
         del policy
         gc.collect()
     rows=[outcome[t["source_id"]] for t in selected]
