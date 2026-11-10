@@ -1,0 +1,159 @@
+name: Q3 Learned Representation - Third Disjoint Original Author Gate
+on:
+  push:
+    branches:
+      - research/q3-evidence-trained-representation-policy-20261110
+    paths:
+      - ".github/workflows/q3_source_residual_external_transfer.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  PYTHONHASHSEED: "0"
+  OMP_NUM_THREADS: "1"
+  OPENBLAS_NUM_THREADS: "1"
+  GH_TOKEN: ${{ github.token }}
+jobs:
+  freeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Freeze third disjoint ARCANA SOURCE-only registry, original outputs withheld
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          git init -q /tmp/author
+          git -C /tmp/author fetch -q --depth 1 https://github.com/density-11/arcana-test.git 3f3dc8f650deb271a29e282bfb0e5ca95a7d64d6
+          git -C /tmp/author checkout -q FETCH_HEAD
+          test "$(git -C /tmp/author rev-parse HEAD)" = "3f3dc8f650deb271a29e282bfb0e5ca95a7d64d6"
+          mkdir -p frozen
+          python -m research.q3.q3_structural_original_gate freeze-arcana-next8-v3 --original /tmp/author/data --out frozen/BLIND.json
+          sha256sum frozen/BLIND.json > frozen/BLIND.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path("frozen/BLIND.json").read_text())
+          assert x["scope"]=="THIRD_DISJOINT_SOURCE_AUTHOR_ORIGINALS_NO_TUNING"
+          assert len(x["records"])==8
+          assert x["no_target_gold_in_blind"] is True
+          assert not set(r["id"] for r in x["records"])&set(x["prior_excluded"])
+          print("Q3_THIRD_AUTHOR_SOURCE_ONLY_FROZEN",[r["id"] for r in x["records"]],flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-third-source-only-frozen
+          path: frozen/
+          retention-days: 90
+
+  invent:
+    needs: freeze
+    runs-on: ubuntu-latest
+    timeout-minutes: 85
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-third-source-only-frozen
+          path: frozen
+      - name: Same SOURCE proof Docker and immutable 173-example learned prior
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          docker pull python:3.11-alpine
+          python -m pytest -q -x tests/test_q3_source_residual_probes.py
+          mkdir -p prior old evidence
+          gh run download 42737094253 --name q3-source-residual-learned-policy-frozen-50-original --dir prior
+          gh run download 42593621076 --name Q3-REAL-WEIGHT-LEARNING-ORIGINAL-SOURCE-BLIND --dir old
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("prior/SOURCE_REPRESENTATION_POLICY.json").read_text())
+          assert p["target_gold_read"] is False
+          assert p["check_executions"]==173
+          assert sum(x["partial_transfer"] for x in p["outcomes"])==107
+          print("Q3_PRETRAINED_REPRESENTATION_POLICY_PINNED_SOURCE_ONLY",flush=True)
+          PY
+      - name: Matched A2 B2 C2 and strong A12 original SOURCE predictions
+        run: |
+          set -euo pipefail
+          python -m research.q3.q3_structural_original_gate infer --blind frozen/BLIND.json --teachers old/SOURCE_TEACHERS.jsonl --representation-prior prior/SOURCE_REPRESENTATION_POLICY.json --max-proposals 2 --out evidence/TWO.json
+          sha256sum evidence/TWO.json > evidence/TWO.sha256
+          python -m research.q3.q3_structural_original_gate infer --blind frozen/BLIND.json --teachers old/SOURCE_TEACHERS.jsonl --representation-prior prior/SOURCE_REPRESENTATION_POLICY.json --max-proposals 12 --out evidence/TWELVE.json
+          sha256sum evidence/TWELVE.json > evidence/TWELVE.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          for name,budget in (("TWO",2),("TWELVE",12)):
+              s=json.loads(Path("evidence/"+name+".json").read_text())
+              assert s["max_proposals"]==budget and not s["target_gold_accessed"]
+              assert s["external_source_policy_sha256"]
+              assert len(s["records"])==8
+              print("Q3_FROZEN_PREDICTIONS",name,{a:sum(r["arms"][a]["source_verified"] for r in s["records"]) for a in "ABC"},flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-third-original-two-budget-predictions-frozen
+          path: evidence/
+          if-no-files-found: warn
+          retention-days: 90
+
+  score:
+    needs: invent
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-third-source-only-frozen
+          path: frozen
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-third-original-two-budget-predictions-frozen
+          path: evidence
+      - name: Only AFTER SOURCE predictions SHA frozen, obtain original-author targets
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          git init -q /tmp/grade
+          git -C /tmp/grade fetch -q --depth 1 https://github.com/density-11/arcana-test.git 3f3dc8f650deb271a29e282bfb0e5ca95a7d64d6
+          git -C /tmp/grade checkout -q FETCH_HEAD
+          mkdir -p score
+          python -m research.q3.q3_structural_original_gate score --blind frozen/BLIND.json --predictions evidence/TWO.json --expected-sha "$(cut -d ' ' -f1 evidence/TWO.sha256)" --original /tmp/grade/data --out score/TWO.json
+          python -m research.q3.q3_structural_original_gate score --blind frozen/BLIND.json --predictions evidence/TWELVE.json --expected-sha "$(cut -d ' ' -f1 evidence/TWELVE.sha256)" --original /tmp/grade/data --out score/TWELVE.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          t=json.loads(Path("score/TWO.json").read_text())
+          s=json.loads(Path("score/TWELVE.json").read_text())
+          assert t["summary"]["originals"]==s["summary"]["originals"]==8
+          byid={r["id"]:r for r in s["records"]}
+          exclusive=sum(r["C"] and not (
+              r["A"] or r["B"] or r["native_exact"] or byid[r["id"]]["A"])
+              for r in t["records"])
+          print("Q3_LEARNED_REPRESENTATION_AUTHOR_EXACT",
+                {"A2":t["summary"]["A"],"B2":t["summary"]["B"],
+                 "C2":t["summary"]["C"],"A12":s["summary"]["A"],
+                 "native":t["summary"]["native_exact"],
+                 "C2_exclusive_over_all":exclusive,
+                 "Q3_GLOBAL":"OPEN"},flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-third-original-scored-causal-ablation
+          path: score/
+          if-no-files-found: warn
+          retention-days: 90
