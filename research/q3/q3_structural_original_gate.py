@@ -104,7 +104,7 @@ def freeze_arcana(author_data_dir,output):
           [r["id"] for r in entries],sha_file(output),flush=True)
 
 
-def freeze_arcana_next8(author_data_dir,output):
+def freeze_arcana_next8(author_data_dir,output,*,skip=0):
     """New SOURCE registry frozen before reading chosen author TARGET labels.
 
     Excludes every previously opened ARCANA development task, including the
@@ -120,7 +120,9 @@ def freeze_arcana_next8(author_data_dir,output):
     files=[p for p in root.glob("*.json") if p.name not in exclude]
     salt="NEUMANN-Q3-STRUCTURAL-LIFT-NEXT8-20261110-FROZEN-V1"
     files.sort(key=lambda p:sha256((salt+"/"+p.name).encode()).hexdigest())
-    selected=files[:8]
+    if skip not in (0,8):
+        raise ValueError("only pre-registered disjoint cohort offsets permitted")
+    selected=files[skip:skip+8]
     if len(selected)!=8:
         raise ValueError("independent-author holdout not available")
     entries=[]
@@ -139,16 +141,22 @@ def freeze_arcana_next8(author_data_dir,output):
     out={
         "schema":SCHEMA,
         "origin":"arcana",
-        "scope":"NEWLY_FROZEN_AUTHOR_ORIGINALS_NO_TUNING",
+        "scope":("NEWLY_FROZEN_AUTHOR_ORIGINALS_NO_TUNING"
+                 if skip==0 else "SECOND_DISJOINT_SOURCE_AUTHOR_ORIGINALS"),
         "revision":ARCANA_REVISION,
         "source_fingerprint":sha256(canonical(
             [(p.name,sha_file(p)) for p in selected]
             ).encode()).hexdigest(),
         "records":entries,
         "no_target_gold_in_blind":True,
-        "prior_excluded":sorted(exclude),
+        "prior_excluded":sorted(exclude|{p.name for p in files[:skip]}),
         "salt":salt,
-        "run_pre_registration":"No representation-policy changes after first freeze",
+        "run_pre_registration":(
+            "No representation-policy changes after first freeze" if skip==0
+            else "SECOND disjoint registry: original unseen target must not "
+                 "be used to alter the graph invention policy"),
+        **({"prior_first_eight_ids":[p.name for p in files[:skip]]}
+            if skip else {}),
     }
     Path(output).write_text(canonical(out)+"\n")
     print("Q3_NEXT8_EXTERNAL_SOURCE_BLIND_FROZEN",
@@ -399,9 +407,11 @@ def gate(codearc,arcana):
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
     sp=parser.add_subparsers(dest="cmd",required=True)
-    for name in ("freeze-codearc","freeze-arcana","freeze-arcana-next8","infer","score","gate"):
+    for name in ("freeze-codearc","freeze-arcana","freeze-arcana-next8",
+                 "freeze-arcana-next8-v2","infer","score","gate"):
         x=sp.add_parser(name)
-        if name in ("freeze-codearc","freeze-arcana","freeze-arcana-next8"):
+        if name in ("freeze-codearc","freeze-arcana","freeze-arcana-next8",
+                     "freeze-arcana-next8-v2"):
             x.add_argument("--original",required=True)
             x.add_argument("--out",required=True)
         if name=="infer":
@@ -424,6 +434,8 @@ if __name__=="__main__":
         freeze_arcana(args.original,args.out)
     elif args.cmd=="freeze-arcana-next8":
         freeze_arcana_next8(args.original,args.out)
+    elif args.cmd=="freeze-arcana-next8-v2":
+        freeze_arcana_next8(args.original,args.out,skip=8)
     elif args.cmd=="infer":
         infer(args.blind,args.teachers,args.out)
     elif args.cmd=="score":
