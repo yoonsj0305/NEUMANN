@@ -176,7 +176,7 @@ def test_one_general_rewrite_invents_object_duplication_with_source_proof():
     assert rules[0].representation.startswith("source-inferred-graph-rewrite/")
     # Shape-conditioned rules may be strictly better than literal color
     # memories; do not artificially force the weaker category hypothesis.
-    assert "for dr,dc,dest,orientation in mapping[val]" in rules[0].program
+    assert "for dr,dc,color_role,orientation in mapping[val]" in rules[0].program
     p,d=certify(train,check)
     assert d.verified
     assert d.program==rules[0].program
