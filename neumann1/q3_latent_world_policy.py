@@ -60,6 +60,9 @@ class TrainableLatentWorldPolicy:
         except ImportError as exc:
             raise RuntimeError("peft needed for actual neural updating") from exc
         self.torch=torch
+        # A/B/C must share the same frozen *initial* adapter parameters.
+        # Sampling also uses a task-prompt-derived seed during inference.
+        torch.manual_seed(seed)
         self.tokenizer=Tokenizer.from_pretrained(
             model_name,revision=revision,trust_remote_code=False)
         if self.tokenizer.pad_token_id is None:
