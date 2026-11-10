@@ -88,6 +88,9 @@ def test_one_engine_learns_a_new_latent_state_from_real_source_feedback():
     former=ExperienceStructureFormer(core)
     engine=NeumannEngine(
         former,[FixtureSolver()],FixtureVerifier(),min_confidence=0.8)
+    # The new learned causal core does not instantiate the historical
+    # human-defined AST synthesis grammar anywhere in its hot path.
+    assert engine._meta_inventor is None
     p=fixture_problem()
 
     before=engine.solve(p)
@@ -125,6 +128,7 @@ def test_one_engine_learns_a_new_latent_state_from_real_source_feedback():
     assert after.representation.confidence>=0.8
     # New concept came from the model, not candidate_ir metadata.
     assert "candidate_ir" not in p.metadata
+    assert engine._meta_inventor is None
 
 
 def test_sealed_source_is_unusable_for_learning_or_adaptive_retesting():
