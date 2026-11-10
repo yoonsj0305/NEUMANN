@@ -122,6 +122,10 @@ class CausalExperienceCore:
     def hypotheses(self):
         return self._hypotheses
 
+    @property
+    def task_id(self):
+        return self._task
+
     def start(self,task_id,context,allowed_queries,*,sealed_queries=()):
         """Open only explicit, bounded observations; never open target gold."""
         if self._frozen:
