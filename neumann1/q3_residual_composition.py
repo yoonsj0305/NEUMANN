@@ -68,6 +68,64 @@ def _sequential_code(first,second):
     return validate_code(code)
 
 
+def induce_residual_guided_compositions(train,*,max_candidates=6):
+    """Reinvent second-stage operators on the residual left by a first stage.
+
+    Both classical and learned Q3 arms have the same SOURCE-only grammar.
+    Reserved SOURCE checks and external target answers never enter here.
+    """
+    if not 2<=len(train)<=32 or not 1<=max_candidates<=16:
+        raise ValueError("bounded SOURCE method-composition budget required")
+    first_steps=induce_source_residual_probes(train,max_probes=8)
+    ranked=[]
+    for first in first_steps:
+        try:
+            intermediate=[first.execute(x) for x,y in train]
+            residual=list(zip(intermediate,[y for x,y in train]))
+            before=sum(
+                source_edit_f1(x,y,p)
+                for (x,y),p in zip(train,intermediate))/len(train)
+            second_steps=induce_source_residual_probes(
+                residual,max_probes=5)
+        except (TypeError,ValueError,IndexError,KeyError,OverflowError):
+            continue
+        for second in second_steps:
+            if first.program==second.program:
+                continue
+            try:
+                predicted=[second.execute(v) for v in intermediate]
+                after=sum(
+                    source_edit_f1(x,y,p)
+                    for (x,y),p in zip(train,predicted))/len(train)
+                if after<=before+1e-9:
+                    continue
+                exact=all(
+                    source_same_value(p,y)
+                    for p,(_,y) in zip(predicted,train))
+                code=_sequential_code(first.program,second.program)
+            except (TypeError,ValueError,IndexError,KeyError,OverflowError):
+                continue
+            if len(code)>6000:
+                continue
+            ranked.append((
+                -int(exact),-after,len(code),
+                StructuralFactor(
+                    code,"source-composition/residual-guided-program",
+                    3 if exact else 18,len(train))))
+    ranked.sort(key=lambda item:(
+        item[0],item[1],item[2],item[3].program))
+    seen=set()
+    result=[]
+    for _,_,_,factor in ranked:
+        if factor.program in seen:
+            continue
+        seen.add(factor.program)
+        result.append(factor)
+        if len(result)>=max_candidates:
+            break
+    return tuple(result)
+
+
 def induce_source_compositions(train,*,max_candidates=6):
     """Generate bounded new source-dependent methods, no domain dispatch."""
     if not 2<=len(train)<=32 or not 1<=max_candidates<=16:
@@ -87,7 +145,8 @@ def induce_source_compositions(train,*,max_candidates=6):
     for src,changes in grouped.items():
         dst,n=sorted(changes,key=lambda p:(-p[1],repr(p[0])))[0]
         best[src]=dst
-    candidates=[]
+    candidates=list(induce_residual_guided_compositions(
+        train,max_candidates=min(6,max_candidates)))
     if len(best)>=2:
         mapping=sorted(best.items(),key=lambda a:repr(a[0]))[:8]
         code=_parallel_code(mapping)
