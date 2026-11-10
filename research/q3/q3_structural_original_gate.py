@@ -189,7 +189,10 @@ def _classical_arcana(source,targets):
         return [],"ABSTAIN_NATIVE_"+type(exc).__name__
 
 
-def infer(blind,teacher_file,output,*,external_source_prior=None):
+def infer(blind,teacher_file,output,*,external_source_prior=None,
+          max_proposals=12):
+    if max_proposals not in (1,2,12):
+        raise ValueError("pre-registered causal 1/2/12 proposal budgets only")
     inp=json.loads(Path(blind).read_text())
     if inp.get("schema")!=SCHEMA or not inp.get("no_target_gold_in_blind"):
         raise ValueError("invalid original author blind")
@@ -251,7 +254,8 @@ def infer(blind,teacher_file,output,*,external_source_prior=None):
                 representation_prior=(
                     representation_prior if arm=="C" else None))
             outcome=SingleDiscoveryCore(
-                policy,runner,memory=library,max_proposals=12).discover(
+                policy,runner,memory=library,
+                max_proposals=max_proposals).discover(
                 train,checks,reuse_memory=False)
             discovery=outcome.discovery
             solved_code=cached if cached is not None else (
@@ -307,7 +311,7 @@ def infer(blind,teacher_file,output,*,external_source_prior=None):
         "same_general_executable_substrate":True,
         "max_states":6500,
         "max_evaluations":250000,
-        "max_proposals":12,
+        "max_proposals":max_proposals,
         "target_gold_accessed":False,
         "records":all_results,
     }
@@ -442,6 +446,7 @@ if __name__=="__main__":
             x.add_argument("--blind",required=True)
             x.add_argument("--teachers",required=True)
             x.add_argument("--representation-prior",default=None)
+            x.add_argument("--max-proposals",type=int,default=12)
             x.add_argument("--out",required=True)
         if name=="score":
             x.add_argument("--blind",required=True)
@@ -463,7 +468,8 @@ if __name__=="__main__":
         freeze_arcana_next8(args.original,args.out,skip=8)
     elif args.cmd=="infer":
         infer(args.blind,args.teachers,args.out,
-              external_source_prior=args.representation_prior)
+              external_source_prior=args.representation_prior,
+              max_proposals=args.max_proposals)
     elif args.cmd=="score":
         score(args.blind,args.predictions,args.expected_sha,
               args.original,args.out)
