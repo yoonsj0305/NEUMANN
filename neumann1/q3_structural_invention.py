@@ -31,6 +31,7 @@ from .q3_structure_factorization import induce_structural_factors
 from .q3_object_graph_invention import induce_object_graph_factors
 from .q3_source_residual_probes import induce_source_residual_probes
 from .q3_residual_composition import induce_source_compositions
+from .q3_coordinate_morphisms import induce_coordinate_morphisms
 
 _INVALID = object()
 
@@ -330,6 +331,12 @@ class StructuralInventionPolicy:
                 source_pairs,max_candidates=min(6,self.max_candidates))),
             list(induce_source_residual_probes(
                 source_pairs,max_probes=min(8,self.max_candidates))),
+            # The old grammar could not represent any shape-changing
+            # index transformations (7/20 original SOURCE tasks had ZERO
+            # hypotheses). Source-only axis morphisms lift array geometry
+            # to an executable method without benchmark-task routing.
+            list(induce_coordinate_morphisms(
+                source_pairs,max_candidates=min(4,self.max_candidates))),
         )
         for family in families:
             if self.representation_prior is not None:
