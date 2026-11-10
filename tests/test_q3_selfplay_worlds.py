@@ -39,7 +39,8 @@ def test_model_generated_only_teacher_must_be_independently_executable(tmp_path)
     path.write_text("".join(canonical(w)+"\n" for w in rows))
     accepted,digest=validate_worlds(path,runner)
     assert len(accepted)==2 and len(digest)==64
-    rows[0]["synthetic_test"][-1][-1]=888888
+    original_x,_=rows[0]["synthetic_test"][-1]
+    rows[0]["synthetic_test"][-1]=[original_x,888888]
     path.write_text("".join(canonical(w)+"\n" for w in rows))
     with pytest.raises(ValueError,match="failed real executor"):
         validate_worlds(path,runner)
