@@ -39,8 +39,9 @@ def _dependencies():
 class LocalCausalCodePolicy:
     def __init__(self,*,model_name=DEFAULT_MODEL,model_revision=None,
                  adapter_path=None,max_new_tokens=400,temperature=0.3,
-                 seed=1007):
-        if not 32<=max_new_tokens<=2048 or not 0<temperature<=1:
+                 seed=1007,max_context_tokens=4096):
+        if (not 32<=max_new_tokens<=2048 or not 0<temperature<=1
+                or not 512<=max_context_tokens<=8192):
             raise ValueError("finite generation bounds required")
         torch,Model,Tokenizer=_dependencies()
         self.torch=torch
@@ -64,6 +65,7 @@ class LocalCausalCodePolicy:
         self.max_new_tokens=max_new_tokens
         self.temperature=temperature
         self.seed=seed
+        self.max_context_tokens=max_context_tokens
         self.device=next(self.model.parameters()).device
 
     def propose(self,prompt):
@@ -73,7 +75,7 @@ class LocalCausalCodePolicy:
         # A truncated repair prompt would train a different policy than
         # the live policy, and make independent SOURCE verification suspect.
         ids=require_full_source_context(
-            self.tokenizer,rendered,max_tokens=1536)
+            self.tokenizer,rendered,max_tokens=self.max_context_tokens)
         tokens=self.torch.tensor(
             [ids],dtype=self.torch.long,device=self.device)
         tokens={"input_ids":tokens,
@@ -219,7 +221,7 @@ def finetune_source_policy(
         # from prior original-author SOURCE episodes, never TARGET answers.
         completion=teacher_code+tokenizer.eos_token
         full_ids,labels=model_training_ids(
-            tokenizer,prompt,completion,max_length=1536)
+            tokenizer,prompt,completion,max_length=4096)
         inputs=torch.tensor([full_ids],dtype=torch.long,device=device)
         targets=torch.tensor([labels],dtype=torch.long,device=device)
         optimizer.zero_grad(set_to_none=True)
@@ -242,6 +244,8 @@ def finetune_source_policy(
         "source_sha256":source_sha,
         "source_programs":len(source),
         "training_objective":training_objective,
+        "inference_max_context_tokens":4096,
+        "train_prompt_and_code_max_tokens":4096,
         "repair_examples":sum(phase in ("TRAIN_SOURCE","INDEPENDENT_SOURCE")
                               for _,_,phase,_,_ in learning_rows),
         "training_pairs_sha256":hashlib.sha256(json.dumps(
