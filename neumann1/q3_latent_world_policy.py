@@ -19,13 +19,16 @@ def _canonical(x):
 
 
 WORLD_SYSTEM=(
-    "Infer latent causal world structure from SOURCE observations. "
-    "Reply ONLY as JSON: {\"hypotheses\":[{\"name\":\"h1\","
-    "\"kind\":\"neumann.latent\",\"latent_variables\":{\"variable\":"
-    "\"meaning\"},\"relations\":{},\"predictions\":{\"query_id\":"
-    "\"predicted observed JSON value\"}}]}. You may invent new latent "
-    "variables and relations; output need not be Python or a fixed DSL. "
-    "Predict ONLY declared query IDs. Prefer falsifiable alternatives."
+    "Infer a latent causal world model from SOURCE observations. "
+    "Return one JSON OBJECT, not a JSON array or markdown. "
+    "Its key 'hypotheses' must contain 1 or 2 hypothesis objects. "
+    "Each hypothesis has: name (short string), kind ('neumann.latent'), "
+    "latent_variables (map of newly hypothesized variables to meanings), "
+    "relations (map of testable relationships), and predictions "
+    "(map from ACTUAL authorized_query_inputs keys to predicted outcomes). "
+    "Do not copy placeholder keys like 'query_id' or template descriptions. "
+    "Use ONLY the real query IDs in the user input. No SOURCE answer oracle. "
+    "Your concepts may be novel; no Python code or fixed answer DSL required."
 )
 PREDICTION_SYSTEM=(
     "Predict what the next SOURCE intervention will cause. Given a latent "
@@ -119,15 +122,28 @@ class TrainableLatentWorldPolicy:
         fence=chr(96)*3
         if raw.startswith(fence):
             raw=raw.split("\n",1)[-1].split(fence,1)[0].strip()
+        from .causal_experience import LatentHypothesisFormatError
         try:
             parsed=json.loads(raw)
         except json.JSONDecodeError as exc:
-            raise ValueError("model did not produce latent-state JSON") from exc
+            raise LatentHypothesisFormatError(
+                "model did not produce latent-state JSON") from exc
         if not isinstance(parsed,dict):
-            raise ValueError("latent hypotheses must be JSON object")
+            raise LatentHypothesisFormatError(
+                "latent hypotheses must be a JSON object")
         proposals=parsed.get("hypotheses")
         if not isinstance(proposals,list) or not 1<=len(proposals)<=2:
-            raise ValueError("model must propose 1 or 2 world hypotheses")
+            raise LatentHypothesisFormatError(
+                "model must propose 1 or 2 world hypotheses")
+        if any(
+            not isinstance(item,dict) or
+            not isinstance(item.get("predictions"),dict) or
+            not item.get("predictions") or
+            set(item["predictions"])-set(allowed_queries)
+            for item in proposals
+        ):
+            raise LatentHypothesisFormatError(
+                "model produced no real authorized SOURCE query predictions")
         self._last_latent_prefix=prefix
         return proposals
 
@@ -208,6 +224,53 @@ class TrainableLatentWorldPolicy:
             "actual_trainable_weight_delta_l1":delta,
             "outcome_provenance":"TRUSTED_SOURCE_ONLY",
             "not_independent_Q3_Q6_proof":True,
+        }
+
+    def learn_grounded_source_without_hypothesis(
+            self,*,task_id,context,query,observed,evidence_id):
+        """Actual SOURCE consequence gradient when NO hypothesis was formed.
+
+        This is *not* causal theory discovery. It trains the SAME weights
+        used by hypotheses() to predict a verified next observation and
+        thereby removes the zero-learning deadlock caused by invalid JSON.
+        No fabricated concept, TARGET gold, new model or added task solver.
+        """
+        if self.update_count>=self.max_updates:
+            return None
+        if (not isinstance(task_id,str) or not task_id or
+                not isinstance(evidence_id,str) or not evidence_id):
+            raise ValueError("authorized SOURCE and evidence IDs required")
+        prefix=_chat(self.tokenizer,PREDICTION_SYSTEM,_canonical({
+            "task_id":task_id,
+            "prior_world_observations":context,
+            "authorized_SOURCE_query":query,
+            "formed_hypothesis":None,
+            "hypothesis_formation_failed":True,
+        }))
+        self.model.train()
+        self.optimizer.zero_grad(set_to_none=True)
+        loss=self._loss(prefix,_canonical(observed))
+        if not self.torch.isfinite(loss):
+            raise ValueError("nonfinite verified observation loss")
+        trainable=[p for p in self.model.parameters() if p.requires_grad]
+        before=[p.detach().clone() for p in trainable]
+        loss.backward()
+        self.torch.nn.utils.clip_grad_norm_(trainable,1.0)
+        self.optimizer.step()
+        delta=sum(float((p.detach()-b).abs().sum().cpu())
+                  for p,b in zip(trainable,before))
+        self.model.eval()
+        self.update_count+=1
+        return {
+            "schema":"NEUMANN.CAUSAL.PREHYPOTHESIS-SOURCE-UPDATE.v1",
+            "updates":self.update_count,
+            "learning_objective":"VERIFIED_NEXT_OBSERVATION_NO_HYPOTHESIS",
+            "source_prediction_loss":float(loss.detach().cpu()),
+            "actual_trainable_weight_delta_l1":delta,
+            "original_TARGET_gold_seen":False,
+            "provenance":"TRUSTED_SOURCE_ONLY",
+            "new_causal_concept_proven":False,
+            "generalization_proven":False,
         }
 
     def save_learned_weights(self,directory):
