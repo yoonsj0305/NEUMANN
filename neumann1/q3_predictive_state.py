@@ -125,7 +125,12 @@ class PredictiveStatePolicy:
         return {
             "prediction":choices[idx],
             "raw_relative_loglik":[round(float(x),6) for x in scores.cpu()],
-            "representation":"LEARNED_HIDDEN_ACTIVATION_CONDITIONAL",
+            # This path predicts original-author answer *labels*. Hidden
+            # Transformer activations are NOT evidence that a reusable
+            # causal concept, state coordinate or invention policy formed.
+            "representation":"PRETRAINED_HIDDEN_STATE_OPTION_SCORING",
+            "explicit_new_concept_discovered":False,
+            "hypothesis_intervention_revision_learned":False,
             "calibrated_probability":False,
             "no_human_authored_domain_answer_rule":True,
         }
@@ -173,5 +178,7 @@ class PredictiveStatePolicy:
             "source_prediction_loss":loss_value,
             "evidence_id":evidence_id,
             "scope":"TRUSTED_SOURCE_ONLY",
-            "learned_internal_representation_not_interpretable_concept_proof":True,
+            "learning_objective":"OBSERVED_LABEL_CROSS_ENTROPY",
+            "independent_concept_invention_demonstrated":False,
+            "learning_strategy_self_improvement_demonstrated":False,
         }
