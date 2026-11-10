@@ -55,7 +55,7 @@ def test_compositional_invention_abstains_when_unseen_SOURCE_refutes_mapping():
     candidate=induce_source_compositions(TRAIN,max_candidates=6)
     assert candidate
     withheld=[
-        ([[1,0,3],[0,1,3]],[[5,0,4],[0,5,4]]),
+        ([[1,3,0],[0,1,3]],[[5,4,0],[0,5,4]]),
     ]
     # Do not trust 100%-SOURCE-train fit as an original scientific PASS:
     # here a conflicting independent SOURCE relation must reject it.
