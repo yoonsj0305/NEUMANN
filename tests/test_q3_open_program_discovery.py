@@ -78,7 +78,7 @@ def test_missing_sandbox_fails_closed(monkeypatch):
 def test_no_unverified_model_outputs_promoted_into_training(tmp_path):
     example={
         "schema":"NEUMANN.Q3.PROGRAM-SOURCE-TEACHER.v1",
-        "pairs":[([1,2],[3,4])],
+        "pairs":[([1,2],[3,4]),([2,3],[4,5])],
         "program":"def transform(x):\n    return x",
         "sha256":"not_the_actual_sha",
         "independent_checks":1,
