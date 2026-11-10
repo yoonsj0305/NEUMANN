@@ -238,11 +238,17 @@ jobs:
           from pathlib import Path
           result=json.loads(Path("score/POSTFIRST_ORIGINAL_SCORE.json").read_text())["summary"]
           assert result["q3_global"]=="OPEN"
-          assert result["scientific_scope"]=="PREVIOUSLY_EXPOSED_AUTHOR_SOURCE_DEV"
-          print("Q3_AUTHOR_ORIGINAL_RESULT_NOT_GLOBAL_PASS",result,flush=True)
+          assert result["scientific_scope"]=="PROSPECTIVE_100_RELATIVE_TO_PRIOR_50_ONLY"
+          assert result["source_original_cohort_denominator"]==100
+          assert result["source_certified_originals"]==3
+          assert 0<=result["exact_originals"]<=result["source_certified_originals"]
+          assert result["prediction_sha256"]==Path("predictions/PREDICTIONS.sha256").read_text().split()[0]
+          print("Q3_PROSPECTIVE_100_EXACT_ORIGINALS_Q3_STILL_OPEN",result,flush=True)
           PY
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: q3-coordinate-original-author-scored-not-global-Q3
           path: score/
+          if-no-files-found: warn
           retention-days: 90
