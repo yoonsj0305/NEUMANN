@@ -152,3 +152,48 @@ def test_source_invents_orientation_of_one_object_without_rotating_unrelated_obj
     assert result.verified
     assert result.program not in ("def transform(x):\n    return x",)
     assert "mapping=" in result.program
+
+
+
+def test_one_general_rewrite_invents_object_duplication_with_source_proof():
+    def scene(r,c):
+        item=[(r,c),(r,c+1)]
+        copy=[(r,c+3),(r,c+4)]
+        anchor=[(5,8),(6,8)]
+        return (
+            canvas([(1,item),(2,anchor)]),
+            canvas([(1,item),(1,copy),(2,anchor)]))
+    train=[scene(1,0),scene(2,1)]
+    check=[scene(3,0)]
+    rules=induce_object_graph_factors(train)
+    assert rules
+    assert "graph-rewrite/category" in rules[0].representation
+    assert "for dr,dc,dest,orientation in mapping[val]" in rules[0].program
+    p,d=certify(train,check)
+    assert d.verified
+    assert d.program==rules[0].program
+
+
+def test_one_general_rewrite_invents_object_deletion_from_source_differences():
+    def scene(r,c):
+        deleted=[(r,c),(r,c+1)]
+        keep=[(5,8),(6,8)]
+        return (canvas([(1,deleted),(2,keep)]),
+                canvas([(2,keep)]))
+    train=[scene(1,0),scene(2,1)]
+    check=[scene(3,0)]
+    rules=induce_object_graph_factors(train)
+    assert rules
+    assert "graph-rewrite/category" in rules[0].representation
+    p,d=certify(train,check)
+    assert d.verified
+    assert d.program==rules[0].program
+
+
+def test_no_graph_rule_claim_without_executable_source_reconstruction():
+    # Same source object identity, inconsistent creation/deletion on two
+    # independent SOURCE demonstrations. Must not fabricate a fit.
+    inp=canvas([(1,[(1,1),(1,2)]),(2,[(5,7),(6,7)])])
+    out1=canvas([(2,[(5,7),(6,7)])])
+    out2=canvas([(1,[(1,1),(1,2)]),(2,[(5,7),(6,7)])])
+    assert induce_object_graph_factors([(inp,out1),(inp,out2)])==()
