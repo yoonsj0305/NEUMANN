@@ -106,6 +106,9 @@ class CausalExperienceCore:
         self._hypotheses=()
         self._evaluated_queries=set()
         self._last_update=None
+        self._sealed_queries=set()
+        self._source_certified=False
+        self._source_certification_opened=False
 
     def freeze(self):
         """No original-target outcome may update the learned policy."""
@@ -119,13 +122,18 @@ class CausalExperienceCore:
     def hypotheses(self):
         return self._hypotheses
 
-    def start(self,task_id,context,allowed_queries):
+    def start(self,task_id,context,allowed_queries,*,sealed_queries=()):
         """Open only explicit, bounded observations; never open target gold."""
+        if self._frozen:
+            raise ValueError("cannot start new hypothesis during frozen scoring")
         if not isinstance(task_id,str) or not task_id:
             raise ValueError("source identity required")
         if not isinstance(allowed_queries,dict) or not 1<=len(allowed_queries)<=16:
             raise ValueError("authorized SOURCE query map required")
         _json(context);_json(allowed_queries)
+        sealed=set(sealed_queries)
+        if not sealed.issubset(allowed_queries) or not sealed:
+            raise ValueError("at least one predeclared sealed SOURCE check required")
         # Reuse causal failures as SOURCE experience, not cached answers.
         history=tuple(self.experiences[-self.max_experiences:])
         raw=self.policy.hypotheses(context,history,dict(allowed_queries))
@@ -141,6 +149,9 @@ class CausalExperienceCore:
         self._allowed=dict(allowed_queries)
         self._hypotheses=candidates
         self._evaluated_queries=set()
+        self._sealed_queries=sealed
+        self._source_certified=False
+        self._source_certification_opened=False
         self._last_update=None
         return candidates
 
@@ -155,7 +166,7 @@ class CausalExperienceCore:
             raise ValueError("start a SOURCE hypothesis first")
         choices=[]
         for query in sorted(self._allowed):
-            if query in self._evaluated_queries:
+            if query in self._evaluated_queries or query in self._sealed_queries:
                 continue
             guesses=[_json(h.predictions[query]) for h in self._hypotheses
                      if query in h.predictions]
@@ -179,6 +190,8 @@ class CausalExperienceCore:
             raise ValueError("frozen independent evaluation cannot learn")
         if self._task is None or query_id not in self._allowed:
             raise ValueError("unregistered SOURCE query")
+        if query_id in self._sealed_queries:
+            raise ValueError("reserved independent SOURCE check may not train policy")
         if query_id in self._evaluated_queries:
             raise ValueError("no repeat tuning on an already revealed query")
         if len(self.experiences)>=self.max_experiences:
@@ -243,9 +256,38 @@ class CausalExperienceCore:
         used=set(self._evaluated_queries)
         task=self._task
         allowed=dict(self._allowed)
-        result=self.start(task,context,allowed)
+        sealed=set(self._sealed_queries)
+        result=self.start(task,context,allowed,sealed_queries=sealed)
         self._evaluated_queries=used
         return result
+
+    def certify_sealed_source(self,query_id,observed,*,evidence_id,
+                              verify_source):
+        """One-shot, sealed SOURCE check of the *frozen* top hypothesis.
+
+        Never feeds outcomes into hypothesis generation or weight updates.
+        If wrong, the latent representation stays unsupported/low confidence.
+        """
+        if not self._frozen or self._task is None:
+            raise ValueError("freeze hypotheses before independent SOURCE check")
+        if query_id not in self._sealed_queries:
+            raise ValueError("this query was not pre-registered as sealed")
+        if self._source_certification_opened:
+            raise ValueError("sealed SOURCE checker is one-shot")
+        if not isinstance(evidence_id,str) or not evidence_id:
+            raise ValueError("independent SOURCE evidence identity required")
+        _json(observed)
+        if not callable(verify_source) or verify_source(
+                self._task,query_id,self._allowed[query_id],
+                observed,evidence_id) is not True:
+            raise ValueError("unverified sealed SOURCE observation")
+        # Mark before assessing any output: no adaptive second attempt.
+        self._source_certification_opened=True
+        hypothesis=self._hypotheses[0]
+        self._source_certified=(
+            query_id in hypothesis.predictions and
+            _json(hypothesis.predictions[query_id])==_json(observed))
+        return self._source_certified
 
     def representation(self):
         """Expose an unverified latent state; downstream verifier still rules."""
@@ -254,14 +296,18 @@ class CausalExperienceCore:
             return Representation(IRKind.UNKNOWN,{},0.0,
                                   "no model-generated latent hypothesis")
         h=self._hypotheses[0]
-        # A SOURCE hypothesis does NOT get a numeric truth probability from
-        # mere fit, nor become eligible for unverified physical actuation.
+        # SOURCE prediction checks are not calibrated posterior confidence.
+        # 0.85 is a *bounded research admission gate*, not certainty about
+        # unobserved consequences or a physical-safety certificate.
         return Representation(
             kind=h.kind,
             payload={"latent_variables":h.latent_variables,
                      "relations":h.relations,
                      "hypothesis_sha256":h.digest},
-            confidence=0.0,
-            rationale="unverified model-induced latent representation; "
-                      "requires independent downstream validation",
+            confidence=0.85 if self._source_certified else 0.0,
+            rationale=("sealed independent SOURCE prediction agreed; "
+                       "still requires downstream TARGET verification"
+                       if self._source_certified else
+                       "unverified model-induced latent representation; "
+                       "requires independent downstream validation"),
         )
