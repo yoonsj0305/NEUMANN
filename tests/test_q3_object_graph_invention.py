@@ -117,12 +117,18 @@ def test_frozen_source_graph_rewrite_degrades_on_unseen_feature_class():
     factors=induce_object_graph_factors(known)
     assert factors
     runner=IsolatedPython(max_seconds=8)
-    # A new unseen non-background token not present in the learned
-    # observation -> output identity (not fabricated perfect SOURCE fit).
-    changed=source(label=5,origin=(0,0))[0]
-    run=runner.evaluate(factors[0].program,[changed])
+    # Relative "source" symbol roles must generalize to an unseen color,
+    # even if SOURCE training only used literal color 1.
+    unseen_input,unseen_expected=source(label=5,origin=(0,0))
+    run=runner.evaluate(factors[0].program,[unseen_input])
     assert run.status=="EXECUTED"
-    assert source_same_value(run.outputs[0],changed)
+    assert source_same_value(run.outputs[0],unseen_expected)
+    # Unknown geometric feature class must fail safely to original input,
+    # never claim a verified transformation from unsupported morphology.
+    alien=canvas([(7,[(0,0)]),(2,[(5,7),(6,7)])])
+    unknown=runner.evaluate(factors[0].program,[alien])
+    assert unknown.status=="EXECUTED"
+    assert source_same_value(unknown.outputs[0],alien)
 
 
 
@@ -167,7 +173,9 @@ def test_one_general_rewrite_invents_object_duplication_with_source_proof():
     check=[scene(3,0)]
     rules=induce_object_graph_factors(train)
     assert rules
-    assert "graph-rewrite/category" in rules[0].representation
+    assert rules[0].representation.startswith("source-inferred-graph-rewrite/")
+    # Shape-conditioned rules may be strictly better than literal color
+    # memories; do not artificially force the weaker category hypothesis.
     assert "for dr,dc,dest,orientation in mapping[val]" in rules[0].program
     p,d=certify(train,check)
     assert d.verified
@@ -184,7 +192,7 @@ def test_one_general_rewrite_invents_object_deletion_from_source_differences():
     check=[scene(3,0)]
     rules=induce_object_graph_factors(train)
     assert rules
-    assert "graph-rewrite/category" in rules[0].representation
+    assert rules[0].representation.startswith("source-inferred-graph-rewrite/")
     p,d=certify(train,check)
     assert d.verified
     assert d.program==rules[0].program
