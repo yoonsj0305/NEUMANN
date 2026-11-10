@@ -144,7 +144,7 @@ def freeze(*,folio_train,folio_validation,bbh,out_visible,
                 x for x in _select_unique_group(
                     test_rows,domain+"/target")
                 if x["group_id"] not in source_story_ids][
-                    :TARGETS_PER_DOMAIN]]
+                    :TARGETS_PER_DOMAIN]
         if len(targets)!=TARGETS_PER_DOMAIN:
             raise ValueError("not enough untouched original author targets")
         for i in range(TRAIN_EPISODES_PER_DOMAIN):
