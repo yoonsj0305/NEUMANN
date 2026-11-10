@@ -62,6 +62,12 @@ def fixture_problem():
             "sealed_query":{"input":"sealed_query"},
         },
         "sealed_source_query_ids":["sealed_query"],
+        # Both evidence queries refer to one externally identified mechanism.
+        # This identity is not a solution, label or algorithm family.
+        "source_episode_bindings":{
+            "train_query":"original-author-episode-1",
+            "sealed_query":"original-author-episode-1",
+        },
         "observations":{"raw":[1,2,3]},
     })
 
@@ -136,7 +142,9 @@ def test_sealed_source_is_unusable_for_learning_or_adaptive_retesting():
     policy=AdaptiveFixturePolicy()
     core=CausalExperienceCore(policy,max_hypotheses=2)
     core.start("example.source",{"raw":[1,2]},fixture_problem().metadata[
-        "source_queries"],sealed_queries={"sealed_query"})
+        "source_queries"],sealed_queries={"sealed_query"},
+        episode_bindings=fixture_problem().metadata[
+            "source_episode_bindings"])
     with pytest.raises(ValueError,match="reserved independent SOURCE"):
         core.observe("sealed_query","revised",evidence_id="sealed_query.signed",
                      verify_source=source_observation_verifier)
@@ -217,7 +225,34 @@ def test_missing_experience_and_unauthorized_prediction_fail_closed():
         illegal.start("example.source",{},{
             "train_query":{"input":"train_query"},
             "sealed_query":{"input":"sealed_query"}},
-            sealed_queries={"sealed_query"})
+            sealed_queries={"sealed_query"},
+            episode_bindings=fixture_problem().metadata[
+                "source_episode_bindings"])
+
+
+def test_unrelated_source_worlds_cannot_certify_a_target_mechanism():
+    """This is the exact Q3/Q6 error from previous external-original tests."""
+    policy=AdaptiveFixturePolicy()
+    core=CausalExperienceCore(policy,max_hypotheses=2)
+    former=ExperienceStructureFormer(core)
+    problem=fixture_problem()
+    # Two unrelated original stories are domain examples, not causal
+    # interventions into the same latent mechanism.
+    problem.metadata["source_episode_bindings"]={
+        "train_query":"unrelated-story-A",
+        "sealed_query":"unrelated-story-B",
+    }
+    response=former.form(problem,CostLedger())
+    assert response.kind==IRKind.UNKNOWN
+    assert response.confidence==0.0
+    assert core.task_id is None
+    with pytest.raises(ValueError,match="same-mechanism"):
+        core.start(
+            "example.source",{"raw":[1,2]},
+            problem.metadata["source_queries"],
+            sealed_queries={"sealed_query"},
+            episode_bindings=problem.metadata["source_episode_bindings"])
+    assert policy.learn_calls==0
 
 
 def test_old_fixed_ir_scaffold_remains_available_as_degraded_mode():
