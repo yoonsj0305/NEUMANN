@@ -24,6 +24,9 @@ from .q3_object_graph_invention import induce_object_graph_factors
 from .q3_source_residual_probes import (
     induce_source_residual_probes,source_edit_f1)
 from .q3_residual_composition import induce_source_compositions
+from .q3_structure_factorization import induce_structural_factors
+from .q3_coordinate_morphisms import induce_coordinate_morphisms
+from .q3_periodic_residual_invention import induce_periodic_residual_rules
 
 
 @dataclass(frozen=True)
@@ -137,13 +140,26 @@ class LearnedRepresentationPrior:
             # First-principles deletion: stop demanding a perfect SOURCE
             # program before the discovery policy can learn from errors.
             # Probe grammars are available to BOTH frozen-classical A and C.
+            # The inference core exposes SIX representation families.
+            # Previously the SOURCE learner observed only THREE. Thus the
+            # discovery prior remained exactly zero for index-morphisms,
+            # periodic causal residuals, and structural factorization on
+            # every independent task. Give every shared A/C family real
+            # SOURCE success AND refutation evidence. The per-family cap
+            # is fixed before seeing independent checks.
             factors=(
-                tuple(induce_object_graph_factors(
-                    train,max_candidates=12))
+                tuple(induce_structural_factors(
+                    train,max_candidates=4))
+                +tuple(induce_object_graph_factors(
+                    train,max_candidates=4))
                 +tuple(induce_source_compositions(
-                    train,max_candidates=6))
+                    train,max_candidates=4))
                 +tuple(induce_source_residual_probes(
-                    train,max_probes=8))
+                    train,max_probes=4))
+                +tuple(induce_coordinate_morphisms(
+                    train,max_candidates=4))
+                +tuple(induce_periodic_residual_rules(
+                    train,max_candidates=4))
             )
             for factor in factors:
                 key=factor.representation
@@ -218,10 +234,13 @@ class LearnedRepresentationPrior:
                     evidence.name==representation.rsplit("/",1)[-1]):
                 total=(evidence.successful_transfer+
                        evidence.falsified_transfer)
-                # Partial means "a useful changed-cell relation", NOT a
-                # correct full program: credit no more than 1/2 each.
-                return ((evidence.successful_transfer+
-                         0.5*evidence.partial_transfer+1)/(total+2))
+                # Center on the unobserved Beta(1,1) prior. Otherwise
+                # even 100% REFUTED hypotheses score > 0 and are ranked
+                # ahead of entirely untried representations (score 0).
+                # Partial edits are NOT exact success: they stay in the
+                # audit ledger, but cannot turn refutation into proof.
+                return ((evidence.successful_transfer+1)/(total+2)
+                        -0.5)
         return 0.0
 
     def order_key(self,factor):
