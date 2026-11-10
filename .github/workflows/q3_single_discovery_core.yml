@@ -37,4 +37,4 @@ jobs:
           python -m pip install 'torch==2.5.1' --index-url https://download.pytorch.org/whl/cpu
       - name: Run one core across arithmetic and strings, verify memory and sandbox
         run: |
-          python -m pytest -q -x tests/test_q3_single_discovery_core.py tests/test_q3_neural_gradient_contract.py tests/test_q3_open_program_discovery.py tests/test_causal_experience_core.py
+          python -m pytest -q -x tests/test_causal_experience_core.py tests/test_q3_neural_gradient_contract.py tests/test_q3_open_program_discovery.py tests/test_q3_single_discovery_core.py
