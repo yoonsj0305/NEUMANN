@@ -30,6 +30,7 @@ from neumann1.open_program_inventor import IsolatedPython,source_same_value
 from neumann1.q3_single_discovery_core import SingleDiscoveryCore,SourceMethodMemory
 from neumann1.q3_structural_invention import (
     LearnedDiscoveryPolicy,StructuralInventionPolicy)
+from neumann1.q3_representation_policy import LearnedRepresentationPrior
 
 SCHEMA="NEUMANN.Q3.UNIFIED-STRUCTURAL-INVENTION.v1"
 ARCANA_REVISION="3f3dc8f650deb271a29e282bfb0e5ca95a7d64d6"
@@ -203,6 +204,10 @@ def infer(blind,teacher_file,output):
     fitted=LearnedDiscoveryPolicy.fit(library.episodes)
     if not fitted.weights or not fitted.provenance:
         raise ValueError("no learned discovery operator policy")
+    representation_prior=LearnedRepresentationPrior.learn(
+        library.episodes,runner)
+    print("Q3_DISCOVERY_REPRESENTATION_POLICY_SOURCE_TRAINED",
+          representation_prior.evidence(),flush=True)
     known={e.program for e in library.episodes}
 
     all_results=[]
@@ -229,7 +234,9 @@ def infer(blind,teacher_file,output):
             policy=StructuralInventionPolicy(
                 fitted_prior,max_states=6500,
                 max_evaluations=250000,max_candidates=12,
-                prior_method_count=len(library.episodes))
+                prior_method_count=len(library.episodes),
+                representation_prior=(
+                    representation_prior if arm=="C" else None))
             outcome=SingleDiscoveryCore(
                 policy,runner,memory=library,max_proposals=12).discover(
                 train,checks,reuse_memory=False)
@@ -280,6 +287,7 @@ def infer(blind,teacher_file,output):
         "teacher_sha256":sha_file(teacher_file),
         "policy_weights_sha256":sha256(canonical(fitted.weights).encode()).hexdigest(),
         "learned_operator_weights":fitted.weights,
+        "source_refutation_representation_policy":representation_prior.evidence(),
         "same_general_executable_substrate":True,
         "max_states":6500,
         "max_evaluations":250000,
