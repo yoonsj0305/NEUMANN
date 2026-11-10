@@ -33,6 +33,7 @@ from .q3_source_residual_probes import induce_source_residual_probes
 from .q3_residual_composition import induce_source_compositions
 from .q3_coordinate_morphisms import induce_coordinate_morphisms
 from .q3_periodic_residual_invention import induce_periodic_residual_rules
+from .q3_relational_predicate_invention import induce_relational_comprehensions
 
 _INVALID = object()
 
@@ -344,6 +345,11 @@ class StructuralInventionPolicy:
             # whole-array transform can reproduce it.
             list(induce_periodic_residual_rules(
                 source_pairs,max_candidates=min(4,self.max_candidates))),
+            # New relational DNF is *induced* from causal changed-cell
+            # witnesses; it is one shared method language for A and C,
+            # not a pre-written task-specific output.
+            list(induce_relational_comprehensions(
+                source_pairs,max_candidates=min(4,self.max_candidates))),
         )
         for family in families:
             if self.representation_prior is not None:
@@ -366,7 +372,7 @@ class StructuralInventionPolicy:
                         default=1000000))))
         # Interleave: at a 2-proposal budget an added family cannot consume
         # both places solely because it assigned an arbitrary cheap cost.
-        # All A/B/C arms share the identical four families and limits.
+        # All A/B/C arms share the identical families and limits.
         factors=[]
         for rank in range(max(map(len,families),default=0)):
             for family in families:
