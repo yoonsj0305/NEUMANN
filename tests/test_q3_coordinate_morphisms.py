@@ -69,7 +69,7 @@ def test_abstain_when_independent_source_refutes_a_fitting_coordinate_rule():
         ([[1,2],[3,4]],mirror([[1,2],[3,4]])),
         ([[1,4,7],[2,5,8]],mirror([[1,4,7],[2,5,8]])),
     ]
-    held=[([[1,2],[3,4]],[[1,2],[3,4]])]
+    held=[([[9,8],[7,6]],[[9,8],[7,6]])]
     methods=induce_coordinate_morphisms(train)
     assert methods
     policy=StructuralInventionPolicy(max_candidates=12)
