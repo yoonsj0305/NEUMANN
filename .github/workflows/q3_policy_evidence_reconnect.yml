@@ -3,9 +3,12 @@ on:
   push:
     branches:
       - research/q3-policy-evidence-reconnect-20261110
+      - research/q3-relational-causal-language-induction-20261110
     paths:
       - ".github/workflows/q3_policy_evidence_reconnect.yml"
       - "neumann1/q3_representation_policy.py"
+      - "neumann1/q3_structural_invention.py"
+      - "neumann1/q3_relational_predicate_invention.py"
       - "tests/test_q3_representation_policy.py"
   workflow_dispatch:
 permissions:
