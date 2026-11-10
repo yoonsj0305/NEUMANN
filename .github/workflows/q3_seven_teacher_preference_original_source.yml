@@ -1,0 +1,114 @@
+name: Q3 One-Core Source Preference Gradient - Seven Prior Teachers to Disjoint Originals
+on:
+  push:
+    branches:
+      - research/q3-one-core-preference-learning-20261110
+    paths:
+      - ".github/workflows/q3_seven_teacher_preference_original_source.yml"
+      - "neumann1/q3_preference_learning.py"
+      - "neumann1/q3_trainable_code_policy.py"
+      - "research/q3/q3_seven_teacher_preference_data.py"
+      - "research/q3/q3_model_repair_real_source_ablation.py"
+      - "tests/test_q3_preference_learning.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONHASHSEED: "0"
+  OMP_NUM_THREADS: "2"
+  OPENBLAS_NUM_THREADS: "2"
+  TOKENIZERS_PARALLELISM: "false"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+jobs:
+  actual_model_preference_gradient:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install fixed local-weight Qwen PyTorch and independent Docker verifier
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          python -m pip install -q --index-url https://download.pytorch.org/whl/cpu 'torch==2.5.1'
+          python -m pip install -q 'transformers==4.46.3' 'peft==0.14.0' 'accelerate==1.2.1' 'huggingface_hub==0.27.1' 'jinja2>=3.1.4,<4'
+          docker pull python:3.11-alpine
+          python -m pytest -q -x tests/test_q3_preference_learning.py tests/test_q3_neural_gradient_contract.py
+      - name: Read 7 frozen prior AUTHOR SOURCE model-written teachers and 100 ID-disjoint original SOURCE checks
+        run: |
+          set -euo pipefail
+          mkdir -p old_teachers heldout evidence
+          gh run download 42593621076 --name Q3-REAL-WEIGHT-LEARNING-ORIGINAL-SOURCE-BLIND --dir old_teachers
+          gh run download 42757846590 --name q3-prospective-source-100-originals-frozen --dir heldout
+          test "$(cut -d ' ' -f1 heldout/ORIGINAL_SOURCE_ONLY.sha256)" = "$(sha256sum heldout/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from neumann1.q3_trainable_code_policy import source_training_rows
+          teachers,sha=source_training_rows('old_teachers/SOURCE_TEACHERS.jsonl')
+          targets=json.loads(Path("heldout/ORIGINAL_SOURCE_ONLY.json").read_text())
+          assert len(teachers)==7
+          assert targets["original_source_count"]==100
+          assert targets["no_target_gold_in_payload"] is True
+          assert not ({str(t["original_id"]) for t in teachers} &
+                      {r["source_id"] for r in targets["records"]})
+          revision=Path("old_teachers/MODEL_REVISION.txt").read_text().strip()
+          assert revision=="ea3f2471cf1b1f0db85067f1ef93848e38e88c25"
+          print("Q3_SEVEN_VERIFIED_TEACHER_REGISTRY_ID_DISJOINT",sha,flush=True)
+          PY
+      - name: Actual pretrained model emits errors; attest source-only corrected open programs
+        run: |
+          set -euo pipefail
+          python -u -m research.q3.q3_seven_teacher_preference_data \
+            --teachers old_teachers/SOURCE_TEACHERS.jsonl \
+            --model-revision "$(cat old_teachers/MODEL_REVISION.txt)" \
+            --out evidence/REAL_MODEL_REFUTATION_PREFERENCES.jsonl \
+            --report evidence/REAL_REFUTATION_PROVENANCE.json \
+            --max-teachers 7
+          sha256sum evidence/REAL_MODEL_REFUTATION_PREFERENCES.jsonl \
+            > evidence/REAL_MODEL_REFUTATION_PREFERENCES.sha256
+      - name: Update ONE generator using frozen-base contrastive executable preferences, then evaluate A/C
+        run: |
+          set -euo pipefail
+          if [ ! -s evidence/REAL_MODEL_REFUTATION_PREFERENCES.jsonl ]; then
+            echo "Q3_NO_GENUINE_ON_POLICY_PREFERENCE_EVIDENCE_ABSTAIN" | tee evidence/Q3_NO_PREFERENCE_TEACHER.txt
+            exit 0
+          fi
+          python -u -m neumann1.q3_trainable_code_policy \
+            --sources evidence/REAL_MODEL_REFUTATION_PREFERENCES.jsonl \
+            --model-revision "$(cat old_teachers/MODEL_REVISION.txt)" \
+            --model Qwen/Qwen2.5-Coder-0.5B-Instruct \
+            --adapter-output adapter \
+            --objective source_preference \
+            --steps 8 \
+            --seed 1007
+          python -u -m research.q3.q3_model_repair_real_source_ablation \
+            --cohort heldout/ORIGINAL_SOURCE_ONLY.json \
+            --model-revision "$(cat old_teachers/MODEL_REVISION.txt)" \
+            --adapter adapter \
+            --limit 6 --max-proposals 2 \
+            --out evidence/PREFERENCE_LEARNED_VS_BASE_6_REAL_AUTHOR_SOURCE.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("evidence/PREFERENCE_LEARNED_VS_BASE_6_REAL_AUTHOR_SOURCE.json").read_text())
+          s=d["summary"]
+          assert s["source_originals"]==6
+          assert s["original_TEST_gold_accessed"] is False
+          assert s["q3_global"]=="OPEN"
+          print("Q3_REAL_BASE_VS_PREFERENCE_GRADIENT",{
+            k:s[k] for k in ("A_exact_source","C_exact_source","C_exclusive_source","A_exclusive_source")},flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-one-core-seven-source-preference-gradient-original-author-source-ablation
+          path: |
+            evidence/
+            adapter/neumann_source_training_manifest.json
+          if-no-files-found: warn
+          retention-days: 90
