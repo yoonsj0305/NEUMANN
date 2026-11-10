@@ -28,6 +28,7 @@ from .q3_structure_factorization import induce_structural_factors
 from .q3_coordinate_morphisms import induce_coordinate_morphisms
 from .q3_periodic_residual_invention import induce_periodic_residual_rules
 from .q3_relational_predicate_invention import induce_relational_comprehensions
+from .q3_relational_reduce_invention import induce_relational_reducers
 
 
 @dataclass(frozen=True)
@@ -162,6 +163,8 @@ class LearnedRepresentationPrior:
                 +tuple(induce_periodic_residual_rules(
                     train,max_candidates=4))
                 +tuple(induce_relational_comprehensions(
+                    train,max_candidates=4))
+                +tuple(induce_relational_reducers(
                     train,max_candidates=4))
             )
             for factor in factors:
