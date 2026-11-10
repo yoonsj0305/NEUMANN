@@ -1,0 +1,72 @@
+name: Q3Q6 Score Existing SHA-Frozen Original Predictions Only
+on:
+  push:
+    branches:
+      - research/q3q6-frozen-crosssemantic-original-20261110
+    paths:
+      - ".github/workflows/q3q6_score_existing_frozen.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  independent_original_scorer_without_model_or_training:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3q6-frozen-original-author-visible-source
+          path: visible
+          run-id: 42834364029
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3q6-original-target-gold-sealed-scorer-only
+          path: target_gold
+          run-id: 42834364029
+          github-token: TOKEN_PLACEHOLDER
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3q6-neural-source-learned-frozen-original-predictions
+          path: frozen_predictions
+          run-id: 42834364029
+          github-token: TOKEN_PLACEHOLDER
+      - name: Validate immutable original predictions and score without model dependencies
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          sha256sum -c frozen_predictions/predictions.sha256
+          mkdir -p scored_originals
+          python -m research.q3.q3q6_original_transfer_run score \
+            --predictions frozen_predictions/learned_latent_original_predictions.json \
+            --gold target_gold/original_gold.json \
+            --manifest visible/frozen_original_manifest.json \
+            --out scored_originals/q3q6_original_two_domain_verdict.json
+          sha256sum scored_originals/q3q6_original_two_domain_verdict.json \
+            > scored_originals/scorer_sha256.txt
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path("scored_originals/q3q6_original_two_domain_verdict.json").read_text())
+          assert len(r["originals"])==8 and len(r["domains"])==2
+          assert r["Q3_global"]==r["Q6_global"]=="OPEN"
+          print("Q3Q6_ORIGINAL_FROZEN_FIRST_SCORE",{
+            "domains":r["domains"],
+            "C_updates":r["C_actual_weight_updates"],
+            "initial_condition":r["causal_two_domain_initial_condition"],
+          },flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3q6-first-original-immutable-scoring-from-run-42834364029
+          path: scored_originals/
+          if-no-files-found: warn
+          retention-days: 90
