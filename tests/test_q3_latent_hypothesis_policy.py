@@ -26,7 +26,9 @@ def test_same_policy_proposes_explanation_and_executable_method():
     base=DummyPolicy()
     policy=HypothesisConditionedPolicy(base)
     assert policy.propose("original observations") == CODE
-    assert len(base.prompts)==1
+    assert policy.propose("second observations") == CODE
+    assert len(base.prompts)==2
+    assert HYP in base.prompts[1]
     assert "original observations" in base.prompts[0]
     assert "latent" in base.prompts[0]
     assert policy.hypothesis_attempts[0]["provenance"]=="MODEL_AUTHORED_NOT_VERIFIED_CONCEPT"
@@ -46,6 +48,9 @@ def test_repair_training_requires_model_authorship_and_real_refutation(monkeypat
     from neumann1 import q3_latent_hypothesis_policy as mod
     row={"hypothesis_provenance":"MODEL_AUTHORED",
          "corrected_hypothesis":HYP,
+         "repair_prior_hypothesis":HYP,
+         "repair_prior_hypothesis_provenance":"MODEL_AUTHORED",
+         "repair_prior_hypothesis_sha256":sha256(HYP.encode()).hexdigest(),
          "corrected_hypothesis_sha256":sha256(HYP.encode()).hexdigest(),
          "program":CODE}
     seen=[]
@@ -54,7 +59,7 @@ def test_repair_training_requires_model_authorship_and_real_refutation(monkeypat
         return "actual refuted program and observed counterexample", "TRAIN_SOURCE"
     monkeypatch.setattr(mod,"recertified_repair_prompt",genuine_repair)
     prompt,answer,phase=recertified_hypothesis_repair_row(row,object())
-    assert prompt==hypothesis_prompt("actual refuted program and observed counterexample")
+    assert prompt==hypothesis_prompt("actual refuted program and observed counterexample",HYP)
     assert parse_hypothesis_proposal(answer)==(HYP,CODE)
     assert phase=="TRAIN_SOURCE"
     assert seen==[row]
