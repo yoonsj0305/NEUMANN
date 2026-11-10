@@ -20,7 +20,7 @@ def test_source_changes_reconstruct_exact_original_output(a,b):
     delta=causal_json_edits(a,b)
     assert json.dumps(replay_observed_edits(a,delta),sort_keys=True)==json.dumps(
         b,sort_keys=True)
-    if a==b:
+    if json.dumps(a,sort_keys=True)==json.dumps(b,sort_keys=True):
         assert delta==()
 
 
