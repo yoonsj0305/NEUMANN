@@ -121,7 +121,7 @@ def freeze_arcana_next8(author_data_dir,output,*,skip=0):
     files=[p for p in root.glob("*.json") if p.name not in exclude]
     salt="NEUMANN-Q3-STRUCTURAL-LIFT-NEXT8-20261110-FROZEN-V1"
     files.sort(key=lambda p:sha256((salt+"/"+p.name).encode()).hexdigest())
-    if skip not in (0,8):
+    if skip not in (0,8,16):
         raise ValueError("only pre-registered disjoint cohort offsets permitted")
     selected=files[skip:skip+8]
     if len(selected)!=8:
@@ -142,8 +142,10 @@ def freeze_arcana_next8(author_data_dir,output,*,skip=0):
     out={
         "schema":SCHEMA,
         "origin":"arcana",
-        "scope":("NEWLY_FROZEN_AUTHOR_ORIGINALS_NO_TUNING"
-                 if skip==0 else "SECOND_DISJOINT_SOURCE_AUTHOR_ORIGINALS"),
+        "scope":(
+            "NEWLY_FROZEN_AUTHOR_ORIGINALS_NO_TUNING" if skip==0 else
+            "SECOND_DISJOINT_SOURCE_AUTHOR_ORIGINALS" if skip==8 else
+            "THIRD_DISJOINT_SOURCE_AUTHOR_ORIGINALS_NO_TUNING"),
         "revision":ARCANA_REVISION,
         "source_fingerprint":sha256(canonical(
             [(p.name,sha_file(p)) for p in selected]
@@ -154,8 +156,7 @@ def freeze_arcana_next8(author_data_dir,output,*,skip=0):
         "salt":salt,
         "run_pre_registration":(
             "No representation-policy changes after first freeze" if skip==0
-            else "SECOND disjoint registry: original unseen target must not "
-                 "be used to alter the graph invention policy"),
+            else "Disjoint registry: do not alter discovery after SOURCE freeze"),
         **({"prior_first_eight_ids":[p.name for p in files[:skip]]}
             if skip else {}),
     }
@@ -207,9 +208,10 @@ def infer(blind,teacher_file,output,*,external_source_prior=None,
     fitted=LearnedDiscoveryPolicy.fit(library.episodes)
     if not fitted.weights or not fitted.provenance:
         raise ValueError("no learned discovery operator policy")
-    representation_prior=LearnedRepresentationPrior.learn(
-        library.episodes,runner)
-    if external_source_prior is not None:
+    if external_source_prior is None:
+        representation_prior=LearnedRepresentationPrior.learn(
+            library.episodes,runner)
+    else:
         # This source-only prior was frozen by an independently registered
         # ARC2 author-development job before the target author originals
         # were even loaded. Never train from current TARGET outputs.
@@ -217,7 +219,9 @@ def infer(blind,teacher_file,output,*,external_source_prior=None,
         if (frozen.get("training_original_author")!="ARC-AGI-2"
                 or frozen.get("training_original_revision")!=
                    "f3283f727488ad98fe575ea6a5ac981e4a188e49"
-                or frozen.get("source_teacher_count",0)<2
+                or frozen.get("source_teacher_count")!=50
+                or frozen.get("check_executions",0)<=0
+                or frozen.get("target_gold_read") is not False
                 or not frozen.get("frozen_source_only_sha256")):
             raise ValueError("external graph method evidence is not pinned")
         representation_prior=LearnedRepresentationPrior.from_source_snapshot(
@@ -436,10 +440,11 @@ if __name__=="__main__":
     parser=argparse.ArgumentParser()
     sp=parser.add_subparsers(dest="cmd",required=True)
     for name in ("freeze-codearc","freeze-arcana","freeze-arcana-next8",
-                 "freeze-arcana-next8-v2","infer","score","gate"):
+                 "freeze-arcana-next8-v2","freeze-arcana-next8-v3",
+                 "infer","score","gate"):
         x=sp.add_parser(name)
         if name in ("freeze-codearc","freeze-arcana","freeze-arcana-next8",
-                     "freeze-arcana-next8-v2"):
+                     "freeze-arcana-next8-v2","freeze-arcana-next8-v3"):
             x.add_argument("--original",required=True)
             x.add_argument("--out",required=True)
         if name=="infer":
@@ -466,6 +471,8 @@ if __name__=="__main__":
         freeze_arcana_next8(args.original,args.out)
     elif args.cmd=="freeze-arcana-next8-v2":
         freeze_arcana_next8(args.original,args.out,skip=8)
+    elif args.cmd=="freeze-arcana-next8-v3":
+        freeze_arcana_next8(args.original,args.out,skip=16)
     elif args.cmd=="infer":
         infer(args.blind,args.teachers,args.out,
               external_source_prior=args.representation_prior,
