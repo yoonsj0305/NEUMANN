@@ -27,7 +27,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Run original-corpus split and source/target leakage contracts
+      - name: Preflight original-corpus syntax, split and source/target leakage contracts
         run: |
           set -euo pipefail
           python -m pip install -q -e . pytest
