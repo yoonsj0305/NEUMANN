@@ -143,3 +143,32 @@ def test_next_eight_external_originals_pre_registered_and_old_ones_excluded(tmp_
     assert "HIDDEN_ORIGINAL_GOLD" not in out.read_text()
     assert all("target_inputs" in r and "test" not in r
                for r in frozen["records"])
+
+
+
+def test_second_author_source_cohort_disjoint_and_original_gold_unseen(tmp_path):
+    from research.q3.q3_structural_original_gate import freeze_arcana_next8
+    d=tmp_path/"author"
+    d.mkdir()
+    payload={
+        "train":[{"input":[[i]],"output":[[i+1]]}
+                 for i in (0,2,4)],
+        "test":[{"input":[[13]],"output":[["ORIGINAL_GOLD_NOT_ALLOWED"]]}],
+    }
+    for i in range(25):
+        (d/f"new_author_{i}.json").write_text(json.dumps(payload))
+    first=tmp_path/"first.json"
+    second=tmp_path/"second.json"
+    freeze_arcana_next8(str(d),str(first))
+    freeze_arcana_next8(str(d),str(second),skip=8)
+    p=json.loads(first.read_text())
+    q=json.loads(second.read_text())
+    assert p["scope"]=="NEWLY_FROZEN_AUTHOR_ORIGINALS_NO_TUNING"
+    assert q["scope"]=="SECOND_DISJOINT_SOURCE_AUTHOR_ORIGINALS"
+    assert len(q["records"])==8
+    assert not ({r["id"] for r in p["records"]} &
+                {r["id"] for r in q["records"]})
+    assert set(q["prior_first_eight_ids"])=={r["id"] for r in p["records"]}
+    assert set(q["prior_first_eight_ids"]).issubset(set(q["prior_excluded"]))
+    assert "ORIGINAL_GOLD_NOT_ALLOWED" not in second.read_text()
+    assert q["no_target_gold_in_blind"] is True
