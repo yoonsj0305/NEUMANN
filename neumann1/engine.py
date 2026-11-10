@@ -13,8 +13,20 @@ class NeumannEngine:
         self.solvers = list(solvers)
         self.verifier = verifier
         self.min_confidence = min_confidence
-        # Persist learned executable method-constructors across solve calls.
-        self.meta_inventor = meta_inventor if meta_inventor is not None else StructuralMetaInventor()
+        # The legacy fixed-AST inventor is only an optional classical
+        # research tool. Never instantiate it on the latent-world path.
+        # Historical invent_program()/synthesize_program() APIs still work.
+        self._meta_inventor = meta_inventor
+
+    @property
+    def meta_inventor(self) -> StructuralMetaInventor:
+        if self._meta_inventor is None:
+            self._meta_inventor = StructuralMetaInventor()
+        return self._meta_inventor
+
+    @meta_inventor.setter
+    def meta_inventor(self, inventor: StructuralMetaInventor):
+        self._meta_inventor = inventor
 
     def solve(self, problem: Problem) -> SolveResult:
         ledger = CostLedger()
