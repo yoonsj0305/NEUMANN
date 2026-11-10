@@ -123,3 +123,32 @@ def test_frozen_source_graph_rewrite_degrades_on_unseen_feature_class():
     run=runner.evaluate(factors[0].program,[changed])
     assert run.status=="EXECUTED"
     assert source_same_value(run.outputs[0],changed)
+
+
+
+def test_source_invents_orientation_of_one_object_without_rotating_unrelated_objects():
+    from neumann1.q3_object_graph_invention import _symmetry_points
+    def framed(r,c,other_col):
+        shape=((0,0),(1,0),(1,1))
+        rotated=_symmetry_points(shape,"turn90")
+        first=[(r+y,c+x) for y,x in shape]
+        first_output=[(r+y,c+2+x) for y,x in rotated]
+        anchor=[(6,other_col),(6,other_col+1)]
+        return (
+            canvas([(3,first),(2,anchor)]),
+            canvas([(3,first_output),(2,anchor)])
+        )
+    source_train=[
+        framed(1,1,7),
+        framed(2,2,6),
+    ]
+    heldout=[
+        framed(0,3,1),
+    ]
+    factors=induce_object_graph_factors(source_train)
+    assert factors
+    assert "turn90" in factors[0].program
+    policy,result=certify(source_train,heldout)
+    assert result.verified
+    assert result.program not in ("def transform(x):\n    return x",)
+    assert "mapping=" in result.program
