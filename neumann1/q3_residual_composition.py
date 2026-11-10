@@ -21,7 +21,8 @@ from dataclasses import dataclass
 
 from .open_program_inventor import source_same_value,validate_code
 from .q3_structure_factorization import _all_leaves,StructuralFactor
-from .q3_source_residual_probes import induce_source_residual_probes
+from .q3_source_residual_probes import (
+    induce_source_residual_probes,source_edit_f1)
 
 
 def _parallel_code(pairs):
