@@ -18,7 +18,8 @@ from pathlib import Path
 from typing import Sequence
 
 from .q3_prompt_contract import (
-    model_prefix,model_training_ids,source_discovery_prompt)
+    model_prefix,model_training_ids,source_discovery_prompt,
+    require_full_source_context)
 
 
 
@@ -67,9 +68,16 @@ class LocalCausalCodePolicy:
 
     def propose(self,prompt):
         rendered=model_prefix(self.tokenizer,prompt)
-        tokens=self.tokenizer(
-            rendered,return_tensors="pt",add_special_tokens=False,
-            truncation=True,max_length=1536).to(self.device)
+        # Never silently right-truncate the end of the prompt, where the
+        # current causal failure and exact prior executable code reside.
+        # A truncated repair prompt would train a different policy than
+        # the live policy, and make independent SOURCE verification suspect.
+        ids=require_full_source_context(
+            self.tokenizer,rendered,max_tokens=1536)
+        tokens=self.torch.tensor(
+            [ids],dtype=self.torch.long,device=self.device)
+        tokens={"input_ids":tokens,
+                "attention_mask":self.torch.ones_like(tokens)}
         # Source-prompt-derived RNG makes first proposals IDENTICAL across
         # the opaque-error and typed-counterexample causal ablations.
         # Later prompts legitimately diverge only when feedback differs.
