@@ -1,0 +1,95 @@
+name: Q3 Learn Discovery Representation From Real Original ARC2 SOURCE Failures
+on:
+  push:
+    branches:
+      - research/q3-evidence-trained-representation-policy-20261110
+    paths:
+      - ".github/workflows/q3_real_original_source_representation_training.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  freeze_original_source_only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify original independent author and pin the exact previous 256 task SOURCE registry
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . numpy scipy
+          git init -q arc2_official
+          git -C arc2_official fetch -q --depth 1 \
+            https://github.com/arcprize/ARC-AGI-2.git \
+            f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C arc2_official checkout -q FETCH_HEAD
+          test "$(git -C arc2_official rev-parse HEAD)" = \
+            f3283f727488ad98fe575ea6a5ac981e4a188e49
+          mkdir -p source_only
+          python -m research.q3.q3_representation_original_source_training freeze \
+            --original-root arc2_official/data/training \
+            --limit 64 --out source_only/ORIGINAL_SOURCE_ONLY.json
+          sha256sum source_only/ORIGINAL_SOURCE_ONLY.json \
+            > source_only/ORIGINAL_SOURCE_ONLY.sha256
+          python - <<'PY'
+          from pathlib import Path
+          x=Path("source_only/ORIGINAL_SOURCE_ONLY.json").read_text()
+          assert '"test"' not in x
+          assert '"target_outputs"' not in x
+          print("Q3_ORIGINAL_AUTHOR_SOURCE_FROZEN_NO_TARGET_GOLD",flush=True)
+          PY
+          rm -rf arc2_official
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-original-arc2-source-only-frozen
+          path: source_only/
+          retention-days: 90
+
+  learn_from_actual_positive_and_negative_source_trials:
+    needs: freeze_original_source_only
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-original-arc2-source-only-frozen
+          path: source_only
+      - name: Run full isolated Docker oracle on SOURCE-only original teacher episodes
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          docker pull python:3.11-alpine
+          test "$(cut -d ' ' -f1 source_only/ORIGINAL_SOURCE_ONLY.sha256)" = \
+            "$(sha256sum source_only/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+          python -m pytest -q -x tests/test_q3_representation_policy.py
+          mkdir -p frozen_policy
+          python -m research.q3.q3_representation_original_source_training learn \
+            --source-only source_only/ORIGINAL_SOURCE_ONLY.json \
+            --out frozen_policy/SOURCE_REPRESENTATION_POLICY.json
+          sha256sum frozen_policy/SOURCE_REPRESENTATION_POLICY.json \
+            > frozen_policy/SOURCE_REPRESENTATION_POLICY.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("frozen_policy/SOURCE_REPRESENTATION_POLICY.json").read_text())
+          assert p["schema"]=="NEUMANN.Q3.SOURCE-REPRESENTATION-POLICY.v1"
+          assert p["training_original_author"]=="ARC-AGI-2"
+          assert p["target_gold_read"] is False
+          print("Q3_ACTUAL_ORIGINAL_SOURCE_POSITIVE_NEGATIVE_POLICY",
+                [(x["name"],x["successful_transfer"],x["falsified_transfer"])
+                 for x in p["outcomes"]],flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-real-source-learned-representation-prior
+          path: frozen_policy/
+          if-no-files-found: warn
+          retention-days: 90
