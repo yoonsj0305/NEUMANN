@@ -53,7 +53,13 @@ def stable_key(domain,item):
     return digest(SALT+"/"+domain+"/"+str(item))
 
 
-def _rows_folio(path):
+def _rows_folio(path,*,split):
+    if split not in ("train","validation"):
+        raise ValueError("official FOLIO split required")
+    # The original authors use Unknown for TRAIN and Uncertain for VALIDATION.
+    # Preserve their exact published labels without outcome-conditioned tuning.
+    labels=("True","False","Unknown") if split=="train" else (
+        "True","False","Uncertain")
     rows=[]
     for row_number,line in enumerate(Path(path).read_text().splitlines()):
         if not line.strip():
@@ -66,7 +72,7 @@ def _rows_folio(path):
         if (not isinstance(r["premises"],list) or
                 not isinstance(r["conclusion"],str)):
             raise ValueError("invalid original FOLIO natural language")
-        if r["label"] not in ("True","False","Unknown"):
+        if r["label"] not in labels:
             raise ValueError("unexpected FOLIO original label")
         original_id=r.get("example_id","validation-row-"+str(row_number))
         # Group by actual premise text, not absent official validation ID:
@@ -76,7 +82,7 @@ def _rows_folio(path):
             "id":str(original_id),"group_id":group_id,
             "input":{"premises":r["premises"],
                      "conclusion":r["conclusion"],
-                     "answer_set":["True","False","Unknown"]},
+                     "answer_set":list(labels)},
             "label":r["label"],
         })
     return rows
@@ -119,7 +125,8 @@ def freeze(*,folio_train,folio_validation,bbh,out_visible,
            out_source_oracle,out_target_gold,out_manifest):
     sets={
         "folio_logical_entailment":(
-            _rows_folio(folio_train),_rows_folio(folio_validation)),
+            _rows_folio(folio_train,split="train"),
+            _rows_folio(folio_validation,split="validation")),
         "bbh_causal_attribution":(
             _rows_bbh(bbh),None),
     }
