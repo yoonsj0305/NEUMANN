@@ -236,7 +236,9 @@ def finetune_source_policy(
     manifest={
         "schema":"NEUMANN.Q3.SOURCE-PROGRAM-LORA.v1",
         "base_model":model_name,"model_revision":model_revision,
-        "prompt_contract":("source_hypothesis_repair+chat_template.v1"\n            if training_objective=="source_hypothesis_repair"\n            else "source_discovery_prompt+chat_template.v1"),
+        "prompt_contract":("source_hypothesis_repair+chat_template.v1"
+            if training_objective=="source_hypothesis_repair"
+            else "source_discovery_prompt+chat_template.v1"),
         "source_sha256":source_sha,
         "source_programs":len(source),
         "training_objective":training_objective,
