@@ -221,18 +221,18 @@ def _apply_learned_law(inp,key,mapping):
     return out
 
 
-def _choose_law(source_pairs):
+def _candidate_laws(source_pairs):
     all_examples=[]
     for inp,out in source_pairs:
         if not _rect(inp) or not _rect(out):
-            return None
+            return ()
         if len(inp)!=len(out) or len(inp[0])!=len(out[0]):
-            return None
+            return ()
         bg=_mode(inp)
         if bg is None or not source_same_value(bg,_mode(out)):
-            return None
+            return ()
         pairs=_pair_nodes(inp,out,bg)
-        if pairs is None:return None
+        if pairs is None:return ()
         original_nodes=_nodes(inp,bg)
         for src,offspring in pairs:
             all_examples.append(
@@ -241,7 +241,7 @@ def _choose_law(source_pairs):
     if not all_examples or all(
             a==((0,0,("source",),"identity"),)
             for f,a in all_examples):
-        return None
+        return ()
     keys=("global","category","area","height","width","row_rank",
           "col_rank","left_half","top_half","bbox_aspect","shape")
     choices=[]
@@ -270,9 +270,15 @@ def _choose_law(source_pairs):
         cost=(8+sum(6*len(actions)+2 for actions in mapping.values())
               +(0 if key=="global" else 3))
         choices.append((cost,key,mapping))
-    if not choices:return None
+    if not choices:return ()
     choices.sort(key=lambda c:(c[0],c[1]))
-    return choices[0]
+    return tuple(choices)
+
+
+def _choose_law(source_pairs):
+    """Compatibility shim: first MDL hypothesis, NOT sufficient for CEGIS."""
+    laws=_candidate_laws(source_pairs)
+    return laws[0] if laws else None
 
 
 def _compiled_program(key,mapping):
@@ -365,15 +371,21 @@ def induce_object_graph_factors(source_pairs,*,max_candidates=4):
     """Return a generic graph-correspondence rule iff its SOURCE fit is exact."""
     if not 2<=len(source_pairs)<=32 or not 1<=max_candidates<=12:
         raise ValueError("bounded source evidence required")
-    chosen=_choose_law(source_pairs)
-    if chosen is None:return ()
-    description,key,mapping=chosen
-    try:
-        program=_compiled_program(key,mapping)
-    except (TypeError,ValueError,OverflowError):
-        return ()
-    # This is a hypothesis, not certified. The existing GenerativeProgramInventor
-    # will execute it on withheld independent SOURCE examples before acceptance.
-    return (StructuralFactor(program,
-                             "source-inferred-graph-rewrite/"+key,
-                             description,len(source_pairs)),)
+    result=[]
+    known_programs=set()
+    for description,key,mapping in _candidate_laws(source_pairs):
+        try:
+            program=_compiled_program(key,mapping)
+        except (TypeError,ValueError,OverflowError):
+            continue
+        if program in known_programs:
+            continue
+        result.append(StructuralFactor(
+            program,"source-inferred-graph-rewrite/"+key,
+            description,len(source_pairs)))
+        known_programs.add(program)
+        if len(result)>=max_candidates:
+            break
+    # All represent competing, SOURCE-fitting causal explanations.
+    # The SAME existing independent Docker verifier refutes hypotheses.
+    return tuple(result)
