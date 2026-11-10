@@ -23,6 +23,7 @@ from .open_program_inventor import source_same_value
 from .q3_object_graph_invention import induce_object_graph_factors
 from .q3_source_residual_probes import (
     induce_source_residual_probes,source_edit_f1)
+from .q3_residual_composition import induce_source_compositions
 
 
 @dataclass(frozen=True)
@@ -136,9 +137,14 @@ class LearnedRepresentationPrior:
             # First-principles deletion: stop demanding a perfect SOURCE
             # program before the discovery policy can learn from errors.
             # Probe grammars are available to BOTH frozen-classical A and C.
-            factors=tuple(induce_object_graph_factors(
-                train,max_candidates=12))+tuple(
-                induce_source_residual_probes(train,max_probes=8))
+            factors=(
+                tuple(induce_object_graph_factors(
+                    train,max_candidates=12))
+                +tuple(induce_source_compositions(
+                    train,max_candidates=6))
+                +tuple(induce_source_residual_probes(
+                    train,max_probes=8))
+            )
             for factor in factors:
                 key=factor.representation
                 scores=ledger.setdefault(key,[0,0,0])
