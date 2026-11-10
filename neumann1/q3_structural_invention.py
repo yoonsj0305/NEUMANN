@@ -315,27 +315,36 @@ class StructuralInventionPolicy:
         # Induce the missing intermediate structure from SOURCE before
         # guessing whole-array scalar expressions. One generic JSON-tree
         # factorizer, not a separate ARC/list/string task solver.
-        factors=list(induce_structural_factors(
-            source_pairs,max_candidates=self.max_candidates))
-        # A general graph correspondence representation is attempted on
-        # each valid SOURCE topology. It never handles a named benchmark
-        # differently and is open to unlearned A on identical terms.
-        factors.extend(induce_object_graph_factors(
-            source_pairs,max_candidates=self.max_candidates))
-        # The earlier policy learned ZERO signal on 50 real ARC2 originals:
-        # it admitted only exact-fit representations. Both learned C and
-        # unlearned A now share these partially explanatory executable
-        # SOURCE proposals; the same independent Docker gate decides truth.
-        factors.extend(induce_source_residual_probes(
-            source_pairs,max_probes=min(8,self.max_candidates)))
-        # Two partial causal laws may jointly explain an original SOURCE
-        # transformation. Give A and C the SAME compositional grammar.
-        factors.extend(induce_source_compositions(
-            source_pairs,max_candidates=min(6,self.max_candidates)))
-        if self.representation_prior is not None:
-            factors.sort(key=self.representation_prior.order_key)
-        else:
-            factors.sort(key=lambda f:(f.description_length,f.representation))
+        # First-principles deletion: adding an operator family must not
+        # remove pre-existing independent-SOURCE-certified graph methods
+        # simply by taking the first 12 globally sorted descriptions.
+        # Reserve bounded proposal access to each general representation
+        # *mechanism*, and rank within each mechanism using actual prior
+        # SOURCE-refutation evidence when present. This is not task routing.
+        families=(
+            list(induce_structural_factors(
+                source_pairs,max_candidates=self.max_candidates)),
+            list(induce_object_graph_factors(
+                source_pairs,max_candidates=self.max_candidates)),
+            list(induce_source_compositions(
+                source_pairs,max_candidates=min(6,self.max_candidates))),
+            list(induce_source_residual_probes(
+                source_pairs,max_probes=min(8,self.max_candidates))),
+        )
+        for family in families:
+            if self.representation_prior is not None:
+                family.sort(key=self.representation_prior.order_key)
+            else:
+                family.sort(key=lambda f:(
+                    f.description_length,f.representation,len(f.program)))
+        # Interleave: at a 2-proposal budget an added family cannot consume
+        # both places solely because it assigned an arbitrary cheap cost.
+        # All A/B/C arms share the identical four families and limits.
+        factors=[]
+        for rank in range(max(map(len,families),default=0)):
+            for family in families:
+                if rank<len(family):
+                    factors.append(family[rank])
         pool: list[Candidate] = []
         observed: dict[tuple[str, ...], Candidate] = {}
         exact: list[Candidate] = []
