@@ -1,0 +1,60 @@
+name: Q3 Prospective 100 Real SOURCE - Learned C vs Equal Grammar Classical A
+on:
+  push:
+    branches:
+      - research/q3-relational-causal-language-induction-20261110
+    paths:
+      - ".github/workflows/q3_relational_learned_transfer_100.yml"
+      - "research/q3/q3_relational_policy_transfer_gate.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONHASHSEED: "0"
+  OMP_NUM_THREADS: "1"
+  OPENBLAS_NUM_THREADS: "1"
+jobs:
+  prospective_100_source_transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Fixed 30 AUTHOR SOURCE teachers and disjoint 100 prospective AUTHOR SOURCE
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          python -m pytest -q -x tests/test_q3_relational_predicate_invention.py tests/test_q3_representation_policy.py
+          docker pull python:3.11-alpine
+          mkdir -p teacher cohort evidence
+          gh run download 42735035357 --name q3-original-arc2-source-only-frozen --dir teacher
+          gh run download 42757846590 --name q3-prospective-source-100-originals-frozen --dir cohort
+          test "$(cut -d ' ' -f1 teacher/ORIGINAL_SOURCE_ONLY.sha256)" = "$(sha256sum teacher/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+          test "$(cut -d ' ' -f1 cohort/ORIGINAL_SOURCE_ONLY.sha256)" = "$(sha256sum cohort/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+      - name: Independent Docker SOURCE verification, exactly equal A/C grammar and budgets
+        run: |
+          set -euo pipefail
+          python -u -m research.q3.q3_relational_policy_transfer_gate --teacher teacher/ORIGINAL_SOURCE_ONLY.json --cohort cohort/ORIGINAL_SOURCE_ONLY.json --out evidence/RELATIONAL_CROSS_TASK_REAL_SOURCE.json
+          sha256sum evidence/RELATIONAL_CROSS_TASK_REAL_SOURCE.json > evidence/RELATIONAL_CROSS_TASK_REAL_SOURCE.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.loads(Path("evidence/RELATIONAL_CROSS_TASK_REAL_SOURCE.json").read_text())["summary"]
+          assert s["source_cohort"]==100
+          assert s["original_target_gold_read"] is False
+          assert s["q3_global"]=="OPEN"
+          assert s["C2_exclusive_vs_A12"]<=s["C2_exclusive_vs_A2"]
+          print("Q3_100_CLASSICAL_VS_LEARNED_SOURCE_RECEIPT",
+                {k:s[k] for k in ("A2","A12","C2","C2_exclusive_vs_A2","C2_exclusive_vs_A12")},flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-relational-100-real-source-learned-classical-transfer
+          path: evidence/
+          if-no-files-found: warn
+          retention-days: 90
