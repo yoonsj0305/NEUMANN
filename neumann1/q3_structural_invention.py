@@ -32,6 +32,7 @@ from .q3_object_graph_invention import induce_object_graph_factors
 from .q3_source_residual_probes import induce_source_residual_probes
 from .q3_residual_composition import induce_source_compositions
 from .q3_coordinate_morphisms import induce_coordinate_morphisms
+from .q3_periodic_residual_invention import induce_periodic_residual_rules
 
 _INVALID = object()
 
@@ -336,6 +337,12 @@ class StructuralInventionPolicy:
             # hypotheses). Source-only axis morphisms lift array geometry
             # to an executable method without benchmark-task routing.
             list(induce_coordinate_morphisms(
+                source_pairs,max_candidates=min(4,self.max_candidates))),
+            # If shape is periodic but its base unit has new causal
+            # structure, invent the shortest residual update and compile
+            # it into a new executable rather than assuming any fixed
+            # whole-array transform can reproduce it.
+            list(induce_periodic_residual_rules(
                 source_pairs,max_candidates=min(4,self.max_candidates))),
         )
         for family in families:
