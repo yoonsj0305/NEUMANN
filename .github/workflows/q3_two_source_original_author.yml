@@ -1,0 +1,145 @@
+name: Q3 Two SOURCE Examples - Original Author Gold Only After Frozen Program
+on:
+  push:
+    branches:
+      - research/q3-causal-residual-program-synthesis-20261110
+    paths:
+      - "research/q3/q3_two_source_original_gate.py"
+      - ".github/workflows/q3_two_source_original_author.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONHASHSEED: "0"
+jobs:
+  source_fit_without_original_gold:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          docker pull python:3.11-alpine
+          mkdir -p source methods
+          gh run download 42757846590 --name q3-prospective-source-100-originals-frozen --dir source
+          test "$(cut -d ' ' -f1 source/ORIGINAL_SOURCE_ONLY.sha256)" = "$(sha256sum source/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+          python -m research.q3.q3_two_source_original_gate fit --source source/ORIGINAL_SOURCE_ONLY.json --out methods/FROZEN_TWO_SOURCE_METHODS.json
+          sha256sum methods/FROZEN_TWO_SOURCE_METHODS.json > methods/FROZEN_TWO_SOURCE_METHODS.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-two-source-full-fit-methods-before-gold
+          path: methods/
+          retention-days: 90
+  freeze_original_author_test_input_only:
+    needs: source_fit_without_original_gold
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-two-source-full-fit-methods-before-gold
+          path: methods
+      - run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          test "$(cut -d ' ' -f1 methods/FROZEN_TWO_SOURCE_METHODS.sha256)" = "$(sha256sum methods/FROZEN_TWO_SOURCE_METHODS.json | cut -d ' ' -f1)"
+          git init -q /tmp/original-author
+          git -C /tmp/original-author fetch -q --depth 1 https://github.com/arcprize/ARC-AGI-2.git f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/original-author checkout -q FETCH_HEAD
+          mkdir -p blind
+          python -m research.q3.q3_two_source_original_gate blind --methods methods/FROZEN_TWO_SOURCE_METHODS.json --author-root /tmp/original-author/data/training --out blind/ORIGINAL_INPUTS_ONLY.json
+          sha256sum blind/ORIGINAL_INPUTS_ONLY.json > blind/ORIGINAL_INPUTS_ONLY.sha256
+          rm -rf /tmp/original-author
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-two-source-original-inputs-without-gold
+          path: blind/
+          retention-days: 90
+  predict_before_original_gold:
+    needs: freeze_original_author_test_input_only
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-two-source-full-fit-methods-before-gold
+          path: methods
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-two-source-original-inputs-without-gold
+          path: blind
+      - run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          docker pull python:3.11-alpine
+          mkdir -p predictions
+          test "$(cut -d ' ' -f1 blind/ORIGINAL_INPUTS_ONLY.sha256)" = "$(sha256sum blind/ORIGINAL_INPUTS_ONLY.json | cut -d ' ' -f1)"
+          python -m research.q3.q3_two_source_original_gate predict --methods methods/FROZEN_TWO_SOURCE_METHODS.json --blind blind/ORIGINAL_INPUTS_ONLY.json --out predictions/ORIGINAL_PREDICTIONS_BEFORE_GOLD.json
+          sha256sum predictions/ORIGINAL_PREDICTIONS_BEFORE_GOLD.json > predictions/ORIGINAL_PREDICTIONS_BEFORE_GOLD.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-two-source-original-predictions-frozen-before-gold
+          path: predictions/
+          retention-days: 90
+  independent_gold_score:
+    needs: predict_before_original_gold
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-two-source-full-fit-methods-before-gold
+          path: methods
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-two-source-original-inputs-without-gold
+          path: blind
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-two-source-original-predictions-frozen-before-gold
+          path: predictions
+      - run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          test "$(cut -d ' ' -f1 predictions/ORIGINAL_PREDICTIONS_BEFORE_GOLD.sha256)" = "$(sha256sum predictions/ORIGINAL_PREDICTIONS_BEFORE_GOLD.json | cut -d ' ' -f1)"
+          git init -q /tmp/original-author
+          git -C /tmp/original-author fetch -q --depth 1 https://github.com/arcprize/ARC-AGI-2.git f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/original-author checkout -q FETCH_HEAD
+          mkdir -p score
+          python -m research.q3.q3_two_source_original_gate score --author-root /tmp/original-author/data/training --methods methods/FROZEN_TWO_SOURCE_METHODS.json --blind blind/ORIGINAL_INPUTS_ONLY.json --predictions predictions/ORIGINAL_PREDICTIONS_BEFORE_GOLD.json --expected-sha "$(cut -d ' ' -f1 predictions/ORIGINAL_PREDICTIONS_BEFORE_GOLD.sha256)" --out score/ORIGINAL_TWO_SOURCE_SCORE.json
+          sha256sum score/ORIGINAL_TWO_SOURCE_SCORE.json > score/ORIGINAL_TWO_SOURCE_SCORE.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.loads(Path("score/ORIGINAL_TWO_SOURCE_SCORE.json").read_text())
+          assert s["q3_global"]=="OPEN"
+          assert s["two_example_denominator"]==22
+          assert s["full_original_cohort_denominator"]==100
+          assert s["source_fitted_not_independently_source_certified"] is True
+          print("Q3_TWO_SOURCE_GOLD_FREEZE_AUDITED",s["original_test_exact"],flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-two-source-independent-original-author-test-score
+          path: score/
+          if-no-files-found: warn
+          retention-days: 90
