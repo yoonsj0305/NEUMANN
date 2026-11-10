@@ -291,3 +291,61 @@ def test_genuine_torch_gradient_changes_world_learning_weights_without_code():
     assert receipt2["reinforced_model_authored_latent"] is False
     assert receipt2["actual_trainable_weight_delta_l1"]>0
     assert policy.learn_from_counterexample((e2,)) is None
+
+
+def test_frozen_latent_model_can_predict_unlabeled_target_without_gold_access():
+    class NewTaskPolicy(AdaptiveFixturePolicy):
+        def hypotheses(self,context,source_history,allowed_queries):
+            state="initial" if not self.scalar else "revised"
+            return [
+                Hypothesis(
+                    name="self-proposed-causal-world",kind="neumann.latent",
+                    latent_variables={"relation":state},
+                    relations={"hypothesis":"new role binding"},
+                    predictions={"train_query":state,
+                                 "sealed_query":"revised",
+                                 "target_query":"revised"}),
+                Hypothesis(
+                    name="alternative-model",kind="neumann.latent",
+                    latent_variables={"relation":"different"},
+                    relations={},
+                    predictions={"train_query":"different",
+                                 "sealed_query":"different",
+                                 "target_query":"different"}),
+            ]
+    p=fixture_problem()
+    p.metadata["source_queries"]["target_query"]={"input":"unseen target"}
+    p.metadata["unlabeled_target_query_ids"]=["target_query"]
+    model=NewTaskPolicy()
+    core=CausalExperienceCore(model,max_hypotheses=2)
+    engine=NeumannEngine(
+        ExperienceStructureFormer(core),[FixtureSolver()],
+        FixtureVerifier(),min_confidence=0.8)
+    engine.solve(p)
+    with pytest.raises(ValueError,match="TARGET observation"):
+        engine.observe_source_experience(
+            "target_query","revised",
+            evidence_id="target_query.signed",
+            verify_source=lambda *args:True)
+    assert core.select_query()=="train_query"
+    with pytest.raises(ValueError,match="no independent SOURCE"):
+        engine.predict_unlabeled_target("target_query")
+    engine.observe_source_experience(
+        "train_query","revised",
+        evidence_id="train_query.signed",
+        verify_source=source_observation_verifier,
+        revise_context={"new_evidence":"SOURCE only"})
+    engine.certify_source_representation(
+        "sealed_query","revised",
+        evidence_id="sealed_query.signed",
+        verify_source=source_observation_verifier)
+    answer=engine.predict_unlabeled_target("target_query")
+    assert answer=="revised"
+    assert model.learn_calls==1
+    with pytest.raises(ValueError,match="only predeclared unlabeled TARGET"):
+        engine.predict_unlabeled_target("train_query")
+    with pytest.raises(ValueError,match="frozen"):
+        engine.observe_source_experience(
+            "train_query","revised",
+            evidence_id="train_query.signed",
+            verify_source=source_observation_verifier)
