@@ -29,6 +29,13 @@ def _digest(value: Any) -> str:
     return sha256(_json(value).encode()).hexdigest()
 
 
+class LatentHypothesisFormatError(ValueError):
+    """Only model-authored hypothesis formatting can trigger SOURCE bootstrap.
+
+    SOURCE validation errors and actual infrastructure failures never do.
+    """
+
+
 @dataclass(frozen=True)
 class Hypothesis:
     """A model-proposed *mutable conceptual state*, not an executable answer."""
@@ -110,6 +117,9 @@ class CausalExperienceCore:
         self._episode_bindings={}
         self._source_certified=False
         self._source_certification_opened=False
+        self._allow_grounded_bootstrap=False
+        self._last_context=None
+        self._proposal_format_error_sha=None
 
     def freeze(self):
         """No original-target outcome may update the learned policy."""
@@ -128,7 +138,8 @@ class CausalExperienceCore:
         return self._task
 
     def start(self,task_id,context,allowed_queries,*,
-              sealed_queries=(),episode_bindings=None):
+              sealed_queries=(),episode_bindings=None,
+              allow_grounded_bootstrap=False):
         """Open only explicit, bounded observations; never open target gold."""
         if self._frozen:
             raise ValueError("cannot start new hypothesis during frozen scoring")
@@ -155,9 +166,28 @@ class CausalExperienceCore:
                 "same-mechanism episode across all queried interventions")
         # Reuse causal failures as SOURCE experience, not cached answers.
         history=tuple(self.experiences[-self.max_experiences:])
-        raw=self.policy.hypotheses(context,history,dict(allowed_queries))
-        if not isinstance(raw,(list,tuple)) or not 1<=len(raw)<=self.max_hypotheses:
-            raise ValueError("model must propose bounded latent hypotheses")
+        # A model that prints an invalid hypothesis template must not block
+        # learning from an independently verified SOURCE outcome. Only
+        # recognized model-output format failures can use this explicit
+        # research opt-in; bad provenance/permissions still fail closed.
+        format_error=None
+        try:
+            raw=self.policy.hypotheses(
+                context,history,dict(allowed_queries))
+        except LatentHypothesisFormatError as exc:
+            if (not allow_grounded_bootstrap or not callable(
+                    getattr(self.policy,
+                            "learn_grounded_source_without_hypothesis",
+                            None))):
+                raise
+            raw=()
+            format_error=_digest({
+                "failure":"UNFORMED_LATENT_HYPOTHESIS",
+                "error":str(exc)})
+        if raw or format_error is None:
+            if (not isinstance(raw,(list,tuple)) or
+                    not 1<=len(raw)<=self.max_hypotheses):
+                raise ValueError("model must propose bounded latent hypotheses")
         # Freeze the model-authored candidate bytes before SOURCE is opened.
         # A mutable dict in policy memory must not rewrite old predictions.
         candidates=tuple(
@@ -177,6 +207,9 @@ class CausalExperienceCore:
         self._source_certified=False
         self._source_certification_opened=False
         self._last_update=None
+        self._last_context=context
+        self._allow_grounded_bootstrap=bool(allow_grounded_bootstrap)
+        self._proposal_format_error_sha=format_error
         return candidates
 
     def select_query(self):
@@ -200,6 +233,12 @@ class CausalExperienceCore:
             if distinct>1:
                 choices.append((distinct,query))
         if not choices:
+            if not self._hypotheses and self._allow_grounded_bootstrap:
+                # No model hypothesis exists yet; information gain is
+                # UNKNOWN. Select first unused authorized nonsealed SOURCE,
+                # not a hidden TARGET or artificial counterexample.
+                usable=set(self._allowed)-self._sealed_queries-self._evaluated_queries
+                return min(usable) if usable else None
             return None
         return sorted(choices,key=lambda item:(-item[0],item[1]))[0][1]
 
@@ -245,7 +284,38 @@ class CausalExperienceCore:
             }
             events.append(event)
         if not events:
-            raise ValueError("no hypothesis predicted the authorized measurement")
+            if not self._allow_grounded_bootstrap or self._hypotheses:
+                raise ValueError("no hypothesis predicted the authorized measurement")
+            learner=getattr(
+                self.policy,"learn_grounded_source_without_hypothesis",
+                None)
+            if not callable(learner):
+                raise ValueError("no permitted grounded SOURCE learner")
+            receipt=learner(
+                task_id=self._task,context=self._last_context,
+                query=self._allowed[query_id],observed=observed,
+                evidence_id=evidence_id)
+            event={
+                "schema":"NEUMANN.CAUSAL.UNFORMED-SOURCE-EVIDENCE.v1",
+                "task_id":self._task,"query_id":query_id,
+                "query":self._allowed[query_id],
+                "hypothesis":None,"hypothesis_sha256":"UNFORMED",
+                "predicted":None,"observed":observed,
+                "contradicted":False,
+                "no_prior_hypothesis_was_falsified":True,
+                "proposal_format_error_sha":self._proposal_format_error_sha,
+                "evidence_id":evidence_id,"scope":"TRUSTED_SOURCE_ONLY",
+                "learning_receipt":receipt,
+            }
+            self.experiences.append(event)
+            self._evaluated_queries.add(query_id)
+            result=CausalUpdate(
+                task_id=self._task,query_id=query_id,
+                hypothesis_sha256="UNFORMED",predicted=None,
+                observed=observed,contradicted=False,
+                learning_receipt=receipt,evidence_sha256=_digest(event))
+            self._last_update=(result,)
+            return self._last_update
         # Model weights/strategy can change here. This is NOT automatically a
         # Q3 success; null receipt honestly means no policy learning.
         learner=getattr(self.policy,"learn_from_counterexample",None)
@@ -284,7 +354,8 @@ class CausalExperienceCore:
         bindings=dict(self._episode_bindings)
         result=self.start(
             task,context,allowed,
-            sealed_queries=sealed,episode_bindings=bindings)
+            sealed_queries=sealed,episode_bindings=bindings,
+            allow_grounded_bootstrap=self._allow_grounded_bootstrap)
         self._evaluated_queries=used
         return result
 
@@ -311,6 +382,9 @@ class CausalExperienceCore:
                 self._task,query_id,self._allowed[query_id],
                 observed,evidence_id) is not True:
             raise ValueError("unverified sealed SOURCE observation")
+        if not self._hypotheses:
+            self._source_certified=False
+            return False
         hypothesis=self._hypotheses[0]
         # A hypothesis that contradicts *known* SOURCE may not be admitted
         # just because one sealed example happens to agree.
