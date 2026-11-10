@@ -51,3 +51,45 @@ All six original tasks have been reused across development branches; even a late
 - A first older frozen run #42791954426 was still in progress at this archived note's creation, and its result is NOT invented or merged with the completed run. Any later result must be reported as its own cohort with its own SHA.
 
 **Decision:** the self-generated inversion-training mechanism **did not produce a Q3/Q6 multiplier on the completed original SOURCE and synthetic heldout gates**, even though it autonomously generated runnable code. This is an actual negative evidence-based STOP on promoting the #773 branch. Do not expand self-play samples, add per-task answer operators, rerun this development six, or reinterpret syntax output as a learned novel discovery policy. The next different experimental study exceeds the Q3 budget; owner must explicitly approve a single frozen two-independently-authored-semantics gate and settle its authority against the older Architecture Multiplier block.
+
+
+## 2026-11-11 Q3/Q6 independent two-domain causal study: STOP classification-only mechanism
+
+**Question answer for actual original tests: NO. Q3/Q6 global: UNPROVEN.** This is the scientific decision from previously registered studies, not a newly repeated experiment.
+
+### Original test 1: symbolic-latent JSON as prerequisite to learning
+
+- [Frozen original A/B/C run #42834364029](https://github.com/yoonsj0305/NEUMANN/actions/runs/42834364029); [separate immutable original scorer #42836007493](https://github.com/yoonsj0305/NEUMANN/actions/runs/42836007493).
+- Yale-LILY FOLIO original independent validation: A=0/4, B=0/4, C=0/4; transparent nearest-SOURCE comparator=1/4.
+- BIG-Bench Hard causal judgment original: A=0/4, B=0/4, C=0/4; nearest-SOURCE comparator=2/4.
+- C original four SOURCE learning episodes yielded **zero neural updates**. A/B/C no model-authored query hypotheses passed `start()` and all original attempts ABSTAIN.
+- One SOURCE-only identical frozen checkpoint diagnostic [#42836583910](https://github.com/yoonsj0305/NEUMANN/actions/runs/42836583910) showed base 0.5B copied a literal JSON template in a top-level LIST, including the placeholder `query_id` and value `predicted observed JSON value`. `ValueError('latent hypotheses must be JSON object')` occurred BEFORE the first refutation. Mere permissive JSON parsing cannot generate missing falsifiable hypotheses. **Decision: do not use correctly formatted symbolic text as an indispensable prerequisite for learning from observations.**
+
+### Original test 2: direct SOURCE label prediction with actual learned weights
+
+- [SHA-frozen two-author study #42838378641](https://github.com/yoonsj0305/NEUMANN/actions/runs/42838378641) completed all three jobs SUCCESS, including independent original TARGET scoring performed after prediction freeze. New SHA-salt cohort excludes *all* original question IDs and same-story/premise groups exposed in test 1.
+- Same model and architecture A/B/C, identical seed/init: C ran **4 true LoRA SOURCE gradients**, measured summed trainable L1 parameter change **81.64392104672879**; this is an absolute parameter sum, NOT a normalized ability or calibrated skill measure.
+- FOLIO original unseen 4: A=0/4, B=0/4, C=0/4; nearest-SOURCE comparator=**3/4**.
+- Causal original unseen 4: A=0/4, B=0/4, C=0/4; nearest-SOURCE comparator=**2/4**.
+- Frozen raw (not admitted) original predictions were **IDENTICAL across A/B/C for ALL 8**:
+  - FOLIO rows validation-159, -177, -106, -28: A=B=C `Uncertain` on all four, all wrong.
+  - BBH IDs 185, 6, 73, 136: A=B=C `No, Yes, Yes, Yes` respectively; raw correct on 6 and 136 for all arms, no C-only gain.
+- Held-out SOURCE source-check counts: FOLIO **0/2** for every A/B/C task; BBH A/B **1/2** each task; C **0/2** for ID 185, **1/2** others. The learned C made one SOURCE check **worse**.
+- Therefore zero new method/representation solving ability from the measured four SGD updates; even raw unverified TARGET predictions offered zero C-exclusive gains.
+
+### Root cause: invalid causal episode definition plus wrong optimization target
+
+1. **Learning objective was category prediction, not new concept/discovery policy.** `neumann1/q3_predictive_state.py::_choice_loglik` compares autoregressive next-label scores, `learn_source()` optimizes generic outcome cross-entropy. Four nonzero gradients prove updating weights, not identifying a new causal representation or improving hypothesis-construction policy.
+2. **No coherent hidden world/causal episode.** `research/q3/q3q6_two_author_freeze.py` intentionally selects SOURCE demonstration, probe and sealed check from DIFFERENT original stories/premise groups, and TARGET from ANOTHER unrelated group. This is a useful domain-distribution test, but not a within-world intervention/counterexample chain. The 2/2 SOURCE check lacks causal bearing on each individual TARGET. Treat it as a conservative unrelated-data abstention filter, NOT certification of a discovered target mechanism. In FOLIO random three-label tasks, meeting two unrelated exact checks has a ~1/9 *Assumption* probability under an iid-uniform guess, and in binary BBH ~1/4; these are illustrative probabilities, not measured distributions.
+3. **No independent concept verification or mechanism reuse.** The model's internal states were not materialized as separate falsifiable, reusable hypotheses. Label ranking by the frozen model, even if it changed, would not by itself prove Q3 invention.
+4. **Surface mismatch**: official FOLIO TRAIN uses `Unknown`, official validation `Uncertain`. Source/target label surface thus differs, a domain adaptation confound. This was preserved as published and NOT retroactively changed to improve results.
+5. **Total cost not established**: neural inference/training wall-time and RAM/VRAM not fully metered per term; the measured L1 sum is not a compute saving.
+
+### STOP and preserve
+
+- **STOP PR #776 predictive-state classification branch as a Q3/Q6 mechanism; do not merge.** Keep branch commit and all first-run receipts, old TARGET outputs, hashes and independent scorer logs immutable. Move its active decision to `archive/q3/`.
+- PR #775 remains a **draft learning-interface mechanism**, not demonstrated useful autonomous invention, and remains unmerged.
+- **Do not create a third experiment from prompting tweaks, increased context size, teacher count, unrelated SOURCE checks or reusing the now-opened eight original TARGETs.** Q3/Q6 experiment count in this bounded cycle is **2/3**. If a third is authorized, its decisive change must be a *within-instance/world-bound* intervention+counterexample, learned reusable structural representation, and truly new original AUTHOR TARGETs in two unrelated mathematical/causal semantic domains. The same tool budgets and properly matched baseline must remain. Positive in both domains decides whether to retain the mechanism for reproduction; zero C-exclusive in either decides STOP. No ability guarantee.
+- Do not claim frontier-level intelligence or Q3/Q6 PASS from 39 regression tests, four gradients, or author-domain labels alone. Q1-Q7 global all remain UNPROVEN.
+
+**Next owner decision:** retain PR #775 as only an experimental interface while STOPping current predictive-state classification direction; approve a single coherent-world, representation-learning third and final bounded study ONLY once there is a falsifiable common causal episode and novel-structure acquisition objective.
