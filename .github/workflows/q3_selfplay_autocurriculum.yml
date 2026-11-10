@@ -49,6 +49,7 @@ jobs:
           python -u -m research.q3.q3_selfplay_worlds \
             --model-revision ea3f2471cf1b1f0db85067f1ef93848e38e88c25 \
             --candidates 48 \
+            --seed 3007 \
             --train worlds/SELF_CREATED_TRAIN_WORLD_PROOFS.jsonl \
             --heldout worlds/SELF_CREATED_HELDOUT_WORLD_PROOFS.jsonl \
             --report worlds/SELF_PLAY_CAUSAL_PROVENANCE.json
@@ -58,6 +59,8 @@ jobs:
           from pathlib import Path
           s=json.loads(Path("worlds/SELF_PLAY_CAUSAL_PROVENANCE.json").read_text())
           assert s["attempted_worlds"]==48
+          assert s["generation_seed"]==3007
+          assert s["heldout_partition_precommit"]=="q3.selfplay.v2.seed.3007/"
           assert s["real_author_original_TEST_gold_read"] is False
           assert s["no_human_authored_answer_operators"] is True
           assert s["q3_global"]=="OPEN"
