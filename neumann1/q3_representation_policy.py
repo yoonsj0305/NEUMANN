@@ -27,6 +27,7 @@ from .q3_residual_composition import induce_source_compositions
 from .q3_structure_factorization import induce_structural_factors
 from .q3_coordinate_morphisms import induce_coordinate_morphisms
 from .q3_periodic_residual_invention import induce_periodic_residual_rules
+from .q3_relational_predicate_invention import induce_relational_comprehensions
 
 
 @dataclass(frozen=True)
@@ -140,7 +141,7 @@ class LearnedRepresentationPrior:
             # First-principles deletion: stop demanding a perfect SOURCE
             # program before the discovery policy can learn from errors.
             # Probe grammars are available to BOTH frozen-classical A and C.
-            # The inference core exposes SIX representation families.
+            # The inference core exposes multiple representation families.
             # Previously the SOURCE learner observed only THREE. Thus the
             # discovery prior remained exactly zero for index-morphisms,
             # periodic causal residuals, and structural factorization on
@@ -159,6 +160,8 @@ class LearnedRepresentationPrior:
                 +tuple(induce_coordinate_morphisms(
                     train,max_candidates=4))
                 +tuple(induce_periodic_residual_rules(
+                    train,max_candidates=4))
+                +tuple(induce_relational_comprehensions(
                     train,max_candidates=4))
             )
             for factor in factors:
