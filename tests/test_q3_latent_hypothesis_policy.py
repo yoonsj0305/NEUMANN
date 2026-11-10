@@ -10,7 +10,7 @@ from neumann1.q3_latent_hypothesis_policy import (
 from neumann1.open_program_inventor import UnsafeProposal
 
 
-CODE="def transform(x):\n    return x\n"
+CODE="def transform(x):\n    return x"
 HYP="A hidden relation preserves every observed input value."
 
 
