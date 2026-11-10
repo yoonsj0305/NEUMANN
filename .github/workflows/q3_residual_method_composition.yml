@@ -1,0 +1,32 @@
+name: Q3 Combine Falsified Partial SOURCE Methods into New Executables
+on:
+  push:
+    branches:
+      - research/q3-composable-source-program-invention-20261110
+    paths:
+      - ".github/workflows/q3_residual_method_composition.yml"
+      - "neumann1/q3_residual_composition.py"
+      - "neumann1/q3_structural_invention.py"
+      - "tests/test_q3_residual_composition.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual_docker_composed_methods:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Prove new compiled program composition on disjoint SOURCE, verify counterexample rejection
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          docker pull python:3.11-alpine
+          python -m pytest -q -x \
+            tests/test_q3_residual_composition.py \
+            tests/test_q3_source_residual_probes.py \
+            tests/test_q3_representation_policy.py \
+            tests/test_q3_structural_invention.py
