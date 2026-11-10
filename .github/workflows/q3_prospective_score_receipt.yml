@@ -1,0 +1,96 @@
+name: Q3 Prospective 100 - Independent AUTHOR Score Receipt Only
+on:
+  push:
+    branches:
+      - research/q3-coordinate-prospective-100-original-20261110
+    paths:
+      - ".github/workflows/q3_prospective_score_receipt.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  grade_unmodified_sha_frozen_predictions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Recover frozen methods and original author predictions, never rerun inference
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          mkdir -p methods blind predictions score
+          gh run download 42756864397 \
+            --name q3-coordinate-frozen-source-methods \
+            --dir methods
+          gh run download 42756864397 \
+            --name q3-coordinate-original-input-blind \
+            --dir blind
+          gh run download 42756864397 \
+            --name q3-coordinate-original-author-predictions-before-gold \
+            --dir predictions
+          test "$(cut -d ' ' -f1 methods/FROZEN_SOURCE_METHODS.sha256)" = \
+               "$(sha256sum methods/FROZEN_SOURCE_METHODS.json | cut -d ' ' -f1)"
+          test "$(cut -d ' ' -f1 blind/TARGET_INPUTS_ONLY.sha256)" = \
+               "$(sha256sum blind/TARGET_INPUTS_ONLY.json | cut -d ' ' -f1)"
+          SHA="$(cut -d ' ' -f1 predictions/PREDICTIONS.sha256)"
+          test "$SHA" = "$(sha256sum predictions/PREDICTIONS.json | cut -d ' ' -f1)"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path("methods/FROZEN_SOURCE_METHODS.json").read_text())
+          b=json.loads(Path("blind/TARGET_INPUTS_ONLY.json").read_text())
+          p=json.loads(Path("predictions/PREDICTIONS.json").read_text())
+          assert m["source_originals"]==100
+          assert m["prior_exposure"]=="PROSPECTIVE_100_RELATIVE_TO_PRIOR_50_ONLY"
+          assert m["source_verified_count"]==3
+          assert b["target_gold_not_serialized"] is True
+          assert p["original_gold_read"] is False
+          assert len(p["receipts"])==3
+          print("Q3_ORIGINAL_AUTHOR_PREDICTIONS_ALREADY_FROZEN",
+                [e["id"][:8] for e in p["receipts"]],flush=True)
+          PY
+      - name: Obtain gold only after frozen hash receipts and independently score exact originals
+        run: |
+          set -euo pipefail
+          git init -q /tmp/official-arc2
+          git -C /tmp/official-arc2 fetch -q --depth 1 \
+            https://github.com/arcprize/ARC-AGI-2.git \
+            f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/official-arc2 checkout -q FETCH_HEAD
+          SHA="$(cut -d ' ' -f1 predictions/PREDICTIONS.sha256)"
+          python -m research.q3.q3_coordinate_original_source_gate score \
+            --author-root /tmp/official-arc2/data/training \
+            --methods methods/FROZEN_SOURCE_METHODS.json \
+            --blind blind/TARGET_INPUTS_ONLY.json \
+            --predictions predictions/PREDICTIONS.json \
+            --expected-sha "$SHA" \
+            --out score/PROSPECTIVE_100_ORIGINAL_EXACT.json
+          sha256sum score/PROSPECTIVE_100_ORIGINAL_EXACT.json \
+            > score/PROSPECTIVE_100_ORIGINAL_EXACT.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.loads(Path("score/PROSPECTIVE_100_ORIGINAL_EXACT.json").read_text())
+          q=s["summary"]
+          assert q["scientific_scope"]=="PROSPECTIVE_100_RELATIVE_TO_PRIOR_50_ONLY"
+          assert q["source_original_cohort_denominator"]==100
+          assert q["q3_global"]=="OPEN"
+          assert len(s["records"])==q["source_certified_originals"]
+          print("Q3_PROSPECTIVE_100_ORIGINAL_AUTHOR_EXACT_FROZEN",
+                {"exact_originals":q["exact_originals"],
+                 "denominator":q["source_original_cohort_denominator"],
+                 "original_prediction_sha256":q["prediction_sha256"],
+                 "scope":q["scientific_scope"],
+                 "global_Q3":"OPEN"},flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-prospective100-author-score-from-frozen-model-predictions
+          path: score/
+          retention-days: 90
