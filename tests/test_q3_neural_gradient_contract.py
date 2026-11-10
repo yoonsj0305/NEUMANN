@@ -35,7 +35,7 @@ def test_real_inference_prefix_and_training_mask_are_identical():
     assert tokens[:len(expected)]==expected
     assert labels[:len(expected)]==[-100]*len(expected)
     assert labels[len(expected):]==tokens[len(expected):]
-    assert "Source input: [3, 5]" in prompt
+    assert "Source input: [3,5]" in prompt
     assert "Expected source output: 8" in prompt
 
 
