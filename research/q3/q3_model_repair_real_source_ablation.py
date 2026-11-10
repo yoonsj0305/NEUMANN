@@ -36,7 +36,8 @@ def compare(cohort,*,model_revision,adapter,out,limit=6,max_proposals=2):
             or manifest.get("base_model")!=
                 "Qwen/Qwen2.5-Coder-0.5B-Instruct"
             or manifest.get("model_revision")!=model_revision
-            or manifest.get("training_objective")!="source_repair"
+            or manifest.get("training_objective") not in (
+                "source_repair","source_preference")
             or manifest.get("repair_examples",0)<1
             or not 1<=limit<=100 or not 1<=max_proposals<=8):
         raise ValueError("wrong frozen SOURCE-only trained repair intervention")
