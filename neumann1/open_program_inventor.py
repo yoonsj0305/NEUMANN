@@ -21,7 +21,7 @@ import re
 import shutil
 import subprocess
 from time import perf_counter_ns
-from .q3_prompt_contract import source_discovery_prompt
+from .q3_prompt_contract import source_discovery_prompt,SourceContextOverflow
 
 def source_same_value(actual, expected):
     """Original-source JSON equality, preserving bool/int output distinctions."""
@@ -341,6 +341,15 @@ class GenerativeProgramInventor:
             try:
                 raw=self.policy.propose(prompt)
                 code=validate_code(raw)
+            except SourceContextOverflow:
+                # This is missing model *capacity*, not an invalid program.
+                # Do not spend remaining proposals repeating a truncated
+                # request, or claim a verifier-tested hypothesis was made.
+                receipts.append(Attempt(
+                    "",0,len(train),"ABSTAIN_CONTEXT_OVERFLOW",step,None))
+                return Discovery(
+                    "ABSTAIN_CONTEXT_OVERFLOW",None,None,
+                    tuple(receipts),len(checks),False)
             except (UnsafeProposal,ValueError,TypeError) as exc:
                 # The previous policy threw away 9/27 original candidate
                 # proposals as REJECTED but supplied zero preflight detail.
