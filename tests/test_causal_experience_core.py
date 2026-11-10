@@ -326,3 +326,123 @@ def test_genuine_torch_gradient_changes_world_learning_weights_without_code():
     assert receipt2["reinforced_model_authored_latent"] is False
     assert receipt2["actual_trainable_weight_delta_l1"]>0
     assert policy.learn_from_counterexample((e2,)) is None
+    # Even when NO hypothesis could initially be formatted, the SAME
+    # trainable neural weights can absorb a verified observation directly.
+    policy.max_updates=3
+    before_unformed=policy.model.weight.detach().clone()
+    receipt3=policy.learn_grounded_source_without_hypothesis(
+        task_id="example.source",context={"observations":[1,2]},
+        query={"input":"observed source transition"},
+        observed={"effect":"new source observation"},
+        evidence_id="source-only-authorized-proof")
+    assert receipt3["updates"]==3
+    assert receipt3["new_causal_concept_proven"] is False
+    assert receipt3["actual_trainable_weight_delta_l1"]>0
+    assert not torch.equal(before_unformed,policy.model.weight.detach())
+
+
+def test_invalid_first_model_hypothesis_can_learn_authorized_source_and_revise():
+    """The real zero-gradient blocker: invalid model JSON no longer kills learning."""
+    from neumann1.causal_experience import LatentHypothesisFormatError
+
+    class InitiallyUnformedPolicy:
+        def __init__(self):
+            self.learned=0
+            self.attempts=0
+
+        def hypotheses(self,context,source_history,queries):
+            self.attempts+=1
+            if self.learned==0:
+                raise LatentHypothesisFormatError(
+                    "model copied a JSON placeholder, not SOURCE query IDs")
+            assert source_history[-1]["scope"]=="TRUSTED_SOURCE_ONLY"
+            return [Hypothesis(
+                name="model-authored-after-source",
+                kind="neumann.latent",
+                latent_variables={"relation":"revised"},
+                relations={"from_source":"an empirical candidate only"},
+                predictions={"train_query":"revised",
+                             "sealed_query":"revised"})]
+
+        def learn_grounded_source_without_hypothesis(
+                self,*,task_id,context,query,observed,evidence_id):
+            assert task_id=="example.source"
+            assert query=={"input":"train_query"}
+            assert observed=="revised"
+            assert evidence_id=="train_query.signed"
+            self.learned+=1
+            return {
+                "updates":self.learned,
+                "TRAINABLE_SOURCE_POLICY_STATE_CHANGED":True,
+                "new_concept_proven":False,
+            }
+
+    policy=InitiallyUnformedPolicy()
+    core=CausalExperienceCore(policy)
+    former=ExperienceStructureFormer(
+        core,allow_grounded_bootstrap=True)
+    engine=NeumannEngine(
+        former,[FixtureSolver()],FixtureVerifier(),min_confidence=0.8)
+    before=engine.solve(fixture_problem())
+    assert not before.verified
+    assert core.hypotheses==()
+    assert core.select_query()=="train_query"
+    with pytest.raises(ValueError,match="reserved independent SOURCE"):
+        engine.observe_source_experience(
+            "sealed_query","revised",
+            evidence_id="sealed_query.signed",
+            verify_source=source_observation_verifier)
+    assert policy.learned==0
+    with pytest.raises(ValueError,match="unverified"):
+        engine.observe_source_experience(
+            "train_query","wrong",
+            evidence_id="train_query.signed",
+            verify_source=source_observation_verifier)
+    assert policy.learned==0
+    receipts=engine.observe_source_experience(
+        "train_query","revised",
+        evidence_id="train_query.signed",
+        verify_source=source_observation_verifier,
+        revise_context={"source_observation_verified":True})
+    assert policy.learned==1
+    assert len(receipts)==1
+    assert receipts[0].hypothesis_sha256=="UNFORMED"
+    assert receipts[0].predicted is None
+    assert receipts[0].contradicted is False
+    assert receipts[0].learning_receipt["updates"]==1
+    with pytest.raises(ValueError,match="repeat"):
+        engine.observe_source_experience(
+            "train_query","revised",
+            evidence_id="train_query.signed",
+            verify_source=source_observation_verifier)
+    assert len(core.hypotheses)==1
+    assert core.hypotheses[0].latent_variables["relation"]=="revised"
+    assert engine.certify_source_representation(
+        "sealed_query","revised",
+        evidence_id="sealed_query.signed",
+        verify_source=source_observation_verifier)
+    after=engine.solve(fixture_problem())
+    assert after.verified
+    assert after.answer=="revised"
+    assert policy.attempts==2
+
+
+def test_invalid_initial_hypothesis_does_not_silently_enable_bootstrap():
+    from neumann1.causal_experience import LatentHypothesisFormatError
+
+    class RefusingPolicy:
+        def hypotheses(self,*args):
+            raise LatentHypothesisFormatError(
+                "no valid model-authored latent hypothesis")
+        def learn_grounded_source_without_hypothesis(self,**kwargs):
+            raise AssertionError("must not receive unauthorized SOURCE")
+
+    core=CausalExperienceCore(RefusingPolicy())
+    with pytest.raises(LatentHypothesisFormatError):
+        core.start(
+            "example.source",fixture_problem().metadata["observations"],
+            fixture_problem().metadata["source_queries"],
+            sealed_queries={"sealed_query"},
+            episode_bindings=fixture_problem().metadata[
+                "source_episode_bindings"])
+    assert core.task_id is None
