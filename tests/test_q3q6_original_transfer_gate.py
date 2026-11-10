@@ -22,11 +22,12 @@ def test_original_corpus_freeze_separates_target_gold_from_model(tmp_path):
          "conclusion":"P? "+str(i),
          "label":("True","False","Unknown")[i%3]}
         for i in range(34)]
+    # Official FOLIO VALIDATION has no numeric story/example IDs, and uses
+    # Uncertain where TRAIN uses Unknown. Never rewrite original gold.
     fvalid=[
-        {"story_id":100+i,"example_id":100+i,
-         "premises":["Separate "+str(i)],
+        {"premises":["Separate "+str(i)],
          "conclusion":"Check "+str(i),
-         "label":("True","False","Unknown")[i%3]}
+         "label":("True","False","Uncertain")[i%3]}
         for i in range(12)]
     folio_train.write_text("".join(canonical(x)+"\n" for x in ftrain))
     folio_validation.write_text("".join(canonical(x)+"\n" for x in fvalid))
