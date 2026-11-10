@@ -1,0 +1,50 @@
+name: Q3 SOURCE-only representation failure anatomy
+on:
+  push:
+    branches:
+      - research/q3-relational-causal-language-induction-20261110
+    paths:
+      - ".github/workflows/q3_relational_anatomy.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  GH_TOKEN: ${{ github.token }}
+jobs:
+  original_source_anatomy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect SOURCE training pairs, never original TEST
+        run: |
+          set -euo pipefail
+          mkdir -p source
+          gh run download 42757846590 --name q3-prospective-source-100-originals-frozen --dir source
+          test "$(cut -d ' ' -f1 source/ORIGINAL_SOURCE_ONLY.sha256)" = "$(sha256sum source/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          data=json.loads(Path("source/ORIGINAL_SOURCE_ONLY.json").read_text())
+          assert data["original_source_count"]==100
+          assert data["no_target_gold_in_payload"] is True
+          eligible=[r for r in data["records"] if len(r["source_pairs"])>=3]
+          def shape(v):
+              return (len(v),len(v[0])) if v and isinstance(v[0],list) else None
+          cohorts={"shape_changed":[],"shape_preserved":[]}
+          for r in eligible:
+              train=r["source_pairs"][:-1]
+              kind="shape_changed" if any(shape(x)!=shape(y) for x,y in train) else "shape_preserved"
+              cohorts[kind].append(r)
+          for kind,rows in cohorts.items():
+              rows.sort(key=lambda r:hashlib.sha256(("Q3.DIAGNOSTICS.v1:"+r["source_id"]).encode()).hexdigest())
+              print("Q3_COHORT",kind,len(rows))
+              for r in rows[:4]:
+                  print("Q3_SOURCE_DIAGNOSTIC",json.dumps({
+                    "kind":kind,"id":r["source_id"],
+                    "train":r["source_pairs"][:-1],
+                    "withheld_source_check_input":r["source_pairs"][-1][0],
+                    "source_pair_count":len(r["source_pairs"])
+                    },sort_keys=True,separators=(",",":")),flush=True)
+          PY
