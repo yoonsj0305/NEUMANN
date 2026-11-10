@@ -85,6 +85,8 @@ class TrainableLatentWorldPolicy:
         self.update_count=0
         self.seed=seed
         self._last_latent_prefix=None
+        # SOURCE-only failure diagnosis. Never used to condition decoding.
+        self.last_raw_hypothesis=None
 
     def _ids(self,text):
         ids=self.tokenizer(
@@ -119,6 +121,9 @@ class TrainableLatentWorldPolicy:
                 pad_token_id=self.tokenizer.eos_token_id)
         raw=self.tokenizer.decode(
             output[0][x.shape[1]:],skip_special_tokens=True).strip()
+        # Diagnostic read-only snapshot; generated TARGET outputs are not
+        # exposed to this SOURCE-only diagnostic process.
+        self.last_raw_hypothesis=raw
         fence=chr(96)*3
         if raw.startswith(fence):
             raw=raw.split("\n",1)[-1].split(fence,1)[0].strip()
