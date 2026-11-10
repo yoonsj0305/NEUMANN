@@ -1,0 +1,84 @@
+name: Q3 One-Core Causal-Latent Observation on Real Original SOURCE
+on:
+  push:
+    branches:
+      - research/q3-one-core-lossless-causal-observer-20261110
+    paths:
+      - ".github/workflows/q3_one_core_causal_observer.yml"
+      - "neumann1/q3_causal_observer.py"
+      - "neumann1/open_program_inventor.py"
+      - "tests/test_q3_causal_observer.py"
+      - "research/q3/q3_causal_observer_source_ablation.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONHASHSEED: "0"
+  OMP_NUM_THREADS: "2"
+  OPENBLAS_NUM_THREADS: "2"
+  TOKENIZERS_PARALLELISM: "false"
+jobs:
+  same_model_original_source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Test information-preserving observer and original sandbox
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          docker pull python:3.11-alpine
+          python -m pytest -q -x tests/test_q3_causal_observer.py tests/test_q3_source_repair_learning.py tests/test_q3_open_program_discovery.py
+      - name: Pin actual 0.5B model and previous ORIGINAL SOURCE-only registry
+        run: |
+          set -euo pipefail
+          python -m pip install -q --index-url https://download.pytorch.org/whl/cpu 'torch==2.5.1'
+          python -m pip install -q 'transformers==4.46.3' 'huggingface_hub==0.27.1' 'jinja2>=3.1.4,<4'
+          mkdir -p source evidence
+          gh run download 42757846590 --name q3-prospective-source-100-originals-frozen --dir source
+          test "$(cut -d ' ' -f1 source/ORIGINAL_SOURCE_ONLY.sha256)" = "$(sha256sum source/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from huggingface_hub import model_info
+          assert model_info("Qwen/Qwen2.5-Coder-0.5B-Instruct").sha=="ea3f2471cf1b1f0db85067f1ef93848e38e88c25"
+          o=json.loads(Path("source/ORIGINAL_SOURCE_ONLY.json").read_text())
+          assert o["no_target_gold_in_payload"] is True
+          assert o["original_source_count"]==100
+          print("Q3_NO_TARGET_GOLD_SAME_BASE_PAIRED_OBSERVER",flush=True)
+          PY
+      - name: Execute SAME code invention policy with raw SOURCE vs lossless observed causal deltas
+        run: |
+          set -euo pipefail
+          python -u -m research.q3.q3_causal_observer_source_ablation \
+            --source source/ORIGINAL_SOURCE_ONLY.json \
+            --revision ea3f2471cf1b1f0db85067f1ef93848e38e88c25 \
+            --out evidence/Q3_CAUSAL_OBSERVER_ORIGINAL_SOURCE.json
+          sha256sum evidence/Q3_CAUSAL_OBSERVER_ORIGINAL_SOURCE.json > evidence/Q3_CAUSAL_OBSERVER_ORIGINAL_SOURCE.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.loads(Path("evidence/Q3_CAUSAL_OBSERVER_ORIGINAL_SOURCE.json").read_text())["summary"]
+          assert s["same_model_same_verifier"] is True
+          assert s["same_max_program_attempts"]==2
+          assert s["original_TARGET_gold_read"] is False
+          assert s["q3_global"]=="OPEN"
+          print("Q3_REAL_OBSERVER_CAUSAL_GATE",{
+            "raw":s["raw_source_verified"],
+            "lossless_causal":s["causal_edits_source_verified"],
+            "causal_only":s["causal_edits_exclusive"],
+            "raw_only":s["raw_source_exclusive"],
+          },flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-universal-causal-observer-frozen-six-original-source
+          path: evidence/
+          if-no-files-found: warn
+          retention-days: 90
