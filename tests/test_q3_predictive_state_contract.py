@@ -44,10 +44,15 @@ def test_source_outcome_updates_actual_same_neural_policy_without_json_hypothesi
     q={"scenario":"unknown causal relation","answer_set":["Yes","No"]}
     result_before=p.predict(ctx,[],q)
     assert result_before["prediction"] in ("Yes","No")
+    assert result_before["explicit_new_concept_discovered"] is False
+    assert result_before["hypothesis_intervention_revision_learned"] is False
+    assert result_before["representation"]=="PRETRAINED_HIDDEN_STATE_OPTION_SCORING"
     receipt=p.learn_source(ctx,[],q,"Yes",evidence_id="signed-SOURCE-1")
     assert receipt["update"]==1
     assert receipt["actual_trainable_weight_delta_l1"]>0
     assert receipt["scope"]=="TRUSTED_SOURCE_ONLY"
+    assert receipt["learning_objective"]=="OBSERVED_LABEL_CROSS_ENTROPY"
+    assert receipt["independent_concept_invention_demonstrated"] is False
     assert not p.torch.equal(before,p.model.weight.detach())
     result_after=p.predict(ctx,[],q)
     assert result_after["prediction"] in ("Yes","No")
