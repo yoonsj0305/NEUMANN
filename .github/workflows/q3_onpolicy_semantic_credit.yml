@@ -1,0 +1,66 @@
+name: Q3 One-Core Autonomous Partial-Error Credit from Real Model Outputs
+on:
+  push:
+    branches:
+      - research/q3-one-core-onpolicy-semantic-credit-20261110
+    paths:
+      - ".github/workflows/q3_onpolicy_semantic_credit.yml"
+      - "neumann1/q3_semantic_credit.py"
+      - "research/q3/q3_self_generated_partial_source.py"
+      - "tests/test_q3_semantic_credit.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONHASHSEED: "0"
+  OMP_NUM_THREADS: "2"
+  OPENBLAS_NUM_THREADS: "2"
+  TOKENIZERS_PARALLELISM: "false"
+jobs:
+  learnable_self_generated_source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Same model, same general sandbox, real SOURCE-only difference
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          python -m pip install -q --index-url https://download.pytorch.org/whl/cpu 'torch==2.5.1'
+          python -m pip install -q 'transformers==4.46.3' 'peft==0.14.0' 'accelerate==1.2.1' 'huggingface_hub==0.27.1' 'jinja2>=3.1.4,<4'
+          docker pull python:3.11-alpine
+          python -m pytest -q -x tests/test_q3_semantic_credit.py
+          mkdir -p source evidence
+          gh run download 42735035357 --name q3-original-arc2-source-only-frozen --dir source
+          test "$(cut -d ' ' -f1 source/ORIGINAL_SOURCE_ONLY.sha256)" = "$(sha256sum source/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+          python -u -m research.q3.q3_self_generated_partial_source \
+            --source source/ORIGINAL_SOURCE_ONLY.json \
+            --model-revision ea3f2471cf1b1f0db85067f1ef93848e38e88c25 \
+            --max-tasks 12 \
+            --proposals-per-task 3 \
+            --out evidence/ACTUAL_SELF_GENERATED_PARTIAL_PREFERENCES.jsonl \
+            --report evidence/SELF_GENERATED_PROGRAM_CREDIT.json
+          sha256sum evidence/ACTUAL_SELF_GENERATED_PARTIAL_PREFERENCES.jsonl > evidence/ACTUAL_SELF_GENERATED_PARTIAL_PREFERENCES.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path("evidence/SELF_GENERATED_PROGRAM_CREDIT.json").read_text())
+          assert r["independent_source_checks_read"] is False
+          assert r["original_target_gold_read"] is False
+          assert r["all_preferences_uncertified"] is True
+          assert r["q3_global"]=="OPEN"
+          print("Q3_REAL_PARTIAL_SOURCE_SIGNAL_DIAGNOSTIC",
+                r["genuine_executable_partial_preferences"],flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-one-core-onpolicy-semantic-source-program-preferences-actual
+          path: evidence/
+          if-no-files-found: warn
+          retention-days: 90
