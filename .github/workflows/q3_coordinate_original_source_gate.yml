@@ -1,10 +1,14 @@
-name: Q3 Coordinate Representation Invention - Frozen Real Original Gate
+name: Q3 SOURCE-Invented Coordinate and Causal Residual - Real Original Gate
 on:
   push:
     branches:
       - research/q3-source-inferred-coordinate-morphism-20261110
+      - research/q3-periodic-residual-causal-invention-20261110
     paths:
       - ".github/workflows/q3_coordinate_original_source_gate.yml"
+      - "neumann1/q3_periodic_residual_invention.py"
+      - "neumann1/q3_coordinate_morphisms.py"
+      - "tests/test_q3_periodic_residual_invention.py"
   workflow_dispatch:
 permissions:
   contents: read
@@ -27,7 +31,7 @@ jobs:
           set -euo pipefail
           python -m pip install -q -e . pytest
           docker pull python:3.11-alpine
-          python -m pytest -q -x tests/test_q3_coordinate_morphisms.py
+          python -m pytest -q -x tests/test_q3_coordinate_morphisms.py tests/test_q3_periodic_residual_invention.py
           mkdir -p previous methods
           gh run download 42735035357 \
             --name q3-original-arc2-source-only-frozen \
