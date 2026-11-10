@@ -1,4 +1,5 @@
 from __future__ import annotations
+from .q3_single_discovery_core import invent_open_program_for_engine
 
 from .types import Problem, SolveResult, CostLedger, display_kind, is_unknown_kind
 from .family_registry import FamilyRegistry
@@ -204,3 +205,7 @@ class RegistryEngine:
         from .source_learned_grid_router import SourceLearnedGridRouter
         return SourceLearnedGridRouter(source_policy).solve(
             category, source_examples, target_inputs)
+
+    # Q3 single trainable invention path. Historical specialist solvers are
+    # unchanged optional comparators and never the default invention policy.
+    invent_open_program_from_source = invent_open_program_for_engine

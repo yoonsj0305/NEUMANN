@@ -1,4 +1,5 @@
 from __future__ import annotations
+from .q3_single_discovery_core import invent_open_program_for_engine
 from typing import Iterable
 from .types import Problem, SolveResult, CostLedger, IRKind
 from .interfaces import StructureFormer, Solver, Verifier
@@ -144,3 +145,7 @@ class NeumannEngine:
         from .source_learned_grid_router import SourceLearnedGridRouter
         return SourceLearnedGridRouter(source_policy).solve(
             category, source_examples, target_inputs)
+
+    # Q3 single trainable invention path. Historical specialist solvers are
+    # unchanged optional comparators and never the default invention policy.
+    invent_open_program_from_source = invent_open_program_for_engine
