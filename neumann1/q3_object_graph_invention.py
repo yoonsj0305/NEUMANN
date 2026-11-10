@@ -134,8 +134,12 @@ def _pair_nodes(src,dst,background):
     for l in left:
         choices=[]
         for j,r in enumerate(right):
-            for op in _symmetry_matches(l.shape,r.shape):
-                choices.append((j,op))
+            matches=_symmetry_matches(l.shape,r.shape)
+            if matches:
+                # Symmetric shapes often admit 2-8 equivalent coordinate
+                # operators. Choose one minimal-description representative
+                # instead of multiplying the correspondence search space.
+                choices.append((j,matches[0]))
         if not choices:return None
         candidate_matches.append(choices)
     if any(len(choices)>7 for choices in candidate_matches):
