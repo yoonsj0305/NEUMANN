@@ -2,10 +2,12 @@ name: Q3 Neural Program Repair Learning Contract - Real Isolated SOURCE
 on:
   push:
     branches:
-      - research/q3-one-core-real-repair-learning-20261110
+      - research/q3-one-core-causal-context-20261110
     paths:
       - ".github/workflows/q3_open_program_repair_learning.yml"
       - "neumann1/open_program_inventor.py"
+      - "neumann1/q3_prompt_contract.py"
+      - "tests/test_q3_neural_gradient_contract.py"
       - "neumann1/q3_source_repair_learning.py"
       - "neumann1/q3_trainable_code_policy.py"
       - "tests/test_q3_source_repair_learning.py"

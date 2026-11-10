@@ -1,0 +1,42 @@
+name: Q3 One-Core Original SOURCE Context-Capacity Audit
+on:
+  push:
+    branches:
+      - research/q3-one-core-causal-context-20261110
+    paths:
+      - ".github/workflows/q3_source_context_capacity_audit.yml"
+      - "research/q3/q3_source_context_capacity_audit.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  GH_TOKEN: ${{ github.token }}
+  TOKENIZERS_PARALLELISM: "false"
+jobs:
+  original_source_no_gold:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: |
+          set -euo pipefail
+          python -m pip install -q -e . "transformers==4.46.3" "huggingface_hub==0.27.1" "jinja2>=3.1.4,<4"
+          mkdir -p source evidence
+          gh run download 42757846590 --name q3-prospective-source-100-originals-frozen --dir source
+          test "$(cut -d ' ' -f1 source/ORIGINAL_SOURCE_ONLY.sha256)" = "$(sha256sum source/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+          python -m research.q3.q3_source_context_capacity_audit \
+            --source source/ORIGINAL_SOURCE_ONLY.json \
+            --model-revision ea3f2471cf1b1f0db85067f1ef93848e38e88c25 \
+            --out evidence/Q3_SOURCE_PROMPT_CAPACITY.json
+          sha256sum evidence/Q3_SOURCE_PROMPT_CAPACITY.json > evidence/Q3_SOURCE_PROMPT_CAPACITY.sha256
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-one-core-real-original-source-context-capacity
+          path: evidence/
+          if-no-files-found: warn
+          retention-days: 90

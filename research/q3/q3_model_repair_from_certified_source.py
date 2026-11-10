@@ -18,7 +18,7 @@ from pathlib import Path
 from neumann1.open_program_inventor import (
     IsolatedPython,validate_code,source_same_value,UnsafeProposal,
 )
-from neumann1.q3_prompt_contract import source_discovery_prompt
+from neumann1.q3_prompt_contract import source_discovery_prompt,SourceContextOverflow
 from neumann1.q3_source_repair_learning import recertified_repair_prompt
 from neumann1.q3_single_discovery_core import SourceMethodMemory
 from neumann1.q3_trainable_code_policy import LocalCausalCodePolicy
@@ -77,10 +77,15 @@ def collect(source_path,method_path,*,out,report,model_revision,max_tasks=6,
         # witnesses in the same no-network Docker backend.
         entry=memory.admit(sid,train,checks,corrected["program"])
         initial_prompt=source_discovery_prompt(train)
-        raw=proposer.propose(initial_prompt)
         trial={"id":sid,"prior_certified_sha256":entry.program_sha256,
                "model_revision":model_revision,"model_did_correct":False,
                "target_gold_accessed":False}
+        try:
+            raw=proposer.propose(initial_prompt)
+        except SourceContextOverflow:
+            trial["status"]="ABSTAIN_CONTEXT_OVERFLOW"
+            trials.append(trial)
+            continue
         try:
             wrong=validate_code(raw)
         except (UnsafeProposal,ValueError,TypeError):

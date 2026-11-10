@@ -2,12 +2,14 @@ name: Q3 REAL 0.5B Code Model - SOURCE Refutation to Gradient to Heldout SOURCE
 on:
   push:
     branches:
-      - research/q3-one-core-real-repair-learning-20261110
+      - research/q3-one-core-causal-context-20261110
     paths:
       - ".github/workflows/q3_real_neural_repair_gradient.yml"
       - "research/q3/q3_model_repair_from_certified_source.py"
       - "research/q3/q3_model_repair_real_source_ablation.py"
       - "neumann1/q3_source_repair_learning.py"
+      - "neumann1/q3_prompt_contract.py"
+      - "research/q3/q3_model_repair_real_source_ablation.py"
       - "neumann1/q3_trainable_code_policy.py"
   workflow_dispatch:
 permissions:

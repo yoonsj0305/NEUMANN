@@ -35,7 +35,7 @@ def test_real_inference_prefix_and_training_mask_are_identical():
     assert tokens[:len(expected)]==expected
     assert labels[:len(expected)]==[-100]*len(expected)
     assert labels[len(expected):]==tokens[len(expected):]
-    assert "Source input: [3, 5]" in prompt
+    assert "Source input: [3,5]" in prompt
     assert "Expected source output: 8" in prompt
 
 
@@ -95,3 +95,21 @@ def test_neural_training_requires_reexecuted_independent_source_teachers():
             return SimpleNamespace(status="ABSTAIN_NO_SANDBOX",outputs=())
     with pytest.raises(UnsafeProposal,match="SOURCE-certified"):
         recertify_source_rows([teacher],runner=AbsentSandbox())
+
+
+def test_neural_inference_preserves_last_source_error_or_refuses_context():
+    from neumann1.q3_prompt_contract import (
+        require_full_source_context,SourceContextOverflow)
+    class Tokenizer:
+        def __call__(self,rendered,*,add_special_tokens=False,
+                     truncation=False):
+            assert truncation is False
+            assert add_special_tokens is False
+            return {"input_ids":[ord(c) for c in rendered]}
+    tok=Tokenizer()
+    prompt="SOURCE_EXAMPLES\nPREVIOUS_WRONG_PROGRAM\nLATEST_CAUSAL_WITNESS"
+    assert len(require_full_source_context(
+        tok,prompt,max_tokens=128))==len(prompt)
+    huge=prompt+"X"*150
+    with pytest.raises(SourceContextOverflow,match="no observations discarded"):
+        require_full_source_context(tok,huge,max_tokens=128)
