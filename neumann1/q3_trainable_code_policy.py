@@ -108,7 +108,8 @@ def source_training_rows(path):
                 or not isinstance(record.get("pairs"),list)
                 or not record["pairs"]
                 or not isinstance(record.get("program"),str)
-                or record.get("independent_checks",0)<1):
+                or not isinstance(record.get("independent_checks"),int)
+                or not 1<=record["independent_checks"]<len(record["pairs"])):
             raise ValueError(
                 "training file includes non-source/uncertified proposal")
         actual=hashlib.sha256(record["program"].encode()).hexdigest()
@@ -138,7 +139,8 @@ def recertify_source_rows(rows, *, runner=None):
 
 def finetune_source_policy(
         source_jsonl,adapter_output,*,model_name=DEFAULT_MODEL,
-        model_revision=None,max_steps=40,lr=0.00015,rank=4,seed=1007):
+        model_revision=None,max_steps=40,lr=0.00015,rank=4,seed=1007,
+        training_objective="source_program_imitation"):
     """LoRA gradient update of generator weights on prior certified SOURCE.
 
     Does NOT train on target test answers or private reference programs.
@@ -148,10 +150,37 @@ def finetune_source_policy(
     if (not 1<=max_steps<=10000 or not 0<lr<=0.01 or
             not 1<=rank<=32):
         raise ValueError("bounded explicit training contract")
+    if training_objective not in (
+            "source_program_imitation","source_repair"):
+        raise ValueError("unknown Q3 learning objective")
     source,source_sha=source_training_rows(source_jsonl)
     if not source:
         raise ValueError("no independently source-certified programs to learn")
     teacher_receipts=recertify_source_rows(source)
+    # A real invention-policy update conditions the new program on an
+    # *actual failed executable method* and an independent SOURCE
+    # counterexample, NOT merely on unrelated solved program texts.
+    if training_objective=="source_repair":
+        from .open_program_inventor import IsolatedPython
+        from .q3_source_repair_learning import recertified_repair_prompt
+        runner=IsolatedPython(max_seconds=8)
+        learning_rows=[]
+        for row in source:
+            if "repair_prior_program" not in row:
+                continue
+            prompt,phase=recertified_repair_prompt(row,runner)
+            learning_rows.append((prompt,row["program"],phase,
+                                  row["repair_prior_sha256"],row["sha256"]))
+        if not learning_rows:
+            raise ValueError("no independently SOURCE-falsified repair episodes")
+    else:
+        learning_rows=[]
+        for row in source:
+            n=row["independent_checks"]
+            # Never silently train on the reserved independent SOURCE check.
+            prompt=source_discovery_prompt(row["pairs"][:-n])
+            learning_rows.append((prompt,row["program"],
+                                  "SOURCE_PROGRAM_IMITATION","",row["sha256"]))
     torch,Model,Tokenizer=_dependencies()
     try:
         from peft import LoraConfig,get_peft_model
@@ -176,12 +205,11 @@ def finetune_source_policy(
         lr=lr)
     losses=[]
     for step in range(max_steps):
-        row=source[step%len(source)]
-        # Match the live SOURCE-only 6-example prompt *exactly*, rather
-        # than training with a separate text format never seen at inference.
-        teacher_pairs=row["pairs"][:6]
-        prompt=source_discovery_prompt(teacher_pairs)
-        completion=row["program"]+tokenizer.eos_token
+        prompt,teacher_code,_,_,_=learning_rows[step%len(learning_rows)]
+        # This exact prompt is seen by the live local model on SOURCE
+        # refutation. All targets below are *certified executable programs*
+        # from prior original-author SOURCE episodes, never TARGET answers.
+        completion=teacher_code+tokenizer.eos_token
         full_ids,labels=model_training_ids(
             tokenizer,prompt,completion,max_length=1536)
         inputs=torch.tensor([full_ids],dtype=torch.long,device=device)
@@ -205,6 +233,12 @@ def finetune_source_policy(
         "prompt_contract":"source_discovery_prompt+chat_template.v1",
         "source_sha256":source_sha,
         "source_programs":len(source),
+        "training_objective":training_objective,
+        "repair_examples":sum(phase in ("TRAIN_SOURCE","INDEPENDENT_SOURCE")
+                              for _,_,phase,_,_ in learning_rows),
+        "training_pairs_sha256":hashlib.sha256(json.dumps(
+            [(phase,prior,cert) for _,_,phase,prior,cert in learning_rows],
+            sort_keys=True,separators=(",",":")).encode()).hexdigest(),
         "docker_source_reverified":len(teacher_receipts),
         "source_proof_receipts_sha256":hashlib.sha256(
             json.dumps(teacher_receipts).encode()).hexdigest(),
@@ -226,9 +260,13 @@ if __name__=="__main__":
     p.add_argument("--model-revision",default=None)
     p.add_argument("--steps",type=int,default=40)
     p.add_argument("--seed",type=int,default=1007)
+    p.add_argument("--objective",choices=(
+        "source_program_imitation","source_repair"),
+        default="source_program_imitation")
     args=p.parse_args()
     print(json.dumps(
         finetune_source_policy(
             args.sources,args.adapter_output,model_name=args.model,
             model_revision=args.model_revision,
-            max_steps=args.steps,seed=args.seed),indent=2))
+            max_steps=args.steps,seed=args.seed,
+            training_objective=args.objective),indent=2))
