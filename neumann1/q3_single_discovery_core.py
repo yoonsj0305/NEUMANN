@@ -190,8 +190,7 @@ class SingleDiscoveryCore:
     episodes after freeze().
     """
 
-    def __init__(self, policy, runner=None, *, memory=None, max_proposals=8):
-        self.policy = policy
+    def __init__(self, policy, runner=None, *, memory=None, max_proposals=8,\n                 hypothesis_mode=False):\n        if hypothesis_mode:\n            from .q3_latent_hypothesis_policy import HypothesisConditionedPolicy\n            policy = HypothesisConditionedPolicy(policy)\n        self.policy = policy
         self.runner = runner if runner is not None else IsolatedPython()
         self.memory = (memory if memory is not None
                        else SourceMethodMemory(self.runner))
@@ -227,8 +226,7 @@ class SingleDiscoveryCore:
 def invent_open_program_for_engine(
         engine, source_pairs, independent_source_checks, *,
         proposal_policy, runner=None, max_proposals=8,
-        method_memory=None, reuse_memory=False,
-        source_identity=None, excluded_source_ids=()):
+        method_memory=None, reuse_memory=False, hypothesis_mode=False,\n        source_identity=None, excluded_source_ids=()):
     """ONE production Q3 interface used without code forks by both engines.
 
     There is no eager persistent method memory, auto-retrieval or family
@@ -252,7 +250,7 @@ def invent_open_program_for_engine(
             raise ValueError("source identity already present in method memory")
     core = SingleDiscoveryCore(
         proposal_policy, runtime, memory=memory,
-        max_proposals=max_proposals)
+        max_proposals=max_proposals, hypothesis_mode=hypothesis_mode)
     result = core.discover(
         source_pairs, independent_source_checks,
         reuse_memory=reuse_memory,
