@@ -372,17 +372,45 @@ class GenerativeProgramInventor:
                 correct=0  # historical opaque runtime-error feedback ablation
             receipts.append(Attempt(sha,correct,len(train),result.status,step,code))
             if correct==len(train):
-                final=self.runner.evaluate(code,[x for x,y in checks])
-                if final.status=="EXECUTED" and all(
-                        source_same_value(got,y) for got,(_,y) in zip(final.outputs,checks)):
-                    return Discovery("SOURCE_VERIFIED_OPEN_PROGRAM",code,sha,
-                                     tuple(receipts),len(checks),True)
-                # Independent SOURCE checks are authorized NEW SOURCE,
-                # not original author TARGET labels. Show both the wrong
-                # executable program and a source-only counterexample.
-                prompt+=source_refutation_feedback(
-                    code,checks,final,independent=True,
-                    rich=self.reveal_independent_counterexample)
+                # A SOURCE verifier can no longer claim independence after
+                # its labels were revealed as repair feedback. Split any
+                # multi-check reservoir into critic and SEALED final checks
+                # before the first proposal. The sealed check is NEVER sent
+                # into the model prompt, and a failed sealed check ends this
+                # task without adaptive retesting. If there is only one
+                # check, all of it stays sealed.
+                feedback_checks=(
+                    checks[:-1] if self.reveal_independent_counterexample
+                    and len(checks)>1 else ())
+                sealed_checks=(
+                    checks[-1:] if feedback_checks else checks)
+                if feedback_checks:
+                    diagnostic=self.runner.evaluate(
+                        code,[x for x,y in feedback_checks])
+                    if (diagnostic.status!="EXECUTED" or
+                        len(diagnostic.outputs)!=len(feedback_checks) or
+                        not all(source_same_value(got,y)
+                            for got,(_,y) in zip(
+                                diagnostic.outputs,feedback_checks))):
+                        prompt+=source_refutation_feedback(
+                            code,feedback_checks,diagnostic,
+                            independent=True,rich=True)
+                        continue
+                final=self.runner.evaluate(
+                    code,[x for x,y in sealed_checks])
+                if (final.status=="EXECUTED" and
+                        len(final.outputs)==len(sealed_checks) and all(
+                            source_same_value(got,y)
+                            for got,(_,y) in zip(final.outputs,sealed_checks))):
+                    return Discovery(
+                        "SOURCE_VERIFIED_OPEN_PROGRAM",code,sha,
+                        tuple(receipts),len(checks),True)
+                # A final independent SOURCE test has been opened; its
+                # outcome may only determine PASS/ABSTAIN. Even an opaque
+                # pass/fail bit cannot be repeatedly optimized against.
+                return Discovery(
+                    "ABSTAIN_SEALED_SOURCE_REFUTED",None,None,
+                    tuple(receipts),len(checks),False)
             else:
                 prompt+=source_refutation_feedback(
                     code,train,result,rich=self.rich_runtime_feedback)
@@ -441,6 +469,9 @@ def source_training_example(source,discovery,*,independent_source_checks=None,
                 "repair_prior_sha256":hashlib.sha256(old.encode()).hexdigest(),
                 "repair_phase":("INDEPENDENT_SOURCE"
                     if prior.source_correct==len(train)
-                    else "TRAIN_SOURCE")})
+                    else "TRAIN_SOURCE"),
+                "repair_feedback_checks_count":(
+                    len(checks)-1 if prior.source_correct==len(train)
+                    else 0)})
             break
     return data
