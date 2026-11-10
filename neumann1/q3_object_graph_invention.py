@@ -87,6 +87,41 @@ def _nodes(grid,background):
     return tuple(sorted(nodes,key=lambda n:(n.r0,n.c0,str(n.color))))
 
 
+
+# D4 symmetries are an algebra of possible coordinate re-representations,
+# not task-specific operators. Fit which transformation actually applies
+# across independent SOURCE examples rather than hard-coding its name.
+_SYMMETRIES=("identity","turn90","turn180","turn270",
+             "reflect_rows","reflect_cols","swap_axes","reflect_diagonal")
+
+
+def _symmetry_points(points,operator):
+    if operator=="identity":
+        raw=[(y,x) for y,x in points]
+    elif operator=="turn90":
+        raw=[(x,-y) for y,x in points]
+    elif operator=="turn180":
+        raw=[(-y,-x) for y,x in points]
+    elif operator=="turn270":
+        raw=[(-x,y) for y,x in points]
+    elif operator=="reflect_rows":
+        raw=[(-y,x) for y,x in points]
+    elif operator=="reflect_cols":
+        raw=[(y,-x) for y,x in points]
+    elif operator=="swap_axes":
+        raw=[(x,y) for y,x in points]
+    elif operator=="reflect_diagonal":
+        raw=[(-x,-y) for y,x in points]
+    else:
+        raise ValueError("unrecognized source-inferred coordinate symmetry")
+    r0=min(y for y,x in raw);c0=min(x for y,x in raw)
+    return tuple(sorted((y-r0,x-c0) for y,x in raw))
+
+
+def _symmetry_matches(shape,target):
+    return tuple(operator for operator in _SYMMETRIES
+                 if _symmetry_points(shape,operator)==target)
+
 def _pair_nodes(src,dst,background):
     left=_nodes(src,background)
     right=_nodes(dst,background)
@@ -95,12 +130,12 @@ def _pair_nodes(src,dst,background):
     # Group only by observed normalized geometry, independent of color/position.
     # Ambiguous shape matches abort: assigning identities via hindsight would
     # let withheld SOURCE labels leak into the learned "representation".
-    by_shape={}
-    for j,r in enumerate(right):
-        by_shape.setdefault(r.shape,[]).append(j)
     candidate_matches=[]
     for l in left:
-        choices=by_shape.get(l.shape,[])
+        choices=[]
+        for j,r in enumerate(right):
+            for op in _symmetry_matches(l.shape,r.shape):
+                choices.append((j,op))
         if not choices:return None
         candidate_matches.append(choices)
     if any(len(choices)>7 for choices in candidate_matches):
@@ -120,19 +155,21 @@ def _pair_nodes(src,dst,background):
                 best_cost=cost;best=sig
             return
         i=order[pos];old=left[i]
-        for j in candidate_matches[i]:
+        for j,orientation in candidate_matches[i]:
             if j in used:continue
             new=right[j]
             distance=abs(new.r0-old.r0)+abs(new.c0-old.c0)
-            # Small fixed penalty for recoloring; prefer label preservation.
-            delta=distance+5*int(not source_same_value(
-                old.color,new.color))
-            matching[i]=j
+            # Penalize invented state changes without making any selected
+            # target gold available to the final inference policy.
+            delta=(distance+5*int(not source_same_value(
+                old.color,new.color))+2*int(orientation!="identity"))
+            matching[i]=(j,orientation)
             dfs(pos+1,used|{j},matching,cost+delta)
             del matching[i]
     dfs(0,set(),{},0)
     if best is None:return None
-    return tuple((l,right[best[i]]) for i,l in enumerate(left))
+    return tuple((l,right[best[i][0]],best[i][1])
+                 for i,l in enumerate(left))
 
 
 def _features(node,nodes,height,width):
@@ -171,12 +208,13 @@ def _choose_law(source_pairs):
         pairs=_pair_nodes(inp,out,bg)
         if pairs is None:return None
         original_nodes=_nodes(inp,bg)
-        for src,dst in pairs:
-            action=(dst.r0-src.r0,dst.c0-src.c0,dst.color)
+        for src,dst,orientation in pairs:
+            action=(dst.r0-src.r0,dst.c0-src.c0,dst.color,
+                    orientation)
             all_examples.append(
                 (_features(src,original_nodes,len(inp),len(inp[0])),
                  action))
-    if not all_examples or all(a==(0,0,f["category"])
+    if not all_examples or all(a==(0,0,f["category"],"identity")
                                 for f,a in all_examples):
         return None
     keys=("global","category","area","height","width","row_rank",
@@ -268,10 +306,25 @@ def _compiled_program(key,mapping):
         "        else:val=shape\n"
         "        if val not in mapping:\n"
         "            return x\n"
-        "        dr,dc,dest=mapping[val]\n"
+        "        dr,dc,dest,orientation=mapping[val]\n"
+        "        rel=[]\n"
         "        for y,z in pts:\n"
-        "            yy=y+dr\n"
-        "            xx=z+dc\n"
+        "            dy=y-r0\n"
+        "            dx=z-c0\n"
+        "            if orientation=='identity':a,b=dy,dx\n"
+        "            elif orientation=='turn90':a,b=dx,-dy\n"
+        "            elif orientation=='turn180':a,b=-dy,-dx\n"
+        "            elif orientation=='turn270':a,b=-dx,dy\n"
+        "            elif orientation=='reflect_rows':a,b=-dy,dx\n"
+        "            elif orientation=='reflect_cols':a,b=dy,-dx\n"
+        "            elif orientation=='swap_axes':a,b=dx,dy\n"
+        "            else:a,b=-dx,-dy\n"
+        "            rel.append((a,b))\n"
+        "        mr=min(v[0] for v in rel)\n"
+        "        mc=min(v[1] for v in rel)\n"
+        "        for a,b in rel:\n"
+        "            yy=r0+dr+a-mr\n"
+        "            xx=c0+dc+b-mc\n"
         "            if 0<=yy<h and 0<=xx<w:\n"
         "                out[yy][xx]=dest\n"
         "    return out"
