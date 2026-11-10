@@ -85,7 +85,7 @@ jobs:
               "q3_global":"OPEN",
               "this_is_pre_verification_coverage_not_success":True,
           }
-          Path("evidence/Q3_REAL_FAILURE_TAXONOMY.json").write_text(json.dumps(result,sort_keys=True,indent=2)+"\\n")
+          Path("evidence/Q3_REAL_FAILURE_TAXONOMY.json").write_text(json.dumps(result,sort_keys=True,indent=2))
           print("Q3_ACTUAL_ORIGINAL_AUTHOR_FAILURE_TAXONOMY",result,flush=True)
           PY
       - uses: actions/upload-artifact@v4
