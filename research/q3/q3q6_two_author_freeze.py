@@ -49,8 +49,8 @@ def digest(s):
         s if isinstance(s,bytes) else s.encode()).hexdigest()
 
 
-def stable_key(domain,item):
-    return digest(SALT+"/"+domain+"/"+str(item))
+def stable_key(domain,item,*,salt=SALT):
+    return digest(salt+"/"+domain+"/"+str(item))
 
 
 def _rows_folio(path,*,split):
@@ -109,8 +109,9 @@ def _rows_bbh(path):
     return rows
 
 
-def _select_unique_group(rows,domain):
-    ordered=sorted(rows,key=lambda x:(stable_key(domain,x["id"]),x["id"]))
+def _select_unique_group(rows,domain,*,salt=SALT):
+    ordered=sorted(
+        rows,key=lambda x:(stable_key(domain,x["id"],salt=salt),x["id"]))
     seen=set()
     result=[]
     for row in ordered:
@@ -122,7 +123,16 @@ def _select_unique_group(rows,domain):
 
 
 def freeze(*,folio_train,folio_validation,bbh,out_visible,
-           out_source_oracle,out_target_gold,out_manifest):
+           out_source_oracle,out_target_gold,out_manifest,
+           study_salt=SALT,exclude_register=None):
+    """Freeze ID-only cohort; V2 excludes ALL prior visible original groups."""
+    if not isinstance(study_salt,str) or len(study_salt)<12:
+        raise ValueError("pre-registered label-blind ID salt required")
+    previous=None
+    if exclude_register is not None:
+        previous=json.loads(Path(exclude_register).read_text())
+        if not isinstance(previous.get("selected_original_ids"),dict):
+            raise ValueError("invalid immutable prior original ID registry")
     sets={
         "folio_logical_entailment":(
             _rows_folio(folio_train,split="train"),
@@ -137,7 +147,28 @@ def freeze(*,folio_train,folio_validation,bbh,out_visible,
     target_gold=[]
     selections={}
     for domain,(train_rows,test_rows) in sets.items():
-        source=_select_unique_group(train_rows,domain+"/source")
+        blocked_ids=set()
+        blocked_groups=set()
+        if previous is not None:
+            old=previous["selected_original_ids"][domain]
+            for category in (
+                "train_original_ids","eval_SOURCE_ids",
+                "heldout_original_TARGET_ids"):
+                blocked_ids.update(old[category])
+            for category in (
+                "train_story_ids","source_story_ids","target_story_ids"):
+                blocked_groups.update(old[category])
+        # Exclude every previously exposed semantic premise/story group,
+        # not merely their different row IDs or changed target answers.
+        train_rows=[x for x in train_rows if
+                    x["id"] not in blocked_ids and
+                    x["group_id"] not in blocked_groups]
+        if test_rows is not None:
+            test_rows=[x for x in test_rows if
+                       x["id"] not in blocked_ids and
+                       x["group_id"] not in blocked_groups]
+        source=_select_unique_group(
+            train_rows,domain+"/source",salt=study_salt)
         required_source=(
             TRAIN_EPISODES_PER_DOMAIN*3+TARGETS_PER_DOMAIN*3)
         if len(source)<required_source:
@@ -157,7 +188,7 @@ def freeze(*,folio_train,folio_validation,bbh,out_visible,
         else:
             targets=[
                 x for x in _select_unique_group(
-                    test_rows,domain+"/target")
+                    test_rows,domain+"/target",salt=study_salt)
                 if x["group_id"] not in source_story_ids][
                     :TARGETS_PER_DOMAIN]
         if len(targets)!=TARGETS_PER_DOMAIN:
@@ -233,7 +264,11 @@ def freeze(*,folio_train,folio_validation,bbh,out_visible,
     }
     manifest={
         "schema":"NEUMANN.Q3Q6.TWO-AUTHOR-PREREGISTRY.v1",
-        "frozen_salt":SALT,"repository_head":os.getenv("GITHUB_SHA",""),
+        "frozen_salt":study_salt,
+        "excluded_prior_author_original_register_sha256":(
+            digest(Path(exclude_register).read_bytes())
+            if exclude_register is not None else None),
+        "repository_head":os.getenv("GITHUB_SHA",""),
         "base_model":MODEL,"base_revision":REV,
         "train_episodes_per_domain":TRAIN_EPISODES_PER_DOMAIN,
         "target_originals_per_domain":TARGETS_PER_DOMAIN,
@@ -267,6 +302,8 @@ def main():
               "out-visible","out-source-oracle",
               "out-target-gold","out-manifest"):
         f.add_argument("--"+n,required=True)
+    f.add_argument("--study-salt",default=SALT)
+    f.add_argument("--exclude-register")
     a=p.parse_args()
     if a.cmd=="freeze":
         freeze(folio_train=a.folio_train,
@@ -274,7 +311,9 @@ def main():
                out_visible=a.out_visible,
                out_source_oracle=a.out_source_oracle,
                out_target_gold=a.out_target_gold,
-               out_manifest=a.out_manifest)
+               out_manifest=a.out_manifest,
+               study_salt=a.study_salt,
+               exclude_register=a.exclude_register)
 
 
 if __name__=="__main__":
