@@ -24,15 +24,17 @@ def audit(source_file,out,model_revision):
         if len(pair)<3:
             continue
         train=pair[:-1]
-        original=source_discovery_prompt(train)
-        compact=original
+        # The deployed prompt is now compact; reconstruct the OLD spaced
+        # representation explicitly to preserve before/after comparability.
+        compact=source_discovery_prompt(train)
+        original=compact
         for x,y in train:
             for prefix,obj in (("Source input: ",x),
                                ("Expected source output: ",y)):
-                old=prefix+json.dumps(obj,ensure_ascii=True)
-                new=prefix+json.dumps(
+                spaced=prefix+json.dumps(obj,ensure_ascii=True)
+                tight=prefix+json.dumps(
                     obj,ensure_ascii=True,separators=(",",":"))
-                compact=compact.replace(old,new)
+                original=original.replace(tight,spaced)
         a=len(tokenizer(
             model_prefix(tokenizer,original),
             add_special_tokens=False,truncation=False)["input_ids"])
