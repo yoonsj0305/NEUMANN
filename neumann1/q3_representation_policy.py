@@ -21,6 +21,8 @@ import json
 
 from .open_program_inventor import source_same_value
 from .q3_object_graph_invention import induce_object_graph_factors
+from .q3_source_residual_probes import (
+    induce_source_residual_probes,source_edit_f1)
 
 
 @dataclass(frozen=True)
@@ -28,6 +30,7 @@ class FeatureOutcome:
     name: str
     successful_transfer: int
     falsified_transfer: int
+    partial_transfer: int = 0
 
 
 @dataclass(frozen=True)
@@ -130,10 +133,15 @@ class LearnedRepresentationPrior:
                 [source_id,train,checks]).encode()).hexdigest())
             # Use only training SOURCE to create hypotheses. Independent
             # SOURCE check labels are consumed by the real verifier ONLY.
-            factors=induce_object_graph_factors(train,max_candidates=12)
+            # First-principles deletion: stop demanding a perfect SOURCE
+            # program before the discovery policy can learn from errors.
+            # Probe grammars are available to BOTH frozen-classical A and C.
+            factors=tuple(induce_object_graph_factors(
+                train,max_candidates=12))+tuple(
+                induce_source_residual_probes(train,max_probes=8))
             for factor in factors:
-                key=factor.representation.rsplit("/",1)[-1]
-                scores=ledger.setdefault(key,[0,0])
+                key=factor.representation
+                scores=ledger.setdefault(key,[0,0,0])
                 output=runner.evaluate(factor.program,[x for x,y in checks])
                 executions+=1
                 accepted=(
@@ -142,8 +150,16 @@ class LearnedRepresentationPrior:
                     all(source_same_value(value,y)
                         for value,(_,y) in zip(output.outputs,checks)))
                 scores[0 if accepted else 1]+=1
+                if not accepted and output.status=="EXECUTED" and (
+                        len(output.outputs)==len(checks)):
+                    # Partial causal explanations are useful learning data,
+                    # but NEVER counted as independently correct solutions.
+                    gain=sum(source_edit_f1(x,y,p) for p,(x,y)
+                             in zip(output.outputs,checks))/len(checks)
+                    if gain>0.0:
+                        scores[2]+=1
         return cls(
-            tuple(FeatureOutcome(key,v[0],v[1])
+            tuple(FeatureOutcome(key,v[0],v[1],v[2])
                   for key,v in sorted(ledger.items())),
             tuple(sorted(receipts)),executions)
 
@@ -162,9 +178,12 @@ class LearnedRepresentationPrior:
             raise ValueError("invalid or duplicated SOURCE identity")
         outcomes=tuple(FeatureOutcome(
             str(x["name"]),int(x["successful_transfer"]),
-            int(x["falsified_transfer"])) for x in rows)
+            int(x["falsified_transfer"]),
+            int(x.get("partial_transfer",0))) for x in rows)
         if (len({x.name for x in outcomes})!=len(outcomes)
                 or any(x.successful_transfer<0 or x.falsified_transfer<0
+                       or x.partial_transfer<0
+                       or x.partial_transfer>x.falsified_transfer
                        for x in outcomes)):
             raise ValueError("corrupted learned preference counts")
         return cls(outcomes,tuple(ids),int(snapshot["check_executions"]))
@@ -178,19 +197,26 @@ class LearnedRepresentationPrior:
             "outcomes":[{
                 "name":x.name,
                 "successful_transfer":x.successful_transfer,
-                "falsified_transfer":x.falsified_transfer}
+                "falsified_transfer":x.falsified_transfer,
+                "partial_transfer":x.partial_transfer}
                 for x in self.outcomes],
             "q3_global":"OPEN"}
 
     def score(self,representation):
         """Beta(1,1) smoothed probability, not a fabricated exact win."""
-        name=representation.rsplit("/",1)[-1]
         for evidence in self.outcomes:
-            if evidence.name==name:
-                return ((evidence.successful_transfer+1)/
-                        (evidence.successful_transfer+
-                         evidence.falsified_transfer+2))
-        return 0.5
+            # Accept either exact source-inferred graph name or a qualified
+            # source-probe name. Avoid silently merging unrelated feature
+            # families with a coincidentally equal suffix.
+            if (evidence.name==representation or
+                    evidence.name==representation.rsplit("/",1)[-1]):
+                total=(evidence.successful_transfer+
+                       evidence.falsified_transfer)
+                # Partial means "a useful changed-cell relation", NOT a
+                # correct full program: credit no more than 1/2 each.
+                return ((evidence.successful_transfer+
+                         0.5*evidence.partial_transfer+1)/(total+2))
+        return 0.0
 
     def order_key(self,factor):
         return (-self.score(factor.representation),
@@ -210,7 +236,8 @@ class LearnedRepresentationPrior:
             "outcomes":[{
                 "feature":o.name,
                 "pass":o.successful_transfer,
-                "refuted":o.falsified_transfer
+                "refuted":o.falsified_transfer,
+                "partial_edit_improvements_not_exact":o.partial_transfer
             } for o in self.outcomes],
             "target_gold_read":False,
             "q3_global":"OPEN",
