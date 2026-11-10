@@ -52,6 +52,17 @@ def test_original_corpus_freeze_separates_target_gold_from_model(tmp_path):
     assert "target_label" not in visible.read_text()
     assert all("label" not in t["target"] for t in
                v["evaluation_tasks"])
+    # The old study sampled four *unrelated* original-story groups per
+    # target. These examples are valid SOURCE classification demonstrations,
+    # but NOT independent tests of one target's hidden causal mechanism.
+    from research.q3.q3q6_predictive_state_original import (
+        source_can_certify_target)
+    assert all(
+        not source_can_certify_target(task)
+        for task in v["evaluation_tasks"])
+    assert all(
+        len(set(task["source_target_world_group_hashes"].values()))==4
+        for task in v["evaluation_tasks"])
     assert all(set(m["selected_original_ids"][domain][
         "heldout_original_TARGET_ids"]).isdisjoint(
         m["selected_original_ids"][domain]["train_original_ids"]+
@@ -120,3 +131,26 @@ def test_exact_scorer_refuses_to_promote_non_learning_to_new_intelligence(tmp_pa
     assert not s["causal_two_domain_initial_condition"]
     assert all(v["C_exact"]==4 for v in s["domains"].values())
     assert s["Q3_global"]==s["Q6_global"]=="OPEN"
+
+
+def test_cross_world_source_accuracy_never_certifies_new_target():
+    from research.q3.q3q6_predictive_state_original import (
+        source_can_certify_target)
+    unrelated={
+        "source_target_world_group_hashes":{
+            "demonstration":"world-a","probe":"world-b",
+            "sealed":"world-c","target":"world-d"},
+        "source_target_common_world_certificate":True,
+    }
+    assert not source_can_certify_target(unrelated)
+    same={
+        "source_target_world_group_hashes":{
+            "demonstration":"same-world","probe":"same-world",
+            "sealed":"same-world","target":"same-world"},
+        "source_target_common_world_certificate":True,
+    }
+    assert source_can_certify_target(same)
+    assert not source_can_certify_target(dict(
+        same,source_target_common_world_certificate=False))
+    assert not source_can_certify_target({
+        "source_target_world_group_hashes":{"target":"same-world"}})
