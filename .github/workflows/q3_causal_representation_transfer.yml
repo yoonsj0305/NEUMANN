@@ -1,0 +1,81 @@
+name: Q3 Causal Source-Learned Representation Transfer - 30 Train / 20 Holdout
+on:
+  push:
+    branches:
+      - research/q3-composable-source-program-invention-20261110
+    paths:
+      - ".github/workflows/q3_causal_representation_transfer.yml"
+      - "research/q3/q3_causal_representation_transfer.py"
+      - "neumann1/q3_representation_policy.py"
+      - "neumann1/q3_structural_invention.py"
+      - "neumann1/q3_residual_composition.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  disjoint_source_causal_gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Use one common SOURCE-only Q3 inference core and real Docker oracle
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          docker pull python:3.11-alpine
+          python -m pytest -q -x \
+            tests/test_q3_source_residual_probes.py \
+            tests/test_q3_residual_composition.py \
+            tests/test_q3_representation_policy.py
+      - name: Reuse immutable ARC2 SOURCE-only 50 author originals, no TARGET downloads
+        run: |
+          set -euo pipefail
+          mkdir -p source_only evidence
+          gh run download 42735035357 \
+            --name q3-original-arc2-source-only-frozen \
+            --dir source_only
+          test "$(cut -d ' ' -f1 source_only/ORIGINAL_SOURCE_ONLY.sha256)" = \
+            "$(sha256sum source_only/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path("source_only/ORIGINAL_SOURCE_ONLY.json").read_text())
+          assert d["original_source_count"]==50
+          assert d["no_target_gold_in_payload"] is True
+          assert not any("test" in x for x in d["records"])
+          print("Q3_NO_TARGET_GOLD_ONLY_SOURCE_PRE_REGISTERED",flush=True)
+          PY
+      - name: Train representation selection on 30 originals, test against 20 completely disjoint SOURCE author problems
+        run: |
+          set -euo pipefail
+          python -m research.q3.q3_causal_representation_transfer \
+            --frozen-source source_only/ORIGINAL_SOURCE_ONLY.json \
+            --out evidence/SOURCE_CAUSAL_CROSS_TASK.json
+          sha256sum evidence/SOURCE_CAUSAL_CROSS_TASK.json \
+            > evidence/SOURCE_CAUSAL_CROSS_TASK.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.loads(Path("evidence/SOURCE_CAUSAL_CROSS_TASK.json").read_text())
+          result=s["summary"]
+          assert result["tasks"]==20
+          assert result["no_original_target_gold"] is True
+          assert result["q3_global"]=="OPEN"
+          print("Q3_INDEPENDENT_SOURCE_TRANSFER_ABLATION",result,flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-disjoint-source-30-learn-20-heldout-causal-evidence
+          path: evidence/
+          if-no-files-found: warn
+          retention-days: 90
