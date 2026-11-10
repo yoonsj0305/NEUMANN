@@ -30,6 +30,7 @@ from .open_program_inventor import source_same_value, validate_code
 from .q3_structure_factorization import induce_structural_factors
 from .q3_object_graph_invention import induce_object_graph_factors
 from .q3_source_residual_probes import induce_source_residual_probes
+from .q3_residual_composition import induce_source_compositions
 
 _INVALID = object()
 
@@ -327,6 +328,10 @@ class StructuralInventionPolicy:
         # SOURCE proposals; the same independent Docker gate decides truth.
         factors.extend(induce_source_residual_probes(
             source_pairs,max_probes=min(8,self.max_candidates)))
+        # Two partial causal laws may jointly explain an original SOURCE
+        # transformation. Give A and C the SAME compositional grammar.
+        factors.extend(induce_source_compositions(
+            source_pairs,max_candidates=min(6,self.max_candidates)))
         if self.representation_prior is not None:
             factors.sort(key=self.representation_prior.order_key)
         else:
