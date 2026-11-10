@@ -31,13 +31,13 @@ jobs:
           name: q3q6-original-target-gold-sealed-scorer-only
           path: target_gold
           run-id: 42834364029
-          github-token: TOKEN_PLACEHOLDER
+          github-token: ${{ github.token }}
       - uses: actions/download-artifact@v4
         with:
           name: q3q6-neural-source-learned-frozen-original-predictions
           path: frozen_predictions
           run-id: 42834364029
-          github-token: TOKEN_PLACEHOLDER
+          github-token: ${{ github.token }}
       - name: Validate immutable original predictions and score without model dependencies
         run: |
           set -euo pipefail
