@@ -55,17 +55,25 @@ def stable_key(domain,item):
 
 def _rows_folio(path):
     rows=[]
-    for line in Path(path).read_text().splitlines():
+    for row_number,line in enumerate(Path(path).read_text().splitlines()):
         if not line.strip():
             continue
         r=json.loads(line)
-        if not all(k in r for k in (
-                "story_id","example_id","premises","conclusion","label")):
+        # Original TRAIN carries story_id/example_id; official VALIDATION
+        # carries neither. Never infer identity from the heldout label.
+        if not all(k in r for k in ("premises","conclusion","label")):
             raise ValueError("unexpected original FOLIO schema")
+        if (not isinstance(r["premises"],list) or
+                not isinstance(r["conclusion"],str)):
+            raise ValueError("invalid original FOLIO natural language")
         if r["label"] not in ("True","False","Unknown"):
             raise ValueError("unexpected FOLIO original label")
+        original_id=r.get("example_id","validation-row-"+str(row_number))
+        # Group by actual premise text, not absent official validation ID:
+        # multiple target conclusions from the SAME world are not new domains.
+        group_id=digest(canonical(r["premises"]))
         rows.append({
-            "id":str(r["example_id"]),"group_id":str(r["story_id"]),
+            "id":str(original_id),"group_id":group_id,
             "input":{"premises":r["premises"],
                      "conclusion":r["conclusion"],
                      "answer_set":["True","False","Unknown"]},
