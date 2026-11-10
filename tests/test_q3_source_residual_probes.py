@@ -67,7 +67,9 @@ def test_partial_source_posterior_rejects_test_gold_tamper_and_frozen_provenance
     snapshot=prior.source_snapshot()
     restored=LearnedRepresentationPrior.from_source_snapshot(snapshot)
     assert restored==prior
-    assert prior.score("probe/atomic-relation")>prior.score(
+    # Partial-only results are independently refuted complete programs.
+    # They must NOT outrank never-tried exact representations.
+    assert prior.score("probe/atomic-relation")<prior.score(
         "probe/undiscovered-no-evidence")
     snapshot["outcomes"][0]["partial_transfer"]=10000000
     with pytest.raises(ValueError,match="corrupted"):
