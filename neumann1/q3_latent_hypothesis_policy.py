@@ -13,9 +13,9 @@ from .open_program_inventor import UnsafeProposal, validate_code
 from .q3_source_repair_learning import recertified_repair_prompt
 
 
-def hypothesis_prompt(source_prompt):
+def hypothesis_prompt(source_prompt, prior_hypothesis=None):
     """Same prompt string at neural training and inference time."""
-    return (source_prompt +
+    if prior_hypothesis is not None:\n        if not isinstance(prior_hypothesis,str) or not 10<=len(prior_hypothesis)<=3000:\n            raise ValueError("bounded prior model hypothesis required")\n        source_prompt += ("\\nPrevious model-authored hypothesis to revise: "\n                          +prior_hypothesis+"\\n")\n    return (source_prompt +
         "\nBefore choosing an implementation, infer a falsifiable internal "
         "explanation of the observations. You may introduce new latent "
         "variables, relations and coordinate systems. Do not select a "
@@ -60,10 +60,10 @@ class HypothesisConditionedPolicy:
     """
     def __init__(self,base_policy):
         self.base_policy=base_policy
-        self.hypothesis_attempts=[]
+        self.hypothesis_attempts=[]\n        self._previous_hypothesis=None
 
     def propose(self,source_prompt):
-        raw=self.base_policy.propose(hypothesis_prompt(source_prompt))
+        raw=self.base_policy.propose(\n            hypothesis_prompt(source_prompt,self._previous_hypothesis))
         hypothesis,code=parse_hypothesis_proposal(raw)
         self.hypothesis_attempts.append({
             "hypothesis":hypothesis,
