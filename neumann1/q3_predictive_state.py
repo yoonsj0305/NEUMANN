@@ -137,18 +137,30 @@ class PredictiveStatePolicy:
             raise ValueError("signed SOURCE provenance required")
         if observed not in query.get("answer_set",[]):
             raise ValueError("SOURCE observation outside declared answer space")
+        self.model.eval()
+        # First infer relative outcome probabilities without retaining any
+        # long-sequence graphs. Cross-entropy exact gradient at this model
+        # point is sum_i (p_i - 1[i=gold]) * grad(score_i).
+        with self.torch.inference_mode():
+            initial_scores,choices=self._scores(context,memory,query)
+            probability=self.torch.softmax(
+                initial_scores.detach().float(),dim=0).clone()
+            observed_index=choices.index(observed)
+            loss_value=float(-self.torch.log(
+                probability[observed_index].clamp_min(1e-12)).cpu())
         self.model.train()
         self.optimizer.zero_grad(set_to_none=True)
-        logits,choices=self._scores(context,memory,query)
-        target=self.torch.tensor(
-            [choices.index(observed)],device=self.device,dtype=self.torch.long)
-        loss=self.torch.nn.functional.cross_entropy(
-            logits.view(1,-1),target)
-        if not self.torch.isfinite(loss):
-            raise ValueError("SOURCE causal-world loss nonfinite")
+        prefix,_=self._prompt(context,memory,query)
         trainable=[p for p in self.model.parameters() if p.requires_grad]
         before=[p.detach().clone() for p in trainable]
-        loss.backward()
+        for i,label in enumerate(choices):
+            coefficient=float(probability[i])-(1.0 if i==observed_index else 0.0)
+            if abs(coefficient)<1e-9:
+                continue
+            # Exactly one candidate's graph lives at once, crucial for
+            # CPU local and 7 GB GitHub runner memory limits.
+            score=self._choice_loglik(prefix,label)
+            (coefficient*score).backward()
         self.torch.nn.utils.clip_grad_norm_(trainable,1.0)
         self.optimizer.step()
         delta=sum(float((p.detach()-b).abs().sum().cpu())
@@ -158,7 +170,7 @@ class PredictiveStatePolicy:
         return {
             "update":self.update_count,
             "actual_trainable_weight_delta_l1":delta,
-            "source_prediction_loss":float(loss.detach().cpu()),
+            "source_prediction_loss":loss_value,
             "evidence_id":evidence_id,
             "scope":"TRUSTED_SOURCE_ONLY",
             "learned_internal_representation_not_interpretable_concept_proof":True,
