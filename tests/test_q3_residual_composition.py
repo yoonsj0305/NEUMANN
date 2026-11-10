@@ -3,7 +3,8 @@ import pytest
 
 from neumann1.open_program_inventor import (
     IsolatedPython,source_same_value,validate_code)
-from neumann1.q3_residual_composition import induce_source_compositions
+from neumann1.q3_residual_composition import (
+    induce_source_compositions,induce_residual_guided_compositions)
 from neumann1.q3_source_residual_probes import induce_source_residual_probes
 from neumann1.q3_single_discovery_core import SingleDiscoveryCore
 from neumann1.q3_structural_invention import StructuralInventionPolicy
@@ -82,3 +83,68 @@ def test_safe_bounded_program_algebra_and_no_target_oracle():
         assert "TARGET" not in m.program
         assert "eval(" not in m.program
         assert "exec(" not in m.program
+
+
+def test_second_stage_is_invented_from_first_stage_residual_not_memorized_answer():
+    """A movement followed by relabeling is absent from original atomic probes.
+
+    The new algorithm must first invent how to move a token, observe the
+    remaining SOURCE discrepancy, then invent a fresh second method.
+    """
+    def source(r,c):
+        x=[[0]*7 for _ in range(5)]
+        y=[[0]*7 for _ in range(5)]
+        x[r][c]=1
+        y[r][c+1]=2
+        return x,y
+    train=[source(1,1),source(2,3)]
+    independent=[source(3,4)]
+    runner=IsolatedPython(max_seconds=8)
+    originals=induce_source_residual_probes(train,max_probes=8)
+    assert originals
+    assert all(not source_same_value(
+        runner.evaluate(p.program,[independent[0][0]]).outputs[0],
+        independent[0][1]) for p in originals)
+    synthesized=induce_residual_guided_compositions(train,max_candidates=6)
+    assert synthesized
+    successes=[]
+    for candidate in synthesized:
+        result=runner.evaluate(
+            candidate.program,[x for x,y in independent])
+        if result.status=="EXECUTED" and source_same_value(
+                result.outputs[0],independent[0][1]):
+            successes.append(candidate)
+    assert successes
+    assert any("stage2(stage1(x))" in p.program for p in successes)
+    assert all(p.program not in [base.program for base in originals]
+               for p in successes)
+    # Same original single core makes the final independent certification.
+    policy=StructuralInventionPolicy(max_candidates=12)
+    outcome=SingleDiscoveryCore(
+        policy,runner,max_proposals=12).discover(
+        train,independent,reuse_memory=False).discovery
+    assert outcome.verified
+
+
+def test_new_residual_guided_invention_rejected_by_independent_counterexample():
+    def source(r,c,target):
+        x=[[0]*7 for _ in range(5)]
+        y=[[0]*7 for _ in range(5)]
+        x[r][c]=1
+        y[r][c+1]=target
+        return x,y
+    train=[source(1,1,2),source(2,3,2)]
+    check=[source(3,4,5)]
+    produced=induce_residual_guided_compositions(train,max_candidates=6)
+    assert produced
+    runner=IsolatedPython(max_seconds=8)
+    assert all(
+        not source_same_value(
+            runner.evaluate(p.program,[check[0][0]]).outputs[0],
+            check[0][1])
+        for p in produced)
+    p=StructuralInventionPolicy(max_candidates=12)
+    result=SingleDiscoveryCore(
+        p,runner,max_proposals=12).discover(
+        train,check,reuse_memory=False).discovery
+    assert result.verified is False
