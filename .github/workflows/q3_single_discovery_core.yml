@@ -12,10 +12,13 @@ on:
       - "neumann1/q3_latent_world_policy.py"
       - "tests/test_causal_experience_core.py"
       - "tests/test_q3q6_original_transfer_gate.py"
+      - "tests/test_q3_predictive_state_contract.py"
+      - "neumann1/q3_predictive_state.py"
+      - "research/q3/q3q6_predictive_state_original.py"
       - "research/q3/q3q6_two_author_freeze.py"
       - "research/q3/q3q6_original_transfer_run.py"
       - "neumann1/registry_engine.py"
-      - "tests/test_q3_single_discovery_core.py tests/test_q3q6_original_transfer_gate.py"
+      - "tests/test_q3_single_discovery_core.py tests/test_q3q6_original_transfer_gate.py tests/test_q3_predictive_state_contract.py"
       - ".github/workflows/q3_single_discovery_core.yml"
   workflow_dispatch:
 permissions:
