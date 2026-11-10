@@ -107,13 +107,21 @@ def recertified_repair_prompt(row,runner):
         suffix=source_refutation_feedback(code,train,outcome)
         phase="TRAIN_SOURCE"
     else:
-        held=runner.evaluate(code,[x for x,y in checks])
+        # Only checks that the inference loop may legally disclose can be
+        # part of a repair prompt. The last independent SOURCE check stays
+        # sealed even while past teacher episodes are recertified.
+        feedback_count=row.get("repair_feedback_checks_count",0)
+        if (type(feedback_count) is not int or
+                not 1<=feedback_count<len(checks)):
+            raise ValueError("no fresh sealed SOURCE check after repair")
+        feedback=checks[:feedback_count]
+        held=runner.evaluate(code,[x for x,y in feedback])
         if held.status not in ("EXECUTED","EXECUTED_WITH_ERRORS"):
             raise ValueError("prior cannot be checked in independent sandbox")
-        if not _witnesses(checks,held):
-            raise ValueError("prior is already fully SOURCE-verified; no repair")
+        if not _witnesses(feedback,held):
+            raise ValueError("prior was not falsified by feedback SOURCE")
         suffix=source_refutation_feedback(
-            code,checks,held,independent=True)
+            code,feedback,held,independent=True)
         phase="INDEPENDENT_SOURCE"
     if phase!=row.get("repair_phase"):
         raise ValueError("repair counterexample phase mismatches provenance")
