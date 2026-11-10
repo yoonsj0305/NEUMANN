@@ -217,6 +217,17 @@ def freeze(*,folio_train,folio_validation,bbh,out_visible,
         for i,target in enumerate(targets):
             source_three=eval_source[3*i:3*i+3]
             task_id=domain+".original."+target["id"]
+            # These are four DIFFERENT author-world groups. They may be
+            # useful supervised examples of a general domain, but they are
+            # not experiments probing the *same* hidden causal rule.
+            group_ids={
+                "demonstration":source_three[0]["group_id"],
+                "probe":source_three[1]["group_id"],
+                "sealed":source_three[2]["group_id"],
+                "target":target["group_id"],
+            }
+            causal_linkage=(
+                len(set(group_ids.values()))==1)
             visible["evaluation_tasks"].append({
                 "domain":domain,"task_id":task_id,
                 "demonstration":{
@@ -226,6 +237,8 @@ def freeze(*,folio_train,folio_validation,bbh,out_visible,
                 "sealed":{"input":source_three[2]["input"]},
                 "target":{"input":target["input"],
                           "original_id":target["id"]},
+                "source_target_common_world_certificate":causal_linkage,
+                "source_target_world_group_hashes":group_ids,
             })
             source_hidden.append({
                 "task_id":task_id,
@@ -274,6 +287,7 @@ def freeze(*,folio_train,folio_validation,bbh,out_visible,
         "target_originals_per_domain":TARGETS_PER_DOMAIN,
         "one_trainable_core_no_domain_solver":True,
         "no_TARGET_gold_in_model_visible_bundle":True,
+        "cross_instance_source_checks_not_same_world_verification":True,
         "model_visible_sha256":digest(Path(out_visible).read_bytes()),
         "SOURCE_oracle_sha256":digest(Path(out_source_oracle).read_bytes()),
         "TARGET_gold_sha256":digest(Path(out_target_gold).read_bytes()),
