@@ -66,7 +66,8 @@ class ExperienceStructureFormer:
             self.core.start(
                 ident,{"problem":problem.raw_text,
                        "observations":md.get("observations",())},
-                queries,sealed_queries=sealed)
+                queries,sealed_queries=sealed,
+                target_queries=md.get("unlabeled_target_query_ids",()))
         return self.core.representation()
 
     def observe_source(self,query_id,actual,*,evidence_id,verify_source,
@@ -78,6 +79,10 @@ class ExperienceStructureFormer:
         if revise_context is not None:
             self.core.revise(revise_context)
         return updates
+
+    def predict_unlabeled_target(self,query_id):
+        """Return a frozen prediction, never a TARGET gold or training label."""
+        return self.core.predict_target(query_id)
 
     def certify_source(self,query_id,actual,*,evidence_id,verify_source):
         """One-shot independent SOURCE proof, no adaptive learning."""
