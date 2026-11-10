@@ -1,0 +1,33 @@
+name: Q3 Causal Learned Representation Choice - Real SOURCE Counterexamples
+on:
+  push:
+    branches:
+      - research/q3-evidence-trained-representation-policy-20261110
+    paths:
+      - ".github/workflows/q3_representation_policy_gate.yml"
+      - "neumann1/q3_representation_policy.py"
+      - "neumann1/q3_object_graph_invention.py"
+      - "neumann1/q3_structural_invention.py"
+      - "tests/test_q3_representation_policy.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  learned_causal_representation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Train representation choice with actual disjoint SOURCE receipts and Docker
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          docker pull python:3.11-alpine
+          python -m pytest -q -x \
+            tests/test_q3_representation_policy.py \
+            tests/test_q3_object_graph_invention.py \
+            tests/test_q3_structural_invention.py \
+            tests/test_q3_structural_original_contract.py
