@@ -189,7 +189,7 @@ def _classical_arcana(source,targets):
         return [],"ABSTAIN_NATIVE_"+type(exc).__name__
 
 
-def infer(blind,teacher_file,output):
+def infer(blind,teacher_file,output,*,external_source_prior=None):
     inp=json.loads(Path(blind).read_text())
     if inp.get("schema")!=SCHEMA or not inp.get("no_target_gold_in_blind"):
         raise ValueError("invalid original author blind")
@@ -206,6 +206,19 @@ def infer(blind,teacher_file,output):
         raise ValueError("no learned discovery operator policy")
     representation_prior=LearnedRepresentationPrior.learn(
         library.episodes,runner)
+    if external_source_prior is not None:
+        # This source-only prior was frozen by an independently registered
+        # ARC2 author-development job before the target author originals
+        # were even loaded. Never train from current TARGET outputs.
+        frozen=json.loads(Path(external_source_prior).read_text())
+        if (frozen.get("training_original_author")!="ARC-AGI-2"
+                or frozen.get("training_original_revision")!=
+                   "f3283f727488ad98fe575ea6a5ac981e4a188e49"
+                or frozen.get("source_teacher_count",0)<2
+                or not frozen.get("frozen_source_only_sha256")):
+            raise ValueError("external graph method evidence is not pinned")
+        representation_prior=LearnedRepresentationPrior.from_source_snapshot(
+            frozen)
     print("Q3_DISCOVERY_REPRESENTATION_POLICY_SOURCE_TRAINED",
           representation_prior.evidence(),flush=True)
     known={e.program for e in library.episodes}
@@ -288,6 +301,9 @@ def infer(blind,teacher_file,output):
         "policy_weights_sha256":sha256(canonical(fitted.weights).encode()).hexdigest(),
         "learned_operator_weights":fitted.weights,
         "source_refutation_representation_policy":representation_prior.evidence(),
+        "external_source_policy_sha256":(
+            sha_file(external_source_prior)
+            if external_source_prior is not None else None),
         "same_general_executable_substrate":True,
         "max_states":6500,
         "max_evaluations":250000,
@@ -425,6 +441,7 @@ if __name__=="__main__":
         if name=="infer":
             x.add_argument("--blind",required=True)
             x.add_argument("--teachers",required=True)
+            x.add_argument("--representation-prior",default=None)
             x.add_argument("--out",required=True)
         if name=="score":
             x.add_argument("--blind",required=True)
@@ -445,7 +462,8 @@ if __name__=="__main__":
     elif args.cmd=="freeze-arcana-next8-v2":
         freeze_arcana_next8(args.original,args.out,skip=8)
     elif args.cmd=="infer":
-        infer(args.blind,args.teachers,args.out)
+        infer(args.blind,args.teachers,args.out,
+              external_source_prior=args.representation_prior)
     elif args.cmd=="score":
         score(args.blind,args.predictions,args.expected_sha,
               args.original,args.out)
