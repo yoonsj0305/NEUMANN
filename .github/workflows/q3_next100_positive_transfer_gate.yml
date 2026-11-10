@@ -1,0 +1,234 @@
+name: Q3 Positive SOURCE Evidence -> Prospective 100 A/C Original Author Transfer
+on:
+  push:
+    branches:
+      - research/q3-positive-evidence-prospective-next100-20261110
+    paths:
+      - ".github/workflows/q3_next100_positive_transfer_gate.yml"
+      - "research/q3/q3_next100_positive_transfer.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONHASHSEED: "0"
+  OMP_NUM_THREADS: "1"
+  OPENBLAS_NUM_THREADS: "1"
+jobs:
+  freeze_next100_source_cohort:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - name: Freeze 100 IDs by SHA, exclude exactly prior 50+100 before inspecting any outcomes
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          mkdir -p old50 prior100 next100
+          gh run download 42735035357 --name q3-original-arc2-source-only-frozen --dir old50
+          gh run download 42757846590 --name q3-prospective-source-100-originals-frozen --dir prior100
+          test "$(cut -d ' ' -f1 old50/ORIGINAL_SOURCE_ONLY.sha256)" = "$(sha256sum old50/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+          test "$(cut -d ' ' -f1 prior100/ORIGINAL_SOURCE_ONLY.sha256)" = "$(sha256sum prior100/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+          git init -q /tmp/author
+          git -C /tmp/author fetch -q --depth 1 https://github.com/arcprize/ARC-AGI-2.git f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/author checkout -q FETCH_HEAD
+          test "$(git -C /tmp/author rev-parse HEAD)" = "f3283f727488ad98fe575ea6a5ac981e4a188e49"
+          python -m research.q3.q3_next100_positive_transfer freeze --author-root /tmp/author/data/training --old50 old50/ORIGINAL_SOURCE_ONLY.json --prior100 prior100/ORIGINAL_SOURCE_ONLY.json --out next100/ORIGINAL_SOURCE_ONLY.json
+          sha256sum next100/ORIGINAL_SOURCE_ONLY.json > next100/ORIGINAL_SOURCE_ONLY.sha256
+          rm -rf /tmp/author
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path("next100/ORIGINAL_SOURCE_ONLY.json").read_text())
+          assert x["original_source_count"]==100
+          assert x["source_scope"]=="NEXT100_RELATIVE_TO_PRIOR_150_ONLY"
+          assert x["no_target_gold_in_payload"] is True
+          assert not any("test" in r for r in x["records"])
+          print("Q3_NEXT100_AUTHOR_SOURCE_LOCKED",x["source_registry"],flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-next100-hash-registered-source-only
+          path: next100/
+          retention-days: 90
+
+  learn_from_100_real_source_episodes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - name: Train candidate-selection posterior using source errors and real positive proofs only
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          docker pull python:3.11-alpine
+          python -m pytest -q -x tests/test_q3_relational_predicate_invention.py tests/test_q3_relational_reduce_invention.py tests/test_q3_representation_policy.py
+          mkdir -p prior100 prior
+          gh run download 42757846590 --name q3-prospective-source-100-originals-frozen --dir prior100
+          test "$(cut -d ' ' -f1 prior100/ORIGINAL_SOURCE_ONLY.sha256)" = "$(sha256sum prior100/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+          python -m research.q3.q3_next100_positive_transfer learn --prior100 prior100/ORIGINAL_SOURCE_ONLY.json --out prior/FROZEN_LEARNED_SOURCE_PRIOR.json
+          sha256sum prior/FROZEN_LEARNED_SOURCE_PRIOR.json > prior/FROZEN_LEARNED_SOURCE_PRIOR.sha256
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-source100-positive-negative-prior-no-target
+          path: prior/
+          if-no-files-found: warn
+          retention-days: 90
+
+  source_ablate_a_c_and_freeze:
+    needs: [freeze_next100_source_cohort,learn_from_100_real_source_episodes]
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-next100-hash-registered-source-only
+          path: next100
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-source100-positive-negative-prior-no-target
+          path: prior
+      - name: Test equal-grammar A2 vs C2 with independent SOURCE sandbox, retain A12 strong classical
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          docker pull python:3.11-alpine
+          mkdir -p methods
+          test "$(cut -d ' ' -f1 next100/ORIGINAL_SOURCE_ONLY.sha256)" = "$(sha256sum next100/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+          test "$(cut -d ' ' -f1 prior/FROZEN_LEARNED_SOURCE_PRIOR.sha256)" = "$(sha256sum prior/FROZEN_LEARNED_SOURCE_PRIOR.json | cut -d ' ' -f1)"
+          python -u -m research.q3.q3_next100_positive_transfer invent --new100 next100/ORIGINAL_SOURCE_ONLY.json --prior prior/FROZEN_LEARNED_SOURCE_PRIOR.json --out methods/FROZEN_SOURCE_METHODS.json
+          sha256sum methods/FROZEN_SOURCE_METHODS.json > methods/FROZEN_SOURCE_METHODS.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path("methods/FROZEN_SOURCE_METHODS.json").read_text())
+          assert x["source_originals"]==100
+          assert x["prior_exposure"]=="NEXT100_RELATIVE_TO_PRIOR_150_ONLY"
+          assert x["target_gold_accessed"] is False
+          assert x["q3_global"]=="OPEN"
+          print("Q3_NEXT100_SOURCE_ONLY_A_C",x["SOURCE_ABLATION"],flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-next100-frozen-a2-a12-c2-source-programs
+          path: methods/
+          if-no-files-found: warn
+          retention-days: 90
+
+  blind_author_test_inputs:
+    needs: source_ablate_a_c_and_freeze
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-next100-frozen-a2-a12-c2-source-programs
+          path: methods
+      - run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          test "$(cut -d ' ' -f1 methods/FROZEN_SOURCE_METHODS.sha256)" = "$(sha256sum methods/FROZEN_SOURCE_METHODS.json | cut -d ' ' -f1)"
+          git init -q /tmp/author
+          git -C /tmp/author fetch -q --depth 1 https://github.com/arcprize/ARC-AGI-2.git f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/author checkout -q FETCH_HEAD
+          mkdir -p blind
+          python -m research.q3.q3_coordinate_original_source_gate blind --methods methods/FROZEN_SOURCE_METHODS.json --author-root /tmp/author/data/training --out blind/TARGET_INPUTS_ONLY.json
+          sha256sum blind/TARGET_INPUTS_ONLY.json > blind/TARGET_INPUTS_ONLY.sha256
+          rm -rf /tmp/author
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-next100-author-inputs-only-no-gold
+          path: blind/
+          retention-days: 90
+
+  predict_before_any_original_gold:
+    needs: blind_author_test_inputs
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-next100-frozen-a2-a12-c2-source-programs
+          path: methods
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-next100-author-inputs-only-no-gold
+          path: blind
+      - run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          docker pull python:3.11-alpine
+          mkdir -p prediction
+          test "$(cut -d ' ' -f1 blind/TARGET_INPUTS_ONLY.sha256)" = "$(sha256sum blind/TARGET_INPUTS_ONLY.json | cut -d ' ' -f1)"
+          python -m research.q3.q3_coordinate_original_source_gate predict --methods methods/FROZEN_SOURCE_METHODS.json --blind blind/TARGET_INPUTS_ONLY.json --out prediction/PREDICTIONS_BEFORE_GOLD.json
+          sha256sum prediction/PREDICTIONS_BEFORE_GOLD.json > prediction/PREDICTIONS_BEFORE_GOLD.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-next100-prediction-sha-frozen-before-gold
+          path: prediction/
+          retention-days: 90
+
+  postfrozen_original_author_a_c_score:
+    needs: predict_before_any_original_gold
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-next100-frozen-a2-a12-c2-source-programs
+          path: methods
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-next100-author-inputs-only-no-gold
+          path: blind
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-next100-prediction-sha-frozen-before-gold
+          path: prediction
+      - run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          test "$(cut -d ' ' -f1 prediction/PREDICTIONS_BEFORE_GOLD.sha256)" = "$(sha256sum prediction/PREDICTIONS_BEFORE_GOLD.json | cut -d ' ' -f1)"
+          git init -q /tmp/author
+          git -C /tmp/author fetch -q --depth 1 https://github.com/arcprize/ARC-AGI-2.git f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/author checkout -q FETCH_HEAD
+          mkdir -p score
+          python -m research.q3.q3_next100_positive_transfer score --author-root /tmp/author/data/training --methods methods/FROZEN_SOURCE_METHODS.json --blind blind/TARGET_INPUTS_ONLY.json --predictions prediction/PREDICTIONS_BEFORE_GOLD.json --expected-sha "$(cut -d ' ' -f1 prediction/PREDICTIONS_BEFORE_GOLD.sha256)" --out score/NEXT100_ORIGINAL_A_C_EXACT.json
+          sha256sum score/NEXT100_ORIGINAL_A_C_EXACT.json > score/NEXT100_ORIGINAL_A_C_EXACT.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.loads(Path("score/NEXT100_ORIGINAL_A_C_EXACT.json").read_text())
+          assert s["cohort_denominator"]==100
+          assert s["scientific_scope"]=="NEXT100_RELATIVE_TO_PRIOR_150_ONLY"
+          assert s["q3_global"]=="OPEN"
+          print("Q3_NEXT100_ORIGINAL_AUTHOR_EXACT_FROZEN",s["original_exact"],
+                {"C2_vs_A2":s["C2_exclusive_vs_A2"],
+                 "C2_vs_A12":s["C2_exclusive_vs_A12"]},flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-next100-100-original-author-a-c-comparison-gold-after-freeze
+          path: score/
+          if-no-files-found: warn
+          retention-days: 90
