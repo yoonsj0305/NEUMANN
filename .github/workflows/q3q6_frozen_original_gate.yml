@@ -49,6 +49,27 @@ jobs:
           curl -fsSL --retry 2 \
             "https://raw.githubusercontent.com/suzgunmirac/BIG-Bench-Hard/$BBH/bbh/causal_judgement.json" \
             -o public_originals/causal_judgement.json
+      - name: Verify pinned official FOLIO train/validation schemas before any model or scoring
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          schemas=[
+              ("public_originals/folio-train.jsonl",
+               {"True","False","Unknown"}),
+              ("public_originals/folio-validation.jsonl",
+               {"True","False","Uncertain"}),
+          ]
+          for filename,expected in schemas:
+              rows=[json.loads(x) for x in Path(filename).read_text().splitlines() if x.strip()]
+              assert len(rows)>100, "official original source not downloaded"
+              vocabulary={r["label"] for r in rows}
+              assert vocabulary==expected, (filename,vocabulary)
+              assert all(isinstance(r["premises"],list) and isinstance(r["conclusion"],str) for r in rows)
+              print("Q3Q6_ORIGINAL_CORPUS_SCHEMA_PINNED",filename,
+                    len(rows),sorted(vocabulary),flush=True)
+          PY
       - name: Freeze SOURCE and untouched original TARGET by ID hash BEFORE model inference
         run: |
           set -euo pipefail
