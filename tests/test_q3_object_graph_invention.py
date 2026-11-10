@@ -117,12 +117,12 @@ def test_frozen_source_graph_rewrite_degrades_on_unseen_feature_class():
     factors=induce_object_graph_factors(known)
     assert factors
     runner=IsolatedPython(max_seconds=8)
-    # Relative "source" symbol roles must generalize to an unseen color,
-    # even if SOURCE training only used literal color 1.
+    # This training cohort contains two equal-shape objects whose actions
+    # differ. Category is essential, so unseen categories must degrade.
     unseen_input,unseen_expected=source(label=5,origin=(0,0))
     run=runner.evaluate(factors[0].program,[unseen_input])
     assert run.status=="EXECUTED"
-    assert source_same_value(run.outputs[0],unseen_expected)
+    assert source_same_value(run.outputs[0],unseen_input)
     # Unknown geometric feature class must fail safely to original input,
     # never claim a verified transformation from unsupported morphology.
     alien=canvas([(7,[(0,0)]),(2,[(5,7),(6,7)])])
@@ -205,3 +205,25 @@ def test_no_graph_rule_claim_without_executable_source_reconstruction():
     out1=canvas([(2,[(5,7),(6,7)])])
     out2=canvas([(1,[(1,1),(1,2)]),(2,[(5,7),(6,7)])])
     assert induce_object_graph_factors([(inp,out1),(inp,out2)])==()
+
+
+
+def test_causal_geometry_rule_is_equivariant_to_unseen_literal_colors():
+    # When shape, not color, predicts the action, SOURCE-induced method must
+    # generalize an entirely unseen category using a relative output role.
+    def make(r,color):
+        first=[(r,1),(r,2)]
+        shifted=[(r,2),(r,3)]
+        second=[(5,8),(6,8)]
+        second_shift=[(5,7),(6,7)]
+        return (
+            canvas([(color,first),(2,second)]),
+            canvas([(color,shifted),(2,second_shift)]))
+    train=[make(0,1),make(1,1)]
+    check=[make(2,5)]
+    plans=induce_object_graph_factors(train)
+    assert plans
+    assert "source" in plans[0].program
+    p,d=certify(train,check)
+    assert d.verified
+    assert "graph-rewrite" not in d.program  # standalone executable, no domain calls
