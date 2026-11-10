@@ -1,0 +1,45 @@
+name: Q3Q6 Audit Existing Frozen Selfplay Semantics (No Model Calls)
+on:
+  push:
+    branches:
+      - research/q3-one-core-selfplay-verified-worlds-20261110
+    paths:
+      - ".github/workflows/q3q6_audit_frozen_selfplay_worlds.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  GH_TOKEN: ${{ github.token }}
+jobs:
+  validate_prospective_original_worlds:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Recheck existing SHA-frozen artifacts; no new training or proposals
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          docker pull python:3.11-alpine
+          mkdir -p worlds evidence
+          gh run download 42791954426 \
+            --name q3-frozen-self-invented-executable-curriculum-48-proposals \
+            --dir worlds
+          sha256sum -c worlds/WORLDS.sha256
+          python -m research.q3.q3_selfplay_semantic_leakage_audit \
+            --train worlds/SELF_CREATED_TRAIN_WORLD_PROOFS.jsonl \
+            --heldout worlds/SELF_CREATED_HELDOUT_WORLD_PROOFS.jsonl \
+            --out evidence/SELFPLAY_FINITE_PROBE_DISTINCTNESS.json
+          sha256sum evidence/SELFPLAY_FINITE_PROBE_DISTINCTNESS.json \
+            > evidence/SELFPLAY_FINITE_PROBE_DISTINCTNESS.sha256
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3q6-frozen-selfplay-no-model-call-behavioral-audit
+          path: evidence/
+          if-no-files-found: warn
+          retention-days: 90
