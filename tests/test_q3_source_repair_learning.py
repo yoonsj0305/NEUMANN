@@ -41,7 +41,7 @@ class RecordedScriptPolicy:
     (
       "def transform(x):\n    return x if x%2==0 else 0",
       "def transform(x):\n    return x",
-      [(2,2),(4,4)],[(3,3)],
+      [(2,2),(4,4)],[(3,3),(5,5)],
       "INDEPENDENT_SOURCE",
     ),
 ])
@@ -100,7 +100,7 @@ def test_unverified_or_fabricated_repair_is_never_training_evidence():
     fabricated=dict(row)
     fabricated["repair_prior_program"]=discovery.program
     fabricated["repair_prior_sha256"]=discovery.frozen_sha256
-    with pytest.raises(ValueError,match="already fully SOURCE-verified"):
+    with pytest.raises(ValueError,match="no fresh sealed SOURCE"):
         recertified_repair_prompt(fabricated,runner)
     false_labels=dict(row)
     false_labels["pairs"]=list(row["pairs"])
@@ -123,3 +123,19 @@ def test_clean_one_shot_success_not_misreported_as_repair():
     assert "repair_prior_program" not in row
     with pytest.raises(ValueError,match="genuine failed prior"):
         recertified_repair_prompt(row,runner)
+
+
+def test_single_sealed_source_check_is_never_used_as_adaptive_oracle():
+    """A failed final SOURCE check is a terminal ABSTAIN, not a new prompt."""
+    runner=IsolatedPython(max_seconds=12)
+    before="def transform(x):\n    return x if x%2==0 else 0"
+    after="def transform(x):\n    return x"
+    policy=RecordedScriptPolicy((before,after))
+    discovery=GenerativeProgramInventor(
+        policy,runner,max_proposals=2).discover(
+            [(2,2),(4,4)],independent_source_checks=[(3,3)])
+    assert discovery.status=="ABSTAIN_SEALED_SOURCE_REFUTED"
+    assert discovery.verified is False
+    assert discovery.program is None
+    assert len(discovery.attempts)==1
+    assert len(policy.prompts)==1, "the sealed check must never be reused"
