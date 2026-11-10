@@ -303,7 +303,7 @@ def score(predictions,gold_path,manifest_path,out):
     report={
         "schema":"NEUMANN.Q3Q6.CAUSAL-ORIGINAL-SCORE.v1",
         "causal_two_domain_initial_condition":bool(condition),
-        "C πραγμα_weight_updates":p["C_actual_weight_updates"],
+        "C_actual_weight_updates":p["C_actual_weight_updates"],
         "C_weight_delta_l1":p["C_weight_delta_l1"],
         "domains":stats,
         "originals":outputs,
