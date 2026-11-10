@@ -1,0 +1,75 @@
+name: Q3 Full Representation Learning Reconnection - Actual Author SOURCE
+on:
+  push:
+    branches:
+      - research/q3-policy-evidence-reconnect-20261110
+    paths:
+      - ".github/workflows/q3_policy_evidence_reconnect.yml"
+      - "neumann1/q3_representation_policy.py"
+      - "tests/test_q3_representation_policy.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONHASHSEED: "0"
+  OMP_NUM_THREADS: "1"
+  OPENBLAS_NUM_THREADS: "1"
+jobs:
+  actual_original_author_source_ablation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run real sandbox mechanism and regression tests
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          docker pull python:3.11-alpine
+          python -m pytest -q -x tests/test_q3_representation_policy.py tests/test_q3_coordinate_morphisms.py tests/test_q3_periodic_residual_invention.py
+      - name: Read PINNED pre-existing 50 AUTHOR SOURCE files only (not original TEST)
+        run: |
+          set -euo pipefail
+          mkdir -p prior evidence
+          gh run download 42735035357 --name q3-original-arc2-source-only-frozen --dir prior
+          test "$(cut -d ' ' -f1 prior/ORIGINAL_SOURCE_ONLY.sha256)" = "$(sha256sum prior/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path("prior/ORIGINAL_SOURCE_ONLY.json").read_text())
+          assert d["original_source_count"]==50
+          assert d["no_target_gold_in_payload"] is True
+          assert len(d["records"])==50
+          assert all("source_train" in x and "source_independent_checks" in x for x in d["records"])
+          print("Q3_50_AUTHOR_SOURCE_NO_TARGET_GOLD_FROZEN",flush=True)
+          PY
+      - name: Train six-representation policy on 30 original SOURCE; check A2 A12 C2 on 20 disjoint SOURCE
+        run: |
+          set -euo pipefail
+          python -m research.q3.q3_causal_representation_transfer \
+            --frozen-source prior/ORIGINAL_SOURCE_ONLY.json \
+            --out evidence/Q3_FULL_REPRESENTATION_SOURCE_TRANSFER.json
+          sha256sum evidence/Q3_FULL_REPRESENTATION_SOURCE_TRANSFER.json > evidence/Q3_FULL_REPRESENTATION_SOURCE_TRANSFER.sha256
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path("evidence/Q3_FULL_REPRESENTATION_SOURCE_TRANSFER.json").read_text())
+          s=d["summary"]
+          assert s["tasks"]==20 and s["no_original_target_gold"] is True
+          assert s["q3_global"]=="OPEN"
+          assert s["learned_prior"]["target_gold_read"] is False
+          print("Q3_RECONNECTED_POLICY_REAL_SOURCE", {
+            k:s[k] for k in ("A2","A12","C2","C2_only_vs_A2","C2_only_vs_A12")
+          },flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-full-representation-learning-original-source-30x20
+          path: evidence/
+          if-no-files-found: warn
+          retention-days: 90
