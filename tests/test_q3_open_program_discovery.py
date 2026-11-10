@@ -37,7 +37,9 @@ def test_source_refutation_and_proposal_revision_in_sandbox(tmp_path):
     assert record.attempts[1].source_correct==2
     assert "falsified" in policy.prompts[1]
     assert record.apply([3,8],runner)==[9,64]
-    sample=source_training_example(source,record)
+    sample=source_training_example(
+        source,record,independent_source_checks=independent,
+        source_identity="constructed-source-repair")
     saved=tmp_path/"source.jsonl"
     saved.write_text(json.dumps(sample)+"\n")
     rows,source_sha=source_training_rows(saved)
