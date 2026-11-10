@@ -1,0 +1,92 @@
+name: Q3 Repair Zero-Signal Bottleneck - Learn From Real SOURCE Residuals
+on:
+  push:
+    branches:
+      - research/q3-evidence-trained-representation-policy-20261110
+    paths:
+      - ".github/workflows/q3_source_residual_learning.yml"
+      - "neumann1/q3_source_residual_probes.py"
+      - "neumann1/q3_representation_policy.py"
+      - "neumann1/q3_structural_invention.py"
+      - "tests/test_q3_source_residual_probes.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  learned_source_residuals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install and test genuine SOURCE hypothesis verifier
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          docker pull python:3.11-alpine
+          python -m pytest -q -x \
+            tests/test_q3_source_residual_probes.py \
+            tests/test_q3_representation_policy.py \
+            tests/test_q3_object_graph_invention.py \
+            tests/test_q3_structural_invention.py
+      - name: Reuse immutable original ARC2 SOURCE-only registry, never access its test labels
+        run: |
+          set -euo pipefail
+          mkdir -p original_source frozen_policy
+          gh run download 42735035357 \
+            --name q3-original-arc2-source-only-frozen \
+            --dir original_source
+          expected="$(cut -d ' ' -f1 original_source/ORIGINAL_SOURCE_ONLY.sha256)"
+          actual="$(sha256sum original_source/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+          test "$expected" = "$actual"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          q=json.loads(Path("original_source/ORIGINAL_SOURCE_ONLY.json").read_text())
+          assert q["original_source_count"]==50
+          assert q["no_target_gold_in_payload"] is True
+          assert q["upstream_revision"]=="f3283f727488ad98fe575ea6a5ac981e4a188e49"
+          assert '"test"' not in Path("original_source/ORIGINAL_SOURCE_ONLY.json").read_text()
+          print("Q3_SAME_50_ORIGINAL_SOURCE_TEACHERS_AND_NO_TARGET_GOLD",flush=True)
+          PY
+      - name: Actual isolated SOURCE check learns which partially correct representations transfer
+        run: |
+          set -euo pipefail
+          python -m research.q3.q3_representation_original_source_training learn \
+            --source-only original_source/ORIGINAL_SOURCE_ONLY.json \
+            --out frozen_policy/SOURCE_REPRESENTATION_POLICY.json
+          sha256sum frozen_policy/SOURCE_REPRESENTATION_POLICY.json \
+            > frozen_policy/SOURCE_REPRESENTATION_POLICY.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("frozen_policy/SOURCE_REPRESENTATION_POLICY.json").read_text())
+          assert p["schema"]=="NEUMANN.Q3.SOURCE-REPRESENTATION-POLICY.v1"
+          assert p["source_teacher_count"]==50
+          assert p["target_gold_read"] is False
+          assert p["check_executions"]>0, "failure signal still zero"
+          exact=sum(x["successful_transfer"] for x in p["outcomes"])
+          partial=sum(x["partial_transfer"] for x in p["outcomes"])
+          print("Q3_ACTUAL_ORIGINAL_SOURCE_CAUSAL_TRAINING",
+                {"trials":p["check_executions"],
+                 "exact_SOURCE_verified_candidates":exact,
+                 "partial_not_exact_changed_cell_improvements":partial,
+                 "representation_features":len(p["outcomes"]),
+                 "global_Q3":"OPEN"},flush=True)
+          assert exact+partial>0, "no useful source-verifier discovery policy signal"
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-source-residual-learned-policy-frozen-50-original
+          path: frozen_policy/
+          if-no-files-found: warn
+          retention-days: 90
