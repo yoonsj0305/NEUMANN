@@ -123,57 +123,50 @@ def _symmetry_matches(shape,target):
                  if _symmetry_points(shape,operator)==target)
 
 def _pair_nodes(src,dst,background):
+    """Infer a bounded one-to-many correspondence without a task-family rule.
+
+    Prior code required len(input_nodes)==len(output_nodes), eliminating
+    creation, deletion and splitting from the representation itself. Every
+    OUTPUT object now receives a most plausible SOURCE parent with the
+    same geometry up to D4. Parents may have zero/one/multiple children.
+    Non-matching shapes still fail closed; those require a newly discovered
+    structural operation rather than fabricated answer coordinates.
+    """
     left=_nodes(src,background)
     right=_nodes(dst,background)
-    if not left or len(left)!=len(right) or len(left)>40:
+    if not left or len(left)>40 or len(right)>60:
         return None
-    # Group only by observed normalized geometry, independent of color/position.
-    # Ambiguous shape matches abort: assigning identities via hindsight would
-    # let withheld SOURCE labels leak into the learned "representation".
-    candidate_matches=[]
-    for l in left:
-        choices=[]
-        for j,r in enumerate(right):
-            matches=_symmetry_matches(l.shape,r.shape)
-            if matches:
-                # Symmetric shapes often admit 2-8 equivalent coordinate
-                # operators. Choose one minimal-description representative
-                # instead of multiplying the correspondence search space.
-                choices.append((j,matches[0]))
-        if not choices:return None
-        candidate_matches.append(choices)
-    if any(len(choices)>7 for choices in candidate_matches):
-        return None
-    # Max 40 components, bounded DFS candidates; minimize geometry and token
-    # consistency across ALL observations, not a benchmark-specific key.
-    order=sorted(range(len(left)),key=lambda i:len(candidate_matches[i]))
-    best=None;best_cost=None;examined=0
-    def dfs(pos,used,matching,cost):
-        nonlocal best,best_cost,examined
-        examined+=1
-        if examined>=15000:return
-        if best_cost is not None and cost>best_cost:return
-        if pos==len(order):
-            sig=tuple(matching[i] for i in range(len(left)))
-            if best_cost is None or (cost,sig)<(best_cost,best):
-                best_cost=cost;best=sig
-            return
-        i=order[pos];old=left[i]
-        for j,orientation in candidate_matches[i]:
-            if j in used:continue
-            new=right[j]
-            distance=abs(new.r0-old.r0)+abs(new.c0-old.c0)
-            # Penalize invented state changes without making any selected
-            # target gold available to the final inference policy.
-            delta=(distance+5*int(not source_same_value(
-                old.color,new.color))+2*int(orientation!="identity"))
-            matching[i]=(j,orientation)
-            dfs(pos+1,used|{j},matching,cost+delta)
-            del matching[i]
-    dfs(0,set(),{},0)
-    if best is None:return None
-    return tuple((l,right[best[i][0]],best[i][1])
-                 for i,l in enumerate(left))
+    children={i:[] for i in range(len(left))}
+    # Preserve unchanged object identities first. Then assign newly created
+    # copies by minimum description length/correspondence cost.
+    decisions=[]
+    for j,new in enumerate(right):
+        options=[]
+        for i,old in enumerate(left):
+            m=_symmetry_matches(old.shape,new.shape)
+            if not m:continue
+            orient=m[0]
+            delta=(abs(new.r0-old.r0)+abs(new.c0-old.c0)
+                   +5*int(not source_same_value(old.color,new.color))
+                   +2*int(orient!="identity"))
+            options.append((delta,i,orient))
+        if not options:
+            return None
+        decisions.append((j,sorted(options)))
+    # Provenance-safe order: the simplest unchanged components anchor
+    # correspondence; unexplained output components may be copies.
+    decisions.sort(key=lambda t:(t[1][0][0],len(t[1]),t[0]))
+    for j,options in decisions:
+        cost,i,orient=min(options,key=lambda x:(
+            x[0]+3*len(children[x[1]]),x[0],x[1]))
+        old=left[i];new=right[j]
+        children[i].append((new.r0-old.r0,new.c0-old.c0,
+                            new.color,orient))
+        if len(children[i])>6:return None
+    result=[]
+    for i,old in enumerate(left):
+        result.append((old,tuple(sorted(children[i],key=repr))))
+    return tuple(result)
 
 
 def _features(node,nodes,height,width):
@@ -199,6 +192,27 @@ def _key(v):
                       ensure_ascii=True,allow_nan=False)
 
 
+def _apply_learned_law(inp,key,mapping):
+    """Pure SOURCE diagnostic; independent SOURCE Docker still gates success."""
+    bg=_mode(inp)
+    if bg is None:return None
+    nodes=_nodes(inp,bg)
+    out=[[bg for c in range(len(inp[0]))] for r in range(len(inp))]
+    for node in nodes:
+        value="ALL" if key=="global" else _features(
+            node,nodes,len(inp),len(inp[0]))[key]
+        actions=mapping.get(value)
+        if actions is None:return None
+        for dr,dc,color,orientation in actions:
+            shifted=_symmetry_points(node.shape,orientation)
+            for dy,dx in shifted:
+                rr=node.r0+dr+dy
+                cc=node.c0+dc+dx
+                if 0<=rr<len(inp) and 0<=cc<len(inp[0]):
+                    out[rr][cc]=color
+    return out
+
+
 def _choose_law(source_pairs):
     all_examples=[]
     for inp,out in source_pairs:
@@ -212,14 +226,13 @@ def _choose_law(source_pairs):
         pairs=_pair_nodes(inp,out,bg)
         if pairs is None:return None
         original_nodes=_nodes(inp,bg)
-        for src,dst,orientation in pairs:
-            action=(dst.r0-src.r0,dst.c0-src.c0,dst.color,
-                    orientation)
+        for src,offspring in pairs:
             all_examples.append(
                 (_features(src,original_nodes,len(inp),len(inp[0])),
-                 action))
-    if not all_examples or all(a==(0,0,f["category"],"identity")
-                                for f,a in all_examples):
+                 offspring))
+    if not all_examples or all(
+            a==((0,0,f["category"],"identity"),)
+            for f,a in all_examples):
         return None
     keys=("global","category","area","height","width","row_rank",
           "col_rank","left_half","top_half","bbox_aspect","shape")
@@ -230,21 +243,24 @@ def _choose_law(source_pairs):
         good=True
         for features,action in all_examples:
             value="ALL" if key=="global" else features[key]
-            # Native hashable feature values (int/str/tuple) preserve typed
-            # equality at code generation and runtime. Do NOT stringify them:
-            # a str encoding mismatch previously made all rules unreachable.
             if value in mapping and mapping[value]!=action:
                 good=False;break
             mapping[value]=action
             supports[value]+=1
         if not good or len(mapping)>10:continue
         if any(n<2 for n in supports.values()):
-            # Each learned branch must receive repeat SOURCE evidence.
-            # A unique object identity is not a transferable rule.
+            # Do not call a single unreplicated object a transferable rule.
             continue
         if key!="global" and len(mapping)<=1:
             continue
-        cost=8+len(mapping)*6+(0 if key=="global" else 3)
+        if not all(source_same_value(
+            _apply_learned_law(x,key,mapping),y)
+            for x,y in source_pairs):
+            # Matching alone can produce the wrong causal grouping when
+            # components overlap or share shape. Reconstruct SOURCE exactly.
+            continue
+        cost=(8+sum(6*len(actions)+2 for actions in mapping.values())
+              +(0 if key=="global" else 3))
         choices.append((cost,key,mapping))
     if not choices:return None
     choices.sort(key=lambda c:(c[0],c[1]))
@@ -310,27 +326,27 @@ def _compiled_program(key,mapping):
         "        else:val=shape\n"
         "        if val not in mapping:\n"
         "            return x\n"
-        "        dr,dc,dest,orientation=mapping[val]\n"
-        "        rel=[]\n"
-        "        for y,z in pts:\n"
-        "            dy=y-r0\n"
-        "            dx=z-c0\n"
-        "            if orientation=='identity':a,b=dy,dx\n"
-        "            elif orientation=='turn90':a,b=dx,-dy\n"
-        "            elif orientation=='turn180':a,b=-dy,-dx\n"
-        "            elif orientation=='turn270':a,b=-dx,dy\n"
-        "            elif orientation=='reflect_rows':a,b=-dy,dx\n"
-        "            elif orientation=='reflect_cols':a,b=dy,-dx\n"
-        "            elif orientation=='swap_axes':a,b=dx,dy\n"
-        "            else:a,b=-dx,-dy\n"
-        "            rel.append((a,b))\n"
-        "        mr=min(v[0] for v in rel)\n"
-        "        mc=min(v[1] for v in rel)\n"
-        "        for a,b in rel:\n"
-        "            yy=r0+dr+a-mr\n"
-        "            xx=c0+dc+b-mc\n"
-        "            if 0<=yy<h and 0<=xx<w:\n"
-        "                out[yy][xx]=dest\n"
+        "        for dr,dc,dest,orientation in mapping[val]:\n"
+        "            rel=[]\n"
+        "            for y,z in pts:\n"
+        "                dy=y-r0\n"
+        "                dx=z-c0\n"
+        "                if orientation=='identity':a,b=dy,dx\n"
+        "                elif orientation=='turn90':a,b=dx,-dy\n"
+        "                elif orientation=='turn180':a,b=-dy,-dx\n"
+        "                elif orientation=='turn270':a,b=-dx,dy\n"
+        "                elif orientation=='reflect_rows':a,b=-dy,dx\n"
+        "                elif orientation=='reflect_cols':a,b=dy,-dx\n"
+        "                elif orientation=='swap_axes':a,b=dx,dy\n"
+        "                else:a,b=-dx,-dy\n"
+        "                rel.append((a,b))\n"
+        "            mr=min(v[0] for v in rel)\n"
+        "            mc=min(v[1] for v in rel)\n"
+        "            for a,b in rel:\n"
+        "                yy=r0+dr+a-mr\n"
+        "                xx=c0+dc+b-mc\n"
+        "                if 0<=yy<h and 0<=xx<w:\n"
+        "                    out[yy][xx]=dest\n"
         "    return out"
     )
     return validate_code(code)
