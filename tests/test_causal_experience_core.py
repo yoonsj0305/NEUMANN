@@ -125,7 +125,8 @@ def test_one_engine_learns_a_new_latent_state_from_real_source_feedback():
     assert after.verified
     assert after.answer=="revised"
     assert after.representation.kind=="neumann.latent"
-    assert after.representation.confidence>=0.8
+    assert after.representation.confidence==1.0
+    assert "not calibrated probability" in after.representation.rationale
     # New concept came from the model, not candidate_ir metadata.
     assert "candidate_ir" not in p.metadata
     assert engine._meta_inventor is None
@@ -141,10 +142,13 @@ def test_sealed_source_is_unusable_for_learning_or_adaptive_retesting():
                      verify_source=source_observation_verifier)
     assert policy.learn_calls==0
     core.freeze()
-    assert core.certify_sealed_source(
+    # A heldout check alone, without even one independently trusted
+    # training SOURCE observation, cannot certify a latent causal state.
+    assert not core.certify_sealed_source(
         "sealed_query","revised",
         evidence_id="sealed_query.signed",
         verify_source=source_observation_verifier)
+    assert core.representation().confidence==0.0
     with pytest.raises(ValueError,match="one-shot"):
         core.certify_sealed_source(
             "sealed_query","revised",
@@ -174,6 +178,25 @@ def test_refutation_must_be_source_verified_and_cannot_reopen_after_revision():
             "train_query","revised",evidence_id="train_query.signed",
             verify_source=source_observation_verifier)
     assert policy.learn_calls==1
+
+
+
+def test_source_contradiction_cannot_be_cleared_by_lucky_sealed_match():
+    policy=AdaptiveFixturePolicy()
+    core=CausalExperienceCore(policy,max_hypotheses=2)
+    former=ExperienceStructureFormer(core)
+    former.form(fixture_problem(),CostLedger())
+    # The source prediction was "initial", but actual = "revised".
+    # Force no revision after learning; the old representation stays wrong.
+    former.observe_source(
+        "train_query","revised",evidence_id="train_query.signed",
+        verify_source=source_observation_verifier)
+    assert policy.learn_calls==1
+    assert core.representation().payload["latent_variables"]["relation"]=="initial"
+    assert not former.certify_source(
+        "sealed_query","revised",evidence_id="sealed_query.signed",
+        verify_source=source_observation_verifier)
+    assert core.representation().confidence==0.0
 
 
 def test_missing_experience_and_unauthorized_prediction_fail_closed():
