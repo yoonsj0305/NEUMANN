@@ -230,7 +230,8 @@ def freeze(*,folio_train,folio_validation,bbh,out_visible,
         "public_original_corpus_sha256":sources,
         "selected_original_ids":selections,
         "all_Q1_to_Q7_globally_unproven":True,
-        "source_task_names_seen_in_prior_NEUMANN_issue_or_PR_search":False,
+        "prior_PR_title_body_search_FOLIO_and_BBH_zero_matches":True,
+        "full_prior_repo_or_pretraining_exposure_audit":"UNKNOWN",
         "benchmark_pretraining_contamination_not_excluded":True,
     }
     Path(out_manifest).write_text(canonical(manifest)+"\n")
