@@ -87,6 +87,101 @@ class LearnedRepresentationPrior:
                   sorted(ledger.items())),
             tuple(sorted(receipts)),executions)
 
+    @classmethod
+    def learn_source_trials(cls, original_source_trials, runner, *,
+                            max_episodes=256):
+        """Learn successes AND real failures from source-only original tasks.
+
+        This unlike .learn() does NOT demand a previously solved task: a
+        model with no success must still be able to learn from its failed
+        representations. SOURCE observations are split by original input
+        identity. The final original test outputs are never accepted here.
+        """
+        if not 1<=max_episodes<=2048:
+            raise ValueError("finite SOURCE teaching budget required")
+        trials=list(original_source_trials)
+        if len(trials)>max_episodes:
+            raise ValueError("SOURCE task budget exceeded")
+        ledger={}
+        receipts=[]
+        seen_ids=set()
+        executions=0
+        for source_id,train,checks in trials:
+            if (not isinstance(source_id,str) or not source_id or
+                    source_id in seen_ids):
+                raise ValueError("duplicate or missing original SOURCE ID")
+            seen_ids.add(source_id)
+            train=tuple((x,y) for x,y in train)
+            checks=tuple((x,y) for x,y in checks)
+            if not 2<=len(train)<=32 or not 1<=len(checks)<=32:
+                raise ValueError("disjoint SOURCE train/check required")
+            # Explicit type-preserving JSON serialization guards the
+            # original observation provenance and duplicate inputs.
+            def canonical(v):
+                return json.dumps(v,sort_keys=True,separators=(",",":"),
+                                  ensure_ascii=True,allow_nan=False)
+            known=[canonical(x) for x,y in train]
+            reserved=[canonical(x) for x,y in checks]
+            if (len(set(known))!=len(known) or
+                    len(set(reserved))!=len(reserved) or
+                    set(known)&set(reserved)):
+                raise ValueError("original SOURCE inputs overlap across split")
+            receipts.append(sha256(canonical(
+                [source_id,train,checks]).encode()).hexdigest())
+            # Use only training SOURCE to create hypotheses. Independent
+            # SOURCE check labels are consumed by the real verifier ONLY.
+            factors=induce_object_graph_factors(train,max_candidates=12)
+            for factor in factors:
+                key=factor.representation.rsplit("/",1)[-1]
+                scores=ledger.setdefault(key,[0,0])
+                output=runner.evaluate(factor.program,[x for x,y in checks])
+                executions+=1
+                accepted=(
+                    output.status=="EXECUTED" and
+                    len(output.outputs)==len(checks) and
+                    all(source_same_value(value,y)
+                        for value,(_,y) in zip(output.outputs,checks)))
+                scores[0 if accepted else 1]+=1
+        return cls(
+            tuple(FeatureOutcome(key,v[0],v[1])
+                  for key,v in sorted(ledger.items())),
+            tuple(sorted(receipts)),executions)
+
+    @classmethod
+    def from_source_snapshot(cls, snapshot):
+        if (not isinstance(snapshot,dict)
+                or snapshot.get("schema")!="NEUMANN.Q3.SOURCE-REPRESENTATION-POLICY.v1"
+                or snapshot.get("target_gold_read") is not False):
+            raise ValueError("untrusted frozen SOURCE representation snapshot")
+        rows=snapshot.get("outcomes")
+        ids=snapshot.get("source_episode_sha256")
+        if not isinstance(rows,list) or not isinstance(ids,list):
+            raise ValueError("missing certified SOURCE preference data")
+        if (len(set(ids))!=len(ids) or
+                any(not isinstance(x,str) or len(x)!=64 for x in ids)):
+            raise ValueError("invalid or duplicated SOURCE identity")
+        outcomes=tuple(FeatureOutcome(
+            str(x["name"]),int(x["successful_transfer"]),
+            int(x["falsified_transfer"])) for x in rows)
+        if (len({x.name for x in outcomes})!=len(outcomes)
+                or any(x.successful_transfer<0 or x.falsified_transfer<0
+                       for x in outcomes)):
+            raise ValueError("corrupted learned preference counts")
+        return cls(outcomes,tuple(ids),int(snapshot["check_executions"]))
+
+    def source_snapshot(self):
+        return {
+            "schema":"NEUMANN.Q3.SOURCE-REPRESENTATION-POLICY.v1",
+            "target_gold_read":False,
+            "source_episode_sha256":list(self.source_episode_sha256),
+            "check_executions":self.check_executions,
+            "outcomes":[{
+                "name":x.name,
+                "successful_transfer":x.successful_transfer,
+                "falsified_transfer":x.falsified_transfer}
+                for x in self.outcomes],
+            "q3_global":"OPEN"}
+
     def score(self,representation):
         """Beta(1,1) smoothed probability, not a fabricated exact win."""
         name=representation.rsplit("/",1)[-1]
