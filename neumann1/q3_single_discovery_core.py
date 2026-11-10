@@ -190,7 +190,12 @@ class SingleDiscoveryCore:
     episodes after freeze().
     """
 
-    def __init__(self, policy, runner=None, *, memory=None, max_proposals=8,\n                 hypothesis_mode=False):\n        if hypothesis_mode:\n            from .q3_latent_hypothesis_policy import HypothesisConditionedPolicy\n            policy = HypothesisConditionedPolicy(policy)\n        self.policy = policy
+    def __init__(self, policy, runner=None, *, memory=None, max_proposals=8,
+                 hypothesis_mode=False):
+        if hypothesis_mode:
+            from .q3_latent_hypothesis_policy import HypothesisConditionedPolicy
+            policy = HypothesisConditionedPolicy(policy)
+        self.policy = policy
         self.runner = runner if runner is not None else IsolatedPython()
         self.memory = (memory if memory is not None
                        else SourceMethodMemory(self.runner))
