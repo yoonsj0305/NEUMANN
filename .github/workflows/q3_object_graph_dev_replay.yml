@@ -1,0 +1,91 @@
+name: Q3 Object Graph - Prior Eight Original SOURCE Development Replay
+on:
+  push:
+    branches:
+      - research/q3-structural-graph-policy-20261110
+    paths:
+      - ".github/workflows/q3_object_graph_dev_replay.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  eight_original_dev:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Reproduce existing frozen eight original SOURCE and shared grammar
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          docker pull python:3.11-alpine
+          python -m pytest -q -x tests/test_q3_object_graph_invention.py
+          mkdir -p frozen prior evidence score
+          gh run download 42720251337 \
+            --name q3-new8-frozen-input-source-only \
+            --dir frozen
+          gh run download 42593621076 \
+            --name Q3-REAL-WEIGHT-LEARNING-ORIGINAL-SOURCE-BLIND \
+            --dir prior
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          data=json.loads(Path("frozen/BLIND.json").read_text())
+          assert data["scope"]=="NEWLY_FROZEN_AUTHOR_ORIGINALS_NO_TUNING"
+          assert len(data["records"])==8
+          expected=Path("frozen/BLIND.sha256").read_text().split()[0]
+          assert hashlib.sha256(Path("frozen/BLIND.json").read_bytes()).hexdigest()==expected
+          print("Q3_OBJECT_GRAPH_DEV_ONLY_PREVIOUSLY_EXPOSED_COHO",expected,flush=True)
+          PY
+      - name: One shared causal discovery core, matched original A/B/C
+        run: |
+          set -euo pipefail
+          python -m research.q3.q3_structural_original_gate infer \
+            --blind frozen/BLIND.json \
+            --teachers prior/SOURCE_TEACHERS.jsonl \
+            --out evidence/GRAPH_PREDICTIONS.json
+          sha256sum evidence/GRAPH_PREDICTIONS.json \
+            > evidence/GRAPH_PREDICTIONS.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("evidence/GRAPH_PREDICTIONS.json").read_text())
+          assert p["target_gold_accessed"] is False
+          print("Q3_GENERAL_GRAPH_DEV_SOURCE_VERIFIED",
+                {k:sum(r["arms"][k]["source_verified"]
+                       for r in p["records"]) for k in ("A","B","C")},
+                flush=True)
+          PY
+      - name: Only AFTER SHA-frozen predictions compare previously opened original author gold
+        run: |
+          set -euo pipefail
+          git init -q /tmp/q3-external
+          git -C /tmp/q3-external fetch -q --depth 1 \
+            https://github.com/density-11/arcana-test.git \
+            3f3dc8f650deb271a29e282bfb0e5ca95a7d64d6
+          git -C /tmp/q3-external checkout -q FETCH_HEAD
+          SHA="$(cut -d ' ' -f1 evidence/GRAPH_PREDICTIONS.sha256)"
+          python -m research.q3.q3_structural_original_gate score \
+            --blind frozen/BLIND.json \
+            --predictions evidence/GRAPH_PREDICTIONS.json \
+            --expected-sha "$SHA" \
+            --original /tmp/q3-external/data \
+            --out score/GRAPH_DEV_ORIGINAL_SCORE.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-object-graph-preexposed-eight-author-dev
+          path: |
+            evidence/
+            score/
+          retention-days: 90
+          if-no-files-found: warn
