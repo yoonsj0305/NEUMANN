@@ -20,13 +20,13 @@ def test_original_corpus_freeze_separates_target_gold_from_model(tmp_path):
         {"story_id":i,"example_id":i,
          "premises":["P if Q; Q","Text "+str(i)],
          "conclusion":"P? "+str(i),
-         "label":("True","False","Uncertain")[i%3]}
+         "label":("True","False","Unknown")[i%3]}
         for i in range(34)]
     fvalid=[
         {"story_id":100+i,"example_id":100+i,
          "premises":["Separate "+str(i)],
          "conclusion":"Check "+str(i),
-         "label":("True","False","Uncertain")[i%3]}
+         "label":("True","False","Unknown")[i%3]}
         for i in range(12)]
     folio_train.write_text("".join(canonical(x)+"\n" for x in ftrain))
     folio_validation.write_text("".join(canonical(x)+"\n" for x in fvalid))
