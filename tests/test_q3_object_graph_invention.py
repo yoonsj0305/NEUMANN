@@ -179,7 +179,15 @@ def test_one_general_rewrite_invents_object_duplication_with_source_proof():
     assert "for dr,dc,color_role,orientation in mapping[val]" in rules[0].program
     p,d=certify(train,check)
     assert d.verified
-    assert d.program==rules[0].program
+    # A different, shorter SOURCE-derived representation (e.g. a leaf
+    # category substitution for deletion) may solve the same observations.
+    # Verify the graph rewrite itself independently rather than requiring
+    # the shared core to prefer the more complicated hypothesis.
+    verified=IsolatedPython(max_seconds=8).evaluate(
+        rules[0].program,[x for x,y in check])
+    assert verified.status=="EXECUTED"
+    assert all(source_same_value(v,y)
+               for v,(_,y) in zip(verified.outputs,check))
 
 
 def test_one_general_rewrite_invents_object_deletion_from_source_differences():
@@ -195,7 +203,15 @@ def test_one_general_rewrite_invents_object_deletion_from_source_differences():
     assert rules[0].representation.startswith("source-inferred-graph-rewrite/")
     p,d=certify(train,check)
     assert d.verified
-    assert d.program==rules[0].program
+    # A different, shorter SOURCE-derived representation (e.g. a leaf
+    # category substitution for deletion) may solve the same observations.
+    # Verify the graph rewrite itself independently rather than requiring
+    # the shared core to prefer the more complicated hypothesis.
+    verified=IsolatedPython(max_seconds=8).evaluate(
+        rules[0].program,[x for x,y in check])
+    assert verified.status=="EXECUTED"
+    assert all(source_same_value(v,y)
+               for v,(_,y) in zip(verified.outputs,check))
 
 
 def test_no_graph_rule_claim_without_executable_source_reconstruction():
