@@ -73,6 +73,18 @@ class NeumannEngine:
             trace=trace,
         )
 
+    def predict_unlabeled_target(self,query_id):
+        """Model-authored frozen prediction, NOT independently scored truth.
+
+        Returns no answer without an independent SOURCE certificate.
+        Only the external original-author evaluator may score this against
+        withheld original TEST labels.
+        """
+        predict=getattr(self.structure_former,"predict_unlabeled_target",None)
+        if not callable(predict):
+            raise RuntimeError("no learned latent target prediction interface")
+        return predict(query_id)
+
     def observe_source_experience(
             self,query_id,actual,*,evidence_id,verify_source,
             revise_context=None):
