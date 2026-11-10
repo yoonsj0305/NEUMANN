@@ -29,6 +29,7 @@ from typing import Any, Iterable
 from .open_program_inventor import source_same_value, validate_code
 from .q3_structure_factorization import induce_structural_factors
 from .q3_object_graph_invention import induce_object_graph_factors
+from .q3_source_residual_probes import induce_source_residual_probes
 
 _INVALID = object()
 
@@ -320,6 +321,12 @@ class StructuralInventionPolicy:
         # differently and is open to unlearned A on identical terms.
         factors.extend(induce_object_graph_factors(
             source_pairs,max_candidates=self.max_candidates))
+        # The earlier policy learned ZERO signal on 50 real ARC2 originals:
+        # it admitted only exact-fit representations. Both learned C and
+        # unlearned A now share these partially explanatory executable
+        # SOURCE proposals; the same independent Docker gate decides truth.
+        factors.extend(induce_source_residual_probes(
+            source_pairs,max_probes=min(8,self.max_candidates)))
         if self.representation_prior is not None:
             factors.sort(key=self.representation_prior.order_key)
         else:
