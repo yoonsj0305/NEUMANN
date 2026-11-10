@@ -31,8 +31,10 @@ def source_discovery_prompt(pairs, *, method_context=""):
         "Use arithmetic, loops, conditionals and list operations to "
         "express your own new algorithm. Do NOT memorize examples.\n"
         + "\n".join(
-            "Source input: "+json.dumps(x,ensure_ascii=True)
-            + "\nExpected source output: "+json.dumps(y,ensure_ascii=True)
+            "Source input: "+json.dumps(
+                x,ensure_ascii=True,separators=(",",":"))
+            + "\nExpected source output: "+json.dumps(
+                y,ensure_ascii=True,separators=(",",":"))
             for x,y in pairs))
 
 
