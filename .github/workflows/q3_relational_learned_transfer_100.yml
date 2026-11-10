@@ -3,9 +3,11 @@ on:
   push:
     branches:
       - research/q3-relational-causal-language-induction-20261110
+      - research/q3-relational-reducer-induction-20261110
     paths:
       - ".github/workflows/q3_relational_learned_transfer_100.yml"
       - "research/q3/q3_relational_policy_transfer_gate.py"
+      - "neumann1/q3_relational_reduce_invention.py"
   workflow_dispatch:
 permissions:
   contents: read
