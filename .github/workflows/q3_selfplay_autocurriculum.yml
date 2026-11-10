@@ -1,0 +1,152 @@
+name: Q3 Autonomous Program Worlds - Self-Generated Curriculum and Cross-Domain Transfer
+on:
+  push:
+    branches:
+      - research/q3-one-core-selfplay-verified-worlds-20261110
+    paths:
+      - ".github/workflows/q3_selfplay_autocurriculum.yml"
+      - "research/q3/q3_selfplay_worlds.py"
+      - "research/q3/q3_selfplay_train.py"
+      - "research/q3/q3_selfplay_disjoint_original_ablation.py"
+      - "tests/test_q3_selfplay_worlds.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONHASHSEED: "0"
+  OMP_NUM_THREADS: "2"
+  OPENBLAS_NUM_THREADS: "2"
+  TOKENIZERS_PARALLELISM: "false"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+jobs:
+  autonomously_invent_executable_worlds:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Real sandbox + fixed local model for self-generated executable tasks
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          python -m pip install -q --index-url https://download.pytorch.org/whl/cpu 'torch==2.5.1'
+          python -m pip install -q 'transformers==4.46.3' 'peft==0.14.0' 'accelerate==1.2.1' 'huggingface_hub==0.27.1' 'jinja2>=3.1.4,<4'
+          docker pull python:3.11-alpine
+          python -m pytest -q -x tests/test_q3_selfplay_worlds.py
+          python - <<'PY'
+          from huggingface_hub import model_info
+          assert model_info("Qwen/Qwen2.5-Coder-0.5B-Instruct").sha=="ea3f2471cf1b1f0db85067f1ef93848e38e88c25"
+          print("Q3_SELF_PLAY_BASE_GENERATOR_FROZEN",flush=True)
+          PY
+      - name: Generate candidate executable algorithms with NO human-supplied target solution
+        run: |
+          set -euo pipefail
+          mkdir -p worlds
+          python -u -m research.q3.q3_selfplay_worlds \
+            --model-revision ea3f2471cf1b1f0db85067f1ef93848e38e88c25 \
+            --candidates 48 \
+            --train worlds/SELF_CREATED_TRAIN_WORLD_PROOFS.jsonl \
+            --heldout worlds/SELF_CREATED_HELDOUT_WORLD_PROOFS.jsonl \
+            --report worlds/SELF_PLAY_CAUSAL_PROVENANCE.json
+          sha256sum worlds/*.jsonl > worlds/WORLDS.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.loads(Path("worlds/SELF_PLAY_CAUSAL_PROVENANCE.json").read_text())
+          assert s["attempted_worlds"]==48
+          assert s["real_author_original_TEST_gold_read"] is False
+          assert s["no_human_authored_answer_operators"] is True
+          assert s["q3_global"]=="OPEN"
+          print("Q3_AUTONOMOUS_WORLD_GENERATION_RECEIPT",{
+            "accepted":s["verified_nontrivial_worlds"],
+            "train":s["selfplay_training_worlds"],
+            "heldout":s["program_disjoint_synthetic_heldout"]},flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-frozen-self-invented-executable-curriculum-48-proposals
+          path: worlds/
+          if-no-files-found: warn
+          retention-days: 90
+  weight_update_and_independent_source_transfer:
+    needs: autonomously_invent_executable_worlds
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-frozen-self-invented-executable-curriculum-48-proposals
+          path: worlds
+      - name: Reverify model-created training SOURCE before adapting the SAME neural program policy
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          python -m pip install -q --index-url https://download.pytorch.org/whl/cpu 'torch==2.5.1'
+          python -m pip install -q 'transformers==4.46.3' 'peft==0.14.0' 'accelerate==1.2.1' 'huggingface_hub==0.27.1' 'jinja2>=3.1.4,<4'
+          docker pull python:3.11-alpine
+          mkdir -p evidence original_source
+          sha256sum -c worlds/WORLDS.sha256
+          gh run download 42757846590 \
+            --name q3-prospective-source-100-originals-frozen --dir original_source
+          test "$(cut -d ' ' -f1 original_source/ORIGINAL_SOURCE_ONLY.sha256)" = "$(sha256sum original_source/ORIGINAL_SOURCE_ONLY.json | cut -d ' ' -f1)"
+      - name: Update SAME code generator from its own verified programs then evaluate programs unseen during training
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.loads(Path("worlds/SELF_PLAY_CAUSAL_PROVENANCE.json").read_text())
+          if s["selfplay_training_worlds"]<2 or s["program_disjoint_synthetic_heldout"]<1:
+              print("Q3_NO_SUFFICIENT_SELF_GENERATED_PROGRAM_DIVERSITY_ABSTAIN",s,flush=True)
+              Path("evidence/Q3_ABORT_INSUFFICIENT_WORLDS.txt").write_text("NO_REAL_SELFPLAY_TRAINING\n")
+          PY
+          if [ -f evidence/Q3_ABORT_INSUFFICIENT_WORLDS.txt ]; then
+            exit 0
+          fi
+          python -u -m research.q3.q3_selfplay_train \
+            --worlds worlds/SELF_CREATED_TRAIN_WORLD_PROOFS.jsonl \
+            --revision ea3f2471cf1b1f0db85067f1ef93848e38e88c25 \
+            --adapter adapter --steps 24
+          sha256sum adapter/neumann_selfplay_training_manifest.json > evidence/SELF_PLAY_WEIGHTS_MANIFEST.sha256
+          python -u -m research.q3.q3_selfplay_disjoint_original_ablation \
+            --train-worlds worlds/SELF_CREATED_TRAIN_WORLD_PROOFS.jsonl \
+            --heldout-worlds worlds/SELF_CREATED_HELDOUT_WORLD_PROOFS.jsonl \
+            --original-source original_source/ORIGINAL_SOURCE_ONLY.json \
+            --adapter adapter \
+            --revision ea3f2471cf1b1f0db85067f1ef93848e38e88c25 \
+            --out evidence/Q3_ONE_CORE_SELF_PLAY_CROSS_DOMAIN_RESULTS.json
+          sha256sum evidence/Q3_ONE_CORE_SELF_PLAY_CROSS_DOMAIN_RESULTS.json > evidence/Q3_SELF_PLAY_RESULTS.sha256
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path("evidence/Q3_ONE_CORE_SELF_PLAY_CROSS_DOMAIN_RESULTS.json").read_text())["summary"]
+          assert d["original_author_TARGET_gold_accessed"] is False
+          assert d["q3_global"]=="OPEN"
+          assert d["no_human_written_target_operator"] is True
+          print("Q3_SELF_PLAY_REAL_C_AND_A_FINAL",{
+            k:d[k] for k in (
+                "strict_program_disjoint_synthetic_heldout",
+                "A_synthetic_original_exact","C_synthetic_original_exact",
+                "C_synthetic_exclusive",
+                "A_real_original_SOURCE_exact",
+                "C_real_original_SOURCE_exact",
+                "C_real_original_SOURCE_exclusive")},flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-self-generated-neural-policy-real-generalization-source-receipts
+          path: |
+            evidence/
+            adapter/neumann_selfplay_training_manifest.json
+          if-no-files-found: warn
+          retention-days: 90
