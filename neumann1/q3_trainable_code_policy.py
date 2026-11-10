@@ -161,7 +161,7 @@ def finetune_source_policy(
             not 1<=rank<=32):
         raise ValueError("bounded explicit training contract")
     if training_objective not in (
-            "source_program_imitation","source_repair"):
+            "source_program_imitation","source_repair","source_preference"):
         raise ValueError("unknown Q3 learning objective")
     source,source_sha=source_training_rows(source_jsonl)
     if not source:
@@ -170,7 +170,7 @@ def finetune_source_policy(
     # A real invention-policy update conditions the new program on an
     # *actual failed executable method* and an independent SOURCE
     # counterexample, NOT merely on unrelated solved program texts.
-    if training_objective=="source_repair":
+    if training_objective in ("source_repair","source_preference"):
         from .open_program_inventor import IsolatedPython
         from .q3_source_repair_learning import recertified_repair_prompt
         runner=IsolatedPython(max_seconds=8)
@@ -214,18 +214,27 @@ def finetune_source_policy(
         (p for p in model.parameters() if p.requires_grad),
         lr=lr)
     losses=[]
+    preference_margins=[]
     for step in range(max_steps):
-        prompt,teacher_code,_,_,_=learning_rows[step%len(learning_rows)]
-        # This exact prompt is seen by the live local model on SOURCE
-        # refutation. All targets below are *certified executable programs*
-        # from prior original-author SOURCE episodes, never TARGET answers.
-        completion=teacher_code+tokenizer.eos_token
-        full_ids,labels=model_training_ids(
-            tokenizer,prompt,completion,max_length=4096)
-        inputs=torch.tensor([full_ids],dtype=torch.long,device=device)
-        targets=torch.tensor([labels],dtype=torch.long,device=device)
+        index=step%len(learning_rows)
+        prompt,teacher_code,_,_,_=learning_rows[index]
         optimizer.zero_grad(set_to_none=True)
-        loss=model(input_ids=inputs,labels=targets).loss
+        if training_objective=="source_preference":
+            from .q3_preference_learning import preference_loss
+            negative=source[index]["repair_prior_program"]
+            loss,comparison=preference_loss(
+                model,tokenizer,prompt,teacher_code,negative,
+                device=device,beta=1.0,max_length=4096)
+            preference_margins.append(comparison)
+        else:
+            # The identical SOURCE prompt conditions code generation.
+            # No target gold, no train/independent-check reclassification.
+            completion=teacher_code+tokenizer.eos_token
+            full_ids,labels=model_training_ids(
+                tokenizer,prompt,completion,max_length=4096)
+            inputs=torch.tensor([full_ids],dtype=torch.long,device=device)
+            targets=torch.tensor([labels],dtype=torch.long,device=device)
+            loss=model(input_ids=inputs,labels=targets).loss
         if not torch.isfinite(loss):
             raise ValueError("nonfinite model learning loss")
         loss.backward()
@@ -251,6 +260,10 @@ def finetune_source_policy(
         "training_pairs_sha256":hashlib.sha256(json.dumps(
             [(phase,prior,cert) for _,_,phase,prior,cert in learning_rows],
             sort_keys=True,separators=(",",":")).encode()).hexdigest(),
+        "preference_objective":("frozen-base per-token logprob DPO beta=1.0"
+                                 if training_objective=="source_preference"
+                                 else None),
+        "preference_margins":preference_margins,
         "docker_source_reverified":len(teacher_receipts),
         "source_proof_receipts_sha256":hashlib.sha256(
             json.dumps(teacher_receipts).encode()).hexdigest(),
@@ -273,7 +286,7 @@ if __name__=="__main__":
     p.add_argument("--steps",type=int,default=40)
     p.add_argument("--seed",type=int,default=1007)
     p.add_argument("--objective",choices=(
-        "source_program_imitation","source_repair"),
+        "source_program_imitation","source_repair","source_preference"),
         default="source_program_imitation")
     args=p.parse_args()
     print(json.dumps(
