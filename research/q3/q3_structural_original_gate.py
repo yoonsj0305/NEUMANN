@@ -121,7 +121,7 @@ def freeze_arcana_next8(author_data_dir,output,*,skip=0):
     files=[p for p in root.glob("*.json") if p.name not in exclude]
     salt="NEUMANN-Q3-STRUCTURAL-LIFT-NEXT8-20261110-FROZEN-V1"
     files.sort(key=lambda p:sha256((salt+"/"+p.name).encode()).hexdigest())
-    if skip not in (0,8,16):
+    if skip not in (0,8,16,24):
         raise ValueError("only pre-registered disjoint cohort offsets permitted")
     selected=files[skip:skip+8]
     if len(selected)!=8:
@@ -145,7 +145,8 @@ def freeze_arcana_next8(author_data_dir,output,*,skip=0):
         "scope":(
             "NEWLY_FROZEN_AUTHOR_ORIGINALS_NO_TUNING" if skip==0 else
             "SECOND_DISJOINT_SOURCE_AUTHOR_ORIGINALS" if skip==8 else
-            "THIRD_DISJOINT_SOURCE_AUTHOR_ORIGINALS_NO_TUNING"),
+            "THIRD_DISJOINT_SOURCE_AUTHOR_ORIGINALS_NO_TUNING" if skip==16
+            else "FOURTH_DISJOINT_SOURCE_AUTHOR_ORIGINALS_NO_TUNING"),
         "revision":ARCANA_REVISION,
         "source_fingerprint":sha256(canonical(
             [(p.name,sha_file(p)) for p in selected]
@@ -441,10 +442,11 @@ if __name__=="__main__":
     sp=parser.add_subparsers(dest="cmd",required=True)
     for name in ("freeze-codearc","freeze-arcana","freeze-arcana-next8",
                  "freeze-arcana-next8-v2","freeze-arcana-next8-v3",
-                 "infer","score","gate"):
+                 "freeze-arcana-next8-v4","infer","score","gate"):
         x=sp.add_parser(name)
         if name in ("freeze-codearc","freeze-arcana","freeze-arcana-next8",
-                     "freeze-arcana-next8-v2","freeze-arcana-next8-v3"):
+                     "freeze-arcana-next8-v2","freeze-arcana-next8-v3",
+                     "freeze-arcana-next8-v4"):
             x.add_argument("--original",required=True)
             x.add_argument("--out",required=True)
         if name=="infer":
@@ -473,6 +475,8 @@ if __name__=="__main__":
         freeze_arcana_next8(args.original,args.out,skip=8)
     elif args.cmd=="freeze-arcana-next8-v3":
         freeze_arcana_next8(args.original,args.out,skip=16)
+    elif args.cmd=="freeze-arcana-next8-v4":
+        freeze_arcana_next8(args.original,args.out,skip=24)
     elif args.cmd=="infer":
         infer(args.blind,args.teachers,args.out,
               external_source_prior=args.representation_prior,
