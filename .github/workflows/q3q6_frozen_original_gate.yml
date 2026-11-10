@@ -27,7 +27,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Validate official FOLIO True/False/Unknown labels and frozen SOURCE/TARGET boundary
+      - name: Verify FOLIO official ID-less validation and label-blind premise grouping before original evaluation
         run: |
           set -euo pipefail
           python -m pip install -q -e . pytest
