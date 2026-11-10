@@ -134,7 +134,8 @@ class CausalExperienceCore:
             raise ValueError("source identity required")
         if not isinstance(allowed_queries,dict) or not 1<=len(allowed_queries)<=16:
             raise ValueError("authorized SOURCE query map required")
-        _json(context);_json(allowed_queries)
+        context=json.loads(_json(context))
+        allowed_queries=json.loads(_json(allowed_queries))
         sealed=set(sealed_queries)
         if not sealed.issubset(allowed_queries) or not sealed:
             raise ValueError("at least one predeclared sealed SOURCE check required")
@@ -143,8 +144,12 @@ class CausalExperienceCore:
         raw=self.policy.hypotheses(context,history,dict(allowed_queries))
         if not isinstance(raw,(list,tuple)) or not 1<=len(raw)<=self.max_hypotheses:
             raise ValueError("model must propose bounded latent hypotheses")
-        candidates=tuple(h if isinstance(h,Hypothesis)
-                         else Hypothesis(**h) for h in raw)
+        # Freeze the model-authored candidate bytes before SOURCE is opened.
+        # A mutable dict in policy memory must not rewrite old predictions.
+        candidates=tuple(
+            Hypothesis(**json.loads(_json(
+                h.as_dict() if isinstance(h,Hypothesis) else h)))
+            for h in raw)
         if len({h.digest for h in candidates})!=len(candidates):
             raise ValueError("duplicate latent hypotheses")
         if any(set(h.predictions)-set(allowed_queries) for h in candidates):
@@ -198,11 +203,11 @@ class CausalExperienceCore:
             raise ValueError("reserved independent SOURCE check may not train policy")
         if query_id in self._evaluated_queries:
             raise ValueError("no repeat tuning on an already revealed query")
-        if len(self.experiences)>=self.max_experiences:
+        if len(self.experiences)+len(self._hypotheses)>self.max_experiences:
             raise ValueError("experience budget exhausted")
         if not isinstance(evidence_id,str) or not evidence_id:
             raise ValueError("external observation provenance required")
-        _json(observed)
+        observed=json.loads(_json(observed))
         if not callable(verify_source) or verify_source(
                 self._task,query_id,self._allowed[query_id],observed,evidence_id
         ) is not True:
@@ -280,13 +285,14 @@ class CausalExperienceCore:
             raise ValueError("sealed SOURCE checker is one-shot")
         if not isinstance(evidence_id,str) or not evidence_id:
             raise ValueError("independent SOURCE evidence identity required")
-        _json(observed)
+        observed=json.loads(_json(observed))
+        # Even an unsuccessful attempt consumes the sealed checker. No
+        # adaptive label/provenance probing on a second try.
+        self._source_certification_opened=True
         if not callable(verify_source) or verify_source(
                 self._task,query_id,self._allowed[query_id],
                 observed,evidence_id) is not True:
             raise ValueError("unverified sealed SOURCE observation")
-        # Mark before assessing any output: no adaptive second attempt.
-        self._source_certification_opened=True
         hypothesis=self._hypotheses[0]
         self._source_certified=(
             query_id in hypothesis.predictions and
