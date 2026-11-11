@@ -1,6 +1,13 @@
 # NEUMANN 1 | Pre-registration: exact elimination + zero-investment verified cascade
 2026-11-11 | Written and pushed BEFORE any ConceptARC task byte is fetched | Global Q1–Q7 OPEN
 
+> **CORRECTION 2026-11-11 (same day, after a complete PR search).** The statement that ConceptARC was never used
+> in this repository is FALSE. The same 160 tasks at the same commit were opened on 2026-10-22 by PRs #468, #474,
+> #478, #480 and #487 (unmerged branches). My earlier search covered commits only and its PR query had errored.
+> Consequences: this run was the first for the *merged hybrid / cascade engines*, but NOT a first exposure of the
+> corpus to the project, so its capability numbers are not fresh-family (Q6) evidence. H1 (output exactness) and
+> H2 (classical speed-up) are equivalence/cost facts and are unaffected. The original text is kept below unchanged.
+
 ## 0. Why this experiment (root cause, not another variant)
 
 The 2026-11-08 source-learned lazy router ([doc](Q3Q4Q6_SOURCE_LEARNED_LAZY_STRATEGY_360_INDEPENDENT_2026_11_08.md))

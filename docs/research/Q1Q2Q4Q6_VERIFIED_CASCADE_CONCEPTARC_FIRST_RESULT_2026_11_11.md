@@ -1,6 +1,13 @@
 # NEUMANN 1 | ConceptARC FIRST: exact elimination PASS, zero-investment cascade FAIL
 2026-11-11 | Immutable FIRST receipt | Global Q1–Q7 OPEN
 
+> **CORRECTION 2026-11-11 (same day, after a complete PR search).** The statement that ConceptARC was never used
+> in this repository is FALSE. The same 160 tasks at the same commit were opened on 2026-10-22 by PRs #468, #474,
+> #478, #480 and #487 (unmerged branches). My earlier search covered commits only and its PR query had errored.
+> Consequences: this run was the first for the *merged hybrid / cascade engines*, but NOT a first exposure of the
+> corpus to the project, so its capability numbers are not fresh-family (Q6) evidence. H1 (output exactness) and
+> H2 (classical speed-up) are equivalence/cost facts and are unaffected. The original text is kept below unchanged.
+
 Pre-registration: [Q1Q2Q4Q6_VERIFIED_CASCADE_CONCEPTARC_PREREG_2026_11_11.md](Q1Q2Q4Q6_VERIFIED_CASCADE_CONCEPTARC_PREREG_2026_11_11.md)
 (local commit `66c8430`, made before any ConceptARC blob was fetched; the push
 to GitHub was refused with HTTP 403 in this session, so the pre-registration

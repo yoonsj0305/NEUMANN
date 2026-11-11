@@ -11,7 +11,7 @@ computation; cheaper derivable work belongs outside neural inference.
 ## 2026-11-11 ConceptARC FIRST: exact elimination PASS, cascade FAIL
 
 [Result](docs/research/Q1Q2Q4Q6_VERIFIED_CASCADE_CONCEPTARC_FIRST_RESULT_2026_11_11.md)
-on all 160 ConceptARC originals (new author, pinned before opening):
+on all 160 ConceptARC originals (pinned before this run; CORRECTION: the corpus had already been opened by PRs #468-#487 on 2026-10-22, so capability numbers are not fresh-family evidence):
 the output-identical classical accelerator `classical_grid_fast.fit_all`
 matched the original fit lists **160/160** (1,461/1,461 incl. dev) at
 **4.38x** less classical search; adopted in the production hybrid
