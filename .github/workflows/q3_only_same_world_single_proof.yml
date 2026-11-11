@@ -1,0 +1,160 @@
+name: Q3 ONLY One Hidden World Autonomous Hypothesis Revision
+on:
+  push:
+    branches:
+      - feature/causal-experience-latent-core-20261110
+    paths:
+      - research/q3/q3_only_same_world_single_proof.py
+      - .github/workflows/q3_only_same_world_single_proof.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONHASHSEED: "0"
+  OMP_NUM_THREADS: "2"
+  OPENBLAS_NUM_THREADS: "2"
+  TOKENIZERS_PARALLELISM: "false"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+
+jobs:
+  precommit_single_hidden_world:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Predeclare ONE hidden world and separate sealed SOURCE
+        run: |
+          set -euo pipefail
+          python -m research.q3.q3_only_same_world_single_proof freeze --out-dir split
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          v=json.loads(Path("split/visible/visible.json").read_text())
+          g=json.loads(Path("split/gold/gold.json").read_text())
+          assert v["target_labels_present"] is False
+          assert v["queries"]["sealed"]==g["sealed"]["input"]
+          assert "observed" not in v["queries"]["sealed"]
+          assert v["mechanism"] and len(v["context"][
+              "observed_same_world_causal_interventions"])==4
+          print("Q3_ONE_WORLD_NO_SEALED_GOLD_IN_VISIBLE",flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-only-visible
+          path: split/visible/
+          retention-days: 90
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-only-authorized-probe
+          path: split/source/
+          retention-days: 90
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-only-sealed-gold-scorer-only
+          path: split/gold/
+          retention-days: 90
+
+  infer_real_model_and_freeze:
+    needs: precommit_single_hidden_world
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-only-visible
+          path: split/visible
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-only-authorized-probe
+          path: split/source
+      - name: Never expose sealed SOURCE outcome to Qwen
+        run: |
+          set -euo pipefail
+          test ! -e split/gold/gold.json
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          m=json.loads(Path("split/visible/manifest.json").read_text())
+          assert hashlib.sha256(Path("split/visible/visible.json").read_bytes()).hexdigest()==m["visible_sha256"]
+          assert hashlib.sha256(Path("split/source/source.json").read_bytes()).hexdigest()==m["source_sha256"]
+          assert m["sealed_gold_not_model_visible"] is True
+          assert m["world_count"]==1 and m["neural_gradient_cap"]==1
+          print("Q3_SEALED_SOURCE_IS_NOT_IN_MODEL_JOB",flush=True)
+          PY
+      - name: Load pinned real Qwen0.5B and LoRA
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . scikit-learn
+          python -m pip install -q --index-url https://download.pytorch.org/whl/cpu 'torch==2.5.1'
+          python -m pip install -q 'transformers==4.46.3' 'peft==0.14.0' \
+            'accelerate==1.2.1' 'huggingface_hub==0.27.1' 'jinja2>=3.1.4,<4'
+          python - <<'PY'
+          from huggingface_hub import model_info
+          assert model_info("Qwen/Qwen2.5-Coder-0.5B-Instruct").sha=="ea3f2471cf1b1f0db85067f1ef93848e38e88c25"
+          print("Q3_PRETRAINED_WEIGHT_PIN_VERIFIED", flush=True)
+          PY
+      - name: B context control versus C real SOURCE gradient, freeze before scoring
+        run: |
+          set -euo pipefail
+          mkdir -p predictions
+          python -u -m research.q3.q3_only_same_world_single_proof infer \
+            --visible split/visible/visible.json \
+            --source split/source/source.json \
+            --out predictions/frozen.json
+          sha256sum predictions/frozen.json > predictions/frozen.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("predictions/frozen.json").read_text())
+          assert set(p["arms"])=={"B_context_only","C_source_gradient"}
+          assert p["original_sealed_gold_seen"] is False
+          print("Q3_ONE_WORLD_PREDICTIONS_FROZEN",flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-only-frozen-real-neural-predictions
+          path: predictions/
+          retention-days: 90
+
+  independent_sealed_scoring:
+    needs: infer_real_model_and_freeze
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-only-frozen-real-neural-predictions
+          path: predictions
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-only-sealed-gold-scorer-only
+          path: split/gold
+      - name: Independent sealed SOURCE after SHA freeze, zero retuning
+        run: |
+          set -euo pipefail
+          sha256sum -c predictions/frozen.sha256
+          python -m research.q3.q3_only_same_world_single_proof score \
+            --pred predictions/frozen.json \
+            --gold split/gold/gold.json \
+            --out scored/q3_verdict.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-only-independent-one-world-verdict
+          path: scored/
+          retention-days: 90
+          if-no-files-found: warn
