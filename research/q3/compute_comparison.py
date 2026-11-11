@@ -7,7 +7,7 @@ Read-only post-hoc report (not a pre-registered test). Inputs:
     and the TARGET task.json files (blob SHA-1 checked; only character counts are used,
     no task content is written anywhere).
 
-python research/q3/compute_comparison.py <bigbench_clone> <dir_with_scores_json>
+python research/q3/compute_comparison.py <bigbench_clone> <dir_with_scores_json> [result.json] [out.json]
 
 Compute units (stated, not hidden):
   * LM inference  >= 2 * N_params * T_prompt FLOPs per query (dense forward pass lower bound;
@@ -49,9 +49,11 @@ def blob_sha(b):
     return hashlib.sha1(b"blob %d\0" % len(b) + b).hexdigest()
 
 
-def main(bigbench, scores_dir):
+def main(bigbench, scores_dir, result=RESULT, out=OUT):
+    global OUT
+    OUT = out
     reg = json.loads(pathlib.Path(REGISTRY).read_text())
-    res = json.loads(pathlib.Path(RESULT).read_text())
+    res = json.loads(pathlib.Path(result).read_text())
     frozen = json.loads(pathlib.Path(FROZEN).read_text())
     target = reg["splits"]["rule_target"]
     ids = [p.split("/")[-2] for p in target]
@@ -65,7 +67,8 @@ def main(bigbench, scores_dir):
         chars[p.split("/")[-2]] = [len("Input: %s\nOutput: %s\n" % (e["input"], e["target"]))
                                    for e in ex]
     rows = res["families"]["rule"]["rows"]
-    out = {"schema": "neumann.compute-comparison.list-functions.v1", "pin": PIN,
+    out = {"schema": "neumann.compute-comparison.list-functions.v1", "pin": PIN, "neumann_result": result,
+           "neumann_result_label": res.get("label", "FIRST"),
            "target_tasks": len(ids), "neumann": {}, "lms": {},
            "assumptions": {"ops_per_cpu_second_upper_bound": OPS_PER_CPU_S,
                            "lm_tokens_per_char": 0.25, "train_tokens": TRAIN_TOKENS}}
@@ -133,4 +136,4 @@ def main(bigbench, scores_dir):
 
 
 if __name__ == "__main__":
-    main(*sys.argv[1:3])
+    main(*sys.argv[1:5])

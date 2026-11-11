@@ -110,3 +110,35 @@ def test_fresh_plan_scores_both_hypotheses(tmp_path, monkeypatch):
     assert res["verdict"]["F1_Q3_sequences_first_exposure"] == "PASS"       # C: 25 over A/B, 12 exclusive
     assert res["verdict"]["F2_Q6_cross_semantic_zero_shot"] == "FAIL"       # C_L == A
     assert res["summary"]["F1_Q3_sequences_frozen_core"]["exclusive"] == 12
+
+
+def test_end_to_end_smoke_on_dev_tasks(tmp_path, monkeypatch):
+    """build -> checkpoint runner -> score -> checklist, with tiny budgets and self-authored tasks only."""
+    import invention_dev_family, invention_eval2_report as rp
+    import checkpoint_runner as cr
+    paths = {k: str(tmp_path / ("second_%s.json" % k)) for k in ("freeze", "rows", "manifest", "result")}
+    monkeypatch.setattr(ev, "P", lambda p, kind: paths[kind])
+    monkeypatch.setattr(first, "N_TARGET", 400)
+    monkeypatch.setattr(first, "N_STRONG", 1600)
+    (tmp_path / "second_freeze.json").write_text(json.dumps({"freeze_sha256": "x"}))
+    src, tgt = invention_dev_family.tasks()
+    lists = [dict(t, id="rule/" + t["id"]) for t in (src + tgt)[:6]]
+    seq = lambda name, f: {"id": "oeis/" + name, "in_types": ["I"], "out_type": "I",
+                           "train": [((n,), f(n)) for n in range(14)], "test": [((n,), f(n)) for n in range(14, 20)]}
+    fams = {"rule": lists + [{"id": "rule/u", "unsupported": "x"}],
+            "dc": [dict(t, id="dc/" + t["id"]) for t in (src + tgt)[6:9]],
+            "oeis": [seq("sq", lambda n: n * n), seq("lin", lambda n: 2 * n + 1), seq("fib", lambda n: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181][n])]}
+    jobs, manifest = ev.build("second", fams)
+    assert len(jobs) == 6 * 6 + 3 * 4 + 3 * 5 and manifest["families"]["oeis"]["arms"][-1] == "D"
+    (tmp_path / "second_manifest.json").write_text(json.dumps(manifest))
+    rows = cr.run(jobs, paths["rows"], workers=2, worker=ev.job)
+    assert all(r["status"] == "ok" for r in rows.values())
+    res = ev.score("second")
+    assert res["unresolved"] == [] and res["integrity"]["status"] == "VOID"      # dev tasks: A != 25
+    d = res["families"]["oeis"]["rows"]
+    assert d["oeis/sq"]["D"]["solved"] and d["oeis/fib"]["D"]["solved"]          # specialist arm wired
+    assert all("work" in r["C"] and r["C"]["n_hidden"] == 8 for k, r in res["families"]["rule"]["rows"].items()
+               if "unsupported" not in r)
+    rp.main("second")
+    chk = json.loads((tmp_path / "second_checklist.json").read_text())
+    assert set(chk["families"]) == {"rule", "dc", "oeis"} and "P3_compute_wording" in chk["families"]["rule"]
