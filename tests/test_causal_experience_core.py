@@ -587,3 +587,34 @@ def test_refuted_model_concept_probability_actually_decreases():
     assert result["refuted_model_authored_latent_penalty"] is True
     assert result["actual_trainable_weight_delta_l1"]>0
     assert after>before, "refuted model concept must actually become less likely"
+
+
+def test_same_model_revision_receives_only_verified_source_counterexample_witness():
+    """Projection of already authorized evidence, NOT a new task experiment."""
+    from neumann1.q3_latent_world_policy import TrainableLatentWorldPolicy
+    history=[
+        {
+            "scope":"TRUSTED_SOURCE_ONLY","task_id":"one_author_episode",
+            "query":{"intervention":"measure again"},
+            "observed":{"value":17},"predicted":{"value":12},
+            "contradicted":True,
+            "hypothesis":{
+                "latent_variables":{
+                    "proposed_internal_causal_concept":
+                        "an invented but incorrect causal relation"}},
+            "learning_receipt":{"huge_optimizer_log":"unrelated metadata"},
+        },
+    ]
+    witnesses=TrainableLatentWorldPolicy._source_witnesses(history)
+    assert len(witnesses)==1
+    row=witnesses[0]
+    assert row["source_identity"]=="one_author_episode"
+    assert row["verified_observation"]=={"value":17}
+    assert row["incorrect_prediction"]=={"value":12}
+    assert row["refuted_model_hypothesis"]==(
+        "an invented but incorrect causal relation")
+    assert "learning_receipt" not in str(row)
+    assert "huge_optimizer_log" not in str(witnesses)
+    with pytest.raises(ValueError,match="non-SOURCE"):
+        TrainableLatentWorldPolicy._source_witnesses([
+            dict(history[0],scope="ORIGINAL_TARGET_GOLD")])
