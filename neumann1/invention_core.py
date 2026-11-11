@@ -49,6 +49,61 @@ class Found(Exception):
         self.entry = entry
 
 
+# ------------------------------------------------------------------ executor
+# Semantics-preserving executor switches (see docs/research/
+# Q3Q6_EXECUTOR_EXACTNESS_2026_11_11.md).  Both default to ON; turning them
+# OFF reproduces the frozen 2026-11-11 FIRST executor's evaluation order
+# exactly (used only by the equivalence harness).
+CALL_BY_NEED = True     # a binder-free abstraction argument is evaluated at
+                        # most once per call, on first reference
+REUSE_VECTORS = True    # binder-free children of a higher-order candidate are
+                        # read from their already computed value vectors
+# Work meter: number of substrate evaluation steps (first-order primitive
+# applications, `if` vector steps, loop iterations).  The same unit in both
+# executor modes; metering only, it never influences search.
+WORK = [0]
+
+
+def _need(f, env):
+    """Call-by-need thunk for a binder-free abstraction argument.  The value
+    depends only on the call-site scope `env`, which is fixed for the whole
+    call; the argument is evaluated on first reference (exactly where
+    call-by-name would first evaluate it, so an exception is raised at the
+    same point) and the value is reused for later references."""
+    cell = []
+
+    def g(_e):
+        if cell:
+            return cell[0]
+        v = f(env)
+        cell.append(v)
+        return v
+    return g
+
+
+def _need2(g, env, A):
+    cell = []
+
+    def h(_e):
+        if cell:
+            return cell[0]
+        v = g(env, A)
+        cell.append(v)
+        return v
+    return h
+
+
+def _lookup(vec, idx):
+    """Binder-free child of a higher-order candidate: its value on env #i is
+    vec[i] (None = failure), computed earlier by the same executor."""
+    def f(_env):
+        v = vec[idx[0]]
+        if v is None:
+            raise Fail
+        return v
+    return f
+
+
 # ----------------------------------------------------------------- substrate
 def _add(a, b):
     r = a + b
@@ -122,12 +177,15 @@ class Prim:
     """A primitive. params = ((type, binder_types), ...).  A parameter with
     binder types is a lambda body evaluated in the scope extended by them."""
     __slots__ = ("name", "ret", "params", "kind", "f", "vf", "comm", "body",
-                 "lib", "arity", "tmpl", "vprog")
+                 "lib", "arity", "tmpl", "vprog", "lazy")
 
     def __init__(self, name, ret, params, kind, f=None, comm=False, body=None):
         self.name, self.ret, self.params = name, ret, tuple(params)
         self.kind, self.f, self.comm, self.body = kind, f, comm, body
         self.arity = len(self.params)
+        # binder-free parameters: their hole is always evaluated on the
+        # call-site scope (js == () <=> no binder types, see _au/_to_body)
+        self.lazy = tuple(i for i, (_, bt) in enumerate(self.params) if not bt)
         self.vf = None
         self.lib = None
         self.tmpl = {}
@@ -166,6 +224,7 @@ class Prim:
                 a, = fns
 
                 def fn1(env):
+                    WORK[0] += 1
                     r = f(a(env))
                     if r is None:
                         raise Fail
@@ -174,6 +233,7 @@ class Prim:
             a, b = fns
 
             def fn2(env):
+                WORK[0] += 1
                 r = f(a(env), b(env))
                 if r is None:
                     raise Fail
@@ -187,7 +247,9 @@ class Prim:
 
             def foldr(env):
                 acc = init(env)
-                for x in reversed(lst(env)):
+                xs = lst(env)
+                WORK[0] += len(xs)
+                for x in reversed(xs):
                     acc = body(env + (x, acc))
                 return acc
             return foldr
@@ -196,20 +258,41 @@ class Prim:
 
             def foldl(env):
                 acc = init(env)
-                for x in lst(env):
+                xs = lst(env)
+                WORK[0] += len(xs)
+                for x in xs:
                     acc = body(env + (x, acc))
                 return acc
             return foldl
         if kind == "map":
             body, lst = fns
-            return lambda env: tuple([body(env + (x,)) for x in lst(env)])
+
+            def map_(env):
+                xs = lst(env)
+                WORK[0] += len(xs)
+                return tuple([body(env + (x,)) for x in xs])
+            return map_
         if kind == "filter":
             body, lst = fns
-            return lambda env: tuple([x for x in lst(env) if body(env + (x,))])
+
+            def filter_(env):
+                xs = lst(env)
+                WORK[0] += len(xs)
+                return tuple([x for x in xs if body(env + (x,))])
+            return filter_
         t = self.tmpl.get(depth)
         if t is None:
             t = self.tmpl[depth] = _template(self.body, depth, depth, self.lib)
-        return lambda env: t(env, fns)
+        lazy = self.lazy
+        if not CALL_BY_NEED or not lazy:
+            return lambda env: t(env, fns)
+
+        def call(env):
+            A = list(fns)
+            for k in lazy:
+                A[k] = _need(fns[k], env)
+            return t(env, A)
+        return call
 
 
 def _native2(p, subs):
@@ -225,6 +308,7 @@ def _native2(p, subs):
             a, = subs
 
             def g1(env, A):
+                WORK[0] += 1
                 r = f(a(env, A))
                 if r is None:
                     raise Fail
@@ -233,6 +317,7 @@ def _native2(p, subs):
         a, b = subs
 
         def g2(env, A):
+            WORK[0] += 1
             r = f(a(env, A), b(env, A))
             if r is None:
                 raise Fail
@@ -246,7 +331,9 @@ def _native2(p, subs):
 
         def gr(env, A):
             acc = init(env, A)
-            for x in reversed(lst(env, A)):
+            xs = lst(env, A)
+            WORK[0] += len(xs)
+            for x in reversed(xs):
                 acc = body(env + (x, acc), A)
             return acc
         return gr
@@ -255,16 +342,28 @@ def _native2(p, subs):
 
         def gl(env, A):
             acc = init(env, A)
-            for x in lst(env, A):
+            xs = lst(env, A)
+            WORK[0] += len(xs)
+            for x in xs:
                 acc = body(env + (x, acc), A)
             return acc
         return gl
     if kind == "map":
         body, lst = subs
-        return lambda env, A: tuple([body(env + (x,), A) for x in lst(env, A)])
+
+        def gm(env, A):
+            xs = lst(env, A)
+            WORK[0] += len(xs)
+            return tuple([body(env + (x,), A) for x in xs])
+        return gm
     if kind == "filter":
         body, lst = subs
-        return lambda env, A: tuple([x for x in lst(env, A) if body(env + (x,), A)])
+
+        def gf(env, A):
+            xs = lst(env, A)
+            WORK[0] += len(xs)
+            return tuple([x for x in xs if body(env + (x,), A)])
+        return gf
     raise ValueError(kind)
 
 
@@ -300,9 +399,18 @@ def _template(b, dcur, dcall, lib):
     if inner is None:
         inner = p.tmpl[dcur] = _template(p.body, dcur, dcur, lib)
 
-    def call(env, A):
-        return inner(env, [(lambda e, g=g: g(e, A)) for g in subs])
-    return call
+    lazy = set(p.lazy) if CALL_BY_NEED else ()
+    if not lazy:
+        def call(env, A):
+            return inner(env, [(lambda e, g=g: g(e, A)) for g in subs])
+        return call
+
+    def call_need(env, A):
+        # binder-free arguments of the nested call depend only on this call's
+        # scope `env`: evaluate each at most once, on first reference
+        return inner(env, [_need2(g, env, A) if k in lazy else (lambda e, g=g: g(e, A))
+                           for k, g in enumerate(subs)])
+    return call_need
 
 
 def _comp_body(b, dcur, argfns, dcall, lib):
@@ -478,11 +586,16 @@ def inline(ast, depth, lib):
 
 # ------------------------------------------------------------------- search
 class _E:
-    __slots__ = ("prim", "kids", "vec", "fn", "depth", "term", "hv")
+    __slots__ = ("prim", "kids", "vec", "fn", "depth", "term", "hv", "faith")
 
-    def __init__(self, prim, kids, vec, fn, depth, term, hv):
+    def __init__(self, prim, kids, vec, fn, depth, term, hv, faith=True):
         self.prim, self.kids, self.vec, self.fn = prim, kids, vec, fn
         self.depth, self.term, self.hv = depth, term, hv
+        # faith: vec[i] is exactly what getfn() returns on env #i of this
+        # context (None <=> Fail).  False for value-mode abstraction calls,
+        # which treat a failing argument as failure even when the body would
+        # never reference it (strict), whereas closures are lazy.
+        self.faith = faith
 
     def getfn(self):
         f = self.fn
@@ -696,18 +809,27 @@ class Search:
         if self.n > self.budget:
             raise Budget()
         fn = None
+        faith = True
         if kind == "fo":
+            WORK[0] += len(ctx.envs)
             if p.arity == 0:
                 vec = (p.f(),) * len(ctx.envs)
             else:
                 vec = p.vf(*[k.vec for k in kids])
+            for k in kids:
+                if not k.faith:
+                    faith = False
+                    break
         elif kind == "if":
             c, a, b = kids
             if a is b:
                 return
+            WORK[0] += len(ctx.envs)
             vec = tuple([None if x is None else (y if x else z)
                          for x, y, z in zip(c.vec, a.vec, b.vec)])
+            faith = c.faith and a.faith and b.faith
         elif kind == "inv" and p.first_order():
+            faith = False
             # A first-order abstraction is a function of its argument VALUES:
             # reuse the children's value vectors instead of re-running them.
             vp = p.value_fn()
@@ -718,6 +840,23 @@ class Search:
                     continue
                 try:
                     res.append(vp(args))
+                except Fail:
+                    res.append(None)
+            vec = tuple(res)
+        elif REUSE_VECTORS:
+            # Higher-order candidate.  Binder-free children whose vector is
+            # faithful are read from it instead of being re-executed; the
+            # general closure (needed by parents in other scopes) is built
+            # later by getfn() from the same children.
+            idx = [0]
+            fast = [_lookup(k.vec, idx) if not bt and k.faith else k.getfn()
+                    for k, (_, bt) in zip(kids, p.params)]
+            fe = p.make(fast, ctx.depth)
+            res = []
+            for i, env in enumerate(ctx.envs):
+                idx[0] = i
+                try:
+                    res.append(fe(env))
                 except Fail:
                     res.append(None)
             vec = tuple(res)
@@ -732,7 +871,7 @@ class Search:
             vec = tuple(res)
         if vec.count(None) == len(vec):
             return
-        self._keep(ctx, out, _E(p, kids, vec, fn, ctx.depth, None, hv), p.ret)
+        self._keep(ctx, out, _E(p, kids, vec, fn, ctx.depth, None, hv, faith), p.ret)
 
     def _keep(self, ctx, out, e, t):
         seen = ctx.seen[t]
@@ -1087,6 +1226,7 @@ def solve(task, spec=(), cost=None, budget=100000, memory=None, k_retrieve=8):
     """One task, one arm.  task: {in_types, out_type, train, test}.
     Only `train` reaches the search; `test` is scored afterwards."""
     t0 = time.perf_counter()
+    c0, w0 = time.process_time(), WORK[0]
     lib = library_from_spec(spec)
     cost = _as_cost(cost)
     used, via, ast = 0, None, None
@@ -1107,7 +1247,9 @@ def solve(task, spec=(), cost=None, budget=100000, memory=None, k_retrieve=8):
     return {"fit": ast is not None, "solved": bool(ok), "via": via,
             "candidates": used, "ast": ast,
             "size": size(ast) if ast is not None else None,
-            "seconds": round(time.perf_counter() - t0, 4)}
+            "seconds": round(time.perf_counter() - t0, 4),
+            "cpu_seconds": round(time.process_time() - c0, 4),
+            "work": WORK[0] - w0}
 
 
 # ----------------------------------------------------------------- training
