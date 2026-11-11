@@ -1,5 +1,5 @@
 # NEUMANN 1 | Pre-registration: SECOND evaluation (opened targets) and FRESH evaluation (never-opened pool)
-2026-11-11 | DRAFT until the freeze commits named in §6; binding from then on | Global Q1–Q7 OPEN
+2026-11-11 | Plan `second`: BINDING (frozen 13:58:12 UTC, §6). Plan `fresh`: draft until its freeze commit | Global Q1–Q7 OPEN
 
 Authority: [Frozen North Star](frozen_north_star.md), issue #745, the FIRST pre-registration
 ([Q3Q6_INVENTION_CORE_PREREG_2026_11_11.md](Q3Q6_INVENTION_CORE_PREREG_2026_11_11.md)) and the owner's instructions
@@ -111,9 +111,33 @@ C vs A4.
 2. A timing sample of every arm on SOURCE tasks at the real budgets, with the checkpoint runner, is reported
    (per-task CPU and work percentiles), and `wall_cap_s` is set at least 10× above the maximum observed.
 
+### 5.1 Gate results (both passed before the `second` freeze)
+
+1. **Executor differential test** (12:03–13:39 UTC, `executor_equivalence_50k.json`): 3 528 / 3 528 jobs accounted
+   for, 0 missing, 0 duplicates, 0 exceptions. Frozen vs new executor: 1 161 comparable pairs, **0 mismatches**
+   (AST, candidates, trace, fit, solved, via). 32 wall-cap timeouts, all in the old evaluation order (frozen 15,
+   off 17), excluded from the evidence; the new executor completed 1 176 / 1 176.
+2. **SOURCE timing at the real budgets** (13:41–13:57 UTC, `source_timing_gate.json`; first 40 rule SOURCE and
+   first 40 OEIS SOURCE tasks in the registry's salted order, every arm): 400 / 400 jobs `ok`. CPU seconds per job,
+   median / p90 / max:
+
+   | Arm | rule | oeis |
+   |---|---|---|
+   | A (200 k) | 2.5 / 3.0 / 3.4 | 2.0 / 2.2 / 2.4 |
+   | A4 (800 k) | 11.7 / 12.8 / 13.9 | 5.8 / 6.6 / 6.9 |
+   | B | 9.9 / 62.4 / 98.0 | 2.4 / 2.6 / 2.8 |
+   | C | 7.5 / 73.5 / 109.6 | 1.8 / 2.2 / 2.3 |
+   | C_no_inventions | 11.3 / 110.6 / 234.8 | — |
+   | C_no_learned_prior | 6.0 / 26.5 / 52.7 | — |
+
+   Maximum over all jobs 234.8 s; peak RSS 366 MB. `wall_cap_s` = **3 600** (15× the maximum).
+   Known before the run, from this sample: at equal candidates the memory arms do about 14× the work per candidate
+   of A (rule B 1 023 vs A 73 substrate steps per candidate), so "A4 = 4× compute" will not hold in CPU or work
+   terms; the P3 wording rule of §2 applies.
+
 ## 6. Freeze records (filled at freeze time)
 
 | Plan | Freeze file | freeze_sha256 | Commit |
 |---|---|---|---|
-| second | `docs/experiments/invention_second_freeze.json` | (pending) | (pending) |
+| second | `docs/experiments/invention_second_freeze.json` | `08c1536d…f639` (2026-11-11 13:58:12 UTC) | the commit that adds the freeze file; pushed before launch |
 | fresh | `docs/experiments/invention_fresh_freeze.json` | (pending) | (pending) |
