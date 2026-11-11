@@ -86,6 +86,7 @@ class TrainableLatentWorldPolicy:
         self.seed=seed
         self._last_latent_prefix=None
         self._last_latent_text=None
+        self._last_query_training_prefixes={}
 
     def _ids(self,text):
         ids=self.tokenizer(
@@ -148,6 +149,7 @@ class TrainableLatentWorldPolicy:
             from .causal_experience import LatentHypothesisFormatError
             raise LatentHypothesisFormatError("unbounded model hypothesis")
         predictions={}
+        query_training_prefixes={}
         for query_id,query in sorted(allowed_queries.items()):
             query_prefix=_chat(self.tokenizer,QUERY_SYSTEM,_canonical({
                 "SOURCE_observations":context,
@@ -155,6 +157,13 @@ class TrainableLatentWorldPolicy:
                 "model_authored_hypothesis":proposed_text,
                 "single_authorized_query":{query_id:query},
             }))
+            # Bind the exact inference prompt before SOURCE labels are opened.
+            # SOURCE learning must not use an unrelated teacher prompt.
+            query_training_prefixes[query_id]={
+                "query_digest":sha256(_canonical(query).encode()).hexdigest(),
+                "prefix":query_prefix,
+                "concept_digest":sha256(proposed_text.encode()).hexdigest(),
+            }
             raw=self._generate(
                 query_prefix,max_new_tokens=self.max_new_tokens)
             try:
@@ -166,6 +175,7 @@ class TrainableLatentWorldPolicy:
             predictions[query_id]=value
         self._last_latent_prefix=concept_prefix
         self._last_latent_text=proposed_text
+        self._last_query_training_prefixes=query_training_prefixes
         return [{
             "name":"model-authored-"+sha256(proposed_text.encode()).hexdigest()[:16],
             "kind":"neumann.latent",
@@ -177,13 +187,36 @@ class TrainableLatentWorldPolicy:
     def _world_teacher(self,event):
         if event.get("scope")!="TRUSTED_SOURCE_ONLY":
             raise ValueError("independent TARGET outcome cannot train")
+        # One model, ONE inference prefix. Previous training minimized label
+        # NLL after PREDICTION_SYSTEM, while actual inference used QUERY_SYSTEM.
+        # Such off-policy prompting cannot establish learned hypothesis use.
+        observed=event["observed"]
+        completion=(observed if isinstance(observed,str)
+                    else _canonical(observed))
+        stored=getattr(self,"_last_query_training_prefixes",{})
+        if stored:
+            entry=stored.get(event["query_id"])
+            if entry is None:
+                raise ValueError("SOURCE query has no matching inference prompt")
+            if entry["query_digest"]!=sha256(
+                    _canonical(event["query"]).encode()).hexdigest():
+                raise ValueError("SOURCE query changed after model prediction")
+            concept=event.get("hypothesis",{}).get(
+                "latent_variables",{}).get("proposed_internal_causal_concept")
+            if not isinstance(concept,str) or (
+                    entry["concept_digest"] !=
+                    sha256(concept.encode()).hexdigest()):
+                raise ValueError("SOURCE claim differs from model-authored hypothesis")
+            return entry["prefix"],completion
+        # Legacy mock-policy gradient contracts do not generate actual queries.
+        # Their structural tests are NOT a production Q3 claim.
         return (
             _chat(self.tokenizer,PREDICTION_SYSTEM,_canonical({
                 "query":event["query"],
                 "proposed_latent_state":event["hypothesis"],
                 "prediction_made_before_measurement":event["predicted"],
             })),
-            _canonical(event["observed"]),
+            completion,
         )
 
     def _loss(self,prefix,completion):
@@ -264,6 +297,8 @@ class TrainableLatentWorldPolicy:
             "updates":self.update_count,
             "loss":float(objective.detach().cpu()),
             "world_prediction_loss":float(prediction_loss.detach().cpu()),
+            "source_prediction_train_infer_prefix_identical":bool(
+                getattr(self,"_last_query_training_prefixes",{})),
             "reinforced_model_authored_latent":reinforced,
             "refuted_model_authored_latent_penalty":refuted_model_authored_latent,
             "learning_objective":(
