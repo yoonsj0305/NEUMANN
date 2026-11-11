@@ -106,7 +106,52 @@ Data:
 * arms A, B (frozen memory), C (frozen inventions, prior and memory); budget 50 000 candidates; wall cap 300 s per
   job.
 
-Results: see §3.1 (filled from `docs/experiments/results/executor_equivalence_50k.json` when the run completes).
+### 3.1 Results (run 12:03–13:39 UTC, code commit `4507b8e`, core sha256 `e94ce526…614c`)
+
+Receipts: `docs/experiments/results/executor_equivalence_50k.json` (aggregate),
+`executor_equivalence_50k_rows.jsonl.gz` (all 3 528 rows; sha256 of the uncompressed file `a4b53f16…79fe`),
+`executor_equivalence_50k.log`.
+
+**Accounting.** 392 tasks × 3 arms × 3 executors = 3 528 jobs expected; 3 528 rows; 0 missing; 0 duplicate keys.
+
+| Executor | completed | wall-cap timeouts (300 s) |
+|---|---:|---:|
+| frozen | 1 161 | 15 (B 4, C 11) |
+| off | 1 159 | 17 (B 6, C 11) |
+| **on** | **1 176** | **0** |
+
+All 32 timeouts belong to the old evaluation order, on rule SOURCE tasks in the memory arms. They are **not
+comparable** and are **excluded from the correctness evidence**: for 4 (B) + 11 (C) task–arm pairs there is no
+frozen result to compare with. No job raised an exception.
+
+**Equality on every comparable pair** (fit, solved, via, returned AST, candidate count, SHA-256 of the ordered
+`_keep` trace, trace length):
+
+| Arm | frozen vs on: comparable / mismatches | frozen vs off | off vs on | solved (frozen = on) |
+|---|---:|---:|---:|---:|
+| A | 392 / **0** | 392 / 0 | 392 / 0 | 51 = 51 |
+| B | 388 / **0** | 386 / 0 | 386 / 0 | 82 = 82 |
+| C | 381 / **0** | 381 / 0 | 381 / 0 | 93 = 93 |
+
+1 161 frozen-vs-on comparisons, 0 mismatches. This is evidence on development data at a 50 000 budget, not a
+proof; the proof obligations are the code-level argument of §2.
+
+**Cost** (triples where all three executors finished; so the 32 worst old-executor cases are *not* in these sums):
+
+| Arm | CPU s frozen → on (total) | ratio | work off → on (total) | per-task CPU ratio: median / p90 / p99 / max | worst single task (frozen → on) |
+|---|---:|---:|---:|---|---|
+| A | 254.7 → 251.7 | 1.01× | 1.25× less | 1.00 / 1.25 / 1.50 / 2.0 | 1.46 s → 1.22 s |
+| B | 2 236.8 → 571.7 | 3.9× | 6.9× less | 0.93 / 1.41 / 12.8 / 18.4 | 198.4 s → 15.5 s |
+| C | 2 278.9 → 520.9 | 4.4× | 7.7× less | 0.96 / 1.44 / 13.1 / 20.6 | 193.2 s → 11.2 s |
+
+How to read this honestly:
+* The saving is concentrated in the tail. On the median task the new executor is slightly **slower** (0.93–0.96×
+  in B/C; largest slowdown < 1 s) because of thunk and metering overhead. In the worst decile of old-executor cost
+  it is 10–20× faster.
+* With the censored cases included the tail is larger than the table shows: every task the old executors could not
+  finish in 300 s finished in ≤ 30 s (max `on` CPU over all 1 176 jobs: A 1.2 s, B 25.0 s, C 29.7 s).
+* The work meter falls in every arm (A 1.25×) because binder-free children are no longer re-executed, but in A
+  this does not reduce CPU: the saved steps are cheap and the bookkeeping costs as much.
 
 Unit tests:
 * `tests/test_executor_exactness.py`: trace-level equality with the frozen executor on a dev sample for A, B, C;
