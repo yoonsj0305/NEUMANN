@@ -16,8 +16,6 @@ import re
 import time
 from pathlib import Path
 
-from neumann1.causal_experience import CausalExperienceCore
-from neumann1.q3_latent_world_policy import TrainableLatentWorldPolicy
 
 SALT = "NEUMANN.Q3Q6.FINAL.ONE.SAME.WORLD.2026-11-11.FROZEN"
 REV = "ea3f2471cf1b1f0db85067f1ef93848e38e88c25"
@@ -186,6 +184,7 @@ def verifier(task, oracle):
     return check
 
 def effort(model, task, oracle, memory, training):
+    from neumann1.causal_experience import CausalExperienceCore
     core = CausalExperienceCore(PolicyView(model, memory, training),
                                 max_hypotheses=2, max_experiences=32)
     context = {"original_author_semantics": task["domain"],
@@ -250,6 +249,7 @@ def source_nearest(domain, query, task, memory, oracle):
     return min(refs, key=lambda e: distance(e["query"],query))["observed"]
 
 def infer(visible_path, source_path, out):
+    from neumann1.q3_latent_world_policy import TrainableLatentWorldPolicy
     visible, oracle = load(visible_path), load(source_path)
     if visible["schema"] != "NEUMANN.Q3Q6.FINAL.SAME-WORLD.VISIBLE.v1":
         raise ValueError("visible precommit invalid")
