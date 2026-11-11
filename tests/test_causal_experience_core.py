@@ -512,3 +512,61 @@ def test_concept_and_predictions_have_independent_model_generation_channels():
     assert item["predictions"]["sealed"]=={"effect":43}
     assert len(policy.model.calls)==3
     assert "previously unnamed" in policy._last_latent_text
+
+
+def test_refuted_model_concept_probability_actually_decreases():
+    """Gradient sign check on tiny neural logits, NOT an intelligence claim."""
+    torch=pytest.importorskip("torch")
+    from types import SimpleNamespace
+    from neumann1.q3_latent_world_policy import TrainableLatentWorldPolicy
+
+    class Tokenizer:
+        eos_token="!"
+        def __call__(self,text,add_special_tokens=False,truncation=False):
+            assert truncation is False
+            return {"input_ids":[ord(c)%128 for c in text]}
+
+    class TinyLM(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.logits=torch.nn.Parameter(torch.zeros(128))
+        def forward(self,input_ids,labels):
+            import torch.nn.functional as F
+            n,m=input_ids.shape
+            logits=self.logits.view(1,1,128).expand(n,m,128)
+            return SimpleNamespace(loss=F.cross_entropy(
+                logits[:,:-1,:].transpose(1,2),labels[:,1:],
+                ignore_index=-100))
+
+    policy=TrainableLatentWorldPolicy.__new__(TrainableLatentWorldPolicy)
+    policy.torch=torch
+    policy.tokenizer=Tokenizer()
+    policy.model=TinyLM()
+    policy.device="cpu"
+    policy.optimizer=torch.optim.AdamW(policy.model.parameters(),lr=0.05)
+    policy.max_context_tokens=3072
+    policy.max_updates=1
+    policy.update_count=0
+    policy._last_latent_prefix="Model invented a hypothesis:"
+    policy._last_latent_text="zzzzzzzzzzzzzzzz"
+    event={
+        "scope":"TRUSTED_SOURCE_ONLY",
+        "task_id":"one_coherent_source_world",
+        "query_id":"source_counterexample",
+        "evidence_id":"verified_source_only",
+        "query":{"intervention":"original"},
+        "hypothesis":{"name":"model-drawn","kind":"neumann.latent",
+            "latent_variables":{"concept":"zzzz"},
+            "relations":{},"predictions":{"source_counterexample":"wrong"}},
+        "predicted":"wrong",
+        "observed":"xxxxxxxxxx",
+        "contradicted":True,
+    }
+    before=float(policy._loss(policy._last_latent_prefix,
+                              policy._last_latent_text).detach())
+    result=policy.learn_from_counterexample((event,))
+    after=float(policy._loss(policy._last_latent_prefix,
+                             policy._last_latent_text).detach())
+    assert result["refuted_model_authored_latent_penalty"] is True
+    assert result["actual_trainable_weight_delta_l1"]>0
+    assert after>before, "refuted model concept must actually become less likely"
