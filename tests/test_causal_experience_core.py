@@ -326,16 +326,26 @@ def test_genuine_torch_gradient_changes_world_learning_weights_without_code():
     assert receipt2["reinforced_model_authored_latent"] is False
     assert receipt2["actual_trainable_weight_delta_l1"]>0
     assert policy.learn_from_counterexample((e2,)) is None
+    # An actually model-authored hypothesis which is refuted must now
+    # receive a proposal-distribution penalty, not only prediction loss.
+    policy.max_updates=3
+    policy._last_latent_text="hypothetical latent learned by the neural proposer"
+    prior=policy.model.weight.detach().clone()
+    rejected=policy.learn_from_counterexample((e2,))
+    assert rejected["refuted_model_authored_latent_penalty"] is True
+    assert rejected["reinforced_model_authored_latent"] is False
+    assert rejected["actual_trainable_weight_delta_l1"]>0
+    assert not torch.equal(prior,policy.model.weight.detach())
     # Even when NO hypothesis could initially be formatted, the SAME
     # trainable neural weights can absorb a verified observation directly.
-    policy.max_updates=3
+    policy.max_updates=4
     before_unformed=policy.model.weight.detach().clone()
     receipt3=policy.learn_grounded_source_without_hypothesis(
         task_id="example.source",context={"observations":[1,2]},
         query={"input":"observed source transition"},
         observed={"effect":"new source observation"},
         evidence_id="source-only-authorized-proof")
-    assert receipt3["updates"]==3
+    assert receipt3["updates"]==4
     assert receipt3["new_causal_concept_proven"] is False
     assert receipt3["actual_trainable_weight_delta_l1"]>0
     assert not torch.equal(before_unformed,policy.model.weight.detach())
@@ -446,3 +456,59 @@ def test_invalid_initial_hypothesis_does_not_silently_enable_bootstrap():
             episode_bindings=fixture_problem().metadata[
                 "source_episode_bindings"])
     assert core.task_id is None
+
+
+def test_concept_and_predictions_have_independent_model_generation_channels():
+    """Transport proof only: no handcrafted grammar or multi-grid JSON gate."""
+    torch=pytest.importorskip("torch")
+    from neumann1.q3_latent_world_policy import TrainableLatentWorldPolicy
+
+    class Tokenizer:
+        eos_token="!"
+        eos_token_id=33
+        chat_template=None
+        def __call__(self,text,add_special_tokens=False,truncation=False):
+            assert truncation is False
+            return {"input_ids":[ord(char) for char in text]}
+        def decode(self,ids,skip_special_tokens=True):
+            return "".join(chr(int(t)) for t in ids)
+
+    tok=Tokenizer()
+    class TextOnlyModel:
+        calls=[]
+        def eval(self):
+            return self
+        def generate(self,*,input_ids,attention_mask,max_new_tokens,
+                     do_sample,temperature,top_p,pad_token_id):
+            prompt=tok.decode(input_ids[0])
+            self.calls.append(prompt)
+            if "single_authorized_query" not in prompt:
+                # This free-form model hypothesis is deliberately NOT JSON.
+                answer="A previously unnamed hidden relation regulates outputs."
+            elif '"probe"' in prompt:
+                answer='{"effect":42}'
+            else:
+                answer='{"effect":43}'
+            extension=torch.tensor([[ord(c) for c in answer]],
+                                   dtype=torch.long)
+            return torch.cat((input_ids,extension),dim=1)
+
+    policy=TrainableLatentWorldPolicy.__new__(TrainableLatentWorldPolicy)
+    policy.torch=torch
+    policy.tokenizer=tok
+    policy.model=TextOnlyModel()
+    policy.device="cpu"
+    policy.seed=1007
+    policy.max_context_tokens=4096
+    policy.max_new_tokens=500
+    proposed=policy.hypotheses(
+        {"SOURCE_demo":{"input":[1,2],"output":[3,4]}},(),
+        {"probe":{"input":[2,3]},"sealed":{"input":[9,7]}})
+    assert len(proposed)==1
+    item=proposed[0]
+    assert item["kind"]=="neumann.latent"
+    assert "previously unnamed" in item["relations"]["model_authored_falsifiable_claim"]
+    assert item["predictions"]["probe"]=={"effect":42}
+    assert item["predictions"]["sealed"]=={"effect":43}
+    assert len(policy.model.calls)==3
+    assert "previously unnamed" in policy._last_latent_text
