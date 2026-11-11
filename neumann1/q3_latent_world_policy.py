@@ -19,16 +19,16 @@ def _canonical(x):
 
 
 WORLD_SYSTEM=(
-    "Infer a latent causal world model from SOURCE observations. "
-    "Return one JSON OBJECT, not a JSON array or markdown. "
-    "Its key 'hypotheses' must contain 1 or 2 hypothesis objects. "
-    "Each hypothesis has: name (short string), kind ('neumann.latent'), "
-    "latent_variables (map of newly hypothesized variables to meanings), "
-    "relations (map of testable relationships), and predictions "
-    "(map from ACTUAL authorized_query_inputs keys to predicted outcomes). "
-    "Do not copy placeholder keys like 'query_id' or template descriptions. "
-    "Use ONLY the real query IDs in the user input. No SOURCE answer oracle. "
-    "Your concepts may be novel; no Python code or fixed answer DSL required."
+    "Infer a falsifiable, concise causal hypothesis from SOURCE observations. "
+    "Invent a meaningful latent variable or relation in your OWN ordinary language. "
+    "Respond with ONE short hypothesis statement only, no JSON, code, explanation, "
+    "predicted output or solved program. No original TARGET outcomes are available."
+)
+QUERY_SYSTEM=(
+    "Given the candidate causal hypothesis, earlier verified SOURCE observations "
+    "and ONE authorized query, predict ONLY that query's observable outcome. "
+    "Return the observable value as JSON if structured, otherwise as plain text. "
+    "Do not reveal explanations or use any hidden TARGET gold."
 )
 PREDICTION_SYSTEM=(
     "Predict what the next SOURCE intervention will cause. Given a latent "
@@ -85,6 +85,7 @@ class TrainableLatentWorldPolicy:
         self.update_count=0
         self.seed=seed
         self._last_latent_prefix=None
+        self._last_latent_text=None
 
     def _ids(self,text):
         ids=self.tokenizer(
@@ -95,16 +96,8 @@ class TrainableLatentWorldPolicy:
                 "latent SOURCE context exceeds budget; no data truncated")
         return ids
 
-    def hypotheses(self,context,source_history,allowed_queries):
-        if any(r.get("scope")!="TRUSTED_SOURCE_ONLY" for r in source_history):
-            raise ValueError("non-SOURCE experience in causal context")
-        user=_canonical({
-            "current_observation":context,
-            "prior_source_experiences":list(source_history)[-12:],
-            "authorized_query_inputs":allowed_queries,
-            "instruction":"propose 1 or 2 diverse falsifiable latent hypotheses",
-        })
-        prefix=_chat(self.tokenizer,WORLD_SYSTEM,user)
+    def _generate(self,prefix,*,max_new_tokens):
+        """One model-authored bounded answer. No human-filled hypothesis fields."""
         ids=self._ids(prefix)
         x=self.torch.tensor([ids],dtype=self.torch.long,device=self.device)
         self.torch.manual_seed(
@@ -112,40 +105,74 @@ class TrainableLatentWorldPolicy:
             %(2**31))
         self.model.eval()
         with self.torch.inference_mode():
-            output=self.model.generate(
+            out=self.model.generate(
                 input_ids=x,attention_mask=self.torch.ones_like(x),
-                max_new_tokens=self.max_new_tokens,
+                max_new_tokens=max_new_tokens,
                 do_sample=True,temperature=0.3,top_p=0.9,
                 pad_token_id=self.tokenizer.eos_token_id)
         raw=self.tokenizer.decode(
-            output[0][x.shape[1]:],skip_special_tokens=True).strip()
+            out[0][x.shape[1]:],skip_special_tokens=True).strip()
         fence=chr(96)*3
         if raw.startswith(fence):
             raw=raw.split("\n",1)[-1].split(fence,1)[0].strip()
         from .causal_experience import LatentHypothesisFormatError
-        try:
-            parsed=json.loads(raw)
-        except json.JSONDecodeError as exc:
-            raise LatentHypothesisFormatError(
-                "model did not produce latent-state JSON") from exc
-        if not isinstance(parsed,dict):
-            raise LatentHypothesisFormatError(
-                "latent hypotheses must be a JSON object")
-        proposals=parsed.get("hypotheses")
-        if not isinstance(proposals,list) or not 1<=len(proposals)<=2:
-            raise LatentHypothesisFormatError(
-                "model must propose 1 or 2 world hypotheses")
-        if any(
-            not isinstance(item,dict) or
-            not isinstance(item.get("predictions"),dict) or
-            not item.get("predictions") or
-            set(item["predictions"])-set(allowed_queries)
-            for item in proposals
-        ):
-            raise LatentHypothesisFormatError(
-                "model produced no real authorized SOURCE query predictions")
-        self._last_latent_prefix=prefix
-        return proposals
+        if not raw:
+            raise LatentHypothesisFormatError("model emitted empty hypothesis/output")
+        return raw
+
+    def hypotheses(self,context,source_history,allowed_queries):
+        """Model invents concept text, THEN predicts observations individually.
+
+        The old single JSON completion mixed concept invention with all
+        grid/string outputs. On CPU Qwen0.5B it mostly emitted invalid JSON
+        before ANY causal inference could be certified. Formatting is a
+        transport detail, not the representation language.
+        """
+        if any(r.get("scope")!="TRUSTED_SOURCE_ONLY" for r in source_history):
+            raise ValueError("non-SOURCE experience in causal context")
+        if not isinstance(allowed_queries,dict) or not allowed_queries:
+            raise ValueError("authorized SOURCE/query inputs required")
+        memory=list(source_history)[-12:]
+        prompt=_canonical({
+            "current_observation":context,
+            "prior_source_experiences":memory,
+            "authorized_query_inputs":allowed_queries,
+            "instruction":"propose ONE minimal new causal relation; not an answer",
+        })
+        concept_prefix=_chat(self.tokenizer,WORLD_SYSTEM,prompt)
+        proposed_text=self._generate(
+            concept_prefix,max_new_tokens=min(self.max_new_tokens,128))
+        # This string is MODEL-authored: no domain operators, answer DSL,
+        # rule tables or human-supplied concept teacher.
+        if len(proposed_text)>1200:
+            from .causal_experience import LatentHypothesisFormatError
+            raise LatentHypothesisFormatError("unbounded model hypothesis")
+        predictions={}
+        for query_id,query in sorted(allowed_queries.items()):
+            query_prefix=_chat(self.tokenizer,QUERY_SYSTEM,_canonical({
+                "SOURCE_observations":context,
+                "prior_verified_SOURCE":memory,
+                "model_authored_hypothesis":proposed_text,
+                "single_authorized_query":{query_id:query},
+            }))
+            raw=self._generate(
+                query_prefix,max_new_tokens=self.max_new_tokens)
+            try:
+                value=json.loads(raw)
+            except (ValueError,TypeError):
+                # A language answer such as SCAN command string is legitimate;
+                # never invent its contents on the caller's behalf.
+                value=raw
+            predictions[query_id]=value
+        self._last_latent_prefix=concept_prefix
+        self._last_latent_text=proposed_text
+        return [{
+            "name":"model-authored-"+sha256(proposed_text.encode()).hexdigest()[:16],
+            "kind":"neumann.latent",
+            "latent_variables":{"proposed_internal_causal_concept":proposed_text},
+            "relations":{"model_authored_falsifiable_claim":proposed_text},
+            "predictions":predictions,
+        }]
 
     def _world_teacher(self,event):
         if event.get("scope")!="TRUSTED_SOURCE_ONLY":
@@ -197,13 +224,30 @@ class TrainableLatentWorldPolicy:
         correct=[e for e in events if not e["contradicted"]]
         objective=prediction_loss
         reinforced=False
+        refuted_model_authored_latent=False
+        concept=getattr(self,"_last_latent_text",None)
         if correct and self._last_latent_prefix is not None:
-            # Only the MODEL-authored SOURCE-consistent concept is reinforced,
-            # never a human-provided target solution.
-            target=_canonical({"hypotheses":[correct[0]["hypothesis"]]})
+            # Reward the model's OWN source-consistent concept, not a
+            # human-authored Python program or TARGET answer.
+            if concept:
+                target=concept
+            else:
+                # Compatibility with earlier deterministic engineering tests.
+                target=_canonical({"hypotheses":[correct[0]["hypothesis"]]})
             objective=objective+0.25*self._loss(
                 self._last_latent_prefix,target)
             reinforced=True
+        elif (not correct and concept and
+              self._last_latent_prefix is not None):
+            # Crucial missing learning signal in the old policy:
+            # all-wrong model-authored hypotheses previously had NO effect
+            # on their own proposal probability. Minimize the negative
+            # proposal NLL (bounded, clipped), i.e. lower probability of
+            # repeating this specifically SOURCE-refuted concept.
+            # This is hypothesis rejection, NOT proof of a better concept.
+            objective=objective-0.05*self._loss(
+                self._last_latent_prefix,concept)
+            refuted_model_authored_latent=True
         if not self.torch.isfinite(objective):
             raise ValueError("nonfinite causal learning loss")
         trainable=[p for p in self.model.parameters() if p.requires_grad]
@@ -221,6 +265,7 @@ class TrainableLatentWorldPolicy:
             "loss":float(objective.detach().cpu()),
             "world_prediction_loss":float(prediction_loss.detach().cpu()),
             "reinforced_model_authored_latent":reinforced,
+            "refuted_model_authored_latent_penalty":refuted_model_authored_latent,
             "actual_trainable_weight_delta_l1":delta,
             "outcome_provenance":"TRUSTED_SOURCE_ONLY",
             "not_independent_Q3_Q6_proof":True,
