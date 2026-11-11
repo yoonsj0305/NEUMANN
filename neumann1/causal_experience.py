@@ -233,10 +233,14 @@ class CausalExperienceCore:
             if distinct>1:
                 choices.append((distinct,query))
         if not choices:
-            if not self._hypotheses and self._allow_grounded_bootstrap:
-                # No model hypothesis exists yet; information gain is
-                # UNKNOWN. Select first unused authorized nonsealed SOURCE,
-                # not a hidden TARGET or artificial counterexample.
+            # A single self-authored hypothesis still needs an empirical
+            # falsification. The old disagreement-only selector returned
+            # None when the neural proposer (intentionally) emitted one
+            # candidate, so the autonomous Q3 loop could NEVER observe
+            # a counterexample without a human manually picking the query.
+            # Do not turn a missing hypothesis into a fake discovery:
+            # bootstrap still requires an explicit source-only opt-in.
+            if self._hypotheses or self._allow_grounded_bootstrap:
                 usable=set(self._allowed)-self._sealed_queries-self._evaluated_queries
                 return min(usable) if usable else None
             return None
