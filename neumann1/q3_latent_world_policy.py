@@ -239,14 +239,14 @@ class TrainableLatentWorldPolicy:
             reinforced=True
         elif (not correct and concept and
               self._last_latent_prefix is not None):
-            # Crucial missing learning signal in the old policy:
-            # all-wrong model-authored hypotheses previously had NO effect
-            # on their own proposal probability. Minimize the negative
-            # proposal NLL (bounded, clipped), i.e. lower probability of
-            # repeating this specifically SOURCE-refuted concept.
-            # This is hypothesis rejection, NOT proof of a better concept.
-            objective=objective-0.05*self._loss(
-                self._last_latent_prefix,concept)
+            # Q3-first objective: a SOURCE-refuted self-proposed concept
+            # must become LESS likely. Combining a weak negative term with
+            # next-state teacher loss can make the wrong concept MORE likely
+            # (shared-token gradient conflict). For this bounded update,
+            # remove the label-rehearsal term and optimize explicit rejection.
+            # Verified SOURCE outcome remains in the revision context.
+            # Rejection alone is NOT invention of a correct replacement.
+            objective=-self._loss(self._last_latent_prefix,concept)
             refuted_model_authored_latent=True
         if not self.torch.isfinite(objective):
             raise ValueError("nonfinite causal learning loss")
@@ -266,6 +266,10 @@ class TrainableLatentWorldPolicy:
             "world_prediction_loss":float(prediction_loss.detach().cpu()),
             "reinforced_model_authored_latent":reinforced,
             "refuted_model_authored_latent_penalty":refuted_model_authored_latent,
+            "learning_objective":(
+                "REJECT_REFUTED_MODEL_AUTHORED_CONCEPT"
+                if refuted_model_authored_latent else
+                "VERIFIED_SOURCE_NEXT_OUTCOME_AND_CONCEPT_REWARD"),
             "actual_trainable_weight_delta_l1":delta,
             "outcome_provenance":"TRUSTED_SOURCE_ONLY",
             "not_independent_Q3_Q6_proof":True,
