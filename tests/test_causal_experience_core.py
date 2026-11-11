@@ -512,6 +512,22 @@ def test_concept_and_predictions_have_independent_model_generation_channels():
     assert item["predictions"]["sealed"]=={"effect":43}
     assert len(policy.model.calls)==3
     assert "previously unnamed" in policy._last_latent_text
+    # The SAME prompt that generated the SOURCE prediction must be used
+    # for its supervised observation loss; no off-policy teacher shortcut.
+    event={
+        "scope":"TRUSTED_SOURCE_ONLY","query_id":"probe",
+        "query":{"input":[2,3]},"observed":{"effect":99},
+        "hypothesis":item,"predicted":{"effect":42},
+    }
+    loss_prefix,target=policy._world_teacher(event)
+    assert loss_prefix==policy.model.calls[1]
+    assert target=='{"effect":99}'
+    with pytest.raises(ValueError,match="query changed"):
+        policy._world_teacher(dict(event,query={"input":[7,7]}))
+    forged=dict(item,latent_variables={
+        "proposed_internal_causal_concept":"human-inserted claim"})
+    with pytest.raises(ValueError,match="differs"):
+        policy._world_teacher(dict(event,hypothesis=forged))
 
 
 def test_refuted_model_concept_probability_actually_decreases():
