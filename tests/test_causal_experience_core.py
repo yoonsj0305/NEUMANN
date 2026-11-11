@@ -618,3 +618,29 @@ def test_same_model_revision_receives_only_verified_source_counterexample_witnes
     with pytest.raises(ValueError,match="non-SOURCE"):
         TrainableLatentWorldPolicy._source_witnesses([
             dict(history[0],scope="ORIGINAL_TARGET_GOLD")])
+
+
+def test_single_model_authored_hypothesis_can_autonomously_choose_a_falsification():
+    """Q3 active sensing cannot depend on a second competing candidate."""
+    class SinglePolicy:
+        def hypotheses(self,context,history,queries):
+            return [{
+                "name":"one-model-authored-candidate",
+                "kind":"neumann.latent",
+                "latent_variables":{"invented_causal_factor":"unverified"},
+                "relations":{"mechanism":"unverified"},
+                "predictions":{"train_query":"initial",
+                               "sealed_query":"initial"},
+            }]
+    core=CausalExperienceCore(SinglePolicy())
+    meta=fixture_problem().metadata
+    core.start("example.source",{"raw":[1,2]},meta["source_queries"],
+               sealed_queries={"sealed_query"},
+               episode_bindings=meta["source_episode_bindings"])
+    assert len(core.hypotheses)==1
+    assert core.select_query()=="train_query"
+    assert core._evaluated_queries==set()
+    # Once the only nonsealed SOURCE intervention is consumed, no repeated
+    # tuning and no access to the reserved sealed verifier.
+    core._evaluated_queries.add("train_query")
+    assert core.select_query() is None
