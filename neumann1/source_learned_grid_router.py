@@ -28,9 +28,9 @@ class RoutedGridResult:
     max_attempts:int=2
 
 def _classical(demo,inputs,limit=2):
-    matches,checks=previous.fit_task(
-        demo,range(len(previous.PROGRAMS)),len(previous.PROGRAMS),
-        max_hits=len(previous.PROGRAMS))
+    # Output-identical exact elimination of redundant classical work.
+    from .classical_grid_fast import fit_all
+    matches,checks=fit_all(demo)
     # Exact source symmetries take precedence over unconstrained palette
     # mappings; prevent overfitting otherwise indistinguishable demos.
     ordered=sorted(matches,key=lambda item:(

@@ -1,0 +1,9978 @@
+{
+ "schema": "neumann.q4.conceptarc-verified-cascade-FIRST.v1",
+ "registry_sha256": "4c5b80d0c480f9a7d3f26ce3786f68720cfba6b55065bcf8ea2c574c5a5c2084",
+ "commit": "0e67da6af879e4bad3d7cd3c196e8d551b445725",
+ "summary": {
+  "tasks": 160,
+  "valid": 160,
+  "errors": 0,
+  "test_outputs": 480,
+  "classical_only": {
+   "joint": 3,
+   "per_output": 16,
+   "seconds": 2.1255
+  },
+  "relational_only": {
+   "joint": 4,
+   "per_output": 57,
+   "seconds": 18.2467
+  },
+  "hybrid_fast": {
+   "joint": 7,
+   "per_output": 71,
+   "seconds": 20.3721
+  },
+  "cascade_composed": {
+   "joint": 6,
+   "per_output": 69,
+   "seconds": 20.1929
+  },
+  "hybrid_original_run": {
+   "joint": 7,
+   "per_output": 71,
+   "seconds": 26.6375
+  },
+  "cascade_run": {
+   "joint": 6,
+   "per_output": 69,
+   "seconds": 19.9494
+  },
+  "classical_original_seconds": 9.3052,
+  "classical_fast_seconds": 2.1255,
+  "relational_seconds": 18.2467,
+  "exact_equivalent": 160,
+  "family_router_refused": 160,
+  "cascade_escalated": 151,
+  "cascade_lost_vs_hybrid": 1,
+  "cascade_gained_vs_hybrid": 0
+ },
+ "verdict": {
+  "H1_exactness": "PASS",
+  "H2_classical_speedup": 4.3779,
+  "H2_elimination": "PASS",
+  "H3b_actual_runs_joint": [
+   6,
+   7
+  ],
+  "H3_iso_capability": "FAIL",
+  "H4_cost_ratio_vs_hybrid_original": 0.7489,
+  "H4_cost_ratio_vs_hybrid_fast": 0.9793,
+  "H4_cost": "FAIL",
+  "H5_open_set_routing": "PASS",
+  "global_Q1_Q7": "OPEN"
+ },
+ "wall_s": 87.826,
+ "rows": [
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.8682,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 267.7814,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 280.6496,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 280.6496,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 284.8435,
+    "cpu_ms": 283.3721,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 289.0197,
+    "cpu_ms": 286.3681,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 67.5394,
+    "cpu_ms": 67.4981
+   },
+   "classical_fast": {
+    "ms": 12.8682,
+    "cpu_ms": 12.8709
+   },
+   "relational": {
+    "ms": 267.7814,
+    "cpu_ms": 267.657,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/AboveBelow/AboveBelow1.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.0693,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 120.8086,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 132.8779,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 132.8779,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 161.4723,
+    "cpu_ms": 160.9204,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 135.3419,
+    "cpu_ms": 135.1337,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 42.7735,
+    "cpu_ms": 40.5153
+   },
+   "classical_fast": {
+    "ms": 12.0693,
+    "cpu_ms": 12.0454
+   },
+   "relational": {
+    "ms": 120.8086,
+    "cpu_ms": 120.2228,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/AboveBelow/AboveBelow10.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.4054,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 452.3293,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 467.7346,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 467.7346,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 529.6538,
+    "cpu_ms": 529.6145,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 469.5004,
+    "cpu_ms": 469.191,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 80.368,
+    "cpu_ms": 80.3315
+   },
+   "classical_fast": {
+    "ms": 15.4054,
+    "cpu_ms": 15.3558
+   },
+   "relational": {
+    "ms": 452.3293,
+    "cpu_ms": 441.3477,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/AboveBelow/AboveBelow2.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.7927,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 254.3639,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 266.1567,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 266.1567,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 324.3033,
+    "cpu_ms": 324.251,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 276.3222,
+    "cpu_ms": 276.1873,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 58.5878,
+    "cpu_ms": 58.5898
+   },
+   "classical_fast": {
+    "ms": 11.7927,
+    "cpu_ms": 11.7941
+   },
+   "relational": {
+    "ms": 254.3639,
+    "cpu_ms": 254.2614,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/AboveBelow/AboveBelow3.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 17.3876,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 38.5578,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 55.9453,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 55.9453,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 85.0953,
+    "cpu_ms": 85.0971,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 54.1412,
+    "cpu_ms": 54.1317,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 48.6953,
+    "cpu_ms": 48.6601
+   },
+   "classical_fast": {
+    "ms": 17.3876,
+    "cpu_ms": 17.3903
+   },
+   "relational": {
+    "ms": 38.5578,
+    "cpu_ms": 38.5583,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/AboveBelow/AboveBelow4.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.0278,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 40.9744,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 56.0023,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 56.0023,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 86.2616,
+    "cpu_ms": 86.2642,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 53.4552,
+    "cpu_ms": 53.4565,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 47.3974,
+    "cpu_ms": 47.3997
+   },
+   "classical_fast": {
+    "ms": 15.0278,
+    "cpu_ms": 15.0305
+   },
+   "relational": {
+    "ms": 40.9744,
+    "cpu_ms": 40.975,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/AboveBelow/AboveBelow5.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.4847,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 75.44,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 89.9248,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 89.9248,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 137.1377,
+    "cpu_ms": 137.1392,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 92.2815,
+    "cpu_ms": 92.2464,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 57.7587,
+    "cpu_ms": 57.7606
+   },
+   "classical_fast": {
+    "ms": 14.4847,
+    "cpu_ms": 14.487
+   },
+   "relational": {
+    "ms": 75.44,
+    "cpu_ms": 75.4396,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/AboveBelow/AboveBelow6.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.1415,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 400.7938,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 415.9353,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 415.9353,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 453.982,
+    "cpu_ms": 449.7392,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 371.5828,
+    "cpu_ms": 371.5277,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 55.0635,
+    "cpu_ms": 55.0233
+   },
+   "classical_fast": {
+    "ms": 15.1415,
+    "cpu_ms": 15.1314
+   },
+   "relational": {
+    "ms": 400.7938,
+    "cpu_ms": 398.8053,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/AboveBelow/AboveBelow7.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 16.5673,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 107.8038,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 124.3711,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 124.3711,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 145.9832,
+    "cpu_ms": 145.2197,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 72.9299,
+    "cpu_ms": 72.9017,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 88.1083,
+    "cpu_ms": 88.1119
+   },
+   "classical_fast": {
+    "ms": 16.5673,
+    "cpu_ms": 16.5514
+   },
+   "relational": {
+    "ms": 107.8038,
+    "cpu_ms": 106.9584,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/AboveBelow/AboveBelow8.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.1211,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 263.6474,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 276.7684,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 276.7684,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 261.9005,
+    "cpu_ms": 246.4305,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 216.611,
+    "cpu_ms": 216.6128,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 51.0596,
+    "cpu_ms": 51.0205
+   },
+   "classical_fast": {
+    "ms": 13.1211,
+    "cpu_ms": 12.896
+   },
+   "relational": {
+    "ms": 263.6474,
+    "cpu_ms": 252.6867,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/AboveBelow/AboveBelow9.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 8.2068,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 57.0118,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 65.2187,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 65.2187,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 96.5419,
+    "cpu_ms": 96.3613,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 65.389,
+    "cpu_ms": 65.3897,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 39.3656,
+    "cpu_ms": 39.3661
+   },
+   "classical_fast": {
+    "ms": 8.2068,
+    "cpu_ms": 8.1988
+   },
+   "relational": {
+    "ms": 57.0118,
+    "cpu_ms": 57.0086,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Center/Center1.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 8.0466,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 7.0242,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.0707,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.0707,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 54.6905,
+    "cpu_ms": 54.6936,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.1359,
+    "cpu_ms": 15.0248,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 49.9377,
+    "cpu_ms": 48.6566
+   },
+   "classical_fast": {
+    "ms": 8.0466,
+    "cpu_ms": 7.919
+   },
+   "relational": {
+    "ms": 7.0242,
+    "cpu_ms": 7.0229,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Center/Center10.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 4.4037,
+    "attempts": 2
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.14,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 4.5437,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 4.4037,
+    "attempts": 2
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.9626,
+    "cpu_ms": 15.6805,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 4.4072,
+    "cpu_ms": 4.4087,
+    "attempts": 2,
+    "engines_run": [
+     "classical"
+    ]
+   },
+   "classical_original": {
+    "ms": 16.3291,
+    "cpu_ms": 16.3304
+   },
+   "classical_fast": {
+    "ms": 4.4037,
+    "cpu_ms": 4.4044
+   },
+   "relational": {
+    "ms": 0.14,
+    "cpu_ms": 0.1391,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Center/Center2.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.8737,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.1049,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.9786,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.9786,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 69.5641,
+    "cpu_ms": 69.567,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.9243,
+    "cpu_ms": 14.9255,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 70.3961,
+    "cpu_ms": 70.0053
+   },
+   "classical_fast": {
+    "ms": 14.8737,
+    "cpu_ms": 14.8756
+   },
+   "relational": {
+    "ms": 0.1049,
+    "cpu_ms": 0.1022,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Center/Center3.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 9.4453,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 13.3499,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 22.7951,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 22.7951,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 50.3964,
+    "cpu_ms": 50.3633,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 22.6879,
+    "cpu_ms": 22.6891,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 37.3428,
+    "cpu_ms": 37.3445
+   },
+   "classical_fast": {
+    "ms": 9.4453,
+    "cpu_ms": 9.4468
+   },
+   "relational": {
+    "ms": 13.3499,
+    "cpu_ms": 13.3499,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Center/Center4.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.6237,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 184.3852,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 196.0089,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 196.0089,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 233.6415,
+    "cpu_ms": 233.6449,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 196.7491,
+    "cpu_ms": 196.4964,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 54.1875,
+    "cpu_ms": 54.1895
+   },
+   "classical_fast": {
+    "ms": 11.6237,
+    "cpu_ms": 11.6263
+   },
+   "relational": {
+    "ms": 184.3852,
+    "cpu_ms": 184.3148,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Center/Center5.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.9318,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 439.5017,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 451.4335,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 451.4335,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 503.5853,
+    "cpu_ms": 503.1309,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 450.923,
+    "cpu_ms": 449.0185,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 69.5925,
+    "cpu_ms": 69.4627
+   },
+   "classical_fast": {
+    "ms": 11.9318,
+    "cpu_ms": 11.9335
+   },
+   "relational": {
+    "ms": 439.5017,
+    "cpu_ms": 438.5358,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Center/Center6.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 6.4151,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0586,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 6.4737,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 6.4737,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 49.0647,
+    "cpu_ms": 49.0665,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 6.4701,
+    "cpu_ms": 6.4708,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 49.7341,
+    "cpu_ms": 49.5312
+   },
+   "classical_fast": {
+    "ms": 6.4151,
+    "cpu_ms": 6.4167
+   },
+   "relational": {
+    "ms": 0.0586,
+    "cpu_ms": 0.0572,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Center/Center7.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 9.8478,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 302.3232,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 312.171,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 312.171,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 341.3407,
+    "cpu_ms": 340.7076,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 316.3279,
+    "cpu_ms": 314.8805,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 37.2922,
+    "cpu_ms": 37.2656
+   },
+   "classical_fast": {
+    "ms": 9.8478,
+    "cpu_ms": 9.8497
+   },
+   "relational": {
+    "ms": 302.3232,
+    "cpu_ms": 301.6613,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Center/Center8.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 9.3036,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 187.8246,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 197.1282,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 197.1282,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 247.5926,
+    "cpu_ms": 247.4095,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 206.2795,
+    "cpu_ms": 195.4994,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 59.2876,
+    "cpu_ms": 59.1719
+   },
+   "classical_fast": {
+    "ms": 9.3036,
+    "cpu_ms": 9.3051
+   },
+   "relational": {
+    "ms": 187.8246,
+    "cpu_ms": 187.827,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Center/Center9.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.216,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 175.2245,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 189.4404,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 189.4404,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 222.9618,
+    "cpu_ms": 222.0852,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 178.2074,
+    "cpu_ms": 177.9395,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 58.0608,
+    "cpu_ms": 57.699
+   },
+   "classical_fast": {
+    "ms": 14.216,
+    "cpu_ms": 14.2182
+   },
+   "relational": {
+    "ms": 175.2245,
+    "cpu_ms": 174.7068,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/CleanUp/CleanUp1.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 10.0825,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 30.3575,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 40.44,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 40.44,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 108.12,
+    "cpu_ms": 106.9234,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 41.7015,
+    "cpu_ms": 41.4985,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 32.1209,
+    "cpu_ms": 32.1219
+   },
+   "classical_fast": {
+    "ms": 10.0825,
+    "cpu_ms": 10.0852
+   },
+   "relational": {
+    "ms": 30.3575,
+    "cpu_ms": 30.3587,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/CleanUp/CleanUp10.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 17.138,
+    "attempts": 1
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 134.7867,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 3,
+    "ms": 151.9246,
+    "attempts": 2
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 17.138,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 3,
+    "ms": 197.5711,
+    "cpu_ms": 197.5524,
+    "attempts": 2
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 16.7239,
+    "cpu_ms": 16.6958,
+    "attempts": 1,
+    "engines_run": [
+     "classical"
+    ]
+   },
+   "classical_original": {
+    "ms": 70.2834,
+    "cpu_ms": 70.2388
+   },
+   "classical_fast": {
+    "ms": 17.138,
+    "cpu_ms": 17.1399
+   },
+   "relational": {
+    "ms": 134.7867,
+    "cpu_ms": 134.5524,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/CleanUp/CleanUp2.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.3448,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 5.1754,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 20.5202,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 20.5202,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 61.29,
+    "cpu_ms": 61.2483,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 20.2146,
+    "cpu_ms": 20.215,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 56.705,
+    "cpu_ms": 56.6567
+   },
+   "classical_fast": {
+    "ms": 15.3448,
+    "cpu_ms": 15.3235
+   },
+   "relational": {
+    "ms": 5.1754,
+    "cpu_ms": 5.1597,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/CleanUp/CleanUp3.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.9053,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 450.2055,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 462.1108,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 462.1108,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 505.1901,
+    "cpu_ms": 504.8703,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 463.2565,
+    "cpu_ms": 462.952,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 52.1416,
+    "cpu_ms": 52.144
+   },
+   "classical_fast": {
+    "ms": 11.9053,
+    "cpu_ms": 11.9067
+   },
+   "relational": {
+    "ms": 450.2055,
+    "cpu_ms": 449.9989,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/CleanUp/CleanUp4.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 9.7887,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 227.4226,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 237.2112,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 237.2112,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 261.3629,
+    "cpu_ms": 260.461,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 236.0854,
+    "cpu_ms": 235.9694,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 40.6625,
+    "cpu_ms": 40.665
+   },
+   "classical_fast": {
+    "ms": 9.7887,
+    "cpu_ms": 9.7899
+   },
+   "relational": {
+    "ms": 227.4226,
+    "cpu_ms": 227.1811,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/CleanUp/CleanUp5.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 17.7403,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 195.0768,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 212.8171,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 212.8171,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 300.5027,
+    "cpu_ms": 293.1314,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 230.1484,
+    "cpu_ms": 228.7278,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 55.8585,
+    "cpu_ms": 55.4298
+   },
+   "classical_fast": {
+    "ms": 17.7403,
+    "cpu_ms": 17.6102
+   },
+   "relational": {
+    "ms": 195.0768,
+    "cpu_ms": 194.3374,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/CleanUp/CleanUp6.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.3569,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 211.1448,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 224.5017,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 224.5017,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 240.0961,
+    "cpu_ms": 240.0174,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 188.795,
+    "cpu_ms": 188.7805,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 67.4217,
+    "cpu_ms": 66.886
+   },
+   "classical_fast": {
+    "ms": 13.3569,
+    "cpu_ms": 13.3326
+   },
+   "relational": {
+    "ms": 211.1448,
+    "cpu_ms": 210.1771,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/CleanUp/CleanUp7.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.2311,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 2.8367,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 17.0677,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 17.0677,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 49.149,
+    "cpu_ms": 49.1512,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 17.1822,
+    "cpu_ms": 17.1831,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 46.9488,
+    "cpu_ms": 46.6854
+   },
+   "classical_fast": {
+    "ms": 14.2311,
+    "cpu_ms": 14.2335
+   },
+   "relational": {
+    "ms": 2.8367,
+    "cpu_ms": 2.8358,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/CleanUp/CleanUp8.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 10.2512,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 54.4747,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 64.7259,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 64.7259,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 106.4944,
+    "cpu_ms": 102.311,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 81.8687,
+    "cpu_ms": 81.8371,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 32.1314,
+    "cpu_ms": 32.1326
+   },
+   "classical_fast": {
+    "ms": 10.2512,
+    "cpu_ms": 10.2528
+   },
+   "relational": {
+    "ms": 54.4747,
+    "cpu_ms": 54.4134,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/CleanUp/CleanUp9.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.6336,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 17.7511,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 30.3847,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 30.3847,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 57.639,
+    "cpu_ms": 57.5797,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 31.0059,
+    "cpu_ms": 31.0072,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 40.6293,
+    "cpu_ms": 40.6172
+   },
+   "classical_fast": {
+    "ms": 12.6336,
+    "cpu_ms": 12.6364
+   },
+   "relational": {
+    "ms": 17.7511,
+    "cpu_ms": 17.7509,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/CompleteShape/CompleteShape1.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.7162,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 269.3495,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 284.0657,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 284.0657,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 358.3346,
+    "cpu_ms": 353.5308,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 253.2293,
+    "cpu_ms": 252.524,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 65.4604,
+    "cpu_ms": 65.1841
+   },
+   "classical_fast": {
+    "ms": 14.7162,
+    "cpu_ms": 14.6836
+   },
+   "relational": {
+    "ms": 269.3495,
+    "cpu_ms": 269.0981,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/CompleteShape/CompleteShape10.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.3008,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 150.0439,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 163.3447,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 163.3447,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 142.234,
+    "cpu_ms": 139.5292,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 130.3555,
+    "cpu_ms": 121.1356,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 66.5805,
+    "cpu_ms": 64.1306
+   },
+   "classical_fast": {
+    "ms": 13.3008,
+    "cpu_ms": 11.1202
+   },
+   "relational": {
+    "ms": 150.0439,
+    "cpu_ms": 149.0561,
+    "fit": true,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/CompleteShape/CompleteShape2.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 16.2063,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 89.5571,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 105.7634,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 105.7634,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 136.4421,
+    "cpu_ms": 135.61,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 105.0821,
+    "cpu_ms": 104.7218,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 49.4217,
+    "cpu_ms": 48.6646
+   },
+   "classical_fast": {
+    "ms": 16.2063,
+    "cpu_ms": 16.0594
+   },
+   "relational": {
+    "ms": 89.5571,
+    "cpu_ms": 89.2848,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/CompleteShape/CompleteShape3.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.8297,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 100.7193,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 114.549,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 114.549,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 134.4444,
+    "cpu_ms": 133.2362,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 110.0031,
+    "cpu_ms": 108.2955,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 48.3241,
+    "cpu_ms": 48.2813
+   },
+   "classical_fast": {
+    "ms": 13.8297,
+    "cpu_ms": 13.5239
+   },
+   "relational": {
+    "ms": 100.7193,
+    "cpu_ms": 100.5831,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/CompleteShape/CompleteShape4.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 10.1623,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 47.6628,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 57.8251,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 57.8251,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 80.0442,
+    "cpu_ms": 79.0501,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 59.3756,
+    "cpu_ms": 59.2092,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 31.6381,
+    "cpu_ms": 31.6396
+   },
+   "classical_fast": {
+    "ms": 10.1623,
+    "cpu_ms": 10.1643
+   },
+   "relational": {
+    "ms": 47.6628,
+    "cpu_ms": 47.6156,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/CompleteShape/CompleteShape5.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.1544,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 59.5822,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 70.7366,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 70.7366,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 98.0888,
+    "cpu_ms": 97.2561,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 75.4891,
+    "cpu_ms": 75.4926,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 33.8843,
+    "cpu_ms": 33.4945
+   },
+   "classical_fast": {
+    "ms": 11.1544,
+    "cpu_ms": 11.1564
+   },
+   "relational": {
+    "ms": 59.5822,
+    "cpu_ms": 59.5055,
+    "fit": true,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/CompleteShape/CompleteShape6.json"
+  },
+  {
+   "classical_only": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 11.7203,
+    "attempts": 2
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 37.332,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 49.0523,
+    "attempts": 2
+   },
+   "cascade_composed": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 11.7203,
+    "attempts": 2
+   },
+   "hybrid_original_run": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 69.8666,
+    "cpu_ms": 69.3496,
+    "attempts": 2
+   },
+   "cascade_run": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 11.7488,
+    "cpu_ms": 10.8871,
+    "attempts": 2,
+    "engines_run": [
+     "classical"
+    ]
+   },
+   "classical_original": {
+    "ms": 32.9935,
+    "cpu_ms": 32.9954
+   },
+   "classical_fast": {
+    "ms": 11.7203,
+    "cpu_ms": 11.7233
+   },
+   "relational": {
+    "ms": 37.332,
+    "cpu_ms": 37.1955,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/CompleteShape/CompleteShape7.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.3365,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 252.5601,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 265.8967,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 265.8967,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 324.2395,
+    "cpu_ms": 321.4297,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 232.9358,
+    "cpu_ms": 232.7631,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 40.2453,
+    "cpu_ms": 40.1182
+   },
+   "classical_fast": {
+    "ms": 13.3365,
+    "cpu_ms": 13.0981
+   },
+   "relational": {
+    "ms": 252.5601,
+    "cpu_ms": 250.4219,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/CompleteShape/CompleteShape8.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 18.4264,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 86.4428,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 104.8692,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 104.8692,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 148.7712,
+    "cpu_ms": 148.6363,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 112.7202,
+    "cpu_ms": 107.9037,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 61.9751,
+    "cpu_ms": 61.9323
+   },
+   "classical_fast": {
+    "ms": 18.4264,
+    "cpu_ms": 18.4296
+   },
+   "relational": {
+    "ms": 86.4428,
+    "cpu_ms": 86.4337,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/CompleteShape/CompleteShape9.json"
+  },
+  {
+   "classical_only": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 5.7939,
+    "attempts": 1
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0621,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 5.856,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 5.7939,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 32.5032,
+    "cpu_ms": 32.5039,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 53.1907,
+    "cpu_ms": 53.1929,
+    "attempts": 1,
+    "engines_run": [
+     "classical"
+    ]
+   },
+   "classical_original": {
+    "ms": 33.3003,
+    "cpu_ms": 33.2339
+   },
+   "classical_fast": {
+    "ms": 5.7939,
+    "cpu_ms": 5.7952
+   },
+   "relational": {
+    "ms": 0.0621,
+    "cpu_ms": 0.061,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Copy/Copy1.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.8655,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 67.8388,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 79.7043,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 79.7043,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 134.2014,
+    "cpu_ms": 126.5636,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 90.8358,
+    "cpu_ms": 90.6662,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 44.801,
+    "cpu_ms": 44.6039
+   },
+   "classical_fast": {
+    "ms": 11.8655,
+    "cpu_ms": 11.8448
+   },
+   "relational": {
+    "ms": 67.8388,
+    "cpu_ms": 66.3992,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Copy/Copy10.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 17.4436,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 197.4048,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 214.8484,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 214.8484,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 226.8041,
+    "cpu_ms": 226.6843,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 168.9583,
+    "cpu_ms": 168.9609,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 59.1437,
+    "cpu_ms": 59.1065
+   },
+   "classical_fast": {
+    "ms": 17.4436,
+    "cpu_ms": 17.4337
+   },
+   "relational": {
+    "ms": 197.4048,
+    "cpu_ms": 197.1832,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Copy/Copy2.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.5292,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 293.9009,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 305.4301,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 305.4301,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 386.8211,
+    "cpu_ms": 385.8059,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 387.3486,
+    "cpu_ms": 384.2366,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 32.1214,
+    "cpu_ms": 32.1239
+   },
+   "classical_fast": {
+    "ms": 11.5292,
+    "cpu_ms": 10.8109
+   },
+   "relational": {
+    "ms": 293.9009,
+    "cpu_ms": 293.8443,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Copy/Copy3.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.8666,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 325.8061,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 339.6727,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 339.6727,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 377.3552,
+    "cpu_ms": 373.9859,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 410.3766,
+    "cpu_ms": 409.1449,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 51.1295,
+    "cpu_ms": 50.188
+   },
+   "classical_fast": {
+    "ms": 13.8666,
+    "cpu_ms": 13.7855
+   },
+   "relational": {
+    "ms": 325.8061,
+    "cpu_ms": 323.7018,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Copy/Copy4.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 9.3519,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0781,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 9.4299,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 9.4299,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 39.3447,
+    "cpu_ms": 39.3367,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 9.2264,
+    "cpu_ms": 9.2272,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 39.1977,
+    "cpu_ms": 39.1994
+   },
+   "classical_fast": {
+    "ms": 9.3519,
+    "cpu_ms": 9.3545
+   },
+   "relational": {
+    "ms": 0.0781,
+    "cpu_ms": 0.0761,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Copy/Copy5.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 5.0042,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0701,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 5.0743,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 5.0743,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 24.1511,
+    "cpu_ms": 24.122,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 5.2271,
+    "cpu_ms": 5.2276,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 24.0997,
+    "cpu_ms": 24.1016
+   },
+   "classical_fast": {
+    "ms": 5.0042,
+    "cpu_ms": 5.0052
+   },
+   "relational": {
+    "ms": 0.0701,
+    "cpu_ms": 0.0691,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Copy/Copy6.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.0018,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 74.0445,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 86.0463,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 86.0463,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 114.0077,
+    "cpu_ms": 114.0111,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 83.6846,
+    "cpu_ms": 83.6872,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 42.8277,
+    "cpu_ms": 42.8316
+   },
+   "classical_fast": {
+    "ms": 12.0018,
+    "cpu_ms": 12.0048
+   },
+   "relational": {
+    "ms": 74.0445,
+    "cpu_ms": 74.0448,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Copy/Copy7.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.6506,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 79.7298,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 93.3804,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 93.3804,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 129.5005,
+    "cpu_ms": 129.4555,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 92.987,
+    "cpu_ms": 92.9746,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 46.7505,
+    "cpu_ms": 46.7516
+   },
+   "classical_fast": {
+    "ms": 13.6506,
+    "cpu_ms": 13.6529
+   },
+   "relational": {
+    "ms": 79.7298,
+    "cpu_ms": 79.7302,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Copy/Copy8.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.2836,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 346.4168,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 357.7004,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 357.7004,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 357.3262,
+    "cpu_ms": 356.7647,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 401.8907,
+    "cpu_ms": 397.7727,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 59.9096,
+    "cpu_ms": 59.847
+   },
+   "classical_fast": {
+    "ms": 11.2836,
+    "cpu_ms": 11.2864
+   },
+   "relational": {
+    "ms": 346.4168,
+    "cpu_ms": 346.3599,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Copy/Copy9.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.1544,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.084,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.2384,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.2384,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 64.7075,
+    "cpu_ms": 64.0193,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 16.7081,
+    "cpu_ms": 15.4582,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 62.1441,
+    "cpu_ms": 62.0077
+   },
+   "classical_fast": {
+    "ms": 15.1544,
+    "cpu_ms": 15.0397
+   },
+   "relational": {
+    "ms": 0.084,
+    "cpu_ms": 0.0812,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Count/Count1.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.2863,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0937,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.38,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.38,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 72.5725,
+    "cpu_ms": 72.5477,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 9.7732,
+    "cpu_ms": 9.6168,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 55.4914,
+    "cpu_ms": 55.051
+   },
+   "classical_fast": {
+    "ms": 11.2863,
+    "cpu_ms": 10.5901
+   },
+   "relational": {
+    "ms": 0.0937,
+    "cpu_ms": 0.0901,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Count/Count10.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 7.6242,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.1453,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 7.7694,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 7.7694,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 96.7444,
+    "cpu_ms": 96.6492,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 7.9047,
+    "cpu_ms": 7.9064,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 96.6197,
+    "cpu_ms": 96.1322
+   },
+   "classical_fast": {
+    "ms": 7.6242,
+    "cpu_ms": 7.6271
+   },
+   "relational": {
+    "ms": 0.1453,
+    "cpu_ms": 0.1422,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Count/Count2.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.8599,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.1001,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.96,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.96,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 49.7071,
+    "cpu_ms": 49.4249,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.784,
+    "cpu_ms": 13.1656,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 51.3276,
+    "cpu_ms": 51.2647
+   },
+   "classical_fast": {
+    "ms": 12.8599,
+    "cpu_ms": 12.8478
+   },
+   "relational": {
+    "ms": 0.1001,
+    "cpu_ms": 0.0981,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Count/Count3.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.3834,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0773,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.4606,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.4606,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 56.5425,
+    "cpu_ms": 56.4081,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.6698,
+    "cpu_ms": 13.6945,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 58.4406,
+    "cpu_ms": 57.8699
+   },
+   "classical_fast": {
+    "ms": 13.3834,
+    "cpu_ms": 13.1221
+   },
+   "relational": {
+    "ms": 0.0773,
+    "cpu_ms": 0.0743,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Count/Count4.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 8.6345,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0881,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 8.7226,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 8.7226,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 58.909,
+    "cpu_ms": 58.9114,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 10.4051,
+    "cpu_ms": 10.4079,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 51.4532,
+    "cpu_ms": 51.3735
+   },
+   "classical_fast": {
+    "ms": 8.6345,
+    "cpu_ms": 8.6376
+   },
+   "relational": {
+    "ms": 0.0881,
+    "cpu_ms": 0.0858,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Count/Count5.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.1976,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0814,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.279,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.279,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 40.1088,
+    "cpu_ms": 40.1105,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.4641,
+    "cpu_ms": 13.4656,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 41.1272,
+    "cpu_ms": 41.1061
+   },
+   "classical_fast": {
+    "ms": 13.1976,
+    "cpu_ms": 13.1998
+   },
+   "relational": {
+    "ms": 0.0814,
+    "cpu_ms": 0.0798,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Count/Count6.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.5603,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0694,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.6297,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.6297,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 38.4049,
+    "cpu_ms": 38.4056,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.3788,
+    "cpu_ms": 12.3797,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 39.7371,
+    "cpu_ms": 39.7442
+   },
+   "classical_fast": {
+    "ms": 13.5603,
+    "cpu_ms": 13.5626
+   },
+   "relational": {
+    "ms": 0.0694,
+    "cpu_ms": 0.0678,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Count/Count7.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 16.6729,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0982,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 16.7711,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 16.7711,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 49.6339,
+    "cpu_ms": 49.1201,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 16.8232,
+    "cpu_ms": 16.8159,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 47.5939,
+    "cpu_ms": 47.5691
+   },
+   "classical_fast": {
+    "ms": 16.6729,
+    "cpu_ms": 16.6749
+   },
+   "relational": {
+    "ms": 0.0982,
+    "cpu_ms": 0.0955,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Count/Count8.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 29.8537,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0865,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 29.9402,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 29.9402,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 81.0991,
+    "cpu_ms": 81.1034,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 24.016,
+    "cpu_ms": 19.2229,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 82.0233,
+    "cpu_ms": 79.4078
+   },
+   "classical_fast": {
+    "ms": 29.8537,
+    "cpu_ms": 29.8575
+   },
+   "relational": {
+    "ms": 0.0865,
+    "cpu_ms": 0.0836,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Count/Count9.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 6.2,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 129.9904,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 136.1904,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 136.1904,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 109.3156,
+    "cpu_ms": 108.6939,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 74.1414,
+    "cpu_ms": 74.0589,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 35.0728,
+    "cpu_ms": 30.7775
+   },
+   "classical_fast": {
+    "ms": 6.2,
+    "cpu_ms": 6.2033
+   },
+   "relational": {
+    "ms": 129.9904,
+    "cpu_ms": 129.7064,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/ExtendToBoundary/ExtendToBoundary1.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.2,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 85.2317,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 99.4317,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 99.4317,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 129.2033,
+    "cpu_ms": 127.9413,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 96.312,
+    "cpu_ms": 96.2689,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 44.2703,
+    "cpu_ms": 44.1697
+   },
+   "classical_fast": {
+    "ms": 14.2,
+    "cpu_ms": 14.2033
+   },
+   "relational": {
+    "ms": 85.2317,
+    "cpu_ms": 84.9675,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/ExtendToBoundary/ExtendToBoundary10.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.0844,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 134.8788,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 147.9632,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 147.9632,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 239.9178,
+    "cpu_ms": 239.4572,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 202.655,
+    "cpu_ms": 202.3737,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 85.2184,
+    "cpu_ms": 85.2217
+   },
+   "classical_fast": {
+    "ms": 13.0844,
+    "cpu_ms": 13.0869
+   },
+   "relational": {
+    "ms": 134.8788,
+    "cpu_ms": 134.8795,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/ExtendToBoundary/ExtendToBoundary2.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.1409,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 62.0377,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 73.1786,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 73.1786,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 109.9112,
+    "cpu_ms": 109.7962,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 73.6065,
+    "cpu_ms": 73.6085,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 48.6843,
+    "cpu_ms": 47.3795
+   },
+   "classical_fast": {
+    "ms": 11.1409,
+    "cpu_ms": 11.144
+   },
+   "relational": {
+    "ms": 62.0377,
+    "cpu_ms": 61.6479,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/ExtendToBoundary/ExtendToBoundary3.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 8.5334,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 2.2085,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 10.7419,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 10.7419,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 50.1273,
+    "cpu_ms": 50.0834,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 10.5838,
+    "cpu_ms": 10.5857,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 53.165,
+    "cpu_ms": 53.1534
+   },
+   "classical_fast": {
+    "ms": 8.5334,
+    "cpu_ms": 8.5356
+   },
+   "relational": {
+    "ms": 2.2085,
+    "cpu_ms": 2.2075,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/ExtendToBoundary/ExtendToBoundary4.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 5.2082,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 58.3311,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 63.5393,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 63.5393,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 98.6491,
+    "cpu_ms": 98.4059,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 64.5632,
+    "cpu_ms": 64.5371,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 41.7719,
+    "cpu_ms": 41.7465
+   },
+   "classical_fast": {
+    "ms": 5.2082,
+    "cpu_ms": 5.2106
+   },
+   "relational": {
+    "ms": 58.3311,
+    "cpu_ms": 57.7133,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/ExtendToBoundary/ExtendToBoundary5.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 9.2119,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 78.2189,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 87.4308,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 87.4308,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 143.9287,
+    "cpu_ms": 143.8284,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 86.7435,
+    "cpu_ms": 86.4453,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 68.2782,
+    "cpu_ms": 68.2814
+   },
+   "classical_fast": {
+    "ms": 9.2119,
+    "cpu_ms": 9.2136
+   },
+   "relational": {
+    "ms": 78.2189,
+    "cpu_ms": 77.3645,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/ExtendToBoundary/ExtendToBoundary6.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 7.7889,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 54.3708,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 62.1597,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 62.1597,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 77.5943,
+    "cpu_ms": 76.7363,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 63.323,
+    "cpu_ms": 63.016,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 22.427,
+    "cpu_ms": 22.4277
+   },
+   "classical_fast": {
+    "ms": 7.7889,
+    "cpu_ms": 7.7918
+   },
+   "relational": {
+    "ms": 54.3708,
+    "cpu_ms": 54.3202,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/ExtendToBoundary/ExtendToBoundary7.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 18.3757,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 91.7997,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 110.1754,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 110.1754,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 131.8203,
+    "cpu_ms": 131.4436,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 109.4952,
+    "cpu_ms": 107.8616,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 40.0218,
+    "cpu_ms": 40.0231
+   },
+   "classical_fast": {
+    "ms": 18.3757,
+    "cpu_ms": 18.3063
+   },
+   "relational": {
+    "ms": 91.7997,
+    "cpu_ms": 91.4604,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/ExtendToBoundary/ExtendToBoundary8.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 10.412,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 88.9915,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 99.4034,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 99.4034,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 147.6992,
+    "cpu_ms": 147.7013,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 108.6017,
+    "cpu_ms": 108.6037,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 58.6079,
+    "cpu_ms": 57.011
+   },
+   "classical_fast": {
+    "ms": 10.412,
+    "cpu_ms": 10.2114
+   },
+   "relational": {
+    "ms": 88.9915,
+    "cpu_ms": 88.7864,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/ExtendToBoundary/ExtendToBoundary9.json"
+  },
+  {
+   "classical_only": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 19.6721,
+    "attempts": 1
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0965,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 19.7686,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 19.6721,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 79.2087,
+    "cpu_ms": 78.4771,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 23.9375,
+    "cpu_ms": 23.4935,
+    "attempts": 1,
+    "engines_run": [
+     "classical"
+    ]
+   },
+   "classical_original": {
+    "ms": 77.6422,
+    "cpu_ms": 76.1554
+   },
+   "classical_fast": {
+    "ms": 19.6721,
+    "cpu_ms": 19.5121
+   },
+   "relational": {
+    "ms": 0.0965,
+    "cpu_ms": 0.0921,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/ExtractObjects/ExtractObjects1.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.9859,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0796,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.0655,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.0655,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 55.4726,
+    "cpu_ms": 55.3355,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 18.184,
+    "cpu_ms": 18.1013,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 45.9157,
+    "cpu_ms": 44.8129
+   },
+   "classical_fast": {
+    "ms": 14.9859,
+    "cpu_ms": 13.9935
+   },
+   "relational": {
+    "ms": 0.0796,
+    "cpu_ms": 0.0756,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/ExtractObjects/ExtractObjects10.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 21.0755,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.1352,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 21.2107,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 21.2107,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 88.0097,
+    "cpu_ms": 88.0135,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 20.8732,
+    "cpu_ms": 20.876,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 101.1842,
+    "cpu_ms": 101.1004
+   },
+   "classical_fast": {
+    "ms": 21.0755,
+    "cpu_ms": 21.0792
+   },
+   "relational": {
+    "ms": 0.1352,
+    "cpu_ms": 0.1316,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/ExtractObjects/ExtractObjects2.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 27.4584,
+    "attempts": 2
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0895,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 27.5479,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 27.4584,
+    "attempts": 2
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 64.157,
+    "cpu_ms": 63.979,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 27.2749,
+    "cpu_ms": 27.2149,
+    "attempts": 2,
+    "engines_run": [
+     "classical"
+    ]
+   },
+   "classical_original": {
+    "ms": 70.3442,
+    "cpu_ms": 70.3469
+   },
+   "classical_fast": {
+    "ms": 27.4584,
+    "cpu_ms": 27.3761
+   },
+   "relational": {
+    "ms": 0.0895,
+    "cpu_ms": 0.0849,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/ExtractObjects/ExtractObjects3.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 19.332,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.1048,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 19.4368,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 19.4368,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 82.015,
+    "cpu_ms": 82.0181,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 18.1828,
+    "cpu_ms": 18.1861,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 83.9503,
+    "cpu_ms": 83.4197
+   },
+   "classical_fast": {
+    "ms": 19.332,
+    "cpu_ms": 19.2323
+   },
+   "relational": {
+    "ms": 0.1048,
+    "cpu_ms": 0.1008,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/ExtractObjects/ExtractObjects4.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.6421,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.1079,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.7501,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.7501,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 63.7102,
+    "cpu_ms": 63.5208,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.7729,
+    "cpu_ms": 15.7767,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 62.0611,
+    "cpu_ms": 61.9645
+   },
+   "classical_fast": {
+    "ms": 14.6421,
+    "cpu_ms": 14.6467
+   },
+   "relational": {
+    "ms": 0.1079,
+    "cpu_ms": 0.1048,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/ExtractObjects/ExtractObjects5.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.6892,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0875,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.7766,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.7766,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 60.6513,
+    "cpu_ms": 60.5478,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.1915,
+    "cpu_ms": 13.1939,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 59.9248,
+    "cpu_ms": 59.5941
+   },
+   "classical_fast": {
+    "ms": 12.6892,
+    "cpu_ms": 12.693
+   },
+   "relational": {
+    "ms": 0.0875,
+    "cpu_ms": 0.085,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/ExtractObjects/ExtractObjects6.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.0579,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0806,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.1385,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.1385,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 42.8836,
+    "cpu_ms": 42.8864,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.3143,
+    "cpu_ms": 12.3164,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 53.4891,
+    "cpu_ms": 53.434
+   },
+   "classical_fast": {
+    "ms": 15.0579,
+    "cpu_ms": 15.0419
+   },
+   "relational": {
+    "ms": 0.0806,
+    "cpu_ms": 0.0771,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/ExtractObjects/ExtractObjects7.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 21.2195,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0745,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 21.294,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 21.294,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 61.6166,
+    "cpu_ms": 61.6211,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 20.2512,
+    "cpu_ms": 20.225,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 69.7518,
+    "cpu_ms": 69.7558
+   },
+   "classical_fast": {
+    "ms": 21.2195,
+    "cpu_ms": 21.2097
+   },
+   "relational": {
+    "ms": 0.0745,
+    "cpu_ms": 0.0707,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/ExtractObjects/ExtractObjects8.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.7586,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0736,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.8322,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.8322,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 53.0555,
+    "cpu_ms": 53.0582,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.3761,
+    "cpu_ms": 13.3127,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 61.4155,
+    "cpu_ms": 61.3931
+   },
+   "classical_fast": {
+    "ms": 13.7586,
+    "cpu_ms": 13.763
+   },
+   "relational": {
+    "ms": 0.0736,
+    "cpu_ms": 0.0703,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/ExtractObjects/ExtractObjects9.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 24.5285,
+    "attempts": 2
+   },
+   "relational_only": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 1.1763,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 25.7047,
+    "attempts": 2
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 24.5285,
+    "attempts": 2
+   },
+   "hybrid_original_run": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 84.7016,
+    "cpu_ms": 84.5009,
+    "attempts": 2
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 25.8069,
+    "cpu_ms": 25.8095,
+    "attempts": 2,
+    "engines_run": [
+     "classical"
+    ]
+   },
+   "classical_original": {
+    "ms": 83.5533,
+    "cpu_ms": 83.4356
+   },
+   "classical_fast": {
+    "ms": 24.5285,
+    "cpu_ms": 24.4947
+   },
+   "relational": {
+    "ms": 1.1763,
+    "cpu_ms": 1.1739,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/FilledNotFilled/FilledNotFilled1.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 17.9557,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 239.2868,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 257.2425,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 257.2425,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 300.7814,
+    "cpu_ms": 298.4805,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 189.2042,
+    "cpu_ms": 188.943,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 106.9332,
+    "cpu_ms": 106.8294
+   },
+   "classical_fast": {
+    "ms": 17.9557,
+    "cpu_ms": 17.9602
+   },
+   "relational": {
+    "ms": 239.2868,
+    "cpu_ms": 235.6276,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/FilledNotFilled/FilledNotFilled10.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.5748,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0832,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.658,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.658,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 68.1306,
+    "cpu_ms": 68.134,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.5255,
+    "cpu_ms": 14.5286,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 68.0097,
+    "cpu_ms": 68.0125
+   },
+   "classical_fast": {
+    "ms": 14.5748,
+    "cpu_ms": 14.5784
+   },
+   "relational": {
+    "ms": 0.0832,
+    "cpu_ms": 0.0805,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/FilledNotFilled/FilledNotFilled2.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.8201,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0912,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.9113,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.9113,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 65.9487,
+    "cpu_ms": 65.8253,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.0277,
+    "cpu_ms": 15.0291,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 65.6803,
+    "cpu_ms": 65.6853
+   },
+   "classical_fast": {
+    "ms": 14.8201,
+    "cpu_ms": 14.8235
+   },
+   "relational": {
+    "ms": 0.0912,
+    "cpu_ms": 0.0885,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/FilledNotFilled/FilledNotFilled3.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.1695,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 246.0506,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 258.22,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 258.22,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 301.0626,
+    "cpu_ms": 300.4388,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 248.5514,
+    "cpu_ms": 246.6108,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 85.4861,
+    "cpu_ms": 85.2857
+   },
+   "classical_fast": {
+    "ms": 12.1695,
+    "cpu_ms": 12.1557
+   },
+   "relational": {
+    "ms": 246.0506,
+    "cpu_ms": 245.3512,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/FilledNotFilled/FilledNotFilled4.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 8.4723,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 21.052,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 29.5243,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 29.5243,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 56.5839,
+    "cpu_ms": 56.5853,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 29.0839,
+    "cpu_ms": 29.0542,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 37.1343,
+    "cpu_ms": 37.1359
+   },
+   "classical_fast": {
+    "ms": 8.4723,
+    "cpu_ms": 8.4746
+   },
+   "relational": {
+    "ms": 21.052,
+    "cpu_ms": 21.052,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/FilledNotFilled/FilledNotFilled5.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.9708,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 166.4392,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 179.41,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 179.41,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 187.7963,
+    "cpu_ms": 186.6647,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 171.1081,
+    "cpu_ms": 170.9581,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 26.0947,
+    "cpu_ms": 25.5604
+   },
+   "classical_fast": {
+    "ms": 12.9708,
+    "cpu_ms": 12.9726
+   },
+   "relational": {
+    "ms": 166.4392,
+    "cpu_ms": 159.5234,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/FilledNotFilled/FilledNotFilled6.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 7.3614,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 3.7157,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.0771,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.0771,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 43.0791,
+    "cpu_ms": 42.9174,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 10.9321,
+    "cpu_ms": 10.9333,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 45.3246,
+    "cpu_ms": 45.2939
+   },
+   "classical_fast": {
+    "ms": 7.3614,
+    "cpu_ms": 7.3628
+   },
+   "relational": {
+    "ms": 3.7157,
+    "cpu_ms": 3.7145,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/FilledNotFilled/FilledNotFilled7.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 10.2285,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 17.7005,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 27.929,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 27.929,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 57.2202,
+    "cpu_ms": 57.2044,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 27.9466,
+    "cpu_ms": 27.8581,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 33.889,
+    "cpu_ms": 33.8911
+   },
+   "classical_fast": {
+    "ms": 10.2285,
+    "cpu_ms": 10.2323
+   },
+   "relational": {
+    "ms": 17.7005,
+    "cpu_ms": 17.7,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/FilledNotFilled/FilledNotFilled8.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.7465,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 173.9302,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 187.6766,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 187.6766,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 285.7919,
+    "cpu_ms": 282.6706,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 205.3136,
+    "cpu_ms": 189.7984,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 82.5317,
+    "cpu_ms": 82.3227
+   },
+   "classical_fast": {
+    "ms": 13.7465,
+    "cpu_ms": 13.7495
+   },
+   "relational": {
+    "ms": 173.9302,
+    "cpu_ms": 173.5168,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/FilledNotFilled/FilledNotFilled9.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 16.184,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 144.7344,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 160.9184,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 160.9184,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 205.3358,
+    "cpu_ms": 204.7151,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 165.2933,
+    "cpu_ms": 165.2757,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 63.5359,
+    "cpu_ms": 61.6881
+   },
+   "classical_fast": {
+    "ms": 16.184,
+    "cpu_ms": 16.187
+   },
+   "relational": {
+    "ms": 144.7344,
+    "cpu_ms": 144.4701,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/HorizontalVertical/HorizontalVertical1.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.442,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 17.3242,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 31.7663,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 31.7663,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 63.0058,
+    "cpu_ms": 62.9666,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 29.9526,
+    "cpu_ms": 29.8489,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 49.8312,
+    "cpu_ms": 49.3981
+   },
+   "classical_fast": {
+    "ms": 14.442,
+    "cpu_ms": 14.4014
+   },
+   "relational": {
+    "ms": 17.3242,
+    "cpu_ms": 17.3233,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/HorizontalVertical/HorizontalVertical10.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 18.0845,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 234.9968,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 253.0813,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 253.0813,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 252.6457,
+    "cpu_ms": 252.1804,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 270.1027,
+    "cpu_ms": 258.0068,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 71.4588,
+    "cpu_ms": 71.3589
+   },
+   "classical_fast": {
+    "ms": 18.0845,
+    "cpu_ms": 18.0869
+   },
+   "relational": {
+    "ms": 234.9968,
+    "cpu_ms": 233.6135,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/HorizontalVertical/HorizontalVertical2.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 8.6944,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 29.0749,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 37.7692,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 37.7692,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 78.3953,
+    "cpu_ms": 78.3581,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 39.1303,
+    "cpu_ms": 39.0784,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 48.268,
+    "cpu_ms": 46.786
+   },
+   "classical_fast": {
+    "ms": 8.6944,
+    "cpu_ms": 8.6958
+   },
+   "relational": {
+    "ms": 29.0749,
+    "cpu_ms": 28.8688,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/HorizontalVertical/HorizontalVertical3.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 16.7945,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 68.7216,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 85.5161,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 85.5161,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 140.9465,
+    "cpu_ms": 140.5215,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 83.7187,
+    "cpu_ms": 82.4794,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 58.1181,
+    "cpu_ms": 58.0261
+   },
+   "classical_fast": {
+    "ms": 16.7945,
+    "cpu_ms": 15.5713
+   },
+   "relational": {
+    "ms": 68.7216,
+    "cpu_ms": 68.378,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/HorizontalVertical/HorizontalVertical4.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.5902,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 25.3344,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 39.9246,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 39.9246,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 97.3767,
+    "cpu_ms": 95.2637,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 44.5496,
+    "cpu_ms": 42.3898,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 78.3927,
+    "cpu_ms": 76.5582
+   },
+   "classical_fast": {
+    "ms": 14.5902,
+    "cpu_ms": 14.4027
+   },
+   "relational": {
+    "ms": 25.3344,
+    "cpu_ms": 25.3344,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/HorizontalVertical/HorizontalVertical5.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.243,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 59.6075,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 72.8505,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 72.8505,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 134.3966,
+    "cpu_ms": 134.341,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 66.6936,
+    "cpu_ms": 66.6961,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 116.7069,
+    "cpu_ms": 112.7436
+   },
+   "classical_fast": {
+    "ms": 13.243,
+    "cpu_ms": 13.2288
+   },
+   "relational": {
+    "ms": 59.6075,
+    "cpu_ms": 56.9631,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/HorizontalVertical/HorizontalVertical6.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 18.626,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 86.6802,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 105.3063,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 105.3063,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 158.6483,
+    "cpu_ms": 155.3121,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 102.0108,
+    "cpu_ms": 100.8183,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 91.5235,
+    "cpu_ms": 91.0462
+   },
+   "classical_fast": {
+    "ms": 18.626,
+    "cpu_ms": 18.6103
+   },
+   "relational": {
+    "ms": 86.6802,
+    "cpu_ms": 85.9863,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/HorizontalVertical/HorizontalVertical7.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 26.4988,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 386.8011,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 413.2999,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 413.2999,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 423.0486,
+    "cpu_ms": 418.7086,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 359.1927,
+    "cpu_ms": 353.4402,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 74.1031,
+    "cpu_ms": 73.3597
+   },
+   "classical_fast": {
+    "ms": 26.4988,
+    "cpu_ms": 23.9515
+   },
+   "relational": {
+    "ms": 386.8011,
+    "cpu_ms": 366.7493,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/HorizontalVertical/HorizontalVertical8.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 9.3561,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 10.5866,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 19.9428,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 19.9428,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 39.8786,
+    "cpu_ms": 39.4537,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 20.5998,
+    "cpu_ms": 19.6905,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 30.388,
+    "cpu_ms": 30.0721
+   },
+   "classical_fast": {
+    "ms": 9.3561,
+    "cpu_ms": 9.3583
+   },
+   "relational": {
+    "ms": 10.5866,
+    "cpu_ms": 10.1747,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/HorizontalVertical/HorizontalVertical9.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.5102,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0729,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.5831,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.5831,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 67.1658,
+    "cpu_ms": 66.8005,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.7767,
+    "cpu_ms": 14.7789,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 64.6049,
+    "cpu_ms": 63.8775
+   },
+   "classical_fast": {
+    "ms": 13.5102,
+    "cpu_ms": 13.5133
+   },
+   "relational": {
+    "ms": 0.0729,
+    "cpu_ms": 0.07,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/InsideOutside/InsideOutside1.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.9665,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 395.8819,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 407.8485,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 407.8485,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 495.0826,
+    "cpu_ms": 479.0317,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 417.8655,
+    "cpu_ms": 416.4196,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 42.2052,
+    "cpu_ms": 41.9829
+   },
+   "classical_fast": {
+    "ms": 11.9665,
+    "cpu_ms": 11.9695
+   },
+   "relational": {
+    "ms": 395.8819,
+    "cpu_ms": 382.9154,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/InsideOutside/InsideOutside10.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.2063,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 115.0359,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 128.2422,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 128.2422,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 193.3272,
+    "cpu_ms": 193.0112,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 124.9084,
+    "cpu_ms": 124.8609,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 78.762,
+    "cpu_ms": 78.0638
+   },
+   "classical_fast": {
+    "ms": 13.2063,
+    "cpu_ms": 13.2107
+   },
+   "relational": {
+    "ms": 115.0359,
+    "cpu_ms": 112.4987,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/InsideOutside/InsideOutside2.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.589,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 144.8994,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 157.4884,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 157.4884,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 229.4314,
+    "cpu_ms": 228.8734,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 162.3934,
+    "cpu_ms": 158.5796,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 85.4478,
+    "cpu_ms": 85.4516
+   },
+   "classical_fast": {
+    "ms": 12.589,
+    "cpu_ms": 12.5915
+   },
+   "relational": {
+    "ms": 144.8994,
+    "cpu_ms": 144.1699,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/InsideOutside/InsideOutside3.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 19.2298,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 362.192,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 381.4218,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 381.4218,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 426.7338,
+    "cpu_ms": 424.3394,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 276.913,
+    "cpu_ms": 276.6466,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 134.4618,
+    "cpu_ms": 133.5176
+   },
+   "classical_fast": {
+    "ms": 19.2298,
+    "cpu_ms": 19.2337
+   },
+   "relational": {
+    "ms": 362.192,
+    "cpu_ms": 350.3623,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/InsideOutside/InsideOutside4.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.4604,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 463.9885,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 475.449,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 475.449,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 550.0196,
+    "cpu_ms": 545.4456,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 470.6239,
+    "cpu_ms": 466.339,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 70.6071,
+    "cpu_ms": 70.5088
+   },
+   "classical_fast": {
+    "ms": 11.4604,
+    "cpu_ms": 11.4627
+   },
+   "relational": {
+    "ms": 463.9885,
+    "cpu_ms": 461.9536,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/InsideOutside/InsideOutside5.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 17.8969,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 354.6974,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 372.5943,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 372.5943,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 453.5122,
+    "cpu_ms": 444.5355,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 474.4288,
+    "cpu_ms": 470.0889,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 68.2549,
+    "cpu_ms": 68.0473
+   },
+   "classical_fast": {
+    "ms": 17.8969,
+    "cpu_ms": 17.9012
+   },
+   "relational": {
+    "ms": 354.6974,
+    "cpu_ms": 349.7339,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/InsideOutside/InsideOutside6.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.3543,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0823,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.4367,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.4367,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 69.7935,
+    "cpu_ms": 68.6886,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.0232,
+    "cpu_ms": 13.6444,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 72.8238,
+    "cpu_ms": 69.7584
+   },
+   "classical_fast": {
+    "ms": 15.3543,
+    "cpu_ms": 13.9115
+   },
+   "relational": {
+    "ms": 0.0823,
+    "cpu_ms": 0.0791,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/InsideOutside/InsideOutside7.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.2084,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 288.1449,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 303.3533,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 303.3533,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 273.9675,
+    "cpu_ms": 273.969,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 265.1914,
+    "cpu_ms": 258.3697,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 52.9433,
+    "cpu_ms": 52.1443
+   },
+   "classical_fast": {
+    "ms": 15.2084,
+    "cpu_ms": 15.2104
+   },
+   "relational": {
+    "ms": 288.1449,
+    "cpu_ms": 284.5245,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/InsideOutside/InsideOutside8.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.5021,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 102.8869,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 114.3889,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 114.3889,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 102.697,
+    "cpu_ms": 102.6161,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 86.3257,
+    "cpu_ms": 86.2604,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 37.2977,
+    "cpu_ms": 33.9234
+   },
+   "classical_fast": {
+    "ms": 11.5021,
+    "cpu_ms": 11.5054
+   },
+   "relational": {
+    "ms": 102.8869,
+    "cpu_ms": 102.8053,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/InsideOutside/InsideOutside9.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.8437,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 164.0585,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 176.9022,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 176.9022,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 215.2237,
+    "cpu_ms": 213.656,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 190.6563,
+    "cpu_ms": 190.0148,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 60.326,
+    "cpu_ms": 60.329
+   },
+   "classical_fast": {
+    "ms": 12.8437,
+    "cpu_ms": 12.7745
+   },
+   "relational": {
+    "ms": 164.0585,
+    "cpu_ms": 163.9034,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/MoveToBoundary/MoveToBoundary1.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 7.4653,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 303.9487,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 311.414,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 311.414,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 293.3023,
+    "cpu_ms": 291.6724,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 301.3742,
+    "cpu_ms": 299.7625,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 30.659,
+    "cpu_ms": 30.5462
+   },
+   "classical_fast": {
+    "ms": 7.4653,
+    "cpu_ms": 7.468
+   },
+   "relational": {
+    "ms": 303.9487,
+    "cpu_ms": 303.0367,
+    "fit": true,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/MoveToBoundary/MoveToBoundary10.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 16.2262,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 278.1122,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 294.3385,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 294.3385,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 277.371,
+    "cpu_ms": 276.4162,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 276.859,
+    "cpu_ms": 273.2222,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 75.4225,
+    "cpu_ms": 75.3721
+   },
+   "classical_fast": {
+    "ms": 16.2262,
+    "cpu_ms": 16.1066
+   },
+   "relational": {
+    "ms": 278.1122,
+    "cpu_ms": 275.3533,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/MoveToBoundary/MoveToBoundary2.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 16.6981,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 156.4061,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 173.1042,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 173.1042,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 283.7246,
+    "cpu_ms": 279.8221,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 145.339,
+    "cpu_ms": 143.4888,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 56.8277,
+    "cpu_ms": 56.7688
+   },
+   "classical_fast": {
+    "ms": 16.6981,
+    "cpu_ms": 16.7025
+   },
+   "relational": {
+    "ms": 156.4061,
+    "cpu_ms": 152.7898,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/MoveToBoundary/MoveToBoundary3.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.6752,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 180.9909,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 193.6661,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 193.6661,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 218.1441,
+    "cpu_ms": 216.0904,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 236.7539,
+    "cpu_ms": 232.0413,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 39.1502,
+    "cpu_ms": 38.3171
+   },
+   "classical_fast": {
+    "ms": 12.6752,
+    "cpu_ms": 12.6775
+   },
+   "relational": {
+    "ms": 180.9909,
+    "cpu_ms": 179.3387,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/MoveToBoundary/MoveToBoundary4.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.9084,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 211.5346,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 223.443,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 223.443,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 193.2084,
+    "cpu_ms": 190.4946,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 157.4012,
+    "cpu_ms": 157.1544,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 38.035,
+    "cpu_ms": 38.0013
+   },
+   "classical_fast": {
+    "ms": 11.9084,
+    "cpu_ms": 11.5393
+   },
+   "relational": {
+    "ms": 211.5346,
+    "cpu_ms": 192.0936,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/MoveToBoundary/MoveToBoundary5.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 8.749,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 37.6678,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 46.4168,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 46.4168,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 87.4252,
+    "cpu_ms": 87.376,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 46.3145,
+    "cpu_ms": 46.2758,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 49.614,
+    "cpu_ms": 49.582
+   },
+   "classical_fast": {
+    "ms": 8.749,
+    "cpu_ms": 8.7167
+   },
+   "relational": {
+    "ms": 37.6678,
+    "cpu_ms": 37.6235,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/MoveToBoundary/MoveToBoundary6.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.2867,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 420.174,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 431.4607,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 431.4607,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 493.4169,
+    "cpu_ms": 490.0997,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 375.4121,
+    "cpu_ms": 374.587,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 37.6944,
+    "cpu_ms": 37.6541
+   },
+   "classical_fast": {
+    "ms": 11.2867,
+    "cpu_ms": 11.2894
+   },
+   "relational": {
+    "ms": 420.174,
+    "cpu_ms": 418.2111,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/MoveToBoundary/MoveToBoundary7.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.0686,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 346.7593,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 357.8279,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 357.8279,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 361.259,
+    "cpu_ms": 360.7336,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 306.8619,
+    "cpu_ms": 305.8395,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 40.1993,
+    "cpu_ms": 40.1723
+   },
+   "classical_fast": {
+    "ms": 11.0686,
+    "cpu_ms": 11.071
+   },
+   "relational": {
+    "ms": 346.7593,
+    "cpu_ms": 346.058,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/MoveToBoundary/MoveToBoundary8.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 8.9441,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 322.7079,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 331.6521,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 331.6521,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 288.4828,
+    "cpu_ms": 288.0944,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 330.7516,
+    "cpu_ms": 329.5327,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 40.5682,
+    "cpu_ms": 40.5478
+   },
+   "classical_fast": {
+    "ms": 8.9441,
+    "cpu_ms": 8.9486
+   },
+   "relational": {
+    "ms": 322.7079,
+    "cpu_ms": 322.257,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/MoveToBoundary/MoveToBoundary9.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.1935,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 5.8061,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 18.9997,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 18.9997,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 49.4656,
+    "cpu_ms": 49.1421,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 19.0744,
+    "cpu_ms": 19.0757,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 43.7719,
+    "cpu_ms": 43.7727
+   },
+   "classical_fast": {
+    "ms": 13.1935,
+    "cpu_ms": 13.197
+   },
+   "relational": {
+    "ms": 5.8061,
+    "cpu_ms": 5.8051,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Order/Order1.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 10.3967,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0742,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 10.4709,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 10.4709,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 57.2573,
+    "cpu_ms": 56.953,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 10.2742,
+    "cpu_ms": 10.2761,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 57.5305,
+    "cpu_ms": 57.2272
+   },
+   "classical_fast": {
+    "ms": 10.3967,
+    "cpu_ms": 10.4003
+   },
+   "relational": {
+    "ms": 0.0742,
+    "cpu_ms": 0.0723,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Order/Order10.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 8.8914,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 284.8128,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 293.7042,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 293.7042,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 283.7144,
+    "cpu_ms": 283.4377,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 289.6137,
+    "cpu_ms": 287.0895,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 28.1925,
+    "cpu_ms": 28.1948
+   },
+   "classical_fast": {
+    "ms": 8.8914,
+    "cpu_ms": 8.8933
+   },
+   "relational": {
+    "ms": 284.8128,
+    "cpu_ms": 282.2077,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Order/Order2.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.6301,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 128.6567,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 142.2868,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 142.2868,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 157.5973,
+    "cpu_ms": 154.3271,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 128.8994,
+    "cpu_ms": 128.7961,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 38.1594,
+    "cpu_ms": 37.9031
+   },
+   "classical_fast": {
+    "ms": 13.6301,
+    "cpu_ms": 13.2668
+   },
+   "relational": {
+    "ms": 128.6567,
+    "cpu_ms": 124.6701,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Order/Order3.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.6223,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 3.2826,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 16.9049,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 16.9049,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 44.0919,
+    "cpu_ms": 44.0215,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.5153,
+    "cpu_ms": 12.5164,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 42.893,
+    "cpu_ms": 42.8954
+   },
+   "classical_fast": {
+    "ms": 13.6223,
+    "cpu_ms": 13.5963
+   },
+   "relational": {
+    "ms": 3.2826,
+    "cpu_ms": 3.2715,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Order/Order4.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 8.7032,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 173.5245,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 182.2277,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 182.2277,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 223.9137,
+    "cpu_ms": 223.4641,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 213.6325,
+    "cpu_ms": 208.3816,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 36.0295,
+    "cpu_ms": 36.0316
+   },
+   "classical_fast": {
+    "ms": 8.7032,
+    "cpu_ms": 8.706
+   },
+   "relational": {
+    "ms": 173.5245,
+    "cpu_ms": 173.1737,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Order/Order5.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.3323,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 3.8519,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.1842,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.1842,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 56.8786,
+    "cpu_ms": 55.5094,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.7091,
+    "cpu_ms": 14.6372,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 60.473,
+    "cpu_ms": 60.2189
+   },
+   "classical_fast": {
+    "ms": 11.3323,
+    "cpu_ms": 11.2268
+   },
+   "relational": {
+    "ms": 3.8519,
+    "cpu_ms": 3.6621,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Order/Order6.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 10.6898,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 209.8946,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 220.5844,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 220.5844,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 262.4485,
+    "cpu_ms": 262.295,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 229.4038,
+    "cpu_ms": 229.3735,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 52.9615,
+    "cpu_ms": 52.4691
+   },
+   "classical_fast": {
+    "ms": 10.6898,
+    "cpu_ms": 10.5443
+   },
+   "relational": {
+    "ms": 209.8946,
+    "cpu_ms": 205.122,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Order/Order7.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 7.9342,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0702,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 8.0043,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 8.0043,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 41.5226,
+    "cpu_ms": 41.3458,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 8.0529,
+    "cpu_ms": 8.0539,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 42.5667,
+    "cpu_ms": 42.5495
+   },
+   "classical_fast": {
+    "ms": 7.9342,
+    "cpu_ms": 7.9375
+   },
+   "relational": {
+    "ms": 0.0702,
+    "cpu_ms": 0.0676,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Order/Order8.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 6.5243,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 91.2811,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 97.8054,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 97.8054,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 170.8891,
+    "cpu_ms": 170.8929,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 96.7185,
+    "cpu_ms": 96.6776,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 29.5962,
+    "cpu_ms": 29.5988
+   },
+   "classical_fast": {
+    "ms": 6.5243,
+    "cpu_ms": 6.4881
+   },
+   "relational": {
+    "ms": 91.2811,
+    "cpu_ms": 91.2826,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/Order/Order9.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 18.5719,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 156.5318,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 175.1037,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 175.1037,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 184.9946,
+    "cpu_ms": 184.9101,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 202.5165,
+    "cpu_ms": 202.3048,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 74.5954,
+    "cpu_ms": 74.5998
+   },
+   "classical_fast": {
+    "ms": 18.5719,
+    "cpu_ms": 18.5759
+   },
+   "relational": {
+    "ms": 156.5318,
+    "cpu_ms": 156.515,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/SameDifferent/SameDifferent1.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 9.0863,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 175.707,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 184.7933,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 184.7933,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 277.7597,
+    "cpu_ms": 273.7483,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 227.5209,
+    "cpu_ms": 226.1031,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 50.9581,
+    "cpu_ms": 50.744
+   },
+   "classical_fast": {
+    "ms": 9.0863,
+    "cpu_ms": 9.089
+   },
+   "relational": {
+    "ms": 175.707,
+    "cpu_ms": 174.409,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/SameDifferent/SameDifferent10.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.2996,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 186.0267,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 199.3263,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 199.3263,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 244.4378,
+    "cpu_ms": 243.369,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 234.3026,
+    "cpu_ms": 233.896,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 67.5811,
+    "cpu_ms": 67.2387
+   },
+   "classical_fast": {
+    "ms": 13.2996,
+    "cpu_ms": 13.3041
+   },
+   "relational": {
+    "ms": 186.0267,
+    "cpu_ms": 185.5925,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/SameDifferent/SameDifferent2.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.1271,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 232.4566,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 245.5837,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 245.5837,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 187.6668,
+    "cpu_ms": 185.5656,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 184.436,
+    "cpu_ms": 183.9609,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 52.9103,
+    "cpu_ms": 52.9125
+   },
+   "classical_fast": {
+    "ms": 13.1271,
+    "cpu_ms": 13.1291
+   },
+   "relational": {
+    "ms": 232.4566,
+    "cpu_ms": 228.0399,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/SameDifferent/SameDifferent3.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 17.9185,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 81.5453,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 99.4638,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 99.4638,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 161.1921,
+    "cpu_ms": 160.9073,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 85.631,
+    "cpu_ms": 85.57,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 54.5427,
+    "cpu_ms": 54.4555
+   },
+   "classical_fast": {
+    "ms": 17.9185,
+    "cpu_ms": 17.5134
+   },
+   "relational": {
+    "ms": 81.5453,
+    "cpu_ms": 81.3301,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/SameDifferent/SameDifferent4.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.1571,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.4859,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.6431,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.6431,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 60.7833,
+    "cpu_ms": 60.3964,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.4287,
+    "cpu_ms": 12.107,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 60.2447,
+    "cpu_ms": 59.9694
+   },
+   "classical_fast": {
+    "ms": 11.1571,
+    "cpu_ms": 11.1593
+   },
+   "relational": {
+    "ms": 0.4859,
+    "cpu_ms": 0.4839,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/SameDifferent/SameDifferent5.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.4085,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 248.0379,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 261.4464,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 261.4464,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 373.79,
+    "cpu_ms": 370.4368,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 279.2783,
+    "cpu_ms": 274.775,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 65.5064,
+    "cpu_ms": 64.663
+   },
+   "classical_fast": {
+    "ms": 13.4085,
+    "cpu_ms": 13.4107
+   },
+   "relational": {
+    "ms": 248.0379,
+    "cpu_ms": 238.7919,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/SameDifferent/SameDifferent6.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 19.212,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 356.9826,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 376.1946,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 376.1946,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 417.5793,
+    "cpu_ms": 406.6573,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 354.3206,
+    "cpu_ms": 353.1464,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 111.1047,
+    "cpu_ms": 109.3194
+   },
+   "classical_fast": {
+    "ms": 19.212,
+    "cpu_ms": 18.6312
+   },
+   "relational": {
+    "ms": 356.9826,
+    "cpu_ms": 353.5703,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/SameDifferent/SameDifferent7.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.8663,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.111,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.9773,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.9773,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 98.2097,
+    "cpu_ms": 98.0438,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.9586,
+    "cpu_ms": 15.9609,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 105.3021,
+    "cpu_ms": 105.0193
+   },
+   "classical_fast": {
+    "ms": 15.8663,
+    "cpu_ms": 15.6758
+   },
+   "relational": {
+    "ms": 0.111,
+    "cpu_ms": 0.1077,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/SameDifferent/SameDifferent8.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.2818,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 6.7053,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 21.9871,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 21.9871,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 111.4035,
+    "cpu_ms": 110.799,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 21.8736,
+    "cpu_ms": 21.8744,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 95.3934,
+    "cpu_ms": 94.2751
+   },
+   "classical_fast": {
+    "ms": 15.2818,
+    "cpu_ms": 15.2848
+   },
+   "relational": {
+    "ms": 6.7053,
+    "cpu_ms": 6.7029,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/SameDifferent/SameDifferent9.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.4051,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.118,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.5231,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.5231,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 77.4461,
+    "cpu_ms": 77.2284,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 18.0082,
+    "cpu_ms": 17.9576,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 77.2341,
+    "cpu_ms": 77.2054
+   },
+   "classical_fast": {
+    "ms": 15.4051,
+    "cpu_ms": 15.4086
+   },
+   "relational": {
+    "ms": 0.118,
+    "cpu_ms": 0.1157,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/TopBottom2D/TopBottom2D1.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.6515,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 3.9359,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 19.5874,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 19.5874,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 59.7311,
+    "cpu_ms": 59.7323,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 19.4881,
+    "cpu_ms": 19.4758,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 55.7794,
+    "cpu_ms": 55.6713
+   },
+   "classical_fast": {
+    "ms": 15.6515,
+    "cpu_ms": 15.6551
+   },
+   "relational": {
+    "ms": 3.9359,
+    "cpu_ms": 3.9347,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/TopBottom2D/TopBottom2D10.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.5216,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.072,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.5936,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.5936,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 43.9848,
+    "cpu_ms": 43.9716,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.4275,
+    "cpu_ms": 12.3651,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 44.3901,
+    "cpu_ms": 44.3577
+   },
+   "classical_fast": {
+    "ms": 12.5216,
+    "cpu_ms": 12.5012
+   },
+   "relational": {
+    "ms": 0.072,
+    "cpu_ms": 0.0705,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/TopBottom2D/TopBottom2D2.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 10.1529,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 16.6782,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 26.8311,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 26.8311,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 76.8636,
+    "cpu_ms": 72.9263,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 39.8812,
+    "cpu_ms": 39.7325,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 70.8655,
+    "cpu_ms": 70.7123
+   },
+   "classical_fast": {
+    "ms": 10.1529,
+    "cpu_ms": 10.088
+   },
+   "relational": {
+    "ms": 16.6782,
+    "cpu_ms": 16.6774,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/TopBottom2D/TopBottom2D3.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.0064,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 404.6077,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 417.6142,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 417.6142,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 411.1751,
+    "cpu_ms": 410.8613,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 392.5429,
+    "cpu_ms": 390.485,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 85.7485,
+    "cpu_ms": 85.1788
+   },
+   "classical_fast": {
+    "ms": 13.0064,
+    "cpu_ms": 12.4185
+   },
+   "relational": {
+    "ms": 404.6077,
+    "cpu_ms": 400.7578,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/TopBottom2D/TopBottom2D4.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.352,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 138.9993,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 153.3513,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 153.3513,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 189.895,
+    "cpu_ms": 187.4481,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 159.0404,
+    "cpu_ms": 158.9043,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 70.1881,
+    "cpu_ms": 70.1903
+   },
+   "classical_fast": {
+    "ms": 14.352,
+    "cpu_ms": 14.356
+   },
+   "relational": {
+    "ms": 138.9993,
+    "cpu_ms": 138.2676,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/TopBottom2D/TopBottom2D5.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.9969,
+    "attempts": 2
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0739,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.0708,
+    "attempts": 2
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.9969,
+    "attempts": 2
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 45.6415,
+    "cpu_ms": 45.5762,
+    "attempts": 2
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.0482,
+    "cpu_ms": 12.0802,
+    "attempts": 2,
+    "engines_run": [
+     "classical"
+    ]
+   },
+   "classical_original": {
+    "ms": 52.0625,
+    "cpu_ms": 52.0493
+   },
+   "classical_fast": {
+    "ms": 11.9969,
+    "cpu_ms": 11.9991
+   },
+   "relational": {
+    "ms": 0.0739,
+    "cpu_ms": 0.0724,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/TopBottom2D/TopBottom2D6.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.8888,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0979,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.9867,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.9867,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 76.8036,
+    "cpu_ms": 76.2465,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 69.4805,
+    "cpu_ms": 68.6092,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 88.2506,
+    "cpu_ms": 87.8952
+   },
+   "classical_fast": {
+    "ms": 11.8888,
+    "cpu_ms": 11.8922
+   },
+   "relational": {
+    "ms": 0.0979,
+    "cpu_ms": 0.095,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/TopBottom2D/TopBottom2D7.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 16.5865,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 7.582,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 24.1686,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 24.1686,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 80.9984,
+    "cpu_ms": 80.8787,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 18.81,
+    "cpu_ms": 18.764,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 90.1468,
+    "cpu_ms": 89.6402
+   },
+   "classical_fast": {
+    "ms": 16.5865,
+    "cpu_ms": 16.5812
+   },
+   "relational": {
+    "ms": 7.582,
+    "cpu_ms": 7.506,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/TopBottom2D/TopBottom2D8.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 9.9067,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 9.6154,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 19.5221,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 19.5221,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 83.2844,
+    "cpu_ms": 80.6823,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 20.2784,
+    "cpu_ms": 19.9713,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 67.4123,
+    "cpu_ms": 65.4561
+   },
+   "classical_fast": {
+    "ms": 9.9067,
+    "cpu_ms": 8.9525
+   },
+   "relational": {
+    "ms": 9.6154,
+    "cpu_ms": 9.2903,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/TopBottom2D/TopBottom2D9.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 15.3034,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 3.4761,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 18.7795,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 18.7795,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 67.2547,
+    "cpu_ms": 66.996,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 18.6275,
+    "cpu_ms": 18.6292,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 66.2681,
+    "cpu_ms": 63.7802
+   },
+   "classical_fast": {
+    "ms": 15.3034,
+    "cpu_ms": 15.2657
+   },
+   "relational": {
+    "ms": 3.4761,
+    "cpu_ms": 3.4742,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/TopBottom3D/TopBottom3D1.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 18.0739,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 50.12,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 68.1939,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 68.1939,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 115.424,
+    "cpu_ms": 114.8042,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 68.1072,
+    "cpu_ms": 68.1088,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 68.3663,
+    "cpu_ms": 68.3701
+   },
+   "classical_fast": {
+    "ms": 18.0739,
+    "cpu_ms": 18.0767
+   },
+   "relational": {
+    "ms": 50.12,
+    "cpu_ms": 49.8118,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/TopBottom3D/TopBottom3D10.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.4007,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 42.218,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 54.6187,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 54.6187,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 100.8918,
+    "cpu_ms": 100.8939,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 2,
+    "ms": 55.9889,
+    "cpu_ms": 55.9917,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 64.9091,
+    "cpu_ms": 64.9114
+   },
+   "classical_fast": {
+    "ms": 12.4007,
+    "cpu_ms": 12.4107
+   },
+   "relational": {
+    "ms": 42.218,
+    "cpu_ms": 42.2181,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/TopBottom3D/TopBottom3D2.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.1686,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 194.9494,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 208.118,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 208.118,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 267.5269,
+    "cpu_ms": 259.2433,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 272.2057,
+    "cpu_ms": 270.5525,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 54.3646,
+    "cpu_ms": 54.2473
+   },
+   "classical_fast": {
+    "ms": 13.1686,
+    "cpu_ms": 13.1729
+   },
+   "relational": {
+    "ms": 194.9494,
+    "cpu_ms": 194.1245,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/TopBottom3D/TopBottom3D3.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 12.3077,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 339.9714,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 352.2791,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 352.2791,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 348.8913,
+    "cpu_ms": 347.6197,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 309.5914,
+    "cpu_ms": 307.1344,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 76.6945,
+    "cpu_ms": 76.6962
+   },
+   "classical_fast": {
+    "ms": 12.3077,
+    "cpu_ms": 12.1996
+   },
+   "relational": {
+    "ms": 339.9714,
+    "cpu_ms": 333.9474,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/TopBottom3D/TopBottom3D4.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.6387,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0989,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.7375,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.7375,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 56.9469,
+    "cpu_ms": 56.8198,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 17.6976,
+    "cpu_ms": 17.4496,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 55.3174,
+    "cpu_ms": 55.2851
+   },
+   "classical_fast": {
+    "ms": 13.6387,
+    "cpu_ms": 13.6416
+   },
+   "relational": {
+    "ms": 0.0989,
+    "cpu_ms": 0.0952,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/TopBottom3D/TopBottom3D5.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.4063,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 0.0968,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.5031,
+    "attempts": 0
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.5031,
+    "attempts": 0
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 61.3481,
+    "cpu_ms": 61.3018,
+    "attempts": 0
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 13.5947,
+    "cpu_ms": 13.5961,
+    "attempts": 0,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 61.9614,
+    "cpu_ms": 61.6365
+   },
+   "classical_fast": {
+    "ms": 14.4063,
+    "cpu_ms": 14.0711
+   },
+   "relational": {
+    "ms": 0.0968,
+    "cpu_ms": 0.0943,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/TopBottom3D/TopBottom3D6.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 14.0285,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 46.2225,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 60.251,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 60.251,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 123.8198,
+    "cpu_ms": 121.9698,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": true,
+    "per_output": 3,
+    "ms": 59.9788,
+    "cpu_ms": 59.4651,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 76.4099,
+    "cpu_ms": 75.8709
+   },
+   "classical_fast": {
+    "ms": 14.0285,
+    "cpu_ms": 13.7346
+   },
+   "relational": {
+    "ms": 46.2225,
+    "cpu_ms": 45.907,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/TopBottom3D/TopBottom3D7.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 11.269,
+    "attempts": 0
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 67.5525,
+    "attempts": 1
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 78.8215,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 78.8215,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 121.6248,
+    "cpu_ms": 121.5548,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 73.5963,
+    "cpu_ms": 73.5656,
+    "attempts": 1,
+    "engines_run": [
+     "classical",
+     "relational"
+    ]
+   },
+   "classical_original": {
+    "ms": 68.8304,
+    "cpu_ms": 68.832
+   },
+   "classical_fast": {
+    "ms": 11.269,
+    "cpu_ms": 11.2716
+   },
+   "relational": {
+    "ms": 67.5525,
+    "cpu_ms": 67.5377,
+    "fit": true,
+    "candidate": true
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/TopBottom3D/TopBottom3D8.json"
+  },
+  {
+   "classical_only": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 18.8855,
+    "attempts": 1
+   },
+   "relational_only": {
+    "joint": false,
+    "per_output": 0,
+    "ms": 5.4945,
+    "attempts": 0
+   },
+   "hybrid_fast": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 24.38,
+    "attempts": 1
+   },
+   "cascade_composed": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 18.8855,
+    "attempts": 1
+   },
+   "hybrid_original_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 89.0841,
+    "cpu_ms": 89.0869,
+    "attempts": 1
+   },
+   "cascade_run": {
+    "joint": false,
+    "per_output": 1,
+    "ms": 19.3196,
+    "cpu_ms": 19.3207,
+    "attempts": 1,
+    "engines_run": [
+     "classical"
+    ]
+   },
+   "classical_original": {
+    "ms": 80.0949,
+    "cpu_ms": 78.9974
+   },
+   "classical_fast": {
+    "ms": 18.8855,
+    "cpu_ms": 18.8614
+   },
+   "relational": {
+    "ms": 5.4945,
+    "cpu_ms": 5.4926,
+    "fit": false,
+    "candidate": false
+   },
+   "exact_equivalent": true,
+   "family_router": "REFUSED_UNSEEN_FAMILY",
+   "tests": 3,
+   "id": "corpus/TopBottom3D/TopBottom3D9.json"
+  }
+ ]
+}
