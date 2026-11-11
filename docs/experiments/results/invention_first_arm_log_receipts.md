@@ -22,7 +22,7 @@ log's SHA-256 at copy time.
 |---|---|---|---|---|---|---|
 | 1 | rule | A | `rule A solved 25 / 125 wall 70.4` | ≤ 08:28:08 | 10:45:31 | `b26d0334…df80` (2 lines) |
 | 2 | rule | A4 | `rule A4 solved 34 / 125 wall 312.2` | 08:28:08 | 10:45:31 | `b26d0334…df80` (2 lines) |
-| 3 | rule | B | INCOMPLETE (running since 08:28:08) | | | |
+| 3 | rule | B | INCOMPLETE (running since 08:28:08; no line printed as of 11:39 UTC; ~124/125 tasks finished, inferred from pipe counters, count unknown; see the operational diagnosis) | | | |
 | 4 | rule | C | INCOMPLETE (not started) | | | |
 | 5 | rule | C_no_inventions | INCOMPLETE (not started) | | | |
 | 6 | rule | C_no_learned_prior | INCOMPLETE (not started) | | | |
