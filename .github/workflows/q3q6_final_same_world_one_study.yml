@@ -5,6 +5,7 @@ on:
       - research/q3q6-final-same-world-frozen-20261111
     paths:
       - .github/workflows/q3q6_final_same_world_one_study.yml
+      - research/q3/q3q6_final_same_world_one_study.py
   workflow_dispatch:
 
 permissions:
@@ -109,7 +110,7 @@ jobs:
       - name: Pin same real Qwen0.5B checkpoint and CPU LoRA, fixed update budgets
         run: |
           set -euo pipefail
-          python -m pip install -q -e .
+          python -m pip install -q -e . scikit-learn
           python -m pip install -q --index-url https://download.pytorch.org/whl/cpu 'torch==2.5.1'
           python -m pip install -q 'transformers==4.46.3' 'peft==0.14.0' \
             'accelerate==1.2.1' 'huggingface_hub==0.27.1' 'jinja2>=3.1.4,<4'
