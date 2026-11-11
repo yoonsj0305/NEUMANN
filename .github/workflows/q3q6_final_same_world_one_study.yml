@@ -1,0 +1,179 @@
+name: Q3 Q6 FINAL ONE Same Hidden World SOURCE Observation Refutation
+on:
+  push:
+    branches:
+      - research/q3q6-final-same-world-frozen-20261111
+    paths:
+      - .github/workflows/q3q6_final_same_world_one_study.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONHASHSEED: "0"
+  OMP_NUM_THREADS: "2"
+  OPENBLAS_NUM_THREADS: "2"
+  TOKENIZERS_PARALLELISM: "false"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+
+jobs:
+  precommit_original_worlds:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Download pinned original independent-author corpora, no generated task rules
+        run: |
+          set -euo pipefail
+          mkdir -p originals
+          SCAN=c4b756cbc010d75c912f16c42c8f15dc6b7e6c8f
+          ARC=399030444e0ab0cc8b4e199870fb20b863846f34
+          curl -fsSL --retry 2 "https://raw.githubusercontent.com/brendenlake/SCAN/$SCAN/simple_split/tasks_train_simple.txt" -o originals/scan_train.txt
+          curl -fsSL --retry 2 "https://raw.githubusercontent.com/brendenlake/SCAN/$SCAN/simple_split/tasks_test_simple.txt" -o originals/scan_test.txt
+          git init -q originals/arc
+          git -C originals/arc fetch -q --depth 1 https://github.com/fchollet/ARC-AGI.git "$ARC"
+          git -C originals/arc checkout -q FETCH_HEAD
+          test "$(git -C originals/arc rev-parse HEAD)" = "$ARC"
+          sha256sum originals/scan_train.txt originals/scan_test.txt
+      - name: Predeclare SHA-selected original identity, same-world evidence, independent sealed gold
+        run: |
+          set -euo pipefail
+          python -m research.q3.q3q6_final_same_world_one_study freeze \
+            --scan-train originals/scan_train.txt \
+            --scan-test originals/scan_test.txt \
+            --arc-dir originals/arc/data/evaluation \
+            --out-dir split
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          vis=json.loads(Path("split/visible/visible.json").read_text())
+          oracle=json.loads(Path("split/source/source.json").read_text())
+          assert len(vis["training"])==4 and len(vis["evaluation"])==8
+          assert {t["domain"] for t in vis["evaluation"]} == {
+            "scan_compositional_language","arc_visual_transformation"}
+          assert all(t["mechanism"] == oracle[t["task_id"]]["mechanism"]
+                     for t in vis["training"]+vis["evaluation"])
+          assert all("output" not in t["queries"] for t in vis["evaluation"])
+          print("PRECOMMIT_SAME_WORLD_OBSERVATION_AND_COUNTEREXAMPLE_CONTRACT_OK", flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3q6-final-model-visible
+          path: split/visible/
+          retention-days: 90
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3q6-final-independent-source-only
+          path: split/source/
+          retention-days: 90
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3q6-final-original-TARGET-GOLD-scorer-only
+          path: split/gold/
+          retention-days: 90
+
+  original_inference_single_frozen_study:
+    needs: precommit_original_worlds
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3q6-final-model-visible
+          path: split/visible
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3q6-final-independent-source-only
+          path: split/source
+      - name: Ensure original TARGET gold not available to model
+        run: |
+          set -euo pipefail
+          test ! -e split/gold/gold.json
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          m=json.loads(Path("split/visible/manifest.json").read_text())
+          assert m["visible_hash"]==hashlib.sha256(Path("split/visible/visible.json").read_bytes()).hexdigest()
+          assert m["source_hash"]==hashlib.sha256(Path("split/source/source.json").read_bytes()).hexdigest()
+          assert m["target_labels_in_visible"] is False
+          print("TARGET_GOLD_IS_SEPARATE_AND_NEVER_DOWNLOADED_BY_MODEL",flush=True)
+          PY
+      - name: Pin same real Qwen0.5B checkpoint and CPU LoRA, fixed update budgets
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          python -m pip install -q --index-url https://download.pytorch.org/whl/cpu 'torch==2.5.1'
+          python -m pip install -q 'transformers==4.46.3' 'peft==0.14.0' \
+            'accelerate==1.2.1' 'huggingface_hub==0.27.1' 'jinja2>=3.1.4,<4'
+          python - <<'PY'
+          from huggingface_hub import model_info
+          actual=model_info("Qwen/Qwen2.5-Coder-0.5B-Instruct").sha
+          assert actual=="ea3f2471cf1b1f0db85067f1ef93848e38e88c25"
+          print("FROZEN_PRETRAINED_WEIGHTS_VERIFIED", actual,flush=True)
+          PY
+      - name: Run A B C original inference with EXACT 4 SOURCE gradients budget, freeze 8 predictions
+        run: |
+          set -euo pipefail
+          mkdir -p predictions
+          python -u -m research.q3.q3q6_final_same_world_one_study infer \
+            --visible split/visible/visible.json \
+            --source split/source/source.json \
+            --out predictions/predictions.json
+          sha256sum predictions/predictions.json > predictions/predictions.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("predictions/predictions.json").read_text())
+          assert p["TARGET_gold_read"] is False
+          assert all(len(p["A_B_C"][arm])==8 for arm in "ABC")
+          assert p["same_model_weights_start"] is True
+          print("ALL_EIGHT_ORIGINAL_TARGET_PREDICTIONS_SEALED",flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3q6-final-original-frozen-predictions
+          path: predictions/
+          retention-days: 90
+          if-no-files-found: warn
+
+  independent_original_scorer_after_freeze:
+    needs: original_inference_single_frozen_study
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3q6-final-original-frozen-predictions
+          path: predictions
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3q6-final-original-TARGET-GOLD-scorer-only
+          path: split/gold
+      - name: Score once only after all predictions frozen; no learning in scorer
+        run: |
+          set -euo pipefail
+          sha256sum -c predictions/predictions.sha256
+          python -m research.q3.q3q6_final_same_world_one_study score \
+            --pred predictions/predictions.json \
+            --gold split/gold/gold.json \
+            --out scored/final_verdict.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3q6-final-one-independent-scientific-verdict
+          path: scored/
+          if-no-files-found: warn
+          retention-days: 90
