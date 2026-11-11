@@ -112,7 +112,8 @@ def freeze(scan_train, scan_test, arc_dir, out_dir):
         oracle[task["task_id"]] = src
         for sample in (a[start], a[start+1]):
             visible["source_memory"].append(
-                {"domain": DOMAINS[0], "query": sample["input"], "observed": sample["output"],
+                {"domain": DOMAINS[0], "source_task_id": task["task_id"],
+                 "query": sample["input"], "observed": sample["output"],
                  "scope": "TRUSTED_SOURCE_ONLY", "mechanism": scan_world})
     for i in range(PER_DOMAIN_TARGET):
         task, src = episode(DOMAINS[0], "SCAN-eval-" + str(i),
@@ -139,7 +140,8 @@ def freeze(scan_train, scan_test, arc_dir, out_dir):
             visible["training"].append(task)
             for pair in (demo, probe):
                 visible["source_memory"].append(
-                    {"domain": DOMAINS[1], "query": pair["input"],
+                    {"domain": DOMAINS[1], "source_task_id": task["task_id"],
+                     "query": pair["input"],
                      "observed": pair["output"],
                      "scope": "TRUSTED_SOURCE_ONLY", "mechanism": mechanism})
     if (len(visible["training"]) != 4 or len(visible["evaluation"]) != 8
@@ -222,7 +224,7 @@ def effort(model, task, oracle, memory, training):
     return {"task_id": task["task_id"], "domain": task["domain"],
             "source_certified": certified,
             "initial_latent_sha256": initial, "revised_latent_sha256": revised,
-            "genuinely_changed_latent": bool(initial and revised and initial != revised),
+            "genuinely_changed_latent": bool(revised and initial != revised),
             "learning_receipt": receipt,
             "raw_prediction": raw, "certified_prediction": submitted,
             "status": status, "seconds": round(time.monotonic()-start, 3),
@@ -267,7 +269,8 @@ def infer(visible_path, source_path, out):
             for t in visible["training"]:
                 row=effort(model,t,oracle,
                            [m for m in visible["source_memory"]
-                            if m["domain"]==t["domain"]],True)
+                            if m["domain"]==t["domain"] and
+                            m["source_task_id"]!=t["task_id"]],True)
                 training_receipts.append(row)
                 print("FINAL_Q3Q6_TRAIN_SOURCE_ONLY",t["task_id"],
                       row["status"], "updates",model.update_count,flush=True)
