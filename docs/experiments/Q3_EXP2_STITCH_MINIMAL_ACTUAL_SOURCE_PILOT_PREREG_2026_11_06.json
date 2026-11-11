@@ -1,0 +1,46 @@
+{
+  "schema": "neumann.q3.exp2.external-stitch-minimal-admission.v1",
+  "date": "2026-11-06",
+  "north_star": "Frontier-level problem solving with minimum necessary computation",
+  "prior_source_scope": "G1 own-weight neural trained 31.5625% synthetic heldout but 1/5 real external; cvc5 native 8/8. G2 native 24/24. P45 finite mask language no programs on 399/400. No repetitive search or source test cheating.",
+  "external_project": {
+    "repo": "mlb2251/stitch",
+    "git_commit": "350804b7b35807c78bd21c313785ae5152ae2985",
+    "license": "MIT",
+    "upstream_authored_readme_quickstart": true,
+    "executable": "cargo run --release --bin=compress",
+    "command_flags": [
+      "--max-arity=3",
+      "--iterations=1",
+      "--show-rewritten"
+    ]
+  },
+  "core_assumption": "An already-published scalable abstraction compressor can mine repeated subtrees from existing solved programs; this provides reusable library candidates. It does NOT supply missing semantic programs or an own-weight model.",
+  "one_hypothesis": "On only 2 published sample Lisp programs from upstream README, the pinned actual Stitch engine extracts a reusable abstraction that reduces its own documented static description-length metric and exactly rewrites both source programs.",
+  "original_published_demo": [
+    "(foo (a a a))",
+    "(bar (b b b))"
+  ],
+  "source_programs_provided_before_evaluation": true,
+  "expected_semantic_pattern": "Function of one argument (x x x), reusable in two programs; this is the upstream example and not independent novel discovery.",
+  "cost_limit": {
+    "CI_wall_timeout_minutes": 15,
+    "iterations": 1,
+    "max_arity": 3,
+    "threads": 1,
+    "network_dependencies_build_counted_separately": true,
+    "energy": "UNKNOWN"
+  },
+  "comparison": "no trainable own-weight NEUMANN model executed; simple exact reuse vs unchanged originals only; Q3 requires later original off-family proof with learned proposal and same-rights GP/CEGIS.",
+  "stop_conditions": [
+    "If pin cannot compile cleanly within 15m, no invasive integration; record infra blocked.",
+    "If tool cannot compress and produce valid rewrites, reject adoption; do not tune loop.",
+    "Even if demo compression passes, stop: user-defined Q3 remains OPEN unless independent own-weight generated operator and new-formalism verified source advantage."
+  ],
+  "degraded_mode": "Do not invoke abstraction learner; existing native classical and independently checked originals remain authoritative.",
+  "interface": "Problem: original typed program AST list; Candidate: reusable macro with typed holes; Proof: independent expansion and original behavior equivalence; Reusable Structure: versioned macro and use sites. No source primitive additions may be treated as learned.",
+  "Q3": "OPEN",
+  "Q4": "OPEN",
+  "Q6": "OPEN",
+  "Q7": "OPEN"
+}
