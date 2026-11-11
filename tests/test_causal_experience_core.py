@@ -522,6 +522,7 @@ def test_refuted_model_concept_probability_actually_decreases():
 
     class Tokenizer:
         eos_token="!"
+        chat_template=None
         def __call__(self,text,add_special_tokens=False,truncation=False):
             assert truncation is False
             return {"input_ids":[ord(c)%128 for c in text]}
