@@ -19,10 +19,13 @@ def _canonical(x):
 
 
 WORLD_SYSTEM=(
-    "Infer a falsifiable, concise causal hypothesis from SOURCE observations. "
-    "Invent a meaningful latent variable or relation in your OWN ordinary language. "
-    "Respond with ONE short hypothesis statement only, no JSON, code, explanation, "
-    "predicted output or solved program. No original TARGET outcomes are available."
+    "Infer ONE concise, falsifiable latent causal relation from authorized "
+    "SOURCE observations. If a previously MODEL-proposed hypothesis was "
+    "contradicted by verified SOURCE, propose a NEW explanation of what "
+    "changed and why. Do not copy a measured output as the whole hypothesis; "
+    "explain a relation able to predict another unobserved intervention. "
+    "The latent concept must be authored by YOU, not a supplied operator DSL. "
+    "Return only the candidate concept text, no JSON, code or TARGET answer."
 )
 QUERY_SYSTEM=(
     "Given the candidate causal hypothesis, earlier verified SOURCE observations "
@@ -121,6 +124,39 @@ class TrainableLatentWorldPolicy:
             raise LatentHypothesisFormatError("model emitted empty hypothesis/output")
         return raw
 
+    @staticmethod
+    def _source_witnesses(source_history):
+        """Keep the falsifiable SOURCE evidence, delete noncausal log noise.
+
+        This is an evidence projection, NOT a hand-coded rule or a teacher
+        solution. No sealed SOURCE or TARGET labels enter via this method:
+        the caller is responsible for authorizing evidence in the core.
+        """
+        records=[]
+        for event in list(source_history)[-12:]:
+            if event.get("scope")!="TRUSTED_SOURCE_ONLY":
+                raise ValueError("non-SOURCE experience in causal context")
+            row={
+                "source_identity":event.get("task_id",
+                                   event.get("source_task_id",
+                                   event.get("mechanism"))),
+                "intervention":event.get("query"),
+                "verified_observation":event.get("observed"),
+            }
+            if event.get("contradicted") is True:
+                hypothesis=event.get("hypothesis") or {}
+                claimed=(hypothesis.get("latent_variables") or {}).get(
+                    "proposed_internal_causal_concept")
+                if claimed is None:
+                    claimed=hypothesis.get("relations")
+                row.update({
+                    "refuted_model_hypothesis":claimed,
+                    "incorrect_prediction":event.get("predicted"),
+                    "reason_to_revise":"verified SOURCE contradicted proposal",
+                })
+            records.append(row)
+        return records
+
     def hypotheses(self,context,source_history,allowed_queries):
         """Model invents concept text, THEN predicts observations individually.
 
@@ -133,12 +169,14 @@ class TrainableLatentWorldPolicy:
             raise ValueError("non-SOURCE experience in causal context")
         if not isinstance(allowed_queries,dict) or not allowed_queries:
             raise ValueError("authorized SOURCE/query inputs required")
-        memory=list(source_history)[-12:]
+        memory=self._source_witnesses(source_history)
         prompt=_canonical({
             "current_observation":context,
             "prior_source_experiences":memory,
             "authorized_query_inputs":allowed_queries,
-            "instruction":"propose ONE minimal new causal relation; not an answer",
+            "instruction":("create or revise ONE latent relation explaining the "
+                           "latest verified SOURCE counterexample; do not "
+                           "merely repeat the observed label"),
         })
         concept_prefix=_chat(self.tokenizer,WORLD_SYSTEM,prompt)
         proposed_text=self._generate(
