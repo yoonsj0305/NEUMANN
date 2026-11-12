@@ -146,4 +146,26 @@ mechanism on integer goals, not by W4.
 | # | Hypothesis | Criterion | Result | Record |
 |---|---|---|---|---|
 | 1 | H1 | K1–K4, both domains | (pending) | (pending) |
-| 2 | H2 | J1–J3, both list families | (pending) | (pending) |
+| 2 | H2 | J1–J3, both list families | **FAIL** (rule: J1, J2 fail; dc: J1 fails on p) | `docs/experiments/results/discovery_iter2_inverted_inventions.json`, `discovery_iter2_rows.jsonl.gz` |
+
+### Iteration 2 result (2026-11-12, 08:26–08:47 UTC; 972 / 972 jobs)
+
+| Family | V | V0 (inventions removed) | S | V only / V0 only | McNemar p | Solved by V and neither V0 nor S | CPU s V / V0 |
+|---|---|---|---|---|---|---|---|
+| rule TARGET (125) | 63 | 60 | 61 | 4 / 1 | 0.375 | 3 | 395 / 429 |
+| dc (199) | 158 | 151 | 151 | 8 / 1 | 0.039 | 8 | 243 / 304 |
+
+**Verdict: FAIL** by the criterion fixed before the run (J1 needs ≥ 5 and p < 0.025 in both families).
+
+What the record shows, without re-reading the criterion:
+* The effect is real and has the predicted sign in both families: every task V gains is solved through the
+  inverse of the invented append (rule: constant blocks before and after the input; dc: "append the k-th
+  element", "repeat the input k times"), in 0.002–2.6 CPU s, and none is solved when the inventions are removed.
+  Three of the five discordant tasks that are not of this kind (rule/c172, rule/c112, dc/078) are solved by the
+  traversal state, which the inventions do not touch: they are timing noise of the CPU cap.
+* The effect is small: +3 and +7 tasks. Pooled over the two families it is 12 : 2 (p = 0.013), which is not the
+  registered test.
+* Cause: of the eight inventions only one (append) is both recoverable and applicable to list goals. The
+  mechanism is limited by how many invertible operations the system has invented, not by the search.
+* The run shared the machine with the experience run of iteration 1 (8 processes on 4 cores); caps are process
+  CPU time, and all three arms were affected alike.
