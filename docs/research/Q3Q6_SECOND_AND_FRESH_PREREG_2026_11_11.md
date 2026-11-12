@@ -1,5 +1,5 @@
 # NEUMANN 1 | Pre-registration: SECOND evaluation (opened targets) and FRESH evaluation (never-opened pool)
-2026-11-11 | Plan `second`: BINDING (frozen 13:58:12 UTC, §6). Plan `fresh`: draft until its freeze commit | Global Q1–Q7 OPEN
+2026-11-11 | Plan `second`: BINDING (frozen 13:58:12 UTC, §6), COMPLETED 2026-11-12: [result](Q3Q6_SECOND_EVALUATION_RESULT_2026_11_12.md). Plan `fresh`: draft until its freeze commit | Global Q1–Q7 OPEN
 
 Authority: [Frozen North Star](frozen_north_star.md), issue #745, the FIRST pre-registration
 ([Q3Q6_INVENTION_CORE_PREREG_2026_11_11.md](Q3Q6_INVENTION_CORE_PREREG_2026_11_11.md)) and the owner's instructions

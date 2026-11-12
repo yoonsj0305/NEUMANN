@@ -1,0 +1,158 @@
+{
+ "assumptions": {
+  "lm_tokens_per_char": 0.25,
+  "ops_per_cpu_second_upper_bound": 10000000000.0,
+  "train_tokens": {
+   "GPT": 300000000000.0,
+   "PaLM": 780000000000.0
+  }
+ },
+ "lms": {
+  "BIG-G_128b_T=0": {
+   "C_not_perfect": 23,
+   "inference_flops_per_query_lower_bound_mean": 15242005064712.191,
+   "inference_per_query_over_C_per_task": 110.68583325150767,
+   "mean_exact_str_match": 0.248,
+   "params": 137702416384,
+   "perfect_and_C_solved": 5,
+   "perfect_not_C": 3,
+   "shots": 3,
+   "tasks_perfect": 8,
+   "tasks_scored": 125,
+   "training_flops_6ND": null
+  },
+  "BIG-G_1b_T=0": {
+   "C_not_perfect": 26,
+   "inference_flops_per_query_lower_bound_mean": 126109144252.416,
+   "inference_per_query_over_C_per_task": 0.9157913052088871,
+   "mean_exact_str_match": 0.1067,
+   "params": 1139320832,
+   "perfect_and_C_solved": 2,
+   "perfect_not_C": 2,
+   "shots": 3,
+   "tasks_perfect": 4,
+   "tasks_scored": 125,
+   "training_flops_6ND": null
+  },
+  "BIG-G_8b_T=0": {
+   "C_not_perfect": 24,
+   "inference_flops_per_query_lower_bound_mean": 965329366155.264,
+   "inference_per_query_over_C_per_task": 7.010120046634607,
+   "mean_exact_str_match": 0.176,
+   "params": 8721174528,
+   "perfect_and_C_solved": 4,
+   "perfect_not_C": 2,
+   "shots": 3,
+   "tasks_perfect": 6,
+   "tasks_scored": 125,
+   "training_flops_6ND": null
+  },
+  "GPT_GPT-3-13B": {
+   "C_not_perfect": 23,
+   "inference_flops_per_query_lower_bound_mean": 1438944000000.0,
+   "inference_per_query_over_C_per_task": 10.449459566904093,
+   "mean_exact_str_match": 0.232,
+   "params": 13000000000,
+   "perfect_and_C_solved": 5,
+   "perfect_not_C": 5,
+   "shots": 3,
+   "tasks_perfect": 10,
+   "tasks_scored": 125,
+   "training_flops_6ND": 2.34e+22,
+   "training_over_C_source": 308707124.0105541
+  },
+  "GPT_GPT-3-200B": {
+   "C_not_perfect": 24,
+   "inference_flops_per_query_lower_bound_mean": 22137600000000.0,
+   "inference_per_query_over_C_per_task": 160.76091641390914,
+   "mean_exact_str_match": 0.248,
+   "params": 200000000000,
+   "perfect_and_C_solved": 4,
+   "perfect_not_C": 4,
+   "shots": 3,
+   "tasks_perfect": 8,
+   "tasks_scored": 125,
+   "training_flops_6ND": 3.6e+23,
+   "training_over_C_source": 4749340369.39314
+  },
+  "PaLM_535b": {
+   "C_not_perfect": 18,
+   "inference_flops_per_query_lower_bound_mean": 88319940000000.0,
+   "inference_per_query_over_C_per_task": 641.3700894415596,
+   "mean_exact_str_match": 0.3627,
+   "params": 535000000000,
+   "perfect_and_C_solved": 10,
+   "perfect_not_C": 15,
+   "shots": 5,
+   "tasks_perfect": 25,
+   "tasks_scored": 125,
+   "training_flops_6ND": 2.5038e+24,
+   "training_over_C_source": 33031662269.129288
+  },
+  "PaLM_64b": {
+   "C_not_perfect": 20,
+   "inference_flops_per_query_lower_bound_mean": 10317205629566.977,
+   "inference_per_query_over_C_per_task": 74.9224591572677,
+   "mean_exact_str_match": 0.2933,
+   "params": 62496702464,
+   "perfect_and_C_solved": 8,
+   "perfect_not_C": 10,
+   "shots": 5,
+   "tasks_perfect": 18,
+   "tasks_scored": 125,
+   "training_flops_6ND": 2.9248456753152e+23,
+   "training_over_C_source": 3858635455.56095
+  },
+  "PaLM_8b": {
+   "C_not_perfect": 20,
+   "inference_flops_per_query_lower_bound_mean": 1425093076451.328,
+   "inference_per_query_over_C_per_task": 10.348875620908885,
+   "mean_exact_str_match": 0.2507,
+   "params": 8632532992,
+   "perfect_and_C_solved": 8,
+   "perfect_not_C": 4,
+   "shots": 5,
+   "tasks_perfect": 12,
+   "tasks_scored": 125,
+   "training_flops_6ND": 4.040025440256e+22,
+   "training_over_C_source": 532984886.5773087
+  }
+ },
+ "neumann": {
+  "A": {
+   "candidates": 21021850,
+   "cpu_seconds": 250.9,
+   "ops_upper_bound_per_task": 20073296000.0,
+   "ops_upper_bound_total": 2509162000000.0,
+   "solved_tasks": 25
+  },
+  "A4": {
+   "candidates": 77135758,
+   "cpu_seconds": 1059.4,
+   "ops_upper_bound_per_task": 84752120000.0,
+   "ops_upper_bound_total": 10594015000000.0,
+   "solved_tasks": 34
+  },
+  "B": {
+   "candidates": 19413775,
+   "cpu_seconds": 1773.1,
+   "ops_upper_bound_per_task": 141850896000.0,
+   "ops_upper_bound_total": 17731362000000.0,
+   "solved_tasks": 29
+  },
+  "C": {
+   "candidates": 18573711,
+   "cpu_seconds": 1721.3,
+   "ops_upper_bound_per_task": 137705112000.00003,
+   "ops_upper_bound_total": 17213139000000.002,
+   "solved_tasks": 28,
+   "source_investment_cpu_seconds_upper": 7580.0,
+   "source_investment_ops_upper": 75800000000000.0
+  }
+ },
+ "neumann_result": "docs/experiments/results/invention_second_result.json",
+ "neumann_result_label": "SECOND evaluation on targets opened by the INCOMPLETE FIRST run; not FIRST evidence",
+ "pin": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+ "schema": "neumann.compute-comparison.list-functions.v1",
+ "target_tasks": 125
+}
