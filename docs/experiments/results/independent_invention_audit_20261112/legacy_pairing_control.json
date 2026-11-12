@@ -1,0 +1,238 @@
+{
+  "legacy_false_pass": true,
+  "strict": {
+    "disjoint_equal_count_cohort_rejected": true,
+    "reason": "unregistered arm/id: ('S', 'rule/S0')"
+  },
+  "legacy_result": {
+    "alpha_per_test": 0.025,
+    "families": {
+      "dc": {
+        "V_only_vs_V0": {
+          "dc/V0": {
+            "cpu": 1.0,
+            "program": "nil"
+          },
+          "dc/V1": {
+            "cpu": 1.0,
+            "program": "nil"
+          },
+          "dc/V2": {
+            "cpu": 1.0,
+            "program": "nil"
+          },
+          "dc/V3": {
+            "cpu": 1.0,
+            "program": "nil"
+          },
+          "dc/V4": {
+            "cpu": 1.0,
+            "program": "nil"
+          },
+          "dc/V5": {
+            "cpu": 1.0,
+            "program": "nil"
+          },
+          "dc/V6": {
+            "cpu": 1.0,
+            "program": "nil"
+          }
+        },
+        "V_via": {
+          "fixture": 7
+        },
+        "V_vs_S": {
+          "S_only": 0,
+          "V_only": 7,
+          "mcnemar_p": 0.015625
+        },
+        "cpu_seconds": {
+          "S": 7.0,
+          "V": 7.0,
+          "V0": 7.0
+        },
+        "criterion": {
+          "J1": {
+            "V0_only": 0,
+            "V_only": 7,
+            "mcnemar_p": 0.015625,
+            "pass": true
+          },
+          "J2": {
+            "exclusive": [
+              "dc/V0",
+              "dc/V1",
+              "dc/V2",
+              "dc/V3",
+              "dc/V4",
+              "dc/V5",
+              "dc/V6"
+            ],
+            "pass": true
+          },
+          "J3": {
+            "cpu_V": 7.0,
+            "cpu_V0": 7.0,
+            "pass": true
+          }
+        },
+        "fit": {
+          "S": 0,
+          "V": 7,
+          "V0": 0
+        },
+        "pass": true,
+        "solved": {
+          "S": 0,
+          "V": 7,
+          "V0": 0
+        },
+        "solved_ids": {
+          "S": [],
+          "V": [
+            "dc/V0",
+            "dc/V1",
+            "dc/V2",
+            "dc/V3",
+            "dc/V4",
+            "dc/V5",
+            "dc/V6"
+          ],
+          "V0": []
+        },
+        "tasks": 7
+      },
+      "rule": {
+        "V_only_vs_V0": {
+          "rule/V0": {
+            "cpu": 1.0,
+            "program": "nil"
+          },
+          "rule/V1": {
+            "cpu": 1.0,
+            "program": "nil"
+          },
+          "rule/V2": {
+            "cpu": 1.0,
+            "program": "nil"
+          },
+          "rule/V3": {
+            "cpu": 1.0,
+            "program": "nil"
+          },
+          "rule/V4": {
+            "cpu": 1.0,
+            "program": "nil"
+          },
+          "rule/V5": {
+            "cpu": 1.0,
+            "program": "nil"
+          },
+          "rule/V6": {
+            "cpu": 1.0,
+            "program": "nil"
+          }
+        },
+        "V_via": {
+          "fixture": 7
+        },
+        "V_vs_S": {
+          "S_only": 0,
+          "V_only": 7,
+          "mcnemar_p": 0.015625
+        },
+        "cpu_seconds": {
+          "S": 7.0,
+          "V": 7.0,
+          "V0": 7.0
+        },
+        "criterion": {
+          "J1": {
+            "V0_only": 0,
+            "V_only": 7,
+            "mcnemar_p": 0.015625,
+            "pass": true
+          },
+          "J2": {
+            "exclusive": [
+              "rule/V0",
+              "rule/V1",
+              "rule/V2",
+              "rule/V3",
+              "rule/V4",
+              "rule/V5",
+              "rule/V6"
+            ],
+            "pass": true
+          },
+          "J3": {
+            "cpu_V": 7.0,
+            "cpu_V0": 7.0,
+            "pass": true
+          }
+        },
+        "fit": {
+          "S": 0,
+          "V": 7,
+          "V0": 0
+        },
+        "pass": true,
+        "solved": {
+          "S": 0,
+          "V": 7,
+          "V0": 0
+        },
+        "solved_ids": {
+          "S": [],
+          "V": [
+            "rule/V0",
+            "rule/V1",
+            "rule/V2",
+            "rule/V3",
+            "rule/V4",
+            "rule/V5",
+            "rule/V6"
+          ],
+          "V0": []
+        },
+        "tasks": 7
+      }
+    },
+    "inventions": [
+      "f0",
+      "f1",
+      "f2",
+      "f3",
+      "f4",
+      "f5",
+      "f6",
+      "f7"
+    ],
+    "iteration_pass": true,
+    "label": "iteration 2: inverted inventions",
+    "min_exclusive": 5,
+    "note": "development validation on opened TARGET list families; not evidence for any gate",
+    "recoverable_arguments": {
+      "f0": [
+        1
+      ],
+      "f2": [
+        1
+      ],
+      "f3": [
+        0,
+        1
+      ],
+      "f6": [
+        1
+      ],
+      "f7": [
+        0,
+        1
+      ]
+    },
+    "schema": "neumann.discovery-policy.iteration.v1"
+  },
+  "hardened_report_rejects": "incomplete/unexpected iteration-2 cohort: {'rule': 7, 'dc': 7}",
+  "historical_report_unchanged": true
+}
