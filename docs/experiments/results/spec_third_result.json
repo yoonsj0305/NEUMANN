@@ -1,0 +1,206 @@
+{
+ "families": {
+  "dc": {
+   "S_cpu_on_tasks_A@4_failed": {
+    "A@4_spent_each": 24.0,
+    "max": 3.8537,
+    "median": 0.397,
+    "n": 26
+   },
+   "S_fit": 163,
+   "S_solved_after_80pct_of_cap": 0,
+   "S_via": {
+    "chain": 24,
+    "search": 28,
+    "zfilter": 40,
+    "zmap": 59
+   },
+   "S_vs_A": {
+    "first_only": 27,
+    "mcnemar_p": 0.0,
+    "second_only": 1
+   },
+   "S_vs_A@4": {
+    "first_only": 26,
+    "mcnemar_p": 0.001319,
+    "second_only": 7
+   },
+   "ablations": {
+    "S_no_inverse": {
+     "first_only": 11,
+     "mcnemar_p": 0.006348,
+     "necessary": "SHOWN",
+     "second_only": 1
+    },
+    "S_no_state": {
+     "first_only": 2,
+     "mcnemar_p": 0.5,
+     "necessary": "NOT_SHOWN",
+     "second_only": 0
+    }
+   },
+   "cpu_S_le_A": true,
+   "cpu_on_tasks_both_solve": {
+    "A": 54.81,
+    "S": 34.55,
+    "n": 124
+   },
+   "cpu_seconds": {
+    "A": 438.7,
+    "A@4": 1506.6,
+    "S": 294.3,
+    "S_no_inverse": 326.6,
+    "S_no_state": 295.2
+   },
+   "exclusive": 26,
+   "reference_SECOND": {
+    "A": 115,
+    "A4": 129,
+    "B": 95,
+    "C": 119
+   },
+   "second_A4_solved_but_A@4_not": 0,
+   "solved": {
+    "A": 125,
+    "A@4": 132,
+    "S": 151,
+    "S_no_inverse": 141,
+    "S_no_state": 149
+   },
+   "verdict": "PASS"
+  },
+  "oeis": {
+   "S_cpu_on_tasks_A@4_failed": {
+    "A@4_spent_each": 24.0,
+    "max": 4.2402,
+    "median": 0.0414,
+    "n": 6
+   },
+   "S_fit": 23,
+   "S_solved_after_80pct_of_cap": 0,
+   "S_via": {
+    "inverse": 2,
+    "rec": 11
+   },
+   "S_vs_A": {
+    "first_only": 7,
+    "mcnemar_p": 0.015625,
+    "second_only": 0
+   },
+   "S_vs_A@4": {
+    "first_only": 6,
+    "mcnemar_p": 0.03125,
+    "second_only": 0
+   },
+   "ablations": {},
+   "cpu_S_le_A": true,
+   "cpu_on_tasks_both_solve": {
+    "A": 4.0,
+    "S": 0.82,
+    "n": 6
+   },
+   "cpu_seconds": {
+    "A": 1017.4,
+    "A@4": 4032.0,
+    "D": 0.0,
+    "S": 958.2
+   },
+   "exclusive": 1,
+   "reference_SECOND": {
+    "A": 4,
+    "A4": 6,
+    "B": 4,
+    "C": 5
+   },
+   "second_A4_solved_but_A@4_not": 0,
+   "solved": {
+    "A": 6,
+    "A@4": 7,
+    "D": 25,
+    "S": 13
+   },
+   "verdict": "FAIL"
+  },
+  "rule": {
+   "S_cpu_on_tasks_A@4_failed": {
+    "A@4_spent_each": 24.0,
+    "max": 5.7938,
+    "median": 0.0577,
+    "n": 27
+   },
+   "S_fit": 62,
+   "S_solved_after_80pct_of_cap": 1,
+   "S_via": {
+    "chain": 22,
+    "search": 5,
+    "zfilter": 24,
+    "zmap": 11
+   },
+   "S_vs_A": {
+    "first_only": 29,
+    "mcnemar_p": 0.0,
+    "second_only": 0
+   },
+   "S_vs_A@4": {
+    "first_only": 27,
+    "mcnemar_p": 0.0,
+    "second_only": 0
+   },
+   "ablations": {
+    "S_no_inverse": {
+     "first_only": 11,
+     "mcnemar_p": 0.000977,
+     "necessary": "SHOWN",
+     "second_only": 0
+    },
+    "S_no_state": {
+     "first_only": 17,
+     "mcnemar_p": 1.5e-05,
+     "necessary": "SHOWN",
+     "second_only": 0
+    }
+   },
+   "cpu_S_le_A": true,
+   "cpu_on_tasks_both_solve": {
+    "A": 33.01,
+    "S": 16.25,
+    "n": 33
+   },
+   "cpu_seconds": {
+    "A": 587.2,
+    "A@4": 2229.3,
+    "S": 419.2,
+    "S_no_inverse": 473.9,
+    "S_no_state": 511.4
+   },
+   "exclusive": 27,
+   "reference_SECOND": {
+    "A": 25,
+    "A4": 34,
+    "B": 29,
+    "C": 28
+   },
+   "second_A4_solved_but_A@4_not": 0,
+   "solved": {
+    "A": 33,
+    "A@4": 35,
+    "S": 62,
+    "S_no_inverse": 51,
+    "S_no_state": 45
+   },
+   "verdict": "PASS"
+  }
+ },
+ "freeze_sha256": "cab062fcb9571ce17baf00bd12df9213e7a629d6751cf99dd23bd5777711cad7",
+ "label": "THIRD evaluation on targets opened by FIRST/SECOND; not first-exposure evidence",
+ "schema": "neumann.q3q6.spec-third-result.v1",
+ "unresolved": [],
+ "verdict": {
+  "SECOND_verdicts": "UNCHANGED (FAIL)",
+  "THIRD_gate": "PASS",
+  "V_dc": "PASS",
+  "V_oeis": "FAIL",
+  "V_rule": "PASS",
+  "global_Q1_Q7": "OPEN"
+ }
+}

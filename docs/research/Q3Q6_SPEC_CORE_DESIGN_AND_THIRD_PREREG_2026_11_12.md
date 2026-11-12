@@ -1,5 +1,5 @@
 # NEUMANN 1 | Specification-space core: design, SOURCE-only development evidence, pre-registration of THIRD
-2026-11-12 | Plan `third`: BINDING from its freeze commit (§6) | SECOND verdicts: FAIL, sealed, unchanged | Global Q1–Q7 OPEN
+2026-11-12 | Plan `third`: BINDING from its freeze commit (§6), COMPLETED 06:24 UTC: [result](Q3Q6_THIRD_EVALUATION_RESULT_2026_11_12.md) | SECOND verdicts: FAIL, sealed, unchanged | Global Q1–Q7 OPEN
 
 Authority: [Frozen North Star](frozen_north_star.md); the owner's instruction of 2026-11-12 (keep SECOND's FAIL and
 all evidence immutable; do not run FRESH with the old core; design a state-representation and operation-generation
