@@ -100,8 +100,50 @@ proposer) solved 7 of the 68 tasks the THIRD core does not solve. If the experie
 K1 at p < 0.0125 (8 : 0 or better) is at the edge on lists; on sequences the bound is not yet known. The
 criterion is not adjusted to that.
 
+## 6b. Iteration 2 (defined before its run; added while iteration 1's experience run was still in progress)
+
+**Why now.** The experience run of iteration 1 finished its list half: with the untrained policy and 20× the test
+cap it solved 7 SOURCE list tasks beyond the THIRD core (3–55 CPU s each). A policy that only re-allocates and
+re-orders the same hypothesis space can amortise at most those. The binding limit is what the hypothesis space
+can express, not how it is searched. Iteration 1 is still completed and recorded as defined.
+
+**Idea.** SECOND: an invented operation used forward, as one more primitive, adds nothing. THIRD: an operation
+used backward, through its inverse, removes most of the search. So every operation the system invents is tested
+on self-generated data for recoverability of each argument from the result (`inverted.derive_op_inverses`); a
+recoverable argument turns the invention into a decomposition operator. Goals are decomposed recursively and
+every sub-goal is matched by hash against the forward bank (`inverted.RSearch`). The chain is:
+experience → invented operation → derived inverse → new decomposition → solved task.
+
+**Hypothesis H2.** The eight operations the system invented on SOURCE (the abstractions in
+`invention_core_frozen.json`, unchanged since before FIRST), once inverted, let the goal-directed search solve
+list tasks outside SOURCE that the same search without the inventions (V0) and the THIRD core (S) do not solve,
+at the same CPU cap.
+
+**Data.** Development validation: rule TARGET (125) and dc (199 usable). SECOND failed on these sets and they
+are development-only from now on; they can never again be first-exposure evidence. No task content was read to
+build the mechanism; it was built on SOURCE and self-authored tasks. Cap 6 CPU s per task.
+
+**Arms.** S (frozen THIRD core); V0 (recursive goal graph, primitive inverses only: the control with the
+inventions removed); V (V0 + inverted inventions). Self-play recoverability: f7 (append) both arguments, f3
+(power) both, f0 and f2 one each; of these only f7 has list arguments and acts on list goals.
+
+**Criterion J (all three, in both families).** Bonferroni over the two tests: exact McNemar p < 0.025.
+
+| | Condition |
+|---|---|
+| J1 | at least 5 tasks solved by V and not V0, and p < 0.025 |
+| J2 | at least 5 tasks solved by V and by neither V0 nor S |
+| J3 | total CPU(V) ≤ total CPU(V0) |
+
+**Stated in advance.** On SOURCE, where the inventions were learned (so not a clean test): V 62, V0 56, S 57;
+V only 6, V0 only 0, p = 0.031. None of the 6 was solved by the old core, so none is a replay. The same count on
+rule TARGET would miss J1 (6 : 0 gives p = 0.031; 7 : 0 is needed). The criterion is not adjusted to that.
+Integer goals (sequences) are not covered by this iteration; a PASS on lists would be followed by the same
+mechanism on integer goals, not by W4.
+
 ## 7. Iteration records
 
 | # | Hypothesis | Criterion | Result | Record |
 |---|---|---|---|---|
 | 1 | H1 | K1–K4, both domains | (pending) | (pending) |
+| 2 | H2 | J1–J3, both list families | (pending) | (pending) |
