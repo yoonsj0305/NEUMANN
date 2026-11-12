@@ -1,0 +1,67 @@
+{
+  "corrected_SOURCE_investment": {
+    "all_125_discovery_cpu_seconds": 405.1137,
+    "successful_57_cpu_seconds": 28.1955,
+    "failed_68_cpu_seconds": 376.9182,
+    "reason": "Primary donor-only investment/horizon fields omit failed SOURCE discovery. They are incomplete and must not be used for full-cost claims. Original result JSON remains unchanged."
+  },
+  "shared_inverse_discovery_investment_cpu_seconds": null,
+  "V_original_macro_training_investment_CPU_seconds": null,
+  "corrected_measured_SOURCE_inclusive_horizon_scenarios_seconds": {
+    "1": {
+      "B": 407.46236202184997,
+      "T": 407.4708946404,
+      "C": 407.576183780075,
+      "C-no-map": 407.47673405625,
+      "BudgetOnly": 412.10895314814996
+    },
+    "10": {
+      "B": 427.40862589849996,
+      "T": 427.49395208399994,
+      "C": 428.54684348075,
+      "C-no-map": 427.5523462425,
+      "BudgetOnly": 473.8745371615
+    },
+    "100": {
+      "B": 626.871264665,
+      "T": 627.7245265199999,
+      "C": 638.2534404875,
+      "C-no-map": 628.308468105,
+      "BudgetOnly": 1091.530377295
+    }
+  },
+  "horizon_scope": "accounting-only uniform recurrence, with every historical SOURCE attempt charged once; not actual warm-run measurements. Shared executor investment and OS/queue overhead remain UNKNOWN.",
+  "iso_capability_break_even": "NOT_ADMITTED: C and BudgetOnly solve different task sets; energy and full shared setup unmeasured",
+  "type_only_complete_audits": [
+    {
+      "receiver": "rule/c130",
+      "all_type_only_stage_application_counts": {
+        "zfilter": 870,
+        "ast": 24
+      },
+      "total_applications_tested": 894,
+      "TRAIN_fits": [],
+      "receiver_TEST_read": false,
+      "cpu_seconds": 0.046091617000000085,
+      "scope": "exhaustive finite T fragment/column/constant class only; not arbitrary typed composition or unlimited Q3 discovery"
+    }
+  ],
+  "failed_C_generalizations": [
+    {
+      "receiver": "rule/c116",
+      "program": "(foldlL (cons $1 $2) $0 (tail $0))",
+      "candidate_correspondence": null,
+      "via": "q3_fallback",
+      "classification": "TRAIN fit does not certify receiver preconditions/generalization"
+    },
+    {
+      "receiver": "rule/c099",
+      "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (lt 5 (div $0 8))>",
+      "candidate_correspondence": null,
+      "via": "q3_fallback",
+      "classification": "TRAIN fit does not certify receiver preconditions/generalization"
+    }
+  ],
+  "failure_diagnosis_boundary": "No-rule/no-fit may be finite preimage coverage or search/policy/budget; not a proof that no correspondence exists. Fit-but-wrong is a verified applicability/generalization failure.",
+  "primary_result_unchanged": true
+}
