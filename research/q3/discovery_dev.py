@@ -104,5 +104,69 @@ def cv(bigbench, oeis, cap, wake_rows, out):
     _run(cv_job, jobs, out, lambda r: (r["arm"], r["id"]))
 
 
+ALPHA = 0.05 / 4                  # Bonferroni over 2 domains x {C vs B, C vs A}
+MIN_EXCLUSIVE = 5
+
+
+def _vs(so, a, b):
+    w, l = len(so[a] - so[b]), len(so[b] - so[a])
+    return {"first_only": w, "second_only": l, "mcnemar_p": first.mcnemar(w, l)}
+
+
+def report(wake_rows, cv_rows, out, label):
+    """The pre-defined criterion K1-K4 per domain, and the immutable record of the iteration."""
+    import collections
+    pols, wrows = policies(wake_rows)
+    rows = [json.loads(l) for l in open(cv_rows)]
+    rec = {"schema": "neumann.discovery-policy.iteration.v1", "label": label,
+           "note": "SOURCE-only development; cross-validated; not evidence for any gate",
+           "alpha_per_test": ALPHA, "min_exclusive": MIN_EXCLUSIVE, "folds": FOLDS, "domains": {},
+           "experience": {}, "policy_fold0": {}}
+    for fam in ("rule", "oeis"):
+        ws = [r for r in wrows if r["id"].startswith(fam + "/")]
+        rec["experience"][fam] = {"tasks": len(ws), "cpu_seconds": round(sum(r["cpu_seconds"] for r in ws), 1),
+                                  "train_verified": sum(r["fit"] for r in ws),
+                                  "via": dict(collections.Counter(str(r["via"]) for r in ws if r["fit"]))}
+        by = {}
+        for r in rows:
+            if r["id"].startswith(fam + "/"):
+                by.setdefault(r["arm"], {})[r["id"]] = r
+        n = len(by["C"])
+        assert all(len(v) == n for v in by.values()), {a: len(v) for a, v in by.items()}
+        so = {a: {i for i, r in v.items() if r["solved"]} for a, v in by.items()}
+        cpu = {a: round(sum(r["cpu_seconds"] for r in v.values()), 1) for a, v in by.items()}
+        rivals = [a for a in ("A", "B", "S", "D") if a in by]
+        excl = sorted(so["C"] - set().union(*[so[a] for a in rivals]))
+        k = {"K1": _vs(so, "C", "B"), "K2": _vs(so, "C", "A")}
+        k["K1"]["pass"] = k["K1"]["first_only"] >= MIN_EXCLUSIVE and k["K1"]["mcnemar_p"] < ALPHA
+        k["K2"]["pass"] = len(so["C"]) > len(so["A"]) and k["K2"]["mcnemar_p"] < ALPHA
+        k["K3"] = {"exclusive": excl, "pass": len(excl) >= MIN_EXCLUSIVE}
+        k["K4"] = {"cpu_C": cpu["C"], "cpu_B": cpu["B"], "pass": cpu["C"] <= cpu["B"]}
+        rec["domains"][fam] = {
+            "tasks": n, "solved": {a: len(s) for a, s in so.items()}, "fit": {a: sum(r["fit"] for r in v.values()) for a, v in by.items()},
+            "cpu_seconds": cpu, "criterion": k, "pass": all(v["pass"] for v in k.values()),
+            "C_via": dict(collections.Counter(str(by["C"][i]["via"]) for i in so["C"])),
+            "C_vs_S": _vs(so, "C", "S"), "C_vs_Cw": _vs(so, "C", "Cw") if "Cw" in so else None,
+            "B_vs_A": _vs(so, "B", "A"), "A_vs_S": _vs(so, "A", "S"),
+            "C_only_vs_B": {i: {"via": by["C"][i]["via"], "program": by["C"][i]["program"]} for i in sorted(so["C"] - so["B"])},
+            "B_only_vs_C": sorted(so["B"] - so["C"]),
+            "solved_ids": {a: sorted(s) for a, s in so.items()}}
+    p0 = pols[0]
+    rec["policy_fold0"] = {"weights": {"/".join([k[0], k[1], ",".join(map(str, k[2]))]): round(v, 4)
+                                       for k, v in sorted(p0.weights.items(), key=lambda kv: -kv[1])},
+                           "features": [[ic.show(f), list(st), t] for f, st, t in p0.features],
+                           "memory_size": len(p0.memory), "cost_contexts": ["/".join(k) for k in sorted(p0.costs)]}
+    rec["iteration_pass"] = all(d["pass"] for d in rec["domains"].values())
+    import pathlib
+    pathlib.Path(out).write_text(json.dumps(rec, indent=1, sort_keys=True))
+    for fam, d in rec["domains"].items():
+        print(fam, d["solved"], "cpu", d["cpu_seconds"])
+        print("  ", {k: {x: y for x, y in v.items() if x != "exclusive"} for k, v in d["criterion"].items()},
+              "exclusive", len(d["criterion"]["K3"]["exclusive"]), "PASS" if d["pass"] else "FAIL")
+        print("   C via", d["C_via"], "C vs S", d["C_vs_S"], "C vs Cw", d["C_vs_Cw"])
+    print("experience", rec["experience"])
+    print("ITERATION", "PASS" if rec["iteration_pass"] else "FAIL")
+
+
 if __name__ == "__main__":
-    {"wake": wake, "cv": cv}[sys.argv[1]](*sys.argv[2:])
+    {"wake": wake, "cv": cv, "report": report}[sys.argv[1]](*sys.argv[2:])
