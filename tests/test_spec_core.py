@@ -1,5 +1,6 @@
 """Specification-space core: derived inverses are reproducible; each decomposition solves what it should;
-the baseline arm is the frozen enumerator; no decomposition is used when its switch is off."""
+the baseline arm is the frozen enumerator; no decomposition is used when its switch is off.
+Case analysis was deleted after the SOURCE ablation showed it added no solved task (North Star section 5)."""
 import json, pathlib, random, sys
 sys.path.insert(0, ".")
 from neumann1 import invention_core as ic, spec_core as sc
@@ -28,7 +29,7 @@ def test_derived_inverse_table_is_reproducible_and_self_generated():
 def test_chain_decomposition_solves_a_positional_edit_far_beyond_forward_search():
     t = _task(lambda x: (x[2], x[1], x[0], 4) + x[4:])
     r = sc.solve(t, 4, "S", INV)
-    assert r["solved"] and r["via"] in ("chain", "zmap", "zmap+split")
+    assert r["solved"] and r["via"] in ("chain", "zmap")
     assert not sc.solve(t, 4, "A", INV)["fit"]
     assert sc.solve(t, 4, "S_no_state", INV)["via"] == "chain"
     c = _task(lambda x: (18, 42, 77, 20, 36))
@@ -58,15 +59,11 @@ def test_sequence_as_self_referential_object():
         assert not sc.solve(t, 4, "S_no_state", INV)["solved"]
 
 
-def test_backward_step_with_a_derived_inverse_and_case_analysis():
+def test_backward_step_with_a_derived_inverse():
     ex = [((n,), n * n * n + 3 * n + 7) for n in range(20)]
     t = {"id": "p", "in_types": ["I"], "out_type": "I", "train": ex[:14], "test": ex[14:]}
     r = sc.solve(t, 4, "S_no_state", INV)
     assert r["solved"] and r["via"] in ("inverse", "search")
-    t = _task(lambda x: x[1:] if x[0] > 4 else (9,) + x)
-    r = sc.solve(t, 4, "S", INV)
-    assert r["fit"] and r["via"] == "split"
-    assert not sc.solve(t, 4, "S_no_split", INV)["fit"]
 
 
 def test_baseline_arm_is_the_frozen_enumerator():
@@ -74,3 +71,9 @@ def test_baseline_arm_is_the_frozen_enumerator():
     a = sc.solve(t, 4, "A", INV)
     b = ic.solve(t, budget=10 ** 6)
     assert a["sol"][1] == b["ast"] and a["candidates"] == b["candidates"] and a["via"] == "search"
+
+
+def test_chain_with_repeated_source_positions():
+    t = _task(lambda x: (x[1], x[0], x[1]) + x[3:])          # two head goals are the same vector
+    r = sc.solve(t, 4, "S_no_state", INV)
+    assert r["solved"] and r["via"] == "chain"

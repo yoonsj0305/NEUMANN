@@ -25,8 +25,8 @@ CODE = ("neumann1/spec_core.py", "neumann1/invention_core.py", "research/q3/spec
 CAP_S = 6.0                      # CPU seconds per task for every arm; "A@4" gets 4 x CAP_S
 WALL_CAP_S = 900.0               # operational safety cap only
 WORKERS = 4
-ARMS = {"rule": ["S", "A", "A@4", "S_no_state", "S_no_inverse", "S_no_split"],
-        "dc": ["S", "A", "A@4", "S_no_state", "S_no_inverse", "S_no_split"],
+ARMS = {"rule": ["S", "A", "A@4", "S_no_state", "S_no_inverse"],
+        "dc": ["S", "A", "A@4", "S_no_state", "S_no_inverse"],
         "oeis": ["S", "A", "A@4", "D"]}
 S_TYPE = ("S",)                  # arms whose unresolved rows are completed against the claim
 MIN_EXCLUSIVE = 5
@@ -155,7 +155,7 @@ def family_rule(cells, cpu, arms):
           and out["S_vs_A@4"]["mcnemar_p"] < 0.05 and out["exclusive"] >= MIN_EXCLUSIVE and out["cpu_S_le_A"])
     out["verdict"] = "PASS" if ok else "FAIL"
     out["ablations"] = {}
-    for ab in ("S_no_state", "S_no_inverse", "S_no_split"):
+    for ab in ("S_no_state", "S_no_inverse"):
         if ab in arms:
             v = versus(cells, "S", ab)
             v["necessary"] = "SHOWN" if n["S"] > n[ab] and v["mcnemar_p"] < 0.05 else "NOT_SHOWN"

@@ -1,0 +1,2611 @@
+{
+ "cap_cpu_seconds": 6.0,
+ "note": "development data (SOURCE splits) only; tuned on these tasks; not evidence for any gate",
+ "oeis": {
+  "S_rows": {
+   "oeis/A000007": {
+    "cpu_seconds": 0.0005,
+    "fit": true,
+    "program": "<rec n=$0 hist=$1 | 0>",
+    "solved": true,
+    "via": "rec"
+   },
+   "oeis/A000009": {
+    "cpu_seconds": 6.0017,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000013": {
+    "cpu_seconds": 6.0042,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000014": {
+    "cpu_seconds": 6.0025,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000015": {
+    "cpu_seconds": 6.0061,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000025": {
+    "cpu_seconds": 6.0007,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000027": {
+    "cpu_seconds": 0.0003,
+    "fit": true,
+    "program": "<rec n=$0 hist=$1 | $0>",
+    "solved": true,
+    "via": "rec"
+   },
+   "oeis/A000031": {
+    "cpu_seconds": 6.0234,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000038": {
+    "cpu_seconds": 0.0002,
+    "fit": true,
+    "program": "<rec n=$0 hist=$1 | 0>",
+    "solved": true,
+    "via": "rec"
+   },
+   "oeis/A000046": {
+    "cpu_seconds": 6.022,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000047": {
+    "cpu_seconds": 6.0057,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000051": {
+    "cpu_seconds": 0.0528,
+    "fit": true,
+    "program": "<rec n=$0 hist=$1 | (sub (mul 2 (head $1)) 1)>",
+    "solved": true,
+    "via": "rec"
+   },
+   "oeis/A000052": {
+    "cpu_seconds": 6.0052,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000053": {
+    "cpu_seconds": 6.0033,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000054": {
+    "cpu_seconds": 6.002,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000057": {
+    "cpu_seconds": 6.002,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000059": {
+    "cpu_seconds": 6.0029,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000063": {
+    "cpu_seconds": 6.1234,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000065": {
+    "cpu_seconds": 6.001,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000070": {
+    "cpu_seconds": 6.0004,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000074": {
+    "cpu_seconds": 6.1306,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000077": {
+    "cpu_seconds": 6.0515,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000078": {
+    "cpu_seconds": 6.0009,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000083": {
+    "cpu_seconds": 6.0004,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000084": {
+    "cpu_seconds": 6.0015,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000085": {
+    "cpu_seconds": 6.0005,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000087": {
+    "cpu_seconds": 6.0022,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000093": {
+    "cpu_seconds": 6.0405,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000103": {
+    "cpu_seconds": 6.0057,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000114": {
+    "cpu_seconds": 6.0031,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000115": {
+    "cpu_seconds": 3.7357,
+    "fit": true,
+    "program": "(add (div (div (mul $0 $0) 3) 8) (add 1 (div $0 2)))",
+    "solved": false,
+    "via": "inverse"
+   },
+   "oeis/A000118": {
+    "cpu_seconds": 6.0006,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000120": {
+    "cpu_seconds": 6.0007,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000125": {
+    "cpu_seconds": 6.0031,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000127": {
+    "cpu_seconds": 6.0035,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000135": {
+    "cpu_seconds": 6.0051,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000140": {
+    "cpu_seconds": 6.001,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000147": {
+    "cpu_seconds": 6.0008,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000151": {
+    "cpu_seconds": 6.0034,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000153": {
+    "cpu_seconds": 6.0021,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000159": {
+    "cpu_seconds": 6.0053,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000160": {
+    "cpu_seconds": 6.0028,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000168": {
+    "cpu_seconds": 6.003,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000172": {
+    "cpu_seconds": 6.0005,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000188": {
+    "cpu_seconds": 6.0006,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000189": {
+    "cpu_seconds": 6.0008,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000198": {
+    "cpu_seconds": 6.0031,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000199": {
+    "cpu_seconds": 6.0034,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000201": {
+    "cpu_seconds": 2.444,
+    "fit": true,
+    "program": "(sub (add $0 (sub $0 1)) (div (mul $0 3) 8))",
+    "solved": true,
+    "via": "inverse"
+   },
+   "oeis/A000203": {
+    "cpu_seconds": 6.0005,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000205": {
+    "cpu_seconds": 6.0007,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000208": {
+    "cpu_seconds": 6.1238,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000209": {
+    "cpu_seconds": 6.0006,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000210": {
+    "cpu_seconds": 0.3511,
+    "fit": true,
+    "program": "<rec n=$0 hist=$1 | (add $0 (div (mul $0 5) 7))>",
+    "solved": true,
+    "via": "rec"
+   },
+   "oeis/A000213": {
+    "cpu_seconds": 6.0018,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000216": {
+    "cpu_seconds": 6.0896,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000228": {
+    "cpu_seconds": 6.0009,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000233": {
+    "cpu_seconds": 6.0009,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000235": {
+    "cpu_seconds": 6.0004,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000238": {
+    "cpu_seconds": 6.0018,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000239": {
+    "cpu_seconds": 6.1129,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000243": {
+    "cpu_seconds": 6.0039,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000252": {
+    "cpu_seconds": 6.0024,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000253": {
+    "cpu_seconds": 6.0005,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000255": {
+    "cpu_seconds": 6.002,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000256": {
+    "cpu_seconds": 6.0003,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000257": {
+    "cpu_seconds": 6.0004,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000272": {
+    "cpu_seconds": 6.0006,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000276": {
+    "cpu_seconds": 6.001,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000294": {
+    "cpu_seconds": 6.0006,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000297": {
+    "cpu_seconds": 6.0014,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000302": {
+    "cpu_seconds": 0.0011,
+    "fit": true,
+    "program": "<rec n=$0 hist=$1 | (mul 4 (head $1))>",
+    "solved": true,
+    "via": "rec"
+   },
+   "oeis/A000307": {
+    "cpu_seconds": 6.0749,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000309": {
+    "cpu_seconds": 6.0021,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000312": {
+    "cpu_seconds": 0.3204,
+    "fit": true,
+    "program": "<rec n=$0 hist=$1 | (foldrI (mul $0 $3) 1 $1)>",
+    "solved": false,
+    "via": "rec"
+   },
+   "oeis/A000313": {
+    "cpu_seconds": 6.0426,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000325": {
+    "cpu_seconds": 4.2543,
+    "fit": true,
+    "program": "(sub (foldrI (add $2 $2) 1 (range $0)) $0)",
+    "solved": true,
+    "via": "inverse"
+   },
+   "oeis/A000327": {
+    "cpu_seconds": 6.0024,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000328": {
+    "cpu_seconds": 6.0014,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000334": {
+    "cpu_seconds": 6.0007,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000335": {
+    "cpu_seconds": 6.0004,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000340": {
+    "cpu_seconds": 6.0008,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000342": {
+    "cpu_seconds": 6.1237,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000347": {
+    "cpu_seconds": 6.0019,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000365": {
+    "cpu_seconds": 6.0172,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000366": {
+    "cpu_seconds": 6.0063,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000367": {
+    "cpu_seconds": 6.0035,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000376": {
+    "cpu_seconds": 6.0102,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000400": {
+    "cpu_seconds": 0.0008,
+    "fit": true,
+    "program": "<rec n=$0 hist=$1 | (mul 6 (head $1))>",
+    "solved": true,
+    "via": "rec"
+   },
+   "oeis/A000408": {
+    "cpu_seconds": 6.0016,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000412": {
+    "cpu_seconds": 6.0004,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000418": {
+    "cpu_seconds": 6.0017,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000419": {
+    "cpu_seconds": 6.1127,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000425": {
+    "cpu_seconds": 6.0241,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000430": {
+    "cpu_seconds": 6.0003,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000434": {
+    "cpu_seconds": 6.1216,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000439": {
+    "cpu_seconds": 6.0473,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000447": {
+    "cpu_seconds": 6.0005,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000450": {
+    "cpu_seconds": 6.0015,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000465": {
+    "cpu_seconds": 6.1408,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000467": {
+    "cpu_seconds": 6.0003,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000481": {
+    "cpu_seconds": 6.0003,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000482": {
+    "cpu_seconds": 6.0044,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000485": {
+    "cpu_seconds": 6.0017,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000491": {
+    "cpu_seconds": 6.0005,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000496": {
+    "cpu_seconds": 6.0223,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000498": {
+    "cpu_seconds": 6.0033,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000512": {
+    "cpu_seconds": 6.0014,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000520": {
+    "cpu_seconds": 0.0007,
+    "fit": true,
+    "program": "<rec n=$0 hist=$1 | 1>",
+    "solved": true,
+    "via": "rec"
+   },
+   "oeis/A000523": {
+    "cpu_seconds": 0.0058,
+    "fit": true,
+    "program": "<rec n=$0 hist=$1 | (add 2 (div $0 8))>",
+    "solved": true,
+    "via": "rec"
+   },
+   "oeis/A000527": {
+    "cpu_seconds": 6.0018,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000538": {
+    "cpu_seconds": 6.0191,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000545": {
+    "cpu_seconds": 6.0004,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000562": {
+    "cpu_seconds": 6.0019,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000563": {
+    "cpu_seconds": 6.0007,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000581": {
+    "cpu_seconds": 6.0018,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000584": {
+    "cpu_seconds": 2.3204,
+    "fit": true,
+    "program": "<rec n=$0 hist=$1 | (foldrI (mul $0 $3) $0 (range 4))>",
+    "solved": true,
+    "via": "rec"
+   },
+   "oeis/A000588": {
+    "cpu_seconds": 6.0011,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000590": {
+    "cpu_seconds": 6.0003,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000594": {
+    "cpu_seconds": 6.0023,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000597": {
+    "cpu_seconds": 6.0002,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000605": {
+    "cpu_seconds": 6.0009,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000624": {
+    "cpu_seconds": 6.0033,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000627": {
+    "cpu_seconds": 6.0011,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000630": {
+    "cpu_seconds": 6.0737,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000636": {
+    "cpu_seconds": 6.0026,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000648": {
+    "cpu_seconds": 6.0029,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000650": {
+    "cpu_seconds": 6.0008,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000660": {
+    "cpu_seconds": 6.116,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000661": {
+    "cpu_seconds": 6.0013,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000671": {
+    "cpu_seconds": 6.1207,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000673": {
+    "cpu_seconds": 6.0005,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000675": {
+    "cpu_seconds": 6.0052,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000689": {
+    "cpu_seconds": 0.0681,
+    "fit": true,
+    "program": "<rec n=$0 hist=$1 | (mul 2 (mod (head $1) 5))>",
+    "solved": true,
+    "via": "rec"
+   },
+   "oeis/A000693": {
+    "cpu_seconds": 6.0066,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000695": {
+    "cpu_seconds": 6.0338,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000703": {
+    "cpu_seconds": 6.0006,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000710": {
+    "cpu_seconds": 6.0004,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000713": {
+    "cpu_seconds": 6.0005,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000727": {
+    "cpu_seconds": 6.0016,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000729": {
+    "cpu_seconds": 6.0006,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000732": {
+    "cpu_seconds": 6.0022,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000736": {
+    "cpu_seconds": 6.0003,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000741": {
+    "cpu_seconds": 6.0007,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000746": {
+    "cpu_seconds": 6.0009,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000747": {
+    "cpu_seconds": 6.0008,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000750": {
+    "cpu_seconds": 6.0005,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000752": {
+    "cpu_seconds": 6.0005,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000755": {
+    "cpu_seconds": 6.0017,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000757": {
+    "cpu_seconds": 6.0016,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000758": {
+    "cpu_seconds": 6.0006,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000774": {
+    "cpu_seconds": 6.0007,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000775": {
+    "cpu_seconds": 6.0045,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000783": {
+    "cpu_seconds": 6.0003,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000784": {
+    "cpu_seconds": 6.0022,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000793": {
+    "cpu_seconds": 6.0007,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000799": {
+    "cpu_seconds": 6.002,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000800": {
+    "cpu_seconds": 6.0009,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000804": {
+    "cpu_seconds": 6.0471,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000822": {
+    "cpu_seconds": 6.0008,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000825": {
+    "cpu_seconds": 6.0003,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000828": {
+    "cpu_seconds": 6.0003,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000837": {
+    "cpu_seconds": 6.0007,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000865": {
+    "cpu_seconds": 0.0007,
+    "fit": true,
+    "program": "<rec n=$0 hist=$1 | (add 1 (head $1))>",
+    "solved": true,
+    "via": "rec"
+   },
+   "oeis/A000866": {
+    "cpu_seconds": 6.0002,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000867": {
+    "cpu_seconds": 6.0002,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000888": {
+    "cpu_seconds": 6.0003,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000910": {
+    "cpu_seconds": 6.1134,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000911": {
+    "cpu_seconds": 6.0003,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000922": {
+    "cpu_seconds": 6.0004,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000928": {
+    "cpu_seconds": 6.0007,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000929": {
+    "cpu_seconds": 3.5976,
+    "fit": true,
+    "program": "(add (div (div (mul $0 $0) 7) 7) (add 1 (div $0 3)))",
+    "solved": false,
+    "via": "inverse"
+   },
+   "oeis/A000931": {
+    "cpu_seconds": 6.0017,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000940": {
+    "cpu_seconds": 6.0028,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000943": {
+    "cpu_seconds": 6.0005,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000945": {
+    "cpu_seconds": 6.0005,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000959": {
+    "cpu_seconds": 6.0564,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000960": {
+    "cpu_seconds": 6.0022,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000962": {
+    "cpu_seconds": 6.0004,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000969": {
+    "cpu_seconds": 3.7675,
+    "fit": true,
+    "program": "(add (div (mul $0 (sub 5 $0)) 3) (add 1 (mul $0 $0)))",
+    "solved": true,
+    "via": "inverse"
+   },
+   "oeis/A000972": {
+    "cpu_seconds": 6.0005,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000973": {
+    "cpu_seconds": 6.002,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000980": {
+    "cpu_seconds": 6.0002,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000984": {
+    "cpu_seconds": 6.0005,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000992": {
+    "cpu_seconds": 6.0001,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000997": {
+    "cpu_seconds": 6.0024,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "oeis/A000999": {
+    "cpu_seconds": 6.0745,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   }
+  },
+  "S_vs_A": {
+   "first_only": 7,
+   "mcnemar_p": 0.015625,
+   "second_only": 0
+  },
+  "S_vs_D": {
+   "first_only": 3,
+   "mcnemar_p": 0.0002771615982055664,
+   "second_only": 21
+  },
+  "arms": {
+   "A": {
+    "cpu_seconds": 1072.8,
+    "fit": 10,
+    "solved": 8,
+    "solved_after_80pct_of_cap": 0,
+    "via": {
+     "search": 8
+    }
+   },
+   "D": {
+    "cpu_seconds": 0.0,
+    "fit": 33,
+    "solved": 33,
+    "solved_after_80pct_of_cap": 0,
+    "via": {
+     "None": 33
+    }
+   },
+   "S": {
+    "cpu_seconds": 1037.3,
+    "fit": 18,
+    "solved": 15,
+    "solved_after_80pct_of_cap": 0,
+    "via": {
+     "inverse": 3,
+     "rec": 12
+    }
+   }
+  },
+  "chain_solution_sizes": [],
+  "cpu_on_tasks_both_solve": {
+   "A": 6.1,
+   "S": 2.7,
+   "n": 8
+  },
+  "solved_ids": {
+   "A": [
+    "oeis/A000007",
+    "oeis/A000027",
+    "oeis/A000038",
+    "oeis/A000210",
+    "oeis/A000302",
+    "oeis/A000400",
+    "oeis/A000520",
+    "oeis/A000584"
+   ],
+   "D": [
+    "oeis/A000007",
+    "oeis/A000027",
+    "oeis/A000038",
+    "oeis/A000051",
+    "oeis/A000078",
+    "oeis/A000125",
+    "oeis/A000127",
+    "oeis/A000213",
+    "oeis/A000253",
+    "oeis/A000297",
+    "oeis/A000302",
+    "oeis/A000325",
+    "oeis/A000340",
+    "oeis/A000400",
+    "oeis/A000439",
+    "oeis/A000447",
+    "oeis/A000481",
+    "oeis/A000520",
+    "oeis/A000538",
+    "oeis/A000562",
+    "oeis/A000563",
+    "oeis/A000581",
+    "oeis/A000584",
+    "oeis/A000597",
+    "oeis/A000689",
+    "oeis/A000750",
+    "oeis/A000865",
+    "oeis/A000867",
+    "oeis/A000910",
+    "oeis/A000931",
+    "oeis/A000962",
+    "oeis/A000969",
+    "oeis/A000973"
+   ],
+   "S": [
+    "oeis/A000007",
+    "oeis/A000027",
+    "oeis/A000038",
+    "oeis/A000051",
+    "oeis/A000201",
+    "oeis/A000210",
+    "oeis/A000302",
+    "oeis/A000325",
+    "oeis/A000400",
+    "oeis/A000520",
+    "oeis/A000523",
+    "oeis/A000584",
+    "oeis/A000689",
+    "oeis/A000865",
+    "oeis/A000969"
+   ]
+  },
+  "tasks": 187
+ },
+ "rule": {
+  "S_cpu_on_tasks_A@4_failed": {
+   "A@4_total_on_same_tasks": 770.5,
+   "max": 2.4519,
+   "median": 0.0138,
+   "n": 32,
+   "total": 20.9
+  },
+  "S_rows": {
+   "rule/c002": {
+    "cpu_seconds": 0.0012,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (eq $1 2)>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c003": {
+    "cpu_seconds": 1.2033,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (eq $1 6)>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c006": {
+    "cpu_seconds": 0.0016,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (lt $1 2)>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c008": {
+    "cpu_seconds": 0.0015,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (lt $1 6)>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c009": {
+    "cpu_seconds": 0.0012,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (lt $1 6)>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c010": {
+    "cpu_seconds": 6.0072,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c012": {
+    "cpu_seconds": 0.2045,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (lt $1 (foldrI 4 $1 $3))>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c013": {
+    "cpu_seconds": 1.3099,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (eq 0 (div (sub $1 2) 5))>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c014": {
+    "cpu_seconds": 0.0005,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (lt 1 $1)>",
+    "solved": false,
+    "via": "zfilter"
+   },
+   "rule/c016": {
+    "cpu_seconds": 1.0937,
+    "fit": true,
+    "program": "<zmap e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (ifI (eq $1 1) 8 $0)>",
+    "solved": true,
+    "via": "zmap"
+   },
+   "rule/c018": {
+    "cpu_seconds": 1.4439,
+    "fit": true,
+    "program": "<zmap e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (ifI (eq $1 5) 3 $0)>",
+    "solved": true,
+    "via": "zmap"
+   },
+   "rule/c022": {
+    "cpu_seconds": 0.0005,
+    "fit": true,
+    "program": "(cons (head $0) (cons 5 (tail $0)))",
+    "solved": true,
+    "via": "chain"
+   },
+   "rule/c023": {
+    "cpu_seconds": 6.0083,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c024": {
+    "cpu_seconds": 1.1105,
+    "fit": true,
+    "program": "(cons (head $0) (cons (ifI (lt 4 (head $0)) 5 8) (tail $0)))",
+    "solved": true,
+    "via": "chain"
+   },
+   "rule/c025": {
+    "cpu_seconds": 0.0063,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (not (eq $1 1))>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c026": {
+    "cpu_seconds": 0.0052,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (not (eq $1 2))>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c027": {
+    "cpu_seconds": 6.009,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c028": {
+    "cpu_seconds": 0.0069,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (not (eq $1 2))>",
+    "solved": false,
+    "via": "zfilter"
+   },
+   "rule/c030": {
+    "cpu_seconds": 0.0014,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (lt 1 $2)>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c031": {
+    "cpu_seconds": 6.0059,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c033": {
+    "cpu_seconds": 2.4519,
+    "fit": true,
+    "program": "(cons (head (tail (tail (tail $0)))) (cons (head (tail $0)) (cons (head (tail (tail $0))) (cons (head $0) (tail (tail (tail (tail $0))))))))",
+    "solved": true,
+    "via": "chain"
+   },
+   "rule/c036": {
+    "cpu_seconds": 6.0077,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c038": {
+    "cpu_seconds": 3.1326,
+    "fit": true,
+    "program": "(foldrL (cons $1 $2) (cons 9 nil) $0)",
+    "solved": true,
+    "via": "search"
+   },
+   "rule/c039": {
+    "cpu_seconds": 6.0085,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c040": {
+    "cpu_seconds": 6.0051,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c041": {
+    "cpu_seconds": 0.0002,
+    "fit": true,
+    "program": "(cons 9 nil)",
+    "solved": true,
+    "via": "chain"
+   },
+   "rule/c044": {
+    "cpu_seconds": 0.0004,
+    "fit": true,
+    "program": "(cons 1 (cons 9 (cons 4 (cons 3 (cons 2 (cons 5 (cons 8 (cons 0 (cons 4 (cons 9 nil))))))))))",
+    "solved": true,
+    "via": "chain"
+   },
+   "rule/c045": {
+    "cpu_seconds": 0.0002,
+    "fit": true,
+    "program": "<zmap e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | $0>",
+    "solved": true,
+    "via": "zmap"
+   },
+   "rule/c047": {
+    "cpu_seconds": 0.0002,
+    "fit": true,
+    "program": "(cons 9 (cons 6 (cons 3 (cons 8 (cons 5 $0)))))",
+    "solved": true,
+    "via": "chain"
+   },
+   "rule/c049": {
+    "cpu_seconds": 0.0007,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (lt 0 $1)>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c053": {
+    "cpu_seconds": 2.4179,
+    "fit": true,
+    "program": "(cons (head $0) (cons (head $0) (tail (tail $0))))",
+    "solved": false,
+    "via": "chain"
+   },
+   "rule/c054": {
+    "cpu_seconds": 2.4201,
+    "fit": true,
+    "program": "(cons (head (tail (tail $0))) (cons (head (tail (tail $0))) (tail (tail $0))))",
+    "solved": true,
+    "via": "chain"
+   },
+   "rule/c055": {
+    "cpu_seconds": 6.0096,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c056": {
+    "cpu_seconds": 0.0039,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (not (eq $1 4))>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c057": {
+    "cpu_seconds": 6.0534,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c060": {
+    "cpu_seconds": 1.0739,
+    "fit": true,
+    "program": "(cons (head (tail (tail $0))) (cons (head (tail $0)) (cons (head $0) (cons 4 (cons (head (tail (tail (tail (tail $0))))) (cons (head (foldrL (tail $2) $0 (range 6))) nil))))))",
+    "solved": true,
+    "via": "chain"
+   },
+   "rule/c061": {
+    "cpu_seconds": 0.0005,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (isnil $4)>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c062": {
+    "cpu_seconds": 0.0008,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (lt 0 $2)>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c063": {
+    "cpu_seconds": 0.0016,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (lt (head $5) $1)>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c067": {
+    "cpu_seconds": 6.0097,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c068": {
+    "cpu_seconds": 6.0077,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c071": {
+    "cpu_seconds": 0.0007,
+    "fit": true,
+    "program": "<zmap e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (add $0 2)>",
+    "solved": true,
+    "via": "zmap"
+   },
+   "rule/c073": {
+    "cpu_seconds": 0.0344,
+    "fit": true,
+    "program": "<zmap e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (add $0 (add $1 1))>",
+    "solved": true,
+    "via": "zmap"
+   },
+   "rule/c075": {
+    "cpu_seconds": 0.014,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (eq 0 (mod $1 2))>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c082": {
+    "cpu_seconds": 0.0007,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (eq $1 2)>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c083": {
+    "cpu_seconds": 0.0011,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (eq $1 6)>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c084": {
+    "cpu_seconds": 0.0008,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (eq $1 6)>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c086": {
+    "cpu_seconds": 2.4287,
+    "fit": true,
+    "program": "(cons (head (tail (tail (tail $0)))) (cons (head (tail $0)) (cons (head (tail (tail $0))) (cons (head $0) (tail (tail (tail (tail $0))))))))",
+    "solved": true,
+    "via": "chain"
+   },
+   "rule/c087": {
+    "cpu_seconds": 2.4213,
+    "fit": true,
+    "program": "(cons (head $0) (cons (head (tail (tail $0))) (cons (head (tail $0)) (tail (tail (tail $0))))))",
+    "solved": true,
+    "via": "chain"
+   },
+   "rule/c088": {
+    "cpu_seconds": 2.4278,
+    "fit": true,
+    "program": "(cons (head (tail (tail (tail $0)))) (cons (head (tail (tail $0))) (cons (head (tail $0)) (cons (head $0) (tail (tail (tail (tail $0))))))))",
+    "solved": true,
+    "via": "chain"
+   },
+   "rule/c090": {
+    "cpu_seconds": 0.0004,
+    "fit": true,
+    "program": "(cons 18 (cons 42 (cons 77 (cons 20 (cons 36 nil)))))",
+    "solved": true,
+    "via": "chain"
+   },
+   "rule/c091": {
+    "cpu_seconds": 0.0004,
+    "fit": true,
+    "program": "(cons 81 (cons 99 (cons 41 (cons 23 (cons 22 (cons 75 (cons 68 (cons 30 (cons 24 (cons 69 nil))))))))))",
+    "solved": true,
+    "via": "chain"
+   },
+   "rule/c097": {
+    "cpu_seconds": 6.0305,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c099": {
+    "cpu_seconds": 0.0268,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (lt 5 (div $0 8))>",
+    "solved": false,
+    "via": "zfilter"
+   },
+   "rule/c102": {
+    "cpu_seconds": 0.0002,
+    "fit": true,
+    "program": "<zmap e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | $0>",
+    "solved": true,
+    "via": "zmap"
+   },
+   "rule/c105": {
+    "cpu_seconds": 6.0028,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c106": {
+    "cpu_seconds": 6.0066,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c108": {
+    "cpu_seconds": 0.0969,
+    "fit": true,
+    "program": "(cons (foldrI (add $1 $2) 0 $0) nil)",
+    "solved": true,
+    "via": "chain"
+   },
+   "rule/c109": {
+    "cpu_seconds": 0.1004,
+    "fit": true,
+    "program": "(cons (foldrI (mul $1 $2) 1 $0) nil)",
+    "solved": true,
+    "via": "chain"
+   },
+   "rule/c116": {
+    "cpu_seconds": 0.466,
+    "fit": true,
+    "program": "(foldlL (cons $1 $2) $0 (tail $0))",
+    "solved": false,
+    "via": "search"
+   },
+   "rule/c117": {
+    "cpu_seconds": 6.0086,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c120": {
+    "cpu_seconds": 0.0008,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (isnil $3)>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c123": {
+    "cpu_seconds": 6.0082,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c127": {
+    "cpu_seconds": 0.0007,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (lt 0 $2)>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c130": {
+    "cpu_seconds": 6.0064,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c131": {
+    "cpu_seconds": 6.0078,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c132": {
+    "cpu_seconds": 0.0047,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (not (eq $1 2))>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c134": {
+    "cpu_seconds": 6.0207,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c135": {
+    "cpu_seconds": 6.0076,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c137": {
+    "cpu_seconds": 0.005,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (not (eq $0 3))>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c140": {
+    "cpu_seconds": 1.1533,
+    "fit": true,
+    "program": "<zmap e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (ifI (eq $1 1) 9 $0)>",
+    "solved": true,
+    "via": "zmap"
+   },
+   "rule/c142": {
+    "cpu_seconds": 6.0009,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c145": {
+    "cpu_seconds": 0.0005,
+    "fit": true,
+    "program": "<zmap e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (head $5)>",
+    "solved": true,
+    "via": "zmap"
+   },
+   "rule/c147": {
+    "cpu_seconds": 6.064,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c148": {
+    "cpu_seconds": 6.0117,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c149": {
+    "cpu_seconds": 0.2279,
+    "fit": true,
+    "program": "(tail (map (mul $1 (head $0)) $0))",
+    "solved": true,
+    "via": "search"
+   },
+   "rule/c152": {
+    "cpu_seconds": 6.0085,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c153": {
+    "cpu_seconds": 6.0086,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c154": {
+    "cpu_seconds": 6.0056,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c155": {
+    "cpu_seconds": 0.0395,
+    "fit": true,
+    "program": "<zmap e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (add $0 (mul $0 $1))>",
+    "solved": true,
+    "via": "zmap"
+   },
+   "rule/c157": {
+    "cpu_seconds": 6.0142,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c158": {
+    "cpu_seconds": 6.0081,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c159": {
+    "cpu_seconds": 6.0231,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c162": {
+    "cpu_seconds": 0.058,
+    "fit": true,
+    "program": "<zmap e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (add 7 (mul $0 3))>",
+    "solved": true,
+    "via": "zmap"
+   },
+   "rule/c166": {
+    "cpu_seconds": 6.0089,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c170": {
+    "cpu_seconds": 0.0102,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (eq 0 (mul $1 $2))>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c171": {
+    "cpu_seconds": 2.1286,
+    "fit": true,
+    "program": "<zmap e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (foldrI (add $6 $7) $0 $3)>",
+    "solved": true,
+    "via": "zmap"
+   },
+   "rule/c173": {
+    "cpu_seconds": 6.0147,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c175": {
+    "cpu_seconds": 6.0074,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c176": {
+    "cpu_seconds": 6.017,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c178": {
+    "cpu_seconds": 6.0072,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c181": {
+    "cpu_seconds": 6.0069,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c185": {
+    "cpu_seconds": 6.0082,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c186": {
+    "cpu_seconds": 0.0031,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (lt (head $5) $0)>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c188": {
+    "cpu_seconds": 6.0053,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c189": {
+    "cpu_seconds": 6.0123,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c190": {
+    "cpu_seconds": 6.01,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c191": {
+    "cpu_seconds": 6.0101,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c192": {
+    "cpu_seconds": 0.1679,
+    "fit": true,
+    "program": "<zmap e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (div (div $0 2) 5)>",
+    "solved": true,
+    "via": "zmap"
+   },
+   "rule/c194": {
+    "cpu_seconds": 6.0132,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c197": {
+    "cpu_seconds": 6.0077,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c198": {
+    "cpu_seconds": 6.013,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c201": {
+    "cpu_seconds": 6.0118,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c204": {
+    "cpu_seconds": 6.0094,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c205": {
+    "cpu_seconds": 6.0152,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c206": {
+    "cpu_seconds": 6.0087,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c208": {
+    "cpu_seconds": 1.3411,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (lt $2 (foldlI $6 $0 $4))>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c211": {
+    "cpu_seconds": 6.0105,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c214": {
+    "cpu_seconds": 6.0065,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c218": {
+    "cpu_seconds": 1.3072,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (eq $0 (foldlI $6 $1 $3))>",
+    "solved": false,
+    "via": "zfilter"
+   },
+   "rule/c219": {
+    "cpu_seconds": 0.0138,
+    "fit": true,
+    "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (eq 0 (mod $2 2))>",
+    "solved": true,
+    "via": "zfilter"
+   },
+   "rule/c222": {
+    "cpu_seconds": 0.0409,
+    "fit": true,
+    "program": "<zmap e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (add $1 (add $2 1))>",
+    "solved": true,
+    "via": "zmap"
+   },
+   "rule/c226": {
+    "cpu_seconds": 6.0063,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c227": {
+    "cpu_seconds": 6.0119,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c229": {
+    "cpu_seconds": 6.0175,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c232": {
+    "cpu_seconds": 6.0012,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c235": {
+    "cpu_seconds": 6.0019,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c237": {
+    "cpu_seconds": 6.0128,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c238": {
+    "cpu_seconds": 6.0067,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c239": {
+    "cpu_seconds": 6.0082,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c241": {
+    "cpu_seconds": 6.0096,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c242": {
+    "cpu_seconds": 6.0125,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c244": {
+    "cpu_seconds": 6.0099,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c248": {
+    "cpu_seconds": 6.0068,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   },
+   "rule/c249": {
+    "cpu_seconds": 6.0076,
+    "fit": false,
+    "program": null,
+    "solved": false,
+    "via": null
+   }
+  },
+  "S_vs_A": {
+   "first_only": 36,
+   "mcnemar_p": 5.529727786779404e-10,
+   "second_only": 1
+  },
+  "S_vs_A@4": {
+   "first_only": 32,
+   "mcnemar_p": 7.916241884231567e-09,
+   "second_only": 1
+  },
+  "S_vs_S_no_inverse": {
+   "first_only": 11,
+   "mcnemar_p": 0.0009765625,
+   "second_only": 0
+  },
+  "S_vs_S_no_state": {
+   "first_only": 21,
+   "mcnemar_p": 1.0967254638671875e-05,
+   "second_only": 1
+  },
+  "arms": {
+   "A": {
+    "cpu_seconds": 616.1,
+    "fit": 25,
+    "solved": 22,
+    "solved_after_80pct_of_cap": 0,
+    "via": {
+     "search": 22
+    }
+   },
+   "A@4": {
+    "cpu_seconds": 2342.8,
+    "fit": 30,
+    "solved": 26,
+    "solved_after_80pct_of_cap": 0,
+    "via": {
+     "search": 26
+    }
+   },
+   "S": {
+    "cpu_seconds": 405.1,
+    "fit": 63,
+    "solved": 57,
+    "solved_after_80pct_of_cap": 0,
+    "via": {
+     "chain": 15,
+     "search": 2,
+     "zfilter": 27,
+     "zmap": 13
+    }
+   },
+   "S_no_inverse": {
+    "cpu_seconds": 463.0,
+    "fit": 51,
+    "solved": 46,
+    "solved_after_80pct_of_cap": 0,
+    "via": {
+     "search": 6,
+     "zfilter": 27,
+     "zmap": 13
+    }
+   },
+   "S_no_state": {
+    "cpu_seconds": 505.8,
+    "fit": 43,
+    "solved": 37,
+    "solved_after_80pct_of_cap": 0,
+    "via": {
+     "chain": 25,
+     "search": 12
+    }
+   }
+  },
+  "chain_solution_sizes": [
+   3,
+   7,
+   8,
+   8,
+   11,
+   11,
+   13,
+   13,
+   16,
+   21,
+   21,
+   23,
+   23,
+   23,
+   30
+  ],
+  "cpu_on_tasks_both_solve": {
+   "A": 12.0,
+   "S": 6.1,
+   "n": 21
+  },
+  "solved_ids": {
+   "A": [
+    "rule/c006",
+    "rule/c016",
+    "rule/c022",
+    "rule/c025",
+    "rule/c038",
+    "rule/c041",
+    "rule/c045",
+    "rule/c049",
+    "rule/c061",
+    "rule/c071",
+    "rule/c102",
+    "rule/c108",
+    "rule/c109",
+    "rule/c120",
+    "rule/c137",
+    "rule/c140",
+    "rule/c145",
+    "rule/c149",
+    "rule/c162",
+    "rule/c186",
+    "rule/c192",
+    "rule/c218"
+   ],
+   "A@4": [
+    "rule/c003",
+    "rule/c006",
+    "rule/c016",
+    "rule/c022",
+    "rule/c025",
+    "rule/c038",
+    "rule/c041",
+    "rule/c045",
+    "rule/c049",
+    "rule/c061",
+    "rule/c071",
+    "rule/c083",
+    "rule/c102",
+    "rule/c108",
+    "rule/c109",
+    "rule/c120",
+    "rule/c137",
+    "rule/c140",
+    "rule/c145",
+    "rule/c149",
+    "rule/c162",
+    "rule/c170",
+    "rule/c186",
+    "rule/c192",
+    "rule/c218",
+    "rule/c222"
+   ],
+   "S": [
+    "rule/c002",
+    "rule/c003",
+    "rule/c006",
+    "rule/c008",
+    "rule/c009",
+    "rule/c012",
+    "rule/c013",
+    "rule/c016",
+    "rule/c018",
+    "rule/c022",
+    "rule/c024",
+    "rule/c025",
+    "rule/c026",
+    "rule/c030",
+    "rule/c033",
+    "rule/c038",
+    "rule/c041",
+    "rule/c044",
+    "rule/c045",
+    "rule/c047",
+    "rule/c049",
+    "rule/c054",
+    "rule/c056",
+    "rule/c060",
+    "rule/c061",
+    "rule/c062",
+    "rule/c063",
+    "rule/c071",
+    "rule/c073",
+    "rule/c075",
+    "rule/c082",
+    "rule/c083",
+    "rule/c084",
+    "rule/c086",
+    "rule/c087",
+    "rule/c088",
+    "rule/c090",
+    "rule/c091",
+    "rule/c102",
+    "rule/c108",
+    "rule/c109",
+    "rule/c120",
+    "rule/c127",
+    "rule/c132",
+    "rule/c137",
+    "rule/c140",
+    "rule/c145",
+    "rule/c149",
+    "rule/c155",
+    "rule/c162",
+    "rule/c170",
+    "rule/c171",
+    "rule/c186",
+    "rule/c192",
+    "rule/c208",
+    "rule/c219",
+    "rule/c222"
+   ],
+   "S_no_inverse": [
+    "rule/c002",
+    "rule/c003",
+    "rule/c006",
+    "rule/c008",
+    "rule/c009",
+    "rule/c012",
+    "rule/c013",
+    "rule/c016",
+    "rule/c018",
+    "rule/c022",
+    "rule/c025",
+    "rule/c026",
+    "rule/c030",
+    "rule/c038",
+    "rule/c041",
+    "rule/c045",
+    "rule/c049",
+    "rule/c056",
+    "rule/c061",
+    "rule/c062",
+    "rule/c063",
+    "rule/c071",
+    "rule/c073",
+    "rule/c075",
+    "rule/c082",
+    "rule/c083",
+    "rule/c084",
+    "rule/c102",
+    "rule/c108",
+    "rule/c109",
+    "rule/c120",
+    "rule/c127",
+    "rule/c132",
+    "rule/c137",
+    "rule/c140",
+    "rule/c145",
+    "rule/c149",
+    "rule/c155",
+    "rule/c162",
+    "rule/c170",
+    "rule/c171",
+    "rule/c186",
+    "rule/c192",
+    "rule/c208",
+    "rule/c219",
+    "rule/c222"
+   ],
+   "S_no_state": [
+    "rule/c003",
+    "rule/c006",
+    "rule/c016",
+    "rule/c022",
+    "rule/c024",
+    "rule/c025",
+    "rule/c033",
+    "rule/c038",
+    "rule/c041",
+    "rule/c044",
+    "rule/c045",
+    "rule/c047",
+    "rule/c049",
+    "rule/c054",
+    "rule/c060",
+    "rule/c061",
+    "rule/c071",
+    "rule/c083",
+    "rule/c086",
+    "rule/c087",
+    "rule/c088",
+    "rule/c090",
+    "rule/c091",
+    "rule/c102",
+    "rule/c108",
+    "rule/c109",
+    "rule/c120",
+    "rule/c132",
+    "rule/c137",
+    "rule/c140",
+    "rule/c145",
+    "rule/c149",
+    "rule/c162",
+    "rule/c170",
+    "rule/c186",
+    "rule/c192",
+    "rule/c218"
+   ]
+  },
+  "tasks": 125
+ },
+ "schema": "neumann.spec-core.dev-source.v1"
+}

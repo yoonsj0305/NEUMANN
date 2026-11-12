@@ -1,0 +1,46 @@
+{
+ "arms": {
+  "dc": [
+   "S",
+   "A",
+   "A@4",
+   "S_no_state",
+   "S_no_inverse"
+  ],
+  "oeis": [
+   "S",
+   "A",
+   "A@4",
+   "D"
+  ],
+  "rule": [
+   "S",
+   "A",
+   "A@4",
+   "S_no_state",
+   "S_no_inverse"
+  ]
+ },
+ "cap_cpu_seconds": 6.0,
+ "code_sha256": {
+  "docs/experiments/results/spec_core_inverses.json": "0c74e8c5a5ee32dee09cda96d05a8651a9ac93de32b36fb3bcf4b31154008c2e",
+  "neumann1/invention_core.py": "e94ce5264e2ebffdac006cb44f8e11e36e7822cdb7bf3cbc00eb61448ae3614c",
+  "neumann1/spec_core.py": "7213ba3163691737d8345667be55349776205cff2d0f483423c73720962008f2",
+  "research/q3/checkpoint_runner.py": "ae26d0feaf3fe47bdb43e62c400ee53683644f154b518232d037775b96c94138",
+  "research/q3/invention_eval2.py": "480bff21aaa2edceea544c8850131bd3b85aae513009b4029c8d82ca13f6ae90",
+  "research/q3/invention_first.py": "c9d91428424a0654c9b1ce79d4c4c257288480e8978da00237aa1b187986ad2d",
+  "research/q3/sequence_specialist.py": "113b347eb9d3b214c5633ba46cbf34990ec19f09e6cc0081bc54c4261efd03ce",
+  "research/q3/spec_eval.py": "ec6c6af33422d21dae5bce55f35914d9d283a816782847a6ba08e2ffc2c78115"
+ },
+ "created_utc": "2026-11-12T05:27:37Z",
+ "first_registry_sha256": "2e2e18fea860f506ddf0e5c8a767eafd47e613b1ef2c0f365651fc1c4f7a789c",
+ "freeze_sha256": "cab062fcb9571ce17baf00bd12df9213e7a629d6751cf99dd23bd5777711cad7",
+ "label": "THIRD evaluation on targets opened by FIRST/SECOND; not first-exposure evidence",
+ "min_exclusive": 5,
+ "rule": "V_f: solved(S) > solved(A) and > solved(A@4); exact two-sided McNemar p < 0.05 vs both; >= 5 tasks solved by S and by none of A, A@4 (and D on oeis); total CPU(S) <= total CPU(A). Gate = V_rule and V_dc.  Ablations: S > ablation with McNemar p < 0.05, else NOT_SHOWN.",
+ "schema": "neumann.q3q6.spec-third-freeze.v1",
+ "strong_baseline_cap_multiple": 4,
+ "unresolved_policy": "adverse/favourable completion, three-valued verdict",
+ "wall_cap_s": 900.0,
+ "workers": 4
+}

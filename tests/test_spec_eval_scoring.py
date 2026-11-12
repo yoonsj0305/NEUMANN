@@ -30,8 +30,7 @@ def _write(tmp_path, monkeypatch, fams, drop=(), cpu=None):
 def _fam(n=60, s=40, a=15, a4=20, extra=True):
     d = {"S": [i < s for i in range(n)], "A": [i < a for i in range(n)], "A@4": [i < a4 for i in range(n)]}
     if extra:
-        d.update({"S_no_state": [i < a4 for i in range(n)], "S_no_inverse": [i < s - 1 for i in range(n)],
-                  "S_no_split": [i < s for i in range(n)]})
+        d.update({"S_no_state": [i < a4 for i in range(n)], "S_no_inverse": [i < s - 1 for i in range(n)]})
     return d
 
 
@@ -44,7 +43,7 @@ def test_registered_rule_and_gate(tmp_path, monkeypatch):
     assert r["families"]["oeis"]["exclusive"] == 10 and r["families"]["oeis"]["verdict"] == "PASS"
     ab = r["families"]["rule"]["ablations"]
     assert ab["S_no_state"]["necessary"] == "SHOWN" and ab["S_no_inverse"]["necessary"] == "NOT_SHOWN"
-    assert ab["S_no_split"]["necessary"] == "NOT_SHOWN" and r["verdict"]["SECOND_verdicts"].startswith("UNCHANGED")
+    assert r["verdict"]["SECOND_verdicts"].startswith("UNCHANGED")
     fams["dc"] = _fam(s=22, a=15, a4=20)                       # more solved, but not significant vs A@4
     _write(tmp_path, monkeypatch, fams)
     r = se.score()

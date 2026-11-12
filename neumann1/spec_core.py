@@ -37,25 +37,18 @@ class Done(Exception):
         self.sol, self.via = sol, via
 
 
-def _bits(n):
-    return bin(n).count("1")
-
-
 # ---------------------------------------------------------------- search
 class GSearch(ic.Search):
     """The frozen forward enumerator plus: a CPU deadline, a table of goal vectors matched by hash against
-    every kept top-level value, backward goals for integer targets, and partial-match bookkeeping."""
+    every kept top-level value, and backward goals for integer targets."""
 
-    def __init__(self, lib, in_types, out_type, examples, deadline, consts=(), inv=None, split=False,
-                 min_support=2, accept=None, max_cands=10 ** 12):
+    def __init__(self, lib, in_types, out_type, examples, deadline, consts=(), inv=None, accept=None,
+                 max_cands=10 ** 12):
         super().__init__(lib, ic.uniform_costs(), in_types, out_type, examples, max_cands, consts=consts)
         self.deadline = deadline
         self.goals = {}
         self.inv = inv
-        self.split, self.min_support = split, min_support
         self.accept = accept
-        self.full = (1 << len(examples)) - 1
-        self.masks, self.preds = {}, []
         self.by, self.nback = {}, 0
         self.types = (out_type,)
         self.goals[(out_type, self.target)] = self._root
@@ -91,16 +84,6 @@ class GSearch(ic.Search):
             if self.nback < 300:
                 self.nback += 1
                 self._backward(e)
-        if self.split:
-            if t == self.out_type:
-                m = 0
-                for i, (a, b) in enumerate(zip(v, self.target)):
-                    if a == b:
-                        m |= 1 << i
-                if m and m not in self.masks and len(self.masks) < 600:
-                    self.masks[m] = e
-            elif t == T_B and len(self.preds) < 600 and None not in v:
-                self.preds.append(e)
 
     # -- structural decomposition of a list target with the derived inverse of cons
     def _chain(self):
@@ -135,25 +118,24 @@ class GSearch(ic.Search):
                         ast = ("cons", hs[j], ast)
                     raise Done(("ast", ast), "chain")
 
-        def on_head(k):
+        def on(slots, ks):
             def h(e):
-                if hs[k] is None:
-                    hs[k] = e.ast()
-                    check()
+                ast = e.ast()
+                for k in ks:
+                    if slots[k] is None:
+                        slots[k] = ast
+                check()
             return h
-
-        def on_tail(k):
-            def h(e):
-                if ts[k] is None:
-                    ts[k] = e.ast()
-                    check()
-            return h
-        for k, (h, t) in enumerate(zip(heads, tails)):
+        same = {}
+        for k, h in enumerate(heads):
             if len(set(h)) == 1:
                 hs[k] = ("k", h[0])                   # a constant read from the data
             else:
-                self.goals.setdefault((T_I, h), on_head(k))
-            self.goals.setdefault((T_L, t), on_tail(k))
+                same.setdefault(h, []).append(k)      # equal head vectors share one goal
+        for h, ks in same.items():
+            self.goals[(T_I, h)] = on(hs, ks)
+        for k, t in enumerate(tails):
+            self.goals[(T_L, t)] = on(ts, [k])
 
     # -- one backward step for an integer target: target = op(known, ?) with a derived inverse
     def _backward(self, e):
@@ -176,43 +158,18 @@ class GSearch(ic.Search):
                 h(self.by[w])
             self.goals.setdefault((T_I, w), h)
 
-    # -- case analysis: two partial solutions joined by a predicate from the bank
-    def unify(self):
-        if not self.split or self.out_type == T_B:
-            return None
-        full, items, ms = self.full, list(self.masks.items()), self.min_support
-        best = None
-        for pe in self.preds:
-            pc = 0
-            for i, b in enumerate(pe.vec):
-                if b:
-                    pc |= 1 << i
-            nc = full ^ pc
-            if _bits(pc) < ms or _bits(nc) < ms:
-                continue
-            e1 = next((e for m, e in items if not pc & ~m), None)
-            if e1 is None:
-                continue
-            e2 = next((e for m, e in items if not nc & ~m), None)
-            if e2 is None:
-                continue
-            ast = ("ifL" if self.out_type == T_L else "ifI", pe.ast(), e1.ast(), e2.ast())
-            s = ic.size(ast)
-            if best is None or s < best[0]:
-                best = (s, ast)
-        return best[1] if best else None
-
     def run(self):
+        self.levels = []                 # candidates evaluated when each cost level was completed
         try:
             for c in range(1, self.max_level + 1):
                 for t in self.types:
                     self._pool(self.top, t, c)
+                self.levels.append(self.n)
         except Done as d:
             return d.sol, d.via
         except ic.Budget:
-            pass
-        ast = self.unify()
-        return (("ast", ast), "split") if ast is not None else (None, None)
+            return None, None
+        return None, None
 
 
 # ------------------------------------------------------ operation generation
@@ -440,12 +397,11 @@ def show(sol):
 
 
 # -------------------------------------------------------------------- solve
-ARMS = {            # (traversal state, derived inverse operators, case analysis)
-    "A": (False, False, False),             # the frozen forward enumerator under the same CPU cap
-    "S": (True, True, True),
-    "S_no_state": (False, True, True),
-    "S_no_inverse": (True, False, True),
-    "S_no_split": (True, True, False),
+ARMS = {            # (traversal state, derived inverse operators)
+    "A": (False, False),                    # the frozen forward enumerator under the same CPU cap
+    "S": (True, True),
+    "S_no_state": (False, True),
+    "S_no_inverse": (True, False),
 }
 
 
@@ -453,26 +409,25 @@ def solve(task, cap_s, arm="S", inv=None):
     """One task, one arm, one CPU cap (seconds of process CPU, everything included)."""
     c0, w0 = time.process_time(), ic.WORK[0]
     deadline = c0 + cap_s
-    use_state, use_inv, use_split = ARMS[arm]
+    use_state, use_inv = ARMS[arm]
     lib = ic.base_library()
     train = task["train"]
     consts = ic.data_constants(train)
-    sol, via, cands = None, None, 0
+    sol, via, cands, levels = None, None, 0, None
     if use_state:
         subs = subtasks(task)
         for st in subs:
             pts = _pick(st["points"])
             end = min(deadline, time.process_time() + SUB_SHARE * cap_s / len(subs))
             for _ in range(4):                 # counterexample-guided: steps the body gets wrong join the sample
-                s = GSearch(lib, st["in_types"], st["out_type"], [(p[2], p[3]) for p in pts],
-                            end - (0.2 if use_split else 0), consts=consts, split=use_split, min_support=3)
-                got, how = s.run()
+                s = GSearch(lib, st["in_types"], st["out_type"], [(p[2], p[3]) for p in pts], end, consts=consts)
+                got, _ = s.run()
                 cands += s.n
                 if got is None:
                     break
                 cand = (st["kind"], got[1])
                 if all(run_solution(cand, lib, i, train) == o for i, o in train):
-                    sol, via = cand, st["kind"] + ("+split" if how == "split" else "")
+                    sol, via = cand, st["kind"]
                     break
                 bad = [p for p in st["points"] if p not in pts and ic.run_program(got[1], lib, p[2]) != p[3]]
                 if not bad or time.process_time() > end:
@@ -481,11 +436,12 @@ def solve(task, cap_s, arm="S", inv=None):
             if sol is not None:
                 break
     if sol is None:
-        s = GSearch(lib, task["in_types"], task["out_type"], train, deadline - (0.2 if use_split else 0),
-                    consts=consts, inv=inv if use_inv else None, split=use_split)
+        s = GSearch(lib, task["in_types"], task["out_type"], train, deadline, consts=consts,
+                    inv=inv if use_inv else None)
         sol, via = s.run()
         cands += s.n
+        levels = s.levels
     ok = sol is not None and all(run_solution(sol, lib, i, train) == o for i, o in task["test"])
     return {"fit": sol is not None, "solved": bool(ok), "via": via, "candidates": cands,
             "sol": sol, "program": show(sol), "size": ic.size(sol[1]) + (sol[0] != "ast") if sol else None,
-            "cpu_seconds": round(time.process_time() - c0, 4), "work": ic.WORK[0] - w0}
+            "levels": levels, "cpu_seconds": round(time.process_time() - c0, 4), "work": ic.WORK[0] - w0}

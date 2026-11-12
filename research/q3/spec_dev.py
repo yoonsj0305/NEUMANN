@@ -3,7 +3,7 @@
 python research/q3/spec_dev.py <bigbench> <oeis> <cap_s> <arm,arm,...> <rows.jsonl> [family[,family]]
 
 Arms: A (frozen forward enumerator under the same CPU cap), A@k (the same with k times the cap),
-S, S_no_state, S_no_inverse, S_no_split, D (sequence specialist, oeis only).
+S, S_no_state, S_no_inverse, D (sequence specialist, oeis only).
 """
 from __future__ import annotations
 import json, sys
@@ -34,9 +34,14 @@ def job(a):
 
 def main(bigbench, oeis, cap, arms, out, fams="rule,oeis"):
     d = dev_source.load(bigbench, oeis)
+    done = set()
+    try:                                    # resumable: rows already written are kept
+        done = {(r["arm"], r["id"]) for r in map(json.loads, open(out))}
+    except FileNotFoundError:
+        pass
     jobs = [(arm, float(cap), t) for arm in arms.split(",") for f in fams.split(",") for t in d[f]
-            if not (arm == "D" and f != "oeis")]
-    with Pool(4) as p, open(out, "w") as fh:
+            if not (arm == "D" and f != "oeis") and (arm, t["id"]) not in done]
+    with Pool(4) as p, open(out, "a") as fh:
         for r in p.imap_unordered(job, jobs):
             fh.write(json.dumps(r) + "\n")
             fh.flush()
