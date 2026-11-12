@@ -145,7 +145,7 @@ mechanism on integer goals, not by W4.
 
 | # | Hypothesis | Criterion | Result | Record |
 |---|---|---|---|---|
-| 1 | H1 | K1–K4, both domains | (pending) | (pending) |
+| 1 | H1 | K1–K4, both domains | **FAIL** (lists: K1–K4 all fail; sequences: K1–K3 fail) | `docs/experiments/results/discovery_iter1_source_cv.json`, `discovery_iter1_cv_rows.jsonl`, `discovery_iter1_experience_rows.jsonl.gz` |
 | 2 | H2 | J1–J3, both list families | **FAIL** (rule: J1, J2 fail; dc: J1 fails on p) | `docs/experiments/results/discovery_iter2_inverted_inventions.json`, `discovery_iter2_rows.jsonl.gz` |
 
 ### Iteration 2 result (2026-11-12, 08:26–08:47 UTC; 972 / 972 jobs)
@@ -169,3 +169,43 @@ What the record shows, without re-reading the criterion:
   mechanism is limited by how many invertible operations the system has invented, not by the search.
 * The run shared the machine with the experience run of iteration 1 (8 processes on 4 cores); caps are process
   CPU time, and all three arms were affected alike.
+
+### Iteration 1 result (2026-11-12; experience 07:51–09:00 UTC, cross-validation 14:13–14:43 UTC; 1 747 / 1 747 jobs)
+
+The machine restarted between the experience run and the cross-validation; the experience rows (312 / 312) were
+complete and were committed before the cross-validation started. No row was re-run.
+
+Solved held-out SOURCE tasks, cap 6 CPU s (5-fold; the policy of a fold never saw its tasks):
+
+| Domain | S (THIRD) | D | A (untrained) | B (A + memory) | C (B + learned policy) | Cw (C without proposals) |
+|---|---|---|---|---|---|---|
+| lists (125) | 57 | — | 58 | 59 | 59 | 58 |
+| sequences (187) | 15 | 33 | 17 | 17 | 21 | 20 |
+
+| Domain | K1: C only / B only, p | K2: C only / A only, p | K3: solved by C and no other arm | K4: CPU C / B |
+|---|---|---|---|---|
+| lists | 4 / 4, p = 1.0 — FAIL | 6 / 5, p = 1.0 — FAIL | 2 — FAIL | 392.4 / 390.6 — FAIL |
+| sequences | 4 / 0, p = 0.125 — FAIL | 4 / 0, p = 0.125 — FAIL | 1 — FAIL | 1 001 / 1 020 — pass |
+
+**Verdict: FAIL.** W4 is not started; no independent family is registered or opened.
+
+Experience cost: 6 884 CPU s on lists (cap 120 s), 4 979 CPU s on sequences (cap 30 s). It verified 73 list tasks
+(8 through a latent feature) and 25 sequences (7 through a latent feature).
+
+Cause, by the three candidates of the protocol:
+* **Representation capacity (binding).** With 20× the test cap and the untrained policy, the hypothesis space
+  reached 7 list tasks beyond the THIRD core, each at 3–55 CPU s. A policy that re-divides the cap and re-orders
+  generation inside that space had at most those to gain, and gained none: on lists the 4 tasks it wins and the 4
+  it loses against B are both mostly cap-timing differences (one win comes from a proposal).
+* **Policy.** It did learn (weights 0.57 for the list step operator against 0.03 for a latent scope; 72 verified
+  methods; a list of latent variables) and it was used (10 list tasks and 4 sequences were solved through a
+  proposal). But what it proposes on lists is what the proposer finds anyway. On sequences it adds 4 tasks, of
+  which 1 is beyond every other arm including the specialist.
+* **Counterexample learning.** Not the limit here: the candidates the policy needed were never generated.
+
+Read together with iteration 2: the only learned component with a causal effect so far is an operation the
+system invented and then inverted (12 : 2 pooled over two list families, below the registered thresholds). The
+hypothesis space itself is still supplied by the developer. That, not the policy, is what Q3 has to change.
+
+A third mechanism (splitting output positions by a searched predicate) was prototyped during the wait and then
+withdrawn before any evaluation: it is one more developer-written decomposition and is not in the repository.
