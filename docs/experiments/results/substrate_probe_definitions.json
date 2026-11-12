@@ -1,0 +1,191 @@
+{
+ "schema": "neumann.substrate-probe.v1",
+ "cap_cpu_seconds": 60.0,
+ "vocabulary": "substrate + len",
+ "rows": [
+  {
+   "operation": "append",
+   "type": "(L, L) -> L",
+   "found": true,
+   "candidates": 14767,
+   "cpu_seconds": 0.19,
+   "cost_levels_completed": 5,
+   "definition": "(foldrL (cons $2 $3) $1 $0)",
+   "size": 6,
+   "holds_on_fresh_arguments": true
+  },
+  {
+   "operation": "reverse",
+   "type": "(L) -> L",
+   "found": true,
+   "candidates": 9967,
+   "cpu_seconds": 0.17,
+   "cost_levels_completed": 5,
+   "definition": "(foldlL (cons $1 $2) nil $0)",
+   "size": 6,
+   "holds_on_fresh_arguments": true
+  },
+  {
+   "operation": "last",
+   "type": "(L) -> I",
+   "found": true,
+   "candidates": 395,
+   "cpu_seconds": 0.0,
+   "cost_levels_completed": 3,
+   "definition": "(foldlI $1 0 $0)",
+   "size": 4,
+   "holds_on_fresh_arguments": true
+  },
+  {
+   "operation": "snoc",
+   "type": "(L, I) -> L",
+   "found": true,
+   "candidates": 1111498,
+   "cpu_seconds": 9.35,
+   "cost_levels_completed": 7,
+   "definition": "(foldrL (cons $2 $3) (cons $1 nil) $0)",
+   "size": 8,
+   "holds_on_fresh_arguments": true
+  },
+  {
+   "operation": "count",
+   "type": "(L, I) -> I",
+   "found": true,
+   "candidates": 55150,
+   "cpu_seconds": 0.46,
+   "cost_levels_completed": 5,
+   "definition": "(len (filter (eq $1 $2) $0))",
+   "size": 6,
+   "holds_on_fresh_arguments": true
+  },
+  {
+   "operation": "sum",
+   "type": "(L) -> I",
+   "found": true,
+   "candidates": 18568,
+   "cpu_seconds": 0.13,
+   "cost_levels_completed": 5,
+   "definition": "(foldrI (add $1 $2) 0 $0)",
+   "size": 6,
+   "holds_on_fresh_arguments": true
+  },
+  {
+   "operation": "maximum",
+   "type": "(L) -> I",
+   "found": false,
+   "candidates": 4131328,
+   "cpu_seconds": 60.02,
+   "cost_levels_completed": 8
+  },
+  {
+   "operation": "nth",
+   "type": "(L, I) -> I",
+   "found": true,
+   "candidates": 238406,
+   "cpu_seconds": 1.09,
+   "cost_levels_completed": 6,
+   "definition": "(head (foldrL (tail $3) $0 (range $1)))",
+   "size": 7,
+   "holds_on_fresh_arguments": true
+  },
+  {
+   "operation": "drop",
+   "type": "(L, I) -> L",
+   "found": true,
+   "candidates": 17589,
+   "cpu_seconds": 0.09,
+   "cost_levels_completed": 5,
+   "definition": "(foldrL (tail $3) $0 (range $1))",
+   "size": 6,
+   "holds_on_fresh_arguments": true
+  },
+  {
+   "operation": "take",
+   "type": "(L, I) -> L",
+   "found": false,
+   "candidates": 5416704,
+   "cpu_seconds": 60.1,
+   "cost_levels_completed": 8
+  },
+  {
+   "operation": "init",
+   "type": "(L) -> L",
+   "found": false,
+   "candidates": 3645952,
+   "cpu_seconds": 60.11,
+   "cost_levels_completed": 8
+  },
+  {
+   "operation": "rotate",
+   "type": "(L, I) -> L",
+   "found": false,
+   "candidates": 5704192,
+   "cpu_seconds": 60.24,
+   "cost_levels_completed": 8
+  },
+  {
+   "operation": "replace_at",
+   "type": "(L, I, I) -> L",
+   "found": false,
+   "candidates": 7453184,
+   "cpu_seconds": 60.25,
+   "cost_levels_completed": 8
+  },
+  {
+   "operation": "insert_at",
+   "type": "(L, I, I) -> L",
+   "found": false,
+   "candidates": 6121984,
+   "cpu_seconds": 60.26,
+   "cost_levels_completed": 8
+  },
+  {
+   "operation": "interleave",
+   "type": "(L, L) -> L",
+   "found": false,
+   "candidates": 4205056,
+   "cpu_seconds": 60.08,
+   "cost_levels_completed": 8
+  },
+  {
+   "operation": "zip_add",
+   "type": "(L, L) -> L",
+   "found": false,
+   "candidates": 4392448,
+   "cpu_seconds": 60.11,
+   "cost_levels_completed": 8
+  },
+  {
+   "operation": "gather",
+   "type": "(L, L) -> L",
+   "found": false,
+   "candidates": 4024064,
+   "cpu_seconds": 60.21,
+   "cost_levels_completed": 8
+  },
+  {
+   "operation": "repeat",
+   "type": "(L, I) -> L",
+   "found": false,
+   "candidates": 5047552,
+   "cpu_seconds": 60.16,
+   "cost_levels_completed": 8
+  },
+  {
+   "operation": "sort",
+   "type": "(L) -> L",
+   "found": false,
+   "candidates": 3575040,
+   "cpu_seconds": 60.09,
+   "cost_levels_completed": 8
+  },
+  {
+   "operation": "unique",
+   "type": "(L) -> L",
+   "found": false,
+   "candidates": 3640064,
+   "cpu_seconds": 60.05,
+   "cost_levels_completed": 8
+  }
+ ]
+}

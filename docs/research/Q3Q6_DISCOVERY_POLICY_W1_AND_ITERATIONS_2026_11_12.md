@@ -201,7 +201,7 @@ larger budget.
 |---|---|---|---|---|
 | 1 | H1 | K1–K4, both domains | **FAIL** (lists: K1–K4 all fail; sequences: K1–K3 fail) | `docs/experiments/results/discovery_iter1_source_cv.json`, `discovery_iter1_cv_rows.jsonl`, `discovery_iter1_experience_rows.jsonl.gz` |
 | 2 | H2 | J1–J3, both list families | **FAIL** (rule: J1, J2 fail; dc: J1 fails on p) | `docs/experiments/results/discovery_iter2_inverted_inventions.json`, `discovery_iter2_rows.jsonl.gz` |
-| 3 | H3 | G1–G5, both domains | (pending) | (pending) |
+| 3 | H3 | G1–G5, both domains | **FAIL** (every condition, both domains) | `docs/experiments/results/discovery_iter3_source_cv.json`, `discovery_iter3_ops_rows.jsonl`, `discovery_iter3_cv_rows.jsonl`, `substrate_probe_definitions.json` |
 
 ### Iteration 2 result (2026-11-12, 08:26–08:47 UTC; 972 / 972 jobs)
 
@@ -264,3 +264,53 @@ hypothesis space itself is still supplied by the developer. That, not the policy
 
 A third mechanism (splitting output positions by a searched predicate) was prototyped during the wait and then
 withdrawn before any evaluation: it is one more developer-written decomposition and is not in the repository.
+
+### Iteration 3 result (2026-11-12, 23:10–23:34 UTC; generation 223 / 223 tasks, cross-validation 624 / 624 jobs)
+
+Generation, measured: 223 failed SOURCE tasks, 1 823 CPU s, **6 011 gap specifications posed, 11 definitions
+synthesised** (10 distinct, in 6 tasks; none on sequences). One has support from two tasks: append, with the
+same behaviour as the old core's f7. It is in the operation set of three of the five folds; the other two folds
+have no generated operation.
+
+| Domain | A | B | Cn (generation removed) | C | S | D |
+|---|---|---|---|---|---|---|
+| lists (125) | 58 | 59 | 59 | 57 | 57 | — |
+| sequences (187) | 17 | 21 | 21 | 21 | 15 | 33 |
+
+| | lists | sequences |
+|---|---|---|
+| G1 new operation used | none — FAIL | none — FAIL |
+| G2 tasks solved with a generated operation | 3 — FAIL | 0 — FAIL |
+| G3 C only / Cn only, p | 2 / 4, p = 0.69 — FAIL | 0 / 0 — FAIL |
+| G4 at least two operations in the gain | one (append) — FAIL | none — FAIL |
+| G5 CPU C / Cn | 405.2 / 404.6 — FAIL | 1 008 / 1 002 — FAIL |
+
+**Verdict: FAIL.** Nothing is handed to Q6. No budget was increased.
+
+Limits of this run itself: 6 list and 8 integer pieces per context, the root and the first open sub-goal of each
+type, 0.25 CPU s per specification. A wider pool would re-derive append in more tasks. It would not change what
+follows.
+
+### Limit analysis: what the definition language can express (`research/q3/substrate_probe.py`)
+
+Twenty standard constructors were specified by self-generated examples and given to the same synthesiser with
+240× the per-specification budget (60 CPU s each; a found definition was re-checked on 40 fresh arguments).
+
+| Found (definition holds on fresh arguments) | Not found in 60 CPU s (3.5–7.5 million candidates, cost level 8 completed) |
+|---|---|
+| append (0.2 s), reverse (0.2 s), last, sum, drop (0.1 s), count (0.5 s, through `len`), nth (1.1 s), snoc (9.3 s) | take, init, rotate, replace_at, insert_at, interleave, zip_add, gather, repeat, maximum, sort, unique |
+
+* Reachable: one fold over one list, and "drop / nth through `range`". Not reachable: selection or edit by
+  position, any simultaneous traversal of two lists, repetition, order statistics, de-duplication.
+* The list failures that remain on SOURCE are of exactly the second kind (insertions and interleavings,
+  positional swaps and rotations, counts and maxima inside a step, sorting).
+* Several of the unreachable operations are easy for the THIRD core as a traversal with index and remaining
+  count (take, init, replace_at). That state representation was written by the developer, and a generated
+  definition cannot use it: a definition is a plain substrate program over its arguments.
+
+**Conclusion of iterations 1–3.** Re-dividing the cap (1), inverting operations obtained by compression (2) and
+synthesising operations from failure gaps (3) all fail their registered criteria, for one reason: what the
+system can invent is bounded by the language its inventions are written in, and that language is weaker than
+the developer-designed representation that produced THIRD. Autonomous invention in the sense of Q3 is **not
+shown**. A larger search budget does not move this boundary (cost level 8 at 60 s; the missing definitions need
+level 12 and beyond).
