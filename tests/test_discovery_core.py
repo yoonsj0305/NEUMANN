@@ -87,3 +87,21 @@ def test_memory_is_reverified_and_is_a_separate_switch():
     wrong = dc.Policy(memory=[("rec", ("mul", ("k", 2), ("head", ("v", 1))), ("I", "L"), "I")])
     r = dc.solve(seq, 4, wrong, INV)
     assert r["via"] != "memory" and r["solved"]                              # a stored wrong recurrence is rejected
+
+
+def test_learned_latent_variable_is_reproposed_on_a_new_scope_with_a_new_readout():
+    feat = ("isnil", ("filter", ("not", ("lt", ("v", 2), ("v", 0))), ("v", 1)))     # nothing in the list is >= e
+    pol = dc.Policy(features=[(feat, ("I", "L"), "B")])
+
+    def later_max(x):                       # keep elements greater than everything AFTER them: scope (e, suf)
+        return tuple(v for j, v in enumerate(x) if all(v > w for w in x[j + 1:]))
+
+    def not_running_max(x):                 # the negated readout on the original scope (e, pre)
+        return tuple(v for j, v in enumerate(x) if not all(v > w for w in x[:j]))
+    for f, scope in ((later_max, [0, 4]), (not_running_max, [0, 3])):
+        r = dc.solve(_task(f), 6, pol, INV)
+        assert r["solved"] and r["via"] == "zfilter+proposal", (r["via"], r["program"])
+        assert [h for h in r["tried"] if h["ok"]][0]["hyp"][2] == scope
+        assert not dc.solve(_task(f), 6, dc.Policy(), INV)["solved"]        # the same proposer without the policy
+    exp = [_row(_task(later_max), dc.solve(_task(later_max), 6, pol, INV))]
+    assert dc.fit(exp).features[0] == (feat, ("I", "L"), "B")              # verified use re-enters the policy

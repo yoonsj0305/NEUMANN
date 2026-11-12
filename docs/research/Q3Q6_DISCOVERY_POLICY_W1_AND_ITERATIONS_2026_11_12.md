@@ -27,7 +27,7 @@ the A001 1 000 are not fetched. No existing gate or verdict is changed by anythi
 | executable method | a substrate program, or kind + step-operator program; typed inputs and output; returns failure outside its domain | `spec_core.run_solution` |
 | verification | the method reproduces every TRAIN example (step operators: every supervised point) | `check` in `solve` |
 | counterexample | a point a candidate gets wrong; it joins the sample and the search resumes | CEGIS loop in `solve` |
-| policy update | `fit(experience)`: success rate of each hypothesis; description lengths of the symbols of verified methods per context; the verified methods | `discovery_core.fit` |
+| policy update | `fit(experience)`: success rate of each hypothesis; description lengths of the symbols of verified methods per context; the latent variables that verified; the verified methods | `discovery_core.fit` |
 
 Contexts are keyed by types, positions and the alignment relation only. The same code and the same policy object
 serve lists and sequences.
@@ -38,11 +38,13 @@ serve lists and sequences.
 |---|---|
 | the hypothesis space: 3 alignment kinds × {body, feature × scopes} + direct search with inverse goals | how the CPU cap is divided among hypotheses and their order (`weights`) |
 | readouts generated from the library by type: derived inverses for integer goals, every binary integer predicate for boolean goals | the generative order of step operators, latent features and direct programs per context (`costs`) |
-| verification and counterexample loop | nothing else |
+| verification and counterexample loop | which latent variables to propose first on a new task (`features`): variables that verified earlier, re-instantiated on every scope of matching types and joined by a freshly generated readout |
 
-An untrained policy is uniform on both. A latent feature is not taken from memory: it is enumerated for the task
-at hand under the policy's generative order. Memory (verified methods of earlier tasks, re-verified before use)
-is a separate switch so that "remembering" and "having learned how to look" can be told apart.
+An untrained policy is uniform and proposes nothing. Memory (complete verified methods of earlier tasks,
+re-verified before use) is a separate switch so that "remembering an answer" and "having learned how to look"
+can be told apart: a proposal re-uses a discovered latent variable, not a method, and the scope and readout it
+ends up with need not be the ones it was discovered with. Arm `Cw` removes the proposals and keeps the weights
+and costs, so the three learned parts can be attributed.
 
 What will count as **invention-attributable**: a task solved by the arm with the learned policy and by none of
 the same proposer without the learned policy, the memory arm, and the specialist.
@@ -55,7 +57,8 @@ the same proposer without the learned policy, the memory arm, and the specialist
 | D | finite differences + Berlekamp–Massey (specialist for sequences) |
 | A | base proposer, untrained policy, no memory |
 | B | A + memory of verified methods; no policy learning. **This is the control with only the learned policy removed.** |
-| C | B + learned policy |
+| C | B + learned policy (weights, generative costs, latent-variable proposals) |
+| Cw | C without latent-variable proposals (attribution only; not part of the criterion) |
 
 All arms: the same CPU cap per task, everything included (hypothesis generation, failed hypotheses, verification,
 memory replay). Recorded per task: CPU, candidates, every hypothesis tried with its CPU and outcome. Recorded
@@ -74,9 +77,10 @@ same proposer, at the same CPU cap, solve held-out SOURCE tasks that it does not
 (B), without memory (A), and that the specialists do not solve.
 
 **Data.** SOURCE only: rule SOURCE (125 list functions) and OEIS SOURCE (187 sequences). 5-fold cross-validation
-with a salted hash of the task id. Experience = the base proposer with the untrained policy and a 30 CPU s cap on
-every SOURCE task (`wake`); for a fold the policy is fitted on the experience of the other four folds, both
-domains pooled (one policy). Only TRAIN-verified outcomes reach the policy; hidden tests never do. Evaluation cap:
+with a salted hash of the task id. Experience = the base proposer with the untrained policy on every SOURCE task
+(`wake`), cap 120 CPU s on lists and 30 CPU s on sequences: the untrained policy divides the cap among up to 20
+hypotheses on a list task, and a probe showed that the first latent features cost about 2 CPU s each. For a fold
+the policy is fitted on the experience of the other four folds, both domains pooled (one policy). Only TRAIN-verified outcomes reach the policy; hidden tests never do. Evaluation cap:
 6 CPU s per task for every arm.
 
 **Criterion K (all four, in both domains).** Family-wise α = 0.05 over the four tests (2 domains × {C vs B, C vs A}),
@@ -91,9 +95,10 @@ Bonferroni: each exact two-sided McNemar p < 0.0125.
 
 PASS → W4 (register two independent families). FAIL → cause analysis; no family is opened.
 
-**Stated in advance.** A feasibility probe on rule SOURCE (untrained policy, 20 s cap) solved 7 of the 68 tasks the
-THIRD core does not solve. That bounds what a policy can amortise on lists near 7–8 tasks, so K1 at p < 0.0125
-(8 : 0 or better) is at the edge; on sequences the bound is not yet known. The criterion is not adjusted to that.
+**Stated in advance.** A feasibility probe on rule SOURCE (untrained policy, 20 s cap, an earlier version of the
+proposer) solved 7 of the 68 tasks the THIRD core does not solve. If the experience run finds a similar number,
+K1 at p < 0.0125 (8 : 0 or better) is at the edge on lists; on sequences the bound is not yet known. The
+criterion is not adjusted to that.
 
 ## 7. Iteration records
 

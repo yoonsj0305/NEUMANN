@@ -40,10 +40,11 @@ class Refuted(Exception):
 class Policy:
     """Everything the discovery policy knows.  Policy() is the untrained policy."""
 
-    def __init__(self, costs=None, weights=None, memory=None):
+    def __init__(self, costs=None, weights=None, memory=None, features=None):
         self.costs = costs or {}          # context -> {symbol: bits}; absent = uniform order
         self.weights = weights or {}      # hypothesis -> expected usefulness; absent = 1 (uniform)
         self.memory = memory or []        # verified methods of earlier tasks: (kind, ast, in_types, out_type)
+        self.features = features or []    # latent variables that verified before: (ast, scope types, type)
         self.default = 0.5 if self.weights else 1.0     # a hypothesis the policy has no experience with
 
     def cost(self, *ctx):
@@ -114,9 +115,10 @@ def feature_search(lib, inv, st, pts, scope, end, consts, cost):
             pts += fresh[:8]
 
 
-def _feature_round(lib, inv, st, pts, scope, end, consts, cost):
+def _readouts(lib, inv, st, pts, consts):
+    """Shallow readouts joining a latent feature to the rest of the state, generated from the library by type.
+    Returns (feature types wanted, match) where match(vector, type) lists builders feature AST -> body AST."""
     types = st["in_types"]
-    n = len(types)
     g = tuple(p[3] for p in pts)
     col = lambda i: tuple(p[2][i] for p in pts)
     knowns = [(("v", i), col(i)) for i, t in enumerate(types) if t == T_I]
@@ -128,8 +130,7 @@ def _feature_round(lib, inv, st, pts, scope, end, consts, cost):
                     vec = p.vf(col(i))
                     if None not in vec:
                         knowns.append(((p.name, ("v", i)), vec))
-    out_t = st["out_type"]
-    if out_t == T_I:
+    if st["out_type"] == T_I:
         table = {g: None}
         for name, k, q in inv["_given_I"]:
             f = lib[name].f
@@ -140,49 +141,57 @@ def _feature_round(lib, inv, st, pts, scope, end, consts, cost):
                     continue
                 if all((f(a, b) if k == 1 else f(b, a)) == c for a, b, c in zip(v, w, g)):
                     table.setdefault(w, (name, k, ast))
-        ftypes = (T_I,)
-    else:
-        ng = tuple(not b for b in g)
-        preds = [p for p in lib.values() if p.kind == "fo" and p.ret == T_B and p.arity == 2
-                 and all(t == T_I for t, _ in p.params)]
-        ftypes = (T_B, T_I)          # a boolean feature needs no readout: it comes first at each level
 
-    def confirm(body, e):
-        fn = ic.compile_ast(body, n, lib)
-        bad = []
-        for p in st["points"]:
-            try:
-                ok = fn(p[2]) == p[3]
-            except ic.Fail:
-                ok = False
-            if not ok:
-                bad.append(p)
-        if bad:
-            raise Refuted(bad)
-        raise sc.Done(("ast", body), e.ast())
+        def match(v, t):
+            if t != T_I or v not in table:
+                return []
+            r = table[v]
+            if r is None:
+                return [lambda f: f]
+            return [lambda f: (r[0], r[2], f) if r[1] == 1 else (r[0], f, r[2])]
+        return (T_I,), match
+    ng = tuple(not b for b in g)
+    preds = [p for p in lib.values() if p.kind == "fo" and p.ret == T_B and p.arity == 2
+             and all(t == T_I for t, _ in p.params)]
 
-    def offer(e, t):
-        v = e.vec
-        if out_t == T_I:
-            if v in table:
-                r = table[v]
-                f = _remap(e.ast(), scope, n)
-                confirm(f if r is None else ((r[0], r[2], f) if r[1] == 1 else (r[0], f, r[2])), e)
-            return
+    def match(v, t):
         if t == T_B:
-            if v == g or v == ng:
-                f = _remap(e.ast(), scope, n)
-                confirm(f if v == g else ("not", f), e)
-            return
+            return [lambda f: f] if v == g else [lambda f: ("not", f)] if v == ng else []
+        out = []
         for p in preds:
             pf = p.f
             for ast, kv in knowns:
                 for a, b, swap in ((v, kv, False), (kv, v, True)):
                     r = tuple([pf(x, y) for x, y in zip(a, b)])
                     if r == g or r == ng:
-                        f = _remap(e.ast(), scope, n)
-                        body = (p.name, ast, f) if swap else (p.name, f, ast)
-                        confirm(body if r == g else ("not", body), e)
+                        def build(f, name=p.name, ast=ast, swap=swap, neg=(r != g)):
+                            body = (name, ast, f) if swap else (name, f, ast)
+                            return ("not", body) if neg else body
+                        out.append(build)
+        return out
+    return (T_B, T_I), match            # a boolean feature needs no readout: it comes first at each level
+
+
+def _feature_round(lib, inv, st, pts, scope, end, consts, cost):
+    types = st["in_types"]
+    n = len(types)
+    ftypes, match = _readouts(lib, inv, st, pts, consts)
+
+    def offer(e, t):
+        for build in match(e.vec, t):
+            body = build(_remap(e.ast(), scope, n))
+            fn = ic.compile_ast(body, n, lib)
+            bad = []
+            for p in st["points"]:
+                try:
+                    ok = fn(p[2]) == p[3]
+                except ic.Fail:
+                    ok = False
+                if not ok:
+                    bad.append(p)
+            if bad:
+                raise Refuted(bad)
+            raise sc.Done(("ast", body), e.ast())
     s = FSearch(lib, tuple(types[i] for i in scope), [tuple(p[2][i] for i in scope) for p in pts], end, consts,
                 cost, ftypes, offer)
     try:
@@ -191,6 +200,31 @@ def _feature_round(lib, inv, st, pts, scope, end, consts, cost):
         r.k = s.n
         raise
     return (sol[1], feat, s.n) if sol is not None else (None, None, s.n)
+
+
+def propose(lib, inv, st, consts, feats, end):
+    """Latent variables that verified on EARLIER tasks, re-instantiated on every scope of matching types of
+    this task and joined by a freshly generated readout.  Returns (body, feature, scope) or None.  The result
+    is a new method: neither the scope nor the readout need be the ones the variable was discovered with."""
+    pts, types = st["points"], st["in_types"]
+    n = len(types)
+    ftypes, match = _readouts(lib, inv, st, pts, consts)
+    for feat, stypes, ret in feats:
+        if ret not in ftypes:
+            continue
+        for scope in scopes(types):
+            if tuple(types[i] for i in scope) != tuple(stypes):
+                continue
+            if time.process_time() > end:
+                return None
+            fn = ic.compile_ast(feat, len(scope), lib)
+            try:
+                v = tuple(fn(tuple(p[2][i] for i in scope)) for p in pts)
+            except ic.Fail:
+                continue
+            for build in match(v, ret):
+                return build(_remap(feat, scope, n)), feat, scope
+    return None
 
 
 def solve(task, cap_s, policy, inv, features=True, replay=True, log=None):
@@ -217,6 +251,18 @@ def solve(task, cap_s, policy, inv, features=True, replay=True, log=None):
             if ok:
                 sol, via = (kind, ast), "memory"
                 break
+    if sol is None and policy.features:         # latent variables the policy has learned to propose first
+        for st in subs:
+            now = time.process_time()
+            got = propose(lib, inv, st, consts, policy.features, c0 + SUB_SHARE * cap_s)
+            tried.append({"hyp": [st["kind"], "proposal", list(got[2]) if got else []], "ok": got is not None,
+                          "cpu": round(time.process_time() - now, 4)})
+            if got is not None and check((st["kind"], got[0])):
+                sol, via = (st["kind"], got[0]), st["kind"] + "+proposal"
+                tried[-1].update(body=got[0], feature=got[1], scope_types=[st["in_types"][j] for j in got[2]],
+                                 in_types=list(st["in_types"]))
+                break
+            tried[-1]["ok"] = False
     if sol is None:
         hyps = []
         for st in subs:
@@ -285,9 +331,10 @@ def fit(experience, lib=None):
                  ("body", kind)      step operators of that alignment kind
                  ("feature", kind)   latent features of that kind, pooled with all verified step operators
                  ("direct", sig)     direct programs of that type signature
+      features latent variables that verified, most frequent first (re-proposed on new tasks, see `propose`)
       memory   the verified methods themselves (used only by arms that have memory)."""
     lib = lib or ic.base_library()
-    att, suc, bodies, feats, direct, memory = {}, {}, {}, {}, {}, []
+    att, suc, bodies, feats, direct, memory, latent = {}, {}, {}, {}, {}, [], {}
     for r in experience:
         for t in r["tried"]:
             k = (t["hyp"][0], t["hyp"][1], tuple(t["hyp"][2]))
@@ -297,7 +344,9 @@ def fit(experience, lib=None):
                 if "body" in t:
                     bodies.setdefault(k[0], []).append((ic._tup(t["body"]), tuple(t["in_types"])))
                     if t.get("feature") is not None:
-                        feats.setdefault(k[0], []).append((ic._tup(t["feature"]), tuple(t["scope_types"])))
+                        f = (ic._tup(t["feature"]), tuple(t["scope_types"]))
+                        feats.setdefault(k[0], []).append(f)
+                        latent[f] = latent.get(f, 0) + 1
         if r["sol"] is not None:
             kind, ast = r["sol"][0], ic._tup(r["sol"][1])
             memory.append((kind, ast, tuple(r["in_types"]), r["out_type"]))
@@ -312,4 +361,6 @@ def fit(experience, lib=None):
         costs[("feature", kind)] = ic.learn_costs(feats.get(kind, []) + pooled, lib)
     for sig, ds in direct.items():
         costs[("direct", sig)] = ic.learn_costs(ds, lib)
-    return Policy(costs, weights, memory)
+    features = [(f, st, ic._typeof(f, st, lib)) for (f, st), _ in
+                sorted(latent.items(), key=lambda kv: (-kv[1], ic.size(kv[0][0]), repr(kv[0])))]
+    return Policy(costs, weights, memory, features)

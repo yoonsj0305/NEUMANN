@@ -9,7 +9,8 @@
         S  the frozen THIRD core (specialist for lists)        D  sequence specialist (oeis only)
         A  base proposer, untrained policy, no memory
         B  A + memory of verified methods (no policy learning)  = the causal control for the policy
-        C  B + learned policy (weights + generative costs)
+        C  B + learned policy (hypothesis weights, generative costs, latent-variable proposals)
+        Cw C without the latent-variable proposals (attribution only)
 """
 from __future__ import annotations
 import json, sys
@@ -59,6 +60,8 @@ def cv_job(a):
             r = dc.solve(t, cap, dc.Policy(), _inv(), replay=False)
         elif arm == "B":
             r = dc.solve(t, cap, dc.Policy(memory=pol.memory), _inv())
+        elif arm == "Cw":                   # ablation: learned weights and costs, no latent-variable proposals
+            r = dc.solve(t, cap, dc.Policy(pol.costs, pol.weights, pol.memory), _inv())
         else:
             r = dc.solve(t, cap, pol, _inv())
     r.pop("sol", None)
@@ -96,7 +99,7 @@ def cv(bigbench, oeis, cap, wake_rows, out):
     global POLICY
     POLICY, _ = policies(wake_rows)
     d = dev_source.load(bigbench, oeis)
-    jobs = [(arm, t, float(cap)) for f in ("rule", "oeis") for arm in ("C", "B", "A", "S", "D") for t in d[f]
+    jobs = [(arm, t, float(cap)) for f in ("rule", "oeis") for arm in ("C", "B", "A", "S", "D", "Cw") for t in d[f]
             if not (arm == "D" and f != "oeis")]
     _run(cv_job, jobs, out, lambda r: (r["arm"], r["id"]))
 
