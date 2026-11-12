@@ -141,12 +141,67 @@ rule TARGET would miss J1 (6 : 0 gives p = 0.031; 7 : 0 is needed). The criterio
 Integer goals (sequences) are not covered by this iteration; a PASS on lists would be followed by the same
 mechanism on integer goals, not by W4.
 
+## 6c. Iteration 3 (defined before its run; owner's conditional approval of 2026-11-12)
+
+**Fixed.** Iterations 1 and 2 stay FAIL. No further work on dividing the cap or re-ordering generation inside
+the same hypothesis space. SOURCE only. No FRESH data, no new framework, no family-specific inventor, no new
+model dependency. Q6 is not developed here.
+
+**Mechanism (`neumann1/opgen.py`; one generic procedure, no operation written by hand).** For every SOURCE task
+that arm B fails to TRAIN-verify, the system
+1. proposes the function and type of an operation it lacks, as a gap specification (pieces → open goal): the
+   pieces are the cheapest forward values of the context, or what is left of a list goal after an embedded
+   piece is removed; the goal is the task's target, an unsolved sub-goal of the goal graph, or the per-point
+   target of a traversal sub-specification;
+2. synthesises an executable definition over the pieces alone (the task input is not visible to it);
+3. runs the definition on self-generated arguments: it must be defined on at least half, not constant and not
+   a projection; its behaviour there is the signature that identifies the operation across tasks;
+4. tests on self-generated data which arguments are recoverable from the result; a recoverable argument makes
+   the operation a decomposition operator in the goal graph;
+5. keeps an operation only if gaps of at least two different tasks produced it (at most 8 per fold).
+Vocabulary of definitions: the substrate plus `len`, which the system derived earlier as the inverse of `range`.
+
+**Hypothesis H3.** Operations generated this way from the failures of other SOURCE tasks let the same system
+solve held-out SOURCE tasks that it does not solve with the generation removed.
+
+**Data and arms.** The 5 folds of iteration 1. For a fold, the policy and the operation set use the other four
+folds only. Failures are defined by TRAIN verification; hidden tests never reach the generator. Cap 6 CPU s.
+
+| Arm | Definition |
+|---|---|
+| A | fixed operation and representation space (iteration 1's arm A; rows re-used) |
+| B | A + learned policy and memory (iteration 1's arm C; rows re-used) |
+| Cn | B + recursive goal graph, no generated operation = **C with the generation removed** |
+| C | Cn + generated operations (in every search at a fixed cost of 2; backward where recoverable) |
+| S, D | THIRD core; sequence specialist (rows re-used) |
+
+**Criterion G (all five, in both domains; lists = rule SOURCE, sequences = OEIS SOURCE).** Bonferroni over the
+two domains for the causal test: exact two-sided McNemar p < 0.025.
+
+| | Condition |
+|---|---|
+| G1 | a held-out task is solved by C with a generated operation whose behaviour on self-generated arguments differs from every primitive, from `len` and from each of the eight operations of the old core |
+| G2 | at least 5 held-out tasks are solved by C with a generated operation in the method |
+| G3 | at least 5 tasks solved by C and not Cn, and p < 0.025 |
+| G4 | those tasks involve at least 2 distinct generated operations, none accounting for more than three quarters of them |
+| G5 | total CPU(C) ≤ total CPU(Cn); the CPU of generation (specifications posed, definitions synthesised, failures) is reported |
+
+Reported, not gating: C against B, A, S, D; tasks solved by C and by no other arm; the operation table per fold.
+
+**Stated in advance.** On self-authored tasks the generator re-derives append from gaps (same behaviour as
+the old core's f7) and nothing else. If SOURCE gives the same, G1 and G4 fail by definition even if G3 holds.
+Constructors that the remaining list failures appear to need (interleave, insert at a position, merge) have no
+short definition in this substrate, which has no simultaneous traversal of two lists; the generator is not
+expected to find them. If the iteration fails, the next step is an analysis of the definition language, not a
+larger budget.
+
 ## 7. Iteration records
 
 | # | Hypothesis | Criterion | Result | Record |
 |---|---|---|---|---|
 | 1 | H1 | K1–K4, both domains | **FAIL** (lists: K1–K4 all fail; sequences: K1–K3 fail) | `docs/experiments/results/discovery_iter1_source_cv.json`, `discovery_iter1_cv_rows.jsonl`, `discovery_iter1_experience_rows.jsonl.gz` |
 | 2 | H2 | J1–J3, both list families | **FAIL** (rule: J1, J2 fail; dc: J1 fails on p) | `docs/experiments/results/discovery_iter2_inverted_inventions.json`, `discovery_iter2_rows.jsonl.gz` |
+| 3 | H3 | G1–G5, both domains | (pending) | (pending) |
 
 ### Iteration 2 result (2026-11-12, 08:26–08:47 UTC; 972 / 972 jobs)
 
