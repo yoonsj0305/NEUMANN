@@ -177,3 +177,83 @@ not the search and not the budget.
 * Stage A passes → Stage B: learned relations (relations used in verified solutions of one domain, abstracted of
   constants, proposed first in the other) with ablation; then registration of two never-opened families in two
   semantic domains, frozen before any byte is read, and a full-cost comparison (Q5) only after that.
+
+## 7. After Stage A: formation and learning, tested separately (owner's decisions of 2026-11-13)
+
+Stage A stays FAIL. No relation type, aggregate or operation is added by hand. SOURCE only; no FRESH data.
+
+### 7.1 Why the list failures happened (`research/q3/failure_split.py`, diagnosis only)
+
+The 57 rule SOURCE tasks the Stage A arm R did not solve, re-run with the same code at 10× the cap (60 CPU s):
+
+| Cause | Tasks | How it was established |
+|---|---|---|
+| generalisation: fits TRAIN, fails the hidden tests | 15 | Stage A rows (14) and the 10× run (1) |
+| search: a correct representation exists in the relation language and is found at 10× | 4 | 10× run |
+| not found at 10× | 38 | 10× run; this does not prove inexpressibility |
+
+Of the 38 not found, **23 have answers made only of copies of input cells** (provenance coverage 1.0): 17 are
+shorter than the input (which cells survive depends on other cells: first occurrences, running maxima,
+values that occur once), 4 are same-length reorderings (sorting, swaps), 2 are other shapes. For these the
+correspondence is fully observed, and the Stage A construction still fails, because it reads the
+correspondence only from the answer side ("where does this answer cell come from?"). The question these tasks
+answer is on the input side ("what happens to this input cell?"), and it depends on SETS of cells. The other
+15 have mostly computed cells (digits, counts, histograms, ranges).
+
+So: 15 generalisation, 4 search, 23 a representation the system does not form although the relation is
+observable, 15 computed values with no observed relation. No diagnostic structure was given to any solver.
+
+### 7.2 Why the earlier approach did not extend, in one sentence
+
+Every relation the system could use was a slot the developer had prepared (which side of a correspondence is
+read, which coordinates exist, that a relation must be completed by a value program in one step). The system
+filled slots; it never created a new specification from what it observed.
+
+### 7.3 Minimal mechanism (`neumann1/latent.py`): one procedure, four configurations
+
+| | Configuration | What is added |
+|---|---|---|
+| R0 | Stage A | fixed relations over fixed coordinates |
+| R1 | + typed relational substrate, no formation, no learning | cell SETS as coordinates (each input list's prefix up to the cell, the answer's own prefix) and `len` (derived by the system as range⁻¹): selection, aggregation and order over cell sets are expressible as coordinate programs, found only by blind search |
+| R2 | + formation from observation and counterexample | **residual latent**: a relation that explains the answer up to a residual creates a new specification (the residual), solved recursively by the same procedure, and only if the residual is simpler than what it replaces. **transport latent**: the observed correspondence read from the input side gives every input cell a new supervised target (destination, or presence); repeated values are left to an acceptance test over the whole vector instead of a fixed embedding |
+| R3 | + learning from verified experience | the generative order of coordinate programs per context and the order of latent kinds, fitted on representations R2 verified on OTHER folds |
+
+R1, R2 and R3 share one acceptance rule added here: a representation longer than the cells it explains is
+rejected (minimal description). It answers the 15 generalisation failures of §7.1 and is identical in the
+three arms, so it cannot explain a difference between them.
+
+Constructible vs verified: the substrate makes relations constructible; a relation counts as verified only
+when the representation built with it reproduces every TRAIN example, and as useful only when the hidden
+tests pass. Both are recorded per task (`kinds`, `progs` in the rows).
+
+### 7.4 Pre-registration (fixed before any run on tasks)
+
+Data: rule SOURCE (125, lists) and OEIS SOURCE (187, sequences); the 5 folds of iteration 1; cap 6 CPU s per
+task for every arm, everything included. R0 = Stage A rows (same code path). A, B, S, D, Cn, C4 as before.
+
+**Formation (R2 against R1), each domain; Bonferroni over 2 domains.**
+
+| | Condition |
+|---|---|
+| F1 | at least 5 tasks solved by R2 and not R1, exact McNemar p < 0.025 |
+| F2 | at least 3 tasks solved by R2 and by none of A, B, S, D, Cn, C4, R0, R1 |
+| F3 | at least 80 % of the tasks R2 gains are solved through a formed latent (residual or transport) |
+| F4 | total CPU(R2) ≤ 1.05 × total CPU(R1) |
+
+**Learning (R3 against R2), each domain.** For a fold, the prior is fitted on R2's TRAIN-verified
+representations of the other four folds. Similarity control: a task R3 gains whose representation, with
+constants masked, equals one verified in its training folds is counted separately and does not count for L1.
+
+| | Condition (either) |
+|---|---|
+| L1 capability | at least 5 clean tasks solved by R3 and not R2, p < 0.025 |
+| L2 cost | solved(R3) ≥ solved(R2) and CPU(R3) ≤ 0.7 × CPU(R2) on the tasks both solve |
+
+FORMATION PASS = F1–F4 in both domains. LEARNING PASS = L1 or L2 in both domains. They are reported
+separately. Reported, not gating: R1 against R0 (the substrate alone).
+
+**Stated in advance.** On self-authored tasks R2 forms a residual latent for "cumulative popcount" (first
+differences, themselves a divide-and-conquer recurrence) and a transport latent for "first occurrences"; it
+does not find running-maximum selection or counting within the cap. Formation is expected to add sequences;
+lists are uncertain. Learning is expected to add nothing (iteration 1 found no effect of a learned order), and
+this run tests that expectation rather than assuming it. A PASS here is SOURCE evidence only.

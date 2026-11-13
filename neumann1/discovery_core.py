@@ -230,7 +230,13 @@ def propose(lib, inv, st, consts, feats, end):
 CELL_SHARE = 0.3          # iteration 4: share of the cap for constructed cell representations (`cells`)
 
 
+LATENT_CFG = {}           # set by the harness: {"R1": Cfg, "R2": Cfg, "R3": Cfg per fold}
+
+
 def _run(sol, lib, inputs, train, in_types, task=None):
+    if sol[0] in ("lat", "residual", "transport", "keep"):
+        from neumann1 import latent
+        return latent.run(sol, latent.library(latent.Cfg(subst=True)), inputs, task)
     if sol[0] == "relcells":
         from neumann1 import relcells
         return relcells.run(sol, lib, inputs, task)
@@ -337,7 +343,10 @@ def solve(task, cap_s, policy, inv, features=True, replay=True, log=None, spec=(
         from neumann1 import cells as cl
         now = time.process_time()
         end = min(deadline, now + CELL_SHARE * cap_s)
-        if cells in ("rel", "rel0"):             # stage A: relational factorisation; rel0 = without self/linked
+        if cells in LATENT_CFG:                  # representation formation (R1, R2, R3): `neumann1.latent`
+            from neumann1 import latent
+            got = latent.solve(task, end, inv, LATENT_CFG[cells])
+        elif cells in ("rel", "rel0"):           # stage A: relational factorisation; rel0 = without self/linked
             from neumann1 import relcells
             on = cells == "rel"
             got = relcells.solve(task, end, inv, ic.base_library(), self_src=on, linked=on)
@@ -345,7 +354,10 @@ def solve(task, cap_s, policy, inv, features=True, replay=True, log=None, spec=(
             got = cl.solve(task, end, ic.base_library())
         tried.append({"hyp": ["cells", "construct", []], "ok": got is not None, "cpu": round(time.process_time() - now, 4)})
         if got is not None:
-            if got[0] == "relcells":
+            if got[0] in ("lat", "residual", "transport", "keep"):
+                from neumann1 import latent
+                sol, via = got, "latent:" + "+".join(latent.kinds(got))
+            elif got[0] == "relcells":
                 from neumann1 import relcells
                 sol, via = got, "rel:" + "+".join(sorted({"%s/%s%s" % (r[0], r[1], "/" + r[2] if r[2] else "")
                                                           for r in relcells.relations_used(got)}))
@@ -377,7 +389,10 @@ def solve(task, cap_s, policy, inv, features=True, replay=True, log=None, spec=(
         if not all(sc.run_solution(sol, lib, i, train) == o for i, o in train):
             sol, via = None, None                # an expansion that does not re-verify is not a solution
     ok = sol is not None and all(_run(sol, lib, i, train, task["in_types"], task) == o for i, o in task["test"])
-    if sol is not None and sol[0] == "relcells":
+    if sol is not None and sol[0] in ("lat", "residual", "transport", "keep"):
+        from neumann1 import latent
+        prog, size = latent.show(sol), None
+    elif sol is not None and sol[0] == "relcells":
         from neumann1 import relcells
         prog, size = relcells.show(sol), None
     elif sol is not None and sol[0] in ("cells", "select"):
