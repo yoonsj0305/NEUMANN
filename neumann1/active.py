@@ -312,7 +312,24 @@ def grammar(vals, kinds=None):
     return [(k, g[k]) for k in order]
 
 
-def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, prior_ws=None, log=None):
+def features(examples):
+    """Observable task features for the discovery policy (initial examples only)."""
+    out_t = _type(examples[0][1])
+    ins = [x for (x,), _ in examples]
+    outs = [y for _, y in examples]
+    if out_t == T_L:
+        rel = "same" if all(len(a) == len(b) for a, b in zip(ins, outs)) else \
+            "shorter" if all(len(b) <= len(a) for a, b in zip(ins, outs)) else \
+            "longer" if all(len(b) >= len(a) for a, b in zip(ins, outs)) else "mixed"
+        contained = all(set(b) <= set(a) for a, b in zip(ins, outs))
+    else:
+        rel = "scalar"
+        contained = out_t == T_I and all(b in a for a, b in zip(ins, outs) if a)
+    return "%s|%s|%s" % (out_t, rel, "contained" if contained else "computed")
+
+
+def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, prior_ws=None, log=None,
+                 prior_structure=None):
     """Learn S(u) = (f(u.w) for w in W), Update and Readout = component 0, with W grown only when needed.
 
       * W starts with the empty continuation: the answer itself as the state (the output-state machine).
@@ -389,9 +406,13 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                 return None
         return st
 
+    sentinels = {T_I: [0, 1, min(vals) - 1, max(vals) + 1], T_L: [()], T_B: [False, True]}[s_type]
+
     def init_candidates():
+        """The observed empty-input state where it is defined; where it is not (the answer is undefined on short
+        inputs), virtual initial values: identities and sentinels below / above every value seen.  No query."""
         z = S(())
-        options = [[v] if v is not None else _inits(s_type) for v in z]
+        options = [[v] if v is not None else sentinels for v in z]
         import itertools
         return [tuple(c) for c in itertools.product(*options)]
 
@@ -402,6 +423,12 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         rec["components"].append({"w": list(w), "why": why, "kind": "derived:e+w"})
         return True
     tried_grammar = set()
+    if prior_structure:                       # a learned hypothesis about the state structure, tested like any other
+        g = dict(grammar(vals))
+        for kind in prior_structure:
+            if kind in g and add_component(g[kind], "learned structure prior"):
+                rec["components"][-1]["kind"] = kind
+                tried_grammar.add(g[kind])
 
     def represent(trans, why):
         """Add one continuation whose values are not a function of the current state (new information), or one
@@ -412,15 +439,19 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             if w in W or w in tried_grammar:
                 continue
             tried_grammar.add(w)
-            feat, informative = {}, False
+            feat, merged, undefined_vals = {}, False, set()
             for u in pref:
                 a = S(u)
                 v = F(cont(u, w))
-                if v is not None and None in a:
-                    informative = True              # defined where the state is not
+                if None in a:
+                    if v is not None:
+                        undefined_vals.add(repr(v))      # what it says where the state says nothing
+                    continue
                 if a in feat and feat[a] != v:
-                    informative = True              # distinguishes prefixes the state merges
+                    merged = True                       # not a function of the state: new information
                 feat[a] = v
+            # informative = distinguishes states the representation merges, or varies where the state is undefined
+            informative = merged or len(undefined_vals) > 1
             if informative and add_component(w, why + "; informative continuation"):
                 rec["components"][-1]["kind"] = kind
                 return True
@@ -501,8 +532,13 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             lo_, hi_ = 0, len(seq)
             while hi_ - lo_ > 1:
                 mid = (lo_ + hi_) // 2
+                ps = pred_states[mid]
+                a0 = F(cont(prefixes[mid], W[0]))       # the answer component first (one query)
+                if a0 is not None and ps is not None and None not in ps and ps[0] != a0:
+                    hi_ = mid
+                    continue
                 t = S(prefixes[mid])
-                if None in t or pred_states[mid] == t:
+                if None in t or ps == t:
                     lo_ = mid
                 else:
                     hi_ = mid
@@ -580,12 +616,16 @@ def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
         frec = {"machines": []}
         p = None
         qlimit = env.budget - CHALLENGE - DISCRIMINATE
-        directions = (policy or {}).get("directions") if arm == "E" else None
+        pol = None
+        if arm == "E" and policy:
+            pol = policy["by_feature"].get(features(ex), policy["global"])
+        directions = pol["directions"] if pol else None
         for direction in (directions or ("prefix", "suffix")):
             if time.process_time() > c0 + 0.6 * cap or env.used >= qlimit:
                 break
             m, mobs, mrec = form_machine(env, ex + obs, c0 + 0.6 * cap, qlimit, direction, rng,
-                                         (policy or {}).get("continuation_kinds") if arm == "E" else None)
+                                         pol["continuation_kinds"] if pol else None, None,
+                                         (pol or {}).get("structures", {}).get(direction))
             obs += mobs
             frec["machines"].append(mrec)
             if m is not None:

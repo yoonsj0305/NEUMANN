@@ -46,6 +46,7 @@ def job(a):
                 "fit": False, "queries": env.used, "cpu_seconds": CAP, "error": "%s: %s" % (type(e).__name__, e),
                 "trace": traceback.format_exc()[-1500:], "out_type": ac._type(env.initial()[0][1])}
     rec.update(name=spec.name, parts=len(spec.parts), solved=bool(pred is not None and env._score(pred)),
+               features=ac.features(env.initial()),
                out_type=ac._type(env.initial()[0][1]), log=[[list(x), y if not isinstance(y, tuple) else list(y)]
                                                            for x, y in env.log])
     f = rec.get("formation")
@@ -56,7 +57,7 @@ def job(a):
 
 
 def _specs(split):
-    return [s for s in E.tasks() if split_of(s.name) == split]
+    return [s for s in E.tasks() if split == "all" or split_of(s.name) == split]
 
 
 def _go(jobs, out):
@@ -77,24 +78,33 @@ def run(split, out, arms="A,B,C,Dq,D"):
     _go([(a, s) for a in arms.split(",") for s in _specs(split)], out)
 
 
-def policy_from(rows, exclude_fold):
-    """Discovery experience of OTHER tasks (never the task itself, never its answers): which reading direction
-    formed an accepted machine, and which continuation kinds became informative state components.  A
-    continuation is abstracted to its relation to the values seen (above / below every value, length), not
-    kept as the literal values of another task."""
-    d = [r for r in rows if r["arm"] == "D" and fold_of(r["name"]) != exclude_fold and r.get("formation")]
-    dirs, kinds = collections.Counter(), collections.Counter()
+def policy_from(rows, exclude_fold=None):
+    """Discovery policy learned from D's experience on OTHER tasks (never the task itself, never answers):
+    per observable feature bucket of the initial examples (output type, length relation, whether output
+    values are input values) and globally: which reading direction formed an accepted machine, which
+    continuation kinds became informative components, and the most frequent accepted component structure
+    per direction.  Continuations are abstracted to kinds (above / below every value seen), not values."""
+    d = [r for r in rows if r["arm"] == "D" and r.get("formation") and r.get("features")
+         and (exclude_fold is None or fold_of(r["name"]) != exclude_fold)]
+
+    def summarise(rs):
+        dirs, kinds, structs = collections.Counter(), collections.Counter(), {}
+        for r in rs:
+            f = r["formation"]
+            for m in f.get("machines", []):
+                if m.get("challenge"):
+                    dirs[m["direction"]] += 1
+                    ks = tuple(c.get("kind", "?") for c in m.get("components", []))
+                    structs.setdefault(m["direction"], collections.Counter())[ks] += 1
+                    kinds.update(k for k in ks if k in ("above", "below", "above2", "below2"))
+        return {"directions": tuple(sorted(("prefix", "suffix"), key=lambda k: -dirs.get(k, 0))),
+                "continuation_kinds": [k for k, _ in kinds.most_common()],
+                "structures": {k: list(v.most_common(1)[0][0]) for k, v in structs.items() if v.most_common(1)[0][0]},
+                "evidence": {"accepted_machines": sum(dirs.values())}}
+    by = collections.defaultdict(list)
     for r in d:
-        f = r["formation"]
-        if f.get("formed"):
-            dirs[f["formed"]] += 1
-        for m in f.get("machines", []):
-            if m.get("challenge"):
-                for c in m.get("components", []):
-                    kinds[c.get("kind", "?")] += 1
-    order = tuple(sorted(("prefix", "suffix"), key=lambda k: -dirs.get(k, 0)))
-    return {"directions": order, "continuation_kinds": [k for k, _ in kinds.most_common()],
-            "counts": {"directions": dict(dirs), "kinds": dict(kinds)}}
+        by[r["features"]].append(r)
+    return {"global": summarise(d), "by_feature": {k: summarise(v) for k, v in by.items() if len(v) >= 2}}
 
 
 def runDq(split, out):
