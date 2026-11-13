@@ -1,0 +1,183 @@
+"""Q3 FRESH evaluation (single run) on the registered MBPP + HumanEval tasks.
+
+  policy <dev_experience_rows.jsonl> <policy.json>     freeze the discovery policy learned on list-routines
+  freeze <registry.json> <policy.json>                 write docs/experiments/q3_fresh_freeze.json
+  run <tasks.json> <rows.jsonl>                        arms D, A, then Dq (replay of D), then E (frozen policy)
+  score <rows.jsonl> <record.json>
+"""
+from __future__ import annotations
+import collections, datetime, hashlib, json, pathlib, sys
+sys.path.insert(0, ".")
+sys.path.insert(0, "research/q3")
+sys.path.insert(0, "research/q3/fresh")
+from multiprocessing import Pool
+import env_fresh as EF
+import invention_first as first
+import active_dev as dev
+from neumann1 import active as ac
+
+CAP, BUDGET = 30.0, 60
+FREEZE = "docs/experiments/q3_fresh_freeze.json"
+CODE = ["neumann1/active.py", "neumann1/latent.py", "neumann1/relcells.py", "neumann1/cells.py",
+        "neumann1/discovery_core.py", "neumann1/spec_core.py", "neumann1/invention_core.py", "neumann1/opgen.py",
+        "docs/experiments/results/spec_core_inverses.json", "research/q3/fresh/env_fresh.py",
+        "research/q3/fresh/sandbox.py", "research/q3/fresh/sandbox_worker.py", "research/q3/fresh/registry.py",
+        "research/q3/fresh/fresh_run.py", "research/q3/active_dev.py"]
+POLICY, REPLAY = None, {}
+
+
+def sha(p):
+    return hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()
+
+
+def policy(rows_path, out):
+    rows = [json.loads(l) for l in open(rows_path)]
+    pol = dev.policy_from(rows)
+    pathlib.Path(out).write_text(json.dumps(pol, indent=1, sort_keys=True))
+    print(json.dumps(pol["global"], indent=1), len(pol["by_feature"]), "feature buckets")
+
+
+def freeze(registry, policy_path):
+    reg = json.loads(pathlib.Path(registry).read_text())
+    fz = {"schema": "neumann.q3-fresh-freeze.v1",
+          "created_utc": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+          "registry_sha256": reg["registry_sha256"], "tasks": len(reg["selected"]),
+          "policy_sha256": sha(policy_path), "code_sha256": {p: sha(p) for p in CODE},
+          "budget_queries": BUDGET, "cap_cpu_seconds": CAP, "arms": ["A", "D", "Dq", "E"],
+          "criteria": {
+              "V2_latent_state_discovery": ">= 5 FRESH tasks solved by D with an accepted machine of m >= 2 components that Dq does not solve",
+              "V1_method_invention": "net D-only minus Dq-only >= 10, exact two-sided McNemar p < 0.05, D-only tasks from >= 2 structure classes",
+              "V3_learned_policy": "E vs D: E-only >= 5 and McNemar p < 0.05, or solved(E) >= solved(D) with total CPU(E) <= 0.7 x CPU(D)",
+              "reported_separately": "tasks solved ONLY through a new latent component (m >= 2) by D and by E",
+              "unresolved": "tasks whose reference fails its own published tests (T3) are reported and not run; error rows count as unsolved for D/E and solved for rivals"},
+          "predictions_before_the_run": {
+              "V2": "uncertain, more likely FAIL: few MBPP/HumanEval list tasks need a state beyond the answer",
+              "V1": "uncertain", "V3": "uncertain, more likely FAIL"}}
+    fz["freeze_sha256"] = hashlib.sha256(json.dumps(fz, sort_keys=True).encode()).hexdigest()
+    if pathlib.Path(FREEZE).exists():
+        raise SystemExit("ALREADY_FROZEN")
+    pathlib.Path(FREEZE).write_text(json.dumps(fz, indent=1, sort_keys=True))
+    print("FROZEN", fz["freeze_sha256"])
+
+
+def check_freeze():
+    fz = json.loads(pathlib.Path(FREEZE).read_text())
+    sig = fz.pop("freeze_sha256")
+    assert hashlib.sha256(json.dumps(fz, sort_keys=True).encode()).hexdigest() == sig, "FREEZE_MUTATED"
+    for p, h in fz["code_sha256"].items():
+        assert sha(p) == h, "CODE_CHANGED " + p
+    return fz
+
+
+def job(a):
+    arm, task = a
+    seed = int(hashlib.sha256(task["id"].encode()).hexdigest(), 16) % 1000
+    try:
+        env = EF.Env(task, 0, budget=BUDGET)
+    except EF.Inconsistent:
+        return {"arm": arm, "name": task["id"], "status": "inconsistent", "solved": False, "fit": False}
+    try:
+        pol = None
+        if arm == "E":
+            pol = json.loads(json.dumps(POLICY))
+        pred, rec = ac.run_arm(arm, env, CAP, seed=seed, policy=pol, replay=REPLAY.get(task["id"]))
+        rec.update(name=task["id"], solved=bool(pred is not None and env._score(pred)), out_type=env.out_type,
+                   features=ac.features(env.initial()), n_hidden=len(env._test),
+                   log=[[list(x), list(y) if isinstance(y, tuple) else y] for x, y in env.log], status="ok")
+    except Exception as e:
+        import traceback
+        rec = {"arm": arm, "name": task["id"], "status": "error", "solved": False, "fit": False,
+               "error": "%s: %s" % (type(e).__name__, e), "trace": traceback.format_exc()[-1500:]}
+    finally:
+        env.close()
+    return rec
+
+
+def _go(jobs, out):
+    done = set()
+    try:
+        done = {(r["arm"], r["name"]) for r in map(json.loads, open(out))}
+    except FileNotFoundError:
+        pass
+    jobs = [j for j in jobs if (j[0], j[1]["id"]) not in done]
+    print("todo", len(jobs), flush=True)
+    with Pool(4) as p, open(out, "a") as fh:
+        for r in p.imap_unordered(job, jobs, chunksize=1):
+            fh.write(json.dumps(r, default=list) + "\n")
+            fh.flush()
+
+
+def run(tasks_path, out):
+    global POLICY
+    fz = check_freeze()
+    tasks = json.loads(pathlib.Path(tasks_path).read_text())
+    reg_ids = set(json.loads(pathlib.Path("docs/experiments/q3_fresh_registry.json").read_text())["selected"])
+    assert {t["id"] for t in tasks} == reg_ids
+    _go([(a, t) for a in ("D", "A") for t in tasks], out)
+    for r in map(json.loads, open(out)):
+        if r["arm"] == "D" and r.get("status") == "ok":
+            REPLAY[r["name"]] = r.get("query_inputs", [])
+    _go([("Dq", t) for t in tasks if t["id"] in REPLAY], out)
+    POLICY = json.loads(pathlib.Path("docs/experiments/q3_fresh_policy.json").read_text())
+    assert sha("docs/experiments/q3_fresh_policy.json") == fz["policy_sha256"]
+    _go([("E", t) for t in tasks], out)
+
+
+def structure(r):
+    v = r.get("via") or ""
+    if not v.startswith("state:"):
+        return None
+    m = int(v.split("m=")[1]) if "m=" in v else 1
+    return "m>=2" if m >= 2 else ("list-state" if r.get("out_type") == "L" else "scalar-state")
+
+
+def score(rows_path, out):
+    fz = check_freeze()
+    rows = [json.loads(l) for l in open(rows_path)]
+    by = {}
+    for r in rows:
+        by.setdefault(r["arm"], {})[r["name"]] = r
+    names = sorted(set(by["D"]))
+    inconsistent = sorted(k for k in names if by["D"][k].get("status") == "inconsistent")
+    run_names = [k for k in names if k not in inconsistent]
+
+    def solved(a, k):
+        r = by.get(a, {}).get(k)
+        if r is None or r.get("status") == "error":
+            return a not in ("D", "E")
+        return bool(r["solved"])
+    so = {a: {k for k in run_names if solved(a, k)} for a in by}
+    vs = lambda a, b: {"first_only": len(so[a] - so[b]), "second_only": len(so[b] - so[a]),
+                       "mcnemar_p": first.mcnemar(len(so[a] - so[b]), len(so[b] - so[a]))}
+    dq = vs("D", "Dq")
+    d_only = sorted(so["D"] - so["Dq"])
+    cls = collections.Counter(structure(by["D"][k]) for k in d_only)
+    latent_d = [k for k in d_only if structure(by["D"][k]) == "m>=2"]
+    latent_e = [k for k in sorted(so["E"] - so["Dq"]) if structure(by["E"][k]) == "m>=2"]
+    cpu = {a: round(sum(r.get("cpu_seconds", 0) for r in v.values()), 1) for a, v in by.items()}
+    ed = vs("E", "D")
+    v1 = dq["first_only"] - dq["second_only"] >= 10 and dq["mcnemar_p"] < 0.05 and len([c for c in cls if c]) >= 2
+    v2 = len(latent_d) >= 5
+    v3 = (ed["first_only"] >= 5 and ed["mcnemar_p"] < 0.05) or (len(so["E"]) >= len(so["D"]) and cpu["E"] <= 0.7 * cpu["D"])
+    rec = {"freeze_sha256": json.loads(pathlib.Path(FREEZE).read_text())["freeze_sha256"],
+           "tasks_registered": len(names), "reference_inconsistent": inconsistent, "tasks_run": len(run_names),
+           "errors": {a: sorted(k for k, r in v.items() if r.get("status") == "error") for a, v in by.items()},
+           "solved": {a: len(s) for a, s in so.items()}, "cpu_seconds": cpu,
+           "queries": {a: sum(r.get("queries", 0) for r in v.values()) for a, v in by.items()},
+           "comparisons": {"D_vs_Dq": dq, "D_vs_A": vs("D", "A"), "E_vs_D": ed, "Dq_vs_A": vs("Dq", "A")},
+           "D_only_vs_Dq": {k: {"structure": structure(by["D"][k]), "program": by["D"][k].get("program")} for k in d_only},
+           "Dq_only_vs_D": sorted(so["Dq"] - so["D"]), "D_only_structure_classes": dict(cls),
+           "solved_only_through_new_latent_component": {"D": latent_d, "E": latent_e},
+           "replay_identical": sum(json.dumps(by["D"][k].get("log")) == json.dumps(by["Dq"].get(k, {}).get("log"))
+                                   for k in run_names if k in by.get("Dq", {})),
+           "verdict": {"V1_method_invention": "PASS" if v1 else "FAIL",
+                       "V2_latent_state_discovery": "PASS" if v2 else "FAIL",
+                       "V3_learned_policy": "PASS" if v3 else "FAIL"}}
+    pathlib.Path(out).write_text(json.dumps(rec, indent=1, sort_keys=True))
+    print(json.dumps({k: v for k, v in rec.items() if k != "D_only_vs_Dq"}, indent=1))
+    for k, v in rec["D_only_vs_Dq"].items():
+        print("  D+", k, v["structure"], (v["program"] or "")[:90])
+
+
+if __name__ == "__main__":
+    {"policy": policy, "freeze": freeze, "run": run, "score": score}[sys.argv[1]](*sys.argv[2:])

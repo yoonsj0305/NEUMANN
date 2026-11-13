@@ -388,14 +388,35 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                 u = step_input(u, e)
         return pts + extra
 
+    virt = {"value": None, "tried": []}
+
+    def vs(t, u):
+        """A state with its undefined components replaced by the virtual value (None: unusable).  A state that is
+        entirely undefined below the root carries no information and is never virtualised."""
+        if None not in t:
+            return t
+        if virt["value"] is None or (all(v is None for v in t) and u):
+            return None
+        return tuple(virt["value"] if v is None else v for v in t)
+
     def transitions():
+        """Observed transitions.  With a virtual value set, transitions into and out of partly undefined states
+        are kept with the undefined components replaced by that value (no query)."""
         out = []
         for u, e in points():
-            a, b = S(u), S(step_input(u, e))
-            if None in a or None in b:
+            v = step_input(u, e)
+            a, b = vs(S(u), u), vs(S(v), v)
+            if a is None or b is None:
                 continue
             out.append(((a, e), b, u))
         return out
+
+    def partly_undefined():
+        """Is there an observed state with some components defined and some not (the only case a virtual value
+        can change anything beyond the initial state, which init_candidates already covers)?"""
+        return any(None in t and any(c is not None for c in t)
+                   for t in (tuple(memo.get(cont(u, w)) if cont(u, w) in memo else 0 for w in W)
+                             for u in dict.fromkeys(u for u, e in points())))
 
     def fold(upd, z, x):
         st = z
@@ -412,7 +433,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         """The observed empty-input state where it is defined; where it is not (the answer is undefined on short
         inputs), virtual initial values: identities and sentinels below / above every value seen.  No query."""
         z = S(())
-        options = [[v] if v is not None else sentinels for v in z]
+        options = [[v] if v is not None else ([virt["value"]] if virt["value"] is not None else sentinels) for v in z]
         import itertools
         return [tuple(c) for c in itertools.product(*options)]
 
@@ -421,6 +442,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             return False
         W.append(w)
         rec["components"].append({"w": list(w), "why": why, "kind": "derived:e+w"})
+        virt["value"], virt["tried"] = None, []          # the structure changed: boundary repairs are retried
         return True
     tried_grammar = set()
     if prior_structure:                       # a learned hypothesis about the state structure, tested like any other
@@ -433,10 +455,30 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
     def represent(trans, why):
         """Add one continuation whose values are not a function of the current state (new information), or one
         that makes the state defined where the answer is undefined.  Checked on a few observed prefixes only."""
-        pref = [u for u, e in points()][:7]
-        for kind, w in grammar(vals, prior_ws):
-            w = tuple(w)
-            if w in W or w in tried_grammar:
+        allp = list(dict.fromkeys(u for u, e in points()))
+        # most diagnostic first: prefixes where the current state is (partly) undefined, then the shortest
+        pref = sorted(allp, key=lambda u: (None not in tuple(memo.get(cont(u, w0)) for w0 in W), len(u)))[:8]
+        cands = [(k, tuple(w)) for k, w in grammar(vals, prior_ws) if tuple(w) not in W and tuple(w) not in tried_grammar]
+        # screening (early accept, no extra cost: the screened prefixes are a subset of the full check's): two
+        # prefixes where the state is undefined, or two prefixes the state merges -- a difference there is decisive
+        st = {u: S(u) for u in pref}
+        und = [u for u in pref if None in st[u] and u][:2]
+        groups = {}
+        for u in pref:
+            if None not in st[u]:
+                groups.setdefault(st[u], []).append(u)
+        mrg = next((g[:2] for g in groups.values() if len(g) > 1), [])
+        for kind, w in cands:
+            for pair in (und, mrg):
+                if len(pair) == 2:
+                    v1, v2 = F(cont(pair[0], w)), F(cont(pair[1], w))
+                    if v1 is not None and v2 is not None and v1 != v2:
+                        tried_grammar.add(w)
+                        if add_component(w, why + "; informative continuation (screen)"):
+                            rec["components"][-1]["kind"] = kind
+                            return True
+        for kind, w in cands:
+            if w in tried_grammar:
                 continue
             tried_grammar.add(w)
             feat, merged, undefined_vals = {}, False, set()
@@ -457,6 +499,31 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                 return True
         rec["events"].append("no informative continuation")
         return False
+    def attempt(trans, share):
+        """Update per component from the observed transitions, then the best initial state.  No query.
+        Returns (updates, asts, z, failing examples), or (None, asts found so far, None, None)."""
+        in_t = tuple([s_type] * len(W)) + (T_I,)
+        rows = [[(a + (e,), b[j]) for (a, e), b, _ in trans] for j in range(len(W))]
+        upd, asts = [], []
+        for j in range(len(W)):
+            end = min(deadline, time.process_time() + share * max(0.0, deadline - time.process_time()))
+            g, ast = (None, None)
+            if s_type == T_L:                 # list-valued components: the cell construction (R2) first
+                g, ast = synth_cells(in_t, rows[j], end)
+            if g is None:
+                g, ast = synth_multi(in_t, s_type, rows[j], end)
+            if g is None and s_type == T_I:
+                g, ast = synth_cover(in_t, s_type, rows[j], min(deadline, time.process_time() + 0.6))
+            if g is None:
+                return None, asts, None, None
+            upd.append(g)
+            asts.append(ast)
+        best = None
+        for z in init_candidates():
+            fails = [x for (x,), y in examples if (lambda r: r is None or r[0] != y)(fold(upd, z, tuple(x)))]
+            if best is None or len(fails) < len(best[1]):
+                best = (z, fails)
+        return upd, asts, best[0], best[1]
     try:
         for rnd in range(25):
             if time.process_time() > deadline:
@@ -482,36 +549,16 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                     break
                 continue
             # 2. Update per component, then joint verification on every initial example
-            in_t = tuple([s_type] * len(W)) + (T_I,)
-            rows = [[(a + (e,), b[j]) for (a, e), b, _ in trans] for j in range(len(W))]
-            upd, asts = [], []
-            for j in range(len(W)):
-                end = min(deadline, time.process_time() + 0.25 * max(0.0, deadline - time.process_time()))
-                g, ast = (None, None)
-                if s_type == T_L:                 # list-valued components: the cell construction (R2) first
-                    g, ast = synth_cells(in_t, rows[j], end)
-                if g is None:
-                    g, ast = synth_multi(in_t, s_type, rows[j], end)
-                if g is None and s_type == T_I:
-                    g, ast = synth_cover(in_t, s_type, rows[j], min(deadline, time.process_time() + 0.6))
-                if g is None:
-                    break
-                upd.append(g)
-                asts.append(ast)
-            if len(upd) < len(W):
-                rec["events"].append("no update for component %d" % len(upd))
+            upd, asts, z, fails = attempt(trans, 0.25)
+            if upd is None:
+                rec["events"].append("no update for component %d" % len(asts))
                 if not represent(trans, "update not found"):
                     break
                 continue
-            best = None
-            for z in init_candidates():
-                fails = [x for (x,), y in examples if (lambda r: r is None or r[0] != y)(fold(upd, z, tuple(x)))]
-                if best is None or len(fails) < len(best[1]):
-                    best = (z, fails)
-            z, fails = best
             rec["events"].append("round %d: m=%d, examples failing %d" % (rnd, len(W), len(fails)))
             if not fails:
                 rec["update"] = [a[1] if isinstance(a, tuple) and a and a[0] == "cells" else ic.show(a) for a in asts]
+                rec["virtual_value"] = virt["value"]
                 rec["init"] = repr(z)
                 rec["formed"] = True
 
@@ -537,8 +584,8 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                 if a0 is not None and ps is not None and None not in ps and ps[0] != a0:
                     hi_ = mid
                     continue
-                t = S(prefixes[mid])
-                if None in t or ps == t:
+                t = vs(S(prefixes[mid]), prefixes[mid])
+                if t is None or ps == t:
                     lo_ = mid
                 else:
                     hi_ = mid
@@ -547,8 +594,8 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                 u, e = prefixes[i - 1], seq[i - 1]
                 if (u, e) in extra:
                     continue
-                a, b = S(u), S(prefixes[i])
-                if None in a or None in b:
+                a, b = vs(S(u), u), vs(S(prefixes[i]), prefixes[i])
+                if a is None or b is None:
                     continue
                 if tuple(g(a + (e,)) for g in upd) != b:
                     extra.append((u, e))
@@ -558,6 +605,23 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             rec["counterexamples"] += added
             if not added:
                 rec["events"].append("counterexample not localisable")
+                rec.setdefault("unlocalised", []).append(list(x))
+                if s_type == T_I and partly_undefined() and not virt["tried"]:
+                    # first: a virtual value for the undefined components -- every candidate is compared on the
+                    # observations already made (no query); the one leaving the fewest failing examples is kept
+                    scored = []
+                    for v in (min(vals) - 1, max(vals) + 1):
+                        virt["value"] = v
+                        u_, _, _, f_ = attempt(transitions(), 0.1)
+                        scored.append((len(examples) + 1 if u_ is None else len(f_), v))
+                    virt["tried"] = [v for _, v in scored]
+                    rec["events"].append("virtual values compared: %s" % scored)
+                    nf, v = min(scored)
+                    if nf <= len(fails):         # a tie still moves the failure where it can be localised
+                        virt["value"] = v
+                        rec["events"].append("virtual value %d for undefined components (%d failing)" % (v, nf))
+                        continue
+                virt["value"] = None
                 if not represent(trans, "counterexample hidden in undefined prefixes"):
                     break
     except Exhausted:
