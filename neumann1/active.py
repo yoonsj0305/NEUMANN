@@ -52,7 +52,7 @@ def passive(examples, cap, cost=None):
     sol = r.get("sol")
     if sol is None:
         return None, r
-    lib = ic.base_library()
+    lib = _lib()
 
     def predict(inp):
         try:
@@ -104,7 +104,7 @@ def committee_queries(env, examples, rng, budget, deadline):
         t = task_of(examples)
         r = dc.solve(t, share, dc.Policy(), _inv(), cells=cfg)
         if r.get("sol") is not None:
-            sol, lib = r["sol"], ic.base_library()
+            sol, lib = r["sol"], _lib()
             members.append(lambda inp, sol=sol, t=t: _safe(lambda: dc._run(sol, lib, inp, t["train"], t["in_types"], t)))
     seen = {e[0][0] for e in examples}
     pool = [generic_input(rng) for _ in range(40)]
@@ -134,39 +134,35 @@ def _safe(f):
 
 
 # ------------------------------------------------------- state formation (D)
-def _init_guess(kind, x0, s1_type):
-    return x0 if s1_type == T_I else (x0,) if s1_type == T_L else None
+def _lib():
+    from neumann1 import opgen
+    return ic.library_from_spec(opgen.seed_spec())
 
 
-class Trajectory:
-    """Observed states of one input under one structural hypothesis."""
+def _inits(s_type, x0):
+    """Initial-state candidates: identity elements of the state's type, or the first element as the state.
+    Generic by type; the fold verification on every initial example decides among them."""
+    if s_type == T_I:
+        return [0, 1, ("unit",)]
+    if s_type == T_L:
+        return [(), ("unit",)]
+    return [False, True]
 
-    def __init__(self, kind, x, final):
-        self.kind, self.x, self.states = kind, tuple(x), {}
-        n = len(self.x)
-        self.states[n if kind == "prefix" else 0] = final
 
-    def next_index(self):
-        n = len(self.x)
-        order = range(0, n) if self.kind == "prefix" else range(n, 0, -1)
-        for i in order:
-            if i not in self.states:
-                return i
-        return None
-
-    def part(self, i):
-        return self.x[:i] if self.kind == "prefix" else self.x[i:]
-
-    def transitions(self):
-        n, out = len(self.x), []
-        for i in range(n):
-            if self.kind == "prefix" and i in self.states and i + 1 in self.states \
-                    and self.states[i] is not None and self.states[i + 1] is not None:
-                out.append(((self.states[i], self.x[i]), self.states[i + 1]))
-            if self.kind == "suffix" and i in self.states and i + 1 in self.states \
-                    and self.states[i] is not None and self.states[i + 1] is not None:
-                out.append(((self.x[i], self.states[i + 1]), self.states[i]))
-        return out
+def fold(kind, g, s0, x, s_type):
+    xs = list(x) if kind == "prefix" else list(x)[::-1]
+    if isinstance(s0, tuple) and s0 == ("unit",):
+        if not xs:
+            return None
+        s = xs[0] if s_type == T_I else (xs[0],)
+        xs = xs[1:]
+    else:
+        s = s0
+    for e in xs:
+        s = g((s, e)) if kind == "prefix" else g((e, s))
+        if s is None:
+            return None
+    return s
 
 
 def consistent(trans):
@@ -178,126 +174,190 @@ def consistent(trans):
     return True
 
 
-def fold(kind, g, s0, x, s_type):
-    """Run the hypothesised state machine.  s0: state of the empty input, or None (first element as state)."""
-    xs = list(x)
-    if kind == "prefix":
-        if s0 is None:
-            if not xs:
+def synth_step(kind, trans, s_type, deadline, checks, prior=None):
+    """Step functions consistent with the observed transitions, enumerated in cost order; the first whose fold
+    reproduces every check (initial examples and queried states) from some typed initial state is returned.
+    For list states the cell construction (`latent`, R2) is tried first: it reaches insertion-like steps."""
+    if len(trans) < 2:
+        return None
+    lib = _lib()
+    in_types = (s_type, T_I) if kind == "prefix" else (T_I, s_type)
+    target = tuple(v for _, v in trans)
+    inputs = [k for k, _ in trans]
+
+    def verify(g):
+        for z in _inits(s_type, None):
+            if all(fold(kind, g, z, x[0], s_type) == y for x, y in checks):
+                return z
+        return None
+
+    def as_g(ast):
+        fn = ic.compile_ast(ic._tup(ast), 2, lib)
+
+        def g(args):
+            try:
+                v = fn(tuple(args))
+            except (ic.Fail, RecursionError, TypeError):
                 return None
-            s = _init_guess(kind, xs[0], s_type)
-            xs = xs[1:]
-        else:
-            s = s0
-        for e in xs:
-            s = g((s, e))
-            if s is None:
-                return None
-        return s
-    if s0 is None:
-        if not xs:
-            return None
-        s = _init_guess(kind, xs[-1], s_type)
-        xs = xs[:-1]
-    else:
-        s = s0
-    for e in reversed(xs):
-        s = g((e, s))
-        if s is None:
-            return None
-    return s
+            return v if _type(v) == s_type else None
+        return g
+    if s_type == T_L:
+        t = {"id": "step", "in_types": list(in_types), "out_type": T_L,
+             "train": [(k, v) for k, v in trans], "test": []}
+        end = time.process_time() + 0.5 * max(0.0, deadline - time.process_time())
+        sol = lt.solve(t, end, _inv(), lt.Cfg(subst=True, latent=True))
+        if sol is not None:
+            def g(args, sol=sol, t=t):
+                return _safe(lambda: lt.run(sol, lt.library(lt.Cfg(subst=True)), tuple(args), t)) \
+                    if sol[0] in ("lat", "residual", "transport", "keep") else None
+            z = verify(g)
+            if z is not None:
+                return g, lt.show(sol), z, None
+    found = []
+    k = len(target)
+    # probe pairs refine observational equivalence: with only the observed transitions as inputs, a rejected
+    # candidate would hide every other program with the same values there (including the right one)
+    states = list(dict.fromkeys(v for _, v in trans))
+    elems = list(dict.fromkeys(e for (a, b) in inputs for e in ((b,) if kind == "prefix" else (a,))))
+    for x, _ in checks[:4]:
+        elems += [e for e in x[0] if e not in elems]
+    probes = []
+    for st in states[:6]:
+        for el in elems[:6]:
+            pr = (st, el) if kind == "prefix" else (el, st)
+            if pr not in inputs and pr not in probes:
+                probes.append(pr)
+    inputs = inputs + probes[:30]
+
+    def offer(e, t):
+        if e.vec[:k] == target:
+            g = as_g(e.ast())
+            z = verify(g)
+            if z is not None:
+                found.append((g, ic.show(e.ast()), z, e.ast()))
+                raise sc.Done(None, None)
+    srch = dc.FSearch(lib, in_types, inputs, deadline, (), ic.uniform_costs(), (s_type,), offer)
+    if prior:
+        srch.cost = ic._as_cost(prior)
+    srch.run()
+    return found[0] if found else None
 
 
-def synth_step(kind, trans, s_type, cap, cost=None):
-    if not trans:
-        return None, None
-    ex = [((a, b), out) for (a, b), out in trans]
-    in_types = [s_type, T_I] if kind == "prefix" else [T_I, s_type]
-    t = {"id": "step", "in_types": in_types, "out_type": s_type, "train": ex, "test": []}
-    pol = dc.Policy(costs={("direct", ic.sig_key(t)): cost} if cost else None)
-    r = dc.solve(t, cap, pol, _inv(), cells="R2")
-    sol = r.get("sol")
-    if sol is None:
-        return None, None
-    lib = ic.base_library()
+class Plan:
+    """Per hypothesis: per-example trajectories grown from the KNOWN final state inwards, round-robin over the
+    initial examples (longest first), so every query adds one transition."""
 
-    def g(args):
-        return _safe(lambda: dc._run(sol, lib, tuple(args), t["train"], t["in_types"], t))
-    return g, r["program"]
+    def __init__(self, kind, examples):
+        self.kind = kind
+        self.traj = []
+        for (x,), y in sorted(examples, key=lambda e: -len(e[0][0])):
+            if len(x) >= 1:
+                n = len(x)
+                self.traj.append({"x": tuple(x), "states": {n if kind == "prefix" else 0: y}})
+        self.rr = 0
+
+    def next_query(self):
+        for _ in range(len(self.traj)):
+            tr = self.traj[self.rr % len(self.traj)]
+            self.rr += 1
+            n, st = len(tr["x"]), tr["states"]
+            idx = range(n - 1, -1, -1) if self.kind == "prefix" else range(1, n + 1)
+            for i in idx:
+                if i not in st:
+                    return tr, i
+        return None
+
+    def part(self, tr, i):
+        return tr["x"][:i] if self.kind == "prefix" else tr["x"][i:]
+
+    def transitions(self):
+        out = []
+        for tr in self.traj:
+            x, st = tr["x"], tr["states"]
+            for i in range(len(x)):
+                a, b = st.get(i), st.get(i + 1)
+                if a is None or b is None:
+                    continue
+                out.append(((a, x[i]), b) if self.kind == "prefix" else ((x[i], b), a))
+        return out
 
 
-def form_state(env, examples, budget, deadline, order=("prefix", "suffix"), split=None, cost=None, log=None):
+RESERVE = 2      # queries kept to test a formed state machine on fresh, non-intervened inputs
+
+
+def form_state(env, examples, budget, deadline, order=("prefix", "suffix"), split=None, prior=None, rng=None):
     """Returns (predict or None, observations, record)."""
-    obs, rec = [], {"hypotheses": {}, "queries": 0}
-    x_star = max((e[0][0] for e in examples), key=len)
-    final = next(y for (x,), y in examples if x == x_star)
-    if len(x_star) < 2:
-        return None, obs, rec
-    s_type = _type(final)
-    trajs = {k: Trajectory(k, x_star, final) for k in order}
+    rng = rng or random.Random(0)
+    obs, rec = [], {"hypotheses": {}, "queries": 0, "validation": []}
+    limit = env.budget - RESERVE
+    s_type = _type(examples[0][1])
+    plans = {k: Plan(k, examples) for k in order}
     alive = {k: True for k in order}
-    split = split or {k: budget // len(order) for k in order}
-    used = {k: 0 for k in order}
-    s0 = {}
+    split = dict(split or {k: 2 for k in order})       # phase 1: a few queries per hypothesis
+    asked = {k: 0 for k in order}
 
-    def query(kind):
-        tr = trajs[kind]
-        i = tr.next_index()
-        if i is None:
+    def query(k):
+        nq = plans[k].next_query()
+        if nq is None:
             return False
-        y = ask(env, tr.part(i), obs)
+        tr, i = nq
+        y = ask(env, plans[k].part(tr, i), obs)
         rec["queries"] += 1
-        used[kind] += 1
-        tr.states[i] = y
-        if len(tr.part(i)) == 0:
-            s0[kind] = y
-        if not consistent(tr.transitions()):
-            alive[kind] = False
+        asked[k] += 1
+        tr["states"][i] = y
+        if not consistent(plans[k].transitions()):
+            alive[k] = False
+            rec["hypotheses"].setdefault(k, {})["refuted_by_intervention"] = True
         return True
 
-    def attempt(kind):
-        tr = trajs[kind]
-        trans = tr.transitions()
-        if len(trans) < 2 or not alive[kind]:
+    def attempt(k):
+        trans = plans[k].transitions()
+        checks = list(examples) + [o for o in obs]
+        got = synth_step(k, trans, s_type, min(deadline, time.process_time() + 0.35 * max(0.0, deadline - time.process_time())),
+                         checks, prior)
+        rec["hypotheses"].setdefault(k, {}).update({"transitions": len(trans), "verified": got is not None,
+                                                    "program": got[1] if got else None})
+        if got is None:
             return None
-        g, prog = synth_step(kind, trans, s_type, max(0.2, min(1.2, deadline - time.process_time())), cost)
-        if g is None:
-            return None
-        z = s0.get(kind)
+        g, prog, z, ast = got
+        rec["hypotheses"][k]["ast"] = ast
+        return lambda inp, g=g, z=z: fold(k, g, z, inp[0], s_type)
 
-        def predict(inp, g=g, z=z, kind=kind):
-            return fold(kind, g, z, inp[0], s_type)
-        ok = all(predict(i) == o for i, o in list(examples) + obs)
-        rec["hypotheses"][kind] = {"program": prog, "transitions": len(trans), "verified": ok}
-        return predict if ok else None
-    # interleave by the split, test after each round, and use left-over queries as counterexamples
-    rounds = 0
-    while env.used < env.budget and time.process_time() < deadline:
-        progressed = False
+    phase = 0
+    while time.process_time() < deadline:
         for k in order:
-            if alive[k] and used[k] < split[k] and env.used < env.budget:
-                progressed |= query(k)
-        rounds += 1
+            while alive[k] and asked[k] < split[k] and env.used < limit:
+                if not query(k):
+                    break
         for k in order:
             if alive[k] and time.process_time() < deadline:
                 p = attempt(k)
                 if p is not None:
-                    while env.used < env.budget and trajs[k].next_index() is not None:
-                        before = list(obs)
-                        query(k)
-                        if obs != before and p(obs[-1][0]) != obs[-1][1]:
-                            p = attempt(k)               # counterexample: re-synthesise
-                            if p is None:
-                                break
-                    if p is not None:
+                    # the reserved queries test the formed state machine on fresh inputs it was not built from;
+                    # a mismatch is a counterexample: it joins the checks and the step is synthesised again
+                    seen = {e[0][0] for e in list(examples) + obs}
+                    while p is not None and env.used < env.budget:
+                        x = generic_input(rng)
+                        while x in seen or len(x) < 2:
+                            x = generic_input(rng)
+                        y = ask(env, x, obs)
+                        if y is None:
+                            continue
+                        ok = p((x,)) == y
+                        rec["validation"].append(ok)
+                        if not ok:
+                            p = attempt(k)
+                    if p is not None and alive[k]:
                         rec["formed"] = k
+                        rec["state_type"] = s_type
                         return p, obs, rec
-        if not progressed:
-            if all(used[k] >= split[k] for k in order):
-                for k in order:
-                    split[k] = budget
-            else:
-                break
+        live = [k for k in order if alive[k]]
+        if env.used >= limit or not live or phase > 3:
+            break
+        phase += 1
+        left = limit - env.used
+        for j, k in enumerate(live):                      # phase 2: spread what is left over live hypotheses
+            split[k] = asked[k] + left // len(live) + (1 if j < left % len(live) else 0)
     return None, obs, rec
 
 
@@ -318,15 +378,15 @@ def run_arm(arm, env, cap, seed=0, policy=None):
         obs = committee_queries(env, ex, rng, env.budget, c0 + 0.4 * cap)
         pred, r = passive(ex + obs, max(0.2, deadline - time.process_time()))
     else:
-        order, split, cost = ("prefix", "suffix"), None, None
+        order, split, prior = ("prefix", "suffix"), None, None
         if arm == "E" and policy:
-            order, split, cost = policy["order"], dict(policy["split"]), policy.get("cost")
-        p, obs, frec = form_state(env, ex, env.budget, c0 + 0.6 * cap, order, split, cost)
+            order, split, prior = policy["order"], dict(policy["split"]), policy.get("prior")
+        p, obs, frec = form_state(env, ex, env.budget, c0 + 0.6 * cap, order, split, prior, rng)
         rec["formation"] = frec
         if arm == "Dq":
             pred, r = passive(ex + obs, max(0.2, deadline - time.process_time()))
         elif p is not None:
-            pred, r = p, {"via": "state:" + frec.get("formed", "?"), "program": frec["hypotheses"][frec["formed"]]["program"]}
+            pred, r = p, {"via": "state:" + frec["formed"], "program": frec["hypotheses"][frec["formed"]]["program"]}
         else:
             rest = env.budget - env.used
             if rest > 0:
