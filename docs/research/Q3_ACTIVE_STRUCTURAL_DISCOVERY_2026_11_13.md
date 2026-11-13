@@ -60,3 +60,56 @@ everything seen", converging from 11 to 3 failing examples before the budget run
 
 No formal criterion was registered and the formal split was not opened: the probe gives no reason to expect a
 PASS.
+
+## 5. After the owner's directive "Q3 Autonomous Structural Invention" (2026-11-13)
+
+### 5.1 Code audit (verified causes, each with its reproduction in the session record)
+
+| # | Defect | Verified by | Fix |
+|---|---|---|---|
+| F1 | Dq re-ran D's formation and did not receive D's fallback queries (D 1 822 vs Dq 1 736 queries) | code + probe counts | Dq replays D's exact query inputs; query-answer logs hash-identical (60 / 60) |
+| F2 | a machine was adopted without validation when the budget was exhausted (count-k(k=3) wrong machine adopted) | code (`ok_all` stayed true) | independent challenge on 3 fresh inputs; no queries left = not accepted |
+| F3 | an adopted wrong machine replaced a correct passive solution | probe (3 tasks) | machine vs passive decided by a discriminating query where they disagree |
+| F4 | output-state stage consumed the budget before latent search | probe (`tried: []`) | one formation path: components grown on demand |
+| F5 | equivalence pruning hid the correct step after a rejected candidate | reproduction (max) | probe-refined equivalence |
+| F6 | a case cover returned only its first tree | reproduction (2nd largest) | case trees enumerated in cost order |
+| F7 | counterexample localisation failed inside undefined prefixes | reproduction (2nd smallest) | treated as a representation signal: add an informative continuation |
+| F8 | list-valued components had lost the cell construction in the unification | probe (42 / 60 at the query limit) | restored |
+
+### 5.2 Mechanism after the fixes
+
+S(u) = (f(u·w) for w in W), W = [()] at first; a component is added only when (i) two equal (state, element)
+pairs have different successors (continuation e·w_j, Rivest–Schapire), or (ii) no Update fits / a
+counterexample is hidden in undefined prefixes and a grammar continuation carries information the state lacks
+(not a function of the state on observed prefixes, or defined where the state is not). Update per component
+by per-transition synthesis (list components: cell construction); fold verified on every initial example;
+counterexamples localised by binary search; independent challenge; discriminating query against the passive
+solution.
+
+### 5.3 Probe after the fixes (60 tasks, 60 queries, 30 CPU s, every arm)
+
+| Arm | solved | wrong fit | CPU s | queries |
+|---|---|---|---|---|
+| A | 31 | 14 | 557 | 0 |
+| Dq | 35 | 0 | 840 | 3 545 |
+| D | **41** | 2 | 1 005 | 3 545 |
+| E | 40 | 2 | 1 016 | 3 547 |
+
+D vs Dq 7 : 1 (p = 0.070); D vs A 12 : 2 (p = 0.013); E vs D 0 : 1. Of the 7 D-only tasks, 1 uses a discovered
+latent component (2nd largest: W = [(), (16,)], i.e. "answer after appending a value above everything" =
+running maximum); 6 are output-as-state machines (counted separately, as the directive requires).
+Formation outcomes: 28 machines passed the challenge, 25 attempts ended at the query limit, 7 had answers
+undefined on the designed trajectories.
+
+### 5.4 Formal pre-registration (frozen in `docs/experiments/q3_active_formal_freeze.json` before the run)
+
+168 formal tasks (never run), every arm with 60 queries and 30 CPU s; arms A, B, C, D, Dq (replay), E.
+
+| ID | PASS rule |
+|---|---|
+| V1 executable method invention | net D-only minus Dq-only ≥ 10, exact McNemar p < 0.05, D-only tasks from ≥ 2 structure classes |
+| V2 autonomous latent state discovery | ≥ 5 formal tasks solved by D with an accepted m ≥ 2 machine that Dq does not solve |
+| V3 learned discovery policy | E-only ≥ 5 vs D with p < 0.05, or solved(E) ≥ solved(D) at ≤ 0.7 × CPU |
+
+Predictions written before the run: V1 uncertain; V2 expected FAIL (few hidden-state tasks); V3 expected FAIL.
+This environment is from one independent source (list-routines); it is not a new independent problem family.
