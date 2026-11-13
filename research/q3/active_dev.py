@@ -19,6 +19,7 @@ import invention_first as first
 
 CAP, BUDGET, FOLDS = 30.0, 40, 5
 POLICY = {}
+REPLAY = {}
 
 
 def _h(s):
@@ -38,7 +39,7 @@ def job(a):
     env = E.Env(spec, 0, budget=BUDGET)
     pol = POLICY.get(fold_of(spec.name)) if arm == "E" else None
     try:
-        pred, rec = ac.run_arm(arm, env, CAP, seed=_h(spec.name) % 1000, policy=pol)
+        pred, rec = ac.run_arm(arm, env, CAP, seed=_h(spec.name) % 1000, policy=pol, replay=REPLAY.get(spec.name))
     except Exception as e:                       # recorded, never silently counted
         import traceback
         return {"arm": arm, "name": spec.name, "parts": len(spec.parts), "status": "error", "solved": False,
@@ -98,6 +99,24 @@ def policy_from(rows, exclude_fold):
     return {"order": order, "split": split, "prior": prior, "rate": rate, "n_programs": len(progs)}
 
 
+def runDq(split, out):
+    """Dq replays, query by query, the inputs D submitted (same environment answers); hash-checked later."""
+    rows = [json.loads(l) for l in open(out)]
+    for r in rows:
+        if r["arm"] == "D":
+            REPLAY[r["name"]] = r.get("query_inputs", [])
+    _go([("Dq", s) for s in _specs(split) if s.name in REPLAY], out)
+
+
+def replay_check(rows):
+    """D and Dq saw the same queries and answers: compare hashes of the logged (input, output) lists."""
+    d = {r["name"]: r for r in rows if r["arm"] == "D"}
+    q = {r["name"]: r for r in rows if r["arm"] == "Dq"}
+    h = lambda r: hashlib.sha256(json.dumps(r.get("log"), sort_keys=True).encode()).hexdigest()
+    same = sum(h(d[k]) == h(q[k]) for k in d if k in q)
+    return {"pairs": len([k for k in d if k in q]), "identical_query_answer_logs": same}
+
+
 def runE(split, out):
     rows = [json.loads(l) for l in open(out)]
     for f in range(FOLDS):
@@ -119,7 +138,7 @@ def report(split, rows_path, out):
         by.setdefault(r["arm"], {})[r["name"]] = r
     n = len(next(iter(by.values())))
     so = {a: {k for k, r in v.items() if r["solved"]} for a, v in by.items()}
-    rec = {"split": split, "tasks": n, "arms": {}}
+    rec = {"split": split, "tasks": n, "arms": {}, "replay_check": replay_check(rows)}
     for a, v in sorted(by.items()):
         rec["arms"][a] = {"solved": len(so[a]), "fit": sum(r["fit"] for r in v.values()),
                           "wrong_fit": sum(r["fit"] and not r["solved"] for r in v.values()),
@@ -130,13 +149,16 @@ def report(split, rows_path, out):
     rec["comparisons"] = {"%s_vs_%s" % (a, b): _vs(so, a, b) for a, b in pairs if a in so and b in so}
     if "D" in by:
         formed = {k: r for k, r in by["D"].items() if r.get("formation", {}).get("formed")}
+        rec["D_formed_and_challenged"] = len(formed)
         rec["D_formed"] = len(formed)
         rec["D_formed_solved"] = sum(r["solved"] for r in formed.values())
         rec["D_gain_over_Dq"] = {k: {"via": by["D"][k]["via"], "program": by["D"][k]["program"]}
                                  for k in sorted(so["D"] - so.get("Dq", set()))}
         rec["D_loss_to_Dq"] = sorted(so.get("Dq", set()) - so["D"])
-        rec["refuted_by_intervention"] = sum(any(h.get("refuted_by_intervention") for h in r.get("formation", {}).get("hypotheses", {}).values())
-                                             for r in by["D"].values())
+        rec["D_machines"] = {k: {"solved": r["solved"], "via": r["via"], "program": r["program"]}
+                             for k, r in sorted(by["D"].items()) if r.get("formation", {}).get("formed")}
+        rec["D_latent_components_formed"] = sum(1 for r in by["D"].values() if r.get("formation", {}).get("formed")
+                                                and "m=1" not in (r.get("via") or ""))
     pathlib.Path(out).write_text(json.dumps(rec, indent=1, sort_keys=True))
     print(json.dumps({k: v for k, v in rec.items() if k not in ("D_gain_over_Dq",)}, indent=1))
     for k, v in rec.get("D_gain_over_Dq", {}).items():
@@ -144,4 +166,4 @@ def report(split, rows_path, out):
 
 
 if __name__ == "__main__":
-    {"run": run, "runE": runE, "report": report}[sys.argv[1]](*sys.argv[2:])
+    {"run": run, "runDq": runDq, "runE": runE, "report": report}[sys.argv[1]](*sys.argv[2:])

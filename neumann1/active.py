@@ -139,30 +139,9 @@ def _lib():
     return ic.library_from_spec(opgen.seed_spec())
 
 
-def _inits(s_type, x0):
-    """Initial-state candidates: identity elements of the state's type, or the first element as the state.
-    Generic by type; the fold verification on every initial example decides among them."""
-    if s_type == T_I:
-        return [0, 1, ("unit",)]
-    if s_type == T_L:
-        return [(), ("unit",)]
-    return [False, True]
-
-
-def fold(kind, g, s0, x, s_type):
-    xs = list(x) if kind == "prefix" else list(x)[::-1]
-    if isinstance(s0, tuple) and s0 == ("unit",):
-        if not xs:
-            return None
-        s = xs[0] if s_type == T_I else (xs[0],)
-        xs = xs[1:]
-    else:
-        s = s0
-    for e in xs:
-        s = g((s, e)) if kind == "prefix" else g((e, s))
-        if s is None:
-            return None
-    return s
+def _inits(s_type):
+    """Typed identity-like initial values; used only for components whose empty-input value is undefined."""
+    return {T_I: [0, 1], T_L: [()], T_B: [False, True]}[s_type]
 
 
 def consistent(trans):
@@ -172,206 +151,6 @@ def consistent(trans):
             return False
         seen[k] = v
     return True
-
-
-def synth_step(kind, trans, s_type, deadline, checks, prior=None):
-    """Step functions consistent with the observed transitions, enumerated in cost order; the first whose fold
-    reproduces every check (initial examples and queried states) from some typed initial state is returned.
-    For list states the cell construction (`latent`, R2) is tried first: it reaches insertion-like steps."""
-    if len(trans) < 2:
-        return None
-    lib = _lib()
-    in_types = (s_type, T_I) if kind == "prefix" else (T_I, s_type)
-    target = tuple(v for _, v in trans)
-    inputs = [k for k, _ in trans]
-
-    def verify(g):
-        for z in _inits(s_type, None):
-            if all(fold(kind, g, z, x[0], s_type) == y for x, y in checks):
-                return z
-        return None
-
-    def as_g(ast):
-        fn = ic.compile_ast(ic._tup(ast), 2, lib)
-
-        def g(args):
-            try:
-                v = fn(tuple(args))
-            except (ic.Fail, RecursionError, TypeError):
-                return None
-            return v if _type(v) == s_type else None
-        return g
-    if s_type == T_L:
-        t = {"id": "step", "in_types": list(in_types), "out_type": T_L,
-             "train": [(k, v) for k, v in trans], "test": []}
-        end = time.process_time() + 0.5 * max(0.0, deadline - time.process_time())
-        sol = lt.solve(t, end, _inv(), lt.Cfg(subst=True, latent=True))
-        if sol is not None:
-            def g(args, sol=sol, t=t):
-                return _safe(lambda: lt.run(sol, lt.library(lt.Cfg(subst=True)), tuple(args), t)) \
-                    if sol[0] in ("lat", "residual", "transport", "keep") else None
-            z = verify(g)
-            if z is not None:
-                return g, lt.show(sol), z, None
-    found = []
-    k = len(target)
-    # probe pairs refine observational equivalence: with only the observed transitions as inputs, a rejected
-    # candidate would hide every other program with the same values there (including the right one)
-    states = list(dict.fromkeys(v for _, v in trans))
-    elems = list(dict.fromkeys(e for (a, b) in inputs for e in ((b,) if kind == "prefix" else (a,))))
-    for x, _ in checks[:4]:
-        elems += [e for e in x[0] if e not in elems]
-    probes = []
-    for st in states[:6]:
-        for el in elems[:6]:
-            pr = (st, el) if kind == "prefix" else (el, st)
-            if pr not in inputs and pr not in probes:
-                probes.append(pr)
-    inputs = inputs + probes[:30]
-
-    def offer(e, t):
-        if e.vec[:k] == target:
-            g = as_g(e.ast())
-            z = verify(g)
-            if z is not None:
-                found.append((g, ic.show(e.ast()), z, e.ast()))
-                raise sc.Done(None, None)
-    srch = dc.FSearch(lib, in_types, inputs, deadline, (), ic.uniform_costs(), (s_type,), offer)
-    if prior:
-        srch.cost = ic._as_cost(prior)
-    srch.run()
-    return found[0] if found else None
-
-
-class Plan:
-    """Per hypothesis: per-example trajectories grown from the KNOWN final state inwards, round-robin over the
-    initial examples (longest first), so every query adds one transition."""
-
-    def __init__(self, kind, examples):
-        self.kind = kind
-        self.traj = []
-        for (x,), y in sorted(examples, key=lambda e: -len(e[0][0])):
-            if len(x) >= 1:
-                n = len(x)
-                self.traj.append({"x": tuple(x), "states": {n if kind == "prefix" else 0: y}})
-        self.rr = 0
-
-    def next_query(self):
-        for _ in range(len(self.traj)):
-            tr = self.traj[self.rr % len(self.traj)]
-            self.rr += 1
-            n, st = len(tr["x"]), tr["states"]
-            idx = range(n - 1, -1, -1) if self.kind == "prefix" else range(1, n + 1)
-            for i in idx:
-                if i not in st:
-                    return tr, i
-        return None
-
-    def part(self, tr, i):
-        return tr["x"][:i] if self.kind == "prefix" else tr["x"][i:]
-
-    def transitions(self):
-        out = []
-        for tr in self.traj:
-            x, st = tr["x"], tr["states"]
-            for i in range(len(x)):
-                a, b = st.get(i), st.get(i + 1)
-                if a is None or b is None:
-                    continue
-                out.append(((a, x[i]), b) if self.kind == "prefix" else ((x[i], b), a))
-        return out
-
-
-RESERVE = 2      # queries kept to test a formed state machine on fresh, non-intervened inputs
-
-
-OUTPUT_STATE_QUERIES = 4   # at most this many queries for the output-as-state hypotheses
-
-
-def form_state(env, examples, budget, deadline, order=("prefix", "suffix"), split=None, prior=None, rng=None):
-    """Returns (predict or None, observations, record)."""
-    rng = rng or random.Random(0)
-    obs, rec = [], {"hypotheses": {}, "queries": 0, "validation": []}
-    limit = min(env.budget - RESERVE, env.used + OUTPUT_STATE_QUERIES)
-    s_type = _type(examples[0][1])
-    plans = {k: Plan(k, examples) for k in order}
-    alive = {k: True for k in order}
-    split = dict(split or {k: 2 for k in order})       # phase 1: a few queries per hypothesis
-    asked = {k: 0 for k in order}
-
-    def query(k):
-        nq = plans[k].next_query()
-        if nq is None:
-            return False
-        tr, i = nq
-        y = ask(env, plans[k].part(tr, i), obs)
-        rec["queries"] += 1
-        asked[k] += 1
-        tr["states"][i] = y
-        if not consistent(plans[k].transitions()):
-            alive[k] = False
-            rec["hypotheses"].setdefault(k, {})["refuted_by_intervention"] = True
-        return True
-
-    def attempt(k):
-        trans = plans[k].transitions()
-        checks = list(examples) + [o for o in obs]
-        got = synth_step(k, trans, s_type, min(deadline, time.process_time() + 0.35 * max(0.0, deadline - time.process_time())),
-                         checks, prior)
-        rec["hypotheses"].setdefault(k, {}).update({"transitions": len(trans), "verified": got is not None,
-                                                    "program": got[1] if got else None})
-        if got is None:
-            return None
-        g, prog, z, ast = got
-        rec["hypotheses"][k]["ast"] = ast
-        return lambda inp, g=g, z=z: fold(k, g, z, inp[0], s_type)
-
-    phase = 0
-    while time.process_time() < deadline:
-        for k in order:
-            while alive[k] and asked[k] < split[k] and env.used < limit:
-                if not query(k):
-                    break
-        for k in order:
-            if alive[k] and time.process_time() < deadline:
-                p = attempt(k)
-                if p is not None:
-                    # the reserved queries test the formed state machine on fresh inputs it was not built from;
-                    # a mismatch is a counterexample: it joins the checks and the step is synthesised again
-                    seen = {e[0][0] for e in list(examples) + obs}
-                    stop = env.used + RESERVE
-                    while p is not None and env.used < min(env.budget, stop):
-                        x = generic_input(rng)
-                        while x in seen or len(x) < 2:
-                            x = generic_input(rng)
-                        y = ask(env, x, obs)
-                        if y is None:
-                            continue
-                        ok = p((x,)) == y
-                        rec["validation"].append(ok)
-                        if not ok:
-                            p = attempt(k)
-                    if p is not None and alive[k]:
-                        rec["formed"] = k
-                        rec["state_type"] = s_type
-                        return p, obs, rec
-        live = [k for k in order if alive[k]]
-        if env.used >= limit or not live or phase > 3:
-            break
-        phase += 1
-        left = limit - env.used
-        for j, k in enumerate(live):                      # phase 2: spread what is left over live hypotheses
-            split[k] = asked[k] + left // len(live) + (1 if j < left % len(live) else 0)
-    return None, obs, rec
-
-
-# --------------------------------------- latent state from distinguishing experiments (Myhill-Nerode)
-def experiments(examples):
-    """Generic single-cell continuations w to distinguish prefixes (type- and range-based, no task knowledge):
-    a value above every value seen, a value below every value seen, and the first element again."""
-    vals = [v for (x,), _ in examples for v in x] or [0]
-    return [("above", lambda u: (max(vals) + 1,)), ("below", lambda u: (min(min(vals) - 1, 0),)),
-            ("repeat-first", lambda u: (u[0],) if u else None)]
 
 
 def synth_multi(in_types, out_type, rows, deadline, check=None, prior=None):
@@ -506,170 +285,262 @@ def synth_cover(in_types, out_type, rows, deadline, check=None):
     return None, None
 
 
-def form_latent(env, examples, deadline, order=None, rng=None, log=None):
-    """Prefix-state hypothesis with the state AUGMENTED by the answer under a distinguishing continuation w:
-    state(u) = (f(u), f(u.w)).  The extra component is a hidden intermediate the data never shows; the agent
-    makes it observable by its own experiment, then synthesises both component steps under per-transition
-    supervision and verifies the fold on every initial example."""
+class Exhausted(Exception):
+    pass
+
+
+def grammar(vals):
+    """Generic continuation grammar (a starting point only): one value above / below every value seen."""
+    hi, lo = max(vals) + 1, min(min(vals) - 1, 0)
+    return [(hi,), (lo,), (hi, hi), (lo, lo)]
+
+
+def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, prior_ws=None, log=None):
+    """Learn S(u) = (f(u.w) for w in W), Update and Readout = component 0, with W grown only when needed.
+
+      * W starts with the empty continuation: the answer itself as the state (the output-state machine).
+      * Transitions are observed on order-covering trajectories (ascending, descending, random distinct values);
+        every component value is a query f(u.w) the agent designs.
+      * Insufficient state, detected as two equal (state, element) pairs with different successors, yields the
+        distinguishing continuation e.w_j directly (Rivest-Schapire / L*); otherwise, when no Update fits or a
+        counterexample cannot be repaired, a grammar continuation is added only if its values on the observed
+        prefixes are NOT a function of the current state (it carries new information).
+      * Each component's Update is synthesised under per-transition supervision (enumeration with refined
+        equivalence, then a per-transition case cover); the machine must reproduce every initial example;
+        a failing example is localised by binary search and adds the transition that refutes the machine.
+    Returns (predict or None, observations, record)."""
     rng = rng or random.Random(0)
-    rec = {"tried": []}
-    obs = []
+    obs, rec = [], {"direction": direction, "components": [], "events": []}
     s_type = _type(examples[0][1])
+    if s_type == T_B:
+        s_type = T_B
+    vals = sorted({v for (x,), _ in examples for v in x}) or list(range(10))
     memo = {tuple(x): y for (x,), y in examples}
 
     def F(u):
         u = tuple(u)
         if u in memo:
             return memo[u]
-        if env.used >= env.budget - RESERVE:
-            raise StopIteration
+        if env.used >= qlimit:
+            raise Exhausted
         y = ask(env, u, obs)
         memo[u] = y
         return y
-    TRAJ_Q = 12                                     # queries for trajectories; the rest go to counterexamples
-    exps = experiments(examples)
-    if order:
-        exps = sorted(exps, key=lambda e: order.index(e[0]) if e[0] in order else 99)
-    # informative trajectories: fresh inputs with distinct values walked from the start, so the hidden state
-    # changes often (a long observed input walked from its end mostly repeats one state)
-    vals = sorted({v for (x,), _ in examples for v in x}) or list(range(10))
+
+    def cont(u, w):
+        return tuple(u) + tuple(w) if direction == "prefix" else tuple(w) + tuple(u)
+
+    def step_input(u, e):
+        return tuple(u) + (e,) if direction == "prefix" else (e,) + tuple(u)
+
+    W = [()]
+
+    def S(u):
+        return tuple(F(cont(u, w)) for w in W)
     lo, hi = min(vals), max(vals)
-    # order-covering designs: ascending, descending and random distinct values, so that any hidden state
-    # defined by order relations among the elements changes along at least one trajectory
     pool = list(range(lo, hi + 1))
     rng.shuffle(pool)
-    asc = tuple(sorted(pool[:5]))
-    trajs = [asc, asc[::-1], tuple(pool[5:9])]
-    for name, wf in exps:
-        if time.process_time() > deadline or env.used >= env.budget - RESERVE:
-            break
-        trans_s, trans_p, consistent_ = [], [], True
-        start = env.used
-        try:
-            for x in trajs:
-                for i in range(1, len(x)):             # from the start outwards
-                    u, ue = x[:i], x[:i + 1]
-                    w, we = wf(u), wf(ue)
-                    if w is None or we is None:
-                        continue
-                    su, sue = F(u), F(ue)
-                    pu, pue = F(u + w), F(ue + we)
-                    if None in (su, sue, pu, pue):
-                        continue
-                    if env.used - start >= TRAJ_Q:
-                        raise StopIteration
-                    trans_s.append(((su, pu, x[i]), sue))
-                    trans_p.append(((su, pu, x[i]), pue))
-                    if time.process_time() > deadline:
-                        break
-        except StopIteration:
-            pass
-        info = {"experiment": name, "transitions": len(trans_s)}
-        rec["tried"].append(info)
-        if len(trans_s) < 3 or not consistent(trans_s) or not consistent(trans_p):
-            info["consistent"] = False
-            continue
-        info["consistent"] = True
-        x0s = [(tuple(x), y) for (x,), y in examples]
-        in_t = (s_type, s_type, T_I)
+    asc = tuple(sorted(pool[:4]))
+    trajs = [asc, asc[::-1], tuple(pool[4:8])]
+    extra = []                        # (u, e) points added by counterexamples
 
-        def F_w(u):
-            w = wf(tuple(u))
-            return F(tuple(u) + w) if w is not None else None
+    def points():
+        pts = []
+        for x in trajs:
+            seq = x if direction == "prefix" else x[::-1]
+            u = ()
+            for e in seq:
+                pts.append((u, e))
+                u = step_input(u, e)
+        return pts + extra
 
-        def run_trace(gs, gp, z, x):
-            """States of the candidate machine along x (None where undefined)."""
-            s_, p_ = z
-            out = []
-            for e in x:
-                s_, p_ = (gs((s_, p_, e)), gp((s_, p_, e))) if s_ is not None and p_ is not None else (None, None)
-                out.append((s_, p_))
-            return out
-        def init_candidates():
-            """Identity elements of the state type (both components); the fold on the examples decides."""
-            base = [z for z in _inits(s_type, None) if not (isinstance(z, tuple) and z == ("unit",))]
-            return [(z, zp) for z in base for zp in base]
-        holder, rounds = {}, 0
-        while time.process_time() < deadline and rounds < 15:
-            rounds += 1
-            end = min(deadline, time.process_time() + 0.3 * max(0.0, deadline - time.process_time()))
-            gp, ast_p = synth_multi(in_t, s_type, trans_p, end)
-            if gp is None:
+    def transitions():
+        out = []
+        for u, e in points():
+            a, b = S(u), S(step_input(u, e))
+            if None in a or None in b:
+                continue
+            out.append(((a, e), b, u))
+        return out
+
+    def fold(upd, z, x):
+        st = z
+        seq = x if direction == "prefix" else x[::-1]
+        for e in seq:
+            st = tuple(g(st + (e,)) for g in upd)
+            if None in st:
+                return None
+        return st
+
+    def init_candidates():
+        z = S(())
+        options = [[v] if v is not None else _inits(s_type) for v in z]
+        import itertools
+        return [tuple(c) for c in itertools.product(*options)]
+
+    def add_component(w, why):
+        if w in W or len(W) >= 4:
+            return False
+        W.append(w)
+        rec["components"].append({"w": list(w), "why": why})
+        return True
+    tried_grammar = set()
+
+    def represent(trans, why):
+        """Add one continuation whose values are not a function of the current state (new information), or one
+        that makes the state defined where the answer is undefined.  Checked on a few observed prefixes only."""
+        pref = [u for u, e in points()][:7]
+        for w in (prior_ws or []) + grammar(vals):
+            w = tuple(w)
+            if w in W or w in tried_grammar:
+                continue
+            tried_grammar.add(w)
+            feat, informative = {}, False
+            for u in pref:
+                a = S(u)
+                v = F(cont(u, w))
+                if v is not None and None in a:
+                    informative = True              # defined where the state is not
+                if a in feat and feat[a] != v:
+                    informative = True              # distinguishes prefixes the state merges
+                feat[a] = v
+            if informative and add_component(w, why + "; informative continuation"):
+                return True
+        rec["events"].append("no informative continuation")
+        return False
+    try:
+        for rnd in range(25):
+            if time.process_time() > deadline:
+                rec["events"].append("deadline")
                 break
-            gs, ast_s = synth_multi(in_t, s_type, trans_s, min(deadline, time.process_time() + 0.2))
-            if gs is None:
-                gs, ast_s = synth_cover(in_t, s_type, trans_s, min(deadline, time.process_time() + 0.6))
-            if gs is None:
+            trans = transitions()
+            if len(trans) < 3:
+                rec["events"].append("too few defined transitions")
                 break
+            # 1. insufficient state: equal (state, element), different successors -> distinguishing continuation
+            seen, conflict = {}, None
+            for (a, e), b, u in trans:
+                if (a, e) in seen and seen[(a, e)][0] != b:
+                    conflict = (seen[(a, e)], (b, u), e)
+                    break
+                seen.setdefault((a, e), (b, u))
+            if conflict:
+                (b1, _), (b2, _), e = conflict
+                j = next(i for i in range(len(W)) if b1[i] != b2[i])
+                w = ((e,) + W[j]) if direction == "prefix" else (W[j] + (e,))
+                if not add_component(w, "inconsistent transitions"):
+                    rec["events"].append("state insufficient, component limit")
+                    break
+                continue
+            # 2. Update per component, then joint verification on every initial example
+            in_t = tuple([s_type] * len(W)) + (T_I,)
+            rows = [[(a + (e,), b[j]) for (a, e), b, _ in trans] for j in range(len(W))]
+            upd, asts = [], []
+            for j in range(len(W)):
+                end = min(deadline, time.process_time() + 0.25 * max(0.0, deadline - time.process_time()))
+                g, ast = synth_multi(in_t, s_type, rows[j], end)
+                if g is None and s_type == T_I:
+                    g, ast = synth_cover(in_t, s_type, rows[j], min(deadline, time.process_time() + 0.6))
+                if g is None:
+                    break
+                upd.append(g)
+                asts.append(ast)
+            if len(upd) < len(W):
+                rec["events"].append("no update for component %d" % len(upd))
+                if not represent(trans, "update not found"):
+                    break
+                continue
             best = None
             for z in init_candidates():
-                fails = [x for x, y in x0s if run_trace(gs, gp, z, x)[-1:] != [] and run_trace(gs, gp, z, x)[-1][0] != y]
+                fails = [x for (x,), y in examples if (lambda r: r is None or r[0] != y)(fold(upd, z, tuple(x)))]
                 if best is None or len(fails) < len(best[1]):
                     best = (z, fails)
             z, fails = best
-            info.setdefault("rounds", []).append({"answer": ic.show(ast_s), "latent": ic.show(ast_p),
-                                                  "fails": len(fails), "init": repr(z), "queries": env.used})
+            rec["events"].append("round %d: m=%d, examples failing %d" % (rnd, len(W), len(fails)))
             if not fails:
-                holder.update(gs=gs, gp=gp, ast_s=ast_s, ast_p=ast_p, z=z)
-                break
-            # counterexample: localise, by binary search over prefix lengths, the first step where the machine
-            # leaves the observed states of x; the true states on both sides of it give one new transition
-            x = fails[0]
-            trace = run_trace(gs, gp, z, x)
+                rec["update"] = [ic.show(a) for a in asts]
+                rec["init"] = repr(z)
+                rec["formed"] = True
+
+                def predict(inp, upd=list(upd), z=z):
+                    r = fold(upd, z, tuple(inp[0]))
+                    return None if r is None else r[0]
+                return predict, obs, rec
+            # 3. counterexample: binary search for the first step leaving the true states, add that point
+            x = tuple(fails[0])
+            seq = x if direction == "prefix" else x[::-1]
+            prefixes = [()]
+            for e in seq:
+                prefixes.append(step_input(prefixes[-1], e))
+            pred_states = [z]
+            for e in seq:
+                st = pred_states[-1]
+                pred_states.append(None if st is None or None in st else tuple(g(st + (e,)) for g in upd))
+            lo_, hi_ = 0, len(seq)
+            while hi_ - lo_ > 1:
+                mid = (lo_ + hi_) // 2
+                t = S(prefixes[mid])
+                if None in t or pred_states[mid] == t:
+                    lo_ = mid
+                else:
+                    hi_ = mid
             added = False
-            try:
-                lo_, hi_ = 0, len(x)                      # trace agrees at lo_ (0 = initial state), differs at hi_
-                while hi_ - lo_ > 1:
-                    mid = (lo_ + hi_) // 2
-                    true = (F(x[:mid]), F_w(x[:mid]))
-                    if None in true or trace[mid - 1] == true:
-                        lo_ = mid
-                    else:
-                        hi_ = mid
-                # from just before the localised point, find the first step whose prediction from the TRUE
-                # previous state is wrong (prefixes where the answer is undefined are skipped)
-                for i in list(range(max(1, lo_), len(x) + 1)) + list(range(1, max(1, lo_))):
-                    prev = (F(x[:i - 1]), F_w(x[:i - 1]))
-                    if None in prev:
-                        continue
-                    true = (F(x[:i]), F_w(x[:i]))
-                    if None in true:
-                        continue
-                    step = (gs((prev[0], prev[1], x[i - 1])), gp((prev[0], prev[1], x[i - 1])))
-                    if step != true:
-                        trans_s.append(((prev[0], prev[1], x[i - 1]), true[0]))
-                        trans_p.append(((prev[0], prev[1], x[i - 1]), true[1]))
-                        added = True
-                        break
-            except StopIteration:
-                pass
-            info.setdefault("counterexamples", 0)
-            info["counterexamples"] += added
-            if not added or not consistent(trans_s) or not consistent(trans_p):
-                break
-        info.update(step_latent=ic.show(holder["ast_p"]) if holder else None,
-                    step_answer=ic.show(holder["ast_s"]) if holder else None)
-        if not holder:
-            continue
-        gs, gp, ast_s, ast_p = holder["gs"], holder["gp"], holder["ast_s"], holder["ast_p"]
-        z = holder["z"]
-        rec["formed"] = name
-        rec["latent"] = {"experiment": name, "step_answer": ast_s, "step_latent": ast_p, "init": list(z) if not isinstance(z[0], tuple) else None}
-        def predict(inp, gs=gs, gp=gp, z=z):
-            tr = run_trace(gs, gp, z, tuple(inp[0]))
-            return tr[-1][0] if tr else z[0]
-        return predict, obs, rec
+            for i in list(range(max(1, lo_), len(seq) + 1)) + list(range(1, max(1, lo_))):
+                u, e = prefixes[i - 1], seq[i - 1]
+                if (u, e) in extra:
+                    continue
+                a, b = S(u), S(prefixes[i])
+                if None in a or None in b:
+                    continue
+                if tuple(g(a + (e,)) for g in upd) != b:
+                    extra.append((u, e))
+                    added = True
+                    break
+            rec.setdefault("counterexamples", 0)
+            rec["counterexamples"] += added
+            if not added:
+                rec["events"].append("counterexample not localisable")
+                if not represent(trans, "counterexample hidden in undefined prefixes"):
+                    break
+    except Exhausted:
+        rec["events"].append("query limit")
     return None, obs, rec
 
 
 # -------------------------------------------------------------------- arms
-def run_arm(arm, env, cap, seed=0, policy=None):
-    """Returns a row: predict + cost record."""
+CHALLENGE = 3     # fresh inputs a formed machine must predict before it may replace the passive solution
+
+
+def challenge(env, machine, examples, obs, rng, k=CHALLENGE):
+    """Independent challenge on fresh inputs the machine was not built from.  Returns True / False / None
+    (None: no query left, the machine is NOT accepted)."""
+    seen = {e[0][0] for e in list(examples) + obs}
+    results = []
+    tries = 0
+    while len(results) < k and env.used < env.budget and tries < 50:
+        tries += 1
+        x = generic_input(rng)
+        if x in seen or len(x) < 2:
+            continue
+        seen.add(x)
+        y = ask(env, x, obs)
+        if y is None:
+            continue
+        results.append(machine((x,)) == y)
+    if len(results) < k:
+        return None
+    return all(results)
+
+
+def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
+    """One arm on one task.  `replay`: for Dq, the exact list of query inputs D made (answers come from the
+    environment again, so the information is identical)."""
     rng = random.Random(seed)
     c0 = time.process_time()
     deadline = c0 + cap
     ex = env.initial()
     rec = {"arm": arm}
+    obs = []
     if arm == "A":
         pred, r = passive(ex, cap)
     elif arm == "B":
@@ -678,42 +549,39 @@ def run_arm(arm, env, cap, seed=0, policy=None):
     elif arm == "C":
         obs = committee_queries(env, ex, rng, env.budget, c0 + 0.4 * cap)
         pred, r = passive(ex + obs, max(0.2, deadline - time.process_time()))
+    elif arm == "Dq":
+        for x in replay or []:
+            ask(env, tuple(x), obs)
+        pred, r = passive(ex + obs, max(0.2, deadline - time.process_time()))
     else:
-        order, split, prior = ("prefix", "suffix"), None, None
-        if arm == "E" and policy:
-            order, split, prior = policy["order"], dict(policy["split"]), policy.get("prior")
-        p, obs, frec = form_state(env, ex, env.budget, c0 + 0.35 * cap, order, split, prior, rng)
-        if p is None and time.process_time() < c0 + 0.7 * cap:
-            lp, lobs, lrec = form_latent(env, ex + obs, c0 + 0.7 * cap, (policy or {}).get("experiments") if arm == "E" else None, rng)
-            obs += lobs
-            frec["latent"] = lrec
-            if lp is not None:
-                seen = {e[0][0] for e in ex + obs}
-                ok_all = True
-                while env.used < env.budget:            # validation on fresh inputs, as for the output state
-                    x = generic_input(rng)
-                    if x in seen or len(x) < 2:
-                        continue
-                    y = ask(env, x, obs)
-                    if y is not None:
-                        ok = lp((x,)) == y
-                        frec["validation"].append(ok)
-                        ok_all &= ok
-                if ok_all:
-                    p = lp
-                    frec["formed"] = "latent:" + lrec["formed"]
-                    frec["hypotheses"]["latent:" + lrec["formed"]] = {"program": "answer=%s ; latent=%s" % (
-                        ic.show(lrec["latent"]["step_answer"]), ic.show(lrec["latent"]["step_latent"]))}
+        frec = {"machines": []}
+        p = None
+        qlimit = env.budget - CHALLENGE
+        for direction in ("prefix", "suffix"):
+            if time.process_time() > c0 + 0.6 * cap or env.used >= qlimit:
+                break
+            m, mobs, mrec = form_machine(env, ex + obs, c0 + 0.6 * cap, qlimit, direction, rng,
+                                         (policy or {}).get("continuations") if arm == "E" else None)
+            obs += mobs
+            frec["machines"].append(mrec)
+            if m is not None:
+                verdict = challenge(env, m, ex, obs, rng)
+                mrec["challenge"] = verdict
+                if verdict:
+                    p = m
+                    frec["formed"] = direction
+                    break
+        rest = env.budget - env.used
+        if p is None and rest > 0:
+            obs += committee_queries(env, ex + obs, rng, rest, time.process_time() + 0.3 * max(0.0, deadline - time.process_time()))
         rec["formation"] = frec
-        if arm == "Dq":
-            pred, r = passive(ex + obs, max(0.2, deadline - time.process_time()))
-        elif p is not None:
-            pred, r = p, {"via": "state:" + frec["formed"], "program": frec["hypotheses"][frec["formed"]]["program"]}
+        if p is not None:
+            mr = frec["machines"][-1]
+            pred, r = p, {"via": "state:%s:m=%d" % (frec["formed"], len(mr["components"]) + 1),
+                          "program": "W=%s update=%s" % ([[]] + [c["w"] for c in mr["components"]], mr.get("update"))}
         else:
-            rest = env.budget - env.used
-            if rest > 0:
-                obs += committee_queries(env, ex + obs, rng, rest, time.process_time() + 0.3 * (deadline - time.process_time()))
             pred, r = passive(ex + obs, max(0.2, deadline - time.process_time()))
     rec.update({"via": r.get("via") if r else None, "program": r.get("program") if r else None,
-                "fit": pred is not None, "queries": env.used, "cpu_seconds": round(time.process_time() - c0, 4)})
+                "fit": pred is not None, "queries": env.used, "cpu_seconds": round(time.process_time() - c0, 4),
+                "query_inputs": [list(x) for x, _ in env.log]})
     return pred, rec
