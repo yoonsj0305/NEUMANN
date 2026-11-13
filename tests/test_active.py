@@ -36,3 +36,15 @@ def test_no_queries_left_means_no_adoption():
     env = E.Env(TS["count-k(k=2)"], 0, budget=60)
     env.used = env.budget
     assert ac.challenge(env, lambda x: 0, env.initial(), [], __import__("random").Random(0)) is None
+
+
+def test_learned_policy_gate_and_allotment_are_obeyed():
+    pol = {"directions": ("prefix", "suffix"), "continuation_kinds": [], "structures": {},
+           "formation": {"skip": True, "max_queries": None, "max_cpu": None}}
+    env = E.Env(TS["count-k(k=2)"], 0, budget=60)
+    _, rec = ac.run_arm("E", env, 20.0, policy={"global": pol, "by_feature": {}})
+    assert rec["formation"].get("skipped_by_policy") and rec["formation"]["machines"] == []
+    pol["formation"] = {"skip": False, "max_queries": 5, "max_cpu": None}
+    env = E.Env(TS["count-k(k=2)"], 0, budget=60)
+    _, rec = ac.run_arm("E", env, 20.0, policy={"global": pol, "by_feature": {}})
+    assert all(m["queries_used"] <= 5 for m in rec["formation"]["machines"])

@@ -303,12 +303,14 @@ def synth_cells(in_types, rows, deadline):
     return g, ("cells", lt.show(sol))
 
 
-def grammar(vals, kinds=None):
+def grammar(vals, kinds=None, restrict=False):
     """Generic continuation grammar (a starting point only): values above / below every value seen, once or
-    twice.  `kinds` (learned on other tasks) reorders it; nothing task-specific is added."""
+    twice.  `kinds` (learned on other tasks) reorders it; with `restrict` (learned: the other kinds never
+    became a component of an accepted machine on this kind of task) only those kinds are tried."""
     hi, lo = max(vals) + 1, min(min(vals) - 1, 0)
     g = {"above": (hi,), "below": (lo,), "above2": (hi, hi), "below2": (lo, lo)}
-    order = [k for k in (kinds or []) if k in g] + [k for k in ("above", "below", "above2", "below2") if k not in (kinds or [])]
+    order = [k for k in (kinds or []) if k in g] + ([] if restrict else
+                                                    [k for k in ("above", "below", "above2", "below2") if k not in (kinds or [])])
     return [(k, g[k]) for k in order]
 
 
@@ -329,7 +331,7 @@ def features(examples):
 
 
 def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, prior_ws=None, log=None,
-                 prior_structure=None):
+                 prior_structure=None, restrict_kinds=False):
     """Learn S(u) = (f(u.w) for w in W), Update and Readout = component 0, with W grown only when needed.
 
       * W starts with the empty continuation: the answer itself as the state (the output-state machine).
@@ -350,6 +352,8 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         s_type = T_B
     vals = sorted({v for (x,), _ in examples for v in x}) or list(range(10))
     memo = {tuple(x): y for (x,), y in examples}
+    tag, qp = ["states"], {}
+    rec["query_purpose"] = qp
 
     def F(u):
         u = tuple(u)
@@ -359,6 +363,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             raise Exhausted
         y = ask(env, u, obs)
         memo[u] = y
+        qp[tag[0]] = qp.get(tag[0], 0) + 1          # what the query was for (instrumentation only)
         return y
 
     def cont(u, w):
@@ -403,6 +408,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         """Observed transitions.  With a virtual value set, transitions into and out of partly undefined states
         are kept with the undefined components replaced by that value (no query)."""
         out = []
+        tag[0] = "states"
         for u, e in points():
             v = step_input(u, e)
             a, b = vs(S(u), u), vs(S(v), v)
@@ -453,50 +459,37 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                 tried_grammar.add(g[kind])
 
     def represent(trans, why):
-        """Add one continuation whose values are not a function of the current state (new information), or one
-        that makes the state defined where the answer is undefined.  Checked on a few observed prefixes only."""
-        allp = list(dict.fromkeys(u for u, e in points()))
-        # most diagnostic first: prefixes where the current state is (partly) undefined, then the shortest
-        pref = sorted(allp, key=lambda u: (None not in tuple(memo.get(cont(u, w0)) for w0 in W), len(u)))[:8]
-        cands = [(k, tuple(w)) for k, w in grammar(vals, prior_ws) if tuple(w) not in W and tuple(w) not in tried_grammar]
-        # screening (early accept, no extra cost: the screened prefixes are a subset of the full check's): two
-        # prefixes where the state is undefined, or two prefixes the state merges -- a difference there is decisive
-        st = {u: S(u) for u in pref}
-        und = [u for u in pref if None in st[u] and u][:2]
+        """Add one continuation that carries information the current state does not: its values differ on two
+        observed prefixes the state merges, or on two prefixes where the state is undefined.  Two queries per
+        candidate (the dev experience: an 8-prefix check never produced a component of an accepted machine,
+        and its queries were what pushed formations over the limit)."""
+        tag[0] = "candidate"
+        allp = sorted(dict.fromkeys(u for u, e in points()), key=len)
+        cands = [(k, tuple(w)) for k, w in grammar(vals, prior_ws, restrict_kinds)
+                 if tuple(w) not in W and tuple(w) not in tried_grammar]
+        st = {u: S(u) for u in allp}                    # all observed already (transitions() ran this round)
+        und = [u for u in allp if None in st[u] and u][:4]
         groups = {}
-        for u in pref:
+        for u in allp:
             if None not in st[u]:
                 groups.setdefault(st[u], []).append(u)
-        mrg = next((g[:2] for g in groups.values() if len(g) > 1), [])
+        mrg = next((g[:4] for g in groups.values() if len(g) > 1), [])
         for kind, w in cands:
-            for pair in (und, mrg):
-                if len(pair) == 2:
-                    v1, v2 = F(cont(pair[0], w)), F(cont(pair[1], w))
-                    if v1 is not None and v2 is not None and v1 != v2:
+            for pool in (und, mrg):
+                got = []                                 # two defined answers (a blocked / invalid one is skipped)
+                for u in pool:
+                    if len(got) == 2:
+                        break
+                    v = F(cont(u, w))
+                    if v is not None:
+                        got.append(v)
+                if len(got) == 2:
+                    v1, v2 = got
+                    if v1 != v2:
                         tried_grammar.add(w)
                         if add_component(w, why + "; informative continuation (screen)"):
                             rec["components"][-1]["kind"] = kind
                             return True
-        for kind, w in cands:
-            if w in tried_grammar:
-                continue
-            tried_grammar.add(w)
-            feat, merged, undefined_vals = {}, False, set()
-            for u in pref:
-                a = S(u)
-                v = F(cont(u, w))
-                if None in a:
-                    if v is not None:
-                        undefined_vals.add(repr(v))      # what it says where the state says nothing
-                    continue
-                if a in feat and feat[a] != v:
-                    merged = True                       # not a function of the state: new information
-                feat[a] = v
-            # informative = distinguishes states the representation merges, or varies where the state is undefined
-            informative = merged or len(undefined_vals) > 1
-            if informative and add_component(w, why + "; informative continuation"):
-                rec["components"][-1]["kind"] = kind
-                return True
         rec["events"].append("no informative continuation")
         return False
     def attempt(trans, share):
@@ -567,6 +560,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                     return None if r is None else r[0]
                 return predict, obs, rec
             # 3. counterexample: binary search for the first step leaving the true states, add that point
+            tag[0] = "localise"
             x = tuple(fails[0])
             seq = x if direction == "prefix" else x[::-1]
             prefixes = [()]
@@ -684,12 +678,22 @@ def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
         if arm == "E" and policy:
             pol = policy["by_feature"].get(features(ex), policy["global"])
         directions = pol["directions"] if pol else None
-        for direction in (directions or ("prefix", "suffix")):
+        lim = (pol or {}).get("formation") or {}
+        if lim.get("skip"):                  # learned: formation never succeeded on this kind of task
+            directions = ()
+            frec["skipped_by_policy"] = True
+        for direction in (("prefix", "suffix") if directions is None else directions):
             if time.process_time() > c0 + 0.6 * cap or env.used >= qlimit:
                 break
-            m, mobs, mrec = form_machine(env, ex + obs, c0 + 0.6 * cap, qlimit, direction, rng,
+            q0, t0 = env.used, time.process_time()
+            # learned allotment per machine: what every accepted machine on this kind of task needed (+ margin)
+            f_q = min(qlimit, q0 + lim["max_queries"]) if lim.get("max_queries") else qlimit
+            f_end = min(c0 + 0.6 * cap, t0 + lim["max_cpu"]) if lim.get("max_cpu") else c0 + 0.6 * cap
+            m, mobs, mrec = form_machine(env, ex + obs, f_end, f_q, direction, rng,
                                          pol["continuation_kinds"] if pol else None, None,
-                                         (pol or {}).get("structures", {}).get(direction))
+                                         (pol or {}).get("structures", {}).get(direction),
+                                         bool((pol or {}).get("restrict_kinds")))
+            mrec["queries_used"], mrec["cpu"] = env.used - q0, round(time.process_time() - t0, 3)
             obs += mobs
             frec["machines"].append(mrec)
             if m is not None:
