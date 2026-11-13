@@ -257,3 +257,57 @@ differences, themselves a divide-and-conquer recurrence) and a transport latent 
 does not find running-maximum selection or counting within the cap. Formation is expected to add sequences;
 lists are uncertain. Learning is expected to add nothing (iteration 1 found no effect of a learned order), and
 this run tests that expectation rather than assuming it. A PASS here is SOURCE evidence only.
+
+### 7.5 Result (2026-11-13, 03:57–04:16 UTC; 936 / 936 jobs) — FORMATION **FAIL**, LEARNING **FAIL**
+
+Record: `docs/experiments/results/formation_record.json`, rows `formation_rows.jsonl`.
+
+| Domain | S | D | R0 | R1 | R2 | R3 | R2 only / R1 only | R3 only / R2 only | CPU s R1 / R2 / R3 |
+|---|---|---|---|---|---|---|---|---|---|
+| lists: rule SOURCE (125) | 57 | — | 68 | 71 | 71 | 73 | 1 / 1 | 4 / 2 | 318 / 318 / 323 |
+| sequences: OEIS SOURCE (187) | 15 | 33 | 28 | 30 | 29 | 31 | 1 / 2 | 3 / 1 | 969 / 963 / 952 |
+
+| Condition | lists | sequences |
+|---|---|---|
+| F1 formation: ≥ 5 and p < 0.025 | 1 : 1 — FAIL | 1 : 2 — FAIL |
+| F2 ≥ 3 solved by R2 and no other arm | 1 — FAIL | 0 — FAIL |
+| F3 gain through a formed latent | 1 of 1 | 1 of 1 |
+| F4 CPU R2 ≤ 1.05 × R1 | pass | pass |
+| L1 learning capability: ≥ 5 clean and p < 0.025 | 4 clean, 4 : 2, p = 0.69 — FAIL | 3 clean, 3 : 1, p = 0.63 — FAIL |
+| L2 learning cost: CPU ≤ 0.7× on tasks both solve | 48.1 vs 47.2 s — FAIL | 33.4 vs 33.5 s — FAIL |
+
+No R3 gain has the shape of a representation verified in its training folds (similarity control: 0 flagged).
+Reported: the substrate alone (R1 against R0) gives 4 : 1 on lists and 2 : 0 on sequences, not significant.
+
+**Cause, separated by a diagnostic** (`formation_standalone_diagnostic.json`; not a verdict). In the pipeline the
+formation stage gets about 1 CPU s. To tell "too little time" from "does not apply", the construction was run
+alone with the whole 6 s cap on the 209 tasks neither R1 nor R2 solved: R2 solved 2 list tasks and 0 sequences
+(R1: 3 and 1). **Time is not the cause.** The two formation rules create new specifications only from
+intermediates that are OBSERVABLE in the data (a residual through an inverse; the destination or presence of an
+input cell). On the remaining failures the specification they create still needs a leaf function that is
+deep: "no earlier element is at least this one", "this value occurs once", a rank. Those leaves depend on
+intermediates that are NOT observable in any example (a running maximum, a count): nothing in the data
+supervises them, so they are again found only by enumerating definitions, which is the cost the factorisation
+was meant to remove.
+
+**What the four experiments since THIRD establish together.**
+* Structure whose intermediate values are observable (copies, linked copies, residuals, earlier terms) is
+  discovered cheaply and causally: iteration 4 (26 : 1 pooled), Stage A sequences (7 : 0).
+* Structure whose intermediate values are hidden is not reached by any mechanism tested, whether by a learned
+  order (iteration 1, R3), by gap synthesis (iteration 3) or by forming residual / transport latents (R2).
+* Cross-task learning has shown no effect in any of five attempts. Here R3 has the right sign in both domains
+  (4 : 2, 3 : 1) and no cost advantage; that is not evidence.
+
+The assumption to revisit is therefore not the search budget and not the relation list: it is that a hidden
+intermediate can be found by enumerating its definition. The next hypothesis has to make hidden state
+testable without enumerating programs for it, for example by intervention: change one input cell, observe
+which answer cells change, and read the dependency structure of the hidden state from that. With example-only
+data this needs the system to construct its own probes from the examples it has, which no current component
+does.
+
+### 7.6 Hand-over interface for Q6 (`docs/experiments/results/q6_contract_formation_v1.json`)
+
+Every representation R2 verified on TRAIN is exported with its domain, kinds, preconditions, the coordinate
+functions with their types, the execution entry point, and whether the hidden tests passed. This is
+representation reuse. It is **not** transfer of a learned principle, and the file says so: formation and
+learning both failed their criteria.

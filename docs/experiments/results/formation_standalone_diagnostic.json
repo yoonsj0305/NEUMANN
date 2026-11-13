@@ -1,0 +1,3837 @@
+[
+{
+"id": "rule/c010",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.99
+},
+{
+"id": "rule/c023",
+"arm": "R2",
+"fit": true,
+"solved": false,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=(add $0 1) | ((lt 1 $0) ? copy 0[(sub $0 1)] : ((lt $1 3) ? value (foldrI 8 $4 $9) : value (foldrI 5 $4 $9)))>",
+"cpu": 0.57
+},
+{
+"id": "rule/c024",
+"arm": "R2",
+"fit": true,
+"solved": false,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=(add $0 1) | ((lt 1 $0) ? copy 0[(sub $0 1)] : ((lt $1 $6) ? value 5 : value (foldrI 8 $4 $9)))>",
+"cpu": 0.77
+},
+{
+"id": "rule/c028",
+"arm": "R2",
+"fit": true,
+"solved": false,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=(sub $0 1) | ((lt $0 2) ? copy 0[$0] : copy 0[(len $8)])>",
+"cpu": 0.13
+},
+{
+"id": "rule/c031",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 6.03
+},
+{
+"id": "rule/c036",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.44
+},
+{
+"id": "rule/c039",
+"arm": "R2",
+"fit": true,
+"solved": false,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=(add $0 (div (mod $0 5) 3)) | ((eq $0 $3) ? value 9 : copy 0[$0])>",
+"cpu": 0.13
+},
+{
+"id": "rule/c040",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.74
+},
+{
+"id": "rule/c053",
+"arm": "R2",
+"fit": true,
+"solved": false,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=$0 | ((eq $0 1) ? copy 0[0] : copy 0[$0])>",
+"cpu": 0.02
+},
+{
+"id": "rule/c055",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 3.95
+},
+{
+"id": "rule/c057",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 3.04
+},
+{
+"id": "rule/c067",
+"arm": "R2",
+"fit": true,
+"solved": false,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=$0 | ((lt $1 2) ? copy 0[(mul $0 $1)] : ((isnil $9) ? copy 0[$1] : copy 0[$0]))>",
+"cpu": 0.04
+},
+{
+"id": "rule/c068",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 3.06
+},
+{
+"id": "rule/c097",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 3.04
+},
+{
+"id": "rule/c102",
+"arm": "R2",
+"fit": true,
+"solved": true,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=$0 | copy 0[$0]>",
+"cpu": 0.0
+},
+{
+"id": "rule/c106",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.99
+},
+{
+"id": "rule/c116",
+"arm": "R2",
+"fit": true,
+"solved": false,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=(add $0 (sub $0 1)) | ((lt $0 $3) ? copy 0[(sub $3 (len $8))] : copy self[$1])>",
+"cpu": 0.38
+},
+{
+"id": "rule/c131",
+"arm": "R2",
+"fit": true,
+"solved": true,
+"kinds": [
+"transport"
+],
+"program": "<transport arg0 present=(lt (mod (div $0 5) 4) 2)>",
+"cpu": 4.69
+},
+{
+"id": "rule/c134",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 6.01
+},
+{
+"id": "rule/c142",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 3.05
+},
+{
+"id": "rule/c147",
+"arm": "R2",
+"fit": true,
+"solved": false,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=(add $0 $0) | ((eq $0 1) ? value 1 : ((lt $7 $6) ? value (add $7 1) : copy 0[(div $0 2)]))>",
+"cpu": 0.07
+},
+{
+"id": "rule/c148",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.72
+},
+{
+"id": "rule/c152",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.46
+},
+{
+"id": "rule/c153",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.73
+},
+{
+"id": "rule/c154",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.96
+},
+{
+"id": "rule/c159",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.73
+},
+{
+"id": "rule/c166",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.99
+},
+{
+"id": "rule/c175",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 6.01
+},
+{
+"id": "rule/c178",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.91
+},
+{
+"id": "rule/c181",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.97
+},
+{
+"id": "rule/c185",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.94
+},
+{
+"id": "rule/c189",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.72
+},
+{
+"id": "rule/c190",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.72
+},
+{
+"id": "rule/c191",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.73
+},
+{
+"id": "rule/c197",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 3.07
+},
+{
+"id": "rule/c198",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 6.01
+},
+{
+"id": "rule/c201",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.95
+},
+{
+"id": "rule/c204",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.74
+},
+{
+"id": "rule/c205",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.2
+},
+{
+"id": "rule/c206",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 6.01
+},
+{
+"id": "rule/c214",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.96
+},
+{
+"id": "rule/c218",
+"arm": "R2",
+"fit": true,
+"solved": false,
+"kinds": [
+"transport"
+],
+"program": "<transport arg0 present=(eq $0 (foldlI $6 $1 $3))>",
+"cpu": 1.06
+},
+{
+"id": "rule/c226",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 6.01
+},
+{
+"id": "rule/c227",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 6.01
+},
+{
+"id": "rule/c229",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 6.01
+},
+{
+"id": "rule/c232",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.85
+},
+{
+"id": "rule/c235",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.72
+},
+{
+"id": "rule/c237",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 6.01
+},
+{
+"id": "rule/c238",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 6.01
+},
+{
+"id": "rule/c239",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 3.57
+},
+{
+"id": "rule/c241",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 3.68
+},
+{
+"id": "rule/c242",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 6.01
+},
+{
+"id": "rule/c248",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 6.01
+},
+{
+"id": "oeis/A000009",
+"arm": "R2",
+"fit": true,
+"solved": false,
+"kinds": [
+"residual",
+"cells"
+],
+"program": "<residual add(self[(sub $0 1)], w) | w = <relcells m=- | linked(sub (div $1 3), self[(mod 3 $0)])>>",
+"cpu": 1.34
+},
+{
+"id": "oeis/A000013",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.86
+},
+{
+"id": "oeis/A000014",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.86
+},
+{
+"id": "oeis/A000015",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 3.6
+},
+{
+"id": "oeis/A000025",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.82
+},
+{
+"id": "oeis/A000031",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.92
+},
+{
+"id": "oeis/A000046",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.87
+},
+{
+"id": "oeis/A000047",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.86
+},
+{
+"id": "oeis/A000052",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.9
+},
+{
+"id": "oeis/A000053",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.81
+},
+{
+"id": "oeis/A000054",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.89
+},
+{
+"id": "oeis/A000057",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.91
+},
+{
+"id": "oeis/A000059",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.81
+},
+{
+"id": "oeis/A000063",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.83
+},
+{
+"id": "oeis/A000065",
+"arm": "R2",
+"fit": true,
+"solved": false,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=- | linked(add (add $2 (add 1 (div $3 4))), self[(div $0 2)])>",
+"cpu": 1.38
+},
+{
+"id": "oeis/A000070",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.83
+},
+{
+"id": "oeis/A000074",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.89
+},
+{
+"id": "oeis/A000077",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.87
+},
+{
+"id": "oeis/A000078",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.83
+},
+{
+"id": "oeis/A000083",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.83
+},
+{
+"id": "oeis/A000084",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000087",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000093",
+"arm": "R2",
+"fit": true,
+"solved": false,
+"kinds": [
+"residual",
+"cells"
+],
+"program": "<residual add(self[(add $0 (sub (mod 1 $2) 2))], w) | w = <relcells m=- | linked(add (div $2 2), self[(mod $0 (div $1 $3))])>>",
+"cpu": 3.86
+},
+{
+"id": "oeis/A000103",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.83
+},
+{
+"id": "oeis/A000114",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.67
+},
+{
+"id": "oeis/A000118",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.84
+},
+{
+"id": "oeis/A000127",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.81
+},
+{
+"id": "oeis/A000135",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.82
+},
+{
+"id": "oeis/A000140",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000147",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.84
+},
+{
+"id": "oeis/A000151",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.79
+},
+{
+"id": "oeis/A000153",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.84
+},
+{
+"id": "oeis/A000159",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.82
+},
+{
+"id": "oeis/A000160",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.86
+},
+{
+"id": "oeis/A000168",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000172",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.82
+},
+{
+"id": "oeis/A000188",
+"arm": "R2",
+"fit": true,
+"solved": false,
+"kinds": [
+"residual",
+"cells"
+],
+"program": "<residual add(self[(sub (div $1 2) 1)], w) | w = <relcells m=- | ((eq $2 $3) ? value (div $0 6) : value 0)>>",
+"cpu": 1.97
+},
+{
+"id": "oeis/A000189",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.05
+},
+{
+"id": "oeis/A000198",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.87
+},
+{
+"id": "oeis/A000199",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.94
+},
+{
+"id": "oeis/A000203",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.86
+},
+{
+"id": "oeis/A000205",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.82
+},
+{
+"id": "oeis/A000208",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.83
+},
+{
+"id": "oeis/A000209",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.91
+},
+{
+"id": "oeis/A000216",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.87
+},
+{
+"id": "oeis/A000228",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.81
+},
+{
+"id": "oeis/A000233",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.92
+},
+{
+"id": "oeis/A000235",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.83
+},
+{
+"id": "oeis/A000238",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.88
+},
+{
+"id": "oeis/A000239",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.79
+},
+{
+"id": "oeis/A000243",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000252",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.88
+},
+{
+"id": "oeis/A000253",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000256",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.82
+},
+{
+"id": "oeis/A000257",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000272",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.84
+},
+{
+"id": "oeis/A000276",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000294",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.86
+},
+{
+"id": "oeis/A000307",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.82
+},
+{
+"id": "oeis/A000309",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000312",
+"arm": "R2",
+"fit": true,
+"solved": false,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=- | value (foldrI (mul $0 $6) 1 $4)>",
+"cpu": 0.62
+},
+{
+"id": "oeis/A000313",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000327",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.83
+},
+{
+"id": "oeis/A000328",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.84
+},
+{
+"id": "oeis/A000334",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000335",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000342",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.81
+},
+{
+"id": "oeis/A000347",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.82
+},
+{
+"id": "oeis/A000365",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000366",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.79
+},
+{
+"id": "oeis/A000367",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.83
+},
+{
+"id": "oeis/A000376",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.84
+},
+{
+"id": "oeis/A000408",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.95
+},
+{
+"id": "oeis/A000412",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.81
+},
+{
+"id": "oeis/A000418",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.93
+},
+{
+"id": "oeis/A000419",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000425",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000430",
+"arm": "R2",
+"fit": true,
+"solved": false,
+"kinds": [
+"residual",
+"cells"
+],
+"program": "<residual add(self[(sub $0 1)], w) | w = <relcells m=- | ((lt $0 6) ? value 2 : value (sub 6 $2))>>",
+"cpu": 1.59
+},
+{
+"id": "oeis/A000434",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000439",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000450",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000465",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.82
+},
+{
+"id": "oeis/A000467",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000481",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.82
+},
+{
+"id": "oeis/A000482",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.81
+},
+{
+"id": "oeis/A000485",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000491",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.82
+},
+{
+"id": "oeis/A000496",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.82
+},
+{
+"id": "oeis/A000498",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000512",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.81
+},
+{
+"id": "oeis/A000527",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.87
+},
+{
+"id": "oeis/A000545",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.84
+},
+{
+"id": "oeis/A000562",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000563",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.79
+},
+{
+"id": "oeis/A000588",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.81
+},
+{
+"id": "oeis/A000590",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.82
+},
+{
+"id": "oeis/A000594",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.84
+},
+{
+"id": "oeis/A000597",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.84
+},
+{
+"id": "oeis/A000605",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.84
+},
+{
+"id": "oeis/A000624",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.85
+},
+{
+"id": "oeis/A000627",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.86
+},
+{
+"id": "oeis/A000630",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.88
+},
+{
+"id": "oeis/A000636",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000648",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.84
+},
+{
+"id": "oeis/A000650",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.82
+},
+{
+"id": "oeis/A000660",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.83
+},
+{
+"id": "oeis/A000661",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.86
+},
+{
+"id": "oeis/A000671",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.88
+},
+{
+"id": "oeis/A000673",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.93
+},
+{
+"id": "oeis/A000675",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.88
+},
+{
+"id": "oeis/A000693",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.81
+},
+{
+"id": "oeis/A000695",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000710",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.83
+},
+{
+"id": "oeis/A000713",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000727",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.86
+},
+{
+"id": "oeis/A000729",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.92
+},
+{
+"id": "oeis/A000732",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.83
+},
+{
+"id": "oeis/A000736",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000741",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.9
+},
+{
+"id": "oeis/A000746",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000747",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000750",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.81
+},
+{
+"id": "oeis/A000752",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000755",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.84
+},
+{
+"id": "oeis/A000757",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.85
+},
+{
+"id": "oeis/A000758",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.8
+},
+{
+"id": "oeis/A000774",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.84
+},
+{
+"id": "oeis/A000775",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.87
+},
+{
+"id": "oeis/A000783",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.83
+},
+{
+"id": "oeis/A000784",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.84
+},
+{
+"id": "oeis/A000793",
+"arm": "R2",
+"fit": true,
+"solved": false,
+"kinds": [
+"residual",
+"cells"
+],
+"program": "<residual mul(self[(add 1 (div (add $0 $3) 6))], w) | w = <relcells m=- | linked(add (sub 2 (div 5 $0)), self[(div $0 5)])>>",
+"cpu": 3.25
+},
+{
+"id": "oeis/A000799",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.87
+},
+{
+"id": "oeis/A000800",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.81
+},
+{
+"id": "oeis/A000804",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.9
+},
+{
+"id": "oeis/A000822",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.83
+},
+{
+"id": "oeis/A000825",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.79
+},
+{
+"id": "oeis/A000828",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.81
+},
+{
+"id": "oeis/A000837",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.88
+},
+{
+"id": "oeis/A000866",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.81
+},
+{
+"id": "oeis/A000888",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.83
+},
+{
+"id": "oeis/A000910",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.82
+},
+{
+"id": "oeis/A000911",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.82
+},
+{
+"id": "oeis/A000922",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.88
+},
+{
+"id": "oeis/A000928",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.83
+},
+{
+"id": "oeis/A000929",
+"arm": "R2",
+"fit": true,
+"solved": false,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=- | linked(sub (sub $0 (div $2 2)), self[(mod 4 $0)])>",
+"cpu": 0.05
+},
+{
+"id": "oeis/A000940",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.83
+},
+{
+"id": "oeis/A000943",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.82
+},
+{
+"id": "oeis/A000945",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.81
+},
+{
+"id": "oeis/A000959",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.86
+},
+{
+"id": "oeis/A000960",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.92
+},
+{
+"id": "oeis/A000962",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.88
+},
+{
+"id": "oeis/A000972",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.85
+},
+{
+"id": "oeis/A000973",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.87
+},
+{
+"id": "oeis/A000980",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.85
+},
+{
+"id": "oeis/A000992",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.82
+},
+{
+"id": "oeis/A000997",
+"arm": "R2",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.83
+},
+{
+"id": "rule/c010",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.74
+},
+{
+"id": "rule/c023",
+"arm": "R1",
+"fit": true,
+"solved": false,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=(add $0 1) | ((lt 1 $0) ? copy 0[(sub $0 1)] : ((lt $1 3) ? value (foldrI 8 $4 $9) : value (foldrI 5 $4 $9)))>",
+"cpu": 0.48
+},
+{
+"id": "rule/c024",
+"arm": "R1",
+"fit": true,
+"solved": false,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=(add $0 1) | ((lt 1 $0) ? copy 0[(sub $0 1)] : ((lt $1 $6) ? value 5 : value (foldrI 8 $4 $9)))>",
+"cpu": 0.6
+},
+{
+"id": "rule/c028",
+"arm": "R1",
+"fit": true,
+"solved": false,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=(sub $0 1) | ((lt $0 2) ? copy 0[$0] : copy 0[(len $8)])>",
+"cpu": 0.04
+},
+{
+"id": "rule/c031",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.87
+},
+{
+"id": "rule/c036",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.84
+},
+{
+"id": "rule/c039",
+"arm": "R1",
+"fit": true,
+"solved": false,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=(add $0 (div (mod $0 5) 3)) | ((eq $0 $3) ? value 9 : copy 0[$0])>",
+"cpu": 0.13
+},
+{
+"id": "rule/c040",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.82
+},
+{
+"id": "rule/c053",
+"arm": "R1",
+"fit": true,
+"solved": false,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=$0 | ((eq $0 1) ? copy 0[0] : copy 0[$0])>",
+"cpu": 0.02
+},
+{
+"id": "rule/c055",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.88
+},
+{
+"id": "rule/c057",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.87
+},
+{
+"id": "rule/c067",
+"arm": "R1",
+"fit": true,
+"solved": false,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=$0 | ((lt $1 2) ? copy 0[(mul $0 $1)] : ((isnil $9) ? copy 0[$1] : copy 0[$0]))>",
+"cpu": 0.04
+},
+{
+"id": "rule/c068",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.29
+},
+{
+"id": "rule/c097",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.89
+},
+{
+"id": "rule/c102",
+"arm": "R1",
+"fit": true,
+"solved": true,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=$0 | copy 0[$0]>",
+"cpu": 0.0
+},
+{
+"id": "rule/c106",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.89
+},
+{
+"id": "rule/c116",
+"arm": "R1",
+"fit": true,
+"solved": false,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=(add $0 (sub $0 1)) | ((lt $0 $3) ? copy 0[(sub $3 (len $8))] : copy self[$1])>",
+"cpu": 0.38
+},
+{
+"id": "rule/c131",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.73
+},
+{
+"id": "rule/c134",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.72
+},
+{
+"id": "rule/c142",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.87
+},
+{
+"id": "rule/c147",
+"arm": "R1",
+"fit": true,
+"solved": false,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=(add $0 $0) | ((eq $0 1) ? value 1 : ((lt $7 $6) ? value (add $7 1) : copy 0[(div $0 2)]))>",
+"cpu": 0.07
+},
+{
+"id": "rule/c148",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.73
+},
+{
+"id": "rule/c152",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.94
+},
+{
+"id": "rule/c153",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.73
+},
+{
+"id": "rule/c154",
+"arm": "R1",
+"fit": true,
+"solved": true,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=$0 | ((eq 0 (mod $4 2)) ? value (mul $4 3) : copy 0[$0])>",
+"cpu": 3.17
+},
+{
+"id": "rule/c159",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.78
+},
+{
+"id": "rule/c166",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.94
+},
+{
+"id": "rule/c175",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.72
+},
+{
+"id": "rule/c178",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.72
+},
+{
+"id": "rule/c181",
+"arm": "R1",
+"fit": true,
+"solved": true,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=$0 | ((eq 0 (mod $0 2)) ? copy 0[$0] : copy 0[(add $1 1)])>",
+"cpu": 3.79
+},
+{
+"id": "rule/c185",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.85
+},
+{
+"id": "rule/c189",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.72
+},
+{
+"id": "rule/c190",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.73
+},
+{
+"id": "rule/c191",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.73
+},
+{
+"id": "rule/c197",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.87
+},
+{
+"id": "rule/c198",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.72
+},
+{
+"id": "rule/c201",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.89
+},
+{
+"id": "rule/c204",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.79
+},
+{
+"id": "rule/c205",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.57
+},
+{
+"id": "rule/c206",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.76
+},
+{
+"id": "rule/c214",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.98
+},
+{
+"id": "rule/c218",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.72
+},
+{
+"id": "rule/c226",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.72
+},
+{
+"id": "rule/c227",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.73
+},
+{
+"id": "rule/c229",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.73
+},
+{
+"id": "rule/c232",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.56
+},
+{
+"id": "rule/c235",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.72
+},
+{
+"id": "rule/c237",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.73
+},
+{
+"id": "rule/c238",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.73
+},
+{
+"id": "rule/c239",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.58
+},
+{
+"id": "rule/c241",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.56
+},
+{
+"id": "rule/c242",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.73
+},
+{
+"id": "rule/c248",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 0.73
+},
+{
+"id": "oeis/A000009",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 1.18
+},
+{
+"id": "oeis/A000013",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.73
+},
+{
+"id": "oeis/A000014",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000015",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 1.4
+},
+{
+"id": "oeis/A000025",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.69
+},
+{
+"id": "oeis/A000031",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.7
+},
+{
+"id": "oeis/A000046",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.78
+},
+{
+"id": "oeis/A000047",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.71
+},
+{
+"id": "oeis/A000052",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.88
+},
+{
+"id": "oeis/A000053",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.59
+},
+{
+"id": "oeis/A000054",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.77
+},
+{
+"id": "oeis/A000057",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.69
+},
+{
+"id": "oeis/A000059",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.6
+},
+{
+"id": "oeis/A000063",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.74
+},
+{
+"id": "oeis/A000065",
+"arm": "R1",
+"fit": true,
+"solved": false,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=- | linked(add (add $2 (add 1 (div $3 4))), self[(div $0 2)])>",
+"cpu": 1.23
+},
+{
+"id": "oeis/A000070",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.65
+},
+{
+"id": "oeis/A000074",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.69
+},
+{
+"id": "oeis/A000077",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.66
+},
+{
+"id": "oeis/A000078",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.6
+},
+{
+"id": "oeis/A000083",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.65
+},
+{
+"id": "oeis/A000084",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000087",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.63
+},
+{
+"id": "oeis/A000093",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.6
+},
+{
+"id": "oeis/A000103",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.66
+},
+{
+"id": "oeis/A000114",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.6
+},
+{
+"id": "oeis/A000118",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.71
+},
+{
+"id": "oeis/A000127",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.64
+},
+{
+"id": "oeis/A000135",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.68
+},
+{
+"id": "oeis/A000140",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.64
+},
+{
+"id": "oeis/A000147",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.74
+},
+{
+"id": "oeis/A000151",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.61
+},
+{
+"id": "oeis/A000153",
+"arm": "R1",
+"fit": true,
+"solved": true,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=- | linked(sub (sub (mul $0 (add $2 $3)) $3), self[(sub $0 2)])>",
+"cpu": 4.05
+},
+{
+"id": "oeis/A000159",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000160",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000168",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.63
+},
+{
+"id": "oeis/A000172",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.63
+},
+{
+"id": "oeis/A000188",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 1.85
+},
+{
+"id": "oeis/A000189",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.59
+},
+{
+"id": "oeis/A000198",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.82
+},
+{
+"id": "oeis/A000199",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.6
+},
+{
+"id": "oeis/A000203",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.6
+},
+{
+"id": "oeis/A000205",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.66
+},
+{
+"id": "oeis/A000208",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000209",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.64
+},
+{
+"id": "oeis/A000216",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.7
+},
+{
+"id": "oeis/A000228",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.61
+},
+{
+"id": "oeis/A000233",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.67
+},
+{
+"id": "oeis/A000235",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.68
+},
+{
+"id": "oeis/A000238",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.61
+},
+{
+"id": "oeis/A000239",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000243",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.63
+},
+{
+"id": "oeis/A000252",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000253",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.66
+},
+{
+"id": "oeis/A000256",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000257",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000272",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.64
+},
+{
+"id": "oeis/A000276",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.61
+},
+{
+"id": "oeis/A000294",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.64
+},
+{
+"id": "oeis/A000307",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.63
+},
+{
+"id": "oeis/A000309",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.64
+},
+{
+"id": "oeis/A000312",
+"arm": "R1",
+"fit": true,
+"solved": false,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=- | value (foldrI (mul $0 $6) 1 $4)>",
+"cpu": 0.71
+},
+{
+"id": "oeis/A000313",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.61
+},
+{
+"id": "oeis/A000327",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.65
+},
+{
+"id": "oeis/A000328",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.77
+},
+{
+"id": "oeis/A000334",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.63
+},
+{
+"id": "oeis/A000335",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000342",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.7
+},
+{
+"id": "oeis/A000347",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000365",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000366",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.61
+},
+{
+"id": "oeis/A000367",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.63
+},
+{
+"id": "oeis/A000376",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.6
+},
+{
+"id": "oeis/A000408",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.59
+},
+{
+"id": "oeis/A000412",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.64
+},
+{
+"id": "oeis/A000418",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.72
+},
+{
+"id": "oeis/A000419",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.59
+},
+{
+"id": "oeis/A000425",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.65
+},
+{
+"id": "oeis/A000430",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 1.57
+},
+{
+"id": "oeis/A000434",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.61
+},
+{
+"id": "oeis/A000439",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.61
+},
+{
+"id": "oeis/A000450",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000465",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.64
+},
+{
+"id": "oeis/A000467",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.63
+},
+{
+"id": "oeis/A000481",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.65
+},
+{
+"id": "oeis/A000482",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000485",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000491",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.64
+},
+{
+"id": "oeis/A000496",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.64
+},
+{
+"id": "oeis/A000498",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000512",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.66
+},
+{
+"id": "oeis/A000527",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000545",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.61
+},
+{
+"id": "oeis/A000562",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000563",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.63
+},
+{
+"id": "oeis/A000588",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000590",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000594",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.61
+},
+{
+"id": "oeis/A000597",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.61
+},
+{
+"id": "oeis/A000605",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.63
+},
+{
+"id": "oeis/A000624",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.61
+},
+{
+"id": "oeis/A000627",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.81
+},
+{
+"id": "oeis/A000630",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.66
+},
+{
+"id": "oeis/A000636",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.64
+},
+{
+"id": "oeis/A000648",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.64
+},
+{
+"id": "oeis/A000650",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.63
+},
+{
+"id": "oeis/A000660",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.63
+},
+{
+"id": "oeis/A000661",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.65
+},
+{
+"id": "oeis/A000671",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.68
+},
+{
+"id": "oeis/A000673",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 5.02
+},
+{
+"id": "oeis/A000675",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000693",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.78
+},
+{
+"id": "oeis/A000695",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.63
+},
+{
+"id": "oeis/A000710",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.65
+},
+{
+"id": "oeis/A000713",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.63
+},
+{
+"id": "oeis/A000727",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.81
+},
+{
+"id": "oeis/A000729",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.69
+},
+{
+"id": "oeis/A000732",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000736",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.65
+},
+{
+"id": "oeis/A000741",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.85
+},
+{
+"id": "oeis/A000746",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.64
+},
+{
+"id": "oeis/A000747",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.63
+},
+{
+"id": "oeis/A000750",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.79
+},
+{
+"id": "oeis/A000752",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.63
+},
+{
+"id": "oeis/A000755",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.63
+},
+{
+"id": "oeis/A000757",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.64
+},
+{
+"id": "oeis/A000758",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000774",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.83
+},
+{
+"id": "oeis/A000775",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.63
+},
+{
+"id": "oeis/A000783",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.73
+},
+{
+"id": "oeis/A000784",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.69
+},
+{
+"id": "oeis/A000793",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.61
+},
+{
+"id": "oeis/A000799",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.82
+},
+{
+"id": "oeis/A000800",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.77
+},
+{
+"id": "oeis/A000804",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.63
+},
+{
+"id": "oeis/A000822",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000825",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000828",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.69
+},
+{
+"id": "oeis/A000837",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.6
+},
+{
+"id": "oeis/A000866",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.65
+},
+{
+"id": "oeis/A000888",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.63
+},
+{
+"id": "oeis/A000910",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.7
+},
+{
+"id": "oeis/A000911",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.64
+},
+{
+"id": "oeis/A000922",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.67
+},
+{
+"id": "oeis/A000928",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.66
+},
+{
+"id": "oeis/A000929",
+"arm": "R1",
+"fit": true,
+"solved": false,
+"kinds": [
+"cells"
+],
+"program": "<relcells m=- | linked(sub (sub $0 (div $2 2)), self[(mod 4 $0)])>",
+"cpu": 0.05
+},
+{
+"id": "oeis/A000940",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.62
+},
+{
+"id": "oeis/A000943",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.64
+},
+{
+"id": "oeis/A000945",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.63
+},
+{
+"id": "oeis/A000959",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.6
+},
+{
+"id": "oeis/A000960",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.77
+},
+{
+"id": "oeis/A000962",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.67
+},
+{
+"id": "oeis/A000972",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.63
+},
+{
+"id": "oeis/A000973",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.66
+},
+{
+"id": "oeis/A000980",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.64
+},
+{
+"id": "oeis/A000992",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.77
+},
+{
+"id": "oeis/A000997",
+"arm": "R1",
+"fit": false,
+"solved": false,
+"kinds": null,
+"program": null,
+"cpu": 4.72
+}
+]
