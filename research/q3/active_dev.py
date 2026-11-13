@@ -78,25 +78,23 @@ def run(split, out, arms="A,B,C,Dq,D"):
 
 
 def policy_from(rows, exclude_fold):
-    """What the discovery experience of other tasks says: which hypothesis formed, how to split queries, and the
-    generative order of step programs that verified."""
+    """Discovery experience of OTHER tasks (never the task itself, never its answers): which reading direction
+    formed an accepted machine, and which continuation kinds became informative state components.  A
+    continuation is abstracted to its relation to the values seen (above / below every value, length), not
+    kept as the literal values of another task."""
     d = [r for r in rows if r["arm"] == "D" and fold_of(r["name"]) != exclude_fold and r.get("formation")]
-    formed = collections.Counter(r["formation"].get("formed") for r in d if r["formation"].get("formed"))
-    tried = collections.Counter(k for r in d for k in r["formation"].get("hypotheses", {}))
-    rate = {k: (formed.get(k, 0) + 0.5) / (tried.get(k, 0) + 1.0) for k in ("prefix", "suffix")}
-    order = tuple(sorted(rate, key=lambda k: -rate[k]))
-    share = rate[order[0]] / (rate[order[0]] + rate[order[1]])
-    first_n = max(1, min(BUDGET - ac.RESERVE - 1, round(share * (BUDGET - ac.RESERVE))))
-    split = {order[0]: first_n, order[1]: BUDGET - ac.RESERVE - first_n}
-    progs = []
+    dirs, kinds = collections.Counter(), collections.Counter()
     for r in d:
         f = r["formation"]
-        k = f.get("formed")
-        if k and f["hypotheses"][k].get("ast"):
-            st = r["out_type"]
-            progs.append((ic._tup(f["hypotheses"][k]["ast"]), (st, "I") if k == "prefix" else ("I", st)))
-    prior = ic.learn_costs(progs, ac._lib()) if progs else None
-    return {"order": order, "split": split, "prior": prior, "rate": rate, "n_programs": len(progs)}
+        if f.get("formed"):
+            dirs[f["formed"]] += 1
+        for m in f.get("machines", []):
+            if m.get("challenge"):
+                for c in m.get("components", []):
+                    kinds[c.get("kind", "?")] += 1
+    order = tuple(sorted(("prefix", "suffix"), key=lambda k: -dirs.get(k, 0)))
+    return {"directions": order, "continuation_kinds": [k for k, _ in kinds.most_common()],
+            "counts": {"directions": dict(dirs), "kinds": dict(kinds)}}
 
 
 def runDq(split, out):
@@ -121,8 +119,7 @@ def runE(split, out):
     rows = [json.loads(l) for l in open(out)]
     for f in range(FOLDS):
         POLICY[f] = policy_from(rows, f)
-        print("fold", f, POLICY[f]["order"], POLICY[f]["split"], {k: round(v, 3) for k, v in POLICY[f]["rate"].items()},
-              "programs", POLICY[f]["n_programs"], flush=True)
+        print("fold", f, POLICY[f], flush=True)
     _go([("E", s) for s in _specs(split)], out)
 
 

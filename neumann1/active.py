@@ -289,10 +289,13 @@ class Exhausted(Exception):
     pass
 
 
-def grammar(vals):
-    """Generic continuation grammar (a starting point only): one value above / below every value seen."""
+def grammar(vals, kinds=None):
+    """Generic continuation grammar (a starting point only): values above / below every value seen, once or
+    twice.  `kinds` (learned on other tasks) reorders it; nothing task-specific is added."""
     hi, lo = max(vals) + 1, min(min(vals) - 1, 0)
-    return [(hi,), (lo,), (hi, hi), (lo, lo)]
+    g = {"above": (hi,), "below": (lo,), "above2": (hi, hi), "below2": (lo, lo)}
+    order = [k for k in (kinds or []) if k in g] + [k for k in ("above", "below", "above2", "below2") if k not in (kinds or [])]
+    return [(k, g[k]) for k in order]
 
 
 def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, prior_ws=None, log=None):
@@ -382,7 +385,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         if w in W or len(W) >= 4:
             return False
         W.append(w)
-        rec["components"].append({"w": list(w), "why": why})
+        rec["components"].append({"w": list(w), "why": why, "kind": "derived:e+w"})
         return True
     tried_grammar = set()
 
@@ -390,7 +393,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         """Add one continuation whose values are not a function of the current state (new information), or one
         that makes the state defined where the answer is undefined.  Checked on a few observed prefixes only."""
         pref = [u for u, e in points()][:7]
-        for w in (prior_ws or []) + grammar(vals):
+        for kind, w in grammar(vals, prior_ws):
             w = tuple(w)
             if w in W or w in tried_grammar:
                 continue
@@ -405,6 +408,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                     informative = True              # distinguishes prefixes the state merges
                 feat[a] = v
             if informative and add_component(w, why + "; informative continuation"):
+                rec["components"][-1]["kind"] = kind
                 return True
         rec["events"].append("no informative continuation")
         return False
@@ -509,6 +513,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
 
 # -------------------------------------------------------------------- arms
 CHALLENGE = 3     # fresh inputs a formed machine must predict before it may replace the passive solution
+DISCRIMINATE = 2  # queries kept to decide between an accepted machine and the passive solution where they differ
 
 
 def challenge(env, machine, examples, obs, rng, k=CHALLENGE):
@@ -556,12 +561,13 @@ def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
     else:
         frec = {"machines": []}
         p = None
-        qlimit = env.budget - CHALLENGE
-        for direction in ("prefix", "suffix"):
+        qlimit = env.budget - CHALLENGE - DISCRIMINATE
+        directions = (policy or {}).get("directions") if arm == "E" else None
+        for direction in (directions or ("prefix", "suffix")):
             if time.process_time() > c0 + 0.6 * cap or env.used >= qlimit:
                 break
             m, mobs, mrec = form_machine(env, ex + obs, c0 + 0.6 * cap, qlimit, direction, rng,
-                                         (policy or {}).get("continuations") if arm == "E" else None)
+                                         (policy or {}).get("continuation_kinds") if arm == "E" else None)
             obs += mobs
             frec["machines"].append(mrec)
             if m is not None:
@@ -571,16 +577,34 @@ def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
                     p = m
                     frec["formed"] = direction
                     break
-        rest = env.budget - env.used
-        if p is None and rest > 0:
+        rest = env.budget - env.used - (DISCRIMINATE if p is not None else 0)
+        if rest > 0:
             obs += committee_queries(env, ex + obs, rng, rest, time.process_time() + 0.3 * max(0.0, deadline - time.process_time()))
         rec["formation"] = frec
+        pp, r = passive(ex + obs, max(0.2, deadline - time.process_time()))
+        pred = pp
         if p is not None:
             mr = frec["machines"][-1]
-            pred, r = p, {"via": "state:%s:m=%d" % (frec["formed"], len(mr["components"]) + 1),
-                          "program": "W=%s update=%s" % ([[]] + [c["w"] for c in mr["components"]], mr.get("update"))}
-        else:
-            pred, r = passive(ex + obs, max(0.2, deadline - time.process_time()))
+            rm = {"via": "state:%s:m=%d" % (frec["formed"], len(mr["components"]) + 1),
+                  "program": "W=%s update=%s" % ([[]] + [c["w"] for c in mr["components"]], mr.get("update"))}
+            choice = "machine"
+            if pp is not None:
+                # two hypotheses fit everything observed: query where they disagree, keep the one that is right
+                seen = {e[0][0] for e in ex + obs}
+                for _ in range(DISCRIMINATE):
+                    x = next((x for x in (generic_input(rng) for _ in range(200))
+                              if x not in seen and len(x) >= 2 and _safe(lambda: p((x,))) != _safe(lambda: pp((x,)))), None)
+                    if x is None or env.used >= env.budget:
+                        break
+                    seen.add(x)
+                    y = ask(env, x, obs)
+                    if y is None:
+                        continue
+                    choice = "machine" if p((x,)) == y else "passive" if pp((x,)) == y else "neither"
+                    break
+            frec["adoption"] = choice
+            if choice == "machine" or pp is None:
+                pred, r = p, rm
     rec.update({"via": r.get("via") if r else None, "program": r.get("program") if r else None,
                 "fit": pred is not None, "queries": env.used, "cpu_seconds": round(time.process_time() - c0, 4),
                 "query_inputs": [list(x) for x, _ in env.log]})
