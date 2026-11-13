@@ -246,3 +246,58 @@ On this dev set V2's count (4–5) is at or below the frozen threshold of 5, and
 * Criteria and predictions: `docs/experiments/q3_fresh_freeze.json` (the same V1 / V2 / V3 rules as the formal
   run; tasks solved only through a new latent component are reported separately). The single run follows
   the commit of the freeze.
+
+### 7.6 FRESH result (single run; freeze `132053fa…33eb` committed in `94d2a6a` before the run)
+
+111 registered; `mbpp/38` reference inconsistent under T3 (its reference returns a float, the published test an
+int) and not run; 110 run; 442 / 442 jobs. Errors: `humaneval/114` in D and E (see defects), counted as unsolved
+for D / E and solved for the rivals, as frozen. D and Dq query-answer logs identical in 109 / 109.
+Record: `docs/experiments/results/q3_fresh_record.json`; seal: `docs/experiments/q3_fresh_seal.json`.
+
+| Arm | solved (of 110) | CPU s | queries |
+|---|---|---|---|
+| A passive | 26 | 1 963 | 0 |
+| Dq = D's queries, no formation | 25 | 2 619 | 6 468 |
+| **D state formation** | **38** | 2 712 | 6 468 |
+| E = D + frozen learned policy | 38 | 2 710 | 6 470 |
+
+| Comparison | first only / second only | exact McNemar p |
+|---|---|---|
+| **D vs Dq** | **14 / 1** | **0.00098** |
+| D vs A | 15 / 3 | 0.0075 |
+| E vs D | 0 / 0 | 1.0 |
+| Dq vs A | 3 / 4 | 1.0 |
+
+| Verdict (frozen rule) | Result |
+|---|---|
+| V1 executable method invention: net D − Dq ≥ 10, p < 0.05, ≥ 2 structure classes | **PASS** on FRESH (net 13, p = 0.00098; list-state 7, scalar-state 7) |
+| V2 latent state discovery: ≥ 5 D-only tasks with an m ≥ 2 machine | **FAIL** (0) |
+| Solved only through a new latent component (m ≥ 2, neither A nor Dq solves) | D 0, E 0 |
+| V3 learned discovery policy | **FAIL** (E vs D 0 : 0; CPU 2 710 vs 2 712 s) |
+
+What the record shows:
+* The 14 D-only tasks are MBPP tasks whose method D invented as a fold over the input from its own
+  interventions: 7 sorting tasks (`mbpp/54, 71, 141, 152, 428, 516, 940`: counting, comb, pancake, merge,
+  shell, radix, heap sort) solved by the same discovered list-state step — insert the element into the sorted
+  answer of the prefix (insertion sort), whatever algorithm the reference uses — and 7 scalar folds (sums and
+  counts under sign / parity conditions, first even / odd element: `mbpp/66, 133, 221, 329, 697, 807, 870`).
+  All 14 use the answer itself as the state (m = 1).
+* No FRESH task was solved through a new latent component. 62 formation attempts added components; one m = 2
+  machine (`mbpp/45`, gcd of an array; component "answer after appending 18") reproduced every initial example,
+  passed the 3-input challenge and was adopted, and failed the hidden test: an overfit machine, not a latent
+  discovery. Another (`mbpp/670`) was rejected by the challenge. The prediction "V2 more likely FAIL" held.
+* The frozen policy changed nothing measurable (E = D task by task); the prediction "V3 more likely FAIL" held.
+* Query use in D's formation on FRESH: states 2 983, candidate continuations 527, localisation 490; 33 of 176
+  formation attempts ended at the query limit.
+
+Defects found in the FRESH run (not repaired in the counted run):
+* F9 `humaneval/114` (inputs down to −9 999 999 999 999 999): the order-covering trajectories were drawn from
+  `range(min, max)` of the observed values, which exhausted memory. Repaired after the run (trajectory values
+  drawn from the observed values and their neighbours when the range is large); the repair is not counted.
+* F10 an overfit m = 2 machine passed fold verification and the 3-input challenge (`mbpp/45`): the challenge
+  inputs come from a generic generator (0–16) unlike the task's large values; recorded, not repaired in this
+  record.
+
+Scope: V1 now holds on an independent FRESH source (MBPP + HumanEval, authors' references run in isolation) at
+60 queries / 30 CPU s, at an absolute level of 38 / 110. V2 and V3 have failed twice (formal, FRESH).
+Q3 as a whole and Q6 remain OPEN.
