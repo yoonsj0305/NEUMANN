@@ -289,6 +289,20 @@ class Exhausted(Exception):
     pass
 
 
+def synth_cells(in_types, rows, deadline):
+    """A list-valued Update by the representation-construction core (`latent`, R2), under per-transition
+    supervision; returns (g, description)."""
+    t = {"id": "update", "in_types": list(in_types), "out_type": T_L, "train": [(k, v) for k, v in rows], "test": []}
+    sol = lt.solve(t, deadline, _inv(), lt.Cfg(subst=True, latent=True))
+    if sol is None or sol[0] not in ("lat", "residual", "transport", "keep"):
+        return None, None
+    lib = lt.library(lt.Cfg(subst=True))
+
+    def g(args, sol=sol, t=t):
+        return _safe(lambda: lt.run(sol, lib, tuple(args), t))
+    return g, ("cells", lt.show(sol))
+
+
 def grammar(vals, kinds=None):
     """Generic continuation grammar (a starting point only): values above / below every value seen, once or
     twice.  `kinds` (learned on other tasks) reorders it; nothing task-specific is added."""
@@ -442,7 +456,11 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             upd, asts = [], []
             for j in range(len(W)):
                 end = min(deadline, time.process_time() + 0.25 * max(0.0, deadline - time.process_time()))
-                g, ast = synth_multi(in_t, s_type, rows[j], end)
+                g, ast = (None, None)
+                if s_type == T_L:                 # list-valued components: the cell construction (R2) first
+                    g, ast = synth_cells(in_t, rows[j], end)
+                if g is None:
+                    g, ast = synth_multi(in_t, s_type, rows[j], end)
                 if g is None and s_type == T_I:
                     g, ast = synth_cover(in_t, s_type, rows[j], min(deadline, time.process_time() + 0.6))
                 if g is None:
@@ -462,7 +480,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             z, fails = best
             rec["events"].append("round %d: m=%d, examples failing %d" % (rnd, len(W), len(fails)))
             if not fails:
-                rec["update"] = [ic.show(a) for a in asts]
+                rec["update"] = [a[1] if isinstance(a, tuple) and a and a[0] == "cells" else ic.show(a) for a in asts]
                 rec["init"] = repr(z)
                 rec["formed"] = True
 
