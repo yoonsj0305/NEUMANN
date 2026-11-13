@@ -130,6 +130,46 @@ Development disclosure: the mechanism and the cover order were developed on self
 contents were read during earlier iterations. A PASS would be SOURCE evidence only and would lead to Stage B,
 not to a Q3 or Q6 claim.
 
+### Stage A result (2026-11-13, 01:03–01:23 UTC; 1 272 / 1 272 jobs) — **FAIL**
+
+Record: `docs/experiments/results/stage_a_record.json`, rows `stage_a_rows.jsonl`.
+
+| Domain | A | B | S | D | Cn | C4 | R0 | **R** | R only / R0 only | p | solved by R and no other arm | CPU s R / R0 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| lists: rule SOURCE (125) | 58 | 59 | 57 | — | 59 | 65 | 65 | **68** | 6 / 3 | 0.51 | 4 | 322 / 341 |
+| sequences: OEIS SOURCE (187) | 17 | 21 | 15 | 33 | 21 | 19 | 21 | **28** | 7 / 0 | 0.016 | 4 | 940 / 941 |
+| rule TARGET (reported) | — | — | 62 | — | 59 | 64 | 64 | 65 | 2 / 1 | 1.0 | 2 | 347 / 349 |
+| dc (reported) | — | — | 151 | — | 148 | 162 | 162 | 162 | 0 / 0 | — | 0 | 182 / 179 |
+
+| Condition | lists | sequences |
+|---|---|---|
+| A1: ≥ 5 and p < 0.025 | 6 : 3, p = 0.51 — **FAIL** | 7 : 0, p = 0.016 — pass |
+| A2: ≥ 3 solved by R and no other arm | 4 — pass | 4 — pass (none of them solved by D) |
+| A3: ≥ 80 % of the gain through a self or linked relation | 1 of 6 — **FAIL** | 7 of 7 — pass |
+| A4: CPU R ≤ 1.05 × R0 | pass | pass |
+
+**Verdict: FAIL** (the rule requires both domains). Stage B is not started; nothing is registered or opened.
+
+What the record shows, kept apart from the verdict:
+* **Sequences: a causal gain that the removal of the new relations removes (7 : 0).** All seven gained
+  sequences are solved through a relation from the answer's own earlier cells, linked by an operation whose
+  inverse the system derived: popcount A000120 as a(⌊n/2⌋) + (n mod 2); A000999 through a(⌊(n+2)/5⌋);
+  A000255, A000297 through a(n−2); A000984 and A000125 through a fixed earlier cell. Four of them are solved by
+  no other arm, including the classical specialist; A000120 is a divide-and-conquer recurrence that neither the
+  THIRD history state nor finite differences / Berlekamp–Massey express. The specialist still solves more
+  sequences overall (33 against 28; 13 it solves that R does not, 8 the reverse).
+* **Lists: no attributable gain.** Of R's six extra list tasks, one uses a linked relation (rule/c176, each
+  element plus its successor); the others are cap-timing and cover differences, and R loses three that R0
+  solves. On rule TARGET and dc, R = R0 within one task. The list failures that remain need structures this
+  relation vocabulary does not produce (aggregates inside a cell, ranks for sorting, counting).
+* The cover order changed in development (cheapest consistent description first) is shared by R and R0; R0
+  alone equals C4 on every list family (65, 64, 162), so it neither helps nor hurts at this scale.
+
+Cause, by the kill criterion: the principle "an answer cell is a linked copy of an observed cell" carries to the
+second domain where the observed cells include the answer's own past, and adds ability there that the strong
+specialist lacks. On lists the binding limit is the relation vocabulary (equality and three derived inverses),
+not the search and not the budget.
+
 ## 6. Kill criteria for the programme
 
 * Stage A fails → the relational principle does not carry across domains as constructed; the next step is an
