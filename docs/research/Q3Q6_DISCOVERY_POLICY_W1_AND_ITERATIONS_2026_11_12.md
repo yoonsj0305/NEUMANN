@@ -298,7 +298,7 @@ Q6); no independent set is opened without the owner's approval.
 | 1 | H1 | K1–K4, both domains | **FAIL** (lists: K1–K4 all fail; sequences: K1–K3 fail) | `docs/experiments/results/discovery_iter1_source_cv.json`, `discovery_iter1_cv_rows.jsonl`, `discovery_iter1_experience_rows.jsonl.gz` |
 | 2 | H2 | J1–J3, both list families | **FAIL** (rule: J1, J2 fail; dc: J1 fails on p) | `docs/experiments/results/discovery_iter2_inverted_inventions.json`, `discovery_iter2_rows.jsonl.gz` |
 | 3 | H3 | G1–G5, both domains | **FAIL** (every condition, both domains) | `docs/experiments/results/discovery_iter3_source_cv.json`, `discovery_iter3_ops_rows.jsonl`, `discovery_iter3_cv_rows.jsonl`, `substrate_probe_definitions.json` |
-| 4 | H4 | R1–R4 (rule SOURCE), V1–V2 (rule TARGET, dc) | (pending) | (pending) |
+| 4 | H4 | R1–R4 (rule SOURCE), V1–V2 (rule TARGET, dc) | **FAIL** (R1 p = 0.070; rule TARGET V1 p = 0.0625, V2 3 < 5; dc passes) | `docs/experiments/results/discovery_iter4_record.json`, `discovery_iter4_rows.jsonl`, `op_witnesses.json`, `solver_probe_definitions.json` |
 
 ### Iteration 2 result (2026-11-12, 08:26–08:47 UTC; 972 / 972 jobs)
 
@@ -411,3 +411,41 @@ system can invent is bounded by the language its inventions are written in, and 
 the developer-designed representation that produced THIRD. Autonomous invention in the sense of Q3 is **not
 shown**. A larger search budget does not move this boundary (cost level 8 at 60 s; the missing definitions need
 level 12 and beyond).
+
+### Iteration 4 result (2026-11-12/13, 23:58–00:20 UTC; 1 272 / 1 272 jobs)
+
+| Family | A | B | S | Cn (construction removed) | C | C only / Cn only | p | solved by C and no rival | CPU s C / Cn |
+|---|---|---|---|---|---|---|---|---|---|
+| rule SOURCE (125) | 58 | 59 | 57 | 59 | **65** | 7 / 1 | 0.070 | 7 | 335 / 392 |
+| rule TARGET (125, dev.) | — | — | 62 | 59 | **64** | 5 / 0 | 0.0625 | 3 | 347 / 418 |
+| dc (199, dev.) | — | — | 151 | 148 | **162** | 14 / 0 | 1.2e-4 | 14 | 180 / 292 |
+| OEIS SOURCE (187) | 17 | 21 | 15 | 21 | 19 | 0 / 2 | 0.5 | 0 | 1 015 / 1 006 |
+
+| Condition | Result |
+|---|---|
+| R1 rule SOURCE: ≥ 5 and p < 0.01 | 7 : 1, p = 0.070 — **FAIL** |
+| R2 rule SOURCE: ≥ 5 solved by C and no rival | 7 — pass |
+| R3 rule SOURCE: ≥ 3 structure classes, none > 60 % | 4 classes, largest 3 of 7 — pass |
+| R4 rule SOURCE: CPU C ≤ Cn | 335 ≤ 392 — pass |
+| V1 rule TARGET: ≥ 5 and p < 0.025 | 5 : 0, p = 0.0625 — **FAIL** |
+| V2 rule TARGET: ≥ 5 solved by C and neither Cn nor S | 3 — **FAIL** |
+| V1, V2 dc | 14 : 0, p = 1.2e-4; 14 — pass |
+
+**Verdict: FAIL** by the criterion fixed before the run. Step 5 (handing representations to Q6) is not taken.
+
+What the record shows, kept apart from the verdict:
+* The effect has the predicted sign in all three list families and is never reversed by more than one task:
+  pooled 26 : 1. On dc, the family that was never used in development, it passes on its own (14 : 0).
+* The gained tasks are solved with representations of several forms, all constructed per task from the
+  observed relations: rotations and cyclic copies with a modular index (dc/169–171, 181–183), insertion of a
+  copied element (dc/007–010), interleaving with a computed index value (rule/c147), conditional replacement of
+  values (rule/c154), positional swaps (rule/c181), selection of the first maximum (dc/123).
+* C used less CPU than Cn in every list family (−15 %, −17 %, −38 %): a constructed representation ends the
+  search early.
+* Cost of the case split: on rule SOURCE 30 tasks fit through cells and 19 generalise; on rule TARGET 34 and
+  24. A wrong fit stops the search, which cost one task (rule/c149). Precision of the split is the weak point.
+* Sequences: no effect, as predicted (an integer-to-integer task has no list cells); the 0 : 2 is cap timing.
+
+Reading against the registered thresholds: the two rule families have fewer tasks of the kind the mechanism
+addresses; 7 : 1 and 5 : 0 have the right sign but not the significance the criterion asked for. The
+criterion is not changed after the fact.
