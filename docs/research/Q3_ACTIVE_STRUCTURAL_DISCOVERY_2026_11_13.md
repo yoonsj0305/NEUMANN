@@ -113,3 +113,47 @@ undefined on the designed trajectories.
 
 Predictions written before the run: V1 uncertain; V2 expected FAIL (few hidden-state tasks); V3 expected FAIL.
 This environment is from one independent source (list-routines); it is not a new independent problem family.
+
+## 6. FORMAL result (168 tasks, first run; frozen `2fd5f3bd…b1f6`; 1 008 / 1 008 jobs, 0 errors)
+
+Record: `docs/experiments/results/q3_active_formal_record.json`; rows `q3_active_formal_rows.jsonl`. Scored by
+`research/q3/active_formal_score.py` (written after the freeze and before any formal row was seen; it checks
+the freeze hash, the code hashes and the task list hash). D and Dq query-answer logs: identical in 168 / 168.
+
+| Arm | solved | CPU s | queries |
+|---|---|---|---|
+| A passive | 99 | 1 425 | 0 |
+| B random queries | 101 | 2 160 | 10 080 |
+| C disagreement queries | 101 | 2 385 | 10 067 |
+| Dq = D's queries, no formation | 104 | 2 037 | 9 956 |
+| **D state formation** | **115** | 2 473 | 9 956 |
+| E = D + learned policy | 116 | 2 462 | 9 954 |
+
+| Comparison | first only / second only | exact McNemar p |
+|---|---|---|
+| **D vs Dq (formation, same information)** | **12 / 1** | **0.0034** |
+| D vs C | 15 / 1 | 0.0005 |
+| D vs A | 24 / 8 | 0.0070 |
+| Dq vs C | 4 / 1 | 0.375 |
+| C vs B | 1 / 1 | 1.0 |
+| B vs A | 12 / 10 | 0.83 |
+| E vs D | 1 / 0 | 1.0 |
+
+| Verdict (frozen rule) | Result |
+|---|---|
+| V1 executable method invention: net D − Dq ≥ 10, p < 0.05, ≥ 2 structure classes | **PASS** (net 11, p = 0.0034; list-state 8, scalar-state 3, m ≥ 2: 1) |
+| V2 autonomous latent state discovery: ≥ 5 D-only tasks with an m ≥ 2 machine | **FAIL** (1: `prepend-k(k=-2) \| positions`, component w = (3,) derived from an inconsistency) |
+| V3 learned discovery policy | **FAIL** (E vs D 1 : 0) |
+
+What the record shows:
+* More queries alone do not help (B vs A 12 : 10, C vs B 1 : 1); the same queries without formation help
+  little (Dq vs C 4 : 1). The gain is from what D does with the queries: it intervenes on prefixes to make the
+  answer's step structure observable, synthesises the step under per-transition supervision, verifies the fold,
+  repairs it with localised counterexamples and accepts it only after an independent challenge.
+* 11 of the 12 D-only tasks use the answer itself as the state (count-k, has-k, filters composed with maps,
+  interleavings); 1 uses a component the system added because two equal states had different successors.
+  New latent variables beyond the answer remain rare in this environment, so V2 fails as predicted.
+* Cost: at equal queries D uses 21 % more CPU than Dq (2 473 vs 2 037 s); 81 of 168 formation attempts ended at
+  the query limit.
+* Scope: one independent source (list-routines, transcribed), with developer-chosen compositions; not a new
+  independent problem family; no FRESH evaluation. A PASS of V1 is a partial Q3 result at this scope only.

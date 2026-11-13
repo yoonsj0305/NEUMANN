@@ -1,0 +1,155 @@
+{
+ "D_latent_m2_only": [
+  "prepend-k(k=-2) | positions"
+ ],
+ "D_only_structure_classes": {
+  "list-state": 8,
+  "m>=2": 1,
+  "scalar-state": 3
+ },
+ "D_only_vs_Dq": {
+  "append-k(k=2) | intersperse-k(k=10)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 2) | ((lt $1 $3) ? copy 0[(sub $0 2)] : ((isnil $10) ? value $4 : value (add $0 9)))>']",
+   "structure": "list-state",
+   "via": "state:suffix:m=1"
+  },
+  "count-k(k=10)": {
+   "program": "W=[[]] update=['(ifI (eq 1 (sub $1 9)) (add $0 1) $0)']",
+   "structure": "scalar-state",
+   "via": "state:prefix:m=1"
+  },
+  "count-k(k=2)": {
+   "program": "W=[[]] update=['(ifI (eq $1 2) (add $0 1) $0)']",
+   "structure": "scalar-state",
+   "via": "state:prefix:m=1"
+  },
+  "has-k(k=10)": {
+   "program": "W=[[]] update=['(eq 1 (ifI $0 1 (sub $1 9)))']",
+   "structure": "scalar-state",
+   "via": "state:prefix:m=1"
+  },
+  "identify-is-mod-k(k=2) | append-k(k=10)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((lt $5 $1) ? value (head $9) : ((eq $1 (mod $4 2)) ? value 0 : value 1))>']",
+   "structure": "list-state",
+   "via": "state:prefix:m=1"
+  },
+  "intersperse-k(k=0) | pow-k(k=2)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 (add 1 (mod $0 2))) | ((lt $0 $3) ? copy 0[$0] : ((eq $1 0) ? value (mul $4 $4) : value 0))>']",
+   "structure": "list-state",
+   "via": "state:prefix:m=1"
+  },
+  "prepend-k(k=-2) | positions": {
+   "program": "W=[[], [3]] update=['<relcells m=(foldrI $1 $0 (range $2)) | copy 1[$0]>', '<relcells m=(add $0 (foldrI 2 1 (range $2))) | ((lt 0 $1) ? copy 1[$0] : ((eq $0 $3) ? value (add $7 1) : value (add $10 1)))>']",
+   "structure": "m>=2",
+   "via": "state:prefix:m=2"
+  },
+  "remove-mod-k(k=2) | append-k(k=3)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 (mod $1 2)) | ((eq $2 $3) ? copy 0[$0] : ((eq $1 1) ? value $4 : value (head $9)))>']",
+   "structure": "list-state",
+   "via": "state:prefix:m=1"
+  },
+  "remove-mod-k(k=2) | identify-k(k=-2)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 (mod $1 2)) | value 0>']",
+   "structure": "list-state",
+   "via": "state:prefix:m=1"
+  },
+  "remove-mod-k(k=2) | pow-k(k=3)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 (mod $1 2)) | ((eq $0 $3) ? value (mul $4 (mul $4 $4)) : copy 0[$0])>']",
+   "structure": "list-state",
+   "via": "state:prefix:m=1"
+  },
+  "remove-mod-k(k=3) | add-k(k=-2)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 (mod (mul $1 $1) 3)) | ((eq $0 $3) ? value (sub $4 2) : copy 0[$0])>']",
+   "structure": "list-state",
+   "via": "state:prefix:m=1"
+  },
+  "reverse | identify-is-mod-k(k=7)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((lt $1 $3) ? copy 0[(sub $0 1)] : ((eq $0 (mod $4 7)) ? value 1 : value 0))>']",
+   "structure": "list-state",
+   "via": "state:prefix:m=1"
+  }
+ },
+ "Dq_only_vs_D": [
+  "rotate-k(k=3)"
+ ],
+ "comparisons": {
+  "B_vs_A": {
+   "first_only": 12,
+   "mcnemar_p": 0.8318119049072266,
+   "second_only": 10
+  },
+  "C_vs_B": {
+   "first_only": 1,
+   "mcnemar_p": 1.0,
+   "second_only": 1
+  },
+  "D_vs_A": {
+   "first_only": 24,
+   "mcnemar_p": 0.0070003666914999485,
+   "second_only": 8
+  },
+  "D_vs_C": {
+   "first_only": 15,
+   "mcnemar_p": 0.000518798828125,
+   "second_only": 1
+  },
+  "D_vs_Dq": {
+   "first_only": 12,
+   "mcnemar_p": 0.00341796875,
+   "second_only": 1
+  },
+  "Dq_vs_C": {
+   "first_only": 4,
+   "mcnemar_p": 0.375,
+   "second_only": 1
+  },
+  "E_vs_D": {
+   "first_only": 1,
+   "mcnemar_p": 1.0,
+   "second_only": 0
+  }
+ },
+ "cpu_seconds": {
+  "A": 1425.4,
+  "B": 2160.4,
+  "C": 2384.7,
+  "D": 2473.1,
+  "Dq": 2037.4,
+  "E": 2462.3
+ },
+ "errors": {
+  "A": [],
+  "B": [],
+  "C": [],
+  "D": [],
+  "Dq": [],
+  "E": []
+ },
+ "freeze_sha256": "2fd5f3bd993d5161b3651b1545f2e72710508ecd1c7ad9ebc8a8c1a174a0b1f6",
+ "queries": {
+  "A": 0,
+  "B": 10080,
+  "C": 10067,
+  "D": 9956,
+  "Dq": 9956,
+  "E": 9954
+ },
+ "replay_check": {
+  "identical_query_answer_logs": 168,
+  "pairs": 168
+ },
+ "solved": {
+  "A": 99,
+  "B": 101,
+  "C": 101,
+  "D": 115,
+  "Dq": 104,
+  "E": 116
+ },
+ "tasks": 168,
+ "verdict": {
+  "V1_method_invention": "PASS",
+  "V2_latent_state_discovery": "FAIL",
+  "V3_learned_policy": "FAIL"
+ }
+}
