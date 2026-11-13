@@ -1,0 +1,261 @@
+{
+ "schema": "neumann.solver-probe.v1",
+ "cap_cpu_seconds": 20.0,
+ "rows": [
+  {
+   "operation": "append",
+   "type": [
+    "L",
+    "L"
+   ],
+   "traversal_stages_available": 0,
+   "defined": true,
+   "fit": true,
+   "via": "search",
+   "program": "(foldrL (cons $2 $3) $1 $0)",
+   "cpu_seconds": 0.191
+  },
+  {
+   "operation": "reverse",
+   "type": [
+    "L"
+   ],
+   "traversal_stages_available": 1,
+   "defined": true,
+   "fit": true,
+   "via": "zmap",
+   "program": "<zmap e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (head (foldrL (tail $7) $5 $4))>",
+   "cpu_seconds": 1.2129
+  },
+  {
+   "operation": "last",
+   "type": [
+    "L"
+   ],
+   "traversal_stages_available": 0,
+   "defined": true,
+   "fit": true,
+   "via": "search",
+   "program": "(foldlI $1 0 $0)",
+   "cpu_seconds": 0.0141
+  },
+  {
+   "operation": "snoc",
+   "type": [
+    "L",
+    "I"
+   ],
+   "traversal_stages_available": 0,
+   "defined": true,
+   "fit": true,
+   "via": "search",
+   "program": "(foldrL (cons $2 $3) (cons $1 nil) $0)",
+   "cpu_seconds": 8.2797
+  },
+  {
+   "operation": "count",
+   "type": [
+    "L",
+    "I"
+   ],
+   "traversal_stages_available": 0,
+   "defined": false,
+   "fit": true,
+   "via": "inverse",
+   "program": "(sub (mod 9 (mod (add 4 (head $0)) 7)) (div $1 6))",
+   "cpu_seconds": 4.2641
+  },
+  {
+   "operation": "sum",
+   "type": [
+    "L"
+   ],
+   "traversal_stages_available": 0,
+   "defined": true,
+   "fit": true,
+   "via": "search",
+   "program": "(foldrI (add $1 $2) 0 $0)",
+   "cpu_seconds": 0.0843
+  },
+  {
+   "operation": "maximum",
+   "type": [
+    "L"
+   ],
+   "traversal_stages_available": 0,
+   "defined": false,
+   "fit": false,
+   "via": null,
+   "program": null,
+   "cpu_seconds": 20.0022
+  },
+  {
+   "operation": "nth",
+   "type": [
+    "L",
+    "I"
+   ],
+   "traversal_stages_available": 0,
+   "defined": true,
+   "fit": true,
+   "via": "search",
+   "program": "(head (foldrL (tail $3) $0 (range $1)))",
+   "cpu_seconds": 0.9951
+  },
+  {
+   "operation": "drop",
+   "type": [
+    "L",
+    "I"
+   ],
+   "traversal_stages_available": 0,
+   "defined": true,
+   "fit": true,
+   "via": "search",
+   "program": "(foldrL (tail $3) $0 (range $1))",
+   "cpu_seconds": 0.0868
+  },
+  {
+   "operation": "take",
+   "type": [
+    "L",
+    "I"
+   ],
+   "traversal_stages_available": 0,
+   "defined": false,
+   "fit": false,
+   "via": null,
+   "program": null,
+   "cpu_seconds": 20.012
+  },
+  {
+   "operation": "init",
+   "type": [
+    "L"
+   ],
+   "traversal_stages_available": 2,
+   "defined": true,
+   "fit": true,
+   "via": "zfilter",
+   "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (lt 0 $2)>",
+   "cpu_seconds": 0.0012
+  },
+  {
+   "operation": "rotate",
+   "type": [
+    "L",
+    "I"
+   ],
+   "traversal_stages_available": 0,
+   "defined": false,
+   "fit": false,
+   "via": null,
+   "program": null,
+   "cpu_seconds": 20.0162
+  },
+  {
+   "operation": "replace_at",
+   "type": [
+    "L",
+    "I",
+    "I"
+   ],
+   "traversal_stages_available": 0,
+   "defined": false,
+   "fit": false,
+   "via": null,
+   "program": null,
+   "cpu_seconds": 20.0831
+  },
+  {
+   "operation": "insert_at",
+   "type": [
+    "L",
+    "I",
+    "I"
+   ],
+   "traversal_stages_available": 0,
+   "defined": false,
+   "fit": false,
+   "via": null,
+   "program": null,
+   "cpu_seconds": 20.0721
+  },
+  {
+   "operation": "interleave",
+   "type": [
+    "L",
+    "L"
+   ],
+   "traversal_stages_available": 0,
+   "defined": false,
+   "fit": false,
+   "via": null,
+   "program": null,
+   "cpu_seconds": 20.009
+  },
+  {
+   "operation": "zip_add",
+   "type": [
+    "L",
+    "L"
+   ],
+   "traversal_stages_available": 0,
+   "defined": false,
+   "fit": false,
+   "via": null,
+   "program": null,
+   "cpu_seconds": 20.0113
+  },
+  {
+   "operation": "gather",
+   "type": [
+    "L",
+    "L"
+   ],
+   "traversal_stages_available": 0,
+   "defined": false,
+   "fit": false,
+   "via": null,
+   "program": null,
+   "cpu_seconds": 20.0261
+  },
+  {
+   "operation": "repeat",
+   "type": [
+    "L",
+    "I"
+   ],
+   "traversal_stages_available": 0,
+   "defined": false,
+   "fit": false,
+   "via": null,
+   "program": null,
+   "cpu_seconds": 20.0124
+  },
+  {
+   "operation": "sort",
+   "type": [
+    "L"
+   ],
+   "traversal_stages_available": 1,
+   "defined": false,
+   "fit": false,
+   "via": null,
+   "program": null,
+   "cpu_seconds": 20.0061
+  },
+  {
+   "operation": "unique",
+   "type": [
+    "L"
+   ],
+   "traversal_stages_available": 2,
+   "defined": true,
+   "fit": true,
+   "via": "zfilter",
+   "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (isnil (filter (eq $0 $6) $3))>",
+   "cpu_seconds": 0.4248
+  }
+ ]
+}

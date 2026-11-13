@@ -195,6 +195,102 @@ short definition in this substrate, which has no simultaneous traversal of two l
 expected to find them. If the iteration fails, the next step is an analysis of the definition language, not a
 larger budget.
 
+## 6d. Iteration 4 (defined before its run; owner's decision of 2026-11-12: substrate review P0)
+
+### Step 1 — the 12 constructors iteration 3 did not define (`research/q3/op_witnesses.py`)
+
+Each was given a developer-written witness program in the same definition language (substrate + `len`), used
+only as a measuring device and never given to a solver. **All 12 witnesses hold on 40 fresh arguments: none of
+the 12 is inexpressible.** What separates them is the cost level of a whole-program definition. The synthesiser
+completes level 8 in 60 CPU s (1.04 M candidates at level 8, growth 6.4× per level), so:
+
+| Operation | Cost level of the witness | Candidates to reach it (extrapolated) | CPU s at the measured rate |
+|---|---|---|---|
+| gather | 9 | 7e+06 | 4e+02 |
+| repeat | 10 | 4e+07 | 2e+03 |
+| maximum | 10 | 4e+07 | 2e+03 |
+| init | 12 | 2e+09 | 1e+05 |
+| take | 19 | 8e+14 | 4e+10 |
+| zip_add | 19 | 8e+14 | 4e+10 |
+| unique | 19 | 8e+14 | 4e+10 |
+| sort | 20 | 5e+15 | 3e+11 |
+| interleave | 22 | 2e+17 | 1e+13 |
+| rotate | 29 | 9e+22 | 5e+18 |
+| insert_at | 31 | 4e+24 | 2e+20 |
+| replace_at | 33 | 1e+26 | 8e+21 |
+
+* Budget-limited (level 9–10, minutes to an hour): gather, repeat, maximum. More budget would find them.
+* Structurally out of reach for whole-program enumeration (level 12–33, a day to 1e21 s): init, take, zip_add,
+  unique, sort, interleave, rotate, insert_at, replace_at. No realistic budget finds them. Their witnesses are
+  compositions of one-fold pieces (drop, reverse, append, nth): the obstacle is that a definition is searched
+  as one program with one bit of supervision per example.
+
+### Step 2 — the THIRD solver connected to operation definitions (`research/q3/solver_probe.py`, diagnosis only)
+
+The 20 constructors, specified by self-generated examples, were given to `spec_core.solve` (arm S, 20 CPU s):
+it defines 12, including init and unique, which the plain synthesiser did not. **Every operation with more than
+one argument gets 0 traversal stages** (`subtasks` re-represents only one list or one integer input, with an
+equal-length or subsequence alignment), so take, rotate, replace_at, insert_at, interleave, zip_add, gather and
+repeat stay undefined. That is the structural limit: the per-position supervision that makes THIRD cheap is
+tied to one input and two developer-chosen alignments.
+
+### Step 3 — mechanism: representations constructed from observed cell relations (`neumann1/cells.py`)
+
+One type-generic procedure (any number of list and integer arguments); no operation, traversal or alignment is
+written for a problem.
+* Every list is a sequence of cells. Generic coordinates of an output cell: t, m−1−t, m, every list length, every
+  integer argument, the element of every list argument at t, every list argument. Of an input cell: its element,
+  i, n−1−i, every integer argument, every list argument.
+* Observed relation: for every output cell, the input cells holding an equal value (provenance), per argument.
+* Constructed per task: a length function; pieces "copy from argument a at idx(c)" (idx must land in the
+  observed provenance) or "value v(c)"; a case split by predicates when one piece does not cover all cells
+  (anytime, after each completed cost level); for an integer output, a selection over the cells of one list
+  argument. All functions are searched over the coordinates under per-cell supervision, and the result must
+  reproduce every TRAIN example.
+* It generalises THIRD's two fixed alignments (equal length = copy at t; subsequence = selection) to alignments
+  the system reads from the data, and removes the one-input restriction. It adds no state component that names
+  an operation.
+
+Diagnostic on the 20 self-generated constructors (not evidence; 20 CPU s each): 17 defined in ≤ 4.2 CPU s,
+including 10 of the 12 above (all except sort and unique; also not count and sum, which have no provenance).
+
+**Claim scope, stated in advance.** The developer supplies the cell coordinates and the equality relation. The
+system constructs per task which relation is used and the index / value / length / case functions. A PASS
+would show that constructing representations from observed relations adds solving ability over the fixed THIRD
+representation and over iteration 1's best configuration. It would not show that the system invented the
+notion of a cell or of provenance.
+
+### Step 4 — causal test (criteria fixed here, before any run on tasks)
+
+**Hypothesis H4.** Constructing cell representations from observed relations lets the system solve list tasks
+that the same system with the construction removed does not solve, at the same CPU cap.
+
+**Arms** (cap 6 CPU s, everything included). Cn = iteration 1's best configuration (learned policy + memory;
+5-fold policies on SOURCE, the policy fitted on all SOURCE experience elsewhere), re-run here. C = Cn + cell
+construction (30 % of the cap, before the direct phase; the direct phase gets the rest). A, B, S, D: rows of
+iteration 1 (SOURCE) and of THIRD (S on rule TARGET and dc), same code and cap.
+
+**Data.** SOURCE: rule SOURCE (125) is the causal test; OEIS SOURCE (187) is reported only, and C = Cn up to
+timing is predicted because an integer-to-integer task has no list cells (outside the claim scope).
+Development validation: rule TARGET (125) and dc (199). These sets were opened by FIRST/SECOND and are
+development-only; they are not first exposure. The developer read SOURCE task contents while designing the
+mechanism; the contents of rule TARGET and dc were not read.
+
+**Criterion.**
+
+| | Condition |
+|---|---|
+| R1 (rule SOURCE) | at least 5 tasks solved by C and not Cn, exact McNemar p < 0.01 |
+| R2 (rule SOURCE) | at least 5 tasks solved by C and by none of A, B, Cn, S |
+| R3 (rule SOURCE) | the tasks C gains through a constructed representation span at least 3 structure classes, none more than 60 % of them |
+| R4 (rule SOURCE) | total CPU(C) ≤ total CPU(Cn) |
+| V1 (rule TARGET; dc; each) | at least 5 tasks solved by C and not Cn, p < 0.025 |
+| V2 (rule TARGET; dc; each) | at least 5 tasks solved by C and by neither Cn nor S |
+
+Iteration 4 PASS = R1–R4 and V1–V2 in both validation families. A PASS is not a Q3 PASS: it is SOURCE plus
+opened development sets. Only a PASS leads to step 5 (connecting the representations to the common contract for
+Q6); no independent set is opened without the owner's approval.
+
 ## 7. Iteration records
 
 | # | Hypothesis | Criterion | Result | Record |
@@ -202,6 +298,7 @@ larger budget.
 | 1 | H1 | K1–K4, both domains | **FAIL** (lists: K1–K4 all fail; sequences: K1–K3 fail) | `docs/experiments/results/discovery_iter1_source_cv.json`, `discovery_iter1_cv_rows.jsonl`, `discovery_iter1_experience_rows.jsonl.gz` |
 | 2 | H2 | J1–J3, both list families | **FAIL** (rule: J1, J2 fail; dc: J1 fails on p) | `docs/experiments/results/discovery_iter2_inverted_inventions.json`, `discovery_iter2_rows.jsonl.gz` |
 | 3 | H3 | G1–G5, both domains | **FAIL** (every condition, both domains) | `docs/experiments/results/discovery_iter3_source_cv.json`, `discovery_iter3_ops_rows.jsonl`, `discovery_iter3_cv_rows.jsonl`, `substrate_probe_definitions.json` |
+| 4 | H4 | R1–R4 (rule SOURCE), V1–V2 (rule TARGET, dc) | (pending) | (pending) |
 
 ### Iteration 2 result (2026-11-12, 08:26–08:47 UTC; 972 / 972 jobs)
 
