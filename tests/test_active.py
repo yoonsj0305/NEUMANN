@@ -48,3 +48,17 @@ def test_learned_policy_gate_and_allotment_are_obeyed():
     env = E.Env(TS["count-k(k=2)"], 0, budget=60)
     _, rec = ac.run_arm("E", env, 20.0, policy={"global": pol, "by_feature": {}})
     assert all(m["queries_used"] <= 5 for m in rec["formation"]["machines"])
+
+
+def test_formation_handles_a_huge_value_range():
+    class Env:                                   # F9: values near -1e16 once exhausted memory
+        budget, used, log = 60, 0, []
+
+        def query(self, x):
+            self.used += 1
+            y = min(x) if x else None
+            self.log.append((tuple(x), y))
+            return y
+    ex = [((x,), min(x)) for x in [(2, -9999999999999999, 4), (1000000, 3), (5, 7, 1), (9, 9)]]
+    pred, _, rec = ac.form_machine(Env(), ex, __import__("time").process_time() + 10, 40)
+    assert pred is not None and pred(((4, -10 ** 17, 8),)) == -10 ** 17

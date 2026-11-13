@@ -377,7 +377,9 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
     def S(u):
         return tuple(F(cont(u, w)) for w in W)
     lo, hi = min(vals), max(vals)
-    pool = list(range(lo, hi + 1))
+    # order-covering trajectory values: the observed range, or (a large range, F9 in the FRESH record) the
+    # observed values and their neighbours
+    pool = list(range(lo, hi + 1)) if hi - lo <= 256 else sorted({v + d for v in vals for d in (-1, 0, 1)})
     rng.shuffle(pool)
     asc = tuple(sorted(pool[:4]))
     trajs = [asc, asc[::-1], tuple(pool[4:8])]
