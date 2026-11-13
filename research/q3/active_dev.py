@@ -37,7 +37,13 @@ def job(a):
     arm, spec = a
     env = E.Env(spec, 0, budget=BUDGET)
     pol = POLICY.get(fold_of(spec.name)) if arm == "E" else None
-    pred, rec = ac.run_arm(arm, env, CAP, seed=_h(spec.name) % 1000, policy=pol)
+    try:
+        pred, rec = ac.run_arm(arm, env, CAP, seed=_h(spec.name) % 1000, policy=pol)
+    except Exception as e:                       # recorded, never silently counted
+        import traceback
+        return {"arm": arm, "name": spec.name, "parts": len(spec.parts), "status": "error", "solved": False,
+                "fit": False, "queries": env.used, "cpu_seconds": CAP, "error": "%s: %s" % (type(e).__name__, e),
+                "trace": traceback.format_exc()[-1500:], "out_type": ac._type(env.initial()[0][1])}
     rec.update(name=spec.name, parts=len(spec.parts), solved=bool(pred is not None and env._score(pred)),
                out_type=ac._type(env.initial()[0][1]), log=[[list(x), y if not isinstance(y, tuple) else list(y)]
                                                            for x, y in env.log])

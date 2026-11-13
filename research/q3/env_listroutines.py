@@ -117,7 +117,8 @@ routine("modulo-k", lambda l, p: [x % K(p) for x in l], [{"k": 2}, {"k": 3}, {"k
 routine("mult-k", lambda l, p: [x * K(p) for x in l], [{"k": 2}, {"k": 3}, {"k": -2}, {"k": 10}])
 routine("pop", lambda l, p: l[:-1], min_len=lambda p: 1, len_default=len1)
 routine("positions", lambda l, p: [i for i, x in enumerate(l) if x != 0])
-routine("pow-base-k", lambda l, p: [K(p) ** x for x in l], [{"k": 2}, {"k": 3}, {"k": 4}],
+routine("pow-base-k", lambda l, p: [K(p) ** x for x in l] if all(x >= 0 for x in l) else 1 / 0,   # each-nonnegative
+        [{"k": 2}, {"k": 3}, {"k": 4}],
         gen=lambda rng, p, n: rlist(rng, n, 0, 12))
 routine("pow-k", lambda l, p: [x ** K(p) for x in l], [{"k": 2}, {"k": 3}, {"k": 4}])
 routine("prepend-k", lambda l, p: [K(p)] + l, [{"k": 2}, {"k": 3}, {"k": -2}, {"k": 10}])
@@ -172,7 +173,9 @@ class Spec:
                 raise Invalid
             if isinstance(v, bool) and i < len(self.parts) - 1:
                 raise Invalid
-            if isinstance(v, list) and (len(v) > 40 or any(abs(e) > 10 ** 12 for e in v)):
+            if isinstance(v, list) and (len(v) > 40 or any(not isinstance(e, int) or abs(e) > 10 ** 12 for e in v)):
+                raise Invalid
+            if not isinstance(v, (list, bool, int)):
                 raise Invalid
         return _norm(v)
 
