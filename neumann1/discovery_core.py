@@ -230,7 +230,10 @@ def propose(lib, inv, st, consts, feats, end):
 CELL_SHARE = 0.3          # iteration 4: share of the cap for constructed cell representations (`cells`)
 
 
-def _run(sol, lib, inputs, train, in_types):
+def _run(sol, lib, inputs, train, in_types, task=None):
+    if sol[0] == "relcells":
+        from neumann1 import relcells
+        return relcells.run(sol, lib, inputs, task)
     if sol[0] in ("cells", "select"):
         from neumann1 import cells
         return cells.run(sol, lib, inputs, in_types)
@@ -333,10 +336,21 @@ def solve(task, cap_s, policy, inv, features=True, replay=True, log=None, spec=(
     if sol is None and cells:
         from neumann1 import cells as cl
         now = time.process_time()
-        got = cl.solve(task, min(deadline, now + CELL_SHARE * cap_s), ic.base_library())
+        end = min(deadline, now + CELL_SHARE * cap_s)
+        if cells in ("rel", "rel0"):             # stage A: relational factorisation; rel0 = without self/linked
+            from neumann1 import relcells
+            on = cells == "rel"
+            got = relcells.solve(task, end, inv, ic.base_library(), self_src=on, linked=on)
+        else:
+            got = cl.solve(task, end, ic.base_library())
         tried.append({"hyp": ["cells", "construct", []], "ok": got is not None, "cpu": round(time.process_time() - now, 4)})
         if got is not None:
-            sol, via = got, "cells:" + cl.structure(got)
+            if got[0] == "relcells":
+                from neumann1 import relcells
+                sol, via = got, "rel:" + "+".join(sorted({"%s/%s%s" % (r[0], r[1], "/" + r[2] if r[2] else "")
+                                                          for r in relcells.relations_used(got)}))
+            else:
+                sol, via = got, "cells:" + cl.structure(got)
     if sol is None:
         if ops is not None and task["out_type"] == T_L:
             from neumann1 import inverted
@@ -362,8 +376,11 @@ def solve(task, cap_s, policy, inv, features=True, replay=True, log=None, spec=(
         lib = ic.base_library()
         if not all(sc.run_solution(sol, lib, i, train) == o for i, o in train):
             sol, via = None, None                # an expansion that does not re-verify is not a solution
-    ok = sol is not None and all(_run(sol, lib, i, train, task["in_types"]) == o for i, o in task["test"])
-    if sol is not None and sol[0] in ("cells", "select"):
+    ok = sol is not None and all(_run(sol, lib, i, train, task["in_types"], task) == o for i, o in task["test"])
+    if sol is not None and sol[0] == "relcells":
+        from neumann1 import relcells
+        prog, size = relcells.show(sol), None
+    elif sol is not None and sol[0] in ("cells", "select"):
         from neumann1 import cells as cl
         prog, size = cl.show(sol), None
     else:
