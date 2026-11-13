@@ -101,18 +101,22 @@ def policy_from(rows, exclude_fold=None):
                     if "queries_used" in m:
                         q_acc.append(m["queries_used"])
                         c_acc.append(m["cpu"])
-        # the formation allotment: what every accepted machine of this kind of task needed (with a 25% margin);
-        # formation beyond it has never ended in an accepted machine in the experience, so it is cut there and
-        # the queries go to the committee instead.  No accepted machine on >= 5 tasks: formation is skipped.
+        # the formation allotment: what every accepted machine of this kind of task needed (with a 25% margin),
+        # only where at least 10 accepted machines support it (dev cross-validation: an allotment from 2-4
+        # machines cut formations that needed more); formation beyond it has never ended in an accepted machine,
+        # so the queries go to the committee instead.  No accepted machine on >= 5 tasks: formation is skipped.
+        # No CPU allotment: synthesis splits its deadline into stages, so a shorter deadline changed what it
+        # found even when it would have finished early (dev cross-validation).
         return {"directions": tuple(sorted(("prefix", "suffix"), key=lambda k: -dirs.get(k, 0))),
                 "continuation_kinds": [k for k, _ in kinds.most_common()],
-                # enough experience on this kind of task: continuation kinds that never became a component of an
-                # accepted machine are not tried (failed distinguishing experiments are not repeated)
-                "restrict_kinds": len(rs) >= 5,
+                # kinds are only reordered, never removed: dev cross-validation showed that tasks sharing the
+                # observable features can need opposite kinds (kth-largest / kth-smallest), so a restriction
+                # learned from a handful of machines removed the one experiment that was needed
+                "restrict_kinds": False,
                 "structures": {k: list(v.most_common(1)[0][0]) for k, v in structs.items() if v.most_common(1)[0][0]},
                 "formation": {"skip": len(rs) >= 5 and not dirs,
-                              "max_queries": int(1.25 * max(q_acc)) + 1 if q_acc else None,
-                              "max_cpu": round(1.5 * max(c_acc), 3) + 0.5 if c_acc else None},
+                              "max_queries": int(1.25 * max(q_acc)) + 1 if len(q_acc) >= 10 else None,
+                              "max_cpu": None},
                 "evidence": {"tasks": len(rs), "accepted_machines": sum(dirs.values())}}
     by = collections.defaultdict(list)
     for r in d:

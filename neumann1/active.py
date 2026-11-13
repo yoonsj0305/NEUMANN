@@ -468,7 +468,8 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         cands = [(k, tuple(w)) for k, w in grammar(vals, prior_ws, restrict_kinds)
                  if tuple(w) not in W and tuple(w) not in tried_grammar]
         st = {u: S(u) for u in allp}                    # all observed already (transitions() ran this round)
-        und = [u for u in allp if None in st[u] and u][:4]
+        # undefined prefixes nearest the definedness boundary first (a short continuation can define them)
+        und = sorted((u for u in allp if None in st[u] and u), key=len, reverse=True)[:4]
         groups = {}
         for u in allp:
             if None not in st[u]:

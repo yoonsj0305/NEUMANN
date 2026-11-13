@@ -157,3 +157,92 @@ What the record shows:
   the query limit.
 * Scope: one independent source (list-routines, transcribed), with developer-chosen compositions; not a new
   independent problem family; no FRESH evaluation. A PASS of V1 is a partial Q3 result at this scope only.
+
+## 7. After the owner's directive "Q3 후속 연구 승인 및 실행 지시" (2026-11-13)
+
+The 168 formal rows, the freeze `2fd5f3bd…b1f6` and the seal are unchanged. Everything in 7.1–7.4 is
+development on list-routines (re-tests of tasks already used, including the 168 formal ones); none of it is
+counted as an independent result.
+
+### 7.1 V2 bottleneck: where the queries went
+
+* Formal rows (dev reading only): 84 formation attempts ended at the query limit; 128 "counterexample not
+  localisable" events led to 102 component additions; 62 of the 84 were list-output tasks.
+* Instrumented re-run (each query tagged by purpose: trajectory states / candidate continuation / counterexample
+  localisation) on 40 dev tasks with a query-limit machine: 576 / 310 / 117 queries. The dominant pattern
+  (25 of 40): the prefix machine with the answer as its only component finds no Update, the candidate check
+  spends 4 kinds × 8 prefixes = 32 queries, finds nothing informative, and the suffix machine is left with ~10
+  queries.
+* In the dev experience the 8-prefix candidate check added 32 components, none of them in an accepted machine;
+  the 2-prefix decisive check added 36, 5 of them in accepted machines (all 5 solved).
+
+### 7.2 Changes (each from the evidence above; no criterion changed)
+
+1. Candidate continuations are decided on two decisive prefixes only: two prefixes the current state merges, or
+   the two undefined prefixes nearest the definedness boundary; a blocked or invalid answer is skipped.
+   A continuation is added only if its two answers differ (new information), never speculatively.
+2. Virtual values for undefined components: only where a state is partly undefined (never as wasted rounds of
+   a one-component machine); both candidates (below / above every value seen) are compared on the observations
+   already made, without a query; they apply to transitions into and out of undefined states and to the
+   counterexample search, so a failure at the definedness boundary becomes localisable.
+3. Observations, transitions and counterexample points are reused throughout (memoised answers; a new
+   component queries only its own values); the purpose of every query is recorded.
+4. Tried and rejected (dev evidence, reverted): filling added components on the order-covering trajectories
+   only — the saved state queries moved into counterexample localisation and kth-largest(k=3) still exceeded
+   the limit.
+
+### 7.3 V3 policy: what is learned, what dev cross-validation rejected
+
+Learned from D's experience on other tasks (5 hash folds; a task never sees a policy fitted on its own fold),
+per observable feature bucket of the initial examples: the order of reading directions, the order of
+continuation kinds that became components of accepted machines, the most frequent accepted structure,
+a formation gate (no accepted machine on ≥ 5 tasks → formation skipped, queries go to the committee) and a
+per-machine query allotment (what every accepted machine needed, +25 %).
+
+Dev cross-validation of a first version (E 146 vs D 158, 1 : 13, p = 0.0018) rejected three elements:
+* a CPU allotment — synthesis splits its deadline into stages, so a shorter deadline changed what it found even
+  where D finished in 0.15 s;
+* restricting continuation kinds to those seen in accepted machines — kth-largest and kth-smallest share every
+  observable feature and need opposite kinds; a restriction learned from a handful of machines removed the one
+  experiment needed;
+* query allotments learned from 2–4 machines — they cut formations that needed more.
+The frozen version keeps ordering, structure prior and gate, and an allotment only where ≥ 10 accepted machines
+support it.
+
+### 7.4 Dev re-tests on list-routines (228 tasks, 60 queries, 30 CPU s; not independent results)
+
+| Code | D solved | m ≥ 2 solves | query-limit machines | other |
+|---|---|---|---|---|
+| `9883e42` (V2/V3 commit before this section) | 155 | 1 | 101 | |
+| `dfff806` virtual values compared without queries, 2-prefix screen + 8-prefix check | 157 | 5 | 106 | |
+| `d690d7b` 2-prefix decisive check only | 158 | 4 | 35 | Dq 139 (D : Dq 21 : 2, m ≥ 2 D-only 4); logs identical 228 / 228; first-version E 146 (1 : 13) |
+| final (undefined prefixes nearest the boundary first) | 159 | 5 | 34 | revised E 158 (E : D 0 : 1) |
+
+The m ≥ 2 solves are kth-largest(k=2), kth-smallest(k=2), identify-k(k=1) | kth-smallest(k=2) (a component
+"answer after appending a value above / below every value seen" = the next order statistic, found by the
+decisive check) and prepend-k(k=±2) | positions (a component derived from an inconsistency). kth-…(k=3) finds
+the right three-component structure but needs about 60 formation queries; the budget stays at 60.
+On this dev set V2's count (4–5) is at or below the frozen threshold of 5, and the revised policy does not beat D.
+
+### 7.5 FRESH data and pre-registration (before any FRESH task was run)
+
+* Sources (`docs/experiments/q3_fresh_registry.json`): MBPP `google-research/google-research@f8d6d14a`
+  (`mbpp/mbpp.jsonl`, sha256 `ccf64cea…2a9f`; repository Apache-2.0, dataset CC-BY-4.0) and HumanEval
+  `openai/human-eval@b9453e8f` (`data/HumanEval.jsonl.gz`, sha256 `b796127e…979ef`, MIT).
+* Selection (mechanical, `research/q3/fresh/registry.py`, decided before any task text or outcome was read):
+  T1 every test assert is `f(<int list literal>) == <int | bool | int list literal>` with one positional
+  argument (MBPP test_list + challenge_test_list; HumanEval: every assert of `check` on `candidate`, ≥ 2);
+  T2 the reference passes a static audit (imports from a fixed whitelist, no forbidden names, no dunder
+  attributes). 111 selected (84 MBPP, 27 HumanEval), 0 excluded by T2; registry sha256 `25724ce8…30d`.
+  T3 (at run time, before any arm): a reference that fails its own published tests is reported, not run.
+* Isolation (`research/q3/fresh/sandbox.py`): `unshare -n` (no network interface), `python3 -I -S`,
+  RLIMIT_CPU 60 s, RLIMIT_AS 1 GiB, RLIMIT_FSIZE 0, RLIMIT_NOFILE 16, empty working directory and environment,
+  restricted builtins, import whitelist, 1 s alarm per call.
+* Observation protocol (`research/q3/fresh/env_fresh.py`): initial = the published tests, then generated inputs
+  answered by the reference, up to 8; hidden = 10 further generated inputs, never queryable; generator elements
+  from the published input values ± 1, lengths in [min − 1, max + 1], seed = sha256 of the task id.
+* Arms A (passive), D, Dq (exact replay of D's queries), E (D + the policy frozen in
+  `docs/experiments/q3_fresh_policy.json`, fitted on the final dev D rows); 60 queries, 30 CPU s.
+* Criteria and predictions: `docs/experiments/q3_fresh_freeze.json` (the same V1 / V2 / V3 rules as the formal
+  run; tasks solved only through a new latent component are reported separately). The single run follows
+  the commit of the freeze.
