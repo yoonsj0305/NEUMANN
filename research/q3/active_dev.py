@@ -17,7 +17,7 @@ import env_listroutines as E
 from neumann1 import active as ac, invention_core as ic
 import invention_first as first
 
-CAP, BUDGET, FOLDS = 6.0, 8, 5
+CAP, BUDGET, FOLDS = 30.0, 40, 5
 POLICY = {}
 
 
