@@ -1,0 +1,67 @@
+name: NEUMANN G0 active oracle SGI12 FIRST without gold
+on:
+  push:
+    branches: [research/rc51-intelligence-spend-gate-20261026]
+    paths:
+      - .github/workflows/g0-sgi-active-oracle-first-20261027.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/g0-sgi-active-oracle-first-20261027.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-first-model-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/rc51-intelligence-spend-gate-20261026
+          persist-credentials: false
+      - name: Check pre-source code and protocol
+        run: |
+          set -euo pipefail
+          test -s docs/research/G0_SGI_ACTIVE_ORACLE_NEW12_PREREG_20261027.md
+          python3 -m py_compile research/q3/discovery_policy/sgi_active_oracle_v1.py
+          sha256sum research/q3/discovery_policy/sgi_active_oracle_v1.py
+      - name: Install native classical and independent probe-input evaluator
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cvc5
+          python3 -m pip -q install 'z3-solver==4.13.3.0'
+          cvc5 --version
+          python3 -c 'import z3; assert z3.get_version_string()=="4.13.3"'
+      - name: Fetch exact original upstream after code freeze, prepare source-only pack
+        run: |
+          set -euo pipefail
+          git init -q upstream
+          git -C upstream remote add origin https://github.com/Barnard-PL-Labs/sygus-sgi-1.git
+          git -C upstream fetch --depth 1 origin e7ae840e5546e9243ff94afb1a29064fc050011c
+          git -C upstream checkout -q --detach FETCH_HEAD
+          test "$(git -C upstream rev-parse HEAD)" = e7ae840e5546e9243ff94afb1a29064fc050011c
+          python3 research/q3/discovery_policy/sgi_active_oracle_v1.py prepare
+          test -s private_input_pack.json
+          # Remove original full corpus, including withheld probe/heldout labels,
+          # from the PROPOSAL process's accessible disk.
+          rm -rf upstream
+      - name: Generate all 12 source-only 3-arm guesses and probe-request decisions
+        run: |
+          set -euo pipefail
+          test ! -e upstream
+          python3 research/q3/discovery_policy/sgi_active_oracle_v1.py propose
+          sha256sum new12_first/FIRST_PROPOSALS_AND_QUERY_DECISIONS_UNGRADED.json
+          cat new12_first/FIRST_SHA256.txt
+      - name: Upload first immutable proposals before grader sees gold
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-g0-sgi12-active-oracle-FIRST-UNgraded-20261027
+          path: |
+            new12_first/FIRST_PROPOSALS_AND_QUERY_DECISIONS_UNGRADED.json
+            new12_first/FIRST_SHA256.txt
+            new12_first/*.stdout
+            new12_first/*.stderr
+          if-no-files-found: warn

@@ -1,0 +1,13 @@
+# NEUMANN 1 | SLIA legacy-source modernization Amendment 1 AFTER native syntax-only error, 2026-10-30
+
+First original 16 **unchanged** [#40643083431](https://github.com/yoonsj0305/NEUMANN/actions/runs/40643083431), original first SHA `7acee7938ea2b8d18db2dd38058de36f7abdcf5116fbd703f6fce048b3a4418c`. First postfirst *strict one-list-to-two-list only* grammar conversion [#40994427823](https://github.com/yoonsj0305/NEUMANN/actions/runs/40994427823) corrected the parenthesis grammar form, but native official CVC5 1.4.2 **still returned errors for all four**, specifically `Symbol 'int.to.str' not declared as a variable`. Result JSON SHA **`1f36ad87c1091d54a09b1b2aa8b21739e96e368f04f2098d5dcd03a0765c0344`**. Preserve BOTH earlier first outcomes and stage1 converted stdout/stderr. A failure is not a training or task-hardness negative.
+
+**Before stage2 new native run**, explicitly amend syntax migration to known SMT-LIB 2.5→2.6 String theory operator renaming within the grammar ONLY:
+- `int.to.str(t)` -> `str.from_int(t)`, same integer-to-base10-string intended semantics.
+- `str.to.int(s)` -> `str.to_int(s)`, same decimal string-to-int intended semantics.
+- Old bare negative integer grammar literal `-1` -> modern syntactic unary `(- 1)` when it is an integer literal. This is required by the SyGuS-IF 2.0 language standard for old integer grammar terminals.
+- Original function name, typed signature, all input/output examples, 4 nonterminal names/sorts, all nonconversion operators, all string literal bytes and every production tree shape except the named symbols and minus syntax remain unchanged.
+- The earlier source syntax-only audit must not be retrospectively marked a native success. New outputs are separately named `FORMAT_AND_STANDARD_OPERATOR_RENAMING_STAGE2`, and every candidate must still be checked on **ALL original source examples with independent Z3**, not falsely awarded arbitrary intended-output oracle rights. If a modern parser still rejects a different old operator, preserve that error and HOLD rather than silently make a third opportunistic modification.
+- Published original source pin `SyGuS-Org/benchmarks` **`13c8deb68a873635879c9a69bc78caebd340f646`**, official binary cvc5 **1.4.2** exact ZIP SHA `0af677313c8277dc558d3049b192389db4d975d31c968fbd6f31cf0849ee411d`, fixed CPU≤12/wall≤15 per item, exactly four original files 12-15.
+
+**Scientific boundary:** This corrects a source/tool language mismatch, **not neural program invention, not new G1 learning**. Even a solver-synthesized function fits only the listed PBE examples; `get-first-word` has two provably distinct valid original-grammar programs on unlisted input `"hello "`. G1 HOLD, Q1–Q7 OPEN, G2 NOT RUN; PR #616 DRAFT/main unmerged.

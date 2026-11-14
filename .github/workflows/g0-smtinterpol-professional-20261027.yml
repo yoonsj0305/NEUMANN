@@ -1,0 +1,156 @@
+name: NEUMANN G0 SMTInterpol professional post-first baseline
+on:
+  push:
+    branches: [research/rc51-intelligence-spend-gate-20261026]
+    paths:
+      - .github/workflows/g0-smtinterpol-professional-20261027.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/g0-smtinterpol-professional-20261027.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: neumann-g0-smtinterpol-specialist
+  cancel-in-progress: false
+jobs:
+  run-postfirst-specialist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - name: Pin runtime and fetch official specialist solver
+        run: |
+          set -euo pipefail
+          mkdir -p receipts/originals
+          java -version 2>&1 | tee receipts/java_version.txt
+          curl --fail --location --retry 2 --max-time 60 \
+            -o smtinterpol.jar \
+            https://ultimate.informatik.uni-freiburg.de/smtinterpol/smtinterpol-2.5-1453-gedae1f37.jar
+          echo '8d42e87614fcdbe6fce5233b91f20563dfd9a854d999127d70cfb42853e091c7  smtinterpol.jar' | sha256sum --check
+          java -jar smtinterpol.jar -version > receipts/solver_version.stdout 2> receipts/solver_version.stderr || true
+      - name: Smoke test executable interpolation on fully known control
+        run: |
+          set -euo pipefail
+          cat > receipts/control.smt2 <<'SMT'
+          (set-option :produce-proofs true)
+          (set-logic QF_LIA)
+          (declare-fun x () Int)
+          (assert (! (>= x 1) :named A))
+          (assert (! (<= x 0) :named B))
+          (check-sat)
+          (get-interpolants A B)
+          (exit)
+          SMT
+          timeout 15s java -Xmx512m -jar smtinterpol.jar receipts/control.smt2 > receipts/control.out 2> receipts/control.err
+          cat receipts/control.out
+          grep -qx unsat <(grep '^unsat$' receipts/control.out)
+          if grep -Eiq 'unsupported|error|exception' receipts/control.out receipts/control.err; then exit 12; fi
+      - name: Get pinned ORIGINAL 2026-10-27 already-opened SMTInterpol source cohort
+        run: |
+          set -euo pipefail
+          git init -q receipts/upstream
+          git -C receipts/upstream remote add origin https://github.com/ultimate-pa/smtinterpol.git
+          git -C receipts/upstream fetch --depth 1 origin f65e98f05203f1d2801bf5bd121766bfcd6451ec
+          git -C receipts/upstream checkout --detach -q FETCH_HEAD
+          test "$(git -C receipts/upstream rev-parse HEAD)" = 'f65e98f05203f1d2801bf5bd121766bfcd6451ec'
+      - name: Original-file baseline with bounded solver execution and preserved raw output
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,os,subprocess,resource,pathlib
+          root=pathlib.Path('receipts')
+          src=root/'upstream'
+          names=[
+            'cctest003.smt2','trivdiseq001.smt2','trivdiseq002.smt2',
+            'trivdiseq003.smt2','trivdiseq004.smt2','ufliatest001.smt2',
+            'ufliatest002.smt2','ufliatest003.smt2','ufliatest004.smt2',
+            'uflratest001.smt2','uflratest002.smt2','uflratest003.smt2']
+          results=[]
+          for name in names:
+            rel='SMTInterpolTest/test/interpolation/'+name
+            path=src/rel
+            d={'task':name,'original_relpath':rel,'upstream_commit':'f65e98f05203f1d2801bf5bd121766bfcd6451ec'}
+            if not path.is_file():
+              d['status']='NOT_RUN_MISSING_SOURCE';results.append(d);continue
+            b=path.read_bytes()
+            d['sha256']=hashlib.sha256(b).hexdigest()
+            d['git_blob_sha1']=hashlib.sha1(b'blob '+str(len(b)).encode()+bytes([0])+b).hexdigest()
+            d['original_bytes']=len(b)
+            def limits():
+              resource.setrlimit(resource.RLIMIT_CPU,(4,5))
+            try:
+              import time
+              t0=time.monotonic()
+              ru_before=resource.getrusage(resource.RUSAGE_CHILDREN)
+              proc=subprocess.Popen(['java','-Xmx512m','-XX:MaxMetaspaceSize=128m',
+                '-XX:ReservedCodeCacheSize=32m','-jar','smtinterpol.jar',str(path.resolve())],
+                stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,preexec_fn=limits,errors='replace')
+              max_rss_kb=0
+              forced=None
+              while proc.poll() is None:
+                try:
+                  status=pathlib.Path(f'/proc/{proc.pid}/status').read_text(errors='replace')
+                  import re
+                  match=re.search(r'^VmRSS:\s+(\d+) kB',status,re.MULTILINE)
+                  if match:
+                    max_rss_kb=max(max_rss_kb,int(match.group(1)))
+                    if max_rss_kb>800*1024:
+                      forced='RSS_OVER_800_MIB';proc.kill()
+                except (FileNotFoundError,ProcessLookupError): pass
+                if time.monotonic()-t0>7:
+                  forced='WALL_OVER_7_S';proc.kill()
+                time.sleep(0.015)
+              stdout,stderr=proc.communicate(timeout=3)
+              ru_after=resource.getrusage(resource.RUSAGE_CHILDREN)
+              d['cpu_user_seconds']=round(ru_after.ru_utime-ru_before.ru_utime,6)
+              d['cpu_system_seconds']=round(ru_after.ru_stime-ru_before.ru_stime,6)
+              d['exit_code']=proc.returncode
+              d['max_rss_kib_sampled']=max_rss_kb if max_rss_kb>0 else None
+              d['wall_seconds']=round(time.monotonic()-t0,6)
+              if forced: d['forced_termination']=forced
+              d['stderr_excerpt']=stderr[:700]
+              pathlib.Path(root/'originals'/f'{name}.stdout').write_text(stdout)
+              pathlib.Path(root/'originals'/f'{name}.stderr').write_text(stderr)
+              low=(stdout+'\n'+stderr).lower()
+              d['unsat_exact_lines']=sum(1 for q in stdout.splitlines() if q.strip()=='unsat')
+              d['solver_error_or_unsupported']=any(q in low for q in ('unsupported','exception','(error','error:'))
+              d['stdout_sha256']=hashlib.sha256(stdout.encode()).hexdigest()
+              d['status']='POSTFIRST_RAW_SOLVER_RESULT_NOT_INDEPENDENTLY_VERIFIED'
+              if proc.returncode!=0 or d['solver_error_or_unsupported'] or forced:
+                d['status']='HOLD_EXECUTOR_ERROR_OR_UNSUPPORTED'
+            except subprocess.TimeoutExpired as e:
+              d['status']='HOLD_WALL_TIMEOUT'
+            except Exception as e:
+              d['status']='HOLD_EXECUTION_EXCEPTION'
+              d['exception_type']=type(e).__name__
+            results.append(d)
+          (root/'postfirst_rss_repair_raw_baseline.json').write_text(json.dumps({
+            'science_scope':'POST_FIRST execution environment repair to a previously opened original baseline; first 12/12 EXIT_1 historical artifact preserved unchanged; NOT new blind discovery',
+            'original_first_v2_witnesses':'0/7 unchanged',
+            'claims':'No verified Craig witnesses, no new own-weight learning, no Q1-Q7 closure',
+            'source':'ultimate-pa/smtinterpol','results':results},indent=2,sort_keys=True))
+          print(json.dumps(results,indent=2))
+          PY
+      - name: SHA receipts
+        if: always()
+        run: |
+          if test -d receipts; then
+            find receipts -path 'receipts/upstream' -prune -o -type f -print0 | xargs -0 -r sha256sum > receipts/sha256-manifest.txt
+          fi
+      - name: Save frozen historical post-first specialist results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-g0-smtinterpol-postfirst-telemetry-repair-20261027
+          path: |
+            receipts/control.smt2
+            receipts/control.out
+            receipts/control.err
+            receipts/java_version.txt
+            receipts/solver_version.stdout
+            receipts/solver_version.stderr
+            receipts/postfirst_rss_repair_raw_baseline.json
+            receipts/originals
+            receipts/sha256-manifest.txt
+          if-no-files-found: warn

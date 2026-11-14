@@ -1,0 +1,65 @@
+name: NEUMANN G0 SGI12 original conditional-oracle Z3 grade postfirst
+on:
+  push:
+    branches: [research/rc51-intelligence-spend-gate-20261026]
+    paths:
+      - .github/workflows/g0-sgi-active-oracle-grade-20261027.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/g0-sgi-active-oracle-grade-20261027.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  grade-immutable-new12:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SEALED_FIRST_SHA256: a2713cee7e4a54506501927c07ff65f78d4ad110e4c9568892d937f3a0aa8185
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/rc51-intelligence-spend-gate-20261026
+          persist-credentials: false
+      - name: Fetch immutable source-only first without any original gold
+        uses: actions/download-artifact@v4
+        with:
+          name: neumann-g0-sgi12-active-oracle-FIRST-UNgraded-20261027
+          run-id: 40456478489
+          repository: yoonsj0305/NEUMANN
+          github-token: ${{ github.token }}
+          path: new12_first
+      - name: Verify first outputs were sealed in separate prior GitHub commit
+        run: |
+          set -euo pipefail
+          grep -q '14d3bf66' docs/research/G0_SGI_ACTIVE_ORACLE_NEW12_FIRST_SEALED_BEFORE_GOLD_20261027.md || true
+          echo 'a2713cee7e4a54506501927c07ff65f78d4ad110e4c9568892d937f3a0aa8185  new12_first/FIRST_PROPOSALS_AND_QUERY_DECISIONS_UNGRADED.json' | sha256sum --check
+          sha256sum research/q3/discovery_policy/sgi_active_oracle_v1_postfirst_grade_fast.py
+      - name: Pin original new benchmark and install independent Z3 and classical CVC5
+        run: |
+          set -euo pipefail
+          git init -q upstream
+          git -C upstream remote add origin https://github.com/Barnard-PL-Labs/sygus-sgi-1.git
+          git -C upstream fetch --depth 1 origin e7ae840e5546e9243ff94afb1a29064fc050011c
+          git -C upstream checkout -q --detach FETCH_HEAD
+          test "$(git -C upstream rev-parse HEAD)" = e7ae840e5546e9243ff94afb1a29064fc050011c
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -y -qq install cvc5
+          python3 -m pip -q install 'z3-solver==4.13.3.0'
+          cvc5 --version
+          python3 -c 'import z3; assert z3.get_version_string()=="4.13.3"'
+      - name: Grade all frozen C0, C1, and active decisions with original outputs
+        run: |
+          set -euo pipefail
+          python3 research/q3/discovery_policy/sgi_active_oracle_v1_postfirst_grade_fast.py
+          test -s new12_score/POSTFIRST_ORIGINAL_ACTIVE_ORACLE_GRADE.json
+          sha256sum new12_score/POSTFIRST_ORIGINAL_ACTIVE_ORACLE_GRADE.json
+      - name: Archive exact independent source and heldout verdicts, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-g0-sgi12-active-oracle-postfirst-all-original-grade-20261027
+          path: new12_score/POSTFIRST_ORIGINAL_ACTIVE_ORACLE_GRADE.json
+          if-no-files-found: warn

@@ -1,0 +1,9 @@
+# NEUMANN 1 | Post-FIRST sorting_naive exact Boolean compression and original grammar proof (2026-10-28)
+
+The official original source is SyGuS-Org/benchmarks Git 13c8deb68a873635879c9a69bc78caebd340f646, path lib/General_Track/woosuk/sorting_naive.eqn_sygus_iter_256_0.sl, source SHA256 07ec6bd54cdf81008dcb273cb7528c3c5ad30843b0642262ef8b8731cb5137e6. Original professional CVC5 1.4.2 full specification TIMEOUT after ~12 native CPU seconds, frozen original twelve FIRST SHA256 bde9d71dc8e9120a4178e29cb1e758014c2f7effcade3ccec1e75fdc1c1505ba.
+
+THIS IS EXPLICITLY POST-FIRST DEV and strong classical specialist work, NOT learned NEUMANN ownweight A/B or unseen transfer. The task's original published six-Boolean-input origCir and depth-restricted synth-fun skel source are already inspected.
+
+Before executing: parse original helper origCir and exact synthesis depth grammar. Use SymPy 1.14.0 to simplify original Boolean circuit in CNF, verify all 64 truth-table rows exactly, use logical De Morgan rewrite and search AND parenthesization/order for candidate derivable by original grammar, not general unconstrained Boolean expression. Emit native define-fun skel with original input names/sorts, then independent Z3 4.13.3 check that original universal constraint's negation is UNSAT. Need BOTH original target CFG AST derivation and independent source exact formal semantic proof. Any checker error means HOLD, no PASS.
+
+Measure SymPy simplification, grammar search and Z3 separately. Do NOT compare Z3 checking a posthoc known candidate to CVC5 discovering a candidate as same-capability solve-cost 10x. If cheap classical Boolean simplification works, DO NOT waste NEUMANN training compute memorizing already-derivable circuit identities. Global Q1-Q7 OPEN, G1 HOLD, G2 NOT RUN; PR #616 draft unmerged.

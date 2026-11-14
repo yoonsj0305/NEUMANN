@@ -1,0 +1,10 @@
+# NEUMANN 1 | POST-FIRST original 106.c finite one-step safety violation prereg | 2026-10-29
+
+Chronology: original 16 first is frozen SHA 7acee7938ea2b8d18db2dd38058de36f7abdcf5116fbd703f6fce048b3a4418c, and source body ALREADY OPENED, so this is classical retrospective investigation, not blind G1 nor ownweight neural discovery. Published SyGuS-Org/benchmarks commit 13c8deb68a873635879c9a69bc78caebd340f646, original lib/Inv_Track/xujie_code2inv/106.c.sl, original CVC5 1.4.2 returned infeasible without a separate proof.
+
+Fixed concrete witness proposed **before any SMT check**. Source 14 Int state signature names, in exact original order: a,j,k,m,a_0,j_0,k_0,k_1,k_2,k_3,m_0,m_1,m_2,m_3.
+INITIAL [0,0,0,1,0,0,0,0,0,1,1,1,0,1].
+NEXT [0,0,1,1,0,0,0,0,1,0,1,1,0,0].
+Source initial clause pre-f demands a=a0,j=j0,k=k1=0,m=m0,a0≤m0,j0<1. Transition third disjunct allows k2=k=0,m1=m=1,k2<1,m1≥a0=0,k3=1=k',m3=m1=1=m',a'=a0=0,j'=j0=0. Original next source post-f fails at next state a=a0=0,j=j0=0,k=k2=1,m=m1=1,k2≥1,a0<m1. This is a candidate one-step reachable unsafe state.
+
+Formal independent original-source proof: parse unchanged source original pre-f/trans-f/post-f and inv-constraint, confirm 14 original typed Int arguments, use exact original helper bodies. Query concrete 28 fixed state values for pre(s)∧trans(s,s')∧¬post(s') => SAT and its opposite under the same fixed state values => UNSAT. Additionally run unconstrained 28-var existence query. Run both Z3 4.13.3 and official cvc5 1.4.2 with release SHA256 0af677313c8277dc558d3049b192389db4d975d31c968fbd6f31cf0849ee411d; record raw scripts and complete statuses; if disagreement, HOLD. No after-first retuning. A genuine unsafe one-step trace disproves existence of ANY sound inductive safety invariant I satisfying init→I, I∧trans→I', I→post for this original transition relation, independent of I grammar. No neural G1 promotion, all global Q1–Q7 OPEN G1 HOLD G2 NOT RUN and PR#616 DRAFT.

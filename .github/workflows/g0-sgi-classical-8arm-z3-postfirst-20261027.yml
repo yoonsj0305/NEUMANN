@@ -1,0 +1,63 @@
+name: NEUMANN G0 SGI eight classical postfirst independent Z3 grade
+on:
+  push:
+    branches: [research/rc51-intelligence-spend-gate-20261026]
+    paths:
+      - .github/workflows/g0-sgi-classical-8arm-z3-postfirst-20261027.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/g0-sgi-classical-8arm-z3-postfirst-20261027.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  grade-eight-frozen-classical:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/rc51-intelligence-spend-gate-20261026
+          persist-credentials: false
+      - name: Download frozen eight ungraded solver outputs from an earlier run
+        uses: actions/download-artifact@v4
+        with:
+          name: neumann-g0-sgi-eight-classical-postfirst-UNgraded
+          run-id: 40454590527
+          repository: yoonsj0305/NEUMANN
+          github-token: ${{ github.token }}
+          path: eight_ungraded
+      - name: Download older first twelve task outputs, pin unchanged
+        uses: actions/download-artifact@v4
+        with:
+          name: neumann-g0-sgi-postfirst-selection-repair-CVC5-20261027
+          run-id: 40451797444
+          repository: yoonsj0305/NEUMANN
+          github-token: ${{ github.token }}
+          path: previous_first
+      - name: Check original identities before using any heldout gold
+        run: |
+          set -euo pipefail
+          echo '32601fd1b243b4fec4d3a94df48ad3253320839a1b31e10756eda00ff9e803f9  eight_ungraded/POSTFIRST_EIGHT_CONFIGS_CANDIDATES_BEFORE_GRADE.json' | sha256sum --check
+          echo '44047cd18e17e517cf0029329589411b997f53427d8fa3e152b044183d8524f0  previous_first/FIRST_CVC5_SOURCE_ONLY.json' | sha256sum --check
+          git init -q upstream
+          git -C upstream remote add origin https://github.com/Barnard-PL-Labs/sygus-sgi-1.git
+          git -C upstream fetch --depth 1 origin e7ae840e5546e9243ff94afb1a29064fc050011c
+          git -C upstream checkout -q --detach FETCH_HEAD
+          test "$(git -C upstream rev-parse HEAD)" = e7ae840e5546e9243ff94afb1a29064fc050011c
+      - name: Independent Z3 original past-and-heldout verdicts for all eight pre-fixed arms
+        run: |
+          set -euo pipefail
+          python3 -m pip -q install 'z3-solver==4.13.3.0'
+          python3 -c 'import z3; assert z3.get_version_string()=="4.13.3"'
+          python3 research/q3/discovery_policy/sgi_eight_arm_postfirst_z3_grade.py
+          sha256sum postfirst_grade/EIGHT_ARM_POSTFIRST_INDEPENDENT_Z3_GRADE.json
+      - name: Preserve every arm, failures too
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-g0-sgi-eight-classical-Z3-all-graded-postfirst
+          path: postfirst_grade/EIGHT_ARM_POSTFIRST_INDEPENDENT_Z3_GRADE.json
+          if-no-files-found: warn
