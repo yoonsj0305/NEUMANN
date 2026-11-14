@@ -1,0 +1,149 @@
+{
+ "B_cache": {
+  "adopted_but_wrong": [
+   "humaneval/40"
+  ],
+  "cpu_q": [
+   2747,
+   6508
+  ],
+  "solved": 48
+ },
+ "D_invent": {
+  "adopted_but_wrong": [
+   "humaneval/40",
+   "mbpp/68"
+  ],
+  "cpu_q": [
+   2758,
+   6516
+  ],
+  "solved": 45
+ },
+ "D_invent_vs_repair": {
+  "only_inv": [
+   "humaneval/3",
+   "mbpp/567",
+   "mbpp/588",
+   "mbpp/670"
+  ],
+  "only_rep": [
+   "humaneval/121",
+   "mbpp/775"
+  ],
+  "p": 0.6875
+ },
+ "D_repair": {
+  "adopted_but_wrong": [],
+  "cpu_q": [
+   2758,
+   6524
+  ],
+  "solved": 43
+ },
+ "Dq": {
+  "adopted_but_wrong": [],
+  "cpu_q": [
+   2648,
+   6516
+  ],
+  "solved": 24
+ },
+ "E_action": {
+  "adopted_but_wrong": [
+   "humaneval/40",
+   "mbpp/68"
+  ],
+  "cpu_q": [
+   2757,
+   6512
+  ],
+  "solved": 47
+ },
+ "E_decisions_on_differing_tasks": {
+  "humaneval/121": [
+   "repair",
+   "repair",
+   "invent"
+  ],
+  "mbpp/775": [
+   "invent",
+   "repair",
+   "repair",
+   "repair"
+  ]
+ },
+ "E_vs_B": {
+  "only_B": [
+   "humaneval/126",
+   "humaneval/85",
+   "mbpp/690"
+  ],
+  "only_E": [
+   "mbpp/670",
+   "mbpp/775"
+  ],
+  "p": 1.0
+ },
+ "E_vs_D": {
+  "only_D": [],
+  "only_E": [
+   "humaneval/121",
+   "mbpp/775"
+  ],
+  "p": 0.5
+ },
+ "E_vs_Drepair": {
+  "only_Drep": [],
+  "only_E": [
+   "humaneval/3",
+   "mbpp/567",
+   "mbpp/588",
+   "mbpp/670"
+  ],
+  "p": 0.125
+ },
+ "LR_invent": {
+  "gained_vs_159": [
+   "count-k(k=3)",
+   "keep-mod-k(k=3) | modulo-k(k=3)",
+   "pop | is-evens"
+  ],
+  "lost_vs_159": [
+   "count-k(k=10)",
+   "prepend-k(k=-2) | positions",
+   "replace-all-k-with-n(k=2,n=10) | sum",
+   "rotate-k(k=1) | identify-geq-k(k=2)"
+  ],
+  "solved": 158
+ },
+ "LR_repair": {
+  "gained_vs_159": [
+   "count-k(k=3)",
+   "keep-mod-k(k=3) | modulo-k(k=3)",
+   "pop | is-evens",
+   "prepend-k(k=10) | positions",
+   "slice-k-n(k=3,n=4) | repeat-k(k=5)"
+  ],
+  "lost_vs_159": [
+   "pow-k(k=3) | index-k(k=2)",
+   "prepend-k(k=-2) | positions",
+   "replace-all-k-with-n(k=2,n=10) | sum",
+   "rotate-k(k=1) | identify-geq-k(k=2)"
+  ],
+  "solved": 160
+ },
+ "code_commit": "96f5ea6",
+ "determinism_check": "humaneval/121, humaneval/126, mbpp/680, 4 list-routines regressions, rotate-k|identify-geq-k: 3 repeats each, identical outcome every time (code b9f3f43)",
+ "full_regression_tests": "1148 passed, 53 skipped (code 96f5ea6)",
+ "oracle_best_fixed_mode": 47,
+ "policy_humaneval": {
+  "invent_better": 4,
+  "pairs": 7
+ },
+ "policy_mbpp": {
+  "invent_better": 2,
+  "pairs": 5
+ },
+ "status": "DEVELOPMENT ONLY - opened FRESH and list-routines re-used; not independent evidence"
+}

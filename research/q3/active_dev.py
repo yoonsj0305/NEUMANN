@@ -1,0 +1,258 @@
+"""Active structural discovery on the black-box SOURCE environment (development only).
+
+  run <split> <rows.jsonl> [arms]     split = probe | formal; arms default A,B,C,Dq,D
+  runE <split> <rows.jsonl>           arm E: D + discovery policy fitted on D's rows of the OTHER folds
+  report <split> <rows.jsonl> <record.json>
+
+Tasks: `env_listroutines.tasks()` (108 single routines, 120 compositions); the split is a salted hash of the
+task name (probe ~30 %, formal ~70 %), fixed before any run.  Same initial observation (8 examples), same
+query budget (8), same CPU cap (6 s, environment execution included) for every arm.
+"""
+from __future__ import annotations
+import collections, hashlib, json, pathlib, sys
+sys.path.insert(0, ".")
+sys.path.insert(0, "research/q3")
+from multiprocessing import Pool
+import env_listroutines as E
+from neumann1 import active as ac, invention_core as ic
+import invention_first as first
+
+CAP, BUDGET, FOLDS = 30.0, 60, 5
+POLICY = {}
+REPLAY = {}
+
+
+def _h(s):
+    return int(hashlib.sha256(s.encode()).hexdigest(), 16)
+
+
+def split_of(name):
+    return "probe" if _h("neumann-active-split-v1:" + name) % 10 < 3 else "formal"
+
+
+def fold_of(name):
+    return _h("neumann-active-fold-v1:" + name) % FOLDS
+
+
+def job(a):
+    arm, spec = a
+    env = E.Env(spec, 0, budget=BUDGET)
+    pol = POLICY.get(fold_of(spec.name)) if arm == "E" else None
+    try:
+        pred, rec = ac.run_arm(arm, env, CAP, seed=_h(spec.name) % 1000, policy=pol, replay=REPLAY.get(spec.name))
+    except Exception as e:                       # recorded, never silently counted
+        import traceback
+        return {"arm": arm, "name": spec.name, "parts": len(spec.parts), "status": "error", "solved": False,
+                "fit": False, "queries": env.used, "cpu_seconds": CAP, "error": "%s: %s" % (type(e).__name__, e),
+                "trace": traceback.format_exc()[-1500:], "out_type": ac._type(env.initial()[0][1])}
+    rec.update(name=spec.name, parts=len(spec.parts), solved=bool(pred is not None and env._score(pred)),
+               features=ac.features(env.initial()),
+               out_type=ac._type(env.initial()[0][1]), log=[[list(x), y if not isinstance(y, tuple) else list(y)]
+                                                           for x, y in env.log])
+    f = rec.get("formation")
+    if f:
+        for h in f.get("hypotheses", {}).values():
+            h.pop("ast", None) if h.get("ast") is None else h.update(ast=h["ast"])
+    return rec
+
+
+def _specs(split):
+    return [s for s in E.tasks() if split == "all" or split_of(s.name) == split]
+
+
+def _go(jobs, out):
+    done = set()
+    try:
+        done = {(r["arm"], r["name"]) for r in map(json.loads, open(out))}
+    except FileNotFoundError:
+        pass
+    jobs = [j for j in jobs if (j[0], j[1].name) not in done]
+    print("todo", len(jobs), flush=True)
+    with Pool(4) as p, open(out, "a") as fh:
+        for r in p.imap_unordered(job, jobs, chunksize=1):
+            fh.write(json.dumps(r, default=list) + "\n")
+            fh.flush()
+
+
+def run(split, out, arms="A,B,C,Dq,D"):
+    _go([(a, s) for a in arms.split(",") for s in _specs(split)], out)
+
+
+def policy_from(rows, exclude_fold=None):
+    """Discovery policy learned from D's experience on OTHER tasks (never the task itself, never answers):
+    per observable feature bucket of the initial examples (output type, length relation, whether output
+    values are input values) and globally: which reading direction formed an accepted machine, which
+    continuation kinds became informative components, and the most frequent accepted component structure
+    per direction.  Continuations are abstracted to kinds (above / below every value seen), not values."""
+    d = [r for r in rows if r["arm"] == "D" and r.get("formation") and r.get("features")
+         and (exclude_fold is None or fold_of(r["name"]) != exclude_fold)]
+
+    def summarise(rs):
+        dirs, kinds, structs = collections.Counter(), collections.Counter(), {}
+        q_acc, c_acc = [], []
+        for r in rs:
+            f = r["formation"]
+            for m in f.get("machines", []):
+                if m.get("challenge"):
+                    dirs[m["direction"]] += 1
+                    ks = tuple(c.get("kind", "?") for c in m.get("components", []))
+                    structs.setdefault(m["direction"], collections.Counter())[ks] += 1
+                    kinds.update(k for k in ks if k in ("above", "below", "above2", "below2"))
+                    if "queries_used" in m:
+                        q_acc.append(m["queries_used"])
+                        c_acc.append(m["cpu"])
+        # the formation allotment: what every accepted machine of this kind of task needed (with a 25% margin),
+        # only where at least 10 accepted machines support it (dev cross-validation: an allotment from 2-4
+        # machines cut formations that needed more); formation beyond it has never ended in an accepted machine,
+        # so the queries go to the committee instead.  No accepted machine on >= 5 tasks: formation is skipped.
+        # No CPU allotment: synthesis splits its deadline into stages, so a shorter deadline changed what it
+        # found even when it would have finished early (dev cross-validation).
+        return {"directions": tuple(sorted(("prefix", "suffix"), key=lambda k: -dirs.get(k, 0))),
+                "continuation_kinds": [k for k, _ in kinds.most_common()],
+                # kinds are only reordered, never removed: dev cross-validation showed that tasks sharing the
+                # observable features can need opposite kinds (kth-largest / kth-smallest), so a restriction
+                # learned from a handful of machines removed the one experiment that was needed
+                "restrict_kinds": False,
+                "structures": {k: list(v.most_common(1)[0][0]) for k, v in structs.items() if v.most_common(1)[0][0]},
+                "formation": {"skip": len(rs) >= 5 and not dirs,
+                              "max_queries": int(1.25 * max(q_acc)) + 1 if len(q_acc) >= 10 else None,
+                              "max_cpu": None},
+                "evidence": {"tasks": len(rs), "accepted_machines": sum(dirs.values())}}
+    by = collections.defaultdict(list)
+    for r in d:
+        by[r["features"]].append(r)
+    return {"global": summarise(d), "by_feature": {k: summarise(v) for k, v in by.items() if len(v) >= 2}}
+
+
+def discovery_policy_from(rows, threshold=0.5):
+    """V3 discovery policy (replaces the per-variable experience prior, which ranked variables by their past
+    identity and lost three HumanEval tasks).  Learned from D's invention logs on OTHER tasks, with credit
+    separated by stage, over features of the evidence each task itself produced (`active._inv_features`):
+      synthesis: every tried set -> did an Update / readout exist on the extended state?
+      repair:    every ADOPTED set (with its failing fraction) -> did it end in a machine that passed the
+                 independent challenge and the hidden test?
+    No variable identity enters the model."""
+    from neumann1 import active as ac_
+    syn, rep = [], []
+    for r in rows:
+        if r.get("arm") != "D" or not r.get("formation"):
+            continue
+        for m in r["formation"].get("machines", []):
+            final = {(c.get("update"), c.get("init")) for c in m.get("components", []) if c.get("kind") == "accumulator"}
+            verified = bool(m.get("challenge")) and bool(r.get("solved")) and str(r.get("via", "")).startswith("state")
+            for inv in m.get("inventions", []):
+                adopted = [tuple(v) for v in (inv.get("adopted") or [])]
+                if adopted and isinstance(adopted[0][0], list):
+                    adopted = [tuple(x) for v in adopted for x in v]
+                for t in inv.get("tried", []):
+                    f = t.get("feat")
+                    if not isinstance(f, dict):
+                        continue
+                    syn.append((f, int(bool(t.get("update_found")))))
+                    vs = [tuple(v) for v in t.get("vars", [])]
+                    if t.get("update_found") and vs and all(v in adopted for v in vs):
+                        ok = verified and all(v in final for v in vs)
+                        rep.append((dict(f, fail_frac=t.get("fail_frac") or 0.0), int(ok)))
+    pol = ac_.DiscoveryPolicy(ac_.DiscoveryPolicy.fit_logistic(syn), ac_.DiscoveryPolicy.fit_logistic(rep), threshold)
+    out = pol.to_json()
+    out["evidence"] = {"synthesis_examples": len(syn), "synthesis_positive": sum(y for _, y in syn),
+                       "repair_examples": len(rep), "repair_positive": sum(y for _, y in rep)}
+    return out
+
+
+def structural_knowledge(rows):
+    """Structural Knowledge Units from D's verified machines of OTHER tasks (minimal; reuses what the run
+    already recorded).  A unit is kept only if its machine passed the independent challenge and the hidden test
+    and used invented variables."""
+    units = []
+    for r in rows:
+        if r.get("arm") != "D" or not r.get("solved") or not str(r.get("via", "")).startswith("state"):
+            continue
+        ms = [m for m in r["formation"].get("machines", []) if m.get("challenge")]
+        if not ms:
+            continue
+        m = ms[-1]
+        vs = [[c["update"], c["init"]] for c in m.get("components", []) if c.get("kind") == "accumulator"]
+        if not vs:
+            continue
+        inv = (m.get("inventions") or [{}])[-1]
+        units.append({"id": r["name"], "route": "readout" if m.get("readout") else "state", "vars": vs,
+                      "observed_conflict": {"why": inv.get("why"), "contradictions": inv.get("conflicts")},
+                      "structural_relation": [v[0] for v in vs],
+                      "transition": m.get("update"), "readout": m.get("readout"),
+                      "preconditions": {"answer_type": r.get("out_type"), "explains_current_contradictions": True},
+                      "counterexamples": [],
+                      "verification": {"independent_challenge": True, "hidden_test": True},
+                      "discovery_procedure": m.get("events"),
+                      "minimality": m.get("minimality"),
+                      "cost": {"queries": m.get("queries_used"), "cpu_seconds": m.get("cpu")}})
+    return units
+
+
+def runDq(split, out):
+    """Dq replays, query by query, the inputs D submitted (same environment answers); hash-checked later."""
+    rows = [json.loads(l) for l in open(out)]
+    for r in rows:
+        if r["arm"] == "D":
+            REPLAY[r["name"]] = r.get("query_inputs", [])
+    _go([("Dq", s) for s in _specs(split) if s.name in REPLAY], out)
+
+
+def replay_check(rows):
+    """D and Dq saw the same queries and answers: compare hashes of the logged (input, output) lists."""
+    d = {r["name"]: r for r in rows if r["arm"] == "D"}
+    q = {r["name"]: r for r in rows if r["arm"] == "Dq"}
+    h = lambda r: hashlib.sha256(json.dumps(r.get("log"), sort_keys=True).encode()).hexdigest()
+    same = sum(h(d[k]) == h(q[k]) for k in d if k in q)
+    return {"pairs": len([k for k in d if k in q]), "identical_query_answer_logs": same}
+
+
+def runE(split, out):
+    rows = [json.loads(l) for l in open(out)]
+    for f in range(FOLDS):
+        POLICY[f] = policy_from(rows, f)
+        print("fold", f, POLICY[f], flush=True)
+    _go([("E", s) for s in _specs(split)], out)
+
+
+def _vs(so, a, b):
+    w, l = len(so[a] - so[b]), len(so[b] - so[a])
+    return {"first_only": w, "second_only": l, "mcnemar_p": first.mcnemar(w, l)}
+
+
+def report(split, rows_path, out):
+    rows = [json.loads(l) for l in open(rows_path)]
+    by = {}
+    for r in rows:
+        by.setdefault(r["arm"], {})[r["name"]] = r
+    n = len(next(iter(by.values())))
+    so = {a: {k for k, r in v.items() if r["solved"]} for a, v in by.items()}
+    rec = {"split": split, "tasks": n, "arms": {}, "replay_check": replay_check(rows)}
+    for a, v in sorted(by.items()):
+        rec["arms"][a] = {"solved": len(so[a]), "fit": sum(r["fit"] for r in v.values()),
+                          "wrong_fit": sum(r["fit"] and not r["solved"] for r in v.values()),
+                          "cpu_seconds": round(sum(r["cpu_seconds"] for r in v.values()), 1),
+                          "queries": sum(r["queries"] for r in v.values()),
+                          "by_parts": dict(collections.Counter(r["parts"] for r in v.values() if r["solved"]))}
+    pairs = [("D", "Dq"), ("D", "C"), ("C", "B"), ("B", "A"), ("D", "A"), ("E", "D"), ("Dq", "C")]
+    rec["comparisons"] = {"%s_vs_%s" % (a, b): _vs(so, a, b) for a, b in pairs if a in so and b in so}
+    if "D" in by:
+        formed = {k: r for k, r in by["D"].items() if r.get("formation", {}).get("formed")}
+        rec["D_formed_and_challenged"] = len(formed)
+        rec["D_formed"] = len(formed)
+        rec["D_formed_solved"] = sum(r["solved"] for r in formed.values())
+        rec["D_gain_over_Dq"] = {k: {"via": by["D"][k]["via"], "program": by["D"][k]["program"]}
+                                 for k in sorted(so["D"] - so.get("Dq", set()))}
+        rec["D_loss_to_Dq"] = sorted(so.get("Dq", set()) - so["D"])
+        rec["D_machines"] = {k: {"solved": r["solved"], "via": r["via"], "program": r["program"]}
+                             for k, r in sorted(by["D"].items()) if r.get("formation", {}).get("formed")}
+        rec["D_latent_components_formed"] = sum(1 for r in by["D"].values() if r.get("formation", {}).get("formed")
+                                                and "m=1" not in (r.get("via") or ""))
+    pathlib.Path(out).write_text(json.dumps(rec, indent=1, sort_keys=True))
+    print(json.dumps({k: v for k, v in rec.items() if k not in ("D_gain_over_Dq",)}, indent=1))
+    for k, v in rec.get("D_gain_over_Dq", {}).items():
+        print("  D+", k, v["via"], (v["program"] or "")[:70])
+
+
+if __name__ == "__main__":
+    {"run": run, "runDq": runDq, "runE": runE, "report": report}[sys.argv[1]](*sys.argv[2:])

@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from time import perf_counter_ns
 from .relational_grid_inventor import RelationalGridInventor,grid
 from . import arc2_meta_grid_reasoner as old
+from .classical_grid_fast import fit_all
 
 @dataclass(frozen=True)
 class GridCandidate:
@@ -53,9 +54,10 @@ class HybridArcGridInventor:
         new_outputs=tuple(self.relational.apply(result,g) for g in target)
         elapsed_new=(perf_counter_ns()-t)/1e6
         t=perf_counter_ns()
-        baseline,index_checks=old.fit_task(
-            demo,range(len(old.PROGRAMS)),len(old.PROGRAMS),
-            max_hits=len(old.PROGRAMS))
+        # Output-identical to old.fit_task(..., max_hits=626): shared
+        # prefixes, duplicate intermediates and post-mismatch demos are
+        # eliminated (ConceptARC FIRST 160/160 + 1,301 dev tasks identical).
+        baseline,index_checks=fit_all(demo)
         # A recoloring adapter has up to 10 additional fitted variables.
         # If an exact geometric transformation exists, it is strictly
         # simpler and more likely to survive unseen input colors. The old

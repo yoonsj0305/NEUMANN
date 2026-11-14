@@ -1,0 +1,141 @@
+{
+ "D_only_structure_classes": {
+  "list-state": 7,
+  "scalar-state": 7
+ },
+ "D_only_vs_Dq": {
+  "mbpp/133": {
+   "program": "W=[[]] update=['(ifI (lt $1 0) (add $0 $1) $0)']",
+   "structure": "scalar-state"
+  },
+  "mbpp/141": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((not (lt $7 $4)) ? copy 0[(sub $0 1)] : ((lt $4 $5) ? value $4 : value (mod $5 (add $4 1))))>']",
+   "structure": "list-state"
+  },
+  "mbpp/152": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((not (lt $7 $4)) ? copy 0[(sub $0 1)] : ((lt $4 $5) ? value $4 : value (mod $5 (add $4 1))))>']",
+   "structure": "list-state"
+  },
+  "mbpp/221": {
+   "program": "W=[[]] update=['(ifI (lt $1 $0) $0 (ifI (eq 0 (mod $1 2)) (mod $0 (add $1 1)) $0))']",
+   "structure": "scalar-state"
+  },
+  "mbpp/329": {
+   "program": "W=[[]] update=['(ifI (lt $1 1) (add $0 1) $0)']",
+   "structure": "scalar-state"
+  },
+  "mbpp/428": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((not (lt $7 $4)) ? copy 0[(sub $0 1)] : ((lt $4 $5) ? value $4 : value (mod $5 (add $4 1))))>']",
+   "structure": "list-state"
+  },
+  "mbpp/516": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((not (lt $7 $4)) ? copy 0[(sub $0 1)] : ((lt $4 $5) ? value $4 : value (mod $5 (add $4 1))))>']",
+   "structure": "list-state"
+  },
+  "mbpp/54": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((not (lt $7 $4)) ? copy 0[(sub $0 1)] : ((lt $4 $5) ? value $4 : value (mod $5 (add $4 1))))>']",
+   "structure": "list-state"
+  },
+  "mbpp/66": {
+   "program": "W=[[]] update=['(ifI (lt $1 0) $0 (add $0 1))']",
+   "structure": "scalar-state"
+  },
+  "mbpp/697": {
+   "program": "W=[[]] update=['(add $0 (sub 1 (mod $1 2)))']",
+   "structure": "scalar-state"
+  },
+  "mbpp/71": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((not (lt $7 $4)) ? copy 0[(sub $0 1)] : ((lt $4 $5) ? value $4 : value (mod $5 (add $4 1))))>']",
+   "structure": "list-state"
+  },
+  "mbpp/807": {
+   "program": "W=[[]] update=['(ifI (lt $1 $0) $0 (ifI (eq 0 (mod $1 2)) $0 (mod $0 (add $1 1))))']",
+   "structure": "scalar-state"
+  },
+  "mbpp/870": {
+   "program": "W=[[]] update=['(ifI (lt $1 0) $0 (add $0 $1))']",
+   "structure": "scalar-state"
+  },
+  "mbpp/940": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((eq $5 (mod $5 $4)) ? copy 0[$0] : ((lt $7 $4) ? value $4 : copy 0[(sub $0 1)]))>']",
+   "structure": "list-state"
+  }
+ },
+ "Dq_only_vs_D": [
+  "humaneval/114"
+ ],
+ "V2_count_D_only_vs_Dq_m2": {
+  "D": [],
+  "E": []
+ },
+ "comparisons": {
+  "D_vs_A": {
+   "first_only": 15,
+   "mcnemar_p": 0.007537841796875,
+   "second_only": 3
+  },
+  "D_vs_Dq": {
+   "first_only": 14,
+   "mcnemar_p": 0.0009765625,
+   "second_only": 1
+  },
+  "Dq_vs_A": {
+   "first_only": 3,
+   "mcnemar_p": 1.0,
+   "second_only": 4
+  },
+  "E_vs_D": {
+   "first_only": 0,
+   "mcnemar_p": 1.0,
+   "second_only": 0
+  }
+ },
+ "cpu_seconds": {
+  "A": 1962.5,
+  "D": 2712.3,
+  "Dq": 2618.6,
+  "E": 2709.7
+ },
+ "errors": {
+  "A": [],
+  "D": [
+   "humaneval/114"
+  ],
+  "Dq": [],
+  "E": [
+   "humaneval/114"
+  ]
+ },
+ "freeze_sha256": "132053fa403859adceed16faa8cfe63ebd200f70389e2d4cebad02705f2333eb",
+ "queries": {
+  "A": 0,
+  "D": 6468,
+  "Dq": 6468,
+  "E": 6470
+ },
+ "reference_inconsistent": [
+  "mbpp/38"
+ ],
+ "replay_identical": 109,
+ "solved": {
+  "A": 26,
+  "D": 38,
+  "Dq": 25,
+  "E": 38
+ },
+ "solved_only_through_new_latent_component": {
+  "D": [],
+  "E": []
+ },
+ "solved_with_m2_machine": {
+  "D": [],
+  "E": []
+ },
+ "tasks_registered": 111,
+ "tasks_run": 110,
+ "verdict": {
+  "V1_method_invention": "PASS",
+  "V2_latent_state_discovery": "FAIL",
+  "V3_learned_policy": "FAIL"
+ }
+}

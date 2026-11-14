@@ -1,0 +1,99 @@
+{
+ "D": {
+  "Dq": 23,
+  "cpu": 2763,
+  "queries": 6514,
+  "solved": 45
+ },
+ "D_only_m2": [
+  "humaneval/3",
+  "humaneval/62",
+  "humaneval/85",
+  "mbpp/476",
+  "mbpp/567",
+  "mbpp/588",
+  "mbpp/680",
+  "mbpp/790"
+ ],
+ "D_vs_Dq": [
+  22,
+  0,
+  4.76837158203125e-07
+ ],
+ "E_full": {
+  "D_only": [
+   "humaneval/3",
+   "humaneval/85",
+   "mbpp/680"
+  ],
+  "adopted_but_wrong": [
+   "mbpp/472",
+   "mbpp/670"
+  ],
+  "cpu": 2762,
+  "only_vs_D": [
+   "mbpp/775"
+  ],
+  "p": 0.625,
+  "queries": 6520,
+  "solved": 43
+ },
+ "E_sel": {
+  "D_only": [
+   "humaneval/3",
+   "humaneval/85"
+  ],
+  "adopted_but_wrong": [
+   "mbpp/19",
+   "mbpp/68"
+  ],
+  "cpu": 2763,
+  "only_vs_D": [
+   "humaneval/126",
+   "mbpp/775"
+  ],
+  "p": 1.0,
+  "queries": 6516,
+  "solved": 45
+ },
+ "ablation_single_variable": {
+  "note": "MULTI=False, same seed and budget",
+  "solved": 0,
+  "tasks": [
+   "mbpp/476",
+   "mbpp/588",
+   "humaneval/3"
+  ]
+ },
+ "adopted_but_wrong": [
+  "mbpp/19",
+  "mbpp/46",
+  "mbpp/68"
+ ],
+ "code_commit": "9c9ade1",
+ "full_regression_tests": "1148 passed, 53 skipped (code 9c9ade1)",
+ "list_routines_D": {
+  "previous_dev": 159,
+  "solved": 157
+ },
+ "multi_variable_D_only_vs_Dq": [
+  "humaneval/3",
+  "mbpp/476",
+  "mbpp/588"
+ ],
+ "multi_variable_solves": {
+  "humaneval/3": [
+   "(sub 0 $0)@1",
+   "(add $0 $1)@0"
+  ],
+  "mbpp/476": [
+   "(if (lt $0 $1) $1 $0)@below",
+   "(if (lt $0 $1) $0 $1)@above"
+  ],
+  "mbpp/588": [
+   "(if (lt $0 $1) $0 $1)@above",
+   "(if (lt $0 $1) $1 $0)@0"
+  ]
+ },
+ "status": "DEVELOPMENT ONLY - opened FRESH tasks re-used; list-routines re-used; not independent evidence"
+}
