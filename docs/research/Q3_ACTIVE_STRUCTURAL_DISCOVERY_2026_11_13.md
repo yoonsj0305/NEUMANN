@@ -710,3 +710,31 @@ Unsolved tasks split (the three bottlenecks the directive separates):
 The signal is richer than the 4 final-outcome labels (233 events on 60 tasks across three lineages) but heavily
 repeated, and only 8 tasks connect a witness to a verified invention. Whether witness prediction can be learned
 and improves discovery (directive §5) was NOT tested in this session. V3 FAIL; Q3 OPEN; Q6 untouched.
+
+## 16. Gate A audit: can the existing records teach query value? (2026-11-15) — DEVELOPMENT ONLY, no new runs
+
+Of the 233 witness events of section 15, by how they arose (from the code paths that log them, `neumann1/active.py`):
+
+| kind | events | how it arose | SOURCE query chosen among candidates? |
+|---|---|---|---|
+| rejected invented variable | 98 | internal: synthesis / fold on data already observed | no query |
+| contradiction | 88 | trajectory state queries of a FIXED design (ascending, descending, random) | SOURCE queries, but not a selection |
+| Update counterexample (self-test) | 27 | self-test query, chosen where a rival hypothesis disagrees | yes |
+| readout counterexample | 11 | readout self-test query | yes |
+| state-sufficiency refutation | 8 | sufficiency probe: a pair with equal final states | yes |
+| start counterexample | 1 | self-test query | yes |
+
+So 47 events come from SOURCE queries the system selected; 186 are internal checks or fixed-design observations.
+For none of the 47 did the run record the candidate set at selection time, the rival each candidate targeted, or
+the answers the unselected candidates would have produced (they were never asked). Relative query value is
+therefore not learnable from the existing records: **learnable query-selection cases = 0**. Gate A fails on the
+records; per the directive the experiment stops here. The minimal addition needed is to log, at each selected
+query, the candidate pool size, the rival kind that produced the chosen input, and the hypothesis change after
+the answer — and, to obtain counterfactual labels, to ask a second candidate on development tasks under the same
+budget. Not implemented in this session.
+
+Representation vs information vs policy (section 15's split, revisited): `mbpp/19` and `mbpp/46` reached
+contradictions and state refutations (information present) but no candidate holds a set of seen values; the
+admissible candidates there were chance fits. They are representation-limited, which section 15's count of 0 hid.
+
+V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched.
