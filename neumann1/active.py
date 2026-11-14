@@ -383,8 +383,161 @@ def accumulators():
             if not _evolves(fn, out_t):
                 continue                      # h settles on a constant after one step: no state
             out.append({"t": out_t, "ast": ast, "fn": fn, "show": show_ast(ast), "size": len(show_ast(ast))})
+    out += _conditional_accumulators(lib, {repr(a["ast"]) for a in out})
     _ACC["all"] = out
     return out
+
+
+_RB = {}
+
+
+def readout_basis(arity, out_t, n=80):
+    """The first small programs of the substrate over `arity` integer variables (cost order, distinct by
+    behaviour): the cheap readouts R(h1[, h2]) checked exactly before any synthesis."""
+    key = (arity, out_t)
+    if key in _RB:
+        return _RB[key]
+    lib = _lib()
+    vals_ = (-3, -1, 0, 1, 2, 5, 7)
+    probes = [tuple(v) for v in __import__("itertools").product(vals_, repeat=arity)]
+    got = []
+
+    def offer(e, t):
+        got.append(e.ast())
+        if len(got) >= n:
+            raise sc.Done(None, None)
+    srch = dc.FSearch(lib, (T_I,) * arity, probes, time.process_time() + 1.0, (), ic.uniform_costs(), (out_t,), offer)
+    try:
+        srch.run()
+    except sc.Done:
+        pass
+    out = []
+    for ast in got:
+        fn = ic.compile_ast(ic._tup(ast), arity, lib)
+        out.append((ast, fn))
+    _RB[key] = out
+    return out
+
+
+def _conditional_accumulators(lib, have):
+    """The case-split class h' = if P(h, e) then A else B, composed from the same substrate: P every small
+    predicate of (h, e) in cost order, A / B the elementary terms (keep h, take e, add, count, multiply,
+    subtract, reset to 0 / 1; for lists: keep, collect e, restart from e).  Running maxima / minima,
+    conditional sums and counts, first-of-a-kind and filtered collections are all in this class; nothing
+    task-specific is named."""
+    out, seen = [], set(have)
+    v0, v1 = ("v", 0), ("v", 1)
+    for in_t, terms, iff, probes, npred in (
+            ((T_I, T_I), [v0, v1, ("add", v0, v1), ("add", v0, ("k", 1)), ("mul", v0, v1), ("sub", v0, v1),
+                          ("k", 0), ("k", 1)], "ifI",
+             [(h, e) for h in (-3, -1, 0, 1, 2, 5, 7) for e in (-3, -1, 0, 1, 2, 5, 7)], 60),
+            ((T_L, T_I), [v0, ("cons", v1, v0), ("cons", v1, ("nil",))], "ifL",
+             [(tuple(l), e) for l in ([], [1], [2, 1], [3, 3, 0], [5, -1]) for e in (0, 1, 3, -1)], 40)):
+        preds = []
+
+        def offer(e, t, preds=preds, npred=npred):
+            if len(set(e.vec)) > 1:
+                preds.append(e.ast())
+            if len(preds) >= npred:
+                raise sc.Done(None, None)
+        srch = dc.FSearch(lib, in_t, probes, time.process_time() + 2.0, (), ic.uniform_costs(), (T_B,), offer)
+        try:
+            srch.run()
+        except sc.Done:
+            pass
+        for pr in preds:
+            for ta in terms:
+                for tb in terms:
+                    if ta == tb:
+                        continue
+                    ast = (iff, pr, ta, tb)
+                    try:
+                        fn = ic.compile_ast(ic._tup(ast), 2, lib)
+                    except Exception:
+                        continue
+                    vec = []
+                    for q in probes:
+                        try:
+                            v = fn(q)
+                            vec.append(tuple(v) if isinstance(v, list) else v)
+                        except Exception:
+                            vec.append(None)
+                    key = repr(vec)
+                    if key in seen or None in vec or not _evolves(fn, in_t[0]):
+                        continue
+                    seen.add(key)
+                    out.append({"t": in_t[0], "ast": ast, "fn": fn, "show": show_ast(ast), "size": len(show_ast(ast))})
+    return out
+
+
+def _inv_features(it, n_prefixes, n_conf, why, s_type, zkind):
+    """Evidence of the CURRENT task about one candidate set of invented variables (no identity of a variable,
+    nothing remembered from other tasks): how many contradictions were observed and why invention was called,
+    how finely the set splits the observed prefixes, its description length, and the structural class of each
+    variable (reads the element, keeps memory, case split, list valued, kind of start)."""
+    vs_ = it["vars"]
+    f = {"bias": 1.0, "n_vars2": float(len(vs_) >= 2), "size": it["size"] / 40.0,
+         "granularity": it["ns"] / max(1, n_prefixes), "conflicts": min(n_conf, 20) / 20.0,
+         "why_conflict": float(why.startswith("inconsistent")), "why_noupdate": float(why.startswith("update")),
+         "ans_bool": float(s_type == T_B), "ans_list": float(s_type == T_L)}
+    for c, z in vs_:
+        sh = c["show"]
+        for k, v in (("reads_e", "$1" in sh), ("keeps_h", "$0" in sh), ("case", sh.startswith("(if")),
+                     ("list", c["t"] == T_L), ("start_" + zkind(z) if zkind(z) in ("below", "above", "nil") else
+                                               "start_const", True)):
+            f[k] = f.get(k, 0.0) + float(v) / len(vs_)
+    return {k: round(v, 4) for k, v in f.items()}
+
+
+class DiscoveryPolicy:
+    """Learned discovery policy (V3) with separated credit.  Two logistic models over the current task's evidence
+    (`_inv_features`):
+      synthesis  P(an Update exists | variables tried)              -- credit to variable selection + synthesis
+      repair     P(verified machine | set adopted, failing fraction) -- credit to counterexample repair
+    `expected` = synthesis x repair at the typical failing fraction orders the candidate sets; `repairable`
+    decides adoption.  Labels come only from independently verified outcomes of OTHER tasks."""
+
+    def __init__(self, w_syn, w_rep, threshold=0.5, adopt=True):
+        self.w_syn, self.w_rep, self.threshold, self.adopt = w_syn, w_rep, threshold, adopt
+
+    @staticmethod
+    def _p(w, f):
+        import math
+        z = sum(w.get(k, 0.0) * v for k, v in f.items())
+        return 1.0 / (1.0 + math.exp(-max(-30.0, min(30.0, z))))
+
+    def expected(self, f):
+        return self._p(self.w_syn, f) * self._p(self.w_rep, dict(f, fail_frac=0.0))
+
+    def repairable(self, f, fail_frac):
+        return self._p(self.w_rep, dict(f, fail_frac=fail_frac)) >= self.threshold
+
+    def to_json(self):
+        return {"w_syn": self.w_syn, "w_rep": self.w_rep, "threshold": self.threshold, "adopt": self.adopt}
+
+    @classmethod
+    def from_json(cls, d):
+        return None if not d else cls(d["w_syn"], d["w_rep"], d.get("threshold", 0.5), d.get("adopt", True))
+
+    @staticmethod
+    def fit_logistic(data, epochs=300, lr=0.1, l2=0.01):
+        """data: [(features, label)].  Plain batch gradient descent, L2-regularised."""
+        import math
+        keys = sorted({k for f, _ in data for k in f})
+        w = {k: 0.0 for k in keys}
+        n = max(1, len(data))
+        pos = sum(y for _, y in data)
+        cw = {1: n / (2.0 * max(1, pos)), 0: n / (2.0 * max(1, n - pos))}     # class-balanced
+        for _ in range(epochs):
+            g = {k: l2 * w[k] for k in keys}
+            for f, y in data:
+                z = sum(w[k] * v for k, v in f.items())
+                p_ = 1.0 / (1.0 + math.exp(-max(-30.0, min(30.0, z))))
+                for k, v in f.items():
+                    g[k] += cw[y] * (p_ - y) * v / n
+            for k in keys:
+                w[k] -= lr * g[k]
+        return {k: round(v, 5) for k, v in w.items()}
 
 
 def _acc_step(fn, h, e):
@@ -483,7 +636,7 @@ def features(examples):
 
 
 def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, prior_ws=None, log=None,
-                 prior_structure=None, restrict_kinds=False, acc_prior=None):
+                 prior_structure=None, restrict_kinds=False, acc_prior=None, policy_model=None):
     """Learn S(u) = (f(u.w) for w in W), Update and Readout = component 0, with W grown only when needed.
 
       * W starts with the empty continuation: the answer itself as the state (the output-state machine).
@@ -731,96 +884,371 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         admissible one is invented (3.2E: state / transition / init / domain errors are handled elsewhere)."""
         if not acc:
             return False
-        a = acc.pop()
-        rejected.add((a["show"], zkind(a["z"])))
         k = max(i for i, c in enumerate(rec["components"]) if c.get("kind") == "accumulator")
-        rec["components"].pop(k)
-        rec["events"].append("rejected invented variable %s (%s)" % (a["show"], reason))
+        n = rec["components"][k].get("set_size", 1)
+        for _ in range(n):                   # the whole adopted set: it was one structural hypothesis
+            a = acc.pop()
+            rejected.add((a["show"], zkind(a["z"])))
+            k = max(i for i, c in enumerate(rec["components"]) if c.get("kind") == "accumulator")
+            rec["components"].pop(k)
+            rec["events"].append("rejected invented variable %s (%s)" % (a["show"], reason))
         return invent(transitions(), reason)
+
+    def ident_start(c, z):
+        """z is an identity start for G when G(z, e) = e for every observed value (0 for sums, the sentinel below
+        every value for maxima, ...): the variable then does not depend on an arbitrary start."""
+        return c["t"] == T_I and all(_acc_step(c["fn"], z, e) == e for e in vals)
 
     def zkind(z):
         return "nil" if z == () else "below" if z == min(vals) - 1 else "above" if z == max(vals) + 1 else repr(z)
 
+    ro = {}
+
+    def readout(rdata, rconf, rfull, rcands, why, log_, exact_only=False):
+        """Moore readout from invented state: the answer as a function R of invented variables only, each
+        updated by its own fold.  Admissible sets make the answer a function of them on every observed prefix
+        and example (they cover every pair of data points with different answers); one variable, else pairs
+        (set cover).  Coarsest first (a minimal sufficient statistic), then description length.  R is
+        synthesised from all those points; the self-test then probes where the next admissible readout
+        disagrees, and a counterexample joins the data (the next set is tried)."""
+        if not rdata or time.process_time() > deadline:
+            return False
+        cl = sorted(rcands.values(), key=lambda it: (it["nd"], it["size"]))
+        sets = [it for it in cl if it["rmask"] == rfull][:40]
+        # set-cover partners: the variables that explain the most answer differences, smallest first
+        # pairs by meet-in-the-middle: for a readout op(h1, h2) of the substrate's invertible binary operations,
+        # the values h2 must take are determined by h1 and the answers; the candidates are indexed by their value
+        # vectors, so every (h1, op) costs one lookup instead of a scan over all partners
+        if s_type == T_I and len(rdata) >= 3:
+            ys = [y for _, y in rdata]
+            index = {}
+            for it in cl:
+                if it["vars"][0][0]["t"] == T_I:
+                    index.setdefault(tuple(it["rv"][0]), it)
+            inv = (("sub", lambda a, y: a - y, ("sub", ("v", 0), ("v", 1))),     # h1 - h2 = y
+                   ("rsub", lambda a, y: a + y, ("sub", ("v", 1), ("v", 0))),    # h2 - h1 = y
+                   ("add", lambda a, y: y - a, ("add", ("v", 0), ("v", 1))),     # h1 + h2 = y
+                   ("mul", lambda a, y: y // a if a and y % a == 0 else None, ("mul", ("v", 0), ("v", 1))))
+            joined = []
+            for it in cl:
+                if it["vars"][0][0]["t"] != T_I:
+                    continue
+                h1 = it["rv"][0]
+                for name, f_, ast_r in inv:
+                    try:
+                        need = tuple(f_(a, y) for a, y in zip(h1, ys))
+                    except Exception:
+                        continue
+                    if None in need or need not in index:
+                        continue
+                    other = index[need]
+                    if other["vars"][0][0]["show"] == it["vars"][0][0]["show"]:
+                        continue
+                    joined.append({"vars": it["vars"] + other["vars"], "rv": it["rv"] + other["rv"],
+                                   "nd": len(set(zip(h1, need))), "size": it["size"] + other["size"] + PAIR_COST,
+                                   "join": ast_r})
+            joined.sort(key=lambda it: it["size"])
+            sets += joined[:200]
+        for it in sets:
+            it["ns"] = it["nd"]
+            it["feat"] = _inv_features(it, len(rdata), len(rconf), "readout:" + why, s_type, zkind)
+            it["feat"]["readout"] = 1.0
+        sets.sort(key=lambda it: (it["nd"], it["size"]))
+        if policy_model is not None:
+            learned = sorted(sets, key=lambda it: -policy_model.expected(it["feat"]))
+            mixed, seen_ = [], set()
+            for a_, b_ in zip(learned, sets):
+                for it in (a_, b_):
+                    if id(it) not in seen_:
+                        seen_.add(id(it)); mixed.append(it)
+            sets = mixed
+        log_["readout_sets"] = len(sets)
+        found = []
+        # exact check against the cheap readout basis (early exit on the first point that disagrees)
+        if s_type in (T_I, T_B):
+            exact = []
+            # a boolean answer carries one bit per point: the hypotheses searched are bounded (first 50 sets,
+            # 30 readouts) so that a chance fit stays unlikely (dev: a hash-like variable with a threshold fitted)
+            nset, nbas = (50, 30) if s_type == T_B else (1200, 80)
+            for it in sets[:nset]:
+                if any(c["t"] != T_I for c, _ in it["vars"]):
+                    continue
+                pts = [(tuple(r[k] for r in it["rv"]), y) for k, (_, y) in enumerate(rdata)]
+                basis = readout_basis(len(it["vars"]), s_type)[:nbas]
+                if it.get("join"):
+                    basis = [(it["join"], ic.compile_ast(ic._tup(it["join"]), 2, _lib()))] + basis
+                for ast, fn in basis:
+                    try:
+                        if all(fn(xx) == y for xx, y in pts):
+                            exact.append((it["size"] + len(show_ast(ast)), it, ast, fn))
+                            break
+                    except Exception:
+                        continue
+            exact.sort(key=lambda r: r[0])
+            for _, it, ast, fn in exact[:2]:
+                g = lambda args, fn=fn: _safe(lambda: fn(tuple(args)))
+                log_["tried"].append({"vars": [[c["show"], zkind(z)] for c, z in it["vars"]], "feat": it["feat"],
+                                      "update_found": True, "fail_frac": 0.0})
+                it["g"] = g
+
+                def pred(x, g=g, vs=it["vars"]):
+                    hs = []
+                    for c, z in vs:
+                        h = z
+                        for e in (tuple(x) if direction == "prefix" else tuple(x)[::-1]):
+                            h = _acc_step(c["fn"], h, e)
+                            if h is None:
+                                return None
+                        hs.append(h)
+                    return g(tuple(hs))
+                found.append((it, pred, ast))
+        # staged: a cheap readout attempt for many sets (small programs appear within milliseconds), then the
+        # longer synthesis for the first ones that had none
+        staged = [] if found or exact_only else [(it, 0.03, 0.0) for it in sets[:30]] + [(it, 0.15, 0.15) for it in sets[:6]]
+        done_ = set()
+        for it, t_m, t_c in staged:
+            if time.process_time() > deadline or len(found) >= 2:
+                break
+            if id(it) in done_:
+                continue
+            in_t = tuple(c["t"] for c, _ in it["vars"])
+            rows = [(tuple(r[k] for r in it["rv"]), y) for k, (_, y) in enumerate(rdata)]
+            g, ast = synth_multi(in_t, s_type, rows, min(deadline, time.process_time() + t_m))
+            if g is None and t_c and s_type in (T_I, T_B):
+                g, ast = synth_cover(in_t, s_type, rows, min(deadline, time.process_time() + t_c))
+            if g is not None:
+                done_.add(id(it))
+            log_["tried"].append({"vars": [[c["show"], zkind(z)] for c, z in it["vars"]], "feat": it["feat"],
+                                  "update_found": g is not None, "fail_frac": 0.0 if g is not None else None})
+            if g is None:
+                continue
+
+            def pred(x, g=g, vs=it["vars"]):
+                hs = []
+                for c, z in vs:
+                    h = z
+                    for e in (tuple(x) if direction == "prefix" else tuple(x)[::-1]):
+                        h = _acc_step(c["fn"], h, e)
+                        if h is None:
+                            return None
+                    hs.append(h)
+                return g(tuple(hs))
+            found.append((it, pred, ast))
+        if not found:
+            return False
+        it, pred, ast = found[0]
+        rivs = [found[1][1]] if len(found) > 1 else []
+        if it.get("g"):                      # the same readout from other starts (initial-state hypotheses)
+            for k_, (c_, z_) in enumerate(it["vars"]):
+                for z_alt in ([0, 1, min(vals) - 1, max(vals) + 1] if c_["t"] == T_I else []):
+                    if z_alt == z_:
+                        continue
+                    vs2 = list(it["vars"])
+                    vs2[k_] = (c_, z_alt)
+
+                    def p2(x, g=it["g"], vs=vs2):
+                        hs = []
+                        for c, z in vs:
+                            h = z
+                            for e in (tuple(x) if direction == "prefix" else tuple(x)[::-1]):
+                                h = _acc_step(c["fn"], h, e)
+                                if h is None:
+                                    return None
+                            hs.append(h)
+                        return g(tuple(hs))
+                    rivs.insert(0, p2)
+        tag[0] = "selftest"
+        used_r = set()
+        for _ in range(SELFTEST):
+            if selftest["left"] <= 0:
+                break
+            base_ = [task_input(rng, vals, lens) for _ in range(120)]
+            pool_ = [x for x in dict.fromkeys(base_ + [y for x in base_[:60] for y in edits(x, rng)]) if x not in memo]
+            x = None
+            for ri, r_ in enumerate(rivs):                    # one experiment per rival, closest first
+                if ri in used_r:
+                    continue
+                used_r.add(ri)
+                x = next((x for x in pool_ if _safe(lambda: pred(x)) != _safe(lambda r_=r_: r_(x))), None)
+                if x is not None:
+                    break
+            if x is None:
+                x = pool_[0] if pool_ else None
+            if x is None:
+                break
+            y = F(x)
+            selftest["left"] -= 1
+            if y is not None and _safe(lambda: pred(x)) != y:
+                examples.append(((x,), y))
+                rec["events"].append("readout self-test counterexample")
+                rejected.update((c["show"], zkind(z)) for c, z in it["vars"])
+                return False
+        ro["predict"] = pred
+        log_["adopted"] = [[c["show"], zkind(z)] for c, z in it["vars"]]
+        rec["readout"] = show_ast(ast)
+        rec["accumulators"] = log_["adopted"]
+        for c, z in it["vars"]:
+            rec["components"].append({"w": None, "why": why + "; invented variable (readout)", "kind": "accumulator",
+                                      "update": c["show"], "init": zkind(z), "set_size": len(it["vars"])})
+        rec["events"].append("readout %s of %s" % (show_ast(ast), " + ".join(c["show"] for c, _ in it["vars"])))
+        return True
+
     def invent(trans, why):
-        """Counterexample-driven state invention (no query to form a hypothesis).  Every candidate accumulator
-        h' = G(h, e) is computed on every observed prefix; a candidate is admissible only if, with h added, the
-        observed transitions become a function of (state, element) -- it explains the conflict instead of merely
-        adding a dimension.  The coarsest admissible ones (fewest distinct states: a minimal sufficient
-        statistic), then the smallest, are tried: Update synthesis, then the fold on every initial example.
-        Several survivors: queries where they disagree (inputs from the task's distribution) decide."""
+        """Counterexample-driven state invention (no query to form a hypothesis).
+
+        The observed contradictions are the pairs of transitions with equal (state, element) and different
+        successors.  Every candidate variable h' = G(h, e) (from `accumulators()`, the same list for every task)
+        is computed on every observed prefix; it *explains* a contradiction when it separates its two prefixes.
+        A set of variables is admissible when together they explain every contradiction, i.e. with them the
+        observed transitions become a function of (state, element): one variable when one suffices, otherwise
+        pairs whose explained sets cover all contradictions (a set cover over the contradictions; a single
+        variable never needs to explain everything).  Sets inducing the same partition of the observed prefixes
+        cannot be told apart by anything observed and are collapsed.  Order: description length (sizes, plus
+        PAIR_COST per extra variable), then coarseness -- or, for arm E, the learned discovery policy, which
+        scores the CURRENT task's evidence (see `DiscoveryPolicy`).  Each tried set: Update synthesis on the
+        extended state, then the fold on every initial example; the first whose Update exists and leaves at
+        most a quarter of the examples failing is adopted (the repair loop owns the rest)."""
         key = (len(W), len(acc), virt["value"], why, len(rejected))
-        if key in invent_tried or len(acc) >= 2 or time.process_time() > deadline:
+        if key in invent_tried or len(acc) >= MAX_ACC or time.process_time() > deadline:
             return False
         invent_tried.add(key)
         us = list(dict.fromkeys([u for _, _, u in trans] + [step_input(u, e) for (a, e), b, u in trans]))
-        cands = []
+        groups = {}
+        for (a, e), b, u in trans:
+            groups.setdefault((a, e), []).append((b, u))
+        conf = []
+        for g in groups.values():
+            for x in range(len(g)):
+                for y in range(x + 1, len(g)):
+                    if g[x][0] != g[y][0]:
+                        conf.append((g[x][1], g[y][1]))
+        conf = conf[:60]
+        fullm = (1 << len(conf)) - 1
+        base = {u: (full(u) or ()) for u in us}
+
+        def signature(hvs):
+            lab = {}
+            return tuple(lab.setdefault(base[u] + tuple(h[u] for h in hvs), len(lab)) for u in us), len(lab)
+        singles, partial = {}, {}
+        # Moore readout data: the answer at every observed prefix where it is defined and at every example
+        rdata = [(u, memo[cont(u, W[0])]) for u in us if memo.get(cont(u, W[0])) is not None]
+        rdata += [(tuple(x), y) for (x,), y in examples if all(tuple(x) != u for u, _ in rdata)]
+        rconf = [(i, j) for i in range(len(rdata)) for j in range(i + 1, len(rdata)) if rdata[i][1] != rdata[j][1]][:400]
+        rfull = (1 << len(rconf)) - 1
+        rcands = {}
         for c in accumulators():
             for z in ([0, 1, min(vals) - 1, max(vals) + 1] if c["t"] == T_I else [()]):
+                if (c["show"], zkind(z)) in rejected:
+                    continue
                 cache = {}
                 hv = {u: hval(c["fn"], z, u, cache) for u in us}
                 if None in hv.values() or len(set(hv.values())) < 2:
                     continue
-                tab, ok = {}, True
-                for (a, e), b, u in trans:
-                    if tab.setdefault((a + (hv[u],), e), b) != b:
-                        ok = False
-                        break
-                if ok:
-                    # the partition of the observed prefixes it induces: equal partitions cannot be told apart by
-                    # anything observed, so only the simplest of each is kept
-                    lab = {}
-                    sig = tuple(lab.setdefault((full(u) or ()) + (hv[u],), len(lab)) for u in us)
-                    cands.append((c["size"], len(lab), sig, c, z))
-        if acc_prior:                                  # learned on other tasks (V3): what invented variables worked
-            cands.sort(key=lambda r: (-acc_prior.get((r[3]["show"], zkind(r[4])), 0.0), r[0], r[1]))
-        else:                                          # Occam on the variable's definition, then coarsest
-            cands.sort(key=lambda r: (r[0], r[1]))
-        uniq, sigs = [], set()
-        for r in cands:                 # equal partitions collapse, except the same variable from another start
-            if (r[2], r[3]["show"]) not in sigs and not any(s_[0] == r[2] and s_[1] != r[3]["show"] for s_ in sigs):
-                sigs.add((r[2], r[3]["show"]))
-                uniq.append((r[1], r[0], r[3], r[4]))
-        cands = uniq
-        log_ = {"why": why, "admissible": len(cands), "tried": [], "adopted": None}
+                if rdata:
+                    rv = [hval(c["fn"], z, u, cache) for u, _ in rdata]
+                    if None not in rv:
+                        rmask = sum(1 << k for k, (i_, j_) in enumerate(rconf) if rv[i_] != rv[j_])
+                        if rmask:
+                            nd = len(set(rv))
+                            k2 = tuple(rv)        # values, not the partition: a readout needs the values
+                            sz = c["size"] + (0 if ident_start(c, z) else 3)
+                            if k2 not in rcands or (sz, nd) < (rcands[k2]["size"], rcands[k2]["nd"]):
+                                rcands[k2] = {"vars": [(c, z)], "rv": [rv], "rmask": rmask, "size": sz, "nd": nd}
+                mask = sum(1 << k for k, (p_, q_) in enumerate(conf) if hv[p_] != hv[q_])
+                if not mask and conf:
+                    continue
+                sig, ns = signature([hv])
+                it = {"vars": [(c, z)], "size": c["size"] + (0 if ident_start(c, z) else 3), "mask": mask, "ns": ns,
+                      "hv": [hv]}
+                bucket = singles if mask == fullm else partial
+                k_ = (sig, c["show"]) if bucket is singles else sig
+                if k_ not in bucket or (it["size"], ns) < (bucket[k_]["size"], bucket[k_]["ns"]):
+                    bucket[k_] = it
+        # the same variable from another start stays (an initial-state hypothesis); other equal partitions collapse
+        sl, seen_sig = [], {}
+        for (sig, show), it in sorted(singles.items(), key=lambda kv: (kv[1]["size"], kv[1]["ns"])):
+            if sig in seen_sig and seen_sig[sig] != show:
+                continue
+            seen_sig.setdefault(sig, show)
+            sl.append(it)
+        combos = []
+        pl = sorted(partial.values(), key=lambda it: (-bin(it["mask"]).count("1"), it["size"]))[:120] if conf else sl[:12]
+        for x in range(len(pl)):
+            for y in range(x + 1, len(pl)):
+                if conf and pl[x]["mask"] | pl[y]["mask"] != fullm:
+                    continue
+                if pl[x]["vars"][0][0]["show"] == pl[y]["vars"][0][0]["show"]:
+                    continue
+                combos.append({"vars": pl[x]["vars"] + pl[y]["vars"], "hv": pl[x]["hv"] + pl[y]["hv"],
+                               "size": pl[x]["size"] + pl[y]["size"] + PAIR_COST, "mask": fullm})
+        csig = {}
+        for it in combos:
+            sig, ns = signature(it["hv"])
+            it["ns"] = ns
+            if sig not in csig or (it["size"], ns) < (csig[sig]["size"], csig[sig]["ns"]):
+                csig[sig] = it
+        items = sl + list(csig.values())
+        for it in items:                     # the evidence the discovery policy sees (current task only)
+            it["feat"] = _inv_features(it, len(us), len(conf), why, s_type, zkind)
+        items.sort(key=lambda it: (it["size"], it["ns"]))
+        if policy_model is not None:
+            # learned order, interleaved with the description-length order: the policy can bring a set forward
+            # on the current task's evidence, it can never drop D's own first choices
+            learned = sorted(items, key=lambda it: -policy_model.expected(it["feat"]))
+            mixed, seen_ = [], set()
+            for a_, b_ in zip(learned, items):
+                for it in (a_, b_):
+                    if id(it) not in seen_:
+                        seen_.add(id(it))
+                        mixed.append(it)
+            items = mixed
+        log_ = {"why": why, "admissible": len(sl), "combinations": len(csig), "conflicts": len(conf),
+                "tried": [], "adopted": None, "cpu_left": round(deadline - time.process_time(), 2)}
         rec.setdefault("inventions", []).append(log_)
+        if not conf and readout(rdata, rconf, rfull, rcands, why, log_, exact_only=True):
+            return True                      # no contradiction observed: an exact readout is the stronger evidence
         tol = max(1, len(examples) // 4)
         chosen, rival = None, None
-        pool_c = [r for r in cands if (r[2]["show"], zkind(r[3])) not in rejected]
-        if acc_prior:                      # learned: every variable with positive verified credit, then the cheapest
-            pos = [r for r in pool_c if acc_prior.get((r[2]["show"], zkind(r[3])), 0.0) > 0]
-            pool_c = pos + [r for r in pool_c if r not in pos][:INVENT_K]
-        else:
-            pool_c = pool_c[:INVENT_K]
-        for ns, size, c, z in pool_c:
+        for it in items[:INVENT_K]:
             if time.process_time() > deadline:
                 break
-            acc.append({"t": c["t"], "fn": c["fn"], "z": z, "cache": {}, "show": c["show"]})
+            for c, z in it["vars"]:
+                acc.append({"t": c["t"], "fn": c["fn"], "z": z, "cache": {}, "show": c["show"]})
             try:
                 upd, asts, z0, fails = attempt(transitions(), 0.03, 0.3)
             finally:
-                acc.pop()
-            log_["tried"].append([c["show"], zkind(z), None if upd is None else len(fails)])
-            # the simplest variable whose Update exists and is nearly consistent is adopted: its remaining
-            # failures are counterexamples for the repair loop; the next admissible one is kept as the rival
-            # hypothesis that the self-test tries to tell apart
-            if upd is not None and len(fails) <= tol:
+                del acc[len(acc) - len(it["vars"]):]
+            nf = None if upd is None else len(fails)
+            log_["tried"].append({"vars": [[c["show"], zkind(z)] for c, z in it["vars"]], "feat": it["feat"],
+                                  "update_found": upd is not None,
+                                  "fail_frac": None if nf is None else round(nf / max(1, len(examples)), 3)})
+            ok_ = upd is not None and nf <= tol
+            if upd is not None and policy_model is not None and policy_model.adopt:
+                # learned adoption: will the repair loop turn this set into a verified machine?
+                ok_ = policy_model.repairable(it["feat"], nf / max(1, len(examples)))
+            if ok_:
                 if chosen is None:
-                    chosen = (c, z)
+                    chosen = it
                     continue
                 rival = lambda x, upd=upd, z0=z0: (lambda r: None if r is None else r[0])(fold(upd, z0, x))
                 break
         if chosen is None:
-            return False
-        c, z = chosen
+            return readout(rdata, rconf, rfull, rcands, why, log_)
         rivals[:] = [rival] if rival else []
-        acc.append({"t": c["t"], "fn": c["fn"], "z": z, "cache": {}, "show": c["show"]})
-        log_["adopted"] = [c["show"], zkind(z)]
-        rec["components"].append({"w": None, "why": why + "; invented accumulator", "kind": "accumulator",
-                                  "update": c["show"], "init": zkind(z)})
-        rec["events"].append("invented h' = %s from %s (%s)" % (c["show"], zkind(z), why))
+        for c, z in chosen["vars"]:
+            acc.append({"t": c["t"], "fn": c["fn"], "z": z, "cache": {}, "show": c["show"]})
+            rec["components"].append({"w": None, "why": why + "; invented accumulator", "kind": "accumulator",
+                                      "update": c["show"], "init": zkind(z), "set_size": len(chosen["vars"])})
+        log_["adopted"] = [[c["show"], zkind(z)] for c, z in chosen["vars"]]
+        rec["events"].append("invented %s (%s)" % (" + ".join("h' = %s from %s" % (c["show"], zkind(z))
+                                                              for c, z in chosen["vars"]), why))
         return True
     try:
         for rnd in range(25):
+            if ro:
+                rec["formed"] = True
+                rec["update"] = ["readout " + rec["readout"]]
+                return (lambda inp, p_=ro["predict"]: p_(inp[0])), obs, rec
             if time.process_time() > deadline:
                 rec["events"].append("deadline")
                 break
@@ -917,6 +1345,10 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                     r = fold(upd, z, tuple(inp[0]))
                     return None if r is None else r[0]
                 return predict, obs, rec
+            # representation change before more repair: the fold still fails on at least half the examples after
+            # two rounds -> the state, not a transition, is the likely error (invention is query-free)
+            if rnd >= 2 and len(fails) * 2 >= len(examples) and invent(trans, "no progress"):
+                continue
             # 3. counterexample: binary search for the first step leaving the true states, add that point
             tag[0] = "localise"
             x = tuple(fails[0])
@@ -985,24 +1417,11 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
 
 # -------------------------------------------------------------------- arms
 SELFTEST = 3      # self-test queries per formed machine (at most 3 repairs) before it is returned
-INVENT_K = 8      # admissible invented variables tried per invention (cost order, or learned order for E)
+MAX_ACC = 3       # invented variables per machine
+PAIR_COST = 6     # description-length charge for each additional invented variable
+INVENT_K = 10     # admissible invented variables tried per invention (cost order, or learned order for E)
 CHALLENGE = 3     # fresh inputs a formed machine must predict before it may replace the passive solution
 DISCRIMINATE = 2  # queries kept to decide between an accepted machine and the passive solution where they differ
-
-
-def _acc_prior(policy, ex):
-    """The learned invented-variable prior for this task: its output type's experience, the global one added
-    with half weight (back-off).  None when no policy (arm D)."""
-    ap = (policy or {}).get("acc")
-    if not ap:
-        return None
-    t = _type(ex[0][1])
-    sc_ = {}
-    for k, v in ap.get("global", {}).items():
-        sc_[tuple(k.split("||"))] = 0.5 * v
-    for k, v in ap.get("by_out_type", {}).get(t, {}).items():
-        sc_[tuple(k.split("||"))] = sc_.get(tuple(k.split("||")), 0.0) + v
-    return sc_
 
 
 def challenge(env, machine, examples, obs, rng, k=CHALLENGE):
@@ -1071,7 +1490,8 @@ def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
             m, mobs, mrec = form_machine(env, ex + obs, f_end, f_q, direction, rng,
                                          pol["continuation_kinds"] if pol else None, None,
                                          (pol or {}).get("structures", {}).get(direction),
-                                         bool((pol or {}).get("restrict_kinds")), _acc_prior(policy, ex))
+                                         bool((pol or {}).get("restrict_kinds")), None,
+                                         DiscoveryPolicy.from_json((policy or {}).get("discovery")))
             mrec["queries_used"], mrec["cpu"] = env.used - q0, round(time.process_time() - t0, 3)
             obs += mobs
             frec["machines"].append(mrec)

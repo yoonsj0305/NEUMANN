@@ -124,43 +124,40 @@ def policy_from(rows, exclude_fold=None):
     return {"global": summarise(d), "by_feature": {k: summarise(v) for k, v in by.items() if len(v) >= 2}}
 
 
-def acc_experience(rows, mode="learned"):
-    """Invented-variable experience of OTHER tasks (V3).  `learned`: credit only from independently verified
-    outcomes -- +1 to each variable of a machine that passed the independent challenge AND solved the hidden
-    test, -1 to each variable of a machine that was adopted but wrong (overfit), -0.25 when the repair loop
-    itself rejected the variable; a variable tried but not needed gets nothing (no evidence either way).
-    `cache`: every adopted variable +1, outcomes ignored (an experience cache without learning, the comparison
-    arm).  Keys "show||init"."""
-    score = collections.Counter()
+def discovery_policy_from(rows, threshold=0.5):
+    """V3 discovery policy (replaces the per-variable experience prior, which ranked variables by their past
+    identity and lost three HumanEval tasks).  Learned from D's invention logs on OTHER tasks, with credit
+    separated by stage, over features of the evidence each task itself produced (`active._inv_features`):
+      synthesis: every tried set -> did an Update / readout exist on the extended state?
+      repair:    every ADOPTED set (with its failing fraction) -> did it end in a machine that passed the
+                 independent challenge and the hidden test?
+    No variable identity enters the model."""
+    from neumann1 import active as ac_
+    syn, rep = [], []
     for r in rows:
         if r.get("arm") != "D" or not r.get("formation"):
             continue
-        f = r["formation"]
-        for m in f.get("machines", []):
-            final = ["%s||%s" % (c.get("update"), c.get("init")) for c in m.get("components", [])
-                     if c.get("kind") == "accumulator"]
-            if mode == "cache":
-                for inv in m.get("inventions", []):
-                    if inv.get("adopted"):
-                        score["||".join(inv["adopted"])] += 1
-                continue
+        for m in r["formation"].get("machines", []):
+            final = {(c.get("update"), c.get("init")) for c in m.get("components", []) if c.get("kind") == "accumulator"}
+            verified = bool(m.get("challenge")) and bool(r.get("solved")) and str(r.get("via", "")).startswith("state")
             for inv in m.get("inventions", []):
-                ad = inv.get("adopted")
-                if ad and "||".join(ad) not in final:
-                    score["||".join(ad)] -= 0.25
-            if m.get("challenge") and f.get("adoption") in ("machine", None) and r.get("via", "").startswith("state"):
-                for k in final:
-                    score[k] += 1 if r.get("solved") else -1
-    return {k: round(v, 3) for k, v in score.items() if v}
-
-
-def acc_policy(rows, mode="learned"):
-    """Per output type (observable) with the global experience as back-off."""
-    by = collections.defaultdict(list)
-    for r in rows:
-        by[r.get("out_type")].append(r)
-    glob = acc_experience(rows, mode)
-    return {"global": glob, "by_out_type": {t: acc_experience(v, mode) for t, v in by.items() if t}}
+                adopted = [tuple(v) for v in (inv.get("adopted") or [])]
+                if adopted and isinstance(adopted[0][0], list):
+                    adopted = [tuple(x) for v in adopted for x in v]
+                for t in inv.get("tried", []):
+                    f = t.get("feat")
+                    if not isinstance(f, dict):
+                        continue
+                    syn.append((f, int(bool(t.get("update_found")))))
+                    vs = [tuple(v) for v in t.get("vars", [])]
+                    if t.get("update_found") and vs and all(v in adopted for v in vs):
+                        ok = verified and all(v in final for v in vs)
+                        rep.append((dict(f, fail_frac=t.get("fail_frac") or 0.0), int(ok)))
+    pol = ac_.DiscoveryPolicy(ac_.DiscoveryPolicy.fit_logistic(syn), ac_.DiscoveryPolicy.fit_logistic(rep), threshold)
+    out = pol.to_json()
+    out["evidence"] = {"synthesis_examples": len(syn), "synthesis_positive": sum(y for _, y in syn),
+                       "repair_examples": len(rep), "repair_positive": sum(y for _, y in rep)}
+    return out
 
 
 def runDq(split, out):
