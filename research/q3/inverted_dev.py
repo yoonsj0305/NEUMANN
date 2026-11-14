@@ -53,6 +53,14 @@ def run(bigbench, ec, oeis, cap, out):
 
 def report(rows_path, out):
     rows = [json.loads(l) for l in open(rows_path)]
+    # Paired statistics require identical task identities, not just row counts.
+    # Keep the frozen scoring thresholds and historical records unchanged.
+    from independent_invention_audit import validate_rows
+    expected = {r["id"] for r in rows if r.get("arm") == "V"}
+    counts = {f: sum(i.startswith(f + "/") for i in expected) for f in FAMILIES}
+    if counts != {"rule": 125, "dc": 199} or len(expected) != 324:
+        raise ValueError("incomplete/unexpected iteration-2 cohort: %r" % counts)
+    validate_rows(rows, expected)
     rec = {"schema": "neumann.discovery-policy.iteration.v1", "label": "iteration 2: inverted inventions",
            "note": "development validation on opened TARGET list families; not evidence for any gate",
            "inventions": [n for n, *_ in SPEC], "recoverable_arguments": OPS,
