@@ -1,0 +1,58 @@
+name: NEUMANN G0 immutable original FIRST read-only scientific audit
+on:
+  push:
+    branches:
+      - research/g0-tqli-original-branch-gate-20261106
+    paths:
+      - .github/workflows/G0_TQLI_FIRST_READONLY_AUDIT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original-first-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Download original immutable first result from failed science run, NEVER rerun source
+        uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G0-TQLI-ORIGINAL-FIRST
+          run-id: 42143419543
+          github-token: ${{ github.token }}
+          path: pinned-first
+      - name: Pin SHA and print exact original result including error, no inference from CI red
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m research.g0.tqli_first_readonly_audit pinned-first/G0-TQLI-ORIGINAL-FIRST.json > G0-TQLI-FIRST-READONLY-AUDIT.json
+          cat G0-TQLI-FIRST-READONLY-AUDIT.json
+      - name: Corrupted immutable first cannot be used as evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          from research.g0.tqli_first_readonly_audit import audit
+          p=Path("pinned-first/G0-TQLI-ORIGINAL-FIRST.json")
+          data=json.loads(p.read_text())
+          data["scientific_status"]="G0_ORIGINAL_CLASSICAL_BRANCH_SAT_VERIFIED"
+          forged=Path("/tmp/G0-FORGED-FIRST.json")
+          forged.write_text(json.dumps(data))
+          a=audit(str(forged))
+          assert not a["audit_pass"]
+          assert "ORIGINAL_FIRST_RECEIPT_TAMPERED" in a["errors"]
+          assert "SAT_WITHOUT_INDEPENDENT_PROOF" in a["errors"]
+          print("IMMUTABLE_FIRST_SCIENCE_FORGERY_REJECTED")
+          PY
+      - name: Save independent audit regardless of outcome
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G0-TQLI-FIRST-INDEPENDENT-READONLY-AUDIT
+          path: G0-TQLI-FIRST-READONLY-AUDIT.json
+          if-no-files-found: warn
+          retention-days: 90
