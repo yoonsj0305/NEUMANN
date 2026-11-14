@@ -190,9 +190,15 @@ def synth_multi(in_types, out_type, rows, deadline, check=None, prior=None):
     return found[0] if found else (None, None)
 
 
+MIN_SUPPORT = 2   # every branch of a case tree must explain at least this many observed transitions
+
+
 def covers(pieces, preds, full, deadline, per_split=2):
     """Case trees over the cells, cheapest first: one piece; pred ? A : B; pred1 ? A : (pred2 ? B : C).
-    Predicates are distinct cell partitions (at most 2^cells), so all of them are examined."""
+    Predicates are distinct cell partitions (at most 2^cells), so all of them are examined.  A branch that
+    explains a single transition is a memorised exception, not a step (FRESH dev: every wrongly adopted
+    machine special-cased one observed value, e.g. e == 8), so each branch needs MIN_SUPPORT transitions."""
+    sup = lambda m: bin(m).count("1") >= MIN_SUPPORT
     def cover_of(R, k):
         out = []
         for m, a in pieces:
@@ -207,18 +213,20 @@ def covers(pieces, preds, full, deadline, per_split=2):
     for pm, pa in preds:
         if time.process_time() > deadline:
             return
+        if not (sup(pm & full) and sup(~pm & full)):
+            continue
         for A in cover_of(pm & full, per_split):
             for B in cover_of(~pm & full, per_split):
                 yield ("case", pa, A, B)
     firsts = [(pm, pa, cover_of(pm & full, per_split)) for pm, pa in preds]
-    firsts = [f for f in firsts if f[2]]
+    firsts = [f for f in firsts if f[2] and sup(f[0] & full)]
     for pm, pa, As in firsts:
         R = ~pm & full
         for qm, qa in preds:
             if time.process_time() > deadline:
                 return
             t_, f_ = qm & R, ~qm & R
-            if not t_ or not f_:
+            if not (sup(t_) and sup(f_)):
                 continue
             Bs = cover_of(t_, per_split)
             if not Bs:
@@ -230,11 +238,11 @@ def covers(pieces, preds, full, deadline, per_split=2):
                         yield ("case", pa, A, ("case", qa, B, C))
 
 
-def synth_cover(in_types, out_type, rows, deadline, check=None):
+def synth_cover(in_types, out_type, rows, deadline, check=None, alts=None):
     """Per-transition factorisation of a step: every transition is a cell; pieces are cheap programs that are
     right on some cells, predicates split the cells (the cover principle of `cells`, iteration 4).  Every
     case tree in cost order becomes an ordinary program (nested ifI) and must pass check()."""
-    if out_type != T_I:
+    if out_type not in (T_I, T_B):
         return None, None
     lib = _lib()
     target = [o for _, o in rows]
@@ -244,14 +252,16 @@ def synth_cover(in_types, out_type, rows, deadline, check=None):
 
     def offer(e, t):
         v = e.vec
-        mk = sum(1 << j for j, b in enumerate(v) if (b if t == T_B else b == target[j]))
         if t == T_B:
+            mk = sum(1 << j for j, b in enumerate(v) if b)
             if 0 < mk < full and ("p", mk) not in seen:
                 seen.add(("p", mk)); preds.append((mk, e.ast()))
-        elif mk and ("v", mk) not in seen:
-            seen.add(("v", mk)); pieces.append((mk, e.ast()))
-    for c in range(10):
-        offer(type("K", (), {"vec": (c,) * len(rows), "ast": lambda self, c=c: ("k", c)})(), T_I)
+        if t == out_type:
+            mk = sum(1 << j for j, b in enumerate(v) if b == target[j])
+            if mk and ("v", mk) not in seen:
+                seen.add(("v", mk)); pieces.append((mk, e.ast()))
+    for c in (range(10) if out_type == T_I else (False, True)):
+        offer(type("K", (), {"vec": (c,) * len(rows), "ast": lambda self, c=c: ("k", c)})(), out_type)
     srch = dc.FSearch(lib, tuple(in_types), inputs, deadline, (), ic.uniform_costs(), (T_I, T_B), offer)
     tried = set()
 
@@ -270,7 +280,7 @@ def synth_cover(in_types, out_type, rows, deadline, check=None):
             if repr(ast) in tried:
                 continue
             tried.add(repr(ast))
-            fn = ic.compile_ast(ast, len(in_types), lib)
+            fn = ic.compile_ast(ast, len(in_types), lib) if out_type == T_I else _case_fn(node, len(in_types), lib)
 
             def g(args, fn=fn):
                 try:
@@ -279,14 +289,156 @@ def synth_cover(in_types, out_type, rows, deadline, check=None):
                     return None
                 return v if _type(v) == out_type else None
             if check is None or check(g):
+                if alts is not None:          # other case trees equally consistent with every observed transition
+                    alts.extend(_alt_covers(covers(pieces, preds, full, deadline), repr(ast), out_type,
+                                            len(in_types), lib, to_ast))
                 return g, ast
         if time.process_time() > deadline:
             break
     return None, None
 
 
+def _alt_covers(gen, first, out_type, n, lib, to_ast, k=3):
+    out, seen = [], {first}
+    for node in gen:
+        ast = to_ast(node)
+        if repr(ast) in seen:
+            continue
+        seen.add(repr(ast))
+        fn = ic.compile_ast(ast, n, lib) if out_type == T_I else _case_fn(node, n, lib)
+
+        def g(args, fn=fn):
+            try:
+                v = fn(tuple(args))
+            except (ic.Fail, RecursionError, TypeError):
+                return None
+            return v if _type(v) == out_type else None
+        out.append(g)
+        if len(out) >= k:
+            break
+    return out
+
+
 class Exhausted(Exception):
     pass
+
+
+def _case_fn(node, n, lib):
+    """A case tree (pred ? A : B, nested) as a function of the argument tuple (boolean steps have no if-node)."""
+    if node[0] == "case":
+        p, a, b = (_case_fn(x, n, lib) for x in node[1:])
+        return lambda args: a(args) if p(args) else b(args)
+    if node[0] == "k":
+        return lambda args, c=node[1]: c
+    return ic.compile_ast(ic._tup(node), n, lib)
+
+
+def show_ast(a):
+    if isinstance(a, tuple) and a and a[0] in ("ifI", "case") and len(a) == 4:
+        return "(if %s %s %s)" % tuple(show_ast(x) for x in a[1:])
+    if isinstance(a, tuple) and a and a[0] == "k":
+        return repr(a[1])
+    try:
+        return ic.show(a)
+    except Exception:
+        return repr(a)
+
+
+# ------------------------------------------------- invented state: accumulators over the input itself
+_ACC = {}
+
+
+def accumulators():
+    """Candidate latent state variables that cost no query: folds h' = G(h, e) over the input, with G every
+    small program of the generic substrate (integer and list valued), in cost order, distinct by behaviour.
+    Nothing task-specific: the same list for every task."""
+    if "all" in _ACC:
+        return _ACC["all"]
+    lib = _lib()
+    out = []
+    for in_t, out_t, probes, lim in (
+            ((T_I, T_I), T_I, [(h, e) for h in (-3, -1, 0, 1, 2, 5, 7) for e in (-3, -1, 0, 1, 2, 5, 7)], 700),
+            ((T_L, T_I), T_L, [(tuple(l), e) for l in ([], [1], [2, 1], [3, 3, 0], [5, -1]) for e in (0, 1, 3, -1)], 120)):
+        got = []
+
+        def offer(e, t, got=got, lim=lim):
+            got.append(e.ast())
+            if len(got) >= lim:
+                raise sc.Done(None, None)
+        srch = dc.FSearch(lib, in_t, probes, time.process_time() + 2.0, (), ic.uniform_costs(), (out_t,), offer)
+        try:
+            srch.run()
+        except sc.Done:
+            pass
+        for ast in got:
+            fn = ic.compile_ast(ic._tup(ast), 2, lib)
+            vec = []
+            for pr in probes:
+                try:
+                    vec.append(fn(pr))
+                except Exception:
+                    vec.append(None)
+            if all(v == pr[0] for v, pr in zip(vec, probes)) or len(set(map(repr, vec))) < 2:
+                continue                      # h never changes, or ignores everything
+            if not _evolves(fn, out_t):
+                continue                      # h settles on a constant after one step: no state
+            out.append({"t": out_t, "ast": ast, "fn": fn, "show": show_ast(ast), "size": len(show_ast(ast))})
+    _ACC["all"] = out
+    return out
+
+
+def _acc_step(fn, h, e):
+    try:
+        v = fn((h, e))
+    except Exception:
+        return None
+    return tuple(v) if isinstance(v, list) else v
+
+
+def _evolves(fn, t):
+    """Does h keep carrying information along an input (not constant from the second step on)?"""
+    seqs = [(3, -1, 4, 1, -5, 9), (2, 7, 1, 8, 2, 8), (0, 0, 5, -2, 5, 3)]
+    for z in ((0, 1, -2) if t == T_I else ((),)):
+        for q in seqs:
+            h, hs = z, []
+            try:
+                for e in q:
+                    h = fn((h, e))
+                    h = tuple(h) if isinstance(h, list) else h
+                    hs.append(h)
+            except Exception:
+                continue
+            if len(set(map(repr, hs))) > 1:
+                return True
+    return False
+
+
+def task_input(rng, vals, lens):
+    """An input from the task's own value and length distribution: observed values, their neighbours,
+    duplicates, shorter and longer lists; one input in five also carries one boundary element (beyond the
+    observed range, or a sign change) -- F10.  Nothing task-specific: only what was observed."""
+    lo, hi = min(vals), max(vals)
+    span = max(1, hi - lo)
+    n = rng.randint(max(0, min(lens) - 1), max(lens) + 2)
+    x = []
+    for _ in range(n):
+        r = rng.random()
+        if x and r < 0.2:
+            v = rng.choice(x)                                   # duplicate
+        elif r < 0.75:
+            v = rng.choice(vals)
+        else:
+            v = rng.choice(vals) + rng.choice((-1, 1))
+        x.append(v)
+    if x and rng.random() < 0.2:
+        # boundary element inside the domain the observations show: beyond the observed range, but never a
+        # sign the task was not observed with (references are often undefined there)
+        opts = [hi + rng.randint(1, span)] if hi >= 0 or lo < 0 else []
+        opts += [lo - rng.randint(1, span)] if lo < 0 else [max(0, lo - rng.randint(1, span))]
+        if lo < 0 < hi:
+            opts.append(-rng.choice(vals))
+        x[rng.randrange(len(x))] = rng.choice(opts)
+    return tuple(x)
 
 
 def synth_cells(in_types, rows, deadline):
@@ -331,7 +483,7 @@ def features(examples):
 
 
 def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, prior_ws=None, log=None,
-                 prior_structure=None, restrict_kinds=False):
+                 prior_structure=None, restrict_kinds=False, acc_prior=None):
     """Learn S(u) = (f(u.w) for w in W), Update and Readout = component 0, with W grown only when needed.
 
       * W starts with the empty continuation: the answer itself as the state (the output-state machine).
@@ -346,6 +498,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         a failing example is localised by binary search and adds the transition that refutes the machine.
     Returns (predict or None, observations, record)."""
     rng = rng or random.Random(0)
+    examples = list(examples)                 # discriminating observations join the verification set
     obs, rec = [], {"direction": direction, "components": [], "events": []}
     s_type = _type(examples[0][1])
     if s_type == T_B:
@@ -376,6 +529,41 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
 
     def S(u):
         return tuple(F(cont(u, w)) for w in W)
+
+    # invented state variables computed from the input itself (no query): folds h' = G(h, e) from z
+    acc = []
+    lens = [len(x) for (x,), _ in examples]
+
+    def hseq(u):
+        return tuple(u) if direction == "prefix" else tuple(u)[::-1]
+
+    def hval(fn, z, u, cache):
+        """h(u) by the fold, prefix-closed cache (trajectories and counterexample points share prefixes)."""
+        u = tuple(u)
+        if u in cache:
+            return cache[u]
+        if not u:
+            h = z
+        else:
+            parent, e = (u[:-1], u[-1]) if direction == "prefix" else (u[1:], u[0])
+            hp = hval(fn, z, parent, cache)
+            try:
+                h = None if hp is None else fn((hp, e))
+            except Exception:
+                h = None
+            if isinstance(h, list):
+                h = tuple(h)
+        cache[u] = h
+        return h
+
+    def H(u):
+        out = []
+        for a in acc:
+            h = hval(a["fn"], a["z"], u, a["cache"])
+            if h is None:
+                return None
+            out.append(h)
+        return tuple(out)
     lo, hi = min(vals), max(vals)
     # order-covering trajectory values: the observed range, or (a large range, F9 in the FRESH record) the
     # observed values and their neighbours
@@ -406,6 +594,14 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             return None
         return tuple(virt["value"] if v is None else v for v in t)
 
+    def full(u):
+        """Observed components (virtualised where undefined) followed by the invented accumulators."""
+        t = vs(S(u), u)
+        if t is None:
+            return None
+        hh = H(u)
+        return None if hh is None else t + hh
+
     def transitions():
         """Observed transitions.  With a virtual value set, transitions into and out of partly undefined states
         are kept with the undefined components replaced by that value (no query)."""
@@ -413,7 +609,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         tag[0] = "states"
         for u, e in points():
             v = step_input(u, e)
-            a, b = vs(S(u), u), vs(S(v), v)
+            a, b = full(u), full(v)
             if a is None or b is None:
                 continue
             out.append(((a, e), b, u))
@@ -442,6 +638,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         inputs), virtual initial values: identities and sentinels below / above every value seen.  No query."""
         z = S(())
         options = [[v] if v is not None else ([virt["value"]] if virt["value"] is not None else sentinels) for v in z]
+        options += [[a["z"]] for a in acc]
         import itertools
         return [tuple(c) for c in itertools.product(*options)]
 
@@ -495,10 +692,11 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                             return True
         rec["events"].append("no informative continuation")
         return False
-    def attempt(trans, share):
+    def attempt(trans, share, cover=0.6):
         """Update per component from the observed transitions, then the best initial state.  No query.
         Returns (updates, asts, z, failing examples), or (None, asts found so far, None, None)."""
-        in_t = tuple([s_type] * len(W)) + (T_I,)
+        in_t = tuple([s_type] * len(W)) + tuple(a["t"] for a in acc) + (T_I,)
+        upd_alts[:] = []
         rows = [[(a + (e,), b[j]) for (a, e), b, _ in trans] for j in range(len(W))]
         upd, asts = [], []
         for j in range(len(W)):
@@ -508,18 +706,119 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                 g, ast = synth_cells(in_t, rows[j], end)
             if g is None:
                 g, ast = synth_multi(in_t, s_type, rows[j], end)
-            if g is None and s_type == T_I:
-                g, ast = synth_cover(in_t, s_type, rows[j], min(deadline, time.process_time() + 0.6))
+            if g is None and s_type in (T_I, T_B):
+                alts = [] if j == 0 else None
+                g, ast = synth_cover(in_t, s_type, rows[j], min(deadline, time.process_time() + cover), alts=alts)
+                if j == 0:
+                    upd_alts[:] = alts or []
             if g is None:
                 return None, asts, None, None
             upd.append(g)
             asts.append(ast)
+        for k, a in enumerate(acc):                  # the invented variables carry their own (known) update
+            upd.append(lambda args, fn=a["fn"], i=len(W) + k: _acc_step(fn, args[i], args[-1]))
         best = None
         for z in init_candidates():
             fails = [x for (x,), y in examples if (lambda r: r is None or r[0] != y)(fold(upd, z, tuple(x)))]
             if best is None or len(fails) < len(best[1]):
                 best = (z, fails)
         return upd, asts, best[0], best[1]
+    invent_tried, rejected, rivals, upd_alts = set(), set(), [], []
+    selftest = {"left": SELFTEST * 3}
+
+    def revise(reason):
+        """A wrong structural hypothesis: the invented variable could not be repaired -> rejected, and the next
+        admissible one is invented (3.2E: state / transition / init / domain errors are handled elsewhere)."""
+        if not acc:
+            return False
+        a = acc.pop()
+        rejected.add((a["show"], zkind(a["z"])))
+        k = max(i for i, c in enumerate(rec["components"]) if c.get("kind") == "accumulator")
+        rec["components"].pop(k)
+        rec["events"].append("rejected invented variable %s (%s)" % (a["show"], reason))
+        return invent(transitions(), reason)
+
+    def zkind(z):
+        return "nil" if z == () else "below" if z == min(vals) - 1 else "above" if z == max(vals) + 1 else repr(z)
+
+    def invent(trans, why):
+        """Counterexample-driven state invention (no query to form a hypothesis).  Every candidate accumulator
+        h' = G(h, e) is computed on every observed prefix; a candidate is admissible only if, with h added, the
+        observed transitions become a function of (state, element) -- it explains the conflict instead of merely
+        adding a dimension.  The coarsest admissible ones (fewest distinct states: a minimal sufficient
+        statistic), then the smallest, are tried: Update synthesis, then the fold on every initial example.
+        Several survivors: queries where they disagree (inputs from the task's distribution) decide."""
+        key = (len(W), len(acc), virt["value"], why, len(rejected))
+        if key in invent_tried or len(acc) >= 2 or time.process_time() > deadline:
+            return False
+        invent_tried.add(key)
+        us = list(dict.fromkeys([u for _, _, u in trans] + [step_input(u, e) for (a, e), b, u in trans]))
+        cands = []
+        for c in accumulators():
+            for z in ([0, 1, min(vals) - 1, max(vals) + 1] if c["t"] == T_I else [()]):
+                cache = {}
+                hv = {u: hval(c["fn"], z, u, cache) for u in us}
+                if None in hv.values() or len(set(hv.values())) < 2:
+                    continue
+                tab, ok = {}, True
+                for (a, e), b, u in trans:
+                    if tab.setdefault((a + (hv[u],), e), b) != b:
+                        ok = False
+                        break
+                if ok:
+                    # the partition of the observed prefixes it induces: equal partitions cannot be told apart by
+                    # anything observed, so only the simplest of each is kept
+                    lab = {}
+                    sig = tuple(lab.setdefault((full(u) or ()) + (hv[u],), len(lab)) for u in us)
+                    cands.append((c["size"], len(lab), sig, c, z))
+        if acc_prior:                                  # learned on other tasks (V3): what invented variables worked
+            cands.sort(key=lambda r: (-acc_prior.get((r[3]["show"], zkind(r[4])), 0.0), r[0], r[1]))
+        else:                                          # Occam on the variable's definition, then coarsest
+            cands.sort(key=lambda r: (r[0], r[1]))
+        uniq, sigs = [], set()
+        for r in cands:                 # equal partitions collapse, except the same variable from another start
+            if (r[2], r[3]["show"]) not in sigs and not any(s_[0] == r[2] and s_[1] != r[3]["show"] for s_ in sigs):
+                sigs.add((r[2], r[3]["show"]))
+                uniq.append((r[1], r[0], r[3], r[4]))
+        cands = uniq
+        log_ = {"why": why, "admissible": len(cands), "tried": [], "adopted": None}
+        rec.setdefault("inventions", []).append(log_)
+        tol = max(1, len(examples) // 4)
+        chosen, rival = None, None
+        pool_c = [r for r in cands if (r[2]["show"], zkind(r[3])) not in rejected]
+        if acc_prior:                      # learned: every variable with positive verified credit, then the cheapest
+            pos = [r for r in pool_c if acc_prior.get((r[2]["show"], zkind(r[3])), 0.0) > 0]
+            pool_c = pos + [r for r in pool_c if r not in pos][:INVENT_K]
+        else:
+            pool_c = pool_c[:INVENT_K]
+        for ns, size, c, z in pool_c:
+            if time.process_time() > deadline:
+                break
+            acc.append({"t": c["t"], "fn": c["fn"], "z": z, "cache": {}, "show": c["show"]})
+            try:
+                upd, asts, z0, fails = attempt(transitions(), 0.03, 0.3)
+            finally:
+                acc.pop()
+            log_["tried"].append([c["show"], zkind(z), None if upd is None else len(fails)])
+            # the simplest variable whose Update exists and is nearly consistent is adopted: its remaining
+            # failures are counterexamples for the repair loop; the next admissible one is kept as the rival
+            # hypothesis that the self-test tries to tell apart
+            if upd is not None and len(fails) <= tol:
+                if chosen is None:
+                    chosen = (c, z)
+                    continue
+                rival = lambda x, upd=upd, z0=z0: (lambda r: None if r is None else r[0])(fold(upd, z0, x))
+                break
+        if chosen is None:
+            return False
+        c, z = chosen
+        rivals[:] = [rival] if rival else []
+        acc.append({"t": c["t"], "fn": c["fn"], "z": z, "cache": {}, "show": c["show"]})
+        log_["adopted"] = [c["show"], zkind(z)]
+        rec["components"].append({"w": None, "why": why + "; invented accumulator", "kind": "accumulator",
+                                  "update": c["show"], "init": zkind(z)})
+        rec["events"].append("invented h' = %s from %s (%s)" % (c["show"], zkind(z), why))
+        return True
     try:
         for rnd in range(25):
             if time.process_time() > deadline:
@@ -536,6 +835,8 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                     conflict = (seen[(a, e)], (b, u), e)
                     break
                 seen.setdefault((a, e), (b, u))
+            if conflict and invent(trans, "inconsistent transitions"):
+                continue
             if conflict:
                 (b1, _), (b2, _), e = conflict
                 j = next(i for i in range(len(W)) if b1[i] != b2[i])
@@ -548,13 +849,67 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             upd, asts, z, fails = attempt(trans, 0.25)
             if upd is None:
                 rec["events"].append("no update for component %d" % len(asts))
+                if invent(trans, "update not found") or revise("update not found"):
+                    continue
                 if not represent(trans, "update not found"):
                     break
                 continue
             rec["events"].append("round %d: m=%d, examples failing %d" % (rnd, len(W), len(fails)))
+            if not fails and selftest["left"] > 0:
+                # verification-driven repair: inputs from the task's own distribution and boundaries where the
+                # machine is most exposed (duplicates, extremes, other lengths); a wrong prediction is a
+                # counterexample that joins the verification set and is localised next round (a transition
+                # error), never a reason to accept.  The independent challenge after formation is separate.
+                tag[0] = "selftest"
+                m_ = lambda x, upd=list(upd), z=z: (lambda r: None if r is None else r[0])(fold(upd, z, x))
+                # rival hypotheses: other answer Updates equally consistent with every observed transition, and
+                # the runner-up invented variable; the experiment is an input where they predict differently
+                riv = [lambda x, u2=[g0] + list(upd[1:]), z=z: (lambda r: None if r is None else r[0])(fold(u2, z, x))
+                       for g0 in upd_alts]
+                # the same machine from another start of an invented variable (an initial-state hypothesis)
+                for k_, a_ in enumerate(acc):
+                    for z_alt in ([0, 1, min(vals) - 1, max(vals) + 1] if a_["t"] == T_I else []):
+                        if z_alt != a_["z"]:
+                            zz = tuple(z[:len(W) + k_]) + (z_alt,) + tuple(z[len(W) + k_ + 1:])
+                            riv.insert(0, lambda x, upd=list(upd), zz=zz: (lambda r: None if r is None else r[0])(fold(upd, zz, x)))
+                # closest rivals first (another start, another equally consistent Update): random tests miss the
+                # small regions where they differ; a distant rival is refuted by any test, so it comes last
+                riv += rivals
+                used_r = set()
+                bad = None
+                for _ in range(SELFTEST):
+                    base_ = [task_input(rng, vals, lens) for _ in range(120)]
+                    # the experiment is searched, not sampled: task-distribution inputs and their generic edits
+                    # (sorted, reversed, an element replaced / deleted / duplicated), where the hypotheses split
+                    pool_ = [x for x in dict.fromkeys(base_ + [y for x in base_[:60] for y in edits(x, rng)])
+                             if x not in memo]
+                    # an experiment from the hypotheses: where the rival invented variable predicts otherwise
+                    x = None
+                    for ri, r in enumerate(riv):          # one experiment per rival, closest first
+                        if ri in used_r:
+                            continue
+                        x = next((x for x in pool_ if _safe(lambda: m_(x)) != _safe(lambda r=r: r(x))), None)
+                        used_r.add(ri)
+                        if x is not None:
+                            break
+                    if x is None:
+                        x = pool_[0] if pool_ else None
+                    if x is None:
+                        break
+                    y = F(x)
+                    selftest["left"] -= 1
+                    if y is not None and _safe(lambda: m_(x)) != y:
+                        bad = (x, y)
+                        break
+                if bad:
+                    examples.append(((bad[0],), bad[1]))
+                    rec["events"].append("self-test counterexample (transition error)")
+                    rec["selftest_counterexamples"] = rec.get("selftest_counterexamples", 0) + 1
+                    continue
             if not fails:
-                rec["update"] = [a[1] if isinstance(a, tuple) and a and a[0] == "cells" else ic.show(a) for a in asts]
+                rec["update"] = [show_ast(a) if not (isinstance(a, tuple) and a and a[0] == "cells") else a[1] for a in asts]
                 rec["virtual_value"] = virt["value"]
+                rec["accumulators"] = [[a["show"], zkind(a["z"])] for a in acc]
                 rec["init"] = repr(z)
                 rec["formed"] = True
 
@@ -581,7 +936,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                 if a0 is not None and ps is not None and None not in ps and ps[0] != a0:
                     hi_ = mid
                     continue
-                t = vs(S(prefixes[mid]), prefixes[mid])
+                t = full(prefixes[mid])
                 if t is None or ps == t:
                     lo_ = mid
                 else:
@@ -591,7 +946,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                 u, e = prefixes[i - 1], seq[i - 1]
                 if (u, e) in extra:
                     continue
-                a, b = vs(S(u), u), vs(S(prefixes[i]), prefixes[i])
+                a, b = full(u), full(prefixes[i])
                 if a is None or b is None:
                     continue
                 if tuple(g(a + (e,)) for g in upd) != b:
@@ -619,6 +974,8 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                         rec["events"].append("virtual value %d for undefined components (%d failing)" % (v, nf))
                         continue
                 virt["value"] = None
+                if invent(trans, "counterexample not localisable") or revise("counterexample not localisable"):
+                    continue
                 if not represent(trans, "counterexample hidden in undefined prefixes"):
                     break
     except Exhausted:
@@ -627,19 +984,38 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
 
 
 # -------------------------------------------------------------------- arms
+SELFTEST = 3      # self-test queries per formed machine (at most 3 repairs) before it is returned
+INVENT_K = 8      # admissible invented variables tried per invention (cost order, or learned order for E)
 CHALLENGE = 3     # fresh inputs a formed machine must predict before it may replace the passive solution
 DISCRIMINATE = 2  # queries kept to decide between an accepted machine and the passive solution where they differ
+
+
+def _acc_prior(policy, ex):
+    """The learned invented-variable prior for this task: its output type's experience, the global one added
+    with half weight (back-off).  None when no policy (arm D)."""
+    ap = (policy or {}).get("acc")
+    if not ap:
+        return None
+    t = _type(ex[0][1])
+    sc_ = {}
+    for k, v in ap.get("global", {}).items():
+        sc_[tuple(k.split("||"))] = 0.5 * v
+    for k, v in ap.get("by_out_type", {}).get(t, {}).items():
+        sc_[tuple(k.split("||"))] = sc_.get(tuple(k.split("||")), 0.0) + v
+    return sc_
 
 
 def challenge(env, machine, examples, obs, rng, k=CHALLENGE):
     """Independent challenge on fresh inputs the machine was not built from.  Returns True / False / None
     (None: no query left, the machine is NOT accepted)."""
     seen = {e[0][0] for e in list(examples) + obs}
+    vals = sorted({v for (x,), _ in examples for v in x}) or list(range(10))
+    lens = [len(x) for (x,), _ in examples]
     results = []
     tries = 0
-    while len(results) < k and env.used < env.budget and tries < 50:
+    while len(results) < k and env.used < env.budget and tries < 200:
         tries += 1
-        x = generic_input(rng)
+        x = task_input(rng, vals, lens)          # F10: the task's own value distribution and its boundaries
         if x in seen or len(x) < 2:
             continue
         seen.add(x)
@@ -695,7 +1071,7 @@ def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
             m, mobs, mrec = form_machine(env, ex + obs, f_end, f_q, direction, rng,
                                          pol["continuation_kinds"] if pol else None, None,
                                          (pol or {}).get("structures", {}).get(direction),
-                                         bool((pol or {}).get("restrict_kinds")))
+                                         bool((pol or {}).get("restrict_kinds")), _acc_prior(policy, ex))
             mrec["queries_used"], mrec["cpu"] = env.used - q0, round(time.process_time() - t0, 3)
             obs += mobs
             frec["machines"].append(mrec)
@@ -721,7 +1097,8 @@ def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
                 # two hypotheses fit everything observed: query where they disagree, keep the one that is right
                 seen = {e[0][0] for e in ex + obs}
                 for _ in range(DISCRIMINATE):
-                    x = next((x for x in (generic_input(rng) for _ in range(200))
+                    vals_ = sorted({v for (x,), _ in ex for v in x}) or list(range(10))
+                    x = next((x for x in (task_input(rng, vals_, [len(x) for (x,), _ in ex]) for _ in range(300))
                               if x not in seen and len(x) >= 2 and _safe(lambda: p((x,))) != _safe(lambda: pp((x,)))), None)
                     if x is None or env.used >= env.budget:
                         break

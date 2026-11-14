@@ -124,6 +124,48 @@ def policy_from(rows, exclude_fold=None):
     return {"global": summarise(d), "by_feature": {k: summarise(v) for k, v in by.items() if len(v) >= 2}}
 
 
+def acc_experience(rows, mode="learned"):
+    """Invented-variable experience of OTHER tasks (V3).  `learned`: credit from independently verified
+    outcomes -- +1 when the variable was adopted in a machine that passed the independent challenge and solved
+    the task, -1 when it was adopted in a machine that was rejected or wrong, -0.5 when the repair loop itself
+    rejected it, -0.1 per trial that left examples failing.  `cache`: every adopted variable +1, outcomes
+    ignored (an experience cache without learning, the comparison arm).  Keys "show||init"."""
+    score = collections.Counter()
+    for r in rows:
+        if r.get("arm") != "D" or not r.get("formation"):
+            continue
+        for m in r["formation"].get("machines", []):
+            for inv in m.get("inventions", []):
+                ad = inv.get("adopted")
+                if mode == "cache":
+                    if ad:
+                        score["||".join(ad)] += 1
+                    continue
+                for show, zk, fails in inv.get("tried", []):
+                    if fails is None or fails > 0:
+                        score[show + "||" + zk] -= 0.1
+                if ad:
+                    key = "||".join(ad)
+                    still = [c for c in m.get("components", []) if c.get("kind") == "accumulator"
+                             and [c.get("update"), c.get("init")] == ad]
+                    if not still:
+                        score[key] -= 0.5
+                    elif m.get("challenge") and r.get("solved"):
+                        score[key] += 1
+                    else:
+                        score[key] -= 1
+    return {k: round(v, 3) for k, v in score.items() if v}
+
+
+def acc_policy(rows, mode="learned"):
+    """Per output type (observable) with the global experience as back-off."""
+    by = collections.defaultdict(list)
+    for r in rows:
+        by[r.get("out_type")].append(r)
+    glob = acc_experience(rows, mode)
+    return {"global": glob, "by_out_type": {t: acc_experience(v, mode) for t, v in by.items() if t}}
+
+
 def runDq(split, out):
     """Dq replays, query by query, the inputs D submitted (same environment answers); hash-checked later."""
     rows = [json.loads(l) for l in open(out)]
