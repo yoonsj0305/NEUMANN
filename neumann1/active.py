@@ -877,6 +877,8 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                 best = (z, fails)
         return upd, asts, best[0], best[1]
     invent_tried, rejected, rivals, upd_alts = set(), set(), [], []
+    fail_hist = []                           # failing examples per round (stagnation triggers invention)
+    hcache = {}                              # (candidate, start) -> {prefix: value}, shared by every invention call
     selftest = {"left": SELFTEST * 3}
 
     def revise(reason):
@@ -919,7 +921,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         # pairs by meet-in-the-middle: for a readout op(h1, h2) of the substrate's invertible binary operations,
         # the values h2 must take are determined by h1 and the answers; the candidates are indexed by their value
         # vectors, so every (h1, op) costs one lookup instead of a scan over all partners
-        if s_type == T_I and len(rdata) >= 3:
+        if MULTI and s_type == T_I and len(rdata) >= 3:
             ys = [y for _, y in rdata]
             index = {}
             for it in cl:
@@ -1006,8 +1008,9 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         # longer synthesis for the first ones that had none
         staged = [] if found or exact_only else [(it, 0.03, 0.0) for it in sets[:30]] + [(it, 0.15, 0.15) for it in sets[:6]]
         done_ = set()
+        ro_end = time.process_time() + 0.3 * max(0.0, deadline - time.process_time())
         for it, t_m, t_c in staged:
-            if time.process_time() > deadline or len(found) >= 2:
+            if time.process_time() > ro_end or len(found) >= 2:
                 break
             if id(it) in done_:
                 continue
@@ -1109,7 +1112,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         extended state, then the fold on every initial example; the first whose Update exists and leaves at
         most a quarter of the examples failing is adopted (the repair loop owns the rest)."""
         key = (len(W), len(acc), virt["value"], why, len(rejected))
-        if key in invent_tried or len(acc) >= MAX_ACC or time.process_time() > deadline:
+        if key in invent_tried or len(acc) >= (MAX_ACC if MULTI else 1) or time.process_time() > deadline:
             return False
         invent_tried.add(key)
         us = list(dict.fromkeys([u for _, _, u in trans] + [step_input(u, e) for (a, e), b, u in trans]))
@@ -1140,7 +1143,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             for z in ([0, 1, min(vals) - 1, max(vals) + 1] if c["t"] == T_I else [()]):
                 if (c["show"], zkind(z)) in rejected:
                     continue
-                cache = {}
+                cache = hcache.setdefault((id(c), z), {})   # values persist across invention calls (no recompute)
                 hv = {u: hval(c["fn"], z, u, cache) for u in us}
                 if None in hv.values() or len(set(hv.values())) < 2:
                     continue
@@ -1172,7 +1175,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             seen_sig.setdefault(sig, show)
             sl.append(it)
         combos = []
-        pl = sorted(partial.values(), key=lambda it: (-bin(it["mask"]).count("1"), it["size"]))[:120] if conf else sl[:12]
+        pl = [] if not MULTI else sorted(partial.values(), key=lambda it: (-bin(it["mask"]).count("1"), it["size"]))[:120] if conf else sl[:12]
         for x in range(len(pl)):
             for y in range(x + 1, len(pl)):
                 if conf and pl[x]["mask"] | pl[y]["mask"] != fullm:
@@ -1209,8 +1212,9 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             return True                      # no contradiction observed: an exact readout is the stronger evidence
         tol = max(1, len(examples) // 4)
         chosen, rival = None, None
+        inv_end = time.process_time() + 0.3 * max(0.0, deadline - time.process_time())
         for it in items[:INVENT_K]:
-            if time.process_time() > deadline:
+            if time.process_time() > inv_end:           # invention may not starve the other routes
                 break
             for c, z in it["vars"]:
                 acc.append({"t": c["t"], "fn": c["fn"], "z": z, "cache": {}, "show": c["show"]})
@@ -1345,9 +1349,11 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                     r = fold(upd, z, tuple(inp[0]))
                     return None if r is None else r[0]
                 return predict, obs, rec
-            # representation change before more repair: the fold still fails on at least half the examples after
-            # two rounds -> the state, not a transition, is the likely error (invention is query-free)
-            if rnd >= 2 and len(fails) * 2 >= len(examples) and invent(trans, "no progress"):
+            # representation change before more repair: the fold fails on at least half the examples and has not
+            # improved over two rounds -> the state, not a transition, is the likely error (invention is query-free)
+            fail_hist.append(len(fails))
+            if len(fail_hist) >= 3 and fail_hist[-1] >= fail_hist[-3] and len(fails) * 2 >= len(examples) \
+                    and invent(trans, "no progress"):
                 continue
             # 3. counterexample: binary search for the first step leaving the true states, add that point
             tag[0] = "localise"
@@ -1418,6 +1424,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
 # -------------------------------------------------------------------- arms
 SELFTEST = 3      # self-test queries per formed machine (at most 3 repairs) before it is returned
 MAX_ACC = 3       # invented variables per machine
+MULTI = True      # ablation switch: False = one invented variable at a time, no sets, no joined readouts
 PAIR_COST = 6     # description-length charge for each additional invented variable
 INVENT_K = 10     # admissible invented variables tried per invention (cost order, or learned order for E)
 CHALLENGE = 3     # fresh inputs a formed machine must predict before it may replace the passive solution
