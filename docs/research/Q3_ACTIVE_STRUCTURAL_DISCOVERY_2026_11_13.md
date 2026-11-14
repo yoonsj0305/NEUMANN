@@ -607,3 +607,35 @@ Verdicts: V1 PASS (sealed). V2 development; Gate A not passed. V3: first causal 
 discovery DECISION adds solves over D on deterministic tasks (2 : 0, development, not significant), but not over
 the verified-structure cache B: development FAIL (Gate B). Q3 OPEN; Q6 OPEN. No independent evaluation.
 Full regression: 1148 passed, 53 skipped (code `96f5ea6`).
+
+## 12. Decision-level counterfactuals and the factorial comparison (2026-11-14) — DEVELOPMENT ONLY
+
+* **Audit of section 11's labels.** They were task-level: two whole runs under one fixed action, attributed to the
+  first decision. Replaced by decision-level replay (`ACTION_SCHEDULE`, code `ea528c6`): the same task, seed and
+  budget re-run with exactly ONE decision (index 0 or 1) switched to repair. 346 replays; the decisions before the
+  switch were identical in 251 (the evidence includes the CPU fraction left, which varies with timing — a
+  limitation of the identity check, recorded). Only **7** decisions changed the outcome: repair better at
+  `count-k(k=10)`#0, `prepend-k(k=-2) | positions`#0, `humaneval/85`#1, `mbpp/775`#0; invention better at
+  `humaneval/3`#1, `mbpp/670`#0, `pow-k(k=3) | index-k(k=2)`#1. Two of the list-routines regressions are thus
+  located exactly: inventing at the first branch point blocks the repair route that solved them (Phase E).
+* **Factorial arms** (FRESH-dev 110, lineage split; policy from 5 outcome-changing decisions per fold; knowledge
+  units from the other lineages; `mbpp/775` counted as a semantic failure):
+
+| arm | knowledge | learned decisions | solved (semantic) | adopted but wrong |
+|---|---|---|---|---|
+| D | – | – | 45 | 2 |
+| D-repair | – | fixed repair | 42 | 0 |
+| B | cache | – | 48 | 1 |
+| E-action (decision-level) | – | yes | 45 (vs D 1 : 1) | 2 |
+| E-joint | relevant | yes | 48 | 1 |
+| E-joint-ablated | relevant | – | 47 | 1 |
+
+* E-joint = B task for task (0 : 0); E-joint vs E-action 4 : 1; E-joint vs its ablation 1 : 0 (`humaneval/85`).
+  The decision-level policy did not reproduce section 11's 2 : 0 (E-action 45 vs D 45). Every gain of E-joint is
+  also B's: the verified-structure cache, not the learned discovery decision, carries it.
+* Answer to the directive's question, in development: NEUMANN currently remembers WHAT it found (the cache
+  helps); evidence that it learned HOW to discover is limited to one non-significant, non-reproduced comparison.
+  The signal itself is scarce — 7 outcome-changing decisions in 346.
+
+Verdicts: V1 PASS (sealed). V2 development (two-variable cases preserved; list-routines regressions located,
+not recovered). V3 FAIL. Q3 OPEN. Q6 OPEN. Full regression: 1148 passed, 53 skipped. Seals intact.
