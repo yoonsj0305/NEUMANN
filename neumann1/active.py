@@ -954,7 +954,12 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         a = ACTION_MODE
         if action_policy is not None:
             a = action_policy(f) or a
-        rec.setdefault("decisions", []).append({"why": why, "action": a, "feat": {k: round(v, 3) for k, v in f.items()}})
+        idx = _DEC[0]
+        _DEC[0] += 1
+        if idx in ACTION_SCHEDULE:           # counterfactual replay: same run up to here, one decision changed
+            a = ACTION_SCHEDULE[idx]
+        rec.setdefault("decisions", []).append({"why": why, "action": a, "index": idx,
+                                                "feat": {k: round(v, 3) for k, v in f.items()}})
         return a
     hcache = {}                              # (candidate, start) -> {prefix: value}, shared by every invention call
     selftest = {"left": SELFTEST * 3}
@@ -1625,6 +1630,8 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
 SELFTEST = 3      # self-test queries per formed machine (at most 3 repairs) before it is returned
 MAX_ACC = 3       # invented variables per machine
 ACTION_MODE = "invent"   # D's fixed decision at a discovery branch point ("repair": the counterfactual arm)
+ACTION_SCHEDULE = {}     # {decision index: action} -- replays a run and changes exactly one decision
+_DEC = [0]               # decision counter of the current run (reset by run_arm)
 MULTI = True      # ablation switch: False = one invented variable at a time, no sets, no joined readouts
 PAIR_COST = 6     # description-length charge for each additional invented variable
 INVENT_SHARE = 0.4  # share of a machine's formation CPU that all its invention calls may use together
@@ -1674,6 +1681,7 @@ def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
     """One arm on one task.  `replay`: for Dq, the exact list of query inputs D made (answers come from the
     environment again, so the information is identical)."""
     rng = random.Random(seed)
+    _DEC[0] = 0
     c0 = time.process_time()
     deadline = c0 + cap
     ex = env.initial()
