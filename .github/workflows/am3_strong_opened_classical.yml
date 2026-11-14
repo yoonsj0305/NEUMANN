@@ -1,0 +1,53 @@
+# AM3: This is a POSTHOC OPENED diagnostic, not a fresh benchmark or model.
+name: NEUMANN AM3 Strong Opened Classical Control
+on:
+  push:
+    branches:
+      - research/am3-opened-12-strong-classical-ceiling-20261105
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  opened-strong-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install declared scientific runtime dependencies
+        run: python -m pip install -e .
+      - name: Original checker and 48 metamorphic semantics assertions
+        run: python -m unittest -v tests.test_am3_strong_opened_classical
+      - name: First model-free original-task scorer
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m experiments.am3_strong_opened_classical > am3-first-opened-12.json
+          python - <<'PY'
+          import json,hashlib
+          p="am3-first-opened-12.json"
+          raw=open(p,"rb").read()
+          d=json.loads(raw)
+          assert d["run_count"]==12
+          assert d["model_call_count"]==0
+          assert d["accepted"]==12
+          assert d["decision"]=="CURRENT_AM1_12_TASKS_NON_DISCRIMINATIVE_IF_12_OF_12"
+          assert all(r["checker_calls"]==1 for r in d["rows"])
+          assert d["global_q1_to_q7"]=="OPEN"
+          assert not d["preregistered_before_tasks"]
+          print(json.dumps({
+            "first_receipt_sha256":hashlib.sha256(raw).hexdigest(),
+            "opened_original":d["run_count"],"checker_successes":d["accepted"],
+            "model_calls":d["model_call_count"],"family_results":d["family_results"],
+            "decision":d["decision"],"scientific_scope":d["scope"]}))
+          PY
+      - name: Retain the unedited first result whether success or failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-am3-first-opened-12-strong-classical
+          path: am3-first-opened-12.json
+          if-no-files-found: warn
+          retention-days: 90
