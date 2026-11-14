@@ -482,3 +482,77 @@ has 32 positive episodes; its features cannot separate a wrong variable from a w
 V1 PASS retained (sealed). V2: multi-variable invention works in development (3 tasks, all failing without it),
 with one more wrong adoption and a 2-task list-routines regression; no independent result. V3: development FAIL.
 Q3 overall OPEN; Q6 OPEN (not modified).
+
+## 10. Structural knowledge and autonomous invention (2026-11-14, directive "Q3 Structural Knowledge") — DEVELOPMENT ONLY
+
+Same conditions (60 queries, 30 CPU s, classical fallback, Dq replay); opened FRESH and list-routines re-used;
+no new data opened; Q6 untouched.
+
+### 10.1 Phase A — regressions, wrong adoptions, minimal state
+
+* Regressions (`count-k(k=10)`, `prepend-k(k=-2) | positions`, `identify-k(k=1) | kth-smallest(k=2)`,
+  `replace-all-k-with-n | sum`): in the 159-version each was solved by repair or the continuation route
+  (6–16 CPU s); in the 157-version invention ran first at "counterexample not localisable" / "no Update",
+  used 14–18 of the 18 formation seconds, and in `identify-k | kth-smallest` adopted a junk pair that passed
+  the fold and failed the challenge. Cause: CPU allocation, not the representation. Change: all invention
+  calls of one machine share 40 % of its CPU.
+* Wrong adoptions: `mbpp/46` (boolean readout of a hash-like variable) and `mbpp/19` — wrong STATE (both need
+  a set of seen values, which no candidate expresses); `mbpp/68` — wrong UPDATE (constant special cases) on
+  plausible variables; `mbpp/476` (earlier run) — wrong START. Changes: (a) state-sufficiency refutation —
+  two inputs whose machines end in the same state must have the same answer; a pair is searched among
+  task-distribution inputs and their edits and asked (≤ 2 queries); different answers reject the
+  representation, not an Update; (b) a readout counterexample explained by another START of the same variables
+  switches the start instead of rejecting the variables (this had cost `mbpp/588`).
+* Minimal state: every machine with ≥ 2 invented variables drops each in turn and re-synthesises; a variable
+  stays only if the machine without it cannot reproduce every observation. `humaneval/3`: the parity variable
+  is removed (the machine is the running sum alone); `mbpp/476`, `mbpp/588`: neither of min / max can be
+  removed (no readout of the other alone) — within this substrate, not a claim of mathematical minimality.
+
+| dev | 157-version | now |
+|---|---|---|
+| FRESH-dev D / Dq | 45 / 23 | 45 / 24 (21 : 0) |
+| two invented variables, both required (removal fails) | 2 (+1 with an unused variable) | 2: `mbpp/476`, `mbpp/588` |
+| adopted but wrong | 3 | 2 (`humaneval/40`, `mbpp/68`); state refutations fired on 4 tasks |
+| list-routines (159-version = 159) | 157 | 158: still lost the four above and `rotate-k(k=1) | identify-geq-k(k=2)`; gained 4 |
+
+Gate A: the multi-variable structures are preserved and wrong adoptions no longer exceed the sealed D (2);
+the four named list-routines regressions are NOT recovered (net −1 against the 159-version). Not passed.
+
+### 10.2 Phase B — Structural Knowledge Units (minimal, `active_dev.structural_knowledge`)
+
+A unit is made only from a machine of another task that passed the independent challenge and the hidden test and
+uses invented variables. It reuses what the run already records: observed contradiction (why invention was
+called, how many contradictions), structural relation (the variable definitions), representation, transition,
+readout, preconditions, counterexamples, verification, discovery procedure (the event log), minimality,
+cost. On a new task (`_apply_knowledge`) a unit is a hypothesis: its relation is rebuilt from the current
+candidates with values recomputed on THIS task's observations; arm E proposes it only if it explains the
+current contradictions (or separates every pair of differently answered points); transition and readout are
+re-synthesised on the current data, never copied; D's own order follows unchanged.
+
+### 10.3 Phases C/D — causal comparison (lineage split: units from list-routines + the other FRESH source)
+
+| arm (110 FRESH-dev) | solved | vs D (only / D-only) | adopted but wrong |
+|---|---|---|---|
+| D | 45 | — | 2 |
+| E: relevance-gated reconstruction | 47 | 3 : 1, p = 0.63 (`humaneval/121, 126`, `mbpp/690` / `mbpp/670`) | 1 |
+| B: verified memory, no relevance check (= E-no-relevance here) | 47 | identical to E | 1 |
+| ES: knowledge-task link shuffled | 42 | 0 : 3 (`mbpp/567, 670, 790`) | 2 |
+
+Relevance check: 1 709 applications passed, 2 013 were refused as not explaining the current contradictions,
+1 490 relations could not be formed from this task's candidates.
+
+* Gate B (E beyond D AND beyond B, causally from relational learning): **not passed**. E = B task for task: the
+  relevance gate changed nothing measurable. E vs D 3 : 1 is not significant; `humaneval/121` and `126` are
+  CPU-borderline tasks that D solved in earlier dev runs.
+* Gate C (negative transfer): knowledge linked at random costs three tasks (ES); with real links neither E nor B
+  lost more than one task — wrong links harm, but this run cannot show that the relevance judgement is what
+  prevents it, because B (no judgement) did not lose either.
+* Gate D (invention beyond reuse): not shown — no E-only solve is attributable to a reconstructed unit.
+* What was NOT done: a learned policy over discovery ACTIONS (explore / apply / test applicability / invent /
+  combine / repair / prune / reject) with counterfactual credit. The stage-separated policy of section 9 remains
+  the only learned element; it failed there.
+
+### 10.4 Verdicts
+
+V1 PASS (sealed). V2: development only; Gate A not passed (list-routines regressions). V3: development FAIL
+(Gate B). Q3 overall OPEN. Q6 OPEN (Codex). No independent evaluation was pre-registered.

@@ -1,0 +1,214 @@
+{
+ "B": {
+  "D_only": [
+   "mbpp/670"
+  ],
+  "adopted_but_wrong": [
+   "humaneval/40"
+  ],
+  "applications": {
+   "applied": 3716,
+   "not:relation not formabl": 1502
+  },
+  "cpu": 2750,
+  "errors": [],
+  "only_vs_D": [
+   "humaneval/121",
+   "humaneval/126",
+   "mbpp/690"
+  ],
+  "p": 0.625,
+  "solved": 47
+ },
+ "D": 45,
+ "D_only_m2": [
+  "humaneval/3",
+  "humaneval/62",
+  "mbpp/476",
+  "mbpp/567",
+  "mbpp/588",
+  "mbpp/670",
+  "mbpp/790"
+ ],
+ "D_vs_Dq": [
+  21,
+  0,
+  9.5367431640625e-07
+ ],
+ "Dq": 24,
+ "E": {
+  "D_only": [
+   "mbpp/670"
+  ],
+  "adopted_but_wrong": [
+   "humaneval/40"
+  ],
+  "applications": {
+   "applied": 1709,
+   "not:does not explain the": 2013,
+   "not:relation not formabl": 1490
+  },
+  "cpu": 2748,
+  "errors": [],
+  "only_vs_D": [
+   "humaneval/121",
+   "humaneval/126",
+   "mbpp/690"
+  ],
+  "p": 0.625,
+  "solved": 47
+ },
+ "ES": {
+  "D_only": [
+   "mbpp/567",
+   "mbpp/670",
+   "mbpp/790"
+  ],
+  "adopted_but_wrong": [
+   "mbpp/19",
+   "mbpp/472"
+  ],
+  "applications": {
+   "applied": 5283
+  },
+  "cpu": 2760,
+  "errors": [],
+  "only_vs_D": [],
+  "p": 0.25,
+  "solved": 42
+ },
+ "adopted_but_wrong": [
+  "humaneval/40",
+  "mbpp/68"
+ ],
+ "code_commit": "b9f3f43 (E/B/ES arms ran after a guard fix in the readout ordering that does not change D)",
+ "cpu": 2752,
+ "full_regression_tests": "see section 10.6",
+ "list_routines": {
+  "gained": [
+   "count-k(k=3)",
+   "keep-mod-k(k=3) | modulo-k(k=3)",
+   "pop | is-evens",
+   "slice-k-n(k=3,n=4) | repeat-k(k=5)"
+  ],
+  "lost": [
+   "count-k(k=10)",
+   "identify-k(k=1) | kth-smallest(k=2)",
+   "prepend-k(k=-2) | positions",
+   "replace-all-k-with-n(k=2,n=10) | sum",
+   "rotate-k(k=1) | identify-geq-k(k=2)"
+  ],
+  "reference_159_version": 159,
+  "solved": 158
+ },
+ "minimality": {
+  "humaneval/3": [
+   [
+    {
+     "counterexample": null,
+     "removable": false,
+     "var": "(add $0 $1)",
+     "without_it": "no Update"
+    },
+    {
+     "removable": true,
+     "var": "(sub 0 $0)"
+    }
+   ]
+  ],
+  "mbpp/476": [
+   [
+    {
+     "removable": false,
+     "var": "(if (lt $0 $1) $1 $0)",
+     "without_it": "no readout of the other variable alone"
+    },
+    {
+     "removable": false,
+     "var": "(if (lt $0 $1) $0 $1)",
+     "without_it": "no readout of the other variable alone"
+    }
+   ]
+  ],
+  "mbpp/588": [
+   [
+    {
+     "removable": false,
+     "var": "(if (lt $0 $1) $0 $1)",
+     "without_it": "no readout of the other variable alone"
+    },
+    {
+     "removable": false,
+     "var": "(if (lt $0 $1) $1 $0)",
+     "without_it": "no readout of the other variable alone"
+    }
+   ]
+  ],
+  "mbpp/68": [
+   [
+    {
+     "counterexample": null,
+     "removable": false,
+     "var": "(add $0 $1)",
+     "without_it": "no Update"
+    },
+    {
+     "counterexample": [
+      [
+       5,
+       1
+      ]
+     ],
+     "removable": false,
+     "var": "$1",
+     "without_it": "2 examples fail"
+    }
+   ]
+  ],
+  "mbpp/775": [
+   [
+    {
+     "counterexample": [
+      [
+       2,
+       1,
+       4,
+       3,
+       6,
+       7,
+       6,
+       3
+      ]
+     ],
+     "removable": false,
+     "var": "(add $0 $1)",
+     "without_it": "4 examples fail"
+    },
+    {
+     "counterexample": null,
+     "removable": false,
+     "var": "$1",
+     "without_it": "no Update"
+    }
+   ]
+  ]
+ },
+ "queries": 6516,
+ "state_refutations": {
+  "humaneval/109": 2,
+  "humaneval/43": 1,
+  "mbpp/472": 1,
+  "mbpp/670": 2
+ },
+ "status": "DEVELOPMENT ONLY - opened FRESH and list-routines re-used; not independent evidence",
+ "two_variable_solves": {
+  "mbpp/476": [
+   "(if (lt $0 $1) $1 $0)@below",
+   "(if (lt $0 $1) $0 $1)@above"
+  ],
+  "mbpp/588": [
+   "(if (lt $0 $1) $0 $1)@above",
+   "(if (lt $0 $1) $1 $0)@below"
+  ]
+ }
+}
