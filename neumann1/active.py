@@ -470,6 +470,61 @@ def _conditional_accumulators(lib, have):
     return out
 
 
+def _apply_knowledge(knowledge, items, singles, partials, conf, fullm, rec, route):
+    """Structural knowledge (SKUs from OTHER tasks' verified machines) as hypotheses about the CURRENT task.
+
+    mode "relevant" (arm E): an SKU's relation -- its variable set -- is rebuilt from the current candidates (same
+      definition, values recomputed on THIS task's observations) and proposed only if it explains the current
+      contradictions (state route: covers every observed contradiction; readout route: separates every pair of
+      points with different answers).  Transition / readout are re-synthesised on the current data, never copied.
+      Proposed sets go first; D's own order follows unchanged.
+    mode "norelevance": the same SKU sets first, whether or not they explain anything here.
+    mode "shuffled": random variable sets of the same sizes (the link between knowledge and task broken).
+    Each application is logged with its outcome (cost of trying it included in the CPU accounting)."""
+    mode, units = knowledge.get("mode"), knowledge.get("units", [])
+    pool = {}
+    mk = "mask" if route == "state" else "rmask"
+    for it in list(singles) + list(partials):
+        if len(it["vars"]) == 1:
+            c, z = it["vars"][0]
+            pool.setdefault((c["show"], _zk_of(it, c, z)), it)
+    out, log = [], rec.setdefault("knowledge", [])
+    rng = __import__("random").Random(len(items))
+    for u in units:
+        if u.get("route") != route:
+            continue
+        if mode == "shuffled":
+            keys = rng.sample(sorted(pool), k=min(len(pool), len(u["vars"])))
+        else:
+            keys = [tuple(v) for v in u["vars"]]
+        parts = [pool.get(k) for k in keys]
+        if None in parts:
+            log.append({"sku": u["id"], "route": route, "applied": False, "reason": "relation not formable here"})
+            continue
+        mask = 0
+        for p_ in parts:
+            mask |= p_.get(mk, 0)
+        explains = (not conf) or mask == fullm
+        if mode == "relevant" and not explains:
+            log.append({"sku": u["id"], "route": route, "applied": False, "reason": "does not explain the current contradictions"})
+            continue
+        it = {"vars": [v for p_ in parts for v in p_["vars"]], "size": sum(p_["size"] for p_ in parts),
+              "ns": max(p_.get("ns", p_.get("nd", 0)) for p_ in parts), "nd": max(p_.get("nd", p_.get("ns", 0)) for p_ in parts),
+              "mask": mask, mk: mask, "sku": u["id"],
+              "feat": parts[0].get("feat", {})}
+        if route == "state":
+            it["hv"] = [h for p_ in parts for h in p_.get("hv", [])]
+        else:
+            it["rv"] = [r for p_ in parts for r in p_.get("rv", [])]
+        out.append(it)
+        log.append({"sku": u["id"], "route": route, "applied": True, "explains": explains})
+    return out + [it for it in items if all(it is not o for o in out)]
+
+
+def _zk_of(it, c, z):
+    return (it.get("zkinds") or ["nil" if z == () else repr(z)])[0]
+
+
 def _inv_features(it, n_prefixes, n_conf, why, s_type, zkind):
     """Evidence of the CURRENT task about one candidate set of invented variables (no identity of a variable,
     nothing remembered from other tasks): how many contradictions were observed and why invention was called,
@@ -636,7 +691,7 @@ def features(examples):
 
 
 def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, prior_ws=None, log=None,
-                 prior_structure=None, restrict_kinds=False, acc_prior=None, policy_model=None):
+                 prior_structure=None, restrict_kinds=False, acc_prior=None, policy_model=None, knowledge=None):
     """Learn S(u) = (f(u.w) for w in W), Update and Readout = component 0, with W grown only when needed.
 
       * W starts with the empty continuation: the answer itself as the state (the output-state machine).
@@ -880,6 +935,37 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
     fail_hist = []                           # failing examples per round (stagnation triggers invention)
     hcache = {}                              # (candidate, start) -> {prefix: value}, shared by every invention call
     selftest = {"left": SELFTEST * 3}
+    inv_budget = {"left": INVENT_SHARE * max(0.0, deadline - time.process_time())}
+
+    def sufficiency_probe(state_of):
+        """Is the machine's state sufficient?  Two inputs that end in the SAME state must have the same answer
+        (Myhill-Nerode on the final state).  A pair is searched among task-distribution inputs and their generic
+        edits (no query); the unknown answers are asked (at most two queries).  Different answers refute the
+        state representation itself -- not an Update or a start."""
+        base_ = [task_input(rng, vals, lens) for _ in range(80)]
+        cand = list(dict.fromkeys(base_ + [y for x in base_[:40] for y in edits(x, rng)]))
+        by = {}
+        for x in cand:
+            st_ = _safe(lambda: state_of(x))
+            if st_ is None:
+                continue
+            k_ = repr(st_)
+            if k_ in by and by[k_] != x and (x not in memo or by[k_] not in memo):
+                pair = (by[k_], x)
+                break
+            by.setdefault(k_, x)
+        else:
+            return None
+        if selftest["left"] < 2:
+            return None
+        ys = []
+        for x in pair:
+            if x not in memo:
+                selftest["left"] -= 1
+            ys.append(F(x))
+        if None in ys or ys[0] == ys[1]:
+            return None
+        return [(pair[0], ys[0]), (pair[1], ys[1])]
 
     def revise(reason):
         """A wrong structural hypothesis: the invented variable could not be repaired -> rejected, and the next
@@ -956,6 +1042,8 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             it["feat"] = _inv_features(it, len(rdata), len(rconf), "readout:" + why, s_type, zkind)
             it["feat"]["readout"] = 1.0
         sets.sort(key=lambda it: (it["nd"], it["size"]))
+        if knowledge:
+            sets = _apply_knowledge(knowledge, sets, sets, cl, rconf, rfull, rec, "readout")
         if policy_model is not None:
             learned = sorted(sets, key=lambda it: -policy_model.expected(it["feat"]))
             mixed, seen_ = [], set()
@@ -1008,7 +1096,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         # longer synthesis for the first ones that had none
         staged = [] if found or exact_only else [(it, 0.03, 0.0) for it in sets[:30]] + [(it, 0.15, 0.15) for it in sets[:6]]
         done_ = set()
-        ro_end = time.process_time() + 0.3 * max(0.0, deadline - time.process_time())
+        ro_end = time.process_time() + min(0.3 * max(0.0, deadline - time.process_time()), inv_budget["left"])
         for it, t_m, t_c in staged:
             if time.process_time() > ro_end or len(found) >= 2:
                 break
@@ -1059,9 +1147,26 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                                     return None
                             hs.append(h)
                         return g(tuple(hs))
+                    p2.vs = vs2
                     rivs.insert(0, p2)
         tag[0] = "selftest"
         used_r = set()
+
+        def hstate(x, vs=it["vars"]):
+            hs = []
+            for c, z in vs:
+                h = z
+                for e in (tuple(x) if direction == "prefix" else tuple(x)[::-1]):
+                    h = _acc_step(c["fn"], h, e)
+                hs.append(h)
+            return tuple(hs)
+        pr_ = sufficiency_probe(hstate)
+        if pr_:
+            examples.extend(((x_,), y_) for x_, y_ in pr_)
+            rec["events"].append("readout state insufficient: equal invented states, different answers")
+            rec["state_refutations"] = rec.get("state_refutations", 0) + 1
+            rejected.update((c["show"], zkind(z)) for c, z in it["vars"])
+            return False
         for _ in range(SELFTEST):
             if selftest["left"] <= 0:
                 break
@@ -1083,9 +1188,34 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             selftest["left"] -= 1
             if y is not None and _safe(lambda: pred(x)) != y:
                 examples.append(((x,), y))
+                # classify: if another START of the same variables explains this and every earlier point, it was an
+                # initial-state error -- switch the start, keep the variables
+                pts_all = [(xx, yy) for xx, yy in rdata] + [(tuple(xx), yy) for (xx,), yy in examples]
+                fix = next((r_ for r_ in rivs if getattr(r_, "vs", None)
+                            and all(_safe(lambda r_=r_, xx=xx: r_(xx)) == yy for xx, yy in pts_all)), None)
+                if fix is not None:
+                    it, pred = dict(it, vars=fix.vs), fix
+                    rec["events"].append("readout self-test counterexample: initial-state error, start switched")
+                    continue
                 rec["events"].append("readout self-test counterexample")
                 rejected.update((c["show"], zkind(z)) for c, z in it["vars"])
                 return False
+        if len(it["vars"]) == 2 and s_type in (T_I, T_B):
+            mini = rec.setdefault("minimality", [])
+            pts_all = [(x, y) for x, y in rdata] + [(tuple(x), y) for (x,), y in examples]
+            for k_ in range(2):
+                c_, z_ = it["vars"][1 - k_]
+                vals_ = [hstate(x, [(c_, z_)])[0] for x, _ in pts_all]
+                one = next(((ast1, fn1) for ast1, fn1 in readout_basis(1, s_type)
+                            if all(_safe(lambda: fn1((v_,))) == y for v_, (_, y) in zip(vals_, pts_all))), None)
+                gone = it["vars"][k_][0]["show"]
+                if one:
+                    mini.append({"var": gone, "removable": True})
+                    ast, fn1 = one
+                    it = dict(it, vars=[(c_, z_)])
+                    pred = (lambda x, fn1=fn1, c_=c_, z_=z_: _safe(lambda: fn1((hstate(x, [(c_, z_)])[0],))))
+                    break
+                mini.append({"var": gone, "removable": False, "without_it": "no readout of the other variable alone"})
         ro["predict"] = pred
         log_["adopted"] = [[c["show"], zkind(z)] for c, z in it["vars"]]
         rec["readout"] = show_ast(ast)
@@ -1097,6 +1227,17 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         return True
 
     def invent(trans, why):
+        """Budgeted wrapper: all invention calls of one machine share INVENT_SHARE of its CPU, so invention never
+        starves repair and the continuation route (dev: four list-routines regressions)."""
+        if inv_budget["left"] <= 0:
+            return False
+        t_ = time.process_time()
+        try:
+            return _invent(trans, why)
+        finally:
+            inv_budget["left"] -= time.process_time() - t_
+
+    def _invent(trans, why):
         """Counterexample-driven state invention (no query to form a hypothesis).
 
         The observed contradictions are the pairs of transitions with equal (state, element) and different
@@ -1156,13 +1297,14 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                             k2 = tuple(rv)        # values, not the partition: a readout needs the values
                             sz = c["size"] + (0 if ident_start(c, z) else 3)
                             if k2 not in rcands or (sz, nd) < (rcands[k2]["size"], rcands[k2]["nd"]):
-                                rcands[k2] = {"vars": [(c, z)], "rv": [rv], "rmask": rmask, "size": sz, "nd": nd}
+                                rcands[k2] = {"vars": [(c, z)], "rv": [rv], "rmask": rmask, "size": sz, "nd": nd,
+                                              "zkinds": [zkind(z)]}
                 mask = sum(1 << k for k, (p_, q_) in enumerate(conf) if hv[p_] != hv[q_])
                 if not mask and conf:
                     continue
                 sig, ns = signature([hv])
                 it = {"vars": [(c, z)], "size": c["size"] + (0 if ident_start(c, z) else 3), "mask": mask, "ns": ns,
-                      "hv": [hv]}
+                      "hv": [hv], "zkinds": [zkind(z)]}
                 bucket = singles if mask == fullm else partial
                 k_ = (sig, c["show"]) if bucket is singles else sig
                 if k_ not in bucket or (it["size"], ns) < (bucket[k_]["size"], bucket[k_]["ns"]):
@@ -1194,6 +1336,8 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         for it in items:                     # the evidence the discovery policy sees (current task only)
             it["feat"] = _inv_features(it, len(us), len(conf), why, s_type, zkind)
         items.sort(key=lambda it: (it["size"], it["ns"]))
+        if knowledge:
+            items = _apply_knowledge(knowledge, items, sl, list(partial.values()), conf, fullm, rec, "state")
         if policy_model is not None:
             # learned order, interleaved with the description-length order: the policy can bring a set forward
             # on the current task's evidence, it can never drop D's own first choices
@@ -1212,7 +1356,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             return True                      # no contradiction observed: an exact readout is the stronger evidence
         tol = max(1, len(examples) // 4)
         chosen, rival = None, None
-        inv_end = time.process_time() + 0.3 * max(0.0, deadline - time.process_time())
+        inv_end = time.process_time() + min(0.3 * max(0.0, deadline - time.process_time()), inv_budget["left"])
         for it in items[:INVENT_K]:
             if time.process_time() > inv_end:           # invention may not starve the other routes
                 break
@@ -1309,6 +1453,15 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                 riv += rivals
                 used_r = set()
                 bad = None
+                if acc:
+                    pr_ = sufficiency_probe(lambda x, upd=list(upd), z=z: fold(upd, z, x))
+                    if pr_:
+                        examples.extend(((x_,), y_) for x_, y_ in pr_)
+                        rec["events"].append("state insufficient: equal final states, different answers")
+                        rec["state_refutations"] = rec.get("state_refutations", 0) + 1
+                        if revise("state insufficient"):
+                            continue
+                        break
                 for _ in range(SELFTEST):
                     base_ = [task_input(rng, vals, lens) for _ in range(120)]
                     # the experiment is searched, not sampled: task-distribution inputs and their generic edits
@@ -1338,6 +1491,23 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                     rec["events"].append("self-test counterexample (transition error)")
                     rec["selftest_counterexamples"] = rec.get("selftest_counterexamples", 0) + 1
                     continue
+            if not fails and len(acc) >= 2:
+                # actual minimality (within this substrate): drop each invented variable in turn; it stays only if
+                # the machine without it cannot be re-synthesised to reproduce every observation
+                mini = rec.setdefault("minimality", [])
+                for k_ in reversed(range(len(acc))):
+                    a_ = acc.pop(k_)
+                    u2, as2, z2, f2 = attempt(transitions(), 0.05, 0.3)
+                    if u2 is not None and not f2:
+                        upd, asts, z = u2, as2, z2
+                        ci = [i for i, c in enumerate(rec["components"]) if c.get("kind") == "accumulator"][k_]
+                        rec["components"].pop(ci)
+                        mini.append({"var": a_["show"], "removable": True})
+                    else:
+                        acc.insert(k_, a_)
+                        mini.append({"var": a_["show"], "removable": False,
+                                     "counterexample": None if f2 is None else [list(f2[0])] if f2 else None,
+                                     "without_it": "no Update" if u2 is None else "%d examples fail" % len(f2)})
             if not fails:
                 rec["update"] = [show_ast(a) if not (isinstance(a, tuple) and a and a[0] == "cells") else a[1] for a in asts]
                 rec["virtual_value"] = virt["value"]
@@ -1426,6 +1596,7 @@ SELFTEST = 3      # self-test queries per formed machine (at most 3 repairs) bef
 MAX_ACC = 3       # invented variables per machine
 MULTI = True      # ablation switch: False = one invented variable at a time, no sets, no joined readouts
 PAIR_COST = 6     # description-length charge for each additional invented variable
+INVENT_SHARE = 0.4  # share of a machine's formation CPU that all its invention calls may use together
 INVENT_K = 10     # admissible invented variables tried per invention (cost order, or learned order for E)
 CHALLENGE = 3     # fresh inputs a formed machine must predict before it may replace the passive solution
 DISCRIMINATE = 2  # queries kept to decide between an accepted machine and the passive solution where they differ
@@ -1498,7 +1669,8 @@ def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
                                          pol["continuation_kinds"] if pol else None, None,
                                          (pol or {}).get("structures", {}).get(direction),
                                          bool((pol or {}).get("restrict_kinds")), None,
-                                         DiscoveryPolicy.from_json((policy or {}).get("discovery")))
+                                         DiscoveryPolicy.from_json((policy or {}).get("discovery")),
+                                         (policy or {}).get("knowledge"))
             mrec["queries_used"], mrec["cpu"] = env.used - q0, round(time.process_time() - t0, 3)
             obs += mobs
             frec["machines"].append(mrec)

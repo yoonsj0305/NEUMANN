@@ -160,6 +160,35 @@ def discovery_policy_from(rows, threshold=0.5):
     return out
 
 
+def structural_knowledge(rows):
+    """Structural Knowledge Units from D's verified machines of OTHER tasks (minimal; reuses what the run
+    already recorded).  A unit is kept only if its machine passed the independent challenge and the hidden test
+    and used invented variables."""
+    units = []
+    for r in rows:
+        if r.get("arm") != "D" or not r.get("solved") or not str(r.get("via", "")).startswith("state"):
+            continue
+        ms = [m for m in r["formation"].get("machines", []) if m.get("challenge")]
+        if not ms:
+            continue
+        m = ms[-1]
+        vs = [[c["update"], c["init"]] for c in m.get("components", []) if c.get("kind") == "accumulator"]
+        if not vs:
+            continue
+        inv = (m.get("inventions") or [{}])[-1]
+        units.append({"id": r["name"], "route": "readout" if m.get("readout") else "state", "vars": vs,
+                      "observed_conflict": {"why": inv.get("why"), "contradictions": inv.get("conflicts")},
+                      "structural_relation": [v[0] for v in vs],
+                      "transition": m.get("update"), "readout": m.get("readout"),
+                      "preconditions": {"answer_type": r.get("out_type"), "explains_current_contradictions": True},
+                      "counterexamples": [],
+                      "verification": {"independent_challenge": True, "hidden_test": True},
+                      "discovery_procedure": m.get("events"),
+                      "minimality": m.get("minimality"),
+                      "cost": {"queries": m.get("queries_used"), "cpu_seconds": m.get("cpu")}})
+    return units
+
+
 def runDq(split, out):
     """Dq replays, query by query, the inputs D submitted (same environment answers); hash-checked later."""
     rows = [json.loads(l) for l in open(out)]
