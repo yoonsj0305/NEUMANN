@@ -1,0 +1,62 @@
+name: NEUMANN Q3 exact first seventh original postgrade macro semantic and CPU audit
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/q3_original_seventh32_structural_postgrade.yml"
+      - "research/q3/immutable_seventh_macro_postgrade_audit.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  aftergrade_exact_first_receipt_and_semantic_ast_audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39917673566
+          name: q3-seventh-first-original32-source-numeric-no-author-formula
+          github-token: ${{ github.token }}
+          path: /tmp/7-audit/source
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39917673566
+          name: q3-seventh-first-original32-private-full-author-functions
+          github-token: ${{ github.token }}
+          path: /tmp/7-audit/secret
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39917673566
+          name: q3-seventh-learned-macro-first-source-predictions-before-author-truth
+          github-token: ${{ github.token }}
+          path: /tmp/7-audit/pred
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39917673566
+          name: q3-seventh-first-independent-true-author-macro-versus-classical-original-proof
+          github-token: ${{ github.token }}
+          path: /tmp/7-audit/grade
+      - name: Strict SHA pin first ORIGINAL then inspect true author grammar and CPU use without replay/tuning
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/7-audit/results
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/q3/immutable_seventh_macro_postgrade_audit.py \
+              --source /tmp/7-audit/source/SEVENTH32_NO_FORMULAS_NUMERIC_XY.json \
+              --original /tmp/7-audit/secret/SEVENTH32_TRUE_AUTHOR_ORIGINAL_FORMULAS.json \
+              --pred /tmp/7-audit/pred/LEARNED_RECURSIVE_MACRO_AND_FULL_CLASSICAL_FIRST_SOURCE_PROGRAMS.json \
+              --grade /tmp/7-audit/grade/SEVENTH32_FIRST_EXACT_ORIGINAL_LAMBDA_MACRO_GRADE.json \
+              --out /tmp/7-audit/results/IMMUTABLE_FIRST_PROGRAM_LANGUAGE_AND_TOTAL_COST.json \
+            | tee /tmp/7-audit/results/SEMANTIC_FIRST_EVIDENCE_POSTGRADE_AUDIT.log
+          sha256sum /tmp/7-audit/results/IMMUTABLE_FIRST_PROGRAM_LANGUAGE_AND_TOTAL_COST.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-seventh32-first-science-structural-expression-macro-cost-audit
+          path: /tmp/7-audit/results/
+          if-no-files-found: error

@@ -1,0 +1,61 @@
+name: NEUMANN Q3 first eighth32 original exact semantic novelty and cost audit immutable receipts
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/q3_eighth32_postgrade_semantic_audit.yml"
+      - "research/q3/eighth32_strict_original_semantic_audit.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  strict_first_frozen_author_original_semantics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39920470677
+          name: q3-eighth32-source-only-actual-public-author-numeric
+          github-token: ${{ github.token }}
+          path: /tmp/e8-original-audit/source
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39920470677
+          name: q3-eighth32-actual-private-full-author-equations-grader-only
+          github-token: ${{ github.token }}
+          path: /tmp/e8-original-audit/truth
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39920470677
+          name: q3-eighth32-frozen-nonlinear-learned-generated-macro-and-classical-pregrade
+          github-token: ${{ github.token }}
+          path: /tmp/e8-original-audit/pred
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39920470677
+          name: q3-eighth32-first-real-author-full-original-nonlinear-macro-independent-grade
+          github-token: ${{ github.token }}
+          path: /tmp/e8-original-audit/grade
+      - name: Pin each first-run source truth candidate and grade SHA before examining any semantic function class
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/e8-original-audit/out
+          PYTHONPATH=research/g0 python research/q3/eighth32_strict_original_semantic_audit.py \
+            --source /tmp/e8-original-audit/source/EIGHTH32_NUMERIC_SOURCE_WITHOUT_TRUE_FORMULAS.json \
+            --truth /tmp/e8-original-audit/truth/EIGHTH32_PRIVATE_FULL_AUTHOR_EQUATIONS.json \
+            --pred /tmp/e8-original-audit/pred/FIRST_NEURAL_AND_CLASSICAL_NESTED_MACRO_PREDICTIONS.json \
+            --grade /tmp/e8-original-audit/grade/FIRST_EIGHTH32_FULL_ORIGINAL_NONLINEAR_MACRO_EXACT_GRADE.json \
+            --out /tmp/e8-original-audit/out/FIRST_EIGHTH32_STRICT_TRUE_NONLINEAR_MACRO_AUDIT.json \
+            | tee /tmp/e8-original-audit/out/POSTGRADE_DEFINITIONS_AND_COST_FROZEN_LOG.txt
+          sha256sum /tmp/e8-original-audit/out/FIRST_EIGHTH32_STRICT_TRUE_NONLINEAR_MACRO_AUDIT.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-eighth32-first-original-frozen-exact-true-nonlinear-learned-macro-audit
+          path: /tmp/e8-original-audit/out/
+          if-no-files-found: error

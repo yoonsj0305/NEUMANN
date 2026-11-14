@@ -1,0 +1,163 @@
+name: NEUMANN Q3 first learned graph STRUCTURE action from source rewards original tenth32
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_structural_action_tenth32_exact.yml'
+      - 'research/q3/learned_structural_graph_action_tenth32.py'
+      - 'research/g0/erbench_original_tenth.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  pin_original_author_and_withhold_true_formula:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - name: Freeze author original 10k original corpus SHA and never-previously-graded tenth32 metadata before inference
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3t/source /tmp/q3t/truth /tmp/q3t/corpus
+          python - <<'PY'
+          import urllib.request,pathlib,hashlib
+          revision='95bf15c27de68c3f170ca6140d2e4a811c60344f'
+          url='https://huggingface.co/datasets/EquationDiscovery/Equation_Recovery_Benchmark/resolve/'+revision+'/train.csv?download=true'
+          request=urllib.request.Request(url,headers={'User-Agent':'NEUMANN-Q3-structural-real-original-tenth32/1'})
+          with urllib.request.urlopen(request,timeout=70) as f:data=f.read()
+          sha=hashlib.sha256(data).hexdigest()
+          assert sha=='03c0ceb53ed0348650c0a94ed5cd1e452325d2b7c7d3be68f9a458316eda33b1'
+          pathlib.Path('/tmp/q3t/corpus/original.csv').write_bytes(data)
+          print('ORIGINAL_AUTHOR_CORPUS_AND_COMMIT_PIN_VERIFIED',revision,sha)
+          PY
+          OPENBLAS_NUM_THREADS=1 python research/g0/erbench_original_tenth.py --mode prepare \
+            --csv-path /tmp/q3t/corpus/original.csv \
+            --revision 95bf15c27de68c3f170ca6140d2e4a811c60344f \
+            --source /tmp/q3t/source/TENTH32_PUBLIC_SOURCE_NUMERIC_ONLY.json \
+            --truth /tmp/q3t/truth/TENTH32_PRIVATE_TRUE_AUTHOR_EQUATIONS.json
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/q3t/source/TENTH32_PUBLIC_SOURCE_NUMERIC_ONLY.json'))
+          assert x['all_selected']==32
+          assert len(x['source_numeric_without_equations'])==32
+          assert all('original_expression' not in e for e in x['source_numeric_without_equations'])
+          print('TENTH32_ORIGINAL_TRUE_AUTHOR_EXPRESSIONS_PHYSICALLY_WITHHELD')
+          PY
+          rm /tmp/q3t/corpus/original.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-tenth32-author-source-only-numeric
+          path: /tmp/q3t/source/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-tenth32-private-true-author-function-grader-only
+          path: /tmp/q3t/truth/
+          if-no-files-found: error
+  actual_structural_action_neural_training_and_source_only_self_reward:
+    needs: pin_original_author_and_withhold_true_formula
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39913799990
+          name: q3-sx-online-no-label-training-original128-only-numeric
+          github-token: ${{ github.token }}
+          path: /tmp/q3t/train
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-tenth32-author-source-only-numeric
+          path: /tmp/q3t/source
+      - name: Unit controls prove all five graph edit operators are executable and structure truly constructed from numeric source
+        run: |
+          set -euo pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/g0:research/q3 python - <<'PY'
+          import numpy as np
+          from learned_structural_graph_action_tenth32 import ACTIONS,source_context,best_program,TRAIN_SEED
+          x=np.linspace(0.1,1.7,48)
+          test=[
+            ('ADD_BRANCH',lambda x:2*(x-1)**3/9+2*(2*x+1)**3/9-2),
+            ('MULTIPLY_BRANCH',lambda x:x*x),
+            ('COMPOSE_UNARY',lambda x:(x+1)**4),
+            ('RATIONAL_REWRITE',lambda x:(2*x+1)/(x+2))
+          ]
+          assert len(ACTIONS)==5
+          for action,fun in test:
+             row={'x':x.tolist(),'y':fun(x).tolist()}
+             inp=source_context(row)
+             assert inp is not None,(action,'SOURCE_CONTEXT_INVALID')
+             err,macro,calls=best_program(inp,action,[])
+             assert calls>0,(action,'NO_REAL_GRAPH_SEARCH')
+             assert np.isfinite(err),(action,'NO_NUMERIC_ACTION_REWARD')
+             print('STRUCTURE_ACTION_EXECUTABLE',action,'source_best',err,'generated_lambda',macro and macro['named_lambda'])
+          negative={'x':x.tolist(),'y':(np.sin(x)+0.13*x**5).tolist()}
+          assert best_program(source_context(negative),'REUSE_BINDING',[])[1] is None
+          print('Q3_ACTUAL_STRUCTURAL_ACTION_AND_EMPTY_MEMORY_NEGATIVE_CONTROLS_PASS')
+          PY
+      - name: Learn graph topology ACTIONS from real OTHER ORIGINAL author numeric task rewards, freeze proposals before true authored equations
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3t/pred
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/g0:research/q3 \
+            python research/q3/learned_structural_graph_action_tenth32.py --mode infer \
+            --train /tmp/q3t/train/OTHER_ORIGINAL128_NUMERIC_XY_NO_FORMULA.json \
+            --source /tmp/q3t/source/TENTH32_PUBLIC_SOURCE_NUMERIC_ONLY.json \
+            --pred /tmp/q3t/pred/FIRST_TENTH32_LEARNED_STRUCTURAL_EDIT_MACROS_AND_ALL_CLASSICAL.json \
+            | tee /tmp/q3t/pred/FIRST_REWARD_POLICY_AND_TYPED_NEW_AST_MACROS.log
+          sha256sum /tmp/q3t/pred/FIRST_TENTH32_LEARNED_STRUCTURAL_EDIT_MACROS_AND_ALL_CLASSICAL.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-tenth32-frozen-structural-action-neural-macros-before-authored-grade
+          path: /tmp/q3t/pred/
+          if-no-files-found: error
+  independent_authored_original_full_symbolic_truth_after_freeze:
+    needs: actual_structural_action_neural_training_and_source_only_self_reward
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-tenth32-private-true-author-function-grader-only
+          path: /tmp/q3t/truth
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-tenth32-frozen-structural-action-neural-macros-before-authored-grade
+          path: /tmp/q3t/pred
+      - name: Independently prove full original functions against author exact symbolic math, all methods same 32
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3t/grade
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0:research/q3 \
+            python research/q3/learned_structural_graph_action_tenth32.py --mode grade \
+            --truth /tmp/q3t/truth/TENTH32_PRIVATE_TRUE_AUTHOR_EQUATIONS.json \
+            --pred /tmp/q3t/pred/FIRST_TENTH32_LEARNED_STRUCTURAL_EDIT_MACROS_AND_ALL_CLASSICAL.json \
+            --out /tmp/q3t/grade/TENTH32_FIRST_TRUE_AUTHOR_SYMBOLIC_EQUIVALENCE_ALL_STRUCTURAL_ARMS.json \
+            | tee /tmp/q3t/grade/INDEPENDENT_TENTH_ORIGINAL_AUTHOR_EXACT_GRADE.log
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/q3t/grade/TENTH32_FIRST_TRUE_AUTHOR_SYMBOLIC_EQUIVALENCE_ALL_STRUCTURAL_ARMS.json'))
+          assert len(d['method_source_author_full_expression_grades'])==4
+          assert all(x['all']==32 for x in d['method_source_author_full_expression_grades'].values())
+          assert d['G1']=='HOLD' and d['Q3']=='OPEN'
+          print('COMPLETE_TENTH32_TRUE_ORIGINALS_ALL_ACCOUNTED')
+          PY
+          sha256sum /tmp/q3t/grade/TENTH32_FIRST_TRUE_AUTHOR_SYMBOLIC_EQUIVALENCE_ALL_STRUCTURAL_ARMS.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-tenth32-independent-original-author-full-symbolic-proof-structural-edit
+          path: /tmp/q3t/grade/
+          if-no-files-found: error

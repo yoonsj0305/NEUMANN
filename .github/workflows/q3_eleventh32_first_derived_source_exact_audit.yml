@@ -1,0 +1,62 @@
+name: NEUMANN Q3 immutable first original eleventh32 genuine derived power symbolic proofs
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_eleventh32_first_derived_source_exact_audit.yml'
+      - 'research/q3/eleventh32_locked_nonrational_macro_audit.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  certify_two_original_author_nonrational_operators:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39936479218
+          name: neumann-q3-eleventh-original-source-only
+          github-token: ${{ github.token }}
+          path: /tmp/q3eleventh/source
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39936479218
+          name: neumann-q3-eleventh-original-private-author-truth
+          github-token: ${{ github.token }}
+          path: /tmp/q3eleventh/truth
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39936479218
+          name: neumann-q3-eleventh-original-sealed-learned-exp-log-derived-macros
+          github-token: ${{ github.token }}
+          path: /tmp/q3eleventh/pred
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39936479218
+          name: neumann-q3-eleventh-original-full-authored-exact-derived-operator-grade
+          github-token: ${{ github.token }}
+          path: /tmp/q3eleventh/grade
+      - name: Verify all source/truth/pred/grade original SHA and prove exact named operator and additional two original authors
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3eleventh/audit
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/q3/eleventh32_locked_nonrational_macro_audit.py \
+            --source /tmp/q3eleventh/source/ELEVENTH32_NUMERIC_NO_AUTHOR_TRUTH.json \
+            --truth /tmp/q3eleventh/truth/ELEVENTH32_PRIVATE_AUTHOR_EQUATIONS.json \
+            --pred /tmp/q3eleventh/pred/FIRST_ELEVENTH32_DERIVED_EXPLOG_POWER_AND_CLASSICAL_MACROS.json \
+            --grade /tmp/q3eleventh/grade/FIRST_ELEVENTH32_DERIVED_OPERATOR_EXACT_AUTHOR_FUNCTION_GRADE.json \
+            --out /tmp/q3eleventh/audit/FIRST_TWO_REAL_ORIGINAL_DERIVED_EXPLOG_MACROS_CERTIFIED.json \
+            | tee /tmp/q3eleventh/audit/NATIVE_AUTHOR_TRUE_OPERATOR_EQUIVALENCE.log
+          sha256sum /tmp/q3eleventh/audit/FIRST_TWO_REAL_ORIGINAL_DERIVED_EXPLOG_MACROS_CERTIFIED.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-eleventh-first-real-author-two-derived-exp-log-macros-proof
+          path: /tmp/q3eleventh/audit/
+          if-no-files-found: error

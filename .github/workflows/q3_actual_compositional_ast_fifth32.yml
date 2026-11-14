@@ -1,0 +1,143 @@
+name: NEUMANN Q3 original fifth32 actual learned compositional AST versus full classical primitive graph
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_actual_compositional_ast_fifth32.yml'
+      - 'research/g0/erbench_original_fifth.py'
+      - 'research/q3/real_learned_compositional_ast_external.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_author_train_data_and_fifth32_truth_isolation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - name: Freeze external author source original SHA without test output access
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/author-5/original /tmp/author-5/source /tmp/author-5/private /tmp/author-5/train
+          python - <<'PY'
+          import urllib.request,hashlib,pathlib
+          commit="95bf15c27de68c3f170ca6140d2e4a811c60344f"
+          url="https://huggingface.co/datasets/EquationDiscovery/Equation_Recovery_Benchmark/resolve/"+commit+"/train.csv?download=true"
+          with urllib.request.urlopen(urllib.request.Request(url,headers={"User-Agent":"NEUMANN-Q3-learned-compositional-AST/1"}),timeout=60) as f:raw=f.read()
+          assert hashlib.sha256(raw).hexdigest()=="03c0ceb53ed0348650c0a94ed5cd1e452325d2b7c7d3be68f9a458316eda33b1"
+          pathlib.Path("/tmp/author-5/original/frozen.csv").write_bytes(raw)
+          print("EXTERNAL_ORIGINAL_AUTHOR_SHA_VERIFIED",commit,len(raw))
+          PY
+      - name: Prepare first future fifth32 source-only x/y and separate training original author primitive labels
+        run: |
+          set -euo pipefail
+          export OPENBLAS_NUM_THREADS=1
+          PYTHONPATH=research/g0 python research/q3/real_learned_compositional_ast_external.py --mode train_data \
+            --csv-path /tmp/author-5/original/frozen.csv \
+            --train /tmp/author-5/train/TRAIN_NONOVERLAP_ORIGINAL_SEMANTIC_OPERATOR_SIGNAL.json
+          python research/g0/erbench_original_fifth.py --mode prepare \
+            --csv-path /tmp/author-5/original/frozen.csv \
+            --revision 95bf15c27de68c3f170ca6140d2e4a811c60344f \
+            --source /tmp/author-5/source/FIFTH32_NUMERIC_SOURCE_WITHOUT_TRUE_FORMULA.json \
+            --truth /tmp/author-5/private/FIFTH32_PRIVATE_EXACT_ORIGINAL_EQUATIONS.json
+          python - <<'PY'
+          import json
+          a=json.load(open("/tmp/author-5/train/TRAIN_NONOVERLAP_ORIGINAL_SEMANTIC_OPERATOR_SIGNAL.json"))
+          b=json.load(open("/tmp/author-5/source/FIFTH32_NUMERIC_SOURCE_WITHOUT_TRUE_FORMULA.json"))
+          assert a["train_ranks"]==[96,2096] and a["evaluation_ranks"]==[2128,2160]
+          assert b["all_selected"]==32
+          print("COMPLETE_FIRST_HOLDOUT_FIFTH32_PHYSICALLY_DISJOINT",len(a["samples"]),len(b["source_numeric_without_equations"]))
+          PY
+          rm -f /tmp/author-5/original/frozen.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-fifth32-source-only-public-original-numeric-observations
+          path: /tmp/author-5/source/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-originals-outside-fifth32-train-input-output-primitive-supervision
+          path: /tmp/author-5/train/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-fifth32-private-full-original-author-formulas-grader-only
+          path: /tmp/author-5/private/
+          if-no-files-found: error
+  actual_trained_neural_generated_expression_program_and_exhaustive_ablations:
+    needs: original_author_train_data_and_fifth32_truth_isolation
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-fifth32-source-only-public-original-numeric-observations
+          path: /tmp/5-source
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-originals-outside-fifth32-train-input-output-primitive-supervision
+          path: /tmp/5-train
+      - name: Train actual neural primitive operator ranking then synthesize new 1- and 2-feature typed ASTs without original formulas
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/5-source-pred
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/q3/real_learned_compositional_ast_external.py --mode infer \
+            --train /tmp/5-train/TRAIN_NONOVERLAP_ORIGINAL_SEMANTIC_OPERATOR_SIGNAL.json \
+            --source /tmp/5-source/FIFTH32_NUMERIC_SOURCE_WITHOUT_TRUE_FORMULA.json \
+            --pred /tmp/5-source-pred/NEW_AST_AND_CLASSICAL_SAME_PRIMITIVES_SOURCE_ONLY.json \
+            | tee /tmp/5-source-pred/BEFORE_AUTHOR_GRADE_NEW_COMPOSITE_PROGRAMS.log
+          sha256sum /tmp/5-source-pred/NEW_AST_AND_CLASSICAL_SAME_PRIMITIVES_SOURCE_ONLY.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-external-original-fifth32-sealed-neural-generated-AST-programs-before-author-grade
+          path: /tmp/5-source-pred/
+          if-no-files-found: error
+  immutable_first_native_author_expression_semantic_grade:
+    needs: actual_trained_neural_generated_expression_program_and_exhaustive_ablations
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-fifth32-private-full-original-author-formulas-grader-only
+          path: /tmp/5-private
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-external-original-fifth32-sealed-neural-generated-AST-programs-before-author-grade
+          path: /tmp/5-source-pred
+      - name: Full original author symbolic identity for every admitted candidate versus equal-rights classical
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/5-independent-grader
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/q3/real_learned_compositional_ast_external.py --mode grade \
+            --truth /tmp/5-private/FIFTH32_PRIVATE_EXACT_ORIGINAL_EQUATIONS.json \
+            --pred /tmp/5-source-pred/NEW_AST_AND_CLASSICAL_SAME_PRIMITIVES_SOURCE_ONLY.json \
+            --out /tmp/5-independent-grader/FIFTH32_FIRST_NATIVE_AUTHOR_EXACT_GRADE.json \
+            | tee /tmp/5-independent-grader/ORIGINAL_AUTHOR_EXACT_GRADE.log
+          python - <<'PY'
+          import json
+          obj=json.load(open('/tmp/5-independent-grader/FIFTH32_FIRST_NATIVE_AUTHOR_EXACT_GRADE.json'))
+          assert all(z['total']==32 for z in obj['scores'].values())
+          assert obj['learned_semantically_new_atomic_operator']=='NOT_PROVED'
+          assert obj['G1']=='HOLD'
+          print('SCOPED_LEARNED_COMPOSITION_NOT_NEW_SEMANTIC_ATOM')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-fifth32-independent-original-author-exact-compositional-AST-grade
+          path: /tmp/5-independent-grader/
+          if-no-files-found: error

@@ -1,0 +1,55 @@
+name: NEUMANN Q3 original real exponential rank TWO nonreducibility SHA-locked proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_eleventh32_real_2_exp_minimality.yml'
+      - 'research/q3/eleventh32_two_exponential_exact_minimality.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  certify_real_original_two_distinct_exponentials_strictly_necessary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39936479218
+          name: neumann-q3-eleventh-original-private-author-truth
+          github-token: ${{ github.token }}
+          path: /tmp/q3-exprank/truth
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39936479218
+          name: neumann-q3-eleventh-original-sealed-learned-exp-log-derived-macros
+          github-token: ${{ github.token }}
+          path: /tmp/q3-exprank/pred
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39936479218
+          name: neumann-q3-eleventh-original-full-authored-exact-derived-operator-grade
+          github-token: ${{ github.token }}
+          path: /tmp/q3-exprank/grade
+      - name: Assert THREE immutable first source receipts then check REAL exponential differential minimality + first generated macro exact identity
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-exprank/out
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/q3/eleventh32_two_exponential_exact_minimality.py \
+            --truth /tmp/q3-exprank/truth/ELEVENTH32_PRIVATE_AUTHOR_EQUATIONS.json \
+            --pred /tmp/q3-exprank/pred/FIRST_ELEVENTH32_DERIVED_EXPLOG_POWER_AND_CLASSICAL_MACROS.json \
+            --grade /tmp/q3-exprank/grade/FIRST_ELEVENTH32_DERIVED_OPERATOR_EXACT_AUTHOR_FUNCTION_GRADE.json \
+            --out /tmp/q3-exprank/out/EXACT_ORIGINAL_TWO_EXPONENTS_NONREDUCIBLE_TO_ONE_REAL_EXP.json \
+            | tee /tmp/q3-exprank/out/ORIGINAL_FIRST_2_EXP_MATHEMATICAL_PROOF.log
+          sha256sum /tmp/q3-exprank/out/EXACT_ORIGINAL_TWO_EXPONENTS_NONREDUCIBLE_TO_ONE_REAL_EXP.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-original-exp-log-two-macros-strict-real-exponential-rank-proof
+          path: /tmp/q3-exprank/out/
+          if-no-files-found: error

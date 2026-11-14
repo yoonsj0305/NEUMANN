@@ -1,0 +1,164 @@
+name: NEUMANN Q3 learn reusable nested nonlinear graph macros on new original eighth32
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/q3_nested_macro_eighth32_exact.yml"
+      - "research/g0/erbench_original_eighth.py"
+      - "research/q3/learned_compositional_unary_macro_eighth32.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  pin_external_original_and_physically_isolate_author_truth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - name: Verify pin of authentic public external author dataset before any actual sampled input
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-eighth/corpus /tmp/q3-eighth/source /tmp/q3-eighth/secret
+          python - <<'PY'
+          import urllib.request,hashlib,pathlib
+          commit="95bf15c27de68c3f170ca6140d2e4a811c60344f"
+          url="https://huggingface.co/datasets/EquationDiscovery/Equation_Recovery_Benchmark/resolve/"+commit+"/train.csv?download=true"
+          req=urllib.request.Request(url,headers={"User-Agent":"NEUMANN-Q3-nested-learned-macro-public-original-eighth32/1"})
+          with urllib.request.urlopen(req,timeout=70) as f: raw=f.read()
+          digest=hashlib.sha256(raw).hexdigest()
+          assert digest=="03c0ceb53ed0348650c0a94ed5cd1e452325d2b7c7d3be68f9a458316eda33b1"
+          pathlib.Path("/tmp/q3-eighth/corpus/true_author.csv").write_bytes(raw)
+          print("Q3_EIGHTH_ORIGINAL_AUTHOR_SHA_PIN_VERIFIED",commit,digest)
+          PY
+      - name: Freeze never-tested EIGHTH original32 IDs ranks 2224:2256 before truth-aided grading
+        run: |
+          set -euo pipefail
+          OPENBLAS_NUM_THREADS=1 python research/g0/erbench_original_eighth.py --mode prepare \
+            --csv-path /tmp/q3-eighth/corpus/true_author.csv \
+            --revision 95bf15c27de68c3f170ca6140d2e4a811c60344f \
+            --source /tmp/q3-eighth/source/EIGHTH32_NUMERIC_SOURCE_WITHOUT_TRUE_FORMULAS.json \
+            --truth /tmp/q3-eighth/secret/EIGHTH32_PRIVATE_FULL_AUTHOR_EQUATIONS.json
+          python - <<'PY'
+          import json
+          a=json.load(open('/tmp/q3-eighth/source/EIGHTH32_NUMERIC_SOURCE_WITHOUT_TRUE_FORMULAS.json'))
+          assert a['all_selected']==32 and len(a['source_numeric_without_equations'])==32
+          assert all('original_expression' not in v for v in a['source_numeric_without_equations'])
+          print("Q3_REAL_EXTERNAL_UNSEEN_EIGHTH32_SOURCE_TRUE_AUTHOR_FORMULAS_EXCLUDED")
+          PY
+          rm -f /tmp/q3-eighth/corpus/true_author.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-eighth32-source-only-actual-public-author-numeric
+          path: /tmp/q3-eighth/source/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-eighth32-actual-private-full-author-equations-grader-only
+          path: /tmp/q3-eighth/secret/
+          if-no-files-found: error
+  actual_self_reward_learned_graph_macros_and_all_matched_baselines:
+    needs: pin_external_original_and_physically_isolate_author_truth
+    runs-on: ubuntu-latest
+    timeout-minutes: 23
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39913799990
+          name: q3-sx-online-no-label-training-original128-only-numeric
+          github-token: ${{ github.token }}
+          path: /tmp/q3-eighth/training-other-originals
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-eighth32-source-only-actual-public-author-numeric
+          path: /tmp/q3-eighth/source-only
+      - name: Unit-prove that newly composed nonlinear lambda ASTs pass source reconstruction, invalid guesses reject
+        run: |
+          set -euo pipefail
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0:research/q3 python - <<'PY'
+          import numpy as np,sympy as sp
+          from learned_compositional_unary_macro_eighth32 import numeric_exact_source_reward,build_macro,X,ACTIONS
+          x=np.linspace(.2,1.9,48)
+          examples=[
+             (("S2","Z1","ID","SIN"),lambda x:3*np.sin(2*x+1)+2),
+             (("SN1","Z0","ID","EXP"),lambda x:np.exp(-x)+1),
+             (("S1","Z0","SIN","COS"),lambda x:np.cos(np.sin(x))),
+             (("S1","Z2","ID","LOG"),lambda x:np.log(x+2)),
+             (("S2","Z0","ID","TANH"),lambda x:2*np.tanh(2*x)+1)
+          ]
+          for path,f in examples:
+              res=numeric_exact_source_reward({'x':x.tolist(),'y':f(x).tolist()},path)
+              assert res is not None,('NONLINEAR_AST_POSITIVE_CONTROL',path)
+              expr=sp.sympify(res['named_lambda'].replace('lambda x: ',''),locals={'x':X})
+              assert sp.count_ops(expr)>=1
+          reject=numeric_exact_source_reward(
+               {'x':x.tolist(),'y':np.cos(np.sin(x)).tolist()},
+               ("S1","Z0","ID","SIN"))
+          assert reject is None,'WRONG_MACRO_WAS_ACCEPTED'
+          assert len(ACTIONS)==3920
+          print("Q3_REAL_UNARY_NESTED_GRAPH_5_NONLINEAR_POSITIVE_CONTROLS_PASS_AND_BAD_GUESS_REJECT")
+          PY
+      - name: Freeze real learned AST actions, matched 512-program random/heuristic, full 3920 classical
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-eighth/pregrade
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/g0:research/q3 \
+            python research/q3/learned_compositional_unary_macro_eighth32.py --mode infer \
+            --train /tmp/q3-eighth/training-other-originals/OTHER_ORIGINAL128_NUMERIC_XY_NO_FORMULA.json \
+            --source /tmp/q3-eighth/source-only/EIGHTH32_NUMERIC_SOURCE_WITHOUT_TRUE_FORMULAS.json \
+            --pred /tmp/q3-eighth/pregrade/FIRST_NEURAL_AND_CLASSICAL_NESTED_MACRO_PREDICTIONS.json \
+            | tee /tmp/q3-eighth/pregrade/PRE_GRADE_NOVEL_MACRO_LEARNING_AND_COMPARE.log
+          sha256sum /tmp/q3-eighth/pregrade/FIRST_NEURAL_AND_CLASSICAL_NESTED_MACRO_PREDICTIONS.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-eighth32-frozen-nonlinear-learned-generated-macro-and-classical-pregrade
+          path: /tmp/q3-eighth/pregrade/
+          if-no-files-found: error
+  first_independent_original_author_entire_function_symbolic_equivalence:
+    needs: actual_self_reward_learned_graph_macros_and_all_matched_baselines
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-eighth32-actual-private-full-author-equations-grader-only
+          path: /tmp/q3-eighth/private
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-eighth32-frozen-nonlinear-learned-generated-macro-and-classical-pregrade
+          path: /tmp/q3-eighth/pregrade
+      - name: Independent exact original source author FULL mathematical function equality for all four arms
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-eighth/graded
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0:research/q3 \
+            python research/q3/learned_compositional_unary_macro_eighth32.py --mode grade \
+            --truth /tmp/q3-eighth/private/EIGHTH32_PRIVATE_FULL_AUTHOR_EQUATIONS.json \
+            --pred /tmp/q3-eighth/pregrade/FIRST_NEURAL_AND_CLASSICAL_NESTED_MACRO_PREDICTIONS.json \
+            --out /tmp/q3-eighth/graded/FIRST_EIGHTH32_FULL_ORIGINAL_NONLINEAR_MACRO_EXACT_GRADE.json \
+            | tee /tmp/q3-eighth/graded/INDEPENDENT_AUTHOR_ORIGINAL_EXACT_NONLINEAR_GRADE.log
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3-eighth/graded/FIRST_EIGHTH32_FULL_ORIGINAL_NONLINEAR_MACRO_EXACT_GRADE.json'))
+          assert all(z['total_originals']==32 for z in r['native_full_source_exact_author_grade'].values())
+          assert r['G1']=='HOLD' and r['global_Q3']=='OPEN'
+          print('FIRST_FRESH_AUTHOR_32_CASES_ACCOUNTED_ZERO_FALSE_CERTIFIED')
+          PY
+          sha256sum /tmp/q3-eighth/graded/FIRST_EIGHTH32_FULL_ORIGINAL_NONLINEAR_MACRO_EXACT_GRADE.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-eighth32-first-real-author-full-original-nonlinear-macro-independent-grade
+          path: /tmp/q3-eighth/graded/
+          if-no-files-found: error

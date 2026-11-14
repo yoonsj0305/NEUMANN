@@ -1,0 +1,42 @@
+name: NEUMANN Q6 freeze actual trained MLP into exact deployable artifact and replay without refitting
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q6_source_trained_policy_checkpoint_exact.yml'
+      - 'research/q3/serialize_source_only_learned_graph_policy.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  one_time_train_prior_original_numeric_only_then_bit_exact_model_replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39913799990
+          name: q3-sx-online-no-label-training-original128-only-numeric
+          github-token: ${{ github.token }}
+          path: /tmp/q6-freeze/training_source
+      - name: Actual old author source-only MLP train ONCE then save trusted checkpoint, prove 60 test predictions plus every weight/intercept exactly identical after reload
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q6-freeze/checkpoint
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/g0:research/q3 \
+            python research/q3/serialize_source_only_learned_graph_policy.py \
+            --train /tmp/q6-freeze/training_source/OTHER_ORIGINAL128_NUMERIC_XY_NO_FORMULA.json \
+            --model /tmp/q6-freeze/checkpoint/SOURCE_REWARD_TRAINED_GRAPH_STRUCTURE_POLICY.joblib \
+            --receipt /tmp/q6-freeze/checkpoint/ACTUAL_BIT_EXACT_SOURCE_ONLY_TRAINED_MODEL_CHECKPOINT_PROOF.json \
+            | tee /tmp/q6-freeze/checkpoint/FIRST_TRUE_SERIALIZED_MODEL_PREDICTION_IDENTITY_LOG.txt
+          sha256sum /tmp/q6-freeze/checkpoint/*
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q6-source-only-trained-model-exact-serialized-future-independent-author-checkpoint
+          path: /tmp/q6-freeze/checkpoint/
+          if-no-files-found: error

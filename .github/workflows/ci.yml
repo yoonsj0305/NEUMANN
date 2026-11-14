@@ -225,3 +225,146 @@ jobs:
         run: pytest -q tests/test_lp_expand4_holdout_replay_v102.py
       - name: Matched tiny-Transformer benchmark
         run: python benchmark_v031.py
+
+
+  # Q3 original12 author-source-first jobs in existing trusted CI because
+  # GitHub did not register the new standalone workflow on branch PR.
+  # These three jobs are temporary branch-only research and NOT merged by default.
+  physically_separate_first_12_authored_equations_from_source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - name: Freeze original author Keijzer seven and Neat five by task metadata from pinned DSO source
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-q3new/source /tmp/q3-q3new/gold
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/q3:research/g0 \
+            python research/q3/first_keijzer_neat_source_only.py \
+            --source /tmp/q3-q3new/source/ORIGINAL12_XY_SOURCE_ONLY.json \
+            --truth /tmp/q3-q3new/gold/ORIGINAL12_TRUE_AUTHOR_FORMULAS_GRADER_ONLY.json \
+            | tee /tmp/q3-q3new/source/FIRST_AUTHOR_PIN_AND_PHYSICAL_SOURCE_TRUTH_LOG.txt
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3-q3new/source/ORIGINAL12_XY_SOURCE_ONLY.json'))
+          assert len(r['source_numeric_without_equations'])==12
+          assert all('original_expression' not in t and 'author_full_expression_sympy' not in t for t in r['source_numeric_without_equations'])
+          assert all(t['collection'] in ('DSO_Keijzer','DSO_Neat') for t in r['source_numeric_without_equations'])
+          print("ORIGINAL12_PUBLISHED_OTHER_AUTHOR_EQNS_PHYSICALLY_WITHHELD_FROM_MODEL")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-first-new-keijzer7-neat5-source-only-real-original-x-y
+          path: /tmp/q3-q3new/source/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-first-new-keijzer7-neat5-gold-full-author-original-graders-only
+          path: /tmp/q3-q3new/gold/
+          if-no-files-found: error
+  actually_train_neural_edits_from_independent_source_reward_then_SHA_freeze:
+    needs: physically_separate_first_12_authored_equations_from_source
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-first-new-keijzer7-neat5-source-only-real-original-x-y
+          path: /tmp/q3-q3new/source/
+      - name: Mechanism controls: all five graph-edit families actually execute, graph constructs new lambda and no fabricated source exact
+        run: |
+          set -euo pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/q3:research/g0 python - <<'PY'
+          import numpy as np,sympy as sp
+          from learned_dynamic_graph_family_2authors import ACTIONS,GRAMMARS,execute,X
+          assert len(ACTIONS)==5 and all(len(g)>20 for g in GRAMMARS.values())
+          x=np.linspace(.15,1.1,48)
+          examples={
+           'POLYNOMIAL':x**4+2*x**2+x,
+           'TRIG_PRODUCT':np.sin(x**2)*np.cos(x)-5,
+           'LOG_SUM':np.log(x**2+x)+np.log(x**3+x),
+           'EXP_ROOT':np.exp(-x**2),
+           'SAFE':(x+1)/(x+2),
+          }
+          for action,y in examples.items():
+              row={'x':x.tolist(),'y':y.tolist()}
+              proposal,calls,nodes=execute(row,action)
+              assert calls>0,(action,'ACTION_DID_NOT_RUN')
+              assert proposal is not None,(action,'NO_EXECUTABLE_VERIFIED_SOURCE_MACRO')
+              expr=sp.sympify(proposal['defined_operator_AST'],locals={'x':X})
+              assert expr.has(X),(action,'NOT_A_VARIABLE_FUNCTION')
+              print('ACTUAL_GRAPH_EDIT_SOURCE_POSITIVE_CONTROL_PASS',action,
+                    'lambda',proposal['named_lambda'],'fits',calls,'nodes',nodes)
+          # Wrong targets may generate float fits but must not become exact.
+          bad={'x':x.tolist(),'y':(np.sin(x)+.017*x**7).tolist()}
+          proposal,_,_=execute(bad,'EXP_ROOT')
+          assert proposal is None,'WRONG_GRAPH_ACCEPTED_WITHOUT_SOURCE_PROOF'
+          print('Q3_GRAPH_EDIT_CONSTRUCTION_POSITIVE5_NEGATIVE1_PASS')
+          PY
+      - name: Train model on 60 independent synthetic source-only tasks and independently infer exact 12 actual author numeric originals with four strong source controls
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-q3new/pregrade
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/q3:research/g0 \
+            python research/q3/learned_dynamic_graph_family_2authors.py --mode infer \
+            --source /tmp/q3-q3new/source/ORIGINAL12_XY_SOURCE_ONLY.json \
+            --pred /tmp/q3-q3new/pregrade/FIRST_NEURAL_RECURSIVE_GRAPH_AND_FOUR_CLASSICAL_12_PRED.json \
+            | tee /tmp/q3-q3new/pregrade/FIRST_MODEL_SELF_REWARD_AND_GRAPH_CONSTRUCTION.log
+          sha256sum /tmp/q3-q3new/pregrade/FIRST_NEURAL_RECURSIVE_GRAPH_AND_FOUR_CLASSICAL_12_PRED.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-first-new-keijzer7-neat5-sealed-real-learned-graph-edit-predictions
+          path: /tmp/q3-q3new/pregrade/
+          if-no-files-found: error
+  third_party_style_original_author_entire_analytic_formula_exact_grader:
+    needs: actually_train_neural_edits_from_independent_source_reward_then_SHA_freeze
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-first-new-keijzer7-neat5-gold-full-author-original-graders-only
+          path: /tmp/q3-q3new/gold/
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-first-new-keijzer7-neat5-sealed-real-learned-graph-edit-predictions
+          path: /tmp/q3-q3new/pred/
+      - name: Exact published author's full analytic symbolic formula, not source numeric approximate only, 12/12 accounted PASS or UNKNOWN
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-q3new/grade
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/q3:research/g0 \
+            python research/q3/learned_dynamic_graph_family_2authors.py --mode grade \
+            --truth /tmp/q3-q3new/gold/ORIGINAL12_TRUE_AUTHOR_FORMULAS_GRADER_ONLY.json \
+            --pred /tmp/q3-q3new/pred/FIRST_NEURAL_RECURSIVE_GRAPH_AND_FOUR_CLASSICAL_12_PRED.json \
+            --out /tmp/q3-q3new/grade/FIRST_KEIJZER7_NEAT5_PUBLISHED_AUTHOR_ORIGINAL_EXACT_GRADE.json \
+            | tee /tmp/q3-q3new/grade/NATIVE_AUTHOR_REAL_ORIGINAL_INDEPENDENT_FULL_FORMULA_EQUIVALENCE.log
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3-q3new/grade/FIRST_KEIJZER7_NEAT5_PUBLISHED_AUTHOR_ORIGINAL_EXACT_GRADE.json'))
+          assert len(r['method_full_author_symbolic_exact'])==6
+          assert all(x['all']==12 for x in r['method_full_author_symbolic_exact'].values())
+          assert r['G1']=='HOLD' and r['Q3_GLOBAL']=='OPEN'
+          print("ALL_FIRST_INDEPENDENT_12_REAL_AUTHOR_ORIGINALS_ACCOUNTED")
+          PY
+          sha256sum /tmp/q3-q3new/grade/FIRST_KEIJZER7_NEAT5_PUBLISHED_AUTHOR_ORIGINAL_EXACT_GRADE.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-first-new-keijzer7-neat5-whole-original-real-author-sympy-math-grade
+          path: /tmp/q3-q3new/grade/
+          if-no-files-found: error
+
+# Execution-only 2026-10-24: trigger REGISTERED CI Keijzer+Neat original author three-job grade; model and source code byte-identical to frozen PR554.

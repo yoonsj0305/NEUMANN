@@ -1,0 +1,135 @@
+name: NEUMANN Q3 recursive self-reward macro library + neural AST graph edits NEW original seventh32
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/q3_recursive_macro_original_seventh32.yml"
+      - "research/g0/erbench_original_seventh.py"
+      - "research/q3/learn_recursive_macro_from_external_rewards.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  first_external_original_seventh32_physically_isolate_source_and_full_author_formula:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - name: Same independent author pinned public corpus immutable SHA
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/7th-corpus /tmp/7th-source /tmp/7th-author-private
+          python - <<'PY'
+          import urllib.request,hashlib,pathlib
+          revision="95bf15c27de68c3f170ca6140d2e4a811c60344f"
+          uri="https://huggingface.co/datasets/EquationDiscovery/Equation_Recovery_Benchmark/resolve/"+revision+"/train.csv?download=true"
+          with urllib.request.urlopen(urllib.request.Request(uri,headers={"User-Agent":"NEUMANN-Q3-7th-recursive-macro/1"}),timeout=60) as r:raw=r.read()
+          assert hashlib.sha256(raw).hexdigest()=="03c0ceb53ed0348650c0a94ed5cd1e452325d2b7c7d3be68f9a458316eda33b1"
+          pathlib.Path("/tmp/7th-corpus/original.csv").write_bytes(raw)
+          print("Q3_SEVENTH_EXTERNAL_AUTHOR_UPSTREAM_ORIGINAL_SHA_FROZEN",revision,len(raw),flush=True)
+          PY
+      - name: Exactly 32 previously untouched source-author original IDs, isolate complete true formula until separate grader
+        run: |
+          set -euo pipefail
+          OPENBLAS_NUM_THREADS=1 python research/g0/erbench_original_seventh.py --mode prepare \
+            --csv-path /tmp/7th-corpus/original.csv \
+            --revision 95bf15c27de68c3f170ca6140d2e4a811c60344f \
+            --source /tmp/7th-source/SEVENTH32_NO_FORMULAS_NUMERIC_XY.json \
+            --truth /tmp/7th-author-private/SEVENTH32_TRUE_AUTHOR_ORIGINAL_FORMULAS.json
+          python - <<'PY'
+          import json
+          d=json.load(open("/tmp/7th-source/SEVENTH32_NO_FORMULAS_NUMERIC_XY.json"))
+          assert d['all_selected']==32 and len(d['source_numeric_without_equations'])==32
+          assert d['csv_sha256']=="03c0ceb53ed0348650c0a94ed5cd1e452325d2b7c7d3be68f9a458316eda33b1"
+          print('NEUMANN_7TH_PRESELECTED_UNTOUCHED_32_AUTHOR_SOURCE_ONLY',flush=True)
+          PY
+          rm -f /tmp/7th-corpus/original.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-seventh-first-original32-source-numeric-no-author-formula
+          path: /tmp/7th-source/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-seventh-first-original32-private-full-author-functions
+          path: /tmp/7th-author-private/
+          if-no-files-found: error
+  actual_recursive_neural_graph_macro_training_and_source_programs_sealed:
+    needs: first_external_original_seventh32_physically_isolate_source_and_full_author_formula
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39913799990
+          name: q3-sx-online-no-label-training-original128-only-numeric
+          github-token: ${{ github.token }}
+          path: /tmp/7th-train-frozen
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-seventh-first-original32-source-numeric-no-author-formula
+          path: /tmp/7th-source-only
+      - name: Teach learner ONLY successful self-generated recursive macro source reward, never original author formula
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/7th-pred
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/q3/learn_recursive_macro_from_external_rewards.py --mode infer \
+              --train /tmp/7th-train-frozen/OTHER_ORIGINAL128_NUMERIC_XY_NO_FORMULA.json \
+              --source /tmp/7th-source-only/SEVENTH32_NO_FORMULAS_NUMERIC_XY.json \
+              --pred /tmp/7th-pred/LEARNED_RECURSIVE_MACRO_AND_FULL_CLASSICAL_FIRST_SOURCE_PROGRAMS.json \
+            | tee /tmp/7th-pred/NEURAL_MACRO_LIBRARY_FIRST_PRE_GRADE.log
+          sha256sum /tmp/7th-pred/LEARNED_RECURSIVE_MACRO_AND_FULL_CLASSICAL_FIRST_SOURCE_PROGRAMS.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-seventh-learned-macro-first-source-predictions-before-author-truth
+          path: /tmp/7th-pred/
+          if-no-files-found: error
+  independent_full_original_author_semantic_equivalence_for_learned_and_classical:
+    needs: actual_recursive_neural_graph_macro_training_and_source_programs_sealed
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-seventh-first-original32-private-full-author-functions
+          path: /tmp/7th-secret-author
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-seventh-learned-macro-first-source-predictions-before-author-truth
+          path: /tmp/7th-first-pred
+      - name: Full source author analytic expression identity checked only after immutable source proposal is sealed
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/7th-original-grade
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/q3/learn_recursive_macro_from_external_rewards.py --mode grade \
+              --truth /tmp/7th-secret-author/SEVENTH32_TRUE_AUTHOR_ORIGINAL_FORMULAS.json \
+              --pred /tmp/7th-first-pred/LEARNED_RECURSIVE_MACRO_AND_FULL_CLASSICAL_FIRST_SOURCE_PROGRAMS.json \
+              --out /tmp/7th-original-grade/SEVENTH32_FIRST_EXACT_ORIGINAL_LAMBDA_MACRO_GRADE.json \
+            | tee /tmp/7th-original-grade/FIRST_NATIVE_ORIGINAL_AUTHOR_GRADES.log
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/7th-original-grade/SEVENTH32_FIRST_EXACT_ORIGINAL_LAMBDA_MACRO_GRADE.json'))
+          assert all(s['total']==32 for s in r['all_method_exact_originals'].values())
+          assert r['G1']=='HOLD' and r['global_Q3']=='OPEN'
+          print('ALL_32_ORIGINAL_SEVENTH_AUTHOR_EQUATIONS_GRADED_WITHOUT_UNVERIFIED_ADMISSION')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-seventh-first-independent-true-author-macro-versus-classical-original-proof
+          path: /tmp/7th-original-grade/
+          if-no-files-found: error

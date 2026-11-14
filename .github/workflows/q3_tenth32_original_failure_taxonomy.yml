@@ -1,0 +1,48 @@
+name: NEUMANN Q3 tenth32 exact original unseen failure grammar aftergrade locked audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_tenth32_original_failure_taxonomy.yml'
+      - 'research/q3/tenth32_locked_native_original_failure_taxonomy.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  classify_independent_author_program_form_after_original_grader_without_new_model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39934318424
+          name: neumann-q3-tenth32-private-true-author-function-grader-only
+          github-token: ${{ github.token }}
+          path: /tmp/q3-tenth-tx/private
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39934318424
+          name: neumann-q3-tenth32-independent-original-author-full-symbolic-proof-structural-edit
+          github-token: ${{ github.token }}
+          path: /tmp/q3-tenth-tx/grade
+      - name: Assert first author/gold SHA and inventory all unsupported expressions, only after frozen original grader
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-tenth-tx/out
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/g0 \
+            python research/q3/tenth32_locked_native_original_failure_taxonomy.py \
+            --truth /tmp/q3-tenth-tx/private/TENTH32_PRIVATE_TRUE_AUTHOR_EQUATIONS.json \
+            --grade /tmp/q3-tenth-tx/grade/TENTH32_FIRST_TRUE_AUTHOR_SYMBOLIC_EQUIVALENCE_ALL_STRUCTURAL_ARMS.json \
+            --out /tmp/q3-tenth-tx/out/ORIGINAL_TENTH32_ALL32_AUTHOR_GRAMMAR_FAILURES_AFTER_FIRST_GRADE.json \
+            | tee /tmp/q3-tenth-tx/out/EXACT_SOURCE_OPERATOR_AND_COMPLEXITY_DIAGNOSTICS.log
+          sha256sum /tmp/q3-tenth-tx/out/ORIGINAL_TENTH32_ALL32_AUTHOR_GRAMMAR_FAILURES_AFTER_FIRST_GRADE.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-tenth32-after-original-signed-all32-grammar-failure-taxonomy
+          path: /tmp/q3-tenth-tx/out/
+          if-no-files-found: error

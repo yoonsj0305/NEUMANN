@@ -1,0 +1,145 @@
+name: NEUMANN G0 ERBench second 32 frozen physical-coordinate rationalization prospective author proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/neumann_erbench_second32_physical_rational.yml'
+      - 'research/g0/erbench_original_second.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  metadata_freeze_source_without_truth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Frozen source-only implementation and requirements
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+          python -m py_compile research/g0/erbench_original_second.py
+          python - <<'PY'
+          import sys,numpy as np,sympy as sp
+          sys.path.insert(0,'research/g0')
+          from erbench_original_second import rational_fit
+          X=sp.Symbol('x')
+          a=np.linspace(0.23,3.1,48)
+          for form in (2*X+1, X**2+X/2, (X+1)/(X+2)):
+              f=sp.lambdify(X,form,'numpy')
+              guess,spent=rational_fit(a,np.asarray(f(a),dtype=float))
+              assert guess,('SOURCE_RATIONALIZATION_UNIT_FAIL',form)
+              reconstructed=sp.sympify(guess['expr'],locals={'x':X})
+              assert sp.cancel(reconstructed-form)==0,(form,guess)
+          print('PHYSICAL_X_CANONICALIZATION_THREE_UNIT_FORMS_PASS')
+          PY
+          mkdir -p /tmp/erbench-cohort /tmp/erbench-secret
+      - name: Resolve official external repository SHA BEFORE reading original task equations
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,urllib.request,pathlib,hashlib
+          base="https://huggingface.co"
+          name="EquationDiscovery/Equation_Recovery_Benchmark"
+          def get(uri):
+              req=urllib.request.Request(uri,headers={"User-Agent":"NEUMANN-reproducible-original-G0/1"})
+              with urllib.request.urlopen(req,timeout=45) as f:return f.read()
+          meta=json.loads(get(base+"/api/datasets/"+name))
+          sha=meta["sha"]
+          assert sha=="95bf15c27de68c3f170ca6140d2e4a811c60344f","UPSTREAM_REVISION_CHANGED_ABORT"
+          root=pathlib.Path("/tmp/erbench-cohort")
+          (root/"upstream_sha.txt").write_text(sha+"\n")
+          print("UPSTREAM_ORIGINAL_SHA_FROZEN_BEFORE_CSV_READ",sha,flush=True)
+          raw=get(base+"/datasets/"+name+"/resolve/"+sha+"/train.csv?download=true")
+          assert 40000<len(raw)<8000000,("SOURCE_SIZE_INVALID",len(raw))
+          assert hashlib.sha256(raw).hexdigest()=="03c0ceb53ed0348650c0a94ed5cd1e452325d2b7c7d3be68f9a458316eda33b1","UPSTREAM_CSV_CHANGED_ABORT"
+          (root/"author_train.csv").write_bytes(raw)
+          print("ORIGINAL_PUBLIC_CSV_SHA256",hashlib.sha256(raw).hexdigest(),len(raw),flush=True)
+          PY
+      - name: Original 10000 source scan; ID/hash-selected 32 task cohort, physically separated private true formulas
+        run: |
+          set -euo pipefail
+          python research/g0/erbench_original_second.py --mode prepare \
+            --csv-path /tmp/erbench-cohort/author_train.csv \
+            --revision "$(cat /tmp/erbench-cohort/upstream_sha.txt)" \
+            --source /tmp/erbench-cohort/NUMERIC_SOURCE_ONLY_NO_FORMULAS.json \
+            --truth /tmp/erbench-secret/ORIGINAL_FORMULAS_ONLY_GRADER.json
+          rm /tmp/erbench-cohort/author_train.csv
+          test -s /tmp/erbench-cohort/NUMERIC_SOURCE_ONLY_NO_FORMULAS.json
+          test -s /tmp/erbench-secret/ORIGINAL_FORMULAS_ONLY_GRADER.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: erbench-frozen-second32-numeric-no-original-formula
+          path: /tmp/erbench-cohort/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: erbench-private-original-equations-grader-only
+          path: /tmp/erbench-secret/
+          if-no-files-found: error
+  source_only_classical_first_predictions:
+    needs: metadata_freeze_source_without_truth
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          name: erbench-frozen-second32-numeric-no-original-formula
+          path: /tmp/erbench-numeric
+      - name: Bounded source-only 1D polynomial/rational classical synthesis, no ground truth
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/erbench-pred
+          OPENBLAS_NUM_THREADS=1 python research/g0/erbench_original_second.py --mode infer \
+            --source /tmp/erbench-numeric/NUMERIC_SOURCE_ONLY_NO_FORMULAS.json \
+            --out /tmp/erbench-pred/SOURCE_SEALED_PREDICTIONS.json
+          sha256sum /tmp/erbench-pred/SOURCE_SEALED_PREDICTIONS.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: erbench-source-only-sealed-before-original-independent-grade
+          path: /tmp/erbench-pred/
+          if-no-files-found: error
+  original_author_formula_independent_grade:
+    needs: source_only_classical_first_predictions
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          name: erbench-private-original-equations-grader-only
+          path: /tmp/erbench-private
+      - uses: actions/download-artifact@v4
+        with:
+          name: erbench-source-only-sealed-before-original-independent-grade
+          path: /tmp/erbench-pred
+      - name: Independent original-author exact expression comparison, all 32 tasks kept, G1 HOLD
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/erbench-grade
+          OPENBLAS_NUM_THREADS=1 python research/g0/erbench_original_second.py --mode grade \
+            --source /tmp/erbench-pred/SOURCE_SEALED_PREDICTIONS.json \
+            --truth /tmp/erbench-private/ORIGINAL_FORMULAS_ONLY_GRADER.json \
+            --out /tmp/erbench-grade/INDEPENDENT_ORIGINAL_FORMULA_GRADE.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/erbench-grade/INDEPENDENT_ORIGINAL_FORMULA_GRADE.json'))
+          assert d['counts']['total']==len(d['all_rows'])==32
+          assert d['G1']=='HOLD'
+          print('ORIGINAL_32_DENOMINATOR_ALL_RETAINED')
+          print('NO_UNPROVEN_NEURAL_INVENTION_CLAIM')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: erbench-second-original-32-independent-symbolic-truth-grade
+          path: /tmp/erbench-grade/
+          if-no-files-found: error
