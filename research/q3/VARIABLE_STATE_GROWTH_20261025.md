@@ -1,0 +1,19 @@
+# NEUMANN 1 Q3 · learned residual evidence + variable-state compiler (2026-10-25)
+
+**Research-only draft. This is NOT general autonomous operator invention.**
+
+Previous own-weight direct **fixed 1..4-capacity classifier** scored first frozen 125/411 (and 0/180 previously unseen 5-state tasks). On this study's NEW separate 160 5/6-state tasks the fixed model also scored 0/160 with **64 queried six-bit input words per task**.
+
+New own-weight learned **3 parameter** equality scorer (weights W_MAX -4.431497573852539, W_MEAN -4.19536828994751, BIAS 2.5596377849578857) was fitted in ~0.092 CPU seconds using 8,550 pairs of **behavioral future output signatures** from 2/3/4-state source-only demonstrations. Critically the input includes a HUMAN-COMPUTED 'any mismatch' and mean mismatch, so equality comparison is already straightforward for a classical baseline and the network adds no unique semantic insight.
+
+A HUMAN-WRITTEN observational BFS compiler consults that scorer, appends a new state on novel residual behavior, and emits the complete executable Mealy program with no fixed 4-capacity output head. FIRST source-only on previously unobserved 80 5-state +80 6-state generated machines: **160/160 correct minimal state count**, 160/160 all-future-word bisimulation equivalent against hidden original transition tables; 2000/2000 distinct original state pairs have distinguishing suffixes length<=5, independent further 640 inputs length16/128/1024/4096 correct. Not trained on 5/6-state examples. The generator computed **655,040** end-to-end traces offline (4,094 each), and the compiler actually looked up **66,240** unique oracle words (mean414/task); do not pretend only 66k traces were generated or that this matches the fixed classifier's 64 probes per task.
+
+**Strong equal-evidence classical equality+same BFS** also correctly solves **160/160** in first ~0.155 process CPU seconds vs learned scorer+BFS ~0.429 seconds PLUS training. An adaptive classical variant was ~0.143s but saved ZERO observations for this cohort. Therefore accuracy, compute and information efficiency do **not** establish Q4 or neural-only innovation.
+
+**Information impossibility counterexample:** a minimal **7-state** machine emits all zeros for ALL 126 binary words of length<=6, identical to a 1-state always-zero machine, but emits one on seven consecutive zero symbols. Since the program's bounded query evidence cannot exclude such a hypothesis without a trusted state-capacity upper bound or an equivalence oracle, it returns **PROVISIONAL** only, never CERTIFIED. All finite probe assertions are conditioned on the known target class.
+
+**Full actual data, frozen own-weight torch checkpoints, separate source and gold, standalone all-future-word bisimulation, classical comparisons, negative example, executable code, clean replay script**: `NEUMANN1_Q3_OWNWEIGHT_VARIABLE_STATE_GROWTH_AND_ALIAS_BOUND_20261025.zip` from the current conversation, 33 files, ~788 KB, SHA256 `5eaaf36b32a48273aa9fb60048603e6be93bb55504d1acb4530ef466b3e6de7e`; SHA manifest covers32 archive files. Clean unzip `bash REPRODUCE.sh` completed exit0.
+
+**Gate:** state count not a fixed classifier label = SCOPED_PASS; generated code + all-word equivalence = SCOPED_PASS; first own-weight equality source learning = SCOPED_PASS but **model does not choose suffix depth, discover states' number independently, invent a new semantic primitive or write state-creation policy**. Stronger classical wins. Q3/Q4/Q6/Q7 GLOBAL OPEN; do NOT merge this PR to main without review.
+
+Next scientifically decisive step must be model-owned *operator-language/state-capacity growth policy and discriminating experiments*, tested on untouched independent authors with a strong equal-rights active automata-learning baseline. Stop making more fixed-signature binary transducer benchmarks just to claim 100%.
