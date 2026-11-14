@@ -416,3 +416,69 @@ was pre-registered (directive §7, Phase D).
 | V3 learned discovery policy | development FAIL (Phase C): 0 additional solves |
 | Q3 overall | OPEN |
 | Q6 | OPEN (separate work) |
+
+## 9. Multi-variable state invention and a stage-separated discovery policy (2026-11-14) — DEVELOPMENT ONLY
+
+Same conditions (60 queries, 30 CPU s, classical passive fallback). Opened FRESH tasks and list-routines are
+re-used for development; repeated optimisation on them is not independent evidence; no new FRESH was opened.
+
+### 9.1 Audit of `invent()` (code `29b9a66`)
+
+1. A candidate set had to be ONE variable that explained every observed contradiction; a structure needing two
+   variables (maximum and minimum, first even and first odd) could not be admitted at all.
+2. The candidate class had no case-split fold: the cost-ordered enumeration filled its 700 slots with
+   arithmetic on constants, so running maxima / minima, conditional sums and first-of-a-kind were absent.
+3. With no contradiction observed (`mbpp/588` max − min), admission was vacuous and the Occam order tried
+   arithmetic junk first.
+4. Invention ran only after the answer-state loop had used ~95 % of the formation CPU (0.4 s of 18 s left).
+
+### 9.2 Mechanism (one general mechanism; no operator or solver added)
+
+* Contradictions as a set cover: each candidate explains the contradictions whose two prefixes it separates;
+  admissible sets are single variables explaining all, or pairs whose explained sets cover all.
+* Moore readout: the answer as R(h1[, h2]) of invented variables only. The data are every observed prefix and
+  example; sets cover all pairs of points with different answers; R is checked exactly against the first
+  small programs of the substrate, and pairs are completed by meet-in-the-middle joins through the inverses of
+  the substrate's own add / sub / mul (the partner variable's values are computed, then looked up).
+* Case-split folds `h' = if P(h, e) then A else B` generated from the substrate's predicates and elementary
+  terms (757 → 2 549 candidates); identity starts preferred (G(z, e) = e on observed values).
+* Representation change on stagnation (fold failing on half the examples without improvement over two rounds);
+  invention CPU capped at 30 % of what is left per call; per-candidate caches shared by all calls.
+* Boolean readout search bounded (50 sets, 30 readouts) to keep chance fits unlikely; readout self-tests probe
+  the other starts of each variable.
+
+### 9.3 Result (dev)
+
+| FRESH re-used for dev (110) | value |
+|---|---|
+| D solved / Dq on the same queries | 45 / 23 (22 : 0, p = 4.8e-7) |
+| D-only with m ≥ 2 | 8 (`humaneval/3, 62, 85`, `mbpp/476, 567, 588, 680, 790`) |
+| **solved with two invented variables, D-only vs Dq** | **3**: `mbpp/588` max − min = readout `h2 − h1` of `h1' = min(h1, e)`, `h2' = max(h2, e)`; `mbpp/476` max + min = `h1 + h2`; `humaneval/3` running balance (the adopted pair contains an unused parity variable: the minimal state is the sum alone) |
+| single-variable ablation (`MULTI = False`) on those 3 | 0 solved |
+| adopted but wrong | 3 (`mbpp/19, 46, 68`) — one more than the sealed old D (2) |
+| list-routines dev | 157 (previous dev 159); lost `count-k(k=10)`, `prepend-k(k=-2) | positions`, `identify-k(k=1) | kth-smallest(k=2)`, `replace-all-k-with-n | sum`; gained 2; m ≥ 2 solves 23 |
+
+### 9.4 V3: stage-separated discovery policy (dev cross-validation by author lineage)
+
+The per-variable experience prior (8.4) was removed. `DiscoveryPolicy` holds two logistic models over the
+evidence the current task itself produced (number of contradictions, why invention was called, how finely a set
+splits the observed prefixes, description length, structural class of each variable, answer type; no variable
+identity): synthesis credit P(Update / readout exists) from 9 407 tried sets of other tasks, repair credit
+P(verified machine | adopted, failing fraction) from 124 adopted sets (32 verified). The learned order is
+interleaved with D's order, so D's own first choices are always tried.
+
+| (110, dev) | solved | vs D (only / D-only) |
+|---|---|---|
+| D | 45 | — |
+| E selection only | 45 | 2 : 2 (`humaneval/126`, `mbpp/775` / `humaneval/3`, `humaneval/85`), p = 1.0 |
+| E selection + learned adoption | 43 | 1 : 3, p = 0.63 |
+
+**Phase C: not passed.** No net additional solve; the two E-only tasks are CPU-borderline tasks that D solved in
+earlier dev runs, so they cannot be attributed to the policy; learned adoption lost three. The repair-stage model
+has 32 positive episodes; its features cannot separate a wrong variable from a wrong Update.
+
+### 9.5 Verdicts
+
+V1 PASS retained (sealed). V2: multi-variable invention works in development (3 tasks, all failing without it),
+with one more wrong adoption and a 2-task list-routines regression; no independent result. V3: development FAIL.
+Q3 overall OPEN; Q6 OPEN (not modified).
