@@ -1,0 +1,80 @@
+{
+  "schema": "neumann.q3.g3.post-first-2025-natives-eldarica2.3-golem0.9.0.v1",
+  "date": "2026-11-06",
+  "original_first": {
+    "run": 42174775254,
+    "original_cohorts": 3,
+    "source_24_total": 24,
+    "first_SHA256": {
+      "LIA_MULTIPHASE": "c4529472973dc7e102e3b755ff866ccac5f285a9d7206488d65dd054f5b41535",
+      "ARRAY_CHC": "47d2776afe699cccab8dc6d6e4b4f06707522f61e8d3d079c478c5614ed5f8c8",
+      "ADT_CHC": "84e35263eb08153776ccb1fb6ae97a1a76b82b8ca8959fd8b6502987474c6376"
+    },
+    "immutable_readonly_audit_first": 42175491787,
+    "published_metadata_confirmed": "All 8 ARRAY_CHC included in LIA-Lin-Arrays.set and have no expected_verdict in 2025; 7/8 LIA first native Z3 gave no grounded result at 15s but published labels SAT; 8 ADT Z3 agree with known official labels."
+  },
+  "postfirst_scope": {
+    "original_repo": "chc-comp/chc-comp25-benchmarks",
+    "commit": "ddd279cab0717db6effe69baad451a8eb04ffd86",
+    "groups": [
+      {
+        "id": "ARRAY_CHC",
+        "sources": "exact same already opened 8 Git blobs from fixed metadata",
+        "n": 8,
+        "solvers": [
+          "Eldarica2.3"
+        ]
+      },
+      {
+        "id": "LIA_MULTIPHASE",
+        "sources": "exact seven originally Z3-15s-unresolved source IDs; pre-filter by immutable first result statuses, not by new model performance",
+        "n": 7,
+        "solvers": [
+          "Eldarica2.3",
+          "Golem0.9.0"
+        ]
+      }
+    ],
+    "unit_budget_seconds_per_source_solver": 20
+  },
+  "binary_releases": [
+    {
+      "name": "Eldarica v2.3 Linux static",
+      "source": "https://github.com/uuverifiers/eldarica/releases/download/v2.3/eldarica-x86-linux-static.gz",
+      "sha256": "6815742c34e92d26b379006029eeeb1877757947206b5af9c2f7ff61a5e9440d",
+      "version": "v2.3",
+      "theory": [
+        "integer",
+        "arrays"
+      ]
+    },
+    {
+      "name": "Golem v0.9.0 Linux x64",
+      "source": "https://github.com/usi-verification-and-security/golem/releases/download/v0.9.0/golem-x64-linux.tar.bz2",
+      "sha256": "8209e804c6d4870e52d8d53b605a19145309445bffbd7e89f3ab4db31afdc490",
+      "version": "v0.9.0",
+      "theory": [
+        "integer"
+      ],
+      "not_for_arrays": true
+    }
+  ],
+  "first_preflight": "Before any original G3 scores, download binaries verify SHA, test both on source-free safe / unsafe CHC and one disjoint public 2025 pilot; do not count CLI error as solver failure.",
+  "science": {
+    "primary_question": "Does a more appropriate strong current third-party solver close previously Z3-unresolved sources, especially 2025 archived-array no-verdict cases?",
+    "candidate_discovery_from_originals": false,
+    "never_claim_native_unknown_as_unprovable": true,
+    "never_claim_published_unlabeled_as_mathematical_unsolvable": true,
+    "source_verdict_not_proof_object": true,
+    "conservation": "all 8 arrays and all 7 Z3-inconclusive LIA exactly, frozen IDs and hashes; 0 benchmark replacements",
+    "Q3": "OPEN",
+    "Q4": "OPEN",
+    "Q6": "OPEN",
+    "Q7": "OPEN"
+  },
+  "cost": {
+    "unit": "one GitHub hosted ubuntu runner, per-CLI-process wall-ms, 20s per original; tool download excluded from solve time",
+    "model_training_zero": true,
+    "hardware_optimization_not_claimed": true
+  }
+}

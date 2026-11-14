@@ -1,0 +1,87 @@
+{
+  "schema": "neumann.q3.g3.future-array-structural-transfer-untouched-eight.v1",
+  "date": "2026-11-06",
+  "purpose": "Prevent learner overfitting on opened 2025 CHC array8. Freeze next 8 originally unread tasks and do not fetch bodies or score until *own-weight learned* typed array-invariant proposer, strong native baselines, and independent verifier are frozen.",
+  "upstream": {
+    "repo": "chc-comp/chc-comp25-benchmarks",
+    "commit": "ddd279cab0717db6effe69baad451a8eb04ffd86",
+    "folder": "quic3/data",
+    "original_file_bodies_read_in_this_selection": false,
+    "original_YAML_verdicts_read_in_this_selection": false
+  },
+  "deterministic_selection": {
+    "seed": "NEUMANN-G3-20261106:",
+    "method": "FNV1a uint32 on seed+quic3/data/<filename>, eligible .smt2 301..19999 bytes, alphabetical? rank ascending by numerical hash; previous 8 original first used rank 1..8. Here ranks 9..16 only.",
+    "reserve_only": true
+  },
+  "targets": [
+    {
+      "file": "standard_find_true-unreach-call_ground_000.smt2",
+      "git_blob": "458dfab5520ebee02fd70efd7526bdf800ad8e9c",
+      "bytes": 5847,
+      "rank": 9
+    },
+    {
+      "file": "standard_copy8_true-unreach-call_ground_000.smt2",
+      "git_blob": "c7ab5f23cd9ce67aad37c95cb0f8d8fa3a256893",
+      "bytes": 19085,
+      "rank": 10
+    },
+    {
+      "file": "standard_init9_true-unreach-call_ground_000.smt2",
+      "git_blob": "fc46208475e55071ce5af94726284d01f8145d52",
+      "bytes": 13912,
+      "rank": 11
+    },
+    {
+      "file": "array_init_partial_000.smt2",
+      "git_blob": "53059588b66fac83a1d8358102493bf8cee6d479",
+      "bytes": 3708,
+      "rank": 12
+    },
+    {
+      "file": "array_nd_two_times_cell_true_000.smt2",
+      "git_blob": "624924fe4a1026995b0e30180d14f173c6032682",
+      "bytes": 5349,
+      "rank": 13
+    },
+    {
+      "file": "standard_copyInitSum3_true-unreach-call_ground_000.smt2",
+      "git_blob": "0480b6e1cd1a64986fc4e12bbad4ef58df40a1a7",
+      "bytes": 7344,
+      "rank": 14
+    },
+    {
+      "file": "array_monotonic_set_000.smt2",
+      "git_blob": "a9e13531a73fcf2c2ce1fdb4636e2b8124b3a270",
+      "bytes": 5288,
+      "rank": 15
+    },
+    {
+      "file": "sanfoundry_10_true-unreach-call_ground_000.smt2",
+      "git_blob": "6f21c8e41e3909bc84893644f141edd1a747f5f4",
+      "bytes": 7272,
+      "rank": 16
+    }
+  ],
+  "freeze_state": {
+    "all_source_bodies_untouched": true,
+    "none_scored_with_NEUMANN": true,
+    "no_Z3_or_other_original_solver_run": true,
+    "published_outcomes_unopened": true,
+    "first_on_hard_originals": "NOT_RUN",
+    "all_eight_denominator_fixed": true
+  },
+  "future_learned_mechanism": "Typed executable relational array-invariant proposal generator: synthesize quantified index/frame relations linking array states across transitions, with proof-guided independent SMT validation. No manually hard-coded solution for original reserve tasks. Learned own weights frozen before entering source reserve.",
+  "required_preflight": {
+    "1": "Preregister checkpoint+training code SHA, disjoint synthetic-only array-training families, fixed proofs/cost budget and model configuration.",
+    "2": "Strong classical Eldarica, Z3, Golem only if accepted theory, independent GP/CEGIS same grammar and same rights, and untrained model ablation.",
+    "3": "Independent original source-soundness verifier for generated invariant (unsat of negated init/induction/safety), and separate counterexample witness for unsafe, negative mutation controls.",
+    "4": "One exact original8 FIRST, keep all negative results; no repeated retuning on revealed originals.",
+    "5": "Q3 PASS only learned-exclusive independently verified source witness vs equal-rights strongest classical, Q4 full-cost advantage separately measured; Q6 requires different previously unopened FORMALISM, not just another array task."
+  },
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q6": "OPEN",
+  "global_Q7": "OPEN"
+}

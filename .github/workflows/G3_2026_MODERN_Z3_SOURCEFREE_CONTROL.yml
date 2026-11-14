@@ -1,0 +1,70 @@
+name: NEUMANN G3 modern 2026 Z3 sourcefree HORN controls before official array8 rerun
+on:
+  push:
+    branches:
+      - research/q3-g3-2025-chc-native-first-20261106
+    paths:
+      - .github/workflows/G3_2026_MODERN_Z3_SOURCEFREE_CONTROL.yml
+permissions:
+  contents: read
+jobs:
+  modern-native-sourcefree:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pin genuine Z3 project modern 2026 PyPI release
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile research/g3/modern_z3_2026.py
+          python -m pip install --quiet --no-cache-dir 'z3-solver==5.0.0.0'
+          python - <<'PY'
+          import z3
+          print('MODERN_Z3_NATIVE_VERSION',z3.get_version_string())
+          assert z3.get_version_string().startswith('5.0.'),z3.get_version_string()
+          PY
+      - name: Sourcefree HORN positive and negative property controls without ANY selected original source
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research.g3.modern_z3_2026 --synthetic > G3-MODERN-Z3-SOURCEFREE-SAT-UNSAT.json
+          python - <<'PY'
+          import json
+          x=json.load(open('G3-MODERN-Z3-SOURCEFREE-SAT-UNSAT.json'))
+          print(json.dumps(x,sort_keys=True))
+          assert x['controls_pass'] is True
+          assert x['safe']['status']=='SAT_CLAIM_UNVERIFIED'
+          assert x['unsafe']['status']=='UNSAT_CLAIM_UNVERIFIED'
+          assert x['original_8_bodies_opened_by_this_control'] is False
+          print('MODERN_2026_Z3_CHC_SAT_UNSAT_SOURCEFREE_PASS')
+          PY
+      - name: Actual NONSELECTED 2025 CHC source pilot, original eight NEVER opened in this step
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research.g3.modern_z3_2026 --pilot > G3-MODERN-Z3-NONSELECTED-OFFICIAL-PILOT.json
+          python - <<'PY'
+          import json
+          x=json.load(open('G3-MODERN-Z3-NONSELECTED-OFFICIAL-PILOT.json'))
+          print(json.dumps(x,sort_keys=True))
+          assert x['not_in_registered_8'] is True
+          assert x['source_git_blob']=='3f814a05b5e518c3a0bf18d3e67c22a50bd6a185'
+          assert x['pilot_pass'] is True
+          print('MODERN_2026_Z3_REAL_2025_CHC_NONSELECTED_PILOT_PASS')
+          PY
+      - name: Preserve exact sourcefree original rights control first, not a Q3 novel result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G3-Z3-2026-SOURCEFREE-HORN-PILOT
+          path: |
+            G3-MODERN-Z3-SOURCEFREE-SAT-UNSAT.json
+            G3-MODERN-Z3-NONSELECTED-OFFICIAL-PILOT.json
+          if-no-files-found: warn
+          retention-days: 90

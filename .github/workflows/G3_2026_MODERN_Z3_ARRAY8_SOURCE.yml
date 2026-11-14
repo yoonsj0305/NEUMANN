@@ -1,0 +1,110 @@
+name: NEUMANN G3 Z3 2026 v5 strong classical exact 2025 ARRAY8 post-FIRST
+on:
+  push:
+    branches:
+      - research/q3-g3-2025-chc-native-first-20261106
+    paths:
+      - .github/workflows/G3_2026_MODERN_Z3_ARRAY8_SOURCE.yml
+permissions:
+  contents: read
+jobs:
+  postfirst-modern-strong-native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install independent stable 2026 Z3 5.0.0.0 full-provenance PyPI release
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile research/g3/modern_z3_2026.py
+          python -m pip install --quiet --no-cache-dir 'z3-solver==5.0.0.0'
+          python - <<'PY'
+          import z3
+          assert z3.get_version_string().startswith('5.0.'),z3.get_version_string()
+          print('MODERN_NATIVE_Z3_PACKAGE',z3.get_version_string())
+          PY
+      - name: Byte-immutable old actual FIRST source and official 2025 zero published array verdict, no new task selection
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          pre=json.loads(Path('docs/experiments/G3_2025_CHCCOMP_24_FIRST_METADATA_PREREG_2026_11_06.json').read_text())
+          contract=json.loads(Path('docs/experiments/G3_POSTFIRST_MODERN_Z3_5_NATIVE_ARRAY8_CONTRACT_2026_11_06.json').read_text())
+          c=next(x for x in pre['cohorts'] if x['id']=='ARRAY_CHC')
+          assert len(c['targets'])==8
+          assert contract['source_first_ARRAY_sha256']=='47d2776afe699cccab8dc6d6e4b4f06707522f61e8d3d079c478c5614ed5f8c8'
+          assert contract['source_first_official_audit_sha256']=='8e05b0a75ad63883daa6bc1fda5d6853c62a08b5b869b9d6c43b1946f55af3df'
+          assert all(len(x['git_blob'])==40 for x in c['targets'])
+          print('G3_EXACT_2025_ARRAY8_POSTFIRST_NO_NEW_ORIGINAL_SELECTION')
+          PY
+      - name: Repeat source-free real 2026 HORN interpretation control before scoring originals
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research.g3.modern_z3_2026 --synthetic > G3-MODERN-Z3-2026-PREFLIGHT.json
+          python - <<'PY'
+          import json
+          v=json.load(open('G3-MODERN-Z3-2026-PREFLIGHT.json'))
+          assert v['controls_pass'] is True
+          assert v['original_8_bodies_opened_by_this_control'] is False
+          print('MODERN_Z3_2026_SOURCEFREE_SAFE_AND_UNSAFE_PASS')
+          PY
+      - name: ONE actual modern native full original ARRAY8 run, 15s each, no model or original labels
+        shell: bash
+        run: |
+          set -uo pipefail
+          python -m research.g3.modern_z3_2026 --array8 > G3-Z3-2026-ARRAY8-POSTFIRST.json 2> G3-Z3-2026-ARRAY8-POSTFIRST.stderr
+          rc=$?
+          if test -s G3-Z3-2026-ARRAY8-POSTFIRST.json; then
+            python - <<'PY'
+          import json
+          x=json.load(open('G3-Z3-2026-ARRAY8-POSTFIRST.json'))
+          print(json.dumps({'science':x.get('science_status'),
+           'stats':x.get('stats'),
+           'original_2025_array_results':[{
+             'name':r['file'],'source_sha':r['original_git_blob'],
+             'native_status':r['solver']['status'],
+             'version':r['solver'].get('z3_version'),
+             'wall_ms':r['solver'].get('wall_ms'),
+             'reason':r['solver'].get('reason_unknown')} for r in x.get('rows',[])]
+          },sort_keys=True))
+          assert x['stats']['original_count']==8
+          assert x['stats']['neumann_student_trained'] is False
+          assert x['stats']['original_ARC_eval_IDs_consumed']==0
+          PY
+            code=$?
+            if test "$code" -ne 0; then rc=1;fi
+          else
+            rc=1
+          fi
+          cat G3-Z3-2026-ARRAY8-POSTFIRST.stderr
+          echo "Z3_2026_NATIVE_ARRAY8_RESULT_EXIT=$rc"
+          exit "$rc"
+      - name: SHA256 preserve actual native output, even negative, immutable original-first unaffected
+        if: always()
+        shell: bash
+        run: |
+          if test -s G3-Z3-2026-ARRAY8-POSTFIRST.json; then
+            sha256sum G3-Z3-2026-ARRAY8-POSTFIRST.json > G3-Z3-2026-ARRAY8-POSTFIRST.sha256
+            cat G3-Z3-2026-ARRAY8-POSTFIRST.sha256
+          fi
+      - name: Archive modern full-classical original 8 result and control
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G3-Z3-2026-ARRAY8-POSTFIRST-NATIVE
+          path: |
+            G3-Z3-2026-ARRAY8-POSTFIRST.json
+            G3-Z3-2026-ARRAY8-POSTFIRST.sha256
+            G3-Z3-2026-ARRAY8-POSTFIRST.stderr
+            G3-MODERN-Z3-2026-PREFLIGHT.json
+          if-no-files-found: warn
+          retention-days: 90

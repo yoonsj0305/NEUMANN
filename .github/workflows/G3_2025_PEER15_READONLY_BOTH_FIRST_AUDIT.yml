@@ -1,0 +1,127 @@
+name: NEUMANN G3 2025 actual Golem Eldarica original15 immutable FIRST scientific audit
+# V1/V2 READONLY had one copied 64-char array SHA typo in *Python* assertion. Shell artifact hashes always passed. Correct exact sha; neither 2025 native original is rerun.
+on:
+  push:
+    branches:
+      - research/q3-g3-2025-chc-native-first-20261106
+    paths:
+      - .github/workflows/G3_2025_PEER15_READONLY_BOTH_FIRST_AUDIT.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit-original-fifteen-exact-bytes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-2025-ACTUAL-LIA_MULTIPHASE-PEER-POSTFIRST
+          run-id: 42177539601
+          github-token: ${{ github.token }}
+          path: first-go-071
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G3-2025-ACTUAL-ARRAY_CHC-PEER-POSTFIRST
+          run-id: 42177539601
+          github-token: ${{ github.token }}
+          path: first-eld-22
+      - name: Pinned 2025 versions EXACT original first, FAIL before audit if bytes modified
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '67e3955f9b5c45c82076400ffd375cddc69ff7b95c403608bc5eac906e8c2f56  first-go-071/G3-2025-LIA_MULTIPHASE-PEER-POSTFIRST.json' | sha256sum -c -
+          echo '668bcaed18b4933b80861dd1dc65f66ca621d6e70fbdbe565398610db5bf3864  first-eld-22/G3-2025-ARRAY_CHC-PEER-POSTFIRST.json' | sha256sum -c -
+      - name: Independent read-only sum of original 7+8, no program synthesis or source re-fetch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          source=json.loads(Path('docs/experiments/G3_2025_CHCCOMP_24_FIRST_METADATA_PREREG_2026_11_06.json').read_text())
+          specs={k:next(v for v in source['cohorts'] if v['id']==k) for k in ('LIA_MULTIPHASE','ARRAY_CHC')}
+          files={'LIA_MULTIPHASE':'first-go-071/G3-2025-LIA_MULTIPHASE-PEER-POSTFIRST.json',
+                 'ARRAY_CHC':'first-eld-22/G3-2025-ARRAY_CHC-PEER-POSTFIRST.json'}
+          sha={'LIA_MULTIPHASE':'67e3955f9b5c45c82076400ffd375cddc69ff7b95c403608bc5eac906e8c2f56',
+               'ARRAY_CHC':'668bcaed18b4933b80861dd1dc65f66ca621d6e70fbdbe565398610db5bf3864'}
+          original_first_sha={'LIA_MULTIPHASE':'c4529472973dc7e102e3b755ff866ccac5f285a9d7206488d65dd054f5b41535',
+                              'ARRAY_CHC':'47d2776afe699cccab8dc6d6e4b4f06707522f61e8d3d079c478c5614ed5f8c8'}
+          cases=[]
+          for cohort,path in files.items():
+              content=Path(path).read_bytes()
+              got=hashlib.sha256(content).hexdigest()
+              print('POSTFIRST_EXACT_SHA_DIAG',cohort,got,sha[cohort])
+              assert got==sha[cohort],(cohort,got,sha[cohort])
+              x=json.loads(content)
+              assert x['schema']=='neumann.q3.g3.postfirst-reproduction-native-CHCCOMP2025-actual-peers.v1'
+              print('POSTFIRST_FIRST_SCOPE_DIAG',cohort,x.get('science_status'),x.get('peer_version'))
+              assert x['science_status']=='POSTFIRST_KNOWN_NATIVE_COMPARISON_NEUMANN_LEARNED_Q3_OPEN'
+              assert x['peer_version']==('Golem-0.7.1' if cohort=='LIA_MULTIPHASE' else 'Eldarica-2.2')
+              assert x['first_z3_original_sha256']==original_first_sha[cohort]
+              assert x['stats']['source_denominator']==8
+              assert x['stats']['peer_originals_executed']==(7 if cohort=='LIA_MULTIPHASE' else 8)
+              assert x['stats']['student_neural_training_invocations']==0
+              assert x['stats']['new_ARC_eval_originals']==0
+              assert x['stats']['peer_verdict_conflicts_with_official_competition']==0
+              assert [r['name'] for r in x['rows']]==[z['file'] for z in specs[cohort]['targets']]
+              assert sum(r['peer_executed'] for r in x['rows'])==x['stats']['peer_originals_executed']
+              assert sum(r['claimed_correct'] for r in x['rows'])==x['stats']['peer_verdict_agrees_with_official_competition']
+              assert sum((r.get('peer') or {}).get('status') in ('NATIVE_SAT_CLAIM','NATIVE_UNSAT_CLAIM') for r in x['rows'])==x['stats']['peer_sat_unsat_raw']
+              for r in x['rows']:
+                  cases.append({'cohort':cohort,'file':r['name'],
+                    'old_Z3':r['original_Z3_status'],
+                    'actually_peer_scored':r['peer_executed'],
+                    'peer_status':(r.get('peer') or {}).get('status'),
+                    'peer_wall_ms':(r.get('peer') or {}).get('wall_ms'),
+                    'peer_stdout':(r.get('peer') or {}).get('stdout_excerpt','')[:150],
+                    'official_EXPECTED':r.get('official_2025_expected'),
+                    'official_agreed':r.get('official_competition_verdict_matches',False),
+                    'peer_2025_scientific_classification':r.get('classification')})
+              print('PEER_FIRST_IMMUTABLE',cohort,json.dumps(x['stats'],sort_keys=True))
+          assert len(cases)==16 and sum(x['actually_peer_scored'] for x in cases)==15
+          stats={
+            'registered_groups':2,'original_cohort_coverage':16,
+            'historical_peer_actual_source_tasks':15,
+            'historical_peer_SAT_UNSAT_raw':sum(x['peer_status'] in ('NATIVE_SAT_CLAIM','NATIVE_UNSAT_CLAIM') for x in cases),
+            'historical_peer_official_label_corrob':sum(x['official_agreed'] for x in cases),
+            'historical_peer_unknown_or_timeout':sum(x['actually_peer_scored'] and x['peer_status'] not in ('NATIVE_SAT_CLAIM','NATIVE_UNSAT_CLAIM') for x in cases),
+            'prior_Z3_known_SAT_in_group_not_retested':1,
+            'official_golden_metadata_missing_array8':sum(x['actually_peer_scored'] and x['official_EXPECTED'] not in ('SAT','UNSAT') for x in cases),
+            'all_original_read_only':True,'neumann_student_training_runs':0,
+            'new_arc_eval_consumption':0
+          }
+          v={'schema':'neumann.q3.g3.2025-two-original-native-peers-first-readonly.v1',
+            'audit_pass':True,'first_sha256':sha,'stats':stats,'original_cases':cases,
+            'Q3':'OPEN','Q4':'OPEN','Q6':'OPEN','Q7':'OPEN'}
+          Path('G3-2025-TWO-PEERS-15-FIRST-IMMUTABLE-READONLY.json').write_text(json.dumps(v,indent=2,sort_keys=True)+'\n')
+          print('G3_2025_PEERS_SOURCE_FIRST_RECOVERY_AND_TOTALS_PASS',json.dumps(stats,sort_keys=True))
+          for x in cases:
+              if x['actually_peer_scored']:print('PINNED_2025_ORIGINAL',json.dumps(x,sort_keys=True))
+          PY
+      - name: Negative favorable first evidence mutation cannot be silently promoted
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          p=Path('first-go-071/G3-2025-LIA_MULTIPHASE-PEER-POSTFIRST.json')
+          x=json.loads(p.read_text())
+          x['stats']['peer_verdict_agrees_with_official_competition']=7
+          forged=json.dumps(x).encode()
+          original_expected='67e3955f9b5c45c82076400ffd375cddc69ff7b95c403608bc5eac906e8c2f56'
+          assert hashlib.sha256(forged).hexdigest()!=original_expected
+          print('G3_FORGED_FAVORABLE_HISTORICAL_SPECIALIST_FIRST_REJECTED')
+          PY
+      - name: Preserve FIRST immutable source-classification receipt and negative evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G3-REAL-2025-TWO-PEERS-15-INDEPENDENT-FIRST-READONLY
+          path: G3-2025-TWO-PEERS-15-FIRST-IMMUTABLE-READONLY.json
+          if-no-files-found: warn
+          retention-days: 90
