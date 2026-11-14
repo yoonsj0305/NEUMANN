@@ -1,0 +1,53 @@
+name: NEUMANN Q34 one-shot optimal unknown Boolean operator discovery full exhaustive proofs
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q34_one_shot_boolean_operator.yml'
+      - 'research/q34/one_shot_boolean_operator.py'
+      - 'research/q34/independent_shannon_audit.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  full_65536_truth_table_induction_and_independent_BDD:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Full deterministic 4x4 de Bruijn source, all 65536 unknown 2x2 operators reconstructed and ANF exact on entire domain
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/neumann-q34-first
+          python research/q34/one_shot_boolean_operator.py | tee /tmp/neumann-q34-first/FIRST_65536_ANF_PROOF.json
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/neumann-q34-first/FIRST_65536_ANF_PROOF.json'))
+          assert x['rules_recovered_and_ANF_domain_verified']==65536
+          assert x['incorrect_operators']==0 and x['highest_degree_four_rules']==32768
+          assert x['used_binary_output_bits']==x['minimum_binary_output_bits']==16
+          assert x['used_experiment_rounds']==x['minimum_experiment_rounds']==1
+          assert sum(int(z) for z in x['essential_variable_counts'].values())==65536
+          print('Q34_ORIGINAL_BOOLEAN_OPERATORS_ALL_65536_AND_INFO_OPTIMAL_SOURCE_PROVED')
+          PY
+      - name: Independently recompile every recovered unknown Boolean operator via reduced Shannon BDD, all-input proof
+        run: |
+          set -euo pipefail
+          PYTHONPATH=research/q34 python research/q34/independent_shannon_audit.py | tee /tmp/neumann-q34-first/INDEPENDENT_65536_SHANNON_BDD_PROOF.json
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/neumann-q34-first/INDEPENDENT_65536_SHANNON_BDD_PROOF.json'))
+          assert x['independent_BDD_synthesis_verified']==65536
+          assert sum(int(z) for z in x['BDD_node_count_distribution'].values())==65536
+          assert x['bounded_Q34']=='PASS'
+          print('INDEPENDENT_ALL_65536_SOURCE_OPERATORS_TWO_SYMBOLIC_LANGUAGES_0_ERRORS')
+          PY
+          sha256sum /tmp/neumann-q34-first/*.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q34-first-exhaustive-65536-operator-one-probe-anf-plus-independent-shannon-exact
+          path: /tmp/neumann-q34-first/
+          if-no-files-found: error
