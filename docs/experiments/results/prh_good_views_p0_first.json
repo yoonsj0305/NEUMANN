@@ -1,0 +1,131 @@
+{
+  "cells": {
+    "iid": {
+      "good_views": {
+        "correct": 128,
+        "recall_at_1": 1.0,
+        "total": 128
+      },
+      "raw_unrotated": {
+        "correct": 0,
+        "recall_at_1": 0.0,
+        "total": 128
+      },
+      "same_view_corruption": {
+        "correct": 0,
+        "recall_at_1": 0.0,
+        "total": 128
+      },
+      "unrelated_pairing": {
+        "correct": 2,
+        "recall_at_1": 0.015625,
+        "total": 128
+      },
+      "whole_cell_eval_ns": 405373
+    },
+    "new-sensor": {
+      "good_views": {
+        "correct": 1,
+        "recall_at_1": 0.0078125,
+        "total": 128
+      },
+      "raw_unrotated": {
+        "correct": 3,
+        "recall_at_1": 0.0234375,
+        "total": 128
+      },
+      "same_view_corruption": {
+        "correct": 3,
+        "recall_at_1": 0.0234375,
+        "total": 128
+      },
+      "unrelated_pairing": {
+        "correct": 0,
+        "recall_at_1": 0.0,
+        "total": 128
+      },
+      "whole_cell_eval_ns": 171886
+    },
+    "sparse-structure": {
+      "good_views": {
+        "correct": 118,
+        "recall_at_1": 0.921875,
+        "total": 128
+      },
+      "raw_unrotated": {
+        "correct": 2,
+        "recall_at_1": 0.015625,
+        "total": 128
+      },
+      "same_view_corruption": {
+        "correct": 2,
+        "recall_at_1": 0.015625,
+        "total": 128
+      },
+      "unrelated_pairing": {
+        "correct": 2,
+        "recall_at_1": 0.015625,
+        "total": 128
+      },
+      "whole_cell_eval_ns": 182802
+    }
+  },
+  "contract": {
+    "base_seed": 20261103,
+    "cell_names": [
+      "iid",
+      "sparse-structure",
+      "new-sensor"
+    ],
+    "controls": [
+      "raw-unrotated",
+      "unrelated-pairing",
+      "same-view-corruption"
+    ],
+    "dimension": 8,
+    "eval_cases_per_cell": 128,
+    "gate": {
+      "iid_good_minus_unrelated_min": 0.5,
+      "iid_retrieval_r1_min": 0.8,
+      "new_sensor_is_diagnostic_only": true,
+      "sparse_retrieval_r1_min": 0.5
+    },
+    "is_not": [
+      "JEPA/LeJEPA reproducibility",
+      "oracle-free executable program discovery",
+      "Q3/Q4/Q5/Q6/Q7 closure",
+      "frontier-gap evidence"
+    ],
+    "model": "orthogonal-procrustes-closed-form-no-NN",
+    "observation_noise_std": 0.035,
+    "prior_global_gates": {
+      "Q1": "OPEN",
+      "Q2": "OPEN",
+      "Q3": "OPEN",
+      "Q4": "OPEN",
+      "Q5": "OPEN",
+      "Q6": "OPEN",
+      "Q7": "OPEN"
+    },
+    "schema": "neumann.prh.good-views.p0.v1",
+    "scope": "synthetic-alignment-mechanism-only",
+    "train_pairs": 512
+  },
+  "energy_joule": null,
+  "fit_examples": 512,
+  "flops": null,
+  "gpu_vram_bytes": null,
+  "interpretation": "P0 tests cross-view alignment. Classical Procrustes is a strong lower-cost comparator; no neural model, new program or frontier claim.",
+  "latency_note": "CPU perf_counter_ns, wall-clock only; not hardware energy or FLOPs",
+  "measured_fit_ns": 103444,
+  "monetary_cost_usd": null,
+  "peak_ram_bytes": null,
+  "platform": {
+    "machine": "x86_64",
+    "numpy": "2.3.5",
+    "processor": "",
+    "python": "3.13.5"
+  },
+  "q1_to_q7": "OPEN",
+  "test_result": "P0_ALIGNMENT_MECHANISM_PASS"
+}
