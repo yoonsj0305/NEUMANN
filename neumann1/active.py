@@ -691,7 +691,8 @@ def features(examples):
 
 
 def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, prior_ws=None, log=None,
-                 prior_structure=None, restrict_kinds=False, acc_prior=None, policy_model=None, knowledge=None):
+                 prior_structure=None, restrict_kinds=False, acc_prior=None, policy_model=None, knowledge=None,
+                 action_policy=None):
     """Learn S(u) = (f(u.w) for w in W), Update and Readout = component 0, with W grown only when needed.
 
       * W starts with the empty continuation: the answer itself as the state (the output-state machine).
@@ -933,6 +934,28 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         return upd, asts, best[0], best[1]
     invent_tried, rejected, rivals, upd_alts = set(), set(), [], []
     fail_hist = []                           # failing examples per round (stagnation triggers invention)
+    t_start, q_start = time.process_time(), env.used
+
+    def choose(why, trans, n_fail):
+        """A discovery decision: invent new state now, or keep repairing the current representation (localise,
+        continuation, virtual values).  D: invent first (ACTION_MODE); a learned action policy decides from the
+        CURRENT evidence only.  Every decision is logged with its evidence for counterfactual learning."""
+        groups = {}
+        for (a, e), b, u in trans:
+            groups.setdefault((a, e), set()).add(b)
+        f = {"bias": 1.0, "why_" + why.split()[0]: 1.0,
+             "contradictions": min(sum(len(v) > 1 for v in groups.values()), 10) / 10.0,
+             "components": (len(W) - 1) / 3.0, "invented": len(acc) / 3.0,
+             "ans_bool": float(s_type == T_B), "ans_list": float(s_type == T_L),
+             "fail_frac": n_fail / max(1, len(examples)),
+             "cpu_left": max(0.0, deadline - time.process_time()) / max(1e-6, deadline - t_start),
+             "q_left": max(0, qlimit - env.used) / max(1, qlimit - q_start),
+             "rounds": min(len(fail_hist), 10) / 10.0, "undefined": float(virt["value"] is not None)}
+        a = ACTION_MODE
+        if action_policy is not None:
+            a = action_policy(f) or a
+        rec.setdefault("decisions", []).append({"why": why, "action": a, "feat": {k: round(v, 3) for k, v in f.items()}})
+        return a
     hcache = {}                              # (candidate, start) -> {prefix: value}, shared by every invention call
     selftest = {"left": SELFTEST * 3}
     inv_budget = {"left": INVENT_SHARE * max(0.0, deadline - time.process_time())}
@@ -1411,7 +1434,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                     conflict = (seen[(a, e)], (b, u), e)
                     break
                 seen.setdefault((a, e), (b, u))
-            if conflict and invent(trans, "inconsistent transitions"):
+            if conflict and choose("inconsistent transitions", trans, 0) == "invent" and invent(trans, "inconsistent transitions"):
                 continue
             if conflict:
                 (b1, _), (b2, _), e = conflict
@@ -1425,11 +1448,14 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             upd, asts, z, fails = attempt(trans, 0.25)
             if upd is None:
                 rec["events"].append("no update for component %d" % len(asts))
-                if invent(trans, "update not found") or revise("update not found"):
+                act_ = choose("update not found", trans, len(examples))
+                if act_ == "invent" and (invent(trans, "update not found") or revise("update not found")):
                     continue
-                if not represent(trans, "update not found"):
-                    break
-                continue
+                if represent(trans, "update not found"):
+                    continue
+                if act_ != "invent" and (invent(trans, "update not found") or revise("update not found")):
+                    continue
+                break
             rec["events"].append("round %d: m=%d, examples failing %d" % (rnd, len(W), len(fails)))
             if not fails and selftest["left"] > 0:
                 # verification-driven repair: inputs from the task's own distribution and boundaries where the
@@ -1523,7 +1549,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             # improved over two rounds -> the state, not a transition, is the likely error (invention is query-free)
             fail_hist.append(len(fails))
             if len(fail_hist) >= 3 and fail_hist[-1] >= fail_hist[-3] and len(fails) * 2 >= len(examples) \
-                    and invent(trans, "no progress"):
+                    and choose("no progress", trans, len(fails)) == "invent" and invent(trans, "no progress"):
                 continue
             # 3. counterexample: binary search for the first step leaving the true states, add that point
             tag[0] = "localise"
@@ -1582,10 +1608,14 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                         rec["events"].append("virtual value %d for undefined components (%d failing)" % (v, nf))
                         continue
                 virt["value"] = None
-                if invent(trans, "counterexample not localisable") or revise("counterexample not localisable"):
+                act_ = choose("not localisable", trans, len(fails))
+                if act_ == "invent" and (invent(trans, "counterexample not localisable") or revise("counterexample not localisable")):
                     continue
-                if not represent(trans, "counterexample hidden in undefined prefixes"):
-                    break
+                if represent(trans, "counterexample hidden in undefined prefixes"):
+                    continue
+                if act_ != "invent" and (invent(trans, "counterexample not localisable") or revise("counterexample not localisable")):
+                    continue
+                break
     except Exhausted:
         rec["events"].append("query limit")
     return None, obs, rec
@@ -1594,12 +1624,27 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
 # -------------------------------------------------------------------- arms
 SELFTEST = 3      # self-test queries per formed machine (at most 3 repairs) before it is returned
 MAX_ACC = 3       # invented variables per machine
+ACTION_MODE = "invent"   # D's fixed decision at a discovery branch point ("repair": the counterfactual arm)
 MULTI = True      # ablation switch: False = one invented variable at a time, no sets, no joined readouts
 PAIR_COST = 6     # description-length charge for each additional invented variable
 INVENT_SHARE = 0.4  # share of a machine's formation CPU that all its invention calls may use together
 INVENT_K = 10     # admissible invented variables tried per invention (cost order, or learned order for E)
 CHALLENGE = 3     # fresh inputs a formed machine must predict before it may replace the passive solution
 DISCRIMINATE = 2  # queries kept to decide between an accepted machine and the passive solution where they differ
+
+
+def _action_policy(d):
+    """Learned discovery-action policy (V3): P(inventing now beats repairing the current representation | the
+    decision's evidence), learned from counterfactual pairs on other tasks.  Decides only when confident
+    (|p - 0.5| > margin); otherwise None, and D's own decision stands."""
+    if not d:
+        return None
+    w, m = d["w"], d.get("margin", 0.15)
+
+    def pol(f):
+        p = DiscoveryPolicy._p(w, f)
+        return "invent" if p > 0.5 + m else "repair" if p < 0.5 - m else None
+    return pol
 
 
 def challenge(env, machine, examples, obs, rng, k=CHALLENGE):
@@ -1670,7 +1715,7 @@ def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
                                          (pol or {}).get("structures", {}).get(direction),
                                          bool((pol or {}).get("restrict_kinds")), None,
                                          DiscoveryPolicy.from_json((policy or {}).get("discovery")),
-                                         (policy or {}).get("knowledge"))
+                                         (policy or {}).get("knowledge"), _action_policy((policy or {}).get("action")))
             mrec["queries_used"], mrec["cpu"] = env.used - q0, round(time.process_time() - t0, 3)
             obs += mobs
             frec["machines"].append(mrec)
