@@ -1,0 +1,133 @@
+name: Q3 REAL 0.5B Code Model - SOURCE Refutation to Gradient to Heldout SOURCE
+on:
+  push:
+    branches:
+      - research/q3-one-core-real-repair-learning-20261110
+    paths:
+      - ".github/workflows/q3_real_neural_repair_gradient.yml"
+      - "research/q3/q3_model_repair_from_certified_source.py"
+      - "research/q3/q3_model_repair_real_source_ablation.py"
+      - "neumann1/q3_source_repair_learning.py"
+      - "neumann1/q3_trainable_code_policy.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONHASHSEED: "0"
+  OMP_NUM_THREADS: "2"
+  OPENBLAS_NUM_THREADS: "2"
+  TOKENIZERS_PARALLELISM: "false"
+jobs:
+  actual_gradient:
+    runs-on: ubuntu-latest
+    timeout-minutes: 85
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install real CPU PyTorch and pinned model-learning runtime
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          python -m pip install -q --index-url https://download.pytorch.org/whl/cpu torch==2.5.1
+          python -m pip install -q "transformers==4.46.3" "peft==0.14.0" "accelerate==1.2.1" "huggingface_hub==0.27.1"
+          docker pull python:3.11-alpine
+      - name: Freeze exact immutable upstream pretrained model weight revision
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          python - <<'PY'
+          from huggingface_hub import model_info
+          from pathlib import Path
+          m=model_info("Qwen/Qwen2.5-Coder-0.5B-Instruct")
+          sha=m.sha
+          assert len(sha)==40 and all(x in "0123456789abcdef" for x in sha)
+          Path("evidence/FROZEN_MODEL_REVISION.txt").write_text(sha+"\n")
+          print("Q3_PRETRAINED_NEURAL_REVISION_FROZEN",sha,flush=True)
+          PY
+      - name: Obtain disjoint original AUTHOR SOURCE teachers only
+        run: |
+          set -euo pipefail
+          mkdir -p teacher_source teacher_methods heldout_source
+          gh run download 42735035357 --name q3-original-arc2-source-only-frozen --dir teacher_source
+          gh run download 42756200217 --name q3-coordinate-frozen-source-methods --dir teacher_methods
+          gh run download 42757846590 --name q3-prospective-source-100-originals-frozen --dir heldout_source
+          for dir in teacher_source teacher_methods heldout_source; do
+            case "$dir" in
+              teacher_source|heldout_source)
+                file="$dir/ORIGINAL_SOURCE_ONLY.json"; sha="$dir/ORIGINAL_SOURCE_ONLY.sha256";;
+              teacher_methods)
+                file="$dir/FROZEN_SOURCE_METHODS.json"; sha="$dir/FROZEN_SOURCE_METHODS.sha256";;
+            esac
+            test "$(cut -d ' ' -f1 "$sha")" = "$(sha256sum "$file" | cut -d ' ' -f1)"
+          done
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          t=json.loads(Path("teacher_source/ORIGINAL_SOURCE_ONLY.json").read_text())
+          m=json.loads(Path("teacher_methods/FROZEN_SOURCE_METHODS.json").read_text())
+          h=json.loads(Path("heldout_source/ORIGINAL_SOURCE_ONLY.json").read_text())
+          assert t["original_source_count"]==m["source_originals"]==50
+          assert h["original_source_count"]==100
+          assert t["no_target_gold_in_payload"] and h["no_target_gold_in_payload"]
+          assert m["target_gold_accessed"] is False
+          assert not set(t["original_ids"])&set(h["original_ids"])
+          print("Q3_REAL_NEURAL_NO_ORIGINAL_TARGET_GOLD",flush=True)
+          PY
+      - name: Pretrained model emits genuinely wrong programs; only independently SOURCE-certified corrections become teachers
+        run: |
+          set -euo pipefail
+          python -u -m research.q3.q3_model_repair_from_certified_source \
+            --source teacher_source/ORIGINAL_SOURCE_ONLY.json \
+            --methods teacher_methods/FROZEN_SOURCE_METHODS.json \
+            --model-revision "$(cat evidence/FROZEN_MODEL_REVISION.txt)" \
+            --out evidence/SOURCE_REPAIR_TEACHERS.jsonl \
+            --report evidence/MODEL_ERROR_PROVENANCE.json \
+            --max-tasks 6
+          sha256sum evidence/SOURCE_REPAIR_TEACHERS.jsonl > evidence/SOURCE_REPAIR_TEACHERS.sha256
+      - name: If and ONLY if real model errors exist, update real LoRA weights and evaluate disjoint A/C
+        run: |
+          set -euo pipefail
+          if [ ! -s evidence/SOURCE_REPAIR_TEACHERS.jsonl ]; then
+            echo "Q3_ZERO_GENUINE_EXECUTABLE_MODEL_REPAIR_TEACHERS_ABSTAIN" | tee evidence/Q3_MODEL_RESULT.txt
+            exit 0
+          fi
+          python -u -m neumann1.q3_trainable_code_policy \
+            --sources evidence/SOURCE_REPAIR_TEACHERS.jsonl \
+            --adapter-output adapter \
+            --model "Qwen/Qwen2.5-Coder-0.5B-Instruct" \
+            --model-revision "$(cat evidence/FROZEN_MODEL_REVISION.txt)" \
+            --objective source_repair \
+            --steps 2 \
+            --seed 1007
+          python -u -m research.q3.q3_model_repair_real_source_ablation \
+            --cohort heldout_source/ORIGINAL_SOURCE_ONLY.json \
+            --model-revision "$(cat evidence/FROZEN_MODEL_REVISION.txt)" \
+            --adapter adapter \
+            --limit 6 \
+            --max-proposals 2 \
+            --out evidence/HELDOUT_ORIGINAL_AUTHOR_SOURCE_A_VS_C.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          v=json.loads(Path("evidence/HELDOUT_ORIGINAL_AUTHOR_SOURCE_A_VS_C.json").read_text())
+          s=v["summary"]
+          assert s["original_TEST_gold_accessed"] is False
+          assert s["q3_global"]=="OPEN"
+          print("Q3_REAL_GRADIENT_SOURCE_REPAIR_VERDICT",{
+            "A":s["A_exact_source"],"C":s["C_exact_source"],
+            "C_only":s["C_exclusive_source"],"A_only":s["A_exclusive_source"],
+            "original_AUTHOR_TEST":"NOT_RUN","global_Q3":"OPEN"},flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-real-weight-neural-source-repair-gradient-and-independent-source-receipts
+          path: |
+            evidence/
+            adapter/neumann_source_training_manifest.json
+          if-no-files-found: warn
+          retention-days: 90

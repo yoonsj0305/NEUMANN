@@ -322,6 +322,15 @@ class GenerativeProgramInventor:
         if len(check_inputs)!=len(set(check_inputs)) or (
                 train_inputs & set(check_inputs)):
             raise ValueError("SOURCE verifier must be disjoint from training")
+        # Same SINGLE Q3 invention loop, with structured SOURCE-only
+        # preparation for learned structural policies. Neural proposers keep
+        # their original prompt interface without any task-family routing.
+        prepare=getattr(self.policy,"prepare",None)
+        if prepare is not None:
+            prepare(train)
+        # One feedback contract for live invention and supervised repair.
+        # Local import avoids a cyclic module dependency.
+        from .q3_source_repair_learning import source_refutation_feedback
         prompt=source_discovery_prompt(train,method_context=method_context)
         seen=set()
         receipts=[]
@@ -341,10 +350,11 @@ class GenerativeProgramInventor:
                     raw_hash,0,len(train),"REJECTED",step,
                     raw[:3000] if isinstance(raw,str) else None))
                 prompt+=(
-                    "\nYour proposed code failed the deterministic Python "
-                    "preflight. Fix the code while preserving its hypothesized "
-                    "algorithm. Error: "+type(exc).__name__+": "+
-                    str(exc)[:220]+"\n")
+                    "\nYour last program failed Python preflight. "
+                    "Prior proposed code (never executed):\n"+
+                    (raw[:1500] if isinstance(raw,str) else "")+
+                    "\nFix the SAME program's causal hypothesis. Error: "+
+                    type(exc).__name__+": "+str(exc)[:220]+"\n")
                 continue
             sha=hashlib.sha256(code.encode()).hexdigest()
             if sha in seen:
@@ -362,67 +372,106 @@ class GenerativeProgramInventor:
                 correct=0  # historical opaque runtime-error feedback ablation
             receipts.append(Attempt(sha,correct,len(train),result.status,step,code))
             if correct==len(train):
-                final=self.runner.evaluate(code,[x for x,y in checks])
-                if final.status=="EXECUTED" and all(
-                        source_same_value(got,y) for got,(_,y) in zip(final.outputs,checks)):
-                    return Discovery("SOURCE_VERIFIED_OPEN_PROGRAM",code,sha,
-                                     tuple(receipts),len(checks),True)
-                # A failed disjoint SOURCE verifier is a SOURCE label, not
-                # any hidden TARGET answer. Previously, this true new
-                # observation was discarded and the model was told only
-                # "refuted". Give an explicit causal witness to the next
-                # synthesis attempt. The ablation can retain the old opaque
-                # feedback, while both arms see identical first proposals.
-                if self.reveal_independent_counterexample and (
-                        final.status in ("EXECUTED","EXECUTED_WITH_ERRORS")):
-                    witness=[]
-                    for got,error,(x,y) in zip(
-                            final.outputs,final.errors,checks):
-                        if error is not None or not source_same_value(got,y):
-                            witness.append({
-                                "source_input":x,
-                                "source_expected":y,
-                                "previous_observed":got,
-                                "runtime_error":error})
-                    prompt+=(
-                        "\nYour proposed algorithm passed the first SOURCE "
-                        "examples but FAILED on NEW SOURCE observations. "
-                        "Identify the missing invariant and revise the "
-                        "algorithm. New SOURCE counterexamples:\n"+
-                        json.dumps(witness[:3],ensure_ascii=True)[:3500])
-                else:
-                    prompt+=(
-                        "\nAn independent SOURCE verifier refuted your "
-                        "program. Propose a different general algorithm.")
+                # A SOURCE verifier can no longer claim independence after
+                # its labels were revealed as repair feedback. Split any
+                # multi-check reservoir into critic and SEALED final checks
+                # before the first proposal. The sealed check is NEVER sent
+                # into the model prompt, and a failed sealed check ends this
+                # task without adaptive retesting. If there is only one
+                # check, all of it stays sealed.
+                feedback_checks=(
+                    checks[:-1] if self.reveal_independent_counterexample
+                    and len(checks)>1 else ())
+                sealed_checks=(
+                    checks[-1:] if feedback_checks else checks)
+                if feedback_checks:
+                    diagnostic=self.runner.evaluate(
+                        code,[x for x,y in feedback_checks])
+                    if (diagnostic.status!="EXECUTED" or
+                        len(diagnostic.outputs)!=len(feedback_checks) or
+                        not all(source_same_value(got,y)
+                            for got,(_,y) in zip(
+                                diagnostic.outputs,feedback_checks))):
+                        prompt+=source_refutation_feedback(
+                            code,feedback_checks,diagnostic,
+                            independent=True,rich=True)
+                        continue
+                final=self.runner.evaluate(
+                    code,[x for x,y in sealed_checks])
+                if (final.status=="EXECUTED" and
+                        len(final.outputs)==len(sealed_checks) and all(
+                            source_same_value(got,y)
+                            for got,(_,y) in zip(final.outputs,sealed_checks))):
+                    return Discovery(
+                        "SOURCE_VERIFIED_OPEN_PROGRAM",code,sha,
+                        tuple(receipts),len(checks),True)
+                # A final independent SOURCE test has been opened; its
+                # outcome may only determine PASS/ABSTAIN. Even an opaque
+                # pass/fail bit cannot be repeatedly optimized against.
+                return Discovery(
+                    "ABSTAIN_SEALED_SOURCE_REFUTED",None,None,
+                    tuple(receipts),len(checks),False)
             else:
-                errors=[]
-                if source_executed and self.rich_runtime_feedback:
-                    for got,error,(x,y) in zip(
-                            result.outputs,result.errors,train):
-                        if error is not None:
-                            errors.append({
-                                "input":x,"expected":y,
-                                "runtime_failure":error})
-                        elif not source_same_value(got,y):
-                            errors.append({
-                                "input":x,"expected":y,"got":got})
-                else:
-                    errors=["ABSTAIN_RUNTIME_ERROR" if source_executed
-                            else result.status]
-                prompt+=(
-                    "\nYour last source program was falsified. "
-                    "Fix the causal rule, not individual examples. Errors:\n"+
-                    json.dumps(errors[:3],ensure_ascii=True)[:3500])
+                prompt+=source_refutation_feedback(
+                    code,train,result,rich=self.rich_runtime_feedback)
         return Discovery("ABSTAIN_NO_SOURCE_PROGRAM",None,None,
                          tuple(receipts),len(checks),False)
 
 
-def source_training_example(source,discovery):
-    """Certified original SOURCE episodes only. Never target gold."""
-    if not discovery.verified:raise UnsafeProposal("source certificate absent")
-    return {
+def source_training_example(source,discovery,*,independent_source_checks=None,
+                            source_identity=None):
+    """Immutable complete SOURCE proof and actual failed->verified repair.
+
+    Previous implementation recorded the *count* of SOURCE checks but
+    silently omitted their actual input/output pairs. During subsequent
+    training, a training example was mislabelled as an independent check.
+    A proof must contain the genuine split; otherwise ABSTAIN.
+    """
+    if not discovery.verified or discovery.program is None:
+        raise UnsafeProposal("source certificate absent")
+    if not isinstance(source_identity,(int,str)) or not str(source_identity).strip():
+        raise ValueError("original SOURCE identity required")
+    if independent_source_checks is None:
+        raise ValueError("actual independent SOURCE pairs required")
+    train=tuple((x,y) for x,y in source)
+    checks=tuple((x,y) for x,y in independent_source_checks)
+    if (not train or not checks
+            or len(checks)!=discovery.independent_source_checks):
+        raise ValueError("independent SOURCE count/evidence mismatch")
+    def key(x):
+        return json.dumps(x,sort_keys=True,separators=(",",":"),
+                          ensure_ascii=True,allow_nan=False)
+    a=[key(x) for x,y in train]
+    b=[key(x) for x,y in checks]
+    if (len(a)!=len(set(a)) or len(b)!=len(set(b))
+            or set(a)&set(b)):
+        raise ValueError("independent SOURCE split contaminated")
+    code=validate_code(discovery.program)
+    if hashlib.sha256(code.encode()).hexdigest()!=discovery.frozen_sha256:
+        raise ValueError("certified program digest mismatch")
+    data={
         "schema":"NEUMANN.Q3.PROGRAM-SOURCE-TEACHER.v1",
-        "pairs":list(source),"program":discovery.program,
-        "sha256":discovery.frozen_sha256,
-        "independent_checks":discovery.independent_source_checks,
-        "provenance":"ORIGINAL_SOURCE_ONLY"}
+        "original_id":str(source_identity),
+        "pairs":[list(z) for z in (*train,*checks)],
+        "program":code,"sha256":discovery.frozen_sha256,
+        "independent_checks":len(checks),
+        "provenance":"ORIGINAL_SOURCE_ONLY",
+        "no_target_gold":True}
+    # The last *executed* unsuccessful candidate provides real repair input.
+    # A standalone successful program with no failed attempts is NOT a
+    # self-improving repair demonstration.
+    for prior in reversed(discovery.attempts[:-1]):
+        if (prior.program and prior.status in
+                ("EXECUTED","EXECUTED_WITH_ERRORS")):
+            old=validate_code(prior.program)
+            data.update({
+                "repair_prior_program":old,
+                "repair_prior_sha256":hashlib.sha256(old.encode()).hexdigest(),
+                "repair_phase":("INDEPENDENT_SOURCE"
+                    if prior.source_correct==len(train)
+                    else "TRAIN_SOURCE"),
+                "repair_feedback_checks_count":(
+                    len(checks)-1 if prior.source_correct==len(train)
+                    else 0)})
+            break
+    return data

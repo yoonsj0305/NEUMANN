@@ -1,0 +1,42 @@
+name: Q3 Neural Program Repair Learning Contract - Real Isolated SOURCE
+on:
+  push:
+    branches:
+      - research/q3-one-core-real-repair-learning-20261110
+    paths:
+      - ".github/workflows/q3_open_program_repair_learning.yml"
+      - "neumann1/open_program_inventor.py"
+      - "neumann1/q3_source_repair_learning.py"
+      - "neumann1/q3_trainable_code_policy.py"
+      - "tests/test_q3_source_repair_learning.py"
+      - "tests/test_q3_open_program_discovery.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  same_prompt_neural_gradient_contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify source-only exact repair prompt and independent checks in real sandbox
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e . pytest
+          docker pull python:3.11-alpine
+          python -m pytest -q -x \
+            tests/test_q3_source_repair_learning.py \
+            tests/test_q3_open_program_discovery.py \
+            tests/test_q3_neural_gradient_contract.py \
+            tests/test_q3_single_discovery_core.py
+      - name: Explicit scientific scope (not author-original transfer)
+        run: |
+          echo "Q3_REPAIR_PROMPT_AND_TEACHER_PROVENANCE_CONTRACT_ONLY"
+          echo "NO_C_EXCLUSIVE_AUTHOR_ORIGINAL_MEASURED"
+          echo "Q3_GLOBAL_OPEN"
