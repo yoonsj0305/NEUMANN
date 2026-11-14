@@ -301,3 +301,118 @@ Defects found in the FRESH run (not repaired in the counted run):
 Scope: V1 now holds on an independent FRESH source (MBPP + HumanEval, authors' references run in isolation) at
 60 queries / 30 CPU s, at an absolute level of 38 / 110. V2 and V3 have failed twice (formal, FRESH).
 Q3 as a whole and Q6 remain OPEN.
+
+## 8. Directive "Q3 Autonomous Structural Invention Breakthrough" (2026-11-14) — DEVELOPMENT ONLY
+
+Everything below is development. The FRESH tasks were opened by the single run of section 7; here they are
+re-used only for error analysis and development, never as independent evidence. The sealed FORMAL and FRESH
+records are unchanged.
+
+### 8.1 Phase A — the bottleneck, separated (classified from the sealed FRESH D rows and the final dev rows)
+
+| D unsolved, by cause | FRESH (71) | list-routines dev (69) |
+|---|---|---|
+| state conflict detected, then query limit | 26 (+1 with challenge rejection) | 1 |
+| Update synthesis failure | 30 (+3 with conflict / rejection) | 31 (+3) |
+| query limit without conflict | 6 | 14 |
+| undefined domain / unlocalisable counterexample | 3 | 15 (+1) |
+| wrong adoption (adopted, hidden test failed) | 2 | 3 |
+
+The decisive finding: on 29 FRESH tasks D *did* detect that the answer is not a sufficient state (two
+prefixes with the same answer and different futures), but it could only add continuation components, each a
+query-measured value that carries one bit when the answer is boolean. The latent quantity these tasks need —
+the last element (is-sorted, monotone trends, adjacent products), the index parity (odd / even position rules),
+a counter or a running sum — would take a component per threshold. That is a representation limit, not a
+budget limit: continuation states measure the latent variable through the oracle instead of computing it.
+
+### 8.2 Phase B — counterexample-driven state invention (`neumann1/active.py`)
+
+* **Invented variables.** Candidate latent variables are folds `h' = G(h, e)` from an initial value, where `G`
+  is every small program of the existing generic substrate (integer and list valued; 809 after removing
+  programs that ignore the input or settle on a constant), the same list for every task; computing one costs
+  no query.
+* **Admission from the contradiction.** On a state conflict (or when no Update exists, or a counterexample
+  cannot be localised) a candidate is admissible only if, with `h` added, every observed transition becomes a
+  function of (state, element) — it explains the conflict instead of adding a dimension. Candidates that induce
+  the same partition of the observed prefixes are collapsed; they are tried in Occam order (size of `G`), at
+  most 8: Update synthesis on the extended state, then the fold on every initial example. The simplest whose
+  Update exists and leaves at most a quarter of the examples failing is adopted; the next one is kept as the
+  rival hypothesis.
+* **Failure classification and repair.** A counterexample is localised to its first wrong step (transition
+  error: the point is added and the Update re-synthesised); a wrong start of an invented variable is an
+  initial-state error (alternative starts are rival hypotheses); a variable that cannot be repaired is a wrong
+  structural hypothesis: it is rejected and the next admissible one is invented.
+* **Experiments from hypotheses.** Before a formed machine is returned, up to 3 self-test queries are chosen
+  where it disagrees with its closest rivals — the same machine from another start, other case trees equally
+  consistent with every transition, the runner-up variable — searched over task-distribution inputs and their
+  generic edits (sorted, reversed, element replaced / deleted / duplicated). A disagreement observed is a
+  counterexample for the repair loop, never a reason to accept.
+* **Boolean steps** get case trees (no boolean if-node existed); every case-tree branch must explain at least
+  two observed transitions (all wrongly adopted machines in dev special-cased one value).
+* **F10.** Self-test, challenge and discrimination inputs come from the task's own observed values, their
+  neighbours, duplicates and lengths, with a boundary element in one input of five, never of a sign the task
+  was not observed with.
+
+### 8.3 Phase B dev result (60 queries, 30 CPU s, same harness)
+
+| | old D (sealed FRESH run) | new D (dev) |
+|---|---|---|
+| FRESH tasks solved (of 110) | 38 | 45 |
+| D-only vs Dq replaying the same queries | 14 : 1 | 22 : 0 (Dq re-run on the new queries, p = 4.8e-7) |
+| D-only with an m ≥ 2 machine | 0 | 8 |
+| of which through an invented variable | 0 | 7 (`humaneval/62, 121, 126`, `mbpp/567, 680, 775, 790`; `humaneval/85` via a continuation) |
+| adopted but wrong | 2 (`mbpp/45, 635`) | 1 (`mbpp/68`) |
+| list-routines dev solved / m ≥ 2 solves | 159 / 5 | 159 / 13 |
+| CPU s / queries (FRESH) | 2 712 / 6 468 | 2 753 / 6 520 |
+
+Invented variables in these machines: `h' = e` (last element), `h' = −h` from 1 (index parity), `h' = h + 1`
+(position counter). Example (`humaneval/121`, sum of odd elements at even positions): the answer-only state
+showed equal (state, element) pairs with different successors; 28 of 809 candidates made the transitions a
+function; the simplest, `h' = −h` from 1, was adopted; Update `(if (eq h (mod e 2)) (add s e) s)`; 22 queries.
+Caveat: `mbpp/775` passed the hidden test with an alternating-parity rule that is not the reference's semantics
+on every input.
+
+### 8.4 Phase C — learned discovery policy (dev cross-validation, separated by author lineage)
+
+Policy fitted on list-routines + HumanEval rows, tested on MBPP; fitted on list-routines + MBPP, tested on
+HumanEval. E = invented-variable credit learned from verified outcomes (+1 variable of a machine that passed the
+independent challenge and the hidden test, −1 adopted-but-wrong, −0.25 rejected by its own repair loop; a
+variable tried but not needed gets nothing); B = experience cache (every adopted variable, outcomes ignored).
+Both try their positive variables first, then the 8 cheapest. Run 1 also kept the earlier policy elements
+(direction / kind order, formation allotments); run 2 ("acc only") removes them, so E and B differ from D only
+in the invented-variable prior.
+
+| (110 FRESH tasks, dev) | solved | vs D (only / D-only) | vs B |
+|---|---|---|---|
+| D | 45 | — | — |
+| E learned, run 1 / run 2 | 42 / 42 | 0 : 3 / 0 : 3 | 2 : 1 / 0 : 1 |
+| B cache, run 1 / run 2 | 41 / 43 | 1 : 5 / 1 : 3 | — |
+
+**Phase C: not passed.** The learned prior produced no additional solve and lost three HumanEval latent tasks
+(`humaneval/85, 121, 126`) in both runs: variables credited on other tasks (last element, position counter) are
+tried before the simplest admissible variable of the new task, are "nearly consistent", get adopted, and lead
+to an Update the repair loop cannot finish within the budget. The one exclusive gain is the cache's
+(`humaneval/3`, running sum), which the learned credit had suppressed because the same variable had been
+part of a wrong machine elsewhere — credit assignment cannot separate a wrong variable from a wrong Update with
+this little experience (8 verified latent episodes). Because Phase C did not pass, no new independent evaluation
+was pre-registered (directive §7, Phase D).
+
+### 8.5 The two physical-learning principles (review only, no experiment)
+
+* State skipping: the invented variables are its discrete counterpart in query space — the latent state is
+  computed from the input, never measured through the oracle, and only the states where hypotheses disagree
+  are observed. SS-DFA itself needs a differentiable forward map and a fixed random feedback path; a discrete
+  program search has neither, so it was not applied. Credit from the final verified outcome to the discovery
+  action is what 8.4 tested; with this little experience it did not help.
+* Single map: every invented variable is one shared small map `G` iterated over the input, generated from one
+  substrate for every task. No neural single-map generator was built; no independent effect was measured.
+
+### 8.6 Verdicts after this directive
+
+| | Verdict |
+|---|---|
+| V1 executable method invention | PASS retained (FORMAL and FRESH, sealed) |
+| V2 latent state discovery | development PASS (Phase B criterion met on opened tasks: 0 → 8 D-only m ≥ 2, wrong adoptions 2 → 1); **no independent result** — the sealed FRESH V2 FAIL stands |
+| V3 learned discovery policy | development FAIL (Phase C): 0 additional solves |
+| Q3 overall | OPEN |
+| Q6 | OPEN (separate work) |

@@ -125,35 +125,32 @@ def policy_from(rows, exclude_fold=None):
 
 
 def acc_experience(rows, mode="learned"):
-    """Invented-variable experience of OTHER tasks (V3).  `learned`: credit from independently verified
-    outcomes -- +1 when the variable was adopted in a machine that passed the independent challenge and solved
-    the task, -1 when it was adopted in a machine that was rejected or wrong, -0.5 when the repair loop itself
-    rejected it, -0.1 per trial that left examples failing.  `cache`: every adopted variable +1, outcomes
-    ignored (an experience cache without learning, the comparison arm).  Keys "show||init"."""
+    """Invented-variable experience of OTHER tasks (V3).  `learned`: credit only from independently verified
+    outcomes -- +1 to each variable of a machine that passed the independent challenge AND solved the hidden
+    test, -1 to each variable of a machine that was adopted but wrong (overfit), -0.25 when the repair loop
+    itself rejected the variable; a variable tried but not needed gets nothing (no evidence either way).
+    `cache`: every adopted variable +1, outcomes ignored (an experience cache without learning, the comparison
+    arm).  Keys "show||init"."""
     score = collections.Counter()
     for r in rows:
         if r.get("arm") != "D" or not r.get("formation"):
             continue
-        for m in r["formation"].get("machines", []):
+        f = r["formation"]
+        for m in f.get("machines", []):
+            final = ["%s||%s" % (c.get("update"), c.get("init")) for c in m.get("components", [])
+                     if c.get("kind") == "accumulator"]
+            if mode == "cache":
+                for inv in m.get("inventions", []):
+                    if inv.get("adopted"):
+                        score["||".join(inv["adopted"])] += 1
+                continue
             for inv in m.get("inventions", []):
                 ad = inv.get("adopted")
-                if mode == "cache":
-                    if ad:
-                        score["||".join(ad)] += 1
-                    continue
-                for show, zk, fails in inv.get("tried", []):
-                    if fails is None or fails > 0:
-                        score[show + "||" + zk] -= 0.1
-                if ad:
-                    key = "||".join(ad)
-                    still = [c for c in m.get("components", []) if c.get("kind") == "accumulator"
-                             and [c.get("update"), c.get("init")] == ad]
-                    if not still:
-                        score[key] -= 0.5
-                    elif m.get("challenge") and r.get("solved"):
-                        score[key] += 1
-                    else:
-                        score[key] -= 1
+                if ad and "||".join(ad) not in final:
+                    score["||".join(ad)] -= 0.25
+            if m.get("challenge") and f.get("adoption") in ("machine", None) and r.get("via", "").startswith("state"):
+                for k in final:
+                    score[k] += 1 if r.get("solved") else -1
     return {k: round(v, 3) for k, v in score.items() if v}
 
 
