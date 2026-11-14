@@ -663,3 +663,24 @@ not recovered). V3 FAIL. Q3 OPEN. Q6 OPEN. Full regression: 1148 passed, 53 skip
 Not done in this session: Phases B–E (a learned experiment-selection policy over the existing disagreement /
 sufficiency / Update / start / localisation experiments, intermediate structural-information credit, and the
 D / B / E-static / E-learned / E-no-knowledge / E-no-learning comparison). V3 FAIL, Q3 OPEN, Q6 OPEN.
+
+## 14. Reproducibility of the counterfactual labels (2026-11-14) — DEVELOPMENT ONLY
+
+22 decision pairs (7 outcome-changing, 5 logically different, 10 controls fixed by hash before running), each run
+3 times as D and 3 times with the one decision switched (132 runs, same code `ea528c6`, seed, budget).
+Within each triple the outcome never varied (no UNSTABLE label); but against the single earlier replay:
+
+| group | STABLE effect | NO EFFECT | INVALID |
+|---|---|---|---|
+| outcome-changing (7) | 4: repair better `count-k(k=10)`#0; invent better `humaneval/3`#0, `humaneval/3`#1, `pow-k(k=3) | index-k(k=2)`#1 | 2: `mbpp/670`#0, `prepend-k(k=-2) | positions`#0 (the earlier "effect" did not reproduce) | 1: `mbpp/775` (semantic mismatch) |
+| logically different (5) | 0 | 3 | 2 (prefix differs again) |
+| controls (10) | 0 | 10 | 0 |
+
+So 4 valid causal labels remain (2 of them from one task), from 357 decisions. Only the logical evidence
+features and the query count were compared; the full execution state (RNG, caches, CPU consumed) was not
+captured, so these are same-evidence, not proven same-state, comparisons. With 4 labels a learned
+experiment-selection policy has nothing to learn from: per the stop conditions, the hypothesis of section 13
+("learned distinguishing experiments") was not implemented, and the scarcity is recorded as the finding —
+decision-level outcome changes are rare and the labels needed to learn from them are rarer still.
+
+V1 PASS (sealed). V2 independent OPEN (development results preserved). V3 FAIL. Q3 OPEN. Q6 untouched.

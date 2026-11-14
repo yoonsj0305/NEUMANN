@@ -163,6 +163,646 @@
   "replay_identical": 259
  },
  "full_regression_tests": "1148 passed, 53 skipped (code ea528c6)",
+ "label_reproducibility_3x": {
+  "add-k(k=-2) | pow-base-k(k=2)#1": {
+   "D": [
+    false,
+    false,
+    false
+   ],
+   "alt": [
+    false,
+    false,
+    false
+   ],
+   "cpu_D": [
+    30.0102,
+    30.0069,
+    30.0071
+   ],
+   "group": "control",
+   "label": "NO EFFECT",
+   "q_D": [
+    60,
+    60,
+    60
+   ],
+   "q_alt": [
+    60,
+    60,
+    60
+   ]
+  },
+  "count-k(k=10)#0": {
+   "D": [
+    false,
+    false,
+    false
+   ],
+   "alt": [
+    true,
+    true,
+    true
+   ],
+   "cpu_D": [
+    30.0007,
+    30.0005,
+    30.0028
+   ],
+   "group": "changed",
+   "label": "STABLE: repair better",
+   "q_D": [
+    60,
+    60,
+    60
+   ],
+   "q_alt": [
+    58,
+    58,
+    58
+   ]
+  },
+  "humaneval/3#0": {
+   "D": [
+    true,
+    true,
+    true
+   ],
+   "alt": [
+    false,
+    false,
+    false
+   ],
+   "cpu_D": [
+    30.0047,
+    30.0026,
+    30.0045
+   ],
+   "group": "changed",
+   "label": "STABLE: invent better",
+   "q_D": [
+    58,
+    58,
+    58
+   ],
+   "q_alt": [
+    60,
+    60,
+    60
+   ]
+  },
+  "humaneval/3#1": {
+   "D": [
+    true,
+    true,
+    true
+   ],
+   "alt": [
+    false,
+    false,
+    false
+   ],
+   "cpu_D": [
+    30.0092,
+    30.0103,
+    30.0066
+   ],
+   "group": "changed",
+   "label": "STABLE: invent better",
+   "q_D": [
+    58,
+    58,
+    58
+   ],
+   "q_alt": [
+    60,
+    60,
+    60
+   ]
+  },
+  "keep-mod-k(k=5) | intersperse-k(k=-2)#1": {
+   "D": [
+    false,
+    false,
+    false
+   ],
+   "alt": [
+    false,
+    false,
+    false
+   ],
+   "cpu_D": [
+    30.0043,
+    30.0284,
+    30.0094
+   ],
+   "group": "logical_diff",
+   "label": "NO EFFECT",
+   "q_D": [
+    60,
+    60,
+    60
+   ],
+   "q_alt": [
+    60,
+    60,
+    60
+   ]
+  },
+  "kth-largest(k=2)#1": {
+   "D": [
+    true,
+    true,
+    true
+   ],
+   "alt": [
+    true,
+    true,
+    true
+   ],
+   "cpu_D": [
+    30.0022,
+    30.0013,
+    30.0033
+   ],
+   "group": "control",
+   "label": "NO EFFECT",
+   "q_D": [
+    58,
+    58,
+    58
+   ],
+   "q_alt": [
+    58,
+    58,
+    58
+   ]
+  },
+  "mbpp/382#0": {
+   "D": [
+    false,
+    false,
+    false
+   ],
+   "alt": [
+    false,
+    false,
+    false
+   ],
+   "cpu_D": [
+    30.0012,
+    30.0035,
+    30.0013
+   ],
+   "group": "control",
+   "label": "NO EFFECT",
+   "q_D": [
+    60,
+    60,
+    60
+   ],
+   "q_alt": [
+    60,
+    60,
+    60
+   ]
+  },
+  "mbpp/505#1": {
+   "D": [
+    false,
+    false,
+    false
+   ],
+   "alt": [
+    false,
+    false,
+    false
+   ],
+   "cpu_D": [
+    30.0089,
+    30.0319,
+    30.0116
+   ],
+   "group": "control",
+   "label": "NO EFFECT",
+   "q_D": [
+    60,
+    60,
+    60
+   ],
+   "q_alt": [
+    60,
+    60,
+    60
+   ]
+  },
+  "mbpp/520#0": {
+   "D": [
+    false,
+    false,
+    false
+   ],
+   "alt": [
+    false,
+    false,
+    false
+   ],
+   "cpu_D": [
+    30.0151,
+    30.0081,
+    30.0014
+   ],
+   "group": "control",
+   "label": "NO EFFECT",
+   "q_D": [
+    60,
+    60,
+    60
+   ],
+   "q_alt": [
+    60,
+    60,
+    60
+   ]
+  },
+  "mbpp/670#0": {
+   "D": [
+    false,
+    false,
+    false
+   ],
+   "alt": [
+    false,
+    false,
+    false
+   ],
+   "cpu_D": [
+    30.0194,
+    30.0071,
+    30.0171
+   ],
+   "group": "changed",
+   "label": "NO EFFECT",
+   "q_D": [
+    60,
+    60,
+    60
+   ],
+   "q_alt": [
+    58,
+    58,
+    58
+   ]
+  },
+  "mbpp/775#0": {
+   "D": [
+    false,
+    false,
+    false
+   ],
+   "alt": [
+    true,
+    true,
+    true
+   ],
+   "cpu_D": [
+    30.0078,
+    30.0045,
+    30.002
+   ],
+   "group": "changed",
+   "label": "INVALID (semantic mismatch)",
+   "q_D": [
+    60,
+    60,
+    60
+   ],
+   "q_alt": [
+    58,
+    58,
+    58
+   ]
+  },
+  "pop#0": {
+   "D": [
+    true,
+    true,
+    true
+   ],
+   "alt": [
+    true,
+    true,
+    true
+   ],
+   "cpu_D": [
+    8.9362,
+    9.1477,
+    8.9763
+   ],
+   "group": "control",
+   "label": "NO EFFECT",
+   "q_D": [
+    58,
+    58,
+    58
+   ],
+   "q_alt": [
+    60,
+    60,
+    60
+   ]
+  },
+  "positions | append-k(k=3)#1": {
+   "D": [
+    false,
+    false,
+    false
+   ],
+   "alt": [
+    false,
+    false,
+    false
+   ],
+   "cpu_D": [
+    30.0113,
+    30.0211,
+    30.0206
+   ],
+   "group": "logical_diff",
+   "label": "INVALID (prefix differs)",
+   "q_D": [
+    60,
+    60,
+    60
+   ],
+   "q_alt": [
+    60,
+    60,
+    60
+   ]
+  },
+  "pow-k(k=3) | index-k(k=2)#1": {
+   "D": [
+    true,
+    true,
+    true
+   ],
+   "alt": [
+    false,
+    false,
+    false
+   ],
+   "cpu_D": [
+    30.0071,
+    30.0148,
+    30.0078
+   ],
+   "group": "changed",
+   "label": "STABLE: invent better",
+   "q_D": [
+    58,
+    58,
+    58
+   ],
+   "q_alt": [
+    60,
+    60,
+    60
+   ]
+  },
+  "pow-k(k=4) | product#1": {
+   "D": [
+    false,
+    false,
+    false
+   ],
+   "alt": [
+    false,
+    false,
+    false
+   ],
+   "cpu_D": [
+    30.0046,
+    30.0013,
+    30.045
+   ],
+   "group": "logical_diff",
+   "label": "NO EFFECT",
+   "q_D": [
+    60,
+    60,
+    60
+   ],
+   "q_alt": [
+    60,
+    60,
+    60
+   ]
+  },
+  "pow-k(k=4)#0": {
+   "D": [
+    false,
+    false,
+    false
+   ],
+   "alt": [
+    false,
+    false,
+    false
+   ],
+   "cpu_D": [
+    30.0069,
+    30.055,
+    30.0136
+   ],
+   "group": "control",
+   "label": "NO EFFECT",
+   "q_D": [
+    60,
+    60,
+    60
+   ],
+   "q_alt": [
+    60,
+    60,
+    60
+   ]
+  },
+  "prepend-k(k=-2) | positions#0": {
+   "D": [
+    false,
+    false,
+    false
+   ],
+   "alt": [
+    false,
+    false,
+    false
+   ],
+   "cpu_D": [
+    30.0042,
+    30.0322,
+    30.0064
+   ],
+   "group": "changed",
+   "label": "NO EFFECT",
+   "q_D": [
+    60,
+    60,
+    60
+   ],
+   "q_alt": [
+    60,
+    60,
+    60
+   ]
+  },
+  "prepend-k(k=10) | positions#1": {
+   "D": [
+    false,
+    false,
+    false
+   ],
+   "alt": [
+    false,
+    false,
+    false
+   ],
+   "cpu_D": [
+    30.0052,
+    30.0108,
+    30.0159
+   ],
+   "group": "logical_diff",
+   "label": "NO EFFECT",
+   "q_D": [
+    60,
+    60,
+    60
+   ],
+   "q_alt": [
+    60,
+    60,
+    60
+   ]
+  },
+  "prepend-k(k=2) | append-k(k=-2)#1": {
+   "D": [
+    true,
+    true,
+    true
+   ],
+   "alt": [
+    true,
+    true,
+    true
+   ],
+   "cpu_D": [
+    10.8994,
+    10.8065,
+    10.9232
+   ],
+   "group": "control",
+   "label": "NO EFFECT",
+   "q_D": [
+    60,
+    60,
+    60
+   ],
+   "q_alt": [
+    60,
+    60,
+    60
+   ]
+  },
+  "remove-mod-k(k=5) | kth-largest(k=2)#0": {
+   "D": [
+    false,
+    false,
+    false
+   ],
+   "alt": [
+    false,
+    false,
+    false
+   ],
+   "cpu_D": [
+    30.0046,
+    30.0024,
+    30.0015
+   ],
+   "group": "control",
+   "label": "NO EFFECT",
+   "q_D": [
+    60,
+    60,
+    60
+   ],
+   "q_alt": [
+    60,
+    60,
+    60
+   ]
+  },
+  "replace-all-k-with-n(k=3,n=-2)#1": {
+   "D": [
+    true,
+    true,
+    true
+   ],
+   "alt": [
+    true,
+    true,
+    true
+   ],
+   "cpu_D": [
+    15.0945,
+    15.8436,
+    15.4845
+   ],
+   "group": "control",
+   "label": "NO EFFECT",
+   "q_D": [
+    60,
+    60,
+    60
+   ],
+   "q_alt": [
+    60,
+    60,
+    60
+   ]
+  },
+  "rotate-k(k=-2) | replace-all-k-with-n(k=1,n=2)#1": {
+   "D": [
+    false,
+    false,
+    false
+   ],
+   "alt": [
+    false,
+    false,
+    false
+   ],
+   "cpu_D": [
+    30.0267,
+    30.0058,
+    30.0176
+   ],
+   "group": "logical_diff",
+   "label": "INVALID (prefix differs)",
+   "q_D": [
+    60,
+    60,
+    60
+   ],
+   "q_alt": [
+    60,
+    60,
+    60
+   ]
+  }
+ },
  "phase_A_identity_audit": {
   "cpu_inclusive_identical": 255,
   "index0_pairs_trivially_identical": 195,
