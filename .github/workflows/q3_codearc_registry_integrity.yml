@@ -1,0 +1,44 @@
+name: Q3 CodeARC Original Registry Integrity Audit
+on:
+  push:
+    branches:
+      - research/q3-two-origin-causal-policy-20261109
+    paths:
+      - ".github/workflows/q3_codearc_registry_integrity.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  prove-original-not-reused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Pin authentic original CodeARC I/O without opening target gold
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/orig Q3-REGISTRY
+          curl -fLsS --retry 3             https://huggingface.co/datasets/anjiangwei/CodeARC-Invocations/resolve/119512573bf96148cbb95e99cf7cdd21c06153e4/invocations.jsonl             -o /tmp/orig/invocations.jsonl
+          sha256sum /tmp/orig/invocations.jsonl > Q3-REGISTRY/ORIGINAL_DATA_SHA256.txt
+      - name: Exact legacy eligibility and 88-91 SOURCE-only registry
+        run: |
+          python research/q3/q3_two_origins_preregistered.py prepare             --origin codearc --original /tmp/orig/invocations.jsonl             --out Q3-REGISTRY/BLIND.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('Q3-REGISTRY/BLIND.json').read_text())
+          new={int(r['id']) for r in p['records']}
+          old={255,921,184,116,128,897,573,103}
+          assert len(new)==4 and not new&old, (new,old)
+          print('Q3_CODEARC_NO_REUSE', sorted(new))
+          PY
+          sha256sum Q3-REGISTRY/BLIND.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Q3-ORIGINAL-CODEARC-88-91-IDENTITY-AUDIT
+          path: Q3-REGISTRY/
+          if-no-files-found: warn

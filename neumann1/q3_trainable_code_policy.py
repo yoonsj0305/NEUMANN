@@ -67,9 +67,14 @@ class LocalCausalCodePolicy:
 
     def propose(self,prompt):
         rendered=model_prefix(self.tokenizer,prompt)
+        # Never silently delete original SOURCE evidence to fit a model:
+        # abstain if memory+problem cannot fit the actual prompt budget.
         tokens=self.tokenizer(
             rendered,return_tensors="pt",add_special_tokens=False,
-            truncation=True,max_length=1536).to(self.device)
+            truncation=False)
+        if tokens["input_ids"].shape[1] > 4096:
+            raise ValueError("SOURCE_PROMPT_EXCEEDS_CONTEXT:ABSTAIN")
+        tokens=tokens.to(self.device)
         # Source-prompt-derived RNG makes first proposals IDENTICAL across
         # the opaque-error and typed-counterexample causal ablations.
         # Later prompts legitimately diverge only when feedback differs.
@@ -118,12 +123,8 @@ def source_training_rows(path):
     return records,hashlib.sha256(source_bytes).hexdigest()
 
 
-def recertify_source_rows(rows, *, runner=None):
-    """No self-signed JSON may train weights without executing all SOURCE labels.
-
-    Reuse the exact same SOURCE-only memory verifier, not a second
-    task-domain-specific oracle. No isolated Docker => fail closed.
-    """
+def certified_source_memory(rows, *, runner=None):
+    """Re-execute all SOURCE labels once before learning or reuse."""
     from .open_program_inventor import IsolatedPython
     from .q3_single_discovery_core import SourceMethodMemory
     if not rows or len(rows) > 4096:
@@ -131,14 +132,43 @@ def recertify_source_rows(rows, *, runner=None):
     memory = SourceMethodMemory(
         runner if runner is not None else IsolatedPython(max_seconds=8),
         max_episodes=len(rows))
-    imported = memory.import_source_teachers(rows)
+    memory.import_source_teachers(rows)
     memory.freeze()
-    return tuple(entry.identity for entry in imported)
+    return memory
+
+
+def recertify_source_rows(rows, *, runner=None):
+    return tuple(
+        row.identity for row in
+        certified_source_memory(rows,runner=runner).episodes)
+
+
+def contextual_training_prompt(row, memory):
+    """Leave SELF out: learn method transfer rather than answer copying.
+
+    This is exactly the same two-method SOURCE-only context as deployment B/C.
+    Neither input examples nor self program can be retrieved from prior memory.
+    """
+    identity=row.get("original_id",row.get("source_id"))
+    if identity is None:
+        raise ValueError("no source identity for meta-training")
+    identity=str(identity)
+    if not identity.startswith("source-teacher/"):
+        identity="source-teacher/"+identity
+    if identity not in {entry.source_id for entry in memory.episodes}:
+        raise ValueError("training source not in certified memory")
+    context=memory.context(
+        excluded_ids=(identity,),max_methods=2,max_chars_per_method=320)
+    if not context:
+        raise ValueError("no disjoint method from which to learn")
+    return source_discovery_prompt(row["pairs"][:6],
+                                   method_context=context)
 
 
 def finetune_source_policy(
         source_jsonl,adapter_output,*,model_name=DEFAULT_MODEL,
-        model_revision=None,max_steps=40,lr=0.00015,rank=4,seed=1007):
+        model_revision=None,max_steps=40,lr=0.00015,rank=4,seed=1007,
+        contextual_methods=False):
     """LoRA gradient update of generator weights on prior certified SOURCE.
 
     Does NOT train on target test answers or private reference programs.
@@ -151,7 +181,10 @@ def finetune_source_policy(
     source,source_sha=source_training_rows(source_jsonl)
     if not source:
         raise ValueError("no independently source-certified programs to learn")
-    teacher_receipts=recertify_source_rows(source)
+    certified_memory=certified_source_memory(source)
+    teacher_receipts=tuple(e.identity for e in certified_memory.episodes)
+    if contextual_methods and len(teacher_receipts)<2:
+        raise ValueError("meta-learning requires >=2 independent source methods")
     torch,Model,Tokenizer=_dependencies()
     try:
         from peft import LoraConfig,get_peft_model
@@ -180,7 +213,8 @@ def finetune_source_policy(
         # Match the live SOURCE-only 6-example prompt *exactly*, rather
         # than training with a separate text format never seen at inference.
         teacher_pairs=row["pairs"][:6]
-        prompt=source_discovery_prompt(teacher_pairs)
+        prompt=(contextual_training_prompt(row,certified_memory)
+                if contextual_methods else source_discovery_prompt(teacher_pairs))
         completion=row["program"]+tokenizer.eos_token
         full_ids,labels=model_training_ids(
             tokenizer,prompt,completion,max_length=1536)
@@ -203,6 +237,8 @@ def finetune_source_policy(
         "schema":"NEUMANN.Q3.SOURCE-PROGRAM-LORA.v1",
         "base_model":model_name,"model_revision":model_revision,
         "prompt_contract":"source_discovery_prompt+chat_template.v1",
+        "contextual_method_training":bool(contextual_methods),
+        "leave_self_out_from_past_methods":bool(contextual_methods),
         "source_sha256":source_sha,
         "source_programs":len(source),
         "docker_source_reverified":len(teacher_receipts),
@@ -226,9 +262,11 @@ if __name__=="__main__":
     p.add_argument("--model-revision",default=None)
     p.add_argument("--steps",type=int,default=40)
     p.add_argument("--seed",type=int,default=1007)
+    p.add_argument("--contextual-method-training",action="store_true")
     args=p.parse_args()
     print(json.dumps(
         finetune_source_policy(
             args.sources,args.adapter_output,model_name=args.model,
             model_revision=args.model_revision,
-            max_steps=args.steps,seed=args.seed),indent=2))
+            max_steps=args.steps,seed=args.seed,
+            contextual_methods=args.contextual_method_training),indent=2))

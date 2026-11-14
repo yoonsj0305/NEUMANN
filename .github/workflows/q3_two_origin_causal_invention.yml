@@ -1,0 +1,221 @@
+name: Q3 Two Independent Authors - Learned Discovery Policy Causal Gate
+on:
+  push:
+    branches:
+      - research/q3-two-origin-causal-policy-20261109
+    paths:
+      - ".github/workflows/q3_two_origin_causal_invention.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  PYTHONHASHSEED: "0"
+  OMP_NUM_THREADS: "2"
+  OPENBLAS_NUM_THREADS: "2"
+  MKL_NUM_THREADS: "2"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  TOKENIZERS_PARALLELISM: "false"
+  HF_HUB_DOWNLOAD_TIMEOUT: "180"
+
+jobs:
+  learn:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Pin SOURCE original and model, freeze CodeARC 88-91 registry before teacher access
+        run: |
+          set -euo pipefail
+          mkdir -p training /tmp/q3-codearc
+          curl -fL --retry 3 --silent --show-error \
+            https://huggingface.co/datasets/anjiangwei/CodeARC-Invocations/resolve/119512573bf96148cbb95e99cf7cdd21c06153e4/invocations.jsonl \
+            -o /tmp/q3-codearc/invocations.jsonl
+          test -s /tmp/q3-codearc/invocations.jsonl
+          git ls-remote https://huggingface.co/Qwen/Qwen2.5-Coder-0.5B-Instruct HEAD \
+            | awk '{print $1}' > training/MODEL_REVISION.txt
+          test "$(wc -c < training/MODEL_REVISION.txt)" -eq 41
+          sha256sum /tmp/q3-codearc/invocations.jsonl > training/CODEARC_DATA_SHA256.txt
+          python research/q3/q3_two_origins_preregistered.py prepare \
+            --origin codearc --original /tmp/q3-codearc/invocations.jsonl \
+            --out training/BLIND_CODEARC.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path("training/BLIND_CODEARC.json").read_text())
+          legacy={"schema":"NEUMANN.Q3.NEURAL.CODEARC.BLIND.v1",
+                  "original_sha256":x["source_fingerprint"],
+                  "records":[{"id":int(t["id"]),"source":t["source"]}
+                             for t in x["records"]]}
+          Path("training/LEGACY_TEACHER_EXCLUSION.json").write_text(json.dumps(legacy))
+          print("Q3_FROZEN_TARGET_IDS",[t["id"] for t in x["records"]],flush=True)
+          PY
+      - name: Install exact CPU learning stack and isolated SOURCE verifier
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          python -m pip install -q --index-url https://download.pytorch.org/whl/cpu 'torch==2.5.1'
+          python -m pip install -q 'transformers==4.48.3' 'peft==0.14.0' 'accelerate==1.3.0' pytest sentencepiece
+          docker pull python:3.11-alpine
+      - name: Reuse PRIOR original SOURCE-only model inventions, never reference solutions
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/source1 /tmp/source2 /tmp/source3
+          gh run download 42560914319 \
+            --name Q3-NEURAL-CODEARC-POSTFIRST-REAL-MODEL \
+            --dir /tmp/source1
+          gh run download 42567509069 \
+            --name Q3-NEURAL-CODEARC-POSTFIRST-REAL-MODEL \
+            --dir /tmp/source2
+          gh run download 42585323888 \
+            --name Q3-NEURAL-CODEARC-POSTFIRST-INDEPENDENT-SOURCE-REWARD-64 \
+            --dir /tmp/source3
+          python research/q3/q3_real_source_teacher_builder.py \
+            --prior /tmp/source1 /tmp/source2 /tmp/source3 \
+            --holdout-blind training/LEGACY_TEACHER_EXCLUSION.json \
+            --output training/SOURCE_TEACHERS.jsonl
+          test -s training/SOURCE_TEACHERS.jsonl
+      - name: ACTUALLY train common proposal policy with leave-current-method-out source traces
+        run: |
+          set -euo pipefail
+          REV="$(cat training/MODEL_REVISION.txt)"
+          python -m neumann1.q3_trainable_code_policy \
+            --sources training/SOURCE_TEACHERS.jsonl \
+            --adapter-output training/adapter \
+            --model Qwen/Qwen2.5-Coder-0.5B-Instruct \
+            --model-revision "$REV" --steps 10 \
+            --contextual-method-training
+          test -f training/adapter/adapter_model.safetensors
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Q3-TWO-ORIGIN-FROZEN-SOURCE-ADAPTER
+          path: training/
+          if-no-files-found: warn
+          retention-days: 90
+
+  originals:
+    needs: learn
+    strategy:
+      fail-fast: false
+      matrix:
+        origin: [codearc, arcana]
+    runs-on: ubuntu-latest
+    timeout-minutes: 160
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: Q3-TWO-ORIGIN-FROZEN-SOURCE-ADAPTER
+          path: training
+      - name: Pinned external originals, never train on original TARGET answers
+        run: |
+          set -euo pipefail
+          mkdir -p "original-${{ matrix.origin }}"
+          if [ "${{ matrix.origin }}" = "codearc" ]; then
+            curl -fL --retry 3 --silent --show-error \
+              https://huggingface.co/datasets/anjiangwei/CodeARC-Invocations/resolve/119512573bf96148cbb95e99cf7cdd21c06153e4/invocations.jsonl \
+              -o original-codearc/invocations.jsonl
+            EXPECTED="$(cut -d ' ' -f1 training/CODEARC_DATA_SHA256.txt)"
+            ACTUAL="$(sha256sum original-codearc/invocations.jsonl | cut -d ' ' -f1)"
+            test "$ACTUAL" = "$EXPECTED"
+          else
+            git init -q original-arcana
+            git -C original-arcana fetch -q --depth 1 \
+              https://github.com/density-11/arcana-test.git \
+              3f3dc8f650deb271a29e282bfb0e5ca95a7d64d6
+            git -C original-arcana checkout -q FETCH_HEAD
+            test "$(git -C original-arcana rev-parse HEAD)" = \
+              3f3dc8f650deb271a29e282bfb0e5ca95a7d64d6
+          fi
+      - name: Exact model, ONE general Python program ISA, SOURCE-only Docker
+        run: |
+          set -euo pipefail
+          python -m pip install -q -e .
+          python -m pip install -q --index-url https://download.pytorch.org/whl/cpu 'torch==2.5.1'
+          python -m pip install -q 'transformers==4.48.3' 'peft==0.14.0' 'accelerate==1.3.0' pytest sentencepiece
+          docker pull python:3.11-alpine
+          python -m pytest -q -x tests/test_q3_two_origins_contract.py
+      - name: Freeze full ORIGINAL tasks and author provenance, SOURCE I/O only
+        run: |
+          set -euo pipefail
+          ORIGIN="${{ matrix.origin }}"
+          mkdir -p "result-$ORIGIN"
+          if [ "$ORIGIN" = "codearc" ]; then
+            ORIGINAL=original-codearc/invocations.jsonl
+          else
+            ORIGINAL=original-arcana/data
+          fi
+          python research/q3/q3_two_origins_preregistered.py prepare \
+            --origin "$ORIGIN" --original "$ORIGINAL" \
+            --out "result-$ORIGIN/BLIND.json"
+          if [ "$ORIGIN" = "codearc" ]; then
+            cmp "result-$ORIGIN/BLIND.json" training/BLIND_CODEARC.json
+          fi
+          sha256sum "result-$ORIGIN/BLIND.json" \
+            > "result-$ORIGIN/BLIND.sha256"
+      - name: A pretrained vs B certified-memory vs C actual learned weights
+        run: |
+          set -euo pipefail
+          ORIGIN="${{ matrix.origin }}"
+          REV="$(cat training/MODEL_REVISION.txt)"
+          python research/q3/q3_two_origins_preregistered.py propose \
+            --blind "result-$ORIGIN/BLIND.json" \
+            --teachers training/SOURCE_TEACHERS.jsonl \
+            --adapter training/adapter \
+            --model-revision "$REV" \
+            --out "result-$ORIGIN/PREDICTIONS.json"
+          sha256sum "result-$ORIGIN/PREDICTIONS.json" \
+            > "result-$ORIGIN/PREDICTIONS.sha256"
+      - name: ONLY NOW score heldout original-author gold, immutable A/B/C predictions
+        run: |
+          set -euo pipefail
+          ORIGIN="${{ matrix.origin }}"
+          if [ "$ORIGIN" = "codearc" ]; then
+            ORIGINAL=original-codearc/invocations.jsonl
+          else
+            ORIGINAL=original-arcana/data
+          fi
+          SHA="$(cut -d ' ' -f1 "result-$ORIGIN/PREDICTIONS.sha256")"
+          python research/q3/q3_two_origins_preregistered.py score \
+            --origin "$ORIGIN" --original "$ORIGINAL" \
+            --blind "result-$ORIGIN/BLIND.json" \
+            --predictions "result-$ORIGIN/PREDICTIONS.json" \
+            --expected-sha "$SHA" \
+            --out "result-$ORIGIN/SCORE.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-two-origin-${{ matrix.origin }}-original-receipts
+          path: result-${{ matrix.origin }}/
+          if-no-files-found: warn
+          retention-days: 90
+
+  causal_gate:
+    needs: originals
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-two-origin-codearc-original-receipts
+          path: graded-codearc
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-two-origin-arcana-original-receipts
+          path: graded-arcana
+      - name: Cross-author original exact residual, NO global PASS by model loss
+        run: |
+          python research/q3/q3_two_origins_preregistered.py gate \
+            --codearc-score graded-codearc/SCORE.json \
+            --arcana-score graded-arcana/SCORE.json
