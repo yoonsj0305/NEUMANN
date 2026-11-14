@@ -1,0 +1,39 @@
+name: North Star finite-action bridge (opened contracts only)
+
+on:
+  pull_request:
+    paths:
+      - 'neumann1/finite_action_boundary_v1.py'
+      - 'neumann1/structural_library_admission_v1.py'
+      - 'tests/test_structural_library_admission_v1.py'
+      - 'tests/test_finite_action_boundary_v1.py'
+      - 'experiments/north_star_opened_actual.py'
+      - 'docs/research/NORTH_STAR_LEARNED_STRUCTURE_EXECUTION_PLAN_2026_11_06.md'
+      - '.github/workflows/north_star_finite_action_bridge.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  finite-action-opened:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Existing package import dependencies
+        run: python -m pip install scikit-learn
+      - name: Python compile, no model inference
+        run: python -m py_compile neumann1/finite_action_boundary_v1.py tests/test_finite_action_boundary_v1.py experiments/north_star_opened_actual.py
+      - name: Twelve original opened interface fixtures and negative controls
+        run: python -m unittest discover -s tests -p 'test_finite_action_boundary_v1.py' -v
+      - name: Actual existing arithmetic and CSP solvers plus original independent verifier
+        run: python -m experiments.north_star_opened_actual
+      - name: Typed library operator/signature fail-closed admission
+        run: python -m unittest discover -s tests -p 'test_structural_library_admission_v1.py' -v
+      - name: Existing control-plane compatibility
+        run: python -m unittest discover -s tests -p 'test_control_plane_v1.py' -q
