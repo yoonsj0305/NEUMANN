@@ -639,3 +639,27 @@ Full regression: 1148 passed, 53 skipped (code `96f5ea6`).
 
 Verdicts: V1 PASS (sealed). V2 development (two-variable cases preserved; list-routines regressions located,
 not recovered). V3 FAIL. Q3 OPEN. Q6 OPEN. Full regression: 1148 passed, 53 skipped. Seals intact.
+
+## 13. Phase A of "Information-Driven Structural Invention": counterfactual reliability (2026-11-14) — DEVELOPMENT ONLY
+
+* **Erratum to section 12.** "346 replays, 251 identical" was read from `cf.jsonl` while it was still being
+  written (the wait had timed out); the complete file has 357 pairs (all unique, none failed or duplicated) and
+  259 CPU-inclusive identical replays; 7 outcome-changing decisions either way. The JSON record was right; the
+  section-12 text is kept as written and corrected here.
+* **Identity split.** All 357 pairs were replayed again recording the decision evidence before the switched
+  decision. Logical identity (why, contradictions, components, invented variables, answer type, failing
+  fraction, rounds, undefined region, queries left — everything except the CPU fraction): **352 / 357**
+  (195 of them index-0 pairs, identical by construction). The CPU fraction alone differed by at most 0.24 of the
+  formation budget; it is now recorded separately (`cpu_left_diff`) instead of deciding identity. The 5 logically
+  different pairs (all at index 1, list-routines) are excluded from causal labels.
+* **Outcome-changing decisions on logically identical states: 7** — repair better: `count-k(k=10)`#0,
+  `prepend-k(k=-2) | positions`#0, `mbpp/775`#0 (semantic mismatch, not a valid label); invention better:
+  `humaneval/3`#0 and #1, `mbpp/670`#0, `pow-k(k=3) | index-k(k=2)`#1. Against the first replay set,
+  `humaneval/85`#1 no longer changes the outcome and `humaneval/3`#0 now does: the alternative branch itself is
+  not perfectly reproducible on CPU-boundary tasks, so a single replay is not a reliable label.
+* Gate A (measurement reliability): logical identity is now verified and the counts reconcile; outcome
+  reproducibility of the alternative branch is NOT yet verified (it needs repeated replays per pair).
+
+Not done in this session: Phases B–E (a learned experiment-selection policy over the existing disagreement /
+sufficiency / Update / start / localisation experiments, intermediate structural-information credit, and the
+D / B / E-static / E-learned / E-no-knowledge / E-no-learning comparison). V3 FAIL, Q3 OPEN, Q6 OPEN.

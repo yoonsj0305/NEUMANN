@@ -163,6 +163,73 @@
   "replay_identical": 259
  },
  "full_regression_tests": "1148 passed, 53 skipped (code ea528c6)",
+ "phase_A_identity_audit": {
+  "cpu_inclusive_identical": 255,
+  "index0_pairs_trivially_identical": 195,
+  "logical_identical": 352,
+  "logical_not_identical": [
+   [
+    "keep-mod-k(k=5) | intersperse-k(k=-2)",
+    1
+   ],
+   [
+    "positions | append-k(k=3)",
+    1
+   ],
+   [
+    "pow-k(k=4) | product",
+    1
+   ],
+   [
+    "prepend-k(k=10) | positions",
+    1
+   ],
+   [
+    "rotate-k(k=-2) | replace-all-k-with-n(k=1,n=2)",
+    1
+   ]
+  ],
+  "max_abs_cpu_left_diff_before_switch": 0.24,
+  "outcome_changing_on_logically_identical": [
+   [
+    "count-k(k=10)",
+    0,
+    "repair_better"
+   ],
+   [
+    "humaneval/3",
+    0,
+    "invent_better"
+   ],
+   [
+    "humaneval/3",
+    1,
+    "invent_better"
+   ],
+   [
+    "mbpp/670",
+    0,
+    "invent_better"
+   ],
+   [
+    "mbpp/775",
+    0,
+    "repair_better"
+   ],
+   [
+    "pow-k(k=3) | index-k(k=2)",
+    1,
+    "invent_better"
+   ],
+   [
+    "prepend-k(k=-2) | positions",
+    0,
+    "repair_better"
+   ]
+  ],
+  "pairs": 357,
+  "unique": 357
+ },
  "policy_humaneval": [
   5,
   2
