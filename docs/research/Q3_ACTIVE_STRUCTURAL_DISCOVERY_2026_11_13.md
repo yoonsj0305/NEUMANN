@@ -684,3 +684,29 @@ experiment-selection policy has nothing to learn from: per the stop conditions, 
 decision-level outcome changes are rare and the labels needed to learn from them are rarer still.
 
 V1 PASS (sealed). V2 independent OPEN (development results preserved). V3 FAIL. Q3 OPEN. Q6 untouched.
+
+## 15. Structural witnesses in the existing records (2026-11-14) — DEVELOPMENT ONLY, no new runs
+
+Extracted from the D rows of section 11 (FRESH-dev 110 + list-routines 228, code `96f5ea6`); `mbpp/775` counted
+as a semantic failure. A witness is a recorded, SOURCE-verified observation that refuted or exposed a structural
+hypothesis: an observed contradiction (equal state and element, different successors), a state-sufficiency
+refutation, an Update / readout / start counterexample from a self-test, or a rejected invented variable.
+
+| | value |
+|---|---|
+| witness events | 233 (95 distinct task × kind; 59 % repeats) |
+| tasks / lineages | 60: list-routines 22, MBPP 26, HumanEval 12 |
+| by kind (events / tasks) | contradiction 88 / 34; rejected variable 98 / 23; Update counterexample 27 / 23; readout counterexample 11 / 8; state refutation 8 / 6; start counterexample 1 / 1 |
+| tasks where witnesses led to a verified invented machine | 8 |
+| tasks with witnesses but unsolved | 40 |
+
+Unsolved tasks split (the three bottlenecks the directive separates):
+* information — no structural witness was ever observed: 95 tasks;
+* policy / synthesis — witnesses observed and admissible structures existed, none verified: 40 tasks;
+* representation — witnesses but no admissible structure at all: 0 by this record. The audit cannot see
+  representation limits hidden behind admissible-but-wrong candidates (`mbpp/19`, `46` need a set of seen values,
+  which no candidate expresses, yet junk candidates were admissible), so this split undercounts representation.
+
+The signal is richer than the 4 final-outcome labels (233 events on 60 tasks across three lineages) but heavily
+repeated, and only 8 tasks connect a witness to a verified invention. Whether witness prediction can be learned
+and improves discovery (directive §5) was NOT tested in this session. V3 FAIL; Q3 OPEN; Q6 untouched.
