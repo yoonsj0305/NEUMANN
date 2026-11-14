@@ -1,0 +1,70 @@
+{
+  "schema": "neumann.rc48.actual-ownweight-first-and-posthoc.v1",
+  "date": "2026-10-26",
+  "archive_sha256": "05ccc33483459e7b2606de1de8cee3d60b5e9dfb3b1b7aaf37792ca0c8b1781b",
+  "model_sha256": "e7a7d54f1665c3b698541e88df6d24fd110611094ba753a37cd7c0149fee1539",
+  "first_SHA256": "250ec027c03199e1267582d678ab37d2afcbf0df1b1527cff12339f7aaadce61",
+  "posthoc_first_SHA256": "13651982c42639aafce20749bf9284ba99d84e28d7aaeb2b2188a90beea2e8d1",
+  "synthetic_primary_sequence": {
+    "correct": "3/3",
+    "direct_candidate_evaluations": 241,
+    "learned_prior_candidate_evaluations": 10
+  },
+  "synthetic_primary_grid": {
+    "correct": "3/3 classical fallback",
+    "neural_schema": "UNKNOWN_SOURCE_SCHEMA",
+    "original_failure_preserved": true
+  },
+  "synthetic_posthoc_grid": {
+    "correct": "4/4 all three arms",
+    "direct_candidates": [
+      70,
+      10,
+      68,
+      69
+    ],
+    "learned_candidates": [
+      74,
+      1,
+      4,
+      73
+    ],
+    "classical_library_candidates": [
+      74,
+      1,
+      4,
+      73
+    ],
+    "source_consistent_version_counts": [
+      7,
+      6,
+      3
+    ]
+  },
+  "ablation": {
+    "trained_seed_first_success": true,
+    "random_untrained_pass_both": "13/30",
+    "fresh_trained_posthoc_pass_both": "8/8"
+  },
+  "median_process_cpu_ns": {
+    "direct": 4313025,
+    "classical_joint_full": 21597372,
+    "neural_train_and_all_discovery_full": 579767046
+  },
+  "independent_semantic_io_comparisons": 1007,
+  "hash_manifest_files": 30,
+  "replay_unit_tests_pass": 6,
+  "preregistered_third_party_world": false,
+  "neural_invents_new_base_ISA": false,
+  "full_cost_10x": false,
+  "global_questions": {
+    "Q1": "OPEN",
+    "Q2": "OPEN",
+    "Q3": "OPEN",
+    "Q4": "OPEN",
+    "Q5": "OPEN",
+    "Q6": "OPEN",
+    "Q7": "OPEN"
+  },
+  "interpretation": "bounded learned abstractor has source and posthoc cross-ISA successes but no neural-exclusive capability and large full CPU loss"
+}
