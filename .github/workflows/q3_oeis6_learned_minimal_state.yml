@@ -1,0 +1,132 @@
+name: NEUMANN Q3 first external six published OEIS learned minimal hidden-state dimension and all-n proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/q3_oeis6_learned_minimal_state.yml'
+      - 'research/q3/oeis_state_six.py'
+      - 'research/q3/learned_latent_state_dimension.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  separate_six_public_author_state_recurrences:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check sympy==1.13.3 numpy==1.26.4
+      - name: Source only 16 exact integer values, full published OEIS recurrence and 105 exact future held by independent grader
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3state/source /tmp/q3state/truth
+          PYTHONPATH=research/q3 python research/q3/oeis_state_six.py \
+            --source /tmp/q3state/source/ORIGINAL_SIX_PUBLIC_NUMERIC_INTEGER_PREFIX16_WITHOUT_AUTHOR_RECURRENCE.json \
+            --truth /tmp/q3state/truth/PRIVATE_SIX_TRUE_AUTHOR_RECURRENCES_EXACT_FUTURE_16_120.json
+          python - <<'PY'
+          import json
+          p='/tmp/q3state/source/ORIGINAL_SIX_PUBLIC_NUMERIC_INTEGER_PREFIX16_WITHOUT_AUTHOR_RECURRENCE.json'
+          d=json.load(open(p))
+          assert len(d['source_numeric_without_recurrence'])==6
+          for q in d['source_numeric_without_recurrence']:
+              assert len(q['a'])==16
+              assert not {'author_coefficients','author_initial','original_recursion'}&set(q.keys())
+          print('FIRST_AUTHOR_OEIS_RULES_PHYSICALLY_HIDDEN_FROM_MODEL')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-first-six-published-oeis-source-only-prefix16
+          path: /tmp/q3state/source
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neumann-q3-first-six-published-oeis-private-author-recursion-holdout105
+          path: /tmp/q3state/truth
+          if-no-files-found: error
+  actually_train_state_dimension_and_create_named_dynamic_state_machine:
+    needs: separate_six_public_author_state_recurrences
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check sympy==1.13.3 numpy==1.26.4 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-first-six-published-oeis-source-only-prefix16
+          path: /tmp/q3state/source
+      - name: Source-only exact training controls for state rank1..4 and failed false memory dimension
+        run: |
+          set -euo pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/q3 python - <<'PY'
+          import sympy as sp
+          from learned_latent_state_dimension import fit_exact,generator
+          for r in range(1,5):
+              init=[0]*(r-1)+[1]
+              seq=generator([1]*r,init,16)
+              assert fit_exact(seq,r)['r']==r
+              assert all(fit_exact(seq,j) is None for j in range(1,r))
+              print('REAL_HANKEL_SOURCE_STATE_DIM_CONTROL',r)
+          print('NEGATIVE_SOURCE_LESS_MEMORY_CANNOT_FIT_COMPLETE_SEQUENCE')
+          PY
+      - name: Train sklearn structural state-order MLP from 288 other source-only exact-reward tasks, then seal proposed machine before author recurrence
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3state/pred
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/q3 \
+            python research/q3/learned_latent_state_dimension.py --mode infer \
+            --source /tmp/q3state/source/ORIGINAL_SIX_PUBLIC_NUMERIC_INTEGER_PREFIX16_WITHOUT_AUTHOR_RECURRENCE.json \
+            --pred /tmp/q3state/pred/FIRST_SIX_PUBLISHED_OEIS_NEURAL_STATE_VECTOR_AND_STRONG_CLASSICAL_PRE_GOLD.json \
+            | tee /tmp/q3state/pred/FIRST_REAL_LEARNED_HIDDEN_STATE_DIMENSION_LOG.txt
+          sha256sum /tmp/q3state/pred/FIRST_SIX_PUBLISHED_OEIS_NEURAL_STATE_VECTOR_AND_STRONG_CLASSICAL_PRE_GOLD.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-first-oeis6-frozen-learning-minimal-state-MACHINE-before-author-truth
+          path: /tmp/q3state/pred
+          if-no-files-found: error
+  independent_original_author_105_future_exact_and_all_integer_mathematical_induction:
+    needs: actually_train_state_dimension_and_create_named_dynamic_state_machine
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check sympy==1.13.3 numpy==1.26.4 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-first-six-published-oeis-private-author-recursion-holdout105
+          path: /tmp/q3state/gold
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-first-oeis6-frozen-learning-minimal-state-MACHINE-before-author-truth
+          path: /tmp/q3state/pred
+      - name: Mathematical proof each proposed machine matches published ORIGINAL author recurrence and cannot use fewer latent variables (Hankel determinant), all integer future exact
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3state/grade
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/q3 \
+            python research/q3/learned_latent_state_dimension.py --mode grade \
+            --truth /tmp/q3state/gold/PRIVATE_SIX_TRUE_AUTHOR_RECURRENCES_EXACT_FUTURE_16_120.json \
+            --pred /tmp/q3state/pred/FIRST_SIX_PUBLISHED_OEIS_NEURAL_STATE_VECTOR_AND_STRONG_CLASSICAL_PRE_GOLD.json \
+            --out /tmp/q3state/grade/FIRST_SIX_OEIS_AUTHOR_FULL_ALL_N_INDUCTION_MINIMAL_STATE_HANKEL_PROOF.json \
+            | tee /tmp/q3state/grade/MATHEMATICAL_VALIDATION_AND_CLASSICAL_MATCH.txt
+          python - <<'PY'
+          import json
+          a=json.load(open('/tmp/q3state/grade/FIRST_SIX_OEIS_AUTHOR_FULL_ALL_N_INDUCTION_MINIMAL_STATE_HANKEL_PROOF.json'))
+          assert len(a['method_first_author_original_all_n_induction'])==5
+          assert all(q['total']==6 for q in a['method_first_author_original_all_n_induction'].values())
+          assert a['G1']=='HOLD' and a['Q3_GLOBAL']=='OPEN'
+          print('SIX_PUBLIC_AUTHOR_COMPLETE_CASES_ACCOUNTED_WITHOUT_FALSE_G1_CLOSURE')
+          PY
+          sha256sum /tmp/q3state/grade/FIRST_SIX_OEIS_AUTHOR_FULL_ALL_N_INDUCTION_MINIMAL_STATE_HANKEL_PROOF.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-first-oeis6-published-all-n-recursion-105-future-exact-minimal-hankel-grade
+          path: /tmp/q3state/grade
+          if-no-files-found: error
