@@ -225,3 +225,407 @@ jobs:
         run: pytest -q tests/test_lp_expand4_holdout_replay_v102.py
       - name: Matched tiny-Transformer benchmark
         run: python benchmark_v031.py
+
+  # EXECUTION ONLY, do not merge. Original PR554 model and source byte-identical. GitHub CI first native Keijzer+Neat true math grade.
+  physically_separate_first_12_authored_equations_from_source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - name: Freeze original author Keijzer seven and Neat five by task metadata from pinned DSO source
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-q3new/source /tmp/q3-q3new/gold
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/q3:research/g0 \
+            python research/q3/first_keijzer_neat_source_only.py \
+            --source /tmp/q3-q3new/source/ORIGINAL12_XY_SOURCE_ONLY.json \
+            --truth /tmp/q3-q3new/gold/ORIGINAL12_TRUE_AUTHOR_FORMULAS_GRADER_ONLY.json \
+            | tee /tmp/q3-q3new/source/FIRST_AUTHOR_PIN_AND_PHYSICAL_SOURCE_TRUTH_LOG.txt
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3-q3new/source/ORIGINAL12_XY_SOURCE_ONLY.json'))
+          assert len(r['source_numeric_without_equations'])==12
+          assert all('original_expression' not in t and 'author_full_expression_sympy' not in t for t in r['source_numeric_without_equations'])
+          assert all(t['collection'] in ('DSO_Keijzer','DSO_Neat') for t in r['source_numeric_without_equations'])
+          print("ORIGINAL12_PUBLISHED_OTHER_AUTHOR_EQNS_PHYSICALLY_WITHHELD_FROM_MODEL")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-first-new-keijzer7-neat5-source-only-real-original-x-y
+          path: /tmp/q3-q3new/source/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-first-new-keijzer7-neat5-gold-full-author-original-graders-only
+          path: /tmp/q3-q3new/gold/
+          if-no-files-found: error
+  actually_train_neural_edits_from_independent_source_reward_then_SHA_freeze:
+    needs: physically_separate_first_12_authored_equations_from_source
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-first-new-keijzer7-neat5-source-only-real-original-x-y
+          path: /tmp/q3-q3new/source/
+      - name: "Mechanism controls: all five graph-edit families actually execute, graph constructs new lambda and no fabricated source exact"
+        run: |
+          set -euo pipefail
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/q3:research/g0 python - <<'PY'
+          import numpy as np,sympy as sp
+          from learned_dynamic_graph_family_2authors import ACTIONS,GRAMMARS,execute,X
+          assert len(ACTIONS)==5 and all(len(g)>20 for g in GRAMMARS.values())
+          x=np.linspace(.15,1.1,48)
+          examples={
+           'POLYNOMIAL':x**4+2*x**2+x,
+           'TRIG_PRODUCT':np.sin(x**2)*np.cos(x)-5,
+           'LOG_SUM':np.log(x**2+x)+np.log(x**3+x),
+           'EXP_ROOT':np.exp(-x**2),
+           'SAFE':(x+1)/(x+2),
+          }
+          for action,y in examples.items():
+              row={'x':x.tolist(),'y':y.tolist()}
+              proposal,calls,nodes=execute(row,action)
+              assert calls>0,(action,'ACTION_DID_NOT_RUN')
+              assert proposal is not None,(action,'NO_EXECUTABLE_VERIFIED_SOURCE_MACRO')
+              expr=sp.sympify(proposal['defined_operator_AST'],locals={'x':X})
+              assert expr.has(X),(action,'NOT_A_VARIABLE_FUNCTION')
+              print('ACTUAL_GRAPH_EDIT_SOURCE_POSITIVE_CONTROL_PASS',action,
+                    'lambda',proposal['named_lambda'],'fits',calls,'nodes',nodes)
+          # Wrong targets may generate float fits but must not become exact.
+          bad={'x':x.tolist(),'y':(np.sin(x)+.017*x**7).tolist()}
+          proposal,_,_=execute(bad,'EXP_ROOT')
+          assert proposal is None,'WRONG_GRAPH_ACCEPTED_WITHOUT_SOURCE_PROOF'
+          print('Q3_GRAPH_EDIT_CONSTRUCTION_POSITIVE5_NEGATIVE1_PASS')
+          PY
+      - name: Train model on 60 independent synthetic source-only tasks and independently infer exact 12 actual author numeric originals with four strong source controls
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-q3new/pregrade
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/q3:research/g0 \
+            python research/q3/learned_dynamic_graph_family_2authors.py --mode infer \
+            --source /tmp/q3-q3new/source/ORIGINAL12_XY_SOURCE_ONLY.json \
+            --pred /tmp/q3-q3new/pregrade/FIRST_NEURAL_RECURSIVE_GRAPH_AND_FOUR_CLASSICAL_12_PRED.json \
+            | tee /tmp/q3-q3new/pregrade/FIRST_MODEL_SELF_REWARD_AND_GRAPH_CONSTRUCTION.log
+          sha256sum /tmp/q3-q3new/pregrade/FIRST_NEURAL_RECURSIVE_GRAPH_AND_FOUR_CLASSICAL_12_PRED.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-first-new-keijzer7-neat5-sealed-real-learned-graph-edit-predictions
+          path: /tmp/q3-q3new/pregrade/
+          if-no-files-found: error
+  third_party_style_original_author_entire_analytic_formula_exact_grader:
+    needs: actually_train_neural_edits_from_independent_source_reward_then_SHA_freeze
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-first-new-keijzer7-neat5-gold-full-author-original-graders-only
+          path: /tmp/q3-q3new/gold/
+      - uses: actions/download-artifact@v4
+        with:
+          name: q3-first-new-keijzer7-neat5-sealed-real-learned-graph-edit-predictions
+          path: /tmp/q3-q3new/pred/
+      - name: Exact published author's full analytic symbolic formula, not source numeric approximate only, 12/12 accounted PASS or UNKNOWN
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-q3new/grade
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/q3:research/g0 \
+            python research/q3/learned_dynamic_graph_family_2authors.py --mode grade \
+            --truth /tmp/q3-q3new/gold/ORIGINAL12_TRUE_AUTHOR_FORMULAS_GRADER_ONLY.json \
+            --pred /tmp/q3-q3new/pred/FIRST_NEURAL_RECURSIVE_GRAPH_AND_FOUR_CLASSICAL_12_PRED.json \
+            --out /tmp/q3-q3new/grade/FIRST_KEIJZER7_NEAT5_PUBLISHED_AUTHOR_ORIGINAL_EXACT_GRADE.json \
+            | tee /tmp/q3-q3new/grade/NATIVE_AUTHOR_REAL_ORIGINAL_INDEPENDENT_FULL_FORMULA_EQUIVALENCE.log
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/q3-q3new/grade/FIRST_KEIJZER7_NEAT5_PUBLISHED_AUTHOR_ORIGINAL_EXACT_GRADE.json'))
+          assert len(r['method_full_author_symbolic_exact'])==6
+          assert all(x['all']==12 for x in r['method_full_author_symbolic_exact'].values())
+          assert r['G1']=='HOLD' and r['Q3_GLOBAL']=='OPEN'
+          print("ALL_FIRST_INDEPENDENT_12_REAL_AUTHOR_ORIGINALS_ACCOUNTED")
+          PY
+          sha256sum /tmp/q3-q3new/grade/FIRST_KEIJZER7_NEAT5_PUBLISHED_AUTHOR_ORIGINAL_EXACT_GRADE.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-first-new-keijzer7-neat5-whole-original-real-author-sympy-math-grade
+          path: /tmp/q3-q3new/grade/
+          if-no-files-found: error
+
+# Synchronization marker only: frozen author tasks/model/train/classical comparators unchanged.
+
+  q3_immutable_first_12_true_authors_math_and_learning_cost_audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-source-only-real-original-x-y
+          github-token: ${{ github.token }}
+          path: /tmp/q3-first-audit/source
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-gold-full-author-original-graders-only
+          github-token: ${{ github.token }}
+          path: /tmp/q3-first-audit/truth
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-sealed-real-learned-graph-edit-predictions
+          github-token: ${{ github.token }}
+          path: /tmp/q3-first-audit/pred
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-whole-original-real-author-sympy-math-grade
+          github-token: ${{ github.token }}
+          path: /tmp/q3-first-audit/grade
+      - name: SHA pin all four first source/truth/model/grade, independently reprove exact authors and calculate strict break-even cost
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-first-audit/audit
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 \
+            python research/q3/keijzer_neat_first12_prospective_evidence_audit.py \
+              --source /tmp/q3-first-audit/source/ORIGINAL12_XY_SOURCE_ONLY.json \
+              --truth /tmp/q3-first-audit/truth/ORIGINAL12_TRUE_AUTHOR_FORMULAS_GRADER_ONLY.json \
+              --pred /tmp/q3-first-audit/pred/FIRST_NEURAL_RECURSIVE_GRAPH_AND_FOUR_CLASSICAL_12_PRED.json \
+              --grade /tmp/q3-first-audit/grade/FIRST_KEIJZER7_NEAT5_PUBLISHED_AUTHOR_ORIGINAL_EXACT_GRADE.json \
+              --out /tmp/q3-first-audit/audit/KEIJZER_NEAT12_ORIGINAL_FIRST_MATH_COST_AUTHOR_FAMILY_AUDIT.json \
+              | tee /tmp/q3-first-audit/audit/ORIGINAL_FIRST_TRUE_AUTHOR_MATH_AND_COST_SUMMARY.log
+          sha256sum /tmp/q3-first-audit/audit/KEIJZER_NEAT12_ORIGINAL_FIRST_MATH_COST_AUTHOR_FAMILY_AUDIT.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-keijzer-neat12-first-frozen-author-family-source-math-and-cost-audit
+          path: /tmp/q3-first-audit/audit/
+          if-no-files-found: error
+
+# Q3 first-authored original-only audit refresh: same frozen first SHA, exhaustive 10 static pairs, not new first-blind.
+
+  q3_postgrade_first_source_all5_individual_action_no_dedup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-source-only-real-original-x-y
+          github-token: ${{ github.token }}
+          path: /tmp/q3-pair-counter/source
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-sealed-real-learned-graph-edit-predictions
+          github-token: ${{ github.token }}
+          path: /tmp/q3-pair-counter/first
+      - name: Assert first source/pred SHA, replay every original action by same unchanged graph executor and retain DUPLICATED actions rather than hiding routes
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-pair-counter/peraction
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/q3:research/g0 \
+            python research/q3/keijzer_neat12_static2_exhaustive_original_counterfactual.py --mode infer \
+            --source /tmp/q3-pair-counter/source/ORIGINAL12_XY_SOURCE_ONLY.json \
+            --first_pred /tmp/q3-pair-counter/first/FIRST_NEURAL_RECURSIVE_GRAPH_AND_FOUR_CLASSICAL_12_PRED.json \
+            --out /tmp/q3-pair-counter/peraction/FROZEN_ORIGINAL12_5_GRAPH_ACTIONS_UNDEDUPLICATED_SOURCE.json \
+            | tee /tmp/q3-pair-counter/peraction/ORIGINAL_UNDEDUPLICATED_FIVE_SOURCE_REPLAY_LOG.txt
+          sha256sum /tmp/q3-pair-counter/peraction/FROZEN_ORIGINAL12_5_GRAPH_ACTIONS_UNDEDUPLICATED_SOURCE.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-first-keijzer-neat12-all5-action-source-only-without-dedup
+          path: /tmp/q3-pair-counter/peraction
+          if-no-files-found: error
+
+  q3_postgrade_independent_real_author_grade_of_ALL10_STATIC_pairs:
+    needs: q3_postgrade_first_source_all5_individual_action_no_dedup
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check numpy==1.26.4 sympy==1.13.3 scikit-learn==1.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: neumann-q3-first-keijzer-neat12-all5-action-source-only-without-dedup
+          path: /tmp/q3-pair-grade/source
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-gold-full-author-original-graders-only
+          github-token: ${{ github.token }}
+          path: /tmp/q3-pair-grade/true
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-whole-original-real-author-sympy-math-grade
+          github-token: ${{ github.token }}
+          path: /tmp/q3-pair-grade/firstgrade
+      - name: Full native original analytic truth equality of EACH action, exhaustive all 10 fixed 2-action pairs and all 31 global subsets; preserve first learned 5/12
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-pair-grade/audit
+          OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONPATH=research/q3:research/g0 \
+            python research/q3/keijzer_neat12_static2_exhaustive_original_counterfactual.py --mode grade \
+            --pred /tmp/q3-pair-grade/source/FROZEN_ORIGINAL12_5_GRAPH_ACTIONS_UNDEDUPLICATED_SOURCE.json \
+            --truth /tmp/q3-pair-grade/true/ORIGINAL12_TRUE_AUTHOR_FORMULAS_GRADER_ONLY.json \
+            --first_grade /tmp/q3-pair-grade/firstgrade/FIRST_KEIJZER7_NEAT5_PUBLISHED_AUTHOR_ORIGINAL_EXACT_GRADE.json \
+            --out /tmp/q3-pair-grade/audit/FIRST12_ADAPTIVE2_VS_ALL_STATIC2_EXACT_AUTHOR_GRADE.json \
+            | tee /tmp/q3-pair-grade/audit/ALL10_TWO_ACTION_STATIC_CLASSICAL_COMPARE.log
+          sha256sum /tmp/q3-pair-grade/audit/FIRST12_ADAPTIVE2_VS_ALL_STATIC2_EXACT_AUTHOR_GRADE.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-12-real-original-each-fixed-action-10staticpairs-original-math-certified
+          path: /tmp/q3-pair-grade/audit
+          if-no-files-found: error
+# Q3 source replay strict semantic equivalence diagnostic only; first author truth artifact never changed.
+
+  q3_strict_real_domain_Keijzer7_first_log_identity_mathematical_audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check sympy==1.13.3 numpy==1.26.4
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-source-only-real-original-x-y
+          github-token: ${{ github.token }}
+          path: /tmp/q3-positive-domain/source
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-gold-full-author-original-graders-only
+          github-token: ${{ github.token }}
+          path: /tmp/q3-positive-domain/truth
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-sealed-real-learned-graph-edit-predictions
+          github-token: ${{ github.token }}
+          path: /tmp/q3-positive-domain/pred
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-whole-original-real-author-sympy-math-grade
+          github-token: ${{ github.token }}
+          path: /tmp/q3-positive-domain/grade
+      - name: Fully symbolic REAL-POSITIVE original Keijzer7 logarithm laws, first four SHA pins and corrected full-domain author mathematical equivalence only
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-positive-domain/audit
+          OPENBLAS_NUM_THREADS=1 \
+            python research/q3/keijzer7_strict_positive_real_log_author_firstgrade_audit.py \
+            --source /tmp/q3-positive-domain/source/ORIGINAL12_XY_SOURCE_ONLY.json \
+            --truth /tmp/q3-positive-domain/truth/ORIGINAL12_TRUE_AUTHOR_FORMULAS_GRADER_ONLY.json \
+            --pred /tmp/q3-positive-domain/pred/FIRST_NEURAL_RECURSIVE_GRAPH_AND_FOUR_CLASSICAL_12_PRED.json \
+            --grade /tmp/q3-positive-domain/grade/FIRST_KEIJZER7_NEAT5_PUBLISHED_AUTHOR_ORIGINAL_EXACT_GRADE.json \
+            --out /tmp/q3-positive-domain/audit/AFTERGRADE_FIRST_SOURCE_KEIJZER7_CERTIFIED_LOG_IDENTITY_ON_POSITIVE_REALS.json \
+            | tee /tmp/q3-positive-domain/audit/STRICT_REAL_DOMAIN_POSITIVE_LOG_PROOF_READOUT.txt
+          sha256sum /tmp/q3-positive-domain/audit/AFTERGRADE_FIRST_SOURCE_KEIJZER7_CERTIFIED_LOG_IDENTITY_ON_POSITIVE_REALS.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-original-Keijzer7-real-positive-log-domain-identity-math-proof
+          path: /tmp/q3-positive-domain/audit
+          if-no-files-found: error
+# Exact positive-real logarithm source proof: original author SHA preserved, factorization no longer masks manifest positivity.
+
+  q3_first_keijzer_neat12_ALL_static_pair_real_positive_corrected_math:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install --disable-pip-version-check sympy==1.13.3 numpy==1.26.4
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-gold-full-author-original-graders-only
+          github-token: ${{ github.token }}
+          path: /tmp/q3-final-author/truth
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40067150397
+          name: q3-first-new-keijzer7-neat5-whole-original-real-author-sympy-math-grade
+          github-token: ${{ github.token }}
+          path: /tmp/q3-final-author/first
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40075877886
+          name: neumann-q3-first-keijzer-neat12-all5-action-source-only-without-dedup
+          github-token: ${{ github.token }}
+          path: /tmp/q3-final-author/peraction
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40075877886
+          name: neumann-q3-12-real-original-each-fixed-action-10staticpairs-original-math-certified
+          github-token: ${{ github.token }}
+          path: /tmp/q3-final-author/static-grade
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40076362548
+          name: neumann-q3-original-Keijzer7-real-positive-log-domain-identity-math-proof
+          github-token: ${{ github.token }}
+          path: /tmp/q3-final-author/log-proof
+      - name: Strict SHA five source/grade/math sources; mathematically correct Keijzer7 log and prove all 10 static two-family abilities
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/q3-final-author/proof
+          OPENBLAS_NUM_THREADS=1 PYTHONPATH=research/q3 \
+            python research/q3/keijzer_neat12_real_domain_all_static2_corrected_audit.py \
+            --original_truth /tmp/q3-final-author/truth/ORIGINAL12_TRUE_AUTHOR_FORMULAS_GRADER_ONLY.json \
+            --original_firstgrade /tmp/q3-final-author/first/FIRST_KEIJZER7_NEAT5_PUBLISHED_AUTHOR_ORIGINAL_EXACT_GRADE.json \
+            --source_each_action /tmp/q3-final-author/peraction/FROZEN_ORIGINAL12_5_GRAPH_ACTIONS_UNDEDUPLICATED_SOURCE.json \
+            --independent_first_static_grade /tmp/q3-final-author/static-grade/FIRST12_ADAPTIVE2_VS_ALL_STATIC2_EXACT_AUTHOR_GRADE.json \
+            --original_real_positive_domain_grade /tmp/q3-final-author/log-proof/AFTERGRADE_FIRST_SOURCE_KEIJZER7_CERTIFIED_LOG_IDENTITY_ON_POSITIVE_REALS.json \
+            --out /tmp/q3-final-author/proof/REAL_DOMAIN_CORRECTED_AUTHOR12_LEARNED_ADAPTIVE_VS_10_STATIC_PAIRS.json \
+            | tee /tmp/q3-final-author/proof/MATHEMATICALLY_CORRECTED_AUTHOR12_PERPAIR_FAMILY_PROOF.log
+          sha256sum /tmp/q3-final-author/proof/REAL_DOMAIN_CORRECTED_AUTHOR12_LEARNED_ADAPTIVE_VS_10_STATIC_PAIRS.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neumann-q3-two-authors-all10-fixed2-versus-neural-adaptive-real-domain-corrected-math-proof
+          path: /tmp/q3-final-author/proof
+          if-no-files-found: error
