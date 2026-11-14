@@ -554,5 +554,7 @@ Relevance check: 1 709 applications passed, 2 013 were refused as not explaining
 
 ### 10.4 Verdicts
 
+Full regression suite: 1148 passed, 53 skipped (code `189112a`).
+
 V1 PASS (sealed). V2: development only; Gate A not passed (list-routines regressions). V3: development FAIL
 (Gate B). Q3 overall OPEN. Q6 OPEN (Codex). No independent evaluation was pre-registered.
