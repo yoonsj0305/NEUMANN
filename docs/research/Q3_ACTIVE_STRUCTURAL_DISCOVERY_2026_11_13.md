@@ -558,3 +558,52 @@ Full regression suite: 1148 passed, 53 skipped (code `189112a`).
 
 V1 PASS (sealed). V2: development only; Gate A not passed (list-routines regressions). V3: development FAIL
 (Gate B). Q3 overall OPEN. Q6 OPEN (Codex). No independent evaluation was pre-registered.
+
+## 11. Learning discovery ACTIONS from counterfactual pairs (2026-11-14) — DEVELOPMENT ONLY
+
+Same conditions; opened FRESH and list-routines re-used; nothing new opened; Q6 untouched.
+
+* **Instability (P0-A).** `humaneval/121, 126`, `mbpp/680`, the four list-routines regressions and
+  `rotate-k(k=1) | identify-geq-k(k=2)`, 3 repeats each on the same code and seed: identical outcomes every time.
+  These are deterministic failures of a discovery decision, not CPU-boundary luck: each fails right after a
+  branch point ("no progress", "counterexample not localisable", a contradiction) where invention ran first.
+* **Decision made explicit (`choose`).** At every branch point the machine either invents new state now or
+  keeps repairing the current representation (localise, continuation, virtual values); the other route remains
+  the fallback. Each decision is logged with its evidence (why, contradictions, components, invented
+  variables, answer type, failing fraction, CPU and queries left, rounds, undefined region). D = invent first;
+  the counterfactual arm runs repair first at every branch point on the same task, seed and budget.
+* **Learning (V3).** A pair whose outcomes differ labels the first decision's evidence; logistic policy, acting only
+  when |p − 0.5| > 0.15, otherwise D's decision stands. Author-lineage split: MBPP policy from list-routines +
+  HumanEval pairs (5 pairs), HumanEval policy from list-routines + MBPP pairs (7 pairs).
+
+| FRESH-dev (110) | solved | CPU s / queries | adopted but wrong |
+|---|---|---|---|
+| D (invent first) | 45 | 2 758 / 6 516 | 2 |
+| D-repair (repair first) | 43 | 2 758 / 6 524 | 0 |
+| best fixed action per task (oracle union) | 47 | — | — |
+| **E (learned action policy)** | **47** | 2 757 / 6 512 | 2 |
+| B (verified-structure cache) | 48 | 2 747 / 6 508 | 1 |
+| Dq | 24 | 2 648 / 6 516 | 0 |
+
+* D and D-repair split 4 : 2 (`humaneval/3`, `mbpp/567, 588, 670` need invention first; `humaneval/121`,
+  `mbpp/775` need repair first). E solved all six: E vs D 2 : 0 (`humaneval/121` with decisions
+  repair, repair, invent; `mbpp/775`), E vs D-repair 4 : 0. Without the learned policy (either fixed action)
+  E's two extra solves disappear: a causal contribution of the learned decision, on deterministic tasks.
+* Not significant (2 : 0, p = 0.5); the policy was fitted on 5 and 7 pairs; `mbpp/775` is the task whose
+  hidden-test pass is not the reference semantics (section 8.3).
+* **E vs B: 2 : 3** (E: `mbpp/670, 775`; B: `humaneval/85, 126`, `mbpp/690`). Gate B (E beyond D AND B) not passed.
+* Gate D (new invention): E's extra solves come from choosing between two existing routes, not from a new
+  structure. Not shown.
+* List-routines (Gate A): invent-first 158 (still loses `count-k(k=10)`, `prepend-k(k=-2) | positions`,
+  `replace-all-k-with-n | sum`, `rotate-k(k=1) | identify-geq-k(k=2)`); repair-first 160 (recovers
+  `count-k(k=10)` and more, loses `pow-k(k=3) | index-k(k=2)`). The named regressions are not all recovered by
+  either action; E was not run on list-routines. Not passed.
+* SKU audit (P0-B, not changed): `preconditions` holds only the answer type and a constant flag,
+  `counterexamples` is always empty, `discovery_procedure` is the raw event log without the decision that
+  mattered, and equivalent variable definitions are separate units — the unit stores programs more than
+  relations. The decision log of this section is the first record of WHICH decision led to the solve.
+
+Verdicts: V1 PASS (sealed). V2 development; Gate A not passed. V3: first causal evidence that a learned
+discovery DECISION adds solves over D on deterministic tasks (2 : 0, development, not significant), but not over
+the verified-structure cache B: development FAIL (Gate B). Q3 OPEN; Q6 OPEN. No independent evaluation.
+Full regression: 1148 passed, 53 skipped (code `96f5ea6`).
