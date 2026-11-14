@@ -1,0 +1,98 @@
+{
+  "witnesses": [
+    {
+      "receiver": "rule/c130",
+      "source": "rule/c208",
+      "source_artifact_id": "93fcf1b35debe20cb248ab63f4cea4d827b21b51b8aa32427cc9e38215401475",
+      "source_kernel": [
+        "lt",
+        [
+          "v",
+          1
+        ],
+        [
+          "foldlI",
+          [
+            "v",
+            3
+          ],
+          [
+            "v",
+            0
+          ],
+          [
+            "v",
+            2
+          ]
+        ]
+      ],
+      "recorded_correspondence": {
+        "0": [
+          "k",
+          -2
+        ],
+        "1": [
+          "sub",
+          [
+            "v",
+            1
+          ],
+          [
+            "k",
+            1
+          ]
+        ],
+        "2": [
+          "v",
+          3
+        ]
+      },
+      "frozen_AST_reconstruction_identical": true,
+      "donor_fold_excludes_receiver": true,
+      "whole_program_replay_TRAIN_fits": [],
+      "type_only_applications_exhaustively_tested": 870,
+      "type_only_TRAIN_fits": [],
+      "commuting_relation_samples_passed": 4096,
+      "undefined_mapping_samples_skipped": 0,
+      "binding_removal_controls": [
+        {
+          "kind": "composed_binding_operator_removed",
+          "role": 1,
+          "replacement": [
+            "v",
+            1
+          ],
+          "TRAIN_rejected": true
+        },
+        {
+          "kind": "composed_binding_operator_removed",
+          "role": 1,
+          "replacement": [
+            "k",
+            1
+          ],
+          "TRAIN_rejected": true
+        }
+      ],
+      "type_preserving_source_operator_controls": [
+        {
+          "source_path": [],
+          "old": "lt",
+          "replacement": "eq",
+          "TRAIN_rejected": true
+        },
+        {
+          "source_path": [
+            1
+          ],
+          "old": "foldlI",
+          "replacement": "foldrI",
+          "TRAIN_rejected": true
+        }
+      ],
+      "cpu_seconds": 0.08612720699999987,
+      "scope": "post-primary finite replay/type-class audit and reconstruction checks; TRAIN only, not fresh capability or universal TARGET equivalence"
+    }
+  ],
+  "receiver_TEST_read": false
+}

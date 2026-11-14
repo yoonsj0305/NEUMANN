@@ -1,0 +1,25 @@
+{
+  "scope": "post-primary TRAIN-only generation replay; original outcomes unchanged",
+  "records": [
+    {
+      "id": "rule/c130",
+      "arm": "C",
+      "via": "compound_transport",
+      "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (lt (sub $1 1) (foldlI $6 -2 $3))>",
+      "generation_reproduced_exact_AST": true,
+      "no_map_still_UNKNOWN": null,
+      "worker_total_cpu_seconds": 1.337706354,
+      "receiver_TEST_read": false
+    },
+    {
+      "id": "rule/c130",
+      "arm": "C-no-map",
+      "via": null,
+      "program": null,
+      "generation_reproduced_exact_AST": null,
+      "no_map_still_UNKNOWN": true,
+      "worker_total_cpu_seconds": 3.002940221,
+      "receiver_TEST_read": false
+    }
+  ]
+}
