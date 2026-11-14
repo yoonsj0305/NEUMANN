@@ -1,0 +1,21 @@
+{
+  "schema": "neumann.g1.ownweight-before-external-first-amendment.v1",
+  "date": "2026-11-06",
+  "old_synthetic_FIRST": {
+    "run": 42154037295,
+    "checkpoint_sha256": "8dc216068f511c72a2ef0a3f9b4b5fcc897d7cca2d986f1a0722f6648de979bf",
+    "train_3200": true,
+    "validation_320": true,
+    "raw_validation_token_accuracy": [
+      0.7625,
+      0.74375
+    ],
+    "external_originals_opened": 0
+  },
+  "identified_design_error": "Original synthetic train generator allowed every (left,right) pair among 225 possible AST combinations. 3200 training cases almost surely expose all pairs, making precommitted synthetic-compositional novelty impossible independent of model quality.",
+  "resolution_BEFORE_FIRST_external": "Keep the historical first synthetic weights; add fixed reserved pairs predicate (left+3*right)%5==0, exclude all such pairs from 3200 train AST labels, use ONLY these pairs for 320 synthetic-validation tasks. Train a fresh own-weight v2 checkpoint, freeze SHA before opening any of the eight external SyGuS source bodies. Do not change external target file hashes/denominator, 32-candidate budget, strong full 225 classical baseline, correctness test or model architecture.",
+  "scientific_implication": "No new external evaluation has occurred at this amendment, so no post-outcome tuning of external SyGuS. Training v1 source-only experiment remains immutable and not promoted to v2; v2 external first will be single.",
+  "target_sha_frozen_references": "docs/experiments/G1_OWNWEIGHT_STRING_AST_EXTERNAL_FIRST_PREREG_2026_11_06.json",
+  "reproduce_reserved_rule": "(left + 3*right) % 5 == 0",
+  "Q3": "OPEN"
+}

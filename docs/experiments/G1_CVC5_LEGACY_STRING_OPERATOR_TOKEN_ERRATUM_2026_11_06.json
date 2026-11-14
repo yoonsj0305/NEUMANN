@@ -1,0 +1,28 @@
+{
+  "schema": "neumann.g1.cvc5-legacy-string-operator-renaming-postfirst-erratum.v1",
+  "date": "2026-11-06",
+  "past_immutable_first": {
+    "run": 42162826286,
+    "json_sha256": "777ed4e585297685926f14b5da52e132f87d12f5aacadc38cc5b7cb302879695",
+    "read_only_diagnosis": 42163006493,
+    "all_eight_converted_success": true,
+    "all_original_ground_verified": 0,
+    "actual_stop": "Symbol 'int.to.str' not declared as a variable; never reached solver search."
+  },
+  "exact_source_compatibility_fix": {
+    "scope": "Only AFTER official SyGuS-Org/tools@9f5cc084... format conversion, rename OLD built-in String↔Int conversion operator symbol tokens to current equivalent SMT-LIB operators; do not change grammar structure, examples, heldout split, weights, candidate budget or target denominator.",
+    "tokens": {
+      "int.to.str": "str.from_int",
+      "str.to.int": "str.to_int"
+    },
+    "safety": "Do not modify string literals/comments or unapproved identifiers. Assert all original parsed constraints remain identical, generated expression semantics type-equivalent under SyGuS/SMT-LIB, prove with source-free synthetic solver regression before original attempted.",
+    "published_language_std_reference": "SyGuS IF 2016 string conversion built-ins, SMT-LIB v2.6 string theory equivalent function names.",
+    "expected_after_fix": "cvc5 --lang=sygus2 --sygus accepts the transformed grammar; every candidate must independently prove original heldout ground equality. If not, record fail-closed as infrastructure/solver status, no model success claim.",
+    "corrected_sygus2_source_tool": "research/g1/postfirst_official_converter_cvc5.py",
+    "scope_of_inference": "All source tasks already opened. This is posthoc expert baseline only, not G1 first, Q3 10x or neural-exclusive claim."
+  },
+  "global_Q3": "OPEN",
+  "global_Q4": "OPEN",
+  "global_Q6": "OPEN",
+  "global_Q7": "OPEN"
+}

@@ -1,0 +1,49 @@
+name: NEUMANN G1 frozen expert candidate replay feasibility no solver rerun
+on:
+  push:
+    branches:
+      - research/g1-first-ownweight-ast-sygus-20261106
+    paths:
+      - .github/workflows/G1_FROZEN_EXPERT_CANDIDATE_READONLY_CHECK.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original-candidate-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: NEUMANN-G1-REAL-CVC5-PUBLISHED-GRAMMAR-EXPERT8
+          run-id: 42163619265
+          github-token: ${{ github.token }}
+          path: frozen-expert
+      - name: Check byte-frozen 8/8 first specialist and whether printed candidates are complete
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo 'beb973fb4e09243a1246305847399b6d36fc4a19168197710def1cd2799f1906  frozen-expert/G1-CVC5-LEGACY-OPS-COMPAT8.json' | sha256sum -c -
+          python3 - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          from research.g1.postfirst_real_cvc5_specialist import extract_define
+          x=json.loads(Path('frozen-expert/G1-CVC5-LEGACY-OPS-COMPAT8.json').read_text())
+          assert x['stats']['independently_original_heldout_verified']==8
+          for r in x['rows']:
+              expert=r['specialist']
+              actual=None
+              for attempt in expert['attempts']:
+                  got=extract_define(attempt.get('stdout_excerpt',''))
+                  if got:
+                      actual=got;break
+              got_sha=hashlib.sha256(actual.encode()).hexdigest() if actual is not None else None
+              print(json.dumps({'name':r['name'],
+                  'reported_candidate_sha256':expert.get('candidate_sha256'),
+                  'stdout_recovers_exact_complete_candidate':got_sha==expert.get('candidate_sha256'),
+                  'recovered_length':len(actual) if actual else None},sort_keys=True))
+          print('NO_RERUN_OF_CVC5_SPECIALIST')
+          PY

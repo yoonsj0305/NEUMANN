@@ -1,0 +1,43 @@
+name: NEUMANN G1 own-weight two-token AST training source-free FIRST
+on:
+  push:
+    branches:
+      - research/g1-first-ownweight-ast-sygus-20261106
+    paths:
+      - .github/workflows/G1_OWNWEIGHT_STRING_AST_TRAIN_FIRST.yml
+permissions:
+  contents: read
+jobs:
+  synthetic-first-training:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      PYTHONHASHSEED: "0"
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Numpy one actual CPU training implementation, no external GitHub task fetch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet numpy==2.2.6
+          python -m unittest discover -s tests -p test_g1_ownweight_string_ast.py -v
+          mkdir -p original-first
+          python -m research.g1.ownweight_string_ast original-first/G1-SYNTHETIC-OWNWEIGHT-CHECKPOINT.json > original-first/G1-SYNTHETIC-TRAIN-FIRST-RECEIPT.json
+          cat original-first/G1-SYNTHETIC-TRAIN-FIRST-RECEIPT.json
+          sha256sum original-first/G1-SYNTHETIC-OWNWEIGHT-CHECKPOINT.json > original-first/G1-SYNTHETIC-OWNWEIGHT-CHECKPOINT.sha256
+          cat original-first/G1-SYNTHETIC-OWNWEIGHT-CHECKPOINT.sha256
+      - name: Freeze original trained weights and source-only first receipt before any external target body
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEUMANN-G1-OWNWEIGHT-STRING-AST-SYNTHETIC-FIRST
+          path: original-first/
+          if-no-files-found: warn
+          retention-days: 90
