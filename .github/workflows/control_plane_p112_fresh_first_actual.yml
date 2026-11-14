@@ -1,0 +1,73 @@
+name: NEUMANN P1.12 first frozen real semantic microjudge
+on:
+  push:
+    branches:
+      - research/p112-first-fresh-semantic-gate-20261105
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first-actual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      HF_HUB_DISABLE_XET: "1"
+      TOKENIZERS_PARALLELISM: "false"
+      OMP_NUM_THREADS: "2"
+      MKL_NUM_THREADS: "2"
+    steps:
+      - name: Checkout pinned pre-inference dataset and model scoring code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install CPU-only minimal model runtime, not a paid GPU
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install --index-url https://download.pytorch.org/whl/cpu torch
+          python -m pip install -e . 'transformers==4.57.1'
+          python - <<'PY'
+          import sys,torch,transformers,sklearn
+          print({"python":sys.version,"torch":torch.__version__,
+                "transformers":transformers.__version__,
+                "sklearn":sklearn.__version__,"cuda":torch.cuda.is_available()})
+          assert not torch.cuda.is_available()
+          PY
+      - name: Validate immutable original and corrected preregistration without touching model
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest -v tests.test_control_plane_p112_first_fresh_semantics
+      - name: First actual 12 real model forwards, unchanged after first negative outcome
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m experiments.control_plane_p112_first_fresh_semantics > p112-first-actual.json
+          python - <<'PY'
+          import json
+          r=json.load(open("p112-first-actual.json"))
+          assert r["scores"]["N"] == 12
+          assert r["scores"]["actual_forward_calls"] == 12
+          assert r["previous_p111_eval_reused"] is False
+          assert r["model_training"] is False
+          print({"first_status":r["status"],"counts":r["scores"],"Q1_Q7":r["Q1_Q7"]})
+          PY
+      - name: Hash and preserve ORIGINAL first receipt even if local scientific gate fails
+        if: always()
+        shell: bash
+        run: |
+          if test -f p112-first-actual.json; then
+            sha256sum p112-first-actual.json > p112-first-actual.sha256
+            cat p112-first-actual.sha256
+          fi
+      - name: Upload first immutable actual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-p112-first-fresh-real-model
+          path: |
+            p112-first-actual.json
+            p112-first-actual.sha256
+          if-no-files-found: warn
+          retention-days: 90

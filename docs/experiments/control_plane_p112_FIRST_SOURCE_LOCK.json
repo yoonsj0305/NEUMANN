@@ -1,0 +1,32 @@
+{
+  "schema": "neumann.p112.first.source-lock.v1",
+  "frozen_before_any_pretrained_model_call": true,
+  "eval_source": "docs/experiments/control_plane_p112_FRESH_FIRST_CORRECTED_FROZEN.json",
+  "first_unmodified_source_git_blob": "46f5d7bf2b5f10c491999f398b182cab5de3fe5d",
+  "dataset_blob_sha": "2a89fecd65cf042079411b94bc31093280aa7d54",
+  "source_blobs": {
+    "neumann1/control_plane_p112.py": "1e7f1b84835cf270c55843c18b3dad92914f6d25",
+    "neumann1/control_plane_p111.py": "71cee76bb0ea07583debfb6094ae59dbdf4541b7",
+    "experiments/control_plane_p112_first_fresh_semantics.py": "9df218c1203eded4b87115cdedeeec88992d8867",
+    "tests/test_control_plane_p112_first_fresh_semantics.py": "f10270b09d9ba5a9cc711c1463cebdb26cd7a69e"
+  },
+  "previous_semantic_tasks_excluded": true,
+  "source_model_id": "cross-encoder/ms-marco-MiniLM-L6-v2",
+  "source_model_revision": "ce0834f22110de6d9222af7a7a03628121708969",
+  "no_fitting": true,
+  "local_opened_gate": {
+    "minimum_correct": 9,
+    "minimum_gain_over_best_predefined_lexical": 2,
+    "exact_forward_calls": 12
+  },
+  "study_kind": "Fresh opened microselector architecture falsification only. NOT autonomous semantic-invention or unseen-family transfer.",
+  "cost_limits": "CPU model load+12 batches; no paid GPU, no energy/dollar claims",
+  "prereg_errors": [
+    {
+      "case": "s03",
+      "original": "incorrect expected index 3",
+      "correction": "correct expected index 0",
+      "timing": "before any model inference, original v1 retained"
+    }
+  ]
+}

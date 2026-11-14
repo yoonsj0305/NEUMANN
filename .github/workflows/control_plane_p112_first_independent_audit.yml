@@ -1,0 +1,62 @@
+name: NEUMANN P1.12 first independent no-model audit
+on:
+  push:
+    branches:
+      - research/p112-first-result-independent-audit-20261105
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independent-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install only mathematical and lexical verifier packages, no neural inference
+        run: python -m pip install -e .
+      - name: Retrieve unchanged first actual model receipt (run 42013751594)
+        uses: actions/download-artifact@v4
+        with:
+          name: neumann-p112-first-fresh-real-model
+          run-id: 42013751594
+          github-token: ${{ github.token }}
+          path: first
+      - name: Verify original first SHA before scoring
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "67644a9a29c7ff1a3c4c66cff07207208205e956191ad3333974cc20bbb8c16a  first/p112-first-actual.json" | sha256sum -c -
+      - name: Independent source-aware rank, static control, and integrity replay
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m experiments.control_plane_p112_first_offline_audit first/p112-first-actual.json > p112-INDEPENDENT-AUDIT.json
+          python - <<'PY'
+          import json
+          r=json.load(open("p112-INDEPENDENT-AUDIT.json"))
+          assert r["independent_audit"]=="PASS"
+          assert r["correct"]==3 and r["registered_best_lexical_correct"]==3
+          assert r["registered_first_verdict"]=="P112_LOCAL_OPENED_FAIL"
+          assert r["no_new_model_inference"]
+          print(json.dumps(r,sort_keys=True))
+          PY
+      - name: Deliberate byte-level tamper must fail closed
+        shell: bash
+        run: |
+          cp first/p112-first-actual.json tampered.json
+          printf ' ' >> tampered.json
+          if python -m experiments.control_plane_p112_first_offline_audit tampered.json >/dev/null 2>&1; then
+            echo "Tampered first receipt unexpectedly accepted"
+            exit 1
+          fi
+      - name: Preserve independent negative conclusion
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neumann-p112-FIRST-independent-audit
+          path: p112-INDEPENDENT-AUDIT.json
+          if-no-files-found: warn
+          retention-days: 90
