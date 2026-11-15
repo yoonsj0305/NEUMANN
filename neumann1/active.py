@@ -827,6 +827,23 @@ def synth_cells_candidates(in_types, rows, deadline, k=4):
     return out
 
 
+def synth_cells_fold(in_types, rows, deadline, fold_errors, reach_inputs, k=4):
+    """Development only (opt-in, FOLD_REACH_SYNTH): the first fit of `synth_cells`, then -- only if the machine
+    with it folds an initial example wrongly -- the same enumeration continues as a reachability-guided,
+    fold-constrained search on the same table (latent.solve_fold).  fold_errors(g) / reach_inputs(g) take an
+    Update function.  No SOURCE query.  Returns (g, description, info)."""
+    t = {"id": "update", "in_types": list(in_types), "out_type": T_L, "train": [(k_, v) for k_, v in rows], "test": []}
+    lib = lt.library(lt.Cfg(subst=True))
+
+    def as_fn(sol):
+        return lambda args, sol=sol: _safe(lambda: lt.run(sol, lib, tuple(args), t))
+    sol, info = lt.solve_fold(t, deadline, _inv(), lambda s: fold_errors(as_fn(s)),
+                              lambda s: reach_inputs(as_fn(s)), k=k)
+    if sol is None or sol[0] not in ("lat", "residual", "transport", "keep"):
+        return None, None, info
+    return as_fn(sol), ("cells", lt.show(sol)), info
+
+
 def synth_cells(in_types, rows, deadline):
     """A list-valued Update by the representation-construction core (`latent`, R2), under per-transition
     supervision; returns (g, description)."""
@@ -960,6 +977,8 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         random.Random(TRAJ_SHIFT[0] * 7919 + len(pool)).shuffle(pool)
     asc = tuple(sorted(pool[:4]))
     trajs = [asc, asc[::-1], tuple(pool[4:8])]
+    if REACH_TRAJ:                    # development (opt-in): observe the states the initial examples' folds reach
+        trajs = [tuple(x) for (x,), _ in examples]
     extra = []                        # (u, e) points added by counterexamples
 
     def points():
@@ -1116,7 +1135,37 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             if MIN_SYNTH_CPU and share >= 0.25:     # reallocation (off by default): the main-round synthesis of a
                 end = min(deadline, max(end, time.process_time() + MIN_SYNTH_CPU))   # component gets a floor
             g, ast = (None, None)
-            if s_type == T_L:                 # list-valued components: the cell construction (R2) first
+            if s_type == T_L and FOLD_REACH_SYNTH and j == len(W) - 1:
+                # development (opt-in): the last component completes the machine, so its candidates can be judged
+                # by every initial-example fold; reachable states of those folds refine the search (no query)
+                zs = init_candidates()
+                accu = [lambda args, fn=a["fn"], i=len(W) + k: _acc_step(fn, args[i], args[-1])
+                        for k, a in enumerate(acc)]
+
+                def ferr(gj, done=list(upd)):
+                    u_ = done + [gj] + accu
+                    return min(sum(1 for (x,), y in examples if (lambda r: r is None or r[0] != y)(fold(u_, z_, tuple(x))))
+                               for z_ in zs)
+
+                def rin(gj, done=list(upd)):
+                    u_ = done + [gj] + accu
+                    z_ = min(zs, key=lambda z_: sum(1 for (x,), y in examples
+                                                    if (lambda r: r is None or r[0] != y)(fold(u_, z_, tuple(x)))))
+                    bad, good = [], []
+                    for (x,), y in examples:
+                        st, seen_ = z_, []
+                        for e in (tuple(x) if direction == "prefix" else tuple(x)[::-1]):
+                            seen_.append(st + (e,))
+                            st = tuple(gg(st + (e,)) for gg in u_)
+                            if None in st:
+                                st = None
+                                break
+                        (good if st is not None and st[0] == y else bad).append(seen_)
+                    return [p_ for sq in bad + good for p_ in sq]
+                g, ast, finfo = synth_cells_fold(in_t, rows[j], end, ferr, rin)
+                finfo.pop("first", None)
+                rec.setdefault("fold_reach", []).append(finfo)
+            elif s_type == T_L:               # list-valued components: the cell construction (R2) first
                 g, ast = synth_cells(in_t, rows[j], end)
             if g is None and GOAL_UPDATE_SYNTH and s_type == T_L:
                 r_end = min(end, time.process_time() + max(0.0, end - time.process_time()) * 0.5)
@@ -1890,6 +1939,10 @@ _LAST = [None]           # internal state of the last formed machine (in-place r
 CAPTURE_UPDATE_TRANSITIONS = False  # development audit only; record first attempt/failure SOURCE transition tables
 MIN_SYNTH_CPU = 0.0      # development: CPU floor for each main-round Update synthesis (within the formation deadline)
 GOAL_UPDATE_SYNTH = False  # development ablation: goal-directed residual Update synthesis before the forward search
+REACH_TRAJ = False         # development (opt-in): state trajectories = the initial examples' own prefixes (their
+                           # reachable fold states) instead of the synthetic ascending/descending/random ones
+FOLD_REACH_SYNTH = False   # development (opt-in): reachability-guided, fold-constrained cell synthesis of the last
+                           # list component (synth_cells_fold); off = the legacy first fit, unchanged
 REPAIR = False           # counterexample-guided repair: True = re-form (6e15f35), "inplace" = local re-synthesis of a refuted machine (the compared condition)
 QUERY_SCHEDULE = {}      # {self-test query index: "alt"} -- the second candidate instead of the first
 QSEL = [0]

@@ -67,6 +67,13 @@ class Cfg:
         self.equivalence_cap = max(1, int(equivalence_cap))
         self.candidate_limit = max(1, int(candidate_limit))
         self.collected_candidates = []
+        # Opt-in development only (reachability-guided, fold-constrained search; see solve_fold):
+        #   accept(sol) -> number of initial examples the machine folds wrongly with sol (0 = accept and stop);
+        #   reach_probes(sol) -> cell coordinate rows of the states the fold of sol reaches (no query).
+        # None = the probe-diversified / first-fit behaviour above, unchanged.
+        self.accept = None
+        self.reach_probes = None
+        self.accept_stats = {}
 
     def cost(self, ctx):
         c = ic.uniform_costs()
@@ -305,10 +312,25 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
     seen_candidates = set()
     seen_candidate_probes = set()
     coord_types = coords_types(task, cfg)
-    probes = probe_cells(pts, coord_types) if collecting else []
-    # Candidate-level probes are perturbed, already-observed Update inputs.
-    # These are diagnostic states, not independently verified SOURCE answers.
-    task_probes = probe_cells([i for i, _ in train], task["in_types"]) if collecting else []
+    # Fold-constrained mode: the legacy search up to its first complete candidate; if that candidate folds an
+    # initial example wrongly, the SAME enumeration continues with equivalence refinement keyed by the states the
+    # candidate's own fold reaches, and every later complete candidate is judged by the initial-example folds.
+    # Only the best candidate is kept (no candidate list).
+    folding = collecting and cfg.accept is not None
+    stats = cfg.accept_stats
+    switched = [False]
+    if folding:
+        stats.update({"tested": 0, "best_errors": None, "accepted": False, "first": None, "first_errors": None,
+                      "probe_rows": 0})
+        probes, task_probes = [], []
+    else:
+        probes = probe_cells(pts, coord_types) if collecting else []
+        # Candidate-level probes are perturbed, already-observed Update inputs.
+        # These are diagnostic states, not independently verified SOURCE answers.
+        task_probes = probe_cells([i for i, _ in train], task["in_types"]) if collecting else []
+
+    def refining():
+        return collecting and (switched[0] if folding else bool(collected))
     piece_signatures, pred_signatures = {}, {}
     active_search = [None]
 
@@ -345,6 +367,29 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
             return None
         if not all(run(sol, lib, inputs, task) == expected for inputs, expected in task["train"]):
             return None
+        if folding:
+            seen_candidates.add(key)
+            errs = cfg.accept(sol)
+            stats["tested"] += 1
+            if stats["first"] is None:
+                stats["first"], stats["first_errors"] = sol, errs
+                collected[:] = [sol]
+            if errs is not None and (stats["best_errors"] is None or errs < stats["best_errors"]):
+                stats["best_errors"] = errs
+                collected[:] = [sol]
+                if errs == 0:
+                    stats["accepted"] = True
+                    raise sc.Done(("fold_accepted", None), None)
+            if not switched[0] and cfg.reach_probes is not None:
+                rows = [tuple(r) for r in cfg.reach_probes(sol)]
+                if rows:
+                    probes[:] = rows
+                    stats["probe_rows"] = len(rows)
+                    if active_search[0] is not None:
+                        active_search[0].probe_inputs = tuple(rows)
+                        active_search[0].equivalence_cap = cfg.equivalence_cap
+                switched[0] = True
+            return None
         probe_sig = tuple(repr(run(sol, lib, inputs, task)) for inputs in task_probes)
         if probe_sig in seen_candidate_probes:
             return None
@@ -365,7 +410,7 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
         if not mk or len(pieces) >= c4.MAX_PIECES:
             return
         allowed = (keep_equivalent(piece_signatures, equiv, ast)
-                   if collecting and collected else equiv not in seen)
+                   if refining() else equiv not in seen)
         if allowed:
             seen.add(equiv)
             pieces.append((mk, node))
@@ -381,7 +426,7 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
             if not 0 < mk < full or len(preds) >= c4.MAX_PREDS:
                 return
             allowed = (keep_equivalent(pred_signatures, mk, ast)
-                       if collecting and collected else mk not in pseen)
+                       if refining() else mk not in pseen)
             if allowed:
                 pseen.add(mk)
                 preds.append((mk, ast))
@@ -438,10 +483,19 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
     s = dc.FSearch(lib, coords_types(task, cfg), pts, bank_end, consts, cfg.cost("seq" if seq else "list"), (T_I, T_B),
                    lambda e, t: take(e.vec, e.ast(), t),
                    probe_inputs=probes,
-                   equivalence_cap=cfg.equivalence_cap if collecting and collected else 1)
+                   equivalence_cap=cfg.equivalence_cap if refining() else 1)
     active_search[0] = s
     def collect_covers(limit):
         """Explore alternative general cell covers without changing the legacy first-fit branch."""
+        if folding and switched[0]:
+            for node in _iter_covers(pieces, preds, full, limit):
+                append_candidate(node)
+            return
+        if folding:                                  # before the first candidate: exactly the legacy single cover
+            node = c4._cover(pieces, preds, full, limit)
+            if node is not None:
+                append_candidate(node)
+            return
         # Before the first fit use EXACTLY the legacy cover ordering and
         # one cover attempt. Rotate/prioritise only after that fit is safe.
         ordered = (sorted(pieces, key=lambda p: -bin(p[0]).count("1"))
@@ -456,34 +510,51 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
             node = c4._cover(rotated, preds, full, limit)
             if node is not None:
                 append_candidate(node)
-    for lvl in range(1, s.max_level + 1):
-        try:
-            for t in s.types:
-                s._pool(s.top, t, lvl)
-        except sc.Done as d:
-            if collecting:
-                return collected[0] if collected else None
-            if wrap(d.sol[1]) is not None:
-                return wrap(d.sol[1])
-            break                              # complete but longer than the data: go on to formation
-        except ic.Budget:
-            break
-        if lvl >= 3:
-            end_cover = min(deadline, time.process_time() + 0.08 * span)
-            if collecting:
-                try:
-                    collect_covers(end_cover)
-                except sc.Done:
-                    return collected[0]
-            else:
-                node = c4._cover(pieces, preds, full, end_cover)
-                if wrap(node) is not None:
-                    return wrap(node)
+    def run_levels(lo):
+        """The level loop; returns ("return", sol), ("budget", level) or ("end", None)."""
+        for lvl in range(lo, s.max_level + 1):
+            try:
+                for t in s.types:
+                    s._pool(s.top, t, lvl)
+            except sc.Done as d:
+                if collecting:
+                    return "return", (collected[0] if collected else None)
+                if wrap(d.sol[1]) is not None:
+                    return "return", wrap(d.sol[1])
+                return "end", None                 # complete but longer than the data: go on to formation
+            except ic.Budget:
+                return "budget", lvl
+            if lvl >= 3:
+                end_cover = min(deadline, time.process_time() + 0.08 * span)
+                if collecting:
+                    try:
+                        collect_covers(end_cover)
+                    except sc.Done:
+                        return "return", collected[0]
+                else:
+                    node = c4._cover(pieces, preds, full, end_cover)
+                    if wrap(node) is not None:
+                        return "return", wrap(node)
+        return "end", None
+    status, at = run_levels(1)
+    if status == "return":
+        return at
     if collecting:
         try:
             collect_covers(min(deadline, time.process_time() + 0.05 * span))
         except sc.Done:
             return collected[0]
+        if folding and switched[0] and status == "budget" and time.process_time() < deadline:
+            # fold-constrained continuation only: the rest of THIS call's CPU goes to the same enumeration (from
+            # the level the bank deadline interrupted; that level is rebuilt, its partial entries stay offered)
+            s.deadline = deadline - 0.05 * span
+            status, at = run_levels(at)
+            if status == "return":
+                return at
+            try:
+                collect_covers(deadline)
+            except sc.Done:
+                return collected[0]
         if collected:
             return collected[0]
         node = None
@@ -504,6 +575,53 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
             if got is not None:
                 return got
     return None
+
+
+def _iter_covers(pieces, preds, full, deadline, per=4, firsts_cap=40):
+    """Fold-constrained mode only: the case splits c4._cover would build, but every leaf alternative of the same
+    coverage (up to `per`, in enumeration order) instead of the first one.  Yields nodes lazily; the caller judges
+    each by the initial-example folds and keeps at most one."""
+    def covering(R):
+        out = []
+        for m, n in pieces:
+            if not R & ~m:
+                out.append(n)
+                if len(out) >= per:
+                    break
+        return out
+    for m, node in pieces:
+        if m == full:
+            yield node
+
+    def two(R):
+        for pm, past in preds:
+            if time.process_time() > deadline:
+                return
+            a, b = pm & R, ~pm & R
+            if not a or not b:
+                continue
+            As = covering(a)
+            if not As:
+                continue
+            for B in covering(b):
+                for A in As:
+                    yield ("case", past, A, B)
+    yield from two(full)
+    firsts = []
+    for pm, past in preds:
+        if pm and pm != full:
+            As = covering(pm)
+            if As:
+                firsts.append((-bin(pm).count("1"), len(firsts), pm, past, As))
+    for _, _, pm, past, As in sorted(firsts, key=lambda f: f[:2])[:firsts_cap]:
+        if time.process_time() > deadline:
+            return
+        for rest in two(full & ~pm):
+            for A in As:
+                yield ("case", past, A, rest)
+        for B in covering(full & ~pm):
+            for A in As:
+                yield ("case", past, A, B)
 
 
 def _residual(task, lib, consts, deadline, inv, cfg, order, goals, where, examples, seq, m_ast, ys_):
@@ -618,6 +736,55 @@ def solve_candidates(task, deadline, inv, cfg, k=4):
     if first is not None and repr(first) not in {repr(x) for x in result}:
         result.insert(0, first)
     return result[:k]
+
+
+def reach_cell_probes(task, sol, lib, inputs_list, cfg, limit=32):
+    """Cell coordinate rows of Update inputs that the fold of `sol` actually reaches (the output prefix and length
+    taken from sol's own output there).  These are the machine's reachable states, not SOURCE answers."""
+    rows, used = [], []
+    for p in inputs_list:
+        y = run(sol, lib, p, task)
+        if not isinstance(y, tuple):
+            continue
+        used.append(p)
+        for t in range(len(y)):
+            rows.append(cell(task, p, t, len(y), y, cfg))
+            if len(rows) >= limit:
+                return rows, used
+    return rows, used
+
+
+def solve_fold(task, deadline, inv, fold_errors, reach_inputs, k=4, probe_limit=32):
+    """Development only (opt-in): reachability-guided, fold-constrained cell synthesis on ONE transition table.
+
+    The legacy construction runs up to its first complete transition-consistent candidate (the first fit of
+    `solve`).  If the machine with it folds every initial example correctly it is returned at once.  Otherwise the
+    SAME enumeration continues until `deadline`: observational equivalence is refined on the cell coordinates of
+    the states that candidate's own fold reaches on the initial examples (reach_inputs; no query), and every later
+    complete candidate is judged by fold_errors(sol) -- the search stops at the first with 0 and otherwise keeps
+    only the best.  The observed transitions stay hard constraints; the fold check uses only developer-visible
+    initial examples.  Returns (sol or None, info)."""
+    cfg = Cfg(subst=True, latent=True, equivalence_cap=k, candidate_limit=10 ** 6)
+    lib = library(cfg)
+    observed = {i for i, _ in task["train"]}
+    info = {"first_errors": None, "tested": 0, "accepted": False, "source": "first", "reach_inputs": 0,
+            "probe_rows": 0}
+
+    def probes_of(sol):
+        pts = [p for p in dict.fromkeys(reach_inputs(sol)) if p not in observed]
+        rows, used = reach_cell_probes(task, sol, lib, pts, cfg, probe_limit)
+        info["reach_inputs"] = len(used)
+        return rows
+    cfg.accept, cfg.reach_probes = fold_errors, probes_of
+    sol = solve_cfg(task, deadline, inv, lib, cfg)
+    st = cfg.accept_stats
+    info.update(first_errors=st.get("first_errors"), tested=st.get("tested", 0),
+                accepted=st.get("accepted", False), probe_rows=st.get("probe_rows", 0),
+                first=show(st["first"]) if st.get("first") is not None else None)
+    if sol is not None and st.get("first") is not None and repr(sol) != repr(st["first"]):
+        info["source"] = "reach"
+    info["errors"] = fold_errors(sol) if sol is not None else None
+    return sol, info
 
 
 def solve(task, deadline, inv, cfg):
