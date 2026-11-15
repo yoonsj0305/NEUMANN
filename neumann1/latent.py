@@ -310,6 +310,7 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
     # These are diagnostic states, not independently verified SOURCE answers.
     task_probes = probe_cells([i for i, _ in train], task["in_types"]) if collecting else []
     piece_signatures, pred_signatures = {}, {}
+    active_search = [None]
 
     def signature(ast):
         try:
@@ -350,6 +351,10 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
         seen_candidates.add(key)
         seen_candidate_probes.add(probe_sig)
         collected.append(sol)
+        # Preserve the baseline first-fit search cost; enable expensive
+        # equivalence diversification ONLY after a valid first candidate.
+        if len(collected) == 1 and active_search[0] is not None:
+            active_search[0].equivalence_cap = cfg.equivalence_cap
         if len(collected) >= cfg.candidate_limit:
             raise sc.Done(("candidate_limit", None), None)
         return None
@@ -359,7 +364,8 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
         ast = node[1] if node[0] == "value" else node[2]
         if not mk or len(pieces) >= c4.MAX_PIECES:
             return
-        allowed = (keep_equivalent(piece_signatures, equiv, ast) if collecting else equiv not in seen)
+        allowed = (keep_equivalent(piece_signatures, equiv, ast)
+                   if collecting and collected else equiv not in seen)
         if allowed:
             seen.add(equiv)
             pieces.append((mk, node))
@@ -374,7 +380,8 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
             mk = sum(1 << k for k, b in enumerate(vec) if b)
             if not 0 < mk < full or len(preds) >= c4.MAX_PREDS:
                 return
-            allowed = (keep_equivalent(pred_signatures, mk, ast) if collecting else mk not in pseen)
+            allowed = (keep_equivalent(pred_signatures, mk, ast)
+                       if collecting and collected else mk not in pseen)
             if allowed:
                 pseen.add(mk)
                 preds.append((mk, ast))
@@ -430,7 +437,9 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
     got = None
     s = dc.FSearch(lib, coords_types(task, cfg), pts, bank_end, consts, cfg.cost("seq" if seq else "list"), (T_I, T_B),
                    lambda e, t: take(e.vec, e.ast(), t),
-                   probe_inputs=probes, equivalence_cap=cfg.equivalence_cap if collecting else 1)
+                   probe_inputs=probes,
+                   equivalence_cap=cfg.equivalence_cap if collecting and collected else 1)
+    active_search[0] = s
     def collect_covers(limit):
         """Explore alternative general cell covers without changing the legacy first-fit branch."""
         ordered = sorted(pieces, key=lambda p: -bin(p[0]).count("1"))
