@@ -1,0 +1,79 @@
+{
+ "baseline": {
+  "cpu": 6663,
+  "mismatch_adopted": [],
+  "queries": 19969,
+  "repairs": {},
+  "semantic_solved": 200,
+  "tasks": 338
+ },
+ "inplace": {
+  "cpu": 6655,
+  "mismatch_adopted": [],
+  "queries": 19968,
+  "repairs": {
+   "1 examples still fail on this state space": 1,
+   "no Update on this state space (search or representation)": 1,
+   "repaired (Update / start)": 5,
+   "repaired Update refuted again": 1
+  },
+  "semantic_solved": 202,
+  "tasks": 338
+ },
+ "inplace_vs_baseline": {
+  "lost": [
+   "identify-is-mod-k(k=2) | append-k(k=10)",
+   "keep-mod-k(k=2) | pow-k(k=3)"
+  ],
+  "net": 2,
+  "net_excluding_dev_used": 1,
+  "new": [
+   "mbpp/366",
+   "mbpp/940",
+   "rotate-k(k=1) | identify-geq-k(k=2)",
+   "slice-k-n(k=3,n=4) | repeat-k(k=5)"
+  ],
+  "p": 0.6875
+ },
+ "necessity": {
+  "cpu": 6637,
+  "mismatch_adopted": [],
+  "queries": 19964,
+  "repairs": {
+   "1 examples still fail on this state space": 2,
+   "no Update on this state space (search or representation)": 1,
+   "repaired (Update / start)": 5,
+   "repaired Update refuted again": 1
+  },
+  "semantic_solved": 203,
+  "tasks": 338
+ },
+ "necessity_vs_baseline": {
+  "lost": [
+   "mbpp/345"
+  ],
+  "net": 3,
+  "net_excluding_dev_used": 2,
+  "new": [
+   "mbpp/366",
+   "mbpp/940",
+   "rotate-k(k=1) | identify-geq-k(k=2)",
+   "slice-k-n(k=3,n=4) | repeat-k(k=5)"
+  ],
+  "p": 0.375
+ },
+ "necessity_vs_inplace": {
+  "lost": [
+   "mbpp/345"
+  ],
+  "net": 1,
+  "net_excluding_dev_used": 1,
+  "new": [
+   "identify-is-mod-k(k=2) | append-k(k=10)",
+   "keep-mod-k(k=2) | pow-k(k=3)"
+  ],
+  "p": 1.0
+ },
+ "semantic_rule": "hidden-test pass minus known mismatches; other passes are NOT individually semantics-checked",
+ "status": "DEVELOPMENT ONLY - opened FRESH (110) and list-routines (228) re-used; same commit for all arms"
+}
