@@ -44,7 +44,15 @@ def emit(path, row):
 def capture(args):
     if not args.names and not args.names_file:
         raise SystemExit("Explicit --names or --names-file required; do not silently expand scope.")
-    names = set(json.loads(pathlib.Path(args.names_file).read_text())) if args.names_file else {args.names}
+    if args.names_file:
+        manifest = json.loads(pathlib.Path(args.names_file).read_text())
+        if isinstance(manifest, dict) and "task_ids" in manifest:
+            family = "list-routines" if args.mode == "capture-lr" else "fresh-dev"
+            names = set(manifest["task_ids"][family])
+        else:
+            names = set(manifest)
+    else:
+        names = {args.names}
     if args.mode == "capture-lr":
         import env_listroutines as E
         import active_dev as dev
