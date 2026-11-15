@@ -1040,3 +1040,7 @@ V3 FAIL, Q3 OPEN, Q6 untouched.
 * 76 of 89 snapshots are fitted by neither: the next bottleneck is Update synthesis/representation on these
   transitions (not separated further here). DEVELOPMENT PASS (whole-task causal solves) not evaluated in this step.
 V1 PASS (sealed), V2 independent OPEN, V3 FAIL, Q3 OPEN, Q6 untouched.
+* Correction to the row above: the `mbpp/940` fit of the residual variant is a `relcells` cell program (the existing
+  R2 construction), not a goal-directed residual decomposition; it appears only through a different call path / time
+  share in that variant. Only `pow-k(k=4)` (cons / foldrL with the residual cell e·e·e·e) is a residual construction:
+  SYNTHESIS PASS for residual decomposition = 1 transition, one lineage.
