@@ -1067,6 +1067,29 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         in_t = tuple([s_type] * len(W)) + tuple(a["t"] for a in acc) + (T_I,)
         upd_alts[:] = []
         rows = [[(a + (e,), b[j]) for (a, e), b, _ in trans] for j in range(len(W))]
+        # Development audit: freeze the exact observed transition system without
+        # querying SOURCE or changing synthesis decisions.  Snapshots carry
+        # *only* already-observed states, never hidden tests or reference code.
+        def snapshot(phase, component=None):
+            import hashlib, json
+            data = {"schema": "neumann.q3-update-snapshot.v1",
+                    "phase": phase, "direction": direction,
+                    "in_types": list(in_t), "output_type": s_type,
+                    "W": [list(w) for w in W],
+                    "accumulators": [{"show": a["show"], "type": a["t"],
+                                      "start": a["z"]} for a in acc],
+                    "virtual_value": virt["value"],
+                    "failed_component": component,
+                    "transitions": [{"state": list(a), "element": e,
+                                     "successor": list(b), "prefix": list(u)}
+                                    for (a, e), b, u in trans],
+                    "rows": [{"inputs": list(xs), "output": y}
+                             for xs, y in (rows[component] if component is not None else [])]}
+            canonical = json.dumps(data, sort_keys=True, separators=(",", ":"))
+            data["sha256"] = hashlib.sha256(canonical.encode()).hexdigest()
+            return data
+        if CAPTURE_UPDATE_TRANSITIONS and "first_update_input" not in rec:
+            rec["first_update_input"] = snapshot("first_attempt")
         upd, asts = [], []
         for j in range(len(W)):
             end = min(deadline, time.process_time() + share * max(0.0, deadline - time.process_time()))
@@ -1089,6 +1112,8 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                 if j == 0:
                     upd_alts[:] = alts or []
             if g is None:
+                if CAPTURE_UPDATE_TRANSITIONS and "first_update_failure" not in rec:
+                    rec["first_update_failure"] = snapshot("first_failure", j)
                 return None, asts, None, None
             upd.append(g)
             asts.append(ast)
@@ -1840,6 +1865,7 @@ MAX_ACC = 3       # invented variables per machine
 ACTION_MODE = "invent"   # D's fixed decision at a discovery branch point ("repair": the counterfactual arm)
 REPAIR_EXTRA_CPU = 0.0   # DIAGNOSTIC ONLY: extra CPU for the repair re-synthesis (never in an official run)
 _LAST = [None]           # internal state of the last formed machine (in-place repair)
+CAPTURE_UPDATE_TRANSITIONS = False  # development audit only; record first attempt/failure SOURCE transition tables
 GOAL_UPDATE_SYNTH = False  # development ablation: goal-directed residual Update synthesis before the forward search
 REPAIR = False           # counterexample-guided repair: True = re-form (6e15f35), "inplace" = local re-synthesis of a refuted machine (the compared condition)
 QUERY_SCHEDULE = {}      # {self-test query index: "alt"} -- the second candidate instead of the first
