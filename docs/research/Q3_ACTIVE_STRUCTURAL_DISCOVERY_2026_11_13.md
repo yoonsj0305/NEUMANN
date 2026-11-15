@@ -996,3 +996,25 @@ found within the substrate and time — synthesis, not candidate choice (6 tasks
 cannot separate (2) from (5) when admissible structures exist; see section 16). The directive's candidate-selection
 improvement targets cause (3), 6 tasks; the larger lever is Update synthesis on consistent states (cause 2, 62
 tasks). Not done in this session: any algorithm change, causal experiment or dev-set extension. Q3 OPEN; V3 FAIL.
+
+## 28. Goal-directed residual Update synthesis (code `f127bc3`, opt-in `GOAL_UPDATE_SYNTH`) — DEVELOPMENT ONLY
+
+* Implementation check: `synth_goal_update` and `synth_list_delta_update` (from another session's commits
+  `5ad1adc`, `9e8f0a7`, `f127bc3`) are off by default; `tests/test_active.py` 8 passed; the list delta synthesiser
+  builds `cons` / `foldrL` ASTs and compiles them with `compile_ast` (executable, not a display string).
+* Comparison: the per-task transition tables at failure time are not stored in the logs, so instead each task was
+  run with the same seed, budget (30 CPU s, 60 queries) and policy, residual synthesis off vs on; the runs are
+  identical up to the first synthesis call (same queries), so the first synthesis sees the same table. Raw:
+  `docs/experiments/dev/q3_residual_synthesis_dev_2026_11_15.jsonl`.
+
+| task (Update synthesis failed in Gate E) | baseline | residual |
+|---|---|---|
+| `pow-k(k=4)` | not formed | **formed at round 0, challenge passed, solved**: Update `(foldrL (cons $2 $3) (cons (mul (mul e (mul e e)) e) nil) s)` = append e⁴ (residual: the new last cell; intermediate: e·e·e·e) |
+| `pow-base-k(k=2)`, `identify-is-mod-k(k=7)`, `identify-k(k=10)` | not formed | not formed |
+| `mbpp/45`, `mbpp/22`, `mbpp/200`, `mbpp/281` | not formed | not formed (`mbpp/45`, `mbpp/22`: residual run ends at the CPU deadline instead) |
+
+SYNTHESIS PASS on one development task (list-routines): a previously unsynthesisable list Update was built from
+the observed residual (the appended cell) and executed correctly on the hidden test. Not shown: a second lineage,
+the dev-set extension, regressions, semantics of the other tasks; on two MBPP tasks the residual stage consumed
+the CPU. DEVELOPMENT PASS not reached (one lineage); GENERALIZATION OPEN. V1 PASS (sealed), V2 independent OPEN,
+V3 FAIL, Q3 OPEN, Q6 untouched.
