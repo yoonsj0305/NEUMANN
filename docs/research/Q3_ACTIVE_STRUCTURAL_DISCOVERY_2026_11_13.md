@@ -862,3 +862,34 @@ keep. This confirms the directive's premise: re-forming with `prior_acc` is NOT 
 mechanism (re-synthesise only the conflicting Update from the stored transitions, keeping W, the transitions and
 the start) was NOT implemented in this session — it requires `form_machine` to return its internal state.
 Gates B–D not met. V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched.
+
+## 22. In-place counterexample repair (2026-11-15) — DEVELOPMENT ONLY
+
+* Code (`neumann1/active.py`, `REPAIR = "inplace"`; default off): when a machine is formed, its internal state is
+  kept in memory only (`_LAST`, never in a record): the transition table (W, invented variables and their starts),
+  the observation set, the synthesis and fold functions. When the independent challenge refutes it, the SOURCE
+  counterexample is added once; the prefix transitions of the counterexample join the stored table (their states
+  are SOURCE queries); the same state space is kept and only the synthesised Update components are re-synthesised
+  (`attempt`; invented variables keep their own known updates); the repaired machine must reproduce every
+  observation and pass a NEW challenge on unseen inputs. Repair CPU: at most 8 s, inside the 30 s cap (taken from
+  the classical fallback's share). No `form_machine` restart, no re-invention, no variable rejection.
+* Same seed, 30 CPU s, 60 queries; raw `docs/experiments/dev/q3_inplace_repair_dev_2026_11_15.jsonl`:
+
+| task | arm | repair started with | Update before → after | new challenge | hidden test | semantic |
+|---|---|---|---|---|---|---|
+| `mbpp/366` | baseline / re-form | — | — | — | F / F | — |
+| `mbpp/366` | **in-place** | 12.3 s, 36 queries | `(if (lt s (mul h h)) (mul h e) s)` → `(if (lt s (mul h e)) (mul h e) s)` (state: answer + `h' = e`) | pass | **T** | **yes**: max over adjacent products |
+| `mbpp/670` alt. | baseline / re-form | — | — | — | F / F | — |
+| `mbpp/670` alt. | in-place | 13.1 s, 25 queries | `…(if (eq h 1) (lt (mod e 7) 5) (lt h e))` → `…(if (eq h 1) (lt (mod e 7) 6) (not (lt e h)))` | pass | T | **no**: the `h = 1` special case survives |
+| `identify-k(k=-2)` alt. | in-place | 26.6 s, 9 queries | relcells step | — | F | 13 examples still fail on this state space (continuation state; representation or synthesis, not resolved) |
+
+* Gate A: partly — the counterexample's prefix transitions are SOURCE-observed and the conflicting one is among
+  them, but the FIRST wrong transition was not singled out and recorded. Gate B: met for these machines (W,
+  invented variable, start and table kept; only the answer component re-synthesised). Gate C: met in one task
+  (`mbpp/366`: repaired, new independent challenge passed, semantically correct). Gate D: one additional semantic
+  solve over baseline and re-form (`mbpp/366`), 1 : 0 — a single development task, not significant. Gate E: the
+  repair is off by default; regression of previously solved tasks under `REPAIR = "inplace"` was not measured
+  across the dev set. `mbpp/670` counts as a semantic failure (hidden-test pass without the reference semantics).
+
+V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched.
+Full regression: 1148 passed, 53 skipped (REPAIR off by default).
