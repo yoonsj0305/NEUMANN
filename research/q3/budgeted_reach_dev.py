@@ -124,11 +124,41 @@ def semantic(spec, pred, n=300, seed=777):
     return [ok, tot]
 
 
-def job(arm, name, seed_kind, cap, sem):
+EVAL_SET = "docs/experiments/dev/case2_recovery/eval_set.json"
+
+
+def resolve(name):
+    """A task by name: one of env_listroutines.tasks(), or a pre-registered new composition rebuilt from its name
+    (routine ids and integer parameters) and accepted only if its {name, train, test} hash equals the committed one."""
     specs = {s.name: s for s in E.tasks()}
+    if name in specs:
+        return specs[name]
+    parts = []
+    for part in name.split(" | "):
+        rid, _, rest = part.partition("(")
+        params = {}
+        for kv in filter(None, rest.rstrip(")").split(",")):
+            k, v = kv.split("=")
+            params[k] = int(v)
+        if rid not in E.R:
+            raise KeyError(name)
+        parts.append((rid, params))
+    spec = E.Spec(parts)
+    reg = json.loads(pathlib.Path(EVAL_SET).read_text())
+    want = {t["name"]: t["sha256"] for t in reg["new_compositions"]["tasks"] + reg["regression"]["tasks"]}
+    env = E.Env(spec, 0, budget=60)
+    data = {"name": spec.name, "train": [[list(x), list(y) if isinstance(y, tuple) else y] for (x,), y in env._train],
+            "test": [list(x) for x in env._test]}
+    got = hashlib.sha256(json.dumps(data, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    if spec.name != name or want.get(name) != got:
+        raise SystemExit("TASK_HASH_MISMATCH " + name)
+    return spec
+
+
+def job(arm, name, seed_kind, cap, sem):
     ac._inv()
     set_arm(arm)
-    spec = specs[name]
+    spec = resolve(name)
     env = E.Env(spec, 0, budget=60)
     seed = h(name) % 1000 if seed_kind == "base" else (h(name) + 7919 * int(seed_kind)) % 1000
     calls, charges, phase, last = [], [], ["formation"], [None]
