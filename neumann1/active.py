@@ -204,6 +204,9 @@ def synth_goal_update(in_types, out_type, rows, deadline, check=None):
     if out_type not in (T_I, T_B) or not rows or time.process_time() >= deadline:
         return None, None
     scopes = dc.scopes(in_types)
+    # A streaming Update's final input is the newly observed element.  Trying
+    # that single component first often isolates a minimal residual feature.
+    scopes.sort(key=lambda scope: (len(scope) != 1, len(in_types) - 1 not in scope, scope))
     if not scopes:
         return None, None
     lib = _lib()
@@ -236,6 +239,76 @@ def synth_goal_update(in_types, out_type, rows, deadline, check=None):
 
         if all(g(xs) == y for xs, y in rows) and (check is None or check(g)):
             return g, ast
+    return None, None
+
+
+
+def synth_list_delta_update(in_types, rows, deadline, check=None):
+    """Construct a list-valued Update from an observable one-element delta.
+
+    The output must contain an earlier list-valued state component unchanged,
+    with exactly one new item at either end.  Synthesize that item's value
+    from the transition goal, then assemble a genuine executable AST using
+    cons / foldrL.  Other list transitions are left to the existing solvers.
+    """
+    if not rows or time.process_time() >= deadline:
+        return None, None
+    lib = _lib()
+    n = len(in_types)
+    for state_idx, t in enumerate(in_types):
+        if t != T_L:
+            continue
+        for mode in ("append", "prepend"):
+            residual = []
+            for inp, target in rows:
+                old = inp[state_idx]
+                y = tuple(target) if isinstance(target, (tuple, list)) else None
+                if not isinstance(old, (tuple, list)) or y is None or len(y) != len(old) + 1:
+                    break
+                old = tuple(old)
+                if mode == "append":
+                    if y[:-1] != old:
+                        break
+                    elt = y[-1]
+                else:
+                    if y[1:] != old:
+                        break
+                    elt = y[0]
+                if _type(elt) != T_I:
+                    break
+                residual.append((tuple(inp), elt))
+            if len(residual) != len(rows):
+                continue
+            if time.process_time() >= deadline:
+                return None, None
+            r_end = min(deadline, time.process_time() +
+                        0.6 * max(0.0, deadline - time.process_time()))
+            _, elem_ast = synth_goal_update(in_types, T_I, residual, r_end)
+            if elem_ast is None and time.process_time() < deadline:
+                _, elem_ast = synth_multi(in_types, T_I, residual, deadline)
+            if elem_ast is None:
+                continue
+
+            if mode == "prepend":
+                ast = ("cons", elem_ast, ("v", state_idx))
+            else:
+                # foldr cons over the old list, starting at [new_element].
+                ast = ("foldrL", ("cons", ("v", n), ("v", n + 1)),
+                       ("cons", elem_ast, ("nil",)), ("v", state_idx))
+            try:
+                fn = ic.compile_ast(ic._tup(ast), n, lib)
+            except (ic.Fail, TypeError, KeyError, ValueError):
+                continue
+
+            def g(args, fn=fn):
+                try:
+                    out = fn(tuple(args))
+                except (ic.Fail, RecursionError, TypeError, ValueError):
+                    return None
+                return out if _type(out) == T_L else None
+
+            if all(g(inp) == tuple(y) for inp, y in rows) and (check is None or check(g)):
+                return g, ast
     return None, None
 
 
@@ -1000,6 +1073,9 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             g, ast = (None, None)
             if s_type == T_L:                 # list-valued components: the cell construction (R2) first
                 g, ast = synth_cells(in_t, rows[j], end)
+            if g is None and GOAL_UPDATE_SYNTH and s_type == T_L:
+                r_end = min(end, time.process_time() + max(0.0, end - time.process_time()) * 0.5)
+                g, ast = synth_list_delta_update(in_t, rows[j], r_end)
             if g is None and GOAL_UPDATE_SYNTH and s_type in (T_I, T_B):
                 # Equal outer CPU cap: spend part of the ordinary Update-search
                 # allotment on structural residual goals, not on more candidates.
