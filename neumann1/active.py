@@ -595,6 +595,31 @@ class DiscoveryPolicy:
         return {k: round(v, 5) for k, v in w.items()}
 
 
+def _branch_prunings(ast, n, out_type):
+    """Every Update obtained by replacing ONE case split of `ast` with one of its branches -- the rivals that
+    differ from `ast` exactly on the inputs reaching that split (rare-condition branches included)."""
+    def variants(a):
+        if isinstance(a, tuple) and a and a[0] in ("ifI", "case") and len(a) == 4:
+            yield a[2]
+            yield a[3]
+            for i in (1, 2, 3):
+                for v in variants(a[i]):
+                    yield a[:i] + (v,) + a[i + 1:]
+    lib = _lib()
+    out = []
+    for v in list(variants(ast))[:12]:
+        try:
+            if out_type == T_I:
+                fn = ic.compile_ast(ic._tup(v), n, lib)
+            else:
+                to_case = lambda a: ("case",) + tuple(to_case(x) for x in a[1:]) if isinstance(a, tuple) and a and a[0] == "ifI" and len(a) == 4 else a
+                fn = _case_fn(to_case(v), n, lib)
+        except Exception:
+            continue
+        out.append(lambda args, fn=fn: _safe(lambda: fn(tuple(args))))
+    return out
+
+
 def _acc_step(fn, h, e):
     try:
         v = fn((h, e))
@@ -1585,9 +1610,12 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                     nonlocal deadline
                     deadline = v
                 # the formed machine's internal state, for an in-place repair (same W, invented variables, starts)
-                _LAST[0] = {"extra": extra, "examples": examples, "transitions": transitions, "attempt": attempt,
-                            "fold": fold, "step_input": step_input, "direction": direction,
-                            "set_deadline": set_deadline, "obs": obs, "W": list(W), "acc": [a["show"] for a in acc]}
+                # per-machine repair handle (attached to this machine's function, never written to a record)
+                predict.repair_state = {"extra": extra, "examples": examples, "transitions": transitions,
+                                        "attempt": attempt, "fold": fold, "step_input": step_input,
+                                        "direction": direction, "set_deadline": set_deadline, "obs": obs,
+                                        "W": list(W), "acc": [a["show"] for a in acc], "upd_alts": upd_alts,
+                                        "upd": list(upd), "z": z, "vals": vals, "lens": lens}
                 return predict, obs, rec
             # representation change before more repair: the fold fails on at least half the examples and has not
             # improved over two rounds -> the state, not a transition, is the likely error (invention is query-free)
@@ -1779,17 +1807,16 @@ def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
             obs += mobs
             frec["machines"].append(mrec)
             if m is not None:
-                if mrec.get("formed") is None:
-                    _LAST[0] = None
                 det = []
                 verdict = challenge(env, m, ex, obs, rng, detail=det)
                 mrec["challenge"] = verdict
                 mrec["challenge_detail"] = det
                 cx = [d for d in det if d["predicted"] != d["answer"]]
-                if verdict is False and REPAIR == "inplace" and cx and _LAST[0] and env.used < env.budget - 3:
+                if verdict is False and REPAIR in ("inplace", "inplace+disc") and cx and getattr(m, "repair_state", None) \
+                        and env.used < env.budget - 3:
                     # in-place: the counterexample's prefix transitions join the stored table once; only the Update
                     # (and the start) is re-synthesised on the SAME state space; then a NEW independent challenge
-                    st_ = _LAST[0]
+                    st_ = m.repair_state
                     x_, y_ = tuple(cx[0]["input"]), cx[0]["answer"]
                     y_ = tuple(y_) if isinstance(y_, list) else y_
                     if all(tuple(e_[0][0]) != x_ for e_ in st_["examples"]):
@@ -1811,6 +1838,52 @@ def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
                         u2, f2 = None, None
                         info["cause"] = "queries"
                     info["cpu_used"] = round(time.process_time() - t0_, 2)
+                    if u2 is not None and not f2 and REPAIR == "inplace+disc":
+                        # falsifiability of the repaired Update: inputs where it, the refuted Update and every other
+                        # equally consistent Update disagree are searched and asked; a wrong repaired Update gets the
+                        # new counterexample and is re-synthesised on the SAME state space (at most 3 rounds)
+                        fd = st_["fold"]
+                        info["discrimination"] = []
+                        for _round in range(3):
+                            pm = lambda x, u=list(u2), zz=z2: (lambda r: None if r is None else r[0])(fd(u, zz, x))
+                            rivs_ = [lambda x, u=list(st_["upd"]), zz=st_["z"]: (lambda r: None if r is None else r[0])(fd(u, zz, x))]
+                            rivs_ += [lambda x, u=[g0] + list(u2[1:]), zz=z2: (lambda r: None if r is None else r[0])(fd(u, zz, x))
+                                      for g0 in list(st_["upd_alts"])]
+                            # each case split of the repaired Update pruned in turn: probes its (rare) branch conditions
+                            n_in = len(st_["W"]) + len(st_["acc"]) + 1
+                            out_t = _type(st_["examples"][0][1])
+                            rivs_ += [lambda x, u=[g0] + list(u2[1:]), zz=z2: (lambda r: None if r is None else r[0])(fd(u, zz, x))
+                                      for g0 in (_branch_prunings(a2[0], n_in, out_t) if a2 and isinstance(a2[0], tuple) else [])]
+                            base_ = [task_input(rng, st_["vals"], st_["lens"]) for _ in range(120)]
+                            pool_ = [x for x in dict.fromkeys(base_ + [y for x in base_[:60] for y in edits(x, rng)])
+                                     if all(tuple(e_[0][0]) != x for e_ in st_["examples"])]
+                            xs = [x for x in pool_ if any(_safe(lambda r=r: r(x)) != _safe(lambda: pm(x)) for r in rivs_)]
+                            if not xs or env.used >= env.budget - 3:
+                                info["discrimination"].append("no disagreeing input" if not xs else "queries")
+                                break
+                            # the rarest disagreement first: the input on which the fewest rivals disagree
+                            xs.sort(key=lambda x: sum(_safe(lambda r=r: r(x)) != _safe(lambda: pm(x)) for r in rivs_))
+                            xq = xs[0]
+                            yq = ask(env, xq, obs)
+                            if yq is None or _safe(lambda: pm(xq)) == yq:
+                                info["discrimination"].append("repaired Update confirmed on %s" % (list(xq),))
+                                if yq is not None:
+                                    st_["examples"].append(((xq,), yq))
+                                continue
+                            info["discrimination"].append("repaired Update refuted on %s" % (list(xq),))
+                            st_["examples"].append(((xq,), yq))
+                            seq_ = xq if st_["direction"] == "prefix" else xq[::-1]
+                            u_ = ()
+                            for e_ in seq_:
+                                if (u_, e_) not in st_["extra"]:
+                                    st_["extra"].append((u_, e_))
+                                u_ = st_["step_input"](u_, e_)
+                            try:
+                                u2, a2, z2, f2 = st_["attempt"](st_["transitions"](), 0.5, 1.0)
+                            except Exhausted:
+                                u2, f2 = None, None
+                            if u2 is None or f2:
+                                break
                     if u2 is not None and not f2:
                         info["update_after"] = [show_ast(a) if not (isinstance(a, tuple) and a and a[0] == "cells") else a[1] for a in a2]
                         m2 = (lambda inp, u2=list(u2), z2=z2, fd=st_["fold"]: (lambda r: None if r is None else r[0])(fd(u2, z2, tuple(inp[0]))))

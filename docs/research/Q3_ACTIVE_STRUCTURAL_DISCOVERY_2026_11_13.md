@@ -893,3 +893,26 @@ Gates B–D not met. V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6
 
 V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched.
 Full regression: 1148 passed, 53 skipped (REPAIR off by default).
+
+## 23. Repair ownership and falsifiability of the repaired Update (2026-11-15) — DEVELOPMENT ONLY
+
+* Ownership: the global `_LAST` is gone; each formed machine's function carries its own `repair_state` (W,
+  invented variables and starts, transition table, observations, synthesis functions, the alternative Updates);
+  nothing of it is written to a record.
+* `REPAIR = "inplace+disc"`: after the in-place re-synthesis, inputs are searched (task-distribution inputs and their
+  edits) where the repaired Update disagrees with (a) the refuted Update, (b) every other equally consistent Update,
+  (c) each variant obtained by pruning ONE case split of the repaired Update — the rival that differs exactly where
+  that split's branch is reached, so rare-condition branches are probed without naming any constant. The rarest
+  disagreement is asked first (≤ 3 rounds); a wrong repaired Update gets the counterexample and is re-synthesised on
+  the same state space; then the new independent challenge.
+* Result (same seed, 30 CPU s, 60 queries): `mbpp/366` — 3 probes confirmed the repaired Update, solved and
+  semantically correct (preserved). `mbpp/670` alt. — 3 probes ([-2,0,4,0], [1,-1,0], [2]) all agreed with the
+  repaired Update; the `h = 1` special case was probed once ([1,-1,0], where it happens to give the right answer)
+  and survived; the machine is still adopted with a hidden-test pass and a semantic mismatch. **Not fixed.** The
+  disagreement region of a spurious branch is reached, but one probe in it is not enough when the branch is right on
+  part of that region.
+* Not done: the dev-set comparison (Baseline / In-place / In-place + discrimination: solved sets, regressions, wrong
+  adoptions, cost). Core question (more semantic solves without more wrong adoptions) not answered.
+
+V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched.
+Full regression: 1148 passed, 53 skipped (repair modes off by default).
