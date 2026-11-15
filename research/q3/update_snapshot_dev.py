@@ -68,7 +68,8 @@ def capture(args):
         jobs = [(name, tasks[name], int(hashlib.sha256(name.encode()).hexdigest(), 16) % 1000)
                 for name in sorted(names)]
 
-    done = {r["name"] for r in load_jsonl(args.out) if r.get("status") == "ok"}
+    done = {r["name"] for r in load_jsonl(args.out)
+            if r.get("status") in ("ok", "inconsistent")}
     if ac.GOAL_UPDATE_SYNTH:
         raise SystemExit("Capture must use baseline synthesis (GOAL_UPDATE_SYNTH=False).")
     ac.CAPTURE_UPDATE_TRANSITIONS = True
@@ -76,8 +77,9 @@ def capture(args):
     for name, spec, seed in jobs:
         if name in done:
             continue
-        env = E.Env(spec, 0, budget=60) if args.mode == "capture-lr" else EF.Env(spec, 0, budget=60)
+        env = None
         try:
+            env = E.Env(spec, 0, budget=60) if args.mode == "capture-lr" else EF.Env(spec, 0, budget=60)
             _, rec = ac.run_arm("D", env, 30.0, seed=seed)
             machines = (rec.get("formation") or {}).get("machines") or []
             failures = [m["first_update_failure"] for m in machines if m.get("first_update_failure")]
@@ -88,7 +90,8 @@ def capture(args):
                    "first_attempt": attempts[0] if attempts else None,
                    "failure_count": len(failures), "no_failure_snapshot": not bool(failures)}
         except Exception as e:
-            row = {"status": "error", "name": name,
+            status = "inconsistent" if type(e).__name__ == "Inconsistent" else "error"
+            row = {"status": status, "name": name,
                    "error": type(e).__name__ + ": " + str(e)}
         finally:
             if hasattr(env, "close"):
