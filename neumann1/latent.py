@@ -442,10 +442,14 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
     active_search[0] = s
     def collect_covers(limit):
         """Explore alternative general cell covers without changing the legacy first-fit branch."""
-        ordered = sorted(pieces, key=lambda p: -bin(p[0]).count("1"))
+        # Before the first fit use EXACTLY the legacy cover ordering and
+        # one cover attempt. Rotate/prioritise only after that fit is safe.
+        ordered = (sorted(pieces, key=lambda p: -bin(p[0]).count("1"))
+                   if collected else pieces)
         if not ordered:
             return
-        for shift in range(min(cfg.candidate_limit, len(ordered))):
+        shifts = range(min(cfg.candidate_limit, len(ordered))) if collected else (0,)
+        for shift in shifts:
             if time.process_time() >= limit:
                 return
             rotated = ordered[shift:] + ordered[:shift]
