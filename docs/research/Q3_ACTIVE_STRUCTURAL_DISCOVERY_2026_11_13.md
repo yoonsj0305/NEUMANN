@@ -1150,14 +1150,16 @@ artifact 14156470654, digest `2fe169ec…153a`, as recorded in section 34. CI on
 success, so there was no regression to repair. Locally (Python 3.11, the CI pins) the Q3 test files pass. One
 CPU-budgeted test (`test_policy_is_updated_by_verified_experience_only`, 8 CPU s per task) failed once while five
 experiment processes saturated the cores; it passed when rerun alone on this code and on `d8a95b1`. That failure is
-load timing, not a regression.
+load timing, not a regression. Full CI on the head carrying this section's code (`efb00ec`, run 43705723009): success.
 
 **Method note: the budget unit.** The synthesisers stop on `time.process_time()` deadlines, and the same 5 s first fit
 fitted or failed on the same table between runs (CI: 10/10 fits; local real-clock reruns: 7/10, 7/10, and 5/10 under
 heavy load). So two units are reported:
 * **virtual clock** (`research/q3/vclock.py`, harness only): virtual s = 3.0e-7 · `invention_core.WORK` + 5.0e-5 ·
   clock reads, least-squares fit on 30 real first-fit calls (`vclock_calibration.json`). Every synthesis module and
-  the harness read it, so fixed-table runs are byte-identical across reruns. In the machine runs, query logs, events
+  the harness read it, so fixed-table runs are byte-identical across reruns. GitHub's runner regenerated
+  `reachable_diagnosis.jsonl` and `fold_reach_replay.jsonl` and matched the committed rows exactly (workflow
+  `q3-reachable-fold-dev.yml`, run 43705722762 on `efb00ec`, artifact 14158208864). In the machine runs, query logs, events
   and adopted Updates were identical in 3 reruns of 4 (arm, task) pairs; only the final CPU total of the passive
   fallback phase varied.
 * **real clock**, replicated. This is the official unit.
