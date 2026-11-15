@@ -151,3 +151,39 @@ def test_opt_in_probe_equivalence_keeps_semantically_distinct_top_level_asts():
         assert len(retained) == expected
         assert len(seen) == expected
         assert s.equivalence_extra_kept == expected - 1
+
+
+def test_budgeted_reach_update_failure_can_fallback_once_to_synthetic(monkeypatch):
+    """No SOURCE-side gate is bypassed; the new fallback is opt-in and one-shot."""
+    import random
+    import time
+
+    monkeypatch.setattr(ac, "BUDGETED_REACH_TRAJ", True)
+    monkeypatch.setattr(ac, "REACH_TRAJ", False)
+    monkeypatch.setattr(ac, "REACH_MODE", "replace")
+    monkeypatch.setattr(ac, "REACH_BUDGET", 20)
+    monkeypatch.setattr(ac, "MIN_SYNTH_CPU", 0.0)
+    monkeypatch.setattr(ac, "GOAL_UPDATE_SYNTH", False)
+    monkeypatch.setattr(ac, "FOLD_REACH_SYNTH", False)
+    monkeypatch.setattr(ac, "synth_multi", lambda *args, **kwargs: (None, None))
+    monkeypatch.setattr(ac, "synth_cover", lambda *args, **kwargs: (None, None))
+    monkeypatch.setattr(ac, "REPAIR", False)
+
+    # Force a genuine no-Update branch. The policy must switch to synthetic
+    # observations without increasing either SOURCE or CPU limits.
+    def run(enabled):
+        monkeypatch.setattr(ac, "E_SYNTH_FALLBACK", enabled)
+        ac._REACH_SPENT[0] = 0
+        env = E.Env(TS["count-k(k=2)"], 0, budget=60)
+        _, _, rec = ac.form_machine(
+            env, env.initial(), time.process_time() + 3.0, 50,
+            direction="prefix", rng=random.Random(0))
+        assert env.used <= 50
+        return rec
+
+    control = run(False)
+    assert "reachability synthesis fallback: synthetic trajectories" not in control["events"]
+    treated = run(True)
+    assert treated["events"].count("reachability synthesis fallback: synthetic trajectories") == 1
+    assert treated["reach"]["synthesis_fallback_used"] is True
+    assert treated["reach"]["degraded"] is True
