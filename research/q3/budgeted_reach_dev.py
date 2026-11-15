@@ -40,8 +40,10 @@ def set_arm(arm):
     ac.REPAIR = False
     ac.FOLD_REACH_SYNTH = False
     ac.REACH_TRAJ = arm == "D"
-    ac.BUDGETED_REACH_TRAJ = arm in ("E", "E2")
+    ac.BUDGETED_REACH_TRAJ = arm in ("E", "E2", "EF")
     ac.REACH_MODE = "augment" if arm == "E2" else "replace"
+    # follow-up arms (CASE 2): the existing per-round synthesis CPU floor, a reallocation inside the same 30 s
+    ac.MIN_SYNTH_CPU = 10.0 if arm in ("AF", "EF") else 0.0
 
 
 def last_elem(u, direction):

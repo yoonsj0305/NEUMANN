@@ -1,0 +1,183 @@
+{
+ "D_vs_A": {
+  "lost": [],
+  "new": [
+   "count-k(k=10) @base",
+   "identify-k(k=-2) | remove-mod-k(k=2) @base"
+  ]
+ },
+ "E_vs_A": {
+  "lost": [],
+  "new": [
+   "count-k(k=10) @base",
+   "identify-k(k=-2) | remove-mod-k(k=2) @base",
+   "uniq | is-squares @base"
+  ]
+ },
+ "E_vs_D": {
+  "lost": [],
+  "new": []
+ },
+ "arms": {
+  "A": {
+   "challenge_passed": [
+    "append-k(k=2) | intersperse-k(k=10)",
+    "identify-k(k=2) | is-odds",
+    "positions",
+    "replace-index-k-with-n(k=2,n=10) | has-k(k=3)",
+    "uniq | is-squares"
+   ],
+   "conflict_components": 1,
+   "cost": {
+    "challenge": 15,
+    "committee": 1431,
+    "discriminate": 1,
+    "localise": 189,
+    "selftest": 22,
+    "state_component_screen": 457,
+    "states:initial_state": 88,
+    "states:known_region": 393,
+    "states:new_element": 415,
+    "states:new_length": 403,
+    "states:state_component": 177
+   },
+   "cpu": 1694.97,
+   "degraded": 0,
+   "fallback": 0,
+   "formation_cpu": 663.41,
+   "formation_queries": 2144,
+   "formed": [
+    "append-k(k=2) | intersperse-k(k=10)",
+    "identify-k(k=2) | is-odds",
+    "positions",
+    "replace-index-k-with-n(k=2,n=10) | has-k(k=3)",
+    "uniq | is-squares"
+   ],
+   "queries": 3591,
+   "reach_queries": 0,
+   "reachable_obs": 182,
+   "reachable_total": 2339,
+   "round0_fold_failures": 310,
+   "runs": 60,
+   "semantic": [
+    52,
+    52
+   ],
+   "solved": [
+    "slice-k-n(k=3,n=4) | repeat-k(k=5)"
+   ],
+   "state_queries": 1476,
+   "updates_synthesised": 136
+  },
+  "D": {
+   "challenge_passed": [
+    "append-k(k=2) | intersperse-k(k=10)",
+    "count-k(k=10)",
+    "identify-k(k=-2) | remove-mod-k(k=2)",
+    "identify-k(k=2) | is-odds"
+   ],
+   "conflict_components": 1,
+   "cost": {
+    "challenge": 15,
+    "committee": 234,
+    "discriminate": 2,
+    "localise": 7,
+    "selftest": 23,
+    "state_component_screen": 118,
+    "states:initial_state": 21,
+    "states:known_region": 248,
+    "states:new_element": 212,
+    "states:new_length": 139,
+    "states:state_component": 55
+   },
+   "cpu": 502.54,
+   "degraded": 0,
+   "fallback": 0,
+   "formation_cpu": 154.05,
+   "formation_queries": 823,
+   "formed": [
+    "append-k(k=2) | intersperse-k(k=10)",
+    "count-k(k=10)",
+    "identify-k(k=-2) | remove-mod-k(k=2)",
+    "identify-k(k=2) | is-odds",
+    "is-squares"
+   ],
+   "queries": 1074,
+   "reach_queries": 0,
+   "reachable_obs": 396,
+   "reachable_total": 620,
+   "round0_fold_failures": 35,
+   "runs": 18,
+   "semantic": [
+    569,
+    569
+   ],
+   "solved": [
+    "count-k(k=10)",
+    "identify-k(k=-2) | remove-mod-k(k=2)"
+   ],
+   "state_queries": 675,
+   "updates_synthesised": 33
+  },
+  "E": {
+   "challenge_passed": [
+    "append-k(k=2) | intersperse-k(k=10)",
+    "count-k(k=10)",
+    "identify-k(k=-2) | remove-mod-k(k=2)",
+    "identify-k(k=2) | is-odds",
+    "positions",
+    "replace-index-k-with-n(k=2,n=10) | has-k(k=3)",
+    "uniq | is-squares"
+   ],
+   "conflict_components": 0,
+   "cost": {
+    "challenge": 24,
+    "committee": 1376,
+    "discriminate": 3,
+    "formation:reach": 1114,
+    "localise": 95,
+    "selftest": 36,
+    "state_component_screen": 457,
+    "states:initial_state": 29,
+    "states:known_region": 93,
+    "states:new_element": 85,
+    "states:new_length": 101,
+    "states:state_component": 176
+   },
+   "cpu": 1689.38,
+   "degraded": 42,
+   "fallback": 27,
+   "formation_cpu": 664.2,
+   "formation_queries": 2186,
+   "formed": [
+    "append-k(k=2) | intersperse-k(k=10)",
+    "count-k(k=10)",
+    "identify-k(k=-2) | remove-mod-k(k=2)",
+    "identify-k(k=2) | is-odds",
+    "is-squares",
+    "positions",
+    "replace-index-k-with-n(k=2,n=10) | has-k(k=3)",
+    "uniq | is-squares"
+   ],
+   "queries": 3589,
+   "reach_queries": 1114,
+   "reachable_obs": 746,
+   "reachable_total": 2339,
+   "round0_fold_failures": 335,
+   "runs": 60,
+   "semantic": [
+    868,
+    891
+   ],
+   "solved": [
+    "count-k(k=10)",
+    "identify-k(k=-2) | remove-mod-k(k=2)",
+    "slice-k-n(k=3,n=4) | repeat-k(k=5)",
+    "uniq | is-squares"
+   ],
+   "state_queries": 1598,
+   "updates_synthesised": 144
+  }
+ },
+ "rows": 138
+}

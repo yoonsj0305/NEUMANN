@@ -1,0 +1,144 @@
+{
+ "D_vs_A": {
+  "lost": [],
+  "new": []
+ },
+ "E_vs_A": {
+  "lost": [],
+  "new": []
+ },
+ "E_vs_D": {
+  "lost": [],
+  "new": []
+ },
+ "arms": {
+  "AF": {
+   "challenge_passed": [
+    "prepend-k(k=-2) | positions",
+    "prepend-k(k=-2) | positions",
+    "prepend-k(k=-2) | positions",
+    "rotate-k(k=3)",
+    "rotate-k(k=3)",
+    "rotate-k(k=3)"
+   ],
+   "conflict_components": 6,
+   "cost": {
+    "challenge": 24,
+    "committee": 841,
+    "localise": 256,
+    "selftest": 40,
+    "state_component_screen": 180,
+    "states:initial_state": 9,
+    "states:known_region": 173,
+    "states:new_element": 191,
+    "states:new_length": 173,
+    "states:state_component": 81
+   },
+   "cpu": 990.55,
+   "degraded": 0,
+   "fallback": 0,
+   "formation_cpu": 549.97,
+   "formation_queries": 1103,
+   "formed": [
+    "prepend-k(k=-2) | positions",
+    "prepend-k(k=-2) | positions",
+    "prepend-k(k=-2) | positions",
+    "rotate-k(k=1) | identify-geq-k(k=2)",
+    "rotate-k(k=1) | identify-geq-k(k=2)",
+    "rotate-k(k=3)",
+    "rotate-k(k=3)",
+    "rotate-k(k=3)"
+   ],
+   "queries": 1968,
+   "reach_queries": 0,
+   "reachable_obs": 305,
+   "reachable_total": 972,
+   "round0_fold_failures": 306,
+   "runs": 33,
+   "semantic": [
+    1704,
+    1704
+   ],
+   "solved": [
+    "prepend-k(k=-2) | positions",
+    "prepend-k(k=-2) | positions",
+    "prepend-k(k=-2) | positions",
+    "rotate-k(k=3)",
+    "rotate-k(k=3)",
+    "rotate-k(k=3)"
+   ],
+   "state_queries": 627,
+   "updates_synthesised": 183
+  },
+  "EF": {
+   "challenge_passed": [
+    "identify-is-mod-k(k=7)",
+    "identify-is-mod-k(k=7)",
+    "identify-is-mod-k(k=7)",
+    "prepend-k(k=-2) | positions",
+    "prepend-k(k=-2) | positions",
+    "rotate-k(k=1) | identify-geq-k(k=2)",
+    "rotate-k(k=1) | identify-geq-k(k=2)",
+    "rotate-k(k=1) | identify-geq-k(k=2)",
+    "rotate-k(k=3)",
+    "rotate-k(k=3)"
+   ],
+   "conflict_components": 6,
+   "cost": {
+    "challenge": 30,
+    "committee": 777,
+    "formation:reach": 551,
+    "localise": 103,
+    "selftest": 57,
+    "state_component_screen": 172,
+    "states:initial_state": 3,
+    "states:known_region": 45,
+    "states:new_element": 57,
+    "states:new_length": 54,
+    "states:state_component": 111
+   },
+   "cpu": 990.62,
+   "degraded": 13,
+   "fallback": 15,
+   "formation_cpu": 462.03,
+   "formation_queries": 1153,
+   "formed": [
+    "identify-is-mod-k(k=7)",
+    "identify-is-mod-k(k=7)",
+    "identify-is-mod-k(k=7)",
+    "prepend-k(k=-2) | positions",
+    "prepend-k(k=-2) | positions",
+    "rotate-k(k=1) | identify-geq-k(k=2)",
+    "rotate-k(k=1) | identify-geq-k(k=2)",
+    "rotate-k(k=1) | identify-geq-k(k=2)",
+    "rotate-k(k=3)",
+    "rotate-k(k=3)"
+   ],
+   "queries": 1960,
+   "reach_queries": 551,
+   "reachable_obs": 681,
+   "reachable_total": 972,
+   "round0_fold_failures": 231,
+   "runs": 33,
+   "semantic": [
+    2894,
+    2894
+   ],
+   "solved": [
+    "identify-is-mod-k(k=7)",
+    "identify-is-mod-k(k=7)",
+    "identify-is-mod-k(k=7)",
+    "prepend-k(k=-2) | positions",
+    "prepend-k(k=-2) | positions",
+    "rotate-k(k=1) | identify-geq-k(k=2)",
+    "rotate-k(k=1) | identify-geq-k(k=2)",
+    "rotate-k(k=1) | identify-geq-k(k=2)",
+    "rotate-k(k=3)",
+    "rotate-k(k=3)"
+   ],
+   "state_queries": 821,
+   "updates_synthesised": 134
+  }
+ },
+ "rows": 66
+}
