@@ -1,0 +1,51 @@
+name: Q3 latent candidate diagnostic (opened development only)
+
+on:
+  pull_request:
+    paths:
+      - 'neumann1/latent.py'
+      - 'neumann1/discovery_core.py'
+      - 'neumann1/active.py'
+      - 'research/q3/latent_candidate_replay_dev.py'
+      - '.github/workflows/q3-latent-candidate-dev.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-candidate-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PYTHONHASHSEED: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Dependency-light Q3 offline experiment
+        run: |
+          python research/q3/latent_candidate_replay_dev.py \
+            --snapshots docs/experiments/dev/update_snapshots/lr.jsonl \
+            --target-list docs/experiments/dev/update_snapshots/post_synthesis_first_failure.json \
+            --out /tmp/q3-latent-candidate-lr11.jsonl --cpu 5 --k 4
+      - name: Print conservative development-only summary
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          rows = [json.loads(x) for x in pathlib.Path('/tmp/q3-latent-candidate-lr11.jsonl').read_text().splitlines() if x]
+          eligible = [r for r in rows if r['baseline_fold_errors'] is not None and r['best_candidate_fold_errors'] is not None]
+          improved = [r['name'] for r in eligible if r['best_candidate_fold_errors'] < r['baseline_fold_errors']]
+          print(json.dumps({'task_rows':len(rows),
+                            'candidate_count_total':sum(r['candidate_count'] for r in rows),
+                            'eligible_for_fold':len(eligible),
+                            'fold_gain_names':improved,
+                            'whole_task_solved':'NOT_EVALUATED',
+                            'scope':'DEVELOPMENT_ONLY_NO_SOURCE_QUERIES'}, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-latent-candidate-lr11-dev
+          path: /tmp/q3-latent-candidate-lr11.jsonl
+          if-no-files-found: error
