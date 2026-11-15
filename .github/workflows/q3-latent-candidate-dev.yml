@@ -24,7 +24,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Dependency-light Q3 offline experiment
+      - name: Install project dependencies
+        run: python -m pip install -e .
+      - name: Q3 fixed-transition offline experiment
         run: |
           python research/q3/latent_candidate_replay_dev.py \
             --snapshots docs/experiments/dev/update_snapshots/lr.jsonl \
