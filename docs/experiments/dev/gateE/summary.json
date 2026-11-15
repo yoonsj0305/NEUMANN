@@ -1,14 +1,43 @@
 {
  "baseline": {
   "cpu": 6663,
+  "cpu_mean": 19.71,
+  "cpu_median": 30.0,
   "mismatch_adopted": [],
   "queries": 19969,
   "repairs": {},
   "semantic_solved": 200,
-  "tasks": 338
+  "tasks": 338,
+  "valid_runs": 338
+ },
+ "causal_attribution": {
+  "necessity_acted_on": {
+   "mbpp/775": "kept the simpler Update; remains excluded (earlier semantic MISMATCH; the new program is unaudited: UNKNOWN)"
+  },
+  "necessity_causal_solves_vs_inplace": 0,
+  "new_or_lost_without_any_repair": [
+   "mbpp/940",
+   "slice-k-n(k=3,n=4) | repeat-k(k=5)",
+   "identify-is-mod-k(k=2) | append-k(k=10)",
+   "keep-mod-k(k=2) | pow-k(k=3)",
+   "mbpp/345"
+  ],
+  "note": "the repair modes stop the challenge at the first counterexample, which changes query use and the random stream; differences without a repair are perturbation, not an effect of the mechanism",
+  "repair_caused_new_solves_vs_baseline": {
+   "mbpp/366": "dev-used; semantic VERIFIED (max over adjacent products)",
+   "rotate-k(k=1) | identify-geq-k(k=2)": "not dev-used for repair; semantic UNKNOWN"
+  }
+ },
+ "cost": "stage-level costs (synthesis / repair / verification / fallback) NOT MEASURED; totals per arm above",
+ "counts": {
+  "inconsistent_reference_not_run": "mbpp/38 (3 records)",
+  "tasks_per_arm": 338,
+  "valid_runs": 1014
  },
  "inplace": {
   "cpu": 6655,
+  "cpu_mean": 19.69,
+  "cpu_median": 30.0,
   "mismatch_adopted": [],
   "queries": 19968,
   "repairs": {
@@ -18,7 +47,8 @@
    "repaired Update refuted again": 1
   },
   "semantic_solved": 202,
-  "tasks": 338
+  "tasks": 338,
+  "valid_runs": 338
  },
  "inplace_vs_baseline": {
   "lost": [
@@ -37,6 +67,8 @@
  },
  "necessity": {
   "cpu": 6637,
+  "cpu_mean": 19.64,
+  "cpu_median": 30.0,
   "mismatch_adopted": [],
   "queries": 19964,
   "repairs": {
@@ -46,7 +78,8 @@
    "repaired Update refuted again": 1
   },
   "semantic_solved": 203,
-  "tasks": 338
+  "tasks": 338,
+  "valid_runs": 338
  },
  "necessity_vs_baseline": {
   "lost": [
@@ -75,5 +108,19 @@
   "p": 1.0
  },
  "semantic_rule": "hidden-test pass minus known mismatches; other passes are NOT individually semantics-checked",
- "status": "DEVELOPMENT ONLY - opened FRESH (110) and list-routines (228) re-used; same commit for all arms"
+ "semantic_status": {
+  "MISMATCH": [
+   "mbpp/775 (earlier program)"
+  ],
+  "UNKNOWN": "every other hidden-test pass",
+  "VERIFIED": [
+   "mbpp/366"
+  ]
+ },
+ "status": "DEVELOPMENT ONLY - opened FRESH (110) and list-routines (228) re-used; same commit for all arms",
+ "verdict": {
+  "Gate_E": "DEVELOPMENT FAIL for Branch Necessity; in-place repair not established on new problems",
+  "inplace_vs_baseline": "INCONCLUSIVE (2 repair-caused solves, 1 of them dev-used; the other semantic UNKNOWN; perturbation +2/-2 of the same size)",
+  "necessity_vs_inplace": "DEVELOPMENT FAIL (net +1 is entirely tasks without any repair or branch removal: perturbation; 0 causal solves)"
+ }
 }

@@ -948,3 +948,30 @@ Full regression: 1148 passed, 53 skipped (repair modes off by default).
 * Until that commit exists, Gate E is OPEN / INCONCLUSIVE. The analysis the directive asks for (semantic audit of
   every new solve, per-stage cost, branch counts, first-wrong-decision analysis of losses) remains to be done on
   the completed rows. V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched.
+
+## 26. Gate E result (2026-11-15) — DEVELOPMENT ONLY
+
+Code `c43a427`; 338 tasks × 3 arms = 1 014 valid runs (+ `mbpp/38`, reference inconsistent, not run, in every arm);
+no errors, no duplicates; raw rows and `summary.json` in `docs/experiments/dev/gateE/` (commit `b133843` + this one).
+
+| arm | solved (hidden test, known mismatch excluded) | vs baseline new / lost |
+|---|---|---|
+| baseline | see summary.json | — |
+| in-place | +2 net | new `mbpp/366`, `mbpp/940`, `rotate-k(k=1) \| identify-geq-k(k=2)`, `slice-k-n(k=3,n=4) \| repeat-k(k=5)`; lost `identify-is-mod-k(k=2) \| append-k(k=10)`, `keep-mod-k(k=2) \| pow-k(k=3)` |
+| necessity | +3 net | same four new; lost `mbpp/345` |
+
+Causal attribution: a solve is caused by the mechanism only where a repaired machine was adopted. Repairs were
+attempted on 8 (in-place) / 9 (necessity) tasks and adopted after a new challenge on 5: `mbpp/366`, `mbpp/775`,
+`add-k(k=2) | identify-k(k=10)`, `pow-k(k=2) | is-odds`, `rotate-k(k=1) | identify-geq-k(k=2)`. Of these only `mbpp/366`
+(development case, semantics VERIFIED) and `rotate-k(k=1) | identify-geq-k(k=2)` (semantics UNKNOWN) are new solves;
+the other two were solved by the baseline too. The remaining differences (`mbpp/940`, `slice-k-n…`, the two in-place
+losses, `mbpp/345`) involve no repair at all: the repair modes stop the challenge at the first counterexample, which
+changes query use and the random stream — perturbation of the same size (+2 / −2) as the effect. Branch necessity
+acted on one task (`mbpp/775`, simpler Update kept; still excluded, program unaudited).
+
+Verdict: Branch Necessity vs In-place — **DEVELOPMENT FAIL** (net +1 consists only of perturbed tasks; 0 causal solves).
+In-place vs Baseline — **INCONCLUSIVE** (one causal new solve outside the development cases, semantics unverified,
+within perturbation). Answer to "is NEUMANN smarter on new problems?": not demonstrated.
+Bottleneck: refuted-but-formed machines are rare (≤ 9 of 338 tasks), so repair cannot move the solve count; most
+failures happen before any machine is formed (sections 18–19: synthesis / search). Stage costs NOT MEASURED.
+V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched.
