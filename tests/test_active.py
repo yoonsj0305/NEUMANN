@@ -98,3 +98,26 @@ def test_list_update_delta_synthesizes_append_and_prepend():
             assert g(((7, 9), 4)) == (7, 9, 8)
         else:
             assert g(((7, 9), 4)) == (8, 7, 9)
+
+
+def test_opt_in_first_update_snapshot_matches_observed_transition_hash():
+    """A main-loop Update snapshot is replayable and contains SOURCE-only rows."""
+    import hashlib
+    import json
+    old = ac.CAPTURE_UPDATE_TRANSITIONS
+    ac.CAPTURE_UPDATE_TRANSITIONS = True
+    try:
+        env = E.Env(TS["count-k(k=2)"], 0, budget=60)
+        _, rec = ac.run_arm("D", env, 10.0, seed=0)
+    finally:
+        ac.CAPTURE_UPDATE_TRANSITIONS = old
+    machines = (rec.get("formation") or {}).get("machines", [])
+    snapshots = [m["first_update_input"] for m in machines if "first_update_input" in m]
+    assert snapshots
+    snap = snapshots[0]
+    expected = hashlib.sha256(json.dumps(
+        {k: v for k, v in snap.items() if k != "sha256"},
+        sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    assert snap["sha256"] == expected
+    assert snap["transitions"]
+    assert all(len(r["state"]) + 1 == len(snap["in_types"]) for r in snap["transitions"])
