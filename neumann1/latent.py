@@ -410,25 +410,58 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
         for c in sorted(set(range(10)) | set(consts)):
             take((c,) * len(pts), ("k", c), T_I)
     except sc.Done as d:
-        return wrap(d.sol[1])
+        return collected[0] if collecting and collected else wrap(d.sol[1])
     got = None
     s = dc.FSearch(lib, coords_types(task, cfg), pts, bank_end, consts, cfg.cost("seq" if seq else "list"), (T_I, T_B),
-                   lambda e, t: take(e.vec, e.ast(), t))
+                   lambda e, t: take(e.vec, e.ast(), t),
+                   probe_inputs=probes, equivalence_cap=cfg.equivalence_cap if collecting else 1)
+    def collect_covers(limit):
+        """Explore alternative general cell covers without changing the legacy first-fit branch."""
+        ordered = sorted(pieces, key=lambda p: -bin(p[0]).count("1"))
+        if not ordered:
+            return
+        for shift in range(min(cfg.candidate_limit, len(ordered))):
+            if time.process_time() >= limit:
+                return
+            rotated = ordered[shift:] + ordered[:shift]
+            node = c4._cover(rotated, preds, full, limit)
+            if node is not None:
+                append_candidate(node)
     for lvl in range(1, s.max_level + 1):
         try:
             for t in s.types:
                 s._pool(s.top, t, lvl)
         except sc.Done as d:
+            if collecting:
+                return collected[0] if collected else None
             if wrap(d.sol[1]) is not None:
                 return wrap(d.sol[1])
             break                              # complete but longer than the data: go on to formation
         except ic.Budget:
             break
         if lvl >= 3:
-            node = c4._cover(pieces, preds, full, min(deadline, time.process_time() + 0.08 * span))
-            if wrap(node) is not None:
-                return wrap(node)
-    node = c4._cover(pieces, preds, full, min(deadline, time.process_time() + 0.05 * span))
+            end_cover = min(deadline, time.process_time() + 0.08 * span)
+            if collecting:
+                try:
+                    collect_covers(end_cover)
+                except sc.Done:
+                    return collected[0]
+            else:
+                node = c4._cover(sorted(pieces, key=lambda p: -bin(p[0]).count("1")),
+                                 preds, full, end_cover)
+                if wrap(node) is not None:
+                    return wrap(node)
+    if collecting:
+        try:
+            collect_covers(min(deadline, time.process_time() + 0.05 * span))
+        except sc.Done:
+            return collected[0]
+        if collected:
+            return collected[0]
+        node = None
+    else:
+        node = c4._cover(sorted(pieces, key=lambda p: -bin(p[0]).count("1")),
+                         preds, full, min(deadline, time.process_time() + 0.05 * span))
     if wrap(node) is not None or not lat:
         return wrap(node)
     # ---- formation of intermediate representations (R2): in the learned or default order of latent kinds
@@ -540,6 +573,23 @@ def solve_cfg(task, deadline, inv, lib, cfg, depth=0):
     else:
         ok = all(run(sol, lib, i, task) == o for i, o in task["train"])
     return sol if ok else None
+
+
+def solve_candidates(task, deadline, inv, cfg, k=4):
+    """Development-only bounded alternatives for a single transition specification.
+
+    Every returned candidate reproduces the given transition rows. Candidates
+    are never ranked by hidden tests. Run a separate fold check in active.py
+    before any claim of machine formation.
+    """
+    cfg.candidate_limit = max(2, int(k))
+    cfg.equivalence_cap = min(cfg.candidate_limit, max(2, cfg.equivalence_cap))
+    cfg.collected_candidates = []
+    first = solve(task, deadline, inv, cfg)
+    result = list(cfg.collected_candidates)
+    if first is not None and repr(first) not in {repr(x) for x in result}:
+        result.insert(0, first)
+    return result[:k]
 
 
 def solve(task, deadline, inv, cfg):
