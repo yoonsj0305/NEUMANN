@@ -1113,3 +1113,26 @@ Where alternative transition-consistent programs are discarded on the main list-
 Not done in this session: the experimental probe-signature refinement (P0-B), the candidate / fold comparison on the
 fixed snapshots (P0-C/D) and the machine-level experiment (P0-E). CANDIDATE PASS / FOLD GAIN not evaluated.
 V1 PASS (sealed), V2 independent OPEN, V3 FAIL, Q3 OPEN, Q6 untouched.
+
+
+## 34. Probe-signature candidate retention in Q3 cell synthesis (2026-11-15) — DEVELOPMENT ONLY
+
+Implementation after audit `0deaca7`: `discovery_core.FSearch` can retain up to four top-level expressions per observed value vector when their locally constructed probe signatures differ; `latent.construct` can retain up to four probe-distinct cell/predicate pieces and return complete candidates through `latent.solve_candidates` and `active.synth_cells_candidates`. All settings are opt-in; the official `active.synth_cells` and `attempt` path remains first-fit. Scope limitation: binder/subexpression contexts still use original pruning; synthetic probes are NOT independent SOURCE verification.
+
+An initial immediate-diversification variant regressed candidate discovery on the fixed 10 list-cell cases (4 programs total, one evaluable fold; zero gain). Baseline-first diversification increased that to 8 programs and five evaluable folds; still zero fold gain. The final variant preserves legacy first-cover search/order and enables diversification only after a valid first program.
+
+**Final frozen development experiment:** workflow run [43700395880](https://github.com/yoonsj0305/NEUMANN/actions/runs/43700395880), baseline snapshot files from Gate E, `PYTHONHASHSEED=0`, 5 CPU seconds PER synthesiser per fixed transition, at most four candidates, no SOURCE queries. Artifact `q3-latent-candidate-lr11-dev`, artifact ID 14156470654, ZIP digest `sha256:2fe169ec093d717f26bf350e8410bd196e4d85bd297d6e37b47d116c95d3153a`.
+
+| Metric | Result |
+|---|---|
+| List-cell snapshots attempted | 10 (the 11th is a `foldrI` case outside this mechanism) |
+| Existing single-solution synthesis fits | 10 / 10 |
+| Programs emitted by opt-in candidate synthesis | 12 total |
+| Tasks with >1 probe-distinct candidate | 2 / 10 (`add-k(k=10) | identify-is-prime`, `prepend-k(k=-2) | positions`) |
+| Tasks with comparable initial-example fold evaluation | 7 / 10 |
+| Fold-error improvements against baseline | **0 / 7** |
+| Whole-machine / independent SOURCE challenge / original semantic verification | **NOT EVALUATED** |
+
+**Interpretation:** A limited CANDIDATE GENERATION mechanism has been demonstrated on two opened list-routines tasks; however the extra programs did not reduce fold errors in the seven evaluable cases. This is NOT FOLD GAIN or DEVELOPMENT PASS. Only the original gate-independent evidence remains: V1 PASS (sealed); V2 independent OPEN; V3 FAIL; Q3 OPEN; Q6 untouched. Do not expand to FRESH or new generalisation based on this experiment. CI full-suite result was not confirmed in this record.
+
+**Next decisive question:** Is the lack of fold improvement due to missing latent state/incorrect initial state, or because the permitted cell representation cannot express the correct transition? Perform one matched, SOURCE-free, original-initial-example refit/oracle headroom check on already opened list-routines; if no correct Update exists under fixed W and initial state, stop adding top-K candidates. No per-task hardcoding.
