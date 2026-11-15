@@ -813,3 +813,32 @@ information. Gate D: not met (one information-driven case). Per the directive's 
 the synthesis / repair bottleneck, not query-selection learning. `represent()` was not audited in this session.
 
 V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched.
+
+## 20. Counterexample-guided repair of a refuted machine (2026-11-15) — DEVELOPMENT ONLY
+
+* Code (`neumann1/active.py`): `challenge(..., detail=)` returns every SOURCE check (input, answer, prediction,
+  queries used) and, with `REPAIR`, stops at the first confirmed counterexample; on a refuted machine `run_arm`
+  re-forms the SAME direction with the counterexample added to the observations and the invented variables kept
+  (`form_machine(prior_acc=...)`), and adopts the result only if it passes a NEW independent challenge on inputs it
+  has not seen; otherwise the classical fallback stands. Baseline = `REPAIR = False` (the refuted machine is
+  discarded).
+* Runs (2 repeats each, same seed and budget; raw `docs/experiments/dev/q3_repair_dev_2026_11_15.jsonl`):
+
+| task (condition) | refuted Update | SOURCE counterexample (input → answer, predicted) | repair result | solved base / repair |
+|---|---|---|---|---|
+| `mbpp/366` | `(if (lt s (mul h h)) (mul h e) s)` with h = last | [4,5,6,3] → 30, predicted 18 | kept `h' = e`; no machine re-formed within the remaining budget | F / F |
+| `identify-k(k=-2)`, alt. trajectory | relcells step with `(mod $4 3)` piece | [-16, 10] → [0, 0], predicted (2, 0) | no machine re-formed | F / F |
+| `mbpp/670`, alt. trajectory | case tree with `(lt (mod e 7) 5)` | [-2,-2,-2,-2,-2,0] → True, predicted False | kept `h' = e`; no machine re-formed | F / F |
+| `identify-k(k=-2)`, `mbpp/670`, D trajectory | — (no refutation) | — | — | T / T |
+
+* Cause classification: in all three the refuted Update special-cases a constant or a squared term (an Update
+  error on a plausible variable — `h' = e` is the right variable for `mbpp/366` and `mbpp/670`), but re-synthesis
+  with the counterexample did not produce a machine in the time left (refutation happens at ~17–18 of the 18
+  formation seconds): recorded as "representation or search", not proven. Gate A (counterexample kept): met.
+  Gate B (repair keeping the structure): mechanism in place, no successful repair. Gate C / D: not met (0 repaired
+  solves). Gate E: no regression on the tasks run (`identify-k(k=-2)`, `mbpp/670` solved in both conditions on D's
+  trajectory). What could not be fixed: the repair runs after formation has used almost all of its CPU, so the
+  re-synthesis has seconds left; giving it budget would mean reserving CPU before formation — not done here.
+
+V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched.
+Full regression: 1148 passed, 53 skipped (with REPAIR off by default).

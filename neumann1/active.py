@@ -692,7 +692,7 @@ def features(examples):
 
 def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, prior_ws=None, log=None,
                  prior_structure=None, restrict_kinds=False, acc_prior=None, policy_model=None, knowledge=None,
-                 action_policy=None):
+                 action_policy=None, prior_acc=None):
     """Learn S(u) = (f(u.w) for w in W), Update and Readout = component 0, with W grown only when needed.
 
       * W starts with the empty continuation: the answer itself as the state (the output-state machine).
@@ -935,6 +935,15 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                 best = (z, fails)
         return upd, asts, best[0], best[1]
     invent_tried, rejected, rivals, upd_alts = set(), set(), [], []
+    if prior_acc:                            # repair: keep the invented representation of the refuted machine
+        zmap = {"0": 0, "1": 1, "below": min(vals) - 1, "above": max(vals) + 1, "nil": ()}
+        byshow = {c["show"]: c for c in accumulators()}
+        for show, zk in prior_acc:
+            c = byshow.get(show)
+            if c is not None and zk in zmap:
+                acc.append({"t": c["t"], "fn": c["fn"], "z": zmap[zk], "cache": {}, "show": show})
+                rec["components"].append({"w": None, "why": "kept for repair", "kind": "accumulator",
+                                          "update": show, "init": zk, "set_size": 1})
     fail_hist = []                           # failing examples per round (stagnation triggers invention)
     t_start, q_start = time.process_time(), env.used
 
@@ -1652,6 +1661,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
 SELFTEST = 3      # self-test queries per formed machine (at most 3 repairs) before it is returned
 MAX_ACC = 3       # invented variables per machine
 ACTION_MODE = "invent"   # D's fixed decision at a discovery branch point ("repair": the counterfactual arm)
+REPAIR = False           # counterexample-guided repair of a refuted machine (the compared condition)
 QUERY_SCHEDULE = {}      # {self-test query index: "alt"} -- the second candidate instead of the first
 QSEL = [0]
 TRAJ_SHIFT = [0]         # 0 = D's trajectories; k > 0 = another draw from the same rule (counterfactual)               # self-test query counter of the current run (reset by run_arm)
@@ -1679,7 +1689,7 @@ def _action_policy(d):
     return pol
 
 
-def challenge(env, machine, examples, obs, rng, k=CHALLENGE):
+def challenge(env, machine, examples, obs, rng, k=CHALLENGE, detail=None):
     """Independent challenge on fresh inputs the machine was not built from.  Returns True / False / None
     (None: no query left, the machine is NOT accepted)."""
     seen = {e[0][0] for e in list(examples) + obs}
@@ -1697,6 +1707,11 @@ def challenge(env, machine, examples, obs, rng, k=CHALLENGE):
         if y is None:
             continue
         results.append(machine((x,)) == y)
+        if detail is not None:              # the SOURCE evidence of the check, kept for repair (no hidden test)
+            detail.append({"input": list(x), "answer": y if not isinstance(y, tuple) else list(y),
+                           "predicted": _safe(lambda: machine((x,))), "queries_used": env.used})
+            if not results[-1] and REPAIR:
+                return False                # first confirmed counterexample: stop, keep the budget for repair
     if len(results) < k:
         return None
     return all(results)
@@ -1754,8 +1769,34 @@ def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
             obs += mobs
             frec["machines"].append(mrec)
             if m is not None:
-                verdict = challenge(env, m, ex, obs, rng)
+                det = []
+                verdict = challenge(env, m, ex, obs, rng, detail=det)
                 mrec["challenge"] = verdict
+                mrec["challenge_detail"] = det
+                cx = [d for d in det if d["predicted"] != d["answer"]]
+                if verdict is False and REPAIR and cx and env.used < qlimit:
+                    # repair in place: the counterexample joins the observations, the invented variables are kept,
+                    # the Update is re-synthesised; the repaired machine must pass a NEW independent challenge
+                    x_, y_ = tuple(cx[0]["input"]), cx[0]["answer"]
+                    y_ = tuple(y_) if isinstance(y_, list) else y_
+                    keep = mrec.get("accumulators") or []
+                    m2, mobs2, mrec2 = form_machine(env, ex + obs + [((x_,), y_)], f_end, f_q, direction, rng,
+                                                    None, None, None, False, None, None, None, None, keep)
+                    obs += mobs2
+                    mrec["repair"] = {"counterexample": [list(x_), cx[0]["answer"]], "predicted": cx[0]["predicted"],
+                                      "kept": keep, "update_before": mrec.get("update"), "update_after": mrec2.get("update"),
+                                      "events": mrec2.get("events", [])[-4:]}
+                    if m2 is not None:
+                        det2 = []
+                        v2 = challenge(env, m2, ex + [((x_,), y_)], obs, rng, detail=det2)
+                        mrec["repair"]["challenge"] = v2
+                        mrec["repair"]["cause"] = ("Update / start (representation kept)" if v2 else "UNKNOWN")
+                        if v2:
+                            m, verdict = m2, True
+                            mrec2["challenge"] = True
+                            frec["machines"].append(mrec2)
+                    else:
+                        mrec["repair"]["cause"] = "no machine with the kept representation: representation or search"
                 if verdict:
                     p = m
                     frec["formed"] = direction
