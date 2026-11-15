@@ -1044,3 +1044,20 @@ V1 PASS (sealed), V2 independent OPEN, V3 FAIL, Q3 OPEN, Q6 untouched.
   R2 construction), not a goal-directed residual decomposition; it appears only through a different call path / time
   share in that variant. Only `pow-k(k=4)` (cons / foldrL with the residual cell e·e·e·e) is a residual construction:
   SYNTHESIS PASS for residual decomposition = 1 transition, one lineage.
+
+## 30. Budget recovery on the 11 "both synthesisers fit" snapshots (2026-11-15) — DEVELOPMENT ONLY
+
+* The snapshots do not record the CPU left at the failure, so item 1 of P0-A (actual remaining budget) could not be
+  read from the records.
+* Policy tested (`MIN_SYNTH_CPU`, default 0 = unchanged): each main-round Update synthesis gets a floor of 5 CPU s
+  within the formation deadline (a reallocation, total 30 s / 60 queries unchanged). Same seed; only the floor
+  differs. Raw: `docs/experiments/dev/update_snapshots/budget_floor_lr11.jsonl`.
+* Result: 1 of 11 newly solved — `prepend-k(k=-2) | positions` (m = 2 machine, challenge passed); 0 losses;
+  `prepend-k(k=10) | positions` moved from query limit to the CPU deadline. The other 9 fail as before ("no informative
+  continuation" or, for `rotate-k(k=1) | identify-geq-k(k=2)`, a machine refuted by the challenge).
+* Reading: for 10 of the 11 the Update that is fittable on the frozen first-failure table does NOT turn into a formed
+  machine even with a 5 s synthesis floor — the binding failure lies after that synthesis (fold / localisation /
+  continuation search), not in the synthesis budget. Capability recovery: 1 development task, semantics UNKNOWN.
+  Structural synthesis and generalisation: not addressed this round. Next bottleneck: what happens between a fitted
+  first Update and a formed machine on these 10 tasks.
+V1 PASS (sealed), V2 independent OPEN, V3 FAIL, Q3 OPEN, Q6 untouched.

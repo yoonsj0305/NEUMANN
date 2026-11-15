@@ -1093,6 +1093,8 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         upd, asts = [], []
         for j in range(len(W)):
             end = min(deadline, time.process_time() + share * max(0.0, deadline - time.process_time()))
+            if MIN_SYNTH_CPU and share >= 0.25:     # reallocation (off by default): the main-round synthesis of a
+                end = min(deadline, max(end, time.process_time() + MIN_SYNTH_CPU))   # component gets a floor
             g, ast = (None, None)
             if s_type == T_L:                 # list-valued components: the cell construction (R2) first
                 g, ast = synth_cells(in_t, rows[j], end)
@@ -1866,6 +1868,7 @@ ACTION_MODE = "invent"   # D's fixed decision at a discovery branch point ("repa
 REPAIR_EXTRA_CPU = 0.0   # DIAGNOSTIC ONLY: extra CPU for the repair re-synthesis (never in an official run)
 _LAST = [None]           # internal state of the last formed machine (in-place repair)
 CAPTURE_UPDATE_TRANSITIONS = False  # development audit only; record first attempt/failure SOURCE transition tables
+MIN_SYNTH_CPU = 0.0      # development: CPU floor for each main-round Update synthesis (within the formation deadline)
 GOAL_UPDATE_SYNTH = False  # development ablation: goal-directed residual Update synthesis before the forward search
 REPAIR = False           # counterexample-guided repair: True = re-form (6e15f35), "inplace" = local re-synthesis of a refuted machine (the compared condition)
 QUERY_SCHEDULE = {}      # {self-test query index: "alt"} -- the second candidate instead of the first
