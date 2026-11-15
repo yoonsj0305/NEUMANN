@@ -916,3 +916,23 @@ Full regression: 1148 passed, 53 skipped (REPAIR off by default).
 
 V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched.
 Full regression: 1148 passed, 53 skipped (repair modes off by default).
+
+## 24. Branch necessity in repaired Updates (2026-11-15) — DEVELOPMENT ONLY
+
+* `REPAIR = "inplace+necessity"` (default off): after an in-place repair, every case split of the repaired Update
+  is removed in turn, jointly with every start of the invented variables; a simpler Update that still reproduces
+  EVERY SOURCE observation so far is a rival. New SOURCE inputs where the two disagree are asked, chosen for
+  distinct predicted outcomes (up to 3, not one per branch); the refuted one is dropped; if neither is refuted the
+  simpler is kept (description length; a selection principle, not a proof of the semantics). No constant, task id
+  or answer is used.
+* Result (same seed, 30 CPU s, 60 queries; raw `docs/experiments/dev/q3_branch_necessity_dev_2026_11_15.jsonl`):
+  `mbpp/366` — no split removable on the evidence; repair as before; solved, semantically correct (Gate C kept).
+  `mbpp/670` alt. — one split removable: the simpler Update `(if (not s) False (not (lt e h)))` with another start
+  of `h' = e` reproduces every observation; probes [1,-3,-3,-3], [-1,-1,-1,-1,3], [-1]: the complex Update (with the
+  `h = 1` special case) refuted 3 times, the simpler 0; the simpler kept, passed a new challenge, solved — and it is
+  the reference semantics (non-decreasing check). Gate D: the wrong semantic adoption is resolved on this task.
+* Not done: Gate E — the dev-set comparison (Baseline / In-place / In-place + necessity: semantic solves,
+  regressions, wrong adoptions, branch counts, cost). Two development tasks; not independent evidence.
+
+V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched.
+Full regression: 1148 passed, 53 skipped (repair modes off by default).

@@ -595,6 +595,17 @@ class DiscoveryPolicy:
         return {k: round(v, 5) for k, v in w.items()}
 
 
+def _branch_prunings_ast(ast):
+    def variants(a):
+        if isinstance(a, tuple) and a and a[0] in ("ifI", "case") and len(a) == 4:
+            yield a[2]
+            yield a[3]
+            for i in (1, 2, 3):
+                for v in variants(a[i]):
+                    yield a[:i] + (v,) + a[i + 1:]
+    return list(variants(ast))[:12]
+
+
 def _branch_prunings(ast, n, out_type):
     """Every Update obtained by replacing ONE case split of `ast` with one of its branches -- the rivals that
     differ from `ast` exactly on the inputs reaching that split (rare-condition branches included)."""
@@ -1812,7 +1823,7 @@ def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
                 mrec["challenge"] = verdict
                 mrec["challenge_detail"] = det
                 cx = [d for d in det if d["predicted"] != d["answer"]]
-                if verdict is False and REPAIR in ("inplace", "inplace+disc") and cx and getattr(m, "repair_state", None) \
+                if verdict is False and REPAIR in ("inplace", "inplace+disc", "inplace+necessity") and cx and getattr(m, "repair_state", None) \
                         and env.used < env.budget - 3:
                     # in-place: the counterexample's prefix transitions join the stored table once; only the Update
                     # (and the start) is re-synthesised on the SAME state space; then a NEW independent challenge
@@ -1884,6 +1895,69 @@ def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
                                 u2, f2 = None, None
                             if u2 is None or f2:
                                 break
+                    if u2 is not None and not f2 and REPAIR == "inplace+necessity" and a2 and isinstance(a2[0], tuple):
+                        # branch necessity: each split of the repaired Update is removed in turn (with every start of
+                        # the invented variables); a simpler Update that still reproduces EVERY SOURCE observation is a
+                        # rival the complex one must beat on new SOURCE inputs -- otherwise the simpler is kept (MDL)
+                        fd = st_["fold"]
+                        n_in = len(st_["W"]) + len(st_["acc"]) + 1
+                        out_t = _type(st_["examples"][0][1])
+                        vl = st_["vals"]
+                        starts = [tuple(z2)]
+                        for k_ in range(len(st_["acc"])):
+                            for za in (0, 1, min(vl) - 1, max(vl) + 1):
+                                zz = list(z2); zz[len(st_["W"]) + k_] = za; starts.append(tuple(zz))
+                        to_case = lambda a: ("case",) + tuple(to_case(x) for x in a[1:]) if isinstance(a, tuple) and a and a[0] == "ifI" and len(a) == 4 else a
+                        simple = []
+                        for v in _branch_prunings_ast(a2[0]):
+                            try:
+                                fnv = ic.compile_ast(ic._tup(v), n_in, _lib()) if out_t == T_I else _case_fn(to_case(v), n_in, _lib())
+                            except Exception:
+                                continue
+                            gv = lambda args, fnv=fnv: _safe(lambda: fnv(tuple(args)))
+                            uv = [gv] + list(u2[1:])
+                            for zz in starts:
+                                if all((lambda r: r is not None and r[0] == y)(fd(uv, zz, tuple(x))) for (x,), y in st_["examples"]):
+                                    simple.append((len(show_ast(v)), show_ast(v), uv, zz))
+                                    break
+                        info["necessity"] = {"splits_removable_on_evidence": len(simple)}
+                        if simple:
+                            simple.sort(key=lambda r: r[0])
+                            sz, sv, uv, zz = simple[0]
+                            pc = lambda x, u=list(u2), z_=z2: (lambda r: None if r is None else r[0])(fd(u, z_, x))
+                            ps = lambda x, u=uv, z_=zz: (lambda r: None if r is None else r[0])(fd(u, z_, x))
+                            base_ = [task_input(rng, vl, st_["lens"]) for _ in range(150)]
+                            pool_ = [x for x in dict.fromkeys(base_ + [y for x in base_[:80] for y in edits(x, rng)])
+                                     if all(tuple(e_[0][0]) != x for e_ in st_["examples"])]
+                            dis = [x for x in pool_ if _safe(lambda: pc(x)) != _safe(lambda: ps(x))]
+                            # several probes with distinct predicted outcomes (not one input per branch)
+                            probes, seen_o = [], set()
+                            for x in dis:
+                                key_ = (repr(_safe(lambda: pc(x))), repr(_safe(lambda: ps(x))), len(x))
+                                if key_ not in seen_o:
+                                    seen_o.add(key_); probes.append(x)
+                                if len(probes) >= 3:
+                                    break
+                            verdict_c = verdict_s = 0
+                            for xq in probes:
+                                if env.used >= env.budget - 3:
+                                    break
+                                yq = ask(env, xq, obs)
+                                if yq is None:
+                                    continue
+                                st_["examples"].append(((xq,), yq))
+                                verdict_c += _safe(lambda: pc(xq)) != yq
+                                verdict_s += _safe(lambda: ps(xq)) != yq
+                            info["necessity"].update({"simpler": sv, "probes": [list(x) for x in probes],
+                                                      "complex_refuted": verdict_c, "simpler_refuted": verdict_s})
+                            if verdict_s == 0:                       # not refuted: the simpler wins (MDL)
+                                u2, z2 = uv, zz            # the simpler Update survives: keep it (MDL)
+                                a2 = [("simpler",)] + list(a2[1:])
+                                info["necessity"]["kept"] = "simpler"
+                            else:
+                                info["necessity"]["kept"] = "complex (split necessary)" if verdict_c == 0 else "neither"
+                                if verdict_c:
+                                    u2 = None
                     if u2 is not None and not f2:
                         info["update_after"] = [show_ast(a) if not (isinstance(a, tuple) and a and a[0] == "cells") else a[1] for a in a2]
                         m2 = (lambda inp, u2=list(u2), z2=z2, fd=st_["fold"]: (lambda r: None if r is None else r[0])(fd(u2, z2, tuple(inp[0]))))
