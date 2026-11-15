@@ -1500,20 +1500,35 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                     pool_ = [x for x in dict.fromkeys(base_ + [y for x in base_[:60] for y in edits(x, rng)])
                              if x not in memo]
                     # an experiment from the hypotheses: where the rival invented variable predicts otherwise
-                    x = None
-                    for ri, r in enumerate(riv):          # one experiment per rival, closest first
+                    # candidates: for each rival (closest first) the first input of the pool where it disagrees
+                    nst = len(upd_alts)
+                    kinds = ["start"] * (len(riv) - nst - len(rivals)) + ["update"] * nst + ["variable"] * len(rivals)
+                    cands = []
+                    for ri, r in enumerate(riv):
                         if ri in used_r:
                             continue
-                        x = next((x for x in pool_ if _safe(lambda: m_(x)) != _safe(lambda r=r: r(x))), None)
-                        used_r.add(ri)
-                        if x is not None:
+                        xc = next((x for x in pool_ if _safe(lambda: m_(x)) != _safe(lambda r=r: r(x))), None)
+                        if xc is not None and all(xc != c_[2] for c_ in cands):
+                            cands.append((ri, kinds[ri] if ri < len(kinds) else "?", xc))
+                        if len(cands) >= 2:
                             break
-                    if x is None:
-                        x = pool_[0] if pool_ else None
+                    qi = QSEL[0]
+                    QSEL[0] += 1
+                    pick = 1 if (QUERY_SCHEDULE.get(qi) == "alt" and len(cands) > 1) else 0
+                    x = cands[pick][2] if cands else (pool_[0] if pool_ else None)
+                    if cands:
+                        used_r.add(cands[pick][0])
+                    qrec = {"index": qi, "pool": len(pool_), "queries_before": env.used,
+                            "pool_hash": hash(tuple(pool_[:20])) & 0xffffffff,
+                            "candidates": [[k_, list(x_)] for _, k_, x_ in cands],
+                            "chosen": pick if cands else None}
+                    rec.setdefault("query_decisions", []).append(qrec)
                     if x is None:
                         break
                     y = F(x)
                     selftest["left"] -= 1
+                    qrec["answer"] = y if not isinstance(y, tuple) else list(y)
+                    qrec["change"] = "counterexample" if (y is not None and _safe(lambda: m_(x)) != y) else "none"
                     if y is not None and _safe(lambda: m_(x)) != y:
                         bad = (x, y)
                         break
@@ -1630,6 +1645,8 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
 SELFTEST = 3      # self-test queries per formed machine (at most 3 repairs) before it is returned
 MAX_ACC = 3       # invented variables per machine
 ACTION_MODE = "invent"   # D's fixed decision at a discovery branch point ("repair": the counterfactual arm)
+QUERY_SCHEDULE = {}      # {self-test query index: "alt"} -- the second candidate instead of the first
+QSEL = [0]               # self-test query counter of the current run (reset by run_arm)
 ACTION_SCHEDULE = {}     # {decision index: action} -- replays a run and changes exactly one decision
 _DEC = [0]               # decision counter of the current run (reset by run_arm)
 MULTI = True      # ablation switch: False = one invented variable at a time, no sets, no joined readouts
@@ -1682,6 +1699,7 @@ def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
     environment again, so the information is identical)."""
     rng = random.Random(seed)
     _DEC[0] = 0
+    QSEL[0] = 0
     c0 = time.process_time()
     deadline = c0 + cap
     ex = env.initial()

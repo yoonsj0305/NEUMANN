@@ -738,3 +738,27 @@ contradictions and state refutations (information present) but no candidate hold
 admissible candidates there were chance fits. They are representation-limited, which section 15's count of 0 hid.
 
 V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched.
+
+## 17. Query decisions recorded and compared at the same observation state (2026-11-15) — DEVELOPMENT ONLY
+
+* **WBS-1 (code `neumann1/active.py`):** at every self-test query of a formed machine the run now records
+  `query_decisions`: index, pool size and a hash of the deterministic pool, the candidates (for each rival, closest
+  first, the first pool input where it disagrees: kind = another start / another equally consistent Update / the
+  runner-up variable), the chosen candidate, the SOURCE answer, and the hypothesis change (counterexample or none),
+  with the queries used before. `QUERY_SCHEDULE` makes one query take the second candidate instead.
+* **WBS-2:** every dev task whose earlier D run made a self-test query (188: FRESH-dev and list-routines) was run
+  twice on the same seed and budget — first candidate vs second candidate at the first self-test query. A pair is
+  comparable only if that decision had ≥ 2 candidates and the query history and pool before it are identical in
+  both runs. Cost: 5 860 CPU s, 21 936 queries (development data collection).
+* **WBS-3:** comparable pairs **13** (HumanEval 5, MBPP 7, list-routines 1); candidate kinds start/start 10,
+  start/update 3 (no variable rivals). The evidence differed in 6: the second candidate found a counterexample the
+  first did not in `humaneval/57`, `mbpp/567`, `mbpp/680`, `mbpp/775` (semantic mismatch, not a valid label); the
+  first found one the second did not in `humaneval/85`, `identify-k(k=1) | kth-smallest(k=2)`. Counterexamples:
+  first 3 / 13, second 5 / 13. The full chain occurred once: `mbpp/680` — second candidate → counterexample →
+  invented variable `h' = e` → verified machine → solved (the first branch fails).
+* **Stop (directive §7):** 13 comparable decisions, 5 valid evidence differences, one causal solve: too few to fit
+  or evaluate a learned query policy across lineages; WBS-4 (Static / Learned / Learned-ablated) was not run.
+  Why so few: most first self-test queries had a single candidate (one rival with a disagreement in the pool), and
+  self-tests occur only after a machine is formed.
+
+V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched. Full regression 1148 passed, 53 skipped.

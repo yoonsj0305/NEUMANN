@@ -1,0 +1,74 @@
+{
+ "candidate_kinds": {
+  "start/start": 10,
+  "start/update": 3
+ },
+ "comparable_pairs": 13,
+ "counterexample_alt": 5,
+ "counterexample_first": 3,
+ "cpu_total": 5860,
+ "evidence_differs": [
+  [
+   "humaneval/57",
+   "none",
+   "counterexample"
+  ],
+  [
+   "humaneval/85",
+   "counterexample",
+   "none"
+  ],
+  [
+   "identify-k(k=1) | kth-smallest(k=2)",
+   "counterexample",
+   "none"
+  ],
+  [
+   "mbpp/567",
+   "none",
+   "counterexample"
+  ],
+  [
+   "mbpp/680",
+   "none",
+   "counterexample"
+  ],
+  [
+   "mbpp/775",
+   "none",
+   "counterexample"
+  ]
+ ],
+ "invented_structure_differs": [
+  [
+   "mbpp/680",
+   [],
+   [
+    "$1"
+   ]
+  ],
+  [
+   "mbpp/775",
+   [],
+   [
+    "$1",
+    "(add $0 $1)"
+   ]
+  ]
+ ],
+ "queries_total": 21936,
+ "solved_differs": [
+  [
+   "mbpp/680",
+   false,
+   true
+  ]
+ ],
+ "status": "DEVELOPMENT ONLY",
+ "tasks_by_lineage": {
+  "humaneval": 5,
+  "list-routines": 1,
+  "mbpp": 7
+ },
+ "tasks_run": 188
+}
