@@ -40,10 +40,13 @@ def set_arm(arm):
     ac.REPAIR = False
     ac.FOLD_REACH_SYNTH = False
     ac.REACH_TRAJ = arm == "D"
-    ac.BUDGETED_REACH_TRAJ = arm in ("E", "E2", "EF")
+    ac.BUDGETED_REACH_TRAJ = arm in ("E", "E2", "EF", "EFb", "EFc", "EFbc")
     ac.REACH_MODE = "augment" if arm == "E2" else "replace"
-    # follow-up arms (CASE 2): the existing per-round synthesis CPU floor, a reallocation inside the same 30 s
-    ac.MIN_SYNTH_CPU = 10.0 if arm in ("AF", "EF") else 0.0
+    # CASE-2 arms (section 38): EFb = E + one-shot synthetic fallback after a reachable-table Update failure;
+    # EFc = E + the existing per-round synthesis CPU floor (10 s, a reallocation inside the same formation deadline);
+    # EFbc = both.  AF / EF are the section 36 follow-up names (AF = A + floor, EF = EFc).
+    ac.E_SYNTH_FALLBACK = arm in ("EFb", "EFbc")
+    ac.MIN_SYNTH_CPU = 10.0 if arm in ("AF", "EF", "EFc", "EFbc") else 0.0
 
 
 def last_elem(u, direction):

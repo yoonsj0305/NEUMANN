@@ -1,0 +1,227 @@
+{
+ "env": "env_listroutines.Env(spec, 0, n_train=8, n_test=10, budget=60); hidden tests enter only the hash",
+ "new_compositions": {
+  "candidates_drawn": 29,
+  "quota": {
+   "B": 2,
+   "I": 4,
+   "L": 18
+  },
+  "rule": "any result on these tasks is produced:\n* 24 NEW two-routine compositions from the independent author's routines in env_listroutines (the same lineage):\n  the composition rule of env_listroutines.tasks() (outer routine with a list output, then any routine; valid on\n  Random(2)), with the rng seed string \"compose:neumann-q3-case2-eval-v1\"; names among the existing 228 tasks are\n  excluded; the task must build an Env(spec, 0) (8 initial examples, 10 hidden tests, the unchanged generator).\n  Difficulty stratification by final output type with quotas proportional to the existing 120 compositions\n  (88 L / 19 I / 13 B): L 18, I 4, B 2; candidates are taken in generation order until each quota is full.",
+  "seed": "compose:neumann-q3-case2-eval-v1",
+  "tasks": [
+   {
+    "candidate_index": 1,
+    "name": "mult-k(k=10) | rotate-k(k=-2)",
+    "output_type": "L",
+    "sha256": "a755e44c74eecf572d448883c0f73aaa44fae3c41520026fc30848ade05ba6a7"
+   },
+   {
+    "candidate_index": 2,
+    "name": "intersperse-k(k=-2) | append-k(k=3)",
+    "output_type": "L",
+    "sha256": "24b5dfa8a5b282a39d327c8733e4034fc5da3dd7ea459a9fae8c1809da037cdd"
+   },
+   {
+    "candidate_index": 3,
+    "name": "mult-k(k=10) | pow-k(k=4)",
+    "output_type": "L",
+    "sha256": "f2284c335e036f9ddb18c8a0ef1ebd15904eb8d2cc26b828e2dca03ae97fa8d9"
+   },
+   {
+    "candidate_index": 4,
+    "name": "rotate-k(k=1) | intersperse-k(k=0)",
+    "output_type": "L",
+    "sha256": "31b88859e61243068aa0de12ad85bcad21722e6d6901f1ff2885c4d0b9d01787"
+   },
+   {
+    "candidate_index": 5,
+    "name": "pow-k(k=4) | replace-index-k-with-n(k=2,n=10)",
+    "output_type": "L",
+    "sha256": "7aa6a8f3265a3deaf9ccdde1110c7c92c7b9fa1e17e3e4d31cf2acb1956e3b46"
+   },
+   {
+    "candidate_index": 6,
+    "name": "intersperse-k(k=-2) | identify-is-mod-k(k=3)",
+    "output_type": "L",
+    "sha256": "4b5dae43dd4c2411d303eb021d83f05845f8583176f9f0287fe719308b969b25"
+   },
+   {
+    "candidate_index": 7,
+    "name": "keep-mod-k(k=3) | len",
+    "output_type": "I",
+    "sha256": "e92728f7a1b9f4824d658e16e5aaea31ef8d3d21c91fb41b0a3d56cb1c2479ac"
+   },
+   {
+    "candidate_index": 8,
+    "name": "add-k(k=3) | keep-mod-k(k=2)",
+    "output_type": "L",
+    "sha256": "9da0d3528895ca71e8ed7e39448a5b86efdacb602c56057a1925a98d705b2dfb"
+   },
+   {
+    "candidate_index": 9,
+    "name": "mult-k(k=2) | max",
+    "output_type": "I",
+    "sha256": "8ec6802e6af032b27a25ac0f306dc69fbefd2daabe283cb590e75b49bea9af7c"
+   },
+   {
+    "candidate_index": 10,
+    "name": "identify-geq-k(k=3) | identify-geq-k(k=2)",
+    "output_type": "L",
+    "sha256": "a9603b8b098251c89895824450bfe467a1f9d0c124e5c7b1126d74cf08c8cd0b"
+   },
+   {
+    "candidate_index": 11,
+    "name": "tail | index-k(k=2)",
+    "output_type": "I",
+    "sha256": "e35b3b8926249df100252e5b3e2cd58c82ebf4834937db5d1986a0dfd594bb8f"
+   },
+   {
+    "candidate_index": 12,
+    "name": "pow-k(k=2) | take-k(k=2)",
+    "output_type": "L",
+    "sha256": "4b3bd1ae665b0158bd05491ae7af64e0970afff38f4ab295c59980744e156594"
+   },
+   {
+    "candidate_index": 13,
+    "name": "keep-mod-k(k=5) | add-k(k=10)",
+    "output_type": "L",
+    "sha256": "71e5125335c6ef26a6d035ae88d3dbc398c02051a27c34dcb506aa5dc368ea06"
+   },
+   {
+    "candidate_index": 14,
+    "name": "repeat-k(k=3) | mult-k(k=2)",
+    "output_type": "L",
+    "sha256": "cf38392f741c2a16df4610b8d5f45d6305a8978eafa98c547fbf1c7cf29f4f46"
+   },
+   {
+    "candidate_index": 15,
+    "name": "mult-k(k=10) | product",
+    "output_type": "I",
+    "sha256": "70852999ad9c490377dbd03bdb61383afdedb92ab956cf616ca6e6b725a170ad"
+   },
+   {
+    "candidate_index": 17,
+    "name": "keep-mod-k(k=2) | add-k(k=-2)",
+    "output_type": "L",
+    "sha256": "4b66120663ea271d26fb5a196cc25f2bca7eb33983ac2a4260758b4887dad6b3"
+   },
+   {
+    "candidate_index": 18,
+    "name": "pow-base-k(k=4) | append-k(k=2)",
+    "output_type": "L",
+    "sha256": "d8fd159eba3b079277c03c9954889822747cccbd4a58d22aafdb06404dde97df"
+   },
+   {
+    "candidate_index": 19,
+    "name": "identify-is-prime | identify-k(k=3)",
+    "output_type": "L",
+    "sha256": "74875887716740c0ed21616d83aef405715a77b3d53eaa2e8c0381f78b0e89b3"
+   },
+   {
+    "candidate_index": 20,
+    "name": "modulo-k(k=3) | is-mod-k(k=3)",
+    "output_type": "B",
+    "sha256": "e9c57808ab14aa559b00754b66b467d5d04b8387823f573a3b012cd00fda73b5"
+   },
+   {
+    "candidate_index": 21,
+    "name": "dup | identify-k(k=3)",
+    "output_type": "L",
+    "sha256": "2330921d81e2cfb069103fba80d6a9e4398e5d431255a9cdbf3ad6070f23e63a"
+   },
+   {
+    "candidate_index": 22,
+    "name": "append-k(k=2) | identify-is-mod-k(k=2)",
+    "output_type": "L",
+    "sha256": "698f1b1f48601b53cc6563b62363418d7506b287322fe4f30b84c0e3f22a8319"
+   },
+   {
+    "candidate_index": 23,
+    "name": "identify-is-mod-k(k=3) | slice-k-n(k=3,n=3)",
+    "output_type": "L",
+    "sha256": "23c314b57f5f30a6a7db6a7c2ebd9007f244bf3284f2dff824c295f9adb48e33"
+   },
+   {
+    "candidate_index": 24,
+    "name": "repeat-k(k=5) | rotate-k(k=1)",
+    "output_type": "L",
+    "sha256": "bfb57961b3a5326062dede0c625d2559d0c3e6ee8a77283713330b4158da1474"
+   },
+   {
+    "candidate_index": 29,
+    "name": "rotate-k(k=10) | is-mod-k(k=5)",
+    "output_type": "B",
+    "sha256": "b3ab3c348dd09708f0a1df02ace22c4de8c689551fd8389274e035ff36088073"
+   }
+  ]
+ },
+ "regression": {
+  "pool_size": 133,
+  "rule": "Gate E baseline-solved, never used in a policy-E experiment; first 12 by sha256('neumann-q3-case2-regression-v1:' + name)",
+  "tasks": [
+   {
+    "name": "add-k(k=1)",
+    "output_type": "L",
+    "sha256": "dcdb5131ce305d03395e418e52235015ddc9679a9cff7ef9f22d3ecedf1b09e1"
+   },
+   {
+    "name": "add-k(k=10)",
+    "output_type": "L",
+    "sha256": "62bca8bd818ee51c1a72ce9e57c80d71a5911314d24b98559ae40d574c1b276b"
+   },
+   {
+    "name": "drop-k(k=3)",
+    "output_type": "L",
+    "sha256": "47981dde66f9811f511938e7af9849a5a0fbfc8cada46918f47c747c6a898a6a"
+   },
+   {
+    "name": "has-k(k=10)",
+    "output_type": "B",
+    "sha256": "40ab0f0444b2088ed4b102db96d49dd2d65b9b5f9eeb50e2155d5c6bd3a5d7aa"
+   },
+   {
+    "name": "identify-is-mod-k(k=2) | last",
+    "output_type": "I",
+    "sha256": "3063dc7c4b0b8ae1a1d56c3855fbdd293c02f4b1da425883022b07099346940e"
+   },
+   {
+    "name": "identify-k(k=1) | kth-smallest(k=2)",
+    "output_type": "I",
+    "sha256": "17e8bafa17629f35295698f4e1b99c24b7c22e0269fd5000edd3f244506cf343"
+   },
+   {
+    "name": "index-k(k=3)",
+    "output_type": "I",
+    "sha256": "00ea28d2b26494790b81d4ae45322bf71d8fe77d7bd6062e3f94ca204971f416"
+   },
+   {
+    "name": "intersperse-k(k=1)",
+    "output_type": "L",
+    "sha256": "d3ca5a7681460851eb4c020792d21021525eea307a67683a4fd9a2cd9a2e9b8f"
+   },
+   {
+    "name": "modulo-k(k=3) | pop",
+    "output_type": "L",
+    "sha256": "b8aef65d24e644d6c1e8647e5c98c438d927c5438830a9a5a80762fabbfc0f8c"
+   },
+   {
+    "name": "mult-k(k=-2) | repeat-k(k=2)",
+    "output_type": "L",
+    "sha256": "1d4f5c52f38de2df79ed9bed63ad1bb2d0d45e06ff50fe7c540c44f93aa37cfb"
+   },
+   {
+    "name": "pow-k(k=2) | modulo-k(k=2)",
+    "output_type": "L",
+    "sha256": "f48133eaa06a6dde215d30a3ffb457305f8b40d78f0232a47c128f37ad758a19"
+   },
+   {
+    "name": "rotate-k(k=3) | slice-k-n(k=2,n=3)",
+    "output_type": "L",
+    "sha256": "e3998a6503fa95132217780eed5f61b9f5bfe80ab4bb43ab4b94478e1a95f542"
+   }
+  ]
+ },
+ "schema": "neumann.q3-case2-eval-set.v1",
+ "status": "PRE-REGISTERED before any run on these tasks (development only; same list-routines lineage)"
+}
