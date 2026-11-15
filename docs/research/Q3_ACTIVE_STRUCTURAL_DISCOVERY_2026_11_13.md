@@ -1612,3 +1612,20 @@ The existing `MIN_SYNTH_CPU` floor (section 30; 10 s; a reallocation inside the 
 
 V1 PASS (sealed), V2 independent OPEN, V3 FAIL, Q3 OPEN, Q6 untouched. No FRESH / FORMAL seal opened, no per-task
 answer coded, PR #780 stays Draft.
+
+
+## 37. CASE-2 synthesis fallback: opt-in implementation only (2026-11-15) — NOT A NEW DEVELOPMENT RESULT
+
+The section 36 frozen policy E reduced formation SOURCE charges 577→406 on the 11 tasks (−29.6% against D); its transfer had two robust wins but two robust regressions against A. In the failed tasks, E's reachable-only transition tables failed to yield an Update within the available CPU share. This observation motivates a narrowly scoped safety fallback, but the original 84 transfer tasks are *spent for this policy selection* and cannot be presented as fresh evidence for a revised E.
+
+**Change:** `active.E_SYNTH_FALLBACK = False` is a new opt-in flag (the default is unchanged). If E is active in `REACH_MODE="replace"`, its reachable-only main-round `attempt` returns no Update and the formation deadline has not expired, the machine:
+1. records `reachability synthesis fallback: synthetic trajectories`;
+2. clears the active reachable transition-point list (does not erase already paid SOURCE observations, cache or audit log);
+3. restores the original synthetic trajectories and tries synthesis again on the following round;
+4. permits this fallback only once per machine, preserving the SAME global 30 CPU-s and 60 SOURCE-query caps.
+
+This is a *degraded-mode intervention* against SECTION 36 CASE 2. It does not modify the synthesiser, repair, independent challenge, Q6 or any sealed material. The independent `MIN_SYNTH_CPU` policy is already available and remains off by default. A targeted test checks that fallback is absent when disabled, occurs at most once when enabled after forced no-Update and never exceeds the SOURCE limit.
+
+**Important limitations:** fallback is not guaranteed to recover A's successes because E has already spent resources observing reachable states, and the resumed synthetic search receives only the remaining budget. Neither independent performance nor 84-task net gain nor actual cost advantage has been measured for this intervention. Do not call this CAUSAL DEVELOPMENT PASS. The next experiment requires a NEW preregistered evaluation set: freeze all code and policy parameters, run matched A / E / E+fallback / E+fallback+10s-floor arms on new opened development tasks, and inspect both gains and regressions with actual `time.process_time()`. The additional CPU-floor option must be accounted as reallocation within, not an extension beyond, total formation deadline. Retain original semantics checks and challenge.
+
+**Official gate unchanged:** V1 PASS (sealed), V2 independent OPEN, V3 FAIL, Q3 OPEN; Q6 untouched.
