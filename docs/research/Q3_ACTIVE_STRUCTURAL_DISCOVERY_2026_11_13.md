@@ -1098,3 +1098,18 @@ V1 PASS (sealed), V2 independent OPEN, V3 FAIL, Q3 OPEN, Q6 untouched.
   folds correctly, the representation. Neither was tested in this session. `FOLD_AWARE_SELECTION` was not added.
 * CANDIDATE PASS / FOLD PASS / MACHINE PASS / DEVELOPMENT PASS: not reached (no experiment). GENERALIZATION OPEN.
 V1 PASS (sealed), V2 independent OPEN, V3 FAIL, Q3 OPEN, Q6 untouched.
+
+## 33. Observable-equivalence pruning in the cell construction: audit only (2026-11-15) — no new runs, no code change
+
+Where alternative transition-consistent programs are discarded on the main list-state path
+(`active.synth_cells` → `latent.solve` → `solve_cfg` → `construct`):
+1. `discovery_core.FSearch._keep` (line ~87): an expression whose value vector on the search inputs equals one
+   already kept is dropped (`if v in seen: return`) — observational equivalence on the supplied rows only.
+2. `latent.construct` (lines ~267–281): cell pieces are deduplicated by (key, coverage mask) and predicates by mask
+   (`seen` / `pseen`), with caps `MAX_PIECES` / `MAX_PREDS` — two pieces with the same coverage on the observed
+   transitions are one candidate even if they differ elsewhere.
+3. `active.synth_cells` returns the first solution `lt.solve` produces; there is no alternatives interface
+   (section 32). `cells._cover` (cells.py:159) is not on this path.
+Not done in this session: the experimental probe-signature refinement (P0-B), the candidate / fold comparison on the
+fixed snapshots (P0-C/D) and the machine-level experiment (P0-E). CANDIDATE PASS / FOLD GAIN not evaluated.
+V1 PASS (sealed), V2 independent OPEN, V3 FAIL, Q3 OPEN, Q6 untouched.
