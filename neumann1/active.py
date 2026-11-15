@@ -1061,7 +1061,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                             return True
         rec["events"].append("no informative continuation")
         return False
-    def attempt(trans, share, cover=0.6):
+    def attempt(trans, share, cover=0.6, capture=False):
         """Update per component from the observed transitions, then the best initial state.  No query.
         Returns (updates, asts, z, failing examples), or (None, asts found so far, None, None)."""
         in_t = tuple([s_type] * len(W)) + tuple(a["t"] for a in acc) + (T_I,)
@@ -1088,7 +1088,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             canonical = json.dumps(data, sort_keys=True, separators=(",", ":"))
             data["sha256"] = hashlib.sha256(canonical.encode()).hexdigest()
             return data
-        if CAPTURE_UPDATE_TRANSITIONS and "first_update_input" not in rec:
+        if CAPTURE_UPDATE_TRANSITIONS and capture and "first_update_input" not in rec:
             rec["first_update_input"] = snapshot("first_attempt")
         upd, asts = [], []
         for j in range(len(W)):
@@ -1112,7 +1112,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                 if j == 0:
                     upd_alts[:] = alts or []
             if g is None:
-                if CAPTURE_UPDATE_TRANSITIONS and "first_update_failure" not in rec:
+                if CAPTURE_UPDATE_TRANSITIONS and capture and "first_update_failure" not in rec:
                     rec["first_update_failure"] = snapshot("first_failure", j)
                 return None, asts, None, None
             upd.append(g)
@@ -1657,7 +1657,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                     break
                 continue
             # 2. Update per component, then joint verification on every initial example
-            upd, asts, z, fails = attempt(trans, 0.25)
+            upd, asts, z, fails = attempt(trans, 0.25, capture=True)
             if upd is None:
                 rec["events"].append("no update for component %d" % len(asts))
                 act_ = choose("update not found", trans, len(examples))
