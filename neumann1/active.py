@@ -807,6 +807,26 @@ def task_input(rng, vals, lens):
     return tuple(x)
 
 
+def synth_cells_candidates(in_types, rows, deadline, k=4):
+    """Development-only cell candidate generation on a fixed transition table.
+
+    Returns up to k executable, train-consistent (function, display AST) pairs.
+    Does not query SOURCE, read hidden tests or change the default solver.
+    """
+    t = {"id": "update", "in_types": list(in_types), "out_type": T_L,
+         "train": [(xs, y) for xs, y in rows], "test": []}
+    cfg = lt.Cfg(subst=True, latent=True, equivalence_cap=k, candidate_limit=k)
+    sols = lt.solve_candidates(t, deadline, _inv(), cfg, k=k)
+    lib = lt.library(lt.Cfg(subst=True))
+    out = []
+    for sol in sols:
+        def g(args, sol=sol):
+            return _safe(lambda: lt.run(sol, lib, tuple(args), t))
+        if all(g(xs) == y for xs, y in rows):
+            out.append((g, ("cells", lt.show(sol))))
+    return out
+
+
 def synth_cells(in_types, rows, deadline):
     """A list-valued Update by the representation-construction core (`latent`, R2), under per-transition
     supervision; returns (g, description)."""
