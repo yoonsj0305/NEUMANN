@@ -62,3 +62,17 @@ def test_formation_handles_a_huge_value_range():
     ex = [((x,), min(x)) for x in [(2, -9999999999999999, 4), (1000000, 3), (5, 7, 1), (9, 9)]]
     pred, _, rec = ac.form_machine(Env(), ex, __import__("time").process_time() + 10, 40)
     assert pred is not None and pred(((4, -10 ** 17, 8),)) == -10 ** 17
+
+
+def test_goal_directed_update_synthesizes_an_unseen_residual_relation():
+    """A held-out state/element pair must satisfy an invented Update, not a lookup table."""
+    import time
+    from neumann1 import invention_core as ic
+    pairs = [(0, 0), (0, 1), (2, 0), (2, 2), (3, -1), (3, 2), (7, 1), (7, -1)]
+    rows = [((s, e), s + 2 * e) for s, e in pairs]
+    g, ast = ac.synth_goal_update(
+        (ic.T_I, ic.T_I), ic.T_I, rows, time.process_time() + 8)
+    assert g is not None and ast is not None
+    assert all(g(inputs) == expected for inputs, expected in rows)
+    assert g((12, -3)) == 6
+    assert g((-4, 5)) == 6
