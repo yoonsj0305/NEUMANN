@@ -447,8 +447,7 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
                 except sc.Done:
                     return collected[0]
             else:
-                node = c4._cover(sorted(pieces, key=lambda p: -bin(p[0]).count("1")),
-                                 preds, full, end_cover)
+                node = c4._cover(pieces, preds, full, end_cover)
                 if wrap(node) is not None:
                     return wrap(node)
     if collecting:
@@ -460,8 +459,7 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
             return collected[0]
         node = None
     else:
-        node = c4._cover(sorted(pieces, key=lambda p: -bin(p[0]).count("1")),
-                         preds, full, min(deadline, time.process_time() + 0.05 * span))
+        node = c4._cover(pieces, preds, full, min(deadline, time.process_time() + 0.05 * span))
     if wrap(node) is not None or not lat:
         return wrap(node)
     # ---- formation of intermediate representations (R2): in the learned or default order of latent kinds
@@ -583,7 +581,8 @@ def solve_candidates(task, deadline, inv, cfg, k=4):
     before any claim of machine formation.
     """
     cfg.candidate_limit = max(2, int(k))
-    cfg.equivalence_cap = min(cfg.candidate_limit, max(2, cfg.equivalence_cap))
+    cfg.equivalence_cap = min(cfg.candidate_limit,
+                              cfg.equivalence_cap if cfg.equivalence_cap > 1 else cfg.candidate_limit)
     cfg.collected_candidates = []
     first = solve(task, deadline, inv, cfg)
     result = list(cfg.collected_candidates)
