@@ -510,6 +510,16 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
             node = c4._cover(rotated, preds, full, limit)
             if node is not None:
                 append_candidate(node)
+    first_cover = {}                       # COVER_MEMO: mask -> (pieces scanned, first covering node or None)
+
+    def cover(pieces_, preds_, full_, limit):
+        """c4._cover, or (opt-in COVER_MEMO) the same case split with the 'first piece covering a mask' scan
+        memoised across the calls of this construction.  Exact: `pieces` only grows by appending on this path,
+        so the first covering piece of a mask never changes once found."""
+        if not COVER_MEMO:
+            return c4._cover(pieces_, preds_, full_, limit)
+        return _cover_memo(pieces_, preds_, full_, limit, first_cover)
+
     def run_levels(lo):
         """The level loop; returns ("return", sol), ("budget", level) or ("end", None)."""
         for lvl in range(lo, s.max_level + 1):
@@ -532,7 +542,7 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
                     except sc.Done:
                         return "return", collected[0]
                 else:
-                    node = c4._cover(pieces, preds, full, end_cover)
+                    node = cover(pieces, preds, full, end_cover)
                     if wrap(node) is not None:
                         return "return", wrap(node)
         return "end", None
@@ -559,7 +569,7 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
             return collected[0]
         node = None
     else:
-        node = c4._cover(pieces, preds, full, min(deadline, time.process_time() + 0.05 * span))
+        node = cover(pieces, preds, full, min(deadline, time.process_time() + 0.05 * span))
     if wrap(node) is not None or not lat:
         return wrap(node)
     # ---- formation of intermediate representations (R2): in the learned or default order of latent kinds
@@ -574,6 +584,61 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
             got = _residual(task, lib, consts, deadline, inv, cfg, order, goals, where, examples, seq, m_ast, ys_)
             if got is not None:
                 return got
+    return None
+
+
+COVER_MEMO = False   # development (opt-in): memoise the cover's first-covering-piece scans within one construction
+
+
+def _cover_memo(pieces, preds, full, deadline, memo):
+    """cells._cover with an incremental memo of the first piece covering a mask (same result, same order)."""
+    def first(mask):
+        hit = memo.get(mask)
+        if hit is not None and hit[1] is not None:
+            return hit[1]
+        for i in range(hit[0] if hit else 0, len(pieces)):
+            m, n = pieces[i]
+            if not mask & ~m:
+                memo[mask] = (i + 1, n)
+                return n
+        memo[mask] = (len(pieces), None)
+        return None
+    node = first(full)
+    if node is not None:
+        return node
+
+    def two(R):
+        for pm, past in preds:
+            if time.process_time() > deadline:
+                return None
+            a, b = pm & R, ~pm & R
+            if not a or not b:
+                continue
+            A = first(a)
+            if A is None:
+                continue
+            B = first(b)
+            if B is not None:
+                return ("case", past, A, B)
+        return None
+    got = two(full)
+    if got is not None:
+        return got
+    firsts = []
+    for pm, past in preds:
+        if pm and pm != full:
+            A = first(pm)
+            if A is not None:
+                firsts.append((-bin(pm).count("1"), len(firsts), pm, past, A))
+    for _, _, pm, past, A in sorted(firsts)[:40]:
+        if time.process_time() > deadline:
+            return None
+        rest = two(full & ~pm)
+        if rest is not None:
+            return ("case", past, A, rest)
+        B = first(full & ~pm)
+        if B is not None:
+            return ("case", past, A, B)
     return None
 
 

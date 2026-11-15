@@ -86,3 +86,32 @@ def test_budgeted_reachability_policy_is_off_by_default_and_respects_its_budget(
     assert len(set(charged)) == reach["spent"]
     assert all(any(x == y[:len(x)] for y in initial) for x in charged)       # only initial-example prefixes
     assert all(c["actual_cost"] == c["est_cost"] for c in reach["plan"] if c.get("actual_cost") is not None)
+
+
+def test_cover_memo_is_off_by_default_and_returns_the_same_program():
+    """latent.COVER_MEMO memoises the cover's first-covering-piece scans; on the same table and the same
+    (deterministic, virtual) clock it must return exactly the legacy program."""
+    import vclock
+    import reachable_state_diagnosis_dev as D
+    assert lt.COVER_MEMO is False
+    names = ("rotate-k(k=1) | identify-geq-k(k=2)", "prepend-k(k=-2) | positions")
+    recs = [json.loads(l) for l in pathlib.Path("docs/experiments/dev/update_snapshots/lr.jsonl").read_text()
+            .splitlines() if l.strip()]
+    ac._inv()
+    clock = vclock.install(vclock.VirtualTime(), extra=(sys.modules[__name__],))
+    try:
+        for rec in recs:
+            if rec["name"] not in names or not rec.get("failure"):
+                continue
+            snap = D.Snapshot(rec["failure"])
+            rows = [(D.freeze(r["inputs"]), D.freeze(r["output"])) for r in rec["failure"]["rows"]]
+            got = []
+            for memo in (False, True):
+                lt.COVER_MEMO = memo
+                g, ast = ac.synth_cells(snap.in_types, rows, time.process_time() + 5)
+                got.append(ast)
+            lt.COVER_MEMO = False
+            assert got[0] == got[1] and got[0] is not None
+    finally:
+        lt.COVER_MEMO = False
+        vclock.uninstall()
