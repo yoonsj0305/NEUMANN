@@ -762,3 +762,26 @@ V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched.
   self-tests occur only after a machine is formed.
 
 V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched. Full regression 1148 passed, 53 skipped.
+
+## 18. Observation choice BEFORE a machine exists: trajectories (2026-11-15) — DEVELOPMENT ONLY
+
+* Code: `TRAJ_SHIFT` draws the trajectory values with another permutation under the same generation rule
+  (ascending / descending / random over the observed range); `first_contradictions` records how many
+  (state, element) pairs of the FIRST transition table have more than one successor — evidence available before
+  any machine is formed.
+* Run: the 195 dev tasks where D had invoked invention (list-routines 117, MBPP 54, HumanEval 24), D's draw vs one
+  alternative draw, same seed / budget / synthesiser; the decision (first queries) differs by construction and
+  nothing precedes it, so all 195 pairs are comparable. Cost 9 666 CPU s, 23 224 queries.
+* Pre-formation evidence differed rarely: contradiction present in one draw and absent in the other in **5** tasks
+  (HumanEval 3, MBPP 2); more contradictions with D's draw 2, with the alternative 3.
+* Downstream effects were larger and mostly NOT explained by that evidence: invented structure differed in 16
+  tasks, the solve in 8 (alternative only: `humaneval/121` with `h' = −h`, `mbpp/366` with `h' = e`; D's draw only:
+  `identify-is-mod-k(k=7)`, `identify-k(k=-2)`, `mbpp/516`, `mbpp/670`, `pop | is-evens`, `uniq`); solved 77 vs 73.
+  The outcome is sensitive to which values are observed, but the sensitivity runs through synthesis and repair,
+  not through a contradiction the observation exposed.
+* Pilot criteria (Assumption, directive §5): ≥ 30 comparable decisions — 195 met; ≥ 10 with differing structural
+  evidence — 5, not met; ≥ 2 lineages — met; ≥ 2 hypothesis kinds — only state sufficiency was compared (the
+  continuation path `represent()` was not instrumented in this session), not met. **Stop: no learned policy was
+  built; Static / Learned / D / B comparison not run.**
+
+V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched. Full regression 1148 passed, 53 skipped.

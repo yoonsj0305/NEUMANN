@@ -778,6 +778,8 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
     # observed values and their neighbours
     pool = list(range(lo, hi + 1)) if hi - lo <= 256 else sorted({v + d for v in vals for d in (-1, 0, 1)})
     rng.shuffle(pool)
+    if TRAJ_SHIFT[0]:                 # counterfactual: the same generation rule with another draw of trajectory values
+        random.Random(TRAJ_SHIFT[0] * 7919 + len(pool)).shuffle(pool)
     asc = tuple(sorted(pool[:4]))
     trajs = [asc, asc[::-1], tuple(pool[4:8])]
     extra = []                        # (u, e) points added by counterexamples
@@ -1429,6 +1431,11 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                 rec["events"].append("deadline")
                 break
             trans = transitions()
+            if rnd == 0:                      # pre-formation evidence: contradictions in the first transition table
+                gq = {}
+                for (a_, e_), b_, u_ in trans:
+                    gq.setdefault((a_, e_), set()).add(b_)
+                rec["first_contradictions"] = sum(len(v) > 1 for v in gq.values())
             if len(trans) < 3:
                 rec["events"].append("too few defined transitions")
                 break
@@ -1646,7 +1653,8 @@ SELFTEST = 3      # self-test queries per formed machine (at most 3 repairs) bef
 MAX_ACC = 3       # invented variables per machine
 ACTION_MODE = "invent"   # D's fixed decision at a discovery branch point ("repair": the counterfactual arm)
 QUERY_SCHEDULE = {}      # {self-test query index: "alt"} -- the second candidate instead of the first
-QSEL = [0]               # self-test query counter of the current run (reset by run_arm)
+QSEL = [0]
+TRAJ_SHIFT = [0]         # 0 = D's trajectories; k > 0 = another draw from the same rule (counterfactual)               # self-test query counter of the current run (reset by run_arm)
 ACTION_SCHEDULE = {}     # {decision index: action} -- replays a run and changes exactly one decision
 _DEC = [0]               # decision counter of the current run (reset by run_arm)
 MULTI = True      # ablation switch: False = one invented variable at a time, no sets, no joined readouts
