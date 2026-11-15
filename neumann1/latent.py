@@ -32,9 +32,41 @@ MAX_GOALS, MAX_VALUES = 4000, 40000
 MAX_RESIDUALS = 8
 
 
+def probe_cells(pts, types, limit=12):
+    """Deterministic counterfactual cell coordinates; never SOURCE observations.
+
+    Perturb actual coordinate rows to split observationally equivalent
+    expressions. These synthetic coordinates need not describe valid cells:
+    they are ONLY an equivalence-refinement heuristic, not validation.
+    """
+    result, seen = [], set()
+    for p in pts[:min(8, len(pts))]:
+        for i, t in enumerate(types):
+            for delta in (-1, 1):
+                q = list(p)
+                if t == T_I and isinstance(q[i], int) and not isinstance(q[i], bool):
+                    q[i] += delta
+                elif t == T_L and isinstance(q[i], tuple):
+                    q[i] = q[i] + (delta,) if delta == 1 else q[i][1:]
+                else:
+                    continue
+                k = repr(q)
+                if k not in seen:
+                    seen.add(k)
+                    result.append(tuple(q))
+                    if len(result) >= limit:
+                        return result
+    return result
+
+
 class Cfg:
-    def __init__(self, subst=False, latent=False, prior=None, order=("residual", "transport")):
+    def __init__(self, subst=False, latent=False, prior=None, order=("residual", "transport"),
+                 equivalence_cap=1, candidate_limit=1):
         self.subst, self.latent, self.prior, self.order = subst, latent, prior or {}, tuple(order)
+        # Opt-in development only: baseline behaviour is EXACTLY the old first fit.
+        self.equivalence_cap = max(1, int(equivalence_cap))
+        self.candidate_limit = max(1, int(candidate_limit))
+        self.collected_candidates = []
 
     def cost(self, ctx):
         c = ic.uniform_costs()
@@ -266,18 +298,70 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
     full = (1 << len(pts)) - 1
     pieces, seen, preds, pseen, values, goals, order = [], set(), [], set(), {}, {}, []
     ops = list((inv or {}).get("_given_I", []))
+    # Candidate collection is restricted to top-level development runs. No
+    # SOURCE queries, no impact on the sealed/default evaluator.
+    collecting = cfg.candidate_limit > 1 and depth == 0
+    collected = cfg.collected_candidates if collecting else None
+    seen_candidates = set()
+    coord_types = coords_types(task, cfg)
+    probes = probe_cells(pts, coord_types) if collecting else []
+    piece_signatures, pred_signatures = {}, {}
+
+    def signature(ast):
+        try:
+            fn = ic.compile_ast(ic._tup(ast), len(coord_types), lib)
+        except (ic.Fail, ValueError, KeyError, TypeError):
+            return ()
+        out = []
+        for p in probes:
+            try:
+                v = fn(p)
+                out.append(repr(v))
+            except (ic.Fail, ValueError, KeyError, TypeError, RecursionError, OverflowError):
+                out.append("UNDEFINED")
+        return tuple(out)
+
+    def keep_equivalent(table, key, ast):
+        if not collecting:
+            return key not in table
+        bucket = table.setdefault(key, set())
+        sig = signature(ast)
+        if sig in bucket or len(bucket) >= cfg.equivalence_cap:
+            return False
+        bucket.add(sig)
+        return True
+
+    def append_candidate(node):
+        sol = wrap(node)
+        if sol is None or not collecting:
+            return sol
+        key = repr(sol)
+        if key in seen_candidates:
+            return None
+        if not all(run(sol, lib, inputs, task) == expected for inputs, expected in task["train"]):
+            return None
+        seen_candidates.add(key)
+        collected.append(sol)
+        if len(collected) >= cfg.candidate_limit:
+            raise sc.Done(("candidate_limit", None), None)
+        return None
 
     def add_piece(mk, node, key):
-        if mk and (key, mk) not in seen and len(pieces) < c4.MAX_PIECES:
-            seen.add((key, mk))
+        equiv = (key, mk)
+        ast = node[1] if node[0] == "value" else node[2]
+        if mk and len(pieces) < c4.MAX_PIECES and keep_equivalent(piece_signatures, equiv, ast):
+            seen.add(equiv)
             pieces.append((mk, node))
             if mk == full:
-                raise sc.Done(("found", node), None)
+                if collecting:
+                    append_candidate(node)
+                else:
+                    raise sc.Done(("found", node), None)
 
     def take(vec, ast, t):
         if t == T_B:
             mk = sum(1 << k for k, b in enumerate(vec) if b)
-            if 0 < mk < full and mk not in pseen and len(preds) < c4.MAX_PREDS:
+            if 0 < mk < full and len(preds) < c4.MAX_PREDS and keep_equivalent(pred_signatures, mk, ast):
                 pseen.add(mk)
                 preds.append((mk, ast))
             return
@@ -286,7 +370,10 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
             add_piece(sum(1 << j for j, (a, p) in enumerate(zip(vec, prov)) if a in p[k]), ("copy", k, ast), ("copy", k))
         if vec in goals:
             for k, idx_ast, op in goals[vec]:
-                raise sc.Done(("found", ("linked", k, idx_ast, op, ast)), None)
+                if collecting:
+                    append_candidate(("linked", k, idx_ast, op, ast))
+                else:
+                    raise sc.Done(("found", ("linked", k, idx_ast, op, ast)), None)
         if len(values) < MAX_VALUES:
             values.setdefault(vec, ast)
         for k in keys:
