@@ -42,9 +42,9 @@ def emit(path, row):
 
 
 def capture(args):
-    if not args.names:
-        raise SystemExit("Explicit --names required; do not silently expand scope.")
-    names = set(args.names.split(","))
+    if not args.names and not args.names_file:
+        raise SystemExit("Explicit --names or --names-file required; do not silently expand scope.")
+    names = set(json.loads(pathlib.Path(args.names_file).read_text())) if args.names_file else {args.names}
     if args.mode == "capture-lr":
         import env_listroutines as E
         import active_dev as dev
@@ -61,7 +61,9 @@ def capture(args):
         if not names <= (tasks.keys() & set(registry["selected"])):
             raise SystemExit("Fresh names must occur in both already-opened tasks and registry.")
         for name in names:
-            if canonical_sha(tasks[name]) != registry["task_sha256"][name]:
+            # Registry hashes were defined with json.dumps(sort_keys=True) defaults.
+            task_sha = hashlib.sha256(json.dumps(tasks[name], sort_keys=True).encode()).hexdigest()
+            if task_sha != registry["task_sha256"][name]:
                 raise SystemExit("TASK_SHA_MISMATCH " + name)
         jobs = [(name, tasks[name], int(hashlib.sha256(name.encode()).hexdigest(), 16) % 1000)
                 for name in sorted(names)]
@@ -157,7 +159,8 @@ def replay(args):
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("mode", choices=("capture-lr", "capture-fresh", "replay"))
-    p.add_argument("--names", help="Explicit comma-separated developer task IDs")
+    p.add_argument("--names", help="One explicit task ID (commas inside names are preserved)")
+    p.add_argument("--names-file", help="Existing JSON array of exact task IDs")
     p.add_argument("--out", required=True)
     p.add_argument("--input")
     p.add_argument("--tasks", help="Already-opened FRESH-dev task JSON, supplied locally")
