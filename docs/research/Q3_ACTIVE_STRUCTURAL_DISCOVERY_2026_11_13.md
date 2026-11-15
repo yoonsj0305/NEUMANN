@@ -1082,3 +1082,19 @@ table: `post_synthesis_first_failure.json`.
   (P0-C) and a causal fix (P0-D). Next single mechanism: choose among Updates equally consistent with the
   transitions by the initial examples' folds before committing (the alternatives already exist in `upd_alts`).
 V1 PASS (sealed), V2 independent OPEN, V3 FAIL, Q3 OPEN, Q6 untouched.
+
+## 32. Fold-aware Update selection: interface audit (2026-11-15) — DEVELOPMENT ONLY, no new runs
+
+* `upd_alts` is filled only by `synth_cover` (alternative case trees, for the answer component j = 0); `synth_multi`
+  returns its first fit; `synth_cells` (`lt.solve`, R2 cell construction) returns exactly one program and has no
+  interface for alternatives.
+* The 11 tasks' fixed-transition fits (section 29 replays): 10 are `cells` programs, 1 (`pow-k(k=4) | product`) a
+  `foldrI` expression from `synth_multi`. So for all 11, the in-run Update was produced by a synthesiser that offers
+  NO alternative transition-consistent candidates: fold-aware selection among alternatives has nothing to select
+  from on these tasks.
+* Directive CASE 2 (alternatives not generated): candidate selection is not developed further; the open question is
+  candidate GENERATION in the cell construction (several distinct cell programs consistent with the same
+  transitions, then the initial examples' folds to choose) — or, if the cell language cannot express a program that
+  folds correctly, the representation. Neither was tested in this session. `FOLD_AWARE_SELECTION` was not added.
+* CANDIDATE PASS / FOLD PASS / MACHINE PASS / DEVELOPMENT PASS: not reached (no experiment). GENERALIZATION OPEN.
+V1 PASS (sealed), V2 independent OPEN, V3 FAIL, Q3 OPEN, Q6 untouched.
