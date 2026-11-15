@@ -349,7 +349,8 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
     def add_piece(mk, node, key):
         equiv = (key, mk)
         ast = node[1] if node[0] == "value" else node[2]
-        if mk and len(pieces) < c4.MAX_PIECES and keep_equivalent(piece_signatures, equiv, ast):
+        allowed = (keep_equivalent(piece_signatures, equiv, ast) if collecting else equiv not in seen)
+        if mk and len(pieces) < c4.MAX_PIECES and allowed:
             seen.add(equiv)
             pieces.append((mk, node))
             if mk == full:
@@ -361,7 +362,8 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
     def take(vec, ast, t):
         if t == T_B:
             mk = sum(1 << k for k, b in enumerate(vec) if b)
-            if 0 < mk < full and len(preds) < c4.MAX_PREDS and keep_equivalent(pred_signatures, mk, ast):
+            allowed = (keep_equivalent(pred_signatures, mk, ast) if collecting else mk not in pseen)
+            if 0 < mk < full and len(preds) < c4.MAX_PREDS and allowed:
                 pseen.add(mk)
                 preds.append((mk, ast))
             return
