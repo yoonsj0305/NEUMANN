@@ -936,3 +936,15 @@ Full regression: 1148 passed, 53 skipped (repair modes off by default).
 
 V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched.
 Full regression: 1148 passed, 53 skipped (repair modes off by default).
+
+## 25. Gate E status (2026-11-15 03:23 UTC) — IN PROGRESS, no verdict
+
+* Code under test: `c43a427` (no code change since). Arms baseline / in-place / necessity on the 338 opened dev
+  tasks (FRESH-dev 110, list-routines 228), same seed, 30 CPU s, 60 queries per run.
+* The first launch stopped after 3 + 8 rows per arm (the runner processes were gone; no corrupt or duplicate rows).
+  Relaunched detached at 03:22 UTC; the runners skip rows already present, so only the missing tasks run. Expected
+  ~1.5–2 h. On completion the pipeline writes `docs/experiments/dev/gateE/summary.json` and commits it with the full
+  raw rows ("Q3 Gate E dev comparison").
+* Until that commit exists, Gate E is OPEN / INCONCLUSIVE. The analysis the directive asks for (semantic audit of
+  every new solve, per-stage cost, branch counts, first-wrong-decision analysis of losses) remains to be done on
+  the completed rows. V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched.
