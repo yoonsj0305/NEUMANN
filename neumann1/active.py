@@ -989,7 +989,8 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
     if REACH_TRAJ:                    # development (opt-in): observe the states the initial examples' folds reach
         trajs = [tuple(x) for (x,), _ in examples]
     extra = []                        # (u, e) points added by counterexamples
-    reach = {"pts": [], "log": [], "observed": [], "W": None, "degraded": False, "spent": 0, "fallback": None}
+    reach = {"pts": [], "log": [], "observed": [], "W": None, "degraded": False,
+             "spent": 0, "fallback": None, "synthesis_fallback_used": False}
     synthetic = list(trajs)
     if BUDGETED_REACH_TRAJ and REACH_MODE == "replace":
         trajs = []                    # policy E (replace): the budgeted reachable transitions instead of the synthetic
@@ -1854,6 +1855,23 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             # 2. Update per component, then joint verification on every initial example
             upd, asts, z, fails = attempt(trans, 0.25, capture=True)
             if upd is None:
+                # P0 experimental degraded mode: if E's reachable-only table
+                # cannot produce an Update, retry on the ORIGINAL synthetic
+                # trajectories once. It is a change of observation substrate,
+                # not a relaxation of the SOURCE or machine-verification gates.
+                # The ordinary E and A paths are unchanged unless explicitly
+                # enabled. Re-querying synthetic states still consumes the
+                # same global SOURCE and CPU limits.
+                if (E_SYNTH_FALLBACK and BUDGETED_REACH_TRAJ and REACH_MODE == "replace"
+                        and not trajs and not reach["synthesis_fallback_used"]
+                        and time.process_time() < deadline):
+                    reach["synthesis_fallback_used"] = True
+                    reach["fallback"] = "synthetic after reachable Update synthesis failure"
+                    reach["degraded"] = True
+                    reach["pts"].clear()
+                    trajs[:] = synthetic
+                    rec["events"].append("reachability synthesis fallback: synthetic trajectories")
+                    continue
                 rec["events"].append("no update for component %d" % len(asts))
                 act_ = choose("update not found", trans, len(examples))
                 if act_ == "invent" and (invent(trans, "update not found") or revise("update not found")):
@@ -2084,7 +2102,8 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                             "observed_transitions": reach["observed"], "fallback": reach["fallback"],
                             "candidates_considered": reach.get("considered", 0),
                             "excluded_already_observed_or_undefined": reach.get("excluded_known", 0),
-                            "not_selected": reach.get("not_selected", 0)}
+                            "not_selected": reach.get("not_selected", 0),
+                            "synthesis_fallback_used": reach["synthesis_fallback_used"]}
     return None, obs, rec
 
 
@@ -2099,6 +2118,7 @@ MIN_SYNTH_CPU = 0.0      # development: CPU floor for each main-round Update syn
 GOAL_UPDATE_SYNTH = False  # development ablation: goal-directed residual Update synthesis before the forward search
 REACH_TRAJ = False         # development (opt-in): state trajectories = the initial examples' own prefixes (their
                            # reachable fold states) instead of the synthetic ascending/descending/random ones
+E_SYNTH_FALLBACK = False  # development-only: retry original synthetic trajectories once when E's first reachable-table Update cannot be formed
 BUDGETED_REACH_TRAJ = False  # development (opt-in), policy E: the synthetic trajectories PLUS a budgeted, priority-
                              # selected subset of the initial examples' reachable transitions (REACH_BUDGET queries)
 REACH_BUDGET = 20          # development assumption (not a validated optimum): SOURCE queries policy E may spend
