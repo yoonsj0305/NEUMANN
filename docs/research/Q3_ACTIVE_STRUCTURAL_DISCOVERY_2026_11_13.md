@@ -1629,3 +1629,153 @@ This is a *degraded-mode intervention* against SECTION 36 CASE 2. It does not mo
 **Important limitations:** fallback is not guaranteed to recover A's successes because E has already spent resources observing reachable states, and the resumed synthetic search receives only the remaining budget. Neither independent performance nor 84-task net gain nor actual cost advantage has been measured for this intervention. Do not call this CAUSAL DEVELOPMENT PASS. The next experiment requires a NEW preregistered evaluation set: freeze all code and policy parameters, run matched A / E / E+fallback / E+fallback+10s-floor arms on new opened development tasks, and inspect both gains and regressions with actual `time.process_time()`. The additional CPU-floor option must be accounted as reallocation within, not an extension beyond, total formation deadline. Retain original semantics checks and challenge.
 
 **Official gate unchanged:** V1 PASS (sealed), V2 independent OPEN, V3 FAIL, Q3 OPEN; Q6 untouched.
+
+
+## 38. CASE-2 recovery on a pre-registered new evaluation set (2026-11-15) — DEVELOPMENT ONLY
+
+Directive "Q3 CASE-2 Recovery & Independent Transfer". Question: does the section 37 synthetic fallback remove E's
+Update-synthesis regressions while keeping E's SOURCE economy, and does any E-family arm solve more than A within the
+same 30 CPU s and 60 SOURCE queries? Constraints: no candidate expansion, no new grammar, no increase of the total
+CPU cap. All CPU figures are real `time.process_time()`. Raw evidence: `docs/experiments/dev/case2_recovery/`.
+
+### 38.1 Fallback check (P0-A)
+
+* **Code review of `E_SYNTH_FALLBACK`** (`85fa80a`, `5f2d517`, by another session):
+  * It fires once per machine, only when E's reachable-only table (replace mode, synthetic trajectories still
+    unused) returns no Update in a main-round attempt before the formation deadline.
+  * It restores the synthetic trajectories and clears only the active reachable points. Paid observations, cache
+    and audit log are kept.
+  * After it fires, E's stage 1 and stage 2 are off. The SOURCE and CPU caps are unchanged, and so are the
+    challenge, repair and the synthesiser.
+* **Tests and CI.** Locally the Q3 test files pass (32 / 32, Python 3.11, CI pins), including the new fallback test.
+  CI on the base `5f2d517`: all four checks pass (CI, sequence experiment, receipt contracts, and the
+  reproduction of the section 35 evidence).
+* **Functional debug, NOT counted.** On the two section 36 regression tasks (`keep-mod-k(k=2) | pow-k(k=3)`,
+  `remove-mod-k(k=3) | add-k(k=-2)`; already used, so debugging only):
+  * E fails both again ("no update for component 0" in both machines);
+  * EFb and EFbc recover both: the fallback fires once, round 1 folds every example, the challenge passes, and the
+    random diagnostic inputs are 298 / 298 correct, with 23–24 formation queries;
+  * EFbc spends 10.8–11.5 s of prefix-machine CPU against EFb's 4.8–6.1 s, because the 10 s floor is first spent on
+    the failing reachable table.
+
+### 38.2 New evaluation set (P0-B), committed in `f9a14d7` before any run on it
+
+`research/q3/case2_eval_set_dev.py`; `eval_set.json`, `prereg.json`.
+* **24 new two-routine compositions** of the independent author's routines (same lineage):
+  * the composition rule of `env_listroutines.tasks()`, with the seed string `compose:neumann-q3-case2-eval-v1`;
+  * the existing 228 names are excluded;
+  * the unchanged Env and input generator (8 initial examples, 10 hidden tests);
+  * output-type quotas proportional to the existing 120 compositions: L 18, I 4, B 2 (29 candidates drawn).
+* **12 regression tasks:** Gate E-solved and never used in a policy-E experiment, first 12 by a salted hash.
+* Each task's name and the SHA-256 of {name, train, test} were committed before any run. The hidden tests enter only
+  the hash.
+* The counts are a development design assumption with no statistical power claim. The tasks share the list-routines
+  lineage, so success would not show transfer to another problem domain.
+
+**Arms (frozen in `prereg.json`), each with 30 CPU s and 60 SOURCE queries:**
+
+| arm | observation | synthesis-failure fallback | per-round synthesis floor |
+|---|---|---|---|
+| A | synthetic trajectories | — | 0 |
+| E | budgeted reachability (section 36, frozen) | — | 0 |
+| EFb | budgeted reachability | once per machine | 0 |
+| EFc | budgeted reachability | — | 10 s (a reallocation inside the formation deadline) |
+| EFbc | budgeted reachability | once per machine | 10 s |
+
+Verified solve = the hidden test passed AND every random diagnostic SOURCE input correct. The first pass is all
+5 arms × 36 tasks on the base seed. Every task whose verified outcome differs between arms was rerun twice more on
+the same seed and on seeds 1 and 2, for all 5 arms.
+
+### 38.3 First pass: 5 arms × 36 tasks, base seed (`run1_all36_5arms.jsonl`)
+
+| arm | verified new 24 | verified regression 12 | hidden-test solved (36) | challenge passed | formation SOURCE queries | reach queries | first-Update success (machines) | fallback runs / then verified | total CPU s | formation CPU s | CPU s per verified solve |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| A | 14 | 11 | 26 | 22 | 976 | 0 | 34 / 53 | 0 / 0 | 697.1 | 251.9 | 27.9 |
+| E | 15 | 11 | 26 | 19 | 951 | 586 | 30 / 51 | 0 / 0 | 691.2 | 228.1 | 26.6 |
+| EFb | 15 | 11 | 27 | 20 | 1108 | 586 | 29 / 51 | 11 / 4 | 700.5 | 249.2 | 26.9 |
+| EFc | 16 | 11 | 27 | 19 | 936 | 579 | 32 / 49 | 0 / 0 | 714.0 | 276.4 | 26.4 |
+| EFbc | 16 | 11 | 27 | 18 | 942 | 538 | 31 / 43 | 9 / 4 | 718.1 | 280.5 | 26.6 |
+
+* **No arm has a verified loss against A in this pass.** Every arm verifies 11 of the 12 regression tasks. The 12th,
+  `identify-k(k=1) | kth-smallest(k=2)`, is semantically wrong in every arm that passes its hidden test (231–233 of
+  234 random inputs), so it counts for nobody.
+* **The fallback fired in 11 EFb runs and 9 EFbc runs, and changed no verified outcome.** On every task where it fired,
+  A and E already had the same verified result. The section 36 regression type — A solves, E fails because its
+  reachable-only table yields no Update — occurred on none of the 36 tasks.
+* **Formation SOURCE queries:** the fallback raises EFb's to 1 108, against A's 976, because after a fallback the
+  synthetic states are observed in addition to the reachable ones already paid for. The floor arms use fewer:
+  EFc 936, EFbc 942.
+
+### 38.4 Replication of every task whose outcome differed (3 same-seed runs + seeds 1 and 2)
+
+Raw rows: `changed3_runs2_3.jsonl`, `changed3_seeds1_2.jsonl`. Verified solves over 5 runs:
+
+| task | A | E | EFb | EFc | EFbc | A + floor (post hoc, not in the pre-registered verdict) |
+|---|---|---|---|---|---|---|
+| `rotate-k(k=1) \| intersperse-k(k=0)` (new) | 1 / 5 | **5 / 5** | **5 / 5** | **5 / 5** | **5 / 5** | 1 / 5 |
+| `mult-k(k=10) \| rotate-k(k=-2)` (new) | 0 / 5 | 1 / 5 | 1 / 5 | **5 / 5** | **5 / 5** | 5 / 5 |
+| `identify-k(k=1) \| kth-smallest(k=2)` (regression) | 0 / 5 (4 wrong hidden-test passes) | 0 / 5 (2) | 0 / 5 (4) | 0 / 5 (0) | 0 / 5 (0) | — |
+
+Every verified solve is correct on all random inputs: 297 / 297 and 270 / 270.
+
+Attribution:
+* **`rotate-k(k=1) | intersperse-k(k=0)`: the reachable observation.** Every E arm solves it 5 / 5; A and A + floor
+  solve it 1 / 5. A's machine passes the challenge but fails the hidden test, so the challenge did not catch A's
+  wrong Update.
+* **`mult-k(k=10) | rotate-k(k=-2)`: the CPU floor alone.** A + floor solves it 5 / 5, and E without the floor 1 / 5.
+* **`identify-k(k=1) | kth-smallest(k=2)`:** the fallback restores the hidden-test pass rate (E 2 / 5, EFb 4 / 5,
+  A 4 / 5), but the recovered program is wrong. This is the case where too few counterexamples let a wrong Update be
+  adopted.
+
+### 38.5 Verdicts (P0-E)
+
+* **REGRESSION RECOVERY PASS: not established on independent evidence.**
+  * The pre-registered set contains no instance of the section 36 regression type, so the fallback had nothing to
+    recover. It fired 11 times without changing a verified outcome.
+  * It introduced no new regression: EFb has 0 verified losses against A, and 11 / 12 on the regression set, like A.
+  * The mechanism itself works on the two section 36 cases (2 / 2 recovered, challenge passed, 298 / 298), but those
+    tasks were used to build the fallback, so they are not counted.
+* **CAUSAL DEVELOPMENT PASS: reached on development data, narrowly.** The pre-registered criterion — more verified
+  solves than A on the 24 new compositions, robust over the replicates, with no robust verified regression on the 36
+  tasks — is met by:
+  * **EFc and EFbc: +2** (5 / 5 vs ≤ 1 / 5 on two tasks);
+  * **E and EFb: +1**.
+  The post-hoc A + floor runs show that the second EFc / EFbc task is solved by the floor alone. So the gain
+  attributable to E's reachable observation is 1 task; the floor contributes 1 more on A or E alike. 24 tasks in the
+  same lineage; no statistical claim.
+* **EFFICIENCY PASS: not established.**
+  * Every E arm has accuracy ≥ A's (26–27 vs 25 verified).
+  * Total real CPU is equal within ±3 %: E 691 s (−0.8 %), EFb 701 (+0.5 %), EFc 714 (+2.4 %), EFbc 718 (+3.0 %),
+    against A's 697. The only reduction, E's −0.8 %, is within run-to-run variation.
+  * CPU per verified solve is 4–5 % lower in every E arm (26.4–26.9 vs 27.9 s), but only because there are more
+    solves at about the same total.
+  * Formation SOURCE queries: E −2.6 %, EFc −4.1 %, EFbc −3.5 %, EFb +13.5 %.
+  Accuracy and cost are recorded separately as directed; no cost improvement is claimed.
+* **GENERALIZATION: OPEN.** All tasks are in the same list-routines lineage.
+
+### 38.6 The single bottleneck addressed (P0-F): exact memoisation inside the cover
+
+* **Where the remaining failures are.** No verified regression remains to diagnose. Of the 8 new tasks that no arm
+  solves, 6 have the same first failure in E: no Update on the first observed table (CASE 2). The floor also
+  repeatedly turned a missed first fit into a solve.
+* **What dominates synthesis time.** Profiling the unchanged synthesiser on a captured E table where it needs a 10 s
+  cap (`rotate-k(k=3)`, `cover_memo_extra_table_rotate3_E.json`):
+  * 31 % of the time is in `cells._cover`;
+  * 2.1 s of 9.7 s is one linear scan, "the first piece whose coverage contains a mask", repeated from scratch at every
+    enumeration level although the piece list only grows by appending.
+  This is duplicate search over the same structure, not candidate order and not state representation.
+* **The fix (opt-in, default off): `latent.COVER_MEMO`.** It memoises, within one construction, the first covering
+  piece of each mask, scanning only pieces appended since the last lookup. This is exact on the default first-fit path
+  (`_cover_memo` = `cells._cover` with the scans replaced). No candidate, grammar or budget change.
+* **Check** (`research/q3/cover_memo_check_dev.py`, `cover_memo_check.jsonl`) on the 10 section 31 tables and the
+  captured E table:
+  * identical programs on 11 / 11 tables under the deterministic virtual clock, and the same AST 11 / 11 at real caps
+    of 10 s and 40 s;
+  * real CPU to the first fit −15 % (20.8 → 17.7 s at the 10 s cap; 21.2 → 18.0 s at 40 s, summed over the tables);
+  * at the 5 s cap, 9 vs 9 fits — the speed-up is not yet enough to change fits at the official per-round share.
+  * A test (`tests/test_fold_reach.py`) checks that the default is off and that the program is identical.
+  This gain was measured on fixed tables only. Its machine-level effect needs a new pre-registered set: the 36 tasks
+  here are now used.
+
+V1 PASS (sealed), V2 independent OPEN, V3 FAIL, Q3 OPEN, Q6 untouched. No FRESH / FORMAL seal opened; earlier tasks
+are not re-counted; no per-task code; PR #780 stays Draft.
