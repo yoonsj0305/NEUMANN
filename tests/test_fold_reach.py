@@ -63,3 +63,26 @@ def test_fold_constrained_search_repairs_a_frozen_fold_failure_deterministically
     assert info["source"] == "reach" and info["accepted"]
     assert F.machine_errors(snap, [g], z, examples) == 0
     assert all(g(i) == y for i, y in rows)            # the observed transitions stay hard constraints
+
+
+def test_budgeted_reachability_policy_is_off_by_default_and_respects_its_budget():
+    """Policy E: only prefixes of the GIVEN initial examples, at most REACH_BUDGET charged SOURCE queries."""
+    assert ac.BUDGETED_REACH_TRAJ is False and ac.REACH_TRAJ is False and ac.QUERY_HOOK is None
+    spec = next(s for s in E.tasks() if s.name == "rotate-k(k=1) | identify-geq-k(k=2)")
+    env = E.Env(spec, 0, budget=60)
+    initial = [tuple(x) for (x,), _ in env.initial()]
+    calls = []
+    old = (ac.BUDGETED_REACH_TRAJ, ac.QUERY_HOOK)
+    ac.BUDGETED_REACH_TRAJ, ac.QUERY_HOOK = True, calls.append
+    ac._REACH_SPENT[0] = 0
+    try:
+        _, _, rec = ac.form_machine(env, env.initial(), time.process_time() + 6, 55, "prefix",
+                                    __import__("random").Random(0))
+    finally:
+        ac.BUDGETED_REACH_TRAJ, ac.QUERY_HOOK = old
+    reach = rec["reach"]
+    assert 0 < reach["spent"] <= ac.REACH_BUDGET
+    charged = [c["x"] for c in calls if c["tag"] == "reach" and not c["hit"]]
+    assert len(set(charged)) == reach["spent"]
+    assert all(any(x == y[:len(x)] for y in initial) for x in charged)       # only initial-example prefixes
+    assert all(c["actual_cost"] == c["est_cost"] for c in reach["plan"] if c.get("actual_cost") is not None)

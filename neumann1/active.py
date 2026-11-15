@@ -911,9 +911,13 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
     memo = {tuple(x): y for (x,), y in examples}
     tag, qp = ["states"], {}
     rec["query_purpose"] = qp
+    qctx = [None]                     # (prefix, continuation) of the state component being read (instrumentation)
 
     def F(u):
         u = tuple(u)
+        if QUERY_HOOK is not None:    # development instrumentation only: every call, cached or charged
+            QUERY_HOOK({"tag": tag[0], "x": u, "hit": u in memo, "ctx": qctx[0], "direction": direction,
+                        "W": [list(w) for w in W], "used": env.used})
         if u in memo:
             return memo[u]
         if env.used >= qlimit:
@@ -932,7 +936,12 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
     W = [()]
 
     def S(u):
-        return tuple(F(cont(u, w)) for w in W)
+        out = []
+        for w in W:
+            qctx[0] = (tuple(u), tuple(w))
+            out.append(F(cont(u, w)))
+        qctx[0] = None
+        return tuple(out)
 
     # invented state variables computed from the input itself (no query): folds h' = G(h, e) from z
     acc = []
@@ -980,6 +989,11 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
     if REACH_TRAJ:                    # development (opt-in): observe the states the initial examples' folds reach
         trajs = [tuple(x) for (x,), _ in examples]
     extra = []                        # (u, e) points added by counterexamples
+    reach = {"pts": [], "log": [], "observed": [], "W": None, "degraded": False, "spent": 0, "fallback": None}
+    synthetic = list(trajs)
+    if BUDGETED_REACH_TRAJ and REACH_MODE == "replace":
+        trajs = []                    # policy E (replace): the budgeted reachable transitions instead of the synthetic
+                                      # trajectories (restored below -- the existing path -- if E cannot observe enough)
 
     def points():
         pts = []
@@ -989,7 +1003,105 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             for e in seq:
                 pts.append((u, e))
                 u = step_input(u, e)
+        if BUDGETED_REACH_TRAJ:       # only reachable points whose every state component is already observed
+            pts += [(u, e) for u, e in reach["pts"]
+                    if all(cont(u, w) in memo for w in W) and all(cont(step_input(u, e), w) in memo for w in W)]
         return pts + extra
+
+    def reach_candidates():
+        """Policy E: candidate transitions from the GIVEN initial examples only (their prefixes and elements)."""
+        init = getattr(env, "initial", None)
+        xs = [tuple(x) for (x,), _ in (init() if init else examples)]
+        out, seen_v = [], set()
+        for j, x in enumerate(xs):
+            u = ()
+            for i, e in enumerate(x if direction == "prefix" else x[::-1]):
+                v = step_input(u, e)
+                if v not in seen_v:
+                    seen_v.add(v)
+                    shared = sum(1 for y in xs if (y[:len(v)] == v if direction == "prefix" else
+                                                   (len(v) <= len(y) and y[len(y) - len(v):] == v)))
+                    out.append({"example": j, "step": i, "u": u, "e": e, "v": v, "shared": shared})
+                u = v
+        return out
+
+    def reach_known():
+        """Input-side coverage of what is observed or already planned: parent lengths, elements, (element, length)."""
+        lens_, elems_, el_len = set(), set(), set()
+        for u, e in points() + reach["pts"]:
+            lens_.add(len(u))
+            elems_.add(e)
+            el_len.add((e, len(u)))
+        return lens_, elems_, el_len
+
+    def reach_execute(stage, plan):
+        """Query the planned states (priorities were fixed before any of these answers); never past the budget."""
+        for c in plan:
+            need = [x for x in dict.fromkeys(cont(c["u"], w) for w in W) if x not in memo] + \
+                   [x for x in dict.fromkeys(cont(c["v"], w) for w in W) if x not in memo]
+            need = list(dict.fromkeys(need))
+            c["actual_cost"] = None
+            if len(need) > REACH_BUDGET - _REACH_SPENT[0]:
+                c["skipped"] = "budget"
+                reach["degraded"] = True
+                continue
+            q0, tag0 = env.used, tag[0]
+            tag[0] = "reach"
+            try:
+                for x in need:
+                    F(x)
+            finally:
+                tag[0] = tag0
+            c["actual_cost"] = env.used - q0
+            _REACH_SPENT[0] += env.used - q0
+            reach["spent"] += env.used - q0
+            reach["pts"].append((c["u"], c["e"]))
+            a, b = S(c["u"]), S(c["v"])
+            c["usable"] = None not in a and None not in b
+            if c["usable"]:
+                import hashlib
+                c["transition_sha"] = hashlib.sha256(repr((a, c["e"], b)).encode()).hexdigest()[:16]
+                reach["observed"].append(c["transition_sha"])
+        reach["log"] += [{k: (list(v) if isinstance(v, tuple) else v) for k, v in c.items()} for c in plan]
+
+    def reach_plan(stage, cands, base_gain, min_gain):
+        """Greedy expected-information / marginal-SOURCE-cost selection from input-side signals only."""
+        lens_, elems_, el_len = reach_known()
+        planned, plan, left = set(), [], REACH_BUDGET - _REACH_SPENT[0]
+        done_ = set(reach["pts"])
+        # never twice, and never a transition whose state is already known to be undefined (blocked / invalid)
+        pool_ = [c for c in cands if (c["u"], c["e"]) not in done_ and
+                 not any(memo.get(cont(y, w), 0) is None for y in (c["u"], c["v"]) for w in W)]
+        reach["considered"] = reach.get("considered", 0) + len(cands)
+        reach["excluded_known"] = reach.get("excluded_known", 0) + len(cands) - len(pool_)
+        while pool_ and left > 0:
+            best = None
+            for c in pool_:
+                need = {x for x in [cont(c["u"], w) for w in W] + [cont(c["v"], w) for w in W]
+                        if x not in memo and x not in planned}
+                f = {"new_length": len(c["u"]) not in lens_, "new_element": c["e"] not in elems_,
+                     "conflict_probe": c["e"] in elems_ and (c["e"], len(c["u"])) not in el_len,
+                     "shared": c["shared"] - 1, "path_gap": base_gain > 0}
+                g = 2 * f["new_length"] + 2 * f["new_element"] + f["conflict_probe"] + f["shared"] + base_gain
+                cost = len(need)
+                key = (g / max(cost, 0.5), g, -c["example"], -c["step"])
+                if g >= min_gain and cost <= left and (best is None or key > best[0]):
+                    best = (key, c, f, g, cost, need)
+            if best is None:
+                break
+            _, c, f, g, cost, need = best
+            pool_.remove(c)
+            c.update({"stage": stage, "features": f, "gain": g, "est_cost": cost})
+            plan.append(c)
+            planned |= need
+            left -= cost
+            lens_.add(len(c["u"]))
+            elems_.add(c["e"])
+            el_len.add((c["e"], len(c["u"])))
+        if pool_ and left <= 0:
+            reach["degraded"] = True
+        reach["not_selected"] = reach.get("not_selected", 0) + len(pool_)
+        return plan
 
     virt = {"value": None, "tried": []}
 
@@ -1701,6 +1813,18 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             if time.process_time() > deadline:
                 rec["events"].append("deadline")
                 break
+            if BUDGETED_REACH_TRAJ and reach["W"] != len(W):
+                # stage 1 (round 0, and again after W grows): coverage of the reachable region, before any Update
+                reach["W"] = len(W)
+                tag[0] = "states"
+                if _REACH_SPENT[0] < REACH_BUDGET:
+                    reach_execute(1, reach_plan(1, reach_candidates(), 0, 2))
+                n_av = len(points()) - len(extra) - sum(len(x) for x in trajs)
+                if n_av < 3 and not trajs:
+                    # degraded mode: too few reachable transitions within the budget -> the existing path
+                    trajs[:] = synthetic
+                    reach["fallback"] = "synthetic trajectories (%d reachable transitions observed)" % n_av
+                    rec["events"].append("reachability budget: fallback to the synthetic trajectories")
             trans = transitions()
             if rnd == 0:                      # pre-formation evidence: contradictions in the first transition table
                 gq = {}
@@ -1860,6 +1984,33 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             if len(fail_hist) >= 3 and fail_hist[-1] >= fail_hist[-3] and len(fails) * 2 >= len(examples) \
                     and choose("no progress", trans, len(fails)) == "invent" and invent(trans, "no progress"):
                 continue
+            if BUDGETED_REACH_TRAJ and _REACH_SPENT[0] < REACH_BUDGET:
+                # stage 2 (an Update exists and folds examples wrongly): on each failing example, the first step
+                # whose PREDICTED (state, element) pair was never observed -- chosen before its answer is seen
+                pairs = {(a_, e_) for (a_, e_), b_, u_ in trans}
+                cands2 = []
+                init_ = getattr(env, "initial", None)
+                init_x = {tuple(x_) for (x_,), _ in (init_() if init_ else examples)}
+                for (x_,), y_ in examples:
+                    if tuple(x_) not in {tuple(f_) for f_ in fails} or tuple(x_) not in init_x:
+                        continue                  # candidates come from the GIVEN initial examples only
+                    seq_ = tuple(x_) if direction == "prefix" else tuple(x_)[::-1]
+                    st_, u_ = z, ()
+                    for i_, e_ in enumerate(seq_):
+                        if st_ is None or None in st_:
+                            break
+                        v_ = step_input(u_, e_)
+                        if (st_, e_) not in pairs:
+                            cands2.append({"example": -1, "step": i_, "u": u_, "e": e_, "v": v_, "shared": 1})
+                            break
+                        st_ = tuple(g(st_ + (e_,)) for g in upd)
+                        u_ = v_
+                plan2 = reach_plan(2, cands2, 3, 3)
+                reach_execute(2, plan2)
+                got2 = sum(1 for c in plan2 if c.get("usable"))
+                if got2:
+                    rec["events"].append("reachability: %d path-gap transitions observed" % got2)
+                    continue
             # 3. counterexample: binary search for the first step leaving the true states, add that point
             tag[0] = "localise"
             x = tuple(fails[0])
@@ -1927,6 +2078,13 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                 break
     except Exhausted:
         rec["events"].append("query limit")
+    finally:
+        if BUDGETED_REACH_TRAJ:
+            rec["reach"] = {"spent": reach["spent"], "degraded": reach["degraded"], "plan": reach["log"],
+                            "observed_transitions": reach["observed"], "fallback": reach["fallback"],
+                            "candidates_considered": reach.get("considered", 0),
+                            "excluded_already_observed_or_undefined": reach.get("excluded_known", 0),
+                            "not_selected": reach.get("not_selected", 0)}
     return None, obs, rec
 
 
@@ -1941,6 +2099,12 @@ MIN_SYNTH_CPU = 0.0      # development: CPU floor for each main-round Update syn
 GOAL_UPDATE_SYNTH = False  # development ablation: goal-directed residual Update synthesis before the forward search
 REACH_TRAJ = False         # development (opt-in): state trajectories = the initial examples' own prefixes (their
                            # reachable fold states) instead of the synthetic ascending/descending/random ones
+BUDGETED_REACH_TRAJ = False  # development (opt-in), policy E: the synthetic trajectories PLUS a budgeted, priority-
+                             # selected subset of the initial examples' reachable transitions (REACH_BUDGET queries)
+REACH_BUDGET = 20          # development assumption (not a validated optimum): SOURCE queries policy E may spend
+REACH_MODE = "replace"     # policy E variant: "replace" the synthetic trajectories, or "augment" them
+_REACH_SPENT = [0]         # policy E queries spent in the current run (reset by run_arm; shared by its machines)
+QUERY_HOOK = None          # development instrumentation: called with every formation-state query call (cached or not)
 FOLD_REACH_SYNTH = False   # development (opt-in): reachability-guided, fold-constrained cell synthesis of the last
                            # list component (synth_cells_fold); off = the legacy first fit, unchanged
 REPAIR = False           # counterexample-guided repair: True = re-form (6e15f35), "inplace" = local re-synthesis of a refuted machine (the compared condition)
@@ -2005,6 +2169,7 @@ def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
     rng = random.Random(seed)
     _DEC[0] = 0
     QSEL[0] = 0
+    _REACH_SPENT[0] = 0
     c0 = time.process_time()
     deadline = c0 + cap
     ex = env.initial()
