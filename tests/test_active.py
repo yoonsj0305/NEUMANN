@@ -76,3 +76,25 @@ def test_goal_directed_update_synthesizes_an_unseen_residual_relation():
     assert all(g(inputs) == expected for inputs, expected in rows)
     assert g((12, -3)) == 6
     assert g((-4, 5)) == 6
+
+
+def test_list_update_delta_synthesizes_append_and_prepend():
+    """One-element structural deltas become executable list Update programs."""
+    import time
+    from neumann1 import invention_core as ic
+
+    cases = [((), 2), ((3,), 1), ((3, 2), -1), ((), -3),
+             ((2, 4, 6), 5), ((0, 0), 0), ((9, 8), 7)]
+    for mode in ("append", "prepend"):
+        rows = []
+        for old, e in cases:
+            goal = old + (2 * e,) if mode == "append" else (2 * e,) + old
+            rows.append(((old, e), goal))
+        g, ast = ac.synth_list_delta_update(
+            (ic.T_L, ic.T_I), rows, time.process_time() + 8)
+        assert g is not None and ast is not None
+        assert all(g(inp) == goal for inp, goal in rows)
+        if mode == "append":
+            assert g(((7, 9), 4)) == (7, 9, 8)
+        else:
+            assert g(((7, 9), 4)) == (8, 7, 9)
