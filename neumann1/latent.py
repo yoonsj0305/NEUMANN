@@ -303,8 +303,12 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
     collecting = cfg.candidate_limit > 1 and depth == 0
     collected = cfg.collected_candidates if collecting else None
     seen_candidates = set()
+    seen_candidate_probes = set()
     coord_types = coords_types(task, cfg)
     probes = probe_cells(pts, coord_types) if collecting else []
+    # Candidate-level probes are perturbed, already-observed Update inputs.
+    # These are diagnostic states, not independently verified SOURCE answers.
+    task_probes = probe_cells([i for i, _ in train], task["in_types"]) if collecting else []
     piece_signatures, pred_signatures = {}, {}
 
     def signature(ast):
@@ -340,7 +344,11 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
             return None
         if not all(run(sol, lib, inputs, task) == expected for inputs, expected in task["train"]):
             return None
+        probe_sig = tuple(repr(run(sol, lib, inputs, task)) for inputs in task_probes)
+        if probe_sig in seen_candidate_probes:
+            return None
         seen_candidates.add(key)
+        seen_candidate_probes.add(probe_sig)
         collected.append(sol)
         if len(collected) >= cfg.candidate_limit:
             raise sc.Done(("candidate_limit", None), None)
@@ -349,8 +357,10 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
     def add_piece(mk, node, key):
         equiv = (key, mk)
         ast = node[1] if node[0] == "value" else node[2]
+        if not mk or len(pieces) >= c4.MAX_PIECES:
+            return
         allowed = (keep_equivalent(piece_signatures, equiv, ast) if collecting else equiv not in seen)
-        if mk and len(pieces) < c4.MAX_PIECES and allowed:
+        if allowed:
             seen.add(equiv)
             pieces.append((mk, node))
             if mk == full:
@@ -362,8 +372,10 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
     def take(vec, ast, t):
         if t == T_B:
             mk = sum(1 << k for k, b in enumerate(vec) if b)
+            if not 0 < mk < full or len(preds) >= c4.MAX_PREDS:
+                return
             allowed = (keep_equivalent(pred_signatures, mk, ast) if collecting else mk not in pseen)
-            if 0 < mk < full and len(preds) < c4.MAX_PREDS and allowed:
+            if allowed:
                 pseen.add(mk)
                 preds.append((mk, ast))
             return
@@ -396,7 +408,11 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
                 if any((f(a, b) if kk == 1 else f(b, a)) != y for a, b, y in zip(known, w, ys_)):
                     continue
                 if w in values:
-                    raise sc.Done(("found", ("linked", k, ast, (name, kk), values[w])), None)
+                    node = ("linked", k, ast, (name, kk), values[w])
+                    if collecting:
+                        append_candidate(node)
+                    else:
+                        raise sc.Done(("found", node), None)
                 if len(goals) < MAX_GOALS and w not in goals:
                     goals[w] = [(k, ast, (name, kk))]
                     order.append(w)
