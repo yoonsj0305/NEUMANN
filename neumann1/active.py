@@ -1661,6 +1661,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
 SELFTEST = 3      # self-test queries per formed machine (at most 3 repairs) before it is returned
 MAX_ACC = 3       # invented variables per machine
 ACTION_MODE = "invent"   # D's fixed decision at a discovery branch point ("repair": the counterfactual arm)
+REPAIR_EXTRA_CPU = 0.0   # DIAGNOSTIC ONLY: extra CPU for the repair re-synthesis (never in an official run)
 REPAIR = False           # counterexample-guided repair of a refuted machine (the compared condition)
 QUERY_SCHEDULE = {}      # {self-test query index: "alt"} -- the second candidate instead of the first
 QSEL = [0]
@@ -1780,7 +1781,10 @@ def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
                     x_, y_ = tuple(cx[0]["input"]), cx[0]["answer"]
                     y_ = tuple(y_) if isinstance(y_, list) else y_
                     keep = mrec.get("accumulators") or []
-                    m2, mobs2, mrec2 = form_machine(env, ex + obs + [((x_,), y_)], f_end, f_q, direction, rng,
+                    r_end = max(f_end, time.process_time() + REPAIR_EXTRA_CPU)   # diagnostic only (default 0)
+                    obs_ = [o for o in obs if o[0][0] != x_]                     # the counterexample once only
+                    mrec["repair_budget"] = {"cpu_left": round(r_end - time.process_time(), 2), "queries_left": f_q - env.used}
+                    m2, mobs2, mrec2 = form_machine(env, ex + obs_ + [((x_,), y_)], r_end, f_q, direction, rng,
                                                     None, None, None, False, None, None, None, None, keep)
                     obs += mobs2
                     mrec["repair"] = {"counterexample": [list(x_), cx[0]["answer"]], "predicted": cx[0]["predicted"],

@@ -842,3 +842,23 @@ V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched.
 
 V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched.
 Full regression: 1148 passed, 53 skipped (with REPAIR off by default).
+
+## 21. Why the repair fails: diagnostic with extra CPU (2026-11-15) — DEVELOPMENT ONLY, not an official result
+
+* Code: the counterexample is added once (duplicates removed from the observations); the repair records the CPU
+  and queries left when it starts; `REPAIR_EXTRA_CPU` (default 0, diagnostic only) gives the re-synthesis extra CPU.
+  Raw: `docs/experiments/dev/q3_repair_diagnostic_dev_2026_11_15.jsonl`.
+
+| task | repair started with | extra CPU | outcome of the re-formation (same representation kept) | cause |
+|---|---|---|---|---|
+| `mbpp/366` | 0.29 s, 31 queries | 0 | rounds 0–2, failing 15 → 11 → 20 examples, deadline | CPU |
+| `mbpp/366` | 20 s, 31 queries | 20 | counterexample not localisable → kept `h' = e` REJECTED by its own repair loop → no Update → query limit | search (the re-formation threw the right variable away) |
+| `mbpp/670` (alt. trajectory) | 20 s, 20 queries | 20 | rounds 10–12, failing 7 → 4 → 4, deadline | CPU even with 20 extra s, then queries |
+| `identify-k(k=-2)` (alt.) | 26 s, 4 queries | 20 | query limit (kept accumulator list was empty: a continuation-state machine) | queries |
+
+None repaired. With CPU no longer the binding limit the re-formation still failed: it re-runs the whole
+localise / invent / repair loop, spends queries on it, and in `mbpp/366` rejects the very variable it was told to
+keep. This confirms the directive's premise: re-forming with `prior_acc` is NOT an in-place repair. The in-place
+mechanism (re-synthesise only the conflicting Update from the stored transitions, keeping W, the transitions and
+the start) was NOT implemented in this session — it requires `form_machine` to return its internal state.
+Gates B–D not met. V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched.
