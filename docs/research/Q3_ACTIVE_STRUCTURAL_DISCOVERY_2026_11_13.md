@@ -975,3 +975,24 @@ within perturbation). Answer to "is NEUMANN smarter on new problems?": not demon
 Bottleneck: refuted-but-formed machines are rare (≤ 9 of 338 tasks), so repair cannot move the solve count; most
 failures happen before any machine is formed (sections 18–19: synthesis / search). Stage costs NOT MEASURED.
 V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched.
+
+## 27. Pre-formation failure causes (2026-11-15) — DEVELOPMENT ONLY, no new runs
+
+From the Gate E baseline rows (code `c43a427`; `docs/experiments/dev/gateE/preformation_causes.json`), the 138
+unsolved development tasks by the first cause visible in the record:
+
+| cause (directive §1 numbering) | tasks | list-routines / MBPP / HumanEval |
+|---|---|---|
+| 2 consistent state, no Update synthesised | **62** | 29 / 21 / 12 |
+| 4 queries exhausted | 27 | 14 / 10 / 3 |
+| 4 CPU exhausted | 12 | 4 / 5 / 3 |
+| 1/5 state undefined on short inputs | 12 | 11 / 1 / 0 |
+| 1 state insufficient (counterexample not localisable) | 10 | 7 / 2 / 1 |
+| 3 wrong candidate adopted first (refuted by the challenge) | 6 | 1 / 5 / 0 |
+| other (fold still failing at the end, etc.) | 9 | — |
+
+The dominant cause, in every lineage, is (2): the state is consistent on the observed transitions but no Update is
+found within the substrate and time — synthesis, not candidate choice (6 tasks) and not representation (the record
+cannot separate (2) from (5) when admissible structures exist; see section 16). The directive's candidate-selection
+improvement targets cause (3), 6 tasks; the larger lever is Update synthesis on consistent states (cause 2, 62
+tasks). Not done in this session: any algorithm change, causal experiment or dev-set extension. Q3 OPEN; V3 FAIL.
