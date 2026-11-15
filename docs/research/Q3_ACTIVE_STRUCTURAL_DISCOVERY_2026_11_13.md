@@ -1018,3 +1018,25 @@ the observed residual (the appended cell) and executed correctly on the hidden t
 the dev-set extension, regressions, semantics of the other tasks; on two MBPP tasks the residual stage consumed
 the CPU. DEVELOPMENT PASS not reached (one lineage); GENERALIZATION OPEN. V1 PASS (sealed), V2 independent OPEN,
 V3 FAIL, Q3 OPEN, Q6 untouched.
+
+## 29. Fixed-transition comparison of the Update synthesisers (code `cb5cb65`) — DEVELOPMENT ONLY
+
+* `tests/test_active.py` 9 passed. Snapshots of the first failed Update synthesis were captured for all 91 screen
+  candidates of `q3_update_snapshot_screen.json` (list-routines 42, FRESH-dev 49; FRESH tasks regenerated from the
+  opened registry with matching hashes; no sealed data opened); 41 + 48 distinct snapshots (by SHA-256). Each was
+  replayed WITHOUT any SOURCE query: baseline synthesiser vs goal-directed residual synthesiser, same table, types,
+  grammar and 5 CPU s each. Raw snapshots, replays, SHA256SUMS and summary: `docs/experiments/dev/update_snapshots/`.
+
+| family (snapshots) | residual only | both | neither | baseline only (regression) |
+|---|---|---|---|---|
+| list-routines (41) | 1: `pow-k(k=4)` | 11 | 29 | 0 |
+| FRESH-dev (48) | 1: `mbpp/940` | 0 | 47 | 0 |
+
+* SYNTHESIS PASS on 2 frozen transitions in two lineages: the residual synthesiser built an executable Update the
+  baseline synthesiser could not on the same table (`pow-k(k=4)`: append e⁴; `mbpp/940`: see `summary.json`).
+  No loss. These are component Update fits on fixed transitions, not solved tasks and not semantic verifications.
+* 11 list-routines snapshots are fitted by BOTH synthesisers given 5 s on the frozen table: there the Gate E
+  failure was not synthesis inability but the time available at that point of the run.
+* 76 of 89 snapshots are fitted by neither: the next bottleneck is Update synthesis/representation on these
+  transitions (not separated further here). DEVELOPMENT PASS (whole-task causal solves) not evaluated in this step.
+V1 PASS (sealed), V2 independent OPEN, V3 FAIL, Q3 OPEN, Q6 untouched.

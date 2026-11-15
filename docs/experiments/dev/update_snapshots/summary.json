@@ -1,0 +1,98 @@
+{
+ "lr": {
+  "variants": [
+   "baseline",
+   "residual"
+  ],
+  "snapshots": 41,
+  "categories": {
+   "neither": 29,
+   "both": 11,
+   "only_residual": 1
+  },
+  "new_only": [
+   [
+    "pow-k(k=4)",
+    [
+     "foldrL",
+     [
+      "cons",
+      [
+       "v",
+       2
+      ],
+      [
+       "v",
+       3
+      ]
+     ],
+     [
+      "cons",
+      [
+       "mul",
+       [
+        "mul",
+        [
+         "v",
+         1
+        ],
+        [
+         "mul",
+         [
+          "v",
+          1
+         ],
+         [
+          "v",
+          1
+         ]
+        ]
+       ],
+       [
+        "v",
+        1
+       ]
+      ],
+      [
+       "nil"
+      ]
+     ],
+     [
+      "v",
+      0
+     ]
+    ]
+   ]
+  ],
+  "lost": [],
+  "status": {
+   "ok": 82
+  },
+  "cpu": 341.1
+ },
+ "fresh": {
+  "variants": [
+   "baseline",
+   "residual"
+  ],
+  "snapshots": 48,
+  "categories": {
+   "neither": 47,
+   "only_residual": 1
+  },
+  "new_only": [
+   [
+    "mbpp/940",
+    [
+     "cells",
+     "<relcells m=(add $0 1) | ((not (lt $7 $4)) ? copy 0[(sub $0 1)] : ((lt $4 $5) ? value $4 : value (mod $5 (add $4 1))))>"
+    ]
+   ]
+  ],
+  "lost": [],
+  "status": {
+   "ok": 96
+  },
+  "cpu": 490.6
+ }
+}
