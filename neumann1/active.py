@@ -190,6 +190,55 @@ def synth_multi(in_types, out_type, rows, deadline, check=None, prior=None):
     return found[0] if found else (None, None)
 
 
+
+def synth_goal_update(in_types, out_type, rows, deadline, check=None):
+    """Goal-directed Update synthesis from SOURCE-observed transitions.
+
+    Reuse discovery_core.feature_search: derive a residual goal by inverting a
+    known state/input readout, synthesize the missing feature over a strict
+    subset of state components, and check the entire transition table.
+
+    Development-only alternative to the forward enumerator. No SOURCE queries,
+    task IDs, hidden tests, or learned per-task constants enter this function.
+    """
+    if out_type not in (T_I, T_B) or not rows or time.process_time() >= deadline:
+        return None, None
+    scopes = dc.scopes(in_types)
+    if not scopes:
+        return None, None
+    lib = _lib()
+    points = [("update", i, tuple(xs), y) for i, (xs, y) in enumerate(rows)]
+    state = {"kind": "update", "in_types": list(in_types),
+             "out_type": out_type, "points": points}
+    picked = points[:min(8, len(points))]
+    consts = ic.data_constants(rows)
+    inv = _inv()
+    for idx, scope in enumerate(scopes):
+        remaining = deadline - time.process_time()
+        if remaining <= 0:
+            break
+        slot = min(deadline, time.process_time() + remaining / (len(scopes) - idx))
+        try:
+            ast, _, _ = dc.feature_search(
+                lib, inv, state, picked, scope, slot, consts, ic.uniform_costs())
+            if ast is None:
+                continue
+            fn = ic.compile_ast(ic._tup(ast), len(in_types), lib)
+        except (ic.Fail, TypeError, KeyError, ValueError):
+            continue
+
+        def g(args, fn=fn):
+            try:
+                v = fn(tuple(args))
+            except (ic.Fail, RecursionError, TypeError, ValueError):
+                return None
+            return v if _type(v) == out_type else None
+
+        if all(g(xs) == y for xs, y in rows) and (check is None or check(g)):
+            return g, ast
+    return None, None
+
+
 MIN_SUPPORT = 2   # every branch of a case tree must explain at least this many observed transitions
 
 
@@ -951,6 +1000,11 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             g, ast = (None, None)
             if s_type == T_L:                 # list-valued components: the cell construction (R2) first
                 g, ast = synth_cells(in_t, rows[j], end)
+            if g is None and GOAL_UPDATE_SYNTH and s_type in (T_I, T_B):
+                # Equal outer CPU cap: spend part of the ordinary Update-search
+                # allotment on structural residual goals, not on more candidates.
+                r_end = min(end, time.process_time() + max(0.0, end - time.process_time()) * 0.5)
+                g, ast = synth_goal_update(in_t, s_type, rows[j], r_end)
             if g is None:
                 g, ast = synth_multi(in_t, s_type, rows[j], end)
             if g is None and s_type in (T_I, T_B):
@@ -1710,6 +1764,7 @@ MAX_ACC = 3       # invented variables per machine
 ACTION_MODE = "invent"   # D's fixed decision at a discovery branch point ("repair": the counterfactual arm)
 REPAIR_EXTRA_CPU = 0.0   # DIAGNOSTIC ONLY: extra CPU for the repair re-synthesis (never in an official run)
 _LAST = [None]           # internal state of the last formed machine (in-place repair)
+GOAL_UPDATE_SYNTH = False  # development ablation: goal-directed residual Update synthesis before the forward search
 REPAIR = False           # counterexample-guided repair: True = re-form (6e15f35), "inplace" = local re-synthesis of a refuted machine (the compared condition)
 QUERY_SCHEDULE = {}      # {self-test query index: "alt"} -- the second candidate instead of the first
 QSEL = [0]
