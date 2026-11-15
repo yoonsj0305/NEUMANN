@@ -1061,3 +1061,24 @@ V1 PASS (sealed), V2 independent OPEN, V3 FAIL, Q3 OPEN, Q6 untouched.
   Structural synthesis and generalisation: not addressed this round. Next bottleneck: what happens between a fitted
   first Update and a formed machine on these 10 tasks.
 V1 PASS (sealed), V2 independent OPEN, V3 FAIL, Q3 OPEN, Q6 untouched.
+
+## 31. Post-synthesis first failure on the 11 tasks (2026-11-15) — DEVELOPMENT ONLY
+
+Same seed, A = `MIN_SYNTH_CPU` 0 vs B = 5; the existing step events of `form_machine` (round results, no Update,
+self-test counterexample, invention, localisation, limits) give the path; no new instrumentation (so no change to
+queries or the random stream). Raw traces: `docs/experiments/dev/update_snapshots/post_synthesis_trace_lr11.jsonl`;
+table: `post_synthesis_first_failure.json`.
+
+* First failure (A): **10 / 11 "Update found, fold fails"** — the first round synthesises an Update that fits the
+  observed transitions but folds wrongly on 1–7 of the initial examples; 1 / 11 (`pow-k(k=4) | product`) "Update not
+  found in the run" (found with the floor in B, then the same fold failure). The final "no informative continuation"
+  is the end of the repair that follows: the counterexample loop cannot turn the wrong-but-consistent first Update
+  into one that folds correctly, and the continuation search finds nothing to add.
+* B solved 2 in this run (`prepend-k(k=-2) | positions`, `rotate-k(k=3)`); section 30's run of the same setting solved
+  only the first — `rotate-k(k=3)` is not stable across runs and is not counted.
+* DIAGNOSIS PASS (for these 11): the first wrong decision is the adoption of an Update that fits the observed
+  transitions but not the examples' folds — the transitions on the trajectories under-determine the Update (the
+  same pattern as the wrong-Update refutations of sections 19–22). Not done: the fixed-Update injection experiment
+  (P0-C) and a causal fix (P0-D). Next single mechanism: choose among Updates equally consistent with the
+  transitions by the initial examples' folds before committing (the alternatives already exist in `upd_alts`).
+V1 PASS (sealed), V2 independent OPEN, V3 FAIL, Q3 OPEN, Q6 untouched.
