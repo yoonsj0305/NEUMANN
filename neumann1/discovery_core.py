@@ -80,16 +80,48 @@ def _remap(ast, scope, n_full):
 class FSearch(sc.GSearch):
     """Enumerates functions of a state subset; every kept total value is offered to the readout."""
 
-    def __init__(self, lib, in_types, inputs, deadline, consts, cost, types, offer):
+    def __init__(self, lib, in_types, inputs, deadline, consts, cost, types, offer,
+                 probe_inputs=(), equivalence_cap=1):
         super().__init__(lib, in_types, T_I, [(i, 0) for i in inputs], deadline, consts=consts)
         self.cost, self.types, self.offer, self.goals = cost, types, offer, {}
+        # Development-only top-level equivalence refinement. The default (cap 1)
+        # is the original enumerator; binder contexts retain original pruning.
+        self.probe_inputs = tuple(tuple(p) for p in probe_inputs)
+        self.equivalence_cap = max(1, int(equivalence_cap))
+        self.probe_classes = {}
+        self.equivalence_extra_kept = 0
 
     def _keep(self, ctx, out, e, t):
         seen = ctx.seen[t]
         v = e.vec
-        if v in seen:
-            return
-        seen.add(v)
+        refining = (ctx is self.top and self.equivalence_cap > 1
+                    and bool(self.probe_inputs) and time.process_time() < self.deadline)
+        if not refining:
+            if v in seen:
+                return
+            seen.add(v)
+        else:
+            key = (t, v)
+            variants = self.probe_classes.setdefault(key, set())
+            if len(variants) >= self.equivalence_cap:
+                return
+            ast = e.ast()
+            # All diagnostics are calculated locally. No SOURCE query occurs.
+            fn = ic.compile_ast(ic._tup(ast), len(self.in_types), self.lib)
+            sig = []
+            for p in self.probe_inputs:
+                try:
+                    value = fn(p)
+                    sig.append(tuple(value) if isinstance(value, list) else value)
+                except (ic.Fail, RecursionError, TypeError, ValueError, OverflowError):
+                    sig.append(None)
+            sig = tuple(sig)
+            if sig in variants:
+                return
+            if v in seen:
+                self.equivalence_extra_kept += 1
+            seen.add(v)
+            variants.add(sig)
         out.append(e)
         if ctx is self.top and e.hv and t in self.types and None not in v:
             self.offer(e, t)
