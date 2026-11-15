@@ -1918,12 +1918,12 @@ def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
                             uv = [gv] + list(u2[1:])
                             for zz in starts:
                                 if all((lambda r: r is not None and r[0] == y)(fd(uv, zz, tuple(x))) for (x,), y in st_["examples"]):
-                                    simple.append((len(show_ast(v)), show_ast(v), uv, zz))
+                                    simple.append((len(show_ast(v)), show_ast(v), uv, zz, v))
                                     break
                         info["necessity"] = {"splits_removable_on_evidence": len(simple)}
                         if simple:
                             simple.sort(key=lambda r: r[0])
-                            sz, sv, uv, zz = simple[0]
+                            sz, sv, uv, zz, vast = simple[0]
                             pc = lambda x, u=list(u2), z_=z2: (lambda r: None if r is None else r[0])(fd(u, z_, x))
                             ps = lambda x, u=uv, z_=zz: (lambda r: None if r is None else r[0])(fd(u, z_, x))
                             base_ = [task_input(rng, vl, st_["lens"]) for _ in range(150)]
@@ -1952,7 +1952,7 @@ def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
                                                       "complex_refuted": verdict_c, "simpler_refuted": verdict_s})
                             if verdict_s == 0:                       # not refuted: the simpler wins (MDL)
                                 u2, z2 = uv, zz            # the simpler Update survives: keep it (MDL)
-                                a2 = [("simpler",)] + list(a2[1:])
+                                a2 = [vast] + list(a2[1:])           # the AST actually executed
                                 info["necessity"]["kept"] = "simpler"
                             else:
                                 info["necessity"]["kept"] = "complex (split necessary)" if verdict_c == 0 else "neither"
@@ -1967,6 +1967,8 @@ def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
                         if v2:
                             m, verdict = m2, True
                             mrec["challenge"] = True
+                            # the record describes the machine actually executed: repaired Update and its start
+                            mrec["update"], mrec["init"], mrec["repaired"] = info["update_after"], repr(z2), True
                     elif "cause" not in info:
                         info["cause"] = "no Update on this state space (search or representation)" if u2 is None else \
                                         "%d examples still fail on this state space" % len(f2)
