@@ -785,3 +785,31 @@ V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched. Full regr
   built; Static / Learned / D / B comparison not run.**
 
 V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched. Full regression 1148 passed, 53 skipped.
+
+## 19. First causal divergence of the 8 trajectory-dependent outcomes (2026-11-15) — DEVELOPMENT ONLY
+
+Both draws re-run (code `d479ed4`; raw: `docs/experiments/dev/q3_first_divergence_dev_2026_11_15.json`).
+`uniq` failed in BOTH draws on this re-run (it had differed in section 18): an unstable outcome, excluded.
+
+| task (solving draw) | first difference | class |
+|---|---|---|
+| `humaneval/121` (alt) | no contradiction in either table; "no progress" invention: alt tried 6 sets and adopted `h' = −h` (14.9 s); base tried 28 without an adoption, used 18 s | B search / synthesis |
+| `mbpp/366` (alt) | no contradiction in either; alt adopted `h' = e` after 4 tries and its machine passed the challenge; base reached `h' = e` only after 38 tries + a contradiction, its machine FAILED the challenge (a different Update), suffix ran out of CPU | B synthesis (wrong Update) + CPU |
+| `identify-is-mod-k(k=7)` (base) | base: answer-state machine at round 3, no branch point; alt: Update not found → invention (46 tries) → nothing | B synthesis |
+| `identify-k(k=-2)` (base) | both fail the prefix machine; base's suffix machine verified, alt's suffix machine formed in 0.1 s and FAILED the challenge | B synthesis (wrong Update) |
+| `mbpp/516` (base) | identical first invention call (2 admissible, 39 tries, none); base's suffix machine formed at round 0, alt's suffix found no Update | B synthesis |
+| `mbpp/670` (base) | **alt observed 1 contradiction in the first table, base 0**; both later invented `h' = e`; base's machine verified at round 19, alt's failed the challenge | A observation present in alt, outcome B (Update) |
+| `pop | is-evens` (base) | base observed a contradiction → invented the running sum `h' = h + e` (verified); alt saw no contradiction → "not localisable" path → `h' = e` → no machine | **A information**: the contradiction was what made the right variable admissible |
+| `uniq` | fails in both draws on re-run | UNKNOWN (unstable) |
+
+Summary: in 1 task the observation itself decided the invention (`pop | is-evens`, information); in 6 the
+observations carried no differing contradiction and the outcome split in synthesis / Update choice / CPU (search
+and synthesis); 1 mixed (`mbpp/670`); 1 unstable. No representation limit appeared among these 8.
+
+Gate A (first divergence recorded per task): met. Gate B (a reproducible case where changing an observation
+changes the invention): one candidate (`pop | is-evens`); its reproducibility and a single-observation
+add/remove test were NOT run. Gate C: separated as above — the dominant bottleneck is synthesis / repair, not
+information. Gate D: not met (one information-driven case). Per the directive's final question the next step is
+the synthesis / repair bottleneck, not query-selection learning. `represent()` was not audited in this session.
+
+V1 PASS (sealed). V2 independent OPEN. V3 FAIL. Q3 OPEN. Q6 untouched.
