@@ -121,3 +121,33 @@ def test_opt_in_first_update_snapshot_matches_observed_transition_hash():
     assert snap["sha256"] == expected
     assert snap["transitions"]
     assert all(len(r["state"]) + 1 == len(snap["in_types"]) for r in snap["transitions"])
+
+
+def test_opt_in_probe_equivalence_keeps_semantically_distinct_top_level_asts():
+    """Identical observed vectors may conceal different executable programs."""
+    import time
+    from neumann1 import invention_core as ic, discovery_core as dc
+
+    class Expr:
+        hv = True
+        vec = (0, 1)
+        def __init__(self, ast):
+            self._ast = ast
+        def ast(self):
+            return self._ast
+
+    first = Expr(("v", 0))
+    second = Expr(("mul", ("v", 0), ("v", 0)))
+    lib = ic.base_library()
+    for cap, expected in ((1, 1), (2, 2)):
+        seen = []
+        s = dc.FSearch(lib, (ic.T_I,), [(0,), (1,)],
+                       time.process_time() + 5, (), ic.uniform_costs(), (ic.T_I,),
+                       lambda e, t: seen.append(e.ast()),
+                       probe_inputs=[(2,)], equivalence_cap=cap)
+        retained = []
+        s._keep(s.top, retained, first, ic.T_I)
+        s._keep(s.top, retained, second, ic.T_I)
+        assert len(retained) == expected
+        assert len(seen) == expected
+        assert s.equivalence_extra_kept == expected - 1
