@@ -1356,3 +1356,259 @@ as in A (arm D), or as in C (arm CD). This changes WHICH states are queried, not
 
 V1 PASS (sealed), V2 independent OPEN, V3 FAIL, Q3 OPEN, Q6 untouched. No FRESH / FORMAL seal opened, no per-task
 answer coded, PR #780 stays Draft.
+
+
+## 36. Budgeted reachability discovery (2026-11-15) — DEVELOPMENT ONLY
+
+Directive "Q3 Budgeted Reachability Discovery": obtain the reachable-state information that formed the D solve
+(section 35.4) with fewer SOURCE queries, and show whether it causes more machines and solves within the same
+60-query / 30 CPU s budget. No new synthesiser and no candidate expansion. All CPU figures in this section are real
+`time.process_time()`; the virtual clock of section 35 is not used for any verdict. Raw evidence:
+`docs/experiments/dev/budgeted_reach/` (JSONL rows per run, `summary_*.json`, `freeze_E.json`, `SHA256SUMS`).
+
+### 36.1 Where D's SOURCE queries go (P0-A)
+
+Instrumentation (`research/q3/budgeted_reach_dev.py`; no effect on decisions):
+* `active.QUERY_HOOK` sees every formation-state query call, whether it is answered from the cache or charged.
+* A wrapper on `env.query` records every SOURCE charge and its phase (formation tag, challenge, committee,
+  discrimination).
+* Charged state queries are classified in the order they were charged, per machine direction: initial state,
+  added state component, new length (a parent length above all observed ones), new element, or known region.
+
+Findings, from the code and the base A/D/E pass:
+* **Cache.** `Env.query` charges every call; there is no SOURCE-side cache. De-duplication is the agent's:
+  `form_machine`'s `memo` (seeded with all earlier observations of the run), `challenge`'s `seen` set, and the
+  committee and discrimination filters. On the 11 tasks D made 7 648 state reads, of which 7 062 (92 %) were cache
+  hits. Only 3 SOURCE charges repeated an input, all inputs whose earlier answer was undefined: `obs` keeps only
+  defined answers, so the next machine's `memo` lacks them. Calls and charges are reported separately below.
+* **Total vs formation queries.** After formation, `committee_queries` spends whatever budget is left, so total
+  queries are about 60 in every arm. Only formation-phase queries measure observation cost.
+* **D's state queries (11 tasks): 498** = 6 initial + 107 new length + 129 new element + 177 known region (same
+  lengths and elements already covered) + 79 for added state components.
+* **The second (suffix) machine is the largest single waste.** With `REACH_TRAJ`, `trajs = examples`, and
+  `form_machine` receives `ex + obs`. So D's suffix machine walks the prefixes of every earlier observation, not just
+  the 8 initial examples. It spent 190 state queries (38 % of D's) at 6.3 CPU s in total and hit the query limit
+  before any synthesis on 7 tasks.
+
+D per task, base seed: formation calls / charged queries, then the charged queries by category.
+
+| task | calls / charged | initial | new length | new element | known region | added component (states / screen) | localise | self-test | challenge | prefix / suffix machine queries (suffix CPU s) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `add-k(k=10) \| identify-is-prime` | 941 / 55 | 0 | 12 | 15 | 20 | 0 / 8 | 0 | 0 | 0 | 37 / 18 (0.0) |
+| `identify-is-mod-k(k=7)` | 1453 / 55 | 0 | 14 | 6 | 22 | 0 / 0 | 9 | 4 | 0 | 23 / 32 (0.001) |
+| `identify-is-prime` | 744 / 55 | 0 | 11 | 15 | 21 | 0 / 8 | 0 | 0 | 0 | 24 / 31 (0.001) |
+| `positions \| append-k(k=3)` | 783 / 55 | 0 | 6 | 8 | 6 | 25 / 10 | 0 | 0 | 0 | 55 / - (-) |
+| `pow-k(k=4) \| product` | 415 / 55 | 2 | 10 | 20 | 15 | 0 / 8 | 0 | 0 | 0 | 31 / 24 (0.0) |
+| `prepend-k(k=-2) \| positions` | 917 / 55 | 0 | 6 | 9 | 10 | 30 / 0 | 0 | 0 | 0 | 55 / - (-) |
+| `prepend-k(k=10) \| positions` | 838 / 55 | 1 | 7 | 8 | 7 | 24 / 8 | 0 | 0 | 0 | 53 / 2 (0.0) |
+| `replace-all-k-with-n(k=5,n=0) \| rotate-k(k=1)` | 307 / 55 | 1 | 12 | 16 | 26 | 0 / 0 | 0 | 0 | 0 | 25 / 30 (0.001) |
+| `rotate-k(k=-2) \| replace-all-k-with-n(k=1,n=2)` | 621 / 50 | 0 | 12 | 8 | 18 | 0 / 12 | 0 | 0 | 0 | 13 / 37 (6.289) |
+| `rotate-k(k=1) \| identify-geq-k(k=2)` | 337 / 32 | 0 | 5 | 7 | 8 | 0 / 0 | 5 | 7 | 3 | 32 / - (-) |
+| `rotate-k(k=3)` | 292 / 55 | 2 | 12 | 17 | 24 | 0 / 0 | 0 | 0 | 0 | 27 / 28 (0.0) |
+
+### 36.2 Policy E (P0-B): `BUDGETED_REACH_TRAJ` (off by default), frozen in `1e1ddba`
+
+* **Candidates.** Only transitions along the GIVEN initial examples' prefixes (`env.initial()`), in both machine
+  directions.
+* **Stage 1, before any Update.** A greedy plan maximises gain / marginal uncached SOURCE cost. The cost counts the
+  state components of parent and child that are neither cached nor already planned. Gain = 2·new length +
+  2·new element + 1·conflict probe (a seen element at an unseen parent length) + (examples sharing the prefix − 1);
+  minimum gain 2, so known-region transitions are not observed. The whole plan is fixed from input-side signals
+  before any planned answer is seen, then executed; a candidate whose cost exceeds the remaining budget is skipped.
+* **Stage 2, after an Update exists and folds INITIAL examples wrongly.** On each failing example, E takes the
+  first step whose predicted (state, element) pair was never observed (gain 3 + novelty). It replaces that round's
+  binary-search localisation when it adds a usable transition.
+* **Budget.** At most `REACH_BUDGET = 20` charged queries per run, shared by both machines (a development
+  assumption, not a tuned optimum), with no duplicate charge. Already-observed candidates and candidates known to be
+  undefined are excluded.
+* **Mode.** The selected reachable transitions REPLACE the synthetic trajectories. Degraded mode: fewer than 3 usable
+  reachable transitions → the synthetic trajectories (existing path); budget exhausted → no further E query, and the
+  existing localisation / representation path continues. Both cases are recorded per machine.
+* **Logged per candidate:** stage, example, step, features, gain, estimated and actual cost (equal in every
+  executed case), usability, and the SHA-256 prefix of the observed transition.
+* **Tuning on the 11 development tasks only.** The rejected variant E2 (synthetic + reachable) also solved
+  `rotate-k(k=1) | identify-geq-k(k=2)` but used 545 vs 406 formation queries. Two defects found while tuning were
+  fixed before freezing: stage 2 could re-select a cost-0 transition whose child is a blocked hidden-test prefix
+  (an endless round loop), and it could take failing examples that were self-test counterexamples rather than
+  initial examples. The freeze manifest records the code blob and the transfer task lists, both fixed before any
+  transfer run.
+
+### 36.3 A / D / E on the 11 development tasks (P0-C)
+
+Same task set, seed rule, synthesiser, state grammar, challenge, fallbacks and 60 / 30 budget as `active_dev.job`.
+Each (arm, task, seed) runs in a fresh process; rows in `dev11_ADE_run{1,2,3}.jsonl` (same seed) and
+`dev11_ADE_seeds1_2.jsonl` (seeds sha256(name) + 7919·k).
+
+| task | solved A / D / E (3 same-seed runs) | formation queries A / D / E | reach-state queries D / E | reachable transitions observed A / D / E | round-0 fold failures A / D / E | E degraded / fallback machines |
+|---|---|---|---|---|---|---|
+| `add-k(k=10) \| identify-is-prime` | 0/3 / 0/3 / 0/3 | 45 / 55 / 31 | 47 / 20 | 3 / 37 / 22 of 37 | 32 / — / 28 | 1 / 0 |
+| `identify-is-mod-k(k=7)` | 1/3 / 0/3 / 0/3 | 15 / 55 / 42 | 42 / 16 | 5 / 14 / 12 of 18 | 3 / 0 / 3 | 0 / 0 |
+| `identify-is-prime` | 0/3 / 0/3 / 0/3 | 45 / 55 / 38 | 47 / 20 | 11 / 26 / 22 of 26 | 31 / — / 25 | 1 / 0 |
+| `positions \| append-k(k=3)` | 0/3 / 0/3 / 0/3 | 55 / 55 / 54 | 45 / 20 | 10 / 27 / 24 of 27 | 13 / — / 1 | 1 / 1 |
+| `pow-k(k=4) \| product` | 0/3 / 0/3 / 0/3 | 34 / 55 / 36 | 47 / 20 | 1 / 24 / 17 of 32 | — / — / — | 1 / 1 |
+| `prepend-k(k=-2) \| positions` | 0/3 / 0/3 / 0/3 | 55 / 55 / 55 | 55 / 20 | 7 / 30 / 21 of 32 | 9 / — / 13 | 1 / 1 |
+| `prepend-k(k=10) \| positions` | 0/3 / 0/3 / 0/3 | 55 / 55 / 55 | 47 / 20 | 4 / 29 / 22 of 29 | 11 / — / 18 | 1 / 1 |
+| `replace-all-k-with-n(k=5,n=0) \| rotate-k(k=1)` | 0/3 / 0/3 / 0/3 | 29 / 55 / 20 | 55 / 20 | 12 / 36 / 26 of 36 | 7 / — / 4 | 1 / 0 |
+| `rotate-k(k=-2) \| replace-all-k-with-n(k=1,n=2)` | 0/3 / 0/3 / 0/3 | 30 / 50 / 25 | 38 / 20 | 7 / 21 / 17 of 21 | 10 / — / 1 | 1 / 0 |
+| `rotate-k(k=1) \| identify-geq-k(k=2)` | 0/3 / 3/3 / 3/3 | 52 / 32 / 30 | 20 / 16 | 13 / 24 / 22 of 30 | 16 / 0 / 3 | 0 / 0 |
+| `rotate-k(k=3)` | 0/3 / 0/3 / 0/3 | 27 / 55 / 20 | 55 / 20 | 4 / 28 / 17 of 36 | 5 / — / — | 1 / 0 |
+
+Totals over the 11 tasks, run 1:
+
+| | A | D | E |
+|---|---|---|---|
+| formation SOURCE queries | 442 | 577 | **406** |
+| state-observation queries (D: states; E: reach + states) | 283 | 498 | 290 |
+| formation query calls / of them cache hits | 6 821 / 6 375 | 7 648 / 7 062 | 7 313 / 6 905 |
+| reachable transitions observed (answer component, of 324) | 77 | 296 | 222 |
+| verified state conflicts (component added from an inconsistency) | 2 | 3 | 2 |
+| Updates synthesised (rounds with an Update) | 47 | 12 | 40 |
+| machines formed / challenge passed | 2 / 1 | 1 / 1 | 1 / 1 |
+| solved, same seed ×3 | mod7 1/3 | geq 3/3 | geq 3/3 |
+| solved, seeds 1 and 2 | 0, 0 | 0, 0 | 0, 0 |
+| formation CPU (real s) | 168.2 | 113.9 | 152.7 |
+
+* **Stability.** D and E are stable on the base seed: same solve in 3/3 runs, formation queries 577 (D) and
+  406–407 (E) in every run. A's mod7 solve appears once in three same-seed runs (timing), so it is not counted.
+* **Robustness to the query path.** With seeds 1 and 2, neither D nor E solves anything. The geq solve depends on the
+  self-test and challenge inputs that the base seed draws.
+* **Query efficiency.** On the solved task E uses 30 formation queries (16 reachable) where D uses 32 (20); over the
+  11 tasks 406 vs 577 (−30 %), observing 222 of D's 296 reachable transitions. E's planning cost is negligible:
+  formation CPU is 152.7 s for E vs 168.2 s for A.
+
+### 36.4 Transfer of the frozen E (P0-E)
+
+Frozen policy and task lists in `freeze_E.json` (committed in `1e1ddba` before any transfer run):
+* 60 list-routines tasks unsolved in the Gate E baseline (all except the 11);
+* 24 Gate E-solved tasks as a regression check.
+
+No policy change after freezing. D was run on the first 18 of the 60 only; it was dropped to finish within the
+session. FRESH-dev (the other opened lineage) was NOT run: it needs the pinned MBPP / HumanEval files fetched and
+sandboxed reference execution.
+
+| set | A solved | D solved | E solved | E new vs A | E lost vs A | formation queries A / E | formation CPU A / E |
+|---|---|---|---|---|---|---|---|
+| 60 unsolved | 1 | 2 (of 18 run) | 4 | 3 | 0 | 2 144 / 2 186 | 663 / 664 s |
+| 24 solved | 24 | — | 21 | 0 | **3** | 507 / 649 | 72 / 120 s |
+
+Replicates of every task whose outcome differed between A and E: 3 same-seed runs plus seeds 1 and 2, so 5 runs
+per arm (`transfer_changed6_*.jsonl`). Correctness = random diagnostic SOURCE inputs (outside the budget).
+
+| task | A solved | E solved | E correct on random inputs | reading |
+|---|---|---|---|---|
+| `identify-k(k=-2) \| remove-mod-k(k=2)` | 0 / 5 | **5 / 5** | 271 / 271 | robust new solve by E |
+| `count-k(k=10)` | 2 / 5 (seeds 1, 2 only) | **5 / 5** | 298 / 298 | E robust; A only on other seeds |
+| `uniq \| is-squares` | 0 / 5 | 3 / 5 | **247 / 270** | hidden test passed, semantically wrong: not counted |
+| `reverse \| identify-is-mod-k(k=7)` | 4 / 5 | 4 / 5 | 295 / 295 | the base-run loss was noise |
+| `keep-mod-k(k=2) \| pow-k(k=3)` | 4 / 5 | **0 / 5** | — | **robust regression** |
+| `remove-mod-k(k=3) \| add-k(k=-2)` | 5 / 5 | **0 / 5** | — | **robust regression** |
+
+* **Where E's new solves come from.** Both come from formed state machines with the independent challenge passed.
+  E observed the reachable transitions that A's synthetic trajectories miss: round 0 already folds every example on
+  `identify-k(k=-2) | remove-mod-k(k=2)`. On the 18 tasks D was run on, D solves the same two with more formation
+  queries: 27 and 31, against E's 23 and 23.
+* **Where the regressions come from.** Both are CASE 2. A forms at round 0 on its short synthetic table in 0.3–1.4 s.
+  E's reachable-only table gives "no update for component 0" in both machines, and E's frozen fallback (only when
+  fewer than 3 reachable transitions are usable) does not return to the synthetic table. On the 24 solved tasks E
+  also costs more: 649 vs 507 formation queries, 120 vs 72 formation CPU s.
+
+### 36.5 First failures (P0-F)
+
+First failure of every run, from machine events (`research/q3/budgeted_reach_cases_dev.py`):
+
+| arm, set | solved | CASE 1 (query limit before an Update) | CASE 2 (no Update on the first observed table) | CASE 2b (Update, fold fails, re-synthesis fails) | CASE 3 (added component's Update) | CASE 4 (fold passed, self-test / challenge refutes) | other |
+|---|---|---|---|---|---|---|---|
+| A, dev 11 | 1 | 0 | 1 | 5 | 3 | 1 | 0 |
+| D, dev 11 | 1 | 0 | 6 | 0 | 3 | 1 | 0 |
+| E, dev 11 | 1 | 0 | 4 | 2 | 2 | 2 | 0 |
+| A, transfer 60 | 1 | 2 | 15 | 15 | 1 | 1 | 25 |
+| E, transfer 60 | 4 | 4 | **22** | 2 | 1 | 4 | 23 |
+| E, solved 24 | 21 | 0 | **3** | 0 | 0 | 0 | 0 |
+
+"other" covers undefined states (too few defined transitions), counterexamples that cannot be localised, and
+machines whose fold passed but that did not form before the limits.
+
+* **CASE 1: 20 queries do not suffice.** Rare as a first failure (4/60). The budget mostly runs out in the SECOND
+  machine: 42 transfer machines were degraded and 27 fell back to the synthetic trajectories. The prefix machine
+  uses 5–20 of the 20 queries (median 15), so the cause is how the budget is split across machines, not missing
+  information.
+* **CASE 2: the needed states are observed but no Update is synthesised.** This is the dominant failure of D and E,
+  and the cause of both E regressions. Replay on E's own tables (36.6) shows the unchanged synthesiser finding
+  correct Updates at a 10–20 s per-call cap (about 5 s used). The cost of using the new transition constraints is
+  therefore CPU allocation within a round, not candidates or language.
+* **CASE 3: a conflict or continuation component is added, then its Update is not synthesised.** The positions tasks
+  (2/11) and 1/60. This is the problem of executing a new state component; it is separated and not addressed here.
+* **CASE 4: the fold passes, then the self-test or the challenge refutes.** mod7 (dev) and 4/60. The observed range is
+  overfitted. The refuting counterexamples are kept as recorded; no verification criterion was relaxed.
+* **CASE 5: candidate computation cost cancels the SOURCE saving.** Not observed: planning is negligible, and E's
+  formation CPU is 152.7 s against A's 168.2 s (dev) and 664 s against 663 s (transfer 60). But where A forms quickly
+  (the 24 solved tasks), E's CASE 2 failures cost more CPU (120 vs 72 s).
+
+### 36.6 Follow-up for CASE 2: the existing synthesis CPU floor. Not part of the frozen comparison
+
+The CASE 2 replay (`case2_replay.jsonl`) captured E's own first Update-failure tables and gave them to the UNCHANGED
+synthesiser at real caps of 5 / 10 / 20 / 40 s:
+* `rotate-k(k=3)` fits at a 10 s cap, using 4.8 s: fold errors 0 and **40 / 40** fresh SOURCE inputs.
+* `replace-all-k-with-n(k=5,n=0) | rotate-k(k=1)` fits at a 20 s cap, using 4.9 s: fold 0 and **40 / 40**.
+* `rotate-k(k=-2) | replace-all-k-with-n(k=1,n=2)` (suffix table) fits at 5 s: fold 0, 29/39 fresh.
+* `identify-is-prime` and the `pow-k(k=4) | product` prefix table do not fit even at 40 s.
+
+The synthesiser's internal phase limits are fractions of the cap, so the per-round share in a machine (about 4.5 s)
+misses fits that need only about 5 s of actual CPU at a 10–20 s cap. This is CASE 2 ("needed states observed,
+Update not synthesised") resolved as a CPU-allocation problem, not missing information or language.
+
+The existing `MIN_SYNTH_CPU` floor (section 30; 10 s; a reallocation inside the same 30 s) was therefore run on A
+(AF, control) and E (EF) on the 11 tasks, 3 same-seed runs (`followup_floor_run{1,2,3}.jsonl`):
+
+| arm (3 same-seed runs) | solved per run | formation queries per run | formation CPU per run |
+|---|---|---|---|
+| A (no floor; runs 1–3 of 36.3) | mod7 in 1 of 3 runs | 442 / 470 / 470 | 168 s (run 1) |
+| E (no floor) | geq (3/3) | 406 / 407 / 407 | 153 s (run 1) |
+| **AF** = A + floor | `prepend-k(k=-2) \| positions` 3/3, `rotate-k(k=3)` 3/3 | 351 / 397 / 355 | 183 / 185 / 183 s |
+| **EF** = E + floor | mod7 **3/3**, geq **3/3**, `prepend-k(k=-2) \| positions` 2/3, `rotate-k(k=3)` 2/3 | 381 / 387 / 385 | 158 / 156 / 149 s |
+
+* The floor alone (AF vs A) adds 2 stable development solves.
+* E's observations plus the floor (EF) add mod7 3/3, which neither AF nor E solves (0/3 each), and keep geq 3/3,
+  which AF does not solve (0/3). EF's two floor-only solves are less stable (2/3 each).
+* All solves are correct on 271–297 random inputs.
+* This follow-up was designed after seeing the 11 tasks and has NOT been frozen or transferred, so it counts only as
+  a development indication.
+
+### 36.6b Verdicts (P0-D)
+
+* **QUERY EFFICIENCY PASS (development, narrow).** E obtains the reachable information behind every D solve with
+  fewer SOURCE queries, and loses no D solve on the 11 tasks or on the 18 transfer tasks D ran:
+  * geq: 30 vs 32 formation queries (16 vs 20 reachable), identical in 3/3 runs;
+  * `count-k(k=10)`: 23 vs 27; `identify-k(k=-2) | remove-mod-k(k=2)`: 23 vs 31;
+  * all 11 development tasks: 406 vs 577.
+  Real CPU is not higher than A's on the 11 (152.7 vs 168.2 s) or the 60 (664 vs 663 s), but it is higher on the
+  24 already-solved tasks (120 vs 72 s).
+* **CAUSAL DEVELOPMENT PASS: NOT reached.**
+  * Development 11: E solves geq 3/3 where A solves it 0/3, but D solves it too (no gain over D), and with seeds 1 and 2
+    neither D nor E solves anything.
+  * Frozen transfer: E has 1 fully robust new solve (`identify-k(k=-2) | remove-mod-k(k=2)`, 5/5 vs 0/5) and 1
+    seed-robust one (`count-k(k=10)`, 5/5 vs 2/5). It also has 2 robust regressions (`keep-mod-k(k=2) | pow-k(k=3)`
+    0/5 vs 4/5; `remove-mod-k(k=3) | add-k(k=-2)` 0/5 vs 5/5), with more CPU on those tasks.
+  * Net change in correct solves vs A is 0 under the same caps. Fewer queries alone is not claimed as more
+    intelligence.
+
+
+### 36.7 Decision and the next first failure
+
+* **Observation economy works as designed.** Observing only what has novelty (new parent lengths, new elements,
+  post-Update path gaps) keeps every D solve with about 30 % fewer formation queries. Most of D's extra cost was
+  known-region states and a second machine that re-walks every earlier observation.
+* **The binding constraint after observation is CASE 2.** On the reachable tables the needed states are present
+  (constructive: 40 / 40 fresh-correct fits on `rotate-k(k=3)` and `replace-all…| rotate-k(k=1)` from E's own
+  tables), but the per-round synthesis share is too small for the synthesiser's own phase fractions.
+* **E's replace-mode table is also harder than A's synthetic table on tasks A already solves** — the two robust
+  regressions. A fallback that triggers only on observation shortage does not cover a synthesis shortage.
+* **Not implemented here** (it would need a new freeze and a transfer set not used in this section): E whose
+  fallback also returns to the synthetic table when the first reachable table yields no Update, combined with a
+  per-round synthesis floor. The floor follow-up (36.6) is the development indication for this. The 84 transfer tasks
+  of 36.4 are now used and cannot serve as its held-out set.
+* No new synthesiser, no candidate expansion, no change to the default path (`BUDGETED_REACH_TRAJ`, `REACH_TRAJ`,
+  `MIN_SYNTH_CPU` stay off). Q6 core untouched.
+
+V1 PASS (sealed), V2 independent OPEN, V3 FAIL, Q3 OPEN, Q6 untouched. No FRESH / FORMAL seal opened, no per-task
+answer coded, PR #780 stays Draft.
