@@ -1814,7 +1814,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             if time.process_time() > deadline:
                 rec["events"].append("deadline")
                 break
-            if BUDGETED_REACH_TRAJ and reach["W"] != len(W):
+            if BUDGETED_REACH_TRAJ and not reach["synthesis_fallback_used"] and reach["W"] != len(W):
                 # stage 1 (round 0, and again after W grows): coverage of the reachable region, before any Update
                 reach["W"] = len(W)
                 tag[0] = "states"
@@ -2002,7 +2002,8 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             if len(fail_hist) >= 3 and fail_hist[-1] >= fail_hist[-3] and len(fails) * 2 >= len(examples) \
                     and choose("no progress", trans, len(fails)) == "invent" and invent(trans, "no progress"):
                 continue
-            if BUDGETED_REACH_TRAJ and _REACH_SPENT[0] < REACH_BUDGET:
+            if (BUDGETED_REACH_TRAJ and not reach["synthesis_fallback_used"]
+                    and _REACH_SPENT[0] < REACH_BUDGET):
                 # stage 2 (an Update exists and folds examples wrongly): on each failing example, the first step
                 # whose PREDICTED (state, element) pair was never observed -- chosen before its answer is seen
                 pairs = {(a_, e_) for (a_, e_), b_, u_ in trans}
