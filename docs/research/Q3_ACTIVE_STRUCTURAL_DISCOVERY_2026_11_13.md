@@ -1136,3 +1136,221 @@ An initial immediate-diversification variant regressed candidate discovery on th
 **Interpretation:** A limited CANDIDATE GENERATION mechanism has been demonstrated on two opened list-routines tasks; however the extra programs did not reduce fold errors in the seven evaluable cases. This is NOT FOLD GAIN or DEVELOPMENT PASS. Only the original gate-independent evidence remains: V1 PASS (sealed); V2 independent OPEN; V3 FAIL; Q3 OPEN; Q6 untouched. Do not expand to FRESH or new generalisation based on this experiment. CI full-suite result was not confirmed in this record.
 
 **Next decisive question:** Is the lack of fold improvement due to missing latent state/incorrect initial state, or because the permitted cell representation cannot express the correct transition? Perform one matched, SOURCE-free, original-initial-example refit/oracle headroom check on already opened list-routines; if no correct Update exists under fixed W and initial state, stop adding top-K candidates. No per-task hardcoding.
+
+
+## 35. Reachability-guided structural synthesis (2026-11-15) — DEVELOPMENT ONLY
+
+Directive "Q3 Reachability-Guided Structural Synthesis". Questions: why do the transition-consistent Updates of the
+10 list-cell tasks fold the initial examples wrongly; is more state actually needed; does using the folds'
+reachable states as a synthesis constraint reduce fold errors and solve tasks causally. Raw evidence:
+`docs/experiments/dev/reachable_state/` (JSONL rows per run, `summary.json`, `SHA256SUMS`).
+
+**P0-A audit.** Run 43700395880 (head `cb63174`), job log: 10 rows, 12 candidates, 7 fold-evaluable, fold gains `[]`;
+artifact 14156470654, digest `2fe169ec…153a`, as recorded in section 34. CI on the base `d8a95b1` (run 43700686483):
+success, so there was no regression to repair. Locally (Python 3.11, the CI pins) the Q3 test files pass. One
+CPU-budgeted test (`test_policy_is_updated_by_verified_experience_only`, 8 CPU s per task) failed once while five
+experiment processes saturated the cores; it passed when rerun alone on this code and on `d8a95b1`. That failure is
+load timing, not a regression.
+
+**Method note: the budget unit.** The synthesisers stop on `time.process_time()` deadlines, and the same 5 s first fit
+fitted or failed on the same table between runs (CI: 10/10 fits; local real-clock reruns: 7/10, 7/10, and 5/10 under
+heavy load). So two units are reported:
+* **virtual clock** (`research/q3/vclock.py`, harness only): virtual s = 3.0e-7 · `invention_core.WORK` + 5.0e-5 ·
+  clock reads, least-squares fit on 30 real first-fit calls (`vclock_calibration.json`). Every synthesis module and
+  the harness read it, so fixed-table runs are byte-identical across reruns. In the machine runs, query logs, events
+  and adopted Updates were identical in 3 reruns of 4 (arm, task) pairs; only the final CPU total of the passive
+  fallback phase varied.
+* **real clock**, replicated. This is the official unit.
+
+The virtual unit is **not neutral**. It under-counts formation-phase Python work (≈ 3× fewer virtual than real
+seconds) and C's Python-level fold checks: in 5 real CPU s, C judged 28 candidates on `identify-is-mod-k(k=7)`,
+against 351 in 5 virtual s. Results that hold only in the virtual unit are labelled so and are NOT counted as
+improvements under the official budget. A first harness version mixed real and virtual deadlines (inflated, unequal
+budgets); those runs were discarded and are not reported.
+
+### 35.1 Reachable-state diagnosis (P0-B, P0-C)
+
+For each frozen first-failure table T (section 29 snapshots), the states every initial example's fold actually
+reaches were observed from SOURCE by DIAGNOSTIC queries: S(u) = (f(u·w) for w ∈ W) on all prefixes u. These used a
+separate unlimited Env with the same seed; hidden tests stay blocked, the routine is never read, and the 21–83
+diagnostic queries per task are outside every agent budget. R = these reachable transitions. A = the existing first
+fit on T (5 virtual s). Script `research/q3/reachable_state_diagnosis_dev.py`; rows in `reachable_diagnosis.jsonl`.
+In the column "its folds / fresh", fresh = 20 random SOURCE inputs (diagnostic).
+
+| task | \|T\| | \|R\| (new pairs) | A fold err | conflict on T∪R | Update fitting T∪R (existing cell language) | its folds / fresh | verdict |
+|---|---|---|---|---|---|---|---|
+| `add-k(k=10) \| identify-is-prime` | 13 | 37 (32) | 4 | no | not found (20 s cap) | — | unresolved |
+| `identify-is-mod-k(k=7)` | 15 | 14 (8) | 2 | no | found (4.5 s) | 0 / 20/20 | representable |
+| `identify-is-prime` | 14 | 26 (18) | 4 | no | not found (20 s cap) | — | unresolved |
+| `positions \| append-k(k=3)` | 14 | 25 (19) | 0 | no | found (2.6 s) | 0 / 15/20 | representable |
+| `prepend-k(k=-2) \| positions` | 14 | 30 (24) | 2 | no | found (1.3 s) | 0 / 20/20 | representable |
+| `prepend-k(k=10) \| positions` | 10 | 29 (24) | no fit | **yes** (witness below) | — | — | **W insufficient** |
+| `replace-all-k-with-n(k=5,n=0) \| rotate-k(k=1)` | 16 | 36 (27) | 4 | no | found (9.3 s) | 0 / 20/20 | representable |
+| `rotate-k(k=-2) \| replace-all-k-with-n(k=1,n=2)` | 12 | 21 (20) | 1 | no | not found (20 s cap) | — | unresolved |
+| `rotate-k(k=1) \| identify-geq-k(k=2)` | 17 | 28 (19) | 1 | no | found (0.1 s) | 0 / 13/19 | representable |
+| `rotate-k(k=3)` | 10 | 28 (27) | 3 | no | found (9.2 s) | 0 / 20/20 | representable |
+
+* **Where the folds fail.** All 21 first divergences of A's folds (failing examples with an observed path) occur at a
+  reachable (state, element) pair that T never observed. In 20 of them the state just before is observed and correct;
+  in the 21st that prefix is a blocked hidden-test input. 7 occur at a state longer than any in T (T's trajectories are
+  4-element sequences, while the examples reach length 7), and 5 involve an element value T never contained. The
+  adopted Update is right on everything it was shown. It is wrong where the examples go and the agent did not look.
+* **Is more state needed?** Only for `prepend-k(k=10) | positions`. SOURCE observed state `[0,1,2,3,4]` with element 6
+  going to `[0,1,2,3,4,6]` after prefix `[7,8,9,1,0]`, and to `[0,1,2,3,4,5]` after `[11,10,5,6]`: the answer-as-state
+  W = [()] cannot carry len(u) once u contains zeros. The witness is the proof. This is the one task where W is
+  insufficient. The existing distinguishing-continuation rule (section 2) adds the component e·w = (6,), but only if
+  the conflict is observed, and T's synthetic trajectories never reach it (confirmed in 35.4).
+* **Representable under fixed W and z (no new state): 6 tasks.** With R observed, the EXISTING cell synthesiser builds
+  an Update that reproduces every reachable transition, hence every initial fold. On 20 fresh SOURCE inputs it scores
+  20/20 on 4 of them (`identify-is-mod-k(k=7)`, `prepend-k(k=-2) | positions`,
+  `replace-all-k-with-n(k=5,n=0) | rotate-k(k=1)`, `rotate-k(k=3)`), and 15/20 and 13/19 on the other two. The
+  readout is exact on every task (observed f(x) = the example's answer). The initial state is the observed S(()),
+  except `rotate-k(k=3)`, whose S(()) is blocked; the sentinel () is consistent with every observation there.
+  `positions | append-k(k=3)` already folds correctly from T: its run-time failure was the CPU share at that moment
+  (sections 29–30), not the fold.
+* **Unresolved: 3 tasks** (`identify-is-prime`, `add-k(k=10) | identify-is-prime`,
+  `rotate-k(k=-2) | replace-all-k-with-n(k=1,n=2)`). There is no conflict, and no Update fitting T∪R was found within
+  the synthesiser's own phase limits at a 20 s cap. They are NOT declared inexpressible: no complete impossibility
+  argument for the restricted grammar was built. (Primality needs a membership relation over e; the rotate-by-−2
+  Update needs at least 4 cases where the cover builds at most 3.)
+
+### 35.2 A / B / C on the frozen tables (P0-D, P0-E part 1)
+
+All arms use the same table, types and initial state (the observed root in T, else the machine's sentinel), the
+same cap per component, and no SOURCE query.
+* A = the first fit.
+* B = the section 34 probe-diversified candidates (k = 4), best fold kept.
+* C = `synth_cells_fold` → `latent.solve_fold` (opt-in). The legacy enumeration runs to its first complete candidate,
+  which is identical to A's first fit on 10/10 in every run. If the machine with it folds an initial example wrongly,
+  the SAME enumeration continues to the cap. Observational equivalence is refined on the cell coordinates of the
+  states that candidate's own fold reaches (no query). Every later complete candidate is judged by all
+  initial-example folds; the first with 0 errors is returned, otherwise only the best is kept, never a candidate
+  list. Observed transitions stay hard constraints. For a 2-component W, C acts on the last component and the
+  earlier one is as in A.
+
+Script `research/q3/fold_reach_replay_dev.py`. Cells: fold errors on the 8 initial examples / reachable transitions of
+R reproduced (diagnostic) / fresh SOURCE inputs (diagnostic). Bold = a new Update from C.
+
+**5 virtual s per component** (`fold_reach_replay.jsonl`, byte-identical in two runs):
+
+| task | A | B | C | C candidates judged |
+|---|---|---|---|---|
+| `add-k(k=10) \| identify-is-prime` | 4 / 30/37 / 9/20 | 4 / 30/37 / 9/20 | **2 / 35/37 / 10/20** | 690 |
+| `identify-is-mod-k(k=7)` | 2 / 12/14 / 13/20 | 2 / 12/14 / 13/20 | **0 / 14/14 / 19/20** | 351 |
+| `identify-is-prime` | 4 / 18/26 / 6/20 | 4 / 18/26 / 6/20 | 4 / 18/26 / 6/20 | 20 |
+| `positions \| append-k(k=3)` | 0 / 25/25 / 15/20 | 0 / 25/25 / 15/20 | 0 / 25/25 / 15/20 | 1 |
+| `prepend-k(k=-2) \| positions` | 2 / 21/30 / 15/20 | 2 / 21/30 / 15/20 | **1 / 29/30 / 16/20** | 2040 |
+| `prepend-k(k=10) \| positions` | no fit | no fit | no fit | 0 |
+| `replace-all-k-with-n(k=5,n=0) \| rotate-k(k=1)` | 4 / 25/36 / 13/20 | 4 / 25/36 / 13/20 | 4 / 25/36 / 13/20 | 1 |
+| `rotate-k(k=-2) \| replace-all-k-with-n(k=1,n=2)` | 1 / 18/21 / 9/20 | 1 / 18/21 / 9/20 | 1 / 18/21 / 9/20 | 753 |
+| `rotate-k(k=1) \| identify-geq-k(k=2)` | 1 / 26/28 / 11/19 | 1 / 26/28 / 11/19 | **0 / 28/28 / 13/19** | 525 |
+| `rotate-k(k=3)` | 3 / 24/28 / 10/20 | 3 / 24/28 / 10/20 | 3 / 24/28 / 10/20 | 1 |
+
+**Equal real cap of 40 CPU s per component, all arms** (`fold_reach_replay_real40.jsonl`): fold errors per arm, the
+number of candidates C judged, and real CPU used by A/B/C.
+
+| task | A | B | C | C judged | CPU A/B/C |
+|---|---|---|---|---|---|
+| `add-k(k=10) \| identify-is-prime` | 4 | 4 | **2** | 1028 | 2.6 / 19.2 / 40.0 |
+| `identify-is-mod-k(k=7)` | 2 | 2 | **0** | 351 | 2.4 / 19.4 / 18.9 |
+| `identify-is-prime` | 4 | 4 | **3** | 1039 | 2.6 / 19.3 / 40.0 |
+| `positions \| append-k(k=3)` | 0 | 0 | 0 | 1 | 1.7 / 18.0 / 1.5 |
+| `prepend-k(k=-2) \| positions` | 2 | 2 | **1** | 1896 | 0.9 / 5.4 / 40.1 |
+| `prepend-k(k=10) \| positions` | 3 | 3 | 3 | 1302 | 2.0 / 18.5 / 40.0 |
+| `replace-all-k-with-n(k=5,n=0) \| rotate-k(k=1)` | 4 | 4 | 4 | 1 | 0.6 / 20.0 / 40.0 |
+| `rotate-k(k=-2) \| replace-all-k-with-n(k=1,n=2)` | 1 | 1 | 1 | 1449 | 1.9 / 18.7 / 40.0 |
+| `rotate-k(k=1) \| identify-geq-k(k=2)` | 1 | 1 | **0** | 525 | 0.0 / 18.8 / 1.4 |
+| `rotate-k(k=3)` | 3 | 3 | 3 | 778 | 2.5 / 19.2 / 40.0 |
+
+* **Fold errors.** Virtual 5 s: A 21, B 21, C 15 over 9 evaluable tasks; C improves 4, B 0. Real 40 s: A 24, B 24, C 17
+  over 10; C improves 5 (2 to zero: `identify-is-mod-k(k=7)`, `rotate-k(k=1) | identify-geq-k(k=2)`), B 0. C is never
+  worse, because it returns A's first fit unless a candidate folds strictly better. At 40 s, C runs exactly the
+  virtual-run searches again (351 and 525 candidates). These are new executable Updates that fit T, reproduce more of
+  R, and are at least as good on fresh inputs (`identify-is-mod-k(k=7)` 19/20 vs 13/20). None is fully correct on fresh
+  inputs.
+* **Under the official per-call share** (real 5 CPU s, `fold_reach_replay_real5_run{1,2}.jsonl`), the gain mostly
+  disappears: C improves on 0 of 6 and 1 of 6 jointly evaluable tasks. C judges about 10× fewer candidates per
+  real second than the virtual unit allowed, and A itself fits or fails between the two runs (7/10 fits each).
+* **Cost.** A stops at its first fit (0.04–2.6 s). C's gains need up to 19–40 real CPU s per synthesis call: 7–15× A's
+  CPU, and more than the share a formation round gives a component. B spends about 19 s for no gain.
+* `replace-all…| rotate-k(k=1)` and `rotate-k(k=3)` gain nothing, although 35.1 shows a fold-correct Update in the
+  language. With T's points only, the enumeration does not reach it within the cap.
+
+### 35.3 Whole machine (P0-E part 2)
+
+Script `research/q3/fold_reach_machine_dev.py`: `run_arm("D")` exactly as `active_dev.job` (Env(spec, 0, budget = 60),
+cap 30 s, seed = sha256(name) mod 1000) on the 11 section 31 tasks. Only the last list component's synthesis call
+differs (`FOLD_REACH_SYNTH`; B goes through the same hook). Each (arm, task) runs in a fresh process.
+Solved = the hidden test of the opened development task (evaluation only). Challenge = the machine's own independent
+SOURCE challenge.
+
+| unit (runs) | A solved | B solved | C solved | C lost vs A |
+|---|---|---|---|---|
+| virtual (1; decisions reproduced in 3 reruns) | 0 | 0 | 1 (`identify-is-mod-k(k=7)`) | 0 |
+| real, run 1 | 0 | 0 | 0 | 0 |
+| real, run 2 | 0 | 0 | 0 | 0 |
+
+* **The virtual-unit solve is causal but indirect, and not robust.** In C's run, the prefix machine formed at round 0
+  with a C-built Update that folds all examples (153 candidates judged). The independent challenge **refuted** it.
+  The task was then solved by the suffix machine, whose Update is the legacy first fit (C's search was not triggered
+  there). A's prefix machine instead spent its budget in repair rounds, and A's suffix machine never got an Update.
+  The difference is a budget and path effect, not a correct C-built Update. Under the real clock (run 1) C judges only
+  60 candidates at round 0 and does not form. **Counted: 0 causal new solves for C under the official budget; 0 losses.**
+* Formation CPU per arm is equal within 5% (virtual sums A 169.6, B 178.6, C 173.0 s). The passive fallback overshoots
+  the cap in every arm under the virtual unit.
+* A fold-consistent Update is not a correct one. The 8 final outputs do not identify the Update, as the refuted C
+  prefix machine shows. The intermediate reachable states do: the T∪R fits in 35.1 score 20/20 fresh on 4 tasks.
+
+### 35.4 Follow-up: observing the reachable states (`REACH_TRAJ`, opt-in). Not part of the matched comparison
+
+The diagnosis locates the deficit in observation, not in the candidate set. So one observation-policy change was
+tested within the SAME 60-query and 30 s budget: the agent's state trajectories are the initial examples' own
+prefixes (their reachable fold states) instead of the synthetic ascending / descending / random ones. Synthesis is
+as in A (arm D), or as in C (arm CD). This changes WHICH states are queried, not how many.
+
+| arm | virtual (1 run) | real, full pass (1 run) | `rotate-k(k=1) \| identify-geq-k(k=2)`, real ×3 |
+|---|---|---|---|
+| A | 0 / 11 | 0 / 11 (A/B/C runs 1–2) | A 0 / 3 |
+| D | 1 / 11 | 1 / 11 | **D 3 / 3** (challenge passed each time) |
+| CD | 1 / 11 (the same task) | not run | — |
+
+* **New solve, one task: `rotate-k(k=1) | identify-geq-k(k=2)`.** D's prefix machine queried 20 reachable states. Its
+  round-0 Update already folds all examples. Two self-test counterexamples were localised and repaired, then the
+  machine passed the independent challenge and the hidden test. On 300 random diagnostic SOURCE inputs it is
+  correct 293/293 (`semantic_check_random300.jsonl`). With the same seed and budget, A forms a machine after 15 rounds
+  (rounds 0–14, with an invented accumulator), and the challenge refutes it. D's trace is identical on both units. This is stable on both units (virtual 1/1, real 3/3,
+  plus the full real pass) and caused by the observation policy alone (D = A's synthesis). Semantics: correct on the
+  sampled inputs, not proven.
+* **`prepend-k(k=10) | positions`.** The conflict of 35.1 is observed at round 0, and the existing rule adds the
+  predicted component w = (6,) (W = [(), (6,)]) — the state change the diagnosis said was necessary, made by the
+  existing mechanism. It then fails to synthesise that component's Update, and its 45 state queries exhaust the
+  budget.
+* **`identify-is-mod-k(k=7)`.** Round 0 folds all examples, but self-tests keep finding transition errors, and the 36
+  state queries exhaust the budget. No other task is solved; C adds nothing on top of D (CD = D).
+* Full prefix observation costs 20–45 of the 60 queries. That cost, not the language or the candidate set, is what
+  stops the other representable tasks.
+
+### 35.5 Decision (P0-F)
+
+* **Why the programs fail.** The adopted Updates are right on every transition the agent observed and wrong on the
+  reachable states of the initial examples, which the synthetic trajectories never visit (21/21 divergences). They
+  fail because those states were not observed, not because the program set is too small: B adds candidates with no
+  fold gain.
+* **Is new state needed?** Proven for 1/10 (`prepend-k(k=10) | positions`, conflict witness), not for 6/10
+  (constructive: a fold-correct Update in the current language with fixed W and z), open for 3/10. For the one proven
+  case, the existing distinguishing-continuation rule produces the needed component once the conflict is observed
+  (35.4). No new state-invention mechanism is justified by these 10 tasks yet.
+* **Fold-constrained synthesis (C).** Fold gains occur at an equal 40 s real cap (5/10, A and B 0), but not within the
+  official per-call share, and they did not turn into a robust solve. Per the directive's rule, fold gain was carried
+  to machine formation (35.3), where it produced no causal solve under the official budget. Candidate expansion stops
+  here: neither B nor C is a lever under the current budget.
+* **Next mechanism, measured at development scale only.** The bottleneck is observing the folds' reachable states
+  economically. That means choosing which example prefixes to query, so that the component conflict (positions) and
+  the length / element cases (rotations, identify-*) are observed within the 60-query budget, and making the per-call
+  synthesis cheap enough to use them. Development evidence for this direction: D newly solves 1 of 11 under the
+  official budget (3/3 real replicates, A 0/3). That is one task in one lineage, so not a DEVELOPMENT PASS;
+  GENERALIZATION OPEN. Not done: any FRESH or independent evaluation, query-economical prefix selection, or any change
+  to the default path (`REACH_TRAJ`, `FOLD_REACH_SYNTH` stay off).
+
+V1 PASS (sealed), V2 independent OPEN, V3 FAIL, Q3 OPEN, Q6 untouched. No FRESH / FORMAL seal opened, no per-task
+answer coded, PR #780 stays Draft.
