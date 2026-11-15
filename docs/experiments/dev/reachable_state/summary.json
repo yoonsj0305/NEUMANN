@@ -1,0 +1,2133 @@
+{
+ "diagnosis": {
+  "add-k(k=10) | identify-is-prime": {
+   "A_fold_errors": 4,
+   "R_new_pairs": 32,
+   "R_transitions": 37,
+   "TR_fit": false,
+   "TR_fold_errors": null,
+   "TR_fresh_correct": null,
+   "T_transitions": 13,
+   "conflict_witness": [],
+   "diagnostic_source_queries": 37,
+   "first_divergences": {
+    "element_unseen_in_T": 1,
+    "pair_outside_T": 4,
+    "previous_state_correct": 4,
+    "state_longer_than_T": 2,
+    "total": 4
+   },
+   "readout_ok": true,
+   "verdict": "UNRESOLVED (no conflict; no Update found on T+R within the diagnostic cap; no impossibility claimed)",
+   "z_observed": [
+    true
+   ]
+  },
+  "identify-is-mod-k(k=7)": {
+   "A_fold_errors": 2,
+   "R_new_pairs": 8,
+   "R_transitions": 14,
+   "TR_fit": true,
+   "TR_fold_errors": 0,
+   "TR_fresh_correct": [
+    20,
+    20
+   ],
+   "T_transitions": 15,
+   "conflict_witness": [],
+   "diagnostic_source_queries": 37,
+   "first_divergences": {
+    "element_unseen_in_T": 0,
+    "pair_outside_T": 2,
+    "previous_state_correct": 1,
+    "state_longer_than_T": 1,
+    "total": 2
+   },
+   "readout_ok": true,
+   "verdict": "REPRESENTABLE (fold-correct Update in the existing cell language under fixed W and z)",
+   "z_observed": [
+    true
+   ]
+  },
+  "identify-is-prime": {
+   "A_fold_errors": 4,
+   "R_new_pairs": 18,
+   "R_transitions": 26,
+   "TR_fit": false,
+   "TR_fold_errors": null,
+   "TR_fresh_correct": null,
+   "T_transitions": 14,
+   "conflict_witness": [],
+   "diagnostic_source_queries": 24,
+   "first_divergences": {
+    "element_unseen_in_T": 3,
+    "pair_outside_T": 4,
+    "previous_state_correct": 4,
+    "state_longer_than_T": 0,
+    "total": 4
+   },
+   "readout_ok": true,
+   "verdict": "UNRESOLVED (no conflict; no Update found on T+R within the diagnostic cap; no impossibility claimed)",
+   "z_observed": [
+    true
+   ]
+  },
+  "positions | append-k(k=3)": {
+   "A_fold_errors": 0,
+   "R_new_pairs": 19,
+   "R_transitions": 25,
+   "TR_fit": true,
+   "TR_fold_errors": 0,
+   "TR_fresh_correct": [
+    15,
+    20
+   ],
+   "T_transitions": 14,
+   "conflict_witness": [],
+   "diagnostic_source_queries": 72,
+   "first_divergences": {
+    "element_unseen_in_T": 0,
+    "pair_outside_T": 0,
+    "previous_state_correct": 0,
+    "state_longer_than_T": 0,
+    "total": 0
+   },
+   "readout_ok": true,
+   "verdict": "REPRESENTABLE (fold-correct Update in the existing cell language under fixed W and z)",
+   "z_observed": [
+    true,
+    true
+   ]
+  },
+  "prepend-k(k=-2) | positions": {
+   "A_fold_errors": 2,
+   "R_new_pairs": 24,
+   "R_transitions": 30,
+   "TR_fit": true,
+   "TR_fold_errors": 0,
+   "TR_fresh_correct": [
+    20,
+    20
+   ],
+   "T_transitions": 14,
+   "conflict_witness": [],
+   "diagnostic_source_queries": 83,
+   "first_divergences": {
+    "element_unseen_in_T": 0,
+    "pair_outside_T": 2,
+    "previous_state_correct": 2,
+    "state_longer_than_T": 0,
+    "total": 2
+   },
+   "readout_ok": true,
+   "verdict": "REPRESENTABLE (fold-correct Update in the existing cell language under fixed W and z)",
+   "z_observed": [
+    true,
+    true
+   ]
+  },
+  "prepend-k(k=10) | positions": {
+   "A_fold_errors": null,
+   "R_new_pairs": 24,
+   "R_transitions": 29,
+   "TR_fit": null,
+   "TR_fold_errors": null,
+   "TR_fresh_correct": null,
+   "T_transitions": 10,
+   "conflict_witness": [
+    {
+     "element": 6,
+     "prefixes": [
+      [
+       7,
+       8,
+       9,
+       1,
+       0
+      ],
+      [
+       11,
+       10,
+       5,
+       6
+      ]
+     ],
+     "state": [
+      [
+       0,
+       1,
+       2,
+       3,
+       4
+      ]
+     ],
+     "successors": [
+      [
+       [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6
+       ]
+      ],
+      [
+       [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+       ]
+      ]
+     ]
+    }
+   ],
+   "diagnostic_source_queries": 28,
+   "first_divergences": {
+    "element_unseen_in_T": 0,
+    "pair_outside_T": 0,
+    "previous_state_correct": 0,
+    "state_longer_than_T": 0,
+    "total": 0
+   },
+   "readout_ok": true,
+   "verdict": "W_INSUFFICIENT (SOURCE-observed state conflict on reachable states)",
+   "z_observed": [
+    true
+   ]
+  },
+  "replace-all-k-with-n(k=5,n=0) | rotate-k(k=1)": {
+   "A_fold_errors": 4,
+   "R_new_pairs": 27,
+   "R_transitions": 36,
+   "TR_fit": true,
+   "TR_fold_errors": 0,
+   "TR_fresh_correct": [
+    20,
+    20
+   ],
+   "T_transitions": 16,
+   "conflict_witness": [],
+   "diagnostic_source_queries": 53,
+   "first_divergences": {
+    "element_unseen_in_T": 0,
+    "pair_outside_T": 4,
+    "previous_state_correct": 4,
+    "state_longer_than_T": 0,
+    "total": 4
+   },
+   "readout_ok": true,
+   "verdict": "REPRESENTABLE (fold-correct Update in the existing cell language under fixed W and z)",
+   "z_observed": [
+    true
+   ]
+  },
+  "rotate-k(k=-2) | replace-all-k-with-n(k=1,n=2)": {
+   "A_fold_errors": 1,
+   "R_new_pairs": 20,
+   "R_transitions": 21,
+   "TR_fit": false,
+   "TR_fold_errors": null,
+   "TR_fresh_correct": null,
+   "T_transitions": 12,
+   "conflict_witness": [],
+   "diagnostic_source_queries": 21,
+   "first_divergences": {
+    "element_unseen_in_T": 0,
+    "pair_outside_T": 1,
+    "previous_state_correct": 1,
+    "state_longer_than_T": 1,
+    "total": 1
+   },
+   "readout_ok": true,
+   "verdict": "UNRESOLVED (no conflict; no Update found on T+R within the diagnostic cap; no impossibility claimed)",
+   "z_observed": [
+    true
+   ]
+  },
+  "rotate-k(k=1) | identify-geq-k(k=2)": {
+   "A_fold_errors": 1,
+   "R_new_pairs": 19,
+   "R_transitions": 28,
+   "TR_fit": true,
+   "TR_fold_errors": 0,
+   "TR_fresh_correct": [
+    13,
+    19
+   ],
+   "T_transitions": 17,
+   "conflict_witness": [],
+   "diagnostic_source_queries": 49,
+   "first_divergences": {
+    "element_unseen_in_T": 0,
+    "pair_outside_T": 1,
+    "previous_state_correct": 1,
+    "state_longer_than_T": 0,
+    "total": 1
+   },
+   "readout_ok": true,
+   "verdict": "REPRESENTABLE (fold-correct Update in the existing cell language under fixed W and z)",
+   "z_observed": [
+    true
+   ]
+  },
+  "rotate-k(k=3)": {
+   "A_fold_errors": 3,
+   "R_new_pairs": 27,
+   "R_transitions": 28,
+   "TR_fit": true,
+   "TR_fold_errors": 0,
+   "TR_fresh_correct": [
+    20,
+    20
+   ],
+   "T_transitions": 10,
+   "conflict_witness": [],
+   "diagnostic_source_queries": 55,
+   "first_divergences": {
+    "element_unseen_in_T": 1,
+    "pair_outside_T": 3,
+    "previous_state_correct": 3,
+    "state_longer_than_T": 3,
+    "total": 3
+   },
+   "readout_ok": true,
+   "verdict": "REPRESENTABLE (fold-correct Update in the existing cell language under fixed W and z)",
+   "z_observed": [
+    false
+   ]
+  }
+ },
+ "fixed_snapshot_ABC": {
+  "A_fit": 9,
+  "A_fold_errors_total": 21,
+  "A_fold_zero": 1,
+  "B_fold_errors_total": 21,
+  "B_fold_zero": 1,
+  "B_improved_vs_A": [],
+  "B_worse_vs_A": [],
+  "C_candidates_judged": {
+   "add-k(k=10) | identify-is-prime": 690,
+   "identify-is-mod-k(k=7)": 351,
+   "identify-is-prime": 20,
+   "positions | append-k(k=3)": 1,
+   "prepend-k(k=-2) | positions": 2040,
+   "prepend-k(k=10) | positions": 0,
+   "replace-all-k-with-n(k=5,n=0) | rotate-k(k=1)": 1,
+   "rotate-k(k=-2) | replace-all-k-with-n(k=1,n=2)": 753,
+   "rotate-k(k=1) | identify-geq-k(k=2)": 525,
+   "rotate-k(k=3)": 1
+  },
+  "C_first_equals_A": 10,
+  "C_fit": 9,
+  "C_fold_errors_total": 15,
+  "C_fold_zero": 3,
+  "C_improved_vs_A": [
+   "add-k(k=10) | identify-is-prime",
+   "identify-is-mod-k(k=7)",
+   "prepend-k(k=-2) | positions",
+   "rotate-k(k=1) | identify-geq-k(k=2)"
+  ],
+  "C_new_update": [
+   "add-k(k=10) | identify-is-prime",
+   "identify-is-mod-k(k=7)",
+   "prepend-k(k=-2) | positions",
+   "rotate-k(k=1) | identify-geq-k(k=2)"
+  ],
+  "C_worse_vs_A": [],
+  "fold_evaluable": 9,
+  "per_task": {
+   "add-k(k=10) | identify-is-prime": {
+    "A": {
+     "R_fit": [
+      30,
+      37
+     ],
+     "cpu": 2.245,
+     "fold": 4,
+     "fresh": [
+      9,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      30,
+      37
+     ],
+     "cpu": 2.514,
+     "fold": 4,
+     "fresh": [
+      9,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      35,
+      37
+     ],
+     "cpu": 5.0,
+     "fold": 2,
+     "fresh": [
+      10,
+      20
+     ]
+    }
+   },
+   "identify-is-mod-k(k=7)": {
+    "A": {
+     "R_fit": [
+      12,
+      14
+     ],
+     "cpu": 2.321,
+     "fold": 2,
+     "fresh": [
+      13,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      12,
+      14
+     ],
+     "cpu": 2.322,
+     "fold": 2,
+     "fresh": [
+      13,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      14,
+      14
+     ],
+     "cpu": 4.834,
+     "fold": 0,
+     "fresh": [
+      19,
+      20
+     ]
+    }
+   },
+   "identify-is-prime": {
+    "A": {
+     "R_fit": [
+      18,
+      26
+     ],
+     "cpu": 2.322,
+     "fold": 4,
+     "fresh": [
+      6,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      18,
+      26
+     ],
+     "cpu": 2.323,
+     "fold": 4,
+     "fresh": [
+      6,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      18,
+      26
+     ],
+     "cpu": 5.0,
+     "fold": 4,
+     "fresh": [
+      6,
+      20
+     ]
+    }
+   },
+   "positions | append-k(k=3)": {
+    "A": {
+     "R_fit": [
+      25,
+      25
+     ],
+     "cpu": 1.143,
+     "fold": 0,
+     "fresh": [
+      15,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      25,
+      25
+     ],
+     "cpu": 2.27,
+     "fold": 0,
+     "fresh": [
+      15,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      25,
+      25
+     ],
+     "cpu": 1.144,
+     "fold": 0,
+     "fresh": [
+      15,
+      20
+     ]
+    }
+   },
+   "prepend-k(k=-2) | positions": {
+    "A": {
+     "R_fit": [
+      21,
+      30
+     ],
+     "cpu": 0.453,
+     "fold": 2,
+     "fresh": [
+      15,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      21,
+      30
+     ],
+     "cpu": 2.266,
+     "fold": 2,
+     "fresh": [
+      15,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      29,
+      30
+     ],
+     "cpu": 5.095,
+     "fold": 1,
+     "fresh": [
+      16,
+      20
+     ]
+    }
+   },
+   "prepend-k(k=10) | positions": {
+    "A": {
+     "R_fit": null,
+     "cpu": 3.238,
+     "fold": null,
+     "fresh": null
+    },
+    "B": {
+     "R_fit": null,
+     "cpu": 0.0,
+     "fold": null,
+     "fresh": null
+    },
+    "C": {
+     "R_fit": null,
+     "cpu": 3.238,
+     "fold": null,
+     "fresh": null
+    }
+   },
+   "replace-all-k-with-n(k=5,n=0) | rotate-k(k=1)": {
+    "A": {
+     "R_fit": [
+      25,
+      36
+     ],
+     "cpu": 0.702,
+     "fold": 4,
+     "fresh": [
+      13,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      25,
+      36
+     ],
+     "cpu": 2.517,
+     "fold": 4,
+     "fresh": [
+      13,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      25,
+      36
+     ],
+     "cpu": 5.0,
+     "fold": 4,
+     "fresh": [
+      13,
+      20
+     ]
+    }
+   },
+   "rotate-k(k=-2) | replace-all-k-with-n(k=1,n=2)": {
+    "A": {
+     "R_fit": [
+      18,
+      21
+     ],
+     "cpu": 2.301,
+     "fold": 1,
+     "fresh": [
+      9,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      18,
+      21
+     ],
+     "cpu": 2.302,
+     "fold": 1,
+     "fresh": [
+      9,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      18,
+      21
+     ],
+     "cpu": 5.0,
+     "fold": 1,
+     "fresh": [
+      9,
+      20
+     ]
+    }
+   },
+   "rotate-k(k=1) | identify-geq-k(k=2)": {
+    "A": {
+     "R_fit": [
+      26,
+      28
+     ],
+     "cpu": 0.044,
+     "fold": 1,
+     "fresh": [
+      11,
+      19
+     ]
+    },
+    "B": {
+     "R_fit": [
+      26,
+      28
+     ],
+     "cpu": 2.507,
+     "fold": 1,
+     "fresh": [
+      11,
+      19
+     ]
+    },
+    "C": {
+     "R_fit": [
+      28,
+      28
+     ],
+     "cpu": 0.579,
+     "fold": 0,
+     "fresh": [
+      13,
+      19
+     ]
+    }
+   },
+   "rotate-k(k=3)": {
+    "A": {
+     "R_fit": [
+      24,
+      28
+     ],
+     "cpu": 2.443,
+     "fold": 3,
+     "fresh": [
+      10,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      24,
+      28
+     ],
+     "cpu": 2.444,
+     "fold": 3,
+     "fresh": [
+      10,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      24,
+      28
+     ],
+     "cpu": 5.0,
+     "fold": 3,
+     "fresh": [
+      10,
+      20
+     ]
+    }
+   }
+  },
+  "tasks": 10
+ },
+ "fixed_snapshot_ABC_real40": {
+  "A_fit": 10,
+  "A_fold_errors_total": 24,
+  "A_fold_zero": 1,
+  "B_fold_errors_total": 24,
+  "B_fold_zero": 1,
+  "B_improved_vs_A": [],
+  "B_worse_vs_A": [],
+  "C_candidates_judged": {
+   "add-k(k=10) | identify-is-prime": 1028,
+   "identify-is-mod-k(k=7)": 351,
+   "identify-is-prime": 1039,
+   "positions | append-k(k=3)": 1,
+   "prepend-k(k=-2) | positions": 1896,
+   "prepend-k(k=10) | positions": 1302,
+   "replace-all-k-with-n(k=5,n=0) | rotate-k(k=1)": 1,
+   "rotate-k(k=-2) | replace-all-k-with-n(k=1,n=2)": 1449,
+   "rotate-k(k=1) | identify-geq-k(k=2)": 525,
+   "rotate-k(k=3)": 778
+  },
+  "C_first_equals_A": 10,
+  "C_fit": 10,
+  "C_fold_errors_total": 17,
+  "C_fold_zero": 3,
+  "C_improved_vs_A": [
+   "add-k(k=10) | identify-is-prime",
+   "identify-is-mod-k(k=7)",
+   "identify-is-prime",
+   "prepend-k(k=-2) | positions",
+   "rotate-k(k=1) | identify-geq-k(k=2)"
+  ],
+  "C_new_update": [
+   "add-k(k=10) | identify-is-prime",
+   "identify-is-mod-k(k=7)",
+   "identify-is-prime",
+   "prepend-k(k=-2) | positions",
+   "rotate-k(k=1) | identify-geq-k(k=2)"
+  ],
+  "C_worse_vs_A": [],
+  "fold_evaluable": 10,
+  "per_task": {
+   "add-k(k=10) | identify-is-prime": {
+    "A": {
+     "R_fit": [
+      30,
+      37
+     ],
+     "cpu": 2.601,
+     "fold": 4,
+     "fresh": [
+      9,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      30,
+      37
+     ],
+     "cpu": 19.213,
+     "fold": 4,
+     "fresh": [
+      9,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      35,
+      37
+     ],
+     "cpu": 40.033,
+     "fold": 2,
+     "fresh": [
+      10,
+      20
+     ]
+    }
+   },
+   "identify-is-mod-k(k=7)": {
+    "A": {
+     "R_fit": [
+      12,
+      14
+     ],
+     "cpu": 2.38,
+     "fold": 2,
+     "fresh": [
+      13,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      12,
+      14
+     ],
+     "cpu": 19.384,
+     "fold": 2,
+     "fresh": [
+      13,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      14,
+      14
+     ],
+     "cpu": 18.946,
+     "fold": 0,
+     "fresh": [
+      19,
+      20
+     ]
+    }
+   },
+   "identify-is-prime": {
+    "A": {
+     "R_fit": [
+      18,
+      26
+     ],
+     "cpu": 2.555,
+     "fold": 4,
+     "fresh": [
+      6,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      18,
+      26
+     ],
+     "cpu": 19.347,
+     "fold": 4,
+     "fresh": [
+      6,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      17,
+      26
+     ],
+     "cpu": 40.002,
+     "fold": 3,
+     "fresh": [
+      6,
+      20
+     ]
+    }
+   },
+   "positions | append-k(k=3)": {
+    "A": {
+     "R_fit": [
+      25,
+      25
+     ],
+     "cpu": 1.681,
+     "fold": 0,
+     "fresh": [
+      15,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      25,
+      25
+     ],
+     "cpu": 18.04,
+     "fold": 0,
+     "fresh": [
+      15,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      25,
+      25
+     ],
+     "cpu": 1.523,
+     "fold": 0,
+     "fresh": [
+      15,
+      20
+     ]
+    }
+   },
+   "prepend-k(k=-2) | positions": {
+    "A": {
+     "R_fit": [
+      21,
+      30
+     ],
+     "cpu": 0.875,
+     "fold": 2,
+     "fresh": [
+      15,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      21,
+      30
+     ],
+     "cpu": 5.366,
+     "fold": 2,
+     "fresh": [
+      15,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      29,
+      30
+     ],
+     "cpu": 40.108,
+     "fold": 1,
+     "fresh": [
+      16,
+      20
+     ]
+    }
+   },
+   "prepend-k(k=10) | positions": {
+    "A": {
+     "R_fit": [
+      19,
+      29
+     ],
+     "cpu": 2.045,
+     "fold": 3,
+     "fresh": [
+      11,
+      19
+     ]
+    },
+    "B": {
+     "R_fit": [
+      19,
+      29
+     ],
+     "cpu": 18.542,
+     "fold": 3,
+     "fresh": [
+      11,
+      19
+     ]
+    },
+    "C": {
+     "R_fit": [
+      19,
+      29
+     ],
+     "cpu": 40.018,
+     "fold": 3,
+     "fresh": [
+      11,
+      19
+     ]
+    }
+   },
+   "replace-all-k-with-n(k=5,n=0) | rotate-k(k=1)": {
+    "A": {
+     "R_fit": [
+      25,
+      36
+     ],
+     "cpu": 0.616,
+     "fold": 4,
+     "fresh": [
+      13,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      25,
+      36
+     ],
+     "cpu": 20.027,
+     "fold": 4,
+     "fresh": [
+      13,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      25,
+      36
+     ],
+     "cpu": 40.003,
+     "fold": 4,
+     "fresh": [
+      13,
+      20
+     ]
+    }
+   },
+   "rotate-k(k=-2) | replace-all-k-with-n(k=1,n=2)": {
+    "A": {
+     "R_fit": [
+      18,
+      21
+     ],
+     "cpu": 1.942,
+     "fold": 1,
+     "fresh": [
+      9,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      18,
+      21
+     ],
+     "cpu": 18.655,
+     "fold": 1,
+     "fresh": [
+      9,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      18,
+      21
+     ],
+     "cpu": 40.003,
+     "fold": 1,
+     "fresh": [
+      9,
+      20
+     ]
+    }
+   },
+   "rotate-k(k=1) | identify-geq-k(k=2)": {
+    "A": {
+     "R_fit": [
+      26,
+      28
+     ],
+     "cpu": 0.036,
+     "fold": 1,
+     "fresh": [
+      11,
+      19
+     ]
+    },
+    "B": {
+     "R_fit": [
+      26,
+      28
+     ],
+     "cpu": 18.76,
+     "fold": 1,
+     "fresh": [
+      11,
+      19
+     ]
+    },
+    "C": {
+     "R_fit": [
+      28,
+      28
+     ],
+     "cpu": 1.402,
+     "fold": 0,
+     "fresh": [
+      13,
+      19
+     ]
+    }
+   },
+   "rotate-k(k=3)": {
+    "A": {
+     "R_fit": [
+      24,
+      28
+     ],
+     "cpu": 2.473,
+     "fold": 3,
+     "fresh": [
+      10,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      24,
+      28
+     ],
+     "cpu": 19.227,
+     "fold": 3,
+     "fresh": [
+      10,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      24,
+      28
+     ],
+     "cpu": 40.007,
+     "fold": 3,
+     "fresh": [
+      10,
+      20
+     ]
+    }
+   }
+  },
+  "tasks": 10
+ },
+ "fixed_snapshot_ABC_real5_run1": {
+  "A_fit": 7,
+  "A_fold_errors_total": 12,
+  "A_fold_zero": 1,
+  "B_fold_errors_total": 12,
+  "B_fold_zero": 1,
+  "B_improved_vs_A": [],
+  "B_worse_vs_A": [],
+  "C_candidates_judged": {
+   "add-k(k=10) | identify-is-prime": 32,
+   "identify-is-mod-k(k=7)": 28,
+   "identify-is-prime": 1,
+   "positions | append-k(k=3)": 1,
+   "prepend-k(k=-2) | positions": 169,
+   "prepend-k(k=10) | positions": 0,
+   "replace-all-k-with-n(k=5,n=0) | rotate-k(k=1)": 1,
+   "rotate-k(k=-2) | replace-all-k-with-n(k=1,n=2)": 102,
+   "rotate-k(k=1) | identify-geq-k(k=2)": 240,
+   "rotate-k(k=3)": 1
+  },
+  "C_first_equals_A": 6,
+  "C_fit": 9,
+  "C_fold_errors_total": 12,
+  "C_fold_zero": 1,
+  "C_improved_vs_A": [],
+  "C_new_update": [
+   "prepend-k(k=-2) | positions"
+  ],
+  "C_worse_vs_A": [],
+  "fold_evaluable": 6,
+  "per_task": {
+   "add-k(k=10) | identify-is-prime": {
+    "A": {
+     "R_fit": [
+      30,
+      37
+     ],
+     "cpu": 1.92,
+     "fold": 4,
+     "fresh": [
+      9,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      30,
+      37
+     ],
+     "cpu": 2.583,
+     "fold": 4,
+     "fresh": [
+      9,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      30,
+      37
+     ],
+     "cpu": 5.065,
+     "fold": 4,
+     "fresh": [
+      9,
+      20
+     ]
+    }
+   },
+   "identify-is-mod-k(k=7)": {
+    "A": {
+     "R_fit": [
+      12,
+      14
+     ],
+     "cpu": 2.187,
+     "fold": 2,
+     "fresh": [
+      13,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      12,
+      14
+     ],
+     "cpu": 2.598,
+     "fold": 2,
+     "fresh": [
+      13,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      12,
+      14
+     ],
+     "cpu": 5.002,
+     "fold": 2,
+     "fresh": [
+      13,
+      20
+     ]
+    }
+   },
+   "identify-is-prime": {
+    "A": {
+     "R_fit": null,
+     "cpu": 2.51,
+     "fold": null,
+     "fresh": null
+    },
+    "B": {
+     "R_fit": null,
+     "cpu": 0.0,
+     "fold": null,
+     "fresh": null
+    },
+    "C": {
+     "R_fit": [
+      18,
+      26
+     ],
+     "cpu": 5.005,
+     "fold": 4,
+     "fresh": [
+      6,
+      20
+     ]
+    }
+   },
+   "positions | append-k(k=3)": {
+    "A": {
+     "R_fit": [
+      25,
+      25
+     ],
+     "cpu": 1.395,
+     "fold": 0,
+     "fresh": [
+      15,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      25,
+      25
+     ],
+     "cpu": 2.272,
+     "fold": 0,
+     "fresh": [
+      15,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      25,
+      25
+     ],
+     "cpu": 1.336,
+     "fold": 0,
+     "fresh": [
+      15,
+      20
+     ]
+    }
+   },
+   "prepend-k(k=-2) | positions": {
+    "A": {
+     "R_fit": null,
+     "cpu": 0.73,
+     "fold": null,
+     "fresh": null
+    },
+    "B": {
+     "R_fit": null,
+     "cpu": 0.0,
+     "fold": null,
+     "fresh": null
+    },
+    "C": {
+     "R_fit": [
+      29,
+      30
+     ],
+     "cpu": 5.143,
+     "fold": 1,
+     "fresh": [
+      16,
+      20
+     ]
+    }
+   },
+   "prepend-k(k=10) | positions": {
+    "A": {
+     "R_fit": [
+      19,
+      29
+     ],
+     "cpu": 2.266,
+     "fold": 3,
+     "fresh": [
+      11,
+      19
+     ]
+    },
+    "B": {
+     "R_fit": [
+      19,
+      29
+     ],
+     "cpu": 2.329,
+     "fold": 3,
+     "fresh": [
+      11,
+      19
+     ]
+    },
+    "C": {
+     "R_fit": null,
+     "cpu": 3.234,
+     "fold": null,
+     "fresh": null
+    }
+   },
+   "replace-all-k-with-n(k=5,n=0) | rotate-k(k=1)": {
+    "A": {
+     "R_fit": [
+      25,
+      36
+     ],
+     "cpu": 0.522,
+     "fold": 4,
+     "fresh": [
+      13,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      25,
+      36
+     ],
+     "cpu": 2.511,
+     "fold": 4,
+     "fresh": [
+      13,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      25,
+      36
+     ],
+     "cpu": 5.003,
+     "fold": 4,
+     "fresh": [
+      13,
+      20
+     ]
+    }
+   },
+   "rotate-k(k=-2) | replace-all-k-with-n(k=1,n=2)": {
+    "A": {
+     "R_fit": [
+      18,
+      21
+     ],
+     "cpu": 2.355,
+     "fold": 1,
+     "fresh": [
+      9,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      18,
+      21
+     ],
+     "cpu": 2.534,
+     "fold": 1,
+     "fresh": [
+      9,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      18,
+      21
+     ],
+     "cpu": 5.004,
+     "fold": 1,
+     "fresh": [
+      9,
+      20
+     ]
+    }
+   },
+   "rotate-k(k=1) | identify-geq-k(k=2)": {
+    "A": {
+     "R_fit": [
+      26,
+      28
+     ],
+     "cpu": 0.038,
+     "fold": 1,
+     "fresh": [
+      11,
+      19
+     ]
+    },
+    "B": {
+     "R_fit": [
+      26,
+      28
+     ],
+     "cpu": 2.509,
+     "fold": 1,
+     "fresh": [
+      11,
+      19
+     ]
+    },
+    "C": {
+     "R_fit": [
+      26,
+      28
+     ],
+     "cpu": 5.032,
+     "fold": 1,
+     "fresh": [
+      11,
+      19
+     ]
+    }
+   },
+   "rotate-k(k=3)": {
+    "A": {
+     "R_fit": null,
+     "cpu": 2.508,
+     "fold": null,
+     "fresh": null
+    },
+    "B": {
+     "R_fit": null,
+     "cpu": 0.0,
+     "fold": null,
+     "fresh": null
+    },
+    "C": {
+     "R_fit": [
+      24,
+      28
+     ],
+     "cpu": 5.091,
+     "fold": 3,
+     "fresh": [
+      10,
+      20
+     ]
+    }
+   }
+  },
+  "tasks": 10
+ },
+ "fixed_snapshot_ABC_real5_run2": {
+  "A_fit": 7,
+  "A_fold_errors_total": 10,
+  "A_fold_zero": 1,
+  "B_fold_errors_total": 10,
+  "B_fold_zero": 0,
+  "B_improved_vs_A": [],
+  "B_worse_vs_A": [],
+  "C_candidates_judged": {
+   "add-k(k=10) | identify-is-prime": 1,
+   "identify-is-mod-k(k=7)": 28,
+   "identify-is-prime": 1,
+   "positions | append-k(k=3)": 1,
+   "prepend-k(k=-2) | positions": 201,
+   "prepend-k(k=10) | positions": 22,
+   "replace-all-k-with-n(k=5,n=0) | rotate-k(k=1)": 0,
+   "rotate-k(k=-2) | replace-all-k-with-n(k=1,n=2)": 112,
+   "rotate-k(k=1) | identify-geq-k(k=2)": 288,
+   "rotate-k(k=3)": 0
+  },
+  "C_first_equals_A": 7,
+  "C_fit": 8,
+  "C_fold_errors_total": 9,
+  "C_fold_zero": 1,
+  "C_improved_vs_A": [
+   "prepend-k(k=-2) | positions"
+  ],
+  "C_new_update": [
+   "prepend-k(k=-2) | positions"
+  ],
+  "C_worse_vs_A": [],
+  "fold_evaluable": 6,
+  "per_task": {
+   "add-k(k=10) | identify-is-prime": {
+    "A": {
+     "R_fit": [
+      30,
+      37
+     ],
+     "cpu": 2.335,
+     "fold": 4,
+     "fresh": [
+      9,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      30,
+      37
+     ],
+     "cpu": 2.623,
+     "fold": 4,
+     "fresh": [
+      9,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      30,
+      37
+     ],
+     "cpu": 5.003,
+     "fold": 4,
+     "fresh": [
+      9,
+      20
+     ]
+    }
+   },
+   "identify-is-mod-k(k=7)": {
+    "A": {
+     "R_fit": [
+      12,
+      14
+     ],
+     "cpu": 1.917,
+     "fold": 2,
+     "fresh": [
+      13,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      12,
+      14
+     ],
+     "cpu": 2.577,
+     "fold": 2,
+     "fresh": [
+      13,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      12,
+      14
+     ],
+     "cpu": 5.029,
+     "fold": 2,
+     "fresh": [
+      13,
+      20
+     ]
+    }
+   },
+   "identify-is-prime": {
+    "A": {
+     "R_fit": null,
+     "cpu": 2.501,
+     "fold": null,
+     "fresh": null
+    },
+    "B": {
+     "R_fit": null,
+     "cpu": 0.0,
+     "fold": null,
+     "fresh": null
+    },
+    "C": {
+     "R_fit": [
+      18,
+      26
+     ],
+     "cpu": 5.005,
+     "fold": 4,
+     "fresh": [
+      6,
+      20
+     ]
+    }
+   },
+   "positions | append-k(k=3)": {
+    "A": {
+     "R_fit": [
+      25,
+      25
+     ],
+     "cpu": 1.536,
+     "fold": 0,
+     "fresh": [
+      15,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": null,
+     "cpu": 0.606,
+     "fold": null,
+     "fresh": null
+    },
+    "C": {
+     "R_fit": [
+      25,
+      25
+     ],
+     "cpu": 1.416,
+     "fold": 0,
+     "fresh": [
+      15,
+      20
+     ]
+    }
+   },
+   "prepend-k(k=-2) | positions": {
+    "A": {
+     "R_fit": [
+      21,
+      30
+     ],
+     "cpu": 0.582,
+     "fold": 2,
+     "fresh": [
+      15,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      21,
+      30
+     ],
+     "cpu": 2.281,
+     "fold": 2,
+     "fresh": [
+      15,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      29,
+      30
+     ],
+     "cpu": 5.099,
+     "fold": 1,
+     "fresh": [
+      16,
+      20
+     ]
+    }
+   },
+   "prepend-k(k=10) | positions": {
+    "A": {
+     "R_fit": null,
+     "cpu": 3.255,
+     "fold": null,
+     "fresh": null
+    },
+    "B": {
+     "R_fit": null,
+     "cpu": 0.0,
+     "fold": null,
+     "fresh": null
+    },
+    "C": {
+     "R_fit": [
+      19,
+      29
+     ],
+     "cpu": 5.031,
+     "fold": 3,
+     "fresh": [
+      11,
+      19
+     ]
+    }
+   },
+   "replace-all-k-with-n(k=5,n=0) | rotate-k(k=1)": {
+    "A": {
+     "R_fit": null,
+     "cpu": 2.515,
+     "fold": null,
+     "fresh": null
+    },
+    "B": {
+     "R_fit": null,
+     "cpu": 0.0,
+     "fold": null,
+     "fresh": null
+    },
+    "C": {
+     "R_fit": null,
+     "cpu": 2.509,
+     "fold": null,
+     "fresh": null
+    }
+   },
+   "rotate-k(k=-2) | replace-all-k-with-n(k=1,n=2)": {
+    "A": {
+     "R_fit": [
+      18,
+      21
+     ],
+     "cpu": 2.384,
+     "fold": 1,
+     "fresh": [
+      9,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      18,
+      21
+     ],
+     "cpu": 2.597,
+     "fold": 1,
+     "fresh": [
+      9,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": [
+      18,
+      21
+     ],
+     "cpu": 5.012,
+     "fold": 1,
+     "fresh": [
+      9,
+      20
+     ]
+    }
+   },
+   "rotate-k(k=1) | identify-geq-k(k=2)": {
+    "A": {
+     "R_fit": [
+      26,
+      28
+     ],
+     "cpu": 0.034,
+     "fold": 1,
+     "fresh": [
+      11,
+      19
+     ]
+    },
+    "B": {
+     "R_fit": [
+      26,
+      28
+     ],
+     "cpu": 2.513,
+     "fold": 1,
+     "fresh": [
+      11,
+      19
+     ]
+    },
+    "C": {
+     "R_fit": [
+      26,
+      28
+     ],
+     "cpu": 5.012,
+     "fold": 1,
+     "fresh": [
+      11,
+      19
+     ]
+    }
+   },
+   "rotate-k(k=3)": {
+    "A": {
+     "R_fit": [
+      24,
+      28
+     ],
+     "cpu": 2.507,
+     "fold": 3,
+     "fresh": [
+      10,
+      20
+     ]
+    },
+    "B": {
+     "R_fit": [
+      24,
+      28
+     ],
+     "cpu": 2.701,
+     "fold": 3,
+     "fresh": [
+      10,
+      20
+     ]
+    },
+    "C": {
+     "R_fit": null,
+     "cpu": 2.52,
+     "fold": null,
+     "fresh": null
+    }
+   }
+  },
+  "tasks": 10
+ },
+ "machine_followup_D_CD_vclock": {
+  "CD": {
+   "challenge_passed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "cpu_total": 315.96,
+   "machine_formed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "queries_total": 658,
+   "solved": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ]
+  },
+  "D": {
+   "challenge_passed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "cpu_total": 324.27,
+   "machine_formed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "queries_total": 658,
+   "solved": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ]
+  },
+  "arms": [
+   "CD",
+   "D"
+  ],
+  "tasks": 11
+ },
+ "machine_followup_D_real": {
+  "D": {
+   "challenge_passed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "cpu_total": 330.21,
+   "machine_formed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "queries_total": 658,
+   "solved": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ]
+  },
+  "arms": [
+   "D"
+  ],
+  "tasks": 11
+ },
+ "machine_followup_geq_A_vs_D_real_run1": {
+  "A": {
+   "challenge_passed": [],
+   "cpu_total": 30.02,
+   "machine_formed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "queries_total": 60,
+   "solved": []
+  },
+  "D": {
+   "challenge_passed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "cpu_total": 30.02,
+   "machine_formed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "queries_total": 58,
+   "solved": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ]
+  },
+  "D_lost_vs_A": [],
+  "D_new_solves_vs_A": [
+   "rotate-k(k=1) | identify-geq-k(k=2)"
+  ],
+  "arms": [
+   "A",
+   "D"
+  ],
+  "tasks": 1
+ },
+ "machine_followup_geq_A_vs_D_real_run2": {
+  "A": {
+   "challenge_passed": [],
+   "cpu_total": 30.0,
+   "machine_formed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "queries_total": 60,
+   "solved": []
+  },
+  "D": {
+   "challenge_passed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "cpu_total": 30.02,
+   "machine_formed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "queries_total": 58,
+   "solved": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ]
+  },
+  "D_lost_vs_A": [],
+  "D_new_solves_vs_A": [
+   "rotate-k(k=1) | identify-geq-k(k=2)"
+  ],
+  "arms": [
+   "A",
+   "D"
+  ],
+  "tasks": 1
+ },
+ "machine_followup_geq_A_vs_D_real_run3": {
+  "A": {
+   "challenge_passed": [],
+   "cpu_total": 30.02,
+   "machine_formed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "queries_total": 60,
+   "solved": []
+  },
+  "D": {
+   "challenge_passed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "cpu_total": 30.01,
+   "machine_formed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "queries_total": 58,
+   "solved": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ]
+  },
+  "D_lost_vs_A": [],
+  "D_new_solves_vs_A": [
+   "rotate-k(k=1) | identify-geq-k(k=2)"
+  ],
+  "arms": [
+   "A",
+   "D"
+  ],
+  "tasks": 1
+ },
+ "machine_real_run1": {
+  "A": {
+   "challenge_passed": [],
+   "cpu_total": 330.23,
+   "machine_formed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "queries_total": 660,
+   "solved": []
+  },
+  "B": {
+   "challenge_passed": [],
+   "cpu_total": 330.25,
+   "machine_formed": [],
+   "queries_total": 660,
+   "solved": []
+  },
+  "B_lost_vs_A": [],
+  "B_new_solves_vs_A": [],
+  "C": {
+   "challenge_passed": [],
+   "cpu_total": 330.14,
+   "machine_formed": [],
+   "queries_total": 660,
+   "solved": []
+  },
+  "C_lost_vs_A": [],
+  "C_new_solves_vs_A": [],
+  "arms": [
+   "A",
+   "B",
+   "C"
+  ],
+  "tasks": 11
+ },
+ "machine_real_run2": {
+  "A": {
+   "challenge_passed": [],
+   "cpu_total": 330.19,
+   "machine_formed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "queries_total": 660,
+   "solved": []
+  },
+  "B": {
+   "challenge_passed": [],
+   "cpu_total": 330.17,
+   "machine_formed": [],
+   "queries_total": 660,
+   "solved": []
+  },
+  "B_lost_vs_A": [],
+  "B_new_solves_vs_A": [],
+  "C": {
+   "challenge_passed": [],
+   "cpu_total": 330.19,
+   "machine_formed": [],
+   "queries_total": 660,
+   "solved": []
+  },
+  "C_lost_vs_A": [],
+  "C_new_solves_vs_A": [],
+  "arms": [
+   "A",
+   "B",
+   "C"
+  ],
+  "tasks": 11
+ },
+ "machine_vclock": {
+  "A": {
+   "challenge_passed": [],
+   "cpu_total": 387.58,
+   "machine_formed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "queries_total": 660,
+   "solved": []
+  },
+  "B": {
+   "challenge_passed": [],
+   "cpu_total": 360.07,
+   "machine_formed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "queries_total": 660,
+   "solved": []
+  },
+  "B_lost_vs_A": [],
+  "B_new_solves_vs_A": [],
+  "C": {
+   "challenge_passed": [
+    "identify-is-mod-k(k=7)"
+   ],
+   "cpu_total": 420.69,
+   "machine_formed": [
+    "identify-is-mod-k(k=7)"
+   ],
+   "queries_total": 658,
+   "solved": [
+    "identify-is-mod-k(k=7)"
+   ]
+  },
+  "C_lost_vs_A": [],
+  "C_new_solves_vs_A": [
+   "identify-is-mod-k(k=7)"
+  ],
+  "arms": [
+   "A",
+   "B",
+   "C"
+  ],
+  "tasks": 11
+ },
+ "scope": "DEVELOPMENT ONLY -- opened list-routines; no FRESH / FORMAL data; gates unchanged"
+}

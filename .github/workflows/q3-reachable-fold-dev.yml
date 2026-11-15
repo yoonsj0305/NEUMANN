@@ -1,0 +1,72 @@
+name: Q3 reachable-state fold diagnostic (opened development only)
+
+# Deterministic (virtual-clock) reproduction of the committed development evidence in
+# docs/experiments/dev/reachable_state/: the reachable-state diagnosis and the fixed-snapshot A/B/C comparison.
+# Runs only when these experiment files change; no sealed FRESH / FORMAL data is read.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/q3-reachable-fold-dev.yml'
+      - 'research/q3/vclock.py'
+      - 'research/q3/reachable_state_diagnosis_dev.py'
+      - 'research/q3/fold_reach_replay_dev.py'
+      - 'docs/experiments/dev/reachable_state/**'
+
+permissions:
+  contents: read
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONHASHSEED: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install project dependencies
+        run: |
+          python -m pip install numpy==2.4.6 scipy==1.17.1 scikit-learn==1.9.1 threadpoolctl==3.7.0
+          python -m pip install -e .
+      - name: Fixed-snapshot A/B/C (virtual clock)
+        run: |
+          python research/q3/fold_reach_replay_dev.py \
+            --snapshots docs/experiments/dev/update_snapshots/lr.jsonl \
+            --target-list docs/experiments/dev/update_snapshots/post_synthesis_first_failure.json \
+            --out /tmp/fold_reach_replay.jsonl --cpu 5 --vclock
+      - name: Reachable-state diagnosis (virtual clock)
+        run: |
+          python research/q3/reachable_state_diagnosis_dev.py \
+            --snapshots docs/experiments/dev/update_snapshots/lr.jsonl \
+            --target-list docs/experiments/dev/update_snapshots/post_synthesis_first_failure.json \
+            --out /tmp/reachable_diagnosis.jsonl --cpu 5 --diag-cpu 20 --vclock
+      - name: Compare with the committed evidence (decisions, not wall-clock fields)
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          def load(p):
+              rows = [json.loads(l) for l in pathlib.Path(p).read_text().splitlines() if l.strip()]
+              return {r["name"]: r for r in rows}
+          ok = True
+          for f in ("fold_reach_replay.jsonl", "reachable_diagnosis.jsonl"):
+              a, b = load("/tmp/" + f), load("docs/experiments/dev/reachable_state/" + f)
+              same = a == b
+              print(f, "identical" if same else "DIFFERENT", len(a), len(b))
+              if not same:
+                  ok = False
+                  for k in sorted(set(a) | set(b)):
+                      if a.get(k) != b.get(k):
+                          print("  differs:", k)
+          raise SystemExit(0 if ok else 1)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q3-reachable-fold-dev
+          path: |
+            /tmp/fold_reach_replay.jsonl
+            /tmp/reachable_diagnosis.jsonl
+          if-no-files-found: warn
