@@ -1,0 +1,306 @@
+{
+ "Q_regressions_vs_A": [],
+ "Q_vs_A": {
+  "A_only": [],
+  "Q_only": [
+   "fst(k=2,pred=mod5,trans=count,out=x_plus_s)",
+   "rha(k=2;p=odd;d=1001;o=plus)"
+  ],
+  "p": 0.5
+ },
+ "V2_rule": {
+  "count": 5,
+  "met": true,
+  "psi40_attribution": [
+   "fst(k=2,pred=mod5,trans=count,out=x_plus_s)",
+   "fst(k=3,pred=mod5,trans=count,out=x_if_s0)",
+   "rha(k=2;p=odd;d=1001;o=plus)"
+  ],
+  "psi40_attribution_count": 3,
+  "qdq_runs": 19,
+  "tasks": [
+   "append-k(k=2) | kth-smallest(k=3)",
+   "fst(k=2,pred=mod5,trans=count,out=x_plus_s)",
+   "fst(k=3,pred=mod5,trans=count,out=x_if_s0)",
+   "rha(k=2;p=odd;d=1001;o=plus)",
+   "rotate-k(k=10) | kth-largest(k=2)"
+  ],
+  "threshold": 5
+ },
+ "arms": {
+  "A": {
+   "cpu": 2007.71,
+   "formation_queries": 2930,
+   "robust_verified": 12,
+   "runs": 74,
+   "solved": 16,
+   "verified": 12
+  },
+  "AL": {
+   "cpu": 1782.75,
+   "formation_queries": 2542,
+   "robust_verified": 6,
+   "runs": 62,
+   "solved": 10,
+   "verified": 6
+  },
+  "P": {
+   "cpu": 1784.85,
+   "formation_queries": 2568,
+   "robust_verified": 6,
+   "runs": 62,
+   "solved": 9,
+   "verified": 5
+  },
+  "Q": {
+   "cpu": 2011.88,
+   "formation_queries": 3061,
+   "robust_verified": 14,
+   "runs": 74,
+   "solved": 19,
+   "verified": 14
+  },
+  "Qno": {
+   "cpu": 1775.91,
+   "formation_queries": 2771,
+   "robust_verified": 6,
+   "runs": 62,
+   "solved": 10,
+   "verified": 6
+  }
+ },
+ "core_evidence": [
+  {
+   "Q_runs": [
+    true,
+    true,
+    true,
+    true,
+    false
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false,
+     false,
+     false
+    ],
+    "AL": [
+     false,
+     false,
+     false,
+     false,
+     false
+    ],
+    "P": [
+     false,
+     false,
+     false,
+     false,
+     false
+    ],
+    "Qno": [
+     false,
+     false,
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "fst16",
+   "semantic": [
+    271,
+    271
+   ],
+   "states": [
+    "automaton(k=2; guard=(eq 0 (mod $0 5)); delta=[([0, 0], 0), ([0, 1], 1), ([1, 0], 1), ([1, 1], 0)])"
+   ],
+   "task": "fst(k=2,pred=mod5,trans=count,out=x_plus_s)"
+  },
+  {
+   "Q_runs": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false,
+     false,
+     false
+    ],
+    "AL": [
+     false,
+     false,
+     false,
+     false,
+     false
+    ],
+    "P": [
+     false,
+     false,
+     false,
+     false,
+     false
+    ],
+    "Qno": [
+     false,
+     false,
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "rha16",
+   "semantic": [
+    299,
+    299
+   ],
+   "states": [
+    "automaton(k=2; guard=(eq 0 (mod $0 2)); delta=[([0, 0], 0), ([0, 1], 1), ([1, 0], 1), ([1, 1], 0)])"
+   ],
+   "task": "rha(k=2;p=odd;d=1001;o=plus)"
+  }
+ ],
+ "groups": {
+  "fst16": {
+   "A": {
+    "cpu": 471.69,
+    "robust_verified": [
+     "fst(k=2,pred=geq10,trans=toggle,out=x_if_s0)",
+     "fst(k=2,pred=geq9,trans=toggle,out=x_if_s0)"
+    ]
+   },
+   "AL": {
+    "cpu": 475.47,
+    "robust_verified": [
+     "fst(k=2,pred=geq10,trans=toggle,out=x_if_s0)",
+     "fst(k=2,pred=geq9,trans=toggle,out=x_if_s0)"
+    ]
+   },
+   "P": {
+    "cpu": 476.86,
+    "robust_verified": [
+     "fst(k=2,pred=geq10,trans=toggle,out=x_if_s0)",
+     "fst(k=2,pred=geq9,trans=toggle,out=x_if_s0)"
+    ]
+   },
+   "Q": {
+    "cpu": 475.78,
+    "robust_verified": [
+     "fst(k=2,pred=geq10,trans=toggle,out=x_if_s0)",
+     "fst(k=2,pred=geq9,trans=toggle,out=x_if_s0)",
+     "fst(k=2,pred=mod5,trans=count,out=x_plus_s)"
+    ]
+   },
+   "Qno": {
+    "cpu": 471.7,
+    "robust_verified": [
+     "fst(k=2,pred=geq10,trans=toggle,out=x_if_s0)",
+     "fst(k=2,pred=geq9,trans=toggle,out=x_if_s0)"
+    ]
+   }
+  },
+  "lr_need30": {
+   "A": {
+    "cpu": 828.37,
+    "robust_verified": [
+     "repeat-k(k=2) | index-k(k=3)",
+     "repeat-k(k=5) | index-k(k=2)",
+     "rotate-k(k=1) | drop-k(k=3)",
+     "rotate-k(k=10) | kth-largest(k=2)"
+    ]
+   },
+   "AL": {
+    "cpu": 826.93,
+    "robust_verified": [
+     "repeat-k(k=2) | index-k(k=3)",
+     "repeat-k(k=5) | index-k(k=2)",
+     "rotate-k(k=1) | drop-k(k=3)",
+     "rotate-k(k=10) | kth-largest(k=2)"
+    ]
+   },
+   "P": {
+    "cpu": 827.63,
+    "robust_verified": [
+     "repeat-k(k=2) | index-k(k=3)",
+     "repeat-k(k=5) | index-k(k=2)",
+     "rotate-k(k=1) | drop-k(k=3)",
+     "rotate-k(k=10) | kth-largest(k=2)"
+    ]
+   },
+   "Q": {
+    "cpu": 828.04,
+    "robust_verified": [
+     "repeat-k(k=2) | index-k(k=3)",
+     "repeat-k(k=5) | index-k(k=2)",
+     "rotate-k(k=1) | drop-k(k=3)",
+     "rotate-k(k=10) | kth-largest(k=2)"
+    ]
+   },
+   "Qno": {
+    "cpu": 823.98,
+    "robust_verified": [
+     "repeat-k(k=2) | index-k(k=3)",
+     "repeat-k(k=5) | index-k(k=2)",
+     "rotate-k(k=1) | drop-k(k=3)",
+     "rotate-k(k=10) | kth-largest(k=2)"
+    ]
+   }
+  },
+  "lr_ord12": {
+   "A": {
+    "cpu": 227.39,
+    "robust_verified": [
+     "identify-k(k=-2) | identify-k(k=-2)",
+     "identify-k(k=3) | replace-all-k-with-n(k=5,n=0)",
+     "mult-k(k=2) | add-k(k=-2)",
+     "prepend-k(k=-2) | is-mod-k(k=3)",
+     "replace-all-k-with-n(k=3,n=-2) | prepend-k(k=3)",
+     "slice-k-n(k=3,n=4) | append-k(k=3)"
+    ]
+   },
+   "Q": {
+    "cpu": 227.78,
+    "robust_verified": [
+     "identify-k(k=-2) | identify-k(k=-2)",
+     "identify-k(k=3) | replace-all-k-with-n(k=5,n=0)",
+     "mult-k(k=2) | add-k(k=-2)",
+     "prepend-k(k=-2) | is-mod-k(k=3)",
+     "replace-all-k-with-n(k=3,n=-2) | prepend-k(k=3)",
+     "slice-k-n(k=3,n=4) | append-k(k=3)"
+    ]
+   }
+  },
+  "rha16": {
+   "A": {
+    "cpu": 480.26,
+    "robust_verified": []
+   },
+   "AL": {
+    "cpu": 480.35,
+    "robust_verified": []
+   },
+   "P": {
+    "cpu": 480.36,
+    "robust_verified": []
+   },
+   "Q": {
+    "cpu": 480.28,
+    "robust_verified": [
+     "rha(k=2;p=odd;d=1001;o=plus)"
+    ]
+   },
+   "Qno": {
+    "cpu": 480.22,
+    "robust_verified": []
+   }
+  }
+ },
+ "tasks": 74
+}

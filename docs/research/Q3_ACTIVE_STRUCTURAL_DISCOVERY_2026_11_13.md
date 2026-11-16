@@ -1986,3 +1986,192 @@ python -m pytest -q tests/test_psi.py
 
 No FRESH / FORMAL seal opened, no sealed verdict changed, no section 35–38 task counted, no per-task code, no budget
 increase; Q6 untouched; PR #780 stays Draft.
+
+## 40. Structural identifiability: PSI40 (2026-11-16) — DEVELOPMENT ONLY
+
+Directive "Q3 §40 Structural Identifiability Breakthrough" (base `637e92c`, branch `ccr-99abe820-3phmf0`). Section 39's
+PSI failed for three structural reasons:
+1. a state outside the fixed fold list could not be found;
+2. two distinctions left thousands of folds admissible, so a size prior chose among them;
+3. a failed PSI round spent CPU and SOURCE queries the existing path needed.
+
+PSI40 changes the order of work: identify the state from observations, *construct* an executable representation for
+it, and only then synthesise. Every arm keeps 30 CPU s and 60 SOURCE queries (real `time.process_time()`). Raw
+evidence: `docs/experiments/dev/psi40/`.
+
+**Result in one line.** On a pre-registered set of 74 new tasks, PSI40 verifies 14 against A's 12, with no loss. Two
+tasks carry core evidence: only PSI40 solves them, and withholding the invented state makes them fail again (5/5
+and 4/5 runs). One of the two comes from a family never used in development. The frozen V2 rule is met at exactly 5
+tasks, but only 3 of the 5 are PSI40's (2 with core evidence). **V2: OPEN** under the pre-registered verdict rule.
+
+### 40.1 What changed (code: `neumann1/stateid.py`, `neumann1/active.py` `psi40_round`, opt-in, default off)
+
+| directive item | §39 defect | PSI40 mechanism |
+|---|---|---|
+| P0-A identification without candidates | Experiments were chosen by entropy over candidate programs (a size prior); only pairs with the same current state were comparable. | **Residual future signatures.** When the black box only extends its answer, the residual F(u·w) − F(u) depends on the hidden state alone (Myhill–Nerode for the residual function). Any two observed prefixes, even with different current answers, are compared for free: a differing residual is a separation; agreement on ≥ 2 suffixes that tell other prefixes apart is equal-future evidence. **Experiments are candidate-free**: prefix-closed chains of the least-covered elements, a check on the best table's unobserved cells (closure), and an element on which the best guards disagree. If evidence is insufficient, the state is left undecided. Infinite input domains are never claimed to be identified. |
+| P0-B executable representation | The latent had to be one of 2326 enumerated folds; 13/16 §39 FST states were outside that list. | **Constructed automata.** A guard g(x) is a boolean program of the generic substrate over one element, with the observed element values as constants, enumerated in cost order and collapsed by the partition it induces on the observed alphabet. A smallest table δ(q, g(x)) is found by backtracking over the prefix tree of guard words, such that the run from q = 0 separates every separation (k ≤ 4). The automaton is computable on any input; its post-step value is exposed to the Update, which the unchanged R2 cell construction synthesises. Existing folds remain a second family (unbounded counters). |
+| P0-C identification before synthesis | Two distinctions, then the top 2 of thousands of candidates were synthesised. | Representations of both families are **collapsed into classes by the partition they induce** on the observed prefixes. A class must separate every separation; classes are ordered by equal-evidence splits, then description length, then value magnitude. Experiments decide where the two best classes disagree. A **counterexample split** (Rivest–Schapire style) turns a wrongly folded example into a new separation before the second try. At most 2 synthesis attempts (as in §39). Failures are classified as *not representable / insufficient information / search time* (`stateid.classify_failure`). |
+| P0-D preserving the baseline | PSI pre-empted working paths and spent their queries. | **Entry** only where the existing path has given up ("no informative continuation", component limit, unlocalisable counterexample), or at the first "update not found" when residual signatures already show history-dependent futures (no query spent to decide). **Budget check:** at least 3 s of formation CPU left, and at most half of the remaining SOURCE queries. **Necessity check (observation only):** a same-state distinction, a conflicting transition or a history-dependent residual. Nothing is spent when a check fails. During the attempt the identified state replaces continuation components the path added; on failure everything is restored. |
+
+**Opt-in length floor (`latent.LENGTH_FLOOR`).** The R2 construction gives its answer-length stage 0.12 × span. Below
+about a 10 s span, the stage is cut before it finishes on 4-input tables (controlled case 1). Q, Qno and the control
+AL give it at least 1.5 s inside the same deadline (a reallocation, not more CPU). AL = A + the floor alone.
+
+### 40.2 Controlled cases (P0-E, development; nothing counted)
+
+* **Representation sufficiency with the true state** (`research/q3/psi40_controlled_dev.py`,
+  `controlled_true_state_floor*.jsonl`). The 16 §39 FSTs (now development data) get the true automaton state, exposed
+  before and after the element. Updates are fitted from the reachable transitions of the 8 initial examples.
+  * All 16 give an Update that is exact on 200 fresh inputs: 200/200 each.
+  * Without the floor, the k = 3 tasks need a 10–20 s cap: at 2 s and 5 s the construction gives up after
+    0.24 / 0.6 s. With the floor they fit at caps of at most 5 s, in 0.9–1.5 s.
+  * So the representation was sufficient. The remaining defects were identification and the synthesis span.
+  * An earlier version of this check (`..._BUGGY_truth_superseded`) compared against the oracle. The oracle blocks
+    hidden-test inputs (the empty input is one), so the comparison was wrong; it was replaced by the generator's truth.
+* **The two §39 regressions** (`dev_lr42_iter7_Q.jsonl`). On the 42 §39 list-routines tasks, Q verifies the same 13
+  tasks as A, including both §39 losses. The necessity and budget checks skip PSI40 there.
+
+### 40.3 Development iterations (dev = §39 fst16, dev18, lr42; all already used)
+
+The pass criterion was the same each time: more dev-FST verified, and no A-verified dev task lost.
+
+| it. | hypothesis | change | result |
+|---|---|---|---|
+| 0 | Same-state distinctions plus candidate-free experiments are enough | first PSI40 (raw smoke runs on 4 tasks not kept) | 0/4. Necessity blocked 2/4: a list answer rarely gives two prefixes the same state. With 2 distinctions, all 155 guards admit k = 2 and the trivial guard won. |
+| 1 | Residuals compare prefixes across different answers | residual signatures; closure and disagreement tests on any prefix pair; budget = half of the remaining queries | `dev_iter1`: 4/16 (A 0/16 in §39). First construction: guard `(eq 0 (mod $0 2))` with 0 queries, verified 298/298. |
+| 3 | Thin evidence → wrong table; late entry → no CPU | counterexample split; early entry on residual evidence | `dev_iter3`: 4/16 (a different 4) |
+| 4 | The k = 3 Updates starve on span (controlled case) | length floor 1.5 s; AL control | `dev_iter4`: Q 5/16, **AL 0/16** |
+| 5 | Continuation components the path added double the synthesis | the identified state replaces them during the attempt; chain experiments | `dev_iter5`: **6/16** |
+| 6 | The Update overfits sparse trajectories | every memo transition supervises the attempt | `dev_iter6`: 5/16, with more "search time" → **replaced** |
+| 7 | — | only the memo transitions the found Update gets wrong are added (counterexample-guided) | `dev_iter7`: 5/16. lr42: Q 13 = A 13. dev18: Q 4, A 3, PSI39 5. |
+| 8 | Equal evidence under one uninformative suffix misranks (`(add 1 (mod $0 7))` chosen over length) | equal-future = agreement on ≥ 2 history-dependent suffixes | `dev_iter8`: 4/16 (criterion **not met**; kept as a defect fix, since ±1 task varied between iterations) |
+| 9 | Disagreement tests on prefixes without values; arbitrary class representative; closure after the budget was spent | skip missing values; tie-break by value magnitude; closure first; element closure | `dev_iter9`: 5/16, dev18 4 → **frozen** |
+
+### 40.4 Pre-registered evaluation (frozen in `e162bf0` before any run on it)
+
+* **Set** (`research/q3/psi40_eval_set_dev.py`, `eval_set.json`, name + SHA-256 per task; 74 tasks):
+  * `lr_need30` / `lr_ord12`: new compositions of the independent list-routines lineage (seed
+    `compose:neumann-q3-psi40-eval-v1`; every earlier name excluded);
+  * `fst16`: new draws of the FST family. **PSI40 was developed on this family**; the §39 tasks are excluded.
+  * `rha16`: **random hidden automata** (`research/q3/psi40_rha_family.py`), written for this evaluation and never used
+    in development:
+    * random tables with k = 2–4;
+    * one or two predicates per element class (x < t, odd, (x mod m) < r, x ∈ {a, b});
+    * three output kinds;
+    * 9/16 tasks have two predicates (up to four classes), which is outside PSI40's one-guard class.
+* **Arms** (`prereg.json`):
+  * A;
+  * P = PSI39 as frozen in §39;
+  * Q = PSI40;
+  * Qno = PSI40 with the state withheld;
+  * AL = A + the length floor;
+  * QDq = Q's queries replayed passively (the frozen V2 control).
+
+  lr_need30, fst16 and rha16 got all five formation arms; lr_ord12 got A and Q; QDq ran on the 19 tasks Q solved.
+  Replication covered the 3 tasks whose verified outcome differed between arms.
+
+**Results** (robust verified, after replicates; CPU in seconds, all arms at the 30 s cap):
+
+| arm | lr_need30 | lr_ord12 | fst16 | rha16 | total robust verified | total CPU | formation queries |
+|---|---|---|---|---|---|---|---|
+| A | 4 | 6 | 2 | 0 | **12 / 74** | 2007.7 | 2930 |
+| Q (PSI40) | 4 | 6 | **3** | **1** | **14 / 74** | 2011.9 | 3061 |
+| P (PSI39) | 4 | — | 2 | 0 | 6 / 62 | 1784.9 | 2568 |
+| Qno | 4 | — | 2 | 0 | 6 / 62 | 1775.9 | 2771 |
+| AL | 4 | — | 2 | 0 | 6 / 62 | 1782.8 | 2542 |
+
+* **Q vs A:**
+  * Q-only 2, A-only 0, exact McNemar p = 0.5, no robust regression.
+  * Real CPU +0.2 % (equal by construction: every arm spends the cap).
+  * Formation queries +4.5 %.
+* **PSI40 inside Q:**
+  * 102 rounds, of which 68 were skipped by the budget or necessity check at no cost;
+  * 34 entered, spending 259 s and 532 queries in total;
+  * 9 adoptions.
+* **Replicates** (2 same-seed + seeds 1, 2):
+  * `fst(k=2,pred=mod5,trans=count,out=x_plus_s)`: Q 4/5, A / P / AL / Qno 0/5 each;
+  * `rha(k=2;p=odd;d=1001;o=plus)`: Q 5/5, every control 0/5;
+  * `fst(k=2,pred=geq10,trans=toggle,out=x_if_s0)`: verified by all arms in the majority of runs.
+
+### 40.5 Invention evidence (the two core-evidence tasks)
+
+**`rha(k=2;p=odd;d=1001;o=plus)`** — new family, never seen in development:
+* **Why the old representation failed:** with the answer as state, both machines end with "no update for component
+  0" and "no informative continuation". This holds in A, P, AL and Qno.
+* **Observed distinctions:**
+  * free evidence: residuals of 3 suffixes are history-dependent (4 separations);
+  * a candidate-free chain [15, 4, 8, 13, 16, 3, 12, 11] and 8 disagreement tests (e.g. [] vs [0] distinct, [] vs
+    [3, 12] distinct) raise this to 30 separations;
+  * 21 SOURCE queries in total.
+* **New state:** of 135 guard partitions, 127 merge a separation and 7 admit no 2-state table. The single
+  construction left is `automaton(k=2; guard=(eq 0 (mod $0 2)); δ: 0 –even→ 1, 1 –even→ 0, odd keeps)`. That is the
+  parity of even elements, built from the observations; it was not in any list.
+* **Fold competition:** of the 8653 fold candidates, the best admissible fold class splits 8 equal-evidence pairs;
+  the automaton splits none.
+* **Update:** `relcells m=(add $0 1) | ((eq $0 $3) ? value (add $5 $6) : copy 0[$0])`, i.e. append x + the new state.
+  It was found in the first attempt with 9.9 s left.
+* **Ablation:** Qno (same experiments, state withheld) is not solved in 0/5 runs.
+* **Independent verification:** challenge passed; 299/299 random inputs correct; replicated 5/5.
+
+**`fst(k=2,pred=mod5,trans=count,out=x_plus_s)`** — the development family, new draw:
+* **New state:** constructed from 16 separations (17 queries): `automaton(k=2; guard=(eq 0 (mod $0 5)); count mod 2)`.
+  152 of 153 guards merge a separation.
+* **Update:** the same form, append x + the new state.
+* **Ablation:** Qno fails 0/5.
+* **Independent verification:** challenge passed; 271/271 random inputs; replicated 4/5. Seed 2 was not solved.
+
+**Not counted as evidence:** `fst(k=3,pred=mod5,trans=count,out=x_if_s0)`. Q passes its hidden test with a 2-state
+automaton for a 3-state task, but only 271/293 random inputs are correct. It counts for the frozen V2 rule (hidden-test
+solves), not as core evidence.
+
+### 40.6 Verdicts (rules frozen in `prereg.json`; `psi40_verdict_dev.py`, `eval_verdict.json`)
+
+* **CORE EVIDENCE: 2 tasks.** PSI40 alone solves them, and removing the invented state makes them fail again.
+* **Frozen V2 rule: met (5 / 5).** 5 tasks are solved by Q with an accepted machine of m ≥ 2 that QDq does not solve
+  (QDq solves 12 of 19). But:
+  * 2 of the 5 (`append-k(k=2) | kth-smallest(k=3)`, `rotate-k(k=10) | kth-largest(k=2)`) are solved identically by
+    every arm, through the existing continuation components;
+  * PSI40 attribution is 3, of which 2 carry core evidence.
+* **V2 verdict (pre-registered: PASS needs the rule AND ≥ 5 PSI40-attributed tasks with core evidence): OPEN.**
+* **Regression vs A: none.** Solve rate 14 vs 12 of 74 at equal real CPU, formation queries +4.5 %.
+* **V3: not evaluated.** The directive allows learning only after sufficient V2 invention evidence, and there is not
+  enough.
+* **Official verdicts unchanged:** V1 PASS (sealed), V2 FAIL (FORMAL, sealed) / independent OPEN, V3 FAIL, Q3 OPEN;
+  Q6 untouched.
+* **The §40 set is spent.** Any change from here turns it into development data.
+
+### 40.7 Where PSI40 still fails (post-hoc; first outcome per task on the evaluation, Q arm)
+
+| group | verified (any path) | adopted, not verified | insufficient information | search time | skipped by necessity | PSI40 never reached |
+|---|---|---|---|---|---|---|
+| fst16 | 3 | 3 | 2 | 1 | 5 | 2 |
+| rha16 | 1 | 3 | 4 | 4 | 4 | 0 |
+| lr_need30 | 4 | 0 | 5 | 5 | 3 (+1 budget) | 12 |
+
+**Next first failure: the state count under thin evidence.** Minimal-k picks k = 2 whenever the observed separations
+allow it: 3 adopted-not-verified FSTs, including the k = 3 task above. Further failure sources:
+* **Necessity check is too conservative.** It misses tasks whose trajectories show no history-dependent residual
+  (5 + 4).
+* **One guard is too few.** 9/16 RHA tasks need two predicates (up to 4 element classes).
+* **List-routines states are out of reach.** Their hidden states (top-k values and similar) are not finite-state;
+  PSI40 makes no gain there.
+
+None of this is fixed on the spent set.
+
+### 40.8 Reproduction
+
+```
+git checkout e162bf0                    # frozen code, set, criteria
+export PYTHONHASHSEED=0
+python -c "import json;e=json.load(open('docs/experiments/dev/psi40/eval_set.json'));json.dump([t['name'] for g in ('lr_need30','fst16','rha16') for t in e[g]],open('/tmp/m62.json','w'));json.dump([t['name'] for t in e['lr_ord12']],open('/tmp/o12.json','w'))"
+python research/q3/budgeted_reach_dev.py --names-file /tmp/m62.json --arms A,P,Q,Qno,AL --out run1.jsonl --workers 4 --semantic
+python research/q3/budgeted_reach_dev.py --names-file /tmp/o12.json --arms A,Q --out run1.jsonl --workers 4 --semantic
+NEUMANN_REPLAY_ROWS=run1.jsonl python research/q3/budgeted_reach_dev.py --names-file <Q-solved names> --arms QDq --out qdq.jsonl --workers 4 --semantic
+python research/q3/psi40_verdict_dev.py --base run1.jsonl --reps rep2.jsonl rep3.jsonl seeds.jsonl --dq qdq.jsonl
+python research/q3/psi40_controlled_dev.py docs/experiments/dev/psi/eval_set.json 1.5
+python -m pytest -q tests/test_psi.py
+```
+
+No FRESH / FORMAL seal opened, no sealed verdict changed, no §35–39 task counted, no task-specific inventor or
+constant (guards use the observed values as constants), no budget increase (the floor is a reallocation, controlled
+by AL); Q6 untouched; PR #780 stays Draft.
