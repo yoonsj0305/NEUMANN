@@ -1,0 +1,368 @@
+{
+ "R_regressions_vs_A": [],
+ "R_vs_A": {
+  "A_only": [],
+  "R_only": [
+   "fst(k=2,pred=eq15,trans=count,out=keep_if_s0)",
+   "fst(k=2,pred=geq11,trans=count,out=keep_if_s0)",
+   "fst(k=2,pred=geq13,trans=count,out=keep_if_s0)",
+   "fst(k=2,pred=mod2,trans=count,out=x_plus_s)",
+   "fst(k=2,pred=mod3,trans=toggle,out=x_plus_s)",
+   "rha(k=2;p=modlt_3_2;d=1000;o=keepset_0)"
+  ],
+  "p": 0.0312
+ },
+ "R_vs_Q": {
+  "Q_only": [
+   "fst(k=2,pred=geq8,trans=toggle,out=keep_if_s0)",
+   "fst(k=3,pred=mod2,trans=count,out=x_if_s0)",
+   "rha(k=2;p=odd;d=1001;o=keepset_1)"
+  ],
+  "R_only": [
+   "fst(k=2,pred=eq15,trans=count,out=keep_if_s0)",
+   "fst(k=2,pred=geq11,trans=count,out=keep_if_s0)",
+   "fst(k=2,pred=mod3,trans=toggle,out=x_plus_s)"
+  ]
+ },
+ "V2_rule": {
+  "count": 8,
+  "frozen_metric_tasks": [
+   "fst(k=2,pred=eq10,trans=count,out=x_plus_s)",
+   "fst(k=2,pred=eq15,trans=count,out=keep_if_s0)",
+   "fst(k=2,pred=geq11,trans=count,out=keep_if_s0)",
+   "fst(k=2,pred=geq13,trans=count,out=keep_if_s0)",
+   "fst(k=2,pred=mod2,trans=count,out=x_plus_s)",
+   "fst(k=2,pred=mod3,trans=toggle,out=x_plus_s)",
+   "intersperse-k(k=-2) | sum",
+   "rha(k=2;p=modlt_3_2;d=1000;o=keepset_0)"
+  ],
+  "met": true,
+  "rdq_runs": 20,
+  "substantive_verified_tasks": [
+   "fst(k=2,pred=eq15,trans=count,out=keep_if_s0)",
+   "fst(k=2,pred=geq11,trans=count,out=keep_if_s0)",
+   "fst(k=2,pred=geq13,trans=count,out=keep_if_s0)",
+   "fst(k=2,pred=mod2,trans=count,out=x_plus_s)",
+   "fst(k=2,pred=mod3,trans=toggle,out=x_plus_s)",
+   "intersperse-k(k=-2) | sum",
+   "rha(k=2;p=modlt_3_2;d=1000;o=keepset_0)"
+  ],
+  "threshold": 5,
+  "with_core_evidence": [
+   "fst(k=2,pred=eq15,trans=count,out=keep_if_s0)",
+   "fst(k=2,pred=geq11,trans=count,out=keep_if_s0)",
+   "fst(k=2,pred=mod3,trans=toggle,out=x_plus_s)"
+  ]
+ },
+ "V2_verdict": "OPEN",
+ "arms": {
+  "A": {
+   "cpu": 1485.65,
+   "formation_queries": 2178,
+   "hidden_test_only": 0,
+   "hidden_test_solved": 13,
+   "robust_verified": 13,
+   "runs": 56,
+   "verified": 13
+  },
+  "Q": {
+   "cpu": 1246.81,
+   "formation_queries": 1868,
+   "hidden_test_only": 1,
+   "hidden_test_solved": 13,
+   "robust_verified": 12,
+   "runs": 44,
+   "verified": 12
+  },
+  "R": {
+   "cpu": 1484.62,
+   "formation_queries": 2345,
+   "hidden_test_only": 1,
+   "hidden_test_solved": 20,
+   "robust_verified": 19,
+   "runs": 56,
+   "verified": 19
+  },
+  "Rno": {
+   "cpu": 1242.69,
+   "formation_queries": 2088,
+   "hidden_test_only": 0,
+   "hidden_test_solved": 6,
+   "robust_verified": 6,
+   "runs": 44,
+   "verified": 6
+  }
+ },
+ "core_evidence": [
+  {
+   "R_runs": [
+    true,
+    true,
+    true,
+    false,
+    false
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false,
+     false,
+     false
+    ],
+    "Q": [
+     false,
+     false,
+     false,
+     false,
+     false
+    ],
+    "Rno": [
+     false,
+     false,
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "fst",
+   "semantic": [
+    300,
+    300
+   ],
+   "states": [
+    "automaton(k=2; guard=(eq $0 15); delta=[([0, 0], 0), ([0, 1], 1), ([1, 0], 1), ([1, 1], 0)])"
+   ],
+   "task": "fst(k=2,pred=eq15,trans=count,out=keep_if_s0)"
+  },
+  {
+   "R_runs": [
+    true,
+    true,
+    true,
+    true,
+    false
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false,
+     false,
+     false
+    ],
+    "Q": [
+     false,
+     false,
+     false,
+     true,
+     true
+    ],
+    "Rno": [
+     false,
+     false,
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "fst",
+   "semantic": [
+    296,
+    296
+   ],
+   "states": [
+    "automaton(k=2; guard=(lt $0 11); delta=[([0, 0], 1), ([0, 1], 0), ([1, 0], 0), ([1, 1], 1)])"
+   ],
+   "task": "fst(k=2,pred=geq11,trans=count,out=keep_if_s0)"
+  },
+  {
+   "R_runs": [
+    true,
+    true,
+    true,
+    false,
+    false
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false,
+     false,
+     false
+    ],
+    "Q": [
+     false,
+     false,
+     false,
+     false,
+     false
+    ],
+    "Rno": [
+     false,
+     false,
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "fst",
+   "semantic": [
+    299,
+    299
+   ],
+   "states": [
+    "automaton(k=2; guard=(eq 0 (mod $0 3)); delta=[([0, 0], 0), ([0, 1], 1), ([1, 0], 0), ([1, 1], 0)])"
+   ],
+   "task": "fst(k=2,pred=mod3,trans=toggle,out=x_plus_s)"
+  }
+ ],
+ "groups": {
+  "fst": {
+   "A": {
+    "cpu": 475.79,
+    "hidden_test_only": [],
+    "robust_verified": [
+     "fst(k=2,pred=geq7,trans=toggle,out=x_if_s0)"
+    ]
+   },
+   "Q": {
+    "cpu": 476.07,
+    "hidden_test_only": [
+     "fst(k=2,pred=eq10,trans=count,out=x_plus_s)"
+    ],
+    "robust_verified": [
+     "fst(k=2,pred=geq13,trans=count,out=keep_if_s0)",
+     "fst(k=2,pred=geq7,trans=toggle,out=x_if_s0)",
+     "fst(k=2,pred=geq8,trans=toggle,out=keep_if_s0)",
+     "fst(k=2,pred=mod2,trans=count,out=x_plus_s)",
+     "fst(k=3,pred=mod2,trans=count,out=x_if_s0)"
+    ]
+   },
+   "R": {
+    "cpu": 476.14,
+    "hidden_test_only": [
+     "fst(k=2,pred=eq10,trans=count,out=x_plus_s)"
+    ],
+    "robust_verified": [
+     "fst(k=2,pred=eq15,trans=count,out=keep_if_s0)",
+     "fst(k=2,pred=geq11,trans=count,out=keep_if_s0)",
+     "fst(k=2,pred=geq13,trans=count,out=keep_if_s0)",
+     "fst(k=2,pred=geq7,trans=toggle,out=x_if_s0)",
+     "fst(k=2,pred=mod2,trans=count,out=x_plus_s)",
+     "fst(k=2,pred=mod3,trans=toggle,out=x_plus_s)"
+    ]
+   },
+   "Rno": {
+    "cpu": 476.07,
+    "hidden_test_only": [],
+    "robust_verified": [
+     "fst(k=2,pred=geq7,trans=toggle,out=x_if_s0)"
+    ]
+   }
+  },
+  "lr_need12": {
+   "A": {
+    "cpu": 288.48,
+    "hidden_test_only": [],
+    "robust_verified": [
+     "append-k(k=3) | index-k(k=3)",
+     "intersperse-k(k=-2) | sum",
+     "repeat-k(k=2) | index-k(k=2)",
+     "rotate-k(k=-2) | drop-k(k=5)",
+     "rotate-k(k=-2) | tail"
+    ]
+   },
+   "Q": {
+    "cpu": 290.32,
+    "hidden_test_only": [],
+    "robust_verified": [
+     "append-k(k=3) | index-k(k=3)",
+     "intersperse-k(k=-2) | sum",
+     "repeat-k(k=2) | index-k(k=2)",
+     "rotate-k(k=-2) | drop-k(k=5)",
+     "rotate-k(k=-2) | tail"
+    ]
+   },
+   "R": {
+    "cpu": 286.07,
+    "hidden_test_only": [],
+    "robust_verified": [
+     "append-k(k=3) | index-k(k=3)",
+     "intersperse-k(k=-2) | sum",
+     "repeat-k(k=2) | index-k(k=2)",
+     "rotate-k(k=-2) | drop-k(k=5)",
+     "rotate-k(k=-2) | tail"
+    ]
+   },
+   "Rno": {
+    "cpu": 286.3,
+    "hidden_test_only": [],
+    "robust_verified": [
+     "append-k(k=3) | index-k(k=3)",
+     "intersperse-k(k=-2) | sum",
+     "repeat-k(k=2) | index-k(k=2)",
+     "rotate-k(k=-2) | drop-k(k=5)",
+     "rotate-k(k=-2) | tail"
+    ]
+   }
+  },
+  "lr_ord12": {
+   "A": {
+    "cpu": 241.19,
+    "hidden_test_only": [],
+    "robust_verified": [
+     "append-k(k=-2) | prepend-k(k=2)",
+     "append-k(k=10) | keep-mod-k(k=2)",
+     "drop-k(k=3) | empty",
+     "identify-geq-k(k=2) | pow-base-k(k=3)",
+     "modulo-k(k=3) | replace-index-k-with-n(k=5,n=0)",
+     "mult-k(k=10) | repeat-k(k=3)",
+     "repeat-k(k=3) | min"
+    ]
+   },
+   "R": {
+    "cpu": 241.99,
+    "hidden_test_only": [],
+    "robust_verified": [
+     "append-k(k=-2) | prepend-k(k=2)",
+     "append-k(k=10) | keep-mod-k(k=2)",
+     "drop-k(k=3) | empty",
+     "identify-geq-k(k=2) | pow-base-k(k=3)",
+     "modulo-k(k=3) | replace-index-k-with-n(k=5,n=0)",
+     "mult-k(k=10) | repeat-k(k=3)",
+     "repeat-k(k=3) | min"
+    ]
+   }
+  },
+  "rha": {
+   "A": {
+    "cpu": 480.19,
+    "hidden_test_only": [],
+    "robust_verified": []
+   },
+   "Q": {
+    "cpu": 480.42,
+    "hidden_test_only": [],
+    "robust_verified": [
+     "rha(k=2;p=modlt_3_2;d=1000;o=keepset_0)",
+     "rha(k=2;p=odd;d=1001;o=keepset_1)"
+    ]
+   },
+   "R": {
+    "cpu": 480.42,
+    "hidden_test_only": [],
+    "robust_verified": [
+     "rha(k=2;p=modlt_3_2;d=1000;o=keepset_0)"
+    ]
+   },
+   "Rno": {
+    "cpu": 480.32,
+    "hidden_test_only": [],
+    "robust_verified": []
+   }
+  }
+ },
+ "tasks": 56
+}

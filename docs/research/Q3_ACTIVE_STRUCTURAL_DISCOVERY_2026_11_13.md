@@ -2175,3 +2175,172 @@ python -m pytest -q tests/test_psi.py
 No FRESH / FORMAL seal opened, no sealed verdict changed, no §35–39 task counted, no task-specific inventor or
 constant (guards use the observed values as constants), no budget increase (the floor is a reallocation, controlled
 by AL); Q6 untouched; PR #780 stays Draft.
+
+## 41. Evidence-driven structural invention: PSI41 (2026-11-16) — DEVELOPMENT ONLY
+
+Directive "Q3 Fundamental Invention Breakthrough" (base `4bc13b0`). The question: can the system discover from
+observation which computational structure is needed, and build it as an executable representation, *without
+mistaking "consistent with what was observed" for "sufficient for the future"*? All arms keep 30 CPU s and 60 SOURCE
+queries. Raw evidence: `docs/experiments/dev/psi41/`.
+
+### 41.1 Phase 1 — root cause (§40 failures, now development data)
+
+Every §40 task where PSI40 adopted a state that was wrong (7 of 9 adoptions) was compared with the generator's true
+machine. The first wrong structural decision was always the same: **when the evidence admitted several structures,
+one was committed to without a test.**
+* **Minimal k taken as true:** 2 tasks. A 2-state table was chosen for a 3-state machine because a 2-state table
+  explained every observation. Example: `fst(k=3,pred=mod5,trans=count,out=x_if_s0)` passed its hidden test with
+  271/293 random inputs correct.
+* **Arbitrary guard generalisation:** 4 tasks. Several guards agreed on every observed element; the smallest was taken
+  (`(eq $0 0)` for "x mod 3 = 0", `(lt $0 4)` for "x ≥ 5").
+* **Unobserved cells filled with "stay":** 5 of the 7 adoptions.
+
+### 41.2 The mechanism (`neumann1/stateid.py` §41 part, `active.py` `psi41_identify`; opt-in `PSI41`, default off)
+
+**A — required distinctions.** As in §40: residual future signatures, plus separations between prefixes the current
+representation merges. Observation only.
+
+**B — construction.** The executable structures consistent with the evidence form a **version space**:
+* guards are boolean substrate programs over the **whole observed value range**, not only the observed elements;
+* for each guard, **every** table (`dfa_enumerate`) at the smallest admissible size *and* at one state more;
+* plus the fold classes;
+* structures that predict the same state partition on the observed and candidate prefixes are one hypothesis.
+
+**C — unidentified parts kept open.**
+* A cell no observation reached stays **unknown** (`make_partial_automaton`): a run that meets it gives no answer.
+* Competing structures are kept until evidence removes them.
+* Free equal-future evidence is used as **retractable** merge constraints.
+
+**D — discriminating experiments.**
+* The next observation is the prefix p whose predicted behaviour class splits the surviving structures most evenly.
+  Each structure predicts which observed representative p behaves like. Structures whose representatives would show
+  the same residuals on the tested continuations count as one outcome.
+* The experiment observes p and two informative continuations (the second starts with an element of the guard's other
+  class), and the same continuations of the predicted representative.
+* p's residuals are then compared with every representative: a difference is a separation, agreement on both is an
+  experiment-backed merge.
+* The structure is **identified** when no candidate prefix splits the survivors. If the budget (at most half the
+  remaining queries) runs out first, it stays **undetermined and nothing is synthesised from it**.
+
+**E — execution and repair.**
+* Update synthesis runs only on an identified structure.
+* A refuted structure is removed, its untested merges retracted, and the structure re-identified from all evidence
+  including the refuting observation (`revise`).
+* A counterexample split adds only the one separation it proves.
+
+Entry, budget and necessity checks are those of §40 (PSI40), unchanged.
+
+### 41.3 Iterations (development: the 8 §40 diagnostic tasks, then 16 never-used Phase 3 tasks)
+
+| it. | hypothesis | change | pass criterion | result |
+|---|---|---|---|---|
+| 1 | Keeping competing structures removes wrong adoptions | version space, unknown cells, synthesis only when identified; pair tests | no wrong adoption on the 8 diagnostic tasks | `dev_diag_iter1`: 0 wrong adoptions, but most rounds undetermined (36–1843 left); a §40 core task lost |
+| 2 | One observation should constrain many pairs | prefix-centred test, residuals compared with every observed prefix | ≥ the 2 §40 core tasks kept, no wrong adoption | `dev_diag_iter2`: 3 verified (the 2 core + **3-state `fst(k=3,pred=mod4,trans=count,out=x_if_s0)` identified** 3218 → 2), 0 wrong |
+| 3 | The principle transfers to unused tasks | (none) | R verifies a task A and PSI40 do not, and Rno fails it | `phase3_A_Q_R_Rno_iter2` (16 new tasks): A 0, PSI40 4, R 2, Rno 0; `fst(k=3,pred=mod3,trans=count,out=x_if_s0)` R only |
+| 4 | Tests should split the survivors evenly | even-split (query-by-committee) choice | dev24 verified ≥ 3 | `dev24_R_iter4`: 3, 0 hidden-only |
+| 5 | Choose by expected eliminations per query | information per SOURCE query | ≥ it. 4 | `dev24_R_iter5`: **0** → reverted (only representatives with known residuals counted, so most rounds stopped early) |
+| 6 | Free equal evidence shrinks the space | retractable free merges | ≥ it. 4 | `dev24_R_iter6`: 3 (few free merges exist) |
+| 7 | Evidence was lost between entries, and some tests could not tell outcomes apart | evidence kept per machine; split by observable outcome | key-task replicates improve | `phase3_key_R_replicates_iter8`: mod3 2/5 → unchanged |
+| 8 | A test's own outcome was only used through the generic criterion | test outcome applied directly; merges retracted on refutation | the key task robust (≥ 3/5) | `phase3_key_R_replicates_final`: **mod3 3/5, geq9 5/5**; Rno 0/5 on both; `dev24_R_iter7`: 5 verified, 1 hidden-only → **frozen** |
+
+**Phase 3 decisive case** (never-used task `fst(k=3,pred=mod3,trans=count,out=x_if_s0)`):
+
+| arm | verified runs |
+|---|---|
+| A | 0/5 |
+| PSI40 | 1/5 |
+| R | 3/5 |
+| R-no-state | 0/5 |
+
+* R narrows 4755–5307 structures to 1 in 5 tests (20 queries).
+* The identified structure is the 3-state `automaton(k=3; guard=(eq 0 (mod $0 3)))`, i.e. count mod 3.
+* The answer is correct on 299/299 random inputs.
+* With the state withheld (R-no-state), the task fails.
+
+### 41.4 Pre-registered independent evaluation (frozen in `6c29dfe` before any run on it)
+
+**Set** (`psi41_task_set_dev.py`, `eval_set.json`), every earlier task excluded:
+* 16 new FST draws and 16 new RHA draws (the development families, disclosed);
+* 12 latent-need and 12 ordinary new list-routines compositions as a regression guard.
+
+**Arms:**
+* A;
+* Q = PSI40 as frozen in §40;
+* R = new;
+* Rno = R with the identified state withheld;
+* RDq = R's queries replayed and solved passively.
+
+**Disclosed deviation.** After 140 of 200 base rows, a constructed guard program raised `Fail` on an element value it
+had never seen. That exception aborted the whole harness. A post-freeze fix gives such an element a class of its own
+(`d568766`; corrected in `854f8ca`, since the first fix broke word ordering). The fix changes only runs in which a
+guard raised. The remaining 60 base rows, the RDq replay and all replicates ran with the fixed code
+(`eval_commit.txt`).
+
+**Results** (robust verified; replicates for the 9 tasks whose verified outcome differed between arms):
+
+| arm | fst16 | rha16 | lr_need12 | lr_ord12 | total | hidden-test only | total CPU s | formation queries |
+|---|---|---|---|---|---|---|---|---|
+| A | 1 | 0 | 5 | 7 | **13 / 56** | 0 | 1485.7 | 2178 |
+| Q (PSI40) | 5 | 2 | 5 | — | 12 / 44 | 1 | 1246.8 | 1868 |
+| **R (new)** | **6** | 1 | 5 | 7 | **19 / 56** | 1 | 1484.6 | 2345 |
+| Rno | 1 | 0 | 5 | — | 6 / 44 | 0 | 1242.7 | 2088 |
+
+* **R vs A:** R-only 6, A-only 0, exact McNemar p = 0.031. No regression. Real CPU is equal (−0.1 %); formation
+  queries +7.7 %.
+* **R vs Q:** R-only 3, Q-only 3. On one Q-only task, `fst(k=3,pred=mod2,trans=count,out=x_if_s0)`, R *identified*
+  the 3-state structure (142 → 1) but its Update synthesis ran out of time.
+* **Adoption precision:**
+
+  | arm | tasks with an adopted state | verified | hidden-test only | not solved |
+  |---|---|---|---|---|
+  | R | 8 | 6 | 1 | 1 |
+  | Q | 12 | 6 | 1 | 5 |
+
+  R did not synthesise in 33 rounds it could not settle.
+
+**Core evidence: 3 tasks.** In each, R robustly verifies with an identified state, and A, Q and Rno do not.
+
+| task | runs verified (R / A / Q / Rno) | structures, experiments | constructed state | Update | random inputs correct |
+|---|---|---|---|---|---|
+| `fst(k=2,pred=eq15,trans=count,out=keep_if_s0)` | 3 / 0 / 0 / 0 of 5 | 6 → 2 with 1 experiment (3 queries) | `automaton(k=2; guard=(eq $0 15); count mod 2)` | `relcells m=(add $0 (sub 1 $2)) \| ((eq $0 $3) ? value $6 : copy 0[$0])` (keep x when the new state is 0) | 300/300 |
+| `fst(k=2,pred=geq11,trans=count,out=keep_if_s0)` | 4 / 0 / 2 / 0 of 5 | 88 → 2 with 3 experiments (10 queries) | `automaton(k=2; guard=(lt $0 11))` | same form | 296/296 |
+| `fst(k=2,pred=mod3,trans=toggle,out=x_plus_s)` | 3 / 0 / 0 / 0 of 5 | 4 → 2 with 1 experiment | `automaton(k=2; guard=(eq 0 (mod $0 3)); toggle)` | append x + the new state | 299/299 |
+
+### 41.5 Verdicts (`psi41_verdict_dev.py`, `eval_verdict.json`)
+
+* **Frozen V2 rule: met.**
+  * Frozen metric (hidden test): 8 tasks solved by R with an accepted m ≥ 2 machine that RDq does not solve.
+  * Substantive (verified): 7.
+* **With core evidence: 3 < 5 → V2 OPEN** (pre-registered rule). Of the other V2 tasks, 3 are also solved by PSI40,
+  one by the existing path, and one only on its hidden test.
+* **Official verdicts unchanged:** V1 PASS (sealed), V2 FAIL (FORMAL) / independent OPEN, V3 FAIL (not evaluated),
+  Q3 OPEN; Q6 untouched.
+* **The §41 set is spent.**
+
+### 41.6 What changed, and the next first failure
+
+**What is new.** Structures the system could not previously represent *correctly* are now identified from observation
+before use:
+* a third state that a 2-state table fitted (Phase 3, mod 3; dev mod 4);
+* guards on never-observed element values;
+* table cells no observation reached, which are left open instead of filled.
+
+Wrong confident structures dropped from 7 of 9 adoptions (§40 diagnostic) to 1 hidden-test-only of 8 adoptions in the
+evaluation, and R solves 6 tasks A cannot.
+
+**Next first failure: identification budget.**
+* 33 evaluation rounds stayed undetermined, with half the remaining queries spent and tens to hundreds of structures
+  left.
+* When identification succeeds late, the Update synthesis may run out of CPU (the 3-state Q-only task).
+* Multi-predicate classes (RHA) are still outside one-guard automata.
+
+### 41.7 Reproduction
+
+```
+git checkout 854f8ca && export PYTHONHASHSEED=0
+python research/q3/budgeted_reach_dev.py --names-file <fst+rha+lr_need12 names> --arms A,Q,R,Rno --out run1.jsonl --workers 4 --semantic
+python research/q3/budgeted_reach_dev.py --names-file <lr_ord12 names> --arms A,R --out run1.jsonl --workers 4 --semantic
+NEUMANN_REPLAY_ROWS=run1.jsonl python research/q3/budgeted_reach_dev.py --names-file <R-solved names> --arms RDq --out rdq.jsonl --workers 4 --semantic
+python research/q3/psi41_verdict_dev.py --base run1.jsonl --reps rep2.jsonl rep3.jsonl seeds.jsonl --dq rdq.jsonl
+python -m pytest -q tests/test_psi.py
+```
