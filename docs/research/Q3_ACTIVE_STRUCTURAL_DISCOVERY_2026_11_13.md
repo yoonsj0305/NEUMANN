@@ -2505,6 +2505,15 @@ Directive: do not propose a new architecture. Remove the computational bottlenec
 value; no task template). First pass criterion: a task R fails is solved exactly **inside the agent** at 30 CPU s / 60
 SOURCE queries. Raw evidence: `docs/experiments/dev/psi44/`.
 
+**Result in one line.**
+* The binding cost of §43 was the solver's symbolic operator choice. Factored joint synthesis removes it: the same
+  machine is found in 0.02 s instead of 12–30 s or `unknown`.
+* In the agent at the frozen caps: the decisive task R fails is solved, and development goes 21 / 24.
+* **Pre-registered independent evaluation** on 70 never-used HRT tasks: **K robustly verifies 60, against A 8, R 11
+  and Kno 8.**
+* **V2 rule met, verdict PASS** under the frozen criteria (development track; official sealed verdicts unchanged).
+* Limits are in §44.6: the latent_need group alone gives 4 V2 tasks; same family; conditional updates not covered.
+
 ### 44.1 P0-A: where the cost was
 
 Fixed for every variant: `hrt(u=diff;o=gtkeep)`, the per-step answers along the 8 given examples' prefixes (27 steps),
@@ -2659,3 +2668,78 @@ Two development fixes were made after the first 24-task run in the agent (the re
 * **Rules:** as §44.4, frozen V2 rule with K in D's place and KDq in Dq's.
   * PASS needs ≥ 5 V2 tasks **with core evidence**: K robust, while A, R and Kno are not.
   * Official sealed verdicts unchanged.
+
+### 44.6 Pre-registered evaluation: results and verdict (`eval_*.jsonl`, `eval_verdict.json`)
+
+Code as frozen (neumann1/ = 080541c). Runs as pre-registered:
+* **base:** A, R, K, Kno on all 70 tasks;
+* **KDq:** on the 61 tasks K solves;
+* **replication:** 2 more same-seed runs and seeds 1, 2 for the 54 tasks whose verified outcome differs between the
+  arms.
+
+Two disclosures (`freeze_addendum.txt`):
+* The first launch stopped at task resolution, before any agent ran. The harness's task-hash check did not list the
+  new set file, and adding that file to the list was the only change.
+* The seed step was cut by the session's 2-hour background limit at 397 / 432 rows. It was resumed: only missing
+  rows were run, and in-flight jobs leave no row.
+
+Robustly verified (strict majority of runs; hidden tests **and** 300 random diagnostic inputs exact), same 30 CPU s and
+60 SOURCE queries per run:
+
+| arm | latent_need (9) | other (61) | all (70) | CPU, base runs |
+|---|---|---|---|---|
+| A | 0 | 8 | 8 | 1957 s |
+| R (§41) | 0 | 11 | 11 | 1969 s |
+| **K** | **5** | **55** | **60** | 1904 s |
+| Kno (same queries, machine withheld) | 0 | 8 | 8 | 1949 s |
+| KDq (K's queries, passive; on K's 61) | — | — | 8 solved | — |
+
+**Comparisons:**
+* K vs A: 52 tasks only K solves, 0 only A.
+* K vs R: 50 only K, 1 only R (`countgt/delta`). McNemar p < 10⁻⁶ for both comparisons.
+
+**Stability:** on the 54 replicated tasks, K verifies 5 of 5 runs on 52 tasks, 4 of 5 on 1, and 0 of 5 on 1. The other
+arms solve almost none of these tasks: A 53 × 0/5, R 50 × 0/5, Kno 52 × 0/5.
+
+**Semantic check:** one K solve passed the hidden tests only (`countgt/gtkeep`, 230/271 random inputs). It is not
+verified and not counted as core evidence.
+
+**Generalisation beyond development:**
+* **delta** (x − h, an output kind absent from development): K robustly verifies 21 of the 22 delta tasks. The one
+  it misses is `countgt/delta`, which needs a conditional update.
+* **prev** (the update kind absent from development): K robustly verifies 5 of 5.
+* For every `satsum B` with delta, plusx or gtkeep, K's machine:
+  * uses the invented remaining-capacity latent c, with h' = h − min(h, x) from z0 = B;
+  * rewrites the output in it — x − h = (c + x) − B, h' + x = (x − c') + B, and "x > h" as "c + x > B";
+  * so it is not the hidden register.
+
+**Verdict under the frozen rules:**
+* **V2 rule: met.** 53 tasks: K solves them with an accepted m = 2 machine and KDq does not; 52 of them are verified.
+* **Core evidence:** 50 tasks (latent_need 5, other 45); 49 of the 53 V2 tasks carry it.
+* → **V2 verdict: PASS** (development track; official sealed verdicts unchanged).
+
+**Limits, stated with the verdict:**
+* **Primary group alone.** In the latent_need group, K verifies 5 / 9 with core evidence. But KDq solves one of
+  them (`satsum22/gtkeep`), so the V2 metric inside that group alone is **4 (< 5)**. The pre-registered rule is over
+  the whole set, with groups reported separately; the PASS rests on the whole set.
+* **Same family.** The set is developer-authored (§42) and uses the same family and operator vocabulary as
+  development. These are new parameter and output combinations, including one output kind never seen in
+  development, not a new computational family.
+* **Regression and uncovered updates.** The one regression, `countgt/delta`, and every countgt task need a
+  conditional update, which is outside the operator set; no representation family was added (P0-E).
+* **Failures.** K does not robustly verify 10 tasks:
+  * 4 countgt tasks (conditional update);
+  * `satsum11/evenkeep`, `satsum15/gtkeep`, `satsum17/mod5`, `satsum19/evenkeep`, `satsum19/gtkeep`,
+    `summod10/gtkeep`.
+  For these, the machine found first is wrong, or the shortest true machine (2 operators + a 2-digit constant) is not
+  reached inside the core's CPU share. This is the next computational limit: search depth at 2 operators with a constant,
+  not operator choice.
+* **What was not changed:** Q6 core, sealed results, V2 rule, the 30 s / 60-query caps, R. PR #780 remains Draft.
+
+**Result in one line (§44):**
+* Removing the operator-choice bottleneck (factored joint synthesis: structure enumeration in description-length
+  order, latent trace as a consequence, one functional-table check per update, exactly solved output constants,
+  distinguishing experiments, counterexample re-synthesis) turns the §43 principle from 0 / 24 in the agent into:
+  * **21 / 24 in development**;
+  * **60 / 70 robustly verified on a frozen, never-used set** (A 8, R 11, Kno 8);
+  * **V2 PASS under the frozen rule** (53 tasks; 49 with core evidence), within the same CPU and query budget.
