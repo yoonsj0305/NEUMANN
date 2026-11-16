@@ -1,0 +1,69 @@
+{
+ "arms": {
+  "A": "baseline",
+  "R": "section 41 mechanism, unchanged",
+  "RDq": "R's SOURCE queries replayed and solved passively (frozen V2 control)",
+  "Rno": "R with the identified state withheld"
+ },
+ "budget": {
+  "clock": "time.process_time()",
+  "cpu_seconds": 30.0,
+  "source_queries": 60
+ },
+ "code": "the R mechanism of section 41 (commit 854f8ca for neumann1/), unchanged; no PSI42 code (discarded: no agent-level constraint removed)",
+ "code_blobs": {
+  "neumann1/active.py": "e592c59a634477854584c24456dc5ba57d6135f4",
+  "neumann1/latent.py": "c4978481f01837f07da22fbb39247b17f3786981",
+  "neumann1/stateid.py": "a1e2fb93860d16fe1e23dd313746162394801a05",
+  "research/q3/budgeted_reach_dev.py": "100d24914ef39b5609087b9251ea8213bd3da08e",
+  "research/q3/env_listroutines.py": "b4fb73e602b69d8d5159a92a547accdad82da47f",
+  "research/q3/psi41_verdict_dev.py": "016f7aa6ade21afed50301cf408bfc09eb2b4483",
+  "research/q3/psi42_hrt_family.py": "70f6249eaf3577a7b1c9b36e5d1c5b5ef0b48a38",
+  "research/q3/psi_eval_set_dev.py": "c54072ac7f84696214712c20e2fb8b4a59cbd95f"
+ },
+ "criteria": {
+  "CORE_EVIDENCE": "R robustly verifies with an accepted machine containing an identified state; A and Rno do not",
+  "V2 rule (frozen)": ">= 5 tasks solved by R with an accepted m >= 2 machine that RDq does not solve",
+  "V2 verdict": "PASS if the rule is met AND >= 5 of its tasks carry core evidence; FAIL if not met; OPEN otherwise",
+  "official": "sealed verdicts unchanged",
+  "robust": "strict majority of runs",
+  "verified_solve": "hidden test AND all random diagnostic inputs correct"
+ },
+ "evaluation_set": {
+  "disclosure": "a developer-authored family written for section 42; 24 development draws were run with A, R and the discarded PSI42 before this freeze; R was not changed using them",
+  "file": "eval_set.json",
+  "hrt": [
+   "hrt(u=summod5;o=evenkeep)",
+   "hrt(u=satsum11;o=mod5)",
+   "hrt(u=satsum24;o=gtkeep)",
+   "hrt(u=satsum20;o=mod5)",
+   "hrt(u=satsum23;o=mod5)",
+   "hrt(u=satsum13;o=mod5)",
+   "hrt(u=satsum14;o=mod5)",
+   "hrt(u=satsum18;o=mod5)",
+   "hrt(u=satsum16;o=gtkeep)",
+   "hrt(u=satsum12;o=mod5)",
+   "hrt(u=satsum18;o=evenkeep)",
+   "hrt(u=satsum14;o=evenkeep)",
+   "hrt(u=satsum10;o=mod5)",
+   "hrt(u=satsum24;o=mod5)",
+   "hrt(u=satsum18;o=gtkeep)",
+   "hrt(u=satsum22;o=mod5)"
+  ],
+  "sha256": "d48469e2460cc881311332fbb081e70e7f7a92c25f12684fa774feb700d25051"
+ },
+ "harness": "research/q3/budgeted_reach_dev.py, as in sections 40-41",
+ "question": "does the UNCHANGED section 41 identification principle (residual-future distinctions, version space of executable structures, discriminating experiments, synthesis only when identified) construct the executable state of a NEW computational structure -- hidden numeric registers (HRT) -- that it was never developed on?",
+ "runs": {
+  "RDq": "every task R solves (hidden test) in its base run",
+  "hrt16": [
+   "A",
+   "R",
+   "Rno"
+  ],
+  "replication": "every task whose verified outcome differs between arms: 2 more same-seed runs and seeds 1, 2"
+ },
+ "schema": "neumann.q3-psi42-prereg.v1",
+ "status": "FROZEN before any agent run on the evaluation set (development only; official sealed verdicts unchanged)",
+ "verdict_script": "research/q3/psi41_verdict_dev.py --eval-set docs/experiments/dev/psi42/eval_set.json"
+}

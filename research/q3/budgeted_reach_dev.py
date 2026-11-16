@@ -158,10 +158,11 @@ def registered():
     if pathlib.Path(PSI_EVAL_SET).exists():
         psi = json.loads(pathlib.Path(PSI_EVAL_SET).read_text())
         want.update({t["name"]: t["sha256"] for g in ("latent_need30", "ordinary12", "fst16") for t in psi[g]})
-    for f41 in ("docs/experiments/dev/psi41/phase3_set.json", "docs/experiments/dev/psi41/eval_set.json"):
+    for f41 in ("docs/experiments/dev/psi41/phase3_set.json", "docs/experiments/dev/psi41/eval_set.json",
+                "docs/experiments/dev/psi42/dev_set.json", "docs/experiments/dev/psi42/eval_set.json"):
         if pathlib.Path(f41).exists():
             d41 = json.loads(pathlib.Path(f41).read_text())
-            want.update({t["name"]: t["sha256"] for g in ("fst", "rha", "lr_need12", "lr_ord12") for t in d41.get(g, [])})
+            want.update({t["name"]: t["sha256"] for g in ("fst", "rha", "lr_need12", "lr_ord12", "hrt") for t in d41.get(g, [])})
     if pathlib.Path(PSI40_EVAL_SET).exists():
         p40 = json.loads(pathlib.Path(PSI40_EVAL_SET).read_text())
         want.update({t["name"]: t["sha256"] for g in ("lr_need30", "lr_ord12", "fst16", "rha16") for t in p40[g]})
@@ -178,6 +179,9 @@ def resolve(name):
     if name.startswith("fst("):
         import psi_fst_family
         return checked(psi_fst_family.parse(name), name)
+    if name.startswith("hrt("):
+        import psi42_hrt_family
+        return checked(psi42_hrt_family.parse(name), name)
     if name.startswith("rha("):
         import psi40_rha_family
         return checked(psi40_rha_family.parse(name), name)
