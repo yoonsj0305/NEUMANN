@@ -381,3 +381,159 @@ def classify_failure(n_distinctions, n_reps, attempts):
     if attempts and all(a == "no Update within the synthesis budget" for a in attempts):
         return "search time: representation found, Update synthesis did not finish"
     return "insufficient information: representation(s) found but the Update folds the examples wrongly"
+
+
+# ------------------------------------------------------------------ section 41: evidence-driven structural invention
+def dfa_enumerate(words, seps, merges, k, cap=30, steps=DFA_STEPS):
+    """Every table (up to `cap`, symmetry broken: new states in order) over states 0..k-1 whose run from 0 puts every
+    pair in seps in different states and every pair in merges in the same state.  Cells reached only by unconstrained
+    words are enumerated too (their alternatives are competing hypotheses, never a default).  Returns (list of delta,
+    status)."""
+    for u, v in seps:
+        if words[u] == words[v]:
+            return [], "guard merges a distinction"
+    wp = [(words[u], words[v], 0) for u, v in seps] + [(words[u], words[v], 1) for u, v in merges if words[u] != words[v]]
+    nodes = sorted({w[:i] for w in words.values() for i in range(len(w) + 1)}, key=lambda w: (len(w), w))
+    partners = {}
+    for a, b, same in wp:
+        partners.setdefault(a, []).append((b, same))
+        partners.setdefault(b, []).append((a, same))
+    state, delta, used, cnt, out = {(): 0}, {}, [1], [0], []
+
+    def ok(n):
+        s = state[n]
+        for p, same in partners.get(n, ()):
+            t = state.get(p)
+            if t is not None and (t == s) != bool(same):
+                return False
+        return True
+
+    def go(i):
+        cnt[0] += 1
+        if cnt[0] > steps or len(out) >= cap:
+            raise TimeoutError
+        if i == len(nodes):
+            out.append(dict(delta))
+            return
+        n = nodes[i]
+        if not n:
+            if ok(n):
+                go(i + 1)
+            return
+        s, c = state[n[:-1]], n[-1]
+        if (s, c) in delta:
+            state[n] = delta[(s, c)]
+            if ok(n):
+                go(i + 1)
+            del state[n]
+            return
+        for t in range(min(k, used[0] + 1)):
+            delta[(s, c)] = t
+            state[n] = t
+            grew = t == used[0]
+            if grew:
+                used[0] += 1
+            if ok(n):
+                go(i + 1)
+            if grew:
+                used[0] -= 1
+            del state[n]
+            del delta[(s, c)]
+    status = "complete"
+    try:
+        go(0)
+    except TimeoutError:
+        status = "capped"
+    return out, status
+
+
+def automaton_values(delta, gf, seq, prefixes):
+    """States of the prefixes under a partial table; None where the run meets a cell no evidence fixed."""
+    out = {}
+    for u in prefixes:
+        s = 0
+        for e in seq(u):
+            try:
+                s = delta.get((s, gf(e)))
+            except Exception:
+                s = None
+            if s is None:
+                break
+        out[u] = s
+    return out
+
+
+def make_partial_automaton(k, g, delta):
+    """An executable automaton whose unobserved cells stay UNKNOWN: a run that meets one has no value (no answer is
+    produced from an unidentified transition)."""
+    gf = g["fn"]
+
+    def step(args, delta=dict(delta), gf=gf):
+        h, e = args
+        return delta.get((h, gf(e)))
+    letters = (0, 1) if g["ast"] is not None else (0,)
+    table = sorted((list(kv[0]), kv[1]) for kv in delta.items())
+    return {"family": "automaton", "fn": step, "z": 0, "t": "I", "k": k, "guard": g["show"], "gfn": gf,
+            "delta": dict(delta), "unseen": [(q, c) for q in range(k) for c in letters if (q, c) not in delta],
+            "size": g["size"] + len(delta), "show": "automaton(k=%d; guard=%s; delta=%s)" % (k, g["show"], table)}
+
+
+def version_space(seps, merges, constrained, pool, seq, guards, deadline, cap=30, kmax=KMAX):
+    """Executable structures consistent with the evidence: for the smallest k that admits any (guard, table) and for
+    k + 1, every table (enumerated, capped) of every guard.  Hypotheses are collapsed by the partition they induce on
+    constrained + pool prefixes (structures that predict the same are one hypothesis).  Returns (hyps, info)."""
+    t0 = time.process_time()
+    info = {"guards": len(guards), "status": {}, "kmin": None}
+    allp = list(dict.fromkeys(list(constrained) + list(pool) + [y for pr in list(seps) + list(merges) for y in pr]))
+    hyps, seen, kmin = [], set(), None
+    for k in range(2, kmax + 1):
+        if kmin is not None and k > kmin + 1:
+            break
+        found = False
+        for g in guards:
+            if time.process_time() > deadline:
+                info["reason"] = "deadline"
+                break
+            words = {u: tuple(g["fn"](e) for e in seq(u)) for u in allp}
+            tables, st = dfa_enumerate(words, seps, merges, k, cap)
+            info["status"][st] = info["status"].get(st, 0) + 1
+            for d in tables:
+                found = True
+                vals = automaton_values(d, g["fn"], seq, allp)
+                key = (k,) + partition_key(vals, allp)
+                if key in seen:
+                    continue
+                seen.add(key)
+                r = make_partial_automaton(k, g, d)
+                r["values"] = vals
+                hyps.append(r)
+        if found and kmin is None:
+            kmin = k
+    info["kmin"] = kmin
+    info["hypotheses"] = len(hyps)
+    info["cpu"] = round(time.process_time() - t0, 3)
+    return hyps, info
+
+
+def disagreement_count(top, hyps, u, v):
+    a, b = top["values"].get(u), top["values"].get(v)
+    if a is None or b is None:
+        return 0
+    same = a == b
+    n = 0
+    for h in hyps:
+        x, y = h["values"].get(u), h["values"].get(v)
+        if x is not None and y is not None and (x == y) != same:
+            n += 1
+    return n
+
+
+def consistent(h, seps, merges):
+    hv = h["values"]
+    for u, v in seps:
+        if hv.get(u) is not None and hv.get(v) is not None and hv[u] == hv[v]:
+            return False
+    for u, v in merges:
+        if hv.get(u) is not None and hv.get(v) is not None and hv[u] != hv[v]:
+            return False
+    return True

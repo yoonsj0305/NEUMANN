@@ -131,3 +131,34 @@ def test_rank_prefers_the_value_an_update_can_use_within_one_partition_class():
             {"values": {(): 0, (0,): 1, (0, 0): 2}, "size": 4, "show": "len"}]
     ranked, _ = SI.rank(reps, [((), (0,))], [], prefixes)
     assert ranked[0]["show"] == "len"
+
+
+# ---------------------------------------------------------------- section 41: evidence-driven structural invention
+def test_psi41_is_opt_in():
+    assert ac.PSI41 is False
+
+
+def test_version_space_keeps_the_larger_structure_until_evidence_removes_it():
+    """count of 'big' elements mod 3: with only 0-hit / 1-hit evidence a 2-state table fits; the 3-state table stays a
+    competing hypothesis, and the separation of 1 hit from 2 hits (observed later) leaves only 3-state structures"""
+    seq = lambda u: u
+    g = {"ast": ("lt", ("k", 9), ("v", 0)), "fn": lambda e: int(e > 9), "size": 3, "show": "(lt 9 $0)"}
+    pre = [(), (12,), (3,), (12, 3)]
+    seps = [((), (12,))]
+    hyps, info = SI.version_space(seps, [], pre, [(12, 12), (12, 12, 12)], seq, [g], time.process_time() + 5)
+    assert info["kmin"] == 2 and any(h["k"] == 3 for h in hyps) and any(h["k"] == 2 for h in hyps)
+    seps2 = seps + [((12,), (12, 12)), ((), (12, 12))]
+    left = [h for h in hyps if SI.consistent(h, seps2, [])]
+    assert left and all(h["k"] == 3 for h in left)
+
+
+def test_unobserved_cells_stay_unknown():
+    g = {"ast": ("lt", ("k", 9), ("v", 0)), "fn": lambda e: int(e > 9), "size": 3, "show": "(lt 9 $0)"}
+    a = SI.make_partial_automaton(2, g, {(0, 0): 0, (0, 1): 1})
+    assert a["fn"]((0, 12)) == 1 and a["fn"]((1, 12)) is None and (1, 1) in a["unseen"]
+
+
+def test_dfa_enumerate_respects_merges():
+    words = {(): (), (1,): (1,), (1, 1): (1, 1)}
+    tabs, _ = SI.dfa_enumerate(words, [((), (1,))], [((), (1, 1))], 2)
+    assert tabs and all(t[(1, 1)] == 0 for t in tabs)

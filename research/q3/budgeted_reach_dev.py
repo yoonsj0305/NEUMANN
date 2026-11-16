@@ -54,15 +54,17 @@ def set_arm(arm):
     ac.PSI_ABLATE = arm == "Pno"
     # section 40: Q = PSI40 (structural state identification at the existing path's give-up points, with budget and
     # necessity checks); Qno = PSI40 with the identified state withheld (same experiments)
-    ac.PSI40 = arm in ("Q", "Qno")
-    ac.PSI40_ABLATE = arm == "Qno"
+    ac.PSI40 = arm in ("Q", "Qno", "R", "Rno")
+    ac.PSI40_ABLATE = arm in ("Qno", "Rno")
+    # section 41: R = PSI40 + evidence-driven structural identification (PSI41); Rno = R with the state withheld
+    ac.PSI41 = arm in ("R", "Rno")
     # the answer-length stage of the cell construction gets >= 1.5 s (a reallocation inside the same deadline) in
     # Q, Qno and the control AL = A + the same floor (separates the floor from the identified state)
     from neumann1 import latent as _lt
-    _lt.LENGTH_FLOOR = 1.5 if arm in ("Q", "Qno", "AL") else 0.0
+    _lt.LENGTH_FLOOR = 1.5 if arm in ("Q", "Qno", "AL", "R", "Rno") else 0.0
     # counterexample repair of a refuted machine (the existing in-place rule, section 22): part of PSI (P0-D) for
     # every PSI arm; AR = A + the same rule (the control that separates repair from the latent)
-    ac.REPAIR = "inplace" if arm in ("P", "Pno", "Pl", "PF", "AR", "Q", "Qno") else False
+    ac.REPAIR = "inplace" if arm in ("P", "Pno", "Pl", "PF", "AR", "Q", "Qno", "R", "Rno") else False
     ac.PSI_POLICY = None
     if arm == "Pl":
         import os

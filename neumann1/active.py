@@ -1423,6 +1423,14 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         admissible one is invented (3.2E: state / transition / init / domain errors are handled elsewhere)."""
         if not acc:
             return False
+        if PSI41 and acc[-1].get("psi40") and reason != "update not found":
+            # the refuted assumption is the adopted structure only: it is removed and the structure is identified
+            # again from all evidence, including the refuting observation (nothing else is discarded)
+            a = acc.pop()
+            k = max(i for i, c in enumerate(rec["components"]) if c.get("kind") == "accumulator")
+            rec["components"].pop(k)
+            rec["events"].append("PSI41: structure %s refuted (%s); re-identification" % (a["show"], reason))
+            return psi40_round("refuted: " + reason, transitions())
         if acc[-1].get("psi") and reason == "update not found":
             # a synthesis failure is not evidence against a latent that PSI derived from observed distinctions
             rec["events"].append("PSI latent kept (no Update is a synthesis failure, not a refutation)")
@@ -2216,8 +2224,134 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             eg_ = list(rg_) + [list(pr_) for pr_ in extra_eq]
             return sp_, eg_
         extra_sep, extra_eq = [], []
+        s41 = {"identified": False, "tests": [], "rounds": []}
+
+        class _Done41(Exception):
+            pass
+
+        def psi41_identify():
+            """Section 41 (PSI41): evidence-driven structural identification.  The executable structures consistent
+            with the evidence form a version space (constructed automata over guards on the WHOLE observed value range,
+            every table at the smallest admissible size and one state more, plus the fold classes); a cell no
+            evidence reached stays unknown.  The next experiment is the prefix pair on which the best structure and
+            the most of its surviving competitors predict different state equality; its outcome removes the losers.
+            The structure is IDENTIFIED only when no surviving competitor predicts differently on any testable pair;
+            otherwise it stays undetermined and no Update is synthesised from it."""
+            nonlocal seps, equal_groups, ranked
+            lo_, hi_ = min(vals), max(vals)
+            alphabet_ = list(range(lo_, hi_ + 1)) if hi_ - lo_ <= 40 else sorted(set(vals))
+            guards41 = S_.guard_partitions(alphabet_, _guard_enum, min(deadline, time.process_time() + 1.0))
+            hard_merge = []
+            folds_ = [r_ for r_ in ranked if r_["family"] == "fold"][:20]
+
+            def build(top_hint):
+                obs_ = [u_ for u_ in dict.fromkeys(list(pre_all) + list(pre)) if u_ in memo and memo[u_] is not None]
+                byq = {}
+                for u_ in sorted(obs_, key=lambda u_: (len(u_), u_)):
+                    q_ = top_hint["values"].get(u_) if top_hint else None
+                    if q_ not in byq:
+                        byq[q_] = u_
+                base_ = list(byq.values())[:6]
+                if top_hint and top_hint["family"] == "automaton":
+                    crep = {}
+                    for e_ in alphabet_:
+                        c_ = _safe(lambda e_=e_: top_hint["gfn"](e_))
+                        crep.setdefault(c_, e_)
+                    creps = list(crep.values())
+                else:
+                    creps = alphabet_[:2]
+                pool_ = [step_input(b_, e_) for b_ in base_ for e_ in alphabet_]
+                pool_ += [step_input(step_input(b_, e1), e2) for b_ in base_ for e1 in creps for e2 in creps]
+                pool_ = [u_ for u_ in dict.fromkeys(pool_) if u_ not in set(obs_)]
+                hyps_, vinfo_ = S_.version_space(seps, hard_merge, obs_, pool_, hseq, guards41,
+                                                 min(deadline, time.process_time() + 3.0))
+                for f_ in folds_:
+                    cache = {}
+                    hv_ = {u_: hval(f_["fn"], f_["z"], u_, cache) for u_ in obs_ + pool_}
+                    h_ = dict(f_, values=hv_)
+                    if S_.consistent(h_, seps, hard_merge):
+                        hyps_.append(h_)
+                for h_ in hyps_:
+                    h_["equal_split"] = sum(len({h_["values"].get(u_) for u_ in g if h_["values"].get(u_) is not None}) - 1
+                                            for g in equal_groups)
+                hyps_.sort(key=lambda h_: (h_["equal_split"], h_["size"]))
+                return hyps_, obs_, pool_, vinfo_
+            hyps, obs41, pool41, vinfo = build(ranked[0] if ranked else None)
+            s41["version_space"] = vinfo
+            s41["initial_hypotheses"] = len(hyps)
+            w1 = tuple(ev_best[0]) if ev_best else (order[0],)
+            rebuilt, tested = 0, set()
+            while hyps and time.process_time() < deadline:
+                top = hyps[0]
+                reps_ = []
+                seen_q = set()
+                for u_ in sorted(obs41, key=lambda u_: (len(u_), u_)):
+                    q_ = top["values"].get(u_)
+                    if q_ is not None and q_ not in seen_q:
+                        seen_q.add(q_)
+                        reps_.append(u_)
+
+                def label(h_, p_):
+                    v_ = h_["values"].get(p_)
+                    if v_ is None:
+                        return None
+                    return next((r_ for r_ in reps_ if h_["values"].get(r_) == v_), "new")
+                rivals = hyps[1:]
+                if len(rivals) > 600:                   # a fixed, deterministic subsample for the choice only
+                    rivals = rivals[::len(rivals) // 600 + 1]
+                best_, bn = None, 0
+                for p_ in pool41 + obs41:
+                    if p_ in tested:
+                        continue
+                    lt_ = label(top, p_)
+                    if lt_ is None:
+                        continue
+                    n_ = sum(1 for h_ in rivals if label(h_, p_) not in (None, lt_))
+                    if n_ > bn:
+                        best_, bn = p_, n_
+                if best_ is None:
+                    s41["identified"] = True
+                    break
+                # the observation that tells the competing structures apart: p's answer and two informative
+                # continuations; the residuals are then compared with EVERY observed prefix (no further query)
+                if top["family"] == "automaton":
+                    crep = {}
+                    for e_ in alphabet_:
+                        crep.setdefault(_safe(lambda e_=e_: top["gfn"](e_)), e_)
+                    w2 = (crep.get(1, crep.get(0)),) + w1
+                else:
+                    w2 = tuple(ev_best[1]) if len(ev_best) > 1 else (alphabet_[0],) + w1
+                r_ = label(top, best_)
+                r_ = r_ if isinstance(r_, tuple) else None
+                ask_ = [best_, cont(best_, w1), cont(best_, w2)] + ([cont(r_, w1), cont(r_, w2)] if r_ is not None else [])
+                need = sum(1 for x_ in ask_ if x_ not in memo)
+                if env.used - q0_ + need > qb:
+                    s41["stop"] = "query budget"
+                    break
+                tested.add(best_)
+                for x_ in ask_:
+                    F(x_)
+                if best_ not in pre:
+                    pre.append(best_)
+                fr_, rs_, rg_, _ = evidence()
+                new_s = [pr_ for pr_ in rs_ + [(u_, v_) for u_, v_, _, _, _ in fr_] if best_ in pr_ and pr_ not in seps]
+                new_m = [tuple(g) for g in rg_ if best_ in g and tuple(g) not in hard_merge]
+                seps += new_s
+                hard_merge += new_m
+                s41["tests"].append([list(best_), bn, len(new_s), len(new_m)])
+                hyps = [h_ for h_ in hyps if S_.consistent(h_, seps, hard_merge)]
+                if not hyps and rebuilt < 2:
+                    rebuilt += 1               # every structure refuted: construct again from the new evidence
+                    hyps, obs41, pool41, vinfo = build(None)
+                    s41["rounds"].append({"rebuilt": vinfo})
+            s41["remaining"] = len(hyps)
+            s41["top"] = hyps[0]["show"] if hyps else None
+            ranked = hyps[:1]
+            raise _Done41
         tag[0] = "psi40"
         try:
+            if PSI41:
+                psi41_identify()
             tied = len(ranked) >= 2 and ranked[0]["equal_split"] == ranked[1]["equal_split"]
             if not ranked:
                 # no representation from the free evidence: candidate-free distinction search on merged pairs
@@ -2329,8 +2463,15 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                 seps, equal_groups = rebuild()
                 ranked, reps, pre_all, repinfo = representations(seps, equal_groups)
                 tied = len(ranked) >= 2 and ranked[0]["equal_split"] == ranked[1]["equal_split"]
+        except _Done41:
+            pass
         finally:
             tag[0] = tag0
+        if PSI41:
+            log_["psi41"] = {k_: v_ for k_, v_ in s41.items()}
+            if not s41["identified"]:
+                return end("undetermined: %d executable structures remain consistent and untested (%s)" % (
+                    s41.get("remaining", 0), s41.get("stop", "time")))
         repinfo["disagreement_tests"] = rounds
         repinfo["closure"] = closure
         log_["representation"] = repinfo
@@ -2448,7 +2589,17 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                     # the examples the representation folds wrongly refine the identification before the next try
                     sp_ = cx_split(r_, fails_[0])
                     cx_.append([list(fails_[0]), [list(sp_[0]), list(sp_[1])] if sp_ else None])
-                    if sp_:
+                    if sp_ and PSI41:
+                        # PSI41: the wrong assumption is the merge of this pair; only it is corrected and the
+                        # structure is identified again (no other structure is tried on the old evidence)
+                        seps.append(sp_)
+                        try:
+                            psi41_identify()
+                        except _Done41:
+                            pass
+                        log_["psi41_after_counterexample"] = {"identified": s41["identified"], "top": s41.get("top")}
+                        queue_ = [x for x in ranked[:1] if s41["identified"] and x["show"] not in {t["show"] for t in tried_}]
+                    elif sp_:
                         extra_sep.append((sp_, "distinct"))
                         seps, equal_groups = rebuild()
                         ranked, reps, pre_all, repinfo = representations(seps, equal_groups)
@@ -2827,6 +2978,9 @@ PSI_K = 2                 # admissible latents given a full synthesis attempt pe
 PSI_SYNTH_SHARE = 0.6     # share of the remaining formation CPU for the Update synthesis with ONE latent
 PSI40 = False             # development (opt-in): section 40 structural state identification (neumann1/stateid.py),
                           # entered only where the existing path gives up, after budget and necessity checks
+PSI41 = False             # development (opt-in, section 41): evidence-driven structural identification inside PSI40 --
+                          # version space of constructed structures, unknown cells, discriminating experiments,
+                          # synthesis only when identified, re-identification when an adopted structure is refuted
 PSI40_ABLATE = False      # PSI40-no-state: the same identification and experiments, the state withheld
 PSI40_EARLY = True        # PSI40 may also enter at the first "update not found" when residual signatures (no query)
                           # show history-dependent futures
