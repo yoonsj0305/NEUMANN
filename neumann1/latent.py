@@ -285,7 +285,7 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
         ys, n0 = _seq_hist(task)
         examples = [(n0, ys)]
     else:
-        m_ast = c4._length(lib, task, consts, t0 + 0.12 * span)
+        m_ast = c4._length(lib, task, consts, t0 + max(0.12 * span, min(LENGTH_FLOOR, 0.5 * span)))
         if m_ast is None:                  # the answer's length is not a function of the input lengths:
             if cfg.latent and depth == 0:  # no cell-by-cell construction; the input-side reading may still apply
                 return _transport(task, lib, consts, deadline, cfg)
@@ -587,6 +587,8 @@ def construct(task, lib, consts, deadline, inv, cfg, depth=0):
     return None
 
 
+LENGTH_FLOOR = 0.0   # development (opt-in, section 40): the answer-length stage gets at least this many CPU seconds
+                     # (at most half the span) -- a reallocation inside the same deadline; 0 = the original 0.12 x span
 COVER_MEMO = False   # development (opt-in): memoise the cover's first-covering-piece scans within one construction
 
 

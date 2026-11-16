@@ -71,3 +71,63 @@ def test_fst_family_names_rebuild_the_same_task():
             assert t.run(x) == s.run(x)
     s = F.FSTSpec(2, "eq", 3, "count", "state")
     assert s.run((3, 1, 3, 3)) == (1, 1, 0, 1)
+
+
+# ---------------------------------------------------------------- section 40: structural state identification
+from neumann1 import stateid as SI, latent as LT
+
+
+def test_psi40_is_opt_in():
+    assert ac.PSI40 is False and ac.PSI40_ABLATE is False and LT.LENGTH_FLOOR == 0.0
+
+
+def _parity_of_big(u):
+    """hidden state: parity of the number of elements >= 10 (the answer keeps x only in state 0 after reading it)"""
+    s, out = 0, []
+    for x in u:
+        s ^= x >= 10
+        if s == 0:
+            out.append(x)
+    return tuple(out)
+
+
+def test_residual_signatures_separate_hidden_states_across_different_answers():
+    prefixes = [(), (3,), (12,), (3, 12), (12, 12), (12, 5)]
+    fut = {u: {(w,): _parity_of_big(u + (w,)) for w in (4, 11)} for u in prefixes}
+    seps, groups, info = SI.residual_signatures(prefixes, _parity_of_big, lambda u: fut[u])
+    hidden = {u: sum(x >= 10 for x in u) % 2 for u in prefixes}
+    assert seps and all(hidden[u] != hidden[v] for u, v in seps)
+    assert all(hidden[u] == hidden[v] for u, v in groups)
+    assert info["history_dependent_suffixes"] >= 1
+
+
+def test_constructed_automaton_generalises_beyond_the_observed_elements():
+    prefixes = [(), (3,), (12,), (3, 12), (12, 12), (12, 5), (5, 3), (12, 3, 12)]
+    seps = [(u, v) for i, u in enumerate(prefixes) for v in prefixes[i + 1:]
+            if sum(x >= 10 for x in u) % 2 != sum(x >= 10 for x in v) % 2]
+
+    def enum(alphabet, deadline, limit):
+        return [(("lt", ("k", 9), ("v", 0)), lambda e: 9 < e, 3, "(lt 9 $0)"),
+                (("eq", ("v", 0), ("k", 3)), lambda e: e == 3, 3, "(eq $0 3)")]
+    guards = SI.guard_partitions([3, 5, 12], enum, time.process_time() + 2)
+    reps, info = SI.construct_automata(seps, prefixes, lambda u: u, guards, time.process_time() + 5)
+    assert info["k"] == 2 and reps
+    top = [r for r in reps if r["guard"] == "(lt 9 $0)"][0]
+    run = lambda u: [top["fn"]((h, x)) for h in [0] for x in []] or _fold(lambda h, x: top["fn"]((h, x)), 0)(u)
+    for u in [(15, 1, 16, 0), (10,), (2, 4, 6)]:        # elements never observed
+        assert run(u) == sum(x >= 10 for x in u) % 2
+
+
+def test_dfa_search_reports_unrepresentable_constraints():
+    words = {(): (), (0,): (0,), (0, 0): (0, 0), (0, 0, 0): (0, 0, 0)}
+    seps = [((), (0,)), ((0,), (0, 0)), ((), (0, 0)), ((0, 0, 0), ()), ((0, 0, 0), (0,)), ((0, 0, 0), (0, 0))]
+    assert SI.dfa_search(words, seps, 3)[0] is None
+    assert SI.dfa_search(words, seps, 4)[0] is not None
+
+
+def test_rank_prefers_the_value_an_update_can_use_within_one_partition_class():
+    prefixes = [(), (0,), (0, 0)]
+    reps = [{"values": {(): 1, (0,): 2, (0, 0): 4}, "size": 4, "show": "double"},
+            {"values": {(): 0, (0,): 1, (0, 0): 2}, "size": 4, "show": "len"}]
+    ranked, _ = SI.rank(reps, [((), (0,))], [], prefixes)
+    assert ranked[0]["show"] == "len"

@@ -513,6 +513,35 @@ def accumulators():
 _RB = {}
 
 
+def _guard_enum(alphabet, deadline, limit=200):
+    """Boolean programs of the generic substrate over ONE element (constants: the base constants and the observed
+    element values), in cost order, distinct by behaviour on the observed alphabet: guards for PSI40's
+    constructed automata.  Nothing task-specific."""
+    lib = _lib()
+    probes = [(e,) for e in alphabet]
+    consts = tuple(sorted({e for e in alphabet if isinstance(e, int) and not isinstance(e, bool)
+                           and e not in ic.BASE_CONSTS}))
+    got = []
+
+    def offer(e, t):
+        got.append(e.ast())
+        if len(got) >= limit:
+            raise sc.Done(None, None)
+    srch = dc.FSearch(lib, (T_I,), probes, deadline, consts, ic.uniform_costs(), (T_B,), offer)
+    try:
+        srch.run()
+    except sc.Done:
+        pass
+    out = []
+    for ast in got:
+        try:
+            fn = ic.compile_ast(ic._tup(ast), 1, lib)
+        except Exception:
+            continue
+        out.append((ast, (lambda e, fn=fn: fn((e,))), ic.size(ic._tup(ast)), show_ast(ast)))
+    return out
+
+
 def readout_basis(arity, out_t, n=80):
     """The first small programs of the substrate over `arity` integer variables (cost order, distinct by
     behaviour): the cheap readouts R(h1[, h2]) checked exactly before any synthesis."""
@@ -1143,11 +1172,19 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                    for t in (tuple(memo.get(cont(u, w)) if cont(u, w) in memo else 0 for w in W)
                              for u in dict.fromkeys(u for u, e in points())))
 
+    def argv(st, e):
+        """Update arguments: the state, then the post-step values of the invented variables marked "post" (PSI40's
+        constructed automata: computable from the state and the element), then the element.  Without such a
+        variable this is st + (e,) exactly as before."""
+        if not any(a.get("post") for a in acc):
+            return st + (e,)
+        return st + tuple(_acc_step(a["fn"], st[len(W) + k], e) for k, a in enumerate(acc) if a.get("post")) + (e,)
+
     def fold(upd, z, x):
         st = z
         seq = x if direction == "prefix" else x[::-1]
         for e in seq:
-            st = tuple(g(st + (e,)) for g in upd)
+            st = tuple(g(argv(st, e)) for g in upd)
             if None in st:
                 return None
         return st
@@ -1216,9 +1253,9 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
     def attempt(trans, share, cover=0.6, capture=False):
         """Update per component from the observed transitions, then the best initial state.  No query.
         Returns (updates, asts, z, failing examples), or (None, asts found so far, None, None)."""
-        in_t = tuple([s_type] * len(W)) + tuple(a["t"] for a in acc) + (T_I,)
+        in_t = tuple([s_type] * len(W)) + tuple(a["t"] for a in acc) + tuple(a["t"] for a in acc if a.get("post")) + (T_I,)
         upd_alts[:] = []
-        rows = [[(a + (e,), b[j]) for (a, e), b, _ in trans] for j in range(len(W))]
+        rows = [[(argv(a, e), b[j]) for (a, e), b, _ in trans] for j in range(len(W))]
         # Development audit: freeze the exact observed transition system without
         # querying SOURCE or changing synthesis decisions.  Snapshots carry
         # *only* already-observed states, never hidden tests or reference code.
@@ -1268,8 +1305,8 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                     for (x,), y in examples:
                         st, seen_ = z_, []
                         for e in (tuple(x) if direction == "prefix" else tuple(x)[::-1]):
-                            seen_.append(st + (e,))
-                            st = tuple(gg(st + (e,)) for gg in u_)
+                            seen_.append(argv(st, e))
+                            st = tuple(gg(argv(st, e)) for gg in u_)
                             if None in st:
                                 st = None
                                 break
@@ -1996,6 +2033,432 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         log_["tried"], log_["outcome"] = tried_, "no latent led to an Update folding the examples"
         log_["cpu"], log_["queries"] = round(time.process_time() - t0_, 3), env.used - q0_
         return False
+
+    psi40_tried = set()
+
+    def psi40_early(trans):
+        """Observation-only test for an early PSI40 entry (no query): residual future signatures show that the
+        same suffix extends the answer differently after different histories (a finite hidden state is plausible).
+        Without such evidence PSI40 waits until the existing path has given up."""
+        from neumann1 import stateid as S_
+        if ("early", len(W), len(acc)) in psi40_tried:
+            return False
+        psi40_tried.add(("early", len(W), len(acc)))
+        fut = {}
+        for x_, y_ in list(memo.items()):
+            x_ = tuple(x_)
+            if y_ is None:
+                continue
+            for j in range(1, len(x_) + 1):
+                u_, w_ = (x_[:len(x_) - j], x_[len(x_) - j:]) if direction == "prefix" else (x_[j:], x_[:j])
+                fut.setdefault(u_, {})[w_] = y_
+        _, _, info_ = S_.residual_signatures([u_ for u_ in fut if u_ in memo], lambda u_: memo.get(u_),
+                                             lambda u_: fut.get(u_, {}), direction)
+        rec.setdefault("psi40_early", []).append(info_["history_dependent_suffixes"])
+        return info_["history_dependent_suffixes"] > 0
+
+    def psi40_round(why, trans):
+        """PSI40 (section 40, opt-in): structural state identification where the existing path has given up.
+        1. budget check; 2. observation-only evidence (no query): distinctions between prefixes the current state
+        merges, conflicting transitions, and residual future signatures (what an observed suffix adds to the
+        answer; comparable across different current states); the necessity check passes only if the observations
+        show history-dependent futures; 3. executable representations -- automata CONSTRUCTED from the separations
+        (guard + smallest table) and the existing fold programs -- collapsed into classes by induced partition and
+        ordered by equal-evidence splits, then description length; 4. SOURCE experiments only when the free
+        evidence leaves no class or the two best classes tie: candidate-free distinction search, then a test on
+        a merged pair where the two best classes disagree; 5. Update synthesis with at most two representations of
+        different partitions.  Returns True when a state was adopted; otherwise the existing path ends as before."""
+        from neumann1 import stateid as S_, psi as P_
+        key = (len(W), len(acc), why)
+        if key in psi40_tried or len(acc) >= MAX_ACC or env.used >= qlimit:
+            return False
+        psi40_tried.add(key)
+        t0_, q0_ = time.process_time(), env.used
+        log_ = {"why": why, "W": len(W), "acc": [a["show"] for a in acc], "ablate": bool(PSI40_ABLATE)}
+        rec.setdefault("psi40", []).append(log_)
+
+        def end(outcome, adopted=False):
+            log_["outcome"] = outcome
+            log_["cpu"], log_["queries"] = round(time.process_time() - t0_, 3), env.used - q0_
+            return adopted
+        cpu_left, q_left = deadline - time.process_time(), qlimit - env.used
+        log_["cpu_left"], log_["queries_left"] = round(cpu_left, 2), q_left
+        if cpu_left < PSI40_MIN_CPU:
+            return end("skipped (budget): %.1f s of formation CPU left" % cpu_left)
+        qb = q_left // 2                             # at most half of what is left: the rest stays with the path
+
+        def known(u):
+            xs = [cont(u, w_) for w_ in W]
+            if any(x not in memo for x in xs):
+                return None
+            t_ = vs(tuple(memo[x] for x in xs), u)
+            if t_ is None:
+                return None
+            hh = H(u)
+            return None if hh is None else t_ + hh
+
+        def futures():
+            fut = {}
+            for x_, y_ in list(memo.items()):
+                x_ = tuple(x_)
+                if y_ is None:
+                    continue
+                for j in range(1, len(x_) + 1):
+                    u_, w_ = (x_[:len(x_) - j], x_[len(x_) - j:]) if direction == "prefix" else (x_[j:], x_[:j])
+                    fut.setdefault(u_, {})[w_] = y_
+            return fut
+        pre = set()
+        for (a_, e_), b_, u_ in trans:
+            pre.add(u_)
+            pre.add(step_input(u_, e_))
+        for x_ in list(memo):
+            if known(tuple(x_)) is not None:
+                pre.add(tuple(x_))
+        pre = sorted(pre, key=lambda u_: (len(u_), u_))
+        conf, conf_elems, groups = [], [], {}
+        for (a_, e_), b_, u_ in trans:
+            groups.setdefault((a_, e_), []).append((b_, u_))
+        for (a_, e_), g in groups.items():
+            for i_ in range(len(g)):
+                for j_ in range(i_ + 1, len(g)):
+                    if g[i_][0] != g[j_][0]:
+                        conf.append((g[i_][1], g[j_][1]))
+                        conf_elems.append(e_)
+
+        def evidence():
+            fut = futures()
+            free_ = S_.free_distinctions(pre, known, lambda u_: fut.get(u_, {}))
+            rs_, rg_, rinfo_ = S_.residual_signatures([u_ for u_ in fut if u_ in memo], lambda u_: memo.get(u_),
+                                                      lambda u_: fut.get(u_, {}), direction)
+            ev_best[:] = rinfo_.get("best_suffixes") or []
+            return free_, rs_, rg_, rinfo_
+        ev_best = []
+        free, rseps, rgroups, rinfo0 = evidence()
+        log_["necessity"] = {"free_distinctions": len(free), "conflicting_transitions": len(conf),
+                             "residual": rinfo0}
+        if not free and not conf and not rinfo0["history_dependent_suffixes"]:
+            return end("skipped (necessity): no observed evidence of a hidden state")
+        observed_pairs = set()
+        for g in S_.merged_groups(pre, known).values():
+            for i_ in range(len(g)):
+                for j_ in range(i_ + 1, len(g)):
+                    observed_pairs.add((g[i_], g[j_]))
+        order = sorted(vals, key=lambda v_: -sum(x.count(v_) for (x,), _ in examples))
+        suffixes = [(e_,) for e_ in dict.fromkeys(conf_elems + [max(vals), min(vals)] + order)]
+        fold_cache = {}
+
+        def representations(seps, equal_groups):
+            pre_all = sorted(set(pre) | {y_ for pr_ in seps for y_ in pr_} | {y_ for g in equal_groups for y_ in g},
+                             key=lambda u_: (len(u_), u_))
+            alphabet = sorted({e_ for u_ in pre_all for e_ in u_} | set(vals))
+            tr_ = time.process_time()
+            guards = S_.guard_partitions(alphabet, _guard_enum, min(deadline, tr_ + 1.0))
+            autos, ainfo = S_.construct_automata(seps, pre_all, hseq, guards, min(deadline, time.process_time() + 2.0))
+            reps = []
+            for r_ in autos:
+                cache = {}
+                r_["values"] = {u_: hval(r_["fn"], 0, u_, cache) for u_ in pre_all}
+                reps.append(r_)
+            nf_ = 0
+            for c in accumulators():
+                for z_ in ([0, 1, min(vals) - 1, max(vals) + 1] if c["t"] == T_I else [()]):
+                    cache = hcache.setdefault((id(c), z_), {})
+                    hv = {u_: hval(c["fn"], z_, u_, cache) for u_ in pre_all}
+                    if None in hv.values() or len(set(hv.values())) < 2:
+                        continue
+                    nf_ += 1
+                    reps.append({"family": "fold", "fn": c["fn"], "z": z_, "t": c["t"], "show": c["show"],
+                                 "values": hv, "size": ic.size(ic._tup(c["ast"])) + (0 if ident_start(c, z_) else 1),
+                                 "zkind": zkind(z_)})
+                if time.process_time() > deadline:
+                    break
+            ranked_, kinfo_ = S_.rank(reps, seps, equal_groups, pre_all)
+            return ranked_, reps, pre_all, {"guards": len(guards), "automata": ainfo, "fold_candidates": nf_,
+                                            "classes": kinfo_["admissible_classes"],
+                                            "cpu": round(time.process_time() - tr_, 3)}
+        seps = list(dict.fromkeys(conf + [(u_, v_) for u_, v_, _, _, _ in free] + rseps))
+        equal_groups = list(rgroups)
+        ranked, reps, pre_all, repinfo = representations(seps, equal_groups) if seps else ([], [], pre, {})
+        log_["free_evidence"] = {"separations": len(seps), "equal_groups": len(equal_groups), "representation": repinfo,
+                                 "top": [{k_: r_.get(k_) for k_ in ("family", "show", "size", "equal_split", "classes")}
+                                         for r_ in ranked[:3]]}
+        tag0 = tag[0]
+        evid, rounds, closure = [], [], []
+
+        def test_pair(u_, v_):
+            """Do u and v have the same future?  Residuals (what a suffix adds to each answer) are compared when
+            the answer is extended; otherwise answers are compared only for prefixes the current state merges."""
+            same_z = known(u_) is not None and known(u_) == known(v_)
+            seen_ = False
+            for w_ in sfx()[:2]:
+                if env.used - q0_ + 2 > qb:
+                    break
+                yu0, yv0 = F(u_), F(v_)
+                yu, yv = F(cont(u_, w_)), F(cont(v_, w_))
+                ru, rv = S_.residual(yu0, yu, direction), S_.residual(yv0, yv, direction)
+                if ru is not None and rv is not None:
+                    seen_ = True
+                    if ru != rv:
+                        return "distinct"
+                elif same_z and yu is not None and yv is not None:
+                    seen_ = True
+                    if yu != yv:
+                        return "distinct"
+            return "equal" if seen_ else "unknown"
+        def sfx():
+            """suffixes in order of how many observed prefixes they already tell apart (residual classes)"""
+            return list(dict.fromkeys(list(ev_best) + list(suffixes)))
+
+        def rebuild():
+            fr_, rs_, rg_, _ = evidence()
+            sp_ = list(dict.fromkeys(conf + [(u_, v_) for u_, v_, _, _, _ in fr_ + evid] + rs_ +
+                                     [pr_ for pr_, r_ in extra_sep]))
+            eg_ = list(rg_) + [list(pr_) for pr_ in extra_eq]
+            return sp_, eg_
+        extra_sep, extra_eq = [], []
+        tag[0] = "psi40"
+        try:
+            tied = len(ranked) >= 2 and ranked[0]["equal_split"] == ranked[1]["equal_split"]
+            if not ranked:
+                # no representation from the free evidence: candidate-free distinction search on merged pairs
+                evid, eq_pairs, dinfo = S_.discover(
+                    sorted(observed_pairs), suffixes, cont, F, lambda x: tuple(x) in memo, qb,
+                    min(deadline, time.process_time() + 0.15 * max(0.0, deadline - time.process_time())),
+                    per_pair=3, known=[])
+                log_["discovery"] = dinfo
+                extra_eq += [tuple(pr_) for pr_ in eq_pairs]
+                seps, equal_groups = rebuild()
+                ranked, reps, pre_all, repinfo = representations(seps, equal_groups) if seps else ([], [], pre, {})
+                tied = len(ranked) >= 2 and ranked[0]["equal_split"] == ranked[1]["equal_split"]
+            def refresh():
+                nonlocal seps, equal_groups, ranked, reps, pre_all, repinfo, tied
+                seps, equal_groups = rebuild()
+                ranked, reps, pre_all, repinfo = representations(seps, equal_groups)
+                tied = len(ranked) >= 2 and ranked[0]["equal_split"] == ranked[1]["equal_split"]
+
+            def observe(v_, what):
+                """read v and one informative continuation of v (two queries at most)"""
+                asked_.add(v_)
+                F(v_)
+                for w_ in sfx()[:1]:
+                    F(cont(v_, w_))
+                if v_ not in pre:
+                    pre.append(v_)
+                closure.append(what + [list(v_)])
+                refresh()
+            asked_ = set()
+
+            def cell_closure(n):
+                # a table cell of the best automaton that no observation reached is observed before use
+                for _ in range(n):
+                    top = ranked[0] if ranked else None
+                    if top is None or top["family"] != "automaton" or not top.get("unseen"):
+                        return
+                    q_, c_ = top["unseen"][0]
+                    us_ = [u_ for u_ in pre_all if u_ in memo and top["values"].get(u_) == q_]
+                    es_ = [e_ for e_ in order if _safe(lambda e_=e_: top["gfn"](e_)) == c_]
+                    cand_ = [step_input(u_, e_) for u_ in us_[:6] for e_ in es_[:3] if step_input(u_, e_) not in asked_]
+                    if not cand_ or env.used - q0_ + 2 > qb:
+                        closure.append(["cell", q_, c_, "no budget" if cand_ else "no representative"])
+                        return
+                    observe(cand_[0], ["cell", q_, c_])
+
+            def element_closure(n):
+                # an observed element that the best same-size automata put in different guard classes is read once
+                for _ in range(n):
+                    if not ranked or ranked[0]["family"] != "automaton" or env.used - q0_ + 2 > qb:
+                        return
+                    top = ranked[0]
+                    rivals_ = [r_ for r_ in ranked[1:6] if r_["family"] == "automaton" and r_["k"] == top["k"]]
+                    cand_e = [e_ for e_ in order if any(_safe(lambda e_=e_, r_=r_: r_["gfn"](e_)) !=
+                                                         _safe(lambda e_=e_: top["gfn"](e_)) for r_ in rivals_)]
+                    cand_e = [e_ for e_ in cand_e if not any(e_ in u_ for u_ in pre_all if u_ in memo)] or cand_e
+                    u0_ = min((u_ for u_ in pre_all if u_ in memo), key=lambda u_: (len(u_), u_), default=None)
+                    cand_ = [step_input(u0_, e_) for e_ in cand_e if u0_ is not None and step_input(u0_, e_) not in asked_]
+                    if not cand_:
+                        return
+                    observe(cand_[0], ["element", cand_[0][-1] if direction == "prefix" else cand_[0][0]])
+
+            def weak():
+                return not ranked or tied or (ranked[0]["family"] == "automaton" and ranked[0].get("unseen"))
+
+            def chain():
+                # candidate-free: an observed prefix is extended one element at a time by the elements least covered
+                # by observed transitions; every new answer yields residuals against all observed prefixes
+                if env.used - q0_ + 4 > qb or not any(isinstance(memo.get(u_), tuple) for u_ in pre):
+                    return
+                cov = {e_: 0 for e_ in order}
+                for (a_, e_), b_, u_ in trans:
+                    cov[e_] = cov.get(e_, 0) + 1
+                base_ = min((u_ for u_ in pre if isinstance(memo.get(u_), tuple)), key=lambda u_: (len(u_), u_))
+                els_ = sorted(cov, key=lambda e_: (cov[e_], order.index(e_) if e_ in order else 99))
+                u_, n_, chain_ = base_, 0, []
+                stop_ = env.used - q0_ + (qb - (env.used - q0_)) // 2
+                while env.used - q0_ + 1 <= stop_ and n_ < 8:
+                    e_ = els_[n_ % len(els_)]
+                    u_ = step_input(u_, e_)
+                    n_ += 1
+                    if F(u_) is None:
+                        break
+                    chain_.append(e_)
+                    if u_ not in pre:
+                        pre.append(u_)
+                log_.setdefault("chain", []).append({"base": list(base_), "elements": chain_})
+                refresh()
+            if not ranked:
+                chain()
+            cell_closure(3)
+            element_closure(2)
+            if weak():
+                chain()
+                cell_closure(2)
+            # the two best classes disagree on whether two observed prefixes are in the same state: test that pair
+            pool_ = [u_ for u_ in pre_all if u_ in memo][:60]
+            allp = [(pool_[i_], pool_[j_]) for i_ in range(len(pool_)) for j_ in range(i_ + 1, len(pool_))]
+            skip = set()
+            while tied and env.used - q0_ + 2 <= qb and time.process_time() < deadline:
+                pr_ = S_.disagreement(ranked[0], ranked[1], allp, skip)
+                if pr_ is None:
+                    break
+                skip.add(pr_)
+                res_ = test_pair(*pr_)
+                rounds.append([list(pr_[0]), list(pr_[1]), res_])
+                if res_ == "unknown":
+                    continue
+                (extra_sep if res_ == "distinct" else extra_eq).append((pr_, res_) if res_ == "distinct" else pr_)
+                seps, equal_groups = rebuild()
+                ranked, reps, pre_all, repinfo = representations(seps, equal_groups)
+                tied = len(ranked) >= 2 and ranked[0]["equal_split"] == ranked[1]["equal_split"]
+        finally:
+            tag[0] = tag0
+        repinfo["disagreement_tests"] = rounds
+        repinfo["closure"] = closure
+        log_["representation"] = repinfo
+        log_["separations"] = len(seps)
+        log_["distinctions"] = [[list(u_), list(v_), list(w_), y1 if not isinstance(y1, tuple) else list(y1),
+                                 y2 if not isinstance(y2, tuple) else list(y2)] for u_, v_, w_, y1, y2 in (free + evid)[:8]]
+        log_["ranked"] = [{k_: r_.get(k_) for k_ in ("family", "show", "size", "equal_split", "classes")}
+                          for r_ in ranked[:6]]
+        if not ranked:
+            return end(S_.classify_failure(len(seps), 0, []))
+        if PSI40_ABLATE:                # PSI40-no-state: the same identification, the state is withheld
+            return end("ablated: state withheld")
+        tol = max(1, len(examples) // 4)
+        tried_, cx_ = [], []
+
+        def cx_split(r_, x_):
+            """Counterexample-based split (Rivest-Schapire style): along a failing example, a prefix p and an observed
+            prefix r that the representation puts in the same state are compared on the rest of the example; a
+            different residual (or a different answer, for prefixes the current state merges) separates them."""
+            x_ = tuple(x_)
+            seq_ = x_ if direction == "prefix" else x_[::-1]
+            chain = [()]
+            for e_ in seq_:
+                chain.append(step_input(chain[-1], e_))
+            n_ = len(seq_)
+            cache = {}
+            for i in sorted(range(1, n_), key=lambda i: abs(i - n_ // 2))[:3]:
+                p_ = chain[i]
+                w_ = x_[i:] if direction == "prefix" else x_[:n_ - i]
+                qv = hval(r_["fn"], r_["z"], p_, cache)
+                rs_ = sorted([u_ for u_ in pre_all if u_ in memo and u_ != p_ and r_["values"].get(u_) == qv],
+                             key=lambda u_: (len(u_), u_))
+                if not rs_:
+                    continue
+                if env.used - q0_ + 2 > qb:
+                    break
+                r0 = rs_[0]
+                yp, yx, yr, yrw = F(p_), F(x_), F(r0), F(cont(r0, w_))
+                a_, b_ = S_.residual(yp, yx, direction), S_.residual(yr, yrw, direction)
+                if a_ is not None and b_ is not None:
+                    if a_ != b_:
+                        return (p_, r0)
+                elif known(p_) is not None and known(p_) == known(r0) and yx is not None and yrw is not None \
+                        and yx != yrw:
+                    return (p_, r0)
+            return None
+        queue_ = list(ranked[:2])
+        tag[0] = "psi40"
+        try:
+            while queue_ and len(tried_) < 2 and time.process_time() < deadline:
+                r_ = queue_.pop(0)
+                ent = {"t": T_I if r_["family"] == "automaton" else r_["t"], "fn": r_["fn"], "z": r_["z"],
+                       "cache": {}, "show": r_["show"], "post": r_["family"] == "automaton"}
+                # the identified state replaces the continuation components the existing path added: the attempt
+                # uses (answer, identified state); everything is restored if it fails
+                W_saved, virt_saved = list(W), dict(virt)
+                upd_, fails_ = None, None
+                W[:] = W[:1]
+                acc.append(ent)
+                # every transition already observed (both answers in memo; no query) supervises the Update too
+                have_ = set(points())
+                mpts_ = []
+                for x_ in list(memo):
+                    x_ = tuple(x_)
+                    if not x_ or memo.get(x_) is None:
+                        continue
+                    u_, e_ = (x_[:-1], x_[-1]) if direction == "prefix" else (x_[1:], x_[0])
+                    if memo.get(u_) is not None and (u_, e_) not in have_:
+                        mpts_.append((u_, e_))
+                try:
+                    tr_m = []
+                    for u_, e_ in mpts_:
+                        a_, b_ = full(u_), full(step_input(u_, e_))
+                        if a_ is not None and b_ is not None:
+                            tr_m.append(((a_, e_), b_, u_))
+                    base_t = transitions()
+                    upd_, asts_, z0_, fails_ = attempt(base_t, PSI_SYNTH_SHARE, 0.3)
+                    if upd_ is not None and tr_m and time.process_time() < deadline:
+                        # counterexample-guided: the observed transitions the found Update gets wrong are added and
+                        # the Update is synthesised once more on the same state (nothing else is added)
+                        bad_ = [t_ for t_ in tr_m if tuple(g(argv(t_[0][0], t_[0][1])) for g in upd_) != t_[1]][:8]
+                        if bad_:
+                            mpts_ = [(t_[2], t_[0][1]) for t_ in bad_]
+                            u2_, a2_, z2_, f2_ = attempt(base_t + bad_, PSI_SYNTH_SHARE, 0.3)
+                            if u2_ is not None:
+                                upd_, asts_, z0_, fails_ = u2_, a2_, z2_, f2_
+                        else:
+                            mpts_ = []
+                finally:
+                    acc.pop()
+                    if not (upd_ is not None and P_.classify_outcome(True, len(fails_ or []), tol) == "ok"):
+                        W[:] = W_saved
+                        virt.clear()
+                        virt.update(virt_saved)
+                why_ = P_.classify_outcome(upd_ is not None, len(fails_) if fails_ is not None else 0, tol)
+                tried_.append({"family": r_["family"], "show": r_["show"], "outcome": why_,
+                               "cpu_left": round(deadline - time.process_time(), 2)})
+                if why_ == "ok":
+                    extra.extend(p_ for p_ in mpts_ if p_ not in extra)    # the supervising points stay observed
+                    if len(W_saved) > len(W):
+                        rec["events"].append("PSI40: continuation components %s replaced by the identified state" %
+                                              [list(w_) for w_ in W_saved[1:]])
+                        rec["components"] = [c_ for c_ in rec["components"] if c_.get("w") is None]
+                    psi_cache["result"] = (upd_, asts_, z0_, fails_)
+                    psi_cache["key"] = None
+                    acc.append(dict(ent, psi=True, psi40=True))
+                    rec["components"].append({"w": None, "why": why + "; PSI40 state", "kind": "accumulator",
+                                              "family": r_["family"], "source": "psi40", "update": r_["show"],
+                                              "init": repr(r_["z"]), "set_size": 1})
+                    rec["events"].append("PSI40 state %s (%s; %d separations, %d classes)" % (
+                        r_["show"], why, len(seps), len(ranked)))
+                    log_["tried"], log_["counterexample_splits"] = tried_, cx_
+                    return end("adopted", True)
+                if fails_ and upd_ is not None:
+                    # the examples the representation folds wrongly refine the identification before the next try
+                    sp_ = cx_split(r_, fails_[0])
+                    cx_.append([list(fails_[0]), [list(sp_[0]), list(sp_[1])] if sp_ else None])
+                    if sp_:
+                        extra_sep.append((sp_, "distinct"))
+                        seps, equal_groups = rebuild()
+                        ranked, reps, pre_all, repinfo = representations(seps, equal_groups)
+                        queue_ = [x for x in ranked[:2] if x["show"] not in {t["show"] for t in tried_}][:1] + \
+                            [x for x in queue_ if x["show"] not in {t["show"] for t in tried_}]
+        finally:
+            tag[0] = tag0
+        log_["counterexample_splits"] = cx_
+        log_["tried"] = tried_
+        return end(S_.classify_failure(len(seps), len(ranked), [t_["outcome"] for t_ in tried_]))
     try:
         for rnd in range(25):
             if ro:
@@ -2043,17 +2506,19 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                 w = ((e,) + W[j]) if direction == "prefix" else (W[j] + (e,))
                 if not add_component(w, "inconsistent transitions"):
                     rec["events"].append("state insufficient, component limit")
+                    if PSI40 and psi40_round("inconsistent transitions, component limit", trans):
+                        continue
                     break
                 continue
             # 2. Update per component, then joint verification on every initial example
             pkey = (len(W), tuple(a["show"] for a in acc), len(trans), virt["value"])
-            if PSI and "result" in psi_cache and psi_cache["key"] in (None, pkey):
+            if (PSI or PSI40) and "result" in psi_cache and psi_cache["key"] in (None, pkey):
                 psi_cache["key"] = pkey                      # same state space and table: no re-synthesis
                 upd, asts, z, fails = psi_cache["result"]
                 psi_cache.clear()
             else:
                 upd, asts, z, fails = attempt(trans, 0.25, capture=True)
-                if upd is None and PSI and any(a.get("psi") for a in acc) and pkey not in psi_tried:
+                if upd is None and (PSI or PSI40) and any(a.get("psi") for a in acc) and pkey not in psi_tried:
                     psi_tried.add(pkey)                      # once per table: the latent's synthesis gets PSI's share
                     rec["events"].append("PSI latent: re-synthesis with the PSI share")
                     upd, asts, z, fails = attempt(trans, PSI_SYNTH_SHARE, capture=True)
@@ -2078,12 +2543,16 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                     rec["events"].append("reachability synthesis fallback: synthetic trajectories")
                     continue
                 rec["events"].append("no update for component %d" % len(asts))
+                if PSI40 and PSI40_EARLY and psi40_early(trans) and psi40_round("update not found (early)", trans):
+                    continue
                 act_ = choose("update not found", trans, len(examples))
                 if act_ == "invent" and (invent(trans, "update not found") or revise("update not found")):
                     continue
                 if represent(trans, "update not found"):
                     continue
                 if act_ != "invent" and (invent(trans, "update not found") or revise("update not found")):
+                    continue
+                if PSI40 and psi40_round("update not found", trans):
                     continue
                 break
             rec["events"].append("round %d: m=%d, examples failing %d" % (rnd, len(W), len(fails)))
@@ -2227,7 +2696,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                         if (st_, e_) not in pairs:
                             cands2.append({"example": -1, "step": i_, "u": u_, "e": e_, "v": v_, "shared": 1})
                             break
-                        st_ = tuple(g(st_ + (e_,)) for g in upd)
+                        st_ = tuple(g(argv(st_, e_)) for g in upd)
                         u_ = v_
                 plan2 = reach_plan(2, cands2, 3, 3)
                 reach_execute(2, plan2)
@@ -2245,7 +2714,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             pred_states = [z]
             for e in seq:
                 st = pred_states[-1]
-                pred_states.append(None if st is None or None in st else tuple(g(st + (e,)) for g in upd))
+                pred_states.append(None if st is None or None in st else tuple(g(argv(st, e)) for g in upd))
             lo_, hi_ = 0, len(seq)
             while hi_ - lo_ > 1:
                 mid = (lo_ + hi_) // 2
@@ -2267,7 +2736,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                 a, b = full(u), full(prefixes[i])
                 if a is None or b is None:
                     continue
-                if tuple(g(a + (e,)) for g in upd) != b:
+                if tuple(g(argv(a, e)) for g in upd) != b:
                     extra.append((u, e))
                     added = True
                     break
@@ -2302,6 +2771,8 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                 # PSI here only after the existing repairs (virtual value, invention, new continuation) found nothing:
                 # it must not pre-empt a path that works (development iteration 11, section 39)
                 if PSI and psi_round("counterexample not localisable", trans):
+                    continue
+                if PSI40 and psi40_round("counterexample not localisable", trans):
                     continue
                 break
     except Exhausted:
@@ -2354,6 +2825,12 @@ PSI_ABLATE = False        # P-no-latent: PSI's distinction experiments and inven
 PSI_QUERIES = 10          # SOURCE queries one PSI round may spend on distinction experiments (inside the run budget)
 PSI_K = 2                 # admissible latents given a full synthesis attempt per PSI round
 PSI_SYNTH_SHARE = 0.6     # share of the remaining formation CPU for the Update synthesis with ONE latent
+PSI40 = False             # development (opt-in): section 40 structural state identification (neumann1/stateid.py),
+                          # entered only where the existing path gives up, after budget and necessity checks
+PSI40_ABLATE = False      # PSI40-no-state: the same identification and experiments, the state withheld
+PSI40_EARLY = True        # PSI40 may also enter at the first "update not found" when residual signatures (no query)
+                          # show history-dependent futures
+PSI40_MIN_CPU = 3.0       # formation CPU that must be left for PSI40 to start (budget check, P0-D)
 PSI_CPU_FRAC = 1.0        # all PSI rounds of one machine: at most this share of the machine's formation span
                           # (1.0 = no allowance beyond the formation deadline; 0.35 was rejected in development:
                           # the latent construction budgets its stages as fractions of the span it is given)

@@ -52,9 +52,17 @@ def set_arm(arm):
     # PF = P + the existing synthesis floor (a reallocation control)
     ac.PSI = arm in ("P", "Pno", "Pl", "PF")
     ac.PSI_ABLATE = arm == "Pno"
+    # section 40: Q = PSI40 (structural state identification at the existing path's give-up points, with budget and
+    # necessity checks); Qno = PSI40 with the identified state withheld (same experiments)
+    ac.PSI40 = arm in ("Q", "Qno")
+    ac.PSI40_ABLATE = arm == "Qno"
+    # the answer-length stage of the cell construction gets >= 1.5 s (a reallocation inside the same deadline) in
+    # Q, Qno and the control AL = A + the same floor (separates the floor from the identified state)
+    from neumann1 import latent as _lt
+    _lt.LENGTH_FLOOR = 1.5 if arm in ("Q", "Qno", "AL") else 0.0
     # counterexample repair of a refuted machine (the existing in-place rule, section 22): part of PSI (P0-D) for
     # every PSI arm; AR = A + the same rule (the control that separates repair from the latent)
-    ac.REPAIR = "inplace" if arm in ("P", "Pno", "Pl", "PF", "AR") else False
+    ac.REPAIR = "inplace" if arm in ("P", "Pno", "Pl", "PF", "AR", "Q", "Qno") else False
     ac.PSI_POLICY = None
     if arm == "Pl":
         import os
@@ -227,11 +235,12 @@ def job(arm, name, seed_kind, cap, sem):
         return r
     ac.passive = passive
     c0 = time.process_time()
-    if arm == "PDq":
+    if arm in ("PDq", "QDq"):
         # the frozen V2 control: P's SOURCE queries replayed and answered again, solved passively (no formation)
         import os
         src = [json.loads(l) for l in open(os.environ["NEUMANN_REPLAY_ROWS"]) if l.strip()]
-        rp = next(r for r in src if r["arm"] == "P" and r["name"] == name and r["seed_kind"] == seed_kind)
+        arm_src = "Q" if arm == "QDq" else "P"                       # QDq: the section 40 control for PSI40
+        rp = next(r for r in src if r["arm"] == arm_src and r["name"] == name and r["seed_kind"] == seed_kind)
         pred, rec = ac.run_arm("Dq", env, cap, seed=seed, replay=rp["query_inputs"])
     else:
         pred, rec = ac.run_arm("D", env, cap, seed=seed)
@@ -248,7 +257,7 @@ def job(arm, name, seed_kind, cap, sem):
             "round0_fold_failures": int(rounds[0].split("failing")[1]) if rounds else None,
             "formed": bool(m.get("formed")), "challenge": m.get("challenge"), "update": m.get("update"),
             "cpu": m.get("cpu"), "queries": m.get("queries_used"), "query_purpose": m.get("query_purpose"),
-            "reach": m.get("reach"), "psi": m.get("psi"), "repair": m.get("repair"),
+            "reach": m.get("reach"), "psi": m.get("psi"), "psi40": m.get("psi40"), "repair": m.get("repair"),
             "components": [{k: c.get(k) for k in ("w", "kind", "source", "update", "init", "why")}
                            for c in m.get("components", [])]})
     initial = env.initial()
