@@ -230,12 +230,12 @@ def guard_partitions(alphabet, enumerate_bool, deadline, limit=200):
 
 
 def _guard_class(fn, e):
-    """the class of an element under a guard; None (unknown) when the guard program fails on it (post-freeze crash fix
-    in section 41: a failing guard used to raise and abort the run)"""
+    """the class of an element under a guard; -1 (a class of its own, constrained only by evidence) when the guard
+    program fails on it (post-freeze crash fix in section 41: a failing guard used to raise and abort the run)"""
     try:
         return int(bool(fn(e)))
     except Exception:
-        return None
+        return -1
 
 
 def dfa_search(words, seps, k, steps=DFA_STEPS):
