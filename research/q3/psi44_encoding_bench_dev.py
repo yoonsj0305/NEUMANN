@@ -61,8 +61,6 @@ def main(cap=30.0, name="hrt(u=diff;o=gtkeep)"):
             print(variant.ljust(12), "size<=%d" % K, st, dt, fresh, flush=True)
 
 
-if __name__ == "__main__":
-    main(float(sys.argv[1]) if len(sys.argv) > 1 else 30.0, sys.argv[2] if len(sys.argv) > 2 else "hrt(u=diff;o=gtkeep)")
 
 
 def factored(cap=30.0, names=("hrt(u=diff;o=gtkeep)",)):
@@ -136,3 +134,10 @@ def semantics(n=3000, seed=3):
         res[op] = {"checked": tot, "mismatch_in_range": inr, "mismatch_overflow": ovf}
     print(json.dumps(res))
     return res
+
+
+if __name__ == "__main__":
+    # P0-A: the four section 43 encoding variants, then the factored core, on the SAME data / operator range / cap
+    main(float(sys.argv[1]) if len(sys.argv) > 1 else 30.0, sys.argv[2] if len(sys.argv) > 2 else "hrt(u=diff;o=gtkeep)")
+    first_time(float(sys.argv[1]) if len(sys.argv) > 1 else 30.0,
+               (sys.argv[2] if len(sys.argv) > 2 else "hrt(u=diff;o=gtkeep)",), want=1)

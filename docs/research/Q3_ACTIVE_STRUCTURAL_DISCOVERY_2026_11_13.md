@@ -2497,3 +2497,165 @@ out once the size reaches 2 (`offline_steps_6tasks_25s.jsonl`).
   trees return `unknown` from size 2 within a few seconds, and the same data size succeeds only sometimes.
 * **What a next step needs:** a solver whose cost does not explode with the operator choice (not more CPU, not more
   candidates).
+
+## 44. Joint synthesis: removing the computational bottleneck (2026-11-16) — DEVELOPMENT + PRE-REGISTERED EVALUATION
+
+Directive: do not propose a new architecture. Remove the computational bottleneck of the joint synthesis principle of
+§43 (initial latent, update and output rule constructed together from observed input/output behaviour; no true latent
+value; no task template). First pass criterion: a task R fails is solved exactly **inside the agent** at 30 CPU s / 60
+SOURCE queries. Raw evidence: `docs/experiments/dev/psi44/`.
+
+### 44.1 P0-A: where the cost was
+
+Fixed for every variant: `hrt(u=diff;o=gtkeep)`, the per-step answers along the 8 given examples' prefixes (27 steps),
+the §43 operator range, size ≤ 2, and a 30 CPU s cap (`psi44_encoding_bench_dev.py`,
+`encoding_bench_diff_gtkeep_30s.txt`). `unknown` is recorded as "not solved", not as "impossible".
+
+| encoding (§43 SMT, z3 4.13 bit-vectors) | run 1 | run 2 |
+|---|---|---|
+| §43 as committed | sat, 26.7 s | sat, 24.7 s |
+| without per-node mod circuits (`nomod`) | unknown, 29.7 s | sat, 12.6 s |
+| inactive subtrees fixed to one canonical form (`canon`) | unknown, 29.7 s | unknown, 29.8 s |
+| both | unknown, 29.7 s | sat, 28.6 s |
+| **factored (§44.2), same data and operators** | **0.02 s, 10 traces** | (deterministic) |
+
+* The mod circuits and the inactive subtrees are not the binding cost. Removing them neither makes the solver fast
+  nor stable: the same variant is `sat` in one run and `unknown` in the other.
+* **The binding cost is the symbolic operator choice itself.** Every node is a multiplexer over all operators, and
+  every latent value is a bit-vector unknown.
+* **Semantics** (`smt_vs_python_semantics.json`, 3 000 random argument pairs per operator, both signs):
+  * the bit-vector encoding agrees with Python (the environment's semantics) on every in-range value, including
+    negative arguments of mod (floored, as in Python);
+  * the only disagreements are 8-bit wrap-around of add/sub (729 / 743 of 3 000), where the true value leaves the
+    range;
+  * the §43 core re-checks every solution in Python, so wrap-around cannot make it accept a wrong machine;
+  * the §44 core is pure Python with unbounded integers (latent values bounded at |h| ≤ 200).
+
+### 44.2 The factored core (`neumann1/joint.py: factored_synthesis`; opt-in; no solver)
+
+The same joint problem (h₀ = z0, h' = U(h, x), piece = [V(h, h', x)] if C(h, h', x) else []), decomposed:
+
+1. **Structure choice separated from constants.** Canonical update structures over (h, x) with ≤ 2 operators of the
+   generic integer core (add, sub, min, max, mod by a constant 2..10). Commutative duplicates and a == b forms are
+   removed: 3 / 19 / 304 structures of size 0 / 1 / 2. ≤ 1 constant hole.
+2. **One description-length order** over (structure, constants, start value) together:
+   * 4 bits per operator, 2 per hole;
+   * an Elias-style code per integer: 0 free, small magnitudes cheap;
+   * a heap merge yields every triple once, shortest first;
+   * no task constant enters the order.
+3. **The latent trace is a consequence, not an unknown.** Each triple fixes h along every observed prefix (a compiled
+   closure, one call per step). Then:
+   * **one table check refutes the update for every output rule at once**: the observed pieces must be a function of
+     (h, h', x);
+   * **latents equal on every checked input are not searched again** (an exact deduplication: the key covers every
+     input the examples check).
+4. **The output rule is solved, not enumerated.**
+   * Over the hole-free terms of (h, h', x), V = t + c needs y − t to be constant over the emitting rows (c is
+     solved exactly).
+   * C = (t > c) / (t < c) / (t == c) needs c inside the interval the rows allow.
+   * Several rules can fit the same table; the full examples decide.
+   * Output regularities the data prove (every step emits; every emitted value is the element) are used first and
+     retracted if nothing fits.
+5. **Experiments.**
+   * Machines within 2 bits of the shortest are kept (≤ 3). Inputs on which they disagree are asked as charged
+     SOURCE queries (≤ 8); refuted machines are dropped.
+   * **A challenge counterexample** joins the full examples and the synthesis reruns (≤ 3 rounds, ≤ 6 CPU s each,
+     inside the 30 s); every re-synthesised machine must pass a new, independent challenge.
+
+In the agent (arm **K**, `PSI44_FIRST`):
+* the prefixes of the given examples are observed first (≤ 30 SOURCE queries; the latent values are never queried);
+* the core gets ≤ 85 % of the formation CPU;
+* the unchanged R path follows with what is left;
+* **Kno** makes the same queries and experiments but withholds the factored machine;
+* **KDq** replays K's SOURCE queries and solves them passively (the frozen V2 control).
+
+Constraint removed: **the cost of choosing operators symbolically.**
+* Each candidate update costs one trace and one table check.
+* The output rule costs a closed-form solve.
+* The search is a single, deterministic order with no solver seed.
+* Development history:
+  * the first factored version kept only the first rule per table, so it lost the true update when that rule failed
+    the examples;
+  * the tiered loops (starts tier, then structures) spent their CPU on non-zero starts before 2-operator structures;
+  * the description-length order fixed both, taking offline exact first machines from 10 / 24 to 16 / 24 within
+    10 s (`offline_factored_v*_10s.txt`).
+
+### 44.3 First pass criterion (the decisive task)
+
+`hrt(u=diff;o=gtkeep)`, inside the agent, 30 CPU s / 60 SOURCE queries, the same data and validation for every arm
+(`agent_diff_gtkeep_v*.jsonl`):
+
+| arm | verified | what happened |
+|---|---|---|
+| A | no | — |
+| R (§41) | no | — |
+| **K** | **yes**: hidden tests and 271/271 random diagnostic inputs | U = x − h, z0 = 0, emit x when h' > 0: found in 0.17 s from 22 observed steps (20 queries) |
+| Kno | no | same queries; machine withheld |
+
+The first version of K failed this task. It kept only the first output rule per table, and that rule failed the full
+examples, so the true update was dropped. With every fitting rule checked against the examples, the task passed.
+**Only after this was the core run on other update structures.**
+
+### 44.4 Development tasks: other update structures, variance, controls (24 §42 development HRT tasks)
+
+Same CPU (720 CPU s per arm over the 24 tasks) and the same 60 queries. Verified means hidden test plus 300 random
+inputs. The rules of §44.5 were applied to these development runs (`dev24_verdict_rules_applied.json`); nothing here
+counts.
+
+| arm | base data | data seed 1 | data seed 2 | same-seed repeat | robust (majority) |
+|---|---|---|---|---|---|
+| A | 0 | 0 | 0 | — | 0 |
+| R | 1 | 2 | 2 | — | 2 |
+| **K** | **21** | **21** | **20** | **21** | **20** |
+| Kno | 1 | 2 | 2 | — | 2 |
+| KDq (K's queries, passive) | 1 | — | — | — | — |
+
+What K solves:
+* **Every update kind in the family except countgt:** difference, running maximum, sum mod m, saturating sum.
+* **Every output kind present in development:** element if h' even, element if larger than h, h' mod 5, h' + x.
+* **Hidden-test-only solves: 0.** Every hidden-test solve was also exact on the 300 random inputs.
+
+Invented representations differ from the hidden ones. For every `satsum B / evenkeep` task, K constructs the
+*remaining capacity* h' = h − min(h, x) from z0 = B, not the saturating sum. Its parity, with C flipped for odd B, is
+exactly the output rule, and it is shorter under the description-length order than min(h + x, B).
+
+Failures:
+* `countgt`: its update needs a conditional (h + 1 if x > h). That is outside the operator set; no new
+  representation family was added (directive P0-E).
+* `satsum13/gtkeep`: the counterexample-guided re-synthesis ran out of its 6 s.
+* `satsum22/evenkeep`: robustly unsolved (1 of 4 runs), for the same reason.
+
+Search time and seeds:
+* The core's CPU per task: median 5.2 s, maximum 15.3 s (the share limit).
+* The search is a deterministic order with no solver seed. Variance comes only from the data draw and CPU timing:
+  20–21 of 24 across three data draws and a same-seed repeat.
+
+Rules applied to the development runs: core evidence on 18 tasks; the V2 metric holds on 20 tasks (17 with core
+evidence); no regression against A or R; K vs R: 18 tasks only K solves, 0 only R (McNemar p = 8·10⁻⁶).
+**Development data: not an independent result.**
+
+Two development fixes were made after the first 24-task run in the agent (the record is in the evidence directory):
+* **The counterexample used for repair is a true disagreement.** The challenge records answers as lists and
+  predictions as tuples, so `predicted != answer` was always true.
+  * The section 41 R repair branch has the same comparison. **It was left unchanged** (R is frozen).
+* **A challenge counterexample re-runs the factored synthesis** (counterexample-guided).
+  * Before: 19 / 24 (`agent_dev24_pre_repair_*.jsonl`).
+  * After: 21 / 24 (`dev24_*.jsonl`).
+
+### 44.5 Pre-registered independent evaluation (FROZEN before any agent run on these tasks)
+
+`prereg.json`, `eval_set.json`, `SHA256SUMS.frozen`; code = commit 080541c (blob hashes in `prereg.json`).
+
+* **Set** (`psi44_eval_set_dev.py`, fixed rule, no choice):
+  * every task of the HRT parameter space (110) whose name appears nowhere in `docs/`, `research/` or the §42–44
+    working files: **70 tasks**;
+  * **latent_need** (the property every earlier HRT set was drawn by): 9 tasks — the primary group;
+  * **other**: 61 tasks — generalisation, including the output kind *delta* (x − h) and the update kind *prev*, both
+    absent from development, plus regression.
+* **Runs:**
+  * base: A, R, K, Kno on every task;
+  * KDq: on every task K solves;
+  * 2 more same-seed runs and seeds 1, 2 for every task whose verified outcome differs between the arms.
+* **Rules:** as §44.4, frozen V2 rule with K in D's place and KDq in Dq's.
+  * PASS needs ≥ 5 V2 tasks **with core evidence**: K robust, while A, R and Kno are not.
+  * Official sealed verdicts unchanged.

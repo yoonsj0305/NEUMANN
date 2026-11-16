@@ -1,0 +1,7 @@
+task hrt(u=diff;o=gtkeep) steps 27
+section43    size<=2 sat 24.72 fresh 200/200 {'U': '(sub $1 $0)', 'V': '$2', 'C': '(lt 0 $1)', 'z0': 0}
+nomod        size<=2 sat 12.63 fresh 200/200 {'U': '(sub $1 $0)', 'V': '$2', 'C': '(lt $0 $2)', 'z0': 0}
+canon        size<=2 unknown 29.8 
+canon+nomod  size<=2 sat 28.6 fresh 200/200 {'U': '(sub $1 $0)', 'V': '$2', 'C': '(lt 0 $1)', 'z0': 0}
+hrt(u=diff;o=gtkeep)         want=1 0.02 s {'structures_tried': 6, 'traces': 10, 'tables_functional': 9, 'equivalent_skipped': 0, 'rules_checked': 1} [({'U': '(sub $1 $0)', 'z0': 0, 'V': '$2', 'C': '(> $1 0)'}, 200)]
+BENCHDONE

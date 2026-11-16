@@ -1,0 +1,796 @@
+{
+ "K_regressions": [],
+ "K_vs_A": {
+  "A_only": [],
+  "K_only": 20,
+  "p": 2e-06
+ },
+ "K_vs_R": {
+  "K_only": 18,
+  "R_only": [],
+  "p": 8e-06
+ },
+ "V2_rule": {
+  "by_group": {
+   "latent_need": 20,
+   "other": 0
+  },
+  "count": 20,
+  "frozen_metric_tasks": [
+   "hrt(u=diff;o=evenkeep)",
+   "hrt(u=diff;o=gtkeep)",
+   "hrt(u=max;o=evenkeep)",
+   "hrt(u=max;o=mod5)",
+   "hrt(u=satsum12;o=evenkeep)",
+   "hrt(u=satsum13;o=evenkeep)",
+   "hrt(u=satsum15;o=mod5)",
+   "hrt(u=satsum16;o=evenkeep)",
+   "hrt(u=satsum16;o=mod5)",
+   "hrt(u=satsum17;o=evenkeep)",
+   "hrt(u=satsum19;o=mod5)",
+   "hrt(u=satsum20;o=evenkeep)",
+   "hrt(u=satsum21;o=mod5)",
+   "hrt(u=satsum23;o=evenkeep)",
+   "hrt(u=summod10;o=evenkeep)",
+   "hrt(u=summod10;o=plusx)",
+   "hrt(u=summod5;o=gtkeep)",
+   "hrt(u=summod7;o=evenkeep)",
+   "hrt(u=summod7;o=gtkeep)",
+   "hrt(u=summod7;o=mod5)"
+  ],
+  "kdq_runs": 24,
+  "met": true,
+  "substantive_verified_tasks": [
+   "hrt(u=diff;o=evenkeep)",
+   "hrt(u=diff;o=gtkeep)",
+   "hrt(u=max;o=evenkeep)",
+   "hrt(u=max;o=mod5)",
+   "hrt(u=satsum12;o=evenkeep)",
+   "hrt(u=satsum13;o=evenkeep)",
+   "hrt(u=satsum15;o=mod5)",
+   "hrt(u=satsum16;o=evenkeep)",
+   "hrt(u=satsum16;o=mod5)",
+   "hrt(u=satsum17;o=evenkeep)",
+   "hrt(u=satsum19;o=mod5)",
+   "hrt(u=satsum20;o=evenkeep)",
+   "hrt(u=satsum21;o=mod5)",
+   "hrt(u=satsum23;o=evenkeep)",
+   "hrt(u=summod10;o=evenkeep)",
+   "hrt(u=summod10;o=plusx)",
+   "hrt(u=summod5;o=gtkeep)",
+   "hrt(u=summod7;o=evenkeep)",
+   "hrt(u=summod7;o=gtkeep)",
+   "hrt(u=summod7;o=mod5)"
+  ],
+  "threshold": 5,
+  "with_core_evidence": [
+   "hrt(u=diff;o=gtkeep)",
+   "hrt(u=max;o=evenkeep)",
+   "hrt(u=max;o=mod5)",
+   "hrt(u=satsum12;o=evenkeep)",
+   "hrt(u=satsum13;o=evenkeep)",
+   "hrt(u=satsum15;o=mod5)",
+   "hrt(u=satsum16;o=evenkeep)",
+   "hrt(u=satsum16;o=mod5)",
+   "hrt(u=satsum17;o=evenkeep)",
+   "hrt(u=satsum19;o=mod5)",
+   "hrt(u=satsum20;o=evenkeep)",
+   "hrt(u=satsum21;o=mod5)",
+   "hrt(u=satsum23;o=evenkeep)",
+   "hrt(u=summod10;o=plusx)",
+   "hrt(u=summod5;o=gtkeep)",
+   "hrt(u=summod7;o=evenkeep)",
+   "hrt(u=summod7;o=mod5)"
+  ]
+ },
+ "V2_verdict": "PASS",
+ "arms": {
+  "A": {
+   "cpu": 720.44,
+   "formation_queries": 1056,
+   "hidden_test_only": 0,
+   "hidden_test_solved": 0,
+   "robust_verified": 0,
+   "runs": 24,
+   "verified": 0
+  },
+  "K": {
+   "cpu": 720.42,
+   "formation_queries": 593,
+   "hidden_test_only": 0,
+   "hidden_test_solved": 21,
+   "robust_verified": 20,
+   "runs": 24,
+   "verified": 21
+  },
+  "Kno": {
+   "cpu": 720.35,
+   "formation_queries": 1297,
+   "hidden_test_only": 0,
+   "hidden_test_solved": 1,
+   "robust_verified": 2,
+   "runs": 24,
+   "verified": 1
+  },
+  "R": {
+   "cpu": 720.31,
+   "formation_queries": 1246,
+   "hidden_test_only": 0,
+   "hidden_test_solved": 1,
+   "robust_verified": 2,
+   "runs": 24,
+   "verified": 1
+  }
+ },
+ "core_evidence": [
+  {
+   "K_runs": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false
+    ],
+    "Kno": [
+     false,
+     false,
+     false
+    ],
+    "R": [
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "latent_need",
+   "machine": [
+    "{'U': '(sub $1 $0)', 'z0': 0, 'V': '$2', 'C': '(> $1 0)'}"
+   ],
+   "semantic": [
+    271,
+    271
+   ],
+   "task": "hrt(u=diff;o=gtkeep)"
+  },
+  {
+   "K_runs": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false
+    ],
+    "Kno": [
+     false,
+     false,
+     false
+    ],
+    "R": [
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "latent_need",
+   "machine": [
+    "{'U': '(max $0 $1)', 'z0': 0, 'V': '$2', 'C': '(< (mod $1 2) 1)'}"
+   ],
+   "semantic": [
+    292,
+    292
+   ],
+   "task": "hrt(u=max;o=evenkeep)"
+  },
+  {
+   "K_runs": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false
+    ],
+    "Kno": [
+     false,
+     false,
+     false
+    ],
+    "R": [
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "latent_need",
+   "machine": [
+    "{'U': '(max $0 $1)', 'z0': 0, 'V': '(mod $1 5)', 'C': 'true'}"
+   ],
+   "semantic": [
+    266,
+    266
+   ],
+   "task": "hrt(u=max;o=mod5)"
+  },
+  {
+   "K_runs": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false
+    ],
+    "Kno": [
+     false,
+     false,
+     false
+    ],
+    "R": [
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "latent_need",
+   "machine": [
+    "{'U': '(sub $0 (min $0 $1))', 'z0': 12, 'V': '$2', 'C': '(< (mod $1 2) 1)'}"
+   ],
+   "semantic": [
+    299,
+    299
+   ],
+   "task": "hrt(u=satsum12;o=evenkeep)"
+  },
+  {
+   "K_runs": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false
+    ],
+    "Kno": [
+     false,
+     false,
+     false
+    ],
+    "R": [
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "latent_need",
+   "machine": [
+    "{'U': '(sub $0 (min $0 $1))', 'z0': 13, 'V': '$2', 'C': '(> (mod $1 2) 0)'}"
+   ],
+   "semantic": [
+    268,
+    268
+   ],
+   "task": "hrt(u=satsum13;o=evenkeep)"
+  },
+  {
+   "K_runs": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false
+    ],
+    "Kno": [
+     false,
+     false,
+     false
+    ],
+    "R": [
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "latent_need",
+   "machine": [
+    "{'U': '(min (add $0 $1) 15)', 'z0': 0, 'V': '(mod $1 5)', 'C': 'true'}"
+   ],
+   "semantic": [
+    295,
+    295
+   ],
+   "task": "hrt(u=satsum15;o=mod5)"
+  },
+  {
+   "K_runs": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false
+    ],
+    "Kno": [
+     false,
+     false,
+     false
+    ],
+    "R": [
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "latent_need",
+   "machine": [
+    "{'U': '(sub $0 (min $0 $1))', 'z0': 16, 'V': '$2', 'C': '(< (mod $1 2) 1)'}"
+   ],
+   "semantic": [
+    263,
+    263
+   ],
+   "task": "hrt(u=satsum16;o=evenkeep)"
+  },
+  {
+   "K_runs": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false
+    ],
+    "Kno": [
+     false,
+     false,
+     false
+    ],
+    "R": [
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "latent_need",
+   "machine": [
+    "{'U': '(min (add $0 $1) 16)', 'z0': 0, 'V': '(mod $1 5)', 'C': 'true'}"
+   ],
+   "semantic": [
+    300,
+    300
+   ],
+   "task": "hrt(u=satsum16;o=mod5)"
+  },
+  {
+   "K_runs": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false
+    ],
+    "Kno": [
+     false,
+     false,
+     false
+    ],
+    "R": [
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "latent_need",
+   "machine": [
+    "{'U': '(sub $0 (min $0 $1))', 'z0': 17, 'V': '$2', 'C': '(> (mod $1 2) 0)'}"
+   ],
+   "semantic": [
+    293,
+    293
+   ],
+   "task": "hrt(u=satsum17;o=evenkeep)"
+  },
+  {
+   "K_runs": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false
+    ],
+    "Kno": [
+     false,
+     false,
+     false
+    ],
+    "R": [
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "latent_need",
+   "machine": [
+    "{'U': '(add $0 $1)', 'z0': 0, 'V': '$2', 'C': '(< (sub $0 $2) 0)'}"
+   ],
+   "semantic": [
+    290,
+    290
+   ],
+   "task": "hrt(u=satsum17;o=gtkeep)"
+  },
+  {
+   "K_runs": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false
+    ],
+    "Kno": [
+     false,
+     false,
+     false
+    ],
+    "R": [
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "latent_need",
+   "machine": [
+    "{'U': '(min (add $0 $1) 19)', 'z0': 0, 'V': '(mod $1 5)', 'C': 'true'}"
+   ],
+   "semantic": [
+    299,
+    299
+   ],
+   "task": "hrt(u=satsum19;o=mod5)"
+  },
+  {
+   "K_runs": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false
+    ],
+    "Kno": [
+     false,
+     false,
+     false
+    ],
+    "R": [
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "latent_need",
+   "machine": [
+    "{'U': '(sub $0 (min $0 $1))', 'z0': 20, 'V': '$2', 'C': '(< (mod $1 2) 1)'}"
+   ],
+   "semantic": [
+    271,
+    271
+   ],
+   "task": "hrt(u=satsum20;o=evenkeep)"
+  },
+  {
+   "K_runs": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false
+    ],
+    "Kno": [
+     false,
+     false,
+     false
+    ],
+    "R": [
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "latent_need",
+   "machine": [
+    "{'U': '(min (add $0 $1) 21)', 'z0': 0, 'V': '(mod $1 5)', 'C': 'true'}"
+   ],
+   "semantic": [
+    270,
+    270
+   ],
+   "task": "hrt(u=satsum21;o=mod5)"
+  },
+  {
+   "K_runs": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false
+    ],
+    "Kno": [
+     false,
+     false,
+     false
+    ],
+    "R": [
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "latent_need",
+   "machine": [
+    "{'U': '(sub $0 (min $0 $1))', 'z0': 23, 'V': '$2', 'C': '(> (mod $1 2) 0)'}"
+   ],
+   "semantic": [
+    297,
+    297
+   ],
+   "task": "hrt(u=satsum23;o=evenkeep)"
+  },
+  {
+   "K_runs": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false
+    ],
+    "Kno": [
+     false,
+     false,
+     false
+    ],
+    "R": [
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "latent_need",
+   "machine": [
+    "{'U': '(mod (add $0 $1) 10)', 'z0': 0, 'V': '(add $1 $2)', 'C': 'true'}"
+   ],
+   "semantic": [
+    299,
+    299
+   ],
+   "task": "hrt(u=summod10;o=plusx)"
+  },
+  {
+   "K_runs": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false
+    ],
+    "Kno": [
+     false,
+     false,
+     false
+    ],
+    "R": [
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "latent_need",
+   "machine": [
+    "{'U': '(mod (add $0 $1) 5)', 'z0': 0, 'V': '$2', 'C': '(< (sub $0 $2) 0)'}"
+   ],
+   "semantic": [
+    262,
+    262
+   ],
+   "task": "hrt(u=summod5;o=gtkeep)"
+  },
+  {
+   "K_runs": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false
+    ],
+    "Kno": [
+     false,
+     false,
+     false
+    ],
+    "R": [
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "latent_need",
+   "machine": [
+    "{'U': '(mod (add $0 $1) 7)', 'z0': 0, 'V': '$2', 'C': '(< (mod $1 2) 1)'}"
+   ],
+   "semantic": [
+    298,
+    298
+   ],
+   "task": "hrt(u=summod7;o=evenkeep)"
+  },
+  {
+   "K_runs": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "control_runs": {
+    "A": [
+     false,
+     false,
+     false
+    ],
+    "Kno": [
+     false,
+     false,
+     false
+    ],
+    "R": [
+     false,
+     false,
+     false
+    ]
+   },
+   "group": "latent_need",
+   "machine": [
+    "{'U': '(mod (add $0 $1) 7)', 'z0': 0, 'V': '(mod $1 5)', 'C': 'true'}"
+   ],
+   "semantic": [
+    296,
+    296
+   ],
+   "task": "hrt(u=summod7;o=mod5)"
+  }
+ ],
+ "core_evidence_by_group": {
+  "latent_need": 18,
+  "other": 0
+ },
+ "eval_set_tasks": 24,
+ "groups": {
+  "latent_need": {
+   "A": {
+    "hidden_test_only": [],
+    "robust_verified": []
+   },
+   "K": {
+    "hidden_test_only": [],
+    "robust_verified": [
+     "hrt(u=diff;o=evenkeep)",
+     "hrt(u=diff;o=gtkeep)",
+     "hrt(u=max;o=evenkeep)",
+     "hrt(u=max;o=mod5)",
+     "hrt(u=satsum12;o=evenkeep)",
+     "hrt(u=satsum13;o=evenkeep)",
+     "hrt(u=satsum15;o=mod5)",
+     "hrt(u=satsum16;o=evenkeep)",
+     "hrt(u=satsum16;o=mod5)",
+     "hrt(u=satsum17;o=evenkeep)",
+     "hrt(u=satsum17;o=gtkeep)",
+     "hrt(u=satsum19;o=mod5)",
+     "hrt(u=satsum20;o=evenkeep)",
+     "hrt(u=satsum21;o=mod5)",
+     "hrt(u=satsum23;o=evenkeep)",
+     "hrt(u=summod10;o=evenkeep)",
+     "hrt(u=summod10;o=plusx)",
+     "hrt(u=summod5;o=gtkeep)",
+     "hrt(u=summod7;o=evenkeep)",
+     "hrt(u=summod7;o=mod5)"
+    ]
+   },
+   "Kno": {
+    "hidden_test_only": [],
+    "robust_verified": [
+     "hrt(u=diff;o=evenkeep)",
+     "hrt(u=summod10;o=evenkeep)"
+    ]
+   },
+   "R": {
+    "hidden_test_only": [],
+    "robust_verified": [
+     "hrt(u=diff;o=evenkeep)",
+     "hrt(u=summod10;o=evenkeep)"
+    ]
+   },
+   "tasks": 24
+  },
+  "other": {
+   "tasks": 0
+  }
+ },
+ "tasks": 24
+}

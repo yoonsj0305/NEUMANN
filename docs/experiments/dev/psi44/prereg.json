@@ -1,0 +1,57 @@
+{
+ "arms": {
+  "A": "baseline",
+  "K": "section 44 factored joint core as the primary path (then R)",
+  "KDq": "K's SOURCE queries replayed and solved passively (frozen V2 control)",
+  "Kno": "K with the factored joint machine withheld (same prefix queries and experiments)",
+  "R": "section 41 mechanism, unchanged"
+ },
+ "budget": {
+  "clock": "time.process_time()",
+  "cpu_seconds": 30.0,
+  "source_queries": 60
+ },
+ "code": "commit 080541c: neumann1/ and the harness exactly as frozen here; K = PSI44_FIRST (factored core as the primary path, then the unchanged R path with what is left), PSI40/PSI41 on, REPAIR inplace, LENGTH_FLOOR 1.5",
+ "code_blobs": {
+  "neumann1/active.py": "08325dc34df8fa4d37e5b0384da3b9704da32802",
+  "neumann1/joint.py": "e22ab9f55aa2593359c558b28fe8d9e11257bc1a",
+  "neumann1/latent.py": "c4978481f01837f07da22fbb39247b17f3786981",
+  "neumann1/stateid.py": "a1e2fb93860d16fe1e23dd313746162394801a05",
+  "research/q3/budgeted_reach_dev.py": "2ec17733a782c1f0d14e792f39bd09b260bbe008",
+  "research/q3/env_listroutines.py": "b4fb73e602b69d8d5159a92a547accdad82da47f",
+  "research/q3/psi42_hrt_family.py": "70f6249eaf3577a7b1c9b36e5d1c5b5ef0b48a38",
+  "research/q3/psi44_eval_set_dev.py": "03e289b34dee7782e0f0f285f69b201fac42bf8a",
+  "research/q3/psi44_verdict_dev.py": "59e07fe7356d425ad194c23f9a90c20b7e1483e6",
+  "research/q3/psi_eval_set_dev.py": "c54072ac7f84696214712c20e2fb8b4a59cbd95f"
+ },
+ "criteria": {
+  "CORE_EVIDENCE": "K robustly verifies with an accepted machine containing the factored joint latent (component source psi44); none of A, R, Kno robustly verifies",
+  "V2 rule (frozen)": ">= 5 tasks solved by K (hidden test) with an accepted m >= 2 machine that KDq does not solve",
+  "V2 verdict": "PASS if the rule is met AND >= 5 of its tasks carry core evidence; FAIL if not met; OPEN otherwise",
+  "groups": "reported separately: latent_need (primary) and other",
+  "official": "sealed verdicts unchanged",
+  "regression": "tasks A or R robustly verifies and K does not (reported)",
+  "robust": "strict majority of an arm's runs on a task",
+  "verified_solve": "hidden test AND all random diagnostic inputs correct (300)"
+ },
+ "evaluation_set": {
+  "disclosure": "a developer-authored family (section 42); the factored core was developed on the 24 development draws (offline and in the agent) before this freeze; no evaluation task was run, inspected or named before this freeze",
+  "file": "eval_set.json",
+  "groups": {
+   "latent_need": 9,
+   "other": 61
+  },
+  "rule": "every task of the psi42_hrt_family parameter space (110 tasks) whose name appears nowhere in docs/, research/ or the section 42-44 working files, in name order; groups by psi_eval_set_dev.latent_need; sha256 of {name, train, test} of Env(spec, 0)",
+  "sha256": "41dfa10d94a4eece5462a46e2b6b199af12f247625ffb4829f3b2f2ecd39ed19"
+ },
+ "harness": "research/q3/budgeted_reach_dev.py --cap 30 --semantic",
+ "question": "does the factored joint synthesis core (arm K: initial latent, update and output rule constructed together from observed input/output behaviour, no true latent value, no task template), developed on the 24 development HRT tasks, construct verified executable machines for NEW, never-used tasks of the family -- including output kinds absent from development -- inside the agent at 30 CPU s / 60 SOURCE queries, where A, R and Kno do not?",
+ "runs": {
+  "KDq": "every task K solves (hidden test) in its base run",
+  "base": "every task: A, R, K, Kno with seed 'base' (sha256(name) % 1000, as active_dev)",
+  "replication": "every task whose verified outcome differs between A, R, K, Kno in the base run: 2 more same-seed runs and seeds 1, 2 for A, R, K, Kno"
+ },
+ "schema": "neumann.q3-psi44-prereg.v1",
+ "status": "FROZEN before any agent run on the evaluation set (development only; official sealed verdicts unchanged)",
+ "verdict_script": "research/q3/psi44_verdict_dev.py --eval-set docs/experiments/dev/psi44/eval_set.json"
+}

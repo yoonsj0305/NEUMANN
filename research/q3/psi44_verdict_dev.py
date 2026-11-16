@@ -59,7 +59,7 @@ def main(a):
         v = runs.get((arm, n), [])
         return bool(v) and 2 * sum(v) > len(v)
     ev = json.load(open(a.eval_set))
-    group = {t["name"]: t["group"] for t in ev["hrt"]}
+    group = {t["name"]: t.get("group", "latent_need") for t in ev["hrt"]}   # earlier sets: latent-need only
     arms = sorted({x for v in by.values() for x in v})
     out = {"tasks": len(by), "eval_set_tasks": len(group), "arms": {}, "groups": {}}
     for arm in arms:
