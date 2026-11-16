@@ -1,0 +1,9 @@
+Post-freeze addendum (disclosed; prereg.json and eval_set.json unchanged, hashes in SHA256SUMS.frozen still hold).
+
+The first evaluation launch stopped at task resolution with TASK_HASH_MISMATCH for every task, before any agent
+ran on any evaluation task (no row was written): the harness accepts a rebuilt task only if its {name, train, test}
+hash matches a committed set file, and the section 44 set file was not yet in the harness's list.
+
+Change: research/q3/budgeted_reach_dev.py registered() also reads docs/experiments/dev/psi44/eval_set.json.
+Bookkeeping only -- no arm, budget, rule or mechanism changes.  Harness blob: frozen 2ec17733a782c1f0d14e792f39bd09b260bbe008
+-> 526a3df2689059657e36bc4619f5d9738c34c9a5.  neumann1/ unchanged (commit 080541c).
