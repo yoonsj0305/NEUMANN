@@ -162,3 +162,30 @@ def test_dfa_enumerate_respects_merges():
     words = {(): (), (1,): (1,), (1, 1): (1, 1)}
     tabs, _ = SI.dfa_enumerate(words, [((), (1,))], [((), (1, 1))], 2)
     assert tabs and all(t[(1, 1)] == 0 for t in tabs)
+
+
+# ---------------------------------------------------------------- section 43: joint latent invention (needs z3)
+def test_psi43_is_opt_in():
+    assert ac.PSI43 is False and ac.PSI43_ABLATE is False
+
+
+def test_joint_encoding_smoke_identity_transducer():
+    """encoding check only (size 0): emitting each element is found and generalises; harder machines are a CPU
+    question recorded in section 43, not a unit test"""
+    import pytest
+    from neumann1 import joint as J
+    if J.z3 is None:
+        pytest.skip("z3 not installed (optional dependency)")
+    steps = [(x[:i], x[i], (x[i],)) for x in [(3, 1, 4), (1, 5, 9, 2), (6, 5, 3)] for i in range(len(x))]
+    sol, info = J.synthesise_steps_by_size(steps, time.process_time() + 60, max_ops=1, size_timeout=30)
+    assert sol is not None
+    assert J.run_solution(sol, (9, 0, 7, 7)) == (9, 0, 7, 7)
+
+
+def _diff_trace(x):
+    h, out = 0, []
+    for v in x:
+        h2 = v - h
+        out.append((v, h, h2))
+        h = h2
+    return out

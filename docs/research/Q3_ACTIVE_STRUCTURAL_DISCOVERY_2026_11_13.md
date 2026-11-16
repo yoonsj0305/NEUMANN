@@ -2430,3 +2430,70 @@ the task needs, a finite abstraction of an unbounded register, built from observ
 The next fundamental requirement is a constructor that infers latent values and their update together from the
 observations already paid for (latent-variable program induction). Larger lists, more states or more CPU would not
 supply that.
+
+## 43. Joint latent invention (2026-11-16) — DEVELOPMENT ONLY
+
+Directive: drop the requirement that the latent state's true values be identified before an Update can be synthesised.
+Construct the initial latent value, its update rule and the output rule **together**, from observed input/output
+behaviour alone. Target only an executable minimal sufficient representation, not the hidden one. Raw evidence:
+`docs/experiments/dev/psi43/`.
+
+**Result in one line.**
+* **Offline** (≤ 38 CPU s, the 8 given examples or their prefixes, true register never given): the joint core
+  constructs exact machines (200/200 unseen inputs) for 3 development HRT tasks that A and R fail. Each machine uses a
+  representation **different from the hidden one**.
+* **Inside the agent**, at 30 s / 60 queries: it solves **0 / 24**. The binding constraint is the decision procedure's
+  cost and instability.
+* The first pass criterion is therefore not met in the agent, and **no independent evaluation was run** (the
+  directive's order).
+
+### 43.1 The core (`neumann1/joint.py`; opt-in; z3 is an optional dependency, tests skip without it)
+
+The transducer is one constraint problem:
+  h₀ = z0,  h_{t+1} = U(h_t, x_t),  piece_t = [V(h_t, h_{t+1}, x_t)] if C(h_t, h_{t+1}, x_t) else [].
+* **The latent values h_t at every observed prefix are solver unknowns.** They are never identified first and never
+  queried.
+* **U, V and C are symbolic expression trees of the generic integer core** (variables, constants, add, sub, min, max,
+  mod by a constant; lt / eq for C). Every operator at every node, and every constant, is the solver's choice; no task
+  or generator template is used.
+* **Observations as constraints:** either whole input/output sequences, aligned by an emission counter (needs only the
+  given examples, no query), or per-step answers of observed prefixes.
+* **Search order:**
+  * the total number of operators is bounded and grown;
+  * within a size, counterexample-guided growth of the constraint set;
+  * parts of the output rule that the observations already prove are fixed: every step emits → C = true; every emitted
+    value is the element → V = x.
+* **Any solution reproducing every observation is acceptable.** Output-equivalent internal structures are not told
+  apart.
+
+### 43.2 Offline evidence (development tasks; nothing counted)
+
+`psi43_joint_offline_dev.py`. The generator truth is used only to check unseen inputs.
+
+| task | data | CPU | constructed machine | hidden machine | unseen inputs |
+|---|---|---|---|---|---|
+| `hrt(u=satsum16;o=mod5)` | **the 8 examples only, 0 queries** | 37.8 s (an earlier run: 103 s) | U = min(h + x, 36), V = h' mod 5, C = true, **z0 = 20** | h' = min(16, h + x) from 0 | 200/200 — a *shifted* register |
+| `hrt(u=satsum17;o=gtkeep)` | per-step answers along the 8 examples' prefixes | 5.8 s | U = h + x, C = (h < x), V = x | h' = min(17, h + x) | 200/200 — the saturation is **dropped**: once h ≥ 17 no element can exceed it |
+| `hrt(u=diff;o=gtkeep)` | same | 8.8 s (in one of two runs) | U = x − h, C = (0 < h'), V = x | the same register | 200/200 |
+
+Every run of the 25 s per-step check solves 1 of 6 tasks, but not always the same one; a toy 6-sequence problem times
+out once the size reaches 2 (`offline_steps_6tasks_25s.jsonl`).
+
+### 43.3 Inside the agent (24 development HRT tasks, 30 CPU s, 60 SOURCE queries)
+
+| arm | how the core is used | verified by the joint core |
+|---|---|---|
+| J | after the existing path gives up, on the transitions already observed (8–29 steps, from synthetic trajectories), ≤ 70 % of the remaining CPU | **0 / 24**. Small consistent machines were wrong and were rejected by the full-example check (e.g. U = x mod 5); larger sizes timed out. (J's one verified task is R's automaton) |
+| JF | as the primary path: the given examples' prefixes are observed first (20–33 steps, ≤ 30 queries), 85 % of the formation CPU, 3 s per size | **0 / 24**: every size ≥ 2 returned `unknown` |
+
+### 43.4 Verdict and the next constraint
+
+* **First pass criterion** (solve a development task R fails, without the true structure): met **offline** within
+  ≤ 38 CPU s, but **not inside the agent** at the frozen caps.
+* **Independent evaluation:** not run. **V2 unchanged.** Q6 and the sealed results unchanged.
+* **The stop condition does not apply.** The core is not list exploration: it constructs latent values and rules
+  jointly, and its solutions are not the hidden representations. It stays opt-in and uncounted.
+* **Binding constraint:** the cost and run-to-run instability of deciding the joint problem. Bit-blasted operator-choice
+  trees return `unknown` from size 2 within a few seconds, and the same data size succeeds only sometimes.
+* **What a next step needs:** a solver whose cost does not explode with the operator choice (not more CPU, not more
+  candidates).

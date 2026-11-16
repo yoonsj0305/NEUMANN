@@ -1208,6 +1208,48 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         virt["value"], virt["tried"] = None, []          # the structure changed: boundary repairs are retried
         return True
     tried_grammar = set()
+    joint_first = {}
+    if PSI43_FIRST and direction == "prefix" and s_type == T_L:
+        # section 43, joint core as the PRIMARY path: the prefixes of the given examples are observed (their answers
+        # are what constrains the latent machine), then the initial latent value, its update and the output rule
+        # are synthesised as one constraint problem with most of the formation CPU; the existing path follows
+        # with what is left.  The latent values are never queried.
+        from neumann1 import joint as J_
+        from neumann1 import stateid as S0_
+        if J_.z3 is not None:
+            tag0_ = tag[0]
+            tag[0] = "psi43"
+            steps_ = []
+            try:
+                for (x_,), y_ in sorted(examples, key=lambda ex_: len(ex_[0][0])):
+                    for i_ in range(len(x_)):
+                        if env.used >= min(qlimit, PSI43_FIRST_QUERIES):
+                            break
+                        a_, b_ = F(tuple(x_[:i_])), F(tuple(x_[:i_ + 1]))
+                        pc_ = S0_.residual(a_, b_, direction)
+                        if pc_ is not None and len(pc_) <= 1:
+                            steps_.append((tuple(x_[:i_]), x_[i_], tuple(pc_)))
+            except Exhausted:
+                pass
+            finally:
+                tag[0] = tag0_
+            tj0 = time.process_time()
+            sol43, info43 = J_.synthesise_steps_by_size(steps_, tj0 + PSI43_FIRST_SHARE * max(0.0, deadline - tj0),
+                                                        size_timeout=PSI43_SIZE_TIMEOUT)
+            ok43 = sol43 is not None and all(J_._safe_run(sol43, tuple(x__)) == y__ for (x__,), y__ in examples)
+            joint_first.update({"steps": len(steps_), "queries": env.used, "info": info43,
+                                "cpu": round(time.process_time() - tj0, 3), "reproduces_examples": ok43,
+                                "solution": sol43["show"] if sol43 else None})
+            rec["psi43_first"] = joint_first
+            if ok43 and not PSI43_ABLATE:
+                rec["formed"] = True
+                rec["readout"] = "joint latent machine %s" % (sol43["show"],)
+                rec["update"] = ["joint " + str(sol43["show"])]
+                rec["components"].append({"w": None, "why": "PSI43 joint latent (primary path)", "kind": "accumulator",
+                                          "source": "psi43", "update": str(sol43["show"]), "init": repr(sol43["z0"]),
+                                          "set_size": 1})
+                rec["events"].append("PSI43 joint latent machine %s" % (sol43["show"],))
+                return (lambda inp, s_=sol43: J_._safe_run(s_, tuple(inp[0]))), obs, rec
     if prior_structure:                       # a learned hypothesis about the state structure, tested like any other
         g = dict(grammar(vals))
         for kind in prior_structure:
@@ -2148,6 +2190,39 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                              "residual": rinfo0}
         if not free and not conf and not rinfo0["history_dependent_suffixes"]:
             return end("skipped (necessity): no observed evidence of a hidden state")
+        if PSI43 and direction == "prefix":
+            # section 43: JOINT latent invention -- the initial latent value, its update and the output rule are
+            # one constraint problem over the transitions already observed (no query); latent values are solver
+            # unknowns.  A machine is kept only if it also reproduces every given example in full.
+            from neumann1 import joint as J_
+            if J_.z3 is None:
+                log_["psi43"] = {"status": "z3 not available"}
+            else:
+                steps_ = []
+                for x_, y_ in list(memo.items()):
+                    x_ = tuple(x_)
+                    if not x_ or y_ is None or memo.get(x_[:-1]) is None:
+                        continue
+                    pc_ = S_.residual(memo[x_[:-1]], y_, direction)
+                    if pc_ is not None and len(pc_) <= 1 and all(isinstance(v_, int) for v_ in pc_):
+                        steps_.append((x_[:-1], x_[-1], tuple(pc_)))
+                tj0 = time.process_time()
+                sol43, info43 = J_.synthesise_steps_by_size(
+                    steps_, tj0 + PSI43_SHARE * max(0.0, deadline - tj0), size_timeout=PSI43_SIZE_TIMEOUT)
+                full_ok = sol43 is not None and all(J_._safe_run(sol43, tuple(x__)) == (tuple(y__) if isinstance(y__, tuple) else y__)
+                                                    for (x__,), y__ in examples)
+                log_["psi43"] = {"steps": len(steps_), "info": info43, "cpu": round(time.process_time() - tj0, 3),
+                                 "solution": sol43["show"] if sol43 else None, "reproduces_examples": full_ok}
+                if full_ok and not PSI43_ABLATE:
+                    ro["predict"] = (lambda x__, s_=sol43: J_._safe_run(s_, tuple(x__)))
+                    rec["readout"] = "joint latent machine %s" % (sol43["show"],)
+                    rec["components"].append({"w": None, "why": why + "; PSI43 joint latent", "kind": "accumulator",
+                                              "source": "psi43", "update": str(sol43["show"]), "init": repr(sol43["z0"]),
+                                              "set_size": 1})
+                    rec["events"].append("PSI43 joint latent machine %s" % (sol43["show"],))
+                    return end("adopted (joint)", True)
+                if full_ok and PSI43_ABLATE:
+                    log_["psi43"]["ablated"] = True
         observed_pairs = set()
         for g in S_.merged_groups(pre, known).values():
             for i_ in range(len(g)):
@@ -3038,6 +3113,13 @@ PSI_K = 2                 # admissible latents given a full synthesis attempt pe
 PSI_SYNTH_SHARE = 0.6     # share of the remaining formation CPU for the Update synthesis with ONE latent
 PSI40 = False             # development (opt-in): section 40 structural state identification (neumann1/stateid.py),
                           # entered only where the existing path gives up, after budget and necessity checks
+PSI43 = False             # development (opt-in, section 43): joint latent invention (neumann1/joint.py, needs z3)
+PSI43_ABLATE = False      # the joint machine is constructed but withheld
+PSI43_FIRST = False       # the joint core as the primary path (before the existing formation)
+PSI43_FIRST_QUERIES = 30  # SOURCE queries for the prefixes of the given examples (inside the 60)
+PSI43_FIRST_SHARE = 0.85  # share of the machine's formation CPU for the primary joint synthesis
+PSI43_SHARE = 0.7         # share of the remaining formation CPU the joint synthesis may use
+PSI43_SIZE_TIMEOUT = 3.0  # CPU per size bound inside the joint synthesis
 PSI41 = False             # development (opt-in, section 41): evidence-driven structural identification inside PSI40 --
                           # version space of constructed structures, unknown cells, discriminating experiments,
                           # synthesis only when identified, re-identification when an adopted structure is refuted
