@@ -1,0 +1,5274 @@
+[
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "6eb3c2601a72bd6d4bb213d04a710d5cfa4d39bd25f0b9e85644f91878afb389",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "eq",
+        [
+          "v",
+          1
+        ],
+        [
+          "k",
+          2
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "0487fd7cff5257a980a012595e7b0663789bfc00aaaa223456a3168b0ac5392a",
+      "observations_digest": "8bb251242c8836a4127a3dc7d8754af67be3a42ea65e465ab4ac2ebb4bbf556e",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "5846169f4644fc362600597ef26497060087847887f0bf7f72186b0f209fffa2"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "47a5bfe6e81f59a70ff3403a1316a3e1b011680ba7d5c0bb3fba01555c8c5363"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c002",
+      "author_blob": {
+        "id": "rule/c002",
+        "path": "bigbench/benchmark_tasks/list_functions/c002/task.json",
+        "blob_sha1": "f374deda16a0a0ca1c41f1b8914e0b8b9c3ebd07",
+        "sha256": "6eb3c2601a72bd6d4bb213d04a710d5cfa4d39bd25f0b9e85644f91878afb389",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0012,
+      "source_reverification_cpu_seconds": 0.00020632799999997786
+    },
+    "artifact_id": "7690a4704b55584ca27a5c43b000fbc78ea5a4267109d36bcb6eeb6aae6a1679"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "889d2dc764b58390597cf50cfa6e50963e0efd97e37a0eb34fed8af683888523",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "eq",
+        [
+          "v",
+          1
+        ],
+        [
+          "k",
+          6
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "d587f850f2dfec25b716726ee2018f7dc5ee3424e36eb191f40df50901e9282a",
+      "observations_digest": "4703c82c8ff6a75c91e11cb1770582135ae6f0af11a516f6c75f8ea6fefd47c1",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "f6aa3626fda04995bc99f732542ea1f2acf5cdcf6101175802bd26292f7daff0"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "1521362cb411dbe98452dc997669b7a2a66b540d6dfb4207bcd94babf5ef8def"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c003",
+      "author_blob": {
+        "id": "rule/c003",
+        "path": "bigbench/benchmark_tasks/list_functions/c003/task.json",
+        "blob_sha1": "68d2149f6cc087e095deb72cdfe5f5ad57a2d5b6",
+        "sha256": "889d2dc764b58390597cf50cfa6e50963e0efd97e37a0eb34fed8af683888523",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 1.2033,
+      "source_reverification_cpu_seconds": 0.00031671099999996954
+    },
+    "artifact_id": "4b35aa6ceeb68a96ca7324a1f6773d05a2b481278c4e72fa995c572de1d96c81"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "53296ba67c2d045d3061526d63e0d2c3b8b6b33548a18c506f824053e60e5eea",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "lt",
+        [
+          "v",
+          1
+        ],
+        [
+          "k",
+          2
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "70b91ea0655a7e6da1f4d3303440035ea5df266f02c2edea09d595c63fa38aa3",
+      "observations_digest": "399d267e7e4df8fb6f10d5ce0ff1afcd8273d66122edf641c787927daf504bcf",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "1f2011011c4df6a8e632063bc4b6761bdd6ba31f4bc6513a1f7959e922cb25d0"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "d8e5b2f8e6f1ace5523d443ef9c771a6ad4acd8165f14051e9694b6d4e86c499"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c006",
+      "author_blob": {
+        "id": "rule/c006",
+        "path": "bigbench/benchmark_tasks/list_functions/c006/task.json",
+        "blob_sha1": "0f3b12d188bca837fcacb102b7c0197d019a40de",
+        "sha256": "53296ba67c2d045d3061526d63e0d2c3b8b6b33548a18c506f824053e60e5eea",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0016,
+      "source_reverification_cpu_seconds": 0.00030749700000010094
+    },
+    "artifact_id": "a31b8793fa87810d92d1a5ff31a63b505f375a3fad1a2d68a291573d718f7b32"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "b8ea06d307352adf69b325322bb6a7f5168671e0356c39c1b75930319cfc8085",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "lt",
+        [
+          "v",
+          1
+        ],
+        [
+          "k",
+          6
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "12775934daf5ee6b6875b1986a1cfd20294d57799723dde6e9bae1ed2daa7c67",
+      "observations_digest": "0534820607fbd21e219b53e461c5f20d714d4998f7c4f5db5a3c7cabb4d6b0ba",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "7b91019392f4b8e5c1501446f72d79efa02ebd86f8899eb4396bd93c19d2d011"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "29417a1470d89a841ca3c2dbf98e0e41b784ffb4cdaebdcbaf286d60c3b1b15d"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c008",
+      "author_blob": {
+        "id": "rule/c008",
+        "path": "bigbench/benchmark_tasks/list_functions/c008/task.json",
+        "blob_sha1": "bcdfedb550b832fc0740b4e87f6374f46d2d98e8",
+        "sha256": "b8ea06d307352adf69b325322bb6a7f5168671e0356c39c1b75930319cfc8085",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0015,
+      "source_reverification_cpu_seconds": 0.0002464170000000543
+    },
+    "artifact_id": "cd0ee5ad9c4b84419c81ee8c128a83b8c065fe982ac2984c050d9a19897f345a"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "11835250d6efd7de87746af20933056482bc9c9e02d72f58c724778e89ddf926",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "lt",
+        [
+          "v",
+          1
+        ],
+        [
+          "k",
+          6
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "12775934daf5ee6b6875b1986a1cfd20294d57799723dde6e9bae1ed2daa7c67",
+      "observations_digest": "84d4bf1d93af4aa44f0948df1b91ca9d09de0e08af7cbcc61f3e1de6bf660ca8",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "db734ce4c10b03b406f2c982f9f29779ef81dd832264c72a923b1f92a79019f7"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "e6de52f5f94aad416f54c3c040611b9a7b5a567de4674d74b0fa5ee2595ec1dd"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c009",
+      "author_blob": {
+        "id": "rule/c009",
+        "path": "bigbench/benchmark_tasks/list_functions/c009/task.json",
+        "blob_sha1": "27ba1256b0669056935de0dc2ab64a7806ee9a8f",
+        "sha256": "11835250d6efd7de87746af20933056482bc9c9e02d72f58c724778e89ddf926",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0012,
+      "source_reverification_cpu_seconds": 0.0002744989999998726
+    },
+    "artifact_id": "6b3f777bc45ef5082a2c6ae6e13e3aea437e84ddfd22f43c5a27b81030382b22"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "435936009338ebf6f4443c66bfa29d4ad817e204be2f46363404542ccff2948d",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "lt",
+        [
+          "v",
+          1
+        ],
+        [
+          "foldrI",
+          [
+            "k",
+            4
+          ],
+          [
+            "v",
+            1
+          ],
+          [
+            "v",
+            3
+          ]
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "ae29ace8fa065d36445f0b0019e4fbd8dd70102ede3ccf3eac52f76e9609467b",
+      "observations_digest": "f202c8aa32721d8ca37cb59183c9863acd1cf9748046032438b00e754fa4269f",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "bbeec513c756f4d4c2d95970785d3639829364ca6b554f6eb9dc2c400ff2d883"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "72ec05820e6d601cd556886405a13d30962cf10e38b0868b1861f7c0c6a8732c"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c012",
+      "author_blob": {
+        "id": "rule/c012",
+        "path": "bigbench/benchmark_tasks/list_functions/c012/task.json",
+        "blob_sha1": "94339c9ee9432774293f8514b33dfc2ca117e87e",
+        "sha256": "435936009338ebf6f4443c66bfa29d4ad817e204be2f46363404542ccff2948d",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.2045,
+      "source_reverification_cpu_seconds": 0.0003194950000000585
+    },
+    "artifact_id": "92301d1ab2fde0ce2bd8a802711e4fc4b0541e6b06c65fb8a8b99d193f25ed11"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "3eca90ebe4e54ef8a3a69394a8354693a20e69a4c29c4effddc0ee830485bfd7",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "eq",
+        [
+          "k",
+          0
+        ],
+        [
+          "div",
+          [
+            "sub",
+            [
+              "v",
+              1
+            ],
+            [
+              "k",
+              2
+            ]
+          ],
+          [
+            "k",
+            5
+          ]
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "1d241f98b27c48fca293d039a764269385bebf6e03d27f8434c05b5e39a5dc59",
+      "observations_digest": "29e87efba7fc79ddcb6622dbb70f4d3297a14e91296a393985c2cc524fcc8bfd",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "ca7cd3cad0cbe4d975248466256e22b781b971e62e70d014f4729340eb56994c"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "22b5c8e0b48155a9a992026c7ea41067f62eb58e6452c9be5f5195907c9fee2b"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c013",
+      "author_blob": {
+        "id": "rule/c013",
+        "path": "bigbench/benchmark_tasks/list_functions/c013/task.json",
+        "blob_sha1": "24dc8273e761aca4c1fa621e724e890e9cf48939",
+        "sha256": "3eca90ebe4e54ef8a3a69394a8354693a20e69a4c29c4effddc0ee830485bfd7",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 1.3099,
+      "source_reverification_cpu_seconds": 0.00035661099999995116
+    },
+    "artifact_id": "eea942ed8b3dbc1e11583a9d968b395ca71c4a373d56b97034096f7971cda943"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "84586e660b67461814e9d2cc7bd10c35e53df6df93db7f485fc1fbd859963311",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zmap",
+      "ast": [
+        "ifI",
+        [
+          "eq",
+          [
+            "v",
+            1
+          ],
+          [
+            "k",
+            1
+          ]
+        ],
+        [
+          "k",
+          8
+        ],
+        [
+          "v",
+          0
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "634c49caf3952cb5ac77652de37802a68ca2f14c7280c7b0fec8d0cc4c7ba4ef",
+      "observations_digest": "e859e1e3f784c4915f20d5ab6f31f96ee0700c307822cfed0550e83a468057fd",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "3e9c3f65cb4d500d4dc7dd453cbe5e48dc87a54944070256c078d12c6a713488"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "84822418d7a4f841c2dde2a96fd1e3c93fe1d83c53ddbd41c4366206c764dc01"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c016",
+      "author_blob": {
+        "id": "rule/c016",
+        "path": "bigbench/benchmark_tasks/list_functions/c016/task.json",
+        "blob_sha1": "bc7c6a005c19109f8e72840e6503e14560ab38d3",
+        "sha256": "84586e660b67461814e9d2cc7bd10c35e53df6df93db7f485fc1fbd859963311",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 1.0937,
+      "source_reverification_cpu_seconds": 0.0003547479999999048
+    },
+    "artifact_id": "0d3eb96743cc784c58a5ce880000dc10939b861275b13886b1366a89eadf97a5"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "7363ef322d29c1506a0c65953e96cc68c2d4b84d61cd6c0234a3b2039141b223",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zmap",
+      "ast": [
+        "ifI",
+        [
+          "eq",
+          [
+            "v",
+            1
+          ],
+          [
+            "k",
+            5
+          ]
+        ],
+        [
+          "k",
+          3
+        ],
+        [
+          "v",
+          0
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "fab06f474938a233992b3a292dc2cdb8a18260d7dc126a286966844c0055d3f0",
+      "observations_digest": "8736876a957511bc042d742d1757a09c5bcd970de9eac09c907ca90edf4f633c",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "d406ce5e8552e8e9c0ed659dc3cc4341c6c821b12644888d0d717d1ffa4cf214"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "7fbb94243cdd85d69a61ed339ef0e720141e790cb9fd079560880a74cae343c2"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c018",
+      "author_blob": {
+        "id": "rule/c018",
+        "path": "bigbench/benchmark_tasks/list_functions/c018/task.json",
+        "blob_sha1": "726d6061036a2c44814246a432706b4b3f013122",
+        "sha256": "7363ef322d29c1506a0c65953e96cc68c2d4b84d61cd6c0234a3b2039141b223",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 1.4439,
+      "source_reverification_cpu_seconds": 0.00033949499999996746
+    },
+    "artifact_id": "870730301232cab2b53d1811a5373988e95a0b1f61da793c30ba9bf797908d88"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "24d86ec76cabedd42e95d9ce1348088366dd890db52a878f7901635264578098",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "ast",
+      "ast": [
+        "cons",
+        [
+          "head",
+          [
+            "v",
+            0
+          ]
+        ],
+        [
+          "cons",
+          [
+            "k",
+            5
+          ],
+          [
+            "tail",
+            [
+              "v",
+              0
+            ]
+          ]
+        ]
+      ],
+      "state_types": [
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "5f2ceca7ceeeb2ac3712b3878c36b09c7558a32b3f9670bf01262b5d1aacbcf0",
+      "observations_digest": "4639abd504dc2d9e4ea430b44ea8fa706c11d6a44e589e0948ca96cb90d292de",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "82057af3ad962620ceef34cd5b50f10ff0580acf4980eab39c3a3380eefa2565"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "a77e62809904cf02b42275c64806e279f410e2b615e34ccddc10e34abb999858"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c022",
+      "author_blob": {
+        "id": "rule/c022",
+        "path": "bigbench/benchmark_tasks/list_functions/c022/task.json",
+        "blob_sha1": "a9a3d065d8c6ee17be4f9a076ae6c8d40cdbbbbf",
+        "sha256": "24d86ec76cabedd42e95d9ce1348088366dd890db52a878f7901635264578098",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0005,
+      "source_reverification_cpu_seconds": 0.00010551700000016595
+    },
+    "artifact_id": "4857f1daea55afd168578b9dc97dbe1f1bc2b4b0c104b4fbbe6e4be8cea4afad"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "4fecf0aab33c1d63c372b593884e1525457c3ce3bfb10a09d9f57d11fb7b2b87",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "ast",
+      "ast": [
+        "cons",
+        [
+          "head",
+          [
+            "v",
+            0
+          ]
+        ],
+        [
+          "cons",
+          [
+            "ifI",
+            [
+              "lt",
+              [
+                "k",
+                4
+              ],
+              [
+                "head",
+                [
+                  "v",
+                  0
+                ]
+              ]
+            ],
+            [
+              "k",
+              5
+            ],
+            [
+              "k",
+              8
+            ]
+          ],
+          [
+            "tail",
+            [
+              "v",
+              0
+            ]
+          ]
+        ]
+      ],
+      "state_types": [
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "1319e3096a9145a9998066ca782e3b6092f3cc3485e395ac29c2a0f0a90799bd",
+      "observations_digest": "131b22ed33fc7205319adf925a14a348317c9ed66d6d005508c3d55839f91277",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "85629302b19b1033b75bddf1959bf64565cf42c34b7bcfd07485eeac34ef33f4"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "c9498a6f93349ebbe0a2d4fe24c0174e1a4845d49cacf999b4743e8bcb414ea6"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c024",
+      "author_blob": {
+        "id": "rule/c024",
+        "path": "bigbench/benchmark_tasks/list_functions/c024/task.json",
+        "blob_sha1": "c56fdc35f64d235c61d60d8a3aea0abb182baa06",
+        "sha256": "4fecf0aab33c1d63c372b593884e1525457c3ce3bfb10a09d9f57d11fb7b2b87",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 1.1105,
+      "source_reverification_cpu_seconds": 0.00017994799999998534
+    },
+    "artifact_id": "05afc610be8bddd75b7c09c251182f3417ed713debb74dff2c160191d5752c36"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "c7944faead1ac79424b5bcd129a3683e2555acbae6302f49bb05c170b06f925e",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "not",
+        [
+          "eq",
+          [
+            "v",
+            1
+          ],
+          [
+            "k",
+            1
+          ]
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "5641d64b73540681be5ee556d69c3fe74f0044b2d28fd009d4d77e72446f57e2",
+      "observations_digest": "62498f7ea8e15df1e4830777f621384f475334f99d27071a2800a4ce55678fed",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "57d458307fca915bd9ad66684b59d99813e2acfd5becf5660afe511d83bba9a8"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "a53ffaae377801213244c12980e20febd1db09eefbff9b1fc3285e2f23d7cd4b"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c025",
+      "author_blob": {
+        "id": "rule/c025",
+        "path": "bigbench/benchmark_tasks/list_functions/c025/task.json",
+        "blob_sha1": "263dcb8f0dd4e9b13aae39bf5d468c84c284bd03",
+        "sha256": "c7944faead1ac79424b5bcd129a3683e2555acbae6302f49bb05c170b06f925e",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0063,
+      "source_reverification_cpu_seconds": 0.00035231499999999194
+    },
+    "artifact_id": "7aa17f9bd74b049092046c2f67a9313d24d68d05176d7bbc8b9d2559affd7608"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "f62b0083219a0a1fb3b0a486080cc409ba3ba880ab3226eb1c95c04ba55a999a",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "not",
+        [
+          "eq",
+          [
+            "v",
+            1
+          ],
+          [
+            "k",
+            2
+          ]
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "1498f8aa371ab88d29b591849d68d8b745ec464b76241d02414c29c888b1d31e",
+      "observations_digest": "29510708e9614a4f8e5b14e1896123f5cf6307f9c8e4eddf1dd7c19dcfd189a2",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "2f1196deb71d33a80e6f9ec4a2993df7da017c3cf0bf0872cfda3619b208764e"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "e2c4ca9f42d65f63a6296d74114d9bf1dab05befcc1e94ccf971ee349fcbd868"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c026",
+      "author_blob": {
+        "id": "rule/c026",
+        "path": "bigbench/benchmark_tasks/list_functions/c026/task.json",
+        "blob_sha1": "858e94d094c974c43d85247a54c8a0b55ff2dc31",
+        "sha256": "f62b0083219a0a1fb3b0a486080cc409ba3ba880ab3226eb1c95c04ba55a999a",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0052,
+      "source_reverification_cpu_seconds": 0.0003354389999998819
+    },
+    "artifact_id": "411fbba0555c97e9664ca3d07aaddd14cfe543f91ba8237fa36c3b97057527fb"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "2741074e619ab4c04f6801c850ddfdf4566e867225dc7c24e86d06cdec78893e",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "lt",
+        [
+          "k",
+          1
+        ],
+        [
+          "v",
+          2
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "83ee4f261587b8797e1fb9092b09dd13646be679dd41280a90545c31ec6fc9f6",
+      "observations_digest": "bea1e981ad5b0ead9bc299a1cca4ec7c9a3a01db24c01ceed14b53b17512f58e",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "84710dafcf457b98e85a1f1644a04dac44bc2a9ddd003e3971bb5a18cdcb84f7"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "1a912da635a678cef62fe185f18302503692b6f881563700b633221f49f35964"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c030",
+      "author_blob": {
+        "id": "rule/c030",
+        "path": "bigbench/benchmark_tasks/list_functions/c030/task.json",
+        "blob_sha1": "a0ea251270af16aa3b4c382aa787836666573a4b",
+        "sha256": "2741074e619ab4c04f6801c850ddfdf4566e867225dc7c24e86d06cdec78893e",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0014,
+      "source_reverification_cpu_seconds": 0.0002976729999999428
+    },
+    "artifact_id": "456bc96fc6b76188202a84ed6fbe4fb0ad283ebca83bc4d583c418aa5c0b4a84"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "99a3437b44c929b00359c2b1bf037b48c8c115a2cbdf48e341564f5bf3fe8bc9",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "ast",
+      "ast": [
+        "cons",
+        [
+          "head",
+          [
+            "tail",
+            [
+              "tail",
+              [
+                "tail",
+                [
+                  "v",
+                  0
+                ]
+              ]
+            ]
+          ]
+        ],
+        [
+          "cons",
+          [
+            "head",
+            [
+              "tail",
+              [
+                "v",
+                0
+              ]
+            ]
+          ],
+          [
+            "cons",
+            [
+              "head",
+              [
+                "tail",
+                [
+                  "tail",
+                  [
+                    "v",
+                    0
+                  ]
+                ]
+              ]
+            ],
+            [
+              "cons",
+              [
+                "head",
+                [
+                  "v",
+                  0
+                ]
+              ],
+              [
+                "tail",
+                [
+                  "tail",
+                  [
+                    "tail",
+                    [
+                      "tail",
+                      [
+                        "v",
+                        0
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      "state_types": [
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "c8b4613886506c3d5a8da8245cac62b419fb1031856b322f46bbcc983df316c3",
+      "observations_digest": "acd40328c8c8a7123153afd58c6369c5bc5610a2cf8cba1d393f7839d2bbd4b2",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "fe58f77299488d00dba4d8e6970a1e67ad6db3c4deaf24a481fbf8da245e0421"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "7111501f0b260cd937f7a8225cca7c9df0b2803b5a96880b40f457491cb8358d"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c033",
+      "author_blob": {
+        "id": "rule/c033",
+        "path": "bigbench/benchmark_tasks/list_functions/c033/task.json",
+        "blob_sha1": "6db208a219d3a93d0d460816db1aafcee7a30fcb",
+        "sha256": "99a3437b44c929b00359c2b1bf037b48c8c115a2cbdf48e341564f5bf3fe8bc9",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 2.4519,
+      "source_reverification_cpu_seconds": 0.0003388939999999785
+    },
+    "artifact_id": "e96e02555c515d6ef7b4046e50ede6b8d54dab315958d9529f0fa5e7271fc94d"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "a5c0b1239f866cdb49c8ca8c2d3d5f4d35be29ff95645aa3fbffe43ab9166272",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "ast",
+      "ast": [
+        "foldrL",
+        [
+          "cons",
+          [
+            "v",
+            1
+          ],
+          [
+            "v",
+            2
+          ]
+        ],
+        [
+          "cons",
+          [
+            "k",
+            9
+          ],
+          [
+            "nil"
+          ]
+        ],
+        [
+          "v",
+          0
+        ]
+      ],
+      "state_types": [
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "4c4a1ad694c0c98231fc75646598d682546b4bcfa33874e8b84f7723a063cc61",
+      "observations_digest": "02af5c3aad800731cd7dfef8941e693929ff674bdc78f877f5ed87f75a41306b",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "3602254b7870021b0f3746864afc477cc66da4a3c294984a52928910c5265d20"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "421a74ebf7b01ac86773bbc04b2a3500b3fcd3d5452c82def1dc184d1e33171c"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c038",
+      "author_blob": {
+        "id": "rule/c038",
+        "path": "bigbench/benchmark_tasks/list_functions/c038/task.json",
+        "blob_sha1": "49b08b6d870f06d30485211087cc735cedef748c",
+        "sha256": "a5c0b1239f866cdb49c8ca8c2d3d5f4d35be29ff95645aa3fbffe43ab9166272",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 3.1326,
+      "source_reverification_cpu_seconds": 0.00021910599999985791
+    },
+    "artifact_id": "3a7d428de3cd7084116c087e26aeedb319a2c6bfee9c627eba7ad8ce8bd0cc5c"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "7728bdf50a55459b5b21ab06487bd4e897e42981892d58fc8db335ee3755033c",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "ast",
+      "ast": [
+        "cons",
+        [
+          "k",
+          9
+        ],
+        [
+          "nil"
+        ]
+      ],
+      "state_types": [
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "27db8199d0b6b32f09dcdeba01d408eee35c04f9c875878c4dd8af9af1482478",
+      "observations_digest": "45b69507d9e3e111a6b21fec7a94b509edaf01b8b530e0537d070caf2f79313e",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "40fb32ba3fc841f578023b57ddd6f9a22095a34a39e7b17dc972f00c287a1cd3"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "c1c7444d55bdd61dd1ad774abc2e2e2f8b136f877ce9cbcf4545a00c013420a6"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c041",
+      "author_blob": {
+        "id": "rule/c041",
+        "path": "bigbench/benchmark_tasks/list_functions/c041/task.json",
+        "blob_sha1": "7e53973258adfedc18790e0c3d13af1878dc799c",
+        "sha256": "7728bdf50a55459b5b21ab06487bd4e897e42981892d58fc8db335ee3755033c",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0002,
+      "source_reverification_cpu_seconds": 4.485700000000925e-05
+    },
+    "artifact_id": "2332f2147a8940b941780e9db4a1c6f2b70c61d979eecb224d4087d8f4473e8d"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "5e66c19456671da6d885a0f5b590b196a3be56c4d01d3d489ae44416cea804b2",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "ast",
+      "ast": [
+        "cons",
+        [
+          "k",
+          1
+        ],
+        [
+          "cons",
+          [
+            "k",
+            9
+          ],
+          [
+            "cons",
+            [
+              "k",
+              4
+            ],
+            [
+              "cons",
+              [
+                "k",
+                3
+              ],
+              [
+                "cons",
+                [
+                  "k",
+                  2
+                ],
+                [
+                  "cons",
+                  [
+                    "k",
+                    5
+                  ],
+                  [
+                    "cons",
+                    [
+                      "k",
+                      8
+                    ],
+                    [
+                      "cons",
+                      [
+                        "k",
+                        0
+                      ],
+                      [
+                        "cons",
+                        [
+                          "k",
+                          4
+                        ],
+                        [
+                          "cons",
+                          [
+                            "k",
+                            9
+                          ],
+                          [
+                            "nil"
+                          ]
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      "state_types": [
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "52f81b65871d6adfa430a8a3fd88065b1f9911071882c55399135852c99b3872",
+      "observations_digest": "d2800e1e9ad44f723e769f2290e490dcfe822e14b75830670da87dd8a636945e",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "f245a6a709244c134088672a258fc82c006252160de42f3d152ac31f44feed69"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "9a0f976650bc1f08087cacbe18c5bdd3aae0d2dca6aa4874e42374ec491f7cc4"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c044",
+      "author_blob": {
+        "id": "rule/c044",
+        "path": "bigbench/benchmark_tasks/list_functions/c044/task.json",
+        "blob_sha1": "b710c7419019e00369896a17dd487c9663ea6ad6",
+        "sha256": "5e66c19456671da6d885a0f5b590b196a3be56c4d01d3d489ae44416cea804b2",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0004,
+      "source_reverification_cpu_seconds": 0.0003733150000000407
+    },
+    "artifact_id": "c852c99cf540b0fade40608de9f26d566d0f9370c92c6cac472929a1db22d0a5"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "6c76951ab4f0018945d03ab7b4be3a5117f5f826df7357403c17a5b160c891ba",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zmap",
+      "ast": [
+        "v",
+        0
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "c41319e1a88dd8ffc76df3943caef26af49158bfb8782ebba8b0d9d34320951a",
+      "observations_digest": "01d3736dcf013f226ef096fc1167c22914a23d5a1ad66880dbb3acf6927afd80",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "640da9ac052586553af09b81a19481762a5147d395af11e0738e4f135af37d2e"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "e77b481e7f2cd57656fc6e29a448acc37cc7c947b9d1809037a6c3af64fa1a37"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c045",
+      "author_blob": {
+        "id": "rule/c045",
+        "path": "bigbench/benchmark_tasks/list_functions/c045/task.json",
+        "blob_sha1": "673d15fdb71b8b471814d87bc0bda462c3a238d4",
+        "sha256": "6c76951ab4f0018945d03ab7b4be3a5117f5f826df7357403c17a5b160c891ba",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0002,
+      "source_reverification_cpu_seconds": 9.868700000015274e-05
+    },
+    "artifact_id": "0e6e885fd429099ed9c13a6d125ede29dd619eb16e545128d07fe4470d8ed738"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "b36291ee3be27a7fe5346fac88a0d0a61ad4b339a4303e2249f1eb872f83db0b",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "ast",
+      "ast": [
+        "cons",
+        [
+          "k",
+          9
+        ],
+        [
+          "cons",
+          [
+            "k",
+            6
+          ],
+          [
+            "cons",
+            [
+              "k",
+              3
+            ],
+            [
+              "cons",
+              [
+                "k",
+                8
+              ],
+              [
+                "cons",
+                [
+                  "k",
+                  5
+                ],
+                [
+                  "v",
+                  0
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      "state_types": [
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "0af183d0d0d03e0ba033ec802db152662fc5ffad672a67544db04e5b672f21a8",
+      "observations_digest": "8470aaf5dec0d786983761475ebaba80004dba0ac4e0cc37ba87368c8ef0dd3d",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "1cdc75e0757c0b9c30cf27cbdbbad9b824f405523866ee9be9289c21923ac377"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "c7207aa8f2a8829860761407622c13c59e258ee18690dc1625dd90b8d24e95ef"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c047",
+      "author_blob": {
+        "id": "rule/c047",
+        "path": "bigbench/benchmark_tasks/list_functions/c047/task.json",
+        "blob_sha1": "3c9d4282b3d179490d3cd8e0fa0818e84638a4e2",
+        "sha256": "b36291ee3be27a7fe5346fac88a0d0a61ad4b339a4303e2249f1eb872f83db0b",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0002,
+      "source_reverification_cpu_seconds": 0.00013532099999991054
+    },
+    "artifact_id": "074939813a36d15767b4866bf7f23c1bae5d89ca82fdddde47dc317ca1f4a0a9"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "b180e8b886215157b9bf1c390f3a15ea69284c7700c3b377986cbdaf9ea0652f",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "lt",
+        [
+          "k",
+          0
+        ],
+        [
+          "v",
+          1
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "281bde3f2726e009da563b1a12aeedf02c083bd09871ffb5bceb01292f88b45c",
+      "observations_digest": "346196227c018e7901c2c1a133aff7968742407223245883e129245cb5b05282",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "23ff61052ccf99f152ce627653fa74a34d93eedf30a2bf1f942365ee5186d60c"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "7d84836e58977e0be5a6a7f1842646989c43c747e945324fe7a81e819de90b33"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c049",
+      "author_blob": {
+        "id": "rule/c049",
+        "path": "bigbench/benchmark_tasks/list_functions/c049/task.json",
+        "blob_sha1": "a8160229d4a9ff4f64719426c689b8a89ad80685",
+        "sha256": "b180e8b886215157b9bf1c390f3a15ea69284c7700c3b377986cbdaf9ea0652f",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0007,
+      "source_reverification_cpu_seconds": 0.00021846500000011204
+    },
+    "artifact_id": "2e8f0ca197fb3d0fc7d48a33fb0140ff31af7f5a88118247492e1333bf224261"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "33331d061aeabc916a3b041dc2ed6340d1db81bb1dff5d783d2b18273b4cb876",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "ast",
+      "ast": [
+        "cons",
+        [
+          "head",
+          [
+            "tail",
+            [
+              "tail",
+              [
+                "v",
+                0
+              ]
+            ]
+          ]
+        ],
+        [
+          "cons",
+          [
+            "head",
+            [
+              "tail",
+              [
+                "tail",
+                [
+                  "v",
+                  0
+                ]
+              ]
+            ]
+          ],
+          [
+            "tail",
+            [
+              "tail",
+              [
+                "v",
+                0
+              ]
+            ]
+          ]
+        ]
+      ],
+      "state_types": [
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "0af17a9f13d40b86f9b209be89eb2a288db4aa23c2f7b231d0abe488edf5e336",
+      "observations_digest": "8ee5ba242ea651243f63666bfb1bfc90a4f311014607e99508b3003f8020668d",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "0d2f83be56ac38129b578f11a9ae7a976cbff3b46dc66ceae795ef92b0f1494a"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "fbe0e57b591e8d37fcc0187f3e5e05cd033f2c1900c1bb19bb6a2fa243f04c5d"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c054",
+      "author_blob": {
+        "id": "rule/c054",
+        "path": "bigbench/benchmark_tasks/list_functions/c054/task.json",
+        "blob_sha1": "c0f7afe60223a227c6c3c4cd61a74c287e8547ba",
+        "sha256": "33331d061aeabc916a3b041dc2ed6340d1db81bb1dff5d783d2b18273b4cb876",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 2.4201,
+      "source_reverification_cpu_seconds": 0.0002234719999998358
+    },
+    "artifact_id": "7dd6bcff38b91a9d9c9a4d87111c8e7bfcf24ac460ce352edd840549a5d3e09e"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "1342b2977dc4285da9a30ef6e905651de77aa6d79296abd5bb046d54128a76b6",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "not",
+        [
+          "eq",
+          [
+            "v",
+            1
+          ],
+          [
+            "k",
+            4
+          ]
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "bcc0316ef7282d59a67d246062224765848de4b82887221ff32a306d8c8e05e1",
+      "observations_digest": "85cb6e1122e40461d2b57a9703ee6730a4a9a7b664996589776acfd382d682c6",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "c6f5d18f0c998d0ae5397a43b0418b62ac3c7e0aa1275839410f80c66048b7c9"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "94ba76edc0665ce0c84cb6759cc9bedb34a4ef3f4136cb59bc947c34393b3c5e"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c056",
+      "author_blob": {
+        "id": "rule/c056",
+        "path": "bigbench/benchmark_tasks/list_functions/c056/task.json",
+        "blob_sha1": "db18a344c93234009cdd806548bae83b9f3f3c73",
+        "sha256": "1342b2977dc4285da9a30ef6e905651de77aa6d79296abd5bb046d54128a76b6",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0039,
+      "source_reverification_cpu_seconds": 0.0004857929999999566
+    },
+    "artifact_id": "4292bed88de515ae9ef1f05de4c960be6d6b5fba3eb28ba0a7c5a3fd810355ed"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "fbddcf1f9be443afdce705eb25cafeb13ef9526896aa68c0e70b44b3765342d9",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "ast",
+      "ast": [
+        "cons",
+        [
+          "head",
+          [
+            "tail",
+            [
+              "tail",
+              [
+                "v",
+                0
+              ]
+            ]
+          ]
+        ],
+        [
+          "cons",
+          [
+            "head",
+            [
+              "tail",
+              [
+                "v",
+                0
+              ]
+            ]
+          ],
+          [
+            "cons",
+            [
+              "head",
+              [
+                "v",
+                0
+              ]
+            ],
+            [
+              "cons",
+              [
+                "k",
+                4
+              ],
+              [
+                "cons",
+                [
+                  "head",
+                  [
+                    "tail",
+                    [
+                      "tail",
+                      [
+                        "tail",
+                        [
+                          "tail",
+                          [
+                            "v",
+                            0
+                          ]
+                        ]
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "cons",
+                  [
+                    "head",
+                    [
+                      "foldrL",
+                      [
+                        "tail",
+                        [
+                          "v",
+                          2
+                        ]
+                      ],
+                      [
+                        "v",
+                        0
+                      ],
+                      [
+                        "range",
+                        [
+                          "k",
+                          6
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "nil"
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      "state_types": [
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "cf19ebecb298cdb234044bf3416d55fd70ab10d57873f4b91d8fde27bb916348",
+      "observations_digest": "e2afcff93c8c1493330c9dbd565b359948a5e9af380fe9845fa7de000d2dab94",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "cc8a8118a9832a7b6fcc24161bf9360f4d183715990b1cf714dc2178e89b0256"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "c34194be9fc5f696c0f9575cc187d73bcbc314df16dd7760fa6ddd3427d811c1"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c060",
+      "author_blob": {
+        "id": "rule/c060",
+        "path": "bigbench/benchmark_tasks/list_functions/c060/task.json",
+        "blob_sha1": "eb3bd73c721ec58bf171886923a39176b1b0ccce",
+        "sha256": "fbddcf1f9be443afdce705eb25cafeb13ef9526896aa68c0e70b44b3765342d9",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 1.0739,
+      "source_reverification_cpu_seconds": 0.0006398819999999805
+    },
+    "artifact_id": "87f146203e352982f09aaa4f8e7355a08a7fbc67c2205a4cd86f1ddeb2c80423"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "deb0d543bbd605ae4ec48ed5fbf14395815850ece49c98552e420dac2074c070",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "isnil",
+        [
+          "v",
+          4
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "38c0589fe80ffc7db99155537737ae4070c7de3de0d8df8b0163db0821029b92",
+      "observations_digest": "ba8a2ec09fd6b226e91f00c36862e5539edf823e83444f833a0ceb465ad55114",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "64214e17c21d061f8727b4dd154f97ccaa0135c342af7fb6490528ef71e244a1"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "049c900d2e3448e4359bb8a9016ba763adeaa6056fee2d3808e390296461570f"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c061",
+      "author_blob": {
+        "id": "rule/c061",
+        "path": "bigbench/benchmark_tasks/list_functions/c061/task.json",
+        "blob_sha1": "3a02321fdf17f7bee112c0c479f15ca049b419e2",
+        "sha256": "deb0d543bbd605ae4ec48ed5fbf14395815850ece49c98552e420dac2074c070",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0005,
+      "source_reverification_cpu_seconds": 0.000241979999999975
+    },
+    "artifact_id": "8cf2b7f56912d4677b4930352b2fd1b7a4c3c6990e2ab296db0a6d3f3f6d939f"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "343205ba2cc05d2d418ff697b777bd9256ec2ba87ef7c4127fe62432a93bd989",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "lt",
+        [
+          "k",
+          0
+        ],
+        [
+          "v",
+          2
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "6e3d078ae4d17f064279396fd91ea000dc6896be08e652cf43d504d6d5799908",
+      "observations_digest": "c96211c8d6a86408574ca7e88a81ec41a7352d93cb0219e47efb507ad8465d76",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "e379c7b8cf469c170471991e91c020fca3e634839c00c1f24d8538dae206feb4"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "6e6b9aabba7b500ba65130eacc66cd7d8f8b11989bc8db7dd5170dee70f5e869"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c062",
+      "author_blob": {
+        "id": "rule/c062",
+        "path": "bigbench/benchmark_tasks/list_functions/c062/task.json",
+        "blob_sha1": "65a15fa077b9b3ab49fbbd9a2732acd659df6a89",
+        "sha256": "343205ba2cc05d2d418ff697b777bd9256ec2ba87ef7c4127fe62432a93bd989",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0008,
+      "source_reverification_cpu_seconds": 0.00033063199999983084
+    },
+    "artifact_id": "2c8471856dad1412545e46606051f253c2a7f09e7f75306757d938c15d0fd5e7"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "852e84830bf90ac6346f0d0bca4005c38dafea03bf0b715641cd1c9e64e9f444",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "lt",
+        [
+          "head",
+          [
+            "v",
+            5
+          ]
+        ],
+        [
+          "v",
+          1
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "9f2da642859ff935806f546f4fea2a5881a814715d2692e812f82922afb6b54f",
+      "observations_digest": "4e802ecf734ca426417ebd98f97aa08e54b17d72e51bb3539a458a9d2b21c204",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "14ce18e9c078116f7e2e6aaece2cb23957bf91821af2b698377fcd7e01eab727"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "8d5c1d6099c7e75e792012b607cd8ad0976590d80b08dbf50b0ef3c0a2753c65"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c063",
+      "author_blob": {
+        "id": "rule/c063",
+        "path": "bigbench/benchmark_tasks/list_functions/c063/task.json",
+        "blob_sha1": "369fc8c7d78030b32bb635760841c32897e18a7c",
+        "sha256": "852e84830bf90ac6346f0d0bca4005c38dafea03bf0b715641cd1c9e64e9f444",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0016,
+      "source_reverification_cpu_seconds": 0.00027180500000012486
+    },
+    "artifact_id": "dc96fd09b2b752c99bc40fc3370a0ce1ac0fb67bf60550a8f312db37eb26a5fa"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "36f7509e990009b3af38220f3f8c1b71b7e6f6ea88027f1c5c254e24b0bf7d74",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zmap",
+      "ast": [
+        "add",
+        [
+          "v",
+          0
+        ],
+        [
+          "k",
+          2
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "d8bedc34f48e016d411385ddd24d1ef1b3859ac3ea538d61096066638685af55",
+      "observations_digest": "b674ebe3629fbffada63a533faf210645f581a487577021a5f1cb24383e28db5",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "c2f81880b4f05d003bf60760fb16f8ee0029d444af946c7432bb78387bd5fc00"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "bf6fd271a9fd3a9601032c7e66f8ab8c1d031f4f78f82cec3095f921c8f0f7f7"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c071",
+      "author_blob": {
+        "id": "rule/c071",
+        "path": "bigbench/benchmark_tasks/list_functions/c071/task.json",
+        "blob_sha1": "09dc7cf5f6070b5c591a810ccca2d666bb89f089",
+        "sha256": "36f7509e990009b3af38220f3f8c1b71b7e6f6ea88027f1c5c254e24b0bf7d74",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0007,
+      "source_reverification_cpu_seconds": 0.00013885700000004775
+    },
+    "artifact_id": "0746c791c433daad357d6c56a6a054c310715e9920e1ad9fed93d2405be1559f"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "a548f58bc1a30725d7560fc847f9e5be54209016b5bf70e72d97c2e3c63dabce",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zmap",
+      "ast": [
+        "add",
+        [
+          "v",
+          0
+        ],
+        [
+          "add",
+          [
+            "v",
+            1
+          ],
+          [
+            "k",
+            1
+          ]
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "c665d859fbe989f46239489af0de4b850fd9b1d4714355821371c5c0c9b606f4",
+      "observations_digest": "f24ec4b634831e5f6a54fb8e5d0d8824ffd0e18a2e8809a68b3e272d801e792d",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "ebd09da44cc9e7cdc1b5602b3e60c8ab18099f758a2d0318432571f72f87f588"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "cd673ce4bacd3e3e851962698d4343470af3021d159fdbb4db0bce662259e615"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c073",
+      "author_blob": {
+        "id": "rule/c073",
+        "path": "bigbench/benchmark_tasks/list_functions/c073/task.json",
+        "blob_sha1": "b36ae71c0cad35eff200dcfb1c189d06ecdaf542",
+        "sha256": "a548f58bc1a30725d7560fc847f9e5be54209016b5bf70e72d97c2e3c63dabce",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0344,
+      "source_reverification_cpu_seconds": 0.00019960699999987952
+    },
+    "artifact_id": "1d4a97ec7d814f7eafac23d946c09fb740ca8a462f0838431357c7715ebf6540"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "42f8db760c135aa2735858b96813eb6ba0f17eb69503c71eb701bcc095204e1c",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "eq",
+        [
+          "k",
+          0
+        ],
+        [
+          "mod",
+          [
+            "v",
+            1
+          ],
+          [
+            "k",
+            2
+          ]
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "f174ac0c2dbc8369538bcc419277c88563e5412ee5024827159aa08437d98561",
+      "observations_digest": "a07125883e51b3481ae222cf6184c3b804fd04e724b07d8bd3bd5111cae1dbf6",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "596df01904505f94e58f0e5271d62ec3575b41c44ea162b345e1262c4e893725"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "5cde2614f4cfc0defbeaa8999cd492b4f357996cd66a2fd3e229ee401479cb22"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c075",
+      "author_blob": {
+        "id": "rule/c075",
+        "path": "bigbench/benchmark_tasks/list_functions/c075/task.json",
+        "blob_sha1": "221e6e8af089412c63bf24c3ccf872ebcff9899a",
+        "sha256": "42f8db760c135aa2735858b96813eb6ba0f17eb69503c71eb701bcc095204e1c",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.014,
+      "source_reverification_cpu_seconds": 0.00029094299999998796
+    },
+    "artifact_id": "f1be57123f03cfc5a58d513531b7c7fb4194036fb5b819b5873d9a417b5842da"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "852c37e83f2cd485367f2f44d07b504cdd0c5b618edadf3d180a97ddab3eb57e",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "eq",
+        [
+          "v",
+          1
+        ],
+        [
+          "k",
+          2
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "0487fd7cff5257a980a012595e7b0663789bfc00aaaa223456a3168b0ac5392a",
+      "observations_digest": "7a32c993adc1a71c80df2a0537e0378ea945bb927b17187f69ee52cf5aaf998b",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "8f3d735f778896acfd4a34f2b2d5451daaba6d6bd38e1603ef8b2e9af2c15dab"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "17341663c8c1d77415e692eb9f964a39e517d6e2d702c96f956f314e32661e44"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c082",
+      "author_blob": {
+        "id": "rule/c082",
+        "path": "bigbench/benchmark_tasks/list_functions/c082/task.json",
+        "blob_sha1": "0f4e97c604ca9ead76807a3b931fdc20e9bb7a31",
+        "sha256": "852c37e83f2cd485367f2f44d07b504cdd0c5b618edadf3d180a97ddab3eb57e",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0007,
+      "source_reverification_cpu_seconds": 0.00015567099999991285
+    },
+    "artifact_id": "d2d54ee3b143d3ecca5a6df686320fbb6a0cb89450818fd3e007c01fbece229b"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "e753b6ba2a9aecfb1a427f38ba16beb884e4b8ff8b336af9227057b4d7652077",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "eq",
+        [
+          "v",
+          1
+        ],
+        [
+          "k",
+          6
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "d587f850f2dfec25b716726ee2018f7dc5ee3424e36eb191f40df50901e9282a",
+      "observations_digest": "d215c7ae246cd5d825dcafe5d9da2c335be0a375dcbff190281978faf6032dff",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "29d5805c5aaedbc1c85686e6bc6333614ccfa3e1ee2fca9cec50cf57afd716ef"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "1acbc86ac88ab0ec6c634062f09a2750147c52d3587c48cc1b4032643022785c"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c083",
+      "author_blob": {
+        "id": "rule/c083",
+        "path": "bigbench/benchmark_tasks/list_functions/c083/task.json",
+        "blob_sha1": "a037b50482f28f1b7cbb68e762da8ecf9747d369",
+        "sha256": "e753b6ba2a9aecfb1a427f38ba16beb884e4b8ff8b336af9227057b4d7652077",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0011,
+      "source_reverification_cpu_seconds": 0.00038184799999996244
+    },
+    "artifact_id": "cf5f127a1736312ebd57167018b2b0db993bf7f2eb51a6189fcb3fb6b2865f7a"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "dc7c05b91d545d5c5089e14fe75de8baa4e0d50361402084385d5f770e25fbee",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "eq",
+        [
+          "v",
+          1
+        ],
+        [
+          "k",
+          6
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "d587f850f2dfec25b716726ee2018f7dc5ee3424e36eb191f40df50901e9282a",
+      "observations_digest": "880804e68927e0c6c362357738b2f9d04ecccecf86086b86eb4eefce32a3a6b4",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "e2648882fdd846c2dda3d7e926fe6636d684e9dfd0e8525e423cf5f5c35d322b"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "665c065d4e722a55dc343b66f986bef377d7d81fa10c82cc047932eea245f84f"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c084",
+      "author_blob": {
+        "id": "rule/c084",
+        "path": "bigbench/benchmark_tasks/list_functions/c084/task.json",
+        "blob_sha1": "0139c27df29cf60441174d188606f5221b3d371c",
+        "sha256": "dc7c05b91d545d5c5089e14fe75de8baa4e0d50361402084385d5f770e25fbee",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0008,
+      "source_reverification_cpu_seconds": 0.0002139679999999533
+    },
+    "artifact_id": "a97361c532e8b34f0afa4208987205ea3b43e4c8cd31ce3cab6be92ff2a6b40f"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "863e2fa4ffa85be6eef2a5e17ec563318190b5fc4878614599b55f8dc5634589",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "ast",
+      "ast": [
+        "cons",
+        [
+          "head",
+          [
+            "tail",
+            [
+              "tail",
+              [
+                "tail",
+                [
+                  "v",
+                  0
+                ]
+              ]
+            ]
+          ]
+        ],
+        [
+          "cons",
+          [
+            "head",
+            [
+              "tail",
+              [
+                "v",
+                0
+              ]
+            ]
+          ],
+          [
+            "cons",
+            [
+              "head",
+              [
+                "tail",
+                [
+                  "tail",
+                  [
+                    "v",
+                    0
+                  ]
+                ]
+              ]
+            ],
+            [
+              "cons",
+              [
+                "head",
+                [
+                  "v",
+                  0
+                ]
+              ],
+              [
+                "tail",
+                [
+                  "tail",
+                  [
+                    "tail",
+                    [
+                      "tail",
+                      [
+                        "v",
+                        0
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      "state_types": [
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "c8b4613886506c3d5a8da8245cac62b419fb1031856b322f46bbcc983df316c3",
+      "observations_digest": "215b754cf9ffa70f5b44c3ef33c18500df474ad51b3ead0a9aab7fbfdc678a0f",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "f05278365159e69cf2c9405d0fabdd65f6d7cb7f6de6e3f5ff1f0462b794f913"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "c55684109c9e94e83d4ad48fef09cf95051c797a8d8afbee5fd3aa9ec28b749b"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c086",
+      "author_blob": {
+        "id": "rule/c086",
+        "path": "bigbench/benchmark_tasks/list_functions/c086/task.json",
+        "blob_sha1": "dd8737067fd2b52454dd6cc894cdb1d7a039b9ee",
+        "sha256": "863e2fa4ffa85be6eef2a5e17ec563318190b5fc4878614599b55f8dc5634589",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 2.4287,
+      "source_reverification_cpu_seconds": 0.00033519900000000824
+    },
+    "artifact_id": "5a46e912fb721b79a2ced8aff030fac360cb736951db470b1ff4b2fe388e761b"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "99524af60cd67cdfbe1beab23b2b6907799e2d6aad27391eb42453b31330fe17",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "ast",
+      "ast": [
+        "cons",
+        [
+          "head",
+          [
+            "v",
+            0
+          ]
+        ],
+        [
+          "cons",
+          [
+            "head",
+            [
+              "tail",
+              [
+                "tail",
+                [
+                  "v",
+                  0
+                ]
+              ]
+            ]
+          ],
+          [
+            "cons",
+            [
+              "head",
+              [
+                "tail",
+                [
+                  "v",
+                  0
+                ]
+              ]
+            ],
+            [
+              "tail",
+              [
+                "tail",
+                [
+                  "tail",
+                  [
+                    "v",
+                    0
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      "state_types": [
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "570f022c1c43826b0e9ad4afd751558d97a22f0325035c469bf858c4a1b5805d",
+      "observations_digest": "356301f924d37e7670568d72d8076df376a2284f4490191850cf43d40b678d57",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "80664c4e7fa027df22c25ac614c1b462dc712307fa10f816da7b799e88bdfe7f"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "6d1ef8725ec38f494a42969b9d80d5c6eff542c6104bc82eed53e34f3dbeec45"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c087",
+      "author_blob": {
+        "id": "rule/c087",
+        "path": "bigbench/benchmark_tasks/list_functions/c087/task.json",
+        "blob_sha1": "9e46f5c794b33ef1a776b09ac01089afbdd64cce",
+        "sha256": "99524af60cd67cdfbe1beab23b2b6907799e2d6aad27391eb42453b31330fe17",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 2.4213,
+      "source_reverification_cpu_seconds": 0.00021704299999991683
+    },
+    "artifact_id": "68b51c511ec5e12d22b1882b7df7dd7e4b30f6d04837a82f3874bf59b1b519d7"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "b3560bde450a84d75f77c966660cc2349ced3c852e702f0376b36e1c9fbbbdf3",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "ast",
+      "ast": [
+        "cons",
+        [
+          "head",
+          [
+            "tail",
+            [
+              "tail",
+              [
+                "tail",
+                [
+                  "v",
+                  0
+                ]
+              ]
+            ]
+          ]
+        ],
+        [
+          "cons",
+          [
+            "head",
+            [
+              "tail",
+              [
+                "tail",
+                [
+                  "v",
+                  0
+                ]
+              ]
+            ]
+          ],
+          [
+            "cons",
+            [
+              "head",
+              [
+                "tail",
+                [
+                  "v",
+                  0
+                ]
+              ]
+            ],
+            [
+              "cons",
+              [
+                "head",
+                [
+                  "v",
+                  0
+                ]
+              ],
+              [
+                "tail",
+                [
+                  "tail",
+                  [
+                    "tail",
+                    [
+                      "tail",
+                      [
+                        "v",
+                        0
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      "state_types": [
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "37e6e326d4da5d0dadcb535437122b9aaaf6b87abe11a8717a462d41df4839dc",
+      "observations_digest": "48cfeae9112a32388a51d1cb22f6903aa30384651e31964025e98df95469955e",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "af2bfa9919c535fdae299e57f3f2b21a49eca1eed7bf8007f594c36650ea7a91"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "00d9cc37d0f936dfdd9a8fdf4140d3fc3bb1f8a4cc8591b0752d10263b1116cc"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c088",
+      "author_blob": {
+        "id": "rule/c088",
+        "path": "bigbench/benchmark_tasks/list_functions/c088/task.json",
+        "blob_sha1": "4c679356e36efaa671738b421e99adc423c33c77",
+        "sha256": "b3560bde450a84d75f77c966660cc2349ced3c852e702f0376b36e1c9fbbbdf3",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 2.4278,
+      "source_reverification_cpu_seconds": 0.0003310420000000036
+    },
+    "artifact_id": "9925c6ec7923e8f98c5f335795aa9cbcd1c865b2f99da1160779c42e68be25bd"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "15aee62d0b15767dec846d274d771bea8b866ee6e9c0c877ffb4fb88061feb18",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "ast",
+      "ast": [
+        "cons",
+        [
+          "k",
+          18
+        ],
+        [
+          "cons",
+          [
+            "k",
+            42
+          ],
+          [
+            "cons",
+            [
+              "k",
+              77
+            ],
+            [
+              "cons",
+              [
+                "k",
+                20
+              ],
+              [
+                "cons",
+                [
+                  "k",
+                  36
+                ],
+                [
+                  "nil"
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      "state_types": [
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "915ea56f8ba68483ca0111a4d91f9823bc393796f73bc6764b521272251d17d2",
+      "observations_digest": "dcf8aeec471ee1548c6441bbddf2b92ebacb4dd77f54ee78d6725dc8e764ba4c",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "dbbe62127ab32fa338d7b70c38c8a8ce9bb97600c42c01ed4d780311c798b941"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "ab71c9a242c630b8367e6c35b1188a0976ee486cbfa4b7281b8c8725578f14b5"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c090",
+      "author_blob": {
+        "id": "rule/c090",
+        "path": "bigbench/benchmark_tasks/list_functions/c090/task.json",
+        "blob_sha1": "751799d7bb56277261c2ebc00f7af4e7a3834754",
+        "sha256": "15aee62d0b15767dec846d274d771bea8b866ee6e9c0c877ffb4fb88061feb18",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0004,
+      "source_reverification_cpu_seconds": 0.00012187099999994011
+    },
+    "artifact_id": "3081fe54bac0d34f7c684fcf52d450157e48166350d839a77e08e2b862d499f5"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "a8e4ab20355fc11561cab364c4e83710babfab10526c8d82406f37ed2db821b6",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "ast",
+      "ast": [
+        "cons",
+        [
+          "k",
+          81
+        ],
+        [
+          "cons",
+          [
+            "k",
+            99
+          ],
+          [
+            "cons",
+            [
+              "k",
+              41
+            ],
+            [
+              "cons",
+              [
+                "k",
+                23
+              ],
+              [
+                "cons",
+                [
+                  "k",
+                  22
+                ],
+                [
+                  "cons",
+                  [
+                    "k",
+                    75
+                  ],
+                  [
+                    "cons",
+                    [
+                      "k",
+                      68
+                    ],
+                    [
+                      "cons",
+                      [
+                        "k",
+                        30
+                      ],
+                      [
+                        "cons",
+                        [
+                          "k",
+                          24
+                        ],
+                        [
+                          "cons",
+                          [
+                            "k",
+                            69
+                          ],
+                          [
+                            "nil"
+                          ]
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      "state_types": [
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "16437bbd373f3c94892cfd8cb106c4cb4ba13ed65591d51f6facfe9315bf5ee3",
+      "observations_digest": "9f9dffdab8ec814c9391444f49bf8088e7a2c52029aef4a8dbdbf6574551250a",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "642249e53a12e529005e6abcdce9fa23964ea9be6fa63380dbd94b8d48de8427"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "d48fa192793d12e7ef52f817e5ba6eeeb287c6ac1acac16abb4a9d79a0f1171d"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c091",
+      "author_blob": {
+        "id": "rule/c091",
+        "path": "bigbench/benchmark_tasks/list_functions/c091/task.json",
+        "blob_sha1": "7f1921ca4b21e9952c684be888d20eef6e01e1f3",
+        "sha256": "a8e4ab20355fc11561cab364c4e83710babfab10526c8d82406f37ed2db821b6",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0004,
+      "source_reverification_cpu_seconds": 0.000265874999999971
+    },
+    "artifact_id": "399eb9965c8a4d69c456d2a2ebff8cb4d72f7855465feb874052e28a4f5534c7"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "a60f0632d2f2287f0c78eab8cbe6a966a290a012ead813fabaf6e6685cbe9320",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zmap",
+      "ast": [
+        "v",
+        0
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "c41319e1a88dd8ffc76df3943caef26af49158bfb8782ebba8b0d9d34320951a",
+      "observations_digest": "85dacb08dbaaadffbdadb9f42abac9d0523041d0a3867d1d6e8f0ab016cf464c",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "67a0dcb32036b16a8cfb6711c1ac0a7b9780dc857f834211d818dee505db09d1"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "125f5c0bbf07c25e68cdd3e4cea04a91821c4a6c9aefd77d5d308126be12ceda"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c102",
+      "author_blob": {
+        "id": "rule/c102",
+        "path": "bigbench/benchmark_tasks/list_functions/c102/task.json",
+        "blob_sha1": "5e1536b7294d79ba1b782b00429a579fd2562d68",
+        "sha256": "a60f0632d2f2287f0c78eab8cbe6a966a290a012ead813fabaf6e6685cbe9320",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0002,
+      "source_reverification_cpu_seconds": 0.00010272299999991574
+    },
+    "artifact_id": "eedadb8dab45c1565418af33e9b2e5f1d90752efa3bf37f3a24eb28512067234"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "dd24c964e7ea02f57def31331c8ad2717d9e74928fe8e19ba02833e092b9d025",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "ast",
+      "ast": [
+        "cons",
+        [
+          "foldrI",
+          [
+            "add",
+            [
+              "v",
+              1
+            ],
+            [
+              "v",
+              2
+            ]
+          ],
+          [
+            "k",
+            0
+          ],
+          [
+            "v",
+            0
+          ]
+        ],
+        [
+          "nil"
+        ]
+      ],
+      "state_types": [
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "a87639d72a92f0ccaed6d4f9a9722a57d3032b23452400d0af2d795c3d7fd4bc",
+      "observations_digest": "344978b1215a780f95820a666fbf1be16ae12d6506ebc20aad7c918475b6b237",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "f6bb65673f639ed00f2d4c924ed135a7a70e1eac43a7dbe6dbedde2a7a92dd36"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "42f2020b144b2c17e42405fd3c43bb811eefe8390ec5ee59463734150511f501"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c108",
+      "author_blob": {
+        "id": "rule/c108",
+        "path": "bigbench/benchmark_tasks/list_functions/c108/task.json",
+        "blob_sha1": "377bd776f2ad54a0a0a806569a9ee04d9bf9306f",
+        "sha256": "dd24c964e7ea02f57def31331c8ad2717d9e74928fe8e19ba02833e092b9d025",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0969,
+      "source_reverification_cpu_seconds": 0.00014609799999987239
+    },
+    "artifact_id": "118352ccc1ee1abbb41955d8965b26f39a80dc94f1ee09fc2076d4dea8b3b592"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "aff8a65c2eb9155567a82dfe14bd95d19a0f2ac0b4867c3e0ec81746110f6a62",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "ast",
+      "ast": [
+        "cons",
+        [
+          "foldrI",
+          [
+            "mul",
+            [
+              "v",
+              1
+            ],
+            [
+              "v",
+              2
+            ]
+          ],
+          [
+            "k",
+            1
+          ],
+          [
+            "v",
+            0
+          ]
+        ],
+        [
+          "nil"
+        ]
+      ],
+      "state_types": [
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "0753e881f201626d96ffac4cbfc8d0eb9bd9de640e2da117cb1fcfd89a0ed60b",
+      "observations_digest": "7eeb6e320df0a79279b5c5306c09390d10758956abf1a4da3629c4e1fb098c2e",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "de00e0e6217d017bd5f36d04886593b5987b46d0f60a0826f53abeac4685c3c9"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "20cea64bb07e44b4a8c31f688271c034a299a2f9e8409fbbbb7030daab8ae19f"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c109",
+      "author_blob": {
+        "id": "rule/c109",
+        "path": "bigbench/benchmark_tasks/list_functions/c109/task.json",
+        "blob_sha1": "bf82134b686830ab33e47934879d72a5869a8a7b",
+        "sha256": "aff8a65c2eb9155567a82dfe14bd95d19a0f2ac0b4867c3e0ec81746110f6a62",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.1004,
+      "source_reverification_cpu_seconds": 0.00012174100000006405
+    },
+    "artifact_id": "936286546e42eeefdd781348b0d21b18eb9cfe8e64c506d004e6a21204bb1564"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "1664236900645d53b5c193860846acecc6acd4b8129a4c3961890cfec996e711",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "isnil",
+        [
+          "v",
+          3
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "00c8e4cabb1a16372cf61df296021b4c4cb03feab00c3c38285f9eb534d6eb65",
+      "observations_digest": "6ee62912eb4324de5e3bac8adb09df877dd5d51bd3d58116385e4c1f47a659be",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "795928556e56117df249664a44aae5df4e288d8c9f8c48f5325c6ef012c4a462"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "eebb85d86724ff9577cf182995e8ab504678f45231f5f7ea265517b57ba31c86"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c120",
+      "author_blob": {
+        "id": "rule/c120",
+        "path": "bigbench/benchmark_tasks/list_functions/c120/task.json",
+        "blob_sha1": "98f6de591d947e03556576fcd365835fdf311080",
+        "sha256": "1664236900645d53b5c193860846acecc6acd4b8129a4c3961890cfec996e711",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0008,
+      "source_reverification_cpu_seconds": 0.00018169100000009486
+    },
+    "artifact_id": "fefb912d9a9914b0acd6641c35799c1cde2b113a717fff2784919ff5e7e87f62"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "58e1f3844d6ccdf043f1aa65eeeb420cead010b02fa3f4ff970d1a0e8f8c8d02",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "lt",
+        [
+          "k",
+          0
+        ],
+        [
+          "v",
+          2
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "6e3d078ae4d17f064279396fd91ea000dc6896be08e652cf43d504d6d5799908",
+      "observations_digest": "b37a25b10141802ec8a37237232f4d6c8e7e8a2967022ec79f93c39f35856582",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "dfa235f049b257c82090e4607a4a2dc48ef709167d539ff193baf203aac2ace9"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "76b86d6bb732c7c3cf236bd36619aac9f1b9eb7fe88a76ecc4e620040d488504"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c127",
+      "author_blob": {
+        "id": "rule/c127",
+        "path": "bigbench/benchmark_tasks/list_functions/c127/task.json",
+        "blob_sha1": "017f0fefab6cd968f949794aea0cdc31c9dcc78e",
+        "sha256": "58e1f3844d6ccdf043f1aa65eeeb420cead010b02fa3f4ff970d1a0e8f8c8d02",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0007,
+      "source_reverification_cpu_seconds": 0.00019701400000005087
+    },
+    "artifact_id": "22cfb3aa30daf0a303cc11f0502560bb0e442dbc63987ec2118337e546079ae7"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "b6bd1987c5a69b1d96014e154399a90ba99577f89ea3366d70e178dc3988e9b4",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "not",
+        [
+          "eq",
+          [
+            "v",
+            1
+          ],
+          [
+            "k",
+            2
+          ]
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "1498f8aa371ab88d29b591849d68d8b745ec464b76241d02414c29c888b1d31e",
+      "observations_digest": "04e85f11a8e2485c669981795cc5b9e1100c8931e09c097b5dae0f5946f00658",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "d373296908a678d2d300241a0dca6390844e4534cabf2a15be84b99b700f0bdd"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "40354114c54f002a4ac0c2e1165c40f1577deae94ba11c9a5d6fc2856536958a"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c132",
+      "author_blob": {
+        "id": "rule/c132",
+        "path": "bigbench/benchmark_tasks/list_functions/c132/task.json",
+        "blob_sha1": "b31571f81cb7af4b116bbbec9d7b48727cada943",
+        "sha256": "b6bd1987c5a69b1d96014e154399a90ba99577f89ea3366d70e178dc3988e9b4",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0047,
+      "source_reverification_cpu_seconds": 0.00034030699999987313
+    },
+    "artifact_id": "19e9ab4b74f68178645a78216dd4c5f5739c7b12a51072cbb3e9f4db3571b8e3"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "d042c687c9b549ad4bd9be89d0891250a7e9c0d4a913af69fe050fb49b5cc609",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "not",
+        [
+          "eq",
+          [
+            "v",
+            0
+          ],
+          [
+            "k",
+            3
+          ]
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "903ffb49fa0cdab734b1fba8db86c475e220a0290bfdb32e6b4e891dea70df5a",
+      "observations_digest": "09db112c22029425d7663e20b6cd4ae7501644037fcdfb0625c422c04f83cf7c",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "1af56ac803138d9b338a6bff03d71fb06ce061c804433ce4062b6586a1ddc23f"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "16296ffa6c25978928fa6a6ce3f6ac46c59a982a9c753cd2a46d4c53dad29ab9"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c137",
+      "author_blob": {
+        "id": "rule/c137",
+        "path": "bigbench/benchmark_tasks/list_functions/c137/task.json",
+        "blob_sha1": "c89110c03629cfc9f4b32f18b8300eae95461f8b",
+        "sha256": "d042c687c9b549ad4bd9be89d0891250a7e9c0d4a913af69fe050fb49b5cc609",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.005,
+      "source_reverification_cpu_seconds": 0.0003540770000001192
+    },
+    "artifact_id": "e1a276eece99983686e8954e19d91ba47104869d41e73843010d159e25415266"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "37a84db4cb8dea7bbe6eb703813cf7cb046b5401372f25b8c63abfd425836592",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zmap",
+      "ast": [
+        "ifI",
+        [
+          "eq",
+          [
+            "v",
+            1
+          ],
+          [
+            "k",
+            1
+          ]
+        ],
+        [
+          "k",
+          9
+        ],
+        [
+          "v",
+          0
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "19e9530f1c3fb261f1a236019cc78ebecab268f192caf5da0222d088e2932c1d",
+      "observations_digest": "0f6e8449cc664b42a20ba64a75dcc01ec16743d61e1e7cc8880c9495a9097f37",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "ffc4c50bdc47810d59693b093e44b683ed4a6469fff1eca2879fa96a3dd86fb6"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "4fb36738f0165027bae9a1e3ac7fed4a05d1e2677b491f8de8208c77affa77b3"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c140",
+      "author_blob": {
+        "id": "rule/c140",
+        "path": "bigbench/benchmark_tasks/list_functions/c140/task.json",
+        "blob_sha1": "17abed1ebb1b027c50603ea06306357928103daf",
+        "sha256": "37a84db4cb8dea7bbe6eb703813cf7cb046b5401372f25b8c63abfd425836592",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 1.1533,
+      "source_reverification_cpu_seconds": 0.0002826009999998824
+    },
+    "artifact_id": "2300b2af8cc29039cbc8afc3e7ec6c45f0e342514cfba910507891a920db2a4f"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "e03e2a17bfc4affb2a0338cda943a26b27ec9a927014dc0e08c13a9976fa36ee",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zmap",
+      "ast": [
+        "head",
+        [
+          "v",
+          5
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "8d36f4e38b0e50c30c8ede36a400fce50ba3e7d8945b5acb8b9c641757d38f14",
+      "observations_digest": "156611410b1c44b1cf0d326b5badd49b79932eaa46d49d1dcb6c4124e514ca87",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "ed5bcf15feda8cdc62c97290103fdf3f3a0084040a94f4c654a0fa3bce26c704"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "4167311201dfdbeb1b852bd4f95205b85de56ca58a3fee0012ca21302e37e18f"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c145",
+      "author_blob": {
+        "id": "rule/c145",
+        "path": "bigbench/benchmark_tasks/list_functions/c145/task.json",
+        "blob_sha1": "a7fb8ee743a3b8609231431e5f40d07c78d243fd",
+        "sha256": "e03e2a17bfc4affb2a0338cda943a26b27ec9a927014dc0e08c13a9976fa36ee",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0005,
+      "source_reverification_cpu_seconds": 0.000176893999999983
+    },
+    "artifact_id": "eb424f7820d0c3d03ea8af616c411e5f1483c809cc4e1cb13d658a8bbb3540af"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "990cdb7da1ba59b721ebf8ad72b61c1396e0be48600f604b47a2a8e12cac19fa",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "ast",
+      "ast": [
+        "tail",
+        [
+          "map",
+          [
+            "mul",
+            [
+              "v",
+              1
+            ],
+            [
+              "head",
+              [
+                "v",
+                0
+              ]
+            ]
+          ],
+          [
+            "v",
+            0
+          ]
+        ]
+      ],
+      "state_types": [
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "cec755b5c55b8cdda972c7e4056d0c160a56eb5fbfaea3aca5f5f74c5a1788c5",
+      "observations_digest": "89106f335981468f48af6a34d612090cad5559c74e56863cbcf72efa665c8015",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "1e25541550edc06825d0fe3bf303b059a1578cd1bb454e797ac09159b14b2001"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "bd0b6784f934429297506d0bef87e0f6ed956c991fcef87a33138a4d8f81401d"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c149",
+      "author_blob": {
+        "id": "rule/c149",
+        "path": "bigbench/benchmark_tasks/list_functions/c149/task.json",
+        "blob_sha1": "c01b7abc0433054187df70e8c0f3ae756208dc62",
+        "sha256": "990cdb7da1ba59b721ebf8ad72b61c1396e0be48600f604b47a2a8e12cac19fa",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.2279,
+      "source_reverification_cpu_seconds": 0.00022597599999985007
+    },
+    "artifact_id": "1c01b0df6d26601778df962af6a7745a1a5074a11f8b6cf7aea7adb30a2022a4"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "de68ca029fefe4debf3e0ea5426847c8c26a2e0e9afdc209e6cb48f059e1bd12",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zmap",
+      "ast": [
+        "add",
+        [
+          "v",
+          0
+        ],
+        [
+          "mul",
+          [
+            "v",
+            0
+          ],
+          [
+            "v",
+            1
+          ]
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "d6fe0c1debdd806fb0fc8474b18beafeaf66b6a5c026cbb89b4f735e92374a71",
+      "observations_digest": "80277591d13bf50fed01b872e02424f5d68c6747603a92cf75248cd6e2d177b2",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "d2fd8161a2ecdf8b79b8be5a3623527e6c0a6543e1e2ac75fa9b299181a03945"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "4499d63fadb82655a173e248881c41ea1ef0654d87b418709f1d576aeaa5bebb"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c155",
+      "author_blob": {
+        "id": "rule/c155",
+        "path": "bigbench/benchmark_tasks/list_functions/c155/task.json",
+        "blob_sha1": "321cd5e88d1327d8092878a89c7111645058632e",
+        "sha256": "de68ca029fefe4debf3e0ea5426847c8c26a2e0e9afdc209e6cb48f059e1bd12",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0395,
+      "source_reverification_cpu_seconds": 0.0006158359999999252
+    },
+    "artifact_id": "9c5d8b798b62e2eb5fdd4eb12b09f78acbbfc6a5c645617bb37295b9f84aa309"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "dcc35dc39b75a2d11994c3d9d084f3ff3a6c09f77dda024381ce70b77371ab36",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zmap",
+      "ast": [
+        "add",
+        [
+          "k",
+          7
+        ],
+        [
+          "mul",
+          [
+            "v",
+            0
+          ],
+          [
+            "k",
+            3
+          ]
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "34c5a707b11c11a0ef8336c8d85a539f661721a9ddedbaf1f62c4c1df2e5185c",
+      "observations_digest": "7855d36eff6e609376294e047627d4549cd3f4fe18a09bde2e11729089ddee73",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "9fe8aad206a22a2b6bc1c9b468327e22f1027134891739556a6a4789760cb221"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "4b2ee2aeacf9bad31eb5fa903c03e2801ee267f5b1d72255aa89576f5711708b"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c162",
+      "author_blob": {
+        "id": "rule/c162",
+        "path": "bigbench/benchmark_tasks/list_functions/c162/task.json",
+        "blob_sha1": "826191462da896dba61f90937926a33d38ce1c0d",
+        "sha256": "dcc35dc39b75a2d11994c3d9d084f3ff3a6c09f77dda024381ce70b77371ab36",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.058,
+      "source_reverification_cpu_seconds": 0.0005628280000000707
+    },
+    "artifact_id": "125d91a192d5cf8dcac3949b1da60bbb81af86af245e64dccbe5d15daf0792a1"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "ad6ddd6fe317150aab3b1e0483be9b309299d561a9ba3eac55bcfa703d245697",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "eq",
+        [
+          "k",
+          0
+        ],
+        [
+          "mul",
+          [
+            "v",
+            1
+          ],
+          [
+            "v",
+            2
+          ]
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "b51a4020531c179acaff22ea701f6f203000da6513fab01b2863f98ce541e21d",
+      "observations_digest": "eb1428faf608059d600251ab387af437e6efef57052739bd3ad17be734b990eb",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "176c259c04a8d1b18e29ae779ced8ae9f9f284addf9d2884955465567f76a748"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "689e034e8ddf1273d3f0a8fcf163cd37c43db13fc95b16e6ced8c57cbbbd4a46"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c170",
+      "author_blob": {
+        "id": "rule/c170",
+        "path": "bigbench/benchmark_tasks/list_functions/c170/task.json",
+        "blob_sha1": "8a663f46093e6aba9feff18d0f4c1694712d825c",
+        "sha256": "ad6ddd6fe317150aab3b1e0483be9b309299d561a9ba3eac55bcfa703d245697",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0102,
+      "source_reverification_cpu_seconds": 0.0004969390000000296
+    },
+    "artifact_id": "01e3342260a4126ea1627db76034874eee01586df4d7f69a669535010271b3dd"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "28e855528497478d82ab2ca83ec9928509f4b4a42b531862b951ed5da078eb7e",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zmap",
+      "ast": [
+        "foldrI",
+        [
+          "add",
+          [
+            "v",
+            6
+          ],
+          [
+            "v",
+            7
+          ]
+        ],
+        [
+          "v",
+          0
+        ],
+        [
+          "v",
+          3
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "12d4ee4010ec32f639b489364afc3fea2fa2e68e9b630d7fd6117e23e15c6c08",
+      "observations_digest": "c36f05a74ca815045af8d1226ed74fb8539975980e86dff31b0e7f372ee1f62d",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "f5785a4370d3e401bfc435a47465ac972cb7329ff1244a4ee59a9399321c5729"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "b873f07fe75e6f5bd0a1e42899e8145ae40ad9c03eefd4ff2daefd6b7514306f"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c171",
+      "author_blob": {
+        "id": "rule/c171",
+        "path": "bigbench/benchmark_tasks/list_functions/c171/task.json",
+        "blob_sha1": "ccd054e818482061cc3e1ccea202991909ca03cd",
+        "sha256": "28e855528497478d82ab2ca83ec9928509f4b4a42b531862b951ed5da078eb7e",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 2.1286,
+      "source_reverification_cpu_seconds": 0.0012190940000000872
+    },
+    "artifact_id": "3b995fdd37b8b384abee5ecc9e18e844ba798defb98c1f376664554174363f20"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "2d5d6e2e8a2436098a52aa8149b6435f6f842ed2cde76575956d1eab499bf5f5",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "lt",
+        [
+          "head",
+          [
+            "v",
+            5
+          ]
+        ],
+        [
+          "v",
+          0
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "094886175ff0d2aa8bfa56dfa3a2f6a8b4b9e79ce3c1dec62980469f520a6063",
+      "observations_digest": "3fcadec7ee901f5ac165d350a5bae47b7c63a1e4d96819e0a679fd4b9148851c",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "af9febc248f45e6e0b256bc1b5063b35acf5fd30c9507eb2f157139e5d599727"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "12cb3929abfb07e7ffa17c6de4b1908c8a1ca5b63f9f38bb51d93cedaa532dc6"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c186",
+      "author_blob": {
+        "id": "rule/c186",
+        "path": "bigbench/benchmark_tasks/list_functions/c186/task.json",
+        "blob_sha1": "5a724a995bf56a7cb8971eb3846086e5019f7e3a",
+        "sha256": "2d5d6e2e8a2436098a52aa8149b6435f6f842ed2cde76575956d1eab499bf5f5",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0031,
+      "source_reverification_cpu_seconds": 0.00046254800000000706
+    },
+    "artifact_id": "a405558437f55834b586a8924d446eaa4c1fe4fd37fb311772da96e2c50c4d45"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "e6ef4972843369e2cbf593fac0381c7f43dddd7f05f9edf09f06552d209cc454",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zmap",
+      "ast": [
+        "div",
+        [
+          "div",
+          [
+            "v",
+            0
+          ],
+          [
+            "k",
+            2
+          ]
+        ],
+        [
+          "k",
+          5
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "02da67a72a8c383eb10c3329b204cbd3dacd403488a42c0ba158124bada15c39",
+      "observations_digest": "93edb6ba3ac642afde1b4aedacc5a721f039dbca511230852211f359073d85b8",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "92b3417fea639f71842f81bbe8c64b2153c2205edd5bc6e58f372712c88b2750"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "c7d69cba3445a37803ed7b53b8eee44a4ff4af187062d88b76a3fd3dfc45a222"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c192",
+      "author_blob": {
+        "id": "rule/c192",
+        "path": "bigbench/benchmark_tasks/list_functions/c192/task.json",
+        "blob_sha1": "c819362ec185daac2e4d12e2a9b460f12498a7ee",
+        "sha256": "e6ef4972843369e2cbf593fac0381c7f43dddd7f05f9edf09f06552d209cc454",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.1679,
+      "source_reverification_cpu_seconds": 0.0002947790000000783
+    },
+    "artifact_id": "956767e53ec9f35d5763da0914fef09a11a0adc89de0d2d1110cb1270b4dd443"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "7f6bc797852b57b3c6076149a68fc86a85ecca22975b86a6fad1e35b46c29727",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "lt",
+        [
+          "v",
+          2
+        ],
+        [
+          "foldlI",
+          [
+            "v",
+            6
+          ],
+          [
+            "v",
+            0
+          ],
+          [
+            "v",
+            4
+          ]
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "a0bf8857510034e636b9eced582f1554e583ce053595b3d41e2fb9c76a9e9251",
+      "observations_digest": "14905d706e0093e9eac9bc7560c351dae0558fec21717d162ad116aeaf8c61d8",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "4ca9c7e21f749c096c64b496df7744f3ce6876fe72f49283b73fc6a5157a342f"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "dd160f4c7ae3b4f661e264bc835bab6fc7b5cd7d26e76ba508189627cb5eed83"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c208",
+      "author_blob": {
+        "id": "rule/c208",
+        "path": "bigbench/benchmark_tasks/list_functions/c208/task.json",
+        "blob_sha1": "f6c3b5be4889a2c16f3af98ea7a7fb6ff39a1eb0",
+        "sha256": "7f6bc797852b57b3c6076149a68fc86a85ecca22975b86a6fad1e35b46c29727",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 1.3411,
+      "source_reverification_cpu_seconds": 0.0006502280000000304
+    },
+    "artifact_id": "93fcf1b35debe20cb248ab63f4cea4d827b21b51b8aa32427cc9e38215401475"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "bcbd25df1c16675c48d99a4c118ca0cd080b9b3d3a6945ed81113c6a7b0acb8c",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zfilter",
+      "ast": [
+        "eq",
+        [
+          "k",
+          0
+        ],
+        [
+          "mod",
+          [
+            "v",
+            2
+          ],
+          [
+            "k",
+            2
+          ]
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "5df6cfa3690306c447ac0d9d5bbc6ca414068cb37fdbefccf18d1203c6829154",
+      "observations_digest": "1f2a371743486486f0f25a75c43543abcd5576460c73ae5551283dc6542c7403",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "961cd60bdc5bc1a8c58023ceef13794d6c21eff879526e74792451112179bf57"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "0d8d807c7bd4905770a135356e89272c6d03bd9df54de0c5f196667d4055124f"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c219",
+      "author_blob": {
+        "id": "rule/c219",
+        "path": "bigbench/benchmark_tasks/list_functions/c219/task.json",
+        "blob_sha1": "4a03e3dd5ea5ab1f82c75764b076fdee1c3ed282",
+        "sha256": "bcbd25df1c16675c48d99a4c118ca0cd080b9b3d3a6945ed81113c6a7b0acb8c",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0138,
+      "source_reverification_cpu_seconds": 0.000515416999999907
+    },
+    "artifact_id": "c5e7343c12bf3811cc2e03844d97cab379f3b63276671a8f3134dcc28e8f57fb"
+  },
+  {
+    "producer_commit": "c95fd10d016650485a1a38fcf45b855674863070",
+    "source_task_digest": "57fb9281b199a1726c59f65f308e6b7737c236ffa6819791a86cf6eec43f5ede",
+    "observation_schema": {
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L",
+      "authorized_source": "original donor TRAIN and TEST"
+    },
+    "discovered_representation": {
+      "kind": "typed-ast.v1",
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ]
+    },
+    "executable_method": {
+      "kind": "zmap",
+      "ast": [
+        "add",
+        [
+          "v",
+          1
+        ],
+        [
+          "add",
+          [
+            "v",
+            2
+          ],
+          [
+            "k",
+            1
+          ]
+        ]
+      ],
+      "state_types": [
+        "I",
+        "I",
+        "I",
+        "L",
+        "L",
+        "L"
+      ],
+      "input_types": [
+        "L"
+      ],
+      "output_type": "L"
+    },
+    "source_verification": {
+      "status": "EXACT_OBSERVED_SOURCE",
+      "checker": "q6.reference reused independent interpreter",
+      "method_digest": "3497e080f7c4643128afd53d69f653f37a88d9a0b4e1318a68105bff49730e7a",
+      "observations_digest": "69e6c5bc3bbb3fda65f7595ba1c30da252ab6df8b1bbd3c4dd4c9db8cb4ceada",
+      "finite_scope": {
+        "train": {
+          "examples": 8,
+          "predictions_digest": "7720971a7224c96eaabd44c970436969df64e518e9703b1ce317897e0cafc241"
+        },
+        "test": {
+          "examples": 24,
+          "predictions_digest": "550c7251cedd605e175256e1e0f33b23d25696114538f0db1fdd1f1c069a0d63"
+        }
+      }
+    },
+    "provenance": {
+      "source_id": "rule/c222",
+      "author_blob": {
+        "id": "rule/c222",
+        "path": "bigbench/benchmark_tasks/list_functions/c222/task.json",
+        "blob_sha1": "e098434bc0da25b2c99982da5bf0b4a3d10dc7f1",
+        "sha256": "57fb9281b199a1726c59f65f308e6b7737c236ffa6819791a86cf6eec43f5ede",
+        "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b"
+      },
+      "q3_snapshot_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+      "original_q3_production_commit": null,
+      "producer_role": "historical Q3 artifact exporter, not a new Q3 discovery policy"
+    },
+    "resource_cost": {
+      "historical_q3_discovery_cpu_seconds": 0.0409,
+      "source_reverification_cpu_seconds": 0.00027492900000014586
+    },
+    "artifact_id": "13d671aa1d4b52379528f2b19b5293a0d42e55c48a9142a21c0e76f06bd0d6a7"
+  }
+]

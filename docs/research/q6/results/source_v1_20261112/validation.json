@@ -1,0 +1,22 @@
+{
+  "scope": "archive integrity/consistency only; not a fresh semantic evaluation",
+  "frozen_code_files_unchanged": 8,
+  "protected_baseline_files_unchanged": 6,
+  "fold_libraries_verified": 5,
+  "artifact_digests_verified": 57,
+  "primary_programs_and_grades_verified": 320,
+  "failed_candidate_ledgers_verified": 320,
+  "failed_reconstructed_candidates_preserved": 61330,
+  "post_primary_programs_hash_verified": true,
+  "recorded_witness_generation_reproduced": true,
+  "decision_consistent": true,
+  "unit_validation": {
+    "command": "OPENBLAS_NUM_THREADS=1 python -m pytest -q tests/q6",
+    "passed": 12,
+    "failed": 0,
+    "warnings": 1,
+    "warning_scope": "pre-existing anyio pytest deprecation"
+  },
+  "bundle_verification": "PASS; exact pre-evaluation producer c95fd10 and baseline prerequisite 0d1baec",
+  "base_ref_rechecked_before_publication": "claude/neumann1-executor-fix = 0d1baec723f249a62a901d100af6e941234a43ac"
+}

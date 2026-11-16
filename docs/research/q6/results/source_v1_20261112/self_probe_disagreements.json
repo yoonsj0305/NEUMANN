@@ -1,0 +1,106 @@
+{
+  "scope": "SOURCE-only post-primary diagnostic",
+  "records": [
+    {
+      "receiver": "rule/c013",
+      "transported_program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (lt 1 (foldlI $6 $1 (range (div $1 7))))>",
+      "alternative_q3_program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (eq 0 (div (sub $1 2) 5))>",
+      "generic_probes": 36,
+      "disagreements": [
+        {
+          "input_digest": "f9637ff35d3518b00b8e90187cf8fb394395c985f0e5985e67c4d299b7a915da",
+          "input_length": 24,
+          "transported_output_digest": "aba8c2bcec619b2ce210fee3db719953f50f2eaf27a84e214e8c6a6da6f2e30f",
+          "alternative_output_digest": "17df38ed005369b896affbe90296e2bf43606d1376b256a0634984d2bb71aed9"
+        },
+        {
+          "input_digest": "aa12753df2018c6ae30246ecaf8a0efd616d2822800f072e8ce69772b288e6ee",
+          "input_length": 24,
+          "transported_output_digest": "a328d5273590fd5d12e2315eb5b3e06ba406e51946789a693c0abf586c27fe2b",
+          "alternative_output_digest": "0046b973f7585fc5429ef2ad04929b56c63bf30c4d706386fb02e37f88f01e27"
+        },
+        {
+          "input_digest": "cf9f789fe54617b5f8902665a5b77a0fb87ac597a9e12b230ed7487c0a42bccd",
+          "input_length": 24,
+          "transported_output_digest": "e73f33109b14244b83e54cfa41f78be1f1c3178efcde6116604f3127adce9d99",
+          "alternative_output_digest": "034954ef8d17f217f82a2ddc2eb203b0ecf66109da67ca06fb41b8ee08809e80"
+        },
+        {
+          "input_digest": "882bc931282215edb2383fa921be53507d16287e5806c663b34b6ae48e88c0bf",
+          "input_length": 24,
+          "transported_output_digest": "e20ed63550384259f6698888db5d435d14be517c70f8f42ba3cb122d36574d0f",
+          "alternative_output_digest": "2d9c82451ae9c1fc5b3ea099170980686f9ba5813871e2975eb84faa92e52747"
+        },
+        {
+          "input_digest": "b214abf38ce66ea9a13c672aa7232ff1018d02f005cc838828ede8e45d170cbd",
+          "input_length": 32,
+          "transported_output_digest": "1cbe4a9f47a3a2472c517252ec60d7ea3c360946acedea17cead7e1ee2a17995",
+          "alternative_output_digest": "2c01ad909fed748e2f0eb94cf045e4c3d70229d40cf3b40e58f4602890ad4aab"
+        },
+        {
+          "input_digest": "b012ab0d2fcb261f9ebc06b277d4951029429926c6046b1a2160926bb19df1de",
+          "input_length": 32,
+          "transported_output_digest": "9763a342ce8401a540ebd686d41c3eeff0970be8f65d2baf9ca3dd3c686f3bed",
+          "alternative_output_digest": "9fc96b0a8277bf1c5509f6c65ad22e24444cb36b30a36ed6e65fbb8705917a45"
+        },
+        {
+          "input_digest": "474a28b5a0cd7c36ef985bbbc8ab7a3bcc76e5fb033d2265fc8ac06e22587dfb",
+          "input_length": 32,
+          "transported_output_digest": "31cd170e0675271d4f43f41b48b393f2e94f03e98b55dd3e55ce694ca518bf88",
+          "alternative_output_digest": "198b3814691d7f4e5c7903c6c5366f08d756848d81486c1636ccffce005ed8e5"
+        },
+        {
+          "input_digest": "bb680447f41ad2bd1502ed9dd8495e1874c0582865e437ad1b28d9f760f989a6",
+          "input_length": 32,
+          "transported_output_digest": "4706b46f9c496e6f16b7b3b5c6331ba2626977866cd4456e9ddc5e30f31930a8",
+          "alternative_output_digest": "23833b81f2bdf177d8a173315a3b3dea92b4702f92088f1a8d9aca6eb468ad13"
+        },
+        {
+          "input_digest": "171656312b74805b412054886908dbc77a03d6534fc752242f91a5cc520c91fe",
+          "input_length": 40,
+          "transported_output_digest": "386eeea4faa4f9ca69c9c8765d6a32b993eb6cdfae8d445bfd8af308223f11c4",
+          "alternative_output_digest": "7e3d0b6f37eadded3b43596c08ee2d8727ed5a12d309eb41a255e8f232a286c9"
+        },
+        {
+          "input_digest": "7b1928da7f3e8debf3d42ea685e471f8381030800669283473088de60919e968",
+          "input_length": 40,
+          "transported_output_digest": "fcd18710b0cb1ea1f4db0abbd625202e9a320f80d01ff9d603ef1dea98bc9b66",
+          "alternative_output_digest": "3ebb0c2a5e038867ad219c38c31edcea2736507211e66b3a7f543f47d2c76239"
+        },
+        {
+          "input_digest": "97e7124cd5e30c9c333ba590fa8032130fd16981f1a4cb2f916fd884472d47b8",
+          "input_length": 40,
+          "transported_output_digest": "5e730441a394ccbf1ffdffc3108dacbcdfced5e2f21041cb6b30aa62ebf7a4d6",
+          "alternative_output_digest": "0360f84c67a01d7a6c198725c2b8907433b98c0426fcc4cb409d35504b7b03a9"
+        },
+        {
+          "input_digest": "e1883a37e29f545ec48c5cddfc3d35f6b2d94e23c7d4e719f9e30cf2f69af8de",
+          "input_length": 40,
+          "transported_output_digest": "f42fb6eff5618a3b3c8b4d696861a7315781c189df72f3c92d1d541333760d2f",
+          "alternative_output_digest": "98bf39f1909fdcb7c2468e52caeca2c82aa84ee68fcf48fed0902b64e778fd4b"
+        }
+      ],
+      "undefined_probes": 0,
+      "status": "HYPOTHESES_NOT_EQUIVALENT",
+      "scope": "neither program is a gold oracle; this disproves equivalence, not original-task correctness; no policy update or score change"
+    },
+    {
+      "receiver": "rule/c130",
+      "status": "NO_ALTERNATIVE_Q3_HYPOTHESIS",
+      "scope": "no equivalence/correctness conclusion"
+    },
+    {
+      "receiver": "rule/c073",
+      "transported_program": "<zmap e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (add (add $0 1) $1)>",
+      "alternative_q3_program": "<zmap e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (add $0 (add $1 1))>",
+      "generic_probes": 36,
+      "disagreements": [],
+      "undefined_probes": 0,
+      "status": "NO_DISAGREEMENT_ON_FINITE_PROBES",
+      "scope": "neither program is a gold oracle; this disproves equivalence, not original-task correctness; no policy update or score change"
+    }
+  ],
+  "receiver_TEST_read": false,
+  "new_target_answer_generator": false,
+  "cpu_seconds": 0.0051985369999998365
+}
