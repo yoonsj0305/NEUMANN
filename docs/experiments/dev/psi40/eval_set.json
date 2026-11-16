@@ -1,0 +1,386 @@
+{
+ "compositions_drawn": 590,
+ "fst16": [
+  {
+   "draw": 9,
+   "name": "fst(k=3,pred=geq9,trans=toggle,out=x_if_s0)",
+   "sha256": "f6880fb5ac30801b1050174805681a0317dec98311582cf71cde97af5ee99c4c"
+  },
+  {
+   "draw": 15,
+   "name": "fst(k=2,pred=mod5,trans=count,out=x_plus_s)",
+   "sha256": "188981eef2c927baee1e3aa7938e89d2d92011dd359f0cac8297c37cef30cac6"
+  },
+  {
+   "draw": 17,
+   "name": "fst(k=3,pred=geq11,trans=toggle,out=keep_if_s0)",
+   "sha256": "794ccdd617ea6e7d544e2d88edf44170a5d1e617b45c68b59afdeb707e93f9bb"
+  },
+  {
+   "draw": 26,
+   "name": "fst(k=2,pred=mod3,trans=count,out=x_if_s0)",
+   "sha256": "c988e02bc1d2757adec169c1b346425f359ec8f3ff3c7cc243b643fbacd5b7af"
+  },
+  {
+   "draw": 29,
+   "name": "fst(k=3,pred=geq5,trans=count,out=keep_if_s0)",
+   "sha256": "782176668ea682025c102aafe72ee106dfa5aa0d607c33b226e6897fb47a44c5"
+  },
+  {
+   "draw": 31,
+   "name": "fst(k=3,pred=geq3,trans=count,out=x_if_s0)",
+   "sha256": "30d82cf62e8588ad9de114f83af4f498390ae81fdc0955f663fd82af3ee1e75d"
+  },
+  {
+   "draw": 39,
+   "name": "fst(k=3,pred=mod4,trans=count,out=x_if_s0)",
+   "sha256": "2e06e10613c6fca07945968e97056cee9c2d28ea278ac6df1edda45abf98a8f9"
+  },
+  {
+   "draw": 45,
+   "name": "fst(k=3,pred=mod5,trans=count,out=x_if_s0)",
+   "sha256": "b9bc9e5bf40a6cffe32c493fbc456f812d2e4498c0f4d43604a28bfa68c12a8d"
+  },
+  {
+   "draw": 56,
+   "name": "fst(k=3,pred=geq6,trans=count,out=x_if_s0)",
+   "sha256": "31d6526557c14442569aecca285e3644b49fb7015835fad5b052aaabe7135d6d"
+  },
+  {
+   "draw": 63,
+   "name": "fst(k=2,pred=geq10,trans=toggle,out=x_if_s0)",
+   "sha256": "8c420d19dbc18a4784c255673fc633edfc7327b80c425b4148554ecc96d716c2"
+  },
+  {
+   "draw": 68,
+   "name": "fst(k=2,pred=eq11,trans=toggle,out=x_plus_s)",
+   "sha256": "594438d7d1309cb1ba2c1e5d46815ff77f373118d266720dbf388f0bf3dfea8d"
+  },
+  {
+   "draw": 69,
+   "name": "fst(k=2,pred=geq9,trans=toggle,out=x_if_s0)",
+   "sha256": "4cf3f5a3c0d091331cc78080dde2d64d38c2cdfe8e005035f2b3970f323dc1c1"
+  },
+  {
+   "draw": 71,
+   "name": "fst(k=3,pred=geq12,trans=count,out=x_if_s0)",
+   "sha256": "502133a3fc363d6c0a7de0f9c0b2861c8efa72db15f97a829c876cffabd7359f"
+  },
+  {
+   "draw": 73,
+   "name": "fst(k=2,pred=mod4,trans=toggle,out=keep_if_s0)",
+   "sha256": "08b06bf1c6a8ae0329b6cf7e8924ca7fcfad10e9532dfa1b9c89466dd32fd383"
+  },
+  {
+   "draw": 80,
+   "name": "fst(k=3,pred=eq9,trans=toggle,out=x_plus_s)",
+   "sha256": "053e5407dd9310204753af03e3bb920116a1b52a08d4c81e43db779ddf8360c9"
+  },
+  {
+   "draw": 83,
+   "name": "fst(k=2,pred=mod4,trans=count,out=x_plus_s)",
+   "sha256": "59ad3d454944f23ce7f31197f0a336caf8ef210cd6d56c791da4ff0e67337699"
+  }
+ ],
+ "fst_drawn": 83,
+ "lr_need30": [
+  {
+   "draw": 18,
+   "name": "dedup | modulo-k(k=3)",
+   "sha256": "9670c494aa1ca7d4e12d64a06d0cbcea8f88f408edfdb9da58198bfea7a8da28"
+  },
+  {
+   "draw": 23,
+   "name": "append-k(k=2) | kth-smallest(k=3)",
+   "sha256": "630879b2aa97e0e56b5e1e39d40242b20495bb51ec25ea08b54a157e1860a647"
+  },
+  {
+   "draw": 52,
+   "name": "intersperse-k(k=1) | remove-mod-k(k=3)",
+   "sha256": "4b015206b0c0a1ef61b504145b3653ce290cb6c303e59e922432bc52f6f968df"
+  },
+  {
+   "draw": 62,
+   "name": "dedup | identify-is-mod-k(k=3)",
+   "sha256": "b36ded4444780ef3a50da34762e5a09207c09d0394a63ff70b5dffa84d9dd04e"
+  },
+  {
+   "draw": 65,
+   "name": "remove-mod-k(k=2) | kth-smallest(k=3)",
+   "sha256": "9433d938e98f74b1411a467f0392ea6dc141e764f9b2aa9f2ef20d974c83fd9e"
+  },
+  {
+   "draw": 75,
+   "name": "sort | drop-k(k=3)",
+   "sha256": "6c942633898f7a6f2dfd16ce3d432ed99aa1801ecf19002f8070c39ce2a6925b"
+  },
+  {
+   "draw": 80,
+   "name": "keep-mod-k(k=3) | kth-smallest(k=2)",
+   "sha256": "64a2ddf000b6468fdc2340457ca6141bf77d288093f9d17b65402c3440eb3863"
+  },
+  {
+   "draw": 96,
+   "name": "uniq | tail",
+   "sha256": "84fb1e9835b1ca5673b437a30b5244747659888f7a15b8973048cfad55a74cb9"
+  },
+  {
+   "draw": 110,
+   "name": "replace-index-k-with-n(k=5,n=0) | positions",
+   "sha256": "7b8ad424aa311b064ce8242eb71f85fcca478cef7f26e88c7047f21e237570e2"
+  },
+  {
+   "draw": 121,
+   "name": "rotate-k(k=10) | kth-largest(k=2)",
+   "sha256": "762aea61cd424b0bb4847c65a918da608140825340030ee4e3ebd5882596a98b"
+  },
+  {
+   "draw": 144,
+   "name": "keep-mod-k(k=2) | kth-smallest(k=3)",
+   "sha256": "1d99d142a5298cfccc18d1ef82ab6e938c81e188f42e214e4d95017d31f121aa"
+  },
+  {
+   "draw": 176,
+   "name": "identify-geq-k(k=7) | kth-largest(k=3)",
+   "sha256": "3b16d45e2ed8cef49613cf57c18883e7037b4f22dbdb40893e4af3338597e150"
+  },
+  {
+   "draw": 192,
+   "name": "rotate-k(k=1) | drop-k(k=3)",
+   "sha256": "b0d4a20fd734bdba182e0f0f053a1822a8e92ca39d6a72647867b941aa9c407f"
+  },
+  {
+   "draw": 216,
+   "name": "uniq | modulo-k(k=2)",
+   "sha256": "ca762383c0a3eca2e90cd91a1d0b91c98c841be6ac1715f93c3c735af95233ac"
+  },
+  {
+   "draw": 245,
+   "name": "keep-mod-k(k=5) | kth-smallest(k=3)",
+   "sha256": "2569b777a282bb373d5201f6d43efcdf2f7fee5e4172cd53250eb44931f18c7e"
+  },
+  {
+   "draw": 252,
+   "name": "dedup | modulo-k(k=2)",
+   "sha256": "4d5b9bee409aafc6647a5480215e4096765818a22b3ccabda3f52dfa7278d01c"
+  },
+  {
+   "draw": 263,
+   "name": "append-k(k=3) | kth-smallest(k=2)",
+   "sha256": "657d3d3d62f1d0e03a0a4af473dd9006b6c77f129cafc8c58afdf3ec5a7afca3"
+  },
+  {
+   "draw": 284,
+   "name": "intersperse-k(k=0) | is-odds",
+   "sha256": "dad132b90b463012a0b79fd0f6b4dd86c66e10f0d724d265236e783b22ecd12c"
+  },
+  {
+   "draw": 297,
+   "name": "dedup | drop-k(k=5)",
+   "sha256": "ad8f6ea06ffbce549f2e79a29816577883f6b9148efddfbd5c2f9b09e46df391"
+  },
+  {
+   "draw": 370,
+   "name": "repeat-k(k=5) | index-k(k=2)",
+   "sha256": "03963b7bb8d718161a4a7c487113c826a7e9a0374a1bcd9bcf0f143c62b7387e"
+  },
+  {
+   "draw": 389,
+   "name": "rotate-k(k=-2) | remove-mod-k(k=5)",
+   "sha256": "dcaabd63c351f924f246da59f5cbfc2735e8a547eaa9f85a442a4cb32cc939f4"
+  },
+  {
+   "draw": 403,
+   "name": "repeat-k(k=2) | index-k(k=3)",
+   "sha256": "9a772860f8d63e84238f57a0264b00c7e04c169b9670e36aa6c4ca652ab17d89"
+  },
+  {
+   "draw": 464,
+   "name": "dedup | keep-mod-k(k=3)",
+   "sha256": "5064fb124789b4ef19cae436dca0bb03f8f63b6fd67ad22e2bb5f032249aada0"
+  },
+  {
+   "draw": 479,
+   "name": "positions | identify-k(k=3)",
+   "sha256": "277f1a4adfb4487f3c9a797ae0c849310f7c8a30902971aabe633782cc1263ff"
+  },
+  {
+   "draw": 508,
+   "name": "rotate-k(k=10) | drop-k(k=3)",
+   "sha256": "e150503ac405811758d9535e0c2dd8d9a4513881fec7866aae410bc28e02fc33"
+  },
+  {
+   "draw": 540,
+   "name": "dedup | identify-k(k=-2)",
+   "sha256": "bd4ff7dc77bc0d597544b14b0f9c0c237bccd314380500133e7e3a0cc8894373"
+  },
+  {
+   "draw": 559,
+   "name": "add-k(k=3) | kth-smallest(k=3)",
+   "sha256": "aacdcd9a2512639a0ba23acaa43b8cdec2120fec0621cc9ed4e1628effcfb1b6"
+  },
+  {
+   "draw": 564,
+   "name": "intersperse-k(k=-2) | is-mod-k(k=5)",
+   "sha256": "64c211a02cb8defd9fa7846e0a72800e477aa898270740d7d0a4e741302ebf78"
+  },
+  {
+   "draw": 565,
+   "name": "replace-index-k-with-n(k=1,n=2) | kth-smallest(k=3)",
+   "sha256": "c4e8c6e6bd5e527cbfff56c14c7cb0ea0e2ef1bcc19c79cc35e8ad17955ef455"
+  },
+  {
+   "draw": 590,
+   "name": "positions | is-squares",
+   "sha256": "bdb04c65a41fc06a07a12f2ff35069e97ce2cd2b0d80128e0e54275025a5b1e5"
+  }
+ ],
+ "lr_ord12": [
+  {
+   "draw": 1,
+   "name": "pow-k(k=3) | pop",
+   "sha256": "9a12e8fbaf1a5de480c96580516fd600c2b7eb0f93ead90ba94f37de4449f104"
+  },
+  {
+   "draw": 2,
+   "name": "identify-k(k=-2) | identify-k(k=-2)",
+   "sha256": "83e363aeb99ede06fe76c6d1b41337fbc58ca1018b0e5ca675d2a642f9b22773"
+  },
+  {
+   "draw": 3,
+   "name": "mult-k(k=2) | add-k(k=-2)",
+   "sha256": "d9c85722e076ba57a39001273c7f25210e88e13d92f0675b81ea224b61b4402a"
+  },
+  {
+   "draw": 4,
+   "name": "append-k(k=2) | positions",
+   "sha256": "ada6cfbd3d98a79407ec5e64144b2cc1f514fb0beb34d1cd243141ca324c2ac2"
+  },
+  {
+   "draw": 5,
+   "name": "uniq | add-k(k=-2)",
+   "sha256": "8a1a83886df915e9d3ac4be6b9100d5ecdaac2739c35bc79b4382200a6cca112"
+  },
+  {
+   "draw": 6,
+   "name": "rotate-k(k=3) | rotate-k(k=3)",
+   "sha256": "1d2e2455a5f1b6b375b5e537de811d032da304bff00cd9c33a0662ff1f5f6f04"
+  },
+  {
+   "draw": 7,
+   "name": "slice-k-n(k=3,n=4) | append-k(k=3)",
+   "sha256": "fcedc9a3677eb2ffed542d991775fc548c8c8d58f17f0def1a05b276594dcb77"
+  },
+  {
+   "draw": 8,
+   "name": "replace-all-k-with-n(k=3,n=-2) | prepend-k(k=3)",
+   "sha256": "01b39958c378246b4153eb1d7cc4c359fa7ab00302d058e977dd9d32a5f8f95e"
+  },
+  {
+   "draw": 9,
+   "name": "prepend-k(k=-2) | is-mod-k(k=3)",
+   "sha256": "3e3cf73df3c20766a20027efa7e0b3962b4784443e5f72d2dcd7987f7e3023e3"
+  },
+  {
+   "draw": 10,
+   "name": "repeat-k(k=2) | pow-base-k(k=3)",
+   "sha256": "83a55c4b5b31d0257351906a31bc0b6b0ff513b8bd4c9914808eca2b54d7b458"
+  },
+  {
+   "draw": 11,
+   "name": "identify-k(k=3) | replace-all-k-with-n(k=5,n=0)",
+   "sha256": "294c2df5c807f70aff4d3a0c6a8a4ed1f6bb6a0193e2d4de2859253b946f8a43"
+  },
+  {
+   "draw": 12,
+   "name": "keep-mod-k(k=3) | modulo-k(k=10)",
+   "sha256": "6eda8a7f9fb0bd25dca43e7f36dc6544f90a1617d8f4044e112e276dcdb834a8"
+  }
+ ],
+ "rha16": [
+  {
+   "draw": 1,
+   "name": "rha(k=3;p=lt_9+odd;d=002121100020;o=plus)",
+   "sha256": "ee7deefd8d01126f6476cca36537fac0e49d29cd30060899cd8a29ac145a5065"
+  },
+  {
+   "draw": 3,
+   "name": "rha(k=4;p=modlt_5_1+odd;d=0031020123121213;o=mark)",
+   "sha256": "bbf9a700f82c1329037a79ebab7e18dff09aea87c8515b18c4fc5ba1053139d4"
+  },
+  {
+   "draw": 9,
+   "name": "rha(k=2;p=modlt_3_1+in2_3_5;d=01010110;o=keepset_0)",
+   "sha256": "c63db00be8a139d351c11ff3a774b528f2ec8e375f3a6480a3019ef813b60f30"
+  },
+  {
+   "draw": 10,
+   "name": "rha(k=2;p=modlt_3_2+in2_5_13;d=01100010;o=keepset_1)",
+   "sha256": "68aea8d20b0a512605fbf6d70af1023602305dd7b1386bfb77c7a70a9f59c854"
+  },
+  {
+   "draw": 11,
+   "name": "rha(k=2;p=odd;d=1001;o=plus)",
+   "sha256": "c0348658bc43381c252bdace5770041d2aa7b02ad2d19e3ecd168aa4147929c6"
+  },
+  {
+   "draw": 13,
+   "name": "rha(k=3;p=lt_4;d=112201;o=keepset_02)",
+   "sha256": "93ffffb44d5d5cf04fae7d3ebe866831df864567ad99c2f9509cb54981737a34"
+  },
+  {
+   "draw": 15,
+   "name": "rha(k=4;p=lt_7;d=23023001;o=keepset_123)",
+   "sha256": "dda4a99d7bd13669b2fa005b1855256dd1eef0327c42d6b15d9ac34a38fe20ec"
+  },
+  {
+   "draw": 18,
+   "name": "rha(k=2;p=modlt_3_1;d=1011;o=plus)",
+   "sha256": "3625bc5fd0ea12f7b98890800c1e21c4452a17487317298d1c448438adaf7e73"
+  },
+  {
+   "draw": 19,
+   "name": "rha(k=4;p=modlt_4_1+modlt_3_2;d=3213200111201303;o=keepset_02)",
+   "sha256": "faf2ff62cf3c9c371fef07da62cc38911cc9b0d2e84c1edf6aaec26498b09bf3"
+  },
+  {
+   "draw": 20,
+   "name": "rha(k=2;p=modlt_5_2;d=1101;o=keepset_1)",
+   "sha256": "74031129b7ba0591db32d3221701a9e4b8cdacfedbdf05a9fdbefd5e9c2b7a98"
+  },
+  {
+   "draw": 22,
+   "name": "rha(k=2;p=modlt_5_1;d=0100;o=keepset_1)",
+   "sha256": "acfc724f00551f2c230a84d6d398248b8f7a373bc5fbf2437c10b9f2112859d3"
+  },
+  {
+   "draw": 24,
+   "name": "rha(k=4;p=modlt_5_3+modlt_4_2;d=2133012030320323;o=mark)",
+   "sha256": "bec1fe4b5979668f7a24da5032a0edffb11bb4493eb09989fd84bb19e77b912b"
+  },
+  {
+   "draw": 25,
+   "name": "rha(k=3;p=in2_0_13+in2_0_4;d=200100110121;o=plus)",
+   "sha256": "b51db1e9d82436981a7b9221d8f0c13c69ac8819bc10db9a2ade0d2acd627ce6"
+  },
+  {
+   "draw": 26,
+   "name": "rha(k=3;p=odd;d=021021;o=keepset_01)",
+   "sha256": "9d847adcc37bc5c14b16d2a739e0d26f3572666bb40ba6243d9f4db2897ff357"
+  },
+  {
+   "draw": 27,
+   "name": "rha(k=2;p=lt_11+modlt_3_2;d=11010010;o=plus)",
+   "sha256": "8dd65809ec7c1abc598664377609a7e5e20dbbd9a4910ebc628c335c42a9c611"
+  },
+  {
+   "draw": 29,
+   "name": "rha(k=3;p=lt_7+odd;d=212202122212;o=mark)",
+   "sha256": "a398147cfdddd847b93465882858a174e69369abddab7b5f9a38cad08ff6c2dc"
+  }
+ ],
+ "rha_drawn": 29,
+ "rule": "(latent_need and task_hash are those of research/q3/psi_eval_set_dev.py, unchanged):\n* lr_need30 / lr_ord12 -- new two-routine compositions of the independent list-routines lineage, tasks() rule, seed\n  \"compose:neumann-q3-psi40-eval-v1\", excluding every earlier name (the 228 tasks, section 38 and section 39 sets);\n  the first 30 latent-need and the first 12 not latent-need in generation order;\n* fst16 -- the first 16 latent-need hidden transducers of research/q3/psi_fst_family.py with the seed\n  \"neumann-q3-psi40-fst-v1\", excluding the section 39 fst16 (the SAME family PSI40 was developed on: disclosed);\n* rha16 -- the first 16 latent-need random hidden automata of research/q3/psi40_rha_family.py (a family written for\n  this evaluation, never used in development) with the seed \"neumann-q3-psi40-rha-v1\".\nPer task: name and sha256 of canonical {name, train, test} of Env(spec, 0).",
+ "schema": "neumann.q3-psi40-eval-set.v1",
+ "status": "PRE-REGISTERED before any agent run on these tasks (development; see prereg.json)"
+}

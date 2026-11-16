@@ -1,0 +1,163 @@
+{
+ "arms": {
+  "A": "baseline (unchanged path; no PSI, no repair, length floor 0)",
+  "AL": "A + the same length-stage floor 1.5 s (control: separates the floor from the identified state)",
+  "P": "PSI39 as frozen in section 39 (PSI_QUERIES 10, PSI_K 2, PSI_SYNTH_SHARE 0.6) + in-place repair",
+  "Q": "PSI40: structural state identification at the existing path's give-up points or with residual evidence (PSI40_EARLY), budget check (PSI40_MIN_CPU 3 s; at most half of the remaining queries), observation-only necessity check, constructed automata + fold classes, closure / chain / disagreement experiments, counterexample split, at most two synthesis attempts; length-stage floor 1.5 s; in-place repair",
+  "QDq": "V2 control: Q's SOURCE queries replayed and solved passively (Dq), no formation",
+  "Qno": "Q with the identified state withheld (same identification and experiments; necessity control)"
+ },
+ "budget": {
+  "clock": "time.process_time()",
+  "cpu_seconds": 30.0,
+  "formation_deadline": "0.6 x cap (unchanged)",
+  "source_queries": 60
+ },
+ "code_blobs": {
+  "neumann1/active.py": "8461cc3aedc6df6090fa6666d337d125a70caa89",
+  "neumann1/latent.py": "c4978481f01837f07da22fbb39247b17f3786981",
+  "neumann1/psi.py": "0aff26573be801805fa12a479599b7236091f38a",
+  "neumann1/stateid.py": "4700932468f3dc1b609895c7ece90fd0b8d57937",
+  "research/q3/budgeted_reach_dev.py": "faa7c0da07c44cc565faae456c55f404d3591199",
+  "research/q3/env_listroutines.py": "b4fb73e602b69d8d5159a92a547accdad82da47f",
+  "research/q3/psi40_eval_set_dev.py": "1f1e235824f8bb6347cc05edeb383e8e92133792",
+  "research/q3/psi40_rha_family.py": "e574a9edfb4d9eed67b62221cb8b70cbe8d77a25",
+  "research/q3/psi40_verdict_dev.py": "3ed6b5d2ed49bf58072291a59d4aff6cee9a1122",
+  "research/q3/psi_eval_set_dev.py": "c54072ac7f84696214712c20e2fb8b4a59cbd95f",
+  "research/q3/psi_fst_family.py": "df2588a18479b0d2f48d9538380362a3dfbede2b"
+ },
+ "criteria": {
+  "CORE_EVIDENCE (per task)": "Q robustly verifies it with an accepted machine containing a PSI40 state, and none of A, P, AL, Qno robustly verifies it",
+  "PSI40 attribution of V2": "of the V2-rule tasks, those whose accepted machine contains a PSI40 state and that Qno does not solve; the claim that PSI40 achieves V2 needs >= 5 of these",
+  "REGRESSION": "tasks A robustly verifies and Q does not (reported, never excluded)",
+  "V2 rule (frozen V2 criterion, Q in D's place)": ">= 5 tasks solved by Q with an accepted machine of m >= 2 state components that QDq does not solve",
+  "V2 verdict": "PASS if the V2 rule is met and PSI40 attribution >= 5 with core evidence on those tasks; FAIL if the rule is not met; OPEN otherwise",
+  "V3": "not evaluated here (directive: only after sufficient V2 invention evidence)",
+  "cost": "real CPU and formation SOURCE queries per arm and per group, reported separately from accuracy",
+  "official": "sealed V1 PASS, V2 FAIL (FORMAL) / independent OPEN, V3 FAIL, Q3 OPEN are not changed by this development evaluation; generalization beyond these families stays OPEN",
+  "robust": "strict majority of the runs of the arm on the task (the base run alone if not replicated)",
+  "verified_solve": "hidden test passed AND every random diagnostic SOURCE input correct (300 inputs, seed 777)"
+ },
+ "evaluation_set": {
+  "disclosure": "fst16 is the family PSI40 was developed on (new draws, section 39 tasks excluded); rha16 is a developer-authored family written for this evaluation and never used in development; lr_* are new compositions of the independent list-routines lineage",
+  "file": "eval_set.json",
+  "fst16": [
+   "fst(k=3,pred=geq9,trans=toggle,out=x_if_s0)",
+   "fst(k=2,pred=mod5,trans=count,out=x_plus_s)",
+   "fst(k=3,pred=geq11,trans=toggle,out=keep_if_s0)",
+   "fst(k=2,pred=mod3,trans=count,out=x_if_s0)",
+   "fst(k=3,pred=geq5,trans=count,out=keep_if_s0)",
+   "fst(k=3,pred=geq3,trans=count,out=x_if_s0)",
+   "fst(k=3,pred=mod4,trans=count,out=x_if_s0)",
+   "fst(k=3,pred=mod5,trans=count,out=x_if_s0)",
+   "fst(k=3,pred=geq6,trans=count,out=x_if_s0)",
+   "fst(k=2,pred=geq10,trans=toggle,out=x_if_s0)",
+   "fst(k=2,pred=eq11,trans=toggle,out=x_plus_s)",
+   "fst(k=2,pred=geq9,trans=toggle,out=x_if_s0)",
+   "fst(k=3,pred=geq12,trans=count,out=x_if_s0)",
+   "fst(k=2,pred=mod4,trans=toggle,out=keep_if_s0)",
+   "fst(k=3,pred=eq9,trans=toggle,out=x_plus_s)",
+   "fst(k=2,pred=mod4,trans=count,out=x_plus_s)"
+  ],
+  "lr_need30": [
+   "dedup | modulo-k(k=3)",
+   "append-k(k=2) | kth-smallest(k=3)",
+   "intersperse-k(k=1) | remove-mod-k(k=3)",
+   "dedup | identify-is-mod-k(k=3)",
+   "remove-mod-k(k=2) | kth-smallest(k=3)",
+   "sort | drop-k(k=3)",
+   "keep-mod-k(k=3) | kth-smallest(k=2)",
+   "uniq | tail",
+   "replace-index-k-with-n(k=5,n=0) | positions",
+   "rotate-k(k=10) | kth-largest(k=2)",
+   "keep-mod-k(k=2) | kth-smallest(k=3)",
+   "identify-geq-k(k=7) | kth-largest(k=3)",
+   "rotate-k(k=1) | drop-k(k=3)",
+   "uniq | modulo-k(k=2)",
+   "keep-mod-k(k=5) | kth-smallest(k=3)",
+   "dedup | modulo-k(k=2)",
+   "append-k(k=3) | kth-smallest(k=2)",
+   "intersperse-k(k=0) | is-odds",
+   "dedup | drop-k(k=5)",
+   "repeat-k(k=5) | index-k(k=2)",
+   "rotate-k(k=-2) | remove-mod-k(k=5)",
+   "repeat-k(k=2) | index-k(k=3)",
+   "dedup | keep-mod-k(k=3)",
+   "positions | identify-k(k=3)",
+   "rotate-k(k=10) | drop-k(k=3)",
+   "dedup | identify-k(k=-2)",
+   "add-k(k=3) | kth-smallest(k=3)",
+   "intersperse-k(k=-2) | is-mod-k(k=5)",
+   "replace-index-k-with-n(k=1,n=2) | kth-smallest(k=3)",
+   "positions | is-squares"
+  ],
+  "lr_ord12": [
+   "pow-k(k=3) | pop",
+   "identify-k(k=-2) | identify-k(k=-2)",
+   "mult-k(k=2) | add-k(k=-2)",
+   "append-k(k=2) | positions",
+   "uniq | add-k(k=-2)",
+   "rotate-k(k=3) | rotate-k(k=3)",
+   "slice-k-n(k=3,n=4) | append-k(k=3)",
+   "replace-all-k-with-n(k=3,n=-2) | prepend-k(k=3)",
+   "prepend-k(k=-2) | is-mod-k(k=3)",
+   "repeat-k(k=2) | pow-base-k(k=3)",
+   "identify-k(k=3) | replace-all-k-with-n(k=5,n=0)",
+   "keep-mod-k(k=3) | modulo-k(k=10)"
+  ],
+  "rha16": [
+   "rha(k=3;p=lt_9+odd;d=002121100020;o=plus)",
+   "rha(k=4;p=modlt_5_1+odd;d=0031020123121213;o=mark)",
+   "rha(k=2;p=modlt_3_1+in2_3_5;d=01010110;o=keepset_0)",
+   "rha(k=2;p=modlt_3_2+in2_5_13;d=01100010;o=keepset_1)",
+   "rha(k=2;p=odd;d=1001;o=plus)",
+   "rha(k=3;p=lt_4;d=112201;o=keepset_02)",
+   "rha(k=4;p=lt_7;d=23023001;o=keepset_123)",
+   "rha(k=2;p=modlt_3_1;d=1011;o=plus)",
+   "rha(k=4;p=modlt_4_1+modlt_3_2;d=3213200111201303;o=keepset_02)",
+   "rha(k=2;p=modlt_5_2;d=1101;o=keepset_1)",
+   "rha(k=2;p=modlt_5_1;d=0100;o=keepset_1)",
+   "rha(k=4;p=modlt_5_3+modlt_4_2;d=2133012030320323;o=mark)",
+   "rha(k=3;p=in2_0_13+in2_0_4;d=200100110121;o=plus)",
+   "rha(k=3;p=odd;d=021021;o=keepset_01)",
+   "rha(k=2;p=lt_11+modlt_3_2;d=11010010;o=plus)",
+   "rha(k=3;p=lt_7+odd;d=212202122212;o=mark)"
+  ],
+  "sha256": "03cb9d7147330f33d262b522815d9555ba0e258aba8deb58aa8300803279c3f3"
+ },
+ "harness": "research/q3/budgeted_reach_dev.py (run_arm('D'); Env(spec, 0, budget=60); seed sha256(name) % 1000; fresh process per (arm, task, seed); --semantic; --workers 4; PYTHONHASHSEED=0)",
+ "no_post_hoc": "PSI40 constants, arms, task lists, seeds and criteria are not changed after this commit; a change after seeing evaluation results turns the set into development data",
+ "not_counted": "every section 35-39 task (including the section 39 evaluation set, now development data)",
+ "runs": {
+  "QDq": "every task Q solves (hidden test) in its base run, replaying that run",
+  "fst16": [
+   "A",
+   "P",
+   "Q",
+   "Qno",
+   "AL"
+  ],
+  "lr_need30": [
+   "A",
+   "P",
+   "Q",
+   "Qno",
+   "AL"
+  ],
+  "lr_ord12": [
+   "A",
+   "Q"
+  ],
+  "replication": "every task whose verified outcome differs between any two arms run on it: 2 more same-seed runs and seeds 1, 2 (sha256(name) + 7919 k), for every arm run on that task",
+  "rha16": [
+   "A",
+   "P",
+   "Q",
+   "Qno",
+   "AL"
+  ]
+ },
+ "schema": "neumann.q3-psi40-prereg.v1",
+ "status": "FROZEN before any agent run on the evaluation set (development only; official sealed verdicts unchanged)",
+ "verdict_script": "research/q3/psi40_verdict_dev.py"
+}

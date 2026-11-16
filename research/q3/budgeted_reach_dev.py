@@ -146,6 +146,7 @@ def semantic(spec, pred, n=300, seed=777):
 
 EVAL_SET = "docs/experiments/dev/case2_recovery/eval_set.json"
 PSI_EVAL_SET = "docs/experiments/dev/psi/eval_set.json"
+PSI40_EVAL_SET = "docs/experiments/dev/psi40/eval_set.json"
 
 
 def registered():
@@ -155,6 +156,9 @@ def registered():
     if pathlib.Path(PSI_EVAL_SET).exists():
         psi = json.loads(pathlib.Path(PSI_EVAL_SET).read_text())
         want.update({t["name"]: t["sha256"] for g in ("latent_need30", "ordinary12", "fst16") for t in psi[g]})
+    if pathlib.Path(PSI40_EVAL_SET).exists():
+        p40 = json.loads(pathlib.Path(PSI40_EVAL_SET).read_text())
+        want.update({t["name"]: t["sha256"] for g in ("lr_need30", "lr_ord12", "fst16", "rha16") for t in p40[g]})
     return want
 
 
@@ -168,6 +172,9 @@ def resolve(name):
     if name.startswith("fst("):
         import psi_fst_family
         return checked(psi_fst_family.parse(name), name)
+    if name.startswith("rha("):
+        import psi40_rha_family
+        return checked(psi40_rha_family.parse(name), name)
     parts = []
     for part in name.split(" | "):
         rid, _, rest = part.partition("(")
