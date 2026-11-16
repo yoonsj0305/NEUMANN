@@ -99,7 +99,7 @@ def ratio(task, label):
 
 def main(a):
     name = "%s__%s__%s__s%d__N%d%s" % (a.task, a.kind, a.scale, a.seed, a.N, ("__" + a.tag) if a.tag else "")
-    out = ROOT / name
+    out = (pathlib.Path(a.out_root) if a.out_root else ROOT) / name
     final, logf, ck = out / "final.json", out / "log.jsonl", out / "ckpt.pt"
     if final.exists():
         sys.exit("refusing to overwrite finished run %s (rule 5)" % out)
@@ -130,8 +130,15 @@ def main(a):
         rng.setstate(c["rng"])
         torch.set_rng_state(c["torch_rng"])
         st = c["state"]
+        logged = [json.loads(l).get("step", -1) for l in open(logf) if l.strip()]
+        if st.get("last_rec") and max(logged) < st["step"]:
+            with open(logf, "a") as fh:
+                fh.write(json.dumps(dict(st["last_rec"], note="row restored from checkpoint on resume")) + "\n")
     elif a.resume and logf.exists():
-        sys.exit("no checkpoint to resume from in %s" % out)
+        if any("event" not in json.loads(l) for l in open(logf) if l.strip()):
+            sys.exit("evaluations logged but no checkpoint in %s: not restarting (rule 5)" % out)
+        with open(logf, "a") as fh:                   # killed before the first checkpoint: nothing was recorded
+            fh.write(json.dumps({"event": "restart from step 0: stopped before the first checkpoint"}) + "\n")
     seg = {"segment": len(st["segments"]), "start_step": st["step"], "started": time.strftime("%Y-%m-%d %H:%M:%S")}
     st["segments"].append(seg)
     with open(logf, "a") as fh:
@@ -188,10 +195,14 @@ def main(a):
             st["hits"] = st["hits"] + 1 if rec["acc"][id_label] >= 0.99 else 0
             if st["hits"] >= 2:
                 stop = "early stop: in-distribution >= 99% at two consecutive evaluations"
+            st["last_rec"] = rec
+            # checkpoint first, atomically (a kill during the write leaves the previous checkpoint intact), then the
+            # log row; a resume writes the row again only if the kill fell between the two
+            torch.save({"model": model.state_dict(), "opt": opt.state_dict(), "sched": sched.state_dict(),
+                        "rng": rng.getstate(), "torch_rng": torch.get_rng_state(), "state": st}, str(ck) + ".tmp")
+            os.replace(str(ck) + ".tmp", ck)
             with open(logf, "a") as fh:
                 fh.write(json.dumps(rec) + "\n")
-            torch.save({"model": model.state_dict(), "opt": opt.state_dict(), "sched": sched.state_dict(),
-                        "rng": rng.getstate(), "torch_rng": torch.get_rng_state(), "state": st}, ck)
             print(name, rec["step"], rec["train_loss_mean"], {k: round(v, 3) for k, v in rec["acc"].items()}, flush=True)
             t_seg = time.time()
     if stop is None:
@@ -233,4 +244,5 @@ if __name__ == "__main__":
     p.add_argument("--tag", default="")
     p.add_argument("--resume", action="store_true")
     p.add_argument("--check-flops", action="store_true")
+    p.add_argument("--out-root", default="", help="write elsewhere (harness tests); default stage1/results/phaseA")
     main(p.parse_args())
