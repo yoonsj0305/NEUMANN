@@ -1779,3 +1779,210 @@ Attribution:
 
 V1 PASS (sealed), V2 independent OPEN, V3 FAIL, Q3 OPEN, Q6 untouched. No FRESH / FORMAL seal opened; earlier tasks
 are not re-counted; no per-task code; PR #780 stays Draft.
+
+## 39. Predictive State Invention (2026-11-16) — DEVELOPMENT ONLY
+
+Directive "Q3 Predictive State Invention" (base: PR #780 at `50f27cf`; work on the separate branch
+`ccr-99abe820-3phmf0`). Question: when the current state merges two prefixes u, v (z(u) = z(v)) whose futures differ
+(F(u‖w) ≠ F(v‖w)), can the agent discover that distinction by experiment, invent a minimal executable latent state
+z' = U(z, x), synthesise the method with it, and show with an ablation that the latent is necessary? All CPU figures are
+real `time.process_time()`; every arm has 30 CPU s and 60 SOURCE queries. Raw evidence: `docs/experiments/dev/psi/`.
+
+**Result in one line.** On the development tasks PSI invents the length counter that two positions tasks need, and the
+ablation shows it is necessary. On the pre-registered independent set (46 latent-need tasks + 12 ordinary) PSI
+adopts no latent at all, gives no invention evidence and loses 2 tasks to A robustly. The development success did not
+transfer.
+
+### 39.1 Phase 1 — the deficit (development tasks only)
+
+* **Which tasks need a latent.** Developer-side classification with the reference function (never visible to the
+  agent): the answer-as-state W = [()] is insufficient when two prefixes with the same answer and the same next element
+  get different next answers. 15 of the 228 tasks are insufficient in both directions. With 3 positions compositions
+  that are insufficient in the prefix direction, these give the 18 development tasks (`dev18_names.json`).
+* **The existing invention already had the right latent and starved it.** On `prepend-k(k=10) | positions` the
+  existing `invent()` listed the length counter among 267 admissible candidates. It gave each tried latent 0.03 of
+  the remaining CPU (`INVENT_SYNTH_SHARE`), and no Update was found.
+* **Oracle check** (`research/q3/psi_deficit_check_dev.py`, `phase1_deficit_check.txt`, unlimited oracle, not an agent
+  result). It fits the list Update from the reachable transitions of the 8 initial examples with the unchanged R2 cell
+  construction:
+
+  | task | conflicting (state, e) | no latent, cap 20 s | latent h = len(u), cap 5 s | latent, cap 20 s | fresh fold |
+  |---|---|---|---|---|---|
+  | `prepend-k(k=10) \| positions` | 1 | no fit (12.9 s) | no fit (0.6 s) | fit in 0.68 s | 197 / 197 |
+  | `prepend-k(k=-2) \| positions` | 2 | no fit (12.8 s) | no fit (0.6 s) | fit in 0.99 s | 199 / 199 |
+
+  The fitted Update is `relcells m=(add $0 (mod 1 (add $2 1))) | ((eq $0 $3) ? value (add $4 1) : copy 0[$0])`.
+  Without the latent no Update exists in the space searched. With it, the fit is fast but needs a large enough
+  deadline *span*: the construction allots its stages as fractions of the span. This fact returns in iteration 11.
+
+### 39.2 Mechanism (opt-in, default off; `neumann1/psi.py`, hooks in `neumann1/active.py`)
+
+| directive interface | implementation | failure reasons it returns | cost it returns |
+|---|---|---|---|
+| `discover_distinctions` | `psi.discover_distinctions`: Bayesian experiment design over latent hypotheses (prior 2^(−size/6), soft down-weight 0.3 per equal outcome, hard elimination on a distinction). Pairs come from observed merged prefixes and from constructed pairs u, u·e, u·e·e (e an element that left the state unchanged), with confirmation of the merge. Each experiment is the (pair, suffix) that maximises the split entropy of hypothesis classes. | query budget, deadline, no informative experiment within budget, constructed pair rejected | SOURCE queries, tests, CPU |
+| `invent_state` | `psi.invent_state`: candidate folds h' = G(h, e) of the generic substrate (`accumulators()`, the same list for every task) from starts 0 / 1 / below / above. A candidate is admissible if it separates every distinction and makes the observed transitions functional. Pairs of variables are used only if no single one is admissible. Ranking is by posterior or by the learned score. | no distinction observed, no admissible latent in the construction grammar | candidates, admissible singles, CPU |
+| `synthesize_method` | the existing `attempt()` with the latent joined to the state, at `PSI_SYNTH_SHARE` = 0.6 of the remaining formation CPU, for the top `PSI_K` = 2 latents. The adopted Update is cached and reused while the table is unchanged; repair keeps a PSI latent after an "update not found" revision. | no Update within the synthesis budget; Update found but n initial examples fold wrongly | per-attempt remaining CPU |
+| `verify_necessity` | the Pno arm: the same experiments and the same invention, with the latent withheld. Controls AR (repair only) and AF (CPU floor only). The independent SOURCE challenge and 300 random diagnostic inputs. `research/q3/psi_verdict_dev.py` | — | — |
+| `update_discovery_policy` | `psi.update_discovery_policy`: class-balanced logistic regression on `psi.features` of every tried latent. Label = adopted AND the machine passed the challenge. `research/q3/psi_learn_dev.py` | — | experiences, positives |
+
+**Where PSI is called:**
+* (a) on inconsistent transitions, before the existing invention;
+* (b) when no Update is found;
+* (c) at an unlocalisable counterexample, only after the existing repairs (virtual value, invention, new
+  continuation) found nothing.
+
+**Degraded Mode:** every PSI failure returns False, and the unchanged existing path continues with whatever CPU and
+queries remain. PSI's SOURCE queries come out of the same 60.
+
+### 39.3 Development iterations (all on the 18 development tasks or the 68 training tasks; none on the evaluation set)
+
+| it. | hypothesis | change | pass criterion | evidence |
+|---|---|---|---|---|
+| 1 | Ranking by fewest false splits finds the latent | false-splits-first ranking | P verifies a positions task that A does not | fail: parity was chosen over length |
+| 2–5 | Distinction experiments were too few or badly chosen | Bayesian design, constructed pairs, soft per-test update, flatter prior, (u, u·e·e) pairs | the length counter ranks first on the positions tasks | intermediate raw runs `dev_iter_run1–4` (which iteration each file belongs to was not recorded): runs 1–2 on 18 tasks, P 3 = A 3; run 4 on 4 positions tasks verifies both `prepend-k \| positions` |
+| 6 | The adopted latent was lost to re-synthesis | `psi_cache` reuse of the Update found with the latent | no loss after adoption | positions solves kept |
+| 7 | The positions failure also shows up as an unlocalisable counterexample | PSI hook there; share 0.6; in-place repair for PSI arms and the AR control | no regression | kept; see iteration 12 |
+| 8 | `revise()` discarded the correct latent after one synthesis failure | protect a PSI latent; one re-synthesis with the PSI share (tol = 0 was too strict, reverted in 9) | positions solved | — |
+| 9 | Full run on 18 tasks | — | P ⊇ A and P-only > 0 | `dev18_iter9_A_AR_P_Pno`: verified A 3, AR 3, **P 5**, Pno 3. P-only: both `prepend-k \| positions`. No verified loss. |
+| 10 | kth tasks starve in discovery (identical suffixes, deadline) | hypothesis-class collapse, suffix rotation | kth(k=3) solved | `train68_iter10_P` (and an 8-task subset run, `dev_iter_run6`): kth(k=3) not solved. **Regression: kth-smallest(k=2) and kth-largest(k=2) lost** (PSI spent up to 12.1 s at the unlocalisable hook) |
+| 11 | A per-machine PSI CPU allowance gives a Degraded-Mode guarantee | `PSI_CPU_FRAC` 0.35, and the unlocalisable hook moved after the existing repairs | P ⊇ A on dev, both positions solves kept | `train68_iter11_cap035_P_rejected`: kth(k=2) back, **`prepend-k(k=-2) \| positions` lost**. The correct latent ranked first but had a 2 s span (the construction's stage fractions, 39.1) → **rejected** |
+| 12 | The hook order alone removes the regression | `PSI_CPU_FRAC` = 1.0 (no allowance), hook order of 11 kept | as 11 | `train68_iter12_P` + `dev18_iter12_Pno`: P verifies A's 3 + both positions tasks. Pno verifies A's 3 only → **pass, frozen** |
+
+### 39.4 Invention evidence on the development tasks (not counted as a new result)
+
+Both evidence lines are from iteration 12 (`train68_iter12_P.jsonl`); A, AR and Pno fail both tasks.
+
+* **`prepend-k(k=-2) | positions`**
+  * *Why the old representation failed:* the answer `positions(u)` merges prefixes that differ by zeros.
+  * *Distinctions:* 3, found in 10 queries, e.g. u = [], v = [0, 0], w = [3] → [0, 1] vs [0, 3].
+  * *New state:* h' = h + 1 from 0, chosen among 1830 admissible single latents.
+  * *Update:* the relcells program of 39.1.
+  * *Ablation:* Pno is not solved.
+  * *Independent verification:* challenge passed, 297 / 297 random inputs correct.
+* **`prepend-k(k=10) | positions`**
+  * *Why the old representation failed:* same merge as above.
+  * *Distinctions:* 2, in 9 queries, e.g. [0] vs [0, 0] with w = [1].
+  * *New state:* the same counter, chosen among 1841 admissible.
+  * *Update:* the same program.
+  * *Ablation:* Pno fails.
+  * *Independent verification:* challenge passed, 295 / 295.
+
+The tasks are development tasks and the mechanism was iterated on them, so this is evidence that the mechanism *can*
+work, not a result.
+
+### 39.5 Phase 4 — discovery-policy learning
+
+* **Experience.** Every latent PSI tried in the P runs of iterations 10 and 12 on the 68 training tasks: the 18
+  development tasks plus the 60 section 36 transfer tasks, 10 of which overlap. Iteration 11 is excluded (it had a
+  different synthesis budget).
+* **Data.** 27 experiences from 12 tasks, 4 positives. The positives come from only 2 tasks (the positions counter,
+  once per iteration).
+* **Weights (`policy.json`).** reads_e −3.62, keeps_h +1.47, granularity −0.64, start_0 +0.61, size +0.52; the rest are
+  small. The policy effectively learned "prefer a counter that does not read the element."
+* **Caveat.** This is too little data for a general claim. The policy was frozen before the evaluation and compared
+  there with the description-length order (Pl vs P).
+
+### 39.6 Pre-registered independent evaluation (frozen in `2932a52` before any run on it)
+
+* **Set** (`research/q3/psi_eval_set_dev.py`, `eval_set.json`, name + SHA-256 per task; the resolver refuses any
+  mismatch):
+  * `latent_need30`: the first 30 new two-routine compositions that are latent-need in both directions (seed
+    `compose:neumann-q3-psi-eval-v1`; the 228 tasks and the section 38 compositions excluded; 654 drawn);
+  * `ordinary12`: the first 12 that are not latent-need (regression check);
+  * `fst16`: the first 16 latent-need hidden finite-state transducers of a second, developer-authored family
+    (`research/q3/psi_fst_family.py`, seed `neumann-q3-psi-fst-v1`; 86 drawn).
+
+  No evaluation task was in the training or development data.
+* **Arms** (`prereg.json`):
+  * A — baseline;
+  * AR — A + in-place repair;
+  * AF — A + the existing 10 s synthesis floor (the A+CPU-floor control);
+  * P — PSI;
+  * Pno — latent withheld;
+  * Pl — learned policy;
+  * PDq — P's queries replayed, solved passively.
+
+  latent_need30 and fst16 got all six formation arms, ordinary12 got A and P, and PDq ran on the 12 tasks P solved.
+* **Replication.** Every task whose verified outcome differed between arms got 2 more same-seed runs and seeds 1, 2.
+
+**First pass, base seed** (`eval_run1_base.jsonl`; CPU in seconds; formation SOURCE queries):
+
+| arm | verified latent_need30 | verified fst16 | verified ordinary12 | PSI rounds / adoptions | PSI CPU / queries | total CPU | formation queries |
+|---|---|---|---|---|---|---|---|
+| A | 6 | 0 | 7 | — | — | 1545.8 | 2431 |
+| AR | 6 | 0 | — | — | — | 1331.4 | 1987 |
+| AF | 5 | 0 | — | — | — | 1338.5 | 1577 |
+| P | 5 | 0 | 6 | 77 / **0** | 276.9 / 292 | 1541.6 | 2423 |
+| Pno | 6 | 0 | — | 68 / 0 (withheld) | 119.6 / 260 | 1330.7 | 2105 |
+| Pl | 5 | 0 | — | 63 / **0** | 267.0 / 227 | 1333.7 | 1933 |
+
+**Replicates** (`eval_replicate_*.jsonl`):
+* `prepend-k(k=-2) | kth-largest(k=2)`: verified in A 4/5, AR 4/5, Pno 3/5; AF 0/5, P 0/5, Pl 0/5.
+* `replace-index-k-with-n(k=2,n=10) | identify-k(k=1)` (ordinary): verified in A 5/5, P 0/5.
+
+Both P losses are robust. No other task differs between arms.
+
+### 39.7 Verdicts (rules frozen in `prereg.json`; computed by `psi_verdict_dev.py`, `eval_verdict.json`)
+
+* **INVENTION EVIDENCE: none (0 of 46).** P adopted no latent on any evaluation task.
+* **REGRESSION: 2 robust P losses against A**, both caused by PSI (39.8). They are reported, not excluded.
+* **V1 rule (P vs A): not met.** P-only 0, A-only 2, net −2, p = 0.5.
+* **V2 rule: not met.** 2 tasks are solved with an accepted m ≥ 2 machine that PDq does not solve, against a threshold
+  of 5. Both (`identify-k(k=1) | kth-smallest(k=3)`, `modulo-k(k=2) | kth-largest(k=3)`) are solved identically by
+  every arm through the *existing* invention, not by PSI.
+* **V3 rule (Pl vs P): not met.** The solved sets are identical (6 = 6 on the 46 tasks) and CPU is equal
+  (1333.7 vs 1333.1 s). With no adoption, the learned order never decided anything.
+* **Official verdicts unchanged:** V1 PASS (sealed), V2 independent OPEN, V3 FAIL, Q3 OPEN, Q6 untouched.
+* **The evaluation set is spent.** Any change made from here on turns it into development data.
+
+### 39.8 Why PSI adopted nothing (post-hoc; no verdict depends on it)
+
+* **Rounds on the evaluation set.** Of 77 P rounds, 53 observed no distinction (discovery stopped on "no informative
+  experiment", the deadline or the 10-query budget), and 1 was cut by the SOURCE query limit. In the other 23, none of
+  the top-2 latents led to an Update: 38 attempts found no Update in the budget, and 8 found one that folded the
+  initial examples wrongly.
+* **The hidden state is mostly outside the hypothesis space**
+  (`research/q3/psi_posthoc_representability_dev.py`, `posthoc_fst_representability.txt`). The test asks whether the
+  true automaton state is a function of some candidate fold. That holds for only 3 of the 16 FST tasks, among 2326
+  integer candidates. Counters modulo k and predicates with task constants (x ≥ 10, x mod 3 = 0) are not small
+  programs of the substrate.
+* **Where the state is representable, the evidence is too thin to identify it.** In those 3 tasks PSI observed 2
+  distinctions, which left 3087–5180 admissible single latents. The prior then ranked small wrong folds first
+  ((sub $1 $0), (mul $0 $1), $1), and the capturing folds (size 19 and 29) were never tried with PSI_K = 2.
+* **Regression 1** (`prepend-k(k=-2) | kth-largest(k=2)`). At "update not found", PSI spent 8.5 s on two wrong latents.
+  The existing path then hit the deadline before it could add the second component that solves the task for A
+  (Pno, which spends 3.6 s, keeps the solve). This is the iteration-10 failure type at a different hook.
+* **Regression 2** (`replace-index… | identify-k(k=1)`). PSI's unlocalisable-counterexample round spent its 10 SOURCE
+  queries without a distinction. The suffix machine then had 11 queries instead of 21, and the passive fallback that
+  solves the task for A no longer did.
+
+### 39.9 Next first failure
+
+Identifiability, not discovery mechanics. A 10-query experiment budget yields at most 2–4 distinctions while
+thousands of fold candidates stay admissible, so a prior over program size picks the wrong latent. The hypothesis
+space also lacks modular counters and constant-bearing predicates (13/16 FST states). A next step must:
+* (i) make experiments eliminate classes of candidates faster than queries are spent;
+* (ii) widen the latent space without widening the admissible set;
+* (iii) not charge a failed PSI round against the existing path. Both regressions came from PSI consuming the CPU or
+  queries that A's path needed. A CPU allowance alone fails, because the latent construction needs its full span
+  (iteration 11).
+
+The dependent multi-variable latents of kth(k=3) (top-2 values) remain out of reach, as in development. Any such
+change is development on a spent set and needs a new pre-registered set.
+
+### 39.10 Reproduction
+
+```
+git checkout 2932a52        # frozen code, set, policy, criteria
+export PYTHONHASHSEED=0 NEUMANN_PSI_POLICY=docs/experiments/dev/psi/policy.json
+python -c "import json;e=json.load(open('docs/experiments/dev/psi/eval_set.json'));json.dump([t['name'] for g in ('latent_need30','fst16') for t in e[g]],open('/tmp/n46.json','w'));json.dump([t['name'] for t in e['ordinary12']],open('/tmp/o12.json','w'))"
+python research/q3/budgeted_reach_dev.py --names-file /tmp/n46.json --arms A,AR,AF,P,Pno,Pl --out run1.jsonl --workers 4 --semantic
+python research/q3/budgeted_reach_dev.py --names-file /tmp/o12.json --arms A,P --out run1.jsonl --workers 4 --semantic
+NEUMANN_REPLAY_ROWS=run1.jsonl python research/q3/budgeted_reach_dev.py --names-file <P-solved names> --arms PDq --out pdq.jsonl --workers 4 --semantic
+python research/q3/psi_verdict_dev.py --base run1.jsonl --reps rep2.jsonl rep3.jsonl seeds.jsonl --pdq pdq.jsonl
+python research/q3/psi_learn_dev.py --rows docs/experiments/dev/psi/train68_iter10_P.jsonl docs/experiments/dev/psi/train68_iter12_P.jsonl --out policy.json
+python -m pytest -q tests/test_psi.py
+```
+
+No FRESH / FORMAL seal opened, no sealed verdict changed, no section 35–38 task counted, no per-task code, no budget
+increase; Q6 untouched; PR #780 stays Draft.

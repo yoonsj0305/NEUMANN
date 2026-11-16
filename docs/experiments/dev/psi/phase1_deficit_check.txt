@@ -1,0 +1,14 @@
+== prepend-k(k=10) | positions
+transitions 29 conflicting (state,e) without latent 1
+no latent cap 5 fit False 3.27
+latent len cap 5 fit False 0.6 None
+no latent cap 20 fit False 12.85
+latent len cap 20 fit True 0.68 <relcells m=(add $0 (mod 1 (add $2 1))) | ((eq $0 $3) ? value (add $4 1) : copy 0[$0])>
+   fresh fold 197 / 197
+== prepend-k(k=-2) | positions
+transitions 30 conflicting (state,e) without latent 2
+no latent cap 5 fit False 3.23
+latent len cap 5 fit False 0.6 None
+no latent cap 20 fit False 12.83
+latent len cap 20 fit True 0.99 <relcells m=(add $0 (mod 1 (add $2 1))) | ((eq $0 $3) ? value (add $4 1) : copy 0[$0])>
+   fresh fold 199 / 199

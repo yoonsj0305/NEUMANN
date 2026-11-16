@@ -1,0 +1,150 @@
+fst(k=2,pred=mod2,trans=toggle,out=keep_if_s0) 0 []
+fst(k=2,pred=eq13,trans=count,out=keep_if_s0) 20 [(29, '(if (eq $1 0) $0 (mul $0 $1))', -1), (29, '(if (eq $1 0) $0 (mul $0 $1))', 1)]
+fst(k=3,pred=geq4,trans=toggle,out=keep_if_s0) 0 []
+fst(k=2,pred=mod3,trans=count,out=x_plus_s) 0 []
+fst(k=2,pred=geq10,trans=count,out=x_if_s0) 0 []
+fst(k=2,pred=geq6,trans=count,out=x_if_s0) 0 []
+fst(k=3,pred=mod3,trans=count,out=keep_if_s0) 0 []
+fst(k=3,pred=geq11,trans=count,out=x_if_s0) 0 []
+fst(k=3,pred=mod2,trans=toggle,out=x_plus_s) 0 []
+fst(k=3,pred=mod3,trans=toggle,out=keep_if_s0) 0 []
+fst(k=2,pred=geq5,trans=toggle,out=keep_if_s0) 0 []
+fst(k=2,pred=mod2,trans=count,out=keep_if_s0) 110 [(19, '(add $0 (add $1 1))', -1), (19, '(add $0 (add $1 1))', 0)]
+fst(k=3,pred=geq12,trans=count,out=keep_if_s0) 0 []
+fst(k=2,pred=mod2,trans=count,out=x_if_s0) 110 [(19, '(add $0 (add $1 1))', -1), (19, '(add $0 (add $1 1))', 0)]
+fst(k=3,pred=geq9,trans=count,out=keep_if_s0) 0 []
+fst(k=2,pred=mod4,trans=saturate,out=x_plus_s) 0 []
+{
+ "candidates_integer": 2326,
+ "tasks": [
+  {
+   "task": "fst(k=2,pred=mod2,trans=toggle,out=keep_if_s0)",
+   "capturing_candidates": 0,
+   "smallest": []
+  },
+  {
+   "task": "fst(k=2,pred=eq13,trans=count,out=keep_if_s0)",
+   "capturing_candidates": 20,
+   "smallest": [
+    [
+     29,
+     "(if (eq $1 0) $0 (mul $0 $1))",
+     -1
+    ],
+    [
+     29,
+     "(if (eq $1 0) $0 (mul $0 $1))",
+     1
+    ],
+    [
+     29,
+     "(if (eq $1 0) $0 (mul $0 $1))",
+     17
+    ]
+   ]
+  },
+  {
+   "task": "fst(k=3,pred=geq4,trans=toggle,out=keep_if_s0)",
+   "capturing_candidates": 0,
+   "smallest": []
+  },
+  {
+   "task": "fst(k=2,pred=mod3,trans=count,out=x_plus_s)",
+   "capturing_candidates": 0,
+   "smallest": []
+  },
+  {
+   "task": "fst(k=2,pred=geq10,trans=count,out=x_if_s0)",
+   "capturing_candidates": 0,
+   "smallest": []
+  },
+  {
+   "task": "fst(k=2,pred=geq6,trans=count,out=x_if_s0)",
+   "capturing_candidates": 0,
+   "smallest": []
+  },
+  {
+   "task": "fst(k=3,pred=mod3,trans=count,out=keep_if_s0)",
+   "capturing_candidates": 0,
+   "smallest": []
+  },
+  {
+   "task": "fst(k=3,pred=geq11,trans=count,out=x_if_s0)",
+   "capturing_candidates": 0,
+   "smallest": []
+  },
+  {
+   "task": "fst(k=3,pred=mod2,trans=toggle,out=x_plus_s)",
+   "capturing_candidates": 0,
+   "smallest": []
+  },
+  {
+   "task": "fst(k=3,pred=mod3,trans=toggle,out=keep_if_s0)",
+   "capturing_candidates": 0,
+   "smallest": []
+  },
+  {
+   "task": "fst(k=2,pred=geq5,trans=toggle,out=keep_if_s0)",
+   "capturing_candidates": 0,
+   "smallest": []
+  },
+  {
+   "task": "fst(k=2,pred=mod2,trans=count,out=keep_if_s0)",
+   "capturing_candidates": 110,
+   "smallest": [
+    [
+     19,
+     "(add $0 (add $1 1))",
+     -1
+    ],
+    [
+     19,
+     "(add $0 (add $1 1))",
+     0
+    ],
+    [
+     19,
+     "(add $0 (add $1 1))",
+     1
+    ]
+   ]
+  },
+  {
+   "task": "fst(k=3,pred=geq12,trans=count,out=keep_if_s0)",
+   "capturing_candidates": 0,
+   "smallest": []
+  },
+  {
+   "task": "fst(k=2,pred=mod2,trans=count,out=x_if_s0)",
+   "capturing_candidates": 110,
+   "smallest": [
+    [
+     19,
+     "(add $0 (add $1 1))",
+     -1
+    ],
+    [
+     19,
+     "(add $0 (add $1 1))",
+     0
+    ],
+    [
+     19,
+     "(add $0 (add $1 1))",
+     1
+    ]
+   ]
+  },
+  {
+   "task": "fst(k=3,pred=geq9,trans=count,out=keep_if_s0)",
+   "capturing_candidates": 0,
+   "smallest": []
+  },
+  {
+   "task": "fst(k=2,pred=mod4,trans=saturate,out=x_plus_s)",
+   "capturing_candidates": 0,
+   "smallest": []
+  }
+ ],
+ "fst_tasks_with_a_capturing_candidate": 3
+}

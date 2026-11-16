@@ -1,0 +1,186 @@
+{
+ "P_regressions_vs_A": [
+  "prepend-k(k=-2) | kth-largest(k=2)",
+  "replace-index-k-with-n(k=2,n=10) | identify-k(k=1)"
+ ],
+ "V1_rule_P_vs_A": {
+  "A_only": [
+   "prepend-k(k=-2) | kth-largest(k=2)",
+   "replace-index-k-with-n(k=2,n=10) | identify-k(k=1)"
+  ],
+  "P_only": [],
+  "met": false,
+  "net": -2,
+  "p": 0.5,
+  "structure_classes": []
+ },
+ "V2_rule": {
+  "P_solved_m_ge_2": [
+   "identify-k(k=1) | kth-smallest(k=3)",
+   "modulo-k(k=2) | kth-largest(k=3)"
+  ],
+  "count": 2,
+  "met": false,
+  "pdq_runs": 12,
+  "tasks": [
+   "identify-k(k=1) | kth-smallest(k=3)",
+   "modulo-k(k=2) | kth-largest(k=3)"
+  ],
+  "threshold": 5
+ },
+ "V3_rule_Pl_vs_P": {
+  "P_only": [],
+  "Pl_only": [],
+  "cpu_P": 1333.08,
+  "cpu_Pl": 1333.72,
+  "met": false,
+  "p": 1.0,
+  "process": {
+   "P": {
+    "adoptions": 0,
+    "synthesis_attempts": 46
+   },
+   "Pl": {
+    "adoptions": 0,
+    "synthesis_attempts": 46
+   }
+  },
+  "solved_P": 6,
+  "solved_Pl": 6,
+  "tasks": 46
+ },
+ "arms": {
+  "A": {
+   "challenge_passed": 6,
+   "cpu": 1545.83,
+   "formation_queries": 2431,
+   "robust_verified": 13,
+   "runs": 58,
+   "solved": 14,
+   "verified": 13
+  },
+  "AF": {
+   "challenge_passed": 3,
+   "cpu": 1338.48,
+   "formation_queries": 1577,
+   "robust_verified": 5,
+   "runs": 46,
+   "solved": 6,
+   "verified": 5
+  },
+  "AR": {
+   "challenge_passed": 4,
+   "cpu": 1331.35,
+   "formation_queries": 1987,
+   "robust_verified": 6,
+   "runs": 46,
+   "solved": 7,
+   "verified": 6
+  },
+  "P": {
+   "challenge_passed": 5,
+   "cpu": 1541.64,
+   "formation_queries": 2423,
+   "robust_verified": 11,
+   "runs": 58,
+   "solved": 12,
+   "verified": 11
+  },
+  "Pl": {
+   "challenge_passed": 3,
+   "cpu": 1333.72,
+   "formation_queries": 1933,
+   "robust_verified": 5,
+   "runs": 46,
+   "solved": 6,
+   "verified": 5
+  },
+  "Pno": {
+   "challenge_passed": 4,
+   "cpu": 1330.73,
+   "formation_queries": 2105,
+   "robust_verified": 6,
+   "runs": 46,
+   "solved": 7,
+   "verified": 6
+  }
+ },
+ "groups": {
+  "fst16": {
+   "A": [],
+   "AF": [],
+   "AR": [],
+   "P": [],
+   "Pl": [],
+   "Pno": []
+  },
+  "latent_need30": {
+   "A": [
+    "identify-k(k=1) | kth-smallest(k=3)",
+    "prepend-k(k=-2) | kth-largest(k=2)",
+    "rotate-k(k=-2) | replace-index-k-with-n(k=3,n=-2)",
+    "rotate-k(k=-2) | take-k(k=2)",
+    "rotate-k(k=3) | drop-k(k=2)",
+    "rotate-k(k=3) | drop-k(k=5)"
+   ],
+   "AF": [
+    "identify-k(k=1) | kth-smallest(k=3)",
+    "rotate-k(k=-2) | replace-index-k-with-n(k=3,n=-2)",
+    "rotate-k(k=-2) | take-k(k=2)",
+    "rotate-k(k=3) | drop-k(k=2)",
+    "rotate-k(k=3) | drop-k(k=5)"
+   ],
+   "AR": [
+    "identify-k(k=1) | kth-smallest(k=3)",
+    "prepend-k(k=-2) | kth-largest(k=2)",
+    "rotate-k(k=-2) | replace-index-k-with-n(k=3,n=-2)",
+    "rotate-k(k=-2) | take-k(k=2)",
+    "rotate-k(k=3) | drop-k(k=2)",
+    "rotate-k(k=3) | drop-k(k=5)"
+   ],
+   "P": [
+    "identify-k(k=1) | kth-smallest(k=3)",
+    "rotate-k(k=-2) | replace-index-k-with-n(k=3,n=-2)",
+    "rotate-k(k=-2) | take-k(k=2)",
+    "rotate-k(k=3) | drop-k(k=2)",
+    "rotate-k(k=3) | drop-k(k=5)"
+   ],
+   "Pl": [
+    "identify-k(k=1) | kth-smallest(k=3)",
+    "rotate-k(k=-2) | replace-index-k-with-n(k=3,n=-2)",
+    "rotate-k(k=-2) | take-k(k=2)",
+    "rotate-k(k=3) | drop-k(k=2)",
+    "rotate-k(k=3) | drop-k(k=5)"
+   ],
+   "Pno": [
+    "identify-k(k=1) | kth-smallest(k=3)",
+    "prepend-k(k=-2) | kth-largest(k=2)",
+    "rotate-k(k=-2) | replace-index-k-with-n(k=3,n=-2)",
+    "rotate-k(k=-2) | take-k(k=2)",
+    "rotate-k(k=3) | drop-k(k=2)",
+    "rotate-k(k=3) | drop-k(k=5)"
+   ]
+  },
+  "ordinary12": {
+   "A": [
+    "mult-k(k=-2) | add-k(k=1)",
+    "prepend-k(k=-2) | mult-k(k=3)",
+    "prepend-k(k=3) | keep-mod-k(k=5)",
+    "replace-all-k-with-n(k=1,n=2) | identify-geq-k(k=2)",
+    "replace-index-k-with-n(k=2,n=10) | identify-k(k=1)",
+    "rotate-k(k=1) | identify-k(k=-2)",
+    "slice-k-n(k=2,n=2) | index-k(k=2)"
+   ],
+   "P": [
+    "mult-k(k=-2) | add-k(k=1)",
+    "prepend-k(k=-2) | mult-k(k=3)",
+    "prepend-k(k=3) | keep-mod-k(k=5)",
+    "replace-all-k-with-n(k=1,n=2) | identify-geq-k(k=2)",
+    "rotate-k(k=1) | identify-k(k=-2)",
+    "slice-k-n(k=2,n=2) | index-k(k=2)"
+   ]
+  }
+ },
+ "invention_evidence": [],
+ "tasks": 58
+}
