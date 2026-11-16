@@ -1,0 +1,67 @@
+{
+ "name": "multiplication__abacus__1M__s0__d500__st20__smoke",
+ "task": "multiplication",
+ "kind": "abacus",
+ "scale": "1M",
+ "params": 857216,
+ "config": {
+  "d": 128,
+  "heads": 4,
+  "layers": 4
+ },
+ "seed": 0,
+ "data_size": 500,
+ "data_requested": 500,
+ "steps": 20,
+ "batch": 64,
+ "lr": 0.001,
+ "abacus_offset_max": 100,
+ "train_len": 5,
+ "eval_size": 10,
+ "eval": {
+  "5": {
+   "x_train_len": 1,
+   "accuracy": 0.0,
+   "infer_flops": 635921920
+  },
+  "10": {
+   "x_train_len": 2,
+   "accuracy": 0.0,
+   "infer_flops": 1139192320
+  },
+  "15": {
+   "x_train_len": 3,
+   "accuracy": 0.0,
+   "infer_flops": 1654750720
+  },
+  "20": {
+   "x_train_len": 4,
+   "accuracy": 0.0,
+   "infer_flops": 2182597120
+  }
+ },
+ "train_flops": 139964940288,
+ "wall_train_s": 1.17,
+ "wall_eval_s": 0.06,
+ "final_loss": 2.4377,
+ "loss_curve": [
+  [
+   0,
+   5.0357
+  ],
+  [
+   19,
+   2.4377
+  ]
+ ],
+ "hardware": {
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "torch_threads": 4,
+  "torch": "2.15.0+cu132",
+  "cuda": false,
+  "python": "3.12.3"
+ },
+ "commit": "51fe32eb79682e8b80251fc48cc39974c84b63a1",
+ "flops_note": "analytic from executed shapes; training = 3 x forward; inference without KV cache"
+}

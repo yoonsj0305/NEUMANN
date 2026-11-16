@@ -1,0 +1,94 @@
+"""Stage 1 baselines (no new architecture):
+
+1. "abacus": decoder-only transformer, pre-LN, NoPE attention + Abacus embeddings (McLeish et al. 2024): every digit
+   gets the embedding of its position inside its own number (1, 2, ...), shifted by one random offset per sequence
+   during training so that positions beyond the training length have been trained.  Non-digit tokens get index 0.
+2. "looped": looped / universal transformer: one shared block of `block_layers` layers applied `recur` times, the
+   input embedding injected before every iteration (input injection), Abacus + NoPE as in 1.  At evaluation the
+   number of iterations can be raised (recurrence scaled with the input length).
+"""
+from __future__ import annotations
+import math
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+ABACUS_MAX = 256          # largest Abacus index (training offsets + longest number)
+
+
+def abacus_index(tokens, digit_ids):
+    """1-based position of each digit inside its contiguous digit run; 0 elsewhere"""
+    is_d = torch.isin(tokens, digit_ids)
+    idx = torch.zeros_like(tokens)
+    run = torch.zeros(tokens.shape[0], dtype=tokens.dtype, device=tokens.device)
+    for j in range(tokens.shape[1]):
+        run = torch.where(is_d[:, j], run + 1, torch.zeros_like(run))
+        idx[:, j] = run
+    return idx
+
+
+class Block(nn.Module):
+    def __init__(self, d, heads):
+        super().__init__()
+        self.ln1, self.ln2 = nn.LayerNorm(d), nn.LayerNorm(d)
+        self.qkv = nn.Linear(d, 3 * d)
+        self.proj = nn.Linear(d, d)
+        self.mlp = nn.Sequential(nn.Linear(d, 4 * d), nn.GELU(), nn.Linear(4 * d, d))
+        self.heads = heads
+
+    def forward(self, x):
+        B, T, D = x.shape
+        q, k, v = self.qkv(self.ln1(x)).view(B, T, 3, self.heads, D // self.heads).permute(2, 0, 3, 1, 4)
+        a = F.scaled_dot_product_attention(q, k, v, is_causal=True)          # NoPE: no positional term
+        x = x + self.proj(a.transpose(1, 2).reshape(B, T, D))
+        return x + self.mlp(self.ln2(x))
+
+
+class LM(nn.Module):
+    def __init__(self, vocab, d, heads, layers, kind="abacus", block_layers=2, recur=4, digit_ids=()):
+        super().__init__()
+        self.kind, self.recur = kind, recur
+        self.tok = nn.Embedding(vocab, d)
+        self.aba = nn.Embedding(ABACUS_MAX + 1, d)
+        nn.init.normal_(self.aba.weight, std=0.02)
+        n = layers if kind == "abacus" else block_layers
+        self.blocks = nn.ModuleList([Block(d, heads) for _ in range(n)])
+        self.ln = nn.LayerNorm(d)
+        self.head = nn.Linear(d, vocab, bias=False)
+        self.register_buffer("digit_ids", torch.tensor(list(digit_ids), dtype=torch.long), persistent=False)
+
+    def embed(self, tokens, offset=None):
+        idx = abacus_index(tokens, self.digit_ids)
+        if offset is not None:                              # training: one random shift per sequence
+            idx = torch.where(idx > 0, idx + offset[:, None], idx)
+        idx = idx.clamp(max=ABACUS_MAX)
+        return self.tok(tokens) + self.aba(idx)
+
+    def forward(self, tokens, offset=None, recur=None):
+        e = self.embed(tokens, offset)
+        if self.kind == "abacus":
+            x = e
+            for b in self.blocks:
+                x = b(x)
+        else:
+            x = torch.zeros_like(e)
+            for _ in range(recur or self.recur):
+                x = x + e                                   # input injection
+                for b in self.blocks:
+                    x = b(x)
+        return self.head(self.ln(x))
+
+
+def n_params(m):
+    return sum(p.numel() for p in m.parameters())
+
+
+# parameter scales (~1M / ~10M / ~50M non-embedding + embedding); looped: a 2-layer shared block, width chosen so the
+# parameter count matches the same scale
+SCALES = {
+    "abacus": {"1M": dict(d=128, heads=4, layers=4), "10M": dict(d=320, heads=8, layers=8),
+               "50M": dict(d=576, heads=8, layers=12)},
+    "looped": {"1M": dict(d=176, heads=4, layers=0, block_layers=2, recur=4),
+               "10M": dict(d=640, heads=8, layers=0, block_layers=2, recur=4),
+               "50M": dict(d=1408, heads=16, layers=0, block_layers=2, recur=4)},
+}

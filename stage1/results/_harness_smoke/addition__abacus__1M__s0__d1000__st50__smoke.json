@@ -1,0 +1,67 @@
+{
+ "name": "addition__abacus__1M__s0__d1000__st50__smoke",
+ "task": "addition",
+ "kind": "abacus",
+ "scale": "1M",
+ "params": 857216,
+ "config": {
+  "d": 128,
+  "heads": 4,
+  "layers": 4
+ },
+ "seed": 0,
+ "data_size": 1000,
+ "data_requested": 1000,
+ "steps": 50,
+ "batch": 64,
+ "lr": 0.001,
+ "abacus_offset_max": 100,
+ "train_len": 10,
+ "eval_size": 20,
+ "eval": {
+  "10": {
+   "x_train_len": 1,
+   "accuracy": 0.0,
+   "infer_flops": 1484948480
+  },
+  "20": {
+   "x_train_len": 2,
+   "accuracy": 0.0,
+   "infer_flops": 2874516480
+  },
+  "30": {
+   "x_train_len": 3,
+   "accuracy": 0.0,
+   "infer_flops": 4329620480
+  },
+  "40": {
+   "x_train_len": 4,
+   "accuracy": 0.0,
+   "infer_flops": 5850260480
+  }
+ },
+ "train_flops": 480682917888,
+ "wall_train_s": 9.11,
+ "wall_eval_s": 0.29,
+ "final_loss": 2.3249,
+ "loss_curve": [
+  [
+   0,
+   4.9516
+  ],
+  [
+   49,
+   2.3249
+  ]
+ ],
+ "hardware": {
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "torch_threads": 1,
+  "torch": "2.15.0+cu132",
+  "cuda": false,
+  "python": "3.12.3"
+ },
+ "commit": "51fe32eb79682e8b80251fc48cc39974c84b63a1",
+ "flops_note": "analytic from executed shapes; training = 3 x forward; inference without KV cache"
+}
