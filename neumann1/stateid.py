@@ -225,8 +225,17 @@ def guard_partitions(alphabet, enumerate_bool, deadline, limit=200):
         if part in seen:
             continue
         seen.add(part)
-        out.append({"ast": ast, "fn": (lambda e, fn=fn: int(bool(fn(e)))), "size": size, "show": show})
+        out.append({"ast": ast, "fn": (lambda e, fn=fn: _guard_class(fn, e)), "size": size, "show": show})
     return out
+
+
+def _guard_class(fn, e):
+    """the class of an element under a guard; None (unknown) when the guard program fails on it (post-freeze crash fix
+    in section 41: a failing guard used to raise and abort the run)"""
+    try:
+        return int(bool(fn(e)))
+    except Exception:
+        return None
 
 
 def dfa_search(words, seps, k, steps=DFA_STEPS):
