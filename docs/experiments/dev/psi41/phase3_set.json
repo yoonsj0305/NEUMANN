@@ -1,0 +1,90 @@
+{
+ "fst": [
+  {
+   "draw": 1,
+   "name": "fst(k=3,pred=mod4,trans=count,out=keep_if_s0)",
+   "sha256": "0ec2f82f1a74430042ddb624b5f64b5dd0f8ce165ecc3cbb5fdd1315639f683c"
+  },
+  {
+   "draw": 3,
+   "name": "fst(k=2,pred=geq9,trans=count,out=keep_if_s0)",
+   "sha256": "02a5b76d75b4a206ffb8bc84c814cf59f044afd4c7f093d13afeb776f44e35d6"
+  },
+  {
+   "draw": 6,
+   "name": "fst(k=2,pred=eq10,trans=saturate,out=x_plus_s)",
+   "sha256": "56a1e7ea483696304c57ca8ed9ce59f798fd36729fae1d2add59fffb699142b6"
+  },
+  {
+   "draw": 9,
+   "name": "fst(k=3,pred=mod3,trans=count,out=x_if_s0)",
+   "sha256": "4c1179c277e05b62c9ad3dd29bcb14f66e0780bc8cd679d4f63b13a87ab40339"
+  },
+  {
+   "draw": 17,
+   "name": "fst(k=3,pred=geq6,trans=toggle,out=keep_if_s0)",
+   "sha256": "291da010e17b377f8c19d8a4b793ad0e4074fc1a3c44266cb6496ebdfc676384"
+  },
+  {
+   "draw": 31,
+   "name": "fst(k=3,pred=mod5,trans=count,out=keep_if_s0)",
+   "sha256": "daf2a553861d217f1b5e7b47010510653825d61cb64f70021d3d5c5bafa8a3c4"
+  },
+  {
+   "draw": 43,
+   "name": "fst(k=2,pred=geq6,trans=toggle,out=keep_if_s0)",
+   "sha256": "81986c943803164f43a9a435fc8de3d8359e5ec8da3e6c174d5de99fb983d643"
+  },
+  {
+   "draw": 47,
+   "name": "fst(k=2,pred=eq10,trans=count,out=keep_if_s0)",
+   "sha256": "4fa83d948c9e42da2cefe1e4db691c3812649d2ece5674f627863da78e421eaf"
+  }
+ ],
+ "fst_drawn": 47,
+ "rha": [
+  {
+   "draw": 5,
+   "name": "rha(k=2;p=in2_13_16;d=1000;o=keepset_0)",
+   "sha256": "87bff18787ac4a1f41b2b08217ed2e2cbf06f6f6e3261b09edb75dd270926853"
+  },
+  {
+   "draw": 6,
+   "name": "rha(k=2;p=modlt_4_1;d=1001;o=keepset_1)",
+   "sha256": "9054338eb570fe1cae74d29077054da9d1aa31238f5dd6d01880beda22801bcd"
+  },
+  {
+   "draw": 7,
+   "name": "rha(k=2;p=in2_3_11;d=1101;o=keepset_1)",
+   "sha256": "978ab22e9b0e08234cd56193a4daac1bbd54dc439f3dbc8ba3e8540948a4d4d8"
+  },
+  {
+   "draw": 8,
+   "name": "rha(k=3;p=lt_7+in2_6_15;d=110201211222;o=mark)",
+   "sha256": "d944af3116e6ee6c2b5a9bd920790dbdde4e73aa743d39f074b2d6e26fe85342"
+  },
+  {
+   "draw": 13,
+   "name": "rha(k=3;p=odd;d=020112;o=mark)",
+   "sha256": "18b8c92f711ff07ff54bdf25106f264d8b1818c582bb58f0924a55a7ed41df6a"
+  },
+  {
+   "draw": 18,
+   "name": "rha(k=4;p=modlt_3_2;d=33233111;o=keepset_12)",
+   "sha256": "d176ad932b04e2a0406580432783d90a232b327b7d554e18f730172e4625a0c1"
+  },
+  {
+   "draw": 19,
+   "name": "rha(k=4;p=modlt_3_1+lt_7;d=3122311212110110;o=mark)",
+   "sha256": "a64109930630e2c0346b07a91187a1d1b563a7692537bab4c23dee29e873a6a7"
+  },
+  {
+   "draw": 20,
+   "name": "rha(k=3;p=modlt_4_1;d=200011;o=keepset_1)",
+   "sha256": "278dab0b1423c9a8d5619ba613e415494d0f42ae7423224d7cfa26e37cc58d54"
+  }
+ ],
+ "rha_drawn": 20,
+ "rule": "first n latent-need tasks of each generator with the seeds above, every earlier name excluded; sha256 of {name, train, test} of Env(spec, 0)",
+ "schema": "neumann.q3-psi41-phase3-set.v1"
+}

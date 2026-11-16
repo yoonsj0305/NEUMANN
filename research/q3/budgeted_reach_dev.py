@@ -158,6 +158,10 @@ def registered():
     if pathlib.Path(PSI_EVAL_SET).exists():
         psi = json.loads(pathlib.Path(PSI_EVAL_SET).read_text())
         want.update({t["name"]: t["sha256"] for g in ("latent_need30", "ordinary12", "fst16") for t in psi[g]})
+    for f41 in ("docs/experiments/dev/psi41/phase3_set.json", "docs/experiments/dev/psi41/eval_set.json"):
+        if pathlib.Path(f41).exists():
+            d41 = json.loads(pathlib.Path(f41).read_text())
+            want.update({t["name"]: t["sha256"] for g in ("fst", "rha", "lr_need12", "lr_ord12") for t in d41.get(g, [])})
     if pathlib.Path(PSI40_EVAL_SET).exists():
         p40 = json.loads(pathlib.Path(PSI40_EVAL_SET).read_text())
         want.update({t["name"]: t["sha256"] for g in ("lr_need30", "lr_ord12", "fst16", "rha16") for t in p40[g]})
@@ -244,11 +248,11 @@ def job(arm, name, seed_kind, cap, sem):
         return r
     ac.passive = passive
     c0 = time.process_time()
-    if arm in ("PDq", "QDq"):
+    if arm in ("PDq", "QDq", "RDq"):
         # the frozen V2 control: P's SOURCE queries replayed and answered again, solved passively (no formation)
         import os
         src = [json.loads(l) for l in open(os.environ["NEUMANN_REPLAY_ROWS"]) if l.strip()]
-        arm_src = "Q" if arm == "QDq" else "P"                       # QDq: the section 40 control for PSI40
+        arm_src = {"QDq": "Q", "RDq": "R"}.get(arm, "P")          # QDq / RDq: the section 40 / 41 controls
         rp = next(r for r in src if r["arm"] == arm_src and r["name"] == name and r["seed_kind"] == seed_kind)
         pred, rec = ac.run_arm("Dq", env, cap, seed=seed, replay=rp["query_inputs"])
     else:

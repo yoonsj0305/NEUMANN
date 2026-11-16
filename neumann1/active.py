@@ -1430,6 +1430,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             k = max(i for i, c in enumerate(rec["components"]) if c.get("kind") == "accumulator")
             rec["components"].pop(k)
             rec["events"].append("PSI41: structure %s refuted (%s); re-identification" % (a["show"], reason))
+            s41_mem["merges"] = []             # the merges were the untested assumptions; separations are kept
             return psi40_round("refuted: " + reason, transitions())
         if acc[-1].get("psi") and reason == "update not found":
             # a synthesis failure is not evidence against a latent that PSI derived from observed distinctions
@@ -2043,6 +2044,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         return False
 
     psi40_tried = set()
+    s41_mem = {"seps": [], "merges": [], "tested": set()}   # PSI41 experiment evidence kept across entries
 
     def psi40_early(trans):
         """Observation-only test for an early PSI40 entry (no query): residual future signatures show that the
@@ -2241,7 +2243,14 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             lo_, hi_ = min(vals), max(vals)
             alphabet_ = list(range(lo_, hi_ + 1)) if hi_ - lo_ <= 40 else sorted(set(vals))
             guards41 = S_.guard_partitions(alphabet_, _guard_enum, min(deadline, time.process_time() + 1.0))
-            hard_merge = []
+            hard_merge = list(s41_mem["merges"])
+            for pr_ in s41_mem["seps"]:
+                if pr_ not in seps:
+                    seps.append(pr_)
+            # free equal-future evidence (residuals agree on >= 2 informative suffixes) is used as merge constraints
+            # too; these merges are themselves hypotheses and are retracted if they leave no consistent structure
+            free_merge = [tuple(g) for g in equal_groups if len(g) == 2]
+            use_free = [bool(free_merge)]
             folds_ = [r_ for r_ in ranked if r_["family"] == "fold"][:20]
 
             def build(top_hint):
@@ -2263,13 +2272,19 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                 pool_ = [step_input(b_, e_) for b_ in base_ for e_ in alphabet_]
                 pool_ += [step_input(step_input(b_, e1), e2) for b_ in base_ for e1 in creps for e2 in creps]
                 pool_ = [u_ for u_ in dict.fromkeys(pool_) if u_ not in set(obs_)]
-                hyps_, vinfo_ = S_.version_space(seps, hard_merge, obs_, pool_, hseq, guards41,
+                merges_ = hard_merge + (free_merge if use_free[0] else [])
+                hyps_, vinfo_ = S_.version_space(seps, merges_, obs_, pool_, hseq, guards41,
                                                  min(deadline, time.process_time() + 3.0))
+                if not hyps_ and use_free[0]:
+                    use_free[0] = False
+                    s41["free_merges_retracted"] = len(free_merge)
+                    hyps_, vinfo_ = S_.version_space(seps, hard_merge, obs_, pool_, hseq, guards41,
+                                                     min(deadline, time.process_time() + 3.0))
                 for f_ in folds_:
                     cache = {}
                     hv_ = {u_: hval(f_["fn"], f_["z"], u_, cache) for u_ in obs_ + pool_}
                     h_ = dict(f_, values=hv_)
-                    if S_.consistent(h_, seps, hard_merge):
+                    if S_.consistent(h_, seps, hard_merge + (free_merge if use_free[0] else [])):
                         hyps_.append(h_)
                 for h_ in hyps_:
                     h_["equal_split"] = sum(len({h_["values"].get(u_) for u_ in g if h_["values"].get(u_) is not None}) - 1
@@ -2280,7 +2295,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             s41["version_space"] = vinfo
             s41["initial_hypotheses"] = len(hyps)
             w1 = tuple(ev_best[0]) if ev_best else (order[0],)
-            rebuilt, tested = 0, set()
+            rebuilt, tested = 0, s41_mem["tested"]
             while hyps and time.process_time() < deadline:
                 top = hyps[0]
                 reps_ = []
@@ -2296,24 +2311,48 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                     if v_ is None:
                         return None
                     return next((r_ for r_ in reps_ if h_["values"].get(r_) == v_), "new")
-                rivals = hyps[1:]
-                if len(rivals) > 600:                   # a fixed, deterministic subsample for the choice only
-                    rivals = rivals[::len(rivals) // 600 + 1]
-                best_, bn = None, 0
+                pool_h = hyps if len(hyps) <= 600 else hyps[::len(hyps) // 600 + 1]   # deterministic subsample
+                # the experiment that splits the surviving structures most evenly: for a candidate prefix p every
+                # structure predicts which observed representative p behaves like; the outcome removes all
+                # structures that predicted otherwise (expected survivors = sum of squared label counts / n).  When
+                # no candidate splits them the structure is identified (on the candidate region).
+                if top["family"] == "automaton":
+                    crep0 = {}
+                    for e_ in alphabet_:
+                        crep0.setdefault(_safe(lambda e_=e_: top["gfn"](e_)), e_)
+                    w2_ = (crep0.get(1, crep0.get(0)),) + w1
+                else:
+                    w2_ = tuple(ev_best[1]) if len(ev_best) > 1 else (alphabet_[0],) + w1
+
+                def okey(l_):
+                    """what the test observes for a structure that puts p with representative l: l's residuals for
+                    the two continuations when already known (labels with equal residuals cannot be told apart)"""
+                    if isinstance(l_, tuple) and all(x_ in memo for x_ in (l_, cont(l_, w1), cont(l_, w2_))):
+                        return (S_.residual(memo[l_], memo[cont(l_, w1)], direction),
+                                S_.residual(memo[l_], memo[cont(l_, w2_)], direction))
+                    return ("label", l_)
+                best_, bscore = None, None
                 for p_ in pool41 + obs41:
                     if p_ in tested:
                         continue
-                    lt_ = label(top, p_)
-                    if lt_ is None:
+                    cnt_ = {}
+                    for h_ in pool_h:
+                        l_ = label(h_, p_)
+                        if l_ is not None:
+                            k_ = okey(l_)
+                            cnt_[k_] = cnt_.get(k_, 0) + 1
+                    if len(cnt_) < 2:
                         continue
-                    n_ = sum(1 for h_ in rivals if label(h_, p_) not in (None, lt_))
-                    if n_ > bn:
-                        best_, bn = p_, n_
+                    sc_ = sum(c_ * c_ for c_ in cnt_.values()) / float(sum(cnt_.values()))
+                    if bscore is None or sc_ < bscore:
+                        best_, bscore = p_, sc_
                 if best_ is None:
                     s41["identified"] = True
                     break
-                # the observation that tells the competing structures apart: p's answer and two informative
-                # continuations; the residuals are then compared with EVERY observed prefix (no further query)
+                bn = round(bscore, 1)
+                # the observation: p's answer and two informative continuations, and the same continuations of the
+                # representative the best structure puts p with; residuals are then compared with EVERY observed
+                # prefix (no further query)
                 if top["family"] == "automaton":
                     crep = {}
                     for e_ in alphabet_:
@@ -2336,14 +2375,35 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                 fr_, rs_, rg_, _ = evidence()
                 new_s = [pr_ for pr_ in rs_ + [(u_, v_) for u_, v_, _, _, _ in fr_] if best_ in pr_ and pr_ not in seps]
                 new_m = [tuple(g) for g in rg_ if best_ in g and tuple(g) not in hard_merge]
+                # the test's own outcome: p against every representative whose two tested continuations are known
+                rp_ = (S_.residual(memo.get(best_), memo.get(cont(best_, w1)), direction),
+                       S_.residual(memo.get(best_), memo.get(cont(best_, w2)), direction))
+                if None not in rp_:
+                    for r2_ in reps_:
+                        if r2_ == best_ or not all(x_ in memo for x_ in (r2_, cont(r2_, w1), cont(r2_, w2))):
+                            continue
+                        rr_ = (S_.residual(memo[r2_], memo[cont(r2_, w1)], direction),
+                               S_.residual(memo[r2_], memo[cont(r2_, w2)], direction))
+                        if None in rr_:
+                            continue
+                        pr_ = (best_, r2_)
+                        if rr_ != rp_ and pr_ not in seps:
+                            new_s.append(pr_)
+                        elif rr_ == rp_ and pr_ not in hard_merge:
+                            new_m.append(pr_)
                 seps += new_s
                 hard_merge += new_m
                 s41["tests"].append([list(best_), bn, len(new_s), len(new_m)])
-                hyps = [h_ for h_ in hyps if S_.consistent(h_, seps, hard_merge)]
+                hyps = [h_ for h_ in hyps if S_.consistent(h_, seps, hard_merge + (free_merge if use_free[0] else []))]
+                if not hyps and use_free[0]:
+                    use_free[0] = False        # the free merges led to a contradiction: retract them, keep the rest
+                    s41["free_merges_retracted"] = len(free_merge)
                 if not hyps and rebuilt < 2:
                     rebuilt += 1               # every structure refuted: construct again from the new evidence
                     hyps, obs41, pool41, vinfo = build(None)
                     s41["rounds"].append({"rebuilt": vinfo})
+            s41_mem["seps"] = list(dict.fromkeys(s41_mem["seps"] + [pr_ for pr_ in seps]))
+            s41_mem["merges"] = list(dict.fromkeys(hard_merge))
             s41["remaining"] = len(hyps)
             s41["top"] = hyps[0]["show"] if hyps else None
             ranked = hyps[:1]
