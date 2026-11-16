@@ -1,0 +1,851 @@
+{
+  "audit_checks_pass": true,
+  "auditor_sha256": "506948401f032ae51bcdfdd6107443738535f44d80f8dc40564d443055a287ae",
+  "base_commit": "0d1baec723f249a62a901d100af6e941234a43ac",
+  "controls": {
+    "disjoint_equal_count_cohort_rejected": true,
+    "reason": "unregistered arm/id: ('S', 'rule/S0')"
+  },
+  "global_Q1_Q7": "OPEN; this audit does not close global capability or cost gates",
+  "historical_rows_sha256": "465426bf0193e2aec99c0e98207fc781bfbc4ae99256ee3089e99da0a25052dd",
+  "independent_replay": {
+    "example_evaluations": 13407,
+    "fit": 683,
+    "mismatches": [],
+    "predictions_sha256": "0273d9855517d4ba54858b4ba06a5df4433d449156e567168e0b30bac906d5e0",
+    "rows": 972,
+    "solved": 644
+  },
+  "originals": [
+    {
+      "blob_sha1": "d6d32975e78fa19c7879ae4b42f269b417cff086",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c001/task.json",
+      "sha256": "284fe7c62e047c498ebac1323dcd30903c11c1ae64fb6482addc65fee3585463"
+    },
+    {
+      "blob_sha1": "ab980deb2117f6de3d4b05e0d376dcff16939df3",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c004/task.json",
+      "sha256": "148490050671ecb7cd8ea9ebef3d59514d49bcba95a2b933a007eb4e11f34998"
+    },
+    {
+      "blob_sha1": "646d8725442a96493db4bf8bfbff39fb5a87b999",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c005/task.json",
+      "sha256": "a460437913e13f5d7bef2e79ea7c9c9817642c1eb23254b441f61ace991e6db5"
+    },
+    {
+      "blob_sha1": "ccfabf7cacd4a1e70d4714f7b6aab4773f6bc45d",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c007/task.json",
+      "sha256": "b32753e68c37dc5304f69436c672d2b643453b7cb7a301ad8cc8d4a94b4b1ba0"
+    },
+    {
+      "blob_sha1": "9bd095b682be24a77db4da24b080696d2b014c0a",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c011/task.json",
+      "sha256": "b84cce13d56fe8b8c668068a71280356ee94c3882c66018e771c966971ec0f85"
+    },
+    {
+      "blob_sha1": "2b52f72919f3c896509a5681860498a880382de6",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c015/task.json",
+      "sha256": "3051a200f60b9cb458853c8b80f466eae61047e0ae0a3c9fb4a3c7a9c880ef18"
+    },
+    {
+      "blob_sha1": "6f542181bd4db4be0e904d79f0d06245025259e6",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c017/task.json",
+      "sha256": "1724726f61b897d7822840bfa6545fceb906bba70d036ef705301ccb092197ad"
+    },
+    {
+      "blob_sha1": "ebfa2a5362444e2fd5581b40609d4d48bf42315c",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c019/task.json",
+      "sha256": "105a1084c730b5c02bbbcfab1468301a78e79b206441bcafe106287fec11b1dd"
+    },
+    {
+      "blob_sha1": "75a83f847bead5571683f37dfc0955e234cc3496",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c020/task.json",
+      "sha256": "f85182da8cde1acdc8d082c0a919860fce47b8acf385bd9b0fe6a50cc4f8ffd5"
+    },
+    {
+      "blob_sha1": "193bd67848e5ec72ceb1b7b3b4fd36538f1a4450",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c021/task.json",
+      "sha256": "b5c85b9ce7e1108e2338a81a0a04f2ebe8608d2ad435da61571fb54a4ea325a6"
+    },
+    {
+      "blob_sha1": "90303bff3a025a495a4009b30ec150ac6a2c3619",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c029/task.json",
+      "sha256": "bf93970387bdf8bf5ebc6b7d52f670ca4013e9f522b794563bb2c15c25497015"
+    },
+    {
+      "blob_sha1": "0cc32b5f71d5cd03e57c9885c13e1140ddb0bd4d",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c032/task.json",
+      "sha256": "f91646e496b3cbbc8e63f46785dcc36f7eb76fa804d9d4dcb416836ee816ffc8"
+    },
+    {
+      "blob_sha1": "f4b28173e61455bf8d1d3af083ae2ec7fa8791c5",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c034/task.json",
+      "sha256": "393b7e188fff961c2b16b0090a242abf24c7286f89d26241dcf6fad5d0bd46d9"
+    },
+    {
+      "blob_sha1": "656ec7fe1caf621cede78a5ef22528ddf2d6bfd0",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c035/task.json",
+      "sha256": "ae1ecb47f1c49a4c3abd19abcb8179121d0cc399f7d299a8522340c320356cde"
+    },
+    {
+      "blob_sha1": "bfcf85f86d02ed86a3c3bf98cc49b27c652423db",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c037/task.json",
+      "sha256": "06590e7310d812dbe299ba0bf3190b1598b0950bfd12ac2f72bbed042a365fc3"
+    },
+    {
+      "blob_sha1": "d2101ff983835d12fee9d2aacd8b7b408e962b5a",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c042/task.json",
+      "sha256": "5597150bdcf6af8c85844761af9b3f0d87faa072d0827efe7b6f00452a8cbe4f"
+    },
+    {
+      "blob_sha1": "1387ba7abc7a918aa57aceeba4fa23c221a0f57d",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c043/task.json",
+      "sha256": "a15d62a21d8585cef6a7c9018b8f0b4a6ce8c816ae08fba733ec1aa5031cb0a7"
+    },
+    {
+      "blob_sha1": "ba5cc5cc357bf3d41e7094e208020b0e548d5f22",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c046/task.json",
+      "sha256": "7baff7c5f5f227fd8f7dd65645b8e32b4ad2981e4c9b2b5f9da81c487c397567"
+    },
+    {
+      "blob_sha1": "455047c8296bdac466c0b5eda512fec73286a748",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c048/task.json",
+      "sha256": "3d746a0993ec8d5dc9dd20bf2c669e2ded29574e6f78ca37950665c91670a8f7"
+    },
+    {
+      "blob_sha1": "76f9ed4aa80552b4cebe6f1ae5a83376c325316e",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c050/task.json",
+      "sha256": "1c854e5fad9309b2b450dd06a54e23301ea9e239d6236008b137f1e68535368f"
+    },
+    {
+      "blob_sha1": "642c18d6617846589858a0d4f6bbde91b6e98ccc",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c051/task.json",
+      "sha256": "5d0a4aca9275e5d864ecba141aa198578be81621a066976ea4136164394a6d68"
+    },
+    {
+      "blob_sha1": "d1746ad70f1b019a83a1272c3e376fc2fde58d32",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c052/task.json",
+      "sha256": "681dd27d6013f1f8d3645d970160f5fd4f4b9438ecc6e9c66270be186bf9c918"
+    },
+    {
+      "blob_sha1": "90ee7a820569a2aa4fc8e7153765c07b4f91a60a",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c058/task.json",
+      "sha256": "dd1d3872981d5dff3e6e219cd6fdb0023d39596ce7e6efeb22695de87784bf8f"
+    },
+    {
+      "blob_sha1": "4ed6b5c7ad94b70b49839116eabb4a341dfbf75d",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c059/task.json",
+      "sha256": "b128e44c48ae5f1b13731db46e9fd35033638df63bc2acde34f4963b720917a4"
+    },
+    {
+      "blob_sha1": "7bf7651921abe32fe812eea446e5cc0f51e8b3f7",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c064/task.json",
+      "sha256": "7e7aa2e5c85257e96dd1e7a4f31b6951f6ff52e01c476bc60c12167b29e896d3"
+    },
+    {
+      "blob_sha1": "653addd8e93746ec1ce277074c7a193fdfe7457e",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c065/task.json",
+      "sha256": "2e73131fca01ee16177f322bd2d84e9fc1cdf608f69aaaf38d9effddc1e072ec"
+    },
+    {
+      "blob_sha1": "90160d581956277c74aa64b8fb5680605699913f",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c066/task.json",
+      "sha256": "ccb69178014736c1c5aa570686e42516a02c4b9bc01785c52d7ffde701e52f7f"
+    },
+    {
+      "blob_sha1": "c822e56655ade2c2aea2b5aa48c3f52dcd0f88e8",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c069/task.json",
+      "sha256": "6e6468420591e87c0e32c9f53766142baf3f918e076ad560cb5ff14296d08099"
+    },
+    {
+      "blob_sha1": "f57b87687880003590868ceb00b80560c881f509",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c070/task.json",
+      "sha256": "249c24b4e4ee444966498e6efee3be4f1a542ea0dff9c55067e5a002c0de35f3"
+    },
+    {
+      "blob_sha1": "a04078eea3c2c04b8de5e459de361141d236cf68",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c072/task.json",
+      "sha256": "68ae58c0914fa422f7fb67dc84836304ab3cca5082580d7245509b06fb3951cc"
+    },
+    {
+      "blob_sha1": "f91ce27822cb308e7620cd9c8d2f60641264b80a",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c074/task.json",
+      "sha256": "136edab45df8732d829eee7ecc9027c18ff3e6141530684ef31db52dbdec2d21"
+    },
+    {
+      "blob_sha1": "1e9d12edd3aac40a0ff5f18fb6502b42c947e333",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c076/task.json",
+      "sha256": "d0fc22cb9cf3a802087f9e1e2c3616d374037de71fd7a7dfb47b695df0219554"
+    },
+    {
+      "blob_sha1": "f7fc013f63bfb93a03f6a4251f63ddab687d1d9c",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c077/task.json",
+      "sha256": "ddd9c73df1662f73ed312b792f553c458254f559f4b9c4b90af6a1a17dfdfda0"
+    },
+    {
+      "blob_sha1": "cb12701c2bdb587d1c06e4e844ec6e136b6cda16",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c078/task.json",
+      "sha256": "742fac89eb7956b78f57559b7c3c012f42017bc2db6ee1801afd44e701250ecc"
+    },
+    {
+      "blob_sha1": "d0f54112e7fe5504aadc49e961ccad81fb2073ad",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c079/task.json",
+      "sha256": "24515e5c523d25eadb7304fa200203f78a72e31d21625de5f8cc8a8cd3c083d5"
+    },
+    {
+      "blob_sha1": "16cd794528ace67c6c0b8b48e646dd992c026600",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c080/task.json",
+      "sha256": "981b4956f3b80b928aa0d67ba0d8a38ef5feed7cb9cf283e7d627f51a0eb829d"
+    },
+    {
+      "blob_sha1": "7f152e57776d54d7b4abe94a2fdd81c50bb83955",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c081/task.json",
+      "sha256": "ac0ec8e7bbe563fc8b9a655df18763b00ae4223e638c842326968e9eb8cc818f"
+    },
+    {
+      "blob_sha1": "168ac72b303c37226e835f17ecfb726bc0ec6bc2",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c085/task.json",
+      "sha256": "a3c637256c9b939efa80b21577a9ea789b34f951a546f6ccc1eb96cb79772a42"
+    },
+    {
+      "blob_sha1": "eb26eada7a6ec040131ddd609feaedf6891d2702",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c089/task.json",
+      "sha256": "c8f31ad2228f948b360f2e0dd76504be8c41a0e6f1e78cd3c76d84602c1aea23"
+    },
+    {
+      "blob_sha1": "379fa61a184b0f251269a45e405a19b046b529d1",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c092/task.json",
+      "sha256": "eddecdceddd6b0a3679197c11d8fc0439e8e3ccae6a5d3c8488217006df2182d"
+    },
+    {
+      "blob_sha1": "d4b841dc91a3741c93e5470b5929a4372e72373b",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c093/task.json",
+      "sha256": "945a514717dd14b42a7ca83a859184fef1884e6f673b1ef9ef192f57aa2a2dbe"
+    },
+    {
+      "blob_sha1": "e49db4436ca632ef93fb5742b8a4df021a02e711",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c094/task.json",
+      "sha256": "2cb82f8f50940d2b040308bb08d526bffc909b025a55bedbfceafd783dd1eac7"
+    },
+    {
+      "blob_sha1": "15ff7ea6346898ce94ff7d48267cdca55cba70d8",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c095/task.json",
+      "sha256": "80ca35f70711d9edee9468f21d367bc29f0544c25dae274bf6033dced78838a4"
+    },
+    {
+      "blob_sha1": "453dc742f18ccb28c2a0bea795c65baefef52d57",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c096/task.json",
+      "sha256": "59c22cf4c468dab32c04205682b6f805c58ff1154860c5e78ad47fb734f0dffd"
+    },
+    {
+      "blob_sha1": "c4b74134e97c0b253c6e174f18c27761402efe8e",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c098/task.json",
+      "sha256": "859f9fd8f2a77a726996bfe150067a121102454ede1a88309ddedef6d5089fdd"
+    },
+    {
+      "blob_sha1": "53614fe310843320dc0037361ee2aa9dfd3346d4",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c100/task.json",
+      "sha256": "d652604cdc441f9eec70fdb78a2ada1ed8b8c37da20959ffca63bc0cc8a34684"
+    },
+    {
+      "blob_sha1": "89f8293fd229b3c5091735194543e8facab95c5c",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c101/task.json",
+      "sha256": "f74a6d582d507b26629dcb3399990d383ec8a2e6d44e572165dafe6c035d07e4"
+    },
+    {
+      "blob_sha1": "f2e8d4e2c4894c6e3ab6e3bb8d6b90eb12e28e04",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c103/task.json",
+      "sha256": "c7827336a263917754f09b07684ab857bd85346562ce166b8fc7804d47237224"
+    },
+    {
+      "blob_sha1": "d1a2fe01e75565344142a1d5ccdb0369cad19157",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c104/task.json",
+      "sha256": "05606a2e63af372dd350b4ab34d53cc715adf949aca6ff4a0944c91b24bc9186"
+    },
+    {
+      "blob_sha1": "b02770df017341f9e59249921fab692803c29c37",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c107/task.json",
+      "sha256": "ce0d93b4d003dbd1e47cc776b02a29c5f776ed5232e620bbd848ffb72da6d4d5"
+    },
+    {
+      "blob_sha1": "fd7c6c0d0b1a533ac6c7b1635f96b9b19aab042b",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c110/task.json",
+      "sha256": "23d162afb23df1655bd36f3d0911b330395654a47a9ba47e1d8dad9cf17edc6d"
+    },
+    {
+      "blob_sha1": "3b851841fcb106c17a5a769e0d36e86aa4271d68",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c111/task.json",
+      "sha256": "38bd9aac26bce2d5fa67b3c569da631e81bc30291bfb5574eb7debbea555dd27"
+    },
+    {
+      "blob_sha1": "d51468a5cca23fdfdf3e8b40203d7638b58a563e",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c112/task.json",
+      "sha256": "2007c142fa10ec0ab06dd9d73b1e171064a47f5b6b110abb52a287816a07ba69"
+    },
+    {
+      "blob_sha1": "534d24534633850debca01941659793165157f8e",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c113/task.json",
+      "sha256": "f63bfff389ef04822ff7071b0d6fb017fd56d1cf0b518a83b3fe9630b468f2b9"
+    },
+    {
+      "blob_sha1": "a6865610166a10c88b3b29d8d7ab93676be80031",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c114/task.json",
+      "sha256": "a01fe1f44976503f021d905b901a1fec8809fb0e561c2600b2de0e91932ea093"
+    },
+    {
+      "blob_sha1": "5b30661441567664a0566f0bab9c6552eb7d336c",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c115/task.json",
+      "sha256": "fa657fbc1289b09f9f369bf4e222b26918bb2a45dbad93882d898ede05b8fd60"
+    },
+    {
+      "blob_sha1": "6a7c5f9fc577dc1fae28e9c8cbce15ea4da604dd",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c118/task.json",
+      "sha256": "859f4c40ba531269c8b51e304cad295e04d55b065eb4d93e992c2638258d67f9"
+    },
+    {
+      "blob_sha1": "73dbb02a748436594c33d2c665ddc1c3d5982f21",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c119/task.json",
+      "sha256": "b569905e4ca5d9c57f6aea613662186849f4299371bfd7ce9ba2091e0c4b7322"
+    },
+    {
+      "blob_sha1": "9487e6f48683dc80cb48e8f5cc76c4d5d949dd6e",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c121/task.json",
+      "sha256": "af5339745d2783fe98ac19735b139dbb63eff94c79aaff0f2b592c34f5b1a923"
+    },
+    {
+      "blob_sha1": "85a21b66fcbe903b4cce5941a9e70b8167b859e9",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c122/task.json",
+      "sha256": "e1529d8d58ae5d77d28361a14c313a728ffa40c6ee63c0c729c48f4298a1a98e"
+    },
+    {
+      "blob_sha1": "dec7ec1136b840fff19d7bf6b37e8ad1eea9a2a2",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c124/task.json",
+      "sha256": "a47704383e44f2658679b85eaec81706d147a8fb940226c3e9f0315ce2cd6a86"
+    },
+    {
+      "blob_sha1": "17b02d5c4b94cecfbe90ff86adb4c0221fc7f83e",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c125/task.json",
+      "sha256": "1cccdf8af194812ddc3de5c9f993a64ab71cd68fe5bb39f218db6bb41e6e912a"
+    },
+    {
+      "blob_sha1": "8beed4f64da1b04b4e55cd53986a9642a3ff6387",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c126/task.json",
+      "sha256": "c718b42a5647899c4119ad6edd8335d50268b861ec6d06ebf261522e7feee46f"
+    },
+    {
+      "blob_sha1": "3bd1b06b463c25be63b4a9dedabc78309fa68034",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c128/task.json",
+      "sha256": "05db1c0ecb0979cfc8d2e4aa98bef0ae02c1281c642869f434de853eb8160832"
+    },
+    {
+      "blob_sha1": "c080e3ec950204ba0e339d47f083f5d6192b9b4a",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c129/task.json",
+      "sha256": "8d10495950a0f593821bdafbf74237b35cde5cae8ae4eec830e7c6db0973ee70"
+    },
+    {
+      "blob_sha1": "a3d044a7f1e123d26d43c3442d51d2aab887673a",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c133/task.json",
+      "sha256": "ce2a15c5651ce2293972fae09931864e0b55242d96d647306a6610bdf0fc4cf5"
+    },
+    {
+      "blob_sha1": "7451437b9e1b95ce63b5fbc94c978b7b32fb1ba1",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c136/task.json",
+      "sha256": "869a3f89b70d461c90b9a4ef3bef682b3107aee458b4ab2c622df59936cd57fb"
+    },
+    {
+      "blob_sha1": "29d7cded2afb2e66acc1e73e3127cc0a88ef105c",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c138/task.json",
+      "sha256": "4e855483c8b4ae03833670af4083cd089ea3ba3b3b4f8fe0ff902b10fd5806a3"
+    },
+    {
+      "blob_sha1": "530f18542943fbc5c9f948f36cfc7bab08b27dd7",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c139/task.json",
+      "sha256": "07c9502aad3d509af20067bf4b2304cd87473396c335b76d182c5d0aa2d40a2a"
+    },
+    {
+      "blob_sha1": "b55eb847c9a7c0d106f3941da9363534d1b2632d",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c141/task.json",
+      "sha256": "3d694d4318f62c8607fe43042af60d3c7c4ae090f624228405213f71987a9b44"
+    },
+    {
+      "blob_sha1": "dc226ac92078ddf57ec2cb8bc12be9ffabd6e9df",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c143/task.json",
+      "sha256": "233fe7a7abfd95bc715352b8718eddfc38bf44649fa2016abb6549f6339c8b73"
+    },
+    {
+      "blob_sha1": "b8cb38040721a0b1374be7ac5c70bdf4f38b5062",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c144/task.json",
+      "sha256": "b9dab1ac74643b1fcdec0fe5ff9dd2fc06bea4cc9c70bce4543c775ac8664d0d"
+    },
+    {
+      "blob_sha1": "2f9425e19ab2f82a11822cc594411b5473dc7db8",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c146/task.json",
+      "sha256": "766590dc1eb0642fe5e6ea1788f13c7d7479cd34f5822764fe5148b5826dcefc"
+    },
+    {
+      "blob_sha1": "023ae0c68afa8bb5e3131a8ea2dd38b01d15bdec",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c150/task.json",
+      "sha256": "16168e7e240dc85552bbed9ee912ad4938d5c79c61cbb4481f5ef0ab7e2bdf67"
+    },
+    {
+      "blob_sha1": "8ffdc0e564aa95e38e94d4abaedc20565a54ccbc",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c151/task.json",
+      "sha256": "2df12830f8db7a68781c1a1bed4803753a06ce0a2b42a3dabeadec8c3ca726ae"
+    },
+    {
+      "blob_sha1": "ceebea9af697b1283d57649c551c0fbd2b23090a",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c156/task.json",
+      "sha256": "f5f6f442cbd5e331f74af7456d61f405e905774c1db7b0309593beec27b7b63c"
+    },
+    {
+      "blob_sha1": "1283a1c7d6a45854472b370e5f4bddf3cfc888bb",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c160/task.json",
+      "sha256": "5fed1cde95dbf04d8c79e1faa09ebced0624ed2b9587764f3170e20b22c0e7e5"
+    },
+    {
+      "blob_sha1": "5e8f53b719133918ba9a066f5ed036be907dc5fd",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c161/task.json",
+      "sha256": "1662d7175443b6e4c8006349f9b55fdb02ba9afa2482eb5237bb9e51ebb00c68"
+    },
+    {
+      "blob_sha1": "0c59523f54cf1f44fdfb466ce6ae73c3d362df46",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c163/task.json",
+      "sha256": "8d5639789bc64c0751e12b5ec1035e288a5ba804c489b6835e87e439b20ef9e5"
+    },
+    {
+      "blob_sha1": "c99810e86639eb8363c0503a5cd872463fcd4d02",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c164/task.json",
+      "sha256": "785ce3f797adfa07dbc25bd659e704375723c1a4b06e258ba91bb48a6d1d4d74"
+    },
+    {
+      "blob_sha1": "5ca4ac8da21f2040e207f71f037d3251fa74e911",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c165/task.json",
+      "sha256": "714d2d932b08a5823c29a8ab3d8caf9bfc1d24297348e759021b1786fe649a53"
+    },
+    {
+      "blob_sha1": "46077b3198fd391691fe21b9d3932a4ee112e9f5",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c167/task.json",
+      "sha256": "6fa8ec97dc7d5d3c97dc3ff8225b7a0908ca81ecba91d55cae943cd75a7542da"
+    },
+    {
+      "blob_sha1": "722b655ed43c581278e917c734421157a72538ff",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c168/task.json",
+      "sha256": "8354f8180640805ff18bf9a307acfece97c3f96a6388518c2711f61fafca598a"
+    },
+    {
+      "blob_sha1": "c5d623ff9c2196ae3f2f1caf5db2593e46c6d062",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c169/task.json",
+      "sha256": "96b236f5adf1b9d05895203ba5804cd21b84d1711b23ee28eda7b387b6c38e38"
+    },
+    {
+      "blob_sha1": "f554992093127172807bcdc02e9a238aabb9eca4",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c172/task.json",
+      "sha256": "9e1295f3896a994cc914211daae888cbf560ac40f6c608a6f597ffba7db9d421"
+    },
+    {
+      "blob_sha1": "fc89fc1655ada4d13755c1b27d40a2b0d66a82a8",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c174/task.json",
+      "sha256": "3a7b3f46c5042186268df1ecaa255ff4207f43949f51778729eab3f3dcee9cbf"
+    },
+    {
+      "blob_sha1": "b4b2336aa2a95a1901fb38ceb4ce17b72e4d9316",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c177/task.json",
+      "sha256": "34016d4832924a9fe8f37f05a680c24869863e80e6f7ace7df4d540e39cec872"
+    },
+    {
+      "blob_sha1": "fcf5b3a357eb73edf1c68bae9ff6531f40d7df65",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c179/task.json",
+      "sha256": "c7577c0f4868d919d4ceb7edbde85c6922543f090a82bfea3fa9657f2af81854"
+    },
+    {
+      "blob_sha1": "5675704ba881656a2be84b5df83464346f318767",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c180/task.json",
+      "sha256": "ee42931cb09541c1e1357f38d3a9aa646c489d9553aa2f7ce60c98a3f034b66d"
+    },
+    {
+      "blob_sha1": "499ca06fc29a05cd25c5ff98c732a3748cd70f91",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c182/task.json",
+      "sha256": "03966d8a2068e009f6a5815f84daa118853069468b0613e8d53944a52b690a1d"
+    },
+    {
+      "blob_sha1": "cec008dd95bbd7dbf8e7235e492650e39da34e9e",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c183/task.json",
+      "sha256": "9db29a79b8224140484312543d6f0098bc5e3ea1e79af7965a94ae3dc75f35bb"
+    },
+    {
+      "blob_sha1": "1c771bc1476df7dc4704e34e2f5ca7e134354a7c",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c184/task.json",
+      "sha256": "fc5debabcaf3dda8266e81461bf3cbfcecef5ca89687d29e9ab8065990491711"
+    },
+    {
+      "blob_sha1": "20568c6ff5ed31ab98f0b4a769d163dcc9661a6b",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c187/task.json",
+      "sha256": "bd0947eb3499473de69f3e0692611f91fc13784a94932a32f5cfbfa21fb6440c"
+    },
+    {
+      "blob_sha1": "915bbf996a10d0f66b8262557cbdcfa4747da813",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c193/task.json",
+      "sha256": "b67d62366b8265f871332be768b0c04d6b38ac4211b6343c53a0239f7e9ddb4c"
+    },
+    {
+      "blob_sha1": "c6283ceec87a91ba34b25f608cf1ac46073cd664",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c195/task.json",
+      "sha256": "2382cca08cb79fc387bfb1a189a1bb2c376b157ed8dc574be52e04f40ed9afcf"
+    },
+    {
+      "blob_sha1": "553b0e05d2795eb3540d100e7e16fdb7dbf95f17",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c196/task.json",
+      "sha256": "5cbd7680742282b2b8b8754a8fc4fc28df7f8cafc466f941ffa28d86a3495e5f"
+    },
+    {
+      "blob_sha1": "c2e44539ac8c0b4bb5f3269a9dc4ba557cd06d9f",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c199/task.json",
+      "sha256": "00e85c892f55d709805b40e5bb825be95c7219dd570793e64c3583582803f930"
+    },
+    {
+      "blob_sha1": "716be011d7e28d8f4016c936df92914227c62d1b",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c200/task.json",
+      "sha256": "6e13d2a089fdf73bfd69910a14f7c7dcfe9854c5ca6c1d985c0783e7bf58e8a8"
+    },
+    {
+      "blob_sha1": "793adcde5bce2b8b3e1f85813b7a20d603485ee5",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c202/task.json",
+      "sha256": "256fb2a3a1e94e81c5374ace5ae7177366334cfc4e74188723f59415c6744e23"
+    },
+    {
+      "blob_sha1": "60cd34e9dc158567f666eeab32960c2da3dcadd3",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c203/task.json",
+      "sha256": "d3e0a570b2860f19d3dcbea82d42aeef06a9805fcb5d3bea50b9c12bc366cde4"
+    },
+    {
+      "blob_sha1": "b47ded2f7390353c79ba2e0e8f37fedc844a79bc",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c207/task.json",
+      "sha256": "67c52d32700db6626aca06884a0f154dbca95abb229612d787bfa1ef1885db38"
+    },
+    {
+      "blob_sha1": "a5373c1067d73f5a7ef314ed9a51ee6ea8a6a904",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c209/task.json",
+      "sha256": "59fd4cce5c5b428c3b212f647f4c8e8243844175cb7506a3c4da7be9057c1b35"
+    },
+    {
+      "blob_sha1": "86342b63a672b42ea31e47727c12aa4040a2ed39",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c210/task.json",
+      "sha256": "d01cb6b4c1e2e62b0a4a6c5db61e8bdd55638e7345b5f85dcb293eee636a3c10"
+    },
+    {
+      "blob_sha1": "752e279424c7e9cab8235dee811b876afae12dfd",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c212/task.json",
+      "sha256": "db15781a90c44ea6cf5435bcd8fa5c318b6b9164d391f8fb0fc63fe397bf320b"
+    },
+    {
+      "blob_sha1": "776d4f07c490c80b223ba077de452d5cd74cc41c",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c213/task.json",
+      "sha256": "083388b782f59471633bf34131ce432c64937816900000ead8a8a16ac3b9557f"
+    },
+    {
+      "blob_sha1": "f7019953cab4e79343fe57f7c5b095743feb87e3",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c215/task.json",
+      "sha256": "9e3410772b6bfe17b2d1baf8ec31f9a6978c549061a5633e13e20d0e19d5af21"
+    },
+    {
+      "blob_sha1": "2402c6895d74a72c985eb38bfdb6e60ba4ed815c",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c216/task.json",
+      "sha256": "09fe22c528a5521df95dc002628145e53068e65bb2b55a80f2e36feb6afe9de2"
+    },
+    {
+      "blob_sha1": "961686652745610fe5ea188a01543345282d17f7",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c217/task.json",
+      "sha256": "dd5ac26b8dcffad475c63ce04df1b3bf296b1ed210c478a282c0ccae2266c364"
+    },
+    {
+      "blob_sha1": "82916e4c08597b707268d205abe13b768ebbf287",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c220/task.json",
+      "sha256": "9864e1962a024da1e3bbf3f754d120bfe15b25a90f307d9fa169ebc81141b41d"
+    },
+    {
+      "blob_sha1": "901235d7bbe7e87e32729136fb22288de97b9ff4",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c221/task.json",
+      "sha256": "ff0b215f149ccbe88ff6ed46d6f307ca6e8e694ef74d23f0a57bc710c457b0a7"
+    },
+    {
+      "blob_sha1": "214eaeb2b7ed08f7d3b57910c09dbe53446e9dd7",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c223/task.json",
+      "sha256": "b65cb8274bf3c27d75440f349b44507de89c3b943d240efa8fdec1efc51a67ea"
+    },
+    {
+      "blob_sha1": "55f38e3292c944e8b6880332183a2660e74797e9",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c224/task.json",
+      "sha256": "fe1ccbf03f4dfc0c417d20ac5a4e9b1511272e4a0872c538eacc01d85fc29664"
+    },
+    {
+      "blob_sha1": "be009e100a38ae72d5df2fa062b5d2b2e2380ef3",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c225/task.json",
+      "sha256": "280cd604fa2b877f2dbe5fa978c88636fd97d92297f534e3f196fc49e5250474"
+    },
+    {
+      "blob_sha1": "26280b2f3d58da36e757cbf7941cd2bffb4b23f9",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c228/task.json",
+      "sha256": "2a6b29067508124c91c17adc928415ced57b238e39d0b508a1cb2a63710bfb2f"
+    },
+    {
+      "blob_sha1": "9edc56536a42a933eb6d14f79d8c7a664a68eee3",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c230/task.json",
+      "sha256": "44b2b00c626efafc7d395f1ebeee17b11e8e0bb81622b7fc9504446bbfb0bf3f"
+    },
+    {
+      "blob_sha1": "6baff99bdcd4855e807d66c3e59e81fd03c1c1a3",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c231/task.json",
+      "sha256": "0e4360cc765fbdb3e0990d4d1a262c535f1d1df2150979c67d68a4e1ab3b21d6"
+    },
+    {
+      "blob_sha1": "c8954ce50ad1c2677138678dfb5025c49579c56d",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c233/task.json",
+      "sha256": "740cada3d2cb147f0c898c79e2f94771b88455d72965642939fbe1a4dcb6b994"
+    },
+    {
+      "blob_sha1": "b494b09a31345a589528587a4202534dc44810d6",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c234/task.json",
+      "sha256": "32d64950573a931fa5dbf2055e375cddfb07de5df68419d06e3e88e10686dca8"
+    },
+    {
+      "blob_sha1": "e520feee515756b046eb4c947e2d2922ac0583d9",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c236/task.json",
+      "sha256": "82aa9a44356d53264fcfe2b3f609320808c5b75bde6b1fb9d8d9687da8ec5ffa"
+    },
+    {
+      "blob_sha1": "f76ac27381492b9005dba8cf7b3a014d6691ea64",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c240/task.json",
+      "sha256": "0796afcc96dc3987c8ce0856a3bf73066795f447b2bbe678a797380785c3c831"
+    },
+    {
+      "blob_sha1": "379223e77a4740548bd2989890d007b51bd0b4fa",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c243/task.json",
+      "sha256": "74162e4f3c4294e7d443281d7034395301b3f9aaea90e343bc7570b7a76f324a"
+    },
+    {
+      "blob_sha1": "ce70f6dcda5e64cbf610636450a43c048db56460",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c245/task.json",
+      "sha256": "d76a1be59f3ff1ef57fb116d60894efce29bd32ec296bf13e095dae6685c344b"
+    },
+    {
+      "blob_sha1": "1e8ac0e8c8a103a54a2f4c9b1e8adacce6272863",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c246/task.json",
+      "sha256": "783fb07791c4ca1576dd21716a6ab49610048e6d02afc81f7242fa507ae391a5"
+    },
+    {
+      "blob_sha1": "580da534c8a6ac47dc8969468a917e54ce7f97a8",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c247/task.json",
+      "sha256": "25a07a942ec0dc0bf6f9b2f6202c9dafa4193570e345712e0214ae3e7b9c8b04"
+    },
+    {
+      "blob_sha1": "fdfe73b7dcad2908b4a6079f203fd026ba7a2aff",
+      "commit": "092b196c1f8f14a54bbc62f24759d43bde46dd3b",
+      "path": "bigbench/benchmark_tasks/list_functions/c250/task.json",
+      "sha256": "a0eba01dc04f9d32a84a5cc4c9e61ca7370b508fc90f4a47aa959acab8c12da9"
+    },
+    {
+      "blob_sha1": "2816d1ee51ff2f523704c1930d8736eb99711036",
+      "commit": "cb0e63f5c33cd2de360b791038b0f5272750270e",
+      "path": "data/list_tasks.json",
+      "sha256": "7f830e871be620cad0f8ee8453e76810258c8c54dccb5cae400abea8eb495d57"
+    }
+  ],
+  "paired_scoring": {
+    "dc": {
+      "V0_only": 1,
+      "V_only": 8,
+      "cpu_seconds": {
+        "S": 302.8235,
+        "V": 242.671,
+        "V0": 304.2639
+      },
+      "criterion_pass": {
+        "J1": false,
+        "J2": true,
+        "J3": true
+      },
+      "exclusive": [
+        "dc/006",
+        "dc/007",
+        "dc/008",
+        "dc/009",
+        "dc/010",
+        "dc/169",
+        "dc/170",
+        "dc/171"
+      ],
+      "fit": {
+        "S": 163,
+        "V": 171,
+        "V0": 163
+      },
+      "mcnemar_p": 0.0390625,
+      "pass": false,
+      "solved": {
+        "S": 151,
+        "V": 158,
+        "V0": 151
+      },
+      "tasks": 199
+    },
+    "rule": {
+      "V0_only": 1,
+      "V_only": 4,
+      "cpu_seconds": {
+        "S": 426.7375,
+        "V": 395.2521,
+        "V0": 429.2958
+      },
+      "criterion_pass": {
+        "J1": false,
+        "J2": false,
+        "J3": true
+      },
+      "exclusive": [
+        "rule/c069",
+        "rule/c172",
+        "rule/c196"
+      ],
+      "fit": {
+        "S": 61,
+        "V": 65,
+        "V0": 60
+      },
+      "mcnemar_p": 0.375,
+      "pass": false,
+      "solved": {
+        "S": 61,
+        "V": 63,
+        "V0": 60
+      },
+      "tasks": 125
+    }
+  },
+  "prereg_sha256": "c4f7988b19adf2a351ab0af35e21c58642f698b7f202b9b2b1d5c96eb8fdbaa1",
+  "schema": "neumann.independent-invention-audit.v1",
+  "scientific_iteration2_pass": false
+}
