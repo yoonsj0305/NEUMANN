@@ -1,0 +1,295 @@
+{
+ "compositions_drawn": 277,
+ "fst": [
+  {
+   "draw": 1,
+   "name": "fst(k=2,pred=geq7,trans=toggle,out=x_if_s0)",
+   "sha256": "73b886debc186210ef29f558952c9db5dac1cd0c772ec61bbd3d82e3d8e5cfc1"
+  },
+  {
+   "draw": 4,
+   "name": "fst(k=2,pred=mod2,trans=count,out=x_plus_s)",
+   "sha256": "afdc37ef83335d5e954654729b775b58a841476b6a58972343f694a82d421ce0"
+  },
+  {
+   "draw": 5,
+   "name": "fst(k=3,pred=geq11,trans=toggle,out=x_if_s0)",
+   "sha256": "c2f6f60d45c187eaa82fdf2913916538f1a7788f085112baff7b27af75cda024"
+  },
+  {
+   "draw": 6,
+   "name": "fst(k=3,pred=mod2,trans=count,out=x_if_s0)",
+   "sha256": "5ea212a9e259fc4c529b009c4401ef37d7bf611722e21b3ef17c3706bd763351"
+  },
+  {
+   "draw": 10,
+   "name": "fst(k=2,pred=geq9,trans=toggle,out=keep_if_s0)",
+   "sha256": "c69a3acf3f98f9b65cf59ad23528d395c063dd6ba4cf29ff392eed2d7ca1c7b1"
+  },
+  {
+   "draw": 12,
+   "name": "fst(k=2,pred=eq15,trans=count,out=keep_if_s0)",
+   "sha256": "cf748244bfc9cbc35f3a248a65cbf88b1b73f4e2f432d4101a9a91f507f36c02"
+  },
+  {
+   "draw": 22,
+   "name": "fst(k=3,pred=geq8,trans=toggle,out=keep_if_s0)",
+   "sha256": "c08d0d570d97423b034e200834931248107bf144efd2287a5fdb748b50125c99"
+  },
+  {
+   "draw": 27,
+   "name": "fst(k=2,pred=geq11,trans=count,out=keep_if_s0)",
+   "sha256": "7670686dd0bcfca47f81305af0c6c32dab5021cffa56324ebf5560d3533d868c"
+  },
+  {
+   "draw": 32,
+   "name": "fst(k=2,pred=geq13,trans=count,out=keep_if_s0)",
+   "sha256": "fc9779d5135d319b16be5bfc9fd843d647ed279e4cdcebe660a42fea952dece7"
+  },
+  {
+   "draw": 36,
+   "name": "fst(k=2,pred=mod5,trans=count,out=keep_if_s0)",
+   "sha256": "f9a45e5adb6d709057feb400388b0643e7a480b38aa14a960c447f93a9adfcc9"
+  },
+  {
+   "draw": 42,
+   "name": "fst(k=3,pred=geq10,trans=count,out=keep_if_s0)",
+   "sha256": "65f00e88814863ffc1dcb10c58f16960658f586d67a9c84606f8279af0ae5de8"
+  },
+  {
+   "draw": 82,
+   "name": "fst(k=2,pred=mod3,trans=toggle,out=x_plus_s)",
+   "sha256": "e082b214aa58065e0471ba12312b805a87d30804ed0ea0601fc5ce9f282f5810"
+  },
+  {
+   "draw": 86,
+   "name": "fst(k=2,pred=eq10,trans=count,out=x_plus_s)",
+   "sha256": "158660ffc6c49bc7e0b0aaca5986f1e555fe105a0f4ba204ef5406025d11148d"
+  },
+  {
+   "draw": 89,
+   "name": "fst(k=2,pred=geq8,trans=toggle,out=keep_if_s0)",
+   "sha256": "45f42166c5134d733d3ffeb063abb54f55a32b3798969b442886f43588fec942"
+  },
+  {
+   "draw": 90,
+   "name": "fst(k=2,pred=eq2,trans=count,out=keep_if_s0)",
+   "sha256": "eab773c2d57935a6dad1c159afbcbeb1a282dd92905a7fb57f443337cb5d0f63"
+  },
+  {
+   "draw": 99,
+   "name": "fst(k=3,pred=geq3,trans=toggle,out=keep_if_s0)",
+   "sha256": "084a57de524c4ced446d5594adee8bec85ab526a68be053f3a1c085c4ca76a72"
+  }
+ ],
+ "fst_drawn": 99,
+ "lr_need12": [
+  {
+   "draw": 30,
+   "name": "rotate-k(k=3) | uniq",
+   "sha256": "a34eb70b47efcee27cbd7f42d64f8dcb0b2421f8765d17121b089ecad10d36f0"
+  },
+  {
+   "draw": 59,
+   "name": "repeat-k(k=2) | index-k(k=2)",
+   "sha256": "58587d7bade97cb4673fe42c195dde1537631e3962d3863454d844246b7baa68"
+  },
+  {
+   "draw": 72,
+   "name": "rotate-k(k=-2) | kth-smallest(k=3)",
+   "sha256": "ff6d6ca74c8455d5f8e06d30be08c6a90f5be295448a17d9f6b728a8031f47ff"
+  },
+  {
+   "draw": 78,
+   "name": "rotate-k(k=-2) | tail",
+   "sha256": "17a5c6fbf7837f6f3fc1a88c8bd769918a5ab168a70354c3b237d9f415ca4d1e"
+  },
+  {
+   "draw": 112,
+   "name": "intersperse-k(k=-2) | sum",
+   "sha256": "662e8ffa38113804b1d587b503662e788df2bce684fbf722d6c35fa4defb3180"
+  },
+  {
+   "draw": 118,
+   "name": "remove-mod-k(k=2) | kth-largest(k=2)",
+   "sha256": "083fb531a1a3f9e8efdaa26c187953d4f4468ea52034933f9c0be9fa881a4282"
+  },
+  {
+   "draw": 154,
+   "name": "intersperse-k(k=10) | is-odds",
+   "sha256": "7e85ac24a6a0b1743453f9021a4caab93575ab438be886c2332a3891d38fe9b0"
+  },
+  {
+   "draw": 217,
+   "name": "rotate-k(k=-2) | drop-k(k=5)",
+   "sha256": "448f32d6abcea6932a8a4c54adea482cf0cf7e4f3b54e80424b0137cfa09149d"
+  },
+  {
+   "draw": 218,
+   "name": "replace-index-k-with-n(k=3,n=-2) | kth-largest(k=3)",
+   "sha256": "5762a095777843ccf3b00aa83c64fc9b3685dcfae447b4a67ed242323bed0c51"
+  },
+  {
+   "draw": 245,
+   "name": "pow-k(k=2) | kth-largest(k=2)",
+   "sha256": "cae6fe6d462b23e37cbad06bd406a9fb6149c1138cb936a1d5fcfe6eb49e1d63"
+  },
+  {
+   "draw": 263,
+   "name": "intersperse-k(k=-2) | kth-smallest(k=3)",
+   "sha256": "eb45688b9e35122760db294b3d515a08b31cbeb00043b93a4bb4c7c9a646014b"
+  },
+  {
+   "draw": 277,
+   "name": "append-k(k=3) | index-k(k=3)",
+   "sha256": "57339250b46f7ef36d53aaf9f866b52c06b8ae5a508f5ccb9cefcfdd4852d2f0"
+  }
+ ],
+ "lr_ord12": [
+  {
+   "draw": 1,
+   "name": "add-k(k=-2) | intersperse-k(k=-2)",
+   "sha256": "7b52440a0763414e5adb39077fa4d1188f0356a8be75c4d5950aed765df2d2c2"
+  },
+  {
+   "draw": 2,
+   "name": "replace-index-k-with-n(k=3,n=-2) | intersperse-k(k=0)",
+   "sha256": "1a32756a187e67418c691c9e8815e9d5a35892a2543e396c86b873c154399103"
+  },
+  {
+   "draw": 3,
+   "name": "pow-base-k(k=2) | pow-k(k=3)",
+   "sha256": "010a4dbbb8128e6d2284448007f32a58b61bbbd860088f1dc0d15df0ee20c1f2"
+  },
+  {
+   "draw": 4,
+   "name": "append-k(k=10) | keep-mod-k(k=2)",
+   "sha256": "8f50a209ea1844904caa402426a14915936c6e828fe483c2e1aeaa98f0f31f48"
+  },
+  {
+   "draw": 5,
+   "name": "remove-mod-k(k=5) | remove-mod-k(k=3)",
+   "sha256": "dc835bd7c159cce1cbdac640d369a4716c6716274420adc49616f1a2d640f6e0"
+  },
+  {
+   "draw": 6,
+   "name": "modulo-k(k=3) | replace-index-k-with-n(k=5,n=0)",
+   "sha256": "a01341790aab3a7113361bb6a542479a7bd2802a9b37310a98e320ada1687d99"
+  },
+  {
+   "draw": 7,
+   "name": "identify-geq-k(k=2) | pow-base-k(k=3)",
+   "sha256": "2e13251228bdfbef50e679d3085cb6954b8e95ed23fe0d775f0c916ae5c21ed3"
+  },
+  {
+   "draw": 8,
+   "name": "mult-k(k=10) | repeat-k(k=3)",
+   "sha256": "f8ad99e553fb7540566452463d2762e4837bb4bb934b36567c5530e013afb044"
+  },
+  {
+   "draw": 10,
+   "name": "repeat-k(k=3) | min",
+   "sha256": "d5f60744b36543b0938dc0fd0a36ce2fb01be47928356d7632054abb580c63de"
+  },
+  {
+   "draw": 11,
+   "name": "keep-mod-k(k=3) | pow-base-k(k=2)",
+   "sha256": "94dc9dcf8ced74fae7368184baf55691854e1098b9661635a59c0daa58cc196a"
+  },
+  {
+   "draw": 12,
+   "name": "append-k(k=-2) | prepend-k(k=2)",
+   "sha256": "844f6bf1cb12833aba1206db77a732e797c81d6397433999b9cba0a25d579352"
+  },
+  {
+   "draw": 13,
+   "name": "drop-k(k=3) | empty",
+   "sha256": "5bd6934e2fded7cf0a0ac6dfea2decbfab78cdf853ad1b507ebd4784da2ae7a1"
+  }
+ ],
+ "rha": [
+  {
+   "draw": 1,
+   "name": "rha(k=3;p=lt_9;d=211110;o=mark)",
+   "sha256": "74dc035364415e6a64e2950c772a06cc9ab9cd57e5137b5a1a99dbecdd8703de"
+  },
+  {
+   "draw": 4,
+   "name": "rha(k=3;p=modlt_5_1+odd;d=101012110010;o=plus)",
+   "sha256": "b889926efc8fe354f3b05fc09880f10acb70e7f20499085a8c5beddb5e799acb"
+  },
+  {
+   "draw": 5,
+   "name": "rha(k=3;p=modlt_3_1;d=100221;o=keepset_02)",
+   "sha256": "fd97f7631b6bee14927d56ec0a5054f94171c7f1b250327f4928b551260e25d2"
+  },
+  {
+   "draw": 7,
+   "name": "rha(k=4;p=odd+in2_9_12;d=3203020312213313;o=plus)",
+   "sha256": "8fb4d0993807c9f471312e68eca5eb55d1d2ce61dc812c283944a9c0d61f4c6b"
+  },
+  {
+   "draw": 9,
+   "name": "rha(k=2;p=odd+in2_3_6;d=11110111;o=keepset_1)",
+   "sha256": "7144688ae53ad7e87fe2107b3af8ef4422f39d599ba5a9f87f4bd4bd375911dd"
+  },
+  {
+   "draw": 11,
+   "name": "rha(k=4;p=lt_11;d=02200311;o=keepset_0)",
+   "sha256": "dce7b3899329c5568a1d84ccfb8ec64fc82a87169f1c806a41ebf9085c9ce697"
+  },
+  {
+   "draw": 14,
+   "name": "rha(k=3;p=in2_3_13+modlt_3_1;d=202021202121;o=keepset_1)",
+   "sha256": "c1c5639f08e09ddbdbb09ea16d09dd014f2b1bf4a64053644d40b12e2271aae9"
+  },
+  {
+   "draw": 17,
+   "name": "rha(k=2;p=in2_1_6;d=0100;o=keepset_0)",
+   "sha256": "6910aa2a4bd1e3944083f2ffdeec3f147e8aaf98dcc6509e3f826c4502bb822f"
+  },
+  {
+   "draw": 19,
+   "name": "rha(k=2;p=modlt_4_2+odd;d=11101111;o=plus)",
+   "sha256": "54beaa4523fd22bf16442da47cff1cfe93bd1653f9cb0bf0e3911ba22ac9be84"
+  },
+  {
+   "draw": 21,
+   "name": "rha(k=4;p=odd+lt_7;d=3323003220322131;o=mark)",
+   "sha256": "7e4c11ffd0dcdb7401d7572119ec766b6fdae4b014e08e2c8f97446bfebe6164"
+  },
+  {
+   "draw": 23,
+   "name": "rha(k=4;p=in2_3_7;d=32033001;o=plus)",
+   "sha256": "471e761b9b558c618947d636867ea86d077fb10875925fd8e9a523de95a52f74"
+  },
+  {
+   "draw": 25,
+   "name": "rha(k=2;p=lt_13+modlt_5_3;d=01111001;o=plus)",
+   "sha256": "c6f47536226f9f5cb99e4d9b0d27d21a6acc165c1f61d25bc8841f8edfdacabb"
+  },
+  {
+   "draw": 27,
+   "name": "rha(k=4;p=modlt_5_1+odd;d=0002211013213120;o=keepset_01)",
+   "sha256": "2c1adfbfa78bcf4b20b484fe3bad00e13a227f11f5212530c3d88a0ab465689f"
+  },
+  {
+   "draw": 28,
+   "name": "rha(k=4;p=odd+in2_1_10;d=1322221101301320;o=plus)",
+   "sha256": "e3947186451c9cc7acf5717e1b92fa133ad138116bbf2e4248178b7172723fe5"
+  },
+  {
+   "draw": 29,
+   "name": "rha(k=2;p=modlt_3_2;d=1000;o=keepset_0)",
+   "sha256": "35fc4a139600d93aec5a51d65487f157eb40d5375648b869741571cc9f027c4d"
+  },
+  {
+   "draw": 30,
+   "name": "rha(k=2;p=odd;d=1001;o=keepset_1)",
+   "sha256": "52c92cd7e913448b86f2997a3fbf62841765535bf2a2dbc429ddb41e5b547f2d"
+  }
+ ],
+ "rha_drawn": 30,
+ "rule": "first n latent-need tasks of each generator with the seeds above, every earlier name excluded; sha256 of {name, train, test} of Env(spec, 0)",
+ "schema": "neumann.q3-psi41-eval-set.v1"
+}
