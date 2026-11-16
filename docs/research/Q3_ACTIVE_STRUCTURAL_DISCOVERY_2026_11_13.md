@@ -2344,3 +2344,89 @@ NEUMANN_REPLAY_ROWS=run1.jsonl python research/q3/budgeted_reach_dev.py --names-
 python research/q3/psi41_verdict_dev.py --base run1.jsonl --reps rep2.jsonl rep3.jsonl seeds.jsonl --dq rdq.jsonl
 python -m pytest -q tests/test_psi.py
 ```
+
+## 42. Beyond finite automata: hidden numeric registers (2026-11-16) — DEVELOPMENT ONLY
+
+Directive: does the §41 discovery principle construct numeric / relational state and execution rules that are not
+predefined, without a dedicated inventor? Every added algorithm had to prove the constraint it removes, or be
+discarded. The §41 evaluation is used as development data only. Raw evidence: `docs/experiments/dev/psi42/`.
+
+**Result in one line.** The principle itself is type-independent. Its construction step is not: on a new family of
+hidden numeric registers, three general constructions were tried; none removed the binding constraint at the agent
+level, so all three were discarded. The pre-registered independent test of the unchanged §41 mechanism solves
+**0 / 16** (A 0, Rno 0): **V2 rule not met on this set (FAIL)**. One development task shows the principle building
+the *minimal finite abstraction* of an unbounded register.
+
+### 42.1 The type-independent part of PSI41
+
+Four parts carry over unchanged from §41:
+1. **Evidence:** residual future signatures, i.e. separations and merges of observed prefixes.
+2. **Version space:** the executable structures consistent with that evidence.
+3. **Discriminating experiments:** the next observation splits the surviving structures.
+4. **Identify before synthesising,** and re-identify on refutation.
+
+The type-specific part is the **construction step**. It offers only finite tables (k ≤ k_min + 1) and a fixed
+universal fold list (`accumulators()`: probes −3..7, constants 0..9, 700 programs).
+
+### 42.2 New computational structure: hidden register transducers
+
+`research/q3/psi42_hrt_family.py`, developer-authored and written before any run on it:
+* the hidden state is an integer register h with h' = U(h, x), where U ∈ {max; (h + x) mod m; previous element;
+  relational counter; saturating sum; x − h};
+* the outputs are lossy: h' + x; x − h; x if x > h; h' mod 5; x if h' is even.
+
+Controlled diagnosis on 24 development draws (oracle side, nothing counted; `controlled_sufficiency_and_universal_list.jsonl`):
+* **Representation sufficiency.** Given the true register before and after each element, the unchanged synthesiser
+  builds an exact Update (200/200 fresh) for **18 / 24** tasks.
+* **Representability in §41's space.** The true state partition is in the universal fold list for only **9 / 24**.
+  It is missing for every `summod` and for most saturating sums.
+
+### 42.3 Constructions tried and discarded (rule: no constraint removed → discarded)
+
+| construction | constraint targeted | measured effect | decision |
+|---|---|---|---|
+| task-conditioned register enumeration (probes from the task's value range, observed values as constants) | the fixed universal list | reaches the true partition for 2 / 24 (vs 9 / 24 for the list): the extra constants blow up the space of small programs | discarded |
+| evidence-guided register search (evidence check inside the cost-ordered enumeration, no list cap) | the list's fixed size | 2 / 24 within 5 s; max and (h + x) mod m are not reached | discarded |
+| predictive-state coordinates (PSI42: test outcomes as state, closure on observed transitions, supervised Update) | latent values that are never observed | offline, with unlimited data, closed coordinates exist for 9 / 24 (6 outside §41's space; `offline_predictive_coordinates.txt`). In the agent at 60 queries, each test has only 2–15 coordinate transitions and the Updates fail held-out validation: S verifies **0 / 24** vs R 1 / 24 (`dev24_A_R_S_discarded_PSI42.jsonl`) | discarded |
+
+**Diagnosis.** At this budget the binding constraint is the **observation cost of latent numeric values**: each
+coordinate value costs a SOURCE query. The update grammar is not the limit; the Update is easy once the values are
+known (18 / 24).
+
+### 42.4 Development finding (not counted)
+
+On `hrt(u=diff;o=evenkeep)` (register h' = x − h; output x when h' is even), the unchanged R verifies **5/5** runs
+(297/297 random inputs); A gets 0/5 and Rno 0/4. It did not adopt the numeric register (sub $1 $0) from the fold list.
+It constructed `automaton(k=2; guard=(eq 0 (mod $0 2)))`: the **parity of the register**. That is the minimal state
+the task needs, a finite abstraction of an unbounded register, built from observation
+(`dev_diff_evenkeep_A_R_Rno_replicates.jsonl`).
+
+### 42.5 Pre-registered independent test (frozen in `8aaa8a3` before any run on it)
+
+* **Set:** 16 new latent-need HRT draws (seed `neumann-q3-psi42-hrt-eval`; the 24 development names excluded). The
+  fixed rule produced 14 saturating-sum tasks.
+* **Arms:** A; R (the §41 mechanism, unchanged); Rno.
+
+| arm | verified | hidden-test solved | CPU s |
+|---|---|---|---|
+| A | 0 / 16 | 0 | 480.3 |
+| R | 0 / 16 | 0 | 480.2 |
+| Rno | 0 / 16 | 0 | 480.3 |
+
+* **R's rounds:** 8 ended with **no consistent structure at all** (the version space was empty; this happened in 6 of
+  the 16 tasks). 15 ended undetermined, 3 in search time, and 8 were skipped by the budget or necessity checks.
+* **Core evidence:** none. **Frozen V2 rule:** 0 < 5 → **FAIL on this set.** The official verdicts are unchanged
+  (V1 PASS sealed, V2 FAIL FORMAL / independent OPEN, V3 FAIL, Q3 OPEN); Q6 untouched.
+
+### 42.6 Answer to the directive's question
+
+*Can the same discovery mechanism construct numeric / relational representations that were not predefined?*
+**Not established.**
+* The identification principle is general. It even finds a finite sufficient abstraction of a numeric register when
+  one is small (§42.4).
+* But no general constructor of **numeric executable state from lossy observations within 60 queries** exists in the
+  system. An empty version space shows that the needed state lies outside every family the construction step offers.
+
+The next fundamental requirement is a constructor that infers latent values and their update together from the
+observations already paid for (latent-variable program induction). Larger lists, more states or more CPU would not
+supply that.
