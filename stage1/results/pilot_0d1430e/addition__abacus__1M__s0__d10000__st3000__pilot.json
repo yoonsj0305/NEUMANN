@@ -1,0 +1,183 @@
+{
+ "name": "addition__abacus__1M__s0__d10000__st3000__pilot",
+ "task": "addition",
+ "kind": "abacus",
+ "scale": "1M",
+ "params": 857216,
+ "config": {
+  "d": 128,
+  "heads": 4,
+  "layers": 4
+ },
+ "seed": 0,
+ "data_size": 10000,
+ "data_requested": 10000,
+ "steps": 3000,
+ "batch": 64,
+ "lr": 0.001,
+ "abacus_offset_max": 100,
+ "train_len": 10,
+ "eval_size": 200,
+ "eval": {
+  "10": {
+   "x_train_len": 1,
+   "accuracy": 0.09,
+   "infer_flops": 109629132800
+  },
+  "20": {
+   "x_train_len": 2,
+   "accuracy": 0.0,
+   "infer_flops": 395686860800
+  },
+  "30": {
+   "x_train_len": 3,
+   "accuracy": 0.0,
+   "infer_flops": 875347148800
+  },
+  "40": {
+   "x_train_len": 4,
+   "accuracy": 0.0,
+   "infer_flops": 1541349145600
+  }
+ },
+ "train_flops": 28343910924288,
+ "wall_train_s": 510.31,
+ "wall_eval_s": 58.87,
+ "final_loss": 0.009,
+ "loss_curve": [
+  [
+   0,
+   4.9037
+  ],
+  [
+   100,
+   2.305
+  ],
+  [
+   200,
+   1.9827
+  ],
+  [
+   300,
+   1.8756
+  ],
+  [
+   400,
+   1.7556
+  ],
+  [
+   500,
+   1.6158
+  ],
+  [
+   600,
+   1.5736
+  ],
+  [
+   700,
+   1.3886
+  ],
+  [
+   800,
+   1.3792
+  ],
+  [
+   900,
+   1.269
+  ],
+  [
+   1000,
+   1.3518
+  ],
+  [
+   1100,
+   1.2206
+  ],
+  [
+   1200,
+   0.9068
+  ],
+  [
+   1300,
+   0.8468
+  ],
+  [
+   1400,
+   0.5468
+  ],
+  [
+   1500,
+   0.3593
+  ],
+  [
+   1600,
+   0.3532
+  ],
+  [
+   1700,
+   0.2063
+  ],
+  [
+   1800,
+   0.22
+  ],
+  [
+   1900,
+   0.1705
+  ],
+  [
+   2000,
+   0.1639
+  ],
+  [
+   2100,
+   0.0623
+  ],
+  [
+   2200,
+   0.0443
+  ],
+  [
+   2300,
+   0.3242
+  ],
+  [
+   2400,
+   0.0645
+  ],
+  [
+   2500,
+   0.0148
+  ],
+  [
+   2600,
+   0.034
+  ],
+  [
+   2700,
+   0.0095
+  ],
+  [
+   2800,
+   0.0049
+  ],
+  [
+   2900,
+   0.0131
+  ],
+  [
+   2999,
+   0.009
+  ]
+ ],
+ "hardware": {
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "torch_threads": 1,
+  "torch": "2.15.0+cu132",
+  "cuda": false,
+  "python": "3.12.3"
+ },
+ "commit": "51fe32eb79682e8b80251fc48cc39974c84b63a1",
+ "flops_note": "analytic from executed shapes; training = 3 x forward; inference without KV cache"
+}
