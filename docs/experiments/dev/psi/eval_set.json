@@ -1,0 +1,303 @@
+{
+ "compositions_drawn": 654,
+ "fst16": [
+  {
+   "draw": 5,
+   "name": "fst(k=2,pred=mod2,trans=toggle,out=keep_if_s0)",
+   "sha256": "9a7d75c9916f51282fe0f9efa7e25ac0189e56e46c207de6059ddd6ff2d1f961"
+  },
+  {
+   "draw": 11,
+   "name": "fst(k=2,pred=eq13,trans=count,out=keep_if_s0)",
+   "sha256": "85c0f522097c01115ba713f69ec4cf917111c9234be59cf9eb9327664e891c3e"
+  },
+  {
+   "draw": 12,
+   "name": "fst(k=3,pred=geq4,trans=toggle,out=keep_if_s0)",
+   "sha256": "df2898b32f2f5843009f93e7a5029c4b75455940db4173371697d2ae646d9e89"
+  },
+  {
+   "draw": 13,
+   "name": "fst(k=2,pred=mod3,trans=count,out=x_plus_s)",
+   "sha256": "827c4cda3526b7b9136bd2c1a848fce29b87f85effd472a9f14b0dd269f215f7"
+  },
+  {
+   "draw": 33,
+   "name": "fst(k=2,pred=geq10,trans=count,out=x_if_s0)",
+   "sha256": "da0a483483b895351613cf99de13a29ae05b252c57b641080df4a4a5bb30a904"
+  },
+  {
+   "draw": 34,
+   "name": "fst(k=2,pred=geq6,trans=count,out=x_if_s0)",
+   "sha256": "fedf7cf08ab77019c5f4e4b0102c67aebd3c21e5870ee735fcc136795bcb02b4"
+  },
+  {
+   "draw": 36,
+   "name": "fst(k=3,pred=mod3,trans=count,out=keep_if_s0)",
+   "sha256": "3425b95379f98b43f6e36c4e8cbb7a0662dcd660359517004c42c8714f995387"
+  },
+  {
+   "draw": 40,
+   "name": "fst(k=3,pred=geq11,trans=count,out=x_if_s0)",
+   "sha256": "edc56582c3c024cf6314663f5b25f1c6e273dc0ee9485814157394adfa061d82"
+  },
+  {
+   "draw": 50,
+   "name": "fst(k=3,pred=mod2,trans=toggle,out=x_plus_s)",
+   "sha256": "407fb7337d6553b6fc6c7aa55b0ce13cc1d9da6da1f8e86709902806af0fa465"
+  },
+  {
+   "draw": 56,
+   "name": "fst(k=3,pred=mod3,trans=toggle,out=keep_if_s0)",
+   "sha256": "52443de545eaae0c3e51caaeb80d09d6d15dde8f377f6312defe6fe912ccd935"
+  },
+  {
+   "draw": 57,
+   "name": "fst(k=2,pred=geq5,trans=toggle,out=keep_if_s0)",
+   "sha256": "aa9c3181beb8880cbf873cbf6d26924ac5d74a2ed75186dbea9542e2f2213092"
+  },
+  {
+   "draw": 63,
+   "name": "fst(k=2,pred=mod2,trans=count,out=keep_if_s0)",
+   "sha256": "8b6eaf113a25d121dc6b8314b151150aa103314d69496449f6bc6b0ab7dba6ed"
+  },
+  {
+   "draw": 68,
+   "name": "fst(k=3,pred=geq12,trans=count,out=keep_if_s0)",
+   "sha256": "f3d6c88e83a13fb74c911a9bcb53c8253fff1ca7aed5908ec45026e286cc863a"
+  },
+  {
+   "draw": 72,
+   "name": "fst(k=2,pred=mod2,trans=count,out=x_if_s0)",
+   "sha256": "bb8006e9cb850651f8391ee8a67a802a733b30c1cdea9592035d9f8a7a8962fd"
+  },
+  {
+   "draw": 73,
+   "name": "fst(k=3,pred=geq9,trans=count,out=keep_if_s0)",
+   "sha256": "42caca7ac9e2511f126bb9501fa387fed3979039c012a6257489ebe8ea35f80e"
+  },
+  {
+   "draw": 86,
+   "name": "fst(k=2,pred=mod4,trans=saturate,out=x_plus_s)",
+   "sha256": "70ca26f6e4a9b05ad43a0bc4147448eb3ae4a62ae2b33aafa619d7ac6946347d"
+  }
+ ],
+ "fst_drawn": 86,
+ "latent_need30": [
+  {
+   "draw": 11,
+   "name": "intersperse-k(k=0) | kth-smallest(k=3)",
+   "sha256": "1fb41509fdaf4a58b87ad94def1492478431859ea6103f05277e25e0e7d0526a"
+  },
+  {
+   "draw": 18,
+   "name": "rotate-k(k=10) | take-k(k=2)",
+   "sha256": "732742885baf8094e8ca058cc8a12025b7574e4da899cd88d9d66b1e4da257c7"
+  },
+  {
+   "draw": 70,
+   "name": "sort | kth-smallest(k=3)",
+   "sha256": "6345b1bda3d83d92057b71cd3613a91408d8112a718f73f75b56b7cff567c4f9"
+  },
+  {
+   "draw": 86,
+   "name": "replace-index-k-with-n(k=5,n=0) | kth-smallest(k=3)",
+   "sha256": "bcc4dc9d9627233af3849f80c8b938d9aec06b23516f0653eefd028c378bdee0"
+  },
+  {
+   "draw": 103,
+   "name": "prepend-k(k=10) | kth-largest(k=2)",
+   "sha256": "eb1ae13c832c7f6b1eb77a0ebbfa6ebda9e64032c761ddd12d31d3077ec57d62"
+  },
+  {
+   "draw": 109,
+   "name": "dedup | len",
+   "sha256": "ea0d50d9f9d70e527427b2ad35dab39f16c1a69dd932121c5ac191e03c49243c"
+  },
+  {
+   "draw": 131,
+   "name": "replace-all-k-with-n(k=1,n=2) | kth-smallest(k=3)",
+   "sha256": "c98ad96c614612c218f2dbe1769c64442c64a766ce27674f7bf50fa38aa81b59"
+  },
+  {
+   "draw": 140,
+   "name": "identify-k(k=1) | kth-smallest(k=3)",
+   "sha256": "30214d92587b64dd424d1fcb227f22743b36aabca660d0d4131d7ad0b099ea88"
+  },
+  {
+   "draw": 145,
+   "name": "sort | identify-is-mod-k(k=2)",
+   "sha256": "53354bb603a748f907252f197aa0949f654db91c8a3121fa9679741848c922f2"
+  },
+  {
+   "draw": 148,
+   "name": "keep-mod-k(k=2) | kth-largest(k=3)",
+   "sha256": "225f42b26a5316a77bea521600e6f24e828eb486038464fed61d1e49f05f389c"
+  },
+  {
+   "draw": 156,
+   "name": "keep-mod-k(k=5) | kth-smallest(k=2)",
+   "sha256": "e2e74ace38301a7cfe38f2baab54d6078f2569383c7f7f625c5b652dc3146180"
+  },
+  {
+   "draw": 157,
+   "name": "dedup | identify-is-mod-k(k=7)",
+   "sha256": "887f49a2865f682a07f3fc242e9992c19d57ac906d89c65a823324b104a5bf32"
+  },
+  {
+   "draw": 191,
+   "name": "prepend-k(k=-2) | kth-largest(k=2)",
+   "sha256": "bb01b62d4ade71d1dbc9c0445721895156c58723d3bdc74ed34202f7588d1b29"
+  },
+  {
+   "draw": 220,
+   "name": "rotate-k(k=3) | drop-k(k=5)",
+   "sha256": "ffab9707e57df544f352298515bd637056a6e68caa9515e6f69146004aeba3a1"
+  },
+  {
+   "draw": 247,
+   "name": "repeat-k(k=3) | drop-k(k=3)",
+   "sha256": "aaaca2d0db1eb3ba592f485a48bfe7f0887bb1ee80e437fb6652841c07b7a21b"
+  },
+  {
+   "draw": 248,
+   "name": "identify-k(k=2) | kth-largest(k=3)",
+   "sha256": "90cbadbc709aebf8d3a81c0cd55c0e353b940880befef1f1c5e0f68aaf201e66"
+  },
+  {
+   "draw": 306,
+   "name": "modulo-k(k=3) | kth-smallest(k=2)",
+   "sha256": "da0579c2704a84ed9f96e8c9da6f7a9f2703f1dc26d57af4b43d2937cefe4bef"
+  },
+  {
+   "draw": 314,
+   "name": "rotate-k(k=-2) | take-k(k=2)",
+   "sha256": "26a641442a2ca82ed26e7dc9244e42b3837a21834e88319763df3268c0489add"
+  },
+  {
+   "draw": 331,
+   "name": "uniq | identify-k(k=3)",
+   "sha256": "d85d3929b37849ab750c998fba733fa534e6bbe59da6d6c3b962d415f23c323a"
+  },
+  {
+   "draw": 411,
+   "name": "uniq | identify-is-mod-k(k=7)",
+   "sha256": "bcbbcb6599ccc816e58cc1dbfe5b2be3ace4c9a48d57a6a62b2a7c8242480c8f"
+  },
+  {
+   "draw": 487,
+   "name": "add-k(k=-2) | kth-smallest(k=2)",
+   "sha256": "6c591e802240751cc187283f355b62f138bad9803cecce2bb473fbad3bc10e14"
+  },
+  {
+   "draw": 507,
+   "name": "pow-base-k(k=3) | kth-smallest(k=2)",
+   "sha256": "dece6810fe21953fade5c3292cfadcd765dfbe09db72864ebaa36610012dc664"
+  },
+  {
+   "draw": 514,
+   "name": "modulo-k(k=10) | kth-largest(k=2)",
+   "sha256": "fdbe273625a5f9e90e5a9f730b45cbf9a58554af8482e604004c198cb87b3440"
+  },
+  {
+   "draw": 543,
+   "name": "rotate-k(k=3) | drop-k(k=2)",
+   "sha256": "a0c04a6688c863abd9f9f09f4ae16a4a35099f0847748ed7ea29c72f464a05ef"
+  },
+  {
+   "draw": 573,
+   "name": "sort | identify-is-prime",
+   "sha256": "e51cd51413fd98b3765127ed71f1340782f01dad4c8a40c67ef6615139ba5a86"
+  },
+  {
+   "draw": 586,
+   "name": "intersperse-k(k=10) | kth-largest(k=2)",
+   "sha256": "0ba8d435663e7ac05d7ac44ee2d97a3f638faf20c152d20c44504f30e23eaca2"
+  },
+  {
+   "draw": 595,
+   "name": "drop-k(k=3) | kth-smallest(k=2)",
+   "sha256": "a2fab4267ac01703602d0e206f75bb3a3041f5746658bb91651b0674fca678e0"
+  },
+  {
+   "draw": 619,
+   "name": "modulo-k(k=2) | kth-largest(k=3)",
+   "sha256": "7bd803f818e1bd81c41b69e80355f55b338fc65ed1b5d726ac01526a3935acdb"
+  },
+  {
+   "draw": 635,
+   "name": "uniq | identify-k(k=1)",
+   "sha256": "86653cdd34a42126b2e3618b454dd41ca54e8973bc83feac27cd968281093348"
+  },
+  {
+   "draw": 654,
+   "name": "rotate-k(k=-2) | replace-index-k-with-n(k=3,n=-2)",
+   "sha256": "93f1e6c65476248d034e8347303a6d1262851cc36aec561306683793232326e6"
+  }
+ ],
+ "ordinary12": [
+  {
+   "draw": 1,
+   "name": "slice-k-n(k=2,n=2) | index-k(k=2)",
+   "sha256": "36e119732f314e71bfe753e15e14b58ff770aee2ed28680e6e5bc0df6b9b9dcb"
+  },
+  {
+   "draw": 2,
+   "name": "identify-k(k=1) | intersperse-k(k=0)",
+   "sha256": "d3bb2bcbe5b1c010bf9da9e24570092eecf3bb5794eb2ca977fea5057796a3b2"
+  },
+  {
+   "draw": 3,
+   "name": "prepend-k(k=-2) | mult-k(k=3)",
+   "sha256": "9c21b97e076b532ed48e8e87f95d0b59dde36b44467c48425eaaa2dbc4fef37c"
+  },
+  {
+   "draw": 4,
+   "name": "add-k(k=1) | rotate-k(k=3)",
+   "sha256": "e7731cc27191689bddc79c63d45c040cfb46f414927e215aaf715455cbb73d19"
+  },
+  {
+   "draw": 5,
+   "name": "rotate-k(k=1) | identify-k(k=-2)",
+   "sha256": "2dd9670fabfab475e5e238ce3914b8b8fc26c85c67b8da8b5c09da71b1554a57"
+  },
+  {
+   "draw": 7,
+   "name": "add-k(k=1) | sort",
+   "sha256": "31fa616ca98caaf3f7f57390d9b269775ceac2b47513b7cdd379810857663586"
+  },
+  {
+   "draw": 8,
+   "name": "pow-base-k(k=2) | sum",
+   "sha256": "c5f0f4ae94ef1669aa1c8f91ee2b121e9f5a4c799678821c1117bda79317d5a7"
+  },
+  {
+   "draw": 9,
+   "name": "mult-k(k=-2) | add-k(k=1)",
+   "sha256": "af8c786211a9169991c9163496047c6209552667a0447afa1a7e90d7dbfc83bb"
+  },
+  {
+   "draw": 10,
+   "name": "prepend-k(k=3) | keep-mod-k(k=5)",
+   "sha256": "7d1a47af161eb3cc3019d8149a5d8629eca1f90bee8e40398ea6df477d4779f6"
+  },
+  {
+   "draw": 12,
+   "name": "replace-all-k-with-n(k=1,n=2) | identify-geq-k(k=2)",
+   "sha256": "a511c91a5a73ef0899bb77e7178d222a964c7cbe2824164219fb7986e12106a8"
+  },
+  {
+   "draw": 13,
+   "name": "replace-index-k-with-n(k=2,n=10) | identify-k(k=1)",
+   "sha256": "15cb0a251934c9fc47610fe223ccea3231dce3d0183325035236bb98e1335943"
+  },
+  {
+   "draw": 14,
+   "name": "identify-is-mod-k(k=3) | drop-k(k=5)",
+   "sha256": "e37c95b6ee8b17fa52515534e1b58ef96e497795bbfabaa82892cfaa25a172c4"
+  }
+ ],
+ "rule": "* latent_need(spec): developer-side classification with the reference function (never visible to the agent):\n  the answer-as-state W = [()] is insufficient in BOTH directions -- among 150 sampled prefixes (values from the\n  task's own initial examples, seed 3) and 4 next elements each, two prefixes with the same answer and the same next\n  element get different next answers.  A task property, decided before any agent run.\n* list-routines (same lineage): new two-routine compositions with the tasks() rule and the seed string\n  \"compose:neumann-q3-psi-eval-v1\", excluding every earlier name (the 228 tasks and the section 38 compositions):\n    latent_need30  -- the first 30 latent-need compositions in generation order\n    ordinary12     -- the first 12 compositions that are NOT latent-need (a regression check)\n* fst16 -- the first 16 latent-need hidden finite-state transducers of research/q3/psi_fst_family.py with the seed\n  \"neumann-q3-psi-fst-v1\" (a developer-authored second family).\nPer task: name and sha256 of canonical {name, train, test} of Env(spec, 0).",
+ "schema": "neumann.q3-psi-eval-set.v1",
+ "status": "PRE-REGISTERED before any agent run on these tasks (development; see prereg.json)"
+}

@@ -1,0 +1,336 @@
+{
+ "examples": [
+  {
+   "label": 0,
+   "outcome": "Update found but 8 initial examples fold wrongly",
+   "task": "dedup | tail",
+   "vars": [
+    [
+     "$1",
+     "0"
+    ]
+   ]
+  },
+  {
+   "label": 0,
+   "outcome": "Update found but 8 initial examples fold wrongly",
+   "task": "dedup | tail",
+   "vars": [
+    [
+     "(mul $0 $1)",
+     "1"
+    ]
+   ]
+  },
+  {
+   "label": 0,
+   "outcome": "Update found but 40 initial examples fold wrongly",
+   "task": "dedup | tail",
+   "vars": [
+    [
+     "$1",
+     "0"
+    ]
+   ]
+  },
+  {
+   "label": 0,
+   "outcome": "no Update within the synthesis budget",
+   "task": "dedup | tail",
+   "vars": [
+    [
+     "(sub $1 $0)",
+     "0"
+    ]
+   ]
+  },
+  {
+   "label": 0,
+   "outcome": "Update found but 8 initial examples fold wrongly",
+   "task": "identify-k(k=1) | kth-smallest(k=2)",
+   "vars": [
+    [
+     "$1",
+     "0"
+    ]
+   ]
+  },
+  {
+   "label": 0,
+   "outcome": "ok",
+   "task": "identify-k(k=1) | kth-smallest(k=2)",
+   "vars": [
+    [
+     "(mul $0 $1)",
+     "1"
+    ]
+   ]
+  },
+  {
+   "label": 0,
+   "outcome": "Update found but 3 initial examples fold wrongly",
+   "task": "intersperse-k(k=0) | kth-largest(k=3)",
+   "vars": [
+    [
+     "$1",
+     "0"
+    ]
+   ]
+  },
+  {
+   "label": 0,
+   "outcome": "Update found but 4 initial examples fold wrongly",
+   "task": "intersperse-k(k=0) | kth-largest(k=3)",
+   "vars": [
+    [
+     "(sub $1 $0)",
+     "0"
+    ]
+   ]
+  },
+  {
+   "label": 0,
+   "outcome": "ok",
+   "task": "intersperse-k(k=1) | kth-smallest(k=3)",
+   "vars": [
+    [
+     "(sub $1 $0)",
+     "0"
+    ]
+   ]
+  },
+  {
+   "label": 0,
+   "outcome": "Update found but 8 initial examples fold wrongly",
+   "task": "kth-largest(k=3)",
+   "vars": [
+    [
+     "$1",
+     "0"
+    ]
+   ]
+  },
+  {
+   "label": 0,
+   "outcome": "Update found but 8 initial examples fold wrongly",
+   "task": "kth-largest(k=3)",
+   "vars": [
+    [
+     "(add $0 $1)",
+     "0"
+    ]
+   ]
+  },
+  {
+   "label": 0,
+   "outcome": "Update found but 8 initial examples fold wrongly",
+   "task": "kth-smallest(k=2)",
+   "vars": [
+    [
+     "$1",
+     "0"
+    ]
+   ]
+  },
+  {
+   "label": 0,
+   "outcome": "Update found but 8 initial examples fold wrongly",
+   "task": "kth-smallest(k=2)",
+   "vars": [
+    [
+     "(sub $1 $0)",
+     "0"
+    ]
+   ]
+  },
+  {
+   "label": 0,
+   "outcome": "Update found but 7 initial examples fold wrongly",
+   "task": "kth-smallest(k=3)",
+   "vars": [
+    [
+     "$1",
+     "0"
+    ]
+   ]
+  },
+  {
+   "label": 0,
+   "outcome": "Update found but 7 initial examples fold wrongly",
+   "task": "kth-smallest(k=3)",
+   "vars": [
+    [
+     "(sub $1 $0)",
+     "0"
+    ]
+   ]
+  },
+  {
+   "label": 0,
+   "outcome": "ok",
+   "task": "positions | append-k(k=3)",
+   "vars": [
+    [
+     "$1",
+     "1"
+    ]
+   ]
+  },
+  {
+   "label": 1,
+   "outcome": "ok",
+   "task": "prepend-k(k=-2) | positions",
+   "vars": [
+    [
+     "(add $0 1)",
+     "0"
+    ]
+   ]
+  },
+  {
+   "label": 1,
+   "outcome": "ok",
+   "task": "prepend-k(k=10) | positions",
+   "vars": [
+    [
+     "(add $0 1)",
+     "0"
+    ]
+   ]
+  },
+  {
+   "label": 0,
+   "outcome": "no Update within the synthesis budget",
+   "task": "rotate-k(k=3) | remove-mod-k(k=2)",
+   "vars": [
+    [
+     "$1",
+     "1"
+    ]
+   ]
+  },
+  {
+   "label": 0,
+   "outcome": "no Update within the synthesis budget",
+   "task": "rotate-k(k=3) | remove-mod-k(k=2)",
+   "vars": [
+    [
+     "$1",
+     "0"
+    ]
+   ]
+  },
+  {
+   "label": 0,
+   "outcome": "ok",
+   "task": "positions | append-k(k=3)",
+   "vars": [
+    [
+     "$1",
+     "1"
+    ]
+   ]
+  },
+  {
+   "label": 0,
+   "outcome": "no Update within the synthesis budget",
+   "task": "pow-k(k=4) | index-k(k=2)",
+   "vars": [
+    [
+     "$1",
+     "0"
+    ]
+   ]
+  },
+  {
+   "label": 0,
+   "outcome": "no Update within the synthesis budget",
+   "task": "pow-k(k=4) | index-k(k=2)",
+   "vars": [
+    [
+     "(sub $1 $0)",
+     "0"
+    ]
+   ]
+  },
+  {
+   "label": 1,
+   "outcome": "ok",
+   "task": "prepend-k(k=-2) | positions",
+   "vars": [
+    [
+     "(add $0 1)",
+     "0"
+    ]
+   ]
+  },
+  {
+   "label": 1,
+   "outcome": "ok",
+   "task": "prepend-k(k=10) | positions",
+   "vars": [
+    [
+     "(add $0 1)",
+     "0"
+    ]
+   ]
+  },
+  {
+   "label": 0,
+   "outcome": "no Update within the synthesis budget",
+   "task": "rotate-k(k=3) | remove-mod-k(k=2)",
+   "vars": [
+    [
+     "$1",
+     "1"
+    ]
+   ]
+  },
+  {
+   "label": 0,
+   "outcome": "no Update within the synthesis budget",
+   "task": "rotate-k(k=3) | remove-mod-k(k=2)",
+   "vars": [
+    [
+     "$1",
+     "0"
+    ]
+   ]
+  }
+ ],
+ "n": 27,
+ "positives": 4,
+ "schema": "neumann.q3-psi-policy.v1",
+ "training_rows": [
+  "docs/experiments/dev/psi/train68_iter10_P.jsonl",
+  "docs/experiments/dev/psi/train68_iter12_P.jsonl"
+ ],
+ "training_tasks": [
+  "dedup | tail",
+  "identify-k(k=1) | kth-smallest(k=2)",
+  "intersperse-k(k=0) | kth-largest(k=3)",
+  "intersperse-k(k=1) | kth-smallest(k=3)",
+  "kth-largest(k=3)",
+  "kth-smallest(k=2)",
+  "kth-smallest(k=3)",
+  "positions | append-k(k=3)",
+  "pow-k(k=4) | index-k(k=2)",
+  "prepend-k(k=-2) | positions",
+  "prepend-k(k=10) | positions",
+  "rotate-k(k=3) | remove-mod-k(k=2)"
+ ],
+ "weights": {
+  "bias": 0.11502,
+  "case": 0.0,
+  "evidence": 0.29408,
+  "false_split_frac": 0.0,
+  "granularity": -0.63836,
+  "keeps_h": 1.47144,
+  "list": 0.0,
+  "n_vars2": 0.0,
+  "reads_e": -3.61955,
+  "size": 0.52355,
+  "start_0": 0.61178,
+  "start_1": -0.49676
+ }
+}

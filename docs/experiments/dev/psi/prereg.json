@@ -1,0 +1,157 @@
+{
+ "arms": {
+  "A": "baseline: synthetic trajectories, existing invention, no PSI, no repair, floor 0",
+  "AF": "A + the existing per-round synthesis CPU floor MIN_SYNTH_CPU 10 s (control: CPU reallocation, not representation)",
+  "AR": "A + the existing in-place counterexample repair (control: separates repair from the latent)",
+  "P": "A + PSI (PSI_QUERIES 10, PSI_K 2, PSI_SYNTH_SHARE 0.6, PSI_CPU_FRAC 1.0, description-length/posterior ranking) + in-place repair",
+  "PDq": "V2 control: P's SOURCE queries replayed and solved passively (Dq), no formation",
+  "Pl": "P with the learned discovery policy (policy.json weights, fitted on training tasks only)",
+  "Pno": "P with the discovered latent withheld (same distinction experiments and invention; necessity control)"
+ },
+ "budget": {
+  "clock": "time.process_time()",
+  "cpu_seconds": 30.0,
+  "formation_deadline": "0.6 x cap (unchanged)",
+  "source_queries": 60
+ },
+ "code_blobs": {
+  "neumann1/active.py": "9068c224e1fc232c4f2583e3e21f58ae516094fa",
+  "neumann1/latent.py": "0cb2d401e4074c0f3d37ba1b6f2bee7514fb75b3",
+  "neumann1/psi.py": "0aff26573be801805fa12a479599b7236091f38a",
+  "research/q3/budgeted_reach_dev.py": "3aa428b2281dc642b6c7584bf88b3d01601aa5f8",
+  "research/q3/env_listroutines.py": "b4fb73e602b69d8d5159a92a547accdad82da47f",
+  "research/q3/psi_eval_set_dev.py": "c54072ac7f84696214712c20e2fb8b4a59cbd95f",
+  "research/q3/psi_fst_family.py": "df2588a18479b0d2f48d9538380362a3dfbede2b",
+  "research/q3/psi_learn_dev.py": "7e5e0e048d47d1112272545a4930844b94842a93",
+  "research/q3/psi_verdict_dev.py": "1de674836bc6047204aee91179c79d788e3a848b"
+ },
+ "criteria": {
+  "INVENTION_EVIDENCE (per task)": "P robustly verifies it with an accepted machine that contains a PSI latent, and none of A, AR, AF, Pno robustly verifies it",
+  "REGRESSION": "tasks A robustly verifies and P does not (reported, never excluded)",
+  "V1 rule (frozen V1 criterion, as development evidence on this set)": "P vs A: net >= 10 verified, exact two-sided McNemar p < 0.05, P-only tasks from >= 2 structure classes (list-routines compositions, FST)",
+  "V2 rule (frozen V2 criterion, P in D's place)": ">= 5 tasks solved by P with an accepted machine of m >= 2 components that PDq does not solve",
+  "V3 rule (frozen V3 criterion, Pl in E's place, P in D's place)": "Pl-only >= 5 and p < 0.05, or solved(Pl) >= solved(P) with total CPU(Pl) <= 0.7 x CPU(P)",
+  "official": "the sealed V1 PASS, V2 OPEN (independent), V3 FAIL and Q3 OPEN are not changed by this development evaluation; generalization beyond these two developer-chosen families stays OPEN",
+  "robust": "an arm robustly verifies a task when it verifies it in a strict majority of its runs (base run alone if the task was not replicated)",
+  "verified_solve": "hidden test passed AND every random diagnostic SOURCE input correct (300 inputs, seed 777)"
+ },
+ "evaluation_set": {
+  "file": "eval_set.json",
+  "fst16": [
+   "fst(k=2,pred=mod2,trans=toggle,out=keep_if_s0)",
+   "fst(k=2,pred=eq13,trans=count,out=keep_if_s0)",
+   "fst(k=3,pred=geq4,trans=toggle,out=keep_if_s0)",
+   "fst(k=2,pred=mod3,trans=count,out=x_plus_s)",
+   "fst(k=2,pred=geq10,trans=count,out=x_if_s0)",
+   "fst(k=2,pred=geq6,trans=count,out=x_if_s0)",
+   "fst(k=3,pred=mod3,trans=count,out=keep_if_s0)",
+   "fst(k=3,pred=geq11,trans=count,out=x_if_s0)",
+   "fst(k=3,pred=mod2,trans=toggle,out=x_plus_s)",
+   "fst(k=3,pred=mod3,trans=toggle,out=keep_if_s0)",
+   "fst(k=2,pred=geq5,trans=toggle,out=keep_if_s0)",
+   "fst(k=2,pred=mod2,trans=count,out=keep_if_s0)",
+   "fst(k=3,pred=geq12,trans=count,out=keep_if_s0)",
+   "fst(k=2,pred=mod2,trans=count,out=x_if_s0)",
+   "fst(k=3,pred=geq9,trans=count,out=keep_if_s0)",
+   "fst(k=2,pred=mod4,trans=saturate,out=x_plus_s)"
+  ],
+  "latent_need30": [
+   "intersperse-k(k=0) | kth-smallest(k=3)",
+   "rotate-k(k=10) | take-k(k=2)",
+   "sort | kth-smallest(k=3)",
+   "replace-index-k-with-n(k=5,n=0) | kth-smallest(k=3)",
+   "prepend-k(k=10) | kth-largest(k=2)",
+   "dedup | len",
+   "replace-all-k-with-n(k=1,n=2) | kth-smallest(k=3)",
+   "identify-k(k=1) | kth-smallest(k=3)",
+   "sort | identify-is-mod-k(k=2)",
+   "keep-mod-k(k=2) | kth-largest(k=3)",
+   "keep-mod-k(k=5) | kth-smallest(k=2)",
+   "dedup | identify-is-mod-k(k=7)",
+   "prepend-k(k=-2) | kth-largest(k=2)",
+   "rotate-k(k=3) | drop-k(k=5)",
+   "repeat-k(k=3) | drop-k(k=3)",
+   "identify-k(k=2) | kth-largest(k=3)",
+   "modulo-k(k=3) | kth-smallest(k=2)",
+   "rotate-k(k=-2) | take-k(k=2)",
+   "uniq | identify-k(k=3)",
+   "uniq | identify-is-mod-k(k=7)",
+   "add-k(k=-2) | kth-smallest(k=2)",
+   "pow-base-k(k=3) | kth-smallest(k=2)",
+   "modulo-k(k=10) | kth-largest(k=2)",
+   "rotate-k(k=3) | drop-k(k=2)",
+   "sort | identify-is-prime",
+   "intersperse-k(k=10) | kth-largest(k=2)",
+   "drop-k(k=3) | kth-smallest(k=2)",
+   "modulo-k(k=2) | kth-largest(k=3)",
+   "uniq | identify-k(k=1)",
+   "rotate-k(k=-2) | replace-index-k-with-n(k=3,n=-2)"
+  ],
+  "ordinary12": [
+   "slice-k-n(k=2,n=2) | index-k(k=2)",
+   "identify-k(k=1) | intersperse-k(k=0)",
+   "prepend-k(k=-2) | mult-k(k=3)",
+   "add-k(k=1) | rotate-k(k=3)",
+   "rotate-k(k=1) | identify-k(k=-2)",
+   "add-k(k=1) | sort",
+   "pow-base-k(k=2) | sum",
+   "mult-k(k=-2) | add-k(k=1)",
+   "prepend-k(k=3) | keep-mod-k(k=5)",
+   "replace-all-k-with-n(k=1,n=2) | identify-geq-k(k=2)",
+   "replace-index-k-with-n(k=2,n=10) | identify-k(k=1)",
+   "identify-is-mod-k(k=3) | drop-k(k=5)"
+  ],
+  "sha256": "7758a8b161d9c8d004898eb0b5f616f5f911269843240bc8f02e5f0a18413845"
+ },
+ "harness": "research/q3/budgeted_reach_dev.py (run_arm('D'); Env(spec, 0, budget=60); seed sha256(name) % 1000; fresh process per (arm, task, seed); --semantic; --workers 4; PYTHONHASHSEED=0)",
+ "no_post_hoc": "PSI constants, policy weights, arms, task lists, seeds and criteria are not changed after this commit; a change after seeing evaluation results turns the set into development data",
+ "not_counted": "the 18 PSI development tasks, the 60 section-36 transfer tasks, every section 35-38 task",
+ "policy": {
+  "experience": 27,
+  "file": "policy.json",
+  "positives": 4,
+  "sha256": "230f7ff712406788813b30bae7c134f5a246d9e9b38f8ca477d68fd333e9e886",
+  "training_tasks": "the 18 PSI development tasks and the 60 section-36 transfer tasks (all already used); no evaluation task",
+  "weights": {
+   "bias": 0.11502,
+   "case": 0.0,
+   "evidence": 0.29408,
+   "false_split_frac": 0.0,
+   "granularity": -0.63836,
+   "keeps_h": 1.47144,
+   "list": 0.0,
+   "n_vars2": 0.0,
+   "reads_e": -3.61955,
+   "size": 0.52355,
+   "start_0": 0.61178,
+   "start_1": -0.49676
+  }
+ },
+ "runs": {
+  "PDq": "every task P solves (hidden test) in its base run, replaying that run",
+  "fst16": [
+   "A",
+   "AR",
+   "AF",
+   "P",
+   "Pno",
+   "Pl"
+  ],
+  "latent_need30": [
+   "A",
+   "AR",
+   "AF",
+   "P",
+   "Pno",
+   "Pl"
+  ],
+  "ordinary12": [
+   "A",
+   "P"
+  ],
+  "replication": "every task whose verified outcome differs between any two arms run on it: 2 more same-seed runs and seeds 1, 2 (sha256(name) + 7919 k), for every arm run on that task"
+ },
+ "schema": "neumann.q3-psi-prereg.v1",
+ "status": "FROZEN before any agent run on the evaluation set (development only; official sealed verdicts unchanged)",
+ "verdict_script": "research/q3/psi_verdict_dev.py"
+}
