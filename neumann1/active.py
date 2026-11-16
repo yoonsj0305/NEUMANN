@@ -1209,7 +1209,104 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         return True
     tried_grammar = set()
     joint_first = {}
-    if PSI43_FIRST and direction == "prefix" and s_type == T_L:
+    if PSI44_FIRST and direction == "prefix" and s_type == T_L:
+        # section 44, FACTORED joint synthesis as the primary path (no solver): the prefixes of the given examples are
+        # observed; canonical update structures are enumerated smallest first, each (structure, constants, start)
+        # fixes the latent trace, and the observed output pieces must then be a FUNCTION of (h, h', x) -- one table
+        # check refutes the update for every output rule at once; the output rule's constants are solved exactly.
+        # Several surviving machines are told apart by distinguishing experiments (charged SOURCE queries); a
+        # machine refuted by an answer is dropped, and the synthesis is rerun with the answers if none survives.
+        from neumann1 import joint as J_
+        from neumann1 import stateid as S0_
+        tag0_ = tag[0]
+        tag[0] = "psi44"
+        steps_ = []
+        try:
+            for (x_,), y_ in sorted(examples, key=lambda ex_: len(ex_[0][0])):
+                for i_ in range(len(x_)):
+                    if env.used >= min(qlimit, PSI44_FIRST_QUERIES):
+                        break
+                    a_, b_ = F(tuple(x_[:i_])), F(tuple(x_[:i_ + 1]))
+                    pc_ = S0_.residual(a_, b_, direction)
+                    if pc_ is not None and len(pc_) <= 1 and all(isinstance(v_, int) for v_ in pc_):
+                        steps_.append((tuple(x_[:i_]), x_[i_], tuple(pc_)))
+        except Exhausted:
+            pass
+        tag[0] = tag0_
+        tj0 = time.process_time()
+        dl_ = tj0 + PSI44_FIRST_SHARE * max(0.0, deadline - tj0)
+        full_ = [(tuple(x__), tuple(y__)) for (x__,), y__ in examples if isinstance(y__, tuple)]
+        exps_, reruns_ = [], [0]
+        rng44 = random.Random(44)
+
+        def resolve44(dl_r, qcap):
+            """synthesis, then distinguishing experiments between the surviving machines; a machine refuted by an
+            answer is dropped, and the synthesis is rerun with the answers if none survives"""
+            tag0_r = tag[0]
+            tag[0] = "psi44"
+            cands_r, info_r = J_.factored_synthesis(steps_, full_, dl_r, want=PSI44_WANT)
+            n_exp = 0
+            try:
+                while time.process_time() < dl_r:
+                    if len(cands_r) > 1:
+                        xs_ = J_.distinguishing_inputs(cands_r, vals, rng44)
+                        if not xs_:
+                            cands_r = cands_r[:1]     # no experiment separates them on the observed values
+                            break
+                        if n_exp >= PSI44_DISAMBIG_QUERIES or env.used >= qcap:
+                            break
+                        xq_ = xs_[0]
+                        yq_ = F(xq_)
+                        exps_.append(xq_)
+                        n_exp += 1
+                        if isinstance(yq_, tuple):
+                            full_.append((xq_, yq_))
+                            cands_r = [m_ for m_ in cands_r if J_.run_factored(m_, xq_) == yq_]
+                        continue
+                    if not cands_r and n_exp and reruns_[0] < 3:
+                        reruns_[0] += 1
+                        cands_r, info_r = J_.factored_synthesis(steps_, full_, dl_r, want=PSI44_WANT)
+                        continue
+                    break
+            except Exhausted:
+                pass
+            finally:
+                tag[0] = tag0_r
+            return cands_r, info_r
+        cands_, info44 = resolve44(dl_, qlimit)
+        ok44 = bool(cands_) and all(J_.run_factored(cands_[0], x__) == y__ for x__, y__ in full_)
+        joint_first.update({"steps": len(steps_), "queries": env.used, "info": {k_: v_ for k_, v_ in info44.items()
+                                                                                if k_ != "regularities"},
+                            "regularities": sorted(k_ for k_, v_ in info44.get("regularities", {}).items() if v_),
+                            "experiments": [list(x_) for x_ in exps_], "reruns": reruns_[0],
+                            "candidates_left": len(cands_), "cpu": round(time.process_time() - tj0, 3),
+                            "reproduces_examples": ok44, "solution": cands_[0]["show"] if cands_ else None})
+        rec["psi44_first"] = joint_first
+        if ok44 and not PSI44_ABLATE:
+            m44 = cands_[0]
+            rec["formed"] = True
+            rec["readout"] = "factored joint latent machine %s" % (m44["show"],)
+            rec["update"] = ["joint " + str(m44["show"])]
+            rec["components"].append({"w": None, "why": "PSI44 factored joint latent (primary path)",
+                                      "kind": "accumulator", "source": "psi44", "update": str(m44["show"]),
+                                      "init": repr(m44["z0"]), "set_size": 1})
+            rec["events"].append("PSI44 factored joint latent machine %s" % (m44["show"],))
+            pred44 = (lambda inp, m_=m44: J_.run_factored(m_, tuple(inp[0])))
+
+            def joint_repair(x_c, y_c, dl_c, qcap):
+                """counterexample-guided: a refuting SOURCE answer joins the full examples, the factored synthesis
+                (and its experiments) is rerun; returns (predictor, shown machine) or (None, None)"""
+                if isinstance(y_c, tuple) and all(x__ != x_c for x__, _ in full_):
+                    full_.append((tuple(x_c), tuple(y_c)))
+                c_r, i_r = resolve44(dl_c, qcap)
+                if not c_r or not all(J_.run_factored(c_r[0], x__) == y__ for x__, y__ in full_):
+                    return None, None
+                p_r = (lambda inp, m_=c_r[0]: J_.run_factored(m_, tuple(inp[0])))
+                p_r.joint_repair = joint_repair
+                return p_r, c_r[0]["show"]
+            pred44.joint_repair = joint_repair
+            return pred44, obs, rec
+    elif PSI43_FIRST and direction == "prefix" and s_type == T_L:
         # section 43, joint core as the PRIMARY path: the prefixes of the given examples are observed (their answers
         # are what constrains the latent machine), then the initial latent value, its update and the output rule
         # are synthesised as one constraint problem with most of the formation CPU; the existing path follows
@@ -3113,6 +3210,14 @@ PSI_K = 2                 # admissible latents given a full synthesis attempt pe
 PSI_SYNTH_SHARE = 0.6     # share of the remaining formation CPU for the Update synthesis with ONE latent
 PSI40 = False             # development (opt-in): section 40 structural state identification (neumann1/stateid.py),
                           # entered only where the existing path gives up, after budget and necessity checks
+PSI44_FIRST = False       # development (opt-in, section 44): factored joint synthesis as the primary path (no solver)
+PSI44_ABLATE = False      # the factored joint machine is constructed but withheld (same queries)
+PSI44_FIRST_QUERIES = 30  # SOURCE queries for the prefixes of the given examples (inside the 60)
+PSI44_FIRST_SHARE = 0.85  # share of the machine's formation CPU for the factored synthesis and its experiments
+PSI44_WANT = 3            # surviving machines collected before distinguishing experiments
+PSI44_DISAMBIG_QUERIES = 8  # charged distinguishing experiments between surviving machines
+PSI44_REPAIR_ROUNDS = 3   # counterexample-guided re-syntheses of a refuted factored machine (each with a new challenge)
+PSI44_REPAIR_CPU = 6.0    # CPU per re-synthesis (inside the 30 s cap)
 PSI43 = False             # development (opt-in, section 43): joint latent invention (neumann1/joint.py, needs z3)
 PSI43_ABLATE = False      # the joint machine is constructed but withheld
 PSI43_FIRST = False       # the joint core as the primary path (before the existing formation)
@@ -3147,6 +3252,10 @@ def _action_policy(d):
         p = DiscoveryPolicy._p(w, f)
         return "invent" if p > 0.5 + m else "repair" if p < 0.5 - m else None
     return pol
+
+
+def _as_tuple(v):
+    return tuple(v) if isinstance(v, list) else v
 
 
 def challenge(env, machine, examples, obs, rng, k=CHALLENGE, detail=None):
@@ -3411,6 +3520,50 @@ def run_arm(arm, env, cap, seed=0, policy=None, replay=None):
                             frec["machines"].append(mrec2)
                     else:
                         mrec["repair"]["cause"] = "no machine with the kept representation: representation or search"
+                elif verdict is False and getattr(m, "joint_repair", None) is not None \
+                        and [d for d in det if _as_tuple(d["predicted"]) != _as_tuple(d["answer"])] \
+                        and env.used < env.budget - CHALLENGE - DISCRIMINATE:
+                    # section 44: counterexample-guided joint re-synthesis -- the refuting answer joins the full
+                    # examples, the factored machine is synthesised again; it must pass a NEW independent challenge.
+                    # (A counterexample is a TRUE disagreement: answers are recorded as lists, predictions as tuples.)
+                    cx = [d for d in det if _as_tuple(d["predicted"]) != _as_tuple(d["answer"])]
+                    x_, y_ = tuple(cx[0]["input"]), cx[0]["answer"]
+                    y_ = tuple(y_) if isinstance(y_, list) else y_
+                    info = {"counterexample": [list(x_), cx[0]["answer"]], "predicted": cx[0]["predicted"],
+                            "rounds": []}
+                    m_cur = m
+                    for _round in range(PSI44_REPAIR_ROUNDS):
+                        if env.used >= env.budget - CHALLENGE - DISCRIMINATE or time.process_time() > deadline - 3.0:
+                            info["rounds"].append("budget")
+                            break
+                        t_r = time.process_time()
+                        try:
+                            m2, show2 = m_cur.joint_repair(x_, y_, min(deadline - 3.0, t_r + PSI44_REPAIR_CPU),
+                                                           env.budget - CHALLENGE - DISCRIMINATE)
+                        except Exhausted:
+                            m2, show2 = None, None
+                        if m2 is None:
+                            info["rounds"].append({"machine": None, "cpu": round(time.process_time() - t_r, 2)})
+                            break
+                        det2 = []
+                        v2 = challenge(env, m2, ex + [((x_,), y_)], obs, rng, detail=det2)
+                        info["rounds"].append({"machine": show2, "challenge": v2,
+                                               "cpu": round(time.process_time() - t_r, 2)})
+                        if v2:
+                            m, verdict = m2, True
+                            mrec["challenge"], mrec["repaired"] = True, True
+                            mrec["update"] = ["joint " + str(show2)]
+                            for c_ in mrec.get("components", []):
+                                if c_.get("source") == "psi44":
+                                    c_["update"], c_["init"] = str(show2), repr(show2["z0"])
+                            break
+                        cx2 = [d for d in det2 if _as_tuple(d["predicted"]) != _as_tuple(d["answer"])]
+                        if v2 is None or not cx2:
+                            break
+                        x_, y_ = tuple(cx2[0]["input"]), cx2[0]["answer"]
+                        y_ = tuple(y_) if isinstance(y_, list) else y_
+                        m_cur = m2
+                    mrec["repair"] = info
                 if verdict:
                     p = m
                     frec["formed"] = direction

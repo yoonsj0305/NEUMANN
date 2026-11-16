@@ -65,13 +65,19 @@ def set_arm(arm):
     ac.PSI43_FIRST = arm in ("JF", "JFno")
     if arm in ("JF", "JFno"):
         ac.PSI40, ac.PSI41 = True, True
+    # section 44: K = the FACTORED joint core as the primary path (then the R path with what is left); Kno = K with
+    # the factored machine withheld (same prefix queries and experiments)
+    ac.PSI44_FIRST = arm in ("K", "Kno")
+    ac.PSI44_ABLATE = arm == "Kno"
+    if arm in ("K", "Kno"):
+        ac.PSI40, ac.PSI41 = True, True
     # the answer-length stage of the cell construction gets >= 1.5 s (a reallocation inside the same deadline) in
     # Q, Qno and the control AL = A + the same floor (separates the floor from the identified state)
     from neumann1 import latent as _lt
-    _lt.LENGTH_FLOOR = 1.5 if arm in ("Q", "Qno", "AL", "R", "Rno", "J", "Jno", "JF", "JFno") else 0.0
+    _lt.LENGTH_FLOOR = 1.5 if arm in ("Q", "Qno", "AL", "R", "Rno", "J", "Jno", "JF", "JFno", "K", "Kno") else 0.0
     # counterexample repair of a refuted machine (the existing in-place rule, section 22): part of PSI (P0-D) for
     # every PSI arm; AR = A + the same rule (the control that separates repair from the latent)
-    ac.REPAIR = "inplace" if arm in ("P", "Pno", "Pl", "PF", "AR", "Q", "Qno", "R", "Rno", "J", "Jno", "JF", "JFno") else False
+    ac.REPAIR = "inplace" if arm in ("P", "Pno", "Pl", "PF", "AR", "Q", "Qno", "R", "Rno", "J", "Jno", "JF", "JFno", "K", "Kno") else False
     ac.PSI_POLICY = None
     if arm == "Pl":
         import os
@@ -259,11 +265,11 @@ def job(arm, name, seed_kind, cap, sem):
         return r
     ac.passive = passive
     c0 = time.process_time()
-    if arm in ("PDq", "QDq", "RDq"):
+    if arm in ("PDq", "QDq", "RDq", "KDq"):
         # the frozen V2 control: P's SOURCE queries replayed and answered again, solved passively (no formation)
         import os
         src = [json.loads(l) for l in open(os.environ["NEUMANN_REPLAY_ROWS"]) if l.strip()]
-        arm_src = {"QDq": "Q", "RDq": "R"}.get(arm, "P")          # QDq / RDq: the section 40 / 41 controls
+        arm_src = {"QDq": "Q", "RDq": "R", "KDq": "K"}.get(arm, "P")   # QDq / RDq / KDq: sections 40 / 41 / 44
         rp = next(r for r in src if r["arm"] == arm_src and r["name"] == name and r["seed_kind"] == seed_kind)
         pred, rec = ac.run_arm("Dq", env, cap, seed=seed, replay=rp["query_inputs"])
     else:
@@ -282,6 +288,7 @@ def job(arm, name, seed_kind, cap, sem):
             "formed": bool(m.get("formed")), "challenge": m.get("challenge"), "update": m.get("update"),
             "cpu": m.get("cpu"), "queries": m.get("queries_used"), "query_purpose": m.get("query_purpose"),
             "reach": m.get("reach"), "psi": m.get("psi"), "psi40": m.get("psi40"), "repair": m.get("repair"),
+            "psi43_first": m.get("psi43_first"), "psi44_first": m.get("psi44_first"),
             "components": [{k: c.get(k) for k in ("w", "kind", "source", "update", "init", "why")}
                            for c in m.get("components", [])]})
     initial = env.initial()

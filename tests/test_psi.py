@@ -182,6 +182,29 @@ def test_joint_encoding_smoke_identity_transducer():
     assert J.run_solution(sol, (9, 0, 7, 7)) == (9, 0, 7, 7)
 
 
+def test_factored_joint_synthesis_recovers_a_hidden_register_machine():
+    """section 44: no solver.  A machine the test hides (h' = max(h, x), emit h' - h after every element) is
+    recovered from per-step output pieces only (no latent value given), and it generalises to fresh inputs"""
+    import random
+    from neumann1 import joint as J
+
+    def hidden(x):
+        h, out = 0, []
+        for v in x:
+            h2 = max(h, v)
+            out.append(h2 - h)
+            h = h2
+        return tuple(out)
+    rng = random.Random(4)
+    xs = [tuple(rng.randrange(0, 12) for _ in range(rng.randrange(2, 7))) for _ in range(8)]
+    steps = [(x[:i], x[i], (hidden(x[:i + 1])[-1],)) for x in xs for i in range(len(x))]
+    found, info = J.factored_synthesis(steps, [(x, hidden(x)) for x in xs], time.process_time() + 20, want=1)
+    assert found, info
+    for _ in range(100):
+        x = tuple(rng.randrange(0, 12) for _ in range(rng.randrange(0, 9)))
+        assert J.run_factored(found[0], x) == hidden(x)
+
+
 def _diff_trace(x):
     h, out = 0, []
     for v in x:
