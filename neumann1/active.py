@@ -2354,7 +2354,9 @@ PSI_ABLATE = False        # P-no-latent: PSI's distinction experiments and inven
 PSI_QUERIES = 10          # SOURCE queries one PSI round may spend on distinction experiments (inside the run budget)
 PSI_K = 2                 # admissible latents given a full synthesis attempt per PSI round
 PSI_SYNTH_SHARE = 0.6     # share of the remaining formation CPU for the Update synthesis with ONE latent
-PSI_CPU_FRAC = 0.35       # all PSI rounds of one machine: at most this share of the machine's formation span
+PSI_CPU_FRAC = 1.0        # all PSI rounds of one machine: at most this share of the machine's formation span
+                          # (1.0 = no allowance beyond the formation deadline; 0.35 was rejected in development:
+                          # the latent construction budgets its stages as fractions of the span it is given)
 PSI_POLICY = None         # learned candidate ordering (psi.update_discovery_policy weights); None = description length
 CHALLENGE = 3     # fresh inputs a formed machine must predict before it may replace the passive solution
 DISCRIMINATE = 2  # queries kept to decide between an accepted machine and the passive solution where they differ

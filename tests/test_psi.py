@@ -55,7 +55,7 @@ def test_policy_learning_prefers_features_of_verified_latents():
 
 
 def test_psi_cpu_allowance_is_a_fraction_of_the_formation_span():
-    assert 0.0 < ac.PSI_CPU_FRAC < 1.0 and ac.PSI_SYNTH_SHARE <= 1.0
+    assert 0.0 < ac.PSI_CPU_FRAC <= 1.0 and ac.PSI_SYNTH_SHARE <= 1.0
 
 
 def test_fst_family_names_rebuild_the_same_task():
