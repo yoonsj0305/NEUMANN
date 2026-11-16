@@ -46,7 +46,19 @@ def set_arm(arm):
     # EFc = E + the existing per-round synthesis CPU floor (10 s, a reallocation inside the same formation deadline);
     # EFbc = both.  AF / EF are the section 36 follow-up names (AF = A + floor, EF = EFc).
     ac.E_SYNTH_FALLBACK = arm in ("EFb", "EFbc")
-    ac.MIN_SYNTH_CPU = 10.0 if arm in ("AF", "EF", "EFc", "EFbc") else 0.0
+    ac.MIN_SYNTH_CPU = 10.0 if arm in ("AF", "EF", "EFc", "EFbc", "PF") else 0.0
+    # Predictive State Invention arms (section 39): P = PSI; Pno = PSI with the discovered latent withheld (same
+    # distinction experiments); Pl = PSI with the learned discovery policy (weights from NEUMANN_PSI_POLICY);
+    # PF = P + the existing synthesis floor (a reallocation control)
+    ac.PSI = arm in ("P", "Pno", "Pl", "PF")
+    ac.PSI_ABLATE = arm == "Pno"
+    # counterexample repair of a refuted machine (the existing in-place rule, section 22): part of PSI (P0-D) for
+    # every PSI arm; AR = A + the same rule (the control that separates repair from the latent)
+    ac.REPAIR = "inplace" if arm in ("P", "Pno", "Pl", "PF", "AR") else False
+    ac.PSI_POLICY = None
+    if arm == "Pl":
+        import os
+        ac.PSI_POLICY = json.loads(pathlib.Path(os.environ["NEUMANN_PSI_POLICY"]).read_text())["weights"]
 
 
 def last_elem(u, direction):
@@ -125,14 +137,29 @@ def semantic(spec, pred, n=300, seed=777):
 
 
 EVAL_SET = "docs/experiments/dev/case2_recovery/eval_set.json"
+PSI_EVAL_SET = "docs/experiments/dev/psi/eval_set.json"
+
+
+def registered():
+    """name -> committed sha256 of every pre-registered task (section 38 set, and the section 39 set once committed)."""
+    reg = json.loads(pathlib.Path(EVAL_SET).read_text())
+    want = {t["name"]: t["sha256"] for t in reg["new_compositions"]["tasks"] + reg["regression"]["tasks"]}
+    if pathlib.Path(PSI_EVAL_SET).exists():
+        psi = json.loads(pathlib.Path(PSI_EVAL_SET).read_text())
+        want.update({t["name"]: t["sha256"] for g in ("latent_need30", "ordinary12", "fst16") for t in psi[g]})
+    return want
 
 
 def resolve(name):
-    """A task by name: one of env_listroutines.tasks(), or a pre-registered new composition rebuilt from its name
-    (routine ids and integer parameters) and accepted only if its {name, train, test} hash equals the committed one."""
+    """A task by name: one of env_listroutines.tasks(), or a pre-registered new task rebuilt from its name (routine
+    ids and integer parameters, or the parameters of a section 39 finite-state transducer) and accepted only if its
+    {name, train, test} hash equals the committed one."""
     specs = {s.name: s for s in E.tasks()}
     if name in specs:
         return specs[name]
+    if name.startswith("fst("):
+        import psi_fst_family
+        return checked(psi_fst_family.parse(name), name)
     parts = []
     for part in name.split(" | "):
         rid, _, rest = part.partition("(")
@@ -143,9 +170,11 @@ def resolve(name):
         if rid not in E.R:
             raise KeyError(name)
         parts.append((rid, params))
-    spec = E.Spec(parts)
-    reg = json.loads(pathlib.Path(EVAL_SET).read_text())
-    want = {t["name"]: t["sha256"] for t in reg["new_compositions"]["tasks"] + reg["regression"]["tasks"]}
+    return checked(E.Spec(parts), name)
+
+
+def checked(spec, name):
+    want = registered()
     env = E.Env(spec, 0, budget=60)
     data = {"name": spec.name, "train": [[list(x), list(y) if isinstance(y, tuple) else y] for (x,), y in env._train],
             "test": [list(x) for x in env._test]}
@@ -198,7 +227,14 @@ def job(arm, name, seed_kind, cap, sem):
         return r
     ac.passive = passive
     c0 = time.process_time()
-    pred, rec = ac.run_arm("D", env, cap, seed=seed)
+    if arm == "PDq":
+        # the frozen V2 control: P's SOURCE queries replayed and answered again, solved passively (no formation)
+        import os
+        src = [json.loads(l) for l in open(os.environ["NEUMANN_REPLAY_ROWS"]) if l.strip()]
+        rp = next(r for r in src if r["arm"] == "P" and r["name"] == name and r["seed_kind"] == seed_kind)
+        pred, rec = ac.run_arm("Dq", env, cap, seed=seed, replay=rp["query_inputs"])
+    else:
+        pred, rec = ac.run_arm("D", env, cap, seed=seed)
     cpu = time.process_time() - c0
     ac.QUERY_HOOK = None
     machines = []
@@ -212,7 +248,9 @@ def job(arm, name, seed_kind, cap, sem):
             "round0_fold_failures": int(rounds[0].split("failing")[1]) if rounds else None,
             "formed": bool(m.get("formed")), "challenge": m.get("challenge"), "update": m.get("update"),
             "cpu": m.get("cpu"), "queries": m.get("queries_used"), "query_purpose": m.get("query_purpose"),
-            "reach": m.get("reach")})
+            "reach": m.get("reach"), "psi": m.get("psi"), "repair": m.get("repair"),
+            "components": [{k: c.get(k) for k in ("w", "kind", "source", "update", "init", "why")}
+                           for c in m.get("components", [])]})
     initial = env.initial()
     row = {"arm": arm, "name": name, "seed_kind": seed_kind, "seed": seed, "clock": "process_time", "cap": cap,
            "budget": 60, "solved": bool(pred is not None and env._score(pred)), "via": rec.get("via"),
@@ -225,6 +263,7 @@ def job(arm, name, seed_kind, cap, sem):
            "cost": classify(calls, charges),
            "reachable_transitions_observed": reachable_observed(initial, env.log),
            "machines": machines,
+           "query_inputs": [list(x) for x, _ in env.log],
            "log_sha256": hashlib.sha256(json.dumps([[list(x), y if not isinstance(y, tuple) else list(y)]
                                                     for x, y in env.log]).encode()).hexdigest()}
     if sem and row["solved"]:

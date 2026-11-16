@@ -1386,6 +1386,10 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         admissible one is invented (3.2E: state / transition / init / domain errors are handled elsewhere)."""
         if not acc:
             return False
+        if acc[-1].get("psi") and reason == "update not found":
+            # a synthesis failure is not evidence against a latent that PSI derived from observed distinctions
+            rec["events"].append("PSI latent kept (no Update is a synthesis failure, not a refutation)")
+            return False
         k = max(i for i, c in enumerate(rec["components"]) if c.get("kind") == "accumulator")
         n = rec["components"][k].get("set_size", 1)
         for _ in range(n):                   # the whole adopted set: it was one structural hypothesis
@@ -1777,7 +1781,7 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
             for c, z in it["vars"]:
                 acc.append({"t": c["t"], "fn": c["fn"], "z": z, "cache": {}, "show": c["show"]})
             try:
-                upd, asts, z0, fails = attempt(transitions(), 0.03, 0.3)
+                upd, asts, z0, fails = attempt(transitions(), INVENT_SYNTH_SHARE, 0.3)
             finally:
                 del acc[len(acc) - len(it["vars"]):]
             nf = None if upd is None else len(fails)
@@ -1805,6 +1809,193 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
         rec["events"].append("invented %s (%s)" % (" + ".join("h' = %s from %s" % (c["show"], zkind(z))
                                                               for c, z in chosen["vars"]), why))
         return True
+    psi_tried = set()
+    psi_cache = {}                    # the Update PSI synthesised with its adopted latent, reused while unchanged
+    psi_spent = [0.0]                 # CPU of every PSI round of this machine (Degraded Mode guarantee)
+
+    def psi_round(why, trans):
+        """PSI under its own CPU allowance: all PSI rounds of one machine together use at most PSI_CPU_FRAC of the
+        machine's formation span, so a PSI failure leaves the existing path at least the rest (Degraded Mode).
+        The allowance is enforced by running the round under a shortened deadline (restored afterwards)."""
+        nonlocal deadline
+        room = PSI_CPU_FRAC * max(0.0, deadline - t_start) - psi_spent[0]
+        if room <= 0.0:
+            if ("budget", why) not in psi_tried:
+                psi_tried.add(("budget", why))
+                rec.setdefault("psi", []).append({"why": why, "outcome": "PSI CPU allowance spent", "cpu": 0.0,
+                                                  "queries": 0, "W": len(W)})
+            return False
+        fdl, t0 = deadline, time.process_time()
+        deadline = min(fdl, t0 + room)
+        try:
+            return psi_round_(why, trans, fdl)
+        finally:
+            deadline = fdl
+            psi_spent[0] += time.process_time() - t0
+
+    def psi_round_(why, trans, fdl):
+        """Predictive State Invention (opt-in, neumann1/psi.py): active future-distinction experiments on the prefix
+        pairs the current state merges, a latent fold variable that separates every distinction and makes the
+        observed transitions functional, then Update synthesis with a real share of the remaining CPU.  Returns True
+        when a latent was adopted; False = degraded mode (the existing path continues unchanged)."""
+        from neumann1 import psi as P_
+        key = (len(W), len(acc), why)
+        if key in psi_tried or len(acc) >= MAX_ACC or time.process_time() > deadline or env.used >= qlimit:
+            return False
+        psi_tried.add(key)
+        t0_, q0_ = time.process_time(), env.used
+        log_ = {"why": why, "W": len(W), "acc": [a["show"] for a in acc], "ablate": bool(PSI_ABLATE)}
+        rec.setdefault("psi", []).append(log_)
+
+        def known(u):
+            xs = [cont(u, w_) for w_ in W]
+            if any(x not in memo for x in xs):
+                return None
+            t_ = vs(tuple(memo[x] for x in xs), u)
+            if t_ is None:
+                return None
+            hh = H(u)
+            return None if hh is None else t_ + hh
+        pre = set()
+        for (a_, e_), b_, u_ in trans:
+            pre.add(u_)
+            pre.add(step_input(u_, e_))
+        for x_ in list(memo):
+            u_ = tuple(x_)
+            if known(u_) is not None:
+                pre.add(u_)
+        pre = sorted(pre, key=lambda u_: (len(u_), u_))
+        observed_pairs = set(P_.merged_pairs(pre, known))
+        # constructed pairs: an element that left the observed state unchanged somewhere ((state, e) -> same state)
+        # appended to an observed prefix u gives v = u.e, predicted to be merged with u but with a different
+        # history; the merge is confirmed by observing v's state (charged) before any suffix test
+        loops = []
+        for (a_, e_), b_, u_ in trans:
+            if tuple(a_[:len(W)]) == tuple(b_[:len(W)]) and e_ not in loops:
+                loops.append(e_)
+        pre_set = set(pre)
+        built = []
+        for e_ in loops[:3]:
+            for u_ in pre[:40]:
+                v_ = step_input(u_, e_)
+                if v_ not in pre_set and known(u_) is not None:
+                    v2_ = step_input(v_, e_)
+                    # the chain u, u.e, u.e.e: every pair (same latest element or longer history; history
+                    # depths differing by one AND by two, so that parities and counts can be told apart)
+                    built += [(u_, v_), (v_, v2_), (u_, v2_)]
+        built = list(dict.fromkeys(built))
+        pre_all = list(dict.fromkeys(pre + [y_ for pr_ in built for y_ in pr_]))
+        # competing latent hypotheses: every substrate fold variable from every start, valued on observed prefixes
+        tc_ = time.process_time()
+        cands = []
+        for c in accumulators():
+            for z_ in ([0, 1, min(vals) - 1, max(vals) + 1] if c["t"] == T_I else [()]):
+                cache = hcache.setdefault((id(c), z_), {})
+                hv = {u_: hval(c["fn"], z_, u_, cache) for u_ in pre_all}
+                if None in hv.values() or len(set(hv.values())) < 2:
+                    continue
+                cands.append({"show": c["show"], "size": c["size"] + (0 if ident_start(c, z_) else 3), "hv": hv,
+                              "t": "L" if c["t"] == T_L else "I", "zkind": zkind(z_), "_c": c, "_z": z_})
+            if time.process_time() > deadline:
+                break
+        log_["candidate_valuation_cpu"] = round(time.process_time() - tc_, 3)
+        pairs = sorted(observed_pairs) + built
+
+        def prep_cost(u_, v_):
+            return 0 if (u_, v_) in observed_pairs else \
+                len({cont(y_, w_) for y_ in (u_, v_) for w_ in W if cont(y_, w_) not in memo})
+
+        def prepare(u_, v_):
+            if (u_, v_) in observed_pairs:
+                return True
+            for y_ in (u_, v_):
+                for w_ in W:
+                    F(cont(y_, w_))
+            su_, sv_ = known(u_), known(v_)
+            return su_ is not None and su_ == sv_
+        conf_pairs, conf_elems = [], []
+        groups = {}
+        for (a_, e_), b_, u_ in trans:
+            groups.setdefault((a_, e_), []).append((b_, u_))
+        for (a_, e_), g in groups.items():
+            for i_ in range(len(g)):
+                for j_ in range(i_ + 1, len(g)):
+                    if g[i_][0] != g[j_][0]:
+                        conf_pairs.append((g[i_][1], g[j_][1]))
+                        conf_elems.append(e_)
+        order = sorted(vals, key=lambda v_: -sum(x.count(v_) for (x,), _ in examples))
+        elems = list(dict.fromkeys(conf_elems + [max(vals), min(vals)] + order))
+        suffixes = [(e_,) for e_ in elems]
+        tag0 = tag[0]
+        tag[0] = "psi"
+        try:
+            evid, equal, dinfo = P_.discover_distinctions(
+                pairs, cands, suffixes, cont, F, lambda x: tuple(x) in memo, PSI_QUERIES,
+                min(deadline, time.process_time() + 0.15 * max(0.0, fdl - time.process_time())),
+                prepare=prepare, prepare_cost=prep_cost, per_pair=3)
+        finally:
+            tag[0] = tag0
+        log_["discovery"] = dinfo
+        log_["distinctions"] = [[list(u_), list(v_), list(w_), y1 if not isinstance(y1, tuple) else list(y1),
+                                 y2 if not isinstance(y2, tuple) else list(y2)] for u_, v_, w_, y1, y2 in evid[:12]]
+        sep_pairs = conf_pairs + [(u_, v_) for u_, v_, _, _, _ in evid]
+        tr4 = [(a_[:len(W)], e_, b_[:len(W)], u_) for (a_, e_), b_, u_ in trans]
+        if not sep_pairs:
+            log_["outcome"] = "no distinction observed"
+            log_["cpu"], log_["queries"] = round(time.process_time() - t0_, 3), env.used - q0_
+            return False
+        # the latent must be NEW state: the current invented variables stay, the candidate joins them
+        if acc:
+            hcur = [{u_: hval(a_["fn"], a_["z"], u_, a_["cache"]) for u_ in pre} for a_ in acc]
+            base_t = [(tuple(a_[:len(W)]) + tuple(h[u_] for h in hcur), e_, b_, u_) for a_, e_, b_, u_ in tr4]
+        else:
+            base_t = tr4
+        ranked, iinfo = P_.invent_state(sep_pairs, equal, cands, base_t, policy=PSI_POLICY)
+        iinfo["constructed_pairs"] = len(built)
+        log_["invention"] = iinfo
+        log_["ranked"] = [{"vars": [[c["show"], c["zkind"]] for c in it["vars"]], "size": it["size"],
+                           "false_splits": it["false_splits"], "ns": it["ns"], "feat": it["feat"],
+                           "posterior": it.get("posterior")} for it in ranked[:6]]
+        if not ranked:
+            log_["outcome"] = "no admissible latent in the construction grammar"
+            log_["cpu"], log_["queries"] = round(time.process_time() - t0_, 3), env.used - q0_
+            return False
+        if PSI_ABLATE:                  # P-no-latent: same experiments and invention, the latent is withheld
+            log_["outcome"] = "ablated: latent withheld"
+            log_["cpu"], log_["queries"] = round(time.process_time() - t0_, 3), env.used - q0_
+            return False
+        tol = max(1, len(examples) // 4)   # as the existing invention: the counterexample loop owns the rest
+        tried_ = []
+        for it in ranked[:PSI_K]:
+            if time.process_time() > deadline:
+                break
+            for c in it["vars"]:
+                acc.append({"t": c["_c"]["t"], "fn": c["_c"]["fn"], "z": c["_z"], "cache": {}, "show": c["show"]})
+            try:
+                upd_, asts_, z0_, fails_ = attempt(transitions(), PSI_SYNTH_SHARE, 0.3)
+            finally:
+                del acc[len(acc) - len(it["vars"]):]
+            why_ = P_.classify_outcome(upd_ is not None, len(fails_) if fails_ is not None else 0, tol)
+            tried_.append({"vars": [[c["show"], c["zkind"]] for c in it["vars"]], "outcome": why_,
+                           "feat": it["feat"], "cpu_left": round(deadline - time.process_time(), 2)})
+            if why_ == "ok":
+                psi_cache["result"] = (upd_, asts_, z0_, fails_)
+                psi_cache["key"] = None                      # bound to the table seen after adoption
+                for c in it["vars"]:
+                    acc.append({"t": c["_c"]["t"], "fn": c["_c"]["fn"], "z": c["_z"], "cache": {}, "show": c["show"],
+                                "psi": True})
+                    rec["components"].append({"w": None, "why": why + "; PSI latent", "kind": "accumulator",
+                                              "source": "psi", "update": c["show"], "init": c["zkind"],
+                                              "set_size": len(it["vars"])})
+                rec["events"].append("PSI latent %s (%s; %d distinctions)" % (
+                    " + ".join("h' = %s from %s" % (c["show"], c["zkind"]) for c in it["vars"]), why, len(evid)))
+                log_["tried"], log_["outcome"] = tried_, "adopted"
+                log_["adopted"] = tried_[-1]["vars"]
+                log_["cpu"], log_["queries"] = round(time.process_time() - t0_, 3), env.used - q0_
+                return True
+        log_["tried"], log_["outcome"] = tried_, "no latent led to an Update folding the examples"
+        log_["cpu"], log_["queries"] = round(time.process_time() - t0_, 3), env.used - q0_
+        return False
     try:
         for rnd in range(25):
             if ro:
@@ -1842,6 +2033,8 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                     conflict = (seen[(a, e)], (b, u), e)
                     break
                 seen.setdefault((a, e), (b, u))
+            if conflict and PSI and psi_round("inconsistent transitions", trans):
+                continue
             if conflict and choose("inconsistent transitions", trans, 0) == "invent" and invent(trans, "inconsistent transitions"):
                 continue
             if conflict:
@@ -1853,7 +2046,19 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                     break
                 continue
             # 2. Update per component, then joint verification on every initial example
-            upd, asts, z, fails = attempt(trans, 0.25, capture=True)
+            pkey = (len(W), tuple(a["show"] for a in acc), len(trans), virt["value"])
+            if PSI and "result" in psi_cache and psi_cache["key"] in (None, pkey):
+                psi_cache["key"] = pkey                      # same state space and table: no re-synthesis
+                upd, asts, z, fails = psi_cache["result"]
+                psi_cache.clear()
+            else:
+                upd, asts, z, fails = attempt(trans, 0.25, capture=True)
+                if upd is None and PSI and any(a.get("psi") for a in acc) and pkey not in psi_tried:
+                    psi_tried.add(pkey)                      # once per table: the latent's synthesis gets PSI's share
+                    rec["events"].append("PSI latent: re-synthesis with the PSI share")
+                    upd, asts, z, fails = attempt(trans, PSI_SYNTH_SHARE, capture=True)
+            if upd is None and PSI and psi_round("update not found", trans):
+                continue
             if upd is None:
                 # P0 experimental degraded mode: if E's reachable-only table
                 # cannot produce an Update, retry on the ORIGINAL synthetic
@@ -2094,6 +2299,10 @@ def form_machine(env, examples, deadline, qlimit, direction="prefix", rng=None, 
                     continue
                 if act_ != "invent" and (invent(trans, "counterexample not localisable") or revise("counterexample not localisable")):
                     continue
+                # PSI here only after the existing repairs (virtual value, invention, new continuation) found nothing:
+                # it must not pre-empt a path that works (development iteration 11, section 39)
+                if PSI and psi_round("counterexample not localisable", trans):
+                    continue
                 break
     except Exhausted:
         rec["events"].append("query limit")
@@ -2138,6 +2347,15 @@ MULTI = True      # ablation switch: False = one invented variable at a time, no
 PAIR_COST = 6     # description-length charge for each additional invented variable
 INVENT_SHARE = 0.4  # share of a machine's formation CPU that all its invention calls may use together
 INVENT_K = 10     # admissible invented variables tried per invention (cost order, or learned order for E)
+INVENT_SYNTH_SHARE = 0.03  # share of the remaining CPU for the Update synthesis of ONE tried invented variable
+PSI = False               # development (opt-in): Predictive State Invention (neumann1/psi.py) before the existing
+                          # invention / continuation routes; off = the existing path, unchanged
+PSI_ABLATE = False        # P-no-latent: PSI's distinction experiments and invention run, the latent is withheld
+PSI_QUERIES = 10          # SOURCE queries one PSI round may spend on distinction experiments (inside the run budget)
+PSI_K = 2                 # admissible latents given a full synthesis attempt per PSI round
+PSI_SYNTH_SHARE = 0.6     # share of the remaining formation CPU for the Update synthesis with ONE latent
+PSI_CPU_FRAC = 0.35       # all PSI rounds of one machine: at most this share of the machine's formation span
+PSI_POLICY = None         # learned candidate ordering (psi.update_discovery_policy weights); None = description length
 CHALLENGE = 3     # fresh inputs a formed machine must predict before it may replace the passive solution
 DISCRIMINATE = 2  # queries kept to decide between an accepted machine and the passive solution where they differ
 
