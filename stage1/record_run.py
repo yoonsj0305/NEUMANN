@@ -13,7 +13,8 @@ import time
 
 HERE = pathlib.Path(__file__).resolve().parent
 PH = HERE / "results" / "phaseA2"
-NAME_T = {"addition": "덧셈", "parity": "패리티", "assoc": "연관 기억", "assoc_n4": "연관 기억 (n=4 고정)"}
+NAME_T = {"addition": "덧셈", "parity": "패리티", "assoc": "연관 기억", "assoc_n4": "연관 기억 (n=4 고정)",
+          "mqar": "MQAR", "mqar_n4": "MQAR (n=4 고정)"}
 NAME_K = {"abacus": "Abacus", "looped": "looped", "gru": "GRU", "looped_rr": "looped_rr", "rope": "rope"}
 PH3 = HERE / "results" / "phaseA3"
 Q3 = "Phase A″ — `rope`가 연관 기억 분포 안 ≥95%인가? (실패하면 하네스 문제로 보고 디버그 허용)"
@@ -21,8 +22,40 @@ Q3C = ("Phase A″ 실행 전 점검 — `rope`가 연관 기억 n=4 고정, 2,0
        "(안 되면 본실행 전에 멈추고 보고)")
 
 
+PH4 = HERE / "results" / "phaseA4"
+Q4C = "Phase A‴ 작업 1 점검 — `rope`가 MQAR n=4 고정, 2,000 step에서 질의별 분포 안 ≥95%인가? (아니면 MQAR 본실행 없이 중단)"
+Q4 = ("Phase A‴ 작업 1 — 표준 MQAR에서 트랜스포머 기준선(rope, abacus, looped_rr)이 학습되는가? "
+      "(질의별 분포 안 ≥95%를 기준으로 답함)")
+Q4B = "Phase A‴ 작업 2 — `rope`가 %s 분포 안을 학습하는가? (1단계 기준선 표용; ≥95%%를 기준으로 답함)"
+
+
+def answer4(f):
+    v = idv(f)
+    if f["task"] == "mqar_n4":
+        return "%s (질의별 분포 안 %.3f)" % ("예" if v >= 0.95 else "아니오 — MQAR 본실행 없이 중단", v)
+    if f["task"] == "mqar":
+        done = {}
+        for k in ("rope", "abacus", "looped_rr"):
+            d = PH4 / ("phaseA4_mqar__%s__1M__s0__N100000" % k)
+            if (d / "final.json").exists():
+                done[k] = idv(json.loads((d / "final.json").read_text()))
+        txt = ", ".join("%s %.3f" % (NAME_K[k], x) for k, x in done.items())
+        if any(x >= 0.95 for x in done.values()):
+            return "예 (질의별 분포 안: %s)" % txt
+        if len(done) == 3:
+            return "아니오 (질의별 분포 안: %s)" % txt
+        return "미정 (끝난 트랜스포머 기준선: %s)" % (txt or "없음")
+    return "%s (분포 안 %.3f)" % ("예" if v >= 0.95 else "아니오", v)
+
+
 def labels(phase, task):
     """(heading label, question, commit label) for a run"""
+    if phase == "phaseA4":
+        if task == "mqar_n4":
+            return "Phase A‴ 작업 1 점검", Q4C, "Phase A‴ 점검"
+        if task == "mqar":
+            return "Phase A‴ 작업 1", Q4, "Phase A‴ 작업 1"
+        return "Phase A‴ 작업 2", Q4B % NAME_T[task], "Phase A‴ 작업 2"
     if phase == "phaseA3":
         if task == "assoc_n4":
             return "Phase A″ 실행 전 점검", Q3C, "Phase A″ 점검"
@@ -88,7 +121,8 @@ def entry(d):
     lines = [
         "## %s · %s · %s / %s" % (date, head, NAME_T[t], NAME_K[k]),
         "- 질문: %s" % question,
-        "- 질문에 대한 답: %s" % (answer3(f) if phase == "phaseA3" else answer(t, k)),
+        "- 질문에 대한 답: %s" % (answer4(f) if phase == "phaseA4" else
+                                  answer3(f) if phase == "phaseA3" else answer(t, k)),
         "- 코드 커밋: `%s`%s · 원자료: `%s/`" % (
             (env.get("code_commit") or "?")[:7], " (작업 트리 수정 있음)" if env.get("code_dirty") else "",
             d.relative_to(HERE.parent) if HERE.parent in d.parents else d),
@@ -103,6 +137,9 @@ def entry(d):
         "- 마지막 시점 (step %d): 분포 안 %.3f · 분포 밖 %s" % (
             last["step"], [v for l, v in last["acc"].items() if l.startswith("id")][0], oods_last),
     ]
+    if j.get("acc_seq"):
+        lines.append("- 시퀀스 전체 정답률 (보조, 판정 시점): %s" % " · ".join(
+            "%s: %.3f" % (lab(l), v) for l, v in j["acc_seq"].items()))
     if j.get("acc_fixed4"):
         lines.append("- looped 보조 (고정 4회, 판정 시점): %s" % " · ".join(
             "%s: %.3f" % (lab(l), v) for l, v in j["acc_fixed4"].items()))
