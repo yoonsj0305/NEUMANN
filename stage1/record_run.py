@@ -16,7 +16,7 @@ PH = HERE / "results" / "phaseA2"
 NAME_T = {"addition": "덧셈", "parity": "패리티", "assoc": "연관 기억", "assoc_n4": "연관 기억 (n=4 고정)",
           "mqar": "MQAR", "mqar_n4": "MQAR (n=4 고정)"}
 NAME_K = {"abacus": "Abacus", "looped": "looped", "gru": "GRU", "looped_rr": "looped_rr", "rope": "rope",
-          "pf": "PF"}
+          "pf": "PF", "pf_cont": "PF-cont"}
 # frozen baseline reference (CANDIDATE_DESIGN.md 7, from RESULTS.md 1단계 기준선 표, commit 29559d3)
 BASE_REF = {
     "addition": "분포 안 최고 0.998 (abacus) · 분포 밖 11-20: 0.278 (looped_rr) · 21-30: 0.000 · 31-40: 0.000; "
@@ -65,9 +65,13 @@ def answer_c1(f):
     return "%s (분포 안 %.3f; 유효성 기준 ≥0.95)" % ("예" if v >= 0.95 else "아니오", v)
 
 
-def labels(phase, task):
+def labels(phase, task, kind="pf"):
     """(heading label, question, commit label) for a run"""
     if phase == "c1":
+        if kind == "pf_cont":
+            return ("C1-1 분기 2단계 (PF-cont)",
+                    "C1-1 분기 2단계 — 이산화를 뺀 PF-cont가 %s를 학습 분포 안에서 배우는가? (유효성 기준 ≥0.95; "
+                    "PF가 실패하고 버그 점검에서 구현 결함이 없을 때 1회)" % NAME_T[task], "C1-1 PF-cont")
         q = ("C1-1 — PF가 %s를 학습 분포 안에서 배우는가? (유효성 기준: 분포 안 ≥0.95, 시드 0)" % NAME_T[task]
              if task != "mqar" else "C1-1 — PF의 MQAR 결과 (판정 기준 없음; 질의별·시퀀스 전체 보고)")
         return "C1-1", q, "C1-1"
@@ -137,7 +141,7 @@ def entry(d):
     oods = " · ".join("%s: %.3f" % (lab(l), v) for l, v in j["acc"].items() if l.startswith("ood"))
     oods_last = " · ".join("%s: %.3f" % (lab(l), v) for l, v in last["acc"].items() if l.startswith("ood"))
     phase = cfg.get("phase", "phaseA2")
-    head, question, _ = labels(phase, t)
+    head, question, _ = labels(phase, t, k)
     date = time.strftime("%Y-%m-%d", time.gmtime())
     lines = [
         "## %s · %s · %s / %s" % (date, head, NAME_T[t], NAME_K[k]),
@@ -193,7 +197,7 @@ def main(a):
     cfg = json.loads((d / "config.json").read_text())
     msg = "stage1 %s: %s %s (분포 안 %.3f @ step %d)\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n" \
           "Claude-Session: https://claude.ai/code/session_01VSWBvg7gXA6QqLM5pig7M5\n" % (
-              labels(cfg.get("phase", "phaseA2"), f["task"])[2], f["task"], f["kind"], idv(f), j["step"])
+              labels(cfg.get("phase", "phaseA2"), f["task"], f["kind"])[2], f["task"], f["kind"], idv(f), j["step"])
     files = [str(res.relative_to(root)), str(d.relative_to(root))]
     if (d.parent / "QUEUE_LOG.txt").exists():
         files.append(str((d.parent / "QUEUE_LOG.txt").relative_to(root)))

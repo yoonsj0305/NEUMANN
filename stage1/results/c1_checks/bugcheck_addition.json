@@ -1,0 +1,49 @@
+{
+ "B1_rules_exact": {
+  "id_1-10": 1.0,
+  "ood_11-20": 1.0,
+  "ood_21-30": 1.0,
+  "ood_31-40": 1.0
+ },
+ "B2_eval_causal_and_deterministic": true,
+ "B3_forced_rule_moves_learned_f": {
+  "steps": 3000,
+  "curve_step_loss_id_acc": [
+   [
+    500,
+    0.2958,
+    0.45
+   ],
+   [
+    1000,
+    0.0038,
+    1.0
+   ],
+   [
+    1500,
+    0.0004,
+    1.0
+   ],
+   [
+    2000,
+    0.0055,
+    1.0
+   ],
+   [
+    2500,
+    0.0,
+    1.0
+   ],
+   [
+    3000,
+    0.0,
+    1.0
+   ]
+  ]
+ },
+ "B4_move_logit_grad_mean_abs": {
+  "prompt_steps": 9.079079788512335e-10,
+  "output_steps": 5.982965651516442e-06,
+  "output_steps_nonzero_share": 1.0
+ }
+}

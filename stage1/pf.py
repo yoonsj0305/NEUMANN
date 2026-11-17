@@ -74,10 +74,11 @@ class PF(nn.Module):
             return F.gumbel_softmax(logits, tau=self.tau, hard=True, dim=-1)
         return F.one_hot(logits.argmax(-1), logits.shape[-1]).to(logits.dtype)
 
-    def forward(self, tokens, offset=None, recur=None, controller=None):
+    def forward(self, tokens, offset=None, recur=None, controller=None, forced_moves=None):
         """logits [B, T, V]: position t predicts token t + 1.  `controller` (hand-written rules, checks only)
         replaces g and f: controller.move(x, regs, prev_reads) -> [B, H, 6] one-hot,
-        controller.update(x, regs, reads) -> (new regs [B, R, K] one-hot, output logits [B, V])."""
+        controller.update(x, regs, reads) -> (new regs [B, R, K] one-hot, output logits [B, V]).
+        `forced_moves` (bug check only): a list of [B, H, 6] one-hots, one per step, used instead of g."""
         B, T = tokens.shape
         dev = tokens.device
         issep = torch.isin(tokens, self.sep_ids)
@@ -89,7 +90,10 @@ class PF(nn.Module):
         for t in range(T):
             xt = tokens[:, t]
             e = self.emb(xt)
-            if controller is None:
+            if forced_moves is not None:
+                ml = None
+                w = forced_moves[t]
+            elif controller is None:
                 ml = self.g(torch.cat([e, regs.flatten(1), reads.flatten(1)], -1)).view(B, self.H, len(MOVES))
                 w = self.pick(ml)
             else:
@@ -107,7 +111,7 @@ class PF(nn.Module):
             else:
                 rl = None
                 regs, logits = controller.update(xt, regs, reads)
-            if self.debug is not None and ml is not None:
+            if self.debug is not None and ml is not None and rl is not None:
                 ml.retain_grad()
                 rl.retain_grad()
                 self.debug.append((ml, rl))
@@ -127,3 +131,84 @@ def pf_flops(cfg, B, T, V, train=False):
     fwd = B * T * (mm + reads + index)
     return {"total": 3 * fwd if train else fwd, "matmul": B * T * mm * (3 if train else 1),
             "reads": B * T * reads * (3 if train else 1), "index": B * T * index}
+
+
+def _suffix_min(idx):
+    """out[..., q] = min(idx[..., q:])"""
+    return torch.flip(torch.cummin(torch.flip(idx, [-1]), -1).values, [-1])
+
+
+class PFCont(PF):
+    """PF-cont (CANDIDATE_DESIGN.md 6, ablation / branch step 2): the same machine without discretisation --
+    registers are continuous (softmax over K, carried as distributions), each head is a probability distribution
+    over tape positions, and a step moves it by the softmax mixture of the 6 moves (every move maps each source
+    position to its target exactly as in PF; the distribution is pushed forward).  Reads are the expected one-hot
+    symbol under the head distribution.  Training and evaluation use the same deterministic soft forward."""
+
+    def __init__(self, vocab, **kw):
+        super().__init__(vocab, **kw)
+        self.kind = "pf_cont"
+
+    def targets(self, tokens, t, xt, issep):
+        """[B, 6, T]: the position each source position q moves to under each move at step t"""
+        B, T = tokens.shape
+        pos = torch.arange(T, device=tokens.device).expand(B, T)
+        big = T + 10
+        stay = pos
+        right = torch.clamp(pos + 1, max=t)
+        left = torch.clamp(pos - 1, min=0)
+        start = torch.zeros_like(pos)
+        sidx = torch.where(issep & (pos <= t), pos, torch.full_like(pos, big))
+        nxt = torch.cat([_suffix_min(sidx)[:, 1:], torch.full((B, 1), big, device=tokens.device, dtype=pos.dtype)], 1)
+        nsep = torch.where(nxt < big, nxt, pos)                                   # first sep strictly after q
+        cidx = torch.where((tokens == xt[:, None]) & (pos < t), pos, torch.full_like(pos, big))
+        fc = _suffix_min(cidx)                                                    # first match at or after q
+        cont = torch.where(fc < big, fc + 1, pos)
+        return torch.stack([stay, right, left, nsep, start, cont], 1)
+
+    def forward(self, tokens, offset=None, recur=None, controller=None):
+        B, T = tokens.shape
+        dev = tokens.device
+        issep = torch.isin(tokens, self.sep_ids)
+        onehot_tape = F.one_hot(tokens, self.V).float()                           # [B, T, V]
+        regs = torch.zeros(B, self.R, self.K, device=dev)
+        regs[:, :, 0] = 1.0
+        p = torch.zeros(B, self.H, T, device=dev)
+        p[:, :, 0] = 1.0
+        reads = torch.zeros(B, self.H, self.V, device=dev)
+        out = []
+        for t in range(T):
+            xt = tokens[:, t]
+            e = self.emb(xt)
+            if controller is None:
+                ml = self.g(torch.cat([e, regs.flatten(1), reads.flatten(1)], -1)).view(B, self.H, len(MOVES))
+                pi = F.softmax(ml, -1)
+            else:
+                pi = controller.move(xt, regs, reads)
+            tg = self.targets(tokens, t, xt, issep)                                # [B, 6, T]
+            newp = torch.zeros_like(p)
+            for m in range(len(MOVES)):
+                moved = torch.zeros_like(p).scatter_add_(2, tg[:, m, :].unsqueeze(1).expand(B, self.H, T), p)
+                newp = newp + pi[:, :, m:m + 1] * moved
+            p = newp
+            reads = torch.bmm(p, onehot_tape)                                     # [B, H, V]
+            if controller is None:
+                fo = self.f(torch.cat([e, regs.flatten(1), reads.flatten(1)], -1))
+                regs = F.softmax(fo[:, :self.R * self.K].view(B, self.R, self.K), -1)
+                logits = fo[:, self.R * self.K:]
+            else:
+                regs, logits = controller.update(xt, regs, reads)
+            out.append(logits)
+        return torch.stack(out, 1)
+
+
+def pf_cont_flops(cfg, B, T, V, train=False):
+    """analytic: the two controllers (as PF) + reads under the head distribution (H x T x V per step) + the
+    push-forward of the head distributions (6 moves x H x T per step) + the target tables (suffix scans, ~4 T)"""
+    R, K, H, hid, emb = cfg["R"], cfg["K"], cfg["H"], cfg["hidden"], cfg["emb"]
+    din = emb + R * K + H * V
+    mm = 2 * (din * hid + hid * hid + hid * H * len(MOVES)) + 2 * (din * hid + hid * hid + hid * (R * K + V))
+    per_step = mm + 2 * H * T * V + 2 * len(MOVES) * H * T + 4 * T
+    fwd = B * T * per_step
+    return {"total": 3 * fwd if train else fwd, "matmul_controllers": B * T * mm * (3 if train else 1),
+            "reads": B * T * 2 * H * T * V * (3 if train else 1)}

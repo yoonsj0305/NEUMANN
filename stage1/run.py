@@ -80,6 +80,9 @@ def fwd_flops(kind, cfg, B, Tlen, V, recur=None):
     if kind == "pf":
         import pf as PFM
         return PFM.pf_flops(cfg, B, Tlen, V)["total"]
+    if kind == "pf_cont":
+        import pf as PFM
+        return PFM.pf_cont_flops(cfg, B, Tlen, V)["total"]
     d = cfg["d"]
     if kind == "gru":
         return B * Tlen * (cfg["layers"] * 2 * 3 * (d * d + d * d) + 2 * d * V)
@@ -211,7 +214,8 @@ def main(a):
             "position": {"abacus": "Abacus digit positions + NoPE attention", "looped": "Abacus + NoPE",
                          "looped_rr": "Abacus + NoPE", "gru": "none (recurrence)",
                          "rope": "RoPE in every attention layer (base 10000), no other position embedding",
-                         "pf": "none (read heads over the tape; recurrence over steps)"}[a.kind],
+                         "pf": "none (read heads over the tape; recurrence over steps)",
+                         "pf_cont": "none (soft head distributions over the tape; recurrence over steps)"}[a.kind],
             "pf": {"gumbel_tau": [PF_TAU0, PF_TAU1], "schedule": "exponential over max_steps",
                    "moves": ["stay", "right", "left", "next_sep", "start", "content"], "separators": ["+", "=", "|"],
                    "eval": "argmax", "read_gradient": "straight-through weighted sum of the 6 candidate reads"}
@@ -356,7 +360,7 @@ def main(a):
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--task", choices=T.TASKS, required=True)
-    p.add_argument("--kind", choices=("abacus", "looped", "gru", "looped_rr", "rope", "pf"), required=True)
+    p.add_argument("--kind", choices=("abacus", "looped", "gru", "looped_rr", "rope", "pf", "pf_cont"), required=True)
     p.add_argument("--phase", default="phaseA2", help="results/<phase>/; Phase A records were written as phaseA")
     p.add_argument("--scale", default="1M")
     p.add_argument("--seed", type=int, default=0)

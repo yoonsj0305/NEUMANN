@@ -163,6 +163,10 @@ def build(kind, vocab, digit_ids, cfg):
         import pf as PFM
         import tasks as TT
         return PFM.PF(vocab, sep_ids=[TT.TOK["+"], TT.TOK["="], TT.TOK["|"]], **cfg)
+    if kind == "pf_cont":                   # PF-cont: the same machine without discretisation (branch step 2)
+        import pf as PFM
+        import tasks as TT
+        return PFM.PFCont(vocab, sep_ids=[TT.TOK["+"], TT.TOK["="], TT.TOK["|"]], **cfg)
     if kind == "looped_rr":                 # the same looped network; only its training procedure differs
         return LM(vocab, digit_ids=digit_ids, kind="looped", **cfg)
     return LM(vocab, digit_ids=digit_ids, kind=kind, **cfg)
@@ -186,3 +190,4 @@ SCALES["looped_rr"] = SCALES["looped"]
 SCALES["rope"] = {k: dict(v) for k, v in SCALES["abacus"].items()}    # same layers / width / heads as Abacus
 # C1 Pointer Fold: pre-declared size (CANDIDATE_DESIGN.md 3); not parameter-matched, compared by training FLOPs
 SCALES["pf"] = {"1M": dict(R=4, K=16, H=3, hidden=256, emb=64)}
+SCALES["pf_cont"] = SCALES["pf"]
