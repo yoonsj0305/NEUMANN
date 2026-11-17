@@ -1,0 +1,144 @@
+{
+ "config": {
+  "R": 4,
+  "K": 16,
+  "H": 3,
+  "hidden": 256,
+  "emb": 64
+ },
+ "b_expressiveness": {
+  "addition": {
+   "bins": {
+    "id_1-10": {
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 1000
+    },
+    "ood_11-20": {
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 500
+    },
+    "ood_21-30": {
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 500
+    },
+    "ood_31-40": {
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 500
+    }
+   },
+   "token_lengths_min_prompt_max_total": {
+    "id_1-10": [
+     4,
+     34
+    ],
+    "ood_11-20": [
+     14,
+     64
+    ],
+    "ood_21-30": [
+     24,
+     94
+    ],
+    "ood_31-40": [
+     34,
+     124
+    ]
+   },
+   "all_exact_1.000": true
+  },
+  "parity": {
+   "bins": {
+    "id_1-16": {
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 1000
+    },
+    "ood_17-32": {
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 500
+    },
+    "ood_33-48": {
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 500
+    },
+    "ood_49-64": {
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 500
+    }
+   },
+   "token_lengths_min_prompt_max_total": {
+    "id_1-16": [
+     2,
+     19
+    ],
+    "ood_17-32": [
+     18,
+     35
+    ],
+    "ood_33-48": [
+     34,
+     51
+    ],
+    "ood_49-64": [
+     50,
+     67
+    ]
+   },
+   "all_exact_1.000": true
+  },
+  "mqar": {
+   "bins": {
+    "id_4-16": {
+     "query_teacher_forced": 1.0,
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 1000
+    },
+    "ood_17-32": {
+     "query_teacher_forced": 1.0,
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 500
+    },
+    "ood_33-48": {
+     "query_teacher_forced": 1.0,
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 500
+    },
+    "ood_49-64": {
+     "query_teacher_forced": 1.0,
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 500
+    }
+   },
+   "token_lengths_min_prompt_max_total": {
+    "id_4-16": [
+     9,
+     66
+    ],
+    "ood_17-32": [
+     35,
+     130
+    ],
+    "ood_33-48": [
+     67,
+     194
+    ],
+    "ood_49-64": [
+     99,
+     258
+    ]
+   },
+   "all_exact_1.000": true
+  }
+ }
+}

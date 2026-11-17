@@ -55,6 +55,7 @@ RESULTS = pathlib.Path(__file__).parent / "results"
 LOOPED = ("looped", "looped_rr")
 RR_MIN, RR_MAX = 2, 8      # looped_rr: training iterations per step, uniform
 PROG_ALPHA = 1.0           # looped_rr: weight of the progressive loss (Bansal et al. 2022: (1-a) L_max + a L_prog)
+PF_TAU0, PF_TAU1 = 1.0, 0.1  # PF: straight-through Gumbel temperature, exponential decay over the whole run
 LR = {"1M": 1e-3, "10M": 5e-4, "50M": 2.5e-4}
 OFFSET_MAX = 100          # Abacus training offsets 0..100
 
@@ -76,6 +77,9 @@ def iter_flops(cfg, B, Tlen):
 
 
 def fwd_flops(kind, cfg, B, Tlen, V, recur=None):
+    if kind == "pf":
+        import pf as PFM
+        return PFM.pf_flops(cfg, B, Tlen, V)["total"]
     d = cfg["d"]
     if kind == "gru":
         return B * Tlen * (cfg["layers"] * 2 * 3 * (d * d + d * d) + 2 * d * V)
@@ -206,7 +210,12 @@ def main(a):
             "abacus_offset_max": OFFSET_MAX if a.kind in ("abacus",) + LOOPED else None, "spec": T.SPEC[a.task],
             "position": {"abacus": "Abacus digit positions + NoPE attention", "looped": "Abacus + NoPE",
                          "looped_rr": "Abacus + NoPE", "gru": "none (recurrence)",
-                         "rope": "RoPE in every attention layer (base 10000), no other position embedding"}[a.kind],
+                         "rope": "RoPE in every attention layer (base 10000), no other position embedding",
+                         "pf": "none (read heads over the tape; recurrence over steps)"}[a.kind],
+            "pf": {"gumbel_tau": [PF_TAU0, PF_TAU1], "schedule": "exponential over max_steps",
+                   "moves": ["stay", "right", "left", "next_sep", "start", "content"], "separators": ["+", "=", "|"],
+                   "eval": "argmax", "read_gradient": "straight-through weighted sum of the 6 candidate reads"}
+                  if a.kind == "pf" else None,
             "early_stop": "in-distribution >= 0.99 at two consecutive evaluations",
             "judgment_checkpoint": "highest in-distribution accuracy (earliest if tied); out-of-distribution at it",
             "accuracy": ("MQAR: per-query accuracy of the answers a_i (primary, 'acc'; also used for early stop and "
@@ -241,6 +250,8 @@ def main(a):
         exs = [data[rng.randrange(len(data))] for _ in range(a.batch)]
         xb, yb = make_batch(exs)
         off = torch.randint(0, OFFSET_MAX + 1, (xb.shape[0],)) if a.kind in ("abacus",) + LOOPED else None
+        if a.kind == "pf":                             # Gumbel temperature 1.0 -> 0.1, exponential, whole run
+            model.tau = PF_TAU0 * (PF_TAU1 / PF_TAU0) ** (st["step"] / a.max_steps)
         if a.kind == "looped_rr":
             m = rr_rng.randint(RR_MIN, RR_MAX)
             n = rr_rng.randint(0, m - 1)
@@ -254,6 +265,9 @@ def main(a):
         else:
             logits = model(xb, offset=off)
             step_flops = 3 * fwd_flops(a.kind, cfg, xb.shape[0], xb.shape[1], len(T.VOCAB))
+            if a.kind == "pf":                         # index cost has no backward: count it once
+                import pf as PFM
+                step_flops = PFM.pf_flops(cfg, xb.shape[0], xb.shape[1], len(T.VOCAB), train=True)["total"]
         loss = F.cross_entropy(logits.reshape(-1, len(T.VOCAB)), yb.reshape(-1), ignore_index=-100)
         opt.zero_grad(set_to_none=True)
         loss.backward()
@@ -342,7 +356,7 @@ def main(a):
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--task", choices=T.TASKS, required=True)
-    p.add_argument("--kind", choices=("abacus", "looped", "gru", "looped_rr", "rope"), required=True)
+    p.add_argument("--kind", choices=("abacus", "looped", "gru", "looped_rr", "rope", "pf"), required=True)
     p.add_argument("--phase", default="phaseA2", help="results/<phase>/; Phase A records were written as phaseA")
     p.add_argument("--scale", default="1M")
     p.add_argument("--seed", type=int, default=0)

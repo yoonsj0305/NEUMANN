@@ -15,7 +15,17 @@ HERE = pathlib.Path(__file__).resolve().parent
 PH = HERE / "results" / "phaseA2"
 NAME_T = {"addition": "덧셈", "parity": "패리티", "assoc": "연관 기억", "assoc_n4": "연관 기억 (n=4 고정)",
           "mqar": "MQAR", "mqar_n4": "MQAR (n=4 고정)"}
-NAME_K = {"abacus": "Abacus", "looped": "looped", "gru": "GRU", "looped_rr": "looped_rr", "rope": "rope"}
+NAME_K = {"abacus": "Abacus", "looped": "looped", "gru": "GRU", "looped_rr": "looped_rr", "rope": "rope",
+          "pf": "PF"}
+# frozen baseline reference (CANDIDATE_DESIGN.md 7, from RESULTS.md 1단계 기준선 표, commit 29559d3)
+BASE_REF = {
+    "addition": "분포 안 최고 0.998 (abacus) · 분포 밖 11-20: 0.278 (looped_rr) · 21-30: 0.000 · 31-40: 0.000; "
+                "판정 시점까지 학습 FLOPs 5.18e+14 (looped_rr)",
+    "parity": "분포 안 최고 1.000 (gru) · 분포 밖 17-32: 1.000 · 33-48: 1.000 · 49-64: 1.000 (gru); "
+              "판정 시점까지 학습 FLOPs 1.19e+13 (gru)",
+    "mqar": "질의별 분포 안 최고 1.000 (rope) · 분포 밖 17-32: 0.978 · 33-48: 0.932 · 49-64: 0.844 (looped_rr); "
+            "판정 시점까지 학습 FLOPs 2.68e+14 (looped_rr)",
+}
 PH3 = HERE / "results" / "phaseA3"
 Q3 = "Phase A″ — `rope`가 연관 기억 분포 안 ≥95%인가? (실패하면 하네스 문제로 보고 디버그 허용)"
 Q3C = ("Phase A″ 실행 전 점검 — `rope`가 연관 기억 n=4 고정, 2,000 step에서 분포 안 ≥95%인가? "
@@ -48,8 +58,19 @@ def answer4(f):
     return "%s (분포 안 %.3f)" % ("예" if v >= 0.95 else "아니오", v)
 
 
+def answer_c1(f):
+    v = idv(f)
+    if f["task"] == "mqar":
+        return "미정 — MQAR은 판정 기준 없음, 숫자만 보고 (질의별 분포 안 %.3f)" % v
+    return "%s (분포 안 %.3f; 유효성 기준 ≥0.95)" % ("예" if v >= 0.95 else "아니오", v)
+
+
 def labels(phase, task):
     """(heading label, question, commit label) for a run"""
+    if phase == "c1":
+        q = ("C1-1 — PF가 %s를 학습 분포 안에서 배우는가? (유효성 기준: 분포 안 ≥0.95, 시드 0)" % NAME_T[task]
+             if task != "mqar" else "C1-1 — PF의 MQAR 결과 (판정 기준 없음; 질의별·시퀀스 전체 보고)")
+        return "C1-1", q, "C1-1"
     if phase == "phaseA4":
         if task == "mqar_n4":
             return "Phase A‴ 작업 1 점검", Q4C, "Phase A‴ 점검"
@@ -121,7 +142,7 @@ def entry(d):
     lines = [
         "## %s · %s · %s / %s" % (date, head, NAME_T[t], NAME_K[k]),
         "- 질문: %s" % question,
-        "- 질문에 대한 답: %s" % (answer4(f) if phase == "phaseA4" else
+        "- 질문에 대한 답: %s" % (answer_c1(f) if phase == "c1" else answer4(f) if phase == "phaseA4" else
                                   answer3(f) if phase == "phaseA3" else answer(t, k)),
         "- 코드 커밋: `%s`%s · 원자료: `%s/`" % (
             (env.get("code_commit") or "?")[:7], " (작업 트리 수정 있음)" if env.get("code_dirty") else "",
@@ -137,6 +158,8 @@ def entry(d):
         "- 마지막 시점 (step %d): 분포 안 %.3f · 분포 밖 %s" % (
             last["step"], [v for l, v in last["acc"].items() if l.startswith("id")][0], oods_last),
     ]
+    if phase == "c1" and t in BASE_REF:
+        lines.append("- 같은 과제의 기준선 최고값 (동결, 설계서 7절): %s" % BASE_REF[t])
     if j.get("acc_seq"):
         lines.append("- 시퀀스 전체 정답률 (보조, 판정 시점): %s" % " · ".join(
             "%s: %.3f" % (lab(l), v) for l, v in j["acc_seq"].items()))
