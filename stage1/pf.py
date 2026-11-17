@@ -322,3 +322,56 @@ def pf2_train_flops(cfg, B, T, V, cf_rowsteps):
     total = B * T * (g_fwd + 3 * f_fwd + reads + index) + 2 * cf_rowsteps * g_fwd + pf2_extra_flops(cfg, V, cf_rowsteps)
     matmul = B * T * (g_fwd + 3 * f_fwd) + 2 * cf_rowsteps * g_fwd + cf_rowsteps * H * len(MOVES) * f_fwd
     return {"total": total, "matmul": matmul}
+
+
+# ---- PF-search (CANDIDATE_DESIGN.md 11): the move policy is a table, the update controller is learned ----
+CLASS_NAMES = ("digit", "+", "=", "|", "node", "answer_phase", "other")
+
+
+def token_classes(tokens, digit_ids, plus_id, eq_id, bar_id, node_lo, node_hi):
+    """[B, T] token class 0..6 (design 11): digit, +, =, |, node (key), answer-phase token, other.  Answer phase =
+    positions strictly after the first = or | of the row (the class overrides the token type there)."""
+    isd = torch.isin(tokens, digit_ids)
+    cls = torch.full_like(tokens, 6)
+    cls = torch.where((tokens >= node_lo) & (tokens < node_hi), torch.full_like(cls, 4), cls)
+    cls = torch.where(tokens == bar_id, torch.full_like(cls, 3), cls)
+    cls = torch.where(tokens == eq_id, torch.full_like(cls, 2), cls)
+    cls = torch.where(tokens == plus_id, torch.full_like(cls, 1), cls)
+    cls = torch.where(isd, torch.full_like(cls, 0), cls)
+    end = (tokens == eq_id) | (tokens == bar_id)
+    after = (torch.cumsum(end.long(), 1) - end.long()) > 0                     # strictly after the first =/|
+    return torch.where(after, torch.full_like(cls, 5), cls)
+
+
+class PFPolicy(PF):
+    """PF-search model: the PF machine whose head moves come from a fixed table policy[head, token class]; the
+    move controller g is not used.  Registers and outputs: the learned update controller f (straight-through
+    Gumbel registers, as C1-1/C1-2)."""
+
+    def __init__(self, vocab, policy=None, class_ids=None, **kw):
+        super().__init__(vocab, **kw)
+        self.kind = "pf_search"
+        self.register_buffer("policy", torch.tensor(policy if policy is not None else [[0] * 7] * self.H,
+                                                    dtype=torch.long), persistent=False)
+        self.class_ids = class_ids
+
+    def forward(self, tokens, offset=None, recur=None, controller=None, forced_moves=None):
+        if controller is not None or forced_moves is not None:
+            return super().forward(tokens, controller=controller, forced_moves=forced_moves)
+        c = self.class_ids
+        cls = token_classes(tokens, c["digits"], c["plus"], c["eq"], c["bar"], c["node_lo"], c["node_hi"])
+        mv = self.policy[:, cls].permute(1, 2, 0)                                 # [B, T, H]
+        oh = F.one_hot(mv, len(MOVES)).float()
+        return super().forward(tokens, forced_moves=[oh[:, t] for t in range(tokens.shape[1])])
+
+
+def pf_policy_flops(cfg, B, T, V, train=False):
+    """PF-search model: the update controller f (forward; + backward when training), the 6-candidate reads, the
+    index; no move controller"""
+    R, K, H, hid, emb = cfg["R"], cfg["K"], cfg["H"], cfg["hidden"], cfg["emb"]
+    din = emb + R * K + H * V
+    f_fwd = 2 * (din * hid + hid * hid + hid * (R * K + V))
+    reads = 2 * H * len(MOVES) * V
+    index = 1 + 2 * H * math.ceil(math.log2(T + 1))
+    k = 3 if train else 1
+    return {"total": B * T * (k * f_fwd + k * reads + index), "matmul": B * T * k * f_fwd}

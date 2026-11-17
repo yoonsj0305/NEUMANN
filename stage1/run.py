@@ -80,6 +80,9 @@ def fwd_flops(kind, cfg, B, Tlen, V, recur=None):
     if kind in ("pf", "pf2"):
         import pf as PFM
         return PFM.pf_flops(cfg, B, Tlen, V)["total"]
+    if kind == "pf_search":
+        import pf as PFM
+        return PFM.pf_policy_flops(cfg, B, Tlen, V)["total"]
     if kind == "pf_cont":
         import pf as PFM
         return PFM.pf_cont_flops(cfg, B, Tlen, V)["total"]
@@ -164,10 +167,15 @@ def main(a):
     out.mkdir(parents=True, exist_ok=True)
     torch.set_num_threads(a.threads)
     cfg = dict(M.SCALES[a.kind][a.scale])
+    if a.kind == "pf_search":                        # the move-policy table found by stage1/pf_search.py
+        sr = json.loads(pathlib.Path(a.policy).read_text())
+        cfg["policy"] = sr["policy"]
     digit_ids = [T.TOK[d] for d in T.DIGITS]
     torch.manual_seed(a.seed)
     model = M.build(a.kind, len(T.VOCAB), digit_ids, cfg)
     params = M.n_params(model)
+    if a.kind == "pf_search":                        # the move controller g is not used: count f + embedding
+        params = sum(p.numel() for n, p in model.named_parameters() if not n.startswith("g."))
     data = T.train_set(a.task, a.N, a.seed)
     evals = T.eval_sets(a.task, a.id_size, a.ood_size)
     lr = LR[a.scale]
@@ -216,6 +224,7 @@ def main(a):
                          "rope": "RoPE in every attention layer (base 10000), no other position embedding",
                          "pf": "none (read heads over the tape; recurrence over steps)",
                          "pf2": "none (read heads over the tape; recurrence over steps)",
+                         "pf_search": "none (read heads over the tape; table move policy)",
                          "pf_cont": "none (soft head distributions over the tape; recurrence over steps)"}[a.kind],
             "pf": {"gumbel_tau": [PF_TAU0, PF_TAU1], "schedule": "exponential over max_steps",
                    "moves": ["stay", "right", "left", "next_sep", "start", "content"], "separators": ["+", "=", "|"],
@@ -229,6 +238,8 @@ def main(a):
                     "aux_weight": "added to the loss as is: expected immediate losses summed over heads, mean over "
                                   "target positions", "eval": "argmax"}
                   if a.kind == "pf2" else None,
+            "pf_search": {"policy_file": a.policy, "search": json.loads(pathlib.Path(a.policy).read_text())}
+                         if a.kind == "pf_search" else None,
             "early_stop": "in-distribution >= 0.99 at two consecutive evaluations",
             "judgment_checkpoint": "highest in-distribution accuracy (earliest if tied); out-of-distribution at it",
             "accuracy": ("MQAR: per-query accuracy of the answers a_i (primary, 'acc'; also used for early stop and "
@@ -264,7 +275,7 @@ def main(a):
         exs = [data[rng.randrange(len(data))] for _ in range(a.batch)]
         xb, yb = make_batch(exs)
         off = torch.randint(0, OFFSET_MAX + 1, (xb.shape[0],)) if a.kind in ("abacus",) + LOOPED else None
-        if a.kind in ("pf", "pf2"):                    # Gumbel temperature 1.0 -> 0.1, exponential, whole run
+        if a.kind in ("pf", "pf2", "pf_search"):       # Gumbel temperature 1.0 -> 0.1, exponential, whole run
             model.tau = PF_TAU0 * (PF_TAU1 / PF_TAU0) ** (st["step"] / a.max_steps)
         if a.kind == "looped_rr":
             m = rr_rng.randint(RR_MIN, RR_MAX)
@@ -281,6 +292,9 @@ def main(a):
                 model.targets = yb                     # C1-2: targets for the expected immediate move loss
             logits = model(xb, offset=off)
             step_flops = 3 * fwd_flops(a.kind, cfg, xb.shape[0], xb.shape[1], len(T.VOCAB))
+            if a.kind == "pf_search":
+                import pf as PFM
+                step_flops = PFM.pf_policy_flops(cfg, xb.shape[0], xb.shape[1], len(T.VOCAB), train=True)["total"]
             if a.kind in ("pf", "pf2"):                # index cost has no backward: count it once
                 import pf as PFM
                 step_flops = PFM.pf_flops(cfg, xb.shape[0], xb.shape[1], len(T.VOCAB), train=True)["total"]
@@ -385,8 +399,9 @@ def main(a):
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--task", choices=T.TASKS, required=True)
-    p.add_argument("--kind", choices=("abacus", "looped", "gru", "looped_rr", "rope", "pf", "pf_cont", "pf2"),
-                   required=True)
+    p.add_argument("--kind", choices=("abacus", "looped", "gru", "looped_rr", "rope", "pf", "pf_cont", "pf2",
+                                      "pf_search"), required=True)
+    p.add_argument("--policy", default="", help="pf_search: search_result.json of stage1/pf_search.py")
     p.add_argument("--phase", default="phaseA2", help="results/<phase>/; Phase A records were written as phaseA")
     p.add_argument("--scale", default="1M")
     p.add_argument("--seed", type=int, default=0)
