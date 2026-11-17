@@ -77,6 +77,15 @@ def main():
         lines.append("* %s: %s%s" % (c["criterion"], "—" if c["value"] is None else "%.3f" % c["value"],
                                      "" if c["met"] is None else (" → met" if c["met"] else " → not met")))
     lines.append("* all thresholds met: %s" % ("yes" if allmet else "no"))
+    lines.append("")
+    lines.append("Interrupted by the session's 2-hour background limit and resumed from the last checkpoint (steps after "
+                 "it were recomputed; recorded FLOPs and wall-clock count each step once; see QUEUE_LOG.txt):")
+    for k, v in out.items():
+        if v["segments"] > 1:
+            lines.append("* %s: %d segments" % (k, v["segments"]))
+    lines.append("")
+    lines.append("Wall-clock: one CPU thread per run, up to 4 runs at once on a 4-core CPU (no GPU); times are not "
+                 "corrected for contention.")
     (ROOT / "SUMMARY.md").write_text("\n".join(lines) + "\n")
     (ROOT / "summary.json").write_text(json.dumps({"runs": out, "criteria": crit, "all_thresholds_met": allmet},
                                                   indent=1))
