@@ -84,14 +84,42 @@ def fwd_flops(kind, cfg, B, Tlen, V, recur=None):
 
 
 def make_batch(exs):
-    T_ = max(len(p) + len(a) for p, a in exs)
+    """examples are (prompt, answer) -- every answer token (and <eos>) is a target -- or, for MQAR,
+    (prompt, continuation, mask) -- only the masked continuation tokens (the answers a_i) are targets"""
+    T_ = max(len(e[0]) + len(e[1]) for e in exs)
     x = torch.full((len(exs), T_), T.PAD, dtype=torch.long)
     y = torch.full((len(exs), T_), -100, dtype=torch.long)
-    for i, (p, a) in enumerate(exs):
+    for i, e in enumerate(exs):
+        p, a = e[0], e[1]
         s = p + a
         x[i, :len(s)] = torch.tensor(s)
-        y[i, len(p) - 1:len(s) - 1] = torch.tensor(a)      # the logit at position j predicts token j + 1
+        if len(e) == 2:
+            y[i, len(p) - 1:len(s) - 1] = torch.tensor(a)  # the logit at position j predicts token j + 1
+        else:
+            for j, (tok, m) in enumerate(zip(a, e[2])):
+                if m:
+                    y[i, len(p) + j - 1] = tok
     return x, y
+
+
+@torch.no_grad()
+def score(model, exs, kind, cfg, recur=None, bs=128):
+    """teacher-forced: {"seq": all targets of the example right, "query": share of target tokens right, "flops"}"""
+    model.eval()
+    ok, flops, qok, qn = 0, 0, 0, 0
+    order = sorted(range(len(exs)), key=lambda i: len(exs[i][0]) + len(exs[i][1]))
+    for i in range(0, len(order), bs):
+        chunk = [exs[j] for j in order[i:i + bs]]
+        x, y = make_batch(chunk)
+        logits = model(x, recur=recur)
+        flops += fwd_flops(kind, cfg, x.shape[0], x.shape[1], len(T.VOCAB), recur)
+        pred = logits.argmax(-1)
+        m = y != -100
+        ok += int(((pred == y) | ~m).all(1).sum())
+        qok += int(((pred == y) & m).sum())
+        qn += int(m.sum())
+    model.train()
+    return {"seq": ok / len(exs), "query": qok / max(qn, 1), "flops": flops}
 
 
 @torch.no_grad()
@@ -181,6 +209,9 @@ def main(a):
                          "rope": "RoPE in every attention layer (base 10000), no other position embedding"}[a.kind],
             "early_stop": "in-distribution >= 0.99 at two consecutive evaluations",
             "judgment_checkpoint": "highest in-distribution accuracy (earliest if tied); out-of-distribution at it",
+            "accuracy": ("MQAR: per-query accuracy of the answers a_i (primary, 'acc'; also used for early stop and "
+                         "the judgment checkpoint) and whole-sequence accuracy (secondary, 'acc_seq'); teacher-forced"
+                         if a.task in T.MQAR else "sequence exact match (teacher-forced == greedy)"),
             "looped_eval_rule": "primary: 4 x ceil(bin upper / training upper) iterations; secondary: fixed 4"
                                 if a.kind in LOOPED else None,
             "looped_rr": {"iterations": [RR_MIN, RR_MAX], "progressive_alpha": PROG_ALPHA,
@@ -241,13 +272,22 @@ def main(a):
             window = []
             for label, ex in evals.items():
                 r = None if a.kind not in LOOPED else cfg["recur"] * ratio(a.task, label)
-                acc, fl = exact_match(model, ex, a.kind, cfg, recur=r)
+                if a.task in T.MQAR:                   # MQAR: per-query accuracy primary, whole sequence secondary
+                    sc = score(model, ex, a.kind, cfg, recur=r)
+                    acc, fl = sc["query"], sc["flops"]
+                    rec.setdefault("acc_seq", {})[label] = sc["seq"]
+                else:
+                    acc, fl = exact_match(model, ex, a.kind, cfg, recur=r)
                 rec["acc"][label] = acc
                 st["eval_flops"] += fl
                 if a.kind in LOOPED:
                     rec["recur"][label] = r
                     if label.startswith("ood"):        # secondary: fixed 4 iterations
-                        acc4, fl4 = exact_match(model, ex, a.kind, cfg, recur=cfg["recur"])
+                        if a.task in T.MQAR:
+                            sc4 = score(model, ex, a.kind, cfg, recur=cfg["recur"])
+                            acc4, fl4 = sc4["query"], sc4["flops"]
+                        else:
+                            acc4, fl4 = exact_match(model, ex, a.kind, cfg, recur=cfg["recur"])
                         rec.setdefault("acc_fixed4", {})[label] = acc4
                         st["eval_flops"] += fl4
             st["wall_eval_s"] += time.time() - t_ev
@@ -279,12 +319,14 @@ def main(a):
     id_label = [l for l in last["acc"] if l.startswith("id")][0]
     best = max(rows, key=lambda r: (r["acc"][id_label], -r["step"]))      # highest in-distribution, earliest if tied
     judgment = {"rule": "highest in-distribution accuracy (earliest if tied)", "step": best["step"],
-                "acc": best["acc"], "acc_fixed4": best.get("acc_fixed4"), "train_flops_cum": best["train_flops_cum"],
+                "acc": best["acc"], "acc_fixed4": best.get("acc_fixed4"), "acc_seq": best.get("acc_seq"),
+                "train_flops_cum": best["train_flops_cum"],
                 "wall_train_s_cum": best["wall_train_s_cum"]}
     res = {"name": name, "task": a.task, "kind": a.kind, "scale": a.scale, "params": params, "config": cfg,
            "seed": a.seed, "N": a.N, "batch": a.batch, "lr": lr, "max_steps": a.max_steps, "steps": st["step"],
            "stopped": stop, "spec": T.SPEC[a.task], "id_size": a.id_size, "ood_size": a.ood_size,
-           "judgment": judgment, "last": {"step": last["step"], "acc": last["acc"], "acc_fixed4": last.get("acc_fixed4")},
+           "judgment": judgment, "last": {"step": last["step"], "acc": last["acc"], "acc_fixed4": last.get("acc_fixed4"),
+                                          "acc_seq": last.get("acc_seq")},
            "final_acc": last["acc"], "final_acc_fixed4": last.get("acc_fixed4"), "recur": last.get("recur"),
            "train_flops": st["train_flops"], "eval_flops": st["eval_flops"],
            "wall_train_s": round(st["wall_train_s"], 2), "wall_eval_s": round(st["wall_eval_s"], 2),

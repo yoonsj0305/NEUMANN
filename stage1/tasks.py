@@ -30,7 +30,7 @@ VOCAB = SPECIAL + DIGITS + SYMS + NODES
 TOK = {t: i for i, t in enumerate(VOCAB)}
 PAD, EOS = TOK["<pad>"], TOK["<eos>"]
 
-TASKS = ("addition", "parity", "reachability", "assoc", "assoc_n4")   # reachability: Phase A only; assoc_n4: check
+TASKS = ("addition", "parity", "reachability", "assoc", "assoc_n4", "mqar", "mqar_n4")
 # (training range, in-distribution bin, out-of-distribution bins)
 SPEC = {
     "addition": {"train": (1, 10), "id": (1, 10), "ood": [(11, 20), (21, 30), (31, 40)]},
@@ -39,7 +39,11 @@ SPEC = {
     "assoc": {"train": (4, 16), "id": (4, 16), "ood": [(17, 32), (33, 48), (49, 64)]},
     # Phase A'' pre-run check only: associative recall with n fixed at 4 (the out-of-distribution bins as assoc)
     "assoc_n4": {"train": (4, 4), "id": (4, 4), "ood": [(17, 32), (33, 48), (49, 64)]},
+    # Phase A‴: multi-query associative recall (MQAR); mqar_n4 = its pre-run check (n fixed at 4)
+    "mqar": {"train": (4, 16), "id": (4, 16), "ood": [(17, 32), (33, 48), (49, 64)]},
+    "mqar_n4": {"train": (4, 4), "id": (4, 4), "ood": [(17, 32), (33, 48), (49, 64)]},
 }
+MQAR = ("mqar", "mqar_n4")
 
 
 def _num(rng, ndig):
@@ -102,6 +106,27 @@ def assoc(n, rng):
     return p + ["|", keys[q], "="], [vals[q]]
 
 
+def mqar(n, rng):
+    """multi-query associative recall (Phase A‴, standard MQAR form): k1 v1 ... kn vn | q1 a1 ... qn an <eos>; n
+    distinct keys from the 100 node names, single-digit values, every key queried once in random order.  Returns
+    (prompt, continuation, target mask): the loss and the accuracy are on the answers a_i only."""
+    keys = rng.sample(NODES, n)
+    vals = [str(rng.randrange(10)) for _ in range(n)]
+    p = []
+    for k, v in zip(keys, vals):
+        p += [k, v]
+    p.append("|")
+    cont, mask = [], []
+    for i in rng.sample(range(n), n):
+        cont += [keys[i], vals[i]]
+        mask += [False, True]
+    return p, cont, mask
+
+
+def encode_mqar(p, cont, mask):
+    return [TOK[t] for t in p], [TOK[t] for t in cont] + [EOS], list(mask) + [False]
+
+
 def draw(task, rng, lo, hi, train_dist=False):
     """one example; for addition `train_dist` = both operand lengths independent uniform in lo..hi (the training /
     in-distribution draw), otherwise the longer operand's length is uniform in lo..hi.  Returns (prompt, answer,
@@ -127,6 +152,8 @@ def encode(prompt, answer):
 def train_set(task, size, seed):
     rng = random.Random("train:%s:%d" % (task, seed))
     lo, hi = SPEC[task]["train"]
+    if task in MQAR:
+        return [encode_mqar(*mqar(rng.randint(lo, hi), rng)) for _ in range(size)]
     return [encode(*draw(task, rng, lo, hi, train_dist=True)[:2]) for _ in range(size)]
 
 
@@ -135,6 +162,13 @@ def eval_sets(task, n_id, n_ood):
     the out-of-distribution bins, each from its own fixed seed"""
     out = {}
     lo, hi = SPEC[task]["id"]
+    if task in MQAR:
+        rng = random.Random("eval:%s:id" % task)
+        out["id_%d-%d" % (lo, hi)] = [encode_mqar(*mqar(rng.randint(lo, hi), rng)) for _ in range(n_id)]
+        for lo, hi in SPEC[task]["ood"]:
+            rng = random.Random("eval:%s:%d-%d" % (task, lo, hi))
+            out["ood_%d-%d" % (lo, hi)] = [encode_mqar(*mqar(rng.randint(lo, hi), rng)) for _ in range(n_ood)]
+        return out
     rng = random.Random("eval:%s:id" % task)
     out["id_%d-%d" % (lo, hi)] = [encode(*draw(task, rng, lo, hi, train_dist=True)[:2]) for _ in range(n_id)]
     for lo, hi in SPEC[task]["ood"]:
