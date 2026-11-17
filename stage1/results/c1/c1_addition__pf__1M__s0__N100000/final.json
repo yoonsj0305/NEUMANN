@@ -1,0 +1,101 @@
+{
+ "name": "c1_addition__pf__1M__s0__N100000",
+ "task": "addition",
+ "kind": "pf",
+ "scale": "1M",
+ "params": 441546,
+ "config": {
+  "R": 4,
+  "K": 16,
+  "H": 3,
+  "hidden": 256,
+  "emb": 64
+ },
+ "seed": 0,
+ "N": 100000,
+ "batch": 64,
+ "lr": 0.001,
+ "max_steps": 20000,
+ "steps": 20000,
+ "stopped": "max steps",
+ "spec": {
+  "train": [
+   1,
+   10
+  ],
+  "id": [
+   1,
+   10
+  ],
+  "ood": [
+   [
+    11,
+    20
+   ],
+   [
+    21,
+    30
+   ],
+   [
+    31,
+    40
+   ]
+  ]
+ },
+ "id_size": 1000,
+ "ood_size": 500,
+ "judgment": {
+  "rule": "highest in-distribution accuracy (earliest if tied)",
+  "step": 9000,
+  "acc": {
+   "id_1-10": 0.005,
+   "ood_11-20": 0.0,
+   "ood_21-30": 0.0,
+   "ood_31-40": 0.0
+  },
+  "acc_fixed4": null,
+  "acc_seq": null,
+  "train_flops_cum": 49045974549696,
+  "wall_train_s_cum": 2601.18
+ },
+ "last": {
+  "step": 20000,
+  "acc": {
+   "id_1-10": 0.001,
+   "ood_11-20": 0.0,
+   "ood_21-30": 0.0,
+   "ood_31-40": 0.0
+  },
+  "acc_fixed4": null,
+  "acc_seq": null
+ },
+ "final_acc": {
+  "id_1-10": 0.001,
+  "ood_11-20": 0.0,
+  "ood_21-30": 0.0,
+  "ood_31-40": 0.0
+ },
+ "final_acc_fixed4": null,
+ "recur": {},
+ "train_flops": 108999442347264,
+ "eval_flops": 2315746770720,
+ "wall_train_s": 6262.58,
+ "wall_eval_s": 72.11,
+ "segments": [
+  {
+   "segment": 0,
+   "start_step": 0,
+   "started": "2026-11-17 13:01:55"
+  }
+ ],
+ "hardware": {
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "torch_threads": 1,
+  "torch": "2.15.0+cu132",
+  "cuda": false,
+  "python": "3.12.3"
+ },
+ "commit": "f4ac43e50172fef8a1117bd1400d3062ff3ff3de",
+ "primary_eval_rule": "looped / looped_rr: recurrence 4 x ceil(bin upper / training upper) (declared before runs); fixed 4 recorded as acc_fixed4"
+}
