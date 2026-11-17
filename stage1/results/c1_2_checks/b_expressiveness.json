@@ -1,0 +1,90 @@
+{
+ "config": {
+  "R": 4,
+  "K": 16,
+  "H": 3,
+  "hidden": 256,
+  "emb": 64
+ },
+ "b_expressiveness": {
+  "addition": {
+   "bins": {
+    "id_1-10": {
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 1000
+    },
+    "ood_11-20": {
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 500
+    },
+    "ood_21-30": {
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 500
+    },
+    "ood_31-40": {
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 500
+    }
+   },
+   "all_exact_1.000": true
+  },
+  "parity": {
+   "bins": {
+    "id_1-16": {
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 1000
+    },
+    "ood_17-32": {
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 500
+    },
+    "ood_33-48": {
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 500
+    },
+    "ood_49-64": {
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 500
+    }
+   },
+   "all_exact_1.000": true
+  },
+  "mqar": {
+   "bins": {
+    "id_4-16": {
+     "query_teacher_forced": 1.0,
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 1000
+    },
+    "ood_17-32": {
+     "query_teacher_forced": 1.0,
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 500
+    },
+    "ood_33-48": {
+     "query_teacher_forced": 1.0,
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 500
+    },
+    "ood_49-64": {
+     "query_teacher_forced": 1.0,
+     "seq_teacher_forced": 1.0,
+     "seq_greedy_sample20": 1.0,
+     "n": 500
+    }
+   },
+   "all_exact_1.000": true
+  }
+ }
+}

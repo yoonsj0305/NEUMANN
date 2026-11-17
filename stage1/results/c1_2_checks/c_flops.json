@@ -1,0 +1,35 @@
+{
+ "config": {
+  "R": 4,
+  "K": 16,
+  "H": 3,
+  "hidden": 256,
+  "emb": 64
+ },
+ "c_flops": {
+  "addition": {
+   "batch_shape": [
+    64,
+    33
+   ],
+   "counterfactual_row_steps": 1856,
+   "measured_flop_counter": 21156003840,
+   "analytic_matmul": 21156003840,
+   "matmul_ratio_analytic_over_measured": 1.0,
+   "analytic_total_with_reads_index_losses": 21177332928,
+   "counterfactual_share_of_total": 0.7501
+  },
+  "mqar": {
+   "batch_shape": [
+    64,
+    66
+   ],
+   "counterfactual_row_steps": 1792,
+   "measured_flop_counter": 24393154560,
+   "analytic_matmul": 24393154560,
+   "matmul_ratio_analytic_over_measured": 1.0,
+   "analytic_total_with_reads_index_losses": 24423292800,
+   "counterfactual_share_of_total": 0.628
+  }
+ }
+}

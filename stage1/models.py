@@ -163,6 +163,10 @@ def build(kind, vocab, digit_ids, cfg):
         import pf as PFM
         import tasks as TT
         return PFM.PF(vocab, sep_ids=[TT.TOK["+"], TT.TOK["="], TT.TOK["|"]], **cfg)
+    if kind == "pf2":                       # C1-2: PF with the exact expected immediate loss for the head moves
+        import pf as PFM
+        import tasks as TT
+        return PFM.PF2(vocab, sep_ids=[TT.TOK["+"], TT.TOK["="], TT.TOK["|"]], **cfg)
     if kind == "pf_cont":                   # PF-cont: the same machine without discretisation (branch step 2)
         import pf as PFM
         import tasks as TT
@@ -191,3 +195,4 @@ SCALES["rope"] = {k: dict(v) for k, v in SCALES["abacus"].items()}    # same lay
 # C1 Pointer Fold: pre-declared size (CANDIDATE_DESIGN.md 3); not parameter-matched, compared by training FLOPs
 SCALES["pf"] = {"1M": dict(R=4, K=16, H=3, hidden=256, emb=64)}
 SCALES["pf_cont"] = SCALES["pf"]
+SCALES["pf2"] = SCALES["pf"]

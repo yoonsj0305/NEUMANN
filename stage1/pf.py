@@ -212,3 +212,113 @@ def pf_cont_flops(cfg, B, T, V, train=False):
     fwd = B * T * per_step
     return {"total": 3 * fwd if train else fwd, "matmul_controllers": B * T * mm * (3 if train else 1),
             "reads": B * T * 2 * H * T * V * (3 if train else 1)}
+
+
+class PF2(PF):
+    """C1-2 (CANDIDATE_DESIGN.md 10): the same PF machine; the ONLY change is the learning signal of the head moves.
+    Straight-through on the moves is replaced by the EXACT expected immediate loss: at a step with an output target,
+    for each head j and each of its 6 candidate moves m (the other heads fixed at the moves chosen this step) the
+    read and the output loss L_j(m) of that step are computed; the move logits are trained on
+    sum_m p_j(m) * L_j(m) with p_j = softmax(move logits) (the distribution the forward samples from; L_j(m) is a
+    constant for this term).  The forward uses the one chosen move (sampled by Gumbel-max in training, argmax in
+    evaluation) and reads only its symbol (no straight-through read).  Steps without an output target give no move
+    signal.  Registers keep straight-through Gumbel; structure, sizes, temperature and the training protocol are C1-1's.
+    The training loop sets `targets` ([B, T], -100 where no target) before the forward and adds `aux` to the loss;
+    `aux` = the expected immediate losses summed over heads, averaged over target positions."""
+
+    def __init__(self, vocab, **kw):
+        super().__init__(vocab, **kw)
+        self.kind = "pf2"
+        self.targets = None
+        self.aux = None
+        self.cf_rowsteps = 0                   # rows x steps at which the 18 counterfactual f evaluations ran
+        self.debug_L = []                      # (step, L [B, H, 6]) when debug is on (exactness test)
+
+    def forward(self, tokens, offset=None, recur=None, controller=None, forced_moves=None):
+        if controller is not None or forced_moves is not None:
+            return super().forward(tokens, controller=controller, forced_moves=forced_moves)
+        B, T = tokens.shape
+        dev = tokens.device
+        nm = len(MOVES)
+        issep = torch.isin(tokens, self.sep_ids)
+        regs = torch.zeros(B, self.R, self.K, device=dev)
+        regs[:, :, 0] = 1.0
+        h = torch.zeros(B, self.H, dtype=torch.long, device=dev)
+        reads = torch.zeros(B, self.H, self.V, device=dev)
+        use_signal = self.training and self.targets is not None
+        J = torch.zeros((), device=dev)
+        n_t = 0
+        self.cf_rowsteps = 0
+        out = []
+        for t in range(T):
+            xt = tokens[:, t]
+            e = self.emb(xt)
+            ml = self.g(torch.cat([e, regs.flatten(1), reads.flatten(1)], -1)).view(B, self.H, nm)
+            with torch.no_grad():
+                if self.training:
+                    u = torch.rand_like(ml).clamp_(1e-20, 1.0)
+                    idx = (ml - torch.log(-torch.log(u))).argmax(-1)          # Gumbel-max sample from softmax(ml)
+                else:
+                    idx = ml.argmax(-1)
+            cand = candidates(tokens, t, h, xt, issep)                                 # [B, H, 6]
+            sym = torch.gather(tokens[:, None, :].expand(B, self.H, T), 2, cand)       # [B, H, 6]
+            chosen = torch.gather(sym, 2, idx.unsqueeze(-1)).squeeze(-1)               # [B, H]
+            reads = F.one_hot(chosen, self.V).float()                                  # the chosen move's read only
+            h = torch.gather(cand, 2, idx.unsqueeze(-1)).squeeze(-1)
+            base_in = torch.cat([e, regs.flatten(1), reads.flatten(1)], -1)
+            fo = self.f(base_in)
+            rl = fo[:, :self.R * self.K].view(B, self.R, self.K)
+            logits = fo[:, self.R * self.K:]
+            if use_signal:
+                yt = self.targets[:, t]
+                tm = yt != -100
+                if bool(tm.any()):
+                    with torch.no_grad():
+                        # 18 counterfactual reads: head j takes move m, the other heads keep their chosen reads
+                        cf = reads.unsqueeze(1).unsqueeze(1).expand(B, self.H, nm, self.H, self.V).clone()
+                        oh = F.one_hot(sym, self.V).float()                            # [B, H, 6, V]
+                        for j in range(self.H):
+                            cf[:, j, :, j, :] = oh[:, j]
+                        x_cf = torch.cat([e.unsqueeze(1).expand(B, self.H * nm, e.shape[-1]),
+                                          regs.flatten(1).unsqueeze(1).expand(B, self.H * nm, self.R * self.K),
+                                          cf.view(B, self.H * nm, self.H * self.V)], -1)
+                        lg = self.f(x_cf.reshape(B * self.H * nm, -1))[:, self.R * self.K:]
+                        L = F.cross_entropy(lg, yt.clamp(min=0).repeat_interleave(self.H * nm), reduction="none")
+                        L = L.view(B, self.H, nm) * tm.view(B, 1, 1).float()
+                        self.cf_rowsteps += B
+                    J = J + (F.softmax(ml, -1) * L).sum()
+                    n_t += int(tm.sum())
+                    if self.debug is not None:
+                        self.debug_L.append((t, L.detach().clone()))
+            regs = self.pick(rl)
+            if self.debug is not None:
+                ml.retain_grad()
+                rl.retain_grad()
+                self.debug.append((ml, rl))
+            out.append(logits)
+        self.aux = J / max(n_t, 1) if use_signal else None
+        return torch.stack(out, 1)
+
+
+def pf2_extra_flops(cfg, V, cf_rowsteps):
+    """the 18 counterfactual update/output-controller forwards (no backward) + their losses, per row-step"""
+    R, K, H, hid, emb = cfg["R"], cfg["K"], cfg["H"], cfg["hidden"], cfg["emb"]
+    din = emb + R * K + H * V
+    f_fwd = 2 * (din * hid + hid * hid + hid * (R * K + V))
+    return cf_rowsteps * H * len(MOVES) * (f_fwd + 3 * V) + cf_rowsteps * 3 * H * len(MOVES)
+
+
+def pf2_train_flops(cfg, B, T, V, cf_rowsteps):
+    """C1-2 training FLOPs of one batch, as executed: forward of both controllers at every step; backward of the
+    update controller f at every step (its registers feed later steps); backward of the move controller g only at
+    steps with a target (its logits receive the expected-loss signal there and nothing else); the 6-candidate
+    reads; the index; the 18 counterfactual f forwards and their losses (no backward)."""
+    R, K, H, hid, emb = cfg["R"], cfg["K"], cfg["H"], cfg["hidden"], cfg["emb"]
+    din = emb + R * K + H * V
+    g_fwd = 2 * (din * hid + hid * hid + hid * H * len(MOVES))
+    f_fwd = 2 * (din * hid + hid * hid + hid * (R * K + V))
+    reads = 2 * H * len(MOVES) * V
+    index = 1 + 2 * H * math.ceil(math.log2(T + 1))
+    total = B * T * (g_fwd + 3 * f_fwd + reads + index) + 2 * cf_rowsteps * g_fwd + pf2_extra_flops(cfg, V, cf_rowsteps)
+    matmul = B * T * (g_fwd + 3 * f_fwd) + 2 * cf_rowsteps * g_fwd + cf_rowsteps * H * len(MOVES) * f_fwd
+    return {"total": total, "matmul": matmul}

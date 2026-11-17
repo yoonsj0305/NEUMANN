@@ -1,0 +1,26 @@
+{
+ "config": {
+  "R": 4,
+  "K": 16,
+  "H": 3,
+  "hidden": 256,
+  "emb": 64
+ },
+ "a2_exact_expected_loss_gradient": {
+  "addition": {
+   "target_steps_checked": 25,
+   "max_abs_diff_autograd_vs_closed_form": 1.90857463167049e-09,
+   "non_target_steps_zero_gradient": true
+  },
+  "parity": {
+   "target_steps_checked": 11,
+   "max_abs_diff_autograd_vs_closed_form": 5.248921297607012e-09,
+   "non_target_steps_zero_gradient": true
+  },
+  "mqar": {
+   "target_steps_checked": 27,
+   "max_abs_diff_autograd_vs_closed_form": 1.894932211143896e-09,
+   "non_target_steps_zero_gradient": true
+  }
+ }
+}

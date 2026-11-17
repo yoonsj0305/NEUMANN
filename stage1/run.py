@@ -77,7 +77,7 @@ def iter_flops(cfg, B, Tlen):
 
 
 def fwd_flops(kind, cfg, B, Tlen, V, recur=None):
-    if kind == "pf":
+    if kind in ("pf", "pf2"):
         import pf as PFM
         return PFM.pf_flops(cfg, B, Tlen, V)["total"]
     if kind == "pf_cont":
@@ -215,11 +215,20 @@ def main(a):
                          "looped_rr": "Abacus + NoPE", "gru": "none (recurrence)",
                          "rope": "RoPE in every attention layer (base 10000), no other position embedding",
                          "pf": "none (read heads over the tape; recurrence over steps)",
+                         "pf2": "none (read heads over the tape; recurrence over steps)",
                          "pf_cont": "none (soft head distributions over the tape; recurrence over steps)"}[a.kind],
             "pf": {"gumbel_tau": [PF_TAU0, PF_TAU1], "schedule": "exponential over max_steps",
                    "moves": ["stay", "right", "left", "next_sep", "start", "content"], "separators": ["+", "=", "|"],
                    "eval": "argmax", "read_gradient": "straight-through weighted sum of the 6 candidate reads"}
                   if a.kind == "pf" else None,
+            "pf2": {"gumbel_tau_registers": [PF_TAU0, PF_TAU1], "schedule": "exponential over max_steps",
+                    "moves": ["stay", "right", "left", "next_sep", "start", "content"], "separators": ["+", "=", "|"],
+                    "move_signal": "exact expected immediate loss: sum_m softmax(move logits)_m * L_j(m) at steps "
+                                   "with a target (18 counterfactual f evaluations, no gradient through L)",
+                    "move_sampling": "Gumbel-max in training, argmax in evaluation; read = chosen move only",
+                    "aux_weight": "added to the loss as is: expected immediate losses summed over heads, mean over "
+                                  "target positions", "eval": "argmax"}
+                  if a.kind == "pf2" else None,
             "early_stop": "in-distribution >= 0.99 at two consecutive evaluations",
             "judgment_checkpoint": "highest in-distribution accuracy (earliest if tied); out-of-distribution at it",
             "accuracy": ("MQAR: per-query accuracy of the answers a_i (primary, 'acc'; also used for early stop and "
@@ -249,12 +258,13 @@ def main(a):
                                                            3 * fwd_flops(a.kind, cfg, xb.shape[0], xb.shape[1], len(T.VOCAB))))
     stop = None
     window = []
+    aux_window = []
     t_seg = time.time()
     while st["step"] < a.max_steps and stop is None:
         exs = [data[rng.randrange(len(data))] for _ in range(a.batch)]
         xb, yb = make_batch(exs)
         off = torch.randint(0, OFFSET_MAX + 1, (xb.shape[0],)) if a.kind in ("abacus",) + LOOPED else None
-        if a.kind == "pf":                             # Gumbel temperature 1.0 -> 0.1, exponential, whole run
+        if a.kind in ("pf", "pf2"):                    # Gumbel temperature 1.0 -> 0.1, exponential, whole run
             model.tau = PF_TAU0 * (PF_TAU1 / PF_TAU0) ** (st["step"] / a.max_steps)
         if a.kind == "looped_rr":
             m = rr_rng.randint(RR_MIN, RR_MAX)
@@ -267,12 +277,20 @@ def main(a):
             step_flops = n * iter_flops(cfg, xb.shape[0], xb.shape[1]) + 3 * (
                 k * iter_flops(cfg, xb.shape[0], xb.shape[1]) + xb.shape[0] * xb.shape[1] * 2 * cfg["d"] * len(T.VOCAB))
         else:
+            if a.kind == "pf2":
+                model.targets = yb                     # C1-2: targets for the expected immediate move loss
             logits = model(xb, offset=off)
             step_flops = 3 * fwd_flops(a.kind, cfg, xb.shape[0], xb.shape[1], len(T.VOCAB))
-            if a.kind == "pf":                         # index cost has no backward: count it once
+            if a.kind in ("pf", "pf2"):                # index cost has no backward: count it once
                 import pf as PFM
                 step_flops = PFM.pf_flops(cfg, xb.shape[0], xb.shape[1], len(T.VOCAB), train=True)["total"]
+                if a.kind == "pf2":                    # as executed (see pf.pf2_train_flops)
+                    step_flops = PFM.pf2_train_flops(cfg, xb.shape[0], xb.shape[1], len(T.VOCAB),
+                                                     model.cf_rowsteps)["total"]
         loss = F.cross_entropy(logits.reshape(-1, len(T.VOCAB)), yb.reshape(-1), ignore_index=-100)
+        if a.kind == "pf2":
+            loss_main = loss
+            loss = loss + model.aux
         opt.zero_grad(set_to_none=True)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
@@ -280,14 +298,21 @@ def main(a):
         sched.step()
         st["step"] += 1
         st["train_flops"] += step_flops
-        window.append(loss.item())
+        if a.kind == "pf2":                            # log the answer-token loss (comparable) and the move signal
+            window.append(loss_main.item())
+            aux_window.append(model.aux.item())
+        else:
+            window.append(loss.item())
         if st["step"] % a.eval_every == 0 or st["step"] == a.max_steps:
             st["wall_train_s"] += time.time() - t_seg
             t_ev = time.time()
             rec = {"step": st["step"], "train_flops_cum": st["train_flops"],
                    "train_loss_mean": round(sum(window) / len(window), 5), "lr": sched.get_last_lr()[0],
                    "acc": {}, "recur": {}}
+            if aux_window:
+                rec["train_move_signal_mean"] = round(sum(aux_window) / len(aux_window), 5)
             window = []
+            aux_window = []
             for label, ex in evals.items():
                 r = None if a.kind not in LOOPED else cfg["recur"] * ratio(a.task, label)
                 if a.task in T.MQAR:                   # MQAR: per-query accuracy primary, whole sequence secondary
@@ -360,7 +385,8 @@ def main(a):
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--task", choices=T.TASKS, required=True)
-    p.add_argument("--kind", choices=("abacus", "looped", "gru", "looped_rr", "rope", "pf", "pf_cont"), required=True)
+    p.add_argument("--kind", choices=("abacus", "looped", "gru", "looped_rr", "rope", "pf", "pf_cont", "pf2"),
+                   required=True)
     p.add_argument("--phase", default="phaseA2", help="results/<phase>/; Phase A records were written as phaseA")
     p.add_argument("--scale", default="1M")
     p.add_argument("--seed", type=int, default=0)

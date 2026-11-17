@@ -16,7 +16,15 @@ PH = HERE / "results" / "phaseA2"
 NAME_T = {"addition": "덧셈", "parity": "패리티", "assoc": "연관 기억", "assoc_n4": "연관 기억 (n=4 고정)",
           "mqar": "MQAR", "mqar_n4": "MQAR (n=4 고정)"}
 NAME_K = {"abacus": "Abacus", "looped": "looped", "gru": "GRU", "looped_rr": "looped_rr", "rope": "rope",
-          "pf": "PF", "pf_cont": "PF-cont"}
+          "pf": "PF", "pf_cont": "PF-cont", "pf2": "PF (C1-2)"}
+# C1-1 values of the same task (RESULTS.md "C1-1 요약", commit faa9181): judgment checkpoint
+C11_REF = {
+    "addition": "PF 분포 안 0.005 · 분포 밖 0.000 · 0.000 · 0.000 (PF-cont 0.393 · 0.132 · 0.084 · 0.038); "
+                "판정 시점까지 학습 FLOPs 4.90e+13",
+    "parity": "PF 분포 안 1.000 · 분포 밖 1.000 · 1.000 · 1.000; 판정 시점까지 학습 FLOPs 6.34e+12",
+    "mqar": "PF 질의별 분포 안 0.989 · 분포 밖 0.993 · 0.997 · 0.998, 시퀀스 전체 0.922 · 0.876 · 0.904 · 0.910; "
+            "판정 시점까지 학습 FLOPs 4.41e+13",
+}
 # frozen baseline reference (CANDIDATE_DESIGN.md 7, from RESULTS.md 1단계 기준선 표, commit 29559d3)
 BASE_REF = {
     "addition": "분포 안 최고 0.998 (abacus) · 분포 밖 11-20: 0.278 (looped_rr) · 21-30: 0.000 · 31-40: 0.000; "
@@ -67,6 +75,10 @@ def answer_c1(f):
 
 def labels(phase, task, kind="pf"):
     """(heading label, question, commit label) for a run"""
+    if phase == "c1_2":
+        q = ("C1-2 — 이동 학습 추정기를 바꾼 PF가 %s를 학습 분포 안에서 배우는가? (유효성 기준: 분포 안 ≥0.95, 시드 0)"
+             % NAME_T[task] if task != "mqar" else "C1-2 — PF(C1-2)의 MQAR 결과 (판정 기준 없음; 질의별·시퀀스 전체 보고)")
+        return "C1-2", q, "C1-2"
     if phase == "c1":
         if kind == "pf_cont":
             return ("C1-1 분기 2단계 (PF-cont)",
@@ -146,7 +158,7 @@ def entry(d):
     lines = [
         "## %s · %s · %s / %s" % (date, head, NAME_T[t], NAME_K[k]),
         "- 질문: %s" % question,
-        "- 질문에 대한 답: %s" % (answer_c1(f) if phase == "c1" else answer4(f) if phase == "phaseA4" else
+        "- 질문에 대한 답: %s" % (answer_c1(f) if phase in ("c1", "c1_2") else answer4(f) if phase == "phaseA4" else
                                   answer3(f) if phase == "phaseA3" else answer(t, k)),
         "- 코드 커밋: `%s`%s · 원자료: `%s/`" % (
             (env.get("code_commit") or "?")[:7], " (작업 트리 수정 있음)" if env.get("code_dirty") else "",
@@ -162,8 +174,12 @@ def entry(d):
         "- 마지막 시점 (step %d): 분포 안 %.3f · 분포 밖 %s" % (
             last["step"], [v for l, v in last["acc"].items() if l.startswith("id")][0], oods_last),
     ]
-    if phase == "c1" and t in BASE_REF:
+    if phase in ("c1", "c1_2") and t in BASE_REF:
         lines.append("- 같은 과제의 기준선 최고값 (동결, 설계서 7절): %s" % BASE_REF[t])
+    if phase == "c1_2" and t in C11_REF:
+        lines.append("- 같은 과제의 C1-1 값: %s" % C11_REF[t])
+    if f.get("judgment", {}).get("train_move_signal_mean") is not None:
+        pass
     if j.get("acc_seq"):
         lines.append("- 시퀀스 전체 정답률 (보조, 판정 시점): %s" % " · ".join(
             "%s: %.3f" % (lab(l), v) for l, v in j["acc_seq"].items()))
