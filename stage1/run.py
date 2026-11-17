@@ -79,7 +79,7 @@ def fwd_flops(kind, cfg, B, Tlen, V, recur=None):
     d = cfg["d"]
     if kind == "gru":
         return B * Tlen * (cfg["layers"] * 2 * 3 * (d * d + d * d) + 2 * d * V)
-    L = cfg["layers"] if kind == "abacus" else cfg["block_layers"] * (recur or cfg["recur"])
+    L = cfg["layers"] if kind in ("abacus", "rope") else cfg["block_layers"] * (recur or cfg["recur"])
     return B * Tlen * (2 * 12 * d * d * L + 2 * d * V) + 4 * B * Tlen * Tlen * d * L
 
 
@@ -175,7 +175,10 @@ def main(a):
             "model_config": cfg, "seed": a.seed, "N": a.N, "batch": a.batch, "max_steps": a.max_steps,
             "eval_every": a.eval_every, "id_size": a.id_size, "ood_size": a.ood_size, "lr": lr,
             "optimizer": "AdamW betas (0.9, 0.98) weight decay 0.1, grad clip 1.0, warmup max_steps/20, cosine to 10%",
-            "abacus_offset_max": OFFSET_MAX if a.kind != "gru" else None, "spec": T.SPEC[a.task],
+            "abacus_offset_max": OFFSET_MAX if a.kind in ("abacus",) + LOOPED else None, "spec": T.SPEC[a.task],
+            "position": {"abacus": "Abacus digit positions + NoPE attention", "looped": "Abacus + NoPE",
+                         "looped_rr": "Abacus + NoPE", "gru": "none (recurrence)",
+                         "rope": "RoPE in every attention layer (base 10000), no other position embedding"}[a.kind],
             "early_stop": "in-distribution >= 0.99 at two consecutive evaluations",
             "judgment_checkpoint": "highest in-distribution accuracy (earliest if tied); out-of-distribution at it",
             "looped_eval_rule": "primary: 4 x ceil(bin upper / training upper) iterations; secondary: fixed 4"
@@ -206,7 +209,7 @@ def main(a):
     while st["step"] < a.max_steps and stop is None:
         exs = [data[rng.randrange(len(data))] for _ in range(a.batch)]
         xb, yb = make_batch(exs)
-        off = torch.randint(0, OFFSET_MAX + 1, (xb.shape[0],)) if a.kind != "gru" else None
+        off = torch.randint(0, OFFSET_MAX + 1, (xb.shape[0],)) if a.kind in ("abacus",) + LOOPED else None
         if a.kind == "looped_rr":
             m = rr_rng.randint(RR_MIN, RR_MAX)
             n = rr_rng.randint(0, m - 1)
@@ -297,7 +300,7 @@ def main(a):
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--task", choices=T.TASKS, required=True)
-    p.add_argument("--kind", choices=("abacus", "looped", "gru", "looped_rr"), required=True)
+    p.add_argument("--kind", choices=("abacus", "looped", "gru", "looped_rr", "rope"), required=True)
     p.add_argument("--phase", default="phaseA2", help="results/<phase>/; Phase A records were written as phaseA")
     p.add_argument("--scale", default="1M")
     p.add_argument("--seed", type=int, default=0)

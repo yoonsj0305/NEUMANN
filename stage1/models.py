@@ -93,6 +93,53 @@ class LM(nn.Module):
         return self.head(self.ln(x))
 
 
+def rope_tables(T, hd, base=10000.0, device=None):
+    """cos / sin tables of rotary position embedding (Su et al. 2021) for positions 0..T-1, head dim hd"""
+    inv = 1.0 / (base ** (torch.arange(0, hd, 2, device=device).float() / hd))
+    ang = torch.arange(T, device=device).float()[:, None] * inv[None, :]          # T x hd/2
+    ang = torch.cat([ang, ang], dim=-1)                                           # T x hd
+    return ang.cos(), ang.sin()
+
+
+def _rotate_half(x):
+    x1, x2 = x.chunk(2, dim=-1)
+    return torch.cat([-x2, x1], dim=-1)
+
+
+class RopeBlock(Block):
+    """the same pre-LN block (same parameters); RoPE applied to queries and keys of every head"""
+
+    def forward(self, x, cos=None, sin=None):
+        B, T, D = x.shape
+        q, k, v = self.qkv(self.ln1(x)).view(B, T, 3, self.heads, D // self.heads).permute(2, 0, 3, 1, 4)
+        q = q * cos + _rotate_half(q) * sin
+        k = k * cos + _rotate_half(k) * sin
+        a = F.scaled_dot_product_attention(q, k, v, is_causal=True)
+        x = x + self.proj(a.transpose(1, 2).reshape(B, T, D))
+        return x + self.mlp(self.ln2(x))
+
+
+class RopeLM(nn.Module):
+    """4. "rope" (Phase A''): a standard decoder-only transformer with rotary position embedding in every attention
+    layer and no other position embedding; layers / width / heads as the Abacus 1M model."""
+
+    def __init__(self, vocab, d, heads, layers, **_):
+        super().__init__()
+        self.kind = "rope"
+        self.heads = heads
+        self.tok = nn.Embedding(vocab, d)
+        self.blocks = nn.ModuleList([RopeBlock(d, heads) for _ in range(layers)])
+        self.ln = nn.LayerNorm(d)
+        self.head = nn.Linear(d, vocab, bias=False)
+
+    def forward(self, tokens, offset=None, recur=None):
+        x = self.tok(tokens)
+        cos, sin = rope_tables(tokens.shape[1], x.shape[-1] // self.heads, device=tokens.device)
+        for b in self.blocks:
+            x = b(x, cos, sin)
+        return self.head(self.ln(x))
+
+
 class GRULM(nn.Module):
     def __init__(self, vocab, d, layers, **_):
         super().__init__()
@@ -110,6 +157,8 @@ class GRULM(nn.Module):
 def build(kind, vocab, digit_ids, cfg):
     if kind == "gru":
         return GRULM(vocab, **cfg)
+    if kind == "rope":
+        return RopeLM(vocab, **cfg)
     if kind == "looped_rr":                 # the same looped network; only its training procedure differs
         return LM(vocab, digit_ids=digit_ids, kind="looped", **cfg)
     return LM(vocab, digit_ids=digit_ids, kind=kind, **cfg)
@@ -130,3 +179,4 @@ SCALES = {
     "gru": {"1M": dict(d=256, layers=2)},
 }
 SCALES["looped_rr"] = SCALES["looped"]
+SCALES["rope"] = {k: dict(v) for k, v in SCALES["abacus"].items()}    # same layers / width / heads as Abacus

@@ -1,4 +1,4 @@
-"""Append one finished Phase A' run to stage1/RESULTS.md (CLAUDE.md "결과 기록" format) and commit + push its raw
+"""Append one finished Phase A' / A'' run to stage1/RESULTS.md (CLAUDE.md "결과 기록" format) and commit + push its raw
 records with the entry.  Values are copied from the run's final.json / config.json / env.json; nothing is
 recomputed.  The answer line applies the Phase A' pass criterion (CLAUDE.md) to the runs finished so far.
 
@@ -13,8 +13,33 @@ import time
 
 HERE = pathlib.Path(__file__).resolve().parent
 PH = HERE / "results" / "phaseA2"
-NAME_T = {"addition": "덧셈", "parity": "패리티", "assoc": "연관 기억"}
-NAME_K = {"abacus": "Abacus", "looped": "looped", "gru": "GRU", "looped_rr": "looped_rr"}
+NAME_T = {"addition": "덧셈", "parity": "패리티", "assoc": "연관 기억", "assoc_n4": "연관 기억 (n=4 고정)"}
+NAME_K = {"abacus": "Abacus", "looped": "looped", "gru": "GRU", "looped_rr": "looped_rr", "rope": "rope"}
+PH3 = HERE / "results" / "phaseA3"
+Q3 = "Phase A″ — `rope`가 연관 기억 분포 안 ≥95%인가? (실패하면 하네스 문제로 보고 디버그 허용)"
+Q3C = ("Phase A″ 실행 전 점검 — `rope`가 연관 기억 n=4 고정, 2,000 step에서 분포 안 ≥95%인가? "
+       "(안 되면 본실행 전에 멈추고 보고)")
+
+
+def labels(phase, task):
+    """(heading label, question, commit label) for a run"""
+    if phase == "phaseA3":
+        if task == "assoc_n4":
+            return "Phase A″ 실행 전 점검", Q3C, "Phase A″ 점검"
+        return "Phase A″ 작업", Q3, "Phase A″"
+    work = "작업 1" if task == "assoc" else "작업 2"
+    return "Phase A′ %s" % work, (Q1 if task == "assoc" else Q2), "Phase A′ %s" % work
+
+
+def answer3(f):
+    if f["task"] == "assoc_n4":
+        v = idv(f)
+        return "%s (분포 안 %.3f)" % ("예" if v >= 0.95 else "아니오 — 본실행 전에 멈추고 보고", v)
+    d = PH3 / "phaseA3_assoc__rope__1M__s0__N100000"
+    if not (d / "final.json").exists():
+        return "미정 (연관 기억 rope 실행이 아직 끝나지 않음)"
+    v = idv(json.loads((d / "final.json").read_text()))
+    return "%s (연관 기억 rope 분포 안 %.3f)" % ("예" if v >= 0.95 else "아니오 — 하네스 문제로 보고 디버그", v)
 Q1 = ("Phase A′ 작업 1 — 트랜스포머 기준선(Abacus, looped) 중 하나 이상이 연관 기억 분포 안 ≥95%인가? "
       "(못 하면 과제 형식 버그로 보고 멈춘다)")
 Q2 = "Phase A′ 작업 2 — looped_rr이 덧셈 분포 안 ≥95%를 유지하는가? (분포 밖은 숫자만, 기준 없음)"
@@ -57,14 +82,16 @@ def entry(d):
     lab = lambda l: l.split("_", 1)[1]
     oods = " · ".join("%s: %.3f" % (lab(l), v) for l, v in j["acc"].items() if l.startswith("ood"))
     oods_last = " · ".join("%s: %.3f" % (lab(l), v) for l, v in last["acc"].items() if l.startswith("ood"))
-    work = "작업 1" if t == "assoc" else "작업 2"
+    phase = cfg.get("phase", "phaseA2")
+    head, question, _ = labels(phase, t)
     date = time.strftime("%Y-%m-%d", time.gmtime())
     lines = [
-        "## %s · Phase A′ %s · %s / %s" % (date, work, NAME_T[t], NAME_K[k]),
-        "- 질문: %s" % (Q1 if t == "assoc" else Q2),
-        "- 질문에 대한 답: %s" % answer(t, k),
-        "- 코드 커밋: `%s`%s · 원자료: `stage1/results/phaseA2/%s/`" % (
-            (env.get("code_commit") or "?")[:7], " (작업 트리 수정 있음)" if env.get("code_dirty") else "", d.name),
+        "## %s · %s · %s / %s" % (date, head, NAME_T[t], NAME_K[k]),
+        "- 질문: %s" % question,
+        "- 질문에 대한 답: %s" % (answer3(f) if phase == "phaseA3" else answer(t, k)),
+        "- 코드 커밋: `%s`%s · 원자료: `%s/`" % (
+            (env.get("code_commit") or "?")[:7], " (작업 트리 수정 있음)" if env.get("code_dirty") else "",
+            d.relative_to(HERE.parent) if HERE.parent in d.parents else d),
         "- 결과 표 (판정 체크포인트 = 분포 안 최고 시점, 동률이면 이른 시점; 분포 밖은 그 시점 값):",
         "",
         "| 과제 | 기준선 | 규모 | 데이터 수 | 분포 안 정확도 | 분포 밖 정확도(구간별) | 학습 FLOPs | 시간 (학습 / 평가) |",
@@ -103,12 +130,13 @@ def main(a):
     if a.no_git:
         return
     root = HERE.parent
-    msg = "stage1 Phase A′ %s: %s %s (분포 안 %.3f @ step %d)\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n" \
+    cfg = json.loads((d / "config.json").read_text())
+    msg = "stage1 %s: %s %s (분포 안 %.3f @ step %d)\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n" \
           "Claude-Session: https://claude.ai/code/session_01VSWBvg7gXA6QqLM5pig7M5\n" % (
-              "작업 1" if f["task"] == "assoc" else "작업 2", f["task"], f["kind"], idv(f), j["step"])
+              labels(cfg.get("phase", "phaseA2"), f["task"])[2], f["task"], f["kind"], idv(f), j["step"])
     files = [str(res.relative_to(root)), str(d.relative_to(root))]
-    if (PH / "QUEUE_LOG.txt").exists():
-        files.append(str((PH / "QUEUE_LOG.txt").relative_to(root)))
+    if (d.parent / "QUEUE_LOG.txt").exists():
+        files.append(str((d.parent / "QUEUE_LOG.txt").relative_to(root)))
     subprocess.check_call(["git", "add"] + files, cwd=root)
     subprocess.check_call(["git", "commit", "-q", "-m", msg], cwd=root)
     for i in range(4):

@@ -30,13 +30,15 @@ VOCAB = SPECIAL + DIGITS + SYMS + NODES
 TOK = {t: i for i, t in enumerate(VOCAB)}
 PAD, EOS = TOK["<pad>"], TOK["<eos>"]
 
-TASKS = ("addition", "parity", "reachability", "assoc")      # reachability: Phase A only (excluded from Stage 1)
+TASKS = ("addition", "parity", "reachability", "assoc", "assoc_n4")   # reachability: Phase A only; assoc_n4: check
 # (training range, in-distribution bin, out-of-distribution bins)
 SPEC = {
     "addition": {"train": (1, 10), "id": (1, 10), "ood": [(11, 20), (21, 30), (31, 40)]},
     "parity": {"train": (1, 16), "id": (1, 16), "ood": [(17, 32), (33, 48), (49, 64)]},
     "reachability": {"train": (4, 8), "id": (4, 8), "ood": [(9, 16), (17, 24), (25, 32)]},
     "assoc": {"train": (4, 16), "id": (4, 16), "ood": [(17, 32), (33, 48), (49, 64)]},
+    # Phase A'' pre-run check only: associative recall with n fixed at 4 (the out-of-distribution bins as assoc)
+    "assoc_n4": {"train": (4, 4), "id": (4, 4), "ood": [(17, 32), (33, 48), (49, 64)]},
 }
 
 
@@ -114,7 +116,7 @@ def draw(task, rng, lo, hi, train_dist=False):
         p, a = addition(da, db, rng)
         return p, a, max(da, db)
     n = rng.randint(lo, hi)
-    p, a = {"parity": parity, "reachability": reachability, "assoc": assoc}[task](n, rng)
+    p, a = {"parity": parity, "reachability": reachability, "assoc": assoc, "assoc_n4": assoc}[task](n, rng)
     return p, a, n
 
 
