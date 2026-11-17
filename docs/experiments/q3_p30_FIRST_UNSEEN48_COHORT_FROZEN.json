@@ -1,0 +1,119 @@
+{
+  "schema": "neumann.q3.p30.first-blind-original-evaluation48.v1",
+  "date": "2026-11-05",
+  "source_repository": "fchollet/ARC-AGI",
+  "upstream_commit": "399030444e0ab0cc8b4e199870fb20b863846f34",
+  "previous_manifest_files": [
+    {
+      "path": "docs/experiments/q3_object_rule_induction_p21_COHORT_FROZEN.json",
+      "blob": "33da9126d57afd3348fec361d5fd54a42bca0fb3",
+      "count": 48
+    },
+    {
+      "path": "docs/experiments/q3_object_rule_induction_p211_COHORT_FROZEN.json",
+      "blob": "79cd9eb4349c40ee972bc0aaf634444398b312d4",
+      "count": 48
+    },
+    {
+      "path": "docs/experiments/q3_open_program_teacher_p22_COHORT_FROZEN.json",
+      "blob": "d3efeae438f3d1d32fae235fd349ccbcd4b96df1",
+      "count": 8
+    },
+    {
+      "path": "docs/experiments/q3_typed_guard_ast_p23_COHORT_FROZEN.json",
+      "blob": "49c3fbfd673a4b4371697ad0a1e498386ca5c343",
+      "count": 32
+    },
+    {
+      "path": "docs/experiments/q3_sound_feature_caching_p24_COHORT_FROZEN.json",
+      "blob": "599db16677abc31b0d9f6a6f68c3802a374f3208",
+      "count": 32
+    },
+    {
+      "path": "docs/experiments/q3_generated_decision_trees_p25_COHORT_FROZEN.json",
+      "blob": "104c10e70ec1d3ef55fac6000a6bfcdbb544a981",
+      "count": 32
+    },
+    {
+      "path": "docs/experiments/q3_p27_COHORT_FROZEN.json",
+      "blob": "bd9898cc408ee2ccddc9c2d963d368f107a5a63c",
+      "count": 32
+    },
+    {
+      "path": "docs/experiments/q3_p28_FIRST_FRESH_TRANSFER48_COHORT_FROZEN.json",
+      "blob": "a55f0b9483832ca001fe7bc3a63737bec56dc06c",
+      "count": 48
+    },
+    {
+      "path": "docs/experiments/q3_p29_FIRST_FRESH_ORIGINAL48_COHORT.json",
+      "blob": "819cd66b42c94c25e81e300df75a574ec5b676b4",
+      "count": 48
+    }
+  ],
+  "previous_unique_original_eval_files": 328,
+  "all_official_evaluation_files": 400,
+  "previously_untouched_pool": 72,
+  "filename_selection_only": true,
+  "no_task_bodies_opened_before_freeze": true,
+  "seed": "NEUMANN-P30-FIRST-OPENED-EVALUATION-2026-11-05|",
+  "ids": [
+    "b7fb29bc.json",
+    "e7a25a18.json",
+    "e5c44e8f.json",
+    "bf32578f.json",
+    "c3202e5a.json",
+    "8cb8642d.json",
+    "b7999b51.json",
+    "34b99a2b.json",
+    "b457fec5.json",
+    "5a5a2103.json",
+    "705a3229.json",
+    "9b2a60aa.json",
+    "292dd178.json",
+    "310f3251.json",
+    "1da012fc.json",
+    "b942fd60.json",
+    "b15fca0b.json",
+    "f4081712.json",
+    "79369cc6.json",
+    "11e1fe23.json",
+    "f5c89df1.json",
+    "d304284e.json",
+    "45737921.json",
+    "184a9768.json",
+    "90347967.json",
+    "c7d4e6ad.json",
+    "3b4c2228.json",
+    "ed74f2f2.json",
+    "92e50de0.json",
+    "1a6449f1.json",
+    "d4b1c2b1.json",
+    "62b74c02.json",
+    "782b5218.json",
+    "477d2879.json",
+    "f9a67cb5.json",
+    "aee291af.json",
+    "31d5ba1a.json",
+    "e1baa8a4.json",
+    "00dbd492.json",
+    "e633a9e5.json",
+    "604001fa.json",
+    "55059096.json",
+    "319f2597.json",
+    "2c0b0aff.json",
+    "891232d6.json",
+    "2b01abd0.json",
+    "67c52801.json",
+    "2753e76c.json"
+  ],
+  "unconsumed_after_selection": 24,
+  "hard_gate": {
+    "new_P30_exact_vs_strong_5_classical_plus_P29_min": 2,
+    "P30_new_wrong_submissions_max": 0,
+    "existing_correct_lost_max": 0,
+    "combined_new_wrong_max": 0
+  },
+  "comparison_contract": "All previous 5 classical TOOL and frozen original P29 have equivalent public input and original TEST checker; P30 uses same source and only additional automatic preprocessor composition. This is not learned new opcode.",
+  "verified_previous_opened_training_400": "P30 exact 27/400 and 8 new over P29; +15 exact over original five classically, combined 54/400 with 8 wrong. Public training only.",
+  "global_Q1_to_Q7": "OPEN"
+}

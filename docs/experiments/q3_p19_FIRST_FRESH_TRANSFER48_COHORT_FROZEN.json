@@ -1,0 +1,113 @@
+{
+  "schema": "neumann.q3.p19.first-fresh-original-transfer48.v1",
+  "date": "2026-11-05",
+  "upstream_sha": "399030444e0ab0cc8b4e199870fb20b863846f34",
+  "source": "official data/evaluation, filename-only selection",
+  "prior_manifests": [
+    {
+      "path": "docs/experiments/q3_object_rule_induction_p21_COHORT_FROZEN.json",
+      "blob": "33da9126d57afd3348fec361d5fd54a42bca0fb3",
+      "length": 48
+    },
+    {
+      "path": "docs/experiments/q3_object_rule_induction_p211_COHORT_FROZEN.json",
+      "blob": "79cd9eb4349c40ee972bc0aaf634444398b312d4",
+      "length": 48
+    },
+    {
+      "path": "docs/experiments/q3_open_program_teacher_p22_COHORT_FROZEN.json",
+      "blob": "d3efeae438f3d1d32fae235fd349ccbcd4b96df1",
+      "length": 8
+    },
+    {
+      "path": "docs/experiments/q3_typed_guard_ast_p23_COHORT_FROZEN.json",
+      "blob": "49c3fbfd673a4b4371697ad0a1e498386ca5c343",
+      "length": 32
+    },
+    {
+      "path": "docs/experiments/q3_sound_feature_caching_p24_COHORT_FROZEN.json",
+      "blob": "599db16677abc31b0d9f6a6f68c3802a374f3208",
+      "length": 32
+    },
+    {
+      "path": "docs/experiments/q3_generated_decision_trees_p25_COHORT_FROZEN.json",
+      "blob": "104c10e70ec1d3ef55fac6000a6bfcdbb544a981",
+      "length": 32
+    },
+    {
+      "path": "docs/experiments/q3_p27_COHORT_FROZEN.json",
+      "blob": "bd9898cc408ee2ccddc9c2d963d368f107a5a63c",
+      "length": 32
+    },
+    {
+      "path": "docs/experiments/q3_p28_FIRST_FRESH_TRANSFER48_COHORT_FROZEN.json",
+      "blob": "a55f0b9483832ca001fe7bc3a63737bec56dc06c",
+      "length": 48
+    }
+  ],
+  "excluded": 280,
+  "available": 120,
+  "blind_selection_rule": "FNV1a32(\"neumann-q3-p19-first-fresh-transfer-20261105|\"+filename), unsigned increasing, then filename; first48",
+  "selected": 48,
+  "ids": [
+    "92e50de0.json",
+    "22a4bbc2.json",
+    "52fd389e.json",
+    "506d28a5.json",
+    "9b2a60aa.json",
+    "e5c44e8f.json",
+    "aee291af.json",
+    "782b5218.json",
+    "ad7e01d0.json",
+    "9f27f097.json",
+    "e760a62e.json",
+    "20981f0e.json",
+    "3490cc26.json",
+    "9def23fe.json",
+    "50f325b5.json",
+    "e7a25a18.json",
+    "d304284e.json",
+    "c3202e5a.json",
+    "642d658d.json",
+    "58e15b12.json",
+    "a59b95c0.json",
+    "705a3229.json",
+    "bf32578f.json",
+    "992798f6.json",
+    "ca8de6ea.json",
+    "2697da3f.json",
+    "3d31c5b3.json",
+    "7c9b52a0.json",
+    "3ee1011a.json",
+    "e74e1818.json",
+    "712bf12e.json",
+    "ce8d95cc.json",
+    "17b80ad2.json",
+    "a096bf4d.json",
+    "bbb1b8b6.json",
+    "845d6e51.json",
+    "a8610ef7.json",
+    "423a55dc.json",
+    "c35c1b4c.json",
+    "319f2597.json",
+    "45737921.json",
+    "95a58926.json",
+    "c92b942c.json",
+    "0d87d2a6.json",
+    "b457fec5.json",
+    "31d5ba1a.json",
+    "90347967.json",
+    "2b01abd0.json"
+  ],
+  "held_back": 72,
+  "selected_before_any_original_body_or_test_output_read": true,
+  "source_engine_lock": "P1.9 original exact unchanged blob, zero source-patch permitted after seeing new eval",
+  "old_controls": "P11 B, P20, P24, P25, P27, P28 match original same rights. Compared against fail-closed consensus; separately report per-arm.",
+  "local_stop_gate": {
+    "added_correct_min": 2,
+    "P19_wrong_submissions_max": 0,
+    "combined_wrong_max": 0,
+    "prior_exact_lost_max": 0
+  },
+  "claim_bound": "Source grammar human designed, model-free. Can show program instance synthesis and transfer, never autonomous opcode invention, learned search advantage, frontier or 10x."
+}
