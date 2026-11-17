@@ -1,0 +1,217 @@
+{
+ "alpha_per_test": 0.025,
+ "cap_cpu_seconds": 6.0,
+ "domains": {
+  "oeis": {
+   "cpu_seconds": {
+    "A": 1024.3,
+    "B": 1001.1,
+    "C4": 1014.7,
+    "Cn": 1005.7,
+    "D": 0.0,
+    "R0": 939.6,
+    "R1": 968.8,
+    "R2": 963.0,
+    "R3": 952.0,
+    "S": 1038.7
+   },
+   "fit": {
+    "R0": 43,
+    "R1": 33,
+    "R2": 35,
+    "R3": 39
+   },
+   "formation": {
+    "R1_only": [
+     "oeis/A000125",
+     "oeis/A000984"
+    ],
+    "R2_vs_R1": {
+     "first_only": 1,
+     "mcnemar_p": 1.0,
+     "second_only": 2
+    },
+    "criterion": {
+     "F1": false,
+     "F2": false,
+     "F3": true,
+     "F4": true
+    },
+    "exclusive": [],
+    "gain": {
+     "oeis/A000447": {
+      "program": "<residual add(self[(sub $0 1)], w) | w = <relcells m=- | linked(sub (add $2 (add $2 8)), self[(sub $0 2)])>>",
+      "via": "latent:residual+cells"
+     }
+    },
+    "gain_through_formed_latent": 1,
+    "pass": false
+   },
+   "learning": {
+    "R3_vs_R2": {
+     "first_only": 3,
+     "mcnemar_p": 0.625,
+     "second_only": 1
+    },
+    "cpu_on_tasks_both_solve": {
+     "R2": 33.5,
+     "R3": 33.4,
+     "n": 28
+    },
+    "criterion": {
+     "L1_capability": false,
+     "L2_cost": false
+    },
+    "gain": {
+     "oeis/A000125": {
+      "program": "<relcells m=- | linked(sub (add $0 (add $2 (sub $2 $3))), self[0])>",
+      "via": "latent:cells"
+     },
+     "oeis/A000153": {
+      "program": "<relcells m=- | linked(sub (sub (mul $0 (add $2 $3)) $3), self[(sub $0 2)])>",
+      "via": "latent:cells"
+     },
+     "oeis/A000984": {
+      "program": "<relcells m=- | linked(mul (add $2 (sub $2 (div $2 $0))), self[1])>",
+      "via": "latent:cells"
+     }
+    },
+    "gain_clean": [
+     "oeis/A000125",
+     "oeis/A000153",
+     "oeis/A000984"
+    ],
+    "gain_same_shape_as_training_fold": [],
+    "mcnemar_p_clean": 0.625,
+    "pass": false
+   },
+   "solved": {
+    "A": 17,
+    "B": 21,
+    "C4": 19,
+    "Cn": 21,
+    "D": 33,
+    "R0": 28,
+    "R1": 30,
+    "R2": 29,
+    "R3": 31,
+    "S": 15
+   },
+   "substrate_R1_vs_R0": {
+    "first_only": 2,
+    "mcnemar_p": 0.5,
+    "second_only": 0
+   },
+   "tasks": 187
+  },
+  "rule": {
+   "cpu_seconds": {
+    "A": 391.0,
+    "B": 392.4,
+    "C4": 334.7,
+    "Cn": 392.0,
+    "R0": 321.9,
+    "R1": 318.0,
+    "R2": 317.8,
+    "R3": 322.7,
+    "S": 408.0
+   },
+   "fit": {
+    "R0": 82,
+    "R1": 81,
+    "R2": 81,
+    "R3": 82
+   },
+   "formation": {
+    "R1_only": [
+     "rule/c244"
+    ],
+    "R2_vs_R1": {
+     "first_only": 1,
+     "mcnemar_p": 1.0,
+     "second_only": 1
+    },
+    "criterion": {
+     "F1": false,
+     "F2": false,
+     "F3": true,
+     "F4": true
+    },
+    "exclusive": [
+     "rule/c249"
+    ],
+    "gain": {
+     "rule/c249": {
+      "program": "<transport arg0 present=(eq 0 (foldrI $6 $1 $3))>",
+      "via": "latent:transport"
+     }
+    },
+    "gain_through_formed_latent": 1,
+    "pass": false
+   },
+   "learning": {
+    "R3_vs_R2": {
+     "first_only": 4,
+     "mcnemar_p": 0.6875,
+     "second_only": 2
+    },
+    "cpu_on_tasks_both_solve": {
+     "R2": 47.2,
+     "R3": 48.1,
+     "n": 69
+    },
+    "criterion": {
+     "L1_capability": false,
+     "L2_cost": false
+    },
+    "gain": {
+     "rule/c024": {
+      "program": "(cons (head $0) (cons (ifI (lt (head $0) 5) 8 5) (tail $0)))",
+      "via": "chain"
+     },
+     "rule/c067": {
+      "program": "<relcells m=$0 | ((isnil $9) ? copy 0[$1] : ((lt $1 1) ? copy 0[0] : copy 0[$0]))>",
+      "via": "latent:cells"
+     },
+     "rule/c214": {
+      "program": "<relcells m=(sub $0 2) | ((lt (len $8) (head $5)) ? copy 0[(len $8)] : copy 0[(add $0 2)])>",
+      "via": "latent:cells"
+     },
+     "rule/c244": {
+      "program": "<relcells m=1 | value (len (filter (eq 3 $10) $5))>",
+      "via": "latent:cells"
+     }
+    },
+    "gain_clean": [
+     "rule/c024",
+     "rule/c067",
+     "rule/c214",
+     "rule/c244"
+    ],
+    "gain_same_shape_as_training_fold": [],
+    "mcnemar_p_clean": 0.6875,
+    "pass": false
+   },
+   "solved": {
+    "A": 58,
+    "B": 59,
+    "C4": 65,
+    "Cn": 59,
+    "R0": 68,
+    "R1": 71,
+    "R2": 71,
+    "R3": 73,
+    "S": 57
+   },
+   "substrate_R1_vs_R0": {
+    "first_only": 4,
+    "mcnemar_p": 0.375,
+    "second_only": 1
+   },
+   "tasks": 125
+  }
+ },
+ "formation_pass": false,
+ "learning_pass": false,
+ "schema": "neumann.formation-learning.v1"
+}

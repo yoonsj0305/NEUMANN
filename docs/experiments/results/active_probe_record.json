@@ -1,0 +1,59 @@
+{
+ "D_formed": 17,
+ "D_formed_solved": 14,
+ "D_gain_over_Dq": {},
+ "D_loss_to_Dq": [
+  "identify-is-mod-k(k=7) | head",
+  "intersperse-k(k=10) | append-k(k=2)"
+ ],
+ "arms": {
+  "A": {
+   "by_parts": {
+    "1": 20,
+    "2": 11
+   },
+   "cpu_seconds": 556.0,
+   "fit": 45,
+   "queries": 0,
+   "solved": 31,
+   "wrong_fit": 14
+  },
+  "D": {
+   "by_parts": {
+    "1": 19,
+    "2": 12
+   },
+   "cpu_seconds": 1092.8,
+   "fit": 35,
+   "queries": 1822,
+   "solved": 31,
+   "wrong_fit": 4
+  },
+  "Dq": {
+   "by_parts": {
+    "1": 19,
+    "2": 14
+   },
+   "cpu_seconds": 1046.2,
+   "fit": 36,
+   "queries": 1736,
+   "solved": 33,
+   "wrong_fit": 3
+  }
+ },
+ "comparisons": {
+  "D_vs_A": {
+   "first_only": 3,
+   "mcnemar_p": 1.0,
+   "second_only": 3
+  },
+  "D_vs_Dq": {
+   "first_only": 0,
+   "mcnemar_p": 0.5,
+   "second_only": 2
+  }
+ },
+ "refuted_by_intervention": 0,
+ "split": "probe",
+ "tasks": 60
+}

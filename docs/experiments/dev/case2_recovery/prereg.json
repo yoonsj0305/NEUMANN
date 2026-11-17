@@ -1,0 +1,89 @@
+{
+ "arms": {
+  "A": "synthetic trajectories; no fallback; floor 0",
+  "E": "budgeted reachability (frozen section 36 policy, REACH_BUDGET 20, replace); no fallback; floor 0",
+  "EFb": "E + E_SYNTH_FALLBACK (one synthetic-trajectory retry per machine after a reachable-table Update failure); floor 0",
+  "EFbc": "E + E_SYNTH_FALLBACK + MIN_SYNTH_CPU 10",
+  "EFc": "E; no fallback; MIN_SYNTH_CPU 10 (per main-round synthesis floor inside the formation deadline)"
+ },
+ "budget": {
+  "clock": "time.process_time()",
+  "cpu_seconds": 30.0,
+  "formation_deadline": "0.6 x cap (unchanged)",
+  "source_queries": 60
+ },
+ "code_blobs": {
+  "neumann1/active.py": "2533998a49093bb4a56c794d05180b537dcc47aa",
+  "neumann1/latent.py": "35f7735aeec7e27844ec0881e99fceb7435cf124",
+  "research/q3/budgeted_reach_dev.py": "2efb434bb79ea75da7bb039a7c1d8c4caf29d2a8",
+  "research/q3/case2_eval_set_dev.py": "ddb1fafbbbff3ddf1392ff8062b9547661ed3a30",
+  "research/q3/case2_recovery_summary_dev.py": "51eac830cbadabcbc712618830597c7fa69d01f6"
+ },
+ "criteria": {
+  "CAUSAL_DEVELOPMENT_PASS": "an E-family arm has more verified solves than A on the 24 new compositions under the same caps, robust over the replicates, with no robust verified regression on the 36 tasks",
+  "EFFICIENCY_PASS": "an arm with verified accuracy >= A's (on all 36) has lower total compute (real CPU; formation SOURCE queries reported separately)",
+  "GENERALIZATION": "OPEN regardless (same list-routines lineage)",
+  "REGRESSION_RECOVERY_PASS": "an arm with the fallback recovers the section-36 regression type (A solves, E fails by a reachable-table Update failure) on the regression set or new tasks, by the general fallback, and creates no new regression vs A (robust over the replicates)"
+ },
+ "evaluation_set": {
+  "hashes": "eval_set.json",
+  "new_compositions_24": [
+   "add-k(k=3) | keep-mod-k(k=2)",
+   "append-k(k=2) | identify-is-mod-k(k=2)",
+   "dup | identify-k(k=3)",
+   "identify-geq-k(k=3) | identify-geq-k(k=2)",
+   "identify-is-mod-k(k=3) | slice-k-n(k=3,n=3)",
+   "identify-is-prime | identify-k(k=3)",
+   "intersperse-k(k=-2) | append-k(k=3)",
+   "intersperse-k(k=-2) | identify-is-mod-k(k=3)",
+   "keep-mod-k(k=2) | add-k(k=-2)",
+   "keep-mod-k(k=3) | len",
+   "keep-mod-k(k=5) | add-k(k=10)",
+   "modulo-k(k=3) | is-mod-k(k=3)",
+   "mult-k(k=10) | pow-k(k=4)",
+   "mult-k(k=10) | product",
+   "mult-k(k=10) | rotate-k(k=-2)",
+   "mult-k(k=2) | max",
+   "pow-base-k(k=4) | append-k(k=2)",
+   "pow-k(k=2) | take-k(k=2)",
+   "pow-k(k=4) | replace-index-k-with-n(k=2,n=10)",
+   "repeat-k(k=3) | mult-k(k=2)",
+   "repeat-k(k=5) | rotate-k(k=1)",
+   "rotate-k(k=1) | intersperse-k(k=0)",
+   "rotate-k(k=10) | is-mod-k(k=5)",
+   "tail | index-k(k=2)"
+  ],
+  "regression_12": [
+   "add-k(k=1)",
+   "add-k(k=10)",
+   "drop-k(k=3)",
+   "has-k(k=10)",
+   "identify-is-mod-k(k=2) | last",
+   "identify-k(k=1) | kth-smallest(k=2)",
+   "index-k(k=3)",
+   "intersperse-k(k=1)",
+   "modulo-k(k=3) | pop",
+   "mult-k(k=-2) | repeat-k(k=2)",
+   "pow-k(k=2) | modulo-k(k=2)",
+   "rotate-k(k=3) | slice-k-n(k=2,n=3)"
+  ]
+ },
+ "first_run": "all 5 arms x 36 tasks, base seed",
+ "harness": "research/q3/budgeted_reach_dev.py (run_arm('D') as active_dev.job; Env(spec, 0, budget=60); seed sha256(name) % 1000; fresh process per (arm, task, seed); --semantic)",
+ "metrics": [
+  "verified solves (hidden test + every random diagnostic input correct)",
+  "new / lost verified solves vs A and vs E",
+  "independent challenge passed",
+  "semantic accuracy on random diagnostic inputs",
+  "formation SOURCE queries",
+  "first-Update synthesis success rate (per machine)",
+  "fallback rate and verified solves after fallback",
+  "real CPU (total, formation)",
+  "CPU and formation queries per verified solve"
+ ],
+ "no_post_hoc": "floor value, fallback rule, REACH_BUDGET, priorities and task lists are not changed after this commit",
+ "not_counted": "the two section-36 regression tasks used to debug the fallback (keep-mod-k(k=2) | pow-k(k=3), remove-mod-k(k=3) | add-k(k=-2)) and every earlier task",
+ "replication": "every task whose verified outcome differs between any two arms: 2 more same-seed runs and seeds 1, 2 (sha256(name) + 7919 k), all 5 arms",
+ "schema": "neumann.q3-case2-recovery-prereg.v1",
+ "status": "FROZEN before any run on the evaluation set (development only)"
+}

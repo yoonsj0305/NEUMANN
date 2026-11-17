@@ -1,0 +1,4106 @@
+{
+ "schema": "neumann.q6-contract.representations.v1",
+ "note": "Interface only. These are representations constructed per task on SOURCE; handing them over is representation reuse, NOT transfer of a learned principle: the formation and learning experiments both FAILED their registered criteria.",
+ "entries": [
+  {
+   "task": "rule/c022",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=(add $0 1) | ((lt 1 $0) ? copy 0[(sub $0 1)] : ((isnil $9) ? copy 0[0] : value 5))>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "lt",
+      [
+       "k",
+       1
+      ],
+      [
+       "v",
+       0
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "sub",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       1
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "isnil",
+      [
+       "v",
+       9
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "k",
+      0
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c023",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=(add $0 1) | ((lt 1 $0) ? copy 0[(sub $0 1)] : ((lt $1 3) ? value (foldrI 8 $4 $9) : value (foldrI 5 $4 $9)))>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "lt",
+      [
+       "k",
+       1
+      ],
+      [
+       "v",
+       0
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "sub",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       1
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "lt",
+      [
+       "v",
+       1
+      ],
+      [
+       "k",
+       3
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "foldrI",
+      [
+       "k",
+       8
+      ],
+      [
+       "v",
+       4
+      ],
+      [
+       "v",
+       9
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "foldrI",
+      [
+       "k",
+       5
+      ],
+      [
+       "v",
+       4
+      ],
+      [
+       "v",
+       9
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": false,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c024",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=(add $0 1) | ((lt 1 $0) ? copy 0[(sub $0 1)] : ((lt $1 $6) ? value 5 : value (foldrI 8 $4 $9)))>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "lt",
+      [
+       "k",
+       1
+      ],
+      [
+       "v",
+       0
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "sub",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       1
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "lt",
+      [
+       "v",
+       1
+      ],
+      [
+       "v",
+       6
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "foldrI",
+      [
+       "k",
+       8
+      ],
+      [
+       "v",
+       4
+      ],
+      [
+       "v",
+       9
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": false,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c027",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=(sub $0 1) | ((eq $4 $6) ? copy 0[(len $8)] : ((eq $0 2) ? copy 0[3] : copy 0[$0]))>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "eq",
+      [
+       "v",
+       4
+      ],
+      [
+       "v",
+       6
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "len",
+      [
+       "v",
+       8
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "eq",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       2
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "k",
+      3
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "v",
+      0
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c033",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=$0 | ((lt 3 $0) ? copy 0[$0] : ((isnil $9) ? copy 0[3] : copy 0[(mod $0 3)]))>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "lt",
+      [
+       "k",
+       3
+      ],
+      [
+       "v",
+       0
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "v",
+      0
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "isnil",
+      [
+       "v",
+       9
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "k",
+      3
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "mod",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       3
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c038",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=(add $0 1) | ((eq $0 $3) ? value 9 : copy 0[$0])>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "eq",
+      [
+       "v",
+       0
+      ],
+      [
+       "v",
+       3
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "v",
+      0
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c039",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=(add $0 (div (mod $0 5) 3)) | ((eq $0 $3) ? value 9 : copy 0[$0])>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "eq",
+      [
+       "v",
+       0
+      ],
+      [
+       "v",
+       3
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "v",
+      0
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": false,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c041",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=1 | value 9>",
+   "functions": [],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c047",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=(add $0 5) | ((lt $1 $3) ? copy 0[(sub $0 5)] : ((lt $0 $6) ? value (sub $6 3) : value (foldrI 8 9 $9)))>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "lt",
+      [
+       "v",
+       1
+      ],
+      [
+       "v",
+       3
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "sub",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       5
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "lt",
+      [
+       "v",
+       0
+      ],
+      [
+       "v",
+       6
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "sub",
+      [
+       "v",
+       6
+      ],
+      [
+       "k",
+       3
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "foldrI",
+      [
+       "k",
+       8
+      ],
+      [
+       "k",
+       9
+      ],
+      [
+       "v",
+       9
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c054",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=$0 | ((lt $0 2) ? copy 0[2] : copy 0[$0])>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "lt",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       2
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "k",
+      2
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "v",
+      0
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c060",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=6 | ((lt $0 $1) ? copy 0[(sub $1 3)] : ((eq $0 3) ? value 4 : copy 0[(sub (len $8) $1)]))>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "lt",
+      [
+       "v",
+       0
+      ],
+      [
+       "v",
+       1
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "sub",
+      [
+       "v",
+       1
+      ],
+      [
+       "k",
+       3
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "eq",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       3
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "sub",
+      [
+       "len",
+       [
+        "v",
+        8
+       ]
+      ],
+      [
+       "v",
+       1
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c067",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=$0 | ((lt $1 2) ? copy 0[(mul $0 $1)] : ((isnil $9) ? copy 0[$1] : copy 0[$0]))>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "lt",
+      [
+       "v",
+       1
+      ],
+      [
+       "k",
+       2
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "mul",
+      [
+       "v",
+       0
+      ],
+      [
+       "v",
+       1
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "isnil",
+      [
+       "v",
+       9
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "v",
+      1
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "v",
+      0
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": false,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c086",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=$0 | ((lt 3 $0) ? copy 0[$0] : ((isnil $9) ? copy 0[3] : copy 0[(mod $0 3)]))>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "lt",
+      [
+       "k",
+       3
+      ],
+      [
+       "v",
+       0
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "v",
+      0
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "isnil",
+      [
+       "v",
+       9
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "k",
+      3
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "mod",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       3
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c087",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=$0 | ((lt 2 $0) ? copy 0[$0] : ((isnil $9) ? copy 0[0] : copy 0[(sub 3 $0)]))>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "lt",
+      [
+       "k",
+       2
+      ],
+      [
+       "v",
+       0
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "v",
+      0
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "isnil",
+      [
+       "v",
+       9
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "k",
+      0
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "sub",
+      [
+       "k",
+       3
+      ],
+      [
+       "v",
+       0
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c088",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=$0 | ((lt $0 4) ? copy 0[(sub 3 $0)] : copy 0[$0])>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "lt",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       4
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "sub",
+      [
+       "k",
+       3
+      ],
+      [
+       "v",
+       0
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "v",
+      0
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c105",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=(add $0 (sub $0 2)) | ((lt $0 $1) ? copy 0[$0] : copy 0[(add $0 (sub $3 $2))])>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "lt",
+      [
+       "v",
+       0
+      ],
+      [
+       "v",
+       1
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "v",
+      0
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "add",
+      [
+       "v",
+       0
+      ],
+      [
+       "sub",
+       [
+        "v",
+        3
+       ],
+       [
+        "v",
+        2
+       ]
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c108",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=1 | value (foldrI (add $10 $11) $0 $5)>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "foldrI",
+      [
+       "add",
+       [
+        "v",
+        10
+       ],
+       [
+        "v",
+        11
+       ]
+      ],
+      [
+       "v",
+       0
+      ],
+      [
+       "v",
+       5
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c109",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=1 | value (foldrI (mul $10 $11) $2 $5)>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "foldrI",
+      [
+       "mul",
+       [
+        "v",
+        10
+       ],
+       [
+        "v",
+        11
+       ]
+      ],
+      [
+       "v",
+       2
+      ],
+      [
+       "v",
+       5
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c116",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=(add $0 (sub $0 1)) | ((lt $0 $3) ? copy 0[(sub $3 (len $8))] : copy self[$1])>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "lt",
+      [
+       "v",
+       0
+      ],
+      [
+       "v",
+       3
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "sub",
+      [
+       "v",
+       3
+      ],
+      [
+       "len",
+       [
+        "v",
+        8
+       ]
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "v",
+      1
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": false,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c117",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=$0 | ((lt $1 3) ? copy 0[(sub 2 $1)] : copy 0[(add $0 3)])>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "lt",
+      [
+       "v",
+       1
+      ],
+      [
+       "k",
+       3
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "sub",
+      [
+       "k",
+       2
+      ],
+      [
+       "v",
+       1
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "add",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       3
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c123",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=1 | copy 0[(add $6 (foldlI $10 $0 $5))]>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "add",
+      [
+       "v",
+       6
+      ],
+      [
+       "foldlI",
+       [
+        "v",
+        10
+       ],
+       [
+        "v",
+        0
+       ],
+       [
+        "v",
+        5
+       ]
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c135",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=(sub $0 1) | ((eq $4 $6) ? copy 0[(len $8)] : ((eq $4 7) ? copy 0[(len $8)] : copy 0[$0]))>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "eq",
+      [
+       "v",
+       4
+      ],
+      [
+       "v",
+       6
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "len",
+      [
+       "v",
+       8
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "eq",
+      [
+       "v",
+       4
+      ],
+      [
+       "k",
+       7
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "len",
+      [
+       "v",
+       8
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "v",
+      0
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c147",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=(add $0 $0) | ((eq $0 1) ? value 1 : ((lt $7 $6) ? value (add $7 1) : copy 0[(div $0 2)]))>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "eq",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       1
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "lt",
+      [
+       "v",
+       7
+      ],
+      [
+       "v",
+       6
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "add",
+      [
+       "v",
+       7
+      ],
+      [
+       "k",
+       1
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "div",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       2
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": false,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c149",
+   "domain": "list transformation",
+   "kinds": [
+    "residual",
+    "cells"
+   ],
+   "preconditions": [
+    "an observed relation answer = op(observed cell at idx, w) holds through a system-derived inverse and the residual w is simpler than the answer; w is itself represented recursively",
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<residual mul(0[(mod (len $8) $2)], w) | w = <relcells m=(sub $0 1) | ((eq $1 0) ? copy 0[$2] : copy 0[0])>>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "mod",
+      [
+       "len",
+       [
+        "v",
+        8
+       ]
+      ],
+      [
+       "v",
+       2
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "eq",
+      [
+       "v",
+       1
+      ],
+      [
+       "k",
+       0
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "v",
+      2
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "k",
+      0
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c157",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=(add $0 $0) | ((lt $6 2) ? copy 0[(div $0 2)] : value (mod $6 2))>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "lt",
+      [
+       "v",
+       6
+      ],
+      [
+       "k",
+       2
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "div",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       2
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "mod",
+      [
+       "v",
+       6
+      ],
+      [
+       "k",
+       2
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c158",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=$0 | ((eq $4 (len $8)) ? value 1 : value 0)>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "eq",
+      [
+       "v",
+       4
+      ],
+      [
+       "len",
+       [
+        "v",
+        8
+       ]
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c171",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=$0 | ((isnil $9) ? copy 0[0] : value (add $4 $6))>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "isnil",
+      [
+       "v",
+       9
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "k",
+      0
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "add",
+      [
+       "v",
+       4
+      ],
+      [
+       "v",
+       6
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c173",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=$0 | ((lt $4 $6) ? value $6 : copy 0[$0])>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "lt",
+      [
+       "v",
+       4
+      ],
+      [
+       "v",
+       6
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "v",
+      6
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "v",
+      0
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c176",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=(sub $0 1) | linked(add $4, 0[(len $8)])>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "len",
+      [
+       "v",
+       8
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "v",
+      4
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c194",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=(add $0 2) | ((isnil $9) ? value $3 : ((eq $1 0) ? copy self[0] : copy 0[(sub $1 1)]))>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "isnil",
+      [
+       "v",
+       9
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "v",
+      3
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "eq",
+      [
+       "v",
+       1
+      ],
+      [
+       "k",
+       0
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "k",
+      0
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "sub",
+      [
+       "v",
+       1
+      ],
+      [
+       "k",
+       1
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c211",
+   "domain": "list transformation",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=(add $0 2) | ((lt 4 $1) ? copy 0[(sub $1 2)] : ((lt $1 3) ? copy 0[$1] : copy 0[(sub 7 $1)]))>",
+   "functions": [
+    {
+     "context": "list",
+     "program": [
+      "lt",
+      [
+       "k",
+       4
+      ],
+      [
+       "v",
+       1
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "sub",
+      [
+       "v",
+       1
+      ],
+      [
+       "k",
+       2
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "lt",
+      [
+       "v",
+       1
+      ],
+      [
+       "k",
+       3
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "v",
+      1
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    },
+    {
+     "context": "list",
+     "program": [
+      "sub",
+      [
+       "k",
+       7
+      ],
+      [
+       "v",
+       1
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "I",
+      "L",
+      "I",
+      "I",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "rule/c249",
+   "domain": "list transformation",
+   "kinds": [
+    "transport"
+   ],
+   "preconditions": [
+    "every answer value is an input cell of one list argument: either a permutation (destination per input cell) or a subsequence (presence per input cell)"
+   ],
+   "representation": "<transport arg0 present=(eq 0 (foldrI $6 $1 $3))>",
+   "functions": [
+    {
+     "context": "transport",
+     "program": [
+      "eq",
+      [
+       "k",
+       0
+      ],
+      [
+       "foldrI",
+       [
+        "v",
+        6
+       ],
+       [
+        "v",
+        1
+       ],
+       [
+        "v",
+        3
+       ]
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "L",
+      "L",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "oeis/A000009",
+   "domain": "integer sequence",
+   "kinds": [
+    "residual",
+    "cells"
+   ],
+   "preconditions": [
+    "an observed relation answer = op(observed cell at idx, w) holds through a system-derived inverse and the residual w is simpler than the answer; w is itself represented recursively",
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<residual add(self[(sub $0 1)], w) | w = <relcells m=- | linked(sub (div $1 3), self[(mod 3 $0)])>>",
+   "functions": [
+    {
+     "context": "seq",
+     "program": [
+      "sub",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       1
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    },
+    {
+     "context": "seq",
+     "program": [
+      "mod",
+      [
+       "k",
+       3
+      ],
+      [
+       "v",
+       0
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    },
+    {
+     "context": "seq",
+     "program": [
+      "div",
+      [
+       "v",
+       1
+      ],
+      [
+       "k",
+       3
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": false,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "oeis/A000085",
+   "domain": "integer sequence",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=- | linked(sub (add $2 (mul $0 $3)), self[(sub $0 2)])>",
+   "functions": [
+    {
+     "context": "seq",
+     "program": [
+      "sub",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       2
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    },
+    {
+     "context": "seq",
+     "program": [
+      "add",
+      [
+       "v",
+       2
+      ],
+      [
+       "mul",
+       [
+        "v",
+        0
+       ],
+       [
+        "v",
+        3
+       ]
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "oeis/A000115",
+   "domain": "integer sequence",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=- | linked(add (add $3 (div $0 5)), self[0])>",
+   "functions": [
+    {
+     "context": "seq",
+     "program": [
+      "k",
+      0
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    },
+    {
+     "context": "seq",
+     "program": [
+      "add",
+      [
+       "v",
+       3
+      ],
+      [
+       "div",
+       [
+        "v",
+        0
+       ],
+       [
+        "k",
+        5
+       ]
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "oeis/A000120",
+   "domain": "integer sequence",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=- | linked(add (mod $0 2), self[(div $0 2)])>",
+   "functions": [
+    {
+     "context": "seq",
+     "program": [
+      "div",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       2
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    },
+    {
+     "context": "seq",
+     "program": [
+      "mod",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       2
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "oeis/A000188",
+   "domain": "integer sequence",
+   "kinds": [
+    "residual",
+    "cells"
+   ],
+   "preconditions": [
+    "an observed relation answer = op(observed cell at idx, w) holds through a system-derived inverse and the residual w is simpler than the answer; w is itself represented recursively",
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<residual add(self[(sub (div $1 2) 1)], w) | w = <relcells m=- | ((eq $2 $3) ? value (div $0 6) : value 0)>>",
+   "functions": [
+    {
+     "context": "seq",
+     "program": [
+      "sub",
+      [
+       "div",
+       [
+        "v",
+        1
+       ],
+       [
+        "k",
+        2
+       ]
+      ],
+      [
+       "k",
+       1
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    },
+    {
+     "context": "seq",
+     "program": [
+      "eq",
+      [
+       "v",
+       2
+      ],
+      [
+       "v",
+       3
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    },
+    {
+     "context": "seq",
+     "program": [
+      "div",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       6
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": false,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "oeis/A000201",
+   "domain": "integer sequence",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=- | linked(sub (add $0 (add $2 2)), self[(sub $2 $0)])>",
+   "functions": [
+    {
+     "context": "seq",
+     "program": [
+      "sub",
+      [
+       "v",
+       2
+      ],
+      [
+       "v",
+       0
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    },
+    {
+     "context": "seq",
+     "program": [
+      "add",
+      [
+       "v",
+       0
+      ],
+      [
+       "add",
+       [
+        "v",
+        2
+       ],
+       [
+        "k",
+        2
+       ]
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "oeis/A000255",
+   "domain": "integer sequence",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=- | linked(sub (mul $0 (add $2 $3)), self[(sub $0 2)])>",
+   "functions": [
+    {
+     "context": "seq",
+     "program": [
+      "sub",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       2
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    },
+    {
+     "context": "seq",
+     "program": [
+      "mul",
+      [
+       "v",
+       0
+      ],
+      [
+       "add",
+       [
+        "v",
+        2
+       ],
+       [
+        "v",
+        3
+       ]
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "oeis/A000297",
+   "domain": "integer sequence",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=- | linked(add (mul $0 (add $0 4)), self[(sub $0 2)])>",
+   "functions": [
+    {
+     "context": "seq",
+     "program": [
+      "sub",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       2
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    },
+    {
+     "context": "seq",
+     "program": [
+      "mul",
+      [
+       "v",
+       0
+      ],
+      [
+       "add",
+       [
+        "v",
+        0
+       ],
+       [
+        "k",
+        4
+       ]
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "oeis/A000430",
+   "domain": "integer sequence",
+   "kinds": [
+    "residual",
+    "cells"
+   ],
+   "preconditions": [
+    "an observed relation answer = op(observed cell at idx, w) holds through a system-derived inverse and the residual w is simpler than the answer; w is itself represented recursively",
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<residual add(self[(sub $0 1)], w) | w = <relcells m=- | ((lt $0 6) ? value 2 : value (sub 6 $2))>>",
+   "functions": [
+    {
+     "context": "seq",
+     "program": [
+      "sub",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       1
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    },
+    {
+     "context": "seq",
+     "program": [
+      "lt",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       6
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    },
+    {
+     "context": "seq",
+     "program": [
+      "sub",
+      [
+       "k",
+       6
+      ],
+      [
+       "v",
+       2
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": false,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "oeis/A000447",
+   "domain": "integer sequence",
+   "kinds": [
+    "residual",
+    "cells"
+   ],
+   "preconditions": [
+    "an observed relation answer = op(observed cell at idx, w) holds through a system-derived inverse and the residual w is simpler than the answer; w is itself represented recursively",
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<residual add(self[(sub $0 1)], w) | w = <relcells m=- | linked(sub (add $2 (add $2 8)), self[(sub $0 2)])>>",
+   "functions": [
+    {
+     "context": "seq",
+     "program": [
+      "sub",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       1
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    },
+    {
+     "context": "seq",
+     "program": [
+      "sub",
+      [
+       "v",
+       0
+      ],
+      [
+       "k",
+       2
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    },
+    {
+     "context": "seq",
+     "program": [
+      "add",
+      [
+       "v",
+       2
+      ],
+      [
+       "add",
+       [
+        "v",
+        2
+       ],
+       [
+        "k",
+        8
+       ]
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "oeis/A000581",
+   "domain": "integer sequence",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=- | value (div (mul $1 $2) $0)>",
+   "functions": [
+    {
+     "context": "seq",
+     "program": [
+      "div",
+      [
+       "mul",
+       [
+        "v",
+        1
+       ],
+       [
+        "v",
+        2
+       ]
+      ],
+      [
+       "v",
+       0
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "oeis/A000703",
+   "domain": "integer sequence",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=- | linked(add (ifI (eq $0 4) 2 3), self[(add $0 (sub 4 $2))])>",
+   "functions": [
+    {
+     "context": "seq",
+     "program": [
+      "add",
+      [
+       "v",
+       0
+      ],
+      [
+       "sub",
+       [
+        "k",
+        4
+       ],
+       [
+        "v",
+        2
+       ]
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    },
+    {
+     "context": "seq",
+     "program": [
+      "ifI",
+      [
+       "eq",
+       [
+        "v",
+        0
+       ],
+       [
+        "k",
+        4
+       ]
+      ],
+      [
+       "k",
+       2
+      ],
+      [
+       "k",
+       3
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "oeis/A000929",
+   "domain": "integer sequence",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=- | linked(sub (sub $0 (div $2 2)), self[(mod 4 $0)])>",
+   "functions": [
+    {
+     "context": "seq",
+     "program": [
+      "mod",
+      [
+       "k",
+       4
+      ],
+      [
+       "v",
+       0
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    },
+    {
+     "context": "seq",
+     "program": [
+      "sub",
+      [
+       "v",
+       0
+      ],
+      [
+       "div",
+       [
+        "v",
+        2
+       ],
+       [
+        "k",
+        2
+       ]
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": false,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  },
+  {
+   "task": "oeis/A000999",
+   "domain": "integer sequence",
+   "kinds": [
+    "cells"
+   ],
+   "preconditions": [
+    "answer is a list (or a sequence on consecutive indices); every answer cell is a copy, a linked copy or a value over the cell coordinates; list length is a function of the input lengths and integer arguments"
+   ],
+   "representation": "<relcells m=- | linked(add (div (mod $0 5) 3), self[(div (add $0 2) 5)])>",
+   "functions": [
+    {
+     "context": "seq",
+     "program": [
+      "div",
+      [
+       "add",
+       [
+        "v",
+        0
+       ],
+       [
+        "k",
+        2
+       ]
+      ],
+      [
+       "k",
+       5
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    },
+    {
+     "context": "seq",
+     "program": [
+      "div",
+      [
+       "mod",
+       [
+        "v",
+        0
+       ],
+       [
+        "k",
+        5
+       ]
+      ],
+      [
+       "k",
+       3
+      ]
+     ],
+     "coordinate_types": [
+      "I",
+      "I",
+      "I",
+      "I",
+      "L"
+     ]
+    }
+   ],
+   "execution": "neumann1.latent.run(representation, library, inputs, task)",
+   "verified_on_train": true,
+   "hidden_tests_passed": true,
+   "counterexamples": "none on TRAIN (required for acceptance); hidden-test failure recorded in hidden_tests_passed"
+  }
+ ],
+ "counts": {
+  "cells": 45,
+  "residual": 5,
+  "transport": 1
+ }
+}

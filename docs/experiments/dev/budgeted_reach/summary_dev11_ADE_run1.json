@@ -1,0 +1,150 @@
+{
+ "D_vs_A": {
+  "lost": [
+   "identify-is-mod-k(k=7) @base"
+  ],
+  "new": [
+   "rotate-k(k=1) | identify-geq-k(k=2) @base"
+  ]
+ },
+ "E_vs_A": {
+  "lost": [
+   "identify-is-mod-k(k=7) @base"
+  ],
+  "new": [
+   "rotate-k(k=1) | identify-geq-k(k=2) @base"
+  ]
+ },
+ "E_vs_D": {
+  "lost": [],
+  "new": []
+ },
+ "arms": {
+  "A": {
+   "challenge_passed": [
+    "identify-is-mod-k(k=7)"
+   ],
+   "conflict_components": 2,
+   "cost": {
+    "challenge": 6,
+    "committee": 210,
+    "localise": 60,
+    "selftest": 11,
+    "state_component_screen": 88,
+    "states:initial_state": 5,
+    "states:known_region": 78,
+    "states:new_element": 84,
+    "states:new_length": 79,
+    "states:state_component": 37
+   },
+   "cpu": 330.14,
+   "degraded": 0,
+   "fallback": 0,
+   "formation_cpu": 168.18,
+   "formation_queries": 442,
+   "formed": [
+    "identify-is-mod-k(k=7)",
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "queries": 658,
+   "reach_queries": 0,
+   "reachable_obs": 77,
+   "reachable_total": 324,
+   "round0_fold_failures": 137,
+   "runs": 11,
+   "semantic": [
+    293,
+    293
+   ],
+   "solved": [
+    "identify-is-mod-k(k=7)"
+   ],
+   "state_queries": 283,
+   "updates_synthesised": 47
+  },
+  "D": {
+   "challenge_passed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "conflict_components": 3,
+   "cost": {
+    "challenge": 3,
+    "committee": 78,
+    "localise": 14,
+    "selftest": 11,
+    "state_component_screen": 54,
+    "states:initial_state": 6,
+    "states:known_region": 177,
+    "states:new_element": 129,
+    "states:new_length": 107,
+    "states:state_component": 79
+   },
+   "cpu": 330.24,
+   "degraded": 0,
+   "fallback": 0,
+   "formation_cpu": 113.91,
+   "formation_queries": 577,
+   "formed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "queries": 658,
+   "reach_queries": 0,
+   "reachable_obs": 296,
+   "reachable_total": 324,
+   "round0_fold_failures": 0,
+   "runs": 11,
+   "semantic": [
+    293,
+    293
+   ],
+   "solved": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "state_queries": 498,
+   "updates_synthesised": 12
+  },
+  "E": {
+   "challenge_passed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "conflict_components": 2,
+   "cost": {
+    "challenge": 3,
+    "committee": 249,
+    "formation:reach": 212,
+    "localise": 33,
+    "selftest": 12,
+    "state_component_screen": 71,
+    "states:initial_state": 1,
+    "states:known_region": 11,
+    "states:new_element": 15,
+    "states:new_length": 14,
+    "states:state_component": 37
+   },
+   "cpu": 330.21,
+   "degraded": 9,
+   "fallback": 4,
+   "formation_cpu": 152.69,
+   "formation_queries": 406,
+   "formed": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "queries": 658,
+   "reach_queries": 212,
+   "reachable_obs": 222,
+   "reachable_total": 324,
+   "round0_fold_failures": 96,
+   "runs": 11,
+   "semantic": [
+    293,
+    293
+   ],
+   "solved": [
+    "rotate-k(k=1) | identify-geq-k(k=2)"
+   ],
+   "state_queries": 290,
+   "updates_synthesised": 40
+  }
+ },
+ "rows": 33
+}

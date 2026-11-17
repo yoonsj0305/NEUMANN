@@ -1,0 +1,171 @@
+{
+ "schema": "neumann.op-witnesses.v1",
+ "levels": [
+  1,
+  14,
+  95,
+  485,
+  4134,
+  22748,
+  180474,
+  1036237
+ ],
+ "growth_per_level": 6.39,
+ "rows": [
+  {
+   "operation": "take",
+   "type": [
+    "L",
+    "I"
+   ],
+   "witness": "(foldlL (cons $2 $3) nil (foldrL (tail $3) (foldlL (cons $2 $3) nil $0) (range (sub (len $0) $1))))",
+   "witness_holds": true,
+   "cost_level": 19,
+   "levels_completed_in_60s": 8,
+   "estimated_candidates_to_reach": 755040310544971.4,
+   "estimated_cpu_seconds_at_measured_rate": 43718202141.68987
+  },
+  {
+   "operation": "init",
+   "type": [
+    "L"
+   ],
+   "witness": "(foldlL (cons $1 $2) nil (tail (foldlL (cons $1 $2) nil $0)))",
+   "witness_holds": true,
+   "cost_level": 12,
+   "levels_completed_in_60s": 8,
+   "estimated_candidates_to_reach": 1730574833.1886878,
+   "estimated_cpu_seconds_at_measured_rate": 100203.41870761348
+  },
+  {
+   "operation": "rotate",
+   "type": [
+    "L",
+    "I"
+   ],
+   "witness": "(foldrL (cons $2 $3) (foldlL (cons $2 $3) nil (foldrL (tail $3) (foldlL (cons $2 $3) nil $0) (range (sub (len $0) $1)))) (foldrL (tail $3) $0 (range $1)))",
+   "witness_holds": true,
+   "cost_level": 29,
+   "levels_completed_in_60s": 8,
+   "estimated_candidates_to_reach": 8.605940912140433e+22,
+   "estimated_cpu_seconds_at_measured_rate": 4.982995730980712e+18
+  },
+  {
+   "operation": "replace_at",
+   "type": [
+    "L",
+    "I",
+    "I"
+   ],
+   "witness": "(foldrL (cons $3 $4) (cons $2 (foldrL (tail $4) $0 (range (add $1 1)))) (foldlL (cons $3 $4) nil (foldrL (tail $4) (foldlL (cons $3 $4) nil $0) (range (sub (len $0) $1)))))",
+   "witness_holds": true,
+   "cost_level": 33,
+   "levels_completed_in_60s": 8,
+   "estimated_candidates_to_reach": 1.437241167653648e+26,
+   "estimated_cpu_seconds_at_measured_rate": 8.321886794161845e+21
+  },
+  {
+   "operation": "insert_at",
+   "type": [
+    "L",
+    "I",
+    "I"
+   ],
+   "witness": "(foldrL (cons $3 $4) (cons $2 (foldrL (tail $4) $0 (range $1))) (foldlL (cons $3 $4) nil (foldrL (tail $4) (foldlL (cons $3 $4) nil $0) (range (sub (len $0) $1)))))",
+   "witness_holds": true,
+   "cost_level": 31,
+   "levels_completed_in_60s": 8,
+   "estimated_candidates_to_reach": 3.516932266240426e+24,
+   "estimated_cpu_seconds_at_measured_rate": 2.036367510274441e+20
+  },
+  {
+   "operation": "interleave",
+   "type": [
+    "L",
+    "L"
+   ],
+   "witness": "(foldrL (cons (head (foldrL (tail $5) $0 (range $2))) (cons (head (foldrL (tail $5) $1 (range $2))) $3)) nil (range (len $0)))",
+   "witness_holds": true,
+   "cost_level": 22,
+   "levels_completed_in_60s": 8,
+   "estimated_candidates_to_reach": 1.9725072357672576e+17,
+   "estimated_cpu_seconds_at_measured_rate": 11421174320742.791
+  },
+  {
+   "operation": "zip_add",
+   "type": [
+    "L",
+    "L"
+   ],
+   "witness": "(map (add (head (foldrL (tail $4) $0 (range $2))) (head (foldrL (tail $4) $1 (range $2)))) (range (len $0)))",
+   "witness_holds": true,
+   "cost_level": 19,
+   "levels_completed_in_60s": 8,
+   "estimated_candidates_to_reach": 755040310544971.4,
+   "estimated_cpu_seconds_at_measured_rate": 43718202141.68987
+  },
+  {
+   "operation": "gather",
+   "type": [
+    "L",
+    "L"
+   ],
+   "witness": "(map (head (foldrL (tail $4) $0 (range $2))) $1)",
+   "witness_holds": true,
+   "cost_level": 9,
+   "levels_completed_in_60s": 8,
+   "estimated_candidates_to_reach": 6624329.360007859,
+   "estimated_cpu_seconds_at_measured_rate": 383.5606734757315
+  },
+  {
+   "operation": "repeat",
+   "type": [
+    "L",
+    "I"
+   ],
+   "witness": "(foldrL (foldrL (cons $4 $5) $3 $0) nil (range $1))",
+   "witness_holds": true,
+   "cost_level": 10,
+   "levels_completed_in_60s": 8,
+   "estimated_candidates_to_reach": 42347203.84416126,
+   "estimated_cpu_seconds_at_measured_rate": 2451.979837285945
+  },
+  {
+   "operation": "maximum",
+   "type": [
+    "L"
+   ],
+   "witness": "(foldlI (ifI (lt $2 $1) $1 $2) (head $0) $0)",
+   "witness_holds": true,
+   "cost_level": 10,
+   "levels_completed_in_60s": 8,
+   "estimated_candidates_to_reach": 42347203.84416126,
+   "estimated_cpu_seconds_at_measured_rate": 2451.979837285945
+  },
+  {
+   "operation": "sort",
+   "type": [
+    "L"
+   ],
+   "witness": "(foldrL (foldrL (cons $3 $4) (cons $1 (filter (not (lt $3 $1)) $2)) (filter (lt $3 $1) $2)) nil $0)",
+   "witness_holds": true,
+   "cost_level": 20,
+   "levels_completed_in_60s": 8,
+   "estimated_candidates_to_reach": 4826729500232578.0,
+   "estimated_cpu_seconds_at_measured_rate": 279476384276.91223
+  },
+  {
+   "operation": "unique",
+   "type": [
+    "L"
+   ],
+   "witness": "(foldlL (cons $1 $2) nil (foldlL (ifL (isnil (filter (eq $1 $3) $2)) (cons $1 $2) $2) nil $0))",
+   "witness_holds": true,
+   "cost_level": 19,
+   "levels_completed_in_60s": 8,
+   "estimated_candidates_to_reach": 755040310544971.4,
+   "estimated_cpu_seconds_at_measured_rate": 43718202141.68987
+  }
+ ],
+ "note": "developer-written witnesses; analysis only; never given to any solver"
+}

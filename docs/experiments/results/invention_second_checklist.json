@@ -1,0 +1,341 @@
+{
+ "families": {
+  "dc": {
+   "B_vs_A": {
+    "A_only": 25,
+    "B_only": 5
+   },
+   "C_exclusive": 8,
+   "C_exclusive_inventions": {
+    "f0": 1,
+    "f3": 2,
+    "f4": 1,
+    "f5": 1,
+    "f7": 4
+   },
+   "C_exclusive_programs": {
+    "dc/007": "(f7 (f0 (tail $0) nil) $0)",
+    "dc/010": "(f7 (f4 (m14 (m14 $0))) $0)",
+    "dc/096": "(isnil (f5 (map (mod $1 2) $0)))",
+    "dc/098": "(isnil (filter (lt 0 (mod $1 2)) $0))",
+    "dc/141": "(map (f3 $1 4) $0)",
+    "dc/142": "(map (f3 $1 5) $0)",
+    "dc/169": "(f7 $0 (f7 $0 $0))",
+    "dc/187": "(f7 (m12 (tail (tail $0))) (m12 $0))"
+   },
+   "C_solved_also_solved_by_A4": 108,
+   "P3_compute_wording": "C solved 119 vs A4 129; CPU C 7106 s vs A4 789 s (candidate-matched 4x, NOT compute-matched)",
+   "arms": {
+    "A": {
+     "budget_exhausted": 74,
+     "candidates": 18827934,
+     "cpu_seconds": 218.4,
+     "fit": 125,
+     "fit_but_wrong_using_memory": 0,
+     "solved": 115,
+     "train_fit_precision": 0.92,
+     "unresolved": 0,
+     "via": {
+      "search": 115
+     },
+     "work": 1287352594,
+     "wrong_replays": 0
+    },
+    "A4": {
+     "budget_exhausted": 59,
+     "candidates": 56549616,
+     "cpu_seconds": 789.3,
+     "fit": 140,
+     "fit_but_wrong_using_memory": 0,
+     "solved": 129,
+     "train_fit_precision": 0.921,
+     "unresolved": 0,
+     "via": {
+      "search": 129
+     },
+     "work": 5057584863,
+     "wrong_replays": 0
+    },
+    "B": {
+     "budget_exhausted": 94,
+     "candidates": 20422746,
+     "cpu_seconds": 5848.1,
+     "fit": 105,
+     "fit_but_wrong_using_memory": 0,
+     "solved": 95,
+     "train_fit_precision": 0.905,
+     "unresolved": 0,
+     "via": {
+      "replay": 34,
+      "search": 61
+     },
+     "work": 62925710631,
+     "wrong_replays": 0
+    },
+    "C": {
+     "budget_exhausted": 72,
+     "candidates": 16737264,
+     "cpu_seconds": 7105.7,
+     "fit": 127,
+     "fit_but_wrong_using_memory": 0,
+     "solved": 119,
+     "train_fit_precision": 0.937,
+     "unresolved": 0,
+     "via": {
+      "replay": 34,
+      "search": 85
+     },
+     "work": 76153484871,
+     "wrong_replays": 0
+    }
+   },
+   "hidden_tests_distribution": {
+    "7": 199
+   },
+   "tasks": 217,
+   "usable": 199
+  },
+  "oeis": {
+   "B_vs_A": {
+    "A_only": 2,
+    "B_only": 2
+   },
+   "C_exclusive": 0,
+   "C_exclusive_inventions": {},
+   "C_exclusive_programs": {},
+   "C_solved_also_solved_by_A4": 3,
+   "P3_compute_wording": "C solved 5 vs A4 6; CPU C 298 s vs A4 946 s (candidate-matched 4x, NOT compute-matched)",
+   "arms": {
+    "A": {
+     "budget_exhausted": 173,
+     "candidates": 34944614,
+     "cpu_seconds": 330.7,
+     "fit": 5,
+     "fit_but_wrong_using_memory": 0,
+     "solved": 4,
+     "train_fit_precision": 0.8,
+     "unresolved": 0,
+     "via": {
+      "search": 4
+     },
+     "work": 2182257544,
+     "wrong_replays": 0
+    },
+    "A4": {
+     "budget_exhausted": 168,
+     "candidates": 136772595,
+     "cpu_seconds": 945.8,
+     "fit": 10,
+     "fit_but_wrong_using_memory": 0,
+     "solved": 6,
+     "train_fit_precision": 0.6,
+     "unresolved": 0,
+     "via": {
+      "search": 6
+     },
+     "work": 5475173545,
+     "wrong_replays": 0
+    },
+    "B": {
+     "budget_exhausted": 172,
+     "candidates": 34724122,
+     "cpu_seconds": 400.0,
+     "fit": 6,
+     "fit_but_wrong_using_memory": 1,
+     "solved": 4,
+     "train_fit_precision": 0.667,
+     "unresolved": 0,
+     "via": {
+      "search": 4
+     },
+     "work": 1964654779,
+     "wrong_replays": 0
+    },
+    "C": {
+     "budget_exhausted": 170,
+     "candidates": 34163920,
+     "cpu_seconds": 297.6,
+     "fit": 8,
+     "fit_but_wrong_using_memory": 1,
+     "solved": 5,
+     "train_fit_precision": 0.625,
+     "unresolved": 0,
+     "via": {
+      "search": 5
+     },
+     "work": 1504653520,
+     "wrong_replays": 0
+    },
+    "D": {
+     "fit": 28,
+     "solved": 25,
+     "train_fit_precision": 0.893,
+     "unresolved": 0
+    }
+   },
+   "hidden_tests_distribution": {
+    "6": 178
+   },
+   "tasks": 250,
+   "usable": 178
+  },
+  "rule": {
+   "B_vs_A": {
+    "A_only": 5,
+    "B_only": 9
+   },
+   "C_exclusive": 1,
+   "C_exclusive_also_solved_without_inventions": 0,
+   "C_exclusive_invention_attributable": 1,
+   "C_exclusive_inventions": {
+    "f0": 1,
+    "f7": 1
+   },
+   "C_exclusive_programs": {
+    "rule/c066": "(tail (f7 (f0 $0 nil) $0))"
+   },
+   "C_exclusive_solved_by_C_no_learned_prior": 1,
+   "C_solved_also_solved_by_A4": 23,
+   "P3_compute_wording": "C solved 28 vs A4 34; CPU C 1721 s vs A4 1059 s (candidate-matched 4x, NOT compute-matched)",
+   "arms": {
+    "A": {
+     "budget_exhausted": 100,
+     "candidates": 21021850,
+     "cpu_seconds": 250.9,
+     "fit": 25,
+     "fit_but_wrong_using_memory": 0,
+     "solved": 25,
+     "train_fit_precision": 1.0,
+     "unresolved": 0,
+     "via": {
+      "search": 25
+     },
+     "work": 1448640292,
+     "wrong_replays": 0
+    },
+    "A4": {
+     "budget_exhausted": 90,
+     "candidates": 77135758,
+     "cpu_seconds": 1059.4,
+     "fit": 35,
+     "fit_but_wrong_using_memory": 0,
+     "solved": 34,
+     "train_fit_precision": 0.971,
+     "unresolved": 0,
+     "via": {
+      "search": 34
+     },
+     "work": 6592010895,
+     "wrong_replays": 0
+    },
+    "B": {
+     "budget_exhausted": 92,
+     "candidates": 19413775,
+     "cpu_seconds": 1773.1,
+     "fit": 33,
+     "fit_but_wrong_using_memory": 4,
+     "solved": 29,
+     "train_fit_precision": 0.879,
+     "unresolved": 0,
+     "via": {
+      "replay": 4,
+      "search": 25
+     },
+     "work": 15857498148,
+     "wrong_replays": 0
+    },
+    "C": {
+     "budget_exhausted": 90,
+     "candidates": 18573711,
+     "cpu_seconds": 1721.3,
+     "fit": 35,
+     "fit_but_wrong_using_memory": 7,
+     "solved": 28,
+     "train_fit_precision": 0.8,
+     "unresolved": 0,
+     "via": {
+      "replay": 4,
+      "search": 24
+     },
+     "work": 16223249627,
+     "wrong_replays": 0
+    },
+    "C_no_inventions": {
+     "budget_exhausted": 91,
+     "candidates": 18660953,
+     "cpu_seconds": 3208.6,
+     "fit": 34,
+     "fit_but_wrong_using_memory": 5,
+     "solved": 29,
+     "train_fit_precision": 0.853,
+     "unresolved": 0,
+     "via": {
+      "replay": 4,
+      "search": 25
+     },
+     "work": 29358225162,
+     "wrong_replays": 0
+    },
+    "C_no_learned_prior": {
+     "budget_exhausted": 92,
+     "candidates": 19107042,
+     "cpu_seconds": 1086.0,
+     "fit": 33,
+     "fit_but_wrong_using_memory": 6,
+     "solved": 27,
+     "train_fit_precision": 0.818,
+     "unresolved": 0,
+     "via": {
+      "replay": 4,
+      "search": 23
+     },
+     "work": 9726341909,
+     "wrong_replays": 0
+    }
+   },
+   "hidden_tests_distribution": {
+    "24": 125
+   },
+   "tasks": 125,
+   "usable": 125
+  }
+ },
+ "integrity": {
+  "expected": {
+   "A": 25,
+   "A4": 34
+  },
+  "observed": {
+   "A": 25,
+   "A4": 34
+  },
+  "status": "OK"
+ },
+ "inventions_expanded_size": {
+  "f0": 4,
+  "f1": 5,
+  "f2": 10,
+  "f3": 7,
+  "f4": 13,
+  "f5": 9,
+  "f6": 6,
+  "f7": 6
+ },
+ "label": "SECOND evaluation on targets opened by the INCOMPLETE FIRST run; not FIRST evidence",
+ "plan": "second",
+ "unresolved": 0,
+ "verdict": {
+  "P1_invention": "PASS",
+  "P2_dc": "FAIL",
+  "P2_oeis": "FAIL",
+  "P2_rule": "FAIL",
+  "P3_iso_capability_4x_dc": "NOT_SHOWN",
+  "P3_iso_capability_4x_oeis": "NOT_SHOWN",
+  "P3_iso_capability_4x_rule": "NOT_SHOWN",
+  "Q3_scoped": "FAIL",
+  "Q6a_cross_author_zero_shot": "FAIL",
+  "Q6b_cross_semantic_one_core": "FAIL",
+  "global_Q1_Q7": "OPEN",
+  "issue_745_gate": "FAIL"
+ }
+}

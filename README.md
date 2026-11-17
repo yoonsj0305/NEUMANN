@@ -8,6 +8,19 @@ same useful capability with much less complete compute, memory, energy, latency
 and monetary cost. Learned intelligence discovers meaning/structure and chooses
 computation; cheaper derivable work belongs outside neural inference.
 
+## 2026-11-11 ConceptARC FIRST: exact elimination PASS, cascade FAIL
+
+[Result](docs/research/Q1Q2Q4Q6_VERIFIED_CASCADE_CONCEPTARC_FIRST_RESULT_2026_11_11.md)
+on all 160 ConceptARC originals (pinned before this run; CORRECTION: the corpus had already been opened by PRs #468-#487 on 2026-10-22, so capability numbers are not fresh-family evidence):
+the output-identical classical accelerator `classical_grid_fast.fit_all`
+matched the original fit lists **160/160** (1,461/1,461 incl. dev) at
+**4.38x** less classical search; adopted in the production hybrid
+(26.64 s -> 20.37 s, same 7/160). The zero-investment verified cascade
+**failed** iso-capability (6 vs 7) and cost (0.749x) and is not adopted.
+Root bottleneck exposed: TRAIN-fit precision collapses on the new author
+(relational 6 %, classical 33 %) -> next work is oracle-free hypothesis
+selection, not search speed. Global Q1-Q7 OPEN.
+
 ## 2026-11-06 Q3 cycle break: do not repeat fixed-H search
 
 The [root-cause postmortem](docs/research/NEUMANN_Q3_ROOT_CAUSE_CYCLE_BREAK_2026_11_06.md)

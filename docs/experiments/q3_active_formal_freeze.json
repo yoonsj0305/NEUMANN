@@ -1,0 +1,44 @@
+{
+ "arms": [
+  "A",
+  "B",
+  "C",
+  "D",
+  "Dq",
+  "E"
+ ],
+ "budget_queries": 60,
+ "cap_cpu_seconds": 30.0,
+ "code_sha256": {
+  "docs/experiments/results/spec_core_inverses.json": "0c74e8c5a5ee32dee09cda96d05a8651a9ac93de32b36fb3bcf4b31154008c2e",
+  "neumann1/active.py": "475b14a465fc43b14baa4f73d83c09606804d656de546a9724e73cf207e489a9",
+  "neumann1/cells.py": "83bfdcf0d61152e96119c7688ca5dd9e3dd378908825339820637e1b52a96308",
+  "neumann1/discovery_core.py": "f3e2297e212f9b3b6854501002fb29be4350dc0d7f36b77e8076d4c17436281b",
+  "neumann1/invention_core.py": "e94ce5264e2ebffdac006cb44f8e11e36e7822cdb7bf3cbc00eb61448ae3614c",
+  "neumann1/latent.py": "90de11fbc5a0ef65e12cf2ba35a6f9d2206a40fb7d42d196a4a8a47f4de6eb2b",
+  "neumann1/opgen.py": "70cebe1ebc465d689a274e36f19f425e29c06b14f2e13e0a893d487a7ba49374",
+  "neumann1/relcells.py": "cd302754f9d5fecdefc0281b96108804f96135ab66875fa73321ea51ff411732",
+  "neumann1/spec_core.py": "7213ba3163691737d8345667be55349776205cff2d0f483423c73720962008f2",
+  "research/q3/active_dev.py": "2d189d5225b16b7c3a1cd08556f8e79433058bc2a250855132aeb613a7d7d3e2",
+  "research/q3/active_failures.py": "ed7105d1c90a424b04f0ee260323c6de0ca9352015270cbf62f8b75b2ba59a25",
+  "research/q3/env_listroutines.py": "1f880b2611ea0f91f046d3cfe0da34beab76ce641e6ed08739fc4796439c7bb4"
+ },
+ "created_utc": "2026-11-13T12:51:12Z",
+ "criteria": {
+  "V1_method_invention": "solved(D) - solved(Dq) net (D-only minus Dq-only) >= 10, exact two-sided McNemar p < 0.05, and the D-only tasks are solved by accepted machines of at least 2 distinct structure classes (int-state, list-state, m>=2)",
+  "V2_latent_state_discovery": ">= 5 formal tasks solved by D with an accepted machine of m >= 2 components that Dq does not solve",
+  "V3_learned_policy": "E vs D: E-only >= 5 and p < 0.05, or solved(E) >= solved(D) with total CPU(E) <= 0.7 x CPU(D)",
+  "unresolved": "error rows are reported and count as unsolved for D and E and solved for every rival (adverse completion)"
+ },
+ "env_seed": 0,
+ "folds": 5,
+ "formal_task_names_sha256": "cff51aee43696611157c7efd538d61ff7e088c104136328ae9517b9805367aa0",
+ "formal_tasks": 168,
+ "freeze_sha256": "2fd5f3bd993d5161b3651b1545f2e72710508ecd1c7ad9ebc8a8c1a174a0b1f6",
+ "predictions_stated_before_the_run": {
+  "V1": "uncertain: probe 7:1, p=0.070",
+  "V2": "expected FAIL: the environment contains few hidden-state tasks (probe: 1)",
+  "V3": "expected FAIL: probe E 40 vs D 41"
+ },
+ "schema": "neumann.q3-active-formal-freeze.v1"
+}

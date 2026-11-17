@@ -1,0 +1,696 @@
+{
+ "all_mismatches": [],
+ "duplicate_keys": 0,
+ "expected_jobs": 3528,
+ "expected_tasks": 392,
+ "families": {
+  "dev": 80,
+  "oeis": 187,
+  "rule": 125
+ },
+ "input_sha256": "a4b53f16deef3edfc1de6bfa8d887054ecececc49f6828d43c7c197a5d9779fe",
+ "missing_count": 0,
+ "missing_jobs": [],
+ "per_arm": {
+  "A": {
+   "complete_triples": 392,
+   "cpu_ratio_frozen_over_on_total": 1.01,
+   "cpu_seconds_per_task": {
+    "frozen": {
+     "max": 1.462,
+     "median": 0.677,
+     "min": 0.0,
+     "n": 392,
+     "p10": 0.07,
+     "p90": 0.916,
+     "p99": 1.222
+    },
+    "off": {
+     "max": 1.452,
+     "median": 0.725,
+     "min": 0.0,
+     "n": 392,
+     "p10": 0.067,
+     "p90": 1.0,
+     "p99": 1.163
+    },
+    "on": {
+     "max": 1.217,
+     "median": 0.657,
+     "min": 0.0,
+     "n": 392,
+     "p10": 0.069,
+     "p90": 0.918,
+     "p99": 1.138
+    }
+   },
+   "cpu_seconds_triples": {
+    "frozen": 254.69,
+    "off": 271.69,
+    "on": 251.71
+   },
+   "equality": {
+    "frozen_vs_off": {
+     "comparable": 392,
+     "mismatches": 0
+    },
+    "frozen_vs_on": {
+     "comparable": 392,
+     "mismatches": 0
+    },
+    "off_vs_on": {
+     "comparable": 392,
+     "mismatches": 0
+    }
+   },
+   "frozen_and_on_comparable": 392,
+   "largest_on_slowdowns_seconds": [
+    {
+     "delta": 0.354,
+     "frozen_cpu": 0.7261,
+     "id": "rule/c075",
+     "on_cpu": 1.0804
+    },
+    {
+     "delta": 0.299,
+     "frozen_cpu": 0.6408,
+     "id": "dev/sumL",
+     "on_cpu": 0.94
+    },
+    {
+     "delta": 0.285,
+     "frozen_cpu": 0.5839,
+     "id": "dev/min",
+     "on_cpu": 0.8693
+    }
+   ],
+   "not_comparable_frozen_vs_on": {},
+   "on_cpu_all_completed": {
+    "max": 1.217,
+    "median": 0.657,
+    "min": 0.0,
+    "n": 392,
+    "p10": 0.069,
+    "p90": 0.918,
+    "p99": 1.138
+   },
+   "on_timeouts": 0,
+   "pairs": 392,
+   "per_task_cpu_ratio_frozen_over_on": {
+    "max": 2.04,
+    "median": 1.003,
+    "min": 0.671,
+    "n": 360,
+    "p10": 0.852,
+    "p90": 1.247,
+    "p99": 1.499
+   },
+   "per_task_work_ratio_off_over_on": {
+    "max": 1.339,
+    "median": 1.26,
+    "min": 1.0,
+    "n": 388,
+    "p10": 1.199,
+    "p90": 1.287,
+    "p99": 1.326
+   },
+   "solved_frozen_on_comparable": 51,
+   "solved_on_on_comparable": 51,
+   "work_ratio_off_over_on_total": 1.25,
+   "work_triples": {
+    "off": 1007006992,
+    "on": 803898111
+   },
+   "worst_frozen_cpu_cases": [
+    {
+     "frozen_cpu": 1.4618,
+     "id": "rule/c132",
+     "off_work": 4074036,
+     "on_cpu": 1.217,
+     "on_work": 3318935
+    },
+    {
+     "frozen_cpu": 1.2814,
+     "id": "rule/c010",
+     "off_work": 4123025,
+     "on_cpu": 0.8549,
+     "on_work": 3365457
+    },
+    {
+     "frozen_cpu": 1.224,
+     "id": "oeis/A000135",
+     "off_work": 2322280,
+     "on_cpu": 0.5999,
+     "on_work": 1843684
+    },
+    {
+     "frozen_cpu": 1.2222,
+     "id": "dev/nth4L",
+     "off_work": 3753278,
+     "on_cpu": 0.8212,
+     "on_work": 3026302
+    },
+    {
+     "frozen_cpu": 1.2068,
+     "id": "rule/c009",
+     "off_work": 3597761,
+     "on_cpu": 0.7417,
+     "on_work": 2874666
+    }
+   ]
+  },
+  "B": {
+   "complete_triples": 386,
+   "cpu_ratio_frozen_over_on_total": 3.91,
+   "cpu_seconds_per_task": {
+    "frozen": {
+     "max": 198.379,
+     "median": 0.618,
+     "min": 0.0,
+     "n": 386,
+     "p10": 0.004,
+     "p90": 3.519,
+     "p99": 153.858
+    },
+    "off": {
+     "max": 275.418,
+     "median": 0.686,
+     "min": 0.001,
+     "n": 386,
+     "p10": 0.005,
+     "p90": 4.444,
+     "p99": 199.0
+    },
+    "on": {
+     "max": 16.868,
+     "median": 0.679,
+     "min": 0.001,
+     "n": 386,
+     "p10": 0.005,
+     "p90": 2.852,
+     "p99": 14.045
+    }
+   },
+   "cpu_seconds_triples": {
+    "frozen": 2236.75,
+    "off": 2915.86,
+    "on": 571.7
+   },
+   "equality": {
+    "frozen_vs_off": {
+     "comparable": 386,
+     "mismatches": 0
+    },
+    "frozen_vs_on": {
+     "comparable": 388,
+     "mismatches": 0
+    },
+    "off_vs_on": {
+     "comparable": 386,
+     "mismatches": 0
+    }
+   },
+   "frozen_and_on_comparable": 388,
+   "largest_on_slowdowns_seconds": [
+    {
+     "delta": 0.961,
+     "frozen_cpu": 1.2042,
+     "id": "rule/c134",
+     "on_cpu": 2.1652
+    },
+    {
+     "delta": 0.701,
+     "frozen_cpu": 1.9704,
+     "id": "rule/c073",
+     "on_cpu": 2.671
+    },
+    {
+     "delta": 0.651,
+     "frozen_cpu": 2.2009,
+     "id": "dev/take4",
+     "on_cpu": 2.8521
+    }
+   ],
+   "not_comparable_frozen_vs_on": {
+    "rule/c012": [
+     "frozen",
+     "off"
+    ],
+    "rule/c060": [
+     "frozen",
+     "off"
+    ],
+    "rule/c175": [
+     "frozen",
+     "off"
+    ],
+    "rule/c178": [
+     "frozen",
+     "off"
+    ]
+   },
+   "on_cpu_all_completed": {
+    "max": 25.039,
+    "median": 0.686,
+    "min": 0.001,
+    "n": 392,
+    "p10": 0.005,
+    "p90": 3.009,
+    "p99": 18.841
+   },
+   "on_timeouts": 0,
+   "pairs": 392,
+   "per_task_cpu_ratio_frozen_over_on": {
+    "max": 18.35,
+    "median": 0.931,
+    "min": 0.553,
+    "n": 321,
+    "p10": 0.782,
+    "p90": 1.412,
+    "p99": 12.763
+   },
+   "per_task_work_ratio_off_over_on": {
+    "max": 27.616,
+    "median": 1.049,
+    "min": 1.0,
+    "n": 385,
+    "p10": 1.0,
+    "p90": 1.712,
+    "p99": 13.567
+   },
+   "solved_frozen_on_comparable": 82,
+   "solved_on_on_comparable": 82,
+   "work_ratio_off_over_on_total": 6.9,
+   "work_triples": {
+    "off": 28076054964,
+    "on": 4071853689
+   },
+   "worst_frozen_cpu_cases": [
+    {
+     "frozen_cpu": 262.6664,
+     "id": "rule/c008",
+     "off_work": null,
+     "on_cpu": 19.0174,
+     "on_work": 165384227
+    },
+    {
+     "frozen_cpu": 233.0157,
+     "id": "rule/c173",
+     "off_work": null,
+     "on_cpu": 16.7029,
+     "on_work": 176512613
+    },
+    {
+     "frozen_cpu": 198.3786,
+     "id": "rule/c013",
+     "off_work": 2581253471,
+     "on_cpu": 15.5437,
+     "on_work": 155106204
+    },
+    {
+     "frozen_cpu": 195.3674,
+     "id": "rule/c067",
+     "off_work": 2707221355,
+     "on_cpu": 10.6465,
+     "on_work": 98030029
+    },
+    {
+     "frozen_cpu": 184.0511,
+     "id": "rule/c226",
+     "off_work": 2494729654,
+     "on_cpu": 16.8676,
+     "on_work": 183877053
+    }
+   ]
+  },
+  "C": {
+   "complete_triples": 381,
+   "cpu_ratio_frozen_over_on_total": 4.38,
+   "cpu_seconds_per_task": {
+    "frozen": {
+     "max": 193.191,
+     "median": 0.626,
+     "min": 0.0,
+     "n": 381,
+     "p10": 0.004,
+     "p90": 3.369,
+     "p99": 172.344
+    },
+    "off": {
+     "max": 259.368,
+     "median": 0.693,
+     "min": 0.001,
+     "n": 381,
+     "p10": 0.005,
+     "p90": 4.444,
+     "p99": 222.222
+    },
+    "on": {
+     "max": 16.39,
+     "median": 0.691,
+     "min": 0.001,
+     "n": 381,
+     "p10": 0.005,
+     "p90": 2.802,
+     "p99": 12.966
+    }
+   },
+   "cpu_seconds_triples": {
+    "frozen": 2278.89,
+    "off": 2922.35,
+    "on": 520.87
+   },
+   "equality": {
+    "frozen_vs_off": {
+     "comparable": 381,
+     "mismatches": 0
+    },
+    "frozen_vs_on": {
+     "comparable": 381,
+     "mismatches": 0
+    },
+    "off_vs_on": {
+     "comparable": 381,
+     "mismatches": 0
+    }
+   },
+   "frozen_and_on_comparable": 381,
+   "largest_on_slowdowns_seconds": [
+    {
+     "delta": 0.672,
+     "frozen_cpu": 0.8717,
+     "id": "dev/add_idx",
+     "on_cpu": 1.5442
+    },
+    {
+     "delta": 0.526,
+     "frozen_cpu": 0.9741,
+     "id": "dev/max_m_min",
+     "on_cpu": 1.5003
+    },
+    {
+     "delta": 0.502,
+     "frozen_cpu": 1.5788,
+     "id": "rule/c142",
+     "on_cpu": 2.0811
+    }
+   ],
+   "not_comparable_frozen_vs_on": {
+    "rule/c008": [
+     "frozen",
+     "off"
+    ],
+    "rule/c012": [
+     "frozen",
+     "off"
+    ],
+    "rule/c013": [
+     "frozen",
+     "off"
+    ],
+    "rule/c060": [
+     "frozen",
+     "off"
+    ],
+    "rule/c082": [
+     "frozen",
+     "off"
+    ],
+    "rule/c173": [
+     "frozen",
+     "off"
+    ],
+    "rule/c175": [
+     "frozen",
+     "off"
+    ],
+    "rule/c176": [
+     "frozen",
+     "off"
+    ],
+    "rule/c178": [
+     "frozen",
+     "off"
+    ],
+    "rule/c191": [
+     "frozen",
+     "off"
+    ],
+    "rule/c241": [
+     "frozen",
+     "off"
+    ]
+   },
+   "on_cpu_all_completed": {
+    "max": 29.687,
+    "median": 0.695,
+    "min": 0.001,
+    "n": 392,
+    "p10": 0.005,
+    "p90": 3.228,
+    "p99": 21.328
+   },
+   "on_timeouts": 0,
+   "pairs": 392,
+   "per_task_cpu_ratio_frozen_over_on": {
+    "max": 20.567,
+    "median": 0.96,
+    "min": 0.558,
+    "n": 304,
+    "p10": 0.788,
+    "p90": 1.439,
+    "p99": 13.105
+   },
+   "per_task_work_ratio_off_over_on": {
+    "max": 32.841,
+    "median": 1.003,
+    "min": 1.0,
+    "n": 380,
+    "p10": 1.0,
+    "p90": 1.957,
+    "p99": 18.608
+   },
+   "solved_frozen_on_comparable": 93,
+   "solved_on_on_comparable": 93,
+   "work_ratio_off_over_on_total": 7.74,
+   "work_triples": {
+    "off": 27804800983,
+    "on": 3590646660
+   },
+   "worst_frozen_cpu_cases": [
+    {
+     "frozen_cpu": 193.1915,
+     "id": "rule/c002",
+     "off_work": 2321821631,
+     "on_cpu": 11.162,
+     "on_work": 108685609
+    },
+    {
+     "frozen_cpu": 183.316,
+     "id": "rule/c009",
+     "off_work": 2127552329,
+     "on_cpu": 14.6375,
+     "on_work": 114333530
+    },
+    {
+     "frozen_cpu": 181.5834,
+     "id": "rule/c067",
+     "off_work": 2492586420,
+     "on_cpu": 8.829,
+     "on_work": 75898046
+    },
+    {
+     "frozen_cpu": 172.3443,
+     "id": "rule/c227",
+     "off_work": 2352154275,
+     "on_cpu": 9.8512,
+     "on_work": 110749643
+    },
+    {
+     "frozen_cpu": 170.0833,
+     "id": "rule/c226",
+     "off_work": 2256379746,
+     "on_cpu": 13.9314,
+     "on_work": 143062046
+    }
+   ]
+  }
+ },
+ "rows": 3528,
+ "status": {
+  "frozen": {
+   "ok": 1161,
+   "timeout": 15
+  },
+  "off": {
+   "ok": 1159,
+   "timeout": 17
+  },
+  "on": {
+   "ok": 1176
+  }
+ },
+ "tasks": 392,
+ "timeouts": [
+  [
+   "rule/c008",
+   "B",
+   "off"
+  ],
+  [
+   "rule/c008",
+   "C",
+   "frozen"
+  ],
+  [
+   "rule/c008",
+   "C",
+   "off"
+  ],
+  [
+   "rule/c012",
+   "B",
+   "frozen"
+  ],
+  [
+   "rule/c012",
+   "B",
+   "off"
+  ],
+  [
+   "rule/c012",
+   "C",
+   "frozen"
+  ],
+  [
+   "rule/c012",
+   "C",
+   "off"
+  ],
+  [
+   "rule/c013",
+   "C",
+   "frozen"
+  ],
+  [
+   "rule/c013",
+   "C",
+   "off"
+  ],
+  [
+   "rule/c060",
+   "B",
+   "frozen"
+  ],
+  [
+   "rule/c060",
+   "B",
+   "off"
+  ],
+  [
+   "rule/c060",
+   "C",
+   "frozen"
+  ],
+  [
+   "rule/c060",
+   "C",
+   "off"
+  ],
+  [
+   "rule/c082",
+   "C",
+   "frozen"
+  ],
+  [
+   "rule/c082",
+   "C",
+   "off"
+  ],
+  [
+   "rule/c173",
+   "B",
+   "off"
+  ],
+  [
+   "rule/c173",
+   "C",
+   "frozen"
+  ],
+  [
+   "rule/c173",
+   "C",
+   "off"
+  ],
+  [
+   "rule/c175",
+   "B",
+   "frozen"
+  ],
+  [
+   "rule/c175",
+   "B",
+   "off"
+  ],
+  [
+   "rule/c175",
+   "C",
+   "frozen"
+  ],
+  [
+   "rule/c175",
+   "C",
+   "off"
+  ],
+  [
+   "rule/c176",
+   "C",
+   "frozen"
+  ],
+  [
+   "rule/c176",
+   "C",
+   "off"
+  ],
+  [
+   "rule/c178",
+   "B",
+   "frozen"
+  ],
+  [
+   "rule/c178",
+   "B",
+   "off"
+  ],
+  [
+   "rule/c178",
+   "C",
+   "frozen"
+  ],
+  [
+   "rule/c178",
+   "C",
+   "off"
+  ],
+  [
+   "rule/c191",
+   "C",
+   "frozen"
+  ],
+  [
+   "rule/c191",
+   "C",
+   "off"
+  ],
+  [
+   "rule/c241",
+   "C",
+   "frozen"
+  ],
+  [
+   "rule/c241",
+   "C",
+   "off"
+  ]
+ ]
+}

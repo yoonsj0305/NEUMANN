@@ -1,0 +1,791 @@
+{
+ "alpha_per_test": 0.0125,
+ "domains": {
+  "oeis": {
+   "A_vs_S": {
+    "first_only": 2,
+    "mcnemar_p": 0.5,
+    "second_only": 0
+   },
+   "B_only_vs_C": [],
+   "B_vs_A": {
+    "first_only": 0,
+    "mcnemar_p": 1.0,
+    "second_only": 0
+   },
+   "C_only_vs_B": {
+    "oeis/A000085": {
+     "program": "<rec n=$0 hist=$1 | (foldrI (add $3 (head (tail $1))) (head $1) (tail $1))>",
+     "via": "rec"
+    },
+    "oeis/A000213": {
+     "program": "<rec n=$0 hist=$1 | (add (add (head (tail $1)) (head (tail (tail $1)))) (head $1))>",
+     "via": "rec+proposal"
+    },
+    "oeis/A000867": {
+     "program": "<rec n=$0 hist=$1 | (add (ifI (eq $0 5) (mul $0 $0) 1) (head $1))>",
+     "via": "rec+feature"
+    },
+    "oeis/A000931": {
+     "program": "<rec n=$0 hist=$1 | (add (head (tail $1)) (head (tail (tail $1))))>",
+     "via": "rec+proposal"
+    }
+   },
+   "C_via": {
+    "inverse": 1,
+    "memory": 3,
+    "rec": 8,
+    "rec+feature": 5,
+    "rec+proposal": 4
+   },
+   "C_vs_Cw": {
+    "first_only": 1,
+    "mcnemar_p": 1.0,
+    "second_only": 0
+   },
+   "C_vs_S": {
+    "first_only": 6,
+    "mcnemar_p": 0.03125,
+    "second_only": 0
+   },
+   "cpu_seconds": {
+    "A": 1024.3,
+    "B": 1019.6,
+    "C": 1001.1,
+    "Cw": 1009.6,
+    "D": 0.0,
+    "S": 1038.7
+   },
+   "criterion": {
+    "K1": {
+     "first_only": 4,
+     "mcnemar_p": 0.125,
+     "pass": false,
+     "second_only": 0
+    },
+    "K2": {
+     "first_only": 4,
+     "mcnemar_p": 0.125,
+     "pass": false,
+     "second_only": 0
+    },
+    "K3": {
+     "exclusive": [
+      "oeis/A000085"
+     ],
+     "pass": false
+    },
+    "K4": {
+     "cpu_B": 1019.6,
+     "cpu_C": 1001.1,
+     "pass": true
+    }
+   },
+   "fit": {
+    "A": 20,
+    "B": 20,
+    "C": 23,
+    "Cw": 22,
+    "D": 33,
+    "S": 18
+   },
+   "pass": false,
+   "solved": {
+    "A": 17,
+    "B": 17,
+    "C": 21,
+    "Cw": 20,
+    "D": 33,
+    "S": 15
+   },
+   "solved_ids": {
+    "A": [
+     "oeis/A000007",
+     "oeis/A000027",
+     "oeis/A000038",
+     "oeis/A000051",
+     "oeis/A000201",
+     "oeis/A000210",
+     "oeis/A000302",
+     "oeis/A000325",
+     "oeis/A000340",
+     "oeis/A000400",
+     "oeis/A000520",
+     "oeis/A000523",
+     "oeis/A000538",
+     "oeis/A000584",
+     "oeis/A000689",
+     "oeis/A000865",
+     "oeis/A000969"
+    ],
+    "B": [
+     "oeis/A000007",
+     "oeis/A000027",
+     "oeis/A000038",
+     "oeis/A000051",
+     "oeis/A000201",
+     "oeis/A000210",
+     "oeis/A000302",
+     "oeis/A000325",
+     "oeis/A000340",
+     "oeis/A000400",
+     "oeis/A000520",
+     "oeis/A000523",
+     "oeis/A000538",
+     "oeis/A000584",
+     "oeis/A000689",
+     "oeis/A000865",
+     "oeis/A000969"
+    ],
+    "C": [
+     "oeis/A000007",
+     "oeis/A000027",
+     "oeis/A000038",
+     "oeis/A000051",
+     "oeis/A000085",
+     "oeis/A000201",
+     "oeis/A000210",
+     "oeis/A000213",
+     "oeis/A000302",
+     "oeis/A000325",
+     "oeis/A000340",
+     "oeis/A000400",
+     "oeis/A000520",
+     "oeis/A000523",
+     "oeis/A000538",
+     "oeis/A000584",
+     "oeis/A000689",
+     "oeis/A000865",
+     "oeis/A000867",
+     "oeis/A000931",
+     "oeis/A000969"
+    ],
+    "Cw": [
+     "oeis/A000007",
+     "oeis/A000027",
+     "oeis/A000038",
+     "oeis/A000051",
+     "oeis/A000201",
+     "oeis/A000210",
+     "oeis/A000213",
+     "oeis/A000302",
+     "oeis/A000325",
+     "oeis/A000340",
+     "oeis/A000400",
+     "oeis/A000520",
+     "oeis/A000523",
+     "oeis/A000538",
+     "oeis/A000584",
+     "oeis/A000689",
+     "oeis/A000865",
+     "oeis/A000867",
+     "oeis/A000931",
+     "oeis/A000969"
+    ],
+    "D": [
+     "oeis/A000007",
+     "oeis/A000027",
+     "oeis/A000038",
+     "oeis/A000051",
+     "oeis/A000078",
+     "oeis/A000125",
+     "oeis/A000127",
+     "oeis/A000213",
+     "oeis/A000253",
+     "oeis/A000297",
+     "oeis/A000302",
+     "oeis/A000325",
+     "oeis/A000340",
+     "oeis/A000400",
+     "oeis/A000439",
+     "oeis/A000447",
+     "oeis/A000481",
+     "oeis/A000520",
+     "oeis/A000538",
+     "oeis/A000562",
+     "oeis/A000563",
+     "oeis/A000581",
+     "oeis/A000584",
+     "oeis/A000597",
+     "oeis/A000689",
+     "oeis/A000750",
+     "oeis/A000865",
+     "oeis/A000867",
+     "oeis/A000910",
+     "oeis/A000931",
+     "oeis/A000962",
+     "oeis/A000969",
+     "oeis/A000973"
+    ],
+    "S": [
+     "oeis/A000007",
+     "oeis/A000027",
+     "oeis/A000038",
+     "oeis/A000051",
+     "oeis/A000201",
+     "oeis/A000210",
+     "oeis/A000302",
+     "oeis/A000325",
+     "oeis/A000400",
+     "oeis/A000520",
+     "oeis/A000523",
+     "oeis/A000584",
+     "oeis/A000689",
+     "oeis/A000865",
+     "oeis/A000969"
+    ]
+   },
+   "tasks": 187
+  },
+  "rule": {
+   "A_vs_S": {
+    "first_only": 4,
+    "mcnemar_p": 1.0,
+    "second_only": 3
+   },
+   "B_only_vs_C": [
+    "rule/c010",
+    "rule/c109",
+    "rule/c131",
+    "rule/c171"
+   ],
+   "B_vs_A": {
+    "first_only": 3,
+    "mcnemar_p": 1.0,
+    "second_only": 2
+   },
+   "C_only_vs_B": {
+    "rule/c018": {
+     "program": "<zmap e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (ifI (eq $1 5) 3 $0)>",
+     "via": "zmap"
+    },
+    "rule/c027": {
+     "program": "(cons (head $0) (cons (head (filter (not (eq $1 (head $0))) $0)) (tail (tail (tail $0)))))",
+     "via": "chain"
+    },
+    "rule/c099": {
+     "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (lt 6 (div $0 7))>",
+     "via": "zfilter"
+    },
+    "rule/c208": {
+     "program": "<zfilter e=$0 j=$1 r=$2 pre=$3 suf=$4 x=$5 | (not (lt (sub (foldlI $6 0 $5) 1) $2))>",
+     "via": "zfilter+proposal"
+    }
+   },
+   "C_via": {
+    "chain": 15,
+    "memory": 12,
+    "search": 2,
+    "zfilter": 8,
+    "zfilter+feature": 1,
+    "zfilter+proposal": 10,
+    "zmap": 9,
+    "zmap+feature": 2
+   },
+   "C_vs_Cw": {
+    "first_only": 1,
+    "mcnemar_p": 1.0,
+    "second_only": 0
+   },
+   "C_vs_S": {
+    "first_only": 5,
+    "mcnemar_p": 0.7265625,
+    "second_only": 3
+   },
+   "cpu_seconds": {
+    "A": 391.0,
+    "B": 390.6,
+    "C": 392.4,
+    "Cw": 397.5,
+    "S": 408.0
+   },
+   "criterion": {
+    "K1": {
+     "first_only": 4,
+     "mcnemar_p": 1.0,
+     "pass": false,
+     "second_only": 4
+    },
+    "K2": {
+     "first_only": 6,
+     "mcnemar_p": 1.0,
+     "pass": false,
+     "second_only": 5
+    },
+    "K3": {
+     "exclusive": [
+      "rule/c027",
+      "rule/c099"
+     ],
+     "pass": false
+    },
+    "K4": {
+     "cpu_B": 390.6,
+     "cpu_C": 392.4,
+     "pass": false
+    }
+   },
+   "fit": {
+    "A": 66,
+    "B": 66,
+    "C": 66,
+    "Cw": 65,
+    "S": 63
+   },
+   "pass": false,
+   "solved": {
+    "A": 58,
+    "B": 59,
+    "C": 59,
+    "Cw": 58,
+    "S": 57
+   },
+   "solved_ids": {
+    "A": [
+     "rule/c002",
+     "rule/c003",
+     "rule/c006",
+     "rule/c008",
+     "rule/c009",
+     "rule/c010",
+     "rule/c012",
+     "rule/c013",
+     "rule/c016",
+     "rule/c022",
+     "rule/c024",
+     "rule/c025",
+     "rule/c026",
+     "rule/c030",
+     "rule/c033",
+     "rule/c038",
+     "rule/c041",
+     "rule/c044",
+     "rule/c045",
+     "rule/c047",
+     "rule/c049",
+     "rule/c054",
+     "rule/c056",
+     "rule/c060",
+     "rule/c061",
+     "rule/c062",
+     "rule/c063",
+     "rule/c071",
+     "rule/c073",
+     "rule/c075",
+     "rule/c082",
+     "rule/c083",
+     "rule/c084",
+     "rule/c086",
+     "rule/c087",
+     "rule/c088",
+     "rule/c090",
+     "rule/c091",
+     "rule/c102",
+     "rule/c108",
+     "rule/c109",
+     "rule/c120",
+     "rule/c127",
+     "rule/c131",
+     "rule/c132",
+     "rule/c137",
+     "rule/c140",
+     "rule/c145",
+     "rule/c149",
+     "rule/c155",
+     "rule/c162",
+     "rule/c170",
+     "rule/c178",
+     "rule/c186",
+     "rule/c188",
+     "rule/c192",
+     "rule/c219",
+     "rule/c222"
+    ],
+    "B": [
+     "rule/c002",
+     "rule/c003",
+     "rule/c006",
+     "rule/c008",
+     "rule/c009",
+     "rule/c010",
+     "rule/c012",
+     "rule/c013",
+     "rule/c014",
+     "rule/c016",
+     "rule/c022",
+     "rule/c024",
+     "rule/c025",
+     "rule/c026",
+     "rule/c030",
+     "rule/c033",
+     "rule/c038",
+     "rule/c041",
+     "rule/c044",
+     "rule/c045",
+     "rule/c047",
+     "rule/c049",
+     "rule/c054",
+     "rule/c056",
+     "rule/c060",
+     "rule/c061",
+     "rule/c062",
+     "rule/c063",
+     "rule/c071",
+     "rule/c073",
+     "rule/c075",
+     "rule/c082",
+     "rule/c083",
+     "rule/c084",
+     "rule/c086",
+     "rule/c087",
+     "rule/c088",
+     "rule/c090",
+     "rule/c091",
+     "rule/c108",
+     "rule/c109",
+     "rule/c120",
+     "rule/c127",
+     "rule/c130",
+     "rule/c131",
+     "rule/c132",
+     "rule/c137",
+     "rule/c140",
+     "rule/c145",
+     "rule/c149",
+     "rule/c155",
+     "rule/c162",
+     "rule/c170",
+     "rule/c171",
+     "rule/c186",
+     "rule/c188",
+     "rule/c192",
+     "rule/c219",
+     "rule/c222"
+    ],
+    "C": [
+     "rule/c002",
+     "rule/c003",
+     "rule/c006",
+     "rule/c008",
+     "rule/c009",
+     "rule/c012",
+     "rule/c013",
+     "rule/c014",
+     "rule/c016",
+     "rule/c018",
+     "rule/c022",
+     "rule/c024",
+     "rule/c025",
+     "rule/c026",
+     "rule/c027",
+     "rule/c030",
+     "rule/c033",
+     "rule/c038",
+     "rule/c041",
+     "rule/c044",
+     "rule/c045",
+     "rule/c047",
+     "rule/c049",
+     "rule/c054",
+     "rule/c056",
+     "rule/c060",
+     "rule/c061",
+     "rule/c062",
+     "rule/c063",
+     "rule/c071",
+     "rule/c073",
+     "rule/c075",
+     "rule/c082",
+     "rule/c083",
+     "rule/c084",
+     "rule/c086",
+     "rule/c087",
+     "rule/c088",
+     "rule/c090",
+     "rule/c091",
+     "rule/c099",
+     "rule/c108",
+     "rule/c120",
+     "rule/c127",
+     "rule/c130",
+     "rule/c132",
+     "rule/c137",
+     "rule/c140",
+     "rule/c145",
+     "rule/c149",
+     "rule/c155",
+     "rule/c162",
+     "rule/c170",
+     "rule/c186",
+     "rule/c188",
+     "rule/c192",
+     "rule/c208",
+     "rule/c219",
+     "rule/c222"
+    ],
+    "Cw": [
+     "rule/c002",
+     "rule/c003",
+     "rule/c006",
+     "rule/c008",
+     "rule/c009",
+     "rule/c012",
+     "rule/c013",
+     "rule/c014",
+     "rule/c016",
+     "rule/c018",
+     "rule/c022",
+     "rule/c024",
+     "rule/c025",
+     "rule/c026",
+     "rule/c027",
+     "rule/c030",
+     "rule/c033",
+     "rule/c038",
+     "rule/c041",
+     "rule/c044",
+     "rule/c045",
+     "rule/c047",
+     "rule/c049",
+     "rule/c054",
+     "rule/c056",
+     "rule/c060",
+     "rule/c061",
+     "rule/c062",
+     "rule/c063",
+     "rule/c071",
+     "rule/c073",
+     "rule/c075",
+     "rule/c082",
+     "rule/c083",
+     "rule/c084",
+     "rule/c086",
+     "rule/c087",
+     "rule/c088",
+     "rule/c090",
+     "rule/c091",
+     "rule/c099",
+     "rule/c108",
+     "rule/c120",
+     "rule/c127",
+     "rule/c130",
+     "rule/c132",
+     "rule/c137",
+     "rule/c140",
+     "rule/c145",
+     "rule/c149",
+     "rule/c155",
+     "rule/c162",
+     "rule/c170",
+     "rule/c186",
+     "rule/c188",
+     "rule/c208",
+     "rule/c219",
+     "rule/c222"
+    ],
+    "S": [
+     "rule/c002",
+     "rule/c003",
+     "rule/c006",
+     "rule/c008",
+     "rule/c009",
+     "rule/c012",
+     "rule/c013",
+     "rule/c016",
+     "rule/c018",
+     "rule/c022",
+     "rule/c024",
+     "rule/c025",
+     "rule/c026",
+     "rule/c030",
+     "rule/c033",
+     "rule/c038",
+     "rule/c041",
+     "rule/c044",
+     "rule/c045",
+     "rule/c047",
+     "rule/c049",
+     "rule/c054",
+     "rule/c056",
+     "rule/c060",
+     "rule/c061",
+     "rule/c062",
+     "rule/c063",
+     "rule/c071",
+     "rule/c073",
+     "rule/c075",
+     "rule/c082",
+     "rule/c083",
+     "rule/c084",
+     "rule/c086",
+     "rule/c087",
+     "rule/c088",
+     "rule/c090",
+     "rule/c091",
+     "rule/c102",
+     "rule/c108",
+     "rule/c109",
+     "rule/c120",
+     "rule/c127",
+     "rule/c132",
+     "rule/c137",
+     "rule/c140",
+     "rule/c145",
+     "rule/c149",
+     "rule/c155",
+     "rule/c162",
+     "rule/c170",
+     "rule/c171",
+     "rule/c186",
+     "rule/c192",
+     "rule/c208",
+     "rule/c219",
+     "rule/c222"
+    ]
+   },
+   "tasks": 125
+  }
+ },
+ "experience": {
+  "oeis": {
+   "cpu_seconds": 4978.8,
+   "tasks": 187,
+   "train_verified": 25,
+   "via": {
+    "inverse": 3,
+    "rec": 15,
+    "rec+feature": 7
+   }
+  },
+  "rule": {
+   "cpu_seconds": 6883.6,
+   "tasks": 125,
+   "train_verified": 73,
+   "via": {
+    "chain": 18,
+    "search": 3,
+    "zfilter": 32,
+    "zfilter+feature": 6,
+    "zmap": 12,
+    "zmap+feature": 2
+   }
+  }
+ },
+ "folds": 5,
+ "iteration_pass": false,
+ "label": "iteration 1: learned discovery policy (weights, costs, latent-variable proposals), SOURCE 5-fold CV",
+ "min_exclusive": 5,
+ "note": "SOURCE-only development; cross-validated; not evidence for any gate",
+ "policy_fold0": {
+  "cost_contexts": [
+   "body/rec",
+   "body/zfilter",
+   "body/zmap",
+   "direct/I>I",
+   "direct/L>L",
+   "feature/rec",
+   "feature/zfilter",
+   "feature/zmap"
+  ],
+  "features": [
+   [
+    "(add (head (tail $0)) (head (tail (tail $0))))",
+    [
+     "L"
+    ],
+    "I"
+   ],
+   [
+    "(foldlI $1 9 (range $0))",
+    [
+     "I"
+    ],
+    "I"
+   ],
+   [
+    "(mod (add $0 7) 8)",
+    [
+     "I"
+    ],
+    "I"
+   ],
+   [
+    "(foldrI (add $1 $2) 0 $0)",
+    [
+     "L"
+    ],
+    "I"
+   ],
+   [
+    "(sub (foldlI $1 0 $0) 1)",
+    [
+     "L"
+    ],
+    "I"
+   ],
+   [
+    "(add $0 (div (add $0 4) 3))",
+    [
+     "I"
+    ],
+    "I"
+   ],
+   [
+    "(div (sub 8 (mul $0 5)) 8)",
+    [
+     "I"
+    ],
+    "I"
+   ],
+   [
+    "(foldrI (add $1 $2) 1 (range $0))",
+    [
+     "I"
+    ],
+    "I"
+   ],
+   [
+    "(mul $0 (mul $0 (mul $0 $0)))",
+    [
+     "I"
+    ],
+    "I"
+   ],
+   [
+    "(ifI (eq $0 5) (mul $0 $0) 1)",
+    [
+     "I"
+    ],
+    "I"
+   ]
+  ],
+  "memory_size": 72,
+  "weights": {
+   "direct/body/": 0.0978,
+   "rec/body/": 0.0799,
+   "rec/feature/0": 0.0414,
+   "rec/feature/1": 0.0195,
+   "zfilter/body/": 0.5667,
+   "zfilter/feature/0": 0.025,
+   "zfilter/feature/0,3": 0.0294,
+   "zfilter/feature/0,4": 0.0294,
+   "zfilter/feature/0,5": 0.0294,
+   "zfilter/feature/1": 0.125,
+   "zfilter/feature/2": 0.0278,
+   "zfilter/feature/3": 0.0278,
+   "zfilter/feature/4": 0.0833,
+   "zfilter/feature/5": 0.0294,
+   "zmap/body/": 0.425,
+   "zmap/feature/0": 0.0417,
+   "zmap/feature/0,3": 0.0455,
+   "zmap/feature/0,4": 0.0455,
+   "zmap/feature/0,5": 0.0455,
+   "zmap/feature/1": 0.0417,
+   "zmap/feature/2": 0.0417,
+   "zmap/feature/3": 0.125,
+   "zmap/feature/4": 0.0455,
+   "zmap/feature/5": 0.0455
+  }
+ },
+ "schema": "neumann.discovery-policy.iteration.v1"
+}

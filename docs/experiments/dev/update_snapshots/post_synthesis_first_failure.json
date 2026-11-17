@@ -1,0 +1,262 @@
+{
+ "add-k(k=10) | identify-is-prime": {
+  "0.0": {
+   "cpu": 13.291,
+   "first_failure": "Update found, fold fails (examples failing 7)",
+   "last": "no informative continuation",
+   "qp": {
+    "candidate": 8,
+    "localise": 7,
+    "states": 12
+   },
+   "solved": false
+  },
+  "5.0": {
+   "cpu": 15.438,
+   "first_failure": "Update found, fold fails (examples failing 7)",
+   "last": "no informative continuation",
+   "qp": {
+    "candidate": 8,
+    "localise": 10,
+    "states": 12
+   },
+   "solved": false
+  }
+ },
+ "identify-is-mod-k(k=7)": {
+  "0.0": {
+   "cpu": 17.023,
+   "first_failure": "Update found, fold fails (examples failing 3)",
+   "last": "no informative continuation",
+   "qp": {
+    "candidate": 8,
+    "localise": 4,
+    "selftest": 3,
+    "states": 10
+   },
+   "solved": false
+  },
+  "5.0": {
+   "cpu": 17.885,
+   "first_failure": "Update found, fold fails (examples failing 3)",
+   "last": "no informative continuation",
+   "qp": {
+    "candidate": 8,
+    "localise": 7,
+    "states": 10
+   },
+   "solved": false
+  }
+ },
+ "identify-is-prime": {
+  "0.0": {
+   "cpu": 13.128,
+   "first_failure": "Update found, fold fails (examples failing 6)",
+   "last": "no informative continuation",
+   "qp": {
+    "candidate": 8,
+    "localise": 4,
+    "states": 12
+   },
+   "solved": false
+  },
+  "5.0": {
+   "cpu": 14.165,
+   "first_failure": "Update found, fold fails (examples failing 6)",
+   "last": "no informative continuation",
+   "qp": {
+    "candidate": 8,
+    "localise": 4,
+    "states": 12
+   },
+   "solved": false
+  }
+ },
+ "positions | append-k(k=3)": {
+  "0.0": {
+   "cpu": 11.157,
+   "first_failure": "Update found, fold fails (examples failing 4)",
+   "last": "no informative continuation",
+   "qp": {
+    "candidate": 8,
+    "localise": 4,
+    "states": 24
+   },
+   "solved": false
+  },
+  "5.0": {
+   "cpu": 18.198,
+   "first_failure": "Update found, fold fails (examples failing 4)",
+   "last": "no informative continuation",
+   "qp": {
+    "candidate": 8,
+    "localise": 15,
+    "selftest": 1,
+    "states": 24
+   },
+   "solved": false
+  }
+ },
+ "pow-k(k=4) | product": {
+  "0.0": {
+   "cpu": 10.847,
+   "first_failure": "Update not found in run",
+   "last": "no informative continuation",
+   "qp": {
+    "candidate": 4,
+    "states": 13
+   },
+   "solved": false
+  },
+  "5.0": {
+   "cpu": 14.388,
+   "first_failure": "Update found, fold fails (examples failing 3)",
+   "last": "no informative continuation",
+   "qp": {
+    "candidate": 4,
+    "localise": 2,
+    "states": 13
+   },
+   "solved": false
+  }
+ },
+ "prepend-k(k=-2) | positions": {
+  "0.0": {
+   "cpu": 11.204,
+   "first_failure": "Update found, fold fails (examples failing 2)",
+   "last": "no informative continuation",
+   "qp": {
+    "candidate": 8,
+    "localise": 3,
+    "states": 25
+   },
+   "solved": false
+  },
+  "5.0": {
+   "cpu": 10.35,
+   "first_failure": "Update found, fold fails (examples failing 2)",
+   "last": "round 6: m=2, examples failing 0",
+   "qp": {
+    "localise": 10,
+    "selftest": 3,
+    "states": 25
+   },
+   "solved": true
+  }
+ },
+ "prepend-k(k=10) | positions": {
+  "0.0": {
+   "cpu": 16.593,
+   "first_failure": "Update found, fold fails (examples failing 3)",
+   "last": "no informative continuation",
+   "qp": {
+    "candidate": 12,
+    "localise": 4,
+    "states": 25
+   },
+   "solved": false
+  },
+  "5.0": {
+   "cpu": 18.074,
+   "first_failure": "Update found, fold fails (examples failing 3)",
+   "last": "deadline",
+   "qp": {
+    "candidate": 3,
+    "localise": 7,
+    "states": 12
+   },
+   "solved": false
+  }
+ },
+ "replace-all-k-with-n(k=5,n=0) | rotate-k(k=1)": {
+  "0.0": {
+   "cpu": 10.595,
+   "first_failure": "Update found, fold fails (examples failing 7)",
+   "last": "no informative continuation",
+   "qp": {
+    "localise": 4,
+    "states": 13
+   },
+   "solved": false
+  },
+  "5.0": {
+   "cpu": 13.122,
+   "first_failure": "Update found, fold fails (examples failing 7)",
+   "last": "no informative continuation",
+   "qp": {
+    "localise": 6,
+    "states": 13
+   },
+   "solved": false
+  }
+ },
+ "rotate-k(k=-2) | replace-all-k-with-n(k=1,n=2)": {
+  "0.0": {
+   "cpu": 9.198,
+   "first_failure": "Update found, fold fails (examples failing 1)",
+   "last": "no informative continuation",
+   "qp": {
+    "localise": 3,
+    "states": 12
+   },
+   "solved": false
+  },
+  "5.0": {
+   "cpu": 9.958,
+   "first_failure": "Update found, fold fails (examples failing 1)",
+   "last": "no informative continuation",
+   "qp": {
+    "localise": 3,
+    "states": 12
+   },
+   "solved": false
+  }
+ },
+ "rotate-k(k=1) | identify-geq-k(k=2)": {
+  "0.0": {
+   "cpu": 12.281,
+   "first_failure": "Update found, fold fails (examples failing 3)",
+   "last": "round 14: m=1, examples failing 0",
+   "qp": {
+    "localise": 13,
+    "selftest": 8,
+    "states": 12
+   },
+   "solved": false
+  },
+  "5.0": {
+   "cpu": 12.389,
+   "first_failure": "Update found, fold fails (examples failing 3)",
+   "last": "round 14: m=1, examples failing 0",
+   "qp": {
+    "localise": 13,
+    "selftest": 8,
+    "states": 12
+   },
+   "solved": false
+  }
+ },
+ "rotate-k(k=3)": {
+  "0.0": {
+   "cpu": 10.309,
+   "first_failure": "Update found, fold fails (examples failing 5)",
+   "last": "no informative continuation",
+   "qp": {
+    "localise": 4,
+    "states": 13
+   },
+   "solved": false
+  },
+  "5.0": {
+   "cpu": 6.034,
+   "first_failure": "Update found, fold fails (examples failing 5)",
+   "last": "round 2: m=1, examples failing 0",
+   "qp": {
+    "localise": 4,
+    "selftest": 3,
+    "states": 13
+   },
+   "solved": true
+  }
+ }
+}

@@ -1,0 +1,250 @@
+{
+ "D_formed": 28,
+ "D_formed_and_challenged": 28,
+ "D_formed_solved": 26,
+ "D_gain_over_Dq": {
+  "identify-geq-k(k=2) | intersperse-k(k=0)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 (add 1 (mod $0 2))) | ((lt $0 $3) ? copy 0[$0] : ((lt $4 2) ? value 0 : value (sub 1 $1)))>']",
+   "via": "state:prefix:m=1"
+  },
+  "intersperse-k(k=10) | append-k(k=2)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 (add 1 (mod 1 $0))) | ((eq $1 1) ? value $4 : ((eq $1 2) ? value (add $1 8) : value (head $9)))>']",
+   "via": "state:prefix:m=1"
+  },
+  "keep-mod-k(k=2) | pow-k(k=3)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 (sub 1 (mod $1 2))) | ((eq $0 $3) ? value (mul $4 (mul $4 $4)) : copy 0[$0])>']",
+   "via": "state:prefix:m=1"
+  },
+  "kth-largest(k=2)": {
+   "program": "W=[[], [16]] update=['(ifI (lt $1 $2) $1 (ifI (lt $0 $2) $2 $0))', '(ifI (lt $1 $2) $2 $1)']",
+   "via": "state:prefix:m=2"
+  },
+  "replace-all-k-with-n(k=2,n=10) | sum": {
+   "program": "W=[[]] update=['(ifI (eq $1 2) (add $0 (add $1 8)) (add $0 $1))']",
+   "via": "state:prefix:m=1"
+  },
+  "replace-all-k-with-n(k=5,n=0) | dup": {
+   "program": "W=[[]] update=['<relcells m=(add $0 2) | ((lt $0 $3) ? copy 0[$0] : ((eq $4 5) ? value 0 : value $4))>']",
+   "via": "state:prefix:m=1"
+  },
+  "reverse | replace-all-k-with-n(k=1,n=2)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((lt $1 $3) ? copy 0[(sub $0 1)] : ((eq $4 1) ? value 2 : value $4))>']",
+   "via": "state:prefix:m=1"
+  }
+ },
+ "D_latent_components_formed": 2,
+ "D_loss_to_Dq": [
+  "pow-k(k=4)"
+ ],
+ "D_machines": {
+  "add-k(k=-2)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((eq $0 $3) ? value (sub $4 2) : copy 0[$0])>']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  },
+  "add-k(k=1)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((eq $0 $3) ? value (add $4 1) : copy 0[$0])>']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  },
+  "add-k(k=2) | identify-k(k=-2)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | value 0>']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  },
+  "add-k(k=2) | modulo-k(k=2)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((eq $0 $3) ? value (mod $4 2) : copy 0[$0])>']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  },
+  "append-k(k=-2)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((eq $1 1) ? value $4 : value (head $9))>']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  },
+  "append-k(k=2)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((eq $1 1) ? value $4 : value (head $9))>']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  },
+  "identify-geq-k(k=2) | intersperse-k(k=0)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 (add 1 (mod $0 2))) | ((lt $0 $3) ? copy 0[$0] : ((lt $4 2) ? value 0 : value (sub 1 $1)))>']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  },
+  "identify-is-mod-k(k=2)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((lt $1 (mod $4 2)) ? value 0 : value (mul $5 $5))>']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  },
+  "identify-is-mod-k(k=2) | last": {
+   "program": "W=[[]] update=['(sub 1 (mod $1 2))']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  },
+  "identify-is-mod-k(k=7)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((lt $1 $3) ? copy 0[(sub $0 1)] : ((eq $0 (mod $4 7)) ? value 1 : value 0))>']",
+   "solved": true,
+   "via": "state:suffix:m=1"
+  },
+  "intersperse-k(k=10) | append-k(k=2)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 (add 1 (mod 1 $0))) | ((eq $1 1) ? value $4 : ((eq $1 2) ? value (add $1 8) : value (head $9)))>']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  },
+  "keep-mod-k(k=2) | pow-k(k=3)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 (sub 1 (mod $1 2))) | ((eq $0 $3) ? value (mul $4 (mul $4 $4)) : copy 0[$0])>']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  },
+  "keep-mod-k(k=3) | is-odds": {
+   "program": "(isnil (filter (eq 0 (mod $1 6)) $0))",
+   "solved": true,
+   "via": "search"
+  },
+  "kth-largest(k=2)": {
+   "program": "W=[[], [16]] update=['(ifI (lt $1 $2) $1 (ifI (lt $0 $2) $2 $0))', '(ifI (lt $1 $2) $2 $1)']",
+   "solved": true,
+   "via": "state:prefix:m=2"
+  },
+  "modulo-k(k=2) | count-k(k=3)": {
+   "program": "W=[[]] update=['$0']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  },
+  "modulo-k(k=3)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((eq $0 $3) ? value (mod $4 3) : copy 0[$0])>']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  },
+  "mult-k(k=2)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((eq $0 $3) ? value (add $4 $4) : copy 0[$0])>']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  },
+  "positions": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | value $0>']",
+   "solved": false,
+   "via": "state:prefix:m=1"
+  },
+  "pow-k(k=2)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((eq $0 $3) ? value (mul $4 $4) : copy 0[$0])>']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  },
+  "pow-k(k=2) | modulo-k(k=2)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((eq $0 $3) ? value (mod $4 2) : copy 0[$0])>']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  },
+  "product": {
+   "program": "W=[[]] update=['(mul $0 $1)']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  },
+  "replace-all-k-with-n(k=2,n=10) | is-evens": {
+   "program": "W=[[]] update=['(eq 0 (mod (ifI $0 $1 1) 2))']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  },
+  "replace-all-k-with-n(k=2,n=10) | sum": {
+   "program": "W=[[]] update=['(ifI (eq $1 2) (add $0 (add $1 8)) (add $0 $1))']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  },
+  "replace-all-k-with-n(k=5,n=0) | dup": {
+   "program": "W=[[]] update=['<relcells m=(add $0 2) | ((lt $0 $3) ? copy 0[$0] : ((eq $4 5) ? value 0 : value $4))>']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  },
+  "reverse": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((isnil $10) ? value $4 : copy 0[(sub $0 1)])>']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  },
+  "reverse | replace-all-k-with-n(k=1,n=2)": {
+   "program": "W=[[]] update=['<relcells m=(add $0 1) | ((lt $1 $3) ? copy 0[(sub $0 1)] : ((eq $4 1) ? value 2 : value $4))>']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  },
+  "rotate-k(k=10) | count-k(k=3)": {
+   "program": "W=[[]] update=['$0']",
+   "solved": false,
+   "via": "state:prefix:m=1"
+  },
+  "sum": {
+   "program": "W=[[]] update=['(add $0 $1)']",
+   "solved": true,
+   "via": "state:prefix:m=1"
+  }
+ },
+ "arms": {
+  "A": {
+   "by_parts": {
+    "1": 20,
+    "2": 11
+   },
+   "cpu_seconds": 557.1,
+   "fit": 45,
+   "queries": 0,
+   "solved": 31,
+   "wrong_fit": 14
+  },
+  "D": {
+   "by_parts": {
+    "1": 21,
+    "2": 20
+   },
+   "cpu_seconds": 1005.1,
+   "fit": 43,
+   "queries": 3545,
+   "solved": 41,
+   "wrong_fit": 2
+  },
+  "Dq": {
+   "by_parts": {
+    "1": 21,
+    "2": 14
+   },
+   "cpu_seconds": 840.2,
+   "fit": 35,
+   "queries": 3545,
+   "solved": 35,
+   "wrong_fit": 0
+  },
+  "E": {
+   "by_parts": {
+    "1": 20,
+    "2": 20
+   },
+   "cpu_seconds": 1015.7,
+   "fit": 42,
+   "queries": 3547,
+   "solved": 40,
+   "wrong_fit": 2
+  }
+ },
+ "comparisons": {
+  "D_vs_A": {
+   "first_only": 12,
+   "mcnemar_p": 0.012939453125,
+   "second_only": 2
+  },
+  "D_vs_Dq": {
+   "first_only": 7,
+   "mcnemar_p": 0.0703125,
+   "second_only": 1
+  },
+  "E_vs_D": {
+   "first_only": 0,
+   "mcnemar_p": 1.0,
+   "second_only": 1
+  }
+ },
+ "replay_check": {
+  "identical_query_answer_logs": 60,
+  "pairs": 60
+ },
+ "split": "probe",
+ "tasks": 60
+}
