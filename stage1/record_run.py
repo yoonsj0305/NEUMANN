@@ -11,7 +11,7 @@ import pathlib
 import subprocess
 import time
 
-HERE = pathlib.Path(__file__).parent
+HERE = pathlib.Path(__file__).resolve().parent
 PH = HERE / "results" / "phaseA2"
 NAME_T = {"addition": "덧셈", "parity": "패리티", "assoc": "연관 기억"}
 NAME_K = {"abacus": "Abacus", "looped": "looped", "gru": "GRU", "looped_rr": "looped_rr"}
@@ -94,7 +94,7 @@ def entry(d):
 
 
 def main(a):
-    d = pathlib.Path(a.run_dir)
+    d = pathlib.Path(a.run_dir).resolve()
     text, f, j = entry(d)
     res = HERE / "RESULTS.md"
     with open(res, "a") as fh:
