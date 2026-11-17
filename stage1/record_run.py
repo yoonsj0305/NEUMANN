@@ -1,0 +1,124 @@
+"""Append one finished Phase A' run to stage1/RESULTS.md (CLAUDE.md "결과 기록" format) and commit + push its raw
+records with the entry.  Values are copied from the run's final.json / config.json / env.json; nothing is
+recomputed.  The answer line applies the Phase A' pass criterion (CLAUDE.md) to the runs finished so far.
+
+  python stage1/record_run.py stage1/results/phaseA2/<run name> [--no-git]
+"""
+from __future__ import annotations
+import argparse
+import json
+import pathlib
+import subprocess
+import time
+
+HERE = pathlib.Path(__file__).parent
+PH = HERE / "results" / "phaseA2"
+NAME_T = {"addition": "덧셈", "parity": "패리티", "assoc": "연관 기억"}
+NAME_K = {"abacus": "Abacus", "looped": "looped", "gru": "GRU", "looped_rr": "looped_rr"}
+Q1 = ("Phase A′ 작업 1 — 트랜스포머 기준선(Abacus, looped) 중 하나 이상이 연관 기억 분포 안 ≥95%인가? "
+      "(못 하면 과제 형식 버그로 보고 멈춘다)")
+Q2 = "Phase A′ 작업 2 — looped_rr이 덧셈 분포 안 ≥95%를 유지하는가? (분포 밖은 숫자만, 기준 없음)"
+
+
+def load(name):
+    d = PH / name
+    if not (d / "final.json").exists():
+        return None
+    return json.loads((d / "final.json").read_text())
+
+
+def idv(f):
+    return [v for l, v in f["judgment"]["acc"].items() if l.startswith("id")][0]
+
+
+def answer(task, kind):
+    if task == "assoc":
+        runs = {k: load("phaseA2_assoc__%s__1M__s0__N100000" % k) for k in ("abacus", "looped")}
+        done = {k: idv(f) for k, f in runs.items() if f}
+        if any(v >= 0.95 for v in done.values()):
+            return "예 (%s)" % ", ".join("%s %.3f" % (NAME_K[k], v) for k, v in done.items())
+        if len(done) == 2:
+            return "아니오 (%s) — CLAUDE.md에 따라 과제 형식 버그로 보고 멈춤" % ", ".join(
+                "%s %.3f" % (NAME_K[k], v) for k, v in done.items())
+        return "미정 (끝난 트랜스포머: %s)" % (", ".join("%s %.3f" % (NAME_K[k], v) for k, v in done.items()) or "없음")
+    f = load("phaseA2_addition__looped_rr__1M__s0__N100000")
+    if f is None:
+        return "미정 (덧셈 looped_rr 실행이 아직 끝나지 않음)"
+    v = idv(f)
+    return "%s (덧셈 looped_rr 분포 안 %.3f)" % ("예" if v >= 0.95 else "아니오", v)
+
+
+def entry(d):
+    f = json.loads((d / "final.json").read_text())
+    cfg = json.loads((d / "config.json").read_text())
+    env = json.loads((d / "env.json").read_text())
+    t, k = f["task"], f["kind"]
+    j, last = f["judgment"], f["last"]
+    lab = lambda l: l.split("_", 1)[1]
+    oods = " · ".join("%s: %.3f" % (lab(l), v) for l, v in j["acc"].items() if l.startswith("ood"))
+    oods_last = " · ".join("%s: %.3f" % (lab(l), v) for l, v in last["acc"].items() if l.startswith("ood"))
+    work = "작업 1" if t == "assoc" else "작업 2"
+    date = time.strftime("%Y-%m-%d", time.gmtime())
+    lines = [
+        "## %s · Phase A′ %s · %s / %s" % (date, work, NAME_T[t], NAME_K[k]),
+        "- 질문: %s" % (Q1 if t == "assoc" else Q2),
+        "- 질문에 대한 답: %s" % answer(t, k),
+        "- 코드 커밋: `%s`%s · 원자료: `stage1/results/phaseA2/%s/`" % (
+            (env.get("code_commit") or "?")[:7], " (작업 트리 수정 있음)" if env.get("code_dirty") else "", d.name),
+        "- 결과 표 (판정 체크포인트 = 분포 안 최고 시점, 동률이면 이른 시점; 분포 밖은 그 시점 값):",
+        "",
+        "| 과제 | 기준선 | 규모 | 데이터 수 | 분포 안 정확도 | 분포 밖 정확도(구간별) | 학습 FLOPs | 시간 (학습 / 평가) |",
+        "|---|---|---|---|---|---|---|---|",
+        "| %s | %s | %s | %s | %.3f (step %d) | %s | %.2e (판정 시점까지) / %.2e (전체) | %.0f s / %.0f s |" % (
+            NAME_T[t], NAME_K[k], format(f["params"], ","), format(f["N"], ","), idv(f), j["step"], oods,
+            j["train_flops_cum"], f["train_flops"], f["wall_train_s"], f["wall_eval_s"]),
+        "",
+        "- 마지막 시점 (step %d): 분포 안 %.3f · 분포 밖 %s" % (
+            last["step"], [v for l, v in last["acc"].items() if l.startswith("id")][0], oods_last),
+    ]
+    if j.get("acc_fixed4"):
+        lines.append("- looped 보조 (고정 4회, 판정 시점): %s" % " · ".join(
+            "%s: %.3f" % (lab(l), v) for l, v in j["acc_fixed4"].items()))
+        lines.append("- looped 주 결과의 반복 횟수: %s" % ", ".join("%s → %d" % (lab(l), r) for l, r in f["recur"].items()))
+    if k == "looped_rr":
+        lines.append("- looped_rr 학습: 반복 %s 균등, progressive loss α = %s (%s)" % (
+            cfg["looped_rr"]["iterations"], cfg["looped_rr"]["progressive_alpha"], cfg["looped_rr"]["progressive"]))
+    segs = f["segments"]
+    lines.append("- 이상 사항 / 중단·재개 기록: 종료 사유 — %s; 실행 구간 %d개%s. 실행 환경 %s, %d코어, 1스레드, torch %s, "
+                 "GPU 없음." % (
+                     f["stopped"], len(segs),
+                     "" if len(segs) == 1 else " (세션 백그라운드 2시간 한도로 중단 후 마지막 체크포인트에서 재개: %s)" %
+                     ", ".join("구간 %d step %d부터" % (s["segment"], s["start_step"]) for s in segs[1:]),
+                     env["cpu"], env["cores"], env["torch"]))
+    return "\n".join(lines) + "\n", f, j
+
+
+def main(a):
+    d = pathlib.Path(a.run_dir)
+    text, f, j = entry(d)
+    res = HERE / "RESULTS.md"
+    with open(res, "a") as fh:
+        fh.write("\n" + text)
+    print(text)
+    if a.no_git:
+        return
+    root = HERE.parent
+    msg = "stage1 Phase A′ %s: %s %s (분포 안 %.3f @ step %d)\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n" \
+          "Claude-Session: https://claude.ai/code/session_01VSWBvg7gXA6QqLM5pig7M5\n" % (
+              "작업 1" if f["task"] == "assoc" else "작업 2", f["task"], f["kind"], idv(f), j["step"])
+    files = [str(res.relative_to(root)), str(d.relative_to(root))]
+    if (PH / "QUEUE_LOG.txt").exists():
+        files.append(str((PH / "QUEUE_LOG.txt").relative_to(root)))
+    subprocess.check_call(["git", "add"] + files, cwd=root)
+    subprocess.check_call(["git", "commit", "-q", "-m", msg], cwd=root)
+    for i in range(4):
+        if subprocess.call(["git", "push", "-u", "origin", "stage1/baselines"], cwd=root) == 0:
+            break
+        time.sleep(2 ** (i + 1))
+
+
+if __name__ == "__main__":
+    p = argparse.ArgumentParser()
+    p.add_argument("run_dir")
+    p.add_argument("--no-git", action="store_true")
+    main(p.parse_args())

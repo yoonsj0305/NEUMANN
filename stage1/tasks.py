@@ -1,4 +1,5 @@
-"""Stage 1 / Phase A tasks (CLAUDE.md): addition, parity, graph reachability.
+"""Stage 1 tasks (CLAUDE.md): addition, parity, associative recall (Phase A'); graph reachability (Phase A only,
+excluded from Stage 1 by the 2026-11-17 decision; kept so the Phase A records stay reproducible).
 
 Every task is a prompt -> answer token sequence; the loss is on the answer (and <eos>) only.  Numbers are written
 least significant digit first (the standard Abacus setting: digits of equal significance align).
@@ -12,6 +13,9 @@ least significant digit first (the standard Abacus setting: digits of equal sign
   reachability  a random directed graph on n nodes (names drawn from a fixed pool of 100, round(1.5 n) distinct
                 edges, listed in random order) and a query (s, t) -> Y / N, balanced; training n uniform in 4..8;
                 evaluation in-distribution 4-8, out-of-distribution 9-16 / 17-24 / 25-32.
+  assoc         k1 v1 k2 v2 ... kn vn | q = -> v: n distinct keys from the 100 node names, single-digit values, the
+                query uniform over the keys; training n uniform in 4..16; evaluation in-distribution 4-16,
+                out-of-distribution 17-32 / 33-48 / 49-64.
 The training set is N i.i.d. draws from the training distribution (fixed once per seed; duplicates are allowed, so
 the distribution is exact).  Evaluation sets use their own fixed seeds.
 """
@@ -26,12 +30,13 @@ VOCAB = SPECIAL + DIGITS + SYMS + NODES
 TOK = {t: i for i, t in enumerate(VOCAB)}
 PAD, EOS = TOK["<pad>"], TOK["<eos>"]
 
-TASKS = ("addition", "parity", "reachability")
+TASKS = ("addition", "parity", "reachability", "assoc")      # reachability: Phase A only (excluded from Stage 1)
 # (training range, in-distribution bin, out-of-distribution bins)
 SPEC = {
     "addition": {"train": (1, 10), "id": (1, 10), "ood": [(11, 20), (21, 30), (31, 40)]},
     "parity": {"train": (1, 16), "id": (1, 16), "ood": [(17, 32), (33, 48), (49, 64)]},
     "reachability": {"train": (4, 8), "id": (4, 8), "ood": [(9, 16), (17, 24), (25, 32)]},
+    "assoc": {"train": (4, 16), "id": (4, 16), "ood": [(17, 32), (33, 48), (49, 64)]},
 }
 
 
@@ -83,6 +88,18 @@ def reachability(n, rng):
     return p + ["|", s, "?", t, "="], ["Y" if t in seen else "N"]
 
 
+def assoc(n, rng):
+    """associative recall (Phase A'): k1 v1 ... kn vn | q = -> v; n distinct keys from the 100 node names, values
+    single digits, the query one of the keys (uniform)"""
+    keys = rng.sample(NODES, n)
+    vals = [str(rng.randrange(10)) for _ in range(n)]
+    q = rng.randrange(n)
+    p = []
+    for k, v in zip(keys, vals):
+        p += [k, v]
+    return p + ["|", keys[q], "="], [vals[q]]
+
+
 def draw(task, rng, lo, hi, train_dist=False):
     """one example; for addition `train_dist` = both operand lengths independent uniform in lo..hi (the training /
     in-distribution draw), otherwise the longer operand's length is uniform in lo..hi.  Returns (prompt, answer,
@@ -97,7 +114,7 @@ def draw(task, rng, lo, hi, train_dist=False):
         p, a = addition(da, db, rng)
         return p, a, max(da, db)
     n = rng.randint(lo, hi)
-    p, a = (parity if task == "parity" else reachability)(n, rng)
+    p, a = {"parity": parity, "reachability": reachability, "assoc": assoc}[task](n, rng)
     return p, a, n
 
 

@@ -18,7 +18,17 @@ FLOPs are analytic from the executed (padded) shapes; training = 3 x forward.  T
 2 * 12 d^2 per token per layer + head 2 d V + attention 4 T^2 d per sequence per layer; GRU: 2 * 3 (d_in d + d^2)
 per token per layer + head.  Checked against torch.utils.flop_counter with --check-flops.
 
-Results: stage1/results/phaseA/<name>/{log.jsonl, final.json, ckpt.pt}.  A finished run is never overwritten
+Phase A' (CLAUDE.md, 2026-11-17 decision):
+* looped_rr = the looped network trained with a random number of iterations per step (uniform 2..8) and the
+  progressive loss of Bansal et al. 2022: n ~ U{0..m-1} iterations without gradient (state detached), then
+  k ~ U{1..m-n} iterations with gradient; the loss is taken on the output after n + k iterations
+  (L = (1 - a) L_max + a L_prog with a = PROG_ALPHA = 1).  Evaluation rule unchanged (4 x length ratio primary,
+  fixed 4 secondary).
+* judgment checkpoint = the evaluation with the highest in-distribution accuracy (the earliest if tied);
+  out-of-distribution values are reported at that evaluation; the last evaluation is recorded too.
+* each run also writes config.json and env.json (hardware, library versions, code commit).
+
+Results: stage1/results/<phase>/<name>/{config.json, env.json, log.jsonl, final.json, ckpt.pt (not committed)}.  A finished run is never overwritten
 (rule 5); an unfinished one is continued with --resume from its last checkpoint (every 1,000 steps), and the resume
 is written into its log.
 """
@@ -41,7 +51,10 @@ sys.path.insert(0, os.path.dirname(__file__))
 import tasks as T
 import models as M
 
-ROOT = pathlib.Path(__file__).parent / "results" / "phaseA"
+RESULTS = pathlib.Path(__file__).parent / "results"
+LOOPED = ("looped", "looped_rr")
+RR_MIN, RR_MAX = 2, 8      # looped_rr: training iterations per step, uniform
+PROG_ALPHA = 1.0           # looped_rr: weight of the progressive loss (Bansal et al. 2022: (1-a) L_max + a L_prog)
 LR = {"1M": 1e-3, "10M": 5e-4, "50M": 2.5e-4}
 OFFSET_MAX = 100          # Abacus training offsets 0..100
 
@@ -54,6 +67,12 @@ def hardware():
         pass
     return {"cpu": cpu, "cores": os.cpu_count(), "torch_threads": torch.get_num_threads(), "torch": torch.__version__,
             "cuda": torch.cuda.is_available(), "python": platform.python_version()}
+
+
+def iter_flops(cfg, B, Tlen):
+    """one iteration of the looped block (all its layers)"""
+    d, bl = cfg["d"], cfg["block_layers"]
+    return B * Tlen * 2 * 12 * d * d * bl + 4 * B * Tlen * Tlen * d * bl
 
 
 def fwd_flops(kind, cfg, B, Tlen, V, recur=None):
@@ -99,7 +118,9 @@ def ratio(task, label):
 
 def main(a):
     name = "%s__%s__%s__s%d__N%d%s" % (a.task, a.kind, a.scale, a.seed, a.N, ("__" + a.tag) if a.tag else "")
-    out = (pathlib.Path(a.out_root) if a.out_root else ROOT) / name
+    if a.phase != "phaseA":
+        name = "%s_%s" % (a.phase, name)              # e.g. phaseA2_assoc__abacus__1M__s0__N100000
+    out = (pathlib.Path(a.out_root) if a.out_root else RESULTS / a.phase) / name
     final, logf, ck = out / "final.json", out / "log.jsonl", out / "ckpt.pt"
     if final.exists():
         sys.exit("refusing to overwrite finished run %s (rule 5)" % out)
@@ -120,6 +141,7 @@ def main(a):
     sched = torch.optim.lr_scheduler.LambdaLR(
         opt, lambda s: min(1.0, (s + 1) / warm) * (0.1 + 0.9 * 0.5 * (1 + math.cos(math.pi * min(1.0, s / a.max_steps)))))
     rng = random.Random("batches:%d" % a.seed)
+    rr_rng = random.Random("looped_rr:%d" % a.seed)     # its own stream: the batch sequence equals looped's
     st = {"step": 0, "train_flops": 0, "wall_train_s": 0.0, "wall_eval_s": 0.0, "eval_flops": 0, "hits": 0,
           "segments": []}
     if a.resume and ck.exists():
@@ -128,6 +150,8 @@ def main(a):
         opt.load_state_dict(c["opt"])
         sched.load_state_dict(c["sched"])
         rng.setstate(c["rng"])
+        if "rr_rng" in c:
+            rr_rng.setstate(c["rr_rng"])
         torch.set_rng_state(c["torch_rng"])
         st = c["state"]
         logged = [json.loads(l).get("step", -1) for l in open(logf) if l.strip()]
@@ -139,6 +163,29 @@ def main(a):
             sys.exit("evaluations logged but no checkpoint in %s: not restarting (rule 5)" % out)
         with open(logf, "a") as fh:                   # killed before the first checkpoint: nothing was recorded
             fh.write(json.dumps({"event": "restart from step 0: stopped before the first checkpoint"}) + "\n")
+    if not st["segments"]:
+        try:
+            commit0 = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=os.path.dirname(__file__)).decode().strip()
+            dirty = bool(subprocess.check_output(["git", "status", "--porcelain", "--", "run.py", "models.py",
+                                                  "tasks.py"], cwd=os.path.dirname(__file__)).decode().strip())
+        except Exception:
+            commit0, dirty = None, None
+        (out / "config.json").write_text(json.dumps({
+            "name": name, "phase": a.phase, "task": a.task, "kind": a.kind, "scale": a.scale, "params": params,
+            "model_config": cfg, "seed": a.seed, "N": a.N, "batch": a.batch, "max_steps": a.max_steps,
+            "eval_every": a.eval_every, "id_size": a.id_size, "ood_size": a.ood_size, "lr": lr,
+            "optimizer": "AdamW betas (0.9, 0.98) weight decay 0.1, grad clip 1.0, warmup max_steps/20, cosine to 10%",
+            "abacus_offset_max": OFFSET_MAX if a.kind != "gru" else None, "spec": T.SPEC[a.task],
+            "early_stop": "in-distribution >= 0.99 at two consecutive evaluations",
+            "judgment_checkpoint": "highest in-distribution accuracy (earliest if tied); out-of-distribution at it",
+            "looped_eval_rule": "primary: 4 x ceil(bin upper / training upper) iterations; secondary: fixed 4"
+                                if a.kind in LOOPED else None,
+            "looped_rr": {"iterations": [RR_MIN, RR_MAX], "progressive_alpha": PROG_ALPHA,
+                          "progressive": "n ~ U{0..m-1} no-grad iterations, k ~ U{1..m-n} with grad (Bansal 2022)"}
+                         if a.kind == "looped_rr" else None}, indent=1))
+        (out / "env.json").write_text(json.dumps(dict(hardware(), code_commit=commit0, code_dirty=dirty,
+                                                      numpy=__import__("numpy").__version__,
+                                                      started=time.strftime("%Y-%m-%d %H:%M:%S")), indent=1))
     seg = {"segment": len(st["segments"]), "start_step": st["step"], "started": time.strftime("%Y-%m-%d %H:%M:%S")}
     st["segments"].append(seg)
     with open(logf, "a") as fh:
@@ -160,7 +207,19 @@ def main(a):
         exs = [data[rng.randrange(len(data))] for _ in range(a.batch)]
         xb, yb = make_batch(exs)
         off = torch.randint(0, OFFSET_MAX + 1, (xb.shape[0],)) if a.kind != "gru" else None
-        logits = model(xb, offset=off)
+        if a.kind == "looped_rr":
+            m = rr_rng.randint(RR_MIN, RR_MAX)
+            n = rr_rng.randint(0, m - 1)
+            k = rr_rng.randint(1, m - n)
+            e = model.embed(xb, offset=off)
+            with torch.no_grad():
+                x0 = model.iterate(torch.zeros_like(e), e.detach(), n)
+            logits = model.readout(model.iterate(x0.detach(), e, k))
+            step_flops = n * iter_flops(cfg, xb.shape[0], xb.shape[1]) + 3 * (
+                k * iter_flops(cfg, xb.shape[0], xb.shape[1]) + xb.shape[0] * xb.shape[1] * 2 * cfg["d"] * len(T.VOCAB))
+        else:
+            logits = model(xb, offset=off)
+            step_flops = 3 * fwd_flops(a.kind, cfg, xb.shape[0], xb.shape[1], len(T.VOCAB))
         loss = F.cross_entropy(logits.reshape(-1, len(T.VOCAB)), yb.reshape(-1), ignore_index=-100)
         opt.zero_grad(set_to_none=True)
         loss.backward()
@@ -168,7 +227,7 @@ def main(a):
         opt.step()
         sched.step()
         st["step"] += 1
-        st["train_flops"] += 3 * fwd_flops(a.kind, cfg, xb.shape[0], xb.shape[1], len(T.VOCAB))
+        st["train_flops"] += step_flops
         window.append(loss.item())
         if st["step"] % a.eval_every == 0 or st["step"] == a.max_steps:
             st["wall_train_s"] += time.time() - t_seg
@@ -178,11 +237,11 @@ def main(a):
                    "acc": {}, "recur": {}}
             window = []
             for label, ex in evals.items():
-                r = None if a.kind != "looped" else cfg["recur"] * ratio(a.task, label)
+                r = None if a.kind not in LOOPED else cfg["recur"] * ratio(a.task, label)
                 acc, fl = exact_match(model, ex, a.kind, cfg, recur=r)
                 rec["acc"][label] = acc
                 st["eval_flops"] += fl
-                if a.kind == "looped":
+                if a.kind in LOOPED:
                     rec["recur"][label] = r
                     if label.startswith("ood"):        # secondary: fixed 4 iterations
                         acc4, fl4 = exact_match(model, ex, a.kind, cfg, recur=cfg["recur"])
@@ -199,7 +258,8 @@ def main(a):
             # checkpoint first, atomically (a kill during the write leaves the previous checkpoint intact), then the
             # log row; a resume writes the row again only if the kill fell between the two
             torch.save({"model": model.state_dict(), "opt": opt.state_dict(), "sched": sched.state_dict(),
-                        "rng": rng.getstate(), "torch_rng": torch.get_rng_state(), "state": st}, str(ck) + ".tmp")
+                        "rng": rng.getstate(), "rr_rng": rr_rng.getstate(), "torch_rng": torch.get_rng_state(),
+                        "state": st}, str(ck) + ".tmp")
             os.replace(str(ck) + ".tmp", ck)
             with open(logf, "a") as fh:
                 fh.write(json.dumps(rec) + "\n")
@@ -213,15 +273,21 @@ def main(a):
         commit = None
     rows = [json.loads(l) for l in open(logf) if l.strip() and "event" not in json.loads(l)]
     last = rows[-1]
+    id_label = [l for l in last["acc"] if l.startswith("id")][0]
+    best = max(rows, key=lambda r: (r["acc"][id_label], -r["step"]))      # highest in-distribution, earliest if tied
+    judgment = {"rule": "highest in-distribution accuracy (earliest if tied)", "step": best["step"],
+                "acc": best["acc"], "acc_fixed4": best.get("acc_fixed4"), "train_flops_cum": best["train_flops_cum"],
+                "wall_train_s_cum": best["wall_train_s_cum"]}
     res = {"name": name, "task": a.task, "kind": a.kind, "scale": a.scale, "params": params, "config": cfg,
            "seed": a.seed, "N": a.N, "batch": a.batch, "lr": lr, "max_steps": a.max_steps, "steps": st["step"],
            "stopped": stop, "spec": T.SPEC[a.task], "id_size": a.id_size, "ood_size": a.ood_size,
+           "judgment": judgment, "last": {"step": last["step"], "acc": last["acc"], "acc_fixed4": last.get("acc_fixed4")},
            "final_acc": last["acc"], "final_acc_fixed4": last.get("acc_fixed4"), "recur": last.get("recur"),
            "train_flops": st["train_flops"], "eval_flops": st["eval_flops"],
            "wall_train_s": round(st["wall_train_s"], 2), "wall_eval_s": round(st["wall_eval_s"], 2),
            "segments": st["segments"], "hardware": hardware(), "commit": commit,
-           "primary_eval_rule": "looped: recurrence 4 x ceil(bin upper / training upper) (declared before runs); "
-                                "fixed 4 recorded as acc_fixed4"}
+           "primary_eval_rule": "looped / looped_rr: recurrence 4 x ceil(bin upper / training upper) (declared before "
+                                "runs); fixed 4 recorded as acc_fixed4"}
     final.write_text(json.dumps(res, indent=1))
     if ck.exists():
         ck.unlink()                                   # the record is the log + final; checkpoints are not kept
@@ -231,7 +297,8 @@ def main(a):
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--task", choices=T.TASKS, required=True)
-    p.add_argument("--kind", choices=("abacus", "looped", "gru"), required=True)
+    p.add_argument("--kind", choices=("abacus", "looped", "gru", "looped_rr"), required=True)
+    p.add_argument("--phase", default="phaseA2", help="results/<phase>/; Phase A records were written as phaseA")
     p.add_argument("--scale", default="1M")
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--N", type=int, default=100000)

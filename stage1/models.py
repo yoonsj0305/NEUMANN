@@ -67,6 +67,17 @@ class LM(nn.Module):
         idx = idx.clamp(max=ABACUS_MAX)
         return self.tok(tokens) + self.aba(idx)
 
+    def iterate(self, x, e, n):
+        """n iterations of the shared block with input injection, from state x"""
+        for _ in range(n):
+            x = x + e
+            for b in self.blocks:
+                x = b(x)
+        return x
+
+    def readout(self, x):
+        return self.head(self.ln(x))
+
     def forward(self, tokens, offset=None, recur=None):
         e = self.embed(tokens, offset)
         if self.kind == "abacus":
@@ -99,6 +110,8 @@ class GRULM(nn.Module):
 def build(kind, vocab, digit_ids, cfg):
     if kind == "gru":
         return GRULM(vocab, **cfg)
+    if kind == "looped_rr":                 # the same looped network; only its training procedure differs
+        return LM(vocab, digit_ids=digit_ids, kind="looped", **cfg)
     return LM(vocab, digit_ids=digit_ids, kind=kind, **cfg)
 
 
@@ -116,3 +129,4 @@ SCALES = {
                "50M": dict(d=1408, heads=16, layers=0, block_layers=2, recur=4)},
     "gru": {"1M": dict(d=256, layers=2)},
 }
+SCALES["looped_rr"] = SCALES["looped"]
