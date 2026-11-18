@@ -1,0 +1,74 @@
+{
+ "task": "addition",
+ "policy": [
+  [
+   3,
+   3,
+   2,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   1,
+   1,
+   0,
+   0,
+   0,
+   2,
+   0
+  ],
+  [
+   3,
+   1,
+   4,
+   0,
+   0,
+   1,
+   0
+  ]
+ ],
+ "policy_named": {
+  "head0": {
+   "digit": "next_sep",
+   "+": "next_sep",
+   "=": "left",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "stay",
+   "other": "stay"
+  },
+  "head1": {
+   "digit": "right",
+   "+": "right",
+   "=": "stay",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "left",
+   "other": "stay"
+  },
+  "head2": {
+   "digit": "next_sep",
+   "+": "right",
+   "=": "start",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "right",
+   "other": "stay"
+  }
+ },
+ "best_score_in_distribution_validation_loss": 2.036426881716924,
+ "evaluations": 316,
+ "search_flops": 286574537833440,
+ "stopped": "max sweeps",
+ "spec": {
+  "steps_per_candidate": 300,
+  "val_size": 500,
+  "budget": 400,
+  "sweeps": 3,
+  "init": "all stay",
+  "score": "in-distribution validation answer-token mean cross-entropy, lower is better (design 12)"
+ },
+ "val_acc_of_found_table": 0.002
+}
