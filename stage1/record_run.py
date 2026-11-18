@@ -260,8 +260,9 @@ def main(a):
         files.append(str((d.parent / "QUEUE_LOG.txt").relative_to(root)))
     subprocess.check_call(["git", "add"] + files, cwd=root)
     subprocess.check_call(["git", "commit", "-q", "-m", msg], cwd=root)
+    branch = subprocess.check_output(["git", "branch", "--show-current"], cwd=root, text=True).strip()
     for i in range(4):
-        if subprocess.call(["git", "push", "-u", "origin", "stage1/baselines"], cwd=root) == 0:
+        if subprocess.call(["git", "push", "-u", "origin", branch], cwd=root) == 0:
             break
         time.sleep(2 ** (i + 1))
 
