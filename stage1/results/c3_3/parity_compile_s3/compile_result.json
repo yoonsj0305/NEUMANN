@@ -1,0 +1,212 @@
+{
+ "task": "parity",
+ "data_seed": 3,
+ "teacher": {
+  "path": "stage1/results/c3_3/c3_3_parity__rope__1M__s3__N100000/teacher_best.pt",
+  "untrained_seed": null,
+  "step": 9000,
+  "acc": {
+   "id_1-16": 0.996,
+   "ood_17-32": 0.518,
+   "ood_33-48": 0.518,
+   "ood_49-64": 0.524
+  },
+  "train_flops_to_judgment": 53871615934464
+ },
+ "examples": 2000,
+ "output_steps": 4000,
+ "dependency_kind": "content substitution (design 14)",
+ "extraction": {
+  "flops": 471019335680,
+  "backward_passes": 0,
+  "manual_forward_max_abs_logit_diff": null,
+  "substitution": {
+   "class_symbols": {
+    "digit": [
+     "0",
+     "1"
+    ],
+    "=": [
+     "="
+    ],
+    "answer_phase": [
+     "0",
+     "1"
+    ]
+   },
+   "sequences_forwarded": 21252,
+   "substituted_positions": 19252,
+   "all_zero_rows": 0
+  }
+ },
+ "dependency_mass_on_current_position": 0.14162429746574995,
+ "attention_mass_on_current_position": 0.22505535699240864,
+ "precheck": {
+  "correct_table": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "dependency": {
+   "correct": 0.1537046370318781,
+   "correct_per_head": [
+    0.1537046370318781,
+    0.0,
+    0.0
+   ],
+   "all_stay": 0.1537046370318781,
+   "ratio": 1.0
+  },
+  "attention_aux": {
+   "correct": 0.10830149243189953,
+   "all_stay": 0.10830149243189953,
+   "ratio": 1.0
+  },
+  "criterion": "score(correct) >= 2 x score(all stay) on the dependency (13.2)",
+  "passed": false,
+  "gate_applied": false
+ },
+ "policy": [
+  [
+   5,
+   0,
+   2,
+   0,
+   0,
+   4,
+   0
+  ],
+  [
+   0,
+   0,
+   3,
+   0,
+   0,
+   1,
+   0
+  ],
+  [
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ]
+ ],
+ "policy_named": {
+  "head0": {
+   "digit": "content",
+   "+": "stay",
+   "=": "left",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "start",
+   "other": "stay"
+  },
+  "head1": {
+   "digit": "stay",
+   "+": "stay",
+   "=": "next_sep",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "right",
+   "other": "stay"
+  },
+  "head2": {
+   "digit": "right",
+   "+": "stay",
+   "=": "stay",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "stay",
+   "other": "stay"
+  }
+ },
+ "per_head": [
+  {
+   "column": {
+    "digit": "content",
+    "+": "stay",
+    "=": "left",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "start",
+    "other": "stay"
+   },
+   "score_after_cover": 0.1537353003245004,
+   "columns_tied_at_best": 1296
+  },
+  {
+   "column": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "next_sep",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "score_after_cover": 0.14162429746574995,
+   "columns_tied_at_best": 9072
+  },
+  {
+   "column": {
+    "digit": "right",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "score_after_cover": 0.11976294399097458,
+   "columns_tied_at_best": 2592
+  }
+ ],
+ "table_score_dependency": 0.41512254178122493,
+ "table_score_attention_aux": 0.46510437756881584,
+ "search": {
+  "columns": 279936,
+  "present_classes": [
+   "digit",
+   "=",
+   "answer_phase"
+  ],
+  "distinct_paths_simulated": 216,
+  "head_moves_simulated": 4590432,
+  "score_lookups": 2592000,
+  "head_simulation_operations": 7182432
+ },
+ "reference_agreement_with_correct_table": {
+  "correct_head0_position_read_by_some_compiled_head": 0.57,
+  "correct_head1_position_read_by_some_compiled_head": 0.57,
+  "correct_head2_position_read_by_some_compiled_head": 0.57
+ },
+ "wall_s": 26.3
+}
