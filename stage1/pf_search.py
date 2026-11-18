@@ -17,6 +17,15 @@
   trained under the section 7 protocol.
 
   python stage1/pf_search.py --task addition --out stage1/results/c1_2/pf_search_addition
+
+PF-search v2 (CANDIDATE_DESIGN.md 12, C1-3): `--score loss` changes ONLY the score -- the mean cross-entropy of the
+answer tokens (every target token, <eos> included, as in the training loss; summed over tokens and divided by the
+number of target tokens) on the same in-distribution validation set, computed in evaluation mode (argmax registers)
+after the same 300 steps; lower is better; ties keep the current move (then the lower move index).  Everything else
+(table 3 x 7, coordinate descent from all "stay", at most 3 sweeps, budget 400, same seed / initial weights / batch
+order for every candidate, search FLOPs summed) is section 11 unchanged.  The default `--score acc` is the C1-2 run.
+
+  python stage1/pf_search.py --task addition --score loss --out stage1/results/c1_3/pf_search_v2_addition
 """
 from __future__ import annotations
 import argparse
@@ -38,7 +47,32 @@ BUDGET = 400
 SWEEPS = 3
 
 
-def evaluate(task, policy, seed=0):
+def val_loss(m, exs, cfg, bs=128):
+    """mean answer-token cross-entropy and exact-match accuracy on `exs` in evaluation mode, batched as
+    run.exact_match (same FLOPs)"""
+    import torch
+    import torch.nn.functional as F
+    import tasks as T
+    import run as R
+    m.eval()
+    tot, n, ok, flops = 0.0, 0, 0, 0
+    order = sorted(range(len(exs)), key=lambda i: len(exs[i][0]) + len(exs[i][1]))
+    with torch.no_grad():
+        for i in range(0, len(order), bs):
+            chunk = [exs[j] for j in order[i:i + bs]]
+            x, y = R.make_batch(chunk)
+            lg = m(x)
+            flops += R.fwd_flops("pf_search", cfg, x.shape[0], x.shape[1], len(T.VOCAB))
+            tot += float(F.cross_entropy(lg.reshape(-1, len(T.VOCAB)), y.reshape(-1), ignore_index=-100,
+                                         reduction="sum"))
+            msk = y != -100
+            n += int(msk.sum())
+            ok += int(((lg.argmax(-1) == y) | ~msk).all(1).sum())
+    m.train()
+    return tot / n, ok / len(exs), flops
+
+
+def evaluate(task, policy, seed=0, score="acc"):
     import torch
     import torch.nn.functional as F
     import tasks as T
@@ -70,6 +104,11 @@ def evaluate(task, policy, seed=0):
         sched.step()
         flops += PFM.pf_policy_flops(cfg, xb.shape[0], xb.shape[1], len(T.VOCAB), train=True)["total"]
     val = T.train_set(task, VAL_SIZE, 777)                   # in-distribution validation (own seed)
+    if score == "loss":                                       # v2 (design 12): validation answer-token cross-entropy
+        vl, acc, fl = val_loss(m, val, cfg)
+        flops += fl
+        return {"policy": policy, "score": vl, "val_acc": acc, "flops": flops, "final_loss": round(float(loss), 4),
+                "wall_s": round(time.time() - t0, 1)}
     acc, fl = R.exact_match(m, val, "pf_search", cfg)
     flops += fl
     return {"policy": policy, "score": acc, "flops": flops, "final_loss": round(float(loss), 4),
@@ -107,7 +146,7 @@ def main(a):
                 if n_eval + len(todo) > BUDGET:
                     stop = "budget"
                     break
-                futs = {ex.submit(evaluate, a.task, p): json.dumps(p) for p in todo}
+                futs = {ex.submit(evaluate, a.task, p, 0, a.score): json.dumps(p) for p in todo}
                 for fu in cf.as_completed(futs):
                     r = fu.result()
                     r.update({"sweep": sweep, "cell": [h, c], "class": PFM.CLASS_NAMES[c],
@@ -119,12 +158,15 @@ def main(a):
                         fh.write(json.dumps(r) + "\n")
                 scores = [done[json.dumps(p)]["score"] for p in cands]
                 cur = policy[h][c]
-                best = max(range(NM), key=lambda mv: (scores[mv], mv == cur, -mv))
+                if a.score == "loss":                         # lower is better; ties keep the current move
+                    best = min(range(NM), key=lambda mv: (scores[mv], mv != cur, mv))
+                else:
+                    best = max(range(NM), key=lambda mv: (scores[mv], mv == cur, -mv))
                 if best != cur:
                     changed = True
                     policy[h][c] = best
                 best_score = scores[best]
-                print("sweep %d cell (%d,%s) -> %s score %.3f evals %d" % (
+                print("sweep %d cell (%d,%s) -> %s score %.4f evals %d" % (
                     sweep, h, PFM.CLASS_NAMES[c], PFM.MOVES[best], best_score, n_eval), flush=True)
             if stop:
                 break
@@ -136,9 +178,16 @@ def main(a):
     ex.shutdown()
     res = {"task": a.task, "policy": policy, "policy_named": {
         "head%d" % h: {PFM.CLASS_NAMES[c]: PFM.MOVES[policy[h][c]] for c in range(C)} for h in range(H)},
-        "best_score_in_distribution_validation": best_score, "evaluations": n_eval, "search_flops": total_flops,
+        ("best_score_in_distribution_validation_loss" if a.score == "loss" else
+         "best_score_in_distribution_validation"): best_score, "evaluations": n_eval, "search_flops": total_flops,
         "stopped": stop or "max sweeps", "spec": {"steps_per_candidate": STEPS, "val_size": VAL_SIZE,
-                                                    "budget": BUDGET, "sweeps": SWEEPS, "init": "all stay"}}
+                                                    "budget": BUDGET, "sweeps": SWEEPS, "init": "all stay",
+                                                    "score": ("in-distribution validation answer-token mean "
+                                                              "cross-entropy, lower is better (design 12)"
+                                                              if a.score == "loss" else
+                                                              "in-distribution validation exact match (design 11)")}}
+    if a.score == "loss":
+        res["val_acc_of_found_table"] = done[json.dumps(policy)].get("val_acc")
     (out / "search_result.json").write_text(json.dumps(res, indent=1))
     print(json.dumps(res, indent=1))
 
@@ -148,4 +197,5 @@ if __name__ == "__main__":
     p.add_argument("--task", default="addition")
     p.add_argument("--out", required=True)
     p.add_argument("--workers", type=int, default=4)
+    p.add_argument("--score", choices=("acc", "loss"), default="acc", help="acc: design 11 (C1-2); loss: design 12")
     main(p.parse_args())
