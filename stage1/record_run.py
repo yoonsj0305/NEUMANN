@@ -73,8 +73,32 @@ def answer_c1(f):
     return "%s (분포 안 %.3f; 유효성 기준 ≥0.95)" % ("예" if v >= 0.95 else "아니오", v)
 
 
+def c12_ref(task):
+    """C1-2 values of the same task, read from the C1-2 runs' final.json (judgment checkpoint)"""
+    out = []
+    for k in ("pf2", "pf_search"):
+        d = HERE / "results" / "c1_2" / ("c1_2_%s__%s__1M__s0__N100000" % (task, k))
+        if not (d / "final.json").exists():
+            continue
+        f = json.loads((d / "final.json").read_text())
+        j = f["judgment"]
+        txt = "%s 분포 안 %.3f · 분포 밖 %s; 판정 시점까지 학습 FLOPs %.2e" % (
+            NAME_K[k], idv(f), " · ".join("%.3f" % v for l, v in j["acc"].items() if l.startswith("ood")),
+            j["train_flops_cum"])
+        if k == "pf_search":
+            c = json.loads((d / "config.json").read_text())
+            txt += " (+ 탐색 %.2e)" % c["pf_search"]["search"]["search_flops"]
+        out.append(txt)
+    return " / ".join(out)
+
+
 def labels(phase, task, kind="pf"):
     """(heading label, question, commit label) for a run"""
+    if phase == "c1_3" and kind == "pf_search":
+        return ("C1-3 (PF-search v2)",
+                "C1-3 — 점수를 손실로 고친 PF-search(설계서 12절)가 찾은 이동 정책 표와 경사하강 갱신 제어기가 %s를 "
+                "학습 분포 안에서 배우는가? (유효성 기준 ≥0.95, 시드 0; 판정 FLOPs = 탐색 + 최종 학습)" % NAME_T[task],
+                "C1-3 PF-search v2")
     if phase == "c1_2" and kind == "pf_search":
         return ("C1-2 분기 2단계 (PF-search)",
                 "C1-2 분기 2단계 — PF-search(설계서 11절)로 찾은 이동 정책 표와 경사하강 갱신 제어기가 %s를 학습 분포 "
@@ -162,7 +186,7 @@ def entry(d):
     lines = [
         "## %s · %s · %s / %s" % (date, head, NAME_T[t], NAME_K[k]),
         "- 질문: %s" % question,
-        "- 질문에 대한 답: %s" % (answer_c1(f) if phase in ("c1", "c1_2") else answer4(f) if phase == "phaseA4" else
+        "- 질문에 대한 답: %s" % (answer_c1(f) if phase in ("c1", "c1_2", "c1_3") else answer4(f) if phase == "phaseA4" else
                                   answer3(f) if phase == "phaseA3" else answer(t, k)),
         "- 코드 커밋: `%s`%s · 원자료: `%s/`" % (
             (env.get("code_commit") or "?")[:7], " (작업 트리 수정 있음)" if env.get("code_dirty") else "",
@@ -178,18 +202,23 @@ def entry(d):
         "- 마지막 시점 (step %d): 분포 안 %.3f · 분포 밖 %s" % (
             last["step"], [v for l, v in last["acc"].items() if l.startswith("id")][0], oods_last),
     ]
-    if phase in ("c1", "c1_2") and t in BASE_REF:
+    if phase in ("c1", "c1_2", "c1_3") and t in BASE_REF:
         lines.append("- 같은 과제의 기준선 최고값 (동결, 설계서 7절): %s" % BASE_REF[t])
     if k == "pf_search" and cfg.get("pf_search"):
         sr = cfg["pf_search"]["search"]
-        lines.append("- PF-search 탐색: 평가 %d회, 탐색 FLOPs %.2e, 정지 사유 — %s, 탐색 점수(분포 안 검증) %.3f; 찾은 표: %s"
-                     % (sr["evaluations"], sr["search_flops"], sr["stopped"], sr["best_score_in_distribution_validation"],
+        sc = ("탐색 점수(분포 안 검증 답 토큰 교차 엔트로피) %.4f" % sr["best_score_in_distribution_validation_loss"]
+              if "best_score_in_distribution_validation_loss" in sr else
+              "탐색 점수(분포 안 검증) %.3f" % sr["best_score_in_distribution_validation"])
+        lines.append("- PF-search 탐색: 평가 %d회, 탐색 FLOPs %.2e, 정지 사유 — %s, %s; 찾은 표: %s"
+                     % (sr["evaluations"], sr["search_flops"], sr["stopped"], sc,
                         "; ".join("%s: %s" % (h, ", ".join("%s→%s" % (c, mv) for c, mv in row.items() if mv != "stay")
                                                   or "모두 stay") for h, row in sr["policy_named"].items())))
         lines.append("- 판정 FLOPs (탐색 + 최종 학습 판정 시점까지): %.2e + %.2e = %.2e" % (
             sr["search_flops"], j["train_flops_cum"], sr["search_flops"] + j["train_flops_cum"]))
-    if phase == "c1_2" and t in C11_REF:
+    if phase in ("c1_2", "c1_3") and t in C11_REF:
         lines.append("- 같은 과제의 C1-1 값: %s" % C11_REF[t])
+    if phase == "c1_3" and c12_ref(t):
+        lines.append("- 같은 과제의 C1-2 값: %s" % c12_ref(t))
     if f.get("judgment", {}).get("train_move_signal_mean") is not None:
         pass
     if j.get("acc_seq"):
