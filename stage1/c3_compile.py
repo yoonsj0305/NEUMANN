@@ -62,6 +62,48 @@ def correct_table(task):
     raise SystemExit("no correct token-class table declared for %s" % task)
 
 
+# MQAR: no token-class table is an exact algorithm (query keys and answer digits are both "answer-phase" tokens, so a
+# head cannot do "content" on keys and "start" on digits).  The pre-check reference is the head path of the
+# hand-written PF rule controller (pf_rules.Rules: head 0 content on query keys, start on answer digits; exact in
+# C1-1); the best class-table approximation (head 0: answer-phase -> content) is recorded beside it.
+MQAR_CLASS_APPROX = [[0, 0, 0, 0, 0, PFM.MOVES.index("content"), 0], [0] * NC, [0] * NC]
+
+
+def rule_paths(task, exs, rows):
+    """read positions [3, n_rows] of the hand-written PF rule controller at every output step"""
+    from pf_rules import Rules
+    cfg = M.SCALES["pf"]["1M"]
+    rules = Rules(task, H, cfg["R"], cfg["K"], len(T.VOCAB))
+    want = {}
+    for r, (i, t, _, _) in enumerate(rows):
+        want.setdefault(i, []).append((t, r))
+    out = np.zeros((H, len(rows)), dtype=np.int64)
+    seps = torch.tensor([T.TOK["+"], T.TOK["="], T.TOK["|"]])
+    ids = sorted(want)
+    for c0 in range(0, len(ids), 100):
+        bid = ids[c0:c0 + 100]
+        x, _ = R.make_batch([exs[i] for i in bid])
+        B, Tn = x.shape
+        issep = torch.isin(x, seps)
+        regs = torch.zeros(B, cfg["R"], cfg["K"])
+        regs[:, :, 0] = 1.0
+        h = torch.zeros(B, H, dtype=torch.long)
+        reads = torch.zeros(B, H, len(T.VOCAB))
+        rec = []
+        for t in range(Tn):
+            w = rules.move(x[:, t], regs, reads)
+            cand = PFM.candidates(x, t, h, x[:, t], issep)
+            sym = torch.gather(x[:, None, :].expand(B, H, Tn), 2, cand)
+            reads = (w.unsqueeze(-1) * F.one_hot(sym, len(T.VOCAB)).float()).sum(-2)
+            h = torch.gather(cand, 2, w.argmax(-1, keepdim=True)).squeeze(-1)
+            rec.append(h.clone())
+            regs, _ = rules.update(x[:, t], regs, reads)
+        for bi, i in enumerate(bid):
+            for t, r in want[i]:
+                out[:, r] = rec[t][bi].numpy()
+    return out
+
+
 def teacher_forward(m, x):
     """the RopeLM forward written out (same ops as models.RopeBlock) so that the token embeddings are a leaf and the
     attention weights are available.  Returns (embedding leaf, logits, mean attention [B, T, T])"""
@@ -208,18 +250,33 @@ def main(a):
            "dependency_mass_on_current_position": float(S[ar, tpos].mean()),
            "attention_mass_on_current_position": float(A[ar, tpos].mean())}
     # pre-check (13.2)
-    corr = correct_table(a.task)
     stay = [[0] * NC for _ in range(H)]
-    pc, _ = simulate(exs, rows, corr)
     ps, _ = simulate(exs, rows, stay)
-    pc, ps = pc.numpy(), ps.numpy()
+    ps = ps.numpy()
+    extra = {}
+    if a.task in T.MQAR:
+        corr = None
+        pc = rule_paths(a.task, exs, rows)
+        pa, _ = simulate(exs, rows, MQAR_CLASS_APPROX)
+        pa = pa.numpy()
+        extra["class_table_approximation"] = {
+            "table": {"head%d" % j: {PFM.CLASS_NAMES[c]: PFM.MOVES[MQAR_CLASS_APPROX[j][c]] for c in range(NC)}
+                      for j in range(H)},
+            "dependency_score": table_score(S, list(pa))[0],
+            "share_of_output_steps_reading_the_rule_controller_head0_position": float(np.mean(pa[0] == pc[0]))}
+    else:
+        corr = correct_table(a.task)
+        pc, _ = simulate(exs, rows, corr)
+        pc = pc.numpy()
     c_dep, c_dep_h = table_score(S, list(pc))
     s_dep, s_dep_h = table_score(S, list(ps))
     c_att, _ = table_score(A, list(pc))
     s_att, _ = table_score(A, list(ps))
     passed = c_dep >= 2 * s_dep
-    res["precheck"] = {"correct_table": {"head%d" % j: {PFM.CLASS_NAMES[c]: PFM.MOVES[corr[j][c]] for c in range(NC)}
-                                         for j in range(H)},
+    res["precheck"] = {"correct_table": ({"head%d" % j: {PFM.CLASS_NAMES[c]: PFM.MOVES[corr[j][c]] for c in range(NC)}
+                                          for j in range(H)} if corr is not None else
+                                         "head path of the hand-written PF rule controller (pf_rules.Rules)"),
+                       **extra,
                        "dependency": {"correct": c_dep, "correct_per_head": c_dep_h, "all_stay": s_dep,
                                       "ratio": c_dep / s_dep if s_dep > 0 else None},
                        "attention_aux": {"correct": c_att, "all_stay": s_att,
