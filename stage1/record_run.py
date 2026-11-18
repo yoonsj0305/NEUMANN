@@ -346,7 +346,7 @@ def entry(d):
         lines.extend(c3_lines(d, f, cfg))
         if t in C1_BEST:
             lines.append("- 같은 과제의 C1 최고값: %s" % C1_BEST[t])
-    elif k == "pf_search" and cfg.get("pf_search"):
+    elif k == "pf_search" and cfg.get("pf_search") and phase != "c3_3":
         sr = cfg["pf_search"]["search"]
         sc = ("탐색 점수(분포 안 검증 답 토큰 교차 엔트로피) %.4f" % sr["best_score_in_distribution_validation_loss"]
               if "best_score_in_distribution_validation_loss" in sr else
