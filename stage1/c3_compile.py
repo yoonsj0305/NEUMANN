@@ -231,19 +231,26 @@ def main(a):
     torch.set_num_threads(int(os.environ.get("THREADS", "1")))
     out = os.path.abspath(a.out)
     os.makedirs(out, exist_ok=True)
-    ck = torch.load(a.teacher, weights_only=False)
-    cfg = ck["cfg"]
-    m = M.build("rope", len(T.VOCAB), [T.TOK[d] for d in T.DIGITS], cfg)
-    m.load_state_dict(ck["model"])
+    if a.untrained_seed is not None:                  # C3-2 control: the teacher before training (run.py's init)
+        cfg = dict(M.SCALES["rope"]["1M"])
+        torch.manual_seed(a.untrained_seed)
+        m = M.build("rope", len(T.VOCAB), [T.TOK[d] for d in T.DIGITS], cfg)
+        ck = {"step": 0, "acc": None, "train_flops_cum": 0, "untrained_seed": a.untrained_seed}
+    else:
+        ck = torch.load(a.teacher, weights_only=False)
+        cfg = ck["cfg"]
+        m = M.build("rope", len(T.VOCAB), [T.TOK[d] for d in T.DIGITS], cfg)
+        m.load_state_dict(ck["model"])
     m.eval()
-    exs = T.train_set(a.task, 100000, 0)[:N_EX]
+    exs = T.train_set(a.task, 100000, a.seed)[:N_EX]                            # the teacher's training data
     rows, ext_flops, n_bwd, maxdiff = extract(m, cfg, exs)
     torch.save({"rows": rows}, os.path.join(out, "dependency_rows.pt"))      # local only (gitignored)
     S, A = dense(rows, 2), dense(rows, 3)
     ar = np.arange(len(rows))
     tpos = np.array([r[1] for r in rows])
-    res = {"task": a.task, "teacher": {"path": a.teacher, "step": ck["step"], "acc": ck["acc"],
-                                       "train_flops_to_judgment": ck["train_flops_cum"]},
+    res = {"task": a.task, "data_seed": a.seed,
+           "teacher": {"path": a.teacher or None, "untrained_seed": a.untrained_seed, "step": ck["step"],
+                       "acc": ck["acc"], "train_flops_to_judgment": ck["train_flops_cum"]},
            "examples": N_EX, "output_steps": len(rows),
            "extraction": {"flops": ext_flops, "backward_passes": n_bwd,
                           "manual_forward_max_abs_logit_diff": maxdiff},
@@ -282,7 +289,10 @@ def main(a):
                        "attention_aux": {"correct": c_att, "all_stay": s_att,
                                          "ratio": c_att / s_att if s_att > 0 else None},
                        "criterion": "score(correct) >= 2 x score(all stay) on the dependency (13.2)",
-                       "passed": bool(passed)}
+                       "passed": bool(passed),
+                       "gate_applied": not a.no_gate}
+    if a.no_gate:                                      # C3-1 decision: no pre-check where the correct table is all stay
+        passed = True
     if not passed or a.precheck_only:
         res["stopped"] = ("pre-check only (reference run)" if a.precheck_only else
                           "pre-check not passed: no compile (13.2)")
@@ -341,7 +351,10 @@ def main(a):
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--task", required=True)
-    p.add_argument("--teacher", required=True)
+    p.add_argument("--teacher", default="")
+    p.add_argument("--untrained-seed", type=int, default=None, help="C3-2 control: rope initial weights of this seed")
+    p.add_argument("--seed", type=int, default=0, help="the teacher's training-data seed (first 2,000 examples)")
+    p.add_argument("--no-gate", action="store_true", help="record the pre-check but do not apply it (C3-1 decision)")
     p.add_argument("--out", required=True)
     p.add_argument("--precheck-only", action="store_true", help="reference: stop after the pre-check")
     main(p.parse_args())

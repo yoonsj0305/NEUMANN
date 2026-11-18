@@ -106,12 +106,17 @@ def c3_lines(d, f, cfg):
     """C3-1 student: the compiled table, the pre-check and the FLOPs of every stage (13.3)"""
     t = f["task"]
     cr = cfg["pf_search"]["search"]
-    teacher = json.loads((HERE / "results" / "c3" / ("c3_%s__rope__1M__s0__N100000" % t) / "final.json").read_text())
-    tf = teacher["judgment"]["train_flops_cum"]
+    tf = cr["teacher"]["train_flops_to_judgment"]       # 0 for the C3-2 control (teacher before training)
     ef = cr["extraction"]["flops"]
     sf = f["judgment"]["train_flops_cum"]
     pc = cr["precheck"]["dependency"]
-    return [
+    src = ("- 교사: 학습 전 rope (무작위 초기화, 시드 %d; C3-2 대조군), 의존도 데이터 시드 %d" % (
+               cr["teacher"]["untrained_seed"], cr.get("data_seed", 0)) if cr["teacher"].get("untrained_seed") is not None
+           else "- 교사: `%s` (step %d), 의존도 데이터 시드 %d" % (cr["teacher"]["path"], cr["teacher"]["step"],
+                                                               cr.get("data_seed", 0)))
+    return [src, "- 표 파일: `%s`%s" % (cfg["pf_search"]["policy_file"],
+                                       "; 사전 확인은 기록만 하고 적용하지 않음 (C3-1 판정)"
+                                       if cr["precheck"].get("gate_applied") is False else ""),
         "- 사전 확인 (13.2): 의존도 점수 정답 표 %.4f · 전부 정지 표 %.4f (비 %.2f, 기준 ≥2); 주의 가중치(보조) %.4f · %.4f"
         % (pc["correct"], pc["all_stay"], pc["ratio"], cr["precheck"]["attention_aux"]["correct"],
            cr["precheck"]["attention_aux"]["all_stay"]),
@@ -126,6 +131,27 @@ def c3_lines(d, f, cfg):
         % (tf, ef, sf, tf + ef + sf, cr["search"]["head_simulation_operations"],
            cr["search"]["distinct_paths_simulated"], cr["search"]["columns"]),
     ]
+
+
+def c32_labels(f):
+    """C3-2 runs (the control, the parity student, seeds 1 and 2): (heading, question, commit label), else None"""
+    t, k, sd = f["task"], f["kind"], f["seed"]
+    ctrl = "ctrl" in f["name"].split("__")[-1]
+    if not (sd != 0 or ctrl or (t == "parity" and k == "pf_search")):
+        return None
+    if k == "rope":
+        return ("C3-2 교사 (시드 %d)" % sd,
+                "C3-2 4단계 — 시드 %d 교사 `rope` 학습 (기준선 규약; 판정 체크포인트를 교사로 로컬 보관)" % sd,
+                "C3-2 교사 s%d" % sd)
+    if ctrl:
+        return ("C3-2 대조군",
+                "C3-2 대조군 — 학습 전(무작위 초기화, 시드 %d) 교사에서 같은 방법으로 컴파일한 표의 학생이 %s를 분포 안에서 "
+                "배우는가? 분포 밖에서는? (결과가 교사의 학습에서 왔는지 확인; 판정은 설계 채팅)" % (sd, NAME_T[t]),
+                "C3-2 대조군")
+    return ("C3-2 학생 (시드 %d)" % sd,
+            "C3-2 — 시드 %d에서 교사부터 새로 돌린 C3 파이프라인의 학생이 %s를 분포 안에서 배우는가? 분포 밖에서는? "
+            "(유효성 기준 ≥0.95; 1단계 신호 기준은 7절)" % (sd, NAME_T[t]),
+            "C3-2 학생 s%d" % sd)
 
 
 def labels(phase, task, kind="pf"):
@@ -226,8 +252,10 @@ def entry(d):
     oods = " · ".join("%s: %.3f" % (lab(l), v) for l, v in j["acc"].items() if l.startswith("ood"))
     oods_last = " · ".join("%s: %.3f" % (lab(l), v) for l, v in last["acc"].items() if l.startswith("ood"))
     phase = cfg.get("phase", "phaseA2")
-    head, question, _ = labels(phase, t, k)
+    head, question, _ = (c32_labels(f) if phase == "c3" and c32_labels(f) else labels(phase, t, k))
     kname = "PF 학생 (C3)" if phase == "c3" and k == "pf_search" else NAME_K[k]
+    if phase == "c3":
+        kname += (" 대조군: 학습 전 교사" if "ctrl" in (f["name"].split("__")[-1]) else "") + " · 시드 %d" % f["seed"]
     date = time.strftime("%Y-%m-%d", time.gmtime())
     lines = [
         "## %s · %s · %s / %s" % (date, head, NAME_T[t], kname),
@@ -253,7 +281,7 @@ def entry(d):
         lines.append("- 같은 과제의 기준선 최고값 (동결, 설계서 7절): %s" % BASE_REF[t])
     if phase == "c3" and k == "rope":
         b = HERE / "results" / "phaseA4" / ("phaseA4_%s__rope__1M__s0__N100000" % t) / "final.json"
-        if b.exists():
+        if b.exists() and f["seed"] == 0:
             bf = json.loads(b.read_text())
             lines.append("- 같은 규약의 기준선 rope (Phase A‴, 같은 시드): 분포 안 %.3f (step %d) · 분포 밖 %s; 판정 시점까지 "
                          "학습 FLOPs %.2e" % (idv(bf), bf["judgment"]["step"], " · ".join(
@@ -314,7 +342,8 @@ def main(a):
     cfg = json.loads((d / "config.json").read_text())
     msg = "stage1 %s: %s %s (분포 안 %.3f @ step %d)\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n" \
           "Claude-Session: https://claude.ai/code/session_01VSWBvg7gXA6QqLM5pig7M5\n" % (
-              labels(cfg.get("phase", "phaseA2"), f["task"], f["kind"])[2], f["task"], f["kind"], idv(f), j["step"])
+              (c32_labels(f) if cfg.get("phase") == "c3" and c32_labels(f) else
+               labels(cfg.get("phase", "phaseA2"), f["task"], f["kind"]))[2], f["task"], f["kind"], idv(f), j["step"])
     files = [str(res.relative_to(root)), str(d.relative_to(root))]
     if (d.parent / "QUEUE_LOG.txt").exists():
         files.append(str((d.parent / "QUEUE_LOG.txt").relative_to(root)))
