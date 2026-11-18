@@ -16,7 +16,7 @@ PH = HERE / "results" / "phaseA2"
 NAME_T = {"addition": "덧셈", "parity": "패리티", "assoc": "연관 기억", "assoc_n4": "연관 기억 (n=4 고정)",
           "mqar": "MQAR", "mqar_n4": "MQAR (n=4 고정)"}
 NAME_K = {"abacus": "Abacus", "looped": "looped", "gru": "GRU", "looped_rr": "looped_rr", "rope": "rope",
-          "pf": "PF", "pf_cont": "PF-cont", "pf2": "PF (C1-2)"}
+          "pf": "PF", "pf_cont": "PF-cont", "pf2": "PF (C1-2)", "pf_search": "PF-search"}
 # C1-1 values of the same task (RESULTS.md "C1-1 요약", commit faa9181): judgment checkpoint
 C11_REF = {
     "addition": "PF 분포 안 0.005 · 분포 밖 0.000 · 0.000 · 0.000 (PF-cont 0.393 · 0.132 · 0.084 · 0.038); "
@@ -75,6 +75,10 @@ def answer_c1(f):
 
 def labels(phase, task, kind="pf"):
     """(heading label, question, commit label) for a run"""
+    if phase == "c1_2" and kind == "pf_search":
+        return ("C1-2 분기 2단계 (PF-search)",
+                "C1-2 분기 2단계 — PF-search(설계서 11절)로 찾은 이동 정책 표와 경사하강 갱신 제어기가 %s를 학습 분포 "
+                "안에서 배우는가? (유효성 기준 ≥0.95; 판정 FLOPs = 탐색 + 최종 학습)" % NAME_T[task], "C1-2 PF-search")
     if phase == "c1_2":
         q = ("C1-2 — 이동 학습 추정기를 바꾼 PF가 %s를 학습 분포 안에서 배우는가? (유효성 기준: 분포 안 ≥0.95, 시드 0)"
              % NAME_T[task] if task != "mqar" else "C1-2 — PF(C1-2)의 MQAR 결과 (판정 기준 없음; 질의별·시퀀스 전체 보고)")
@@ -176,6 +180,14 @@ def entry(d):
     ]
     if phase in ("c1", "c1_2") and t in BASE_REF:
         lines.append("- 같은 과제의 기준선 최고값 (동결, 설계서 7절): %s" % BASE_REF[t])
+    if k == "pf_search" and cfg.get("pf_search"):
+        sr = cfg["pf_search"]["search"]
+        lines.append("- PF-search 탐색: 평가 %d회, 탐색 FLOPs %.2e, 정지 사유 — %s, 탐색 점수(분포 안 검증) %.3f; 찾은 표: %s"
+                     % (sr["evaluations"], sr["search_flops"], sr["stopped"], sr["best_score_in_distribution_validation"],
+                        "; ".join("%s: %s" % (h, ", ".join("%s→%s" % (c, mv) for c, mv in row.items() if mv != "stay")
+                                                  or "모두 stay") for h, row in sr["policy_named"].items())))
+        lines.append("- 판정 FLOPs (탐색 + 최종 학습 판정 시점까지): %.2e + %.2e = %.2e" % (
+            sr["search_flops"], j["train_flops_cum"], sr["search_flops"] + j["train_flops_cum"]))
     if phase == "c1_2" and t in C11_REF:
         lines.append("- 같은 과제의 C1-1 값: %s" % C11_REF[t])
     if f.get("judgment", {}).get("train_move_signal_mean") is not None:
