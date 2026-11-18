@@ -1,0 +1,130 @@
+{
+ "name": "c3_parity__pf_search__1M__s2__N100000",
+ "task": "parity",
+ "kind": "pf_search",
+ "scale": "1M",
+ "params": 245944,
+ "config": {
+  "R": 4,
+  "K": 16,
+  "H": 3,
+  "hidden": 256,
+  "emb": 64,
+  "policy": [
+   [
+    0,
+    0,
+    3,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    3,
+    0
+   ],
+   [
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ]
+ },
+ "seed": 2,
+ "N": 100000,
+ "batch": 64,
+ "lr": 0.001,
+ "max_steps": 20000,
+ "steps": 20000,
+ "stopped": "max steps",
+ "spec": {
+  "train": [
+   1,
+   16
+  ],
+  "id": [
+   1,
+   16
+  ],
+  "ood": [
+   [
+    17,
+    32
+   ],
+   [
+    33,
+    48
+   ],
+   [
+    49,
+    64
+   ]
+  ]
+ },
+ "id_size": 1000,
+ "ood_size": 500,
+ "judgment": {
+  "rule": "highest in-distribution accuracy (earliest if tied)",
+  "step": 4000,
+  "acc": {
+   "id_1-16": 0.646,
+   "ood_17-32": 0.54,
+   "ood_33-48": 0.488,
+   "ood_49-64": 0.462
+  },
+  "acc_fixed4": null,
+  "acc_seq": null,
+  "train_flops_cum": 6989652535872,
+  "wall_train_s_cum": 504.03
+ },
+ "last": {
+  "step": 20000,
+  "acc": {
+   "id_1-16": 0.646,
+   "ood_17-32": 0.54,
+   "ood_33-48": 0.488,
+   "ood_49-64": 0.462
+  },
+  "acc_fixed4": null,
+  "acc_seq": null
+ },
+ "final_acc": {
+  "id_1-16": 0.646,
+  "ood_17-32": 0.54,
+  "ood_33-48": 0.488,
+  "ood_49-64": 0.462
+ },
+ "final_acc_fixed4": null,
+ "recur": {},
+ "train_flops": 34954246419200,
+ "eval_flops": 767301471120,
+ "wall_train_s": 2183.94,
+ "wall_eval_s": 31.9,
+ "segments": [
+  {
+   "segment": 0,
+   "start_step": 0,
+   "started": "2026-11-18 06:44:32"
+  }
+ ],
+ "hardware": {
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "torch_threads": 1,
+  "torch": "2.15.0+cu132",
+  "cuda": false,
+  "python": "3.12.3"
+ },
+ "commit": "b370ce3f1ef71df39858cf337e19ddc455dfe3e1",
+ "primary_eval_rule": "looped / looped_rr: recurrence 4 x ceil(bin upper / training upper) (declared before runs); fixed 4 recorded as acc_fixed4"
+}
