@@ -226,8 +226,9 @@ def main(a):
                                          "ratio": c_att / s_att if s_att > 0 else None},
                        "criterion": "score(correct) >= 2 x score(all stay) on the dependency (13.2)",
                        "passed": bool(passed)}
-    if not passed:
-        res["stopped"] = "pre-check not passed: no compile (13.2)"
+    if not passed or a.precheck_only:
+        res["stopped"] = ("pre-check only (reference run)" if a.precheck_only else
+                          "pre-check not passed: no compile (13.2)")
         res["wall_s"] = round(time.time() - t0, 1)
         json.dump(res, open(os.path.join(out, "compile_result.json"), "w"), indent=1)
         print(json.dumps(res, indent=1))
@@ -285,4 +286,5 @@ if __name__ == "__main__":
     p.add_argument("--task", required=True)
     p.add_argument("--teacher", required=True)
     p.add_argument("--out", required=True)
+    p.add_argument("--precheck-only", action="store_true", help="reference: stop after the pre-check")
     main(p.parse_args())
