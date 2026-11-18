@@ -1,0 +1,1364 @@
+{
+ "cases": {
+  "parity_s7": {
+   "table": "allstay",
+   "policy": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "n_in": 1,
+   "machine": {
+    "z0": 0,
+    "U": "(max (mod (add $0 $1) 2) (sub $1 2))",
+    "V": "$0",
+    "C": "(> (max $0 $2) 10)"
+   },
+   "measures": {
+    "U": {
+     "operators": 4,
+     "depth": 3,
+     "constant_holes": 2,
+     "constant_leaves": [
+      2
+     ],
+     "mod_divisors": [
+      2
+     ],
+     "operator_set": [
+      "add",
+      "max",
+      "mod",
+      "sub"
+     ]
+    },
+    "V": {
+     "operators": 0,
+     "depth": 0,
+     "constant_holes": 0,
+     "constant_leaves": [],
+     "mod_divisors": [],
+     "operator_set": [],
+     "additive_constant": 0
+    },
+    "C": {
+     "operators": 1,
+     "depth": 1,
+     "constant_holes": 0,
+     "constant_leaves": [],
+     "mod_divisors": [],
+     "operator_set": [
+      "max"
+     ],
+     "comparison": "cgt",
+     "comparison_constant": 10
+    }
+   },
+   "accuracy": {
+    "training_200 (2-0 observations)": 1.0,
+    "id_1-16": 1.0,
+    "ood_17-32": 1.0,
+    "ood_33-48": 1.0,
+    "ood_49-64": 1.0
+   },
+   "max_abs_latent": 11,
+   "max_abs_any_node_value": 14,
+   "tree": {
+    "U": [
+     [
+      "max",
+      [
+       "mod",
+       [
+        "add",
+        [
+         "v",
+         0
+        ],
+        [
+         "v",
+         1
+        ]
+       ]
+      ],
+      [
+       "sub",
+       [
+        "v",
+        1
+       ],
+       [
+        "c"
+       ]
+      ]
+     ],
+     [
+      2,
+      2
+     ]
+    ],
+    "V": [
+     [
+      [
+       "v",
+       0
+      ],
+      []
+     ],
+     0
+    ],
+    "C": [
+     "cgt",
+     [
+      [
+       "max",
+       [
+        "v",
+        0
+       ],
+       [
+        "v",
+        2
+       ]
+      ],
+      []
+     ],
+     10
+    ]
+   }
+  },
+  "addition_s7": {
+   "table": "compiled",
+   "policy": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     3,
+     1,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     3,
+     3,
+     0,
+     0,
+     1,
+     0
+    ]
+   ],
+   "n_in": 4,
+   "machine": {
+    "z0": 31,
+    "U": "(add (add (max (max (add (add (sub $2 (min $2 (max (sub (mod $0 64) (mod $0 32)) (sub (add $2 20) (mod (add $2 20) 32))))) (sub $3 (min $3 (max (sub $0 (mod $0 64)) (sub (add $3 51) (mod (add $3 51) 64)))))) (max 0 (min 1 (sub (mod (add (mod $0 32) 12) 32) 21)))) (sub (add (min (sub (mod $0 32) 19) (sub 13 $1)) 30) (mod (add (min (sub (mod $0 32) 19) (sub 13 $1)) 30) 31))) (max 0 (sub (sub (add (max (sub (mod $0 64) (mod $0 32)) (sub (add $2 20) (mod (add $2 20) 32))) (max (sub $0 (mod $0 64)) (sub (add $3 51) (mod (add $3 51) 64)))) 75) (sub (add (add (add (sub $2 (min $2 (max (sub (mod $0 64) (mod $0 32)) (sub (add $2 20) (mod (add $2 20) 32))))) (sub $3 (min $3 (max (sub $0 (mod $0 64)) (sub (add $3 51) (mod (add $3 51) 64)))))) (max 0 (min 1 (sub (mod (add (mod $0 32) 12) 32) 21)))) 20) (mod (add (add (add (sub $2 (min $2 (max (sub (mod $0 64) (mod $0 32)) (sub (add $2 20) (mod (add $2 20) 32))))) (sub $3 (min $3 (max (sub $0 (mod $0 64)) (sub (add $3 51) (mod (add $3 51) 64)))))) (max 0 (min 1 (sub (mod (add (mod $0 32) 12) 32) 21)))) 20) 21))))) (max (sub (mod $0 64) (mod $0 32)) (sub (add $2 20) (mod (add $2 20) 32)))) (max (sub $0 (mod $0 64)) (sub (add $3 51) (mod (add $3 51) 64))))",
+    "V": "(add (mod (mod $1 32) 10) (max 0 (sub (sub (mod $1 32) 10) (mod (sub (mod $1 32) 10) 10))))",
+    "C": "(< (mod $1 32) 22)"
+   },
+   "measures": {
+    "U": {
+     "operators": 135,
+     "depth": 16,
+     "constant_holes": 77,
+     "constant_leaves": [
+      20,
+      20,
+      51,
+      51,
+      0,
+      1,
+      12,
+      21,
+      19,
+      13,
+      30,
+      19,
+      13,
+      30,
+      0,
+      20,
+      20,
+      51,
+      51,
+      75,
+      20,
+      20,
+      51,
+      51,
+      0,
+      1,
+      12,
+      21,
+      20,
+      20,
+      20,
+      51,
+      51,
+      0,
+      1,
+      12,
+      21,
+      20,
+      20,
+      20,
+      51,
+      51
+     ],
+     "mod_divisors": [
+      64,
+      32,
+      32,
+      64,
+      64,
+      32,
+      32,
+      32,
+      32,
+      31,
+      64,
+      32,
+      32,
+      64,
+      64,
+      64,
+      32,
+      32,
+      64,
+      64,
+      32,
+      32,
+      64,
+      32,
+      32,
+      64,
+      64,
+      32,
+      32,
+      21,
+      64,
+      32,
+      32,
+      64,
+      64
+     ],
+     "operator_set": [
+      "add",
+      "max",
+      "min",
+      "mod",
+      "sub"
+     ]
+    },
+    "V": {
+     "operators": 10,
+     "depth": 6,
+     "constant_holes": 8,
+     "constant_leaves": [
+      0,
+      10,
+      10
+     ],
+     "mod_divisors": [
+      32,
+      10,
+      32,
+      32,
+      10
+     ],
+     "operator_set": [
+      "add",
+      "max",
+      "mod",
+      "sub"
+     ],
+     "additive_constant": 0
+    },
+    "C": {
+     "operators": 1,
+     "depth": 1,
+     "constant_holes": 1,
+     "constant_leaves": [],
+     "mod_divisors": [
+      32
+     ],
+     "operator_set": [
+      "mod"
+     ],
+     "comparison": "clt",
+     "comparison_constant": 22
+    }
+   },
+   "accuracy": {
+    "training_200 (2-0 observations)": 1.0,
+    "id_1-10": 1.0,
+    "ood_11-20": 1.0,
+    "ood_21-30": 1.0,
+    "ood_31-40": 1.0
+   },
+   "max_abs_latent": 117,
+   "max_abs_any_node_value": 117,
+   "tree": {
+    "U": [
+     [
+      "add",
+      [
+       "add",
+       [
+        "max",
+        [
+         "max",
+         [
+          "add",
+          [
+           "add",
+           [
+            "sub",
+            [
+             "v",
+             2
+            ],
+            [
+             "min",
+             [
+              "v",
+              2
+             ],
+             [
+              "max",
+              [
+               "sub",
+               [
+                "mod",
+                [
+                 "v",
+                 0
+                ]
+               ],
+               [
+                "mod",
+                [
+                 "v",
+                 0
+                ]
+               ]
+              ],
+              [
+               "sub",
+               [
+                "add",
+                [
+                 "v",
+                 2
+                ],
+                [
+                 "c"
+                ]
+               ],
+               [
+                "mod",
+                [
+                 "add",
+                 [
+                  "v",
+                  2
+                 ],
+                 [
+                  "c"
+                 ]
+                ]
+               ]
+              ]
+             ]
+            ]
+           ],
+           [
+            "sub",
+            [
+             "v",
+             3
+            ],
+            [
+             "min",
+             [
+              "v",
+              3
+             ],
+             [
+              "max",
+              [
+               "sub",
+               [
+                "v",
+                0
+               ],
+               [
+                "mod",
+                [
+                 "v",
+                 0
+                ]
+               ]
+              ],
+              [
+               "sub",
+               [
+                "add",
+                [
+                 "v",
+                 3
+                ],
+                [
+                 "c"
+                ]
+               ],
+               [
+                "mod",
+                [
+                 "add",
+                 [
+                  "v",
+                  3
+                 ],
+                 [
+                  "c"
+                 ]
+                ]
+               ]
+              ]
+             ]
+            ]
+           ]
+          ],
+          [
+           "max",
+           [
+            "c"
+           ],
+           [
+            "min",
+            [
+             "c"
+            ],
+            [
+             "sub",
+             [
+              "mod",
+              [
+               "add",
+               [
+                "mod",
+                [
+                 "v",
+                 0
+                ]
+               ],
+               [
+                "c"
+               ]
+              ]
+             ],
+             [
+              "c"
+             ]
+            ]
+           ]
+          ]
+         ],
+         [
+          "sub",
+          [
+           "add",
+           [
+            "min",
+            [
+             "sub",
+             [
+              "mod",
+              [
+               "v",
+               0
+              ]
+             ],
+             [
+              "c"
+             ]
+            ],
+            [
+             "sub",
+             [
+              "c"
+             ],
+             [
+              "v",
+              1
+             ]
+            ]
+           ],
+           [
+            "c"
+           ]
+          ],
+          [
+           "mod",
+           [
+            "add",
+            [
+             "min",
+             [
+              "sub",
+              [
+               "mod",
+               [
+                "v",
+                0
+               ]
+              ],
+              [
+               "c"
+              ]
+             ],
+             [
+              "sub",
+              [
+               "c"
+              ],
+              [
+               "v",
+               1
+              ]
+             ]
+            ],
+            [
+             "c"
+            ]
+           ]
+          ]
+         ]
+        ],
+        [
+         "max",
+         [
+          "c"
+         ],
+         [
+          "sub",
+          [
+           "sub",
+           [
+            "add",
+            [
+             "max",
+             [
+              "sub",
+              [
+               "mod",
+               [
+                "v",
+                0
+               ]
+              ],
+              [
+               "mod",
+               [
+                "v",
+                0
+               ]
+              ]
+             ],
+             [
+              "sub",
+              [
+               "add",
+               [
+                "v",
+                2
+               ],
+               [
+                "c"
+               ]
+              ],
+              [
+               "mod",
+               [
+                "add",
+                [
+                 "v",
+                 2
+                ],
+                [
+                 "c"
+                ]
+               ]
+              ]
+             ]
+            ],
+            [
+             "max",
+             [
+              "sub",
+              [
+               "v",
+               0
+              ],
+              [
+               "mod",
+               [
+                "v",
+                0
+               ]
+              ]
+             ],
+             [
+              "sub",
+              [
+               "add",
+               [
+                "v",
+                3
+               ],
+               [
+                "c"
+               ]
+              ],
+              [
+               "mod",
+               [
+                "add",
+                [
+                 "v",
+                 3
+                ],
+                [
+                 "c"
+                ]
+               ]
+              ]
+             ]
+            ]
+           ],
+           [
+            "c"
+           ]
+          ],
+          [
+           "sub",
+           [
+            "add",
+            [
+             "add",
+             [
+              "add",
+              [
+               "sub",
+               [
+                "v",
+                2
+               ],
+               [
+                "min",
+                [
+                 "v",
+                 2
+                ],
+                [
+                 "max",
+                 [
+                  "sub",
+                  [
+                   "mod",
+                   [
+                    "v",
+                    0
+                   ]
+                  ],
+                  [
+                   "mod",
+                   [
+                    "v",
+                    0
+                   ]
+                  ]
+                 ],
+                 [
+                  "sub",
+                  [
+                   "add",
+                   [
+                    "v",
+                    2
+                   ],
+                   [
+                    "c"
+                   ]
+                  ],
+                  [
+                   "mod",
+                   [
+                    "add",
+                    [
+                     "v",
+                     2
+                    ],
+                    [
+                     "c"
+                    ]
+                   ]
+                  ]
+                 ]
+                ]
+               ]
+              ],
+              [
+               "sub",
+               [
+                "v",
+                3
+               ],
+               [
+                "min",
+                [
+                 "v",
+                 3
+                ],
+                [
+                 "max",
+                 [
+                  "sub",
+                  [
+                   "v",
+                   0
+                  ],
+                  [
+                   "mod",
+                   [
+                    "v",
+                    0
+                   ]
+                  ]
+                 ],
+                 [
+                  "sub",
+                  [
+                   "add",
+                   [
+                    "v",
+                    3
+                   ],
+                   [
+                    "c"
+                   ]
+                  ],
+                  [
+                   "mod",
+                   [
+                    "add",
+                    [
+                     "v",
+                     3
+                    ],
+                    [
+                     "c"
+                    ]
+                   ]
+                  ]
+                 ]
+                ]
+               ]
+              ]
+             ],
+             [
+              "max",
+              [
+               "c"
+              ],
+              [
+               "min",
+               [
+                "c"
+               ],
+               [
+                "sub",
+                [
+                 "mod",
+                 [
+                  "add",
+                  [
+                   "mod",
+                   [
+                    "v",
+                    0
+                   ]
+                  ],
+                  [
+                   "c"
+                  ]
+                 ]
+                ],
+                [
+                 "c"
+                ]
+               ]
+              ]
+             ]
+            ],
+            [
+             "c"
+            ]
+           ],
+           [
+            "mod",
+            [
+             "add",
+             [
+              "add",
+              [
+               "add",
+               [
+                "sub",
+                [
+                 "v",
+                 2
+                ],
+                [
+                 "min",
+                 [
+                  "v",
+                  2
+                 ],
+                 [
+                  "max",
+                  [
+                   "sub",
+                   [
+                    "mod",
+                    [
+                     "v",
+                     0
+                    ]
+                   ],
+                   [
+                    "mod",
+                    [
+                     "v",
+                     0
+                    ]
+                   ]
+                  ],
+                  [
+                   "sub",
+                   [
+                    "add",
+                    [
+                     "v",
+                     2
+                    ],
+                    [
+                     "c"
+                    ]
+                   ],
+                   [
+                    "mod",
+                    [
+                     "add",
+                     [
+                      "v",
+                      2
+                     ],
+                     [
+                      "c"
+                     ]
+                    ]
+                   ]
+                  ]
+                 ]
+                ]
+               ],
+               [
+                "sub",
+                [
+                 "v",
+                 3
+                ],
+                [
+                 "min",
+                 [
+                  "v",
+                  3
+                 ],
+                 [
+                  "max",
+                  [
+                   "sub",
+                   [
+                    "v",
+                    0
+                   ],
+                   [
+                    "mod",
+                    [
+                     "v",
+                     0
+                    ]
+                   ]
+                  ],
+                  [
+                   "sub",
+                   [
+                    "add",
+                    [
+                     "v",
+                     3
+                    ],
+                    [
+                     "c"
+                    ]
+                   ],
+                   [
+                    "mod",
+                    [
+                     "add",
+                     [
+                      "v",
+                      3
+                     ],
+                     [
+                      "c"
+                     ]
+                    ]
+                   ]
+                  ]
+                 ]
+                ]
+               ]
+              ],
+              [
+               "max",
+               [
+                "c"
+               ],
+               [
+                "min",
+                [
+                 "c"
+                ],
+                [
+                 "sub",
+                 [
+                  "mod",
+                  [
+                   "add",
+                   [
+                    "mod",
+                    [
+                     "v",
+                     0
+                    ]
+                   ],
+                   [
+                    "c"
+                   ]
+                  ]
+                 ],
+                 [
+                  "c"
+                 ]
+                ]
+               ]
+              ]
+             ],
+             [
+              "c"
+             ]
+            ]
+           ]
+          ]
+         ]
+        ]
+       ],
+       [
+        "max",
+        [
+         "sub",
+         [
+          "mod",
+          [
+           "v",
+           0
+          ]
+         ],
+         [
+          "mod",
+          [
+           "v",
+           0
+          ]
+         ]
+        ],
+        [
+         "sub",
+         [
+          "add",
+          [
+           "v",
+           2
+          ],
+          [
+           "c"
+          ]
+         ],
+         [
+          "mod",
+          [
+           "add",
+           [
+            "v",
+            2
+           ],
+           [
+            "c"
+           ]
+          ]
+         ]
+        ]
+       ]
+      ],
+      [
+       "max",
+       [
+        "sub",
+        [
+         "v",
+         0
+        ],
+        [
+         "mod",
+         [
+          "v",
+          0
+         ]
+        ]
+       ],
+       [
+        "sub",
+        [
+         "add",
+         [
+          "v",
+          3
+         ],
+         [
+          "c"
+         ]
+        ],
+        [
+         "mod",
+         [
+          "add",
+          [
+           "v",
+           3
+          ],
+          [
+           "c"
+          ]
+         ]
+        ]
+       ]
+      ]
+     ],
+     [
+      64,
+      32,
+      20,
+      20,
+      32,
+      64,
+      51,
+      51,
+      64,
+      0,
+      1,
+      32,
+      12,
+      32,
+      21,
+      32,
+      19,
+      13,
+      30,
+      32,
+      19,
+      13,
+      30,
+      31,
+      0,
+      64,
+      32,
+      20,
+      20,
+      32,
+      64,
+      51,
+      51,
+      64,
+      75,
+      64,
+      32,
+      20,
+      20,
+      32,
+      64,
+      51,
+      51,
+      64,
+      0,
+      1,
+      32,
+      12,
+      32,
+      21,
+      20,
+      64,
+      32,
+      20,
+      20,
+      32,
+      64,
+      51,
+      51,
+      64,
+      0,
+      1,
+      32,
+      12,
+      32,
+      21,
+      20,
+      21,
+      64,
+      32,
+      20,
+      20,
+      32,
+      64,
+      51,
+      51,
+      64
+     ]
+    ],
+    "V": [
+     [
+      [
+       "add",
+       [
+        "mod",
+        [
+         "mod",
+         [
+          "v",
+          1
+         ]
+        ]
+       ],
+       [
+        "max",
+        [
+         "c"
+        ],
+        [
+         "sub",
+         [
+          "sub",
+          [
+           "mod",
+           [
+            "v",
+            1
+           ]
+          ],
+          [
+           "c"
+          ]
+         ],
+         [
+          "mod",
+          [
+           "sub",
+           [
+            "mod",
+            [
+             "v",
+             1
+            ]
+           ],
+           [
+            "c"
+           ]
+          ]
+         ]
+        ]
+       ]
+      ],
+      [
+       32,
+       10,
+       0,
+       32,
+       10,
+       32,
+       10,
+       10
+      ]
+     ],
+     0
+    ],
+    "C": [
+     "clt",
+     [
+      [
+       "mod",
+       [
+        "v",
+        1
+       ]
+      ],
+      [
+       32
+      ]
+     ],
+     22
+    ]
+   }
+  }
+ },
+ "reference_format_F1_parity_no_eos": {
+  "change": "output pieces without <eos> (answer digit only)",
+  "machine": {
+   "z0": 0,
+   "U": "(mod (add $0 $1) 2)",
+   "V": "$0",
+   "C": "(== $2 13)"
+  },
+  "measures": {
+   "U": {
+    "operators": 2,
+    "depth": 2,
+    "constant_holes": 1,
+    "constant_leaves": [],
+    "mod_divisors": [
+     2
+    ],
+    "operator_set": [
+     "add",
+     "mod"
+    ]
+   },
+   "V": {
+    "operators": 0,
+    "depth": 0,
+    "constant_holes": 0,
+    "constant_leaves": [],
+    "mod_divisors": [],
+    "operator_set": [],
+    "additive_constant": 0
+   },
+   "C": {
+    "operators": 0,
+    "depth": 0,
+    "constant_holes": 0,
+    "constant_leaves": [],
+    "mod_divisors": [],
+    "operator_set": [],
+    "comparison": "ceq",
+    "comparison_constant": 13
+   }
+  },
+  "accuracy": {
+   "training_200 (2-0 observations)": 1.0,
+   "id_1-16": 1.0,
+   "ood_17-32": 1.0,
+   "ood_33-48": 1.0,
+   "ood_49-64": 1.0
+  }
+ },
+ "structure_counts": {
+  "parity_U_nv2": {
+   "current_ops2_holes1": 252,
+   "ops4_holes1": 53436,
+   "ops2_holes2": 324,
+   "ops4_holes2": 102882,
+   "per_operator_count_holes2": [
+    1,
+    19,
+    304,
+    5306,
+    97252
+   ]
+  },
+  "addition_U_nv5": {
+   "current_ops2_holes1": 2544,
+   "per_operator_count_holes1": [
+    4,
+    85,
+    2455,
+    85355
+   ],
+   "per_operator_count_holes3": [
+    4,
+    85,
+    2635,
+    99620
+   ]
+  },
+  "output_terms": {
+   "nv3_ops1 (parity V/C, current)": 48,
+   "nv6_ops1 (addition V/C, current)": 141,
+   "nv6_ops2": 5406
+  }
+ },
+ "search_work_estimate": {
+  "trace_rate_per_cpu_s_measured_in_2_0_parity_s7": 20247,
+  "parity_hand_U_description_length": 28,
+  "parity_candidates_up_to_hand_length_relaxed_ops4_holes2": 17921333,
+  "parity_F1_hand_U_description_length": 14,
+  "parity_F1_candidates_up_to_hand_length_current_grammar": 3376,
+  "addition_hand_U_description_length": 1520,
+  "parity_estimated_cpu_s_relaxed": 885.2,
+  "parity_F1_estimated_cpu_s_current": 0.17
+ },
+ "cpu_s": 15.7
+}
