@@ -154,6 +154,42 @@ def c32_labels(f):
             "C3-2 학생 s%d" % sd)
 
 
+def c33_labels(f):
+    """C3-3 runs: (heading, question, commit label)"""
+    t, k, sd = f["task"], f["kind"], f["seed"]
+    tag = f["name"].split("__")[-1] if f["name"].count("__") > 4 else ""
+    if k == "rope":
+        return ("C3-3 교사 (시드 %d)" % sd,
+                "C3-3 확인 실행 — 시드 %d 교사 `rope` 학습 (기준선 규약; 판정 체크포인트를 교사로 로컬 보관)" % sd,
+                "C3-3 교사 s%d" % sd)
+    if tag == "allstay":
+        return ("C3-3 패리티 진단",
+                "C3-3 변경 2 — 전부 정지 표의 학생이 패리티를 분포 안 ≥0.95로 배우는가? (아니면 학생 경로 결함으로 보고 고친다)",
+                "C3-3 패리티 진단")
+    if tag.startswith("dev"):
+        return ("C3-3 개발 확인 (시드 %d)" % sd,
+                "C3-3 개발 확인 — 내용 치환 의존도로 시드 %d 기존 교사에서 컴파일한 표의 학생이 %s를 배우는가? "
+                "(개발용, 판정에 쓰지 않음)" % (sd, NAME_T[t]), "C3-3 개발 s%d" % sd)
+    return ("C3-3 학생 (시드 %d, 판정용)" % sd,
+            "C3-3 확인 실행 — 내용 치환 의존도 C3 학생이 시드 %d에서 %s 1단계 기준을 충족하는가? (7절)" % (sd, NAME_T[t]),
+            "C3-3 학생 s%d" % sd)
+
+
+def stage1_signal_line(f, total_flops):
+    """7절 thresholds for one seed (C3-3 decision seeds 3-5)"""
+    a = f["judgment"]["acc"]
+    if f["task"] == "addition":
+        ok = (a["ood_11-20"] >= 0.778, a["ood_21-30"] >= 0.500, total_flops <= 5.18e14)
+        return ("- 7절 기준 (이 시드): 11–20 %.3f ≥0.778 %s · 21–30 %.3f ≥0.500 %s · 합계 FLOPs %.2e ≤5.18e14 %s"
+                % (a["ood_11-20"], "예" if ok[0] else "아니오", a["ood_21-30"], "예" if ok[1] else "아니오",
+                   total_flops, "예" if ok[2] else "아니오"))
+    if f["task"] == "parity":
+        oo = [v for l, v in a.items() if l.startswith("ood")]
+        return "- 7절 기준 (이 시드): 패리티 세 구간 %s ≥0.99 %s" % (
+            " · ".join("%.3f" % v for v in oo), "예" if all(v >= 0.99 for v in oo) else "아니오")
+    return None
+
+
 def labels(phase, task, kind="pf"):
     """(heading label, question, commit label) for a run"""
     if phase == "c3" and kind == "rope":
@@ -252,16 +288,20 @@ def entry(d):
     oods = " · ".join("%s: %.3f" % (lab(l), v) for l, v in j["acc"].items() if l.startswith("ood"))
     oods_last = " · ".join("%s: %.3f" % (lab(l), v) for l, v in last["acc"].items() if l.startswith("ood"))
     phase = cfg.get("phase", "phaseA2")
-    head, question, _ = (c32_labels(f) if phase == "c3" and c32_labels(f) else labels(phase, t, k))
+    head, question, _ = (c33_labels(f) if phase == "c3_3" else
+                         c32_labels(f) if phase == "c3" and c32_labels(f) else labels(phase, t, k))
     kname = "PF 학생 (C3)" if phase == "c3" and k == "pf_search" else NAME_K[k]
     if phase == "c3":
         kname += (" 대조군: 학습 전 교사" if "ctrl" in (f["name"].split("__")[-1]) else "") + " · 시드 %d" % f["seed"]
+    if phase == "c3_3":
+        kname = ("PF 학생 (C3-3)" if k == "pf_search" else NAME_K[k]) + " · 시드 %d" % f["seed"]
     date = time.strftime("%Y-%m-%d", time.gmtime())
     lines = [
         "## %s · %s · %s / %s" % (date, head, NAME_T[t], kname),
         "- 질문: %s" % question,
-        "- 질문에 대한 답: %s" % (("참고 — 교사 (판정 기준 없음; 분포 안 %.3f)" % idv(f)) if phase == "c3" and k == "rope"
-                                  else answer_c1(f) if phase in ("c1", "c1_2", "c1_3", "c3") else answer4(f) if phase == "phaseA4" else
+        "- 질문에 대한 답: %s" % (("참고 — 교사 (판정 기준 없음; 분포 안 %.3f)" % idv(f))
+                                  if phase in ("c3", "c3_3") and k == "rope"
+                                  else answer_c1(f) if phase in ("c1", "c1_2", "c1_3", "c3", "c3_3") else answer4(f) if phase == "phaseA4" else
                                   answer3(f) if phase == "phaseA3" else answer(t, k)),
         "- 코드 커밋: `%s`%s · 원자료: `%s/`" % (
             (env.get("code_commit") or "?")[:7], " (작업 트리 수정 있음)" if env.get("code_dirty") else "",
@@ -277,8 +317,22 @@ def entry(d):
         "- 마지막 시점 (step %d): 분포 안 %.3f · 분포 밖 %s" % (
             last["step"], [v for l, v in last["acc"].items() if l.startswith("id")][0], oods_last),
     ]
-    if phase in ("c1", "c1_2", "c1_3", "c3") and t in BASE_REF:
+    if phase in ("c1", "c1_2", "c1_3", "c3", "c3_3") and t in BASE_REF:
         lines.append("- 같은 과제의 기준선 최고값 (동결, 설계서 7절): %s" % BASE_REF[t])
+    if phase == "c3_3" and k == "rope":
+        lines.append("- 교사 체크포인트: `teacher_best.pt` (판정 시점 가중치)와 `ckpt.pt`를 로컬에만 보관 (git 제외)")
+    if phase == "c3_3" and k == "pf_search":
+        if "precheck" in cfg["pf_search"]["search"]:
+            cl = c3_lines(d, f, cfg)
+            lines.extend(cl)
+            cr = cfg["pf_search"]["search"]
+            total = cr["teacher"]["train_flops_to_judgment"] + cr["extraction"]["flops"] + j["train_flops_cum"]
+            if f["seed"] >= 3 and stage1_signal_line(f, total):
+                lines.append(stage1_signal_line(f, total))
+        else:
+            lines.append("- 표: 전부 정지 (컴파일 없음, 교사 없음; `%s`)" % cfg["pf_search"]["policy_file"])
+        if t in C1_BEST:
+            lines.append("- 같은 과제의 C1 최고값: %s" % C1_BEST[t])
     if phase == "c3" and k == "rope":
         b = HERE / "results" / "phaseA4" / ("phaseA4_%s__rope__1M__s0__N100000" % t) / "final.json"
         if b.exists() and f["seed"] == 0:
@@ -342,7 +396,8 @@ def main(a):
     cfg = json.loads((d / "config.json").read_text())
     msg = "stage1 %s: %s %s (분포 안 %.3f @ step %d)\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n" \
           "Claude-Session: https://claude.ai/code/session_01VSWBvg7gXA6QqLM5pig7M5\n" % (
-              (c32_labels(f) if cfg.get("phase") == "c3" and c32_labels(f) else
+              (c33_labels(f) if cfg.get("phase") == "c3_3" else
+               c32_labels(f) if cfg.get("phase") == "c3" and c32_labels(f) else
                labels(cfg.get("phase", "phaseA2"), f["task"], f["kind"]))[2], f["task"], f["kind"], idv(f), j["step"])
     files = [str(res.relative_to(root)), str(d.relative_to(root))]
     if (d.parent / "QUEUE_LOG.txt").exists():

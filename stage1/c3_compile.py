@@ -152,6 +152,68 @@ def extract(m, cfg, exs):
     return rows, flops, n_bwd_total, maxdiff
 
 
+def extract_substitution(m, cfg, exs):
+    """C3-3 change 1 (design 14): content-substitution dependency.  For output step t and input position i <= t:
+    the symbol at i is replaced by each OTHER symbol of the same token class (the 7 classes of pf.token_classes; the
+    class's symbols = those observed at scored input positions of that class in these examples; all of them, at most
+    9, in token-id order), and s_t(i) = mean over the substitutes of |p_teacher(correct token at t | substituted) -
+    p_teacher(correct token at t | original)|; a position whose class has no other symbol has s_t(i) = 0; each row is
+    normalised over i = 0..t to sum to 1 (an all-zero row stays zero).  Auxiliary: attention weights of the original
+    input.  One forward per original and per substituted sequence (no backward)."""
+    ci = class_ids()
+    prep, symset = [], {}
+    for idx, e in enumerate(exs):
+        x, y = R.make_batch([e])
+        ts = [t for t in range(x.shape[1]) if int(y[0, t]) != -100]
+        cls = PFM.token_classes(x, ci["digits"], ci["plus"], ci["eq"], ci["bar"], ci["node_lo"], ci["node_hi"])[0]
+        for i in range(max(ts) + 1):
+            symset.setdefault(int(cls[i]), set()).add(int(x[0, i]))
+        prep.append((x, y, ts, cls))
+    subs_of = {c: sorted(v) for c, v in symset.items()}
+    rows, flops, n_seq, n_sub_pos, n_zero_rows = [], 0, 0, 0, 0
+    with torch.no_grad():
+        for idx, (x, y, ts, cls) in enumerate(prep):
+            L = x.shape[1]
+            _, logits, att = teacher_forward(m, x)
+            tgt = y[0, ts]
+            pb = logits[0, ts].softmax(-1).gather(1, tgt.unsqueeze(1)).squeeze(1)       # [n_t]
+            flops += R.fwd_flops("rope", cfg, 1, L, len(T.VOCAB))
+            n_seq += 1
+            sub_x, sub_pos = [], []
+            for i in range(max(ts) + 1):
+                others = [v for v in subs_of[int(cls[i])] if v != int(x[0, i])][:9]
+                if others:
+                    n_sub_pos += 1
+                for v in others:
+                    z = x.clone()
+                    z[0, i] = v
+                    sub_x.append(z)
+                    sub_pos.append(i)
+            S = torch.zeros(len(ts), L, dtype=torch.float64)
+            if sub_x:
+                X = torch.cat(sub_x, 0)
+                pr = m(X)[:, ts].softmax(-1).gather(2, tgt.view(1, -1, 1).expand(X.shape[0], -1, 1)).squeeze(2)
+                flops += R.fwd_flops("rope", cfg, X.shape[0], L, len(T.VOCAB))
+                n_seq += X.shape[0]
+                d = (pr - pb.unsqueeze(0)).abs().double()                              # [n_sub, n_t]
+                pos = torch.tensor(sub_pos)
+                tt = torch.tensor(ts)
+                d = d * (tt.unsqueeze(0) >= pos.unsqueeze(1))                           # causal: t >= i only
+                cnt = torch.zeros(L, dtype=torch.float64).index_add_(0, pos, torch.ones(len(sub_pos), dtype=torch.float64))
+                S = torch.zeros(L, len(ts), dtype=torch.float64).index_add_(0, pos, d).T / cnt.clamp(min=1)
+            for k, t in enumerate(ts):
+                r = S[k, :t + 1]
+                tot = float(r.sum())
+                if tot > 0:
+                    r = r / tot
+                else:
+                    n_zero_rows += 1
+                rows.append((idx, t, r.numpy(), att[0, t, :t + 1].double().numpy()))
+    info = {"class_symbols": {PFM.CLASS_NAMES[c]: [T.VOCAB[v] for v in vs] for c, vs in subs_of.items()},
+            "sequences_forwarded": n_seq, "substituted_positions": n_sub_pos, "all_zero_rows": n_zero_rows}
+    return rows, flops, info
+
+
 def class_ids():
     return dict(digits=torch.tensor([T.TOK[d] for d in T.DIGITS]), plus=T.TOK["+"], eq=T.TOK["="], bar=T.TOK["|"],
                 node_lo=T.TOK[T.NODES[0]], node_hi=T.TOK[T.NODES[-1]] + 1)
@@ -243,7 +305,12 @@ def main(a):
         m.load_state_dict(ck["model"])
     m.eval()
     exs = T.train_set(a.task, 100000, a.seed)[:N_EX]                            # the teacher's training data
-    rows, ext_flops, n_bwd, maxdiff = extract(m, cfg, exs)
+    if a.dependency == "substitution":
+        rows, ext_flops, sub_info = extract_substitution(m, cfg, exs)
+        n_bwd, maxdiff = 0, None
+    else:
+        rows, ext_flops, n_bwd, maxdiff = extract(m, cfg, exs)
+        sub_info = None
     torch.save({"rows": rows}, os.path.join(out, "dependency_rows.pt"))      # local only (gitignored)
     S, A = dense(rows, 2), dense(rows, 3)
     ar = np.arange(len(rows))
@@ -252,8 +319,10 @@ def main(a):
            "teacher": {"path": a.teacher or None, "untrained_seed": a.untrained_seed, "step": ck["step"],
                        "acc": ck["acc"], "train_flops_to_judgment": ck["train_flops_cum"]},
            "examples": N_EX, "output_steps": len(rows),
+           "dependency_kind": ("content substitution (design 14)" if a.dependency == "substitution" else
+                               "input gradient (design 13)"),
            "extraction": {"flops": ext_flops, "backward_passes": n_bwd,
-                          "manual_forward_max_abs_logit_diff": maxdiff},
+                          "manual_forward_max_abs_logit_diff": maxdiff, "substitution": sub_info},
            "dependency_mass_on_current_position": float(S[ar, tpos].mean()),
            "attention_mass_on_current_position": float(A[ar, tpos].mean())}
     # pre-check (13.2)
@@ -355,6 +424,8 @@ if __name__ == "__main__":
     p.add_argument("--untrained-seed", type=int, default=None, help="C3-2 control: rope initial weights of this seed")
     p.add_argument("--seed", type=int, default=0, help="the teacher's training-data seed (first 2,000 examples)")
     p.add_argument("--no-gate", action="store_true", help="record the pre-check but do not apply it (C3-1 decision)")
+    p.add_argument("--dependency", choices=("gradient", "substitution"), default="gradient",
+                   help="gradient: design 13 (C3-1/C3-2); substitution: design 14 (C3-3)")
     p.add_argument("--out", required=True)
     p.add_argument("--precheck-only", action="store_true", help="reference: stop after the pre-check")
     main(p.parse_args())
