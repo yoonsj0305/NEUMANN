@@ -20,7 +20,7 @@
 ### 남은 작업 (기록만)
 1. 위 판정을 `stage1/DECISIONS.md`에 그대로 옮긴다.
 2. `FUTURE.md`에 한 줄: "PF 학생 패리티 퇴화 해(분포 안 0.646, 시드 2·6·8 동일 값) — 1단계 종료로 조사하지 않음."
-3. `stage1/candidate`의 1단계 기록(results, RESULTS.md, DECISIONS.md, FUTURE.md, BUGS.md)을 main에 합치는 PR을 연다. 코드와 원자료는 바꾸지 않는다.
+- 브랜치 병합은 하지 않는다. 1단계 기록은 `stage1/candidate`에 그대로 둔다.
 
 ### 1단계 비교 기준선 (확정)
 과제마다 `abacus`, `rope`, `looped_rr`, `gru` 네 기준선을 모두 돌린다. 후보와 비교할 기준값은 **과제·구간별로 네 기준선 중 가장 높은 분포 밖 정확도**로 한다(후보에게 가장 불리한 쪽).
