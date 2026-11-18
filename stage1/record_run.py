@@ -92,8 +92,53 @@ def c12_ref(task):
     return " / ".join(out)
 
 
+# C1 best values of the same task (RESULTS.md C1-1 / C1-2 / C1-3 summaries): judgment checkpoint
+C1_BEST = {
+    "addition": "PF-cont (C1-1) 분포 안 0.393 · 분포 밖 0.132 · 0.084 · 0.038; 판정 시점까지 학습 FLOPs 1.06e+14 "
+                "(그 밖의 C1: PF-search v2 (C1-3) 0.121, PF (C1-2) 0.018, PF (C1-1) 0.005)",
+    "parity": "PF (C1-1) 분포 안 1.000 · 분포 밖 1.000 · 1.000 · 1.000; 판정 시점까지 학습 FLOPs 6.34e+12",
+    "mqar": "PF (C1-1) 질의별 분포 안 0.989 · 분포 밖 0.993 · 0.997 · 0.998, 시퀀스 전체 0.922 · 0.876 · 0.904 · "
+            "0.910; 판정 시점까지 학습 FLOPs 4.41e+13",
+}
+
+
+def c3_lines(d, f, cfg):
+    """C3-1 student: the compiled table, the pre-check and the FLOPs of every stage (13.3)"""
+    t = f["task"]
+    cr = cfg["pf_search"]["search"]
+    teacher = json.loads((HERE / "results" / "c3" / ("c3_%s__rope__1M__s0__N100000" % t) / "final.json").read_text())
+    tf = teacher["judgment"]["train_flops_cum"]
+    ef = cr["extraction"]["flops"]
+    sf = f["judgment"]["train_flops_cum"]
+    pc = cr["precheck"]["dependency"]
+    return [
+        "- 사전 확인 (13.2): 의존도 점수 정답 표 %.4f · 전부 정지 표 %.4f (비 %.2f, 기준 ≥2); 주의 가중치(보조) %.4f · %.4f"
+        % (pc["correct"], pc["all_stay"], pc["ratio"], cr["precheck"]["attention_aux"]["correct"],
+           cr["precheck"]["attention_aux"]["all_stay"]),
+        "- 컴파일된 표 (stay가 아닌 칸): %s; 헤드별 덮은 의존도 %s" % (
+            "; ".join("%s: %s" % (h, ", ".join("%s→%s" % (c, mv) for c, mv in row.items() if mv != "stay") or "모두 stay")
+                      for h, row in cr["policy_named"].items()),
+            " · ".join("%.4f" % ph["score_after_cover"] for ph in cr["per_head"])),
+        "- 참고 (판정 무관): 정답 표 헤드가 읽는 자리를 컴파일된 표의 어느 헤드가 읽는 비율 %s" % " · ".join(
+            "%.3f" % v for v in cr["reference_agreement_with_correct_table"].values()),
+        "- 단계별 FLOPs (13.3): 교사(판정 시점까지) %.2e + 의존도 추출 %.2e + 학생(판정 시점까지) %.2e = **%.2e**; "
+        "표 탐색은 헤드 시뮬레이션 연산 %.2e회 (FLOPs와 별도; 서로 다른 경로 %d개로 열 %d개 전부의 점수를 얻음)"
+        % (tf, ef, sf, tf + ef + sf, cr["search"]["head_simulation_operations"],
+           cr["search"]["distinct_paths_simulated"], cr["search"]["columns"]),
+    ]
+
+
 def labels(phase, task, kind="pf"):
     """(heading label, question, commit label) for a run"""
+    if phase == "c3" and kind == "rope":
+        return ("C3-1 교사",
+                "C3-1 1단계 — 교사 `rope` 학습 (기준선 rope와 같은 규약, 시드 0; 판정 체크포인트를 교사로 로컬 보관)",
+                "C3-1 교사")
+    if phase == "c3":
+        q = ("C3-1 — rope에서 배운 의존 구조를 PF 이동 표로 컴파일한 학생 모델이 %s를 분포 안에서 배우는가? 분포 밖에서는? "
+             "(유효성 기준 ≥0.95, 시드 0)" % NAME_T[task] if task != "mqar" else
+             "C3-1 — 컴파일된 PF 학생의 MQAR 결과 (판정 기준 없음; 질의별·시퀀스 전체 보고)")
+        return "C3-1 학생", q, "C3-1 학생"
     if phase == "c1_3" and kind == "pf_search":
         return ("C1-3 (PF-search v2)",
                 "C1-3 — 점수를 손실로 고친 PF-search(설계서 12절)가 찾은 이동 정책 표와 경사하강 갱신 제어기가 %s를 "
@@ -182,11 +227,13 @@ def entry(d):
     oods_last = " · ".join("%s: %.3f" % (lab(l), v) for l, v in last["acc"].items() if l.startswith("ood"))
     phase = cfg.get("phase", "phaseA2")
     head, question, _ = labels(phase, t, k)
+    kname = "PF 학생 (C3)" if phase == "c3" and k == "pf_search" else NAME_K[k]
     date = time.strftime("%Y-%m-%d", time.gmtime())
     lines = [
-        "## %s · %s · %s / %s" % (date, head, NAME_T[t], NAME_K[k]),
+        "## %s · %s · %s / %s" % (date, head, NAME_T[t], kname),
         "- 질문: %s" % question,
-        "- 질문에 대한 답: %s" % (answer_c1(f) if phase in ("c1", "c1_2", "c1_3") else answer4(f) if phase == "phaseA4" else
+        "- 질문에 대한 답: %s" % (("참고 — 교사 (판정 기준 없음; 분포 안 %.3f)" % idv(f)) if phase == "c3" and k == "rope"
+                                  else answer_c1(f) if phase in ("c1", "c1_2", "c1_3", "c3") else answer4(f) if phase == "phaseA4" else
                                   answer3(f) if phase == "phaseA3" else answer(t, k)),
         "- 코드 커밋: `%s`%s · 원자료: `%s/`" % (
             (env.get("code_commit") or "?")[:7], " (작업 트리 수정 있음)" if env.get("code_dirty") else "",
@@ -196,15 +243,28 @@ def entry(d):
         "| 과제 | 기준선 | 규모 | 데이터 수 | 분포 안 정확도 | 분포 밖 정확도(구간별) | 학습 FLOPs | 시간 (학습 / 평가) |",
         "|---|---|---|---|---|---|---|---|",
         "| %s | %s | %s | %s | %.3f (step %d) | %s | %.2e (판정 시점까지) / %.2e (전체) | %.0f s / %.0f s |" % (
-            NAME_T[t], NAME_K[k], format(f["params"], ","), format(f["N"], ","), idv(f), j["step"], oods,
+            NAME_T[t], kname, format(f["params"], ","), format(f["N"], ","), idv(f), j["step"], oods,
             j["train_flops_cum"], f["train_flops"], f["wall_train_s"], f["wall_eval_s"]),
         "",
         "- 마지막 시점 (step %d): 분포 안 %.3f · 분포 밖 %s" % (
             last["step"], [v for l, v in last["acc"].items() if l.startswith("id")][0], oods_last),
     ]
-    if phase in ("c1", "c1_2", "c1_3") and t in BASE_REF:
+    if phase in ("c1", "c1_2", "c1_3", "c3") and t in BASE_REF:
         lines.append("- 같은 과제의 기준선 최고값 (동결, 설계서 7절): %s" % BASE_REF[t])
-    if k == "pf_search" and cfg.get("pf_search"):
+    if phase == "c3" and k == "rope":
+        b = HERE / "results" / "phaseA4" / ("phaseA4_%s__rope__1M__s0__N100000" % t) / "final.json"
+        if b.exists():
+            bf = json.loads(b.read_text())
+            lines.append("- 같은 규약의 기준선 rope (Phase A‴, 같은 시드): 분포 안 %.3f (step %d) · 분포 밖 %s; 판정 시점까지 "
+                         "학습 FLOPs %.2e" % (idv(bf), bf["judgment"]["step"], " · ".join(
+                             "%.3f" % v for l, v in bf["judgment"]["acc"].items() if l.startswith("ood")),
+                                               bf["judgment"]["train_flops_cum"]))
+        lines.append("- 교사 체크포인트: `teacher_best.pt` (판정 시점 가중치)와 `ckpt.pt`를 로컬에만 보관 (git 제외)")
+    if phase == "c3" and k == "pf_search":
+        lines.extend(c3_lines(d, f, cfg))
+        if t in C1_BEST:
+            lines.append("- 같은 과제의 C1 최고값: %s" % C1_BEST[t])
+    elif k == "pf_search" and cfg.get("pf_search"):
         sr = cfg["pf_search"]["search"]
         sc = ("탐색 점수(분포 안 검증 답 토큰 교차 엔트로피) %.4f" % sr["best_score_in_distribution_validation_loss"]
               if "best_score_in_distribution_validation_loss" in sr else

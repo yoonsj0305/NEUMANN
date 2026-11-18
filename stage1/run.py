@@ -355,6 +355,12 @@ def main(a):
             if st["hits"] >= 2:
                 stop = "early stop: in-distribution >= 99% at two consecutive evaluations"
             st["last_rec"] = rec
+            if a.keep_best and rec["acc"][id_label] > st.get("best_id", -1.0):
+                # C3 teacher: the judgment checkpoint (highest in-distribution, earliest if tied) kept locally
+                torch.save({"model": model.state_dict(), "step": st["step"], "acc": rec["acc"], "kind": a.kind,
+                            "cfg": cfg, "train_flops_cum": st["train_flops"]}, str(out / "teacher_best.pt") + ".tmp")
+                os.replace(str(out / "teacher_best.pt") + ".tmp", out / "teacher_best.pt")
+                st["best_id"] = rec["acc"][id_label]
             # checkpoint first, atomically (a kill during the write leaves the previous checkpoint intact), then the
             # log row; a resume writes the row again only if the kill fell between the two
             torch.save({"model": model.state_dict(), "opt": opt.state_dict(), "sched": sched.state_dict(),
@@ -391,7 +397,7 @@ def main(a):
            "primary_eval_rule": "looped / looped_rr: recurrence 4 x ceil(bin upper / training upper) (declared before "
                                 "runs); fixed 4 recorded as acc_fixed4"}
     final.write_text(json.dumps(res, indent=1))
-    if ck.exists():
+    if ck.exists() and not a.keep_best:
         ck.unlink()                                   # the record is the log + final; checkpoints are not kept
     print("FINAL", name, stop, {k: round(v, 3) for k, v in last["acc"].items()}, flush=True)
 
@@ -402,6 +408,8 @@ if __name__ == "__main__":
     p.add_argument("--kind", choices=("abacus", "looped", "gru", "looped_rr", "rope", "pf", "pf_cont", "pf2",
                                       "pf_search"), required=True)
     p.add_argument("--policy", default="", help="pf_search: search_result.json of stage1/pf_search.py")
+    p.add_argument("--keep-best", action="store_true",
+                   help="C3 teacher: keep teacher_best.pt (judgment checkpoint) and ckpt.pt locally (not committed)")
     p.add_argument("--phase", default="phaseA2", help="results/<phase>/; Phase A records were written as phaseA")
     p.add_argument("--scale", default="1M")
     p.add_argument("--seed", type=int, default=0)
