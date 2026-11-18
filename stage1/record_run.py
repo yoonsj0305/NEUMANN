@@ -190,6 +190,68 @@ def stage1_signal_line(f, total_flops):
     return None
 
 
+C4_TAG = {"compiled": "컴파일된 표", "allstay": "전부 정지 표"}
+
+
+def c4_tag(f):
+    return f["name"].split("__")[-1] if f["name"].count("__") > 4 else ""
+
+
+def c4_answer(f):
+    sp = HERE / "results" / "c4" / ("selection_%s_s%d.json" % (f["task"], f["seed"]))
+    if not sp.exists():
+        return "미정 (선택 전)"
+    sel = json.loads(sp.read_text())
+    return "%s (분포 안 %.3f; 선택용 검증 %.3f)" % (
+        "선택됨" if sel["selected"] == c4_tag(f) else "선택 안 됨", idv(f),
+        sel["students"][c4_tag(f)]["selection_accuracy"])
+
+
+def c4_labels(f):
+    t, k, sd, tag = f["task"], f["kind"], f["seed"], c4_tag(f)
+    if k == "rope":
+        return ("C4 교사 (시드 %d)" % sd,
+                "C4 — 시드 %d 교사 `rope` 학습 (기준선 규약; 판정 체크포인트를 교사로 로컬 보관)" % sd, "C4 교사 s%d" % sd)
+    return ("C4 학생 (시드 %d, %s)" % (sd, C4_TAG.get(tag, tag)),
+            "C4 — 시드 %d의 %s 학생 (%s; 두 학생 중 선택 전용 분포 안 검증으로 하나를 고르고, 선택된 학생만 7절로 판정)"
+            % (sd, C4_TAG.get(tag, tag), NAME_T[t]), "C4 학생 s%d %s" % (sd, tag))
+
+
+def c4_student_lines(f):
+    """C4 student: its table, the selection (design 15) and, if selected, the 7절 check with the total FLOPs"""
+    t, sd, tag = f["task"], f["seed"], c4_tag(f)
+    R4 = HERE / "results" / "c4"
+    lines = []
+    cr = json.loads((R4 / ("%s_compile_s%d" % (t, sd)) / "compile_result.json").read_text())
+    if tag == "compiled":
+        lines.append("- 컴파일된 표 (stay가 아닌 칸): %s; 사전 확인 비 %.2f%s" % (
+            "; ".join("%s: %s" % (h, ", ".join("%s→%s" % (c, mv) for c, mv in row.items() if mv != "stay") or "모두 stay")
+                      for h, row in cr["policy_named"].items()), cr["precheck"]["dependency"]["ratio"],
+            " (기록만, 적용 안 함)" if cr["precheck"].get("gate_applied") is False else ""))
+    else:
+        lines.append("- 표: 전부 정지 (`stage1/results/c4/allstay_policy.json`)")
+    sp = R4 / ("selection_%s_s%d.json" % (t, sd))
+    if sp.exists():
+        sel = json.loads(sp.read_text())
+        st = sel["students"]
+        lines.append("- 선택 (15절, 선택 전용 검증 %d개, 생성 시드 `%s`): %s; 규칙 — %s; 결과 — **%s** (%s)" % (
+            sel["selection_set"]["size"], sel["selection_set"]["generation_seed"],
+            " · ".join("%s %.3f (움직이는 헤드 %d)" % (C4_TAG[k], v["selection_accuracy"], v["moving_heads"])
+                       for k, v in st.items()), sel["rule"], C4_TAG[sel["selected"]], sel["reason"]))
+        if sel["selected"] == tag:
+            tf = cr["teacher"]["train_flops_to_judgment"]
+            ef = cr["extraction"]["flops"]
+            sf = {k: json.loads((HERE.parent / v["run"] / "final.json").read_text())["judgment"]["train_flops_cum"]
+                  for k, v in st.items()}
+            total = tf + ef + sum(sf.values())
+            lines.append("- 합계 FLOPs (15절): 교사 %.2e + 의존도 추출 %.2e + %s = **%.2e** (학생은 판정 시점까지)" % (
+                tf, ef, " + ".join("학생 %s %.2e" % (C4_TAG[k], v) for k, v in sf.items()), total))
+            sl = stage1_signal_line(f, total)
+            if sl:
+                lines.append(sl)
+    return lines
+
+
 def labels(phase, task, kind="pf"):
     """(heading label, question, commit label) for a run"""
     if phase == "c3" and kind == "rope":
@@ -288,19 +350,23 @@ def entry(d):
     oods = " · ".join("%s: %.3f" % (lab(l), v) for l, v in j["acc"].items() if l.startswith("ood"))
     oods_last = " · ".join("%s: %.3f" % (lab(l), v) for l, v in last["acc"].items() if l.startswith("ood"))
     phase = cfg.get("phase", "phaseA2")
-    head, question, _ = (c33_labels(f) if phase == "c3_3" else
+    head, question, _ = (c4_labels(f) if phase == "c4" else c33_labels(f) if phase == "c3_3" else
                          c32_labels(f) if phase == "c3" and c32_labels(f) else labels(phase, t, k))
     kname = "PF 학생 (C3)" if phase == "c3" and k == "pf_search" else NAME_K[k]
     if phase == "c3":
         kname += (" 대조군: 학습 전 교사" if "ctrl" in (f["name"].split("__")[-1]) else "") + " · 시드 %d" % f["seed"]
     if phase == "c3_3":
         kname = ("PF 학생 (C3-3)" if k == "pf_search" else NAME_K[k]) + " · 시드 %d" % f["seed"]
+    if phase == "c4":
+        kname = (("PF 학생 (C4, %s)" % C4_TAG.get(c4_tag(f), c4_tag(f))) if k == "pf_search" else NAME_K[k]) + \
+            " · 시드 %d" % f["seed"]
     date = time.strftime("%Y-%m-%d", time.gmtime())
     lines = [
         "## %s · %s · %s / %s" % (date, head, NAME_T[t], kname),
         "- 질문: %s" % question,
         "- 질문에 대한 답: %s" % (("참고 — 교사 (판정 기준 없음; 분포 안 %.3f)" % idv(f))
-                                  if phase in ("c3", "c3_3") and k == "rope"
+                                  if phase in ("c3", "c3_3", "c4") and k == "rope"
+                                  else c4_answer(f) if phase == "c4"
                                   else answer_c1(f) if phase in ("c1", "c1_2", "c1_3", "c3", "c3_3") else answer4(f) if phase == "phaseA4" else
                                   answer3(f) if phase == "phaseA3" else answer(t, k)),
         "- 코드 커밋: `%s`%s · 원자료: `%s/`" % (
@@ -317,8 +383,14 @@ def entry(d):
         "- 마지막 시점 (step %d): 분포 안 %.3f · 분포 밖 %s" % (
             last["step"], [v for l, v in last["acc"].items() if l.startswith("id")][0], oods_last),
     ]
-    if phase in ("c1", "c1_2", "c1_3", "c3", "c3_3") and t in BASE_REF:
+    if phase in ("c1", "c1_2", "c1_3", "c3", "c3_3", "c4") and t in BASE_REF:
         lines.append("- 같은 과제의 기준선 최고값 (동결, 설계서 7절): %s" % BASE_REF[t])
+    if phase == "c4" and k == "rope":
+        lines.append("- 교사 체크포인트: `teacher_best.pt` (판정 시점 가중치)와 `ckpt.pt`를 로컬에만 보관 (git 제외)")
+    if phase == "c4" and k == "pf_search":
+        lines.extend(c4_student_lines(f))
+        if t in C1_BEST:
+            lines.append("- 같은 과제의 C1 최고값: %s" % C1_BEST[t])
     if phase == "c3_3" and k == "rope":
         lines.append("- 교사 체크포인트: `teacher_best.pt` (판정 시점 가중치)와 `ckpt.pt`를 로컬에만 보관 (git 제외)")
     if phase == "c3_3" and k == "pf_search":
@@ -346,7 +418,7 @@ def entry(d):
         lines.extend(c3_lines(d, f, cfg))
         if t in C1_BEST:
             lines.append("- 같은 과제의 C1 최고값: %s" % C1_BEST[t])
-    elif k == "pf_search" and cfg.get("pf_search") and phase != "c3_3":
+    elif k == "pf_search" and cfg.get("pf_search") and phase not in ("c3_3", "c4"):
         sr = cfg["pf_search"]["search"]
         sc = ("탐색 점수(분포 안 검증 답 토큰 교차 엔트로피) %.4f" % sr["best_score_in_distribution_validation_loss"]
               if "best_score_in_distribution_validation_loss" in sr else
@@ -396,7 +468,7 @@ def main(a):
     cfg = json.loads((d / "config.json").read_text())
     msg = "stage1 %s: %s %s (분포 안 %.3f @ step %d)\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n" \
           "Claude-Session: https://claude.ai/code/session_01VSWBvg7gXA6QqLM5pig7M5\n" % (
-              (c33_labels(f) if cfg.get("phase") == "c3_3" else
+              (c4_labels(f) if cfg.get("phase") == "c4" else c33_labels(f) if cfg.get("phase") == "c3_3" else
                c32_labels(f) if cfg.get("phase") == "c3" and c32_labels(f) else
                labels(cfg.get("phase", "phaseA2"), f["task"], f["kind"]))[2], f["task"], f["kind"], idv(f), j["step"])
     files = [str(res.relative_to(root)), str(d.relative_to(root))]
