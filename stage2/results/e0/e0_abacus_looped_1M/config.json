@@ -1,0 +1,26 @@
+{
+ "run": "abacus_looped_1M",
+ "kind": "abacus_looped",
+ "scale": "1M",
+ "d": 92,
+ "heads": 4,
+ "layers": 8,
+ "recur": 2,
+ "params": 868020,
+ "seed": 0,
+ "batch": 64,
+ "base_lr": 0.001,
+ "optimizer": "AdamW betas (0.9, 0.98) wd 0.1 clip 1.0",
+ "lr_schedule": "by training FLOPs: linear warm-up 5 % of 1.79e15, cosine to 10 % at 1.79e15, then constant",
+ "budget": 1790000000000000.0,
+ "target": "first evaluation with ood_11-20 >= 0.95 and ood_21-30 >= 0.95",
+ "data": "fresh every batch: T.draw(addition, 1..10, train_dist=True)",
+ "eval": "T.eval_sets(addition, 1000, 500)",
+ "abacus_offset": "per batch shift beta - 1, beta ~ U[1, 100]; test beta = 1",
+ "position_coupling": null,
+ "progressive_loss_alpha": 1.0,
+ "test_recurrence": {
+  "primary": "training recurrences (2), as the paper",
+  "acc_scaled": "stage-1 looped rule: 2 x ceil(bin upper / 10) for the ood bins (recorded only)"
+ }
+}
