@@ -46,6 +46,13 @@ def main():
         reach52 = min([r for r in (reach, reach_s) if r is not None], key=lambda r: r["step"], default=None)
         first = {b: next((r["train_flops_cum"] for r in rs if r["acc"][b] >= 0.95), None) for b in BINS}
         best = {b: max(r["acc"][b] for r in rs) for b in BINS}
+        def closest(r):                      # the checkpoint nearest the reach condition: min(11–20, 21–30), either rule
+            v = min(r["acc"]["ood_11-20"], r["acc"]["ood_21-30"])
+            if "acc_scaled" in r:
+                v = max(v, min(r["acc_scaled"]["ood_11-20"], r["acc_scaled"]["ood_21-30"]))
+            return (v, r["acc"]["ood_11-20"])
+        bc = max(rs, key=closest)
+        at10 = at(rs, 1.79e15) if rs[-1]["train_flops_cum"] >= 1.79e15 * 0.9999 else None
         summary["runs"][run] = {
             "evaluations": len(rs), "last_step": rs[-1]["step"], "last_flops": rs[-1]["train_flops_cum"],
             "last_acc": rs[-1]["acc"],
@@ -58,6 +65,11 @@ def main():
                 "rule": "primary" if reach52 is reach else "acc_scaled", "step": reach52["step"],
                 "train_flops_cum": reach52["train_flops_cum"], "multiple_of_C3": reach52["train_flops_cum"] / C3},
             "first_flops_bin_ge_0.95": first, "best_acc": best,
+            "closest_checkpoint": {"step": bc["step"], "train_flops_cum": bc["train_flops_cum"],
+                                   "multiple_of_C3": bc["train_flops_cum"] / C3, "acc": bc["acc"],
+                                   "acc_scaled": bc.get("acc_scaled")},
+            "at_10x": None if at10 is None else {"step": at10["step"], "acc": at10["acc"],
+                                                 "acc_scaled": at10.get("acc_scaled")},
             "at_points": {"%.3g" % f: (None if at(rs, f) is None else
                                        {"step": at(rs, f)["step"], "train_flops_cum": at(rs, f)["train_flops_cum"],
                                         "acc": at(rs, f)["acc"], "acc_scaled": at(rs, f).get("acc_scaled")})
@@ -74,6 +86,10 @@ def main():
                 s = r.get("acc_scaled", {})
                 line += " | " + " / ".join(fmt(s.get(b)) for b in BINS[1:])
             print(line + " |")
+        print("closest checkpoint (max of min(11–20, 21–30), either rule): step %d, %.3e FLOPs = %.2f x C3, %s%s" % (
+            bc["step"], bc["train_flops_cum"], bc["train_flops_cum"] / C3,
+            " / ".join("%s %s" % (b, fmt(bc["acc"][b])) for b in BINS),
+            "" if "acc_scaled" not in bc else "; scaled " + " / ".join(fmt(bc["acc_scaled"][b]) for b in BINS[1:])))
         print("reach (primary): %s" % ("not reached" if reach is None else "step %d, %.3e FLOPs = %.2f x C3"
                                          % (reach["step"], reach["train_flops_cum"], reach["train_flops_cum"] / C3)))
         if "looped" in run:
