@@ -1,0 +1,183 @@
+{
+ "teacher": "abacus",
+ "task": "addition",
+ "checkpoint": "stage2/results/d1_0/d1_0_addition__abacus__1M__s0__N100000/teacher_best.pt",
+ "checkpoint_step": 12000,
+ "heads_total": 16,
+ "selection_set": {
+  "generation_seed": "select:addition",
+  "size": 1000,
+  "lengths": [
+   1,
+   10
+  ],
+  "metric": "exact match"
+ },
+ "selection_acc": {
+  "a": 0.988,
+  "b": 0.0,
+  "c": 0.987
+ },
+ "c_kept_heads": [
+  [
+   0,
+   2
+  ],
+  [
+   1,
+   0
+  ],
+  [
+   3,
+   2
+  ]
+ ],
+ "c_trace": [
+  {
+   "head": [
+    0,
+    0
+   ],
+   "selection_acc_with_head": 0.251,
+   "kept": false
+  },
+  {
+   "head": [
+    0,
+    1
+   ],
+   "selection_acc_with_head": 0.976,
+   "kept": false
+  },
+  {
+   "head": [
+    0,
+    2
+   ],
+   "selection_acc_with_head": 0.995,
+   "kept": true
+  },
+  {
+   "head": [
+    0,
+    3
+   ],
+   "selection_acc_with_head": 0.716,
+   "kept": false
+  },
+  {
+   "head": [
+    1,
+    0
+   ],
+   "selection_acc_with_head": 0.989,
+   "kept": true
+  },
+  {
+   "head": [
+    1,
+    1
+   ],
+   "selection_acc_with_head": 0.0,
+   "kept": false
+  },
+  {
+   "head": [
+    1,
+    2
+   ],
+   "selection_acc_with_head": 0.376,
+   "kept": false
+  },
+  {
+   "head": [
+    1,
+    3
+   ],
+   "selection_acc_with_head": 0.043,
+   "kept": false
+  },
+  {
+   "head": [
+    2,
+    0
+   ],
+   "selection_acc_with_head": 0.001,
+   "kept": false
+  },
+  {
+   "head": [
+    2,
+    1
+   ],
+   "selection_acc_with_head": 0.001,
+   "kept": false
+  },
+  {
+   "head": [
+    2,
+    2
+   ],
+   "selection_acc_with_head": 0.379,
+   "kept": false
+  },
+  {
+   "head": [
+    2,
+    3
+   ],
+   "selection_acc_with_head": 0.014,
+   "kept": false
+  },
+  {
+   "head": [
+    3,
+    0
+   ],
+   "selection_acc_with_head": 0.381,
+   "kept": false
+  },
+  {
+   "head": [
+    3,
+    1
+   ],
+   "selection_acc_with_head": 0.982,
+   "kept": false
+  },
+  {
+   "head": [
+    3,
+    2
+   ],
+   "selection_acc_with_head": 0.987,
+   "kept": true
+  },
+  {
+   "head": [
+    3,
+    3
+   ],
+   "selection_acc_with_head": 0.98,
+   "kept": false
+  }
+ ],
+ "rule": "(c): keep a head if the selection accuracy with it (on top of the kept heads) >= (a) - 0.005; choice: higher selection accuracy of (b) and (c), tie -> (c)",
+ "choice": "c",
+ "a_id_eval": {
+  "acc": 0.998
+ },
+ "stage1_reference": {
+  "source": "stage1/results/phaseA/addition__abacus__1M__s0__N100000 log step 12000",
+  "step": 12000,
+  "acc": {
+   "id_1-10": 0.998,
+   "ood_11-20": 0.24,
+   "ood_21-30": 0.0,
+   "ood_31-40": 0.0
+  },
+  "acc_seq": null
+ },
+ "a_id_equals_stage1": true,
+ "wall_s": 14.3
+}
