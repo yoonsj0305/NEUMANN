@@ -158,12 +158,15 @@ def env():
 
 
 def evaluate(model, cfg, evals):
-    out = {}
+    """exact match on every bin; abacus_looped is primarily scored with its training recurrences (2, as the paper);
+    the stage-1 looped rule (recurrences x ceil(bin upper / 10)) is recorded alongside as acc_scaled"""
+    rc = {"d": cfg["d"], "layers": cfg["layers"], "block_layers": cfg["layers"], "recur": cfg.get("recur", 1)}
+    out, scaled = {}, {}
     for label, ex in evals.items():
-        acc, _ = R.exact_match(model, ex, cfg["kind"], {"d": cfg["d"], "layers": cfg["layers"],
-                                                         "block_layers": cfg["layers"], "recur": cfg.get("recur", 1)})
-        out[label] = acc
-    return out
+        out[label], _ = R.exact_match(model, ex, cfg["kind"], rc)
+        if cfg["kind"] == "abacus_looped" and R.ratio("addition", label) > 1:
+            scaled[label], _ = R.exact_match(model, ex, cfg["kind"], rc, recur=cfg["recur"] * R.ratio("addition", label))
+    return out, scaled
 
 
 def main(a):
@@ -208,7 +211,10 @@ def main(a):
                               "abacus_looped": "per batch shift beta - 1, beta ~ U[1, 100]; test beta = 1"}.get(cfg["kind"]),
             "position_coupling": {"max_pos": PC_MAX_POS, "train_start": "per sequence uniform 1 .. max_pos - max(la,lb) - 1",
                                   "test_start": 1} if cfg["kind"] == "position_coupling" else None,
-            "progressive_loss_alpha": PROG_ALPHA if cfg["kind"] == "abacus_looped" else None}, indent=1))
+            "progressive_loss_alpha": PROG_ALPHA if cfg["kind"] == "abacus_looped" else None,
+            "test_recurrence": {"primary": "training recurrences (2), as the paper",
+                                "acc_scaled": "stage-1 looped rule: 2 x ceil(bin upper / 10) for the ood bins (recorded only)"}
+            if cfg["kind"] == "abacus_looped" else None}, indent=1))
         (d / "env.json").write_text(json.dumps(env(), indent=1))
     if st.get("last_rec") and logf.exists():            # a cut between checkpoint and log line: restore the line
         logged = [json.loads(l).get("step", -1) for l in open(logf)]
@@ -270,11 +276,14 @@ def main(a):
             st["wall_train"] += time.time() - t_seg
             t_ev = time.time()
             model.eval()
-            acc = evaluate(model, cfg, evals)
+            acc, acc_scaled = evaluate(model, cfg, evals)
             st["wall_eval"] += time.time() - t_ev
             rec = {"step": st["step"], "train_flops_cum": st["flops"], "train_loss_mean": round(sum(window) / len(window), 5),
                    "lr": opt.param_groups[0]["lr"], "acc": acc, "wall_train_s_cum": round(st["wall_train"], 1),
                    "wall_eval_s_cum": round(st["wall_eval"], 1), "segment": seg["segment"]}
+            if acc_scaled:
+                rec["acc_scaled"] = acc_scaled
+                rec["recur_scaled"] = {k: cfg["recur"] * R.ratio("addition", k) for k in acc_scaled}
             window = []
             if acc["ood_11-20"] >= TARGET and acc["ood_21-30"] >= TARGET:
                 st["reached"] = {"step": st["step"], "train_flops_cum": st["flops"], "acc": acc}
