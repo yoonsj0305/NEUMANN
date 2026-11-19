@@ -9,7 +9,8 @@ for r in "$@"; do
   (
     echo "$(date '+%F %T') launch $r $EXTRA max_wall=$MAX_WALL" >> $LOG
     python stage2/e0.py --run "$r" --resume --max-wall "$MAX_WALL" $EXTRA >> "${OUT_DIR:-/tmp}/e0_$r.stdout" 2>&1
-    echo "$(date '+%F %T') exit $? $r" >> $LOG
+    rc=$?
+    echo "$(date '+%F %T') exit $rc $r" >> $LOG
   ) &
 done
 wait

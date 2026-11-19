@@ -12,7 +12,7 @@ ROOT = HERE.parent
 OUT = HERE / "results" / "e0"
 C3 = 1.79e14
 BINS = ["id_1-10", "ood_11-20", "ood_21-30", "ood_31-40"]
-RUNS = ["abacus_ii_1M", "abacus_looped_1M", "abacus_looped_10M", "position_coupling_1M"]
+RUNS = ["abacus_ii_1M", "abacus_looped_1M", "abacus_looped_10M", "position_coupling_1M", "position_coupling_pad_1M"]
 POINTS = [2.5e13, 5e13, 1e14, 1.79e14, 2.5e14, 5.18e14, 1e15, 1.79e15, 3e15, 5.37e15]
 LOOPED_RR = ROOT / "stage1/results/phaseA2/phaseA2_addition__looped_rr__1M__s0__N100000/log.jsonl"
 
