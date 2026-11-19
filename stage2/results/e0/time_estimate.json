@@ -1,0 +1,40 @@
+{
+ "method": "four e0.py runs at once, 1 thread each, Intel Xeon 2.10GHz 4 cores; training FLOP/s and evaluation seconds from the first 400 (10M: 40) steps; evaluation every 1,000 steps in the real runs",
+ "runs": {
+  "abacus_ii_1M": {
+   "train_flops_per_s": 62258543833.580986,
+   "flops_per_step": 10475000000.0,
+   "eval_s_each": 4.1,
+   "steps_to_10x": 170883,
+   "hours_to_10x": 8.18,
+   "hours_10x_to_30x_if_extended": 15.97
+  },
+  "abacus_looped_1M": {
+   "train_flops_per_s": 51628849270.664505,
+   "flops_per_step": 15927500000.0,
+   "eval_s_each": 9.95,
+   "steps_to_10x": 112384,
+   "hours_to_10x": 9.94,
+   "hours_10x_to_30x_if_extended": 19.26
+  },
+  "abacus_looped_10M": {
+   "train_flops_per_s": 87633495145.63106,
+   "flops_per_step": 180525000000.0,
+   "eval_s_each": 63.35,
+   "steps_to_10x": 9916,
+   "hours_to_10x": 5.85,
+   "hours_10x_to_30x_if_extended": 11.35
+  },
+  "position_coupling_1M": {
+   "train_flops_per_s": 74501779359.4306,
+   "flops_per_step": 10467500000.0,
+   "eval_s_each": 3.5,
+   "steps_to_10x": 171005,
+   "hours_to_10x": 6.84,
+   "hours_10x_to_30x_if_extended": 13.35
+  }
+ },
+ "hours_10x_phase_parallel": 9.94,
+ "hours_worst_case_total": 29.2,
+ "cap_hours": 48
+}
