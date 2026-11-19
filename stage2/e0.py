@@ -148,6 +148,14 @@ def iter_only(cfg, B, Tn):
     return B * Tn * 2 * 12 * d * d * L + 4 * B * Tn * Tn * d * L
 
 
+def reach_rule(acc, acc_scaled):
+    """5.2: reached when, under one test rule, ood_11-20 and ood_21-30 are both >= 0.95; abacus_looped has two rules
+    (its training recurrences, and acc_scaled), the earlier counts"""
+    hit = [name for name, a in (("primary", acc), ("acc_scaled", acc_scaled or None))
+           if a and a.get("ood_11-20", 0) >= TARGET and a.get("ood_21-30", 0) >= TARGET]
+    return hit or None
+
+
 def lr_at(flops, base):
     w = 0.05 * BUDGET_10X
     if flops < w:
@@ -237,8 +245,16 @@ def main(a):
         if max(logged) < st["last_rec"]["step"]:
             with open(logf, "a") as fh:
                 fh.write(json.dumps({**st["last_rec"], "restored_from_checkpoint": True}) + "\n")
+    if st["reached"] is None and logf.exists():          # a reach under a rule an earlier code version did not stop on
+        for r in (json.loads(l) for l in open(logf)):
+            if "step" in r and reach_rule(r["acc"], r.get("acc_scaled")):
+                st["reached"] = {"step": r["step"], "train_flops_cum": r["train_flops_cum"], "acc": r["acc"],
+                                 "acc_scaled": r.get("acc_scaled"), "rule": reach_rule(r["acc"], r.get("acc_scaled")),
+                                 "detected_on_resume": True, "trained_until_step": st["step"]}
+                break
     seg = {"segment": len(st["segments"]), "start_step": st["step"], "started": time.strftime("%Y-%m-%d %H:%M:%S"),
-           "budget": budget, "max_wall_s": a.max_wall, "threads": a.threads}
+           "budget": budget, "max_wall_s": a.max_wall, "threads": a.threads,
+           "reach_rule": "5.2: either test rule, both bins under the same rule"}
     ev = "start" if seg["segment"] == 0 else ("extend" if st["segments"][-1]["budget"] < budget else "resume")
     st["segments"].append(seg)
     with open(logf, "a") as fh:
@@ -305,8 +321,9 @@ def main(a):
                 rec["acc_scaled"] = acc_scaled
                 rec["recur_scaled"] = {k: cfg["recur"] * R.ratio("addition", k) for k in acc_scaled}
             window = []
-            if acc["ood_11-20"] >= TARGET and acc["ood_21-30"] >= TARGET:
-                st["reached"] = {"step": st["step"], "train_flops_cum": st["flops"], "acc": acc}
+            if reach_rule(acc, acc_scaled):
+                st["reached"] = {"step": st["step"], "train_flops_cum": st["flops"], "acc": acc,
+                                 "acc_scaled": acc_scaled or None, "rule": reach_rule(acc, acc_scaled)}
             st["last_rec"] = rec
             save()
             with open(logf, "a") as fh:
@@ -330,6 +347,8 @@ def main(a):
            "multiple_of_C3": (st["reached"]["train_flops_cum"] / C3_FLOPS) if st["reached"] else None,
            "best_ood_11_20": max(r["acc"]["ood_11-20"] for r in rows),
            "best_ood_21_30": max(r["acc"]["ood_21-30"] for r in rows),
+           "best_scaled_ood_11_20": max((r["acc_scaled"]["ood_11-20"] for r in rows if "acc_scaled" in r), default=None),
+           "best_scaled_ood_21_30": max((r["acc_scaled"]["ood_21-30"] for r in rows if "acc_scaled" in r), default=None),
            "last": rows[-1], "wall_train_s": round(st["wall_train"], 1), "wall_eval_s": round(st["wall_eval"], 1),
            "segments": st["segments"]}
     final.write_text(json.dumps(fin, indent=1))

@@ -43,6 +43,7 @@ def main():
         reach = next((r for r in rs if r["acc"]["ood_11-20"] >= 0.95 and r["acc"]["ood_21-30"] >= 0.95), None)
         reach_s = next((r for r in rs if "acc_scaled" in r and r["acc_scaled"]["ood_11-20"] >= 0.95
                         and r["acc_scaled"]["ood_21-30"] >= 0.95), None)
+        reach52 = min([r for r in (reach, reach_s) if r is not None], key=lambda r: r["step"], default=None)
         first = {b: next((r["train_flops_cum"] for r in rs if r["acc"][b] >= 0.95), None) for b in BINS}
         best = {b: max(r["acc"][b] for r in rs) for b in BINS}
         summary["runs"][run] = {
@@ -53,6 +54,9 @@ def main():
             "reached_secondary_scaled_recurrence": None if reach_s is None else {
                 "step": reach_s["step"], "train_flops_cum": reach_s["train_flops_cum"],
                 "multiple_of_C3": reach_s["train_flops_cum"] / C3, "acc_scaled": reach_s["acc_scaled"]},
+            "reached_5_2": None if reach52 is None else {
+                "rule": "primary" if reach52 is reach else "acc_scaled", "step": reach52["step"],
+                "train_flops_cum": reach52["train_flops_cum"], "multiple_of_C3": reach52["train_flops_cum"] / C3},
             "first_flops_bin_ge_0.95": first, "best_acc": best,
             "at_points": {"%.3g" % f: (None if at(rs, f) is None else
                                        {"step": at(rs, f)["step"], "train_flops_cum": at(rs, f)["train_flops_cum"],
@@ -73,8 +77,10 @@ def main():
         print("reach (primary): %s" % ("not reached" if reach is None else "step %d, %.3e FLOPs = %.2f x C3"
                                          % (reach["step"], reach["train_flops_cum"], reach["train_flops_cum"] / C3)))
         if "looped" in run:
-            print("reach (secondary, scaled recurrence): %s" % ("not reached" if reach_s is None else
+            print("reach (acc_scaled): %s" % ("not reached" if reach_s is None else
                   "step %d, %.3e FLOPs = %.2f x C3" % (reach_s["step"], reach_s["train_flops_cum"], reach_s["train_flops_cum"] / C3)))
+            print("reach (5.2, earlier of the two rules): %s" % ("not reached" if reach52 is None else
+                  "step %d, %.3e FLOPs = %.2f x C3" % (reach52["step"], reach52["train_flops_cum"], reach52["train_flops_cum"] / C3)))
     # 5.1 item 3: abacus_looped 1M against the stage-1 looped_rr log at the same FLOPs (up to 5.18e14)
     p = OUT / "e0_abacus_looped_1M" / "log.jsonl"
     if p.exists() and rows(p):
@@ -99,12 +105,15 @@ def main():
                 fmt(r["acc"]["ood_21-30"]), fmt(r["acc_fixed4"]["ood_11-20"]), fmt(r["acc_fixed4"]["ood_21-30"]),
                 fmt(a["acc"]["id_1-10"]), fmt(a["acc"]["ood_11-20"]), fmt(a["acc"]["ood_21-30"]),
                 fmt(s.get("ood_11-20")), fmt(s.get("ood_21-30"))))
-        lower = [c for c in cmp_ if any(c["abacus_looped_acc"][b] < c["looped_rr_acc"][b] for b in BINS)]
+        def al_same_rule(c, b):              # 5.2: compared under the stage-1 looped rule (acc_scaled; id = 2 recurrences)
+            return c["abacus_looped_acc"][b] if b == "id_1-10" else (c["abacus_looped_acc_scaled"] or {}).get(b, -1)
+        lower = [c for c in cmp_ if any(al_same_rule(c, b) < c["looped_rr_acc"][b] for b in BINS)]
         summary["looped_rr_comparison"] = {
             "rule": "for every stage-1 looped_rr evaluation (FLOPs f <= 5.18e14), the last abacus_looped 1M evaluation "
-                    "at or before f; 'lower' = any bin of abacus_looped (primary) below looped_rr (stage-1 rule)",
+                    "at or before f; 'lower' = any bin of abacus_looped under the same rule (5.2: acc_scaled, "
+                    "id bin = 2 recurrences) below looped_rr (stage-1 rule)",
             "points": cmp_, "points_where_abacus_looped_lower": [
-                {"flops": c["flops"], "bins": [b for b in BINS if c["abacus_looped_acc"][b] < c["looped_rr_acc"][b]]}
+                {"flops": c["flops"], "bins": [b for b in BINS if al_same_rule(c, b) < c["looped_rr_acc"][b]]}
                 for c in lower]}
         print("points where abacus_looped 1M is lower in some bin: %d of %d" % (len(lower), len(cmp_)))
     (OUT / "summary.json").write_text(json.dumps(summary, indent=1))
