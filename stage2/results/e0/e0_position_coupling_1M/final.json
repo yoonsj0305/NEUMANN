@@ -1,0 +1,68 @@
+{
+ "run": "position_coupling_1M",
+ "params": 862720,
+ "steps": 171120,
+ "train_flops": 1790004487127040,
+ "budget": 1790000000000000.0,
+ "reached": null,
+ "stopped": "budget",
+ "multiple_of_C3": null,
+ "best_ood_11_20": 0.754,
+ "best_ood_21_30": 0.202,
+ "best_scaled_ood_11_20": null,
+ "best_scaled_ood_21_30": null,
+ "last": {
+  "step": 171120,
+  "train_flops_cum": 1790004487127040,
+  "train_loss_mean": 0.00056,
+  "lr": 0.0001000000000254375,
+  "acc": {
+   "id_1-10": 0.999,
+   "ood_11-20": 0.054,
+   "ood_21-30": 0.0,
+   "ood_31-40": 0.0
+  },
+  "wall_train_s_cum": 26458.3,
+  "wall_eval_s_cum": 727.2,
+  "segment": 3
+ },
+ "wall_train_s": 26458.3,
+ "wall_eval_s": 727.2,
+ "segments": [
+  {
+   "segment": 0,
+   "start_step": 0,
+   "started": "2026-11-19 12:46:08",
+   "budget": 1790000000000000.0,
+   "max_wall_s": 6900.0,
+   "threads": 1
+  },
+  {
+   "segment": 1,
+   "start_step": 39601,
+   "started": "2026-11-19 14:41:39",
+   "budget": 1790000000000000.0,
+   "max_wall_s": 6900.0,
+   "threads": 1,
+   "reach_rule": "5.2: either test rule, both bins under the same rule"
+  },
+  {
+   "segment": 2,
+   "start_step": 79581,
+   "started": "2026-11-19 16:36:52",
+   "budget": 1790000000000000.0,
+   "max_wall_s": 6900.0,
+   "threads": 1,
+   "reach_rule": "5.2: either test rule, both bins under the same rule"
+  },
+  {
+   "segment": 3,
+   "start_step": 120691,
+   "started": "2026-11-19 18:32:05",
+   "budget": 1790000000000000.0,
+   "max_wall_s": 6900.0,
+   "threads": 1,
+   "reach_rule": "5.2: either test rule, both bins under the same rule"
+  }
+ ]
+}
