@@ -62,6 +62,7 @@ RUNS = {
     "abacus_looped_1M": dict(kind="abacus_looped", scale="1M", d=92, heads=4, layers=8, recur=2),
     "abacus_looped_10M": dict(kind="abacus_looped", scale="10M", d=320, heads=8, layers=8, recur=2),
     "position_coupling_1M": dict(kind="position_coupling", scale="1M", d=256, heads=4, layers=1),
+    "position_coupling_pad_1M": dict(kind="position_coupling", scale="1M", d=256, heads=4, layers=1, pad=True),
 }
 
 
@@ -121,6 +122,19 @@ class E0LM(nn.Module):
         else:
             x = self.iterate(torch.zeros_like(e), e, recur or self.recur)
         return self.head(self.ln(x))
+
+
+def zero_pad(ex):
+    """the paper's zero-padding in the reversed format: both operands padded with high zeros to L = max(la, lb) digits,
+    the reversed sum padded to L + 1 digits, then <eos>.  Same problem; scoring stays exact match of every answer
+    token (the padded zero included, so it is not more lenient)"""
+    p, a = ex
+    i, z = p.index(T.TOK["+"]), T.TOK["0"]
+    A, B, s = p[:i], p[i + 1:-1], a[:-1]
+    assert p[-1] == T.TOK["="] and a[-1] == T.EOS
+    L = max(len(A), len(B))
+    return (A + [z] * (L - len(A)) + [T.TOK["+"]] + B + [z] * (L - len(B)) + [T.TOK["="]],
+            s + [z] * (L + 1 - len(s)) + [T.EOS])
 
 
 def fwd_flops(cfg, B, Tn, iters=None):
@@ -210,7 +224,9 @@ def main(a):
             "abacus_offset": {"abacus_ii": "per sequence uniform 0..100 (stage 1)",
                               "abacus_looped": "per batch shift beta - 1, beta ~ U[1, 100]; test beta = 1"}.get(cfg["kind"]),
             "position_coupling": {"max_pos": PC_MAX_POS, "train_start": "per sequence uniform 1 .. max_pos - max(la,lb) - 1",
-                                  "test_start": 1} if cfg["kind"] == "position_coupling" else None,
+                                  "test_start": 1,
+                                  "zero_padding": "operands to max(la, lb), reversed sum to max + 1 (paper)" if cfg.get("pad")
+                                  else "none (stage-1 format)"} if cfg["kind"] == "position_coupling" else None,
             "progressive_loss_alpha": PROG_ALPHA if cfg["kind"] == "abacus_looped" else None,
             "test_recurrence": {"primary": "training recurrences (2), as the paper",
                                 "acc_scaled": "stage-1 looped rule: 2 x ceil(bin upper / 10) for the ood bins (recorded only)"}
@@ -228,6 +244,8 @@ def main(a):
     with open(logf, "a") as fh:
         fh.write(json.dumps({"event": ev, **seg, "params": params}) + "\n")
     evals = T.eval_sets("addition", 1000, 500)
+    if cfg.get("pad"):
+        evals = {k: [zero_pad(e) for e in v] for k, v in evals.items()}
     window = st.pop("window", [])                      # losses since the last evaluation, kept across a cut
     t_seg = t0 = time.time()
 
@@ -237,6 +255,8 @@ def main(a):
         os.replace(str(ck) + ".tmp", ck)
     while st["flops"] < budget and st["reached"] is None:
         exs = [T.encode(*T.draw("addition", rng, 1, 10, train_dist=True)[:2]) for _ in range(BATCH)]
+        if cfg.get("pad"):
+            exs = [zero_pad(e) for e in exs]
         xb, yb = R.make_batch(exs)
         B, Tn = xb.shape
         for g in opt.param_groups:
