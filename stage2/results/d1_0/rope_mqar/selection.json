@@ -1,0 +1,233 @@
+{
+ "teacher": "rope",
+ "task": "mqar",
+ "checkpoint": "stage1/results/c3/c3_mqar__rope__1M__s0__N100000/teacher_best.pt",
+ "checkpoint_step": 3000,
+ "heads_total": 16,
+ "selection_set": {
+  "generation_seed": "select:mqar",
+  "size": 1000,
+  "lengths": [
+   4,
+   16
+  ],
+  "metric": "per-query accuracy"
+ },
+ "selection_acc": {
+  "a": 0.9995922943634695,
+  "b": 0.989909285495872,
+  "c": 0.9945979003159718
+ },
+ "c_kept_heads": [
+  [
+   0,
+   0
+  ],
+  [
+   0,
+   1
+  ],
+  [
+   0,
+   2
+  ],
+  [
+   0,
+   3
+  ],
+  [
+   1,
+   1
+  ],
+  [
+   1,
+   2
+  ],
+  [
+   2,
+   0
+  ],
+  [
+   2,
+   1
+  ],
+  [
+   2,
+   2
+  ],
+  [
+   2,
+   3
+  ],
+  [
+   3,
+   0
+  ],
+  [
+   3,
+   1
+  ],
+  [
+   3,
+   2
+  ],
+  [
+   3,
+   3
+  ]
+ ],
+ "c_trace": [
+  {
+   "head": [
+    0,
+    0
+   ],
+   "selection_acc_with_head": 0.9991845887269392,
+   "kept": true
+  },
+  {
+   "head": [
+    0,
+    1
+   ],
+   "selection_acc_with_head": 0.9990826623178065,
+   "kept": true
+  },
+  {
+   "head": [
+    0,
+    2
+   ],
+   "selection_acc_with_head": 0.9973499133625522,
+   "kept": true
+  },
+  {
+   "head": [
+    0,
+    3
+   ],
+   "selection_acc_with_head": 0.9954133115890327,
+   "kept": true
+  },
+  {
+   "head": [
+    1,
+    0
+   ],
+   "selection_acc_with_head": 0.989399653450209,
+   "kept": false
+  },
+  {
+   "head": [
+    1,
+    1
+   ],
+   "selection_acc_with_head": 0.9951075323616349,
+   "kept": true
+  },
+  {
+   "head": [
+    1,
+    2
+   ],
+   "selection_acc_with_head": 0.9948017531342371,
+   "kept": true
+  },
+  {
+   "head": [
+    1,
+    3
+   ],
+   "selection_acc_with_head": 0.9940882682703088,
+   "kept": false
+  },
+  {
+   "head": [
+    2,
+    0
+   ],
+   "selection_acc_with_head": 0.9948017531342371,
+   "kept": true
+  },
+  {
+   "head": [
+    2,
+    1
+   ],
+   "selection_acc_with_head": 0.9946998267251045,
+   "kept": true
+  },
+  {
+   "head": [
+    2,
+    2
+   ],
+   "selection_acc_with_head": 0.9948017531342371,
+   "kept": true
+  },
+  {
+   "head": [
+    2,
+    3
+   ],
+   "selection_acc_with_head": 0.9945979003159718,
+   "kept": true
+  },
+  {
+   "head": [
+    3,
+    0
+   ],
+   "selection_acc_with_head": 0.9945979003159718,
+   "kept": true
+  },
+  {
+   "head": [
+    3,
+    1
+   ],
+   "selection_acc_with_head": 0.9945979003159718,
+   "kept": true
+  },
+  {
+   "head": [
+    3,
+    2
+   ],
+   "selection_acc_with_head": 0.9945979003159718,
+   "kept": true
+  },
+  {
+   "head": [
+    3,
+    3
+   ],
+   "selection_acc_with_head": 0.9945979003159718,
+   "kept": true
+  }
+ ],
+ "rule": "(c): keep a head if the selection accuracy with it (on top of the kept heads) >= (a) - 0.005; choice: higher selection accuracy of (b) and (c), tie -> (c)",
+ "choice": "c",
+ "a_id_eval": {
+  "acc": 0.999900299102692,
+  "seq": 0.999
+ },
+ "stage1_reference": {
+  "source": "stage1/results/phaseA4/phaseA4_mqar__rope__1M__s0__N100000",
+  "step": 3000,
+  "acc": {
+   "id_4-16": 0.999900299102692,
+   "ood_17-32": 0.9535295063515035,
+   "ood_33-48": 0.7900429693287895,
+   "ood_49-64": 0.5506592399351337
+  },
+  "acc_seq": {
+   "id_4-16": 0.999,
+   "ood_17-32": 0.446,
+   "ood_33-48": 0.002,
+   "ood_49-64": 0.0
+  }
+ },
+ "a_id_equals_stage1": true,
+ "wall_s": 36.9
+}
