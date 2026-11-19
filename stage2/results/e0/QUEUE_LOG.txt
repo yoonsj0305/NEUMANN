@@ -14,3 +14,8 @@
 2026-11-19 14:41:28 note: the 'exit 0' lines above are wrong (the queue script logged the status of date, not of e0.py); the logs show planned cuts (event cut) at abacus_ii_1M step 31520 and position_coupling_1M step 39601. Script fixed to log the e0.py status.
 2026-11-19 14:41:35 launch abacus_ii_1M  max_wall=6900
 2026-11-19 14:41:35 launch position_coupling_1M  max_wall=6900
+2026-11-19 14:46:45 exit 0 abacus_looped_1M
+2026-11-19 14:46:46 exit 0 abacus_looped_10M
+2026-11-19 14:46:54 launch abacus_looped_1M  max_wall=6900
+2026-11-19 14:46:54 launch abacus_looped_10M  max_wall=6900
+2026-11-19 14:47:19 note: exit 0 for both looped runs at 14:46 is the old logging bug; their logs show planned cuts at steps 15133 and 2311.
