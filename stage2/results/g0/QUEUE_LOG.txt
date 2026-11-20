@@ -4,3 +4,28 @@
 2026-11-20 05:37:06 launch teacher xor s10
 2026-11-20 05:37:06 launch teacher xor s11
 2026-11-20 05:37:06 launch baseline xor looped_rr
+2026-11-20 06:37:21 exit teacher xor s11 code 0
+2026-11-20 06:37:21 launch compile xor s11
+2026-11-20 06:39:41 exit compile xor s11 code 0
+2026-11-20 06:39:41 launch teacher mul1 s9
+2026-11-20 06:52:42 exit teacher mul1 s9 code 0
+2026-11-20 06:52:42 launch compile mul1 s9
+2026-11-20 06:55:03 exit compile mul1 s9 code 0
+2026-11-20 06:55:03 launch teacher mul1 s10
+2026-11-20 07:02:23 exit teacher xor s9 code 0
+2026-11-20 07:02:23 launch compile xor s9
+2026-11-20 07:04:54 exit compile xor s9 code 0
+2026-11-20 07:04:54 launch teacher mul1 s11
+2026-11-20 07:08:04 exit teacher mul1 s10 code 0
+2026-11-20 07:08:04 launch compile mul1 s10
+2026-11-20 07:10:34 exit compile mul1 s10 code 0
+2026-11-20 07:10:34 launch teacher reverse s9
+2026-11-20 07:13:15 exit teacher xor s10 code 0
+2026-11-20 07:13:15 launch teacher reverse s10
+2026-11-20 07:16:35 exit teacher reverse s9 code 0
+2026-11-20 07:16:35 launch compile reverse s9
+2026-11-20 07:18:15 cut teacher mul1 s11 (after its checkpoint at log row 7)
+2026-11-20 07:18:15 exit compile reverse s9 code 0
+2026-11-20 07:19:05 exit teacher reverse s10 code 0
+2026-11-20 07:21:55 cut baseline xor looped_rr (after its checkpoint at log row 12)
+2026-11-20 07:32:06 orchestrator stop at the limit: {"copy s9": "teacher", "copy s10": "teacher", "copy s11": "teacher", "reverse s9": "students", "reverse s10": "compile", "reverse s11": "teacher", "xor s9": "students", "xor s10": "failed: teacher in-distribution 0.089 < 0.95", "xor s11": "students", "mul1 s9": "students", "mul1 s10": "students", "mul1 s11": "teacher", "prefix_sum s9": "teacher", "prefix_sum s10": "teacher", "prefix_sum s11": "teacher"}
