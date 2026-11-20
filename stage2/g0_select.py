@@ -11,6 +11,7 @@ the compiled table is itself all "stay".
 * Out-of-distribution data is not read here.
 
   python stage2/g0_select.py --task copy --seed 9      # writes stage2/results/g0/selection_copy_s9.json
+  python stage2/g0_select.py --task copy --seed 12 --phase g0p      # G-0' (7.12): stage2/results/g0p, runs g0p_*
 """
 from __future__ import annotations
 import argparse
@@ -26,11 +27,12 @@ RES = HERE / "results" / "g0"
 TOL_COUNT = 5                  # 0.005 of the 1,000 selection examples
 
 
-def name(task, seed, tag):
-    return "g0_%s__pf_search__1M__s%d__N100000__%s" % (task, seed, tag)
+def name(task, seed, tag, phase="g0"):
+    return "%s_%s__pf_search__1M__s%d__N100000__%s" % (phase, task, seed, tag)
 
 
 def main(a):
+    res = HERE / "results" / a.phase
     A.install()
     import torch
     import c4_select as CS
@@ -43,7 +45,7 @@ def main(a):
            "students": {}}
     for tag in ("compiled", "allstay"):
         for restart, sd in enumerate((a.seed, a.seed + 100)):
-            d = RES / name(a.task, sd, tag)
+            d = res / name(a.task, sd, tag, a.phase)
             if (d / "final.json").exists():
                 s = CS.student(d, sel)
                 s.update(tag=tag, restart=restart, run_seed=sd, correct=round(s["selection_accuracy"] * len(sel)))
@@ -56,7 +58,7 @@ def main(a):
                 "selected_run": st[pick]["run"],
                 "reason": ("highest selection accuracy" if len(pool) == 1 else
                            "tied within 0.005: fewer moving heads, then the smaller restart number")})
-    p = RES / ("selection_%s_s%d.json" % (a.task, a.seed))
+    p = res / ("selection_%s_s%d.json" % (a.task, a.seed))
     p.write_text(json.dumps(out, indent=1))
     print(json.dumps({k: out[k] for k in ("task", "seed", "selected", "reason")}),
           {k: v["selection_accuracy"] for k, v in st.items()})
@@ -66,4 +68,5 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--task", required=True)
     ap.add_argument("--seed", type=int, required=True)
+    ap.add_argument("--phase", default="g0", help="results/<phase>/ and the run-name prefix (g0, or g0p for G-0')")
     main(ap.parse_args())

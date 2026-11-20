@@ -1,0 +1,106 @@
+{
+ "per_task": {
+  "copy": {
+   "teacher_s_per_step": 0.11771,
+   "student_s_per_step": 0.112265,
+   "teacher_worst_h": 0.6539444444444444,
+   "student_worst_h": 0.6236944444444444,
+   "compile_max_s": 100.3,
+   "per_seed_h": {
+    "worst": 3.8805277777777776,
+    "g0_measured": 1.430650925925926,
+    "g0_plus_restarts": 2.101262037037037
+   },
+   "g0_measured_per_seed_h_values": [
+    1.4265666666666665,
+    1.3693027777777778,
+    1.3960833333333336
+   ]
+  },
+  "reverse": {
+   "teacher_s_per_step": 0.11583,
+   "student_s_per_step": 0.11240599999999999,
+   "teacher_worst_h": 0.6435,
+   "student_worst_h": 0.6244777777777778,
+   "compile_max_s": 98.7,
+   "per_seed_h": {
+    "worst": 3.8623277777777782,
+    "g0_measured": 2.189464814814815,
+    "g0_plus_restarts": 2.849631481481482
+   },
+   "g0_measured_per_seed_h_values": [
+    1.4686472222222222,
+    2.521116666666667,
+    2.4786305555555557
+   ]
+  },
+  "xor": {
+   "teacher_s_per_step": 0.287787,
+   "student_s_per_step": 0.27033999999999997,
+   "teacher_worst_h": 1.5988166666666668,
+   "student_worst_h": 1.5018888888888886,
+   "compile_max_s": 148.3,
+   "per_seed_h": {
+    "worst": 9.296383333333335,
+    "g0_measured": 4.418626388888889,
+    "g0_plus_restarts": 6.034109722222222
+   },
+   "g0_measured_per_seed_h_values": [
+    4.502902777777778,
+    4.267683333333333
+   ]
+  },
+  "mul1": {
+   "teacher_s_per_step": 0.128995,
+   "student_s_per_step": 0.134029,
+   "teacher_worst_h": 0.7166388888888889,
+   "student_worst_h": 0.7446055555555556,
+   "compile_max_s": 138.8,
+   "per_seed_h": {
+    "worst": 4.500255555555556,
+    "g0_measured": 2.5480212962962963,
+    "g0_plus_restarts": 3.2813268518518517
+   },
+   "g0_measured_per_seed_h_values": [
+    2.6139777777777784,
+    2.628825,
+    2.3012611111111108
+   ]
+  },
+  "prefix_sum": {
+   "teacher_s_per_step": 0.11775,
+   "student_s_per_step": 0.109955,
+   "teacher_worst_h": 0.6541666666666667,
+   "student_worst_h": 0.6108611111111111,
+   "compile_max_s": 101.6,
+   "per_seed_h": {
+    "worst": 3.83,
+    "g0_measured": 1.4223601851851853,
+    "g0_plus_restarts": 2.0931935185185186
+   },
+   "g0_measured_per_seed_h_values": [
+    1.3863222222222222,
+    1.4121722222222222,
+    1.368586111111111
+   ]
+  }
+ },
+ "cpu_hours": {
+  "worst": 76.10848333333334,
+  "g0_measured": 36.027370833333336,
+  "g0_plus_restarts": 49.07857083333333
+ },
+ "wall_hours_4_workers": {
+  "worst": 19.027120833333335,
+  "g0_measured": 9.006842708333334,
+  "g0_plus_restarts": 12.269642708333333
+ },
+ "wall_hours_4_workers_plus_longest_run": {
+  "worst": 20.625937500000003,
+  "g0_measured": 10.605659375000002,
+  "g0_plus_restarts": 13.868459374999999
+ },
+ "longest_run_hours": 1.5988166666666668,
+ "limit_hours": 48,
+ "note": "rates measured in G-0 (stage2/results/g0); no baselines (reused from G-0)"
+}
