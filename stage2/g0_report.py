@@ -80,8 +80,9 @@ def main():
             r["teacher"] = {"judgment_step": tf["judgment"]["step"], "id": tf["judgment"]["acc"][L[0]],
                             "judgment_flops": tf["judgment"]["train_flops_cum"], "steps": tf["steps"],
                             "stopped": tf["stopped"]}
-            if r["teacher"]["id"] < TEACHER_MIN:
+            if r["teacher"]["id"] < TEACHER_MIN:          # 7.4: counted as a pipeline failure (the seed does not win)
                 r["failure_stage"] = "teacher"
+                r["win"] = False
                 seeds[s] = r
                 continue
             cr = jl(RES / ("%s_compile_s%d" % (task, s)) / "compile_result.json")
@@ -93,8 +94,9 @@ def main():
             r["precheck"] = {"ratio": pc["dependency"]["ratio"], "correct": pc["dependency"]["correct"],
                              "all_stay": pc["dependency"]["all_stay"], "passed": pc["passed"]}
             r["extraction_flops"] = cr["extraction"]["flops"]
-            if "policy" not in cr:
+            if "policy" not in cr:                        # 7.4: counted as a failure
                 r["failure_stage"] = "precheck"
+                r["win"] = False
                 seeds[s] = r
                 continue
             corr = jl(HERE / ("results/g0a/tables.json" if task != "prefix_sum" else
