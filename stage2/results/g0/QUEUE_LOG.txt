@@ -217,3 +217,15 @@
 2026-11-20 16:40:17 exit student reverse s110 allstay code 0
 2026-11-20 16:40:17 launch select reverse s10
 2026-11-20 16:40:27 exit select reverse s10 code 0
+2026-11-20 16:40:31 launch student reverse s111 allstay
+2026-11-20 16:43:22 exit student reverse s11 compiled code 0
+2026-11-20 16:43:22 launch student copy s9 compiled
+2026-11-20 16:47:13 exit student copy s9 compiled code 0
+2026-11-20 16:47:13 launch student copy s109 compiled
+2026-11-20 16:51:04 exit student copy s109 compiled code 0
+2026-11-20 16:51:04 launch student copy s9 allstay
+2026-11-20 16:55:05 cut student reverse s111 compiled (after its checkpoint at log row 20)
+2026-11-20 16:55:15 cut student reverse s11 allstay (after its checkpoint at log row 11)
+2026-11-20 16:55:15 cut student reverse s111 allstay (after its checkpoint at log row 10)
+2026-11-20 16:55:25 cut student copy s9 allstay (after its checkpoint at log row 4)
+2026-11-20 17:09:18 orchestrator stop at the limit: {"copy s9": "students", "copy s10": "students", "copy s11": "students", "reverse s9": "selected", "reverse s10": "selected", "reverse s11": "students", "xor s9": "selected", "xor s10": "failed: teacher in-distribution 0.089 < 0.95", "xor s11": "selected", "mul1 s9": "selected", "mul1 s10": "selected", "mul1 s11": "selected", "prefix_sum s9": "students", "prefix_sum s10": "students", "prefix_sum s11": "students"}
