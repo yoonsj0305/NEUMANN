@@ -1,0 +1,180 @@
+{
+ "task": "copy",
+ "seed": 9,
+ "selection_set": {
+  "generation_seed": "select:copy",
+  "size": 1000,
+  "draw": "training distribution"
+ },
+ "rule": "highest selection accuracy; within 0.005 (<= 5 of 1000 examples): fewer moving heads, then the smaller restart number",
+ "students": {
+  "compiled_r0": {
+   "run": "stage2/results/g0/g0_copy__pf_search__1M__s9__N100000__compiled",
+   "judgment_step": 1000,
+   "selection_accuracy": 1.0,
+   "moving_heads": 3,
+   "policy": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     3,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "selection_eval_flops": 6955748688,
+   "tag": "compiled",
+   "restart": 0,
+   "run_seed": 9,
+   "correct": 1000
+  },
+  "compiled_r1": {
+   "run": "stage2/results/g0/g0_copy__pf_search__1M__s109__N100000__compiled",
+   "judgment_step": 1000,
+   "selection_accuracy": 1.0,
+   "moving_heads": 3,
+   "policy": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     3,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "selection_eval_flops": 6955748688,
+   "tag": "compiled",
+   "restart": 1,
+   "run_seed": 109,
+   "correct": 1000
+  },
+  "allstay_r0": {
+   "run": "stage2/results/g0/g0_copy__pf_search__1M__s9__N100000__allstay",
+   "judgment_step": 14000,
+   "selection_accuracy": 0.121,
+   "moving_heads": 0,
+   "policy": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "selection_eval_flops": 6955748688,
+   "tag": "allstay",
+   "restart": 0,
+   "run_seed": 9,
+   "correct": 121
+  },
+  "allstay_r1": {
+   "run": "stage2/results/g0/g0_copy__pf_search__1M__s109__N100000__allstay",
+   "judgment_step": 18000,
+   "selection_accuracy": 0.119,
+   "moving_heads": 0,
+   "policy": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "selection_eval_flops": 6955748688,
+   "tag": "allstay",
+   "restart": 1,
+   "run_seed": 109,
+   "correct": 119
+  }
+ },
+ "best_correct": 1000,
+ "tied_within_tolerance": [
+  "compiled_r0",
+  "compiled_r1"
+ ],
+ "selected": "compiled_r0",
+ "selected_run": "stage2/results/g0/g0_copy__pf_search__1M__s9__N100000__compiled",
+ "reason": "tied within 0.005: fewer moving heads, then the smaller restart number"
+}
