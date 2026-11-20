@@ -1,0 +1,228 @@
+{
+ "task": "copy",
+ "data_seed": 11,
+ "teacher": {
+  "path": "/home/user/NEUMANN/stage2/results/g0/g0_copy__rope__1M__s11__N100000/teacher_best.pt",
+  "untrained_seed": null,
+  "step": 3000,
+  "acc": {
+   "id_1-10": 1.0,
+   "ood_11-20": 0.0,
+   "ood_21-30": 0.0,
+   "ood_31-40": 0.0
+  },
+  "train_flops_to_judgment": 20896754466816
+ },
+ "examples": 2000,
+ "output_steps": 13128,
+ "dependency_kind": "content substitution (design 14)",
+ "extraction": {
+  "flops": 5300664193024,
+  "backward_passes": 0,
+  "manual_forward_max_abs_logit_diff": null,
+  "substitution": {
+   "class_symbols": {
+    "digit": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "=": [
+     "="
+    ],
+    "answer_phase": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ]
+   },
+   "sequences_forwarded": 202304,
+   "substituted_positions": 22256,
+   "all_zero_rows": 0
+  }
+ },
+ "dependency_mass_on_current_position": 0.07371598344177793,
+ "attention_mass_on_current_position": 0.07563424622654202,
+ "precheck": {
+  "correct_table": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "dependency": {
+   "correct": 0.8412204072071048,
+   "correct_per_head": [
+    0.8200507164651876,
+    0.021169690741917217,
+    0.0
+   ],
+   "all_stay": 0.17351253137377232,
+   "ratio": 4.848182437007898
+  },
+  "attention_aux": {
+   "correct": 0.3781984833341987,
+   "all_stay": 0.12995144916523252,
+   "ratio": 2.9103060086180457
+  },
+  "criterion": "score(correct) >= 2 x score(all stay) on the dependency (13.2)",
+  "passed": true,
+  "gate_applied": true
+ },
+ "policy": [
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0
+  ],
+  [
+   0,
+   0,
+   3,
+   0,
+   0,
+   1,
+   0
+  ],
+  [
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ]
+ ],
+ "policy_named": {
+  "head0": {
+   "digit": "stay",
+   "+": "stay",
+   "=": "stay",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "right",
+   "other": "stay"
+  },
+  "head1": {
+   "digit": "stay",
+   "+": "stay",
+   "=": "next_sep",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "right",
+   "other": "stay"
+  },
+  "head2": {
+   "digit": "right",
+   "+": "stay",
+   "=": "stay",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "stay",
+   "other": "stay"
+  }
+ },
+ "per_head": [
+  {
+   "column": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "score_after_cover": 0.8200507164651876,
+   "columns_tied_at_best": 46656
+  },
+  {
+   "column": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "next_sep",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "score_after_cover": 0.07371598344177793,
+   "columns_tied_at_best": 9072
+  },
+  {
+   "column": {
+    "digit": "right",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "score_after_cover": 0.05313755289135501,
+   "columns_tied_at_best": 2592
+  }
+ ],
+ "table_score_dependency": 0.9469042527983205,
+ "table_score_attention_aux": 0.45017015037120733,
+ "search": {
+  "columns": 279936,
+  "present_classes": [
+   "digit",
+   "=",
+   "answer_phase"
+  ],
+  "distinct_paths_simulated": 216,
+  "head_moves_simulated": 5239296,
+  "score_lookups": 8506944,
+  "head_simulation_operations": 13746240
+ },
+ "reference_agreement_with_correct_table": {
+  "correct_head0_position_read_by_some_compiled_head": 1.0,
+  "correct_head1_position_read_by_some_compiled_head": 0.1662096282754418,
+  "correct_head2_position_read_by_some_compiled_head": 0.1662096282754418
+ },
+ "wall_s": 99.2
+}
