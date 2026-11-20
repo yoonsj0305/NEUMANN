@@ -283,3 +283,9 @@
 2026-11-20 18:48:24 exit student prefix_sum s109 allstay code 0
 2026-11-20 18:48:24 launch select prefix_sum s9
 2026-11-20 18:48:34 exit select prefix_sum s9 code 0
+2026-11-20 18:48:40 launch student prefix_sum s11 allstay
+2026-11-20 18:50:10 cut student prefix_sum s111 compiled (after its checkpoint at log row 2)
+2026-11-20 18:50:20 cut student prefix_sum s11 allstay (after its checkpoint at log row 2)
+2026-11-20 18:51:21 cut student prefix_sum s110 allstay (after its checkpoint at log row 15)
+2026-11-20 18:51:31 cut student prefix_sum s10 allstay (after its checkpoint at log row 16)
+2026-11-20 19:04:44 orchestrator stop at the limit: {"copy s9": "selected", "copy s10": "selected", "copy s11": "selected", "reverse s9": "selected", "reverse s10": "selected", "reverse s11": "selected", "xor s9": "selected", "xor s10": "failed: teacher in-distribution 0.089 < 0.95", "xor s11": "selected", "mul1 s9": "selected", "mul1 s10": "selected", "mul1 s11": "selected", "prefix_sum s9": "selected", "prefix_sum s10": "students", "prefix_sum s11": "students"}

@@ -1,0 +1,121 @@
+{
+ "name": "g0_prefix_sum__pf_search__1M__s11__N100000__allstay",
+ "phase": "g0",
+ "task": "prefix_sum",
+ "kind": "pf_search",
+ "scale": "1M",
+ "params": 249211,
+ "model_config": {
+  "R": 4,
+  "K": 16,
+  "H": 3,
+  "hidden": 256,
+  "emb": 64,
+  "policy": [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ]
+ },
+ "seed": 11,
+ "N": 100000,
+ "batch": 64,
+ "max_steps": 20000,
+ "eval_every": 1000,
+ "id_size": 1000,
+ "ood_size": 500,
+ "lr": 0.001,
+ "optimizer": "AdamW betas (0.9, 0.98) weight decay 0.1, grad clip 1.0, warmup max_steps/20, cosine to 10%",
+ "abacus_offset_max": null,
+ "spec": {
+  "train": [
+   1,
+   10
+  ],
+  "id": [
+   1,
+   10
+  ],
+  "ood": [
+   [
+    11,
+    20
+   ],
+   [
+    21,
+    30
+   ],
+   [
+    31,
+    40
+   ]
+  ]
+ },
+ "position": "none (read heads over the tape; table move policy)",
+ "pf": null,
+ "pf2": null,
+ "pf_search": {
+  "policy_file": "/home/user/NEUMANN/stage2/results/g0/allstay_policy.json",
+  "search": {
+   "policy": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "note": "G-0 all-stay table (7.4), the C4 student (b)"
+  }
+ },
+ "early_stop": "in-distribution >= 0.99 at two consecutive evaluations",
+ "judgment_checkpoint": "highest in-distribution accuracy (earliest if tied); out-of-distribution at it",
+ "accuracy": "sequence exact match (teacher-forced == greedy)",
+ "looped_eval_rule": null,
+ "looped_rr": null
+}
