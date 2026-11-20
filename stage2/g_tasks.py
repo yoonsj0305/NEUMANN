@@ -14,12 +14,15 @@ Formats (prompt -> answer, then <eos>; numbers least significant digit first, as
                                                                          (no leading zeros, as addition's rev(a + b))
   mul1         rev(a) * d =  ->  rev(a * d)                            d one digit 0-9 (as a 1-digit number of
                                                                          addition, 0 included); answer as above
+  prefix_sum   x_1 .. x_n =  ->  s_1 .. s_n                            s_k = (x_1 + .. + x_k) mod 10; digits i.i.d.
+                                                                         uniform 0-9; s_k in the order of x_k
+                                                                         (G-0, DESIGN 7.10: replaces subtraction)
 Reference only, not a candidate (G-0a report): subtraction_pad = subtraction with the answer padded with zeros to
 len(a) digits (rev of a - b written with exactly len(a) digits).
 
 Length conventions (7.5):
-  digit tasks (copy, reverse, subtraction, mul1, subtraction_pad) as addition: training 1-10, evaluation bins
-    in-distribution 1-10, out-of-distribution 11-20 / 21-30 / 31-40.  One-operand tasks (copy, reverse; mul1's a)
+  digit tasks (copy, reverse, subtraction, mul1, prefix_sum, subtraction_pad) as addition: training 1-10, evaluation bins
+    in-distribution 1-10, out-of-distribution 11-20 / 21-30 / 31-40.  One-operand tasks (copy, reverse, prefix_sum; mul1's a)
     draw the length uniformly in the range.  subtraction draws its two operand lengths exactly as addition
     (training: independent uniform; evaluation: the longer length uniform in the bin, the other uniform in
     1..longer), draws the two numbers, and puts the larger first (a >= b), so the longer operand is always a.
@@ -43,11 +46,12 @@ assert all(TOK[t] == T1.TOK[t] for t in T1.VOCAB)
 INFIX = ["+"] + OPS                                   # the "+" kind (7.4)
 DIGITS = T1.DIGITS
 
-TASKS = ("copy", "reverse", "xor", "subtraction", "mul1")
+TASKS = ("copy", "reverse", "xor", "subtraction", "mul1")            # the G-0a candidates (7.5)
+SUITE = ("copy", "reverse", "xor", "mul1", "prefix_sum")             # the G-0 task suite (7.10), frozen on prefix_sum
 REFERENCE = ("subtraction_pad",)
 DIGIT_SPEC = {"train": (1, 10), "id": (1, 10), "ood": [(11, 20), (21, 30), (31, 40)]}      # = addition
 BIT_SPEC = {"train": (1, 16), "id": (1, 16), "ood": [(17, 32), (33, 48), (49, 64)]}        # = parity
-SPEC = {t: (BIT_SPEC if t == "xor" else DIGIT_SPEC) for t in TASKS + REFERENCE}
+SPEC = {t: (BIT_SPEC if t == "xor" else DIGIT_SPEC) for t in TASKS + REFERENCE + ("prefix_sum",)}
 
 _num, _rev = T1._num, T1._rev
 
@@ -89,8 +93,17 @@ def mul1(n, rng):
     return _rev(a) + ["*", str(d), "="], _rev(a * d)
 
 
+def prefix_sum(n, rng):
+    x = [rng.randrange(10) for _ in range(n)]
+    s, out = 0, []
+    for v in x:
+        s = (s + v) % 10
+        out.append(str(s))
+    return [str(v) for v in x] + ["="], out
+
+
 TWO_LENGTHS = {"subtraction": subtraction, "subtraction_pad": subtraction_pad}
-ONE_LENGTH = {"copy": copy, "reverse": reverse, "xor": xor, "mul1": mul1}
+ONE_LENGTH = {"copy": copy, "reverse": reverse, "xor": xor, "mul1": mul1, "prefix_sum": prefix_sum}
 
 
 def draw(task, rng, lo, hi, train_dist=False):

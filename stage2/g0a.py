@@ -21,6 +21,7 @@ padded-answer algorithm) is run on it to measure how often the answer's length i
 and on the reference task subtraction_pad (answer padded to len(a) digits), which is not a candidate.
 
   python stage2/g0a.py          # writes stage2/results/g0a/{config,tables,final,env}.json
+  python stage2/g0a.py --tasks prefix_sum --out stage2/results/g0/a_prefix_sum      # G-0 step 1 (DESIGN 7.10)
 """
 from __future__ import annotations
 import json
@@ -75,6 +76,8 @@ TABLES = {
     "subtraction_pad": TWO_POINTER,
     # head 0 on a_k; head 1 jumps to '*', right onto d at '=', then stays on d
     "mul1": table({0: {"answer_phase": RIGHT}, 1: {"+": NSEP, "=": RIGHT}}),
+    # G-0 (7.10): head 0 sits on x_1 and walks right in the answer phase (the copy table)
+    "prefix_sum": table({0: {"answer_phase": RIGHT}}),
 }
 CONTROLLERS = {
     "copy": "stateless: output head 0's digit; <eos> when head 0 reads a non-digit ('=')",
@@ -85,6 +88,8 @@ CONTROLLERS = {
     "subtraction_pad": "same as subtraction",
     "mul1": "r1 carry 0-8, r2 a exhausted, r3 done: d = head 1's digit; d = 0 -> '0' then <eos>; otherwise digit "
             "(a_k d + carry) mod 10; once a is exhausted the carry if non-zero, then <eos>",
+    "prefix_sum": "stateless: at '=' output head 0's digit (s_1 = x_1); afterwards (current token s_{k-1} + head 0's "
+                  "digit x_k) mod 10; <eos> when head 0 reads a non-digit ('=')",
 }
 REG_USE = "r0 = answer phase (set at '='), r1-r3 as listed per task; registers are only updated in the answer phase"
 
@@ -93,13 +98,17 @@ def is_d(tok):
     return tok in DIG
 
 
-def rule(task, rd, r):
+def rule(task, rd, r, xi=None):
     """one answer step: reads rd (3 token ids), registers r (mutable list) -> output token id.  Batches are padded,
     so the machine also steps past a row's end (outputs there are not scored); digit look-ups of a read that is not
     a digit there use 0 (as stage1/pf_search_v2_check.TableController)."""
     a, b = rd[0], rd[1]
     if task == "copy":
         return a if is_d(a) else EOS
+    if task == "prefix_sum":                              # xi = the current token: '=' or the previous answer s_{k-1}
+        if not is_d(a):
+            return EOS
+        return a if xi == TOK["="] else TOK[str((DIG.get(xi, 0) + DIG[a]) % 10)]
     if task == "reverse":
         return a if is_d(b) else EOS
     if task == "xor":
@@ -160,7 +169,7 @@ class Controller:
             o = EOS
             if xi == TOK["="] or r[0] == 1:
                 r[0] = 1
-                o = rule(self.task, rd[b], r)
+                o = rule(self.task, rd[b], r, xi)
             newr.append(r)
             outs.append(o)
         return F.one_hot(torch.tensor(newr), self.K).float(), F.one_hot(torch.tensor(outs), self.V).float() * 100.0
@@ -237,15 +246,23 @@ def short_len(task, exs):
     return n
 
 
-def main():
+def main(argv=None):
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--tasks", default=",".join(list(G.TASKS) + list(G.REFERENCE)),
+                    help="comma list (default: the G-0a candidates and the reference)")
+    ap.add_argument("--out", default=str(OUT), help="results directory (default stage2/results/g0a)")
+    args = ap.parse_args(argv)
+    out = pathlib.Path(args.out)
     torch.set_num_threads(1)
-    OUT.mkdir(parents=True, exist_ok=True)
+    out.mkdir(parents=True, exist_ok=True)
     cfg = dict(M.SCALES["pf"]["1M"])
     torch.manual_seed(0)
     pf = PFM.PF(len(G.VOCAB), sep_ids=SEP_IDS, **cfg)        # its learned g and f are never used here
     pf.eval()
-    tasks = list(G.TASKS) + list(G.REFERENCE)
-    config = {"design": "stage2/DESIGN.md 7.4-7.6 (G-0a)", "tasks": list(G.TASKS), "reference_only": list(G.REFERENCE),
+    tasks = args.tasks.split(",")
+    config = {"design": "stage2/DESIGN.md 7.4-7.6 (G-0a); 7.10 (prefix_sum, G-0 step 1)", "tasks": tasks,
+              "g0a_candidates": list(G.TASKS), "g0_suite": list(G.SUITE), "reference_only": list(G.REFERENCE),
               "spec": {t: G.SPEC[t] for t in tasks}, "vocab_added": G.OPS, "vocab_size": len(G.VOCAB),
               "token_kinds": "digits and bits = digit; infix operators + - * ^ = '+' kind; '=', '|', answer phase "
                              "(strictly after the first '=' or '|'), others as stage 1 (stage1/pf.py token_classes)",
@@ -256,7 +273,7 @@ def main():
                                                           % (N_TRAIN, list(SEEDS))},
               "criterion": "representable iff the hand table + hand controller scores 1.000 (stage-1 teacher-forced "
                            "sequence exact match) on the in-distribution bin and every out-of-distribution bin"}
-    (OUT / "config.json").write_text(json.dumps(config, indent=1))
+    (out / "config.json").write_text(json.dumps(config, indent=1))
     res = {}
     for task in tasks:
         t0 = time.time()
@@ -282,15 +299,15 @@ def main():
             r["answer_shorter_than_a"] = {l: short_len(task, sets[l]) for l in sets}
         res[task] = r
         print("%-16s %s  %s" % (task, " ".join("%s %.3f" % (l, acc[l]) for l in acc), r["wall_s"]), flush=True)
-    (OUT / "final.json").write_text(json.dumps(res, indent=1, ensure_ascii=False))
+    (out / "final.json").write_text(json.dumps(res, indent=1, ensure_ascii=False))
     # the 14-section pre-check's "correct table" is a table that is exact here; subtraction's is not (see report)
     tables = {t: {"table": TABLES[t], "readable": readable(TABLES[t]),
                   "moving_heads": sum(any(m != STAY for m in col) for col in TABLES[t]),
                   "controller": CONTROLLERS[t], "registers": REG_USE,
                   "exact_on_all_bins": res[t]["exact_on_all_bins"],
-                  "correct_table_for_precheck": res[t]["exact_on_all_bins"] and t in G.TASKS} for t in tasks}
-    (OUT / "tables.json").write_text(json.dumps(tables, indent=1))
-    (OUT / "env.json").write_text(json.dumps(env(), indent=1))
+                  "correct_table_for_precheck": res[t]["exact_on_all_bins"] and t in G.SUITE} for t in tasks}
+    (out / "tables.json").write_text(json.dumps(tables, indent=1))
+    (out / "env.json").write_text(json.dumps(env(), indent=1))
 
 
 if __name__ == "__main__":
