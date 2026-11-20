@@ -1,0 +1,317 @@
+{
+ "name": "g0_reverse__pf_search__1M__s9__N100000__compiled",
+ "phase": "g0",
+ "task": "reverse",
+ "kind": "pf_search",
+ "scale": "1M",
+ "params": 249211,
+ "model_config": {
+  "R": 4,
+  "K": 16,
+  "H": 3,
+  "hidden": 256,
+  "emb": 64,
+  "policy": [
+   [
+    1,
+    0,
+    0,
+    0,
+    0,
+    2,
+    0
+   ],
+   [
+    0,
+    0,
+    3,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    1,
+    0,
+    0,
+    1,
+    0
+   ]
+  ]
+ },
+ "seed": 9,
+ "N": 100000,
+ "batch": 64,
+ "max_steps": 20000,
+ "eval_every": 1000,
+ "id_size": 1000,
+ "ood_size": 500,
+ "lr": 0.001,
+ "optimizer": "AdamW betas (0.9, 0.98) weight decay 0.1, grad clip 1.0, warmup max_steps/20, cosine to 10%",
+ "abacus_offset_max": null,
+ "spec": {
+  "train": [
+   1,
+   10
+  ],
+  "id": [
+   1,
+   10
+  ],
+  "ood": [
+   [
+    11,
+    20
+   ],
+   [
+    21,
+    30
+   ],
+   [
+    31,
+    40
+   ]
+  ]
+ },
+ "position": "none (read heads over the tape; table move policy)",
+ "pf": null,
+ "pf2": null,
+ "pf_search": {
+  "policy_file": "/home/user/NEUMANN/stage2/results/g0/reverse_compile_s9/compile_result.json",
+  "search": {
+   "task": "reverse",
+   "data_seed": 9,
+   "teacher": {
+    "path": "/home/user/NEUMANN/stage2/results/g0/g0_reverse__rope__1M__s9__N100000/teacher_best.pt",
+    "untrained_seed": null,
+    "step": 2000,
+    "acc": {
+     "id_1-10": 1.0,
+     "ood_11-20": 0.0,
+     "ood_21-30": 0.0,
+     "ood_31-40": 0.0
+    },
+    "train_flops_to_judgment": 13932900581376
+   },
+   "examples": 2000,
+   "output_steps": 12920,
+   "dependency_kind": "content substitution (design 14)",
+   "extraction": {
+    "flops": 5187539339264,
+    "backward_passes": 0,
+    "manual_forward_max_abs_logit_diff": null,
+    "substitution": {
+     "class_symbols": {
+      "digit": [
+       "0",
+       "1",
+       "2",
+       "3",
+       "4",
+       "5",
+       "6",
+       "7",
+       "8",
+       "9"
+      ],
+      "=": [
+       "="
+      ],
+      "answer_phase": [
+       "0",
+       "1",
+       "2",
+       "3",
+       "4",
+       "5",
+       "6",
+       "7",
+       "8",
+       "9"
+      ]
+     },
+     "sequences_forwarded": 198560,
+     "substituted_positions": 21840,
+     "all_zero_rows": 0
+    }
+   },
+   "dependency_mass_on_current_position": 0.07264135383546287,
+   "attention_mass_on_current_position": 0.17958879091102203,
+   "precheck": {
+    "correct_table": {
+     "head0": {
+      "digit": "right",
+      "+": "stay",
+      "=": "stay",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "left",
+      "other": "stay"
+     },
+     "head1": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "stay",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "right",
+      "other": "stay"
+     },
+     "head2": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "stay",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "stay",
+      "other": "stay"
+     }
+    },
+    "dependency": {
+     "correct": 0.9168297817835684,
+     "correct_per_head": [
+      0.9167971824738498,
+      3.249336885215175e-05,
+      1.0594086646709343e-07
+     ],
+     "all_stay": 0.2273666473743616,
+     "ratio": 4.0323846631471785
+    },
+    "attention_aux": {
+     "correct": 0.3445374172914704,
+     "all_stay": 0.14554825077992475,
+     "ratio": 2.367169756044859
+    },
+    "criterion": "score(correct) >= 2 x score(all stay) on the dependency (13.2)",
+    "passed": true,
+    "gate_applied": true
+   },
+   "policy": [
+    [
+     1,
+     0,
+     0,
+     0,
+     0,
+     2,
+     0
+    ],
+    [
+     0,
+     0,
+     3,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     1,
+     0,
+     0,
+     1,
+     0
+    ]
+   ],
+   "policy_named": {
+    "head0": {
+     "digit": "right",
+     "+": "stay",
+     "=": "stay",
+     "|": "stay",
+     "node": "stay",
+     "answer_phase": "left",
+     "other": "stay"
+    },
+    "head1": {
+     "digit": "stay",
+     "+": "stay",
+     "=": "next_sep",
+     "|": "stay",
+     "node": "stay",
+     "answer_phase": "right",
+     "other": "stay"
+    },
+    "head2": {
+     "digit": "stay",
+     "+": "stay",
+     "=": "right",
+     "|": "stay",
+     "node": "stay",
+     "answer_phase": "right",
+     "other": "stay"
+    }
+   },
+   "per_head": [
+    {
+     "column": {
+      "digit": "right",
+      "+": "stay",
+      "=": "stay",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "left",
+      "other": "stay"
+     },
+     "score_after_cover": 0.9167971824738498,
+     "columns_tied_at_best": 2592
+    },
+    {
+     "column": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "next_sep",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "right",
+      "other": "stay"
+     },
+     "score_after_cover": 0.07264135383546287,
+     "columns_tied_at_best": 9072
+    },
+    {
+     "column": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "right",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "right",
+      "other": "stay"
+     },
+     "score_after_cover": 0.003851778370682496,
+     "columns_tied_at_best": 5184
+    }
+   ],
+   "table_score_dependency": 0.9932903146799952,
+   "table_score_attention_aux": 0.45533423404448636,
+   "search": {
+    "columns": 279936,
+    "present_classes": [
+     "digit",
+     "=",
+     "answer_phase"
+    ],
+    "distinct_paths_simulated": 216,
+    "head_moves_simulated": 5149440,
+    "score_lookups": 8372160,
+    "head_simulation_operations": 13521600
+   },
+   "reference_agreement_with_correct_table": {
+    "correct_head0_position_read_by_some_compiled_head": 1.0,
+    "correct_head1_position_read_by_some_compiled_head": 0.0784829721362229,
+    "correct_head2_position_read_by_some_compiled_head": 0.30959752321981426
+   },
+   "wall_s": 93.7
+  }
+ },
+ "early_stop": "in-distribution >= 0.99 at two consecutive evaluations",
+ "judgment_checkpoint": "highest in-distribution accuracy (earliest if tied); out-of-distribution at it",
+ "accuracy": "sequence exact match (teacher-forced == greedy)",
+ "looped_eval_rule": null,
+ "looped_rr": null
+}
