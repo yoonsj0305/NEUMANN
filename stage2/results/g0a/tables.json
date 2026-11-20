@@ -1,0 +1,392 @@
+{
+ "copy": {
+  "table": [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  "readable": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "moving_heads": 1,
+  "controller": "stateless: output head 0's digit; <eos> when head 0 reads a non-digit ('=')",
+  "registers": "r0 = answer phase (set at '='), r1-r3 as listed per task; registers are only updated in the answer phase",
+  "exact_on_all_bins": true,
+  "correct_table_for_precheck": true
+ },
+ "reverse": {
+  "table": [
+   [
+    1,
+    0,
+    0,
+    0,
+    0,
+    2,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  "readable": {
+   "head0": {
+    "digit": "right",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "left",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "moving_heads": 2,
+  "controller": "stateless: <eos> when head 1 reads a non-digit ('='), otherwise output head 0's digit",
+  "registers": "r0 = answer phase (set at '='), r1-r3 as listed per task; registers are only updated in the answer phase",
+  "exact_on_all_bins": true,
+  "correct_table_for_precheck": true
+ },
+ "xor": {
+  "table": [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    3,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  "readable": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "moving_heads": 2,
+  "controller": "stateless: output head0 xor head1; <eos> when head 0 reads a non-digit ('^')",
+  "registers": "r0 = answer phase (set at '='), r1-r3 as listed per task; registers are only updated in the answer phase",
+  "exact_on_all_bins": true,
+  "correct_table_for_precheck": true
+ },
+ "subtraction": {
+  "table": [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    3,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  "readable": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "moving_heads": 2,
+  "controller": "aligned-stream subtraction (r1 borrow, r2 a exhausted, r3 b exhausted): digit (a_k - b_k - borrow) mod 10, b_k = 0 once b is exhausted; <eos> once a is exhausted (always len(a) digits)",
+  "registers": "r0 = answer phase (set at '='), r1-r3 as listed per task; registers are only updated in the answer phase",
+  "exact_on_all_bins": false,
+  "correct_table_for_precheck": false
+ },
+ "mul1": {
+  "table": [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    3,
+    1,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  "readable": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "moving_heads": 2,
+  "controller": "r1 carry 0-8, r2 a exhausted, r3 done: d = head 1's digit; d = 0 -> '0' then <eos>; otherwise digit (a_k d + carry) mod 10; once a is exhausted the carry if non-zero, then <eos>",
+  "registers": "r0 = answer phase (set at '='), r1-r3 as listed per task; registers are only updated in the answer phase",
+  "exact_on_all_bins": true,
+  "correct_table_for_precheck": true
+ },
+ "subtraction_pad": {
+  "table": [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    3,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  "readable": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "moving_heads": 2,
+  "controller": "same as subtraction",
+  "registers": "r0 = answer phase (set at '='), r1-r3 as listed per task; registers are only updated in the answer phase",
+  "exact_on_all_bins": true,
+  "correct_table_for_precheck": false
+ }
+}
