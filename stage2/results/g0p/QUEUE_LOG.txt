@@ -254,3 +254,6 @@
 2026-11-21 07:30:42 launch select prefix_sum s12
 2026-11-21 07:30:52 cut student prefix_sum s13 allstay (after its checkpoint at log row 17)
 2026-11-21 07:30:52 exit select prefix_sum s12 code 0
+2026-11-21 07:31:37 exit student prefix_sum s14 compiled code 0
+2026-11-21 07:32:07 cut student prefix_sum s113 allstay (after its checkpoint at log row 16)
+2026-11-21 07:45:20 orchestrator stop at the limit: {"copy s12": "selected", "copy s13": "selected", "copy s14": "selected", "reverse s12": "selected", "reverse s13": "selected", "reverse s14": "selected", "xor s12": "selected", "xor s13": "selected", "xor s14": "failed: teacher select 0.833, restart 0.490 < 0.95", "mul1 s12": "selected", "mul1 s13": "selected", "mul1 s14": "selected", "prefix_sum s12": "selected", "prefix_sum s13": "students", "prefix_sum s14": "students"}
