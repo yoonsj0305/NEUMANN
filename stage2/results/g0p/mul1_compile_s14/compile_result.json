@@ -1,0 +1,232 @@
+{
+ "task": "mul1",
+ "data_seed": 14,
+ "teacher": {
+  "path": "/home/user/NEUMANN/stage2/results/g0p/g0p_mul1__rope__1M__s14__N100000/teacher_best.pt",
+  "untrained_seed": null,
+  "step": 7000,
+  "acc": {
+   "id_1-10": 1.0,
+   "ood_11-20": 0.094,
+   "ood_21-30": 0.088,
+   "ood_31-40": 0.05
+  },
+  "train_flops_to_judgment": 55596776767488
+ },
+ "examples": 2000,
+ "output_steps": 13458,
+ "dependency_kind": "content substitution (design 14)",
+ "extraction": {
+  "flops": 6530531618560,
+  "backward_passes": 0,
+  "manual_forward_max_abs_logit_diff": null,
+  "substitution": {
+   "class_symbols": {
+    "digit": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "+": [
+     "*"
+    ],
+    "=": [
+     "="
+    ],
+    "answer_phase": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ]
+   },
+   "sequences_forwarded": 222653,
+   "substituted_positions": 24517,
+   "all_zero_rows": 0
+  }
+ },
+ "dependency_mass_on_current_position": 0.06314183392245996,
+ "attention_mass_on_current_position": 0.07806465564140498,
+ "precheck": {
+  "correct_table": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "dependency": {
+   "correct": 0.7194599221237798,
+   "correct_per_head": [
+    0.31522398577295807,
+    0.35649303798906457,
+    0.047742898361757206
+   ],
+   "all_stay": 0.12029186600899675,
+   "ratio": 5.9809523785255
+  },
+  "attention_aux": {
+   "correct": 0.3210644262234478,
+   "all_stay": 0.10971979001407696,
+   "ratio": 2.9262216613999668
+  },
+  "criterion": "score(correct) >= 2 x score(all stay) on the dependency (13.2)",
+  "passed": true,
+  "gate_applied": true
+ },
+ "policy": [
+  [
+   0,
+   3,
+   1,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0
+  ],
+  [
+   0,
+   3,
+   2,
+   0,
+   0,
+   0,
+   0
+  ]
+ ],
+ "policy_named": {
+  "head0": {
+   "digit": "stay",
+   "+": "next_sep",
+   "=": "right",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "stay",
+   "other": "stay"
+  },
+  "head1": {
+   "digit": "stay",
+   "+": "stay",
+   "=": "stay",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "right",
+   "other": "stay"
+  },
+  "head2": {
+   "digit": "stay",
+   "+": "next_sep",
+   "=": "left",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "stay",
+   "other": "stay"
+  }
+ },
+ "per_head": [
+  {
+   "column": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "score_after_cover": 0.3954708913932173,
+   "columns_tied_at_best": 3024
+  },
+  {
+   "column": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "score_after_cover": 0.2762461323688053,
+   "columns_tied_at_best": 17928
+  },
+  {
+   "column": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "left",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "score_after_cover": 0.0808534770407973,
+   "columns_tied_at_best": 2592
+  }
+ ],
+ "table_score_dependency": 0.7525705008028198,
+ "table_score_attention_aux": 0.3036370622212817,
+ "search": {
+  "columns": 279936,
+  "present_classes": [
+   "digit",
+   "+",
+   "=",
+   "answer_phase"
+  ],
+  "distinct_paths_simulated": 1296,
+  "head_moves_simulated": 36958032,
+  "score_lookups": 52324704,
+  "head_simulation_operations": 89282736
+ },
+ "reference_agreement_with_correct_table": {
+  "correct_head0_position_read_by_some_compiled_head": 1.0,
+  "correct_head1_position_read_by_some_compiled_head": 1.0,
+  "correct_head2_position_read_by_some_compiled_head": 0.1694902660127805
+ },
+ "wall_s": 132.9
+}
