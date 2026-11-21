@@ -104,3 +104,24 @@
 2026-11-21 16:50:40 launch teacher xor s315 (resume)
 2026-11-21 16:50:40 launch teacher rev_xor s415 (resume)
 2026-11-21 16:50:40 launch baseline rev_xor looped_rr (resume)
+2026-11-21 17:00:00 exit teacher rev_xor s316 code 0
+2026-11-21 17:00:00 launch check rev_xor s316
+2026-11-21 17:00:10 exit check rev_xor s316 code 0
+2026-11-21 17:00:10 launch teacher rev_xor s416
+2026-11-21 17:49:55 exit teacher xor s315 code 0
+2026-11-21 17:49:55 launch check xor s315
+2026-11-21 17:50:05 exit check xor s315 code 0
+2026-11-21 17:50:05 launch teacher xor s415
+2026-11-21 18:03:36 exit teacher rev_xor s415 code 0
+2026-11-21 18:03:36 launch check rev_xor s415
+2026-11-21 18:03:46 exit check rev_xor s415 code 0
+2026-11-21 18:03:46 launch baseline xor looped_rr
+2026-11-21 18:32:29 exit teacher xor s415 code 0
+2026-11-21 18:32:29 launch check xor s415
+2026-11-21 18:32:39 exit teacher rev_xor s416 code 0
+2026-11-21 18:32:39 exit check xor s415 code 0
+2026-11-21 18:32:39 launch check rev_xor s416
+2026-11-21 18:32:49 exit check rev_xor s416 code 0
+2026-11-21 18:33:49 cut baseline rev_xor looped_rr (after its checkpoint at log row 14)
+2026-11-21 18:35:19 cut baseline xor looped_rr (after its checkpoint at log row 4)
+2026-11-21 18:45:49 orchestrator stop at the limit: {"reverse s15": "students", "reverse s16": "students", "reverse s17": "students", "rev_xor s15": "failed: teacher select 0.414 · 0.100 · 0.056 · 0.431 < 0.95 (restarts exhausted)", "rev_xor s16": "failed: teacher select 0.302 · 0.633 · 0.539 · 0.310 < 0.95 (restarts exhausted)", "rev_xor s17": "students", "xor s15": "compile", "xor s16": "students", "xor s17": "students", "baseline reverse abacus": "running", "baseline reverse rope": "running", "baseline reverse looped_rr": "running", "baseline reverse gru": "running", "baseline rev_xor abacus": "running", "baseline rev_xor rope": "running", "baseline rev_xor looped_rr": "running", "baseline rev_xor gru": "running", "baseline xor abacus": "running", "baseline xor rope": "running", "baseline xor looped_rr": "running", "baseline xor gru": "running"}
