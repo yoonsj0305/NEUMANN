@@ -10,8 +10,10 @@ that step's offset from the <eos> step (0 = the <eos> step, -1 = one step before
 the <eos> step).
 
   python stage2/g0_reverse_paths.py      # writes stage2/results/g0/reverse_paths.json
+  python stage2/g0_reverse_paths.py --phase g0p --seeds 12 13 14      # G-0': stage2/results/g0p/reverse_paths.json
 """
 from __future__ import annotations
+import argparse
 import json
 import pathlib
 import sys
@@ -21,7 +23,6 @@ sys.path.insert(0, str(HERE))
 import g_tasks as G            # noqa: E402
 import g0a                     # noqa: E402
 
-RES = HERE / "results" / "g0"
 V = G.VOCAB
 
 
@@ -36,9 +37,10 @@ def end_marker(seq, plen, path):
     return out
 
 
-def main():
+def main(a):
+    RES = HERE / "results" / a.phase
     tabs = {"correct": g0a.TABLES["reverse"]}
-    for s in (9, 10, 11):
+    for s in a.seeds:
         tabs["compiled_s%d" % s] = json.loads((RES / ("reverse_compile_s%d" % s) / "compile_result.json")
                                               .read_text())["policy"]
     exs = G.selection_set("reverse")[:200]
@@ -73,4 +75,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--phase", default="g0")
+    ap.add_argument("--seeds", type=int, nargs="+", default=[9, 10, 11])
+    main(ap.parse_args())
