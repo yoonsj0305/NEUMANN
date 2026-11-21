@@ -1,0 +1,522 @@
+{
+ "copy": {
+  "table": [
+   [
+    0,
+    0,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  "readable": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "moving_heads": 1,
+  "controller": "stateless: output head 0's digit; <eos> when head 0 reads a non-digit ('=')",
+  "registers": "r0 = answer phase (set at '='); r1-r3 as listed",
+  "end_marker_head": "n/a",
+  "exact_on_all_bins": true
+ },
+ "reverse": {
+  "table": [
+   [
+    1,
+    0,
+    0,
+    0,
+    0,
+    2,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  "readable": {
+   "head0": {
+    "digit": "right",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "left",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "moving_heads": 1,
+  "controller": "stateless: <eos> when head 0 (the content head) reads BOS, otherwise output head 0's digit",
+  "registers": "r0 = answer phase (set at '='); r1-r3 as listed",
+  "end_marker_head": null,
+  "exact_on_all_bins": true
+ },
+ "xor": {
+  "table": [
+   [
+    0,
+    0,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    3,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  "readable": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "moving_heads": 2,
+  "controller": "stateless: output head 0 xor head 1; <eos> when head 0 reads a non-digit ('^')",
+  "registers": "r0 = answer phase (set at '='); r1-r3 as listed",
+  "end_marker_head": "n/a",
+  "exact_on_all_bins": true
+ },
+ "mul1": {
+  "table": [
+   [
+    0,
+    0,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    3,
+    1,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  "readable": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "moving_heads": 2,
+  "controller": "as G-0a: r1 carry 0-8, r2 a exhausted, r3 done; d = head 1's digit",
+  "registers": "r0 = answer phase (set at '='); r1-r3 as listed",
+  "end_marker_head": "n/a",
+  "exact_on_all_bins": true
+ },
+ "prefix_sum": {
+  "table": [
+   [
+    0,
+    0,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  "readable": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "moving_heads": 1,
+  "controller": "stateless: at '=' output head 0's digit; afterwards (current token + head 0's digit) mod 10; <eos> when head 0 reads a non-digit ('=')",
+  "registers": "r0 = answer phase (set at '='); r1-r3 as listed",
+  "end_marker_head": "n/a",
+  "exact_on_all_bins": true
+ },
+ "rev_xor": {
+  "table": [
+   [
+    1,
+    1,
+    0,
+    0,
+    0,
+    2,
+    0
+   ],
+   [
+    0,
+    3,
+    2,
+    0,
+    0,
+    2,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  "readable": {
+   "head0": {
+    "digit": "right",
+    "+": "right",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "left",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "left",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "left",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "moving_heads": 2,
+  "controller": "stateless: <eos> when head 1 (the x content head) reads BOS, otherwise output head 0 xor head 1",
+  "registers": "r0 = answer phase (set at '='); r1-r3 as listed",
+  "end_marker_head": null,
+  "exact_on_all_bins": true
+ },
+ "addition": {
+  "table": [
+   [
+    0,
+    0,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    3,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  "readable": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "moving_heads": 2,
+  "controller": "the C1-3 hand controller (stage1/pf_search_v2_check.TableController): r1 carry, r2 a exhausted, r3 b exhausted; digit (a_k + b_k + carry) mod 10, the final carry, then <eos>",
+  "registers": "r0 = answer phase (set at '='); r1-r3 as listed",
+  "end_marker_head": "n/a",
+  "exact_on_all_bins": true
+ },
+ "parity": {
+  "table": [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  "readable": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "moving_heads": 0,
+  "controller": "r1 = running xor of the current-token bits in the prompt (BOS and '=' are not bits); output r1 at '=', then <eos>",
+  "registers": "r0 = answer phase (set at '='); r1-r3 as listed",
+  "end_marker_head": "n/a",
+  "exact_on_all_bins": true
+ }
+}

@@ -1,0 +1,428 @@
+{
+ "design": "stage2/DESIGN.md 9.4-2 (H-0a item 2)",
+ "teachers": {
+  "g0_s10": {
+   "run": "stage2/results/g0/g0_xor__rope__1M__s10__N100000",
+   "run_seed": 10,
+   "checkpoint": "stage2/results/g0/g0_xor__rope__1M__s10__N100000/teacher_best.pt",
+   "judgment_step": 18000,
+   "run_steps": 20000,
+   "selection_set": {
+    "generation_seed": "select:xor",
+    "size": 1000
+   },
+   "token_accuracy_answer_and_eos": 0.5470058626465661,
+   "token_accuracy_answer_bits": 0.49403648269410666,
+   "sequence_accuracy": 0.054,
+   "answer_tokens": 9552,
+   "answer_bits": 8552,
+   "precheck": {
+    "ratio": 2.226289673933721,
+    "correct": 0.10976292108068503,
+    "all_stay": 0.0493030724464263,
+    "passed": true
+   },
+   "compile_data_seed": 10,
+   "compiled": {
+    "policy": [
+     [
+      0,
+      3,
+      3,
+      0,
+      0,
+      1,
+      0
+     ],
+     [
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0
+     ],
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    ],
+    "policy_named": {
+     "head0": {
+      "digit": "stay",
+      "+": "next_sep",
+      "=": "next_sep",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "right",
+      "other": "stay"
+     },
+     "head1": {
+      "digit": "right",
+      "+": "stay",
+      "=": "right",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "right",
+      "other": "stay"
+     },
+     "head2": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "stay",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "stay",
+      "other": "stay"
+     }
+    },
+    "table_reads": {
+     "head0": {
+      "reads_x_k": 0.0,
+      "reads_y_k": 0.0
+     },
+     "head1": {
+      "reads_x_k": 0.0,
+      "reads_y_k": 0.005144995322731525
+     },
+     "head2": {
+      "reads_x_k": 0.11693171188026193,
+      "reads_y_k": 0.0
+     }
+    },
+    "reads_x_k_max": 0.11693171188026193,
+    "reads_y_k_max": 0.005144995322731525,
+    "aligned": false
+   }
+  },
+  "g0p_s13": {
+   "run": "stage2/results/g0p/g0p_xor__rope__1M__s13__N100000",
+   "run_seed": 13,
+   "checkpoint": "stage2/results/g0p/g0p_xor__rope__1M__s13__N100000/teacher_best.pt",
+   "judgment_step": 20000,
+   "run_steps": 20000,
+   "selection_set": {
+    "generation_seed": "select:xor",
+    "size": 1000
+   },
+   "token_accuracy_answer_and_eos": 0.7687395309882747,
+   "token_accuracy_answer_bits": 0.7416978484565014,
+   "sequence_accuracy": 0.552,
+   "answer_tokens": 9552,
+   "answer_bits": 8552,
+   "precheck": {
+    "ratio": 4.613263188959474,
+    "correct": 0.5198109604428623,
+    "all_stay": 0.11267749945133876,
+    "passed": true
+   },
+   "compile_data_seed": 13,
+   "compiled": {
+    "policy": [
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0
+     ],
+     [
+      0,
+      3,
+      1,
+      0,
+      0,
+      1,
+      0
+     ],
+     [
+      0,
+      0,
+      1,
+      0,
+      0,
+      2,
+      0
+     ]
+    ],
+    "policy_named": {
+     "head0": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "stay",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "right",
+      "other": "stay"
+     },
+     "head1": {
+      "digit": "stay",
+      "+": "next_sep",
+      "=": "right",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "right",
+      "other": "stay"
+     },
+     "head2": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "right",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "left",
+      "other": "stay"
+     }
+    },
+    "table_reads": {
+     "head0": {
+      "reads_x_k": 1.0,
+      "reads_y_k": 0.0
+     },
+     "head1": {
+      "reads_x_k": 0.0,
+      "reads_y_k": 1.0
+     },
+     "head2": {
+      "reads_x_k": 0.0,
+      "reads_y_k": 0.0
+     }
+    },
+    "reads_x_k_max": 1.0,
+    "reads_y_k_max": 1.0,
+    "aligned": true
+   }
+  },
+  "g0p_s14": {
+   "run": "stage2/results/g0p/g0p_xor__rope__1M__s14__N100000",
+   "run_seed": 14,
+   "checkpoint": "stage2/results/g0p/g0p_xor__rope__1M__s14__N100000/teacher_best.pt",
+   "judgment_step": 19000,
+   "run_steps": 20000,
+   "selection_set": {
+    "generation_seed": "select:xor",
+    "size": 1000
+   },
+   "token_accuracy_answer_and_eos": 0.9477596314907872,
+   "token_accuracy_answer_bits": 0.9416510757717493,
+   "sequence_accuracy": 0.833,
+   "answer_tokens": 9552,
+   "answer_bits": 8552,
+   "precheck": {
+    "ratio": 11.114810687860908,
+    "correct": 0.8035925535973535,
+    "all_stay": 0.07229925692526647,
+    "passed": true
+   },
+   "compile_data_seed": 14,
+   "compiled": {
+    "policy": [
+     [
+      0,
+      3,
+      1,
+      0,
+      0,
+      1,
+      0
+     ],
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0
+     ],
+     [
+      0,
+      0,
+      1,
+      0,
+      0,
+      2,
+      0
+     ]
+    ],
+    "policy_named": {
+     "head0": {
+      "digit": "stay",
+      "+": "next_sep",
+      "=": "right",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "right",
+      "other": "stay"
+     },
+     "head1": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "stay",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "right",
+      "other": "stay"
+     },
+     "head2": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "right",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "left",
+      "other": "stay"
+     }
+    },
+    "table_reads": {
+     "head0": {
+      "reads_x_k": 0.0,
+      "reads_y_k": 1.0
+     },
+     "head1": {
+      "reads_x_k": 1.0,
+      "reads_y_k": 0.0
+     },
+     "head2": {
+      "reads_x_k": 0.0,
+      "reads_y_k": 0.0
+     }
+    },
+    "reads_x_k_max": 1.0,
+    "reads_y_k_max": 1.0,
+    "aligned": true
+   }
+  },
+  "g0p_s214": {
+   "run": "stage2/results/g0p/g0p_xor__rope__1M__s214__N100000",
+   "run_seed": 214,
+   "checkpoint": "stage2/results/g0p/g0p_xor__rope__1M__s214__N100000/teacher_best.pt",
+   "judgment_step": 20000,
+   "run_steps": 20000,
+   "selection_set": {
+    "generation_seed": "select:xor",
+    "size": 1000
+   },
+   "token_accuracy_answer_and_eos": 0.818676716917923,
+   "token_accuracy_answer_bits": 0.7974742750233863,
+   "sequence_accuracy": 0.49,
+   "answer_tokens": 9552,
+   "answer_bits": 8552,
+   "precheck": {
+    "ratio": 6.451147727581778,
+    "correct": 0.5809858671405023,
+    "all_stay": 0.09005930288288184,
+    "passed": true
+   },
+   "compile_data_seed": 214,
+   "compiled": {
+    "policy": [
+     [
+      0,
+      3,
+      1,
+      0,
+      0,
+      1,
+      0
+     ],
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0
+     ],
+     [
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0
+     ]
+    ],
+    "policy_named": {
+     "head0": {
+      "digit": "stay",
+      "+": "next_sep",
+      "=": "right",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "right",
+      "other": "stay"
+     },
+     "head1": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "stay",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "right",
+      "other": "stay"
+     },
+     "head2": {
+      "digit": "right",
+      "+": "stay",
+      "=": "right",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "stay",
+      "other": "stay"
+     }
+    },
+    "table_reads": {
+     "head0": {
+      "reads_x_k": 0.0,
+      "reads_y_k": 1.0
+     },
+     "head1": {
+      "reads_x_k": 1.0,
+      "reads_y_k": 0.0
+     },
+     "head2": {
+      "reads_x_k": 0.0,
+      "reads_y_k": 0.11693171188026193
+     }
+    },
+    "reads_x_k_max": 1.0,
+    "reads_y_k_max": 1.0,
+    "aligned": true
+   }
+  }
+ },
+ "correct_table_reads_reference": {
+  "head0": {
+   "reads_x_k": 1.0,
+   "reads_y_k": 0.0
+  },
+  "head1": {
+   "reads_x_k": 0.0,
+   "reads_y_k": 1.0
+  },
+  "head2": {
+   "reads_x_k": 0.11693171188026193,
+   "reads_y_k": 0.0
+  }
+ },
+ "env": {
+  "code_commit": "9c18f43f105e4042d41aa60f24c3b0fd79c70c56",
+  "code_dirty": true,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1
+ }
+}
