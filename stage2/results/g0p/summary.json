@@ -1,0 +1,2896 @@
+{
+ "tasks": {
+  "copy": {
+   "bins": [
+    "id_1-10",
+    "ood_11-20",
+    "ood_21-30",
+    "ood_31-40"
+   ],
+   "baselines": {
+    "abacus": {
+     "judgment_step": 8000,
+     "acc": {
+      "id_1-10": 0.992,
+      "ood_11-20": 0.452,
+      "ood_21-30": 0.008,
+      "ood_31-40": 0.0
+     },
+     "judgment_flops": 55728356818944,
+     "steps": 9000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+    },
+    "rope": {
+     "judgment_step": 2000,
+     "acc": {
+      "id_1-10": 1.0,
+      "ood_11-20": 0.0,
+      "ood_21-30": 0.0,
+      "ood_31-40": 0.0
+     },
+     "judgment_flops": 13930953277440,
+     "steps": 3000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+    },
+    "looped_rr": {
+     "judgment_step": 14000,
+     "acc": {
+      "id_1-10": 0.998,
+      "ood_11-20": 0.424,
+      "ood_21-30": 0.0,
+      "ood_31-40": 0.0
+     },
+     "judgment_flops": 242123984019456,
+     "steps": 14000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+    },
+    "gru": {
+     "judgment_step": 9000,
+     "acc": {
+      "id_1-10": 0.996,
+      "ood_11-20": 0.074,
+      "ood_21-30": 0.0,
+      "ood_31-40": 0.0
+     },
+     "judgment_flops": 62178671001600,
+     "steps": 10000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+    }
+   },
+   "baseline_best": {
+    "id_1-10": 1.0,
+    "ood_11-20": 0.452,
+    "ood_21-30": 0.008,
+    "ood_31-40": 0.0
+   },
+   "baseline_best_by": {
+    "id_1-10": "rope",
+    "ood_11-20": "abacus",
+    "ood_21-30": "abacus",
+    "ood_31-40": "abacus"
+   },
+   "flops_cap": 242123984019456,
+   "seeds": {
+    "12": {
+     "failure_stage": null,
+     "teachers": [
+      {
+       "run_seed": 12,
+       "restart": 0,
+       "judgment_step": 3000,
+       "steps": 4000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+       "id_at_judgment": 1.0,
+       "selection_accuracy": 1.0,
+       "passed": true,
+       "judgment_flops": 20899350872064,
+       "run_flops": 27865152061440,
+       "check_eval_flops": 23460139008
+      }
+     ],
+     "teacher_restarted": false,
+     "teacher_used": 12,
+     "precheck": {
+      "ratio": 3.7460908066935152,
+      "correct": 0.6633077302953203,
+      "all_stay": 0.177066644810137,
+      "passed": true
+     },
+     "extraction_flops": 5214783887360,
+     "compile_data_seed": 12,
+     "compile": {
+      "policy": [
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        0,
+        0,
+        3,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      ],
+      "policy_named": {
+       "head0": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "stay",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       },
+       "head1": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "next_sep",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       },
+       "head2": {
+        "digit": "right",
+        "+": "stay",
+        "=": "stay",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "stay",
+        "other": "stay"
+       }
+      },
+      "agreement_moving_correct_heads": {
+       "0": 1.0
+      },
+      "reads_correct_positions": true,
+      "compiled_all_stay": false
+     },
+     "students": {
+      "compiled_r0": {
+       "run": "stage2/results/g0p/g0p_copy__pf_search__1M__s12__N100000__compiled",
+       "selection_accuracy": 1.0,
+       "moving_heads": 3,
+       "judgment_step": 1000,
+       "acc": {
+        "id_1-10": 1.0,
+        "ood_11-20": 1.0,
+        "ood_21-30": 1.0,
+        "ood_31-40": 1.0
+       },
+       "judgment_flops": 2051487724160,
+       "steps": 2000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+      },
+      "compiled_r1": {
+       "run": "stage2/results/g0p/g0p_copy__pf_search__1M__s112__N100000__compiled",
+       "selection_accuracy": 1.0,
+       "moving_heads": 3,
+       "judgment_step": 1000,
+       "acc": {
+        "id_1-10": 1.0,
+        "ood_11-20": 1.0,
+        "ood_21-30": 1.0,
+        "ood_31-40": 1.0
+       },
+       "judgment_flops": 2051674240000,
+       "steps": 2000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+      },
+      "allstay_r0": {
+       "run": "stage2/results/g0p/g0p_copy__pf_search__1M__s12__N100000__allstay",
+       "selection_accuracy": 0.119,
+       "moving_heads": 0,
+       "judgment_step": 17000,
+       "acc": {
+        "id_1-10": 0.106,
+        "ood_11-20": 0.0,
+        "ood_21-30": 0.0,
+        "ood_31-40": 0.0
+       },
+       "judgment_flops": 34873985699840,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "allstay_r1": {
+       "run": "stage2/results/g0p/g0p_copy__pf_search__1M__s112__N100000__allstay",
+       "selection_accuracy": 0.124,
+       "moving_heads": 0,
+       "judgment_step": 11000,
+       "acc": {
+        "id_1-10": 0.109,
+        "ood_11-20": 0.0,
+        "ood_21-30": 0.0,
+        "ood_31-40": 0.0
+       },
+       "judgment_flops": 22565991934080,
+       "steps": 20000,
+       "stopped": "max steps"
+      }
+     },
+     "selected": "compiled_r0",
+     "selection_reason": "tied within 0.005: fewer moving heads, then the smaller restart number",
+     "flops": {
+      "teachers": 20899350872064,
+      "teachers_alt": 20899350872064,
+      "extraction": 5214783887360,
+      "students": 61543139598080
+     },
+     "total_flops": 87657274357504,
+     "total_flops_alt": 87657274357504,
+     "criteria": {
+      "1_ood_first_two_ge_0.90": true,
+      "2_ge_baseline_best_minus_0.01": true,
+      "3_total_flops_le_cap": true,
+      "total_flops_over_cap": 0.3620346605169864,
+      "3_alt_failed_teacher_whole_run": true,
+      "total_flops_alt_over_cap": 0.3620346605169864,
+      "criterion_3_changes_with_alt": false
+     },
+     "win": true
+    },
+    "13": {
+     "failure_stage": null,
+     "teachers": [
+      {
+       "run_seed": 13,
+       "restart": 0,
+       "judgment_step": 4000,
+       "steps": 5000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+       "id_at_judgment": 1.0,
+       "selection_accuracy": 1.0,
+       "passed": true,
+       "judgment_flops": 27867099365376,
+       "run_flops": 34833549656064,
+       "check_eval_flops": 23460139008
+      }
+     ],
+     "teacher_restarted": false,
+     "teacher_used": 13,
+     "precheck": {
+      "ratio": 4.402525210729141,
+      "correct": 0.7535037727239237,
+      "all_stay": 0.1711526309690636,
+      "passed": true
+     },
+     "extraction_flops": 5229499990016,
+     "compile_data_seed": 13,
+     "compile": {
+      "policy": [
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        0,
+        0,
+        3,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      ],
+      "policy_named": {
+       "head0": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "stay",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       },
+       "head1": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "next_sep",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       },
+       "head2": {
+        "digit": "right",
+        "+": "stay",
+        "=": "stay",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "stay",
+        "other": "stay"
+       }
+      },
+      "agreement_moving_correct_heads": {
+       "0": 1.0
+      },
+      "reads_correct_positions": true,
+      "compiled_all_stay": false
+     },
+     "students": {
+      "compiled_r0": {
+       "run": "stage2/results/g0p/g0p_copy__pf_search__1M__s13__N100000__compiled",
+       "selection_accuracy": 1.0,
+       "moving_heads": 3,
+       "judgment_step": 1000,
+       "acc": {
+        "id_1-10": 1.0,
+        "ood_11-20": 1.0,
+        "ood_21-30": 1.0,
+        "ood_31-40": 1.0
+       },
+       "judgment_flops": 2051674240000,
+       "steps": 2000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+      },
+      "compiled_r1": {
+       "run": "stage2/results/g0p/g0p_copy__pf_search__1M__s113__N100000__compiled",
+       "selection_accuracy": 1.0,
+       "moving_heads": 3,
+       "judgment_step": 1000,
+       "acc": {
+        "id_1-10": 1.0,
+        "ood_11-20": 1.0,
+        "ood_21-30": 1.0,
+        "ood_31-40": 1.0
+       },
+       "judgment_flops": 2051674240000,
+       "steps": 2000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+      },
+      "allstay_r0": {
+       "run": "stage2/results/g0p/g0p_copy__pf_search__1M__s13__N100000__allstay",
+       "selection_accuracy": 0.119,
+       "moving_heads": 0,
+       "judgment_step": 11000,
+       "acc": {
+        "id_1-10": 0.106,
+        "ood_11-20": 0.0,
+        "ood_21-30": 0.0,
+        "ood_31-40": 0.0
+       },
+       "judgment_flops": 22566364965760,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "allstay_r1": {
+       "run": "stage2/results/g0p/g0p_copy__pf_search__1M__s113__N100000__allstay",
+       "selection_accuracy": 0.127,
+       "moving_heads": 0,
+       "judgment_step": 12000,
+       "acc": {
+        "id_1-10": 0.111,
+        "ood_11-20": 0.0,
+        "ood_21-30": 0.0,
+        "ood_31-40": 0.0
+       },
+       "judgment_flops": 24617293142400,
+       "steps": 20000,
+       "stopped": "max steps"
+      }
+     },
+     "selected": "compiled_r0",
+     "selection_reason": "tied within 0.005: fewer moving heads, then the smaller restart number",
+     "flops": {
+      "teachers": 27867099365376,
+      "teachers_alt": 27867099365376,
+      "extraction": 5229499990016,
+      "students": 51287006588160
+     },
+     "total_flops": 84383605943552,
+     "total_flops_alt": 84383605943552,
+     "criteria": {
+      "1_ood_first_two_ge_0.90": true,
+      "2_ge_baseline_best_minus_0.01": true,
+      "3_total_flops_le_cap": true,
+      "total_flops_over_cap": 0.34851403211988824,
+      "3_alt_failed_teacher_whole_run": true,
+      "total_flops_alt_over_cap": 0.34851403211988824,
+      "criterion_3_changes_with_alt": false
+     },
+     "win": true
+    },
+    "14": {
+     "failure_stage": null,
+     "teachers": [
+      {
+       "run_seed": 14,
+       "restart": 0,
+       "judgment_step": 3000,
+       "steps": 3000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+       "id_at_judgment": 1.0,
+       "selection_accuracy": 1.0,
+       "passed": true,
+       "judgment_flops": 20899999973376,
+       "run_flops": 20899999973376,
+       "check_eval_flops": 23460139008
+      }
+     ],
+     "teacher_restarted": false,
+     "teacher_used": 14,
+     "precheck": {
+      "ratio": 4.983025215404616,
+      "correct": 0.8612534859288826,
+      "all_stay": 0.17283747296047944,
+      "passed": true
+     },
+     "extraction_flops": 5335036886016,
+     "compile_data_seed": 14,
+     "compile": {
+      "policy": [
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        0,
+        0,
+        3,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      ],
+      "policy_named": {
+       "head0": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "stay",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       },
+       "head1": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "next_sep",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       },
+       "head2": {
+        "digit": "right",
+        "+": "stay",
+        "=": "stay",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "stay",
+        "other": "stay"
+       }
+      },
+      "agreement_moving_correct_heads": {
+       "0": 1.0
+      },
+      "reads_correct_positions": true,
+      "compiled_all_stay": false
+     },
+     "students": {
+      "compiled_r0": {
+       "run": "stage2/results/g0p/g0p_copy__pf_search__1M__s14__N100000__compiled",
+       "selection_accuracy": 1.0,
+       "moving_heads": 3,
+       "judgment_step": 1000,
+       "acc": {
+        "id_1-10": 1.0,
+        "ood_11-20": 1.0,
+        "ood_21-30": 1.0,
+        "ood_31-40": 1.0
+       },
+       "judgment_flops": 2051301208320,
+       "steps": 2000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+      },
+      "compiled_r1": {
+       "run": "stage2/results/g0p/g0p_copy__pf_search__1M__s114__N100000__compiled",
+       "selection_accuracy": 1.0,
+       "moving_heads": 3,
+       "judgment_step": 1000,
+       "acc": {
+        "id_1-10": 1.0,
+        "ood_11-20": 1.0,
+        "ood_21-30": 1.0,
+        "ood_31-40": 1.0
+       },
+       "judgment_flops": 2051487724160,
+       "steps": 2000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+      },
+      "allstay_r0": {
+       "run": "stage2/results/g0p/g0p_copy__pf_search__1M__s14__N100000__allstay",
+       "selection_accuracy": 0.123,
+       "moving_heads": 0,
+       "judgment_step": 9000,
+       "acc": {
+        "id_1-10": 0.107,
+        "ood_11-20": 0.0,
+        "ood_21-30": 0.0,
+        "ood_31-40": 0.0
+       },
+       "judgment_flops": 18463949064960,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "allstay_r1": {
+       "run": "stage2/results/g0p/g0p_copy__pf_search__1M__s114__N100000__allstay",
+       "selection_accuracy": 0.117,
+       "moving_heads": 0,
+       "judgment_step": 9000,
+       "acc": {
+        "id_1-10": 0.105,
+        "ood_11-20": 0.0,
+        "ood_21-30": 0.0,
+        "ood_31-40": 0.0
+       },
+       "judgment_flops": 18463576033280,
+       "steps": 20000,
+       "stopped": "max steps"
+      }
+     },
+     "selected": "compiled_r0",
+     "selection_reason": "tied within 0.005: fewer moving heads, then the smaller restart number",
+     "flops": {
+      "teachers": 20899999973376,
+      "teachers_alt": 20899999973376,
+      "extraction": 5335036886016,
+      "students": 41030314030720
+     },
+     "total_flops": 67265350890112,
+     "total_flops_alt": 67265350890112,
+     "criteria": {
+      "1_ood_first_two_ge_0.90": true,
+      "2_ge_baseline_best_minus_0.01": true,
+      "3_total_flops_le_cap": true,
+      "total_flops_over_cap": 0.2778136629566894,
+      "3_alt_failed_teacher_whole_run": true,
+      "total_flops_alt_over_cap": 0.2778136629566894,
+      "criterion_3_changes_with_alt": false
+     },
+     "win": true
+    }
+   },
+   "win": true,
+   "decisive_win": true,
+   "different_structure_from_addition": true
+  },
+  "reverse": {
+   "bins": [
+    "id_1-10",
+    "ood_11-20",
+    "ood_21-30",
+    "ood_31-40"
+   ],
+   "baselines": {
+    "abacus": {
+     "judgment_step": 10000,
+     "acc": {
+      "id_1-10": 0.999,
+      "ood_11-20": 0.438,
+      "ood_21-30": 0.0,
+      "ood_31-40": 0.0
+     },
+     "judgment_flops": 69666450210816,
+     "steps": 10000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+    },
+    "rope": {
+     "judgment_step": 2000,
+     "acc": {
+      "id_1-10": 1.0,
+      "ood_11-20": 0.0,
+      "ood_21-30": 0.0,
+      "ood_31-40": 0.0
+     },
+     "judgment_flops": 13932900581376,
+     "steps": 3000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+    },
+    "looped_rr": {
+     "judgment_step": 10000,
+     "acc": {
+      "id_1-10": 0.993,
+      "ood_11-20": 0.36,
+      "ood_21-30": 0.0,
+      "ood_31-40": 0.0
+     },
+     "judgment_flops": 172839381118976,
+     "steps": 14000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+    },
+    "gru": {
+     "judgment_step": 9000,
+     "acc": {
+      "id_1-10": 0.994,
+      "ood_11-20": 0.078,
+      "ood_21-30": 0.0,
+      "ood_31-40": 0.0
+     },
+     "judgment_flops": 62184952627200,
+     "steps": 10000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+    }
+   },
+   "baseline_best": {
+    "id_1-10": 1.0,
+    "ood_11-20": 0.438,
+    "ood_21-30": 0.0,
+    "ood_31-40": 0.0
+   },
+   "baseline_best_by": {
+    "id_1-10": "rope",
+    "ood_11-20": "abacus",
+    "ood_21-30": "abacus",
+    "ood_31-40": "abacus"
+   },
+   "flops_cap": 172839381118976,
+   "seeds": {
+    "12": {
+     "failure_stage": "compile",
+     "teachers": [
+      {
+       "run_seed": 12,
+       "restart": 0,
+       "judgment_step": 2000,
+       "steps": 3000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+       "id_at_judgment": 1.0,
+       "selection_accuracy": 1.0,
+       "passed": true,
+       "judgment_flops": 13932900581376,
+       "run_flops": 20897403568128,
+       "check_eval_flops": 23449653248
+      }
+     ],
+     "teacher_restarted": false,
+     "teacher_used": 12,
+     "precheck": {
+      "ratio": 3.9691463255615607,
+      "correct": 0.9031617918188714,
+      "all_stay": 0.22754560243910651,
+      "passed": true
+     },
+     "extraction_flops": 5430271835648,
+     "compile_data_seed": 12,
+     "compile": {
+      "policy": [
+       [
+        1,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0
+       ],
+       [
+        0,
+        0,
+        3,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        0,
+        0,
+        3,
+        0,
+        0,
+        2,
+        0
+       ]
+      ],
+      "policy_named": {
+       "head0": {
+        "digit": "right",
+        "+": "stay",
+        "=": "stay",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "left",
+        "other": "stay"
+       },
+       "head1": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "next_sep",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       },
+       "head2": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "next_sep",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "left",
+        "other": "stay"
+       }
+      },
+      "agreement_moving_correct_heads": {
+       "0": 1.0,
+       "1": 0.1503646342380272
+      },
+      "reads_correct_positions": false,
+      "compiled_all_stay": false
+     },
+     "students": {
+      "compiled_r0": {
+       "run": "stage2/results/g0p/g0p_reverse__pf_search__1M__s12__N100000__compiled",
+       "selection_accuracy": 0.849,
+       "moving_heads": 3,
+       "judgment_step": 12000,
+       "acc": {
+        "id_1-10": 0.852,
+        "ood_11-20": 0.316,
+        "ood_21-30": 0.148,
+        "ood_31-40": 0.05
+       },
+       "judgment_flops": 24617106626560,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "compiled_r1": {
+       "run": "stage2/results/g0p/g0p_reverse__pf_search__1M__s112__N100000__compiled",
+       "selection_accuracy": 0.812,
+       "moving_heads": 3,
+       "judgment_step": 13000,
+       "acc": {
+        "id_1-10": 0.826,
+        "ood_11-20": 0.28,
+        "ood_21-30": 0.128,
+        "ood_31-40": 0.05
+       },
+       "judgment_flops": 26669713445760,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "allstay_r0": {
+       "run": "stage2/results/g0p/g0p_reverse__pf_search__1M__s12__N100000__allstay",
+       "selection_accuracy": 0.175,
+       "moving_heads": 0,
+       "judgment_step": 2000,
+       "acc": {
+        "id_1-10": 0.187,
+        "ood_11-20": 0.0,
+        "ood_21-30": 0.0,
+        "ood_31-40": 0.0
+       },
+       "judgment_flops": 4102975448320,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "allstay_r1": {
+       "run": "stage2/results/g0p/g0p_reverse__pf_search__1M__s112__N100000__allstay",
+       "selection_accuracy": 0.175,
+       "moving_heads": 0,
+       "judgment_step": 3000,
+       "acc": {
+        "id_1-10": 0.187,
+        "ood_11-20": 0.0,
+        "ood_21-30": 0.0,
+        "ood_31-40": 0.0
+       },
+       "judgment_flops": 6154649688320,
+       "steps": 20000,
+       "stopped": "max steps"
+      }
+     },
+     "selected": "compiled_r0",
+     "selection_reason": "highest selection accuracy",
+     "flops": {
+      "teachers": 13932900581376,
+      "teachers_alt": 13932900581376,
+      "extraction": 5430271835648,
+      "students": 61544445208960
+     },
+     "total_flops": 80907617625984,
+     "total_flops_alt": 80907617625984,
+     "criteria": {
+      "1_ood_first_two_ge_0.90": false,
+      "2_ge_baseline_best_minus_0.01": false,
+      "3_total_flops_le_cap": true,
+      "total_flops_over_cap": 0.46810869781054293,
+      "3_alt_failed_teacher_whole_run": true,
+      "total_flops_alt_over_cap": 0.46810869781054293,
+      "criterion_3_changes_with_alt": false
+     },
+     "win": false
+    },
+    "13": {
+     "failure_stage": "compile",
+     "teachers": [
+      {
+       "run_seed": 13,
+       "restart": 0,
+       "judgment_step": 2000,
+       "steps": 3000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+       "id_at_judgment": 1.0,
+       "selection_accuracy": 1.0,
+       "passed": true,
+       "judgment_flops": 13932900581376,
+       "run_flops": 20899999973376,
+       "check_eval_flops": 23449653248
+      }
+     ],
+     "teacher_restarted": false,
+     "teacher_used": 13,
+     "precheck": {
+      "ratio": 3.7598957676691356,
+      "correct": 0.8605862356459419,
+      "all_stay": 0.2288856630138562,
+      "passed": true
+     },
+     "extraction_flops": 5246568268288,
+     "compile_data_seed": 13,
+     "compile": {
+      "policy": [
+       [
+        1,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0
+       ],
+       [
+        0,
+        0,
+        3,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        0,
+        0,
+        3,
+        0,
+        0,
+        2,
+        0
+       ]
+      ],
+      "policy_named": {
+       "head0": {
+        "digit": "right",
+        "+": "stay",
+        "=": "stay",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "left",
+        "other": "stay"
+       },
+       "head1": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "next_sep",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       },
+       "head2": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "next_sep",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "left",
+        "other": "stay"
+       }
+      },
+      "agreement_moving_correct_heads": {
+       "0": 1.0,
+       "1": 0.1542376802652888
+      },
+      "reads_correct_positions": false,
+      "compiled_all_stay": false
+     },
+     "students": {
+      "compiled_r0": {
+       "run": "stage2/results/g0p/g0p_reverse__pf_search__1M__s13__N100000__compiled",
+       "selection_accuracy": 0.781,
+       "moving_heads": 3,
+       "judgment_step": 4000,
+       "acc": {
+        "id_1-10": 0.785,
+        "ood_11-20": 0.252,
+        "ood_21-30": 0.108,
+        "ood_31-40": 0.044
+       },
+       "judgment_flops": 8205950896640,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "compiled_r1": {
+       "run": "stage2/results/g0p/g0p_reverse__pf_search__1M__s113__N100000__compiled",
+       "selection_accuracy": 0.869,
+       "moving_heads": 3,
+       "judgment_step": 13000,
+       "acc": {
+        "id_1-10": 0.86,
+        "ood_11-20": 0.356,
+        "ood_21-30": 0.158,
+        "ood_31-40": 0.054
+       },
+       "judgment_flops": 26669526929920,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "allstay_r0": {
+       "run": "stage2/results/g0p/g0p_reverse__pf_search__1M__s13__N100000__allstay",
+       "selection_accuracy": 0.175,
+       "moving_heads": 0,
+       "judgment_step": 3000,
+       "acc": {
+        "id_1-10": 0.187,
+        "ood_11-20": 0.0,
+        "ood_21-30": 0.0,
+        "ood_31-40": 0.0
+       },
+       "judgment_flops": 6154649688320,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "allstay_r1": {
+       "run": "stage2/results/g0p/g0p_reverse__pf_search__1M__s113__N100000__allstay",
+       "selection_accuracy": 0.192,
+       "moving_heads": 0,
+       "judgment_step": 4000,
+       "acc": {
+        "id_1-10": 0.199,
+        "ood_11-20": 0.0,
+        "ood_21-30": 0.0,
+        "ood_31-40": 0.0
+       },
+       "judgment_flops": 8205950896640,
+       "steps": 20000,
+       "stopped": "max steps"
+      }
+     },
+     "selected": "compiled_r1",
+     "selection_reason": "highest selection accuracy",
+     "flops": {
+      "teachers": 13932900581376,
+      "teachers_alt": 13932900581376,
+      "extraction": 5246568268288,
+      "students": 49236078411520
+     },
+     "total_flops": 68415547261184,
+     "total_flops_alt": 68415547261184,
+     "criteria": {
+      "1_ood_first_two_ge_0.90": false,
+      "2_ge_baseline_best_minus_0.01": false,
+      "3_total_flops_le_cap": true,
+      "total_flops_over_cap": 0.3958330955494996,
+      "3_alt_failed_teacher_whole_run": true,
+      "total_flops_alt_over_cap": 0.3958330955494996,
+      "criterion_3_changes_with_alt": false
+     },
+     "win": false
+    },
+    "14": {
+     "failure_stage": "compile",
+     "teachers": [
+      {
+       "run_seed": 14,
+       "restart": 0,
+       "judgment_step": 2000,
+       "steps": 3000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+       "id_at_judgment": 1.0,
+       "selection_accuracy": 1.0,
+       "passed": true,
+       "judgment_flops": 13932251480064,
+       "run_flops": 20899350872064,
+       "check_eval_flops": 23449653248
+      }
+     ],
+     "teacher_restarted": false,
+     "teacher_used": 14,
+     "precheck": {
+      "ratio": 3.8248218039095434,
+      "correct": 0.8095024003508452,
+      "all_stay": 0.2116444743970587,
+      "passed": true
+     },
+     "extraction_flops": 5318331039232,
+     "compile_data_seed": 14,
+     "compile": {
+      "policy": [
+       [
+        1,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0
+       ],
+       [
+        0,
+        0,
+        3,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        0,
+        0,
+        3,
+        0,
+        0,
+        2,
+        0
+       ]
+      ],
+      "policy_named": {
+       "head0": {
+        "digit": "right",
+        "+": "stay",
+        "=": "stay",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "left",
+        "other": "stay"
+       },
+       "head1": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "next_sep",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       },
+       "head2": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "next_sep",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "left",
+        "other": "stay"
+       }
+      },
+      "agreement_moving_correct_heads": {
+       "0": 1.0,
+       "1": 0.15266010228226853
+      },
+      "reads_correct_positions": false,
+      "compiled_all_stay": false
+     },
+     "students": {
+      "compiled_r0": {
+       "run": "stage2/results/g0p/g0p_reverse__pf_search__1M__s14__N100000__compiled",
+       "selection_accuracy": 0.781,
+       "moving_heads": 3,
+       "judgment_step": 3000,
+       "acc": {
+        "id_1-10": 0.785,
+        "ood_11-20": 0.252,
+        "ood_21-30": 0.108,
+        "ood_31-40": 0.044
+       },
+       "judgment_flops": 6154463172480,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "compiled_r1": {
+       "run": "stage2/results/g0p/g0p_reverse__pf_search__1M__s114__N100000__compiled",
+       "selection_accuracy": 0.781,
+       "moving_heads": 3,
+       "judgment_step": 3000,
+       "acc": {
+        "id_1-10": 0.785,
+        "ood_11-20": 0.252,
+        "ood_21-30": 0.108,
+        "ood_31-40": 0.044
+       },
+       "judgment_flops": 6154649688320,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "allstay_r0": {
+       "run": "stage2/results/g0p/g0p_reverse__pf_search__1M__s14__N100000__allstay",
+       "selection_accuracy": 0.175,
+       "moving_heads": 0,
+       "judgment_step": 2000,
+       "acc": {
+        "id_1-10": 0.187,
+        "ood_11-20": 0.0,
+        "ood_21-30": 0.0,
+        "ood_31-40": 0.0
+       },
+       "judgment_flops": 4102788932480,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "allstay_r1": {
+       "run": "stage2/results/g0p/g0p_reverse__pf_search__1M__s114__N100000__allstay",
+       "selection_accuracy": 0.175,
+       "moving_heads": 0,
+       "judgment_step": 2000,
+       "acc": {
+        "id_1-10": 0.187,
+        "ood_11-20": 0.0,
+        "ood_21-30": 0.0,
+        "ood_31-40": 0.0
+       },
+       "judgment_flops": 4103348480000,
+       "steps": 20000,
+       "stopped": "max steps"
+      }
+     },
+     "selected": "compiled_r0",
+     "selection_reason": "tied within 0.005: fewer moving heads, then the smaller restart number",
+     "flops": {
+      "teachers": 13932251480064,
+      "teachers_alt": 13932251480064,
+      "extraction": 5318331039232,
+      "students": 20515250273280
+     },
+     "total_flops": 39765832792576,
+     "total_flops_alt": 39765832792576,
+     "criteria": {
+      "1_ood_first_two_ge_0.90": false,
+      "2_ge_baseline_best_minus_0.01": false,
+      "3_total_flops_le_cap": true,
+      "total_flops_over_cap": 0.23007391333577343,
+      "3_alt_failed_teacher_whole_run": true,
+      "total_flops_alt_over_cap": 0.23007391333577343,
+      "criterion_3_changes_with_alt": false
+     },
+     "win": false
+    }
+   },
+   "win": false,
+   "decisive_win": false,
+   "different_structure_from_addition": true
+  },
+  "xor": {
+   "bins": [
+    "id_1-16",
+    "ood_17-32",
+    "ood_33-48",
+    "ood_49-64"
+   ],
+   "baselines": {
+    "abacus": {
+     "judgment_step": 18000,
+     "acc": {
+      "id_1-16": 0.247,
+      "ood_17-32": 0.0,
+      "ood_33-48": 0.0,
+      "ood_49-64": 0.0
+     },
+     "judgment_flops": 300889626918912,
+     "steps": 20000,
+     "stopped": "max steps"
+    },
+    "rope": {
+     "judgment_step": 17000,
+     "acc": {
+      "id_1-16": 0.999,
+      "ood_17-32": 0.0,
+      "ood_33-48": 0.0,
+      "ood_49-64": 0.0
+     },
+     "judgment_flops": 284168500051968,
+     "steps": 17000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+    },
+    "looped_rr": {
+     "judgment_step": 19000,
+     "acc": {
+      "id_1-16": 0.164,
+      "ood_17-32": 0.0,
+      "ood_33-48": 0.0,
+      "ood_49-64": 0.0
+     },
+     "judgment_flops": 780511151996928,
+     "steps": 20000,
+     "stopped": "max steps"
+    },
+    "gru": {
+     "judgment_step": 20000,
+     "acc": {
+      "id_1-16": 0.67,
+      "ood_17-32": 0.0,
+      "ood_33-48": 0.0,
+      "ood_49-64": 0.0
+     },
+     "judgment_flops": 320055734108160,
+     "steps": 20000,
+     "stopped": "max steps"
+    }
+   },
+   "baseline_best": {
+    "id_1-16": 0.999,
+    "ood_17-32": 0.0,
+    "ood_33-48": 0.0,
+    "ood_49-64": 0.0
+   },
+   "baseline_best_by": {
+    "id_1-16": "rope",
+    "ood_17-32": "abacus",
+    "ood_33-48": "abacus",
+    "ood_49-64": "abacus"
+   },
+   "flops_cap": 780511151996928,
+   "seeds": {
+    "12": {
+     "failure_stage": null,
+     "teachers": [
+      {
+       "run_seed": 12,
+       "restart": 0,
+       "judgment_step": 11000,
+       "steps": 11000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+       "id_at_judgment": 1.0,
+       "selection_accuracy": 0.998,
+       "passed": true,
+       "judgment_flops": 183895900618752,
+       "run_flops": 183895900618752,
+       "check_eval_flops": 54104205312
+      }
+     ],
+     "teacher_restarted": false,
+     "teacher_used": 12,
+     "precheck": {
+      "ratio": 14.915471351919026,
+      "correct": 0.9034746832710531,
+      "all_stay": 0.06057298907652771,
+      "passed": true
+     },
+     "extraction_flops": 3268451439360,
+     "compile_data_seed": 12,
+     "compile": {
+      "policy": [
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        0,
+        3,
+        1,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        0,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0
+       ]
+      ],
+      "policy_named": {
+       "head0": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "stay",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       },
+       "head1": {
+        "digit": "stay",
+        "+": "next_sep",
+        "=": "right",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       },
+       "head2": {
+        "digit": "stay",
+        "+": "next_sep",
+        "=": "left",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "stay",
+        "other": "stay"
+       }
+      },
+      "agreement_moving_correct_heads": {
+       "0": 1.0,
+       "1": 1.0
+      },
+      "reads_correct_positions": true,
+      "compiled_all_stay": false
+     },
+     "students": {
+      "compiled_r0": {
+       "run": "stage2/results/g0p/g0p_xor__pf_search__1M__s12__N100000__compiled",
+       "selection_accuracy": 1.0,
+       "moving_heads": 3,
+       "judgment_step": 1000,
+       "acc": {
+        "id_1-16": 1.0,
+        "ood_17-32": 1.0,
+        "ood_33-48": 1.0,
+        "ood_49-64": 1.0
+       },
+       "judgment_flops": 4750018455936,
+       "steps": 2000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+      },
+      "compiled_r1": {
+       "run": "stage2/results/g0p/g0p_xor__pf_search__1M__s112__N100000__compiled",
+       "selection_accuracy": 1.0,
+       "moving_heads": 3,
+       "judgment_step": 1000,
+       "acc": {
+        "id_1-16": 1.0,
+        "ood_17-32": 1.0,
+        "ood_33-48": 1.0,
+        "ood_49-64": 1.0
+       },
+       "judgment_flops": 4752536430144,
+       "steps": 2000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+      },
+      "allstay_r0": {
+       "run": "stage2/results/g0p/g0p_xor__pf_search__1M__s12__N100000__allstay",
+       "selection_accuracy": 0.045,
+       "moving_heads": 0,
+       "judgment_step": 11000,
+       "acc": {
+        "id_1-16": 0.063,
+        "ood_17-32": 0.0,
+        "ood_33-48": 0.0,
+        "ood_49-64": 0.0
+       },
+       "judgment_flops": 52274263657728,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "allstay_r1": {
+       "run": "stage2/results/g0p/g0p_xor__pf_search__1M__s112__N100000__allstay",
+       "selection_accuracy": 0.042,
+       "moving_heads": 0,
+       "judgment_step": 13000,
+       "acc": {
+        "id_1-16": 0.056,
+        "ood_17-32": 0.0,
+        "ood_33-48": 0.0,
+        "ood_49-64": 0.0
+       },
+       "judgment_flops": 61782973591872,
+       "steps": 20000,
+       "stopped": "max steps"
+      }
+     },
+     "selected": "compiled_r0",
+     "selection_reason": "tied within 0.005: fewer moving heads, then the smaller restart number",
+     "flops": {
+      "teachers": 183895900618752,
+      "teachers_alt": 183895900618752,
+      "extraction": 3268451439360,
+      "students": 123559792135680
+     },
+     "total_flops": 310724144193792,
+     "total_flops_alt": 310724144193792,
+     "criteria": {
+      "1_ood_first_two_ge_0.90": true,
+      "2_ge_baseline_best_minus_0.01": true,
+      "3_total_flops_le_cap": true,
+      "total_flops_over_cap": 0.3981034010837746,
+      "3_alt_failed_teacher_whole_run": true,
+      "total_flops_alt_over_cap": 0.3981034010837746,
+      "criterion_3_changes_with_alt": false
+     },
+     "win": true
+    },
+    "13": {
+     "failure_stage": null,
+     "teachers": [
+      {
+       "run_seed": 13,
+       "restart": 0,
+       "judgment_step": 20000,
+       "steps": 20000,
+       "stopped": "max steps",
+       "id_at_judgment": 0.558,
+       "selection_accuracy": 0.552,
+       "passed": false,
+       "judgment_flops": 334257941938176,
+       "run_flops": 334257941938176,
+       "check_eval_flops": 54104205312
+      },
+      {
+       "run_seed": 213,
+       "restart": 1,
+       "judgment_step": 18000,
+       "steps": 18000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+       "id_at_judgment": 0.999,
+       "selection_accuracy": 0.999,
+       "passed": true,
+       "judgment_flops": 300889655230464,
+       "run_flops": 300889655230464,
+       "check_eval_flops": 54104205312
+      }
+     ],
+     "teacher_restarted": true,
+     "teacher_used": 213,
+     "precheck": {
+      "ratio": 13.566531353092886,
+      "correct": 0.9055436325433475,
+      "all_stay": 0.06674835364876833,
+      "passed": true
+     },
+     "extraction_flops": 3212361950976,
+     "compile_data_seed": 213,
+     "compile": {
+      "policy": [
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        0,
+        3,
+        1,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        1,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0
+       ]
+      ],
+      "policy_named": {
+       "head0": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "stay",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       },
+       "head1": {
+        "digit": "stay",
+        "+": "next_sep",
+        "=": "right",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       },
+       "head2": {
+        "digit": "right",
+        "+": "stay",
+        "=": "stay",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "left",
+        "other": "stay"
+       }
+      },
+      "agreement_moving_correct_heads": {
+       "0": 1.0,
+       "1": 1.0
+      },
+      "reads_correct_positions": true,
+      "compiled_all_stay": false
+     },
+     "students": {
+      "compiled_r0": {
+       "run": "stage2/results/g0p/g0p_xor__pf_search__1M__s13__N100000__compiled",
+       "selection_accuracy": 1.0,
+       "moving_heads": 3,
+       "judgment_step": 1000,
+       "acc": {
+        "id_1-16": 1.0,
+        "ood_17-32": 1.0,
+        "ood_33-48": 1.0,
+        "ood_49-64": 1.0
+       },
+       "judgment_flops": 4750298230848,
+       "steps": 2000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+      },
+      "compiled_r1": {
+       "run": "stage2/results/g0p/g0p_xor__pf_search__1M__s113__N100000__compiled",
+       "selection_accuracy": 1.0,
+       "moving_heads": 3,
+       "judgment_step": 1000,
+       "acc": {
+        "id_1-16": 1.0,
+        "ood_17-32": 1.0,
+        "ood_33-48": 1.0,
+        "ood_49-64": 1.0
+       },
+       "judgment_flops": 4750857780672,
+       "steps": 2000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+      },
+      "allstay_r0": {
+       "run": "stage2/results/g0p/g0p_xor__pf_search__1M__s13__N100000__allstay",
+       "selection_accuracy": 0.049,
+       "moving_heads": 0,
+       "judgment_step": 9000,
+       "acc": {
+        "id_1-16": 0.08,
+        "ood_17-32": 0.0,
+        "ood_33-48": 0.0,
+        "ood_49-64": 0.0
+       },
+       "judgment_flops": 42758559350784,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "allstay_r1": {
+       "run": "stage2/results/g0p/g0p_xor__pf_search__1M__s113__N100000__allstay",
+       "selection_accuracy": 0.052,
+       "moving_heads": 0,
+       "judgment_step": 16000,
+       "acc": {
+        "id_1-16": 0.062,
+        "ood_17-32": 0.0,
+        "ood_33-48": 0.0,
+        "ood_49-64": 0.0
+       },
+       "judgment_flops": 76023516612672,
+       "steps": 20000,
+       "stopped": "max steps"
+      }
+     },
+     "selected": "compiled_r0",
+     "selection_reason": "tied within 0.005: fewer moving heads, then the smaller restart number",
+     "flops": {
+      "teachers": 635147597168640,
+      "teachers_alt": 635147597168640,
+      "extraction": 3212361950976,
+      "students": 128283231974976
+     },
+     "total_flops": 766643191094592,
+     "total_flops_alt": 766643191094592,
+     "criteria": {
+      "1_ood_first_two_ge_0.90": true,
+      "2_ge_baseline_best_minus_0.01": true,
+      "3_total_flops_le_cap": true,
+      "total_flops_over_cap": 0.9822322065907002,
+      "3_alt_failed_teacher_whole_run": true,
+      "total_flops_alt_over_cap": 0.9822322065907002,
+      "criterion_3_changes_with_alt": false
+     },
+     "win": true
+    },
+    "14": {
+     "failure_stage": "teacher (after restart)",
+     "teachers": [
+      {
+       "run_seed": 14,
+       "restart": 0,
+       "judgment_step": 19000,
+       "steps": 20000,
+       "stopped": "max steps",
+       "id_at_judgment": 0.83,
+       "selection_accuracy": 0.833,
+       "passed": false,
+       "judgment_flops": 317608650768384,
+       "run_flops": 334325614067712,
+       "check_eval_flops": 54104205312
+      },
+      {
+       "run_seed": 214,
+       "restart": 1,
+       "judgment_step": 20000,
+       "steps": 20000,
+       "stopped": "max steps",
+       "id_at_judgment": 0.498,
+       "selection_accuracy": 0.49,
+       "passed": false,
+       "judgment_flops": 334309993611264,
+       "run_flops": 334309993611264,
+       "check_eval_flops": 54104205312
+      }
+     ],
+     "teacher_restarted": true,
+     "teacher_used": null,
+     "win": false
+    }
+   },
+   "win": false,
+   "decisive_win": false,
+   "different_structure_from_addition": false
+  },
+  "mul1": {
+   "bins": [
+    "id_1-10",
+    "ood_11-20",
+    "ood_21-30",
+    "ood_31-40"
+   ],
+   "baselines": {
+    "abacus": {
+     "judgment_step": 11000,
+     "acc": {
+      "id_1-10": 0.992,
+      "ood_11-20": 0.178,
+      "ood_21-30": 0.014,
+      "ood_31-40": 0.0
+     },
+     "judgment_flops": 87370943938560,
+     "steps": 12000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+    },
+    "rope": {
+     "judgment_step": 7000,
+     "acc": {
+      "id_1-10": 0.997,
+      "ood_11-20": 0.048,
+      "ood_21-30": 0.002,
+      "ood_31-40": 0.002
+     },
+     "judgment_flops": 55599067103232,
+     "steps": 8000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+    },
+    "looped_rr": {
+     "judgment_step": 18000,
+     "acc": {
+      "id_1-10": 0.981,
+      "ood_11-20": 0.22,
+      "ood_21-30": 0.048,
+      "ood_31-40": 0.0
+     },
+     "judgment_flops": 354601744234496,
+     "steps": 20000,
+     "stopped": "max steps"
+    },
+    "gru": {
+     "judgment_step": 19000,
+     "acc": {
+      "id_1-10": 0.731,
+      "ood_11-20": 0.098,
+      "ood_21-30": 0.124,
+      "ood_31-40": 0.084
+     },
+     "judgment_flops": 149117311549440,
+     "steps": 20000,
+     "stopped": "max steps"
+    }
+   },
+   "baseline_best": {
+    "id_1-10": 0.997,
+    "ood_11-20": 0.22,
+    "ood_21-30": 0.124,
+    "ood_31-40": 0.084
+   },
+   "baseline_best_by": {
+    "id_1-10": "rope",
+    "ood_11-20": "looped_rr",
+    "ood_21-30": "gru",
+    "ood_31-40": "gru"
+   },
+   "flops_cap": 354601744234496,
+   "seeds": {
+    "12": {
+     "failure_stage": null,
+     "teachers": [
+      {
+       "run_seed": 12,
+       "restart": 0,
+       "judgment_step": 10000,
+       "steps": 11000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+       "id_at_judgment": 1.0,
+       "selection_accuracy": 1.0,
+       "passed": true,
+       "judgment_flops": 79423639732224,
+       "run_flops": 87366035177472,
+       "check_eval_flops": 26537850880
+      }
+     ],
+     "teacher_restarted": false,
+     "teacher_used": 12,
+     "precheck": {
+      "ratio": 6.147383217474058,
+      "correct": 0.7175059830378505,
+      "all_stay": 0.1167173019242278,
+      "passed": true
+     },
+     "extraction_flops": 6619346101504,
+     "compile_data_seed": 12,
+     "compile": {
+      "policy": [
+       [
+        0,
+        3,
+        1,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        0,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0
+       ]
+      ],
+      "policy_named": {
+       "head0": {
+        "digit": "stay",
+        "+": "next_sep",
+        "=": "right",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "stay",
+        "other": "stay"
+       },
+       "head1": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "stay",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       },
+       "head2": {
+        "digit": "stay",
+        "+": "next_sep",
+        "=": "left",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "stay",
+        "other": "stay"
+       }
+      },
+      "agreement_moving_correct_heads": {
+       "0": 1.0,
+       "1": 1.0
+      },
+      "reads_correct_positions": true,
+      "compiled_all_stay": false
+     },
+     "students": {
+      "compiled_r0": {
+       "run": "stage2/results/g0p/g0p_mul1__pf_search__1M__s12__N100000__compiled",
+       "selection_accuracy": 0.992,
+       "moving_heads": 3,
+       "judgment_step": 10000,
+       "acc": {
+        "id_1-10": 0.997,
+        "ood_11-20": 0.99,
+        "ood_21-30": 0.964,
+        "ood_31-40": 0.962
+       },
+       "judgment_flops": 23302263212480,
+       "steps": 10000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+      },
+      "compiled_r1": {
+       "run": "stage2/results/g0p/g0p_mul1__pf_search__1M__s112__N100000__compiled",
+       "selection_accuracy": 0.921,
+       "moving_heads": 3,
+       "judgment_step": 17000,
+       "acc": {
+        "id_1-10": 0.916,
+        "ood_11-20": 0.8,
+        "ood_21-30": 0.764,
+        "ood_31-40": 0.738
+       },
+       "judgment_flops": 39613539710080,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "allstay_r0": {
+       "run": "stage2/results/g0p/g0p_mul1__pf_search__1M__s12__N100000__allstay",
+       "selection_accuracy": 0.157,
+       "moving_heads": 0,
+       "judgment_step": 18000,
+       "acc": {
+        "id_1-10": 0.145,
+        "ood_11-20": 0.098,
+        "ood_21-30": 0.128,
+        "ood_31-40": 0.1
+       },
+       "judgment_flops": 41946852868480,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "allstay_r1": {
+       "run": "stage2/results/g0p/g0p_mul1__pf_search__1M__s112__N100000__allstay",
+       "selection_accuracy": 0.161,
+       "moving_heads": 0,
+       "judgment_step": 16000,
+       "acc": {
+        "id_1-10": 0.148,
+        "ood_11-20": 0.098,
+        "ood_21-30": 0.128,
+        "ood_31-40": 0.1
+       },
+       "judgment_flops": 37283583836800,
+       "steps": 20000,
+       "stopped": "max steps"
+      }
+     },
+     "selected": "compiled_r0",
+     "selection_reason": "highest selection accuracy",
+     "flops": {
+      "teachers": 79423639732224,
+      "teachers_alt": 79423639732224,
+      "extraction": 6619346101504,
+      "students": 142146239627840
+     },
+     "total_flops": 228189225461568,
+     "total_flops_alt": 228189225461568,
+     "criteria": {
+      "1_ood_first_two_ge_0.90": true,
+      "2_ge_baseline_best_minus_0.01": true,
+      "3_total_flops_le_cap": true,
+      "total_flops_over_cap": 0.6435084687870791,
+      "3_alt_failed_teacher_whole_run": true,
+      "total_flops_alt_over_cap": 0.6435084687870791,
+      "criterion_3_changes_with_alt": false
+     },
+     "win": true
+    },
+    "13": {
+     "failure_stage": null,
+     "teachers": [
+      {
+       "run_seed": 13,
+       "restart": 0,
+       "judgment_step": 9000,
+       "steps": 9000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+       "id_at_judgment": 1.0,
+       "selection_accuracy": 1.0,
+       "passed": true,
+       "judgment_flops": 71476993277952,
+       "run_flops": 71476993277952,
+       "check_eval_flops": 26537850880
+      }
+     ],
+     "teacher_restarted": false,
+     "teacher_used": 13,
+     "precheck": {
+      "ratio": 5.986530563413148,
+      "correct": 0.7176830217289406,
+      "all_stay": 0.11988296294937184,
+      "passed": true
+     },
+     "extraction_flops": 6682106972160,
+     "compile_data_seed": 13,
+     "compile": {
+      "policy": [
+       [
+        0,
+        3,
+        1,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        0,
+        3,
+        3,
+        0,
+        0,
+        1,
+        0
+       ]
+      ],
+      "policy_named": {
+       "head0": {
+        "digit": "stay",
+        "+": "next_sep",
+        "=": "right",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "stay",
+        "other": "stay"
+       },
+       "head1": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "stay",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       },
+       "head2": {
+        "digit": "stay",
+        "+": "next_sep",
+        "=": "next_sep",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       }
+      },
+      "agreement_moving_correct_heads": {
+       "0": 1.0,
+       "1": 1.0
+      },
+      "reads_correct_positions": true,
+      "compiled_all_stay": false
+     },
+     "students": {
+      "compiled_r0": {
+       "run": "stage2/results/g0p/g0p_mul1__pf_search__1M__s13__N100000__compiled",
+       "selection_accuracy": 0.989,
+       "moving_heads": 3,
+       "judgment_step": 15000,
+       "acc": {
+        "id_1-10": 0.988,
+        "ood_11-20": 0.936,
+        "ood_21-30": 0.94,
+        "ood_31-40": 0.928
+       },
+       "judgment_flops": 34952695384320,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "compiled_r1": {
+       "run": "stage2/results/g0p/g0p_mul1__pf_search__1M__s113__N100000__compiled",
+       "selection_accuracy": 0.996,
+       "moving_heads": 3,
+       "judgment_step": 7000,
+       "acc": {
+        "id_1-10": 0.996,
+        "ood_11-20": 0.988,
+        "ood_21-30": 0.982,
+        "ood_31-40": 0.948
+       },
+       "judgment_flops": 16312488850560,
+       "steps": 8000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+      },
+      "allstay_r0": {
+       "run": "stage2/results/g0p/g0p_mul1__pf_search__1M__s13__N100000__allstay",
+       "selection_accuracy": 0.16,
+       "moving_heads": 0,
+       "judgment_step": 19000,
+       "acc": {
+        "id_1-10": 0.143,
+        "ood_11-20": 0.098,
+        "ood_21-30": 0.128,
+        "ood_31-40": 0.1
+       },
+       "judgment_flops": 44273544714560,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "allstay_r1": {
+       "run": "stage2/results/g0p/g0p_mul1__pf_search__1M__s113__N100000__allstay",
+       "selection_accuracy": 0.163,
+       "moving_heads": 0,
+       "judgment_step": 16000,
+       "acc": {
+        "id_1-10": 0.143,
+        "ood_11-20": 0.098,
+        "ood_21-30": 0.128,
+        "ood_31-40": 0.1
+       },
+       "judgment_flops": 37284143384320,
+       "steps": 20000,
+       "stopped": "max steps"
+      }
+     },
+     "selected": "compiled_r1",
+     "selection_reason": "highest selection accuracy",
+     "flops": {
+      "teachers": 71476993277952,
+      "teachers_alt": 71476993277952,
+      "extraction": 6682106972160,
+      "students": 132822872333760
+     },
+     "total_flops": 210981972583872,
+     "total_flops_alt": 210981972583872,
+     "criteria": {
+      "1_ood_first_two_ge_0.90": true,
+      "2_ge_baseline_best_minus_0.01": true,
+      "3_total_flops_le_cap": true,
+      "total_flops_over_cap": 0.5949828956406681,
+      "3_alt_failed_teacher_whole_run": true,
+      "total_flops_alt_over_cap": 0.5949828956406681,
+      "criterion_3_changes_with_alt": false
+     },
+     "win": true
+    },
+    "14": {
+     "failure_stage": null,
+     "teachers": [
+      {
+       "run_seed": 14,
+       "restart": 0,
+       "judgment_step": 7000,
+       "steps": 7000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+       "id_at_judgment": 1.0,
+       "selection_accuracy": 1.0,
+       "passed": true,
+       "judgment_flops": 55596776767488,
+       "run_flops": 55596776767488,
+       "check_eval_flops": 26537850880
+      }
+     ],
+     "teacher_restarted": false,
+     "teacher_used": 14,
+     "precheck": {
+      "ratio": 5.9809523785255,
+      "correct": 0.7194599221237798,
+      "all_stay": 0.12029186600899675,
+      "passed": true
+     },
+     "extraction_flops": 6530531618560,
+     "compile_data_seed": 14,
+     "compile": {
+      "policy": [
+       [
+        0,
+        3,
+        1,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        0,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0
+       ]
+      ],
+      "policy_named": {
+       "head0": {
+        "digit": "stay",
+        "+": "next_sep",
+        "=": "right",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "stay",
+        "other": "stay"
+       },
+       "head1": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "stay",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       },
+       "head2": {
+        "digit": "stay",
+        "+": "next_sep",
+        "=": "left",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "stay",
+        "other": "stay"
+       }
+      },
+      "agreement_moving_correct_heads": {
+       "0": 1.0,
+       "1": 1.0
+      },
+      "reads_correct_positions": true,
+      "compiled_all_stay": false
+     },
+     "students": {
+      "compiled_r0": {
+       "run": "stage2/results/g0p/g0p_mul1__pf_search__1M__s14__N100000__compiled",
+       "selection_accuracy": 1.0,
+       "moving_heads": 3,
+       "judgment_step": 15000,
+       "acc": {
+        "id_1-10": 1.0,
+        "ood_11-20": 1.0,
+        "ood_21-30": 1.0,
+        "ood_31-40": 0.998
+       },
+       "judgment_flops": 34952975158080,
+       "steps": 16000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+      },
+      "compiled_r1": {
+       "run": "stage2/results/g0p/g0p_mul1__pf_search__1M__s114__N100000__compiled",
+       "selection_accuracy": 0.975,
+       "moving_heads": 3,
+       "judgment_step": 20000,
+       "acc": {
+        "id_1-10": 0.972,
+        "ood_11-20": 0.898,
+        "ood_21-30": 0.914,
+        "ood_31-40": 0.918
+       },
+       "judgment_flops": 46603780361600,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "allstay_r0": {
+       "run": "stage2/results/g0p/g0p_mul1__pf_search__1M__s14__N100000__allstay",
+       "selection_accuracy": 0.149,
+       "moving_heads": 0,
+       "judgment_step": 14000,
+       "acc": {
+        "id_1-10": 0.144,
+        "ood_11-20": 0.098,
+        "ood_21-30": 0.128,
+        "ood_31-40": 0.1
+       },
+       "judgment_flops": 32622739511040,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "allstay_r1": {
+       "run": "stage2/results/g0p/g0p_mul1__pf_search__1M__s114__N100000__allstay",
+       "selection_accuracy": 0.16,
+       "moving_heads": 0,
+       "judgment_step": 16000,
+       "acc": {
+        "id_1-10": 0.145,
+        "ood_11-20": 0.098,
+        "ood_21-30": 0.128,
+        "ood_31-40": 0.1
+       },
+       "judgment_flops": 37282931031360,
+       "steps": 20000,
+       "stopped": "max steps"
+      }
+     },
+     "selected": "compiled_r0",
+     "selection_reason": "highest selection accuracy",
+     "flops": {
+      "teachers": 55596776767488,
+      "teachers_alt": 55596776767488,
+      "extraction": 6530531618560,
+      "students": 151462426062080
+     },
+     "total_flops": 213589734448128,
+     "total_flops_alt": 213589734448128,
+     "criteria": {
+      "1_ood_first_two_ge_0.90": true,
+      "2_ge_baseline_best_minus_0.01": true,
+      "3_total_flops_le_cap": true,
+      "total_flops_over_cap": 0.6023369538387899,
+      "3_alt_failed_teacher_whole_run": true,
+      "total_flops_alt_over_cap": 0.6023369538387899,
+      "criterion_3_changes_with_alt": false
+     },
+     "win": true
+    }
+   },
+   "win": true,
+   "decisive_win": true,
+   "different_structure_from_addition": true
+  },
+  "prefix_sum": {
+   "bins": [
+    "id_1-10",
+    "ood_11-20",
+    "ood_21-30",
+    "ood_31-40"
+   ],
+   "baselines": {
+    "abacus": {
+     "judgment_step": 8000,
+     "acc": {
+      "id_1-10": 1.0,
+      "ood_11-20": 0.186,
+      "ood_21-30": 0.0,
+      "ood_31-40": 0.0
+     },
+     "judgment_flops": 55728356818944,
+     "steps": 11000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+    },
+    "rope": {
+     "judgment_step": 3000,
+     "acc": {
+      "id_1-10": 1.0,
+      "ood_11-20": 0.0,
+      "ood_21-30": 0.0,
+      "ood_31-40": 0.0
+     },
+     "judgment_flops": 20899999973376,
+     "steps": 4000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+    },
+    "looped_rr": {
+     "judgment_step": 18000,
+     "acc": {
+      "id_1-10": 0.993,
+      "ood_11-20": 0.212,
+      "ood_21-30": 0.0,
+      "ood_31-40": 0.0
+     },
+     "judgment_flops": 311325904879616,
+     "steps": 19000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+    },
+    "gru": {
+     "judgment_step": 13000,
+     "acc": {
+      "id_1-10": 0.997,
+      "ood_11-20": 0.0,
+      "ood_21-30": 0.0,
+      "ood_31-40": 0.0
+     },
+     "judgment_flops": 89815939153920,
+     "steps": 14000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+    }
+   },
+   "baseline_best": {
+    "id_1-10": 1.0,
+    "ood_11-20": 0.212,
+    "ood_21-30": 0.0,
+    "ood_31-40": 0.0
+   },
+   "baseline_best_by": {
+    "id_1-10": "abacus",
+    "ood_11-20": "looped_rr",
+    "ood_21-30": "abacus",
+    "ood_31-40": "abacus"
+   },
+   "flops_cap": 311325904879616,
+   "seeds": {
+    "12": {
+     "failure_stage": null,
+     "teachers": [
+      {
+       "run_seed": 12,
+       "restart": 0,
+       "judgment_step": 3000,
+       "steps": 4000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+       "id_at_judgment": 1.0,
+       "selection_accuracy": 1.0,
+       "passed": true,
+       "judgment_flops": 20898701770752,
+       "run_flops": 27865152061440,
+       "check_eval_flops": 23027404800
+      }
+     ],
+     "teacher_restarted": false,
+     "teacher_used": 12,
+     "precheck": {
+      "ratio": 2.9813924059763224,
+      "correct": 0.5217564764315891,
+      "all_stay": 0.17500429510241824,
+      "passed": true
+     },
+     "extraction_flops": 5292595354112,
+     "compile_data_seed": 12,
+     "compile": {
+      "policy": [
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        0,
+        0,
+        3,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      ],
+      "policy_named": {
+       "head0": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "stay",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       },
+       "head1": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "next_sep",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       },
+       "head2": {
+        "digit": "right",
+        "+": "stay",
+        "=": "stay",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "stay",
+        "other": "stay"
+       }
+      },
+      "agreement_moving_correct_heads": {
+       "0": 1.0
+      },
+      "reads_correct_positions": true,
+      "compiled_all_stay": false
+     },
+     "students": {
+      "compiled_r0": {
+       "run": "stage2/results/g0p/g0p_prefix_sum__pf_search__1M__s12__N100000__compiled",
+       "selection_accuracy": 1.0,
+       "moving_heads": 3,
+       "judgment_step": 1000,
+       "acc": {
+        "id_1-10": 1.0,
+        "ood_11-20": 1.0,
+        "ood_21-30": 1.0,
+        "ood_31-40": 1.0
+       },
+       "judgment_flops": 2051301208320,
+       "steps": 2000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+      },
+      "compiled_r1": {
+       "run": "stage2/results/g0p/g0p_prefix_sum__pf_search__1M__s112__N100000__compiled",
+       "selection_accuracy": 1.0,
+       "moving_heads": 3,
+       "judgment_step": 1000,
+       "acc": {
+        "id_1-10": 1.0,
+        "ood_11-20": 1.0,
+        "ood_21-30": 1.0,
+        "ood_31-40": 1.0
+       },
+       "judgment_flops": 2051301208320,
+       "steps": 2000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+      },
+      "allstay_r0": {
+       "run": "stage2/results/g0p/g0p_prefix_sum__pf_search__1M__s12__N100000__allstay",
+       "selection_accuracy": 0.097,
+       "moving_heads": 0,
+       "judgment_step": 12000,
+       "acc": {
+        "id_1-10": 0.114,
+        "ood_11-20": 0.0,
+        "ood_21-30": 0.0,
+        "ood_31-40": 0.0
+       },
+       "judgment_flops": 24617106626560,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "allstay_r1": {
+       "run": "stage2/results/g0p/g0p_prefix_sum__pf_search__1M__s112__N100000__allstay",
+       "selection_accuracy": 0.097,
+       "moving_heads": 0,
+       "judgment_step": 16000,
+       "acc": {
+        "id_1-10": 0.115,
+        "ood_11-20": 0.0,
+        "ood_21-30": 0.0,
+        "ood_31-40": 0.0
+       },
+       "judgment_flops": 32822124944000,
+       "steps": 20000,
+       "stopped": "max steps"
+      }
+     },
+     "selected": "compiled_r0",
+     "selection_reason": "tied within 0.005: fewer moving heads, then the smaller restart number",
+     "flops": {
+      "teachers": 20898701770752,
+      "teachers_alt": 20898701770752,
+      "extraction": 5292595354112,
+      "students": 61541833987200
+     },
+     "total_flops": 87733131112064,
+     "total_flops_alt": 87733131112064,
+     "criteria": {
+      "1_ood_first_two_ge_0.90": true,
+      "2_ge_baseline_best_minus_0.01": true,
+      "3_total_flops_le_cap": true,
+      "total_flops_over_cap": 0.281804789569274,
+      "3_alt_failed_teacher_whole_run": true,
+      "total_flops_alt_over_cap": 0.281804789569274,
+      "criterion_3_changes_with_alt": false
+     },
+     "win": true
+    },
+    "13": {
+     "failure_stage": null,
+     "teachers": [
+      {
+       "run_seed": 13,
+       "restart": 0,
+       "judgment_step": 3000,
+       "steps": 3000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+       "id_at_judgment": 1.0,
+       "selection_accuracy": 1.0,
+       "passed": true,
+       "judgment_flops": 20900649074688,
+       "run_flops": 20900649074688,
+       "check_eval_flops": 23027404800
+      }
+     ],
+     "teacher_restarted": false,
+     "teacher_used": 13,
+     "precheck": {
+      "ratio": 3.127068631377665,
+      "correct": 0.5123179943052226,
+      "all_stay": 0.16383330674757693,
+      "passed": true
+     },
+     "extraction_flops": 5333244731392,
+     "compile_data_seed": 13,
+     "compile": {
+      "policy": [
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        0,
+        0,
+        3,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      ],
+      "policy_named": {
+       "head0": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "stay",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       },
+       "head1": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "next_sep",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       },
+       "head2": {
+        "digit": "right",
+        "+": "stay",
+        "=": "stay",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "stay",
+        "other": "stay"
+       }
+      },
+      "agreement_moving_correct_heads": {
+       "0": 1.0
+      },
+      "reads_correct_positions": true,
+      "compiled_all_stay": false
+     },
+     "students": {
+      "compiled_r0": {
+       "run": "stage2/results/g0p/g0p_prefix_sum__pf_search__1M__s13__N100000__compiled",
+       "selection_accuracy": 1.0,
+       "moving_heads": 3,
+       "judgment_step": 1000,
+       "acc": {
+        "id_1-10": 1.0,
+        "ood_11-20": 1.0,
+        "ood_21-30": 1.0,
+        "ood_31-40": 1.0
+       },
+       "judgment_flops": 2051674240000,
+       "steps": 2000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+      },
+      "compiled_r1": {
+       "run": "stage2/results/g0p/g0p_prefix_sum__pf_search__1M__s113__N100000__compiled",
+       "selection_accuracy": 1.0,
+       "moving_heads": 3,
+       "judgment_step": 1000,
+       "acc": {
+        "id_1-10": 1.0,
+        "ood_11-20": 1.0,
+        "ood_21-30": 1.0,
+        "ood_31-40": 1.0
+       },
+       "judgment_flops": 2051487724160,
+       "steps": 2000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+      },
+      "allstay_r0": {
+       "run": "stage2/results/g0p/g0p_prefix_sum__pf_search__1M__s13__N100000__allstay",
+       "selection_accuracy": 0.098,
+       "moving_heads": 0,
+       "judgment_step": 8000,
+       "acc": {
+        "id_1-10": 0.117,
+        "ood_11-20": 0.0,
+        "ood_21-30": 0.0,
+        "ood_31-40": 0.0
+       },
+       "judgment_flops": 16412461340800,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "allstay_r1": {
+       "run": "stage2/results/g0p/g0p_prefix_sum__pf_search__1M__s113__N100000__allstay",
+       "selection_accuracy": 0.096,
+       "moving_heads": 0,
+       "judgment_step": 12000,
+       "acc": {
+        "id_1-10": 0.111,
+        "ood_11-20": 0.0,
+        "ood_21-30": 0.0,
+        "ood_31-40": 0.0
+       },
+       "judgment_flops": 24617666174080,
+       "steps": 20000,
+       "stopped": "max steps"
+      }
+     },
+     "selected": "compiled_r0",
+     "selection_reason": "tied within 0.005: fewer moving heads, then the smaller restart number",
+     "flops": {
+      "teachers": 20900649074688,
+      "teachers_alt": 20900649074688,
+      "extraction": 5333244731392,
+      "students": 45133289479040
+     },
+     "total_flops": 71367183285120,
+     "total_flops_alt": 71367183285120,
+     "criteria": {
+      "1_ood_first_two_ge_0.90": true,
+      "2_ge_baseline_best_minus_0.01": true,
+      "3_total_flops_le_cap": true,
+      "total_flops_over_cap": 0.2292362510364063,
+      "3_alt_failed_teacher_whole_run": true,
+      "total_flops_alt_over_cap": 0.2292362510364063,
+      "criterion_3_changes_with_alt": false
+     },
+     "win": true
+    },
+    "14": {
+     "failure_stage": null,
+     "teachers": [
+      {
+       "run_seed": 14,
+       "restart": 0,
+       "judgment_step": 2000,
+       "steps": 3000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+       "id_at_judgment": 0.998,
+       "selection_accuracy": 0.995,
+       "passed": true,
+       "judgment_flops": 13930304176128,
+       "run_flops": 20897403568128,
+       "check_eval_flops": 23027404800
+      }
+     ],
+     "teacher_restarted": false,
+     "teacher_used": 14,
+     "precheck": {
+      "ratio": 2.9038676968015515,
+      "correct": 0.5299773862992445,
+      "all_stay": 0.1825074148119713,
+      "passed": true
+     },
+     "extraction_flops": 5356501606400,
+     "compile_data_seed": 14,
+     "compile": {
+      "policy": [
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        0,
+        0,
+        3,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        0,
+        0,
+        1,
+        0,
+        0,
+        2,
+        0
+       ]
+      ],
+      "policy_named": {
+       "head0": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "stay",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       },
+       "head1": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "next_sep",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "right",
+        "other": "stay"
+       },
+       "head2": {
+        "digit": "stay",
+        "+": "stay",
+        "=": "right",
+        "|": "stay",
+        "node": "stay",
+        "answer_phase": "left",
+        "other": "stay"
+       }
+      },
+      "agreement_moving_correct_heads": {
+       "0": 1.0
+      },
+      "reads_correct_positions": true,
+      "compiled_all_stay": false
+     },
+     "students": {
+      "compiled_r0": {
+       "run": "stage2/results/g0p/g0p_prefix_sum__pf_search__1M__s14__N100000__compiled",
+       "selection_accuracy": 1.0,
+       "moving_heads": 3,
+       "judgment_step": 1000,
+       "acc": {
+        "id_1-10": 1.0,
+        "ood_11-20": 1.0,
+        "ood_21-30": 1.0,
+        "ood_31-40": 1.0
+       },
+       "judgment_flops": 2050928176640,
+       "steps": 2000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+      },
+      "compiled_r1": {
+       "run": "stage2/results/g0p/g0p_prefix_sum__pf_search__1M__s114__N100000__compiled",
+       "selection_accuracy": 1.0,
+       "moving_heads": 3,
+       "judgment_step": 1000,
+       "acc": {
+        "id_1-10": 1.0,
+        "ood_11-20": 1.0,
+        "ood_21-30": 1.0,
+        "ood_31-40": 1.0
+       },
+       "judgment_flops": 2051301208320,
+       "steps": 2000,
+       "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations"
+      },
+      "allstay_r0": {
+       "run": "stage2/results/g0p/g0p_prefix_sum__pf_search__1M__s14__N100000__allstay",
+       "selection_accuracy": 0.097,
+       "moving_heads": 0,
+       "judgment_step": 17000,
+       "acc": {
+        "id_1-10": 0.113,
+        "ood_11-20": 0.0,
+        "ood_21-30": 0.0,
+        "ood_31-40": 0.0
+       },
+       "judgment_flops": 34873799184000,
+       "steps": 20000,
+       "stopped": "max steps"
+      },
+      "allstay_r1": {
+       "run": "stage2/results/g0p/g0p_prefix_sum__pf_search__1M__s114__N100000__allstay",
+       "selection_accuracy": 0.096,
+       "moving_heads": 0,
+       "judgment_step": 13000,
+       "acc": {
+        "id_1-10": 0.115,
+        "ood_11-20": 0.0,
+        "ood_21-30": 0.0,
+        "ood_31-40": 0.0
+       },
+       "judgment_flops": 26668780866560,
+       "steps": 20000,
+       "stopped": "max steps"
+      }
+     },
+     "selected": "compiled_r0",
+     "selection_reason": "tied within 0.005: fewer moving heads, then the smaller restart number",
+     "flops": {
+      "teachers": 13930304176128,
+      "teachers_alt": 13930304176128,
+      "extraction": 5356501606400,
+      "students": 65644809435520
+     },
+     "total_flops": 84931615218048,
+     "total_flops_alt": 84931615218048,
+     "criteria": {
+      "1_ood_first_two_ge_0.90": true,
+      "2_ge_baseline_best_minus_0.01": true,
+      "3_total_flops_le_cap": true,
+      "total_flops_over_cap": 0.27280612980435887,
+      "3_alt_failed_teacher_whole_run": true,
+      "total_flops_alt_over_cap": 0.27280612980435887,
+      "criterion_3_changes_with_alt": false
+     },
+     "win": true
+    }
+   },
+   "win": true,
+   "decisive_win": true,
+   "different_structure_from_addition": true
+  }
+ },
+ "baselines_from": "stage2/results/g0",
+ "wins": 3,
+ "answer": "undecided",
+ "teacher_restarts": [
+  "xor s13",
+  "xor s14"
+ ]
+}
