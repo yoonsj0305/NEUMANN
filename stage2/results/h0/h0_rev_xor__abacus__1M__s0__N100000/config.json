@@ -1,0 +1,56 @@
+{
+ "name": "h0_rev_xor__abacus__1M__s0__N100000",
+ "phase": "h0",
+ "task": "rev_xor",
+ "kind": "abacus",
+ "scale": "1M",
+ "params": 857984,
+ "model_config": {
+  "d": 128,
+  "heads": 4,
+  "layers": 4
+ },
+ "seed": 0,
+ "N": 100000,
+ "batch": 64,
+ "max_steps": 20000,
+ "eval_every": 1000,
+ "id_size": 1000,
+ "ood_size": 500,
+ "lr": 0.001,
+ "optimizer": "AdamW betas (0.9, 0.98) weight decay 0.1, grad clip 1.0, warmup max_steps/20, cosine to 10%",
+ "abacus_offset_max": 100,
+ "spec": {
+  "train": [
+   1,
+   16
+  ],
+  "id": [
+   1,
+   16
+  ],
+  "ood": [
+   [
+    17,
+    32
+   ],
+   [
+    33,
+    48
+   ],
+   [
+    49,
+    64
+   ]
+  ]
+ },
+ "position": "Abacus digit positions + NoPE attention",
+ "pf": null,
+ "pf2": null,
+ "pf_search": null,
+ "early_stop": "in-distribution >= 0.99 at two consecutive evaluations",
+ "judgment_checkpoint": "highest in-distribution accuracy (earliest if tied); out-of-distribution at it",
+ "accuracy": "sequence exact match (teacher-forced == greedy)",
+ "looped_eval_rule": null,
+ "looped_rr": null
+}
