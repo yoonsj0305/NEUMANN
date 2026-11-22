@@ -1,0 +1,220 @@
+{
+ "task": "rev_xor",
+ "data_seed": 20,
+ "teacher": {
+  "path": "/home/user/NEUMANN/stage2/results/i0a/i0a_rev_xor__rope__1M__s20__N100000/teacher_step02000.pt",
+  "untrained_seed": null,
+  "step": 2000,
+  "acc": {
+   "id_1-16": 0.089,
+   "ood_17-32": 0.0,
+   "ood_33-48": 0.0,
+   "ood_49-64": 0.0
+  },
+  "train_flops_to_judgment": 34141239705600
+ },
+ "examples": 2000,
+ "output_steps": 18965,
+ "dependency_kind": "content substitution (design 14)",
+ "extraction": {
+  "flops": 3261183602688,
+  "backward_passes": 0,
+  "manual_forward_max_abs_logit_diff": null,
+  "substitution": {
+   "class_symbols": {
+    "other": [
+     "<bos>"
+    ],
+    "digit": [
+     "0",
+     "1"
+    ],
+    "+": [
+     "^"
+    ],
+    "=": [
+     "="
+    ],
+    "answer_phase": [
+     "0",
+     "1"
+    ]
+   },
+   "sequences_forwarded": 52895,
+   "substituted_positions": 50895,
+   "all_zero_rows": 0
+  }
+ },
+ "dependency_mass_on_current_position": 0.21214877542967708,
+ "attention_mass_on_current_position": 0.027641200334876735,
+ "precheck": {
+  "correct_table": {
+   "head0": {
+    "digit": "right",
+    "+": "right",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "left",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "left",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "left",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "dependency": {
+   "correct": 0.07799356458198399,
+   "correct_per_head": [
+    0.029994207077386887,
+    0.04799935750459711,
+    0.0
+   ],
+   "all_stay": 0.0,
+   "ratio": null
+  },
+  "attention_aux": {
+   "correct": 0.1470975825782215,
+   "all_stay": 0.07332532549433601,
+   "ratio": 2.006095187256741
+  },
+  "criterion": "score(correct) >= 2 x score(all stay) on the dependency (13.2)",
+  "passed": true,
+  "gate_applied": false
+ },
+ "policy": [
+  [
+   1,
+   2,
+   3,
+   0,
+   0,
+   1,
+   0
+  ],
+  [
+   0,
+   0,
+   1,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   1,
+   1,
+   0,
+   0,
+   0,
+   0
+  ]
+ ],
+ "policy_named": {
+  "head0": {
+   "digit": "right",
+   "+": "left",
+   "=": "next_sep",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "right",
+   "other": "stay"
+  },
+  "head1": {
+   "digit": "stay",
+   "+": "stay",
+   "=": "right",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "stay",
+   "other": "stay"
+  },
+  "head2": {
+   "digit": "stay",
+   "+": "right",
+   "=": "right",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "stay",
+   "other": "stay"
+  }
+ },
+ "per_head": [
+  {
+   "column": {
+    "digit": "right",
+    "+": "left",
+    "=": "next_sep",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "score_after_cover": 0.21346650317037896,
+   "columns_tied_at_best": 216
+  },
+  {
+   "column": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "score_after_cover": 0.09960208393114124,
+   "columns_tied_at_best": 4104
+  },
+  {
+   "column": {
+    "digit": "stay",
+    "+": "right",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "score_after_cover": 0.07749360870264121,
+   "columns_tied_at_best": 432
+  }
+ ],
+ "table_score_dependency": 0.3905621958041614,
+ "table_score_attention_aux": 0.1482388468015931,
+ "search": {
+  "columns": 279936,
+  "present_classes": [
+   "digit",
+   "+",
+   "=",
+   "answer_phase",
+   "other"
+  ],
+  "distinct_paths_simulated": 7776,
+  "head_moves_simulated": 442415520,
+  "score_lookups": 442415520,
+  "head_simulation_operations": 884831040
+ },
+ "reference_agreement_with_correct_table": {
+  "correct_head0_position_read_by_some_compiled_head": 0.005905615607698392,
+  "correct_head1_position_read_by_some_compiled_head": 0.20500922752438702,
+  "correct_head2_position_read_by_some_compiled_head": 0.0
+ },
+ "wall_s": 865.9
+}
