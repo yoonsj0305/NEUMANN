@@ -1,0 +1,135 @@
+{
+ "design": "stage2/DESIGN.md 11.7 (key / query channels); check before training",
+ "results": {
+  "addition": {
+   "id_1-10": {
+    "examples": 200,
+    "literal_vs_prompt_only": 0.995,
+    "depends_on_answer_length": 0.995,
+    "answer_length_not_fixed": 0.03
+   },
+   "ood_11-20": {
+    "examples": 200,
+    "literal_vs_prompt_only": 1.0,
+    "depends_on_answer_length": 1.0,
+    "answer_length_not_fixed": 0.02
+   },
+   "ood_21-30": {
+    "examples": 200,
+    "literal_vs_prompt_only": 1.0,
+    "depends_on_answer_length": 1.0,
+    "answer_length_not_fixed": 0.005
+   },
+   "ood_31-40": {
+    "examples": 200,
+    "literal_vs_prompt_only": 1.0,
+    "depends_on_answer_length": 1.0,
+    "answer_length_not_fixed": 0.01
+   }
+  },
+  "copy": {
+   "id_1-10": {
+    "examples": 200,
+    "literal_vs_prompt_only": 0.0,
+    "depends_on_answer_length": 0.0,
+    "answer_length_not_fixed": 0.0
+   },
+   "ood_11-20": {
+    "examples": 200,
+    "literal_vs_prompt_only": 0.0,
+    "depends_on_answer_length": 0.0,
+    "answer_length_not_fixed": 0.0
+   },
+   "ood_21-30": {
+    "examples": 200,
+    "literal_vs_prompt_only": 0.0,
+    "depends_on_answer_length": 0.0,
+    "answer_length_not_fixed": 0.0
+   },
+   "ood_31-40": {
+    "examples": 200,
+    "literal_vs_prompt_only": 0.0,
+    "depends_on_answer_length": 0.0,
+    "answer_length_not_fixed": 0.0
+   }
+  },
+  "mul1": {
+   "id_1-10": {
+    "examples": 200,
+    "literal_vs_prompt_only": 0.325,
+    "depends_on_answer_length": 0.325,
+    "answer_length_not_fixed": 0.32
+   },
+   "ood_11-20": {
+    "examples": 200,
+    "literal_vs_prompt_only": 0.285,
+    "depends_on_answer_length": 0.285,
+    "answer_length_not_fixed": 0.265
+   },
+   "ood_21-30": {
+    "examples": 200,
+    "literal_vs_prompt_only": 0.385,
+    "depends_on_answer_length": 0.385,
+    "answer_length_not_fixed": 0.385
+   },
+   "ood_31-40": {
+    "examples": 200,
+    "literal_vs_prompt_only": 0.36,
+    "depends_on_answer_length": 0.36,
+    "answer_length_not_fixed": 0.36
+   }
+  },
+  "prefix_sum": {
+   "id_1-10": {
+    "examples": 200,
+    "literal_vs_prompt_only": 0.0,
+    "depends_on_answer_length": 0.0,
+    "answer_length_not_fixed": 0.0
+   },
+   "ood_11-20": {
+    "examples": 200,
+    "literal_vs_prompt_only": 0.0,
+    "depends_on_answer_length": 0.0,
+    "answer_length_not_fixed": 0.0
+   },
+   "ood_21-30": {
+    "examples": 200,
+    "literal_vs_prompt_only": 0.0,
+    "depends_on_answer_length": 0.0,
+    "answer_length_not_fixed": 0.0
+   },
+   "ood_31-40": {
+    "examples": 200,
+    "literal_vs_prompt_only": 0.0,
+    "depends_on_answer_length": 0.0,
+    "answer_length_not_fixed": 0.0
+   }
+  },
+  "reverse": {
+   "id_1-10": {
+    "examples": 200,
+    "literal_vs_prompt_only": 0.0,
+    "depends_on_answer_length": 0.0,
+    "answer_length_not_fixed": 0.0
+   },
+   "ood_11-20": {
+    "examples": 200,
+    "literal_vs_prompt_only": 0.0,
+    "depends_on_answer_length": 0.0,
+    "answer_length_not_fixed": 0.0
+   },
+   "ood_21-30": {
+    "examples": 200,
+    "literal_vs_prompt_only": 0.0,
+    "depends_on_answer_length": 0.0,
+    "answer_length_not_fixed": 0.0
+   },
+   "ood_31-40": {
+    "examples": 200,
+    "literal_vs_prompt_only": 0.0,
+    "depends_on_answer_length": 0.0,
+    "answer_length_not_fixed": 0.0
+   }
+  }
+ }
+}
