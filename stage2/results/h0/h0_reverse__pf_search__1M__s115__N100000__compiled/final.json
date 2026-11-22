@@ -1,0 +1,130 @@
+{
+ "name": "h0_reverse__pf_search__1M__s115__N100000__compiled",
+ "task": "reverse",
+ "kind": "pf_search",
+ "scale": "1M",
+ "params": 250300,
+ "config": {
+  "R": 4,
+  "K": 16,
+  "H": 3,
+  "hidden": 256,
+  "emb": 64,
+  "policy": [
+   [
+    1,
+    0,
+    0,
+    0,
+    0,
+    2,
+    0
+   ],
+   [
+    0,
+    0,
+    3,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    3,
+    0,
+    0,
+    2,
+    0
+   ]
+  ]
+ },
+ "seed": 115,
+ "N": 100000,
+ "batch": 64,
+ "lr": 0.001,
+ "max_steps": 20000,
+ "steps": 2000,
+ "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+ "spec": {
+  "train": [
+   1,
+   10
+  ],
+  "id": [
+   1,
+   10
+  ],
+  "ood": [
+   [
+    11,
+    20
+   ],
+   [
+    21,
+    30
+   ],
+   [
+    31,
+    40
+   ]
+  ]
+ },
+ "id_size": 1000,
+ "ood_size": 500,
+ "judgment": {
+  "rule": "highest in-distribution accuracy (earliest if tied)",
+  "step": 1000,
+  "acc": {
+   "id_1-10": 1.0,
+   "ood_11-20": 1.0,
+   "ood_21-30": 1.0,
+   "ood_31-40": 1.0
+  },
+  "acc_fixed4": null,
+  "acc_seq": null,
+  "train_flops_cum": 2153385839616,
+  "wall_train_s_cum": 100.37
+ },
+ "last": {
+  "step": 2000,
+  "acc": {
+   "id_1-10": 1.0,
+   "ood_11-20": 1.0,
+   "ood_21-30": 1.0,
+   "ood_31-40": 1.0
+  },
+  "acc_fixed4": null,
+  "acc_seq": null
+ },
+ "final_acc": {
+  "id_1-10": 1.0,
+  "ood_11-20": 1.0,
+  "ood_21-30": 1.0,
+  "ood_31-40": 1.0
+ },
+ "final_acc_fixed4": null,
+ "recur": {},
+ "train_flops": 4306771679232,
+ "eval_flops": 97156174984,
+ "wall_train_s": 206.75,
+ "wall_eval_s": 3.79,
+ "segments": [
+  {
+   "segment": 0,
+   "start_step": 0,
+   "started": "2026-11-22 01:51:18"
+  }
+ ],
+ "hardware": {
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "torch_threads": 1,
+  "torch": "2.15.0+cu132",
+  "cuda": false,
+  "python": "3.12.3"
+ },
+ "commit": "c40cd4194a6e2ad1c195fe872ab67bdc989a2f06",
+ "primary_eval_rule": "looped / looped_rr: recurrence 4 x ceil(bin upper / training upper) (declared before runs); fixed 4 recorded as acc_fixed4"
+}
