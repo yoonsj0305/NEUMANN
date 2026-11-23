@@ -1,0 +1,26 @@
+copy O id_1-10 {'h0': (0.8478729963008631, 0.7169774627606817)} None
+copy O ood_11-20 {'h0': (0.822680412371134, 0.5266351101754501)} {'wrong': 326, 'correct': 174, 'front': 0.2085889570552147, 'middle': 0.34355828220858897, 'end': 0.44785276073619634, 'eos_target': 0.0}
+copy O ood_21-30 {'h0': (0.5315111813869438, 0.25343760124910103)} {'wrong': 500, 'correct': 0, 'front': 0.826, 'middle': 0.162, 'end': 0.012, 'eos_target': 0.0}
+copy O ood_31-40 {'h0': (0.32086581974810535, 0.14736115657524881)} {'wrong': 500, 'correct': 0, 'front': 1.0, 'middle': 0.0, 'end': 0.0, 'eos_target': 0.0}
+{
+ "in_distribution": {
+  "unchanged": 0.998,
+  "run_judgment_acc": 0.998,
+  "ablation_all_ids_0": 0.081,
+  "ablation_drop": 0.917,
+  "shuffle_query_plus_1_50": 0.997,
+  "shuffle_drop": 0.0010000000000000009
+ },
+ "reading_rule_by_ood_bin": {
+  "ood_11-20": "a",
+  "ood_21-30": "a",
+  "ood_31-40": "a"
+ },
+ "ood_acc": {
+  "id_1-10": 0.998,
+  "ood_11-20": 0.348,
+  "ood_21-30": 0.0,
+  "ood_31-40": 0.0
+ },
+ "max_abs_logit_diff_recomputed_vs_model": 2.765655517578125e-05
+}
