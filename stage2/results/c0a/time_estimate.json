@@ -1,0 +1,28 @@
+{
+ "per_task": {
+  "addition": {
+   "s_per_step": 0.17185,
+   "worst_20000_h": 0.9547222222222222
+  },
+  "reverse": {
+   "s_per_step": 0.17185,
+   "worst_20000_h": 0.9547222222222222
+  },
+  "mul1": {
+   "s_per_step": 0.1434,
+   "worst_20000_h": 0.7966666666666666
+  },
+  "copy": {
+   "s_per_step": 0.12363,
+   "worst_20000_h": 0.6868333333333333
+  },
+  "prefix_sum": {
+   "s_per_step": 0.12667,
+   "worst_20000_h": 0.7037222222222222
+  }
+ },
+ "cpu_hours_worst": 4.096666666666667,
+ "wall_hours_worst_4_workers_plus_longest": 1.978888888888889,
+ "limit_hours": 48,
+ "note": "worst case: every run 20,000 steps (no early stop); s/step from smoke runs of this code"
+}

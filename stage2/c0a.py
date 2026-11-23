@@ -23,8 +23,8 @@ The IDs are computed inside the model from the token tensor (a deterministic fun
 their computation is an index cost and, as the Abacus index, not counted in the FLOPs.
 
 stage1/run.py is executed from its own source with two textual changes (asserted to apply once each; the file is not
-edited): "coupled" is added to the --kind choices, and to the kinds whose FLOPs use cfg["layers"] (the abacus / rope
-transformer formula).  models.build / models.SCALES get the "coupled" kind at run time (cfg: the abacus 1M shape + the
+edited): "coupled" is added to the --kind choices, to the kinds whose FLOPs use cfg["layers"] (the abacus / rope
+transformer formula) and to config.json's position description.  models.build / models.SCALES get the "coupled" kind at run time (cfg: the abacus 1M shape + the
 move table, recorded in config.json).  run.py's Abacus offsets are not drawn for this kind; the model draws its own
 offsets from the torch generator while training.
 
@@ -264,6 +264,10 @@ def cmd_check(a):
 PATCHES = [
     ('"pf_search"), required=True)', '"pf_search", "coupled"), required=True)'),
     ('if kind in ("abacus", "rope") else', 'if kind in ("abacus", "rope", "coupled") else'),
+    ('"pf_cont": "none (soft head distributions over the tape; recurrence over steps)"}[a.kind]',
+     '"pf_cont": "none (soft head distributions over the tape; recurrence over steps)",\n'
+     '                         "coupled": "NoPE attention + head-path coupling: per head a key and a query ID embedding '
+     '(stage2/c0a.py, DESIGN 11.7 / 11.8), training offsets 0..100 per sequence and head"}[a.kind]'),
 ]
 
 
