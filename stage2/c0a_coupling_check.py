@@ -17,6 +17,11 @@ Per task and bin (hand tables: G-0a; reverse: the H-0a BOS table; 200 examples p
                            examples with the same prompt length profile (operand lengths) -- answer information
 
   python stage2/c0a_coupling_check.py        # writes stage2/results/c0a/coupling_check.json
+  python stage2/c0a_coupling_check.py --definition prompt_extended
+      the 11.8 definition (key IDs from the head path over the prompt + (prompt length + 2) answer-phase steps, first
+      visits counted over the whole extended path, written for positions of the actual sequence): depends_on_answer_length
+      = share of examples whose prompt key IDs change when the answer is one token longer
+      -> writes stage2/results/c0a/coupling_check_prompt_extended.json
 """
 from __future__ import annotations
 import collections
@@ -57,6 +62,43 @@ def keys(path, n):
                 cnt[h] += 1
                 k[h][i] = cnt[h]
     return k
+
+
+def keys_ext(s, P, tab):
+    """11.8: first-visit order over the head path on s[:P] + (P + 2) answer-phase tokens, positions < len(s)"""
+    path = g0a.head_path(s[:P] + [FILL] * (P + 2), tab)
+    k = [[0] * len(s) for _ in range(3)]
+    seen = [set() for _ in range(3)]
+    cnt = [0, 0, 0]
+    for st in path:
+        for h in range(3):
+            i = st[h]
+            if i not in seen[h]:
+                seen[h].add(i)
+                cnt[h] += 1
+                if i < len(s):
+                    k[h][i] = cnt[h]
+    return k
+
+
+def main_extended():
+    torch.set_num_threads(1)
+    res = {}
+    for t, tab in TAB.items():
+        res[t] = {}
+        for lab, ex in sets(t).items():
+            dep = 0
+            for p, a in ex:
+                s = p + a
+                k0 = keys_ext(s, len(p), tab)
+                k1 = keys_ext(s + [FILL], len(p), tab)
+                dep += [r[:len(p)] for r in k0] != [r[:len(p)] for r in k1]
+            res[t][lab] = {"examples": len(ex), "depends_on_answer_length": dep / len(ex)}
+            print(t, lab, json.dumps(res[t][lab]), flush=True)
+    out = HERE / "results" / "c0a"
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "coupling_check_prompt_extended.json").write_text(json.dumps(
+        {"design": "stage2/DESIGN.md 11.8 (prompt-only key IDs); check 3", "results": res}, indent=1))
 
 
 def profile(p):
@@ -100,4 +142,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if "--definition" in sys.argv and sys.argv[sys.argv.index("--definition") + 1] == "prompt_extended":
+        main_extended()
+    else:
+        main()
