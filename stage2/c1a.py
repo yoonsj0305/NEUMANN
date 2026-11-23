@@ -1,8 +1,12 @@
 """C-1a gate (stage2/DESIGN.md 11.13, 11.14): a standard transformer with hard reads.  O arm (hand tables: G-0a for
 addition, copy, mul1, prefix_sum; H-0a BOS table for reverse), student seed 21.
 
-Student input at position t (11.13):  u_t = E(x_t) + sum_h R_h(E(x[p_h(t)]))   over the MOVING heads h of the table
-                                      in_t = u_t + S(u_{t-1})                   (S(u_{-1}) = 0)
+Student input at position t (11.13, 11.15):
+      u_t = E(x_t) + sum_h R_h(E(x[p_h(t)]) + F_h b_h(t))   over the MOVING heads h of the table
+      in_t = u_t + S(u_{t-1})                               (S(u_{-1}) = 0)
+  segment tag (11.15, stateless): g(i) = number of separators ('+', '=', '|' and the infix operators of the vocabulary)
+  at positions <= i (answer positions: the number after the last prompt segment); b_h(t) = [g(p_h(t)) == g(p_h(t0))]
+  with t0 = the first scored step (the first '=' position, which predicts the first answer token); F_h a learned vector.
   p_h(t): the head position after the move at step t, by the stage-1 PF move code (pf.candidates, pf.token_classes with
   the adapter's operators as "+" kind and separators) on the actual tokens; p_h(t) <= t (causal).  E is the token
   embedding, R_h and S learned linear maps (d x d, no bias).
@@ -15,15 +19,16 @@ the two kinds in --kind, in config.json's position description, and a FLOPs bran
 (attention + 24 d^2 per token and layer + head) or, for M, 16 d^2 per token and layer + head; both plus the hard-read
 maps (2 d^2 per token for each R_h and for S).  --keep-best keeps the judgment checkpoint.
 
-  check --task T   pre-training checks (all must be 1.000): (a) the student's read positions equal the hand-table
-                   head path of stage2/g0a.head_path (independent implementation); (b) p_h(t) <= t; (c) invariance: a
-                   random answer of random length (0 .. prompt length + 1) leaves the read positions of the common steps
-                   unchanged; (d) local determinism and coverage (11.14-1): key = (x_t, x[p_h(t)] for the moving heads,
-                   x_{t-1}, x[p_h(t-1)]) -> next token, built from the training data (seed 21, 100,000): conflicts = 0,
-                   every scored-step key of the in-distribution and each out-of-distribution evaluation set present in
-                   the table, and the table's exact match 1.000 on every set
+  check --task T   pre-training checks (11.15; writes pretraining_check_seg_<task>.json -- the first check, without
+                   the segment tag, is pretraining_check_<task>.json from commit e878b1a): (a) the student's read
+                   positions equal the hand-table head path of stage2/g0a.head_path (independent implementation);
+                   (b) p_h(t) <= t; (c) invariance: a random answer of random length (0 .. prompt length + 1) leaves the
+                   read positions and the segment bits of the common steps unchanged; (d) local determinism (11.15):
+                   key = (x_t, (x[p_h(t)], b_h(t)) for the moving heads, x_{t-1}, (x[p_h(t-1)], b_h(t-1))) -> next
+                   token, built from the training data (seed 21, 100,000): conflicts = 0 and, on the scored steps whose
+                   key is in the table, the table's prediction right on every step (1.000 per set); coverage recorded
   train --task T --arm {C,M}
-  diag  --task T --arm {C,M}   in-distribution exact match with the hard reads and the shift removed (R_h and S terms 0)
+  diag  --task T --arm {C,M}   in-distribution exact match with the hard reads, segment tags and the shift removed (R_h, F_h, S terms 0)
   report
 """
 from __future__ import annotations
@@ -55,6 +60,23 @@ def moving(table):
     return [j for j in range(H) if any(m != 0 for m in table[j])]
 
 
+def separators(tokens):
+    import tasks as T
+    ids = [T.TOK[s] for s in ("+", "=", "|", "-", "*", "^") if s in T.TOK]
+    return torch.isin(tokens, torch.tensor(ids))
+
+
+def segment_bits(tokens, P):
+    """b_h(t) = [g(p_h(t)) == g(p_h(t0))], g(i) = separators at positions <= i, t0 = first '=' position [B, H, T]"""
+    import tasks as T
+    g = torch.cumsum(separators(tokens).long(), 1)                               # [B, T]
+    t0 = (tokens == T.TOK["="]).float().argmax(1)                                # [B]
+    assert bool((tokens == T.TOK["="]).any(1).all())
+    gp = g[:, None, :].expand(-1, P.shape[1], -1).gather(2, P)                   # g(p_h(t)) [B, H, T]
+    ref = gp.gather(2, t0[:, None, None].expand(-1, P.shape[1], 1))              # g(p_h(t0)) [B, H, 1]
+    return (gp == ref).long()
+
+
 def read_paths(tokens, table):
     """head positions after the move at every step [B, H, T], on the actual tokens (PF move code, batched)"""
     import tasks as T
@@ -83,6 +105,7 @@ class HardReadLM(nn.Module):
         self.tok = nn.Embedding(vocab, d)
         self.R = nn.ModuleList([nn.Linear(d, d, bias=False) for _ in self.moving])
         self.S = nn.Linear(d, d, bias=False)
+        self.F = nn.Parameter(torch.randn(max(1, len(self.moving)), d) * 0.02)   # segment-tag vectors (11.15)
         if mlp_only:
             self.blocks = nn.ModuleList([MLPBlock(d) for _ in range(layers)])
         else:
@@ -96,9 +119,10 @@ class HardReadLM(nn.Module):
         if self.ablate:
             return e
         P = read_paths(tokens, self.table)
+        bits = segment_bits(tokens, P).to(e.dtype)
         u = e
-        for r, j in zip(self.R, self.moving):
-            u = u + r(e.gather(1, P[:, j, :, None].expand(-1, -1, e.shape[-1])))
+        for k, (r, j) in enumerate(zip(self.R, self.moving)):
+            u = u + r(e.gather(1, P[:, j, :, None].expand(-1, -1, e.shape[-1])) + bits[:, j, :, None] * self.F[k])
         sh = torch.zeros_like(u)
         sh[:, 1:] = self.S(u[:, :-1])
         return u + sh
@@ -174,13 +198,14 @@ def cmd_check(a):
     rng = random.Random("c1a:invariance:%s" % a.task)
     torch.set_num_threads(1)
 
-    def keys(x, y, P):
-        """scored-step keys [(key, next token)] of a batch"""
+    def keys(x, y, P, Bt):
+        """scored-step keys [(key, next token)] of a batch (11.15: reads with their segment bits)"""
         out = []
         for b in range(x.shape[0]):
             for t in (y[b] != -100).nonzero()[:, 0].tolist():
-                k = (int(x[b, t]),) + tuple(int(x[b, P[b, j, t]]) for j in mv)
-                k += (int(x[b, t - 1]),) + tuple(int(x[b, P[b, j, t - 1]]) for j in mv) if t > 0 else (-1,) * (1 + len(mv))
+                assert t > 0
+                k = (int(x[b, t]),) + tuple((int(x[b, P[b, j, t]]), int(Bt[b, j, t])) for j in mv)
+                k += (int(x[b, t - 1]),) + tuple((int(x[b, P[b, j, t - 1]]), int(Bt[b, j, t - 1])) for j in mv)
                 out.append((b, k, int(y[b, t])))
         return out
 
@@ -190,7 +215,7 @@ def cmd_check(a):
     for i in range(0, len(train), 256):
         x, y = R.make_batch(train[i:i + 256])
         P = read_paths(x, table)
-        for _, k, v in keys(x, y, P):
+        for _, k, v in keys(x, y, P, segment_bits(x, P)):
             if k in tabk and tabk[k] != v:
                 conflicts += 1
             tabk.setdefault(k, v)
@@ -199,12 +224,13 @@ def cmd_check(a):
     res = {"moving_heads": mv, "train_examples": len(train), "table_keys": len(tabk), "conflicts": conflicts, "sets": {}}
     for lab, ex in evs.items():
         same = caus = inv = 0
-        n_keys = covered = 0
+        n_keys = covered = cov_ok = 0
         ok_ex = 0
         for i in range(0, len(ex), 128):
             chunk = ex[i:i + 128]
             x, y = R.make_batch(chunk)
             P = read_paths(x, table)
+            Bt = segment_bits(x, P)
             # (a) against g0a.head_path, (b) causality
             for b, (p, ans) in enumerate(chunk):
                 s = p + ans
@@ -218,15 +244,17 @@ def cmd_check(a):
                 alt.append((p, [T.TOK[rng.choice(T.DIGITS)] for _ in range(La)] + [T.EOS]))
             x2, _ = R.make_batch(alt)
             P2 = read_paths(x2, table)
+            B2 = segment_bits(x2, P2)
             for b, ((p, ans), (_, a2)) in enumerate(zip(chunk, alt)):
                 c = min(len(p) + len(ans), len(p) + len(a2))
-                inv += bool((P[b, :, :c] == P2[b, :, :c]).all())
+                inv += bool((P[b, :, :c] == P2[b, :, :c]).all()) and bool((Bt[b, :, :c] == B2[b, :, :c]).all())
             # (d) coverage and table prediction
             wrong = set()
-            for b, k, v in keys(x, y, P):
+            for b, k, v in keys(x, y, P, Bt):
                 n_keys += 1
                 if k in tabk:
                     covered += 1
+                    cov_ok += tabk[k] == v
                     if tabk[k] != v:
                         wrong.add(b)
                 else:
@@ -234,13 +262,16 @@ def cmd_check(a):
             ok_ex += len(chunk) - len(wrong)
         res["sets"][lab] = {"examples": len(ex), "read_positions_equal_hand_table_path": same / len(ex),
                             "causal": caus / len(ex), "invariance": inv / len(ex),
-                            "key_coverage": covered / n_keys, "table_exact_match": ok_ex / len(ex)}
+                            "covered_steps_table_right": cov_ok / covered if covered else None,
+                            "key_coverage_recorded_only": covered / n_keys,
+                            "table_exact_match_recorded_only": ok_ex / len(ex)}
         print(a.task, lab, res["sets"][lab], flush=True)
-    res["all_1.000"] = conflicts == 0 and all(v == 1.0 for s in res["sets"].values() for k, v in s.items()
-                                              if k != "examples")
+    res["all_1.000"] = conflicts == 0 and all(
+        s[k] == 1.0 for s in res["sets"].values()
+        for k in ("read_positions_equal_hand_table_path", "causal", "invariance", "covered_steps_table_right"))
     res["env"] = h0a.env(["stage2/c1a.py"])
     OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / ("pretraining_check_%s.json" % a.task)).write_text(json.dumps(res, indent=1))
+    (OUT / ("pretraining_check_seg_%s.json" % a.task)).write_text(json.dumps(res, indent=1))
     print("conflicts", conflicts, "keys", len(tabk), "all 1.000:", res["all_1.000"])
 
 
