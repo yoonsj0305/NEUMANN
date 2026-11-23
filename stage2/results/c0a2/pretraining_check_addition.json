@@ -1,0 +1,90 @@
+{
+ "design": "stage2/DESIGN.md 11.7, 11.8 checks (a) invariance and (c) query = key of the read position, on the student code (stage2/c0a.py coupling_ids)",
+ "task": "addition",
+ "table": [
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0
+  ],
+  [
+   0,
+   3,
+   1,
+   0,
+   0,
+   1,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ]
+ ],
+ "results": {
+  "id_1-10": {
+   "examples": 200,
+   "invariance": 1.0,
+   "query_equals_key_of_read_position": 1.0,
+   "query_ids_checked": 4932,
+   "ids_equal_independent_implementation": 1.0,
+   "max_key_id": 25,
+   "max_key_id_plus_offset_below_256": true
+  },
+  "ood_11-20": {
+   "examples": 200,
+   "invariance": 1.0,
+   "query_equals_key_of_read_position": 1.0,
+   "query_ids_checked": 10146,
+   "ids_equal_independent_implementation": 1.0,
+   "max_key_id": 45,
+   "max_key_id_plus_offset_below_256": true
+  },
+  "ood_21-30": {
+   "examples": 200,
+   "invariance": 1.0,
+   "query_equals_key_of_read_position": 1.0,
+   "query_ids_checked": 16005,
+   "ids_equal_independent_implementation": 1.0,
+   "max_key_id": 65,
+   "max_key_id_plus_offset_below_256": true
+  },
+  "ood_31-40": {
+   "examples": 200,
+   "invariance": 1.0,
+   "query_equals_key_of_read_position": 1.0,
+   "query_ids_checked": 22116,
+   "ids_equal_independent_implementation": 1.0,
+   "max_key_id": 84,
+   "max_key_id_plus_offset_below_256": true
+  },
+  "train_s21_first200": {
+   "examples": 200,
+   "invariance": 1.0,
+   "query_equals_key_of_read_position": 1.0,
+   "query_ids_checked": 4764,
+   "ids_equal_independent_implementation": 1.0,
+   "max_key_id": 25,
+   "max_key_id_plus_offset_below_256": true
+  }
+ },
+ "all_1.000": true,
+ "env": {
+  "code_commit": "7e3ad3a2d36aa9e9182438158e3cfd1c43642f19",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1
+ }
+}
