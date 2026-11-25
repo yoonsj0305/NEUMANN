@@ -1,0 +1,16 @@
+{
+ "design": "stage2/DESIGN.md section 3 (2-0a)",
+ "observations": "stage2/s2_0.py to_io (2-0 code and scoring)",
+ "run": "k_ext.run_factored",
+ "training_sequences": "T.train_set(task, 100000, 7)[:200]",
+ "evaluation": "T.eval_sets(task, 1000, 500)",
+ "no_search": true,
+ "grammar_limits_measured": [
+  "U operators/depth/holes",
+  "V operators",
+  "C operators",
+  "operator set",
+  "value range (8-bit / latent +-200)",
+  "constant range (-20..40, z0 -20..40, mod 2..10)"
+ ]
+}

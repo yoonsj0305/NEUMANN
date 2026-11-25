@@ -1,0 +1,23 @@
+/home/user/NEUMANN/stage1/diag_phaseA3.py:46: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  return float(loss)
+{
+ "D1_mask_answer_position_ok": "64/64",
+ "D2_loss_equals_answer_only_CE": true,
+ "D2_target_tokens_per_example": [
+  2
+ ],
+ "D3_params_without_gradient": [],
+ "D4_teacher_forced_vs_greedy": [
+  0.41,
+  0.41
+ ],
+ "D5_control_value_of_last_pair_n4_2000steps": {
+  "acc": 1.0,
+  "final_loss": 0.0
+ },
+ "D5_control_value_of_first_pair_n4_2000steps": {
+  "acc": 1.0,
+  "final_loss": 0.0
+ }
+}

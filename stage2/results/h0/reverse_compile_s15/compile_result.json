@@ -1,0 +1,232 @@
+{
+ "task": "reverse",
+ "data_seed": 15,
+ "teacher": {
+  "path": "/home/user/NEUMANN/stage2/results/h0/h0_reverse__rope__1M__s15__N100000/teacher_best.pt",
+  "untrained_seed": null,
+  "step": 2000,
+  "acc": {
+   "id_1-10": 1.0,
+   "ood_11-20": 0.04,
+   "ood_21-30": 0.0,
+   "ood_31-40": 0.0
+  },
+  "train_flops_to_judgment": 14587920384000
+ },
+ "examples": 2000,
+ "output_steps": 13135,
+ "dependency_kind": "content substitution (design 14)",
+ "extraction": {
+  "flops": 5649387659264,
+  "backward_passes": 0,
+  "manual_forward_max_abs_logit_diff": null,
+  "substitution": {
+   "class_symbols": {
+    "other": [
+     "<bos>"
+    ],
+    "digit": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "=": [
+     "="
+    ],
+    "answer_phase": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ]
+   },
+   "sequences_forwarded": 202430,
+   "substituted_positions": 22270,
+   "all_zero_rows": 0
+  }
+ },
+ "dependency_mass_on_current_position": 0.20363519282573886,
+ "attention_mass_on_current_position": 0.08031705974356236,
+ "precheck": {
+  "correct_table": {
+   "head0": {
+    "digit": "right",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "left",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "dependency": {
+   "correct": 0.6491603131396719,
+   "correct_per_head": [
+    0.6491603131396719,
+    0.0,
+    0.0
+   ],
+   "all_stay": 0.0,
+   "ratio": null
+  },
+  "attention_aux": {
+   "correct": 0.20432717892017638,
+   "all_stay": 0.07509536039669862,
+   "ratio": 2.720902833954028
+  },
+  "criterion": "score(correct) >= 2 x score(all stay) on the dependency (13.2)",
+  "passed": true,
+  "gate_applied": true
+ },
+ "policy": [
+  [
+   1,
+   0,
+   0,
+   0,
+   0,
+   2,
+   0
+  ],
+  [
+   0,
+   0,
+   3,
+   0,
+   0,
+   1,
+   0
+  ],
+  [
+   0,
+   0,
+   3,
+   0,
+   0,
+   2,
+   0
+  ]
+ ],
+ "policy_named": {
+  "head0": {
+   "digit": "right",
+   "+": "stay",
+   "=": "stay",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "left",
+   "other": "stay"
+  },
+  "head1": {
+   "digit": "stay",
+   "+": "stay",
+   "=": "next_sep",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "right",
+   "other": "stay"
+  },
+  "head2": {
+   "digit": "stay",
+   "+": "stay",
+   "=": "next_sep",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "left",
+   "other": "stay"
+  }
+ },
+ "per_head": [
+  {
+   "column": {
+    "digit": "right",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "left",
+    "other": "stay"
+   },
+   "score_after_cover": 0.6491603131396719,
+   "columns_tied_at_best": 2592
+  },
+  {
+   "column": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "next_sep",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "score_after_cover": 0.20363519282573886,
+   "columns_tied_at_best": 9072
+  },
+  {
+   "column": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "next_sep",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "left",
+    "other": "stay"
+   },
+   "score_after_cover": 0.14505610179167924,
+   "columns_tied_at_best": 9072
+  }
+ ],
+ "table_score_dependency": 0.99785160775709,
+ "table_score_attention_aux": 0.41315838453672943,
+ "search": {
+  "columns": 279936,
+  "present_classes": [
+   "digit",
+   "=",
+   "answer_phase",
+   "other"
+  ],
+  "distinct_paths_simulated": 1296,
+  "head_moves_simulated": 34045920,
+  "score_lookups": 51068880,
+  "head_simulation_operations": 85114800
+ },
+ "reference_agreement_with_correct_table": {
+  "correct_head0_position_read_by_some_compiled_head": 1.0,
+  "correct_head1_position_read_by_some_compiled_head": 0.15226494099733537,
+  "correct_head2_position_read_by_some_compiled_head": 0.15226494099733537
+ },
+ "wall_s": 121.0
+}

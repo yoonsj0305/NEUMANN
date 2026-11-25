@@ -1,0 +1,128 @@
+{
+ "name": "c1a_addition__hardread__1M__s21__N100000__oracle",
+ "task": "addition",
+ "kind": "hardread",
+ "scale": "1M",
+ "params": 873472,
+ "config": {
+  "d": 128,
+  "heads": 4,
+  "layers": 4,
+  "table": [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    3,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ]
+ },
+ "seed": 21,
+ "N": 100000,
+ "batch": 64,
+ "lr": 0.001,
+ "max_steps": 20000,
+ "steps": 3000,
+ "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+ "spec": {
+  "train": [
+   1,
+   10
+  ],
+  "id": [
+   1,
+   10
+  ],
+  "ood": [
+   [
+    11,
+    20
+   ],
+   [
+    21,
+    30
+   ],
+   [
+    31,
+    40
+   ]
+  ]
+ },
+ "id_size": 1000,
+ "ood_size": 500,
+ "judgment": {
+  "rule": "highest in-distribution accuracy (earliest if tied)",
+  "step": 3000,
+  "acc": {
+   "id_1-10": 0.994,
+   "ood_11-20": 0.976,
+   "ood_21-30": 0.954,
+   "ood_31-40": 0.89
+  },
+  "acc_fixed4": null,
+  "acc_seq": null,
+  "train_flops_cum": 33322480435200,
+  "wall_train_s_cum": 543.79
+ },
+ "last": {
+  "step": 3000,
+  "acc": {
+   "id_1-10": 0.994,
+   "ood_11-20": 0.976,
+   "ood_21-30": 0.954,
+   "ood_31-40": 0.89
+  },
+  "acc_fixed4": null,
+  "acc_seq": null
+ },
+ "final_acc": {
+  "id_1-10": 0.994,
+  "ood_11-20": 0.976,
+  "ood_21-30": 0.954,
+  "ood_31-40": 0.89
+ },
+ "final_acc_fixed4": null,
+ "recur": {},
+ "train_flops": 33322480435200,
+ "eval_flops": 738643820544,
+ "wall_train_s": 543.79,
+ "wall_eval_s": 13.6,
+ "segments": [
+  {
+   "segment": 0,
+   "start_step": 0,
+   "started": "2026-11-25 00:55:06"
+  }
+ ],
+ "hardware": {
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "torch_threads": 1,
+  "torch": "2.15.0+cu132",
+  "cuda": false,
+  "python": "3.12.3"
+ },
+ "commit": "99bbb614d0f219e089cee3754d38d63da6d03205",
+ "primary_eval_rule": "looped / looped_rr: recurrence 4 x ceil(bin upper / training upper) (declared before runs); fixed 4 recorded as acc_fixed4"
+}

@@ -1,0 +1,36 @@
+{
+ "per_task": {
+  "addition": {
+   "teacher_s_per_step_max": 0.31189333333333336,
+   "teacher_20000_h": 1.7327407407407407,
+   "compile_s_max": 474.8,
+   "compiles": 9,
+   "compiles_h": 1.187
+  },
+  "mul1": {
+   "teacher_s_per_step_max": 0.14047625,
+   "teacher_20000_h": 0.7804236111111111,
+   "compile_s_max": 142.3,
+   "compiles": 9,
+   "compiles_h": 0.35575
+  },
+  "xor": {
+   "teacher_s_per_step_max": 0.2841355,
+   "teacher_20000_h": 1.5785305555555555,
+   "compile_s_max": 891.8,
+   "compiles": 9,
+   "compiles_h": 2.2295
+  },
+  "rev_xor": {
+   "teacher_s_per_step_max": 0.2793655,
+   "teacher_20000_h": 1.5520305555555554,
+   "compile_s_max": 873.8,
+   "compiles": 9,
+   "compiles_h": 2.1845
+  }
+ },
+ "cpu_hours": 11.600475462962963,
+ "wall_hours_teachers_in_parallel_then_compiles_4_workers_plus_longest_compile": 3.4696504629629628,
+ "limit_hours": 48,
+ "note": "rates: the largest measured (wall train + eval) / step of rope 1M teachers of the task (1 thread, 4 jobs at a time, same machine) and the largest measured compile wall; measuring adds < 1 min per task"
+}

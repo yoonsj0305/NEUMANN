@@ -1,0 +1,123 @@
+{
+ "name": "d1_0_addition__looped_rr__1M__s0__N100000",
+ "task": "addition",
+ "kind": "looped_rr",
+ "scale": "1M",
+ "params": 835824,
+ "config": {
+  "d": 176,
+  "heads": 4,
+  "layers": 0,
+  "block_layers": 2,
+  "recur": 4
+ },
+ "seed": 0,
+ "N": 100000,
+ "batch": 64,
+ "lr": 0.001,
+ "max_steps": 20000,
+ "steps": 20000,
+ "stopped": "max steps",
+ "spec": {
+  "train": [
+   1,
+   10
+  ],
+  "id": [
+   1,
+   10
+  ],
+  "ood": [
+   [
+    11,
+    20
+   ],
+   [
+    21,
+    30
+   ],
+   [
+    31,
+    40
+   ]
+  ]
+ },
+ "id_size": 1000,
+ "ood_size": 500,
+ "judgment": {
+  "rule": "highest in-distribution accuracy (earliest if tied)",
+  "step": 20000,
+  "acc": {
+   "id_1-10": 0.991,
+   "ood_11-20": 0.278,
+   "ood_21-30": 0.0,
+   "ood_31-40": 0.0
+  },
+  "acc_fixed4": {
+   "ood_11-20": 0.29,
+   "ood_21-30": 0.0,
+   "ood_31-40": 0.0
+  },
+  "acc_seq": null,
+  "train_flops_cum": 517580907503616,
+  "wall_train_s_cum": 6546.52
+ },
+ "last": {
+  "step": 20000,
+  "acc": {
+   "id_1-10": 0.991,
+   "ood_11-20": 0.278,
+   "ood_21-30": 0.0,
+   "ood_31-40": 0.0
+  },
+  "acc_fixed4": {
+   "ood_11-20": 0.29,
+   "ood_21-30": 0.0,
+   "ood_31-40": 0.0
+  },
+  "acc_seq": null
+ },
+ "final_acc": {
+  "id_1-10": 0.991,
+  "ood_11-20": 0.278,
+  "ood_21-30": 0.0,
+  "ood_31-40": 0.0
+ },
+ "final_acc_fixed4": {
+  "ood_11-20": 0.29,
+  "ood_21-30": 0.0,
+  "ood_31-40": 0.0
+ },
+ "recur": {
+  "id_1-10": 4,
+  "ood_11-20": 8,
+  "ood_21-30": 12,
+  "ood_31-40": 16
+ },
+ "train_flops": 517580907503616,
+ "eval_flops": 63028310343680,
+ "wall_train_s": 6546.52,
+ "wall_eval_s": 969.06,
+ "segments": [
+  {
+   "segment": 0,
+   "start_step": 0,
+   "started": "2026-11-19 09:21:46"
+  },
+  {
+   "segment": 1,
+   "start_step": 18000,
+   "started": "2026-11-19 11:21:06"
+  }
+ ],
+ "hardware": {
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "torch_threads": 1,
+  "torch": "2.15.0+cu132",
+  "cuda": false,
+  "python": "3.12.3"
+ },
+ "commit": "9725e90543ac47bc93cedf82ebd19d0e765662f7",
+ "primary_eval_rule": "looped / looped_rr: recurrence 4 x ceil(bin upper / training upper) (declared before runs); fixed 4 recorded as acc_fixed4"
+}

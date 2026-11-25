@@ -1,0 +1,221 @@
+{
+ "teacher": "abacus",
+ "task": "mqar",
+ "checkpoint": "stage2/results/d1_0/d1_0_mqar__abacus__1M__s0__N100000/teacher_best.pt",
+ "checkpoint_step": 6000,
+ "heads_total": 16,
+ "selection_set": {
+  "generation_seed": "select:mqar",
+  "size": 1000,
+  "lengths": [
+   4,
+   16
+  ],
+  "metric": "per-query accuracy"
+ },
+ "selection_acc": {
+  "a": 0.9977576189990827,
+  "b": 0.3146468249923555,
+  "c": 0.9962287228620935
+ },
+ "c_kept_heads": [
+  [
+   1,
+   0
+  ],
+  [
+   1,
+   1
+  ],
+  [
+   1,
+   3
+  ],
+  [
+   2,
+   0
+  ],
+  [
+   2,
+   1
+  ],
+  [
+   2,
+   2
+  ],
+  [
+   2,
+   3
+  ],
+  [
+   3,
+   0
+  ],
+  [
+   3,
+   1
+  ],
+  [
+   3,
+   2
+  ],
+  [
+   3,
+   3
+  ]
+ ],
+ "c_trace": [
+  {
+   "head": [
+    0,
+    0
+   ],
+   "selection_acc_with_head": 0.7394760982570584,
+   "kept": false
+  },
+  {
+   "head": [
+    0,
+    1
+   ],
+   "selection_acc_with_head": 0.47008459891958004,
+   "kept": false
+  },
+  {
+   "head": [
+    0,
+    2
+   ],
+   "selection_acc_with_head": 0.8533278972581796,
+   "kept": false
+  },
+  {
+   "head": [
+    0,
+    3
+   ],
+   "selection_acc_with_head": 0.7603710121292427,
+   "kept": false
+  },
+  {
+   "head": [
+    1,
+    0
+   ],
+   "selection_acc_with_head": 0.9975537661808175,
+   "kept": true
+  },
+  {
+   "head": [
+    1,
+    1
+   ],
+   "selection_acc_with_head": 0.9975537661808175,
+   "kept": true
+  },
+  {
+   "head": [
+    1,
+    2
+   ],
+   "selection_acc_with_head": 0.992253592905922,
+   "kept": false
+  },
+  {
+   "head": [
+    1,
+    3
+   ],
+   "selection_acc_with_head": 0.9965345020894913,
+   "kept": true
+  },
+  {
+   "head": [
+    2,
+    0
+   ],
+   "selection_acc_with_head": 0.9962287228620935,
+   "kept": true
+  },
+  {
+   "head": [
+    2,
+    1
+   ],
+   "selection_acc_with_head": 0.9963306492712262,
+   "kept": true
+  },
+  {
+   "head": [
+    2,
+    2
+   ],
+   "selection_acc_with_head": 0.996636428498624,
+   "kept": true
+  },
+  {
+   "head": [
+    2,
+    3
+   ],
+   "selection_acc_with_head": 0.9962287228620935,
+   "kept": true
+  },
+  {
+   "head": [
+    3,
+    0
+   ],
+   "selection_acc_with_head": 0.9962287228620935,
+   "kept": true
+  },
+  {
+   "head": [
+    3,
+    1
+   ],
+   "selection_acc_with_head": 0.9962287228620935,
+   "kept": true
+  },
+  {
+   "head": [
+    3,
+    2
+   ],
+   "selection_acc_with_head": 0.9962287228620935,
+   "kept": true
+  },
+  {
+   "head": [
+    3,
+    3
+   ],
+   "selection_acc_with_head": 0.9962287228620935,
+   "kept": true
+  }
+ ],
+ "rule": "(c): keep a head if the selection accuracy with it (on top of the kept heads) >= (a) - 0.005; choice: higher selection accuracy of (b) and (c), tie -> (c)",
+ "choice": "c",
+ "a_id_eval": {
+  "acc": 0.9978065802592223,
+  "seq": 0.979
+ },
+ "stage1_reference": {
+  "source": "stage1/results/phaseA4/phaseA4_mqar__abacus__1M__s0__N100000",
+  "step": 6000,
+  "acc": {
+   "id_4-16": 0.9978065802592223,
+   "ood_17-32": 0.9245055475156778,
+   "ood_33-48": 0.6966958067861906,
+   "ood_49-64": 0.4549460621871254
+  },
+  "acc_seq": {
+   "id_4-16": 0.979,
+   "ood_17-32": 0.336,
+   "ood_33-48": 0.0,
+   "ood_49-64": 0.0
+  }
+ },
+ "a_id_equals_stage1": true,
+ "wall_s": 27.1
+}

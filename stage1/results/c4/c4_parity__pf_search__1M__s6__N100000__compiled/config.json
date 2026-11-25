@@ -1,0 +1,301 @@
+{
+ "name": "c4_parity__pf_search__1M__s6__N100000__compiled",
+ "phase": "c4",
+ "task": "parity",
+ "kind": "pf_search",
+ "scale": "1M",
+ "params": 245944,
+ "model_config": {
+  "R": 4,
+  "K": 16,
+  "H": 3,
+  "hidden": 256,
+  "emb": 64,
+  "policy": [
+   [
+    0,
+    0,
+    3,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    5,
+    0,
+    2,
+    0,
+    0,
+    4,
+    0
+   ],
+   [
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ]
+ },
+ "seed": 6,
+ "N": 100000,
+ "batch": 64,
+ "max_steps": 20000,
+ "eval_every": 1000,
+ "id_size": 1000,
+ "ood_size": 500,
+ "lr": 0.001,
+ "optimizer": "AdamW betas (0.9, 0.98) weight decay 0.1, grad clip 1.0, warmup max_steps/20, cosine to 10%",
+ "abacus_offset_max": null,
+ "spec": {
+  "train": [
+   1,
+   16
+  ],
+  "id": [
+   1,
+   16
+  ],
+  "ood": [
+   [
+    17,
+    32
+   ],
+   [
+    33,
+    48
+   ],
+   [
+    49,
+    64
+   ]
+  ]
+ },
+ "position": "none (read heads over the tape; table move policy)",
+ "pf": null,
+ "pf2": null,
+ "pf_search": {
+  "policy_file": "stage1/results/c4/parity_compile_s6/compile_result.json",
+  "search": {
+   "task": "parity",
+   "data_seed": 6,
+   "teacher": {
+    "path": "stage1/results/c4/c4_parity__rope__1M__s6__N100000/teacher_best.pt",
+    "untrained_seed": null,
+    "step": 8000,
+    "acc": {
+     "id_1-16": 0.996,
+     "ood_17-32": 0.5,
+     "ood_33-48": 0.512,
+     "ood_49-64": 0.464
+    },
+    "train_flops_to_judgment": 47893656109056
+   },
+   "examples": 2000,
+   "output_steps": 4000,
+   "dependency_kind": "content substitution (design 14)",
+   "extraction": {
+    "flops": 476015403008,
+    "backward_passes": 0,
+    "manual_forward_max_abs_logit_diff": null,
+    "substitution": {
+     "class_symbols": {
+      "digit": [
+       "0",
+       "1"
+      ],
+      "=": [
+       "="
+      ],
+      "answer_phase": [
+       "0",
+       "1"
+      ]
+     },
+     "sequences_forwarded": 21314,
+     "substituted_positions": 19314,
+     "all_zero_rows": 0
+    }
+   },
+   "dependency_mass_on_current_position": 0.1930230419858749,
+   "attention_mass_on_current_position": 0.2248017416195944,
+   "precheck": {
+    "correct_table": {
+     "head0": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "stay",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "stay",
+      "other": "stay"
+     },
+     "head1": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "stay",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "stay",
+      "other": "stay"
+     },
+     "head2": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "stay",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "stay",
+      "other": "stay"
+     }
+    },
+    "dependency": {
+     "correct": 0.16603919710729104,
+     "correct_per_head": [
+      0.16603919710729104,
+      0.0,
+      0.0
+     ],
+     "all_stay": 0.16603919710729104,
+     "ratio": 1.0
+    },
+    "attention_aux": {
+     "correct": 0.11780007884523366,
+     "all_stay": 0.11780007884523366,
+     "ratio": 1.0
+    },
+    "criterion": "score(correct) >= 2 x score(all stay) on the dependency (13.2)",
+    "passed": false,
+    "gate_applied": false
+   },
+   "policy": [
+    [
+     0,
+     0,
+     3,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     5,
+     0,
+     2,
+     0,
+     0,
+     4,
+     0
+    ],
+    [
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "policy_named": {
+    "head0": {
+     "digit": "stay",
+     "+": "stay",
+     "=": "next_sep",
+     "|": "stay",
+     "node": "stay",
+     "answer_phase": "right",
+     "other": "stay"
+    },
+    "head1": {
+     "digit": "content",
+     "+": "stay",
+     "=": "left",
+     "|": "stay",
+     "node": "stay",
+     "answer_phase": "start",
+     "other": "stay"
+    },
+    "head2": {
+     "digit": "right",
+     "+": "stay",
+     "=": "stay",
+     "|": "stay",
+     "node": "stay",
+     "answer_phase": "stay",
+     "other": "stay"
+    }
+   },
+   "per_head": [
+    {
+     "column": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "next_sep",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "right",
+      "other": "stay"
+     },
+     "score_after_cover": 0.1930230419858749,
+     "columns_tied_at_best": 9072
+    },
+    {
+     "column": {
+      "digit": "content",
+      "+": "stay",
+      "=": "left",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "start",
+      "other": "stay"
+     },
+     "score_after_cover": 0.16612007511134463,
+     "columns_tied_at_best": 1296
+    },
+    {
+     "column": {
+      "digit": "right",
+      "+": "stay",
+      "=": "stay",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "stay",
+      "other": "stay"
+     },
+     "score_after_cover": 0.11167742267059627,
+     "columns_tied_at_best": 2592
+    }
+   ],
+   "table_score_dependency": 0.4708205397678158,
+   "table_score_attention_aux": 0.41242931033729113,
+   "search": {
+    "columns": 279936,
+    "present_classes": [
+     "digit",
+     "=",
+     "answer_phase"
+    ],
+    "distinct_paths_simulated": 216,
+    "head_moves_simulated": 4603824,
+    "score_lookups": 2592000,
+    "head_simulation_operations": 7195824
+   },
+   "reference_agreement_with_correct_table": {
+    "correct_head0_position_read_by_some_compiled_head": 0.5755,
+    "correct_head1_position_read_by_some_compiled_head": 0.5755,
+    "correct_head2_position_read_by_some_compiled_head": 0.5755
+   },
+   "wall_s": 27.6
+  }
+ },
+ "early_stop": "in-distribution >= 0.99 at two consecutive evaluations",
+ "judgment_checkpoint": "highest in-distribution accuracy (earliest if tied); out-of-distribution at it",
+ "accuracy": "sequence exact match (teacher-forced == greedy)",
+ "looped_eval_rule": null,
+ "looped_rr": null
+}

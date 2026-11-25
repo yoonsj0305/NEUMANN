@@ -1,0 +1,89 @@
+{
+ "hand_table": {
+  "head0": {
+   "digit": "stay",
+   "+": "stay",
+   "=": "stay",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "right",
+   "other": "stay"
+  },
+  "head1": {
+   "digit": "stay",
+   "+": "next_sep",
+   "=": "right",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "right",
+   "other": "stay"
+  },
+  "head2": {
+   "digit": "stay",
+   "+": "stay",
+   "=": "stay",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "stay",
+   "other": "stay"
+  }
+ },
+ "E_expressiveness_hand_table_with_hand_update_controller": {
+  "id_1-10": 1.0,
+  "ood_11-20": 1.0,
+  "ood_21-30": 1.0,
+  "ood_31-40": 1.0
+ },
+ "S_scores": {
+  "hand": {
+   "seed1": {
+    "val_loss": 2.0361785197240936,
+    "val_acc": 0.0,
+    "final_train_loss": 2.0971,
+    "flops": 910195573128,
+    "wall_s": 93.8
+   },
+   "seed0": {
+    "val_loss": 2.0277383459970486,
+    "val_acc": 0.004,
+    "final_train_loss": 2.0172,
+    "flops": 906881448840,
+    "wall_s": 98.9
+   },
+   "seed2": {
+    "val_loss": 2.0591515819241146,
+    "val_acc": 0.002,
+    "final_train_loss": 2.0343,
+    "flops": 907341821768,
+    "wall_s": 100.8
+   }
+  },
+  "all_stay": {
+   "seed0": {
+    "val_loss": 2.3496176430583713,
+    "val_acc": 0.0,
+    "final_train_loss": 2.3475,
+    "flops": 906881448840,
+    "wall_s": 106.4
+   },
+   "seed1": {
+    "val_loss": 2.3535259309600822,
+    "val_acc": 0.0,
+    "final_train_loss": 2.3356,
+    "flops": 910195573128,
+    "wall_s": 99.6
+   },
+   "seed2": {
+    "val_loss": 2.368499180879964,
+    "val_acc": 0.0,
+    "final_train_loss": 2.3612,
+    "flops": 907341821768,
+    "wall_s": 100.9
+   }
+  }
+ },
+ "criterion": "distinguishes iff score(hand) < score(all stay) at seed 0 (declared before running)",
+ "distinguishes": true,
+ "seed0_difference_all_stay_minus_hand": 0.3218792970613227,
+ "check_flops_total": 5448837687472
+}

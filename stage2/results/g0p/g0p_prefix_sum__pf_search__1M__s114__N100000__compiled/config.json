@@ -1,0 +1,317 @@
+{
+ "name": "g0p_prefix_sum__pf_search__1M__s114__N100000__compiled",
+ "phase": "g0p",
+ "task": "prefix_sum",
+ "kind": "pf_search",
+ "scale": "1M",
+ "params": 249211,
+ "model_config": {
+  "R": 4,
+  "K": 16,
+  "H": 3,
+  "hidden": 256,
+  "emb": 64,
+  "policy": [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    3,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    1,
+    0,
+    0,
+    2,
+    0
+   ]
+  ]
+ },
+ "seed": 114,
+ "N": 100000,
+ "batch": 64,
+ "max_steps": 20000,
+ "eval_every": 1000,
+ "id_size": 1000,
+ "ood_size": 500,
+ "lr": 0.001,
+ "optimizer": "AdamW betas (0.9, 0.98) weight decay 0.1, grad clip 1.0, warmup max_steps/20, cosine to 10%",
+ "abacus_offset_max": null,
+ "spec": {
+  "train": [
+   1,
+   10
+  ],
+  "id": [
+   1,
+   10
+  ],
+  "ood": [
+   [
+    11,
+    20
+   ],
+   [
+    21,
+    30
+   ],
+   [
+    31,
+    40
+   ]
+  ]
+ },
+ "position": "none (read heads over the tape; table move policy)",
+ "pf": null,
+ "pf2": null,
+ "pf_search": {
+  "policy_file": "/home/user/NEUMANN/stage2/results/g0p/prefix_sum_compile_s14/compile_result.json",
+  "search": {
+   "task": "prefix_sum",
+   "data_seed": 14,
+   "teacher": {
+    "path": "/home/user/NEUMANN/stage2/results/g0p/g0p_prefix_sum__rope__1M__s14__N100000/teacher_best.pt",
+    "untrained_seed": null,
+    "step": 2000,
+    "acc": {
+     "id_1-10": 0.998,
+     "ood_11-20": 0.0,
+     "ood_21-30": 0.0,
+     "ood_31-40": 0.0
+    },
+    "train_flops_to_judgment": 13930304176128
+   },
+   "examples": 2000,
+   "output_steps": 13176,
+   "dependency_kind": "content substitution (design 14)",
+   "extraction": {
+    "flops": 5356501606400,
+    "backward_passes": 0,
+    "manual_forward_max_abs_logit_diff": null,
+    "substitution": {
+     "class_symbols": {
+      "digit": [
+       "0",
+       "1",
+       "2",
+       "3",
+       "4",
+       "5",
+       "6",
+       "7",
+       "8",
+       "9"
+      ],
+      "=": [
+       "="
+      ],
+      "answer_phase": [
+       "0",
+       "1",
+       "2",
+       "3",
+       "4",
+       "5",
+       "6",
+       "7",
+       "8",
+       "9"
+      ]
+     },
+     "sequences_forwarded": 203168,
+     "substituted_positions": 22352,
+     "all_zero_rows": 0
+    }
+   },
+   "dependency_mass_on_current_position": 0.39421584956609607,
+   "attention_mass_on_current_position": 0.08479639630049125,
+   "precheck": {
+    "correct_table": {
+     "head0": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "stay",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "right",
+      "other": "stay"
+     },
+     "head1": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "stay",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "stay",
+      "other": "stay"
+     },
+     "head2": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "stay",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "stay",
+      "other": "stay"
+     }
+    },
+    "dependency": {
+     "correct": 0.5299773862992445,
+     "correct_per_head": [
+      0.4992402080162164,
+      0.03073717828302809,
+      0.0
+     ],
+     "all_stay": 0.1825074148119713,
+     "ratio": 2.9038676968015515
+    },
+    "attention_aux": {
+     "correct": 0.3918458698581764,
+     "all_stay": 0.15046118058670827,
+     "ratio": 2.604298785442283
+    },
+    "criterion": "score(correct) >= 2 x score(all stay) on the dependency (13.2)",
+    "passed": true,
+    "gate_applied": true
+   },
+   "policy": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     3,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     1,
+     0,
+     0,
+     2,
+     0
+    ]
+   ],
+   "policy_named": {
+    "head0": {
+     "digit": "stay",
+     "+": "stay",
+     "=": "stay",
+     "|": "stay",
+     "node": "stay",
+     "answer_phase": "right",
+     "other": "stay"
+    },
+    "head1": {
+     "digit": "stay",
+     "+": "stay",
+     "=": "next_sep",
+     "|": "stay",
+     "node": "stay",
+     "answer_phase": "right",
+     "other": "stay"
+    },
+    "head2": {
+     "digit": "stay",
+     "+": "stay",
+     "=": "right",
+     "|": "stay",
+     "node": "stay",
+     "answer_phase": "left",
+     "other": "stay"
+    }
+   },
+   "per_head": [
+    {
+     "column": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "stay",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "right",
+      "other": "stay"
+     },
+     "score_after_cover": 0.4992402080162164,
+     "columns_tied_at_best": 23328
+    },
+    {
+     "column": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "next_sep",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "right",
+      "other": "stay"
+     },
+     "score_after_cover": 0.39421584956609607,
+     "columns_tied_at_best": 9072
+    },
+    {
+     "column": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "right",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "left",
+      "other": "stay"
+     },
+     "score_after_cover": 0.030745590049727555,
+     "columns_tied_at_best": 10368
+    }
+   ],
+   "table_score_dependency": 0.92420164763204,
+   "table_score_attention_aux": 0.4949969742347474,
+   "search": {
+    "columns": 279936,
+    "present_classes": [
+     "digit",
+     "=",
+     "answer_phase"
+    ],
+    "distinct_paths_simulated": 216,
+    "head_moves_simulated": 5260032,
+    "score_lookups": 8538048,
+    "head_simulation_operations": 13798080
+   },
+   "reference_agreement_with_correct_table": {
+    "correct_head0_position_read_by_some_compiled_head": 1.0,
+    "correct_head1_position_read_by_some_compiled_head": 1.0,
+    "correct_head2_position_read_by_some_compiled_head": 1.0
+   },
+   "wall_s": 90.2
+  }
+ },
+ "early_stop": "in-distribution >= 0.99 at two consecutive evaluations",
+ "judgment_checkpoint": "highest in-distribution accuracy (earliest if tied); out-of-distribution at it",
+ "accuracy": "sequence exact match (teacher-forced == greedy)",
+ "looped_eval_rule": null,
+ "looped_rr": null
+}

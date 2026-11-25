@@ -1,0 +1,62 @@
+2026-11-19 12:46:05 launch abacus_looped_1M  max_wall=6900
+2026-11-19 12:46:05 launch abacus_looped_10M  max_wall=6900
+2026-11-19 12:46:05 launch abacus_ii_1M  max_wall=6900
+2026-11-19 12:46:05 launch position_coupling_1M  max_wall=6900
+2026-11-19 12:48:34 exit 0 abacus_looped_1M
+2026-11-19 12:48:34 exit 0 abacus_looped_10M
+2026-11-19 12:48:36 stopped abacus_looped_1M and abacus_looped_10M before their first evaluation (no results) to add the secondary stage-1 recurrence rule evaluation; their directories (config, env, start event only) removed and the runs restarted from step 0
+2026-11-19 12:51:40 launch abacus_looped_10M  max_wall=6900
+2026-11-19 12:51:40 launch abacus_looped_1M  max_wall=6900
+2026-11-19 12:53:56 added position_coupling_pad_1M (paper zero-padding; the unpadded position_coupling_1M keeps running as the first result)
+2026-11-19 12:54:03 launch position_coupling_pad_1M  max_wall=6900
+2026-11-19 14:41:09 exit 0 position_coupling_1M
+2026-11-19 14:41:09 exit 0 abacus_ii_1M
+2026-11-19 14:41:28 note: the 'exit 0' lines above are wrong (the queue script logged the status of date, not of e0.py); the logs show planned cuts (event cut) at abacus_ii_1M step 31520 and position_coupling_1M step 39601. Script fixed to log the e0.py status.
+2026-11-19 14:41:35 launch abacus_ii_1M  max_wall=6900
+2026-11-19 14:41:35 launch position_coupling_1M  max_wall=6900
+2026-11-19 14:46:45 exit 0 abacus_looped_1M
+2026-11-19 14:46:46 exit 0 abacus_looped_10M
+2026-11-19 14:46:54 launch abacus_looped_1M  max_wall=6900
+2026-11-19 14:46:54 launch abacus_looped_10M  max_wall=6900
+2026-11-19 14:47:19 note: exit 0 for both looped runs at 14:46 is the old logging bug; their logs show planned cuts at steps 15133 and 2311.
+2026-11-19 14:49:08 exit 0 position_coupling_pad_1M
+2026-11-19 14:49:16 note: exit 0 for position_coupling_pad_1M at 14:49:08 is the old logging bug; its log shows a planned cut at step 50000.
+2026-11-19 14:49:16 launch position_coupling_pad_1M  max_wall=6900
+2026-11-19 16:36:40 exit 3 abacus_ii_1M
+2026-11-19 16:36:40 exit 3 position_coupling_1M
+2026-11-19 16:36:49 launch abacus_ii_1M  max_wall=6900
+2026-11-19 16:36:49 launch position_coupling_1M  max_wall=6900
+2026-11-19 16:41:59 exit 3 abacus_looped_1M
+2026-11-19 16:42:01 exit 3 abacus_looped_10M
+2026-11-19 16:42:07 launch abacus_looped_1M  max_wall=6900
+2026-11-19 16:42:07 launch abacus_looped_10M  max_wall=6900
+2026-11-19 16:44:20 exit 3 position_coupling_pad_1M
+2026-11-19 16:44:27 launch position_coupling_pad_1M  max_wall=6900
+2026-11-19 18:31:53 exit 3 abacus_ii_1M
+2026-11-19 18:31:53 exit 3 position_coupling_1M
+2026-11-19 18:32:02 launch position_coupling_1M  max_wall=6900
+2026-11-19 18:32:02 launch abacus_ii_1M  max_wall=6900
+2026-11-19 18:37:12 exit 3 abacus_looped_1M
+2026-11-19 18:37:13 exit 3 abacus_looped_10M
+2026-11-19 18:37:20 launch abacus_looped_1M  max_wall=6900
+2026-11-19 18:37:20 launch abacus_looped_10M  max_wall=6900
+2026-11-19 18:39:31 exit 3 position_coupling_pad_1M
+2026-11-19 18:39:39 launch position_coupling_pad_1M  max_wall=6900
+2026-11-19 18:57:50 exit 0 position_coupling_pad_1M
+2026-11-19 20:20:16 exit 0 position_coupling_1M
+2026-11-19 20:25:36 exit 0 abacus_looped_10M
+2026-11-19 20:27:06 exit 3 abacus_ii_1M
+2026-11-19 20:27:18 launch abacus_ii_1M  max_wall=6900
+2026-11-19 20:32:28 exit 3 abacus_looped_1M
+2026-11-19 20:32:35 launch abacus_looped_1M  max_wall=6900
+2026-11-19 21:42:41 exit 0 abacus_ii_1M
+2026-11-19 22:12:07 container restart killed abacus_looped_1M during segment 4 (unplanned, no cut event); last checkpoint and log row at step 87000 (22:08); the steps after it were lost and are redone from that checkpoint
+2026-11-19 22:12:07 launch abacus_looped_1M  max_wall=6900
+2026-11-20 00:07:19 exit 3 abacus_looped_1M
+2026-11-20 00:07:30 launch abacus_looped_1M  max_wall=6900
+2026-11-20 00:39:53 exit 0 abacus_looped_1M
+2026-11-20 00:40:48 10x phase done (all five runs, none reached). 30x extension target by DESIGN 5.1 + 5.3 tie-break: abacus_looped_10M (criterion 1 tied at 0.000 for all three general methods; criterion 2 best 21-30: abacus_looped_10M 0.004 at step 7000, the others 0.000) -> extension_pick.json. Continues from its last checkpoint (step 10077, 1.790e15) to 5.37e15 with 4 threads (only process now; measured 0.76 vs 2.15 s/step at 1 thread)
+2026-11-20 00:40:55 launch abacus_looped_10M --extend --budget 5.37e15 --threads 4 max_wall=6900
+2026-11-20 02:36:02 exit 3 abacus_looped_10M
+2026-11-20 02:36:16 launch abacus_looped_10M --extend --budget 5.37e15 --threads 4 max_wall=6900
+2026-11-20 04:05:16 exit 0 abacus_looped_10M

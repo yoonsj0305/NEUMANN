@@ -1,0 +1,854 @@
+{
+ "copy": {
+  "accuracy": {
+   "id_1-10": 1.0,
+   "ood_11-20": 1.0,
+   "ood_21-30": 1.0,
+   "ood_31-40": 1.0,
+   "select": 1.0,
+   "train_s15_first2000": 1.0,
+   "train_s16_first2000": 1.0,
+   "train_s17_first2000": 1.0
+  },
+  "n": {
+   "id_1-10": 1000,
+   "ood_11-20": 500,
+   "ood_21-30": 500,
+   "ood_31-40": 500,
+   "select": 1000,
+   "train_s15_first2000": 2000,
+   "train_s16_first2000": 2000,
+   "train_s17_first2000": 2000
+  },
+  "exact_on_all_bins": true,
+  "exact_on_all_sets": true,
+  "example": {
+   "id_1-10": "<bos> 6 0 3 6 =  ->  6 0 3 6 <eos>",
+   "ood_11-20": "<bos> 9 2 6 3 4 5 7 6 1 7 1 8 5 5 2 2 1 1 1 3 =  ->  9 2 6 3 4 5 7 6 1 7 1 8 5 5 2 2 1 1 1 3 <eos>",
+   "ood_21-30": "<bos> 5 3 6 6 0 2 1 2 4 5 1 0 1 9 4 0 6 9 2 3 6 1 =  ->  5 3 6 6 0 2 1 2 4 5 1 0 1 9 4 0 6 9 2 3 6 1 <eos>",
+   "ood_31-40": "<bos> 0 6 7 9 4 7 7 6 0 3 8 7 0 5 4 9 9 5 8 3 8 4 1 6 7 4 6 4 1 2 0 6 =  ->  0 6 7 9 4 7 7 6 0 3 8 7 0 5 4 9 9 5 8 3 8 4 1 6 7 4 6 4 1 2 0 6 <eos>"
+  },
+  "trace": {
+   "tokens": "<bos> 6 0 3 6 = | 6 0 3 6 <eos>",
+   "answer_steps": [
+    {
+     "step": 5,
+     "x_t": "=",
+     "heads": [
+      1,
+      0,
+      0
+     ],
+     "reads": [
+      "6",
+      "<bos>",
+      "<bos>"
+     ],
+     "output": "6",
+     "target": "6"
+    },
+    {
+     "step": 6,
+     "x_t": "6",
+     "heads": [
+      2,
+      0,
+      0
+     ],
+     "reads": [
+      "0",
+      "<bos>",
+      "<bos>"
+     ],
+     "output": "0",
+     "target": "0"
+    },
+    {
+     "step": 7,
+     "x_t": "0",
+     "heads": [
+      3,
+      0,
+      0
+     ],
+     "reads": [
+      "3",
+      "<bos>",
+      "<bos>"
+     ],
+     "output": "3",
+     "target": "3"
+    },
+    {
+     "step": 8,
+     "x_t": "3",
+     "heads": [
+      4,
+      0,
+      0
+     ],
+     "reads": [
+      "6",
+      "<bos>",
+      "<bos>"
+     ],
+     "output": "6",
+     "target": "6"
+    },
+    {
+     "step": 9,
+     "x_t": "6",
+     "heads": [
+      5,
+      0,
+      0
+     ],
+     "reads": [
+      "=",
+      "<bos>",
+      "<bos>"
+     ],
+     "output": "<eos>",
+     "target": "<eos>"
+    }
+   ]
+  },
+  "wall_s": 3.0
+ },
+ "reverse": {
+  "accuracy": {
+   "id_1-10": 1.0,
+   "ood_11-20": 1.0,
+   "ood_21-30": 1.0,
+   "ood_31-40": 1.0,
+   "select": 1.0,
+   "train_s15_first2000": 1.0,
+   "train_s16_first2000": 1.0,
+   "train_s17_first2000": 1.0
+  },
+  "n": {
+   "id_1-10": 1000,
+   "ood_11-20": 500,
+   "ood_21-30": 500,
+   "ood_31-40": 500,
+   "select": 1000,
+   "train_s15_first2000": 2000,
+   "train_s16_first2000": 2000,
+   "train_s17_first2000": 2000
+  },
+  "exact_on_all_bins": true,
+  "exact_on_all_sets": true,
+  "example": {
+   "id_1-10": "<bos> 5 7 1 8 9 6 3 7 =  ->  7 3 6 9 8 1 7 5 <eos>",
+   "ood_11-20": "<bos> 1 4 8 4 5 4 9 7 1 2 4 0 9 5 2 8 7 3 =  ->  3 7 8 2 5 9 0 4 2 1 7 9 4 5 4 8 4 1 <eos>",
+   "ood_21-30": "<bos> 7 3 9 1 0 4 0 1 1 9 1 5 0 5 9 2 3 5 8 4 6 1 0 =  ->  0 1 6 4 8 5 3 2 9 5 0 5 1 9 1 1 0 4 0 1 9 3 7 <eos>",
+   "ood_31-40": "<bos> 0 2 4 4 0 3 6 1 9 0 4 4 0 8 6 3 9 1 2 3 8 8 6 4 5 6 3 7 0 3 7 4 5 =  ->  5 4 7 3 0 7 3 6 5 4 6 8 8 3 2 1 9 3 6 8 0 4 4 0 9 1 6 3 0 4 4 2 0 <eos>"
+  },
+  "trace": {
+   "tokens": "<bos> 1 4 7 8 = | 8 7 4 1 <eos>",
+   "answer_steps": [
+    {
+     "step": 5,
+     "x_t": "=",
+     "heads": [
+      4,
+      0,
+      0
+     ],
+     "reads": [
+      "8",
+      "<bos>",
+      "<bos>"
+     ],
+     "output": "8",
+     "target": "8"
+    },
+    {
+     "step": 6,
+     "x_t": "8",
+     "heads": [
+      3,
+      0,
+      0
+     ],
+     "reads": [
+      "7",
+      "<bos>",
+      "<bos>"
+     ],
+     "output": "7",
+     "target": "7"
+    },
+    {
+     "step": 7,
+     "x_t": "7",
+     "heads": [
+      2,
+      0,
+      0
+     ],
+     "reads": [
+      "4",
+      "<bos>",
+      "<bos>"
+     ],
+     "output": "4",
+     "target": "4"
+    },
+    {
+     "step": 8,
+     "x_t": "4",
+     "heads": [
+      1,
+      0,
+      0
+     ],
+     "reads": [
+      "1",
+      "<bos>",
+      "<bos>"
+     ],
+     "output": "1",
+     "target": "1"
+    },
+    {
+     "step": 9,
+     "x_t": "1",
+     "heads": [
+      0,
+      0,
+      0
+     ],
+     "reads": [
+      "<bos>",
+      "<bos>",
+      "<bos>"
+     ],
+     "output": "<eos>",
+     "target": "<eos>"
+    }
+   ]
+  },
+  "wall_s": 2.7,
+  "bos_reads": {
+   "id_1-10": {
+    "head0": {
+     "reads_bos_at_eos_step": 1.0,
+     "reads_bos_at_an_earlier_answer_step": 0.0
+    },
+    "head1": {
+     "reads_bos_at_eos_step": 1.0,
+     "reads_bos_at_an_earlier_answer_step": 1.0
+    },
+    "head2": {
+     "reads_bos_at_eos_step": 1.0,
+     "reads_bos_at_an_earlier_answer_step": 1.0
+    }
+   },
+   "ood_11-20": {
+    "head0": {
+     "reads_bos_at_eos_step": 1.0,
+     "reads_bos_at_an_earlier_answer_step": 0.0
+    },
+    "head1": {
+     "reads_bos_at_eos_step": 1.0,
+     "reads_bos_at_an_earlier_answer_step": 1.0
+    },
+    "head2": {
+     "reads_bos_at_eos_step": 1.0,
+     "reads_bos_at_an_earlier_answer_step": 1.0
+    }
+   },
+   "ood_21-30": {
+    "head0": {
+     "reads_bos_at_eos_step": 1.0,
+     "reads_bos_at_an_earlier_answer_step": 0.0
+    },
+    "head1": {
+     "reads_bos_at_eos_step": 1.0,
+     "reads_bos_at_an_earlier_answer_step": 1.0
+    },
+    "head2": {
+     "reads_bos_at_eos_step": 1.0,
+     "reads_bos_at_an_earlier_answer_step": 1.0
+    }
+   },
+   "ood_31-40": {
+    "head0": {
+     "reads_bos_at_eos_step": 1.0,
+     "reads_bos_at_an_earlier_answer_step": 0.0
+    },
+    "head1": {
+     "reads_bos_at_eos_step": 1.0,
+     "reads_bos_at_an_earlier_answer_step": 1.0
+    },
+    "head2": {
+     "reads_bos_at_eos_step": 1.0,
+     "reads_bos_at_an_earlier_answer_step": 1.0
+    }
+   }
+  }
+ },
+ "xor": {
+  "accuracy": {
+   "id_1-16": 1.0,
+   "ood_17-32": 1.0,
+   "ood_33-48": 1.0,
+   "ood_49-64": 1.0,
+   "select": 1.0,
+   "train_s15_first2000": 1.0,
+   "train_s16_first2000": 1.0,
+   "train_s17_first2000": 1.0
+  },
+  "n": {
+   "id_1-16": 1000,
+   "ood_17-32": 500,
+   "ood_33-48": 500,
+   "ood_49-64": 500,
+   "select": 1000,
+   "train_s15_first2000": 2000,
+   "train_s16_first2000": 2000,
+   "train_s17_first2000": 2000
+  },
+  "exact_on_all_bins": true,
+  "exact_on_all_sets": true,
+  "example": {
+   "id_1-16": "<bos> 0 0 0 0 0 1 0 0 0 0 0 0 ^ 1 0 1 0 1 1 1 1 0 0 1 1 =  ->  1 0 1 0 1 0 1 1 0 0 1 1 <eos>",
+   "ood_17-32": "<bos> 0 0 0 1 1 1 0 1 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 0 0 1 0 0 0 1 1 0 ^ 1 0 1 1 1 0 0 0 0 0 1 0 1 0 1 1 1 0 1 0 1 1 0 1 0 1 0 1 0 0 1 0 =  ->  1 0 1 0 0 1 0 1 0 0 1 0 1 0 1 0 0 1 0 0 1 1 0 1 0 0 0 1 0 1 0 0 <eos>",
+   "ood_33-48": "<bos> 0 1 1 0 1 1 0 0 0 0 0 1 0 1 1 1 1 0 0 1 1 1 0 0 1 1 1 1 1 1 0 1 0 0 0 1 1 1 0 0 0 1 0 1 1 0 ^ 0 1 0 0 0 1 1 1 0 0 1 0 0 1 0 1 0 1 1 1 0 1 1 1 0 0 0 0 1 1 1 0 0 0 1 0 0 0 0 0 1 1 1 0 1 1 =  ->  0 0 1 0 1 0 1 1 0 0 1 1 0 0 1 0 1 1 1 0 1 0 1 1 1 1 1 1 0 0 1 1 0 0 1 1 1 1 0 0 1 0 1 1 0 1 <eos>",
+   "ood_49-64": "<bos> 1 0 1 1 1 1 0 1 1 1 1 1 0 1 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1 1 1 0 1 0 0 0 0 1 1 1 1 1 1 0 1 1 0 0 0 1 1 1 1 0 1 1 ^ 1 0 1 1 1 1 0 1 1 0 0 1 0 0 1 0 0 0 1 0 1 1 0 0 0 1 1 0 0 0 0 1 1 0 1 1 1 0 1 0 1 0 1 0 0 1 1 1 1 0 1 1 0 1 1 0 =  ->  0 0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 0 1 1 0 1 1 1 0 0 1 1 1 1 1 1 1 0 0 1 1 1 1 0 1 0 1 0 0 1 0 1 1 1 1 0 0 1 1 0 1 <eos>"
+  },
+  "trace": {
+   "tokens": "<bos> 0 ^ 1 = | 1 <eos>",
+   "answer_steps": [
+    {
+     "step": 4,
+     "x_t": "=",
+     "heads": [
+      1,
+      3,
+      0
+     ],
+     "reads": [
+      "0",
+      "1",
+      "<bos>"
+     ],
+     "output": "1",
+     "target": "1"
+    },
+    {
+     "step": 5,
+     "x_t": "1",
+     "heads": [
+      2,
+      4,
+      0
+     ],
+     "reads": [
+      "^",
+      "=",
+      "<bos>"
+     ],
+     "output": "<eos>",
+     "target": "<eos>"
+    }
+   ]
+  },
+  "wall_s": 7.0
+ },
+ "mul1": {
+  "accuracy": {
+   "id_1-10": 1.0,
+   "ood_11-20": 1.0,
+   "ood_21-30": 1.0,
+   "ood_31-40": 1.0,
+   "select": 1.0,
+   "train_s15_first2000": 1.0,
+   "train_s16_first2000": 1.0,
+   "train_s17_first2000": 1.0
+  },
+  "n": {
+   "id_1-10": 1000,
+   "ood_11-20": 500,
+   "ood_21-30": 500,
+   "ood_31-40": 500,
+   "select": 1000,
+   "train_s15_first2000": 2000,
+   "train_s16_first2000": 2000,
+   "train_s17_first2000": 2000
+  },
+  "exact_on_all_bins": true,
+  "exact_on_all_sets": true,
+  "example": {
+   "id_1-10": "<bos> 8 1 7 7 * 1 =  ->  8 1 7 7 <eos>",
+   "ood_11-20": "<bos> 0 7 8 6 4 5 4 1 5 1 6 8 9 * 5 =  ->  0 5 3 4 3 7 2 7 5 7 0 3 9 4 <eos>",
+   "ood_21-30": "<bos> 3 4 7 7 8 4 7 0 8 6 3 6 5 0 0 5 2 1 3 6 0 1 8 7 * 0 =  ->  0 <eos>",
+   "ood_31-40": "<bos> 5 6 3 8 0 0 3 1 7 6 7 7 8 6 1 8 3 6 2 0 7 9 6 1 1 6 6 8 8 5 8 1 8 2 1 4 * 0 =  ->  0 <eos>"
+  },
+  "trace": {
+   "tokens": "<bos> 6 2 * 9 = | 4 3 2 <eos>",
+   "answer_steps": [
+    {
+     "step": 5,
+     "x_t": "=",
+     "heads": [
+      1,
+      4,
+      0
+     ],
+     "reads": [
+      "6",
+      "9",
+      "<bos>"
+     ],
+     "output": "4",
+     "target": "4"
+    },
+    {
+     "step": 6,
+     "x_t": "4",
+     "heads": [
+      2,
+      4,
+      0
+     ],
+     "reads": [
+      "2",
+      "9",
+      "<bos>"
+     ],
+     "output": "3",
+     "target": "3"
+    },
+    {
+     "step": 7,
+     "x_t": "3",
+     "heads": [
+      3,
+      4,
+      0
+     ],
+     "reads": [
+      "*",
+      "9",
+      "<bos>"
+     ],
+     "output": "2",
+     "target": "2"
+    },
+    {
+     "step": 8,
+     "x_t": "2",
+     "heads": [
+      4,
+      4,
+      0
+     ],
+     "reads": [
+      "9",
+      "9",
+      "<bos>"
+     ],
+     "output": "<eos>",
+     "target": "<eos>"
+    }
+   ]
+  },
+  "wall_s": 2.9
+ },
+ "prefix_sum": {
+  "accuracy": {
+   "id_1-10": 1.0,
+   "ood_11-20": 1.0,
+   "ood_21-30": 1.0,
+   "ood_31-40": 1.0,
+   "select": 1.0,
+   "train_s15_first2000": 1.0,
+   "train_s16_first2000": 1.0,
+   "train_s17_first2000": 1.0
+  },
+  "n": {
+   "id_1-10": 1000,
+   "ood_11-20": 500,
+   "ood_21-30": 500,
+   "ood_31-40": 500,
+   "select": 1000,
+   "train_s15_first2000": 2000,
+   "train_s16_first2000": 2000,
+   "train_s17_first2000": 2000
+  },
+  "exact_on_all_bins": true,
+  "exact_on_all_sets": true,
+  "example": {
+   "id_1-10": "<bos> 1 8 3 4 5 3 2 =  ->  1 9 2 6 1 4 6 <eos>",
+   "ood_11-20": "<bos> 9 6 4 5 3 3 2 6 9 1 8 =  ->  9 5 9 4 7 0 2 8 7 8 6 <eos>",
+   "ood_21-30": "<bos> 6 7 7 2 9 0 9 2 4 1 9 5 1 0 0 8 5 2 4 9 4 1 6 2 1 3 7 =  ->  6 3 0 2 1 1 0 2 6 7 6 1 2 2 2 0 5 7 1 0 4 5 1 3 4 7 4 <eos>",
+   "ood_31-40": "<bos> 0 1 0 3 4 3 4 1 9 9 6 6 2 0 1 9 6 5 5 4 9 0 0 4 2 9 7 3 5 7 1 5 8 2 2 4 4 =  ->  0 1 1 4 8 1 5 6 5 4 0 6 8 8 9 8 4 9 4 8 7 7 7 1 3 2 9 2 7 4 5 0 8 0 2 6 0 <eos>"
+  },
+  "trace": {
+   "tokens": "<bos> 7 0 7 7 = | 7 7 4 1 <eos>",
+   "answer_steps": [
+    {
+     "step": 5,
+     "x_t": "=",
+     "heads": [
+      1,
+      0,
+      0
+     ],
+     "reads": [
+      "7",
+      "<bos>",
+      "<bos>"
+     ],
+     "output": "7",
+     "target": "7"
+    },
+    {
+     "step": 6,
+     "x_t": "7",
+     "heads": [
+      2,
+      0,
+      0
+     ],
+     "reads": [
+      "0",
+      "<bos>",
+      "<bos>"
+     ],
+     "output": "7",
+     "target": "7"
+    },
+    {
+     "step": 7,
+     "x_t": "7",
+     "heads": [
+      3,
+      0,
+      0
+     ],
+     "reads": [
+      "7",
+      "<bos>",
+      "<bos>"
+     ],
+     "output": "4",
+     "target": "4"
+    },
+    {
+     "step": 8,
+     "x_t": "4",
+     "heads": [
+      4,
+      0,
+      0
+     ],
+     "reads": [
+      "7",
+      "<bos>",
+      "<bos>"
+     ],
+     "output": "1",
+     "target": "1"
+    },
+    {
+     "step": 9,
+     "x_t": "1",
+     "heads": [
+      5,
+      0,
+      0
+     ],
+     "reads": [
+      "=",
+      "<bos>",
+      "<bos>"
+     ],
+     "output": "<eos>",
+     "target": "<eos>"
+    }
+   ]
+  },
+  "wall_s": 2.9
+ },
+ "rev_xor": {
+  "accuracy": {
+   "id_1-16": 1.0,
+   "ood_17-32": 1.0,
+   "ood_33-48": 1.0,
+   "ood_49-64": 1.0,
+   "select": 1.0,
+   "train_s15_first2000": 1.0,
+   "train_s16_first2000": 1.0,
+   "train_s17_first2000": 1.0
+  },
+  "n": {
+   "id_1-16": 1000,
+   "ood_17-32": 500,
+   "ood_33-48": 500,
+   "ood_49-64": 500,
+   "select": 1000,
+   "train_s15_first2000": 2000,
+   "train_s16_first2000": 2000,
+   "train_s17_first2000": 2000
+  },
+  "exact_on_all_bins": true,
+  "exact_on_all_sets": true,
+  "example": {
+   "id_1-16": "<bos> 0 0 1 0 0 0 1 0 0 1 1 0 1 0 ^ 1 0 1 1 0 1 1 1 1 1 1 0 1 1 =  ->  1 0 0 0 0 1 1 0 1 0 1 0 0 1 <eos>",
+   "ood_17-32": "<bos> 0 0 0 0 0 0 0 1 0 0 1 0 1 0 1 0 1 1 0 1 0 ^ 0 0 0 1 0 1 1 0 0 1 1 0 1 1 0 1 1 1 1 0 0 =  ->  0 1 1 0 0 1 1 1 0 0 0 1 0 1 1 1 0 1 0 0 0 <eos>",
+   "ood_33-48": "<bos> 1 1 1 0 1 1 1 1 1 0 0 1 0 1 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 1 0 0 0 1 ^ 0 0 1 1 1 0 1 0 0 0 1 1 1 1 0 0 1 0 1 1 1 1 1 1 0 0 0 1 0 0 1 0 0 0 0 0 1 =  ->  0 0 0 0 1 1 1 1 1 0 1 1 1 0 0 0 0 0 0 1 1 0 0 0 1 0 1 0 1 1 0 1 0 1 0 1 1 <eos>",
+   "ood_49-64": "<bos> 1 1 1 1 1 0 0 1 1 0 0 1 1 0 0 0 0 1 1 1 0 0 0 0 1 1 1 0 1 0 0 0 0 1 0 0 0 0 0 0 1 0 1 1 0 0 0 1 1 0 0 0 0 ^ 0 0 0 0 0 1 0 1 0 1 1 1 0 1 1 1 0 1 0 0 1 1 0 0 0 0 1 0 1 0 1 0 0 0 1 1 1 1 1 0 0 1 0 1 1 1 1 0 0 0 0 0 0 =  ->  0 0 0 0 1 1 1 1 1 0 1 1 1 0 1 1 1 1 1 1 0 0 1 0 0 0 0 1 1 0 0 1 1 1 1 0 0 1 1 1 1 0 1 1 1 0 0 1 1 1 1 1 1 <eos>"
+  },
+  "trace": {
+   "tokens": "<bos> 1 ^ 0 = | 1 <eos>",
+   "answer_steps": [
+    {
+     "step": 4,
+     "x_t": "=",
+     "heads": [
+      3,
+      1,
+      0
+     ],
+     "reads": [
+      "0",
+      "1",
+      "<bos>"
+     ],
+     "output": "1",
+     "target": "1"
+    },
+    {
+     "step": 5,
+     "x_t": "1",
+     "heads": [
+      2,
+      0,
+      0
+     ],
+     "reads": [
+      "^",
+      "<bos>",
+      "<bos>"
+     ],
+     "output": "<eos>",
+     "target": "<eos>"
+    }
+   ]
+  },
+  "wall_s": 6.9,
+  "bos_reads": {
+   "id_1-16": {
+    "head0": {
+     "reads_bos_at_eos_step": 0.0,
+     "reads_bos_at_an_earlier_answer_step": 0.0
+    },
+    "head1": {
+     "reads_bos_at_eos_step": 1.0,
+     "reads_bos_at_an_earlier_answer_step": 0.0
+    },
+    "head2": {
+     "reads_bos_at_eos_step": 1.0,
+     "reads_bos_at_an_earlier_answer_step": 1.0
+    }
+   },
+   "ood_17-32": {
+    "head0": {
+     "reads_bos_at_eos_step": 0.0,
+     "reads_bos_at_an_earlier_answer_step": 0.0
+    },
+    "head1": {
+     "reads_bos_at_eos_step": 1.0,
+     "reads_bos_at_an_earlier_answer_step": 0.0
+    },
+    "head2": {
+     "reads_bos_at_eos_step": 1.0,
+     "reads_bos_at_an_earlier_answer_step": 1.0
+    }
+   },
+   "ood_33-48": {
+    "head0": {
+     "reads_bos_at_eos_step": 0.0,
+     "reads_bos_at_an_earlier_answer_step": 0.0
+    },
+    "head1": {
+     "reads_bos_at_eos_step": 1.0,
+     "reads_bos_at_an_earlier_answer_step": 0.0
+    },
+    "head2": {
+     "reads_bos_at_eos_step": 1.0,
+     "reads_bos_at_an_earlier_answer_step": 1.0
+    }
+   },
+   "ood_49-64": {
+    "head0": {
+     "reads_bos_at_eos_step": 0.0,
+     "reads_bos_at_an_earlier_answer_step": 0.0
+    },
+    "head1": {
+     "reads_bos_at_eos_step": 1.0,
+     "reads_bos_at_an_earlier_answer_step": 0.0
+    },
+    "head2": {
+     "reads_bos_at_eos_step": 1.0,
+     "reads_bos_at_an_earlier_answer_step": 1.0
+    }
+   }
+  }
+ },
+ "addition": {
+  "accuracy": {
+   "id_1-10": 1.0,
+   "ood_11-20": 1.0,
+   "ood_21-30": 1.0,
+   "ood_31-40": 1.0,
+   "select": 1.0,
+   "train_s15_first2000": 1.0,
+   "train_s16_first2000": 1.0,
+   "train_s17_first2000": 1.0
+  },
+  "n": {
+   "id_1-10": 1000,
+   "ood_11-20": 500,
+   "ood_21-30": 500,
+   "ood_31-40": 500,
+   "select": 1000,
+   "train_s15_first2000": 2000,
+   "train_s16_first2000": 2000,
+   "train_s17_first2000": 2000
+  },
+  "exact_on_all_bins": true,
+  "exact_on_all_sets": true,
+  "example": {
+   "id_1-10": "<bos> 6 4 6 1 7 7 1 + 2 4 8 9 8 9 1 6 5 5 =  ->  8 8 4 1 6 7 3 6 5 5 <eos>",
+   "ood_11-20": "<bos> 6 6 3 5 5 9 1 5 2 1 1 1 4 5 9 4 3 5 + 4 9 9 4 8 2 9 7 =  ->  0 6 3 0 4 2 1 3 3 1 1 1 4 5 9 4 3 5 <eos>",
+   "ood_21-30": "<bos> 6 8 2 7 5 0 0 3 8 1 6 6 6 9 1 8 1 8 9 5 4 1 5 3 5 3 0 2 + 7 3 9 2 5 4 2 4 2 0 2 1 8 6 9 9 0 4 1 1 3 =  ->  3 2 2 0 1 5 2 7 0 2 8 7 4 6 1 8 2 2 1 7 7 1 5 3 5 3 0 2 <eos>",
+   "ood_31-40": "<bos> 3 2 5 9 3 6 3 6 4 0 7 6 0 0 5 6 1 6 1 9 4 1 9 5 9 5 7 9 0 8 4 0 5 7 4 0 0 0 8 4 + 9 0 2 1 7 8 0 7 8 2 3 0 0 4 4 8 7 9 7 6 9 4 3 5 3 6 1 6 2 1 1 4 0 0 5 7 =  ->  2 3 7 0 1 5 4 3 3 3 0 7 0 4 9 4 9 5 9 5 4 6 2 1 3 2 9 5 3 9 5 4 5 7 9 7 0 0 8 4 <eos>"
+  },
+  "trace": {
+   "tokens": "<bos> 8 + 9 = | 7 1 <eos>",
+   "answer_steps": [
+    {
+     "step": 4,
+     "x_t": "=",
+     "heads": [
+      1,
+      3,
+      0
+     ],
+     "reads": [
+      "8",
+      "9",
+      "<bos>"
+     ],
+     "output": "7",
+     "target": "7"
+    },
+    {
+     "step": 5,
+     "x_t": "7",
+     "heads": [
+      2,
+      4,
+      0
+     ],
+     "reads": [
+      "+",
+      "=",
+      "<bos>"
+     ],
+     "output": "1",
+     "target": "1"
+    },
+    {
+     "step": 6,
+     "x_t": "1",
+     "heads": [
+      3,
+      5,
+      0
+     ],
+     "reads": [
+      "9",
+      "7",
+      "<bos>"
+     ],
+     "output": "<eos>",
+     "target": "<eos>"
+    }
+   ]
+  },
+  "wall_s": 4.3
+ },
+ "parity": {
+  "accuracy": {
+   "id_1-16": 1.0,
+   "ood_17-32": 1.0,
+   "ood_33-48": 1.0,
+   "ood_49-64": 1.0,
+   "select": 1.0,
+   "train_s15_first2000": 1.0,
+   "train_s16_first2000": 1.0,
+   "train_s17_first2000": 1.0
+  },
+  "n": {
+   "id_1-16": 1000,
+   "ood_17-32": 500,
+   "ood_33-48": 500,
+   "ood_49-64": 500,
+   "select": 1000,
+   "train_s15_first2000": 2000,
+   "train_s16_first2000": 2000,
+   "train_s17_first2000": 2000
+  },
+  "exact_on_all_bins": true,
+  "exact_on_all_sets": true,
+  "example": {
+   "id_1-16": "<bos> 0 0 1 0 1 0 1 0 =  ->  1 <eos>",
+   "ood_17-32": "<bos> 1 0 1 0 1 0 0 1 0 0 0 1 0 0 1 1 0 0 0 0 0 0 1 =  ->  0 <eos>",
+   "ood_33-48": "<bos> 1 0 1 0 0 1 1 0 0 0 1 0 1 0 0 1 1 1 0 0 1 0 1 0 0 0 1 0 0 1 0 0 0 0 0 1 0 1 0 0 1 1 1 =  ->  0 <eos>",
+   "ood_49-64": "<bos> 0 1 1 1 1 1 1 1 1 0 0 1 1 0 0 0 1 0 0 0 0 0 1 0 0 0 1 1 0 0 1 0 0 0 0 1 1 1 0 1 0 1 1 1 1 1 1 0 0 1 1 1 0 0 1 0 1 0 1 0 0 1 1 =  ->  1 <eos>"
+  },
+  "trace": {
+   "tokens": "<bos> 0 0 0 1 = | 1 <eos>",
+   "answer_steps": [
+    {
+     "step": 5,
+     "x_t": "=",
+     "heads": [
+      0,
+      0,
+      0
+     ],
+     "reads": [
+      "<bos>",
+      "<bos>",
+      "<bos>"
+     ],
+     "output": "1",
+     "target": "1"
+    },
+    {
+     "step": 6,
+     "x_t": "1",
+     "heads": [
+      0,
+      0,
+      0
+     ],
+     "reads": [
+      "<bos>",
+      "<bos>",
+      "<bos>"
+     ],
+     "output": "<eos>",
+     "target": "<eos>"
+    }
+   ]
+  },
+  "wall_s": 2.6
+ }
+}

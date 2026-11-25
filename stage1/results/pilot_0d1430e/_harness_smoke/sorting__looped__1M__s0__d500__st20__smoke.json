@@ -1,0 +1,78 @@
+{
+ "name": "sorting__looped__1M__s0__d500__st20__smoke",
+ "task": "sorting",
+ "kind": "looped",
+ "scale": "1M",
+ "params": 836176,
+ "config": {
+  "d": 176,
+  "heads": 4,
+  "layers": 0,
+  "block_layers": 2,
+  "recur": 4
+ },
+ "seed": 0,
+ "data_size": 500,
+ "data_requested": 500,
+ "steps": 20,
+ "batch": 64,
+ "lr": 0.001,
+ "abacus_offset_max": 100,
+ "train_len": 8,
+ "eval_size": 10,
+ "eval": {
+  "8": {
+   "x_train_len": 1,
+   "accuracy": 0.0,
+   "infer_flops": 3898343680
+  },
+  "16": {
+   "x_train_len": 2,
+   "accuracy": 0.0,
+   "infer_flops": 7967795968,
+   "accuracy_recur_scaled": 0.0,
+   "recur_scaled": 8,
+   "infer_flops_recur_scaled": 15882096384
+  },
+  "24": {
+   "x_train_len": 3,
+   "accuracy": 0.0,
+   "infer_flops": 12284821120,
+   "accuracy_recur_scaled": 0.0,
+   "recur_scaled": 12,
+   "infer_flops_recur_scaled": 36693976704
+  },
+  "32": {
+   "x_train_len": 4,
+   "accuracy": 0.0,
+   "infer_flops": 16809334080,
+   "accuracy_recur_scaled": 0.0,
+   "recur_scaled": 16,
+   "infer_flops_recur_scaled": 66916618560
+  }
+ },
+ "train_flops": 1555545513984,
+ "wall_train_s": 7.4,
+ "wall_eval_s": 1.34,
+ "final_loss": 2.3744,
+ "loss_curve": [
+  [
+   0,
+   4.9027
+  ],
+  [
+   19,
+   2.3744
+  ]
+ ],
+ "hardware": {
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "torch_threads": 4,
+  "torch": "2.15.0+cu132",
+  "cuda": false,
+  "python": "3.12.3"
+ },
+ "commit": "51fe32eb79682e8b80251fc48cc39974c84b63a1",
+ "flops_note": "analytic from executed shapes; training = 3 x forward; inference without KV cache"
+}

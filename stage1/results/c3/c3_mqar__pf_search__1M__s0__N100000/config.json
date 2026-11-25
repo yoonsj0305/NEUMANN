@@ -1,0 +1,285 @@
+{
+ "name": "c3_mqar__pf_search__1M__s0__N100000",
+ "phase": "c3",
+ "task": "mqar",
+ "kind": "pf_search",
+ "scale": "1M",
+ "params": 245944,
+ "model_config": {
+  "R": 4,
+  "K": 16,
+  "H": 3,
+  "hidden": 256,
+  "emb": 64,
+  "policy": [
+   [
+    0,
+    0,
+    0,
+    3,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    5,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0
+   ]
+  ]
+ },
+ "seed": 0,
+ "N": 100000,
+ "batch": 64,
+ "max_steps": 20000,
+ "eval_every": 1000,
+ "id_size": 1000,
+ "ood_size": 500,
+ "lr": 0.001,
+ "optimizer": "AdamW betas (0.9, 0.98) weight decay 0.1, grad clip 1.0, warmup max_steps/20, cosine to 10%",
+ "abacus_offset_max": null,
+ "spec": {
+  "train": [
+   4,
+   16
+  ],
+  "id": [
+   4,
+   16
+  ],
+  "ood": [
+   [
+    17,
+    32
+   ],
+   [
+    33,
+    48
+   ],
+   [
+    49,
+    64
+   ]
+  ]
+ },
+ "position": "none (read heads over the tape; table move policy)",
+ "pf": null,
+ "pf2": null,
+ "pf_search": {
+  "policy_file": "stage1/results/c3/mqar_compile/compile_result.json",
+  "search": {
+   "task": "mqar",
+   "teacher": {
+    "path": "stage1/results/c3/c3_mqar__rope__1M__s0__N100000/teacher_best.pt",
+    "step": 3000,
+    "acc": {
+     "id_4-16": 0.999900299102692,
+     "ood_17-32": 0.9535295063515035,
+     "ood_33-48": 0.7900429693287895,
+     "ood_49-64": 0.5506592399351337
+    },
+    "train_flops_to_judgment": 66080335724544
+   },
+   "examples": 2000,
+   "output_steps": 20135,
+   "extraction": {
+    "flops": 4176135782400,
+    "backward_passes": 119,
+    "manual_forward_max_abs_logit_diff": 8.58306884765625e-05
+   },
+   "dependency_mass_on_current_position": 0.3823955093162298,
+   "attention_mass_on_current_position": 0.02619472325166402,
+   "precheck": {
+    "correct_table": "head path of the hand-written PF rule controller (pf_rules.Rules)",
+    "class_table_approximation": {
+     "table": {
+      "head0": {
+       "digit": "stay",
+       "+": "stay",
+       "=": "stay",
+       "|": "stay",
+       "node": "stay",
+       "answer_phase": "content",
+       "other": "stay"
+      },
+      "head1": {
+       "digit": "stay",
+       "+": "stay",
+       "=": "stay",
+       "|": "stay",
+       "node": "stay",
+       "answer_phase": "stay",
+       "other": "stay"
+      },
+      "head2": {
+       "digit": "stay",
+       "+": "stay",
+       "=": "stay",
+       "|": "stay",
+       "node": "stay",
+       "answer_phase": "stay",
+       "other": "stay"
+      }
+     },
+     "dependency_score": 0.06993446421621505,
+     "share_of_output_steps_reading_the_rule_controller_head0_position": 0.20898932207598708
+    },
+    "dependency": {
+     "correct": 0.21745055212479467,
+     "correct_per_head": [
+      0.19421373679753184,
+      0.023236815327262815,
+      0.0
+     ],
+     "all_stay": 0.023236815327262815,
+     "ratio": 9.358018689836069
+    },
+    "attention_aux": {
+     "correct": 0.12921852601980244,
+     "all_stay": 0.030814690948705654,
+     "ratio": 4.193406522716729
+    },
+    "criterion": "score(correct) >= 2 x score(all stay) on the dependency (13.2)",
+    "passed": true
+   },
+   "policy": [
+    [
+     0,
+     0,
+     0,
+     3,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     5,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0
+    ]
+   ],
+   "policy_named": {
+    "head0": {
+     "digit": "stay",
+     "+": "stay",
+     "=": "stay",
+     "|": "next_sep",
+     "node": "stay",
+     "answer_phase": "right",
+     "other": "stay"
+    },
+    "head1": {
+     "digit": "stay",
+     "+": "stay",
+     "=": "stay",
+     "|": "stay",
+     "node": "stay",
+     "answer_phase": "content",
+     "other": "stay"
+    },
+    "head2": {
+     "digit": "stay",
+     "+": "stay",
+     "=": "stay",
+     "|": "right",
+     "node": "stay",
+     "answer_phase": "stay",
+     "other": "stay"
+    }
+   },
+   "per_head": [
+    {
+     "column": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "stay",
+      "|": "next_sep",
+      "node": "stay",
+      "answer_phase": "right",
+      "other": "stay"
+     },
+     "score_after_cover": 0.3823955093162298,
+     "columns_tied_at_best": 7992
+    },
+    {
+     "column": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "stay",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "content",
+      "other": "stay"
+     },
+     "score_after_cover": 0.04669764888895223,
+     "columns_tied_at_best": 28080
+    },
+    {
+     "column": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "stay",
+      "|": "right",
+      "node": "stay",
+      "answer_phase": "stay",
+      "other": "stay"
+     },
+     "score_after_cover": 0.03591897733761803,
+     "columns_tied_at_best": 5616
+    }
+   ],
+   "table_score_dependency": 0.4650121355428001,
+   "table_score_attention_aux": 0.10928539502528559,
+   "search": {
+    "columns": 279936,
+    "present_classes": [
+     "digit",
+     "|",
+     "node",
+     "answer_phase"
+    ],
+    "distinct_paths_simulated": 1296,
+    "head_moves_simulated": 104379840,
+    "score_lookups": 78284880,
+    "head_simulation_operations": 182664720
+   },
+   "reference_agreement_with_correct_table": {
+    "correct_head0_position_read_by_some_compiled_head": 0.29704494661037995,
+    "correct_head1_position_read_by_some_compiled_head": 0.0,
+    "correct_head2_position_read_by_some_compiled_head": 0.0
+   },
+   "wall_s": 87.3
+  }
+ },
+ "early_stop": "in-distribution >= 0.99 at two consecutive evaluations",
+ "judgment_checkpoint": "highest in-distribution accuracy (earliest if tied); out-of-distribution at it",
+ "accuracy": "MQAR: per-query accuracy of the answers a_i (primary, 'acc'; also used for early stop and the judgment checkpoint) and whole-sequence accuracy (secondary, 'acc_seq'); teacher-forced",
+ "looped_eval_rule": null,
+ "looped_rr": null
+}

@@ -1,0 +1,55 @@
+{
+ "config": {
+  "R": 4,
+  "K": 16,
+  "H": 3,
+  "hidden": 256,
+  "emb": 64
+ },
+ "c_gradients": {
+  "addition": {
+   "steps": 32,
+   "move_logit_grad_nonzero_steps": 31,
+   "register_logit_grad_zero_at_steps": [
+    30,
+    31
+   ],
+   "move_logit_grad_abs_sum": 0.0034385257255919177,
+   "register_logit_grad_nonzero_steps": 30,
+   "register_logit_grad_abs_sum": 0.006152658499851971,
+   "move_controller_g_param_grad_abs_sum": 0.030748759585549124,
+   "update_controller_f_param_grad_abs_sum": 40.163136303424835,
+   "params_without_grad": []
+  },
+  "parity": {
+   "steps": 19,
+   "move_logit_grad_nonzero_steps": 18,
+   "register_logit_grad_zero_at_steps": [
+    17,
+    18
+   ],
+   "move_logit_grad_abs_sum": 0.0026241159655455777,
+   "register_logit_grad_nonzero_steps": 17,
+   "register_logit_grad_abs_sum": 0.0061398235798719725,
+   "move_controller_g_param_grad_abs_sum": 0.05927108065225184,
+   "update_controller_f_param_grad_abs_sum": 101.39989626407623,
+   "params_without_grad": []
+  },
+  "mqar": {
+   "steps": 66,
+   "move_logit_grad_nonzero_steps": 62,
+   "register_logit_grad_zero_at_steps": [
+    0,
+    63,
+    64,
+    65
+   ],
+   "move_logit_grad_abs_sum": 0.0032341367047156438,
+   "register_logit_grad_nonzero_steps": 62,
+   "register_logit_grad_abs_sum": 0.0058427637399947035,
+   "move_controller_g_param_grad_abs_sum": 0.02688399702310562,
+   "update_controller_f_param_grad_abs_sum": 31.259119242429733,
+   "params_without_grad": []
+  }
+ }
+}

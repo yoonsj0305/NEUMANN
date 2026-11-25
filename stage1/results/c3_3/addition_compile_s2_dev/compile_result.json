@@ -1,0 +1,232 @@
+{
+ "task": "addition",
+ "data_seed": 2,
+ "teacher": {
+  "path": "stage1/results/c3/c3_addition__rope__1M__s2__N100000/teacher_best.pt",
+  "untrained_seed": null,
+  "step": 11000,
+  "acc": {
+   "id_1-10": 0.999,
+   "ood_11-20": 0.054,
+   "ood_21-30": 0.0,
+   "ood_31-40": 0.0
+  },
+  "train_flops_to_judgment": 115236859281408
+ },
+ "examples": 2000,
+ "output_steps": 16465,
+ "dependency_kind": "content substitution (design 14)",
+ "extraction": {
+  "flops": 12819384995840,
+  "backward_passes": 0,
+  "manual_forward_max_abs_logit_diff": null,
+  "substitution": {
+   "class_symbols": {
+    "digit": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "+": [
+     "+"
+    ],
+    "=": [
+     "="
+    ],
+    "answer_phase": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ]
+   },
+   "sequences_forwarded": 330806,
+   "substituted_positions": 36534,
+   "all_zero_rows": 0
+  }
+ },
+ "dependency_mass_on_current_position": 0.15174434795663028,
+ "attention_mass_on_current_position": 0.06037945412483995,
+ "precheck": {
+  "correct_table": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "dependency": {
+   "correct": 0.7121908928126197,
+   "correct_per_head": [
+    0.346633061021524,
+    0.3535844818492067,
+    0.011973349941888957
+   ],
+   "all_stay": 0.07270628821913173,
+   "ratio": 9.795451126127158
+  },
+  "attention_aux": {
+   "correct": 0.3061459826247248,
+   "all_stay": 0.054230492915805444,
+   "ratio": 5.645273833303086
+  },
+  "criterion": "score(correct) >= 2 x score(all stay) on the dependency (13.2)",
+  "passed": true,
+  "gate_applied": true
+ },
+ "policy": [
+  [
+   0,
+   3,
+   1,
+   0,
+   0,
+   1,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0
+  ],
+  [
+   0,
+   3,
+   3,
+   0,
+   0,
+   1,
+   0
+  ]
+ ],
+ "policy_named": {
+  "head0": {
+   "digit": "stay",
+   "+": "next_sep",
+   "=": "right",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "right",
+   "other": "stay"
+  },
+  "head1": {
+   "digit": "stay",
+   "+": "stay",
+   "=": "stay",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "right",
+   "other": "stay"
+  },
+  "head2": {
+   "digit": "stay",
+   "+": "next_sep",
+   "=": "next_sep",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "right",
+   "other": "stay"
+  }
+ },
+ "per_head": [
+  {
+   "column": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "score_after_cover": 0.3535844818492067,
+   "columns_tied_at_best": 1512
+  },
+  {
+   "column": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "score_after_cover": 0.346633061021524,
+   "columns_tied_at_best": 17712
+  },
+  {
+   "column": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "next_sep",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "score_after_cover": 0.15174434795663028,
+   "columns_tied_at_best": 3024
+  }
+ ],
+ "table_score_dependency": 0.851961890827361,
+ "table_score_attention_aux": 0.33683153410693034,
+ "search": {
+  "columns": 279936,
+  "present_classes": [
+   "digit",
+   "+",
+   "=",
+   "answer_phase"
+  ],
+  "distinct_paths_simulated": 1296,
+  "head_moves_simulated": 52532064,
+  "score_lookups": 64015920,
+  "head_simulation_operations": 116547984
+ },
+ "reference_agreement_with_correct_table": {
+  "correct_head0_position_read_by_some_compiled_head": 1.0,
+  "correct_head1_position_read_by_some_compiled_head": 1.0,
+  "correct_head2_position_read_by_some_compiled_head": 0.1214697843911327
+ },
+ "wall_s": 271.3
+}

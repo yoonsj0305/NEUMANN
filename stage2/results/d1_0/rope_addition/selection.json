@@ -1,0 +1,187 @@
+{
+ "teacher": "rope",
+ "task": "addition",
+ "checkpoint": "stage1/results/c3/c3_addition__rope__1M__s0__N100000/teacher_best.pt",
+ "checkpoint_step": 6000,
+ "heads_total": 16,
+ "selection_set": {
+  "generation_seed": "select:addition",
+  "size": 1000,
+  "lengths": [
+   1,
+   10
+  ],
+  "metric": "exact match"
+ },
+ "selection_acc": {
+  "a": 0.99,
+  "b": 0.024,
+  "c": 0.985
+ },
+ "c_kept_heads": [
+  [
+   2,
+   0
+  ],
+  [
+   2,
+   3
+  ],
+  [
+   3,
+   0
+  ],
+  [
+   3,
+   3
+  ]
+ ],
+ "c_trace": [
+  {
+   "head": [
+    0,
+    0
+   ],
+   "selection_acc_with_head": 0.103,
+   "kept": false
+  },
+  {
+   "head": [
+    0,
+    1
+   ],
+   "selection_acc_with_head": 0.535,
+   "kept": false
+  },
+  {
+   "head": [
+    0,
+    2
+   ],
+   "selection_acc_with_head": 0.122,
+   "kept": false
+  },
+  {
+   "head": [
+    0,
+    3
+   ],
+   "selection_acc_with_head": 0.316,
+   "kept": false
+  },
+  {
+   "head": [
+    1,
+    0
+   ],
+   "selection_acc_with_head": 0.597,
+   "kept": false
+  },
+  {
+   "head": [
+    1,
+    1
+   ],
+   "selection_acc_with_head": 0.219,
+   "kept": false
+  },
+  {
+   "head": [
+    1,
+    2
+   ],
+   "selection_acc_with_head": 0.557,
+   "kept": false
+  },
+  {
+   "head": [
+    1,
+    3
+   ],
+   "selection_acc_with_head": 0.799,
+   "kept": false
+  },
+  {
+   "head": [
+    2,
+    0
+   ],
+   "selection_acc_with_head": 0.987,
+   "kept": true
+  },
+  {
+   "head": [
+    2,
+    1
+   ],
+   "selection_acc_with_head": 0.976,
+   "kept": false
+  },
+  {
+   "head": [
+    2,
+    2
+   ],
+   "selection_acc_with_head": 0.978,
+   "kept": false
+  },
+  {
+   "head": [
+    2,
+    3
+   ],
+   "selection_acc_with_head": 0.987,
+   "kept": true
+  },
+  {
+   "head": [
+    3,
+    0
+   ],
+   "selection_acc_with_head": 0.985,
+   "kept": true
+  },
+  {
+   "head": [
+    3,
+    1
+   ],
+   "selection_acc_with_head": 0.984,
+   "kept": false
+  },
+  {
+   "head": [
+    3,
+    2
+   ],
+   "selection_acc_with_head": 0.982,
+   "kept": false
+  },
+  {
+   "head": [
+    3,
+    3
+   ],
+   "selection_acc_with_head": 0.985,
+   "kept": true
+  }
+ ],
+ "rule": "(c): keep a head if the selection accuracy with it (on top of the kept heads) >= (a) - 0.005; choice: higher selection accuracy of (b) and (c), tie -> (c)",
+ "choice": "c",
+ "a_id_eval": {
+  "acc": 0.992
+ },
+ "stage1_reference": {
+  "source": "stage1/results/phaseA4/phaseA4_addition__rope__1M__s0__N100000",
+  "step": 6000,
+  "acc": {
+   "id_1-10": 0.992,
+   "ood_11-20": 0.006,
+   "ood_21-30": 0.0,
+   "ood_31-40": 0.0
+  },
+  "acc_seq": null
+ },
+ "a_id_equals_stage1": true,
+ "wall_s": 13.7
+}

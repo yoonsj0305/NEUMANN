@@ -1,0 +1,212 @@
+{
+ "task": "parity",
+ "data_seed": 5,
+ "teacher": {
+  "path": "stage1/results/c3_3/c3_3_parity__rope__1M__s5__N100000/teacher_best.pt",
+  "untrained_seed": null,
+  "step": 14000,
+  "acc": {
+   "id_1-16": 0.998,
+   "ood_17-32": 0.56,
+   "ood_33-48": 0.45,
+   "ood_49-64": 0.482
+  },
+  "train_flops_to_judgment": 83805593665536
+ },
+ "examples": 2000,
+ "output_steps": 4000,
+ "dependency_kind": "content substitution (design 14)",
+ "extraction": {
+  "flops": 450804256768,
+  "backward_passes": 0,
+  "manual_forward_max_abs_logit_diff": null,
+  "substitution": {
+   "class_symbols": {
+    "digit": [
+     "0",
+     "1"
+    ],
+    "=": [
+     "="
+    ],
+    "answer_phase": [
+     "0",
+     "1"
+    ]
+   },
+   "sequences_forwarded": 20589,
+   "substituted_positions": 18589,
+   "all_zero_rows": 1812
+  }
+ },
+ "dependency_mass_on_current_position": 0.0017400974198223684,
+ "attention_mass_on_current_position": 0.1361719696521759,
+ "precheck": {
+  "correct_table": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "dependency": {
+   "correct": 0.11922191754236308,
+   "correct_per_head": [
+    0.11922191754236308,
+    0.0,
+    0.0
+   ],
+   "all_stay": 0.11922191754236308,
+   "ratio": 1.0
+  },
+  "attention_aux": {
+   "correct": 0.13104111936502158,
+   "all_stay": 0.13104111936502158,
+   "ratio": 1.0
+  },
+  "criterion": "score(correct) >= 2 x score(all stay) on the dependency (13.2)",
+  "passed": false,
+  "gate_applied": false
+ },
+ "policy": [
+  [
+   5,
+   0,
+   2,
+   0,
+   0,
+   4,
+   0
+  ],
+  [
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0
+  ]
+ ],
+ "policy_named": {
+  "head0": {
+   "digit": "content",
+   "+": "stay",
+   "=": "left",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "start",
+   "other": "stay"
+  },
+  "head1": {
+   "digit": "right",
+   "+": "stay",
+   "=": "stay",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "stay",
+   "other": "stay"
+  },
+  "head2": {
+   "digit": "stay",
+   "+": "stay",
+   "=": "stay",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "right",
+   "other": "stay"
+  }
+ },
+ "per_head": [
+  {
+   "column": {
+    "digit": "content",
+    "+": "stay",
+    "=": "left",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "start",
+    "other": "stay"
+   },
+   "score_after_cover": 0.11923998607659106,
+   "columns_tied_at_best": 1296
+  },
+  {
+   "column": {
+    "digit": "right",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "score_after_cover": 0.08190225083653586,
+   "columns_tied_at_best": 2592
+  },
+  {
+   "column": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "score_after_cover": 0.060320193768279934,
+   "columns_tied_at_best": 23328
+  }
+ ],
+ "table_score_dependency": 0.26146243068140684,
+ "table_score_attention_aux": 0.3363385248146951,
+ "search": {
+  "columns": 279936,
+  "present_classes": [
+   "digit",
+   "=",
+   "answer_phase"
+  ],
+  "distinct_paths_simulated": 216,
+  "head_moves_simulated": 4447224,
+  "score_lookups": 2592000,
+  "head_simulation_operations": 7039224
+ },
+ "reference_agreement_with_correct_table": {
+  "correct_head0_position_read_by_some_compiled_head": 1.0,
+  "correct_head1_position_read_by_some_compiled_head": 1.0,
+  "correct_head2_position_read_by_some_compiled_head": 1.0
+ },
+ "wall_s": 23.6
+}

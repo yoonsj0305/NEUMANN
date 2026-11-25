@@ -1,0 +1,212 @@
+{
+ "task": "parity",
+ "data_seed": 2,
+ "teacher": {
+  "path": "stage1/results/c3/c3_parity__rope__1M__s2__N100000/teacher_best.pt",
+  "untrained_seed": null,
+  "step": 6000,
+  "acc": {
+   "id_1-16": 0.996,
+   "ood_17-32": 0.582,
+   "ood_33-48": 0.502,
+   "ood_49-64": 0.538
+  },
+  "train_flops_to_judgment": 35917741424640
+ },
+ "examples": 2000,
+ "output_steps": 4000,
+ "dependency_kind": "content substitution (design 14)",
+ "extraction": {
+  "flops": 459755253760,
+  "backward_passes": 0,
+  "manual_forward_max_abs_logit_diff": null,
+  "substitution": {
+   "class_symbols": {
+    "digit": [
+     "0",
+     "1"
+    ],
+    "=": [
+     "="
+    ],
+    "answer_phase": [
+     "0",
+     "1"
+    ]
+   },
+   "sequences_forwarded": 20838,
+   "substituted_positions": 18838,
+   "all_zero_rows": 216
+  }
+ },
+ "dependency_mass_on_current_position": 0.0847997831102912,
+ "attention_mass_on_current_position": 0.24800761089473963,
+ "precheck": {
+  "correct_table": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "dependency": {
+   "correct": 0.19098753334989202,
+   "correct_per_head": [
+    0.19098753334989202,
+    0.0,
+    0.0
+   ],
+   "all_stay": 0.19098753334989202,
+   "ratio": 1.0
+  },
+  "attention_aux": {
+   "correct": 0.11233701284672133,
+   "all_stay": 0.11233701284672133,
+   "ratio": 1.0
+  },
+  "criterion": "score(correct) >= 2 x score(all stay) on the dependency (13.2)",
+  "passed": false,
+  "gate_applied": false
+ },
+ "policy": [
+  [
+   5,
+   0,
+   2,
+   0,
+   0,
+   4,
+   0
+  ],
+  [
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0
+  ]
+ ],
+ "policy_named": {
+  "head0": {
+   "digit": "content",
+   "+": "stay",
+   "=": "left",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "start",
+   "other": "stay"
+  },
+  "head1": {
+   "digit": "right",
+   "+": "stay",
+   "=": "stay",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "stay",
+   "other": "stay"
+  },
+  "head2": {
+   "digit": "stay",
+   "+": "stay",
+   "=": "stay",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "right",
+   "other": "stay"
+  }
+ },
+ "per_head": [
+  {
+   "column": {
+    "digit": "content",
+    "+": "stay",
+    "=": "left",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "start",
+    "other": "stay"
+   },
+   "score_after_cover": 0.1910065234416899,
+   "columns_tied_at_best": 1296
+  },
+  {
+   "column": {
+    "digit": "right",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "score_after_cover": 0.1280335350907842,
+   "columns_tied_at_best": 2592
+  },
+  {
+   "column": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "score_after_cover": 0.10061295774696509,
+   "columns_tied_at_best": 23328
+  }
+ ],
+ "table_score_dependency": 0.4196530162794392,
+ "table_score_attention_aux": 0.2740729516922147,
+ "search": {
+  "columns": 279936,
+  "present_classes": [
+   "digit",
+   "=",
+   "answer_phase"
+  ],
+  "distinct_paths_simulated": 216,
+  "head_moves_simulated": 4501008,
+  "score_lookups": 2592000,
+  "head_simulation_operations": 7093008
+ },
+ "reference_agreement_with_correct_table": {
+  "correct_head0_position_read_by_some_compiled_head": 1.0,
+  "correct_head1_position_read_by_some_compiled_head": 1.0,
+  "correct_head2_position_read_by_some_compiled_head": 1.0
+ },
+ "wall_s": 16.7
+}

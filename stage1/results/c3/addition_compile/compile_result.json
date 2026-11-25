@@ -1,0 +1,191 @@
+{
+ "task": "addition",
+ "teacher": {
+  "path": "stage1/results/c3/c3_addition__rope__1M__s0__N100000/teacher_best.pt",
+  "step": 6000,
+  "acc": {
+   "id_1-10": 0.992,
+   "ood_11-20": 0.006,
+   "ood_21-30": 0.0,
+   "ood_31-40": 0.0
+  },
+  "train_flops_to_judgment": 62813103194112
+ },
+ "examples": 2000,
+ "output_steps": 16412,
+ "extraction": {
+  "flops": 1842357043200,
+  "backward_passes": 112,
+  "manual_forward_max_abs_logit_diff": 3.4809112548828125e-05
+ },
+ "dependency_mass_on_current_position": 0.16803784254164505,
+ "attention_mass_on_current_position": 0.07679473394605206,
+ "precheck": {
+  "correct_table": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "dependency": {
+   "correct": 0.3478045503720355,
+   "correct_per_head": [
+    0.14371148009970855,
+    0.13511787347982526,
+    0.0689751967925017
+   ],
+   "all_stay": 0.09981251300468193,
+   "ratio": 3.484578635503556
+  },
+  "attention_aux": {
+   "correct": 0.2510673331932984,
+   "all_stay": 0.04764881475347719,
+   "ratio": 5.269120218252159
+  },
+  "criterion": "score(correct) >= 2 x score(all stay) on the dependency (13.2)",
+  "passed": true
+ },
+ "policy": [
+  [
+   0,
+   3,
+   3,
+   0,
+   0,
+   1,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0
+  ],
+  [
+   0,
+   3,
+   1,
+   0,
+   0,
+   1,
+   0
+  ]
+ ],
+ "policy_named": {
+  "head0": {
+   "digit": "stay",
+   "+": "next_sep",
+   "=": "next_sep",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "right",
+   "other": "stay"
+  },
+  "head1": {
+   "digit": "stay",
+   "+": "stay",
+   "=": "stay",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "right",
+   "other": "stay"
+  },
+  "head2": {
+   "digit": "stay",
+   "+": "next_sep",
+   "=": "right",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "right",
+   "other": "stay"
+  }
+ },
+ "per_head": [
+  {
+   "column": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "next_sep",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "score_after_cover": 0.16803784254164505,
+   "columns_tied_at_best": 3024
+  },
+  {
+   "column": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "score_after_cover": 0.14371148009970855,
+   "columns_tied_at_best": 17712
+  },
+  {
+   "column": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "score_after_cover": 0.13511787347982526,
+   "columns_tied_at_best": 1512
+  }
+ ],
+ "table_score_dependency": 0.44686719612117887,
+ "table_score_attention_aux": 0.29588893524502397,
+ "search": {
+  "columns": 279936,
+  "present_classes": [
+   "digit",
+   "+",
+   "=",
+   "answer_phase"
+  ],
+  "distinct_paths_simulated": 1296,
+  "head_moves_simulated": 52287120,
+  "score_lookups": 63809856,
+  "head_simulation_operations": 116096976
+ },
+ "reference_agreement_with_correct_table": {
+  "correct_head0_position_read_by_some_compiled_head": 1.0,
+  "correct_head1_position_read_by_some_compiled_head": 1.0,
+  "correct_head2_position_read_by_some_compiled_head": 0.12186205215695832
+ },
+ "wall_s": 18.2
+}

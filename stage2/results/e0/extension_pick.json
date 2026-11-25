@@ -1,0 +1,84 @@
+{
+ "rule": "DESIGN 5.1 + 5.3 tie-break (1. 21-30 at 10x, 2. best 21-30 either test rule, 3. best 11-20)",
+ "candidates": {
+  "abacus_ii_1M": {
+   "c1_at_10x_21_30": 0.0,
+   "c1_detail": {
+    "step": 170875,
+    "train_flops_cum": 1790003613794304,
+    "primary": 0.0,
+    "acc_scaled": null
+   },
+   "c2_best_21_30": 0.0,
+   "c2_detail": {
+    "step": 1000,
+    "train_flops_cum": 10481239326720,
+    "primary_best": 0.0,
+    "acc_scaled_best": -1
+   },
+   "c3_best_11_20": 0.218,
+   "c3_detail": {
+    "step": 55000,
+    "train_flops_cum": 575966089052160,
+    "primary_best": 0.218,
+    "acc_scaled_best": -1
+   },
+   "last_checkpoint_step": 170875,
+   "last_checkpoint_flops": 1790003613794304
+  },
+  "abacus_looped_1M": {
+   "c1_at_10x_21_30": 0.0,
+   "c1_detail": {
+    "step": 116030,
+    "train_flops_cum": 1790000111083520,
+    "primary": 0.0,
+    "acc_scaled": 0.0
+   },
+   "c2_best_21_30": 0.0,
+   "c2_detail": {
+    "step": 1000,
+    "train_flops_cum": 15681498435584,
+    "primary_best": 0.0,
+    "acc_scaled_best": 0.0
+   },
+   "c3_best_11_20": 0.434,
+   "c3_detail": {
+    "step": 98000,
+    "train_flops_cum": 1512178995453952,
+    "primary_best": 0.434,
+    "acc_scaled_best": 0.364
+   },
+   "last_checkpoint_step": 116030,
+   "last_checkpoint_flops": 1790000111083520
+  },
+  "abacus_looped_10M": {
+   "c1_at_10x_21_30": 0.0,
+   "c1_detail": {
+    "step": 10077,
+    "train_flops_cum": 1790145782415360,
+    "primary": 0.0,
+    "acc_scaled": 0.0
+   },
+   "c2_best_21_30": 0.004,
+   "c2_detail": {
+    "step": 7000,
+    "train_flops_cum": 1242396447866880,
+    "primary_best": 0.004,
+    "acc_scaled_best": 0.0
+   },
+   "c3_best_11_20": 0.31,
+   "c3_detail": {
+    "step": 7000,
+    "train_flops_cum": 1242396447866880,
+    "primary_best": 0.31,
+    "acc_scaled_best": 0.288
+   },
+   "last_checkpoint_step": 10077,
+   "last_checkpoint_flops": 1790145782415360
+  }
+ },
+ "extend": "abacus_looped_10M",
+ "decided_by": "c2_best_21_30",
+ "tied_after_all_criteria": null,
+ "budget": 5370000000000000.0
+}

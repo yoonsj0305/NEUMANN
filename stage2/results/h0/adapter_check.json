@@ -1,0 +1,135 @@
+{
+ "vocab_size": 124,
+ "added_tokens": [
+  "-",
+  "*",
+  "^",
+  "<bos>"
+ ],
+ "bos_id": 123,
+ "stage1_data_identical": {
+  "addition": true,
+  "parity": true
+ },
+ "hand_table_accuracy": {
+  "copy": {
+   "id_1-10": 1.0,
+   "ood_11-20": 1.0,
+   "ood_21-30": 1.0,
+   "ood_31-40": 1.0
+  },
+  "reverse": {
+   "id_1-10": 1.0,
+   "ood_11-20": 1.0,
+   "ood_21-30": 1.0,
+   "ood_31-40": 1.0
+  },
+  "xor": {
+   "id_1-16": 1.0,
+   "ood_17-32": 1.0,
+   "ood_33-48": 1.0,
+   "ood_49-64": 1.0
+  },
+  "mul1": {
+   "id_1-10": 1.0,
+   "ood_11-20": 1.0,
+   "ood_21-30": 1.0,
+   "ood_31-40": 1.0
+  },
+  "prefix_sum": {
+   "id_1-10": 1.0,
+   "ood_11-20": 1.0,
+   "ood_21-30": 1.0,
+   "ood_31-40": 1.0
+  },
+  "rev_xor": {
+   "id_1-16": 1.0,
+   "ood_17-32": 1.0,
+   "ood_33-48": 1.0,
+   "ood_49-64": 1.0
+  }
+ },
+ "data_identical_to_h_tasks": {
+  "copy": {
+   "eval": true,
+   "train_s15_s16_s17_first2000": true,
+   "select": true,
+   "bos_first_only": true
+  },
+  "reverse": {
+   "eval": true,
+   "train_s15_s16_s17_first2000": true,
+   "select": true,
+   "bos_first_only": true
+  },
+  "xor": {
+   "eval": true,
+   "train_s15_s16_s17_first2000": true,
+   "select": true,
+   "bos_first_only": true
+  },
+  "mul1": {
+   "eval": true,
+   "train_s15_s16_s17_first2000": true,
+   "select": true,
+   "bos_first_only": true
+  },
+  "prefix_sum": {
+   "eval": true,
+   "train_s15_s16_s17_first2000": true,
+   "select": true,
+   "bos_first_only": true
+  },
+  "rev_xor": {
+   "eval": true,
+   "train_s15_s16_s17_first2000": true,
+   "select": true,
+   "bos_first_only": true
+  }
+ },
+ "token_kinds_equal_g0a": {
+  "copy": true,
+  "reverse": true,
+  "xor": true,
+  "mul1": true,
+  "prefix_sum": true,
+  "rev_xor": true
+ },
+ "compile_simulation_vs_pf_head_path": {
+  "copy": {
+   "output_steps": 1271,
+   "same_read_positions": true
+  },
+  "reverse": {
+   "output_steps": 1314,
+   "same_read_positions": true
+  },
+  "xor": {
+   "output_steps": 1866,
+   "same_read_positions": true
+  },
+  "mul1": {
+   "output_steps": 1371,
+   "same_read_positions": true
+  },
+  "prefix_sum": {
+   "output_steps": 1349,
+   "same_read_positions": true
+  },
+  "rev_xor": {
+   "output_steps": 1892,
+   "same_read_positions": true
+  }
+ },
+ "precheck_correct_table_is_h0a": {
+  "copy": true,
+  "reverse": true,
+  "xor": true,
+  "mul1": true,
+  "prefix_sum": true,
+  "rev_xor": true
+ },
+ "all_exact": true,
+ "all_identical": true,
+ "wall_s": 39.9
+}

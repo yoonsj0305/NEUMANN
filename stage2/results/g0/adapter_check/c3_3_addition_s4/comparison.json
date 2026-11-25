@@ -1,0 +1,91 @@
+{
+ "teacher": "stage1/results/c3_3/c3_3_addition__rope__1M__s4__N100000/teacher_best.pt",
+ "teacher_vocab": 120,
+ "reference": "stage1/results/c3_3/addition_compile_s4/compile_result.json",
+ "same_policy": true,
+ "policy": [
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0
+  ],
+  [
+   0,
+   3,
+   1,
+   0,
+   0,
+   1,
+   0
+  ],
+  [
+   0,
+   3,
+   3,
+   0,
+   0,
+   1,
+   0
+  ]
+ ],
+ "reference_policy": [
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0
+  ],
+  [
+   0,
+   3,
+   1,
+   0,
+   0,
+   1,
+   0
+  ],
+  [
+   0,
+   3,
+   3,
+   0,
+   0,
+   1,
+   0
+  ]
+ ],
+ "precheck_dependency_new": {
+  "correct": 0.6957409950877034,
+  "correct_per_head": [
+   0.34733018352749945,
+   0.3382571162648609,
+   0.010153695295343022
+  ],
+  "all_stay": 0.07072107747460128,
+  "ratio": 9.83781667265422
+ },
+ "precheck_dependency_reference": {
+  "correct": 0.6957409950877034,
+  "correct_per_head": [
+   0.34733018352749945,
+   0.3382571162648609,
+   0.010153695295343022
+  ],
+  "all_stay": 0.07072107747460128,
+  "ratio": 9.83781667265422
+ },
+ "same_precheck_scores": true,
+ "same_per_head_scores": true,
+ "same_table_score": true,
+ "same_class_symbols": true,
+ "extraction_flops_new_vocab123": 12722244095232,
+ "extraction_flops_reference_vocab120": 12716339023872,
+ "identical": true
+}

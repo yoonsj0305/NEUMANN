@@ -1,0 +1,78 @@
+{
+ "name": "reachability__gru__1M__s0__N100000",
+ "task": "reachability",
+ "kind": "gru",
+ "scale": "1M",
+ "params": 851456,
+ "config": {
+  "d": 256,
+  "layers": 2
+ },
+ "seed": 0,
+ "N": 100000,
+ "batch": 64,
+ "lr": 0.001,
+ "max_steps": 20000,
+ "steps": 20000,
+ "stopped": "max steps",
+ "spec": {
+  "train": [
+   4,
+   8
+  ],
+  "id": [
+   4,
+   8
+  ],
+  "ood": [
+   [
+    9,
+    16
+   ],
+   [
+    17,
+    24
+   ],
+   [
+    25,
+    32
+   ]
+  ]
+ },
+ "id_size": 1000,
+ "ood_size": 500,
+ "final_acc": {
+  "id_4-8": 0.69,
+  "ood_9-16": 0.594,
+  "ood_17-24": 0.562,
+  "ood_25-32": 0.508
+ },
+ "final_acc_fixed4": null,
+ "recur": {},
+ "train_flops": 345165004800000,
+ "eval_flops": 8079868231680,
+ "wall_train_s": 4649.25,
+ "wall_eval_s": 103.26,
+ "segments": [
+  {
+   "segment": 0,
+   "start_step": 0,
+   "started": "2026-11-17 00:01:46"
+  },
+  {
+   "segment": 1,
+   "start_step": 16000,
+   "started": "2026-11-17 01:08:04"
+  }
+ ],
+ "hardware": {
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "torch_threads": 1,
+  "torch": "2.15.0+cu132",
+  "cuda": false,
+  "python": "3.12.3"
+ },
+ "commit": "b78fe7b2b5e68aa06b3d7474d3601cc1b660b4de",
+ "primary_eval_rule": "looped: recurrence 4 x ceil(bin upper / training upper) (declared before runs); fixed 4 recorded as acc_fixed4"
+}

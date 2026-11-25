@@ -1,0 +1,103 @@
+{
+ "name": "g0_xor__gru__1M__s0__N100000",
+ "task": "xor",
+ "kind": "gru",
+ "scale": "1M",
+ "params": 852992,
+ "config": {
+  "d": 256,
+  "layers": 2
+ },
+ "seed": 0,
+ "N": 100000,
+ "batch": 64,
+ "lr": 0.001,
+ "max_steps": 20000,
+ "steps": 20000,
+ "stopped": "max steps",
+ "spec": {
+  "train": [
+   1,
+   16
+  ],
+  "id": [
+   1,
+   16
+  ],
+  "ood": [
+   [
+    17,
+    32
+   ],
+   [
+    33,
+    48
+   ],
+   [
+    49,
+    64
+   ]
+  ]
+ },
+ "id_size": 1000,
+ "ood_size": 500,
+ "judgment": {
+  "rule": "highest in-distribution accuracy (earliest if tied)",
+  "step": 20000,
+  "acc": {
+   "id_1-16": 0.67,
+   "ood_17-32": 0.0,
+   "ood_33-48": 0.0,
+   "ood_49-64": 0.0
+  },
+  "acc_fixed4": null,
+  "acc_seq": null,
+  "train_flops_cum": 320055734108160,
+  "wall_train_s_cum": 4728.43
+ },
+ "last": {
+  "step": 20000,
+  "acc": {
+   "id_1-16": 0.67,
+   "ood_17-32": 0.0,
+   "ood_33-48": 0.0,
+   "ood_49-64": 0.0
+  },
+  "acc_fixed4": null,
+  "acc_seq": null
+ },
+ "final_acc": {
+  "id_1-16": 0.67,
+  "ood_17-32": 0.0,
+  "ood_33-48": 0.0,
+  "ood_49-64": 0.0
+ },
+ "final_acc_fixed4": null,
+ "recur": {},
+ "train_flops": 320055734108160,
+ "eval_flops": 7437837312000,
+ "wall_train_s": 4728.43,
+ "wall_eval_s": 102.92,
+ "segments": [
+  {
+   "segment": 0,
+   "start_step": 0,
+   "started": "2026-11-20 11:52:12"
+  },
+  {
+   "segment": 1,
+   "start_step": 18000,
+   "started": "2026-11-20 13:18:52"
+  }
+ ],
+ "hardware": {
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "torch_threads": 1,
+  "torch": "2.15.0+cu132",
+  "cuda": false,
+  "python": "3.12.3"
+ },
+ "commit": "edebf5ec233af2678a21b6aefc40c31f2dc7ebce",
+ "primary_eval_rule": "looped / looped_rr: recurrence 4 x ceil(bin upper / training upper) (declared before runs); fixed 4 recorded as acc_fixed4"
+}

@@ -1,0 +1,72 @@
+{
+ "task": "addition",
+ "policy": [
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ]
+ ],
+ "policy_named": {
+  "head0": {
+   "digit": "stay",
+   "+": "stay",
+   "=": "stay",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "stay",
+   "other": "stay"
+  },
+  "head1": {
+   "digit": "stay",
+   "+": "stay",
+   "=": "stay",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "right",
+   "other": "stay"
+  },
+  "head2": {
+   "digit": "stay",
+   "+": "stay",
+   "=": "stay",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "stay",
+   "other": "stay"
+  }
+ },
+ "best_score_in_distribution_validation": 0.002,
+ "evaluations": 166,
+ "search_flops": 150542320507440,
+ "stopped": "converged (a sweep changed nothing)",
+ "spec": {
+  "steps_per_candidate": 300,
+  "val_size": 500,
+  "budget": 400,
+  "sweeps": 3,
+  "init": "all stay"
+ }
+}

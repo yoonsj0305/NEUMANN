@@ -1,0 +1,641 @@
+{
+ "per_run": {
+  "copy|rope": {
+   "s_per_step": 0.1145,
+   "s_per_eval": 3.3,
+   "worst_s": 2356.0,
+   "stage1_like_steps": 7000.0,
+   "stage1_like_steps_values": [
+    7000
+   ],
+   "stage1_like_s": 824.6
+  },
+  "copy|pf_search": {
+   "s_per_step": 0.06475,
+   "s_per_eval": 1.78,
+   "worst_s": 1330.6,
+   "stage1_like_steps": 16666.666666666668,
+   "stage1_like_steps_values": [
+    20000,
+    20000,
+    9000,
+    20000,
+    11000,
+    20000
+   ],
+   "stage1_like_s": 1109.4266666666667
+  },
+  "copy|abacus": {
+   "s_per_step": 0.0945,
+   "s_per_eval": 2.62,
+   "worst_s": 1942.4,
+   "stage1_like_steps": 13000.0,
+   "stage1_like_steps_values": [
+    13000
+   ],
+   "stage1_like_s": 1262.56
+  },
+  "copy|looped_rr": {
+   "s_per_step": 0.1775,
+   "s_per_eval": 29.13,
+   "worst_s": 4132.6,
+   "stage1_like_steps": 20000.0,
+   "stage1_like_steps_values": [
+    20000
+   ],
+   "stage1_like_s": 4132.6
+  },
+  "copy|gru": {
+   "s_per_step": 0.093,
+   "s_per_eval": 1.66,
+   "worst_s": 1893.2,
+   "stage1_like_steps": 20000.0,
+   "stage1_like_steps_values": [
+    20000
+   ],
+   "stage1_like_s": 1893.2
+  },
+  "reverse|rope": {
+   "s_per_step": 0.11274999999999999,
+   "s_per_eval": 3.43,
+   "worst_s": 2323.6,
+   "stage1_like_steps": 7000.0,
+   "stage1_like_steps_values": [
+    7000
+   ],
+   "stage1_like_s": 813.2599999999999
+  },
+  "reverse|pf_search": {
+   "s_per_step": 0.06999999999999999,
+   "s_per_eval": 1.91,
+   "worst_s": 1438.1999999999998,
+   "stage1_like_steps": 16666.666666666668,
+   "stage1_like_steps_values": [
+    20000,
+    20000,
+    9000,
+    20000,
+    11000,
+    20000
+   ],
+   "stage1_like_s": 1199.1366666666668
+  },
+  "reverse|abacus": {
+   "s_per_step": 0.10600000000000001,
+   "s_per_eval": 2.45,
+   "worst_s": 2169.0,
+   "stage1_like_steps": 13000.0,
+   "stage1_like_steps_values": [
+    13000
+   ],
+   "stage1_like_s": 1409.8500000000001
+  },
+  "reverse|looped_rr": {
+   "s_per_step": 0.18275,
+   "s_per_eval": 31.83,
+   "worst_s": 4291.6,
+   "stage1_like_steps": 20000.0,
+   "stage1_like_steps_values": [
+    20000
+   ],
+   "stage1_like_s": 4291.6
+  },
+  "reverse|gru": {
+   "s_per_step": 0.10175000000000001,
+   "s_per_eval": 1.8,
+   "worst_s": 2071.0,
+   "stage1_like_steps": 20000.0,
+   "stage1_like_steps_values": [
+    20000
+   ],
+   "stage1_like_s": 2071.0
+  },
+  "xor|rope": {
+   "s_per_step": 0.25125000000000003,
+   "s_per_eval": 7.86,
+   "worst_s": 5182.200000000001,
+   "stage1_like_steps": 5000.0,
+   "stage1_like_steps_values": [
+    5000
+   ],
+   "stage1_like_s": 1295.5500000000002
+  },
+  "xor|pf_search": {
+   "s_per_step": 0.2815,
+   "s_per_eval": 4.29,
+   "worst_s": 5715.799999999999,
+   "stage1_like_steps": 15833.333333333334,
+   "stage1_like_steps_values": [
+    20000,
+    20000,
+    12000,
+    3000,
+    20000,
+    20000
+   ],
+   "stage1_like_s": 4525.723333333333
+  },
+  "xor|abacus": {
+   "s_per_step": 0.236,
+   "s_per_eval": 6.89,
+   "worst_s": 4857.8,
+   "stage1_like_steps": 12000.0,
+   "stage1_like_steps_values": [
+    12000
+   ],
+   "stage1_like_s": 2914.68
+  },
+  "xor|looped_rr": {
+   "s_per_step": 0.418,
+   "s_per_eval": 81.94,
+   "worst_s": 9998.8,
+   "stage1_like_steps": 18000.0,
+   "stage1_like_steps_values": [
+    18000
+   ],
+   "stage1_like_s": 8998.92
+  },
+  "xor|gru": {
+   "s_per_step": 0.1965,
+   "s_per_eval": 4.61,
+   "worst_s": 4022.2,
+   "stage1_like_steps": 2000.0,
+   "stage1_like_steps_values": [
+    2000
+   ],
+   "stage1_like_s": 402.22
+  },
+  "mul1|rope": {
+   "s_per_step": 0.12125,
+   "s_per_eval": 3.17,
+   "worst_s": 2488.4,
+   "stage1_like_steps": 7000.0,
+   "stage1_like_steps_values": [
+    7000
+   ],
+   "stage1_like_s": 870.94
+  },
+  "mul1|pf_search": {
+   "s_per_step": 0.07625,
+   "s_per_eval": 1.98,
+   "worst_s": 1564.6,
+   "stage1_like_steps": 16666.666666666668,
+   "stage1_like_steps_values": [
+    20000,
+    20000,
+    9000,
+    20000,
+    11000,
+    20000
+   ],
+   "stage1_like_s": 1304.4933333333336
+  },
+  "mul1|abacus": {
+   "s_per_step": 0.12425,
+   "s_per_eval": 2.66,
+   "worst_s": 2538.2,
+   "stage1_like_steps": 13000.0,
+   "stage1_like_steps_values": [
+    13000
+   ],
+   "stage1_like_s": 1649.83
+  },
+  "mul1|looped_rr": {
+   "s_per_step": 0.1935,
+   "s_per_eval": 28.08,
+   "worst_s": 4431.6,
+   "stage1_like_steps": 20000.0,
+   "stage1_like_steps_values": [
+    20000
+   ],
+   "stage1_like_s": 4431.6
+  },
+  "mul1|gru": {
+   "s_per_step": 0.10625,
+   "s_per_eval": 2.24,
+   "worst_s": 2169.8,
+   "stage1_like_steps": 20000.0,
+   "stage1_like_steps_values": [
+    20000
+   ],
+   "stage1_like_s": 2169.8
+  },
+  "prefix_sum|rope": {
+   "s_per_step": 0.1075,
+   "s_per_eval": 3.1,
+   "worst_s": 2212.0,
+   "stage1_like_steps": 7000.0,
+   "stage1_like_steps_values": [
+    7000
+   ],
+   "stage1_like_s": 774.2
+  },
+  "prefix_sum|pf_search": {
+   "s_per_step": 0.05175,
+   "s_per_eval": 1.66,
+   "worst_s": 1068.2,
+   "stage1_like_steps": 16666.666666666668,
+   "stage1_like_steps_values": [
+    20000,
+    20000,
+    9000,
+    20000,
+    11000,
+    20000
+   ],
+   "stage1_like_s": 890.72
+  },
+  "prefix_sum|abacus": {
+   "s_per_step": 0.11025,
+   "s_per_eval": 2.43,
+   "worst_s": 2253.6,
+   "stage1_like_steps": 13000.0,
+   "stage1_like_steps_values": [
+    13000
+   ],
+   "stage1_like_s": 1464.84
+  },
+  "prefix_sum|looped_rr": {
+   "s_per_step": 0.1895,
+   "s_per_eval": 30.82,
+   "worst_s": 4406.4,
+   "stage1_like_steps": 20000.0,
+   "stage1_like_steps_values": [
+    20000
+   ],
+   "stage1_like_s": 4406.4
+  },
+  "prefix_sum|gru": {
+   "s_per_step": 0.09475,
+   "s_per_eval": 1.49,
+   "worst_s": 1924.8,
+   "stage1_like_steps": 20000.0,
+   "stage1_like_steps_values": [
+    20000
+   ],
+   "stage1_like_s": 1924.8
+  }
+ },
+ "per_run_role": {
+  "copy|rope|teacher": {
+   "s_per_step": 0.1145,
+   "s_per_eval": 3.3,
+   "worst_s": 2356.0,
+   "stage1_like_steps": 8000.0,
+   "stage1_like_steps_values": [
+    8000,
+    7000,
+    9000
+   ],
+   "stage1_like_s": 942.4
+  },
+  "copy|rope|baseline": {
+   "s_per_step": 0.1145,
+   "s_per_eval": 3.3,
+   "worst_s": 2356.0,
+   "stage1_like_steps": 7000.0,
+   "stage1_like_steps_values": [
+    7000
+   ],
+   "stage1_like_s": 824.6
+  },
+  "copy|pf_search|student": {
+   "s_per_step": 0.06475,
+   "s_per_eval": 1.78,
+   "worst_s": 1330.6,
+   "stage1_like_steps": 16666.666666666668,
+   "stage1_like_steps_values": [
+    20000,
+    20000,
+    9000,
+    20000,
+    11000,
+    20000
+   ],
+   "stage1_like_s": 1109.4266666666667
+  },
+  "copy|abacus|baseline": {
+   "s_per_step": 0.0945,
+   "s_per_eval": 2.62,
+   "worst_s": 1942.4,
+   "stage1_like_steps": 13000.0,
+   "stage1_like_steps_values": [
+    13000
+   ],
+   "stage1_like_s": 1262.56
+  },
+  "copy|looped_rr|baseline": {
+   "s_per_step": 0.1775,
+   "s_per_eval": 29.13,
+   "worst_s": 4132.6,
+   "stage1_like_steps": 20000.0,
+   "stage1_like_steps_values": [
+    20000
+   ],
+   "stage1_like_s": 4132.6
+  },
+  "copy|gru|baseline": {
+   "s_per_step": 0.093,
+   "s_per_eval": 1.66,
+   "worst_s": 1893.2,
+   "stage1_like_steps": 20000.0,
+   "stage1_like_steps_values": [
+    20000
+   ],
+   "stage1_like_s": 1893.2
+  },
+  "reverse|rope|teacher": {
+   "s_per_step": 0.11274999999999999,
+   "s_per_eval": 3.43,
+   "worst_s": 2323.6,
+   "stage1_like_steps": 8000.0,
+   "stage1_like_steps_values": [
+    8000,
+    7000,
+    9000
+   ],
+   "stage1_like_s": 929.4399999999999
+  },
+  "reverse|rope|baseline": {
+   "s_per_step": 0.11274999999999999,
+   "s_per_eval": 3.43,
+   "worst_s": 2323.6,
+   "stage1_like_steps": 7000.0,
+   "stage1_like_steps_values": [
+    7000
+   ],
+   "stage1_like_s": 813.2599999999999
+  },
+  "reverse|pf_search|student": {
+   "s_per_step": 0.06999999999999999,
+   "s_per_eval": 1.91,
+   "worst_s": 1438.1999999999998,
+   "stage1_like_steps": 16666.666666666668,
+   "stage1_like_steps_values": [
+    20000,
+    20000,
+    9000,
+    20000,
+    11000,
+    20000
+   ],
+   "stage1_like_s": 1199.1366666666668
+  },
+  "reverse|abacus|baseline": {
+   "s_per_step": 0.10600000000000001,
+   "s_per_eval": 2.45,
+   "worst_s": 2169.0,
+   "stage1_like_steps": 13000.0,
+   "stage1_like_steps_values": [
+    13000
+   ],
+   "stage1_like_s": 1409.8500000000001
+  },
+  "reverse|looped_rr|baseline": {
+   "s_per_step": 0.18275,
+   "s_per_eval": 31.83,
+   "worst_s": 4291.6,
+   "stage1_like_steps": 20000.0,
+   "stage1_like_steps_values": [
+    20000
+   ],
+   "stage1_like_s": 4291.6
+  },
+  "reverse|gru|baseline": {
+   "s_per_step": 0.10175000000000001,
+   "s_per_eval": 1.8,
+   "worst_s": 2071.0,
+   "stage1_like_steps": 20000.0,
+   "stage1_like_steps_values": [
+    20000
+   ],
+   "stage1_like_s": 2071.0
+  },
+  "xor|rope|teacher": {
+   "s_per_step": 0.25125000000000003,
+   "s_per_eval": 7.86,
+   "worst_s": 5182.200000000001,
+   "stage1_like_steps": 7000.0,
+   "stage1_like_steps_values": [
+    8000,
+    6000,
+    7000
+   ],
+   "stage1_like_s": 1813.7700000000002
+  },
+  "xor|rope|baseline": {
+   "s_per_step": 0.25125000000000003,
+   "s_per_eval": 7.86,
+   "worst_s": 5182.200000000001,
+   "stage1_like_steps": 5000.0,
+   "stage1_like_steps_values": [
+    5000
+   ],
+   "stage1_like_s": 1295.5500000000002
+  },
+  "xor|pf_search|student": {
+   "s_per_step": 0.2815,
+   "s_per_eval": 4.29,
+   "worst_s": 5715.799999999999,
+   "stage1_like_steps": 15833.333333333334,
+   "stage1_like_steps_values": [
+    20000,
+    20000,
+    12000,
+    3000,
+    20000,
+    20000
+   ],
+   "stage1_like_s": 4525.723333333333
+  },
+  "xor|abacus|baseline": {
+   "s_per_step": 0.236,
+   "s_per_eval": 6.89,
+   "worst_s": 4857.8,
+   "stage1_like_steps": 12000.0,
+   "stage1_like_steps_values": [
+    12000
+   ],
+   "stage1_like_s": 2914.68
+  },
+  "xor|looped_rr|baseline": {
+   "s_per_step": 0.418,
+   "s_per_eval": 81.94,
+   "worst_s": 9998.8,
+   "stage1_like_steps": 18000.0,
+   "stage1_like_steps_values": [
+    18000
+   ],
+   "stage1_like_s": 8998.92
+  },
+  "xor|gru|baseline": {
+   "s_per_step": 0.1965,
+   "s_per_eval": 4.61,
+   "worst_s": 4022.2,
+   "stage1_like_steps": 2000.0,
+   "stage1_like_steps_values": [
+    2000
+   ],
+   "stage1_like_s": 402.22
+  },
+  "mul1|rope|teacher": {
+   "s_per_step": 0.12125,
+   "s_per_eval": 3.17,
+   "worst_s": 2488.4,
+   "stage1_like_steps": 8000.0,
+   "stage1_like_steps_values": [
+    8000,
+    7000,
+    9000
+   ],
+   "stage1_like_s": 995.36
+  },
+  "mul1|rope|baseline": {
+   "s_per_step": 0.12125,
+   "s_per_eval": 3.17,
+   "worst_s": 2488.4,
+   "stage1_like_steps": 7000.0,
+   "stage1_like_steps_values": [
+    7000
+   ],
+   "stage1_like_s": 870.94
+  },
+  "mul1|pf_search|student": {
+   "s_per_step": 0.07625,
+   "s_per_eval": 1.98,
+   "worst_s": 1564.6,
+   "stage1_like_steps": 16666.666666666668,
+   "stage1_like_steps_values": [
+    20000,
+    20000,
+    9000,
+    20000,
+    11000,
+    20000
+   ],
+   "stage1_like_s": 1304.4933333333336
+  },
+  "mul1|abacus|baseline": {
+   "s_per_step": 0.12425,
+   "s_per_eval": 2.66,
+   "worst_s": 2538.2,
+   "stage1_like_steps": 13000.0,
+   "stage1_like_steps_values": [
+    13000
+   ],
+   "stage1_like_s": 1649.83
+  },
+  "mul1|looped_rr|baseline": {
+   "s_per_step": 0.1935,
+   "s_per_eval": 28.08,
+   "worst_s": 4431.6,
+   "stage1_like_steps": 20000.0,
+   "stage1_like_steps_values": [
+    20000
+   ],
+   "stage1_like_s": 4431.6
+  },
+  "mul1|gru|baseline": {
+   "s_per_step": 0.10625,
+   "s_per_eval": 2.24,
+   "worst_s": 2169.8,
+   "stage1_like_steps": 20000.0,
+   "stage1_like_steps_values": [
+    20000
+   ],
+   "stage1_like_s": 2169.8
+  },
+  "prefix_sum|rope|teacher": {
+   "s_per_step": 0.1075,
+   "s_per_eval": 3.1,
+   "worst_s": 2212.0,
+   "stage1_like_steps": 8000.0,
+   "stage1_like_steps_values": [
+    8000,
+    7000,
+    9000
+   ],
+   "stage1_like_s": 884.8
+  },
+  "prefix_sum|rope|baseline": {
+   "s_per_step": 0.1075,
+   "s_per_eval": 3.1,
+   "worst_s": 2212.0,
+   "stage1_like_steps": 7000.0,
+   "stage1_like_steps_values": [
+    7000
+   ],
+   "stage1_like_s": 774.2
+  },
+  "prefix_sum|pf_search|student": {
+   "s_per_step": 0.05175,
+   "s_per_eval": 1.66,
+   "worst_s": 1068.2,
+   "stage1_like_steps": 16666.666666666668,
+   "stage1_like_steps_values": [
+    20000,
+    20000,
+    9000,
+    20000,
+    11000,
+    20000
+   ],
+   "stage1_like_s": 890.72
+  },
+  "prefix_sum|abacus|baseline": {
+   "s_per_step": 0.11025,
+   "s_per_eval": 2.43,
+   "worst_s": 2253.6,
+   "stage1_like_steps": 13000.0,
+   "stage1_like_steps_values": [
+    13000
+   ],
+   "stage1_like_s": 1464.84
+  },
+  "prefix_sum|looped_rr|baseline": {
+   "s_per_step": 0.1895,
+   "s_per_eval": 30.82,
+   "worst_s": 4406.4,
+   "stage1_like_steps": 20000.0,
+   "stage1_like_steps_values": [
+    20000
+   ],
+   "stage1_like_s": 4406.4
+  },
+  "prefix_sum|gru|baseline": {
+   "s_per_step": 0.09475,
+   "s_per_eval": 1.49,
+   "worst_s": 1924.8,
+   "stage1_like_steps": 20000.0,
+   "stage1_like_steps_values": [
+    20000
+   ],
+   "stage1_like_s": 1924.8
+  }
+ },
+ "compile_s": {
+  "copy": 212.66666666666666,
+  "reverse": 212.66666666666666,
+  "xor": 328.6666666666667,
+  "mul1": 232.0,
+  "prefix_sum": 212.66666666666666
+ },
+ "cpu_hours": {
+  "worst": 68.98794444444445,
+  "stage1_like": 49.06937777777777
+ },
+ "wall_hours_4_workers": {
+  "worst": 17.246986111111113,
+  "stage1_like": 12.267344444444442
+ },
+ "wall_hours_4_workers_plus_longest_run": {
+  "worst": 20.024430555555554,
+  "stage1_like": 14.76704444444444
+ },
+ "longest_run_hours": {
+  "worst": 2.7774444444444444,
+  "stage1_like": 2.4997
+ },
+ "limit_hours": 48,
+ "note": "worst = every run 20,000 steps and 20 evaluations; stage1_like = the step counts of the matching stage-1 runs. Bench: 40 steps + 1 evaluation per run, 4 runs at a time, 1 thread each."
+}

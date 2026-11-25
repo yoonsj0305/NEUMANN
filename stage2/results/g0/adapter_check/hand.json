@@ -1,0 +1,114 @@
+{
+ "vocab_size": 123,
+ "added_tokens": [
+  "-",
+  "*",
+  "^"
+ ],
+ "stage1_data_identical": {
+  "addition": true,
+  "parity": true
+ },
+ "accuracy": {
+  "addition_c1_3_hand_table": {
+   "id_1-10": 1.0,
+   "ood_11-20": 1.0,
+   "ood_21-30": 1.0,
+   "ood_31-40": 1.0
+  },
+  "addition_c1_1_rule_controller": {
+   "id_1-10": 1.0,
+   "ood_11-20": 1.0,
+   "ood_21-30": 1.0,
+   "ood_31-40": 1.0
+  },
+  "parity_c1_1_rule_controller": {
+   "id_1-16": 1.0,
+   "ood_17-32": 1.0,
+   "ood_33-48": 1.0,
+   "ood_49-64": 1.0
+  },
+  "copy_g0a_hand_table": {
+   "id_1-10": 1.0,
+   "ood_11-20": 1.0,
+   "ood_21-30": 1.0,
+   "ood_31-40": 1.0
+  },
+  "reverse_g0a_hand_table": {
+   "id_1-10": 1.0,
+   "ood_11-20": 1.0,
+   "ood_21-30": 1.0,
+   "ood_31-40": 1.0
+  },
+  "xor_g0a_hand_table": {
+   "id_1-16": 1.0,
+   "ood_17-32": 1.0,
+   "ood_33-48": 1.0,
+   "ood_49-64": 1.0
+  },
+  "mul1_g0a_hand_table": {
+   "id_1-10": 1.0,
+   "ood_11-20": 1.0,
+   "ood_21-30": 1.0,
+   "ood_31-40": 1.0
+  },
+  "prefix_sum_g0a_hand_table": {
+   "id_1-10": 1.0,
+   "ood_11-20": 1.0,
+   "ood_21-30": 1.0,
+   "ood_31-40": 1.0
+  }
+ },
+ "g0_data_identical_to_g_tasks": {
+  "copy": {
+   "eval": true,
+   "train_s9_s10_s11_first2000": true,
+   "select": true
+  },
+  "reverse": {
+   "eval": true,
+   "train_s9_s10_s11_first2000": true,
+   "select": true
+  },
+  "xor": {
+   "eval": true,
+   "train_s9_s10_s11_first2000": true,
+   "select": true
+  },
+  "mul1": {
+   "eval": true,
+   "train_s9_s10_s11_first2000": true,
+   "select": true
+  },
+  "prefix_sum": {
+   "eval": true,
+   "train_s9_s10_s11_first2000": true,
+   "select": true
+  }
+ },
+ "compile_simulation_vs_pf_head_path": {
+  "copy": {
+   "output_steps": 1299,
+   "same_read_positions": true
+  },
+  "reverse": {
+   "output_steps": 1243,
+   "same_read_positions": true
+  },
+  "xor": {
+   "output_steps": 1858,
+   "same_read_positions": true
+  },
+  "mul1": {
+   "output_steps": 1292,
+   "same_read_positions": true
+  },
+  "prefix_sum": {
+   "output_steps": 1273,
+   "same_read_positions": true
+  }
+ },
+ "all_exact": true,
+ "all_identical": true,
+ "wall_s": 36.7
+}

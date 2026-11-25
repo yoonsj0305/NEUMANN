@@ -1,0 +1,38 @@
+{
+ "config": {
+  "R": 4,
+  "K": 16,
+  "H": 3,
+  "hidden": 256,
+  "emb": 64
+ },
+ "d_flops": {
+  "addition": {
+   "batch_shape": [
+    64,
+    33
+   ],
+   "measured_flop_counter": 5482414080,
+   "analytic_matmul": 5482414080,
+   "matmul_ratio_analytic_over_measured": 1.0,
+   "analytic_reads_6_candidates": 27371520,
+   "analytic_index": 78144,
+   "analytic_total": 5510020032,
+   "note": "the flop counter counts dense matmuls only; reads (elementwise weighted sum) and the position index (comparisons) are analytic"
+  },
+  "mqar": {
+   "batch_shape": [
+    64,
+    66
+   ],
+   "measured_flop_counter": 10964828160,
+   "analytic_matmul": 10964828160,
+   "matmul_ratio_analytic_over_measured": 1.0,
+   "analytic_reads_6_candidates": 54743040,
+   "analytic_index": 181632,
+   "analytic_total": 11020116096,
+   "note": "the flop counter counts dense matmuls only; reads (elementwise weighted sum) and the position index (comparisons) are analytic"
+  },
+  "params": 441546
+ }
+}

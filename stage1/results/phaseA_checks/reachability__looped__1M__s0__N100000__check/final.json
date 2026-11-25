@@ -1,0 +1,85 @@
+{
+ "name": "reachability__looped__1M__s0__N100000__check",
+ "task": "reachability",
+ "kind": "looped",
+ "scale": "1M",
+ "params": 835824,
+ "config": {
+  "d": 176,
+  "heads": 4,
+  "layers": 0,
+  "block_layers": 2,
+  "recur": 4
+ },
+ "seed": 0,
+ "N": 100000,
+ "batch": 64,
+ "lr": 0.001,
+ "max_steps": 200,
+ "steps": 200,
+ "stopped": "max steps",
+ "spec": {
+  "train": [
+   4,
+   8
+  ],
+  "id": [
+   4,
+   8
+  ],
+  "ood": [
+   [
+    9,
+    16
+   ],
+   [
+    17,
+    24
+   ],
+   [
+    25,
+    32
+   ]
+  ]
+ },
+ "id_size": 200,
+ "ood_size": 100,
+ "final_acc": {
+  "id_4-8": 0.52,
+  "ood_9-16": 0.47,
+  "ood_17-24": 0.45,
+  "ood_25-32": 0.5
+ },
+ "final_acc_fixed4": {
+  "ood_9-16": 0.47,
+  "ood_17-24": 0.45,
+  "ood_25-32": 0.5
+ },
+ "recur": {
+  "id_4-8": 4,
+  "ood_9-16": 8,
+  "ood_17-24": 12,
+  "ood_25-32": 16
+ },
+ "train_flops": 13304315904000,
+ "eval_flops": 2763936980992,
+ "wall_train_s": 158.12,
+ "wall_eval_s": 39.11,
+ "segments": [
+  {
+   "segment": 0,
+   "start_step": 0,
+   "started": "2026-11-16 23:01:42"
+  }
+ ],
+ "hardware": {
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "torch_threads": 1,
+  "torch": "2.15.0+cu132",
+  "cuda": false,
+  "python": "3.12.3"
+ },
+ "commit": "5ce4a9d2083121d0a0ad5ab2e440dc0ff3f080ad",
+ "primary_eval_rule": "looped: recurrence 4 x ceil(bin upper / training upper) (declared before runs); fixed 4 recorded as acc_fixed4"
+}

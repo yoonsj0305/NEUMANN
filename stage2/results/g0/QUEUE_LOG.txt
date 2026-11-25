@@ -1,0 +1,307 @@
+2026-11-20 05:37:03 time estimate (stage2/g0_time.py, bench 40 steps + 1 eval per task x model, 4 at a time): worst case 69.0 CPU h = 17.2 h wall at 4 workers (20.0 h with the longest run 2.78 h as tail); stage-1-like step counts 49.1 CPU h = 12.3 h (14.8 h). Limit 48 h: proceed.
+2026-11-20 05:37:06 orchestrator start (workers 4, max_wall 6900, python /tmp/claude-0/-home-user-NEUMANN/87d05f95-27a9-535f-9293-4221906025b2/scratchpad/venv_s1/bin/python)
+2026-11-20 05:37:06 launch teacher xor s9
+2026-11-20 05:37:06 launch teacher xor s10
+2026-11-20 05:37:06 launch teacher xor s11
+2026-11-20 05:37:06 launch baseline xor looped_rr
+2026-11-20 06:37:21 exit teacher xor s11 code 0
+2026-11-20 06:37:21 launch compile xor s11
+2026-11-20 06:39:41 exit compile xor s11 code 0
+2026-11-20 06:39:41 launch teacher mul1 s9
+2026-11-20 06:52:42 exit teacher mul1 s9 code 0
+2026-11-20 06:52:42 launch compile mul1 s9
+2026-11-20 06:55:03 exit compile mul1 s9 code 0
+2026-11-20 06:55:03 launch teacher mul1 s10
+2026-11-20 07:02:23 exit teacher xor s9 code 0
+2026-11-20 07:02:23 launch compile xor s9
+2026-11-20 07:04:54 exit compile xor s9 code 0
+2026-11-20 07:04:54 launch teacher mul1 s11
+2026-11-20 07:08:04 exit teacher mul1 s10 code 0
+2026-11-20 07:08:04 launch compile mul1 s10
+2026-11-20 07:10:34 exit compile mul1 s10 code 0
+2026-11-20 07:10:34 launch teacher reverse s9
+2026-11-20 07:13:15 exit teacher xor s10 code 0
+2026-11-20 07:13:15 launch teacher reverse s10
+2026-11-20 07:16:35 exit teacher reverse s9 code 0
+2026-11-20 07:16:35 launch compile reverse s9
+2026-11-20 07:18:15 cut teacher mul1 s11 (after its checkpoint at log row 7)
+2026-11-20 07:18:15 exit compile reverse s9 code 0
+2026-11-20 07:19:05 exit teacher reverse s10 code 0
+2026-11-20 07:21:55 cut baseline xor looped_rr (after its checkpoint at log row 12)
+2026-11-20 07:32:06 orchestrator stop at the limit: {"copy s9": "teacher", "copy s10": "teacher", "copy s11": "teacher", "reverse s9": "students", "reverse s10": "compile", "reverse s11": "teacher", "xor s9": "students", "xor s10": "failed: teacher in-distribution 0.089 < 0.95", "xor s11": "students", "mul1 s9": "students", "mul1 s10": "students", "mul1 s11": "teacher", "prefix_sum s9": "teacher", "prefix_sum s10": "teacher", "prefix_sum s11": "teacher"}
+2026-11-20 07:32:34 orchestrator start (workers 4, max_wall 6900, python /tmp/claude-0/-home-user-NEUMANN/87d05f95-27a9-535f-9293-4221906025b2/scratchpad/venv_s1/bin/python)
+2026-11-20 07:32:34 launch compile reverse s10
+2026-11-20 07:32:34 launch baseline xor looped_rr (resume)
+2026-11-20 07:32:34 launch teacher mul1 s11 (resume)
+2026-11-20 07:32:34 launch teacher reverse s11
+2026-11-20 07:34:25 exit compile reverse s10 code 0
+2026-11-20 07:34:25 launch teacher copy s9
+2026-11-20 07:38:25 exit teacher reverse s11 code 0
+2026-11-20 07:38:25 launch compile reverse s11
+2026-11-20 07:39:05 exit teacher mul1 s11 code 0
+2026-11-20 07:39:05 launch compile mul1 s11
+2026-11-20 07:40:05 exit compile reverse s11 code 0
+2026-11-20 07:40:05 launch teacher copy s10
+2026-11-20 07:40:15 exit teacher copy s9 code 0
+2026-11-20 07:40:15 launch compile copy s9
+2026-11-20 07:41:25 exit compile mul1 s11 code 0
+2026-11-20 07:41:25 launch teacher copy s11
+2026-11-20 07:42:06 exit compile copy s9 code 0
+2026-11-20 07:42:06 launch teacher prefix_sum s9
+2026-11-20 07:45:56 exit teacher copy s10 code 0
+2026-11-20 07:45:56 launch compile copy s10
+2026-11-20 07:47:26 exit teacher copy s11 code 0
+2026-11-20 07:47:26 launch compile copy s11
+2026-11-20 07:47:46 exit compile copy s10 code 0
+2026-11-20 07:47:46 launch teacher prefix_sum s10
+2026-11-20 07:49:17 exit compile copy s11 code 0
+2026-11-20 07:49:17 launch teacher prefix_sum s11
+2026-11-20 07:50:07 exit teacher prefix_sum s9 code 0
+2026-11-20 07:50:07 launch compile prefix_sum s9
+2026-11-20 07:51:47 exit compile prefix_sum s9 code 0
+2026-11-20 07:51:47 launch student xor s9 compiled
+2026-11-20 07:55:18 exit teacher prefix_sum s11 code 0
+2026-11-20 07:55:18 launch compile prefix_sum s11
+2026-11-20 07:55:38 exit teacher prefix_sum s10 code 0
+2026-11-20 07:55:38 launch compile prefix_sum s10
+2026-11-20 07:57:08 exit compile prefix_sum s11 code 0
+2026-11-20 07:57:08 launch student xor s109 compiled
+2026-11-20 07:57:28 exit compile prefix_sum s10 code 0
+2026-11-20 07:57:28 launch student xor s9 allstay
+2026-11-20 08:00:58 exit student xor s9 compiled code 0
+2026-11-20 08:00:58 launch student xor s109 allstay
+2026-11-20 08:06:09 exit student xor s109 compiled code 0
+2026-11-20 08:06:09 launch student xor s11 compiled
+2026-11-20 08:15:21 exit student xor s11 compiled code 0
+2026-11-20 08:15:21 launch student xor s111 compiled
+2026-11-20 08:24:23 exit student xor s111 compiled code 0
+2026-11-20 08:24:23 launch student xor s11 allstay
+2026-11-20 08:58:39 exit baseline xor looped_rr code 0
+2026-11-20 08:58:41 launch student xor s111 allstay
+2026-11-20 09:13:24 cut student xor s9 allstay (after its checkpoint at log row 19)
+2026-11-20 09:14:24 cut student xor s111 allstay (after its checkpoint at log row 5)
+2026-11-20 09:15:34 cut student xor s109 allstay (after its checkpoint at log row 19)
+2026-11-20 09:17:14 cut student xor s11 allstay (after its checkpoint at log row 13)
+2026-11-20 09:27:35 orchestrator stop at the limit: {"copy s9": "students", "copy s10": "students", "copy s11": "students", "reverse s9": "students", "reverse s10": "students", "reverse s11": "students", "xor s9": "students", "xor s10": "failed: teacher in-distribution 0.089 < 0.95", "xor s11": "students", "mul1 s9": "students", "mul1 s10": "students", "mul1 s11": "students", "prefix_sum s9": "students", "prefix_sum s10": "students", "prefix_sum s11": "students"}
+2026-11-20 09:28:01 orchestrator start (workers 4, max_wall 6900, python /tmp/claude-0/-home-user-NEUMANN/87d05f95-27a9-535f-9293-4221906025b2/scratchpad/venv_s1/bin/python)
+2026-11-20 09:28:01 launch student xor s9 allstay (resume)
+2026-11-20 09:28:01 launch student xor s109 allstay (resume)
+2026-11-20 09:28:01 launch student xor s11 allstay (resume)
+2026-11-20 09:28:01 launch student xor s111 allstay (resume)
+2026-11-20 09:35:32 exit student xor s9 allstay code 0
+2026-11-20 09:35:32 launch baseline xor rope
+2026-11-20 09:35:52 exit student xor s109 allstay code 0
+2026-11-20 09:35:52 launch select xor s9
+2026-11-20 09:36:02 exit select xor s9 code 0
+2026-11-20 09:36:06 launch baseline xor abacus
+2026-11-20 10:05:32 exit student xor s11 allstay code 0
+2026-11-20 10:05:32 launch baseline mul1 looped_rr
+2026-11-20 10:39:09 exit student xor s111 allstay code 0
+2026-11-20 10:39:09 launch select xor s11
+2026-11-20 10:39:19 exit select xor s11 code 0
+2026-11-20 10:39:24 launch baseline prefix_sum looped_rr
+2026-11-20 10:53:17 exit baseline xor rope code 0
+2026-11-20 10:53:19 launch baseline reverse looped_rr
+2026-11-20 10:58:40 exit baseline xor abacus code 0
+2026-11-20 10:58:43 launch baseline copy looped_rr
+2026-11-20 11:09:45 cut baseline prefix_sum looped_rr (after its checkpoint at log row 8)
+2026-11-20 11:10:55 cut baseline reverse looped_rr (after its checkpoint at log row 5)
+2026-11-20 11:11:35 cut baseline copy looped_rr (after its checkpoint at log row 4)
+2026-11-20 11:12:56 cut baseline mul1 looped_rr (after its checkpoint at log row 15)
+2026-11-20 11:23:07 orchestrator stop at the limit: {"copy s9": "students", "copy s10": "students", "copy s11": "students", "reverse s9": "students", "reverse s10": "students", "reverse s11": "students", "xor s9": "selected", "xor s10": "failed: teacher in-distribution 0.089 < 0.95", "xor s11": "selected", "mul1 s9": "students", "mul1 s10": "students", "mul1 s11": "students", "prefix_sum s9": "students", "prefix_sum s10": "students", "prefix_sum s11": "students"}
+2026-11-20 11:23:19 orchestrator start (workers 4, max_wall 6900, python /tmp/claude-0/-home-user-NEUMANN/87d05f95-27a9-535f-9293-4221906025b2/scratchpad/venv_s1/bin/python)
+2026-11-20 11:23:19 launch baseline mul1 looped_rr (resume)
+2026-11-20 11:23:19 launch baseline prefix_sum looped_rr (resume)
+2026-11-20 11:23:19 launch baseline reverse looped_rr (resume)
+2026-11-20 11:23:19 launch baseline copy looped_rr (resume)
+2026-11-20 11:52:06 exit baseline mul1 looped_rr code 0
+2026-11-20 11:52:08 launch baseline xor gru
+2026-11-20 12:06:31 exit baseline reverse looped_rr code 0
+2026-11-20 12:06:34 launch baseline mul1 abacus
+2026-11-20 12:09:44 exit baseline copy looped_rr code 0
+2026-11-20 12:09:47 launch baseline mul1 rope
+2026-11-20 12:14:48 exit baseline prefix_sum looped_rr code 0
+2026-11-20 12:14:50 launch baseline copy rope
+2026-11-20 12:21:32 exit baseline copy rope code 0
+2026-11-20 12:21:34 launch baseline reverse rope
+2026-11-20 12:27:55 exit baseline reverse rope code 0
+2026-11-20 12:27:58 launch baseline prefix_sum abacus
+2026-11-20 12:28:38 exit baseline mul1 rope code 0
+2026-11-20 12:28:40 launch baseline prefix_sum rope
+2026-11-20 12:32:21 exit baseline mul1 abacus code 0
+2026-11-20 12:32:23 launch baseline mul1 gru
+2026-11-20 12:37:04 exit baseline prefix_sum rope code 0
+2026-11-20 12:37:07 launch baseline reverse abacus
+2026-11-20 12:48:39 exit baseline prefix_sum abacus code 0
+2026-11-20 12:48:41 launch baseline reverse gru
+2026-11-20 12:56:03 exit baseline reverse abacus code 0
+2026-11-20 12:56:05 launch baseline copy abacus
+2026-11-20 13:04:57 cut baseline xor gru (after its checkpoint at log row 19)
+2026-11-20 13:05:07 cut baseline mul1 gru (after its checkpoint at log row 17)
+2026-11-20 13:05:17 cut baseline copy abacus (after its checkpoint at log row 5)
+2026-11-20 13:05:27 cut baseline reverse gru (after its checkpoint at log row 10)
+2026-11-20 13:18:29 orchestrator stop at the limit: {"copy s9": "students", "copy s10": "students", "copy s11": "students", "reverse s9": "students", "reverse s10": "students", "reverse s11": "students", "xor s9": "selected", "xor s10": "failed: teacher in-distribution 0.089 < 0.95", "xor s11": "selected", "mul1 s9": "students", "mul1 s10": "students", "mul1 s11": "students", "prefix_sum s9": "students", "prefix_sum s10": "students", "prefix_sum s11": "students"}
+2026-11-20 13:18:47 orchestrator start (workers 4, max_wall 6900, python /tmp/claude-0/-home-user-NEUMANN/87d05f95-27a9-535f-9293-4221906025b2/scratchpad/venv_s1/bin/python)
+2026-11-20 13:18:47 launch baseline xor gru (resume)
+2026-11-20 13:18:47 launch baseline mul1 gru (resume)
+2026-11-20 13:18:47 launch baseline reverse gru (resume)
+2026-11-20 13:18:47 launch baseline copy abacus (resume)
+2026-11-20 13:20:48 exit baseline reverse gru code 0
+2026-11-20 13:20:50 launch baseline prefix_sum gru
+2026-11-20 13:27:11 exit baseline xor gru code 0
+2026-11-20 13:27:14 exit baseline mul1 gru code 0
+2026-11-20 13:27:16 launch baseline copy gru
+2026-11-20 13:27:16 launch student mul1 s9 compiled
+2026-11-20 13:28:56 exit baseline copy abacus code 0
+2026-11-20 13:28:59 launch student mul1 s109 compiled
+2026-11-20 13:42:21 exit student mul1 s9 compiled code 0
+2026-11-20 13:42:21 launch student mul1 s9 allstay
+2026-11-20 13:45:12 exit baseline copy gru code 0
+2026-11-20 13:45:15 launch student mul1 s109 allstay
+2026-11-20 13:45:45 exit baseline prefix_sum gru code 0
+2026-11-20 13:45:48 launch student mul1 s10 compiled
+2026-11-20 14:10:02 exit student mul1 s109 compiled code 0
+2026-11-20 14:10:02 launch student mul1 s110 compiled
+2026-11-20 14:23:35 exit student mul1 s110 compiled code 0
+2026-11-20 14:23:35 launch student mul1 s10 allstay
+2026-11-20 14:25:55 exit student mul1 s9 allstay code 0
+2026-11-20 14:25:55 launch student mul1 s110 allstay
+2026-11-20 14:27:46 exit student mul1 s10 compiled code 0
+2026-11-20 14:27:46 launch student mul1 s11 compiled
+2026-11-20 14:28:06 exit student mul1 s109 allstay code 0
+2026-11-20 14:28:06 launch select mul1 s9
+2026-11-20 14:28:16 exit select mul1 s9 code 0
+2026-11-20 14:28:20 launch student mul1 s111 compiled
+2026-11-20 14:37:32 exit student mul1 s111 compiled code 0
+2026-11-20 14:37:32 launch student mul1 s11 allstay
+2026-11-20 14:50:05 exit student mul1 s11 compiled code 0
+2026-11-20 14:50:05 launch student mul1 s111 allstay
+2026-11-20 15:00:47 cut student mul1 s111 allstay (after its checkpoint at log row 8)
+2026-11-20 15:01:17 cut student mul1 s110 allstay (after its checkpoint at log row 17)
+2026-11-20 15:01:17 cut student mul1 s11 allstay (after its checkpoint at log row 13)
+2026-11-20 15:01:47 cut student mul1 s10 allstay (after its checkpoint at log row 18)
+2026-11-20 15:13:49 orchestrator stop at the limit: {"copy s9": "students", "copy s10": "students", "copy s11": "students", "reverse s9": "students", "reverse s10": "students", "reverse s11": "students", "xor s9": "selected", "xor s10": "failed: teacher in-distribution 0.089 < 0.95", "xor s11": "selected", "mul1 s9": "selected", "mul1 s10": "students", "mul1 s11": "students", "prefix_sum s9": "students", "prefix_sum s10": "students", "prefix_sum s11": "students"}
+2026-11-20 15:14:10 orchestrator start (workers 4, max_wall 6900, python /tmp/claude-0/-home-user-NEUMANN/87d05f95-27a9-535f-9293-4221906025b2/scratchpad/venv_s1/bin/python)
+2026-11-20 15:14:10 launch student mul1 s10 allstay (resume)
+2026-11-20 15:14:10 launch student mul1 s110 allstay (resume)
+2026-11-20 15:14:10 launch student mul1 s11 allstay (resume)
+2026-11-20 15:14:10 launch student mul1 s111 allstay (resume)
+2026-11-20 15:21:21 exit student mul1 s10 allstay code 0
+2026-11-20 15:21:21 launch student reverse s9 compiled
+2026-11-20 15:22:11 exit student mul1 s110 allstay code 0
+2026-11-20 15:22:11 launch select mul1 s10
+2026-11-20 15:22:21 exit select mul1 s10 code 0
+2026-11-20 15:22:27 launch student reverse s109 compiled
+2026-11-20 15:24:57 exit student reverse s9 compiled code 0
+2026-11-20 15:24:57 launch student reverse s9 allstay
+2026-11-20 15:25:57 exit student reverse s109 compiled code 0
+2026-11-20 15:25:57 launch student reverse s109 allstay
+2026-11-20 15:33:09 exit student mul1 s11 allstay code 0
+2026-11-20 15:33:09 launch student reverse s10 compiled
+2026-11-20 15:47:12 exit student mul1 s111 allstay code 0
+2026-11-20 15:47:12 launch select mul1 s11
+2026-11-20 15:47:22 exit select mul1 s11 code 0
+2026-11-20 15:47:28 launch student reverse s110 compiled
+2026-11-20 16:02:11 exit student reverse s9 allstay code 0
+2026-11-20 16:02:11 launch student reverse s10 allstay
+2026-11-20 16:03:02 exit student reverse s109 allstay code 0
+2026-11-20 16:03:02 launch select reverse s9
+2026-11-20 16:03:12 exit select reverse s9 code 0
+2026-11-20 16:03:17 launch student reverse s110 allstay
+2026-11-20 16:09:39 exit student reverse s10 compiled code 0
+2026-11-20 16:09:39 launch student reverse s11 compiled
+2026-11-20 16:20:42 exit student reverse s110 compiled code 0
+2026-11-20 16:20:42 launch student reverse s111 compiled
+2026-11-20 16:39:47 exit student reverse s10 allstay code 0
+2026-11-20 16:39:47 launch student reverse s11 allstay
+2026-11-20 16:40:17 exit student reverse s110 allstay code 0
+2026-11-20 16:40:17 launch select reverse s10
+2026-11-20 16:40:27 exit select reverse s10 code 0
+2026-11-20 16:40:31 launch student reverse s111 allstay
+2026-11-20 16:43:22 exit student reverse s11 compiled code 0
+2026-11-20 16:43:22 launch student copy s9 compiled
+2026-11-20 16:47:13 exit student copy s9 compiled code 0
+2026-11-20 16:47:13 launch student copy s109 compiled
+2026-11-20 16:51:04 exit student copy s109 compiled code 0
+2026-11-20 16:51:04 launch student copy s9 allstay
+2026-11-20 16:55:05 cut student reverse s111 compiled (after its checkpoint at log row 20)
+2026-11-20 16:55:15 cut student reverse s11 allstay (after its checkpoint at log row 11)
+2026-11-20 16:55:15 cut student reverse s111 allstay (after its checkpoint at log row 10)
+2026-11-20 16:55:25 cut student copy s9 allstay (after its checkpoint at log row 4)
+2026-11-20 17:09:18 orchestrator stop at the limit: {"copy s9": "students", "copy s10": "students", "copy s11": "students", "reverse s9": "selected", "reverse s10": "selected", "reverse s11": "students", "xor s9": "selected", "xor s10": "failed: teacher in-distribution 0.089 < 0.95", "xor s11": "selected", "mul1 s9": "selected", "mul1 s10": "selected", "mul1 s11": "selected", "prefix_sum s9": "students", "prefix_sum s10": "students", "prefix_sum s11": "students"}
+2026-11-20 17:09:35 orchestrator start (workers 4, max_wall 6900, python /tmp/claude-0/-home-user-NEUMANN/87d05f95-27a9-535f-9293-4221906025b2/scratchpad/venv_s1/bin/python)
+2026-11-20 17:09:35 launch student reverse s111 compiled (resume)
+2026-11-20 17:09:35 launch student reverse s11 allstay (resume)
+2026-11-20 17:09:35 launch student reverse s111 allstay (resume)
+2026-11-20 17:09:35 launch student copy s9 allstay (resume)
+2026-11-20 17:11:46 exit student reverse s111 compiled code 0
+2026-11-20 17:11:46 launch student copy s109 allstay
+2026-11-20 17:30:11 exit student reverse s11 allstay code 0
+2026-11-20 17:30:11 launch student copy s10 compiled
+2026-11-20 17:32:22 exit student reverse s111 allstay code 0
+2026-11-20 17:32:22 launch select reverse s11
+2026-11-20 17:32:32 exit select reverse s11 code 0
+2026-11-20 17:32:36 launch student copy s110 compiled
+2026-11-20 17:33:56 exit student copy s10 compiled code 0
+2026-11-20 17:33:56 launch student copy s10 allstay
+2026-11-20 17:36:17 exit student copy s110 compiled code 0
+2026-11-20 17:36:17 launch student copy s110 allstay
+2026-11-20 17:40:38 exit student copy s9 allstay code 0
+2026-11-20 17:40:38 launch student copy s11 compiled
+2026-11-20 17:44:19 exit student copy s11 compiled code 0
+2026-11-20 17:44:19 launch student copy s111 compiled
+2026-11-20 17:48:00 exit student copy s109 allstay code 0
+2026-11-20 17:48:00 exit student copy s111 compiled code 0
+2026-11-20 17:48:00 launch select copy s9
+2026-11-20 17:48:00 launch student copy s11 allstay
+2026-11-20 17:48:10 exit select copy s9 code 0
+2026-11-20 17:48:15 launch student copy s111 allstay
+2026-11-20 18:07:01 exit student copy s10 allstay code 0
+2026-11-20 18:07:01 launch student prefix_sum s9 compiled
+2026-11-20 18:10:52 exit student prefix_sum s9 compiled code 0
+2026-11-20 18:10:52 launch student prefix_sum s109 compiled
+2026-11-20 18:11:02 exit student copy s110 allstay code 0
+2026-11-20 18:11:02 launch select copy s10
+2026-11-20 18:11:12 exit select copy s10 code 0
+2026-11-20 18:11:16 launch student prefix_sum s9 allstay
+2026-11-20 18:14:37 exit student prefix_sum s109 compiled code 0
+2026-11-20 18:14:37 launch student prefix_sum s109 allstay
+2026-11-20 18:22:30 exit student copy s111 allstay code 0
+2026-11-20 18:22:30 launch student prefix_sum s10 compiled
+2026-11-20 18:23:20 exit student copy s11 allstay code 0
+2026-11-20 18:23:20 launch select copy s11
+2026-11-20 18:23:30 exit select copy s11 code 0
+2026-11-20 18:23:35 launch student prefix_sum s110 compiled
+2026-11-20 18:26:16 exit student prefix_sum s10 compiled code 0
+2026-11-20 18:26:16 launch student prefix_sum s10 allstay
+2026-11-20 18:27:16 exit student prefix_sum s110 compiled code 0
+2026-11-20 18:27:16 launch student prefix_sum s110 allstay
+2026-11-20 18:44:33 exit student prefix_sum s9 allstay code 0
+2026-11-20 18:44:33 launch student prefix_sum s11 compiled
+2026-11-20 18:48:14 exit student prefix_sum s11 compiled code 0
+2026-11-20 18:48:14 launch student prefix_sum s111 compiled
+2026-11-20 18:48:24 exit student prefix_sum s109 allstay code 0
+2026-11-20 18:48:24 launch select prefix_sum s9
+2026-11-20 18:48:34 exit select prefix_sum s9 code 0
+2026-11-20 18:48:40 launch student prefix_sum s11 allstay
+2026-11-20 18:50:10 cut student prefix_sum s111 compiled (after its checkpoint at log row 2)
+2026-11-20 18:50:20 cut student prefix_sum s11 allstay (after its checkpoint at log row 2)
+2026-11-20 18:51:21 cut student prefix_sum s110 allstay (after its checkpoint at log row 15)
+2026-11-20 18:51:31 cut student prefix_sum s10 allstay (after its checkpoint at log row 16)
+2026-11-20 19:04:44 orchestrator stop at the limit: {"copy s9": "selected", "copy s10": "selected", "copy s11": "selected", "reverse s9": "selected", "reverse s10": "selected", "reverse s11": "selected", "xor s9": "selected", "xor s10": "failed: teacher in-distribution 0.089 < 0.95", "xor s11": "selected", "mul1 s9": "selected", "mul1 s10": "selected", "mul1 s11": "selected", "prefix_sum s9": "selected", "prefix_sum s10": "students", "prefix_sum s11": "students"}
+2026-11-20 19:05:00 orchestrator start (workers 4, max_wall 6900, python /tmp/claude-0/-home-user-NEUMANN/87d05f95-27a9-535f-9293-4221906025b2/scratchpad/venv_s1/bin/python)
+2026-11-20 19:05:00 launch student prefix_sum s10 allstay (resume)
+2026-11-20 19:05:00 launch student prefix_sum s110 allstay (resume)
+2026-11-20 19:05:00 launch student prefix_sum s111 compiled (resume)
+2026-11-20 19:05:00 launch student prefix_sum s11 allstay (resume)
+2026-11-20 19:07:21 exit student prefix_sum s111 compiled code 0
+2026-11-20 19:07:21 launch student prefix_sum s111 allstay
+2026-11-20 19:13:33 exit student prefix_sum s10 allstay code 0
+2026-11-20 19:16:34 exit student prefix_sum s110 allstay code 0
+2026-11-20 19:16:34 launch select prefix_sum s10
+2026-11-20 19:16:44 exit select prefix_sum s10 code 0
+2026-11-20 19:36:35 exit student prefix_sum s11 allstay code 0
+2026-11-20 19:42:16 exit student prefix_sum s111 allstay code 0
+2026-11-20 19:42:16 launch select prefix_sum s11
+2026-11-20 19:42:26 exit select prefix_sum s11 code 0
+2026-11-20 19:42:31 all done: {"copy s9": "selected", "copy s10": "selected", "copy s11": "selected", "reverse s9": "selected", "reverse s10": "selected", "reverse s11": "selected", "xor s9": "selected", "xor s10": "failed: teacher in-distribution 0.089 < 0.95", "xor s11": "selected", "mul1 s9": "selected", "mul1 s10": "selected", "mul1 s11": "selected", "prefix_sum s9": "selected", "prefix_sum s10": "selected", "prefix_sum s11": "selected"}

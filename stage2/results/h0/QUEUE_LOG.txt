@@ -1,0 +1,263 @@
+2026-11-21 11:04:35 time estimate (stage2/h0_time.py, G-0/G-0' measured rates): worst (every seed 4 teachers, every run 20,000 steps) 168.6 CPU h = 46.9 h wall for both bundles with per-bundle tails (bundle 1 30.4 h, bundle 2 16.5 h); measured 22.0 h; measured + 3 restarts every seed 35.4 h. First computation with the global longest run as both tails: 48.5 h (corrected: the bundles run one after the other). Limit 48 h: proceed with bundle 1.
+2026-11-21 11:04:35 orchestrator start (bundle 1: reverse, rev_xor, xor; workers 4, max_wall 6900, python /tmp/claude-0/-home-user-NEUMANN/87d05f95-27a9-535f-9293-4221906025b2/scratchpad/venv_s1/bin/python)
+2026-11-21 11:04:35 launch teacher rev_xor s15
+2026-11-21 11:04:35 launch teacher rev_xor s16
+2026-11-21 11:04:35 launch teacher rev_xor s17
+2026-11-21 11:04:35 launch teacher xor s15
+2026-11-21 12:33:58 exit teacher rev_xor s16 code 0
+2026-11-21 12:33:58 launch check rev_xor s16
+2026-11-21 12:34:08 exit check rev_xor s16 code 0
+2026-11-21 12:34:08 launch teacher xor s16
+2026-11-21 12:34:18 exit teacher rev_xor s15 code 0
+2026-11-21 12:34:18 exit teacher xor s15 code 0
+2026-11-21 12:34:18 launch check rev_xor s15
+2026-11-21 12:34:18 launch check xor s15
+2026-11-21 12:34:28 exit check rev_xor s15 code 0
+2026-11-21 12:34:28 exit check xor s15 code 0
+2026-11-21 12:34:28 launch teacher xor s17
+2026-11-21 12:34:28 launch teacher rev_xor s215
+2026-11-21 12:34:38 exit teacher rev_xor s17 code 0
+2026-11-21 12:34:38 launch check rev_xor s17
+2026-11-21 12:34:48 exit check rev_xor s17 code 0
+2026-11-21 12:34:48 launch compile rev_xor s17
+2026-11-21 12:48:38 cut teacher xor s16 (after its checkpoint at log row 4)
+2026-11-21 12:49:28 exit compile rev_xor s17 code 0
+2026-11-21 12:49:58 cut teacher rev_xor s215 (after its checkpoint at log row 4)
+2026-11-21 12:50:08 cut teacher xor s17 (after its checkpoint at log row 4)
+2026-11-21 12:59:39 orchestrator stop at the limit: {"reverse s15": "teacher", "reverse s16": "teacher", "reverse s17": "teacher", "rev_xor s15": "teacher restart 1", "rev_xor s16": "teacher restart 1", "rev_xor s17": "students", "xor s15": "teacher restart 1", "xor s16": "teacher", "xor s17": "teacher", "baseline reverse abacus": "running", "baseline reverse rope": "running", "baseline reverse looped_rr": "running", "baseline reverse gru": "running", "baseline rev_xor abacus": "running", "baseline rev_xor rope": "running", "baseline rev_xor looped_rr": "running", "baseline rev_xor gru": "running", "baseline xor abacus": "running", "baseline xor rope": "running", "baseline xor looped_rr": "running", "baseline xor gru": "running"}
+2026-11-21 12:59:57 orchestrator start (bundle 1: reverse, rev_xor, xor; workers 4, max_wall 6900, python /tmp/claude-0/-home-user-NEUMANN/87d05f95-27a9-535f-9293-4221906025b2/scratchpad/venv_s1/bin/python)
+2026-11-21 12:59:57 launch teacher xor s16 (resume)
+2026-11-21 12:59:57 launch teacher xor s17 (resume)
+2026-11-21 12:59:57 launch teacher rev_xor s215 (resume)
+2026-11-21 12:59:57 launch teacher rev_xor s216
+2026-11-21 14:18:00 exit teacher xor s16 code 0
+2026-11-21 14:18:00 exit teacher rev_xor s215 code 0
+2026-11-21 14:18:00 launch check rev_xor s215
+2026-11-21 14:18:00 launch check xor s16
+2026-11-21 14:18:10 exit check rev_xor s215 code 0
+2026-11-21 14:18:10 exit check xor s16 code 0
+2026-11-21 14:18:10 launch teacher xor s215
+2026-11-21 14:18:10 launch teacher xor s216
+2026-11-21 14:18:30 exit teacher xor s17 code 0
+2026-11-21 14:18:30 launch check xor s17
+2026-11-21 14:18:40 exit check xor s17 code 0
+2026-11-21 14:18:40 launch teacher xor s217
+2026-11-21 14:31:41 exit teacher rev_xor s216 code 0
+2026-11-21 14:31:41 launch check rev_xor s216
+2026-11-21 14:31:51 exit check rev_xor s216 code 0
+2026-11-21 14:31:51 launch teacher rev_xor s315
+2026-11-21 14:41:51 cut teacher xor s216 (after its checkpoint at log row 6)
+2026-11-21 14:42:01 cut teacher rev_xor s315 (after its checkpoint at log row 3)
+2026-11-21 14:42:31 cut teacher xor s217 (after its checkpoint at log row 6)
+2026-11-21 14:44:21 cut teacher xor s215 (after its checkpoint at log row 6)
+2026-11-21 14:55:02 orchestrator stop at the limit: {"reverse s15": "teacher", "reverse s16": "teacher", "reverse s17": "teacher", "rev_xor s15": "teacher restart 2", "rev_xor s16": "teacher restart 2", "rev_xor s17": "students", "xor s15": "teacher restart 1", "xor s16": "teacher restart 1", "xor s17": "teacher restart 1", "baseline reverse abacus": "running", "baseline reverse rope": "running", "baseline reverse looped_rr": "running", "baseline reverse gru": "running", "baseline rev_xor abacus": "running", "baseline rev_xor rope": "running", "baseline rev_xor looped_rr": "running", "baseline rev_xor gru": "running", "baseline xor abacus": "running", "baseline xor rope": "running", "baseline xor looped_rr": "running", "baseline xor gru": "running"}
+2026-11-21 14:55:18 orchestrator start (bundle 1: reverse, rev_xor, xor; workers 4, max_wall 6900, python /tmp/claude-0/-home-user-NEUMANN/87d05f95-27a9-535f-9293-4221906025b2/scratchpad/venv_s1/bin/python)
+2026-11-21 14:55:18 launch teacher xor s215 (resume)
+2026-11-21 14:55:18 launch teacher xor s216 (resume)
+2026-11-21 14:55:18 launch teacher xor s217 (resume)
+2026-11-21 14:55:18 launch teacher rev_xor s315 (resume)
+2026-11-21 15:00:18 exit teacher xor s216 code 0
+2026-11-21 15:00:18 launch check xor s216
+2026-11-21 15:00:28 exit check xor s216 code 0
+2026-11-21 15:00:28 launch compile xor s16
+2026-11-21 15:15:19 exit compile xor s16 code 0
+2026-11-21 15:15:19 launch teacher rev_xor s316
+2026-11-21 15:37:10 exit teacher xor s217 code 0
+2026-11-21 15:37:10 launch check xor s217
+2026-11-21 15:37:20 exit check xor s217 code 0
+2026-11-21 15:37:20 launch compile xor s17
+2026-11-21 15:51:51 exit compile xor s17 code 0
+2026-11-21 15:51:51 launch teacher reverse s15
+2026-11-21 15:58:21 exit teacher reverse s15 code 0
+2026-11-21 15:58:21 launch check reverse s15
+2026-11-21 15:58:31 exit check reverse s15 code 0
+2026-11-21 15:58:31 launch compile reverse s15
+2026-11-21 16:00:41 exit compile reverse s15 code 0
+2026-11-21 16:00:41 launch teacher reverse s16
+2026-11-21 16:04:32 exit teacher xor s215 code 0
+2026-11-21 16:04:32 launch check xor s215
+2026-11-21 16:04:42 exit check xor s215 code 0
+2026-11-21 16:04:42 launch teacher xor s315
+2026-11-21 16:07:22 exit teacher reverse s16 code 0
+2026-11-21 16:07:22 launch check reverse s16
+2026-11-21 16:07:32 exit check reverse s16 code 0
+2026-11-21 16:07:32 launch compile reverse s16
+2026-11-21 16:09:42 exit compile reverse s16 code 0
+2026-11-21 16:09:42 launch teacher reverse s17
+2026-11-21 16:18:03 exit teacher rev_xor s315 code 0
+2026-11-21 16:18:03 launch check rev_xor s315
+2026-11-21 16:18:13 exit check rev_xor s315 code 0
+2026-11-21 16:18:13 launch teacher rev_xor s415
+2026-11-21 16:20:33 exit teacher reverse s17 code 0
+2026-11-21 16:20:33 launch check reverse s17
+2026-11-21 16:20:43 exit check reverse s17 code 0
+2026-11-21 16:20:43 launch compile reverse s17
+2026-11-21 16:23:03 exit compile reverse s17 code 0
+2026-11-21 16:23:03 launch baseline rev_xor looped_rr
+2026-11-21 16:38:15 cut teacher rev_xor s415 (after its checkpoint at log row 5)
+2026-11-21 16:38:45 cut teacher xor s315 (after its checkpoint at log row 8)
+2026-11-21 16:39:45 cut teacher rev_xor s316 (after its checkpoint at log row 19)
+2026-11-21 16:44:35 cut baseline rev_xor looped_rr (after its checkpoint at log row 3)
+2026-11-21 16:50:25 orchestrator stop at the limit: {"reverse s15": "students", "reverse s16": "students", "reverse s17": "students", "rev_xor s15": "teacher restart 3", "rev_xor s16": "teacher restart 2", "rev_xor s17": "students", "xor s15": "teacher restart 2", "xor s16": "students", "xor s17": "students", "baseline reverse abacus": "running", "baseline reverse rope": "running", "baseline reverse looped_rr": "running", "baseline reverse gru": "running", "baseline rev_xor abacus": "running", "baseline rev_xor rope": "running", "baseline rev_xor looped_rr": "running", "baseline rev_xor gru": "running", "baseline xor abacus": "running", "baseline xor rope": "running", "baseline xor looped_rr": "running", "baseline xor gru": "running"}
+2026-11-21 16:50:40 orchestrator start (bundle 1: reverse, rev_xor, xor; workers 4, max_wall 6900, python /tmp/claude-0/-home-user-NEUMANN/87d05f95-27a9-535f-9293-4221906025b2/scratchpad/venv_s1/bin/python)
+2026-11-21 16:50:40 launch teacher rev_xor s316 (resume)
+2026-11-21 16:50:40 launch teacher xor s315 (resume)
+2026-11-21 16:50:40 launch teacher rev_xor s415 (resume)
+2026-11-21 16:50:40 launch baseline rev_xor looped_rr (resume)
+2026-11-21 17:00:00 exit teacher rev_xor s316 code 0
+2026-11-21 17:00:00 launch check rev_xor s316
+2026-11-21 17:00:10 exit check rev_xor s316 code 0
+2026-11-21 17:00:10 launch teacher rev_xor s416
+2026-11-21 17:49:55 exit teacher xor s315 code 0
+2026-11-21 17:49:55 launch check xor s315
+2026-11-21 17:50:05 exit check xor s315 code 0
+2026-11-21 17:50:05 launch teacher xor s415
+2026-11-21 18:03:36 exit teacher rev_xor s415 code 0
+2026-11-21 18:03:36 launch check rev_xor s415
+2026-11-21 18:03:46 exit check rev_xor s415 code 0
+2026-11-21 18:03:46 launch baseline xor looped_rr
+2026-11-21 18:32:29 exit teacher xor s415 code 0
+2026-11-21 18:32:29 launch check xor s415
+2026-11-21 18:32:39 exit teacher rev_xor s416 code 0
+2026-11-21 18:32:39 exit check xor s415 code 0
+2026-11-21 18:32:39 launch check rev_xor s416
+2026-11-21 18:32:49 exit check rev_xor s416 code 0
+2026-11-21 18:33:49 cut baseline rev_xor looped_rr (after its checkpoint at log row 14)
+2026-11-21 18:35:19 cut baseline xor looped_rr (after its checkpoint at log row 4)
+2026-11-21 18:45:49 orchestrator stop at the limit: {"reverse s15": "students", "reverse s16": "students", "reverse s17": "students", "rev_xor s15": "failed: teacher select 0.414 · 0.100 · 0.056 · 0.431 < 0.95 (restarts exhausted)", "rev_xor s16": "failed: teacher select 0.302 · 0.633 · 0.539 · 0.310 < 0.95 (restarts exhausted)", "rev_xor s17": "students", "xor s15": "compile", "xor s16": "students", "xor s17": "students", "baseline reverse abacus": "running", "baseline reverse rope": "running", "baseline reverse looped_rr": "running", "baseline reverse gru": "running", "baseline rev_xor abacus": "running", "baseline rev_xor rope": "running", "baseline rev_xor looped_rr": "running", "baseline rev_xor gru": "running", "baseline xor abacus": "running", "baseline xor rope": "running", "baseline xor looped_rr": "running", "baseline xor gru": "running"}
+2026-11-21 18:46:04 orchestrator start (bundle 1: reverse, rev_xor, xor; workers 4, max_wall 6900, python /tmp/claude-0/-home-user-NEUMANN/87d05f95-27a9-535f-9293-4221906025b2/scratchpad/venv_s1/bin/python)
+2026-11-21 18:46:04 launch compile xor s15
+2026-11-21 18:46:04 launch baseline rev_xor looped_rr (resume)
+2026-11-21 18:46:04 launch baseline xor looped_rr (resume)
+2026-11-21 18:46:04 launch baseline rev_xor abacus
+2026-11-21 19:01:06 exit compile xor s15 code 0
+2026-11-21 19:01:06 launch baseline rev_xor rope
+2026-11-21 19:37:29 exit baseline rev_xor rope code 0
+2026-11-21 19:37:32 launch baseline rev_xor gru
+2026-11-21 20:05:44 exit baseline rev_xor looped_rr code 0
+2026-11-21 20:05:47 launch baseline xor abacus
+2026-11-21 20:19:58 exit baseline rev_xor abacus code 0
+2026-11-21 20:20:00 launch baseline xor rope
+2026-11-21 20:27:11 cut baseline rev_xor gru (after its checkpoint at log row 14)
+2026-11-21 20:29:01 cut baseline xor abacus (after its checkpoint at log row 6)
+2026-11-21 20:29:31 cut baseline xor rope (after its checkpoint at log row 3)
+2026-11-21 20:35:51 cut baseline xor looped_rr (after its checkpoint at log row 16)
+2026-11-21 20:41:12 orchestrator stop at the limit: {"reverse s15": "students", "reverse s16": "students", "reverse s17": "students", "rev_xor s15": "failed: teacher select 0.414 · 0.100 · 0.056 · 0.431 < 0.95 (restarts exhausted)", "rev_xor s16": "failed: teacher select 0.302 · 0.633 · 0.539 · 0.310 < 0.95 (restarts exhausted)", "rev_xor s17": "students", "xor s15": "students", "xor s16": "students", "xor s17": "students", "baseline reverse abacus": "running", "baseline reverse rope": "running", "baseline reverse looped_rr": "running", "baseline reverse gru": "running", "baseline rev_xor abacus": "done", "baseline rev_xor rope": "done", "baseline rev_xor looped_rr": "done", "baseline rev_xor gru": "running", "baseline xor abacus": "running", "baseline xor rope": "running", "baseline xor looped_rr": "running", "baseline xor gru": "running"}
+2026-11-21 20:41:59 orchestrator start (bundle 1: reverse, rev_xor, xor; workers 4, max_wall 6900, python /tmp/claude-0/-home-user-NEUMANN/87d05f95-27a9-535f-9293-4221906025b2/scratchpad/venv_s1/bin/python)
+2026-11-21 20:41:59 launch baseline xor looped_rr (resume)
+2026-11-21 20:41:59 launch baseline rev_xor gru (resume)
+2026-11-21 20:41:59 launch baseline xor abacus (resume)
+2026-11-21 20:41:59 launch baseline xor rope (resume)
+2026-11-21 21:08:41 exit baseline rev_xor gru code 0
+2026-11-21 21:08:43 launch baseline xor gru
+2026-11-21 21:39:46 exit baseline xor looped_rr code 0
+2026-11-21 21:39:48 launch student rev_xor s17 compiled
+2026-11-21 21:42:59 exit baseline xor abacus code 0
+2026-11-21 21:43:01 launch student rev_xor s117 compiled
+2026-11-21 21:48:51 exit student rev_xor s17 compiled code 0
+2026-11-21 21:48:51 launch student rev_xor s17 allstay
+2026-11-21 21:52:42 exit student rev_xor s117 compiled code 0
+2026-11-21 21:52:42 launch student rev_xor s117 allstay
+2026-11-21 22:02:12 exit baseline xor rope code 0
+2026-11-21 22:02:15 launch student xor s15 compiled
+2026-11-21 22:11:15 exit student xor s15 compiled code 0
+2026-11-21 22:11:16 launch student xor s115 compiled
+2026-11-21 22:21:06 exit student xor s115 compiled code 0
+2026-11-21 22:21:06 launch student xor s15 allstay
+2026-11-21 22:22:36 cut student rev_xor s117 allstay (after its checkpoint at log row 8)
+2026-11-21 22:24:06 exit baseline xor gru code 0
+2026-11-21 22:26:19 cut student xor s15 allstay (after its checkpoint at log row 2)
+2026-11-21 22:26:29 cut student rev_xor s17 allstay (after its checkpoint at log row 10)
+2026-11-21 22:36:59 orchestrator stop at the limit: {"reverse s15": "students", "reverse s16": "students", "reverse s17": "students", "rev_xor s15": "failed: teacher select 0.414 · 0.100 · 0.056 · 0.431 < 0.95 (restarts exhausted)", "rev_xor s16": "failed: teacher select 0.302 · 0.633 · 0.539 · 0.310 < 0.95 (restarts exhausted)", "rev_xor s17": "students", "xor s15": "students", "xor s16": "students", "xor s17": "students", "baseline reverse abacus": "running", "baseline reverse rope": "running", "baseline reverse looped_rr": "running", "baseline reverse gru": "running", "baseline rev_xor abacus": "done", "baseline rev_xor rope": "done", "baseline rev_xor looped_rr": "done", "baseline rev_xor gru": "done", "baseline xor abacus": "done", "baseline xor rope": "done", "baseline xor looped_rr": "done", "baseline xor gru": "done"}
+2026-11-21 22:37:14 orchestrator start (bundle 1: reverse, rev_xor, xor; workers 4, max_wall 6900, python /tmp/claude-0/-home-user-NEUMANN/87d05f95-27a9-535f-9293-4221906025b2/scratchpad/venv_s1/bin/python)
+2026-11-21 22:37:14 launch student rev_xor s17 allstay (resume)
+2026-11-21 22:37:14 launch student rev_xor s117 allstay (resume)
+2026-11-21 22:37:14 launch student xor s15 allstay (resume)
+2026-11-21 22:37:14 launch student xor s115 allstay
+2026-11-21 23:29:28 exit student rev_xor s17 allstay code 0
+2026-11-21 23:29:28 launch student xor s16 compiled
+2026-11-21 23:35:19 exit student rev_xor s117 allstay code 0
+2026-11-21 23:35:19 launch select rev_xor s17
+2026-11-21 23:35:29 exit select rev_xor s17 code 0
+2026-11-21 23:35:33 launch student xor s116 compiled
+2026-11-21 23:38:33 exit student xor s16 compiled code 0
+2026-11-21 23:38:33 launch student xor s16 allstay
+2026-11-21 23:45:04 exit student xor s116 compiled code 0
+2026-11-21 23:45:04 launch student xor s116 allstay
+2026-11-22 00:00:15 exit student xor s15 allstay code 0
+2026-11-22 00:00:15 launch student xor s17 compiled
+2026-11-22 00:06:16 exit student xor s115 allstay code 0
+2026-11-22 00:06:16 launch select xor s15
+2026-11-22 00:06:26 exit select xor s15 code 0
+2026-11-22 00:06:29 launch student xor s117 compiled
+2026-11-22 00:09:10 exit student xor s17 compiled code 0
+2026-11-22 00:09:10 launch student xor s17 allstay
+2026-11-22 00:15:40 exit student xor s117 compiled code 0
+2026-11-22 00:15:40 launch student xor s117 allstay
+2026-11-22 00:19:11 cut student xor s116 allstay (after its checkpoint at log row 9)
+2026-11-22 00:19:31 cut student xor s16 allstay (after its checkpoint at log row 10)
+2026-11-22 00:20:01 cut student xor s17 allstay (after its checkpoint at log row 4)
+2026-11-22 00:20:41 cut student xor s117 allstay (after its checkpoint at log row 2)
+2026-11-22 00:32:22 orchestrator stop at the limit: {"reverse s15": "students", "reverse s16": "students", "reverse s17": "students", "rev_xor s15": "failed: teacher select 0.414 · 0.100 · 0.056 · 0.431 < 0.95 (restarts exhausted)", "rev_xor s16": "failed: teacher select 0.302 · 0.633 · 0.539 · 0.310 < 0.95 (restarts exhausted)", "rev_xor s17": "selected", "xor s15": "selected", "xor s16": "students", "xor s17": "students", "baseline reverse abacus": "running", "baseline reverse rope": "running", "baseline reverse looped_rr": "running", "baseline reverse gru": "running", "baseline rev_xor abacus": "done", "baseline rev_xor rope": "done", "baseline rev_xor looped_rr": "done", "baseline rev_xor gru": "done", "baseline xor abacus": "done", "baseline xor rope": "done", "baseline xor looped_rr": "done", "baseline xor gru": "done"}
+2026-11-22 00:32:36 orchestrator start (bundle 1: reverse, rev_xor, xor; workers 4, max_wall 6900, python /tmp/claude-0/-home-user-NEUMANN/87d05f95-27a9-535f-9293-4221906025b2/scratchpad/venv_s1/bin/python)
+2026-11-22 00:32:36 launch student xor s16 allstay (resume)
+2026-11-22 00:32:36 launch student xor s116 allstay (resume)
+2026-11-22 00:32:36 launch student xor s17 allstay (resume)
+2026-11-22 00:32:36 launch student xor s117 allstay (resume)
+2026-11-22 01:20:41 exit student xor s16 allstay code 0
+2026-11-22 01:20:41 launch baseline reverse looped_rr
+2026-11-22 01:22:51 exit student xor s116 allstay code 0
+2026-11-22 01:22:51 launch select xor s16
+2026-11-22 01:23:01 exit select xor s16 code 0
+2026-11-22 01:23:05 launch baseline reverse abacus
+2026-11-22 01:30:26 exit baseline reverse abacus code 0
+2026-11-22 01:30:28 launch baseline reverse rope
+2026-11-22 01:36:29 exit baseline reverse rope code 0
+2026-11-22 01:36:31 launch baseline reverse gru
+2026-11-22 01:47:53 exit student xor s17 allstay code 0
+2026-11-22 01:47:53 launch student reverse s15 compiled
+2026-11-22 01:51:13 exit baseline reverse gru code 0
+2026-11-22 01:51:15 launch student reverse s115 compiled
+2026-11-22 01:51:35 exit student reverse s15 compiled code 0
+2026-11-22 01:51:36 launch student reverse s15 allstay
+2026-11-22 01:54:56 exit student xor s117 allstay code 0
+2026-11-22 01:54:56 exit student reverse s115 compiled code 0
+2026-11-22 01:54:56 launch select xor s17
+2026-11-22 01:54:56 launch student reverse s115 allstay
+2026-11-22 01:55:06 exit select xor s17 code 0
+2026-11-22 01:55:10 launch student reverse s16 compiled
+2026-11-22 01:58:50 exit student reverse s16 compiled code 0
+2026-11-22 01:58:51 launch student reverse s116 compiled
+2026-11-22 02:02:31 exit student reverse s116 compiled code 0
+2026-11-22 02:02:31 launch student reverse s16 allstay
+2026-11-22 02:05:52 exit baseline reverse looped_rr code 0
+2026-11-22 02:05:54 launch student reverse s116 allstay
+2026-11-22 02:13:55 cut student reverse s15 allstay (after its checkpoint at log row 14)
+2026-11-22 02:13:55 cut student reverse s116 allstay (after its checkpoint at log row 7)
+2026-11-22 02:14:45 cut student reverse s115 allstay (after its checkpoint at log row 13)
+2026-11-22 02:14:45 cut student reverse s16 allstay (after its checkpoint at log row 9)
+2026-11-22 02:27:36 orchestrator stop at the limit: {"reverse s15": "students", "reverse s16": "students", "reverse s17": "students", "rev_xor s15": "failed: teacher select 0.414 · 0.100 · 0.056 · 0.431 < 0.95 (restarts exhausted)", "rev_xor s16": "failed: teacher select 0.302 · 0.633 · 0.539 · 0.310 < 0.95 (restarts exhausted)", "rev_xor s17": "selected", "xor s15": "selected", "xor s16": "selected", "xor s17": "selected", "baseline reverse abacus": "done", "baseline reverse rope": "done", "baseline reverse looped_rr": "done", "baseline reverse gru": "done", "baseline rev_xor abacus": "done", "baseline rev_xor rope": "done", "baseline rev_xor looped_rr": "done", "baseline rev_xor gru": "done", "baseline xor abacus": "done", "baseline xor rope": "done", "baseline xor looped_rr": "done", "baseline xor gru": "done"}
+2026-11-22 02:27:49 orchestrator start (bundle 1: reverse, rev_xor, xor; workers 4, max_wall 6900, python /tmp/claude-0/-home-user-NEUMANN/87d05f95-27a9-535f-9293-4221906025b2/scratchpad/venv_s1/bin/python)
+2026-11-22 02:27:49 launch student reverse s15 allstay (resume)
+2026-11-22 02:27:49 launch student reverse s115 allstay (resume)
+2026-11-22 02:27:49 launch student reverse s16 allstay (resume)
+2026-11-22 02:27:49 launch student reverse s116 allstay (resume)
+2026-11-22 02:40:31 exit student reverse s15 allstay code 0
+2026-11-22 02:40:31 launch student reverse s17 compiled
+2026-11-22 02:43:12 exit student reverse s115 allstay code 0
+2026-11-22 02:43:12 launch select reverse s15
+2026-11-22 02:43:22 exit select reverse s15 code 0
+2026-11-22 02:43:26 launch student reverse s117 compiled
+2026-11-22 02:44:06 exit student reverse s17 compiled code 0
+2026-11-22 02:44:06 launch student reverse s17 allstay
+2026-11-22 02:46:56 exit student reverse s117 compiled code 0
+2026-11-22 02:46:56 launch student reverse s117 allstay
+2026-11-22 02:50:37 exit student reverse s16 allstay code 0
+2026-11-22 02:54:48 exit student reverse s116 allstay code 0
+2026-11-22 02:54:48 launch select reverse s16
+2026-11-22 02:54:58 exit select reverse s16 code 0
+2026-11-22 03:18:15 exit student reverse s17 allstay code 0
+2026-11-22 03:21:15 exit student reverse s117 allstay code 0
+2026-11-22 03:21:15 launch select reverse s17
+2026-11-22 03:21:25 exit select reverse s17 code 0
+2026-11-22 03:21:29 all done: {"reverse s15": "selected", "reverse s16": "selected", "reverse s17": "selected", "rev_xor s15": "failed: teacher select 0.414 · 0.100 · 0.056 · 0.431 < 0.95 (restarts exhausted)", "rev_xor s16": "failed: teacher select 0.302 · 0.633 · 0.539 · 0.310 < 0.95 (restarts exhausted)", "rev_xor s17": "selected", "xor s15": "selected", "xor s16": "selected", "xor s17": "selected", "baseline reverse abacus": "done", "baseline reverse rope": "done", "baseline reverse looped_rr": "done", "baseline reverse gru": "done", "baseline rev_xor abacus": "done", "baseline rev_xor rope": "done", "baseline rev_xor looped_rr": "done", "baseline rev_xor gru": "done", "baseline xor abacus": "done", "baseline xor rope": "done", "baseline xor looped_rr": "done", "baseline xor gru": "done"}

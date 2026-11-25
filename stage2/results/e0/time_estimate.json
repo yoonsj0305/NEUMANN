@@ -1,0 +1,86 @@
+{
+ "method": "four e0.py runs at once, 1 thread each, Intel Xeon 2.10GHz 4 cores; training FLOP/s and evaluation seconds from the first 400 (10M: 40) steps; evaluation every 1,000 steps in the real runs",
+ "runs": {
+  "abacus_ii_1M": {
+   "train_flops_per_s": 62258543833.580986,
+   "flops_per_step": 10475000000.0,
+   "eval_s_each": 4.1,
+   "steps_to_10x": 170883,
+   "hours_to_10x": 8.18,
+   "hours_10x_to_30x_if_extended": 15.97
+  },
+  "abacus_looped_1M": {
+   "train_flops_per_s": 51628849270.664505,
+   "flops_per_step": 15927500000.0,
+   "eval_s_each": 9.95,
+   "steps_to_10x": 112384,
+   "hours_to_10x": 9.94,
+   "hours_10x_to_30x_if_extended": 19.26
+  },
+  "abacus_looped_10M": {
+   "train_flops_per_s": 87633495145.63106,
+   "flops_per_step": 180525000000.0,
+   "eval_s_each": 63.35,
+   "steps_to_10x": 9916,
+   "hours_to_10x": 5.85,
+   "hours_10x_to_30x_if_extended": 11.35
+  },
+  "position_coupling_1M": {
+   "train_flops_per_s": 74501779359.4306,
+   "flops_per_step": 10467500000.0,
+   "eval_s_each": 3.5,
+   "steps_to_10x": 171005,
+   "hours_to_10x": 6.84,
+   "hours_10x_to_30x_if_extended": 13.35
+  }
+ },
+ "hours_10x_phase_parallel": 9.94,
+ "hours_worst_case_total": 29.2,
+ "cap_hours": 48,
+ "revision_after_secondary_eval": {
+  "change": "abacus_looped also scored with the stage-1 looped recurrence rule (4/6/8 recurrences on the ood bins), recorded only",
+  "eval_s_each_measured": {
+   "abacus_looped_1M": 38.7
+  },
+  "eval_s_each_assumed": {
+   "abacus_looped_10M": 250
+  },
+  "hours_to_10x": {
+   "abacus_looped_1M": 10.83,
+   "abacus_looped_10M": 6.37
+  },
+  "hours_10x_phase_parallel": 10.83,
+  "hours_worst_case_total": 32.51
+ },
+ "revision_after_padded_position_coupling": {
+  "change": "fifth run position_coupling_pad_1M (the paper's zero-padding) alongside the four; 5 processes on 4 cores",
+  "assumed_slowdown_while_5_run": 1.25,
+  "hours_10x_phase_parallel": 13.54,
+  "hours_worst_case_total": 35.22
+ },
+ "revision_measured_at_4h": {
+  "when": "2026-11-19 16:45 UTC, about 4.0 h after the 12:46 launch, from the logs (train + eval wall per run, 5 processes on 4 cores)",
+  "measured_flop_per_s_incl_eval": {
+   "abacus_ii_1M": 48300000000.0,
+   "abacus_looped_1M": 34100000000.0,
+   "abacus_looped_10M": 60100000000.0,
+   "position_coupling_1M": 60400000000.0,
+   "position_coupling_pad_1M": 80500000000.0
+  },
+  "hours_remaining_to_10x_at_current_rate": {
+   "abacus_ii_1M": 6.38,
+   "abacus_looped_1M": 10.82,
+   "abacus_looped_10M": 4.98,
+   "position_coupling_1M": 4.29,
+   "position_coupling_pad_1M": 2.34
+  },
+  "hours_10x_phase_parallel": 14.8,
+  "hours_30x_extension_at_current_rate": {
+   "abacus_ii_1M": 20.6,
+   "abacus_looped_1M": 29.2,
+   "abacus_looped_10M": 16.5
+  },
+  "hours_worst_case_total": 44.0,
+  "note": "worst case = abacus_looped_1M extended, at the contended 5-process rate (it runs alone during the extension, so likely faster); under the 48 h cap"
+ }
+}

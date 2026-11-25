@@ -1,0 +1,425 @@
+{
+ "design": "stage2/DESIGN.md 11.9, 11.10",
+ "runs": {
+  "addition_O": {
+   "final": {
+    "judgment_step": 12000,
+    "steps": 12000,
+    "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+    "acc": {
+     "id_1-10": 0.999,
+     "ood_11-20": 0.078,
+     "ood_21-30": 0.0,
+     "ood_31-40": 0.0
+    },
+    "train_flops": 125876346814464,
+    "wall_s": 2357.5899999999997
+   },
+   "diag": {
+    "in_distribution": {
+     "unchanged": 0.999,
+     "run_judgment_acc": 0.999,
+     "ablation_all_ids_0": 0.0,
+     "ablation_drop": 0.999,
+     "shuffle_query_plus_1_50": 0.998,
+     "shuffle_drop": 0.0010000000000000009
+    },
+    "reading_rule_by_ood_bin": {
+     "ood_11-20": "a",
+     "ood_21-30": "a",
+     "ood_31-40": "a"
+    },
+    "failure_position_ood": {
+     "ood_11-20": {
+      "wrong": 461,
+      "correct": 39,
+      "front": 0.5336225596529284,
+      "middle": 0.21908893709327548,
+      "end": 0.2472885032537961,
+      "eos_target": 0.0
+     },
+     "ood_21-30": {
+      "wrong": 500,
+      "correct": 0,
+      "front": 1.0,
+      "middle": 0.0,
+      "end": 0.0,
+      "eos_target": 0.0
+     },
+     "ood_31-40": {
+      "wrong": 500,
+      "correct": 0,
+      "front": 1.0,
+      "middle": 0.0,
+      "end": 0.0,
+      "eos_target": 0.0
+     }
+    }
+   },
+   "attention_best": {
+    "id_1-10": {
+     "h0": [
+      0.6760272307318259,
+      0.6337924415624673,
+      2,
+      3
+     ],
+     "h1": [
+      0.6740821784585461,
+      0.6256262712441029,
+      3,
+      2
+     ]
+    },
+    "ood_11-20": {
+     "h0": [
+      0.5981095955970328,
+      0.4891081703662879,
+      2,
+      3
+     ],
+     "h1": [
+      0.3881311318497248,
+      0.3131022561135207,
+      3,
+      2
+     ]
+    },
+    "ood_21-30": {
+     "h0": [
+      0.27230931564666866,
+      0.22329990323151672,
+      2,
+      3
+     ],
+     "h1": [
+      0.06941513415737112,
+      0.05691144097300194,
+      3,
+      2
+     ]
+    },
+    "ood_31-40": {
+     "h0": [
+      0.13283427135129228,
+      0.10085917262130076,
+      2,
+      3
+     ],
+     "h1": [
+      0.030599420796677778,
+      0.019030005075762687,
+      3,
+      1
+     ]
+    }
+   }
+  },
+  "addition_D": {
+   "final": {
+    "judgment_step": 11000,
+    "steps": 11000,
+    "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+    "acc": {
+     "id_1-10": 0.997,
+     "ood_11-20": 0.116,
+     "ood_21-30": 0.0,
+     "ood_31-40": 0.0
+    },
+    "train_flops": 115382474244096,
+    "wall_s": 2145.4900000000002
+   },
+   "diag": {
+    "in_distribution": {
+     "unchanged": 0.997,
+     "run_judgment_acc": 0.997,
+     "ablation_all_ids_0": 0.002,
+     "ablation_drop": 0.995,
+     "shuffle_query_plus_1_50": 0.999,
+     "shuffle_drop": -0.0020000000000000018
+    },
+    "reading_rule_by_ood_bin": {
+     "ood_11-20": "a",
+     "ood_21-30": "a",
+     "ood_31-40": "a"
+    },
+    "failure_position_ood": {
+     "ood_11-20": {
+      "wrong": 442,
+      "correct": 58,
+      "front": 0.5271493212669683,
+      "middle": 0.14027149321266968,
+      "end": 0.332579185520362,
+      "eos_target": 0.0
+     },
+     "ood_21-30": {
+      "wrong": 500,
+      "correct": 0,
+      "front": 0.998,
+      "middle": 0.002,
+      "end": 0.0,
+      "eos_target": 0.0
+     },
+     "ood_31-40": {
+      "wrong": 500,
+      "correct": 0,
+      "front": 1.0,
+      "middle": 0.0,
+      "end": 0.0,
+      "eos_target": 0.0
+     }
+    }
+   },
+   "attention_best": {
+    "id_1-10": {
+     "h0": [
+      0.5594456601021153,
+      0.4146908083539968,
+      3,
+      1
+     ],
+     "h1": [
+      0.5437636761487965,
+      0.4500302243191866,
+      3,
+      2
+     ]
+    },
+    "ood_11-20": {
+     "h0": [
+      0.5282364201962192,
+      0.31951611344870756,
+      3,
+      1
+     ],
+     "h1": [
+      0.32459918640823165,
+      0.2602877306261688,
+      3,
+      2
+     ]
+    },
+    "ood_21-30": {
+     "h0": [
+      0.1923424781429002,
+      0.1436275238469253,
+      3,
+      3
+     ],
+     "h1": [
+      0.10521555622550498,
+      0.07635662760191689,
+      2,
+      0
+     ]
+    },
+    "ood_31-40": {
+     "h0": [
+      0.06808371127260805,
+      0.051077402824265504,
+      3,
+      3
+     ],
+     "h1": [
+      0.04453308562373641,
+      0.03733706221241232,
+      2,
+      0
+     ]
+    }
+   }
+  },
+  "copy_O": {
+   "final": {
+    "judgment_step": 4000,
+    "steps": 5000,
+    "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+    "acc": {
+     "id_1-10": 0.998,
+     "ood_11-20": 0.348,
+     "ood_21-30": 0.0,
+     "ood_31-40": 0.0
+    },
+    "train_flops": 34829005946880,
+    "wall_s": 681.54
+   },
+   "diag": {
+    "in_distribution": {
+     "unchanged": 0.998,
+     "run_judgment_acc": 0.998,
+     "ablation_all_ids_0": 0.081,
+     "ablation_drop": 0.917,
+     "shuffle_query_plus_1_50": 0.997,
+     "shuffle_drop": 0.0010000000000000009
+    },
+    "reading_rule_by_ood_bin": {
+     "ood_11-20": "a",
+     "ood_21-30": "a",
+     "ood_31-40": "a"
+    },
+    "failure_position_ood": {
+     "ood_11-20": {
+      "wrong": 326,
+      "correct": 174,
+      "front": 0.2085889570552147,
+      "middle": 0.34355828220858897,
+      "end": 0.44785276073619634,
+      "eos_target": 0.0
+     },
+     "ood_21-30": {
+      "wrong": 500,
+      "correct": 0,
+      "front": 0.826,
+      "middle": 0.162,
+      "end": 0.012,
+      "eos_target": 0.0
+     },
+     "ood_31-40": {
+      "wrong": 500,
+      "correct": 0,
+      "front": 1.0,
+      "middle": 0.0,
+      "end": 0.0,
+      "eos_target": 0.0
+     }
+    }
+   },
+   "attention_best": {
+    "id_1-10": {
+     "h0": [
+      0.8478729963008631,
+      0.7169774627606817,
+      3,
+      1
+     ]
+    },
+    "ood_11-20": {
+     "h0": [
+      0.822680412371134,
+      0.5266351101754501,
+      3,
+      1
+     ]
+    },
+    "ood_21-30": {
+     "h0": [
+      0.5315111813869438,
+      0.25343760124910103,
+      3,
+      1
+     ]
+    },
+    "ood_31-40": {
+     "h0": [
+      0.32086581974810535,
+      0.14736115657524881,
+      3,
+      0
+     ]
+    }
+   }
+  },
+  "copy_D": {
+   "final": {
+    "judgment_step": 7000,
+    "steps": 7000,
+    "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+    "acc": {
+     "id_1-10": 0.996,
+     "ood_11-20": 0.29,
+     "ood_21-30": 0.0,
+     "ood_31-40": 0.0
+    },
+    "train_flops": 48761906528256,
+    "wall_s": 950.49
+   },
+   "diag": {
+    "in_distribution": {
+     "unchanged": 0.996,
+     "run_judgment_acc": 0.996,
+     "ablation_all_ids_0": 0.0,
+     "ablation_drop": 0.996,
+     "shuffle_query_plus_1_50": 0.997,
+     "shuffle_drop": -0.0010000000000000009
+    },
+    "reading_rule_by_ood_bin": {
+     "ood_11-20": "a",
+     "ood_21-30": "a",
+     "ood_31-40": "a"
+    },
+    "failure_position_ood": {
+     "ood_11-20": {
+      "wrong": 355,
+      "correct": 145,
+      "front": 0.08732394366197183,
+      "middle": 0.38591549295774646,
+      "end": 0.5267605633802817,
+      "eos_target": 0.0
+     },
+     "ood_21-30": {
+      "wrong": 500,
+      "correct": 0,
+      "front": 0.784,
+      "middle": 0.206,
+      "end": 0.01,
+      "eos_target": 0.0
+     },
+     "ood_31-40": {
+      "wrong": 500,
+      "correct": 0,
+      "front": 1.0,
+      "middle": 0.0,
+      "end": 0.0,
+      "eos_target": 0.0
+     }
+    }
+   },
+   "attention_best": {
+    "id_1-10": {
+     "h0": [
+      0.840937114673243,
+      0.7449973034182321,
+      3,
+      1
+     ]
+    },
+    "ood_11-20": {
+     "h0": [
+      0.8162522741055185,
+      0.5487060083011196,
+      3,
+      1
+     ]
+    },
+    "ood_21-30": {
+     "h0": [
+      0.5424290339582862,
+      0.23509541627395827,
+      3,
+      1
+     ]
+    },
+    "ood_31-40": {
+     "h0": [
+      0.3391309088926449,
+      0.10132115291283103,
+      3,
+      1
+     ]
+    }
+   }
+  }
+ },
+ "o_arm_reproduces_c0a": {
+  "addition": {
+   "same_acc_and_loss_every_row": true,
+   "rows_c0a": 12,
+   "rows_c0b": 12
+  },
+  "copy": {
+   "same_acc_and_loss_every_row": true,
+   "rows_c0a": 5,
+   "rows_c0b": 5
+  }
+ }
+}

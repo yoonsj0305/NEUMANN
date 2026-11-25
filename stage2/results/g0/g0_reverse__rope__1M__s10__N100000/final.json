@@ -1,0 +1,99 @@
+{
+ "name": "g0_reverse__rope__1M__s10__N100000",
+ "task": "reverse",
+ "kind": "rope",
+ "scale": "1M",
+ "params": 824832,
+ "config": {
+  "d": 128,
+  "heads": 4,
+  "layers": 4
+ },
+ "seed": 10,
+ "N": 100000,
+ "batch": 64,
+ "lr": 0.001,
+ "max_steps": 20000,
+ "steps": 3000,
+ "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+ "spec": {
+  "train": [
+   1,
+   10
+  ],
+  "id": [
+   1,
+   10
+  ],
+  "ood": [
+   [
+    11,
+    20
+   ],
+   [
+    21,
+    30
+   ],
+   [
+    31,
+    40
+   ]
+  ]
+ },
+ "id_size": 1000,
+ "ood_size": 500,
+ "judgment": {
+  "rule": "highest in-distribution accuracy (earliest if tied)",
+  "step": 2000,
+  "acc": {
+   "id_1-10": 1.0,
+   "ood_11-20": 0.0,
+   "ood_21-30": 0.0,
+   "ood_31-40": 0.0
+  },
+  "acc_fixed4": null,
+  "acc_seq": null,
+  "train_flops_cum": 13930953277440,
+  "wall_train_s_cum": 226.3
+ },
+ "last": {
+  "step": 3000,
+  "acc": {
+   "id_1-10": 1.0,
+   "ood_11-20": 0.0,
+   "ood_21-30": 0.0,
+   "ood_31-40": 0.0
+  },
+  "acc_fixed4": null,
+  "acc_seq": null
+ },
+ "final_acc": {
+  "id_1-10": 1.0,
+  "ood_11-20": 0.0,
+  "ood_21-30": 0.0,
+  "ood_31-40": 0.0
+ },
+ "final_acc_fixed4": null,
+ "recur": {},
+ "train_flops": 20897403568128,
+ "eval_flops": 499502364672,
+ "wall_train_s": 333.47,
+ "wall_eval_s": 9.0,
+ "segments": [
+  {
+   "segment": 0,
+   "start_step": 0,
+   "started": "2026-11-20 07:13:18"
+  }
+ ],
+ "hardware": {
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "torch_threads": 1,
+  "torch": "2.15.0+cu132",
+  "cuda": false,
+  "python": "3.12.3"
+ },
+ "commit": "1df1d0e5cbaf329c098be6a021a4a557462d1ed4",
+ "primary_eval_rule": "looped / looped_rr: recurrence 4 x ceil(bin upper / training upper) (declared before runs); fixed 4 recorded as acc_fixed4"
+}

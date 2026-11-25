@@ -1,0 +1,67 @@
+{
+ "prefix_sum": {
+  "table": [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  "readable": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "moving_heads": 1,
+  "controller": "stateless: at '=' output head 0's digit (s_1 = x_1); afterwards (current token s_{k-1} + head 0's digit x_k) mod 10; <eos> when head 0 reads a non-digit ('=')",
+  "registers": "r0 = answer phase (set at '='), r1-r3 as listed per task; registers are only updated in the answer phase",
+  "exact_on_all_bins": true,
+  "correct_table_for_precheck": true
+ }
+}

@@ -1,0 +1,232 @@
+{
+ "task": "mul1",
+ "data_seed": 20,
+ "teacher": {
+  "path": "/home/user/NEUMANN/stage2/results/i0a/i0a_mul1__rope__1M__s20__N100000/teacher_step01000.pt",
+  "untrained_seed": null,
+  "step": 1000,
+  "acc": {
+   "id_1-10": 0.183,
+   "ood_11-20": 0.094,
+   "ood_21-30": 0.03,
+   "ood_31-40": 0.0
+  },
+  "train_flops_to_judgment": 7943050838016
+ },
+ "examples": 2000,
+ "output_steps": 13389,
+ "dependency_kind": "content substitution (design 14)",
+ "extraction": {
+  "flops": 6488258752768,
+  "backward_passes": 0,
+  "manual_forward_max_abs_logit_diff": null,
+  "substitution": {
+   "class_symbols": {
+    "digit": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "+": [
+     "*"
+    ],
+    "=": [
+     "="
+    ],
+    "answer_phase": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ]
+   },
+   "sequences_forwarded": 220835,
+   "substituted_positions": 24315,
+   "all_zero_rows": 0
+  }
+ },
+ "dependency_mass_on_current_position": 0.13590962325381137,
+ "attention_mass_on_current_position": 0.06927495580134581,
+ "precheck": {
+  "correct_table": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "dependency": {
+   "correct": 0.5093357379461191,
+   "correct_per_head": [
+    0.17161748665007587,
+    0.26450844227741527,
+    0.07320980901862796
+   ],
+   "all_stay": 0.13851735358956335,
+   "ratio": 3.6770536308058315
+  },
+  "attention_aux": {
+   "correct": 0.28070014519258035,
+   "all_stay": 0.10135529927252879,
+   "ratio": 2.7694668873486417
+  },
+  "criterion": "score(correct) >= 2 x score(all stay) on the dependency (13.2)",
+  "passed": true,
+  "gate_applied": false
+ },
+ "policy": [
+  [
+   0,
+   3,
+   1,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   3,
+   2,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   3,
+   3,
+   0,
+   0,
+   1,
+   0
+  ]
+ ],
+ "policy_named": {
+  "head0": {
+   "digit": "stay",
+   "+": "next_sep",
+   "=": "right",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "stay",
+   "other": "stay"
+  },
+  "head1": {
+   "digit": "stay",
+   "+": "next_sep",
+   "=": "left",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "stay",
+   "other": "stay"
+  },
+  "head2": {
+   "digit": "stay",
+   "+": "next_sep",
+   "=": "next_sep",
+   "|": "stay",
+   "node": "stay",
+   "answer_phase": "right",
+   "other": "stay"
+  }
+ },
+ "per_head": [
+  {
+   "column": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "score_after_cover": 0.2916417328432087,
+   "columns_tied_at_best": 3024
+  },
+  {
+   "column": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "left",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "score_after_cover": 0.14989837538473727,
+   "columns_tied_at_best": 2592
+  },
+  {
+   "column": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "next_sep",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "score_after_cover": 0.13590962325381137,
+   "columns_tied_at_best": 3024
+  }
+ ],
+ "table_score_dependency": 0.5774497314817574,
+ "table_score_attention_aux": 0.22302139108477897,
+ "search": {
+  "columns": 279936,
+  "present_classes": [
+   "digit",
+   "+",
+   "=",
+   "answer_phase"
+  ],
+  "distinct_paths_simulated": 1296,
+  "head_moves_simulated": 36696240,
+  "score_lookups": 52056432,
+  "head_simulation_operations": 88752672
+ },
+ "reference_agreement_with_correct_table": {
+  "correct_head0_position_read_by_some_compiled_head": 0.2390768541339906,
+  "correct_head1_position_read_by_some_compiled_head": 1.0,
+  "correct_head2_position_read_by_some_compiled_head": 0.03861378743744865
+ },
+ "wall_s": 139.5
+}

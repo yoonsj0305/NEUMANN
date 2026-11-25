@@ -1,0 +1,68 @@
+{
+ "task": "addition",
+ "teacher": {
+  "path": "/tmp/claude-0/-home-user-NEUMANN/87d05f95-27a9-535f-9293-4221906025b2/scratchpad/rope_init_seed0.pt",
+  "step": 0,
+  "acc": {},
+  "train_flops_to_judgment": 0
+ },
+ "examples": 2000,
+ "output_steps": 16412,
+ "extraction": {
+  "flops": 1842357043200,
+  "backward_passes": 112,
+  "manual_forward_max_abs_logit_diff": 1.3113021850585938e-06
+ },
+ "dependency_mass_on_current_position": 0.5889093894549523,
+ "attention_mass_on_current_position": 0.06416288400198261,
+ "precheck": {
+  "correct_table": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "dependency": {
+   "correct": 0.08577273317720485,
+   "correct_per_head": [
+    0.029137888221492273,
+    0.02565709886610153,
+    0.030977746089611045
+   ],
+   "all_stay": 0.03680373209651084,
+   "ratio": 2.33054443914226
+  },
+  "attention_aux": {
+   "correct": 0.1766406847751928,
+   "all_stay": 0.06257276576729194,
+   "ratio": 2.8229643137738125
+  },
+  "criterion": "score(correct) >= 2 x score(all stay) on the dependency (13.2)",
+  "passed": true
+ },
+ "stopped": "pre-check only (reference run)",
+ "wall_s": 7.1
+}

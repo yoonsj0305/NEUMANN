@@ -1,0 +1,94 @@
+{
+ "design": "stage2/DESIGN.md 7.4-7.6 (G-0a); 7.10 (prefix_sum, G-0 step 1)",
+ "tasks": [
+  "prefix_sum"
+ ],
+ "g0a_candidates": [
+  "copy",
+  "reverse",
+  "xor",
+  "subtraction",
+  "mul1"
+ ],
+ "g0_suite": [
+  "copy",
+  "reverse",
+  "xor",
+  "mul1",
+  "prefix_sum"
+ ],
+ "reference_only": [
+  "subtraction_pad"
+ ],
+ "spec": {
+  "prefix_sum": {
+   "train": [
+    1,
+    10
+   ],
+   "id": [
+    1,
+    10
+   ],
+   "ood": [
+    [
+     11,
+     20
+    ],
+    [
+     21,
+     30
+    ],
+    [
+     31,
+     40
+    ]
+   ]
+  }
+ },
+ "vocab_added": [
+  "-",
+  "*",
+  "^"
+ ],
+ "vocab_size": 123,
+ "token_kinds": "digits and bits = digit; infix operators + - * ^ = '+' kind; '=', '|', answer phase (strictly after the first '=' or '|'), others as stage 1 (stage1/pf.py token_classes)",
+ "pf_separators": [
+  "+",
+  "=",
+  "|",
+  "-",
+  "*",
+  "^"
+ ],
+ "pf_cfg": {
+  "R": 4,
+  "K": 16,
+  "H": 3,
+  "hidden": 256,
+  "emb": 64
+ },
+ "class_names": [
+  "digit",
+  "+",
+  "=",
+  "|",
+  "node",
+  "answer_phase",
+  "other"
+ ],
+ "moves": [
+  "stay",
+  "right",
+  "left",
+  "next_sep",
+  "start",
+  "content"
+ ],
+ "sets": {
+  "eval": "g_tasks.eval_sets(task, 1000, 500)",
+  "select": "g_tasks.selection_set(task, 1000)",
+  "train": "g_tasks.train_set(task, 2000, seed) for seeds [9, 10, 11]"
+ },
+ "criterion": "representable iff the hand table + hand controller scores 1.000 (stage-1 teacher-forced sequence exact match) on the in-distribution bin and every out-of-distribution bin"
+}

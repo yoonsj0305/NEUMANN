@@ -1,0 +1,96 @@
+{
+ "run": "abacus_looped_10M",
+ "params": 10023360,
+ "steps": 30167,
+ "train_flops": 5370095032401920,
+ "budget": 5370000000000000.0,
+ "reached": null,
+ "stopped": "budget",
+ "multiple_of_C3": null,
+ "best_ood_11_20": 0.332,
+ "best_ood_21_30": 0.004,
+ "best_scaled_ood_11_20": 0.354,
+ "best_scaled_ood_21_30": 0.002,
+ "last": {
+  "step": 30167,
+  "train_flops_cum": 5370095032401920,
+  "train_loss_mean": 0.00313,
+  "lr": 5e-05,
+  "acc": {
+   "id_1-10": 0.992,
+   "ood_11-20": 0.206,
+   "ood_21-30": 0.0,
+   "ood_31-40": 0.0
+  },
+  "wall_train_s_cum": 35183.1,
+  "wall_eval_s_cum": 4242.7,
+  "segment": 5,
+  "acc_scaled": {
+   "ood_11-20": 0.226,
+   "ood_21-30": 0.0,
+   "ood_31-40": 0.0
+  },
+  "recur_scaled": {
+   "ood_11-20": 4,
+   "ood_21-30": 6,
+   "ood_31-40": 8
+  }
+ },
+ "wall_train_s": 35183.1,
+ "wall_eval_s": 4242.7,
+ "segments": [
+  {
+   "segment": 0,
+   "start_step": 0,
+   "started": "2026-11-19 12:51:43",
+   "budget": 1790000000000000.0,
+   "max_wall_s": 6900.0,
+   "threads": 1
+  },
+  {
+   "segment": 1,
+   "start_step": 2311,
+   "started": "2026-11-19 14:46:58",
+   "budget": 1790000000000000.0,
+   "max_wall_s": 6900.0,
+   "threads": 1,
+   "reach_rule": "5.2: either test rule, both bins under the same rule"
+  },
+  {
+   "segment": 2,
+   "start_step": 4754,
+   "started": "2026-11-19 16:42:11",
+   "budget": 1790000000000000.0,
+   "max_wall_s": 6900.0,
+   "threads": 1,
+   "reach_rule": "5.2: either test rule, both bins under the same rule"
+  },
+  {
+   "segment": 3,
+   "start_step": 7250,
+   "started": "2026-11-19 18:37:24",
+   "budget": 1790000000000000.0,
+   "max_wall_s": 6900.0,
+   "threads": 1,
+   "reach_rule": "5.2: either test rule, both bins under the same rule"
+  },
+  {
+   "segment": 4,
+   "start_step": 10077,
+   "started": "2026-11-20 00:41:01",
+   "budget": 5370000000000000.0,
+   "max_wall_s": 6900.0,
+   "threads": 4,
+   "reach_rule": "5.2: either test rule, both bins under the same rule"
+  },
+  {
+   "segment": 5,
+   "start_step": 21401,
+   "started": "2026-11-20 02:36:18",
+   "budget": 5370000000000000.0,
+   "max_wall_s": 6900.0,
+   "threads": 4,
+   "reach_rule": "5.2: either test rule, both bins under the same rule"
+  }
+ ]
+}

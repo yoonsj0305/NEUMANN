@@ -1,0 +1,16 @@
+{
+ "s_per_step_smoke_1000_steps": {
+  "C_addition": 0.21,
+  "C_reverse": 0.159,
+  "M_addition": 0.143,
+  "M_copy": 0.096
+ },
+ "worst_per_run_h": {
+  "C": 1.1666666666666667,
+  "M": 0.7944444444444443
+ },
+ "cpu_hours_worst_10_runs": 9.805555555555555,
+ "wall_hours_worst_4_workers_plus_longest": 3.6180555555555554,
+ "limit_hours": 48,
+ "note": "worst case: every run 20,000 steps; s/step (train + eval) from 1,000-step smoke runs (4 at a time); C uses the largest (addition) for all tasks"
+}

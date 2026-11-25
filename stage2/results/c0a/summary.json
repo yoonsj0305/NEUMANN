@@ -1,0 +1,122 @@
+{
+ "design": "stage2/DESIGN.md 11.4 (pass: >= 4 of 5 tasks with OOD bins 1 and 2 >= 0.90)",
+ "tasks": [
+  {
+   "task": "addition",
+   "judgment_step": 12000,
+   "acc": {
+    "id_1-10": 0.999,
+    "ood_11-20": 0.078,
+    "ood_21-30": 0.0,
+    "ood_31-40": 0.0
+   },
+   "last_acc": {
+    "id_1-10": 0.999,
+    "ood_11-20": 0.078,
+    "ood_21-30": 0.0,
+    "ood_31-40": 0.0
+   },
+   "steps": 12000,
+   "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+   "judgment_flops": 125876346814464,
+   "train_flops": 125876346814464,
+   "wall_train_s": 2022.49,
+   "wall_eval_s": 53.44,
+   "ood_first_two_ge_0.90": false
+  },
+  {
+   "task": "copy",
+   "judgment_step": 4000,
+   "acc": {
+    "id_1-10": 0.998,
+    "ood_11-20": 0.348,
+    "ood_21-30": 0.0,
+    "ood_31-40": 0.0
+   },
+   "last_acc": {
+    "id_1-10": 0.993,
+    "ood_11-20": 0.31,
+    "ood_21-30": 0.0,
+    "ood_31-40": 0.0
+   },
+   "steps": 5000,
+   "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+   "judgment_flops": 27862555656192,
+   "train_flops": 34829005946880,
+   "wall_train_s": 577.07,
+   "wall_eval_s": 15.3,
+   "ood_first_two_ge_0.90": false
+  },
+  {
+   "task": "mul1",
+   "judgment_step": 10000,
+   "acc": {
+    "id_1-10": 0.999,
+    "ood_11-20": 0.144,
+    "ood_21-30": 0.0,
+    "ood_31-40": 0.0
+   },
+   "last_acc": {
+    "id_1-10": 0.999,
+    "ood_11-20": 0.144,
+    "ood_21-30": 0.0,
+    "ood_31-40": 0.0
+   },
+   "steps": 10000,
+   "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+   "judgment_flops": 79428215685120,
+   "train_flops": 79428215685120,
+   "wall_train_s": 1288.81,
+   "wall_eval_s": 34.2,
+   "ood_first_two_ge_0.90": false
+  },
+  {
+   "task": "prefix_sum",
+   "judgment_step": 9000,
+   "acc": {
+    "id_1-10": 1.0,
+    "ood_11-20": 0.168,
+    "ood_21-30": 0.0,
+    "ood_31-40": 0.0
+   },
+   "last_acc": {
+    "id_1-10": 1.0,
+    "ood_11-20": 0.168,
+    "ood_21-30": 0.0,
+    "ood_31-40": 0.0
+   },
+   "steps": 9000,
+   "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+   "judgment_flops": 62697403514880,
+   "train_flops": 62697403514880,
+   "wall_train_s": 1029.57,
+   "wall_eval_s": 27.63,
+   "ood_first_two_ge_0.90": false
+  },
+  {
+   "task": "reverse",
+   "judgment_step": 2000,
+   "acc": {
+    "id_1-10": 0.995,
+    "ood_11-20": 0.27,
+    "ood_21-30": 0.0,
+    "ood_31-40": 0.0
+   },
+   "last_acc": {
+    "id_1-10": 0.99,
+    "ood_11-20": 0.204,
+    "ood_21-30": 0.0,
+    "ood_31-40": 0.0
+   },
+   "steps": 3000,
+   "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+   "judgment_flops": 14585317294080,
+   "train_flops": 21878626713600,
+   "wall_train_s": 364.92,
+   "wall_eval_s": 9.12,
+   "ood_first_two_ge_0.90": false
+  }
+ ],
+ "tasks_meeting": 0,
+ "pass": false
+}

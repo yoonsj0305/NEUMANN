@@ -1,0 +1,91 @@
+{
+ "task": "parity",
+ "seed": 8,
+ "selection_set": {
+  "generation_seed": "select:parity",
+  "size": 1000,
+  "lengths": [
+   1,
+   16
+  ],
+  "draw": "training distribution"
+ },
+ "rule": "higher selection accuracy; if |difference| <= 0.005, fewer moving heads (all stay = 0)",
+ "students": {
+  "compiled": {
+   "run": "stage1/results/c4/c4_parity__pf_search__1M__s8__N100000__compiled",
+   "judgment_step": 14000,
+   "selection_accuracy": 0.755,
+   "moving_heads": 3,
+   "policy": [
+    [
+     0,
+     0,
+     3,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     5,
+     0,
+     2,
+     0,
+     0,
+     4,
+     0
+    ],
+    [
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "selection_eval_flops": 5857368648
+  },
+  "allstay": {
+   "run": "stage1/results/c4/c4_parity__pf_search__1M__s8__N100000__allstay",
+   "judgment_step": 3000,
+   "selection_accuracy": 0.627,
+   "moving_heads": 0,
+   "policy": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "selection_eval_flops": 5857368648
+  }
+ },
+ "difference_compiled_minus_allstay": 0.128,
+ "selected": "compiled",
+ "reason": "higher selection accuracy"
+}

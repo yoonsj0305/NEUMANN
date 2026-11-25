@@ -1,0 +1,130 @@
+{
+ "name": "c3_3_addition__pf_search__1M__s5__N100000",
+ "task": "addition",
+ "kind": "pf_search",
+ "scale": "1M",
+ "params": 245944,
+ "config": {
+  "R": 4,
+  "K": 16,
+  "H": 3,
+  "hidden": 256,
+  "emb": 64,
+  "policy": [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    3,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    3,
+    3,
+    0,
+    0,
+    1,
+    0
+   ]
+  ]
+ },
+ "seed": 5,
+ "N": 100000,
+ "batch": 64,
+ "lr": 0.001,
+ "max_steps": 20000,
+ "steps": 9000,
+ "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+ "spec": {
+  "train": [
+   1,
+   10
+  ],
+  "id": [
+   1,
+   10
+  ],
+  "ood": [
+   [
+    11,
+    20
+   ],
+   [
+    21,
+    30
+   ],
+   [
+    31,
+    40
+   ]
+  ]
+ },
+ "id_size": 1000,
+ "ood_size": 500,
+ "judgment": {
+  "rule": "highest in-distribution accuracy (earliest if tied)",
+  "step": 9000,
+  "acc": {
+   "id_1-10": 0.999,
+   "ood_11-20": 0.998,
+   "ood_21-30": 0.996,
+   "ood_31-40": 0.99
+  },
+  "acc_fixed4": null,
+  "acc_seq": null,
+  "train_flops_cum": 27077810053312,
+  "wall_train_s_cum": 1763.84
+ },
+ "last": {
+  "step": 9000,
+  "acc": {
+   "id_1-10": 0.999,
+   "ood_11-20": 0.998,
+   "ood_21-30": 0.996,
+   "ood_31-40": 0.99
+  },
+  "acc_fixed4": null,
+  "acc_seq": null
+ },
+ "final_acc": {
+  "id_1-10": 0.999,
+  "ood_11-20": 0.998,
+  "ood_21-30": 0.996,
+  "ood_31-40": 0.99
+ },
+ "final_acc_fixed4": null,
+ "recur": {},
+ "train_flops": 27077810053312,
+ "eval_flops": 574578052200,
+ "wall_train_s": 1763.84,
+ "wall_eval_s": 25.84,
+ "segments": [
+  {
+   "segment": 0,
+   "start_step": 0,
+   "started": "2026-11-18 09:56:38"
+  }
+ ],
+ "hardware": {
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "torch_threads": 1,
+  "torch": "2.15.0+cu132",
+  "cuda": false,
+  "python": "3.12.3"
+ },
+ "commit": "6d3b8898c029e0598d6591b9a35af0f7afc296b0",
+ "primary_eval_rule": "looped / looped_rr: recurrence 4 x ceil(bin upper / training upper) (declared before runs); fixed 4 recorded as acc_fixed4"
+}

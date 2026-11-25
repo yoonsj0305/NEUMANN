@@ -1,0 +1,73 @@
+{
+ "task": "parity",
+ "teacher": {
+  "path": "stage1/results/c3/c3_parity__rope__1M__s0__N100000/teacher_best.pt",
+  "step": 4000,
+  "acc": {
+   "id_1-16": 0.995,
+   "ood_17-32": 0.572,
+   "ood_33-48": 0.488,
+   "ood_49-64": 0.462
+  },
+  "train_flops_to_judgment": 23943120420864
+ },
+ "examples": 2000,
+ "output_steps": 4000,
+ "extraction": {
+  "flops": 319869747200,
+  "backward_passes": 35,
+  "manual_forward_max_abs_logit_diff": 4.9591064453125e-05
+ },
+ "dependency_mass_on_current_position": 0.4152738272907402,
+ "attention_mass_on_current_position": 0.20507469196151942,
+ "precheck": {
+  "correct_table": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "stay",
+    "other": "stay"
+   }
+  },
+  "dependency": {
+   "correct": 0.09776078646174861,
+   "correct_per_head": [
+    0.09776078646174861,
+    0.0,
+    0.0
+   ],
+   "all_stay": 0.09776078646174861,
+   "ratio": 1.0
+  },
+  "attention_aux": {
+   "correct": 0.1233006272475468,
+   "all_stay": 0.1233006272475468,
+   "ratio": 1.0
+  },
+  "criterion": "score(correct) >= 2 x score(all stay) on the dependency (13.2)",
+  "passed": false
+ },
+ "stopped": "pre-check not passed: no compile (13.2)",
+ "wall_s": 4.9
+}
