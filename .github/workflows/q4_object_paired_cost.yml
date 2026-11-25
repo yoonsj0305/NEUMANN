@@ -1,0 +1,75 @@
+name: Q4 Same-Original Inverse versus Forward Object Cost
+
+on:
+  pull_request:
+    paths:
+      - "neumann1/scene_graph_inventor.py"
+      - "research/q3/q3_object_inverse_paired_cost.py"
+      - ".github/workflows/q4_object_paired_cost.yml"
+  workflow_dispatch:
+
+jobs:
+  matched-source-algorithm-cost:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Restore two TRUE historical forward solvers by immutable SHA
+        run: |
+          git fetch -q --depth 1 origin c0569e915de56128f87d40df05c6c6b68552c747
+          git fetch -q --depth 1 origin de59b6bcec4a37f0acbfdc0c2fd55f54f811b676
+          git show c0569e915de56128f87d40df05c6c6b68552c747:neumann1/scene_graph_inventor.py > neumann1/_q3_forward_raw.py
+          git show de59b6bcec4a37f0acbfdc0c2fd55f54f811b676:neumann1/scene_graph_inventor.py > neumann1/_q3_forward_pruned.py
+          grep -q 'for mode in RENDERS' neumann1/_q3_forward_raw.py
+          grep -q 'Shape-first pruning' neumann1/_q3_forward_pruned.py
+          test -s neumann1/_q3_forward_raw.py
+          test -s neumann1/_q3_forward_pruned.py
+      - name: Fetch fixed independently-authored training source originals
+        run: |
+          mkdir -p /tmp/q4-object-source
+          git -C /tmp/q4-object-source init -q
+          git -C /tmp/q4-object-source remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/q4-object-source fetch -q --depth 1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/q4-object-source checkout -q FETCH_HEAD
+          test "$(git -C /tmp/q4-object-source rev-parse HEAD)" = f3283f727488ad98fe575ea6a5ac981e4a188e49
+      - name: Matched same-run old/new source search with no original test labels
+        run: |
+          python -m pip install -e .
+          for cohort in first second third; do
+            python research/q3/q3_object_inverse_paired_cost.py \
+              --upstream /tmp/q4-object-source \
+              --cohort "$cohort" \
+              --n 128 \
+              --max-source-ms 350 \
+              --output "q3_object_inverse_matched_${cohort}_cost.json"
+          done
+          python - <<'PY'
+          import json
+          for cohort in ('first','second','third'):
+              d=json.load(open(f'q3_object_inverse_matched_{cohort}_cost.json'))
+              s=d['summary']
+              assert s['cohort']==cohort
+              assert s['retained_source_cases']==128
+              assert s['source_checked']+s['skipped']==128
+              assert not s['external_target_gold_used']
+              assert not s['global_q4_pass']
+              print(cohort,'RAW / INV',s['raw_to_inverse_paired_speedup'],
+                    'PRUNED / INV',s['shape_pruned_to_inverse_paired_speedup'],
+                    'SOURCE FITS',s['raw_forward_source_fits'],
+                    s['shape_pruned_source_fits'],s['inverse_source_fits'])
+          print('PAIRED SOURCE DSL OPTIMIZATION; NOT STRONGEST CLASSICAL/FULL Q4')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q4-matched-forward-inverse-128-source-cost
+          path: q3_object_inverse_matched_*_cost.json
+          if-no-files-found: error

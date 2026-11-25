@@ -1,0 +1,70 @@
+{
+  "schema": "NEUMANN.Q3.representation-operator-invention.synthetic-FIRST.v1",
+  "results": [
+    {
+      "case": "cyclic_prime_31",
+      "universe": 31,
+      "source": 62,
+      "selected_generators": 1,
+      "representation_max_word_length": 30,
+      "heldout": 899,
+      "heldout_exact": 899,
+      "discovery_ms": 0.1149,
+      "heldout_invention_execute_ms": 0.9085,
+      "growth_in_executable_coverage": 15.5
+    },
+    {
+      "case": "noncommutative_S3",
+      "universe": 6,
+      "source": 18,
+      "selected_generators": 2,
+      "representation_max_word_length": 2,
+      "heldout": 18,
+      "heldout_exact": 18,
+      "discovery_ms": 0.0501,
+      "heldout_invention_execute_ms": 0.0136,
+      "growth_in_executable_coverage": 2
+    },
+    {
+      "case": "noninvertible_function_monoid",
+      "universe": 6,
+      "source": 18,
+      "selected_generators": 2,
+      "representation_max_word_length": 3,
+      "heldout": 18,
+      "heldout_exact": 18,
+      "discovery_ms": 0.039,
+      "heldout_invention_execute_ms": 0.0186,
+      "growth_in_executable_coverage": 2
+    },
+    {
+      "case": "union_semilattice_16",
+      "universe": 16,
+      "source": 80,
+      "selected_generators": 4,
+      "representation_max_word_length": 4,
+      "heldout": 176,
+      "heldout_exact": 176,
+      "discovery_ms": 0.0939,
+      "heldout_invention_execute_ms": 0.0401,
+      "growth_in_executable_coverage": 3.2
+    }
+  ],
+  "randomized_unseen_encodings": {
+    "cases": 100,
+    "heldout": 7775,
+    "heldout_exact": 7775,
+    "label_disjoint": true
+  },
+  "adversarial": {
+    "conflicting_source_rejected": true,
+    "nonassociative_holdout_counterexample_exists": true,
+    "global_semantics_not_identifiable_from_source": true
+  },
+  "totals": {
+    "source": 178,
+    "heldout": 1111,
+    "heldout_exact": 1111
+  },
+  "caveat": "Measured with locally executed original benchmark; later GitHub script version may differ in non-semantic output fields. Synthetic finite monoid conditional guarantee, not general Q3 or Q4."
+}

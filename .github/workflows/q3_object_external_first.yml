@@ -1,0 +1,75 @@
+name: Q3 Independent ARC2 Object Grammar Blind First 128
+
+on:
+  pull_request:
+    paths:
+      - "neumann1/scene_graph_inventor.py"
+      - "neumann1/composed_grid_inventor.py"
+      - "research/q3/q3_arc2_object_blind_first.py"
+      - "research/q3/arc2_previous_96_exclusions.json"
+      - ".github/workflows/q3_object_external_first.yml"
+  workflow_dispatch:
+
+jobs:
+  source-blind-object-evaluation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Check independent author revision
+        run: |
+          mkdir -p /tmp/neumann-arc2-objects
+          git -C /tmp/neumann-arc2-objects init -q
+          git -C /tmp/neumann-arc2-objects remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/neumann-arc2-objects fetch -q --depth 1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/neumann-arc2-objects checkout -q FETCH_HEAD
+          test "$(git -C /tmp/neumann-arc2-objects rev-parse HEAD)" = f3283f727488ad98fe575ea6a5ac981e4a188e49
+      - name: Install solver
+        run: python -m pip install -e .
+      - name: Freeze 128 task IDs, exclude previously known 96 and remove all target gold
+        run: |
+          python research/q3/q3_arc2_object_blind_first.py prepare \
+            --upstream /tmp/neumann-arc2-objects \
+            --blind /tmp/neumann-arc2-objects-blind \
+            --n 128
+      - name: Predict without seeing original test outputs
+        run: |
+          python research/q3/q3_arc2_object_blind_first.py propose \
+            --blind /tmp/neumann-arc2-objects-blind \
+            --output q3_object_new128_frozen_predictions.json \
+            --rel-ms 120 \
+            --obj-ms 350
+          sha256sum q3_object_new128_frozen_predictions.json > q3_object_new128.sha256
+          cat q3_object_new128.sha256
+      - name: Score frozen proposals without modifying any predictions
+        run: |
+          freeze_sha="$(cut -d' ' -f1 q3_object_new128.sha256)"
+          python research/q3/q3_arc2_object_blind_first.py score \
+            --upstream /tmp/neumann-arc2-objects \
+            --predictions q3_object_new128_frozen_predictions.json \
+            --expected-sha "$freeze_sha" \
+            --output q3_object_new128_score.json
+          python - <<'PY'
+          import json
+          a=json.load(open('q3_object_new128_score.json'))['summary']
+          assert a['selected_new_external_ids']==128
+          assert a['scored']+a['skipped']==128
+          assert not a['official_arcagi2_evaluation']
+          assert not a['full_q3_q4_q6_pass']
+          print('COMPARATOR OUTCOMES ARE EVIDENCE, NOT UNIVERSAL PASS CLAIMS')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-disjoint128-object-first-gold-blind
+          path: |
+            q3_object_new128_frozen_predictions.json
+            q3_object_new128.sha256
+            q3_object_new128_score.json
+          if-no-files-found: error

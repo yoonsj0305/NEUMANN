@@ -1,0 +1,74 @@
+name: Q3 Fifth Disjoint ARC2 Bulk Object Grammar Blind Original
+
+on:
+  pull_request:
+    paths:
+      - "neumann1/parallel_object_edit_inventor.py"
+      - "research/q3/q3_arc2_parallel_bulk_fifth.py"
+      - "research/q3/arc2_pairwise_fourth128_exclusions.json"
+      - ".github/workflows/q3_bulk_external_fifth.yml"
+  workflow_dispatch:
+
+jobs:
+  external-bulk-original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify fixed independent author repository revision
+        run: |
+          mkdir -p /tmp/arc2-fifth-author
+          git -C /tmp/arc2-fifth-author init -q
+          git -C /tmp/arc2-fifth-author remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/arc2-fifth-author fetch -q --depth 1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/arc2-fifth-author checkout -q FETCH_HEAD
+          test "$(git -C /tmp/arc2-fifth-author rev-parse HEAD)" = f3283f727488ad98fe575ea6a5ac981e4a188e49
+      - name: Install object program inventor
+        run: python -m pip install -e .
+      - name: Reserve fresh fifth 128 original task IDs and strip target outputs
+        run: |
+          python research/q3/q3_arc2_parallel_bulk_fifth.py prepare \
+            --upstream /tmp/arc2-fifth-author \
+            --blind /tmp/arc2-fifth-blind \
+            --n 128
+      - name: SOURCE-only propose with output SHA freeze before any target gold
+        run: |
+          python research/q3/q3_arc2_parallel_bulk_fifth.py propose \
+            --blind /tmp/arc2-fifth-blind \
+            --output q3_fifth_bulk_frozen.json \
+            --bulk-ms 350
+          sha256sum q3_fifth_bulk_frozen.json > q3_fifth_bulk.sha256
+      - name: Score original training task test answers only after frozen proposals
+        run: |
+          frozen_sha="$(cut -d' ' -f1 q3_fifth_bulk.sha256)"
+          python research/q3/q3_arc2_parallel_bulk_fifth.py score \
+            --upstream /tmp/arc2-fifth-author \
+            --predictions q3_fifth_bulk_frozen.json \
+            --expected-sha "$frozen_sha" \
+            --output q3_fifth_bulk_score.json
+          python - <<'PY'
+          import json
+          d=json.load(open('q3_fifth_bulk_score.json'))
+          s=d['summary']
+          assert s['selected']==128
+          assert s['evaluated']+s['skipped']==128
+          assert s['frozen_prediction_sha256']
+          assert s['official_evaluation'] is False
+          assert s['global_q3_pass'] is False
+          print('FIFTH EXTERNAL AUTHOR SOURCE: NO GLOBAL PASS CLAIM')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-fifth-disjoint-original-bulk-program-frozen
+          path: |
+            q3_fifth_bulk_frozen.json
+            q3_fifth_bulk.sha256
+            q3_fifth_bulk_score.json
+          if-no-files-found: error

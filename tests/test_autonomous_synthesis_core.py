@@ -1,6 +1,8 @@
 """NEUMANN live auto-synthesis: exercise normal production engine interfaces.
 
-The classical callback is a DEGRADATION path, never a hidden reference oracle.
+The original-verified classical solver is FIRST by default, never a hidden
+reference oracle. Invented methods are considered on actual classical gaps or
+measured positive source-only utility.
 Every result must pass the caller's original obligation before promotion.
 These checks distinguish behavior from benchmarking/general-intelligence claims.
 """
@@ -68,7 +70,7 @@ def test_engine_automatically_bootstraps_two_sources_and_invents_next_method():
     classical_calls=[]
     def cold(n,params):
         classical_calls.append(n)
-        return max_program(n)
+        return max_program(n) if n <= 3 else None
     first=eng.synthesize_program("general.maximum",2,
         verify=lambda tree:proves(tree,2,"max"),classical=cold)
     second=eng.synthesize_program("general.maximum",3,
@@ -78,13 +80,13 @@ def test_engine_automatically_bootstraps_two_sources_and_invents_next_method():
     assert second["new_method_ids"]  # Source 2 and 3 induced a new program generator.
     assert classical_calls==[2,3]
 
-    # First target solved using the newly invented generator, not classical.
+    # Classical is tried FIRST; its explicit gap enables a new method.
     learned=eng.synthesize_program("general.maximum",4,
         verify=lambda tree:proves(tree,4,"max"),classical=cold)
     assert learned and learned["origin"]=="self_invented_method"
-    assert learned["classical_invocations"]==0
+    assert learned["classical_invocations"]==1
     assert learned["method_queries"]>=1
-    assert classical_calls==[2,3]
+    assert classical_calls==[2,3,4]
     assert learned["new_method_ids"]  # Self-generated solution learns new method.
 
     # Checkpoint the entire LEARNED METHOD LANGUAGE, then continue learning
@@ -95,7 +97,7 @@ def test_engine_automatically_bootstraps_two_sources_and_invents_next_method():
     result=reg.synthesize_program("general.maximum",5,
         verify=lambda tree:proves(tree,5,"max"),classical=cold)
     assert result and result["origin"]=="self_invented_method"
-    assert classical_calls==[2,3]
+    assert classical_calls==[2,3,4,5]
 
 
 def test_autonomous_new_family_first_hit_and_changed_threshold():
@@ -103,7 +105,7 @@ def test_autonomous_new_family_first_hit_and_changed_threshold():
     called=[]
     def cold(n,params):
         called.append((n,params))
-        return scan_program(n,params[0])
+        return scan_program(n,params[0]) if n <= 3 else None
     engine.synthesize_program("automatic.first_hit",2,params=(5,),
         verify=lambda t:proves(t,2,"scan",5),classical=cold)
     source=engine.synthesize_program("automatic.first_hit",3,params=(5,),
@@ -112,8 +114,9 @@ def test_autonomous_new_family_first_hit_and_changed_threshold():
     fresh=engine.synthesize_program("automatic.first_hit",4,params=(15,),
         verify=lambda t:proves(t,4,"scan",15),classical=cold)
     assert fresh and fresh["origin"]=="self_invented_method"
-    assert fresh["classical_invocations"]==0
-    assert called==[(2,(5,)),(3,(5,))]
+    assert fresh["classical_invocations"]==1
+    assert fresh["method_queries"]>=1
+    assert called==[(2,(5,)),(3,(5,)),(4,(15,))]
 
 
 def test_failure_triggers_safe_degraded_classical_and_method_relearning():
@@ -133,7 +136,13 @@ def test_failure_triggers_safe_degraded_classical_and_method_relearning():
         verify=lambda t:proves(t,4,"min"),classical=cold_min)
     assert repair and repair["origin"]=="classical_verified_then_learned"
     assert calls==[4]
-    # Failure changes live method score, never marks the old max method valid.
+    # Classical-first avoids wasting a candidate on an already solved task.
+    assert all(m.failures==0 for m in engine.meta_inventor.methods.values())
+    # In a genuine classical gap, the old MAX method is checked, rejected,
+    # and cannot pollute the method memory for the changed MIN semantics.
+    gap=engine.synthesize_program("changing.domain",5,
+        verify=lambda t:proves(t,5,"min"),classical=lambda n,p:None)
+    assert gap is None
     assert any(m.failures>=1 for m in engine.meta_inventor.methods.values())
     before=len(engine.meta_inventor.methods)
     repair2=engine.synthesize_program("changing.domain",5,

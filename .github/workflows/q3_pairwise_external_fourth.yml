@@ -1,0 +1,72 @@
+name: Q3 Fourth Disjoint ARC2 Pairwise Causal Blind First
+
+on:
+  pull_request:
+    paths:
+      - "neumann1/relational_action_inventor.py"
+      - "research/q3/q3_arc2_pairwise_blind_fourth.py"
+      - "research/q3/arc2_object_third128_exclusions.json"
+      - ".github/workflows/q3_pairwise_external_fourth.yml"
+  workflow_dispatch:
+
+jobs:
+  external-causal-original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Fetch fixed independent-author ARC2 training source
+        run: |
+          mkdir -p /tmp/arc2-causal-author
+          git -C /tmp/arc2-causal-author init -q
+          git -C /tmp/arc2-causal-author remote add origin https://github.com/arcprize/ARC-AGI-2.git
+          git -C /tmp/arc2-causal-author fetch -q --depth 1 origin f3283f727488ad98fe575ea6a5ac981e4a188e49
+          git -C /tmp/arc2-causal-author checkout -q FETCH_HEAD
+          test "$(git -C /tmp/arc2-causal-author rev-parse HEAD)" = f3283f727488ad98fe575ea6a5ac981e4a188e49
+      - name: Install source-invention library
+        run: python -m pip install -e .
+      - name: Freeze disjoint original IDs and erase all target labels
+        run: |
+          python research/q3/q3_arc2_pairwise_blind_fourth.py prepare \
+            --upstream /tmp/arc2-causal-author \
+            --blind /tmp/arc2-causal-blind \
+            --n 128
+      - name: Make source-only predictions before any target gold opens
+        run: |
+          python research/q3/q3_arc2_pairwise_blind_fourth.py propose \
+            --blind /tmp/arc2-causal-blind \
+            --output q3_fourth_causal_frozen.json \
+            --causal-ms 350
+          sha256sum q3_fourth_causal_frozen.json > q3_fourth_causal.sha256
+      - name: Score cryptographically frozen predictions against author originals
+        run: |
+          sha="$(cut -d' ' -f1 q3_fourth_causal.sha256)"
+          python research/q3/q3_arc2_pairwise_blind_fourth.py score \
+            --upstream /tmp/arc2-causal-author \
+            --predictions q3_fourth_causal_frozen.json \
+            --expected-sha "$sha" \
+            --output q3_fourth_causal_score.json
+          python - <<'PY'
+          import json
+          a=json.load(open('q3_fourth_causal_score.json'))['summary']
+          assert a['selected']==128
+          assert a['evaluated']+a['skipped']==128
+          assert not a['official_evaluation']
+          assert not a['global_q3_pass']
+          print('Q3 NO IMPLIED GLOBAL PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-fourth-disjoint-original-pairwise-causal-frozen
+          path: |
+            q3_fourth_causal_frozen.json
+            q3_fourth_causal.sha256
+            q3_fourth_causal_score.json
+          if-no-files-found: error

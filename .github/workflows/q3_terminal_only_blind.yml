@@ -1,0 +1,53 @@
+name: Q3 Endpoint-Only Blind Latent Process - 300 Unseen
+on:
+  pull_request:
+    paths:
+      - "neumann1/terminal_only_process_inventor.py"
+      - "research/q3/q3_terminal_only_blind_first.py"
+      - ".github/workflows/q3_terminal_only_blind.yml"
+  workflow_dispatch:
+
+jobs:
+  no-successor-endpoint-invention:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install exact system under test
+        run: python -m pip install -e .
+      - name: Discover latent transition from source endpoints, freeze unseen target predictions
+        run: |
+          python research/q3/q3_terminal_only_blind_first.py propose \
+            --output q3_terminal_only_frozen.json
+          sha256sum q3_terminal_only_frozen.json > q3_terminal_only.sha256
+      - name: Independent target scorer reads gold only after frozen SHA
+        run: |
+          locked="$(cut -d' ' -f1 q3_terminal_only.sha256)"
+          python research/q3/q3_terminal_only_blind_first.py score \
+            --predictions q3_terminal_only_frozen.json \
+            --expected-sha "$locked" \
+            --output q3_terminal_only_scored.json
+          python - <<'PY'
+          import json
+          x=json.load(open('q3_terminal_only_scored.json'))['summary']
+          assert x['selected']==300
+          assert x['unseen_terminal_source_successor_examples']==0
+          assert x['no_claim_of_unique_true_hidden_transition']
+          assert not x['global_q3_pass']
+          print('Terminal-only Q3: capability evidence, NOT universal claim.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q3-terminal-only-300-source-frozen-programs
+          path: |
+            q3_terminal_only_frozen.json
+            q3_terminal_only.sha256
+            q3_terminal_only_scored.json
+          if-no-files-found: error
