@@ -1,0 +1,49 @@
+{
+ "task": "dup",
+ "teacher": {
+  "run": "l30_dup__rope__1M__s0__N100000",
+  "step": 5000,
+  "acc": {
+   "id_1-10": 0.995,
+   "ood_11-20": 0.074,
+   "ood_21-30": 0.0,
+   "ood_31-40": 0.0
+  },
+  "train_flops_to_judgment": 51294975098880
+ },
+ "examples": 2000,
+ "output_steps": 23756,
+ "dependency": "input gradient (c3 design 13)",
+ "extraction": {
+  "flops": 1978245376000,
+  "backward_passes": 129,
+  "manual_forward_max_abs_logit_diff": 5.1975250244140625e-05
+ },
+ "hand_program": {
+  "coverage": 0.3340928952142539,
+  "per_head": [
+   0.24035483374001154,
+   0.09373806147424235,
+   0.0
+  ]
+ },
+ "all_stay": {
+  "coverage": 0.14886176684963603,
+  "per_head": [
+   0.14886176684963603,
+   0.0,
+   0.0
+  ]
+ },
+ "ratio": 2.2443163364554057,
+ "b_pass": true,
+ "env": {
+  "code_commit": "fe110c5fd23dc9027cabc5a6c4b2edb22df341f2",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1
+ }
+}

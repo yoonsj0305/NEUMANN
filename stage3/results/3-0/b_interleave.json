@@ -1,0 +1,49 @@
+{
+ "task": "interleave",
+ "teacher": {
+  "run": "l30_interleave__rope__1M__s0__N100000",
+  "step": 6000,
+  "acc": {
+   "id_1-10": 0.997,
+   "ood_11-20": 0.0,
+   "ood_21-30": 0.0,
+   "ood_31-40": 0.0
+  },
+  "train_flops_to_judgment": 83827352272896
+ },
+ "examples": 2000,
+ "output_steps": 24088,
+ "dependency": "input gradient (c3 design 13)",
+ "extraction": {
+  "flops": 3366345216000,
+  "backward_passes": 152,
+  "manual_forward_max_abs_logit_diff": 3.2901763916015625e-05
+ },
+ "hand_program": {
+  "coverage": 0.3504380385167807,
+  "per_head": [
+   0.14561649490505058,
+   0.14733218935493522,
+   0.05748935425679486
+  ]
+ },
+ "all_stay": {
+  "coverage": 0.08788625904129009,
+  "per_head": [
+   0.08788625904129009,
+   0.0,
+   0.0
+  ]
+ },
+ "ratio": 3.98740420106106,
+ "b_pass": true,
+ "env": {
+  "code_commit": "fe110c5fd23dc9027cabc5a6c4b2edb22df341f2",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1
+ }
+}

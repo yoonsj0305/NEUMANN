@@ -1,0 +1,49 @@
+{
+ "task": "pairswap",
+ "teacher": {
+  "run": "l30_pairswap__rope__1M__s0__N100000",
+  "step": 4000,
+  "acc": {
+   "id_2-10": 0.996,
+   "ood_12-20": 0.0,
+   "ood_22-30": 0.0,
+   "ood_32-40": 0.0
+  },
+  "train_flops_to_judgment": 27868397568000
+ },
+ "examples": 2000,
+ "output_steps": 13974,
+ "dependency": "input gradient (c3 design 13)",
+ "extraction": {
+  "flops": 909510041600,
+  "backward_passes": 80,
+  "manual_forward_max_abs_logit_diff": 3.0517578125e-05
+ },
+ "hand_program": {
+  "coverage": 0.4111117528120593,
+  "per_head": [
+   0.15883389829203473,
+   0.1946229346520027,
+   0.05765491986802187
+  ]
+ },
+ "all_stay": {
+  "coverage": 0.1406091223596409,
+  "per_head": [
+   0.1406091223596409,
+   0.0,
+   0.0
+  ]
+ },
+ "ratio": 2.9237914717975717,
+ "b_pass": true,
+ "env": {
+  "code_commit": "fe110c5fd23dc9027cabc5a6c4b2edb22df341f2",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1
+ }
+}
