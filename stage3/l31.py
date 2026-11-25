@@ -834,7 +834,7 @@ def cmd_train(a):
         src = src.replace(old, new)
     src = src.replace("input + hard reads of the hand L1 program", "input + hard reads of the synthesized L1 program (stage3/l31.py)")
     argv = ["--task", a.task, "--kind", "l1read", "--scale", "1M", "--seed", str(student_seed(a.seed, a.restart)),
-            "--N", "100000", "--max-steps", "20000", "--phase", "l31", "--out-root", str(OUT), "--threads", "1",
+            "--N", "100000", "--max-steps", os.environ.get("L31_MAX_STEPS", "20000"), "--phase", "l31", "--out-root", str(OUT), "--threads", "1",
             "--tag", "synth_t%d" % a.seed, "--keep-best"]
     if a.resume:
         argv.append("--resume")
