@@ -1,0 +1,16 @@
+{
+ "task": "repeat",
+ "run_seed": 42,
+ "run": "l31_repeat__rope__1M__s42__N100000",
+ "judgment_step": 3000,
+ "selection_set": {
+  "generation_seed": "select:repeat",
+  "size": 1000
+ },
+ "selection_accuracy": 0.993,
+ "threshold": 0.95,
+ "passed": true,
+ "selection_eval_flops": 33840693248,
+ "judgment_train_flops": 30778379550720,
+ "judgment_wall_train_s": 629.48
+}

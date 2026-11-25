@@ -1,0 +1,164 @@
+{
+ "Q": 2,
+ "solver": {
+  "Q": 2,
+  "status": "FEASIBLE",
+  "proved_optimal": false,
+  "objective": 1533011412.0,
+  "bound": 1810633177.0,
+  "gap_relative": 0.18109569363075295,
+  "rows": 840,
+  "coverage_terms": 1903,
+  "mu_cells": 18,
+  "delta_cells": 162,
+  "kinds": [
+   "digit",
+   "=",
+   "answer_phase"
+  ],
+  "wall_s": 600.8120396137238,
+  "cpu_s": 592.6270870000001,
+  "time_limit_s": 600.0,
+  "workers": 1,
+  "random_seed": 0,
+  "exec_check_examples_equal": 1.0
+ },
+ "candidate": "cp-sat",
+ "coverage_synthesis_sample_cp_sat": 0.8931568613801292,
+ "coverage_synthesis_sample_moved": 0.7544835540191177,
+ "coverage": {
+  "synthesis_sample": 0.8931568613801292,
+  "selection_8_10": 0.83842577820772,
+  "all": 0.8454856845137401
+ },
+ "coverage_without_free": {
+  "synthesis_sample": 0.6137258046429667,
+  "selection_8_10": 0.6450282367943349,
+  "all": 0.6409904537772663
+ },
+ "program": {
+  "Q": 2,
+  "mu_non_stay": {
+   "head0": {
+    "q0 =": "right"
+   },
+   "head1": {
+    "q1 answer_phase": "right"
+   },
+   "head2": {
+    "q0 answer_phase": "content"
+   }
+  },
+  "delta_non_keep": [
+   {
+    "q": 0,
+    "kind_x": "answer_phase",
+    "reads": [
+     "digit",
+     "digit",
+     "digit"
+    ],
+    "next": 1
+   },
+   {
+    "q": 1,
+    "kind_x": "answer_phase",
+    "reads": [
+     "digit",
+     "digit",
+     "digit"
+    ],
+    "next": 0
+   }
+  ],
+  "moving_heads": [
+   0,
+   1,
+   2
+  ]
+ },
+ "MU": [
+  [
+   [
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ]
+  ],
+  [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    5,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ]
+ ],
+ "DEL_nonkeep": [
+  {
+   "q": 0,
+   "kind_x": "answer_phase",
+   "reads": [
+    "digit",
+    "digit",
+    "digit"
+   ],
+   "next": 1
+  },
+  {
+   "q": 1,
+   "kind_x": "answer_phase",
+   "reads": [
+    "digit",
+    "digit",
+    "digit"
+   ],
+   "next": 0
+  }
+ ]
+}
