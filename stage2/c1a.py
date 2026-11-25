@@ -310,10 +310,18 @@ def cmd_diag(a):
     model.eval()
     ev = T.eval_sets(a.task, 1000, 500)
     lab = list(ev)[0]
+    def exact(exs, bs=128):                    # stage1/run.py exact_match without its FLOPs count (unpatched here)
+        ok = 0
+        for i in range(0, len(exs), bs):
+            x, y = R.make_batch(exs[i:i + bs])
+            pred = model(x).argmax(-1)
+            m = y != -100
+            ok += int(((pred == y) | ~m).all(1).sum())
+        return ok / len(exs)
     with torch.no_grad():
-        base = R.exact_match(model, ev[lab], ARMS[a.arm], ck["cfg"])[0]
+        base = exact(ev[lab])
         model.ablate = True
-        abl = R.exact_match(model, ev[lab], ARMS[a.arm], ck["cfg"])[0]
+        abl = exact(ev[lab])
     res = {"task": a.task, "arm": a.arm, "judgment_step": ck["step"],
            "in_distribution": {"unchanged": base, "run_judgment_acc": fin["judgment"]["acc"][lab],
                                "reads_and_shift_removed": abl, "drop": base - abl},
