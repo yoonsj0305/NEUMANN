@@ -1,0 +1,11 @@
+oracle_pairswap Q 1 OPTIMAL cpu 15 cp-sat cov {'synthesis_sample': np.float64(0.9285714285714286), 'selection_8_10': np.float64(0.7523553162853297), 'all': np.float64(0.8293258909403177)}
+oracle_pairswap Q 2 OPTIMAL cpu 33 cp-sat cov {'synthesis_sample': np.float64(1.0), 'selection_8_10': np.float64(1.0), 'all': np.float64(1.0)}
+oracle_pairswap Q 3 OPTIMAL cpu 49 moved Q-1 candidate cov {'synthesis_sample': np.float64(1.0), 'selection_8_10': np.float64(1.0), 'all': np.float64(1.0)}
+oracle_pairswap Q 4 OPTIMAL cpu 52 moved Q-1 candidate cov {'synthesis_sample': np.float64(1.0), 'selection_8_10': np.float64(1.0), 'all': np.float64(1.0)}
+oracle_pairswap Q 2 Qp 1 d sel {'conflicts': 1, 'inside_set': 1, 'vs_synthesis_table': 0, 'key_coverage': 0.017496635262449527, 'scored_steps': 2972}
+oracle_pairswap Q 2 Qp 2 d sel {'conflicts': 1, 'inside_set': 1, 'vs_synthesis_table': 0, 'key_coverage': 0.017496635262449527, 'scored_steps': 2972}
+pairswap id_2-10 {'examples': 2000, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_state': 1.0, 'correct_read_ii': 1.0, 'correct_read_ii_free_t_t1': 1.0, 'scored_steps_without_eos': 11876}
+pairswap ood_12-20 {'examples': 500, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_state': 1.0, 'correct_read_ii': 1.0, 'correct_read_ii_free_t_t1': 1.0, 'scored_steps_without_eos': 7998}
+pairswap ood_22-30 {'examples': 500, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_state': 1.0, 'correct_read_ii': 1.0, 'correct_read_ii_free_t_t1': 1.0, 'scored_steps_without_eos': 13084}
+pairswap ood_32-40 {'examples': 500, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_state': 1.0, 'correct_read_ii': 1.0, 'correct_read_ii_free_t_t1': 1.0, 'scored_steps_without_eos': 17994}
+pairswap gate1 Q 2 Qp 1 cov {'synthesis_sample': np.float64(1.0), 'selection_8_10': np.float64(1.0), 'all': np.float64(1.0)} pass strict/free False False

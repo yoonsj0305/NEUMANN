@@ -1,0 +1,248 @@
+{
+ "Q": 2,
+ "Qp": 2,
+ "solver": {
+  "Qp": 2,
+  "status": "OPTIMAL",
+  "proved_optimal": true,
+  "synthesis_sample_conflicts_solver": 0,
+  "changing_delta_p_cells": 0,
+  "contexts": 5,
+  "keys": 558,
+  "steps": 558,
+  "wall_s": 0.35834479331970215,
+  "cpu_s": 0.3560849999998936,
+  "time_limit_s": 600.0,
+  "exec_check_examples_equal": 1.0
+ },
+ "d_selection_8_10": {
+  "conflicts": 0,
+  "inside_set": 0,
+  "vs_synthesis_table": 0,
+  "key_coverage": 0.0011135857461024498,
+  "scored_steps": 2694
+ },
+ "d_synthesis_sample": {
+  "conflicts": 0,
+  "inside_set": 0,
+  "vs_synthesis_table": 0,
+  "key_coverage": 1.0,
+  "scored_steps": 558
+ },
+ "program": {
+  "Q": 4,
+  "mu_non_stay": {
+   "head0": {},
+   "head1": {
+    "q0 answer_phase": "content",
+    "q1 answer_phase": "content",
+    "q2 answer_phase": "start",
+    "q3 answer_phase": "start"
+   },
+   "head2": {}
+  },
+  "delta_non_keep": [
+   {
+    "q": 0,
+    "kind_x": "answer_phase",
+    "reads": [
+     "node",
+     "digit",
+     "node"
+    ],
+    "next": 2
+   },
+   {
+    "q": 1,
+    "kind_x": "answer_phase",
+    "reads": [
+     "node",
+     "digit",
+     "node"
+    ],
+    "next": 3
+   },
+   {
+    "q": 2,
+    "kind_x": "answer_phase",
+    "reads": [
+     "node",
+     "node",
+     "node"
+    ],
+    "next": 0
+   },
+   {
+    "q": 3,
+    "kind_x": "answer_phase",
+    "reads": [
+     "node",
+     "node",
+     "node"
+    ],
+    "next": 1
+   }
+  ],
+  "moving_heads": [
+   1
+  ]
+ },
+ "MU": [
+  [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    5,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    5,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    4,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    4,
+    0
+   ]
+  ],
+  [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ]
+ ],
+ "DEL_nonkeep": [
+  {
+   "q": 0,
+   "kind_x": "answer_phase",
+   "reads": [
+    "node",
+    "digit",
+    "node"
+   ],
+   "next": 2
+  },
+  {
+   "q": 1,
+   "kind_x": "answer_phase",
+   "reads": [
+    "node",
+    "digit",
+    "node"
+   ],
+   "next": 3
+  },
+  {
+   "q": 2,
+   "kind_x": "answer_phase",
+   "reads": [
+    "node",
+    "node",
+    "node"
+   ],
+   "next": 0
+  },
+  {
+   "q": 3,
+   "kind_x": "answer_phase",
+   "reads": [
+    "node",
+    "node",
+    "node"
+   ],
+   "next": 1
+  }
+ ]
+}
