@@ -1,0 +1,38 @@
+{
+ "task": "dup",
+ "teacher_seed": 42,
+ "selection_set": {
+  "generation_seed": "select:dup",
+  "size": 1000
+ },
+ "correct": {
+  "0": 1000,
+  "1": 1000
+ },
+ "accuracy": {
+  "0": 1.0,
+  "1": 1.0
+ },
+ "tied_within_tolerance": [
+  0,
+  1
+ ],
+ "selected_restart": 0,
+ "selected_seed": 52,
+ "rule": "highest selection accuracy; within 0.005 (<= 5 of 1,000) the smaller restart",
+ "env": {
+  "code_commit": "3fd87bcbc004af42967d2c4e41264b15fb1b932e",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1,
+  "ortools": "9.15.6755",
+  "cp_sat": {
+   "num_workers": 1,
+   "random_seed": 0,
+   "max_time_in_seconds": 600.0
+  }
+ }
+}
