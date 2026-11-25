@@ -1,0 +1,673 @@
+{
+ "design": "stage2/DESIGN.md 11.13 (pass, arm C only: >= 4 of 5 tasks with OOD bins 1 and 2 >= 0.90), 11.14",
+ "arms": {
+  "C": {
+   "kind": "hardread",
+   "tasks": [
+    {
+     "task": "addition",
+     "params": 873472,
+     "judgment_step": 3000,
+     "steps": 3000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+     "acc": {
+      "id_1-10": 0.994,
+      "ood_11-20": 0.976,
+      "ood_21-30": 0.954,
+      "ood_31-40": 0.89
+     },
+     "last_acc": {
+      "id_1-10": 0.994,
+      "ood_11-20": 0.976,
+      "ood_21-30": 0.954,
+      "ood_31-40": 0.89
+     },
+     "judgment_flops": 33322480435200,
+     "train_flops": 33322480435200,
+     "wall_s": 557.39,
+     "ood_first_two_ge_0.90": true,
+     "reads_removed": {
+      "unchanged": 0.994,
+      "run_judgment_acc": 0.994,
+      "reads_and_shift_removed": 0.0,
+      "drop": 0.994
+     },
+     "curve": {
+      "id_ge_0.5": {
+       "step": 1000,
+       "ood_bin1": 0.92
+      },
+      "id_ge_0.99": {
+       "step": 2000,
+       "ood_bin1": 0.984
+      },
+      "ood_bin1_max": 0.984,
+      "ood_bin2_max": 0.954,
+      "rows": [
+       {
+        "step": 1000,
+        "acc": {
+         "id_1-10": 0.963,
+         "ood_11-20": 0.92,
+         "ood_21-30": 0.846,
+         "ood_31-40": 0.694
+        }
+       },
+       {
+        "step": 2000,
+        "acc": {
+         "id_1-10": 0.992,
+         "ood_11-20": 0.984,
+         "ood_21-30": 0.94,
+         "ood_31-40": 0.892
+        }
+       },
+       {
+        "step": 3000,
+        "acc": {
+         "id_1-10": 0.994,
+         "ood_11-20": 0.976,
+         "ood_21-30": 0.954,
+         "ood_31-40": 0.89
+        }
+       }
+      ]
+     }
+    },
+    {
+     "task": "copy",
+     "params": 857728,
+     "judgment_step": 1000,
+     "steps": 2000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+     "acc": {
+      "id_1-10": 1.0,
+      "ood_11-20": 1.0,
+      "ood_21-30": 1.0,
+      "ood_31-40": 1.0
+     },
+     "last_acc": {
+      "id_1-10": 1.0,
+      "ood_11-20": 1.0,
+      "ood_21-30": 1.0,
+      "ood_31-40": 1.0
+     },
+     "judgment_flops": 7243249188864,
+     "train_flops": 14485824110592,
+     "wall_s": 263.74,
+     "ood_first_two_ge_0.90": true,
+     "reads_removed": {
+      "unchanged": 1.0,
+      "run_judgment_acc": 1.0,
+      "reads_and_shift_removed": 0.0,
+      "drop": 1.0
+     },
+     "curve": {
+      "id_ge_0.5": {
+       "step": 1000,
+       "ood_bin1": 1.0
+      },
+      "id_ge_0.99": {
+       "step": 1000,
+       "ood_bin1": 1.0
+      },
+      "ood_bin1_max": 1.0,
+      "ood_bin2_max": 1.0,
+      "rows": [
+       {
+        "step": 1000,
+        "acc": {
+         "id_1-10": 1.0,
+         "ood_11-20": 1.0,
+         "ood_21-30": 1.0,
+         "ood_31-40": 1.0
+        }
+       },
+       {
+        "step": 2000,
+        "acc": {
+         "id_1-10": 1.0,
+         "ood_11-20": 1.0,
+         "ood_21-30": 1.0,
+         "ood_31-40": 1.0
+        }
+       }
+      ]
+     }
+    },
+    {
+     "task": "mul1",
+     "params": 874240,
+     "judgment_step": 4000,
+     "steps": 4000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+     "acc": {
+      "id_1-10": 0.995,
+      "ood_11-20": 0.962,
+      "ood_21-30": 0.93,
+      "ood_31-40": 0.906
+     },
+     "last_acc": {
+      "id_1-10": 0.995,
+      "ood_11-20": 0.962,
+      "ood_21-30": 0.93,
+      "ood_31-40": 0.906
+     },
+     "judgment_flops": 33653618589696,
+     "train_flops": 33653618589696,
+     "wall_s": 591.79,
+     "ood_first_two_ge_0.90": true,
+     "reads_removed": {
+      "unchanged": 0.995,
+      "run_judgment_acc": 0.995,
+      "reads_and_shift_removed": 0.0,
+      "drop": 0.995
+     },
+     "curve": {
+      "id_ge_0.5": {
+       "step": 1000,
+       "ood_bin1": 0.696
+      },
+      "id_ge_0.99": {
+       "step": 3000,
+       "ood_bin1": 0.954
+      },
+      "ood_bin1_max": 0.962,
+      "ood_bin2_max": 0.93,
+      "rows": [
+       {
+        "step": 1000,
+        "acc": {
+         "id_1-10": 0.838,
+         "ood_11-20": 0.696,
+         "ood_21-30": 0.576,
+         "ood_31-40": 0.548
+        }
+       },
+       {
+        "step": 2000,
+        "acc": {
+         "id_1-10": 0.923,
+         "ood_11-20": 0.824,
+         "ood_21-30": 0.702,
+         "ood_31-40": 0.602
+        }
+       },
+       {
+        "step": 3000,
+        "acc": {
+         "id_1-10": 0.992,
+         "ood_11-20": 0.954,
+         "ood_21-30": 0.928,
+         "ood_31-40": 0.896
+        }
+       },
+       {
+        "step": 4000,
+        "acc": {
+         "id_1-10": 0.995,
+         "ood_11-20": 0.962,
+         "ood_21-30": 0.93,
+         "ood_31-40": 0.906
+        }
+       }
+      ]
+     }
+    },
+    {
+     "task": "prefix_sum",
+     "params": 857728,
+     "judgment_step": 1000,
+     "steps": 2000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+     "acc": {
+      "id_1-10": 1.0,
+      "ood_11-20": 1.0,
+      "ood_21-30": 1.0,
+      "ood_31-40": 1.0
+     },
+     "last_acc": {
+      "id_1-10": 1.0,
+      "ood_11-20": 1.0,
+      "ood_21-30": 1.0,
+      "ood_31-40": 1.0
+     },
+     "judgment_flops": 7243923456000,
+     "train_flops": 14487172644864,
+     "wall_s": 263.96,
+     "ood_first_two_ge_0.90": true,
+     "reads_removed": {
+      "unchanged": 1.0,
+      "run_judgment_acc": 1.0,
+      "reads_and_shift_removed": 0.0,
+      "drop": 1.0
+     },
+     "curve": {
+      "id_ge_0.5": {
+       "step": 1000,
+       "ood_bin1": 1.0
+      },
+      "id_ge_0.99": {
+       "step": 1000,
+       "ood_bin1": 1.0
+      },
+      "ood_bin1_max": 1.0,
+      "ood_bin2_max": 1.0,
+      "rows": [
+       {
+        "step": 1000,
+        "acc": {
+         "id_1-10": 1.0,
+         "ood_11-20": 1.0,
+         "ood_21-30": 1.0,
+         "ood_31-40": 1.0
+        }
+       },
+       {
+        "step": 2000,
+        "acc": {
+         "id_1-10": 1.0,
+         "ood_11-20": 1.0,
+         "ood_21-30": 1.0,
+         "ood_31-40": 1.0
+        }
+       }
+      ]
+     }
+    },
+    {
+     "task": "reverse",
+     "params": 857984,
+     "judgment_step": 1000,
+     "steps": 2000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+     "acc": {
+      "id_1-10": 1.0,
+      "ood_11-20": 1.0,
+      "ood_21-30": 1.0,
+      "ood_31-40": 1.0
+     },
+     "last_acc": {
+      "id_1-10": 1.0,
+      "ood_11-20": 1.0,
+      "ood_21-30": 1.0,
+      "ood_31-40": 1.0
+     },
+     "judgment_flops": 7582015291392,
+     "train_flops": 15164030582784,
+     "wall_s": 268.1,
+     "ood_first_two_ge_0.90": true,
+     "reads_removed": {
+      "unchanged": 1.0,
+      "run_judgment_acc": 1.0,
+      "reads_and_shift_removed": 0.0,
+      "drop": 1.0
+     },
+     "curve": {
+      "id_ge_0.5": {
+       "step": 1000,
+       "ood_bin1": 1.0
+      },
+      "id_ge_0.99": {
+       "step": 1000,
+       "ood_bin1": 1.0
+      },
+      "ood_bin1_max": 1.0,
+      "ood_bin2_max": 1.0,
+      "rows": [
+       {
+        "step": 1000,
+        "acc": {
+         "id_1-10": 1.0,
+         "ood_11-20": 1.0,
+         "ood_21-30": 1.0,
+         "ood_31-40": 1.0
+        }
+       },
+       {
+        "step": 2000,
+        "acc": {
+         "id_1-10": 1.0,
+         "ood_11-20": 1.0,
+         "ood_21-30": 1.0,
+         "ood_31-40": 1.0
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "tasks_meeting": 5
+  },
+  "M": {
+   "kind": "hardread_mlp",
+   "tasks": [
+    {
+     "task": "addition",
+     "params": 608256,
+     "judgment_step": 3000,
+     "steps": 3000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+     "acc": {
+      "id_1-10": 0.998,
+      "ood_11-20": 0.994,
+      "ood_21-30": 0.982,
+      "ood_31-40": 0.982
+     },
+     "last_acc": {
+      "id_1-10": 0.998,
+      "ood_11-20": 0.994,
+      "ood_21-30": 0.982,
+      "ood_31-40": 0.982
+     },
+     "judgment_flops": 22183044710400,
+     "train_flops": 22183044710400,
+     "wall_s": 358.78000000000003,
+     "ood_first_two_ge_0.90": true,
+     "reads_removed": {
+      "unchanged": 0.998,
+      "run_judgment_acc": 0.998,
+      "reads_and_shift_removed": 0.0,
+      "drop": 0.998
+     },
+     "curve": {
+      "id_ge_0.5": {
+       "step": 1000,
+       "ood_bin1": 0.9
+      },
+      "id_ge_0.99": {
+       "step": 2000,
+       "ood_bin1": 0.982
+      },
+      "ood_bin1_max": 0.994,
+      "ood_bin2_max": 0.986,
+      "rows": [
+       {
+        "step": 1000,
+        "acc": {
+         "id_1-10": 0.956,
+         "ood_11-20": 0.9,
+         "ood_21-30": 0.832,
+         "ood_31-40": 0.81
+        }
+       },
+       {
+        "step": 2000,
+        "acc": {
+         "id_1-10": 0.99,
+         "ood_11-20": 0.982,
+         "ood_21-30": 0.986,
+         "ood_31-40": 0.988
+        }
+       },
+       {
+        "step": 3000,
+        "acc": {
+         "id_1-10": 0.998,
+         "ood_11-20": 0.994,
+         "ood_21-30": 0.982,
+         "ood_31-40": 0.982
+        }
+       }
+      ]
+     }
+    },
+    {
+     "task": "copy",
+     "params": 592512,
+     "judgment_step": 1000,
+     "steps": 2000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+     "acc": {
+      "id_1-10": 1.0,
+      "ood_11-20": 1.0,
+      "ood_21-30": 1.0,
+      "ood_31-40": 1.0
+     },
+     "last_acc": {
+      "id_1-10": 1.0,
+      "ood_11-20": 1.0,
+      "ood_21-30": 1.0,
+      "ood_31-40": 1.0
+     },
+     "judgment_flops": 4838574489600,
+     "train_flops": 9676709068800,
+     "wall_s": 156.08,
+     "ood_first_two_ge_0.90": true,
+     "reads_removed": {
+      "unchanged": 1.0,
+      "run_judgment_acc": 1.0,
+      "reads_and_shift_removed": 0.0,
+      "drop": 1.0
+     },
+     "curve": {
+      "id_ge_0.5": {
+       "step": 1000,
+       "ood_bin1": 1.0
+      },
+      "id_ge_0.99": {
+       "step": 1000,
+       "ood_bin1": 1.0
+      },
+      "ood_bin1_max": 1.0,
+      "ood_bin2_max": 1.0,
+      "rows": [
+       {
+        "step": 1000,
+        "acc": {
+         "id_1-10": 1.0,
+         "ood_11-20": 1.0,
+         "ood_21-30": 1.0,
+         "ood_31-40": 1.0
+        }
+       },
+       {
+        "step": 2000,
+        "acc": {
+         "id_1-10": 1.0,
+         "ood_11-20": 1.0,
+         "ood_21-30": 1.0,
+         "ood_31-40": 1.0
+        }
+       }
+      ]
+     }
+    },
+    {
+     "task": "mul1",
+     "params": 609024,
+     "judgment_step": 3000,
+     "steps": 3000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+     "acc": {
+      "id_1-10": 1.0,
+      "ood_11-20": 1.0,
+      "ood_21-30": 1.0,
+      "ood_31-40": 1.0
+     },
+     "last_acc": {
+      "id_1-10": 1.0,
+      "ood_11-20": 1.0,
+      "ood_21-30": 1.0,
+      "ood_31-40": 1.0
+     },
+     "judgment_flops": 16956960620544,
+     "train_flops": 16956960620544,
+     "wall_s": 274.52,
+     "ood_first_two_ge_0.90": true,
+     "reads_removed": {
+      "unchanged": 1.0,
+      "run_judgment_acc": 1.0,
+      "reads_and_shift_removed": 0.002,
+      "drop": 0.998
+     },
+     "curve": {
+      "id_ge_0.5": {
+       "step": 1000,
+       "ood_bin1": 0.812
+      },
+      "id_ge_0.99": {
+       "step": 2000,
+       "ood_bin1": 0.99
+      },
+      "ood_bin1_max": 1.0,
+      "ood_bin2_max": 1.0,
+      "rows": [
+       {
+        "step": 1000,
+        "acc": {
+         "id_1-10": 0.904,
+         "ood_11-20": 0.812,
+         "ood_21-30": 0.75,
+         "ood_31-40": 0.672
+        }
+       },
+       {
+        "step": 2000,
+        "acc": {
+         "id_1-10": 0.998,
+         "ood_11-20": 0.99,
+         "ood_21-30": 0.978,
+         "ood_31-40": 0.964
+        }
+       },
+       {
+        "step": 3000,
+        "acc": {
+         "id_1-10": 1.0,
+         "ood_11-20": 1.0,
+         "ood_21-30": 1.0,
+         "ood_31-40": 1.0
+        }
+       }
+      ]
+     }
+    },
+    {
+     "task": "prefix_sum",
+     "params": 592512,
+     "judgment_step": 1000,
+     "steps": 2000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+     "acc": {
+      "id_1-10": 1.0,
+      "ood_11-20": 1.0,
+      "ood_21-30": 1.0,
+      "ood_31-40": 1.0
+     },
+     "last_acc": {
+      "id_1-10": 1.0,
+      "ood_11-20": 1.0,
+      "ood_21-30": 1.0,
+      "ood_31-40": 1.0
+     },
+     "judgment_flops": 4839014400000,
+     "train_flops": 9677588889600,
+     "wall_s": 159.26999999999998,
+     "ood_first_two_ge_0.90": true,
+     "reads_removed": {
+      "unchanged": 1.0,
+      "run_judgment_acc": 1.0,
+      "reads_and_shift_removed": 0.001,
+      "drop": 0.999
+     },
+     "curve": {
+      "id_ge_0.5": {
+       "step": 1000,
+       "ood_bin1": 1.0
+      },
+      "id_ge_0.99": {
+       "step": 1000,
+       "ood_bin1": 1.0
+      },
+      "ood_bin1_max": 1.0,
+      "ood_bin2_max": 1.0,
+      "rows": [
+       {
+        "step": 1000,
+        "acc": {
+         "id_1-10": 1.0,
+         "ood_11-20": 1.0,
+         "ood_21-30": 1.0,
+         "ood_31-40": 1.0
+        }
+       },
+       {
+        "step": 2000,
+        "acc": {
+         "id_1-10": 1.0,
+         "ood_11-20": 1.0,
+         "ood_21-30": 1.0,
+         "ood_31-40": 1.0
+        }
+       }
+      ]
+     }
+    },
+    {
+     "task": "reverse",
+     "params": 592768,
+     "judgment_step": 1000,
+     "steps": 2000,
+     "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+     "acc": {
+      "id_1-10": 1.0,
+      "ood_11-20": 1.0,
+      "ood_21-30": 1.0,
+      "ood_31-40": 1.0
+     },
+     "last_acc": {
+      "id_1-10": 1.0,
+      "ood_11-20": 1.0,
+      "ood_21-30": 1.0,
+      "ood_31-40": 1.0
+     },
+     "judgment_flops": 5059220078592,
+     "train_flops": 10118440157184,
+     "wall_s": 165.29999999999998,
+     "ood_first_two_ge_0.90": true,
+     "reads_removed": {
+      "unchanged": 1.0,
+      "run_judgment_acc": 1.0,
+      "reads_and_shift_removed": 0.0,
+      "drop": 1.0
+     },
+     "curve": {
+      "id_ge_0.5": {
+       "step": 1000,
+       "ood_bin1": 1.0
+      },
+      "id_ge_0.99": {
+       "step": 1000,
+       "ood_bin1": 1.0
+      },
+      "ood_bin1_max": 1.0,
+      "ood_bin2_max": 1.0,
+      "rows": [
+       {
+        "step": 1000,
+        "acc": {
+         "id_1-10": 1.0,
+         "ood_11-20": 1.0,
+         "ood_21-30": 1.0,
+         "ood_31-40": 1.0
+        }
+       },
+       {
+        "step": 2000,
+        "acc": {
+         "id_1-10": 1.0,
+         "ood_11-20": 1.0,
+         "ood_21-30": 1.0,
+         "ood_31-40": 1.0
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "tasks_meeting": 5
+  }
+ },
+ "pass_arm_C": true
+}
