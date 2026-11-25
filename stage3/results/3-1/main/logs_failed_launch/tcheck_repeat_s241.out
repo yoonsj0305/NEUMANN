@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "/home/user/NEUMANN/stage3/l31m.py", line 177, in <module>
+    main()
+  File "/home/user/NEUMANN/stage3/l31m.py", line 172, in main
+    {"teacher_check": l31.cmd_teacher_check, "choose": cmd_choose, "train": l31.cmd_train, "select": l31.cmd_select,
+  File "/home/user/NEUMANN/stage3/l31.py", line 744, in cmd_teacher_check
+    ck = torch.load(d / "teacher_best.pt", weights_only=False)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/claude-0/-home-user-NEUMANN/87d05f95-27a9-535f-9293-4221906025b2/scratchpad/venv_s1/lib/python3.12/site-packages/torch/serialization.py", line 1566, in load
+    with _open_file_like(f, "rb") as opened_file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/claude-0/-home-user-NEUMANN/87d05f95-27a9-535f-9293-4221906025b2/scratchpad/venv_s1/lib/python3.12/site-packages/torch/serialization.py", line 796, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/claude-0/-home-user-NEUMANN/87d05f95-27a9-535f-9293-4221906025b2/scratchpad/venv_s1/lib/python3.12/site-packages/torch/serialization.py", line 777, in __init__
+    super().__init__(open(name, mode))  # noqa: SIM115
+                     ^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/user/NEUMANN/stage3/results/3-1/main/l31_repeat__rope__1M__s241__N100000/teacher_best.pt'
