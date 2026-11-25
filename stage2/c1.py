@@ -52,11 +52,11 @@ import c1a                       # noqa: E402
 OUT = pathlib.Path(os.environ.get("C1_OUT", HERE / "results" / "c1"))
 TASKS = c0a.TASKS
 TOL_COUNT = 5
-SRC = {"addition": [ROOT / "stage1/results/c4/addition_compile_s%d" % s for s in (6, 7, 8)],
-       "copy": [HERE / "results/g0p/copy_compile_s%d" % s for s in (12, 13, 14)],
-       "mul1": [HERE / "results/g0p/mul1_compile_s%d" % s for s in (12, 13, 14)],
-       "prefix_sum": [HERE / "results/g0p/prefix_sum_compile_s%d" % s for s in (12, 13, 14)],
-       "reverse": [HERE / "results/h0/reverse_compile_s%d" % s for s in (15, 16, 17)]}
+SRC = {"addition": [ROOT / ("stage1/results/c4/addition_compile_s%d" % s) for s in (6, 7, 8)],
+       "copy": [HERE / ("results/g0p/copy_compile_s%d" % s) for s in (12, 13, 14)],
+       "mul1": [HERE / ("results/g0p/mul1_compile_s%d" % s) for s in (12, 13, 14)],
+       "prefix_sum": [HERE / ("results/g0p/prefix_sum_compile_s%d" % s) for s in (12, 13, 14)],
+       "reverse": [HERE / ("results/h0/reverse_compile_s%d" % s) for s in (15, 16, 17)]}
 BASE_ACC = {"addition": [ROOT / "stage1/results/phaseA/addition__abacus__1M__s0__N100000",
                          ROOT / "stage1/results/phaseA/addition__gru__1M__s0__N100000",
                          ROOT / "stage1/results/phaseA2/phaseA2_addition__looped_rr__1M__s0__N100000",
