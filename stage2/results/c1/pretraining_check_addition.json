@@ -1,0 +1,381 @@
+{
+ "table1": {
+  "source": "stage1/results/c4/addition_compile_s6",
+  "teacher_seed": 6,
+  "policy": [
+   [
+    0,
+    3,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    3,
+    3,
+    0,
+    0,
+    1,
+    0
+   ]
+  ],
+  "policy_named": {
+   "head0": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "next_sep",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   }
+  },
+  "moving_heads": [
+   0,
+   1,
+   2
+  ],
+  "content_move_in_table": false,
+  "d_conflicts_recorded": 0,
+  "d_table_keys": 305824,
+  "sets": {
+   "id_1-10": {
+    "examples": 1000,
+    "causal_p_le_t": 1.0,
+    "causal_invariance_read_positions_any_t": 1.0,
+    "causal_invariance_bits_t_ge_t0": 1.0,
+    "examples_with_t_ge_t0": 435,
+    "bits_unchanged_any_t_recorded_only": 0.568,
+    "d_covered_steps_table_right_recorded": 1.0,
+    "d_key_coverage_recorded": 0.8371018721128131
+   },
+   "ood_11-20": {
+    "examples": 500,
+    "causal_p_le_t": 1.0,
+    "causal_invariance_read_positions_any_t": 1.0,
+    "causal_invariance_bits_t_ge_t0": 1.0,
+    "examples_with_t_ge_t0": 227,
+    "bits_unchanged_any_t_recorded_only": 0.586,
+    "d_covered_steps_table_right_recorded": 1.0,
+    "d_key_coverage_recorded": 0.7278056951423786
+   },
+   "ood_21-30": {
+    "examples": 500,
+    "causal_p_le_t": 1.0,
+    "causal_invariance_read_positions_any_t": 1.0,
+    "causal_invariance_bits_t_ge_t0": 1.0,
+    "examples_with_t_ge_t0": 226,
+    "bits_unchanged_any_t_recorded_only": 0.626,
+    "d_covered_steps_table_right_recorded": 1.0,
+    "d_key_coverage_recorded": 0.6682996683750377
+   },
+   "ood_31-40": {
+    "examples": 500,
+    "causal_p_le_t": 1.0,
+    "causal_invariance_read_positions_any_t": 1.0,
+    "causal_invariance_bits_t_ge_t0": 1.0,
+    "examples_with_t_ge_t0": 197,
+    "bits_unchanged_any_t_recorded_only": 0.572,
+    "d_covered_steps_table_right_recorded": 1.0,
+    "d_key_coverage_recorded": 0.6607835637396864
+   },
+   "train_first200": {
+    "examples": 200,
+    "causal_p_le_t": 1.0,
+    "causal_invariance_read_positions_any_t": 1.0,
+    "causal_invariance_bits_t_ge_t0": 1.0,
+    "examples_with_t_ge_t0": 80,
+    "bits_unchanged_any_t_recorded_only": 0.575,
+    "d_covered_steps_table_right_recorded": 1.0,
+    "d_key_coverage_recorded": 1.0
+   }
+  },
+  "gate_b_cprime_1.000": true
+ },
+ "table2": {
+  "source": "stage1/results/c4/addition_compile_s7",
+  "teacher_seed": 7,
+  "policy": [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    3,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    3,
+    3,
+    0,
+    0,
+    1,
+    0
+   ]
+  ],
+  "policy_named": {
+   "head0": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "next_sep",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   }
+  },
+  "moving_heads": [
+   0,
+   1,
+   2
+  ],
+  "content_move_in_table": false,
+  "d_conflicts_recorded": 0,
+  "d_table_keys": 304829,
+  "sets": {
+   "id_1-10": {
+    "examples": 1000,
+    "causal_p_le_t": 1.0,
+    "causal_invariance_read_positions_any_t": 1.0,
+    "causal_invariance_bits_t_ge_t0": 1.0,
+    "examples_with_t_ge_t0": 443,
+    "bits_unchanged_any_t_recorded_only": 0.566,
+    "d_covered_steps_table_right_recorded": 1.0,
+    "d_key_coverage_recorded": 0.8282275711159738
+   },
+   "ood_11-20": {
+    "examples": 500,
+    "causal_p_le_t": 1.0,
+    "causal_invariance_read_positions_any_t": 1.0,
+    "causal_invariance_bits_t_ge_t0": 1.0,
+    "examples_with_t_ge_t0": 213,
+    "bits_unchanged_any_t_recorded_only": 0.592,
+    "d_covered_steps_table_right_recorded": 1.0,
+    "d_key_coverage_recorded": 0.7264895908111989
+   },
+   "ood_21-30": {
+    "examples": 500,
+    "causal_p_le_t": 1.0,
+    "causal_invariance_read_positions_any_t": 1.0,
+    "causal_invariance_bits_t_ge_t0": 1.0,
+    "examples_with_t_ge_t0": 194,
+    "bits_unchanged_any_t_recorded_only": 0.546,
+    "d_covered_steps_table_right_recorded": 1.0,
+    "d_key_coverage_recorded": 0.6744799517636418
+   },
+   "ood_31-40": {
+    "examples": 500,
+    "causal_p_le_t": 1.0,
+    "causal_invariance_read_positions_any_t": 1.0,
+    "causal_invariance_bits_t_ge_t0": 1.0,
+    "examples_with_t_ge_t0": 227,
+    "bits_unchanged_any_t_recorded_only": 0.638,
+    "d_covered_steps_table_right_recorded": 1.0,
+    "d_key_coverage_recorded": 0.655483306923119
+   },
+   "train_first200": {
+    "examples": 200,
+    "causal_p_le_t": 1.0,
+    "causal_invariance_read_positions_any_t": 1.0,
+    "causal_invariance_bits_t_ge_t0": 1.0,
+    "examples_with_t_ge_t0": 97,
+    "bits_unchanged_any_t_recorded_only": 0.62,
+    "d_covered_steps_table_right_recorded": 1.0,
+    "d_key_coverage_recorded": 1.0
+   }
+  },
+  "gate_b_cprime_1.000": true
+ },
+ "table3": {
+  "source": "stage1/results/c4/addition_compile_s8",
+  "teacher_seed": 8,
+  "policy": [
+   [
+    0,
+    3,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    3,
+    3,
+    0,
+    0,
+    1,
+    0
+   ]
+  ],
+  "policy_named": {
+   "head0": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "right",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head1": {
+    "digit": "stay",
+    "+": "stay",
+    "=": "stay",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   },
+   "head2": {
+    "digit": "stay",
+    "+": "next_sep",
+    "=": "next_sep",
+    "|": "stay",
+    "node": "stay",
+    "answer_phase": "right",
+    "other": "stay"
+   }
+  },
+  "moving_heads": [
+   0,
+   1,
+   2
+  ],
+  "content_move_in_table": false,
+  "d_conflicts_recorded": 0,
+  "d_table_keys": 305274,
+  "sets": {
+   "id_1-10": {
+    "examples": 1000,
+    "causal_p_le_t": 1.0,
+    "causal_invariance_read_positions_any_t": 1.0,
+    "causal_invariance_bits_t_ge_t0": 1.0,
+    "examples_with_t_ge_t0": 463,
+    "bits_unchanged_any_t_recorded_only": 0.592,
+    "d_covered_steps_table_right_recorded": 1.0,
+    "d_key_coverage_recorded": 0.8298079260880136
+   },
+   "ood_11-20": {
+    "examples": 500,
+    "causal_p_le_t": 1.0,
+    "causal_invariance_read_positions_any_t": 1.0,
+    "causal_invariance_bits_t_ge_t0": 1.0,
+    "examples_with_t_ge_t0": 192,
+    "bits_unchanged_any_t_recorded_only": 0.578,
+    "d_covered_steps_table_right_recorded": 1.0,
+    "d_key_coverage_recorded": 0.7303182579564489
+   },
+   "ood_21-30": {
+    "examples": 500,
+    "causal_p_le_t": 1.0,
+    "causal_invariance_read_positions_any_t": 1.0,
+    "causal_invariance_bits_t_ge_t0": 1.0,
+    "examples_with_t_ge_t0": 209,
+    "bits_unchanged_any_t_recorded_only": 0.586,
+    "d_covered_steps_table_right_recorded": 1.0,
+    "d_key_coverage_recorded": 0.6687518842327405
+   },
+   "ood_31-40": {
+    "examples": 500,
+    "causal_p_le_t": 1.0,
+    "causal_invariance_read_positions_any_t": 1.0,
+    "causal_invariance_bits_t_ge_t0": 1.0,
+    "examples_with_t_ge_t0": 188,
+    "bits_unchanged_any_t_recorded_only": 0.558,
+    "d_covered_steps_table_right_recorded": 1.0,
+    "d_key_coverage_recorded": 0.6501830501065515
+   },
+   "train_first200": {
+    "examples": 200,
+    "causal_p_le_t": 1.0,
+    "causal_invariance_read_positions_any_t": 1.0,
+    "causal_invariance_bits_t_ge_t0": 1.0,
+    "examples_with_t_ge_t0": 88,
+    "bits_unchanged_any_t_recorded_only": 0.54,
+    "d_covered_steps_table_right_recorded": 1.0,
+    "d_key_coverage_recorded": 1.0
+   }
+  },
+  "gate_b_cprime_1.000": true
+ },
+ "all_1.000": true,
+ "env": {
+  "code_commit": "934d509908af99ddb5d8780a8d54106f8c4d3592",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1
+ }
+}
