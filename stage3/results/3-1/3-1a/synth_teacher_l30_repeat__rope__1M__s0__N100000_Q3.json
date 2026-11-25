@@ -1,0 +1,204 @@
+{
+ "source": "teacher",
+ "task": "repeat",
+ "table": null,
+ "meta": {
+  "data": "tasks.train_set(repeat, 100000, 0)",
+  "data_seed": 0,
+  "synthesis_sample": {
+   "rule": "first 100 with length <= 7",
+   "indices_max": 151,
+   "lengths": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ]
+  },
+  "selection_set": {
+   "rule": "first 300 with length 8-10",
+   "indices_max": 952
+  },
+  "all": "first 2000",
+  "teacher": {
+   "teacher_run": "stage3/results/3-0/l30_repeat__rope__1M__s0__N100000",
+   "teacher_step": 5000,
+   "teacher_train_flops_to_judgment": 51294975098880,
+   "examples": 2000,
+   "extraction_flops": 2158382438400,
+   "backward_passes": 136,
+   "manual_forward_max_abs_logit_diff": 1.52587890625e-05,
+   "extraction_cpu_s": 24.948231
+  }
+ },
+ "solver": {
+  "Q": 3,
+  "status": "FEASIBLE",
+  "proved_optimal": false,
+  "objective": 2604548720.0,
+  "bound": 5574556736.0,
+  "gap_relative": 1.1403157841485876,
+  "coverage_int": 381228,
+  "coverage_int_bound": 815948.0,
+  "coverage_rounded_mean": 0.4671911764705882,
+  "coverage_rounded_mean_bound": 0.9999362745098039,
+  "rows": 816,
+  "nonstay_mu_cells_solver": 4,
+  "changing_delta_cells_solver": 0,
+  "kinds_x": [
+   "digit",
+   "=",
+   "answer_phase"
+  ],
+  "kinds_read": [
+   "digit",
+   "=",
+   "answer_phase"
+  ],
+  "mu_cells": 27,
+  "delta_cells": 243,
+  "coverage_terms": 8171,
+  "wall_s": 603.2618253231049,
+  "cpu_s": 596.361456,
+  "time_limit_s": 600.0,
+  "workers": 1,
+  "random_seed": 0,
+  "used_mu_cells": 9,
+  "used_delta_cells": 7,
+  "exec_check_examples_equal": 1.0
+ },
+ "coverage": {
+  "synthesis_sample": 0.4672028767984237,
+  "selection_8_10": 0.37307502530287273,
+  "all_2000": 0.417689142280476
+ },
+ "env": {
+  "code_commit": "d1472472cf0075b58d5f9de86a5615d63dec7e3b",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1,
+  "ortools": "9.15.6755",
+  "cp_sat": {
+   "num_workers": 1,
+   "random_seed": 0,
+   "max_time_in_seconds": 600.0
+  }
+ },
+ "program": {
+  "Q": 3,
+  "mu_non_stay": {
+   "head0": {
+    "q0 digit": "right",
+    "q0 answer_phase": "right"
+   },
+   "head1": {
+    "q0 =": "next_sep"
+   },
+   "head2": {
+    "q0 answer_phase": "content"
+   }
+  },
+  "delta_non_keep": [],
+  "moving_heads": [
+   0,
+   1,
+   2
+  ]
+ },
+ "MU": [
+  [
+   [
+    1,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  [
+   [
+    0,
+    0,
+    3,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    5,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ]
+ ],
+ "DEL_nonkeep": []
+}

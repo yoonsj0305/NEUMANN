@@ -1,0 +1,144 @@
+{
+ "source": "l0",
+ "task": "reverse",
+ "table": 2,
+ "meta": {
+  "data": "tasks.train_set(reverse, 100000, 16)",
+  "data_seed": 16,
+  "synthesis_sample": {
+   "rule": "first 100 with length <= 7",
+   "indices_max": 139,
+   "lengths": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ]
+  },
+  "selection_set": {
+   "rule": "first 300 with length 8-10",
+   "indices_max": 976
+  },
+  "all": "first 2000"
+ },
+ "solver": {
+  "Q": 1,
+  "status": "OPTIMAL",
+  "proved_optimal": true,
+  "objective": 6663625.0,
+  "bound": 6663625.0,
+  "gap_relative": 0.0,
+  "coverage_int": 512587,
+  "coverage_int_bound": 512586.53846153844,
+  "coverage_rounded_mean": 0.9991949317738792,
+  "coverage_rounded_mean_bound": 0.9991940320887689,
+  "rows": 513,
+  "nonstay_mu_cells_solver": 6,
+  "changing_delta_cells_solver": 0,
+  "kinds_x": [
+   "digit",
+   "=",
+   "answer_phase",
+   "other"
+  ],
+  "kinds_read": [
+   "digit",
+   "=",
+   "answer_phase",
+   "other"
+  ],
+  "mu_cells": 12,
+  "delta_cells": 0,
+  "coverage_terms": 1439,
+  "wall_s": 15.085229873657227,
+  "cpu_s": 14.953444999999999,
+  "time_limit_s": 600.0,
+  "workers": 1,
+  "random_seed": 0,
+  "used_mu_cells": 12,
+  "used_delta_cells": 4,
+  "exec_check_examples_equal": 1.0
+ },
+ "coverage": {
+  "synthesis_sample": 1.0,
+  "selection_8_10": 1.0,
+  "all_2000": 1.0
+ },
+ "env": {
+  "code_commit": "d1472472cf0075b58d5f9de86a5615d63dec7e3b",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1,
+  "ortools": "9.15.6755",
+  "cp_sat": {
+   "num_workers": 1,
+   "random_seed": 0,
+   "max_time_in_seconds": 600.0
+  }
+ },
+ "program": {
+  "Q": 1,
+  "mu_non_stay": {
+   "head0": {
+    "q0 digit": "right",
+    "q0 answer_phase": "left"
+   },
+   "head1": {
+    "q0 =": "next_sep",
+    "q0 answer_phase": "left"
+   },
+   "head2": {
+    "q0 =": "next_sep",
+    "q0 answer_phase": "right"
+   }
+  },
+  "delta_non_keep": [],
+  "moving_heads": [
+   0,
+   1,
+   2
+  ]
+ },
+ "MU": [
+  [
+   [
+    1,
+    0,
+    0,
+    0,
+    0,
+    2,
+    0
+   ]
+  ],
+  [
+   [
+    0,
+    0,
+    3,
+    0,
+    0,
+    2,
+    0
+   ]
+  ],
+  [
+   [
+    0,
+    0,
+    3,
+    0,
+    0,
+    1,
+    0
+   ]
+  ]
+ ],
+ "DEL_nonkeep": []
+}

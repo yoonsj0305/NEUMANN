@@ -1,0 +1,237 @@
+{
+ "source": "oracle",
+ "task": "pairswap",
+ "table": null,
+ "meta": {
+  "data": "tasks.train_set(pairswap, 100000, 0)",
+  "data_seed": 0,
+  "synthesis_sample": {
+   "rule": "first 100 with length 2-6",
+   "indices_max": 169,
+   "lengths": [
+    2,
+    4,
+    6
+   ]
+  },
+  "selection_set": {
+   "rule": "first 300 with length 8-10",
+   "indices_max": 713
+  },
+  "all": "first 2000"
+ },
+ "solver": {
+  "Q": 4,
+  "status": "OPTIMAL",
+  "proved_optimal": true,
+  "objective": 6228948699.0,
+  "bound": 6228948699.0,
+  "gap_relative": 0.0,
+  "coverage_int": 518000,
+  "coverage_int_bound": 517999.89180873183,
+  "coverage_rounded_mean": 1.0,
+  "coverage_rounded_mean_bound": 0.9999997911365479,
+  "rows": 518,
+  "nonstay_mu_cells_solver": 4,
+  "changing_delta_cells_solver": 1,
+  "kinds_x": [
+   "digit",
+   "=",
+   "answer_phase"
+  ],
+  "kinds_read": [
+   "digit",
+   "=",
+   "answer_phase"
+  ],
+  "mu_cells": 36,
+  "delta_cells": 324,
+  "coverage_terms": 518,
+  "wall_s": 123.74316000938416,
+  "cpu_s": 122.36687699999999,
+  "time_limit_s": 600.0,
+  "workers": 1,
+  "random_seed": 0,
+  "used_mu_cells": 12,
+  "used_delta_cells": 6,
+  "exec_check_examples_equal": 1.0
+ },
+ "coverage": {
+  "synthesis_sample": 1.0,
+  "selection_8_10": 1.0,
+  "all_2000": 1.0
+ },
+ "env": {
+  "code_commit": "d1472472cf0075b58d5f9de86a5615d63dec7e3b",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1,
+  "ortools": "9.15.6755",
+  "cp_sat": {
+   "num_workers": 1,
+   "random_seed": 0,
+   "max_time_in_seconds": 600.0
+  }
+ },
+ "program": {
+  "Q": 4,
+  "mu_non_stay": {
+   "head0": {},
+   "head1": {
+    "q1 answer_phase": "right"
+   },
+   "head2": {
+    "q0 =": "right",
+    "q0 answer_phase": "right",
+    "q1 answer_phase": "right"
+   }
+  },
+  "delta_non_keep": [
+   {
+    "q": 0,
+    "kind_x": "answer_phase",
+    "reads": [
+     "digit",
+     "digit",
+     "digit"
+    ],
+    "next": 1
+   }
+  ],
+  "moving_heads": [
+   1,
+   2
+  ]
+ },
+ "MU": [
+  [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  [
+   [
+    0,
+    0,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ]
+ ],
+ "DEL_nonkeep": [
+  {
+   "q": 0,
+   "kind_x": "answer_phase",
+   "reads": [
+    "digit",
+    "digit",
+    "digit"
+   ],
+   "next": 1
+  }
+ ]
+}

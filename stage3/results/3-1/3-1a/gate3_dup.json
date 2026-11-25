@@ -1,0 +1,445 @@
+{
+ "check": "6.6-3 real teacher dependency",
+ "task": "dup",
+ "teacher": {
+  "teacher_run": "stage3/results/3-0/l30_dup__rope__1M__s0__N100000",
+  "teacher_step": 5000,
+  "teacher_train_flops_to_judgment": 51294975098880,
+  "examples": 2000,
+  "extraction_flops": 1978245376000,
+  "backward_passes": 129,
+  "manual_forward_max_abs_logit_diff": 5.1975250244140625e-05,
+  "extraction_cpu_s": 22.273963000000002
+ },
+ "hand_coverage": {
+  "synthesis_sample": 0.3670970448833912,
+  "selection_8_10": 0.3015325950418746,
+  "all_2000": 0.33409289521425356
+ },
+ "hand_coverage_3_0_B": 0.3340928952142539,
+ "per_Q": {
+  "1": {
+   "coverage": {
+    "synthesis_sample": 0.526840088710927,
+    "selection_8_10": 0.37018487493258573,
+    "all_2000": 0.4463345061195742
+   },
+   "program": {
+    "Q": 1,
+    "mu_non_stay": {
+     "head0": {},
+     "head1": {
+      "q0 =": "right"
+     },
+     "head2": {
+      "q0 =": "next_sep",
+      "q0 answer_phase": "right"
+     }
+    },
+    "delta_non_keep": [],
+    "moving_heads": [
+     1,
+     2
+    ]
+   },
+   "solver": {
+    "status": "OPTIMAL",
+    "proved_optimal": true,
+    "gap_relative": 0.0,
+    "cpu_s": 169.651334,
+    "coverage_rounded_mean": 0.5268344988344988,
+    "coverage_rounded_mean_bound": 0.5268341491841492
+   },
+   "supply_agreement_all_2000_without_eos": 0.3485934914506343,
+   "supply_agreement_all_2000_with_eos": 0.32800134702811923,
+   "d_conflicts_recorded": {
+    "id_1-10": 19598,
+    "ood_11-20": 15103,
+    "ood_21-30": 25057,
+    "ood_31-40": 35380
+   },
+   "d_train_conflicts": 508569
+  },
+  "2": {
+   "coverage": {
+    "synthesis_sample": 0.6014472510065364,
+    "selection_8_10": 0.4837992300839885,
+    "all_2000": 0.5419611357959978
+   },
+   "program": {
+    "Q": 2,
+    "mu_non_stay": {
+     "head0": {
+      "q0 =": "next_sep",
+      "q0 answer_phase": "right",
+      "q1 answer_phase": "right"
+     },
+     "head1": {
+      "q0 answer_phase": "content"
+     },
+     "head2": {
+      "q0 =": "right",
+      "q0 answer_phase": "left"
+     }
+    },
+    "delta_non_keep": [
+     {
+      "q": 0,
+      "kind_x": "=",
+      "reads": [
+       "=",
+       "digit",
+       "digit"
+      ],
+      "next": 1
+     },
+     {
+      "q": 0,
+      "kind_x": "answer_phase",
+      "reads": [
+       "answer_phase",
+       "digit",
+       "digit"
+      ],
+      "next": 1
+     },
+     {
+      "q": 0,
+      "kind_x": "answer_phase",
+      "reads": [
+       "answer_phase",
+       "=",
+       "digit"
+      ],
+      "next": 1
+     },
+     {
+      "q": 1,
+      "kind_x": "answer_phase",
+      "reads": [
+       "answer_phase",
+       "digit",
+       "digit"
+      ],
+      "next": 0
+     }
+    ],
+    "moving_heads": [
+     0,
+     1,
+     2
+    ]
+   },
+   "solver": {
+    "status": "FEASIBLE",
+    "proved_optimal": false,
+    "gap_relative": 0.6626434992088692,
+    "cpu_s": 591.432781,
+    "coverage_rounded_mean": 0.6014522144522144,
+    "coverage_rounded_mean_bound": 1.0
+   },
+   "supply_agreement_all_2000_without_eos": 1.0,
+   "supply_agreement_all_2000_with_eos": 1.0,
+   "d_conflicts_recorded": {
+    "id_1-10": 0,
+    "ood_11-20": 0,
+    "ood_21-30": 0,
+    "ood_31-40": 0
+   },
+   "d_train_conflicts": 0
+  },
+  "3": {
+   "coverage": {
+    "synthesis_sample": 0.5536920676300927,
+    "selection_8_10": 0.4300970330748582,
+    "all_2000": 0.4900287604667428
+   },
+   "program": {
+    "Q": 3,
+    "mu_non_stay": {
+     "head0": {
+      "q0 =": "next_sep",
+      "q1 answer_phase": "content",
+      "q2 answer_phase": "content"
+     },
+     "head1": {
+      "q1 answer_phase": "content"
+     },
+     "head2": {
+      "q0 =": "next_sep",
+      "q0 answer_phase": "start",
+      "q1 answer_phase": "right"
+     }
+    },
+    "delta_non_keep": [
+     {
+      "q": 0,
+      "kind_x": "=",
+      "reads": [
+       "=",
+       "digit",
+       "="
+      ],
+      "next": 1
+     },
+     {
+      "q": 0,
+      "kind_x": "answer_phase",
+      "reads": [
+       "=",
+       "digit",
+       "digit"
+      ],
+      "next": 2
+     },
+     {
+      "q": 1,
+      "kind_x": "answer_phase",
+      "reads": [
+       "=",
+       "digit",
+       "answer_phase"
+      ],
+      "next": 0
+     },
+     {
+      "q": 1,
+      "kind_x": "answer_phase",
+      "reads": [
+       "=",
+       "=",
+       "answer_phase"
+      ],
+      "next": 2
+     },
+     {
+      "q": 1,
+      "kind_x": "answer_phase",
+      "reads": [
+       "answer_phase",
+       "digit",
+       "digit"
+      ],
+      "next": 2
+     },
+     {
+      "q": 2,
+      "kind_x": "answer_phase",
+      "reads": [
+       "=",
+       "digit",
+       "digit"
+      ],
+      "next": 1
+     },
+     {
+      "q": 2,
+      "kind_x": "answer_phase",
+      "reads": [
+       "answer_phase",
+       "digit",
+       "digit"
+      ],
+      "next": 1
+     }
+    ],
+    "moving_heads": [
+     0,
+     1,
+     2
+    ]
+   },
+   "solver": {
+    "status": "FEASIBLE",
+    "proved_optimal": false,
+    "gap_relative": 0.8060239779160617,
+    "cpu_s": 593.246801,
+    "coverage_rounded_mean": 0.5537027972027972,
+    "coverage_rounded_mean_bound": 1.0
+   },
+   "supply_agreement_all_2000_without_eos": 0.9080713366427652,
+   "supply_agreement_all_2000_with_eos": 0.9158107425492508,
+   "d_conflicts_recorded": {
+    "id_1-10": 0,
+    "ood_11-20": 0,
+    "ood_21-30": 0,
+    "ood_31-40": 0
+   },
+   "d_train_conflicts": 0
+  },
+  "4": {
+   "coverage": {
+    "synthesis_sample": 0.5372150426294094,
+    "selection_8_10": 0.4244356164056448,
+    "all_2000": 0.4801577809447941
+   },
+   "program": {
+    "Q": 4,
+    "mu_non_stay": {
+     "head0": {
+      "q0 =": "right",
+      "q1 answer_phase": "right"
+     },
+     "head1": {},
+     "head2": {
+      "q0 =": "next_sep",
+      "q1 answer_phase": "content"
+     }
+    },
+    "delta_non_keep": [
+     {
+      "q": 0,
+      "kind_x": "=",
+      "reads": [
+       "=",
+       "digit",
+       "="
+      ],
+      "next": 1
+     },
+     {
+      "q": 0,
+      "kind_x": "answer_phase",
+      "reads": [
+       "digit",
+       "digit",
+       "="
+      ],
+      "next": 2
+     },
+     {
+      "q": 0,
+      "kind_x": "answer_phase",
+      "reads": [
+       "digit",
+       "digit",
+       "answer_phase"
+      ],
+      "next": 1
+     },
+     {
+      "q": 1,
+      "kind_x": "answer_phase",
+      "reads": [
+       "digit",
+       "digit",
+       "answer_phase"
+      ],
+      "next": 0
+     },
+     {
+      "q": 1,
+      "kind_x": "answer_phase",
+      "reads": [
+       "answer_phase",
+       "digit",
+       "="
+      ],
+      "next": 0
+     },
+     {
+      "q": 2,
+      "kind_x": "answer_phase",
+      "reads": [
+       "digit",
+       "digit",
+       "="
+      ],
+      "next": 3
+     },
+     {
+      "q": 3,
+      "kind_x": "answer_phase",
+      "reads": [
+       "digit",
+       "digit",
+       "="
+      ],
+      "next": 1
+     }
+    ],
+    "moving_heads": [
+     0,
+     2
+    ]
+   },
+   "solver": {
+    "status": "FEASIBLE",
+    "proved_optimal": false,
+    "gap_relative": 0.8614504173541627,
+    "cpu_s": 592.488256,
+    "coverage_rounded_mean": 0.5372156177156178,
+    "coverage_rounded_mean_bound": 1.0
+   },
+   "supply_agreement_all_2000_without_eos": 1.0,
+   "supply_agreement_all_2000_with_eos": 1.0,
+   "d_conflicts_recorded": {
+    "id_1-10": 0,
+    "ood_11-20": 0,
+    "ood_21-30": 0,
+    "ood_31-40": 0
+   },
+   "d_train_conflicts": 0
+  }
+ },
+ "best_coverage_all_2000": 0.5419611357959978,
+ "threshold": 0.32409289521425355,
+ "pass": true,
+ "selection_recorded": {
+  "selected_Q": 2,
+  "dedup_discarded": {},
+  "kept": [
+   1,
+   2,
+   3,
+   4
+  ]
+ },
+ "meta": {
+  "data": "tasks.train_set(dup, 100000, 0)",
+  "data_seed": 0,
+  "synthesis_sample": {
+   "rule": "first 100 with length <= 7",
+   "indices_max": 129,
+   "lengths": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ]
+  },
+  "selection_set": {
+   "rule": "first 300 with length 8-10",
+   "indices_max": 962
+  },
+  "all": "first 2000",
+  "teacher": {
+   "teacher_run": "stage3/results/3-0/l30_dup__rope__1M__s0__N100000",
+   "teacher_step": 5000,
+   "teacher_train_flops_to_judgment": 51294975098880,
+   "examples": 2000,
+   "extraction_flops": 1978245376000,
+   "backward_passes": 129,
+   "manual_forward_max_abs_logit_diff": 5.1975250244140625e-05,
+   "extraction_cpu_s": 22.273963000000002
+  }
+ },
+ "env": {
+  "code_commit": "d1472472cf0075b58d5f9de86a5615d63dec7e3b",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1,
+  "ortools": "9.15.6755",
+  "cp_sat": {
+   "num_workers": 1,
+   "random_seed": 0,
+   "max_time_in_seconds": 600.0
+  }
+ }
+}

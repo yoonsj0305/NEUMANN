@@ -1,0 +1,136 @@
+{
+ "source": "oracle",
+ "task": "repeat",
+ "table": null,
+ "meta": {
+  "data": "tasks.train_set(repeat, 100000, 0)",
+  "data_seed": 0,
+  "synthesis_sample": {
+   "rule": "first 100 with length <= 7",
+   "indices_max": 151,
+   "lengths": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ]
+  },
+  "selection_set": {
+   "rule": "first 300 with length 8-10",
+   "indices_max": 952
+  },
+  "all": "first 2000"
+ },
+ "solver": {
+  "Q": 1,
+  "status": "OPTIMAL",
+  "proved_optimal": true,
+  "objective": 5579998.0,
+  "bound": 5579998.0,
+  "gap_relative": 0.0,
+  "coverage_int": 558000,
+  "coverage_int_bound": 557999.8,
+  "coverage_rounded_mean": 0.6838235294117647,
+  "coverage_rounded_mean_bound": 0.6838232843137255,
+  "rows": 816,
+  "nonstay_mu_cells_solver": 2,
+  "changing_delta_cells_solver": 0,
+  "kinds_x": [
+   "digit",
+   "=",
+   "answer_phase"
+  ],
+  "kinds_read": [
+   "digit",
+   "=",
+   "answer_phase"
+  ],
+  "mu_cells": 9,
+  "delta_cells": 0,
+  "coverage_terms": 816,
+  "wall_s": 43.146137714385986,
+  "cpu_s": 42.72290999999999,
+  "time_limit_s": 600.0,
+  "workers": 1,
+  "random_seed": 0,
+  "used_mu_cells": 9,
+  "used_delta_cells": 5,
+  "exec_check_examples_equal": 1.0
+ },
+ "coverage": {
+  "synthesis_sample": 0.6838235294117647,
+  "selection_8_10": 0.5785888927698218,
+  "all_2000": 0.6250833889259506
+ },
+ "env": {
+  "code_commit": "d1472472cf0075b58d5f9de86a5615d63dec7e3b",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1,
+  "ortools": "9.15.6755",
+  "cp_sat": {
+   "num_workers": 1,
+   "random_seed": 0,
+   "max_time_in_seconds": 600.0
+  }
+ },
+ "program": {
+  "Q": 1,
+  "mu_non_stay": {
+   "head0": {},
+   "head1": {
+    "q0 =": "next_sep"
+   },
+   "head2": {
+    "q0 answer_phase": "content"
+   }
+  },
+  "delta_non_keep": [],
+  "moving_heads": [
+   1,
+   2
+  ]
+ },
+ "MU": [
+  [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  [
+   [
+    0,
+    0,
+    3,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    5,
+    0
+   ]
+  ]
+ ],
+ "DEL_nonkeep": []
+}

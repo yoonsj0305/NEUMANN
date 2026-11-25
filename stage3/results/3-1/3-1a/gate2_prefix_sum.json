@@ -1,0 +1,404 @@
+{
+ "check": "6.6-2 L0 regression",
+ "task": "prefix_sum",
+ "tables": {
+  "table1": {
+   "source": "stage2/results/g0p/prefix_sum_compile_s12",
+   "policy": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     3,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "moving_heads_table": [
+    0,
+    1,
+    2
+   ],
+   "synthesized": {
+    "Q": 1,
+    "mu_non_stay": {
+     "head0": {
+      "q0 answer_phase": "right"
+     },
+     "head1": {
+      "q0 =": "next_sep",
+      "q0 answer_phase": "right"
+     },
+     "head2": {
+      "q0 digit": "right"
+     }
+    },
+    "delta_non_keep": [],
+    "moving_heads": [
+     0,
+     1,
+     2
+    ]
+   },
+   "coverage": {
+    "synthesis_sample": 1.0,
+    "selection_8_10": 1.0,
+    "all_2000": 1.0
+   },
+   "read_positions_equal_as_sets": {
+    "synthesis_sample": 1.0,
+    "selection_8_10": 1.0,
+    "all_2000": 1.0
+   },
+   "solver": {
+    "Q": 1,
+    "status": "OPTIMAL",
+    "proved_optimal": true,
+    "objective": 5065926.0,
+    "bound": 5065926.0,
+    "gap_relative": 0.0,
+    "coverage_int": 506593,
+    "coverage_int_bound": 506592.6,
+    "coverage_rounded_mean": 0.9991972386587771,
+    "coverage_rounded_mean_bound": 0.999196449704142,
+    "rows": 507,
+    "nonstay_mu_cells_solver": 4,
+    "changing_delta_cells_solver": 0,
+    "kinds_x": [
+     "digit",
+     "=",
+     "answer_phase"
+    ],
+    "kinds_read": [
+     "digit",
+     "=",
+     "answer_phase"
+    ],
+    "mu_cells": 9,
+    "delta_cells": 0,
+    "coverage_terms": 1421,
+    "wall_s": 13.718960762023926,
+    "cpu_s": 13.542923000000002,
+    "time_limit_s": 600.0,
+    "workers": 1,
+    "random_seed": 0,
+    "used_mu_cells": 9,
+    "used_delta_cells": 3,
+    "exec_check_examples_equal": 1.0
+   },
+   "pass": true,
+   "meta": {
+    "data": "tasks.train_set(prefix_sum, 100000, 12)",
+    "data_seed": 12,
+    "synthesis_sample": {
+     "rule": "first 100 with length <= 7",
+     "indices_max": 149,
+     "lengths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+     ]
+    },
+    "selection_set": {
+     "rule": "first 300 with length 8-10",
+     "indices_max": 1011
+    },
+    "all": "first 2000"
+   }
+  },
+  "table2": {
+   "source": "stage2/results/g0p/prefix_sum_compile_s13",
+   "policy": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     3,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "moving_heads_table": [
+    0,
+    1,
+    2
+   ],
+   "synthesized": {
+    "Q": 1,
+    "mu_non_stay": {
+     "head0": {
+      "q0 =": "next_sep",
+      "q0 answer_phase": "right"
+     },
+     "head1": {
+      "q0 answer_phase": "right"
+     },
+     "head2": {
+      "q0 digit": "right"
+     }
+    },
+    "delta_non_keep": [],
+    "moving_heads": [
+     0,
+     1,
+     2
+    ]
+   },
+   "coverage": {
+    "synthesis_sample": 1.0,
+    "selection_8_10": 1.0,
+    "all_2000": 1.0
+   },
+   "read_positions_equal_as_sets": {
+    "synthesis_sample": 1.0,
+    "selection_8_10": 1.0,
+    "all_2000": 1.0
+   },
+   "solver": {
+    "Q": 1,
+    "status": "OPTIMAL",
+    "proved_optimal": true,
+    "objective": 5045946.0,
+    "bound": 5045946.0,
+    "gap_relative": 0.0,
+    "coverage_int": 504595,
+    "coverage_int_bound": 504594.6,
+    "coverage_rounded_mean": 0.9991980198019802,
+    "coverage_rounded_mean_bound": 0.9991972277227722,
+    "rows": 505,
+    "nonstay_mu_cells_solver": 4,
+    "changing_delta_cells_solver": 0,
+    "kinds_x": [
+     "digit",
+     "=",
+     "answer_phase"
+    ],
+    "kinds_read": [
+     "digit",
+     "=",
+     "answer_phase"
+    ],
+    "mu_cells": 9,
+    "delta_cells": 0,
+    "coverage_terms": 1415,
+    "wall_s": 12.45850682258606,
+    "cpu_s": 12.294512,
+    "time_limit_s": 600.0,
+    "workers": 1,
+    "random_seed": 0,
+    "used_mu_cells": 9,
+    "used_delta_cells": 3,
+    "exec_check_examples_equal": 1.0
+   },
+   "pass": true,
+   "meta": {
+    "data": "tasks.train_set(prefix_sum, 100000, 13)",
+    "data_seed": 13,
+    "synthesis_sample": {
+     "rule": "first 100 with length <= 7",
+     "indices_max": 139,
+     "lengths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+     ]
+    },
+    "selection_set": {
+     "rule": "first 300 with length 8-10",
+     "indices_max": 999
+    },
+    "all": "first 2000"
+   }
+  },
+  "table3": {
+   "source": "stage2/results/g0p/prefix_sum_compile_s14",
+   "policy": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     3,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     1,
+     0,
+     0,
+     2,
+     0
+    ]
+   ],
+   "moving_heads_table": [
+    0,
+    1,
+    2
+   ],
+   "synthesized": {
+    "Q": 1,
+    "mu_non_stay": {
+     "head0": {
+      "q0 answer_phase": "right"
+     },
+     "head1": {
+      "q0 =": "next_sep",
+      "q0 answer_phase": "right"
+     },
+     "head2": {
+      "q0 =": "right",
+      "q0 answer_phase": "left"
+     }
+    },
+    "delta_non_keep": [],
+    "moving_heads": [
+     0,
+     1,
+     2
+    ]
+   },
+   "coverage": {
+    "synthesis_sample": 1.0,
+    "selection_8_10": 1.0,
+    "all_2000": 1.0
+   },
+   "read_positions_equal_as_sets": {
+    "synthesis_sample": 1.0,
+    "selection_8_10": 1.0,
+    "all_2000": 1.0
+   },
+   "solver": {
+    "Q": 1,
+    "status": "OPTIMAL",
+    "proved_optimal": true,
+    "objective": 5604485.0,
+    "bound": 5604485.0,
+    "gap_relative": 0.0,
+    "coverage_int": 560449,
+    "coverage_int_bound": 560448.5,
+    "coverage_rounded_mean": 0.9990178253119429,
+    "coverage_rounded_mean_bound": 0.9990169340463458,
+    "rows": 561,
+    "nonstay_mu_cells_solver": 5,
+    "changing_delta_cells_solver": 0,
+    "kinds_x": [
+     "digit",
+     "=",
+     "answer_phase"
+    ],
+    "kinds_read": [
+     "digit",
+     "=",
+     "answer_phase"
+    ],
+    "mu_cells": 9,
+    "delta_cells": 0,
+    "coverage_terms": 1673,
+    "wall_s": 14.504831790924072,
+    "cpu_s": 14.413539,
+    "time_limit_s": 600.0,
+    "workers": 1,
+    "random_seed": 0,
+    "used_mu_cells": 9,
+    "used_delta_cells": 4,
+    "exec_check_examples_equal": 1.0
+   },
+   "pass": true,
+   "meta": {
+    "data": "tasks.train_set(prefix_sum, 100000, 14)",
+    "data_seed": 14,
+    "synthesis_sample": {
+     "rule": "first 100 with length <= 7",
+     "indices_max": 148,
+     "lengths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+     ]
+    },
+    "selection_set": {
+     "rule": "first 300 with length 8-10",
+     "indices_max": 945
+    },
+    "all": "first 2000"
+   }
+  }
+ },
+ "pass": true,
+ "env": {
+  "code_commit": "d1472472cf0075b58d5f9de86a5615d63dec7e3b",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1,
+  "ortools": "9.15.6755",
+  "cp_sat": {
+   "num_workers": 1,
+   "random_seed": 0,
+   "max_time_in_seconds": 600.0
+  }
+ }
+}
