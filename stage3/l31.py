@@ -179,7 +179,7 @@ def rows_teacher(task, run_dir, exs, ids, tag):
         rows.setdefault(ids[k], []).append((t, np.asarray(s)))
     for i in rows:
         rows[i].sort(key=lambda r: r[0])
-    info = {"teacher_run": str(pathlib.Path(run_dir).relative_to(ROOT)), "teacher_step": ck["step"],
+    info = {"teacher_run": str(pathlib.Path(run_dir).resolve().relative_to(ROOT)), "teacher_step": ck["step"],
             "teacher_train_flops_to_judgment": ck["train_flops_cum"], "examples": len(ids),
             "extraction_flops": flops, "backward_passes": n_bwd, "manual_forward_max_abs_logit_diff": maxdiff,
             "extraction_cpu_s": cpu_s() - t0}
@@ -723,6 +723,233 @@ def cmd_gate3(a):
     print(a.task, "gate3 hand", hand, "best", best, "pass", res["pass"], "selected Q", pick)
 
 
+# ---------------------------------------------------------------- 3-1 main run (6.7 with 6.9)
+TEACHER_SEEDS = (41, 42, 43)
+BASE30 = HERE / "results" / "3-0"
+
+
+def teacher_dir(task, seed):
+    return OUT / ("l31_%s__rope__1M__s%d__N100000" % (task, seed))
+
+
+def cmd_teacher_check(a):
+    """6.9-6 / G-0' 7.12: in-distribution exact match of the judgment checkpoint on select:<task> (1,000); >= 0.95"""
+    setup(a.task)
+    import tasks as T
+    import models as M
+    import run as R
+    import c4_select as CS
+    torch.set_num_threads(1)
+    d = teacher_dir(a.task, a.seed)
+    ck = torch.load(d / "teacher_best.pt", weights_only=False)
+    fin = json.loads((d / "final.json").read_text())
+    assert ck["step"] == fin["judgment"]["step"]
+    m = M.build("rope", len(T.VOCAB), [T.TOK[x] for x in T.DIGITS], ck["cfg"])
+    m.load_state_dict(ck["model"])
+    sel = CS.selection_set(a.task)
+    with torch.no_grad():
+        acc, fl = R.exact_match(m, sel, "rope", ck["cfg"])
+    out = {"task": a.task, "run_seed": a.seed, "run": d.name, "judgment_step": ck["step"],
+           "selection_set": {"generation_seed": "select:%s" % a.task, "size": len(sel)}, "selection_accuracy": acc,
+           "threshold": 0.95, "passed": acc >= 0.95, "selection_eval_flops": fl,
+           "judgment_train_flops": fin["judgment"]["train_flops_cum"], "judgment_wall_train_s": fin["judgment"]["wall_train_s_cum"]}
+    (OUT / ("teacher_select_%s_s%d.json" % (a.task, a.seed))).write_text(json.dumps(out, indent=1))
+    print(json.dumps({k: out[k] for k in ("task", "run_seed", "selection_accuracy", "passed")}))
+
+
+def used_teacher(task, s):
+    """the teacher of teacher seed s: s if it passed its check, else s + 200 (None if both failed)"""
+    for seed in (s, s + 200):
+        p = OUT / ("teacher_select_%s_s%d.json" % (task, seed))
+        if p.exists() and json.loads(p.read_text())["passed"]:
+            return seed
+    return None
+
+
+def choice_path(task, s):
+    return OUT / ("choice_%s_t%d.json" % (task, s))
+
+
+def cmd_choose(a):
+    """dedup + Q selection (6.9-1) on the synthesized candidates of teacher seed s; record coverages and agreements"""
+    torch.set_num_threads(1)
+    seed = used_teacher(a.task, a.seed)
+    a.source, a.table, a.teacher_run = "teacher", None, str(teacher_dir(a.task, seed))
+    exs, syn, sel, ids_all, rows, meta = source_data(a)
+    sols = load_sols(src_name(a), OUT)
+    assert sorted(sols) == [1, 2, 3, 4], sorted(sols)
+    pick, dup_of, kept, paths = select_q(a.task, exs, ids_all, sols)
+    hp = batch_paths(exs, ids_all, l1.program_tensors(l1.PROGRAMS[a.task]))
+    hpaths = {i: v[2] for i, v in hp.items()}
+    hand = {"synthesis_sample": coverage(rows, syn, hpaths), "selection_8_10": coverage(rows, sel, hpaths),
+            "all_2000": coverage(rows, ids_all, hpaths)}
+    per = {Q: {"coverage": sols[Q][2]["coverage"], "program": sols[Q][2]["program"],
+               "solver": {k: sols[Q][2]["solver"][k] for k in ("status", "proved_optimal", "gap_relative", "cpu_s",
+                                                               "coverage_rounded_mean", "coverage_rounded_mean_bound",
+                                                               "exec_check_examples_equal")},
+               "supply_agreement_all_2000_without_eos": supply_agreement(a.task, exs, ids_all, paths[Q], False),
+               "supply_agreement_all_2000_with_eos": supply_agreement(a.task, exs, ids_all, paths[Q], True)}
+           for Q in sorted(sols)}
+    MU, DEL, dd = sols[pick]
+    res = {"task": a.task, "teacher_seed": a.seed, "teacher_run_seed": seed, "selected_Q": pick,
+           "dedup_discarded": dup_of, "kept": kept,
+           "rule": "selection-set (length 8-10, first 300) coverage; within 0.005 the smaller Q (6.9-1)",
+           "per_Q": per, "hand_coverage_same_dependency": hand, "meta": meta, "MU": MU.tolist(),
+           "DEL_nonkeep": dd["DEL_nonkeep"], "program": dd["program"],
+           "synthesis_cpu_s_total": sum(sols[Q][2]["solver"]["cpu_s"] for Q in sols), "env": env_info()}
+    choice_path(a.task, a.seed).write_text(json.dumps(res, indent=1, default=str))
+    print(a.task, a.seed, "selected Q", pick, {Q: per[Q]["coverage"]["selection_8_10"] for Q in per}, "hand", hand)
+
+
+def register_choice(task, s):
+    MU, DEL, d = load_prog(choice_path(task, s))
+    Q = MU.shape[1]
+    name = "synth_%s_t%d" % (task, s)
+    l1.PROGRAMS[name] = {"Q": Q, "mu": {h: {(q, KINDS[k]): MOVES[int(MU[h, q, k])] for q in range(Q) for k in range(7)
+                                            if int(MU[h, q, k]) != 0} for h in range(H)},
+                         "tensors": (MU, DEL)}
+    if not getattr(l1, "_l31_patch", False):
+        orig = l1.program_tensors
+        l1.program_tensors = lambda prog: prog["tensors"] if "tensors" in prog else orig(prog)
+        l1._l31_patch = True
+    l1.register(name)
+    return name
+
+
+def student_seed(s, restart):
+    return s + 10 + 100 * restart
+
+
+def student_dir(task, s, restart):
+    return OUT / ("l31_%s__l1read__1M__s%d__N100000__synth_t%d" % (task, student_seed(s, restart), s))
+
+
+def cmd_train(a):
+    setup(a.task)
+    register_choice(a.task, a.seed)
+    path = ROOT / "stage1" / "run.py"
+    src = path.read_text()
+    for old, new in l1.PATCHES:
+        assert src.count(old) == 1, old
+        src = src.replace(old, new)
+    src = src.replace("input + hard reads of the hand L1 program", "input + hard reads of the synthesized L1 program (stage3/l31.py)")
+    argv = ["--task", a.task, "--kind", "l1read", "--scale", "1M", "--seed", str(student_seed(a.seed, a.restart)),
+            "--N", "100000", "--max-steps", "20000", "--phase", "l31", "--out-root", str(OUT), "--threads", "1",
+            "--tag", "synth_t%d" % a.seed, "--keep-best"]
+    if a.resume:
+        argv.append("--resume")
+    sys.argv = [str(path)] + argv
+    exec(compile(src, str(path), "exec"), {"__name__": "__main__", "__file__": str(path)})
+
+
+def cmd_select(a):
+    """C-1 rule: the two restarts' judgment checkpoints on select:<task>; within 5 of 1,000 the smaller restart"""
+    setup(a.task)
+    register_choice(a.task, a.seed)
+    import tasks as T
+    import models as M
+    import c4_select as CS
+    import c1
+    torch.set_num_threads(1)
+    sel = CS.selection_set(a.task)
+    counts = {}
+    for r in (0, 1):
+        d = student_dir(a.task, a.seed, r)
+        ck = torch.load(d / "teacher_best.pt", weights_only=False)
+        fin = json.loads((d / "final.json").read_text())
+        assert ck["step"] == fin["judgment"]["step"]
+        m = M.build("l1read", len(T.VOCAB), [T.TOK[x] for x in T.DIGITS], ck["cfg"])
+        m.load_state_dict(ck["model"])
+        m.eval()
+        counts[r] = c1.exact(m, sel)
+    best = max(counts.values())
+    pool = [r for r in (0, 1) if best - counts[r] <= 5]
+    pick = min(pool)
+    res = {"task": a.task, "teacher_seed": a.seed, "selection_set": {"generation_seed": "select:%s" % a.task, "size": len(sel)},
+           "correct": counts, "accuracy": {r: c / len(sel) for r, c in counts.items()}, "tied_within_tolerance": pool,
+           "selected_restart": pick, "selected_seed": student_seed(a.seed, pick),
+           "rule": "highest selection accuracy; within 0.005 (<= 5 of 1,000) the smaller restart", "env": env_info()}
+    (OUT / ("selection_%s_t%d.json" % (a.task, a.seed))).write_text(json.dumps(res, indent=1))
+    print(json.dumps({k: res[k] for k in ("task", "teacher_seed", "accuracy", "selected_restart")}))
+
+
+def jl(p):
+    return json.loads(pathlib.Path(p).read_text())
+
+
+def baselines30(task):
+    import baseline_table as BT
+    acc, budget, time_s = {}, {}, {}
+    for k in ("abacus", "rope", "looped_rr", "gru"):
+        d = BASE30 / ("l30_%s__%s__1M__s0__N100000" % (task, k))
+        f = jl(d / "final.json")
+        acc[k] = BT.judged(d)[1]
+        budget[k] = f["train_flops"] / f["steps"] * 20000
+        time_s[k] = {"judgment_wall_train_s": f["judgment"]["wall_train_s_cum"], "wall_train_s": f["wall_train_s"]}
+    labs = list(acc["rope"])
+    best = {l: max(v[l] for v in acc.values()) for l in labs}
+    best_kind = {l: [k for k in acc if acc[k][l] == best[l]] for l in labs}
+    return {"best": best, "best_kind": best_kind, "by_kind": acc, "budget": max(budget.values()), "time_s": time_s}
+
+
+def cmd_report(a):
+    out = {"design": "stage3/DESIGN.md 6.7 (verdict 7.7 with the 9.12 budget), 6.9", "tasks": {}}
+    wins = 0
+    for t in l1.VERDICT_TASKS:
+        B = baselines30(t)
+        labs = list(B["best"])
+        rows = []
+        for s in TEACHER_SEEDS:
+            r = {"teacher_seed": s}
+            seeds = [x for x in (s, s + 200) if (OUT / ("teacher_select_%s_s%d.json" % (t, x))).exists()]
+            checks = [jl(OUT / ("teacher_select_%s_s%d.json" % (t, x))) for x in seeds]
+            r["teacher_checks"] = {c["run_seed"]: c["selection_accuracy"] for c in checks}
+            used = used_teacher(t, s)
+            r["teacher_used"] = used
+            if used is None:
+                r["failure"] = "teacher"
+                rows.append(r)
+                continue
+            ch = jl(choice_path(t, s))
+            sel = jl(OUT / ("selection_%s_t%d.json" % (t, s)))
+            fs = [jl(student_dir(t, s, k) / "final.json") for k in (0, 1)]
+            f = fs[sel["selected_restart"]]
+            acc = f["judgment"]["acc"]
+            teacher_fl = sum(c["judgment_train_flops"] for c in checks)
+            extract_fl = ch["meta"]["teacher"]["extraction_flops"]
+            stud_fl = [x["judgment"]["train_flops_cum"] for x in fs]
+            total = teacher_fl + extract_fl + sum(stud_fl)
+            c1_ = acc[labs[1]] >= 0.90 and acc[labs[2]] >= 0.90
+            c2_ = acc[labs[1]] >= B["best"][labs[1]] - 0.01 and acc[labs[2]] >= B["best"][labs[2]] - 0.01
+            c3_ = total <= B["budget"]
+            teacher_s = sum(c["judgment_wall_train_s"] for c in checks)
+            cpu = {"teacher_judgment_train_s": teacher_s, "extraction_cpu_s": ch["meta"]["teacher"]["extraction_cpu_s"],
+                   "synthesis_cpu_s": ch["synthesis_cpu_s_total"],
+                   "students_judgment_train_s": [x["judgment"]["wall_train_s_cum"] for x in fs]}
+            cpu["total"] = cpu["teacher_judgment_train_s"] + cpu["extraction_cpu_s"] + cpu["synthesis_cpu_s"] + sum(cpu["students_judgment_train_s"])
+            r.update({"selected_Q": ch["selected_Q"], "dedup_discarded": ch["dedup_discarded"],
+                      "coverage_by_Q": {Q: v["coverage"] for Q, v in ch["per_Q"].items()},
+                      "solver_by_Q": {Q: v["solver"] for Q, v in ch["per_Q"].items()},
+                      "supply_agreement_by_Q": {Q: (v["supply_agreement_all_2000_without_eos"], v["supply_agreement_all_2000_with_eos"])
+                                                for Q, v in ch["per_Q"].items()},
+                      "hand_coverage": ch["hand_coverage_same_dependency"], "program": ch["program"],
+                      "selected_restart": sel["selected_restart"], "selection_accuracy": sel["accuracy"],
+                      "acc": acc, "judgment_step": f["judgment"]["step"], "steps": f["steps"],
+                      "flops": {"teacher": teacher_fl, "extraction": extract_fl, "students": stud_fl, "total": total,
+                                "budget": B["budget"], "fraction": total / B["budget"]},
+                      "cpu_s": cpu, "criteria": {"1_ood12_ge_0.90": c1_, "2_ge_baseline_best_minus_0.01": c2_,
+                                                 "3_total_flops_le_budget": c3_}, "win": c1_ and c2_ and c3_})
+            rows.append(r)
+        win = len(rows) == 3 and all(x.get("win") for x in rows)
+        wins += win
+        out["tasks"][t] = {"baselines": B, "tables": rows, "win": win}
+    out["tasks_won"] = wins
+    out["answer"] = "yes" if wins >= 3 else "no"
+    (OUT / "summary.json").write_text(json.dumps(out, indent=1, default=str))
+    print(json.dumps({t: [(x.get("selected_Q"), x.get("acc"), x.get("win")) for x in v["tables"]] for t, v in out["tasks"].items()}, default=str))
+    print("tasks won", wins)
+
+
 def main():
     p = argparse.ArgumentParser()
     sp = p.add_subparsers(dest="cmd", required=True)
@@ -737,8 +964,17 @@ def main():
     for name in ("gate1", "gate2", "gate3"):
         q = sp.add_parser(name)
         q.add_argument("--task", required=True)
+    for name in ("teacher_check", "choose", "train", "select"):
+        q = sp.add_parser(name)
+        q.add_argument("--task", required=True)
+        q.add_argument("--seed", type=int, required=True)
+        q.add_argument("--restart", type=int, default=0)
+        q.add_argument("--resume", action="store_true")
+    sp.add_parser("report")
     a = p.parse_args()
-    {"synth": cmd_synth, "deps": cmd_deps, "gate1": cmd_gate1, "gate2": cmd_gate2, "gate3": cmd_gate3}[a.cmd](a)
+    {"synth": cmd_synth, "deps": cmd_deps, "gate1": cmd_gate1, "gate2": cmd_gate2, "gate3": cmd_gate3,
+     "teacher_check": cmd_teacher_check, "choose": cmd_choose, "train": cmd_train, "select": cmd_select,
+     "report": cmd_report}[a.cmd](a)
 
 
 if __name__ == "__main__":

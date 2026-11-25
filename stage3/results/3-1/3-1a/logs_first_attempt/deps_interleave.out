@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "/home/user/NEUMANN/stage3/l31.py", line 745, in <module>
+    main()
+  File "/home/user/NEUMANN/stage3/l31.py", line 741, in main
+    {"synth": cmd_synth, "deps": cmd_deps, "gate1": cmd_gate1, "gate2": cmd_gate2, "gate3": cmd_gate3}[a.cmd](a)
+  File "/home/user/NEUMANN/stage3/l31.py", line 462, in cmd_deps
+    exs, syn, sel, ids_all, rows, meta = source_data(a)
+                                         ^^^^^^^^^^^^^^
+  File "/home/user/NEUMANN/stage3/l31.py", line 447, in source_data
+    rows, info = rows_teacher(a.task, a.teacher_run, exs, ids_all, tag)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/NEUMANN/stage3/l31.py", line 182, in rows_teacher
+    info = {"teacher_run": str(pathlib.Path(run_dir).relative_to(ROOT)), "teacher_step": ck["step"],
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 682, in relative_to
+    raise ValueError(f"{str(self)!r} is not in the subpath of {str(other)!r}")
+ValueError: 'stage3/results/3-0/l30_interleave__rope__1M__s0__N100000' is not in the subpath of '/home/user/NEUMANN'
