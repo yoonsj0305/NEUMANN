@@ -1,0 +1,32 @@
+{
+ "task": "mul1",
+ "table": 2,
+ "selection_set": {
+  "generation_seed": "select:mul1",
+  "size": 1000
+ },
+ "correct": {
+  "0": 998,
+  "1": 996
+ },
+ "accuracy": {
+  "0": 0.998,
+  "1": 0.996
+ },
+ "tied_within_tolerance": [
+  0,
+  1
+ ],
+ "selected_restart": 0,
+ "selected_seed": 32,
+ "rule": "highest selection accuracy; within 0.005 (<= 5 of 1,000) the smaller restart",
+ "env": {
+  "code_commit": "28a214258fa655fba1f3cea9011d5eea3561fc29",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1
+ }
+}
