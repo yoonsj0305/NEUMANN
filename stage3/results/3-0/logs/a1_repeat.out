@@ -1,0 +1,10 @@
+repeat id_1-10 {'examples': 2000, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_q': 1.0, 'correct_read_scored_steps_without_eos': 1.0, 'scored_steps_without_eos': 21910}
+repeat ood_11-20 {'examples': 500, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_q': 1.0, 'correct_read_scored_steps_without_eos': 1.0, 'scored_steps_without_eos': 15702}
+repeat ood_21-30 {'examples': 500, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_q': 1.0, 'correct_read_scored_steps_without_eos': 1.0, 'scored_steps_without_eos': 25574}
+repeat ood_31-40 {'examples': 500, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_q': 1.0, 'correct_read_scored_steps_without_eos': 1.0, 'scored_steps_without_eos': 35540}
+repeat (d) {"train_seed": 30, "train_examples": 100000, "train_table_keys": 113240, "train_conflicts": 0, "conflicts_0_everywhere": true}
+    id_1-10 {'scored_steps': 23910, 'conflicts_within_set': 0, 'covered_steps_vs_train_table_wrong': 0, 'key_coverage_recorded': 0.9815976578837307}
+    ood_11-20 {'scored_steps': 16202, 'conflicts_within_set': 0, 'covered_steps_vs_train_table_wrong': 0, 'key_coverage_recorded': 0.9591408468090359}
+    ood_21-30 {'scored_steps': 26074, 'conflicts_within_set': 0, 'covered_steps_vs_train_table_wrong': 0, 'key_coverage_recorded': 0.9546674848508092}
+    ood_31-40 {'scored_steps': 36040, 'conflicts_within_set': 0, 'covered_steps_vs_train_table_wrong': 0, 'key_coverage_recorded': 0.9514150943396227}
+repeat A1: True

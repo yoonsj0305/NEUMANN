@@ -1,0 +1,11 @@
+interleave without_eos_step coverage 0.3216 d conflicts any: True table [[0, 0, 0, 0, 0, 5, 0], [0, 0, 3, 0, 0, 1, 0], [0, 0, 1, 0, 0, 0, 0]]
+    id_1-10 {'scored_steps': 23842, 'conflicts_within_set': 76, 'covered_steps_vs_train_table_wrong': 3649, 'key_coverage_recorded': 0.4558342420937841}
+    ood_11-20 {'scored_steps': 15930, 'conflicts_within_set': 15, 'covered_steps_vs_train_table_wrong': 2094, 'key_coverage_recorded': 0.22517263025737602}
+    ood_21-30 {'scored_steps': 25828, 'conflicts_within_set': 54, 'covered_steps_vs_train_table_wrong': 3284, 'key_coverage_recorded': 0.18518661917299056}
+    ood_31-40 {'scored_steps': 36188, 'conflicts_within_set': 126, 'covered_steps_vs_train_table_wrong': 4489, 'key_coverage_recorded': 0.16859179838620536}
+interleave with_eos_step coverage 0.3028 d conflicts any: True table [[0, 0, 0, 0, 0, 5, 0], [0, 0, 1, 0, 0, 0, 0], [0, 0, 3, 0, 0, 1, 0]]
+    id_1-10 {'scored_steps': 23842, 'conflicts_within_set': 76, 'covered_steps_vs_train_table_wrong': 3649, 'key_coverage_recorded': 0.4558342420937841}
+    ood_11-20 {'scored_steps': 15930, 'conflicts_within_set': 15, 'covered_steps_vs_train_table_wrong': 2094, 'key_coverage_recorded': 0.22517263025737602}
+    ood_21-30 {'scored_steps': 25828, 'conflicts_within_set': 54, 'covered_steps_vs_train_table_wrong': 3284, 'key_coverage_recorded': 0.18518661917299056}
+    ood_31-40 {'scored_steps': 36188, 'conflicts_within_set': 126, 'covered_steps_vs_train_table_wrong': 4489, 'key_coverage_recorded': 0.16859179838620536}
+interleave A2 L0 outside: True (both variants agree: True)

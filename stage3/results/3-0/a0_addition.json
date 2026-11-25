@@ -1,0 +1,192 @@
+{
+ "task": "addition",
+ "tables": {
+  "table1": {
+   "source": "stage1/results/c4/addition_compile_s6",
+   "policy": [
+    [
+     0,
+     3,
+     1,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     3,
+     3,
+     0,
+     0,
+     1,
+     0
+    ]
+   ],
+   "sets": {
+    "id_1-10": {
+     "steps": 21336,
+     "read_positions_equal": 1.0,
+     "segment_bits_equal": 1.0
+    },
+    "ood_11-20": {
+     "steps": 21419,
+     "read_positions_equal": 1.0,
+     "segment_bits_equal": 1.0
+    },
+    "ood_21-30": {
+     "steps": 33291,
+     "read_positions_equal": 1.0,
+     "segment_bits_equal": 1.0
+    },
+    "ood_31-40": {
+     "steps": 46159,
+     "read_positions_equal": 1.0,
+     "segment_bits_equal": 1.0
+    },
+    "train_first200": {
+     "steps": 4337,
+     "read_positions_equal": 1.0,
+     "segment_bits_equal": 1.0
+    }
+   }
+  },
+  "table2": {
+   "source": "stage1/results/c4/addition_compile_s7",
+   "policy": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     3,
+     1,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     3,
+     3,
+     0,
+     0,
+     1,
+     0
+    ]
+   ],
+   "sets": {
+    "id_1-10": {
+     "steps": 21336,
+     "read_positions_equal": 1.0,
+     "segment_bits_equal": 1.0
+    },
+    "ood_11-20": {
+     "steps": 21419,
+     "read_positions_equal": 1.0,
+     "segment_bits_equal": 1.0
+    },
+    "ood_21-30": {
+     "steps": 33291,
+     "read_positions_equal": 1.0,
+     "segment_bits_equal": 1.0
+    },
+    "ood_31-40": {
+     "steps": 46159,
+     "read_positions_equal": 1.0,
+     "segment_bits_equal": 1.0
+    },
+    "train_first200": {
+     "steps": 4268,
+     "read_positions_equal": 1.0,
+     "segment_bits_equal": 1.0
+    }
+   }
+  },
+  "table3": {
+   "source": "stage1/results/c4/addition_compile_s8",
+   "policy": [
+    [
+     0,
+     3,
+     1,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     3,
+     3,
+     0,
+     0,
+     1,
+     0
+    ]
+   ],
+   "sets": {
+    "id_1-10": {
+     "steps": 21336,
+     "read_positions_equal": 1.0,
+     "segment_bits_equal": 1.0
+    },
+    "ood_11-20": {
+     "steps": 21419,
+     "read_positions_equal": 1.0,
+     "segment_bits_equal": 1.0
+    },
+    "ood_21-30": {
+     "steps": 33291,
+     "read_positions_equal": 1.0,
+     "segment_bits_equal": 1.0
+    },
+    "ood_31-40": {
+     "steps": 46159,
+     "read_positions_equal": 1.0,
+     "segment_bits_equal": 1.0
+    },
+    "train_first200": {
+     "steps": 4276,
+     "read_positions_equal": 1.0,
+     "segment_bits_equal": 1.0
+    }
+   }
+  }
+ },
+ "all_1.000": true,
+ "env": {
+  "code_commit": "021aeab79176d0ebcbb7b436cee16132d7b6fa6b",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1
+ }
+}

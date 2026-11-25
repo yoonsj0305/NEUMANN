@@ -1,0 +1,137 @@
+{
+ "task": "pairswap",
+ "program": {
+  "Q": 3,
+  "mu": {
+   "head0": {
+    "q0 =": "right",
+    "q0 answer_phase": "right",
+    "q1 answer_phase": "right",
+    "q2 answer_phase": "right"
+   },
+   "head1": {
+    "q0 answer_phase": "right",
+    "q2 answer_phase": "right"
+   }
+  },
+  "mu_default": "stay",
+  "delta_rules_first_match": [
+   {
+    "q": 0,
+    "kind_x": "=",
+    "kind_reads": {},
+    "next": 1
+   },
+   {
+    "q": 1,
+    "kind_x": "answer_phase",
+    "kind_reads": {},
+    "next": 0
+   },
+   {
+    "q": 0,
+    "kind_x": "answer_phase",
+    "kind_reads": {},
+    "next": 2
+   },
+   {
+    "q": 2,
+    "kind_x": "answer_phase",
+    "kind_reads": {},
+    "next": 0
+   },
+   {
+    "q": "*",
+    "kind_x": "*",
+    "kind_reads": {},
+    "next": "same"
+   }
+  ],
+  "supply_head_by_q": {
+   "q0": 0,
+   "q1": 1,
+   "q2": 1
+  },
+  "note": "head 0 reads position k+1 at answer step k (supplies even k: s_{k+1}); head 1 reads position k-1 (supplies odd k: s_{k-1}), starting one step late: q = 1 marks answer step 1 (head 1 stays at 0), then q alternates 0 (even k) / 2 (odd k >= 3)"
+ },
+ "moving_heads": [
+  0,
+  1
+ ],
+ "bos": false,
+ "bos_reason": "no head needs the left end: every head starts at position 0 and reads it directly; no head moves left (H-0 BOS convention not used)",
+ "kind_of_read": "kappa at the read position (pf.token_classes on the tape)",
+ "sets": {
+  "id_2-10": {
+   "examples": 2000,
+   "b_causal_p_le_t": 1.0,
+   "c_prime_invariance_t_ge_t0_positions_bits_q": 1.0,
+   "correct_read_scored_steps_without_eos": 1.0,
+   "scored_steps_without_eos": 11876
+  },
+  "ood_12-20": {
+   "examples": 500,
+   "b_causal_p_le_t": 1.0,
+   "c_prime_invariance_t_ge_t0_positions_bits_q": 1.0,
+   "correct_read_scored_steps_without_eos": 1.0,
+   "scored_steps_without_eos": 7998
+  },
+  "ood_22-30": {
+   "examples": 500,
+   "b_causal_p_le_t": 1.0,
+   "c_prime_invariance_t_ge_t0_positions_bits_q": 1.0,
+   "correct_read_scored_steps_without_eos": 1.0,
+   "scored_steps_without_eos": 13084
+  },
+  "ood_32-40": {
+   "examples": 500,
+   "b_causal_p_le_t": 1.0,
+   "c_prime_invariance_t_ge_t0_positions_bits_q": 1.0,
+   "correct_read_scored_steps_without_eos": 1.0,
+   "scored_steps_without_eos": 17994
+  }
+ },
+ "d": {
+  "train_seed": 30,
+  "train_examples": 100000,
+  "train_table_keys": 102957,
+  "train_conflicts": 0,
+  "sets": {
+   "id_2-10": {
+    "scored_steps": 13876,
+    "conflicts_within_set": 0,
+    "covered_steps_vs_train_table_wrong": 0,
+    "key_coverage_recorded": 0.950634188526953
+   },
+   "ood_12-20": {
+    "scored_steps": 8498,
+    "conflicts_within_set": 0,
+    "covered_steps_vs_train_table_wrong": 0,
+    "key_coverage_recorded": 0.8926806307366439
+   },
+   "ood_22-30": {
+    "scored_steps": 13584,
+    "conflicts_within_set": 0,
+    "covered_steps_vs_train_table_wrong": 0,
+    "key_coverage_recorded": 0.8763250883392226
+   },
+   "ood_32-40": {
+    "scored_steps": 18494,
+    "conflicts_within_set": 0,
+    "covered_steps_vs_train_table_wrong": 0,
+    "key_coverage_recorded": 0.8664972423488699
+   }
+  },
+  "conflicts_0_everywhere": true
+ },
+ "a1_all": true,
+ "env": {
+  "code_commit": "021aeab79176d0ebcbb7b436cee16132d7b6fa6b",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1
+ }
+}

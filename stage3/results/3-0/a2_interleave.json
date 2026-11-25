@@ -1,0 +1,265 @@
+{
+ "task": "interleave",
+ "data": "train_set(seed 0)[:2000] (c3 method)",
+ "variants": {
+  "without_eos_step": {
+   "output_steps": 22088,
+   "best_l0_table": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     5,
+     0
+    ],
+    [
+     0,
+     0,
+     3,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "per_head": [
+    {
+     "column": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "stay",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "content",
+      "other": "stay"
+     },
+     "score_after_cover": 0.1491307497283593,
+     "columns_tied_at_best": 18360
+    },
+    {
+     "column": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "next_sep",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "right",
+      "other": "stay"
+     },
+     "score_after_cover": 0.09054690329590728,
+     "columns_tied_at_best": 8640
+    },
+    {
+     "column": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "right",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "stay",
+      "other": "stay"
+     },
+     "score_after_cover": 0.08189967403114813,
+     "columns_tied_at_best": 5616
+    }
+   ],
+   "coverage": 0.3215773270554147,
+   "moving_heads": [
+    0,
+    1,
+    2
+   ],
+   "d_without_q": {
+    "train_seed": 30,
+    "train_examples": 100000,
+    "train_table_keys": 772581,
+    "train_conflicts": 107908,
+    "sets": {
+     "id_1-10": {
+      "scored_steps": 23842,
+      "conflicts_within_set": 76,
+      "covered_steps_vs_train_table_wrong": 3649,
+      "key_coverage_recorded": 0.4558342420937841
+     },
+     "ood_11-20": {
+      "scored_steps": 15930,
+      "conflicts_within_set": 15,
+      "covered_steps_vs_train_table_wrong": 2094,
+      "key_coverage_recorded": 0.22517263025737602
+     },
+     "ood_21-30": {
+      "scored_steps": 25828,
+      "conflicts_within_set": 54,
+      "covered_steps_vs_train_table_wrong": 3284,
+      "key_coverage_recorded": 0.18518661917299056
+     },
+     "ood_31-40": {
+      "scored_steps": 36188,
+      "conflicts_within_set": 126,
+      "covered_steps_vs_train_table_wrong": 4489,
+      "key_coverage_recorded": 0.16859179838620536
+     }
+    },
+    "conflicts_0_everywhere": false
+   },
+   "l0_outside": true,
+   "why": {
+    "coverage_lt_0.99": true,
+    "d_conflict_gt_0": true
+   },
+   "present_classes": [
+    "digit",
+    "+",
+    "=",
+    "answer_phase"
+   ],
+   "distinct_paths_simulated": 1296
+  },
+  "with_eos_step": {
+   "output_steps": 24088,
+   "best_l0_table": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     5,
+     0
+    ],
+    [
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     3,
+     0,
+     0,
+     1,
+     0
+    ]
+   ],
+   "per_head": [
+    {
+     "column": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "stay",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "content",
+      "other": "stay"
+     },
+     "score_after_cover": 0.13674858850880106,
+     "columns_tied_at_best": 18360
+    },
+    {
+     "column": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "right",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "stay",
+      "other": "stay"
+     },
+     "score_after_cover": 0.08302889405513118,
+     "columns_tied_at_best": 19656
+    },
+    {
+     "column": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "next_sep",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "right",
+      "other": "stay"
+     },
+     "score_after_cover": 0.08302889405513118,
+     "columns_tied_at_best": 8856
+    }
+   ],
+   "coverage": 0.3028063766190634,
+   "moving_heads": [
+    0,
+    1,
+    2
+   ],
+   "d_without_q": {
+    "train_seed": 30,
+    "train_examples": 100000,
+    "train_table_keys": 772581,
+    "train_conflicts": 107908,
+    "sets": {
+     "id_1-10": {
+      "scored_steps": 23842,
+      "conflicts_within_set": 76,
+      "covered_steps_vs_train_table_wrong": 3649,
+      "key_coverage_recorded": 0.4558342420937841
+     },
+     "ood_11-20": {
+      "scored_steps": 15930,
+      "conflicts_within_set": 15,
+      "covered_steps_vs_train_table_wrong": 2094,
+      "key_coverage_recorded": 0.22517263025737602
+     },
+     "ood_21-30": {
+      "scored_steps": 25828,
+      "conflicts_within_set": 54,
+      "covered_steps_vs_train_table_wrong": 3284,
+      "key_coverage_recorded": 0.18518661917299056
+     },
+     "ood_31-40": {
+      "scored_steps": 36188,
+      "conflicts_within_set": 126,
+      "covered_steps_vs_train_table_wrong": 4489,
+      "key_coverage_recorded": 0.16859179838620536
+     }
+    },
+    "conflicts_0_everywhere": false
+   },
+   "l0_outside": true,
+   "why": {
+    "coverage_lt_0.99": true,
+    "d_conflict_gt_0": true
+   },
+   "present_classes": [
+    "digit",
+    "+",
+    "=",
+    "answer_phase"
+   ],
+   "distinct_paths_simulated": 1296
+  }
+ },
+ "l0_outside_same_in_both_variants": true,
+ "a2_l0_outside": true,
+ "env": {
+  "code_commit": "021aeab79176d0ebcbb7b436cee16132d7b6fa6b",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1
+ }
+}
