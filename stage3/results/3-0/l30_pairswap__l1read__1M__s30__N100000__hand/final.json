@@ -1,0 +1,101 @@
+{
+ "name": "l30_pairswap__l1read__1M__s30__N100000__hand",
+ "task": "pairswap",
+ "kind": "l1read",
+ "scale": "1M",
+ "params": 874624,
+ "config": {
+  "d": 128,
+  "heads": 4,
+  "layers": 4,
+  "program": "pairswap",
+  "q_zero": false
+ },
+ "seed": 30,
+ "N": 100000,
+ "batch": 64,
+ "lr": 0.001,
+ "max_steps": 20000,
+ "steps": 2000,
+ "stopped": "early stop: in-distribution >= 99% at two consecutive evaluations",
+ "spec": {
+  "train": [
+   2,
+   10
+  ],
+  "id": [
+   2,
+   10
+  ],
+  "ood": [
+   [
+    12,
+    20
+   ],
+   [
+    22,
+    30
+   ],
+   [
+    32,
+    40
+   ]
+  ]
+ },
+ "id_size": 1000,
+ "ood_size": 500,
+ "judgment": {
+  "rule": "highest in-distribution accuracy (earliest if tied)",
+  "step": 1000,
+  "acc": {
+   "id_2-10": 1.0,
+   "ood_12-20": 1.0,
+   "ood_22-30": 1.0,
+   "ood_32-40": 1.0
+  },
+  "acc_fixed4": null,
+  "acc_seq": null,
+  "train_flops_cum": 7382335488000,
+  "wall_train_s_cum": 138.29
+ },
+ "last": {
+  "step": 2000,
+  "acc": {
+   "id_2-10": 1.0,
+   "ood_12-20": 1.0,
+   "ood_22-30": 1.0,
+   "ood_32-40": 1.0
+  },
+  "acc_fixed4": null,
+  "acc_seq": null
+ },
+ "final_acc": {
+  "id_2-10": 1.0,
+  "ood_12-20": 1.0,
+  "ood_22-30": 1.0,
+  "ood_32-40": 1.0
+ },
+ "final_acc_fixed4": null,
+ "recur": {},
+ "train_flops": 14764670976000,
+ "eval_flops": 357771825152,
+ "wall_train_s": 263.11,
+ "wall_eval_s": 7.03,
+ "segments": [
+  {
+   "segment": 0,
+   "start_step": 0,
+   "started": "2026-11-25 05:44:03"
+  }
+ ],
+ "hardware": {
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "torch_threads": 1,
+  "torch": "2.15.0+cu132",
+  "cuda": false,
+  "python": "3.12.3"
+ },
+ "commit": "43577e74640bae69397ae2fcabc66e1ce9624e08",
+ "primary_eval_rule": "looped / looped_rr: recurrence 4 x ceil(bin upper / training upper) (declared before runs); fixed 4 recorded as acc_fixed4"
+}
