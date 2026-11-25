@@ -274,7 +274,8 @@ def fin_of(d):
 
 
 def baselines(task):
-    accs = [fin_of(d)["judgment"]["acc"] for d in BASE_ACC[task]]
+    import baseline_table                                          # Phase A runs (before the judgment rule): the
+    accs = [baseline_table.judged(d)[1] for d in BASE_ACC[task]]   # same rule applied to log.jsonl (stage 1)
     labs = list(accs[0])
     best = {l: max(x[l] for x in accs) for l in labs}
     budget = {}
