@@ -1,0 +1,362 @@
+{
+ "Q": 4,
+ "Qp": 1,
+ "states": 4,
+ "solver": {
+  "Qp": 1,
+  "status": "OPTIMAL",
+  "proved_optimal": true,
+  "synthesis_sample_unexplained_solver": 34,
+  "synthesis_sample_steps": 518,
+  "synthesis_sample_empty_E": 0,
+  "changing_delta_p_cells": 0,
+  "contexts": 0,
+  "table_keys": 6,
+  "wall_s": 0.11093711853027344,
+  "cpu_s": 0.10918099999999953,
+  "time_limit_s": 600.0,
+  "workers": 1,
+  "random_seed": 0,
+  "exec_check_examples_equal": 1.0
+ },
+ "routing_file": "stage3/results/3-1/3-1a2/teacher_pairswap_route_Q4.json",
+ "routing_candidate": "cp-sat",
+ "coverage": {
+  "synthesis_sample": 0.9793077679057706,
+  "selection_8_10": 0.9626705728502847,
+  "all": 0.9705013107552799
+ },
+ "coverage_without_free": {
+  "synthesis_sample": 0.9157830307173932,
+  "selection_8_10": 0.8909831502147147,
+  "all": 0.9029628223498068
+ },
+ "explanation": {
+  "synthesis_sample": {
+   "rate": 0.9343629343629344,
+   "eos_rate": 1.0,
+   "steps": 518,
+   "eos_steps": 100,
+   "key_not_in_table": 0.0,
+   "empty_E": 0.0
+  },
+  "selection_8_10": {
+   "rate": 0.7779273216689099,
+   "eos_rate": 1.0,
+   "steps": 2972,
+   "eos_steps": 300,
+   "key_not_in_table": 0.0,
+   "empty_E": 0.0
+  },
+  "all": {
+   "rate": 0.8465006440532418,
+   "eos_rate": 1.0,
+   "steps": 13974,
+   "eos_steps": 2000,
+   "key_not_in_table": 0.0,
+   "empty_E": 0.0
+  }
+ },
+ "table": [
+  {
+   "q": 0,
+   "kind_x": "=",
+   "reads": [
+    "digit",
+    "digit",
+    "digit"
+   ],
+   "bits": [
+    1,
+    1,
+    1
+   ],
+   "qp": 0,
+   "c": "head2"
+  },
+  {
+   "q": 0,
+   "kind_x": "answer_phase",
+   "reads": [
+    "digit",
+    "digit",
+    "digit"
+   ],
+   "bits": [
+    1,
+    1,
+    1
+   ],
+   "qp": 0,
+   "c": "head0"
+  },
+  {
+   "q": 0,
+   "kind_x": "answer_phase",
+   "reads": [
+    "digit",
+    "=",
+    "="
+   ],
+   "bits": [
+    1,
+    0,
+    0
+   ],
+   "qp": 0,
+   "c": "head0"
+  },
+  {
+   "q": 1,
+   "kind_x": "answer_phase",
+   "reads": [
+    "digit",
+    "digit",
+    "digit"
+   ],
+   "bits": [
+    1,
+    1,
+    1
+   ],
+   "qp": 0,
+   "c": "EOS"
+  },
+  {
+   "q": 2,
+   "kind_x": "answer_phase",
+   "reads": [
+    "digit",
+    "digit",
+    "digit"
+   ],
+   "bits": [
+    1,
+    1,
+    1
+   ],
+   "qp": 0,
+   "c": "head1"
+  },
+  {
+   "q": 2,
+   "kind_x": "answer_phase",
+   "reads": [
+    "digit",
+    "=",
+    "digit"
+   ],
+   "bits": [
+    1,
+    0,
+    1
+   ],
+   "qp": 0,
+   "c": "head0"
+  }
+ ],
+ "program": {
+  "Q": 4,
+  "mu_non_stay": {
+   "head0": {
+    "q2 answer_phase": "right"
+   },
+   "head1": {
+    "q0 =": "right",
+    "q0 answer_phase": "right",
+    "q1 answer_phase": "left",
+    "q2 answer_phase": "right"
+   },
+   "head2": {
+    "q0 =": "right",
+    "q0 answer_phase": "right",
+    "q1 answer_phase": "left"
+   }
+  },
+  "delta_non_keep": [
+   {
+    "q": 0,
+    "kind_x": "answer_phase",
+    "reads": [
+     "digit",
+     "digit",
+     "digit"
+    ],
+    "next": 2
+   },
+   {
+    "q": 0,
+    "kind_x": "answer_phase",
+    "reads": [
+     "digit",
+     "=",
+     "="
+    ],
+    "next": 1
+   },
+   {
+    "q": 2,
+    "kind_x": "answer_phase",
+    "reads": [
+     "digit",
+     "=",
+     "digit"
+    ],
+    "next": 1
+   }
+  ],
+  "moving_heads": [
+   0,
+   1,
+   2
+  ]
+ },
+ "MU": [
+  [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  [
+   [
+    0,
+    0,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    2,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  [
+   [
+    0,
+    0,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    2,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  ]
+ ],
+ "DEL_nonkeep": [
+  {
+   "q": 0,
+   "kind_x": "answer_phase",
+   "reads": [
+    "digit",
+    "digit",
+    "digit"
+   ],
+   "next": 2
+  },
+  {
+   "q": 0,
+   "kind_x": "answer_phase",
+   "reads": [
+    "digit",
+    "=",
+    "="
+   ],
+   "next": 1
+  },
+  {
+   "q": 2,
+   "kind_x": "answer_phase",
+   "reads": [
+    "digit",
+    "=",
+    "digit"
+   ],
+   "next": 1
+  }
+ ]
+}

@@ -1,0 +1,92 @@
+{
+ "check": "A2' path-free L0 coverage (6.12-3, record)",
+ "task": "repeat",
+ "solver": {
+  "status": "OPTIMAL",
+  "proved_optimal": true,
+  "objective": 5449.0,
+  "bound": 5449.0,
+  "gap_relative": 0.0,
+  "free_covered_steps": 171,
+  "wall_s": 22.419203519821167,
+  "cpu_s": 22.271688000000005,
+  "time_limit_s": 600.0,
+  "workers": 1,
+  "random_seed": 0,
+  "exec_check_examples_equal": 1.0
+ },
+ "program": {
+  "Q": 1,
+  "mu_non_stay": {
+   "head0": {
+    "q0 answer_phase": "content"
+   },
+   "head1": {},
+   "head2": {}
+  },
+  "delta_non_keep": [],
+  "moving_heads": [
+   0
+  ]
+ },
+ "covered": {
+  "synthesis_sample": {
+   "without_eos": 1.0,
+   "with_eos": 0.8774509803921569,
+   "steps_without_eos": 716,
+   "steps_with_eos": 816
+  },
+  "selection_8_10": {
+   "without_eos": 1.0,
+   "with_eos": 0.9476074048201187,
+   "steps_without_eos": 5426,
+   "steps_with_eos": 5726
+  },
+  "all": {
+   "without_eos": 1.0,
+   "with_eos": 0.9166110740493663,
+   "steps_without_eos": 21984,
+   "steps_with_eos": 23984
+  }
+ },
+ "all_stay": {
+  "synthesis_sample": {
+   "without_eos": 0.441340782122905,
+   "with_eos": 0.3872549019607843,
+   "steps_without_eos": 716,
+   "steps_with_eos": 816
+  },
+  "all": {
+   "without_eos": 0.3790938864628821,
+   "with_eos": 0.34748165443629087,
+   "steps_without_eos": 21984,
+   "steps_with_eos": 23984
+  }
+ },
+ "data": "train_set seed 0, the first 2,000 (synthesis sample as 6.9-1)",
+ "env": {
+  "code_commit": "93a2d27fde4884f421f50c16ca705adf1845e2b6",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1,
+  "ortools": "9.15.6755",
+  "cp_sat": {
+   "num_workers": 1,
+   "random_seed": 0,
+   "max_time_in_seconds": 600.0
+  },
+  "module": "stage3/l31c.py",
+  "code": {
+   "code_commit": "93a2d27fde4884f421f50c16ca705adf1845e2b6",
+   "code_dirty": false,
+   "torch": "2.15.0+cu132",
+   "python": "3.12.3",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "cores": 4,
+   "threads": 1
+  }
+ }
+}

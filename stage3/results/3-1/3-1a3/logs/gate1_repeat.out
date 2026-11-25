@@ -1,0 +1,13 @@
+oracle_repeat Q 1 Qp 1 expl {'synthesis_sample': 0.6838, 'selection_8_10': 0.5786, 'all': 0.6251} cov sel 0.5786 cpu 0.2
+oracle_repeat Q 1 Qp 2 expl {'synthesis_sample': 0.7267, 'selection_8_10': 0.6037, 'all': 0.655} cov sel 0.5786 cpu 0.3
+oracle_repeat Q 1 Qp 3 expl {'synthesis_sample': 0.7341, 'selection_8_10': 0.6051, 'all': 0.6584} cov sel 0.5786 cpu 17.6
+oracle_repeat Q 1 Qp 4 expl {'synthesis_sample': 0.7402, 'selection_8_10': 0.6133, 'all': 0.6656} cov sel 0.5786 cpu 595.4
+oracle_repeat Q 2 Qp 1 expl {'synthesis_sample': 1.0, 'selection_8_10': 1.0, 'all': 1.0} cov sel 1.0000 cpu 0.2
+oracle_repeat Q 2 Qp 2 expl {'synthesis_sample': 1.0, 'selection_8_10': 1.0, 'all': 1.0} cov sel 1.0000 cpu 0.2
+oracle_repeat Q 3 Qp 1 expl {'synthesis_sample': 1.0, 'selection_8_10': 1.0, 'all': 1.0} cov sel 1.0000 cpu 0.2
+oracle_repeat Q 4 Qp 1 expl {'synthesis_sample': 1.0, 'selection_8_10': 1.0, 'all': 1.0} cov sel 1.0000 cpu 0.2
+repeat id_1-10 {'examples': 2000, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_state': 1.0, 'correct_read_ii': 1.0, 'correct_read_ii_free_t_t1': 1.0, 'scored_steps_without_eos': 21910}
+repeat ood_11-20 {'examples': 500, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_state': 1.0, 'correct_read_ii': 1.0, 'correct_read_ii_free_t_t1': 1.0, 'scored_steps_without_eos': 15702}
+repeat ood_21-30 {'examples': 500, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_state': 1.0, 'correct_read_ii': 1.0, 'correct_read_ii_free_t_t1': 1.0, 'scored_steps_without_eos': 25574}
+repeat ood_31-40 {'examples': 500, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_state': 1.0, 'correct_read_ii': 1.0, 'correct_read_ii_free_t_t1': 1.0, 'scored_steps_without_eos': 35540}
+repeat gate1 pick (2, 1) expl {'rate': 1.0, 'eos_rate': 1.0, 'steps': 5726, 'eos_steps': 300, 'key_not_in_table': 0.0, 'empty_E': 0.0} pass True True

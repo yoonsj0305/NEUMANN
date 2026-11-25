@@ -1,1 +1,13 @@
 oracle_mqar Q 1 Qp 1 expl {'synthesis_sample': 0.5681, 'selection_8_10': 0.4161, 'all': 0.3708} cov sel 0.4376 cpu 0.2
+oracle_mqar Q 1 Qp 2 expl {'synthesis_sample': 0.5771, 'selection_8_10': 0.4091, 'all': 0.3676} cov sel 0.4376 cpu 594.6
+oracle_mqar Q 1 Qp 3 expl {'synthesis_sample': 0.5824, 'selection_8_10': 0.4135, 'all': 0.3684} cov sel 0.4376 cpu 594.5
+oracle_mqar Q 1 Qp 4 expl {'synthesis_sample': 0.5914, 'selection_8_10': 0.4027, 'all': 0.366} cov sel 0.4376 cpu 595.3
+oracle_mqar Q 2 Qp 1 expl {'synthesis_sample': 1.0, 'selection_8_10': 1.0, 'all': 1.0} cov sel 1.0000 cpu 0.4
+oracle_mqar Q 2 Qp 2 expl {'synthesis_sample': 1.0, 'selection_8_10': 1.0, 'all': 1.0} cov sel 1.0000 cpu 0.5
+oracle_mqar Q 3 Qp 1 expl {'synthesis_sample': 1.0, 'selection_8_10': 1.0, 'all': 1.0} cov sel 1.0000 cpu 0.1
+oracle_mqar Q 4 Qp 1 expl {'synthesis_sample': 1.0, 'selection_8_10': 1.0, 'all': 1.0} cov sel 1.0000 cpu 0.2
+mqar id_4-16 {'examples': 2000, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_state': 1.0, 'correct_read_ii': 1.0, 'correct_read_ii_free_t_t1': 1.0, 'scored_steps_without_eos': 19970}
+mqar ood_17-32 {'examples': 500, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_state': 1.0, 'correct_read_ii': 1.0, 'correct_read_ii_free_t_t1': 1.0, 'scored_steps_without_eos': 12438}
+mqar ood_33-48 {'examples': 500, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_state': 1.0, 'correct_read_ii': 1.0, 'correct_read_ii_free_t_t1': 1.0, 'scored_steps_without_eos': 20247}
+mqar ood_49-64 {'examples': 500, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_state': 1.0, 'correct_read_ii': 1.0, 'correct_read_ii_free_t_t1': 1.0, 'scored_steps_without_eos': 28366}
+mqar gate1 pick (2, 1) expl {'rate': 1.0, 'eos_rate': None, 'steps': 2694, 'eos_steps': 0, 'key_not_in_table': 0.0, 'empty_E': 0.0} pass True True

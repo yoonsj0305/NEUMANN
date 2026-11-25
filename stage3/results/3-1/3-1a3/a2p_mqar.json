@@ -1,0 +1,98 @@
+{
+ "check": "A2' path-free L0 coverage (6.12-3, record)",
+ "task": "mqar",
+ "solver": {
+  "status": "FEASIBLE",
+  "proved_optimal": false,
+  "objective": 4456.0,
+  "bound": 6383.0,
+  "gap_relative": 0.43245062836624776,
+  "free_covered_steps": 56,
+  "wall_s": 600.8595385551453,
+  "cpu_s": 594.379733,
+  "time_limit_s": 600.0,
+  "workers": 1,
+  "random_seed": 0,
+  "exec_check_examples_equal": 1.0
+ },
+ "program": {
+  "Q": 1,
+  "mu_non_stay": {
+   "head0": {
+    "q0 answer_phase": "content"
+   },
+   "head1": {
+    "q0 answer_phase": "right"
+   },
+   "head2": {
+    "q0 |": "right"
+   }
+  },
+  "delta_non_keep": [],
+  "moving_heads": [
+   0,
+   1,
+   2
+  ]
+ },
+ "covered": {
+  "synthesis_sample": {
+   "without_eos": 0.7150537634408602,
+   "with_eos": 0.7150537634408602,
+   "steps_without_eos": 558,
+   "steps_with_eos": 558
+  },
+  "selection_8_10": {
+   "without_eos": 0.5746102449888641,
+   "with_eos": 0.5746102449888641,
+   "steps_without_eos": 2694,
+   "steps_with_eos": 2694
+  },
+  "all": {
+   "without_eos": 0.5401042960019866,
+   "with_eos": 0.5401042960019866,
+   "steps_without_eos": 20135,
+   "steps_with_eos": 20135
+  }
+ },
+ "all_stay": {
+  "synthesis_sample": {
+   "without_eos": 0.1003584229390681,
+   "with_eos": 0.1003584229390681,
+   "steps_without_eos": 558,
+   "steps_with_eos": 558
+  },
+  "all": {
+   "without_eos": 0.09004221504842315,
+   "with_eos": 0.09004221504842315,
+   "steps_without_eos": 20135,
+   "steps_with_eos": 20135
+  }
+ },
+ "data": "train_set seed 0, the first 2,000 (synthesis sample as 6.9-1)",
+ "env": {
+  "code_commit": "93a2d27fde4884f421f50c16ca705adf1845e2b6",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1,
+  "ortools": "9.15.6755",
+  "cp_sat": {
+   "num_workers": 1,
+   "random_seed": 0,
+   "max_time_in_seconds": 600.0
+  },
+  "module": "stage3/l31c.py",
+  "code": {
+   "code_commit": "93a2d27fde4884f421f50c16ca705adf1845e2b6",
+   "code_dirty": false,
+   "torch": "2.15.0+cu132",
+   "python": "3.12.3",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "cores": 4,
+   "threads": 1
+  }
+ }
+}

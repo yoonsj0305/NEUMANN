@@ -1,0 +1,13 @@
+oracle_pairswap Q 1 Qp 1 expl {'synthesis_sample': 0.8108, 'selection_8_10': 0.6874, 'all': 0.7439} cov sel 0.7524 cpu 0.1
+oracle_pairswap Q 1 Qp 2 expl {'synthesis_sample': 0.9382, 'selection_8_10': 0.7725, 'all': 0.8456} cov sel 0.7524 cpu 0.3
+oracle_pairswap Q 1 Qp 3 expl {'synthesis_sample': 0.9402, 'selection_8_10': 0.7803, 'all': 0.8484} cov sel 0.7524 cpu 0.9
+oracle_pairswap Q 1 Qp 4 expl {'synthesis_sample': 0.9402, 'selection_8_10': 0.7803, 'all': 0.8484} cov sel 0.7524 cpu 3.7
+oracle_pairswap Q 2 Qp 1 expl {'synthesis_sample': 0.8938, 'selection_8_10': 0.7779, 'all': 0.8217} cov sel 1.0000 cpu 0.1
+oracle_pairswap Q 2 Qp 2 expl {'synthesis_sample': 1.0, 'selection_8_10': 1.0, 'all': 1.0} cov sel 1.0000 cpu 0.4
+oracle_pairswap Q 3 Qp 1 expl {'synthesis_sample': 0.8938, 'selection_8_10': 0.7779, 'all': 0.8217} cov sel 1.0000 cpu 0.1
+oracle_pairswap Q 4 Qp 1 expl {'synthesis_sample': 0.8938, 'selection_8_10': 0.7779, 'all': 0.8217} cov sel 1.0000 cpu 0.1
+pairswap id_2-10 {'examples': 2000, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_state': 1.0, 'correct_read_ii': 1.0, 'correct_read_ii_free_t_t1': 1.0, 'scored_steps_without_eos': 11876}
+pairswap ood_12-20 {'examples': 500, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_state': 1.0, 'correct_read_ii': 1.0, 'correct_read_ii_free_t_t1': 1.0, 'scored_steps_without_eos': 7998}
+pairswap ood_22-30 {'examples': 500, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_state': 1.0, 'correct_read_ii': 1.0, 'correct_read_ii_free_t_t1': 1.0, 'scored_steps_without_eos': 13084}
+pairswap ood_32-40 {'examples': 500, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_state': 1.0, 'correct_read_ii': 1.0, 'correct_read_ii_free_t_t1': 1.0, 'scored_steps_without_eos': 17994}
+pairswap gate1 pick (2, 2) expl {'rate': 1.0, 'eos_rate': 1.0, 'steps': 2972, 'eos_steps': 300, 'key_not_in_table': 0.0, 'empty_E': 0.0} pass True True
