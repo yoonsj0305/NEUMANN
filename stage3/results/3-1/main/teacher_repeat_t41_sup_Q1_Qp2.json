@@ -1,0 +1,280 @@
+{
+ "Q": 1,
+ "Qp": 2,
+ "states": 2,
+ "solver": {
+  "Qp": 2,
+  "status": "OPTIMAL",
+  "proved_optimal": true,
+  "synthesis_sample_unexplained_solver": 89,
+  "synthesis_sample_steps": 840,
+  "synthesis_sample_empty_E": 0,
+  "changing_delta_p_cells": 0,
+  "contexts": 7,
+  "table_keys": 8,
+  "wall_s": 0.345578670501709,
+  "cpu_s": 0.33748100000002523,
+  "time_limit_s": 600.0,
+  "workers": 1,
+  "random_seed": 0,
+  "exec_check_examples_equal": 1.0
+ },
+ "routing_file": "stage3/results/3-1/main/teacher_repeat_t41_route_Q1.json",
+ "routing_candidate": "cp-sat",
+ "coverage": {
+  "synthesis_sample": 0.9431299134182869,
+  "selection_8_10": 0.9689848153370365,
+  "all": 0.9656578978107275
+ },
+ "coverage_without_free": {
+  "synthesis_sample": 0.7306963411321263,
+  "selection_8_10": 0.8445758364155567,
+  "all": 0.8299222248901159
+ },
+ "explanation": {
+  "synthesis_sample": {
+   "rate": 0.8940476190476191,
+   "eos_rate": 0.11,
+   "steps": 840,
+   "eos_steps": 100,
+   "key_not_in_table": 0.0,
+   "empty_E": 0.0
+  },
+  "selection_8_10": {
+   "rate": 0.9472573839662447,
+   "eos_rate": 0.0,
+   "steps": 5688,
+   "eos_steps": 300,
+   "key_not_in_table": 0.0,
+   "empty_E": 0.0
+  },
+  "all": {
+   "rate": 0.9246586816316275,
+   "eos_rate": 0.1005,
+   "steps": 23878,
+   "eos_steps": 2000,
+   "key_not_in_table": 0.0,
+   "empty_E": 0.0
+  }
+ },
+ "table": [
+  {
+   "q": 0,
+   "kind_x": "=",
+   "reads": [
+    "digit",
+    "digit",
+    "digit"
+   ],
+   "bits": [
+    1,
+    1,
+    1
+   ],
+   "qp": 0,
+   "c": "head2"
+  },
+  {
+   "q": 0,
+   "kind_x": "=",
+   "reads": [
+    "=",
+    "digit",
+    "digit"
+   ],
+   "bits": [
+    1,
+    1,
+    1
+   ],
+   "qp": 0,
+   "c": "prev"
+  },
+  {
+   "q": 0,
+   "kind_x": "answer_phase",
+   "reads": [
+    "digit",
+    "digit",
+    "digit"
+   ],
+   "bits": [
+    1,
+    1,
+    1
+   ],
+   "qp": 0,
+   "c": "head2"
+  },
+  {
+   "q": 0,
+   "kind_x": "answer_phase",
+   "reads": [
+    "=",
+    "digit",
+    "digit"
+   ],
+   "bits": [
+    0,
+    1,
+    1
+   ],
+   "qp": 0,
+   "c": "head2"
+  },
+  {
+   "q": 0,
+   "kind_x": "answer_phase",
+   "reads": [
+    "answer_phase",
+    "digit",
+    "="
+   ],
+   "bits": [
+    0,
+    1,
+    0
+   ],
+   "qp": 0,
+   "c": "head0"
+  },
+  {
+   "q": 0,
+   "kind_x": "answer_phase",
+   "reads": [
+    "answer_phase",
+    "digit",
+    "="
+   ],
+   "bits": [
+    1,
+    1,
+    0
+   ],
+   "qp": 0,
+   "c": "cur"
+  },
+  {
+   "q": 0,
+   "kind_x": "answer_phase",
+   "reads": [
+    "answer_phase",
+    "digit",
+    "answer_phase"
+   ],
+   "bits": [
+    0,
+    1,
+    0
+   ],
+   "qp": 0,
+   "c": "head0"
+  },
+  {
+   "q": 0,
+   "kind_x": "answer_phase",
+   "reads": [
+    "answer_phase",
+    "digit",
+    "answer_phase"
+   ],
+   "bits": [
+    1,
+    1,
+    0
+   ],
+   "qp": 0,
+   "c": "EOS"
+  }
+ ],
+ "program": {
+  "Q": 2,
+  "mu_non_stay": {
+   "head0": {
+    "q0 =": "right",
+    "q0 answer_phase": "right",
+    "q1 =": "right",
+    "q1 answer_phase": "right"
+   },
+   "head1": {
+    "q0 digit": "content",
+    "q0 =": "left",
+    "q1 digit": "content",
+    "q1 =": "left"
+   },
+   "head2": {
+    "q0 answer_phase": "right",
+    "q1 answer_phase": "right"
+   }
+  },
+  "delta_non_keep": [],
+  "moving_heads": [
+   0,
+   1,
+   2
+  ]
+ },
+ "MU": [
+  [
+   [
+    0,
+    0,
+    1,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    1,
+    0,
+    0,
+    1,
+    0
+   ]
+  ],
+  [
+   [
+    5,
+    0,
+    2,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    5,
+    0,
+    2,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ]
+  ]
+ ],
+ "DEL_nonkeep": []
+}

@@ -1,0 +1,99 @@
+{
+ "Q": 1,
+ "solver": {
+  "Q": 1,
+  "status": "OPTIMAL",
+  "proved_optimal": true,
+  "objective": 3414223.0,
+  "bound": 3414223.0,
+  "gap_relative": 0.0,
+  "rows": 494,
+  "coverage_terms": 1151,
+  "mu_cells": 9,
+  "delta_cells": 0,
+  "kinds": [
+   "digit",
+   "=",
+   "answer_phase"
+  ],
+  "wall_s": 33.272178411483765,
+  "cpu_s": 32.80713000000001,
+  "time_limit_s": 600.0,
+  "workers": 1,
+  "random_seed": 0,
+  "exec_check_examples_equal": 1.0
+ },
+ "candidate": "cp-sat",
+ "coverage_synthesis_sample_cp_sat": 0.8547394822853143,
+ "coverage_synthesis_sample_moved": null,
+ "coverage": {
+  "synthesis_sample": 0.8547394822853143,
+  "selection_8_10": 0.6649573459530083,
+  "all": 0.6917284411409447
+ },
+ "coverage_without_free": {
+  "synthesis_sample": 0.7623276827202194,
+  "selection_8_10": 0.5689766788643279,
+  "all": 0.5962512065356048
+ },
+ "program": {
+  "Q": 1,
+  "mu_non_stay": {
+   "head0": {
+    "q0 digit": "right",
+    "q0 =": "left"
+   },
+   "head1": {
+    "q0 =": "right",
+    "q0 answer_phase": "right"
+   },
+   "head2": {
+    "q0 digit": "content",
+    "q0 =": "left",
+    "q0 answer_phase": "start"
+   }
+  },
+  "delta_non_keep": [],
+  "moving_heads": [
+   0,
+   1,
+   2
+  ]
+ },
+ "MU": [
+  [
+   [
+    1,
+    0,
+    2,
+    0,
+    0,
+    0,
+    0
+   ]
+  ],
+  [
+   [
+    0,
+    0,
+    1,
+    0,
+    0,
+    1,
+    0
+   ]
+  ],
+  [
+   [
+    5,
+    0,
+    2,
+    0,
+    0,
+    4,
+    0
+   ]
+  ]
+ ],
+ "DEL_nonkeep": []
+}
