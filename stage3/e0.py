@@ -66,6 +66,7 @@ def check_kinds(task):
     import tasks as T
     name = {"digit": "digit", "op": "+", "=": "=", "other": "other"}
     toks = E.kind_of_token(task)
+    toks = dict([(t, k) for t, k in toks.items() if t != "="] + [("=", toks["="])])    # '=' last: answer phase after it
     ids = torch.tensor([[T.TOK[t] for t in toks]])
     got = l1.kinds_of(ids)[0].tolist()
     return {t: {"e_tasks": k, "machine": l1.KINDS[g], "same": name[k] == l1.KINDS[g]} for (t, k), g in zip(toks.items(), got)}
@@ -396,6 +397,17 @@ ROWS = [
 assert [r[0] for r in ROWS] and set(r[0] for r in ROWS) == set(E.SUITE) and all(r[2] in CAUSES + (None,) for r in ROWS)
 
 
+def cmd_kinds(a):
+    """the kind check of every task whose format is fixed (results/3-E0/kinds.json).  The a1_<task>.json "kinds"
+    field of the first runs put '=' first in the probe, so every later token read as answer_phase there (a bug of the
+    probe only: the checks use the real tapes)"""
+    install()
+    out = {t: check_kinds(t) for t in E.SUITE if not E.SYMBOLS[t]["pending"]}
+    out = {"tasks": out, "all_same": all(v["same"] for k in out.values() for v in k.values())}
+    (OUT / "kinds.json").write_text(json.dumps(out, indent=1))
+    print("all same:", out["all_same"])
+
+
 def cmd_report(a):
     import h0a
     rows = []
@@ -439,8 +451,9 @@ def main():
         p.add_argument("--task", required=True, choices=sorted(PROGRAMS))
     sub.add_parser("binadd_end")
     sub.add_parser("report")
+    sub.add_parser("kinds")
     a = ap.parse_args()
-    {"a1": cmd_a1, "l0": cmd_l0, "binadd_end": cmd_binadd_end, "report": cmd_report}[a.cmd](a)
+    {"a1": cmd_a1, "l0": cmd_l0, "binadd_end": cmd_binadd_end, "report": cmd_report, "kinds": cmd_kinds}[a.cmd](a)
 
 
 if __name__ == "__main__":

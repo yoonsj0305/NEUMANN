@@ -588,3 +588,64 @@
   - 학습률 조정 목록이 비어 있어 드라이버의 `xargs`가 빈 인자로 한 번 불렸다(`-r` 없음). `pe3b.py run`이 인자 오류(코드 2)로 끝났고 아무것도 실행하지 않았다. `QUEUE_LOG.txt`의 "exit  code 2"와 `logs/.out`이 그 흔적이다.
   - rel_rand의 π는 지시대로 순서 전체 길이(프롬프트 + 답 + eos)로 뽑았다. 인과적 teacher forcing 평가에서는 π 간격이 전체 길이를 일부 드러낼 수 있다. 답 길이가 프롬프트로 정해지는 과제는 추가 정보가 없지만, 덧셈·N×1에서는 마지막 올림을 드러낼 수 있다(기준선에 유리한 쪽). 설계 채팅에 질문으로 올렸다.
   - 범위: 기준선 시드 0만이다. 여러 시드는 공개 전 목록에 남는다(설계서 8.5).
+
+## 2026-11-26 · 3-E0 외부 벤치마크 표현력 조사 (학습 없음)
+- 질문: Delétang 외(ICLR 2023) 15과제 중 몇 개가 L1(Q ≤ 4, 헤드 3)로 표현되는가? 몇 개가 L0로 되는가? 나머지는 어떤 원인으로 밖인가? (설계서 9.1)
+- 질문에 대한 답: L1 15개 중 3개(even_pairs, reverse_string, duplicate_string), L0 15개 중 2개(even_pairs, reverse_string). 나머지 12개의 원인은 값 상태 5, 한 step 두 칸 이상 2, 출력당 읽기 증가 2, 값 조건 제어 1, 그 밖 2(binary_addition: 끝 시점, missing_duplicate_string: 상태 수 6)다. 형식 질문 4개(Q1–Q4)가 남아 있지만, 어느 답이어도 L0·L1 판정은 같다(원인 분류만 둘이 바뀔 수 있다).
+- 코드 커밋: 06dcc2f (`stage3/e_tasks.py`, `stage3/e0.py`, `stage3/e0_replay.py`, `stage3/e0_mds_search.py`), 이 항목의 커밋(e0.py의 kinds·report 추가).
+  - even_pairs·reverse_string A1은 e0.py가 커밋되기 전(af7aee7 위, code_dirty)에 돌렸다. 검사 코드는 06dcc2f와 같다(이후 바뀐 것은 report·kinds 함수뿐).
+- 원자료: `stage3/results/3-E0/`
+  - `replay.json`: 원본과 옮긴 생성기 대조. `a1_<과제>.json`: 손 프로그램과 A1. `l0_duplicate_string.json`: L0 시도.
+  - `binadd_end.json`: 덧셈 끝 시점 통계. `mds_search.json`: 6상태 프로그램 탐색. `kinds.json`: 종류 대응 확인. `summary.json`: 15행 표. `logs/`.
+- 과제 정의:
+  - 원본은 github.com/google-deepmind/neural_networks_chomsky_hierarchy, 커밋 2b8eb4bee872acf5b637fcc672f01c06939dc4ef(2024-04-12)다. 매개변수는 `experiments/constants.py` TASK_BUILDERS를 따른다(modular_arithmetic_brackets는 mult=True, 나머지는 기본값).
+  - 생성 규칙은 줄 단위로 옮겼다. 난수원만 python `random.Random` 하나로 바꿨다(상한 포함·제외는 원본과 같다).
+  - 재생 대조(`e0_replay.py`): 원본 sample_batch(배치 1, jit 끔)의 난수를 같은 Random으로 바꿔 돌렸다. 과제마다 길이 1–40 × 25 = 1,000개에서 입력·출력이 모두 같다(15 × 1,000, 불일치 0). 원본 실행 환경은 jax 0.12.1, numpy 2.5.5, chex 0.1.92다.
+- 형식(9.1, 모든 과제 같은 규칙): `<bos> 입력 = 출력 <eos>`이고, 분류 과제는 클래스 토큰 하나다. 길이 n은 벤치마크의 length 인자다(학습·분포 안 1–10, 분포 밖 11–20 / 21–30 / 31–40).
+- 종류 대응 (확정분, `kinds.json`에서 기계의 종류와 모두 같음):
+
+| 과제 | digit | op | = | other |
+|---|---|---|---|---|
+| parity_check · even_pairs · reverse_string · duplicate_string · odds_first · compute_sqrt | 0 1 | – | 구분자 | `<bos>` |
+| bucket_sort | 0–4 | – | 구분자 | `<bos>` |
+| missing_duplicate_string | 0 1 | – | 구분자 | `<bos>`, 자리표시 2 → `<missing>`, 채움 3 → `<empty>` |
+| modular_arithmetic | 0–4 | + − × (Q1) | 구분자 | `<bos>` |
+| binary_addition · binary_multiplication | 0 1 | +(2) · ×(2) | 구분자 | `<bos>`; 출력의 끝 토큰 2와 채움 0은 Q4 |
+| cycle_navigation | 행동 0 1 2: Q2 | Q2 | 구분자 | `<bos>` |
+| modular_arithmetic_brackets · solve_equation | 0–4 | + − (×) (Q1) | 구분자 | `<bos>`; 괄호, x, 입력 안의 =는 Q3 |
+| stack_manipulation | 0 1 | POP · PUSH0 · PUSH1 (Q1) | 구분자 | `<bos>`; 출력 끝 토큰·채움은 Q4 |
+
+- 검사: 3-0 A1 그대로다(`stage3/l1.py` 함수 재사용). 분포 안 2,000개, 분포 밖 구간마다 500개이고, (d)는 학습 100,000개(시드 30) 표다. 어댑터는 H-0 BOS 어댑터에 새 토큰과 15과제를 더했다.
+
+| 과제 | 계층 | 출력형 | L0 | L1 | Q | 원인 분류 | 근거 |
+|---|---|---|---|---|---|---|---|
+| even_pairs | 정규 | 분류 | 예 | 예 | 1 | – | 클래스 = [s_1 ≠ s_n]. 헤드 0이 '='에서 s_1, 헤드 1이 s_n을 읽는다. (b)·(c′) 1.000, (d) 충돌 0(학습 표 키 8개) |
+| parity_check | 정규 | 분류 | 아니오 | 아니오 | – | 값 상태 | 1의 개수 mod 2. q는 종류로만 바뀌고 키는 읽기 6개뿐이다 |
+| modular_arithmetic | 정규 | 분류 | 아니오 | 아니오 | – | 값 상태 | 식의 값 mod 5(누적값) |
+| cycle_navigation | 정규 | 분류 | 아니오 | 아니오 | – | 값 상태 (Q2) | Σ(a−1) mod 5. 행동을 기호별 op 종류로 보면 상태 5개가 필요해 Q ≤ 4 초과 |
+| modular_arithmetic_brackets | DCF | 분류 | 아니오 | 아니오 | – | 값 상태 | 괄호 식의 값 mod 5 |
+| reverse_string | DCF | 열 | 예 | 예 | 1 | – | H-0 BOS 표. (b)·(c′)·정답 읽기 1.000, (d) 충돌 0 |
+| solve_equation | DCF | 분류 | 아니오 | 아니오 | – | 값 상태 | 미지수 = 나머지 식 값에서 풀어야 함 |
+| stack_manipulation | DCF | 열 | 아니오 | 아니오 | – | 한 step 두 칸 이상 (Q1) | 지워진 원소를 건너뛸 칸 수에 상한이 없다. Q1이 'op 하나'이면 명령을 구분 못 해 값 조건 제어 |
+| binary_addition | CS | 열 | 아니오 | 아니오 | – | 그 밖 (끝 시점) | 피연산자는 앞자리 0 포함, 합은 앞자리 0 없음. 끝이 '남은 윗자리가 모두 0인가'에 달린다. 합이 자연 끝(긴 피연산자 + 올림)보다 짧은 예: 분포 안 0.264, 분포 밖 0.478 · 0.498 · 0.472 |
+| binary_multiplication | CS | 열 | 아니오 | 아니오 | – | 출력당 읽기 증가 | k번째 자리 = Σ a_i b_{k−i} + 올림 |
+| compute_sqrt | CS | 열 | 아니오 | 아니오 | – | 출력당 읽기 증가 | i번째 비트가 윗자리 2i+2개 전체(나머지)에 달림 |
+| duplicate_string | CS | 열 | 아니오 | 예 | 3 | – | 3-0 repeat 프로그램 + `<bos>`. (b)·(c′)·정답 읽기 1.000, (d) 충돌 0. L0 시도: 덮임 0.674(eos 제외) · 0.626(포함), q 없는 (d) 충돌 전 구간 > 0 |
+| missing_duplicate_string | CS | 분류 | 아니오 | 아니오 | (6) | 그 밖 (상태 수) | 짝 위치 p ± n/2를 실시간으로 찾는 6상태 프로그램이 A1 전부 1.000·(d) 0. 4상태 이하는 찾지 못했다(속도 분해 논증: 번갈이 쌍 3개 필요) |
+| odds_first | CS | 열 | 아니오 | 아니오 | – | 한 step 두 칸 이상 | 출력마다 읽을 위치가 2칸씩 나아간다 |
+| bucket_sort | CS | 열 | 아니오 | 아니오 | – | 값 조건 제어 | 값 v를 개수(v)번 쓴다. 다음 값 선택이 값에 달린다 |
+
+- 논증 전문은 `summary.json` rows[].argument에 있다. 값 상태 논증에는 빈틈이 하나 있다: content 이동은 위치를 값에 따라 바꾸는데, 그 경로가 답을 위치로 담을 가능성까지 배제한 증명은 아니다.
+- 설계 채팅의 사전 예상과 다른 곳:
+  - binary_addition은 L1 밖이다(예상: 안). 원인은 자리 순서가 아니라 앞자리 0 규약(입력은 zfill, 출력은 최소 길이)이다.
+  - even_pairs·duplicate_string·reverse_string은 예상대로 L1 안이고, odds_first·binary_multiplication·compute_sqrt도 예상대로 밖이다. 보류였던 stack_manipulation·bucket_sort는 위 분류다.
+- 형식 질문(정하지 않고 PENDING으로 둠, `e_tasks.QUESTIONS`):
+  - Q1: op 종류가 하나(L1의 '+' 종류, G-0처럼 PF 구분자)인가, 기호마다 다른 종류인가?
+  - Q2: cycle_navigation 행동 0/1/2는 데이터(digit)인가 명령(op)인가?
+  - Q3: 괄호, x, solve_equation 입력 안의 '='는 op인가 other인가?
+  - Q4: 끝 토큰 2와 그 뒤 채움 0은 끝 토큰 → `<eos>`, 채움 삭제인가, 채운 출력 전체 뒤 `<eos>`인가?
+  - 영향: 해당 과제는 모두 어느 답이어도 L1 밖이다. stack_manipulation(Q1)과 cycle_navigation(Q2)의 원인 분류만 바뀔 수 있다.
+- 이상 사항:
+  - 첫 A1 실행의 `kinds` 필드는 검사용 탐침에서 '='를 앞에 두어 뒤 토큰이 모두 answer_phase로 나왔다. 탐침만의 오류다(검사는 실제 테이프로 했다). `kinds.json`에서 고쳐 다시 쟀고, 모두 같다. a1 파일은 덮어쓰지 않았다.
+  - 원본 ModularArithmetic의 `_operators`는 생성기 식이라 한 번 쓰면 비는데, 재생 대조는 예마다 새 객체를 만들어 피했다. 규칙은 세 연산 모두다.
+- 시간: CPU 약 40분이다(재생 대조와 A1 (d) 표가 대부분).

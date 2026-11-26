@@ -1,0 +1,231 @@
+{
+ "task": "missing_duplicate_string",
+ "program": {
+  "Q": 6,
+  "mu": {
+   "head0": {
+    "q0 digit": "left",
+    "q2 digit": "right",
+    "q2 other": "right",
+    "q3 other": "right",
+    "q4 digit": "left"
+   },
+   "head1": {
+    "q0 digit": "right",
+    "q2 digit": "right",
+    "q2 other": "right",
+    "q3 digit": "right",
+    "q3 other": "right",
+    "q4 digit": "right",
+    "q5 digit": "right"
+   }
+  },
+  "mu_default": "stay",
+  "delta_rules_first_match": [
+   {
+    "q": 0,
+    "kind_x": "other",
+    "kind_reads": {
+     "head1": "other"
+    },
+    "next": 3
+   },
+   {
+    "q": 0,
+    "kind_x": "*",
+    "kind_reads": {},
+    "next": 1
+   },
+   {
+    "q": 1,
+    "kind_x": "other",
+    "kind_reads": {
+     "head1": "other"
+    },
+    "next": 2
+   },
+   {
+    "q": 1,
+    "kind_x": "*",
+    "kind_reads": {},
+    "next": 0
+   },
+   {
+    "q": 2,
+    "kind_x": "other",
+    "kind_reads": {},
+    "next": 5
+   },
+   {
+    "q": 2,
+    "kind_x": "*",
+    "kind_reads": {},
+    "next": 3
+   },
+   {
+    "q": 3,
+    "kind_x": "other",
+    "kind_reads": {},
+    "next": 4
+   },
+   {
+    "q": 3,
+    "kind_x": "*",
+    "kind_reads": {},
+    "next": 2
+   },
+   {
+    "q": 4,
+    "kind_x": "*",
+    "kind_reads": {
+     "head0": "other"
+    },
+    "next": 1
+   },
+   {
+    "q": 4,
+    "kind_x": "*",
+    "kind_reads": {},
+    "next": 5
+   },
+   {
+    "q": 5,
+    "kind_x": "*",
+    "kind_reads": {
+     "head0": "other"
+    },
+    "next": 0
+   },
+   {
+    "q": 5,
+    "kind_x": "*",
+    "kind_reads": {},
+    "next": 4
+   }
+  ],
+  "supply_head_by_q": {
+   "q0": 1,
+   "q1": 1,
+   "q2": 1,
+   "q3": 1,
+   "q4": 0,
+   "q5": 0
+  },
+  "note": "missing_duplicate_string, Q = 6 (OUTSIDE L1: Q <= 4).  Found by brute force over a 6-state family\n    (raw data: mds_search.json).  State = (phase, parity); parity flips every step.\n      Z = head 0, Y = head 1.  Hole at p (kind other), |s| = L, partner p + L (p <= L) or p - L (p > L).\n      phase 1 (before the hole): Z right on parity 0 (half speed), Y right (full speed); both right at the hole step\n      phase 2 (after the hole):  Z left on parity 0 (half speed), Y right (full speed)\n      phase 3 (Z back on <bos>, only when p <= L, at about 2p): Y right on parity 0 (half speed)\n      The run starts in a phase-3 state; at step 0 Y reads <bos> -> phase 1.\n      At '=' (t0) q is phase 2 iff p > L (supply Z = p - L), phase 3 iff p <= L (supply Y = 2p + (2L - 2p)/2 = p + L).",
+  "copy_type": true,
+  "outside_l1": "Q = 6 > 4"
+ },
+ "kinds": {
+  "<bos>": {
+   "e_tasks": "other",
+   "machine": "other",
+   "same": true
+  },
+  "=": {
+   "e_tasks": "=",
+   "machine": "=",
+   "same": true
+  },
+  "0": {
+   "e_tasks": "digit",
+   "machine": "answer_phase",
+   "same": false
+  },
+  "1": {
+   "e_tasks": "digit",
+   "machine": "answer_phase",
+   "same": false
+  },
+  "<missing>": {
+   "e_tasks": "other",
+   "machine": "answer_phase",
+   "same": false
+  },
+  "<empty>": {
+   "e_tasks": "other",
+   "machine": "answer_phase",
+   "same": false
+  }
+ },
+ "bos": true,
+ "format": "<bos> input = output <eos> (DESIGN 9.1)",
+ "sets": {
+  "id_1-10": {
+   "examples": 2000,
+   "b_causal_p_le_t": 1.0,
+   "c_prime_invariance_t_ge_t0_positions_bits_q": 1.0,
+   "correct_read_scored_steps_without_eos": 1.0,
+   "scored_steps_without_eos": 2000
+  },
+  "ood_11-20": {
+   "examples": 500,
+   "b_causal_p_le_t": 1.0,
+   "c_prime_invariance_t_ge_t0_positions_bits_q": 1.0,
+   "correct_read_scored_steps_without_eos": 1.0,
+   "scored_steps_without_eos": 500
+  },
+  "ood_21-30": {
+   "examples": 500,
+   "b_causal_p_le_t": 1.0,
+   "c_prime_invariance_t_ge_t0_positions_bits_q": 1.0,
+   "correct_read_scored_steps_without_eos": 1.0,
+   "scored_steps_without_eos": 500
+  },
+  "ood_31-40": {
+   "examples": 500,
+   "b_causal_p_le_t": 1.0,
+   "c_prime_invariance_t_ge_t0_positions_bits_q": 1.0,
+   "correct_read_scored_steps_without_eos": 1.0,
+   "scored_steps_without_eos": 500
+  }
+ },
+ "d": {
+  "train_seed": 30,
+  "train_examples": 100000,
+  "train_table_keys": 38,
+  "train_conflicts": 0,
+  "sets": {
+   "id_1-10": {
+    "scored_steps": 4000,
+    "conflicts_within_set": 0,
+    "covered_steps_vs_train_table_wrong": 0,
+    "key_coverage_recorded": 1.0
+   },
+   "ood_11-20": {
+    "scored_steps": 1000,
+    "conflicts_within_set": 0,
+    "covered_steps_vs_train_table_wrong": 0,
+    "key_coverage_recorded": 1.0
+   },
+   "ood_21-30": {
+    "scored_steps": 1000,
+    "conflicts_within_set": 0,
+    "covered_steps_vs_train_table_wrong": 0,
+    "key_coverage_recorded": 1.0
+   },
+   "ood_31-40": {
+    "scored_steps": 1000,
+    "conflicts_within_set": 0,
+    "covered_steps_vs_train_table_wrong": 0,
+    "key_coverage_recorded": 1.0
+   }
+  },
+  "conflicts_0_everywhere": true
+ },
+ "all_checks_1.000_and_d_0": true,
+ "moving_heads": [
+  0,
+  1
+ ],
+ "in_l1": false,
+ "in_l0": false,
+ "env": {
+  "code_commit": "06dcc2f4eff80f6ebffb9efab143bf9e31845cfb",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1
+ }
+}

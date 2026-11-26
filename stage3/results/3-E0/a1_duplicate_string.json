@@ -1,0 +1,153 @@
+{
+ "task": "duplicate_string",
+ "program": {
+  "Q": 3,
+  "mu": {
+   "head0": {
+    "q1 =": "right",
+    "q1 answer_phase": "right"
+   },
+   "head1": {
+    "q0 digit": "right",
+    "q1 =": "right",
+    "q1 answer_phase": "right"
+   },
+   "head2": {
+    "q2 answer_phase": "right"
+   }
+  },
+  "mu_default": "stay",
+  "delta_rules_first_match": [
+   {
+    "q": 0,
+    "kind_x": "digit",
+    "kind_reads": {},
+    "next": 1
+   },
+   {
+    "q": 1,
+    "kind_x": "*",
+    "kind_reads": {
+     "head1": "="
+    },
+    "next": 2
+   },
+   {
+    "q": "*",
+    "kind_x": "*",
+    "kind_reads": {},
+    "next": "same"
+   }
+  ],
+  "supply_head_by_q": {
+   "q1": 0,
+   "q2": 2
+  },
+  "note": "the 3-0 repeat program with <bos>: q = 0 until the first digit (head 1 steps onto s_0 there), q = 1 copies s with head 0 (from s_0 at '='); head 1 runs one position ahead of head 0 and reads '=' at answer step n - 1, so q = 2 from step n: head 2 leaves <bos> and copies s again; it reads '=' at the <eos> step",
+  "copy_type": true
+ },
+ "kinds": {
+  "<bos>": {
+   "e_tasks": "other",
+   "machine": "other",
+   "same": true
+  },
+  "=": {
+   "e_tasks": "=",
+   "machine": "=",
+   "same": true
+  },
+  "0": {
+   "e_tasks": "digit",
+   "machine": "answer_phase",
+   "same": false
+  },
+  "1": {
+   "e_tasks": "digit",
+   "machine": "answer_phase",
+   "same": false
+  }
+ },
+ "bos": true,
+ "format": "<bos> input = output <eos> (DESIGN 9.1)",
+ "sets": {
+  "id_1-10": {
+   "examples": 2000,
+   "b_causal_p_le_t": 1.0,
+   "c_prime_invariance_t_ge_t0_positions_bits_q": 1.0,
+   "correct_read_scored_steps_without_eos": 1.0,
+   "scored_steps_without_eos": 22316
+  },
+  "ood_11-20": {
+   "examples": 500,
+   "b_causal_p_le_t": 1.0,
+   "c_prime_invariance_t_ge_t0_positions_bits_q": 1.0,
+   "correct_read_scored_steps_without_eos": 1.0,
+   "scored_steps_without_eos": 15380
+  },
+  "ood_21-30": {
+   "examples": 500,
+   "b_causal_p_le_t": 1.0,
+   "c_prime_invariance_t_ge_t0_positions_bits_q": 1.0,
+   "correct_read_scored_steps_without_eos": 1.0,
+   "scored_steps_without_eos": 25484
+  },
+  "ood_31-40": {
+   "examples": 500,
+   "b_causal_p_le_t": 1.0,
+   "c_prime_invariance_t_ge_t0_positions_bits_q": 1.0,
+   "correct_read_scored_steps_without_eos": 1.0,
+   "scored_steps_without_eos": 35480
+  }
+ },
+ "d": {
+  "train_seed": 30,
+  "train_examples": 100000,
+  "train_table_keys": 78,
+  "train_conflicts": 0,
+  "sets": {
+   "id_1-10": {
+    "scored_steps": 24316,
+    "conflicts_within_set": 0,
+    "covered_steps_vs_train_table_wrong": 0,
+    "key_coverage_recorded": 1.0
+   },
+   "ood_11-20": {
+    "scored_steps": 15880,
+    "conflicts_within_set": 0,
+    "covered_steps_vs_train_table_wrong": 0,
+    "key_coverage_recorded": 1.0
+   },
+   "ood_21-30": {
+    "scored_steps": 25984,
+    "conflicts_within_set": 0,
+    "covered_steps_vs_train_table_wrong": 0,
+    "key_coverage_recorded": 1.0
+   },
+   "ood_31-40": {
+    "scored_steps": 35980,
+    "conflicts_within_set": 0,
+    "covered_steps_vs_train_table_wrong": 0,
+    "key_coverage_recorded": 1.0
+   }
+  },
+  "conflicts_0_everywhere": true
+ },
+ "all_checks_1.000_and_d_0": true,
+ "moving_heads": [
+  0,
+  1,
+  2
+ ],
+ "in_l1": true,
+ "in_l0": false,
+ "env": {
+  "code_commit": "06dcc2f4eff80f6ebffb9efab143bf9e31845cfb",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1
+ }
+}

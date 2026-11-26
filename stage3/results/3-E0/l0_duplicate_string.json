@@ -1,0 +1,277 @@
+{
+ "task": "duplicate_string",
+ "method": "stage3/l1.py cmd_a2 (3-0 A2): oracle dependency = the supply head's read position of the L1 hand program; exhaustive L0 compile, 3 heads, greedy cover",
+ "data": "train_set(seed 0)[:2000]",
+ "variants": {
+  "without_eos_step": {
+   "output_steps": 21894,
+   "best_l0_table": [
+    [
+     0,
+     0,
+     1,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "per_head": [
+    {
+     "column": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "right",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "right",
+      "other": "stay"
+     },
+     "score_after_cover": 0.5,
+     "columns_tied_at_best": 10368
+    },
+    {
+     "column": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "right",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "stay",
+      "other": "stay"
+     },
+     "score_after_cover": 0.09134922809902256,
+     "columns_tied_at_best": 16848
+    },
+    {
+     "column": {
+      "digit": "right",
+      "+": "stay",
+      "=": "stay",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "stay",
+      "other": "stay"
+     },
+     "score_after_cover": 0.08267105142961542,
+     "columns_tied_at_best": 2592
+    }
+   ],
+   "coverage": 0.674020279528638,
+   "moving_heads": [
+    0,
+    1,
+    2
+   ],
+   "d_without_q": {
+    "train_seed": 30,
+    "train_examples": 100000,
+    "train_table_keys": 74,
+    "train_conflicts": 310203,
+    "sets": {
+     "id_1-10": {
+      "scored_steps": 24316,
+      "conflicts_within_set": 6946,
+      "covered_steps_vs_train_table_wrong": 6288,
+      "key_coverage_recorded": 1.0
+     },
+     "ood_11-20": {
+      "scored_steps": 15880,
+      "conflicts_within_set": 3946,
+      "covered_steps_vs_train_table_wrong": 4070,
+      "key_coverage_recorded": 1.0
+     },
+     "ood_21-30": {
+      "scored_steps": 25984,
+      "conflicts_within_set": 6526,
+      "covered_steps_vs_train_table_wrong": 6605,
+      "key_coverage_recorded": 1.0
+     },
+     "ood_31-40": {
+      "scored_steps": 35980,
+      "conflicts_within_set": 9146,
+      "covered_steps_vs_train_table_wrong": 9127,
+      "key_coverage_recorded": 1.0
+     }
+    },
+    "conflicts_0_everywhere": false
+   },
+   "any_head_reads_target_scored_without_eos": {
+    "id_1-10": 0.9481537910019717,
+    "ood_11-20": 0.9406371911573472,
+    "ood_21-30": 0.940786375765186,
+    "ood_31-40": 0.9426155580608794
+   },
+   "l0_outside": true,
+   "why": {
+    "coverage_lt_0.99": true,
+    "d_conflict_gt_0": true
+   },
+   "present_classes": [
+    "digit",
+    "=",
+    "answer_phase",
+    "other"
+   ],
+   "distinct_paths_simulated": 1296
+  },
+  "with_eos_step": {
+   "output_steps": 23894,
+   "best_l0_table": [
+    [
+     0,
+     0,
+     1,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     3,
+     0
+    ],
+    [
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "per_head": [
+    {
+     "column": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "right",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "right",
+      "other": "stay"
+     },
+     "score_after_cover": 0.4581484891604587,
+     "columns_tied_at_best": 10368
+    },
+    {
+     "column": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "stay",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "next_sep",
+      "other": "stay"
+     },
+     "score_after_cover": 0.08370302167908261,
+     "columns_tied_at_best": 73872
+    },
+    {
+     "column": {
+      "digit": "stay",
+      "+": "stay",
+      "=": "right",
+      "|": "stay",
+      "node": "stay",
+      "answer_phase": "stay",
+      "other": "stay"
+     },
+     "score_after_cover": 0.08370302167908261,
+     "columns_tied_at_best": 16848
+    }
+   ],
+   "coverage": 0.6255545325186239,
+   "moving_heads": [
+    0,
+    1,
+    2
+   ],
+   "d_without_q": {
+    "train_seed": 30,
+    "train_examples": 100000,
+    "train_table_keys": 46,
+    "train_conflicts": 329346,
+    "sets": {
+     "id_1-10": {
+      "scored_steps": 24316,
+      "conflicts_within_set": 7261,
+      "covered_steps_vs_train_table_wrong": 6667,
+      "key_coverage_recorded": 1.0
+     },
+     "ood_11-20": {
+      "scored_steps": 15880,
+      "conflicts_within_set": 4055,
+      "covered_steps_vs_train_table_wrong": 4152,
+      "key_coverage_recorded": 1.0
+     },
+     "ood_21-30": {
+      "scored_steps": 25984,
+      "conflicts_within_set": 6540,
+      "covered_steps_vs_train_table_wrong": 6744,
+      "key_coverage_recorded": 1.0
+     },
+     "ood_31-40": {
+      "scored_steps": 35980,
+      "conflicts_within_set": 9141,
+      "covered_steps_vs_train_table_wrong": 9205,
+      "key_coverage_recorded": 1.0
+     }
+    },
+    "conflicts_0_everywhere": false
+   },
+   "any_head_reads_target_scored_without_eos": {
+    "id_1-10": 0.8764115432873275,
+    "ood_11-20": 0.8752925877763329,
+    "ood_21-30": 0.8736069690786376,
+    "ood_31-40": 0.8755073280721534
+   },
+   "l0_outside": true,
+   "why": {
+    "coverage_lt_0.99": true,
+    "d_conflict_gt_0": true
+   },
+   "present_classes": [
+    "digit",
+    "=",
+    "answer_phase",
+    "other"
+   ],
+   "distinct_paths_simulated": 1296
+  }
+ },
+ "l0_outside": true,
+ "env": {
+  "code_commit": "06dcc2f4eff80f6ebffb9efab143bf9e31845cfb",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1
+ }
+}

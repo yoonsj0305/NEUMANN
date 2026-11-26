@@ -1,0 +1,331 @@
+{
+ "design": "stage3/DESIGN.md 9.1",
+ "source": {
+  "repo": "github.com/google-deepmind/neural_networks_chomsky_hierarchy",
+  "commit": "2b8eb4bee872acf5b637fcc672f01c06939dc4ef",
+  "commit_date": "2024-04-12 10:58:08 +0100"
+ },
+ "rows": [
+  {
+   "task": "even_pairs",
+   "level": "regular",
+   "output_type": "분류",
+   "cause": null,
+   "argument": "클래스 = [s_1 != s_n] (인접 불일치 쌍 수의 홀짝). L0 손 프로그램(Q = 1)이 (b)·(c′) 1.000, (d) 충돌 0이다.",
+   "format_pending": [],
+   "Q": 1,
+   "a1_all": true,
+   "in_l1": true,
+   "in_l0": true
+  },
+  {
+   "task": "parity_check",
+   "level": "regular",
+   "output_type": "분류",
+   "cause": "값 상태",
+   "argument": "클래스 = 1의 개수 mod 2로, 모든 입력 값에 달린다. 입력은 모두 digit 종류다. 출력 step의 키는 x_t, x_{t-1}과 헤드 셋의 두 step 읽기(토큰 6개)와 q뿐이고, q는 종류로만 바뀐다(값을 보지 않는다). content를 쓰지 않으면 읽는 위치도 값과 무관하므로, 읽지 않는 자리 하나를 바꿔 답만 바뀌는 두 입력이 생긴다(n ≥ 7). content 이동(현재 토큰과 같은 값의 다음 칸으로 건너뜀)은 위치를 값에 따라 바꾸지만, 그 경로가 답을 위치로 담을 가능성까지 배제한 증명은 아니다.",
+   "format_pending": [],
+   "Q": null,
+   "in_l1": false,
+   "in_l0": false
+  },
+  {
+   "task": "modular_arithmetic",
+   "level": "regular",
+   "output_type": "분류",
+   "cause": "값 상태",
+   "argument": "답 = 식의 값 mod 5(곱셈 먼저)로, 모든 항의 값에 달린다. 연산 기호는 op 종류라 q가 구조는 볼 수 있지만 누적값(0–4)은 담지 못한다. 출력 step의 키는 x_t, x_{t-1}과 헤드 셋의 두 step 읽기(토큰 6개)와 q뿐이고, q는 종류로만 바뀐다(값을 보지 않는다). content를 쓰지 않으면 읽는 위치도 값과 무관하므로, 읽지 않는 자리 하나를 바꿔 답만 바뀌는 두 입력이 생긴다(n ≥ 7). content 이동(현재 토큰과 같은 값의 다음 칸으로 건너뜀)은 위치를 값에 따라 바꾸지만, 그 경로가 답을 위치로 담을 가능성까지 배제한 증명은 아니다.",
+   "format_pending": [
+    "Q1"
+   ],
+   "Q": null,
+   "in_l1": false,
+   "in_l0": false
+  },
+  {
+   "task": "cycle_navigation",
+   "level": "regular",
+   "output_type": "분류",
+   "cause": "값 상태",
+   "argument": "답 = Σ(a − 1) mod 5. 행동 기호를 digit로 보면 값 상태다(위 논증). 기호마다 다른 op 종류로 보면 상태 5개(원 위의 위치)가 필요해 Q ≤ 4를 넘는다(Q2 답에 따라 분류가 '그 밖: Q 한도'로 바뀐다. 표현 밖이라는 결론은 같다).",
+   "format_pending": [
+    "Q2"
+   ],
+   "Q": null,
+   "in_l1": false,
+   "in_l0": false
+  },
+  {
+   "task": "modular_arithmetic_brackets",
+   "level": "dcf",
+   "output_type": "분류",
+   "cause": "값 상태",
+   "argument": "답 = 괄호 식의 값 mod 5로, 부분식 값을 중첩 깊이만큼 들고 있어야 한다. 값은 q에 들어가지 않는다. 출력 step의 키는 x_t, x_{t-1}과 헤드 셋의 두 step 읽기(토큰 6개)와 q뿐이고, q는 종류로만 바뀐다(값을 보지 않는다). content를 쓰지 않으면 읽는 위치도 값과 무관하므로, 읽지 않는 자리 하나를 바꿔 답만 바뀌는 두 입력이 생긴다(n ≥ 7). content 이동(현재 토큰과 같은 값의 다음 칸으로 건너뜀)은 위치를 값에 따라 바꾸지만, 그 경로가 답을 위치로 담을 가능성까지 배제한 증명은 아니다.",
+   "format_pending": [
+    "Q1",
+    "Q3"
+   ],
+   "Q": null,
+   "in_l1": false,
+   "in_l0": false
+  },
+  {
+   "task": "reverse_string",
+   "level": "dcf",
+   "output_type": "열",
+   "cause": null,
+   "argument": "H-0 BOS 표와 같다(Q = 1): 헤드가 입력을 따라가 '='에서 s_n을 읽고 왼쪽으로 간다. <eos> step에서 <bos>를 읽는다.",
+   "format_pending": [],
+   "Q": 1,
+   "a1_all": true,
+   "in_l1": true,
+   "in_l0": true
+  },
+  {
+   "task": "solve_equation",
+   "level": "dcf",
+   "output_type": "분류",
+   "cause": "값 상태",
+   "argument": "x = (우변 − 나머지 부분식의 값)을 풀어야 하므로, 괄호 식 전체의 값에 달린다. 출력 step의 키는 x_t, x_{t-1}과 헤드 셋의 두 step 읽기(토큰 6개)와 q뿐이고, q는 종류로만 바뀐다(값을 보지 않는다). content를 쓰지 않으면 읽는 위치도 값과 무관하므로, 읽지 않는 자리 하나를 바꿔 답만 바뀌는 두 입력이 생긴다(n ≥ 7). content 이동(현재 토큰과 같은 값의 다음 칸으로 건너뜀)은 위치를 값에 따라 바꾸지만, 그 경로가 답을 위치로 담을 가능성까지 배제한 증명은 아니다.",
+   "format_pending": [
+    "Q1",
+    "Q3"
+   ],
+   "Q": null,
+   "in_l1": false,
+   "in_l0": false
+  },
+  {
+   "task": "stack_manipulation",
+   "level": "dcf",
+   "output_type": "열",
+   "cause": "한 step 두 칸 이상",
+   "argument": "k번째 출력은 위에서 k번째로 남은 원소다. 그 사이에 POP으로 지워진 원소가 길이에 따라 늘어나는 만큼 있어서, 출력 한 step에 건너뛸 칸 수에 상한이 없다(POP 수를 세는 일도 필요하다). 이것은 명령 기호가 종류로 구분될 때의 원인이다. Q1 답이 'op 하나'이면 POP·PUSH0·PUSH1이 같은 종류라 상태·이동이 명령을 구분하지 못하므로 '값 조건 제어'다.",
+   "format_pending": [
+    "Q1",
+    "Q4"
+   ],
+   "Q": null,
+   "in_l1": false,
+   "in_l0": false
+  },
+  {
+   "task": "binary_addition",
+   "level": "cs",
+   "output_type": "열",
+   "cause": "그 밖",
+   "argument": "끝 시점이 아직 읽지 않은 값에 달린다(G-0a 뺄셈과 같은 유형). 피연산자는 앞자리 0을 포함한 고정 길이로 쓰고(zfill), 합은 앞자리 0 없이 쓴다. 그래서 k자리 뒤에서 끝낼지가 '두 수의 남은 윗자리가 모두 0이고 올림이 없는가'에 달리는데, 남은 자리 수는 길이에 따라 늘어난다. 자리 값과 올림은 x_t와 앞 step 읽기로 국소적으로 정해진다(1단계 덧셈과 같다). Q4(끝 토큰·채움)를 어느 쪽으로 정해도 끝 토큰의 위치가 같은 문제다.",
+   "format_pending": [
+    "Q4"
+   ],
+   "Q": null,
+   "in_l1": false,
+   "in_l0": false,
+   "sum_shorter_than_natural_end": {
+    "train_seed30": 0.25991,
+    "id_1-10": 0.2635,
+    "ood_11-20": 0.478,
+    "ood_21-30": 0.498,
+    "ood_31-40": 0.472
+   }
+  },
+  {
+   "task": "binary_multiplication",
+   "level": "cs",
+   "output_type": "열",
+   "cause": "출력당 읽기 증가",
+   "argument": "곱의 k번째 자리는 Σ_i a_i b_{k−i}와 올림으로, k + 1쌍을 읽어야 한다. (끝 시점 문제도 덧셈과 같이 있다.)",
+   "format_pending": [
+    "Q4"
+   ],
+   "Q": null,
+   "in_l1": false,
+   "in_l0": false
+  },
+  {
+   "task": "compute_sqrt",
+   "level": "cs",
+   "output_type": "열",
+   "cause": "출력당 읽기 증가",
+   "argument": "floor(√x)의 i번째 비트(윗자리부터)는 입력 윗자리 2i + 2개 전체(나머지 x_top − y²)에 달린다. 출력 step마다 읽어야 할 자리가 늘어난다.",
+   "format_pending": [],
+   "Q": null,
+   "in_l1": false,
+   "in_l0": false
+  },
+  {
+   "task": "duplicate_string",
+   "level": "cs",
+   "output_type": "열",
+   "cause": null,
+   "argument": "3-0 repeat 프로그램에 <bos>를 넣은 판(Q = 3)이다. L0는 3-0 A2 방식(전수 L0 컴파일)으로 시도했다.",
+   "format_pending": [],
+   "Q": 3,
+   "a1_all": true,
+   "in_l1": true,
+   "in_l0": false,
+   "l0_attempt": {
+    "without_eos_step": {
+     "coverage": 0.674020279528638,
+     "d_conflict": true
+    },
+    "with_eos_step": {
+     "coverage": 0.6255545325186239,
+     "d_conflict": true
+    }
+   }
+  },
+  {
+   "task": "missing_duplicate_string",
+   "level": "cs",
+   "output_type": "분류",
+   "cause": "그 밖",
+   "argument": "상태 수 한도다. 답은 구멍 p의 짝 위치(p + L 또는 p − L, L = n/2)의 토큰이다. 실시간으로 그 위치에 헤드를 두는 6상태 프로그램이 A1을 모두 통과한다(Q = 6 > 4). 4상태로는 찾지 못했다. 논증(속도 분해): 2L은 입력 끝에만 나타나므로 마지막 구간의 속도가 ±1/2여야 하고(번갈이 상태 2개), p > L이면 공급 헤드가 p 앞뒤로 +1/2·−1/2(서로 다른 번갈이 쌍 2개), p ≤ L이면 다른 헤드가 2p까지 전속 뒤 1/2(세 번째 쌍)이어야 한다. 그래서 2 + 2 + 2 = 6개다. 다른 길(보이는 1의 개수 홀짝)은 값 상태다.",
+   "format_pending": [],
+   "Q": 6,
+   "a1_all": true,
+   "in_l1": false,
+   "in_l0": false
+  },
+  {
+   "task": "odds_first",
+   "level": "cs",
+   "output_type": "열",
+   "cause": "한 step 두 칸 이상",
+   "argument": "출력 k는 s[2k+1](뒤 절반은 s[2k])라 읽을 위치가 출력마다 2칸씩 나아간다. 헤드는 step당 한 칸이라 한 헤드의 경로는 기울기 2인 목표 경로를 되돌아가지 않는 한 한 번만 만나고, 헤드 셋으로는 출력 몇 개만 공급한다(입력에 구분자가 없어 next_sep도 쓸 수 없다).",
+   "format_pending": [],
+   "Q": null,
+   "in_l1": false,
+   "in_l0": false
+  },
+  {
+   "task": "bucket_sort",
+   "level": "cs",
+   "output_type": "열",
+   "cause": "값 조건 제어",
+   "argument": "출력은 값 v를 개수(v)번 쓰는 것이다. 다음 출력이 v인지 다음 값인지는 남은 v가 있는가와 다음에 있는 값이 무엇인가(값에 따른 횟수)에 달린다. 모든 값이 digit 종류라 q와 이동은 값을 보지 않는다. content 이동으로 '같은 값이 더 있는가'는 일부 볼 수 있지만, 다음 값 u를 고를 수는 없다.",
+   "format_pending": [],
+   "Q": null,
+   "in_l1": false,
+   "in_l0": false
+  }
+ ],
+ "in_l1": 3,
+ "in_l0": 2,
+ "causes": {
+  "값 상태": [
+   "parity_check",
+   "modular_arithmetic",
+   "cycle_navigation",
+   "modular_arithmetic_brackets",
+   "solve_equation"
+  ],
+  "한 step 두 칸 이상": [
+   "stack_manipulation",
+   "odds_first"
+  ],
+  "출력당 읽기 증가": [
+   "binary_multiplication",
+   "compute_sqrt"
+  ],
+  "값 조건 제어": [
+   "bucket_sort"
+  ],
+  "그 밖": [
+   "binary_addition",
+   "missing_duplicate_string"
+  ]
+ },
+ "questions": {
+  "Q1": "op kind: one 'op' kind for every operation / command symbol (the L1 kind '+', a PF separator, as G-0's '-', '*', '^'), or a separate kind per symbol (more than the 7 kinds of DESIGN 3)?",
+  "Q2": "cycle_navigation actions 0/1/2 (stay/right/left in the docstring): data symbols (digit) or command symbols (op)?",
+  "Q3": "'(' ')' (brackets), 'x' (the unknown) and the '=' inside a solve_equation input: op or other?  (The inner '=' cannot be the separator token: answer_phase starts at the first '='.)",
+  "Q4": "termination token 2 and the 0 padding after it (binary_addition, binary_multiplication, stack_manipulation; the benchmark masks everything after the termination token): termination -> <eos> and padding dropped, or the whole padded output before <eos>?"
+ },
+ "replay": {
+  "modular_arithmetic": {
+   "examples": 1000,
+   "mismatch": 0,
+   "first_mismatch": null
+  },
+  "parity_check": {
+   "examples": 1000,
+   "mismatch": 0,
+   "first_mismatch": null
+  },
+  "even_pairs": {
+   "examples": 1000,
+   "mismatch": 0,
+   "first_mismatch": null
+  },
+  "cycle_navigation": {
+   "examples": 1000,
+   "mismatch": 0,
+   "first_mismatch": null
+  },
+  "modular_arithmetic_brackets": {
+   "examples": 1000,
+   "mismatch": 0,
+   "first_mismatch": null
+  },
+  "reverse_string": {
+   "examples": 1000,
+   "mismatch": 0,
+   "first_mismatch": null
+  },
+  "stack_manipulation": {
+   "examples": 1000,
+   "mismatch": 0,
+   "first_mismatch": null
+  },
+  "solve_equation": {
+   "examples": 1000,
+   "mismatch": 0,
+   "first_mismatch": null
+  },
+  "missing_duplicate_string": {
+   "examples": 1000,
+   "mismatch": 0,
+   "first_mismatch": null
+  },
+  "compute_sqrt": {
+   "examples": 1000,
+   "mismatch": 0,
+   "first_mismatch": null
+  },
+  "duplicate_string": {
+   "examples": 1000,
+   "mismatch": 0,
+   "first_mismatch": null
+  },
+  "odds_first": {
+   "examples": 1000,
+   "mismatch": 0,
+   "first_mismatch": null
+  },
+  "binary_addition": {
+   "examples": 1000,
+   "mismatch": 0,
+   "first_mismatch": null
+  },
+  "binary_multiplication": {
+   "examples": 1000,
+   "mismatch": 0,
+   "first_mismatch": null
+  },
+  "bucket_sort": {
+   "examples": 1000,
+   "mismatch": 0,
+   "first_mismatch": null
+  }
+ },
+ "env": {
+  "code_commit": "06dcc2f4eff80f6ebffb9efab143bf9e31845cfb",
+  "code_dirty": true,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 4
+ }
+}

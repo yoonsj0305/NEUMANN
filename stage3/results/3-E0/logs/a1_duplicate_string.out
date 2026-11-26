@@ -2,3 +2,9 @@ duplicate_string id_1-10 {'examples': 2000, 'b_causal_p_le_t': 1.0, 'c_prime_inv
 duplicate_string ood_11-20 {'examples': 500, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_q': 1.0, 'correct_read_scored_steps_without_eos': 1.0, 'scored_steps_without_eos': 15380}
 duplicate_string ood_21-30 {'examples': 500, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_q': 1.0, 'correct_read_scored_steps_without_eos': 1.0, 'scored_steps_without_eos': 25484}
 duplicate_string ood_31-40 {'examples': 500, 'b_causal_p_le_t': 1.0, 'c_prime_invariance_t_ge_t0_positions_bits_q': 1.0, 'correct_read_scored_steps_without_eos': 1.0, 'scored_steps_without_eos': 35480}
+duplicate_string (d) {"train_seed": 30, "train_examples": 100000, "train_table_keys": 78, "train_conflicts": 0, "conflicts_0_everywhere": true}
+    id_1-10 {'scored_steps': 24316, 'conflicts_within_set': 0, 'covered_steps_vs_train_table_wrong': 0, 'key_coverage_recorded': 1.0}
+    ood_11-20 {'scored_steps': 15880, 'conflicts_within_set': 0, 'covered_steps_vs_train_table_wrong': 0, 'key_coverage_recorded': 1.0}
+    ood_21-30 {'scored_steps': 25984, 'conflicts_within_set': 0, 'covered_steps_vs_train_table_wrong': 0, 'key_coverage_recorded': 1.0}
+    ood_31-40 {'scored_steps': 35980, 'conflicts_within_set': 0, 'covered_steps_vs_train_table_wrong': 0, 'key_coverage_recorded': 1.0}
+duplicate_string A1 all: True Q 3 in L1: True in L0: False
