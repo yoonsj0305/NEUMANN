@@ -6,3 +6,6 @@
 2026-11-26 15:45:52 exit interleave__tape_rnn__lr1 code 0
 2026-11-26 18:51:14 note: container restarted ~16:00 UTC (all runs killed; tape copy/dup/prefix_sum/reverse partial logs kept as *.interrupted1). p0.py gets checkpoint/resume; p0_run3.sh replaces p0_run.sh/p0_run2.sh
 2026-11-26 18:51:18 driver3 start (P0; vm.max_map_count=1048576)
+2026-11-26 19:34:04 exit stage3/results/3-P/p0_mmapfix mul1__tape_rnn__lr1 code 137
+2026-11-26 19:34:04 exit stage3/results/3-P/p0_mmapfix addition__tape_rnn__lr1 code 137
+2026-11-26 20:57:02 note: driver3 tape addition/mul1 (p0_mmapfix) exit 137 = memory-cgroup OOM (limit 14.0 GB; the two procs at 6.8 and 5.5 GB). Per-shape compiled code: grad ~35 MB, pred ~5 MB (addition 63 train + 696 eval shapes). mul1 tape resumed by hand with MALLOC_ARENA_MAX=2
