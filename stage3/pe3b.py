@@ -378,19 +378,141 @@ def cmd_tunelist(a):
                     print(t, k, m)
 
 
+# ---------------------------------------------------------------- report (8.3 verdict rule)
+S1, S2 = ROOT / "stage1" / "results", ROOT / "stage2" / "results"
+OLD = ("abacus", "rope", "looped_rr", "gru")
+DECISIVE = 0.60
+TOL = 0.01
+
+
+def old_baselines(task):
+    """the four seed-0 baselines of the format the task was judged in: {name: (run dir, judgment acc)}"""
+    import baseline_table as BT
+    out = {}
+    if task in ("dup", "interleave", "repeat", "pairswap"):
+        for k in OLD:
+            d = HERE / "results" / "3-0" / ("l30_%s__%s__1M__s0__N100000" % (task, k))
+            out[k] = (d, BT.judged(d)[1])
+    elif task == "addition":
+        for k in OLD:
+            d = S1 / BT.SRC[("addition", k)]
+            out[k] = (d, BT.judged(d)[1])
+    else:
+        pools = [("g0", "")] if task != "reverse" else [("h0", " (BOS)"), ("g0", " (BOS 없음)")]
+        for ph, suf in pools:
+            for k in OLD:
+                d = S2 / ph / ("%s_%s__%s__1M__s0__N100000" % (ph, task, k))
+                out[k + suf] = (d, BT.judged(d)[1])
+    return out
+
+
+def new_baselines(task):
+    """per new kind: every LR run, and the one used (highest bin-2 judgment value; ties: the default LR first)"""
+    out = {}
+    for k in KINDS:
+        runs = []
+        for m in LR_MULTS:
+            f = jl(run_dir(task, k, m) / "final.json")
+            if f:
+                runs.append({"lr_mult": m, "lr": f["lr"], "run": str(run_dir(task, k, m).relative_to(ROOT)),
+                             "judgment_step": f["judgment"]["step"], "steps": f["steps"], "stopped": f["stopped"],
+                             "acc": f["judgment"]["acc"], "last_acc": f["last"]["acc"],
+                             "judgment_flops": f["judgment"]["train_flops_cum"], "train_flops": f["train_flops"],
+                             "wall_train_s": f["wall_train_s"], "params": f["params"]})
+        assert runs and runs[0]["lr_mult"] == 1.0, (task, k)
+        L = list(runs[0]["acc"])
+        tuned = (runs[0]["acc"][L[0]] < 0.95 or runs[0]["acc"][L[2]] >= 0.10)
+        if tuned:
+            assert len(runs) == 3, ("tuning runs missing", task, k)
+        used = max(runs, key=lambda r: (r["acc"][L[2]], -LR_MULTS.index(r["lr_mult"])))
+        out[k] = {"runs": runs, "tuned": tuned, "used_lr_mult": used["lr_mult"], "acc": used["acc"]}
+    return out
+
+
+def judged_runs(task):
+    """the candidate results the earlier verdicts used: {group: [(label, acc)]}"""
+    g = {}
+    if task in ("dup", "interleave", "repeat", "pairswap"):
+        d = jl(HERE / "results" / "3-1" / "main" / "summary.json")
+        g["3-1 (teachers 41-43)"] = [("t%d" % r["teacher_seed"], r["acc"]) for r in d["tasks"][task]["tables"]]
+    if task == "addition":
+        rows = []
+        for s in (6, 7, 8):
+            sel = jl(S1 / "c4" / ("selection_addition_s%d.json" % s))
+            f = jl(ROOT / sel["students"][sel["selected"]]["run"] / "final.json")
+            rows.append(("s%d" % s, f["judgment"]["acc"]))
+        g["C4 (seeds 6-8)"] = rows
+    for ph, name, tasks in (("g0", "G-0 (seeds 9-11)", ("copy", "mul1", "prefix_sum")),
+                            ("g0p", "G-0' (seeds 12-14)", ("copy", "mul1", "prefix_sum")),
+                            ("h0", "H-0 BOS (seeds 15-17)", ("reverse",))):
+        if task in tasks:
+            d = jl(S2 / ph / "summary.json")
+            g[name] = [("s%s" % s, r["students"][r["selected"]]["acc"]) for s, r in d["tasks"][task]["seeds"].items()]
+    if task in ("addition", "copy", "mul1", "prefix_sum", "reverse"):
+        d = jl(S2 / "c1" / "summary.json")
+        g["C-1 (tables 1-3)"] = [("table%d" % r["table"], r["acc"]) for r in d["tasks"][task]["tables"]]
+    return g
+
+
+def cmd_report(a):
+    out = {"design": "stage3/DESIGN.md 8.3 with 8.5", "decisive_threshold_bin2": DECISIVE, "tasks": {}}
+    withdrawn = []
+    for t in TASKS:
+        old = old_baselines(t)
+        new = new_baselines(t)
+        L = list(new["rel_rand"]["acc"])
+        pool_old = {k: v[1] for k, v in old.items()}
+        pool = dict(pool_old)
+        pool.update({k + " (3-B)": v["acc"] for k, v in new.items()})
+        best_old = {l: max(v[l] for v in pool_old.values()) for l in L}
+        best = {l: max(v[l] for v in pool.values()) for l in L}
+        best_by = {l: [k for k, v in pool.items() if v[l] == best[l]] for l in L}
+        dec_old = best_old[L[2]] <= DECISIVE
+        dec_new = best[L[2]] <= DECISIVE
+        groups = {}
+        for gname, rows in judged_runs(t).items():
+            rr = []
+            for lab, acc in rows:
+                c2_old = all(acc[l] >= best_old[l] - TOL for l in L[1:3])
+                c2_new = all(acc[l] >= best[l] - TOL for l in L[1:3])
+                rr.append({"run": lab, "ood_bins_1_2": [acc[L[1]], acc[L[2]]], "criterion2_old_best": c2_old,
+                           "criterion2_new_best": c2_new})
+            groups[gname] = {"rows": rr, "criterion2_all_old": all(r["criterion2_old_best"] for r in rr),
+                             "criterion2_all_new": all(r["criterion2_new_best"] for r in rr)}
+        if dec_old and not dec_new:
+            withdrawn.append(t)
+        out["tasks"][t] = {"bins": L, "old_baselines": {k: {"run": str(v[0].relative_to(ROOT)), "acc": v[1]} for k, v in old.items()},
+                           "new_baselines": new, "best_old": best_old, "best": best, "best_by": best_by,
+                           "decisive_before": dec_old, "decisive_after": dec_new, "judged_runs": groups}
+    out["decisive_withdrawn"] = withdrawn
+    out["answer"] = "yes" if not withdrawn else "no"
+    import h0a
+    out["env"] = {"code": h0a.env(["stage3/pe3b.py"])}
+    (OUT / "summary.json").write_text(json.dumps(out, indent=1, default=str))
+    for t, v in out["tasks"].items():
+        L = v["bins"]
+        print(t, "best old", [round(v["best_old"][l], 3) for l in L], "new", [round(v["best"][l], 3) for l in L],
+              v["best_by"][L[2]], "decisive", v["decisive_before"], "->", v["decisive_after"],
+              {g: (x["criterion2_all_old"], x["criterion2_all_new"]) for g, x in v["judged_runs"].items()})
+        for k, n in v["new_baselines"].items():
+            print("   ", k, "tuned" if n["tuned"] else "", [(r["lr_mult"], [round(r["acc"][l], 3) for l in L], r["judgment_step"]) for r in n["runs"]])
+    print("withdrawn", withdrawn, "answer", out["answer"])
+
+
 def main():
     import argparse
     p = argparse.ArgumentParser()
     sp = p.add_subparsers(dest="cmd", required=True)
     sp.add_parser("check")
     sp.add_parser("tunelist")
+    sp.add_parser("report")
     q = sp.add_parser("run")
     q.add_argument("--task", required=True, choices=TASKS)
     q.add_argument("--kind", required=True, choices=KINDS)
     q.add_argument("--lr-mult", type=float, default=1.0)
     q.add_argument("--resume", action="store_true")
     a = p.parse_args()
-    {"check": cmd_check, "run": cmd_run, "tunelist": cmd_tunelist}[a.cmd](a)
+    {"check": cmd_check, "run": cmd_run, "tunelist": cmd_tunelist, "report": cmd_report}[a.cmd](a)
 
 
 if __name__ == "__main__":
