@@ -1,0 +1,48 @@
+{
+ "i_sorted_unique_in_range": {
+  "fraction": 1.0,
+  "sequences": 1200,
+  "eval_draw_repeats_after_eval_reset": true
+ },
+ "ii_causal": {
+  "rel_rand_same_positions": {
+   "fraction": 1.0,
+   "cases": 900,
+   "tolerance": 1e-05
+  },
+  "nope": {
+   "fraction": 1.0,
+   "cases": 900,
+   "tolerance": 1e-05
+  },
+  "rel_rand_eval_draw": {
+   "fraction": 1.0,
+   "cases": 50,
+   "tolerance": 1e-05
+  }
+ },
+ "iii_fixed_positions_equal_standard_relative": {
+  "fraction": 1.0,
+  "sequences": 200,
+  "tolerance": 0.0001,
+  "max_abs_logit_diff": 1.1920928955078125e-06
+ },
+ "params": {
+  "rel_rand": 891392,
+  "nope": 824832,
+  "rope": 824832
+ },
+ "all_1.000": true,
+ "env": {
+  "code": {
+   "code_commit": "d4afefd9a6dfa1b3d8458a28a5adb8139a9814fe",
+   "code_dirty": true,
+   "torch": "2.15.0+cu132",
+   "python": "3.12.3",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "cores": 4,
+   "threads": 1
+  },
+  "torch": "2.15.0+cu132"
+ }
+}
