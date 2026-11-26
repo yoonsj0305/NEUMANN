@@ -33,6 +33,7 @@ import argparse
 import json
 import os
 import pathlib
+import pickle
 import platform
 import random
 import subprocess
@@ -185,8 +186,11 @@ def cmd_run(a):
            "output": "answer tokens without <eos>, one empty token per answer position",
            "input_vocab": ivoc, "output_vocab": ovoc, "id_size": ID_SIZE, "ood_size": OOD_SIZE,
            "spec": spec, "design": "stage3/DESIGN.md 10.3, 10.5"}
-    (d / "config.json").write_text(json.dumps(cfg, indent=1))
-    (d / "env.json").write_text(json.dumps(env_info(a.pkg), indent=1))
+    ck_path = d / "ckpt.pt"                           # resume state (pickle; *.pt is git-ignored)
+    resume = ck_path.exists() and (d / "log.jsonl").exists() and not (d / "final.json").exists()
+    if not resume:
+        (d / "config.json").write_text(json.dumps(cfg, indent=1))
+        (d / "env.json").write_text(json.dumps(env_info(a.pkg), indent=1))
 
     core_model = constants.MODEL_BUILDERS[a.arch](output_size=len(ovoc), return_all_outputs=True,
                                                   **ARCH_PARAMS[a.arch])
@@ -259,14 +263,32 @@ def cmd_run(a):
             acc[lab] = ok / len(exs)
         return acc
 
-    log = open(d / "log.jsonl", "w")
     labels = list(evs)
     best = None
     hits = 0
     t_train = t_eval = 0.0
     stopped = "max steps"
     last = None
-    for step in range(1, MAX_STEPS + 1):
+    start = 1
+    resumes = []
+    if resume:                                        # continue exactly where the last checkpoint left off
+        with open(ck_path, "rb") as f:
+            ck = pickle.load(f)
+        params = jax.tree_util.tree_map(jnp.asarray, ck["params"])
+        opt_state = jax.tree_util.tree_map(jnp.asarray, ck["opt_state"])
+        rng.setstate(ck["rng"])
+        best, hits, last, t_train, t_eval, resumes = (ck["best"], ck["hits"], ck["last"], ck["t_train"],
+                                                      ck["t_eval"], ck["resumes"])
+        start = ck["step"] + 1
+        kept = [x for x in (d / "log.jsonl").read_text().splitlines() if json.loads(x)["step"] <= ck["step"]]
+        (d / "log.jsonl").write_text("".join(x + "\n" for x in kept))
+        resumes = resumes + [{"from_step": ck["step"], "time_utc": time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                 time.gmtime()),
+                              "env": env_info(a.pkg)}]
+        (d / "resumes.json").write_text(json.dumps(resumes, indent=1))
+        print(name, "resumed from step", ck["step"], flush=True)
+    log = open(d / "log.jsonl", "a" if resume else "w")
+    for step in range(start, MAX_STEPS + 1):
         t0 = time.time()
         n = rng.choice(lens)
         exs = [draw(rng, n, n)[:2] for _ in range(BATCH)]
@@ -297,11 +319,20 @@ def cmd_run(a):
             if hits >= 2:
                 stopped = "early stop: in-distribution >= 0.99 at two consecutive evaluations"
                 break
+            ck = {"step": step, "params": jax.device_get(params), "opt_state": jax.device_get(opt_state),
+                  "rng": rng.getstate(), "best": best, "hits": hits, "last": last, "t_train": t_train,
+                  "t_eval": t_eval, "resumes": resumes}
+            with open(str(ck_path) + ".tmp", "wb") as f:
+                pickle.dump(ck, f)
+            os.replace(str(ck_path) + ".tmp", ck_path)
     fin = {"name": name, "steps": last["step"], "stopped": stopped, "judgment_rule": "highest in-distribution "
            "accuracy, earliest on ties", "judgment": {"step": best["step"], "acc": best["acc"]},
            "last": {"step": last["step"], "acc": last["acc"]}, "wall_train_s": round(t_train, 1),
-           "wall_eval_s": round(t_eval, 1), "params": int(sum(v.size for v in jax.tree_util.tree_leaves(params)))}
+           "wall_eval_s": round(t_eval, 1), "params": int(sum(v.size for v in jax.tree_util.tree_leaves(params))),
+           "resumed_from_steps": [r["from_step"] for r in resumes]}
     (d / "final.json").write_text(json.dumps(fin, indent=1))
+    if ck_path.exists():
+        ck_path.unlink()
     print(name, "final", json.dumps(fin), flush=True)
 
 
