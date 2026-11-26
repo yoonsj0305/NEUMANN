@@ -1,0 +1,345 @@
+{
+ "design": "stage3/DESIGN.md 7.5-1",
+ "task": "repeat",
+ "classes": {
+  "a_eos_timing": "first wrong step: target <eos> and prediction not <eos>, or prediction <eos> and target not <eos>",
+  "b_digit_value": "first wrong step: target and prediction both digits",
+  "other": "first wrong step of any other kind"
+ },
+ "eval_sets": "tasks.eval_sets(repeat, 1000, 500), batching as stage1/run.py exact_match",
+ "students": [
+  {
+   "teacher_seed": 41,
+   "restart": 1,
+   "student_seed": 151,
+   "role": "selected",
+   "judgment_step": 3000,
+   "bins": {
+    "id_1-10": {
+     "acc": 0.997,
+     "final_json_acc": 0.997,
+     "failures": 3,
+     "counts": {
+      "a_eos_timing": 3,
+      "a_target_eos_pred_digit": 1,
+      "a_pred_eos_target_digit": 2,
+      "b_digit_value": 0,
+      "other": 0
+     },
+     "fraction_of_failures": {
+      "a_eos_timing": 1.0,
+      "b_digit_value": 0.0,
+      "other": 0.0
+     }
+    },
+    "ood_11-20": {
+     "acc": 0.978,
+     "final_json_acc": 0.978,
+     "failures": 11,
+     "counts": {
+      "a_eos_timing": 10,
+      "a_target_eos_pred_digit": 2,
+      "a_pred_eos_target_digit": 8,
+      "b_digit_value": 1,
+      "other": 0
+     },
+     "fraction_of_failures": {
+      "a_eos_timing": 0.9090909090909091,
+      "b_digit_value": 0.09090909090909091,
+      "other": 0.0
+     }
+    },
+    "ood_21-30": {
+     "acc": 0.948,
+     "final_json_acc": 0.948,
+     "failures": 26,
+     "counts": {
+      "a_eos_timing": 23,
+      "a_target_eos_pred_digit": 6,
+      "a_pred_eos_target_digit": 17,
+      "b_digit_value": 3,
+      "other": 0
+     },
+     "fraction_of_failures": {
+      "a_eos_timing": 0.8846153846153846,
+      "b_digit_value": 0.11538461538461539,
+      "other": 0.0
+     }
+    },
+    "ood_31-40": {
+     "acc": 0.872,
+     "final_json_acc": 0.872,
+     "failures": 64,
+     "counts": {
+      "a_eos_timing": 62,
+      "a_target_eos_pred_digit": 13,
+      "a_pred_eos_target_digit": 49,
+      "b_digit_value": 2,
+      "other": 0
+     },
+     "fraction_of_failures": {
+      "a_eos_timing": 0.96875,
+      "b_digit_value": 0.03125,
+      "other": 0.0
+     }
+    }
+   }
+  },
+  {
+   "teacher_seed": 42,
+   "restart": 0,
+   "student_seed": 52,
+   "role": "selected",
+   "judgment_step": 3000,
+   "bins": {
+    "id_1-10": {
+     "acc": 0.996,
+     "final_json_acc": 0.996,
+     "failures": 4,
+     "counts": {
+      "a_eos_timing": 4,
+      "a_target_eos_pred_digit": 2,
+      "a_pred_eos_target_digit": 2,
+      "b_digit_value": 0,
+      "other": 0
+     },
+     "fraction_of_failures": {
+      "a_eos_timing": 1.0,
+      "b_digit_value": 0.0,
+      "other": 0.0
+     }
+    },
+    "ood_11-20": {
+     "acc": 0.98,
+     "final_json_acc": 0.98,
+     "failures": 10,
+     "counts": {
+      "a_eos_timing": 5,
+      "a_target_eos_pred_digit": 0,
+      "a_pred_eos_target_digit": 5,
+      "b_digit_value": 5,
+      "other": 0
+     },
+     "fraction_of_failures": {
+      "a_eos_timing": 0.5,
+      "b_digit_value": 0.5,
+      "other": 0.0
+     }
+    },
+    "ood_21-30": {
+     "acc": 0.946,
+     "final_json_acc": 0.946,
+     "failures": 27,
+     "counts": {
+      "a_eos_timing": 21,
+      "a_target_eos_pred_digit": 5,
+      "a_pred_eos_target_digit": 16,
+      "b_digit_value": 6,
+      "other": 0
+     },
+     "fraction_of_failures": {
+      "a_eos_timing": 0.7777777777777778,
+      "b_digit_value": 0.2222222222222222,
+      "other": 0.0
+     }
+    },
+    "ood_31-40": {
+     "acc": 0.902,
+     "final_json_acc": 0.902,
+     "failures": 49,
+     "counts": {
+      "a_eos_timing": 31,
+      "a_target_eos_pred_digit": 9,
+      "a_pred_eos_target_digit": 22,
+      "b_digit_value": 18,
+      "other": 0
+     },
+     "fraction_of_failures": {
+      "a_eos_timing": 0.6326530612244898,
+      "b_digit_value": 0.3673469387755102,
+      "other": 0.0
+     }
+    }
+   }
+  },
+  {
+   "teacher_seed": 43,
+   "restart": 0,
+   "student_seed": 53,
+   "role": "selected",
+   "judgment_step": 1000,
+   "bins": {
+    "id_1-10": {
+     "acc": 0.993,
+     "final_json_acc": 0.993,
+     "failures": 7,
+     "counts": {
+      "a_eos_timing": 7,
+      "a_target_eos_pred_digit": 1,
+      "a_pred_eos_target_digit": 6,
+      "b_digit_value": 0,
+      "other": 0
+     },
+     "fraction_of_failures": {
+      "a_eos_timing": 1.0,
+      "b_digit_value": 0.0,
+      "other": 0.0
+     }
+    },
+    "ood_11-20": {
+     "acc": 0.888,
+     "final_json_acc": 0.888,
+     "failures": 56,
+     "counts": {
+      "a_eos_timing": 54,
+      "a_target_eos_pred_digit": 2,
+      "a_pred_eos_target_digit": 52,
+      "b_digit_value": 2,
+      "other": 0
+     },
+     "fraction_of_failures": {
+      "a_eos_timing": 0.9642857142857143,
+      "b_digit_value": 0.03571428571428571,
+      "other": 0.0
+     }
+    },
+    "ood_21-30": {
+     "acc": 0.648,
+     "final_json_acc": 0.648,
+     "failures": 176,
+     "counts": {
+      "a_eos_timing": 169,
+      "a_target_eos_pred_digit": 2,
+      "a_pred_eos_target_digit": 167,
+      "b_digit_value": 7,
+      "other": 0
+     },
+     "fraction_of_failures": {
+      "a_eos_timing": 0.9602272727272727,
+      "b_digit_value": 0.03977272727272727,
+      "other": 0.0
+     }
+    },
+    "ood_31-40": {
+     "acc": 0.396,
+     "final_json_acc": 0.396,
+     "failures": 302,
+     "counts": {
+      "a_eos_timing": 283,
+      "a_target_eos_pred_digit": 6,
+      "a_pred_eos_target_digit": 277,
+      "b_digit_value": 19,
+      "other": 0
+     },
+     "fraction_of_failures": {
+      "a_eos_timing": 0.9370860927152318,
+      "b_digit_value": 0.06291390728476821,
+      "other": 0.0
+     }
+    }
+   }
+  },
+  {
+   "teacher_seed": 43,
+   "restart": 1,
+   "student_seed": 153,
+   "role": "teacher 43 restart 1 (not selected)",
+   "judgment_step": 4000,
+   "bins": {
+    "id_1-10": {
+     "acc": 0.998,
+     "final_json_acc": 0.998,
+     "failures": 2,
+     "counts": {
+      "a_eos_timing": 2,
+      "a_target_eos_pred_digit": 2,
+      "a_pred_eos_target_digit": 0,
+      "b_digit_value": 0,
+      "other": 0
+     },
+     "fraction_of_failures": {
+      "a_eos_timing": 1.0,
+      "b_digit_value": 0.0,
+      "other": 0.0
+     }
+    },
+    "ood_11-20": {
+     "acc": 0.954,
+     "final_json_acc": 0.954,
+     "failures": 23,
+     "counts": {
+      "a_eos_timing": 22,
+      "a_target_eos_pred_digit": 13,
+      "a_pred_eos_target_digit": 9,
+      "b_digit_value": 1,
+      "other": 0
+     },
+     "fraction_of_failures": {
+      "a_eos_timing": 0.9565217391304348,
+      "b_digit_value": 0.043478260869565216,
+      "other": 0.0
+     }
+    },
+    "ood_21-30": {
+     "acc": 0.854,
+     "final_json_acc": 0.854,
+     "failures": 73,
+     "counts": {
+      "a_eos_timing": 70,
+      "a_target_eos_pred_digit": 22,
+      "a_pred_eos_target_digit": 48,
+      "b_digit_value": 3,
+      "other": 0
+     },
+     "fraction_of_failures": {
+      "a_eos_timing": 0.958904109589041,
+      "b_digit_value": 0.0410958904109589,
+      "other": 0.0
+     }
+    },
+    "ood_31-40": {
+     "acc": 0.714,
+     "final_json_acc": 0.714,
+     "failures": 143,
+     "counts": {
+      "a_eos_timing": 142,
+      "a_target_eos_pred_digit": 39,
+      "a_pred_eos_target_digit": 103,
+      "b_digit_value": 1,
+      "other": 0
+     },
+     "fraction_of_failures": {
+      "a_eos_timing": 0.993006993006993,
+      "b_digit_value": 0.006993006993006993,
+      "other": 0.0
+     }
+    }
+   }
+  }
+ ],
+ "env": {
+  "code_commit": "eb6c1c5b043ae9712da7f92dc783a58f6dbac2c5",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1,
+  "ortools": "9.15.6755",
+  "cp_sat": {
+   "num_workers": 1,
+   "random_seed": 0,
+   "max_time_in_seconds": 600.0
+  },
+  "module": "stage3/l31diag.py",
+  "code": {
+   "code_commit": "eb6c1c5b043ae9712da7f92dc783a58f6dbac2c5",
+   "code_dirty": false,
+   "torch": "2.15.0+cu132",
+   "python": "3.12.3",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "cores": 4,
+   "threads": 1
+  }
+ }
+}

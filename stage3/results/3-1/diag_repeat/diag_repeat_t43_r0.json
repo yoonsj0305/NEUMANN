@@ -1,0 +1,445 @@
+{
+ "teacher_seed": 43,
+ "restart": 0,
+ "student_seed": 53,
+ "role": "selected",
+ "run": "stage3/results/3-1/main/l31_repeat__l1read__1M__s53__N100000__synth_t43",
+ "judgment_step": 1000,
+ "bins": {
+  "id_1-10": {
+   "n": 1000,
+   "acc": 0.993,
+   "final_json_acc": 0.993,
+   "failures": 7,
+   "counts": {
+    "a_eos_timing": 7,
+    "a_target_eos_pred_digit": 1,
+    "a_pred_eos_target_digit": 6,
+    "b_digit_value": 0,
+    "other": 0
+   },
+   "fraction_of_failures": {
+    "a_eos_timing": 1.0,
+    "b_digit_value": 0.0,
+    "other": 0.0
+   },
+   "first_wrong_position": {
+    "a_eos_timing": {
+     "mean_answer_index": 15.714285714285714,
+     "mean_answer_len_with_eos": 18.428571428571427,
+     "fraction_in_second_half": 1.0
+    },
+    "b_digit_value": {
+     "mean_answer_index": null,
+     "mean_answer_len_with_eos": null,
+     "fraction_in_second_half": null
+    }
+   },
+   "examples": {
+    "a_eos_timing": [
+     {
+      "prompt": "6 5 2 9 6 6 =",
+      "target": "6 5 2 9 6 6 6 5 2 9 6 6 <eos>",
+      "prediction_on_answer_steps": "6 5 2 9 6 6 6 5 2 9 6 6 6",
+      "first_wrong_answer_index": 12,
+      "target_token": "<eos>",
+      "predicted_token": "6",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "1 2 0 3 6 0 6 2 =",
+      "target": "1 2 0 3 6 0 6 2 1 2 0 3 6 0 6 2 <eos>",
+      "prediction_on_answer_steps": "1 2 0 3 6 0 6 2 1 2 0 3 6 0 <eos> 2 <eos>",
+      "first_wrong_answer_index": 14,
+      "target_token": "6",
+      "predicted_token": "<eos>",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "0 7 4 1 6 5 0 6 5 =",
+      "target": "0 7 4 1 6 5 0 6 5 0 7 4 1 6 5 0 6 5 <eos>",
+      "prediction_on_answer_steps": "0 7 4 1 6 5 0 6 5 0 7 4 1 6 5 <eos> 6 5 <eos>",
+      "first_wrong_answer_index": 15,
+      "target_token": "0",
+      "predicted_token": "<eos>",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "7 9 3 9 9 7 5 7 2 =",
+      "target": "7 9 3 9 9 7 5 7 2 7 9 3 9 9 7 5 7 2 <eos>",
+      "prediction_on_answer_steps": "7 9 3 9 9 7 5 7 2 7 9 3 9 9 7 5 <eos> 2 <eos>",
+      "first_wrong_answer_index": 16,
+      "target_token": "7",
+      "predicted_token": "<eos>",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "5 2 5 3 4 9 0 5 4 =",
+      "target": "5 2 5 3 4 9 0 5 4 5 2 5 3 4 9 0 5 4 <eos>",
+      "prediction_on_answer_steps": "5 2 5 3 4 9 0 5 4 5 2 5 3 4 9 0 <eos> 4 <eos>",
+      "first_wrong_answer_index": 16,
+      "target_token": "5",
+      "predicted_token": "<eos>",
+      "n_wrong_steps": 1
+     }
+    ],
+    "b_digit_value": [],
+    "other": []
+   }
+  },
+  "ood_11-20": {
+   "n": 500,
+   "acc": 0.888,
+   "final_json_acc": 0.888,
+   "failures": 56,
+   "counts": {
+    "a_eos_timing": 54,
+    "a_target_eos_pred_digit": 2,
+    "a_pred_eos_target_digit": 52,
+    "b_digit_value": 2,
+    "other": 0
+   },
+   "fraction_of_failures": {
+    "a_eos_timing": 0.9642857142857143,
+    "b_digit_value": 0.03571428571428571,
+    "other": 0.0
+   },
+   "first_wrong_position": {
+    "a_eos_timing": {
+     "mean_answer_index": 31.40740740740741,
+     "mean_answer_len_with_eos": 35.592592592592595,
+     "fraction_in_second_half": 1.0
+    },
+    "b_digit_value": {
+     "mean_answer_index": 7.5,
+     "mean_answer_len_with_eos": 33.0,
+     "fraction_in_second_half": 0.0
+    }
+   },
+   "examples": {
+    "a_eos_timing": [
+     {
+      "prompt": "0 5 4 8 9 0 3 3 8 0 4 =",
+      "target": "0 5 4 8 9 0 3 3 8 0 4 0 5 4 8 9 0 3 3 8 0 4 <eos>",
+      "prediction_on_answer_steps": "0 5 4 8 9 0 3 3 8 0 4 0 5 4 8 9 0 3 3 8 <eos> 4 <eos>",
+      "first_wrong_answer_index": 20,
+      "target_token": "0",
+      "predicted_token": "<eos>",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "9 3 5 4 6 9 5 2 5 5 4 6 =",
+      "target": "9 3 5 4 6 9 5 2 5 5 4 6 9 3 5 4 6 9 5 2 5 5 4 6 <eos>",
+      "prediction_on_answer_steps": "9 3 5 4 6 9 5 2 5 5 4 6 9 3 5 4 6 9 5 2 5 5 4 6 9",
+      "first_wrong_answer_index": 24,
+      "target_token": "<eos>",
+      "predicted_token": "9",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "5 3 7 7 9 3 5 8 4 9 0 0 =",
+      "target": "5 3 7 7 9 3 5 8 4 9 0 0 5 3 7 7 9 3 5 8 4 9 0 0 <eos>",
+      "prediction_on_answer_steps": "5 3 7 7 9 3 5 8 4 9 0 0 5 3 7 7 9 3 5 8 4 9 0 <eos> <eos>",
+      "first_wrong_answer_index": 23,
+      "target_token": "0",
+      "predicted_token": "<eos>",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "4 3 3 2 0 8 2 3 2 4 4 4 0 =",
+      "target": "4 3 3 2 0 8 2 3 2 4 4 4 0 4 3 3 2 0 8 2 3 2 4 4 4 0 <eos>",
+      "prediction_on_answer_steps": "4 3 3 2 0 8 2 3 2 4 4 4 0 4 3 3 2 0 8 2 3 2 4 4 <eos> 0 <eos>",
+      "first_wrong_answer_index": 24,
+      "target_token": "4",
+      "predicted_token": "<eos>",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "6 5 3 9 7 0 8 6 6 7 3 6 4 =",
+      "target": "6 5 3 9 7 0 8 6 6 7 3 6 4 6 5 3 9 7 0 8 6 6 7 3 6 4 <eos>",
+      "prediction_on_answer_steps": "6 5 3 9 7 0 8 6 6 7 3 6 4 6 5 3 9 7 0 8 6 6 7 3 <eos> 4 <eos>",
+      "first_wrong_answer_index": 24,
+      "target_token": "6",
+      "predicted_token": "<eos>",
+      "n_wrong_steps": 1
+     }
+    ],
+    "b_digit_value": [
+     {
+      "prompt": "3 6 9 6 9 9 6 1 3 0 4 8 5 =",
+      "target": "3 6 9 6 9 9 6 1 3 0 4 8 5 3 6 9 6 9 9 6 1 3 0 4 8 5 <eos>",
+      "prediction_on_answer_steps": "3 6 9 6 9 9 6 1 3 0 4 3 5 3 6 9 6 9 9 6 1 3 0 4 8 5 <eos>",
+      "first_wrong_answer_index": 11,
+      "target_token": "8",
+      "predicted_token": "3",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "3 4 1 4 8 4 2 4 3 0 7 0 0 3 2 1 9 9 8 =",
+      "target": "3 4 1 4 8 4 2 4 3 0 7 0 0 3 2 1 9 9 8 3 4 1 4 8 4 2 4 3 0 7 0 0 3 2 1 9 9 8 <eos>",
+      "prediction_on_answer_steps": "3 4 1 4 3 4 2 4 3 0 7 0 0 3 2 1 9 9 8 3 4 1 4 8 4 2 4 3 0 7 0 0 3 2 1 9 9 8 <eos>",
+      "first_wrong_answer_index": 4,
+      "target_token": "8",
+      "predicted_token": "3",
+      "n_wrong_steps": 1
+     }
+    ],
+    "other": []
+   }
+  },
+  "ood_21-30": {
+   "n": 500,
+   "acc": 0.648,
+   "final_json_acc": 0.648,
+   "failures": 176,
+   "counts": {
+    "a_eos_timing": 169,
+    "a_target_eos_pred_digit": 2,
+    "a_pred_eos_target_digit": 167,
+    "b_digit_value": 7,
+    "other": 0
+   },
+   "fraction_of_failures": {
+    "a_eos_timing": 0.9602272727272727,
+    "b_digit_value": 0.03977272727272727,
+    "other": 0.0
+   },
+   "first_wrong_position": {
+    "a_eos_timing": {
+     "mean_answer_index": 48.34319526627219,
+     "mean_answer_len_with_eos": 53.946745562130175,
+     "fraction_in_second_half": 1.0
+    },
+    "b_digit_value": {
+     "mean_answer_index": 18.857142857142858,
+     "mean_answer_len_with_eos": 55.285714285714285,
+     "fraction_in_second_half": 0.0
+    }
+   },
+   "examples": {
+    "a_eos_timing": [
+     {
+      "prompt": "1 3 7 3 7 6 4 9 9 0 3 1 3 1 4 3 5 2 6 2 5 =",
+      "target": "1 3 7 3 7 6 4 9 9 0 3 1 3 1 4 3 5 2 6 2 5 1 3 7 3 7 6 4 9 9 0 3 1 3 1 4 3 5 2 6 2 5 <eos>",
+      "prediction_on_answer_steps": "1 3 7 3 7 6 4 9 9 0 3 1 3 1 4 3 5 2 6 2 5 1 3 7 3 7 6 4 9 9 0 3 1 3 1 4 3 5 2 6 2 <eos> <eos>",
+      "first_wrong_answer_index": 41,
+      "target_token": "5",
+      "predicted_token": "<eos>",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "7 9 0 3 7 4 8 5 0 2 7 0 4 7 0 2 4 1 6 8 7 =",
+      "target": "7 9 0 3 7 4 8 5 0 2 7 0 4 7 0 2 4 1 6 8 7 7 9 0 3 7 4 8 5 0 2 7 0 4 7 0 2 4 1 6 8 7 <eos>",
+      "prediction_on_answer_steps": "7 9 0 3 7 4 8 5 0 2 7 0 4 7 0 2 4 1 6 8 7 7 9 0 3 7 4 8 5 0 2 7 0 4 7 0 2 4 1 6 8 <eos> <eos>",
+      "first_wrong_answer_index": 41,
+      "target_token": "7",
+      "predicted_token": "<eos>",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "0 2 3 3 6 3 7 6 0 5 3 3 5 6 4 9 1 3 0 0 6 =",
+      "target": "0 2 3 3 6 3 7 6 0 5 3 3 5 6 4 9 1 3 0 0 6 0 2 3 3 6 3 7 6 0 5 3 3 5 6 4 9 1 3 0 0 6 <eos>",
+      "prediction_on_answer_steps": "0 2 3 3 6 3 7 6 0 5 3 3 5 6 4 9 1 3 0 0 6 0 2 3 3 6 3 7 6 0 5 3 3 5 6 4 9 1 3 0 <eos> 6 <eos>",
+      "first_wrong_answer_index": 40,
+      "target_token": "0",
+      "predicted_token": "<eos>",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "1 1 4 1 7 9 3 0 5 6 0 1 7 6 8 6 0 9 1 8 5 =",
+      "target": "1 1 4 1 7 9 3 0 5 6 0 1 7 6 8 6 0 9 1 8 5 1 1 4 1 7 9 3 0 5 6 0 1 7 6 8 6 0 9 1 8 5 <eos>",
+      "prediction_on_answer_steps": "1 1 4 1 7 9 3 0 5 6 0 1 7 6 8 6 0 9 1 8 5 1 1 4 1 7 9 3 0 5 6 0 1 7 6 8 6 0 9 <eos> 8 5 <eos>",
+      "first_wrong_answer_index": 39,
+      "target_token": "1",
+      "predicted_token": "<eos>",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "4 7 2 0 0 3 4 3 8 7 3 4 8 4 6 7 3 6 9 4 2 =",
+      "target": "4 7 2 0 0 3 4 3 8 7 3 4 8 4 6 7 3 6 9 4 2 4 7 2 0 0 3 4 3 8 7 3 4 8 4 6 7 3 6 9 4 2 <eos>",
+      "prediction_on_answer_steps": "4 7 2 0 0 3 4 3 8 7 3 4 8 4 6 7 3 6 9 4 2 4 7 2 0 0 3 4 3 8 7 3 4 8 4 6 7 3 6 9 <eos> 2 <eos>",
+      "first_wrong_answer_index": 40,
+      "target_token": "4",
+      "predicted_token": "<eos>",
+      "n_wrong_steps": 1
+     }
+    ],
+    "b_digit_value": [
+     {
+      "prompt": "8 2 0 2 8 3 4 5 5 1 5 9 9 8 8 2 0 9 8 9 4 4 1 4 =",
+      "target": "8 2 0 2 8 3 4 5 5 1 5 9 9 8 8 2 0 9 8 9 4 4 1 4 8 2 0 2 8 3 4 5 5 1 5 9 9 8 8 2 0 9 8 9 4 4 1 4 <eos>",
+      "prediction_on_answer_steps": "8 2 0 2 8 3 4 5 5 1 5 9 9 8 8 2 0 9 8 9 8 4 1 4 8 2 0 2 8 3 4 5 5 1 5 9 9 8 8 2 0 9 8 9 4 4 1 4 <eos>",
+      "first_wrong_answer_index": 20,
+      "target_token": "4",
+      "predicted_token": "8",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "9 9 0 9 4 6 1 7 5 0 8 7 7 6 9 8 5 3 1 1 3 3 2 7 9 3 =",
+      "target": "9 9 0 9 4 6 1 7 5 0 8 7 7 6 9 8 5 3 1 1 3 3 2 7 9 3 9 9 0 9 4 6 1 7 5 0 8 7 7 6 9 8 5 3 1 1 3 3 2 7 9 3 <eos>",
+      "prediction_on_answer_steps": "9 9 0 9 4 6 1 7 5 0 8 7 7 6 9 8 5 3 1 9 3 3 2 7 9 3 9 9 0 9 4 6 1 7 5 0 8 7 7 6 9 8 5 3 1 1 3 3 2 7 9 3 <eos>",
+      "first_wrong_answer_index": 19,
+      "target_token": "1",
+      "predicted_token": "9",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "8 4 0 2 8 7 5 2 8 6 6 9 6 5 2 3 2 8 0 9 3 9 7 3 2 4 2 =",
+      "target": "8 4 0 2 8 7 5 2 8 6 6 9 6 5 2 3 2 8 0 9 3 9 7 3 2 4 2 8 4 0 2 8 7 5 2 8 6 6 9 6 5 2 3 2 8 0 9 3 9 7 3 2 4 2 <eos>",
+      "prediction_on_answer_steps": "8 4 0 2 8 7 5 2 8 6 6 9 6 5 2 3 2 8 0 9 3 9 8 3 2 4 2 8 4 0 2 8 7 5 2 8 6 6 9 6 5 2 3 2 8 0 9 3 9 7 3 2 4 2 <eos>",
+      "first_wrong_answer_index": 22,
+      "target_token": "7",
+      "predicted_token": "8",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "3 3 6 1 8 4 3 5 6 7 1 6 1 2 2 9 3 5 4 1 0 2 4 0 6 9 1 =",
+      "target": "3 3 6 1 8 4 3 5 6 7 1 6 1 2 2 9 3 5 4 1 0 2 4 0 6 9 1 3 3 6 1 8 4 3 5 6 7 1 6 1 2 2 9 3 5 4 1 0 2 4 0 6 9 1 <eos>",
+      "prediction_on_answer_steps": "3 3 6 1 3 4 3 5 6 7 1 6 1 2 2 9 3 5 4 1 0 2 4 0 6 9 1 3 3 6 1 8 4 3 5 6 7 1 6 1 2 2 9 3 5 4 1 0 2 4 0 6 9 1 <eos>",
+      "first_wrong_answer_index": 4,
+      "target_token": "8",
+      "predicted_token": "3",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "8 4 9 5 5 8 5 8 3 4 1 9 8 5 0 2 4 8 1 9 3 0 8 0 4 5 9 8 =",
+      "target": "8 4 9 5 5 8 5 8 3 4 1 9 8 5 0 2 4 8 1 9 3 0 8 0 4 5 9 8 8 4 9 5 5 8 5 8 3 4 1 9 8 5 0 2 4 8 1 9 3 0 8 0 4 5 9 8 <eos>",
+      "prediction_on_answer_steps": "8 4 9 5 5 8 5 8 3 4 1 9 8 5 0 2 4 8 1 9 3 0 8 0 8 5 9 8 8 4 9 5 5 8 5 8 3 4 1 9 8 5 0 2 4 8 1 9 3 0 8 0 <eos> 5 9 <eos> <eos>",
+      "first_wrong_answer_index": 24,
+      "target_token": "4",
+      "predicted_token": "8",
+      "n_wrong_steps": 3
+     }
+    ],
+    "other": []
+   }
+  },
+  "ood_31-40": {
+   "n": 500,
+   "acc": 0.396,
+   "final_json_acc": 0.396,
+   "failures": 302,
+   "counts": {
+    "a_eos_timing": 283,
+    "a_target_eos_pred_digit": 6,
+    "a_pred_eos_target_digit": 277,
+    "b_digit_value": 19,
+    "other": 0
+   },
+   "fraction_of_failures": {
+    "a_eos_timing": 0.9370860927152318,
+    "b_digit_value": 0.06291390728476821,
+    "other": 0.0
+   },
+   "first_wrong_position": {
+    "a_eos_timing": {
+     "mean_answer_index": 65.59717314487632,
+     "mean_answer_len_with_eos": 72.56183745583039,
+     "fraction_in_second_half": 1.0
+    },
+    "b_digit_value": {
+     "mean_answer_index": 27.68421052631579,
+     "mean_answer_len_with_eos": 72.89473684210526,
+     "fraction_in_second_half": 0.21052631578947367
+    }
+   },
+   "examples": {
+    "a_eos_timing": [
+     {
+      "prompt": "8 4 9 2 5 0 8 1 9 1 3 6 3 1 8 0 6 4 8 8 7 5 8 8 4 6 0 7 4 3 3 =",
+      "target": "8 4 9 2 5 0 8 1 9 1 3 6 3 1 8 0 6 4 8 8 7 5 8 8 4 6 0 7 4 3 3 8 4 9 2 5 0 8 1 9 1 3 6 3 1 8 0 6 4 8 8 7 5 8 8 4 6 0 7 4 3 3 <eos>",
+      "prediction_on_answer_steps": "8 4 9 2 5 0 8 1 9 1 3 6 3 1 8 0 6 4 8 8 7 5 8 8 4 6 0 7 4 3 3 8 4 9 2 5 0 8 1 9 1 3 6 3 1 8 0 6 4 8 8 7 5 8 8 4 6 0 7 <eos> 3 3 <eos>",
+      "first_wrong_answer_index": 59,
+      "target_token": "4",
+      "predicted_token": "<eos>",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "4 7 1 9 2 7 1 7 2 7 7 3 4 9 5 7 3 8 5 6 0 0 9 8 0 3 6 1 4 0 9 =",
+      "target": "4 7 1 9 2 7 1 7 2 7 7 3 4 9 5 7 3 8 5 6 0 0 9 8 0 3 6 1 4 0 9 4 7 1 9 2 7 1 7 2 7 7 3 4 9 5 7 3 8 5 6 0 0 9 8 0 3 6 1 4 0 9 <eos>",
+      "prediction_on_answer_steps": "4 7 1 9 2 7 1 7 2 7 7 3 4 9 5 7 3 8 5 6 0 0 9 8 0 3 6 1 4 0 9 4 7 1 9 2 7 1 7 2 7 7 3 4 9 5 7 3 8 5 6 0 0 9 8 0 3 6 1 <eos> 0 9 <eos>",
+      "first_wrong_answer_index": 59,
+      "target_token": "4",
+      "predicted_token": "<eos>",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "9 7 7 0 2 2 6 9 7 1 8 5 0 6 8 5 3 8 8 9 0 5 1 1 1 9 9 5 0 9 7 =",
+      "target": "9 7 7 0 2 2 6 9 7 1 8 5 0 6 8 5 3 8 8 9 0 5 1 1 1 9 9 5 0 9 7 9 7 7 0 2 2 6 9 7 1 8 5 0 6 8 5 3 8 8 9 0 5 1 1 1 9 9 5 0 9 7 <eos>",
+      "prediction_on_answer_steps": "9 7 7 0 2 2 6 9 7 1 8 5 0 6 8 5 3 8 8 9 0 5 1 1 1 9 9 5 0 9 7 9 7 7 0 2 2 6 9 7 1 8 5 0 6 8 5 3 8 8 9 0 5 1 1 1 9 9 5 0 <eos> 7 <eos>",
+      "first_wrong_answer_index": 60,
+      "target_token": "9",
+      "predicted_token": "<eos>",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "3 7 7 6 2 1 7 5 1 8 7 4 0 5 0 6 4 8 1 8 4 0 3 3 0 2 3 8 6 4 5 =",
+      "target": "3 7 7 6 2 1 7 5 1 8 7 4 0 5 0 6 4 8 1 8 4 0 3 3 0 2 3 8 6 4 5 3 7 7 6 2 1 7 5 1 8 7 4 0 5 0 6 4 8 1 8 4 0 3 3 0 2 3 8 6 4 5 <eos>",
+      "prediction_on_answer_steps": "3 7 7 6 2 1 7 5 1 8 7 4 0 5 0 6 4 8 1 8 4 0 3 3 0 2 3 8 6 4 5 3 7 7 6 2 1 7 5 1 8 7 4 0 5 0 6 4 8 1 8 4 0 3 <eos> 0 2 3 8 6 4 5 <eos>",
+      "first_wrong_answer_index": 54,
+      "target_token": "3",
+      "predicted_token": "<eos>",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "1 9 8 3 3 6 7 3 4 7 7 5 3 0 6 9 8 0 3 8 7 4 7 3 1 1 6 3 9 9 1 =",
+      "target": "1 9 8 3 3 6 7 3 4 7 7 5 3 0 6 9 8 0 3 8 7 4 7 3 1 1 6 3 9 9 1 1 9 8 3 3 6 7 3 4 7 7 5 3 0 6 9 8 0 3 8 7 4 7 3 1 1 6 3 9 9 1 <eos>",
+      "prediction_on_answer_steps": "1 9 8 3 3 6 7 3 4 7 7 5 3 0 6 9 8 0 3 8 7 4 7 3 1 1 6 3 9 9 1 1 9 8 3 3 6 7 3 4 7 7 5 3 0 6 9 8 0 3 8 7 4 7 3 <eos> <eos> <eos> 3 9 9 <eos> <eos>",
+      "first_wrong_answer_index": 55,
+      "target_token": "1",
+      "predicted_token": "<eos>",
+      "n_wrong_steps": 4
+     }
+    ],
+    "b_digit_value": [
+     {
+      "prompt": "3 1 1 3 9 1 4 5 5 0 3 1 2 5 6 6 2 8 4 5 9 9 9 1 6 5 1 8 8 6 7 =",
+      "target": "3 1 1 3 9 1 4 5 5 0 3 1 2 5 6 6 2 8 4 5 9 9 9 1 6 5 1 8 8 6 7 3 1 1 3 9 1 4 5 5 0 3 1 2 5 6 6 2 8 4 5 9 9 9 1 6 5 1 8 8 6 7 <eos>",
+      "prediction_on_answer_steps": "3 1 1 3 9 1 4 5 5 0 3 1 2 5 6 6 2 8 4 5 9 9 9 1 6 5 1 3 8 6 7 3 1 1 3 9 1 4 5 5 0 3 1 2 5 6 6 2 8 4 5 9 9 9 1 6 5 1 8 8 6 7 <eos>",
+      "first_wrong_answer_index": 27,
+      "target_token": "8",
+      "predicted_token": "3",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "3 3 0 3 9 2 6 3 9 9 9 7 7 4 8 4 3 4 9 9 3 1 4 6 7 2 8 6 4 8 6 =",
+      "target": "3 3 0 3 9 2 6 3 9 9 9 7 7 4 8 4 3 4 9 9 3 1 4 6 7 2 8 6 4 8 6 3 3 0 3 9 2 6 3 9 9 9 7 7 4 8 4 3 4 9 9 3 1 4 6 7 2 8 6 4 8 6 <eos>",
+      "prediction_on_answer_steps": "3 3 0 3 9 2 6 3 9 9 9 7 7 4 3 4 3 4 9 9 3 1 4 6 7 2 8 6 4 3 6 3 3 0 3 9 2 6 3 9 9 9 7 7 4 8 4 3 4 9 9 3 1 4 6 7 2 8 6 4 8 6 <eos>",
+      "first_wrong_answer_index": 14,
+      "target_token": "8",
+      "predicted_token": "3",
+      "n_wrong_steps": 2
+     },
+     {
+      "prompt": "8 8 6 4 7 6 3 8 0 2 3 5 2 4 8 5 9 7 7 0 6 3 3 3 7 2 4 8 1 4 0 =",
+      "target": "8 8 6 4 7 6 3 8 0 2 3 5 2 4 8 5 9 7 7 0 6 3 3 3 7 2 4 8 1 4 0 8 8 6 4 7 6 3 8 0 2 3 5 2 4 8 5 9 7 7 0 6 3 3 3 7 2 4 8 1 4 0 <eos>",
+      "prediction_on_answer_steps": "8 8 6 4 7 6 3 8 0 2 3 5 2 4 8 5 9 7 7 0 6 3 3 3 7 2 4 8 1 8 0 8 8 6 4 7 6 3 8 0 2 3 5 2 4 8 5 9 7 7 0 6 3 3 3 7 2 4 8 1 4 0 <eos>",
+      "first_wrong_answer_index": 29,
+      "target_token": "4",
+      "predicted_token": "8",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "8 8 5 7 5 5 0 4 6 9 4 1 4 7 5 8 3 7 9 1 5 5 8 3 0 5 4 7 8 1 4 1 4 =",
+      "target": "8 8 5 7 5 5 0 4 6 9 4 1 4 7 5 8 3 7 9 1 5 5 8 3 0 5 4 7 8 1 4 1 4 8 8 5 7 5 5 0 4 6 9 4 1 4 7 5 8 3 7 9 1 5 5 8 3 0 5 4 7 8 1 4 1 4 <eos>",
+      "prediction_on_answer_steps": "8 8 5 7 5 5 0 4 6 9 4 1 4 7 5 8 3 7 9 1 5 5 8 3 0 5 4 7 8 1 8 1 4 8 8 5 7 5 5 0 4 6 9 4 1 4 7 5 8 3 7 9 1 5 5 8 3 0 5 4 7 8 1 4 1 4 <eos>",
+      "first_wrong_answer_index": 30,
+      "target_token": "4",
+      "predicted_token": "8",
+      "n_wrong_steps": 1
+     },
+     {
+      "prompt": "0 0 4 5 6 8 0 7 0 3 8 5 9 8 9 3 1 4 3 6 7 1 4 2 1 7 5 9 4 9 6 8 4 9 =",
+      "target": "0 0 4 5 6 8 0 7 0 3 8 5 9 8 9 3 1 4 3 6 7 1 4 2 1 7 5 9 4 9 6 8 4 9 0 0 4 5 6 8 0 7 0 3 8 5 9 8 9 3 1 4 3 6 7 1 4 2 1 7 5 9 4 9 6 8 4 9 <eos>",
+      "prediction_on_answer_steps": "0 0 4 5 6 8 0 7 0 3 8 5 9 8 9 3 1 4 3 6 7 1 4 2 1 7 5 9 4 9 6 8 4 9 0 5 4 5 6 8 0 7 0 3 8 5 9 8 9 3 1 4 3 6 7 1 4 2 1 7 5 9 4 9 6 8 4 9 <eos>",
+      "first_wrong_answer_index": 35,
+      "target_token": "0",
+      "predicted_token": "5",
+      "n_wrong_steps": 1
+     }
+    ],
+    "other": []
+   }
+  }
+ }
+}
