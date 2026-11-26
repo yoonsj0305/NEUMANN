@@ -1,0 +1,128 @@
+{
+ "task": "reverse_string",
+ "program": {
+  "Q": 1,
+  "mu": {
+   "head0": {
+    "q0 answer_phase": "left",
+    "q0 digit": "right"
+   }
+  },
+  "mu_default": "stay",
+  "delta_rules_first_match": [
+   {
+    "q": "*",
+    "kind_x": "*",
+    "kind_reads": {},
+    "next": "same"
+   }
+  ],
+  "supply_head_by_q": {
+   "q0": 0
+  },
+  "note": "the H-0 BOS table: head 0 follows the input, reads s_n at '=', then moves left; it reads <bos> at the <eos> step",
+  "copy_type": true
+ },
+ "kinds": {
+  "<bos>": {
+   "e_tasks": "other",
+   "machine": "other",
+   "same": true
+  },
+  "=": {
+   "e_tasks": "=",
+   "machine": "=",
+   "same": true
+  },
+  "0": {
+   "e_tasks": "digit",
+   "machine": "answer_phase",
+   "same": false
+  },
+  "1": {
+   "e_tasks": "digit",
+   "machine": "answer_phase",
+   "same": false
+  }
+ },
+ "bos": true,
+ "format": "<bos> input = output <eos> (DESIGN 9.1)",
+ "sets": {
+  "id_1-10": {
+   "examples": 2000,
+   "b_causal_p_le_t": 1.0,
+   "c_prime_invariance_t_ge_t0_positions_bits_q": 1.0,
+   "correct_read_scored_steps_without_eos": 1.0,
+   "scored_steps_without_eos": 10874
+  },
+  "ood_11-20": {
+   "examples": 500,
+   "b_causal_p_le_t": 1.0,
+   "c_prime_invariance_t_ge_t0_positions_bits_q": 1.0,
+   "correct_read_scored_steps_without_eos": 1.0,
+   "scored_steps_without_eos": 7817
+  },
+  "ood_21-30": {
+   "examples": 500,
+   "b_causal_p_le_t": 1.0,
+   "c_prime_invariance_t_ge_t0_positions_bits_q": 1.0,
+   "correct_read_scored_steps_without_eos": 1.0,
+   "scored_steps_without_eos": 12782
+  },
+  "ood_31-40": {
+   "examples": 500,
+   "b_causal_p_le_t": 1.0,
+   "c_prime_invariance_t_ge_t0_positions_bits_q": 1.0,
+   "correct_read_scored_steps_without_eos": 1.0,
+   "scored_steps_without_eos": 17658
+  }
+ },
+ "d": {
+  "train_seed": 30,
+  "train_examples": 100000,
+  "train_table_keys": 20,
+  "train_conflicts": 0,
+  "sets": {
+   "id_1-10": {
+    "scored_steps": 12874,
+    "conflicts_within_set": 0,
+    "covered_steps_vs_train_table_wrong": 0,
+    "key_coverage_recorded": 1.0
+   },
+   "ood_11-20": {
+    "scored_steps": 8317,
+    "conflicts_within_set": 0,
+    "covered_steps_vs_train_table_wrong": 0,
+    "key_coverage_recorded": 1.0
+   },
+   "ood_21-30": {
+    "scored_steps": 13282,
+    "conflicts_within_set": 0,
+    "covered_steps_vs_train_table_wrong": 0,
+    "key_coverage_recorded": 1.0
+   },
+   "ood_31-40": {
+    "scored_steps": 18158,
+    "conflicts_within_set": 0,
+    "covered_steps_vs_train_table_wrong": 0,
+    "key_coverage_recorded": 1.0
+   }
+  },
+  "conflicts_0_everywhere": true
+ },
+ "all_checks_1.000_and_d_0": true,
+ "moving_heads": [
+  0
+ ],
+ "in_l1": true,
+ "in_l0": true,
+ "env": {
+  "code_commit": "af7aee740783c218125a542e864ab33c99450e2e",
+  "code_dirty": true,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1
+ }
+}

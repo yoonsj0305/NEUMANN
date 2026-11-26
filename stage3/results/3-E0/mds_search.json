@@ -1,0 +1,20 @@
+{
+ "family": "3-E0: brute force over a 6-state program family for missing_duplicate_string (pure python simulation of the L1\nmoves stay / right / left: right clamped to t, left clamped to 0; transitions on the kind read, as stage3/l1.py).\nOnly head positions matter (the target is the token at the partner position), so every n in 1..40 and every hole\nposition p is checked, values are not needed.  State = (phase 1/2/3, parity); parity flips every step; the run starts\nin (phase 3, parity 0).  Z, Y = heads 0, 1.  Family (variants enumerated in this order, the first one that is exact\neverywhere is written to OUT_JSON):\n  Z: phase 1 right on parity zr, phases 2-3 left on parity zl;  Y: phases 1-2 right, phase 3 right on parity yr;\n  moves at '=' (eqZ, eqY) and at kind-other steps per phase (oZ1, oY1: the hole; oZ2, oY2, oZ3, oY3: the pad);\n  supply: phase 1 -> s1 (n = 1 only), phase 2 -> Z, phase 3 -> Y.\n  python stage3/e0_mds_search.py OUT_JSON\n",
+ "variants_tried_until_first": 19688,
+ "first_exact": {
+  "zr": 0,
+  "zl": 0,
+  "yr": 0,
+  "par0": 1,
+  "s1": "Y",
+  "eqZ": "s",
+  "eqY": "s",
+  "oZ1": "r",
+  "oY1": "r",
+  "oZ2": "s",
+  "oY2": "s",
+  "oZ3": "s",
+  "oY3": "s"
+ },
+ "checked": "n = 1..40, every hole position"
+}
