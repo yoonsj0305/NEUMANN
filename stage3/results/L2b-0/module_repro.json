@@ -1,0 +1,297 @@
+{
+ "design": "the C-1 modules reproduce their C-1 judgment accuracies (teacher-forced exact match on the C-1 evaluation sets, tasks.eval_sets(task, 1000, 500))",
+ "modules": {
+  "add_table1": {
+   "dir": "stage2/results/c1/c1_addition__hardread__1M__s31__N100000__table1",
+   "step": 5000,
+   "vocab": 120,
+   "table": [
+    [
+     0,
+     3,
+     1,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     3,
+     3,
+     0,
+     0,
+     1,
+     0
+    ]
+   ],
+   "judgment_acc": {
+    "id_1-10": 1.0,
+    "ood_11-20": 0.998,
+    "ood_21-30": 1.0,
+    "ood_31-40": 0.98
+   },
+   "reproduced_acc": {
+    "id_1-10": 1.0,
+    "ood_11-20": 0.998,
+    "ood_21-30": 1.0,
+    "ood_31-40": 0.98
+   },
+   "equal": true
+  },
+  "add_table2": {
+   "dir": "stage2/results/c1/c1_addition__hardread__1M__s32__N100000__table2",
+   "step": 3000,
+   "vocab": 120,
+   "table": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     3,
+     1,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     3,
+     3,
+     0,
+     0,
+     1,
+     0
+    ]
+   ],
+   "judgment_acc": {
+    "id_1-10": 1.0,
+    "ood_11-20": 0.998,
+    "ood_21-30": 0.994,
+    "ood_31-40": 1.0
+   },
+   "reproduced_acc": {
+    "id_1-10": 1.0,
+    "ood_11-20": 0.998,
+    "ood_21-30": 0.994,
+    "ood_31-40": 1.0
+   },
+   "equal": true
+  },
+  "add_table3": {
+   "dir": "stage2/results/c1/c1_addition__hardread__1M__s33__N100000__table3",
+   "step": 4000,
+   "vocab": 120,
+   "table": [
+    [
+     0,
+     3,
+     1,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     3,
+     3,
+     0,
+     0,
+     1,
+     0
+    ]
+   ],
+   "judgment_acc": {
+    "id_1-10": 1.0,
+    "ood_11-20": 1.0,
+    "ood_21-30": 0.986,
+    "ood_31-40": 0.978
+   },
+   "reproduced_acc": {
+    "id_1-10": 1.0,
+    "ood_11-20": 1.0,
+    "ood_21-30": 0.986,
+    "ood_31-40": 0.978
+   },
+   "equal": true
+  },
+  "mul1_table1": {
+   "dir": "stage2/results/c1/c1_mul1__hardread__1M__s31__N100000__table1",
+   "step": 3000,
+   "vocab": 123,
+   "table": [
+    [
+     0,
+     3,
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     3,
+     2,
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "judgment_acc": {
+    "id_1-10": 0.994,
+    "ood_11-20": 0.948,
+    "ood_21-30": 0.908,
+    "ood_31-40": 0.898
+   },
+   "reproduced_acc": {
+    "id_1-10": 0.994,
+    "ood_11-20": 0.948,
+    "ood_21-30": 0.908,
+    "ood_31-40": 0.898
+   },
+   "equal": true
+  },
+  "mul1_table2": {
+   "dir": "stage2/results/c1/c1_mul1__hardread__1M__s32__N100000__table2",
+   "step": 3000,
+   "vocab": 123,
+   "table": [
+    [
+     0,
+     3,
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     3,
+     3,
+     0,
+     0,
+     1,
+     0
+    ]
+   ],
+   "judgment_acc": {
+    "id_1-10": 0.994,
+    "ood_11-20": 0.99,
+    "ood_21-30": 0.97,
+    "ood_31-40": 0.938
+   },
+   "reproduced_acc": {
+    "id_1-10": 0.994,
+    "ood_11-20": 0.99,
+    "ood_21-30": 0.97,
+    "ood_31-40": 0.938
+   },
+   "equal": true
+  },
+  "mul1_table3": {
+   "dir": "stage2/results/c1/c1_mul1__hardread__1M__s33__N100000__table3",
+   "step": 5000,
+   "vocab": 123,
+   "table": [
+    [
+     0,
+     3,
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     3,
+     2,
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "judgment_acc": {
+    "id_1-10": 0.999,
+    "ood_11-20": 0.996,
+    "ood_21-30": 0.982,
+    "ood_31-40": 0.956
+   },
+   "reproduced_acc": {
+    "id_1-10": 0.999,
+    "ood_11-20": 0.996,
+    "ood_21-30": 0.982,
+    "ood_31-40": 0.956
+   },
+   "equal": true
+  }
+ },
+ "all_equal": true,
+ "env": {
+  "code_commit": "22ac00e5835a990511c54b4732f5917fcf72f1a1",
+  "code_dirty": false,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 1
+ }
+}

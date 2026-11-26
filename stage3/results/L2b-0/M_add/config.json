@@ -1,0 +1,173 @@
+{
+ "design": "stage3/DESIGN.md 11.5-2 M",
+ "module": "add",
+ "modules": [
+  {
+   "dir": "stage2/results/c1/c1_addition__hardread__1M__s31__N100000__table1",
+   "step": 5000,
+   "vocab": 120,
+   "table": [
+    [
+     0,
+     3,
+     1,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     3,
+     3,
+     0,
+     0,
+     1,
+     0
+    ]
+   ],
+   "judgment_acc": {
+    "id_1-10": 1.0,
+    "ood_11-20": 0.998,
+    "ood_21-30": 1.0,
+    "ood_31-40": 0.98
+   }
+  },
+  {
+   "dir": "stage2/results/c1/c1_addition__hardread__1M__s32__N100000__table2",
+   "step": 3000,
+   "vocab": 120,
+   "table": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     3,
+     1,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     3,
+     3,
+     0,
+     0,
+     1,
+     0
+    ]
+   ],
+   "judgment_acc": {
+    "id_1-10": 1.0,
+    "ood_11-20": 0.998,
+    "ood_21-30": 0.994,
+    "ood_31-40": 1.0
+   }
+  },
+  {
+   "dir": "stage2/results/c1/c1_addition__hardread__1M__s33__N100000__table3",
+   "step": 4000,
+   "vocab": 120,
+   "table": [
+    [
+     0,
+     3,
+     1,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     3,
+     3,
+     0,
+     0,
+     1,
+     0
+    ]
+   ],
+   "judgment_acc": {
+    "id_1-10": 1.0,
+    "ood_11-20": 1.0,
+    "ood_21-30": 0.986,
+    "ood_31-40": 0.978
+   }
+  }
+ ],
+ "bins": [
+  [
+   1,
+   10
+  ],
+  [
+   11,
+   20
+  ],
+  [
+   21,
+   30
+  ],
+  [
+   31,
+   40
+  ],
+  [
+   41,
+   50
+  ],
+  [
+   51,
+   60
+  ],
+  [
+   61,
+   70
+  ],
+  [
+   71,
+   80
+  ],
+  [
+   81,
+   90
+  ],
+  [
+   91,
+   100
+  ]
+ ],
+ "examples_per_bin": 2000,
+ "generation_seed": "L2b-0:M:add:<lo>-<hi>",
+ "draw": "longer operand uniform in the bin, the other uniform in 1..longer, which one is longer at random",
+ "correct": "teacher-forced exact match of the answer and <eos> (= greedy decoding exact, causal model)",
+ "majority3": "strict: >= 2 of the 3 tables right; ties (exactly one right, the two wrong outputs different) counted separately; wrong majority = >= 2 identical wrong outputs"
+}
