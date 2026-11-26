@@ -1,0 +1,75 @@
+{
+ "name": "p0_mul1__tape_rnn__s0",
+ "task": "mul1",
+ "arch": "tape_rnn",
+ "arch_params": {
+  "hidden_size": 256,
+  "memory_cell_size": 8,
+  "memory_size": 256
+ },
+ "seed": 0,
+ "model_init_seed": 0,
+ "batch": 128,
+ "lr": 0.001,
+ "lr_mult": 1.0,
+ "max_steps": 100000,
+ "eval_every": 1000,
+ "optimizer": "clip_by_global_norm(1.0) + adam(lr)",
+ "loss": "mean over examples (weighted by group size) and positions of summed pointwise cross-entropy",
+ "data": "fresh examples every step; one n per batch uniform over [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]",
+ "input": "judged prompt (BOS, '=' as judged)",
+ "output": "answer tokens without <eos>, one empty token per answer position",
+ "input_vocab": [
+  "*",
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "="
+ ],
+ "output_vocab": [
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9"
+ ],
+ "id_size": 1000,
+ "ood_size": 500,
+ "spec": {
+  "train": [
+   1,
+   10
+  ],
+  "id": [
+   1,
+   10
+  ],
+  "ood": [
+   [
+    11,
+    20
+   ],
+   [
+    21,
+    30
+   ],
+   [
+    31,
+    40
+   ]
+  ]
+ },
+ "design": "stage3/DESIGN.md 10.3, 10.5"
+}
