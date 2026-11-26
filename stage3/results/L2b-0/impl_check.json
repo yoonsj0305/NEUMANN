@@ -1,0 +1,160 @@
+{
+ "design": "stage3/DESIGN.md 11.3 implementation check (exact integer modules; not used for the verdict)",
+ "note": "check data: n, m and operand digit counts independent uniform in the bin, k uniform",
+ "tasks": {
+  "mulNM": {
+   "id": {
+    "lengths": [
+     1,
+     10
+    ],
+    "k": null,
+    "examples": 1004,
+    "accuracy": 1.0,
+    "calls_mean": 10.816733067729084,
+    "calls_max": 20,
+    "calls_by_module_max": {
+     "add": 10,
+     "mul1": 10
+    },
+    "seconds": 0.1
+   },
+   "ood1": {
+    "lengths": [
+     11,
+     20
+    ],
+    "k": null,
+    "examples": 500,
+    "accuracy": 1.0,
+    "calls_mean": 30.764,
+    "calls_max": 40,
+    "calls_by_module_max": {
+     "add": 20,
+     "mul1": 20
+    },
+    "seconds": 0.09
+   },
+   "ood2": {
+    "lengths": [
+     21,
+     30
+    ],
+    "k": null,
+    "examples": 500,
+    "accuracy": 1.0,
+    "calls_mean": 51.048,
+    "calls_max": 60,
+    "calls_by_module_max": {
+     "add": 30,
+     "mul1": 30
+    },
+    "seconds": 0.16
+   },
+   "ood3": {
+    "lengths": [
+     31,
+     50
+    ],
+    "k": null,
+    "examples": 200,
+    "accuracy": 1.0,
+    "calls_mean": 81.93,
+    "calls_max": 100,
+    "calls_by_module_max": {
+     "add": 50,
+     "mul1": 50
+    },
+    "seconds": 0.13
+   }
+  },
+  "multi_add": {
+   "id": {
+    "lengths": [
+     1,
+     10
+    ],
+    "k": [
+     2,
+     5
+    ],
+    "examples": 1002,
+    "accuracy": 1.0,
+    "calls_mean": 3.414171656686627,
+    "calls_max": 5,
+    "calls_by_module_max": {
+     "add": 5,
+     "mul1": 0
+    },
+    "seconds": 0.09
+   },
+   "ood1": {
+    "lengths": [
+     11,
+     20
+    ],
+    "k": [
+     6,
+     10
+    ],
+    "examples": 500,
+    "accuracy": 1.0,
+    "calls_mean": 7.966,
+    "calls_max": 10,
+    "calls_by_module_max": {
+     "add": 10,
+     "mul1": 0
+    },
+    "seconds": 0.02
+   },
+   "ood2": {
+    "lengths": [
+     21,
+     30
+    ],
+    "k": [
+     11,
+     20
+    ],
+    "examples": 500,
+    "accuracy": 1.0,
+    "calls_mean": 15.526,
+    "calls_max": 20,
+    "calls_by_module_max": {
+     "add": 20,
+     "mul1": 0
+    },
+    "seconds": 0.05
+   },
+   "ood3": {
+    "lengths": [
+     31,
+     50
+    ],
+    "k": [
+     21,
+     40
+    ],
+    "examples": 200,
+    "accuracy": 1.0,
+    "calls_mean": 29.96,
+    "calls_max": 40,
+    "calls_by_module_max": {
+     "add": 40,
+     "mul1": 0
+    },
+    "seconds": 0.06
+   }
+  }
+ },
+ "all_1.000": true,
+ "env": {
+  "code_commit": "6a0f193bb9073e5f095a78fa2d0f597d4c3eca16",
+  "code_dirty": true,
+  "torch": "2.15.0+cu132",
+  "python": "3.12.3",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cores": 4,
+  "threads": 4
+ }
+}
