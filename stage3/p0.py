@@ -30,6 +30,8 @@ Learning-rate tuning (10.3): lr x 0.5 and x 2 when the default run has in-distri
 """
 from __future__ import annotations
 import argparse
+import ctypes
+import gc
 import json
 import os
 import pathlib
@@ -56,6 +58,11 @@ ARCH_PARAMS = {"stack_rnn": {"hidden_size": 256, "stack_cell_size": 8, "stack_si
 BATCH, LR = 128, 1e-3
 MAX_STEPS = int(os.environ.get("P0_MAX_STEPS", 100_000))          # smoke runs only (P0_OUT elsewhere)
 EVAL_EVERY = int(os.environ.get("P0_EVAL_EVERY", 1000))
+RSS_FREE_MB = int(os.environ.get("P0_RSS_FREE_MB", 0))   # >0: after an evaluation, free eval executables above this RSS
+
+
+def rss_mb():
+    return int(open("/proc/self/status").read().split("VmRSS:")[1].split()[0]) // 1024
 ID_SIZE, OOD_SIZE = 1000, 500
 EVAL_SUB = 250
 
@@ -171,6 +178,13 @@ def cmd_run(a):
     name = "p0_%s__%s__s0%s" % (a.task, a.arch, tag)
     d = OUT / name
     d.mkdir(parents=True, exist_ok=True)
+    import fcntl                                      # one process per run directory (exit 75 if already running)
+    lock = open(d / ".lock", "w")
+    try:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        print(name, "already running", flush=True)
+        sys.exit(75)
     draw, spec = task_draw(a.task)
     evs = eval_sets(a.task)
     ivoc, ovoc = vocabularies(a.task, evs)
@@ -250,6 +264,8 @@ def cmd_run(a):
     opt_state = opt.init(params)
     upd = jax.jit(lambda g, s, p: opt.update(g, s, p))
 
+    frees = [0]
+
     def evaluate(params):
         acc = {}
         for lab, exs in evs.items():
@@ -261,6 +277,15 @@ def cmd_run(a):
                     pr = np.asarray(pred_fn(shape[1])(params, x))
                     ok += int((pr == np.asarray(y).argmax(-1)).all(-1).sum())
             acc[lab] = ok / len(exs)
+        if RSS_FREE_MB and rss_mb() > RSS_FREE_MB:     # drop evaluation-only executables (recompiled next time;
+            pred_fns.clear()                            # same function and shapes, so the same predictions)
+            models.clear()
+            gc.collect()
+            try:
+                ctypes.CDLL("libc.so.6").malloc_trim(0)
+            except OSError:
+                pass
+            frees[0] += 1
         return acc
 
     labels = list(evs)
@@ -279,6 +304,7 @@ def cmd_run(a):
         rng.setstate(ck["rng"])
         best, hits, last, t_train, t_eval, resumes = (ck["best"], ck["hits"], ck["last"], ck["t_train"],
                                                       ck["t_eval"], ck["resumes"])
+        frees[0] = ck.get("eval_cache_frees", 0)
         start = ck["step"] + 1
         kept = [x for x in (d / "log.jsonl").read_text().splitlines() if json.loads(x)["step"] <= ck["step"]]
         (d / "log.jsonl").write_text("".join(x + "\n" for x in kept))
@@ -321,7 +347,7 @@ def cmd_run(a):
                 break
             ck = {"step": step, "params": jax.device_get(params), "opt_state": jax.device_get(opt_state),
                   "rng": rng.getstate(), "best": best, "hits": hits, "last": last, "t_train": t_train,
-                  "t_eval": t_eval, "resumes": resumes}
+                  "t_eval": t_eval, "resumes": resumes, "eval_cache_frees": frees[0]}
             with open(str(ck_path) + ".tmp", "wb") as f:
                 pickle.dump(ck, f)
             os.replace(str(ck_path) + ".tmp", ck_path)
@@ -329,7 +355,7 @@ def cmd_run(a):
            "accuracy, earliest on ties", "judgment": {"step": best["step"], "acc": best["acc"]},
            "last": {"step": last["step"], "acc": last["acc"]}, "wall_train_s": round(t_train, 1),
            "wall_eval_s": round(t_eval, 1), "params": int(sum(v.size for v in jax.tree_util.tree_leaves(params))),
-           "resumed_from_steps": [r["from_step"] for r in resumes]}
+           "resumed_from_steps": [r["from_step"] for r in resumes], "eval_cache_frees": frees[0]}
     (d / "final.json").write_text(json.dumps(fin, indent=1))
     if ck_path.exists():
         ck_path.unlink()
