@@ -49,6 +49,24 @@ def install():
         if tok not in T.TOK:
             T.TOK[tok] = len(T.VOCAB)
             T.VOCAB.append(tok)
+    # DESIGN 10.1-1 Q1: every op symbol is the one op kind (the L1 '+' kind) and a PF separator, as G-0's '-', '*', '^'
+    import pf as PFM
+    import c1a
+    extra = sorted({tok for t in E.SUITE for tok, kd in E.SYMBOLS[t]["input"].values() if kd == "op"}
+                   - {"+", "-", "*", "^"})
+    ex_ids = torch.tensor([T.TOK[x] for x in extra])
+    h0_classes, h0_candidates, c1a_separators = PFM.token_classes, PFM.candidates, c1a.separators
+
+    def token_classes(tokens, digit_ids, plus_id, eq_id, bar_id, node_lo, node_hi):
+        t = torch.where(torch.isin(tokens, ex_ids.to(tokens.device)), torch.full_like(tokens, plus_id), tokens)
+        return h0_classes(t, digit_ids, plus_id, eq_id, bar_id, node_lo, node_hi)
+
+    def candidates(tape, t, h, xt, issep):
+        return h0_candidates(tape, t, h, xt, issep | torch.isin(tape, ex_ids.to(tape.device)))
+
+    def separators(tokens):
+        return c1a_separators(tokens) | torch.isin(tokens, ex_ids.to(tokens.device))
+    PFM.token_classes, PFM.candidates, c1a.separators = token_classes, candidates, separators
     T.TASKS = tuple(T.TASKS) + tuple(t for t in E.SUITE if t not in T.TASKS)
     T.SPEC.update({t: E.SPEC[t] for t in E.SUITE})
     inner = T.draw
@@ -403,8 +421,11 @@ def cmd_kinds(a):
     probe only: the checks use the real tapes)"""
     install()
     out = {t: check_kinds(t) for t in E.SUITE if not E.SYMBOLS[t]["pending"]}
-    out = {"tasks": out, "all_same": all(v["same"] for k in out.values() for v in k.values())}
-    (OUT / "kinds.json").write_text(json.dumps(out, indent=1))
+    out = {"tasks": out, "all_same": all(v["same"] for k in out.values() for v in k.values()),
+           "format_answers": E.ANSWERS}
+    name = "kinds.json" if not (OUT / "kinds.json").exists() else "kinds_10.1.json"     # rule 5: keep the first file
+    (OUT / name).write_text(json.dumps(out, indent=1))
+    print("written", name)
     print("all same:", out["all_same"])
 
 

@@ -649,3 +649,24 @@
   - 첫 A1 실행의 `kinds` 필드는 검사용 탐침에서 '='를 앞에 두어 뒤 토큰이 모두 answer_phase로 나왔다. 탐침만의 오류다(검사는 실제 테이프로 했다). `kinds.json`에서 고쳐 다시 쟀고, 모두 같다. a1 파일은 덮어쓰지 않았다.
   - 원본 ModularArithmetic의 `_operators`는 생성기 식이라 한 번 쓰면 비는데, 재생 대조는 예마다 새 객체를 만들어 피했다. 규칙은 세 연산 모두다.
 - 시간: CPU 약 40분이다(재생 대조와 A1 (d) 표가 대부분).
+
+## 2026-11-26 · 3-E0 형식 확정 (설계서 10.1-1 반영)
+- 질문: 형식 PENDING 넷을 10.1-1대로 정해도 3-E0의 L0·L1 판정이 그대로인가?
+- 질문에 대한 답: 예. 다만 stack_manipulation의 원인 분류는 확인이 필요하다(아래).
+- 코드 커밋: 이 항목의 커밋(`stage3/e_tasks.py` 형식표, `stage3/e0.py` 어댑터). 원자료: `stage3/results/3-E0/kinds_10.1.json`(첫 `kinds.json`은 그대로 둔다).
+- 반영한 것:
+  - Q1: 연산·명령 기호는 모두 op 종류 하나다(L1의 '+' 종류, PF 구분자). 새 op 토큰 `(`, `)`, `x`, `<eq_in>`, `<pop>`, `<push0>`, `<push1>`도 기계에서 '+' 종류와 구분자로 넣었다.
+  - Q2: cycle 행동 0/1/2는 digit이다.
+  - Q3: 입력 안의 괄호, x, `=`는 op다.
+  - Q4: 끝 토큰 2를 `<eos>`로 바꾸고 채움은 지운다(binary_addition, binary_multiplication, stack_manipulation).
+  - 이제 15과제 모두 인코딩된다. 기계 종류와 e_tasks 종류는 15과제 모두 같다(`kinds_10.1.json`).
+- L0·L1 판정 재확인:
+  - L1 안 세 과제(even_pairs, reverse_string, duplicate_string)는 형식표와 인코딩이 바뀌지 않았다. 바뀐 것은 끝 토큰 과제 셋과 PENDING 과제 넷뿐이다. 그래서 A1 결과가 그대로이고, 다시 돌리지 않았다.
+  - 나머지 12과제는 모두 L1 밖 그대로다.
+    - binary_addition·binary_multiplication: 끝 토큰을 `<eos>`로 바꿔도 끝 위치는 같다. 끝 시점 통계(`binadd_end.json`)는 형식과 무관하다.
+    - cycle_navigation: digit이므로 3-E0 논증대로 값 상태다.
+    - 괄호·x·= 과제(값 상태): 결론이 바뀌지 않는다.
+- 이상 사항(확인 필요): stack_manipulation.
+  - 3-E0 논증문에는 "Q1 답이 'op 하나'이면 POP·PUSH0·PUSH1이 같은 종류라 상태·이동이 명령을 구분하지 못하므로 '값 조건 제어'"라고 적었다.
+  - 10.1 판정은 op 하나로 정하면서 원인을 '한 step 두 칸 이상'으로 두었다.
+  - 두 장애는 함께 있다. 분류는 설계 채팅이 정한다. L1 밖이라는 결론은 같다.

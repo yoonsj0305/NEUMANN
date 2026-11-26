@@ -12,8 +12,8 @@ Two layers:
   2 FORMAT (9.1, one rule for every task):  <bos> input = output <eos>;  a classification task's output is its class as
     one token.  Token kinds: data symbols -> digit, operation / command symbols -> op, the separator between input and
     output -> '=', anything else -> other.  SYMBOLS[task] lists every benchmark symbol with its token and kind.
-    Entries marked PENDING are definition questions for the design chat (3-E0 report); a task with a PENDING entry
-    raises when encoded (no check uses it).
+    The four 3-E0 format questions (QUESTIONS) were answered in DESIGN 10.1-1 (ANSWERS) and are applied; no entry is
+    PENDING now.
 Length (9.1): the benchmark's `length` argument n; training 1-10, in-distribution 1-10, out-of-distribution
 11-20 / 21-30 / 31-40, n uniform in the range (one rng.randint draw, then the generator's draws, as l_tasks.draw).
 Generation seeds: the stage-1 functions (tasks.train_set / eval_sets) through stage3/e0.py install().
@@ -292,25 +292,25 @@ SYMBOLS = {
     "parity_check": {"input": BIN_IN, "output": BIN_OUT, "output_rule": "class token", "pending": []},
     "even_pairs": {"input": BIN_IN, "output": BIN_OUT, "output_rule": "class token", "pending": []},
     "modular_arithmetic": {"input": M5_IN | {5: ("+", "op"), 6: ("-", "op"), 7: ("*", "op")},
-                           "output": M5_OUT, "output_rule": "class token", "pending": ["Q1"]},
-    "cycle_navigation": {"input": {0: (PENDING, "digit|op"), 1: (PENDING, "digit|op"), 2: (PENDING, "digit|op")},
-                         "output": M5_OUT, "output_rule": "class token", "pending": ["Q2"]},
+                           "output": M5_OUT, "output_rule": "class token", "pending": []},
+    "cycle_navigation": {"input": {0: _digit(0), 1: _digit(1), 2: _digit(2)},
+                         "output": M5_OUT, "output_rule": "class token", "pending": []},
     "modular_arithmetic_brackets": {"input": dict({str(v): _digit(v) for v in range(5)},
                                                   **{"+": ("+", "op"), "-": ("-", "op"), "*": ("*", "op"),
-                                                     "(": ("(", PENDING), ")": (")", PENDING)}),
-                                    "output": M5_OUT, "output_rule": "class token", "pending": ["Q1", "Q3"]},
+                                                     "(": ("(", "op"), ")": (")", "op")}),
+                                    "output": M5_OUT, "output_rule": "class token", "pending": []},
     "reverse_string": {"input": BIN_IN, "output": BIN_OUT, "output_rule": "sequence", "pending": []},
     "solve_equation": {"input": {str(v): _digit(v) for v in range(5)} | {0: _digit(0)}
-                                 | {"+": ("+", "op"), "-": ("-", "op"), "(": ("(", PENDING),
-                                    ")": (")", PENDING), "x": ("x", PENDING), "=": ("<eq_in>", PENDING)},
-                       "output": M5_OUT, "output_rule": "class token", "pending": ["Q1", "Q3"]},
-    "stack_manipulation": {"input": {0: _digit(0), 1: _digit(1), 2: ("<pop>", PENDING), 3: ("<push0>", PENDING),
-                                     4: ("<push1>", PENDING)},
-                           "output": BIN_OUT, "output_rule": PENDING, "pending": ["Q1", "Q4"]},
+                                 | {"+": ("+", "op"), "-": ("-", "op"), "(": ("(", "op"),
+                                    ")": (")", "op"), "x": ("x", "op"), "=": ("<eq_in>", "op")},
+                       "output": M5_OUT, "output_rule": "class token", "pending": []},
+    "stack_manipulation": {"input": {0: _digit(0), 1: _digit(1), 2: ("<pop>", "op"), 3: ("<push0>", "op"),
+                                     4: ("<push1>", "op")},
+                           "output": BIN_OUT, "output_rule": "terminated", "pending": []},
     "binary_addition": {"input": {0: _digit(0), 1: _digit(1), 2: ("+", "op")}, "output": BIN_OUT,
-                        "output_rule": PENDING, "pending": ["Q4"]},
+                        "output_rule": "terminated", "pending": []},
     "binary_multiplication": {"input": {0: _digit(0), 1: _digit(1), 2: ("*", "op")}, "output": BIN_OUT,
-                              "output_rule": PENDING, "pending": ["Q4"]},
+                              "output_rule": "terminated", "pending": []},
     "compute_sqrt": {"input": BIN_IN, "output": BIN_OUT, "output_rule": "sequence", "pending": []},
     "duplicate_string": {"input": BIN_IN, "output": BIN_OUT, "output_rule": "sequence", "pending": []},
     "missing_duplicate_string": {"input": {0: _digit(0), 1: _digit(1), 2: ("<missing>", "other"),
@@ -320,6 +320,10 @@ SYMBOLS = {
     "bucket_sort": {"input": M5_IN, "output": M5_OUT, "output_rule": "sequence", "pending": []},
 }
 assert set(SYMBOLS) == set(SUITE)
+# QUESTIONS: the 3-E0 format questions; answered 2026-11-26 (DESIGN 10.1-1): Q1 one op kind (the L1 '+' kind, a PF
+# separator, as G-0), Q2 digit, Q3 op ("an input symbol that is neither data nor the separator -> op"), Q4 termination
+# -> <eos>, padding dropped.  Kept for the record.
+ANSWERS = {"Q1": "one op kind", "Q2": "digit", "Q3": "op", "Q4": "termination -> <eos>, padding dropped"}
 QUESTIONS = {
     "Q1": "op kind: one 'op' kind for every operation / command symbol (the L1 kind '+', a PF separator, as G-0's "
           "'-', '*', '^'), or a separate kind per symbol (more than the 7 kinds of DESIGN 3)?",
@@ -339,6 +343,8 @@ def encode_symbols(task, inp, out):
     if sy["pending"]:
         raise ValueError("%s: format pending design-chat answer(s) %s" % (task, sy["pending"]))
     prompt = ["<bos>"] + [sy["input"][v][0] for v in inp] + ["="]
+    if sy["output_rule"] == "terminated":                  # 10.1-1 Q4: termination token 2 -> <eos>, padding dropped
+        out = out[:out.index(2)]
     answer = [sy["output"][v] for v in out]
     return prompt, answer
 
