@@ -22,7 +22,9 @@ needs() {  # needs OUTDIR TASK ARCH -> exit 0 if lr x0.5 / x2 are required (10.3
 sys.exit(0 if (j[l[0]]<0.95 or j[l[2]]>=0.10) else 1)"
 }
 one() {  # one OUTDIR TASK ARCH MULT
-  o=$1; t=$2; a=$3; m=$4; tag=""; [ "$m" != "1" ] && tag="__lrx$m"; name=${t}__${a}__lr$m
+  # tag as p0.py writes it ("__lrx%g": 2.0 -> "__lrx2"); before 2026-11-27 23:40 this was "__lrx$m", so a finished
+  # x2 run was not seen and was started again after each restart (first results restored; see *.reruns_by_restart/).
+  o=$1; t=$2; a=$3; m=$4; tag=""; [ "$m" != "1" ] && tag="__lrx$(printf %g $m)"; name=${t}__${a}__lr$m
   while true; do
     [ -f $o/p0_${t}__${a}__s0${tag}/final.json ] && return 0
     if pgrep -f -- "p0.py run --task $t --arch $a --lr-mult $m " > /dev/null; then sleep 60; continue; fi
