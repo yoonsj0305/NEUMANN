@@ -1,0 +1,153 @@
+{
+ "design": "stage3/DESIGN.md 11.5-2 M",
+ "module": "mul1",
+ "modules": [
+  {
+   "dir": "stage2/results/c1/c1_mul1__hardread__1M__s31__N100000__table1",
+   "step": 3000,
+   "vocab": 123,
+   "table": [
+    [
+     0,
+     3,
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     3,
+     2,
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "judgment_acc": {
+    "id_1-10": 0.994,
+    "ood_11-20": 0.948,
+    "ood_21-30": 0.908,
+    "ood_31-40": 0.898
+   }
+  },
+  {
+   "dir": "stage2/results/c1/c1_mul1__hardread__1M__s32__N100000__table2",
+   "step": 3000,
+   "vocab": 123,
+   "table": [
+    [
+     0,
+     3,
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     3,
+     3,
+     0,
+     0,
+     1,
+     0
+    ]
+   ],
+   "judgment_acc": {
+    "id_1-10": 0.994,
+    "ood_11-20": 0.99,
+    "ood_21-30": 0.97,
+    "ood_31-40": 0.938
+   }
+  },
+  {
+   "dir": "stage2/results/c1/c1_mul1__hardread__1M__s33__N100000__table3",
+   "step": 5000,
+   "vocab": 123,
+   "table": [
+    [
+     0,
+     3,
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     3,
+     2,
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "judgment_acc": {
+    "id_1-10": 0.999,
+    "ood_11-20": 0.996,
+    "ood_21-30": 0.982,
+    "ood_31-40": 0.956
+   }
+  }
+ ],
+ "bins": [
+  [
+   1,
+   10
+  ],
+  [
+   11,
+   20
+  ],
+  [
+   21,
+   30
+  ],
+  [
+   31,
+   40
+  ],
+  [
+   41,
+   50
+  ]
+ ],
+ "examples_per_bin": 2000,
+ "generation_seed": "L2b-0:M:mul1:<lo>-<hi>",
+ "draw": "multiplicand length uniform in the bin, multiplier digit uniform 0-9",
+ "correct": "teacher-forced exact match of the answer and <eos> (= greedy decoding exact, causal model)",
+ "majority3": "strict: >= 2 of the 3 tables right; ties (exactly one right, the two wrong outputs different) counted separately; wrong majority = >= 2 identical wrong outputs"
+}
