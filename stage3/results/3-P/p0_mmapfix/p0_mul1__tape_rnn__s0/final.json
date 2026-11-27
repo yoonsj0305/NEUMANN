@@ -1,0 +1,32 @@
+{
+ "name": "p0_mul1__tape_rnn__s0",
+ "steps": 100000,
+ "stopped": "max steps",
+ "judgment_rule": "highest in-distribution accuracy, earliest on ties",
+ "judgment": {
+  "step": 85000,
+  "acc": {
+   "id_1-10": 0.401,
+   "ood_11-20": 0.098,
+   "ood_21-30": 0.12,
+   "ood_31-40": 0.088
+  }
+ },
+ "last": {
+  "step": 100000,
+  "acc": {
+   "id_1-10": 0.401,
+   "ood_11-20": 0.098,
+   "ood_21-30": 0.12,
+   "ood_31-40": 0.088
+  }
+ },
+ "wall_train_s": 39330.7,
+ "wall_eval_s": 5219.2,
+ "params": 96407,
+ "resumed_from_steps": [
+  2000,
+  60000
+ ],
+ "eval_cache_frees": 39
+}
