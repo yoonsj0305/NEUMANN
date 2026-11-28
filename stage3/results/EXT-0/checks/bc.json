@@ -1,0 +1,483 @@
+{
+ "b": {
+  "task": "parity_check",
+  "config": "x_t + hand parity register (2 states)",
+  "select_score": 1.0,
+  "table": 4,
+  "pass": true
+ },
+ "b_info_edsm_x_t_only": {
+  "edsm": {
+   "pta_nodes": 764,
+   "alphabet": 4,
+   "label_conflicts_in_pta": 0,
+   "states": 3,
+   "merges": 6,
+   "trials": 39
+  },
+  "select_score": 1.0,
+  "cpu_seconds": 0.3
+ },
+ "c": {
+  "moves": {
+   "+2": {
+    "column": [
+     0,
+     0,
+     4,
+     0,
+     0,
+     6,
+     0
+    ],
+    "strings": [
+     {
+      "string": "<bos> 2 0 2 1 = 0 1 2 2 <eos>",
+      "positions": [
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       2,
+       4,
+       6,
+       8,
+       10
+      ],
+      "fail": [
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0
+      ],
+      "equals_reference": true,
+      "equals_hand_expectation": true
+     },
+     {
+      "string": "<bos> 1 0 + 1 1 = 0 0 1 <eos>",
+      "positions": [
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       2,
+       4,
+       6,
+       8
+      ],
+      "fail": [
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0
+      ],
+      "equals_reference": true,
+      "equals_hand_expectation": null
+     },
+     {
+      "string": "<bos> 0 1 1 0 1 0 = 1 1 1 0 0 0 <eos>",
+      "positions": [
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       2,
+       4,
+       6,
+       8,
+       10,
+       12,
+       14
+      ],
+      "fail": [
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0
+      ],
+      "equals_reference": true,
+      "equals_hand_expectation": null
+     }
+    ]
+   },
+   "-2": {
+    "column": [
+     1,
+     0,
+     0,
+     0,
+     0,
+     7,
+     0
+    ],
+    "strings": [
+     {
+      "string": "<bos> 2 0 2 1 = 0 1 2 2 <eos>",
+      "positions": [
+       0,
+       1,
+       2,
+       3,
+       4,
+       4,
+       2,
+       0,
+       0,
+       0,
+       0
+      ],
+      "fail": [
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0
+      ],
+      "equals_reference": true,
+      "equals_hand_expectation": true
+     },
+     {
+      "string": "<bos> 1 0 + 1 1 = 0 0 1 <eos>",
+      "positions": [
+       0,
+       1,
+       2,
+       2,
+       3,
+       4,
+       4,
+       2,
+       0,
+       0,
+       0
+      ],
+      "fail": [
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0
+      ],
+      "equals_reference": true,
+      "equals_hand_expectation": null
+     },
+     {
+      "string": "<bos> 0 1 1 0 1 0 = 1 1 1 0 0 0 <eos>",
+      "positions": [
+       0,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       6,
+       4,
+       2,
+       0,
+       0,
+       0,
+       0,
+       0
+      ],
+      "fail": [
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0
+      ],
+      "equals_reference": true,
+      "equals_hand_expectation": null
+     }
+    ]
+   },
+   "seek_right": {
+    "column": [
+     1,
+     0,
+     4,
+     0,
+     0,
+     8,
+     0
+    ],
+    "strings": [
+     {
+      "string": "<bos> 2 0 2 1 = 0 1 2 2 <eos>",
+      "positions": [
+       0,
+       1,
+       2,
+       3,
+       4,
+       0,
+       2,
+       4,
+       4,
+       4,
+       4
+      ],
+      "fail": [
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       1,
+       1,
+       1
+      ],
+      "equals_reference": true,
+      "equals_hand_expectation": true
+     },
+     {
+      "string": "<bos> 1 0 + 1 1 = 0 0 1 <eos>",
+      "positions": [
+       0,
+       1,
+       2,
+       2,
+       3,
+       4,
+       0,
+       2,
+       2,
+       2,
+       2
+      ],
+      "fail": [
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       1,
+       1,
+       1
+      ],
+      "equals_reference": true,
+      "equals_hand_expectation": null
+     },
+     {
+      "string": "<bos> 0 1 1 0 1 0 = 1 1 1 0 0 0 <eos>",
+      "positions": [
+       0,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       0,
+       2,
+       3,
+       5,
+       6,
+       6,
+       6,
+       6
+      ],
+      "fail": [
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       1,
+       1,
+       1
+      ],
+      "equals_reference": true,
+      "equals_hand_expectation": null
+     }
+    ]
+   },
+   "seek_left": {
+    "column": [
+     1,
+     0,
+     0,
+     0,
+     0,
+     9,
+     0
+    ],
+    "strings": [
+     {
+      "string": "<bos> 2 0 2 1 = 0 1 2 2 <eos>",
+      "positions": [
+       0,
+       1,
+       2,
+       3,
+       4,
+       4,
+       2,
+       2,
+       1,
+       1,
+       1
+      ],
+      "fail": [
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       1,
+       0,
+       1,
+       1
+      ],
+      "equals_reference": true,
+      "equals_hand_expectation": true
+     },
+     {
+      "string": "<bos> 1 0 + 1 1 = 0 0 1 <eos>",
+      "positions": [
+       0,
+       1,
+       2,
+       2,
+       3,
+       4,
+       4,
+       4,
+       4,
+       4,
+       4
+      ],
+      "fail": [
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       1,
+       1,
+       1,
+       1
+      ],
+      "equals_reference": true,
+      "equals_hand_expectation": null
+     },
+     {
+      "string": "<bos> 0 1 1 0 1 0 = 1 1 1 0 0 0 <eos>",
+      "positions": [
+       0,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       6,
+       5,
+       3,
+       2,
+       1,
+       1,
+       1,
+       1
+      ],
+      "fail": [
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       1,
+       1,
+       1
+      ],
+      "equals_reference": true,
+      "equals_hand_expectation": null
+     }
+    ]
+   }
+  },
+  "pass": true
+ },
+ "pass": true
+}

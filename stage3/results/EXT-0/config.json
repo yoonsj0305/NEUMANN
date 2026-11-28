@@ -1,0 +1,76 @@
+{
+ "design": "stage3/DESIGN.md 13.5, 13.6",
+ "tasks": [
+  "modular_arithmetic",
+  "parity_check",
+  "cycle_navigation",
+  "modular_arithmetic_brackets",
+  "stack_manipulation",
+  "solve_equation",
+  "missing_duplicate_string",
+  "compute_sqrt",
+  "odds_first",
+  "binary_addition",
+  "binary_multiplication",
+  "bucket_sort",
+  "even_pairs",
+  "reverse_string",
+  "duplicate_string"
+ ],
+ "out_of_expressivity": [
+  "modular_arithmetic",
+  "parity_check",
+  "cycle_navigation",
+  "modular_arithmetic_brackets",
+  "stack_manipulation",
+  "solve_equation",
+  "missing_duplicate_string",
+  "compute_sqrt",
+  "odds_first",
+  "binary_addition",
+  "binary_multiplication",
+  "bucket_sort"
+ ],
+ "inside_expressivity": [
+  "even_pairs",
+  "reverse_string",
+  "duplicate_string"
+ ],
+ "data": "tf0.training(task, 100000) = tasks.train_set(task, 100000, 0)",
+ "fit_lengths": [
+  1,
+  7
+ ],
+ "select_lengths": [
+  8,
+  10
+ ],
+ "moves": [
+  "stay",
+  "right",
+  "left",
+  "next_sep",
+  "start",
+  "cont",
+  "+2",
+  "-2",
+  "seek_right",
+  "seek_left"
+ ],
+ "adopt": 0.999,
+ "pass": 0.9,
+ "m_limit_pairs": 2000,
+ "pair_bytes_cap": 1500000000.0,
+ "top_routings_for_R_L": 20,
+ "qmax": 64,
+ "cpu_cap_per_task_control": 21600,
+ "control_stages": [
+  "base",
+  "M",
+  "R",
+  "MR"
+ ],
+ "library_stages": "base, used kinds by count (M before R on ties), L, remaining singles (M, R), MR, ML, RL",
+ "orders": "random.Random('EXT-0:order:<seed>').shuffle(e_tasks.SUITE), seeds 0-4",
+ "ood": "tasks.eval_sets(task, 10, 500) bins 11-20 / 21-30 / 31-40"
+}
