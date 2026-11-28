@@ -1,0 +1,29 @@
+{
+ "name": "p0_pairswap__stack_rnn__s0",
+ "steps": 33000,
+ "stopped": "early stop: in-distribution >= 0.99 at two consecutive evaluations",
+ "judgment_rule": "highest in-distribution accuracy, earliest on ties",
+ "judgment": {
+  "step": 32000,
+  "acc": {
+   "id_2-10": 1.0,
+   "ood_12-20": 0.0,
+   "ood_22-30": 0.0,
+   "ood_32-40": 0.0
+  }
+ },
+ "last": {
+  "step": 33000,
+  "acc": {
+   "id_2-10": 0.99,
+   "ood_12-20": 0.0,
+   "ood_22-30": 0.0,
+   "ood_32-40": 0.0
+  }
+ },
+ "wall_train_s": 3997.9,
+ "wall_eval_s": 20.5,
+ "params": 76565,
+ "resumed_from_steps": [],
+ "eval_cache_frees": 0
+}
