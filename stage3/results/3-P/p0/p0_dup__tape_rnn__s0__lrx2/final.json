@@ -1,0 +1,29 @@
+{
+ "name": "p0_dup__tape_rnn__s0__lrx2",
+ "steps": 2000,
+ "stopped": "early stop: in-distribution >= 0.99 at two consecutive evaluations",
+ "judgment_rule": "highest in-distribution accuracy, earliest on ties",
+ "judgment": {
+  "step": 2000,
+  "acc": {
+   "id_1-10": 1.0,
+   "ood_11-20": 0.964,
+   "ood_21-30": 0.918,
+   "ood_31-40": 0.868
+  }
+ },
+ "last": {
+  "step": 2000,
+  "acc": {
+   "id_1-10": 1.0,
+   "ood_11-20": 0.964,
+   "ood_21-30": 0.918,
+   "ood_31-40": 0.868
+  }
+ },
+ "wall_train_s": 786.3,
+ "wall_eval_s": 47.3,
+ "params": 96151,
+ "resumed_from_steps": [],
+ "eval_cache_frees": 0
+}
