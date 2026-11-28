@@ -600,7 +600,92 @@ def _parity(toks):
     return out
 
 
-HAND = {"parity": lambda D: _tape_from(D, _parity)}
+def _prompt_fold(step):
+    """state per position from a fold over the prompt tokens (frozen after '=')"""
+    def fn(toks):
+        st, out, ended = None, [], False
+        for tk in toks:
+            if not ended:
+                st = step(st, tk)
+            if tk == "=":
+                ended = True
+            out.append(st)
+        return out
+    return fn
+
+
+def _st_cycle(st, tk):
+    st = 0 if st is None else st
+    return (st + int(tk) - 1) % 5 if tk in ("0", "1", "2") else st
+
+
+def _st_even_pairs(st, tk):
+    if tk not in ("0", "1"):
+        return st if st is not None else ("start",)
+    if st is None or st == ("start",):
+        return (int(tk), 0)
+    last, par = st
+    return (int(tk), par ^ (int(tk) != last))
+
+
+def _st_modarith(st, tk):
+    """(phase, acc, term or sign): Deletang _evaluate_expression -- '-' negates the next term's first factor,
+    '*' binds before '+'; value = (acc + term) mod 5"""
+    if st is None:
+        st = ("start", 0, 1)
+    ph, acc, z = st
+    if tk in ("0", "1", "2", "3", "4"):
+        v = int(tk)
+        if ph == "start":
+            return ("num", 0, v % 5)
+        if ph == "mul":
+            return ("num", acc, (z * v) % 5)
+        return ("num", acc, (z * v) % 5)                       # ph == "add": z = sign
+    if tk == "+":
+        return ("add", (acc + z) % 5, 1)
+    if tk == "-":
+        return ("add", (acc + z) % 5, 4)                       # sign -1 mod 5
+    if tk == "*":
+        return ("mul", acc, z)
+    return st
+
+
+HAND_IDS = {}
+
+
+def _ids(fn):
+    def tape(D):
+        import tasks as T
+        out = np.full((D.n, D.Tm), DEAD, dtype=np.int32)
+        for i in range(D.n):
+            toks = [T.VOCAB[v] for v in D.X[i, :D.L[i]]]
+            for t, s_ in enumerate(fn(toks)):
+                out[i, t] = HAND_IDS.setdefault((fn.__name__, s_), len(HAND_IDS))
+        return out
+    return tape
+
+
+HAND = {"parity": lambda D: _tape_from(D, _parity),
+        "cycle": _ids(_prompt_fold(_st_cycle)),
+        "even_pairs": _ids(_prompt_fold(_st_even_pairs)),
+        "modarith": _ids(_prompt_fold(_st_modarith))}
+# 13.7-4 hand configurations (x_t + a hand register over the prompt, no routing); other tasks: reason recorded
+HAND_CFG = {"parity_check": "parity", "cycle_navigation": "cycle", "even_pairs": "even_pairs",
+            "modular_arithmetic": "modarith"}
+HAND_NONE = {
+    "modular_arithmetic_brackets": "needs a stack (nesting depth grows with length): not a <= 64-state register",
+    "solve_equation": "needs a stack (bracketed expression): not a <= 64-state register",
+    "stack_manipulation": "needs a stack: not a <= 64-state register",
+    "binary_multiplication": "reads per output grow with length: not expressible in the grammar",
+    "compute_sqrt": "reads per output grow with length: not expressible in the grammar",
+    "missing_duplicate_string": "compares positions i and i + n/2 with n unknown until the end: no hand construction "
+                                "in the grammar found",
+    "binary_addition": "needs a hand routing for the two little-endian operands plus a carry register: not built "
+                       "(recorded; a search problem cannot be excluded)",
+    "odds_first": "needs a jump from the odd to the even positions at an output-dependent time: no hand construction "
+                  "in the grammar found",
+    "bucket_sort": "needs value-ordered output (counting all 5 values): no hand construction in the grammar found",
+    "reverse_string": "inside L0 (3-E0)", "duplicate_string": "inside L1 only (3-E0)"}
 
 
 # ================================================================ search stages
@@ -1299,6 +1384,134 @@ def cmd_judge(a):
                                    "--cfgs-file", str(tmp)], stdout=fh, stderr=subprocess.STDOUT)
 
 
+# ================================================================ hand configurations (13.7-4) and report
+def solved_map():
+    out = {}
+    for f in (OUT / "judge").glob("*.json"):
+        r = json.loads(f.read_text())
+        out[(r["task"], r["cfg_id"])] = r
+    return out
+
+
+def cmd_hand(a):
+    import subprocess
+    d = OUT / "hand"
+    d.mkdir(parents=True, exist_ok=True)
+    J = solved_map()
+    for f in sorted((OUT / "control").glob("*.json")):
+        r = json.loads(f.read_text())
+        task = r["task"]
+        ad = r["adopted"]
+        if ad and J.get((task, cfg_id(ad["cfg"])), {}).get("solved"):
+            continue
+        out = d / ("%s.json" % task)
+        if out.exists():
+            continue
+        if task not in HAND_CFG:
+            out.write_text(json.dumps({"task": task, "hand": None, "reason": HAND_NONE.get(task, "not built")},
+                                      indent=1))
+            continue
+        subprocess.check_call([sys.executable, str(HERE / "ext0.py"), "hand-task", "--task", task])
+
+
+def cmd_hand_task(a):
+    T = Task(a.task)
+    name = HAND_CFG[a.task]
+    cfg = {"moves": 6, "routing": [], "reg": {"id": "hand:" + name, "hand": name}}
+    C0 = time.process_time()
+    s, tsz, occ = T.cand(cfg)
+    r = {"task": a.task, "hand": "x_t + hand register %r (13.7-4)" % name, "select_score": s, "table": tsz,
+         "occam": occ, "cpu_seconds": round(time.process_time() - C0, 1)}
+    cr = json.loads((OUT / "control" / ("%s.json" % a.task)).read_text())
+    best = cr["best_any"]["score"] if cr["best_any"] else None
+    r["search_best_select"] = best
+    r["reading"] = ("search problem (hand > search)" if best is None or s > best else
+                    "language problem (hand <= search)")
+    (OUT / "hand" / ("%s.json" % a.task)).write_text(json.dumps(r, indent=1))
+    print(json.dumps(r), flush=True)
+
+
+def cmd_report(a):
+    J = solved_map()
+    causes = json.loads((HERE / "results" / "3-E0" / "summary.json").read_text())["causes"]
+    cause_of = {t: c for c, ts in causes.items() for t in ts}
+
+    def jd(task, ad):
+        return J.get((task, cfg_id(ad["cfg"]))) if ad else None
+    rows_ = []
+    ctrl = {}
+    for f in sorted((OUT / "control").glob("*.json")):
+        r = json.loads(f.read_text())
+        ctrl[r["task"]] = r
+        ad = r["adopted"]
+        j = jd(r["task"], ad)
+        hand = OUT / "hand" / ("%s.json" % r["task"])
+        rows_.append({
+            "task": r["task"], "out_of_expressivity": r["task"] in OUT_OF, "3-E0_cause": cause_of.get(r["task"]),
+            "adopted_stage": ad["stage"] if ad else None, "adopted_cfg": _short(ad["cfg"]) if ad else None,
+            "select": ad["score"] if ad else None,
+            "best_select_any": r["best_any"]["score"] if r["best_any"] else None,
+            "best_stage_any": r["best_any"]["stage"] if r["best_any"] else None,
+            "ood": {k: v["accuracy_greedy"] for k, v in j["bins"].items()} if j else None,
+            "missing_key_step_rate": {k: v["missing_key_step_rate"] for k, v in j["bins"].items()} if j else None,
+            "greedy_equals_teacher_forced": all(v["greedy_equals_teacher_forced"] for v in j["bins"].values())
+            if j else None,
+            "solved": bool(j and j["solved"]), "capped": r.get("capped"),
+            "cpu_search": r["cost_cpu"], "candidates": r["cost_candidates"],
+            "cpu_table": j["cpu_table"] if j else None, "cpu_verify": j["cpu_verify"] if j else None,
+            "stages_tried": [(t["stage"], t.get("best_score")) for t in r["tried"]],
+            "hand": json.loads(hand.read_text()) if hand.exists() else None})
+    disc_ctrl = sorted(x["task"] for x in rows_ if x["solved"] and x["out_of_expressivity"])
+    orders = []
+    for f in sorted((OUT / "library").glob("order*.json")):
+        L = json.loads(f.read_text())
+        per = []
+        for r in L["tasks"]:
+            ad = r["adopted"]
+            j = jd(r["task"], ad)
+            c = ctrl[r["task"]]
+            per.append({"task": r["task"], "adopted_stage": ad["stage"] if ad else None,
+                        "uses_L": bool(ad and ad.get("reg") is not None and "L" in KINDS[ad["stage"]]),
+                        "solved": bool(j and j["solved"]), "transfer": r["transfer"],
+                        "cpu_library": r["cost_cpu"], "cpu_control": c["cost_cpu"],
+                        "cand_library": r["cost_candidates"], "cand_control": c["cost_candidates"],
+                        "library_before": r["library_before"]})
+        tot = {k: sum(p[k] for p in per) for k in ("cpu_library", "cpu_control", "cand_library", "cand_control")}
+        orders.append({"order": L["order"], "tasks": per, "totals": tot,
+                       "ratio_cpu": tot["cpu_control"] / max(tot["cpu_library"], 1e-9),
+                       "ratio_candidates": tot["cand_control"] / max(tot["cand_library"], 1),
+                       "solved_out_of": sorted(p["task"] for p in per if p["solved"] and p["task"] in OUT_OF),
+                       "transfer_tasks": sorted(p["task"] for p in per if p["transfer"])})
+    med = lambda v: float(np.median(v)) if v else None                     # noqa: E731
+    per_task_cpu = [p["cpu_control"] / max(p["cpu_library"], 1e-9) for o in orders for p in o["tasks"]]
+    per_task_cand = [p["cand_control"] / max(p["cand_library"], 1) for o in orders for p in o["tasks"]]
+    strong = sorted({p["task"] for o in orders for p in o["tasks"]
+                     if p["solved"] and p["task"] in OUT_OF and p["task"] not in disc_ctrl})
+    growth = {"weak_median_ratio_cpu_over_orders": med([o["ratio_cpu"] for o in orders]),
+              "weak_median_ratio_candidates_over_orders": med([o["ratio_candidates"] for o in orders]),
+              "median_per_task_ratio_cpu": med(per_task_cpu), "median_per_task_ratio_candidates": med(per_task_cand),
+              "strong_tasks": strong}
+    growth["weak"] = bool(growth["weak_median_ratio_cpu_over_orders"] is not None
+                          and growth["weak_median_ratio_cpu_over_orders"] >= 2)
+    growth["strong"] = len(strong) >= 1
+    by_kind = {}
+    for x in rows_:
+        k = x["adopted_stage"] if x["solved"] else "unsolved"
+        by_kind.setdefault(k, []).append({"task": x["task"], "3-E0_cause": x["3-E0_cause"]})
+    res = {"design": "stage3/DESIGN.md 13.5, 13.6", "control": rows_,
+           "discovery_control": {"solved": disc_ctrl, "n": len(disc_ctrl), "of": len(OUT_OF)},
+           "discovery_library_per_order": [len(o["solved_out_of"]) for o in orders],
+           "transfer_per_order": [len(o["transfer_tasks"]) for o in orders],
+           "growth": growth, "by_kind_vs_3E0_cause": by_kind, "orders": orders,
+           "inside_expressivity_engine_check": {x["task"]: x["solved"] for x in rows_ if not x["out_of_expressivity"]},
+           "cpu_total_seconds": round(total_cpu() + sum(json.loads(f.read_text()).get("cpu_seconds", 0)
+                                                        for f in (OUT / "hand").glob("*.json")), 1)}
+    res["answer_rule"] = ("yes" if len(disc_ctrl) >= 4 and (growth["weak"] or growth["strong"]) else "no")
+    (OUT / "final.json").write_text(json.dumps(res, indent=1))
+    print(json.dumps({k: res[k] for k in ("discovery_control", "discovery_library_per_order", "transfer_per_order",
+                                          "growth", "answer_rule", "cpu_total_seconds")}, indent=1), flush=True)
+
+
 def main():
     p = argparse.ArgumentParser()
     sp = p.add_subparsers(dest="cmd", required=True)
@@ -1315,6 +1528,10 @@ def main():
     q = sp.add_parser("library")
     q.add_argument("--order", type=int, required=True)
     sp.add_parser("judge")
+    sp.add_parser("hand")
+    sp.add_parser("report")
+    q = sp.add_parser("hand-task")
+    q.add_argument("--task", required=True)
     q = sp.add_parser("judge-task")
     q.add_argument("--task", required=True)
     q.add_argument("--cfgs-file", required=True)
@@ -1322,7 +1539,8 @@ def main():
     if a.cmd == "judge-task":
         a.cfgs = pathlib.Path(a.cfgs_file).read_text()
     {"check-a": cmd_check_a, "check-bc": cmd_check_bc, "stage": cmd_stage, "control": cmd_control,
-     "library": cmd_library, "judge": cmd_judge, "judge-task": cmd_judge_task}[a.cmd](a)
+     "library": cmd_library, "judge": cmd_judge, "judge-task": cmd_judge_task, "hand": cmd_hand,
+     "hand-task": cmd_hand_task, "report": cmd_report}[a.cmd](a)
 
 
 if __name__ == "__main__":
