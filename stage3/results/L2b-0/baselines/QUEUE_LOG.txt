@@ -4,3 +4,6 @@
 2026-11-28 10:01:44 exit mulNM abacus lr1.0 code 0
 2026-11-28 11:25:13 exit multi_add abacus lr1.0 code 0
 2026-11-28 13:20:21 exit mulNM rel_rand lr1.0 code 0
+2026-11-28 13:38:18 exit multi_add rel_rand lr1.0 code 137
+2026-11-28 13:44:27 note: multi_add rel_rand lr1.0 exit 137 at 13:38:18 = killed at its first evaluation (no step row; RSS 4.3 GB at the last 30 s sample and rising): rel_rand evaluation batch 128 at T ~1,779, P_MAX 1,792 needs several 128x4xTxP float tensors (~6.5 GB each) > the 14 GB memory limit. Kept as 3b_multi_add__rel_rand__1M__s0__N100000__killed_eval_bs128. Rerun from step 0 with evaluation batch 4 for multi_add rel_rand / nope (stage3/l2b_base.py EVAL_BS; memory only, the evaluation draw is per sequence in the sorted order so results are unchanged; peak 1.75 GB measured). Container restarted ~13:40 (all drivers stopped); drivers rerun.
+2026-11-28 13:44:38 driver start (baselines, P=1)

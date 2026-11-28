@@ -7,6 +7,7 @@
                  rel_rand P_MAX (the position range {0..P_MAX-1}): the 3-B value 512 when the longest evaluation
                  sequence fits, else the smallest multiple of 256 >= the longest evaluation sequence (multi_add)
                  -- recorded choice (rule 4: the randomized range must cover the test lengths, Ruoss et al. 2023).
+multi_add rel_rand / nope: evaluation batch 4 instead of 128 (memory only, results unchanged; see cmd_run).
 Memory RNNs (10.5 format): stage3/l2b_p0.py.
 
   python stage3/l2b_base.py run --task multi_add|mulNM --kind K [--lr-mult M] [--resume]
@@ -27,6 +28,7 @@ for p in (str(ROOT / "stage1"), str(ROOT / "stage2"), str(HERE)):
 OUT = pathlib.Path(os.environ.get("L2B_BASE_OUT", HERE / "results" / "L2b-0" / "baselines"))
 STAGE1 = ("abacus", "rope", "looped_rr", "gru")
 PE3B = ("rel_rand", "nope")
+EVAL_BS = 4                      # multi_add rel_rand / nope evaluation batch (memory only; see cmd_run)
 
 
 def longest_eval(task):
@@ -60,6 +62,16 @@ def cmd_run(a):
     if a.kind == "rel_rand":
         pe3b.P_MAX = pmax(a.task)
         print("rel_rand P_MAX", pe3b.P_MAX, flush=True)
+    if a.task == "multi_add":
+        # evaluation batch 128 -> EVAL_BS (memory only; the first multi_add rel_rand run was killed at its first
+        # evaluation, exit 137: at T ~1,779 and P_MAX 1,792 one 128-batch needs several 128x4xTxP float tensors,
+        # ~6.5 GB each).  Results are unchanged: run.py sorts the whole set by length once, and the rel_rand
+        # evaluation draw is per sequence in that order from one generator restarted at model.eval(), so every
+        # example gets the same positions for any batch size; nope has no positions.
+        for f in ("score", "exact_match"):
+            pe3b.PATCHES.append(("def %s(model, exs, kind, cfg, recur=None, bs=128):" % f,
+                                 "def %s(model, exs, kind, cfg, recur=None, bs=%d):" % (f, EVAL_BS)))
+        print("multi_add evaluation batch", EVAL_BS, flush=True)
     pe3b.ADAPTER[a.task] = "r"
     pe3b.install_adapter = lambda task: r_adapter.install()
     os.environ["PE3B_OUT"] = str(OUT)
