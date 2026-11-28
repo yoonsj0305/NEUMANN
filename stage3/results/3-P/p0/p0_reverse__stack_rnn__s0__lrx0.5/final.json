@@ -1,0 +1,29 @@
+{
+ "name": "p0_reverse__stack_rnn__s0__lrx0.5",
+ "steps": 3000,
+ "stopped": "early stop: in-distribution >= 0.99 at two consecutive evaluations",
+ "judgment_rule": "highest in-distribution accuracy, earliest on ties",
+ "judgment": {
+  "step": 2000,
+  "acc": {
+   "id_1-10": 0.999,
+   "ood_11-20": 0.936,
+   "ood_21-30": 0.508,
+   "ood_31-40": 0.076
+  }
+ },
+ "last": {
+  "step": 3000,
+  "acc": {
+   "id_1-10": 0.999,
+   "ood_11-20": 0.968,
+   "ood_21-30": 0.908,
+   "ood_31-40": 0.836
+  }
+ },
+ "wall_train_s": 348.6,
+ "wall_eval_s": 17.7,
+ "params": 76821,
+ "resumed_from_steps": [],
+ "eval_cache_frees": 0
+}

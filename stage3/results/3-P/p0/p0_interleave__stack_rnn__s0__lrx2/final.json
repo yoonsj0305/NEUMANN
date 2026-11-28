@@ -1,0 +1,31 @@
+{
+ "name": "p0_interleave__stack_rnn__s0__lrx2",
+ "steps": 100000,
+ "stopped": "max steps",
+ "judgment_rule": "highest in-distribution accuracy, earliest on ties",
+ "judgment": {
+  "step": 34000,
+  "acc": {
+   "id_1-10": 0.298,
+   "ood_11-20": 0.0,
+   "ood_21-30": 0.0,
+   "ood_31-40": 0.0
+  }
+ },
+ "last": {
+  "step": 100000,
+  "acc": {
+   "id_1-10": 0.282,
+   "ood_11-20": 0.0,
+   "ood_21-30": 0.0,
+   "ood_31-40": 0.0
+  }
+ },
+ "wall_train_s": 23906.9,
+ "wall_eval_s": 138.6,
+ "params": 76821,
+ "resumed_from_steps": [
+  42000
+ ],
+ "eval_cache_frees": 0
+}
