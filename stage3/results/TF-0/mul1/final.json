@@ -572,5 +572,82 @@
    "literal_equal_on_present_classes_as_sets": false,
    "every_selected_path_in_compiled": true
   }
- }
+ },
+ "Hprime": {
+  "training_steps": 673352,
+  "configurations": 2500,
+  "deterministic": 324,
+  "enumeration_seconds": 17.7,
+  "S": {
+   "config": "x_t h0@t:masked h0@t-1:masked h1@t:masked",
+   "size": 4,
+   "T_S_size": 5160,
+   "T_S_over_product_space": 0.3876784372652141,
+   "feature_columns": [
+    0,
+    4,
+    7,
+    10
+   ]
+  },
+  "closure": {
+   "sequences": 100000,
+   "lengths": [
+    5,
+    50
+   ],
+   "scored_steps": 2654362,
+   "steps_with_key_not_in_T_S": 0,
+   "distinct_keys_not_in_T_S": 0,
+   "sequences_with_a_missing_key": 0,
+   "wrong_steps_on_present_keys": 0,
+   "missing_keys": [],
+   "seconds": 51.4
+  },
+  "KL": {
+   "L": 4,
+   "sequences": 100000,
+   "scored_steps": 528559,
+   "wrong_steps": 0,
+   "missing_key_steps": 0,
+   "step_accuracy": 1.0,
+   "wrong_keys": [],
+   "seconds": 3.3
+  },
+  "confirm": {
+   "1-10": {
+    "examples": 2000,
+    "accuracy_teacher_forced": 1.0,
+    "accuracy_greedy": 1.0,
+    "greedy_equals_teacher_forced": true
+   },
+   "11-20": {
+    "examples": 2000,
+    "accuracy_teacher_forced": 1.0,
+    "accuracy_greedy": 1.0,
+    "greedy_equals_teacher_forced": true
+   },
+   "21-30": {
+    "examples": 2000,
+    "accuracy_teacher_forced": 1.0,
+    "accuracy_greedy": 1.0,
+    "greedy_equals_teacher_forced": true
+   },
+   "31-40": {
+    "examples": 2000,
+    "accuracy_teacher_forced": 1.0,
+    "accuracy_greedy": 1.0,
+    "greedy_equals_teacher_forced": true
+   },
+   "41-50": {
+    "examples": 2000,
+    "accuracy_teacher_forced": 1.0,
+    "accuracy_greedy": 1.0,
+    "greedy_equals_teacher_forced": true
+   }
+  }
+ },
+ "Hprime_checks_pass": true,
+ "cpu_seconds_total": 936.6,
+ "wall_seconds_total": 947.2
 }
