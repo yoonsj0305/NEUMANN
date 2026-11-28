@@ -553,5 +553,67 @@
    "literal_equal_on_present_classes_as_sets": false,
    "every_selected_path_in_compiled": true
   }
- }
+ },
+ "Hprime": {
+  "training_steps": 651175,
+  "configurations": 100,
+  "deterministic": 60,
+  "enumeration_seconds": 5.3,
+  "S": {
+   "config": "h0@t:masked",
+   "size": 1,
+   "T_S_size": 11,
+   "T_S_over_product_space": 1.0,
+   "feature_columns": [
+    4
+   ]
+  },
+  "closure": {
+   "sequences": 100000,
+   "lengths": [
+    11,
+    40
+   ],
+   "scored_steps": 2648862,
+   "steps_with_key_not_in_T_S": 0,
+   "distinct_keys_not_in_T_S": 0,
+   "sequences_with_a_missing_key": 0,
+   "wrong_steps_on_present_keys": 0,
+   "missing_keys": [],
+   "seconds": 33.9
+  },
+  "KL": {
+   "L": 5,
+   "sequences": 111110,
+   "scored_steps": 654320,
+   "wrong_steps": 0,
+   "missing_key_steps": 0,
+   "step_accuracy": 1.0,
+   "wrong_keys": [],
+   "seconds": 3.1
+  },
+  "confirm": {
+   "ood_11-20": {
+    "examples": 500,
+    "accuracy_teacher_forced": 1.0,
+    "accuracy_greedy": 1.0,
+    "greedy_equals_teacher_forced": true
+   },
+   "ood_21-30": {
+    "examples": 500,
+    "accuracy_teacher_forced": 1.0,
+    "accuracy_greedy": 1.0,
+    "greedy_equals_teacher_forced": true
+   },
+   "ood_31-40": {
+    "examples": 500,
+    "accuracy_teacher_forced": 1.0,
+    "accuracy_greedy": 1.0,
+    "greedy_equals_teacher_forced": true
+   }
+  }
+ },
+ "Hprime_checks_pass": true,
+ "cpu_seconds_total": 153.7,
+ "wall_seconds_total": 157.6
 }
