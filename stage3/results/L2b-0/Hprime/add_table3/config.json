@@ -1,0 +1,67 @@
+{
+ "design": "stage3/DESIGN.md 11.8, 11.9, 11.10",
+ "module": "add",
+ "table": 3,
+ "compiled_table": [
+  [
+   0,
+   3,
+   1,
+   0,
+   0,
+   1,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0
+  ],
+  [
+   0,
+   3,
+   3,
+   0,
+   0,
+   1,
+   0
+  ]
+ ],
+ "moving_heads": [
+  0,
+  1,
+  2
+ ],
+ "cells": [
+  "h0@t",
+  "h0@t-1",
+  "h1@t",
+  "h1@t-1",
+  "h2@t",
+  "h2@t-1"
+ ],
+ "training_data": "T.train_set('addition', 100000, 233) (the H run of table 3 with the smallest seed)",
+ "order": "size, distinct keys on the training steps, fewer original reads, sorted feature columns",
+ "routing_11.9-1": {
+  "every_hand_moving_head_has_a_compiled_head_with_the_same_path_1.000": true,
+  "hand_head_path_equal_fraction_by_compiled_head": {
+   "0": {
+    "0": 0.0,
+    "1": 1.0,
+    "2": 0.0
+   },
+   "1": {
+    "0": 1.0,
+    "1": 0.0,
+    "2": 0.0
+   }
+  },
+  "compiled_heads_without_hand_counterpart": [
+   2
+  ]
+ }
+}
