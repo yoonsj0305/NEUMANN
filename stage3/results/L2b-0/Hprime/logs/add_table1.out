@@ -1,1 +1,17 @@
 train steps 822460 distinct rows 305569 10
+enumeration 62500 deterministic 3920 2887
+S {'config': 'x_t h0@t:masked h0@t-1:masked h1@t:masked h1@t-1:masked', 'cfg': [1, 0, [2, 2, 2, 2, 0, 0]], 'size': 5, 'feature_columns': [0, 4, 7, 10, 13], 'T_S_size': 24518, 'distinct_keys': 24518, 'product_space_of_observed_component_values': 175692, 'T_S_over_product_space': 0.13955103248867337, 'uses_heads_without_hand_counterpart': []}
+closure {'sequences': 100000, 'lengths': (4, 100), 'scored_steps': 5302111, 'steps_with_key_not_in_T_S': 0, 'distinct_keys_not_in_T_S': 0, 'sequences_with_a_missing_key': 0, 'wrong_steps_on_present_keys': 0, 'sequence_accuracy_teacher_forced': 1.0, 'seconds': 307.9}
+KL canonical {'L': 3, 'sequences': 1000000, 'scored_steps': 4494395, 'wrong_steps': 0, 'missing_key_steps': 0, 'step_accuracy': 1.0, 'sequence_accuracy': 1.0, 'seconds': 36.8}
+KL all_digit_strings (record only, 11.9-3) {'L': 3, 'sequences': 1232100, 'scored_steps': 5413275, 'wrong_steps': 130400, 'missing_key_steps': 113985, 'step_accuracy': 0.975911070470279, 'sequence_accuracy': 0.8942374807239672, 'seconds': 44.3}
+M 1-10 {'examples': 2000, 'accuracy_teacher_forced': 1.0, 'accuracy_greedy': 1.0, 'greedy_equals_teacher_forced': True, 'missing_key_steps': 0, 'greedy_status': {'ok': 2000, 'missing': 0, 'length': 0}, 'seconds': 0.4}
+M 11-20 {'examples': 2000, 'accuracy_teacher_forced': 1.0, 'accuracy_greedy': 1.0, 'greedy_equals_teacher_forced': True, 'missing_key_steps': 0, 'greedy_status': {'ok': 2000, 'missing': 0, 'length': 0}, 'seconds': 1.1}
+M 21-30 {'examples': 2000, 'accuracy_teacher_forced': 1.0, 'accuracy_greedy': 1.0, 'greedy_equals_teacher_forced': True, 'missing_key_steps': 0, 'greedy_status': {'ok': 2000, 'missing': 0, 'length': 0}, 'seconds': 2.0}
+M 31-40 {'examples': 2000, 'accuracy_teacher_forced': 1.0, 'accuracy_greedy': 1.0, 'greedy_equals_teacher_forced': True, 'missing_key_steps': 0, 'greedy_status': {'ok': 2000, 'missing': 0, 'length': 0}, 'seconds': 3.4}
+M 41-50 {'examples': 2000, 'accuracy_teacher_forced': 1.0, 'accuracy_greedy': 1.0, 'greedy_equals_teacher_forced': True, 'missing_key_steps': 0, 'greedy_status': {'ok': 2000, 'missing': 0, 'length': 0}, 'seconds': 4.4}
+M 51-60 {'examples': 2000, 'accuracy_teacher_forced': 1.0, 'accuracy_greedy': 1.0, 'greedy_equals_teacher_forced': True, 'missing_key_steps': 0, 'greedy_status': {'ok': 2000, 'missing': 0, 'length': 0}, 'seconds': 6.0}
+M 61-70 {'examples': 2000, 'accuracy_teacher_forced': 1.0, 'accuracy_greedy': 1.0, 'greedy_equals_teacher_forced': True, 'missing_key_steps': 0, 'greedy_status': {'ok': 2000, 'missing': 0, 'length': 0}, 'seconds': 7.7}
+M 71-80 {'examples': 2000, 'accuracy_teacher_forced': 1.0, 'accuracy_greedy': 1.0, 'greedy_equals_teacher_forced': True, 'missing_key_steps': 0, 'greedy_status': {'ok': 2000, 'missing': 0, 'length': 0}, 'seconds': 10.1}
+M 81-90 {'examples': 2000, 'accuracy_teacher_forced': 1.0, 'accuracy_greedy': 1.0, 'greedy_equals_teacher_forced': True, 'missing_key_steps': 0, 'greedy_status': {'ok': 2000, 'missing': 0, 'length': 0}, 'seconds': 11.2}
+M 91-100 {'examples': 2000, 'accuracy_teacher_forced': 1.0, 'accuracy_greedy': 1.0, 'greedy_equals_teacher_forced': True, 'missing_key_steps': 0, 'greedy_status': {'ok': 2000, 'missing': 0, 'length': 0}, 'seconds': 14.2}
+done True True 3347.3

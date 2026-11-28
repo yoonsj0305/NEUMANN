@@ -1,0 +1,55 @@
+{
+ "design": "stage3/DESIGN.md 11.5-3, 11.7, 11.10-1",
+ "task": "mulNM",
+ "program": "stage3/recomb.py mulNM",
+ "modules": {
+  "add": {
+   "H'_table": 1,
+   "S": "x_t h0@t:masked h0@t-1:masked h1@t:masked h1@t-1:masked"
+  },
+  "mul1": {
+   "H'_table": 1,
+   "S": "x_t h0@t:masked h1@t:masked h1@t-1:masked"
+  }
+ },
+ "bins": [
+  [
+   "id_1-10",
+   1,
+   10,
+   null,
+   500
+  ],
+  [
+   "ood_11-20",
+   11,
+   20,
+   null,
+   500
+  ],
+  [
+   "ood_21-30",
+   21,
+   30,
+   null,
+   500
+  ],
+  [
+   "ood_31-50",
+   31,
+   50,
+   null,
+   500
+  ],
+  [
+   "ood_51-100",
+   51,
+   100,
+   null,
+   200
+  ]
+ ],
+ "generation_seed": "L2b-0:R:mulNM:<bin label>",
+ "draw": "recomb.composite_example: n, m and every operand's digit count independent uniform in the bin, k uniform; canonical numbers",
+ "correct": "exact match of the program output with the integer result; a module call meeting a key not in T_S makes the example wrong"
+}
