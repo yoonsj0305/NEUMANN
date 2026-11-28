@@ -5,3 +5,9 @@ pair 1.0 [(0, 0, 0, 0, 0, 0, 0), (1, 0, 0, 0, 0, 2, 0)] 13
 triple 1.0 0.0
 hand {'moving_heads': [[1, 0, 0, 0, 0, 2, 0]], 'score': 1.0, 'every_hand_path_in_selected_fit_and_select': True} C1 {'1': {'compiled_moving': [[1, 0, 0, 0, 0, 2, 0], [0, 0, 3, 0, 0, 1, 0], [0, 0, 3, 0, 0, 2, 0]], 'literal_equal_on_present_classes_as_sets': False, 'every_selected_path_in_compiled': True}, '2': {'compiled_moving': [[1, 0, 0, 0, 0, 2, 0], [0, 0, 3, 0, 0, 2, 0], [0, 0, 3, 0, 0, 1, 0]], 'literal_equal_on_present_classes_as_sets': False, 'every_selected_path_in_compiled': True}, '3': {'compiled_moving': [[1, 0, 0, 0, 0, 2, 0], [0, 0, 3, 0, 0, 2, 0], [0, 0, 3, 0, 0, 1, 0]], 'literal_equal_on_present_classes_as_sets': False, 'every_selected_path_in_compiled': True}}
 H' S {'config': 'h0@t:masked', 'size': 1, 'T_S_size': 11, 'T_S_over_product_space': 1.0, 'feature_columns': [4]} 6
+closure {'sequences': 100000, 'lengths': [11, 40], 'scored_steps': 2652540, 'steps_with_key_not_in_T_S': 0, 'distinct_keys_not_in_T_S': 0, 'sequences_with_a_missing_key': 0, 'wrong_steps_on_present_keys': 0, 'seconds': 34.8}
+KL {'L': 5, 'sequences': 111110, 'scored_steps': 654320, 'wrong_steps': 0, 'missing_key_steps': 0, 'step_accuracy': 1.0, 'seconds': 3.3}
+confirm ood_11-20 {'examples': 500, 'accuracy_teacher_forced': 1.0, 'accuracy_greedy': 1.0, 'greedy_equals_teacher_forced': True}
+confirm ood_21-30 {'examples': 500, 'accuracy_teacher_forced': 1.0, 'accuracy_greedy': 1.0, 'greedy_equals_teacher_forced': True}
+confirm ood_31-40 {'examples': 500, 'accuracy_teacher_forced': 1.0, 'accuracy_greedy': 1.0, 'greedy_equals_teacher_forced': True}
+done reverse True 462.1
