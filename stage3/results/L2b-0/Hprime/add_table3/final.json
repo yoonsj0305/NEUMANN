@@ -1,0 +1,1177 @@
+{
+ "design": "stage3/DESIGN.md 11.8, 11.9, 11.10",
+ "module": "add",
+ "table": 3,
+ "compiled_table": [
+  [
+   0,
+   3,
+   1,
+   0,
+   0,
+   1,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0
+  ],
+  [
+   0,
+   3,
+   3,
+   0,
+   0,
+   1,
+   0
+  ]
+ ],
+ "moving_heads": [
+  0,
+  1,
+  2
+ ],
+ "cells": [
+  "h0@t",
+  "h0@t-1",
+  "h1@t",
+  "h1@t-1",
+  "h2@t",
+  "h2@t-1"
+ ],
+ "training_data": "T.train_set('addition', 100000, 233) (the H run of table 3 with the smallest seed)",
+ "order": "size, distinct keys on the training steps, fewer original reads, sorted feature columns",
+ "routing_11.9-1": {
+  "every_hand_moving_head_has_a_compiled_head_with_the_same_path_1.000": true,
+  "hand_head_path_equal_fraction_by_compiled_head": {
+   "0": {
+    "0": 0.0,
+    "1": 1.0,
+    "2": 0.0
+   },
+   "1": {
+    "0": 1.0,
+    "1": 0.0,
+    "2": 0.0
+   }
+  },
+  "compiled_heads_without_hand_counterpart": [
+   2
+  ]
+ },
+ "training_steps": 821391,
+ "training_distinct_rows": 305181,
+ "enumeration": {
+  "configurations": 62500,
+  "seconds": 2818.7,
+  "deterministic": 3920,
+  "by_size": {
+   "0": {
+    "configurations": 1,
+    "deterministic": 0,
+    "first_deterministic": [],
+    "fewest_keys_nondeterministic": [
+     {
+      "config": "(empty)",
+      "distinct_keys": 1
+     }
+    ]
+   },
+   "1": {
+    "configurations": 20,
+    "deterministic": 0,
+    "first_deterministic": [],
+    "fewest_keys_nondeterministic": [
+     {
+      "config": "h2@t:bit",
+      "distinct_keys": 1
+     },
+     {
+      "config": "h0@t:bit",
+      "distinct_keys": 2
+     },
+     {
+      "config": "h0@t-1:bit",
+      "distinct_keys": 2
+     }
+    ]
+   },
+   "2": {
+    "configurations": 178,
+    "deterministic": 0,
+    "first_deterministic": [],
+    "fewest_keys_nondeterministic": [
+     {
+      "config": "h0@t:bit h2@t:bit",
+      "distinct_keys": 2
+     },
+     {
+      "config": "h0@t-1:bit h2@t:bit",
+      "distinct_keys": 2
+     },
+     {
+      "config": "h1@t:bit h2@t:bit",
+      "distinct_keys": 2
+     }
+    ]
+   },
+   "3": {
+    "configurations": 930,
+    "deterministic": 0,
+    "first_deterministic": [],
+    "fewest_keys_nondeterministic": [
+     {
+      "config": "h0@t:bit h0@t-1:bit h2@t:bit",
+      "distinct_keys": 3
+     },
+     {
+      "config": "h0@t:bit h2@t:bit h2@t-1:bit",
+      "distinct_keys": 3
+     },
+     {
+      "config": "h0@t-1:bit h2@t:bit h2@t-1:bit",
+      "distinct_keys": 3
+     }
+    ]
+   },
+   "4": {
+    "configurations": 3171,
+    "deterministic": 0,
+    "first_deterministic": [],
+    "fewest_keys_nondeterministic": [
+     {
+      "config": "h0@t:bit h0@t-1:bit h2@t:bit h2@t-1:bit",
+      "distinct_keys": 4
+     },
+     {
+      "config": "h1@t:bit h1@t-1:bit h2@t:bit h2@t-1:bit",
+      "distinct_keys": 4
+     },
+     {
+      "config": "h0@t:bit h1@t:bit h2@t:bit h2@t-1:bit",
+      "distinct_keys": 5
+     }
+    ]
+   },
+   "5": {
+    "configurations": 7428,
+    "deterministic": 12,
+    "first_deterministic": [
+     {
+      "config": "x_t h0@t:masked h0@t-1:masked h1@t:masked h1@t-1:masked",
+      "distinct_keys": 24515
+     },
+     {
+      "config": "h0@t:masked h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:masked",
+      "distinct_keys": 24515
+     },
+     {
+      "config": "h0@t:masked h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:orig",
+      "distinct_keys": 24515
+     },
+     {
+      "config": "x_t h0@t:orig h0@t-1:masked h1@t:masked h1@t-1:masked",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:masked h1@t:orig h1@t-1:masked",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "h0@t:orig h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:masked",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "h0@t:masked h0@t-1:masked h1@t:orig h1@t-1:masked h2@t:masked",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "h0@t:orig h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:orig",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "h0@t:masked h0@t-1:masked h1@t:orig h1@t-1:masked h2@t:orig",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "x_t h0@t:orig h0@t-1:masked h1@t:orig h1@t-1:masked",
+      "distinct_keys": 28538
+     }
+    ],
+    "fewest_keys_nondeterministic": [
+     {
+      "config": "h0@t:bit h0@t-1:bit h1@t:bit h2@t:bit h2@t-1:bit",
+      "distinct_keys": 7
+     },
+     {
+      "config": "h0@t:bit h0@t-1:bit h1@t-1:bit h2@t:bit h2@t-1:bit",
+      "distinct_keys": 7
+     },
+     {
+      "config": "h0@t:bit h1@t:bit h1@t-1:bit h2@t:bit h2@t-1:bit",
+      "distinct_keys": 7
+     }
+    ]
+   },
+   "6": {
+    "configurations": 12275,
+    "deterministic": 112,
+    "first_deterministic": [
+     {
+      "config": "x_t h0@t:masked h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:bit",
+      "distinct_keys": 24515
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:masked",
+      "distinct_keys": 24515
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:masked h1@t:masked h1@t-1:masked h2@t-1:bit",
+      "distinct_keys": 24515
+     },
+     {
+      "config": "h0@t:masked h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:masked h2@t-1:bit",
+      "distinct_keys": 24515
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:orig",
+      "distinct_keys": 24515
+     },
+     {
+      "config": "h0@t:masked h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:orig+bit",
+      "distinct_keys": 24515
+     },
+     {
+      "config": "h0@t:masked h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:orig h2@t-1:bit",
+      "distinct_keys": 24515
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:masked h1@t:masked h1@t-1:masked",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "x_t h0@t:orig h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:bit",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "x_t h0@t:orig h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:masked",
+      "distinct_keys": 26486
+     }
+    ],
+    "fewest_keys_nondeterministic": [
+     {
+      "config": "h0@t:bit h0@t-1:bit h1@t:bit h1@t-1:bit h2@t:bit h2@t-1:bit",
+      "distinct_keys": 10
+     },
+     {
+      "config": "x_t h0@t:bit h0@t-1:bit h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 31
+     },
+     {
+      "config": "x_t h1@t:bit h1@t-1:bit h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 31
+     }
+    ]
+   },
+   "7": {
+    "configurations": 14494,
+    "deterministic": 432,
+    "first_deterministic": [
+     {
+      "config": "x_t h0@t:masked h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:bit h2@t-1:bit",
+      "distinct_keys": 24515
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:masked h2@t-1:bit",
+      "distinct_keys": 24515
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:orig+bit",
+      "distinct_keys": 24515
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:orig h2@t-1:bit",
+      "distinct_keys": 24515
+     },
+     {
+      "config": "h0@t:masked h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 24515
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:bit",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:masked",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:masked h1@t:masked h1@t-1:masked h2@t-1:bit",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "x_t h0@t:orig h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:bit h2@t-1:bit",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "x_t h0@t:orig h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:masked h2@t-1:bit",
+      "distinct_keys": 26486
+     }
+    ],
+    "fewest_keys_nondeterministic": [
+     {
+      "config": "x_t h0@t:bit h0@t-1:bit h1@t-1:bit h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 52
+     },
+     {
+      "config": "x_t h0@t-1:bit h1@t:bit h1@t-1:bit h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 52
+     },
+     {
+      "config": "x_t h0@t:bit h0@t-1:bit h1@t:bit h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 61
+     }
+    ]
+   },
+   "8": {
+    "configurations": 12275,
+    "deterministic": 900,
+    "first_deterministic": [
+     {
+      "config": "x_t h0@t:masked h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 24515
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:bit h2@t-1:bit",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:masked h2@t-1:bit",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:masked h1@t:orig+bit h1@t-1:masked h2@t:bit h2@t-1:bit",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:masked h1@t:orig+bit h1@t-1:masked h2@t:masked h2@t-1:bit",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:masked h1@t:masked h1@t-1:orig+bit h2@t:bit h2@t-1:bit",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:masked h1@t:masked h1@t-1:orig+bit h2@t:masked h2@t-1:bit",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:orig+bit",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:orig h2@t-1:bit",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "x_t h0@t:orig h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 26486
+     }
+    ],
+    "fewest_keys_nondeterministic": [
+     {
+      "config": "x_t h0@t:bit h0@t-1:bit h1@t:bit h1@t-1:bit h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 82
+     },
+     {
+      "config": "x_{t-1} h0@t:bit h0@t-1:bit h1@t:bit h1@t-1:bit h2@t:bit h2@t-1:orig+bit",
+      "distinct_keys": 104
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:bit h0@t-1:bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 330
+     }
+    ]
+   },
+   "9": {
+    "configurations": 7428,
+    "deterministic": 1111,
+    "first_deterministic": [
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:masked h1@t:masked h1@t-1:masked h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:masked h1@t:orig+bit h1@t-1:masked h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:masked h1@t:masked h1@t-1:orig+bit h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 26486
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:orig+bit h1@t:masked h1@t-1:masked h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 26495
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:orig+bit h1@t:masked h1@t-1:orig+bit h2@t:bit h2@t-1:bit",
+      "distinct_keys": 28466
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:orig+bit h1@t:masked h1@t-1:orig+bit h2@t:masked h2@t-1:bit",
+      "distinct_keys": 28466
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:orig+bit h1@t:masked h1@t-1:orig+bit h2@t:orig+bit",
+      "distinct_keys": 28466
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:orig+bit h1@t:masked h1@t-1:orig+bit h2@t:orig h2@t-1:bit",
+      "distinct_keys": 28466
+     },
+     {
+      "config": "h0@t:masked h0@t-1:orig+bit h1@t:masked h1@t-1:orig+bit h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 28466
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:masked h1@t:orig+bit h1@t-1:masked h2@t:bit h2@t-1:bit",
+      "distinct_keys": 28538
+     }
+    ],
+    "fewest_keys_nondeterministic": [
+     {
+      "config": "x_t x_{t-1} h0@t:bit h0@t-1:bit h1@t-1:bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 540
+     },
+     {
+      "config": "x_t x_{t-1} h0@t-1:bit h1@t:bit h1@t-1:bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 540
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:bit h1@t:bit h1@t-1:bit h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 550
+     }
+    ]
+   },
+   "10": {
+    "configurations": 3171,
+    "deterministic": 840,
+    "first_deterministic": [
+     {
+      "config": "x_t h0@t:masked h0@t-1:orig+bit h1@t:masked h1@t-1:orig+bit h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 28466
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:masked h1@t:orig+bit h1@t-1:masked h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 28538
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:masked h1@t:masked h1@t-1:orig+bit h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 28546
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:orig+bit h1@t:orig+bit h1@t-1:masked h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 28556
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:masked h1@t:orig+bit h1@t-1:orig+bit h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 39222
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:orig+bit h1@t:masked h1@t-1:masked h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 39235
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:orig+bit h1@t:orig+bit h1@t-1:orig+bit h2@t:bit h2@t-1:bit",
+      "distinct_keys": 41292
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:orig+bit h1@t:orig+bit h1@t-1:orig+bit h2@t:masked h2@t-1:bit",
+      "distinct_keys": 41292
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:orig+bit h1@t:orig+bit h1@t-1:orig+bit h2@t:orig+bit",
+      "distinct_keys": 41292
+     },
+     {
+      "config": "x_t h0@t:masked h0@t-1:orig+bit h1@t:orig+bit h1@t-1:orig+bit h2@t:orig h2@t-1:bit",
+      "distinct_keys": 41292
+     }
+    ],
+    "fewest_keys_nondeterministic": [
+     {
+      "config": "x_t x_{t-1} h0@t:bit h0@t-1:bit h1@t:bit h1@t-1:bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 860
+     },
+     {
+      "config": "x_t h0@t:bit h0@t-1:orig+bit h1@t:bit h1@t-1:orig+bit h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 1626
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:orig+bit h0@t-1:bit h1@t-1:bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 3501
+     }
+    ]
+   },
+   "11": {
+    "configurations": 930,
+    "deterministic": 389,
+    "first_deterministic": [
+     {
+      "config": "x_t h0@t:masked h0@t-1:orig+bit h1@t:orig+bit h1@t-1:orig+bit h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 41292
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:orig+bit h1@t:masked h1@t-1:orig+bit h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 41295
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:masked h1@t:orig+bit h1@t-1:orig+bit h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 41585
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:orig+bit h1@t:orig+bit h1@t-1:masked h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 41649
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:orig+bit h1@t:orig+bit h1@t-1:orig+bit h2@t:bit h2@t-1:bit",
+      "distinct_keys": 54696
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:orig+bit h1@t:orig+bit h1@t-1:orig+bit h2@t:masked h2@t-1:bit",
+      "distinct_keys": 54696
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:orig+bit h1@t:orig+bit h1@t-1:orig+bit h2@t:orig+bit",
+      "distinct_keys": 54696
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:orig+bit h1@t:orig+bit h1@t-1:orig+bit h2@t:orig h2@t-1:bit",
+      "distinct_keys": 54696
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:orig+bit h1@t:orig+bit h1@t-1:orig h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 54696
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:orig+bit h1@t:orig h1@t-1:orig+bit h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 54696
+     }
+    ],
+    "fewest_keys_nondeterministic": [
+     {
+      "config": "x_t x_{t-1} h0@t:orig+bit h0@t-1:bit h1@t:bit h1@t-1:bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 5706
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:bit h0@t-1:bit h1@t:orig+bit h1@t-1:bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 5710
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:bit h0@t-1:orig+bit h1@t:bit h1@t-1:bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 6699
+     }
+    ]
+   },
+   "12": {
+    "configurations": 178,
+    "deterministic": 107,
+    "first_deterministic": [
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:orig+bit h1@t:orig+bit h1@t-1:orig+bit h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 54696
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:masked h0@t-1:orig+bit h1@t:masked h1@t-1:orig+bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 184161
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:orig+bit h0@t-1:masked h1@t:masked h1@t-1:orig+bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 189200
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:masked h0@t-1:orig+bit h1@t:orig+bit h1@t-1:masked h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 189446
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:orig+bit h0@t-1:masked h1@t:orig+bit h1@t-1:masked h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 195035
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:orig+bit h0@t-1:orig+bit h1@t:masked h1@t-1:masked h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 231187
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:masked h0@t-1:masked h1@t:orig+bit h1@t-1:orig+bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 233288
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:orig+bit h1@t:masked h1@t-1:orig+bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 242194
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:orig+bit h0@t-1:orig+bit h1@t:masked h1@t-1:orig+bit h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 243004
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:orig+bit h0@t-1:orig+bit h1@t:masked h1@t-1:orig+bit h2@t:orig+bit h2@t-1:masked",
+      "distinct_keys": 243004
+     }
+    ],
+    "fewest_keys_nondeterministic": [
+     {
+      "config": "x_t x_{t-1} h0@t:bit h0@t-1:orig+bit h1@t:bit h1@t-1:orig+bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 12477
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:orig+bit h0@t-1:bit h1@t:orig+bit h1@t-1:bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 37120
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:bit h0@t-1:orig+bit h1@t:orig+bit h1@t-1:bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 38917
+     }
+    ]
+   },
+   "13": {
+    "configurations": 20,
+    "deterministic": 16,
+    "first_deterministic": [
+     {
+      "config": "x_t x_{t-1} h0@t:orig+bit h0@t-1:orig+bit h1@t:masked h1@t-1:orig+bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 243004
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:masked h0@t-1:orig+bit h1@t:orig+bit h1@t-1:orig+bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 245115
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:orig+bit h0@t-1:orig+bit h1@t:orig+bit h1@t-1:masked h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 249201
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:orig+bit h0@t-1:masked h1@t:orig+bit h1@t-1:orig+bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 251015
+     },
+     {
+      "config": "x_t h0@t:orig+bit h0@t-1:orig+bit h1@t:orig+bit h1@t-1:orig+bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 304371
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:orig+bit h0@t-1:orig+bit h1@t:orig+bit h1@t-1:orig+bit h2@t:orig+bit h2@t-1:bit",
+      "distinct_keys": 305181
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:orig+bit h0@t-1:orig+bit h1@t:orig+bit h1@t-1:orig+bit h2@t:orig+bit h2@t-1:masked",
+      "distinct_keys": 305181
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:orig+bit h0@t-1:orig+bit h1@t:orig+bit h1@t-1:orig+bit h2@t:bit h2@t-1:orig+bit",
+      "distinct_keys": 305181
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:orig+bit h0@t-1:orig+bit h1@t:orig+bit h1@t-1:orig+bit h2@t:masked h2@t-1:orig+bit",
+      "distinct_keys": 305181
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:orig+bit h0@t-1:orig+bit h1@t:orig+bit h1@t-1:orig+bit h2@t:orig+bit h2@t-1:orig",
+      "distinct_keys": 305181
+     }
+    ],
+    "fewest_keys_nondeterministic": [
+     {
+      "config": "x_t x_{t-1} h0@t:bit h0@t-1:orig+bit h1@t:orig+bit h1@t-1:orig+bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 75496
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:orig+bit h0@t-1:orig+bit h1@t:bit h1@t-1:orig+bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 76298
+     },
+     {
+      "config": "x_t x_{t-1} h0@t:orig+bit h0@t-1:orig+bit h1@t:orig+bit h1@t-1:bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 206275
+     }
+    ]
+   },
+   "14": {
+    "configurations": 1,
+    "deterministic": 1,
+    "first_deterministic": [
+     {
+      "config": "x_t x_{t-1} h0@t:orig+bit h0@t-1:orig+bit h1@t:orig+bit h1@t-1:orig+bit h2@t:orig+bit h2@t-1:orig+bit",
+      "distinct_keys": 305181
+     }
+    ],
+    "fewest_keys_nondeterministic": []
+   }
+  }
+ },
+ "S": {
+  "config": "x_t h0@t:masked h0@t-1:masked h1@t:masked h1@t-1:masked",
+  "cfg": [
+   1,
+   0,
+   [
+    2,
+    2,
+    2,
+    2,
+    0,
+    0
+   ]
+  ],
+  "size": 5,
+  "feature_columns": [
+   0,
+   4,
+   7,
+   10,
+   13
+  ],
+  "T_S_size": 24515,
+  "distinct_keys": 24515,
+  "product_space_of_observed_component_values": 175692,
+  "T_S_over_product_space": 0.13953395715228922,
+  "uses_heads_without_hand_counterpart": []
+ },
+ "closure": {
+  "sequences": 100000,
+  "lengths": [
+   4,
+   100
+  ],
+  "scored_steps": 5302111,
+  "steps_with_key_not_in_T_S": 258,
+  "distinct_keys_not_in_T_S": 3,
+  "sequences_with_a_missing_key": 258,
+  "wrong_steps_on_present_keys": 0,
+  "sequence_accuracy_teacher_forced": 0.99742,
+  "missing_keys": [
+   "x_t=9 h0@t=0 h0@t-1=9 h1@t=3 h1@t-1=9",
+   "x_t=6 h0@t=8 h0@t-1=0 h1@t=0 h1@t-1=5",
+   "x_t=8 h0@t=6 h0@t-1=8 h1@t=\u2205 h1@t-1=0"
+  ],
+  "seconds": 300.6
+ },
+ "KL": {
+  "canonical": {
+   "L": 3,
+   "sequences": 1000000,
+   "scored_steps": 4494395,
+   "wrong_steps": 10,
+   "missing_key_steps": 10,
+   "step_accuracy": 0.9999977750064246,
+   "sequence_accuracy": 0.99999,
+   "wrong_keys": [
+    {
+     "key": "x_t=8 h0@t=6 h0@t-1=8 h1@t=\u2205 h1@t-1=0",
+     "T_S": "missing",
+     "contract": "6"
+    }
+   ],
+   "seconds": 36.1
+  },
+  "all_digit_strings (record only, 11.9-3)": {
+   "L": 3,
+   "sequences": 1232100,
+   "scored_steps": 5413275,
+   "wrong_steps": 130556,
+   "missing_key_steps": 114141,
+   "step_accuracy": 0.9758822524257497,
+   "sequence_accuracy": 0.8941482022563103,
+   "wrong_keys": [
+    {
+     "key": "x_t=0 h0@t=0 h0@t-1=0 h1@t=\u2205 h1@t-1=0",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=1 h0@t=0 h0@t-1=1 h1@t=\u2205 h1@t-1=0",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=2 h0@t=0 h0@t-1=2 h1@t=\u2205 h1@t-1=0",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=3 h0@t=0 h0@t-1=3 h1@t=\u2205 h1@t-1=0",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=4 h0@t=0 h0@t-1=4 h1@t=\u2205 h1@t-1=0",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=5 h0@t=0 h0@t-1=5 h1@t=\u2205 h1@t-1=0",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=6 h0@t=0 h0@t-1=6 h1@t=\u2205 h1@t-1=0",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=7 h0@t=0 h0@t-1=7 h1@t=\u2205 h1@t-1=0",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=8 h0@t=0 h0@t-1=8 h1@t=\u2205 h1@t-1=0",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=8 h0@t=6 h0@t-1=8 h1@t=\u2205 h1@t-1=0",
+     "T_S": "missing",
+     "contract": "6"
+    },
+    {
+     "key": "x_t=9 h0@t=0 h0@t-1=9 h1@t=\u2205 h1@t-1=0",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=1 h0@t=0 h0@t-1=1 h1@t=\u2205 h1@t-1=\u2205",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=2 h0@t=0 h0@t-1=2 h1@t=\u2205 h1@t-1=\u2205",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=3 h0@t=0 h0@t-1=3 h1@t=\u2205 h1@t-1=\u2205",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=4 h0@t=0 h0@t-1=4 h1@t=\u2205 h1@t-1=\u2205",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=5 h0@t=0 h0@t-1=5 h1@t=\u2205 h1@t-1=\u2205",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=6 h0@t=0 h0@t-1=6 h1@t=\u2205 h1@t-1=\u2205",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=7 h0@t=0 h0@t-1=7 h1@t=\u2205 h1@t-1=\u2205",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=8 h0@t=0 h0@t-1=8 h1@t=\u2205 h1@t-1=\u2205",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=9 h0@t=0 h0@t-1=9 h1@t=\u2205 h1@t-1=\u2205",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=1 h0@t=0 h0@t-1=0 h1@t=\u2205 h1@t-1=1",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=2 h0@t=0 h0@t-1=1 h1@t=\u2205 h1@t-1=1",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=3 h0@t=0 h0@t-1=2 h1@t=\u2205 h1@t-1=1",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=4 h0@t=0 h0@t-1=3 h1@t=\u2205 h1@t-1=1",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=5 h0@t=0 h0@t-1=4 h1@t=\u2205 h1@t-1=1",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=6 h0@t=0 h0@t-1=5 h1@t=\u2205 h1@t-1=1",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=7 h0@t=0 h0@t-1=6 h1@t=\u2205 h1@t-1=1",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=8 h0@t=0 h0@t-1=7 h1@t=\u2205 h1@t-1=1",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=9 h0@t=0 h0@t-1=8 h1@t=\u2205 h1@t-1=1",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=1 h0@t=\u2205 h0@t-1=0 h1@t=\u2205 h1@t-1=\u2205",
+     "T_S": "missing",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=1 h0@t=0 h0@t-1=0 h1@t=\u2205 h1@t-1=\u2205",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=2 h0@t=0 h0@t-1=1 h1@t=\u2205 h1@t-1=\u2205",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=3 h0@t=0 h0@t-1=2 h1@t=\u2205 h1@t-1=\u2205",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=4 h0@t=0 h0@t-1=3 h1@t=\u2205 h1@t-1=\u2205",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=5 h0@t=0 h0@t-1=4 h1@t=\u2205 h1@t-1=\u2205",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=6 h0@t=0 h0@t-1=5 h1@t=\u2205 h1@t-1=\u2205",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=7 h0@t=0 h0@t-1=6 h1@t=\u2205 h1@t-1=\u2205",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=8 h0@t=0 h0@t-1=7 h1@t=\u2205 h1@t-1=\u2205",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=9 h0@t=0 h0@t-1=8 h1@t=\u2205 h1@t-1=\u2205",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=2 h0@t=0 h0@t-1=0 h1@t=\u2205 h1@t-1=2",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=3 h0@t=0 h0@t-1=1 h1@t=\u2205 h1@t-1=2",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=4 h0@t=0 h0@t-1=2 h1@t=\u2205 h1@t-1=2",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=5 h0@t=0 h0@t-1=3 h1@t=\u2205 h1@t-1=2",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=6 h0@t=0 h0@t-1=4 h1@t=\u2205 h1@t-1=2",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=7 h0@t=0 h0@t-1=5 h1@t=\u2205 h1@t-1=2",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=8 h0@t=0 h0@t-1=6 h1@t=\u2205 h1@t-1=2",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=9 h0@t=0 h0@t-1=7 h1@t=\u2205 h1@t-1=2",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=3 h0@t=0 h0@t-1=0 h1@t=\u2205 h1@t-1=3",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=4 h0@t=0 h0@t-1=1 h1@t=\u2205 h1@t-1=3",
+     "T_S": "0",
+     "contract": "<eos>"
+    },
+    {
+     "key": "x_t=5 h0@t=0 h0@t-1=2 h1@t=\u2205 h1@t-1=3",
+     "T_S": "0",
+     "contract": "<eos>"
+    }
+   ],
+   "seconds": 43.6
+  }
+ },
+ "admission_checks_pass": false,
+ "M": {
+  "1-10": {
+   "examples": 2000,
+   "accuracy_teacher_forced": 1.0,
+   "accuracy_greedy": 1.0,
+   "greedy_equals_teacher_forced": true,
+   "missing_key_steps": 0,
+   "greedy_status": {
+    "ok": 2000,
+    "missing": 0,
+    "length": 0
+   },
+   "seconds": 0.4
+  },
+  "11-20": {
+   "examples": 2000,
+   "accuracy_teacher_forced": 1.0,
+   "accuracy_greedy": 1.0,
+   "greedy_equals_teacher_forced": true,
+   "missing_key_steps": 0,
+   "greedy_status": {
+    "ok": 2000,
+    "missing": 0,
+    "length": 0
+   },
+   "seconds": 1.1
+  },
+  "21-30": {
+   "examples": 2000,
+   "accuracy_teacher_forced": 0.9985,
+   "accuracy_greedy": 0.9985,
+   "greedy_equals_teacher_forced": true,
+   "missing_key_steps": 3,
+   "greedy_status": {
+    "ok": 1997,
+    "missing": 3,
+    "length": 0
+   },
+   "seconds": 2.1
+  },
+  "31-40": {
+   "examples": 2000,
+   "accuracy_teacher_forced": 0.9995,
+   "accuracy_greedy": 0.9995,
+   "greedy_equals_teacher_forced": true,
+   "missing_key_steps": 1,
+   "greedy_status": {
+    "ok": 1999,
+    "missing": 1,
+    "length": 0
+   },
+   "seconds": 3.3
+  },
+  "41-50": {
+   "examples": 2000,
+   "accuracy_teacher_forced": 0.9975,
+   "accuracy_greedy": 0.9975,
+   "greedy_equals_teacher_forced": true,
+   "missing_key_steps": 5,
+   "greedy_status": {
+    "ok": 1995,
+    "missing": 5,
+    "length": 0
+   },
+   "seconds": 4.8
+  },
+  "51-60": {
+   "examples": 2000,
+   "accuracy_teacher_forced": 0.999,
+   "accuracy_greedy": 0.999,
+   "greedy_equals_teacher_forced": true,
+   "missing_key_steps": 2,
+   "greedy_status": {
+    "ok": 1998,
+    "missing": 2,
+    "length": 0
+   },
+   "seconds": 6.1
+  },
+  "61-70": {
+   "examples": 2000,
+   "accuracy_teacher_forced": 0.9945,
+   "accuracy_greedy": 0.9945,
+   "greedy_equals_teacher_forced": true,
+   "missing_key_steps": 11,
+   "greedy_status": {
+    "ok": 1989,
+    "missing": 11,
+    "length": 0
+   },
+   "seconds": 8.1
+  },
+  "71-80": {
+   "examples": 2000,
+   "accuracy_teacher_forced": 0.9925,
+   "accuracy_greedy": 0.9925,
+   "greedy_equals_teacher_forced": true,
+   "missing_key_steps": 15,
+   "greedy_status": {
+    "ok": 1985,
+    "missing": 15,
+    "length": 0
+   },
+   "seconds": 10.3
+  },
+  "81-90": {
+   "examples": 2000,
+   "accuracy_teacher_forced": 0.998,
+   "accuracy_greedy": 0.998,
+   "greedy_equals_teacher_forced": true,
+   "missing_key_steps": 4,
+   "greedy_status": {
+    "ok": 1996,
+    "missing": 4,
+    "length": 0
+   },
+   "seconds": 11.2
+  },
+  "91-100": {
+   "examples": 2000,
+   "accuracy_teacher_forced": 0.9935,
+   "accuracy_greedy": 0.9935,
+   "greedy_equals_teacher_forced": true,
+   "missing_key_steps": 13,
+   "greedy_status": {
+    "ok": 1987,
+    "missing": 13,
+    "length": 0
+   },
+   "seconds": 14.4
+  }
+ },
+ "M_all_1.000": false,
+ "seconds": 3272.4
+}
