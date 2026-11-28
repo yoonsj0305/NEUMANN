@@ -1,0 +1,29 @@
+{
+ "name": "p0_mul1__stack_rnn__s0",
+ "steps": 100000,
+ "stopped": "max steps",
+ "judgment_rule": "highest in-distribution accuracy, earliest on ties",
+ "judgment": {
+  "step": 100000,
+  "acc": {
+   "id_1-10": 0.414,
+   "ood_11-20": 0.016,
+   "ood_21-30": 0.102,
+   "ood_31-40": 0.042
+  }
+ },
+ "last": {
+  "step": 100000,
+  "acc": {
+   "id_1-10": 0.414,
+   "ood_11-20": 0.016,
+   "ood_21-30": 0.102,
+   "ood_31-40": 0.042
+  }
+ },
+ "wall_train_s": 10678.3,
+ "wall_eval_s": 3355.8,
+ "params": 76821,
+ "resumed_from_steps": [],
+ "eval_cache_frees": 89
+}
