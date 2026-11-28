@@ -1,0 +1,29 @@
+{
+ "name": "p0_even_pairs__stack_rnn__s0",
+ "steps": 2000,
+ "stopped": "early stop: in-distribution >= 0.99 at two consecutive evaluations",
+ "judgment_rule": "highest in-distribution accuracy, earliest on ties",
+ "judgment": {
+  "step": 1000,
+  "acc": {
+   "id_1-10": 1.0,
+   "ood_11-20": 0.99,
+   "ood_21-30": 0.666,
+   "ood_31-40": 0.536
+  }
+ },
+ "last": {
+  "step": 2000,
+  "acc": {
+   "id_1-10": 1.0,
+   "ood_11-20": 0.928,
+   "ood_21-30": 0.586,
+   "ood_31-40": 0.536
+  }
+ },
+ "wall_train_s": 157.3,
+ "wall_eval_s": 21.7,
+ "params": 72205,
+ "resumed_from_steps": [],
+ "eval_cache_frees": 0
+}

@@ -1,0 +1,12 @@
+train steps 674135 distinct rows 49776 8
+enumeration 62500 deterministic 12960 394
+S {'config': 'x_t h0@t:masked h1@t:masked h1@t-1:masked', 'cfg': [1, 0, [2, 0, 2, 2, 0, 0]], 'size': 4, 'feature_columns': [0, 4, 10, 13], 'T_S_size': 5160, 'distinct_keys': 5160, 'product_space_of_observed_component_values': 13310, 'T_S_over_product_space': 0.3876784372652141, 'uses_heads_without_hand_counterpart': []}
+closure {'sequences': 100000, 'lengths': (5, 50), 'scored_steps': 2654362, 'steps_with_key_not_in_T_S': 0, 'distinct_keys_not_in_T_S': 0, 'sequences_with_a_missing_key': 0, 'wrong_steps_on_present_keys': 0, 'sequence_accuracy_teacher_forced': 1.0, 'seconds': 52.7}
+KL canonical {'L': 4, 'sequences': 100000, 'scored_steps': 528559, 'wrong_steps': 0, 'missing_key_steps': 0, 'step_accuracy': 1.0, 'sequence_accuracy': 1.0, 'seconds': 3.4}
+KL all_digit_strings (record only, 11.9-3) {'L': 4, 'sequences': 111100, 'scored_steps': 576150, 'wrong_steps': 9990, 'missing_key_steps': 6841, 'step_accuracy': 0.9826607654256704, 'sequence_accuracy': 0.91008100810081, 'seconds': 3.7}
+M 1-10 {'examples': 2000, 'accuracy_teacher_forced': 1.0, 'accuracy_greedy': 1.0, 'greedy_equals_teacher_forced': True, 'missing_key_steps': 0, 'greedy_status': {'ok': 2000, 'missing': 0, 'length': 0}, 'seconds': 0.3}
+M 11-20 {'examples': 2000, 'accuracy_teacher_forced': 1.0, 'accuracy_greedy': 1.0, 'greedy_equals_teacher_forced': True, 'missing_key_steps': 0, 'greedy_status': {'ok': 2000, 'missing': 0, 'length': 0}, 'seconds': 0.6}
+M 21-30 {'examples': 2000, 'accuracy_teacher_forced': 1.0, 'accuracy_greedy': 1.0, 'greedy_equals_teacher_forced': True, 'missing_key_steps': 0, 'greedy_status': {'ok': 2000, 'missing': 0, 'length': 0}, 'seconds': 1.1}
+M 31-40 {'examples': 2000, 'accuracy_teacher_forced': 1.0, 'accuracy_greedy': 1.0, 'greedy_equals_teacher_forced': True, 'missing_key_steps': 0, 'greedy_status': {'ok': 2000, 'missing': 0, 'length': 0}, 'seconds': 1.6}
+M 41-50 {'examples': 2000, 'accuracy_teacher_forced': 1.0, 'accuracy_greedy': 1.0, 'greedy_equals_teacher_forced': True, 'missing_key_steps': 0, 'greedy_status': {'ok': 2000, 'missing': 0, 'length': 0}, 'seconds': 2.4}
+done True True 468.1
