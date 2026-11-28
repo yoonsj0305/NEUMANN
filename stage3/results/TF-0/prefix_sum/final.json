@@ -1,0 +1,557 @@
+{
+ "design": "stage3/DESIGN.md 12.3 with 12.5",
+ "task": "prefix_sum",
+ "training": "T.train_set('prefix_sum', 100000, 0)",
+ "fit_examples": 69747,
+ "select_examples": 30253,
+ "classes": [
+  0,
+  2,
+  5
+ ],
+ "columns": 216,
+ "fit_scored_steps": 348796,
+ "select_scored_steps": 302483,
+ "m_distinct_paths": 62,
+ "path_seconds": 60.9,
+ "single": {
+  "score": 1.0,
+  "column": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0
+  ],
+  "seconds": 0.2,
+  "top": [
+   {
+    "score": 1.0,
+    "column": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ]
+   },
+   {
+    "score": 1.0,
+    "column": [
+     0,
+     0,
+     1,
+     0,
+     0,
+     1,
+     0
+    ]
+   },
+   {
+    "score": 1.0,
+    "column": [
+     1,
+     0,
+     4,
+     0,
+     0,
+     1,
+     0
+    ]
+   },
+   {
+    "score": 1.0,
+    "column": [
+     5,
+     0,
+     4,
+     0,
+     0,
+     1,
+     0
+    ]
+   },
+   {
+    "score": 0.3601227176403302,
+    "column": [
+     0,
+     0,
+     1,
+     0,
+     0,
+     5,
+     0
+    ]
+   },
+   {
+    "score": 0.33689496599808916,
+    "column": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     5,
+     0
+    ]
+   },
+   {
+    "score": 0.33689496599808916,
+    "column": [
+     1,
+     0,
+     4,
+     0,
+     0,
+     5,
+     0
+    ]
+   },
+   {
+    "score": 0.33689496599808916,
+    "column": [
+     5,
+     0,
+     4,
+     0,
+     0,
+     5,
+     0
+    ]
+   },
+   {
+    "score": 0.30004661418988837,
+    "column": [
+     0,
+     0,
+     1,
+     0,
+     0,
+     3,
+     0
+    ]
+   },
+   {
+    "score": 0.2971175239600242,
+    "column": [
+     0,
+     0,
+     1,
+     0,
+     0,
+     2,
+     0
+    ]
+   }
+  ]
+ },
+ "pair": {
+  "score": 1.0,
+  "columns": [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ]
+  ],
+  "pairs": 1891,
+  "seconds": 14.6,
+  "top": [
+   {
+    "score": 1.0,
+    "columns": [
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0
+     ]
+    ]
+   },
+   {
+    "score": 1.0,
+    "columns": [
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0
+     ]
+    ]
+   },
+   {
+    "score": 1.0,
+    "columns": [
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      0,
+      4,
+      0,
+      0,
+      1,
+      0
+     ]
+    ]
+   },
+   {
+    "score": 1.0,
+    "columns": [
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      5,
+      0,
+      4,
+      0,
+      0,
+      1,
+      0
+     ]
+    ]
+   },
+   {
+    "score": 1.0,
+    "columns": [
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0
+     ],
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      3,
+      0
+     ]
+    ]
+   },
+   {
+    "score": 1.0,
+    "columns": [
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0
+     ],
+     [
+      0,
+      0,
+      3,
+      0,
+      0,
+      0,
+      0
+     ]
+    ]
+   },
+   {
+    "score": 1.0,
+    "columns": [
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0
+     ],
+     [
+      0,
+      0,
+      1,
+      0,
+      0,
+      2,
+      0
+     ]
+    ]
+   },
+   {
+    "score": 1.0,
+    "columns": [
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0
+     ],
+     [
+      0,
+      0,
+      1,
+      0,
+      0,
+      3,
+      0
+     ]
+    ]
+   },
+   {
+    "score": 1.0,
+    "columns": [
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0
+     ],
+     [
+      0,
+      0,
+      3,
+      0,
+      0,
+      1,
+      0
+     ]
+    ]
+   },
+   {
+    "score": 1.0,
+    "columns": [
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0
+     ],
+     [
+      0,
+      0,
+      3,
+      0,
+      0,
+      2,
+      0
+     ]
+    ]
+   }
+  ]
+ },
+ "triple": {
+  "score": 1.0,
+  "added_column": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   3,
+   0
+  ],
+  "gain": 0.0,
+  "seconds": 4.8
+ },
+ "selected": {
+  "heads": 1,
+  "routing": [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ]
+  ],
+  "score": 1.0,
+  "rule": "pair if pair - single >= 0.001, triple if gain >= 0.001"
+ },
+ "search_cpu_seconds": 107.8,
+ "search_wall_seconds": 110.7,
+ "hand": {
+  "moving_heads": [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ]
+  ],
+  "score": 1.0,
+  "every_hand_path_in_selected_fit_and_select": true
+ },
+ "C1_compiled": {
+  "1": {
+   "compiled_moving": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     3,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "literal_equal_on_present_classes_as_sets": false,
+   "every_selected_path_in_compiled": true
+  },
+  "2": {
+   "compiled_moving": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     3,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "literal_equal_on_present_classes_as_sets": false,
+   "every_selected_path_in_compiled": true
+  },
+  "3": {
+   "compiled_moving": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     3,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     1,
+     0,
+     0,
+     2,
+     0
+    ]
+   ],
+   "literal_equal_on_present_classes_as_sets": false,
+   "every_selected_path_in_compiled": true
+  }
+ }
+}
